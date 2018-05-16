@@ -120,7 +120,7 @@ public final class MapboxMap {
    *
    * @param outState the bundle to save the state to.
    */
-  void onSaveInstanceState(Bundle outState) {
+  void onSaveInstanceState(@NonNull Bundle outState) {
     outState.putParcelable(MapboxConstants.STATE_CAMERA_POSITION, transform.getCameraPosition());
     outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, nativeMapView.getDebug());
     outState.putString(MapboxConstants.STATE_STYLE_URL, nativeMapView.getStyleUrl());
@@ -132,7 +132,7 @@ public final class MapboxMap {
    *
    * @param savedInstanceState the bundle containing the saved state
    */
-  void onRestoreInstanceState(Bundle savedInstanceState) {
+  void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
     final CameraPosition cameraPosition = savedInstanceState.getParcelable(MapboxConstants.STATE_CAMERA_POSITION);
 
     uiSettings.onRestoreInstanceState(savedInstanceState);
@@ -266,6 +266,7 @@ public final class MapboxMap {
    *
    * @return all the layers in the current style
    */
+  @NonNull
   public List<Layer> getLayers() {
     return nativeMapView.getLayers();
   }
@@ -377,6 +378,7 @@ public final class MapboxMap {
    *
    * @return all the sources in the current style
    */
+  @NonNull
   public List<Source> getSources() {
     return nativeMapView.getSources();
   }
@@ -463,10 +465,11 @@ public final class MapboxMap {
    *
    * @param name the name of the image to remove
    */
-  public void removeImage(String name) {
+  public void removeImage(@NonNull String name) {
     nativeMapView.removeImage(name);
   }
 
+  @Nullable
   public Bitmap getImage(@NonNull String name) {
     return nativeMapView.getImage(name);
   }
@@ -537,6 +540,7 @@ public final class MapboxMap {
    *
    * @return the UiSettings associated with this map
    */
+  @NonNull
   public UiSettings getUiSettings() {
     return uiSettings;
   }
@@ -551,6 +555,7 @@ public final class MapboxMap {
    *
    * @return the Projection associated with this map
    */
+  @NonNull
   public Projection getProjection() {
     return projection;
   }
@@ -564,7 +569,7 @@ public final class MapboxMap {
    *
    * @return the global light source
    */
-  @Nullable
+  @NonNull
   public Light getLight() {
     return nativeMapView.getLight();
   }
@@ -590,6 +595,7 @@ public final class MapboxMap {
    *
    * @return The current position of the Camera.
    */
+  @NonNull
   public final CameraPosition getCameraPosition() {
     return transform.getCameraPosition();
   }
@@ -612,7 +618,7 @@ public final class MapboxMap {
    *
    * @param update The change that should be applied to the camera.
    */
-  public final void moveCamera(CameraUpdate update) {
+  public final void moveCamera(@NonNull CameraUpdate update) {
     moveCamera(update, null);
   }
 
@@ -624,7 +630,8 @@ public final class MapboxMap {
    * @param update   The change that should be applied to the camera
    * @param callback the callback to be invoked when an animation finishes or is canceled
    */
-  public final void moveCamera(final CameraUpdate update, final MapboxMap.CancelableCallback callback) {
+  public final void moveCamera(@NonNull final CameraUpdate update,
+                               @Nullable final MapboxMap.CancelableCallback callback) {
     transform.moveCamera(MapboxMap.this, update, callback);
   }
 
@@ -650,7 +657,7 @@ public final class MapboxMap {
    *                   positive, otherwise an IllegalArgumentException will be thrown.
    * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
    */
-  public final void easeCamera(CameraUpdate update, int durationMs) {
+  public final void easeCamera(@NonNull CameraUpdate update, int durationMs) {
     easeCamera(update, durationMs, null);
   }
 
@@ -673,7 +680,8 @@ public final class MapboxMap {
    *                   Do not update or ease the camera from within onCancel().
    * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
    */
-  public final void easeCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
+  public final void easeCamera(@NonNull CameraUpdate update, int durationMs,
+                               @Nullable final MapboxMap.CancelableCallback callback) {
     easeCamera(update, durationMs, true, callback);
   }
 
@@ -691,7 +699,7 @@ public final class MapboxMap {
    *                           positive, otherwise an IllegalArgumentException will be thrown.
    * @param easingInterpolator True for easing interpolator, false for linear.
    */
-  public final void easeCamera(CameraUpdate update, int durationMs, boolean easingInterpolator) {
+  public final void easeCamera(@NonNull CameraUpdate update, int durationMs, boolean easingInterpolator) {
     easeCamera(update, durationMs, easingInterpolator, null);
   }
 
@@ -711,8 +719,10 @@ public final class MapboxMap {
    *                           by a later camera movement or a user gesture, onCancel() will be called.
    *                           Do not update or ease the camera from within onCancel().
    */
-  public final void easeCamera(final CameraUpdate update, final int durationMs, final boolean easingInterpolator,
-                               final MapboxMap.CancelableCallback callback) {
+  public final void easeCamera(@NonNull final CameraUpdate update,
+                               final int durationMs,
+                               final boolean easingInterpolator,
+                               @Nullable final MapboxMap.CancelableCallback callback) {
     easeCamera(update, durationMs, easingInterpolator, callback, false);
   }
 
@@ -733,8 +743,9 @@ public final class MapboxMap {
    *                           Do not update or ease the camera from within onCancel().
    * @param isDismissable      true will allow animated camera changes dismiss a tracking mode.
    */
-  public final void easeCamera(final CameraUpdate update, final int durationMs, final boolean easingInterpolator,
-                               final MapboxMap.CancelableCallback callback, final boolean isDismissable) {
+  public final void easeCamera(@NonNull final CameraUpdate update, final int durationMs,
+                               final boolean easingInterpolator, @Nullable final MapboxMap.CancelableCallback callback,
+                               final boolean isDismissable) {
 
     if (durationMs <= 0) {
       throw new IllegalArgumentException("Null duration passed into easeCamera");
@@ -751,7 +762,7 @@ public final class MapboxMap {
    * @param update The change that should be applied to the camera.
    * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
    */
-  public final void animateCamera(CameraUpdate update) {
+  public final void animateCamera(@NonNull CameraUpdate update) {
     animateCamera(update, MapboxConstants.ANIMATION_DURATION, null);
   }
 
@@ -767,7 +778,7 @@ public final class MapboxMap {
    *                 called. Do not update or animate the camera from within onCancel().
    * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
    */
-  public final void animateCamera(CameraUpdate update, MapboxMap.CancelableCallback callback) {
+  public final void animateCamera(@NonNull CameraUpdate update, @Nullable MapboxMap.CancelableCallback callback) {
     animateCamera(update, MapboxConstants.ANIMATION_DURATION, callback);
   }
 
@@ -782,7 +793,7 @@ public final class MapboxMap {
    *                   positive, otherwise an IllegalArgumentException will be thrown.
    * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
    */
-  public final void animateCamera(CameraUpdate update, int durationMs) {
+  public final void animateCamera(@NonNull CameraUpdate update, int durationMs) {
     animateCamera(update, durationMs, null);
   }
 
@@ -804,8 +815,8 @@ public final class MapboxMap {
    *                   isn't required, leave it as null.
    * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
    */
-  public final void animateCamera(final CameraUpdate update, final int durationMs,
-                                  final MapboxMap.CancelableCallback callback) {
+  public final void animateCamera(@NonNull final CameraUpdate update, final int durationMs,
+                                  @Nullable final MapboxMap.CancelableCallback callback) {
     if (durationMs <= 0) {
       throw new IllegalArgumentException("Null duration passed into animageCamera");
     }
@@ -1069,6 +1080,7 @@ public final class MapboxMap {
    *
    * @return The json of the map style
    */
+  @NonNull
   public String getStyleJson() {
     return nativeMapView.getStyleJson();
   }
@@ -1232,7 +1244,7 @@ public final class MapboxMap {
    *
    * @param polyline An updated polyline object.
    */
-  public void updatePolyline(Polyline polyline) {
+  public void updatePolyline(@NonNull Polyline polyline) {
     annotationManager.updatePolyline(polyline);
   }
 
@@ -1263,7 +1275,7 @@ public final class MapboxMap {
    *
    * @param polygon An updated polygon object
    */
-  public void updatePolygon(Polygon polygon) {
+  public void updatePolygon(@NonNull Polygon polygon) {
     annotationManager.updatePolygon(polygon);
   }
 
@@ -1468,6 +1480,7 @@ public final class MapboxMap {
    *
    * @return The currently selected marker.
    */
+  @NonNull
   public List<Marker> getSelectedMarkers() {
     return annotationManager.getSelectedMarkers();
   }
@@ -1477,6 +1490,7 @@ public final class MapboxMap {
    *
    * @return the associated MarkerViewManager
    */
+  @NonNull
   public MarkerViewManager getMarkerViewManager() {
     return annotationManager.getMarkerViewManager();
   }
@@ -1550,6 +1564,7 @@ public final class MapboxMap {
    * @param padding      the padding to apply to the bounds
    * @return the camera position that fits the bounds and padding
    */
+  @NonNull
   public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds, int[] padding) {
     // get padded camera position from LatLngBounds
     return nativeMapView.getCameraForLatLngBounds(latLngBounds, padding);
@@ -1563,6 +1578,7 @@ public final class MapboxMap {
    * @param padding  the padding to apply to the bounds
    * @return the camera position that fits the bounds and padding
    */
+  @NonNull
   public CameraPosition getCameraForGeometry(Geometry geometry, double bearing, int[] padding) {
     // get padded camera position from Geometry
     return nativeMapView.getCameraForGeometry(geometry, bearing, padding);
@@ -1591,11 +1607,7 @@ public final class MapboxMap {
    * @param bottom The bottom margin in pixels.
    */
   public void setPadding(int left, int top, int right, int bottom) {
-    setPadding(new int[] {left, top, right, bottom});
-  }
-
-  private void setPadding(int[] padding) {
-    projection.setContentPadding(padding);
+    projection.setContentPadding(new int[] {left, top, right, bottom});
     uiSettings.invalidate();
   }
 
@@ -1604,6 +1616,7 @@ public final class MapboxMap {
    *
    * @return An array with length 4 in the LTRB order.
    */
+  @NonNull
   public int[] getPadding() {
     return projection.getContentPadding();
   }
@@ -1755,6 +1768,7 @@ public final class MapboxMap {
   }
 
   // used by MapView
+  @Nullable
   OnFpsChangedListener getOnFpsChangedListener() {
     return onFpsChangedListener;
   }
@@ -1902,7 +1916,7 @@ public final class MapboxMap {
    *                                     will be added to the passed gestures manager.
    * @see <a href="https://github.com/mapbox/mapbox-gestures-android">mapbox-gestures-android library</a>
    */
-  public void setGesturesManager(AndroidGesturesManager androidGesturesManager, boolean attachDefaultListeners,
+  public void setGesturesManager(@NonNull AndroidGesturesManager androidGesturesManager, boolean attachDefaultListeners,
                                  boolean setDefaultMutuallyExclusives) {
     onGesturesManagerInteractionListener.setGesturesManager(
       androidGesturesManager, attachDefaultListeners, setDefaultMutuallyExclusives);
@@ -1914,6 +1928,7 @@ public final class MapboxMap {
    *
    * @return Current gestures manager.
    */
+  @NonNull
   public AndroidGesturesManager getGesturesManager() {
     return onGesturesManagerInteractionListener.getGesturesManager();
   }
@@ -2000,6 +2015,7 @@ public final class MapboxMap {
    *
    * @return Current active InfoWindow Click Listener
    */
+  @Nullable
   public OnInfoWindowClickListener getOnInfoWindowClickListener() {
     return annotationManager.getInfoWindowManager().getOnInfoWindowClickListener();
   }
@@ -2020,6 +2036,7 @@ public final class MapboxMap {
    *
    * @return Current active InfoWindow long Click Listener
    */
+  @Nullable
   public OnInfoWindowLongClickListener getOnInfoWindowLongClickListener() {
     return annotationManager.getInfoWindowManager().getOnInfoWindowLongClickListener();
   }
@@ -2038,6 +2055,7 @@ public final class MapboxMap {
    *
    * @return Current active InfoWindow Close Listener
    */
+  @Nullable
   public OnInfoWindowCloseListener getOnInfoWindowCloseListener() {
     return annotationManager.getInfoWindowManager().getOnInfoWindowCloseListener();
   }
@@ -2147,11 +2165,11 @@ public final class MapboxMap {
    * @see MapboxMap#addOnMoveListener(OnMoveListener)
    */
   public interface OnMoveListener {
-    void onMoveBegin(MoveGestureDetector detector);
+    void onMoveBegin(@NonNull MoveGestureDetector detector);
 
-    void onMove(MoveGestureDetector detector);
+    void onMove(@NonNull MoveGestureDetector detector);
 
-    void onMoveEnd(MoveGestureDetector detector);
+    void onMoveEnd(@NonNull MoveGestureDetector detector);
   }
 
   /**
@@ -2160,11 +2178,11 @@ public final class MapboxMap {
    * @see MapboxMap#addOnRotateListener(OnRotateListener)
    */
   public interface OnRotateListener {
-    void onRotateBegin(RotateGestureDetector detector);
+    void onRotateBegin(@NonNull RotateGestureDetector detector);
 
-    void onRotate(RotateGestureDetector detector);
+    void onRotate(@NonNull RotateGestureDetector detector);
 
-    void onRotateEnd(RotateGestureDetector detector);
+    void onRotateEnd(@NonNull RotateGestureDetector detector);
   }
 
   /**
@@ -2173,11 +2191,11 @@ public final class MapboxMap {
    * @see MapboxMap#addOnScaleListener(OnScaleListener)
    */
   public interface OnScaleListener {
-    void onScaleBegin(StandardScaleGestureDetector detector);
+    void onScaleBegin(@NonNull StandardScaleGestureDetector detector);
 
-    void onScale(StandardScaleGestureDetector detector);
+    void onScale(@NonNull StandardScaleGestureDetector detector);
 
-    void onScaleEnd(StandardScaleGestureDetector detector);
+    void onScaleEnd(@NonNull StandardScaleGestureDetector detector);
   }
 
   /**
@@ -2186,11 +2204,11 @@ public final class MapboxMap {
    * @see MapboxMap#addOnShoveListener(OnShoveListener)
    */
   public interface OnShoveListener {
-    void onShoveBegin(ShoveGestureDetector detector);
+    void onShoveBegin(@NonNull ShoveGestureDetector detector);
 
-    void onShove(ShoveGestureDetector detector);
+    void onShove(@NonNull ShoveGestureDetector detector);
 
-    void onShoveEnd(ShoveGestureDetector detector);
+    void onShoveEnd(@NonNull ShoveGestureDetector detector);
   }
 
   /**
@@ -2442,7 +2460,7 @@ public final class MapboxMap {
      *
      * @param marker The marker were the info window is attached to
      */
-    void onInfoWindowLongClick(Marker marker);
+    void onInfoWindowLongClick(@NonNull Marker marker);
   }
 
   /**
@@ -2457,7 +2475,7 @@ public final class MapboxMap {
      *
      * @param marker The marker of the info window that was closed.
      */
-    void onInfoWindowClose(Marker marker);
+    void onInfoWindowClose(@NonNull Marker marker);
   }
 
   /**
@@ -2637,7 +2655,7 @@ public final class MapboxMap {
      *
      * @param snapshot the snapshot bitmap
      */
-    void onSnapshotReady(Bitmap snapshot);
+    void onSnapshotReady(@NonNull Bitmap snapshot);
   }
 
   /**
@@ -2649,12 +2667,13 @@ public final class MapboxMap {
      *
      * @param style the style that has been loaded
      */
-    void onStyleLoaded(String style);
+    void onStyleLoaded(@NonNull String style);
   }
 
   //
   // Used for instrumentation testing
   //
+  @NonNull
   Transform getTransform() {
     return transform;
   }

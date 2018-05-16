@@ -43,14 +43,16 @@ public class Projection {
   /**
    * Returns the spherical Mercator projected meters for a LatLng.
    */
-  public ProjectedMeters getProjectedMetersForLatLng(LatLng latLng) {
+  @NonNull
+  public ProjectedMeters getProjectedMetersForLatLng(@NonNull LatLng latLng) {
     return nativeMapView.projectedMetersForLatLng(latLng);
   }
 
   /**
    * Returns the LatLng for a spherical Mercator projected meters.
    */
-  public LatLng getLatLngForProjectedMeters(ProjectedMeters projectedMeters) {
+  @NonNull
+  public LatLng getLatLngForProjectedMeters(@NonNull ProjectedMeters projectedMeters) {
     return nativeMapView.latLngForProjectedMeters(projectedMeters);
   }
 
@@ -77,7 +79,8 @@ public class Projection {
    * @return The LatLng corresponding to the point on the screen, or null if the ray through
    * the given screen point does not intersect the ground plane.
    */
-  public LatLng fromScreenLocation(PointF point) {
+  @NonNull
+  public LatLng fromScreenLocation(@NonNull PointF point) {
     return nativeMapView.latLngForPixel(point);
   }
 
@@ -87,6 +90,7 @@ public class Projection {
    *
    * @return The projection of the viewing frustum in its current state.
    */
+  @NonNull
   public VisibleRegion getVisibleRegion() {
     float left = 0;
     float right = nativeMapView.getWidth();
@@ -151,7 +155,8 @@ public class Projection {
    * @param location A LatLng on the map to convert to a screen location.
    * @return A Point representing the screen location in screen pixels.
    */
-  public PointF toScreenLocation(LatLng location) {
+  @NonNull
+  public PointF toScreenLocation(@NonNull LatLng location) {
     return nativeMapView.pixelForLatLng(location);
   }
 
