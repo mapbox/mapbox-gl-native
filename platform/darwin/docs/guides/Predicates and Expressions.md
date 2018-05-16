@@ -536,6 +536,7 @@ expression that contains references to those variables.
    An input expression, then any number of argument pairs, followed by a default
    expression. Each argument pair consists of a constant value followed by an
    expression to produce as a result of matching that constant value.
+   An input value can be either a constant or aggregate expression.
 </dd>
 </dl>
 
