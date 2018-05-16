@@ -465,6 +465,8 @@ void NodeMap::renderFinished() {
     assert(!callback);
     assert(!image.data);
 
+    Nan::AsyncResource resource("mbgl:NodeMap.renderFinished", handle());
+
     if (error) {
         std::string errorMessage;
 
@@ -482,7 +484,7 @@ void NodeMap::renderFinished() {
         error = nullptr;
         assert(!error);
 
-        cb->Call(1, argv);
+        cb->Call(1, argv, &resource);
     } else if (img.data) {
         v8::Local<v8::Object> pixels = Nan::NewBuffer(
             reinterpret_cast<char *>(img.data.get()), img.bytes(),
@@ -498,12 +500,12 @@ void NodeMap::renderFinished() {
             Nan::Null(),
             pixels
         };
-        cb->Call(2, argv);
+        cb->Call(2, argv, &resource);
     } else {
         v8::Local<v8::Value> argv[] = {
             Nan::Error("Didn't get an image")
         };
-        cb->Call(1, argv);
+        cb->Call(1, argv, &resource);
     }
 }
 
@@ -1180,7 +1182,7 @@ NodeMap::~NodeMap() {
     if (map) release();
 }
 
-std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resource, mbgl::FileSource::Callback callback_) {
+std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resource, mbgl::FileSource::Callback fileSourceCallback) {
     Nan::HandleScope scope;
     // Because this method may be called while this NodeMap is already eligible for garbage collection,
     // we need to explicitly hold onto our own handle here so that GC during a v8 call doesn't destroy
@@ -1189,7 +1191,7 @@ std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resou
 
     v8::Local<v8::Value> argv[] = {
         Nan::New<v8::External>(this),
-        Nan::New<v8::External>(&callback_)
+        Nan::New<v8::External>(&fileSourceCallback)
     };
 
     auto instance = Nan::New(NodeRequest::constructor)->NewInstance(2, argv);
