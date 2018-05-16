@@ -23,7 +23,6 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
-
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.telemetry.AppUserTurnstile;
 import com.mapbox.android.telemetry.Event;
@@ -43,6 +42,8 @@ import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
@@ -50,9 +51,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
@@ -598,10 +596,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    * @param listener The callback that's invoked on every frame rendered to the map view.
    * @see MapView#removeOnMapChangedListener(OnMapChangedListener)
    */
-  public void addOnMapChangedListener(@Nullable OnMapChangedListener listener) {
-    if (listener != null) {
-      onMapChangedListeners.add(listener);
-    }
+  public void addOnMapChangedListener(@NonNull OnMapChangedListener listener) {
+    onMapChangedListeners.add(listener);
   }
 
   /**
@@ -610,8 +606,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    * @param listener The previously added callback to remove.
    * @see MapView#addOnMapChangedListener(OnMapChangedListener)
    */
-  public void removeOnMapChangedListener(@Nullable OnMapChangedListener listener) {
-    if (listener != null && onMapChangedListeners.contains(listener)) {
+  public void removeOnMapChangedListener(@NonNull OnMapChangedListener listener) {
+    if (onMapChangedListeners.contains(listener)) {
       onMapChangedListeners.remove(listener);
     }
   }
@@ -622,13 +618,11 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    * @param callback The callback object that will be triggered when the map is ready to be used.
    */
   @UiThread
-  public void getMapAsync(final OnMapReadyCallback callback) {
-    if (!mapCallback.isInitialLoad() && callback != null) {
+  public void getMapAsync(final @NonNull OnMapReadyCallback callback) {
+    if (!mapCallback.isInitialLoad()) {
       callback.onMapReady(mapboxMap);
     } else {
-      if (callback != null) {
-        mapCallback.addOnMapReadyCallback(callback);
-      }
+      mapCallback.addOnMapReadyCallback(callback);
     }
   }
 
