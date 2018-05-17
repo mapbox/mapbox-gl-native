@@ -11,8 +11,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSString *)preferredMapboxStreetsLanguage;
 + (nullable NSString *)preferredMapboxStreetsLanguageForPreferences:(NSArray<NSString *> *)preferencesArray;
 
-- (NSDictionary<NSString *, NSString *> *)localizedKeysByKeyForPreferredLanguage:(nullable NSString *)preferredLanguage;
-
 @end
 
 NS_ASSUME_NONNULL_END

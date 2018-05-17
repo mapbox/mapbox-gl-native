@@ -5,9 +5,11 @@
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/style/expression/compound_expression.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
+using namespace mbgl::style::expression;
 
 static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vector<std::unique_ptr<Layer>>& layers) {
     std::vector<std::unique_ptr<RenderLayer>> result;
@@ -39,7 +41,8 @@ TEST(GroupByLayout, UnrelatedFilter) {
     std::vector<std::unique_ptr<Layer>> layers;
     layers.push_back(std::make_unique<LineLayer>("a", "source"));
     layers.push_back(std::make_unique<LineLayer>("b", "source"));
-    layers[0]->as<LineLayer>()->setFilter(EqualsFilter());
+    ParsingContext context;
+    layers[0]->as<LineLayer>()->setFilter(Filter(createCompoundExpression("filter-has-id", context)));
     auto result = groupByLayout(toRenderLayers(layers));
     ASSERT_EQ(2u, result.size());
 }

@@ -7,6 +7,8 @@
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/expression/compound_expression.hpp>
+#include <mbgl/style/expression/literal.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
@@ -619,6 +621,9 @@ void GLFWView::onDidFinishLoadingStyle() {
 }
 
 void GLFWView::toggle3DExtrusions(bool visible) {
+    using namespace mbgl::style;
+    using namespace mbgl::style::expression;
+    
     show3DExtrusions = visible;
 
     // Satellite-only style does not contain building extrusions data.
@@ -634,7 +639,9 @@ void GLFWView::toggle3DExtrusions(bool visible) {
     auto extrusionLayer = std::make_unique<mbgl::style::FillExtrusionLayer>("3d-buildings", "composite");
     extrusionLayer->setSourceLayer("building");
     extrusionLayer->setMinZoom(15.0f);
-    extrusionLayer->setFilter(mbgl::style::EqualsFilter { "extrude", { std::string("true") } });
+    
+    ParsingContext parsingContext;
+    extrusionLayer->setFilter(Filter(createCompoundExpression("filter-==", createLiteral("extrude"), createLiteral("true"), parsingContext)));
 
     auto colorFn = mbgl::style::SourceFunction<mbgl::Color> { "height",
         mbgl::style::ExponentialStops<mbgl::Color> {

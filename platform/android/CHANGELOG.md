@@ -2,6 +2,12 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.1.2
+ - `"to-string"` expression operator converts `null` to empty string rather than to `"null"` [#11904](https://github.com/mapbox/mapbox-gl-native/pull/11904)
+
+## 6.1.1 - May 7, 2018
+ - Update telemetry to 3.1.0 [#11855](https://github.com/mapbox/mapbox-gl-native/pull/11855)
+
 ## 6.1.0 - May 4, 2018
  - Unwrap LatLngBounds during JNI conversion [#11807](https://github.com/mapbox/mapbox-gl-native/pull/11807)
  - Check if renderer is not destroyed before delivering snapshot [#11800](https://github.com/mapbox/mapbox-gl-native/pull/11800)

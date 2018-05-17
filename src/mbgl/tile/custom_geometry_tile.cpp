@@ -3,7 +3,6 @@
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/actor/scheduler.hpp>
-#include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/tile/tile_observer.hpp>
 #include <mbgl/style/custom_tile_loader.hpp>

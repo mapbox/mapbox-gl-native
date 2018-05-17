@@ -109,6 +109,14 @@ mbgl::Value Literal::serialize() const {
         return *fromExpressionValue<mbgl::Value>(value);
     }
 }
+    
+std::unique_ptr<Literal> createLiteral(const char* value) {
+    return createLiteral(std::string(value));
+}
+
+std::unique_ptr<Literal> createLiteral(Value value) {
+    return std::make_unique<Literal>(value);
+}
 
 } // namespace expression
 } // namespace style

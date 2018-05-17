@@ -151,7 +151,7 @@ MGL_EXPORT
  value will also affect the 1pt stroke around the fill, if the stroke is used.
  
  The default value of this property is an expression that evaluates to the float
- 1. Set this property to `nil` to reset it to the default value.
+ `1`. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  

@@ -50,6 +50,35 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
     const Properties<>::PossiblyEvaluated properties;
     const BackgroundProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
+    auto draw = [&](auto& program, auto&& uniformValues) {
+        const auto allUniformValues = program.computeAllUniformValues(
+            std::move(uniformValues),
+            paintAttributeData,
+            properties,
+            parameters.state.getZoom()
+        );
+        const auto allAttributeBindings = program.computeAllAttributeBindings(
+            parameters.staticData.tileVertexBuffer,
+            paintAttributeData,
+            properties
+        );
+
+        checkRenderability(parameters, program.activeBindingCount(allAttributeBindings));
+
+        program.draw(
+            parameters.context,
+            gl::Triangles(),
+            parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+            gl::StencilMode::disabled(),
+            parameters.colorModeForRenderPass(),
+            parameters.staticData.quadTriangleIndexBuffer,
+            parameters.staticData.tileTriangleSegments,
+            allUniformValues,
+            allAttributeBindings,
+            getID()
+        );
+    };
+
     if (!evaluated.get<BackgroundPattern>().to.empty()) {
         optional<ImagePosition> imagePosA = parameters.imageManager.getPattern(evaluated.get<BackgroundPattern>().from);
         optional<ImagePosition> imagePosB = parameters.imageManager.getPattern(evaluated.get<BackgroundPattern>().to);
@@ -60,12 +89,8 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
         parameters.imageManager.bind(parameters.context, 0);
 
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
-            parameters.programs.backgroundPattern.draw(
-                parameters.context,
-                gl::Triangles(),
-                parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
-                gl::StencilMode::disabled(),
-                parameters.colorModeForRenderPass(),
+            draw(
+                parameters.programs.backgroundPattern,
                 BackgroundPatternUniforms::values(
                     parameters.matrixForTile(tileID),
                     evaluated.get<BackgroundOpacity>(),
@@ -75,36 +100,18 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
                     evaluated.get<BackgroundPattern>(),
                     tileID,
                     parameters.state
-                ),
-                parameters.staticData.tileVertexBuffer,
-                parameters.staticData.quadTriangleIndexBuffer,
-                parameters.staticData.tileTriangleSegments,
-                paintAttributeData,
-                properties,
-                parameters.state.getZoom(),
-                getID()
+                )
             );
         }
     } else {
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
-            parameters.programs.background.draw(
-                parameters.context,
-                gl::Triangles(),
-                parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
-                gl::StencilMode::disabled(),
-                parameters.colorModeForRenderPass(),
+            draw(
+                parameters.programs.background,
                 BackgroundProgram::UniformValues {
                     uniforms::u_matrix::Value{ parameters.matrixForTile(tileID) },
                     uniforms::u_color::Value{ evaluated.get<BackgroundColor>() },
                     uniforms::u_opacity::Value{ evaluated.get<BackgroundOpacity>() },
-                },
-                parameters.staticData.tileVertexBuffer,
-                parameters.staticData.quadTriangleIndexBuffer,
-                parameters.staticData.tileTriangleSegments,
-                paintAttributeData,
-                properties,
-                parameters.state.getZoom(),
-                getID()
+                }
             );
         }
     }
