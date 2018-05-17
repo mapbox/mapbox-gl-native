@@ -54,6 +54,8 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
         width = videoMode->width;
         height = videoMode->height;
     }
+    width = 800;
+    height = 500;
 
     glfwWindowHint(GLFW_COCOA_GRAPHICS_SWITCHING, GL_TRUE);
 
@@ -525,6 +527,14 @@ void GLFWView::run() {
         }
 
         glfwPollEvents();
+        auto *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
+        if ((frameCount / 30) % 2 == 0) {
+            view->map->setLatLng(mbgl::LatLng(0, 170));
+        } else {
+            view->map->setLatLng(mbgl::LatLng(0, -170));
+        }
+
+        frameCount++;
 
         if (dirty && rendererFrontend) {
             dirty = false;

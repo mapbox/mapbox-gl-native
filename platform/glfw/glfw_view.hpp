@@ -107,6 +107,7 @@ private:
     int frames = 0;
     float frameTime = 0;
     double lastReported = 0;
+    int frameCount = 0;
 
     int width = 1024;
     int height = 768;
