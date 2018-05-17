@@ -113,7 +113,7 @@ public:
     
     void dumpDebugLogs() const;
 
-    const OverscaledTileID id;
+    OverscaledTileID id;
     optional<Timestamp> modified;
     optional<Timestamp> expires;
 

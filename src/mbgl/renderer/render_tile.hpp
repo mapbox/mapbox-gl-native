@@ -22,7 +22,7 @@ public:
     RenderTile& operator=(const RenderTile&) = delete;
     RenderTile& operator=(RenderTile&&) = default;
 
-    const UnwrappedTileID id;
+    UnwrappedTileID id;
     Tile& tile;
     ClipID clip;
     mat4 matrix;
