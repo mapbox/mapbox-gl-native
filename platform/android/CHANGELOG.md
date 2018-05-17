@@ -2,8 +2,13 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
-## 6.1.2
+## 6.2.0-alpha.1 - May 17, 2018
+
  - `"to-string"` expression operator converts `null` to empty string rather than to `"null"` [#11904](https://github.com/mapbox/mapbox-gl-native/pull/11904)
+ - Expose MapView#setOfflineRegion [#1922](https://github.com/mapbox/mapbox-gl-native/pull/11922)
+ - Add nullability annotations to public API for kotlin language integration [#11925](https://github.com/mapbox/mapbox-gl-native/pull/11925)
+ - Expose MapView created callbacks on MapFragment and SupportMapFragment [#11934](https://github.com/mapbox/mapbox-gl-native/pull/11934)
+ - Update mapbox-java to 3.1.0 [#11916](https://github.com/mapbox/mapbox-gl-native/pull/11916)
 
 ## 6.1.1 - May 7, 2018
  - Update telemetry to 3.1.0 [#11855](https://github.com/mapbox/mapbox-gl-native/pull/11855)
