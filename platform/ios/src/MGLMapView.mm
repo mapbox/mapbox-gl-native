@@ -3410,7 +3410,7 @@ public:
 
 - (CGPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(nullable UIView *)view
 {
-    if ( ! CLLocationCoordinate2DIsValid(coordinate))
+    if ( ! MGLLocationCoordinate2DIsValid(coordinate))
     {
         return CGPointMake(NAN, NAN);
     }
@@ -3431,7 +3431,7 @@ public:
 
 - (CGRect)convertCoordinateBounds:(MGLCoordinateBounds)bounds toRectToView:(nullable UIView *)view
 {
-    if ( ! CLLocationCoordinate2DIsValid(bounds.sw) || ! CLLocationCoordinate2DIsValid(bounds.ne))
+    if ( ! MGLLocationCoordinate2DIsValid(bounds.sw) || ! MGLLocationCoordinate2DIsValid(bounds.ne))
     {
         return CGRectNull;
     }
