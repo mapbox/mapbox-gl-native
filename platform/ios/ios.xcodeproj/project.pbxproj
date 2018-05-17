@@ -98,7 +98,7 @@
 		353AFA171D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 353AFA131D65AB17005A69F4 /* NSDate+MGLAdditions.mm */; };
 		353BAEF61D646370009A8DA9 /* amsterdam.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 353BAEF51D646370009A8DA9 /* amsterdam.geojson */; };
 		353BAEF71D646370009A8DA9 /* amsterdam.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 353BAEF51D646370009A8DA9 /* amsterdam.geojson */; };
-		353D23961D0B0DFE002BE09D /* MGLAnnotationViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.m */; };
+		353D23961D0B0DFE002BE09D /* MGLAnnotationViewTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.mm */; };
 		354B83961D2E873E005D9406 /* MGLUserLocationAnnotationView.h in Headers */ = {isa = PBXBuildFile; fileRef = 354B83941D2E873E005D9406 /* MGLUserLocationAnnotationView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		354B83971D2E873E005D9406 /* MGLUserLocationAnnotationView.h in Headers */ = {isa = PBXBuildFile; fileRef = 354B83941D2E873E005D9406 /* MGLUserLocationAnnotationView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		354B83981D2E873E005D9406 /* MGLUserLocationAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 354B83951D2E873E005D9406 /* MGLUserLocationAnnotationView.m */; };
@@ -790,7 +790,7 @@
 		353AFA121D65AB17005A69F4 /* NSDate+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+MGLAdditions.h"; sourceTree = "<group>"; };
 		353AFA131D65AB17005A69F4 /* NSDate+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSDate+MGLAdditions.mm"; sourceTree = "<group>"; };
 		353BAEF51D646370009A8DA9 /* amsterdam.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = amsterdam.geojson; path = ../../darwin/test/amsterdam.geojson; sourceTree = "<group>"; };
-		353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLAnnotationViewTests.m; sourceTree = "<group>"; };
+		353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAnnotationViewTests.mm; sourceTree = "<group>"; };
 		354B83941D2E873E005D9406 /* MGLUserLocationAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationAnnotationView.h; sourceTree = "<group>"; };
 		354B83951D2E873E005D9406 /* MGLUserLocationAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLUserLocationAnnotationView.m; sourceTree = "<group>"; };
 		354B839A1D2E9B48005D9406 /* MBXUserLocationAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXUserLocationAnnotationView.h; sourceTree = "<group>"; };
@@ -1812,7 +1812,7 @@
 				4031ACFD1E9FD26900A3EA26 /* Test Helpers */,
 				409F43FB1E9E77D10048729D /* Swift Integration */,
 				357579811D502AD4000B822E /* Styling */,
-				353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.m */,
+				353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.mm */,
 				DAEDC4331D603417000224FF /* MGLAttributionInfoTests.m */,
 				DA35A2C31CCA9F8300E826B2 /* MGLClockDirectionFormatterTests.m */,
 				35D9DDE11DA25EEC00DAAD69 /* MGLCodingTests.m */,
@@ -2883,7 +2883,7 @@
 				DA35A2AA1CCA058D00E826B2 /* MGLCoordinateFormatterTests.m in Sources */,
 				357579831D502AE6000B822E /* MGLRasterStyleLayerTests.mm in Sources */,
 				DAF25720201902BC00367EF5 /* MGLHillshadeStyleLayerTests.mm in Sources */,
-				353D23961D0B0DFE002BE09D /* MGLAnnotationViewTests.m in Sources */,
+				353D23961D0B0DFE002BE09D /* MGLAnnotationViewTests.mm in Sources */,
 				35E208A71D24210F00EC9A46 /* MGLNSDataAdditionsTests.m in Sources */,
 				DA0CD5901CF56F6A00A5F5A5 /* MGLFeatureTests.mm in Sources */,
 				556660D81E1D085500E2C41B /* MGLVersionNumber.m in Sources */,
