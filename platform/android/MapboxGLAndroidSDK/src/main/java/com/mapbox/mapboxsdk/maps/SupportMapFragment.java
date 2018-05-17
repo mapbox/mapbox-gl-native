@@ -31,6 +31,7 @@ import java.util.List;
 public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
 
   private final List<OnMapReadyCallback> mapReadyCallbackList = new ArrayList<>();
+  private MapFragment.OnMapViewReadyCallback mapViewReadyCallback;
   private MapboxMap mapboxMap;
   private MapView map;
 
@@ -53,6 +54,19 @@ public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
     SupportMapFragment mapFragment = new SupportMapFragment();
     mapFragment.setArguments(MapFragmentUtils.createFragmentArgs(mapboxMapOptions));
     return mapFragment;
+  }
+
+  /**
+   * Called when the context attaches to this fragment.
+   *
+   * @param context the context attaching
+   */
+  @Override
+  public void onAttach(Context context) {
+    super.onAttach(context);
+    if (context instanceof MapFragment.OnMapViewReadyCallback) {
+      mapViewReadyCallback = (MapFragment.OnMapViewReadyCallback) context;
+    }
   }
 
   /**
@@ -82,6 +96,11 @@ public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
     super.onViewCreated(view, savedInstanceState);
     map.onCreate(savedInstanceState);
     map.getMapAsync(this);
+
+    // notify listeners about MapView creation
+    if (mapViewReadyCallback != null) {
+      mapViewReadyCallback.onMapViewReady(map);
+    }
   }
 
   @Override

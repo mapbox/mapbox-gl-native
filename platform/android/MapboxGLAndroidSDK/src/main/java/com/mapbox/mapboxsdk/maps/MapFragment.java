@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.mapbox.mapboxsdk.utils.MapFragmentUtils;
 
 import java.util.ArrayList;
@@ -31,6 +30,7 @@ import java.util.List;
 public final class MapFragment extends Fragment implements OnMapReadyCallback {
 
   private final List<OnMapReadyCallback> mapReadyCallbackList = new ArrayList<>();
+  private OnMapViewReadyCallback mapViewReadyCallback;
   private MapboxMap mapboxMap;
   private MapView map;
 
@@ -56,6 +56,19 @@ public final class MapFragment extends Fragment implements OnMapReadyCallback {
   }
 
   /**
+   * Called when the context attaches to this fragment.
+   *
+   * @param context the context attaching
+   */
+  @Override
+  public void onAttach(Context context) {
+    super.onAttach(context);
+    if (context instanceof OnMapViewReadyCallback) {
+      mapViewReadyCallback = (OnMapViewReadyCallback) context;
+    }
+  }
+
+  /**
    * Creates the fragment view hierarchy.
    *
    * @param inflater           Inflater used to inflate content.
@@ -75,15 +88,25 @@ public final class MapFragment extends Fragment implements OnMapReadyCallback {
    * Called when the fragment view hierarchy is created.
    *
    * @param view               The content view of the fragment
-   * @param savedInstanceState THe saved instance state of the framgnt
+   * @param savedInstanceState The saved instance state of the fragment
    */
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     map.onCreate(savedInstanceState);
     map.getMapAsync(this);
+
+    // notify listeners about mapview creation
+    if (mapViewReadyCallback != null) {
+      mapViewReadyCallback.onMapViewReady(map);
+    }
   }
 
+  /**
+   * Called when the style of the map has successfully loaded.
+   *
+   * @param mapboxMap The public api controller of the map
+   */
   @Override
   public void onMapReady(MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
@@ -169,5 +192,22 @@ public final class MapFragment extends Fragment implements OnMapReadyCallback {
     } else {
       onMapReadyCallback.onMapReady(mapboxMap);
     }
+  }
+
+  /**
+   * Callback to be invoked when the map fragment has inflated its MapView.
+   * <p>
+   * To use this interface the context hosting the fragment must implement this interface.
+   * That instance will be set as part of Fragment#onAttach(Context context).
+   * </p>
+   */
+  public interface OnMapViewReadyCallback {
+
+    /**
+     * Called when the map has been created.
+     *
+     * @param mapView The created mapview
+     */
+    void onMapViewReady(MapView mapView);
   }
 }
