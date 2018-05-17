@@ -44,35 +44,21 @@ void start_list_on_local_minimum(PointList& points) {
 //Create a bound towards a local maximum point, starting from pt.
 Bound create_bound_towards_maximum(PointList& points, PointList::iterator& pt) {
     if (std::distance(pt, points.end()) < 2) { return {}; }
-    if (std::distance(pt, points.end()) == 2) {
-        Bound bnd;
-        if (pt->y < std::next(pt)->y) {
-            std::copy(pt, points.end(), std::back_inserter(bnd.points));
-            bnd.winding = true;
-        }
-        else {
-            std::reverse_copy(pt, points.end(), std::back_inserter(bnd.points));
-            bnd.winding = false;
-        }
-        pt = points.end();
-        return bnd;
-    }
+
     const auto begin = pt;
-    auto prev_pt = pt == points.begin() ? std::prev(points.end(), 2) : std::prev(pt);
-    auto next_pt = std::next(pt) == points.end() ? std::next(points.begin()) : std::next(pt);
-    while (pt != points.end()) {
-        if ((pt->y >= prev_pt->y) &&
-            (pt->y > next_pt->y )) {
-            break;
-        }
-        prev_pt = pt;
+    auto next_pt = std::next(begin);
+    while (pt->y <= next_pt->y) {
         pt++;
         next_pt++;
-        if (next_pt == points.end()) { next_pt = std::next(points.begin()); }
+        if(next_pt == points.end()) { pt++; break; }
+    }
+
+    const auto pt_distance = std::distance(begin, next_pt);
+    if (pt_distance < 2) {
+        return {};
     }
 
     Bound bnd;
-    if (std::next(pt) == points.end()) { next_pt = points.end(); pt++; };
     bnd.points.reserve(static_cast<std::size_t>(std::distance(begin, next_pt)));
     std::copy(begin, next_pt, std::back_inserter(bnd.points));
     bnd.winding = true;
@@ -82,35 +68,20 @@ Bound create_bound_towards_maximum(PointList& points, PointList::iterator& pt) {
 //Create a bound towards a local minimum point, starting from pt.
 Bound create_bound_towards_minimum(PointList& points, PointList::iterator& pt) {
     if (std::distance(pt, points.end()) < 2) { return {}; }
-    if (std::distance(pt, points.end()) == 2) {
-        Bound bnd;
-        if (pt->y < std::next(pt)->y) {
-            std::copy(pt, points.end(), std::back_inserter(bnd.points));
-            bnd.winding = true;
-        }
-        else {
-            std::reverse_copy(pt, points.end(), std::back_inserter(bnd.points));
-            bnd.winding = false;
-        }
-        pt = points.end();
-        return bnd;
-    }
+
     auto begin = pt;
-    auto prev_pt = pt == points.begin() ? std::prev(points.end(), 2) : std::prev(pt);
-    auto next_pt = std::next(pt) == points.end() ? std::next(points.begin()) : std::next(pt);
-    while (pt != points.end()) {
-        if ((pt->y <= prev_pt->y) &&
-            (pt->y < next_pt->y)) {
-            break;
-        }
-        prev_pt = pt;
+    auto next_pt = std::next(begin);
+    while (pt->y > next_pt->y) {
         pt++;
         next_pt++;
-        if (next_pt == points.end()) { next_pt = std::next(points.begin()); }
+        if(next_pt == points.end()) { pt++; break; }
     }
 
+    const auto pt_distance = std::distance(begin, next_pt);
+    if (pt_distance < 2) {
+        return {};
+    }
     Bound bnd;
-    if (std::next(pt) == points.end()) { next_pt = points.end(); pt++; };
     bnd.points.reserve(static_cast<std::size_t>(std::distance(begin, next_pt)));
     //For bounds that start at a max, reverse copy so that all bounds start at a min
     std::reverse_copy(begin, next_pt, std::back_inserter(bnd.points));
@@ -131,12 +102,12 @@ void build_bounds_map(PointList& points, uint32_t maxTile, BoundsMap& et, bool c
         Bound to_max = create_bound_towards_maximum(points, pointsIter);
         Bound to_min = create_bound_towards_minimum(points, pointsIter);
 
-        if (to_max.points.size() > 0) {
+        if (to_max.points.size() >= 2) {
             // Projections may result in values beyond the bounds, clamp to max tile coordinates
             const auto y = static_cast<uint32_t>(std::floor(clamp(to_max.points.front().y, 0.0, (double)maxTile)));
             et[y].push_back(to_max);
         }
-        if (to_min.points.size() > 0) {
+        if (to_min.points.size() >= 2) {
             const auto y = static_cast<uint32_t>(std::floor(clamp(to_min.points.front().y, 0.0, (double)maxTile)));
             et[y].push_back(to_min);
         }
@@ -158,7 +129,6 @@ std::vector<TileSpan> scan_row(uint32_t y, Bounds& aet) {
         TileSpan xp = { INT_MAX, 0, b.winding };
         double x;
         const auto numEdges = b.points.size() - 1;
-        assert(numEdges >= 1);
         while (b.currentPoint < numEdges) {
             x = b.interpolate(y);
             update_span(xp, x);

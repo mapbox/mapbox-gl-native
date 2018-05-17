@@ -137,6 +137,17 @@ TEST(TileCover, GeomLineZ10) {
     
 }
 
+TEST(TileCover, GeomLineRegression11870) {
+    auto lineCover = util::tileCover(LineString<double>{
+        {-121.5063900000001,40.470099999999945},
+        {-121.5065300000001,40.470369999999946},
+        {-121.5065900000001,40.470519999999944},
+    }, 14);
+    EXPECT_EQ((std::vector<UnwrappedTileID>{ { 14, 2662, 6174 } }),
+          lineCover);
+
+}
+
 TEST(TileCover, WrappedGeomLineZ10) {
     auto lineCover = util::tileCover(LineString<double>{
         {-179.93342914581299,38.892101707724315},
@@ -262,6 +273,9 @@ TEST(TileCover, GeomSanFranciscoPoly) {
 TEST(TileCover, GeomInvalid) {
     auto point = Point<double>{ -122.5744, 97.6609 };
     EXPECT_THROW(util::tileCover(point, 2), std::domain_error);
+
+    auto badLine = LineString<double>{ {1.0,  35.0} };
+    EXPECT_EQ((std::vector<UnwrappedTileID>{ }), util::tileCover(badLine, 16));
 
     auto badPoly = Polygon<double> { { {1.0,  35.0} } };
     EXPECT_EQ((std::vector<UnwrappedTileID>{ }), util::tileCover(badPoly, 16));
