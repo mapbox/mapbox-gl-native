@@ -447,6 +447,12 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
 }
 
 void NodeMap::renderFinished() {
+    if (!callback) {
+        // In some situations, the render finishes at the same time as we call cancel. Make sure
+        // we are only finishing a render once.
+        return;
+    }
+
     Nan::HandleScope scope;
 
     // We're done with this render call, so we're unrefing so that the loop could close.
