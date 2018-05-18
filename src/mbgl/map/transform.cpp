@@ -654,8 +654,7 @@ void Transform::updateTransitions(const TimePoint& now) {
         if (finish) {
             finish();
         }
-    }
-    else if (!transitionFrameFn) {
+    } else if (!transitionFrameFn) {
         transitionFrameFn = std::move(transition);
     }
 }
