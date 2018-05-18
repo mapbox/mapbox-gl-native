@@ -10,6 +10,10 @@
 
 * Added support for aggregate expressions as input values to `MGL_MATCH` expressions. ([#11866](https://github.com/mapbox/mapbox-gl-native/pull/11866))
 
+### Other changes
+
+* Unknown tokens in URLs are now preserved, rather than replaced with an empty string. ([#11787](https://github.com/mapbox/mapbox-gl-native/issues/11787))
+
 ## 0.7.1
 
 ### Style layers

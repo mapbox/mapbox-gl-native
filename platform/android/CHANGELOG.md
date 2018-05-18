@@ -2,6 +2,9 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## master
+- Unknown tokens in URLs are now preserved, rather than replaced with an empty string [#11787](https://github.com/mapbox/mapbox-gl-native/issues/11787)
+
 ## 6.1.2 - May 18, 2018
  - Update telemetry to 3.1.1 [#11942](https://github.com/mapbox/mapbox-gl-native/pull/11942)
 
