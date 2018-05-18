@@ -2,8 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
-## 6.2.0-alpha.1 - May 17, 2018
+## 6.1.2 - May 18, 2018
+ - Update telemetry to 3.1.1 [#11942](https://github.com/mapbox/mapbox-gl-native/pull/11942)
 
+## 6.2.0-alpha.1 - May 17, 2018
  - `"to-string"` expression operator converts `null` to empty string rather than to `"null"` [#11904](https://github.com/mapbox/mapbox-gl-native/pull/11904)
  - Expose MapView#setOfflineRegion [#1922](https://github.com/mapbox/mapbox-gl-native/pull/11922)
  - Add nullability annotations to public API for kotlin language integration [#11925](https://github.com/mapbox/mapbox-gl-native/pull/11925)
@@ -105,9 +107,9 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Update javadoc configuration for Gradle 4.4 [#11384](https://github.com/mapbox/mapbox-gl-native/pull/11384)
  - Rework zoomIn and zoomOut to use ValueAnimators [#11382](https://github.com/mapbox/mapbox-gl-native/pull/11382)
  - Delete LocalRef when converting Image.java [#11350](https://github.com/mapbox/mapbox-gl-native/pull/11350)
- - Use float for pixelratio when creating a snapshotter [#11367](https://github.com/mapbox/mapbox-gl-native/pull/11367) 
+ - Use float for pixelratio when creating a snapshotter [#11367](https://github.com/mapbox/mapbox-gl-native/pull/11367)
  - Validate width/height when creating a snapshot [#11364](https://github.com/mapbox/mapbox-gl-native/pull/11364)
-  
+
 ## 6.0.0-beta.3 - March 2, 2018
  - Added missing local reference deletes [#11243](https://github.com/mapbox/mapbox-gl-native/pull/11243), [#11272](https://github.com/mapbox/mapbox-gl-native/pull/11272)
  - Remove obsolete camera api [#11201](https://github.com/mapbox/mapbox-gl-native/pull/11201)
@@ -130,7 +132,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Add missing DeleteLocalRefs [#11272](https://github.com/mapbox/mapbox-gl-native/pull/11272)
  - Continue loading style even if we mutate it [#11294](https://github.com/mapbox/mapbox-gl-native/pull/11294)
  - Update telemetry version for OkHttp [#11338](https://github.com/mapbox/mapbox-gl-native/pull/11338)
- 
+
 ## 6.0.0-beta.2 - February 13, 2018
  - Deprecate LocationEngine [#11185](https://github.com/mapbox/mapbox-gl-native/pull/11185)
  - Remove LOST from SDK [11186](https://github.com/mapbox/mapbox-gl-native/pull/11186)
@@ -140,7 +142,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - AddImage performance improvement [#11111](https://github.com/mapbox/mapbox-gl-native/pull/11111)
  - Migrate MAS to 3.0.0, refactor GeoJson integration [#11149](https://github.com/mapbox/mapbox-gl-native/pull/11149)
  - Remove @jar and @aar dependency suffixes [#11161](https://github.com/mapbox/mapbox-gl-native/pull/11161)
- 
+
 ## 5.4.1 - February 9, 2018
  - Don't recreate TextureView surface as part of view resizing, solves OOM crashes [#11148](https://github.com/mapbox/mapbox-gl-native/pull/11148)
  - Don't invoke OnLowMemory before map is ready, solves startup crash on low memory devices [#11109](https://github.com/mapbox/mapbox-gl-native/pull/11109)
@@ -175,7 +177,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Custom library loader [#10733](https://github.com/mapbox/mapbox-gl-native/pull/10733)
  - Inconsistent parameters for LatLngBounds.union [#10728](https://github.com/mapbox/mapbox-gl-native/pull/10728)
  - Gradle 4.1 / AS 3.0 [#10549](https://github.com/mapbox/mapbox-gl-native/pull/10549)
- 
+
 ## 5.3.2 - January 22, 2018
  - Validate surface creation before destroying [#10890](https://github.com/mapbox/mapbox-gl-native/pull/10890)
  - Add filesource activation ot OfflineRegion [#10904](https://github.com/mapbox/mapbox-gl-native/pull/10904)
@@ -185,7 +187,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Allow changing the used OkHttpClient [#10948](https://github.com/mapbox/mapbox-gl-native/pull/10948)
  - Validate zoom level before creating telemetry event [#10959](https://github.com/mapbox/mapbox-gl-native/pull/10959)
  - Handle null call instances in HttpRequest [#10987](https://github.com/mapbox/mapbox-gl-native/pull/10987)
- 
+
 ## 5.3.1 - January 10, 2018
  - Blacklist binary program loading for Vivante GC4000 GPUs [#10862](https://github.com/mapbox/mapbox-gl-native/pull/10862)
  - Support Genymotion [#10841](https://github.com/mapbox/mapbox-gl-native/pull/10841)
@@ -196,11 +198,11 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Allow configuring Http url logging when a request fails [#10830](https://github.com/mapbox/mapbox-gl-native/pull/10830)
  - Don't send double tap event multiple times for telemetry [#10854](https://github.com/mapbox/mapbox-gl-native/pull/10854)
  - Fix code generation [#10856](https://github.com/mapbox/mapbox-gl-native/pull/10856)
- - Use the correct cancelable callback after posting cancel [#10871](https://github.com/mapbox/mapbox-gl-native/pull/10871) 
-  
+ - Use the correct cancelable callback after posting cancel [#10871](https://github.com/mapbox/mapbox-gl-native/pull/10871)
+
 ## 5.3.0 - December 20, 2017
  - Add support for TinySDF [#10706](https://github.com/mapbox/mapbox-gl-native/pull/10706)
- - Save restore MyLocationViewSettings [#10746](https://github.com/mapbox/mapbox-gl-native/pull/10746) 
+ - Save restore MyLocationViewSettings [#10746](https://github.com/mapbox/mapbox-gl-native/pull/10746)
  - Post animation callback invocation [#10664](https://github.com/mapbox/mapbox-gl-native/pull/10664)
  - Allow configuring Http logging [#10681](https://github.com/mapbox/mapbox-gl-native/pull/10681)
  - Fix reverse scale gesture [#10688](https://github.com/mapbox/mapbox-gl-native/pull/10688)
