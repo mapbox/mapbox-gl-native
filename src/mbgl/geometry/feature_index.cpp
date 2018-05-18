@@ -7,7 +7,6 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/style/filter.hpp>
-#include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/tile/tile_id.hpp>
 
 #include <mapbox/geometry/envelope.hpp>

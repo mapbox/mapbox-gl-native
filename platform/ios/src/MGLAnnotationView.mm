@@ -11,8 +11,9 @@
 
 @property (nonatomic, readwrite, nullable) NSString *reuseIdentifier;
 @property (nonatomic, readwrite) CATransform3D lastAppliedScaleTransform;
-@property (nonatomic, readwrite) CATransform3D lastAppliedRotateTransform;
 @property (nonatomic, readwrite) CGFloat lastPitch;
+@property (nonatomic, readwrite) CATransform3D lastAppliedRotationTransform;
+@property (nonatomic, readwrite) CGFloat lastDirection;
 @property (nonatomic, weak) UIPanGestureRecognizer *panGestureRecognizer;
 @property (nonatomic, weak) UILongPressGestureRecognizer *longPressRecognizer;
 @property (nonatomic, weak) MGLMapView *mapView;
@@ -43,9 +44,9 @@
 
 - (void)commonInitWithAnnotation:(nullable id<MGLAnnotation>)annotation reuseIdentifier:(nullable NSString *)reuseIdentifier {
     _lastAppliedScaleTransform = CATransform3DIdentity;
+    _lastAppliedRotationTransform = CATransform3DIdentity;
     _annotation = annotation;
     _reuseIdentifier = [reuseIdentifier copy];
-    _scalesWithViewingDistance = NO;
     _enabled = YES;
 }
 
@@ -159,7 +160,7 @@
 
         // We keep track of each viewing distance scale transform that we apply. Each iteration,
         // we can account for it so that we don't get cumulative scaling every time we move.
-        // We also avoid clobbering any existing transform passed in by the client, too.
+        // We also avoid clobbering any existing transform passed in by the client or this SDK.
         CATransform3D undoOfLastScaleTransform = CATransform3DInvert(_lastAppliedScaleTransform);
         CATransform3D newScaleTransform = CATransform3DMakeScale(pitchAdjustedScale, pitchAdjustedScale, 1);
         CATransform3D effectiveTransform = CATransform3DConcat(undoOfLastScaleTransform, newScaleTransform);
@@ -181,11 +182,20 @@
 {
     if (self.rotatesToMatchCamera == NO) return;
 
-    CGFloat directionRad = self.mapView.direction * M_PI / 180.0;
-    CATransform3D newRotateTransform = CATransform3DMakeRotation(-directionRad, 0, 0, 1);
-    self.layer.transform = CATransform3DConcat(CATransform3DIdentity, newRotateTransform);
-    
-    _lastAppliedRotateTransform = newRotateTransform;
+    CGFloat direction = -MGLRadiansFromDegrees(self.mapView.direction);
+
+    // Return early if the map view has the same rotation as the already-applied transform.
+    if (direction == _lastDirection) return;
+    _lastDirection = direction;
+
+    // We keep track of each rotation transform that we apply. Each iteration,
+    // we can account for it so that we don't get cumulative rotation every time we move.
+    // We also avoid clobbering any existing transform passed in by the client or this SDK.
+    CATransform3D undoOfLastRotationTransform = CATransform3DInvert(_lastAppliedRotationTransform);
+    CATransform3D newRotationTransform = CATransform3DMakeRotation(direction, 0, 0, 1);
+    CATransform3D effectiveTransform = CATransform3DConcat(undoOfLastRotationTransform, newRotationTransform);
+    self.layer.transform = CATransform3DConcat(self.layer.transform, effectiveTransform);
+    _lastAppliedRotationTransform = newRotationTransform;
 }
 
 #pragma mark - Draggable

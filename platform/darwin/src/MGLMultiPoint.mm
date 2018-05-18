@@ -163,7 +163,7 @@
     if (!_bounds) {
         mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
         for (auto coordinate : _coordinates) {
-            if (!CLLocationCoordinate2DIsValid(coordinate)) {
+            if (!MGLLocationCoordinate2DIsValid(coordinate)) {
                 bounds = mbgl::LatLngBounds::empty();
                 break;
             }

@@ -1,17 +1,39 @@
 #include <mbgl/style/conversion/filter.hpp>
+#include <mbgl/style/expression/literal.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/type.hpp>
-#include <mbgl/style/expression/parsing_context.hpp>
+#include <mbgl/style/expression/compound_expression.hpp>
+#include <mbgl/style/expression/boolean_operator.hpp>
 
 namespace mbgl {
 namespace style {
 namespace conversion {
     
-using GeometryValue = mapbox::geometry::value;
+using namespace mbgl::style::expression;
+    
+static bool isExpression(const Convertible& filter);
+std::unique_ptr<Expression> convertLegacyFilter(const Convertible& values, Error& error);
+
+optional<Filter> Converter<Filter>::operator()(const Convertible& value, Error& error) const {
+    if (isExpression(value)) {
+        ParsingContext parsingContext(type::Boolean);
+        ParseResult parseResult = parsingContext.parseExpression(value);
+        if (!parseResult) {
+            error = { parsingContext.getCombinedErrors() };
+            return {};
+        } else {
+            return { Filter(std::move(parseResult)) };
+        }
+    } else {
+        std::unique_ptr<Expression> expression = convertLegacyFilter(value, error);
+        if (!expression) return {};
+        return Filter(optional<std::unique_ptr<Expression>>(std::move(expression)));
+    }
+}
 
 // This is a port from https://github.com/mapbox/mapbox-gl-js/blob/master/src/style-spec/feature_filter/index.js
-static bool isExpressionFilter(const Convertible& filter) {
+bool isExpression(const Convertible& filter) {
     if (!isArray(filter) || arrayLength(filter) == 0) {
         return false;
     }
@@ -20,7 +42,7 @@ static bool isExpressionFilter(const Convertible& filter) {
     
     if (!op) {
         return false;
-
+        
     } else if (*op == "has") {
         if (arrayLength(filter) < 2) return false;
         optional<std::string> operand = toString(arrayMember(filter, 1));
@@ -35,7 +57,7 @@ static bool isExpressionFilter(const Convertible& filter) {
     } else if (*op == "any" || *op == "all") {
         for (std::size_t i = 1; i < arrayLength(filter); i++) {
             Convertible f = arrayMember(filter, i);
-            if (!isExpressionFilter(f) && !toBool(f)) {
+            if (!isExpression(f) && !toBool(f)) {
                 return false;
             }
         }
@@ -46,257 +68,136 @@ static bool isExpressionFilter(const Convertible& filter) {
     }
 }
     
-static optional<GeometryValue> normalizeValue(const optional<GeometryValue>& value, Error& error) {
-    if (!value) {
-        error = { "filter expression value must be a boolean, number, or string" };
-        return {};
+std::unique_ptr<Expression> createExpression(std::string op, std::vector<std::unique_ptr<Expression>> args, Error& error) {
+    if (op == "any") {
+        return std::make_unique<Any>(std::move(args));
+        
+    } else if (op == "all") {
+        return std::make_unique<All>(std::move(args));
+
     } else {
-        return *value;
-    }
-}
-
-static optional<FeatureType> toFeatureType(const Convertible& value, Error& error) {
-    optional<std::string> type = toString(value);
-    if (!type) {
-        error = { "value for $type filter must be a string" };
-        return {};
-    } else if (*type == "Point") {
-        return FeatureType::Point;
-    } else if (*type == "LineString") {
-        return FeatureType::LineString;
-    } else if (*type == "Polygon") {
-        return FeatureType::Polygon;
-    } else {
-        error = { "value for $type filter must be Point, LineString, or Polygon" };
-        return {};
-    }
-}
-
-static optional<FeatureIdentifier> toFeatureIdentifier(const Convertible& value, Error& error) {
-    optional<GeometryValue> identifier = toValue(value);
-    if (!identifier) {
-        error = { "filter expression value must be a boolean, number, or string" };
-        return {};
-    } else {
-        return (*identifier).match(
-            [] (uint64_t t) -> optional<FeatureIdentifier> { return { t }; },
-            [] ( int64_t t) -> optional<FeatureIdentifier> { return { t }; },
-            [] (  double t) -> optional<FeatureIdentifier> { return { t }; },
-            [] (const std::string& t) -> optional<FeatureIdentifier> { return { t }; },
-            [&] (const auto&) -> optional<FeatureIdentifier> {
-                error = { "filter expression value must be a boolean, number, or string" };
-                return {};
-            });
-    }
-}
-
-template <class FilterType, class IdentifierFilterType>
-optional<Filter> convertUnaryFilter(const Convertible& value, Error& error) {
-    if (arrayLength(value) < 2) {
-        error = { "filter expression must have 2 elements" };
-        return {};
-    }
-
-    optional<std::string> key = toString(arrayMember(value, 1));
-    if (!key) {
-        error = { "filter expression key must be a string" };
-        return {};
-    }
-
-    if (*key == "$id") {
-        return { IdentifierFilterType {} };
-    } else {
-        return { FilterType { *key } };
-    }
-}
-
-template <class FilterType, class TypeFilterType, class IdentifierFilterType>
-optional<Filter> convertEqualityFilter(const Convertible& value, Error& error) {
-    if (arrayLength(value) < 3) {
-        error = { "filter expression must have 3 elements" };
-        return {};
-    }
-
-    optional<std::string> key = toString(arrayMember(value, 1));
-    if (!key) {
-        error = { "filter expression key must be a string" };
-        return {};
-    }
-
-    if (*key == "$type") {
-        optional<FeatureType> filterValue = toFeatureType(arrayMember(value, 2), error);
-        if (!filterValue) {
+        ParsingContext parsingContext(type::Boolean);
+        ParseResult parseResult = createCompoundExpression(op, std::move(args), parsingContext);
+        if (!parseResult) {
+            error = { parsingContext.getCombinedErrors() };
             return {};
+        } else {
+            return std::move(*parseResult);
         }
+    }
+}
 
-        return { TypeFilterType { *filterValue } };
+std::unique_ptr<Expression> createExpression(std::string op, std::unique_ptr<Expression> expression, Error& error) {
+    std::vector<std::unique_ptr<Expression>> args;
+    args.push_back(std::move(expression));
+    return createExpression(op, std::move(args), error);
+}
 
-    } else if (*key == "$id") {
-        optional<FeatureIdentifier> filterValue = toFeatureIdentifier(arrayMember(value, 2), error);
-        if (!filterValue) {
-            return {};
-        }
-
-        return { IdentifierFilterType { *filterValue } };
-
+std::unique_ptr<Expression> convertLiteral(const Convertible& convertible, Error& error) {
+    ParsingContext parsingContext;
+    ParseResult parseResult = Literal::parse(convertible, parsingContext);
+    if (parseResult) {
+        return std::move(*parseResult);
     } else {
-        optional<GeometryValue> filterValue = normalizeValue(toValue(arrayMember(value, 2)), error);
-        if (!filterValue) {
-            return {};
-        }
-
-        return { FilterType { *key, *filterValue } };
+        error = { parsingContext.getCombinedErrors() };
+        return {};
     }
 }
 
-template <class FilterType>
-optional<Filter> convertBinaryFilter(const Convertible& value, Error& error) {
-    if (arrayLength(value) < 3) {
-        error = { "filter expression must have 3 elements" };
-        return {};
+std::vector<std::unique_ptr<Expression>> convertLiteralArray(const Convertible &input, Error& error, std::size_t startIndex = 0) {
+    std::vector<std::unique_ptr<Expression>> output;
+    for (std::size_t i = startIndex; i < arrayLength(input); i++) {
+        output.push_back(convertLiteral(arrayMember(input, i), error));
     }
-
-    optional<std::string> key = toString(arrayMember(value, 1));
-    if (!key) {
-        error = { "filter expression key must be a string" };
-        return {};
-    }
-
-    optional<GeometryValue> filterValue = normalizeValue(toValue(arrayMember(value, 2)), error);
-    if (!filterValue) {
-        return {};
-    }
-
-    return { FilterType { *key, *filterValue } };
+    return output;
 }
 
-template <class FilterType, class TypeFilterType, class IdentifierFilterType>
-optional<Filter> convertSetFilter(const Convertible& value, Error& error) {
-    if (arrayLength(value) < 2) {
-        error = { "filter expression must at least 2 elements" };
+std::unique_ptr<Expression> convertLegacyComparisonFilter(const Convertible& values, Error& error, optional<std::string> opOverride = {}) {
+    optional<std::string> op = opOverride ? opOverride : toString(arrayMember(values, 0));
+    optional<std::string> property = toString(arrayMember(values, 1));
+    
+    if (!property) {
+        error = { "filter property must be a string" };
         return {};
-    }
-
-    optional<std::string> key = toString(arrayMember(value, 1));
-    if (!key) {
-        error = { "filter expression key must be a string" };
-        return {};
-    }
-
-    if (*key == "$type") {
-        std::vector<FeatureType> values;
-        for (std::size_t i = 2; i < arrayLength(value); ++i) {
-            optional<FeatureType> filterValue = toFeatureType(arrayMember(value, i), error);
-            if (!filterValue) {
-                return {};
-            }
-            values.push_back(*filterValue);
-        }
-
-        return { TypeFilterType { std::move(values) } };
-
-    } else if (*key == "$id") {
-        std::vector<FeatureIdentifier> values;
-        for (std::size_t i = 2; i < arrayLength(value); ++i) {
-            optional<FeatureIdentifier> filterValue = toFeatureIdentifier(arrayMember(value, i), error);
-            if (!filterValue) {
-                return {};
-            }
-            values.push_back(*filterValue);
-        }
-
-        return { IdentifierFilterType { std::move(values) } };
-
+    } else if (*property == "$type") {
+        return createExpression("filter-type-" + *op, convertLiteralArray(values, error, 2), error);
+    } else if (*property == "$id") {
+        return createExpression("filter-id-" + *op, convertLiteralArray(values, error, 2), error);
     } else {
-        std::vector<GeometryValue> values;
-        for (std::size_t i = 2; i < arrayLength(value); ++i) {
-            optional<GeometryValue> filterValue = normalizeValue(toValue(arrayMember(value, i)), error);
-            if (!filterValue) {
-                return {};
-            }
-            values.push_back(*filterValue);
-        }
-
-        return { FilterType { *key, std::move(values) } };
+        return createExpression("filter-" + *op, convertLiteralArray(values, error, 1), error);
     }
-}
-
-template <class FilterType>
-optional<Filter> convertCompoundFilter(const Convertible& value, Error& error) {
-    std::vector<Filter> filters;
-    for (std::size_t i = 1; i < arrayLength(value); ++i) {
-        optional<Filter> element = convert<Filter>(arrayMember(value, i), error);
-        if (!element) {
-            return {};
-        }
-        filters.push_back(*element);
-    }
-
-    return { FilterType { std::move(filters) } };
 }
     
-optional<Filter> convertExpressionFilter(const Convertible& value, Error& error) {
-    expression::ParsingContext ctx(expression::type::Boolean);
-    expression::ParseResult expression = ctx.parseExpression(value);
-    if (!expression) {
-        error = { ctx.getCombinedErrors() };
+std::unique_ptr<Expression> convertLegacyHasFilter(const Convertible& values, Error& error) {
+    optional<std::string> property = toString(arrayMember(values, 1));
+    
+    if (!property) {
+        error = { "filter property must be a string" };
         return {};
+    } else if (*property == "$type") {
+        return std::make_unique<Literal>(true);
+    } else if (*property == "$id") {
+        return createExpression("filter-has-id", std::vector<std::unique_ptr<Expression>>(), error);
+    } else {
+        return createExpression("filter-has", std::make_unique<Literal>(*property), error);
     }
-
-    return { ExpressionFilter { std::move(*expression) } };
 }
 
-optional<Filter> Converter<Filter>::operator()(const Convertible& value, Error& error) const {
-    if (isExpressionFilter(value)) {
-        return convertExpressionFilter(value, error);
+std::unique_ptr<Expression> convertLegacyInFilter(const Convertible& values, Error& error) {
+    optional<std::string> property = toString(arrayMember(values, 1));
+    
+    if (!property) {
+        error = { "filter property must be a string" };
+        return {};
+    } else if (arrayLength(values) == 0) {
+        return std::make_unique<Literal>(false);
+    } else if (*property == "$type") {
+        return createExpression("filter-type-in", convertLiteralArray(values, error, 2), error);
+    } else if (*property == "$id") {
+        return createExpression("filter-id-in", convertLiteralArray(values, error, 2), error);
+    } else {
+        return createExpression("filter-in", convertLiteralArray(values, error, 1), error);
+    }
+}
+
+std::vector<std::unique_ptr<Expression>> convertLegacyFilterArray(const Convertible &input, Error& error, std::size_t startIndex = 0) {
+    std::vector<std::unique_ptr<Expression>> output;
+    for (std::size_t i = startIndex; i < arrayLength(input); i++) {
+        output.push_back(convertLegacyFilter(arrayMember(input, i), error));
+    }
+    return output;
+}
+    
+std::unique_ptr<Expression> convertLegacyFilter(const Convertible& values, Error& error) {
+    if (isUndefined(values)) {
+        return std::make_unique<Literal>(true);
     }
     
-    if (!isArray(value)) {
-        error = { "filter expression must be an array" };
-        return {};
-    }
+    optional<std::string> op = toString(arrayMember(values, 0));
 
-    if (arrayLength(value) < 1) {
-        error = { "filter expression must have at least 1 element" };
-        return {};
-    }
-
-    optional<std::string> op = toString(arrayMember(value, 0));
     if (!op) {
         error = { "filter operator must be a string" };
         return {};
+    } else if (arrayLength(values) <= 1) {
+        return std::make_unique<Literal>(*op != "any");
+    } else {
+        return (
+            *op == "==" ||
+            *op == "<" ||
+            *op == ">" ||
+            *op == "<=" ||
+            *op == ">=" ? convertLegacyComparisonFilter(values, error) :
+            *op == "!=" ? createExpression("!", convertLegacyComparisonFilter(values, error, {"=="}), error) :
+            *op == "any" ? createExpression("any", convertLegacyFilterArray(values, error, 1), error) :
+            *op == "all" ? createExpression("all", convertLegacyFilterArray(values, error, 1), error) :
+            *op == "none" ? createExpression("!", createExpression("any", convertLegacyFilterArray(values, error, 1), error), error) :
+            *op == "in" ? convertLegacyInFilter(values, error) :
+            *op == "!in" ? createExpression("!", convertLegacyInFilter(values, error), error) :
+            *op == "has" ? convertLegacyHasFilter(values, error) :
+            *op == "!has" ? createExpression("!", convertLegacyHasFilter(values, error), error) :
+            std::make_unique<Literal>(true)
+        );
     }
-
-    if (*op == "==") {
-        return convertEqualityFilter<EqualsFilter, TypeEqualsFilter, IdentifierEqualsFilter>(value, error);
-    } else if (*op == "!=") {
-        return convertEqualityFilter<NotEqualsFilter, TypeNotEqualsFilter, IdentifierNotEqualsFilter>(value, error);
-    } else if (*op == ">") {
-        return convertBinaryFilter<GreaterThanFilter>(value, error);
-    } else if (*op == ">=") {
-        return convertBinaryFilter<GreaterThanEqualsFilter>(value, error);
-    } else if (*op == "<") {
-        return convertBinaryFilter<LessThanFilter>(value, error);
-    } else if (*op == "<=") {
-        return convertBinaryFilter<LessThanEqualsFilter>(value, error);
-    } else if (*op == "in") {
-        return convertSetFilter<InFilter, TypeInFilter, IdentifierInFilter>(value, error);
-    } else if (*op == "!in") {
-        return convertSetFilter<NotInFilter, TypeNotInFilter, IdentifierNotInFilter>(value, error);
-    } else if (*op == "all") {
-        return convertCompoundFilter<AllFilter>(value, error);
-    } else if (*op == "any") {
-        return convertCompoundFilter<AnyFilter>(value, error);
-    } else if (*op == "none") {
-        return convertCompoundFilter<NoneFilter>(value, error);
-    } else if (*op == "has") {
-        return convertUnaryFilter<HasFilter, HasIdentifierFilter>(value, error);
-    } else if (*op == "!has") {
-       return convertUnaryFilter<NotHasFilter, NotHasIdentifierFilter>(value, error);
-    }
-
-    error = { R"(filter operator must be one of "==", "!=", ">", ">=", "<", "<=", "in", "!in", "all", "any", "none", "has", or "!has")" };
-    return {};
 }
 
 } // namespace conversion

@@ -79,8 +79,14 @@
         
         components.push_back(component.doubleValue / 255.0);
     }
-    // Alpha
-    components.back() *= 255.0;
+    
+    if (components.size() < 4) {
+        components.push_back(1.0);
+    } else {
+        // Alpha
+        components.back() *= 255.0;
+    }
+    
     
     // macOS 10.12 Sierra and below uses calibrated RGB by default.
     if ([NSColor redColor].colorSpaceName == NSCalibratedRGBColorSpace) {

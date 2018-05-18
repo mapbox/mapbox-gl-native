@@ -1,7 +1,6 @@
 #include <benchmark/benchmark.h>
 
 #include <mbgl/style/filter.hpp>
-#include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/filter.hpp>

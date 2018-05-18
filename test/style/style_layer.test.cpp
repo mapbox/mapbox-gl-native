@@ -211,7 +211,7 @@ TEST(Layer, Observer) {
         EXPECT_EQ(layer.get(), &layer_);
         filterChanged = true;
     };
-    layer->setFilter(NullFilter());
+    layer->setFilter(Filter());
     EXPECT_TRUE(filterChanged);
 
     // Notifies observer on visibility change.

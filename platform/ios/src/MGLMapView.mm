@@ -49,7 +49,7 @@
 #import "NSBundle+MGLAdditions.h"
 #import "NSDate+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
-#import "NSPredicate+MGLAdditions.h"
+#import "NSPredicate+MGLPrivateAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
 #import "NSURL+MGLAdditions.h"
@@ -4280,6 +4280,15 @@ public:
         moveOnscreen = [self isBringingAnnotationOnscreenSupportedForAnnotation:annotation animated:animateSelection];
     }
 
+    // If we have an invalid positioning rect, we need to provide a suitable default.
+    // This (currently) happens if you select an annotation that has NOT yet been
+    // added. See https://github.com/mapbox/mapbox-gl-native/issues/11476
+    if (CGRectIsNull(calloutPositioningRect)) {
+        CLLocationCoordinate2D origin = annotation.coordinate;
+        CGPoint originPoint = [self convertCoordinate:origin toPointToView:self];
+        calloutPositioningRect = { .origin = originPoint, .size = CGSizeZero };
+    }
+
     CGRect expandedPositioningRect = UIEdgeInsetsInsetRect(calloutPositioningRect, MGLMapViewOffscreenAnnotationPadding);
 
     // Used for callout positioning, and moving offscreen annotations onscreen.
@@ -4432,7 +4441,11 @@ public:
 {
     MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
     CGRect positioningRect = [self positioningRectForCalloutForAnnotationWithTag:annotationTag];
-    
+
+    if (CGRectIsNull(positioningRect)) {
+        return positioningRect;
+    }
+
     // For annotations which `coordinate` falls offscreen it will use the current tap point as anchor instead.
     if ( ! CGRectIntersectsRect(positioningRect, self.bounds) && annotation != self.userLocation)
     {
@@ -4452,15 +4465,15 @@ public:
     id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
     if ( ! annotation)
     {
-        return CGRectZero;
+        return CGRectNull;
     }
     
     if ([annotation isKindOfClass:[MGLMultiPoint class]]) {
         CLLocationCoordinate2D origin = annotation.coordinate;
         CGPoint originPoint = [self convertCoordinate:origin toPointToView:self];
         return CGRectMake(originPoint.x, originPoint.y, MGLAnnotationImagePaddingForHitTest, MGLAnnotationImagePaddingForHitTest);
-        
     }
+    
     UIImage *image = [self imageOfAnnotationWithTag:annotationTag].image;
     if ( ! image)
     {
@@ -4547,6 +4560,8 @@ public:
         return;
     }
 
+    __weak __typeof__(self) weakSelf = self;
+
     // The user location callout view initially points to the user location
     // annotation’s implicit (visual) frame, which is offset from the
     // annotation’s explicit frame. Now the callout view needs to rendezvous
@@ -4560,10 +4575,16 @@ public:
                                  UIViewAnimationOptionBeginFromCurrentState)
                      animations:^
      {
+         __typeof__(self) strongSelf = weakSelf;
+         if ( ! strongSelf)
+         {
+             return;
+         }
+
          calloutView.frame = CGRectOffset(calloutView.frame,
-                                          _initialImplicitCalloutViewOffset.x,
-                                          _initialImplicitCalloutViewOffset.y);
-         _initialImplicitCalloutViewOffset = CGPointZero;
+                                          strongSelf->_initialImplicitCalloutViewOffset.x,
+                                          strongSelf->_initialImplicitCalloutViewOffset.y);
+         strongSelf->_initialImplicitCalloutViewOffset = CGPointZero;
      }
                      completion:NULL];
 }
@@ -5694,10 +5715,12 @@ public:
                 if (annotationView.layer.animationKeys.count > 0) {
                     continue;
                 }
+
                 // Move the annotation view far out of view to the left
-                CGRect adjustedFrame = annotationView.frame;
-                adjustedFrame.origin.x = -CGRectGetWidth(self.frame) * 10.0;
-                annotationView.frame = adjustedFrame;
+                CGPoint adjustedCenter = annotationView.center;
+                adjustedCenter.x = -CGRectGetWidth(self.frame) * 10.0;
+                annotationView.center = adjustedCenter;
+
                 [self enqueueAnnotationViewForAnnotationContext:annotationContext];
             }
         }
@@ -5732,6 +5755,8 @@ public:
         {
             rect = annotationView.frame;
         }
+
+        NSAssert(!CGRectIsNull(rect), @"Positioning rect should not be CGRectNull by this point");
 
         CGPoint point = CGPointMake(CGRectGetMidX(rect), CGRectGetMinY(rect));
 

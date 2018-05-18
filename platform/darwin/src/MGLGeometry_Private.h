@@ -71,6 +71,17 @@ NS_INLINE MGLCoordinateQuad MGLCoordinateQuadFromLatLngArray(std::array<mbgl::La
     MGLLocationCoordinate2DFromLatLng(quad[1]) };
 }
 
+/**
+ YES if the coordinate is valid or NO if it is not.
+ Considers extended coordinates.
+ */
+NS_INLINE BOOL MGLLocationCoordinate2DIsValid(CLLocationCoordinate2D coordinate) {
+    return (coordinate.latitude  <= 90.0  &&
+            coordinate.latitude  >= -90.0  &&
+            coordinate.longitude <= 360.0 &&
+            coordinate.longitude >= -360.0);
+}
+
 #if TARGET_OS_IPHONE
 NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(UIEdgeInsets insets) {
     return { insets.top, insets.left, insets.bottom, insets.right };

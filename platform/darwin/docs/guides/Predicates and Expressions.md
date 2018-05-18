@@ -70,6 +70,8 @@ path or variable into a matching type:
 
 * To cast a value to a number, use `CAST(key, 'NSNumber')`.
 * To cast a value to a string, use `CAST(key, 'NSString')`.
+* To cast a value to a color, use `CAST(key, 'UIColor')` on iOS and `CAST(key, 'NSColor')` on macOS.
+* To cast an `NSColor` or `UIColor` object to an array, use `CAST(noindex(color), 'NSArray')`.
 
 For details about the predicate format string syntax, consult the “Predicate
 Format String Syntax” chapter of the
@@ -534,6 +536,10 @@ expression that contains references to those variables.
    An input expression, then any number of argument pairs, followed by a default
    expression. Each argument pair consists of a constant value followed by an
    expression to produce as a result of matching that constant value.
+   If the input value is an aggregate expression, then any of the constant values within 
+   that aggregate expression result in the following argument. This is shorthand for 
+   specifying an argument pair for each of the constant values within that aggregate 
+   expression. It is not possible to match the aggregate expression itself.
 </dd>
 </dl>
 

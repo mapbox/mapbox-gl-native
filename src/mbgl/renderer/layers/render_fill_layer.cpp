@@ -69,12 +69,11 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                              const auto& depthMode,
                              const auto& indexBuffer,
                              const auto& segments) {
-                program.get(evaluated).draw(
-                    parameters.context,
-                    drawMode,
-                    depthMode,
-                    parameters.stencilModeForClipping(tile.clip),
-                    parameters.colorModeForRenderPass(),
+                auto& programInstance = program.get(evaluated);
+
+                const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
+
+                const auto allUniformValues = programInstance.computeAllUniformValues(
                     FillProgram::UniformValues {
                         uniforms::u_matrix::Value{
                             tile.translatedMatrix(evaluated.get<FillTranslate>(),
@@ -83,12 +82,28 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                         },
                         uniforms::u_world::Value{ parameters.context.viewport.getCurrentValue().size },
                     },
+                    paintPropertyBinders,
+                    evaluated,
+                    parameters.state.getZoom()
+                );
+                const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
                     *bucket.vertexBuffer,
+                    paintPropertyBinders,
+                    evaluated
+                );
+
+                checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
+                programInstance.draw(
+                    parameters.context,
+                    drawMode,
+                    depthMode,
+                    parameters.stencilModeForClipping(tile.clip),
+                    parameters.colorModeForRenderPass(),
                     indexBuffer,
                     segments,
-                    bucket.paintPropertyBinders.at(getID()),
-                    evaluated,
-                    parameters.state.getZoom(),
+                    allUniformValues,
+                    allAttributeBindings,
                     getID()
                 );
             };
@@ -139,12 +154,11 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                              const auto& depthMode,
                              const auto& indexBuffer,
                              const auto& segments) {
-                program.get(evaluated).draw(
-                    parameters.context,
-                    drawMode,
-                    depthMode,
-                    parameters.stencilModeForClipping(tile.clip),
-                    parameters.colorModeForRenderPass(),
+                auto& programInstance = program.get(evaluated);
+
+                const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
+
+                const auto allUniformValues = programInstance.computeAllUniformValues(
                     FillPatternUniforms::values(
                         tile.translatedMatrix(evaluated.get<FillTranslate>(),
                                               evaluated.get<FillTranslateAnchor>(),
@@ -157,12 +171,28 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                         tile.id,
                         parameters.state
                     ),
+                    paintPropertyBinders,
+                    evaluated,
+                    parameters.state.getZoom()
+                );
+                const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
                     *bucket.vertexBuffer,
+                    paintPropertyBinders,
+                    evaluated
+                );
+
+                checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
+                programInstance.draw(
+                    parameters.context,
+                    drawMode,
+                    depthMode,
+                    parameters.stencilModeForClipping(tile.clip),
+                    parameters.colorModeForRenderPass(),
                     indexBuffer,
                     segments,
-                    bucket.paintPropertyBinders.at(getID()),
-                    evaluated,
-                    parameters.state.getZoom(),
+                    allUniformValues,
+                    allAttributeBindings,
                     getID()
                 );
             };
