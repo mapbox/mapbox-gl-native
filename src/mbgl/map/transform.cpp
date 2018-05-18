@@ -628,17 +628,23 @@ bool Transform::inTransition() const {
 }
 
 void Transform::updateTransitions(const TimePoint& now) {
+
     // Use a temporary function to ensure that the transitionFrameFn lambda is
     // called only once per update.
-    //
-    // This addresses the symptons of https://github.com/mapbox/mapbox-gl-native/issues/11180
+
+    // This addresses the symptoms of https://github.com/mapbox/mapbox-gl-native/issues/11180
     // where setting a shape source to nil (or similar) in the `onCameraIsChanging`
     // observer function causes `Map::Impl::onUpdate()` to be called which
     // in turn calls this function (before the current iteration has completed),
-    // leading to an infinite loop.
+    // leading to an infinite loop. See https://github.com/mapbox/mapbox-gl-native/issues/5833
+    // for a similar, related, issue.
     //
     // By temporarily nulling the `transitionFrameFn` (and then restoring it
     // after the temporary has been called) we stop this recursion.
+    //
+    // It's important to note that the scope of this change is stop the above
+    // crashes. It doesn't address any potential deeper issue (for example
+    // user error, how often and when transition callbacks are called).
 
     auto transition = std::move(transitionFrameFn);
     transitionFrameFn = nullptr;
@@ -655,6 +661,9 @@ void Transform::updateTransitions(const TimePoint& now) {
             finish();
         }
     } else if (!transitionFrameFn) {
+        // We have to check `transitionFrameFn` is nil here, since a new transition
+        // may have been triggered in a user callback (from the transition call
+        // above)
         transitionFrameFn = std::move(transition);
     }
 }
