@@ -59,8 +59,6 @@ public final class CompassView extends ImageView implements Runnable {
   }
 
   private void initialize(Context context) {
-    uiSettings = ViewModelProviders.of((FragmentActivity) context).get(UiSettings.class);
-
     // Layout params
     float screenDensity = context.getResources().getDisplayMetrics().density;
     ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams((int) (48 * screenDensity), (int) (48 * screenDensity));
@@ -69,6 +67,10 @@ public final class CompassView extends ImageView implements Runnable {
 
   public void injectCompassAnimationListener(@NonNull MapboxMap.OnCompassAnimationListener compassAnimationListener) {
     this.compassAnimationListener = compassAnimationListener;
+  }
+
+  public void injectUiSettings(@NonNull UiSettings uiSettings) {
+    this.uiSettings = uiSettings;
   }
 
   public void isAnimating(boolean isAnimating) {
@@ -118,7 +120,7 @@ public final class CompassView extends ImageView implements Runnable {
    */
   @Deprecated
   public void update(final double bearing) {
-    if (uiSettings.getCompassRotationObservable().getValue() != bearing) {
+    if (uiSettings != null && uiSettings.getCompassRotationObservable().getValue() != bearing) {
       uiSettings.getCompassRotationObservable().setValue(bearing);
     }
   }

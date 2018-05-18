@@ -23,6 +23,10 @@ import java.util.List;
  * using a FragmentManager.
  * </p>
  * <p>
+ * If you are planning on using multiple MapView instances in one lifecycle
+ * you have to specify a unique ID for each instance with {@link MapboxMapOptions#setMapId(String)} or in xml attributes.
+ * </p>
+ * <p>
  * To get a reference to the MapView, use {@link #getMapAsync(OnMapReadyCallback)}}
  * </p>
  *
@@ -136,17 +140,6 @@ public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
   public void onPause() {
     super.onPause();
     map.onPause();
-  }
-
-  /**
-   * Called when the fragment state needs to be saved.
-   *
-   * @param outState The saved state
-   */
-  @Override
-  public void onSaveInstanceState(@NonNull Bundle outState) {
-    super.onSaveInstanceState(outState);
-    map.onSaveInstanceState(outState);
   }
 
   /**

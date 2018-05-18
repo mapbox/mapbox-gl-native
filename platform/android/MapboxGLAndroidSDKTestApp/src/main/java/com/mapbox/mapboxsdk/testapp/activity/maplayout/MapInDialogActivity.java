@@ -11,8 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -53,14 +57,24 @@ public class MapInDialogActivity extends AppCompatActivity {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-      return inflater.inflate(R.layout.fragment_dialog_map, container);
+      MapboxMapOptions options = new MapboxMapOptions();
+      options.styleUrl("mapbox://styles/mapbox/streets-v10");
+      options.camera(new CameraPosition.Builder()
+        .target(new LatLng(47.6077, -122.3421))
+        .zoom(11)
+        .build());
+      mapView = new MapView(getActivity(), options);
+
+      LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.fragment_dialog_map, container);
+      layout.addView(mapView);
+
+      return layout;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
       super.onViewCreated(view, savedInstanceState);
 
-      mapView = (MapView) view.findViewById(R.id.mapView);
       mapView.onCreate(savedInstanceState);
     }
 
@@ -69,6 +83,7 @@ public class MapInDialogActivity extends AppCompatActivity {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
       return new Dialog(getActivity(), getTheme()) {
         boolean destroyed = false;
+
         @Override
         public void dismiss() {
           if (mapView != null && !destroyed) {

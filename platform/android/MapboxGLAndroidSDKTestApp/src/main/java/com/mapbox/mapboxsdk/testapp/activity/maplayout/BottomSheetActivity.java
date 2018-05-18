@@ -35,6 +35,7 @@ public class BottomSheetActivity extends AppCompatActivity {
   private static final String TAG_BOTTOM_FRAGMENT = "com.mapbox.mapboxsdk.fragment.tag.bottom";
 
   private boolean bottomSheetFragmentAdded;
+  private int mapsSum;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,7 +54,15 @@ public class BottomSheetActivity extends AppCompatActivity {
     BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
     bottomSheetBehavior.setPeekHeight((int) (64 * getResources().getDisplayMetrics().density));
     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-    toggleBottomSheetMapFragment();
+
+    if (savedInstanceState == null) {
+      toggleBottomSheetMapFragment();
+    } else {
+      Fragment fragment = getSupportFragmentManager().findFragmentByTag(TAG_BOTTOM_FRAGMENT);
+      if (fragment != null) {
+        bottomSheetFragmentAdded = true;
+      }
+    }
   }
 
   @Override
@@ -69,6 +78,7 @@ public class BottomSheetActivity extends AppCompatActivity {
     FragmentManager fragmentManager = getSupportFragmentManager();
 
     if (fragmentManager.getBackStackEntryCount() > 0) {
+      mapsSum--;
       fragmentManager.popBackStack();
     } else {
       super.onBackPressed();
@@ -76,11 +86,12 @@ public class BottomSheetActivity extends AppCompatActivity {
   }
 
   private void addMapFragment() {
+    mapsSum++;
     FragmentManager fragmentManager = getSupportFragmentManager();
     int fragmentCount = fragmentManager.getBackStackEntryCount();
 
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-    MainMapFragment mainMapFragment = MainMapFragment.newInstance(fragmentCount);
+    MainMapFragment mainMapFragment = MainMapFragment.newInstance(fragmentCount, mapsSum);
     if (fragmentCount == 0) {
       fragmentTransaction.add(R.id.fragment_container, mainMapFragment, TAG_MAIN_FRAGMENT);
     } else {
@@ -126,19 +137,25 @@ public class BottomSheetActivity extends AppCompatActivity {
 
     private MapView map;
 
-    public static MainMapFragment newInstance(int mapCounter) {
+    public static MainMapFragment newInstance(int mapCounter, int mapSum) {
       MainMapFragment mapFragment = new MainMapFragment();
       MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
       mapboxMapOptions.styleUrl(STYLES[Math.min(Math.max(mapCounter, 0), STYLES.length - 1)]);
+      mapboxMapOptions.setMapId(String.valueOf(mapSum));
       mapFragment.setArguments(MapFragmentUtils.createFragmentArgs(mapboxMapOptions));
       return mapFragment;
     }
 
     @Override
+    public void onAttach(Context context) {
+      super.onAttach(context);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
       super.onCreateView(inflater, container, savedInstanceState);
-      Context context = inflater.getContext();
-      return map = new MapView(context, MapFragmentUtils.resolveArgs(context, getArguments()));
+      //Context context = inflater.getContext();
+      return map = new MapView(getContext(), MapFragmentUtils.resolveArgs(getContext(), getArguments()));
     }
 
     @Override
@@ -194,6 +211,16 @@ public class BottomSheetActivity extends AppCompatActivity {
       super.onDestroyView();
       map.onDestroy();
     }
+
+    @Override
+    public void onDetach() {
+      super.onDetach();
+    }
+
+    @Override
+    public void onDestroy() {
+      super.onDestroy();
+    }
   }
 
   public static class BottomSheetFragment extends Fragment implements OnMapReadyCallback {
@@ -205,6 +232,7 @@ public class BottomSheetActivity extends AppCompatActivity {
       MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
       mapboxMapOptions.renderSurfaceOnTop(true);
       mapboxMapOptions.styleUrl(Style.LIGHT);
+      mapboxMapOptions.setMapId("bottom_sheet_map");
       mapFragment.setArguments(MapFragmentUtils.createFragmentArgs(mapboxMapOptions));
       return mapFragment;
     }

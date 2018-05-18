@@ -72,6 +72,10 @@ import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
  * and style the features of the map to fit your application's use case.
  * </p>
  * <p>
+ * If you are planning on using multiple MapView instances in one lifecycle
+ * you have to specify a unique ID for each instance with {@link MapboxMapOptions#setMapId(String)} or in xml attributes.
+ * </p>
+ * <p>
  * Use of {@code MapView} requires a Mapbox API access token.
  * Obtain an access token on the <a href="https://www.mapbox.com/studio/account/tokens/">Mapbox account page</a>.
  * </p>
@@ -135,16 +139,28 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       // in IDE layout editor, just return
       return;
     }
+
+    if (!(context instanceof FragmentActivity)) {
+      throw new IllegalArgumentException("You need to instantiate MapView from FragmentActivity context. " +
+        "If your LayoutInflater works with a different context try creating MapView programmatically.");
+    }
+
     mapboxMapOptions = options;
+
+    uiSettings = ViewModelProviders.of((FragmentActivity) context)
+      .get(mapboxMapOptions.getMapId() + UiSettings.class.getCanonicalName(), UiSettings.class);
+    mapSettings = ViewModelProviders.of((FragmentActivity) context)
+      .get(mapboxMapOptions.getMapId() + MapSettings.class.getCanonicalName(), MapSettings.class);
 
     // inflate view
     View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
     compassView = (CompassView) view.findViewById(R.id.compassView);
+    compassView.injectUiSettings(uiSettings);
     attrView = (ImageView) view.findViewById(R.id.attributionView);
     logoView = (ImageView) view.findViewById(R.id.logoView);
 
     // create widget updater
-    WidgetUpdater widgetUpdater = new WidgetUpdater(context, compassView, attrView, logoView);
+    WidgetUpdater widgetUpdater = new WidgetUpdater(uiSettings, compassView, attrView, logoView);
     widgetUpdater.initialiseCompassObservableSettings(context);
     widgetUpdater.initialiseAttributionObservableSettings(context);
     widgetUpdater.initialiseLogoObservableSettings(context);
@@ -169,11 +185,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     // setup components for MapboxMap creation
     Projection proj = new Projection(nativeMapView);
 
-    uiSettings = ViewModelProviders.of((FragmentActivity) context).get(UiSettings.class);
     uiSettings.initialiseProjection(proj);
     uiSettings.getFocalPointObservable().observe((LifecycleOwner) context, point -> this.focalPoint = point);
-
-    mapSettings = ViewModelProviders.of((FragmentActivity) context).get(MapSettings.class);
 
     LongSparseArray<Annotation> annotationsArray = new LongSparseArray<>();
     MarkerViewManager markerViewManager = new MarkerViewManager((ViewGroup) findViewById(R.id.markerViewContainer));
@@ -208,7 +221,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     compassView.injectCompassAnimationListener(createCompassAnimationListener(cameraChangeDispatcher));
     compassView.setOnClickListener(createCompassClickListener(cameraChangeDispatcher));
     // inject widgets with MapboxMap
-    attributionClickListener = new AttributionClickListener(context, mapboxMap);
+    attributionClickListener = new AttributionClickListener(context, uiSettings, mapboxMap);
     attrView.setOnClickListener(attributionClickListener);
 
     // Ensure this view is interactable
@@ -1203,11 +1216,10 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     private final AttributionDialogManager defaultDialogManager;
     private AttributionDialogManager currentDialogManager;
 
-    private AttributionClickListener(Context context, MapboxMap mapboxMap) {
+    private AttributionClickListener(Context context, UiSettings uiSettings, MapboxMap mapboxMap) {
       this.defaultDialogManager = new AttributionDialogManager(context, mapboxMap);
       currentDialogManager = defaultDialogManager;
 
-      UiSettings uiSettings = ViewModelProviders.of((FragmentActivity) context).get(UiSettings.class);
       uiSettings.getAttributionDialogManagerObservable().observe(
         (LifecycleOwner) context, this::setCurrentDialogManager);
     }

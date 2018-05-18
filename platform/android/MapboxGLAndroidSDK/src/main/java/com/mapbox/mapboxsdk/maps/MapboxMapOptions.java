@@ -76,6 +76,8 @@ public class MapboxMapOptions implements Parcelable {
 
   private String style;
 
+  private String mapId;
+
   /**
    * Creates a new MapboxMapOptions object.
    */
@@ -122,6 +124,8 @@ public class MapboxMapOptions implements Parcelable {
     prefetchesTiles = in.readByte() != 0;
     zMediaOverlay = in.readByte() != 0;
     localIdeographFontFamily = in.readString();
+
+    mapId = in.readString();
   }
 
   /**
@@ -139,6 +143,7 @@ public class MapboxMapOptions implements Parcelable {
       mapboxMapOptions.camera(new CameraPosition.Builder(typedArray).build());
       mapboxMapOptions.styleUrl(typedArray.getString(R.styleable.mapbox_MapView_mapbox_styleUrl));
       mapboxMapOptions.apiBaseUrl(typedArray.getString(R.styleable.mapbox_MapView_mapbox_apiBaseUrl));
+      mapboxMapOptions.setMapId(typedArray.getString(R.styleable.mapbox_MapView_mapbox_mapId));
 
       mapboxMapOptions.zoomGesturesEnabled(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiZoomGestures, true));
@@ -254,6 +259,20 @@ public class MapboxMapOptions implements Parcelable {
    */
   public MapboxMapOptions styleUrl(String styleUrl) {
     style = styleUrl;
+    return this;
+  }
+
+  /**
+   * Sets a unique ID for this {@link MapView} used in a multi-map setup.
+   * <p>
+   * If you are using multiple MapViews or {@link MapFragment}/{@link SupportMapFragment}
+   * you need to assign a unique ID to each instance of the MapView for state management purposes.
+   *
+   * @param id Map ID used in multi-map setup.
+   * @return This
+   */
+  public MapboxMapOptions setMapId(String id) {
+    mapId = id;
     return this;
   }
 
@@ -691,6 +710,16 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Get this map ID used in a multi-map setup.
+   *
+   * @return Map ID used in multi-map setup.
+   * @see #setMapId(String)
+   */
+  public String getMapId() {
+    return mapId;
+  }
+
+  /**
    * Get the current configured rotate gesture state for a map view.
    *
    * @return True indicates gesture is enabled
@@ -866,6 +895,8 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeByte((byte) (prefetchesTiles ? 1 : 0));
     dest.writeByte((byte) (zMediaOverlay ? 1 : 0));
     dest.writeString(localIdeographFontFamily);
+
+    dest.writeString(mapId);
   }
 
   @Override
@@ -962,6 +993,9 @@ public class MapboxMapOptions implements Parcelable {
     if (localIdeographFontFamily != options.localIdeographFontFamily) {
       return false;
     }
+    if (mapId != null ? !mapId.equals(options.mapId) : options.mapId != null) {
+      return false;
+    }
 
     return false;
   }
@@ -1001,6 +1035,7 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (prefetchesTiles ? 1 : 0);
     result = 31 * result + (zMediaOverlay ? 1 : 0);
     result = 31 * result + (localIdeographFontFamily != null ? localIdeographFontFamily.hashCode() : 0);
+    result = 31 * result + (mapId != null ? mapId.hashCode() : 0);
     return result;
   }
 }

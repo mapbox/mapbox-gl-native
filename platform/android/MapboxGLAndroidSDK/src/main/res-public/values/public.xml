@@ -12,6 +12,7 @@
     <public name="mapbox_styleUrl" type="attr" />
     <public name="mapbox_apiBaseUrl" type="attr" />
     <public name="mapbox_localIdeographFontFamily" type="attr" />
+    <public name="mapbox_mapId" format="string" />
 
     <!--Camera-->
     <public name="mapbox_cameraTargetLng" type="attr" />
@@ -104,7 +105,7 @@
     <public name="mapbox_attributionTelemetryPositive" type="string" />
     <public name="mapbox_attributionTelemetryNegative" type="string" />
     <public name="mapbox_attributionTelemetryNeutral" type="string" />
-    <public name="mapbox_telemetrySettings" type="string"/>
+    <public name="mapbox_telemetrySettings" type="string" />
     <public name="mapbox_offline_error_region_definition_invalid" type="string" />
 
     <!-- Exposed drawables -->

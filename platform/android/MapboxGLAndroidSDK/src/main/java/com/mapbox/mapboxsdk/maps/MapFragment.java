@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.mapbox.mapboxsdk.utils.MapFragmentUtils;
 
 import java.util.ArrayList;
@@ -20,6 +21,10 @@ import java.util.List;
  * It's a wrapper around a view of a map to automatically handle the necessary life cycle needs.
  * Being a fragment, this component can be added to an activity's layout or can dynamically be added
  * using a FragmentManager.
+ * </p>
+ * <p>
+ * If you are planning on using multiple MapView instances in one lifecycle
+ * you have to specify a unique ID for each instance with {@link MapboxMapOptions#setMapId(String)} or in xml attributes.
  * </p>
  * <p>
  * To get a reference to the MapView, use {@link #getMapAsync(OnMapReadyCallback)}}
@@ -140,17 +145,6 @@ public final class MapFragment extends Fragment implements OnMapReadyCallback {
   public void onPause() {
     super.onPause();
     map.onPause();
-  }
-
-  /**
-   * Called when the fragment state needs to be saved.
-   *
-   * @param outState The saved state
-   */
-  @Override
-  public void onSaveInstanceState(@NonNull Bundle outState) {
-    super.onSaveInstanceState(outState);
-    map.onSaveInstanceState(outState);
   }
 
   /**

@@ -25,12 +25,12 @@ public final class WidgetUpdater {
 
   private final UiSettings uiSettings;
 
-  public WidgetUpdater(@NonNull Context context, @NonNull CompassView compassView,
+  public WidgetUpdater(@NonNull UiSettings uiSettings, @NonNull CompassView compassView,
                        @NonNull ImageView attributionView, @NonNull View logoView) {
     this.compassView = compassView;
     this.attributionView = attributionView;
     this.logoView = logoView;
-    uiSettings = ViewModelProviders.of((FragmentActivity) context).get(UiSettings.class);
+    this.uiSettings = uiSettings;
   }
 
   public void initialiseCompassObservableSettings(Context context) {
