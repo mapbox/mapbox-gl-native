@@ -219,7 +219,7 @@
         NSArray *expected = @[@"match", @[@"id"], @[@6, @5, @4, @3], @YES, @NO];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$featureIdentifier IN { 6, 5, 4, 3}"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH(CAST($featureIdentifier, 'NSNumber'), { 3, 4, 5, 6 }, YES, NO) == YES"];
+        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH($featureIdentifier, { 3, 4, 5, 6 }, YES, NO) == YES"];
         auto forwardFilter = [NSPredicate predicateWithMGLJSONObject:expected].mgl_filter;
         NSPredicate *forwardPredicateAfter = [NSPredicate mgl_predicateWithFilter:forwardFilter];
         XCTAssertEqualObjects(predicateAfter, forwardPredicateAfter);
@@ -228,7 +228,7 @@
         NSArray *expected = @[@"!", @[@"match", @[@"get", @"x"], @[@6, @5, @4, @3], @YES, @NO]];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"NOT x IN { 6, 5, 4, 3}"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"NOT MGL_MATCH(CAST(x, 'NSNumber'), { 3, 4, 5, 6 }, YES, NO) == YES"];
+        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"NOT MGL_MATCH(x, { 3, 4, 5, 6 }, YES, NO) == YES"];
         auto forwardFilter = [NSPredicate predicateWithMGLJSONObject:expected].mgl_filter;
         NSPredicate *forwardPredicateAfter = [NSPredicate mgl_predicateWithFilter:forwardFilter];
         XCTAssertEqualObjects(predicateAfter, forwardPredicateAfter);
@@ -237,7 +237,7 @@
         NSArray *expected = @[@"match", @[@"get", @"a"], @[@"b", @"c"], @YES, @NO];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"a IN { 'b', 'c' }"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH(CAST(a, 'NSString'), { 'b', 'c' }, YES, NO) == YES"];
+        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH(a, { 'b', 'c' }, YES, NO) == YES"];
         auto forwardFilter = [NSPredicate predicateWithMGLJSONObject:expected].mgl_filter;
         NSPredicate *forwardPredicateAfter = [NSPredicate mgl_predicateWithFilter:forwardFilter];
         XCTAssertEqualObjects(predicateAfter, forwardPredicateAfter);
@@ -255,7 +255,7 @@
         NSArray *expected = @[@"match", @[@"get", @"x"], @[@6, @5, @4, @3], @YES, @NO];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"{ 6, 5, 4, 3 } CONTAINS x"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH(CAST(x, 'NSNumber'), { 3, 4, 5, 6 }, YES, NO) == YES"];
+        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH(x, { 3, 4, 5, 6 }, YES, NO) == YES"];
         auto forwardFilter = [NSPredicate predicateWithMGLJSONObject:expected].mgl_filter;
         NSPredicate *forwardPredicateAfter = [NSPredicate mgl_predicateWithFilter:forwardFilter];
         XCTAssertEqualObjects(predicateAfter, forwardPredicateAfter);
@@ -273,7 +273,7 @@
         NSArray *expected = @[@"match", @[@"id"], @[@6, @5, @4, @3], @YES, @NO];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"{ 6, 5, 4, 3} CONTAINS $featureIdentifier"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH(CAST($featureIdentifier, 'NSNumber'), { 3, 4, 5, 6 }, YES, NO) == YES"];
+        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH($featureIdentifier, { 3, 4, 5, 6 }, YES, NO) == YES"];
         auto forwardFilter = [NSPredicate predicateWithMGLJSONObject:expected].mgl_filter;
         NSPredicate *forwardPredicateAfter = [NSPredicate mgl_predicateWithFilter:forwardFilter];
         XCTAssertEqualObjects(predicateAfter, forwardPredicateAfter);

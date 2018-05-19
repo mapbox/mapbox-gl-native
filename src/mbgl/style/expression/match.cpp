@@ -83,6 +83,10 @@ template<> EvaluationResult Match<std::string>::evaluate(const EvaluationContext
         return inputValue.error();
     }
 
+    if (!inputValue->is<std::string>()) {
+        return otherwise->evaluate(params);
+    }
+
     auto it = branches.find(inputValue->get<std::string>());
     if (it != branches.end()) {
         return (*it).second->evaluate(params);
@@ -96,7 +100,11 @@ template<> EvaluationResult Match<int64_t>::evaluate(const EvaluationContext& pa
     if (!inputValue) {
         return inputValue.error();
     }
-    
+
+    if (!inputValue->is<double>()) {
+        return otherwise->evaluate(params);
+    }
+
     const auto numeric = inputValue->get<double>();
     int64_t rounded = std::floor(numeric);
     if (numeric == rounded) {
@@ -280,7 +288,7 @@ ParseResult parseMatch(const Convertible& value, ParsingContext& ctx) {
         branches.push_back(std::make_pair(std::move(labels), std::move(*output)));
     }
 
-    auto input = ctx.parse(arrayMember(value, 1), 1, inputType);
+    auto input = ctx.parse(arrayMember(value, 1), 1, {type::Value});
     if (!input) {
         return ParseResult();
     }
@@ -291,6 +299,12 @@ ParseResult parseMatch(const Convertible& value, ParsingContext& ctx) {
     }
 
     assert(inputType && outputType);
+
+    optional<std::string> err;
+    if ((*input)->getType() != type::Value && (err = type::checkSubtype(*inputType, (*input)->getType()))) {
+        ctx.error(*err, 1);
+        return ParseResult();
+    }
 
     return inputType->match(
         [&](const type::NumberType&) {

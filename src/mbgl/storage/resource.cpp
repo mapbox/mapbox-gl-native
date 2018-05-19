@@ -79,13 +79,13 @@ Resource Resource::spriteJSON(const std::string& base, float pixelRatio) {
 Resource Resource::glyphs(const std::string& urlTemplate, const FontStack& fontStack, const std::pair<uint16_t, uint16_t>& glyphRange) {
     return Resource {
         Resource::Kind::Glyphs,
-        util::replaceTokens(urlTemplate, [&](const std::string& token) {
+        util::replaceTokens(urlTemplate, [&](const std::string& token) -> optional<std::string> {
             if (token == "fontstack") {
                 return util::percentEncode(fontStackToString(fontStack));
             } else if (token == "range") {
                 return util::toString(glyphRange.first) + "-" + util::toString(glyphRange.second);
             } else {
-                return std::string();
+                return {};
             }
         })
     };
@@ -104,7 +104,7 @@ Resource Resource::tile(const std::string& urlTemplate,
     }
     return Resource {
         Resource::Kind::Tile,
-        util::replaceTokens(urlTemplate, [&](const std::string& token) {
+        util::replaceTokens(urlTemplate, [&](const std::string& token) -> optional<std::string> {
             if (token == "z") {
                 return util::toString(z);
             } else if (token == "x") {
@@ -123,7 +123,7 @@ Resource Resource::tile(const std::string& urlTemplate,
             } else if (token == "ratio") {
                 return std::string(pixelRatio > 1.0 ? "@2x" : "");
             } else {
-                return std::string();
+                return {};
             }
         }),
         Resource::TileData {
