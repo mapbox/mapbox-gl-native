@@ -382,10 +382,18 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
 /**
  Insert a tile into the offline storage coupled with a offline pack. The compressed flag tells wether the data is (zlib) compressed or not.
  */
--(void)putTileWithUrlTemplate:(NSString *)urlTemplate pixelRatio:(float)pixelRatio x:(int32_t)x y:(int32_t)y z:(int8_t)z data:(NSData *)data compressed:(BOOL)compressed expires:(NSDate *)expires pack:(MGLOfflinePack *)pack completionHandler:(void (^)(NSError * _Nullable error))completion {
+-(void)putTileWithUrlTemplate:(NSString *)urlTemplate pixelRatio:(float)pixelRatio x:(int32_t)x y:(int32_t)y z:(int8_t)z data:(NSData *)data compressed:(BOOL)compressed modified:(NSDate *)modified expires:(NSDate *)expires etag:(NSString *)etag pack:(MGLOfflinePack *)pack completionHandler:(void (^)(NSError * _Nullable error))completion {
     mbgl::Resource resource = mbgl::Resource::tile([urlTemplate UTF8String], pixelRatio, x, y, z, mbgl::Tileset::Scheme::XYZ);
     mbgl::Response response = mbgl::Response();
     response.data = std::make_shared<std::string>(static_cast<const char*>(data.bytes), data.length);
+    
+    if (etag) {
+        response.etag = std::string([etag UTF8String]);
+    }
+    
+    if (modified) {
+        response.modified = mbgl::util::now() + mbgl::Seconds(static_cast<long long>(modified.timeIntervalSinceNow));
+    }
     
     if (expires) {
         response.expires = mbgl::util::now() + mbgl::Seconds(static_cast<long long>(expires.timeIntervalSinceNow));
@@ -397,10 +405,18 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
 /**
  Insert a resource into the offline storage coupled with a offline pack. The compressed flag tells wether the data is (zlib) compressed or not.
  */
--(void)putResourceWithUrl:(NSString *)url data:(NSData *)data compressed:(BOOL)compressed expires:(NSDate *)expires pack:(MGLOfflinePack *)pack completionHandler:(void (^)(NSError * _Nullable error))completion {
+-(void)putResourceWithUrl:(NSString *)url data:(NSData *)data compressed:(BOOL)compressed modified:(NSDate *)modified expires:(NSDate *)expires etag:(NSString *)etag pack:(MGLOfflinePack *)pack completionHandler:(void (^)(NSError * _Nullable error))completion {
     mbgl::Resource resource = mbgl::Resource(mbgl::Resource::Kind::Unknown, [url UTF8String]);
     mbgl::Response response = mbgl::Response();
     response.data = std::make_shared<std::string>(static_cast<const char*>(data.bytes), data.length);
+    
+    if (etag) {
+        response.etag = std::string([etag UTF8String]);
+    }
+    
+    if (modified) {
+        response.modified = mbgl::util::now() + mbgl::Seconds(static_cast<long long>(modified.timeIntervalSinceNow));
+    }
     
     if (expires) {
         response.expires = mbgl::util::now() + mbgl::Seconds(static_cast<long long>(expires.timeIntervalSinceNow));
