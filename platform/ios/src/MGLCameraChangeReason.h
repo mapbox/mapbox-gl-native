@@ -57,5 +57,9 @@ typedef NS_OPTIONS(NSUInteger, MGLCameraChangeReason)
     MGLCameraChangeReasonGestureOneFingerZoom = 1 << 7,
 
     // :nodoc: The user panned with two fingers to tilt the map (two finger drag).
-    MGLCameraChangeReasonGestureTilt = 1 << 8
+    MGLCameraChangeReasonGestureTilt = 1 << 8,
+
+    // :nodoc: Cancelled
+    MGLCameraChangeReasonTransitionCancelled = 1 << 16
+
 };
