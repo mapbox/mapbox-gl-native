@@ -125,7 +125,7 @@ mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDi
                                                  zoomLevel:self.z];
     }
 
-    if(![self isCancelled]) {
+    if(![self isCancelled] && data.count > 0) {
         mbgl::FeatureCollection featureCollection;
         featureCollection.reserve(data.count);
         for (MGLShape <MGLFeature> * feature in data) {
