@@ -935,7 +935,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
         MGLFillExtrusionStyleLayer* layer = [[MGLFillExtrusionStyleLayer alloc] initWithIdentifier:@"extrudedBuildings" source:source];
         layer.sourceLayerIdentifier = @"building";
-        layer.predicate = [NSPredicate predicateWithFormat:@"extrude == 'true' AND height != 0"];
+        layer.predicate = [NSPredicate predicateWithFormat:@"extrude == 'true' AND CAST(height,'NSNumber') > 0"];
         layer.fillExtrusionBase = [NSExpression expressionForKeyPath:@"min_height"];
         layer.fillExtrusionHeight = [NSExpression expressionForKeyPath:@"height"];
 
