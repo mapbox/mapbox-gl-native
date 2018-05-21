@@ -4,7 +4,6 @@ workflows:
   version: 2
   default:
     jobs:
-      - nitpick
       - clang-tidy:
           filters:
             branches:
