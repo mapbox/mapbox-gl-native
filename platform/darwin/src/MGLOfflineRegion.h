@@ -10,6 +10,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @protocol MGLOfflineRegion <NSObject>
 
+/**
+ The number of tiles that the object conforming to the `MGLOfflineRegion`
+ protocol contains.
+ */
+@property (nonatomic, readonly) uint64_t tileCount;
+
 @end
 
 NS_ASSUME_NONNULL_END

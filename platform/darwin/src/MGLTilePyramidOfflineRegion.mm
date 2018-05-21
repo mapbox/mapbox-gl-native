@@ -53,6 +53,11 @@
     return self;
 }
 
+-(uint64_t)tileCount {
+    auto tilePyramidOfflineRegion = [self offlineRegionDefinition];
+    return tilePyramidOfflineRegion.tileCount(mbgl::style::SourceType::Vector, 512, {static_cast<unsigned char>(tilePyramidOfflineRegion.minZoom), static_cast<unsigned char>(tilePyramidOfflineRegion.maxZoom)});
+}
+
 - (instancetype)initWithOfflineRegionDefinition:(const mbgl::OfflineRegionDefinition &)definition {
     NSURL *styleURL = [NSURL URLWithString:@(definition.styleURL.c_str())];
     MGLCoordinateBounds bounds = MGLCoordinateBoundsFromLatLngBounds(definition.bounds);
