@@ -79,6 +79,7 @@ set(MBGL_TEST_FILES
     test/style/conversion/geojson_options.test.cpp
     test/style/conversion/layer.test.cpp
     test/style/conversion/light.test.cpp
+    test/style/conversion/property_value.test.cpp
     test/style/conversion/stringify.test.cpp
     test/style/conversion/tileset.test.cpp
 
