@@ -3582,7 +3582,7 @@ public:
         return MGLAnnotationTagNotFound;
     }
 
-    return  _annotationTagsByAnnotation.at(annotation);
+    return _annotationTagsByAnnotation.at(annotation);
 }
 
 - (void)addAnnotation:(id <MGLAnnotation>)annotation
@@ -5753,21 +5753,18 @@ public:
         if (tag != MGLAnnotationTagNotFound) {
             MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(tag);
             annotationView = annotationContext.annotationView;
+        } else if (annotation == self.userLocation) {
+            annotationView = self.userLocationAnnotationView;
         }
 
-        CGRect rect = [self positioningRectForCalloutForAnnotationWithTag:tag];
+        CGRect positioningRect = annotationView ? annotationView.frame : [self positioningRectForCalloutForAnnotationWithTag:tag];
 
-        if (annotationView)
-        {
-            rect = annotationView.frame;
-        }
+        NSAssert( ! CGRectIsNull(positioningRect), @"Positioning rect should not be CGRectNull by this point");
 
-        NSAssert(!CGRectIsNull(rect), @"Positioning rect should not be CGRectNull by this point");
+        CGPoint centerPoint = CGPointMake(CGRectGetMidX(positioningRect), CGRectGetMinY(positioningRect));
 
-        CGPoint point = CGPointMake(CGRectGetMidX(rect), CGRectGetMinY(rect));
-
-        if ( ! CGPointEqualToPoint(calloutView.center, point)) {
-            calloutView.center = point;
+        if ( ! CGPointEqualToPoint(calloutView.center, centerPoint)) {
+            calloutView.center = centerPoint;
         }
     }
 }
@@ -5840,19 +5837,6 @@ public:
 
         annotationView.hidden = NO;
         [annotationView update];
-
-        if (_userLocationAnnotationIsSelected)
-        {
-            // Ensure the callout view still points to its annotation.
-            UIView <MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
-            CGRect calloutFrame = calloutView.frame;
-            calloutFrame.origin.x = annotationView.center.x - CGRectGetWidth(calloutFrame) / 2;
-            calloutFrame.origin.y = CGRectGetMinY(annotationView.frame) - CGRectGetHeight(calloutFrame);
-            if ( ! CGRectEqualToRect(calloutView.frame, calloutFrame))
-            {
-                calloutView.frame = calloutFrame;
-            }
-        }
     }
     else
     {
