@@ -24,7 +24,8 @@ import java.util.List;
  * </p>
  * <p>
  * If you are planning on using multiple MapView instances in one lifecycle
- * you have to specify a unique ID for each instance with {@link MapboxMapOptions#setMapId(String)} or in xml attributes.
+ * you have to specify a unique ID for each instance with {@link MapboxMapOptions#setMapId(String)}
+ * or in the xml attributes.
  * </p>
  * <p>
  * To get a reference to the MapView, use {@link #getMapAsync(OnMapReadyCallback)}}

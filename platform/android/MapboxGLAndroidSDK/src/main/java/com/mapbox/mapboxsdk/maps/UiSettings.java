@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
@@ -16,6 +18,12 @@ import android.support.v4.content.res.ResourcesCompat;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import timber.log.Timber;
 
 /**
  * Settings for the user interface of a MapboxMap. To obtain this interface, call getUiSettings().
@@ -997,8 +1005,32 @@ public final class UiSettings extends ViewModel {
    * Method used to cleanup resources that might leak during configuration change,
    * like deprecated {@link #setAttributionDialogManager(AttributionDialogManager)} or {@link #getWidth()}.
    */
-  void onMapDestroy() {
+  void onMapDestroy(@NonNull Context context) {
     setAttributionDialogManager(null);
     projection = null;
+    clearObservers((LifecycleOwner) context);
+  }
+
+  private void clearObservers(@NonNull LifecycleOwner lifecycleOwner) {
+    try {
+      Field[] fields = this.getClass().getDeclaredFields();
+      Method method = LiveData.class.getDeclaredMethod("removeObservers", LifecycleOwner.class);
+      for (Field field : fields) {
+        Class type = field.getType();
+        if (type == MutableLiveData.class) {
+          Object value = field.get(this);
+          method.invoke(value, lifecycleOwner);
+        }
+      }
+    } catch (NoSuchMethodException ex) {
+      Timber.e("Unable to clear %s observers, %s.", this.getClass(), ex.getClass().getSimpleName());
+      ex.printStackTrace();
+    } catch (IllegalAccessException ex) {
+      Timber.e("Unable to clear %s observers, %s.", this.getClass(), ex.getClass().getSimpleName());
+      ex.printStackTrace();
+    } catch (InvocationTargetException ex) {
+      Timber.e("Unable to clear %s observers, %s.", this.getClass(), ex.getClass().getSimpleName());
+      ex.printStackTrace();
+    }
   }
 }

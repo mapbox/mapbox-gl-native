@@ -73,7 +73,8 @@ import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
  * </p>
  * <p>
  * If you are planning on using multiple MapView instances in one lifecycle
- * you have to specify a unique ID for each instance with {@link MapboxMapOptions#setMapId(String)} or in xml attributes.
+ * you have to specify a unique ID for each instance with {@link MapboxMapOptions#setMapId(String)}
+ * or in the xml attributes.
  * </p>
  * <p>
  * Use of {@code MapView} requires a Mapbox API access token.
@@ -141,8 +142,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     }
 
     if (!(context instanceof FragmentActivity)) {
-      throw new IllegalArgumentException("You need to instantiate MapView from FragmentActivity context. " +
-        "If your LayoutInflater works with a different context try creating MapView programmatically.");
+      throw new IllegalArgumentException("You need to instantiate MapView from FragmentActivity context. "
+        + "If your LayoutInflater works with a different context try creating MapView programmatically.");
     }
 
     mapboxMapOptions = options;
@@ -435,7 +436,9 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     destroyed = true;
     onMapChangedListeners.clear();
     mapCallback.clearOnMapReadyCallbacks();
-    uiSettings.onMapDestroy();
+
+    uiSettings.onMapDestroy(getContext());
+    mapSettings.onMapDestroy(getContext());
 
     if (nativeMapView != null && hasSurface) {
       // null when destroying an activity programmatically mapbox-navigation-android/issues/503
