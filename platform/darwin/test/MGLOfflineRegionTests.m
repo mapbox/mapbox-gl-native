@@ -29,4 +29,6 @@
     XCTAssertEqual(original.maximumZoomLevel, original.maximumZoomLevel, @"Maximum zoom level has changed.");
 }
 
+// TODO: Add tileCount test(s)
+
 @end
