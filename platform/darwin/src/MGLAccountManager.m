@@ -64,7 +64,9 @@
     [MGLAccountManager sharedManager].accessToken = accessToken;
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    [MGLMapboxEvents setupWithAccessToken:accessToken];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [MGLMapboxEvents setupWithAccessToken:accessToken];
+    });
 #endif
 }
 
