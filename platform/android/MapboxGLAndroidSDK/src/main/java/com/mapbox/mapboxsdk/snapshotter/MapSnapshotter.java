@@ -29,10 +29,8 @@ import com.mapbox.mapboxsdk.storage.FileSource;
 import timber.log.Timber;
 
 /**
- * Use MapSnapshotter to create static map images, rendered in the background.
- * <br>
- * MapSnapshotter itself must be used on the UI thread (for access to the main looper).
- * <br>
+ * <p>Use MapSnapshotter to create static map images, rendered in the background.</p>
+ * <p>MapSnapshotter itself must be used on the UI thread (for access to the main looper).</p>
  * For an example of using MapSnapshotter, see <a href="https://github.com/mapbox/mapbox-gl-native/blob/e423ef5609cd738c07180d11744d4a45ffb3f82f/platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/snapshot/MapSnapshotterActivity.java" target="_blank">MapSnapshotterActivity.java</a>
  */
 @UiThread
@@ -79,11 +77,10 @@ public class MapSnapshotter {
   private ErrorHandler errorHandler;
 
   /**
-   * Specifies the parameters for drawing a static map image using MapSnapshotter.
-   * <br><br>
-   * The width and height of the image must be specified.<br>
-   * Set the Mapbox Style to use with the {@link Options#withStyle(String)} method.<br>
-   * Set the camera position for the snapshot with {@link Options#withCameraPosition(CameraPosition)}.
+   * <p>Specifies the parameters for drawing a static map image using MapSnapshotter.</p>
+   * <p>The width and height of the image must be specified.</p>
+   * <p>Set the Mapbox Style to use with the {@link Options#withStyle(String)} method.</p>
+   * <p>Set the camera position for the snapshot with {@link Options#withCameraPosition(CameraPosition)}.</p>
    */
   public static class Options {
     private float pixelRatio = 1;
@@ -118,7 +115,7 @@ public class MapSnapshotter {
     /**
      * @param region The region to show in the snapshot.
      *               If the {@link CameraPosition} is also set,
-     *               the camera position will be overridden to match the specified region.
+     *               the {@link CameraPosition#target} will be overridden to match the specified region.
      * @return The mutated {@link Options}
      */
     public Options withRegion(LatLngBounds region) {
@@ -137,7 +134,7 @@ public class MapSnapshotter {
 
     /**
      * @param cameraPosition The {@link CameraPosition} to use for the snapshot.
-     *                       Setting a {@link LatLngBounds} region will override the camera position.
+     *                       Setting a {@link LatLngBounds} region will override the {@link CameraPosition#target}.
      * @return The mutated {@link Options}
      */
     public Options withCameraPosition(CameraPosition cameraPosition) {
@@ -296,7 +293,7 @@ public class MapSnapshotter {
    *
    * @param mapSnapshot the map snapshot to draw the overlay on
    */
-  private void addOverlay(MapSnapshot mapSnapshot) {
+  protected void addOverlay(MapSnapshot mapSnapshot) {
     Bitmap snapshot = mapSnapshot.getBitmap();
     Canvas canvas = new Canvas(snapshot);
     int margin = (int) context.getResources().getDisplayMetrics().density * LOGO_MARGIN_DP;
