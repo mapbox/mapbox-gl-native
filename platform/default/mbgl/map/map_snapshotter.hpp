@@ -27,7 +27,7 @@ class MapSnapshotter {
 public:
     MapSnapshotter(FileSource& fileSource,
                    Scheduler& scheduler,
-                   const std::string& styleURL,
+                   const std::pair<bool, std::string> style,
                    const Size&,
                    const float pixelRatio,
                    const CameraOptions&,

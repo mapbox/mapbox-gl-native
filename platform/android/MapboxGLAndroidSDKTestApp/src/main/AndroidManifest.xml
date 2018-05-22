@@ -345,6 +345,17 @@
                 android:value=".activity.FeatureOverviewActivity" />
         </activity>
         <activity
+                android:name=".activity.snapshot.MapSnapshotterLocalStyleActivity"
+                android:description="@string/description_map_snapshotter_local_style"
+                android:label="@string/activity_map_snapshotter_local_style">
+            <meta-data
+                    android:name="@string/category"
+                    android:value="@string/category_imagegenerator" />
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activity.FeatureOverviewActivity" />
+        </activity>
+        <activity
             android:name=".activity.maplayout.DoubleMapActivity"
             android:description="@string/description_doublemap"
             android:label="@string/activity_double_map">

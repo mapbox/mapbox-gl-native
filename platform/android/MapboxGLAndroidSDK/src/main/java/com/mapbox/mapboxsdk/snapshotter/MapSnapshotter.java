@@ -86,6 +86,7 @@ public class MapSnapshotter {
     private int width;
     private int height;
     private String styleUrl = Style.MAPBOX_STREETS;
+    private String styleJson;
     private LatLngBounds region;
     private CameraPosition cameraPosition;
     private boolean showLogo = true;
@@ -108,6 +109,15 @@ public class MapSnapshotter {
      */
     public Options withStyle(String url) {
       this.styleUrl = url;
+      return this;
+    }
+
+    /**
+     * @param styleJson The style json to use
+     * @return the mutated {@link Options}
+     */
+    public Options withStyleJson(String styleJson) {
+      this.styleJson = styleJson;
       return this;
     }
 
@@ -208,7 +218,7 @@ public class MapSnapshotter {
     String programCacheDir = context.getCacheDir().getAbsolutePath();
 
     nativeInitialize(this, fileSource, options.pixelRatio, options.width,
-      options.height, options.styleUrl, options.region, options.cameraPosition,
+      options.height, options.styleUrl, options.styleJson, options.region, options.cameraPosition,
       options.showLogo, programCacheDir);
   }
 
@@ -462,7 +472,7 @@ public class MapSnapshotter {
 
   protected native void nativeInitialize(MapSnapshotter mapSnapshotter,
                                          FileSource fileSource, float pixelRatio,
-                                         int width, int height, String styleUrl,
+                                         int width, int height, String styleUrl, String styleJson,
                                          LatLngBounds region, CameraPosition position,
                                          boolean showLogo, String programCacheDir);
 
