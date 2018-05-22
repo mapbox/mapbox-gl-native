@@ -7,6 +7,7 @@
 #import "MGLOfflineRegion_Private.h"
 #import "MGLGeometry_Private.h"
 #import "MGLStyle.h"
+#import "MGLTileSource.h"
 
 @interface MGLTilePyramidOfflineRegion () <MGLOfflineRegion_Private>
 
@@ -53,8 +54,10 @@
     return self;
 }
 
--(uint64_t)tileCount {
+-(uint64_t)tileCount:(MGLTileSource *)tileSource {
     auto tilePyramidOfflineRegion = [self offlineRegionDefinition];
+    // TODO: Figure out how to work with the MGLTileSource here
+    // TODO: Pass tile type and size into the below method
     return tilePyramidOfflineRegion.tileCount(mbgl::style::SourceType::Vector, 512, {static_cast<unsigned char>(tilePyramidOfflineRegion.minZoom), static_cast<unsigned char>(tilePyramidOfflineRegion.maxZoom)});
 }
 
