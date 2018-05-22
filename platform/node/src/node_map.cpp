@@ -460,7 +460,7 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
 }
 
 void NodeMap::renderFinished() {
-    if (!callback) {
+    if (!req) {
         // In some situations, the render finishes at the same time as we call cancel. Make sure
         // we are only finishing a render once.
         return;
