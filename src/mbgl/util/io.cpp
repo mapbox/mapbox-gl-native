@@ -20,7 +20,7 @@ void write_file(const std::string &filename, const std::string &data) {
 }
 
 std::string read_file(const std::string &filename) {
-    std::ifstream file(filename);
+    std::ifstream file(filename, std::ios::binary);
     if (file.good()) {
         std::stringstream data;
         data << file.rdbuf();
@@ -31,7 +31,7 @@ std::string read_file(const std::string &filename) {
 }
 
 optional<std::string> readFile(const std::string &filename) {
-    std::ifstream file(filename);
+    std::ifstream file(filename, std::ios::binary);
     if (file.good()) {
         std::stringstream data;
         data << file.rdbuf();
