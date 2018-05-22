@@ -28,11 +28,10 @@ public:
                                       const bool pitchWithMap,
                                       const bool collisionDebug);
 
-    void insertFeature(CollisionFeature& feature, bool ignorePlacement);
+    void insertFeature(CollisionFeature& feature, bool ignorePlacement, uint32_t bucketInstanceId);
 
-    std::vector<IndexedSubfeature> queryRenderedSymbols(const GeometryCoordinates&, const UnwrappedTileID& tileID, const std::string& sourceID) const;
+    std::unordered_map<uint32_t, std::vector<IndexedSubfeature>> queryRenderedSymbols(const ScreenLineString&) const;
 
-    
 private:
     bool isOffscreen(const CollisionBox&) const;
     bool isInsideGrid(const CollisionBox&) const;

@@ -6,7 +6,7 @@
 #import "MGLStyle_Private.h"
 #import "MGLMapView_Private.h"
 
-#import "NSPredicate+MGLAdditions.h"
+#import "NSPredicate+MGLPrivateAdditions.h"
 #import "NSURL+MGLAdditions.h"
 
 #include <mbgl/map/map.hpp>
@@ -27,7 +27,7 @@
     return self = [super initWithPendingSource:std::move(source)];
 }
 
-- (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(nullable NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options {
+- (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NSArray<NSString *> *)tileURLTemplates options:(nullable NSDictionary<MGLTileSourceOption, id> *)options {
     mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, options);
     auto source = std::make_unique<mbgl::style::VectorSource>(identifier.UTF8String, tileSet);
     return self = [super initWithPendingSource:std::move(source)];
@@ -47,7 +47,7 @@
     return attribution ? @(attribution->c_str()) : nil;
 }
 
-- (NS_ARRAY_OF(id <MGLFeature>) *)featuresInSourceLayersWithIdentifiers:(NS_SET_OF(NSString *) *)sourceLayerIdentifiers predicate:(nullable NSPredicate *)predicate {
+- (NSArray<id <MGLFeature>> *)featuresInSourceLayersWithIdentifiers:(NSSet<NSString *> *)sourceLayerIdentifiers predicate:(nullable NSPredicate *)predicate {
     
     mbgl::optional<std::vector<std::string>> optionalSourceLayerIDs;
     if (sourceLayerIdentifiers) {
@@ -93,9 +93,9 @@ static NSArray * const MGLMapboxStreetsAlternativeLanguages = @[
     @"mul", @"ar", @"de", @"es", @"fr", @"pt", @"ru", @"zh", @"zh-Hans",
 ];
 
-+ (NS_SET_OF(NSString *) *)mapboxStreetsLanguages {
++ (NSSet<NSString *> *)mapboxStreetsLanguages {
     static dispatch_once_t onceToken;
-    static NS_SET_OF(NSString *) *mapboxStreetsLanguages;
+    static NSSet<NSString *> *mapboxStreetsLanguages;
     dispatch_once(&onceToken, ^{
         mapboxStreetsLanguages = [NSSet setWithArray:MGLMapboxStreetsLanguages];
     });
@@ -112,7 +112,8 @@ static NSArray * const MGLMapboxStreetsAlternativeLanguages = @[
         return [[NSLocale localeWithLocaleIdentifier:language].languageCode isEqualToString:@"en"];
     }]].count;
     
-    NSArray<NSString *> *preferredLanguages = [NSBundle preferredLocalizationsFromArray:MGLMapboxStreetsAlternativeLanguages
+    NSArray<NSString *> *availableLanguages = acceptsEnglish ? MGLMapboxStreetsLanguages : MGLMapboxStreetsAlternativeLanguages;
+    NSArray<NSString *> *preferredLanguages = [NSBundle preferredLocalizationsFromArray:availableLanguages
                                                                          forPreferences:preferencesArray];
     NSString *mostSpecificLanguage;
     for (NSString *language in preferredLanguages) {
@@ -120,10 +121,7 @@ static NSArray * const MGLMapboxStreetsAlternativeLanguages = @[
             mostSpecificLanguage = language;
         }
     }
-    if ([mostSpecificLanguage isEqualToString:@"mul"]) {
-        return acceptsEnglish ? @"en" : nil;
-    }
-    return mostSpecificLanguage;
+    return [mostSpecificLanguage isEqualToString:@"mul"] ? nil : mostSpecificLanguage;
 }
 
 - (BOOL)isMapboxStreets {
@@ -133,21 +131,6 @@ static NSArray * const MGLMapboxStreetsAlternativeLanguages = @[
     }
     NSArray *identifiers = [url.host componentsSeparatedByString:@","];
     return [identifiers containsObject:@"mapbox.mapbox-streets-v7"] || [identifiers containsObject:@"mapbox.mapbox-streets-v6"];
-}
-
-- (NS_DICTIONARY_OF(NSString *, NSString *) *)localizedKeysByKeyForPreferredLanguage:(nullable NSString *)preferredLanguage {
-    if (!self.mapboxStreets) {
-        return @{};
-    }
-
-    // Replace {name} and {name_*} with the matching localized name tag.
-    NSString *localizedKey = preferredLanguage ? [NSString stringWithFormat:@"name_%@", preferredLanguage] : @"name";
-    NSMutableDictionary *localizedKeysByKey = [NSMutableDictionary dictionaryWithObject:localizedKey forKey:@"name"];
-    for (NSString *languageCode in [MGLVectorTileSource mapboxStreetsLanguages]) {
-        NSString *key = [NSString stringWithFormat:@"name_%@", languageCode];
-        localizedKeysByKey[key] = localizedKey;
-    }
-    return localizedKeysByKey;
 }
 
 @end

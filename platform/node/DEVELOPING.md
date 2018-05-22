@@ -4,11 +4,13 @@ This document explains how to build the [Node.js](https://nodejs.org/) bindings 
 
 ## Building
 
-To develop these bindings, you’ll need to build them from source. Building requires [installing all of the basic dependencies needed for Mapbox GL Native](../../INSTALL.md), then running:
+To develop these bindings, you’ll need to build them from source. Building requires the prerequisites listed in either 
+the [macOS](../macos/INSTALL.md#requirements) or [Linux](../linux/README.md#prerequisites) install documentation, depending
+on the target platform.
+
+To compile the Node.js bindings and install module dependencies, from the repository root directory, run:
 
     npm install --build-from-source
-
-From the root directory. This will compile the Node.js bindings and install module dependencies.
 
 To recompile just the C++ code while developing, run `make node`.
 

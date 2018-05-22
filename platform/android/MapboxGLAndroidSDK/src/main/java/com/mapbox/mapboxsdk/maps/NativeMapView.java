@@ -759,9 +759,13 @@ final class NativeMapView {
       return null;
     }
     Source source = getSource(sourceId);
-    return removeSource(source);
+    if (source != null) {
+      return removeSource(source);
+    }
+    return null;
   }
 
+  @Nullable
   public Source removeSource(@NonNull Source source) {
     if (isDestroyedOn("removeSource")) {
       return null;
@@ -775,8 +779,9 @@ final class NativeMapView {
       return;
     }
 
-    // Determine pixel ratio
-    nativeAddImage(name, image, image.getDensity() / DisplayMetrics.DENSITY_DEFAULT);
+    // Determine pixel ratio, cast to float to avoid rounding, see mapbox-gl-native/issues/11809
+    float pixelRatio = (float) image.getDensity() / DisplayMetrics.DENSITY_DEFAULT;
+    nativeAddImage(name, image, pixelRatio);
   }
 
   public void addImages(@NonNull HashMap<String, Bitmap> bitmapHashMap) {

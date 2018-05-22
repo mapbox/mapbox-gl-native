@@ -14,7 +14,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -27,9 +27,12 @@ import java.util.List;
 /**
  * Test activity showing integration of updating metadata of an OfflineRegion.
  */
-public class UpdateMetadataActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class UpdateMetadataActivity extends AppCompatActivity implements AdapterView.OnItemClickListener,
+  AdapterView.OnItemLongClickListener {
 
   private OfflineRegionMetadataAdapter adapter;
+
+  private MapView mapView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,7 @@ public class UpdateMetadataActivity extends AppCompatActivity implements Adapter
     listView.setAdapter(adapter = new OfflineRegionMetadataAdapter(this));
     listView.setEmptyView(findViewById(android.R.id.empty));
     listView.setOnItemClickListener(this);
+    listView.setOnItemLongClickListener(this);
   }
 
   @Override
@@ -62,6 +66,18 @@ public class UpdateMetadataActivity extends AppCompatActivity implements Adapter
     builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
     builder.show();
+  }
+
+  @Override
+  public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+    ViewGroup container = (ViewGroup) findViewById(R.id.container);
+    container.removeAllViews();
+    container.addView(mapView = new MapView(view.getContext()));
+    mapView.setOfflineRegionDefinition(adapter.getItem(position).getDefinition());
+    mapView.onCreate(null);
+    mapView.onStart();
+    mapView.onResume();
+    return true;
   }
 
   private void updateMetadata(OfflineRegion region, byte[] metadata) {
@@ -102,6 +118,16 @@ public class UpdateMetadataActivity extends AppCompatActivity implements Adapter
         Toast.makeText(UpdateMetadataActivity.this, "Error loading regions " + error, Toast.LENGTH_LONG).show();
       }
     });
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    if (mapView != null) {
+      mapView.onPause();
+      mapView.onStop();
+      mapView.onDestroy();
+    }
   }
 
   private static class OfflineRegionMetadataAdapter extends BaseAdapter {

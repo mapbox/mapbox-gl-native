@@ -10,7 +10,7 @@ Put interactive, scalable world maps into your native Cocoa application with the
 
 ![](https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/platform/macos/docs/img/screenshot.jpg)
 
-The Mapbox Maps SDK for macOS is compatible with macOS 10.10.0 and above for Cocoa applications developed in Objective-C, Swift, Interface Builder, or AppleScript. For hybrid applications, consider [Mapbox GL JS](https://www.mapbox.com/mapbox-gl-js/).
+The Mapbox Maps SDK for macOS is compatible with macOS 10.11.0 and above for Cocoa applications developed in Objective-C, Swift, Interface Builder, or AppleScript. For hybrid applications, consider [Mapbox GL JS](https://www.mapbox.com/mapbox-gl-js/).
 
 ## Installation
 
@@ -37,7 +37,7 @@ After running `carthage update`, you’ll find Mapbox.framework in the Carthage/
 Create a [Podfile](https://guides.cocoapods.org/syntax/podfile.html) with the following specification:
 
 ```rb
-platform :osx, '10.10'
+platform :osx, '10.11'
 
 target 'TargetNameForYourApp' do
   pod 'Mapbox-iOS-SDK', '~> x.y'

@@ -26,7 +26,7 @@
     return self.mgl_frameworkInfoDictionary[@"CFBundleIdentifier"];
 }
 
-+ (nullable NS_DICTIONARY_OF(NSString *, id) *)mgl_frameworkInfoDictionary {
++ (nullable NSDictionary<NSString *, id> *)mgl_frameworkInfoDictionary {
     NSBundle *bundle = self.mgl_frameworkBundle;
     return bundle.infoDictionary;
 }

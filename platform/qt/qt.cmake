@@ -145,6 +145,7 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     add_definitions("-Wno-unused-command-line-argument")
     add_definitions("-Wno-unused-local-typedef")
     add_definitions("-Wno-unused-private-field")
+    add_definitions("-Wno-inconsistent-missing-override")
 
     list(APPEND MBGL_QT_CORE_FILES
         PRIVATE platform/qt/src/thread.cpp

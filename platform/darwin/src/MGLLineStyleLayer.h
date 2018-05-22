@@ -180,7 +180,7 @@ MGL_EXPORT
  Used to automatically convert miter joins to bevel joins for sharp angles.
  
  The default value of this property is an expression that evaluates to the float
- 2. Set this property to `nil` to reset it to the default value.
+ `2`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `lineJoin` is set to an
  expression that evaluates to `miter`. Otherwise, it is ignored.
@@ -202,7 +202,7 @@ MGL_EXPORT
  Used to automatically convert round joins to miter joins for shallow angles.
  
  The default value of this property is an expression that evaluates to the float
- 1.05. Set this property to `nil` to reset it to the default value.
+ `1.05`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `lineJoin` is set to an
  expression that evaluates to `round`. Otherwise, it is ignored.
@@ -228,7 +228,7 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- 0. Set this property to `nil` to reset it to the default value.
+ `0`. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
@@ -302,7 +302,10 @@ MGL_EXPORT
 /**
  Specifies the lengths of the alternating dashes and gaps that form the dash
  pattern. The lengths are later scaled by the line width. To convert a dash
- length to points, multiply the length by the current line width.
+ length to points, multiply the length by the current line width. Note that
+ GeoJSON sources with `lineMetrics: true` specified won't render dashed lines to
+ the expected scale. Also note that zoom-dependent expressions will be evaluated
+ only at integer zoom levels.
  
  This property is measured in line widths.
  
@@ -343,7 +346,7 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- 0. Set this property to `nil` to reset it to the default value.
+ `0`. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
@@ -372,7 +375,7 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- 0. Set this property to `nil` to reset it to the default value.
+ `0`. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
@@ -396,7 +399,7 @@ MGL_EXPORT
  The opacity at which the line will be drawn.
  
  The default value of this property is an expression that evaluates to the float
- 1. Set this property to `nil` to reset it to the default value.
+ `1`. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
@@ -542,7 +545,7 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- 1. Set this property to `nil` to reset it to the default value.
+ `1`. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  

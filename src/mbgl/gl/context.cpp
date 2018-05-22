@@ -94,7 +94,13 @@ static_assert(underlying_type(BufferUsage::DynamicDraw) == GL_DYNAMIC_DRAW, "Ope
 
 static_assert(std::is_same<BinaryProgramFormat, GLenum>::value, "OpenGL type mismatch");
 
-Context::Context() = default;
+Context::Context()
+    : maximumVertexBindingCount([] {
+          GLint value;
+          MBGL_CHECK_ERROR(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &value));
+          return value;
+      }()) {
+}
 
 Context::~Context() {
     if (cleanupOnDestruction) {
@@ -351,7 +357,7 @@ VertexArray Context::createVertexArray() {
         VertexArrayID id = 0;
         MBGL_CHECK_ERROR(vertexArray->genVertexArrays(1, &id));
         UniqueVertexArray vao(std::move(id), { this });
-        return { UniqueVertexArrayState(new VertexArrayState(std::move(vao), *this), VertexArrayStateDeleter { true })};
+        return { UniqueVertexArrayState(new VertexArrayState(std::move(vao)), VertexArrayStateDeleter { true })};
     } else {
         // On GL implementations which do not support vertex arrays, attribute bindings are global state.
         // So return a VertexArray which shares our global state tracking and whose deleter is a no-op.

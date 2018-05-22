@@ -88,7 +88,26 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          const auto& binders,
                          const auto& paintProperties)
         {
-            program.get(paintProperties).draw(
+            auto& programInstance = program.get(paintProperties);
+
+            const auto allUniformValues = programInstance.computeAllUniformValues(
+                std::move(uniformValues),
+                *symbolSizeBinder,
+                binders,
+                paintProperties,
+                parameters.state.getZoom()
+            );
+            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
+                *buffers.vertexBuffer,
+                *buffers.dynamicVertexBuffer,
+                *buffers.opacityVertexBuffer,
+                binders,
+                paintProperties
+            );
+
+            checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
+            programInstance.draw(
                 parameters.context,
                 gl::Triangles(),
                 values_.pitchAlignment == AlignmentType::Map
@@ -96,16 +115,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                     : gl::DepthMode::disabled(),
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
-                std::move(uniformValues),
-                *buffers.vertexBuffer,
-                *buffers.dynamicVertexBuffer,
-                *buffers.opacityVertexBuffer,
-                *symbolSizeBinder,
                 *buffers.indexBuffer,
                 buffers.segments,
-                binders,
-                paintProperties,
-                parameters.state.getZoom(),
+                allUniformValues,
+                allAttributeBindings,
                 getID()
             );
         };

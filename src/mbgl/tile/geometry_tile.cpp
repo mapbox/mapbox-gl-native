@@ -16,7 +16,6 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/actor/scheduler.hpp>
 
@@ -133,7 +132,7 @@ void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelatio
     
     buckets = std::move(result.buckets);
     
-    featureIndexPendingCommit = { std::move(result.featureIndex) };
+    latestFeatureIndex = std::move(result.featureIndex);
 
     if (result.glyphAtlasImage) {
         glyphAtlasImage = std::move(*result.glyphAtlasImage);
@@ -201,13 +200,15 @@ Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
     return it->second.get();
 }
 
-void GeometryTile::commitFeatureIndex() {
-    // We commit our pending FeatureIndex when a global placement has run,
-    // synchronizing the global CollisionIndex with the latest buckets/FeatureIndex
-    if (featureIndexPendingCommit) {
-        featureIndex = std::move(*featureIndexPendingCommit);
-        featureIndexPendingCommit = nullopt;
+float GeometryTile::getQueryPadding(const std::vector<const RenderLayer*>& layers) {
+    float queryPadding = 0;
+    for (const RenderLayer* layer : layers) {
+        auto bucket = getBucket(*layer->baseImpl);
+        if (bucket && bucket->hasData()) {
+            queryPadding = std::max(queryPadding, bucket->getQueryRadius(*layer));
+        }
     }
+    return queryPadding;
 }
 
 void GeometryTile::queryRenderedFeatures(
@@ -216,30 +217,26 @@ void GeometryTile::queryRenderedFeatures(
     const TransformState& transformState,
     const std::vector<const RenderLayer*>& layers,
     const RenderedQueryOptions& options,
-    const CollisionIndex& collisionIndex) {
+    const mat4& projMatrix) {
 
     if (!getData()) return;
 
-    // Determine the additional radius needed factoring in property functions
-    float additionalRadius = 0;
-    for (const RenderLayer* layer : layers) {
-        auto bucket = getBucket(*layer->baseImpl);
-        if (bucket) {
-            additionalRadius = std::max(additionalRadius, bucket->getQueryRadius(*layer));
-        }
-    }
+    const float queryPadding = getQueryPadding(layers);
 
-    featureIndex->query(result,
-                        queryGeometry,
-                        transformState.getAngle(),
-                        util::tileSize * id.overscaleFactor(),
-                        std::pow(2, transformState.getZoom() - id.overscaledZ),
-                        options,
-                        id.toUnwrapped(),
-                        sourceID,
-                        layers,
-                        collisionIndex,
-                        additionalRadius);
+    mat4 posMatrix;
+    transformState.matrixFor(posMatrix, id.toUnwrapped());
+    matrix::multiply(posMatrix, projMatrix, posMatrix);
+
+    latestFeatureIndex->query(result,
+                              queryGeometry,
+                              transformState,
+                              posMatrix,
+                              util::tileSize * id.overscaleFactor(),
+                              std::pow(2, transformState.getZoom() - id.overscaledZ),
+                              options,
+                              id.toUnwrapped(),
+                              layers,
+                              queryPadding * transformState.maxPitchScaleFactor());
 }
 
 void GeometryTile::querySourceFeatures(

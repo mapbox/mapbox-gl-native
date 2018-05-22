@@ -62,7 +62,7 @@ CrossTileSymbolLayerIndex::CrossTileSymbolLayerIndex() {
 }
 
 bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& tileID, SymbolBucket& bucket, uint32_t& maxCrossTileID) {
-    auto thisZoomIndexes = indexes[tileID.overscaledZ];
+    const auto& thisZoomIndexes = indexes[tileID.overscaledZ];
     auto previousIndex = thisZoomIndexes.find(tileID);
     if (previousIndex != thisZoomIndexes.end()) {
         if (previousIndex->second.bucketInstanceId == bucket.bucketInstanceId) {
@@ -153,6 +153,10 @@ bool CrossTileSymbolIndex::addLayer(RenderSymbolLayer& symbolLayer) {
         auto bucket = renderTile.tile.getBucket(*symbolLayer.baseImpl);
         assert(dynamic_cast<SymbolBucket*>(bucket));
         SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
+        if (symbolBucket.bucketLeaderID != symbolLayer.getID()) {
+            // Only add this layer if it's the "group leader" for the bucket
+            continue;
+        }
 
         if (!symbolBucket.bucketInstanceId) {
             symbolBucket.bucketInstanceId = ++maxBucketInstanceId;

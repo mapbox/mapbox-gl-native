@@ -82,11 +82,16 @@ bool lineIntersectsBufferedLine(const GeometryCoordinates& lineA, const Geometry
     return false;
 }
 
+bool polygonIntersectsBufferedPoint(const GeometryCoordinates& polygon, const GeometryCoordinate& point, float radius) {
+    if (polygonContainsPoint(polygon, point)) return true;
+    if (pointIntersectsBufferedLine(point, polygon, radius)) return true;
+    return false;
+}
+
 bool polygonIntersectsBufferedMultiPoint(const GeometryCoordinates& polygon, const GeometryCollection& rings, float radius) {
     for (auto& ring : rings) {
         for (auto& point : ring) {
-            if (polygonContainsPoint(polygon, point)) return true;
-            if (pointIntersectsBufferedLine(point, polygon, radius)) return true;
+            if (polygonIntersectsBufferedPoint(polygon, point, radius)) return true;
         }
     }
     return false;

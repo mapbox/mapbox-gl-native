@@ -747,6 +747,11 @@ void Map::Impl::onInvalidate() {
 }
 
 void Map::Impl::onUpdate() {
+    // Don't load/render anything in still mode until explicitly requested.
+    if (mode != MapMode::Continuous && !stillImageRequest) {
+        return;
+    }
+    
     TimePoint timePoint = mode == MapMode::Continuous ? Clock::now() : Clock::time_point::max();
 
     transform.updateTransitions(timePoint);

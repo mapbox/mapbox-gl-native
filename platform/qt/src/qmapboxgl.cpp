@@ -89,15 +89,33 @@ QThreadStorage<std::shared_ptr<mbgl::util::RunLoop>> loop;
 
 std::shared_ptr<mbgl::DefaultFileSource> sharedDefaultFileSource(
         const std::string& cachePath, const std::string& assetRoot, uint64_t maximumCacheSize) {
-    static std::weak_ptr<mbgl::DefaultFileSource> weak;
-    auto fs = weak.lock();
+    static std::mutex mutex;
+    static std::unordered_map<std::string, std::weak_ptr<mbgl::DefaultFileSource>> fileSources;
 
-    if (!fs) {
-        weak = fs = std::make_shared<mbgl::DefaultFileSource>(
-                cachePath, assetRoot, maximumCacheSize);
+    std::lock_guard<std::mutex> lock(mutex);
+
+    // Purge entries no longer in use.
+    for (auto it = fileSources.begin(); it != fileSources.end();) {
+        if (!it->second.lock()) {
+            it = fileSources.erase(it);
+        } else {
+            ++it;
+        }
     }
 
-    return fs;
+    // Return an existing FileSource if available.
+    auto sharedFileSource = fileSources.find(cachePath);
+    if (sharedFileSource != fileSources.end()) {
+        return sharedFileSource->second.lock();
+    }
+
+    // New path, create a new FileSource.
+    auto newFileSource = std::make_shared<mbgl::DefaultFileSource>(
+        cachePath, assetRoot, maximumCacheSize);
+
+    fileSources[cachePath] = newFileSource;
+
+    return newFileSource;
 }
 
 // Conversion helper functions.
@@ -136,15 +154,14 @@ std::unique_ptr<mbgl::style::Image> toStyleImage(const QString &id, const QImage
     \class QMapboxGLSettings
     \brief The QMapboxGLSettings class stores the initial configuration for QMapboxGL.
 
-    \inmodule Mapbox Qt SDK
+    \inmodule Mapbox Maps SDK for Qt
 
     QMapboxGLSettings is used to configure QMapboxGL at the moment of its creation.
     Once created, the QMapboxGLSettings of a QMapboxGL can no longer be changed.
 
-    Cache-related settings are shared between all QMapboxGL instances because different
-    maps will share the same cache database file. The first map to configure cache properties
-    such as size and path will force the configuration to all newly instantiated QMapboxGL
-    objects.
+    Cache-related settings are shared between all QMapboxGL instances using the same cache path.
+    The first map to configure cache properties such as size will force the configuration
+    to all newly instantiated QMapboxGL objects using the same cache in the same process.
 
     \since 4.7
 */
@@ -454,7 +471,7 @@ void QMapboxGLSettings::setResourceTransform(const std::function<std::string(con
     \class QMapboxGL
     \brief The QMapboxGL class is a Qt wrapper for the Mapbox GL Native engine.
 
-    \inmodule Mapbox Qt SDK
+    \inmodule Mapbox Maps SDK for Qt
 
     QMapboxGL is a Qt friendly version the Mapbox GL Native engine using Qt types
     and deep integration with Qt event loop. QMapboxGL relies as much as possible
@@ -515,6 +532,19 @@ void QMapboxGLSettings::setResourceTransform(const std::function<std::string(con
     \value MapChangeSourceDidChange                       A source has changed.
 
     \sa mapChanged()
+*/
+
+/*!
+    \enum QMapboxGL::MapLoadingFailure
+
+    This enum represents map loading failure type.
+
+    \value StyleParseFailure                             Failure to parse the style.
+    \value StyleLoadFailure                              Failure to load the style data.
+    \value NotFoundFailure                               Failure to obtain style resource file.
+    \value UnknownFailure                                Unknown map loading failure.
+
+    \sa mapLoadingFailed()
 */
 
 /*!
@@ -1636,6 +1666,13 @@ void QMapboxGL::connectionEstablished()
 */
 
 /*!
+    \fn void QMapboxGL::mapLoadingFailed(QMapboxGL::MapLoadingFailure type, const QString &description)
+
+    This signal is emitted when a map loading failure happens. Details of the
+    failures are provided, including its \a type and textual \a description.
+*/
+
+/*!
     \fn void QMapboxGL::copyrightsChanged(const QString &copyrightsHtml);
 
     This signal is emitted when the copyrights of the current content of the map
@@ -1672,6 +1709,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     qRegisterMetaType<QMapboxGL::MapChange>("QMapboxGL::MapChange");
 
     connect(m_mapObserver.get(), SIGNAL(mapChanged(QMapboxGL::MapChange)), q, SIGNAL(mapChanged(QMapboxGL::MapChange)));
+    connect(m_mapObserver.get(), SIGNAL(mapLoadingFailed(QMapboxGL::MapLoadingFailure,QString)), q, SIGNAL(mapLoadingFailed(QMapboxGL::MapLoadingFailure,QString)));
     connect(m_mapObserver.get(), SIGNAL(copyrightsChanged(QString)), q, SIGNAL(copyrightsChanged(QString)));
 
     // Setup the Map object

@@ -59,7 +59,7 @@
     MGLTransition transitionTest = MGLTransitionMake(5, 4);
 
 <% for (const property of properties) { -%>
-<%   if (property.name === 'heatmap-color') continue; -%>
+<%   if (property['property-type'] === 'color-ramp') continue; -%>
 
     // <%- originalPropertyName(property) %>
     {
@@ -69,7 +69,7 @@
 
         NSExpression *constantExpression = [NSExpression expressionWithFormat:<%- objCTestValue(property, type, true, 3) %>];
         layer.<%- objCName(property) %> = constantExpression;
-<% if (property["property-function"]) { -%>
+<% if (isDataDriven(property)) { -%>
         mbgl::style::DataDrivenPropertyValue<<%- mbglType(property) %>> propertyValue = { <%- mbglTestValue(property, type) %> };
 <% } else { -%>
         mbgl::style::PropertyValue<<%- mbglType(property) %>> propertyValue = { <%- mbglTestValue(property, type) %> };
@@ -88,13 +88,13 @@
             { 18, <%- mbglTestValue(property, type) %> },
         }};
         propertyValue = mbgl::style::CameraFunction<<%- mbglType(property) %>> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->get<%- camelize(originalPropertyName(property)) %>(), propertyValue,
                        @"Setting <%- objCName(property) %> to a camera expression should update <%- originalPropertyName(property) %>.");
         XCTAssertEqualObjects(layer.<%- objCName(property) %>, functionExpression,
                               @"<%- objCName(property) %> should round-trip camera expressions.");
 
-<% if (property["property-function"] && isInterpolatable(property)) { -%>
+<% if (isDataDriven(property) && isInterpolatable(property)) { -%>
         functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(keyName, 'linear', nil, %@)", @{@18: constantExpression}];
         layer.<%- objCName(property) %> = functionExpression;
 
@@ -120,7 +120,7 @@
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
         XCTAssertEqualObjects(layer.<%- objCName(property) %>, pedanticFunctionExpression,
                               @"<%- objCName(property) %> should round-trip camera-data expressions.");
-<% } -%>                              
+<% } -%>
 <% if (!property.required) { -%>
 
         layer.<%- objCName(property) %> = nil;
@@ -129,7 +129,7 @@
         XCTAssertEqualObjects(layer.<%- objCName(property) %>, defaultExpression,
                               @"<%- objCName(property) %> should return the default value after being unset.");
 <% } -%>
-<% if (!property["property-function"]) { -%>
+<% if (!isDataDriven(property)) { -%>
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.<%- objCName(property) %> = functionExpression, NSException, NSInvalidArgumentException, @"MGL<%- camelize(type) %>Layer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
@@ -154,7 +154,7 @@
 
 - (void)testPropertyNames {
 <% for (const property of properties) { -%>
-<%   if (property.name === 'heatmap-color') continue; -%>
+<%   if (property['property-type'] === 'color-ramp') continue; -%>
     [self testPropertyName:@"<%- property.getter || property.name %>" isBoolean:<%- property.type === 'boolean' ? 'YES' : 'NO' %>];
 <% } -%>
 }

@@ -66,7 +66,7 @@
     return [UIColor colorWithRed:[components[0].constantValue doubleValue] / 255.0
                            green:[components[1].constantValue doubleValue] / 255.0
                             blue:[components[2].constantValue doubleValue] / 255.0
-                           alpha:components.count == 3 ? [components[3].constantValue doubleValue] : 1.0];
+                           alpha:components.count == 3 ? 1.0 : [components[3].constantValue doubleValue]];
 }
 
 @end

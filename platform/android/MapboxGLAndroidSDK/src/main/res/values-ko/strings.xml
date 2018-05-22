@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mapbox_compassContentDescription">지도 나침반. 지도회전를 북쪽으로 재설정합니다.</string>
+    <string name="mapbox_attributionsIconContentDescription">속성 정보. 속성 대화를 표시합니다.</string>
+    <string name="mapbox_myLocationViewContentDescription">로케이션 뷰. 지도에서 현재 위치를 보여줍니다.</string>
+    <string name="mapbox_mapActionDescription">맵박스로 생성된 지도 표시. 두 손가락으로 드래그하여 화면을 위 아래로 움직이세요. 두 손가락을 이용해 화면을 확대 축소 하세요.</string>
+    <string name="mapbox_attributionsDialogTitle">안드로이드를 위한 맵박스 맵 SDK</string>
+    <string name="mapbox_attributionTelemetryTitle">더 나은 맵박스 지도 만들기</string>
+    <string name="mapbox_attributionTelemetryMessage">당신은 익명의 사용 데이터를 제공함으로써, 오픈스트리트맵과 맵박스 향상에 기여하고 있습니다.</string>
+    <string name="mapbox_attributionTelemetryPositive">동의</string>
+    <string name="mapbox_attributionTelemetryNegative">비동의</string>
+    <string name="mapbox_attributionTelemetryNeutral">추가정보</string>
+    <string name="mapbox_attributionErrorNoBrowser">웹 브라우저가 설치 되어 있지 않아, 웹 페이지를 열 수 없습니다.</string>
+    <string name="mapbox_offline_error_region_definition_invalid">제공된 오프라인지역정의가 월드바운즈에 적합하지 않습니다: %s</string>
+    <string name="mapbox_telemetrySettings">원격 측정 설정</string>
+    </resources>

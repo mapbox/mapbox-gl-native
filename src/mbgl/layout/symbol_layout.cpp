@@ -2,7 +2,6 @@
 #include <mbgl/layout/merge_lines.hpp>
 #include <mbgl/layout/clip_lines.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
-#include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/renderer/image_atlas.hpp>
@@ -42,7 +41,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                            std::unique_ptr<GeometryTileLayer> sourceLayer_,
                            ImageDependencies& imageDependencies,
                            GlyphDependencies& glyphDependencies)
-    : bucketName(layers.at(0)->getID()),
+    : bucketLeaderID(layers.at(0)->getID()),
       sourceLayer(std::move(sourceLayer_)),
       overscaling(parameters.tileID.overscaleFactor()),
       zoom(parameters.tileID.overscaledZ),
@@ -181,8 +180,7 @@ bool SymbolLayout::hasSymbolInstances() const {
 }
 
 void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyphPositions,
-                           const ImageMap& imageMap, const ImagePositions& imagePositions,
-                           const OverscaledTileID& tileID, const std::string& sourceID) {
+                           const ImageMap& imageMap, const ImagePositions& imagePositions) {
     const bool textAlongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map &&
         layout.get<SymbolPlacement>() == SymbolPlacementType::Line;
 
@@ -253,7 +251,7 @@ void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyph
 
         // if either shapedText or icon position is present, add the feature
         if (shapedTextOrientations.first || shapedIcon) {
-            addFeature(std::distance(features.begin(), it), feature, shapedTextOrientations, shapedIcon, glyphPositionMap, tileID, sourceID);
+            addFeature(std::distance(features.begin(), it), feature, shapedTextOrientations, shapedIcon, glyphPositionMap);
         }
         
         feature.geometry.clear();
@@ -266,9 +264,7 @@ void SymbolLayout::addFeature(const std::size_t index,
                               const SymbolFeature& feature,
                               const std::pair<Shaping, Shaping>& shapedTextOrientations,
                               optional<PositionedIcon> shapedIcon,
-                              const GlyphPositionMap& glyphPositionMap,
-                              const OverscaledTileID& tileID,
-                              const std::string& sourceID) {
+                              const GlyphPositionMap& glyphPositionMap) {
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
     
@@ -297,8 +293,7 @@ void SymbolLayout::addFeature(const std::size_t index,
                                                   : layout.get<SymbolPlacement>();
 
     const float textRepeatDistance = symbolSpacing / 2;
-    IndexedSubfeature indexedFeature(feature.index, sourceLayer->getName(), bucketName, symbolInstances.size(),
-                                     sourceID, tileID.canonical);
+    IndexedSubfeature indexedFeature(feature.index, sourceLayer->getName(), bucketLeaderID, symbolInstances.size());
 
     auto addSymbolInstance = [&] (const GeometryCoordinates& line, Anchor& anchor) {
         // https://github.com/mapbox/vector-tile-spec/tree/master/2.1#41-layers
@@ -424,7 +419,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
     const bool mayOverlap = layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
         layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>();
     
-    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, mayOverlap, std::move(symbolInstances));
+    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, mayOverlap, bucketLeaderID, std::move(symbolInstances));
 
     for (SymbolInstance &symbolInstance : bucket->symbolInstances) {
 

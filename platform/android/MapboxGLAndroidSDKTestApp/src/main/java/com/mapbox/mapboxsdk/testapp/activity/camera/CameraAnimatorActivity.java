@@ -172,9 +172,12 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
     if (mapboxMap == null) {
       return false;
     }
-    findViewById(R.id.fab).setVisibility(View.GONE);
-    resetCameraPosition();
-    playAnimation(item.getItemId());
+
+    if (item.getItemId() != android.R.id.home) {
+      findViewById(R.id.fab).setVisibility(View.GONE);
+      resetCameraPosition();
+      playAnimation(item.getItemId());
+    }
     return super.onOptionsItemSelected(item);
   }
 

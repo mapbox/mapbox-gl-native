@@ -403,7 +403,7 @@ static NSArray * const MGLTokenizedFunctions = @[
  
  If no replacements take place, this method returns the original collection.
  */
-NS_ARRAY_OF(NSExpression *) *MGLCollectionByReplacingTokensWithKeyPaths(NS_ARRAY_OF(NSExpression *) *collection) {
+NSArray<NSExpression *> *MGLCollectionByReplacingTokensWithKeyPaths(NSArray<NSExpression *> *collection) {
     __block NSMutableArray *upgradedCollection;
     [collection enumerateObjectsUsingBlock:^(NSExpression * _Nonnull item, NSUInteger idx, BOOL * _Nonnull stop) {
         NSExpression *upgradedItem = item.mgl_expressionByReplacingTokensWithKeyPaths;
@@ -424,7 +424,7 @@ NS_ARRAY_OF(NSExpression *) *MGLCollectionByReplacingTokensWithKeyPaths(NS_ARRAY
  If no replacements take place, this method returns the original stop
  dictionary.
  */
-NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokensWithKeyPaths(NS_DICTIONARY_OF(NSNumber *, NSExpression *) *stops) {
+NSDictionary<NSNumber *, NSExpression *> *MGLStopDictionaryByReplacingTokensWithKeyPaths(NSDictionary<NSNumber *, NSExpression *> *stops) {
     __block NSMutableDictionary *upgradedStops;
     [stops enumerateKeysAndObjectsUsingBlock:^(id _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
         if (![value isKindOfClass:[NSExpression class]]) {
@@ -665,11 +665,7 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
 }
 
 + (instancetype)mgl_expressionForConditional:(nonnull NSPredicate *)conditionPredicate trueExpression:(nonnull NSExpression *)trueExpression falseExpresssion:(nonnull NSExpression *)falseExpression {
-    if (@available(iOS 9.0, *)) {
-        return [NSExpression expressionForConditional:conditionPredicate trueExpression:trueExpression falseExpression:falseExpression];
-    } else {
-        return [NSExpression expressionForFunction:@"MGL_IF" arguments:@[[NSExpression expressionWithFormat:@"%@", conditionPredicate], trueExpression, falseExpression]];
-    }
+    return [NSExpression expressionForConditional:conditionPredicate trueExpression:trueExpression falseExpression:falseExpression];
 }
 
 + (instancetype)mgl_expressionForSteppingExpression:(nonnull NSExpression *)steppingExpression fromExpression:(nonnull NSExpression *)minimumExpression stops:(nonnull NSExpression *)stops {
@@ -767,6 +763,11 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         NSArray *array = (NSArray *)object;
         NSString *op = array.firstObject;
         
+        if (![op isKindOfClass:[NSString class]]) {
+            NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(array);
+            return [NSExpression expressionForFunction:@"MGL_FUNCTION" arguments:subexpressions];
+        }
+        
         NSArray *argumentObjects = [array subarrayWithRange:NSMakeRange(1, array.count - 1)];
         
         NSString *functionName = MGLFunctionNamesByExpressionOperator[op];
@@ -802,6 +803,22 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         } else if ([op isEqualToString:@"to-string"] || [op isEqualToString:@"string"]) {
             NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
             return [NSExpression expressionWithFormat:@"CAST(%@, 'NSString')", operand];
+        } else if ([op isEqualToString:@"to-color"]) {
+            NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
+            
+            if (argumentObjects.count == 1) {
+#if TARGET_OS_IPHONE
+                return [NSExpression expressionWithFormat:@"CAST(%@, 'UIColor')", operand];
+#else
+                return [NSExpression expressionWithFormat:@"CAST(%@, 'NSColor')", operand];
+#endif
+            }
+            NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(array);
+            return [NSExpression expressionForFunction:@"MGL_FUNCTION" arguments:subexpressions];
+            
+        } else if ([op isEqualToString:@"to-rgba"]) {
+            NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
+            return [NSExpression expressionWithFormat:@"CAST(noindex(%@), 'NSArray')", operand];
         } else if ([op isEqualToString:@"get"]) {
             if (argumentObjects.count == 2) {
                 NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.lastObject];
@@ -913,26 +930,28 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             
             for (NSUInteger index = 0; index < argumentObjects.count; index++) {
                 if (index % 2 == 0 && index != argumentObjects.count - 1) {
-                    NSPredicate *predicate = [NSPredicate mgl_predicateWithJSONObject:argumentObjects[index]];
+                    NSPredicate *predicate = [NSPredicate predicateWithMGLJSONObject:argumentObjects[index]];
                     NSExpression *argument = [NSExpression expressionForConstantValue:predicate];
                     [arguments addObject:argument];
                 } else {
                     [arguments addObject:[NSExpression expressionWithMGLJSONObject:argumentObjects[index]]];
                 }
             }
-            
-            if (@available(iOS 9.0, *)) {
-                if (arguments.count == 3) {
-                    NSPredicate *conditional = [arguments.firstObject constantValue];
-                    return [NSExpression expressionForConditional:conditional trueExpression:arguments[1] falseExpression:arguments[2]];
-                }
+
+            if (arguments.count == 3) {
+                NSPredicate *conditional = [arguments.firstObject constantValue];
+                return [NSExpression expressionForConditional:conditional trueExpression:arguments[1] falseExpression:arguments[2]];
             }
             return [NSExpression expressionForFunction:@"MGL_IF" arguments:arguments];
         } else if ([op isEqualToString:@"match"]) {
             NSMutableArray *optionsArray = [NSMutableArray array];
-            NSEnumerator *optionsEnumerator = argumentObjects.objectEnumerator;
-            while (id object = optionsEnumerator.nextObject) {
-                NSExpression *option = [NSExpression expressionWithMGLJSONObject:object];
+            
+            for (NSUInteger index = 0; index < argumentObjects.count; index++) {
+                NSExpression *option = [NSExpression expressionWithMGLJSONObject:argumentObjects[index]];
+                // match operators with arrays as matching values should not parse arrays as generic functions.
+                if (index > 0 && index < argumentObjects.count - 1 && !(index % 2 == 0) && [argumentObjects[index] isKindOfClass:[NSArray class]]) {
+                    option = [NSExpression expressionForAggregate:MGLSubexpressionsWithJSONObjects(argumentObjects[index])];
+                }
                 [optionsArray addObject:option];
             }
         
@@ -1097,7 +1116,22 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
                 return [@[@"concat", self.operand.mgl_jsonExpressionObject] arrayByAddingObjectsFromArray:arguments];
             } else if ([function isEqualToString:@"objectFrom:withIndex:"]) {
-                return @[@"at", self.arguments[1].mgl_jsonExpressionObject, self.arguments[0].mgl_jsonExpressionObject];
+                id index = self.arguments[1].mgl_jsonExpressionObject;
+                
+                if ([self.arguments[1] expressionType] == NSConstantValueExpressionType
+                    && [[self.arguments[1] constantValue] isKindOfClass:[NSString class]]) {
+                    id value = self.arguments[1].constantValue;
+                    
+                    if ([value isEqualToString:@"FIRST"]) {
+                        index = [NSExpression expressionForConstantValue:@0].mgl_jsonExpressionObject;
+                    } else if ([value isEqualToString:@"LAST"]) {
+                        index = [NSExpression expressionWithFormat:@"count(%@) - 1", self.arguments[0]].mgl_jsonExpressionObject;
+                    } else if ([value isEqualToString:@"SIZE"]) {
+                        return [NSExpression expressionWithFormat:@"count(%@)", self.arguments[0]].mgl_jsonExpressionObject;
+                    }
+                }
+
+                return @[@"at", index, self.arguments[0].mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"boolValue"]) {
                 return @[@"to-boolean", self.operand.mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"mgl_number"] ||
@@ -1149,6 +1183,26 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     return @[@"to-string", object];
                 } else if ([type isEqualToString:@"NSNumber"]) {
                     return @[@"to-number", object];
+                }
+#if TARGET_OS_IPHONE
+                else if ([type isEqualToString:@"UIColor"] || [type isEqualToString:@"MGLColor"]) {
+                    return @[@"to-color", object];
+                }
+#else
+                else if ([type isEqualToString:@"NSColor"] || [type isEqualToString:@"MGLColor"]) {
+                    return @[@"to-color", object];
+                }
+#endif
+                else if ([type isEqualToString:@"NSArray"]) {
+                    NSExpression *operand = self.arguments.firstObject;
+                    if ([operand expressionType] == NSFunctionExpressionType ) {
+                        operand = self.arguments.firstObject.arguments.firstObject;
+                    }
+                    if (([operand expressionType] != NSConstantValueExpressionType) ||
+                        ([operand expressionType] == NSConstantValueExpressionType &&
+                         [[operand constantValue] isKindOfClass:[MGLColor class]])) {
+                        return @[@"to-rgba", object];
+                    }
                 }
                 [NSException raise:NSInvalidArgumentException
                             format:@"Casting expression to %@ not yet implemented.", type];
@@ -1218,7 +1272,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         case NSAnyKeyExpressionType:
         case NSBlockExpressionType:
             [NSException raise:NSInvalidArgumentException
-                        format:@"Expression type %lu not yet implemented.", self.expressionType];
+                        format:@"Expression type %lu not yet implemented.", (unsigned long)self.expressionType];
     }
     
     // NSKeyPathSpecifierExpression
@@ -1240,11 +1294,11 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     if (self.arguments.count < expectedArgumentCount) {
         [NSException raise:NSInvalidArgumentException format:
          @"Too few arguments to ‘%@’ function; expected %lu arguments.",
-         self.function, expectedArgumentCount];
+         self.function, (unsigned long)expectedArgumentCount];
     } else if (self.arguments.count > expectedArgumentCount) {
         [NSException raise:NSInvalidArgumentException format:
          @"%lu unexpected arguments to ‘%@’ function; expected %lu arguments.",
-         self.arguments.count - expectedArgumentCount, self.function, expectedArgumentCount];
+         self.arguments.count - (unsigned long)expectedArgumentCount, self.function, (unsigned long)expectedArgumentCount];
     }
     
     BOOL isAftermarketFunction = [self.function isEqualToString:@"mgl_interpolate:withCurveType:parameters:stops:"];
@@ -1301,7 +1355,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     NSArray<NSExpression *> *arguments = isAftermarketFunction ? self.arguments : self.arguments[minimumIndex].constantValue;
     
     for (NSUInteger index = minimumIndex; index < arguments.count; index++) {
-        [expressionObject addObject:arguments[index].mgl_jsonExpressionObject];
+        NSArray *argumentObject = arguments[index].mgl_jsonExpressionObject;
+        // match operators with arrays as matching values should not parse arrays using the literal operator.
+        if (index > 0 && index < arguments.count - 1 && !(index % 2 == 0)
+            && (arguments[index].expressionType == NSAggregateExpressionType ||
+                (arguments[index].expressionType == NSConstantValueExpressionType && [arguments[index].constantValue isKindOfClass:[NSArray class]]))) {
+            
+            argumentObject = argumentObject.count == 2 ? argumentObject[1] : argumentObject;
+        }
+        [expressionObject addObject:argumentObject];
     }
     
     return expressionObject;
@@ -1371,7 +1433,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
  
  If no localization takes place, this method returns the original collection.
  */
-NS_ARRAY_OF(NSExpression *) *MGLLocalizedCollection(NS_ARRAY_OF(NSExpression *) *collection, NSLocale * _Nullable locale) {
+NSArray<NSExpression *> *MGLLocalizedCollection(NSArray<NSExpression *> *collection, NSLocale * _Nullable locale) {
     __block NSMutableArray *localizedCollection;
     [collection enumerateObjectsUsingBlock:^(NSExpression * _Nonnull item, NSUInteger idx, BOOL * _Nonnull stop) {
         NSExpression *localizedItem = [item mgl_expressionLocalizedIntoLocale:locale];
@@ -1391,7 +1453,7 @@ NS_ARRAY_OF(NSExpression *) *MGLLocalizedCollection(NS_ARRAY_OF(NSExpression *) 
  If no localization takes place, this method returns the original stop
  dictionary.
  */
-NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLLocalizedStopDictionary(NS_DICTIONARY_OF(NSNumber *, NSExpression *) *stops, NSLocale * _Nullable locale) {
+NSDictionary<NSNumber *, NSExpression *> *MGLLocalizedStopDictionary(NSDictionary<NSNumber *, NSExpression *> *stops, NSLocale * _Nullable locale) {
     __block NSMutableDictionary *localizedStops;
     [stops enumerateKeysAndObjectsUsingBlock:^(id _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
         if (![value isKindOfClass:[NSExpression class]]) {
@@ -1456,16 +1518,14 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLLocalizedStopDictionary(NS_DICT
         }
             
         case NSConditionalExpressionType: {
-            if (@available(iOS 9.0, *)) {
-                NSExpression *trueExpression = self.trueExpression;
-                NSExpression *localizedTrueExpression = [trueExpression mgl_expressionLocalizedIntoLocale:locale];
-                NSExpression *falseExpression = self.falseExpression;
-                NSExpression *localizedFalseExpression = [falseExpression mgl_expressionLocalizedIntoLocale:locale];
-                if (localizedTrueExpression != trueExpression || localizedFalseExpression != falseExpression) {
-                    return [NSExpression expressionForConditional:self.predicate
-                                                   trueExpression:localizedTrueExpression
-                                                  falseExpression:localizedFalseExpression];
-                }
+            NSExpression *trueExpression = self.trueExpression;
+            NSExpression *localizedTrueExpression = [trueExpression mgl_expressionLocalizedIntoLocale:locale];
+            NSExpression *falseExpression = self.falseExpression;
+            NSExpression *localizedFalseExpression = [falseExpression mgl_expressionLocalizedIntoLocale:locale];
+            if (localizedTrueExpression != trueExpression || localizedFalseExpression != falseExpression) {
+                return [NSExpression expressionForConditional:self.predicate
+                                               trueExpression:localizedTrueExpression
+                                              falseExpression:localizedFalseExpression];
             }
             return self;
         }

@@ -33,7 +33,7 @@ public:
                           const TransformState& transformState,
                           const std::vector<const RenderLayer*>& layers,
                           const RenderedQueryOptions& options,
-                          const CollisionIndex& collisionIndex) const final;
+                          const mat4& projMatrix) const final;
 
     std::vector<Feature> querySourceFeatures(const SourceQueryOptions&) const final;
 

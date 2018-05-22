@@ -18,7 +18,7 @@
   "LocationPickerActivity",
   "GeoJsonClusteringActivity",
   "RuntimeStyleTestActivity",
-  "AnimatedMarkerActivity",
+  "AnimatedSymbolLayerActivity",
   "ViewPagerActivity",
   "MapFragmentActivity",
   "SupportMapFragmentActivity",

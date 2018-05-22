@@ -62,19 +62,34 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
         LineBucket& bucket = *reinterpret_cast<LineBucket*>(tile.tile.getBucket(*baseImpl));
 
         auto draw = [&] (auto& program, auto&& uniformValues) {
-            program.get(evaluated).draw(
+            auto& programInstance = program.get(evaluated);
+
+            const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
+
+            const auto allUniformValues = programInstance.computeAllUniformValues(
+                std::move(uniformValues),
+                paintPropertyBinders,
+                evaluated,
+                parameters.state.getZoom()
+            );
+            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
+                *bucket.vertexBuffer,
+                paintPropertyBinders,
+                evaluated
+            );
+
+            checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
+            programInstance.draw(
                 parameters.context,
                 gl::Triangles(),
                 parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
                 parameters.stencilModeForClipping(tile.clip),
                 parameters.colorModeForRenderPass(),
-                std::move(uniformValues),
-                *bucket.vertexBuffer,
                 *bucket.indexBuffer,
                 bucket.segments,
-                bucket.paintPropertyBinders.at(getID()),
-                evaluated,
-                parameters.state.getZoom(),
+                allUniformValues,
+                allAttributeBindings,
                 getID()
             );
         };
@@ -162,15 +177,16 @@ bool RenderLineLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
         const GeometryTileFeature& feature,
         const float zoom,
-        const float bearing,
-        const float pixelsToTileUnits) const {
+        const TransformState& transformState,
+        const float pixelsToTileUnits,
+        const mat4&) const {
 
     // Translate query geometry
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,
             evaluated.get<style::LineTranslate>(),
             evaluated.get<style::LineTranslateAnchor>(),
-            bearing,
+            transformState.getAngle(),
             pixelsToTileUnits);
 
     // Evaluate function

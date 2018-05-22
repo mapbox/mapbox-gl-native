@@ -23,5 +23,6 @@ set(MBGL_BENCHMARK_FILES
 
     # util
     benchmark/util/dtoa.benchmark.cpp
+    benchmark/util/tilecover.benchmark.cpp
 
 )

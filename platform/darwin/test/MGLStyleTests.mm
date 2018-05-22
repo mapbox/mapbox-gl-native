@@ -448,6 +448,10 @@
         XCTAssertNil([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences]);
     }
     {
+        NSArray *preferences = @[@"en", @"fr", @"el"];
+        XCTAssertEqualObjects([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences], @"en");
+    }
+    {
         NSArray *preferences = @[@"tlh"];
         XCTAssertNil([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences]);
     }

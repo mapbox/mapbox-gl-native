@@ -70,7 +70,7 @@
     return _coordinates.size();
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingPointCount
++ (NSSet<NSString *> *)keyPathsForValuesAffectingPointCount
 {
     return [NSSet setWithObjects:@"coordinates", nil];
 }
@@ -163,7 +163,7 @@
     if (!_bounds) {
         mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
         for (auto coordinate : _coordinates) {
-            if (!CLLocationCoordinate2DIsValid(coordinate)) {
+            if (!MGLLocationCoordinate2DIsValid(coordinate)) {
                 bounds = mbgl::LatLngBounds::empty();
                 break;
             }

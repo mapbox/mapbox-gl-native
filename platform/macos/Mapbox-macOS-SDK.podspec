@@ -1,6 +1,6 @@
 Pod::Spec.new do |m|
 
-  version = '0.7.0'
+  version = '0.7.1'
 
   m.name    = 'Mapbox-macOS-SDK'
   m.version = version
@@ -20,7 +20,7 @@ Pod::Spec.new do |m|
   }
 
   m.platform              = :osx
-  m.osx.deployment_target = '10.10'
+  m.osx.deployment_target = '10.11'
 
   m.requires_arc = true
 

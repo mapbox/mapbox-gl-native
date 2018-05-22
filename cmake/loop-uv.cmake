@@ -1,18 +1,14 @@
-add_library(mbgl-loop-uv STATIC
-    platform/default/async_task.cpp
-    platform/default/run_loop.cpp
-    platform/default/timer.cpp
+add_library(mbgl-loop-uv INTERFACE)
+
+target_sources(mbgl-loop-uv INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/default/async_task.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/default/run_loop.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/default/timer.cpp
 )
 
-target_include_directories(mbgl-loop-uv
-    PRIVATE include
-    PRIVATE src
-)
-
-target_link_libraries(mbgl-loop-uv
-    PRIVATE mbgl-core
+target_include_directories(mbgl-loop-uv INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 create_source_groups(mbgl-loop-uv)
-
-xcode_create_scheme(TARGET mbgl-loop-uv)

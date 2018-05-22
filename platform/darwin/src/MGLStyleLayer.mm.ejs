@@ -8,7 +8,7 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLSource.h"
-#import "NSPredicate+MGLAdditions.h"
+#import "NSPredicate+MGLPrivateAdditions.h"
 #import "NSDate+MGLAdditions.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLStyleValue_Private.h"
@@ -103,7 +103,7 @@ namespace mbgl {
 {
     MGLAssertStyleLayerIsValid();
 
-    self.rawLayer->setFilter(predicate ? predicate.mgl_filter : mbgl::style::NullFilter());
+    self.rawLayer->setFilter(predicate ? predicate.mgl_filter : mbgl::style::Filter());
 }
 
 - (NSPredicate *)predicate
@@ -121,7 +121,7 @@ namespace mbgl {
 - (void)set<%- camelize(property.name) %>:(NSExpression *)<%- objCName(property) %> {
     MGLAssertStyleLayerIsValid();
 
-<% if (property["property-function"]) { -%>
+<% if (isDataDriven(property)) { -%>
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue<mbgl::style::DataDrivenPropertyValue<<%- valueTransformerArguments(property)[0] %>>>(<%- objCName(property) %>);
 <% } else { -%>
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue<mbgl::style::PropertyValue<<%- valueTransformerArguments(property)[0] %>>>(<%- objCName(property) %>);
@@ -162,11 +162,15 @@ namespace mbgl {
 - (void)set<%- camelize(property.name) %>:(NSExpression *)<%- objCName(property) %> {
     MGLAssertStyleLayerIsValid();
 
-<% if (property.name === 'heatmap-color') { -%>
+<% switch (property['property-type']) {
+    case 'color-ramp': -%>
     auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::HeatmapColorPropertyValue>(heatmapColor);
-<% } else if (property["property-function"]) { -%>
+<%     break
+    case 'data-driven':
+    case 'cross-faded-data-driven': -%>
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue<mbgl::style::DataDrivenPropertyValue<<%- valueTransformerArguments(property)[0] %>>>(<%- objCName(property) %>);
-<% } else { -%>
+<%     break
+    default: -%>
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue<mbgl::style::PropertyValue<<%- valueTransformerArguments(property)[0] %>>>(<%- objCName(property) %>);
 <% } -%>
     self.rawLayer->set<%- camelize(originalPropertyName(property)) %>(mbglValue);

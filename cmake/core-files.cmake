@@ -360,7 +360,6 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion.hpp
     include/mbgl/style/data_driven_property_value.hpp
     include/mbgl/style/filter.hpp
-    include/mbgl/style/filter_evaluator.hpp
     include/mbgl/style/heatmap_color_property_value.hpp
     include/mbgl/style/image.hpp
     include/mbgl/style/layer.hpp
@@ -377,7 +376,6 @@ set(MBGL_CORE_FILES
     src/mbgl/style/custom_tile_loader.cpp
     src/mbgl/style/custom_tile_loader.hpp
     src/mbgl/style/filter.cpp
-    src/mbgl/style/filter_evaluator.cpp
     src/mbgl/style/image.cpp
     src/mbgl/style/image_impl.cpp
     src/mbgl/style/image_impl.hpp
@@ -748,11 +746,11 @@ set(MBGL_CORE_FILES
     src/mbgl/util/stopwatch.hpp
     src/mbgl/util/string.cpp
     src/mbgl/util/thread_local.hpp
-    src/mbgl/util/throttler.cpp
-    src/mbgl/util/throttler.hpp
     src/mbgl/util/tile_coordinate.hpp
     src/mbgl/util/tile_cover.cpp
     src/mbgl/util/tile_cover.hpp
+    src/mbgl/util/tile_cover_impl.cpp
+    src/mbgl/util/tile_cover_impl.hpp
     src/mbgl/util/tile_range.hpp
     src/mbgl/util/tiny_sdf.cpp
     src/mbgl/util/tiny_sdf.hpp

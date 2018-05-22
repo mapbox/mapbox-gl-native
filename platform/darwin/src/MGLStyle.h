@@ -241,7 +241,7 @@ MGL_EXPORT
 /**
  A set containing the style’s sources.
  */
-@property (nonatomic, strong) NS_SET_OF(__kindof MGLSource *) *sources;
+@property (nonatomic, strong) NSSet<__kindof MGLSource *> *sources;
 
 /**
  Values describing animated transitions to changes on a style's individual
@@ -303,7 +303,7 @@ MGL_EXPORT
  The layers included in the style, arranged according to their back-to-front
  ordering on the screen.
  */
-@property (nonatomic, strong) NS_ARRAY_OF(__kindof MGLStyleLayer *) *layers;
+@property (nonatomic, strong) NSArray<__kindof MGLStyleLayer *> *layers;
 
 /**
  Returns a style layer with the given identifier in the current style.
@@ -417,7 +417,7 @@ MGL_EXPORT
 #pragma mark Managing Style Classes
 
 
-@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((unavailable("Support for style classes has been removed.")));
+@property (nonatomic) NSArray<NSString *> *styleClasses __attribute__((unavailable("Support for style classes has been removed.")));
 
 - (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 

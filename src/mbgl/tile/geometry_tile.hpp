@@ -5,7 +5,6 @@
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/util/feature.hpp>
-#include <mbgl/util/throttler.hpp>
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 
@@ -55,11 +54,13 @@ public:
             const TransformState&,
             const std::vector<const RenderLayer*>& layers,
             const RenderedQueryOptions& options,
-            const CollisionIndex& collisionIndex) override;
+            const mat4& projMatrix) override;
 
     void querySourceFeatures(
         std::vector<Feature>& result,
         const SourceQueryOptions&) override;
+
+    float getQueryPadding(const std::vector<const RenderLayer*>&) override;
 
     void cancel() override;
 
@@ -88,11 +89,11 @@ public:
     void markRenderedPreviously() override;
     void performedFadePlacement() override;
     
-    void commitFeatureIndex() override;
+    const std::shared_ptr<FeatureIndex> getFeatureIndex() const { return latestFeatureIndex; }
     
 protected:
     const GeometryTileData* getData() {
-        return featureIndex ? featureIndex->getData() : nullptr;
+        return latestFeatureIndex ? latestFeatureIndex->getData() : nullptr;
     }
 
 private:
@@ -113,8 +114,7 @@ private:
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
     
-    optional<std::unique_ptr<FeatureIndex>> featureIndexPendingCommit;
-    std::unique_ptr<FeatureIndex> featureIndex;
+    std::shared_ptr<FeatureIndex> latestFeatureIndex;
 
     optional<AlphaImage> glyphAtlasImage;
     optional<PremultipliedImage> iconAtlasImage;

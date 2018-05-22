@@ -10,11 +10,6 @@
 
 namespace mbgl {
 
-OfflineDatabase::Statement::~Statement() {
-    stmt.reset();
-    stmt.clearBindings();
-}
-
 OfflineDatabase::OfflineDatabase(std::string path_, uint64_t maximumCacheSize_)
     : path(std::move(path_)),
       maximumCacheSize(maximumCacheSize_) {
@@ -28,48 +23,62 @@ OfflineDatabase::~OfflineDatabase() {
         statements.clear();
         db.reset();
     } catch (mapbox::sqlite::Exception& ex) {
-        Log::Error(Event::Database, ex.code, ex.what());
+        Log::Error(Event::Database, (int)ex.code, ex.what());
     }
-}
-
-void OfflineDatabase::connect(int flags) {
-    db = std::make_unique<mapbox::sqlite::Database>(path.c_str(), flags);
-    db->setBusyTimeout(Milliseconds::max());
-    db->exec("PRAGMA foreign_keys = ON");
 }
 
 void OfflineDatabase::ensureSchema() {
     if (path != ":memory:") {
-        try {
-            connect(mapbox::sqlite::ReadWrite);
-
-            switch (userVersion()) {
-            case 0: break; // cache-only database; ok to delete
-            case 1: break; // cache-only database; ok to delete
-            case 2: migrateToVersion3(); // fall through
-            case 3: // no-op and fall through
-            case 4: migrateToVersion5(); // fall through
-            case 5: migrateToVersion6(); // fall through
-            case 6: return;
-            default: break; // downgrade, delete the database
-            }
-
-            removeExisting();
-            connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
-        } catch (mapbox::sqlite::Exception& ex) {
-            if (ex.code != mapbox::sqlite::Exception::Code::CANTOPEN && ex.code != mapbox::sqlite::Exception::Code::NOTADB) {
+        auto result = mapbox::sqlite::Database::tryOpen(path, mapbox::sqlite::ReadWrite);
+        if (result.is<mapbox::sqlite::Exception>()) {
+            const auto& ex = result.get<mapbox::sqlite::Exception>();
+            if (ex.code == mapbox::sqlite::ResultCode::NotADB) {
+                // Corrupted; blow it away.
+                removeExisting();
+            } else if (ex.code == mapbox::sqlite::ResultCode::CantOpen) {
+                // Doesn't exist yet.
+            } else {
                 Log::Error(Event::Database, "Unexpected error connecting to database: %s", ex.what());
-                throw;
+                throw ex;
             }
-
+        } else {
             try {
-                if (ex.code == mapbox::sqlite::Exception::Code::NOTADB) {
+                db = std::make_unique<mapbox::sqlite::Database>(std::move(result.get<mapbox::sqlite::Database>()));
+                db->setBusyTimeout(Milliseconds::max());
+                db->exec("PRAGMA foreign_keys = ON");
+
+                switch (userVersion()) {
+                case 0:
+                case 1:
+                    // cache-only database; ok to delete
                     removeExisting();
+                    break;
+                case 2:
+                    migrateToVersion3();
+                    // fall through
+                case 3:
+                case 4:
+                    migrateToVersion5();
+                    // fall through
+                case 5:
+                    migrateToVersion6();
+                    // fall through
+                case 6:
+                    // happy path; we're done
+                    return;
+                default:
+                    // downgrade, delete the database
+                    removeExisting();
+                    break;
                 }
-                connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
-            } catch (...) {
-                Log::Error(Event::Database, "Unexpected error creating database: %s", util::toString(std::current_exception()).c_str());
-                throw;
+            } catch (const mapbox::sqlite::Exception& ex) {
+                // Unfortunately, SQLITE_NOTADB is not always reported upon opening the database.
+                // Apparently sometimes it is delayed until the first read operation.
+                if (ex.code == mapbox::sqlite::ResultCode::NotADB) {
+                    removeExisting();
+                } else {
+                    throw;
+                }
             }
         }
     }
@@ -77,9 +86,9 @@ void OfflineDatabase::ensureSchema() {
     try {
         #include "offline_schema.cpp.include"
 
-        connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
-
-        // If you change the schema you must write a migration from the previous version.
+        db = std::make_unique<mapbox::sqlite::Database>(mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadWrite | mapbox::sqlite::Create));
+        db->setBusyTimeout(Milliseconds::max());
+        db->exec("PRAGMA foreign_keys = ON");
         db->exec("PRAGMA auto_vacuum = INCREMENTAL");
         db->exec("PRAGMA journal_mode = DELETE");
         db->exec("PRAGMA synchronous = FULL");
@@ -92,14 +101,13 @@ void OfflineDatabase::ensureSchema() {
 }
 
 int OfflineDatabase::userVersion() {
-    auto stmt = db->prepare("PRAGMA user_version");
-    stmt.run();
-    return stmt.get<int>(0);
+    return static_cast<int>(getPragma<int64_t>("PRAGMA user_version"));
 }
 
 void OfflineDatabase::removeExisting() {
     Log::Warning(Event::Database, "Removing existing incompatible offline database");
 
+    statements.clear();
     db.reset();
 
     try {
@@ -135,14 +143,12 @@ void OfflineDatabase::migrateToVersion6() {
     transaction.commit();
 }
 
-OfflineDatabase::Statement OfflineDatabase::getStatement(const char * sql) {
+mapbox::sqlite::Statement& OfflineDatabase::getStatement(const char* sql) {
     auto it = statements.find(sql);
-
-    if (it != statements.end()) {
-        return Statement(*it->second);
+    if (it == statements.end()) {
+        it = statements.emplace(sql, std::make_unique<mapbox::sqlite::Statement>(*db, sql)).first;
     }
-
-    return Statement(*statements.emplace(sql, std::make_unique<mapbox::sqlite::Statement>(db->prepare(sql))).first->second);
+    return *it->second;
 }
 
 optional<Response> OfflineDatabase::get(const Resource& resource) {
@@ -209,41 +215,40 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
 }
 
 optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resource& resource) {
-    // clang-format off
-    Statement accessedStmt = getStatement(
-        "UPDATE resources SET accessed = ?1 WHERE url = ?2");
-    // clang-format on
+    // Update accessed timestamp used for LRU eviction.
+    {
+        mapbox::sqlite::Query accessedQuery{ getStatement("UPDATE resources SET accessed = ?1 WHERE url = ?2") };
+        accessedQuery.bind(1, util::now());
+        accessedQuery.bind(2, resource.url);
+        accessedQuery.run();
+    }
 
-    accessedStmt->bind(1, util::now());
-    accessedStmt->bind(2, resource.url);
-    accessedStmt->run();
-
     // clang-format off
-    Statement stmt = getStatement(
+    mapbox::sqlite::Query query{ getStatement(
         //        0      1            2            3       4      5
         "SELECT etag, expires, must_revalidate, modified, data, compressed "
         "FROM resources "
-        "WHERE url = ?");
+        "WHERE url = ?") };
     // clang-format on
 
-    stmt->bind(1, resource.url);
+    query.bind(1, resource.url);
 
-    if (!stmt->run()) {
+    if (!query.run()) {
         return {};
     }
 
     Response response;
     uint64_t size = 0;
 
-    response.etag           = stmt->get<optional<std::string>>(0);
-    response.expires        = stmt->get<optional<Timestamp>>(1);
-    response.mustRevalidate = stmt->get<bool>(2);
-    response.modified       = stmt->get<optional<Timestamp>>(3);
+    response.etag           = query.get<optional<std::string>>(0);
+    response.expires        = query.get<optional<Timestamp>>(1);
+    response.mustRevalidate = query.get<bool>(2);
+    response.modified       = query.get<optional<Timestamp>>(3);
 
-    optional<std::string> data = stmt->get<optional<std::string>>(4);
+    auto data = query.get<optional<std::string>>(4);
     if (!data) {
         response.noContent = true;
-    } else if (stmt->get<bool>(5)) {
+    } else if (query.get<bool>(5)) {
         response.data = std::make_shared<std::string>(util::decompress(*data));
         size = data->length();
     } else {
@@ -255,16 +260,13 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resou
 }
 
 optional<int64_t> OfflineDatabase::hasResource(const Resource& resource) {
-    // clang-format off
-    Statement stmt = getStatement("SELECT length(data) FROM resources WHERE url = ?");
-    // clang-format on
-
-    stmt->bind(1, resource.url);
-    if (!stmt->run()) {
+    mapbox::sqlite::Query query{ getStatement("SELECT length(data) FROM resources WHERE url = ?") };
+    query.bind(1, resource.url);
+    if (!query.run()) {
         return {};
     }
 
-    return stmt->get<optional<int64_t>>(0);
+    return query.get<optional<int64_t>>(0);
 }
 
 bool OfflineDatabase::putResource(const Resource& resource,
@@ -273,19 +275,19 @@ bool OfflineDatabase::putResource(const Resource& resource,
                                   bool compressed) {
     if (response.notModified) {
         // clang-format off
-        Statement update = getStatement(
+        mapbox::sqlite::Query notModifiedQuery{ getStatement(
             "UPDATE resources "
             "SET accessed         = ?1, "
             "    expires          = ?2, "
             "    must_revalidate  = ?3 "
-            "WHERE url    = ?4 ");
+            "WHERE url    = ?4 ") };
         // clang-format on
 
-        update->bind(1, util::now());
-        update->bind(2, response.expires);
-        update->bind(3, response.mustRevalidate);
-        update->bind(4, resource.url);
-        update->run();
+        notModifiedQuery.bind(1, util::now());
+        notModifiedQuery.bind(2, response.expires);
+        notModifiedQuery.bind(3, response.mustRevalidate);
+        notModifiedQuery.bind(4, resource.url);
+        notModifiedQuery.run();
         return false;
     }
 
@@ -296,7 +298,7 @@ bool OfflineDatabase::putResource(const Resource& resource,
     mapbox::sqlite::Transaction transaction(*db, mapbox::sqlite::Transaction::Immediate);
 
     // clang-format off
-    Statement update = getStatement(
+    mapbox::sqlite::Query updateQuery{ getStatement(
         "UPDATE resources "
         "SET kind            = ?1, "
         "    etag            = ?2, "
@@ -306,81 +308,83 @@ bool OfflineDatabase::putResource(const Resource& resource,
         "    accessed        = ?6, "
         "    data            = ?7, "
         "    compressed      = ?8 "
-        "WHERE url           = ?9 ");
+        "WHERE url           = ?9 ") };
     // clang-format on
 
-    update->bind(1, int(resource.kind));
-    update->bind(2, response.etag);
-    update->bind(3, response.expires);
-    update->bind(4, response.mustRevalidate);
-    update->bind(5, response.modified);
-    update->bind(6, util::now());
-    update->bind(9, resource.url);
+    updateQuery.bind(1, int(resource.kind));
+    updateQuery.bind(2, response.etag);
+    updateQuery.bind(3, response.expires);
+    updateQuery.bind(4, response.mustRevalidate);
+    updateQuery.bind(5, response.modified);
+    updateQuery.bind(6, util::now());
+    updateQuery.bind(9, resource.url);
 
     if (response.noContent) {
-        update->bind(7, nullptr);
-        update->bind(8, false);
+        updateQuery.bind(7, nullptr);
+        updateQuery.bind(8, false);
     } else {
-        update->bindBlob(7, data.data(), data.size(), false);
-        update->bind(8, compressed);
+        updateQuery.bindBlob(7, data.data(), data.size(), false);
+        updateQuery.bind(8, compressed);
     }
 
-    update->run();
-    if (update->changes() != 0) {
+    updateQuery.run();
+    if (updateQuery.changes() != 0) {
         transaction.commit();
         return false;
     }
 
     // clang-format off
-    Statement insert = getStatement(
+    mapbox::sqlite::Query insertQuery{ getStatement(
         "INSERT INTO resources (url, kind, etag, expires, must_revalidate, modified, accessed, data, compressed) "
-        "VALUES                (?1,  ?2,   ?3,   ?4,      ?5,              ?6,       ?7,       ?8,   ?9) ");
+        "VALUES                (?1,  ?2,   ?3,   ?4,      ?5,              ?6,       ?7,       ?8,   ?9) ") };
     // clang-format on
 
-    insert->bind(1, resource.url);
-    insert->bind(2, int(resource.kind));
-    insert->bind(3, response.etag);
-    insert->bind(4, response.expires);
-    insert->bind(5, response.mustRevalidate);
-    insert->bind(6, response.modified);
-    insert->bind(7, util::now());
+    insertQuery.bind(1, resource.url);
+    insertQuery.bind(2, int(resource.kind));
+    insertQuery.bind(3, response.etag);
+    insertQuery.bind(4, response.expires);
+    insertQuery.bind(5, response.mustRevalidate);
+    insertQuery.bind(6, response.modified);
+    insertQuery.bind(7, util::now());
 
     if (response.noContent) {
-        insert->bind(8, nullptr);
-        insert->bind(9, false);
+        insertQuery.bind(8, nullptr);
+        insertQuery.bind(9, false);
     } else {
-        insert->bindBlob(8, data.data(), data.size(), false);
-        insert->bind(9, compressed);
+        insertQuery.bindBlob(8, data.data(), data.size(), false);
+        insertQuery.bind(9, compressed);
     }
 
-    insert->run();
+    insertQuery.run();
     transaction.commit();
 
     return true;
 }
 
 optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource::TileData& tile) {
-    // clang-format off
-    Statement accessedStmt = getStatement(
-        "UPDATE tiles "
-        "SET accessed       = ?1 "
-        "WHERE url_template = ?2 "
-        "  AND pixel_ratio  = ?3 "
-        "  AND x            = ?4 "
-        "  AND y            = ?5 "
-        "  AND z            = ?6 ");
-    // clang-format on
+    {
+        // clang-format off
+        mapbox::sqlite::Query accessedQuery{ getStatement(
+            "UPDATE tiles "
+            "SET accessed       = ?1 "
+            "WHERE url_template = ?2 "
+            "  AND pixel_ratio  = ?3 "
+            "  AND x            = ?4 "
+            "  AND y            = ?5 "
+            "  AND z            = ?6 ") };
+        // clang-format on
 
-    accessedStmt->bind(1, util::now());
-    accessedStmt->bind(2, tile.urlTemplate);
-    accessedStmt->bind(3, tile.pixelRatio);
-    accessedStmt->bind(4, tile.x);
-    accessedStmt->bind(5, tile.y);
-    accessedStmt->bind(6, tile.z);
-    accessedStmt->run();
+        accessedQuery.bind(1, util::now());
+        accessedQuery.bind(2, tile.urlTemplate);
+        accessedQuery.bind(3, tile.pixelRatio);
+        accessedQuery.bind(4, tile.x);
+        accessedQuery.bind(5, tile.y);
+        accessedQuery.bind(6, tile.z);
+        accessedQuery.run();
+    }
 
     // clang-format off
-    Statement stmt = getStatement(
+    mapbox::sqlite::Query query{ getStatement(
         //        0      1           2,            3,      4,      5
         "SELECT etag, expires, must_revalidate, modified, data, compressed "
         "FROM tiles "
@@ -388,31 +392,31 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource:
         "  AND pixel_ratio  = ?2 "
         "  AND x            = ?3 "
         "  AND y            = ?4 "
-        "  AND z            = ?5 ");
+        "  AND z            = ?5 ") };
     // clang-format on
 
-    stmt->bind(1, tile.urlTemplate);
-    stmt->bind(2, tile.pixelRatio);
-    stmt->bind(3, tile.x);
-    stmt->bind(4, tile.y);
-    stmt->bind(5, tile.z);
+    query.bind(1, tile.urlTemplate);
+    query.bind(2, tile.pixelRatio);
+    query.bind(3, tile.x);
+    query.bind(4, tile.y);
+    query.bind(5, tile.z);
 
-    if (!stmt->run()) {
+    if (!query.run()) {
         return {};
     }
 
     Response response;
     uint64_t size = 0;
 
-    response.etag            = stmt->get<optional<std::string>>(0);
-    response.expires         = stmt->get<optional<Timestamp>>(1);
-    response.mustRevalidate  = stmt->get<bool>(2);
-    response.modified        = stmt->get<optional<Timestamp>>(3);
+    response.etag            = query.get<optional<std::string>>(0);
+    response.expires         = query.get<optional<Timestamp>>(1);
+    response.mustRevalidate  = query.get<bool>(2);
+    response.modified        = query.get<optional<Timestamp>>(3);
 
-    optional<std::string> data = stmt->get<optional<std::string>>(4);
+    optional<std::string> data = query.get<optional<std::string>>(4);
     if (!data) {
         response.noContent = true;
-    } else if (stmt->get<bool>(5)) {
+    } else if (query.get<bool>(5)) {
         response.data = std::make_shared<std::string>(util::decompress(*data));
         size = data->length();
     } else {
@@ -425,27 +429,27 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource:
 
 optional<int64_t> OfflineDatabase::hasTile(const Resource::TileData& tile) {
     // clang-format off
-    Statement stmt = getStatement(
+    mapbox::sqlite::Query size{ getStatement(
         "SELECT length(data) "
         "FROM tiles "
         "WHERE url_template = ?1 "
         "  AND pixel_ratio  = ?2 "
         "  AND x            = ?3 "
         "  AND y            = ?4 "
-        "  AND z            = ?5 ");
+        "  AND z            = ?5 ") };
     // clang-format on
 
-    stmt->bind(1, tile.urlTemplate);
-    stmt->bind(2, tile.pixelRatio);
-    stmt->bind(3, tile.x);
-    stmt->bind(4, tile.y);
-    stmt->bind(5, tile.z);
+    size.bind(1, tile.urlTemplate);
+    size.bind(2, tile.pixelRatio);
+    size.bind(3, tile.x);
+    size.bind(4, tile.y);
+    size.bind(5, tile.z);
 
-    if (!stmt->run()) {
+    if (!size.run()) {
         return {};
     }
 
-    return stmt->get<optional<int64_t>>(0);
+    return size.get<optional<int64_t>>(0);
 }
 
 bool OfflineDatabase::putTile(const Resource::TileData& tile,
@@ -454,7 +458,7 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
                               bool compressed) {
     if (response.notModified) {
         // clang-format off
-        Statement update = getStatement(
+        mapbox::sqlite::Query notModifiedQuery{ getStatement(
             "UPDATE tiles "
             "SET accessed        = ?1, "
             "    expires         = ?2, "
@@ -463,18 +467,18 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
             "  AND pixel_ratio   = ?5 "
             "  AND x             = ?6 "
             "  AND y             = ?7 "
-            "  AND z             = ?8 ");
+            "  AND z             = ?8 ") };
         // clang-format on
 
-        update->bind(1, util::now());
-        update->bind(2, response.expires);
-        update->bind(3, response.mustRevalidate);
-        update->bind(4, tile.urlTemplate);
-        update->bind(5, tile.pixelRatio);
-        update->bind(6, tile.x);
-        update->bind(7, tile.y);
-        update->bind(8, tile.z);
-        update->run();
+        notModifiedQuery.bind(1, util::now());
+        notModifiedQuery.bind(2, response.expires);
+        notModifiedQuery.bind(3, response.mustRevalidate);
+        notModifiedQuery.bind(4, tile.urlTemplate);
+        notModifiedQuery.bind(5, tile.pixelRatio);
+        notModifiedQuery.bind(6, tile.x);
+        notModifiedQuery.bind(7, tile.y);
+        notModifiedQuery.bind(8, tile.z);
+        notModifiedQuery.run();
         return false;
     }
 
@@ -485,7 +489,7 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
     mapbox::sqlite::Transaction transaction(*db, mapbox::sqlite::Transaction::Immediate);
 
     // clang-format off
-    Statement update = getStatement(
+    mapbox::sqlite::Query updateQuery{ getStatement(
         "UPDATE tiles "
         "SET modified        = ?1, "
         "    etag            = ?2, "
@@ -498,78 +502,75 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
         "  AND pixel_ratio   = ?9 "
         "  AND x             = ?10 "
         "  AND y             = ?11 "
-        "  AND z             = ?12 ");
+        "  AND z             = ?12 ") };
     // clang-format on
 
-    update->bind(1, response.modified);
-    update->bind(2, response.etag);
-    update->bind(3, response.expires);
-    update->bind(4, response.mustRevalidate);
-    update->bind(5, util::now());
-    update->bind(8, tile.urlTemplate);
-    update->bind(9, tile.pixelRatio);
-    update->bind(10, tile.x);
-    update->bind(11, tile.y);
-    update->bind(12, tile.z);
+    updateQuery.bind(1, response.modified);
+    updateQuery.bind(2, response.etag);
+    updateQuery.bind(3, response.expires);
+    updateQuery.bind(4, response.mustRevalidate);
+    updateQuery.bind(5, util::now());
+    updateQuery.bind(8, tile.urlTemplate);
+    updateQuery.bind(9, tile.pixelRatio);
+    updateQuery.bind(10, tile.x);
+    updateQuery.bind(11, tile.y);
+    updateQuery.bind(12, tile.z);
 
     if (response.noContent) {
-        update->bind(6, nullptr);
-        update->bind(7, false);
+        updateQuery.bind(6, nullptr);
+        updateQuery.bind(7, false);
     } else {
-        update->bindBlob(6, data.data(), data.size(), false);
-        update->bind(7, compressed);
+        updateQuery.bindBlob(6, data.data(), data.size(), false);
+        updateQuery.bind(7, compressed);
     }
 
-    update->run();
-    if (update->changes() != 0) {
+    updateQuery.run();
+    if (updateQuery.changes() != 0) {
         transaction.commit();
         return false;
     }
 
     // clang-format off
-    Statement insert = getStatement(
+    mapbox::sqlite::Query insertQuery{ getStatement(
         "INSERT INTO tiles (url_template, pixel_ratio, x,  y,  z,  modified, must_revalidate, etag, expires, accessed,  data, compressed) "
-        "VALUES            (?1,           ?2,          ?3, ?4, ?5, ?6,       ?7,              ?8,   ?9,      ?10,       ?11,  ?12)");
+        "VALUES            (?1,           ?2,          ?3, ?4, ?5, ?6,       ?7,              ?8,   ?9,      ?10,       ?11,  ?12)") };
     // clang-format on
 
-    insert->bind(1, tile.urlTemplate);
-    insert->bind(2, tile.pixelRatio);
-    insert->bind(3, tile.x);
-    insert->bind(4, tile.y);
-    insert->bind(5, tile.z);
-    insert->bind(6, response.modified);
-    insert->bind(7, response.mustRevalidate);
-    insert->bind(8, response.etag);
-    insert->bind(9, response.expires);
-    insert->bind(10, util::now());
+    insertQuery.bind(1, tile.urlTemplate);
+    insertQuery.bind(2, tile.pixelRatio);
+    insertQuery.bind(3, tile.x);
+    insertQuery.bind(4, tile.y);
+    insertQuery.bind(5, tile.z);
+    insertQuery.bind(6, response.modified);
+    insertQuery.bind(7, response.mustRevalidate);
+    insertQuery.bind(8, response.etag);
+    insertQuery.bind(9, response.expires);
+    insertQuery.bind(10, util::now());
 
     if (response.noContent) {
-        insert->bind(11, nullptr);
-        insert->bind(12, false);
+        insertQuery.bind(11, nullptr);
+        insertQuery.bind(12, false);
     } else {
-        insert->bindBlob(11, data.data(), data.size(), false);
-        insert->bind(12, compressed);
+        insertQuery.bindBlob(11, data.data(), data.size(), false);
+        insertQuery.bind(12, compressed);
     }
 
-    insert->run();
+    insertQuery.run();
     transaction.commit();
 
     return true;
 }
 
 std::vector<OfflineRegion> OfflineDatabase::listRegions() {
-    // clang-format off
-    Statement stmt = getStatement(
-        "SELECT id, definition, description FROM regions");
-    // clang-format on
+    mapbox::sqlite::Query query{ getStatement("SELECT id, definition, description FROM regions") };
 
     std::vector<OfflineRegion> result;
 
-    while (stmt->run()) {
+    while (query.run()) {
         result.push_back(OfflineRegion(
-            stmt->get<int64_t>(0),
-            decodeOfflineRegionDefinition(stmt->get<std::string>(1)),
-            stmt->get<std::vector<uint8_t>>(2)));
+            query.get<int64_t>(0),
+            decodeOfflineRegionDefinition(query.get<std::string>(1)),
+            query.get<std::vector<uint8_t>>(2)));
     }
 
     return result;
@@ -578,39 +579,37 @@ std::vector<OfflineRegion> OfflineDatabase::listRegions() {
 OfflineRegion OfflineDatabase::createRegion(const OfflineRegionDefinition& definition,
                                             const OfflineRegionMetadata& metadata) {
     // clang-format off
-    Statement stmt = getStatement(
+    mapbox::sqlite::Query query{ getStatement(
         "INSERT INTO regions (definition, description) "
-        "VALUES              (?1,         ?2) ");
+        "VALUES              (?1,         ?2) ") };
     // clang-format on
 
-    stmt->bind(1, encodeOfflineRegionDefinition(definition));
-    stmt->bindBlob(2, metadata);
-    stmt->run();
+    query.bind(1, encodeOfflineRegionDefinition(definition));
+    query.bindBlob(2, metadata);
+    query.run();
 
-    return OfflineRegion(stmt->lastInsertRowId(), definition, metadata);
+    return OfflineRegion(query.lastInsertRowId(), definition, metadata);
 }
 
 OfflineRegionMetadata OfflineDatabase::updateMetadata(const int64_t regionID, const OfflineRegionMetadata& metadata) {
     // clang-format off
-    Statement stmt = getStatement(
-                                  "UPDATE regions SET description = ?1"
-                                  "WHERE id = ?2");
+    mapbox::sqlite::Query query{ getStatement(
+                                  "UPDATE regions SET description = ?1 "
+                                  "WHERE id = ?2") };
     // clang-format on
-    stmt->bindBlob(1, metadata);
-    stmt->bind(2, regionID);
-    stmt->run();
+    query.bindBlob(1, metadata);
+    query.bind(2, regionID);
+    query.run();
 
     return metadata;
 }
 
 void OfflineDatabase::deleteRegion(OfflineRegion&& region) {
-    // clang-format off
-    Statement stmt = getStatement(
-        "DELETE FROM regions WHERE id = ?");
-    // clang-format on
-
-    stmt->bind(1, region.getID());
-    stmt->run();
+    {
+        mapbox::sqlite::Query query{ getStatement("DELETE FROM regions WHERE id = ?") };
+        query.bind(1, region.getID());
+        query.run();
+    }
 
     evict(0);
     db->exec("PRAGMA incremental_vacuum");
@@ -656,7 +655,7 @@ uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& re
 bool OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
     if (resource.kind == Resource::Kind::Tile) {
         // clang-format off
-        Statement insert = getStatement(
+        mapbox::sqlite::Query insertQuery{ getStatement(
             "INSERT OR IGNORE INTO region_tiles (region_id, tile_id) "
             "SELECT                              ?1,        tiles.id "
             "FROM tiles "
@@ -664,24 +663,24 @@ bool OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
             "  AND pixel_ratio  = ?3 "
             "  AND x            = ?4 "
             "  AND y            = ?5 "
-            "  AND z            = ?6 ");
+            "  AND z            = ?6 ") };
         // clang-format on
 
         const Resource::TileData& tile = *resource.tileData;
-        insert->bind(1, regionID);
-        insert->bind(2, tile.urlTemplate);
-        insert->bind(3, tile.pixelRatio);
-        insert->bind(4, tile.x);
-        insert->bind(5, tile.y);
-        insert->bind(6, tile.z);
-        insert->run();
+        insertQuery.bind(1, regionID);
+        insertQuery.bind(2, tile.urlTemplate);
+        insertQuery.bind(3, tile.pixelRatio);
+        insertQuery.bind(4, tile.x);
+        insertQuery.bind(5, tile.y);
+        insertQuery.bind(6, tile.z);
+        insertQuery.run();
 
-        if (insert->changes() == 0) {
+        if (insertQuery.changes() == 0) {
             return false;
         }
 
         // clang-format off
-        Statement select = getStatement(
+        mapbox::sqlite::Query selectQuery{ getStatement(
             "SELECT region_id "
             "FROM region_tiles, tiles "
             "WHERE region_id   != ?1 "
@@ -690,58 +689,54 @@ bool OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
             "  AND x            = ?4 "
             "  AND y            = ?5 "
             "  AND z            = ?6 "
-            "LIMIT 1 ");
+            "LIMIT 1 ") };
         // clang-format on
 
-        select->bind(1, regionID);
-        select->bind(2, tile.urlTemplate);
-        select->bind(3, tile.pixelRatio);
-        select->bind(4, tile.x);
-        select->bind(5, tile.y);
-        select->bind(6, tile.z);
-        return !select->run();
+        selectQuery.bind(1, regionID);
+        selectQuery.bind(2, tile.urlTemplate);
+        selectQuery.bind(3, tile.pixelRatio);
+        selectQuery.bind(4, tile.x);
+        selectQuery.bind(5, tile.y);
+        selectQuery.bind(6, tile.z);
+        return !selectQuery.run();
     } else {
         // clang-format off
-        Statement insert = getStatement(
+        mapbox::sqlite::Query insertQuery{ getStatement(
             "INSERT OR IGNORE INTO region_resources (region_id, resource_id) "
             "SELECT                                  ?1,        resources.id "
             "FROM resources "
-            "WHERE resources.url = ?2 ");
+            "WHERE resources.url = ?2 ") };
         // clang-format on
 
-        insert->bind(1, regionID);
-        insert->bind(2, resource.url);
-        insert->run();
+        insertQuery.bind(1, regionID);
+        insertQuery.bind(2, resource.url);
+        insertQuery.run();
 
-        if (insert->changes() == 0) {
+        if (insertQuery.changes() == 0) {
             return false;
         }
 
         // clang-format off
-        Statement select = getStatement(
+        mapbox::sqlite::Query selectQuery{ getStatement(
             "SELECT region_id "
             "FROM region_resources, resources "
             "WHERE region_id    != ?1 "
             "  AND resources.url = ?2 "
-            "LIMIT 1 ");
+            "LIMIT 1 ") };
         // clang-format on
 
-        select->bind(1, regionID);
-        select->bind(2, resource.url);
-        return !select->run();
+        selectQuery.bind(1, regionID);
+        selectQuery.bind(2, resource.url);
+        return !selectQuery.run();
     }
 }
 
 OfflineRegionDefinition OfflineDatabase::getRegionDefinition(int64_t regionID) {
-    // clang-format off
-    Statement stmt = getStatement(
-        "SELECT definition FROM regions WHERE id = ?1");
-    // clang-format on
+    mapbox::sqlite::Query query{ getStatement("SELECT definition FROM regions WHERE id = ?1") };
+    query.bind(1, regionID);
+    query.run();
 
-    stmt->bind(1, regionID);
-    stmt->run();
-
-    return decodeOfflineRegionDefinition(stmt->get<std::string>(0));
+    return decodeOfflineRegionDefinition(query.get<std::string>(0));
 }
 
 OfflineRegionStatus OfflineDatabase::getRegionCompletedStatus(int64_t regionID) {
@@ -760,35 +755,35 @@ OfflineRegionStatus OfflineDatabase::getRegionCompletedStatus(int64_t regionID) 
 
 std::pair<int64_t, int64_t> OfflineDatabase::getCompletedResourceCountAndSize(int64_t regionID) {
     // clang-format off
-    Statement stmt = getStatement(
+    mapbox::sqlite::Query query{ getStatement(
         "SELECT COUNT(*), SUM(LENGTH(data)) "
         "FROM region_resources, resources "
         "WHERE region_id = ?1 "
-        "AND resource_id = resources.id ");
+        "AND resource_id = resources.id ") };
     // clang-format on
-    stmt->bind(1, regionID);
-    stmt->run();
-    return { stmt->get<int64_t>(0), stmt->get<int64_t>(1) };
+    query.bind(1, regionID);
+    query.run();
+    return { query.get<int64_t>(0), query.get<int64_t>(1) };
 }
 
 std::pair<int64_t, int64_t> OfflineDatabase::getCompletedTileCountAndSize(int64_t regionID) {
     // clang-format off
-    Statement stmt = getStatement(
+    mapbox::sqlite::Query query{ getStatement(
         "SELECT COUNT(*), SUM(LENGTH(data)) "
         "FROM region_tiles, tiles "
         "WHERE region_id = ?1 "
-        "AND tile_id = tiles.id ");
+        "AND tile_id = tiles.id ") };
     // clang-format on
-    stmt->bind(1, regionID);
-    stmt->run();
-    return { stmt->get<int64_t>(0), stmt->get<int64_t>(1) };
+    query.bind(1, regionID);
+    query.run();
+    return { query.get<int64_t>(0), query.get<int64_t>(1) };
 }
 
 template <class T>
-T OfflineDatabase::getPragma(const char * sql) {
-    Statement stmt = getStatement(sql);
-    stmt->run();
-    return stmt->get<T>(0);
+T OfflineDatabase::getPragma(const char* sql) {
+    mapbox::sqlite::Query query{ getStatement(sql) };
+    query.run();
+    return query.get<T>(0);
 }
 
 // Remove least-recently used resources and tiles until the used database size,
@@ -813,7 +808,7 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
     // size, and because pages can get fragmented on the database.
     while (usedSize() + neededFreeSize + pageSize > maximumCacheSize) {
         // clang-format off
-        Statement accessedStmt = getStatement(
+        mapbox::sqlite::Query accessedQuery{ getStatement(
             "SELECT max(accessed) "
             "FROM ( "
             "    SELECT accessed "
@@ -829,16 +824,16 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
             "    WHERE tile_id IS NULL "
             "  ORDER BY accessed ASC LIMIT ?1 "
             ") "
-        );
-        accessedStmt->bind(1, 50);
+        ) };
+        accessedQuery.bind(1, 50);
         // clang-format on
-        if (!accessedStmt->run()) {
+        if (!accessedQuery.run()) {
             return false;
         }
-        Timestamp accessed = accessedStmt->get<Timestamp>(0);
+        Timestamp accessed = accessedQuery.get<Timestamp>(0);
 
         // clang-format off
-        Statement stmt1 = getStatement(
+        mapbox::sqlite::Query resourceQuery{ getStatement(
             "DELETE FROM resources "
             "WHERE id IN ( "
             "  SELECT id FROM resources "
@@ -846,14 +841,14 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
             "  ON resource_id = resources.id "
             "  WHERE resource_id IS NULL "
             "  AND accessed <= ?1 "
-            ") ");
+            ") ") };
         // clang-format on
-        stmt1->bind(1, accessed);
-        stmt1->run();
-        uint64_t changes1 = stmt1->changes();
+        resourceQuery.bind(1, accessed);
+        resourceQuery.run();
+        const uint64_t resourceChanges = resourceQuery.changes();
 
         // clang-format off
-        Statement stmt2 = getStatement(
+        mapbox::sqlite::Query tileQuery{ getStatement(
             "DELETE FROM tiles "
             "WHERE id IN ( "
             "  SELECT id FROM tiles "
@@ -861,16 +856,16 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
             "  ON tile_id = tiles.id "
             "  WHERE tile_id IS NULL "
             "  AND accessed <= ?1 "
-            ") ");
+            ") ") };
         // clang-format on
-        stmt2->bind(1, accessed);
-        stmt2->run();
-        uint64_t changes2 = stmt2->changes();
+        tileQuery.bind(1, accessed);
+        tileQuery.run();
+        const uint64_t tileChanges = tileQuery.changes();
 
         // The cached value of offlineTileCount does not need to be updated
         // here because only non-offline tiles can be removed by eviction.
 
-        if (changes1 == 0 && changes2 == 0) {
+        if (resourceChanges == 0 && tileChanges == 0) {
             return false;
         }
     }
@@ -901,16 +896,16 @@ uint64_t OfflineDatabase::getOfflineMapboxTileCount() {
     }
 
     // clang-format off
-    Statement stmt = getStatement(
+    mapbox::sqlite::Query query{ getStatement(
         "SELECT COUNT(DISTINCT id) "
         "FROM region_tiles, tiles "
         "WHERE tile_id = tiles.id "
-        "AND url_template LIKE 'mapbox://%' ");
+        "AND url_template LIKE 'mapbox://%' ") };
     // clang-format on
 
-    stmt->run();
+    query.run();
 
-    offlineMapboxTileCount = stmt->get<int64_t>(0);
+    offlineMapboxTileCount = query.get<int64_t>(0);
     return *offlineMapboxTileCount;
 }
 

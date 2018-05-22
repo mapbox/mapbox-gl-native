@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import com.google.gson.JsonObject;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
@@ -16,16 +15,13 @@ import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
-
+import timber.log.Timber;
 
 import java.util.List;
 
-import timber.log.Timber;
-
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.linear;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.step;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.switchCase;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
@@ -44,7 +40,6 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
   private static final String BUS_MAKI_ICON_ID = "bus-11";
   private static final String CAFE_MAKI_ICON_ID = "cafe-11";
   private static final String KEY_PROPERTY_SELECTED = "selected";
-  private static final float ZOOM_STOP_MIN_VALUE = 7.0f;
   private static final float ZOOM_STOP_MAX_VALUE = 12.0f;
 
   private MapView mapView;
@@ -103,11 +98,9 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
     layer = new SymbolLayer(LAYER_ID, SOURCE_ID);
     layer.setProperties(
       iconImage(
-         interpolate(
-           linear(), zoom(),
-           stop(ZOOM_STOP_MIN_VALUE, BUS_MAKI_ICON_ID),
-           stop(ZOOM_STOP_MAX_VALUE, CAFE_MAKI_ICON_ID)
-         )
+        step(zoom(), literal(BUS_MAKI_ICON_ID),
+          stop(ZOOM_STOP_MAX_VALUE, CAFE_MAKI_ICON_ID)
+        )
       ),
       iconSize(
         switchCase(

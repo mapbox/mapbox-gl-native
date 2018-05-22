@@ -23,7 +23,6 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
-
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.telemetry.AppUserTurnstile;
 import com.mapbox.android.telemetry.Event;
@@ -33,6 +32,8 @@ import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
@@ -40,9 +41,13 @@ import com.mapbox.mapboxsdk.maps.renderer.glsurfaceview.GLSurfaceViewMapRenderer
 import com.mapbox.mapboxsdk.maps.renderer.textureview.TextureViewMapRenderer;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
+import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
+import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
@@ -50,9 +55,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
@@ -96,28 +98,30 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   @UiThread
   public MapView(@NonNull Context context) {
     super(context);
-    initialise(context, MapboxMapOptions.createFromAttributes(context, null));
+    initialize(context, MapboxMapOptions.createFromAttributes(context, null));
   }
 
   @UiThread
   public MapView(@NonNull Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
-    initialise(context, MapboxMapOptions.createFromAttributes(context, attrs));
+    initialize(context, MapboxMapOptions.createFromAttributes(context, attrs));
   }
 
   @UiThread
   public MapView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
-    initialise(context, MapboxMapOptions.createFromAttributes(context, attrs));
+    initialize(context, MapboxMapOptions.createFromAttributes(context, attrs));
   }
 
   @UiThread
   public MapView(@NonNull Context context, @Nullable MapboxMapOptions options) {
     super(context);
-    initialise(context, options == null ? MapboxMapOptions.createFromAttributes(context, null) : options);
+    initialize(context, options == null ? MapboxMapOptions.createFromAttributes(context, null) : options);
   }
 
-  private void initialise(@NonNull final Context context, @NonNull final MapboxMapOptions options) {
+  @CallSuper
+  @UiThread
+  protected void initialize(@NonNull final Context context, @NonNull final MapboxMapOptions options) {
     if (isInEditMode()) {
       // in IDE layout editor, just return
       return;
@@ -535,6 +539,35 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     nativeMapView.setStyleUrl(url);
   }
 
+  /**
+   * Loads a new style from the specified offline region definition and moves the map camera to that region.
+   *
+   * @param definition the offline region definition
+   * @see OfflineRegionDefinition
+   */
+  public void setOfflineRegionDefinition(OfflineRegionDefinition definition) {
+    if (destroyed) {
+      return;
+    }
+
+    OfflineTilePyramidRegionDefinition regionDefinition = (OfflineTilePyramidRegionDefinition) definition;
+    setStyleUrl(regionDefinition.getStyleURL());
+    CameraPosition cameraPosition = new CameraPosition.Builder()
+      .target(regionDefinition.getBounds().getCenter())
+      .zoom(regionDefinition.getMinZoom())
+      .build();
+
+    if (!isMapInitialized()) {
+      mapboxMapOptions.camera(cameraPosition);
+      mapboxMapOptions.minZoomPreference(regionDefinition.getMinZoom());
+      mapboxMapOptions.maxZoomPreference(regionDefinition.getMaxZoom());
+      return;
+    }
+    mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    mapboxMap.setMinZoomPreference(regionDefinition.getMinZoom());
+    mapboxMap.setMaxZoomPreference(regionDefinition.getMaxZoom());
+  }
+
   //
   // Rendering
   //
@@ -598,10 +631,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    * @param listener The callback that's invoked on every frame rendered to the map view.
    * @see MapView#removeOnMapChangedListener(OnMapChangedListener)
    */
-  public void addOnMapChangedListener(@Nullable OnMapChangedListener listener) {
-    if (listener != null) {
-      onMapChangedListeners.add(listener);
-    }
+  public void addOnMapChangedListener(@NonNull OnMapChangedListener listener) {
+    onMapChangedListeners.add(listener);
   }
 
   /**
@@ -610,8 +641,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    * @param listener The previously added callback to remove.
    * @see MapView#addOnMapChangedListener(OnMapChangedListener)
    */
-  public void removeOnMapChangedListener(@Nullable OnMapChangedListener listener) {
-    if (listener != null && onMapChangedListeners.contains(listener)) {
+  public void removeOnMapChangedListener(@NonNull OnMapChangedListener listener) {
+    if (onMapChangedListeners.contains(listener)) {
       onMapChangedListeners.remove(listener);
     }
   }
@@ -622,13 +653,11 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    * @param callback The callback object that will be triggered when the map is ready to be used.
    */
   @UiThread
-  public void getMapAsync(final OnMapReadyCallback callback) {
-    if (!mapCallback.isInitialLoad() && callback != null) {
+  public void getMapAsync(final @NonNull OnMapReadyCallback callback) {
+    if (!mapCallback.isInitialLoad()) {
       callback.onMapReady(mapboxMap);
     } else {
-      if (callback != null) {
-        mapCallback.addOnMapReadyCallback(callback);
-      }
+      mapCallback.addOnMapReadyCallback(callback);
     }
   }
 

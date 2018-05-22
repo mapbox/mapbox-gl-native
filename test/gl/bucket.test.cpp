@@ -110,10 +110,11 @@ TEST(Buckets, SymbolBucket) {
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
     bool sortFeaturesByY = false;
+    std::string bucketLeaderID = "test";
     std::vector<SymbolInstance> symbolInstances;
 
     gl::Context context;
-    SymbolBucket bucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, std::move(symbolInstances) };
+    SymbolBucket bucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances) };
     ASSERT_FALSE(bucket.hasIconData());
     ASSERT_FALSE(bucket.hasTextData());
     ASSERT_FALSE(bucket.hasCollisionBoxData());

@@ -148,7 +148,7 @@ NS_ASSUME_NONNULL_BEGIN
  when the feature instance is used to initialize an `MGLShapeSource` and that
  source is added to the map and styled.
  */
-@property (nonatomic, copy) NS_DICTIONARY_OF(NSString *, id) *attributes;
+@property (nonatomic, copy) NSDictionary<NSString *, id> *attributes;
 
 /**
  Returns the feature attribute for the given attribute name.
@@ -167,7 +167,7 @@ NS_ASSUME_NONNULL_BEGIN
  `attributes` property, and an `id` key corresponding to the receiver’s
  `identifier` property.
  */
-- (NS_DICTIONARY_OF(NSString *, id) *)geoJSONDictionary;
+- (NSDictionary<NSString *, id> *)geoJSONDictionary;
 
 @end
 
@@ -252,9 +252,9 @@ MGL_EXPORT
 MGL_EXPORT
 @interface MGLShapeCollectionFeature : MGLShapeCollection <MGLFeature>
 
-@property (nonatomic, copy, readonly) NS_ARRAY_OF(MGLShape<MGLFeature> *) *shapes;
+@property (nonatomic, copy, readonly) NSArray<MGLShape<MGLFeature> *> *shapes;
 
-+ (instancetype)shapeCollectionWithShapes:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)shapes;
++ (instancetype)shapeCollectionWithShapes:(NSArray<MGLShape<MGLFeature> *> *)shapes;
 
 @end
 

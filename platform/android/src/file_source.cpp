@@ -83,6 +83,13 @@ void FileSource::pause(jni::JNIEnv&) {
     }
 }
 
+jni::jboolean FileSource::isResumed(jni::JNIEnv&) {
+    if (activationCounter) {
+       return  (jboolean) (activationCounter > 0);
+    }
+    return (jboolean) false;
+}
+
 jni::Class<FileSource> FileSource::javaClass;
 
 FileSource* FileSource::getNativePeer(jni::JNIEnv& env, jni::Object<FileSource> jFileSource) {
@@ -114,7 +121,8 @@ void FileSource::registerNative(jni::JNIEnv& env) {
         METHOD(&FileSource::setAPIBaseUrl, "setApiBaseUrl"),
         METHOD(&FileSource::setResourceTransform, "setResourceTransform"),
         METHOD(&FileSource::resume, "activate"),
-        METHOD(&FileSource::pause, "deactivate")
+        METHOD(&FileSource::pause, "deactivate"),
+        METHOD(&FileSource::isResumed, "isActivated")
     );
 }
 

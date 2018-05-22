@@ -12,7 +12,7 @@ Alright. So, actually, you may be in the wrong place. From here on in, this READ
 
 **To install and use the Mapbox Maps SDK for Android in an application, see the [Mapbox Maps SDK for Android website](https://www.mapbox.com/install/android/).**
 
-[![](https://www.mapbox.com/android-sdk/images/splash.png)](https://www.mapbox.com/android-sdk/)
+[![](https://www.mapbox.com/android-docs/assets/overview-map-sdk-322-9abe118316efb5910b6101e222a2e57c.png)](https://www.mapbox.com/android-sdk/)
 
 ### Setup environment
 
@@ -89,15 +89,14 @@ More information about building and distributing this project in [DISTRIBUTE.md]
 
 #### Using the SDK snapshot
 
-Instead of using the latest stable release of the Maps SDK for Android, you can use a "snapshot" or the beta version if there is one available. Our snapshots are built every time a Github pull request adds code to this repository's `master` branch. If you'd like to use a snapshot build, your Android project's gradle file should have -SNAPSHOT appended to the SDK version number. For example `5.2.0-SNAPSHOT` or:
+Instead of using the latest stable release of the Maps SDK for Android, you can use a "snapshot" or the beta version if there is one available. Our snapshots are built every time a Github pull request adds code to this repository's `master` branch. If you'd like to use a snapshot build, your Android project's gradle file should have -SNAPSHOT appended to the SDK version number. For example, the `5.2.0-SNAPSHOT` would look like:
 
 ```java
 // Mapbox SDK dependency
-compile('com.mapbox.mapboxsdk:mapbox-android-sdk:5.2.0-SNAPSHOT@aar') {
-    transitive = true
-}
+implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:5.2.0-SNAPSHOT'
 ```
-You need to have the section below in your build.gradle root folder to be able to resolve the SNAPSHOT dependencies:
+
+You also need to have the section below in your build.gradle root folder to be able to resolve the SNAPSHOT dependencies:
 ```
 allprojects {
     repositories {

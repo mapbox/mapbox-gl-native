@@ -16,9 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
  @param fontSize The default text size in points.
  @param linkColor The default link color.
  */
-+ (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosFromHTMLString:(nullable NSString *)htmlString fontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor;
++ (NSArray<MGLAttributionInfo *> *)attributionInfosFromHTMLString:(nullable NSString *)htmlString fontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor;
 
-+ (NSAttributedString *)attributedStringForAttributionInfos:(NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfos;
++ (NSAttributedString *)attributedStringForAttributionInfos:(NSArray<MGLAttributionInfo *> *)attributionInfos;
 
 /**
  Returns a copy of the `URL` property modified to account for the given style
@@ -58,7 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param infos An array of info objects to add to the receiver.
  */
-- (void)growArrayByAddingAttributionInfosFromArray:(NS_ARRAY_OF(MGLAttributionInfo *) *)infos;
+- (void)growArrayByAddingAttributionInfosFromArray:(NSArray<MGLAttributionInfo *> *)infos;
 
 @end
 

@@ -15,10 +15,6 @@ function parseCSSColor(str) {
   ];
 }
 
-global.isDataDriven = function (property) {
-  return property['property-function'] === true;
-};
-
 global.isLightProperty = function (property) {
   return property['light-property'] === true;
 };
@@ -77,30 +73,36 @@ function attributeUniformType(property, type) {
 }
 
 global.layoutPropertyType = function (property) {
-  if (isDataDriven(property)) {
-    return `DataDrivenLayoutProperty<${evaluatedType(property)}>`;
-  } else {
-    return `LayoutProperty<${evaluatedType(property)}>`;
+  switch (property['property-type']) {
+    case 'data-driven':
+    case 'cross-faded-data-driven':
+      return `DataDrivenLayoutProperty<${evaluatedType(property)}>`;
+    default:
+      return `LayoutProperty<${evaluatedType(property)}>`;
   }
 };
 
 global.paintPropertyType = function (property, type) {
-  if (isDataDriven(property)) {
-    return `DataDrivenPaintProperty<${evaluatedType(property)}, ${attributeUniformType(property, type)}>`;
-  } else if (/-pattern$/.test(property.name) || property.name === 'line-dasharray') {
-    return `CrossFadedPaintProperty<${evaluatedType(property)}>`;
-  } else {
-    return `PaintProperty<${evaluatedType(property)}>`;
+  switch (property['property-type']) {
+    case 'data-driven':
+    case 'cross-faded-data-driven':
+      return `DataDrivenPaintProperty<${evaluatedType(property)}, ${attributeUniformType(property, type)}>`;
+    case 'cross-faded':
+      return `CrossFadedPaintProperty<${evaluatedType(property)}>`;
+    default:
+      return `PaintProperty<${evaluatedType(property)}>`;
   }
 };
 
 global.propertyValueType = function (property) {
-  if (isDataDriven(property)) {
-    return `DataDrivenPropertyValue<${evaluatedType(property)}>`;
-  } else if (property.name === 'heatmap-color') {
-    return `HeatmapColorPropertyValue`;
-  } else {
-    return `PropertyValue<${evaluatedType(property)}>`;
+  switch (property['property-type']) {
+    case 'data-driven':
+    case 'cross-faded-data-driven':
+      return `DataDrivenPropertyValue<${evaluatedType(property)}>`;
+    case 'color-ramp':
+      return `HeatmapColorPropertyValue`;
+    default:
+      return `PropertyValue<${evaluatedType(property)}>`;
   }
 };
 

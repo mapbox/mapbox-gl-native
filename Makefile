@@ -111,8 +111,7 @@ run-benchmark-%: benchmark
 	$(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-benchmark --benchmark_filter=$* ${BENCHMARK_ARGS}
 
 .PHONY: node-benchmark
-node-benchmark: $(MACOS_PROJ_PATH)
-	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'node-benchmark' build $(XCPRETTY)
+node-benchmark: node
 
 .PHONY: run-node-benchmark
 run-node-benchmark: node-benchmark
@@ -136,7 +135,11 @@ offline: $(MACOS_PROJ_PATH)
 
 .PHONY: node
 node: $(MACOS_PROJ_PATH)
-	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-node' build $(XCPRETTY)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-node (Active ABI)' build $(XCPRETTY)
+
+.PHONY: node-all
+node-all: $(MACOS_PROJ_PATH)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-node (All ABIs)' build $(XCPRETTY)
 
 .PHONY: macos-test
 macos-test: $(MACOS_PROJ_PATH)
@@ -362,7 +365,11 @@ run-glfw-app: glfw-app
 
 .PHONY: node
 node: $(LINUX_BUILD)
-	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node.active
+
+.PHONY: node-all
+node-all: $(LINUX_BUILD)
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node.all
 
 .PHONY: compdb
 compdb: $(LINUX_BUILD)
@@ -473,12 +480,10 @@ test-node-recycle-map: node
 
 #### Android targets ###########################################################
 
-MBGL_ANDROID_ABIS  = arm-v5;armeabi
-MBGL_ANDROID_ABIS += arm-v7;armeabi-v7a
+MBGL_ANDROID_ABIS  = arm-v7;armeabi-v7a
 MBGL_ANDROID_ABIS += arm-v8;arm64-v8a
 MBGL_ANDROID_ABIS += x86;x86
 MBGL_ANDROID_ABIS += x86-64;x86_64
-MBGL_ANDROID_ABIS += mips;mips
 
 MBGL_ANDROID_LOCAL_WORK_DIR = /data/local/tmp/core-tests
 MBGL_ANDROID_LIBDIR = lib$(if $(filter arm-v8 x86-64,$1),64)
@@ -619,7 +624,7 @@ run-android-unit-test-%: platform/android/gradle/configuration.gradle
 # Builds a release package of the Android SDK
 .PHONY: apackage
 apackage: platform/android/gradle/configuration.gradle
-	make android-lib-arm-v5 && make android-lib-arm-v7 && make android-lib-arm-v8 && make android-lib-x86 && make android-lib-x86-64 && make android-lib-mips
+	make android-lib-arm-v7 && make android-lib-arm-v8 && make android-lib-x86 && make android-lib-x86-64
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all assemble$(BUILDTYPE)
 
 # Build test app instrumentation tests apk and test app apk for all abi's
@@ -687,6 +692,11 @@ endif
 android-configuration: platform/android/gradle/configuration.gradle
 	cat platform/android/gradle/configuration.gradle
 
+# Creates a dependency graph using Graphviz
+.PHONY: android-graph
+android-graph:
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:generateDependencyGraphMapboxLibraries
+
 #### Miscellaneous targets #####################################################
 
 .PHONY: style-code
@@ -701,6 +711,7 @@ codestyle:
 .PHONY: clean
 clean:
 	-rm -rf ./build \
+	        ./lib/*.node \
 	        ./platform/android/gradle/configuration.gradle \
 	        ./platform/android/MapboxGLAndroidSDK/build \
 	        ./platform/android/MapboxGLAndroidSDK/.externalNativeBuild \

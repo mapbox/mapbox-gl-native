@@ -1,6 +1,6 @@
 Pod::Spec.new do |m|
 
-  version = '4.0.0'
+  version = '4.1.0-alpha.1'
 
   m.name    = 'Mapbox-iOS-SDK-symbols'
   m.version = "#{version}-symbols"
@@ -20,7 +20,7 @@ Pod::Spec.new do |m|
   }
 
   m.platform              = :ios
-  m.ios.deployment_target = '8.0'
+  m.ios.deployment_target = '9.0'
 
   m.requires_arc = true
 

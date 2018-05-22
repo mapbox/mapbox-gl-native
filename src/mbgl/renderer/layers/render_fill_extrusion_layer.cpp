@@ -68,24 +68,53 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         parameters.context.setStencilMode(gl::StencilMode::disabled());
         parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {});
 
+        auto draw = [&](auto& programInstance, const auto& tileBucket, auto&& uniformValues) {
+            const auto& paintPropertyBinders = tileBucket.paintPropertyBinders.at(getID());
+
+            const auto allUniformValues = programInstance.computeAllUniformValues(
+                std::move(uniformValues),
+                paintPropertyBinders,
+                evaluated,
+                parameters.state.getZoom()
+            );
+            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
+                *tileBucket.vertexBuffer,
+                paintPropertyBinders,
+                evaluated
+            );
+
+            checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
+            programInstance.draw(
+                parameters.context,
+                gl::Triangles(),
+                parameters.depthModeFor3D(gl::DepthMode::ReadWrite),
+                gl::StencilMode::disabled(),
+                parameters.colorModeForRenderPass(),
+                *tileBucket.indexBuffer,
+                tileBucket.triangleSegments,
+                allUniformValues,
+                allAttributeBindings,
+                getID());
+        };
+
         if (evaluated.get<FillExtrusionPattern>().from.empty()) {
             for (const RenderTile& tile : renderTiles) {
                 assert(dynamic_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl)));
                 FillExtrusionBucket& bucket =
                     *reinterpret_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl));
 
-                parameters.programs.fillExtrusion.get(evaluated).draw(
-                    parameters.context, gl::Triangles(),
-                    parameters.depthModeFor3D(gl::DepthMode::ReadWrite),
-                    gl::StencilMode::disabled(), parameters.colorModeForRenderPass(),
+                draw(
+                    parameters.programs.fillExtrusion.get(evaluated),
+                    bucket,
                     FillExtrusionUniforms::values(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
                                                   evaluated.get<FillExtrusionTranslateAnchor>(),
                                                   parameters.state),
-                        parameters.state, parameters.evaluatedLight),
-                    *bucket.vertexBuffer, *bucket.indexBuffer, bucket.triangleSegments,
-                    bucket.paintPropertyBinders.at(getID()), evaluated, parameters.state.getZoom(),
-                    getID());
+                        parameters.state,
+                        parameters.evaluatedLight
+                    )
+                );
             }
         } else {
             optional<ImagePosition> imagePosA =
@@ -104,10 +133,9 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 FillExtrusionBucket& bucket =
                     *reinterpret_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl));
 
-                parameters.programs.fillExtrusionPattern.get(evaluated).draw(
-                    parameters.context, gl::Triangles(),
-                    parameters.depthModeFor3D(gl::DepthMode::ReadWrite),
-                    gl::StencilMode::disabled(), parameters.colorModeForRenderPass(),
+                draw(
+                    parameters.programs.fillExtrusionPattern.get(evaluated),
+                    bucket,
                     FillExtrusionPatternUniforms::values(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
                                                   evaluated.get<FillExtrusionTranslateAnchor>(),
@@ -115,10 +143,9 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                         parameters.imageManager.getPixelSize(), *imagePosA, *imagePosB,
                         evaluated.get<FillExtrusionPattern>(), tile.id, parameters.state,
                         -std::pow(2, tile.id.canonical.z) / util::tileSize / 8.0f,
-                        parameters.evaluatedLight),
-                    *bucket.vertexBuffer, *bucket.indexBuffer, bucket.triangleSegments,
-                    bucket.paintPropertyBinders.at(getID()), evaluated, parameters.state.getZoom(),
-                    getID());
+                        parameters.evaluatedLight
+                    )
+                );
             }
         }
 
@@ -131,19 +158,39 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
 
         const Properties<>::PossiblyEvaluated properties;
+        const ExtrusionTextureProgram::PaintPropertyBinders paintAttributeData{ properties, 0 };
+        
+        auto& programInstance = parameters.programs.extrusionTexture;
 
-        parameters.programs.extrusionTexture.draw(
-            parameters.context, gl::Triangles(), gl::DepthMode::disabled(),
-            gl::StencilMode::disabled(), parameters.colorModeForRenderPass(),
+        const auto allUniformValues = programInstance.computeAllUniformValues(
             ExtrusionTextureProgram::UniformValues{
                 uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
                 uniforms::u_image::Value{ 0 },
-                uniforms::u_opacity::Value{ evaluated.get<FillExtrusionOpacity>() } },
+                uniforms::u_opacity::Value{ evaluated.get<FillExtrusionOpacity>() }
+            },
+            paintAttributeData,
+            properties,
+            parameters.state.getZoom()
+        );
+        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
             parameters.staticData.extrusionTextureVertexBuffer,
+            paintAttributeData,
+            properties
+        );
+
+        checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
+        programInstance.draw(
+            parameters.context,
+            gl::Triangles(),
+            gl::DepthMode::disabled(),
+            gl::StencilMode::disabled(),
+            parameters.colorModeForRenderPass(),
             parameters.staticData.quadTriangleIndexBuffer,
             parameters.staticData.extrusionTextureSegments,
-            ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 }, properties,
-            parameters.state.getZoom(), getID());
+            allUniformValues,
+            allAttributeBindings,
+            getID());
     }
 }
 
@@ -151,14 +198,15 @@ bool RenderFillExtrusionLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
         const GeometryTileFeature& feature,
         const float,
-        const float bearing,
-        const float pixelsToTileUnits) const {
+        const TransformState& transformState,
+        const float pixelsToTileUnits,
+        const mat4&) const {
 
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,
             evaluated.get<style::FillExtrusionTranslate>(),
             evaluated.get<style::FillExtrusionTranslateAnchor>(),
-            bearing,
+            transformState.getAngle(),
             pixelsToTileUnits);
 
     return util::polygonIntersectsMultiPolygon(translatedQueryGeometry.value_or(queryGeometry), feature.getGeometries());

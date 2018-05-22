@@ -19,7 +19,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     { .latitude = -13.15589555, .longitude = -74.2178961777998 },
 };
 
-NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotation>) *shapes) {
+NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *shapes) {
     NSMutableArray *flattenedShapes = [NSMutableArray arrayWithCapacity:shapes.count];
     for (id <MGLAnnotation> shape in shapes) {
         NSArray *subshapes;
@@ -93,9 +93,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     BOOL _isTouringWorld;
     BOOL _isShowingPolygonAndPolylineAnnotations;
     BOOL _isShowingAnimatedAnnotation;
-    
-    // Snapshotter
-    MGLMapSnapshotter* snapshotter;
+
+    MGLMapSnapshotter *_snapshotter;
 }
 
 #pragma mark Lifecycle
@@ -185,17 +184,23 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     options.zoomLevel = self.mapView.zoomLevel;
     
     // Create and start the snapshotter
-    snapshotter = [[MGLMapSnapshotter alloc] initWithOptions:options];
-    [snapshotter startWithCompletionHandler:^(MGLMapSnapshot *snapshot, NSError *error) {
+    __weak __typeof__(self) weakSelf = self;
+    _snapshotter = [[MGLMapSnapshotter alloc] initWithOptions:options];
+    [_snapshotter startWithCompletionHandler:^(MGLMapSnapshot *snapshot, NSError *error) {
+        __typeof__(self) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+
         if (error) {
             NSLog(@"Could not load snapshot: %@", error.localizedDescription);
         } else {
             // Set the default name for the file and show the panel.
             NSSavePanel *panel = [NSSavePanel savePanel];
-            panel.nameFieldStringValue = [self.mapView.styleURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingPathExtension:@"png"];
+            panel.nameFieldStringValue = [strongSelf.mapView.styleURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingPathExtension:@"png"];
             panel.allowedFileTypes = [@[(NSString *)kUTTypePNG] arrayByAddingObjectsFromArray:[NSBitmapImageRep imageUnfilteredTypes]];
             
-            [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
+            [panel beginSheetModalForWindow:strongSelf.window completionHandler:^(NSInteger result) {
                 if (result == NSFileHandlingPanelOKButton) {
                     // Write the contents in the new format.
                     NSURL *fileURL = panel.URL;
@@ -232,7 +237,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
             }];
 
         }
-        snapshotter = nil;
+
+        strongSelf->_snapshotter = nil;
     }];
 }
 
@@ -340,7 +346,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 }
 
 - (void)toggleStyleLayersAtArrangedObjectIndexes:(NSIndexSet *)indices {
-    NS_ARRAY_OF(MGLStyleLayer *) *layers = [self.mapView.style.reversedLayers objectsAtIndexes:indices];
+    NSArray<MGLStyleLayer *> *layers = [self.mapView.style.reversedLayers objectsAtIndexes:indices];
     BOOL isVisible = layers.firstObject.visible;
     [self.undoManager registerUndoWithTarget:self handler:^(MapDocument * _Nonnull target) {
         [target toggleStyleLayersAtArrangedObjectIndexes:indices];
@@ -376,7 +382,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     [self deleteStyleLayersAtArrangedObjectIndexes:indices];
 }
 
-- (void)insertStyleLayers:(NS_ARRAY_OF(MGLStyleLayer *) *)layers atArrangedObjectIndexes:(NSIndexSet *)indices {
+- (void)insertStyleLayers:(NSArray<MGLStyleLayer *> *)layers atArrangedObjectIndexes:(NSIndexSet *)indices {
     [self.undoManager registerUndoWithTarget:self handler:^(id  _Nonnull target) {
         [self deleteStyleLayersAtArrangedObjectIndexes:indices];
     }];
@@ -396,7 +402,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 }
 
 - (void)deleteStyleLayersAtArrangedObjectIndexes:(NSIndexSet *)indices {
-    NS_ARRAY_OF(MGLStyleLayer *) *layers = [self.mapView.style.reversedLayers objectsAtIndexes:indices];
+    NSArray<MGLStyleLayer *> *layers = [self.mapView.style.reversedLayers objectsAtIndexes:indices];
     [self.undoManager registerUndoWithTarget:self handler:^(id  _Nonnull target) {
         [self insertStyleLayers:layers atArrangedObjectIndexes:indices];
     }];
@@ -572,7 +578,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     [self continueWorldTourWithRemainingAnnotations:annotations];
 }
 
-- (void)continueWorldTourWithRemainingAnnotations:(NS_MUTABLE_ARRAY_OF(MGLPointAnnotation *) *)annotations {
+- (void)continueWorldTourWithRemainingAnnotations:(NSMutableArray<MGLPointAnnotation *> *)annotations {
     MGLPointAnnotation *nextAnnotation = annotations.firstObject;
     if (!nextAnnotation || !_isTouringWorld) {
         _isTouringWorld = NO;
@@ -1179,7 +1185,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         return YES;
     }
     if (menuItem.action == @selector(takeSnapshot:)) {
-        return !(snapshotter && [snapshotter isLoading]);
+        return !(_snapshotter && [_snapshotter isLoading]);
     }
     return NO;
 }
@@ -1236,7 +1242,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 #pragma mark NSSharingServicePickerDelegate methods
 
-- (NS_ARRAY_OF(NSSharingService *) *)sharingServicePicker:(NSSharingServicePicker *)sharingServicePicker sharingServicesForItems:(NSArray *)items proposedSharingServices:(NS_ARRAY_OF(NSSharingService *) *)proposedServices {
+- (NSArray<NSSharingService *> *)sharingServicePicker:(NSSharingServicePicker *)sharingServicePicker sharingServicesForItems:(NSArray *)items proposedSharingServices:(NSArray<NSSharingService *> *)proposedServices {
     NSURL *shareURL = self.shareURL;
     NSURL *browserURL = [[NSWorkspace sharedWorkspace] URLForApplicationToOpenURL:shareURL];
     NSImage *browserIcon = [[NSWorkspace sharedWorkspace] iconForFile:browserURL.path];

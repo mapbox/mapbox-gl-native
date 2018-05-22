@@ -5,6 +5,7 @@
 #import "MBXOfflinePacksTableViewController.h"
 #import "MBXAnnotationView.h"
 #import "MBXUserLocationAnnotationView.h"
+#import "LimeGreenStyleLayer.h"
 #import "MBXEmbeddedMapViewController.h"
 
 #import <Mapbox/Mapbox.h>
@@ -82,6 +83,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingRasterTileSource,
     MBXSettingsRuntimeStylingImageSource,
     MBXSettingsRuntimeStylingRouteLine,
+    MBXSettingsRuntimeStylingAddLimeGreenTriangleLayer,
     MBXSettingsRuntimeStylingDDSPolygon,
     MBXSettingsRuntimeStylingCustomLatLonGrid,
 };
@@ -175,9 +177,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     self.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
     self.mapView.showsScale = YES;
     self.mapView.showsUserHeadingIndicator = YES;
-    if ([UIFont respondsToSelector:@selector(monospacedDigitSystemFontOfSize:weight:)]) {
-        self.hudLabel.titleLabel.font = [UIFont monospacedDigitSystemFontOfSize:10 weight:UIFontWeightRegular];
-    }
+    self.hudLabel.titleLabel.font = [UIFont monospacedDigitSystemFontOfSize:10 weight:UIFontWeightRegular];
 
     if ([MGLAccountManager accessToken].length)
     {
@@ -207,11 +207,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             [self.mapView reloadStyle:self];
         }];
         [alertController addAction:OKAction];
+        alertController.preferredAction = OKAction;
 
-        if ([alertController respondsToSelector:@selector(setPreferredAction:)])
-        {
-            alertController.preferredAction = OKAction;
-        }
         [self presentViewController:alertController animated:YES completion:nil];
     }
 }
@@ -371,6 +368,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Style Raster Tile Source",
                 @"Style Image Source",
                 @"Add Route Line",
+                @"Add Lime Green Triangle Layer",
                 @"Dynamically Style Polygon",
                 @"Add Custom Lat/Lon Grid",
             ]];
@@ -558,6 +556,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingRouteLine:
                     [self styleRouteLine];
+                    break;
+                case MBXSettingsRuntimeStylingAddLimeGreenTriangleLayer:
+                    [self styleAddLimeGreenTriangleLayer];
                     break;
                 case MBXSettingsRuntimeStylingDDSPolygon:
                     [self stylePolygonWithDDS];
@@ -1443,6 +1444,12 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self.mapView.style addLayer:routeLayer];
 }
 
+- (void)styleAddLimeGreenTriangleLayer
+{
+    LimeGreenStyleLayer *layer = [[LimeGreenStyleLayer alloc] initWithIdentifier:@"mbx-custom"];
+    [self.mapView.style addLayer:layer];
+}
+
 - (void)stylePolygonWithDDS {
     CLLocationCoordinate2D leftCoords[] = {
         {37.73081027834234, -122.49412536621094},
@@ -1532,7 +1539,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self continueWorldTourWithRemainingAnnotations:annotations];
 }
 
-- (void)continueWorldTourWithRemainingAnnotations:(NS_MUTABLE_ARRAY_OF(MGLPointAnnotation *) *)annotations
+- (void)continueWorldTourWithRemainingAnnotations:(NSMutableArray<MGLPointAnnotation *> *)annotations
 {
     MGLPointAnnotation *nextAnnotation = annotations.firstObject;
     if (!nextAnnotation || !_isTouringWorld)

@@ -6,7 +6,6 @@ mason_use(benchmark VERSION 1.2.0)
 mason_use(icu VERSION 58.1-min-size)
 mason_use(args VERSION 6.2.0 HEADER_ONLY)
 
-include(cmake/loop-uv.cmake)
 include(cmake/loop-darwin.cmake)
 
 macro(mbgl_platform_core)
@@ -155,7 +154,5 @@ macro(mbgl_platform_benchmark)
 endmacro()
 
 macro(mbgl_platform_node)
-    target_link_libraries(mbgl-node
-        PRIVATE "-Wl,-bind_at_load"
-    )
+    # Define macro to enable this target on this platform
 endmacro()

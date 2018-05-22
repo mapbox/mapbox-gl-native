@@ -332,7 +332,7 @@ public final class UiSettings {
    *
    * @param compass the drawable to show as image compass
    */
-  public void setCompassImage(Drawable compass) {
+  public void setCompassImage(@NonNull Drawable compass) {
     compassView.setCompassImage(compass);
   }
 
@@ -409,6 +409,7 @@ public final class UiSettings {
    *
    * @return the drawable used as compass image
    */
+  @NonNull
   public Drawable getCompassImage() {
     return compassView.getCompassImage();
   }
@@ -544,7 +545,7 @@ public final class UiSettings {
    *
    * @param attributionDialogManager the manager class used for showing attribution
    */
-  public void setAttributionDialogManager(AttributionDialogManager attributionDialogManager) {
+  public void setAttributionDialogManager(@NonNull AttributionDialogManager attributionDialogManager) {
     this.attributionDialogManager = attributionDialogManager;
   }
 
@@ -553,6 +554,7 @@ public final class UiSettings {
    *
    * @return the active manager class used for showing attribution
    */
+  @NonNull
   public AttributionDialogManager getAttributionDialogManager() {
     return attributionDialogManager;
   }
