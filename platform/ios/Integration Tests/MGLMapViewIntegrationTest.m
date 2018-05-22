@@ -45,15 +45,21 @@
     self.renderFinishedExpectation = nil;
 }
 
-- (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
-    if (self.regionDidChange) {
-        self.regionDidChange(mapView, animated);
+- (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated {
+    if (self.regionWillChange) {
+        self.regionWillChange(mapView, animated);
     }
 }
 
 - (void)mapViewRegionIsChanging:(MGLMapView *)mapView {
     if (self.regionIsChanging) {
         self.regionIsChanging(mapView);
+    }
+}
+
+- (void)mapView:(MGLMapView *)mapView regionDidChangeWithReason:(MGLCameraChangeReason)reason animated:(BOOL)animated {
+    if (self.regionDidChange) {
+        self.regionDidChange(mapView, reason, animated);
     }
 }
 
