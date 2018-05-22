@@ -908,6 +908,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
      *               {@link #WILL_START_RENDERING_MAP},
      *               {@link #DID_FINISH_RENDERING_MAP},
      *               {@link #DID_FINISH_RENDERING_MAP_FULLY_RENDERED}.
+     *               {@link #DID_FINISH_LOADING_STYLE},
+     *               {@link #SOURCE_DID_CHANGE}.
      */
     void onMapChanged(@MapChange int change);
   }
