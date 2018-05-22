@@ -15,6 +15,9 @@
 #include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/storage/resource.hpp>
+#include <mbgl/storage/response.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <memory>
 
@@ -370,6 +373,72 @@ const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount = @"Maximu
 
 - (void)setMaximumAllowedMapboxTiles:(uint64_t)maximumCount {
     _mbglFileSource->setOfflineMapboxTileCountLimit(maximumCount);
+}
+
+/**
+ Insert a tile into the offline storage coupled with a offline pack. The compressed flag tells wether the data is (zlib) compressed or not.
+ */
+-(void)putTileWithUrlTemplate:(NSString *)urlTemplate pixelRatio:(float)pixelRatio x:(int32_t)x y:(int32_t)y z:(int8_t)z data:(NSData *)data compressed:(BOOL)compressed modified:(NSDate *)modified expires:(NSDate *)expires etag:(NSString *)etag pack:(MGLOfflinePack *)pack completionHandler:(void (^)(NSError * _Nullable error))completion {
+    mbgl::Resource resource = mbgl::Resource::tile([urlTemplate UTF8String], pixelRatio, x, y, z, mbgl::Tileset::Scheme::XYZ);
+    mbgl::Response response = mbgl::Response();
+    response.data = std::make_shared<std::string>(static_cast<const char*>(data.bytes), data.length);
+    
+    if (etag) {
+        response.etag = std::string([etag UTF8String]);
+    }
+    
+    if (modified) {
+        response.modified = mbgl::util::now() + mbgl::Seconds(static_cast<long long>(modified.timeIntervalSinceNow));
+    }
+    
+    if (expires) {
+        response.expires = mbgl::util::now() + mbgl::Seconds(static_cast<long long>(expires.timeIntervalSinceNow));
+    }
+    
+    [self _putResource:resource response:response compressed:compressed pack:pack completionHandler:completion];
+}
+
+/**
+ Insert a resource into the offline storage coupled with a offline pack. The compressed flag tells wether the data is (zlib) compressed or not.
+ */
+-(void)putResourceWithUrl:(NSString *)url data:(NSData *)data compressed:(BOOL)compressed modified:(NSDate *)modified expires:(NSDate *)expires etag:(NSString *)etag pack:(MGLOfflinePack *)pack completionHandler:(void (^)(NSError * _Nullable error))completion {
+    mbgl::Resource resource = mbgl::Resource(mbgl::Resource::Kind::Unknown, [url UTF8String]);
+    mbgl::Response response = mbgl::Response();
+    response.data = std::make_shared<std::string>(static_cast<const char*>(data.bytes), data.length);
+    
+    if (etag) {
+        response.etag = std::string([etag UTF8String]);
+    }
+    
+    if (modified) {
+        response.modified = mbgl::util::now() + mbgl::Seconds(static_cast<long long>(modified.timeIntervalSinceNow));
+    }
+    
+    if (expires) {
+        response.expires = mbgl::util::now() + mbgl::Seconds(static_cast<long long>(expires.timeIntervalSinceNow));
+    }
+
+    [self _putResource:resource response:response compressed:compressed pack:pack completionHandler:completion];
+}
+
+-(void)_putResource:(mbgl::Resource)resource
+          response:(mbgl::Response)response
+        compressed:(BOOL)compressed
+              pack:(MGLOfflinePack *)pack
+ completionHandler:(void (^)(NSError * _Nullable error))completion {
+    _mbglFileSource->startPutRegionResource(*pack.mbglOfflineRegion, resource, response, compressed, [&, completion](std::exception_ptr exception) {
+        NSError *error;
+        if (exception) {
+            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
+                                                                               NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
+                                                                               }];
+        }
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
+                completion(error);
+            });
+        }
+    });
 }
 
 #pragma mark -

@@ -49,6 +49,7 @@ public:
     optional<std::pair<Response, uint64_t>> getRegionResource(int64_t regionID, const Resource&);
     optional<int64_t> hasRegionResource(int64_t regionID, const Resource&);
     uint64_t putRegionResource(int64_t regionID, const Resource&, const Response&);
+    uint64_t putRegionResource(int64_t regionID, const Resource&, const Response&, const bool compressed);
 
     OfflineRegionDefinition getRegionDefinition(int64_t regionID);
     OfflineRegionStatus getRegionCompletedStatus(int64_t regionID);
@@ -81,6 +82,7 @@ private:
     optional<std::pair<Response, uint64_t>> getInternal(const Resource&);
     optional<int64_t> hasInternal(const Resource&);
     std::pair<bool, uint64_t> putInternal(const Resource&, const Response&, bool evict);
+    std::pair<bool, uint64_t> putInternal(const Resource&, const Response&, bool evict, bool compressed);
 
     // Return value is true iff the resource was previously unused by any other regions.
     bool markUsed(int64_t regionID, const Resource&);

@@ -174,6 +174,15 @@ public:
     void put(const Resource& resource, const Response& response) {
         offlineDatabase->put(resource, response);
     }
+    
+    void startPutRegionResource(const int64_t regionID, const Resource& resource, const Response&  response, const bool compressed, std::function<void (std::exception_ptr)> callback) {
+        try {
+            offlineDatabase->putRegionResource(regionID, resource, response, compressed);
+            callback({});
+        } catch (...) {
+            callback(std::current_exception());
+        }
+    }
 
 private:
     OfflineDownload& getDownload(int64_t regionID) {
@@ -286,6 +295,10 @@ void DefaultFileSource::getOfflineRegionStatus(OfflineRegion& region, std::funct
 void DefaultFileSource::setOfflineMapboxTileCountLimit(uint64_t limit) const {
     impl->actor().invoke(&Impl::setOfflineMapboxTileCountLimit, limit);
 }
+    
+void DefaultFileSource::startPutRegionResource(OfflineRegion& region, const Resource& resource, const Response& response, const bool compressed, std::function<void (std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::startPutRegionResource, region.getID(), resource, response, compressed, callback);
+}
 
 void DefaultFileSource::pause() {
     impl->pause();
@@ -294,7 +307,7 @@ void DefaultFileSource::pause() {
 void DefaultFileSource::resume() {
     impl->resume();
 }
-
+    
 // For testing only:
 
 void DefaultFileSource::setOnlineStatus(const bool status) {

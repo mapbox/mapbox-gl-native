@@ -213,6 +213,34 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
 
     return { inserted, size };
 }
+    
+std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource, const Response& response, bool evict_, bool compressed) {
+    if (response.error) {
+        return { false, 0 };
+    }
+    
+    uint64_t size = response.data->size();
+    
+    if (evict_ && !evict(size)) {
+        Log::Debug(Event::Database, "Unable to make space for entry");
+        return { false, 0 };
+    }
+    
+    bool inserted;
+    
+    if (resource.kind == Resource::Kind::Tile) {
+        assert(resource.tileData);
+        inserted = putTile(*resource.tileData, response,
+                           *response.data,
+                           compressed);
+    } else {
+        inserted = putResource(resource, response,
+                               *response.data,
+                               compressed);
+    }
+    
+    return { inserted, size };
+}
 
 optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resource& resource) {
     // Update accessed timestamp used for LRU eviction.
@@ -640,6 +668,20 @@ optional<int64_t> OfflineDatabase::hasRegionResource(int64_t regionID, const Res
 
 uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& resource, const Response& response) {
     uint64_t size = putInternal(resource, response, false).second;
+    bool previouslyUnused = markUsed(regionID, resource);
+    
+    if (offlineMapboxTileCount
+        && resource.kind == Resource::Kind::Tile
+        && util::mapbox::isMapboxURL(resource.url)
+        && previouslyUnused) {
+        *offlineMapboxTileCount += 1;
+    }
+    
+    return size;
+}
+
+uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& resource, const Response& response, const bool compressed) {
+    uint64_t size = putInternal(resource, response, false, compressed).second;
     bool previouslyUnused = markUsed(regionID, resource);
 
     if (offlineMapboxTileCount

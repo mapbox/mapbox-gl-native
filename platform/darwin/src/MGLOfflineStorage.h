@@ -282,6 +282,16 @@ MGL_EXPORT
 - (void)setMaximumAllowedMapboxTiles:(uint64_t)maximumCount;
 
 /**
+ Insert a tile into the cache.
+ */
+-(void)putTileWithUrlTemplate:(NSString *)urlTemplate pixelRatio:(float)pixelRatio x:(int32_t)x y:(int32_t)y z:(int8_t)z data:(NSData *)data compressed:(BOOL)compressed modified:(NSDate *)modified expires:(NSDate *)expires etag:(NSString *)etag pack:(MGLOfflinePack *)pack completionHandler:(void (^)(NSError * _Nullable error))completion;
+
+/**
+ Insert a resource into the cache.
+ */
+-(void)putResourceWithUrl:(NSString *)url data:(NSData *)data compressed:(BOOL)compressed modified:(NSDate *)modified expires:(NSDate *)expires etag:(NSString *)etag pack:(MGLOfflinePack *)pack completionHandler:(void (^)(NSError * _Nullable error))completion;
+
+/**
  The cumulative size, measured in bytes, of all downloaded resources on disk.
 
  The returned value includes all resources, including tiles, whether downloaded
