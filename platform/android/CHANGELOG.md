@@ -2,6 +2,12 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.1.3 - May 23, 2018
+ - Circle querying fixes [#11571](https://github.com/mapbox/mapbox-gl-native/pull/11571)
+ - Global symbol query [#11742](https://github.com/mapbox/mapbox-gl-native/pull/11742)
+ - Change MapView#initialize modifier to allow overriding [#11969](https://github.com/mapbox/mapbox-gl-native/pull/11969)
+ - Update telemetry to 3.1.2 [#11987](https://github.com/mapbox/mapbox-gl-native/pull/11987)
+
 ## 6.1.2 - May 18, 2018
  - Update telemetry to 3.1.1 [#11942](https://github.com/mapbox/mapbox-gl-native/pull/11942)
 
