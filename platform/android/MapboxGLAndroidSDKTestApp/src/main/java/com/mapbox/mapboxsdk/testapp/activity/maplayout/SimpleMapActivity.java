@@ -10,7 +10,6 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
-import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -18,6 +17,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Test activity showcasing a simple MapView without any MapboxMap interaction.
@@ -25,7 +25,8 @@ import java.util.List;
 public class SimpleMapActivity extends AppCompatActivity {
 
   private MapView mapView;
-  private boolean selected;
+  private int previousSelectedIndex;
+  private Random random = new Random();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -52,34 +53,39 @@ public class SimpleMapActivity extends AppCompatActivity {
       GeoJsonSource source = new GeoJsonSource("source", featureCollection);
       mapboxMap.addSource(source);
 
-      Layer layer = new SymbolLayer("layer", "source")
-        .withProperties(PropertyFactory.iconImage(
-          Expression.switchCase(
-            Expression.get("selected"), Expression.literal(""),
-            Expression.literal("cafe-15")
-          )),
+      SymbolLayer layer = new SymbolLayer("layer", "source")
+        .withProperties(
+          PropertyFactory.iconImage("cafe-15"),
           PropertyFactory.iconSize(2f),
-          PropertyFactory.iconAllowOverlap(true));
+          PropertyFactory.iconAllowOverlap(true)
+        );
+      layer.setFilter(Expression.eq(Expression.get("selected"), false));
       mapboxMap.addLayer(layer);
 
-      Layer layerSelected = new SymbolLayer("layerSelected", "source")
-        .withProperties(PropertyFactory.iconImage(
-          Expression.switchCase(
-            Expression.get("selected"), Expression.literal("restaurant-15"),
-            Expression.literal("")
-          )),
+      SymbolLayer layerSelected = new SymbolLayer("layerSelected", "source")
+        .withProperties(
+          PropertyFactory.iconImage("restaurant-15"),
           PropertyFactory.iconSize(2f),
-          PropertyFactory.iconAllowOverlap(true));
+          PropertyFactory.iconAllowOverlap(true)
+        );
+      layerSelected.setFilter(Expression.eq(Expression.get("selected"), true));
       mapboxMap.addLayerAbove(layerSelected, "layer"); //noting, that we are explicitly z-indexing the selected layer
 
       mapboxMap.addOnMapClickListener(point -> {
-        if (selected) {
-          feature3.addBooleanProperty("selected", false);
-        } else {
-          feature3.addBooleanProperty("selected", true);
+        int index;
+        do {
+          index = random.nextInt(3);
+        } while (index == previousSelectedIndex);
+
+        Feature selectedFeature = features.get(index);
+        selectedFeature.addBooleanProperty("selected", true);
+        for (Feature deselectedFeature : features) {
+          if (deselectedFeature != selectedFeature) {
+            deselectedFeature.addBooleanProperty("selected", false);
+          }
         }
         source.setGeoJson(featureCollection);
-        selected = !selected;
+        previousSelectedIndex = index;
       });
 
       mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
