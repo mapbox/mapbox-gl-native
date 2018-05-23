@@ -2,6 +2,7 @@
   "BaseLocationActivity",
   "MapSnapshotterMarkerActivity",
   "MapSnapshotterReuseActivity",
+  "MapSnapshotterLocalStyleActivity",
   "LatLngBoundsActivity",
   "BottomSheetActivity",
   "MapSnapshotterActivity",
