@@ -428,6 +428,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     _mbglThreadPool = mbgl::sharedThreadPool();
     
     std::string styleURL = std::string([options.styleURL.absoluteString UTF8String]);
+    std::pair<bool, std::string> style = std::make_pair(false, styleURL);
     
     // Size; taking into account the minimum texture size for OpenGL ES
     // For non retina screens the ratio is 1:1 MGLSnapshotterMinimumPixelSize
@@ -454,7 +455,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     }
     
     // Create the snapshotter
-    _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(*mbglFileSource, *_mbglThreadPool, styleURL, size, pixelRatio, cameraOptions, coordinateBounds);
+    _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(*mbglFileSource, *_mbglThreadPool, style, size, pixelRatio, cameraOptions, coordinateBounds);
 }
 
 @end

@@ -57,6 +57,7 @@
     <string name="description_map_snapshotter">Show a static bitmap taken with the MapSnapshotter</string>
     <string name="description_map_snapshotter_reuse">Show how to reuse a MapSnapshotter instance</string>
     <string name="description_map_snapshotter_marker">Show how to add a marker to a Snapshot</string>
+    <string name="description_map_snapshotter_local_style">Show how to load a local style with a Snapshot</string>
     <string name="description_camera_animator">Use Android SDK Animators to animate camera position changes</string>
     <string name="description_symbol_generator">Use Android SDK Views as symbols</string>
     <string name="description_textureview_debug">Use TextureView to render the map</string>

@@ -34,6 +34,7 @@ public:
                    jni::jint width,
                    jni::jint height,
                    jni::String styleURL,
+                   jni::String styleJSON,
                    jni::Object<LatLngBounds> region,
                    jni::Object<CameraPosition> position,
                    jni::jboolean showLogo,
