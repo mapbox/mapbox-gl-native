@@ -2,6 +2,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MGLTileSource;
+
 /**
  An object conforming to the `MGLOfflineRegion` protocol determines which
  resources are required by an `MGLOfflinePack` object. At present, only
@@ -13,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The number of tiles needed to load one of the style’s sources within the region.
  */
-@property (nonatomic, readonly) uint64_t tileCount;
+-(uint64_t)countTilesForTileSource:(MGLTileSource *)tileSource;
 
 @end
 
