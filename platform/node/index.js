@@ -2,9 +2,8 @@
 
 // Shim to wrap req.respond while preserving callback-passing API
 
-var mbgl = require('../../lib/mapbox_gl_native.node');
+var mbgl = require('../../lib/mbgl-node.abi-' + process.versions.modules);
 var constructor = mbgl.Map.prototype.constructor;
-var process = require('process');
 
 var Map = function(options) {
     if (!(options instanceof Object)) {

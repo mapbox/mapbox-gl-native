@@ -305,7 +305,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-debug-arm-v7:
     docker:
-      - image: mbgl/7d2403f42e:android-ndk-r16b
+      - image: mbgl/feb0443038:android-ndk-r17
     resource_class: large
     working_directory: /src
     environment:
@@ -378,7 +378,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-release-all:
     docker:
-      - image: mbgl/7d2403f42e:android-ndk-r16b
+      - image: mbgl/feb0443038:android-ndk-r17
     resource_class: large
     working_directory: /src
     environment:

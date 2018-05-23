@@ -154,7 +154,5 @@ macro(mbgl_platform_benchmark)
 endmacro()
 
 macro(mbgl_platform_node)
-    target_link_libraries(mbgl-node
-        PRIVATE "-Wl,-bind_at_load"
-    )
+    # Define macro to enable this target on this platform
 endmacro()

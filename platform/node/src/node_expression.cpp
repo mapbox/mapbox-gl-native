@@ -52,7 +52,7 @@ type::Type parseType(v8::Local<v8::Object> type) {
 
         v8::Local<v8::String> Nkey = Nan::New("N").ToLocalChecked();
         if (Nan::Has(type, Nkey).FromMaybe(false)) {
-            N = Nan::Get(type, Nkey).ToLocalChecked()->ToInt32()->Value();
+            N = Nan::To<v8::Int32>(Nan::Get(type, Nkey).ToLocalChecked()).ToLocalChecked()->Value();
         }
         return type::Array(itemType, N);
     }

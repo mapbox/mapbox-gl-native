@@ -1,6 +1,7 @@
 #include "bitmap.hpp"
 
 #include <android/bitmap.h>
+#include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 namespace android {
@@ -17,7 +18,7 @@ public:
     ~PixelGuard() {
         const int result = AndroidBitmap_unlockPixels(&env, jni::Unwrap(*bitmap));
         if (result != ANDROID_BITMAP_RESULT_SUCCESS) {
-            throw std::runtime_error("bitmap decoding: could not unlock pixels");
+            Log::Warning(mbgl::Event::General, "Bitmap decoding: could not unlock pixels");
         }
     }
 

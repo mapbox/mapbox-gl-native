@@ -380,7 +380,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
     for (auto it = order.rbegin(); it != order.rend(); ++it) {
         if (it->layer.is<RenderSymbolLayer>()) {
-            if (crossTileSymbolIndex.addLayer(*it->layer.as<RenderSymbolLayer>())) symbolBucketsChanged = true;
+            const float lng = parameters.state.getLatLng().longitude();
+            if (crossTileSymbolIndex.addLayer(*it->layer.as<RenderSymbolLayer>(), lng)) symbolBucketsChanged = true;
         }
     }
 

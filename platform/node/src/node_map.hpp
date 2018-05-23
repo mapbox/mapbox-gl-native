@@ -25,6 +25,8 @@ class NodeMapObserver : public mbgl::MapObserver {
     void onDidFailLoadingMap(std::exception_ptr) override;
 };
 
+class RenderRequest;
+
 class NodeMap : public Nan::ObjectWrap,
                 public mbgl::FileSource {
 public:
@@ -84,7 +86,7 @@ public:
 
     std::exception_ptr error;
     mbgl::PremultipliedImage image;
-    std::unique_ptr<Nan::Callback> callback;
+    std::unique_ptr<RenderRequest> req;
 
     // Async for delivering the notifications of render completion.
     uv_async_t *async;

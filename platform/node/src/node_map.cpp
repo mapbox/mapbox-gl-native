@@ -353,6 +353,18 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
     return options;
 }
 
+class RenderRequest : public Nan::AsyncResource {
+public:
+    RenderRequest(v8::Local<v8::Function> callback_) : AsyncResource("mbgl:RenderRequest") {
+        callback.Reset(callback_);
+    }
+    ~RenderRequest() {
+        callback.Reset();
+    }
+
+    Nan::Persistent<v8::Function> callback;
+};
+
 /**
  * Render an image from the currently-loaded style
  *
@@ -385,15 +397,16 @@ void NodeMap::Render(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         return Nan::ThrowTypeError("Style is not loaded");
     }
 
-    if (nodeMap->callback) {
+    if (nodeMap->req) {
         return Nan::ThrowError("Map is currently rendering an image");
     }
 
     try {
         auto options = ParseOptions(Nan::To<v8::Object>(info[0]).ToLocalChecked());
-        assert(!nodeMap->callback);
+        assert(!nodeMap->req);
         assert(!nodeMap->image.data);
-        nodeMap->callback = std::make_unique<Nan::Callback>(info[1].As<v8::Function>());
+        nodeMap->req = std::make_unique<RenderRequest>(Nan::To<v8::Function>(info[1]).ToLocalChecked());
+
         nodeMap->startRender(std::move(options));
     } catch (mbgl::style::conversion::Error& err) {
         return Nan::ThrowTypeError(err.message.c_str());
@@ -447,6 +460,12 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
 }
 
 void NodeMap::renderFinished() {
+    if (!req) {
+        // In some situations, the render finishes at the same time as we call cancel. Make sure
+        // we are only finishing a render once.
+        return;
+    }
+
     Nan::HandleScope scope;
 
     // We're done with this render call, so we're unrefing so that the loop could close.
@@ -457,13 +476,16 @@ void NodeMap::renderFinished() {
     Unref();
 
     // Move the callback and image out of the way so that the callback can start a new render call.
-    auto cb = std::move(callback);
+    auto request = std::move(req);
     auto img = std::move(image);
-    assert(cb);
+    assert(request);
 
     // These have to be empty to be prepared for the next render call.
-    assert(!callback);
+    assert(!req);
     assert(!image.data);
+
+    v8::Local<v8::Function> callback = Nan::New(request->callback);
+    v8::Local<v8::Object> target = Nan::New<v8::Object>();
 
     if (error) {
         std::string errorMessage;
@@ -482,7 +504,7 @@ void NodeMap::renderFinished() {
         error = nullptr;
         assert(!error);
 
-        cb->Call(1, argv);
+        request->runInAsyncScope(target, callback, 1, argv);
     } else if (img.data) {
         v8::Local<v8::Object> pixels = Nan::NewBuffer(
             reinterpret_cast<char *>(img.data.get()), img.bytes(),
@@ -498,12 +520,12 @@ void NodeMap::renderFinished() {
             Nan::Null(),
             pixels
         };
-        cb->Call(2, argv);
+        request->runInAsyncScope(target, callback, 2, argv);
     } else {
         v8::Local<v8::Value> argv[] = {
             Nan::Error("Didn't get an image")
         };
-        cb->Call(1, argv);
+        request->runInAsyncScope(target, callback, 1, argv);
     }
 }
 
@@ -546,7 +568,7 @@ void NodeMap::Cancel(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
 
     if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
-    if (!nodeMap->callback) return Nan::ThrowError("No render in progress");
+    if (!nodeMap->req) return Nan::ThrowError("No render in progress");
 
     try {
         nodeMap->cancel();
@@ -1192,7 +1214,7 @@ std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resou
         Nan::New<v8::External>(&callback_)
     };
 
-    auto instance = Nan::New(NodeRequest::constructor)->NewInstance(2, argv);
+    auto instance = Nan::NewInstance(Nan::New(NodeRequest::constructor), 2, argv).ToLocalChecked();
 
     Nan::Set(instance, Nan::New("url").ToLocalChecked(), Nan::New(resource.url).ToLocalChecked());
     Nan::Set(instance, Nan::New("kind").ToLocalChecked(), Nan::New<v8::Integer>(resource.kind));

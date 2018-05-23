@@ -2,24 +2,23 @@ ext {
 
     androidVersions = [
             minSdkVersion    : 14,
-            targetSdkVersion : 25,
-            compileSdkVersion: 25,
-            buildToolsVersion: '26.0.3'
+            targetSdkVersion : 27,
+            compileSdkVersion: 27,
+            buildToolsVersion: '27.0.3'
     ]
 
     versions = [
             mapboxServices : '3.1.0',
             mapboxTelemetry: '3.1.1',
             mapboxGestures : '0.2.0',
-            supportLib     : '25.4.0',
-            espresso       : '3.0.1',
-            testRunner     : '1.0.1',
-            leakCanary     : '1.5.1',
-            lost           : '3.0.4',
+            supportLib     : '27.1.1',
+            espresso       : '3.0.2',
+            testRunner     : '1.0.2',
+            leakCanary     : '1.5.4',
             junit          : '4.12',
-            mockito        : '2.10.0',
-            robolectric    : '3.5.1',
-            timber         : '4.5.1',
+            mockito        : '2.18.3',
+            robolectric    : '3.8',
+            timber         : '4.7.0',
             okhttp         : '3.10.0'
     ]
 
@@ -48,7 +47,6 @@ ext {
             supportDesign         : "com.android.support:design:${versions.supportLib}",
             supportRecyclerView   : "com.android.support:recyclerview-v7:${versions.supportLib}",
 
-            lost                  : "com.mapzen.android:lost:${versions.lost}",
             gmsLocation           : 'com.google.android.gms:play-services-location:11.0.4',
             timber                : "com.jakewharton.timber:timber:${versions.timber}",
             okhttp3               : "com.squareup.okhttp3:okhttp:${versions.okhttp}",
