@@ -1,4 +1,5 @@
 #import "MGLMapViewIntegrationTest.h"
+#import "MGLTestUtility.h"
 #import "../../darwin/src/MGLGeometry_Private.h"
 
 @interface MBCameraTransitionTests : MGLMapViewIntegrationTest
@@ -336,7 +337,8 @@
 
 #pragma mark - Pending tests
 
-- (void)disabled_testContinuallyResettingNorthInIsChangingPENDING {
+- (void)testContinuallyResettingNorthInIsChangingPENDING {
+    MGL_CHECK_IF_PENDING_TEST_SHOULD_RUN();
 
     // See https://github.com/mapbox/mapbox-gl-native/pull/11614
     // This test currently fails, unsurprisingly, since we're continually
@@ -369,8 +371,9 @@
     XCTAssertEqualWithAccuracy(self.mapView.direction, 0.0, 0.001, @"Camera should have reset to north. %0.3f", self.mapView.direction);
 }
 
-- (void)disabled_testContinuallySettingCoordinateInIsChangingPENDING {
-    // See above comment in `-disabled_testContinuallyResettingNorthInIsChangingPENDING`
+- (void)testContinuallySettingCoordinateInIsChangingPENDING {
+    // See above comment in `-testContinuallyResettingNorthInIsChangingPENDING`
+    MGL_CHECK_IF_PENDING_TEST_SHOULD_RUN();
 
     // Reset to non-zero, prior to testing
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(0.0, 0.0) animated:NO];
