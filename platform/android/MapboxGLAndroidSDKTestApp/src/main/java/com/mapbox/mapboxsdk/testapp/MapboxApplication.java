@@ -3,12 +3,10 @@ package com.mapbox.mapboxsdk.testapp;
 import android.app.Application;
 import android.os.StrictMode;
 import android.text.TextUtils;
-
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.Telemetry;
 import com.mapbox.mapboxsdk.testapp.utils.TokenUtils;
 import com.squareup.leakcanary.LeakCanary;
-
 import timber.log.Timber;
 
 import static timber.log.Timber.DebugTree;
@@ -30,16 +28,31 @@ public class MapboxApplication extends Application {
   @Override
   public void onCreate() {
     super.onCreate();
+    if (!initializeLeakCanary()) {
+      return;
+    }
+    initializeLogger();
+    initializeStrictMode();
+    initializeMapbox();
+  }
 
+  private boolean initializeLeakCanary() {
     if (LeakCanary.isInAnalyzerProcess(this)) {
       // This process is dedicated to LeakCanary for heap analysis.
       // You should not init your app in this process.
-      return;
+      return false;
     }
     LeakCanary.install(this);
+    return true;
+  }
 
-    initializeLogger();
+  private void initializeLogger() {
+    if (BuildConfig.DEBUG) {
+      Timber.plant(new DebugTree());
+    }
+  }
 
+  private void initializeStrictMode() {
     StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
       .detectDiskReads()
       .detectDiskWrites()
@@ -51,20 +64,18 @@ public class MapboxApplication extends Application {
       .penaltyLog()
       .penaltyDeath()
       .build());
+  }
 
-    String mapboxAccessToken = TokenUtils.getMapboxAccessToken(getApplicationContext());
-    if (TextUtils.isEmpty(mapboxAccessToken) || mapboxAccessToken.equals(DEFAULT_MAPBOX_ACCESS_TOKEN)) {
-      Timber.e(ACCESS_TOKEN_NOT_SET_MESSAGE);
-    }
-
-    Mapbox.getInstance(getApplicationContext(), mapboxAccessToken);
-
+  private void initializeMapbox() {
+    String accessToken = TokenUtils.getMapboxAccessToken(getApplicationContext());
+    validateAccessToken(accessToken);
+    Mapbox.getInstance(getApplicationContext(), accessToken);
     Telemetry.updateDebugLoggingEnabled(true);
   }
 
-  private void initializeLogger() {
-    if (BuildConfig.DEBUG) {
-      Timber.plant(new DebugTree());
+  private static void validateAccessToken(String accessToken) {
+    if (TextUtils.isEmpty(accessToken) || accessToken.equals(DEFAULT_MAPBOX_ACCESS_TOKEN)) {
+      Timber.e(ACCESS_TOKEN_NOT_SET_MESSAGE);
     }
   }
 }
