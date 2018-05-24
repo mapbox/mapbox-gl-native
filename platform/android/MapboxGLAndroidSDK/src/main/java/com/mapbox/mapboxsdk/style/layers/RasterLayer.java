@@ -37,6 +37,7 @@ public class RasterLayer extends Layer {
    * @param sourceId the id of the source
    */
   public RasterLayer(String layerId, String sourceId) {
+    super();
     initialize(layerId, sourceId);
   }
 
@@ -48,6 +49,7 @@ public class RasterLayer extends Layer {
    * @param sourceLayer the source layer to set
    */
   public void setSourceLayer(String sourceLayer) {
+    checkThread();
     nativeSetSourceLayer(sourceLayer);
   }
 
@@ -82,6 +84,7 @@ public class RasterLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getRasterOpacity() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("raster-opacity", nativeGetRasterOpacity());
   }
 
@@ -91,6 +94,7 @@ public class RasterLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getRasterOpacityTransition() {
+    checkThread();
     return nativeGetRasterOpacityTransition();
   }
 
@@ -100,6 +104,7 @@ public class RasterLayer extends Layer {
    * @param options transition options for Float
    */
   public void setRasterOpacityTransition(TransitionOptions options) {
+    checkThread();
     nativeSetRasterOpacityTransition(options.getDuration(), options.getDelay());
   }
 
@@ -110,6 +115,7 @@ public class RasterLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getRasterHueRotate() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("raster-hue-rotate", nativeGetRasterHueRotate());
   }
 
@@ -119,6 +125,7 @@ public class RasterLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getRasterHueRotateTransition() {
+    checkThread();
     return nativeGetRasterHueRotateTransition();
   }
 
@@ -128,6 +135,7 @@ public class RasterLayer extends Layer {
    * @param options transition options for Float
    */
   public void setRasterHueRotateTransition(TransitionOptions options) {
+    checkThread();
     nativeSetRasterHueRotateTransition(options.getDuration(), options.getDelay());
   }
 
@@ -138,6 +146,7 @@ public class RasterLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getRasterBrightnessMin() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("raster-brightness-min", nativeGetRasterBrightnessMin());
   }
 
@@ -147,6 +156,7 @@ public class RasterLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getRasterBrightnessMinTransition() {
+    checkThread();
     return nativeGetRasterBrightnessMinTransition();
   }
 
@@ -156,6 +166,7 @@ public class RasterLayer extends Layer {
    * @param options transition options for Float
    */
   public void setRasterBrightnessMinTransition(TransitionOptions options) {
+    checkThread();
     nativeSetRasterBrightnessMinTransition(options.getDuration(), options.getDelay());
   }
 
@@ -166,6 +177,7 @@ public class RasterLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getRasterBrightnessMax() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("raster-brightness-max", nativeGetRasterBrightnessMax());
   }
 
@@ -175,6 +187,7 @@ public class RasterLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getRasterBrightnessMaxTransition() {
+    checkThread();
     return nativeGetRasterBrightnessMaxTransition();
   }
 
@@ -184,6 +197,7 @@ public class RasterLayer extends Layer {
    * @param options transition options for Float
    */
   public void setRasterBrightnessMaxTransition(TransitionOptions options) {
+    checkThread();
     nativeSetRasterBrightnessMaxTransition(options.getDuration(), options.getDelay());
   }
 
@@ -194,6 +208,7 @@ public class RasterLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getRasterSaturation() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("raster-saturation", nativeGetRasterSaturation());
   }
 
@@ -203,6 +218,7 @@ public class RasterLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getRasterSaturationTransition() {
+    checkThread();
     return nativeGetRasterSaturationTransition();
   }
 
@@ -212,6 +228,7 @@ public class RasterLayer extends Layer {
    * @param options transition options for Float
    */
   public void setRasterSaturationTransition(TransitionOptions options) {
+    checkThread();
     nativeSetRasterSaturationTransition(options.getDuration(), options.getDelay());
   }
 
@@ -222,6 +239,7 @@ public class RasterLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getRasterContrast() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("raster-contrast", nativeGetRasterContrast());
   }
 
@@ -231,6 +249,7 @@ public class RasterLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getRasterContrastTransition() {
+    checkThread();
     return nativeGetRasterContrastTransition();
   }
 
@@ -240,6 +259,7 @@ public class RasterLayer extends Layer {
    * @param options transition options for Float
    */
   public void setRasterContrastTransition(TransitionOptions options) {
+    checkThread();
     nativeSetRasterContrastTransition(options.getDuration(), options.getDelay());
   }
 
@@ -250,6 +270,7 @@ public class RasterLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getRasterFadeDuration() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("raster-fade-duration", nativeGetRasterFadeDuration());
   }
 

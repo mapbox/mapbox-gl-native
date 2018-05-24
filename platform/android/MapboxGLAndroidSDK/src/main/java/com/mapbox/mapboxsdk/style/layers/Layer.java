@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
+import com.mapbox.mapboxsdk.utils.ThreadUtils;
 
 /**
  * Base class for the different Layer types
@@ -15,13 +16,23 @@ public abstract class Layer {
   private boolean invalidated;
 
   public Layer(long nativePtr) {
+    checkThread();
     this.nativePtr = nativePtr;
   }
 
   public Layer() {
+    checkThread();
+  }
+
+  /**
+   * Validates if layer interaction is happening on the UI thread
+   */
+  protected void checkThread(){
+    ThreadUtils.checkThread("Layer");
   }
 
   public void setProperties(@NonNull PropertyValue<?>... properties) {
+    checkThread();
     if (properties.length == 0) {
       return;
     }
@@ -37,26 +48,32 @@ public abstract class Layer {
   }
 
   public String getId() {
+    checkThread();
     return nativeGetId();
   }
 
   public PropertyValue<String> getVisibility() {
+    checkThread();
     return new PaintPropertyValue<>("visibility", (String) nativeGetVisibility());
   }
 
   public float getMinZoom() {
+    checkThread();
     return nativeGetMinZoom();
   }
 
   public float getMaxZoom() {
+    checkThread();
     return nativeGetMaxZoom();
   }
 
   public void setMinZoom(float zoom) {
+    checkThread();
     nativeSetMinZoom(zoom);
   }
 
   public void setMaxZoom(float zoom) {
+    checkThread();
     nativeSetMaxZoom(zoom);
   }
 
@@ -97,5 +114,4 @@ public abstract class Layer {
     }
     return value;
   }
-
 }

@@ -36,6 +36,7 @@ public class BackgroundLayer extends Layer {
    * @param layerId the id of the layer
    */
   public BackgroundLayer(String layerId) {
+    super();
     initialize(layerId);
   }
 
@@ -61,6 +62,7 @@ public class BackgroundLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getBackgroundColor() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("background-color", nativeGetBackgroundColor());
   }
 
@@ -72,6 +74,7 @@ public class BackgroundLayer extends Layer {
    */
   @ColorInt
   public int getBackgroundColorAsInt() {
+    checkThread();
     PropertyValue<String> value = getBackgroundColor();
     if (value.isValue()) {
       return rgbaToColor(value.getValue());
@@ -86,6 +89,7 @@ public class BackgroundLayer extends Layer {
    * @return transition options for String
    */
   public TransitionOptions getBackgroundColorTransition() {
+    checkThread();
     return nativeGetBackgroundColorTransition();
   }
 
@@ -95,6 +99,7 @@ public class BackgroundLayer extends Layer {
    * @param options transition options for String
    */
   public void setBackgroundColorTransition(TransitionOptions options) {
+    checkThread();
     nativeSetBackgroundColorTransition(options.getDuration(), options.getDelay());
   }
 
@@ -105,6 +110,7 @@ public class BackgroundLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getBackgroundPattern() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("background-pattern", nativeGetBackgroundPattern());
   }
 
@@ -114,6 +120,7 @@ public class BackgroundLayer extends Layer {
    * @return transition options for String
    */
   public TransitionOptions getBackgroundPatternTransition() {
+    checkThread();
     return nativeGetBackgroundPatternTransition();
   }
 
@@ -123,6 +130,7 @@ public class BackgroundLayer extends Layer {
    * @param options transition options for String
    */
   public void setBackgroundPatternTransition(TransitionOptions options) {
+    checkThread();
     nativeSetBackgroundPatternTransition(options.getDuration(), options.getDelay());
   }
 
@@ -133,6 +141,7 @@ public class BackgroundLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getBackgroundOpacity() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("background-opacity", nativeGetBackgroundOpacity());
   }
 
@@ -142,6 +151,7 @@ public class BackgroundLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getBackgroundOpacityTransition() {
+    checkThread();
     return nativeGetBackgroundOpacityTransition();
   }
 
@@ -151,6 +161,7 @@ public class BackgroundLayer extends Layer {
    * @param options transition options for Float
    */
   public void setBackgroundOpacityTransition(TransitionOptions options) {
+    checkThread();
     nativeSetBackgroundOpacityTransition(options.getDuration(), options.getDelay());
   }
 

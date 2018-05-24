@@ -37,6 +37,7 @@ public class LineLayer extends Layer {
    * @param sourceId the id of the source
    */
   public LineLayer(String layerId, String sourceId) {
+    super();
     initialize(layerId, sourceId);
   }
 
@@ -48,6 +49,7 @@ public class LineLayer extends Layer {
    * @param sourceLayer the source layer to set
    */
   public void setSourceLayer(String sourceLayer) {
+    checkThread();
     nativeSetSourceLayer(sourceLayer);
   }
 
@@ -68,6 +70,7 @@ public class LineLayer extends Layer {
    * @return sourceLayer the source layer to get
    */
   public String getSourceLayer() {
+    checkThread();
     return nativeGetSourceLayer();
   }
 
@@ -77,6 +80,7 @@ public class LineLayer extends Layer {
    * @param filter the expression filter to set
    */
   public void setFilter(Expression filter) {
+    checkThread();
     nativeSetFilter(filter.toArray());
   }
 
@@ -98,6 +102,7 @@ public class LineLayer extends Layer {
    */
   @Nullable
   public Expression getFilter() {
+    checkThread();
     Expression expression = null;
     JsonArray array = (JsonArray) nativeGetFilter();
     if (array != null) {
@@ -126,6 +131,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getLineCap() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("line-cap", nativeGetLineCap());
   }
 
@@ -136,6 +142,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getLineJoin() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("line-join", nativeGetLineJoin());
   }
 
@@ -146,6 +153,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getLineMiterLimit() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("line-miter-limit", nativeGetLineMiterLimit());
   }
 
@@ -156,6 +164,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getLineRoundLimit() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("line-round-limit", nativeGetLineRoundLimit());
   }
 
@@ -166,6 +175,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getLineOpacity() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("line-opacity", nativeGetLineOpacity());
   }
 
@@ -175,6 +185,7 @@ public class LineLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getLineOpacityTransition() {
+    checkThread();
     return nativeGetLineOpacityTransition();
   }
 
@@ -184,6 +195,7 @@ public class LineLayer extends Layer {
    * @param options transition options for Float
    */
   public void setLineOpacityTransition(TransitionOptions options) {
+    checkThread();
     nativeSetLineOpacityTransition(options.getDuration(), options.getDelay());
   }
 
@@ -194,6 +206,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getLineColor() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("line-color", nativeGetLineColor());
   }
 
@@ -205,6 +218,7 @@ public class LineLayer extends Layer {
    */
   @ColorInt
   public int getLineColorAsInt() {
+    checkThread();
     PropertyValue<String> value = getLineColor();
     if (value.isValue()) {
       return rgbaToColor(value.getValue());
@@ -219,6 +233,7 @@ public class LineLayer extends Layer {
    * @return transition options for String
    */
   public TransitionOptions getLineColorTransition() {
+    checkThread();
     return nativeGetLineColorTransition();
   }
 
@@ -228,6 +243,7 @@ public class LineLayer extends Layer {
    * @param options transition options for String
    */
   public void setLineColorTransition(TransitionOptions options) {
+    checkThread();
     nativeSetLineColorTransition(options.getDuration(), options.getDelay());
   }
 
@@ -238,6 +254,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getLineTranslate() {
+    checkThread();
     return (PropertyValue<Float[]>) new PropertyValue("line-translate", nativeGetLineTranslate());
   }
 
@@ -247,6 +264,7 @@ public class LineLayer extends Layer {
    * @return transition options for Float[]
    */
   public TransitionOptions getLineTranslateTransition() {
+    checkThread();
     return nativeGetLineTranslateTransition();
   }
 
@@ -256,6 +274,7 @@ public class LineLayer extends Layer {
    * @param options transition options for Float[]
    */
   public void setLineTranslateTransition(TransitionOptions options) {
+    checkThread();
     nativeSetLineTranslateTransition(options.getDuration(), options.getDelay());
   }
 
@@ -266,6 +285,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getLineTranslateAnchor() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("line-translate-anchor", nativeGetLineTranslateAnchor());
   }
 
@@ -276,6 +296,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getLineWidth() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("line-width", nativeGetLineWidth());
   }
 
@@ -285,6 +306,7 @@ public class LineLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getLineWidthTransition() {
+    checkThread();
     return nativeGetLineWidthTransition();
   }
 
@@ -294,6 +316,7 @@ public class LineLayer extends Layer {
    * @param options transition options for Float
    */
   public void setLineWidthTransition(TransitionOptions options) {
+    checkThread();
     nativeSetLineWidthTransition(options.getDuration(), options.getDelay());
   }
 
@@ -304,6 +327,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getLineGapWidth() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("line-gap-width", nativeGetLineGapWidth());
   }
 
@@ -313,6 +337,7 @@ public class LineLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getLineGapWidthTransition() {
+    checkThread();
     return nativeGetLineGapWidthTransition();
   }
 
@@ -322,6 +347,7 @@ public class LineLayer extends Layer {
    * @param options transition options for Float
    */
   public void setLineGapWidthTransition(TransitionOptions options) {
+    checkThread();
     nativeSetLineGapWidthTransition(options.getDuration(), options.getDelay());
   }
 
@@ -332,6 +358,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getLineOffset() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("line-offset", nativeGetLineOffset());
   }
 
@@ -341,6 +368,7 @@ public class LineLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getLineOffsetTransition() {
+    checkThread();
     return nativeGetLineOffsetTransition();
   }
 
@@ -350,6 +378,7 @@ public class LineLayer extends Layer {
    * @param options transition options for Float
    */
   public void setLineOffsetTransition(TransitionOptions options) {
+    checkThread();
     nativeSetLineOffsetTransition(options.getDuration(), options.getDelay());
   }
 
@@ -360,6 +389,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getLineBlur() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("line-blur", nativeGetLineBlur());
   }
 
@@ -369,6 +399,7 @@ public class LineLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getLineBlurTransition() {
+    checkThread();
     return nativeGetLineBlurTransition();
   }
 
@@ -378,6 +409,7 @@ public class LineLayer extends Layer {
    * @param options transition options for Float
    */
   public void setLineBlurTransition(TransitionOptions options) {
+    checkThread();
     nativeSetLineBlurTransition(options.getDuration(), options.getDelay());
   }
 
@@ -388,6 +420,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getLineDasharray() {
+    checkThread();
     return (PropertyValue<Float[]>) new PropertyValue("line-dasharray", nativeGetLineDasharray());
   }
 
@@ -397,6 +430,7 @@ public class LineLayer extends Layer {
    * @return transition options for Float[]
    */
   public TransitionOptions getLineDasharrayTransition() {
+    checkThread();
     return nativeGetLineDasharrayTransition();
   }
 
@@ -406,6 +440,7 @@ public class LineLayer extends Layer {
    * @param options transition options for Float[]
    */
   public void setLineDasharrayTransition(TransitionOptions options) {
+    checkThread();
     nativeSetLineDasharrayTransition(options.getDuration(), options.getDelay());
   }
 
@@ -416,6 +451,7 @@ public class LineLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getLinePattern() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("line-pattern", nativeGetLinePattern());
   }
 
@@ -425,6 +461,7 @@ public class LineLayer extends Layer {
    * @return transition options for String
    */
   public TransitionOptions getLinePatternTransition() {
+    checkThread();
     return nativeGetLinePatternTransition();
   }
 
@@ -434,6 +471,7 @@ public class LineLayer extends Layer {
    * @param options transition options for String
    */
   public void setLinePatternTransition(TransitionOptions options) {
+    checkThread();
     nativeSetLinePatternTransition(options.getDuration(), options.getDelay());
   }
 
