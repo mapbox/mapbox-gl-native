@@ -29,11 +29,19 @@ struct Converter<PropertyValue<T>> {
                 return {};
             }
 
-            if (isFeatureConstant(**expression)) {
-                return { CameraFunction<T>(std::move(*expression)) };
-            } else {
+            if (!isFeatureConstant(**expression)) {
                 error = { "property expressions not supported" };
                 return {};
+            } else if (!isZoomConstant(**expression)) {
+                return { CameraFunction<T>(std::move(*expression)) };
+            } else {
+                auto literal = dynamic_cast<Literal*>(expression->get());
+                assert(literal);
+                optional<T> constant = fromExpressionValue<T>(literal->getValue());
+                if (!constant) {
+                    return {};
+                }
+                return PropertyValue<T>(*constant);
             }
         } else if (isObject(value)) {
             optional<CameraFunction<T>> function = convert<CameraFunction<T>>(value, error);

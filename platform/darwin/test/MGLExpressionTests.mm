@@ -306,6 +306,18 @@ using namespace std::string_literals;
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
+    {
+        NSExpression *expression = [NSExpression expressionForKeyPath:@"lineStyle.color"];
+        NSArray *jsonExpression = @[@"get", @"color", @[@"get", @"lineStyle"]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForKeyPath:@"map.box.gl"];
+        NSArray *jsonExpression = @[@"get", @"gl", @[@"get", @"box", @[@"get", @"map"]]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
 }
 
 - (void)testStatisticalExpressionObject {

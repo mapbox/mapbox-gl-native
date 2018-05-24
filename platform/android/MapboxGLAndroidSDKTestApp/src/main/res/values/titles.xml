@@ -57,6 +57,7 @@
     <string name="activity_map_snapshotter">Map Snapshotter</string>
     <string name="activity_map_snapshotter_reuse">Map Snapshotter Reuse</string>
     <string name="activity_map_snapshotter_marker">Map Snapshot with marker</string>
+    <string name="activity_map_snapshotter_local_style">Map Snapshot with local style</string>
     <string name="activity_camera_animator">Animator animation</string>
     <string name="activity_symbol_generator">SymbolGenerator</string>
     <string name="activity_textureview_debug">TextureView debug</string>

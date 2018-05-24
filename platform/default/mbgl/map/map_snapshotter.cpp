@@ -15,7 +15,7 @@ class MapSnapshotter::Impl {
 public:
     Impl(FileSource&,
          Scheduler&,
-         const std::string& styleURL,
+         const std::pair<bool, std::string> style,
          const Size&,
          const float pixelRatio,
          const CameraOptions&,
@@ -43,7 +43,7 @@ private:
 
 MapSnapshotter::Impl::Impl(FileSource& fileSource,
            Scheduler& scheduler,
-           const std::string& styleURL,
+           const std::pair<bool, std::string> style,
            const Size& size,
            const float pixelRatio,
            const CameraOptions& cameraOptions,
@@ -52,8 +52,11 @@ MapSnapshotter::Impl::Impl(FileSource& fileSource,
     : frontend(size, pixelRatio, fileSource, scheduler, programCacheDir)
     , map(frontend, MapObserver::nullObserver(), size, pixelRatio, fileSource, scheduler, MapMode::Static) {
 
-    map.getStyle().loadURL(styleURL);
-
+    if (style.first) {
+        map.getStyle().loadJSON(style.second);
+    } else{
+        map.getStyle().loadURL(style.second);
+    }
     map.jumpTo(cameraOptions);
 
     // Set region, if specified
@@ -134,13 +137,13 @@ LatLngBounds MapSnapshotter::Impl::getRegion() const {
 
 MapSnapshotter::MapSnapshotter(FileSource& fileSource,
                                Scheduler& scheduler,
-                               const std::string& styleURL,
+                               const std::pair<bool, std::string> style,
                                const Size& size,
                                const float pixelRatio,
                                const CameraOptions& cameraOptions,
                                const optional<LatLngBounds> region,
                                const optional<std::string> programCacheDir)
-   : impl(std::make_unique<util::Thread<MapSnapshotter::Impl>>("Map Snapshotter", fileSource, scheduler, styleURL, size, pixelRatio, cameraOptions, region, programCacheDir)) {
+   : impl(std::make_unique<util::Thread<MapSnapshotter::Impl>>("Map Snapshotter", fileSource, scheduler, style, size, pixelRatio, cameraOptions, region, programCacheDir)) {
 }
 
 MapSnapshotter::~MapSnapshotter() = default;

@@ -1070,7 +1070,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             
         case NSKeyPathExpressionType: {
             NSArray *expressionObject;
-            for (NSString *pathComponent in self.keyPath.pathComponents.reverseObjectEnumerator) {
+            NSArray *keyPath = [self.keyPath componentsSeparatedByString:@"."];
+            for (NSString *pathComponent in keyPath) {
                 if (expressionObject) {
                     expressionObject = @[@"get", pathComponent, expressionObject];
                 } else {

@@ -1,5 +1,6 @@
 #import <Mapbox/Mapbox.h>
 #import <XCTest/XCTest.h>
+#import "MGLTestUtility.h"
 
 static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReuseIdentifer";
 
@@ -209,7 +210,8 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
     XCTAssertEqual(view.dragState, MGLAnnotationViewDragStateNone);
 }
 
-- (void)testAnnotationViewInitWithFrame {
+- (void)testAnnotationViewInitWithFramePENDING {
+    MGL_CHECK_IF_PENDING_TEST_SHOULD_RUN();
     CGRect frame = CGRectMake(10.0, 10.0, 100.0, 100.0);
     MGLAnnotationView *view = [[MGLAnnotationView alloc] initWithFrame:frame];
     [self checkDefaultPropertiesForAnnotationView:view];
@@ -220,11 +222,12 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
     [self checkDefaultPropertiesForAnnotationView:view];
 }
 
-- (void)testSelectingADisabledAnnotationView {
+- (void)testSelectingADisabledAnnotationViewPENDING {
+    MGL_CHECK_IF_PENDING_TEST_SHOULD_RUN();
     self.prepareAnnotationView = ^(MGLAnnotationView *view) {
         view.enabled = NO;
     };
-    
+
     // Create annotation
     MGLPointFeature *point = [[MGLPointFeature alloc] init];
     point.title = NSStringFromSelector(_cmd);
