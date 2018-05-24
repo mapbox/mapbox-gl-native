@@ -11,10 +11,6 @@
 
 #include <unistd.h>
 
-#ifndef NODE_EXECUTABLE
-#define NODE_EXECUTABLE node
-#endif
-
 #define xstr(s) str(s)
 #define str(s) #s
 
@@ -53,8 +49,6 @@ Server::Server(const char* script) {
         close(output[0]);
 
         const char* executable = xstr(NODE_EXECUTABLE);
-
-        fprintf(stderr, "executable: %s\n", executable);
 
         // Launch the actual server process.
         int ret = execl(executable, executable, script, nullptr);

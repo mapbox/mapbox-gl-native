@@ -8,6 +8,11 @@ else()
     )
 endif()
 
+
+if(NOT WITH_NODEJS)
+    target_compile_definitions(mbgl-test PRIVATE "-DTEST_HAS_SERVER=0")
+endif()
+
 set_source_files_properties(test/src/mbgl/test/util.cpp PROPERTIES COMPILE_FLAGS -DNODE_EXECUTABLE="${NodeJS_EXECUTABLE}")
 
 target_include_directories(mbgl-test
