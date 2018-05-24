@@ -793,6 +793,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.render.RenderTestActivity"
+            android:label="@string/activity_heatmaplayer"
             android:screenOrientation="portrait"/>
         <!-- Configuration Settings -->
         <meta-data

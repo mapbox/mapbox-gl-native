@@ -592,6 +592,11 @@ android-ndk-stack-$1: platform/android/gradle/configuration.gradle
 .PHONY: run-android-render-test-$1
 run-android-render-test-$1: $(BUILD_DEPS) platform/android/gradle/configuration.gradle
 	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
+	# delete old test results
+	rm -rf platform/android/build/render-test/mapbox/
+  # copy test definitions to test app assets folder, clear old ones first
+	rm -rf platform/android/MapboxGLAndroidSDKTestApp/src/main/assets/integration
+	cp -r mapbox-gl-js/test/integration/ platform/android/MapboxGLAndroidSDKTestApp/src/main/assets
 	# run RenderTest.java to generate static map images
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class="com.mapbox.mapboxsdk.testapp.render.RenderTest"
 	# pull generated images from the device

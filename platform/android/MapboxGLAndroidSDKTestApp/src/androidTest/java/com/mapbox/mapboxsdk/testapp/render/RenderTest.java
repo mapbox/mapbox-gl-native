@@ -40,6 +40,7 @@ public class RenderTest {
 
   @Before
   public void beforeTest() {
+    IdlingPolicies.setMasterPolicyTimeout(30, TimeUnit.MINUTES);
     grantWriteRuntimePermission();
     setupIdlingResource();
   }
@@ -58,7 +59,7 @@ public class RenderTest {
   private void setupIdlingResource() {
     try {
       Timber.e("@Before test: register idle resource");
-      IdlingPolicies.setIdlingResourceTimeout(2, TimeUnit.MINUTES);
+      IdlingPolicies.setIdlingResourceTimeout(30, TimeUnit.MINUTES);
       Espresso.registerIdlingResources(idlingResource = new SnapshotterIdlingResource(rule.getActivity()));
     } catch (IdlingResourceTimeoutException idlingResourceTimeoutException) {
       throw new RuntimeException("Idling out!");
