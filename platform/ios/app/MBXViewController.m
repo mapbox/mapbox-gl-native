@@ -152,8 +152,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
     // Now create a world coord
     CLLocationDegrees heading          = drand48()*360.0;
-    CLLocationDistance dist            = drand48()*radius;
-    CLLocationCoordinate2D newLocation = coordinateCentered(coordinate, heading, dist);
+    CLLocationDistance distance        = drand48()*radius;
+    CLLocationCoordinate2D newLocation = coordinateCentered(coordinate, heading, distance);
     return newLocation;
 }
 
@@ -1753,8 +1753,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     for (NSInteger i = 0; i<numAnnotations; i++) {
 
         CLLocationDegrees heading          = drand48()*360.0;
-        CLLocationDistance dist            = drand48()*radius;
-        CLLocationCoordinate2D newLocation = coordinateCentered(coordinate, heading, dist);
+        CLLocationDistance distance        = drand48()*radius;
+        CLLocationCoordinate2D newLocation = coordinateCentered(coordinate, heading, distance);
 
         MBXDroppedPinAnnotation *annotation = [[MBXDroppedPinAnnotation alloc] init];
         annotation.coordinate = newLocation;
@@ -1769,10 +1769,10 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     [self.mapView removeAnnotations:self.mapView.annotations];
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(31, -100) zoomLevel:3 animated:NO];
 
-    [self _randomWorldTourInternal];
+    [self randomWorldTourInternal];
 }
 
-- (void)_randomWorldTourInternal {
+- (void)randomWorldTourInternal {
 
     self.randomWalk = YES;
 
@@ -1809,7 +1809,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     MBXViewController *strongSelf = weakSelf;
                     if (strongSelf.randomWalk) {
-                        [strongSelf _randomWorldTourInternal];
+                        [strongSelf randomWorldTourInternal];
                     }
                 });
             }];

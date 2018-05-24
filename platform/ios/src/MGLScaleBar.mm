@@ -122,10 +122,6 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 
 @implementation MGLScaleBar
 
-- (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSCurrentLocaleDidChangeNotification object:nil];
-}
-
 - (instancetype)initWithCoder:(NSCoder *)decoder {
     if (self = [super initWithCoder:decoder]) {
         [self commonInit];
@@ -183,18 +179,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 
     // Zero is a special case (no formatting)
     [self addZeroLabel];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(currentLocaleDidChange:)
-                                                 name:NSCurrentLocaleDidChangeNotification
-                                               object:nil];
 }
-
-- (void)currentLocaleDidChange:(NSNotification*)notification {
-    // Clear the cache, so labels should be rebuilt.
-    [self.labelImageCache removeAllObjects];
-    [self addZeroLabel];
-};
 
 #pragma mark - Dimensions
 
