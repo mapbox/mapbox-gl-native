@@ -166,7 +166,7 @@ if(COMMAND mbgl_platform_offline)
     include(cmake/offline.cmake)
 endif()
 
-if(COMMAND mbgl_platform_node)
+if(WITH_NODEJS AND COMMAND mbgl_platform_node)
     include(cmake/node.cmake)
 endif()
 
