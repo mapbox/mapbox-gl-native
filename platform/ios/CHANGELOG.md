@@ -18,6 +18,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Adjusted when and how the camera transition update and finish callbacks are called, fixing recursion bugs. ([#11614](https://github.com/mapbox/mapbox-gl-native/pull/11614))
 * Improved application launch performance.
 * Fixed an issue preventing nested key path expressions get parsed accordingly to the spec. ([#11959](https://github.com/mapbox/mapbox-gl-native/pull/11959))
+* Added custom `-hitTest:withEvent:` to `MGLSMCalloutView` to avoid registering taps in transparent areas of the standard annotation callout. ([#11939](https://github.com/mapbox/mapbox-gl-native/pull/11939))
 
 ## 4.0.1 - May 14, 2018
 

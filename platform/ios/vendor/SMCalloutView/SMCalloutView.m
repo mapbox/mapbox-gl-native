@@ -62,6 +62,26 @@ NSTimeInterval const kMGLSMCalloutViewRepositionDelayForUIScrollView = 1.0/3.0;
     return self;
 }
 
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    UIView *hitView = [super hitTest:point withEvent:event];
+
+    // If we tapped on our container (i.e. the UIButton), then ask the background
+    // view if the point is "inside". MGLSMCalloutMaskedBackgroundView provides a
+    // custom implementation that checks against the main callout and the down arrow.
+    // This avoids taps in "blank" space being detected
+
+    if (hitView == self.containerView) {
+        // Ideally we'd use the background mask to determine whether a tap point
+        // is valid, but that's overkill in this situation
+        CGPoint backgroundPoint = [self convertPoint:point toView:self.backgroundView];
+        if (![self.backgroundView pointInside:backgroundPoint withEvent:event]) {
+            return nil;
+        }
+    }
+
+    return hitView;
+}
+
 - (BOOL)supportsHighlighting {
     if (![self.delegate respondsToSelector:@selector(calloutViewClicked:)])
         return NO;
@@ -736,6 +756,24 @@ static UIImage *blackArrowImage = nil, *whiteArrowImage = nil, *grayArrowImage =
     layer.frame = self.bounds;
     layer.contents = (id)maskImage.CGImage;
     return layer;
+}
+
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
+
+    // Only interested in providing a custom pointInside for touches.
+    if (event.type != UIEventTypeTouches) {
+        return [super pointInside:point withEvent:event];
+    }
+
+    NSArray *views = @[self.containerView, self.arrowView];
+    for (UIView *view in views) {
+        CGPoint viewPoint = [self convertPoint:point toView:view];
+        if (CGRectContainsPoint(view.bounds, viewPoint)) {
+            return YES;
+        }
+    }
+
+    return NO;
 }
 
 @end
