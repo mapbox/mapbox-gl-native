@@ -28,8 +28,6 @@
 #define TOP_ANCHOR_MARGIN 13 // all the above measurements assume a bottom anchor! if we're pointing "up" we'll need to add this top margin to everything.
 #define COMFORTABLE_MARGIN 10 // when we try to reposition content to be visible, we'll consider this margin around your target rect
 
-#define CHECK_CALLOUT_SHAPE_FOR_HIT_TEST
-
 NSTimeInterval const kMGLSMCalloutViewRepositionDelayForUIScrollView = 1.0/3.0;
 
 @interface MGLSMCalloutView ()
@@ -64,9 +62,8 @@ NSTimeInterval const kMGLSMCalloutViewRepositionDelayForUIScrollView = 1.0/3.0;
     return self;
 }
 
-#ifdef CHECK_CALLOUT_SHAPE_FOR_HIT_TEST
-- (UIView*)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
-    UIView* hitView = [super hitTest:point withEvent:event];
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    UIView *hitView = [super hitTest:point withEvent:event];
 
     // If we tapped on our container (i.e. the UIButton), then ask the background
     // view if the point is "inside". MGLSMCalloutMaskedBackgroundView provides a
@@ -84,7 +81,6 @@ NSTimeInterval const kMGLSMCalloutViewRepositionDelayForUIScrollView = 1.0/3.0;
 
     return hitView;
 }
-#endif
 
 - (BOOL)supportsHighlighting {
     if (![self.delegate respondsToSelector:@selector(calloutViewClicked:)])
@@ -762,7 +758,6 @@ static UIImage *blackArrowImage = nil, *whiteArrowImage = nil, *grayArrowImage =
     return layer;
 }
 
-#ifdef CHECK_CALLOUT_SHAPE_FOR_HIT_TEST
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
 
     // Only interested in providing a custom pointInside for touches.
@@ -780,7 +775,6 @@ static UIImage *blackArrowImage = nil, *whiteArrowImage = nil, *grayArrowImage =
 
     return NO;
 }
-#endif
 
 @end
 
