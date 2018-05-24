@@ -135,7 +135,7 @@ endfunction()
 
 if(MBGL_PLATFORM STREQUAL "ios")
     execute_process(
-        COMMAND git submodule update --init platform/ios/vendor/mapbox-events-ios platform/ios/uitest/KIF platform/ios/uitest/OHHTTPStubs
+        COMMAND git submodule update --init platform/ios/vendor/mapbox-events-ios
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 endif()
 
