@@ -17,7 +17,7 @@ public class MapboxMapAction implements ViewAction {
   private OnInvokeActionListener invokeViewAction;
   private MapboxMap mapboxMap;
 
-  private MapboxMapAction(OnInvokeActionListener invokeViewAction, MapboxMap mapboxMap) {
+  public MapboxMapAction(OnInvokeActionListener invokeViewAction, MapboxMap mapboxMap) {
     this.invokeViewAction = invokeViewAction;
     this.mapboxMap = mapboxMap;
   }
