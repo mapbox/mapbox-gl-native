@@ -2,8 +2,23 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
-## master
-- Unknown tokens in URLs are now preserved, rather than replaced with an empty string [#11787](https://github.com/mapbox/mapbox-gl-native/issues/11787)
+## 6.2.0-alpha.2 - May 25, 2018 
+ - UI Thread checking [#12000](https://github.com/mapbox/mapbox-gl-native/pull/12000)
+ - Don't force having an Mapbox access token [#12001](https://github.com/mapbox/mapbox-gl-native/pull/12001)
+ - Unknown tokens in URLs are now preserved, rather than replaced with an empty string [#11787](https://github.com/mapbox/mapbox-gl-native/issues/11787)
+ - Update onMapChange Listener javadoc [#11972](https://github.com/mapbox/mapbox-gl-native/pull/11972)
+ - Set Tile loaded/rendered instead of marking tile as optional [#11985](https://github.com/mapbox/mapbox-gl-native/pull/11985)
+ - Wrap glGetString in `MBGL_CHECK_ERROR` too [#11106](https://github.com/mapbox/mapbox-gl-native/pull/11106)
+ - Accept constant expression in non-dds properties [#11960](https://github.com/mapbox/mapbox-gl-native/pull/11960) 
+ - Style JSON configuration in Snapshotter [#11976](https://github.com/mapbox/mapbox-gl-native/pull/11976)
+ - Remove mips and armeabi as supported ABI, update to NDK 17 [#11458](https://github.com/mapbox/mapbox-gl-native/pull/11458)
+ - Re-assign ids when lng jumps to avoid flicker [#11938](https://github.com/mapbox/mapbox-gl-native/pull/11938)
+ - Change modifier MapView#initialize to allow subclassing [#11969](https://github.com/mapbox/mapbox-gl-native/pull/11969)
+ - Avoid symbol flickering when longitude is wrapped [#11938](https://github.com/mapbox/mapbox-gl-native/pull/11938)
+ - Fix hang when parsing very large angles for hue in hsl colors [#11968](https://github.com/mapbox/mapbox-gl-native/pull/11968)
+ - Clamp TileJSON.bounds latitudes to [-90, 90] [#11964](https://github.com/mapbox/mapbox-gl-native/pull/11964)
+ - Align URL token replacement with GL-JS [#11953](https://github.com/mapbox/mapbox-gl-native/pull/11953)
+ - Align match behaviour [#11935](https://github.com/mapbox/mapbox-gl-native/pull/11935)
 
 ## 6.1.3 - May 23, 2018
  - Circle querying fixes [#11571](https://github.com/mapbox/mapbox-gl-native/pull/11571)
