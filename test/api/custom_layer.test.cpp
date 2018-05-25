@@ -48,7 +48,7 @@ public:
         MBGL_CHECK_ERROR(glCompileShader(fragmentShader));
         MBGL_CHECK_ERROR(glAttachShader(program, fragmentShader));
         MBGL_CHECK_ERROR(glLinkProgram(program));
-        a_pos = glGetAttribLocation(program, "a_pos");
+        a_pos = MBGL_CHECK_ERROR(glGetAttribLocation(program, "a_pos"));
 
         GLfloat triangle[] = { 0, 0.5, 0.5, -0.5, -0.5, -0.5 };
         MBGL_CHECK_ERROR(glGenBuffers(1, &buffer));
