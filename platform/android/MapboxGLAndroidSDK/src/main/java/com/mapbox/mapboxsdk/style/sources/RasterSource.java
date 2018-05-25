@@ -39,6 +39,7 @@ public class RasterSource extends Source {
    * @param url the source url
    */
   public RasterSource(String id, String url) {
+    super();
     initialize(id, url, DEFAULT_TILE_SIZE);
   }
 
@@ -50,6 +51,7 @@ public class RasterSource extends Source {
    * @param tileSize the tile size
    */
   public RasterSource(String id, String url, int tileSize) {
+    super();
     initialize(id, url, tileSize);
   }
 
@@ -60,6 +62,7 @@ public class RasterSource extends Source {
    * @param tileSet the {@link TileSet}
    */
   public RasterSource(String id, TileSet tileSet) {
+    super();
     initialize(id, tileSet.toValueObject(), DEFAULT_TILE_SIZE);
   }
 
@@ -71,6 +74,7 @@ public class RasterSource extends Source {
    * @param tileSize tje tile size
    */
   public RasterSource(String id, TileSet tileSet, int tileSize) {
+    super();
     initialize(id, tileSet.toValueObject(), tileSize);
   }
 
@@ -79,6 +83,7 @@ public class RasterSource extends Source {
    */
   @Nullable
   public String getUrl() {
+    checkThread();
     return nativeGetUrl();
   }
 
