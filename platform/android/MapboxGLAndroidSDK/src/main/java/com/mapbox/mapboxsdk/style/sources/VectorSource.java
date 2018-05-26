@@ -47,6 +47,7 @@ public class VectorSource extends Source {
    * @param url the url
    */
   public VectorSource(String id, String url) {
+    super();
     initialize(id, url);
   }
 
@@ -57,6 +58,7 @@ public class VectorSource extends Source {
    * @param tileSet the tileset
    */
   public VectorSource(String id, TileSet tileSet) {
+    super();
     initialize(id, tileSet.toValueObject());
   }
 
@@ -70,6 +72,7 @@ public class VectorSource extends Source {
   @NonNull
   public List<Feature> querySourceFeatures(@Size(min = 1) String[] sourceLayerIds,
                                            @Nullable Expression filter) {
+    checkThread();
     Feature[] features = querySourceFeatures(
       sourceLayerIds,
       filter != null ? filter.toArray() : null);
@@ -81,6 +84,7 @@ public class VectorSource extends Source {
    */
   @Nullable
   public String getUrl() {
+    checkThread();
     return nativeGetUrl();
   }
 

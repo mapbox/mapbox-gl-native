@@ -9,6 +9,7 @@ import android.support.annotation.UiThread;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+import com.mapbox.mapboxsdk.utils.ThreadUtils;
 
 /**
  * The global light source.
@@ -26,6 +27,7 @@ public class Light {
    * @param nativePtr pointer used by core
    */
   public Light(long nativePtr) {
+    checkThread();
     this.nativePtr = nativePtr;
   }
 
@@ -35,6 +37,7 @@ public class Light {
    * @param anchor as String
    */
   public void setAnchor(@Property.ANCHOR String anchor) {
+    checkThread();
     nativeSetAnchor(anchor);
   }
 
@@ -44,6 +47,7 @@ public class Light {
    * @return anchor as String
    */
   @Property.ANCHOR public String getAnchor() {
+    checkThread();
     return nativeGetAnchor();
   }
 
@@ -53,6 +57,7 @@ public class Light {
    * @param position of the light
    */
   public void setPosition(@NonNull Position position) {
+    checkThread();
     nativeSetPosition(position);
   }
 
@@ -62,6 +67,7 @@ public class Light {
    * @return position as Position
    */
   public Position getPosition() {
+    checkThread();
     return nativeGetPosition();
   }
 
@@ -71,6 +77,7 @@ public class Light {
    * @return transition options for position
    */
   public TransitionOptions getPositionTransition() {
+    checkThread();
     return nativeGetPositionTransition();
   }
 
@@ -80,6 +87,7 @@ public class Light {
    * @param options transition options for position
    */
   public void setPositionTransition(TransitionOptions options) {
+    checkThread();
     nativeSetPositionTransition(options.getDuration(), options.getDelay());
   }
 
@@ -89,6 +97,7 @@ public class Light {
    * @param color as int
    */
   public void setColor(@ColorInt int color) {
+    checkThread();
     nativeSetColor(PropertyFactory.colorToRgbaString(color));
   }
 
@@ -98,6 +107,7 @@ public class Light {
    * @param color as String
    */
   public void setColor(String color) {
+    checkThread();
     nativeSetColor(color);
   }
 
@@ -107,6 +117,7 @@ public class Light {
    * @return color as String
    */
    public String getColor() {
+    checkThread();
     return nativeGetColor();
   }
 
@@ -116,6 +127,7 @@ public class Light {
    * @return transition options for color
    */
   public TransitionOptions getColorTransition() {
+    checkThread();
     return nativeGetColorTransition();
   }
 
@@ -125,6 +137,7 @@ public class Light {
    * @param options transition options for color
    */
   public void setColorTransition(TransitionOptions options) {
+    checkThread();
     nativeSetColorTransition(options.getDuration(), options.getDelay());
   }
 
@@ -134,6 +147,7 @@ public class Light {
    * @param intensity as Float
    */
   public void setIntensity(float intensity) {
+    checkThread();
     nativeSetIntensity(intensity);
   }
 
@@ -143,6 +157,7 @@ public class Light {
    * @return intensity as Float
    */
    public float getIntensity() {
+    checkThread();
     return nativeGetIntensity();
   }
 
@@ -152,6 +167,7 @@ public class Light {
    * @return transition options for intensity
    */
   public TransitionOptions getIntensityTransition() {
+    checkThread();
     return nativeGetIntensityTransition();
   }
 
@@ -161,7 +177,12 @@ public class Light {
    * @param options transition options for intensity
    */
   public void setIntensityTransition(TransitionOptions options) {
+    checkThread();
     nativeSetIntensityTransition(options.getDuration(), options.getDelay());
+  }
+
+  private void checkThread(){
+    ThreadUtils.checkThread("Light");
   }
 
   private native void nativeSetAnchor(String anchor);

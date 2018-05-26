@@ -16,7 +16,6 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.attribution.AttributionLayout;
 import com.mapbox.mapboxsdk.attribution.AttributionMeasure;
@@ -25,7 +24,7 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.storage.FileSource;
-
+import com.mapbox.mapboxsdk.utils.ThreadUtils;
 import timber.log.Timber;
 
 /**
@@ -213,6 +212,7 @@ public class MapSnapshotter {
    * @param options the options to use for the snapshot
    */
   public MapSnapshotter(@NonNull Context context, @NonNull Options options) {
+    checkThread();
     this.context = context.getApplicationContext();
     FileSource fileSource = FileSource.getInstance(context);
     String programCacheDir = context.getCacheDir().getAbsolutePath();
@@ -243,7 +243,7 @@ public class MapSnapshotter {
     if (this.callback != null) {
       throw new IllegalStateException("Snapshotter was already started");
     }
-
+    checkThread();
     this.callback = callback;
     this.errorHandler = errorHandler;
     nativeStart();
@@ -284,6 +284,7 @@ public class MapSnapshotter {
    * the object was created on.
    */
   public void cancel() {
+    checkThread();
     reset();
     nativeCancel();
   }
@@ -463,6 +464,10 @@ public class MapSnapshotter {
       errorHandler.onError(reason);
       reset();
     }
+  }
+
+  private void checkThread() {
+    ThreadUtils.checkThread("MapSnapshotter");
   }
 
   protected void reset() {

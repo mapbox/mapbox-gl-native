@@ -37,6 +37,7 @@ public class SymbolLayer extends Layer {
    * @param sourceId the id of the source
    */
   public SymbolLayer(String layerId, String sourceId) {
+    super();
     initialize(layerId, sourceId);
   }
 
@@ -48,6 +49,7 @@ public class SymbolLayer extends Layer {
    * @param sourceLayer the source layer to set
    */
   public void setSourceLayer(String sourceLayer) {
+    checkThread();
     nativeSetSourceLayer(sourceLayer);
   }
 
@@ -68,6 +70,7 @@ public class SymbolLayer extends Layer {
    * @return sourceLayer the source layer to get
    */
   public String getSourceLayer() {
+    checkThread();
     return nativeGetSourceLayer();
   }
 
@@ -77,6 +80,7 @@ public class SymbolLayer extends Layer {
    * @param filter the expression filter to set
    */
   public void setFilter(Expression filter) {
+    checkThread();
     nativeSetFilter(filter.toArray());
   }
 
@@ -98,6 +102,7 @@ public class SymbolLayer extends Layer {
    */
   @Nullable
   public Expression getFilter() {
+    checkThread();
     Expression expression = null;
     JsonArray array = (JsonArray) nativeGetFilter();
     if (array != null) {
@@ -126,6 +131,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getSymbolPlacement() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("symbol-placement", nativeGetSymbolPlacement());
   }
 
@@ -136,6 +142,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getSymbolSpacing() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("symbol-spacing", nativeGetSymbolSpacing());
   }
 
@@ -146,6 +153,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Boolean> getSymbolAvoidEdges() {
+    checkThread();
     return (PropertyValue<Boolean>) new PropertyValue("symbol-avoid-edges", nativeGetSymbolAvoidEdges());
   }
 
@@ -156,6 +164,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Boolean> getIconAllowOverlap() {
+    checkThread();
     return (PropertyValue<Boolean>) new PropertyValue("icon-allow-overlap", nativeGetIconAllowOverlap());
   }
 
@@ -166,6 +175,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Boolean> getIconIgnorePlacement() {
+    checkThread();
     return (PropertyValue<Boolean>) new PropertyValue("icon-ignore-placement", nativeGetIconIgnorePlacement());
   }
 
@@ -176,6 +186,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Boolean> getIconOptional() {
+    checkThread();
     return (PropertyValue<Boolean>) new PropertyValue("icon-optional", nativeGetIconOptional());
   }
 
@@ -186,6 +197,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getIconRotationAlignment() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("icon-rotation-alignment", nativeGetIconRotationAlignment());
   }
 
@@ -196,6 +208,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getIconSize() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("icon-size", nativeGetIconSize());
   }
 
@@ -206,6 +219,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getIconTextFit() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("icon-text-fit", nativeGetIconTextFit());
   }
 
@@ -216,6 +230,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getIconTextFitPadding() {
+    checkThread();
     return (PropertyValue<Float[]>) new PropertyValue("icon-text-fit-padding", nativeGetIconTextFitPadding());
   }
 
@@ -226,6 +241,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getIconImage() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("icon-image", nativeGetIconImage());
   }
 
@@ -236,6 +252,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getIconRotate() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("icon-rotate", nativeGetIconRotate());
   }
 
@@ -246,6 +263,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getIconPadding() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("icon-padding", nativeGetIconPadding());
   }
 
@@ -256,6 +274,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Boolean> getIconKeepUpright() {
+    checkThread();
     return (PropertyValue<Boolean>) new PropertyValue("icon-keep-upright", nativeGetIconKeepUpright());
   }
 
@@ -266,6 +285,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getIconOffset() {
+    checkThread();
     return (PropertyValue<Float[]>) new PropertyValue("icon-offset", nativeGetIconOffset());
   }
 
@@ -276,6 +296,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getIconAnchor() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("icon-anchor", nativeGetIconAnchor());
   }
 
@@ -286,6 +307,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getIconPitchAlignment() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("icon-pitch-alignment", nativeGetIconPitchAlignment());
   }
 
@@ -296,6 +318,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getTextPitchAlignment() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("text-pitch-alignment", nativeGetTextPitchAlignment());
   }
 
@@ -306,6 +329,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getTextRotationAlignment() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("text-rotation-alignment", nativeGetTextRotationAlignment());
   }
 
@@ -316,6 +340,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getTextField() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("text-field", nativeGetTextField());
   }
 
@@ -326,6 +351,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String[]> getTextFont() {
+    checkThread();
     return (PropertyValue<String[]>) new PropertyValue("text-font", nativeGetTextFont());
   }
 
@@ -336,6 +362,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getTextSize() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("text-size", nativeGetTextSize());
   }
 
@@ -346,6 +373,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getTextMaxWidth() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("text-max-width", nativeGetTextMaxWidth());
   }
 
@@ -356,6 +384,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getTextLineHeight() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("text-line-height", nativeGetTextLineHeight());
   }
 
@@ -366,6 +395,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getTextLetterSpacing() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("text-letter-spacing", nativeGetTextLetterSpacing());
   }
 
@@ -376,6 +406,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getTextJustify() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("text-justify", nativeGetTextJustify());
   }
 
@@ -386,6 +417,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getTextAnchor() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("text-anchor", nativeGetTextAnchor());
   }
 
@@ -396,6 +428,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getTextMaxAngle() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("text-max-angle", nativeGetTextMaxAngle());
   }
 
@@ -406,6 +439,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getTextRotate() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("text-rotate", nativeGetTextRotate());
   }
 
@@ -416,6 +450,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getTextPadding() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("text-padding", nativeGetTextPadding());
   }
 
@@ -426,6 +461,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Boolean> getTextKeepUpright() {
+    checkThread();
     return (PropertyValue<Boolean>) new PropertyValue("text-keep-upright", nativeGetTextKeepUpright());
   }
 
@@ -436,6 +472,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getTextTransform() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("text-transform", nativeGetTextTransform());
   }
 
@@ -446,6 +483,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getTextOffset() {
+    checkThread();
     return (PropertyValue<Float[]>) new PropertyValue("text-offset", nativeGetTextOffset());
   }
 
@@ -456,6 +494,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Boolean> getTextAllowOverlap() {
+    checkThread();
     return (PropertyValue<Boolean>) new PropertyValue("text-allow-overlap", nativeGetTextAllowOverlap());
   }
 
@@ -466,6 +505,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Boolean> getTextIgnorePlacement() {
+    checkThread();
     return (PropertyValue<Boolean>) new PropertyValue("text-ignore-placement", nativeGetTextIgnorePlacement());
   }
 
@@ -476,6 +516,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Boolean> getTextOptional() {
+    checkThread();
     return (PropertyValue<Boolean>) new PropertyValue("text-optional", nativeGetTextOptional());
   }
 
@@ -486,6 +527,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getIconOpacity() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("icon-opacity", nativeGetIconOpacity());
   }
 
@@ -495,6 +537,7 @@ public class SymbolLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getIconOpacityTransition() {
+    checkThread();
     return nativeGetIconOpacityTransition();
   }
 
@@ -504,6 +547,7 @@ public class SymbolLayer extends Layer {
    * @param options transition options for Float
    */
   public void setIconOpacityTransition(TransitionOptions options) {
+    checkThread();
     nativeSetIconOpacityTransition(options.getDuration(), options.getDelay());
   }
 
@@ -514,6 +558,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getIconColor() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("icon-color", nativeGetIconColor());
   }
 
@@ -525,6 +570,7 @@ public class SymbolLayer extends Layer {
    */
   @ColorInt
   public int getIconColorAsInt() {
+    checkThread();
     PropertyValue<String> value = getIconColor();
     if (value.isValue()) {
       return rgbaToColor(value.getValue());
@@ -539,6 +585,7 @@ public class SymbolLayer extends Layer {
    * @return transition options for String
    */
   public TransitionOptions getIconColorTransition() {
+    checkThread();
     return nativeGetIconColorTransition();
   }
 
@@ -548,6 +595,7 @@ public class SymbolLayer extends Layer {
    * @param options transition options for String
    */
   public void setIconColorTransition(TransitionOptions options) {
+    checkThread();
     nativeSetIconColorTransition(options.getDuration(), options.getDelay());
   }
 
@@ -558,6 +606,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getIconHaloColor() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("icon-halo-color", nativeGetIconHaloColor());
   }
 
@@ -569,6 +618,7 @@ public class SymbolLayer extends Layer {
    */
   @ColorInt
   public int getIconHaloColorAsInt() {
+    checkThread();
     PropertyValue<String> value = getIconHaloColor();
     if (value.isValue()) {
       return rgbaToColor(value.getValue());
@@ -583,6 +633,7 @@ public class SymbolLayer extends Layer {
    * @return transition options for String
    */
   public TransitionOptions getIconHaloColorTransition() {
+    checkThread();
     return nativeGetIconHaloColorTransition();
   }
 
@@ -592,6 +643,7 @@ public class SymbolLayer extends Layer {
    * @param options transition options for String
    */
   public void setIconHaloColorTransition(TransitionOptions options) {
+    checkThread();
     nativeSetIconHaloColorTransition(options.getDuration(), options.getDelay());
   }
 
@@ -602,6 +654,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getIconHaloWidth() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("icon-halo-width", nativeGetIconHaloWidth());
   }
 
@@ -611,6 +664,7 @@ public class SymbolLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getIconHaloWidthTransition() {
+    checkThread();
     return nativeGetIconHaloWidthTransition();
   }
 
@@ -620,6 +674,7 @@ public class SymbolLayer extends Layer {
    * @param options transition options for Float
    */
   public void setIconHaloWidthTransition(TransitionOptions options) {
+    checkThread();
     nativeSetIconHaloWidthTransition(options.getDuration(), options.getDelay());
   }
 
@@ -630,6 +685,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getIconHaloBlur() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("icon-halo-blur", nativeGetIconHaloBlur());
   }
 
@@ -639,6 +695,7 @@ public class SymbolLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getIconHaloBlurTransition() {
+    checkThread();
     return nativeGetIconHaloBlurTransition();
   }
 
@@ -648,6 +705,7 @@ public class SymbolLayer extends Layer {
    * @param options transition options for Float
    */
   public void setIconHaloBlurTransition(TransitionOptions options) {
+    checkThread();
     nativeSetIconHaloBlurTransition(options.getDuration(), options.getDelay());
   }
 
@@ -658,6 +716,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getIconTranslate() {
+    checkThread();
     return (PropertyValue<Float[]>) new PropertyValue("icon-translate", nativeGetIconTranslate());
   }
 
@@ -667,6 +726,7 @@ public class SymbolLayer extends Layer {
    * @return transition options for Float[]
    */
   public TransitionOptions getIconTranslateTransition() {
+    checkThread();
     return nativeGetIconTranslateTransition();
   }
 
@@ -676,6 +736,7 @@ public class SymbolLayer extends Layer {
    * @param options transition options for Float[]
    */
   public void setIconTranslateTransition(TransitionOptions options) {
+    checkThread();
     nativeSetIconTranslateTransition(options.getDuration(), options.getDelay());
   }
 
@@ -686,6 +747,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getIconTranslateAnchor() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("icon-translate-anchor", nativeGetIconTranslateAnchor());
   }
 
@@ -696,6 +758,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getTextOpacity() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("text-opacity", nativeGetTextOpacity());
   }
 
@@ -705,6 +768,7 @@ public class SymbolLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getTextOpacityTransition() {
+    checkThread();
     return nativeGetTextOpacityTransition();
   }
 
@@ -714,6 +778,7 @@ public class SymbolLayer extends Layer {
    * @param options transition options for Float
    */
   public void setTextOpacityTransition(TransitionOptions options) {
+    checkThread();
     nativeSetTextOpacityTransition(options.getDuration(), options.getDelay());
   }
 
@@ -724,6 +789,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getTextColor() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("text-color", nativeGetTextColor());
   }
 
@@ -735,6 +801,7 @@ public class SymbolLayer extends Layer {
    */
   @ColorInt
   public int getTextColorAsInt() {
+    checkThread();
     PropertyValue<String> value = getTextColor();
     if (value.isValue()) {
       return rgbaToColor(value.getValue());
@@ -749,6 +816,7 @@ public class SymbolLayer extends Layer {
    * @return transition options for String
    */
   public TransitionOptions getTextColorTransition() {
+    checkThread();
     return nativeGetTextColorTransition();
   }
 
@@ -758,6 +826,7 @@ public class SymbolLayer extends Layer {
    * @param options transition options for String
    */
   public void setTextColorTransition(TransitionOptions options) {
+    checkThread();
     nativeSetTextColorTransition(options.getDuration(), options.getDelay());
   }
 
@@ -768,6 +837,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getTextHaloColor() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("text-halo-color", nativeGetTextHaloColor());
   }
 
@@ -779,6 +849,7 @@ public class SymbolLayer extends Layer {
    */
   @ColorInt
   public int getTextHaloColorAsInt() {
+    checkThread();
     PropertyValue<String> value = getTextHaloColor();
     if (value.isValue()) {
       return rgbaToColor(value.getValue());
@@ -793,6 +864,7 @@ public class SymbolLayer extends Layer {
    * @return transition options for String
    */
   public TransitionOptions getTextHaloColorTransition() {
+    checkThread();
     return nativeGetTextHaloColorTransition();
   }
 
@@ -802,6 +874,7 @@ public class SymbolLayer extends Layer {
    * @param options transition options for String
    */
   public void setTextHaloColorTransition(TransitionOptions options) {
+    checkThread();
     nativeSetTextHaloColorTransition(options.getDuration(), options.getDelay());
   }
 
@@ -812,6 +885,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getTextHaloWidth() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("text-halo-width", nativeGetTextHaloWidth());
   }
 
@@ -821,6 +895,7 @@ public class SymbolLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getTextHaloWidthTransition() {
+    checkThread();
     return nativeGetTextHaloWidthTransition();
   }
 
@@ -830,6 +905,7 @@ public class SymbolLayer extends Layer {
    * @param options transition options for Float
    */
   public void setTextHaloWidthTransition(TransitionOptions options) {
+    checkThread();
     nativeSetTextHaloWidthTransition(options.getDuration(), options.getDelay());
   }
 
@@ -840,6 +916,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getTextHaloBlur() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("text-halo-blur", nativeGetTextHaloBlur());
   }
 
@@ -849,6 +926,7 @@ public class SymbolLayer extends Layer {
    * @return transition options for Float
    */
   public TransitionOptions getTextHaloBlurTransition() {
+    checkThread();
     return nativeGetTextHaloBlurTransition();
   }
 
@@ -858,6 +936,7 @@ public class SymbolLayer extends Layer {
    * @param options transition options for Float
    */
   public void setTextHaloBlurTransition(TransitionOptions options) {
+    checkThread();
     nativeSetTextHaloBlurTransition(options.getDuration(), options.getDelay());
   }
 
@@ -868,6 +947,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getTextTranslate() {
+    checkThread();
     return (PropertyValue<Float[]>) new PropertyValue("text-translate", nativeGetTextTranslate());
   }
 
@@ -877,6 +957,7 @@ public class SymbolLayer extends Layer {
    * @return transition options for Float[]
    */
   public TransitionOptions getTextTranslateTransition() {
+    checkThread();
     return nativeGetTextTranslateTransition();
   }
 
@@ -886,6 +967,7 @@ public class SymbolLayer extends Layer {
    * @param options transition options for Float[]
    */
   public void setTextTranslateTransition(TransitionOptions options) {
+    checkThread();
     nativeSetTextTranslateTransition(options.getDuration(), options.getDelay());
   }
 
@@ -896,6 +978,7 @@ public class SymbolLayer extends Layer {
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getTextTranslateAnchor() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("text-translate-anchor", nativeGetTextTranslateAnchor());
   }
 

@@ -634,7 +634,7 @@ public class MapboxMapTest extends BaseActivityTest {
     }));
   }
 
-  private class MapboxMapAction implements ViewAction {
+  public class MapboxMapAction implements ViewAction {
 
     private InvokeViewAction invokeViewAction;
 

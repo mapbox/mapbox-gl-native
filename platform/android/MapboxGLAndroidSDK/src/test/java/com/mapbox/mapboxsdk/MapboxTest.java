@@ -4,8 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,13 +33,6 @@ public class MapboxTest {
   @Test
   public void testGetAccessToken() {
     final String accessToken = "pk.0000000001";
-    injectMapboxSingleton(accessToken);
-    assertSame(accessToken, Mapbox.getAccessToken());
-  }
-
-  @Test(expected = MapboxConfigurationException.class)
-  public void testGetInvalidAccessToken() {
-    final String accessToken = "dummy";
     injectMapboxSingleton(accessToken);
     assertSame(accessToken, Mapbox.getAccessToken());
   }
