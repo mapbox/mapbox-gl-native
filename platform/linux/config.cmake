@@ -1,5 +1,4 @@
 mason_use(glfw VERSION 2017-07-13-67c9155)
-mason_use(mesa VERSION 13.0.4)
 mason_use(sqlite VERSION 3.14.2)
 mason_use(libuv VERSION 1.9.1)
 mason_use(nunicode VERSION 1.7.1)
@@ -29,8 +28,6 @@ target_link_libraries(mbgl-loop-uv
 target_add_mason_package(mbgl-loop-uv PUBLIC libuv)
 
 macro(mbgl_platform_core)
-    target_add_mason_package(mbgl-core PUBLIC mesa)
-
     if(WITH_OSMESA)
         target_sources(mbgl-core
             PRIVATE platform/default/headless_backend_osmesa.cpp
@@ -42,10 +39,8 @@ macro(mbgl_platform_core)
         target_sources(mbgl-core
             PRIVATE platform/linux/src/headless_backend_egl.cpp
         )
-        target_link_libraries(mbgl-core
-            PUBLIC -lGLESv2
-            PUBLIC -lEGL
-        )
+        mason_use(swiftshader VERSION 2017-11-20)
+        target_add_mason_package(mbgl-core PUBLIC swiftshader)
     else()
         target_sources(mbgl-core
             PRIVATE platform/linux/src/headless_backend_glx.cpp
