@@ -121,8 +121,10 @@ macro(mbgl_filesource)
 
     target_add_mason_package(mbgl-filesource PUBLIC sqlite)
 
+    # We're not referencing any cURL symbols since we're dynamically loading it. However, we want to
+    # link the library anyway since we're definitely going to load it on startup anyway.
     target_link_libraries(mbgl-filesource
-        PUBLIC -lcurl
+        PUBLIC -Wl,--no-as-needed -lcurl -Wl,--as-needed
     )
 endmacro()
 
