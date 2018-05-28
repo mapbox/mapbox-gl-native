@@ -177,6 +177,17 @@ public class ExpressionTest extends BaseActivityTest {
     });
   }
 
+  @Test
+  public void testLiteralProperty() {
+    validateTestSetup();
+    setupStyle();
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      layer.setProperties(
+        fillColor(literal("#4286f4"))
+      );
+    });
+  }
+
   private void setupStyle() {
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       // Add a source
