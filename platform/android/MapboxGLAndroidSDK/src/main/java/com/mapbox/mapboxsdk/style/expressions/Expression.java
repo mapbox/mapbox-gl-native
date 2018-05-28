@@ -3582,6 +3582,12 @@ public class Expression {
       return literal;
     }
 
+    @NonNull
+    @Override
+    public Object[] toArray() {
+      return new Object[] {"literal", literal};
+    }
+
     /**
      * Returns a string representation of the expression literal.
      *
