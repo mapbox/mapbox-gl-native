@@ -23,7 +23,9 @@ FileSource::FileSource(jni::JNIEnv& _env,
         std::make_unique<AssetManagerFileSource>(_env, assetManager));
 
     // Set access token
-    fileSource->setAccessToken(jni::Make<std::string>(_env, accessToken));
+    if (accessToken) {
+        fileSource->setAccessToken(jni::Make<std::string>(_env, accessToken));
+    }
 }
 
 FileSource::~FileSource() {
