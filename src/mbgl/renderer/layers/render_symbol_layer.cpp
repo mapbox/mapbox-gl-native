@@ -234,7 +234,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
             auto pixelRatio = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
-            auto scale = std::pow(2.0f, float(parameters.state.getZoom() - tile.tile.id.overscaledZ));
+            const float scale = std::pow(2, parameters.state.getZoom() - tile.tile.id.overscaledZ);
             std::array<float,2> extrudeScale =
                 {{
                     parameters.pixelsToGLUnits[0] / (pixelRatio * scale),
@@ -267,7 +267,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
             auto pixelRatio = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
-            auto scale = std::pow(2.0f, float(parameters.state.getZoom() - tile.tile.id.overscaledZ));
+            const float scale = std::pow(2, parameters.state.getZoom() - tile.tile.id.overscaledZ);
             std::array<float,2> extrudeScale =
                 {{
                     parameters.pixelsToGLUnits[0] / (pixelRatio * scale),

@@ -442,7 +442,7 @@ void GLFWView::onScroll(GLFWwindow *window, double /*xOffset*/, double yOffset) 
         scale = 1.0 / scale;
     }
 
-    view->map->setZoom(view->map->getZoom() + std::log2(scale), mbgl::ScreenCoordinate { view->lastX, view->lastY });
+    view->map->setZoom(view->map->getZoom() + ::log2(scale), mbgl::ScreenCoordinate { view->lastX, view->lastY });
 }
 
 void GLFWView::onWindowResize(GLFWwindow *window, int width, int height) {

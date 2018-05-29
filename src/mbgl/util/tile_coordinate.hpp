@@ -20,7 +20,7 @@ public:
 
     static TileCoordinate fromLatLng(double zoom, const LatLng& latLng) {
         const double scale = std::pow(2.0, zoom);
-        return { Projection::project(latLng, scale) / double(util::tileSize), zoom };
+        return { Projection::project(latLng, scale) / util::tileSize, zoom };
     }
 
     static TileCoordinate fromScreenCoordinate(const TransformState& state, double zoom, const ScreenCoordinate& screenCoordinate) {
