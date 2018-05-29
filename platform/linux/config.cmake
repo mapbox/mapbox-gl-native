@@ -196,5 +196,7 @@ endmacro()
 
 
 macro(mbgl_platform_node)
-    # Enabling node module by defining this macro
+    target_link_libraries(mbgl-node INTERFACE
+        -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/node/version-script
+    )
 endmacro()
