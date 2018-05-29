@@ -1,9 +1,7 @@
 package com.mapbox.mapboxsdk.style.expressions;
 
 import android.graphics.Color;
-
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
-
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -139,6 +137,13 @@ public class ExpressionTest {
   }
 
   @Test
+  public void testEqExpression() throws Exception {
+    Object[] expected = new Object[] {"==",new Object[]{"get", "hello"}, 1f};
+    Object[] actual = eq(get("hello"), 1).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
   public void testNeq() throws Exception {
     Object[] expected = new Object[] {"!=", 0f, 1f};
     Object[] actual = neq(literal(0), literal(1)).toArray();
@@ -149,6 +154,13 @@ public class ExpressionTest {
   public void testNeqLiteral() throws Exception {
     Object[] expected = new Object[] {"!=", 0f, 1f};
     Object[] actual = neq(literal(0), 1).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testNeqExpression() throws Exception {
+    Object[] expected = new Object[] {"!=",new Object[]{"get", "hello"}, 1f};
+    Object[] actual = neq(get("hello"), 1).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -167,6 +179,13 @@ public class ExpressionTest {
   }
 
   @Test
+  public void testGtExpression() throws Exception {
+    Object[] expected = new Object[] {">", new Object[] {"get", "hello"}, 1f};
+    Object[] actual = gt(get("hello"), 1).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
   public void testLt() throws Exception {
     Object[] expected = new Object[] {"<", 1f, 0f};
     Object[] actual = lt(literal(1), literal(0)).toArray();
@@ -177,6 +196,13 @@ public class ExpressionTest {
   public void testLtLiteral() throws Exception {
     Object[] expected = new Object[] {"<", 1f, 0f};
     Object[] actual = lt(literal(1), 0).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testLtExpression() throws Exception {
+    Object[] expected = new Object[] {"<", new Object[] {"get", "hello"}, 1f};
+    Object[] actual = lt(get("hello"), 1).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -195,9 +221,23 @@ public class ExpressionTest {
   }
 
   @Test
+  public void testGteExpression() throws Exception {
+    Object[] expected = new Object[] {">=", new Object[] {"get", "hello"}, 1f};
+    Object[] actual = gte(get("hello"), 1).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
   public void testLte() throws Exception {
     Object[] expected = new Object[] {"<=", 1f, 1f};
     Object[] actual = lte(literal(1), literal(1)).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testLteExpression() throws Exception {
+    Object[] expected = new Object[] {"<=", new Object[] {"get", "hello"}, 1f};
+    Object[] actual = lte(get("hello"), 1).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
