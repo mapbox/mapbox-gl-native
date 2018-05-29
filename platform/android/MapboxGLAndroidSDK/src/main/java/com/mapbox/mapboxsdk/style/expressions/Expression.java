@@ -5,8 +5,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Size;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.PropertyValue;
@@ -210,7 +212,8 @@ public class Expression {
    * @return the color expression
    */
   public static Expression color(@ColorInt int color) {
-    return toColor(literal(PropertyFactory.colorToRgbaString(color)));
+    int[] rgba = PropertyFactory.colorToRgbaArray(color);
+    return rgba(rgba[0], rgba[1], rgba[2], rgba[3]);
   }
 
   /**
@@ -2426,6 +2429,7 @@ public class Expression {
    * );
    * }
    * </pre>
+   *
    * @param number number to get value from
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-abs">Style specification</a>
@@ -3452,6 +3456,10 @@ public class Expression {
 
   /**
    * Returns a string representation of the object that matches the definition set in the style specification.
+   * <p>
+   * If this expression contains a coma (,) delimited literal, like 'rgba(r, g, b, a)`,
+   * it will be enclosed with double quotes (").
+   * </p>
    *
    * @return a string representation of the object.
    */
@@ -3463,7 +3471,17 @@ public class Expression {
       for (Object argument : arguments) {
         builder.append(", ");
         if (argument instanceof ExpressionLiteral) {
-          builder.append(((ExpressionLiteral) argument).toValue());
+          Object literalValue = ((ExpressionLiteral) argument).toValue();
+
+          // special case for handling unusual input like 'rgba(r, g, b, a)'
+          if (literalValue instanceof String) {
+            if (((String) literalValue).contains(",")) {
+              builder.append("\"").append(literalValue).append("\"");
+              continue;
+            }
+          }
+
+          builder.append(literalValue);
         } else {
           builder.append(argument.toString());
         }
@@ -3471,6 +3489,26 @@ public class Expression {
     }
     builder.append("]");
     return builder.toString();
+  }
+
+  /**
+   * Returns a DSL equivalent of a raw expression.
+   * <p>
+   * If your raw expression contains a coma (,) delimited literal it has to be enclosed with double quotes ("),
+   * for example
+   * </p>
+   * <pre>
+   *   {@code
+   *   ["to-color", "rgba(255, 0, 0, 255)"]
+   *   }
+   * </pre>
+   *
+   * @param rawExpression the raw expression
+   * @return the resulting expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/">Style specification</a>
+   */
+  public static Expression raw(@NonNull String rawExpression) {
+    return Converter.convert(rawExpression);
   }
 
   /**
@@ -3527,6 +3565,11 @@ public class Expression {
      * @param object the object to be treated as literal
      */
     public ExpressionLiteral(@NonNull Object object) {
+      if (object instanceof String) {
+        object = unwrapStringLiteral((String) object);
+      } else if (object instanceof Number) {
+        object = ((Number) object).floatValue();
+      }
       this.literal = object;
     }
 
@@ -3537,6 +3580,12 @@ public class Expression {
      */
     Object toValue() {
       return literal;
+    }
+
+    @NonNull
+    @Override
+    public Object[] toArray() {
+      return new Object[] {"literal", literal};
     }
 
     /**
@@ -3582,6 +3631,15 @@ public class Expression {
       int result = super.hashCode();
       result = 31 * result + (literal != null ? literal.hashCode() : 0);
       return result;
+    }
+
+    private String unwrapStringLiteral(String value) {
+      if (value.length() > 1 &&
+        value.charAt(0) == '\"' && value.charAt(value.length() - 1) == '\"') {
+        return value.substring(1, value.length() - 1);
+      } else {
+        return value;
+      }
     }
   }
 
@@ -3652,9 +3710,11 @@ public class Expression {
   }
 
   /**
-   * Converts a JsonArray to an expression.
+   * Converts a JsonArray or a raw expression to a Java expression.
    */
   public final static class Converter {
+
+    private static final Gson gson = new Gson();
 
     /**
      * Converts a JsonArray to an expression
@@ -3677,6 +3737,8 @@ public class Expression {
           arguments.add(convert((JsonArray) jsonElement));
         } else if (jsonElement instanceof JsonPrimitive) {
           arguments.add(convert((JsonPrimitive) jsonElement));
+        } else if (jsonElement instanceof JsonNull) {
+          arguments.add(new Expression.ExpressionLiteral(""));
         } else {
           throw new RuntimeException("Unsupported expression conversion for " + jsonElement.getClass());
         }
@@ -3700,6 +3762,17 @@ public class Expression {
       } else {
         throw new RuntimeException("Unsupported literal expression conversion for " + jsonPrimitive.getClass());
       }
+    }
+
+    /**
+     * Converts a raw expression to a DSL equivalent.
+     *
+     * @param rawExpression the raw expression to convert
+     * @return the resulting expression
+     * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/">Style specification</a>
+     */
+    public static Expression convert(@NonNull String rawExpression) {
+      return convert(gson.fromJson(rawExpression, JsonArray.class));
     }
   }
 

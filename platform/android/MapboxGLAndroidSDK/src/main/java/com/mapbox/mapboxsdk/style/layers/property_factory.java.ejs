@@ -85,9 +85,24 @@ public class PropertyFactory {
   }
 
 <% } -%>
-  public static String colorToRgbaString(@ColorInt int value) {
-    return String.format(Locale.US,"rgba(%d, %d, %d, %d)",
-      (value >> 16) & 0xFF, (value >> 8) & 0xFF, value & 0xFF, (value >> 24) & 0xFF);
+  /**
+   * Converts Android color int to "rbga(r, g, b, a)" String equivalent.
+   *
+   * @param color Android color int
+   * @return String rgba color
+   */
+  public static String colorToRgbaString(@ColorInt int color) {
+    return String.format(Locale.US, "rgba(%d, %d, %d, %d)",
+      (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, (color >> 24) & 0xFF);
   }
 
+  /**
+   * Converts Android color int to rgba int array.
+   *
+   * @param color Android color int
+   * @return int rgba array
+   */
+  public static int[] colorToRgbaArray(@ColorInt int color) {
+    return new int[] {(color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, (color >> 24) & 0xFF};
+  }
 }

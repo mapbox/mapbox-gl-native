@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.NonNull;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
@@ -27,7 +26,7 @@ public abstract class Layer {
   /**
    * Validates if layer interaction is happening on the UI thread
    */
-  protected void checkThread(){
+  protected void checkThread() {
     ThreadUtils.checkThread("Layer");
   }
 
