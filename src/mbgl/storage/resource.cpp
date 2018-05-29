@@ -21,7 +21,7 @@ static std::string getQuadKey(int32_t x, int32_t y, int8_t z) {
 }
 
 static mapbox::geometry::point<double> getMercCoord(int32_t x, int32_t y, int8_t z) {
-    double resolution = (util::M2PI * util::EARTH_RADIUS_M / 256) / std::pow(2.0f, z);
+    double resolution = (util::M2PI * util::EARTH_RADIUS_M / 256) / std::pow(2, z);
     return {
         x * resolution - util::M2PI * util::EARTH_RADIUS_M / 2,
         y * resolution - util::M2PI * util::EARTH_RADIUS_M / 2,
@@ -30,7 +30,7 @@ static mapbox::geometry::point<double> getMercCoord(int32_t x, int32_t y, int8_t
 
 static std::string getTileBBox(int32_t x, int32_t y, int8_t z) {
     // Alter the y for the Google/OSM tile scheme.
-    y = std::pow(2.0f, z) - y - 1;
+    y = std::pow(2, z) - y - 1;
 
     auto min = getMercCoord(x * 256, y * 256, z);
     auto max = getMercCoord((x + 1) * 256, (y + 1) * 256, z);

@@ -11,7 +11,7 @@ namespace mbgl {
 
 namespace util {
 
-constexpr float tileSize = 512;
+constexpr double tileSize = 512;
 
 /*
  * The maximum extent of a feature that can be safely stored in the buffer.

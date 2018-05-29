@@ -1,5 +1,6 @@
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/math/log2.hpp>
 
 namespace mbgl {
 
@@ -50,7 +51,7 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
     // symbol spacing will put labels very close together in a pitched map.
     // To reduce the cost of adding extra collision circles, we slowly increase
     // them for overscaled tiles.
-    const float overscalingPaddingFactor = 1 + .4 * std::log(overscaling) / std::log(2);
+    const float overscalingPaddingFactor = 1 + .4 * ::log2(static_cast<double>(overscaling));
     const int nPitchPaddingBoxes = std::floor(nBoxes * overscalingPaddingFactor / 2);
 
     // offset the center of the first box by half a box so that the edge of the
