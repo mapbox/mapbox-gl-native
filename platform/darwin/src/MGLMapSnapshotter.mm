@@ -126,7 +126,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     _snapshotCallback = std::make_unique<mbgl::Actor<mbgl::MapSnapshotter::Callback>>(*mbgl::Scheduler::GetCurrent(), [=](std::exception_ptr mbglError, mbgl::PremultipliedImage image, mbgl::MapSnapshotter::Attributions attributions, mbgl::MapSnapshotter::PointForFn pointForFn) {
         __typeof__(self) strongSelf = weakSelf;
         // If self had died, _snapshotCallback would have been destroyed and this block would not be executed
-        assert(strongSelf);
+        NSCAssert(strongSelf, @"Snapshot callback executed after being destroyed.");
 
         strongSelf.loading = false;
 
