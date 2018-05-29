@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.4)
 project(mbgl LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD 14)
 
-option(WITH_CXX11ABI "Use cxx11abi mason packages" OFF)
+option(WITH_CXX11ABI "Use the C++11 ABI" OFF)
 option(WITH_COVERAGE "Enable coverage reports" OFF)
 option(WITH_OSMESA   "Use OSMesa headless backend" OFF)
 option(WITH_EGL      "Use EGL backend" OFF)
