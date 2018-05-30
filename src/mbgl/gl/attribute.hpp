@@ -227,6 +227,7 @@ public:
     using Bindings = IndexedTuple<
         TypeList<As...>,
         TypeList<optional<typename As::Type::Binding>...>>;
+
     using NamedLocations = std::vector<std::pair<const std::string, AttributeLocation>>;
 
     using Vertex = detail::Vertex<typename As::Type...>;

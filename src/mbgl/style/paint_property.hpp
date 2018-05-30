@@ -34,7 +34,22 @@ public:
     using Type = T;
     static constexpr bool IsDataDriven = true;
 
-    using Attribute = A;
+    using Attributes = gl::Attributes<A>;
+    using Uniform = U;
+};
+
+template <class T, class A1, class A2, class U>
+class CrossFadedDataDrivenPaintProperty {
+public:
+    using TransitionableType = Transitionable<DataDrivenPropertyValue<T>>;
+    using UnevaluatedType = Transitioning<DataDrivenPropertyValue<T>>;
+    // need CrossFadedDataDrivenPropertyEvaluator here or maybe can extend the existing CrossFadedPropertyEvaluator?
+    using EvaluatorType = DataDrivenPropertyEvaluator<T>;
+    using PossiblyEvaluatedType = PossiblyEvaluatedPropertyValue<Faded<T>>;
+    using Type = T;
+    static constexpr bool IsDataDriven = true;
+
+    using Attributes = gl::Attributes<A1, A2>;
     using Uniform = U;
 };
 
