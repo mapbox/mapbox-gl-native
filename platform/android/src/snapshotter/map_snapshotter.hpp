@@ -44,6 +44,8 @@ public:
 
     void setStyleUrl(JNIEnv&, jni::String styleURL);
 
+    void setStyleJson(JNIEnv&, jni::String styleJSON);
+
     void setSize(JNIEnv&, jni::jint width, jni::jint height);
 
     void setCameraPosition(JNIEnv&, jni::Object<CameraPosition> position);
