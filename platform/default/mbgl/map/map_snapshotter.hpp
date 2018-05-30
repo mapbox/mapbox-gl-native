@@ -39,6 +39,9 @@ public:
     void setStyleURL(const std::string& styleURL);
     std::string getStyleURL() const;
 
+    void setStyleJSON(const std::string& styleJSON);
+    std::string getStyleJSON() const;
+
     void setSize(const Size&);
     Size getSize() const;
 

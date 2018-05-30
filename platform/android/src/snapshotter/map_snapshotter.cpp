@@ -107,6 +107,10 @@ void MapSnapshotter::setStyleUrl(JNIEnv& env, jni::String styleURL) {
     snapshotter->setStyleURL(jni::Make<std::string>(env, styleURL));
 }
 
+void MapSnapshotter::setStyleJson(JNIEnv& env, jni::String styleJSON) {
+    snapshotter->setStyleJSON(jni::Make<std::string>(env, styleJSON));
+}
+
 void MapSnapshotter::setSize(JNIEnv&, jni::jint width, jni::jint height) {
     auto size = mbgl::Size { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
     snapshotter->setSize(size);
@@ -120,6 +124,7 @@ void MapSnapshotter::setCameraPosition(JNIEnv& env, jni::Object<CameraPosition> 
 void MapSnapshotter::setRegion(JNIEnv& env, jni::Object<LatLngBounds> region) {
     snapshotter->setRegion(LatLngBounds::getLatLngBounds(env, region));
 }
+
 
 // Private methods //
 
@@ -153,6 +158,7 @@ void MapSnapshotter::registerNative(jni::JNIEnv& env) {
                                            "nativeInitialize",
                                            "finalize",
                                             METHOD(&MapSnapshotter::setStyleUrl, "setStyleUrl"),
+                                            METHOD(&MapSnapshotter::setStyleJson, "setStyleJson"),
                                             METHOD(&MapSnapshotter::setSize, "setSize"),
                                             METHOD(&MapSnapshotter::setCameraPosition, "setCameraPosition"),
                                             METHOD(&MapSnapshotter::setRegion, "setRegion"),

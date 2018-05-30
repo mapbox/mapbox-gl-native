@@ -25,6 +25,9 @@ public:
     void setStyleURL(std::string styleURL);
     std::string getStyleURL() const;
 
+    void setStyleJSON(std::string styleJSON);
+    std::string getStyleJSON() const;
+
     void setSize(Size);
     Size getSize() const;
 
@@ -107,6 +110,14 @@ std::string MapSnapshotter::Impl::getStyleURL() const {
     return map.getStyle().getURL();
 }
 
+void MapSnapshotter::Impl::setStyleJSON(std::string styleJSON) {
+    map.getStyle().loadJSON(styleJSON);
+}
+
+std::string MapSnapshotter::Impl::getStyleJSON() const {
+   return map.getStyle().getJSON();
+}
+
 void MapSnapshotter::Impl::setSize(Size size) {
     map.setSize(size);
     frontend.setSize(size);
@@ -158,6 +169,14 @@ void MapSnapshotter::setStyleURL(const std::string& styleURL) {
 
 std::string MapSnapshotter::getStyleURL() const {
     return impl->actor().ask(&Impl::getStyleURL).get();
+}
+
+void MapSnapshotter::setStyleJSON(const std::string& styleJSON) {
+    impl->actor().invoke(&Impl::setStyleJSON, styleJSON);
+}
+
+std::string MapSnapshotter::getStyleJSON() const {
+    return impl->actor().ask(&Impl::getStyleJSON).get();
 }
 
 void MapSnapshotter::setSize(const Size& size) {
