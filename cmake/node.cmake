@@ -1,4 +1,5 @@
 # Load Node.js
+set(NODE_MODULE_CACHE_DIR "${CMAKE_SOURCE_DIR}/build/headers")
 include(node_modules/@mapbox/cmake-node-module/module.cmake)
 
 add_library(mbgl-loop-node INTERFACE)
