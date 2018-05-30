@@ -73,6 +73,7 @@
 #import "MGLAnnotationContainerView_Private.h"
 #import "MGLAttributionInfo_Private.h"
 #import "MGLMapAccessibilityElement.h"
+#import "MGLLocationManager_Private.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -184,7 +185,7 @@ public:
 
 @interface MGLMapView () <UIGestureRecognizerDelegate,
                           GLKViewDelegate,
-                          CLLocationManagerDelegate,
+                          MGLLocationManagerDelegate,
                           MGLSMCalloutViewDelegate,
                           MGLCalloutViewDelegate,
                           MGLMultiPointDelegate,
@@ -225,7 +226,6 @@ public:
 
 /// Indicates how thoroughly the map view is tracking the user location.
 @property (nonatomic) MGLUserTrackingState userTrackingState;
-@property (nonatomic) CLLocationManager *locationManager;
 @property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
 @property (nonatomic) CGFloat quickZoomStart;
@@ -4687,13 +4687,20 @@ public:
 
 #pragma mark - User Location -
 
+- (void)setLocationManager:(id<MGLLocationManager>)locationManager
+{
+    _locationManager = locationManager;
+    _locationManager.delegate = self;
+    [self validateLocationServices];
+}
+
 - (void)validateLocationServices
 {
     BOOL shouldEnableLocationServices = self.showsUserLocation && !self.dormant;
 
     if (shouldEnableLocationServices && ! self.locationManager)
     {
-        self.locationManager = [[CLLocationManager alloc] init];
+        self.locationManager = [[MGLCLLocationManager alloc] init];
 
         if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined)
         {
@@ -4966,12 +4973,12 @@ public:
     }
 }
 
-- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+- (void)locationManager:(MGLCLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
     [self locationManager:manager didUpdateLocations:locations animated:YES];
 }
 
-- (void)locationManager:(__unused CLLocationManager *)manager didUpdateLocations:(NSArray *)locations animated:(BOOL)animated
+- (void)locationManager:(__unused MGLCLLocationManager *)manager didUpdateLocations:(NSArray *)locations animated:(BOOL)animated
 {
     CLLocation *oldLocation = self.userLocation.location;
     CLLocation *newLocation = locations.lastObject;

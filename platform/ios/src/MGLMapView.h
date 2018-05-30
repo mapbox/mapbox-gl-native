@@ -2,7 +2,6 @@
 #import "MGLMapCamera.h"
 
 #import <UIKit/UIKit.h>
-#import <CoreLocation/CoreLocation.h>
 
 #import "MGLFoundation.h"
 #import "MGLTypes.h"
@@ -22,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLOverlay;
 @protocol MGLCalloutView;
 @protocol MGLFeature;
+@protocol MGLLocationManager;
 
 /** The default deceleration rate for a map view. */
 extern MGL_EXPORT const CGFloat MGLMapViewDecelerationRateNormal;
@@ -295,6 +295,8 @@ MGL_EXPORT IB_DESIGNABLE
 - (void)removeStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 
 #pragma mark Displaying the User’s Location
+
+@property (nonatomic, nullable) id<MGLLocationManager> locationManager;
 
 /**
  A Boolean value indicating whether the map may display the user location.

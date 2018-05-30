@@ -64,6 +64,13 @@
     [self.locationManager stopUpdatingLocation];
 }
 
+- (void)dealloc
+{
+    [self.locationManager stopUpdatingLocation];
+    [self.locationManager stopUpdatingHeading];
+    self.delegate = nil;
+}
+
 #pragma mark - CLLocationManagerDelegate
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations
