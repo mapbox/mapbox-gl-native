@@ -4,7 +4,6 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Size;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -180,6 +179,8 @@ public class Expression {
   public static Expression literal(@NonNull Object object) {
     if (object.getClass().isArray()) {
       return literal(ExpressionArray.toObjectArray(object));
+    } else if (object instanceof Expression) {
+      throw new RuntimeException("Can't convert an expression to a literal");
     }
     return new ExpressionLiteral(object);
   }
@@ -426,7 +427,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-==">Style specification</a>
    */
   public static Expression eq(@NonNull Expression compareOne, @NonNull String compareTwo) {
-    return eq(literal(compareOne), literal(compareTwo));
+    return eq(compareOne, literal(compareTwo));
   }
 
   /**
@@ -449,7 +450,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-==">Style specification</a>
    */
   public static Expression eq(@NonNull Expression compareOne, @NonNull Number compareTwo) {
-    return eq(literal(compareOne), literal(compareTwo));
+    return eq(compareOne, literal(compareTwo));
   }
 
   /**
@@ -496,7 +497,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-!=">Style specification</a>
    */
   public static Expression neq(Expression compareOne, boolean compareTwo) {
-    return new Expression("!=", literal(compareOne), literal(compareTwo));
+    return new Expression("!=", compareOne, literal(compareTwo));
   }
 
   /**
@@ -519,7 +520,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-!=">Style specification</a>
    */
   public static Expression neq(@NonNull Expression compareOne, @NonNull String compareTwo) {
-    return new Expression("!=", literal(compareOne), literal(compareTwo));
+    return new Expression("!=", compareOne, literal(compareTwo));
   }
 
   /**
@@ -542,7 +543,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-!=">Style specification</a>
    */
   public static Expression neq(@NonNull Expression compareOne, @NonNull Number compareTwo) {
-    return new Expression("!=", literal(compareOne), literal(compareTwo));
+    return new Expression("!=", compareOne, literal(compareTwo));
   }
 
   /**
@@ -589,7 +590,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3E">Style specification</a>
    */
   public static Expression gt(@NonNull Expression compareOne, @NonNull Number compareTwo) {
-    return new Expression(">", literal(compareOne), literal(compareTwo));
+    return new Expression(">", compareOne, literal(compareTwo));
   }
 
   /**
@@ -612,7 +613,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3E">Style specification</a>
    */
   public static Expression gt(@NonNull Expression compareOne, @NonNull String compareTwo) {
-    return new Expression(">", literal(compareOne), literal(compareTwo));
+    return new Expression(">", compareOne, literal(compareTwo));
   }
 
   /**
@@ -659,7 +660,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3C">Style specification</a>
    */
   public static Expression lt(@NonNull Expression compareOne, @NonNull Number compareTwo) {
-    return new Expression("<", literal(compareOne), literal(compareTwo));
+    return new Expression("<", compareOne, literal(compareTwo));
   }
 
   /**
@@ -682,7 +683,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3C">Style specification</a>
    */
   public static Expression lt(@NonNull Expression compareOne, @NonNull String compareTwo) {
-    return new Expression("<", literal(compareOne), literal(compareTwo));
+    return new Expression("<", compareOne, literal(compareTwo));
   }
 
   /**
@@ -729,7 +730,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3E%3D">Style specification</a>
    */
   public static Expression gte(@NonNull Expression compareOne, @NonNull Number compareTwo) {
-    return new Expression(">=", literal(compareOne), literal(compareTwo));
+    return new Expression(">=", compareOne, literal(compareTwo));
   }
 
   /**
@@ -752,7 +753,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3E%3D">Style specification</a>
    */
   public static Expression gte(@NonNull Expression compareOne, @NonNull String compareTwo) {
-    return new Expression(">=", literal(compareOne), literal(compareTwo));
+    return new Expression(">=", compareOne, literal(compareTwo));
   }
 
   /**
@@ -799,7 +800,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3C%3D">Style specification</a>
    */
   public static Expression lte(@NonNull Expression compareOne, @NonNull Number compareTwo) {
-    return new Expression("<=", literal(compareOne), literal(compareTwo));
+    return new Expression("<=", compareOne, literal(compareTwo));
   }
 
   /**
@@ -822,7 +823,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3C%3D">Style specification</a>
    */
   public static Expression lte(@NonNull Expression compareOne, @NonNull String compareTwo) {
-    return new Expression("<=", literal(compareOne), literal(compareTwo));
+    return new Expression("<=", compareOne, literal(compareTwo));
   }
 
   /**
