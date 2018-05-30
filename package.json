@@ -29,6 +29,7 @@
     "pixelmatch": "^4.0.2",
     "pngjs": "^3.0.0",
     "request": "^2.72.0",
+    "semver": "^5.5.0",
     "tape": "^4.5.1"
   },
   "engines": {
