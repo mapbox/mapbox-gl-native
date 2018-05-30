@@ -18,7 +18,7 @@ public:
          const std::pair<bool, std::string> style,
          const Size&,
          const float pixelRatio,
-         const CameraOptions&,
+         const optional<CameraOptions> cameraOptions,
          const optional<LatLngBounds> region,
          const optional<std::string> programCacheDir);
 
@@ -49,7 +49,7 @@ MapSnapshotter::Impl::Impl(FileSource& fileSource,
            const std::pair<bool, std::string> style,
            const Size& size,
            const float pixelRatio,
-           const CameraOptions& cameraOptions,
+           const optional<CameraOptions> cameraOptions,
            const optional<LatLngBounds> region,
            const optional<std::string> programCacheDir)
     : frontend(size, pixelRatio, fileSource, scheduler, programCacheDir)
@@ -60,7 +60,10 @@ MapSnapshotter::Impl::Impl(FileSource& fileSource,
     } else{
         map.getStyle().loadURL(style.second);
     }
-    map.jumpTo(cameraOptions);
+
+    if (cameraOptions) {
+        map.jumpTo(*cameraOptions);
+    }
 
     // Set region, if specified
     if (region) {
@@ -151,7 +154,7 @@ MapSnapshotter::MapSnapshotter(FileSource& fileSource,
                                const std::pair<bool, std::string> style,
                                const Size& size,
                                const float pixelRatio,
-                               const CameraOptions& cameraOptions,
+                               const optional<CameraOptions> cameraOptions,
                                const optional<LatLngBounds> region,
                                const optional<std::string> programCacheDir)
    : impl(std::make_unique<util::Thread<MapSnapshotter::Impl>>("Map Snapshotter", fileSource, scheduler, style, size, pixelRatio, cameraOptions, region, programCacheDir)) {
