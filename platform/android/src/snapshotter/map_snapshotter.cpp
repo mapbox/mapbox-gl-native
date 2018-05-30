@@ -38,7 +38,12 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
     jFileSource = FileSource::getNativePeer(_env, _jFileSource);
     auto& fileSource = mbgl::android::FileSource::getDefaultFileSource(_env, _jFileSource);
     auto size = mbgl::Size { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
-    auto cameraOptions = position ? CameraPosition::getCameraOptions(_env, position) : CameraOptions();
+
+    optional<mbgl::CameraOptions> cameraOptions;
+    if (position) {
+        cameraOptions = CameraPosition::getCameraOptions(_env, position);
+    }
+
     optional<mbgl::LatLngBounds> bounds;
     if (region) {
         bounds = LatLngBounds::getLatLngBounds(_env, region);

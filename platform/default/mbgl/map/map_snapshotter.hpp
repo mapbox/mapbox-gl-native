@@ -30,7 +30,7 @@ public:
                    const std::pair<bool, std::string> style,
                    const Size&,
                    const float pixelRatio,
-                   const CameraOptions&,
+                   const optional<CameraOptions> cameraOptions,
                    const optional<LatLngBounds> region,
                    const optional<std::string> cacheDir = {});
 
