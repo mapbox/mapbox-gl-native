@@ -50,4 +50,7 @@ public:
     }
 };
 
+template <class, class T>
+using ExpandToType = T;
+
 } // namespace mbgl

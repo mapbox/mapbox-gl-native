@@ -57,18 +57,15 @@ public:
     static constexpr size_t Dimensions = N;
     using Value = std::array<T, N>;
 
-    using Location = AttributeLocation;
-    using Binding = AttributeBinding;
-
     /*
         Create a binding for this attribute.  The `attributeSize` parameter may be used to
         override the number of components available in the buffer for each vertex.  Thus,
         a buffer with only one float for each vertex can be bound to a `vec2` attribute
     */
     template <class Vertex, class DrawMode>
-    static Binding binding(const VertexBuffer<Vertex, DrawMode>& buffer,
-                           std::size_t attributeIndex,
-                           std::size_t attributeSize = N) {
+    static AttributeBinding binding(const VertexBuffer<Vertex, DrawMode>& buffer,
+                                    std::size_t attributeIndex,
+                                    std::size_t attributeSize = N) {
         static_assert(std::is_standard_layout<Vertex>::value, "vertex type must use standard layout");
         assert(attributeSize >= 1);
         assert(attributeSize <= 4);
@@ -84,7 +81,7 @@ public:
         };
     }
 
-    static optional<Binding> offsetBinding(const optional<Binding>& binding, std::size_t vertexOffset) {
+    static optional<AttributeBinding> offsetBinding(const optional<AttributeBinding>& binding, std::size_t vertexOffset) {
         assert(vertexOffset <= std::numeric_limits<uint32_t>::max());
         if (binding) {
             AttributeBinding result = *binding;
@@ -222,10 +219,10 @@ public:
     using Types = TypeList<As...>;
     using Locations = IndexedTuple<
         TypeList<As...>,
-        TypeList<optional<typename As::Type::Location>...>>;
+        TypeList<ExpandToType<As, optional<AttributeLocation>>...>>;
     using Bindings = IndexedTuple<
         TypeList<As...>,
-        TypeList<optional<typename As::Type::Binding>...>>;
+        TypeList<ExpandToType<As, optional<AttributeBinding>>...>>;
     using NamedLocations = std::vector<std::pair<const std::string, AttributeLocation>>;
 
     using Vertex = detail::Vertex<typename As::Type...>;
