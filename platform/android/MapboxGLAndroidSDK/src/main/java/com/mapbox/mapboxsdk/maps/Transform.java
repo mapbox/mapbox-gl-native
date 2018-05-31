@@ -218,10 +218,6 @@ final class Transform implements MapView.OnMapChangedListener {
 
   // Zoom in or out
 
-  double getZoom() {
-    return cameraPosition.zoom;
-  }
-
   double getRawZoom() {
     return mapView.getZoom();
   }
