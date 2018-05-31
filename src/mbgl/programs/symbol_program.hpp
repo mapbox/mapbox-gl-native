@@ -185,7 +185,7 @@ public:
 
 class SourceFunctionSymbolSizeBinder final : public SymbolSizeBinder {
 public:
-    using Vertex = gl::detail::Vertex<gl::Attribute<uint16_t, 1>>;
+    using Vertex = gl::detail::Vertex<gl::AttributeType<uint16_t, 1>>;
     using VertexVector = gl::VertexVector<Vertex>;
     using VertexBuffer = gl::VertexBuffer<Vertex>;
 

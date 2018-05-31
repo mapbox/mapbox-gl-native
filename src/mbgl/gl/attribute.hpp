@@ -46,12 +46,12 @@ public:
 using AttributeBindingArray = std::vector<optional<AttributeBinding>>;
 
 /*
-    gl::Attribute<T,N> manages the binding of a vertex buffer to a GL program attribute.
+    gl::AttributeType<T,N> manages the binding of a vertex buffer to a GL program attribute.
       - T is the underlying primitive type (exposed as Attribute<T,N>::ValueType)
       - N is the number of components in the attribute declared in the shader (exposed as Attribute<T,N>::Dimensions)
 */
 template <class T, std::size_t N>
-class Attribute {
+class AttributeType {
 public:
     using ValueType = T;
     static constexpr size_t Dimensions = N;
@@ -96,7 +96,7 @@ public:
 #define MBGL_DEFINE_ATTRIBUTE(type_, n_, name_)        \
     struct name_ {                                     \
         static auto name() { return #name_; }          \
-        using Type = ::mbgl::gl::Attribute<type_, n_>; \
+        using Type = ::mbgl::gl::AttributeType<type_, n_>; \
     }
 
 namespace detail {
