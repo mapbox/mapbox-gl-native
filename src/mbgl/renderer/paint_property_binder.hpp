@@ -72,7 +72,7 @@ std::array<float, N*2> zoomInterpolatedAttributeValue(const std::array<float, N>
    Note that the shader source varies depending on whether we're using a uniform or
    attribute. Like GL JS, we dynamically compile shaders at runtime to accomodate this.
 */
-template <class T, class A>
+template <class T, class... As>
 class PaintPropertyBinder {
 public:
 
@@ -233,18 +233,18 @@ private:
     optional<gl::VertexBuffer<Vertex>> vertexBuffer;
 };
 
-template <class T, class A>
-std::unique_ptr<PaintPropertyBinder<T, A>>
-PaintPropertyBinder<T, A>::create(const PossiblyEvaluatedPropertyValue<T>& value, float zoom, T defaultValue) {
+template <class T, class... As>
+std::unique_ptr<PaintPropertyBinder<T, As...>>
+PaintPropertyBinder<T, As...>::create(const PossiblyEvaluatedPropertyValue<T>& value, float zoom, T defaultValue) {
     return value.match(
-        [&] (const T& constant) -> std::unique_ptr<PaintPropertyBinder<T, A>> {
-            return std::make_unique<ConstantPaintPropertyBinder<T, A>>(constant);
+        [&] (const T& constant) -> std::unique_ptr<PaintPropertyBinder<T, As...>> {
+            return std::make_unique<ConstantPaintPropertyBinder<T, As...>>(constant);
         },
         [&] (const style::SourceFunction<T>& function) {
-            return std::make_unique<SourceFunctionPaintPropertyBinder<T, A>>(function, defaultValue);
+            return std::make_unique<SourceFunctionPaintPropertyBinder<T, As...>>(function, defaultValue);
         },
         [&] (const style::CompositeFunction<T>& function) {
-            return std::make_unique<CompositeFunctionPaintPropertyBinder<T, A>>(function, zoom, defaultValue);
+            return std::make_unique<CompositeFunctionPaintPropertyBinder<T, As...>>(function, zoom, defaultValue);
         }
     );
 }
