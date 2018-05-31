@@ -30,12 +30,39 @@ public class Telemetry {
     obtainTelemetry();
   }
 
+  /**
+   * Set the debug logging state of telemetry.
+   *
+   * @param debugLoggingEnabled true to enable logging
+   */
   public static void updateDebugLoggingEnabled(boolean debugLoggingEnabled) {
     TelemetryHolder.INSTANCE.telemetry.updateDebugLoggingEnabled(debugLoggingEnabled);
   }
 
+  /**
+   * Update the telemetry rotation session id interval
+   *
+   * @param interval the selected session interval
+   * @return true if rotation session id was updated
+   */
   public static boolean updateSessionIdRotationInterval(SessionInterval interval) {
     return TelemetryHolder.INSTANCE.telemetry.updateSessionIdRotationInterval(interval);
+  }
+
+  /**
+   * Method to be called when an end-user has selected to participate in telemetry collection.
+   */
+  public static void enableOnUserRequest() {
+    TelemetryEnabler.updateTelemetryState(TelemetryEnabler.State.ENABLED);
+    TelemetryHolder.INSTANCE.telemetry.enable();
+  }
+
+  /**
+   * Method to be called when an end-user has selected to opt-out of telemetry collection.
+   */
+  public static void disableOnUserRequest() {
+    Telemetry.obtainTelemetry().disable();
+    TelemetryEnabler.updateTelemetryState(TelemetryEnabler.State.DISABLED);
   }
 
   private static class TelemetryHolder {

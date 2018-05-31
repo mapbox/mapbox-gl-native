@@ -278,6 +278,12 @@ public class MapSnapshotter {
    */
   public native void setStyleUrl(String styleUrl);
 
+  /**
+   * Updates the snapshotter with a new style json
+   *
+   * @param styleJson the style json
+   */
+  public native void setStyleJson(String styleJson);
 
   /**
    * Must be called in on the thread

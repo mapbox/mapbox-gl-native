@@ -30,7 +30,7 @@ public:
                    const std::pair<bool, std::string> style,
                    const Size&,
                    const float pixelRatio,
-                   const CameraOptions&,
+                   const optional<CameraOptions> cameraOptions,
                    const optional<LatLngBounds> region,
                    const optional<std::string> cacheDir = {});
 
@@ -38,6 +38,9 @@ public:
 
     void setStyleURL(const std::string& styleURL);
     std::string getStyleURL() const;
+
+    void setStyleJSON(const std::string& styleJSON);
+    std::string getStyleJSON() const;
 
     void setSize(const Size&);
     Size getSize() const;

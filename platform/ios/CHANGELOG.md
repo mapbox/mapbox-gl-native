@@ -21,6 +21,11 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added custom `-hitTest:withEvent:` to `MGLSMCalloutView` to avoid registering taps in transparent areas of the standard annotation callout. ([#11939](https://github.com/mapbox/mapbox-gl-native/pull/11939))
 * Improved performance and memory impact of `MGLScaleBar`. ([#11921](https://github.com/mapbox/mapbox-gl-native/pull/11921))
 
+## 4.0.2 - May 29, 2018
+
+* Fixed a crash when constant expressions were used for style properties that didn't support data-driven styling. ([#11960](https://github.com/mapbox/mapbox-gl-native/issues/11960))
+* Improved symbol querying. ([#11571](https://github.com/mapbox/mapbox-gl-native/pull/11571), [#11742](https://github.com/mapbox/mapbox-gl-native/pull/11742))
+
 ## 4.0.1 - May 14, 2018
 
 ### Packaging
