@@ -2,6 +2,16 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.2.0-beta.1 - May 31, 2018
+ - Bump mapbox-java to 3.2.0 [#12036](https://github.com/mapbox/mapbox-gl-native/pull/12036)
+ - Optional camera position for map snapshotter [#12028](https://github.com/mapbox/mapbox-gl-native/pull/12029)
+ - Expose enableOnUserRequest and disableOnUserRequest on Telemetry [#12024](https://github.com/mapbox/mapbox-gl-native/pull/12024)
+ - Add style json setter/getter to map snapshotter [#12031](https://github.com/mapbox/mapbox-gl-native/pull/12031)
+ - Fix literal wrapping in comparison expressions [#12022](https://github.com/mapbox/mapbox-gl-native/pull/12022)
+ - Null check access token in filesource initializer [#12023](https://github.com/mapbox/mapbox-gl-native/pull/12023)
+ - Allow literal expression property arguments [#12018](https://github.com/mapbox/mapbox-gl-native/pull/12018)
+ - Raw expression support [#12007](https://github.com/mapbox/mapbox-gl-native/pull/12007) 
+
 ## 6.2.0-alpha.2 - May 25, 2018 
  - UI Thread checking [#12000](https://github.com/mapbox/mapbox-gl-native/pull/12000)
  - Don't force having an Mapbox access token [#12001](https://github.com/mapbox/mapbox-gl-native/pull/12001)
