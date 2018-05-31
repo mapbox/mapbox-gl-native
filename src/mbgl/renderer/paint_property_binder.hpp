@@ -19,7 +19,7 @@ namespace mbgl {
    being zoomed.
 */
 template <class A>
-using ZoomInterpolatedAttributeType = gl::Attribute<typename A::ValueType, A::Dimensions * 2>;
+using ZoomInterpolatedAttributeType = gl::AttributeType<typename A::ValueType, A::Dimensions * 2>;
 
 inline std::array<float, 1> attributeValue(float v) {
     return {{ v }};
@@ -122,7 +122,7 @@ public:
     using BaseAttributeValue = typename BaseAttribute::Value;
     using BaseVertex = gl::detail::Vertex<BaseAttribute>;
 
-    using Attribute = ZoomInterpolatedAttributeType<A>;
+    using AttributeType = ZoomInterpolatedAttributeType<A>;
 
     SourceFunctionPaintPropertyBinder(style::PropertyExpression<T> expression_, T defaultValue_)
         : expression(std::move(expression_)),
@@ -146,7 +146,7 @@ public:
         if (currentValue.isConstant()) {
             return {};
         } else {
-            return Attribute::binding(*vertexBuffer, 0, BaseAttribute::Dimensions);
+            return AttributeType::binding(*vertexBuffer, 0, BaseAttribute::Dimensions);
         }
     }
 
@@ -174,9 +174,9 @@ template <class T, class A>
 class CompositeFunctionPaintPropertyBinder : public PaintPropertyBinder<T, A> {
 public:
 
-    using Attribute = ZoomInterpolatedAttributeType<A>;
-    using AttributeValue = typename Attribute::Value;
-    using Vertex = gl::detail::Vertex<Attribute>;
+    using AttributeType = ZoomInterpolatedAttributeType<A>;
+    using AttributeValue = typename AttributeType::Value;
+    using Vertex = gl::detail::Vertex<AttributeType>;
 
     CompositeFunctionPaintPropertyBinder(style::PropertyExpression<T> expression_, float zoom, T defaultValue_)
         : expression(std::move(expression_)),
@@ -204,7 +204,7 @@ public:
         if (currentValue.isConstant()) {
             return {};
         } else {
-            return Attribute::binding(*vertexBuffer, 0);
+            return AttributeType::binding(*vertexBuffer, 0);
         }
     }
 
