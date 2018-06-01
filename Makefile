@@ -588,6 +588,22 @@ run-android-ui-test-$1-%: platform/android/gradle/configuration.gradle
 android-ndk-stack-$1: platform/android/gradle/configuration.gradle
 	adb logcat | ndk-stack -sym platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/$2/
 
+# Run render tests with pixelmatch
+.PHONY: run-android-render-test-$1
+run-android-render-test-$1: $(BUILD_DEPS) platform/android/gradle/configuration.gradle
+	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
+	# delete old test results
+	rm -rf platform/android/build/render-test/mapbox/
+  # copy test definitions to test app assets folder, clear old ones first
+	rm -rf platform/android/MapboxGLAndroidSDKTestApp/src/main/assets/integration
+	cp -r mapbox-gl-js/test/integration/ platform/android/MapboxGLAndroidSDKTestApp/src/main/assets
+	# run RenderTest.java to generate static map images
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class="com.mapbox.mapboxsdk.testapp.render.RenderTest"
+	# pull generated images from the device
+	adb pull "`adb shell 'printenv EXTERNAL_STORAGE' | tr -d '\r'`/mapbox" platform/android/build/render-test
+	# copy expected result and run pixelmatch
+	python platform/android/scripts/run-render-test.py
+
 endef
 
 # Explodes the arguments into individual variables
@@ -679,6 +695,11 @@ android-javadoc: platform/android/gradle/configuration.gradle
 # Symbolicate ndk stack traces for the arm-v7 abi
 .PHONY: android-ndk-stack
 android-ndk-stack: android-ndk-stack-arm-v7
+
+# Update render tests
+,PHONY: update-android-render-test
+update-android-render-test:
+	python platform/android/scripts/update-render-expected.py
 
 # Open Android Studio if machine is macos
 ifeq ($(HOST_PLATFORM), macos)
