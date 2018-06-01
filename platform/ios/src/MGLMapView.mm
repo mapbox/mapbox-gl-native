@@ -1585,10 +1585,7 @@ public:
 
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
 {
-    if (singleTap.state != UIGestureRecognizerStateRecognized)
-    {
-        return;
-    }
+    if (singleTap.state != UIGestureRecognizerStateRecognized) return;
 
     [self trackGestureEvent:MMEEventGestureSingleTap forRecognizer:singleTap];
 
@@ -1694,45 +1691,46 @@ public:
 
 - (void)handleDoubleTapGesture:(UITapGestureRecognizer *)doubleTap
 {
+    if (doubleTap.state != UIGestureRecognizerStateRecognized) return;
+
     if ( ! self.isZoomEnabled) return;
 
     [self cancelTransitions];
 
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureZoomIn;
 
-    if (doubleTap.state == UIGestureRecognizerStateRecognized)
+    MGLMapCamera *oldCamera = self.camera;
+
+    double newZoom = round(self.zoomLevel) + 1.0;
+
+    CGPoint gesturePoint = [self anchorPointForGesture:doubleTap];
+
+    MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:newZoom aroundAnchorPoint:gesturePoint];
+
+    if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
     {
-        MGLMapCamera *oldCamera = self.camera;
+        [self trackGestureEvent:MMEEventGestureDoubleTap forRecognizer:doubleTap];
 
-        double newZoom = round(self.zoomLevel) + 1.0;
+        mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
+        _mbglMap->setZoom(newZoom, center, MGLDurationFromTimeInterval(MGLAnimationDuration));
 
-        CGPoint gesturePoint = [self anchorPointForGesture:doubleTap];
+        __weak MGLMapView *weakSelf = self;
 
-        MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:newZoom aroundAnchorPoint:gesturePoint];
-
-        if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
-        {
-            [self trackGestureEvent:MMEEventGestureDoubleTap forRecognizer:doubleTap];
-            
-            mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
-            _mbglMap->setZoom(newZoom, center, MGLDurationFromTimeInterval(MGLAnimationDuration));
-            
-            __weak MGLMapView *weakSelf = self;
-            
-            [self animateWithDelay:MGLAnimationDuration animations:^
-             {
-                 [weakSelf unrotateIfNeededForGesture];
-             }];
-        }
-        else
-        {
-            [self unrotateIfNeededForGesture];
-        }
+        [self animateWithDelay:MGLAnimationDuration animations:^
+         {
+             [weakSelf unrotateIfNeededForGesture];
+         }];
+    }
+    else
+    {
+        [self unrotateIfNeededForGesture];
     }
 }
 
 - (void)handleTwoFingerTapGesture:(UITapGestureRecognizer *)twoFingerTap
 {
+    if (twoFingerTap.state != UIGestureRecognizerStateRecognized) return;
+
     if ( ! self.isZoomEnabled) return;
 
     if (_mbglMap->getZoom() == _mbglMap->getMinZoom()) return;
@@ -1741,30 +1739,27 @@ public:
 
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureZoomOut;
 
-    if (twoFingerTap.state == UIGestureRecognizerStateRecognized)
+    MGLMapCamera *oldCamera = self.camera;
+
+    double newZoom = round(self.zoomLevel) - 1.0;
+
+    CGPoint gesturePoint = [self anchorPointForGesture:twoFingerTap];
+
+    MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:newZoom aroundAnchorPoint:gesturePoint];
+
+    if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
     {
-        MGLMapCamera *oldCamera = self.camera;
+        [self trackGestureEvent:MMEEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
 
-        double newZoom = round(self.zoomLevel) - 1.0;
+        mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
+        _mbglMap->setZoom(newZoom, center, MGLDurationFromTimeInterval(MGLAnimationDuration));
 
-        CGPoint gesturePoint = [self anchorPointForGesture:twoFingerTap];
+        __weak MGLMapView *weakSelf = self;
 
-        MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:newZoom aroundAnchorPoint:gesturePoint];
-
-        if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
-        {
-            [self trackGestureEvent:MMEEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
-
-            mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
-            _mbglMap->setZoom(newZoom, center, MGLDurationFromTimeInterval(MGLAnimationDuration));
-            
-            __weak MGLMapView *weakSelf = self;
-            
-            [self animateWithDelay:MGLAnimationDuration animations:^
-             {
-                 [weakSelf unrotateIfNeededForGesture];
-             }];
-        }
+        [self animateWithDelay:MGLAnimationDuration animations:^
+         {
+             [weakSelf unrotateIfNeededForGesture];
+         }];
     }
 }
 
