@@ -294,22 +294,8 @@ public:
     }
 };
 
-namespace detail {
-
-template <class...>
-struct ConcatenateAttributes;
-
-template <class... As, class... Bs>
-struct ConcatenateAttributes<TypeList<As...>, TypeList<Bs...>> {
-    using Type = Attributes<As..., Bs...>;
-};
-
-} // namespace detail
-
-template <class A, class B>
-using ConcatenateAttributes = typename detail::ConcatenateAttributes<
-    typename A::Types,
-    typename B::Types>::Type;
+template <class... As>
+using ConcatenateAttributes = typename TypeListConcat<typename As::Types...>::template ExpandInto<Attributes>;
 
 } // namespace gl
 } // namespace mbgl

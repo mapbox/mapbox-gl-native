@@ -12,8 +12,8 @@ struct LineFloorwidth : style::DataDrivenPaintProperty<float, attributes::a_floo
 };
 
 class RenderLinePaintProperties : public style::ConcatenateProperties<
-    style::LinePaintProperties::PropertyTypes,
-    TypeList<LineFloorwidth>>::Type {};
+    style::LinePaintProperties,
+    style::Properties<LineFloorwidth>> {};
 
 class RenderLineLayer: public RenderLayer {
 public:
