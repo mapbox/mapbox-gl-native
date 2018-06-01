@@ -104,11 +104,12 @@ NSString* validAccessToken() {
     [self waitForExpectations:@[expectation] timeout:2.0];
 }
 
-- (void)testSnapshotterFromBackgroundQueue {
+- (void)testMultipleSnapshottersFromBackgroundQueue {
     if (!validAccessToken()) {
         return;
     }
 
+    // Crashes with only 1 snapshot
     CGSize size = self.mapView.bounds.size;
     CLLocationCoordinate2D coord = CLLocationCoordinate2DMake(30.0, 30.0);
 
@@ -144,9 +145,10 @@ NSString* validAccessToken() {
             MGLTestAssertNotNil(strongself, snapshot.image);
             MGLTestAssertNil(strongself, error, @"Snapshot should not error with: %@", error);
 
-            // Change this to XCTAttachmentLifetimeKeepAlways to be able to look at the snapshots after running
+            // Change this back to XCTAttachmentLifetimeDeleteOnSuccess when we're sure this
+            // test is passing.
             XCTAttachment *attachment = [XCTAttachment attachmentWithImage:snapshot.image];
-            attachment.lifetime = XCTAttachmentLifetimeDeleteOnSuccess;
+            attachment.lifetime = XCTAttachmentLifetimeKeepAlways;
             [strongself addAttachment:attachment];
 
             dispatch_group_leave(group);
@@ -172,11 +174,10 @@ NSString* validAccessToken() {
         });
     });
 
-    [self waitForExpectations:@[expectation] timeout:60.0];
+    [self waitForExpectations:@[expectation] timeout:10.0];
 }
 
-- (void)testMultipleSnapshottersPENDING {
-    MGL_CHECK_IF_PENDING_TEST_SHOULD_RUN();
+- (void)testMultipleSnapshotters {
     if (!validAccessToken()) {
         return;
     }
@@ -216,9 +217,10 @@ NSString* validAccessToken() {
             MGLTestAssertNotNil(strongself, snapshot.image);
             MGLTestAssertNil(strongself, error, @"Snapshot should not error with: %@", error);
 
-            // Change this to XCTAttachmentLifetimeKeepAlways to be able to look at the snapshots after running
+            // Change this back to XCTAttachmentLifetimeDeleteOnSuccess when we're sure this
+            // test is passing.
             XCTAttachment *attachment = [XCTAttachment attachmentWithImage:snapshot.image];
-            attachment.lifetime = XCTAttachmentLifetimeDeleteOnSuccess;
+            attachment.lifetime = XCTAttachmentLifetimeKeepAlways;
             [strongself addAttachment:attachment];
 
             // Dealloc the snapshotter (by having this line in the block, we
@@ -231,7 +233,7 @@ NSString* validAccessToken() {
         }];
     } // end for loop
 
-    [self waitForExpectations:@[expectation] timeout:60.0];
+    [self waitForExpectations:@[expectation] timeout:20.0];
 }
 
 @end
