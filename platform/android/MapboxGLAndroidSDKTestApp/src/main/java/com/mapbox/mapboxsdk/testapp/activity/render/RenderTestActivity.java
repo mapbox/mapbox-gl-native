@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mapbox.mapboxsdk.snapshotter.MapSnapshotter;
 import okio.BufferedSource;
 import okio.Okio;
@@ -33,9 +35,10 @@ import java.util.Map;
  */
 public class RenderTestActivity extends AppCompatActivity {
 
-  private static final String TEST_BASE_PATH = "integration/render-tests";
+  private static final String TEST_BASE_PATH = "integration";
+  private static final String RENDER_TEST_BASE_PATH = TEST_BASE_PATH + "/render-tests";
 
-  // TODO read out excluded tests from /platform/node/test/ignore.json
+  // We additionally read out excluded tests from `/platform/node/test/ignore.json`
   private static final List<String> EXCLUDED_TESTS = new ArrayList<String>() {
     {
       add("overlay,background-opacity");
@@ -50,7 +53,6 @@ public class RenderTestActivity extends AppCompatActivity {
       add("180,raster-rotation");
       add("45,raster-rotation");
       add("90,raster-rotation");
-      add("mapbox-gl-js#5631,regressions"); // crashes
       add("overlapping,raster-masking");
       add("missing,raster-loading");
       add("pitchAndBearing,line-pitch");
@@ -82,6 +84,32 @@ public class RenderTestActivity extends AppCompatActivity {
   }
 
   //
+  // Loads the ignore tests from assets folder
+  //
+  private static class LoadRenderIgnoreTask extends AsyncTask<Void, Void, List<String>> {
+
+    private WeakReference<RenderTestActivity> renderTestActivityWeakReference;
+
+    LoadRenderIgnoreTask(RenderTestActivity renderTestActivity) {
+      this.renderTestActivityWeakReference = new WeakReference<>(renderTestActivity);
+    }
+
+    @Override
+    protected List<String> doInBackground(Void... voids) {
+      return loadIgnoreList(renderTestActivityWeakReference.get().getAssets());
+    }
+
+    @Override
+    protected void onPostExecute(List<String> strings) {
+      super.onPostExecute(strings);
+      if (renderTestActivityWeakReference.get() != null) {
+        renderTestActivityWeakReference.get().onLoadIgnoreList(strings);
+      }
+    }
+  }
+
+
+  //
   // Loads the render test definitions from assets folder
   //
   private static class LoadRenderDefinitionTask extends AsyncTask<Void, Void, List<RenderTestDefinition>> {
@@ -98,13 +126,13 @@ public class RenderTestActivity extends AppCompatActivity {
       AssetManager assetManager = renderTestActivityWeakReference.get().getAssets();
       String[] categories = new String[0];
       try {
-        categories = assetManager.list(TEST_BASE_PATH);
+        categories = assetManager.list(RENDER_TEST_BASE_PATH);
       } catch (IOException exception) {
         Timber.e(exception);
       }
       for (int counter = categories.length - 1; counter >= 0; counter--) {
         try {
-          String[] tests = assetManager.list(String.format("%s/%s", TEST_BASE_PATH, categories[counter]));
+          String[] tests = assetManager.list(String.format("%s/%s", RENDER_TEST_BASE_PATH, categories[counter]));
           for (String test : tests) {
             String styleJson = loadStyleJson(assetManager, categories[counter], test);
             RenderTestStyleDefinition renderTestStyleDefinition = new Gson()
@@ -112,8 +140,7 @@ public class RenderTestActivity extends AppCompatActivity {
             RenderTestDefinition definition = new RenderTestDefinition(
               categories[counter], test, styleJson, renderTestStyleDefinition);
             if (!definition.hasOperations()) {
-              if (!definition.getCategory().equals("combinations")
-                && !EXCLUDED_TESTS.contains(definition.getName() + "," + definition.getCategory())) {
+              if (!EXCLUDED_TESTS.contains(definition.getName() + "," + definition.getCategory())) {
                 definitions.add(definition);
               }
             } else {
@@ -135,17 +162,33 @@ public class RenderTestActivity extends AppCompatActivity {
         renderTestActivity.startRenderTests(renderTestDefinitions);
       }
     }
+  }
 
-    private static String loadStyleJson(AssetManager assets, String category, String test) {
-      String styleJson = null;
-      try (InputStream input = assets.open(String.format("%s/%s/%s/style.json", TEST_BASE_PATH, category, test))) {
-        BufferedSource source = Okio.buffer(Okio.source(input));
-        styleJson = source.readByteString().string(Charset.forName("utf-8"));
-      } catch (IOException exception) {
-        Timber.e(exception);
+  private static List<String> loadIgnoreList(AssetManager assets) {
+    List<String> ignores = new ArrayList<>();
+    try (InputStream input = assets.open(String.format("%s/ignores.json", TEST_BASE_PATH))) {
+      BufferedSource source = Okio.buffer(Okio.source(input));
+      String styleJson = source.readByteString().string(Charset.forName("utf-8"));
+      JsonObject object = new Gson().fromJson(styleJson, JsonObject.class);
+      for (Map.Entry<String, JsonElement> stringJsonElementEntry : object.entrySet()) {
+        String[] parts = stringJsonElementEntry.getKey().split("/");
+        ignores.add(String.format("%s,%s", parts[2], parts[1]));
       }
-      return styleJson;
+    } catch (IOException exception) {
+      Timber.e(exception);
     }
+    return ignores;
+  }
+
+  private static String loadStyleJson(AssetManager assets, String category, String test) {
+    String styleJson = null;
+    try (InputStream input = assets.open(String.format("%s/%s/%s/style.json", RENDER_TEST_BASE_PATH, category, test))) {
+      BufferedSource source = Okio.buffer(Okio.source(input));
+      styleJson = source.readByteString().string(Charset.forName("utf-8"));
+    } catch (IOException exception) {
+      Timber.e(exception);
+    }
+    return styleJson;
   }
 
   private void startRenderTests(List<RenderTestDefinition> renderTestDefinitions) {
@@ -245,6 +288,12 @@ public class RenderTestActivity extends AppCompatActivity {
 
   public void setOnRenderTestCompletionListener(OnRenderTestCompletionListener listener) {
     this.onRenderTestCompletionListener = listener;
+    new LoadRenderIgnoreTask(this).execute();
+  }
+
+  public void onLoadIgnoreList(List<String> ignoreList) {
+    Timber.e("We loaded %s amount of tests to be ignored", ignoreList.size());
+    EXCLUDED_TESTS.addAll(ignoreList);
     new LoadRenderDefinitionTask(this).execute();
   }
 
