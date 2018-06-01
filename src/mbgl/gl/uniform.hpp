@@ -120,23 +120,8 @@ public:
     }
 };
 
-
-namespace detail {
-
-template <class...>
-struct ConcatenateUniforms;
-
-template <class... As, class... Bs>
-struct ConcatenateUniforms<TypeList<As...>, TypeList<Bs...>> {
-    using Type = Uniforms<As..., Bs...>;
-};
-
-} // namespace detail
-
-template <class A, class B>
-using ConcatenateUniforms = typename detail::ConcatenateUniforms<
-    typename A::Types,
-    typename B::Types>::Type;
+template <class... Us>
+using ConcatenateUniforms = typename TypeListConcat<typename Us::Types...>::template ExpandInto<Uniforms>;
 
 } // namespace gl
 } // namespace mbgl
