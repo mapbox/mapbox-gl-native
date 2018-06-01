@@ -511,7 +511,6 @@ public:
     _doubleTap.numberOfTapsRequired = 2;
     [self addGestureRecognizer:_doubleTap];
 
-
     _twoFingerDrag = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerDragGesture:)];
     _twoFingerDrag.minimumNumberOfTouches = 2;
     _twoFingerDrag.maximumNumberOfTouches = 2;
@@ -1586,10 +1585,11 @@ public:
 
 - (void)handleSingleTapGesture:(UITapGestureRecognizer *)singleTap
 {
-    if (singleTap.state != UIGestureRecognizerStateEnded)
+    if (singleTap.state != UIGestureRecognizerStateRecognized)
     {
         return;
     }
+
     [self trackGestureEvent:MMEEventGestureSingleTap forRecognizer:singleTap];
 
     if (self.mapViewProxyAccessibilityElement.accessibilityElementIsFocused)
@@ -1611,8 +1611,8 @@ public:
         return;
     }
 
-    id<MGLAnnotation>annotation = [self annotationForGestureRecognizer:singleTap persistingResults:YES];
-    if(annotation)
+    id<MGLAnnotation> annotation = [self annotationForGestureRecognizer:singleTap persistingResults:YES];
+    if (annotation)
     {
         CGPoint calloutPoint = [singleTap locationInView:self];
         CGRect positionRect = [self positioningRectForAnnotation:annotation defaultCalloutPoint:calloutPoint];
@@ -1698,10 +1698,10 @@ public:
 
     [self cancelTransitions];
 
-    if (doubleTap.state == UIGestureRecognizerStateEnded)
-    {
-        self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureZoomIn;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureZoomIn;
 
+    if (doubleTap.state == UIGestureRecognizerStateRecognized)
+    {
         MGLMapCamera *oldCamera = self.camera;
 
         double newZoom = round(self.zoomLevel) + 1.0;
@@ -1741,13 +1741,7 @@ public:
 
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureZoomOut;
 
-    if (twoFingerTap.state == UIGestureRecognizerStateBegan)
-    {
-        [self trackGestureEvent:MMEEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
-
-        [self notifyGestureDidBegin];
-    }
-    else if (twoFingerTap.state == UIGestureRecognizerStateEnded)
+    if (twoFingerTap.state == UIGestureRecognizerStateRecognized)
     {
         MGLMapCamera *oldCamera = self.camera;
 
@@ -1759,6 +1753,8 @@ public:
 
         if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
+            [self trackGestureEvent:MMEEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
+
             mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
             _mbglMap->setZoom(newZoom, center, MGLDurationFromTimeInterval(MGLAnimationDuration));
             
@@ -1992,7 +1988,6 @@ public:
             if ([self angleBetweenPoints:west east:east] > horizontalToleranceDegrees) {
                 return NO;
             }
-            
         }
     }
     else if (gestureRecognizer == _singleTapGestureRecognizer)
@@ -2000,8 +1995,8 @@ public:
         // Gesture will be recognized if it could deselect an annotation
         if(!self.selectedAnnotation)
         {
-            id<MGLAnnotation>annotation = [self annotationForGestureRecognizer:(UITapGestureRecognizer*)gestureRecognizer persistingResults:NO];
-            if(!annotation) {
+            id<MGLAnnotation> annotation = [self annotationForGestureRecognizer:(UITapGestureRecognizer*)gestureRecognizer persistingResults:NO];
+            if (!annotation) {
                 return NO;
             }
         }
