@@ -12,19 +12,17 @@ import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.adapter.FeatureAdapter;
 import com.mapbox.mapboxsdk.testapp.adapter.FeatureSectionAdapter;
 import com.mapbox.mapboxsdk.testapp.model.activity.Feature;
 import com.mapbox.mapboxsdk.testapp.utils.ItemClickSupport;
+import timber.log.Timber;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import timber.log.Timber;
 
 /**
  * Activity shown when application is started
@@ -79,6 +77,9 @@ public class FeatureOverviewActivity extends AppCompatActivity {
 
   private void onFeaturesLoaded(List<Feature> featuresList) {
     features = featuresList;
+    if (featuresList == null || featuresList.isEmpty()) {
+      return;
+    }
 
     List<FeatureSectionAdapter.Section> sections = new ArrayList<>();
     String currentCat = "";

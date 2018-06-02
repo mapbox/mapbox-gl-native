@@ -6,22 +6,10 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.mapbox.android.telemetry.TelemetryUtils;
 import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-
-import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.net.NoRouteToHostException;
-import java.net.ProtocolException;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.net.ssl.SSLException;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Dispatcher;
@@ -31,6 +19,15 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import timber.log.Timber;
+
+import javax.net.ssl.SSLException;
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.NoRouteToHostException;
+import java.net.ProtocolException;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static android.util.Log.DEBUG;
 import static android.util.Log.ERROR;
@@ -57,43 +54,12 @@ class HTTPRequest implements Callback {
   private HTTPRequest(long nativePtr, String resourceUrl, String etag, String modified) {
     this.nativePtr = nativePtr;
 
-    try {
-      HttpUrl httpUrl = HttpUrl.parse(resourceUrl);
-      if (httpUrl == null) {
-        log(Log.ERROR, String.format("[HTTP] Unable to parse resourceUrl %s", resourceUrl));
-      }
-
-      final String host = httpUrl.host().toLowerCase(MapboxConstants.MAPBOX_LOCALE);
-      // Don't try a request to remote server if we aren't connected
-      if (!Mapbox.isConnected() && !host.equals("127.0.0.1") && !host.equals("localhost")) {
-        throw new NoRouteToHostException("No Internet connection available.");
-      }
-
-      if (host.equals("mapbox.com") || host.endsWith(".mapbox.com") || host.equals("mapbox.cn")
-        || host.endsWith(".mapbox.cn")) {
-        if (httpUrl.querySize() == 0) {
-          resourceUrl = resourceUrl + "?";
-        } else {
-          resourceUrl = resourceUrl + "&";
-        }
-        resourceUrl = resourceUrl + "events=true";
-      }
-
-      Request.Builder builder = new Request.Builder()
-        .url(resourceUrl)
-        .tag(resourceUrl.toLowerCase(MapboxConstants.MAPBOX_LOCALE))
-        .addHeader("User-Agent", getUserAgent());
-      if (etag.length() > 0) {
-        builder = builder.addHeader("If-None-Match", etag);
-      } else if (modified.length() > 0) {
-        builder = builder.addHeader("If-Modified-Since", modified);
-      }
-      Request request = builder.build();
-      call = client.newCall(request);
-      call.enqueue(this);
-    } catch (Exception exception) {
-      handleFailure(call, exception);
+    if (resourceUrl.startsWith("local://")) {
+      // used by render test to serve files from assets
+      executeLocalRequest(resourceUrl);
+      return;
     }
+    executeRequest(resourceUrl, etag, modified);
   }
 
   public void cancel() {
@@ -176,6 +142,57 @@ class HTTPRequest implements Callback {
     // https://github.com/mapbox/mapbox-gl-native/blob/master/platform/android/src/http_file_source.cpp#L192
     dispatcher.setMaxRequestsPerHost(20);
     return dispatcher;
+  }
+
+  private void executeRequest(String resourceUrl, String etag, String modified) {
+    try {
+      HttpUrl httpUrl = HttpUrl.parse(resourceUrl);
+      if (httpUrl == null) {
+        log(Log.ERROR, String.format("[HTTP] Unable to parse resourceUrl %s", resourceUrl));
+      }
+
+      final String host = httpUrl.host().toLowerCase(MapboxConstants.MAPBOX_LOCALE);
+      // Don't try a request to remote server if we aren't connected
+      if (!Mapbox.isConnected() && !host.equals("127.0.0.1") && !host.equals("localhost")) {
+        throw new NoRouteToHostException("No Internet connection available.");
+      }
+
+      if (host.equals("mapbox.com") || host.endsWith(".mapbox.com") || host.equals("mapbox.cn")
+        || host.endsWith(".mapbox.cn")) {
+        if (httpUrl.querySize() == 0) {
+          resourceUrl = resourceUrl + "?";
+        } else {
+          resourceUrl = resourceUrl + "&";
+        }
+        resourceUrl = resourceUrl + "events=true";
+      }
+
+      Request.Builder builder = new Request.Builder()
+        .url(resourceUrl)
+        .tag(resourceUrl.toLowerCase(MapboxConstants.MAPBOX_LOCALE))
+        .addHeader("User-Agent", getUserAgent());
+      if (etag.length() > 0) {
+        builder = builder.addHeader("If-None-Match", etag);
+      } else if (modified.length() > 0) {
+        builder = builder.addHeader("If-Modified-Since", modified);
+      }
+      Request request = builder.build();
+      call = client.newCall(request);
+      call.enqueue(this);
+    } catch (Exception exception) {
+      handleFailure(call, exception);
+    }
+  }
+
+  private void executeLocalRequest(String resourceUrl) {
+    new LocalRequestTask(new LocalRequestTask.OnLocalRequestResponse() {
+      @Override
+      public void onResponse(byte[] bytes) {
+        if (bytes != null) {
+          nativeOnResponse(200, null, null, null, null, null, null, bytes);
+        }
+      }
+    }).execute(resourceUrl);
   }
 
   private void handleFailure(Call call, Exception e) {

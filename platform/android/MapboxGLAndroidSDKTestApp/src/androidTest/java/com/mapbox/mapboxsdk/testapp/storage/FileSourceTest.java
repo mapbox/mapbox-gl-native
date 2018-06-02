@@ -14,6 +14,7 @@ import com.mapbox.mapboxsdk.testapp.activity.FeatureOverviewActivity;
 
 import org.hamcrest.Matcher;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,6 +69,7 @@ public class FileSourceTest {
   }
 
   @Test
+  @Ignore
   public void testRotateMapView() throws Exception {
     assertFalse("1) FileSource should not be active", fileSource.isActivated());
     onView(withText("Simple Map")).perform(click());
