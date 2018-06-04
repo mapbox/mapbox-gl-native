@@ -35,6 +35,7 @@ public:
     static constexpr bool IsDataDriven = true;
 
     using Attribute = A;
+    using Attributes = TypeList<A>;
     using Uniform = U;
 };
 
