@@ -269,9 +269,22 @@ class PaintPropertyBinders;
 
 template <class... Ps>
 class PaintPropertyBinders<TypeList<Ps...>> {
+private:
+    template <class T, class... As>
+    struct Detail;
+
+    template <class T, class... As>
+    struct Detail<T, TypeList<As...>> {
+        using Binder = PaintPropertyBinder<T, typename As::Type...>;
+        using ZoomInterpolatedAttributeList = TypeList<ZoomInterpolatedAttribute<As>...>;
+    };
+
+    template <class P>
+    using Property = Detail<typename P::Type, typename P::Attributes>;
+
 public:
     template <class P>
-    using Binder = PaintPropertyBinder<typename P::Type, typename P::Attribute::Type>;
+    using Binder = typename Property<P>::Binder;
 
     using Binders = IndexedTuple<
         TypeList<Ps...>,
@@ -299,9 +312,9 @@ public:
     }
 
     template <class P>
-    using Attribute = ZoomInterpolatedAttribute<typename P::Attribute>;
+    using ZoomInterpolatedAttributeList = typename Property<P>::ZoomInterpolatedAttributeList;
 
-    using Attributes = gl::Attributes<Attribute<Ps>...>;
+    using Attributes = typename TypeListConcat<ZoomInterpolatedAttributeList<Ps>...>::template ExpandInto<gl::Attributes>;
     using AttributeBindings = typename Attributes::Bindings;
 
     template <class EvaluatedProperties>
