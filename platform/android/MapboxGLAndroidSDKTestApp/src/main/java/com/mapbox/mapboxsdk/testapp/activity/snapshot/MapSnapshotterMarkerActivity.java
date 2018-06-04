@@ -4,12 +4,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 
+import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -17,13 +19,15 @@ import com.mapbox.mapboxsdk.snapshotter.MapSnapshot;
 import com.mapbox.mapboxsdk.snapshotter.MapSnapshotter;
 import com.mapbox.mapboxsdk.testapp.R;
 
+import java.util.List;
+
 import timber.log.Timber;
 
 /**
  * Test activity showing how to use a the {@link MapSnapshotter} and overlay
  * {@link android.graphics.Bitmap}s on top.
  */
-public class MapSnapshotterMarkerActivity extends AppCompatActivity implements MapSnapshotter.SnapshotReadyCallback {
+public class MapSnapshotterMarkerActivity extends AppCompatActivity implements MapSnapshotter.SnapshotReadyCallback, MapSnapshotter.FeaturesQueryCallback {
 
   private MapSnapshotter mapSnapshotter;
 
@@ -49,7 +53,9 @@ public class MapSnapshotterMarkerActivity extends AppCompatActivity implements M
               .withStyle(Style.OUTDOORS)
               .withCameraPosition(new CameraPosition.Builder().target(new LatLng(52.090737, 5.121420)).zoom(15).build())
           );
-          mapSnapshotter.start(MapSnapshotterMarkerActivity.this);
+          mapSnapshotter.queryFeatures(MapSnapshotterMarkerActivity.this,
+            new RectF(0, 0, Math.min(container.getMeasuredWidth(), 1024), Math.min(container.getMeasuredHeight(), 1024)),
+            null, null);
         }
       });
   }
@@ -83,4 +89,8 @@ public class MapSnapshotterMarkerActivity extends AppCompatActivity implements M
     return snapshot.getBitmap();
   }
 
+  @Override
+  public void onFeaturesQueryReady(List<Feature> features) {
+    Timber.d("FEATURES %s", features);
+  }
 }

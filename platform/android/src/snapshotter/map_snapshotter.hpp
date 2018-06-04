@@ -54,6 +54,10 @@ public:
 
     void start(JNIEnv&);
 
+    void queryFeatures(JNIEnv&, jni::jfloat, jni::jfloat, jni::jfloat,
+                       jni::jfloat, jni::Array<jni::String>,
+                       jni::Array<jni::Object<>> jfilter);
+
     void cancel(JNIEnv&);
 
 private:
@@ -66,7 +70,8 @@ private:
     bool showLogo;
 
     std::shared_ptr<mbgl::ThreadPool> threadPool;
-    std::unique_ptr<Actor<mbgl::MapSnapshotter::Callback>> snapshotCallback;
+    std::unique_ptr<Actor<mbgl::MapSnapshotter::SnapshotCallback>> snapshotCallback;
+    std::unique_ptr<Actor<mbgl::MapSnapshotter::QueryFeaturesCallback>> queryFeaturesCallback;
     std::unique_ptr<mbgl::MapSnapshotter> snapshotter;
 
     FileSource *jFileSource;

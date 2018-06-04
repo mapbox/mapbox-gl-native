@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <mbgl/renderer/query.hpp>
 
 namespace mbgl {
 
@@ -53,8 +54,12 @@ public:
 
     using PointForFn = std::function<ScreenCoordinate (const LatLng&)>;
     using Attributions = std::vector<std::string>;
-    using Callback = std::function<void (std::exception_ptr, PremultipliedImage, Attributions, PointForFn)>;
-    void snapshot(ActorRef<Callback>);
+    using SnapshotCallback = std::function<void (std::exception_ptr, PremultipliedImage, Attributions, PointForFn)>;
+    void snapshot(ActorRef<SnapshotCallback>);
+
+    using Features = std::vector<Feature>;
+    using QueryFeaturesCallback = std::function<void (std::exception_ptr, Features)>;
+    void queryFeatures(ActorRef<QueryFeaturesCallback>, const ScreenBox& box, const RenderedQueryOptions& options);
 
 private:
     class Impl;

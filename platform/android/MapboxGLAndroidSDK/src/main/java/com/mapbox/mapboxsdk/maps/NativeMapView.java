@@ -828,8 +828,11 @@ final class NativeMapView {
     if (checkState("queryRenderedFeatures")) {
       return new ArrayList<>();
     }
-    Feature[] features = nativeQueryRenderedFeaturesForPoint(coordinates.x / pixelRatio,
-      coordinates.y / pixelRatio, layerIds, filter != null ? filter.toArray() : null);
+    Feature[] features = nativeQueryRenderedFeaturesForPoint(
+      coordinates.x / pixelRatio,
+      coordinates.y / pixelRatio,
+      layerIds,
+      filter != null ? filter.toArray() : null);
     return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
   }
 

@@ -2,6 +2,7 @@
 
 #include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
+#include <mbgl/renderer/renderer.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/storage/file_source.hpp>
@@ -37,7 +38,9 @@ public:
     void setRegion(LatLngBounds);
     LatLngBounds getRegion() const;
 
-    void snapshot(ActorRef<MapSnapshotter::Callback>);
+    void snapshot(ActorRef<MapSnapshotter::SnapshotCallback>);
+
+    void queryFeatures(ActorRef<MapSnapshotter::QueryFeaturesCallback>, const ScreenBox&, const RenderedQueryOptions&);
 
 private:
     HeadlessFrontend frontend;
@@ -71,7 +74,7 @@ MapSnapshotter::Impl::Impl(FileSource& fileSource,
     }
 }
 
-void MapSnapshotter::Impl::snapshot(ActorRef<MapSnapshotter::Callback> callback) {
+void MapSnapshotter::Impl::snapshot(ActorRef<MapSnapshotter::SnapshotCallback> callback) {
     map.renderStill([this, callback = std::move(callback)] (std::exception_ptr error) mutable {
 
         // Create lambda that captures the current transform state
@@ -96,11 +99,22 @@ void MapSnapshotter::Impl::snapshot(ActorRef<MapSnapshotter::Callback> callback)
 
         // Invoke callback
         callback.invoke(
-                &MapSnapshotter::Callback::operator(),
+                &MapSnapshotter::SnapshotCallback::operator(),
                 error,
                 error ? PremultipliedImage() : frontend.readStillImage(),
                 std::move(attributions),
                 std::move(pointForFn)
+        );
+    });
+}
+
+void MapSnapshotter::Impl::queryFeatures(ActorRef<MapSnapshotter::QueryFeaturesCallback> callback,
+                                         const ScreenBox& box, const RenderedQueryOptions& options) {
+    map.renderStill([this, callback = std::move(callback), box, options] (std::exception_ptr error) mutable {
+        callback.invoke(
+                &MapSnapshotter::QueryFeaturesCallback::operator(),
+                error,
+                error ? std::vector<Feature>() : frontend.getRenderer()->queryRenderedFeatures(box, options)
         );
     });
 }
@@ -162,8 +176,13 @@ MapSnapshotter::MapSnapshotter(FileSource& fileSource,
 
 MapSnapshotter::~MapSnapshotter() = default;
 
-void MapSnapshotter::snapshot(ActorRef<MapSnapshotter::Callback> callback) {
+void MapSnapshotter::snapshot(ActorRef<MapSnapshotter::SnapshotCallback> callback) {
     impl->actor().invoke(&Impl::snapshot, std::move(callback));
+}
+
+void MapSnapshotter::queryFeatures(ActorRef<MapSnapshotter::QueryFeaturesCallback> callback,
+                                   const ScreenBox& box, const RenderedQueryOptions& options) {
+    impl->actor().invoke(&Impl::queryFeatures, std::move(callback), box, options);
 }
 
 void MapSnapshotter::setStyleURL(const std::string& styleURL) {

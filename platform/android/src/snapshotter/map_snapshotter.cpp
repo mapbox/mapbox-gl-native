@@ -7,6 +7,15 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/actor/scheduler.hpp>
 
+#include "../style/android_conversion.hpp"
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/filter.hpp>
+
+#include "../conversion/conversion.hpp"
+#include "../conversion/collection.hpp"
+#include "../style/conversion/filter.hpp"
+#include "../geojson/conversion/feature.hpp"
+
 #include "../attach_env.hpp"
 #include "map_snapshot.hpp"
 
@@ -75,7 +84,7 @@ void MapSnapshotter::start(JNIEnv& env) {
     MBGL_VERIFY_THREAD(tid);
     activateFilesource(env);
 
-    snapshotCallback = std::make_unique<Actor<mbgl::MapSnapshotter::Callback>>(
+    snapshotCallback = std::make_unique<Actor<mbgl::MapSnapshotter::SnapshotCallback>>(
             *Scheduler::GetCurrent(),
             [this](std::exception_ptr err, PremultipliedImage image, std::vector<std::string> attributions, mbgl::MapSnapshotter::PointForFn pointForFn) {
         MBGL_VERIFY_THREAD(tid);
@@ -100,6 +109,50 @@ void MapSnapshotter::start(JNIEnv& env) {
     });
 
     snapshotter->snapshot(snapshotCallback->self());
+}
+
+void MapSnapshotter::queryFeatures(JNIEnv& env, jni::jfloat left, jni::jfloat top,
+                                   jni::jfloat right, jni::jfloat bottom, jni::Array<jni::String> layerIds,
+                                   jni::Array<jni::Object<>> jfilter) {
+    MBGL_VERIFY_THREAD(tid);
+    activateFilesource(env);
+
+    using namespace mbgl::android::conversion;
+    using namespace mbgl::android::geojson;
+
+    queryFeaturesCallback = std::make_unique<Actor<mbgl::MapSnapshotter::QueryFeaturesCallback>>(
+        *Scheduler::GetCurrent(),
+        [this](std::exception_ptr err, const std::vector<mbgl::Feature> features) {
+            MBGL_VERIFY_THREAD(tid);
+            android::UniqueEnv _env = android::AttachEnv();
+
+            using namespace mbgl::android::conversion;
+            using namespace mbgl::android::geojson;
+
+            // todo add error handling
+            if (!err) {
+                // invoke callback
+                static auto onQueryFeaturesReady = javaClass.GetMethod<void (jni::Array<jni::Object<geojson::Feature>>)>(*_env, "onQueryFeaturesReady");
+                jni::Array<jni::Object<geojson::Feature>> featureArray = 
+                        *convert<jni::Array<jni::Object<geojson::Feature>>, std::vector<mbgl::Feature>>(*_env, features);
+
+                javaPeer->Call(*_env,
+                               onQueryFeaturesReady,
+                               featureArray);
+            }
+        }
+    );
+
+    mbgl::optional<std::vector<std::string>> layers;
+    if (layerIds != nullptr && layerIds.Length(env) > 0) {
+        layers = toVector(env, layerIds);
+    }
+    mapbox::geometry::box<double> box = {
+            mapbox::geometry::point<double>{ left, top},
+            mapbox::geometry::point<double>{ right, bottom }
+    };
+
+    snapshotter->queryFeatures(queryFeaturesCallback->self(), box, { layers, toFilter(env, jfilter) });
 }
 
 void MapSnapshotter::cancel(JNIEnv& env) {
@@ -168,6 +221,7 @@ void MapSnapshotter::registerNative(jni::JNIEnv& env) {
                                             METHOD(&MapSnapshotter::setCameraPosition, "setCameraPosition"),
                                             METHOD(&MapSnapshotter::setRegion, "setRegion"),
                                             METHOD(&MapSnapshotter::start, "nativeStart"),
+                                            METHOD(&MapSnapshotter::queryFeatures, "nativeQueryFeatures"),
                                             METHOD(&MapSnapshotter::cancel, "nativeCancel")
     );
 }

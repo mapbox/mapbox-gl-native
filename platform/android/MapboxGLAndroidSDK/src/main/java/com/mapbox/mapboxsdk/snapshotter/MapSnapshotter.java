@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,6 +17,8 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.attribution.AttributionLayout;
 import com.mapbox.mapboxsdk.attribution.AttributionMeasure;
@@ -24,7 +27,13 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.storage.FileSource;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import timber.log.Timber;
 
 /**
@@ -52,6 +61,19 @@ public class MapSnapshotter {
   }
 
   /**
+   * Get notified on features query completion.
+   */
+  public interface FeaturesQueryCallback {
+
+    /**
+     * Called when feature query is complete.
+     *
+     * @param features th features
+     */
+    void onFeaturesQueryReady(List<Feature> features);
+  }
+
+  /**
    * Can be used to get notified of errors
    * in snapshot generation
    *
@@ -74,7 +96,9 @@ public class MapSnapshotter {
   private long nativePtr = 0;
 
   private final Context context;
-  private SnapshotReadyCallback callback;
+  private final float pixelRatio;
+  private SnapshotReadyCallback snapshotCallback;
+  private FeaturesQueryCallback featuresQueryCallback;
   private ErrorHandler errorHandler;
 
   /**
@@ -214,6 +238,7 @@ public class MapSnapshotter {
   public MapSnapshotter(@NonNull Context context, @NonNull Options options) {
     checkThread();
     this.context = context.getApplicationContext();
+    pixelRatio = context.getResources().getDisplayMetrics().density;
     FileSource fileSource = FileSource.getInstance(context);
     String programCacheDir = context.getCacheDir().getAbsolutePath();
 
@@ -223,10 +248,10 @@ public class MapSnapshotter {
   }
 
   /**
-   * Starts loading and rendering the snapshot. The callback will be fired
+   * Starts loading and rendering the snapshot. The snapshotCallback will be fired
    * on the calling thread.
    *
-   * @param callback the callback to use when the snapshot is ready
+   * @param callback the snapshotCallback to use when the snapshot is ready
    */
   public void start(@NonNull SnapshotReadyCallback callback) {
     this.start(callback, null);
@@ -236,17 +261,32 @@ public class MapSnapshotter {
    * Starts loading and rendering the snapshot. The callbacks will be fired
    * on the calling thread.
    *
-   * @param callback     the callback to use when the snapshot is ready
+   * @param callback     the snapshotCallback to use when the snapshot is ready
    * @param errorHandler the error handler to use on snapshot errors
    */
   public void start(@NonNull SnapshotReadyCallback callback, ErrorHandler errorHandler) {
-    if (this.callback != null) {
+    if (this.snapshotCallback != null) {
       throw new IllegalStateException("Snapshotter was already started");
     }
     checkThread();
-    this.callback = callback;
+    this.snapshotCallback = callback;
     this.errorHandler = errorHandler;
     nativeStart();
+  }
+
+  // TODO: 04/06/2018 query docs
+  public void queryFeatures(@NonNull FeaturesQueryCallback callback, @NonNull RectF coordinates,
+                            @Nullable String[] layerIds,
+                            @Nullable Expression filter) {
+    checkThread();
+    this.featuresQueryCallback = callback;
+    nativeQueryFeatures(
+      coordinates.left / pixelRatio,
+      coordinates.top / pixelRatio,
+      coordinates.right / pixelRatio,
+      coordinates.bottom / pixelRatio,
+      layerIds,
+      filter != null ? filter.toArray() : null);
   }
 
   /**
@@ -450,10 +490,28 @@ public class MapSnapshotter {
     new Handler().post(new Runnable() {
       @Override
       public void run() {
-        if (callback != null) {
+        if (snapshotCallback != null) {
           addOverlay(snapshot);
-          callback.onSnapshotReady(snapshot);
+          snapshotCallback.onSnapshotReady(snapshot);
           reset();
+        }
+      }
+    });
+  }
+
+  /**
+   * Called by JNI peer when queried features are ready.
+   * Always called on the origin (main) thread.
+   *
+   * @param features the queried features
+   */
+  protected void onQueryFeaturesReady(final Feature[] features) {
+    new Handler().post(new Runnable() {
+      @Override
+      public void run() {
+        if (featuresQueryCallback != null) {
+          featuresQueryCallback.onFeaturesQueryReady(
+            features != null ? Arrays.asList(features) : new ArrayList<Feature>());
         }
       }
     });
@@ -477,7 +535,8 @@ public class MapSnapshotter {
   }
 
   protected void reset() {
-    callback = null;
+    snapshotCallback = null;
+    featuresQueryCallback = null;
     errorHandler = null;
   }
 
@@ -488,6 +547,11 @@ public class MapSnapshotter {
                                          boolean showLogo, String programCacheDir);
 
   protected native void nativeStart();
+
+  protected native void nativeQueryFeatures(float left, float top,
+                                            float right, float bottom,
+                                            String[] layerIds,
+                                            Object[] filter);
 
   protected native void nativeCancel();
 
