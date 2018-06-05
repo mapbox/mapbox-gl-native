@@ -175,7 +175,10 @@ optional<int64_t> OfflineDatabase::hasInternal(const Resource& resource) {
 }
 
 std::pair<bool, uint64_t> OfflineDatabase::put(const Resource& resource, const Response& response) {
-    return putInternal(resource, response, true);
+    mapbox::sqlite::Transaction transaction(*db, mapbox::sqlite::Transaction::Immediate);
+    auto result = putInternal(resource, response, true);
+    transaction.commit();
+    return result;
 }
 
 std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource, const Response& response, bool evict_) {
@@ -292,11 +295,6 @@ bool OfflineDatabase::putResource(const Resource& resource,
     }
 
     // We can't use REPLACE because it would change the id value.
-
-    // Begin an immediate-mode transaction to ensure that two writers do not attempt
-    // to INSERT a resource at the same moment.
-    mapbox::sqlite::Transaction transaction(*db, mapbox::sqlite::Transaction::Immediate);
-
     // clang-format off
     mapbox::sqlite::Query updateQuery{ getStatement(
         "UPDATE resources "
@@ -329,7 +327,6 @@ bool OfflineDatabase::putResource(const Resource& resource,
 
     updateQuery.run();
     if (updateQuery.changes() != 0) {
-        transaction.commit();
         return false;
     }
 
@@ -356,7 +353,6 @@ bool OfflineDatabase::putResource(const Resource& resource,
     }
 
     insertQuery.run();
-    transaction.commit();
 
     return true;
 }
@@ -484,10 +480,6 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
 
     // We can't use REPLACE because it would change the id value.
 
-    // Begin an immediate-mode transaction to ensure that two writers do not attempt
-    // to INSERT a resource at the same moment.
-    mapbox::sqlite::Transaction transaction(*db, mapbox::sqlite::Transaction::Immediate);
-
     // clang-format off
     mapbox::sqlite::Query updateQuery{ getStatement(
         "UPDATE tiles "
@@ -526,7 +518,6 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
 
     updateQuery.run();
     if (updateQuery.changes() != 0) {
-        transaction.commit();
         return false;
     }
 
@@ -556,7 +547,6 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
     }
 
     insertQuery.run();
-    transaction.commit();
 
     return true;
 }
@@ -639,6 +629,43 @@ optional<int64_t> OfflineDatabase::hasRegionResource(int64_t regionID, const Res
 }
 
 uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& resource, const Response& response) {
+    mapbox::sqlite::Transaction transaction(*db);
+    auto size = putRegionResourceInternal(regionID, resource, response);
+    transaction.commit();
+    return size;
+}
+
+void OfflineDatabase::putRegionResources(int64_t regionID, const std::list<std::tuple<Resource, Response>>& resources, OfflineRegionStatus& status) {
+    mapbox::sqlite::Transaction transaction(*db);
+
+    for (const auto& elem : resources) {
+        const auto& resource = std::get<0>(elem);
+        const auto& response = std::get<1>(elem);
+
+        try {
+            uint64_t resourceSize = putRegionResourceInternal(regionID, resource, response);
+            status.completedResourceCount++;
+            status.completedResourceSize += resourceSize;
+            if (resource.kind == Resource::Kind::Tile) {
+                status.completedTileCount += 1;
+                status.completedTileSize += resourceSize;
+            }
+        } catch (MapboxTileLimitExceededException) {
+            // Commit the rest of the batch and retrow
+            transaction.commit();
+            throw;
+        }
+    }
+
+    // Commit the completed batch
+    transaction.commit();
+}
+
+uint64_t OfflineDatabase::putRegionResourceInternal(int64_t regionID, const Resource& resource, const Response& response) {
+    if (exceedsOfflineMapboxTileCountLimit(resource)) {
+        throw MapboxTileLimitExceededException();
+    }
+
     uint64_t size = putInternal(resource, response, false).second;
     bool previouslyUnused = markUsed(regionID, resource);
 
@@ -907,6 +934,12 @@ uint64_t OfflineDatabase::getOfflineMapboxTileCount() {
 
     offlineMapboxTileCount = query.get<int64_t>(0);
     return *offlineMapboxTileCount;
+}
+
+bool OfflineDatabase::exceedsOfflineMapboxTileCountLimit(const Resource& resource) {
+    return resource.kind == Resource::Kind::Tile
+        && util::mapbox::isMapboxURL(resource.url)
+        && offlineMapboxTileCountLimitExceeded();
 }
 
 } // namespace mbgl

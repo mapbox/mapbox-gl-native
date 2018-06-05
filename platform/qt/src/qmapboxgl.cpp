@@ -703,7 +703,7 @@ double QMapboxGL::scale() const
 
 void QMapboxGL::setScale(double scale_, const QPointF &center)
 {
-    d_ptr->mapObj->setZoom(mbgl::util::log2(scale_), mbgl::ScreenCoordinate { center.x(), center.y() });
+    d_ptr->mapObj->setZoom(::log2(scale_), mbgl::ScreenCoordinate { center.x(), center.y() });
 }
 
 /*!
@@ -1111,7 +1111,7 @@ void QMapboxGL::moveBy(const QPointF &offset)
     can be used for implementing a pinch gesture.
 */
 void QMapboxGL::scaleBy(double scale_, const QPointF &center) {
-    d_ptr->mapObj->setZoom(d_ptr->mapObj->getZoom() + mbgl::util::log2(scale_), mbgl::ScreenCoordinate { center.x(), center.y() });
+    d_ptr->mapObj->setZoom(d_ptr->mapObj->getZoom() + ::log2(scale_), mbgl::ScreenCoordinate { center.x(), center.y() });
 }
 
 /*!

@@ -10,6 +10,12 @@
 
 #define MGLTestAssertEqualWithAccuracy(myself, expression1, expression2, accuracy, ...) \
     _XCTPrimitiveAssertEqualWithAccuracy(myself, expression1, @#expression1, expression2, @#expression2, accuracy, @#accuracy, __VA_ARGS__)
+#define MGLTestAssertNil(myself, expression, ...) \
+    _XCTPrimitiveAssertNil(myself, expression, @#expression, __VA_ARGS__)
+
+#define MGLTestAssertNotNil(myself, expression, ...) \
+    _XCTPrimitiveAssertNotNil(myself, expression, @#expression, __VA_ARGS__)
+
 
 @interface MGLMapViewIntegrationTest : XCTestCase <MGLMapViewDelegate>
 @property (nonatomic) MGLMapView *mapView;

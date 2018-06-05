@@ -598,6 +598,60 @@ TEST(OfflineDatabase, OfflineMapboxTileCount) {
     EXPECT_EQ(0u, db.getOfflineMapboxTileCount());
 }
 
+
+TEST(OfflineDatabase, BatchInsertion) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:", 1024 * 100);
+    OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
+    OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
+
+    Response response;
+    response.data = randomString(1024);
+    std::list<std::tuple<Resource, Response>> resources;
+
+    for (uint32_t i = 1; i <= 100; i++) {
+        resources.emplace_back(Resource::style("http://example.com/"s + util::toString(i)), response);
+    }
+
+    OfflineRegionStatus status;
+    db.putRegionResources(region.getID(), resources, status);
+
+    for (uint32_t i = 1; i <= 100; i++) {
+        EXPECT_TRUE(bool(db.get(Resource::style("http://example.com/"s + util::toString(i)))));
+    }
+}
+
+TEST(OfflineDatabase, BatchInsertionMapboxTileCountExceeded) {
+    using namespace mbgl;
+    
+    OfflineDatabase db(":memory:", 1024 * 100);
+    db.setOfflineMapboxTileCountLimit(1);
+    OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
+    OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
+    
+    Response response;
+    response.data = randomString(1024);
+    std::list<std::tuple<Resource, Response>> resources;
+    
+    resources.emplace_back(Resource::style("http://example.com/"), response);
+    resources.emplace_back(Resource::tile("mapbox://tiles/1", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), response);
+    resources.emplace_back(Resource::tile("mapbox://tiles/2", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), response);
+    
+    OfflineRegionStatus status;
+    try {
+        db.putRegionResources(region.getID(), resources, status);
+        EXPECT_FALSE(true);
+    } catch (MapboxTileLimitExceededException) {
+        // Expected
+    }
+    
+    EXPECT_EQ(status.completedTileCount, 1u);
+    EXPECT_EQ(status.completedResourceCount, 2u);
+    EXPECT_EQ(db.getRegionCompletedStatus(region.getID()).completedTileCount, 1u);
+    EXPECT_EQ(db.getRegionCompletedStatus(region.getID()).completedResourceCount, 2u);
+}
+
 static int databasePageCount(const std::string& path) {
     mapbox::sqlite::Database db = mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadOnly);
     mapbox::sqlite::Statement stmt{ db, "pragma page_count" };

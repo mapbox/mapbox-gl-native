@@ -270,7 +270,7 @@ double TransformState::zoomScale(double zoom) const {
 }
 
 double TransformState::scaleZoom(double s) const {
-    return util::log2(s);
+    return ::log2(s);
 }
 
 ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) const {
@@ -280,7 +280,7 @@ ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) 
 
     mat4 mat = coordinatePointMatrix(getZoom());
     vec4 p;
-    Point<double> pt = Projection::project(latLng, scale) / double(util::tileSize);
+    Point<double> pt = Projection::project(latLng, scale) / util::tileSize;
     vec4 c = {{ pt.x, pt.y, 0, 1 }};
     matrix::transformMat4(p, c, mat);
     return { p[0] / p[3], size.height - p[1] / p[3] };
@@ -427,7 +427,7 @@ float TransformState::maxPitchScaleFactor() const {
     }
     auto latLng = screenCoordinateToLatLng({ 0, static_cast<float>(getSize().height) });
     mat4 mat = coordinatePointMatrix(getZoom());
-    Point<double> pt = Projection::project(latLng, scale) / double(util::tileSize);
+    Point<double> pt = Projection::project(latLng, scale) / util::tileSize;
     vec4 p = {{ pt.x, pt.y, 0, 1 }};
     vec4 topPoint;
     matrix::transformMat4(topPoint, p, mat);

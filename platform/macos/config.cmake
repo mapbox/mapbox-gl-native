@@ -154,5 +154,8 @@ macro(mbgl_platform_benchmark)
 endmacro()
 
 macro(mbgl_platform_node)
-    # Define macro to enable this target on this platform
+    target_link_libraries(mbgl-node INTERFACE
+        -exported_symbols_list ${CMAKE_SOURCE_DIR}/platform/node/symbol-list
+        -dead_strip
+    )
 endmacro()
