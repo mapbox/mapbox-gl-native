@@ -7,6 +7,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Packaging
 
 * The minimum deployment target for this SDK is now iOS 9.0. ([#11776](https://github.com/mapbox/mapbox-gl-native/pull/11776))
+* Removed support for the Fabric distribution platform. ([#12106](https://github.com/mapbox/mapbox-gl-native/pull/12106))
 
 ### Style layers
 
