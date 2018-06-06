@@ -123,7 +123,7 @@ optional<std::vector<std::unique_ptr<Expression>>> convertLiteralArray(const Con
         }
         output.push_back(std::move(*literal));
     }
-    return output;
+    return {std::move(output)};
 }
 
 ParseResult convertLegacyComparisonFilter(const Convertible& values, Error& error, optional<std::string> opOverride = {}) {
