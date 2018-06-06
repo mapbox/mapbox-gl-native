@@ -3,6 +3,11 @@
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/test/stub_geometry_tile_feature.hpp>
 
+#include <mbgl/util/rapidjson.hpp>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
+#include <mbgl/style/conversion/stringify.hpp>
+
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/filter.hpp>
@@ -174,6 +179,13 @@ TEST(Filter, LegacyProperty) {
     ASSERT_TRUE(filter("[\"<=\", \"two\", \"2\"]", {{"two", std::string("2")}}));
     ASSERT_FALSE(filter("[\"<\", \"two\", \"1\"]", {{"two", std::string("2")}}));
     ASSERT_FALSE(filter("[\"==\", \"two\", 4]", {{"two", std::string("2")}}));
+}
+
+TEST(Filter, ExpressionLegacyMix) {
+    conversion::Error error;
+    optional<Filter> filter = conversion::convertJSON<Filter>(R"(["any", ["all", ["==", ["geometry-type"], "LineString"]], ["==", "x", 1]])", error);
+    EXPECT_FALSE(bool(filter));
+    EXPECT_TRUE(error.message.size() > 0);
 }
 
 TEST(Filter, ZoomExpressionNested) {
