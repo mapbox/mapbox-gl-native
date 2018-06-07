@@ -15,60 +15,31 @@
 using namespace std::literals::string_literals;
 using namespace mbgl;
 
-namespace {
-
-void createDir(const char* name) {
-    const int ret = mkdir(name, 0755);
-    if (ret == -1) {
-        ASSERT_EQ(EEXIST, errno);
-    } else {
-        ASSERT_EQ(0, ret);
-    }
-}
-
-void deleteFile(const char* name) {
-    const int ret = unlink(name);
-    if (ret == -1) {
-        ASSERT_EQ(ENOENT, errno);
-    } else {
-        ASSERT_EQ(0, ret);
-    }
-}
-
-void writeFile(const char* name, const std::string& data) {
-    util::write_file(name, data);
-}
-
-void copyFile(const char* orig, const char* dest) {
-    util::write_file(dest, util::read_file(orig));
-}
-
-} // namespace
+static constexpr const char* filename = "test/fixtures/offline_database/offline.db";
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) {
-    createDir("test/fixtures/offline_database");
-    deleteFile("test/fixtures/offline_database/offline.db");
+    FixtureLog log;
+    util::deleteFile(filename);
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-    OfflineDatabase db("test/fixtures/offline_database/offline.db");
+    OfflineDatabase db(filename);
     EXPECT_FALSE(bool(db.get({ Resource::Unknown, "mapbox://test" })));
 
     Log::removeObserver();
 }
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) {
-    createDir("test/fixtures/offline_database");
-    deleteFile("test/fixtures/offline_database/offline.db");
-    std::string path("test/fixtures/offline_database/offline.db");
+    FixtureLog log;
+    util::deleteFile(filename);
 
     {
-        mapbox::sqlite::Database db = mapbox::sqlite::Database::open(path, mapbox::sqlite::Create | mapbox::sqlite::ReadWrite);
+        mapbox::sqlite::Database db = mapbox::sqlite::Database::open(filename, mapbox::sqlite::Create | mapbox::sqlite::ReadWrite);
         db.exec("PRAGMA user_version = 1");
     }
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
-    OfflineDatabase db(path);
+    OfflineDatabase db(filename);
 
     auto observer = Log::removeObserver();
     auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
@@ -76,13 +47,13 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) {
 }
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Invalid)) {
-    createDir("test/fixtures/offline_database");
-    deleteFile("test/fixtures/offline_database/invalid.db");
-    writeFile("test/fixtures/offline_database/invalid.db", "this is an invalid file");
+    FixtureLog log;
+    util::deleteFile(filename);
+    util::write_file(filename, "this is an invalid file");
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-    OfflineDatabase db("test/fixtures/offline_database/invalid.db");
+    OfflineDatabase db(filename);
 
     auto observer = Log::removeObserver();
     auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
@@ -137,11 +108,11 @@ TEST(OfflineDatabase, PutResource) {
 }
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(GetResourceFromOfflineRegion)) {
-    createDir("test/fixtures/offline_database");
-    deleteFile("test/fixtures/offline_database/satellite.db");
-    copyFile("test/fixtures/offline_database/satellite_test.db", "test/fixtures/offline_database/satellite.db");
+    FixtureLog log;
+    util::deleteFile(filename);
+    util::copyFile(filename, "test/fixtures/offline_database/satellite_test.db");
 
-    OfflineDatabase db("test/fixtures/offline_database/satellite.db", mapbox::sqlite::ReadOnly);
+    OfflineDatabase db(filename, mapbox::sqlite::ReadOnly);
 
     Resource resource = Resource::style("mapbox://styles/mapbox/satellite-v9");
     ASSERT_TRUE(db.get(resource));
@@ -315,11 +286,11 @@ TEST(OfflineDatabase, CreateRegionInfiniteMaxZoom) {
 }
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
-    createDir("test/fixtures/offline_database");
-    deleteFile("test/fixtures/offline_database/offline.db");
+    FixtureLog log;
+    util::deleteFile(filename);
 
-    OfflineDatabase db1("test/fixtures/offline_database/offline.db");
-    OfflineDatabase db2("test/fixtures/offline_database/offline.db");
+    OfflineDatabase db1(filename);
+    OfflineDatabase db2(filename);
 
     Resource resource { Resource::Style, "http://example.com/" };
     Response response;
@@ -646,106 +617,106 @@ static std::vector<std::string> databaseTableColumns(const std::string& path, co
 TEST(OfflineDatabase, MigrateFromV2Schema) {
     // v2.db is a v2 database containing a single offline region with a small number of resources.
 
-    deleteFile("test/fixtures/offline_database/migrated.db");
-    writeFile("test/fixtures/offline_database/migrated.db", util::read_file("test/fixtures/offline_database/v2.db"));
+    util::deleteFile(filename);
+    util::copyFile(filename, "test/fixtures/offline_database/v2.db");
 
     {
-        OfflineDatabase db("test/fixtures/offline_database/migrated.db", 0);
+        OfflineDatabase db(filename, 0);
         auto regions = db.listRegions();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
         }
     }
 
-    EXPECT_EQ(6, databaseUserVersion("test/fixtures/offline_database/migrated.db"));
-    EXPECT_LT(databasePageCount("test/fixtures/offline_database/migrated.db"),
+    EXPECT_EQ(6, databaseUserVersion(filename));
+    EXPECT_LT(databasePageCount(filename),
               databasePageCount("test/fixtures/offline_database/v2.db"));
 }
 
 TEST(OfflineDatabase, MigrateFromV3Schema) {
     // v3.db is a v3 database, migrated from v2.
 
-    deleteFile("test/fixtures/offline_database/migrated.db");
-    writeFile("test/fixtures/offline_database/migrated.db", util::read_file("test/fixtures/offline_database/v3.db"));
+    util::deleteFile(filename);
+    util::copyFile(filename, "test/fixtures/offline_database/v3.db");
 
     {
-        OfflineDatabase db("test/fixtures/offline_database/migrated.db", 0);
+        OfflineDatabase db(filename, 0);
         auto regions = db.listRegions();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
         }
     }
 
-    EXPECT_EQ(6, databaseUserVersion("test/fixtures/offline_database/migrated.db"));
+    EXPECT_EQ(6, databaseUserVersion(filename));
 }
 
 TEST(OfflineDatabase, MigrateFromV4Schema) {
     // v4.db is a v4 database, migrated from v2 & v3. This database used `journal_mode = WAL` and `synchronous = NORMAL`.
 
-    deleteFile("test/fixtures/offline_database/migrated.db");
-    writeFile("test/fixtures/offline_database/migrated.db", util::read_file("test/fixtures/offline_database/v4.db"));
+    util::deleteFile(filename);
+    util::copyFile(filename, "test/fixtures/offline_database/v4.db");
 
     {
-        OfflineDatabase db("test/fixtures/offline_database/migrated.db", 0);
+        OfflineDatabase db(filename, 0);
         auto regions = db.listRegions();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
         }
     }
 
-    EXPECT_EQ(6, databaseUserVersion("test/fixtures/offline_database/migrated.db"));
+    EXPECT_EQ(6, databaseUserVersion(filename));
 
     // Journal mode should be DELETE after migration to v5.
-    EXPECT_EQ("delete", databaseJournalMode("test/fixtures/offline_database/migrated.db"));
+    EXPECT_EQ("delete", databaseJournalMode(filename));
 
     // Synchronous setting should be FULL (2) after migration to v5.
-    EXPECT_EQ(2, databaseSyncMode("test/fixtures/offline_database/migrated.db"));
+    EXPECT_EQ(2, databaseSyncMode(filename));
 }
 
 
 TEST(OfflineDatabase, MigrateFromV5Schema) {
     // v5.db is a v5 database, migrated from v2, v3 & v4.
 
-    deleteFile("test/fixtures/offline_database/migrated.db");
-    writeFile("test/fixtures/offline_database/migrated.db", util::read_file("test/fixtures/offline_database/v5.db"));
+    util::deleteFile(filename);
+    util::copyFile(filename, "test/fixtures/offline_database/v5.db");
 
     {
-        OfflineDatabase db("test/fixtures/offline_database/migrated.db", 0);
+        OfflineDatabase db(filename, 0);
         auto regions = db.listRegions();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
         }
     }
 
-    EXPECT_EQ(6, databaseUserVersion("test/fixtures/offline_database/migrated.db"));
+    EXPECT_EQ(6, databaseUserVersion(filename));
 
     EXPECT_EQ((std::vector<std::string>{ "id", "url_template", "pixel_ratio", "z", "x", "y",
                                          "expires", "modified", "etag", "data", "compressed",
                                          "accessed", "must_revalidate" }),
-              databaseTableColumns("test/fixtures/offline_database/migrated.db", "tiles"));
+              databaseTableColumns(filename, "tiles"));
     EXPECT_EQ((std::vector<std::string>{ "id", "url", "kind", "expires", "modified", "etag", "data",
                                          "compressed", "accessed", "must_revalidate" }),
-              databaseTableColumns("test/fixtures/offline_database/migrated.db", "resources"));
+              databaseTableColumns(filename, "resources"));
 }
 
 TEST(OfflineDatabase, DowngradeSchema) {
     // v999.db is a v999 database, it should be deleted
     // and recreated with the current schema.
 
-    deleteFile("test/fixtures/offline_database/migrated.db");
-    writeFile("test/fixtures/offline_database/migrated.db", util::read_file("test/fixtures/offline_database/v999.db"));
+    util::deleteFile(filename);
+    util::copyFile(filename, "test/fixtures/offline_database/v999.db");
 
     {
-        OfflineDatabase db("test/fixtures/offline_database/migrated.db", 0);
+        OfflineDatabase db(filename, 0);
     }
 
-    EXPECT_EQ(6, databaseUserVersion("test/fixtures/offline_database/migrated.db"));
+    EXPECT_EQ(6, databaseUserVersion(filename));
 
     EXPECT_EQ((std::vector<std::string>{ "id", "url_template", "pixel_ratio", "z", "x", "y",
                                          "expires", "modified", "etag", "data", "compressed",
                                          "accessed", "must_revalidate" }),
-              databaseTableColumns("test/fixtures/offline_database/migrated.db", "tiles"));
+              databaseTableColumns(filename, "tiles"));
     EXPECT_EQ((std::vector<std::string>{ "id", "url", "kind", "expires", "modified", "etag", "data",
                                          "compressed", "accessed", "must_revalidate" }),
-              databaseTableColumns("test/fixtures/offline_database/migrated.db", "resources"));
+              databaseTableColumns(filename, "resources"));
 }
