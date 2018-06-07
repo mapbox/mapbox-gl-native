@@ -5,9 +5,11 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.mapbox.mapboxsdk.utils.MapFragmentUtils;
 
 import java.util.ArrayList;
@@ -53,6 +55,19 @@ public final class MapFragment extends Fragment implements OnMapReadyCallback {
     MapFragment mapFragment = new MapFragment();
     mapFragment.setArguments(MapFragmentUtils.createFragmentArgs(mapboxMapOptions));
     return mapFragment;
+  }
+
+  /**
+   * Called when this fragment is inflated, parses XML tag attributes.
+   *
+   * @param context            The context inflating this fragment.
+   * @param attrs              The XML tag attributes.
+   * @param savedInstanceState The saved instance state for the map fragment.
+   */
+  @Override
+  public void onInflate(Context context, AttributeSet attrs, Bundle savedInstanceState) {
+    super.onInflate(context, attrs, savedInstanceState);
+    setArguments(MapFragmentUtils.createFragmentArgs(MapboxMapOptions.createFromAttributes(context, attrs)));
   }
 
   /**
