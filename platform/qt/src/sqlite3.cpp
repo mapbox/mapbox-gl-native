@@ -113,10 +113,6 @@ mapbox::util::variant<Database, Exception> Database::tryOpen(const std::string &
         if (!connectOptions.isEmpty()) connectOptions.append(';');
         connectOptions.append("QSQLITE_OPEN_READONLY");
     }
-    if (flags & OpenFlag::SharedCache) {
-        if (!connectOptions.isEmpty()) connectOptions.append(';');
-        connectOptions.append("QSQLITE_ENABLE_SHARED_CACHE");
-    }
 
     db.setConnectOptions(connectOptions);
     db.setDatabaseName(QString(filename.c_str()));

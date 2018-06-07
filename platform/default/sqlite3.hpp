@@ -14,10 +14,6 @@ enum OpenFlag : int {
     ReadOnly = 0x00000001,
     ReadWrite = 0x00000002,
     Create = 0x00000004,
-    NoMutex = 0x00008000,
-    FullMutex = 0x00010000,
-    SharedCache = 0x00020000,
-    PrivateCache = 0x00040000,
 };
 
 enum class ResultCode : int {
