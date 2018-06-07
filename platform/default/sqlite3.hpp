@@ -11,9 +11,8 @@ namespace mapbox {
 namespace sqlite {
 
 enum OpenFlag : int {
-    ReadOnly = 0x00000001,
-    ReadWrite = 0x00000002,
-    Create = 0x00000004,
+    ReadOnly        = 0b001,
+    ReadWriteCreate = 0b110,
 };
 
 enum class ResultCode : int {

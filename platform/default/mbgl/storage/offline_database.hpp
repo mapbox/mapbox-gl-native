@@ -70,6 +70,7 @@ private:
     int userVersion();
     void ensureSchema();
     void removeExisting();
+    void removeOldCacheTable();
     void migrateToVersion3();
     void migrateToVersion5();
     void migrateToVersion6();

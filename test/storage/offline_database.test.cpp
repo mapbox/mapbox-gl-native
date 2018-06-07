@@ -23,17 +23,6 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) {
     OfflineDatabase db(filename);
     EXPECT_FALSE(bool(db.get({ Resource::Unknown, "mapbox://test" })));
 
-#ifdef __QT__
-    // Qt doesn't support opening a SQLite database without also creating it if it doesn't exist yet.
-    // Therefore, we're currently using the code path that thinks that we opened an old database
-    // (user_version = 0), deletes and recreates the database.
-    EXPECT_EQ(1u, log.count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
-#endif
-#ifndef __QT__
-    // Only non-Qt platforms are setting a logger on the SQLite object.
-    EXPECT_EQ(1u, log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::CantOpen), "cannot open file" }, true));
-    EXPECT_EQ(1u, log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::CantOpen), "No such file or directory" }, true));
-#endif
     EXPECT_EQ(0u, log.uncheckedCount());
 }
 
@@ -42,13 +31,12 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) {
     util::deleteFile(filename);
 
     {
-        mapbox::sqlite::Database db = mapbox::sqlite::Database::open(filename, mapbox::sqlite::Create | mapbox::sqlite::ReadWrite);
+        mapbox::sqlite::Database db = mapbox::sqlite::Database::open(filename, mapbox::sqlite::ReadWriteCreate);
         db.exec("PRAGMA user_version = 1");
     }
 
     OfflineDatabase db(filename);
 
-    EXPECT_EQ(1u, log.count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
     EXPECT_EQ(0u, log.uncheckedCount());
 }
 
@@ -339,17 +327,6 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
     util::deleteFile(filename);
 
     OfflineDatabase db1(filename);
-#ifdef __QT__
-    // Qt doesn't support opening a SQLite database without also creating it if it doesn't exist yet.
-    // Therefore, we're currently using the code path that thinks that we opened an old database
-    // (user_version = 0), deletes and recreates the database.
-    EXPECT_EQ(1u, log.count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
-#endif
-#ifndef __QT__
-    // Only non-Qt platforms are setting a logger on the SQLite object.
-    EXPECT_EQ(1u, log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::CantOpen), "cannot open file" }, true));
-    EXPECT_EQ(1u, log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::CantOpen), "No such file or directory" }, true));
-#endif
     EXPECT_EQ(0u, log.uncheckedCount());
 
     OfflineDatabase db2(filename);
