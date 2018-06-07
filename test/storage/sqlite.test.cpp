@@ -8,7 +8,7 @@ using namespace mbgl;
 TEST(SQLite, Statement) {
     using namespace mbgl;
 
-    mapbox::sqlite::Database db = mapbox::sqlite::Database::open(":memory:", mapbox::sqlite::Create | mapbox::sqlite::ReadWrite);
+    mapbox::sqlite::Database db = mapbox::sqlite::Database::open(":memory:", mapbox::sqlite::ReadWriteCreate);
     db.exec("CREATE TABLE test (id INTEGER);");
 
     mapbox::sqlite::Statement stmt1{ db, "INSERT INTO test (id) VALUES (?1);" };
@@ -49,7 +49,7 @@ TEST(SQLite, TEST_REQUIRES_WRITE(TryOpen)) {
 
 TEST(SQLite, CloseDatabaseWithPendingTransaction) {
     auto db = std::make_unique<mapbox::sqlite::Database>(mapbox::sqlite::Database::open(
-        ":memory:", mapbox::sqlite::ReadWrite | mapbox::sqlite::Create));
+        ":memory:", mapbox::sqlite::ReadWriteCreate));
     mapbox::sqlite::Transaction transaction(*db);
     transaction.commit();
 }
@@ -58,7 +58,7 @@ TEST(SQLite, CloseMovedDatabaseWithPendingTransaction) {
     // Verifies that we can correctly commit a transaction even if we move the Database object to
     // another address.
     auto db1 = mapbox::sqlite::Database::open(":memory:",
-                                              mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
+                                              mapbox::sqlite::ReadWriteCreate);
     std::unique_ptr<mapbox::sqlite::Database> db2;
     mapbox::sqlite::Transaction transaction(db1);
     db2 = std::make_unique<mapbox::sqlite::Database>(std::move(db1));
