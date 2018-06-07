@@ -27,6 +27,9 @@ public:
         }
     }
 
+    void setBusyTimeout(std::chrono::milliseconds timeout);
+    void exec(const std::string& sql);
+
     sqlite3* db;
 };
 
@@ -116,23 +119,31 @@ Database::~Database() = default;
 
 void Database::setBusyTimeout(std::chrono::milliseconds timeout) {
     assert(impl);
-    const int err = sqlite3_busy_timeout(impl->db,
+    impl->setBusyTimeout(timeout);
+}
+
+void DatabaseImpl::setBusyTimeout(std::chrono::milliseconds timeout) {
+    const int err = sqlite3_busy_timeout(db,
         int(std::min<std::chrono::milliseconds::rep>(timeout.count(), std::numeric_limits<int>::max())));
     if (err != SQLITE_OK) {
-        throw Exception { err, sqlite3_errmsg(impl->db) };
+        throw Exception { err, sqlite3_errmsg(db) };
     }
 }
 
 void Database::exec(const std::string &sql) {
     assert(impl);
+    impl->exec(sql);
+}
+
+void DatabaseImpl::exec(const std::string& sql) {
     char *msg = nullptr;
-    const int err = sqlite3_exec(impl->db, sql.c_str(), nullptr, nullptr, &msg);
+    const int err = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &msg);
     if (msg) {
         const std::string message = msg;
         sqlite3_free(msg);
         throw Exception { err, message };
     } else if (err != SQLITE_OK) {
-        throw Exception { err, sqlite3_errmsg(impl->db) };
+        throw Exception { err, sqlite3_errmsg(db) };
     }
 }
 
@@ -405,16 +416,16 @@ uint64_t Query::changes() const {
 }
 
 Transaction::Transaction(Database& db_, Mode mode)
-    : db(db_) {
+    : dbImpl(*db_.impl) {
     switch (mode) {
     case Deferred:
-        db.exec("BEGIN DEFERRED TRANSACTION");
+        dbImpl.exec("BEGIN DEFERRED TRANSACTION");
         break;
     case Immediate:
-        db.exec("BEGIN IMMEDIATE TRANSACTION");
+        dbImpl.exec("BEGIN IMMEDIATE TRANSACTION");
         break;
     case Exclusive:
-        db.exec("BEGIN EXCLUSIVE TRANSACTION");
+        dbImpl.exec("BEGIN EXCLUSIVE TRANSACTION");
         break;
     }
 }
@@ -431,12 +442,12 @@ Transaction::~Transaction() {
 
 void Transaction::commit() {
     needRollback = false;
-    db.exec("COMMIT TRANSACTION");
+    dbImpl.exec("COMMIT TRANSACTION");
 }
 
 void Transaction::rollback() {
     needRollback = false;
-    db.exec("ROLLBACK TRANSACTION");
+    dbImpl.exec("ROLLBACK TRANSACTION");
 }
 
 } // namespace sqlite
