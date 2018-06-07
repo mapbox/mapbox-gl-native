@@ -2,6 +2,11 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.2.0-beta.2 - June 7, 2018
+ - Ensure that camera is invalidated before generating telemetry event [#12042](https://github.com/mapbox/mapbox-gl-native/pull/12042)
+ - Offline download batches [#11284](https://github.com/mapbox/mapbox-gl-native/pull/11284)
+ - Parse Fragment's xml attributes [#12078](https://github.com/mapbox/mapbox-gl-native/pull/12078)
+ 
 ## 6.2.0-beta.1 - May 31, 2018
  - Bump mapbox-java to 3.2.0 [#12036](https://github.com/mapbox/mapbox-gl-native/pull/12036)
  - Optional camera position for map snapshotter [#12028](https://github.com/mapbox/mapbox-gl-native/pull/12029)
