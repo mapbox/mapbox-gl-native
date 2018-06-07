@@ -63,7 +63,7 @@ class Placement {
 public:
     Placement(const TransformState&, MapMode mapMode);
     void placeLayer(RenderSymbolLayer&, const mat4&, bool showCollisionBoxes);
-    bool commit(const Placement& prevPlacement, TimePoint);
+    void commit(const Placement& prevPlacement, TimePoint);
     void updateLayerOpacities(RenderSymbolLayer&);
     float symbolFadeChange(TimePoint now) const;
     bool hasTransitions(TimePoint now) const;
@@ -94,12 +94,12 @@ private:
 
     TransformState state;
     MapMode mapMode;
+    TimePoint fadeStartTime;
     TimePoint commitTime;
 
     std::unordered_map<uint32_t, JointPlacement> placements;
     std::unordered_map<uint32_t, JointOpacityState> opacities;
 
-    TimePoint recentUntil;
     bool stale = false;
     
     std::unordered_map<uint32_t, RetainedQueryData> retainedQueryData;
