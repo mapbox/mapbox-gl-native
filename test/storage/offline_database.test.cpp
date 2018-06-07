@@ -13,6 +13,7 @@
 #include <random>
 
 using namespace std::literals::string_literals;
+using namespace mbgl;
 
 namespace {
 
@@ -35,18 +36,16 @@ void deleteFile(const char* name) {
 }
 
 void writeFile(const char* name, const std::string& data) {
-    mbgl::util::write_file(name, data);
+    util::write_file(name, data);
 }
 
 void copyFile(const char* orig, const char* dest) {
-    mbgl::util::write_file(dest, mbgl::util::read_file(orig));
+    util::write_file(dest, util::read_file(orig));
 }
 
 } // namespace
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) {
-    using namespace mbgl;
-
     createDir("test/fixtures/offline_database");
     deleteFile("test/fixtures/offline_database/offline.db");
 
@@ -59,8 +58,6 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) {
 }
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) {
-    using namespace mbgl;
-
     createDir("test/fixtures/offline_database");
     deleteFile("test/fixtures/offline_database/offline.db");
     std::string path("test/fixtures/offline_database/offline.db");
@@ -79,8 +76,6 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) {
 }
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Invalid)) {
-    using namespace mbgl;
-
     createDir("test/fixtures/offline_database");
     deleteFile("test/fixtures/offline_database/invalid.db");
     writeFile("test/fixtures/offline_database/invalid.db", "this is an invalid file");
@@ -95,8 +90,6 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Invalid)) {
 }
 
 TEST(OfflineDatabase, PutDoesNotStoreConnectionErrors) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
 
     Resource resource { Resource::Unknown, "http://example.com/" };
@@ -108,8 +101,6 @@ TEST(OfflineDatabase, PutDoesNotStoreConnectionErrors) {
 }
 
 TEST(OfflineDatabase, PutDoesNotStoreServerErrors) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
 
     Resource resource { Resource::Unknown, "http://example.com/" };
@@ -121,8 +112,6 @@ TEST(OfflineDatabase, PutDoesNotStoreServerErrors) {
 }
 
 TEST(OfflineDatabase, PutResource) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
 
     Resource resource { Resource::Style, "http://example.com/" };
@@ -148,8 +137,6 @@ TEST(OfflineDatabase, PutResource) {
 }
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(GetResourceFromOfflineRegion)) {
-    using namespace mbgl;
-
     createDir("test/fixtures/offline_database");
     deleteFile("test/fixtures/offline_database/satellite.db");
     copyFile("test/fixtures/offline_database/satellite_test.db", "test/fixtures/offline_database/satellite.db");
@@ -161,8 +148,6 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(GetResourceFromOfflineRegion)) {
 }
 
 TEST(OfflineDatabase, PutAndGetResource) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
 
     Response response1;
@@ -178,8 +163,6 @@ TEST(OfflineDatabase, PutAndGetResource) {
 }
 
 TEST(OfflineDatabase, PutTile) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
 
     Resource resource { Resource::Tile, "http://example.com/" };
@@ -212,8 +195,6 @@ TEST(OfflineDatabase, PutTile) {
 }
 
 TEST(OfflineDatabase, PutResourceNoContent) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
 
     Resource resource { Resource::Style, "http://example.com/" };
@@ -228,8 +209,6 @@ TEST(OfflineDatabase, PutResourceNoContent) {
 }
 
 TEST(OfflineDatabase, PutTileNotFound) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
 
     Resource resource { Resource::Tile, "http://example.com/" };
@@ -251,8 +230,6 @@ TEST(OfflineDatabase, PutTileNotFound) {
 }
 
 TEST(OfflineDatabase, CreateRegion) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
     OfflineRegionMetadata metadata {{ 1, 2, 3 }};
@@ -267,8 +244,6 @@ TEST(OfflineDatabase, CreateRegion) {
 }
 
 TEST(OfflineDatabase, UpdateMetadata) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
     OfflineRegionMetadata metadata {{ 1, 2, 3 }};
@@ -280,8 +255,6 @@ TEST(OfflineDatabase, UpdateMetadata) {
 }
 
 TEST(OfflineDatabase, ListRegions) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
     OfflineRegionMetadata metadata {{ 1, 2, 3 }};
@@ -300,8 +273,6 @@ TEST(OfflineDatabase, ListRegions) {
 }
 
 TEST(OfflineDatabase, GetRegionDefinition) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
     OfflineRegionMetadata metadata {{ 1, 2, 3 }};
@@ -317,8 +288,6 @@ TEST(OfflineDatabase, GetRegionDefinition) {
 }
 
 TEST(OfflineDatabase, DeleteRegion) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
     OfflineRegionMetadata metadata {{ 1, 2, 3 }};
@@ -336,8 +305,6 @@ TEST(OfflineDatabase, DeleteRegion) {
 }
 
 TEST(OfflineDatabase, CreateRegionInfiniteMaxZoom) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
     OfflineRegionMetadata metadata;
@@ -348,8 +315,6 @@ TEST(OfflineDatabase, CreateRegionInfiniteMaxZoom) {
 }
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
-    using namespace mbgl;
-
     createDir("test/fixtures/offline_database");
     deleteFile("test/fixtures/offline_database/offline.db");
 
@@ -390,8 +355,6 @@ static std::shared_ptr<std::string> randomString(size_t size) {
 }
 
 TEST(OfflineDatabase, PutReturnsSize) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
 
     Response compressible;
@@ -408,8 +371,6 @@ TEST(OfflineDatabase, PutReturnsSize) {
 }
 
 TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:", 1024 * 100);
 
     Response response;
@@ -425,8 +386,6 @@ TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
 }
 
 TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:", 1024 * 100);
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
     OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
@@ -443,8 +402,6 @@ TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
 }
 
 TEST(OfflineDatabase, PutFailsWhenEvictionInsuffices) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:", 1024 * 100);
 
     Response big;
@@ -455,8 +412,6 @@ TEST(OfflineDatabase, PutFailsWhenEvictionInsuffices) {
 }
 
 TEST(OfflineDatabase, GetRegionCompletedStatus) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
     OfflineRegionMetadata metadata;
@@ -489,8 +444,6 @@ TEST(OfflineDatabase, GetRegionCompletedStatus) {
 }
 
 TEST(OfflineDatabase, HasRegionResource) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:", 1024 * 100);
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
     OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
@@ -511,8 +464,6 @@ TEST(OfflineDatabase, HasRegionResource) {
 }
 
 TEST(OfflineDatabase, HasRegionResourceTile) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:", 1024 * 100);
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
     OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
@@ -542,8 +493,6 @@ TEST(OfflineDatabase, HasRegionResourceTile) {
 }
 
 TEST(OfflineDatabase, OfflineMapboxTileCount) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
     OfflineRegionMetadata metadata;
@@ -600,8 +549,6 @@ TEST(OfflineDatabase, OfflineMapboxTileCount) {
 
 
 TEST(OfflineDatabase, BatchInsertion) {
-    using namespace mbgl;
-
     OfflineDatabase db(":memory:", 1024 * 100);
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
     OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
@@ -697,8 +644,6 @@ static std::vector<std::string> databaseTableColumns(const std::string& path, co
 }
 
 TEST(OfflineDatabase, MigrateFromV2Schema) {
-    using namespace mbgl;
-
     // v2.db is a v2 database containing a single offline region with a small number of resources.
 
     deleteFile("test/fixtures/offline_database/migrated.db");
@@ -718,8 +663,6 @@ TEST(OfflineDatabase, MigrateFromV2Schema) {
 }
 
 TEST(OfflineDatabase, MigrateFromV3Schema) {
-    using namespace mbgl;
-
     // v3.db is a v3 database, migrated from v2.
 
     deleteFile("test/fixtures/offline_database/migrated.db");
@@ -737,8 +680,6 @@ TEST(OfflineDatabase, MigrateFromV3Schema) {
 }
 
 TEST(OfflineDatabase, MigrateFromV4Schema) {
-    using namespace mbgl;
-
     // v4.db is a v4 database, migrated from v2 & v3. This database used `journal_mode = WAL` and `synchronous = NORMAL`.
 
     deleteFile("test/fixtures/offline_database/migrated.db");
@@ -763,8 +704,6 @@ TEST(OfflineDatabase, MigrateFromV4Schema) {
 
 
 TEST(OfflineDatabase, MigrateFromV5Schema) {
-    using namespace mbgl;
-
     // v5.db is a v5 database, migrated from v2, v3 & v4.
 
     deleteFile("test/fixtures/offline_database/migrated.db");
@@ -790,8 +729,6 @@ TEST(OfflineDatabase, MigrateFromV5Schema) {
 }
 
 TEST(OfflineDatabase, DowngradeSchema) {
-    using namespace mbgl;
-
     // v999.db is a v999 database, it should be deleted
     // and recreated with the current schema.
 
