@@ -387,6 +387,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     bool placementChanged = false;
     if (!placement->stillRecent(parameters.timePoint)) {
+        placementChanged = true;
+
         auto newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode);
         std::set<std::string> usedSymbolLayers;
         for (auto it = order.rbegin(); it != order.rend(); ++it) {
@@ -396,13 +398,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             }
         }
 
-        placementChanged = newPlacement->commit(*placement, parameters.timePoint);
+        newPlacement->commit(*placement, parameters.timePoint);
         crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
-        if (placementChanged || symbolBucketsChanged) {
-            placement = std::move(newPlacement);
-        }
-
-        placement->setRecent(parameters.timePoint);
+        placement = std::move(newPlacement);
         
         updateFadingTiles();
     } else {
