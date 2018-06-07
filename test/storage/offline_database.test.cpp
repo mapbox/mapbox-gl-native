@@ -7,7 +7,6 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/string.hpp>
 
-#include <gtest/gtest.h>
 #include <sqlite3.hpp>
 #include <thread>
 #include <random>
