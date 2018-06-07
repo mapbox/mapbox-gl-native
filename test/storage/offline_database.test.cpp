@@ -21,12 +21,21 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) {
     FixtureLog log;
     util::deleteFile(filename);
 
-    Log::setObserver(std::make_unique<FixtureLogObserver>());
-
     OfflineDatabase db(filename);
     EXPECT_FALSE(bool(db.get({ Resource::Unknown, "mapbox://test" })));
 
-    Log::removeObserver();
+#ifdef __QT__
+    // Qt doesn't support opening a SQLite database without also creating it if it doesn't exist yet.
+    // Therefore, we're currently using the code path that thinks that we opened an old database
+    // (user_version = 0), deletes and recreates the database.
+    EXPECT_EQ(1u, log.count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
+#endif
+#ifndef __QT__
+    // Only non-Qt platforms are setting a logger on the SQLite object.
+    EXPECT_EQ(1u, log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::CantOpen), "cannot open file" }, true));
+    EXPECT_EQ(1u, log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::CantOpen), "No such file or directory" }, true));
+#endif
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) {
@@ -38,12 +47,10 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) {
         db.exec("PRAGMA user_version = 1");
     }
 
-    Log::setObserver(std::make_unique<FixtureLogObserver>());
     OfflineDatabase db(filename);
 
-    auto observer = Log::removeObserver();
-    auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
-    EXPECT_EQ(1u, flo->count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
+    EXPECT_EQ(1u, log.count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Invalid)) {
@@ -51,16 +58,19 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Invalid)) {
     util::deleteFile(filename);
     util::write_file(filename, "this is an invalid file");
 
-    Log::setObserver(std::make_unique<FixtureLogObserver>());
-
     OfflineDatabase db(filename);
 
-    auto observer = Log::removeObserver();
-    auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
-    EXPECT_EQ(1u, flo->count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
+#ifndef __QT__
+    // Only non-Qt platforms are setting a logger on the SQLite object.
+    EXPECT_EQ(1u, log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::NotADB),
+        "statement aborts at 1: [PRAGMA user_version] file is encrypted or is not a database" }, true));
+#endif
+    EXPECT_EQ(1u, log.count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, PutDoesNotStoreConnectionErrors) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
 
     Resource resource { Resource::Unknown, "http://example.com/" };
@@ -69,9 +79,12 @@ TEST(OfflineDatabase, PutDoesNotStoreConnectionErrors) {
 
     db.put(resource, response);
     EXPECT_FALSE(bool(db.get(resource)));
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, PutDoesNotStoreServerErrors) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
 
     Resource resource { Resource::Unknown, "http://example.com/" };
@@ -80,9 +93,12 @@ TEST(OfflineDatabase, PutDoesNotStoreServerErrors) {
 
     db.put(resource, response);
     EXPECT_FALSE(bool(db.get(resource)));
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, PutResource) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
 
     Resource resource { Resource::Style, "http://example.com/" };
@@ -105,6 +121,8 @@ TEST(OfflineDatabase, PutResource) {
     auto updateGetResult = db.get(resource);
     EXPECT_EQ(nullptr, updateGetResult->error.get());
     EXPECT_EQ("second", *updateGetResult->data);
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(GetResourceFromOfflineRegion)) {
@@ -116,9 +134,12 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(GetResourceFromOfflineRegion)) {
 
     Resource resource = Resource::style("mapbox://styles/mapbox/satellite-v9");
     ASSERT_TRUE(db.get(resource));
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, PutAndGetResource) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
 
     Response response1;
@@ -131,9 +152,12 @@ TEST(OfflineDatabase, PutAndGetResource) {
     auto response2 = db.get(resource);
 
     ASSERT_EQ(*response1.data, *(*response2).data);
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, PutTile) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
 
     Resource resource { Resource::Tile, "http://example.com/" };
@@ -163,9 +187,12 @@ TEST(OfflineDatabase, PutTile) {
     auto updateGetResult = db.get(resource);
     EXPECT_EQ(nullptr, updateGetResult->error.get());
     EXPECT_EQ("second", *updateGetResult->data);
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, PutResourceNoContent) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
 
     Resource resource { Resource::Style, "http://example.com/" };
@@ -177,9 +204,12 @@ TEST(OfflineDatabase, PutResourceNoContent) {
     EXPECT_EQ(nullptr, res->error);
     EXPECT_TRUE(res->noContent);
     EXPECT_FALSE(res->data.get());
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, PutTileNotFound) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
 
     Resource resource { Resource::Tile, "http://example.com/" };
@@ -198,9 +228,12 @@ TEST(OfflineDatabase, PutTileNotFound) {
     EXPECT_EQ(nullptr, res->error);
     EXPECT_TRUE(res->noContent);
     EXPECT_FALSE(res->data.get());
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, CreateRegion) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
     OfflineRegionMetadata metadata {{ 1, 2, 3 }};
@@ -212,9 +245,12 @@ TEST(OfflineDatabase, CreateRegion) {
     EXPECT_EQ(definition.maxZoom, region.getDefinition().maxZoom);
     EXPECT_EQ(definition.pixelRatio, region.getDefinition().pixelRatio);
     EXPECT_EQ(metadata, region.getMetadata());
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, UpdateMetadata) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
     OfflineRegionMetadata metadata {{ 1, 2, 3 }};
@@ -223,9 +259,12 @@ TEST(OfflineDatabase, UpdateMetadata) {
     OfflineRegionMetadata newmetadata {{ 4, 5, 6 }};
     db.updateMetadata(region.getID(), newmetadata);
     EXPECT_EQ(db.listRegions().at(0).getMetadata(), newmetadata);
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, ListRegions) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
     OfflineRegionMetadata metadata {{ 1, 2, 3 }};
@@ -241,9 +280,12 @@ TEST(OfflineDatabase, ListRegions) {
     EXPECT_EQ(definition.maxZoom, regions.at(0).getDefinition().maxZoom);
     EXPECT_EQ(definition.pixelRatio, regions.at(0).getDefinition().pixelRatio);
     EXPECT_EQ(metadata, regions.at(0).getMetadata());
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, GetRegionDefinition) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
     OfflineRegionMetadata metadata {{ 1, 2, 3 }};
@@ -256,9 +298,12 @@ TEST(OfflineDatabase, GetRegionDefinition) {
     EXPECT_EQ(definition.minZoom, result.minZoom);
     EXPECT_EQ(definition.maxZoom, result.maxZoom);
     EXPECT_EQ(definition.pixelRatio, result.pixelRatio);
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, DeleteRegion) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
     OfflineRegionMetadata metadata {{ 1, 2, 3 }};
@@ -273,9 +318,12 @@ TEST(OfflineDatabase, DeleteRegion) {
     db.deleteRegion(std::move(region));
 
     ASSERT_EQ(0u, db.listRegions().size());
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, CreateRegionInfiniteMaxZoom) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
     OfflineRegionMetadata metadata;
@@ -283,6 +331,8 @@ TEST(OfflineDatabase, CreateRegionInfiniteMaxZoom) {
 
     EXPECT_EQ(0, region.getDefinition().minZoom);
     EXPECT_EQ(INFINITY, region.getDefinition().maxZoom);
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
@@ -290,6 +340,19 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
     util::deleteFile(filename);
 
     OfflineDatabase db1(filename);
+#ifdef __QT__
+    // Qt doesn't support opening a SQLite database without also creating it if it doesn't exist yet.
+    // Therefore, we're currently using the code path that thinks that we opened an old database
+    // (user_version = 0), deletes and recreates the database.
+    EXPECT_EQ(1u, log.count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
+#endif
+#ifndef __QT__
+    // Only non-Qt platforms are setting a logger on the SQLite object.
+    EXPECT_EQ(1u, log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::CantOpen), "cannot open file" }, true));
+    EXPECT_EQ(1u, log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::CantOpen), "No such file or directory" }, true));
+#endif
+    EXPECT_EQ(0u, log.uncheckedCount());
+
     OfflineDatabase db2(filename);
 
     Resource resource { Resource::Style, "http://example.com/" };
@@ -312,6 +375,8 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
 
     thread1.join();
     thread2.join();
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 static std::shared_ptr<std::string> randomString(size_t size) {
@@ -326,6 +391,7 @@ static std::shared_ptr<std::string> randomString(size_t size) {
 }
 
 TEST(OfflineDatabase, PutReturnsSize) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
 
     Response compressible;
@@ -339,9 +405,12 @@ TEST(OfflineDatabase, PutReturnsSize) {
     Response noContent;
     noContent.noContent = true;
     EXPECT_EQ(0u, db.put(Resource::style("http://example.com/noContent"), noContent).second);
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
+    FixtureLog log;
     OfflineDatabase db(":memory:", 1024 * 100);
 
     Response response;
@@ -354,9 +423,12 @@ TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
     }
 
     EXPECT_FALSE(bool(db.get(Resource::style("http://example.com/1"))));
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
+    FixtureLog log;
     OfflineDatabase db(":memory:", 1024 * 100);
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
     OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
@@ -370,19 +442,29 @@ TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
 
     EXPECT_TRUE(bool(db.get(Resource::style("http://example.com/1"))));
     EXPECT_TRUE(bool(db.get(Resource::style("http://example.com/20"))));
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, PutFailsWhenEvictionInsuffices) {
+    FixtureLog log;
     OfflineDatabase db(":memory:", 1024 * 100);
 
     Response big;
     big.data = randomString(1024 * 100);
 
     EXPECT_FALSE(db.put(Resource::style("http://example.com/big"), big).first);
+
+    EXPECT_EQ(1u, log.count({ EventSeverity::Info, Event::Database, -1, "Unable to make space for entry" }));
+    EXPECT_EQ(0u, log.uncheckedCount());
+
     EXPECT_FALSE(bool(db.get(Resource::style("http://example.com/big"))));
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, GetRegionCompletedStatus) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
     OfflineRegionMetadata metadata;
@@ -412,9 +494,12 @@ TEST(OfflineDatabase, GetRegionCompletedStatus) {
     EXPECT_EQ(styleSize + tileSize, status3.completedResourceSize);
     EXPECT_EQ(1u, status3.completedTileCount);
     EXPECT_EQ(tileSize, status3.completedTileSize);
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, HasRegionResource) {
+    FixtureLog log;
     OfflineDatabase db(":memory:", 1024 * 100);
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
     OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
@@ -432,9 +517,12 @@ TEST(OfflineDatabase, HasRegionResource) {
     EXPECT_TRUE(bool(db.hasRegionResource(region.getID(), Resource::style("http://example.com/1"))));
     EXPECT_TRUE(bool(db.hasRegionResource(region.getID(), Resource::style("http://example.com/20"))));
     EXPECT_EQ(1024, *(db.hasRegionResource(region.getID(), Resource::style("http://example.com/20"))));
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, HasRegionResourceTile) {
+    FixtureLog log;
     OfflineDatabase db(":memory:", 1024 * 100);
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
     OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
@@ -461,9 +549,12 @@ TEST(OfflineDatabase, HasRegionResourceTile) {
     EXPECT_TRUE(bool(db.hasRegionResource(anotherRegion.getID(), resource)));
     EXPECT_EQ(5, *(db.hasRegionResource(anotherRegion.getID(), resource)));
 
+    EXPECT_EQ(0u, log.uncheckedCount());
+
 }
 
 TEST(OfflineDatabase, OfflineMapboxTileCount) {
+    FixtureLog log;
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
     OfflineRegionMetadata metadata;
@@ -516,10 +607,13 @@ TEST(OfflineDatabase, OfflineMapboxTileCount) {
     // Count decreases after deleting a region when the tiles are not used by other regions.
     db.deleteRegion(std::move(region1));
     EXPECT_EQ(0u, db.getOfflineMapboxTileCount());
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 
 TEST(OfflineDatabase, BatchInsertion) {
+    FixtureLog log;
     OfflineDatabase db(":memory:", 1024 * 100);
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
     OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
@@ -538,11 +632,12 @@ TEST(OfflineDatabase, BatchInsertion) {
     for (uint32_t i = 1; i <= 100; i++) {
         EXPECT_TRUE(bool(db.get(Resource::style("http://example.com/"s + util::toString(i)))));
     }
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, BatchInsertionMapboxTileCountExceeded) {
-    using namespace mbgl;
-    
+    FixtureLog log;
     OfflineDatabase db(":memory:", 1024 * 100);
     db.setOfflineMapboxTileCountLimit(1);
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
@@ -568,6 +663,8 @@ TEST(OfflineDatabase, BatchInsertionMapboxTileCountExceeded) {
     EXPECT_EQ(status.completedResourceCount, 2u);
     EXPECT_EQ(db.getRegionCompletedStatus(region.getID()).completedTileCount, 1u);
     EXPECT_EQ(db.getRegionCompletedStatus(region.getID()).completedResourceCount, 2u);
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 static int databasePageCount(const std::string& path) {
@@ -616,7 +713,7 @@ static std::vector<std::string> databaseTableColumns(const std::string& path, co
 
 TEST(OfflineDatabase, MigrateFromV2Schema) {
     // v2.db is a v2 database containing a single offline region with a small number of resources.
-
+    FixtureLog log;
     util::deleteFile(filename);
     util::copyFile(filename, "test/fixtures/offline_database/v2.db");
 
@@ -631,11 +728,13 @@ TEST(OfflineDatabase, MigrateFromV2Schema) {
     EXPECT_EQ(6, databaseUserVersion(filename));
     EXPECT_LT(databasePageCount(filename),
               databasePageCount("test/fixtures/offline_database/v2.db"));
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, MigrateFromV3Schema) {
     // v3.db is a v3 database, migrated from v2.
-
+    FixtureLog log;
     util::deleteFile(filename);
     util::copyFile(filename, "test/fixtures/offline_database/v3.db");
 
@@ -648,11 +747,13 @@ TEST(OfflineDatabase, MigrateFromV3Schema) {
     }
 
     EXPECT_EQ(6, databaseUserVersion(filename));
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, MigrateFromV4Schema) {
     // v4.db is a v4 database, migrated from v2 & v3. This database used `journal_mode = WAL` and `synchronous = NORMAL`.
-
+    FixtureLog log;
     util::deleteFile(filename);
     util::copyFile(filename, "test/fixtures/offline_database/v4.db");
 
@@ -671,12 +772,14 @@ TEST(OfflineDatabase, MigrateFromV4Schema) {
 
     // Synchronous setting should be FULL (2) after migration to v5.
     EXPECT_EQ(2, databaseSyncMode(filename));
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 
 TEST(OfflineDatabase, MigrateFromV5Schema) {
     // v5.db is a v5 database, migrated from v2, v3 & v4.
-
+    FixtureLog log;
     util::deleteFile(filename);
     util::copyFile(filename, "test/fixtures/offline_database/v5.db");
 
@@ -697,12 +800,14 @@ TEST(OfflineDatabase, MigrateFromV5Schema) {
     EXPECT_EQ((std::vector<std::string>{ "id", "url", "kind", "expires", "modified", "etag", "data",
                                          "compressed", "accessed", "must_revalidate" }),
               databaseTableColumns(filename, "resources"));
+
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
 
 TEST(OfflineDatabase, DowngradeSchema) {
     // v999.db is a v999 database, it should be deleted
     // and recreated with the current schema.
-
+    FixtureLog log;
     util::deleteFile(filename);
     util::copyFile(filename, "test/fixtures/offline_database/v999.db");
 
@@ -719,4 +824,7 @@ TEST(OfflineDatabase, DowngradeSchema) {
     EXPECT_EQ((std::vector<std::string>{ "id", "url", "kind", "expires", "modified", "etag", "data",
                                          "compressed", "accessed", "must_revalidate" }),
               databaseTableColumns(filename, "resources"));
+
+    EXPECT_EQ(1u, log.count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
+    EXPECT_EQ(0u, log.uncheckedCount());
 }
