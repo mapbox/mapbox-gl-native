@@ -8,6 +8,8 @@ static NSString * const MGLMapboxMetricsEnabled = @"MGLMapboxMetricsEnabled";
 static NSString * const MGLMapboxMetricsDebugLoggingEnabled = @"MGLMapboxMetricsDebugLoggingEnabled";
 static NSString * const MGLTelemetryAccessToken = @"MGLTelemetryAccessToken";
 static NSString * const MGLTelemetryBaseURL = @"MGLTelemetryBaseURL";
+static NSString * const MGLEventsProfile = @"MMEEventsProfile";
+static NSString * const MGLVariableGeofence = @"VariableGeofence";
 
 @interface MGLMapboxEvents ()
 
@@ -122,21 +124,31 @@ static NSString * const MGLTelemetryBaseURL = @"MGLTelemetryBaseURL";
 }
 
 + (void)setupWithAccessToken:(NSString *)accessToken {
-    NSString *semanticVersion = [NSBundle mgl_frameworkInfoDictionary][@"MGLSemanticVersionString"];
-    NSString *shortVersion = [NSBundle mgl_frameworkInfoDictionary][@"CFBundleShortVersionString"];
-    NSString *sdkVersion = semanticVersion ?: shortVersion;
+    int64_t delayTime = 0;
     
-    // It is possible that an alternative access token was already set on this instance when the class was loaded
-    // Use it if it exists
-    NSString *resolvedAccessToken = [MGLMapboxEvents sharedInstance].accessToken ?: accessToken;
-    
-    [[[self sharedInstance] eventsManager] initializeWithAccessToken:resolvedAccessToken userAgentBase:MGLAPIClientUserAgentBase hostSDKVersion:sdkVersion];
-    
-    // It is possible that an alternative base URL was set on this instance when the class was loaded
-    // Use it if it exists
-    if ([MGLMapboxEvents sharedInstance].baseURL) {
-        [[MGLMapboxEvents sharedInstance] eventsManager].baseURL = [MGLMapboxEvents sharedInstance].baseURL;
+    if ([[[NSBundle mainBundle] objectForInfoDictionaryKey:MGLEventsProfile] isEqualToString:MGLVariableGeofence]) {
+        delayTime = 10;
     }
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSString *semanticVersion = [NSBundle mgl_frameworkInfoDictionary][@"MGLSemanticVersionString"];
+        NSString *shortVersion = [NSBundle mgl_frameworkInfoDictionary][@"CFBundleShortVersionString"];
+        NSString *sdkVersion = semanticVersion ?: shortVersion;
+        
+        // It is possible that an alternative access token was already set on this instance when the class was loaded
+        // Use it if it exists
+        NSString *resolvedAccessToken = [MGLMapboxEvents sharedInstance].accessToken ?: accessToken;
+        
+        [[[self sharedInstance] eventsManager] initializeWithAccessToken:resolvedAccessToken userAgentBase:MGLAPIClientUserAgentBase hostSDKVersion:sdkVersion];
+        
+        // It is possible that an alternative base URL was set on this instance when the class was loaded
+        // Use it if it exists
+        if ([MGLMapboxEvents sharedInstance].baseURL) {
+            [[MGLMapboxEvents sharedInstance] eventsManager].baseURL = [MGLMapboxEvents sharedInstance].baseURL;
+        }
+        
+        [self flush];
+    });
 }
 
 + (void)pushTurnstileEvent {
