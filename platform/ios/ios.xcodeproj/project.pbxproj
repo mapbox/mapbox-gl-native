@@ -1003,8 +1003,8 @@
 		96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationHeadingIndicator.h; sourceTree = "<group>"; };
 		AC518DFD201BB55A00EBC820 /* MGLTelemetryConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTelemetryConfig.h; sourceTree = "<group>"; };
 		AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTelemetryConfig.m; sourceTree = "<group>"; };
-		ACF969F020CB04E500B23FB7 /* MMEEventsService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEEventsService.m; path = "../../../../mapbox-events-ios/MapboxMobileEvents/MMEEventsService.m"; sourceTree = "<group>"; };
-		ACF969F120CB04E500B23FB7 /* MMEEventsService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEEventsService.h; path = "../../../../mapbox-events-ios/MapboxMobileEvents/MMEEventsService.h"; sourceTree = "<group>"; };
+		ACF969F020CB04E500B23FB7 /* MMEEventsService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEEventsService.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventsService.m"; sourceTree = SOURCE_ROOT; };
+		ACF969F120CB04E500B23FB7 /* MMEEventsService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEEventsService.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventsService.h"; sourceTree = SOURCE_ROOT; };
 		CA0C27912076C804001CE5B7 /* MGLShapeSourceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLShapeSourceTests.m; sourceTree = "<group>"; };
 		CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewIntegrationTest.m; sourceTree = "<group>"; };
 		CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLMapViewIntegrationTest.h; sourceTree = "<group>"; };
