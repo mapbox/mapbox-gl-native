@@ -49,6 +49,17 @@ public class RenderTestDefinition {
     return DEFAULT_HEIGHT;
   }
 
+  public float getPixelRatio() {
+    RenderTestStyleDefinition.Test test = getTest();
+    if (test != null) {
+      Float pixelRatio = test.getPixelRatio();
+      if (pixelRatio != null && pixelRatio > 0) {
+        return pixelRatio;
+      }
+    }
+    return 1;
+  }
+
   public String getStyleJson() {
     return styleJson;
   }
@@ -65,6 +76,7 @@ public class RenderTestDefinition {
     return new MapSnapshotter
       .Options(getWidth(), getHeight())
       .withStyleJson(styleJson)
+      .withPixelRatio(getPixelRatio())
       .withLogo(false);
   }
 
