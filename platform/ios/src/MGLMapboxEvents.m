@@ -124,7 +124,7 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
 }
 
 + (void)setupWithAccessToken:(NSString *)accessToken {
-    dispatch_time_t delayTime = 0;
+    int64_t delayTime = 0;
     
     if ([[[NSBundle mainBundle] objectForInfoDictionaryKey:MGLEventsProfile] isEqualToString:MGLVariableGeofence]) {
         delayTime = 10;
