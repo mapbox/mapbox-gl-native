@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +68,19 @@ public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
     if (context instanceof MapFragment.OnMapViewReadyCallback) {
       mapViewReadyCallback = (MapFragment.OnMapViewReadyCallback) context;
     }
+  }
+
+  /**
+   * Called when this fragment is inflated, parses XML tag attributes.
+   *
+   * @param context            The context inflating this fragment.
+   * @param attrs              The XML tag attributes.
+   * @param savedInstanceState The saved instance state for the map fragment.
+   */
+  @Override
+  public void onInflate(Context context, AttributeSet attrs, Bundle savedInstanceState) {
+    super.onInflate(context, attrs, savedInstanceState);
+    setArguments(MapFragmentUtils.createFragmentArgs(MapboxMapOptions.createFromAttributes(context, attrs)));
   }
 
   /**
