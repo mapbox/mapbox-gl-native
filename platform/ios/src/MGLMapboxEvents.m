@@ -8,8 +8,8 @@ static NSString * const MGLMapboxMetricsEnabled = @"MGLMapboxMetricsEnabled";
 static NSString * const MGLMapboxMetricsDebugLoggingEnabled = @"MGLMapboxMetricsDebugLoggingEnabled";
 static NSString * const MGLTelemetryAccessToken = @"MGLTelemetryAccessToken";
 static NSString * const MGLTelemetryBaseURL = @"MGLTelemetryBaseURL";
-static NSString * const kMMEEventsProfile = @"MMEEventsProfile";
-static NSString * const kConfigHibernationRadiusVariableKey = @"VariableGeofence";
+static NSString * const MGLEventsProfile = @"MMEEventsProfile";
+static NSString * const MGLVariableGeofence = @"VariableGeofence";
 
 @interface MGLMapboxEvents ()
 
@@ -124,9 +124,9 @@ static NSString * const kConfigHibernationRadiusVariableKey = @"VariableGeofence
 }
 
 + (void)setupWithAccessToken:(NSString *)accessToken {
-    int delayTime = 0;
+    dispatch_time_t delayTime = 0;
     
-    if ([[[NSBundle mainBundle] objectForInfoDictionaryKey:kMMEEventsProfile] isEqualToString:kConfigHibernationRadiusVariableKey]) {
+    if ([[[NSBundle mainBundle] objectForInfoDictionaryKey:MGLEventsProfile] isEqualToString:MGLVariableGeofence]) {
         delayTime = 10;
     }
     
