@@ -1748,7 +1748,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
         MGLMapView *secondMapView = [[MGLMapView alloc] initWithFrame:
                                      CGRectMake(0, self.view.bounds.size.height / 2,
                                                 self.view.bounds.size.width, self.view.bounds.size.height / 2)];
-        secondMapView.translatesAutoresizingMaskIntoConstraints = false;
+        secondMapView.showsScale = YES;
+        secondMapView.translatesAutoresizingMaskIntoConstraints = NO;
         secondMapView.tag = 2;
         for (NSLayoutConstraint *constraint in self.view.constraints)
         {
