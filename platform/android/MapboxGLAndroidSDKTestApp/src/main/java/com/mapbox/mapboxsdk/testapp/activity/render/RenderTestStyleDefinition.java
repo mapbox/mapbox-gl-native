@@ -34,7 +34,6 @@ public class RenderTestStyleDefinition {
     this.additionalProperties.put(name, value);
   }
 
-
   public class Metadata {
 
     private Test test;
