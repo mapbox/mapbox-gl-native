@@ -12,16 +12,20 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Style layers
 
 * Added support for aggregate expressions as input values to `MGL_MATCH` expressions. ([#11866](https://github.com/mapbox/mapbox-gl-native/pull/11866))
+* Fixed an issue that made `MGLSymbolStyleLayer` flicker when straddling the antimeridian. ([#11938](https://github.com/mapbox/mapbox-gl-native/pull/11938))
 
 ### Other changes
 
 * Unknown tokens in URLs are now preserved, rather than replaced with an empty string. ([#11787](https://github.com/mapbox/mapbox-gl-native/issues/11787))
 * Adjusted when and how the camera transition update and finish callbacks are called, fixing recursion bugs. ([#11614](https://github.com/mapbox/mapbox-gl-native/pull/11614))
-* Improved application launch performance.
+* Improved application launch performance. ([#11784](https://github.com/mapbox/mapbox-gl-native/pull/11784))
 * Fixed an issue preventing nested key path expressions get parsed accordingly to the spec. ([#11959](https://github.com/mapbox/mapbox-gl-native/pull/11959))
 * Added custom `-hitTest:withEvent:` to `MGLSMCalloutView` to avoid registering taps in transparent areas of the standard annotation callout. ([#11939](https://github.com/mapbox/mapbox-gl-native/pull/11939))
 * Improved performance and memory impact of `MGLScaleBar`. ([#11921](https://github.com/mapbox/mapbox-gl-native/pull/11921))
 * Fixed race conditions that could cause crashes when re-using `MGLMapSnapshotter` or using multiple snapshotters at the same time. ([#11831](https://github.com/mapbox/mapbox-gl-native/pull/11831))
+* Fixed an issue where an empty `MGLFeature`s array caused high CPU utilization. ([#11985](https://github.com/mapbox/mapbox-gl-native/pull/11985))
+* Improved offline download performance. ([#11284](https://github.com/mapbox/mapbox-gl-native/pull/11284))
+* Fixed an issue that caused -[MGLMapView visibleFeaturesAtPoint:] to return an empty array when adding or removing features. ([#12076](https://github.com/mapbox/mapbox-gl-native/pull/12076))
 * Fixed crash in `-[MGLStyle localizeLabelsIntoLocale:]` on iOS 9.3 (attempting to access a property that was introduced in iOS 10.0) ([#12123](https://github.com/mapbox/mapbox-gl-native/pull/12123))
 
 ## 4.0.2 - May 29, 2018
