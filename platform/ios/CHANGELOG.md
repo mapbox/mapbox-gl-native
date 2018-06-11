@@ -21,6 +21,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added custom `-hitTest:withEvent:` to `MGLSMCalloutView` to avoid registering taps in transparent areas of the standard annotation callout. ([#11939](https://github.com/mapbox/mapbox-gl-native/pull/11939))
 * Improved performance and memory impact of `MGLScaleBar`. ([#11921](https://github.com/mapbox/mapbox-gl-native/pull/11921))
 * Fixed race conditions that could cause crashes when re-using `MGLMapSnapshotter` or using multiple snapshotters at the same time. ([#11831](https://github.com/mapbox/mapbox-gl-native/pull/11831))
+* Fixed crash in `-[MGLStyle localizeLabelsIntoLocale:]` on iOS 9.3 (attempting to access a property that was introduced in iOS 10.0) ([#12123](https://github.com/mapbox/mapbox-gl-native/pull/12123))
 
 ## 4.0.2 - May 29, 2018
 
