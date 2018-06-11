@@ -16,7 +16,7 @@
 * Adjusted when and how the camera transition update and finish callbacks are called, fixing recursion bugs. ([#11614](https://github.com/mapbox/mapbox-gl-native/pull/11614))
 * Fixed an issue preventing nested key path expressions get parsed accordingly to the spec. ([#11959](https://github.com/mapbox/mapbox-gl-native/pull/11959))
 * Fixed race conditions that could cause crashes when re-using `MGLMapSnapshotter` or using multiple snapshotters at the same time. ([#11831](https://github.com/mapbox/mapbox-gl-native/pull/11831))
-* Fixed crash on iOS 9.3 (`NSLocale.languageCode` introduced in iOS 10.0)
+* Fixed crash on iOS 9.3 (`NSLocale.languageCode` introduced in iOS 10.0, and used in Darwin code) ([#12123](https://github.com/mapbox/mapbox-gl-native/pull/12123))
 
 ## 0.7.1
 
