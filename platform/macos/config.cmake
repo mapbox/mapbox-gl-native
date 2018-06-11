@@ -48,14 +48,12 @@ macro(mbgl_platform_core)
     if(WITH_EGL)
         target_sources(mbgl-core
             PRIVATE platform/linux/src/headless_backend_egl.cpp
-            PRIVATE platform/linux/src/headless_display_egl.cpp
         )
-        mason_use(swiftshader VERSION 2017-11-20)
+        mason_use(swiftshader VERSION 2018-05-31)
         target_add_mason_package(mbgl-core PUBLIC swiftshader)
     else()
         target_sources(mbgl-core
             PRIVATE platform/darwin/src/headless_backend_cgl.cpp
-            PRIVATE platform/darwin/src/headless_display_cgl.cpp
         )
         target_link_libraries(mbgl-core
             PUBLIC "-framework OpenGL"
