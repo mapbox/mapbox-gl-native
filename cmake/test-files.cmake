@@ -23,6 +23,7 @@ set(MBGL_TEST_FILES
 
     # geometry
     test/geometry/dem_data.test.cpp
+    test/geometry/line_atlas.test.cpp
 
     # gl
     test/gl/bucket.test.cpp
