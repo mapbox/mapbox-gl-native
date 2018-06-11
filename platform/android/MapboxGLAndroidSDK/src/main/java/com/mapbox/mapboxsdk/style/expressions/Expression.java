@@ -1017,12 +1017,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-match">Style specification</a>
    */
   public static Expression match(@NonNull Expression input, @NonNull Expression defaultOutput, @NonNull Stop... stops) {
-    Expression[] expressionStops = new Expression[stops.length * 2];
-    for (int i = 0; i < stops.length; i++) {
-      expressionStops[i * 2] = literal(stops[i].value);
-      expressionStops[i * 2 + 1] = literal(stops[i].output);
-    }
-    return match(join(join(new Expression[] {input}, expressionStops), new Expression[] {defaultOutput}));
+    return match(join(join(new Expression[] {input}, Stop.toExpressionArray(stops)), new Expression[] {defaultOutput}));
   }
 
   /**
@@ -3449,8 +3444,6 @@ public class Expression {
       throw new IllegalArgumentException("PropertyValue are not allowed as an expression literal, use value instead.");
     } else if (value instanceof Expression.ExpressionLiteral) {
       return toValue((ExpressionLiteral) value);
-    } else if (value instanceof Expression) {
-      return ((Expression) value).toArray();
     }
     return value;
   }
