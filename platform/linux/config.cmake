@@ -24,7 +24,7 @@ macro(mbgl_platform_core)
         target_sources(mbgl-core
             PRIVATE platform/linux/src/headless_backend_egl.cpp
         )
-        mason_use(swiftshader VERSION 2017-11-20)
+        mason_use(swiftshader VERSION 2018-05-31)
         target_add_mason_package(mbgl-core PUBLIC swiftshader)
     else()
         target_sources(mbgl-core
