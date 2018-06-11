@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.style;
 
 import android.graphics.Color;
 import android.support.test.runner.AndroidJUnit4;
-
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -11,13 +10,11 @@ import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import timber.log.Timber;
 
 import java.io.IOException;
-
-import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
@@ -185,6 +182,25 @@ public class ExpressionTest extends BaseActivityTest {
       layer.setProperties(
         fillColor(literal("#4286f4"))
       );
+    });
+  }
+
+  @Test
+  public void testLiteralMatchExpression() {
+    validateTestSetup();
+    setupStyle();
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      Expression expression = match(literal("something"), literal(0f),
+        stop("1", get("1")),
+        stop("2", get("2")),
+        stop("3", get("3")),
+        stop("4", get("4"))
+      );
+
+      layer.setProperties(
+        fillColor(expression)
+      );
+      expression.toArray();
     });
   }
 
