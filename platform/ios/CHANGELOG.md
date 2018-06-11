@@ -2,6 +2,8 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+* Fixed crash in `-[MGLStyle localizeLabelsIntoLocale:]` on iOS 9.3 (attempting to access a property that was introduced in iOS 10.0) ([#12123](https://github.com/mapbox/mapbox-gl-native/pull/12123))
+
 ## 4.0.2 - May 29, 2018
 
 * Fixed a crash when constant expressions were used for style properties that didn't support data-driven styling. ([#11960](https://github.com/mapbox/mapbox-gl-native/issues/11960))

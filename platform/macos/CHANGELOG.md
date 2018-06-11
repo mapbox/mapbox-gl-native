@@ -1,5 +1,7 @@
 # Changelog for Mapbox Maps SDK for macOS
 
+* Fixed crash in `-[MGLStyle localizeLabelsIntoLocale:]` on iOS 9.3 (attempting to access a property that was introduced in iOS 10.0) ([#12123](https://github.com/mapbox/mapbox-gl-native/pull/12123))
+
 ## 0.7.1
 
 ### Style layers
