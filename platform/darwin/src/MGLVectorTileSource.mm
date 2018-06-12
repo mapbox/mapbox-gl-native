@@ -109,7 +109,16 @@ static NSArray * const MGLMapboxStreetsAlternativeLanguages = @[
 + (NSString *)preferredMapboxStreetsLanguageForPreferences:(NSArray<NSString *> *)preferencesArray {
     BOOL acceptsEnglish = [preferencesArray filteredArrayUsingPredicate:
                            [NSPredicate predicateWithBlock:^BOOL(NSString * _Nullable language, NSDictionary<NSString *,id> * _Nullable bindings) {
-        return [[NSLocale localeWithLocaleIdentifier:language].languageCode isEqualToString:@"en"];
+        NSString *languageCode;
+
+        if (@available(iOS 10.0, macOS 10.12.0, *)) {
+            languageCode = [NSLocale localeWithLocaleIdentifier:language].languageCode;
+        }
+        else {
+            languageCode = [[NSLocale localeWithLocaleIdentifier:language] objectForKey:NSLocaleLanguageCode];
+        }
+
+        return [languageCode isEqualToString:@"en"];
     }]].count;
     
     NSArray<NSString *> *availableLanguages = acceptsEnglish ? MGLMapboxStreetsLanguages : MGLMapboxStreetsAlternativeLanguages;

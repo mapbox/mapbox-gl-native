@@ -136,8 +136,8 @@ final class NativeMapView {
     if (checkState("resizeView")) {
       return;
     }
-    width = (int) (width / pixelRatio);
-    height = (int) (height / pixelRatio);
+    width = (int) Math.ceil(width / pixelRatio);
+    height = (int) Math.ceil(height / pixelRatio);
 
     if (width < 0) {
       throw new IllegalArgumentException("width cannot be negative.");

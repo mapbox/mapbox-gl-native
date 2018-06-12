@@ -60,6 +60,7 @@ public class RenderTestStyleDefinition {
 
     private Integer width;
     private Integer height;
+    private Float pixelRatio;
     private List<Integer> center = null;
     private Integer zoom;
     private Double diff;
@@ -80,6 +81,10 @@ public class RenderTestStyleDefinition {
 
     public void setHeight(Integer height) {
       this.height = height;
+    }
+
+    public Float getPixelRatio() {
+      return pixelRatio;
     }
 
     public List<Integer> getCenter() {

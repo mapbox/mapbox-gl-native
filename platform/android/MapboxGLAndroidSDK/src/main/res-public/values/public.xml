@@ -16,7 +16,7 @@
     <!--Camera-->
     <public name="mapbox_cameraTargetLng" type="attr" />
     <public name="mapbox_cameraTargetLat" type="attr" />
-    <public name="mapbox_cameraZoom_level" type="attr" />
+    <public name="mapbox_cameraZoom" type="attr" />
     <public name="mapbox_cameraBearing" type="attr" />
     <public name="mapbox_cameraTilt" type="attr" />
 
@@ -29,23 +29,10 @@
     <public name="mapbox_uiScrollGestures" type="attr" />
     <public name="mapbox_uiRotateGestures" type="attr" />
     <public name="mapbox_uiTiltGestures" type="attr" />
+    <public name="mapbox_uiDoubleTapGestures" type="attr" />
 
     <!--UI-Controls-->
     <public name="mapbox_uiZoomControls" type="attr" />
-
-    <!--MyLocation-->
-    <public name="mapbox_myLocation" type="attr" />
-    <public name="mapbox_myLocationTintColor" type="attr" />
-    <public name="mapbox_myLocationDrawable" type="attr" />
-    <public name="mapbox_myLocationBearingDrawable" type="attr" />
-    <public name="mapbox_myLocationBackgroundDrawable" type="attr" />
-    <public name="mapbox_myLocationBackgroundTintColor" type="attr" />
-    <public name="mapbox_myLocationBackgroundMarginLeft" type="attr" />
-    <public name="mapbox_myLocationBackgroundMarginTop" type="attr" />
-    <public name="mapbox_myLocationBackgroundMarginRight" type="attr" />
-    <public name="mapbox_myLocationBackgroundMarginBottom" type="attr" />
-    <public name="mapbox_myLocationAccuracyTintColor" type="attr" />
-    <public name="mapbox_myLocationAccuracyAlpha" type="attr" />
 
     <!--Compass-->
     <public name="mapbox_uiCompass" type="attr" />
@@ -72,6 +59,7 @@
     <public name="mapbox_uiAttributionMarginTop" type="attr" />
     <public name="mapbox_uiAttributionMarginRight" type="attr" />
     <public name="mapbox_uiAttributionMarginBottom" type="attr" />
+    <public name="mapbox_uiAttributionTintColor" type="attr" />
 
     <!-- Use TextureView-->
     <public name="mapbox_renderTextureMode" type="attr" />
@@ -96,7 +84,6 @@
     <!-- Exposed strings -->
     <public name="mapbox_compassContentDescription" type="string" />
     <public name="mapbox_attributionsIconContentDescription" type="string" />
-    <public name="mapbox_myLocationViewContentDescription" type="string" />
     <public name="mapbox_mapActionDescription" type="string" />
     <public name="mapbox_attributionsDialogTitle" type="string" />
     <public name="mapbox_attributionTelemetryTitle" type="string" />
@@ -104,7 +91,7 @@
     <public name="mapbox_attributionTelemetryPositive" type="string" />
     <public name="mapbox_attributionTelemetryNegative" type="string" />
     <public name="mapbox_attributionTelemetryNeutral" type="string" />
-    <public name="mapbox_telemetrySettings" type="string"/>
+    <public name="mapbox_telemetrySettings" type="string" />
     <public name="mapbox_offline_error_region_definition_invalid" type="string" />
 
     <!-- Exposed drawables -->
@@ -114,10 +101,7 @@
     <public name="mapbox_info_bg_selector" type="drawable" />
     <public name="mapbox_info_icon_default" type="drawable" />
     <public name="mapbox_info_icon_selected" type="drawable" />
-    <public name="mapbox_mylocation_icon_default" type="drawable" />
-    <public name="mapbox_mylocation_icon_bearing" type="drawable" />
 
     <!-- Exposed colors -->
-    <public name="mapbox_mylocation_ring" type="color" />
     <public name="mapbox_blue" type="color" />
 </resources>
