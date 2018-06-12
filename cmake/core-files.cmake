@@ -4,6 +4,8 @@ set(MBGL_CORE_FILES
     # actor
     include/mbgl/actor/actor.hpp
     include/mbgl/actor/actor_ref.hpp
+    include/mbgl/actor/aspiring_actor.hpp
+    include/mbgl/actor/established_actor.hpp
     include/mbgl/actor/mailbox.hpp
     include/mbgl/actor/message.hpp
     include/mbgl/actor/scheduler.hpp

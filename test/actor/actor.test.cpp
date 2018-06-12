@@ -1,5 +1,6 @@
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 #include <mbgl/test/util.hpp>
 
@@ -7,13 +8,12 @@
 #include <functional>
 #include <future>
 #include <memory>
+#include <thread>
 
 using namespace mbgl;
 using namespace std::chrono_literals;
 
 TEST(Actor, Construction) {
-    // Construction is currently synchronous. It may become asynchronous in the future.
-
     struct Test {
         Test(ActorRef<Test>, bool& constructed) {
             constructed = true;
@@ -25,6 +25,25 @@ TEST(Actor, Construction) {
     Actor<Test> test(pool, std::ref(constructed));
 
     EXPECT_TRUE(constructed);
+}
+
+TEST(Actor, Destruction) {
+    struct Test {
+        Test(ActorRef<Test>, bool& destructed_) : destructed(destructed_) {};
+        ~Test() {
+            destructed = true;
+        }
+        
+        bool& destructed;
+    };
+
+    ThreadPool pool { 1 };
+    bool destructed = false;
+    {
+        Actor<Test> test(pool, std::ref(destructed));
+    }
+
+    EXPECT_TRUE(destructed);
 }
 
 TEST(Actor, DestructionBlocksOnReceive) {
@@ -358,3 +377,55 @@ TEST(Actor, NoSelfActorRef) {
     withArguments.invoke(&WithArguments::receive);
     future.wait();
 }
+
+TEST(Actor, TwoPhaseConstruction) {
+    // This test mimics, in simplified form, the approach used by the Thread<Object> to construct
+    // its actor in two parts so that the Thread<Object> instance can be created without waiting
+    // for the target thread to be up and running.
+
+    struct Test {
+        Test(ActorRef<Test>, std::shared_ptr<bool> destroyed_)
+            : destroyed(std::move(destroyed_)) {};
+        
+        ~Test() {
+            *destroyed = true;
+        }
+        
+        void callMe(std::promise<void> p) {
+            p.set_value();
+        }
+        
+        void stop() {
+            util::RunLoop::Get()->stop();
+        }
+        
+        std::shared_ptr<bool> destroyed;
+    };
+
+    AspiringActor<Test> parent;
+    
+    auto destroyed = std::make_shared<bool>(false);
+    
+    std::promise<void> queueExecuted;
+    auto queueExecutedFuture = queueExecuted.get_future();
+    
+    parent.self().invoke(&Test::callMe, std::move(queueExecuted));
+    parent.self().invoke(&Test::stop);
+    
+    auto thread = std::thread([
+        capturedArgs = std::make_tuple(destroyed),
+        &parent
+    ] () mutable {
+        util::RunLoop loop(util::RunLoop::Type::New);
+        EstablishedActor<Test> test(loop, parent, capturedArgs);
+        loop.run();
+    });
+    
+    // should not hang
+    queueExecutedFuture.get();
+    thread.join();
+    
+    EXPECT_TRUE(*destroyed);
+}
+
+

@@ -58,8 +58,8 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
     
     showLogo = _showLogo;
     // Create the core snapshotter
-    snapshotter = std::make_unique<mbgl::MapSnapshotter>(fileSource,
-                                                         *threadPool,
+    snapshotter = std::make_unique<mbgl::MapSnapshotter>(&fileSource,
+                                                         threadPool,
                                                          style,
                                                          size,
                                                          pixelRatio,
