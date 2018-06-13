@@ -1,12 +1,14 @@
 #include <mbgl/test/util.hpp>
+#include <mbgl/test/fixture_log_observer.hpp>
 
-#include <gtest/gtest.h>
 #include <sqlite3.hpp>
+
+using namespace mbgl;
 
 TEST(SQLite, Statement) {
     using namespace mbgl;
 
-    mapbox::sqlite::Database db = mapbox::sqlite::Database::open(":memory:", mapbox::sqlite::Create | mapbox::sqlite::ReadWrite);
+    mapbox::sqlite::Database db = mapbox::sqlite::Database::open(":memory:", mapbox::sqlite::ReadWriteCreate);
     db.exec("CREATE TABLE test (id INTEGER);");
 
     mapbox::sqlite::Statement stmt1{ db, "INSERT INTO test (id) VALUES (?1);" };
@@ -29,9 +31,36 @@ TEST(SQLite, Statement) {
 }
 
 TEST(SQLite, TEST_REQUIRES_WRITE(TryOpen)) {
+    FixtureLog log;
+
     // Should return a CANTOPEN exception when the database doesn't exist,
     // make sure all the backends behave the same way.
     auto result = mapbox::sqlite::Database::tryOpen("test/fixtures/offline_database/foobar123.db", mapbox::sqlite::ReadOnly);
     ASSERT_TRUE(result.is<mapbox::sqlite::Exception>());
     ASSERT_EQ(result.get<mapbox::sqlite::Exception>().code, mapbox::sqlite::ResultCode::CantOpen);
+
+#ifndef __QT__
+    // Only non-Qt platforms are setting a logger on the SQLite object.
+    EXPECT_EQ(1u, log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::CantOpen), "cannot open file" }, true));
+    EXPECT_EQ(1u, log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::CantOpen), "No such file or directory" }, true));
+#endif
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
+
+TEST(SQLite, CloseDatabaseWithPendingTransaction) {
+    auto db = std::make_unique<mapbox::sqlite::Database>(mapbox::sqlite::Database::open(
+        ":memory:", mapbox::sqlite::ReadWriteCreate));
+    mapbox::sqlite::Transaction transaction(*db);
+    transaction.commit();
+}
+
+TEST(SQLite, CloseMovedDatabaseWithPendingTransaction) {
+    // Verifies that we can correctly commit a transaction even if we move the Database object to
+    // another address.
+    auto db1 = mapbox::sqlite::Database::open(":memory:",
+                                              mapbox::sqlite::ReadWriteCreate);
+    std::unique_ptr<mapbox::sqlite::Database> db2;
+    mapbox::sqlite::Transaction transaction(db1);
+    db2 = std::make_unique<mapbox::sqlite::Database>(std::move(db1));
+    transaction.commit();
 }

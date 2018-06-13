@@ -28,67 +28,70 @@ OfflineDatabase::~OfflineDatabase() {
 }
 
 void OfflineDatabase::ensureSchema() {
-    if (path != ":memory:") {
-        auto result = mapbox::sqlite::Database::tryOpen(path, mapbox::sqlite::ReadWrite);
-        if (result.is<mapbox::sqlite::Exception>()) {
-            const auto& ex = result.get<mapbox::sqlite::Exception>();
-            if (ex.code == mapbox::sqlite::ResultCode::NotADB) {
-                // Corrupted; blow it away.
-                removeExisting();
-            } else if (ex.code == mapbox::sqlite::ResultCode::CantOpen) {
-                // Doesn't exist yet.
-            } else {
-                Log::Error(Event::Database, "Unexpected error connecting to database: %s", ex.what());
-                throw ex;
-            }
+    auto result = mapbox::sqlite::Database::tryOpen(path, mapbox::sqlite::ReadWriteCreate);
+    if (result.is<mapbox::sqlite::Exception>()) {
+        const auto& ex = result.get<mapbox::sqlite::Exception>();
+        if (ex.code == mapbox::sqlite::ResultCode::NotADB) {
+            // Corrupted; blow it away.
+            removeExisting();
+            result = mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadWriteCreate);
         } else {
-            try {
-                db = std::make_unique<mapbox::sqlite::Database>(std::move(result.get<mapbox::sqlite::Database>()));
-                db->setBusyTimeout(Milliseconds::max());
-                db->exec("PRAGMA foreign_keys = ON");
+            Log::Error(Event::Database, "Unexpected error connecting to database: %s", ex.what());
+            throw ex;
+        }
+    }
 
-                switch (userVersion()) {
-                case 0:
-                case 1:
-                    // cache-only database; ok to delete
-                    removeExisting();
-                    break;
-                case 2:
-                    migrateToVersion3();
-                    // fall through
-                case 3:
-                case 4:
-                    migrateToVersion5();
-                    // fall through
-                case 5:
-                    migrateToVersion6();
-                    // fall through
-                case 6:
-                    // happy path; we're done
-                    return;
-                default:
-                    // downgrade, delete the database
-                    removeExisting();
-                    break;
-                }
-            } catch (const mapbox::sqlite::Exception& ex) {
-                // Unfortunately, SQLITE_NOTADB is not always reported upon opening the database.
-                // Apparently sometimes it is delayed until the first read operation.
-                if (ex.code == mapbox::sqlite::ResultCode::NotADB) {
-                    removeExisting();
-                } else {
-                    throw;
-                }
-            }
+    try {
+        assert(result.is<mapbox::sqlite::Database>());
+        db = std::make_unique<mapbox::sqlite::Database>(std::move(result.get<mapbox::sqlite::Database>()));
+        db->setBusyTimeout(Milliseconds::max());
+        db->exec("PRAGMA foreign_keys = ON");
+
+        switch (userVersion()) {
+        case 0:
+        case 1:
+            // Newly created database, or old cache-only database; remove old table if it exists.
+            removeOldCacheTable();
+            break;
+        case 2:
+            migrateToVersion3();
+            // fall through
+        case 3:
+        case 4:
+            migrateToVersion5();
+            // fall through
+        case 5:
+            migrateToVersion6();
+            // fall through
+        case 6:
+            // happy path; we're done
+            return;
+        default:
+            // downgrade, delete the database
+            removeExisting();
+            break;
+        }
+    } catch (const mapbox::sqlite::Exception& ex) {
+        // Unfortunately, SQLITE_NOTADB is not always reported upon opening the database.
+        // Apparently sometimes it is delayed until the first read operation.
+        if (ex.code == mapbox::sqlite::ResultCode::NotADB) {
+            removeExisting();
+        } else {
+            throw;
         }
     }
 
     try {
         #include "offline_schema.cpp.include"
 
-        db = std::make_unique<mapbox::sqlite::Database>(mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadWrite | mapbox::sqlite::Create));
-        db->setBusyTimeout(Milliseconds::max());
-        db->exec("PRAGMA foreign_keys = ON");
+        // When downgrading the database, or when the database is corrupt, we've deleted the old database handle,
+        // so we need to reopen it.
+        if (!db) {
+            db = std::make_unique<mapbox::sqlite::Database>(mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadWriteCreate));
+            db->setBusyTimeout(Milliseconds::max());
+            db->exec("PRAGMA foreign_keys = ON");
+        }
+
         db->exec("PRAGMA auto_vacuum = INCREMENTAL");
         db->exec("PRAGMA journal_mode = DELETE");
         db->exec("PRAGMA synchronous = FULL");
@@ -115,6 +118,11 @@ void OfflineDatabase::removeExisting() {
     } catch (util::IOException& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
     }
+}
+
+void OfflineDatabase::removeOldCacheTable() {
+    db->exec("DROP TABLE IF EXISTS http_cache");
+    db->exec("VACUUM");
 }
 
 void OfflineDatabase::migrateToVersion3() {
@@ -197,7 +205,7 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
     }
 
     if (evict_ && !evict(size)) {
-        Log::Debug(Event::Database, "Unable to make space for entry");
+        Log::Info(Event::Database, "Unable to make space for entry");
         return { false, 0 };
     }
 

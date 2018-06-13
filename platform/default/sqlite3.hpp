@@ -11,13 +11,8 @@ namespace mapbox {
 namespace sqlite {
 
 enum OpenFlag : int {
-    ReadOnly = 0x00000001,
-    ReadWrite = 0x00000002,
-    Create = 0x00000004,
-    NoMutex = 0x00008000,
-    FullMutex = 0x00010000,
-    SharedCache = 0x00020000,
-    PrivateCache = 0x00040000,
+    ReadOnly        = 0b001,
+    ReadWriteCreate = 0b110,
 };
 
 enum class ResultCode : int {
@@ -69,6 +64,7 @@ class DatabaseImpl;
 class Statement;
 class StatementImpl;
 class Query;
+class Transaction;
 
 class Database {
 private:
@@ -91,6 +87,7 @@ private:
     std::unique_ptr<DatabaseImpl> impl;
 
     friend class Statement;
+    friend class Transaction;
 };
 
 // A Statement object represents a prepared statement that can be run repeatedly run with a Query object.
@@ -173,7 +170,7 @@ public:
     void rollback();
 
 private:
-    Database& db;
+    DatabaseImpl& dbImpl;
     bool needRollback = true;
 };
 
