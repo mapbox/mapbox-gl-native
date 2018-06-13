@@ -18,6 +18,7 @@ namespace sqlite {
 class Database;
 class Statement;
 class Query;
+class Exception;
 } // namespace sqlite
 } // namespace mapbox
 
@@ -25,6 +26,10 @@ namespace mbgl {
 
 class Response;
 class TileID;
+
+namespace util {
+struct IOException;
+} // namespace util
 
 struct MapboxTileLimitExceededException :  util::Exception {
     MapboxTileLimitExceededException() : util::Exception("Mapbox tile limit exceeded") {}
@@ -44,10 +49,10 @@ public:
 
     std::vector<OfflineRegion> listRegions();
 
-    OfflineRegion createRegion(const OfflineRegionDefinition&,
-                               const OfflineRegionMetadata&);
+    optional<OfflineRegion> createRegion(const OfflineRegionDefinition&,
+                                         const OfflineRegionMetadata&);
 
-    OfflineRegionMetadata updateMetadata(const int64_t regionID, const OfflineRegionMetadata&);
+    optional<OfflineRegionMetadata> updateMetadata(const int64_t regionID, const OfflineRegionMetadata&);
 
     void deleteRegion(OfflineRegion&&);
 
@@ -57,8 +62,8 @@ public:
     uint64_t putRegionResource(int64_t regionID, const Resource&, const Response&);
     void putRegionResources(int64_t regionID, const std::list<std::tuple<Resource, Response>>&, OfflineRegionStatus&);
 
-    OfflineRegionDefinition getRegionDefinition(int64_t regionID);
-    OfflineRegionStatus getRegionCompletedStatus(int64_t regionID);
+    optional<OfflineRegionDefinition> getRegionDefinition(int64_t regionID);
+    optional<OfflineRegionStatus> getRegionCompletedStatus(int64_t regionID);
 
     void setOfflineMapboxTileCountLimit(uint64_t);
     uint64_t getOfflineMapboxTileCountLimit();
@@ -67,12 +72,15 @@ public:
     bool exceedsOfflineMapboxTileCountLimit(const Resource&);
 
 private:
-    int userVersion();
-    void ensureSchema();
+    void initialize();
+    void handleError(const mapbox::sqlite::Exception&, const char* action);
+    void handleError(const util::IOException&, const char* action);
+
     void removeExisting();
     void removeOldCacheTable();
-    void migrateToVersion3();
+    void createSchema();
     void migrateToVersion5();
+    void migrateToVersion3();
     void migrateToVersion6();
 
     mapbox::sqlite::Statement& getStatement(const char *);

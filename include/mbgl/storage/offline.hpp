@@ -187,11 +187,11 @@ class OfflineRegion {
 public:
     // Move-only; not publicly constructible.
     OfflineRegion(OfflineRegion&&);
-    OfflineRegion& operator=(OfflineRegion&&);
     ~OfflineRegion();
 
     OfflineRegion() = delete;
     OfflineRegion(const OfflineRegion&) = delete;
+    OfflineRegion& operator=(OfflineRegion&&) = delete;
     OfflineRegion& operator=(const OfflineRegion&) = delete;
 
     int64_t getID() const;

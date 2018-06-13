@@ -62,39 +62,44 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
         return status;
     }
 
-    OfflineRegionStatus result = offlineDatabase.getRegionCompletedStatus(id);
+    auto result = offlineDatabase.getRegionCompletedStatus(id);
+    if (!result) {
+        // We can't find this offline region because the database is unavailable, or the download
+        // does not exist.
+        return {};
+    }
 
-    result.requiredResourceCount++;
+    result->requiredResourceCount++;
     optional<Response> styleResponse = offlineDatabase.get(Resource::style(definition.styleURL));
     if (!styleResponse) {
-        return result;
+        return *result;
     }
 
     style::Parser parser;
     parser.parse(*styleResponse->data);
 
-    result.requiredResourceCountIsPrecise = true;
+    result->requiredResourceCountIsPrecise = true;
 
     for (const auto& source : parser.sources) {
         SourceType type = source->getType();
 
         auto handleTiledSource = [&] (const variant<std::string, Tileset>& urlOrTileset, const uint16_t tileSize) {
             if (urlOrTileset.is<Tileset>()) {
-                result.requiredResourceCount +=
+                result->requiredResourceCount +=
                     definition.tileCount(type, tileSize, urlOrTileset.get<Tileset>().zoomRange);
             } else {
-                result.requiredResourceCount += 1;
+                result->requiredResourceCount += 1;
                 const auto& url = urlOrTileset.get<std::string>();
                 optional<Response> sourceResponse = offlineDatabase.get(Resource::source(url));
                 if (sourceResponse) {
                     style::conversion::Error error;
                     optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse->data, error);
                     if (tileset) {
-                        result.requiredResourceCount +=
+                        result->requiredResourceCount +=
                             definition.tileCount(type, tileSize, (*tileset).zoomRange);
                     }
                 } else {
-                    result.requiredResourceCountIsPrecise = false;
+                    result->requiredResourceCountIsPrecise = false;
                 }
             }
         };
@@ -121,7 +126,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
         case SourceType::GeoJSON: {
             const auto& geojsonSource = *source->as<GeoJSONSource>();
             if (geojsonSource.getURL()) {
-                result.requiredResourceCount += 1;
+                result->requiredResourceCount += 1;
             }
             break;
         }
@@ -129,7 +134,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
         case SourceType::Image: {
             const auto& imageSource = *source->as<ImageSource>();
             if (imageSource.getURL()) {
-                result.requiredResourceCount += 1;
+                result->requiredResourceCount += 1;
             }
             break;
         }
@@ -142,14 +147,14 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
     }
 
     if (!parser.glyphURL.empty()) {
-        result.requiredResourceCount += parser.fontStacks().size() * GLYPH_RANGES_PER_FONT_STACK;
+        result->requiredResourceCount += parser.fontStacks().size() * GLYPH_RANGES_PER_FONT_STACK;
     }
 
     if (!parser.spriteURL.empty()) {
-        result.requiredResourceCount += 2;
+        result->requiredResourceCount += 2;
     }
 
-    return result;
+    return *result;
 }
 
 void OfflineDownload::activateDownload() {
