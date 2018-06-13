@@ -5,6 +5,7 @@
 ### Packaging
 
 * The minimum deployment target for this SDK is now macOS 10.11.0. ([#11776](https://github.com/mapbox/mapbox-gl-native/pull/11776))
+* Fixed an issue where `MGLMapView` produced a designable error in Interface Builder storyboards. ([#12140](https://github.com/mapbox/mapbox-gl-native/pull/12140))
 
 ### Style layers
 
