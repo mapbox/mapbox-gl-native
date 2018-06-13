@@ -38,12 +38,6 @@ TEST(SQLite, TEST_REQUIRES_WRITE(TryOpen)) {
     auto result = mapbox::sqlite::Database::tryOpen("test/fixtures/offline_database/foobar123.db", mapbox::sqlite::ReadOnly);
     ASSERT_TRUE(result.is<mapbox::sqlite::Exception>());
     ASSERT_EQ(result.get<mapbox::sqlite::Exception>().code, mapbox::sqlite::ResultCode::CantOpen);
-
-#ifndef __QT__
-    // Only non-Qt platforms are setting a logger on the SQLite object.
-    EXPECT_EQ(1u, log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::CantOpen), "cannot open file" }, true));
-    EXPECT_EQ(1u, log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::CantOpen), "No such file or directory" }, true));
-#endif
     EXPECT_EQ(0u, log.uncheckedCount());
 }
 

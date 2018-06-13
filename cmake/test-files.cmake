@@ -95,6 +95,8 @@ set(MBGL_TEST_FILES
     test/src/mbgl/test/fixture_log_observer.hpp
     test/src/mbgl/test/getrss.cpp
     test/src/mbgl/test/getrss.hpp
+    test/src/mbgl/test/sqlite3_test_fs.cpp
+    test/src/mbgl/test/sqlite3_test_fs.hpp
     test/src/mbgl/test/stub_file_source.cpp
     test/src/mbgl/test/stub_file_source.hpp
     test/src/mbgl/test/stub_geometry_tile_feature.hpp

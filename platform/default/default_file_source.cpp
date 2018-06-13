@@ -74,9 +74,9 @@ public:
     }
 
     void getRegionStatus(int64_t regionID, std::function<void (std::exception_ptr, optional<OfflineRegionStatus>)> callback) {
-        try {
-            callback({}, getDownload(regionID).getStatus());
-        } catch (...) {
+        if (auto download = getDownload(regionID)) {
+            callback({}, download->getStatus());
+        } else {
             callback(std::current_exception(), {});
         }
     }
@@ -92,11 +92,15 @@ public:
     }
 
     void setRegionObserver(int64_t regionID, std::unique_ptr<OfflineRegionObserver> observer) {
-        getDownload(regionID).setObserver(std::move(observer));
+        if (auto download = getDownload(regionID)) {
+            download->setObserver(std::move(observer));
+        }
     }
 
     void setRegionDownloadState(int64_t regionID, OfflineRegionDownloadState state) {
-        getDownload(regionID).setState(state);
+        if (auto download = getDownload(regionID)) {
+            download->setState(state);
+        }
     }
 
     void request(AsyncRequest* req, Resource resource, ActorRef<FileSourceRequest> ref) {
@@ -181,13 +185,19 @@ public:
     }
 
 private:
-    OfflineDownload& getDownload(int64_t regionID) {
+    OfflineDownload* getDownload(int64_t regionID) {
         auto it = downloads.find(regionID);
         if (it != downloads.end()) {
-            return *it->second;
+            return it->second.get();
         }
-        return *downloads.emplace(regionID,
-            std::make_unique<OfflineDownload>(regionID, offlineDatabase->getRegionDefinition(regionID), *offlineDatabase, onlineFileSource)).first->second;
+        auto definition = offlineDatabase->getRegionDefinition(regionID);
+        if (!definition) {
+            return nullptr;
+        }
+
+        auto download = std::make_unique<OfflineDownload>(regionID, std::move(*definition),
+                                                          *offlineDatabase, onlineFileSource);
+        return downloads.emplace(regionID, std::move(download)).first->second.get();
     }
 
     // shared so that destruction is done on the creating thread
