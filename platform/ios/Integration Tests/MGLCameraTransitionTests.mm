@@ -323,11 +323,7 @@
     // Should take MGLAnimationDuration
     [self.mapView setCenterCoordinate:target zoomLevel:zoomLevel animated:YES];
 
-    // Run the loop, so the camera can fly to the new camera
-    while (runloop) {
-        [[NSRunLoop mainRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
-    }
-    [self waitForExpectations:@[expectation] timeout:0.5];
+    [self waitForExpectations:@[expectation] timeout:2.0];
 
     NSLog(@"setCenterCoordinate: %0.4fs", stop1 - stop0);
     NSLog(@"flyToCamera: %0.4fs", stop2 - stop1);
