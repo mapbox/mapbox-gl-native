@@ -298,6 +298,7 @@ public:
     [self installLogoView];
     [self installAttributionView];
     [self installGestureRecognizers];
+    [self installConstraints];
 
     // Set up annotation management and selection state.
     _annotationImagesByIdentifier = [NSMutableDictionary dictionary];
@@ -510,6 +511,23 @@ public:
                                      multiplier:1
                                        constant:8]];
     }
+    
+    // Place the attribution view to the right of the logo view and size it to
+    // fit the buttons inside.
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:_logoView
+                                                     attribute:NSLayoutAttributeBaseline
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:_attributionView
+                                                     attribute:NSLayoutAttributeBaseline
+                                                    multiplier:1
+                                                      constant:_logoView.image.alignmentRect.origin.y]];
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:_attributionView
+                                                     attribute:NSLayoutAttributeLeading
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:_logoView
+                                                     attribute:NSLayoutAttributeTrailing
+                                                    multiplier:1
+                                                      constant:8]];
 }
 
 - (void)dealloc {
@@ -704,7 +722,7 @@ public:
     }
 }
 
-- (void)updateConstraints {
+- (void)installConstraints {
     // Place the zoom controls at the lower-right corner of the view.
     [self addConstraint:
      [NSLayoutConstraint constraintWithItem:self
@@ -760,25 +778,6 @@ public:
                                   attribute:NSLayoutAttributeLeading
                                  multiplier:1
                                    constant:MGLOrnamentPadding - _logoView.image.alignmentRect.origin.x]];
-
-    // Place the attribution view to the right of the logo view and size it to
-    // fit the buttons inside.
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:_logoView
-                                                     attribute:NSLayoutAttributeBaseline
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:_attributionView
-                                                     attribute:NSLayoutAttributeBaseline
-                                                    multiplier:1
-                                                      constant:_logoView.image.alignmentRect.origin.y]];
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:_attributionView
-                                                     attribute:NSLayoutAttributeLeading
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:_logoView
-                                                     attribute:NSLayoutAttributeTrailing
-                                                    multiplier:1
-                                                      constant:8]];
-
-    [super updateConstraints];
 }
 
 - (void)renderSync {
@@ -944,7 +943,6 @@ public:
     if ([source isKindOfClass:[MGLTileSource class]]) {
         [self installAttributionView];
     }
-    self.needsUpdateConstraints = YES;
     self.needsDisplay = YES;
 }
 

@@ -18,7 +18,7 @@
 * Fixed an issue preventing nested key path expressions get parsed accordingly to the spec. ([#11959](https://github.com/mapbox/mapbox-gl-native/pull/11959))
 * Fixed race conditions that could cause crashes when re-using `MGLMapSnapshotter` or using multiple snapshotters at the same time. ([#11831](https://github.com/mapbox/mapbox-gl-native/pull/11831))
 * Fixed crash in `-[MGLStyle localizeLabelsIntoLocale:]` on iOS 9.3 (attempting to access a property that was introduced in iOS 10.0 and used in Darwin code) ([#12123](https://github.com/mapbox/mapbox-gl-native/pull/12123))
-
+* Improved performance in view controllers that contain `MGLMapView`s. ([#12144](https://github.com/mapbox/mapbox-gl-native/pull/12144))
 
 ## 0.7.1
 

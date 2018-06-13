@@ -489,6 +489,8 @@ public:
     [self addSubview:_scaleBar];
     _scaleBarConstraints = [NSMutableArray array];
     
+    [self installConstraints];
+    
     // setup interaction
     //
     _pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
@@ -740,7 +742,7 @@ public:
     return nil;
 }
 
-- (void)updateConstraintsPreiOS11 {
+- (void)installConstraintsPreiOS11 {
     // If we have a view controller reference and its automaticallyAdjustsScrollViewInsets
     // is set to YES, use its view as the parent for constraints. -[MGLMapView adjustContentInset]
     // already take top and bottom layout guides into account. If we don't have a reference, apply
@@ -887,7 +889,7 @@ public:
     [containerView addConstraints:self.attributionButtonConstraints];
 }
 
-- (void)updateConstraints
+- (void)installConstraints
 {
     // If safeAreaLayoutGuide API exists
     if (@available(iOS 11.0, *)) {
@@ -925,10 +927,8 @@ public:
                                                                                                constant:8.0 + self.contentInset.right]];
         [self addConstraints:self.attributionButtonConstraints];
     } else {
-        [self updateConstraintsPreiOS11];
+        [self installConstraintsPreiOS11];
     }
-    
-    [super updateConstraints];
 }
 
 - (NSLayoutConstraint *)constraintForYAxisAnchor:(NSLayoutYAxisAnchor *)yAxisAnchor belowAnchor:(NSLayoutYAxisAnchor *)anchor
@@ -1062,7 +1062,7 @@ public:
     }
 
     // Compass, logo and attribution button constraints needs to be updated.
-    [self setNeedsUpdateConstraints];
+    [self installConstraints];
 }
 
 /// Returns the frame of inset content within the map view.
@@ -1143,6 +1143,7 @@ public:
 - (void)didMoveToSuperview
 {
     [self validateDisplayLink];
+    [self installConstraints];
     [super didMoveToSuperview];
 }
 
