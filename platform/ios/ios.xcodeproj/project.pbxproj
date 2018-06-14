@@ -159,6 +159,10 @@
 		35E208A71D24210F00EC9A46 /* MGLNSDataAdditionsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 35E208A61D24210F00EC9A46 /* MGLNSDataAdditionsTests.m */; };
 		35E79F201D41266300957B9E /* MGLStyleLayer_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 35E79F1F1D41266300957B9E /* MGLStyleLayer_Private.h */; };
 		35E79F211D41266300957B9E /* MGLStyleLayer_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 35E79F1F1D41266300957B9E /* MGLStyleLayer_Private.h */; };
+		35F51A3320D22B02009153CD /* UIView+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 35F51A3120D22B02009153CD /* UIView+MGLAdditions.h */; };
+		35F51A3420D22B02009153CD /* UIView+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 35F51A3120D22B02009153CD /* UIView+MGLAdditions.h */; };
+		35F51A3520D22B02009153CD /* UIView+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 35F51A3220D22B02009153CD /* UIView+MGLAdditions.m */; };
+		35F51A3620D22B02009153CD /* UIView+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 35F51A3220D22B02009153CD /* UIView+MGLAdditions.m */; };
 		36F1153D1D46080700878E1A /* libmbgl-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F1153B1D46080700878E1A /* libmbgl-core.a */; };
 		3E6465D62065767A00685536 /* LimeGreenStyleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E6465D42065767A00685536 /* LimeGreenStyleLayer.m */; };
 		3E8770612074297100B7E842 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 554180411D2E97DE00012372 /* OpenGLES.framework */; };
@@ -837,6 +841,8 @@
 		35E1A4D71D74336F007AA97F /* MGLValueEvaluator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLValueEvaluator.h; sourceTree = "<group>"; };
 		35E208A61D24210F00EC9A46 /* MGLNSDataAdditionsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLNSDataAdditionsTests.m; sourceTree = "<group>"; };
 		35E79F1F1D41266300957B9E /* MGLStyleLayer_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLStyleLayer_Private.h; sourceTree = "<group>"; };
+		35F51A3120D22B02009153CD /* UIView+MGLAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIView+MGLAdditions.h"; sourceTree = "<group>"; };
+		35F51A3220D22B02009153CD /* UIView+MGLAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIView+MGLAdditions.m"; sourceTree = "<group>"; };
 		36F1153B1D46080700878E1A /* libmbgl-core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libmbgl-core.a"; path = "build/Debug-iphoneos/libmbgl-core.a"; sourceTree = "<group>"; };
 		36F1153C1D46080700878E1A /* libmbgl-platform-ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libmbgl-platform-ios.a"; path = "build/Debug-iphoneos/libmbgl-platform-ios.a"; sourceTree = "<group>"; };
 		3E6465D42065767A00685536 /* LimeGreenStyleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LimeGreenStyleLayer.m; path = ../../darwin/app/LimeGreenStyleLayer.m; sourceTree = "<group>"; };
@@ -1530,6 +1536,8 @@
 				30E578121DAA7D690050F07E /* UIImage+MGLAdditions.mm */,
 				DD9BE4F51EB263C50079A3AF /* UIViewController+MGLAdditions.h */,
 				DD9BE4F61EB263C50079A3AF /* UIViewController+MGLAdditions.m */,
+				35F51A3120D22B02009153CD /* UIView+MGLAdditions.h */,
+				35F51A3220D22B02009153CD /* UIView+MGLAdditions.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -2218,6 +2226,7 @@
 				4018B1C91CDC288A00F666AF /* MGLAnnotationView_Private.h in Headers */,
 				35E1A4D81D74336F007AA97F /* MGLValueEvaluator.h in Headers */,
 				DA88482C1CBAFA6200AB86E3 /* NSBundle+MGLAdditions.h in Headers */,
+				35F51A3320D22B02009153CD /* UIView+MGLAdditions.h in Headers */,
 				357FE2DD1E02D2B20068B753 /* NSCoder+MGLAdditions.h in Headers */,
 				35D13AB71D3D15E300AFB4E0 /* MGLStyleLayer.h in Headers */,
 				07D947531F67488E00E37934 /* MGLComputedShapeSource_Private.h in Headers */,
@@ -2405,6 +2414,7 @@
 				AC518E00201BB55A00EBC820 /* MGLTelemetryConfig.h in Headers */,
 				3510FFFA1D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.h in Headers */,
 				DA72620C1DEEE3480043BB89 /* MGLOpenGLStyleLayer.h in Headers */,
+				35F51A3420D22B02009153CD /* UIView+MGLAdditions.h in Headers */,
 				35CE61831D4165D9004F2359 /* UIColor+MGLAdditions.h in Headers */,
 				96E516F32000597100A02306 /* NSDictionary+MGLAdditions.h in Headers */,
 				96E516F02000595800A02306 /* NSBundle+MGLAdditions.h in Headers */,
@@ -3011,6 +3021,7 @@
 				558DE7A21E5615E400C7916D /* MGLFoundation.mm in Sources */,
 				40834BE91FE05E1800C1BD0D /* MMECommonEventData.m in Sources */,
 				3510FFF21D6D9D8C00F413B2 /* NSExpression+MGLAdditions.mm in Sources */,
+				35F51A3520D22B02009153CD /* UIView+MGLAdditions.m in Sources */,
 				DA88481F1CBAFA6200AB86E3 /* MGLMultiPoint.mm in Sources */,
 				DA88482B1CBAFA6200AB86E3 /* MGLTypes.m in Sources */,
 				FA68F14D1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.mm in Sources */,
@@ -3137,6 +3148,7 @@
 				DAA4E41E1CBB730400178DFB /* MGLMapCamera.mm in Sources */,
 				FA68F14E1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.mm in Sources */,
 				1F7454921ECBB42C00021D39 /* MGLLight.mm in Sources */,
+				35F51A3620D22B02009153CD /* UIView+MGLAdditions.m in Sources */,
 				404C26E51D89B877000AA13D /* MGLTileSource.mm in Sources */,
 				355AE0021E9281DA00F3939D /* MGLScaleBar.mm in Sources */,
 				4018B1C81CDC287F00F666AF /* MGLAnnotationView.mm in Sources */,
