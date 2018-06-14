@@ -136,7 +136,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
         if (hasIcon) {
             ft.icon = layout.evaluate<IconImage>(zoom, ft);
-            imageDependencies.insert(*ft.icon);
+            imageDependencies.emplace(*ft.icon, ImageType::Icon);
         }
 
         if (ft.text || ft.icon) {
@@ -455,15 +455,14 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
                         symbolInstance.iconOffset, WritingModeType::None, symbolInstance.line, std::vector<float>());
                 symbolInstance.placedIconIndex = bucket->icon.placedSymbols.size() - 1;
                 PlacedSymbol& iconSymbol = bucket->icon.placedSymbols.back();
-                iconSymbol.vertexStartIndex = addSymbol(
-                                                        bucket->icon, sizeData, *symbolInstance.iconQuad,
+                iconSymbol.vertexStartIndex = addSymbol(bucket->icon, sizeData, *symbolInstance.iconQuad,
                                                         symbolInstance.anchor, iconSymbol);
             }
         }
         
         for (auto& pair : bucket->paintPropertyBinders) {
-            pair.second.first.populateVertexVectors(feature, bucket->icon.vertices.vertexSize());
-            pair.second.second.populateVertexVectors(feature, bucket->text.vertices.vertexSize());
+            pair.second.first.populateVertexVectors(feature, bucket->icon.vertices.vertexSize(), {}, {});
+            pair.second.second.populateVertexVectors(feature, bucket->text.vertices.vertexSize(), {}, {});
         }
     }
 

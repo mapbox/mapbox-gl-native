@@ -69,6 +69,10 @@ bool RenderSymbolLayer::hasTransition() const {
     return unevaluated.hasTransition();
 }
 
+bool RenderSymbolLayer::hasCrossfade() const {
+    return false;
+}
+
 void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
     if (parameters.pass == RenderPass::Opaque) {
         return;
@@ -251,9 +255,9 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 CollisionBoxProgram::UniformValues {
-                    uniforms::u_matrix::Value{ tile.matrix },
-                    uniforms::u_extrude_scale::Value{ extrudeScale },
-                    uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() }
+                    uniforms::u_matrix::Value( tile.matrix ),
+                    uniforms::u_extrude_scale::Value( extrudeScale ),
+                    uniforms::u_camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() )
                 },
                 *bucket.collisionBox.vertexBuffer,
                 *bucket.collisionBox.dynamicVertexBuffer,
@@ -285,10 +289,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 CollisionCircleProgram::UniformValues {
-                    uniforms::u_matrix::Value{ tile.matrix },
-                    uniforms::u_extrude_scale::Value{ extrudeScale },
-                    uniforms::u_overscale_factor::Value{ float(tile.tile.id.overscaleFactor()) },
-                    uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() }
+                    uniforms::u_matrix::Value( tile.matrix ),
+                    uniforms::u_extrude_scale::Value( extrudeScale ),
+                    uniforms::u_overscale_factor::Value( float(tile.tile.id.overscaleFactor()) ),
+                    uniforms::u_camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() )
                 },
                 *bucket.collisionCircle.vertexBuffer,
                 *bucket.collisionCircle.dynamicVertexBuffer,

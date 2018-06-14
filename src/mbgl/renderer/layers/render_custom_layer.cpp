@@ -38,6 +38,9 @@ void RenderCustomLayer::evaluate(const PropertyEvaluationParameters&) {
 bool RenderCustomLayer::hasTransition() const {
     return false;
 }
+bool RenderCustomLayer::hasCrossfade() const {
+    return false;
+}
 
 std::unique_ptr<Bucket> RenderCustomLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
     assert(false);

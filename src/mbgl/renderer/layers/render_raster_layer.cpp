@@ -41,6 +41,10 @@ bool RenderRasterLayer::hasTransition() const {
     return unevaluated.hasTransition();
 }
 
+bool RenderRasterLayer::hasCrossfade() const {
+    return false;
+}
+
 static float saturationFactor(float saturation) {
     if (saturation > 0) {
         return 1 - 1 / (1.001 - saturation);
@@ -83,19 +87,19 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
             RasterProgram::UniformValues {
-                uniforms::u_matrix::Value{ matrix },
-                uniforms::u_image0::Value{ 0 },
-                uniforms::u_image1::Value{ 1 },
-                uniforms::u_opacity::Value{ evaluated.get<RasterOpacity>() },
-                uniforms::u_fade_t::Value{ 1 },
-                uniforms::u_brightness_low::Value{ evaluated.get<RasterBrightnessMin>() },
-                uniforms::u_brightness_high::Value{ evaluated.get<RasterBrightnessMax>() },
-                uniforms::u_saturation_factor::Value{ saturationFactor(evaluated.get<RasterSaturation>()) },
-                uniforms::u_contrast_factor::Value{ contrastFactor(evaluated.get<RasterContrast>()) },
-                uniforms::u_spin_weights::Value{ spinWeights(evaluated.get<RasterHueRotate>()) },
-                uniforms::u_buffer_scale::Value{ 1.0f },
-                uniforms::u_scale_parent::Value{ 1.0f },
-                uniforms::u_tl_parent::Value{ std::array<float, 2> {{ 0.0f, 0.0f }} },
+                uniforms::u_matrix::Value( matrix ),
+                uniforms::u_image0::Value( 0 ),
+                uniforms::u_image1::Value( 1 ),
+                uniforms::u_opacity::Value( evaluated.get<RasterOpacity>() ),
+                uniforms::u_fade_t::Value( 1 ),
+                uniforms::u_brightness_low::Value( evaluated.get<RasterBrightnessMin>() ),
+                uniforms::u_brightness_high::Value( evaluated.get<RasterBrightnessMax>() ),
+                uniforms::u_saturation_factor::Value( saturationFactor(evaluated.get<RasterSaturation>()) ),
+                uniforms::u_contrast_factor::Value( contrastFactor(evaluated.get<RasterContrast>()) ),
+                uniforms::u_spin_weights::Value( spinWeights(evaluated.get<RasterHueRotate>()) ),
+                uniforms::u_buffer_scale::Value( 1.0f ),
+                uniforms::u_scale_parent::Value( 1.0f ),
+                uniforms::u_tl_parent::Value( std::array<float, 2> {{ 0.0f, 0.0f }} ),
             },
             paintAttributeData,
             evaluated,

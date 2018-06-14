@@ -125,10 +125,10 @@ public:
     UniformValues uniformValues(float currentZoom) const {
         const ZoomEvaluatedSize u = evaluateForZoom(currentZoom);
         return UniformValues {
-            uniforms::u_is_size_zoom_constant::Value{ u.isZoomConstant },
-            uniforms::u_is_size_feature_constant::Value{ u.isFeatureConstant},
-            uniforms::u_size_t::Value{ u.sizeT },
-            uniforms::u_size::Value{ u.size }
+            uniforms::u_is_size_zoom_constant::Value( u.isZoomConstant ),
+            uniforms::u_is_size_feature_constant::Value( u.isFeatureConstant),
+            uniforms::u_size_t::Value( u.sizeT ),
+            uniforms::u_size::Value( u.size )
         };
     }
 };

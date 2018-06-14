@@ -9,7 +9,7 @@
 #include <mbgl/shaders/line_sdf.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/renderer/layers/render_line_layer.hpp>
-
+#include <mbgl/renderer/cross_faded_property_evaluator.hpp>
 #include <cmath>
 
 namespace mbgl {
@@ -24,7 +24,6 @@ MBGL_DEFINE_UNIFORM_SCALAR(float, u_ratio);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_tex_y_a);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_tex_y_b);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_sdfgamma);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_fade);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_patternscale_a);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_patternscale_b);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_gl_units_to_pixels);
@@ -107,12 +106,7 @@ class LinePatternProgram : public Program<
         uniforms::u_matrix,
         uniforms::u_ratio,
         uniforms::u_gl_units_to_pixels,
-        uniforms::u_pattern_tl_a,
-        uniforms::u_pattern_br_a,
-        uniforms::u_pattern_tl_b,
-        uniforms::u_pattern_br_b,
-        uniforms::u_pattern_size_a,
-        uniforms::u_pattern_size_b,
+        uniforms::u_scale,
         uniforms::u_texsize,
         uniforms::u_fade,
         uniforms::u_image>,
@@ -126,8 +120,8 @@ public:
                                        const TransformState&,
                                        const std::array<float, 2>& pixelsToGLUnits,
                                        Size atlasSize,
-                                       const ImagePosition& posA,
-                                       const ImagePosition& posB);
+                                       const CrossfadeParameters& crossfade,
+                                       const float pixelRatio);
 };
 
 class LineSDFProgram : public Program<
@@ -157,6 +151,7 @@ public:
                                        const std::array<float, 2>& pixelsToGLUnits,
                                        const LinePatternPos& posA,
                                        const LinePatternPos& posB,
+                                       const CrossfadeParameters& crossfade,
                                        float atlasWidth);
 };
 

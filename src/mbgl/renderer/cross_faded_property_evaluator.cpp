@@ -25,16 +25,9 @@ Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const style::PropertyExpress
 template <typename T>
 Faded<T> CrossFadedPropertyEvaluator<T>::calculate(const T& min, const T& mid, const T& max) const {
     const float z = parameters.z;
-    const float fraction = z - std::floor(z);
-    const std::chrono::duration<float> d = parameters.defaultFadeDuration;
-    const float t =
-        d != std::chrono::duration<float>::zero()
-            ? std::min((parameters.now - parameters.zoomHistory.lastIntegerZoomTime) / d, 1.0f)
-            : 1.0f;
-
     return z > parameters.zoomHistory.lastIntegerZoom
-        ? Faded<T> { min, mid, 2.0f, 1.0f, fraction + (1.0f - fraction) * t }
-        : Faded<T> { max, mid, 0.5f, 1.0f, 1 - (1 - t) * fraction };
+        ? Faded<T> { min, mid }
+        : Faded<T> { max, mid };
 }
 
 template class CrossFadedPropertyEvaluator<std::string>;

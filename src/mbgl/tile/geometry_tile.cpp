@@ -137,8 +137,8 @@ void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelatio
     if (result.glyphAtlasImage) {
         glyphAtlasImage = std::move(*result.glyphAtlasImage);
     }
-    if (result.iconAtlasImage) {
-        iconAtlasImage = std::move(*result.iconAtlasImage);
+    if (result.iconAtlas.image.valid()) {
+        iconAtlas = std::move(result.iconAtlas);
     }
 
     observer->onTileChanged(*this);
@@ -160,12 +160,20 @@ void GeometryTile::getGlyphs(GlyphDependencies glyphDependencies) {
     glyphManager.getGlyphs(*this, std::move(glyphDependencies));
 }
 
-void GeometryTile::onImagesAvailable(ImageMap images, uint64_t imageCorrelationID) {
-    worker.self().invoke(&GeometryTileWorker::onImagesAvailable, std::move(images), imageCorrelationID);
+void GeometryTile::onImagesAvailable(ImageMap images, ImageMap patterns, uint64_t imageCorrelationID) {
+    worker.self().invoke(&GeometryTileWorker::onImagesAvailable, std::move(images), std::move(patterns), imageCorrelationID);
 }
 
 void GeometryTile::getImages(ImageRequestPair pair) {
     imageManager.getImages(*this, std::move(pair));
+}
+
+const optional<ImagePosition> GeometryTile::getPattern(const std::string& pattern) {
+    auto it = iconAtlas.patternPositions.find(pattern);
+    if (it !=  iconAtlas.patternPositions.end()) {
+        return it->second;
+    }
+    return {};
 }
 
 void GeometryTile::upload(gl::Context& context) {
@@ -184,9 +192,9 @@ void GeometryTile::upload(gl::Context& context) {
         glyphAtlasImage = {};
     }
 
-    if (iconAtlasImage) {
-        iconAtlasTexture = context.createTexture(*iconAtlasImage, 0);
-        iconAtlasImage = {};
+    if (iconAtlas.image.valid()) {
+        iconAtlasTexture = context.createTexture(iconAtlas.image, 0);
+        iconAtlas.image = {};
     }
 }
 

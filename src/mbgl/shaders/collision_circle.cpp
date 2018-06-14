@@ -7,8 +7,8 @@ namespace mbgl {
 namespace shaders {
 
 const char* collision_circle::name = "collision_circle";
-const char* collision_circle::vertexSource = source() + 15668;
-const char* collision_circle::fragmentSource = source() + 16974;
+const char* collision_circle::vertexSource = source() + 15671;
+const char* collision_circle::fragmentSource = source() + 16977;
 
 } // namespace shaders
 } // namespace mbgl

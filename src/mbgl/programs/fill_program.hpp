@@ -32,28 +32,19 @@ struct FillPatternUniforms : gl::Uniforms<
     uniforms::u_matrix,
     uniforms::u_world,
     uniforms::u_texsize,
-    uniforms::u_pattern_tl_a,
-    uniforms::u_pattern_br_a,
-    uniforms::u_pattern_tl_b,
-    uniforms::u_pattern_br_b,
-    uniforms::u_pattern_size_a,
-    uniforms::u_pattern_size_b,
-    uniforms::u_scale_a,
-    uniforms::u_scale_b,
-    uniforms::u_mix,
+    uniforms::u_scale,
+    uniforms::u_fade,
     uniforms::u_image,
     uniforms::u_pixel_coord_upper,
-    uniforms::u_pixel_coord_lower,
-    uniforms::u_tile_units_to_pixels>
+    uniforms::u_pixel_coord_lower>
 {
     static Values values(mat4 matrix,
                          Size framebufferSize,
                          Size atlasSize,
-                         const ImagePosition&,
-                         const ImagePosition&,
-                         const Faded<std::string>&,
+                         const CrossfadeParameters& crossfade,
                          const UnwrappedTileID&,
-                         const TransformState&);
+                         const TransformState&,
+                         const float pixelRatio);
 };
 
 class FillProgram : public Program<

@@ -363,12 +363,6 @@
                       @"Unsetting fillPattern should return fill-pattern to the default value.");
         XCTAssertEqualObjects(layer.fillPattern, defaultExpression,
                               @"fillPattern should return the default value after being unset.");
-
-        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
-        XCTAssertThrowsSpecificNamed(layer.fillPattern = functionExpression, NSException, NSInvalidArgumentException, @"MGLFillLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
-        XCTAssertThrowsSpecificNamed(layer.fillPattern = functionExpression, NSException, NSInvalidArgumentException, @"MGLFillLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
         // Transition property test
         layer.fillPatternTransition = transitionTest;
         auto toptions = rawLayer->getFillPatternTransition();

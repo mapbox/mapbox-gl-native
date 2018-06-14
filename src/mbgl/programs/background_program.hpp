@@ -50,7 +50,7 @@ struct BackgroundPatternUniforms : gl::Uniforms<
                          Size atlasSize,
                          const ImagePosition&,
                          const ImagePosition&,
-                         const Faded<std::string>&,
+                         const CrossfadeParameters&,
                          const UnwrappedTileID&,
                          const TransformState&);
 };

@@ -3,7 +3,8 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/style/layer_type.hpp>
-
+#include <mbgl/style/image_impl.hpp>
+#include <mbgl/renderer/image_atlas.hpp>
 #include <atomic>
 
 namespace mbgl {
@@ -13,6 +14,8 @@ class Context;
 } // namespace gl
 
 class RenderLayer;
+class PatternDependency;
+using PatternLayerMap = std::unordered_map<std::string, PatternDependency>;
 
 class Bucket : private util::noncopyable {
 public:
@@ -41,7 +44,12 @@ public:
     // Obtaining these is a costly operation, so we do it only once, and
     // pass-by-const-ref the geometries as a second parameter.
     virtual void addFeature(const GeometryTileFeature&,
-                            const GeometryCollection&) {};
+                            const GeometryCollection&,
+                            const ImagePositions&,
+                            const PatternLayerMap&) {};
+
+    virtual void populateFeatureBuffers(const ImagePositions&) {};
+    virtual void addPatternDependencies(const std::vector<const RenderLayer*>&, ImageDependencies&) {};
 
     // As long as this bucket has a Prepare render pass, this function is getting called. Typically,
     // this only happens once when the bucket is being rendered for the first time.

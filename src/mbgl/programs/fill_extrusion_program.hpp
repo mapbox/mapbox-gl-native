@@ -46,20 +46,12 @@ struct FillExtrusionUniforms : gl::Uniforms<
 
 struct FillExtrusionPatternUniforms : gl::Uniforms<
     uniforms::u_matrix,
-    uniforms::u_pattern_tl_a,
-    uniforms::u_pattern_br_a,
-    uniforms::u_pattern_tl_b,
-    uniforms::u_pattern_br_b,
-    uniforms::u_pattern_size_a,
-    uniforms::u_pattern_size_b,
-    uniforms::u_scale_a,
-    uniforms::u_scale_b,
+    uniforms::u_scale,
     uniforms::u_texsize,
-    uniforms::u_mix,
+    uniforms::u_fade,
     uniforms::u_image,
     uniforms::u_pixel_coord_upper,
     uniforms::u_pixel_coord_lower,
-    uniforms::u_tile_units_to_pixels,
     uniforms::u_height_factor,
     uniforms::u_lightcolor,
     uniforms::u_lightpos,
@@ -67,12 +59,11 @@ struct FillExtrusionPatternUniforms : gl::Uniforms<
 {
     static Values values(mat4,
                          Size atlasSize,
-                         const ImagePosition&,
-                         const ImagePosition&,
-                         const Faded<std::string>&,
+                         const CrossfadeParameters&,
                          const UnwrappedTileID&,
                          const TransformState&,
-                         const float,
+                         const float heightFactor,
+                         const float pixelRatio,
                          const EvaluatedLight&);
 };
 

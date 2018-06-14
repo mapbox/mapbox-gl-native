@@ -220,7 +220,7 @@ namespace mbgl {
 - (void)setFillExtrusionPattern:(NSExpression *)fillExtrusionPattern {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(fillExtrusionPattern, false);
+    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(fillExtrusionPattern, true);
     self.rawLayer->setFillExtrusionPattern(mbglValue);
 }
 

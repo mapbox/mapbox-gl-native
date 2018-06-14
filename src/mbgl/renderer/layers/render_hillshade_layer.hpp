@@ -15,6 +15,7 @@ public:
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
+    bool hasCrossfade() const override;
 
     void render(PaintParameters&, RenderSource* src) override;
 

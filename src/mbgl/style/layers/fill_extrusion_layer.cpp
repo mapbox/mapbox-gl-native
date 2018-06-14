@@ -443,7 +443,7 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
     
     if (property == Property::FillExtrusionPattern) {
         Error error;
-        optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, false, false);
+        optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }

@@ -56,21 +56,27 @@ global.evaluatedType = function (property) {
 
 function attributeUniformType(property, type) {
     const attributeNameExceptions = {
-      'text-opacity': 'opacity',
-      'icon-opacity': 'opacity',
-      'text-color': 'fill_color',
-      'icon-color': 'fill_color',
-      'text-halo-color': 'halo_color',
-      'icon-halo-color': 'halo_color',
-      'text-halo-blur': 'halo_blur',
-      'icon-halo-blur': 'halo_blur',
-      'text-halo-width': 'halo_width',
-      'icon-halo-width': 'halo_width',
-      'line-gap-width': 'gapwidth'
+      'text-opacity': ['opacity'],
+      'icon-opacity': ['opacity'],
+      'text-color': ['fill_color'],
+      'icon-color': ['fill_color'],
+      'text-halo-color': ['halo_color'],
+      'icon-halo-color': ['halo_color'],
+      'text-halo-blur': ['halo_blur'],
+      'icon-halo-blur': ['halo_blur'],
+      'text-halo-width': ['halo_width'],
+      'icon-halo-width': ['halo_width'],
+      'line-gap-width': ['gapwidth'],
+      'line-pattern': ['pattern_to', 'pattern_from'],
+      'fill-pattern': ['pattern_to', 'pattern_from'],
+      'fill-extrusion-pattern': ['pattern_to', 'pattern_from']
     }
-    const name = attributeNameExceptions[property.name] ||
-        property.name.replace(type + '-', '').replace(/-/g, '_');
-    return `attributes::a_${name}${name === 'offset' ? '<1>' : ''}, uniforms::u_${name}`;
+    const names = attributeNameExceptions[property.name] ||
+       [ property.name.replace(type + '-', '').replace(/-/g, '_') ];
+
+    return names.map(name => {
+      return `attributes::a_${name}${name === 'offset' ? '<1>' : ''}, uniforms::u_${name}`
+    }).join(', ');
 }
 
 global.layoutPropertyType = function (property) {
@@ -86,8 +92,9 @@ global.layoutPropertyType = function (property) {
 global.paintPropertyType = function (property, type) {
   switch (property['property-type']) {
     case 'data-driven':
-    case 'cross-faded-data-driven':
       return `DataDrivenPaintProperty<${evaluatedType(property)}, ${attributeUniformType(property, type)}>`;
+    case 'cross-faded-data-driven':
+      return `CrossFadedDataDrivenPaintProperty<${evaluatedType(property)}, ${attributeUniformType(property, type)}>`;
     case 'cross-faded':
       return `CrossFadedPaintProperty<${evaluatedType(property)}>`;
     default:

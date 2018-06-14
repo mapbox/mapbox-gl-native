@@ -11,13 +11,26 @@
 namespace mbgl {
 
 class BucketParameters;
+class RenderFillExtrusionLayer;
 
 class FillExtrusionBucket : public Bucket {
 public:
-    FillExtrusionBucket(const BucketParameters&, const std::vector<const RenderLayer*>&);
+
+    // These aliases are used by the PatternLayout template
+    using RenderLayerType = RenderFillExtrusionLayer;
+    using PossiblyEvaluatedPaintProperties = style::FillExtrusionPaintProperties::PossiblyEvaluated;
+    using PossiblyEvaluatedLayoutProperties = style::Properties<>::PossiblyEvaluated;
+
+    FillExtrusionBucket(const PossiblyEvaluatedLayoutProperties,
+                        std::map<std::string, PossiblyEvaluatedPaintProperties>,
+                        const float,
+                        const uint32_t);
 
     void addFeature(const GeometryTileFeature&,
-                    const GeometryCollection&) override;
+                    const GeometryCollection&,
+                    const mbgl::ImagePositions&,
+                    const PatternLayerMap&) override;
+
     bool hasData() const override;
 
     void upload(gl::Context&) override;
