@@ -40,6 +40,9 @@ public:
     // Returns true if any paint properties have active transitions.
     virtual bool hasTransition() const = 0;
 
+    // Returns true if the layer has a pattern property and is actively crossfading.
+    virtual bool hasCrossfade() const = 0;
+
     // Check whether this layer is of the given subtype.
     template <class T>
     bool is() const;

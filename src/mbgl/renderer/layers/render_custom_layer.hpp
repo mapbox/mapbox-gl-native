@@ -13,6 +13,7 @@ public:
     void transition(const TransitionParameters&) final {}
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
+    bool hasCrossfade() const override;
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const final;
     void render(PaintParameters&, RenderSource*) final;

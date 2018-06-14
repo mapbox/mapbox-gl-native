@@ -16,13 +16,6 @@ namespace gl {
 template <class T>
 void bindUniform(UniformLocation, const T&);
 
-template <class Tag, class T>
-class UniformValue {
-public:
-    explicit UniformValue(T t_) : t(std::move(t_)) {}
-    T t;
-};
-
 class ActiveUniform {
 public:
     std::size_t size;
@@ -42,7 +35,8 @@ ActiveUniforms activeUniforms(ProgramID);
 template <class Tag, class T>
 class Uniform {
 public:
-    using Value = UniformValue<Tag, T>;
+    // TODO should maybe remove this altogether bc it is now redundant?
+    using Value = T;
 
     using Type = T;
 
@@ -50,10 +44,10 @@ public:
     public:
         State(UniformLocation location_) : location(std::move(location_)) {}
 
-        void operator=(const Value& value) {
-            if (location >= 0 && (!current || *current != value.t)) {
-                current = value.t;
-                bindUniform(location, value.t);
+        void operator=(const Type& value) {
+            if (location >= 0 && (!current || *current != value)) {
+                current = value;
+                bindUniform(location, value);
             }
         }
 
@@ -103,7 +97,7 @@ public:
                    : false)... });
 #endif
 
-        return State { { uniformLocation(id, Us::name()) }... };
+        return State(uniformLocation(id, Us::name())...);
     }
 
     template <class Program>

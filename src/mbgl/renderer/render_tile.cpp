@@ -103,8 +103,8 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             tile.debugBucket->segments,
             program.computeAllUniformValues(
                 DebugProgram::UniformValues {
-                    uniforms::u_matrix::Value{ matrix },
-                    uniforms::u_color::Value{ Color::white() }
+                    uniforms::u_matrix::Value( matrix ),
+                    uniforms::u_color::Value( Color::white() )
                 },
                 paintAttributeData,
                 properties,
@@ -124,8 +124,8 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             tile.debugBucket->segments,
             program.computeAllUniformValues(
                 DebugProgram::UniformValues {
-                    uniforms::u_matrix::Value{ matrix },
-                    uniforms::u_color::Value{ Color::black() }
+                    uniforms::u_matrix::Value( matrix ),
+                    uniforms::u_color::Value( Color::black() )
                 },
                 paintAttributeData,
                 properties,
@@ -147,8 +147,8 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             parameters.staticData.tileBorderSegments,
             program.computeAllUniformValues(
                 DebugProgram::UniformValues {
-                    uniforms::u_matrix::Value{ matrix },
-                    uniforms::u_color::Value{ Color::red() }
+                    uniforms::u_matrix::Value( matrix ),
+                    uniforms::u_color::Value( Color::red() )
                 },
                 paintAttributeData,
                 properties,

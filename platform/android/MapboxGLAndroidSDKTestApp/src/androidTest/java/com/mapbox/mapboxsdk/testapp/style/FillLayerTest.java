@@ -353,4 +353,20 @@ public class FillLayerTest extends BaseActivityTest {
       assertEquals((String) layer.getFillPattern().getValue(), (String) "pedestrian-polygon");
     });
   }
+
+  @Test
+  public void testFillPatternAsExpression() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("fill-pattern-expression");
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+
+      // Set and Get
+      Expression expression = string(Expression.get("undefined"));
+      layer.setProperties(fillPattern(expression));
+      assertEquals(layer.getFillPattern().getExpression(), expression);
+    });
+  }
+
 }

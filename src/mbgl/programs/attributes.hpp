@@ -147,6 +147,16 @@ struct a_weight {
     using Type = gl::AttributeType<float, 1>;
 };
 
+struct a_pattern_to {
+    static auto name() { return "a_pattern_to"; }
+    using Type = gl::AttributeType<uint16_t, 4>;
+};
+
+struct a_pattern_from {
+    static auto name() { return "a_pattern_from"; }
+    using Type = gl::AttributeType<uint16_t, 4>;
+};
+
 } // namespace attributes
 
 struct PositionOnlyLayoutAttributes : gl::Attributes<

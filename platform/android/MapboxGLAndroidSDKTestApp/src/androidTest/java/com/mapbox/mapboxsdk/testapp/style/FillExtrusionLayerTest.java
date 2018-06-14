@@ -266,6 +266,22 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
   }
 
   @Test
+  public void testFillExtrusionPatternAsExpression() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("fill-extrusion-pattern-expression");
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+
+      // Set and Get
+      Expression expression = string(Expression.get("undefined"));
+      layer.setProperties(fillExtrusionPattern(expression));
+      assertEquals(layer.getFillExtrusionPattern().getExpression(), expression);
+    });
+  }
+
+
+  @Test
   public void testFillExtrusionHeightTransition() {
     validateTestSetup();
     setupLayer();

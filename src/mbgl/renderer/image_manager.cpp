@@ -67,7 +67,7 @@ void ImageManager::getImages(ImageRequestor& requestor, ImageRequestPair&& pair)
     bool hasAllDependencies = true;
     if (!isLoaded()) {
         for (const auto& dependency : pair.first) {
-            if (images.find(dependency) == images.end()) {
+            if (images.find(dependency.first) == images.end()) {
                 hasAllDependencies = false;
             }
         }
@@ -84,16 +84,17 @@ void ImageManager::removeRequestor(ImageRequestor& requestor) {
 }
 
 void ImageManager::notify(ImageRequestor& requestor, const ImageRequestPair& pair) const {
-    ImageMap response;
+    ImageMap iconMap;
+    ImageMap patternMap;
 
     for (const auto& dependency : pair.first) {
-        auto it = images.find(dependency);
+        auto it = images.find(dependency.first);
         if (it != images.end()) {
-            response.emplace(*it);
+            dependency.second == ImageType::Pattern ? patternMap.emplace(*it) : iconMap.emplace(*it);
         }
     }
 
-    requestor.onImagesAvailable(response, pair.second);
+    requestor.onImagesAvailable(iconMap, patternMap, pair.second);
 }
 
 void ImageManager::dumpDebugLogs() const {

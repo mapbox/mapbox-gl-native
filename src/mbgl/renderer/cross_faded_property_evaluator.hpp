@@ -11,9 +11,6 @@ class Faded {
 public:
     T from;
     T to;
-    float fromScale;
-    float toScale;
-    float t;
 };
 
 template <typename T>

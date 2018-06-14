@@ -77,25 +77,25 @@ Values makeValues(const bool isText,
     mat4 glCoordMatrix = getGlCoordMatrix(tile.matrix, pitchWithMap, rotateWithMap, state, pixelsToTileUnits);
 
     return Values {
-        uniforms::u_matrix::Value{ tile.translatedMatrix(values.translate,
+        uniforms::u_matrix::Value( tile.translatedMatrix(values.translate,
                                    values.translateAnchor,
-                                   state) },
-        uniforms::u_label_plane_matrix::Value{labelPlaneMatrix},
-        uniforms::u_gl_coord_matrix::Value{ tile.translateVtxMatrix(glCoordMatrix,
+                                   state) ),
+        uniforms::u_label_plane_matrix::Value(labelPlaneMatrix),
+        uniforms::u_gl_coord_matrix::Value( tile.translateVtxMatrix(glCoordMatrix,
                                             values.translate,
                                             values.translateAnchor,
                                             state,
-                                            true) },
-        uniforms::u_extrude_scale::Value{ extrudeScale },
-        uniforms::u_texsize::Value{ texsize },
-        uniforms::u_texture::Value{ 0 },
-        uniforms::u_fade_change::Value{ symbolFadeChange },
-        uniforms::u_is_text::Value{ isText },
-        uniforms::u_camera_to_center_distance::Value{ state.getCameraToCenterDistance() },
-        uniforms::u_pitch::Value{ state.getPitch() },
-        uniforms::u_pitch_with_map::Value{ pitchWithMap },
-        uniforms::u_rotate_symbol::Value{ rotateInShader },
-        uniforms::u_aspect_ratio::Value{ state.getSize().aspectRatio() },
+                                            true) ),
+        uniforms::u_extrude_scale::Value( extrudeScale ),
+        uniforms::u_texsize::Value( texsize ),
+        uniforms::u_texture::Value( 0 ),
+        uniforms::u_fade_change::Value( symbolFadeChange ),
+        uniforms::u_is_text::Value( isText ),
+        uniforms::u_camera_to_center_distance::Value( state.getCameraToCenterDistance() ),
+        uniforms::u_pitch::Value( state.getPitch() ),
+        uniforms::u_pitch_with_map::Value( pitchWithMap ),
+        uniforms::u_rotate_symbol::Value( rotateInShader ),
+        uniforms::u_aspect_ratio::Value( state.getSize().aspectRatio() ),
         std::forward<Args>(args)...
     };
 }
@@ -147,8 +147,8 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
         tile,
         state,
         symbolFadeChange,
-        uniforms::u_gamma_scale::Value{ gammaScale },
-        uniforms::u_is_halo::Value{ part == SymbolSDFPart::Halo }
+        uniforms::u_gamma_scale::Value( gammaScale ),
+        uniforms::u_is_halo::Value( part == SymbolSDFPart::Halo )
     );
 }
 

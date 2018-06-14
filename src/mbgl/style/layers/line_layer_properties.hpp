@@ -68,7 +68,7 @@ struct LineDasharray : CrossFadedPaintProperty<std::vector<float>> {
     static std::vector<float> defaultValue() { return {  }; }
 };
 
-struct LinePattern : CrossFadedPaintProperty<std::string> {
+struct LinePattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::a_pattern_to, uniforms::u_pattern_to, attributes::a_pattern_from, uniforms::u_pattern_from> {
     static std::string defaultValue() { return ""; }
 };
 
