@@ -693,6 +693,12 @@ android-lint-test-app: platform/android/gradle/configuration.gradle
 android-javadoc: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:javadocrelease
 
+# Generates platform/android/LICENSE.md file based on all Android project dependencies
+.PHONY: android-license
+android-license: platform/android/gradle/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:licenseReleaseReport
+	python platform/android/scripts/generate-license.py
+
 # Symbolicate ndk stack traces for the arm-v7 abi
 .PHONY: android-ndk-stack
 android-ndk-stack: android-ndk-stack-arm-v7

@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: "com.jaredsburrows.license"
 
 dependencies {
     api (dependenciesList.mapboxAndroidTelemetry) {
@@ -131,6 +132,13 @@ android {
             jniDebuggable true
         }
     }
+}
+
+licenseReport {
+    generateHtmlReport = false
+    generateJsonReport = true
+    copyHtmlReportToAssets = false
+    copyJsonReportToAssets = false
 }
 
 def static getGitRevision() {
