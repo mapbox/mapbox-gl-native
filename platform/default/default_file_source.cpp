@@ -11,8 +11,10 @@
 #include <mbgl/util/url.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/work_request.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <cassert>
+#include <chrono>
 
 namespace mbgl {
 
@@ -151,8 +153,23 @@ public:
 
             // Get from the online file source
             if (resource.hasLoadingMethod(Resource::LoadingMethod::Network)) {
+#if MBGL_TILE_TIMING
+                using namespace std::chrono;
+                milliseconds requestBeginAt = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+#endif
                 tasks[req] = onlineFileSource.request(resource, [=] (Response onlineResponse) mutable {
                     this->offlineDatabase->put(resource, onlineResponse);
+#if MBGL_TILE_TIMING
+                    milliseconds requestEndAt = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+                    if (resource.kind == Resource::Kind::Tile) {
+                        Log::Debug(Event::HttpRequest,
+                                   "Tile:%s, Requesting time:%llims, Size:%u",
+                                   resource.url.c_str(),
+                                   requestEndAt - requestBeginAt,
+                                   onlineResponse.data->size()
+                                   );
+                    }
+#endif
                     callback(onlineResponse);
                 });
             }

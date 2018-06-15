@@ -12,8 +12,10 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/logging.hpp>
 
 #include <unordered_set>
+#include <chrono>
 
 namespace mbgl {
 
@@ -319,6 +321,10 @@ void GeometryTileWorker::parse() {
         return;
     }
 
+#if MBGL_TILE_TIMING
+    using namespace std::chrono;
+    milliseconds parseBeginAt = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+#endif
     std::vector<std::string> symbolOrder;
     for (auto it = layers->rbegin(); it != layers->rend(); it++) {
         if ((*it)->type == LayerType::Symbol) {
@@ -404,6 +410,17 @@ void GeometryTileWorker::parse() {
     requestNewImages(imageDependencies);
 
     performSymbolLayout();
+#if MBGL_TILE_TIMING
+    milliseconds parseEndAt = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+    Log::Debug(Event::HttpRequest,
+               "Souce ID:%s, Canonical:%d/%d/%d, Requesting time:%llims",
+               sourceID.c_str(),
+               id.canonical.z,
+               id.canonical.x,
+               id.canonical.y,
+               parseEndAt - parseBeginAt
+               );
+#endif
 }
 
 bool GeometryTileWorker::hasPendingSymbolDependencies() const {
