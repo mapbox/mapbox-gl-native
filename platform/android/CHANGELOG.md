@@ -2,6 +2,12 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.2.0-beta.3 - June 15, 2018
+ - Always commit symbol placement [#12076](https://github.com/mapbox/mapbox-gl-native/pull/12076)
+ - Ceil map dimensions [#12116](https://github.com/mapbox/mapbox-gl-native/pull/12116)
+ - Fix match stop conversion [#12128](https://github.com/mapbox/mapbox-gl-native/pull/12128)
+ - Telemetry bump to v3.1.3 [#12156](https://github.com/mapbox/mapbox-gl-native/pull/12156)
+
 ## 6.2.0-beta.2 - June 7, 2018
  - Ensure that camera is invalidated before generating telemetry event [#12042](https://github.com/mapbox/mapbox-gl-native/pull/12042)
  - Offline download batches [#11284](https://github.com/mapbox/mapbox-gl-native/pull/11284)
