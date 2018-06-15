@@ -24,11 +24,11 @@ workflows:
               only: /android-v.*/
             branches:
               ignore: /.*/
-      - node6-clang39-release:
+      - node-clang39-release:
           filters:
             tags:
               only: /node-.*/
-      - node6-gcc6-debug:
+      - node-gcc6-debug:
           filters:
             tags:
               only: /node-.*/
@@ -52,7 +52,7 @@ workflows:
               ignore: /.*/
       - macos-debug
       - macos-debug-qt5
-      - macos-release-node6:
+      - macos-release-node:
           filters:
             tags:
               only: /node-.*/
@@ -111,7 +111,7 @@ step-library:
   - &build-node
       run:
         name: Build node
-        command: make node
+        command: make node-all
   - &build-linux
       run:
         name: Build linux
@@ -158,9 +158,9 @@ step-library:
         command: |
           brew install cmake ccache
 
-  - &install-macos-node6-dependencies
+  - &install-macos-node-dependencies
       run:
-        name: Install macOS Node@6 dependencies
+        name: Install macOS Node dependencies
         command: |
           brew install node@6
           brew link node@6 --force --overwrite
@@ -207,7 +207,7 @@ step-library:
       run:
         name: Publish node package
         when: on_success
-        command: platform/node/scripts/after_success.sh
+        command: platform/node/scripts/publish.sh
 
 
   - &upload-render-tests
@@ -516,7 +516,7 @@ jobs:
 
 
 # ------------------------------------------------------------------------------
-  node6-clang39-release:
+  node-clang39-release:
     docker:
       - image: mbgl/7d2403f42e:linux-clang-3.9
     working_directory: /src
@@ -539,7 +539,7 @@ jobs:
       - *upload-render-tests
 
 # ------------------------------------------------------------------------------
-  node6-gcc6-debug:
+  node-gcc6-debug:
     docker:
       - image: mbgl/7d2403f42e:linux-gcc-6
     resource_class: large
@@ -956,7 +956,7 @@ jobs:
           destination: test/fixtures
 
 # ------------------------------------------------------------------------------
-  macos-release-node6:
+  macos-release-node:
     macos:
       xcode: "9.4.0"
     environment:
@@ -965,7 +965,7 @@ jobs:
     steps:
       - checkout
       - *install-macos-dependencies
-      - *install-macos-node6-dependencies
+      - *install-macos-node-dependencies
       - *generate-cache-key
       - *restore-cache
       - *reset-ccache-stats
