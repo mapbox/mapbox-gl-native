@@ -1,5 +1,9 @@
 #import "MGLMapViewIntegrationTest.h"
 
+@interface MGLMapView (MGLMapViewIntegrationTest)
+- (void)updateFromDisplayLink;
+@end
+
 @implementation MGLMapViewIntegrationTest
 
 - (void)setUp {
@@ -90,7 +94,7 @@
         // waitForExpectations below
         timer = [NSTimer scheduledTimerWithTimeInterval:1.0/30.0
                                                  target:self.mapView
-                                               selector:NSSelectorFromString(@"updateFromDisplayLink")
+                                               selector:@selector(updateFromDisplayLink)
                                                userInfo:nil
                                                 repeats:YES];
     }
