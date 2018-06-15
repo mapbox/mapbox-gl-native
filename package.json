@@ -33,7 +33,7 @@
     "tape": "^4.5.1"
   },
   "engines": {
-    "node": ">=4.2.1"
+    "node": ">=6"
   },
   "scripts": {
     "preinstall": "npm install node-pre-gyp",
