@@ -135,15 +135,12 @@ private:
     template <typename ValueType>
     struct VTableHeap : public VTable {
         void move(Storage&& src, Storage& dest) override {
-            destroy(dest);
             dest.dynamic = src.dynamic;
+            src.dynamic = nullptr;
         }
 
         void destroy(Storage& s) override {
-            if (s.dynamic) {
-                delete reinterpret_cast<ValueType*>(s.dynamic);
-            }
-            s.dynamic = nullptr;
+            delete reinterpret_cast<ValueType*>(s.dynamic);
         }
 
         const std::type_info& type() override {
@@ -154,9 +151,8 @@ private:
     template <typename ValueType>
     struct VTableStack : public VTable {
         void move(Storage&& src, Storage& dest) override {
-            auto srcValue = reinterpret_cast<ValueType&&>(src.stack);
-            new (static_cast<void*>(&dest.stack)) ValueType(std::move(srcValue));
-            srcValue.~ValueType();
+            new (&dest.stack) ValueType(std::move(reinterpret_cast<ValueType&>(src.stack)));
+            destroy(src);
         }
 
         void destroy(Storage& s) override {
@@ -178,13 +174,13 @@ private:
     template <typename ValueType, typename _Vt>
     std::enable_if_t<AllocateOnStack<_Vt>::value>
     createStorage(ValueType&& value) {
-        new (static_cast<void*>(&storage.stack)) _Vt(std::forward<ValueType>(value));
+        new (&storage.stack) _Vt(std::forward<ValueType>(value));
     }
 
     template <typename ValueType, typename _Vt>
     std::enable_if_t<!AllocateOnStack<_Vt>::value>
     createStorage(ValueType&& value) {
-        storage.dynamic = static_cast<void*>(new _Vt(std::forward<ValueType>(value)));
+        storage.dynamic = new _Vt(std::forward<ValueType>(value));
     }
 
     template <typename ValueType>

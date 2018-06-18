@@ -10,14 +10,13 @@ public:
         str[0] = 'a';
     }
     
-    TestType(unique_any& p) : TestType() {
-        p = std::unique_ptr<TestType>(this);
-    }
-
     //Detect moves
     TestType(TestType&& t): i1(t.i1+1), i2(t.i2+2) {
         str[0] = t.str[0]+1;
     }
+
+    TestType(const TestType&) = delete;
+    TestType& operator=(const TestType&) = delete;
 
     int i1;
     int i2;
@@ -86,6 +85,39 @@ TEST(UniqueAny, BasicTypes_Move) {
     EXPECT_TRUE(f.has_value());
     EXPECT_TRUE(f.type() == typeid(int));
 
+}
+
+TEST(UniqueAny, SmallType) {
+    struct T {
+        T(int32_t* p_) : p(p_) {
+            (*p)++;
+        }
+
+        T(T&& t) noexcept : p(t.p) {
+            (*p)++;
+        }
+
+        ~T() {
+            (*p)--;
+        }
+
+        T(const T&) = delete;
+        T& operator=(const T&) = delete;
+
+        int32_t* p;
+    };
+
+    int32_t p = 0;
+
+    {
+        unique_any u1 = unique_any(T(&p));
+        EXPECT_EQ(p, 1);
+
+        auto u2(std::move(u1));
+        EXPECT_EQ(p, 1);
+    }
+
+    EXPECT_EQ(p, 0);
 }
 
 TEST(UniqueAny, LargeType) {
