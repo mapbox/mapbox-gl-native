@@ -57,7 +57,7 @@ private:
 
     std::recursive_mutex mtx;
     std::list<Runnable*> runnables;
-    std::list<Runnable*>::iterator nextRunnable;
+    std::list<Runnable*>::iterator nextRunnable = runnables.end();
 };
 
 } // namespace util
