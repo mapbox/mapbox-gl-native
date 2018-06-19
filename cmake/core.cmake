@@ -21,7 +21,7 @@ target_add_mason_package(mbgl-core PRIVATE protozero)
 target_add_mason_package(mbgl-core PRIVATE polylabel)
 target_add_mason_package(mbgl-core PRIVATE wagyu)
 target_add_mason_package(mbgl-core PRIVATE shelf-pack)
-target_add_mason_package(mbgl-core PRIVATE vector-tile)
+target_add_mason_package(mbgl-core PRIVATE vtzero)
 
 mbgl_platform_core()
 

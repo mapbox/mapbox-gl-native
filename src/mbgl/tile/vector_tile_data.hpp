@@ -1,8 +1,13 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 
-#include <mapbox/vector_tile.hpp>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+#include <vtzero/vector_tile.hpp>
+#pragma GCC diagnostic pop
+
 #include <protozero/pbf_reader.hpp>
 
+#include <map>
 #include <unordered_map>
 #include <functional>
 #include <utility>
@@ -11,7 +16,7 @@ namespace mbgl {
 
 class VectorTileFeature : public GeometryTileFeature {
 public:
-    VectorTileFeature(const mapbox::vector_tile::layer&, const protozero::data_view&);
+    VectorTileFeature(const vtzero::layer&, const vtzero::feature&);
 
     FeatureType getType() const override;
     optional<Value> getValue(const std::string& key) const override;
@@ -20,12 +25,15 @@ public:
     GeometryCollection getGeometries() const override;
 
 private:
-    mapbox::vector_tile::feature feature;
+    vtzero::feature feature;
+
+    // hold this reference because feature depends on it
+    const vtzero::layer& layer;
 };
 
 class VectorTileLayer : public GeometryTileLayer {
 public:
-    VectorTileLayer(std::shared_ptr<const std::string> data, const protozero::data_view&);
+    VectorTileLayer(std::shared_ptr<const std::string> data, const vtzero::layer&);
 
     std::size_t featureCount() const override;
     std::unique_ptr<GeometryTileFeature> getFeature(std::size_t i) const override;
@@ -33,7 +41,8 @@ public:
 
 private:
     std::shared_ptr<const std::string> data;
-    mapbox::vector_tile::layer layer;
+    vtzero::layer layer;
+    std::vector<vtzero::feature> features;
 };
 
 class VectorTileData : public GeometryTileData {
@@ -46,9 +55,12 @@ public:
     std::vector<std::string> layerNames() const;
 
 private:
+    void parseLayers() const;
+    
     std::shared_ptr<const std::string> data;
+    vtzero::vector_tile tile;
     mutable bool parsed = false;
-    mutable std::map<std::string, const protozero::data_view> layers;
+    mutable std::map<std::string, vtzero::layer> layers;
 };
 
 } // namespace mbgl
