@@ -5,10 +5,7 @@
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 #import "MGLMapboxEvents.h"
 
-#import "FABKitProtocol.h"
-#import "Fabric+FABKits.h"
-
-@interface MGLAccountManager () <FABKit>
+@interface MGLAccountManager ()
 
 @property (atomic) NSString *accessToken;
 
@@ -73,36 +70,5 @@
 + (NSString *)accessToken {
     return [MGLAccountManager sharedManager].accessToken;
 }
-
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-
-#pragma mark - Fabric
-
-+ (NSString *)bundleIdentifier {
-    return [NSBundle mgl_frameworkBundleIdentifier];
-}
-
-+ (NSString *)kitDisplayVersion {
-    return [NSBundle mgl_frameworkInfoDictionary][@"CFBundleShortVersionString"];
-}
-
-+ (void)initializeIfNeeded {
-    Class fabric = NSClassFromString(@"Fabric");
-
-    if (fabric) {
-        NSDictionary *configuration = [fabric configurationDictionaryForKitClass:[MGLAccountManager class]];
-        if (!configuration || !configuration[@"accessToken"]) {
-            NSLog(@"Configuration dictionary returned by Fabric was nil or doesn’t have accessToken. Can’t initialize MGLAccountManager.");
-            return;
-        }
-        [self setAccessToken:configuration[@"accessToken"]];
-        MGLAccountManager *sharedAccountManager = [self sharedManager];
-        NSLog(@"MGLAccountManager was initialized with access token: %@", sharedAccountManager.accessToken);
-    } else {
-        NSLog(@"MGLAccountManager is used in a project that doesn’t have Fabric.");
-    }
-}
-
-#endif
 
 @end

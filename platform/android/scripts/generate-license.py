@@ -5,8 +5,8 @@ import json
 
 path = os.getcwd() + "/platform/android/"
 with open(path + "LICENSE.md", 'w') as licenseFile:
-    licenseFile.write("<!-- This file was generated. Use `make android-license` to update. -->\n")
-    licenseFile.write("## Additional Mapbox GL licenses\n")
+    licenseFile.write("<!-- This file was generated. Use `make android-license` to update. -->  \n")
+    licenseFile.write("## Additional Mapbox GL licenses  \n")
     with open(path + "MapboxGLAndroidSDK/build/reports/licenses/licenseReleaseReport.json", 'r') as dataFile:
         data = json.load(dataFile)
 
@@ -33,7 +33,7 @@ with open(path + "LICENSE.md", 'w') as licenseFile:
                 licenseName = license["license"]
                 licenseUrl = license["license_url"]
 
-            licenseFile.write("Mapbox GL uses portions of the %s.\n" % projectName +
-                              ("URL: [%s](%s)\n" % (projectUrl, projectUrl) if projectUrl is not None else "") +
+            licenseFile.write("Mapbox GL uses portions of the %s.  \n" % projectName +
+                              ("URL: [%s](%s)  \n" % (projectUrl, projectUrl) if projectUrl is not None else "") +
                               "License: [%s](%s)" % (licenseName, licenseUrl) +
                               "\n\n===========================================================================\n\n")
