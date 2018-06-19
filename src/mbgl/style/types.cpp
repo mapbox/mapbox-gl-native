@@ -25,6 +25,11 @@ MBGL_DEFINE_ENUM(TranslateAnchorType, {
     { TranslateAnchorType::Viewport, "viewport" },
 });
 
+MBGL_DEFINE_ENUM(RasterResamplingType, {
+    { RasterResamplingType::Linear, "linear" },
+    { RasterResamplingType::Nearest, "nearest" },
+});
+
 MBGL_DEFINE_ENUM(HillshadeIlluminationAnchorType, {
     { HillshadeIlluminationAnchorType::Map, "map" },
     { HillshadeIlluminationAnchorType::Viewport, "viewport" },
