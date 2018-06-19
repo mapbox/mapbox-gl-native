@@ -7,6 +7,27 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
+ The resampling/interpolation method to use for overscaling, also known as
+ texture magnification filter
+
+ Values of this type are used in the `MGLRasterStyleLayer.rasterResampling`
+ property.
+ */
+typedef NS_ENUM(NSUInteger, MGLRasterResampling) {
+    /**
+     (Bi)linear filtering interpolates point values using the weighted average
+     of the four closest original source points creating a smooth but blurry
+     look when overscaled
+     */
+    MGLRasterResamplingLinear,
+    /**
+     Nearest neighbor filtering interpolates point values using the nearest
+     original source point creating a sharp but pointated look when overscaled
+     */
+    MGLRasterResamplingNearest,
+};
+
+/**
  An `MGLRasterStyleLayer` is a style layer that renders georeferenced raster
  imagery on the map, especially raster tiles.
  
@@ -233,6 +254,34 @@ MGL_EXPORT
 @property (nonatomic) MGLTransition rasterOpacityTransition;
 
 /**
+ The resampling/interpolation method to use for overscaling, also known as
+ texture magnification filter
+ 
+ The default value of this property is an expression that evaluates to `linear`.
+ Set this property to `nil` to reset it to the default value.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `MGLRasterResampling` values
+ * Any of the following constant string values:
+   * `linear`: (Bi)linear filtering interpolates pixel values using the weighted
+ average of the four closest original source pixels creating a smooth but blurry
+ look when overscaled
+   * `nearest`: Nearest neighbor filtering interpolates pixel values using the
+ nearest original source pixel creating a sharp but pixelated look when
+ overscaled
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *rasterResampling;
+
+/**
  Increase or reduce the saturation of the image.
  
  The default value of this property is an expression that evaluates to the float
@@ -257,6 +306,29 @@ MGL_EXPORT
  This property corresponds to the `raster-saturation-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition rasterSaturationTransition;
+
+@end
+
+/**
+ Methods for wrapping an enumeration value for a style layer attribute in an
+ `MGLRasterStyleLayer` object and unwrapping its raw value.
+ */
+@interface NSValue (MGLRasterStyleLayerAdditions)
+
+#pragma mark Working with Raster Style Layer Attribute Values
+
+/**
+ Creates a new value object containing the given `MGLRasterResampling` enumeration.
+
+ @param rasterResampling The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLRasterResampling:(MGLRasterResampling)rasterResampling;
+
+/**
+ The `MGLRasterResampling` enumeration representation of the value.
+ */
+@property (readonly) MGLRasterResampling MGLRasterResamplingValue;
 
 @end
 

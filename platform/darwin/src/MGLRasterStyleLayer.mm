@@ -11,6 +11,15 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 
+namespace mbgl {
+
+    MBGL_DEFINE_ENUM(MGLRasterResampling, {
+        { MGLRasterResamplingLinear, "linear" },
+        { MGLRasterResamplingNearest, "nearest" },
+    });
+
+}
+
 @interface MGLRasterStyleLayer ()
 
 @property (nonatomic, readonly) mbgl::style::RasterLayer *rawLayer;
@@ -252,6 +261,23 @@
     return transition;
 }
 
+- (void)setRasterResampling:(NSExpression *)rasterResampling {
+    MGLAssertStyleLayerIsValid();
+
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::RasterResamplingType, NSValue *, mbgl::style::RasterResamplingType, MGLRasterResampling>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::RasterResamplingType>>(rasterResampling);
+    self.rawLayer->setRasterResampling(mbglValue);
+}
+
+- (NSExpression *)rasterResampling {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getRasterResampling();
+    if (propertyValue.isUndefined()) {
+        propertyValue = self.rawLayer->getDefaultRasterResampling();
+    }
+    return MGLStyleValueTransformer<mbgl::style::RasterResamplingType, NSValue *, mbgl::style::RasterResamplingType, MGLRasterResampling>().toExpression(propertyValue);
+}
+
 - (void)setRasterSaturation:(NSExpression *)rasterSaturation {
     MGLAssertStyleLayerIsValid();
 
@@ -285,6 +311,20 @@
     transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     return transition;
+}
+
+@end
+
+@implementation NSValue (MGLRasterStyleLayerAdditions)
+
++ (NSValue *)valueWithMGLRasterResampling:(MGLRasterResampling)rasterResampling {
+    return [NSValue value:&rasterResampling withObjCType:@encode(MGLRasterResampling)];
+}
+
+- (MGLRasterResampling)MGLRasterResamplingValue {
+    MGLRasterResampling rasterResampling;
+    [self getValue:&rasterResampling];
+    return rasterResampling;
 }
 
 @end

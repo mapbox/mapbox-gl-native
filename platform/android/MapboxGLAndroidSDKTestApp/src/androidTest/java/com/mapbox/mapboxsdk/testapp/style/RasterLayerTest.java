@@ -242,6 +242,20 @@ public class RasterLayerTest extends BaseActivityTest {
   }
 
   @Test
+  public void testRasterResamplingAsConstant() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("raster-resampling");
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+
+      // Set and Get
+      layer.setProperties(rasterResampling(RASTER_RESAMPLING_LINEAR));
+      assertEquals((String) layer.getRasterResampling().getValue(), (String) RASTER_RESAMPLING_LINEAR);
+    });
+  }
+
+  @Test
   public void testRasterFadeDurationAsConstant() {
     validateTestSetup();
     setupLayer();

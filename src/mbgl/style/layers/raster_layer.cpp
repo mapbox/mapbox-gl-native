@@ -236,6 +236,33 @@ TransitionOptions RasterLayer::getRasterContrastTransition() const {
     return impl().paint.template get<RasterContrast>().options;
 }
 
+PropertyValue<RasterResamplingType> RasterLayer::getDefaultRasterResampling() {
+    return { RasterResamplingType::Linear };
+}
+
+PropertyValue<RasterResamplingType> RasterLayer::getRasterResampling() const {
+    return impl().paint.template get<RasterResampling>().value;
+}
+
+void RasterLayer::setRasterResampling(PropertyValue<RasterResamplingType> value) {
+    if (value == getRasterResampling())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<RasterResampling>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void RasterLayer::setRasterResamplingTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<RasterResampling>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions RasterLayer::getRasterResamplingTransition() const {
+    return impl().paint.template get<RasterResampling>().options;
+}
+
 PropertyValue<float> RasterLayer::getDefaultRasterFadeDuration() {
     return { 300 };
 }

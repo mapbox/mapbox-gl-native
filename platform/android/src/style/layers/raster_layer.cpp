@@ -149,6 +149,12 @@ namespace android {
         layer.as<mbgl::style::RasterLayer>()->RasterLayer::setRasterContrastTransition(options);
     }
 
+    jni::Object<jni::ObjectTag> RasterLayer::getRasterResampling(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::RasterLayer>()->RasterLayer::getRasterResampling());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
     jni::Object<jni::ObjectTag> RasterLayer::getRasterFadeDuration(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::RasterLayer>()->RasterLayer::getRasterFadeDuration());
@@ -193,6 +199,7 @@ namespace android {
             METHOD(&RasterLayer::getRasterContrastTransition, "nativeGetRasterContrastTransition"),
             METHOD(&RasterLayer::setRasterContrastTransition, "nativeSetRasterContrastTransition"),
             METHOD(&RasterLayer::getRasterContrast, "nativeGetRasterContrast"),
+            METHOD(&RasterLayer::getRasterResampling, "nativeGetRasterResampling"),
             METHOD(&RasterLayer::getRasterFadeDuration, "nativeGetRasterFadeDuration"));
     }
 
