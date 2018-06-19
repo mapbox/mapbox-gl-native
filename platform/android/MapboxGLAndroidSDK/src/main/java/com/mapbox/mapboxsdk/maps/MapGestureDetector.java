@@ -438,25 +438,24 @@ final class MapGestureDetector {
       }
 
       transform.cancelTransitions();
-      cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
-
       sendTelemetryEvent(Telemetry.PAN, detector.getFocalPoint());
-
       notifyOnMoveBeginListeners(detector);
-
       return true;
     }
 
     @Override
     public boolean onMove(MoveGestureDetector detector, float distanceX, float distanceY) {
-      // dispatching start even once more if another detector ended, and this one didn't
-      cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
+      // first move event is often delivered with no displacement
+      if (distanceX != 0 || distanceY != 0) {
+        // dispatching camera start event only when the movement actually occurred
+        cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
 
-      // Scroll the map
-      transform.moveBy(-distanceX, -distanceY, 0 /*no duration*/);
+        // Scroll the map
+        transform.moveBy(-distanceX, -distanceY, 0 /*no duration*/);
 
-      notifyOnScrollListeners();
-      notifyOnMoveListeners(detector);
+        notifyOnScrollListeners();
+        notifyOnMoveListeners(detector);
+      }
       return true;
     }
 
@@ -485,7 +484,6 @@ final class MapGestureDetector {
       }
 
       transform.cancelTransitions();
-      cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
       quickZoom = detector.getPointersCount() == 1;
       if (quickZoom) {
@@ -514,7 +512,7 @@ final class MapGestureDetector {
 
     @Override
     public boolean onScale(StandardScaleGestureDetector detector) {
-      // dispatching start even once more if another detector ended, and this one didn't
+      // dispatching camera start event only when the movement actually occurred
       cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
 
       setScaleFocalPoint(detector);
@@ -615,7 +613,6 @@ final class MapGestureDetector {
       }
 
       transform.cancelTransitions();
-      cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
       if (uiSettings.isIncreaseScaleThresholdWhenRotating()) {
         // when rotation starts, interrupting scale and increasing the threshold
@@ -637,7 +634,7 @@ final class MapGestureDetector {
     @Override
     public boolean onRotate(RotateGestureDetector detector, float rotationDegreesSinceLast,
                             float rotationDegreesSinceFirst) {
-      // dispatching start even once more if another detector ended, and this one didn't
+      // dispatching camera start event only when the movement actually occurred
       cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
 
       setRotateFocalPoint(detector);
@@ -743,7 +740,6 @@ final class MapGestureDetector {
       }
 
       transform.cancelTransitions();
-      cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
       sendTelemetryEvent(Telemetry.PITCH, detector.getFocalPoint());
 
@@ -757,7 +753,7 @@ final class MapGestureDetector {
 
     @Override
     public boolean onShove(ShoveGestureDetector detector, float deltaPixelsSinceLast, float deltaPixelsSinceStart) {
-      // dispatching start even once more if another detector ended, and this one didn't
+      // dispatching camera start event only when the movement actually occurred
       cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
 
       // Get tilt value (scale and clamp)
