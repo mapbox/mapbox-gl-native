@@ -928,7 +928,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
         MGLFillExtrusionStyleLayer* layer = [[MGLFillExtrusionStyleLayer alloc] initWithIdentifier:@"extrudedBuildings" source:source];
         layer.sourceLayerIdentifier = @"building";
-        layer.predicate = [NSPredicate predicateWithFormat:@"extrude == 'true' AND height > 0"];
+        layer.predicate = [NSPredicate predicateWithFormat:@"extrude == 'true' AND CAST(height, 'NSNumber') > 0"];
         layer.fillExtrusionBase = [NSExpression expressionForKeyPath:@"min_height"];
         layer.fillExtrusionHeight = [NSExpression expressionForKeyPath:@"height"];
 
@@ -1110,7 +1110,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
         MGLFillStyleLayer *regionsLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"regions"];
 
         // filter (testing both inline and format strings)
-        regionsLayer.predicate = [NSPredicate predicateWithFormat:@"HRRNUM >= %@ AND HRRNUM < 300", @(200)];
+        regionsLayer.predicate = [NSPredicate predicateWithFormat:@"CAST(HRRNUM, 'NSNumber') >= %@ AND CAST(HRRNUM, 'NSNumber') < 300", @(200)];
 
         // paint properties
         regionsLayer.fillColor = [NSExpression expressionForConstantValue:[UIColor blueColor]];
