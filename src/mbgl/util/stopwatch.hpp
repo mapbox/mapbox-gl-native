@@ -4,9 +4,21 @@
 #include <mbgl/util/chrono.hpp>
 
 #include <string>
+#include <sstream>
 
 namespace mbgl {
 namespace util {
+    
+#ifdef MBGL_TIMING
+#define MBGL_TIMING_START(watch)  std::shared_ptr<util::stopwatch> watch = std::make_unique<util::stopwatch>(Event::Timing);
+#define MBGL_TIMING_FINISH(watch, message) \
+    std::stringstream messageStream;  \
+    messageStream << message; \
+    watch->report(messageStream.str());
+#else
+#define MBGL_TIMING_START(watch)
+#define MBGL_TIMING_FINISH(watch, message)
+#endif
 
 #ifndef DISABLE_STOPWATCH
 class stopwatch {
