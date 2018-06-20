@@ -2,6 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.2.0 - June 20, 2018
+ - Remove support for Fabric [#12126](https://github.com/mapbox/mapbox-gl-native/pull/12126)
+ - Dispatch camera start callback only when actually moving [#12172](https://github.com/mapbox/mapbox-gl-native/pull/12172)
+
 ## 6.2.0-beta.3 - June 15, 2018
  - Always commit symbol placement [#12076](https://github.com/mapbox/mapbox-gl-native/pull/12076)
  - Ceil map dimensions [#12116](https://github.com/mapbox/mapbox-gl-native/pull/12116)
