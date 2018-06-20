@@ -450,7 +450,18 @@ public final class MapboxMap {
    * @param image the pre-multiplied Bitmap
    */
   public void addImage(@NonNull String name, @NonNull Bitmap image) {
-    nativeMapView.addImage(name, image);
+    addImage(name, image, false);
+  }
+
+  /**
+   * Adds an image to be used in the map's style
+   *
+   * @param name  the name of the image
+   * @param image the pre-multiplied Bitmap
+   * @param sdf the flag indicating image is an SDF or template image
+   */
+  public void addImage(@NonNull String name, @NonNull Bitmap image, boolean sdf) {
+    nativeMapView.addImage(name, image, sdf);
   }
 
   /**
