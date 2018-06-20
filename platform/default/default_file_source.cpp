@@ -157,9 +157,9 @@ public:
                     this->offlineDatabase->put(resource, onlineResponse);
                     if (resource.kind == Resource::Kind::Tile) {
                         MBGL_TIMING_FINISH(watch,
-                                           " Action: " << "Requesting" <<
+                                           " Action: " << "Requesting," <<
                                            " URL: " << resource.url.c_str() <<
-                                           " Size: " <<  onlineResponse.data->size() << "B," <<
+                                           " Size: " << onlineResponse.data->size() << "B," <<
                                            " Time")
                     }
                     callback(onlineResponse);

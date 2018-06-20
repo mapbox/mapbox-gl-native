@@ -406,7 +406,7 @@ void GeometryTileWorker::parse() {
     requestNewImages(imageDependencies);
 
     MBGL_TIMING_FINISH(watch,
-                       " Action: " << "Parsing" <<
+                       " Action: " << "Parsing," <<
                        " SourceID: " << sourceID.c_str() <<
                        " Canonical: " << static_cast<int>(id.canonical.z) << "/" << id.canonical.x << "/" << id.canonical.y <<
                        " Time");
@@ -475,7 +475,7 @@ void GeometryTileWorker::performSymbolLayout() {
     firstLoad = false;
     
     MBGL_TIMING_FINISH(watch,
-                       " Action: " << "SymbolLayout" <<
+                       " Action: " << "SymbolLayout," <<
                        " SourceID: " << sourceID.c_str() <<
                        " Canonical: " << static_cast<int>(id.canonical.z) << "/" << id.canonical.x << "/" << id.canonical.y <<
                        " Time");
