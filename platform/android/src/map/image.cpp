@@ -11,6 +11,7 @@ mbgl::style::Image Image::getImage(jni::JNIEnv& env, jni::Object<Image> image) {
     static auto pixelRatioField = Image::javaClass.GetField<jni::jfloat>(env, "pixelRatio");
     static auto bufferField = Image::javaClass.GetField<jni::Array<jbyte>>(env, "buffer");
     static auto nameField = Image::javaClass.GetField<jni::String>(env, "name");
+    static auto sdfField = Image::javaClass.GetField<jni::jboolean>(env, "sdf");
 
     auto height = image.Get(env, heightField);
     auto width = image.Get(env, widthField);
@@ -18,6 +19,7 @@ mbgl::style::Image Image::getImage(jni::JNIEnv& env, jni::Object<Image> image) {
     auto pixels = image.Get(env, bufferField);
     auto jName = image.Get(env, nameField);
     auto name = jni::Make<std::string>(env, jName);
+    auto sdf = (bool) image.Get(env, sdfField);
     jni::DeleteLocalRef(env, jName);
 
     jni::NullCheck(env, &pixels);
@@ -30,7 +32,7 @@ mbgl::style::Image Image::getImage(jni::JNIEnv& env, jni::Object<Image> image) {
 
     jni::GetArrayRegion(env, *pixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
     jni::DeleteLocalRef(env, pixels);
-    return mbgl::style::Image {name, std::move(premultipliedImage), pixelRatio};
+    return mbgl::style::Image {name, std::move(premultipliedImage), pixelRatio, sdf};
 }
 
 void Image::registerNative(jni::JNIEnv &env) {
