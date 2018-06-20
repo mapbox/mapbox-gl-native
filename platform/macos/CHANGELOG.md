@@ -1,6 +1,6 @@
 # Changelog for Mapbox Maps SDK for macOS
 
-## master
+## 0.8.0 - June 20, 2018
 
 ### Packaging
 
