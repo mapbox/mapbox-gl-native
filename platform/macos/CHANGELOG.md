@@ -7,20 +7,24 @@
 * The minimum deployment target for this SDK is now macOS 10.11.0. ([#11776](https://github.com/mapbox/mapbox-gl-native/pull/11776))
 * Fixed an issue where `MGLMapView` produced a designable error in Interface Builder storyboards. ([#12140](https://github.com/mapbox/mapbox-gl-native/pull/12140))
 
-### Style layers
+### Styles and rendering
 
 * Added support for aggregate expressions as input values to `MGL_MATCH` expressions. ([#11866](https://github.com/mapbox/mapbox-gl-native/pull/11866))
+* Fixed a crash that occurred when style JSON contained an invalid filter containing an expression. ([#12065](https://github.com/mapbox/mapbox-gl-native/pull/12065))
+* Fixed a crash in `-[MGLStyle localizeLabelsIntoLocale:]` on macOS 10.11. ([#12123](https://github.com/mapbox/mapbox-gl-native/pull/12123))
+* Unknown tokens in URLs are now preserved, rather than replaced with an empty string. ([#11787](https://github.com/mapbox/mapbox-gl-native/issues/11787))
+* Fixed an issue preventing nested key path expressions from accessing the correct feature attributes. ([#11959](https://github.com/mapbox/mapbox-gl-native/pull/11959))
+* Fixed an issue where `MGLSymbolStyleLayer` flickered when straddling the antimeridian. ([#11938](https://github.com/mapbox/mapbox-gl-native/pull/11938))
 
 ### Other changes
 
-* Unknown tokens in URLs are now preserved, rather than replaced with an empty string. ([#11787](https://github.com/mapbox/mapbox-gl-native/issues/11787))
 * Adjusted when and how the camera transition update and finish callbacks are called, fixing recursion bugs. ([#11614](https://github.com/mapbox/mapbox-gl-native/pull/11614))
-* Fixed an issue preventing nested key path expressions get parsed accordingly to the spec. ([#11959](https://github.com/mapbox/mapbox-gl-native/pull/11959))
-* Fixed race conditions that could cause crashes when re-using `MGLMapSnapshotter` or using multiple snapshotters at the same time. ([#11831](https://github.com/mapbox/mapbox-gl-native/pull/11831))
-* Fixed crash in `-[MGLStyle localizeLabelsIntoLocale:]` on macOS 10.11 (attempting to access a property that was introduced in macOS 10.12) ([#12123](https://github.com/mapbox/mapbox-gl-native/pull/12123))
+* Fixed a crash that could occur when reusing `MGLMapSnapshotter` or using multiple snapshotters at the same time. ([#11831](https://github.com/mapbox/mapbox-gl-native/pull/11831))
+* Fixed an issue where an empty `MGLFeature` array caused high CPU utilization. ([#11985](https://github.com/mapbox/mapbox-gl-native/pull/11985))
+* Improved offline download performance. ([#11284](https://github.com/mapbox/mapbox-gl-native/pull/11284))
+* Fixed an issue that caused -[MGLMapView visibleFeaturesAtPoint:] to return an empty array when adding or removing features. ([#12076](https://github.com/mapbox/mapbox-gl-native/pull/12076))
 
-
-## 0.7.1
+## 0.7.1 - May 15, 2018
 
 ### Style layers
 
