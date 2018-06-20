@@ -156,10 +156,11 @@ public:
                 tasks[req] = onlineFileSource.request(resource, [=] (Response onlineResponse) mutable {
                     this->offlineDatabase->put(resource, onlineResponse);
                     if (resource.kind == Resource::Kind::Tile) {
+                        // onlineResponse.data will be null if data not modified
                         MBGL_TIMING_FINISH(watch,
                                            " Action: " << "Requesting," <<
                                            " URL: " << resource.url.c_str() <<
-                                           " Size: " << onlineResponse.data->size() << "B," <<
+                                           " Size: " << (onlineResponse.data != nullptr ? onlineResponse.data->size() : 0) << "B," <<
                                            " Time")
                     }
                     callback(onlineResponse);
