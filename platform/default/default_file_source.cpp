@@ -11,6 +11,7 @@
 #include <mbgl/util/url.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/work_request.hpp>
+#include <mbgl/util/stopwatch.hpp>
 
 #include <cassert>
 
@@ -151,8 +152,17 @@ public:
 
             // Get from the online file source
             if (resource.hasLoadingMethod(Resource::LoadingMethod::Network)) {
+                MBGL_TIMING_START(watch);
                 tasks[req] = onlineFileSource.request(resource, [=] (Response onlineResponse) mutable {
                     this->offlineDatabase->put(resource, onlineResponse);
+                    if (resource.kind == Resource::Kind::Tile) {
+                        // onlineResponse.data will be null if data not modified
+                        MBGL_TIMING_FINISH(watch,
+                                           " Action: " << "Requesting," <<
+                                           " URL: " << resource.url.c_str() <<
+                                           " Size: " << (onlineResponse.data != nullptr ? onlineResponse.data->size() : 0) << "B," <<
+                                           " Time")
+                    }
                     callback(onlineResponse);
                 });
             }
