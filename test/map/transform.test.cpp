@@ -3,6 +3,8 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/util/geo.hpp>
 
+#include <cmath>
+
 using namespace mbgl;
 
 TEST(Transform, InvalidZoom) {
@@ -15,7 +17,7 @@ TEST(Transform, InvalidZoom) {
     transform.setZoom(1);
     ASSERT_DOUBLE_EQ(1, transform.getZoom());
 
-    const double invalid = std::nan("");
+    const double invalid = NAN;
 
     transform.setZoom(invalid);
 
@@ -67,7 +69,7 @@ TEST(Transform, InvalidBearing) {
     ASSERT_DOUBLE_EQ(1, transform.getZoom());
     ASSERT_DOUBLE_EQ(2, transform.getAngle());
 
-    const double invalid = std::nan("");
+    const double invalid = NAN;
     transform.setAngle(invalid);
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());

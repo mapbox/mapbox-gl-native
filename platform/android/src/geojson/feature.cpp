@@ -2,6 +2,8 @@
 #include "geometry.hpp"
 #include "../gson/json_object.hpp"
 
+#include <mbgl/util/string.hpp>
+
 namespace mbgl {
 namespace android {
 namespace geojson {
