@@ -1,0 +1,30 @@
+#pragma once
+
+// This is a minimal polyfill that'll only work exactly for how we use codecvt
+
+#include <string>
+#include <boost/locale/encoding_utf.hpp>
+
+namespace std {
+
+template <typename Codecvt, typename Elem = wchar_t>
+class wstring_convert {
+public:
+    static_assert(std::is_same<Elem, typename Codecvt::Elem>::value, "type mismatch");
+
+    inline std::basic_string<Elem> from_bytes(const string& str) {
+        return boost::locale::conv::utf_to_utf<Elem>(str);
+    }
+
+    inline string to_bytes(const std::basic_string<Elem>& str) {
+        return boost::locale::conv::utf_to_utf<char>(str);
+    }
+};
+
+template <typename E>
+class codecvt_utf8_utf16 {
+public:
+    using Elem = E;
+};
+
+} // namespace std
