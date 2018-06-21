@@ -7,6 +7,8 @@ target_include_directories(mbgl-core
     PRIVATE src
 )
 
+target_link_libraries(mbgl-core PRIVATE codecvt)
+
 target_add_mason_package(mbgl-core PUBLIC geometry)
 target_add_mason_package(mbgl-core PUBLIC variant)
 target_add_mason_package(mbgl-core PRIVATE unique_resource)
