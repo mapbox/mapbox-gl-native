@@ -13,9 +13,9 @@
 
 namespace mbgl {
 
-    MBGL_DEFINE_ENUM(MGLRasterResampling, {
-        { MGLRasterResamplingLinear, "linear" },
-        { MGLRasterResamplingNearest, "nearest" },
+    MBGL_DEFINE_ENUM(MGLRasterResamplingMode, {
+        { MGLRasterResamplingModeLinear, "linear" },
+        { MGLRasterResamplingModeNearest, "nearest" },
     });
 
 }
@@ -261,21 +261,28 @@ namespace mbgl {
     return transition;
 }
 
-- (void)setRasterResampling:(NSExpression *)rasterResampling {
+- (void)setRasterResamplingMode:(NSExpression *)rasterResamplingMode {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::RasterResamplingType, NSValue *, mbgl::style::RasterResamplingType, MGLRasterResampling>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::RasterResamplingType>>(rasterResampling);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::RasterResamplingType, NSValue *, mbgl::style::RasterResamplingType, MGLRasterResamplingMode>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::RasterResamplingType>>(rasterResamplingMode);
     self.rawLayer->setRasterResampling(mbglValue);
 }
 
-- (NSExpression *)rasterResampling {
+- (NSExpression *)rasterResamplingMode {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getRasterResampling();
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefaultRasterResampling();
     }
-    return MGLStyleValueTransformer<mbgl::style::RasterResamplingType, NSValue *, mbgl::style::RasterResamplingType, MGLRasterResampling>().toExpression(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::RasterResamplingType, NSValue *, mbgl::style::RasterResamplingType, MGLRasterResamplingMode>().toExpression(propertyValue);
+}
+
+- (void)setRasterResampling:(NSExpression *)rasterResampling {
+}
+
+- (NSExpression *)rasterResampling {
+    return self.rasterResamplingMode;
 }
 
 - (void)setRasterSaturation:(NSExpression *)rasterSaturation {
@@ -317,14 +324,14 @@ namespace mbgl {
 
 @implementation NSValue (MGLRasterStyleLayerAdditions)
 
-+ (NSValue *)valueWithMGLRasterResampling:(MGLRasterResampling)rasterResampling {
-    return [NSValue value:&rasterResampling withObjCType:@encode(MGLRasterResampling)];
++ (NSValue *)valueWithMGLRasterResamplingMode:(MGLRasterResamplingMode)rasterResamplingMode {
+    return [NSValue value:&rasterResamplingMode withObjCType:@encode(MGLRasterResamplingMode)];
 }
 
-- (MGLRasterResampling)MGLRasterResamplingValue {
-    MGLRasterResampling rasterResampling;
-    [self getValue:&rasterResampling];
-    return rasterResampling;
+- (MGLRasterResamplingMode)MGLRasterResamplingModeValue {
+    MGLRasterResamplingMode rasterResamplingMode;
+    [self getValue:&rasterResamplingMode];
+    return rasterResamplingMode;
 }
 
 @end

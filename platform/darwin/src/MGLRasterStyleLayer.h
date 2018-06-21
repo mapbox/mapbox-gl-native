@@ -10,21 +10,21 @@ NS_ASSUME_NONNULL_BEGIN
  The resampling/interpolation method to use for overscaling, also known as
  texture magnification filter
 
- Values of this type are used in the `MGLRasterStyleLayer.rasterResampling`
+ Values of this type are used in the `MGLRasterStyleLayer.rasterResamplingMode`
  property.
  */
-typedef NS_ENUM(NSUInteger, MGLRasterResampling) {
+typedef NS_ENUM(NSUInteger, MGLRasterResamplingMode) {
     /**
      (Bi)linear filtering interpolates point values using the weighted average
      of the four closest original source points creating a smooth but blurry
      look when overscaled
      */
-    MGLRasterResamplingLinear,
+    MGLRasterResamplingModeLinear,
     /**
      Nearest neighbor filtering interpolates point values using the nearest
      original source point creating a sharp but pointated look when overscaled
      */
-    MGLRasterResamplingNearest,
+    MGLRasterResamplingModeNearest,
 };
 
 /**
@@ -260,9 +260,13 @@ MGL_EXPORT
  The default value of this property is an expression that evaluates to `linear`.
  Set this property to `nil` to reset it to the default value.
  
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-resampling"><code>raster-resampling</code></a>
+ layout property in the Mapbox Style Specification.
+ 
  You can set this property to an expression containing any of the following:
  
- * Constant `MGLRasterResampling` values
+ * Constant `MGLRasterResamplingMode` values
  * Any of the following constant string values:
    * `linear`: (Bi)linear filtering interpolates pixel values using the weighted
  average of the four closest original source pixels creating a smooth but blurry
@@ -279,7 +283,9 @@ MGL_EXPORT
  `$zoomLevel` variable or applying interpolation or step functions to feature
  attributes.
  */
-@property (nonatomic, null_resettable) NSExpression *rasterResampling;
+@property (nonatomic, null_resettable) NSExpression *rasterResamplingMode;
+
+@property (nonatomic, null_resettable) NSExpression *rasterResampling __attribute__((unavailable("Use rasterResamplingMode instead.")));
 
 /**
  Increase or reduce the saturation of the image.
@@ -318,17 +324,17 @@ MGL_EXPORT
 #pragma mark Working with Raster Style Layer Attribute Values
 
 /**
- Creates a new value object containing the given `MGLRasterResampling` enumeration.
+ Creates a new value object containing the given `MGLRasterResamplingMode` enumeration.
 
- @param rasterResampling The value for the new object.
+ @param rasterResamplingMode The value for the new object.
  @return A new value object that contains the enumeration value.
  */
-+ (instancetype)valueWithMGLRasterResampling:(MGLRasterResampling)rasterResampling;
++ (instancetype)valueWithMGLRasterResamplingMode:(MGLRasterResamplingMode)rasterResamplingMode;
 
 /**
- The `MGLRasterResampling` enumeration representation of the value.
+ The `MGLRasterResamplingMode` enumeration representation of the value.
  */
-@property (readonly) MGLRasterResampling MGLRasterResamplingValue;
+@property (readonly) MGLRasterResamplingMode MGLRasterResamplingModeValue;
 
 @end
 

@@ -243,6 +243,7 @@ In style JSON | In Objective-C | In Swift
 `raster-brightness-max` | `MGLRasterStyleLayer.maximumRasterBrightness` | `MGLRasterStyleLayer.maximumRasterBrightness`
 `raster-brightness-min` | `MGLRasterStyleLayer.minimumRasterBrightness` | `MGLRasterStyleLayer.minimumRasterBrightness`
 `raster-hue-rotate` | `MGLRasterStyleLayer.rasterHueRotation` | `MGLRasterStyleLayer.rasterHueRotation`
+`raster-resampling` | `MGLRasterStyleLayer.rasterResamplingMode` | `MGLRasterStyleLayer.rasterResamplingMode`
 
 ### Symbol style layers
 
