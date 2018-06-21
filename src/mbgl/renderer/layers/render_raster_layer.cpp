@@ -123,13 +123,15 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
         );
     };
 
+    const gl::TextureFilter filter = evaluated.get<RasterResampling>() == RasterResamplingType::Nearest ? gl::TextureFilter::Nearest : gl::TextureFilter::Linear;
+
     if (RenderImageSource* imageSource = source->as<RenderImageSource>()) {
         if (imageSource->isEnabled() && imageSource->isLoaded() && !imageSource->bucket->needsUpload()) {
             RasterBucket& bucket = *imageSource->bucket;
 
             assert(bucket.texture);
-            parameters.context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear);
-            parameters.context.bindTexture(*bucket.texture, 1, gl::TextureFilter::Linear);
+            parameters.context.bindTexture(*bucket.texture, 0, filter);
+            parameters.context.bindTexture(*bucket.texture, 1, filter);
 
             for (auto matrix_ : imageSource->matrices) {
                 draw(matrix_,
@@ -147,8 +149,8 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                 continue;
 
             assert(bucket.texture);
-            parameters.context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear);
-            parameters.context.bindTexture(*bucket.texture, 1, gl::TextureFilter::Linear);
+            parameters.context.bindTexture(*bucket.texture, 0, filter);
+            parameters.context.bindTexture(*bucket.texture, 1, filter);
 
             if (bucket.vertexBuffer && bucket.indexBuffer && !bucket.segments.empty()) {
                 // Draw only the parts of the tile that aren't drawn by another tile in the layer.

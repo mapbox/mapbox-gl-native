@@ -53,6 +53,8 @@ public:
     void setRasterContrastTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Object<TransitionOptions> getRasterContrastTransition(jni::JNIEnv&);
 
+    jni::Object<jni::ObjectTag> getRasterResampling(jni::JNIEnv&);
+
     jni::Object<jni::ObjectTag> getRasterFadeDuration(jni::JNIEnv&);
     jni::jobject* createJavaPeer(jni::JNIEnv&);
 

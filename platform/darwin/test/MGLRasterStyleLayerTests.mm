@@ -306,6 +306,49 @@
         XCTAssertEqual(rasterOpacityTransition.duration, transitionTest.duration);
     }
 
+    // raster-resampling
+    {
+        XCTAssertTrue(rawLayer->getRasterResampling().isUndefined(),
+                      @"raster-resampling should be unset initially.");
+        NSExpression *defaultExpression = layer.rasterResamplingMode;
+
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'nearest'"];
+        layer.rasterResamplingMode = constantExpression;
+        mbgl::style::PropertyValue<mbgl::style::RasterResamplingType> propertyValue = { mbgl::style::RasterResamplingType::Nearest };
+        XCTAssertEqual(rawLayer->getRasterResampling(), propertyValue,
+                       @"Setting rasterResamplingMode to a constant value expression should update raster-resampling.");
+        XCTAssertEqualObjects(layer.rasterResamplingMode, constantExpression,
+                              @"rasterResamplingMode should round-trip constant value expressions.");
+
+        constantExpression = [NSExpression expressionWithFormat:@"'nearest'"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.rasterResamplingMode = functionExpression;
+
+        mbgl::style::IntervalStops<mbgl::style::RasterResamplingType> intervalStops = {{
+            { -INFINITY, mbgl::style::RasterResamplingType::Nearest },
+            { 18, mbgl::style::RasterResamplingType::Nearest },
+        }};
+        propertyValue = mbgl::style::CameraFunction<mbgl::style::RasterResamplingType> { intervalStops };
+
+        XCTAssertEqual(rawLayer->getRasterResampling(), propertyValue,
+                       @"Setting rasterResamplingMode to a camera expression should update raster-resampling.");
+        XCTAssertEqualObjects(layer.rasterResamplingMode, functionExpression,
+                              @"rasterResamplingMode should round-trip camera expressions.");
+
+
+        layer.rasterResamplingMode = nil;
+        XCTAssertTrue(rawLayer->getRasterResampling().isUndefined(),
+                      @"Unsetting rasterResamplingMode should return raster-resampling to the default value.");
+        XCTAssertEqualObjects(layer.rasterResamplingMode, defaultExpression,
+                              @"rasterResamplingMode should return the default value after being unset.");
+
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.rasterResamplingMode = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.rasterResamplingMode = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+    }
+
     // raster-saturation
     {
         XCTAssertTrue(rawLayer->getRasterSaturation().isUndefined(),
@@ -366,7 +409,13 @@
     [self testPropertyName:@"raster-fade-duration" isBoolean:NO];
     [self testPropertyName:@"raster-hue-rotation" isBoolean:NO];
     [self testPropertyName:@"raster-opacity" isBoolean:NO];
+    [self testPropertyName:@"raster-resampling-mode" isBoolean:NO];
     [self testPropertyName:@"raster-saturation" isBoolean:NO];
+}
+
+- (void)testValueAdditions {
+    XCTAssertEqual([NSValue valueWithMGLRasterResamplingMode:MGLRasterResamplingModeLinear].MGLRasterResamplingModeValue, MGLRasterResamplingModeLinear);
+    XCTAssertEqual([NSValue valueWithMGLRasterResamplingMode:MGLRasterResamplingModeNearest].MGLRasterResamplingModeValue, MGLRasterResamplingModeNearest);
 }
 
 @end

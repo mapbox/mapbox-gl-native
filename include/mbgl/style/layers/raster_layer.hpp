@@ -67,6 +67,12 @@ public:
     void setRasterContrastTransition(const TransitionOptions&);
     TransitionOptions getRasterContrastTransition() const;
 
+    static PropertyValue<RasterResamplingType> getDefaultRasterResampling();
+    PropertyValue<RasterResamplingType> getRasterResampling() const;
+    void setRasterResampling(PropertyValue<RasterResamplingType>);
+    void setRasterResamplingTransition(const TransitionOptions&);
+    TransitionOptions getRasterResamplingTransition() const;
+
     static PropertyValue<float> getDefaultRasterFadeDuration();
     PropertyValue<float> getRasterFadeDuration() const;
     void setRasterFadeDuration(PropertyValue<float>);

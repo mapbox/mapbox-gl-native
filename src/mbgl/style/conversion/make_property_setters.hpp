@@ -206,6 +206,8 @@ inline auto makePaintPropertySetters() {
     result["raster-saturation-transition"] = &setTransition<RasterLayer, &RasterLayer::setRasterSaturationTransition>;
     result["raster-contrast"] = &setProperty<RasterLayer, PropertyValue<float>, &RasterLayer::setRasterContrast>;
     result["raster-contrast-transition"] = &setTransition<RasterLayer, &RasterLayer::setRasterContrastTransition>;
+    result["raster-resampling"] = &setProperty<RasterLayer, PropertyValue<RasterResamplingType>, &RasterLayer::setRasterResampling>;
+    result["raster-resampling-transition"] = &setTransition<RasterLayer, &RasterLayer::setRasterResamplingTransition>;
     result["raster-fade-duration"] = &setProperty<RasterLayer, PropertyValue<float>, &RasterLayer::setRasterFadeDuration>;
     result["raster-fade-duration-transition"] = &setTransition<RasterLayer, &RasterLayer::setRasterFadeDurationTransition>;
 

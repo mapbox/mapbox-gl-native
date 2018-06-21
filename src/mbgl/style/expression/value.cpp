@@ -337,6 +337,10 @@ template type::Type valueTypeToExpressionType<TranslateAnchorType>();
 template optional<TranslateAnchorType> fromExpressionValue<TranslateAnchorType>(const Value&);
 template Value toExpressionValue(const TranslateAnchorType&);
 
+template type::Type valueTypeToExpressionType<RasterResamplingType>();
+template optional<RasterResamplingType> fromExpressionValue<RasterResamplingType>(const Value&);
+template Value toExpressionValue(const RasterResamplingType&);
+
 template type::Type valueTypeToExpressionType<HillshadeIlluminationAnchorType>();
 template optional<HillshadeIlluminationAnchorType> fromExpressionValue<HillshadeIlluminationAnchorType>(const Value&);
 template Value toExpressionValue(const HillshadeIlluminationAnchorType&);
