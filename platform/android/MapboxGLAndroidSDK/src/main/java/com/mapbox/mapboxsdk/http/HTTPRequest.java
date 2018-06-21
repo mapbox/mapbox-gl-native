@@ -189,7 +189,11 @@ class HTTPRequest implements Callback {
       @Override
       public void onResponse(byte[] bytes) {
         if (bytes != null) {
-          nativeOnResponse(200, null, null, null, null, null, null, bytes);
+          lock.lock();
+          if (nativePtr != 0) {
+            nativeOnResponse(200, null, null, null, null, null, null, bytes);
+          }
+          lock.unlock();
         }
       }
     }).execute(resourceUrl);
