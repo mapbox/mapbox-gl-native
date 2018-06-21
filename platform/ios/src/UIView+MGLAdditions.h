@@ -4,13 +4,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UIView (MGLAdditions)
 
-- (NSLayoutYAxisAnchor *)safeTopAnchor;
+- (NSLayoutYAxisAnchor *)mgl_safeTopAnchor;
 
-- (NSLayoutXAxisAnchor *)safeLeadingAnchor;
+- (NSLayoutXAxisAnchor *)mgl_safeLeadingAnchor;
 
-- (NSLayoutYAxisAnchor *)safeBottomAnchor;
+- (NSLayoutYAxisAnchor *)mgl_safeBottomAnchor;
 
-- (NSLayoutXAxisAnchor *)safeTrailingAnchor;
+- (NSLayoutXAxisAnchor *)mgl_safeTrailingAnchor;
 
 @end
 

@@ -569,7 +569,17 @@ public:
         [MGLMapboxEvents pushEvent:MMEEventTypeMapLoad withAttributes:@{}];
     }
     
-    [self setupConstraints];
+    [[self.scaleBar.topAnchor constraintEqualToAnchor:self.mgl_safeTopAnchor constant:8] setActive:YES];
+    [[self.scaleBar.leadingAnchor constraintEqualToAnchor:self.mgl_safeLeadingAnchor constant:8] setActive:YES];
+    
+    [[self.compassView.topAnchor constraintEqualToAnchor:self.mgl_safeTopAnchor constant:8] setActive:YES];
+    [[self.compassView.trailingAnchor constraintEqualToAnchor:self.mgl_safeTrailingAnchor constant:-8] setActive:YES];
+    
+    [[self.attributionButton.bottomAnchor constraintEqualToAnchor:self.mgl_safeBottomAnchor constant:-8] setActive:YES];
+    [[self.attributionButton.trailingAnchor constraintEqualToAnchor:self.mgl_safeTrailingAnchor constant:-8] setActive:YES];
+    
+    [[self.logoView.leadingAnchor constraintEqualToAnchor:self.mgl_safeLeadingAnchor constant:8] setActive:YES];
+    [[self.logoView.bottomAnchor constraintEqualToAnchor:self.mgl_safeBottomAnchor constant:-8] setActive:YES];
 }
 
 - (mbgl::Size)size
@@ -721,20 +731,6 @@ public:
         return (UIViewController *)laterResponder;
     }
     return nil;
-}
-
-- (void)setupConstraints {
-    [[self.scaleBar.topAnchor constraintEqualToAnchor:self.safeTopAnchor constant:8] setActive:YES];
-    [[self.scaleBar.leadingAnchor constraintEqualToAnchor:self.safeLeadingAnchor constant:8] setActive:YES];
-    
-    [[self.compassView.topAnchor constraintEqualToAnchor:self.safeTopAnchor constant:8] setActive:YES];
-    [[self.compassView.trailingAnchor constraintEqualToAnchor:self.safeTrailingAnchor constant:-8] setActive:YES];
-    
-    [[self.attributionButton.bottomAnchor constraintEqualToAnchor:self.safeBottomAnchor constant:-8] setActive:YES];
-    [[self.attributionButton.trailingAnchor constraintEqualToAnchor:self.safeTrailingAnchor constant:-8] setActive:YES];
-    
-    [[self.logoView.leadingAnchor constraintEqualToAnchor:self.safeLeadingAnchor constant:8] setActive:YES];
-    [[self.logoView.bottomAnchor constraintEqualToAnchor:self.safeBottomAnchor constant:-8] setActive:YES];
 }
 
 - (BOOL)isOpaque

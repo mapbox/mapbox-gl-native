@@ -2,7 +2,7 @@
 
 @implementation UIView (MGLAdditions)
 
-- (NSLayoutYAxisAnchor *)safeTopAnchor {
+- (NSLayoutYAxisAnchor *)mgl_safeTopAnchor {
     if (@available(iOS 11.0, *)) {
         return self.safeAreaLayoutGuide.topAnchor;
     } else {
@@ -10,7 +10,7 @@
     }
 }
 
-- (NSLayoutXAxisAnchor *)safeLeadingAnchor {
+- (NSLayoutXAxisAnchor *)mgl_safeLeadingAnchor {
     if (@available(iOS 11.0, *)) {
         return self.safeAreaLayoutGuide.leadingAnchor;
     } else {
@@ -18,7 +18,7 @@
     }
 }
 
-- (NSLayoutYAxisAnchor *)safeBottomAnchor {
+- (NSLayoutYAxisAnchor *)mgl_safeBottomAnchor {
     if (@available(iOS 11.0, *)) {
         return self.safeAreaLayoutGuide.bottomAnchor;
     } else {
@@ -26,7 +26,7 @@
     }
 }
 
-- (NSLayoutXAxisAnchor *)safeTrailingAnchor {
+- (NSLayoutXAxisAnchor *)mgl_safeTrailingAnchor {
     if (@available(iOS 11.0, *)) {
         return self.safeAreaLayoutGuide.trailingAnchor;
     } else {
