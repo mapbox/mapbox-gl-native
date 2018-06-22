@@ -3,7 +3,7 @@ add_definitions(-DMBGL_USE_GLES2=1)
 mason_use(icu VERSION 58.1-min-size)
 
 macro(initialize_ios_target target)
-    set_xcode_property(${target} IPHONEOS_DEPLOYMENT_TARGET "8.0")
+    set_xcode_property(${target} IPHONEOS_DEPLOYMENT_TARGET "9.0")
     set_xcode_property(${target} ENABLE_BITCODE "YES")
     set_xcode_property(${target} BITCODE_GENERATION_MODE bitcode)
     set_xcode_property(${target} ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
