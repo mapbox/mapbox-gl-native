@@ -1336,6 +1336,26 @@ public class PropertyFactory {
   }
 
   /**
+   * The resampling/interpolation method to use for overscaling, also known as texture magnification filter
+   *
+   * @param value a String value
+   * @return property wrapper around String
+   */
+  public static PropertyValue<String> rasterResampling(@Property.RASTER_RESAMPLING String value) {
+    return new PaintPropertyValue<>("raster-resampling", value);
+  }
+
+  /**
+   * The resampling/interpolation method to use for overscaling, also known as texture magnification filter
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> rasterResampling(Expression expression) {
+    return new PaintPropertyValue<>("raster-resampling", expression);
+  }
+
+  /**
    * Fade duration when a new tile is added.
    *
    * @param value a Float value

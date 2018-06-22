@@ -11,6 +11,15 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 
+namespace mbgl {
+
+    MBGL_DEFINE_ENUM(MGLRasterResamplingMode, {
+        { MGLRasterResamplingModeLinear, "linear" },
+        { MGLRasterResamplingModeNearest, "nearest" },
+    });
+
+}
+
 @interface MGLRasterStyleLayer ()
 
 @property (nonatomic, readonly) mbgl::style::RasterLayer *rawLayer;
@@ -252,6 +261,30 @@
     return transition;
 }
 
+- (void)setRasterResamplingMode:(NSExpression *)rasterResamplingMode {
+    MGLAssertStyleLayerIsValid();
+
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::RasterResamplingType, NSValue *, mbgl::style::RasterResamplingType, MGLRasterResamplingMode>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::RasterResamplingType>>(rasterResamplingMode);
+    self.rawLayer->setRasterResampling(mbglValue);
+}
+
+- (NSExpression *)rasterResamplingMode {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getRasterResampling();
+    if (propertyValue.isUndefined()) {
+        propertyValue = self.rawLayer->getDefaultRasterResampling();
+    }
+    return MGLStyleValueTransformer<mbgl::style::RasterResamplingType, NSValue *, mbgl::style::RasterResamplingType, MGLRasterResamplingMode>().toExpression(propertyValue);
+}
+
+- (void)setRasterResampling:(NSExpression *)rasterResampling {
+}
+
+- (NSExpression *)rasterResampling {
+    return self.rasterResamplingMode;
+}
+
 - (void)setRasterSaturation:(NSExpression *)rasterSaturation {
     MGLAssertStyleLayerIsValid();
 
@@ -285,6 +318,20 @@
     transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     return transition;
+}
+
+@end
+
+@implementation NSValue (MGLRasterStyleLayerAdditions)
+
++ (NSValue *)valueWithMGLRasterResamplingMode:(MGLRasterResamplingMode)rasterResamplingMode {
+    return [NSValue value:&rasterResamplingMode withObjCType:@encode(MGLRasterResamplingMode)];
+}
+
+- (MGLRasterResamplingMode)MGLRasterResamplingModeValue {
+    MGLRasterResamplingMode rasterResamplingMode;
+    [self getValue:&rasterResamplingMode];
+    return rasterResamplingMode;
 }
 
 @end

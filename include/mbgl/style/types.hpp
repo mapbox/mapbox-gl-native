@@ -38,6 +38,11 @@ enum class LineJoinType : uint8_t {
     FlipBevel
 };
 
+enum class RasterResamplingType : bool {
+    Linear,
+    Nearest
+};
+
 enum class HillshadeIlluminationAnchorType : bool {
     Map,
     Viewport

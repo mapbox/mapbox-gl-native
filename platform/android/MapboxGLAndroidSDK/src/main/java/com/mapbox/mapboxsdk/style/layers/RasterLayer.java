@@ -264,6 +264,17 @@ public class RasterLayer extends Layer {
   }
 
   /**
+   * Get the RasterResampling property
+   *
+   * @return property wrapper value around String
+   */
+  @SuppressWarnings("unchecked")
+  public PropertyValue<String> getRasterResampling() {
+    checkThread();
+    return (PropertyValue<String>) new PropertyValue("raster-resampling", nativeGetRasterResampling());
+  }
+
+  /**
    * Get the RasterFadeDuration property
    *
    * @return property wrapper value around Float
@@ -309,6 +320,8 @@ public class RasterLayer extends Layer {
   private native TransitionOptions nativeGetRasterContrastTransition();
 
   private native void nativeSetRasterContrastTransition(long duration, long delay);
+
+  private native Object nativeGetRasterResampling();
 
   private native Object nativeGetRasterFadeDuration();
 
