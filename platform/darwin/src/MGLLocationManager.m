@@ -64,6 +64,11 @@
     [self.locationManager stopUpdatingLocation];
 }
 
+- (void)dismissHeadingCalibrationDisplay
+{
+    [self.locationManager dismissHeadingCalibrationDisplay];
+}
+
 - (void)dealloc
 {
     [self.locationManager stopUpdatingLocation];
@@ -85,6 +90,15 @@
     if ([self.delegate respondsToSelector:@selector(locationManager:didUpdateHeading:)]) {
         [self.delegate locationManager:self didUpdateHeading:newHeading];
     }
+}
+
+- (BOOL)locationManagerShouldDisplayHeadingCalibration:(CLLocationManager *)manager
+{
+    if ([self.delegate respondsToSelector:@selector(locationManagerShouldDisplayHeadingCalibration:)]) {
+        return [self.delegate locationManagerShouldDisplayHeadingCalibration:self];
+    }
+    
+    return NO;
 }
 
 @end

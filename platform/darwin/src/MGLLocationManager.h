@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)requestAlwaysAuthorization;
 - (void)requestWhenInUseAuthorization;
 
+- (void)dismissHeadingCalibrationDisplay;
+
 @end
 
 /**
@@ -39,6 +41,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)locationManager:(id<MGLLocationManager>)manager
        didUpdateHeading:(CLHeading *)newHeading;
+
+- (BOOL)locationManagerShouldDisplayHeadingCalibration:(id<MGLLocationManager>)manager;
+
+- (void)locationManager:(id<MGLLocationManager>)manager
+       didFailWithError:(nonnull NSError *)error;
 
 @optional
 
