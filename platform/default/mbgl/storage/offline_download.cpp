@@ -355,7 +355,7 @@ void OfflineDownload::ensureResource(const Resource& resource,
             if (buffer.size() == 64 || resourcesRemaining.size() == 0) {
                 try {
                     offlineDatabase.putRegionResources(id, buffer, status);
-                } catch (MapboxTileLimitExceededException) {
+                } catch (const MapboxTileLimitExceededException&) {
                     onMapboxTileCountLimitExceeded();
                     return;
                 }
