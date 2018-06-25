@@ -19,6 +19,7 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <list>
+#include <map>
 
 #include <memory>
 
@@ -44,8 +45,7 @@ const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount = @"Maximu
 
 @implementation MGLOfflineStorage {
     std::unique_ptr<mbgl::Actor<mbgl::ResourceTransform>> _mbglResourceTransform;
-    MGLOfflinePack *_resourcesToInsertPack;
-    std::list<std::tuple<mbgl::Resource, mbgl::Response, bool>> _resourcesToInsert;
+    std::multimap<int64_t, std::tuple<mbgl::Resource, mbgl::Response, bool>> _resourcesToInsertByRegionID;
 }
 
 + (instancetype)sharedOfflineStorage {
@@ -398,8 +398,7 @@ const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount = @"Maximu
         response.expires = mbgl::util::now() + mbgl::Seconds(static_cast<long long>(expires.timeIntervalSinceNow));
     }
     
-    _resourcesToInsertPack = pack;
-    _resourcesToInsert.push_back({resource, response, compressed});
+    _resourcesToInsertByRegionID.insert(std::pair<int64_t, std::tuple<mbgl::Resource, mbgl::Response, bool>>(pack.mbglOfflineRegion->getID(), {resource, response, compressed}));
 }
 
 /**
@@ -422,16 +421,19 @@ const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount = @"Maximu
         response.expires = mbgl::util::now() + mbgl::Seconds(static_cast<long long>(expires.timeIntervalSinceNow));
     }
 
-    _resourcesToInsertPack = pack;
-    _resourcesToInsert.push_back({resource, response, compressed});
+    _resourcesToInsertByRegionID.insert(std::pair<int64_t, std::tuple<mbgl::Resource, mbgl::Response, bool>>(pack.mbglOfflineRegion->getID(), {resource, response, compressed}));
 }
 
--(void)commitResourcesWithCompletionHandler:(void (^)(NSError * _Nullable error))completion
+-(void)commitResourcesForPack:(MGLOfflinePack *)pack withCompletionHandler:(void (^)(NSError * _Nullable error))completion
 {
-    MGLOfflinePack *pack = _resourcesToInsertPack;
-    _resourcesToInsertPack = nil;
-    std::list<std::tuple<mbgl::Resource, mbgl::Response, bool>> resources(_resourcesToInsert);
-    _resourcesToInsert.clear();
+    std::list<std::tuple<mbgl::Resource, mbgl::Response, bool>> resources;
+    auto its = _resourcesToInsertByRegionID.equal_range(pack.mbglOfflineRegion->getID());
+    auto it = its.first;
+    const auto end = its.second;
+    while (it != end) {
+        resources.push_back(it->second);
+        _resourcesToInsertByRegionID.erase(it++);
+    }
     
     _mbglFileSource->startPutRegionResources(*pack.mbglOfflineRegion, resources, [&, completion](std::exception_ptr exception) {
         NSError *error;

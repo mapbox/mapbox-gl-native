@@ -294,7 +294,7 @@ MGL_EXPORT
 /**
  Insert a batch of tiles and resources into the cache. Call after some putTileWithUrlTemplate/putResourceWithUrl.
  */
--(void)commitResourcesWithCompletionHandler:(void (^)(NSError * _Nullable error))completion;
+-(void)commitResourcesForPack:(MGLOfflinePack *)pack withCompletionHandler:(void (^)(NSError * _Nullable error))completion;
 
 /**
  The cumulative size, measured in bytes, of all downloaded resources on disk.
