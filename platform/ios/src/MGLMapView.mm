@@ -4698,11 +4698,14 @@ public:
 {
     BOOL shouldEnableLocationServices = self.showsUserLocation && !self.dormant;
 
-    if (shouldEnableLocationServices && ! self.locationManager)
+    if (shouldEnableLocationServices)
     {
-        self.locationManager = [[MGLCLLocationManager alloc] init];
+        // If no custom location manager is provided will use the internal implementation.
+        if (!self.locationManager) {
+            self.locationManager = [[MGLCLLocationManager alloc] init];
+        }
 
-        if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined)
+        if (self.locationManager.authorizationStatus == kCLAuthorizationStatusNotDetermined)
         {
             BOOL requiresWhenInUseUsageDescription = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){11,0,0}];
             BOOL hasWhenInUseUsageDescription = !![[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"];
