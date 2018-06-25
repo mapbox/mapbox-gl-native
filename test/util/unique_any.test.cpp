@@ -42,7 +42,7 @@ TEST(UniqueAny, BasicTypes) {
     EXPECT_TRUE(i.type() == typeid(int));
     EXPECT_TRUE(IsStackAllocated(i, any_cast<int>(&i)));
 
-    auto iValue = any_cast<int>(i);
+    auto iValue = *any_cast<int>(&i);
     EXPECT_TRUE(iValue == 3);
 
     EXPECT_TRUE(unique_any(4).has_value());
@@ -53,7 +53,7 @@ TEST(UniqueAny, BasicTypes) {
     EXPECT_TRUE(f.type() == typeid(float));
     EXPECT_TRUE(IsStackAllocated(f, any_cast<float>(&f)));
 
-    const float fValue = any_cast<const float>(f);
+    const float fValue = *any_cast<const float>(&f);
     EXPECT_TRUE(fValue == 6.2f);
 
     EXPECT_TRUE(unique_any(1.0f).has_value());
@@ -64,7 +64,7 @@ TEST(UniqueAny, BasicTypes) {
     EXPECT_TRUE(c.type() == typeid(char));
     EXPECT_TRUE(IsStackAllocated(c, any_cast<char>(&c)));
 
-    EXPECT_THROW(any_cast<float>(c), bad_any_cast);
+    EXPECT_THROW(any_cast<float>(&c), bad_any_cast);
 
     EXPECT_TRUE(unique_any('4').has_value());
     EXPECT_TRUE(unique_any('4').type() == typeid(char));
@@ -166,14 +166,13 @@ TEST(UniqueAny, SharedPtr) {
     std::weak_ptr<int> weak = shared;
     unique_any u1 = 0;
 
-    EXPECT_THROW(any_cast<float>(u1), bad_any_cast);
+    EXPECT_THROW(any_cast<float>(&u1), bad_any_cast);
 
     EXPECT_EQ(weak.use_count(), 1);
     unique_any u2 = shared;
     EXPECT_EQ(weak.use_count(), 2);
 
-    EXPECT_EQ(any_cast<std::unique_ptr<int>>(&u1), nullptr);
-    EXPECT_FALSE(IsStackAllocated(u1, any_cast<std::shared_ptr<TestType>>(&u1)));
+    EXPECT_THROW(any_cast<std::unique_ptr<int>>(&u1), bad_any_cast);
 
     u1 = std::move(u2);
     EXPECT_EQ(weak.use_count(), 2);
