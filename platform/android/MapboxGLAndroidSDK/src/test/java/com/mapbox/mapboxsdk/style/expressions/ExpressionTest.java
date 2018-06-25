@@ -3,6 +3,8 @@ package com.mapbox.mapboxsdk.style.expressions;
 import android.graphics.Color;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import java.util.Arrays;
 
@@ -85,6 +87,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Expression unit tests that validate the expression output with the expected Object[]array representation.
  */
+@RunWith(RobolectricTestRunner.class)
 public class ExpressionTest {
 
   @Test
@@ -117,7 +120,7 @@ public class ExpressionTest {
 
   @Test
   public void testToRgba() throws Exception {
-    Object[] expected = new Object[] {"to-rgba", new Object[] {"to-color", "rgba(255, 0, 0, 255)"}};
+    Object[] expected = new Object[] {"to-rgba", new Object[] {"to-color", "rgba(255, 0, 0, 1)"}};
     Object[] actual = toRgba(toColor(literal(PropertyFactory.colorToRgbaString(Color.RED)))).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
@@ -138,7 +141,7 @@ public class ExpressionTest {
 
   @Test
   public void testEqExpression() throws Exception {
-    Object[] expected = new Object[] {"==",new Object[]{"get", "hello"}, 1f};
+    Object[] expected = new Object[] {"==", new Object[] {"get", "hello"}, 1f};
     Object[] actual = eq(get("hello"), 1).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
@@ -159,7 +162,7 @@ public class ExpressionTest {
 
   @Test
   public void testNeqExpression() throws Exception {
-    Object[] expected = new Object[] {"!=",new Object[]{"get", "hello"}, 1f};
+    Object[] expected = new Object[] {"!=", new Object[] {"get", "hello"}, 1f};
     Object[] actual = neq(get("hello"), 1).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
@@ -1140,7 +1143,7 @@ public class ExpressionTest {
   @Test
   public void testColorConversion() {
     Expression greenColor = color(0xFF00FF00);
-    Object[] expected = new Object[] {"rgba", 0f, 255f, 0f, 255f};
+    Object[] expected = new Object[] {"rgba", 0f, 255f, 0f, 1f};
     assertTrue("expression should match", Arrays.deepEquals(expected, greenColor.toArray()));
   }
 
@@ -1250,7 +1253,7 @@ public class ExpressionTest {
   public void testRawRgbaColor() {
     Expression expected = interpolate(
       exponential(2f), zoom(),
-      literal(5f), literal("rgba(0, 0, 0, 255)"),
+      literal(5f), literal("rgba(0, 0, 0, 1)"),
       literal(10.5f), literal("rgb(255, 0, 0)"),
       literal(15), color(Color.GREEN),
       literal(20), literal(PropertyFactory.colorToRgbaString(Color.BLUE)));
@@ -1271,5 +1274,20 @@ public class ExpressionTest {
       stop("layer1", 2),
       stop("layer2", 2.7));
     assertEquals("expressions should match", expected, raw(expected.toString()));
+  }
+
+  @Test
+  public void testAlphaValueInColorConversion() {
+    // regression test for #12198
+    Expression colorExpression = color(Color.parseColor("#41FF0000")); // 25.4% alpha red
+    Object[] result = colorExpression.toArray();
+    assertEquals("alpha value should match", 0.254f, (Float) result[4], 0.001f);
+  }
+
+  @Test
+  public void testAlphaValueInStringConversion() {
+    String color = PropertyFactory.colorToRgbaString(Color.parseColor("#41FF0000")).split(" ")[3];
+    String alpha = color.substring(0, color.length() - 1);
+    assertEquals("alpha value should match", 0.254f, Float.valueOf(alpha), 0.001f);
   }
 }
