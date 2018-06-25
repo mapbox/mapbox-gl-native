@@ -300,8 +300,10 @@ MGL_EXPORT IB_DESIGNABLE
  The object that this map view uses to start and stop the delivery of location-related
  events.
  
- If no custom manager is provided or setting this property to `nil` it will default
+ If no custom manager is provided or setting this property to `nil` will default
  to the internal `CLLocationManager` based implementation.
+ 
+ Set the custom location manager before calling `showUserLocation`.
  */
 @property (nonatomic, nullable) id<MGLLocationManager> locationManager;
 
