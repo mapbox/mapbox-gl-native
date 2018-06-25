@@ -427,7 +427,7 @@ CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transfo
 }
 
 CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const EdgeInsets& padding, optional<double> bearing, optional<double> pitch) const {
-    if(bearing) {
+    if (bearing && pitch) {
         double angle = -*bearing * util::DEG2RAD;  // Convert to radians
         Transform transform(impl->transform.getState());
         transform.setAngle(angle);
