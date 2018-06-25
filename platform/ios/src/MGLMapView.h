@@ -926,6 +926,8 @@ MGL_EXPORT IB_DESIGNABLE
  */
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets;
 
+- (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets pitch:(CLLocationDirection)pitch;
+
 /**
  Returns the camera that best fits the given shape, with the specified direction,
  optionally with some additional padding on each side.
@@ -939,6 +941,8 @@ MGL_EXPORT IB_DESIGNABLE
     camera object uses the current pitch.
  */
 - (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(UIEdgeInsets)insets;
+
+- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(UIEdgeInsets)insets pitch:(CLLocationDirection)pitch;
 
 /**
  Returns the point in this view’s coordinate system on which to "anchor" in
