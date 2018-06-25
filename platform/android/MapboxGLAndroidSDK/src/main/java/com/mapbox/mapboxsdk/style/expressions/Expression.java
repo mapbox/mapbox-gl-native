@@ -213,7 +213,7 @@ public class Expression {
    * @return the color expression
    */
   public static Expression color(@ColorInt int color) {
-    int[] rgba = PropertyFactory.colorToRgbaArray(color);
+    float[] rgba = PropertyFactory.colorToRgbaArray(color);
     return rgba(rgba[0], rgba[1], rgba[2], rgba[3]);
   }
 
