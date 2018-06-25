@@ -296,6 +296,13 @@ MGL_EXPORT IB_DESIGNABLE
 
 #pragma mark Displaying the User’s Location
 
+/**
+ The object that this map view uses to start and stop the delivery of location-related
+ events.
+ 
+ If no custom manager is provided or setting this property to `nil` it will default
+ to the internal `CLLocationManager` based implementation.
+ */
 @property (nonatomic, nullable) id<MGLLocationManager> locationManager;
 
 /**
