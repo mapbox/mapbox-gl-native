@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -16,23 +15,34 @@ import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
+import timber.log.Timber;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import timber.log.Timber;
-
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.division;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.gt;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.gte;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.has;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.lt;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.rgb;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.toNumber;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
 /**
@@ -56,7 +66,11 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
     mapView.getMapAsync(map -> {
       mapboxMap = map;
       mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.7749, 122.4194), 0));
-
+      mapboxMap.addImage(
+        "icon-id",
+        BitmapUtils.getBitmapFromDrawable(getResources().getDrawable(R.drawable.ic_hearing_black_24dp)),
+        true
+      );
       // Add a clustered source with some layers
       addClusteredGeoJsonSource();
     });
@@ -139,7 +153,22 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
     };
 
     SymbolLayer unclustered = new SymbolLayer("unclustered-points", "earthquakes");
-    unclustered.setProperties(iconImage("marker-15"));
+    unclustered.setProperties(
+      iconImage("icon-id"),
+      iconSize(
+        division(
+          get("mag"), literal(4.0f)
+        )
+      ),
+      iconColor(
+        interpolate(exponential(1), get("mag"),
+          stop(2.0, rgb(0, 255, 0)),
+          stop(4.5, rgb(0, 0, 255)),
+          stop(7.0, rgb(255, 0, 0))
+        )
+      )
+    );
+
     mapboxMap.addLayer(unclustered);
 
     for (int i = 0; i < layers.length; i++) {
@@ -153,11 +182,12 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
       Expression pointCount = toNumber(get("point_count"));
       circles.setFilter(
         i == 0
-          ? gte(pointCount, literal(layers[i][0])) :
-          all(
-            gte(pointCount, literal(layers[i][0])),
-            lt(pointCount, literal(layers[i - 1][0]))
-          )
+          ? all(has("point_count"),
+          gte(pointCount, literal(layers[i][0]))
+        ) : all(has("point_count"),
+          gt(pointCount, literal(layers[i][0])),
+          lt(pointCount, literal(layers[i - 1][0]))
+        )
       );
       mapboxMap.addLayer(circles);
     }
@@ -165,9 +195,11 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
     // Add the count labels
     SymbolLayer count = new SymbolLayer("count", "earthquakes");
     count.setProperties(
-      textField(get("point_count")),
+      textField(Expression.toString(get("point_count"))),
       textSize(12f),
-      textColor(Color.WHITE)
+      textColor(Color.WHITE),
+      textIgnorePlacement(true),
+      textAllowOverlap(true)
     );
     mapboxMap.addLayer(count);
 
