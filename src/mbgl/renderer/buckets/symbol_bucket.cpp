@@ -192,11 +192,11 @@ void SymbolBucket::sortFeatures(const float angle) {
     std::sort(symbolInstanceIndexes.begin(), symbolInstanceIndexes.end(), [sin, cos, this](size_t &aIndex, size_t &bIndex) {
         const SymbolInstance& a = symbolInstances[aIndex];
         const SymbolInstance& b = symbolInstances[bIndex];
-        const int32_t aRotated = sin * a.anchor.point.x + cos * a.anchor.point.y;
-        const int32_t bRotated = sin * b.anchor.point.x + cos * b.anchor.point.y;
+        const int32_t aRotated = static_cast<int32_t>(std::lround(sin * a.anchor.point.x + cos * a.anchor.point.y));
+        const int32_t bRotated = static_cast<int32_t>(std::lround(sin * b.anchor.point.x + cos * b.anchor.point.y));
         return aRotated != bRotated ?
             aRotated < bRotated :
-            a.index > b.index;
+            a.dataFeatureIndex > b.dataFeatureIndex;
     });
 
     text.triangles.clear();
@@ -207,7 +207,7 @@ void SymbolBucket::sortFeatures(const float angle) {
     
     for (auto i : symbolInstanceIndexes) {
         const SymbolInstance& symbolInstance = symbolInstances[i];
-        featureSortOrder->push_back(symbolInstance.featureIndex);
+        featureSortOrder->push_back(symbolInstance.dataFeatureIndex);
 
         if (symbolInstance.placedTextIndex) {
             addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedTextIndex]);
