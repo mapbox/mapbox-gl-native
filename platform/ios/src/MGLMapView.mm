@@ -3348,11 +3348,11 @@ public:
     return [self cameraForCameraOptions:cameraOptions];
 }
 
-- (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets pitch:(CLLocationDirection)pitch
+- (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds direction:(CLLocationDirection)direction pitch:(CGFloat)pitch edgePadding:(UIEdgeInsets)insets
 {
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
     padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
-    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), padding, pitch);
+    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), padding, direction, pitch);
     return [self cameraForCameraOptions:cameraOptions];
 }
 
@@ -3365,7 +3365,7 @@ public:
     return [self cameraForCameraOptions:cameraOptions];
 }
 
-- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(UIEdgeInsets)insets pitch:(CLLocationDirection)pitch {
+- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction pitch:(CGFloat)pitch edgePadding:(UIEdgeInsets)insets {
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
     padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
 

@@ -427,17 +427,31 @@ CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transfo
 }
 
 CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const EdgeInsets& padding, optional<double> bearing, optional<double> pitch) const {
-    if (bearing && pitch) {
-        double angle = -*bearing * util::DEG2RAD;  // Convert to radians
-        Transform transform(impl->transform.getState());
-        transform.setAngle(angle);
-        CameraOptions options = mbgl::cameraForLatLngs(latLngs, transform, padding);
-        options.angle = angle;
-        options.pitch = pitch;
-        return options;
-    } else {
+    
+    if (!bearing && !pitch) {
         return mbgl::cameraForLatLngs(latLngs, impl->transform, padding);
     }
+    
+    Transform transform(impl->transform.getState());
+    
+    if (bearing) {
+        double angle = -*bearing * util::DEG2RAD; // Convert to radians
+        transform.setAngle(angle);
+    }
+    if (pitch) {
+        transform.setPitch(*pitch);
+    }
+    
+    CameraOptions options = mbgl::cameraForLatLngs(latLngs, transform, padding);
+    
+    if (bearing) {
+        options.angle = transform.getAngle();
+    }
+    if (pitch) {
+        options.angle = transform.getAngle();
+    }
+    
+    return options;
 }
 
 CameraOptions Map::cameraForGeometry(const Geometry<double>& geometry, const EdgeInsets& padding, optional<double> bearing, optional<double> pitch) const {

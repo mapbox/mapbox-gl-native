@@ -926,7 +926,22 @@ MGL_EXPORT IB_DESIGNABLE
  */
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets;
 
-- (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets pitch:(CLLocationDirection)pitch;
+/**
+ Returns the camera that best fits the given coordinate bounds, optionally with
+ some additional padding on each side.
+ 
+ @param bounds The coordinate bounds to fit to the receiver’s viewport.
+ @param direction The direction of the viewport, measured in degrees clockwise from true north.
+ @param pitch The viewing angle of the camera, measured in degrees. A value of
+    `0` results in a camera pointed straight down at the map. Angles greater
+    than `0` result in a camera angled toward the horizon.
+ @param insets The minimum padding (in screen points) that would be visible
+    around the returned camera object if it were set as the receiver’s camera.
+ @return A camera object centered on the same location as the coordinate bounds
+    with zoom level as high (close to the ground) as possible while still
+    including the entire coordinate bounds.
+ */
+- (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds direction:(CLLocationDirection)direction pitch:(CGFloat)pitch edgePadding:(UIEdgeInsets)insets;
 
 /**
  Returns the camera that best fits the given shape, with the specified direction,
@@ -942,7 +957,21 @@ MGL_EXPORT IB_DESIGNABLE
  */
 - (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(UIEdgeInsets)insets;
 
-- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(UIEdgeInsets)insets pitch:(CLLocationDirection)pitch;
+/**
+ Returns the camera that best fits the given shape, with the specified direction and pitch,
+ optionally with some additional padding on each side.
+ 
+ @param shape The shape to fit to the receiver’s viewport.
+ @param direction The direction of the viewport, measured in degrees clockwise from true north.
+ @param pitch The viewing angle of the camera, measured in degrees. A value of
+    `0` results in a camera pointed straight down at the map. Angles greater
+    than `0` result in a camera angled toward the horizon.
+ @param insets The minimum padding (in screen points) that would be visible
+    around the returned camera object if it were set as the receiver’s camera.
+ @return A camera object centered on the shape's center with zoom level as high
+    (close to the ground) as possible while still including the entire shape.
+ */
+- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction pitch:(CGFloat)pitch edgePadding:(UIEdgeInsets)insets;
 
 /**
  Returns the point in this view’s coordinate system on which to "anchor" in
