@@ -218,33 +218,9 @@ template<typename ValueType>
 inline ValueType* any_cast(unique_any* any)
 {
     if(any == nullptr || any->type() != typeid(ValueType))
-        return nullptr;
+        throw bad_any_cast();
     else
         return any->cast<ValueType>();
-}
-
-template<typename ValueType, typename _Vt = std::decay_t<ValueType> >
-inline ValueType any_cast(const unique_any& any)
-{
-    static_assert(std::is_constructible<ValueType, const _Vt&>::value,
-        "any_cast type can't construct copy of contained object");
-    auto temp = any_cast<_Vt>(&any);
-    if (temp == nullptr) {
-        throw bad_any_cast();
-    }
-    return static_cast<ValueType>(*temp);
-}
-
-template<typename ValueType, typename _Vt = std::decay_t<ValueType> >
-inline ValueType any_cast(unique_any& any)
-{
-    static_assert(std::is_constructible<ValueType, const _Vt&>::value,
-        "any_cast type can't construct copy of contained object");
-    auto temp = any_cast<_Vt>(&any);
-    if (temp == nullptr) {
-        throw bad_any_cast();
-    }
-    return static_cast<ValueType>(*temp);
 }
 
 template<typename ValueType, typename _Vt = std::remove_cv_t<ValueType> >

@@ -177,7 +177,8 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 }
 
 - (MGLSource *)sourceFromMBGLSource:(mbgl::style::Source *)rawSource {
-    if (MGLSource *source = rawSource->peer.has_value() ? mbgl::util::any_cast<SourceWrapper>(rawSource->peer).source : nil) {
+    if (rawSource->peer.has_value()) {
+        MGLSource* source = mbgl::util::any_cast<SourceWrapper>(&(rawSource->peer))->source;
         return source;
     }
 
