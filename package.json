@@ -13,7 +13,7 @@
   },
   "license": "BSD-2-Clause",
   "dependencies": {
-    "@mapbox/cmake-node-module": "^1.0.0",
+    "@mapbox/cmake-node-module": "^1.1.0",
     "node-pre-gyp": "^0.6.37",
     "npm-run-all": "^4.0.2"
   },
@@ -47,8 +47,8 @@
   },
   "gypfile": true,
   "binary": {
-    "module_name": "mapbox_gl_native",
-    "module_path": "./lib/",
+    "module_name": "mbgl",
+    "module_path": "./lib/{node_abi}",
     "host": "https://mapbox-node-binary.s3.amazonaws.com",
     "remote_path": "./{name}/v{version}",
     "package_name": "{node_abi}-{platform}-{arch}-{configuration}.tar.gz"

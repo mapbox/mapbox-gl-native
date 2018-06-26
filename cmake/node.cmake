@@ -19,7 +19,7 @@ create_source_groups(mbgl-loop-node)
 
 
 add_node_module(mbgl-node
-    INSTALL_DIR "lib"
+    INSTALL_PATH "lib/{node_abi}/mbgl.node"
     NAN_VERSION "2.10.0"
     EXCLUDE_NODE_ABIS 47 51 59 # Don't build old beta ABIs 5.x, 7.x, and 9.x
 )
