@@ -20,6 +20,9 @@ jni::Object<PointF> MapSnapshot::pixelForLatLng(jni::JNIEnv& env, jni::Object<La
     return PointF::New(env, point.x * pixelRatio, point.y * pixelRatio);
 }
 
+jni::Object<LatLng> MapSnapshot::latLngForPixel(jni::JNIEnv& env, jni::Object<PointF>) {
+    return LatLng::New(env, {0, 0});
+}
 
 // Static methods //
 
@@ -52,6 +55,7 @@ void MapSnapshot::registerNative(jni::JNIEnv& env) {
                                             std::make_unique<MapSnapshot, JNIEnv&>,
                                             "initialize",
                                             "finalize",
+                                            METHOD(&MapSnapshot::latLngForPixel, "latLngForPixel"),
                                             METHOD(&MapSnapshot::pixelForLatLng, "pixelForLatLng")
     );
 }
