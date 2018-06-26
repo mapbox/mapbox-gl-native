@@ -34,6 +34,7 @@ public:
     ~MapSnapshot();
 
     jni::Object<PointF> pixelForLatLng(jni::JNIEnv&, jni::Object<LatLng>);
+    jni::Object<LatLng> latLngForPixel(jni::JNIEnv&, jni::Object<PointF>);
 
 private:
     static jni::Class<MapSnapshot> javaClass;
