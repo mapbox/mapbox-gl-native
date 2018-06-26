@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @required
 
 /**
- The delegate to recive updates.
+ The delegate to receive updates.
  */
 @property (nonatomic, weak) id<MGLLocationManagerDelegate> delegate;
 
