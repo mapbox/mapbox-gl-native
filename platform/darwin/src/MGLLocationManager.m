@@ -26,12 +26,12 @@
 
 - (void)setHeadingOrientation:(CLDeviceOrientation)headingOrientation
 {
-    _locationManager.headingOrientation = headingOrientation;
+    self.locationManager.headingOrientation = headingOrientation;
 }
 
 - (CLDeviceOrientation)headingOrientation
 {
-    return _locationManager.headingOrientation;
+    return self.locationManager.headingOrientation;
 }
 
 - (void)requestAlwaysAuthorization
