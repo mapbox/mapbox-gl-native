@@ -637,7 +637,7 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
     private LayoutInflater inflater;
 
     ImageMarkerViewAdapter(Context context) {
-      super(context);
+      super(context, MarkerView.class);
       inflater = LayoutInflater.from(context);
     }
 
