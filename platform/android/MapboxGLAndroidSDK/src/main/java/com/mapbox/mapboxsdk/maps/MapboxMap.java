@@ -45,7 +45,6 @@ import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.Source;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
 import java.util.List;
 
@@ -2525,10 +2524,9 @@ public final class MapboxMap {
      *
      * @param context the context associated to a MapView
      */
-    @SuppressWarnings("unchecked")
-    public MarkerViewAdapter(Context context) {
+    public MarkerViewAdapter(Context context, Class<U> persistentClass) {
       this.context = context;
-      persistentClass = (Class<U>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+      this.persistentClass = persistentClass;
       viewReusePool = new Pools.SimplePool<>(10000);
     }
 
