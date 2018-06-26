@@ -13,7 +13,7 @@ EvaluationResult toNumber(const Value& v) {
         [](const std::string& s) -> optional<double> {
             try {
                 return util::stof(s);
-            } catch(std::exception) {
+            } catch (const std::exception&) {
                 return optional<double>();
             }
         },

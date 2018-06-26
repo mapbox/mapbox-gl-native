@@ -631,7 +631,7 @@ TEST(OfflineDatabase, BatchInsertionMapboxTileCountExceeded) {
     try {
         db.putRegionResources(region.getID(), resources, status);
         EXPECT_FALSE(true);
-    } catch (MapboxTileLimitExceededException) {
+    } catch (const MapboxTileLimitExceededException&) {
         // Expected
     }
     

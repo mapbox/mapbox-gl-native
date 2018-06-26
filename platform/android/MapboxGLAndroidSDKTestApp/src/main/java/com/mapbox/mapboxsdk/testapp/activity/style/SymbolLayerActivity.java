@@ -1,8 +1,9 @@
 package com.mapbox.mapboxsdk.testapp.activity.style;
 
-import android.graphics.BitmapFactory;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -18,17 +19,28 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 
 import java.util.Arrays;
 import java.util.List;
 
+import static com.mapbox.mapboxsdk.style.expressions.Expression.any;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.has;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.lte;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.not;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAnchor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAnchor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textFont;
@@ -54,11 +66,13 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
     mapView.getMapAsync(map -> {
       mapboxMap = map;
 
-      // Add a image for the makers
+      // Add a sdf image for the makers
+      Drawable icLayersDrawable = getResources().getDrawable(R.drawable.ic_layers);
+      Bitmap icLayersBitmap = BitmapUtils.getBitmapFromDrawable(icLayersDrawable);
       mapboxMap.addImage(
-        "my-marker-image",
-        BitmapFactory.decodeResource(SymbolLayerActivity.this.getResources(),
-          R.drawable.mapbox_marker_icon_default)
+        "my-layers-image",
+        icLayersBitmap,
+        true
       );
 
       // Add a source
@@ -72,12 +86,15 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
       mapboxMap.addLayer(
         new SymbolLayer(MARKER_LAYER, MARKER_SOURCE)
           .withProperties(
-            iconImage("my-marker-image"),
+            iconImage("my-layers-image"),
             iconAllowOverlap(true),
-            textField("{title}"),
+            iconAnchor(Property.ICON_ANCHOR_BOTTOM),
+            textField(get("title")),
+            iconColor(Color.RED),
             textColor(Color.RED),
+            textAnchor(Property.TEXT_ANCHOR_TOP),
             textSize(10f)
-          )
+          ).withFilter((any(not(has("price")), lte(get("price"), literal(25)))))
       );
 
       // Show
