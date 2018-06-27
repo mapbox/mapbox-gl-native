@@ -2,6 +2,7 @@ mason_use(optional VERSION f27e7908 HEADER_ONLY)
 mason_use(tao_tuple VERSION 28626e99 HEADER_ONLY)
 
 include(platform/qt/qt.cmake)
+include(cmake/nunicode.cmake)
 
 if(NOT WITH_QT_DECODERS)
     mason_use(libjpeg-turbo VERSION 1.5.0)
@@ -26,6 +27,7 @@ macro(mbgl_platform_core)
 
     target_link_libraries(mbgl-core
         ${MBGL_QT_CORE_LIBRARIES}
+        PRIVATE nunicode
     )
 
     if(NOT WITH_QT_DECODERS)
