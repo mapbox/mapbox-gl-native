@@ -51,8 +51,6 @@ macro(mbgl_platform_core)
         target_sources(mbgl-core PRIVATE platform/qt/src/bidi.cpp)
     endif()
 
-    target_sources(mbgl-core PRIVATE platform/default/local_glyph_rasterizer.cpp)
-
     if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         target_add_mason_package(mbgl-core PRIVATE optional)
         target_add_mason_package(mbgl-core PRIVATE tao_tuple)

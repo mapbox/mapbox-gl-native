@@ -58,8 +58,11 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/string_stdlib.cpp
         PRIVATE platform/default/thread.cpp
         PRIVATE platform/default/bidi.cpp
+        PRIVATE platform/default/collator.cpp
         PRIVATE platform/default/local_glyph_rasterizer.cpp
         PRIVATE platform/default/thread_local.cpp
+        PRIVATE platform/default/unaccent.cpp
+        PRIVATE platform/default/unaccent.hpp
         PRIVATE platform/default/utf.cpp
 
         # Image handling
