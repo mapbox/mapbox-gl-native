@@ -50,8 +50,9 @@ public:
             CompositeIntervalStops<T>,
             CompositeCategoricalStops<T>>>;
 
-    CompositeFunction(std::unique_ptr<expression::Expression> expression_)
+    CompositeFunction(std::unique_ptr<expression::Expression> expression_, optional<T> defaultValue_ = {})
     :   isExpression(true),
+        defaultValue(std::move(defaultValue_)),
         expression(std::move(expression_)),
         zoomCurve(expression::findZoomCurveChecked(expression.get()))
     {

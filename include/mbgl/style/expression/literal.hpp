@@ -47,12 +47,10 @@ public:
 
     mbgl::Value serialize() const override;
     std::string getOperator() const override { return "literal"; }
+
 private:
     Value value;
 };
-
-std::unique_ptr<Literal> createLiteral(const char* value);
-std::unique_ptr<Literal> createLiteral(Value value);
 
 } // namespace expression
 } // namespace style
