@@ -53,31 +53,59 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 @end
 
 @interface MGLMapSnapshot()
-- (instancetype)initWithImage:(nullable MGLImage *)image scale:(CGFloat)scale pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn;
+- (instancetype)initWithImage:(nullable MGLImage *)image scale:(CGFloat)scale pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn latLngForFn:(mbgl::MapSnapshotter::LatLngForFn)latLngForFn;
 
 @property (nonatomic) CGFloat scale;
 @end
 
 @implementation MGLMapSnapshot {
     mbgl::MapSnapshotter::PointForFn _pointForFn;
+    mbgl::MapSnapshotter::LatLngForFn _latLngForFn;
 }
 
-- (instancetype)initWithImage:(nullable MGLImage *)image scale:(CGFloat)scale pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn
+- (instancetype)initWithImage:(nullable MGLImage *)image scale:(CGFloat)scale pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn latLngForFn:(mbgl::MapSnapshotter::LatLngForFn)latLngForFn
 {
     self = [super init];
     if (self) {
         _pointForFn = std::move(pointForFn);
+        _latLngForFn = std::move(latLngForFn);
         _scale = scale;
         _image = image;
     }
     return self;
 }
 
+#if TARGET_OS_IPHONE
+
 - (CGPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate
 {
     mbgl::ScreenCoordinate sc = _pointForFn(MGLLatLngFromLocationCoordinate2D(coordinate));
     return CGPointMake(sc.x, sc.y);
 }
+
+- (CLLocationCoordinate2D)coordinateForPoint:(CGPoint)point
+{
+    mbgl::LatLng latLng = _latLngForFn(mbgl::ScreenCoordinate(point.x, point.y));
+    return MGLLocationCoordinate2DFromLatLng(latLng);
+}
+
+#else
+
+- (NSPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate
+{
+    mbgl::ScreenCoordinate sc = _pointForFn(MGLLatLngFromLocationCoordinate2D(coordinate));
+    return NSMakePoint(sc.x, self.image.size.height - sc.y);
+}
+
+- (CLLocationCoordinate2D)coordinateForPoint:(NSPoint)point
+{
+    auto screenCoord = mbgl::ScreenCoordinate(point.x, self.image.size.height - point.y);
+    mbgl::LatLng latLng = _latLngForFn(screenCoord);
+    return MGLLocationCoordinate2DFromLatLng(latLng);
+}
+
+#endif
+
 @end
 
 @interface MGLMapSnapshotter()
@@ -123,7 +151,11 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     __weak __typeof__(self) weakSelf = self;
     // mbgl::Scheduler::GetCurrent() scheduler means "run callback on current (ie UI/main) thread"
     // capture weakSelf to avoid retain cycle if callback is never called (ie snapshot cancelled)
-    _snapshotCallback = std::make_unique<mbgl::Actor<mbgl::MapSnapshotter::Callback>>(*mbgl::Scheduler::GetCurrent(), [=](std::exception_ptr mbglError, mbgl::PremultipliedImage image, mbgl::MapSnapshotter::Attributions attributions, mbgl::MapSnapshotter::PointForFn pointForFn) {
+
+    _snapshotCallback = std::make_unique<mbgl::Actor<mbgl::MapSnapshotter::Callback>>(
+							*mbgl::Scheduler::GetCurrent(),
+							[=](std::exception_ptr mbglError, mbgl::PremultipliedImage image, mbgl::MapSnapshotter::Attributions attributions, mbgl::MapSnapshotter::PointForFn pointForFn, mbgl::MapSnapshotter::LatLngForFn latLngForFn) {
+
         __typeof__(self) strongSelf = weakSelf;
         // If self had died, _snapshotCallback would have been destroyed and this block would not be executed
         NSCAssert(strongSelf, @"Snapshot callback executed after being destroyed.");
@@ -147,7 +179,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
             mglImage.size = NSMakeSize(mglImage.size.width / strongSelf.options.scale,
                                        mglImage.size.height / strongSelf.options.scale);
 #endif
-            [strongSelf drawAttributedSnapshot:attributions snapshotImage:mglImage pointForFn:pointForFn queue:queue completionHandler:completion];
+            [strongSelf drawAttributedSnapshot:attributions snapshotImage:mglImage pointForFn:pointForFn latLngForFn:latLngForFn queue:queue completionHandler:completion];
         }
         strongSelf->_snapshotCallback = NULL;
     });
@@ -158,7 +190,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     _mbglMapSnapshotter->snapshot(_snapshotCallback->self());
 }
 
-+ (void)drawAttributedSnapshotWorker:(mbgl::MapSnapshotter::Attributions)attributions snapshotImage:(MGLImage *)mglImage pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn queue:(dispatch_queue_t)queue scale:(CGFloat)scale size:(CGSize)size completionHandler:(MGLMapSnapshotCompletionHandler)completion {
++ (void)drawAttributedSnapshotWorker:(mbgl::MapSnapshotter::Attributions)attributions snapshotImage:(MGLImage *)mglImage pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn latLngForFn:(mbgl::MapSnapshotter::LatLngForFn)latLngForFn queue:(dispatch_queue_t)queue scale:(CGFloat)scale size:(CGSize)size completionHandler:(MGLMapSnapshotCompletionHandler)completion {
     
     NSArray<MGLAttributionInfo *>* attributionInfo = [MGLMapSnapshotter generateAttributionInfos:attributions];
     
@@ -282,12 +314,15 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 #endif
     // Dispatch result to origin queue
     dispatch_async(queue, ^{
-        MGLMapSnapshot* snapshot = [[MGLMapSnapshot alloc] initWithImage:compositedImage scale:scale pointForFn:pointForFn];
+        MGLMapSnapshot* snapshot = [[MGLMapSnapshot alloc] initWithImage:compositedImage
+                                                                   scale:scale
+                                                              pointForFn:pointForFn
+                                                             latLngForFn:latLngForFn];
         completion(snapshot, nil);
     });
 }
 
-- (void)drawAttributedSnapshot:(mbgl::MapSnapshotter::Attributions)attributions snapshotImage:(MGLImage *)mglImage pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn queue:(dispatch_queue_t)queue completionHandler:(MGLMapSnapshotCompletionHandler)completion {
+- (void)drawAttributedSnapshot:(mbgl::MapSnapshotter::Attributions)attributions snapshotImage:(MGLImage *)mglImage pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn latLngForFn:(mbgl::MapSnapshotter::LatLngForFn)latLngForFn queue:(dispatch_queue_t)queue completionHandler:(MGLMapSnapshotCompletionHandler)completion {
     
     // Process image watermark in a work queue
     dispatch_queue_t workQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
@@ -297,7 +332,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     // pointForFn is a copyable std::function that captures state by value: see MapSnapshotter::Impl::snapshot
     dispatch_async(workQueue, ^{
         // Call a class method to ensure we're not accidentally capturing self
-        [MGLMapSnapshotter drawAttributedSnapshotWorker:attributions snapshotImage:mglImage pointForFn:pointForFn queue:queue scale:scale size:size completionHandler:completion];
+        [MGLMapSnapshotter drawAttributedSnapshotWorker:attributions snapshotImage:mglImage pointForFn:pointForFn latLngForFn:latLngForFn queue:queue scale:scale size:size completionHandler:completion];
     });
 }
 
