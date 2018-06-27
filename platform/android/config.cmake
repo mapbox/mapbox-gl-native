@@ -37,13 +37,17 @@ macro(mbgl_platform_core)
         PRIVATE platform/android/src/timer.cpp
 
         # Misc
-        PRIVATE platform/android/src/text/local_glyph_rasterizer_jni.hpp
+        PRIVATE platform/android/src/text/collator.cpp
+        PRIVATE platform/android/src/text/collator_jni.hpp
         PRIVATE platform/android/src/text/local_glyph_rasterizer.cpp
+        PRIVATE platform/android/src/text/local_glyph_rasterizer_jni.hpp
         PRIVATE platform/android/src/logging_android.cpp
         PRIVATE platform/android/src/thread.cpp
         PRIVATE platform/default/string_stdlib.cpp
         PRIVATE platform/default/bidi.cpp
         PRIVATE platform/default/thread_local.cpp
+        PRIVATE platform/default/unaccent.cpp
+        PRIVATE platform/default/unaccent.hpp
         PRIVATE platform/default/utf.cpp
 
         # Image handling
