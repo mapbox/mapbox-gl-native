@@ -2,6 +2,16 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.2.1 -  June 27, 2018
+ - Backport range alpha values from 0 to 1 with int color conversion [#12235](https://github.com/mapbox/mapbox-gl-native/pull/12235)
+
+## 6.3.0-alpha.1 - June 27, 2018
+ - Range alpha values from 0 to 1 with int color conversion [#12210](https://github.com/mapbox/mapbox-gl-native/pull/12210)
+ - Remove reflection lookup for MarkerViewAdapter intialisation [#12218](https://github.com/mapbox/mapbox-gl-native/pull/12218)
+ - GeoJSON clustering expressions logic change [#12211](https://github.com/mapbox/mapbox-gl-native/pull/12211)
+ - Add SDF support, allow template images to be tinted [#12181](https://github.com/mapbox/mapbox-gl-native/pull/12181)
+ - Add android licenses tool, update licenses [#12153](https://github.com/mapbox/mapbox-gl-native/pull/12153)
+
 ## 6.2.0 - June 20, 2018
  - Remove support for Fabric [#12126](https://github.com/mapbox/mapbox-gl-native/pull/12126)
  - Dispatch camera start callback only when actually moving [#12172](https://github.com/mapbox/mapbox-gl-native/pull/12172)
