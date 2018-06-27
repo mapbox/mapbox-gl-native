@@ -1,8 +1,6 @@
-'use strict';
-
-const suite = require('../../../mapbox-gl-js/test/integration').query;
-const suiteImplementation = require('./suite_implementation');
-const ignores = require('./ignores.json');
+import {run} from '../../../mapbox-gl-js/test/integration/lib/query';
+import implementation from './suite_implementation';
+import ignores from './ignores.json';
 
 let tests;
 
@@ -10,4 +8,4 @@ if (process.argv[1] === __filename && process.argv.length > 2) {
     tests = process.argv.slice(2);
 }
 
-suite.run('native', {tests: tests, ignores: ignores}, suiteImplementation);
+run('native', {tests, ignores}, implementation);
