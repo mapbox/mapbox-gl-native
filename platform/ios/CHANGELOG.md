@@ -21,6 +21,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Improved caching performance. ([#12072](https://github.com/mapbox/mapbox-gl-native/pull/12072))
 
+### Other changes 
+
+* Added `-[MGLMapSnapshot coordinateForPoint:]` that returns a map coordinate for a specified snapshot image point. ([#12221](https://github.com/mapbox/mapbox-gl-native/pull/12221))
+
 ## 4.0.3 - June 22, 2018
 
 * Fixed a crash in `-[MGLStyle localizeLabelsIntoLocale:]` on iOS 9._x_. ([#12123](https://github.com/mapbox/mapbox-gl-native/pull/12123))

@@ -86,6 +86,11 @@ MGL_EXPORT
 - (CGPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate;
 
 /**
+ Converts the specified image point to a map coordinate.
+ */
+- (CLLocationCoordinate2D)coordinateForPoint:(CGPoint)point;
+
+/**
  The image of the map’s content.
  */
 @property (nonatomic, readonly) UIImage *image;
@@ -95,6 +100,12 @@ MGL_EXPORT
  image.
  */
 - (NSPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate;
+
+/**
+ Converts the specified image point to a map coordinate.
+ */
+- (CLLocationCoordinate2D)coordinateForPoint:(NSPoint)point;
+
 
 /**
  The image of the map’s content.
