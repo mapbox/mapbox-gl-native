@@ -640,76 +640,13 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
 std::unordered_map<std::string, Definition> CompoundExpressionRegistry::definitions = initializeDefinitions();
 
 using namespace mbgl::style::conversion;
-ParseResult parseCompoundExpression(const std::string name, const Convertible& value, ParsingContext& ctx) {
-    assert(isArray(value) && arrayLength(value) > 0);
 
-    auto it = CompoundExpressionRegistry::definitions.find(name);
-    if (it == CompoundExpressionRegistry::definitions.end()) {
-        ctx.error(
-             R"(Unknown expression ")" + name + R"(". If you wanted a literal array, use ["literal", [...]].)",
-            0
-        );
-        return ParseResult();
-    }
-    const CompoundExpressionRegistry::Definition& definition = it->second;
-
-    auto length = arrayLength(value);
-
-    // Check if we have a single signature with the correct number of
-    // parameters. If so, then use that signature's parameter types for parsing
-    // (and inferring the types of) the arguments.
-    optional<std::size_t> singleMatchingSignature;
-    for (std::size_t j = 0; j < definition.size(); j++) {
-        const std::unique_ptr<detail::SignatureBase>& signature = definition[j];
-        if (
-            signature->params.is<VarargsType>() ||
-            signature->params.get<std::vector<type::Type>>().size() == length - 1
-        ) {
-            if (singleMatchingSignature) {
-                singleMatchingSignature = {};
-            } else {
-                singleMatchingSignature = j;
-            }
-        }
-    }
-
-    // parse subexpressions first
-    std::vector<std::unique_ptr<Expression>> args;
-    args.reserve(length - 1);
-    for (std::size_t i = 1; i < length; i++) {
-        optional<type::Type> expected;
-
-        if (singleMatchingSignature) {
-            expected = definition[*singleMatchingSignature]->params.match(
-                [](const VarargsType& varargs) { return varargs.type; },
-                [&](const std::vector<type::Type>& params_) { return params_[i - 1]; }
-            );
-        }
-
-        auto parsed = ctx.parse(arrayMember(value, i), i, expected);
-        if (!parsed) {
-            return parsed;
-        }
-        args.push_back(std::move(*parsed));
-    }
-    return createCompoundExpression(definition, std::move(args), ctx);
-}
-
-
-ParseResult createCompoundExpression(const std::string& name,
-                                     std::vector<std::unique_ptr<Expression>> args,
-                                     ParsingContext& ctx)
-{
-    return createCompoundExpression(CompoundExpressionRegistry::definitions.at(name), std::move(args), ctx);
-}
-
-
-ParseResult createCompoundExpression(const Definition& definition,
-                                     std::vector<std::unique_ptr<Expression>> args,
-                                     ParsingContext& ctx)
+static ParseResult createCompoundExpression(const Definition& definition,
+                                            std::vector<std::unique_ptr<Expression>> args,
+                                            ParsingContext& ctx)
 {
     ParsingContext signatureContext(ctx.getKey());
-    
+
     for (const std::unique_ptr<detail::SignatureBase>& signature : definition) {
         signatureContext.clearErrors();
 
@@ -767,7 +704,7 @@ ParseResult createCompoundExpression(const Definition& definition,
                     signatures += ")";
                 }
             );
-            
+
         }
         std::string actualTypes;
         for (const auto& arg : args) {
@@ -782,26 +719,67 @@ ParseResult createCompoundExpression(const Definition& definition,
     return ParseResult();
 }
 
-ParseResult createCompoundExpression(const std::string& name, ParsingContext& ctx) {
-    return createCompoundExpression(name, std::vector<std::unique_ptr<Expression>>(), ctx);
+ParseResult parseCompoundExpression(const std::string name, const Convertible& value, ParsingContext& ctx) {
+    assert(isArray(value) && arrayLength(value) > 0);
+
+    auto it = CompoundExpressionRegistry::definitions.find(name);
+    if (it == CompoundExpressionRegistry::definitions.end()) {
+        ctx.error(
+             R"(Unknown expression ")" + name + R"(". If you wanted a literal array, use ["literal", [...]].)",
+            0
+        );
+        return ParseResult();
+    }
+    const CompoundExpressionRegistry::Definition& definition = it->second;
+
+    auto length = arrayLength(value);
+
+    // Check if we have a single signature with the correct number of
+    // parameters. If so, then use that signature's parameter types for parsing
+    // (and inferring the types of) the arguments.
+    optional<std::size_t> singleMatchingSignature;
+    for (std::size_t j = 0; j < definition.size(); j++) {
+        const std::unique_ptr<detail::SignatureBase>& signature = definition[j];
+        if (
+            signature->params.is<VarargsType>() ||
+            signature->params.get<std::vector<type::Type>>().size() == length - 1
+        ) {
+            if (singleMatchingSignature) {
+                singleMatchingSignature = {};
+            } else {
+                singleMatchingSignature = j;
+            }
+        }
+    }
+
+    // parse subexpressions first
+    std::vector<std::unique_ptr<Expression>> args;
+    args.reserve(length - 1);
+    for (std::size_t i = 1; i < length; i++) {
+        optional<type::Type> expected;
+
+        if (singleMatchingSignature) {
+            expected = definition[*singleMatchingSignature]->params.match(
+                [](const VarargsType& varargs) { return varargs.type; },
+                [&](const std::vector<type::Type>& params_) { return params_[i - 1]; }
+            );
+        }
+
+        auto parsed = ctx.parse(arrayMember(value, i), i, expected);
+        if (!parsed) {
+            return parsed;
+        }
+        args.push_back(std::move(*parsed));
+    }
+
+    return createCompoundExpression(definition, std::move(args), ctx);
 }
 
 ParseResult createCompoundExpression(const std::string& name,
-                                     std::unique_ptr<Expression> arg1,
-                                     ParsingContext& ctx) {
-    std::vector<std::unique_ptr<Expression>> args;
-    args.push_back(std::move(arg1));
-    return createCompoundExpression(name, std::move(args), ctx);
-}
-
-ParseResult createCompoundExpression(const std::string& name,
-                                     std::unique_ptr<Expression> arg1,
-                                     std::unique_ptr<Expression> arg2,
-                                     ParsingContext& ctx) {
-    std::vector<std::unique_ptr<Expression>> args;
-    args.push_back(std::move(arg1));
-    args.push_back(std::move(arg2));
-    return createCompoundExpression(name, std::move(args), ctx);
+                                     std::vector<std::unique_ptr<Expression>> args,
+                                     ParsingContext& ctx)
+{
+    return createCompoundExpression(CompoundExpressionRegistry::definitions.at(name), std::move(args), ctx);
 }
 
 } // namespace expression

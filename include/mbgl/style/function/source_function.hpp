@@ -29,8 +29,9 @@ public:
             CategoricalStops<T>,
             IdentityStops<T>>>;
 
-    SourceFunction(std::unique_ptr<expression::Expression> expression_)
+    SourceFunction(std::unique_ptr<expression::Expression> expression_, optional<T> defaultValue_ = {})
         : isExpression(true),
+          defaultValue(std::move(defaultValue_)),
           expression(std::move(expression_))
     {
         assert(expression::isZoomConstant(*expression));
