@@ -1,4 +1,4 @@
-mason_use(glfw VERSION 2017-07-13-67c9155)
+mason_use(glfw VERSION 2018-06-27-0be4f3f)
 mason_use(sqlite VERSION 3.14.2)
 mason_use(libuv VERSION 1.9.1)
 mason_use(nunicode VERSION 1.7.1)
