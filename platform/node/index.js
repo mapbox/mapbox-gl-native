@@ -2,7 +2,7 @@
 
 // Shim to wrap req.respond while preserving callback-passing API
 
-var mbgl = require('../../lib/mbgl-node.abi-' + process.versions.modules);
+var mbgl = require('../../lib/node-v' + process.versions.modules + '/mbgl');
 var constructor = mbgl.Map.prototype.constructor;
 
 var Map = function(options) {

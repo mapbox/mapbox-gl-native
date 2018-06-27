@@ -24,15 +24,11 @@ workflows:
               only: /android-v.*/
             branches:
               ignore: /.*/
-      - node4-clang39-release:
+      - node-clang39-release:
           filters:
             tags:
               only: /node-.*/
-      - node6-clang39-release:
-          filters:
-            tags:
-              only: /node-.*/
-      - node6-gcc6-debug:
+      - node-gcc6-debug:
           filters:
             tags:
               only: /node-.*/
@@ -56,11 +52,7 @@ workflows:
               ignore: /.*/
       - macos-debug
       - macos-debug-qt5
-      - macos-release-node4:
-          filters:
-            tags:
-              only: /node-.*/
-      - macos-release-node6:
+      - macos-release-node:
           filters:
             tags:
               only: /node-.*/
@@ -119,7 +111,7 @@ step-library:
   - &build-node
       run:
         name: Build node
-        command: make node
+        command: make node-all
   - &build-linux
       run:
         name: Build linux
@@ -166,16 +158,9 @@ step-library:
         command: |
           brew install cmake ccache
 
-  - &install-macos-node4-dependencies
+  - &install-macos-node-dependencies
       run:
-        name: Install macOS Node@4 dependencies
-        command: |
-          brew install node@4
-          brew link node@4 --force --overwrite
-
-  - &install-macos-node6-dependencies
-      run:
-        name: Install macOS Node@6 dependencies
+        name: Install macOS Node dependencies
         command: |
           brew install node@6
           brew link node@6 --force --overwrite
@@ -222,7 +207,7 @@ step-library:
       run:
         name: Publish node package
         when: on_success
-        command: platform/node/scripts/after_success.sh
+        command: platform/node/scripts/publish.sh
 
 
   - &upload-render-tests
@@ -531,30 +516,7 @@ jobs:
 
 
 # ------------------------------------------------------------------------------
-  node4-clang39-release:
-    docker:
-      - image: mbgl/7d2403f42e:linux-clang-3.9-node-4
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: RelWithDebInfo
-      WITH_EGL: 1
-      WITH_CXX11ABI: 0
-    steps:
-      - checkout
-      - *generate-cache-key
-      - *restore-cache
-      - *reset-ccache-stats
-      - *build-node
-      - *show-ccache-stats
-      - *save-cache
-      - *run-node-linux-tests
-      - *publish-node-package
-      - *upload-render-tests
-
-# ------------------------------------------------------------------------------
-  node6-clang39-release:
+  node-clang39-release:
     docker:
       - image: mbgl/7d2403f42e:linux-clang-3.9
     working_directory: /src
@@ -577,7 +539,7 @@ jobs:
       - *upload-render-tests
 
 # ------------------------------------------------------------------------------
-  node6-gcc6-debug:
+  node-gcc6-debug:
     docker:
       - image: mbgl/7d2403f42e:linux-gcc-6
     resource_class: large
@@ -994,7 +956,7 @@ jobs:
           destination: test/fixtures
 
 # ------------------------------------------------------------------------------
-  macos-release-node4:
+  macos-release-node:
     macos:
       xcode: "9.4.0"
     environment:
@@ -1003,30 +965,7 @@ jobs:
     steps:
       - checkout
       - *install-macos-dependencies
-      - *install-macos-node4-dependencies
-      - *generate-cache-key
-      - *restore-cache
-      - *reset-ccache-stats
-      - *build-node
-      - *show-ccache-stats
-      - *save-cache
-      - *run-node-macos-tests
-      - *publish-node-package
-      - *upload-render-tests
-      - *collect-xcode-build-logs
-      - *upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  macos-release-node6:
-    macos:
-      xcode: "9.4.0"
-    environment:
-      BUILDTYPE: RelWithDebInfo
-      HOMEBREW_NO_AUTO_UPDATE: 1
-    steps:
-      - checkout
-      - *install-macos-dependencies
-      - *install-macos-node6-dependencies
+      - *install-macos-node-dependencies
       - *generate-cache-key
       - *restore-cache
       - *reset-ccache-stats
