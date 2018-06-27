@@ -5,9 +5,6 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-using Interpolator = variant<ExponentialInterpolator,
-                             CubicBezierInterpolator>;
-
 using namespace mbgl::style::conversion;
 
 ParseResult parseInterpolate(const Convertible& value, ParsingContext& ctx) {

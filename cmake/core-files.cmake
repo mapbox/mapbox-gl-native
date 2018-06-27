@@ -453,6 +453,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/expression/find_zoom_curve.hpp
     include/mbgl/style/expression/get_covering_stops.hpp
     include/mbgl/style/expression/interpolate.hpp
+    include/mbgl/style/expression/interpolator.hpp
     include/mbgl/style/expression/is_constant.hpp
     include/mbgl/style/expression/is_expression.hpp
     include/mbgl/style/expression/length.hpp
