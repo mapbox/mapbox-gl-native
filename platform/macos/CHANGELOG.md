@@ -1,6 +1,10 @@
 # Changelog for Mapbox Maps SDK for macOS
 
- ## 0.7.2 - June 22, 2018
+## 0.7.3 - June 27, 2018
+
+* Improved compatibility with Mapbox China APIs. ([#12233](https://github.com/mapbox/mapbox-gl-native/pull/12233))
+
+## 0.7.2 - June 22, 2018
 
 * Fixed a crash in `-[MGLStyle localizeLabelsIntoLocale:]` on macOS 10.11. ([#12123](https://github.com/mapbox/mapbox-gl-native/pull/12123))
 * Improved compatibility with Mapbox China APIs. ([#11845](https://github.com/mapbox/mapbox-gl-native/pull/11845))
