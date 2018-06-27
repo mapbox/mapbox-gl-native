@@ -3,11 +3,8 @@
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/style/expression/get_covering_stops.hpp>
+#include <mbgl/style/expression/interpolator.hpp>
 #include <mbgl/style/conversion.hpp>
-
-#include <mbgl/util/interpolate.hpp>
-#include <mbgl/util/range.hpp>
-#include <mbgl/util/unitbezier.hpp>
 
 #include <memory>
 #include <map>
@@ -17,48 +14,10 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-class ExponentialInterpolator {
-public:
-    ExponentialInterpolator(double base_) : base(base_) {}
-
-    double base;
-    
-    double interpolationFactor(const Range<double>& inputLevels, const double input) const {
-        return util::interpolationFactor(base,
-                                         Range<float> {
-                                            static_cast<float>(inputLevels.min),
-                                            static_cast<float>(inputLevels.max)
-                                         },
-                                         input);
-    }
-    
-    bool operator==(const ExponentialInterpolator& rhs) const {
-        return base == rhs.base;
-    }
-};
-
-class CubicBezierInterpolator {
-public:
-    CubicBezierInterpolator(double x1_, double y1_, double x2_, double y2_) : ub(x1_, y1_, x2_, y2_) {}
-    
-    double interpolationFactor(const Range<double>& inputLevels, const double input) const {
-        return ub.solve(input / (inputLevels.max - inputLevels.min), 1e-6);
-    }
-    
-    bool operator==(const CubicBezierInterpolator& rhs) const {
-        return ub == rhs.ub;
-    }
-    
-    util::UnitBezier ub;
-};
-
-
 ParseResult parseInterpolate(const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
 
 class InterpolateBase : public Expression {
 public:
-    using Interpolator = variant<ExponentialInterpolator, CubicBezierInterpolator>;
-
     InterpolateBase(const type::Type& type_,
           Interpolator interpolator_,
           std::unique_ptr<Expression> input_,

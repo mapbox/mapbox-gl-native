@@ -95,7 +95,7 @@ struct Convert {
     static ParseResult makeInterpolate(type::Type type,
                                  std::unique_ptr<Expression> input,
                                  std::map<double, std::unique_ptr<Expression>> convertedStops,
-                                 typename Interpolate<OutputType>::Interpolator interpolator)
+                                 Interpolator interpolator)
     {
         ParseResult curve = ParseResult(std::make_unique<Interpolate<OutputType>>(
             std::move(type),
