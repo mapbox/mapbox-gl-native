@@ -155,52 +155,28 @@ ParseResult parseInterpolate(const Convertible& value, ParsingContext& ctx) {
     
     assert(outputType);
     
-    if (
-        *outputType != type::Number &&
-        *outputType != type::Color &&
-        !(
-            outputType->is<type::Array>() &&
-            outputType->get<type::Array>().itemType == type::Number &&
-            outputType->get<type::Array>().N
-        )
-    )
-    {
-        ctx.error("Type " + toString(*outputType) + " is not interpolatable.");
-        return ParseResult();
-    }
-    
     return outputType->match(
         [&](const type::NumberType&) -> ParseResult {
-            return interpolator->match([&](const auto& interpolator_) {
-                return ParseResult(std::make_unique<Interpolate<double>>(
-                    *outputType, interpolator_, std::move(*input), std::move(stops)
-                ));
-            });
+            return ParseResult(std::make_unique<Interpolate<double>>(
+                *outputType, *interpolator, std::move(*input), std::move(stops)
+            ));
         },
         [&](const type::ColorType&) -> ParseResult {
-            return interpolator->match([&](const auto& interpolator_) {
-                return ParseResult(std::make_unique<Interpolate<Color>>(
-                    *outputType, interpolator_, std::move(*input), std::move(stops)
-                ));
-            });
+            return ParseResult(std::make_unique<Interpolate<Color>>(
+                *outputType, *interpolator, std::move(*input), std::move(stops)
+            ));
         },
         [&](const type::Array& arrayType) -> ParseResult {
-            return interpolator->match(
-                [&](const auto& continuousInterpolator) {
-                    if (arrayType.itemType != type::Number || !arrayType.N) {
-                        assert(false); // interpolability already checked above.
-                        return ParseResult();
-                    }
-                    return ParseResult(std::make_unique<Interpolate<std::vector<Value>>>(
-                        *outputType, continuousInterpolator, std::move(*input), std::move(stops)
-                    ));
-                }
-            );
+            if (arrayType.itemType != type::Number || !arrayType.N) {
+                ctx.error("Type " + toString(*outputType) + " is not interpolatable.");
+                return ParseResult();
+            }
+            return ParseResult(std::make_unique<Interpolate<std::vector<Value>>>(
+                *outputType, *interpolator, std::move(*input), std::move(stops)
+            ));
         },
         [&](const auto&) {
-            // unreachable: Null, Boolean, String, Object, Value output types
-            // are not interpolatable, and interpolability was already checked above
-            assert(false);
+            ctx.error("Type " + toString(*outputType) + " is not interpolatable.");
             return ParseResult();
         }
     );
