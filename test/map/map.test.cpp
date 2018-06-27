@@ -84,7 +84,7 @@ TEST(Map, LatLngBoundsToCameraWithAngle) {
     CameraOptions virtualCamera = test.map.cameraForLatLngBounds(bounds, {}, 35);
     ASSERT_TRUE(bounds.contains(*virtualCamera.center));
     EXPECT_NEAR(*virtualCamera.zoom, 1.21385, 1e-5);
-    EXPECT_DOUBLE_EQ(virtualCamera.angle.value_or(0), -35 * util::DEG2RAD);
+    EXPECT_NEAR(virtualCamera.angle.value_or(0), -35 * util::DEG2RAD, 1e-6);
 }
 
 TEST(Map, LatLngsToCamera) {
