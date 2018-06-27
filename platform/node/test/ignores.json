@@ -25,6 +25,8 @@
   "query-tests/circle-radius/feature-state": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue",
   "query-tests/feature-state/default": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue",
   "query-tests/regressions/mapbox-gl-js#6555": "skip - no querySourceFeatures in mbgl-node; needs issue",
+  "query-tests/symbol/filtered-rotated-after-insert": "skip - https://github.com/mapbox/mapbox-gl-native/pull/12225",
+  "query-tests/symbol/rotated-sort": "skip - https://github.com/mapbox/mapbox-gl-native/pull/12225",
   "render-tests/background-color/transition": "https://github.com/mapbox/mapbox-gl-native/issues/10619",
   "render-tests/debug/collision": "https://github.com/mapbox/mapbox-gl-native/issues/3841",
   "render-tests/debug/collision-lines": "https://github.com/mapbox/mapbox-gl-native/issues/10412",
