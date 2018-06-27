@@ -29,6 +29,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/darwin/mbgl/storage/reachability.h
         PRIVATE platform/darwin/mbgl/storage/reachability.m
         PRIVATE platform/darwin/src/CFHandle.hpp
+        PRIVATE platform/darwin/src/collator.mm
         PRIVATE platform/darwin/src/local_glyph_rasterizer.mm
         PRIVATE platform/darwin/src/logging_nslog.mm
         PRIVATE platform/darwin/src/nsthread.mm
