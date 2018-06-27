@@ -614,6 +614,8 @@ set(MBGL_CORE_FILES
     src/mbgl/text/glyph_pbf.cpp
     src/mbgl/text/glyph_pbf.hpp
     src/mbgl/text/glyph_range.hpp
+    src/mbgl/text/language_tag.cpp
+    src/mbgl/text/language_tag.hpp
     src/mbgl/text/local_glyph_rasterizer.hpp
     src/mbgl/text/placement.cpp
     src/mbgl/text/placement.hpp
