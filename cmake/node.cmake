@@ -101,6 +101,7 @@ xcode_create_scheme(
     TYPE node
     NAME "node render tests (Active ABI)"
     ARGS
+        "-r esm"
         "platform/node/test/render.test.js"
     OPTIONAL_ARGS
         "group"
@@ -112,6 +113,7 @@ xcode_create_scheme(
     TYPE node
     NAME "node query tests (Active ABI)"
     ARGS
+        "-r esm"
         "platform/node/test/query.test.js"
     OPTIONAL_ARGS
         "group"
@@ -123,6 +125,7 @@ xcode_create_scheme(
     TYPE node
     NAME "node expression tests (Active ABI)"
     ARGS
+        "-r esm"
         "platform/node/test/expression.test.js"
     OPTIONAL_ARGS
         "group"
@@ -134,6 +137,7 @@ xcode_create_scheme(
     TYPE node
     NAME "node-benchmark (Active ABI)"
     ARGS
+        "-r esm"
         "platform/node/test/benchmark.js"
     OPTIONAL_ARGS
         "group"
