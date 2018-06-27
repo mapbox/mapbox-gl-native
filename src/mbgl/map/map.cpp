@@ -439,7 +439,8 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
         transform.setAngle(angle);
     }
     if (pitch) {
-        transform.setPitch(*pitch);
+        double pichAsRadian = *pitch * util::DEG2RAD; // Convert to radians
+        transform.setPitch(pichAsRadian);
     }
     
     CameraOptions options = mbgl::cameraForLatLngs(latLngs, transform, padding);
