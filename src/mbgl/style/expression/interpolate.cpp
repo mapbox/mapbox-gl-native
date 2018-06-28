@@ -7,6 +7,75 @@ namespace expression {
 
 using namespace mbgl::style::conversion;
 
+template <typename T>
+class Interpolate : public InterpolateBase {
+public:
+    Interpolate(type::Type type_,
+          Interpolator interpolator_,
+          std::unique_ptr<Expression> input_,
+          std::map<double, std::unique_ptr<Expression>> stops_
+    ) : InterpolateBase(std::move(type_), std::move(interpolator_), std::move(input_), std::move(stops_))
+    {
+        static_assert(util::Interpolatable<T>::value, "Interpolate expression requires an interpolatable value type.");
+    }
+
+    EvaluationResult evaluate(const EvaluationContext& params) const override {
+        const EvaluationResult evaluatedInput = input->evaluate(params);
+        if (!evaluatedInput) {
+            return evaluatedInput.error();
+        }
+
+        float x = *fromExpressionValue<float>(*evaluatedInput);
+        if (std::isnan(x)) {
+            return EvaluationError { "Input is not a number." };
+        }
+
+        if (stops.empty()) {
+            return EvaluationError { "No stops in exponential curve." };
+        }
+
+        auto it = stops.upper_bound(x);
+        if (it == stops.end()) {
+            return stops.rbegin()->second->evaluate(params);
+        } else if (it == stops.begin()) {
+            return stops.begin()->second->evaluate(params);
+        } else {
+            float t = interpolationFactor({ std::prev(it)->first, it->first }, x);
+
+            if (t == 0.0f) {
+                return std::prev(it)->second->evaluate(params);
+            }
+            if (t == 1.0f) {
+                return it->second->evaluate(params);
+            }
+
+            EvaluationResult lower = std::prev(it)->second->evaluate(params);
+            if (!lower) {
+                return lower.error();
+            }
+            EvaluationResult upper = it->second->evaluate(params);
+            if (!upper) {
+                return upper.error();
+            }
+
+            if (!lower->is<T>()) {
+                return EvaluationError {
+                    "Expected value to be of type " + toString(valueTypeToExpressionType<T>()) +
+                    ", but found " + toString(typeOf(*lower)) + " instead."
+                };
+            }
+
+            if (!upper->is<T>()) {
+                return EvaluationError {
+                    "Expected value to be of type " + toString(valueTypeToExpressionType<T>()) +
+                    ", but found " + toString(typeOf(*upper)) + " instead."
+                };
+            }
+            return util::interpolate(lower->get<T>(), upper->get<T>(), t);
+        }
+    }
+};
+
 ParseResult parseInterpolate(const Convertible& value, ParsingContext& ctx) {
     assert(isArray(value));
 
@@ -151,29 +220,41 @@ ParseResult parseInterpolate(const Convertible& value, ParsingContext& ctx) {
     }
     
     assert(outputType);
-    
-    return outputType->match(
+
+    return createInterpolate(*outputType,
+                             *interpolator,
+                             std::move(*input),
+                             std::move(stops),
+                             ctx);
+}
+
+ParseResult createInterpolate(type::Type type,
+                              Interpolator interpolator,
+                              std::unique_ptr<Expression> input,
+                              std::map<double, std::unique_ptr<Expression>> stops,
+                              ParsingContext& ctx) {
+    return type.match(
         [&](const type::NumberType&) -> ParseResult {
             return ParseResult(std::make_unique<Interpolate<double>>(
-                *outputType, *interpolator, std::move(*input), std::move(stops)
+                type, interpolator, std::move(input), std::move(stops)
             ));
         },
         [&](const type::ColorType&) -> ParseResult {
             return ParseResult(std::make_unique<Interpolate<Color>>(
-                *outputType, *interpolator, std::move(*input), std::move(stops)
+                type, interpolator, std::move(input), std::move(stops)
             ));
         },
         [&](const type::Array& arrayType) -> ParseResult {
             if (arrayType.itemType != type::Number || !arrayType.N) {
-                ctx.error("Type " + toString(*outputType) + " is not interpolatable.");
+                ctx.error("Type " + toString(type) + " is not interpolatable.");
                 return ParseResult();
             }
             return ParseResult(std::make_unique<Interpolate<std::vector<Value>>>(
-                *outputType, *interpolator, std::move(*input), std::move(stops)
+                type, interpolator, std::move(input), std::move(stops)
             ));
         },
         [&](const auto&) {
-            ctx.error("Type " + toString(*outputType) + " is not interpolatable.");
+            ctx.error("Type " + toString(type) + " is not interpolatable.");
             return ParseResult();
         }
     );
