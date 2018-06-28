@@ -4,6 +4,12 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 4.0.5 - August 14, 2018
 
+### Packaging
+
+* When integrating this framework using CocoaPods, the included bcsymbolmap files are now preserved. If you have bitcode enabled and you are seeing incorrectly symbolicated crash logs, you should create a build phase in your Xcode project that copies these bcsymbolmap files to your app’s Products Directory when installing. ([#12257](https://github.com/mapbox/mapbox-gl-native/pull/12257))
+
+### Other Changes
+
 * Added an `MGLMapView.locationManager` property and `MGLLocationManager` protocol for tracking user location using a custom alternative to `CLLocationManager`. ([#12013](https://github.com/mapbox/mapbox-gl-native/pull/12013))
 
 ## 4.0.4 - June 27, 2018
@@ -41,7 +47,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed a crash that could occur when reusing `MGLMapSnapshotter` or using multiple snapshotters at the same time. ([#11831](https://github.com/mapbox/mapbox-gl-native/pull/11831))
 * Fixed an issue where an empty `MGLFeature` array caused high CPU utilization. ([#11985](https://github.com/mapbox/mapbox-gl-native/pull/11985))
 * Improved offline download performance. ([#11284](https://github.com/mapbox/mapbox-gl-native/pull/11284))
-* Fixed an issue that caused -[MGLMapView visibleFeaturesAtPoint:] to return an empty array when adding or removing features. ([#12076](https://github.com/mapbox/mapbox-gl-native/pull/12076))
+* Fixed an issue that caused `-[MGLMapView visibleFeaturesAtPoint:]` to return an empty array when adding or removing features. ([#12076](https://github.com/mapbox/mapbox-gl-native/pull/12076))
 * Improved application launch performance. ([#11784](https://github.com/mapbox/mapbox-gl-native/pull/11784))
 
 ## 4.0.2 - May 29, 2018
