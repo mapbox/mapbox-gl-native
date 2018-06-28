@@ -1,7 +1,7 @@
 {
   "expression-tests/collator/accent-equals-de": "Locale-specific behavior changes based on platform.",
   "expression-tests/is-supported-script/default": "This tests RTL text plugin behavior specific to GL JS",
-  "expression-tests/resolved-locale/basic": "https://github.com/mapbox/mapbox-gl-native/issues/11692",
+  "expression-tests/resolved-locale/basic": "Even the 'en' locale may not be present on some test systems.",
   "query-tests/geometry/multilinestring": "needs investigation",
   "query-tests/geometry/multipolygon": "needs investigation",
   "query-tests/geometry/polygon": "needs investigation",
