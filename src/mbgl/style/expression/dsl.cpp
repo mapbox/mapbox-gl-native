@@ -3,6 +3,7 @@
 #include <mbgl/style/expression/assertion.hpp>
 #include <mbgl/style/expression/coercion.hpp>
 #include <mbgl/style/expression/equals.hpp>
+#include <mbgl/style/expression/step.hpp>
 #include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/compound_expression.hpp>
 #include <mbgl/util/ignore.hpp>
@@ -33,6 +34,22 @@ std::unique_ptr<Expression> literal(const char* value) {
 
 std::unique_ptr<Expression> literal(Value value) {
     return std::make_unique<Literal>(value);
+}
+
+std::unique_ptr<Expression> literal(std::initializer_list<double> value) {
+    std::vector<Value> values;
+    for (auto i : value) {
+        values.push_back(i);
+    }
+    return literal(values);
+}
+
+std::unique_ptr<Expression> literal(std::initializer_list<const char *> value) {
+    std::vector<Value> values;
+    for (auto i : value) {
+        values.push_back(std::string(i));
+    }
+    return literal(values);
 }
 
 std::unique_ptr<Expression> number(std::unique_ptr<Expression> value) {
@@ -85,6 +102,16 @@ std::unique_ptr<Expression> gt(std::unique_ptr<Expression> lhs,
 std::unique_ptr<Expression> lt(std::unique_ptr<Expression> lhs,
                                std::unique_ptr<Expression> rhs) {
     return compound("<", std::move(lhs), std::move(rhs));
+}
+
+std::unique_ptr<Expression> step(std::unique_ptr<Expression> input,
+                                 std::unique_ptr<Expression> output0,
+                                 double input1, std::unique_ptr<Expression> output1) {
+    type::Type type = output0->getType();
+    std::map<double, std::unique_ptr<Expression>> stops;
+    stops[-std::numeric_limits<double>::infinity()] = std::move(output0);
+    stops[input1] = std::move(output1);
+    return std::make_unique<Step>(type, std::move(input), std::move(stops));
 }
 
 Interpolator linear() {

@@ -8,6 +8,7 @@
 
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
+#include <mbgl/style/expression/dsl.hpp>
 
 @interface MGLBackgroundLayerTests : MGLStyleLayerTests
 @end
@@ -45,11 +46,12 @@
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.backgroundColor = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::Color> intervalStops = {{
-            { -INFINITY, { 1, 0, 0, 1 } },
-            { 18, { 1, 0, 0, 1 } },
-        }};
-        propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<mbgl::Color>(
+                step(zoom(), literal(mbgl::Color(1, 0, 0, 1)), 18.0, literal(mbgl::Color(1, 0, 0, 1)))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getBackgroundColor(), propertyValue,
                        @"Setting backgroundColor to a camera expression should update background-color.");
@@ -85,23 +87,24 @@
                       @"background-opacity should be unset initially.");
         NSExpression *defaultExpression = layer.backgroundOpacity;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.backgroundOpacity = constantExpression;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getBackgroundOpacity(), propertyValue,
                        @"Setting backgroundOpacity to a constant value expression should update background-opacity.");
         XCTAssertEqualObjects(layer.backgroundOpacity, constantExpression,
                               @"backgroundOpacity should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.backgroundOpacity = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = {{
-            { -INFINITY, 0xff },
-            { 18, 0xff },
-        }};
-        propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getBackgroundOpacity(), propertyValue,
                        @"Setting backgroundOpacity to a camera expression should update background-opacity.");
@@ -149,11 +152,12 @@
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.backgroundPattern = functionExpression;
 
-        mbgl::style::IntervalStops<std::string> intervalStops = {{
-            { -INFINITY, "Background Pattern" },
-            { 18, "Background Pattern" },
-        }};
-        propertyValue = mbgl::style::CameraFunction<std::string> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<std::string>(
+                step(zoom(), literal("Background Pattern"), 18.0, literal("Background Pattern"))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getBackgroundPattern(), propertyValue,
                        @"Setting backgroundPattern to a camera expression should update background-pattern.");
