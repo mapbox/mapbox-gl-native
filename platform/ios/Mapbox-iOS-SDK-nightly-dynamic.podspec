@@ -27,4 +27,6 @@ Pod::Spec.new do |m|
   m.vendored_frameworks = 'dynamic/Mapbox.framework'
   m.module_name = 'Mapbox'
 
+  m.preserve_path = '**/*.bcsymbolmap'
+
 end
