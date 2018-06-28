@@ -216,7 +216,7 @@ ParseResult ParsingContext::parseExpression(const Convertible& value, TypeAnnota
 ParseResult ParsingContext::parseLayerPropertyExpression(const Convertible& value, TypeAnnotationOption typeAnnotationOption) {
     ParseResult parsed = parse(value, typeAnnotationOption);
     if (parsed && !isZoomConstant(**parsed)) {
-        optional<variant<const InterpolateBase*, const Step*, ParsingError>> zoomCurve = findZoomCurve(parsed->get());
+        optional<variant<const Interpolate*, const Step*, ParsingError>> zoomCurve = findZoomCurve(parsed->get());
         if (!zoomCurve) {
             error(R"("zoom" expression may only be used as input to a top-level "step" or "interpolate" expression.)");
             return ParseResult();

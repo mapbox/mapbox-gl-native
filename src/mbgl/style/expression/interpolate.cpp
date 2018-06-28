@@ -8,13 +8,13 @@ namespace expression {
 using namespace mbgl::style::conversion;
 
 template <typename T>
-class Interpolate : public InterpolateBase {
+class InterpolateImpl : public Interpolate {
 public:
-    Interpolate(type::Type type_,
+    InterpolateImpl(type::Type type_,
           Interpolator interpolator_,
           std::unique_ptr<Expression> input_,
           std::map<double, std::unique_ptr<Expression>> stops_
-    ) : InterpolateBase(std::move(type_), std::move(interpolator_), std::move(input_), std::move(stops_))
+    ) : Interpolate(std::move(type_), std::move(interpolator_), std::move(input_), std::move(stops_))
     {
         static_assert(util::Interpolatable<T>::value, "Interpolate expression requires an interpolatable value type.");
     }
@@ -235,12 +235,12 @@ ParseResult createInterpolate(type::Type type,
                               ParsingContext& ctx) {
     return type.match(
         [&](const type::NumberType&) -> ParseResult {
-            return ParseResult(std::make_unique<Interpolate<double>>(
+            return ParseResult(std::make_unique<InterpolateImpl<double>>(
                 type, interpolator, std::move(input), std::move(stops)
             ));
         },
         [&](const type::ColorType&) -> ParseResult {
-            return ParseResult(std::make_unique<Interpolate<Color>>(
+            return ParseResult(std::make_unique<InterpolateImpl<Color>>(
                 type, interpolator, std::move(input), std::move(stops)
             ));
         },
@@ -249,7 +249,7 @@ ParseResult createInterpolate(type::Type type,
                 ctx.error("Type " + toString(type) + " is not interpolatable.");
                 return ParseResult();
             }
-            return ParseResult(std::make_unique<Interpolate<std::vector<Value>>>(
+            return ParseResult(std::make_unique<InterpolateImpl<std::vector<Value>>>(
                 type, interpolator, std::move(input), std::move(stops)
             ));
         },
@@ -260,7 +260,7 @@ ParseResult createInterpolate(type::Type type,
     );
 }
 
-std::vector<optional<Value>> InterpolateBase::possibleOutputs() const {
+std::vector<optional<Value>> Interpolate::possibleOutputs() const {
     std::vector<optional<Value>> result;
     for (const auto& stop : stops) {
         for (auto& output : stop.second->possibleOutputs()) {
@@ -270,7 +270,7 @@ std::vector<optional<Value>> InterpolateBase::possibleOutputs() const {
     return result;
 }
 
-mbgl::Value InterpolateBase::serialize() const {
+mbgl::Value Interpolate::serialize() const {
     std::vector<mbgl::Value> serialized;
     serialized.emplace_back(getOperator());
     
