@@ -55,7 +55,23 @@ public:
         );
     }
 
+    bool operator==(const Expression& e) const override {
+        if (auto rhs = dynamic_cast<const InterpolateBase*>(&e)) {
+            if (interpolator != rhs->interpolator ||
+                *input != *(rhs->input) ||
+                stops.size() != rhs->stops.size())
+            {
+                return false;
+            }
+
+            return Expression::childrenEqual(stops, rhs->stops);
+        }
+        return false;
+    }
+
     std::vector<optional<Value>> possibleOutputs() const override;
+    mbgl::Value serialize() const override;
+    std::string getOperator() const override { return "interpolate"; }
 
 protected:
     const Interpolator interpolator;
@@ -130,23 +146,6 @@ public:
             return util::interpolate(lower->get<T>(), upper->get<T>(), t);
         }
     }
-    
-    bool operator==(const Expression& e) const override {
-        if (auto rhs = dynamic_cast<const Interpolate*>(&e)) {
-            if (interpolator != rhs->interpolator ||
-                *input != *(rhs->input) ||
-                stops.size() != rhs->stops.size())
-            {
-                return false;
-            }
-            
-            return Expression::childrenEqual(stops, rhs->stops);
-        }
-        return false;
-    }
-    
-    mbgl::Value serialize() const override;
-    std::string getOperator() const override { return "interpolate"; }
 };
 
 } // namespace expression
