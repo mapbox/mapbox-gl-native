@@ -13,6 +13,7 @@
 
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
+#include <mbgl/style/expression/dsl.hpp>
 
 @interface MGL<%- camelize(type) %>LayerTests : MGLStyleLayerTests
 @end
@@ -83,11 +84,12 @@
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.<%- objCName(property) %> = functionExpression;
 
-        mbgl::style::IntervalStops<<%- mbglType(property) %>> intervalStops = {{
-            { -INFINITY, <%- mbglTestValue(property, type) %> },
-            { 18, <%- mbglTestValue(property, type) %> },
-        }};
-        propertyValue = mbgl::style::CameraFunction<<%- mbglType(property) %>> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<<%- mbglType(property) %>>(
+                step(zoom(), literal(<%- mbglExpressionTestValue(property, type) %>), 18.0, literal(<%- mbglExpressionTestValue(property, type) %>))
+            );
+        }
 
         XCTAssertEqual(rawLayer->get<%- camelize(originalPropertyName(property)) %>(), propertyValue,
                        @"Setting <%- objCName(property) %> to a camera expression should update <%- originalPropertyName(property) %>.");
@@ -98,8 +100,12 @@
         functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(keyName, 'linear', nil, %@)", @{@18: constantExpression}];
         layer.<%- objCName(property) %> = functionExpression;
 
-        mbgl::style::ExponentialStops<<%- mbglType(property) %>> exponentialStops = { {{18, <%- mbglTestValue(property, type) %>}}, 1.0 };
-        propertyValue = mbgl::style::SourceFunction<<%- mbglType(property) %>> { "keyName", exponentialStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::SourceFunction<<%- mbglType(property) %>>(
+                interpolate(linear(), number(get("keyName")), 18.0, literal(<%- mbglExpressionTestValue(property, type) %>))
+            );
+        }
 
         XCTAssertEqual(rawLayer->get<%- camelize(originalPropertyName(property)) %>(), propertyValue,
                        @"Setting <%- objCName(property) %> to a data expression should update <%- originalPropertyName(property) %>.");
@@ -110,11 +116,13 @@
         functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         layer.<%- objCName(property) %> = functionExpression;
 
-        std::map<float, <%- mbglType(property) %>> innerStops { {18, <%- mbglTestValue(property, type) %>} };
-        mbgl::style::CompositeExponentialStops<<%- mbglType(property) %>> compositeStops { { {10.0, innerStops} }, 1.0 };
-
-        propertyValue = mbgl::style::CompositeFunction<<%- mbglType(property) %>> { "keyName", compositeStops };
-
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CompositeFunction<<%- mbglType(property) %>>(
+                interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(<%- mbglExpressionTestValue(property, type) %>)))
+            );
+        }
+        
         XCTAssertEqual(rawLayer->get<%- camelize(originalPropertyName(property)) %>(), propertyValue,
                        @"Setting <%- objCName(property) %> to a camera-data expression should update <%- originalPropertyName(property) %>.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];

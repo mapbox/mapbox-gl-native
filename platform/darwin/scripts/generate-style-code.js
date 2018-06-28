@@ -101,7 +101,7 @@ global.objCTestValue = function (property, layerType, arraysAsStructs, indent) {
         case 'boolean':
             return property.default ? '@"false"' : '@"true"';
         case 'number':
-            return '@"0xff"';
+            return '@"1"';
         case 'string':
             return `@"'${_.startCase(propertyName)}'"`;
         case 'enum':
@@ -145,7 +145,7 @@ global.mbglTestValue = function (property, layerType) {
         case 'boolean':
             return property.default ? 'false' : 'true';
         case 'number':
-            return '0xff';
+            return '1.0';
         case 'string':
             return `"${_.startCase(propertyName)}"`;
         case 'enum': {
@@ -183,6 +183,18 @@ global.mbglTestValue = function (property, layerType) {
             }
         default:
             throw new Error(`unknown type for ${property.name}`);
+    }
+};
+
+global.mbglExpressionTestValue = function (property, layerType) {
+    let propertyName = originalPropertyName(property);
+    switch (property.type) {
+        case 'enum':
+            return `"${_.last(_.keys(property.values))}"`;
+        case 'color':
+            return 'mbgl::Color(1, 0, 0, 1)';
+        default:
+            return global.mbglTestValue(property, layerType);
     }
 };
 

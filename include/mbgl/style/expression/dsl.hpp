@@ -5,6 +5,7 @@
 #include <mbgl/style/expression/interpolator.hpp>
 
 #include <memory>
+#include <initializer_list>
 
 namespace mbgl {
 namespace style {
@@ -16,6 +17,8 @@ namespace dsl {
 
 std::unique_ptr<Expression> literal(const char* value);
 std::unique_ptr<Expression> literal(Value value);
+std::unique_ptr<Expression> literal(std::initializer_list<double> value);
+std::unique_ptr<Expression> literal(std::initializer_list<const char *> value);
 
 std::unique_ptr<Expression> number(std::unique_ptr<Expression>);
 std::unique_ptr<Expression> string(std::unique_ptr<Expression>);
@@ -37,6 +40,10 @@ std::unique_ptr<Expression> gt(std::unique_ptr<Expression>,
                                std::unique_ptr<Expression>);
 std::unique_ptr<Expression> lt(std::unique_ptr<Expression>,
                                std::unique_ptr<Expression>);
+
+std::unique_ptr<Expression> step(std::unique_ptr<Expression> input,
+                                 std::unique_ptr<Expression> output0,
+                                 double input1, std::unique_ptr<Expression> output1);
 
 Interpolator linear();
 Interpolator exponential(double base);
