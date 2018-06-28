@@ -1,73 +1,28 @@
 #pragma once
 
 #include <mbgl/style/expression/expression.hpp>
+#include <mbgl/style/expression/value.hpp>
+#include <mbgl/style/expression/is_constant.hpp>
 #include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/step.hpp>
 #include <mbgl/style/expression/find_zoom_curve.hpp>
-#include <mbgl/style/expression/value.hpp>
-#include <mbgl/style/expression/is_constant.hpp>
-#include <mbgl/style/function/convert.hpp>
-#include <mbgl/style/function/composite_exponential_stops.hpp>
-#include <mbgl/style/function/composite_interval_stops.hpp>
-#include <mbgl/style/function/composite_categorical_stops.hpp>
-#include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/range.hpp>
-#include <mbgl/util/variant.hpp>
-
-#include <string>
-#include <tuple>
 
 namespace mbgl {
-
-class GeometryTileFeature;
-
 namespace style {
-
-// A CompositeFunction consists of an outer zoom function whose stop range values are
-// "inner" source functions. It provides the GL Native implementation of
-// "zoom-and-property" functions from the style spec.
 
 template <class T>
 class CompositeFunction {
 public:
-    using InnerStops = std::conditional_t<
-        util::Interpolatable<T>::value,
-        variant<
-            ExponentialStops<T>,
-            IntervalStops<T>,
-            CategoricalStops<T>>,
-        variant<
-            IntervalStops<T>,
-            CategoricalStops<T>>>;
-
-    using Stops = std::conditional_t<
-        util::Interpolatable<T>::value,
-        variant<
-            CompositeExponentialStops<T>,
-            CompositeIntervalStops<T>,
-            CompositeCategoricalStops<T>>,
-        variant<
-            CompositeIntervalStops<T>,
-            CompositeCategoricalStops<T>>>;
-
+    // The second parameter should be used only for conversions from legacy functions.
     CompositeFunction(std::unique_ptr<expression::Expression> expression_, optional<T> defaultValue_ = {})
-    :   isExpression(true),
-        defaultValue(std::move(defaultValue_)),
-        expression(std::move(expression_)),
-        zoomCurve(expression::findZoomCurveChecked(expression.get()))
-    {
+        : isExpression(defaultValue_),
+          expression(std::move(expression_)),
+          defaultValue(std::move(defaultValue_)),
+          zoomCurve(expression::findZoomCurveChecked(expression.get())) {
         assert(!expression::isZoomConstant(*expression));
         assert(!expression::isFeatureConstant(*expression));
     }
-
-    CompositeFunction(const std::string& property, const Stops& stops, optional<T> defaultValue_ = {})
-    :   isExpression(false),
-        defaultValue(std::move(defaultValue_)),
-        expression(stops.match([&] (const auto& s) {
-            return expression::Convert::toExpression(property, s);
-        })),
-        zoomCurve(expression::findZoomCurveChecked(expression.get()))
-    {}
 
     // Return the range obtained by evaluating the function at each of the zoom levels in zoomRange
     template <class Feature>
@@ -118,8 +73,8 @@ public:
     bool isExpression;
     
 private:
+    std::shared_ptr<const expression::Expression> expression;
     optional<T> defaultValue;
-    std::shared_ptr<expression::Expression> expression;
     const variant<const expression::Interpolate*, const expression::Step*> zoomCurve;
 };
 

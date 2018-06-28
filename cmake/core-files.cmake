@@ -504,6 +504,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/function/interval_stops.hpp
     include/mbgl/style/function/source_function.hpp
     src/mbgl/style/function/categorical_stops.cpp
+    src/mbgl/style/function/convert.cpp
     src/mbgl/style/function/expression.cpp
     src/mbgl/style/function/identity_stops.cpp
 
