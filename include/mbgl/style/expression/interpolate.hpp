@@ -16,9 +16,9 @@ namespace expression {
 
 ParseResult parseInterpolate(const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
 
-class InterpolateBase : public Expression {
+class Interpolate : public Expression {
 public:
-    InterpolateBase(const type::Type& type_,
+    Interpolate(const type::Type& type_,
           Interpolator interpolator_,
           std::unique_ptr<Expression> input_,
           std::map<double, std::unique_ptr<Expression>> stops_
@@ -56,7 +56,7 @@ public:
     }
 
     bool operator==(const Expression& e) const override {
-        if (auto rhs = dynamic_cast<const InterpolateBase*>(&e)) {
+        if (auto rhs = dynamic_cast<const Interpolate*>(&e)) {
             if (interpolator != rhs->interpolator ||
                 *input != *(rhs->input) ||
                 stops.size() != rhs->stops.size())
