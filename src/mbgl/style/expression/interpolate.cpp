@@ -189,8 +189,7 @@ std::vector<optional<Value>> InterpolateBase::possibleOutputs() const {
     return result;
 }
 
-template <typename T>
-mbgl::Value Interpolate<T>::serialize() const {
+mbgl::Value InterpolateBase::serialize() const {
     std::vector<mbgl::Value> serialized;
     serialized.emplace_back(getOperator());
     
