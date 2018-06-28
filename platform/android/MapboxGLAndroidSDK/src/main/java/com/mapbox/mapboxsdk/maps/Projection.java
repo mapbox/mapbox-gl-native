@@ -4,6 +4,8 @@ import android.graphics.PointF;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 
+import com.mapbox.geojson.Point;
+import com.mapbox.mapboxsdk.constants.GeometryConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
@@ -124,54 +126,114 @@ public class Projection {
       bottom = nativeMapView.getHeight() - contentPadding[3];
     }
 
+    LatLng center = fromScreenLocation(new PointF(left + (right - left) / 2, top + (bottom - top) / 2));
+
     LatLng topLeft = fromScreenLocation(new PointF(left, top));
     LatLng topRight = fromScreenLocation(new PointF(right, top));
     LatLng bottomRight = fromScreenLocation(new PointF(right, bottom));
     LatLng bottomLeft = fromScreenLocation(new PointF(left, bottom));
 
-    // Map can be rotated, find correct LatLngBounds that encompasses the visible region (that might be rotated)
-    List<LatLng> boundsPoints = new ArrayList<>();
-    boundsPoints.add(topLeft);
-    boundsPoints.add(topRight);
-    boundsPoints.add(bottomRight);
-    boundsPoints.add(bottomLeft);
+    List<LatLng> latLngs = new ArrayList<>();
+    latLngs.add(topRight);
+    latLngs.add(bottomRight);
+    latLngs.add(bottomLeft);
+    latLngs.add(topLeft);
 
-    // order so that two most northern point are put first
-    while ((boundsPoints.get(0).getLatitude() < boundsPoints.get(3).getLatitude())
-      || (boundsPoints.get(1).getLatitude() < boundsPoints.get(2).getLatitude())) {
-      LatLng first = boundsPoints.remove(0);
-      boundsPoints.add(first);
+    double maxEastLonSpan = 0;
+    double maxWestLonSpan = 0;
+
+    double east = 0;
+    double west = 0;
+    double north = GeometryConstants.MIN_LATITUDE;
+    double south = GeometryConstants.MAX_LATITUDE;
+
+    for (LatLng latLng : latLngs) {
+      double bearing = bearing(center, latLng);
+
+      if (bearing >= 0) {
+        double span = getLongitudeSpan(latLng.getLongitude(), center.getLongitude());
+        if (span > maxEastLonSpan) {
+          maxEastLonSpan = span;
+          east = latLng.getLongitude();
+        }
+      } else {
+        double span = getLongitudeSpan(center.getLongitude(), latLng.getLongitude());
+        if (span > maxWestLonSpan) {
+          maxWestLonSpan = span;
+          west = latLng.getLongitude();
+        }
+      }
+
+      if (north < latLng.getLatitude()) {
+        north = latLng.getLatitude();
+      }
+      if (south > latLng.getLatitude()) {
+        south = latLng.getLatitude();
+      }
     }
 
-    double north = boundsPoints.get(0).getLatitude();
-    if (north < boundsPoints.get(1).getLatitude()) {
-      north = boundsPoints.get(1).getLatitude();
+    return new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight,
+      LatLngBounds.from(north, east, south, west));
+  }
+
+  /**
+   * Takes two {@link Point}s and finds the geographic bearing between them.
+   *
+   * @param latLng1 the first point used for calculating the bearing
+   * @param latLng2 the second point used for calculating the bearing
+   * @return bearing in decimal degrees
+   * @see <a href="http://turfjs.org/docs/#bearing">Turf Bearing documentation</a>
+   */
+  static double bearing(@NonNull LatLng latLng1, @NonNull LatLng latLng2) {
+
+    double lon1 = degreesToRadians(latLng1.getLongitude());
+    double lon2 = degreesToRadians(latLng2.getLongitude());
+    double lat1 = degreesToRadians(latLng1.getLatitude());
+    double lat2 = degreesToRadians(latLng2.getLatitude());
+
+    double value1 = Math.sin(lon2 - lon1) * Math.cos(lat2);
+    double value2 = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1)
+      * Math.cos(lat2) * Math.cos(lon2 - lon1);
+
+    return radiansToDegrees(Math.atan2(value1, value2));
+  }
+
+  /**
+   * Converts an angle in degrees to radians.
+   *
+   * @param degrees angle between 0 and 360 degrees
+   * @return angle in radians
+   */
+  static double degreesToRadians(double degrees) {
+    double radians = degrees % 360;
+    return radians * Math.PI / 180;
+  }
+
+  /**
+   * Converts an angle in radians to degrees.
+   *
+   * @param radians angle in radians
+   * @return degrees between 0 and 360 degrees
+   */
+  static double radiansToDegrees(double radians) {
+    double degrees = radians % (2 * Math.PI);
+    return degrees * 180 / Math.PI;
+  }
+
+  /**
+   * Get the absolute distance, in degrees, between the west and
+   * east boundaries of this LatLngBounds
+   *
+   * @return Span distance
+   */
+  static double getLongitudeSpan(double east, double west) {
+    double longSpan = Math.abs(east - west);
+    if (east > west) {
+      return longSpan;
     }
 
-    double south = boundsPoints.get(2).getLatitude();
-    if (south > boundsPoints.get(3).getLatitude()) {
-      south = boundsPoints.get(3).getLatitude();
-    }
-
-    double firstLon = boundsPoints.get(0).getLongitude();
-    double secondLon = boundsPoints.get(1).getLongitude();
-    double thridLon = boundsPoints.get(2).getLongitude();
-    double fourthLon = boundsPoints.get(3).getLongitude();
-
-    // if it does not go over the date line
-    if (secondLon > fourthLon && firstLon < thridLon) {
-      return new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight,
-        LatLngBounds.from(north,
-          secondLon > thridLon ? secondLon : thridLon,
-          south,
-          firstLon < fourthLon ? firstLon : fourthLon));
-    } else {
-      return new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight,
-        LatLngBounds.from(north,
-          secondLon < thridLon ? secondLon : thridLon,
-          south,
-          firstLon > fourthLon ? firstLon : fourthLon));
-    }
+    // shortest span contains antimeridian
+    return GeometryConstants.LONGITUDE_SPAN - longSpan;
   }
 
   /**
