@@ -930,7 +930,7 @@ MGL_EXPORT IB_DESIGNABLE
  Returns the camera that best fits the given shape, with the specified camera,
  optionally with some additional padding on each side.
  
- @param camera The camera the return camera should adhere to. All values
+ @param camera The camera that the return camera should adhere to. All values
     on this camera will be manipulated except for pitch and direction
  @param shape The shape to fit to the receiver’s viewport.
  @param insets The minimum padding (in screen points) that would be visible
