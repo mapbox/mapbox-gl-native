@@ -9,6 +9,7 @@
 #include <mbgl/style/expression/is_expression.hpp>
 #include <mbgl/style/expression/find_zoom_curve.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
+#include <mbgl/style/expression/literal.hpp>
 
 namespace mbgl {
 namespace style {

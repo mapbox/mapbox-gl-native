@@ -426,6 +426,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/conversion/constant.cpp
     src/mbgl/style/conversion/coordinate.cpp
     src/mbgl/style/conversion/filter.cpp
+    src/mbgl/style/conversion/function.cpp
     src/mbgl/style/conversion/geojson.cpp
     src/mbgl/style/conversion/geojson_options.cpp
     src/mbgl/style/conversion/get_json_type.cpp
@@ -454,6 +455,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/expression/compound_expression.hpp
     include/mbgl/style/expression/dsl.hpp
     include/mbgl/style/expression/equals.hpp
+    include/mbgl/style/expression/error.hpp
     include/mbgl/style/expression/expression.hpp
     include/mbgl/style/expression/find_zoom_curve.hpp
     include/mbgl/style/expression/get_covering_stops.hpp
@@ -498,20 +500,9 @@ set(MBGL_CORE_FILES
 
     # style/function
     include/mbgl/style/function/camera_function.hpp
-    include/mbgl/style/function/categorical_stops.hpp
-    include/mbgl/style/function/composite_categorical_stops.hpp
-    include/mbgl/style/function/composite_exponential_stops.hpp
     include/mbgl/style/function/composite_function.hpp
-    include/mbgl/style/function/composite_interval_stops.hpp
-    include/mbgl/style/function/convert.hpp
-    include/mbgl/style/function/exponential_stops.hpp
-    include/mbgl/style/function/identity_stops.hpp
-    include/mbgl/style/function/interval_stops.hpp
     include/mbgl/style/function/source_function.hpp
-    src/mbgl/style/function/categorical_stops.cpp
-    src/mbgl/style/function/convert.cpp
     src/mbgl/style/function/expression.cpp
-    src/mbgl/style/function/identity_stops.cpp
 
     # style/layers
     include/mbgl/style/layers/background_layer.hpp
