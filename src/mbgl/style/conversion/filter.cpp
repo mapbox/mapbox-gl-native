@@ -14,6 +14,7 @@ using namespace mbgl::style::expression;
     
 static bool isExpression(const Convertible& filter);
 ParseResult convertLegacyFilter(const Convertible& values, Error& error);
+optional<mbgl::Value> serializeLegacyFilter(const Convertible& values);
 
 optional<Filter> Converter<Filter>::operator()(const Convertible& value, Error& error) const {
     if (isExpression(value)) {
@@ -31,7 +32,7 @@ optional<Filter> Converter<Filter>::operator()(const Convertible& value, Error& 
             assert(error.message.size() > 0);
             return {};
         }
-        return Filter(optional<std::unique_ptr<Expression>>(std::move(*expression)));
+        return Filter(optional<std::unique_ptr<Expression>>(std::move(*expression)), serializeLegacyFilter(value));
     }
 }
 
@@ -216,6 +217,24 @@ ParseResult convertLegacyFilter(const Convertible& values, Error& error) {
             ParseResult(std::make_unique<Literal>(true))
         };
     }
+}
+
+optional<mbgl::Value> serializeLegacyFilter(const Convertible& values) {
+    if (isUndefined(values)) {
+        return {};
+    } else if (isArray(values)) {
+        std::vector<mbgl::Value> result;
+        for (std::size_t i = 0; i < arrayLength(values); i++) {
+            auto arrayValue = serializeLegacyFilter(arrayMember(values, i));
+            if (arrayValue) {
+                result.push_back(*arrayValue);
+            } else {
+                result.push_back(NullValue());
+            }
+        }
+        return (mbgl::Value)result;
+    }
+    return toValue(values);
 }
 
 } // namespace conversion
