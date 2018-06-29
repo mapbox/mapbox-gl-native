@@ -10,8 +10,8 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-optional<variant<const InterpolateBase*, const Step*, ParsingError>> findZoomCurve(const expression::Expression* e) {
-    optional<variant<const InterpolateBase*, const Step*, ParsingError>> result;
+optional<variant<const Interpolate*, const Step*, ParsingError>> findZoomCurve(const expression::Expression* e) {
+    optional<variant<const Interpolate*, const Step*, ParsingError>> result;
     
     if (auto let = dynamic_cast<const Let*>(e)) {
         result = findZoomCurve(let->getResult());
@@ -23,7 +23,7 @@ optional<variant<const InterpolateBase*, const Step*, ParsingError>> findZoomCur
                 break;
             }
         }
-    } else if (auto curve = dynamic_cast<const InterpolateBase*>(e)) {
+    } else if (auto curve = dynamic_cast<const Interpolate*>(e)) {
         auto z = dynamic_cast<CompoundExpressionBase*>(curve->getInput().get());
         if (z && z->getName() == "zoom") {
             result = {curve};
@@ -40,7 +40,7 @@ optional<variant<const InterpolateBase*, const Step*, ParsingError>> findZoomCur
     }
     
     e->eachChild([&](const Expression& child) {
-        optional<variant<const InterpolateBase*, const Step*, ParsingError>> childResult(findZoomCurve(&child));
+        optional<variant<const Interpolate*, const Step*, ParsingError>> childResult(findZoomCurve(&child));
         if (childResult) {
             if (childResult->is<ParsingError>()) {
                 result = childResult;
@@ -59,13 +59,13 @@ optional<variant<const InterpolateBase*, const Step*, ParsingError>> findZoomCur
     return result;
 }
 
-variant<const InterpolateBase*, const Step*> findZoomCurveChecked(const expression::Expression* e) {
+variant<const Interpolate*, const Step*> findZoomCurveChecked(const expression::Expression* e) {
     return findZoomCurve(e)->match(
-        [](const ParsingError&) -> variant<const InterpolateBase*, const Step*> {
+        [](const ParsingError&) -> variant<const Interpolate*, const Step*> {
             assert(false);
             return {};
         },
-        [](auto zoomCurve) -> variant<const InterpolateBase*, const Step*> {
+        [](auto zoomCurve) -> variant<const Interpolate*, const Step*> {
             return {std::move(zoomCurve)};
         }
     );

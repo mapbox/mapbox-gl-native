@@ -54,7 +54,7 @@ public:
     
     float interpolationFactor(const Range<float>& inputLevels, const float inputValue) const {
         return zoomCurve.match(
-            [&](const expression::InterpolateBase* z) {
+            [&](const expression::Interpolate* z) {
                 return z->interpolationFactor(Range<double> { inputLevels.min, inputLevels.max }, inputValue);
             },
             [&](const expression::Step*) { return 0.0f; }
@@ -83,7 +83,7 @@ public:
 
 private:
     std::shared_ptr<expression::Expression> expression;
-    const variant<const expression::InterpolateBase*, const expression::Step*> zoomCurve;
+    const variant<const expression::Interpolate*, const expression::Step*> zoomCurve;
 };
 
 } // namespace style

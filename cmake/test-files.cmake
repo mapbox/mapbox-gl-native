@@ -19,7 +19,6 @@ set(MBGL_TEST_FILES
     test/api/custom_layer.test.cpp
     test/api/query.test.cpp
     test/api/recycle_map.cpp
-    test/api/zoom_history.cpp
 
     # geometry
     test/geometry/dem_data.test.cpp
