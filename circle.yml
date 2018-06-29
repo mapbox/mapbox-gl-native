@@ -44,7 +44,8 @@ workflows:
       - ios-sanitize
       - ios-sanitize-address
       - ios-static-analyzer
-      - ios-release:
+      - ios-release
+      - ios-release-tag:
           filters:
             tags:
               only: /ios-.*/
@@ -151,6 +152,14 @@ step-library:
         name: Check public symbols
         command: make check-public-symbols
 
+
+  - &install-ios-packaging-dependencies
+      run:
+        name: Install iOS packaging dependencies
+        command: |
+          echo "ruby-2.3" > ~/.ruby-version
+          sudo gem install jazzy --no-document
+          brew install awscli wget
 
   - &install-macos-dependencies
       run:
@@ -878,17 +887,34 @@ jobs:
     macos:
       xcode: "9.4.0"
     environment:
+      BUILDTYPE: Release
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-ios-test
+      - *build-ios-integration-test
+      - *check-public-symbols
+      - *show-ccache-stats
+      - *save-cache
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
+
+# ------------------------------------------------------------------------------
+  ios-release-tag:
+    macos:
+      xcode: "9.4.0"
+    environment:
+      BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
     shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
       - *install-macos-dependencies
-      - run:
-          name: Install packaging dependencies
-          command: |
-            echo "ruby-2.3" > ~/.ruby-version
-            sudo gem install jazzy --no-document
-            brew install awscli wget
+      - *install-ios-packaging-dependencies
       - *generate-cache-key
       - *restore-cache
       - *reset-ccache-stats
