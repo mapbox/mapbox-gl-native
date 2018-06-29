@@ -192,3 +192,7 @@ TEST(Filter, ZoomExpressionNested) {
     ASSERT_TRUE(filter(R"(["==", ["get", "two"], ["zoom"]])", {{"two", int64_t(2)}}, {}, FeatureType::Point, {}, 2.0f));
     ASSERT_FALSE(filter(R"(["==", ["get", "two"], ["+", ["zoom"], 1]])", {{"two", int64_t(2)}}, {}, FeatureType::Point, {}, 2.0f));
 }
+
+TEST(Filter, Internal) {
+    filter(R"(["filter-==","class","snow"])");
+}
