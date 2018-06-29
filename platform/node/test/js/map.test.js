@@ -532,7 +532,7 @@ test('Map', function(t) {
             t.throws(function() {
                 map.render({}, function() {});
                 map.render({}, function() {});
-            }, /Map is currently rendering an image/);
+            }, /Map is currently processing a RenderRequest/);
 
             map.release();
             t.end();
