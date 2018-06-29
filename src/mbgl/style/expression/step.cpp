@@ -8,6 +8,16 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
+Step::Step(const type::Type& type_,
+           std::unique_ptr<Expression> input_,
+           std::map<double, std::unique_ptr<Expression>> stops_)
+  : Expression(type_),
+    input(std::move(input_)),
+    stops(std::move(stops_))
+{
+    assert(input->getType() == type::Number);
+}
+
 EvaluationResult Step::evaluate(const EvaluationContext& params) const {
     const EvaluationResult evaluatedInput = input->evaluate(params);
     if (!evaluatedInput) {
