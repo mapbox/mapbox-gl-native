@@ -4081,8 +4081,8 @@ public:
                 CGRect frame = CGRectInset({ calloutAnchorPoint, CGSizeZero }, -CGRectGetWidth(annotationView.frame) / 2, -CGRectGetHeight(annotationView.frame) / 2);
 
                 // We need to take any offset into consideration. Note that a large offset will result in a
-                // large value for `_unionedAnnotationRepresentationSize` - which will affect performance for lots
-                // of annotations. Keep the offset as small as possible.
+                // large value for `_unionedAnnotationRepresentationSize` (and thus a larger feature query rect).
+                // Aim to keep the offset as small as possible.
                 frame = CGRectOffset(frame, annotationView.centerOffset.dx, annotationView.centerOffset.dy);
 
                 annotationRect = UIEdgeInsetsInsetRect(frame, annotationView.alignmentRectInsets);
