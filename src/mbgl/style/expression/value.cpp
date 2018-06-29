@@ -12,6 +12,7 @@ type::Type typeOf(const Value& value) {
         [&](double) -> type::Type { return type::Number; },
         [&](const std::string&) -> type::Type { return type::String; },
         [&](const Color&) -> type::Type { return type::Color; },
+        [&](const Collator&) -> type::Type { return type::Collator; },
         [&](const NullValue&) -> type::Type { return type::Null; },
         [&](const std::unordered_map<std::string, Value>&) -> type::Type { return type::Object; },
         [&](const std::vector<Value>& arr) -> type::Type {
@@ -43,6 +44,11 @@ void writeJSON(rapidjson::Writer<rapidjson::StringBuffer>& writer, const Value& 
         },
         [&] (const std::string& s) { writer.String(s); },
         [&] (const Color& c) { writer.String(c.stringify()); },
+        [&] (const Collator&) {
+            // Collators are excluded from constant folding and there's no Literal parser
+            // for them so there shouldn't be any way to serialize this value.
+            assert(false);
+        },
         [&] (const std::vector<Value>& arr) {
             writer.StartArray();
             for(const auto& item : arr) {
@@ -114,6 +120,12 @@ mbgl::Value ValueConverter<mbgl::Value>::fromExpressionValue(const Value& value)
                 array[2],
                 array[3],
             };
+        },
+        [&](const Collator&)->mbgl::Value {
+            // fromExpressionValue can't be used for Collator values,
+            // because they have no meaningful representation as an mbgl::Value
+            assert(false);
+            return mbgl::Value();
         },
         [&](const std::vector<Value>& values)->mbgl::Value {
             std::vector<mbgl::Value> converted;
@@ -261,6 +273,7 @@ template <> type::Type valueTypeToExpressionType<bool>() { return type::Boolean;
 template <> type::Type valueTypeToExpressionType<double>() { return type::Number; }
 template <> type::Type valueTypeToExpressionType<std::string>() { return type::String; }
 template <> type::Type valueTypeToExpressionType<Color>() { return type::Color; }
+template <> type::Type valueTypeToExpressionType<Collator>() { return type::Collator; }
 template <> type::Type valueTypeToExpressionType<std::unordered_map<std::string, Value>>() { return type::Object; }
 template <> type::Type valueTypeToExpressionType<std::vector<Value>>() { return type::Array(type::Value); }
 

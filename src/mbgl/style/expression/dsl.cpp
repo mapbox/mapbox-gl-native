@@ -86,12 +86,12 @@ std::unique_ptr<Expression> zoom() {
 
 std::unique_ptr<Expression> eq(std::unique_ptr<Expression> lhs,
                                std::unique_ptr<Expression> rhs) {
-    return std::make_unique<Equals>(std::move(lhs), std::move(rhs), false);
+    return std::make_unique<Equals>(std::move(lhs), std::move(rhs), nullopt, false);
 }
 
 std::unique_ptr<Expression> ne(std::unique_ptr<Expression> lhs,
                                std::unique_ptr<Expression> rhs) {
-    return std::make_unique<Equals>(std::move(lhs), std::move(rhs), true);
+    return std::make_unique<Equals>(std::move(lhs), std::move(rhs), nullopt, true);
 }
 
 std::unique_ptr<Expression> gt(std::unique_ptr<Expression> lhs,
