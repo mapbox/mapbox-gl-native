@@ -19,14 +19,9 @@ ParseResult parseInterpolate(const mbgl::style::conversion::Convertible& value, 
 class Interpolate : public Expression {
 public:
     Interpolate(const type::Type& type_,
-          Interpolator interpolator_,
-          std::unique_ptr<Expression> input_,
-          std::map<double, std::unique_ptr<Expression>> stops_
-    ) : Expression(type_),
-        interpolator(std::move(interpolator_)),
-        input(std::move(input_)),
-        stops(std::move(stops_))
-    {}
+                Interpolator interpolator_,
+                std::unique_ptr<Expression> input_,
+                std::map<double, std::unique_ptr<Expression>> stops_);
 
     const std::unique_ptr<Expression>& getInput() const { return input; }
     const Interpolator& getInterpolator() const { return interpolator; }

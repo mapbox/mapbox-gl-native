@@ -79,7 +79,7 @@ TEST(Stringify, Value) {
 TEST(Stringify, Filter) {
     using namespace mbgl::style::expression::dsl;
     ASSERT_EQ(stringify(Filter()), "null");
-    ASSERT_EQ(stringify(Filter(eq(literal("a"), literal(1.0)))), "[\"==\",\"a\",1.0]");
+    ASSERT_EQ(stringify(Filter(eq(literal("a"), literal("b")))), "[\"==\",\"a\",\"b\"]");
 }
 
 TEST(Stringify, CameraFunction) {
