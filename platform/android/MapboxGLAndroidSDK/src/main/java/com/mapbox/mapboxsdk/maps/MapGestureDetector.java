@@ -433,6 +433,10 @@ final class MapGestureDetector {
   private final class MoveGestureListener extends MoveGestureDetector.SimpleOnMoveGestureListener {
     @Override
     public boolean onMoveBegin(MoveGestureDetector detector) {
+      if (annotationManager.onMoveBegin(detector.getFocalPoint())) {
+        return true;
+      }
+
       if (!uiSettings.isScrollGesturesEnabled()) {
         return false;
       }
@@ -447,6 +451,10 @@ final class MapGestureDetector {
     public boolean onMove(MoveGestureDetector detector, float distanceX, float distanceY) {
       // first move event is often delivered with no displacement
       if (distanceX != 0 || distanceY != 0) {
+        if (annotationManager.onMove(distanceX, distanceY)) {
+          return true;
+        }
+
         // dispatching camera start event only when the movement actually occurred
         cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
 
@@ -461,6 +469,10 @@ final class MapGestureDetector {
 
     @Override
     public void onMoveEnd(MoveGestureDetector detector, float velocityX, float velocityY) {
+      if (annotationManager.onMoveEnd()) {
+        return;
+      }
+
       cameraChangeDispatcher.onCameraIdle();
       notifyOnMoveEndListeners(detector);
     }
