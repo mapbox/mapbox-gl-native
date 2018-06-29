@@ -370,6 +370,7 @@
 		CA4EB8C720863487006AB465 /* MGLStyleLayerIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */; };
 		CA55CD41202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA55CD42202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CA6914B520E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA6914B420E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m */; };
 		CAA69DA4206DCD0E007279CD /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; };
 		CAA69DA5206DCD0E007279CD /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CABE5DAD2072FAB40003AF3C /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
@@ -1005,6 +1006,7 @@
 		CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLStyleLayerIntegrationTests.m; sourceTree = "<group>"; };
 		CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCameraChangeReason.h; sourceTree = "<group>"; };
 		CA5E5042209BDC5F001A8A81 /* MGLTestUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MGLTestUtility.h; path = ../../darwin/test/MGLTestUtility.h; sourceTree = "<group>"; };
+		CA6914B420E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLAnnotationViewIntegrationTests.m; path = "Annotation Tests/MGLAnnotationViewIntegrationTests.m"; sourceTree = "<group>"; };
 		DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
 		DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAttributionInfo.mm; sourceTree = "<group>"; };
 		DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
@@ -1352,6 +1354,7 @@
 		16376B081FFD9DAF0000563E /* Integration Tests */ = {
 			isa = PBXGroup;
 			children = (
+				CA6914B320E67F07002DB0EE /* Annotations */,
 				CA1B4A4F2099FA2800EDD491 /* Snapshotter Tests */,
 				16376B091FFD9DAF0000563E /* MBGLIntegrationTests.m */,
 				16376B0B1FFD9DAF0000563E /* Info.plist */,
@@ -1713,6 +1716,14 @@
 				CA1B4A502099FB2200EDD491 /* MGLMapSnapshotterTest.m */,
 			);
 			path = "Snapshotter Tests";
+			sourceTree = "<group>";
+		};
+		CA6914B320E67F07002DB0EE /* Annotations */ = {
+			isa = PBXGroup;
+			children = (
+				CA6914B420E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m */,
+			);
+			name = Annotations;
 			sourceTree = "<group>";
 		};
 		DA1DC9411CB6C1C2006E619F = {
@@ -2809,6 +2820,7 @@
 				16376B0A1FFD9DAF0000563E /* MBGLIntegrationTests.m in Sources */,
 				CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */,
 				CA0C27922076C804001CE5B7 /* MGLShapeSourceTests.m in Sources */,
+				CA6914B520E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m in Sources */,
 				CA1B4A512099FB2200EDD491 /* MGLMapSnapshotterTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
