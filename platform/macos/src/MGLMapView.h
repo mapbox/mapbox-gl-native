@@ -486,6 +486,37 @@ MGL_EXPORT IB_DESIGNABLE
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(NSEdgeInsets)insets;
 
 /**
+ Returns the camera that best fits the given coordinate bounds, with the specified camera,
+ optionally with some additional padding on each side.
+ 
+ @param camera The camera that the return camera should adhere to. All values
+    on this camera will be manipulated except for pitch and direction.
+ @param bounds The coordinate bounds to fit to the receiver’s viewport.
+ @param insets The minimum padding (in screen points) that would be visible
+    around the returned camera object if it were set as the receiver’s camera.
+ @return A camera object centered on the same location as the coordinate bounds
+    with zoom level as high (close to the ground) as possible while still
+    including the entire coordinate bounds. The initial camera's pitch and
+    direction will be honored.
+ */
+- (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(NSEdgeInsets)insets;
+
+/**
+ Returns the camera that best fits the given shape, with the specified camera,
+ optionally with some additional padding on each side.
+ 
+ @param camera The camera that the return camera should adhere to. All values
+    on this camera will be manipulated except for pitch and direction.
+ @param shape The shape to fit to the receiver’s viewport.
+ @param insets The minimum padding (in screen points) that would be visible
+    around the returned camera object if it were set as the receiver’s camera.
+ @return A camera object centered on the shape's center with zoom level as high
+    (close to the ground) as possible while still including the entire shape. The
+    initial camera's pitch and direction will be honored.
+ */
+- (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingShape:(MGLShape *)shape edgePadding:(NSEdgeInsets)insets;
+
+/**
  Returns the camera that best fits the given shape, with the specified direction,
  optionally with some additional padding on each side.
 
