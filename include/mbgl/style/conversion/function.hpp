@@ -3,9 +3,18 @@
 #include <mbgl/style/function/camera_function.hpp>
 #include <mbgl/style/function/source_function.hpp>
 #include <mbgl/style/function/composite_function.hpp>
+#include <mbgl/style/function/convert.hpp>
+#include <mbgl/style/function/categorical_stops.hpp>
+#include <mbgl/style/function/exponential_stops.hpp>
+#include <mbgl/style/function/interval_stops.hpp>
+#include <mbgl/style/function/identity_stops.hpp>
+#include <mbgl/style/function/composite_exponential_stops.hpp>
+#include <mbgl/style/function/composite_interval_stops.hpp>
+#include <mbgl/style/function/composite_categorical_stops.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/util/ignore.hpp>
+#include <mbgl/util/variant.hpp>
 
 namespace mbgl {
 namespace style {
@@ -193,12 +202,22 @@ struct Converter<CameraFunction<T>> {
             return {};
         }
 
-        auto stops = StopsConverter<T, typename CameraFunction<T>::Stops>()(value, error);
+        using Stops = std::conditional_t<
+            util::Interpolatable<T>::value,
+            variant<
+                ExponentialStops<T>,
+                IntervalStops<T>>,
+            variant<
+                IntervalStops<T>>>;
+
+        auto stops = StopsConverter<T, Stops>()(value, error);
         if (!stops) {
             return {};
         }
 
-        return CameraFunction<T>(*stops);
+        return CameraFunction<T>((*stops).match([&] (const auto& s) {
+            return expression::Convert::toExpression(s);
+        }), false);
     }
 };
 
@@ -238,7 +257,19 @@ struct Converter<SourceFunction<T>> {
             return {};
         }
 
-        auto stops = StopsConverter<T, typename SourceFunction<T>::Stops>()(value, error);
+        using Stops = std::conditional_t<
+            util::Interpolatable<T>::value,
+            variant<
+                ExponentialStops<T>,
+                IntervalStops<T>,
+                CategoricalStops<T>,
+                IdentityStops<T>>,
+            variant<
+                IntervalStops<T>,
+                CategoricalStops<T>,
+                IdentityStops<T>>>;
+
+        auto stops = StopsConverter<T, Stops>()(value, error);
         if (!stops) {
             return {};
         }
@@ -248,7 +279,9 @@ struct Converter<SourceFunction<T>> {
             return {};
         }
 
-        return SourceFunction<T>(*propertyString, *stops, *defaultValue);
+        return SourceFunction<T>((*stops).match([&] (const auto& s) {
+            return expression::Convert::toExpression(*propertyString, s);
+        }), *defaultValue);
     }
 };
 
@@ -374,7 +407,17 @@ struct Converter<CompositeFunction<T>> {
             return {};
         }
 
-        auto stops = StopsConverter<T, typename CompositeFunction<T>::Stops>()(value, error);
+        using Stops = std::conditional_t<
+            util::Interpolatable<T>::value,
+            variant<
+                CompositeExponentialStops<T>,
+                CompositeIntervalStops<T>,
+                CompositeCategoricalStops<T>>,
+            variant<
+                CompositeIntervalStops<T>,
+                CompositeCategoricalStops<T>>>;
+
+        auto stops = StopsConverter<T, Stops>()(value, error);
         if (!stops) {
             return {};
         }
@@ -384,7 +427,9 @@ struct Converter<CompositeFunction<T>> {
             return {};
         }
 
-        return CompositeFunction<T>(*propertyString, *stops, *defaultValue);
+        return CompositeFunction<T>((*stops).match([&] (const auto& s) {
+            return expression::Convert::toExpression(*propertyString, s);
+        }), *defaultValue);
     }
 };
 

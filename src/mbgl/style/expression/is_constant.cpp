@@ -4,6 +4,8 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
+constexpr static const char filter[] = "filter-";
+
 bool isFeatureConstant(const Expression& expression) {
     if (auto e = dynamic_cast<const CompoundExpressionBase*>(&expression)) {
         const std::string name = e->getName();
@@ -11,6 +13,9 @@ bool isFeatureConstant(const Expression& expression) {
         if (name == "get" && parameterCount && *parameterCount == 1) {
             return false;
         } else if (name == "has" && parameterCount && *parameterCount == 1) {
+            return false;
+        } else if (std::equal(std::begin(filter), std::end(filter) - 1, name.begin())) {
+            // Legacy filters begin with "filter-" and are never constant.
             return false;
         } else if (
             name == "properties" ||

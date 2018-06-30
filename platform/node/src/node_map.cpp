@@ -398,7 +398,7 @@ void NodeMap::Render(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     }
 
     if (nodeMap->req) {
-        return Nan::ThrowError("Map is currently rendering an image");
+        return Nan::ThrowError("Map is currently processing a RenderRequest");
     }
 
     try {

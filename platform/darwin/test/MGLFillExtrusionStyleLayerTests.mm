@@ -8,6 +8,7 @@
 
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
+#include <mbgl/style/expression/dsl.hpp>
 
 @interface MGLFillExtrusionLayerTests : MGLStyleLayerTests
 @end
@@ -54,23 +55,24 @@
                       @"fill-extrusion-base should be unset initially.");
         NSExpression *defaultExpression = layer.fillExtrusionBase;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.fillExtrusionBase = constantExpression;
-        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getFillExtrusionBase(), propertyValue,
                        @"Setting fillExtrusionBase to a constant value expression should update fill-extrusion-base.");
         XCTAssertEqualObjects(layer.fillExtrusionBase, constantExpression,
                               @"fillExtrusionBase should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.fillExtrusionBase = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = {{
-            { -INFINITY, 0xff },
-            { 18, 0xff },
-        }};
-        propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getFillExtrusionBase(), propertyValue,
                        @"Setting fillExtrusionBase to a camera expression should update fill-extrusion-base.");
@@ -80,8 +82,12 @@
         functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(keyName, 'linear', nil, %@)", @{@18: constantExpression}];
         layer.fillExtrusionBase = functionExpression;
 
-        mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
-        propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::SourceFunction<float>(
+                interpolate(linear(), number(get("keyName")), 18.0, literal(1.0))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getFillExtrusionBase(), propertyValue,
                        @"Setting fillExtrusionBase to a data expression should update fill-extrusion-base.");
@@ -92,11 +98,13 @@
         functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         layer.fillExtrusionBase = functionExpression;
 
-        std::map<float, float> innerStops { {18, 0xff} };
-        mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
-
-        propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
-
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CompositeFunction<float>(
+                interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(1.0)))
+            );
+        }
+        
         XCTAssertEqual(rawLayer->getFillExtrusionBase(), propertyValue,
                        @"Setting fillExtrusionBase to a camera-data expression should update fill-extrusion-base.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
@@ -137,11 +145,12 @@
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.fillExtrusionColor = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::Color> intervalStops = {{
-            { -INFINITY, { 1, 0, 0, 1 } },
-            { 18, { 1, 0, 0, 1 } },
-        }};
-        propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<mbgl::Color>(
+                step(zoom(), literal(mbgl::Color(1, 0, 0, 1)), 18.0, literal(mbgl::Color(1, 0, 0, 1)))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getFillExtrusionColor(), propertyValue,
                        @"Setting fillExtrusionColor to a camera expression should update fill-extrusion-color.");
@@ -151,8 +160,12 @@
         functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(keyName, 'linear', nil, %@)", @{@18: constantExpression}];
         layer.fillExtrusionColor = functionExpression;
 
-        mbgl::style::ExponentialStops<mbgl::Color> exponentialStops = { {{18, { 1, 0, 0, 1 }}}, 1.0 };
-        propertyValue = mbgl::style::SourceFunction<mbgl::Color> { "keyName", exponentialStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::SourceFunction<mbgl::Color>(
+                interpolate(linear(), number(get("keyName")), 18.0, literal(mbgl::Color(1, 0, 0, 1)))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getFillExtrusionColor(), propertyValue,
                        @"Setting fillExtrusionColor to a data expression should update fill-extrusion-color.");
@@ -163,11 +176,13 @@
         functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         layer.fillExtrusionColor = functionExpression;
 
-        std::map<float, mbgl::Color> innerStops { {18, { 1, 0, 0, 1 }} };
-        mbgl::style::CompositeExponentialStops<mbgl::Color> compositeStops { { {10.0, innerStops} }, 1.0 };
-
-        propertyValue = mbgl::style::CompositeFunction<mbgl::Color> { "keyName", compositeStops };
-
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CompositeFunction<mbgl::Color>(
+                interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(mbgl::Color(1, 0, 0, 1))))
+            );
+        }
+        
         XCTAssertEqual(rawLayer->getFillExtrusionColor(), propertyValue,
                        @"Setting fillExtrusionColor to a camera-data expression should update fill-extrusion-color.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
@@ -196,23 +211,24 @@
                       @"fill-extrusion-height should be unset initially.");
         NSExpression *defaultExpression = layer.fillExtrusionHeight;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.fillExtrusionHeight = constantExpression;
-        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getFillExtrusionHeight(), propertyValue,
                        @"Setting fillExtrusionHeight to a constant value expression should update fill-extrusion-height.");
         XCTAssertEqualObjects(layer.fillExtrusionHeight, constantExpression,
                               @"fillExtrusionHeight should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.fillExtrusionHeight = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = {{
-            { -INFINITY, 0xff },
-            { 18, 0xff },
-        }};
-        propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getFillExtrusionHeight(), propertyValue,
                        @"Setting fillExtrusionHeight to a camera expression should update fill-extrusion-height.");
@@ -222,8 +238,12 @@
         functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(keyName, 'linear', nil, %@)", @{@18: constantExpression}];
         layer.fillExtrusionHeight = functionExpression;
 
-        mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
-        propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::SourceFunction<float>(
+                interpolate(linear(), number(get("keyName")), 18.0, literal(1.0))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getFillExtrusionHeight(), propertyValue,
                        @"Setting fillExtrusionHeight to a data expression should update fill-extrusion-height.");
@@ -234,11 +254,13 @@
         functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         layer.fillExtrusionHeight = functionExpression;
 
-        std::map<float, float> innerStops { {18, 0xff} };
-        mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
-
-        propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
-
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CompositeFunction<float>(
+                interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(1.0)))
+            );
+        }
+        
         XCTAssertEqual(rawLayer->getFillExtrusionHeight(), propertyValue,
                        @"Setting fillExtrusionHeight to a camera-data expression should update fill-extrusion-height.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
@@ -267,23 +289,24 @@
                       @"fill-extrusion-opacity should be unset initially.");
         NSExpression *defaultExpression = layer.fillExtrusionOpacity;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.fillExtrusionOpacity = constantExpression;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getFillExtrusionOpacity(), propertyValue,
                        @"Setting fillExtrusionOpacity to a constant value expression should update fill-extrusion-opacity.");
         XCTAssertEqualObjects(layer.fillExtrusionOpacity, constantExpression,
                               @"fillExtrusionOpacity should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.fillExtrusionOpacity = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = {{
-            { -INFINITY, 0xff },
-            { 18, 0xff },
-        }};
-        propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getFillExtrusionOpacity(), propertyValue,
                        @"Setting fillExtrusionOpacity to a camera expression should update fill-extrusion-opacity.");
@@ -331,11 +354,12 @@
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.fillExtrusionPattern = functionExpression;
 
-        mbgl::style::IntervalStops<std::string> intervalStops = {{
-            { -INFINITY, "Fill Extrusion Pattern" },
-            { 18, "Fill Extrusion Pattern" },
-        }};
-        propertyValue = mbgl::style::CameraFunction<std::string> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<std::string>(
+                step(zoom(), literal("Fill Extrusion Pattern"), 18.0, literal("Fill Extrusion Pattern"))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getFillExtrusionPattern(), propertyValue,
                        @"Setting fillExtrusionPattern to a camera expression should update fill-extrusion-pattern.");
@@ -389,11 +413,12 @@
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.fillExtrusionTranslation = functionExpression;
 
-        mbgl::style::IntervalStops<std::array<float, 2>> intervalStops = {{
-            { -INFINITY, { 1, 1 } },
-            { 18, { 1, 1 } },
-        }};
-        propertyValue = mbgl::style::CameraFunction<std::array<float, 2>> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<std::array<float, 2>>(
+                step(zoom(), literal({ 1, 1 }), 18.0, literal({ 1, 1 }))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getFillExtrusionTranslate(), propertyValue,
                        @"Setting fillExtrusionTranslation to a camera expression should update fill-extrusion-translate.");
@@ -432,11 +457,12 @@
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.fillExtrusionTranslationAnchor = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::style::TranslateAnchorType> intervalStops = {{
-            { -INFINITY, mbgl::style::TranslateAnchorType::Viewport },
-            { 18, mbgl::style::TranslateAnchorType::Viewport },
-        }};
-        propertyValue = mbgl::style::CameraFunction<mbgl::style::TranslateAnchorType> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<mbgl::style::TranslateAnchorType>(
+                step(zoom(), literal("viewport"), 18.0, literal("viewport"))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getFillExtrusionTranslateAnchor(), propertyValue,
                        @"Setting fillExtrusionTranslationAnchor to a camera expression should update fill-extrusion-translate-anchor.");

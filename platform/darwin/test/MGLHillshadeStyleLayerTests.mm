@@ -8,6 +8,7 @@
 
 #include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
+#include <mbgl/style/expression/dsl.hpp>
 
 @interface MGLHillshadeLayerTests : MGLStyleLayerTests
 @end
@@ -48,11 +49,12 @@
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.hillshadeAccentColor = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::Color> intervalStops = {{
-            { -INFINITY, { 1, 0, 0, 1 } },
-            { 18, { 1, 0, 0, 1 } },
-        }};
-        propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<mbgl::Color>(
+                step(zoom(), literal(mbgl::Color(1, 0, 0, 1)), 18.0, literal(mbgl::Color(1, 0, 0, 1)))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getHillshadeAccentColor(), propertyValue,
                        @"Setting hillshadeAccentColor to a camera expression should update hillshade-accent-color.");
@@ -88,23 +90,24 @@
                       @"hillshade-exaggeration should be unset initially.");
         NSExpression *defaultExpression = layer.hillshadeExaggeration;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.hillshadeExaggeration = constantExpression;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getHillshadeExaggeration(), propertyValue,
                        @"Setting hillshadeExaggeration to a constant value expression should update hillshade-exaggeration.");
         XCTAssertEqualObjects(layer.hillshadeExaggeration, constantExpression,
                               @"hillshadeExaggeration should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.hillshadeExaggeration = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = {{
-            { -INFINITY, 0xff },
-            { 18, 0xff },
-        }};
-        propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getHillshadeExaggeration(), propertyValue,
                        @"Setting hillshadeExaggeration to a camera expression should update hillshade-exaggeration.");
@@ -152,11 +155,12 @@
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.hillshadeHighlightColor = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::Color> intervalStops = {{
-            { -INFINITY, { 1, 0, 0, 1 } },
-            { 18, { 1, 0, 0, 1 } },
-        }};
-        propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<mbgl::Color>(
+                step(zoom(), literal(mbgl::Color(1, 0, 0, 1)), 18.0, literal(mbgl::Color(1, 0, 0, 1)))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getHillshadeHighlightColor(), propertyValue,
                        @"Setting hillshadeHighlightColor to a camera expression should update hillshade-highlight-color.");
@@ -204,11 +208,12 @@
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.hillshadeIlluminationAnchor = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::style::HillshadeIlluminationAnchorType> intervalStops = {{
-            { -INFINITY, mbgl::style::HillshadeIlluminationAnchorType::Viewport },
-            { 18, mbgl::style::HillshadeIlluminationAnchorType::Viewport },
-        }};
-        propertyValue = mbgl::style::CameraFunction<mbgl::style::HillshadeIlluminationAnchorType> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<mbgl::style::HillshadeIlluminationAnchorType>(
+                step(zoom(), literal("viewport"), 18.0, literal("viewport"))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getHillshadeIlluminationAnchor(), propertyValue,
                        @"Setting hillshadeIlluminationAnchor to a camera expression should update hillshade-illumination-anchor.");
@@ -235,23 +240,24 @@
                       @"hillshade-illumination-direction should be unset initially.");
         NSExpression *defaultExpression = layer.hillshadeIlluminationDirection;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.hillshadeIlluminationDirection = constantExpression;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getHillshadeIlluminationDirection(), propertyValue,
                        @"Setting hillshadeIlluminationDirection to a constant value expression should update hillshade-illumination-direction.");
         XCTAssertEqualObjects(layer.hillshadeIlluminationDirection, constantExpression,
                               @"hillshadeIlluminationDirection should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.hillshadeIlluminationDirection = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = {{
-            { -INFINITY, 0xff },
-            { 18, 0xff },
-        }};
-        propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getHillshadeIlluminationDirection(), propertyValue,
                        @"Setting hillshadeIlluminationDirection to a camera expression should update hillshade-illumination-direction.");
@@ -290,11 +296,12 @@
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.hillshadeShadowColor = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::Color> intervalStops = {{
-            { -INFINITY, { 1, 0, 0, 1 } },
-            { 18, { 1, 0, 0, 1 } },
-        }};
-        propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::CameraFunction<mbgl::Color>(
+                step(zoom(), literal(mbgl::Color(1, 0, 0, 1)), 18.0, literal(mbgl::Color(1, 0, 0, 1)))
+            );
+        }
 
         XCTAssertEqual(rawLayer->getHillshadeShadowColor(), propertyValue,
                        @"Setting hillshadeShadowColor to a camera expression should update hillshade-shadow-color.");

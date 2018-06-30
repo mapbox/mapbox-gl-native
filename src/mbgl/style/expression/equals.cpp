@@ -4,11 +4,20 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
+static bool isComparableType(const type::Type& type) {
+    return type == type::String ||
+        type == type::Number ||
+        type == type::Boolean ||
+        type == type::Null;
+}
+
 Equals::Equals(std::unique_ptr<Expression> lhs_, std::unique_ptr<Expression> rhs_, bool negate_)
     : Expression(type::Boolean),
       lhs(std::move(lhs_)),
       rhs(std::move(rhs_)),
       negate(negate_) {
+    assert(isComparableType(lhs->getType()) || isComparableType(rhs->getType()));
+    assert(lhs->getType() == rhs->getType() || lhs->getType() == type::Value || rhs->getType() == type::Value);
 }
 
 EvaluationResult Equals::evaluate(const EvaluationContext& params) const {
@@ -39,13 +48,6 @@ bool Equals::operator==(const Expression& e) const {
 
 std::vector<optional<Value>> Equals::possibleOutputs() const {
     return {{ true }, { false }};
-}
-
-static bool isComparableType(const type::Type& type) {
-    return type == type::String ||
-        type == type::Number ||
-        type == type::Boolean ||
-        type == type::Null;
 }
 
 using namespace mbgl::style::conversion;

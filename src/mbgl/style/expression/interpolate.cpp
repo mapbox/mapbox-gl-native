@@ -260,6 +260,17 @@ ParseResult createInterpolate(type::Type type,
     );
 }
 
+Interpolate::Interpolate(const type::Type& type_,
+                         Interpolator interpolator_,
+                         std::unique_ptr<Expression> input_,
+                         std::map<double, std::unique_ptr<Expression>> stops_)
+  : Expression(type_),
+    interpolator(std::move(interpolator_)),
+    input(std::move(input_)),
+    stops(std::move(stops_)) {
+    assert(input->getType() == type::Number);
+}
+
 std::vector<optional<Value>> Interpolate::possibleOutputs() const {
     std::vector<optional<Value>> result;
     for (const auto& stop : stops) {

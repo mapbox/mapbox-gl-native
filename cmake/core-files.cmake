@@ -448,6 +448,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/expression/coalesce.hpp
     include/mbgl/style/expression/coercion.hpp
     include/mbgl/style/expression/compound_expression.hpp
+    include/mbgl/style/expression/dsl.hpp
     include/mbgl/style/expression/equals.hpp
     include/mbgl/style/expression/expression.hpp
     include/mbgl/style/expression/find_zoom_curve.hpp
@@ -473,6 +474,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/expression/coalesce.cpp
     src/mbgl/style/expression/coercion.cpp
     src/mbgl/style/expression/compound_expression.cpp
+    src/mbgl/style/expression/dsl.cpp
     src/mbgl/style/expression/equals.cpp
     src/mbgl/style/expression/find_zoom_curve.cpp
     src/mbgl/style/expression/get_covering_stops.cpp
@@ -502,6 +504,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/function/interval_stops.hpp
     include/mbgl/style/function/source_function.hpp
     src/mbgl/style/function/categorical_stops.cpp
+    src/mbgl/style/function/convert.cpp
     src/mbgl/style/function/expression.cpp
     src/mbgl/style/function/identity_stops.cpp
 

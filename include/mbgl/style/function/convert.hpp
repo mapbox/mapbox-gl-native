@@ -306,40 +306,15 @@ struct Convert {
         return std::move(*zoomCurve);
     }
 
-    
-    static std::unique_ptr<Expression> fromIdentityFunction(type::Type type, const std::string& property)
+    template <typename T>
+    static std::unique_ptr<Expression> toExpression(const std::string& property,
+                                                    const IdentityStops<T>&)
     {
-        std::unique_ptr<Expression> input = type.match(
-            [&] (const type::StringType&) {
-                return makeGet(type::String, property);
-            },
-            [&] (const type::NumberType&) {
-                return makeGet(type::Number, property);
-            },
-            [&] (const type::BooleanType&) {
-                return makeGet(type::Boolean, property);
-            },
-            [&] (const type::ColorType&) {
-                std::vector<std::unique_ptr<Expression>> args;
-                args.push_back(makeGet(type::String, property));
-                return std::make_unique<Coercion>(type::Color, std::move(args));
-            },
-            [&] (const type::Array& arr) {
-                std::vector<std::unique_ptr<Expression>> getArgs;
-                getArgs.push_back(makeLiteral(property));
-                ParsingContext ctx;
-                ParseResult get = createCompoundExpression("get", std::move(getArgs), ctx);
-                assert(get);
-                assert(ctx.getErrors().size() == 0);
-                return std::make_unique<ArrayAssertion>(arr, std::move(*get));
-            },
-            [&] (const auto&) -> std::unique_ptr<Expression> {
-                return makeLiteral(Null);
-            }
-        );
-        
-        return input;
+        return fromIdentityFunction(property, expression::valueTypeToExpressionType<T>());
     }
+
+private:
+    static std::unique_ptr<Expression> fromIdentityFunction(const std::string& property, type::Type type);
 };
 
 } // namespace expression
