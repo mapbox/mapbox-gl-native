@@ -32,6 +32,8 @@ void start_list_on_local_minimum(PointList& points) {
         next_pt++;
         if (next_pt == points.end()) { next_pt = std::next(points.begin()); }
     }
+    if (pt == points.end())
+        return;
     //Re-close linear rings with first_pt = last_pt
     if (points.back() == points.front()) {
         points.pop_back();
