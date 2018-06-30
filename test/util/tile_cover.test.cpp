@@ -1,10 +1,13 @@
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/map/transform.hpp>
+#include <mbgl/util/geojson.hpp>
 
 #include <algorithm>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
+#include <fstream>
+#include <dirent.h>
 #include <gtest/gtest.h>
 
 using namespace mbgl;
@@ -369,4 +372,82 @@ TEST(TileCover, DISABLED_FuzzLine) {
         while(tc.next()) {
         };
     }
+}
+
+mapbox::geometry::geometry<double> parseGeometry(const std::string& json) {
+    using namespace mapbox::geojson;
+    auto geojson = parse(json);
+    return geojson.match(
+        [](const geometry& geom) {
+            return geom;
+        },
+        [](const feature& feature) {
+            return feature.geometry;
+        },
+        [](const feature_collection& featureCollection) {
+            if (featureCollection.size() < 1) {
+                throw std::runtime_error("No features in feature collection");
+            }
+            geometry_collection geometries;
+            
+            for (auto feature : featureCollection) {
+                geometries.push_back(feature.geometry);
+            }
+            
+            return geometries;
+        });
+}
+
+
+#define DATA_INPUT_POLYJSON
+#ifndef DATA_INPUT_POLYJSON
+#define DATA_INPUT_FOLDER "test/geometry-test-data/input/"
+#else
+#define DATA_INPUT_FOLDER "test/geometry-test-data/input-polyjson/"
+#endif
+
+//Following tests require cloning @mapnik/geometry-test-data into test.
+class TileCoverFuzzTest : public ::testing::TestWithParam<std::string> {};
+INSTANTIATE_TEST_CASE_P(TileCover, TileCoverFuzzTest, ::testing::ValuesIn([] {
+    std::vector<std::string> names;
+    const std::string ending = ".json";
+    static const std::string test_data_directory = DATA_INPUT_FOLDER;
+    DIR *dir = opendir(test_data_directory.c_str());
+    if (dir != nullptr) {
+        for (dirent *dp = nullptr; (dp = readdir(dir)) != nullptr;) {
+            const std::string name = dp->d_name;
+            if (name.length() >= ending.length() && name.compare(name.length() - ending.length(), ending.length(), ending) == 0) {
+                names.push_back(name);
+            }
+        }
+        closedir(dir);
+    }
+    return names;
+}()));
+
+TEST_P(TileCoverFuzzTest, GeometryTestData) {
+    static const std::string test_data_directory = DATA_INPUT_FOLDER;
+    auto readFile = [](const std::string& fileName) -> std::string {
+        std::ifstream stream(fileName.c_str());
+        if (!stream.good()) {
+            throw std::runtime_error("Cannot read file: " + fileName);
+        }
+    
+        std::stringstream buffer;
+        buffer << stream.rdbuf();
+        stream.close();
+        
+        return buffer.str();
+    };
+
+    std::string json = readFile(test_data_directory + GetParam());
+#ifdef DATA_INPUT_POLYJSON
+    // The input-polyjson folder in geometry-test-data contains only point arrays
+    // without the GeoJSON structure.
+    json = R"({"type": "Polygon", "coordinates": )" + json + R"(})";
+#endif
+    auto geometry = parseGeometry(json);
+
+    util::TileCover tc(geometry, 10, false);
+    while (tc.next()){};
 }
