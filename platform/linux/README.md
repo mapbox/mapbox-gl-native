@@ -24,8 +24,6 @@ Ensure you have git and other build essentials:
 
 Ensure you have cmake 3.x:
 
-    sudo add-apt-repository --yes ppa:george-edison55/cmake-3.x
-    sudo apt-get update
     sudo apt-get install cmake cmake-data
 
 Install glfw3 dependencies:
