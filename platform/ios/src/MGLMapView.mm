@@ -3353,8 +3353,9 @@ public:
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
     padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
     
-    CGFloat pitch = camera.pitch < 0 ? _mbglMap->getPitch() : camera.pitch;
-    CLLocationDirection direction = camera.heading < 0 ? _mbglMap->getBearing() : camera.heading;
+    MGLMapCamera *currentCamera = self.camera;
+    CGFloat pitch = camera.pitch < 0 ? currentCamera.pitch : camera.pitch;
+    CLLocationDirection direction = camera.heading < 0 ? currentCamera.heading : camera.heading;
     
     mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), padding, direction, pitch);
     return [self cameraForCameraOptions:cameraOptions];
@@ -3364,8 +3365,9 @@ public:
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
     padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
     
-    CGFloat pitch = camera.pitch < 0 ? _mbglMap->getPitch() : camera.pitch;
-    CLLocationDirection direction = camera.heading < 0 ? _mbglMap->getBearing() : camera.heading;
+    MGLMapCamera *currentCamera = self.camera;
+    CGFloat pitch = camera.pitch < 0 ? currentCamera.pitch : camera.pitch;
+    CLLocationDirection direction = camera.heading < 0 ? currentCamera.heading : camera.heading;
     
     mbgl::CameraOptions cameraOptions = _mbglMap->cameraForGeometry([shape geometryObject], padding, direction, pitch);
     
