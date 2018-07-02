@@ -1,6 +1,6 @@
 # [Mapbox Maps SDK for macOS](https://mapbox.github.io/mapbox-gl-native/macos/)
 
-[![Bitrise](https://www.bitrise.io/app/155ef7da24b38dcd.svg?token=4KSOw_gd6WxTnvGE2rMttg&branch=master)](https://www.bitrise.io/app/155ef7da24b38dcd)
+[![Circle CI build status](https://circleci.com/gh/mapbox/mapbox-gl-native.svg?style=shield)](https://circleci.com/gh/mapbox/workflows/mapbox-gl-native/tree/master)
 
 Put interactive, scalable world maps into your native Cocoa application with the Mapbox Maps SDK for macOS.
 
