@@ -18,12 +18,12 @@ std::string toString(const CanonicalTileID& rhs) {
 } // namespace util
 
 ::std::ostream& operator<<(::std::ostream& os, const OverscaledTileID& rhs) {
-    return os << rhs.canonical << "=>" << uint32_t(rhs.overscaledZ);
+    return os << rhs.canonical << "=>" << uint32_t(rhs.overscaledZ) << (rhs.wrap >= 0 ? "+" : "") << rhs.wrap;
 }
 
 namespace util {
 std::string toString(const OverscaledTileID& rhs) {
-    return util::toString(rhs.canonical) + "=>" + util::toString(rhs.overscaledZ);
+    return util::toString(rhs.canonical) + "=>" + util::toString(rhs.overscaledZ) + (rhs.wrap >= 0 ? "+" : "") + util::toString(rhs.wrap);
 }
 } // namespace util
 

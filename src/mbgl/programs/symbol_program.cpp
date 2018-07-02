@@ -46,13 +46,15 @@ Values makeValues(const bool isText,
                   const float symbolFadeChange,
                   Args&&... args) {
     std::array<float, 2> extrudeScale;
+    const float cameraToCenterDistance = state.getCameraToCenterDistance();
+    const float pitch = state.getPitch();
 
     if (values.pitchAlignment == AlignmentType::Map) {
         extrudeScale.fill(tile.id.pixelsToTileUnits(1, state.getZoom()));
     } else {
         extrudeScale = {{
-            pixelsToGLUnits[0] * state.getCameraToCenterDistance(),
-            pixelsToGLUnits[1] * state.getCameraToCenterDistance()
+            pixelsToGLUnits[0] * cameraToCenterDistance,
+            pixelsToGLUnits[1] * cameraToCenterDistance
         }};
     }
 
@@ -91,8 +93,8 @@ Values makeValues(const bool isText,
         uniforms::u_texture::Value( 0 ),
         uniforms::u_fade_change::Value( symbolFadeChange ),
         uniforms::u_is_text::Value( isText ),
-        uniforms::u_camera_to_center_distance::Value( state.getCameraToCenterDistance() ),
-        uniforms::u_pitch::Value( state.getPitch() ),
+        uniforms::u_camera_to_center_distance::Value( cameraToCenterDistance ),
+        uniforms::u_pitch::Value( pitch ),
         uniforms::u_pitch_with_map::Value( pitchWithMap ),
         uniforms::u_rotate_symbol::Value( rotateInShader ),
         uniforms::u_aspect_ratio::Value( state.getSize().aspectRatio() ),

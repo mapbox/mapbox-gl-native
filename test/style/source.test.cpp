@@ -276,8 +276,8 @@ TEST(Source, RasterTileFail) {
 
     test.renderSourceObserver.tileError = [&] (RenderSource& source_, const OverscaledTileID& tileID, std::exception_ptr error) {
         EXPECT_EQ(SourceType::Raster, source_.baseImpl->type);
-        EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_EQ("Failed by the test case", util::toString(error));
+        EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         test.end();
     };
 

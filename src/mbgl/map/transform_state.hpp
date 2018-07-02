@@ -76,15 +76,15 @@ public:
     double getMaxPitch() const;
 
     // Rotation
-    float getBearing() const;
+    double getBearing() const;
     void setBearing(double bearing);
 
     // Camera
-    float getFieldOfView() const;
-    float getCameraToCenterDistance() const;
+    double getFieldOfView() const;
+    double getCameraToCenterDistance() const;
 
     // Tilt
-    float getPitch() const;
+    double getPitch() const;
     void setPitch(double pitch);
 
     // State

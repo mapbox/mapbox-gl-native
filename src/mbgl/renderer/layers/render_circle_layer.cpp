@@ -54,6 +54,7 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
 
     const bool scaleWithMap = evaluated.get<CirclePitchScale>() == CirclePitchScaleType::Map;
     const bool pitchWithMap = evaluated.get<CirclePitchAlignment>() == AlignmentType::Map;
+    const float cameraToCenterDistance = parameters.state.getCameraToCenterDistance();
 
     for (const RenderTile& tile : renderTiles) {
         auto bucket_ = tile.tile.getBucket<CircleBucket>(*baseImpl);
@@ -79,7 +80,7 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
                         tile.id.pixelsToTileUnits(1, parameters.state.getZoom()),
                         tile.id.pixelsToTileUnits(1, parameters.state.getZoom()) }}
                     : parameters.pixelsToGLUnits ),
-                uniforms::u_camera_to_center_distance::Value( parameters.state.getCameraToCenterDistance() ),
+                uniforms::u_camera_to_center_distance::Value( cameraToCenterDistance ),
                 uniforms::u_pitch_with_map::Value( pitchWithMap )
             },
             paintPropertyBinders,

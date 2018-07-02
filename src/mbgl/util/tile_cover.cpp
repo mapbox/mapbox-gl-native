@@ -116,15 +116,16 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
         return std::tie(a.sqDist, a.x, a.y) < std::tie(b.sqDist, b.x, b.y);
     });
 
-    // Erase duplicate tile IDs (they typically occur at the common side of both triangles).
-    t.erase(std::unique(t.begin(), t.end(), [](const ID& a, const ID& b) {
-                return a.x == b.x && a.y == b.y;
-            }), t.end());
-
     std::vector<UnwrappedTileID> result;
     for (const auto& id : t) {
         result.emplace_back(z, id.x, id.y);
     }
+
+    // Erase duplicate tile IDs (they typically occur at the common side of both triangles).
+    result.erase(std::unique(result.begin(), result.end(), [](const UnwrappedTileID& a, const UnwrappedTileID& b) {
+        return a.canonical == b.canonical;
+    }), result.end());
+
     return result;
 }
 

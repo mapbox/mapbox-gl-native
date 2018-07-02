@@ -279,7 +279,7 @@ double TransformState::getMaxPitch() const {
 
 #pragma mark - Rotation
 
-float TransformState::getBearing() const {
+double TransformState::getBearing() const {
     return bearing;
 }
 
@@ -287,15 +287,15 @@ void TransformState::setBearing(double bearing_) {
     bearing = bearing_;
 }
 
-float TransformState::getFieldOfView() const {
+double TransformState::getFieldOfView() const {
     return fov;
 }
 
-float TransformState::getCameraToCenterDistance() const {
+double TransformState::getCameraToCenterDistance() const {
     return 0.5 * size.height / std::tan(fov / 2.0);
 }
 
-float TransformState::getPitch() const {
+double TransformState::getPitch() const {
     return pitch;
 }
 

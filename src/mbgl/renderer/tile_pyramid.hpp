@@ -49,7 +49,7 @@ public:
     std::vector<std::reference_wrapper<RenderTile>> getRenderTiles();
     Tile* getTile(const OverscaledTileID&);
 
-    void handleWrapJump(float lng);
+    void handleWrapJump(double lng);
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
@@ -79,7 +79,7 @@ private:
 
     TileObserver* observer = nullptr;
 
-    float prevLng = 0;
+    double prevLng = 0;
 };
 
 } // namespace mbgl

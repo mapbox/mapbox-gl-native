@@ -243,7 +243,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     }
 }
 
-void TilePyramid::handleWrapJump(float lng) {
+void TilePyramid::handleWrapJump(double lng) {
     // On top of the regular z/x/y values, TileIDs have a `wrap` value that specify
     // which cppy of the world the tile belongs to. For example, at `lng: 10` you
     // might render z/x/y/0 while at `lng: 370` you would render z/x/y/1.
@@ -260,9 +260,9 @@ void TilePyramid::handleWrapJump(float lng) {
     //
     // This enables us to reuse the tiles at more ideal locations and prevent flickering.
 
-    const float lngDifference = lng - prevLng;
-    const float worldDifference = lngDifference / 360;
-    const int wrapDelta = ::round(worldDifference);
+    const double lngDifference = lng - prevLng;
+    const double worldDifference = lngDifference / 360;
+    const int16_t wrapDelta = ::round(worldDifference);
     prevLng = lng;
 
     if (wrapDelta) {
