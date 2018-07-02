@@ -22,6 +22,10 @@ workflows:
           filters:
             tags:
               only: /node-.*/
+      - node-macos-release:
+          filters:
+            tags:
+              only: /node-.*/
       - linux-clang-3.8-libcxx-debug
       - linux-clang4-sanitize-address
       - linux-clang4-sanitize-undefined
@@ -43,10 +47,6 @@ workflows:
               ignore: /.*/
       - macos-debug
       - macos-debug-qt5
-      - macos-release-node:
-          filters:
-            tags:
-              only: /node-.*/
 
 step-library:
   - &generate-cache-key
@@ -157,9 +157,9 @@ step-library:
         command: |
           brew install cmake ccache
 
-  - &install-macos-node-dependencies
+  - &install-node-macos-dependencies
       run:
-        name: Install macOS Node dependencies
+        name: Install Node macOS dependencies
         command: |
           brew install node@6
           brew link node@6 --force --overwrite
@@ -472,6 +472,29 @@ jobs:
       - *run-node-linux-tests-recycle-map
       - *publish-node-package
       - *upload-render-tests-recycle-map
+
+# ------------------------------------------------------------------------------
+  node-macos-release:
+    macos:
+      xcode: "9.4.0"
+    environment:
+      BUILDTYPE: RelWithDebInfo
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *install-node-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-node
+      - *show-ccache-stats
+      - *save-cache
+      - *run-node-macos-tests
+      - *publish-node-package
+      - *upload-render-tests
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   linux-clang-3.8-libcxx-debug:
@@ -886,26 +909,3 @@ jobs:
       - store_artifacts:
           path: test/fixtures
           destination: test/fixtures
-
-# ------------------------------------------------------------------------------
-  macos-release-node:
-    macos:
-      xcode: "9.4.0"
-    environment:
-      BUILDTYPE: RelWithDebInfo
-      HOMEBREW_NO_AUTO_UPDATE: 1
-    steps:
-      - checkout
-      - *install-macos-dependencies
-      - *install-macos-node-dependencies
-      - *generate-cache-key
-      - *restore-cache
-      - *reset-ccache-stats
-      - *build-node
-      - *show-ccache-stats
-      - *save-cache
-      - *run-node-macos-tests
-      - *publish-node-package
-      - *upload-render-tests
-      - *collect-xcode-build-logs
-      - *upload-xcode-build-logs
