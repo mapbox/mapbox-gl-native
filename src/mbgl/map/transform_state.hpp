@@ -19,9 +19,6 @@ namespace mbgl {
 class UnwrappedTileID;
 
 class TransformState {
-    friend class Transform;
-    friend class RendererState;
-
 public:
     TransformState(ConstrainMode = ConstrainMode::HeightOnly, ViewportMode = ViewportMode::Default);
 
@@ -31,16 +28,30 @@ public:
 
     // Dimensions
     Size getSize() const;
+    void setSize(const Size& size);
 
     // North Orientation
     NorthOrientation getNorthOrientation() const;
+    void setNorthOrientation(NorthOrientation);
     double getNorthOrientationAngle() const;
 
     // Constrain mode
     ConstrainMode getConstrainMode() const;
+    void setConstrainMode(ConstrainMode);
 
     // Viewport mode
     ViewportMode getViewportMode() const;
+    void setViewportMode(ViewportMode);
+
+    // Projection mode
+    bool getAxonometric() const;
+    void setAxonometric(bool axonometric);
+
+    double getXSkew() const;
+    void setXSkew(double xSkew);
+
+    double getYSkew() const;
+    void setYSkew(double ySkew);
 
     CameraOptions getCameraOptions(const EdgeInsets&) const;
 
@@ -51,6 +62,7 @@ public:
 
     // Zoom
     double getZoom() const;
+    double getScale() const;
     uint8_t getIntegerZoom() const;
 
     // Bounds
@@ -67,9 +79,15 @@ public:
 
     // Rotation
     float getBearing() const;
+    void setBearing(double bearing);
+
+    // Camera
     float getFieldOfView() const;
     float getCameraToCenterDistance() const;
+
+    // Tilt
     float getPitch() const;
+    void setPitch(double pitch);
 
     // State
     bool isChanging() const;
@@ -94,6 +112,12 @@ public:
     float getCameraToTileDistance(const UnwrappedTileID&) const;
     float maxPitchScaleFactor() const;
 
+    /** Recenter the map so that the given coordinate is located at the given
+        point on screen. */
+    void moveLatLng(const LatLng&, const ScreenCoordinate&);
+    void setScalePoint(const double scale, const ScreenCoordinate& point);
+    void setLatLngZoom(const LatLng &latLng, double zoom);
+
 private:
     bool rotatedNorth() const;
     void constrain(double& scale, double& x, double& y) const;
@@ -114,13 +138,6 @@ private:
     mat4 coordinatePointMatrix(double z) const;
     mat4 getPixelMatrix() const;
 
-    /** Recenter the map so that the given coordinate is located at the given
-        point on screen. */
-    void moveLatLng(const LatLng&, const ScreenCoordinate&);
-    void setLatLngZoom(const LatLng &latLng, double zoom);
-    void setScalePoint(const double scale, const ScreenCoordinate& point);
-
-private:
     ConstrainMode constrainMode;
     ViewportMode viewportMode;
 

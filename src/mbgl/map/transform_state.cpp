@@ -100,10 +100,20 @@ Size TransformState::getSize() const {
     return size;
 }
 
+void TransformState::setSize(const Size& size_) {
+    size = size_;
+    constrain(scale, x, y);
+}
+
 #pragma mark - North Orientation
 
 NorthOrientation TransformState::getNorthOrientation() const {
     return orientation;
+}
+
+void TransformState::setNorthOrientation(NorthOrientation orientation_) {
+    orientation = orientation_;
+    constrain(scale, x, y);
 }
 
 double TransformState::getNorthOrientationAngle() const {
@@ -124,10 +134,45 @@ ConstrainMode TransformState::getConstrainMode() const {
     return constrainMode;
 }
 
+void TransformState::setConstrainMode(ConstrainMode constrainMode_) {
+    constrainMode = constrainMode_;
+    constrain(scale, x, y);
+}
+
 #pragma mark - ViewportMode
 
 ViewportMode TransformState::getViewportMode() const {
     return viewportMode;
+}
+
+void TransformState::setViewportMode(ViewportMode viewportMode_) {
+    viewportMode = viewportMode_;
+}
+
+#pragma mark - Projection
+
+void TransformState::setAxonometric(bool axonometric_) {
+    axonometric = axonometric_;
+}
+
+bool TransformState::getAxonometric() const {
+    return axonometric;
+}
+
+void TransformState::setXSkew(double xSkew_) {
+    xSkew = xSkew_;
+}
+
+double TransformState::getXSkew() const {
+    return xSkew;
+}
+
+void TransformState::setYSkew(double ySkew_) {
+    ySkew = ySkew_;
+}
+
+double TransformState::getYSkew() const {
+    return ySkew;
 }
 
 #pragma mark - Camera options
@@ -173,6 +218,10 @@ double TransformState::pixel_y() const {
 
 double TransformState::getZoom() const {
     return scaleZoom(scale);
+}
+
+double TransformState::getScale() const {
+    return scale;
 }
 
 uint8_t TransformState::getIntegerZoom() const {
@@ -243,6 +292,10 @@ float TransformState::getBearing() const {
     return bearing;
 }
 
+void TransformState::setBearing(double bearing_) {
+    bearing = bearing_;
+}
+
 float TransformState::getFieldOfView() const {
     return fov;
 }
@@ -255,6 +308,9 @@ float TransformState::getPitch() const {
     return pitch;
 }
 
+void TransformState::setPitch(double pitch_) {
+    pitch = pitch_;
+}
 
 #pragma mark - State
 

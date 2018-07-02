@@ -171,8 +171,8 @@ TEST(Map, LatLngBoundsToCameraWithBearingAndPitch) {
     CameraOptions virtualCamera = test.map.cameraForLatLngBounds(bounds, {}, 35, 20);
     ASSERT_TRUE(bounds.contains(*virtualCamera.center));
     EXPECT_NEAR(*virtualCamera.zoom, 13.66272, 1e-5);
-    ASSERT_DOUBLE_EQ(*virtualCamera.pitch, 20.0);
-    EXPECT_NEAR(virtualCamera.bearing.value_or(0), 35.0, 1e-5);
+    EXPECT_NEAR(*virtualCamera.pitch, 20.0, 1e-5);
+    EXPECT_NEAR(*virtualCamera.bearing, 35.0, 1e-5);
 }
 
 TEST(Map, LatLngsToCamera) {
