@@ -263,23 +263,23 @@ float TransformState::getPitch() const {
 #pragma mark - State
 
 bool TransformState::isChanging() const {
-    return rotating || scaling || panning || gestureInProgress;
-}
-
-bool TransformState::isRotating() const {
-    return rotating;
-}
-
-bool TransformState::isScaling() const {
-    return scaling;
-}
-
-bool TransformState::isPanning() const {
-    return panning;
+    return gestureInProgress || transitionInProgress;
 }
 
 bool TransformState::isGestureInProgress() const {
     return gestureInProgress;
+}
+
+void TransformState::setGestureInProgress(bool gestureInProgress_) {
+    gestureInProgress = gestureInProgress_;
+}
+
+bool TransformState::isTransitionInProgress() const {
+    return transitionInProgress;
+}
+
+void TransformState::setTransitionInProgress(bool transitionInProgress_) {
+    transitionInProgress = transitionInProgress_;
 }
 
 #pragma mark - Projection

@@ -74,10 +74,12 @@ public:
 
     // State
     bool isChanging() const;
-    bool isRotating() const;
-    bool isScaling() const;
-    bool isPanning() const;
+
     bool isGestureInProgress() const;
+    void setGestureInProgress(bool gestureInProgress);
+
+    bool isTransitionInProgress() const;
+    void setTransitionInProgress(bool transitionInProgress);
 
     // Conversion
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
@@ -123,11 +125,9 @@ private:
     ConstrainMode constrainMode;
     ViewportMode viewportMode;
 
-    // animation state
-    bool rotating = false;
-    bool scaling = false;
-    bool panning = false;
+    // State
     bool gestureInProgress = false;
+    bool transitionInProgress = false;
 
     // map position
     double x = 0, y = 0;

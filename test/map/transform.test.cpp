@@ -472,17 +472,29 @@ TEST(Transform, Camera) {
     ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), 0);
 }
 
-TEST(Transform, IsPanning)
+TEST(Transform, TransitionInProgress)
 {
     Transform transform;
 
     AnimationOptions easeOptions(Seconds(1));
     easeOptions.transitionFrameFn = [&transform](double) {
-        ASSERT_TRUE(transform.getState().isPanning());
+        ASSERT_TRUE(transform.getState().isTransitionInProgress());
     };
 
     transform.resize({ 1000, 1000 });
     transform.easeTo(CameraOptions().withCenter(LatLng(0, 360.0)), easeOptions);
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(250));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(500));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(750));
+    transform.updateTransitions(transform.getTransitionStart() + transform.getTransitionDuration());
+
+    transform.easeTo(CameraOptions().withZoom(10.0), easeOptions);
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(250));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(500));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(750));
+    transform.updateTransitions(transform.getTransitionStart() + transform.getTransitionDuration());
+
+    transform.easeTo(CameraOptions().withBearing(45.0), easeOptions);
     transform.updateTransitions(transform.getTransitionStart() + Milliseconds(250));
     transform.updateTransitions(transform.getTransitionStart() + Milliseconds(500));
     transform.updateTransitions(transform.getTransitionStart() + Milliseconds(750));

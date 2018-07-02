@@ -123,18 +123,6 @@ bool Map::isGestureInProgress() const {
     return impl->transform.isGestureInProgress();
 }
 
-bool Map::isRotating() const {
-    return impl->transform.isRotating();
-}
-
-bool Map::isScaling() const {
-    return impl->transform.isScaling();
-}
-
-bool Map::isPanning() const {
-    return impl->transform.isPanning();
-}
-
 #pragma mark -
 
 CameraOptions Map::getCameraOptions(const EdgeInsets& padding) const {

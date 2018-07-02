@@ -104,9 +104,6 @@ public:
 
     // Transform state
     const TransformState& getState() const { return state; }
-    bool isRotating() const { return state.isRotating(); }
-    bool isScaling() const { return state.isScaling(); }
-    bool isPanning() const { return state.isPanning(); }
 
     // Conversion and projection
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;

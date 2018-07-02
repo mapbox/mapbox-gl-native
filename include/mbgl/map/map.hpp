@@ -57,11 +57,10 @@ public:
 
     // Transition
     void cancelTransitions();
+
+    // Gesture
     void setGestureInProgress(bool);
     bool isGestureInProgress() const;
-    bool isRotating() const;
-    bool isScaling() const;
-    bool isPanning() const;
 
     // Camera
     CameraOptions getCameraOptions(const EdgeInsets& = {}) const;

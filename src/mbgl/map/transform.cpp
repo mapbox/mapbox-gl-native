@@ -127,9 +127,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     const double startScale = state.scale;
     const double startBearing = state.bearing;
     const double startPitch = state.pitch;
-    state.panning = unwrappedLatLng != startLatLng;
-    state.scaling = scale != startScale;
-    state.rotating = bearing != startBearing;
+    state.setTransitionInProgress(unwrappedLatLng != startLatLng || scale != startScale || bearing != startBearing);
 
     startTransition(camera, animation, [=](double t) {
         Point<double> framePoint = util::interpolate(startPoint, endPoint, t);
@@ -275,9 +273,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     }
 
     const double startScale = state.scale;
-    state.panning = true;
-    state.scaling = true;
-    state.rotating = bearing != startBearing;
+    state.setTransitionInProgress(true);
 
     startTransition(camera, animation, [=](double k) {
         /// s: The distance traveled along the flight path, measured in
@@ -510,9 +506,7 @@ void Transform::startTransition(const CameraOptions& camera,
     };
 
     transitionFinishFn = [isAnimated, animation, this] {
-        state.panning = false;
-        state.scaling = false;
-        state.rotating = false;
+        state.setTransitionInProgress(false);
         if (animation.transitionFinishFn) {
             animation.transitionFinishFn();
         }
