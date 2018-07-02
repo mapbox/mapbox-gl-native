@@ -421,6 +421,9 @@ jobs:
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/release
           destination: .
+      - run:
+          name: Record size
+          command: platform/android/scripts/metrics.sh
 
 
 # ------------------------------------------------------------------------------
@@ -462,11 +465,9 @@ jobs:
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/release
           destination: .
-      - deploy:
-          name: Show statistics
-          command: |
-            export CLOUDWATCH=true
-            platform/android/scripts/metrics.sh
+      - run:
+          name: Record size
+          command: platform/android/scripts/metrics.sh
       - deploy:
           name: Publish to Maven
           command: make run-android-upload-archives
@@ -514,11 +515,9 @@ jobs:
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/release
           destination: .
-      - deploy:
-          name: Show statistics
-          command: |
-            export CLOUDWATCH=true
-            platform/android/scripts/metrics.sh
+      - run:
+          name: Record size
+          command: platform/android/scripts/metrics.sh
       - deploy:
           name: Publish to Maven
           command: make run-android-upload-archives
@@ -902,6 +901,9 @@ jobs:
       - *save-cache
       - *collect-xcode-build-logs
       - *upload-xcode-build-logs
+      - run:
+          name: Record size
+          command: platform/ios/scripts/metrics.sh
 
 # ------------------------------------------------------------------------------
   ios-release-tag:
