@@ -10,9 +10,9 @@ lipo build/ios/pkg/dynamic/Mapbox-stripped -extract arm64 -output build/ios/pkg/
 lipo build/ios/pkg/dynamic/Mapbox-stripped -extract x86_64 -output build/ios/pkg/dynamic/Mapbox-stripped-x86_64
 
 # Track individual architectures
-scripts/log_binary_size.sh "build/ios/pkg/dynamic/Mapbox-stripped-armv7"   "Platform=iOS,Arch=armv7"
-scripts/log_binary_size.sh "build/ios/pkg/dynamic/Mapbox-stripped-arm64"   "Platform=iOS,Arch=arm64"
-scripts/log_binary_size.sh "build/ios/pkg/dynamic/Mapbox-stripped-x86_64"  "Platform=iOS,Arch=x86_64"
+scripts/check_binary_size.js "build/ios/pkg/dynamic/Mapbox-stripped-armv7"   "iOS armv7"
+scripts/check_binary_size.js "build/ios/pkg/dynamic/Mapbox-stripped-arm64"   "iOS arm64"
+scripts/check_binary_size.js "build/ios/pkg/dynamic/Mapbox-stripped-x86_64"  "iOS x86_64"
 
 # Track overall library size
-scripts/log_binary_size.sh "build/ios/pkg/dynamic/Mapbox-stripped"         "Platform=iOS,Arch=Dynamic"
+scripts/check_binary_size.js "build/ios/pkg/dynamic/Mapbox-stripped"         "iOS Dynamic"
