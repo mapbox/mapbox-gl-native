@@ -1,5 +1,6 @@
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 #include <mbgl/test/util.hpp>
 
@@ -7,13 +8,12 @@
 #include <functional>
 #include <future>
 #include <memory>
+#include <thread>
 
 using namespace mbgl;
 using namespace std::chrono_literals;
 
 TEST(Actor, Construction) {
-    // Construction is currently synchronous. It may become asynchronous in the future.
-
     struct Test {
         Test(ActorRef<Test>, bool& constructed) {
             constructed = true;
@@ -25,6 +25,25 @@ TEST(Actor, Construction) {
     Actor<Test> test(pool, std::ref(constructed));
 
     EXPECT_TRUE(constructed);
+}
+
+TEST(Actor, Destruction) {
+    struct Test {
+        Test(ActorRef<Test>, bool& destructed_) : destructed(destructed_) {};
+        ~Test() {
+            destructed = true;
+        }
+        
+        bool& destructed;
+    };
+
+    ThreadPool pool { 1 };
+    bool destructed = false;
+    {
+        Actor<Test> test(pool, std::ref(destructed));
+    }
+
+    EXPECT_TRUE(destructed);
 }
 
 TEST(Actor, DestructionBlocksOnReceive) {
@@ -63,7 +82,7 @@ TEST(Actor, DestructionBlocksOnReceive) {
 
     Actor<Test> test(pool, std::move(enteredPromise), std::move(exitingFuture));
 
-    test.invoke(&Test::wait);
+    test.self().invoke(&Test::wait);
     enteredFuture.wait();
     exitingPromise.set_value();
 }
@@ -145,7 +164,7 @@ TEST(Actor, DestructionAllowedInReceiveOnSameThread) {
     auto test = std::make_unique<Actor<Test>>(pool);
 
     // Callback (triggered while mutex is locked in Mailbox::receive())
-    test->invoke(&Test::callMeBack, [&]() {
+    test->self().invoke(&Test::callMeBack, [&]() {
         // Destroy the Actor/Mailbox in the same thread
         test.reset();
         callbackFiredPromise.set_value();
@@ -180,16 +199,16 @@ TEST(Actor, SelfDestructionDoesntCrashWaitingReceivingThreads) {
     std::atomic<bool> waitingMessageProcessed {false};
 
     // Callback (triggered while mutex is locked in Mailbox::receive())
-    closingActor->invoke(&Test::callMeBack, [&]() {
+    closingActor->self().invoke(&Test::callMeBack, [&]() {
 
         // Queue up another message from another thread
         std::promise<void> messageQueuedPromise;
-        waitingActor->invoke(&Test::callMeBack, [&]() {
+        waitingActor->self().invoke(&Test::callMeBack, [&]() {
             // This will be waiting on the mutex in
             // Mailbox::receive(), holding a lock
             // on the weak_ptr so the mailbox is not
             // destroyed
-            closingActor->invoke(&Test::callMeBack, [&]() {
+            closingActor->self().invoke(&Test::callMeBack, [&]() {
                 waitingMessageProcessed.store(true);
             });
             messageQueuedPromise.set_value();
@@ -239,10 +258,10 @@ TEST(Actor, OrderedMailbox) {
     Actor<Test> test(pool, std::move(endedPromise));
 
     for (auto i = 1; i <= 10; ++i) {
-        test.invoke(&Test::receive, i);
+        test.self().invoke(&Test::receive, i);
     }
 
-    test.invoke(&Test::end);
+    test.self().invoke(&Test::end);
     endedFuture.wait();
 }
 
@@ -275,10 +294,10 @@ TEST(Actor, NonConcurrentMailbox) {
     Actor<Test> test(pool, std::move(endedPromise));
 
     for (auto i = 1; i <= 10; ++i) {
-        test.invoke(&Test::receive, i);
+        test.self().invoke(&Test::receive, i);
     }
 
-    test.invoke(&Test::end);
+    test.self().invoke(&Test::end);
     endedFuture.wait();
 }
 
@@ -297,7 +316,7 @@ TEST(Actor, Ask) {
     ThreadPool pool { 2 };
     Actor<Test> test(pool);
 
-    auto result = test.ask(&Test::doubleIt, 1);
+    auto result = test.self().ask(&Test::doubleIt, 1);
 
     ASSERT_TRUE(result.valid());
     
@@ -324,7 +343,7 @@ TEST(Actor, AskVoid) {
     bool executed = false;
     Actor<Test> actor(pool, executed);
 
-    actor.ask(&Test::doIt).get();
+    actor.self().ask(&Test::doIt).get();
     EXPECT_TRUE(executed);
 }
 
@@ -355,6 +374,58 @@ TEST(Actor, NoSelfActorRef) {
     auto future = promise.get_future();
     Actor<WithArguments> withArguments(pool, std::move(promise));
     
-    withArguments.invoke(&WithArguments::receive);
+    withArguments.self().invoke(&WithArguments::receive);
     future.wait();
 }
+
+TEST(Actor, TwoPhaseConstruction) {
+    // This test mimics, in simplified form, the approach used by the Thread<Object> to construct
+    // its actor in two parts so that the Thread<Object> instance can be created without waiting
+    // for the target thread to be up and running.
+
+    struct Test {
+        Test(ActorRef<Test>, std::shared_ptr<bool> destroyed_)
+            : destroyed(std::move(destroyed_)) {};
+        
+        ~Test() {
+            *destroyed = true;
+        }
+        
+        void callMe(std::promise<void> p) {
+            p.set_value();
+        }
+        
+        void stop() {
+            util::RunLoop::Get()->stop();
+        }
+        
+        std::shared_ptr<bool> destroyed;
+    };
+
+    AspiringActor<Test> parent;
+    
+    auto destroyed = std::make_shared<bool>(false);
+    
+    std::promise<void> queueExecuted;
+    auto queueExecutedFuture = queueExecuted.get_future();
+    
+    parent.self().invoke(&Test::callMe, std::move(queueExecuted));
+    parent.self().invoke(&Test::stop);
+    
+    auto thread = std::thread([
+        capturedArgs = std::make_tuple(destroyed),
+        &parent
+    ] () mutable {
+        util::RunLoop loop(util::RunLoop::Type::New);
+        EstablishedActor<Test> test(loop, parent, capturedArgs);
+        loop.run();
+    });
+    
+    // should not hang
+    queueExecutedFuture.get();
+    thread.join();
+    
+    EXPECT_TRUE(*destroyed);
+}
+
+

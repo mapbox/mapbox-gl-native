@@ -469,7 +469,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     }
     
     // Create the snapshotter
-    _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(*mbglFileSource, *_mbglThreadPool, style, size, pixelRatio, cameraOptions, coordinateBounds);
+    _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(mbglFileSource, _mbglThreadPool, style, size, pixelRatio, cameraOptions, coordinateBounds);
 }
 
 @end
