@@ -62,7 +62,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
         LineBucket& bucket = *reinterpret_cast<LineBucket*>(tile.tile.getBucket(*baseImpl));
 
         auto draw = [&] (auto& program, auto&& uniformValues) {
-            auto& programInstance = program.get(evaluated);
+            auto& programInstance = program.get(parameters.frameID, evaluated);
 
             const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
