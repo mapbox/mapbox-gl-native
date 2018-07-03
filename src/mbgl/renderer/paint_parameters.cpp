@@ -2,12 +2,14 @@
 #include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/util/chrono.hpp>
 
 namespace mbgl {
 
 PaintParameters::PaintParameters(gl::Context& context_,
                     float pixelRatio_,
                     GLContextMode contextMode_,
+                    const size_t frameID_,
                     RendererBackend& backend_,
                     const UpdateParameters& updateParameters,
                     const EvaluatedLight& evaluatedLight_,
@@ -24,6 +26,7 @@ PaintParameters::PaintParameters(gl::Context& context_,
     mapMode(updateParameters.mode),
     debugOptions(updateParameters.debugOptions),
     contextMode(contextMode_),
+    frameID(frameID_),
     timePoint(updateParameters.timePoint),
     pixelRatio(pixelRatio_),
 #ifndef NDEBUG
@@ -48,6 +51,13 @@ PaintParameters::PaintParameters(gl::Context& context_,
 
     if (state.getViewportMode() == ViewportMode::FlippedY) {
         pixelsToGLUnits[1] *= -1;
+    }
+}
+
+PaintParameters::~PaintParameters() {
+    const size_t retention = mapMode == MapMode::Continuous ? 100 : 20;
+    if (frameID >= retention) {
+        programs.evictNotUsedSince(frameID - retention);
     }
 }
 

@@ -69,7 +69,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                              const auto& depthMode,
                              const auto& indexBuffer,
                              const auto& segments) {
-                auto& programInstance = program.get(evaluated);
+                auto& programInstance = program.get(parameters.frameID, evaluated);
 
                 const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
@@ -154,7 +154,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                              const auto& depthMode,
                              const auto& indexBuffer,
                              const auto& segments) {
-                auto& programInstance = program.get(evaluated);
+                auto& programInstance = program.get(parameters.frameID, evaluated);
 
                 const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 

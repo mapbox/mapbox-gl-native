@@ -28,12 +28,14 @@ public:
     PaintParameters(gl::Context&,
                     float pixelRatio,
                     GLContextMode,
+                    size_t frameID,
                     RendererBackend&,
                     const UpdateParameters&,
                     const EvaluatedLight&,
                     RenderStaticData&,
                     ImageManager&,
                     LineAtlas&);
+    ~PaintParameters();
 
     gl::Context& context;
     RendererBackend& backend;
@@ -49,6 +51,7 @@ public:
     MapMode mapMode;
     MapDebugOptions debugOptions;
     GLContextMode contextMode;
+    const size_t frameID;
     TimePoint timePoint;
 
     float pixelRatio;
