@@ -301,24 +301,36 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
         }
         
         auto updateCollisionBox = [&](const auto& feature, const bool placed) {
-            for (const CollisionBox& box : feature.boxes) {
-                if (feature.alongLine) {
-                   auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, !box.used);
-                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                } else {
-                    auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, false);
-                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
-                }
+            if (feature.alongLine) {
+                return;
+            }
+            auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, false);
+            for (size_t i = 0; i < feature.boxes.size() * 4; i++) {
+                bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
             }
         };
-        updateCollisionBox(symbolInstance.textCollisionFeature, opacityState.text.placed);
-        updateCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
+        
+        auto updateCollisionCircles = [&](const auto& feature, const bool placed) {
+            if (!feature.alongLine) {
+                return;
+            }
+            for (const CollisionBox& box : feature.boxes) {
+                auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, !box.used);
+                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+            }
+        };
+        
+        if (bucket.hasCollisionBoxData()) {
+            updateCollisionBox(symbolInstance.textCollisionFeature, opacityState.text.placed);
+            updateCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
+        }
+        if (bucket.hasCollisionCircleData()) {
+            updateCollisionCircles(symbolInstance.textCollisionFeature, opacityState.text.placed);
+            updateCollisionCircles(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
+        }
     }
 
     bucket.updateOpacity();
