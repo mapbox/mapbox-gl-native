@@ -892,10 +892,6 @@ jobs:
     steps:
       - checkout
       - *install-macos-dependencies
-      - run:
-          name: Install jazzy
-          command: sudo gem install jazzy --no-document
-          background: true
       - *generate-cache-key
       - *restore-cache
       - *reset-ccache-stats
