@@ -4692,6 +4692,9 @@ public:
     _locationManager = locationManager;
     _locationManager.delegate = self;
     
+    if (!locationManager) {
+        _showsUserLocation = NO;
+    }
 }
 
 - (void)validateLocationServices
