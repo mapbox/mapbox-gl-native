@@ -61,8 +61,13 @@ static MGLCoordinateFormatter *DroppedPinCoordinateFormatter;
 
 - (void)update:(NSTimer *)timer {
     NSString *coordinate = [DroppedPinCoordinateFormatter stringFromCoordinate:self.coordinate];
-    NSString *elapsedTime = [_timeIntervalTransformer transformedValue:@(self.elapsedShownTime)];
-    self.subtitle = [NSString stringWithFormat:@"%@\nSelected for %@", coordinate, elapsedTime];
+    if (self.note) {
+        self.subtitle = [@[self.note, coordinate] componentsJoinedByString:@"\n"];
+    } else {
+        NSString *elapsedTime = [_timeIntervalTransformer transformedValue:@(self.elapsedShownTime)];
+        NSString *elapsedString = [NSString stringWithFormat:@"Selected for %@", elapsedTime];
+        self.subtitle = [@[coordinate, elapsedString] componentsJoinedByString:@"\n"];
+    }
 }
 
 @end

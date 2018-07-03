@@ -177,6 +177,66 @@ NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *sha
 
 #pragma mark File methods
 
+- (IBAction)import:(id)sender {
+    NSOpenPanel *panel = [NSOpenPanel openPanel];
+    panel.allowedFileTypes = @[@"public.json", @"json", @"geojson"];
+    panel.allowsMultipleSelection = YES;
+    
+    __weak __typeof__(self) weakSelf = self;
+    [panel beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse result) {
+        if (result != NSFileHandlingPanelOKButton) {
+            return;
+        }
+        
+        for (NSURL *url in panel.URLs) {
+            [weakSelf importFromURL:url];
+        }
+    }];
+}
+
+/**
+ Adds the contents of the GeoJSON file at the given URL to the map.
+ 
+ GeoJSON features are styled according to
+ [simplestyle-spec](https://github.com/mapbox/simplestyle-spec/tree/master/1.1.0/).
+ */
+- (void)importFromURL:(NSURL *)url {
+    MGLStyle *style = self.mapView.style;
+    if (!style) {
+        return;
+    }
+    
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:[NSUUID UUID].UUIDString URL:url options:nil];
+    [self.mapView.style addSource:source];
+    
+    NSString *pointIdentifier = [NSString stringWithFormat:@"%@ marker", source.identifier];
+    MGLSymbolStyleLayer *pointLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:pointIdentifier source:source];
+    pointLayer.iconImageName =
+        [NSExpression expressionWithFormat:@"mgl_join({%K, '-', CAST(TERNARY(%K = 'small', 11, 15), 'NSString')})",
+         @"marker-symbol", @"marker-size"];
+    pointLayer.iconScale = [NSExpression expressionForConstantValue:@1];
+    pointLayer.iconColor = [NSExpression expressionWithFormat:@"CAST(mgl_coalesce({%K, '#7e7e7e'}), 'NSColor')",
+                            @"marker-color"];
+    pointLayer.iconAllowsOverlap = [NSExpression expressionForConstantValue:@YES];
+    [style addLayer:pointLayer];
+    
+    NSString *fillIdentifier = [NSString stringWithFormat:@"%@ fill", source.identifier];
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:fillIdentifier source:source];
+    fillLayer.predicate = [NSPredicate predicateWithFormat:@"fill != nil OR %K != nil", @"fill-opacity"];
+    fillLayer.fillColor = [NSExpression expressionWithFormat:@"CAST(mgl_coalesce({fill, '#555555'}), 'NSColor')"];
+    fillLayer.fillOpacity = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, 0.5})", @"fill-opacity"];
+    [style addLayer:fillLayer];
+    
+    NSString *lineIdentifier = [NSString stringWithFormat:@"%@ stroke", source.identifier];
+    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:lineIdentifier source:source];
+    lineLayer.lineColor = [NSExpression expressionWithFormat:@"CAST(mgl_coalesce({stroke, '#555555'}), 'NSColor')"];
+    lineLayer.lineOpacity = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, 1.0})", @"stroke-opacity"];
+    lineLayer.lineWidth = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, 2})", @"stroke-width"];
+    lineLayer.lineCap = [NSExpression expressionForConstantValue:@"round"];
+    lineLayer.lineJoin = [NSExpression expressionForConstantValue:@"bevel"];
+    [style addLayer:lineLayer];
+}
+
 - (IBAction)takeSnapshot:(id)sender {
     MGLMapCamera *camera = self.mapView.camera;
     
@@ -966,15 +1026,30 @@ NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *sha
 - (DroppedPinAnnotation *)pinAtPoint:(NSPoint)point {
     NSArray *features = [self.mapView visibleFeaturesAtPoint:point];
     NSString *title;
+    NSString *description;
     for (id <MGLFeature> feature in features) {
         if (!title) {
-            title = [feature attributeForKey:@"name_en"] ?: [feature attributeForKey:@"name"];
+            title = [feature attributeForKey:@"title"] ?: [feature attributeForKey:@"name_en"] ?: [feature attributeForKey:@"name"];
+            
+            // simplestyle-spec defines a “description” attribute in HTML format.
+            NSString *featureDescription = [feature attributeForKey:@"description"];
+            if (featureDescription) {
+                // Convert HTML to plain text, because the default popover is
+                // bound to an NSString-typed property.
+                NSData *data = [featureDescription dataUsingEncoding:NSUTF8StringEncoding];
+                description = [[NSAttributedString alloc] initWithHTML:data options:@{} documentAttributes:nil].string;
+            }
+            
+            if (title) {
+                break;
+            }
         }
     }
 
     DroppedPinAnnotation *annotation = [[DroppedPinAnnotation alloc] init];
     annotation.coordinate = [self.mapView convertPoint:point toCoordinateFromView:self.mapView];
     annotation.title = title ?: @"Dropped Pin";
+    annotation.note = description;
     _spellOutNumberFormatter.numberStyle = NSNumberFormatterSpellOutStyle;
     if (_showsToolTipsOnDroppedPins) {
         NSString *formattedNumber = [_spellOutNumberFormatter stringFromNumber:@(++_droppedPinCounter)];
@@ -1182,6 +1257,9 @@ NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *sha
         return !styleURL.isFileURL;
     }
     if (menuItem.action == @selector(giveFeedback:)) {
+        return YES;
+    }
+    if (menuItem.action == @selector(import:)) {
         return YES;
     }
     if (menuItem.action == @selector(takeSnapshot:)) {
