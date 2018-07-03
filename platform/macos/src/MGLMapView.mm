@@ -1275,6 +1275,32 @@ public:
     return [self cameraForCameraOptions:cameraOptions];
 }
 
+- (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(NSEdgeInsets)insets
+{
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
+    padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
+    
+    MGLMapCamera *currentCamera = self.camera;
+    CGFloat pitch = camera.pitch < 0 ? currentCamera.pitch : camera.pitch;
+    CLLocationDirection direction = camera.heading < 0 ? currentCamera.heading : camera.heading;
+    
+    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), padding, direction, pitch);
+    return [self cameraForCameraOptions:cameraOptions];
+}
+
+- (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingShape:(MGLShape *)shape edgePadding:(NSEdgeInsets)insets {
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
+    padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
+    
+    MGLMapCamera *currentCamera = self.camera;
+    CGFloat pitch = camera.pitch < 0 ? currentCamera.pitch : camera.pitch;
+    CLLocationDirection direction = camera.heading < 0 ? currentCamera.heading : camera.heading;
+    
+    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForGeometry([shape geometryObject], padding, direction, pitch);
+    
+    return [self cameraForCameraOptions: cameraOptions];
+}
+
 - (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(NSEdgeInsets)insets {
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
     padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
