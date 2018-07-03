@@ -1636,14 +1636,77 @@ public final class MapboxMap {
    * Get a camera position that fits a provided shape with a given bearing and padding.
    *
    * @param geometry the geometry to constrain the map with
-   * @param bearing  the bearing at which to compute the geometry's bounds
+   * @return the camera position that fits the bounds and padding
+   */
+  @NonNull
+  public CameraPosition getCameraForGeometry(@NonNull Geometry geometry) {
+    // we use current camera tilt value to provide expected transformations as #11993
+    return getCameraForGeometry(geometry, new int[] {0, 0, 0, 0});
+  }
+
+  /**
+   * Get a camera position that fits a provided shape with a given bearing and padding.
+   *
+   * @param geometry the geometry to constrain the map with
    * @param padding  the padding to apply to the bounds
    * @return the camera position that fits the bounds and padding
    */
   @NonNull
+  public CameraPosition getCameraForGeometry(@NonNull Geometry geometry,
+                                             @NonNull @Size(value = 4) int[] padding) {
+    // we use current camera tilt/bearing value to provide expected transformations as #11993
+    return getCameraForGeometry(geometry, padding, transform.getBearing(), transform.getTilt());
+  }
+
+  /**
+   * Get a camera position that fits a provided shape with a given bearing and padding.
+   *
+   * @param geometry the geometry to constrain the map with
+   * @param bearing  the bearing at which to compute the geometry's bounds
+   * @param tilt     the tilt at which to compute the geometry's bounds
+   * @return the camera position that fits the bounds and padding
+   */
+  @NonNull
+  public CameraPosition getCameraForGeometry(@NonNull Geometry geometry,
+                                             @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION,
+                                               to = MapboxConstants.MAXIMUM_DIRECTION) double bearing,
+                                             @FloatRange(from = MapboxConstants.MINIMUM_TILT,
+                                               to = MapboxConstants.MAXIMUM_TILT) double tilt) {
+    return getCameraForGeometry(geometry, new int[] {0, 0, 0, 0}, bearing, tilt);
+  }
+
+  /**
+   * Get a camera position that fits a provided shape with a given bearing and padding.
+   *
+   * @param geometry the geometry to constrain the map with
+   * @param padding  the padding to apply to the bounds
+   * @param bearing  the bearing at which to compute the geometry's bounds
+   * @param tilt     the tilt at which to compute the geometry's bounds
+   * @return the camera position that fits the bounds and padding
+   */
+  @NonNull
+  public CameraPosition getCameraForGeometry(@NonNull Geometry geometry,
+                                             @NonNull @Size(value = 4) int[] padding,
+                                             @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION,
+                                               to = MapboxConstants.MAXIMUM_DIRECTION) double bearing,
+                                             @FloatRange(from = MapboxConstants.MINIMUM_TILT,
+                                               to = MapboxConstants.MAXIMUM_TILT) double tilt) {
+    return nativeMapView.getCameraForGeometry(geometry, padding, bearing, tilt);
+  }
+
+  /**
+   * Get a camera position that fits a provided shape with a given bearing and padding.
+   *
+   * @param geometry the geometry to constrain the map with
+   * @param bearing  the bearing at which to compute the geometry's bounds
+   * @param padding  the padding to apply to the bounds
+   * @return the camera position that fits the bounds and padding
+   * @deprecated use Mapbox{@link #getCameraForGeometry(Geometry, int[], double, double)} instead
+   */
+  @NonNull
+  @Deprecated
   public CameraPosition getCameraForGeometry(Geometry geometry, double bearing, int[] padding) {
-    // get padded camera position from Geometry
-    return nativeMapView.getCameraForGeometry(geometry, bearing, padding);
+    return getCameraForGeometry(geometry, padding, bearing, transform.getTilt());
   }
 
   //
