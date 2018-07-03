@@ -82,7 +82,7 @@ TEST(Actor, DestructionBlocksOnReceive) {
 
     Actor<Test> test(pool, std::move(enteredPromise), std::move(exitingFuture));
 
-    test.invoke(&Test::wait);
+    test.self().invoke(&Test::wait);
     enteredFuture.wait();
     exitingPromise.set_value();
 }
@@ -164,7 +164,7 @@ TEST(Actor, DestructionAllowedInReceiveOnSameThread) {
     auto test = std::make_unique<Actor<Test>>(pool);
 
     // Callback (triggered while mutex is locked in Mailbox::receive())
-    test->invoke(&Test::callMeBack, [&]() {
+    test->self().invoke(&Test::callMeBack, [&]() {
         // Destroy the Actor/Mailbox in the same thread
         test.reset();
         callbackFiredPromise.set_value();
@@ -199,16 +199,16 @@ TEST(Actor, SelfDestructionDoesntCrashWaitingReceivingThreads) {
     std::atomic<bool> waitingMessageProcessed {false};
 
     // Callback (triggered while mutex is locked in Mailbox::receive())
-    closingActor->invoke(&Test::callMeBack, [&]() {
+    closingActor->self().invoke(&Test::callMeBack, [&]() {
 
         // Queue up another message from another thread
         std::promise<void> messageQueuedPromise;
-        waitingActor->invoke(&Test::callMeBack, [&]() {
+        waitingActor->self().invoke(&Test::callMeBack, [&]() {
             // This will be waiting on the mutex in
             // Mailbox::receive(), holding a lock
             // on the weak_ptr so the mailbox is not
             // destroyed
-            closingActor->invoke(&Test::callMeBack, [&]() {
+            closingActor->self().invoke(&Test::callMeBack, [&]() {
                 waitingMessageProcessed.store(true);
             });
             messageQueuedPromise.set_value();
@@ -258,10 +258,10 @@ TEST(Actor, OrderedMailbox) {
     Actor<Test> test(pool, std::move(endedPromise));
 
     for (auto i = 1; i <= 10; ++i) {
-        test.invoke(&Test::receive, i);
+        test.self().invoke(&Test::receive, i);
     }
 
-    test.invoke(&Test::end);
+    test.self().invoke(&Test::end);
     endedFuture.wait();
 }
 
@@ -294,10 +294,10 @@ TEST(Actor, NonConcurrentMailbox) {
     Actor<Test> test(pool, std::move(endedPromise));
 
     for (auto i = 1; i <= 10; ++i) {
-        test.invoke(&Test::receive, i);
+        test.self().invoke(&Test::receive, i);
     }
 
-    test.invoke(&Test::end);
+    test.self().invoke(&Test::end);
     endedFuture.wait();
 }
 
@@ -316,7 +316,7 @@ TEST(Actor, Ask) {
     ThreadPool pool { 2 };
     Actor<Test> test(pool);
 
-    auto result = test.ask(&Test::doubleIt, 1);
+    auto result = test.self().ask(&Test::doubleIt, 1);
 
     ASSERT_TRUE(result.valid());
     
@@ -343,7 +343,7 @@ TEST(Actor, AskVoid) {
     bool executed = false;
     Actor<Test> actor(pool, executed);
 
-    actor.ask(&Test::doIt).get();
+    actor.self().ask(&Test::doIt).get();
     EXPECT_TRUE(executed);
 }
 
@@ -374,7 +374,7 @@ TEST(Actor, NoSelfActorRef) {
     auto future = promise.get_future();
     Actor<WithArguments> withArguments(pool, std::move(promise));
     
-    withArguments.invoke(&WithArguments::receive);
+    withArguments.self().invoke(&WithArguments::receive);
     future.wait();
 }
 

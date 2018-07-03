@@ -86,7 +86,7 @@ void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
     pending = true;
 
     ++correlationID;
-    worker.invoke(&GeometryTileWorker::setData, std::move(data_), correlationID);
+    worker.self().invoke(&GeometryTileWorker::setData, std::move(data_), correlationID);
 }
 
 
@@ -112,14 +112,14 @@ void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) 
     }
 
     ++correlationID;
-    worker.invoke(&GeometryTileWorker::setLayers, std::move(impls), correlationID);
+    worker.self().invoke(&GeometryTileWorker::setLayers, std::move(impls), correlationID);
 }
 
 void GeometryTile::setShowCollisionBoxes(const bool showCollisionBoxes_) {
     if (showCollisionBoxes != showCollisionBoxes_) {
         showCollisionBoxes = showCollisionBoxes_;
         ++correlationID;
-        worker.invoke(&GeometryTileWorker::setShowCollisionBoxes, showCollisionBoxes, correlationID);
+        worker.self().invoke(&GeometryTileWorker::setShowCollisionBoxes, showCollisionBoxes, correlationID);
     }
 }
 
@@ -153,7 +153,7 @@ void GeometryTile::onError(std::exception_ptr err, const uint64_t resultCorrelat
 }
     
 void GeometryTile::onGlyphsAvailable(GlyphMap glyphs) {
-    worker.invoke(&GeometryTileWorker::onGlyphsAvailable, std::move(glyphs));
+    worker.self().invoke(&GeometryTileWorker::onGlyphsAvailable, std::move(glyphs));
 }
 
 void GeometryTile::getGlyphs(GlyphDependencies glyphDependencies) {
@@ -161,7 +161,7 @@ void GeometryTile::getGlyphs(GlyphDependencies glyphDependencies) {
 }
 
 void GeometryTile::onImagesAvailable(ImageMap images, uint64_t imageCorrelationID) {
-    worker.invoke(&GeometryTileWorker::onImagesAvailable, std::move(images), imageCorrelationID);
+    worker.self().invoke(&GeometryTileWorker::onImagesAvailable, std::move(images), imageCorrelationID);
 }
 
 void GeometryTile::getImages(ImageRequestPair pair) {

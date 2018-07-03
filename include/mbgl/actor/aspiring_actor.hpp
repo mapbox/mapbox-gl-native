@@ -45,22 +45,6 @@ public:
         return ActorRef<std::decay_t<Object>>(object(), mailbox);
     }
     
-    template <typename Fn, class... Args>
-    void invoke(Fn fn, Args&&... args) {
-        mailbox->push(actor::makeMessage(object(), fn, std::forward<Args>(args)...));
-    }
-
-    template <typename Fn, class... Args>
-    auto ask(Fn fn, Args&&... args) {
-        // Result type is deduced from the function's return type
-        using ResultType = typename std::result_of<decltype(fn)(Object, Args...)>::type;
-
-        std::promise<ResultType> promise;
-        auto future = promise.get_future();
-        mailbox->push(actor::makeMessage(std::move(promise), object(), fn, std::forward<Args>(args)...));
-        return future;
-    }
-
 private:
     std::shared_ptr<Mailbox> mailbox;
     std::aligned_storage_t<sizeof(Object)> objectStorage;

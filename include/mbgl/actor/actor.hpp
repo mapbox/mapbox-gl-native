@@ -61,20 +61,6 @@ public:
         return parent.self();
     }
 
-    operator ActorRef<std::decay_t<Object>>() {
-        return self();
-    }
-
-    template <typename Fn, class... Args>
-    void invoke(Fn fn, Args&&... args) {
-        parent.invoke(std::move(fn), std::forward<Args>(args)...);
-    }
-
-    template <typename Fn, class... Args>
-    auto ask(Fn fn, Args&&... args) {
-        return parent.ask(std::move(fn), std::forward<Args>(args)...);
-    }
-
 private:
     AspiringActor<Object> parent;
     EstablishedActor<Object> target;
