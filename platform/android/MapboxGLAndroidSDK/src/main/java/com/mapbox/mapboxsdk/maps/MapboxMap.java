@@ -9,12 +9,12 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.Size;
 import android.support.annotation.UiThread;
 import android.support.v4.util.Pools;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.android.gestures.RotateGestureDetector;
@@ -44,11 +44,10 @@ import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.Source;
+import timber.log.Timber;
 
 import java.util.HashMap;
 import java.util.List;
-
-import timber.log.Timber;
 
 /**
  * The general class to interact with in the Android Mapbox SDK. It exposes the entry point for all
@@ -457,7 +456,7 @@ public final class MapboxMap {
    *
    * @param name  the name of the image
    * @param image the pre-multiplied Bitmap
-   * @param sdf the flag indicating image is an SDF or template image
+   * @param sdf   the flag indicating image is an SDF or template image
    */
   public void addImage(@NonNull String name, @NonNull Bitmap image, boolean sdf) {
     nativeMapView.addImage(name, image, sdf);
@@ -1567,17 +1566,70 @@ public final class MapboxMap {
     nativeMapView.setLatLngBounds(latLngBounds);
   }
 
+
   /**
-   * Get a camera position that fits a provided bounds and padding.
+   * Get a camera position that fits a provided bounds and the current camera tilt.
    *
-   * @param latLngBounds the bounds to constrain the map with
+   * @param latLngBounds the bounds to set the map with
+   * @return the camera position that fits the bounds
+   */
+  @NonNull
+  public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds) {
+    // we use current camera tilt value to provide expected transformations as #11993
+    return getCameraForLatLngBounds(latLngBounds, new int[] {0, 0, 0, 0});
+  }
+
+
+  /**
+   * Get a camera position that fits a provided bounds and padding and the current camera tilt.
+   *
+   * @param latLngBounds the bounds to set the map with
    * @param padding      the padding to apply to the bounds
    * @return the camera position that fits the bounds and padding
    */
   @NonNull
-  public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds, int[] padding) {
-    // get padded camera position from LatLngBounds
-    return nativeMapView.getCameraForLatLngBounds(latLngBounds, padding);
+  public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
+                                                 @NonNull @Size(value = 4) int[] padding) {
+    // we use current camera tilt/bearing value to provide expected transformations as #11993
+    return getCameraForLatLngBounds(latLngBounds, padding, transform.getBearing(), transform.getTilt());
+  }
+
+
+  /**
+   * Get a camera position that fits a provided bounds, padding and tilt.
+   *
+   * @param latLngBounds the bounds to set the map with
+   * @param bearing      the bearing to transform the camera position with
+   * @param tilt         to transform the camera position with
+   * @return the camera position that fits the bounds and padding
+   */
+  @NonNull
+  public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
+                                                 @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION,
+                                                   to = MapboxConstants.MAXIMUM_DIRECTION) double bearing,
+                                                 @FloatRange(from = MapboxConstants.MINIMUM_TILT,
+                                                   to = MapboxConstants.MAXIMUM_TILT) double tilt) {
+    return getCameraForLatLngBounds(latLngBounds, new int[] {0, 0, 0, 0}, bearing, tilt);
+  }
+
+
+  /**
+   * Get a camera position that fits a provided bounds, padding and tilt.
+   *
+   * @param latLngBounds the bounds to set the map with
+   * @param padding      the padding to apply to the bounds
+   * @param bearing      the bearing to transform the camera position with
+   * @param tilt         to transform the camera position with
+   * @return the camera position that fits the bounds and padding
+   */
+  @NonNull
+  public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
+                                                 @NonNull @Size(value = 4) int[] padding,
+                                                 @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION,
+                                                   to = MapboxConstants.MAXIMUM_DIRECTION) double bearing,
+                                                 @FloatRange(from = MapboxConstants.MINIMUM_TILT,
+                                                   to = MapboxConstants.MAXIMUM_TILT) double tilt) {
+    return nativeMapView.getCameraForLatLngBounds(latLngBounds, padding, bearing, tilt);
   }
 
   /**

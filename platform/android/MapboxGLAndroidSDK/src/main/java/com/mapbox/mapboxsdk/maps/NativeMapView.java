@@ -249,16 +249,19 @@ final class NativeMapView {
     return nativeGetLatLng().wrap();
   }
 
-  public CameraPosition getCameraForLatLngBounds(LatLngBounds latLngBounds, int[] padding) {
+  public CameraPosition getCameraForLatLngBounds(LatLngBounds bounds, int[] padding, double bearing, double tilt) {
     if (checkState("getCameraForLatLngBounds")) {
       return null;
     }
     return nativeGetCameraForLatLngBounds(
-      latLngBounds,
+      bounds,
       padding[1] / pixelRatio,
       padding[0] / pixelRatio,
       padding[3] / pixelRatio,
-      padding[2] / pixelRatio);
+      padding[2] / pixelRatio,
+      bearing,
+      tilt
+    );
   }
 
   public CameraPosition getCameraForGeometry(Geometry geometry, double bearing, int[] padding) {
@@ -943,7 +946,7 @@ final class NativeMapView {
   private native LatLng nativeGetLatLng();
 
   private native CameraPosition nativeGetCameraForLatLngBounds(
-    LatLngBounds latLngBounds, double top, double left, double bottom, double right);
+    LatLngBounds latLngBounds, double top, double left, double bottom, double right, double bearing, double tilt);
 
   private native CameraPosition nativeGetCameraForGeometry(
     Geometry geometry, double bearing, double top, double left, double bottom, double right);
