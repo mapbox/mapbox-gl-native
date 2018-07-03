@@ -8,6 +8,7 @@ NAME=Mapbox
 OUTPUT=build/ios/pkg
 DERIVED_DATA=build/ios
 PRODUCTS=${DERIVED_DATA}
+LOG_PATH=build/xcodebuild-$(date +"%Y-%m-%d_%H%M%S").log
 
 BUILDTYPE=${BUILDTYPE:-Debug}
 BUILD_FOR_DEVICE=${BUILD_DEVICE:-true}
@@ -76,7 +77,7 @@ xcodebuild \
     -scheme ${SCHEME} \
     -configuration ${BUILDTYPE} \
     -sdk iphonesimulator \
-    -jobs ${JOBS} | xcpretty
+    -jobs ${JOBS} | tee ${LOG_PATH} | xcpretty
 
 if [[ ${BUILD_FOR_DEVICE} == true ]]; then
     step "Building for iOS devices using scheme ${SCHEME}"
@@ -91,7 +92,7 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
         -scheme ${SCHEME} \
         -configuration ${BUILDTYPE} \
         -sdk iphoneos \
-        -jobs ${JOBS} | xcpretty
+        -jobs ${JOBS} | tee ${LOG_PATH} | xcpretty
 fi
 
 LIBS=(Mapbox.a)
