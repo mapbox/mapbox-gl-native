@@ -11,7 +11,6 @@ import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidMarkerPositionException;
@@ -124,107 +123,6 @@ public class MapboxMapTest extends BaseActivityTest {
     }));
   }
 
-  @Test
-  public void testGetCameraForLatLngBounds() {
-    validateTestSetup();
-    onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
-      CameraPosition actualPosition = mapboxMap.getCameraForLatLngBounds(
-        LatLngBounds.from(10, 10, -10, -10));
-      CameraPosition expectedPosition = new CameraPosition.Builder()
-        .target(new LatLng()).zoom(3.66).tilt(0).bearing(0).build();
-      assertEquals("Latitude should match",
-        expectedPosition.target.getLatitude(), actualPosition.target.getLatitude(), 0.00001f);
-      assertEquals("Longitude should match",
-        expectedPosition.target.getLongitude(), actualPosition.target.getLongitude(), 0.00001f);
-      assertEquals("Bearing should match",
-        expectedPosition.zoom, actualPosition.zoom, 0.01f);
-      assertEquals("Tilt should match", expectedPosition.tilt, actualPosition.tilt, 0.01f);
-    }));
-  }
-
-  @Test
-  public void testGetCameraForLatLngBoundsPadding() {
-    validateTestSetup();
-    onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
-      CameraPosition actualPosition = mapboxMap.getCameraForLatLngBounds(
-        LatLngBounds.from(10, 10, -10, -10), new int[] {5, 5, 5, 5});
-      CameraPosition expectedPosition = new CameraPosition.Builder()
-        .target(new LatLng()).zoom(3.64).tilt(0).bearing(0).build();
-      assertEquals("Latitude should match",
-        expectedPosition.target.getLatitude(), actualPosition.target.getLatitude(), 0.00001f);
-      assertEquals("Longitude should match",
-        expectedPosition.target.getLongitude(), actualPosition.target.getLongitude(), 0.00001f);
-      assertEquals("Zoom should match",
-        expectedPosition.zoom, actualPosition.zoom, 0.01f);
-      assertEquals("Tilt should match",
-        expectedPosition.tilt, actualPosition.tilt, 0.01f);
-      assertEquals("Bearing should match",
-        expectedPosition.bearing, actualPosition.bearing, 0.01f);
-    }));
-  }
-
-  @Test
-  public void testGetCameraForLatLngBoundsBearing() {
-    validateTestSetup();
-    onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
-      CameraPosition actualPosition = mapboxMap.getCameraForLatLngBounds(
-        LatLngBounds.from(10, 10, -10, -10),45, 0);
-      CameraPosition expectedPosition = new CameraPosition.Builder()
-        .target(new LatLng()).zoom(3.15).tilt(0).bearing(45).build();
-      assertEquals("Latitude should match",
-        expectedPosition.target.getLatitude(), actualPosition.target.getLatitude(), 0.00001f);
-      assertEquals("Longitude should match",
-        expectedPosition.target.getLongitude(), actualPosition.target.getLongitude(), 0.00001f);
-      assertEquals("Zoom should match",
-        expectedPosition.zoom, actualPosition.zoom, 0.01f);
-      assertEquals("Tilt should match",
-        expectedPosition.tilt, actualPosition.tilt, 0.01f);
-      assertEquals("Bearing should match",
-        expectedPosition.bearing, actualPosition.bearing, 0.01f);
-    }));
-  }
-
-  @Test
-  public void testGetCameraForLatLngBoundsTilt() {
-    validateTestSetup();
-    onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
-      CameraPosition actualPosition = mapboxMap.getCameraForLatLngBounds(
-        LatLngBounds.from(10, 10, -10, -10), 0, 45);
-      CameraPosition expectedPosition = new CameraPosition.Builder()
-        .target(new LatLng(-0.2423318,0)).zoom(3.62).tilt(45).bearing(0).build();
-      assertEquals("Latitude should match",
-        expectedPosition.target.getLatitude(), actualPosition.target.getLatitude(), 0.00001f);
-      assertEquals("Longitude should match",
-        expectedPosition.target.getLongitude(), actualPosition.target.getLongitude(), 0.00001f);
-      assertEquals("Zoom should match",
-        expectedPosition.zoom, actualPosition.zoom, 0.01f);
-      assertEquals("Tilt should match",
-        expectedPosition.tilt, actualPosition.tilt, 0.01f);
-      assertEquals("Bearing should match",
-        expectedPosition.bearing, actualPosition.bearing, 0.01f);
-    }));
-  }
-
-  @Test
-  public void testGetCameraForLatLngBoundsAll() {
-    validateTestSetup();
-    onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
-      CameraPosition actualPosition = mapboxMap.getCameraForLatLngBounds(
-        LatLngBounds.from(10, 10, -10, -10), new int[]{5,5,5,5}, 45, 45);
-      CameraPosition expectedPosition = new CameraPosition.Builder()
-        .target(new LatLng(-0.3418347,-0.3400988)).zoom(3.13).tilt(45).bearing(45).build();
-      assertEquals("Latitude should match",
-        expectedPosition.target.getLatitude(), actualPosition.target.getLatitude(), 0.00001f);
-      assertEquals("Longitude should match",
-        expectedPosition.target.getLongitude(), actualPosition.target.getLongitude(), 0.00001f);
-      assertEquals("Zoom should match",
-        expectedPosition.zoom, actualPosition.zoom, 0.01f);
-      assertEquals("Tilt should match",
-        expectedPosition.tilt, actualPosition.tilt, 0.01f);
-      assertEquals("Bearing should match",
-        expectedPosition.bearing, actualPosition.bearing, 0.01f);
-    }));
-  }
 
   //
   // MinZoomLevel
