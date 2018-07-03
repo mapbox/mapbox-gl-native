@@ -892,12 +892,16 @@ jobs:
     steps:
       - checkout
       - *install-macos-dependencies
+      - run:
+          name: Install jazzy
+          command: sudo gem install jazzy --no-document
+          background: true
       - *generate-cache-key
       - *restore-cache
       - *reset-ccache-stats
-      - *build-ios-test
-      - *build-ios-integration-test
-      - *check-public-symbols
+      - run:
+          name: Build dynamic framework for device and simulator
+          command: make iframework
       - *show-ccache-stats
       - *save-cache
       - *collect-xcode-build-logs
