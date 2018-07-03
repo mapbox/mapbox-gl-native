@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14269.14" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14269.14"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -129,6 +129,14 @@
                                     <action selector="revertDocumentToSaved:" target="-1" id="iJ3-Pv-kwq"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="VwR-Dd-ah9"/>
+                            <menuItem title="Import…" id="DJk-k8-14Y">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="import:" target="-1" id="1Qm-l8-9Rn"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="w4w-CJ-fv2"/>
                             <menuItem title="Export Image…" id="vjX-0E-kLO">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
@@ -666,7 +674,7 @@ CA
                 </menuItem>
             </items>
         </menu>
-        <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="Preferences" animationBehavior="default" id="UWc-yQ-qda">
+        <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="Preferences" animationBehavior="default" id="UWc-yQ-qda">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="109" y="131" width="350" height="84"/>
@@ -690,7 +698,7 @@ CA
                         <rect key="frame" x="113" y="42" width="197" height="22"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="jlV-TC-NUv">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
@@ -742,7 +750,7 @@ CA
             <point key="canvasLocation" x="754" y="221"/>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="45S-yT-WUN"/>
-        <window title="Offline Packs" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="MBXOfflinePacksPanel" animationBehavior="default" id="Jjv-gs-Tx6" customClass="NSPanel">
+        <window title="Offline Packs" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="MBXOfflinePacksPanel" animationBehavior="default" id="Jjv-gs-Tx6" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="830" y="430" width="400" height="300"/>
@@ -764,7 +772,7 @@ CA
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <tableColumns>
-                                        <tableColumn identifier="" editable="NO" width="16" minWidth="10" maxWidth="3.4028234663852886e+38" id="xtw-hQ-8C5" userLabel="State">
+                                        <tableColumn editable="NO" width="16" minWidth="10" maxWidth="3.4028234663852886e+38" id="xtw-hQ-8C5" userLabel="State">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -776,7 +784,7 @@ CA
                                                 <binding destination="dWe-R6-sRz" name="value" keyPath="arrangedObjects.stateImage" id="2wd-1J-TZt"/>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn identifier="" editable="NO" width="116" minWidth="40" maxWidth="1000" id="2hD-LN-h0L">
+                                        <tableColumn editable="NO" width="116" minWidth="40" maxWidth="1000" id="2hD-LN-h0L">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Name">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -796,7 +804,7 @@ CA
                                                 </binding>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn identifier="" editable="NO" width="50" minWidth="40" maxWidth="1000" id="pkI-c7-xoD">
+                                        <tableColumn editable="NO" width="50" minWidth="40" maxWidth="1000" id="pkI-c7-xoD">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Downloaded Resources">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -813,7 +821,7 @@ CA
                                                 <binding destination="dWe-R6-sRz" name="value" keyPath="arrangedObjects.countOfResourcesCompleted" id="mu6-Jg-GiU"/>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn identifier="" editable="NO" width="50" minWidth="10" maxWidth="3.4028234663852886e+38" id="Rrd-A9-jqc">
+                                        <tableColumn editable="NO" width="50" minWidth="10" maxWidth="3.4028234663852886e+38" id="Rrd-A9-jqc">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Total Resources">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -830,7 +838,7 @@ CA
                                                 <binding destination="dWe-R6-sRz" name="value" keyPath="arrangedObjects.countOfResourcesExpected" id="mh2-k0-vvB"/>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn identifier="" editable="NO" width="50" minWidth="40" maxWidth="1000" id="kCO-Cd-bQt">
+                                        <tableColumn editable="NO" width="50" minWidth="40" maxWidth="1000" id="kCO-Cd-bQt">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Downloaded Tiles">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -851,7 +859,7 @@ CA
                                                 </binding>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn identifier="" editable="NO" width="60" minWidth="10" maxWidth="3.4028234663852886e+38" id="WO5-Ci-HgG">
+                                        <tableColumn editable="NO" width="60" minWidth="10" maxWidth="3.4028234663852886e+38" id="WO5-Ci-HgG">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Downloaded Tiles Size">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -872,7 +880,7 @@ CA
                                                 </binding>
                                             </connections>
                                         </tableColumn>
-                                        <tableColumn identifier="" editable="NO" width="60" minWidth="10" maxWidth="3.4028234663852886e+38" id="h7m-6l-KaS">
+                                        <tableColumn editable="NO" width="60" minWidth="10" maxWidth="3.4028234663852886e+38" id="h7m-6l-KaS">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Downloaded Resources Size">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
