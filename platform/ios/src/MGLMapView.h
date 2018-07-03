@@ -305,7 +305,7 @@ MGL_EXPORT IB_DESIGNABLE
  
  Set the custom location manager before calling `showUserLocation`.
  */
-@property (nonatomic, nullable) id<MGLLocationManager> locationManager;
+@property (nonatomic, null_resettable) id<MGLLocationManager> locationManager;
 
 /**
  A Boolean value indicating whether the map may display the user location.
