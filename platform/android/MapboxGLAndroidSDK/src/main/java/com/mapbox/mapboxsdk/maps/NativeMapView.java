@@ -264,16 +264,19 @@ final class NativeMapView {
     );
   }
 
-  public CameraPosition getCameraForGeometry(Geometry geometry, double bearing, int[] padding) {
+  public CameraPosition getCameraForGeometry(Geometry geometry, int[] padding, double bearing, double tilt) {
     if (checkState("getCameraForGeometry")) {
       return null;
     }
     return nativeGetCameraForGeometry(
-      geometry, bearing,
+      geometry,
       padding[1] / pixelRatio,
       padding[0] / pixelRatio,
       padding[3] / pixelRatio,
-      padding[2] / pixelRatio);
+      padding[2] / pixelRatio,
+      bearing,
+      tilt
+    );
   }
 
   public void resetPosition() {
@@ -949,7 +952,7 @@ final class NativeMapView {
     LatLngBounds latLngBounds, double top, double left, double bottom, double right, double bearing, double tilt);
 
   private native CameraPosition nativeGetCameraForGeometry(
-    Geometry geometry, double bearing, double top, double left, double bottom, double right);
+    Geometry geometry, double top, double left, double bottom, double right, double bearing, double tilt);
 
   private native void nativeResetPosition();
 
