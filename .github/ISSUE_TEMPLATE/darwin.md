@@ -1,10 +1,10 @@
 ---
-name: iOS
-about: Mapbox Maps SDK for iOS
+name: iOS or macOS
+about: Mapbox Maps SDK for iOS or macOS
 
 ---
 <!--
-Hello and thanks for contributing to the Mapbox Maps SDK for iOS! To help us diagnose your problem quickly, please:
+Hello and thanks for contributing to the Mapbox Maps SDKs for iOS and macOS! To help us diagnose your problem quickly, please:
 
  - Include a minimal demonstration of the bug, including code, logs, and screenshots.
  - Ensure you can reproduce the bug using the latest release.
@@ -29,6 +29,6 @@ Start with a brief description below this line. -->
 ### Configuration
 
 **Mapbox SDK versions:** 
-**iOS versions:** 
+**iOS/macOS versions:** 
 **Device/simulator models:**
 **Xcode version:** 
