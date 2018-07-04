@@ -164,7 +164,7 @@ namespace mbgl {
 
 <% switch (property['property-type']) {
     case 'color-ramp': -%>
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::HeatmapColorPropertyValue>(heatmapColor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::ColorRampPropertyValue>(heatmapColor);
 <%     break
     case 'data-driven':
     case 'cross-faded-data-driven': -%>

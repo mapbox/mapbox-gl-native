@@ -2,11 +2,11 @@
 
 #pragma once
 
+#include <mbgl/style/color_ramp_property_value.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
 #include <mbgl/style/data_driven_property_value.hpp>
-#include <mbgl/style/heatmap_color_property_value.hpp>
 
 #include <mbgl/util/color.hpp>
 
@@ -55,9 +55,9 @@ public:
     void setHeatmapIntensityTransition(const TransitionOptions&);
     TransitionOptions getHeatmapIntensityTransition() const;
 
-    static HeatmapColorPropertyValue getDefaultHeatmapColor();
-    HeatmapColorPropertyValue getHeatmapColor() const;
-    void setHeatmapColor(HeatmapColorPropertyValue);
+    static ColorRampPropertyValue getDefaultHeatmapColor();
+    ColorRampPropertyValue getHeatmapColor() const;
+    void setHeatmapColor(ColorRampPropertyValue);
     void setHeatmapColorTransition(const TransitionOptions&);
     TransitionOptions getHeatmapColorTransition() const;
 
