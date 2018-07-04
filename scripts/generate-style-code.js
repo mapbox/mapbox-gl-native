@@ -100,7 +100,7 @@ global.propertyValueType = function (property) {
     case 'cross-faded-data-driven':
       return `DataDrivenPropertyValue<${evaluatedType(property)}>`;
     case 'color-ramp':
-      return `HeatmapColorPropertyValue`;
+      return `ColorRampPropertyValue`;
     default:
       return `PropertyValue<${evaluatedType(property)}>`;
   }
