@@ -1,6 +1,8 @@
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/map/transform.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
+#include <mbgl/util/math.hpp>
 
 #include <algorithm>
 #include <stdlib.h>     /* srand, rand */
@@ -43,6 +45,22 @@ TEST(TileCover, Pitch) {
         { 2, 1, 2 }, { 2, 1, 1 }, { 2, 2, 2 }, { 2, 2, 1 }, { 2, 3, 2 }
     }),
               util::tileCover(transform.getState(), 2));
+
+    // 2 tiles on the left, 1 center tiler, then 2 tiles on the right.
+    constexpr uint32_t maximumLimitedTiles = 5 * 5;
+
+    transform.resize({ 2048, 2048 });
+    transform.setAngle(-45.0 * M_PI / 180.0);
+
+    transform.setPitch(67.5 * M_PI / 180.0);
+    for (double zoom = 0.0; zoom < 16.0; zoom += 0.5) {
+        uint8_t integerZoom = std::floor(zoom);
+        transform.setZoom(zoom);
+        auto fullTiles = util::tileCover(transform.getState(), integerZoom, util::TileCoverMode::Full);
+        auto limitedTiles = util::tileCover(transform.getState(), integerZoom, util::TileCoverMode::Limited5x5);
+        EXPECT_GT(fullTiles.size(), limitedTiles.size());
+        EXPECT_GE(maximumLimitedTiles, limitedTiles.size());
+    }
 }
 
 TEST(TileCover, WorldZ1) {

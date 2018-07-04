@@ -1,6 +1,8 @@
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
+#include <mbgl/util/math.hpp>
+#include <mbgl/map/mode.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/tile_cover_impl.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
@@ -78,13 +80,15 @@ namespace util {
 
 namespace {
 
-std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
-                                       const Point<double>& tr,
-                                       const Point<double>& br,
-                                       const Point<double>& bl,
+std::vector<UnwrappedTileID> tileCover(Point<double> tl,
+                                       Point<double> tr,
+                                       Point<double> br,
+                                       Point<double> bl,
                                        const Point<double>& c,
-                                       uint8_t z) {
-    const int32_t tiles = 1 << z;
+                                       uint8_t z,
+                                       TileCoverMode mode,
+                                       double bearing = 0) {
+    const int32_t maxTilesPerAxis = 1 << z;
 
     struct ID {
         int32_t x, y;
@@ -93,9 +97,38 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
 
     std::vector<ID> t;
 
+    // Rotate the center according to bearing.
+    const Point<double> rotatedCenter = util::rotate(c, bearing);
+
+    // Limits the tile coverage to an axis-aligned rectangle according to the
+    // given bearing.
+    auto limitTileCoordinate = [&](Point<double>& point) {
+        auto clampAxis = [](double a, double b) -> double {
+            const double min = a >= b ? b : b - 2.0;
+            const double max = a >= b ? b + 2.0 : b;
+            return util::clamp(a, min, max);
+        };
+
+        // Rotate the tile coordinate according to bearing.
+        Point<double> rotated = util::rotate(point, bearing);
+        rotated.x = clampAxis(rotated.x, rotatedCenter.x);
+        rotated.y = clampAxis(rotated.y, rotatedCenter.y);
+
+        // After clamping, rotate back to original value.
+        point = util::rotate(rotated, -bearing);
+    };
+
+    // Limit tile coverage in continuous mode.
+    if (mode == TileCoverMode::Limited5x5) {
+        limitTileCoordinate(tl);
+        limitTileCoordinate(tr);
+        limitTileCoordinate(br);
+        limitTileCoordinate(bl);
+    }
+
     auto scanLine = [&](int32_t x0, int32_t x1, int32_t y) {
         int32_t x;
-        if (y >= 0 && y <= tiles) {
+        if (y >= 0 && y <= maxTilesPerAxis) {
             for (x = x0; x < x1; ++x) {
                 const auto dx = x + 0.5 - c.x, dy = y + 0.5 - c.y;
                 t.emplace_back(ID{ x, y, dx * dx + dy * dy });
@@ -107,8 +140,8 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
     // \---+
     // | \ |
     // +---\.
-    scanTriangle(tl, tr, br, 0, tiles, scanLine);
-    scanTriangle(br, bl, tl, 0, tiles, scanLine);
+    scanTriangle(tl, tr, br, 0, maxTilesPerAxis, scanLine);
+    scanTriangle(br, bl, tl, 0, maxTilesPerAxis, scanLine);
 
     // Sort first by distance, then by x/y.
     std::sort(t.begin(), t.end(), [](const ID& a, const ID& b) {
@@ -155,21 +188,23 @@ std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, uint8_t z) {
         Projection::project(bounds.southeast(), z),
         Projection::project(bounds.southwest(), z),
         Projection::project(bounds.center(), z),
-        z);
+        z, TileCoverMode::Full);
 }
 
-std::vector<UnwrappedTileID> tileCover(const TransformState& state, uint8_t z) {
+std::vector<UnwrappedTileID> tileCover(const TransformState& state, uint8_t z, TileCoverMode mode) {
     assert(state.valid());
 
     const double w = state.getSize().width;
     const double h = state.getSize().height;
+
+    // top-left, top-right, bottom-right, bottom-left, center
     return tileCover(
         TileCoordinate::fromScreenCoordinate(state, z, { 0,   0   }).p,
         TileCoordinate::fromScreenCoordinate(state, z, { w,   0   }).p,
         TileCoordinate::fromScreenCoordinate(state, z, { w,   h   }).p,
         TileCoordinate::fromScreenCoordinate(state, z, { 0,   h   }).p,
         TileCoordinate::fromScreenCoordinate(state, z, { w/2, h/2 }).p,
-        z);
+        z, mode, state.getAngle());
 }
 
 std::vector<UnwrappedTileID> tileCover(const Geometry<double>& geometry, uint8_t z) {

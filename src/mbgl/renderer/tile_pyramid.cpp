@@ -121,11 +121,12 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
             }
 
             if (panZoom < idealZoom) {
-                panTiles = util::tileCover(parameters.transformState, panZoom);
+                panTiles = util::tileCover(parameters.transformState, panZoom, util::TileCoverMode::Full);
             }
         }
 
-        idealTiles = util::tileCover(parameters.transformState, idealZoom);
+        idealTiles = util::tileCover(parameters.transformState, idealZoom,
+                panTiles.empty() ? util::TileCoverMode::Full : util::TileCoverMode::Limited5x5);
     }
 
     // Stores a list of all the tiles that we're definitely going to retain. There are two
@@ -187,8 +188,8 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     renderTiles.clear();
 
     if (!panTiles.empty()) {
-        algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn,
-                [](const UnwrappedTileID&, Tile&) {}, panTiles, zoomRange, panZoom);
+        algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn, renderTileFn,
+                                     panTiles, zoomRange, panZoom);
     }
 
     algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn, renderTileFn,

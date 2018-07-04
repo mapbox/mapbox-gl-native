@@ -31,9 +31,15 @@ private:
     std::unique_ptr<Impl> impl;
 };
 
+enum class TileCoverMode : uint32_t {
+    Full,       // Full tile coverage
+    Limited5x5, // Limited tile coverage to a viewport axis-aligned 5x5 matrix
+    // Pyramid  // TODO: Tile pyramid containing multiple tile zoom levels
+};
+
 uint8_t coveringZoomLevel(double z, style::SourceType type, uint16_t tileSize);
 
-std::vector<UnwrappedTileID> tileCover(const TransformState&, uint8_t z);
+std::vector<UnwrappedTileID> tileCover(const TransformState&, uint8_t z, TileCoverMode = TileCoverMode::Full);
 std::vector<UnwrappedTileID> tileCover(const LatLngBounds&, uint8_t z);
 std::vector<UnwrappedTileID> tileCover(const Geometry<double>&, uint8_t z);
 
