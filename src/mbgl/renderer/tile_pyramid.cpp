@@ -133,7 +133,6 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     // use because they're still loading. In addition to that, we also need to retain all tiles that
     // we're actively using, e.g. as a replacement for tile that aren't loaded yet.
     std::set<OverscaledTileID> retain;
-    std::set<UnwrappedTileID> rendered;
 
     auto retainTileFn = [&](Tile& tile, TileNecessity necessity) -> void {
         if (retain.emplace(tile.id).second) {
@@ -181,7 +180,6 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
 
     auto renderTileFn = [&](const UnwrappedTileID& tileID, Tile& tile) {
         renderTiles.emplace_back(tileID, tile);
-        rendered.emplace(tileID);
         previouslyRenderedTiles.erase(tileID); // Still rendering this tile, no need for special fading logic.
         tile.markRenderedIdeal();
     };
@@ -204,7 +202,6 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
             // Don't mark the tile "Required" to avoid triggering a new network request
             retainTileFn(tile, TileNecessity::Optional);
             renderTiles.emplace_back(previouslyRenderedTile.first, tile);
-            rendered.emplace(previouslyRenderedTile.first);
         }
     }
 
