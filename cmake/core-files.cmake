@@ -4,6 +4,8 @@ set(MBGL_CORE_FILES
     # actor
     include/mbgl/actor/actor.hpp
     include/mbgl/actor/actor_ref.hpp
+    include/mbgl/actor/aspiring_actor.hpp
+    include/mbgl/actor/established_actor.hpp
     include/mbgl/actor/mailbox.hpp
     include/mbgl/actor/message.hpp
     include/mbgl/actor/scheduler.hpp
@@ -447,6 +449,8 @@ set(MBGL_CORE_FILES
     include/mbgl/style/expression/check_subtype.hpp
     include/mbgl/style/expression/coalesce.hpp
     include/mbgl/style/expression/coercion.hpp
+    include/mbgl/style/expression/collator.hpp
+    include/mbgl/style/expression/collator_expression.hpp
     include/mbgl/style/expression/compound_expression.hpp
     include/mbgl/style/expression/dsl.hpp
     include/mbgl/style/expression/equals.hpp
@@ -473,6 +477,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/expression/check_subtype.cpp
     src/mbgl/style/expression/coalesce.cpp
     src/mbgl/style/expression/coercion.cpp
+    src/mbgl/style/expression/collator_expression.cpp
     src/mbgl/style/expression/compound_expression.cpp
     src/mbgl/style/expression/dsl.cpp
     src/mbgl/style/expression/equals.cpp
@@ -614,6 +619,8 @@ set(MBGL_CORE_FILES
     src/mbgl/text/glyph_pbf.cpp
     src/mbgl/text/glyph_pbf.hpp
     src/mbgl/text/glyph_range.hpp
+    src/mbgl/text/language_tag.cpp
+    src/mbgl/text/language_tag.hpp
     src/mbgl/text/local_glyph_rasterizer.hpp
     src/mbgl/text/placement.cpp
     src/mbgl/text/placement.hpp

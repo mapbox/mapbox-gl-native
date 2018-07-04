@@ -1,4 +1,6 @@
 #include <mbgl/style/expression/is_constant.hpp>
+#include <mbgl/style/expression/collator_expression.hpp>
+
 
 namespace mbgl {
 namespace style {
@@ -24,6 +26,13 @@ bool isFeatureConstant(const Expression& expression) {
         ) {
             return false;
         }
+    }
+    
+    if (dynamic_cast<const CollatorExpression*>(&expression)) {
+        // Although the results of a Collator expression with fixed arguments
+        // generally shouldn't change between executions, we can't serialize them
+        // as constant expressions because results change based on environment.
+        return false;
     }
 
     bool featureConstant = true;

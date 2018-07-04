@@ -102,6 +102,7 @@ const ExpressionRegistry& getExpressionRegistry() {
         {"boolean", Assertion::parse},
         {"case", Case::parse},
         {"coalesce", Coalesce::parse},
+        {"collator", CollatorExpression::parse},
         {"interpolate", parseInterpolate},
         {"length", Length::parse},
         {"let", Let::parse},

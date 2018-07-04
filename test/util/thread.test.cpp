@@ -15,11 +15,11 @@ class TestObject {
 public:
     TestObject(ActorRef<TestObject>, std::thread::id otherTid)
         : tid(std::this_thread::get_id()) {
-        EXPECT_NE(tid, otherTid);
+        EXPECT_NE(tid, otherTid); // Object is created on child thread
     }
 
     ~TestObject() {
-        EXPECT_EQ(tid, std::this_thread::get_id());
+        EXPECT_EQ(tid, std::this_thread::get_id()); // Object is destroyed on child thread
     }
 
     void fn1(int val) const {
@@ -274,4 +274,61 @@ TEST(Thread, PauseResume) {
 
     thread.actor().invoke(&TestWorker::send, [&] { loop.stop(); });
     loop.run();
+}
+
+
+class TestWorkerDelayedConstruction {
+public:
+    TestWorkerDelayedConstruction(ActorRef<TestWorkerDelayedConstruction>, std::future<void> start) {
+        start.get();
+    }
+
+    void send(std::function<void ()> cb) {
+        cb();
+    }
+
+private:
+    Timer timer;
+};
+
+TEST(Thread, InvokeBeforeChildStarts) {
+    RunLoop loop;
+
+    std::promise<void> start;
+    Thread<TestWorkerDelayedConstruction> thread("Test", start.get_future());
+    
+    std::atomic<int> count { 0 };
+    
+    for (unsigned i = 0; i < 100; ++i) {
+        thread.actor().invoke(&TestWorkerDelayedConstruction::send, [&] { ++count; });
+    }
+
+    thread.actor().invoke(&TestWorkerDelayedConstruction::send, [&] { loop.stop(); });
+
+    // This test will be flaky if messages are consumed before the target object is constructed.
+    ASSERT_EQ(count, 0);
+
+    start.set_value();
+    
+    loop.run();
+
+    ASSERT_EQ(count, 100);
+}
+
+TEST(Thread, DeleteBeforeChildStarts) {
+    std::atomic_bool flag(false);
+    std::promise<void> start;
+
+    Thread<TestWorker> control("Control");
+    auto thread = std::make_unique<Thread<TestWorkerDelayedConstruction>>("Test", start.get_future());
+    
+    thread->actor().invoke(&TestWorkerDelayedConstruction::send, [&] { flag = true; });
+
+    control.actor().invoke(&TestWorker::sendDelayed, [&] { start.set_value(); });
+
+    // Should not hang.
+    thread.reset();
+
+    // Should process the queue before destruction.
+    ASSERT_TRUE(flag);
 }

@@ -1,5 +1,6 @@
 add_definitions(-DMBGL_USE_GLES2=1)
 include(cmake/test-files.cmake)
+include(cmake/nunicode.cmake)
 
 # Build thin archives.
 set(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> cruT <TARGET> <LINK_FLAGS> <OBJECTS>")
@@ -21,7 +22,6 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--gc-sections -Wl,--ve
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--gc-sections -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/version-script")
 
 mason_use(jni.hpp VERSION 3.0.0 HEADER_ONLY)
-mason_use(nunicode VERSION 1.7.1)
 mason_use(sqlite VERSION 3.14.2)
 mason_use(gtest VERSION 1.8.0)
 mason_use(icu VERSION 58.1-min-size)
@@ -37,13 +37,17 @@ macro(mbgl_platform_core)
         PRIVATE platform/android/src/timer.cpp
 
         # Misc
-        PRIVATE platform/android/src/text/local_glyph_rasterizer_jni.hpp
+        PRIVATE platform/android/src/text/collator.cpp
+        PRIVATE platform/android/src/text/collator_jni.hpp
         PRIVATE platform/android/src/text/local_glyph_rasterizer.cpp
+        PRIVATE platform/android/src/text/local_glyph_rasterizer_jni.hpp
         PRIVATE platform/android/src/logging_android.cpp
         PRIVATE platform/android/src/thread.cpp
         PRIVATE platform/default/string_stdlib.cpp
         PRIVATE platform/default/bidi.cpp
         PRIVATE platform/default/thread_local.cpp
+        PRIVATE platform/default/unaccent.cpp
+        PRIVATE platform/default/unaccent.hpp
         PRIVATE platform/default/utf.cpp
 
         # Image handling
@@ -81,13 +85,13 @@ macro(mbgl_platform_core)
         PRIVATE platform/android
     )
 
-    target_add_mason_package(mbgl-core PUBLIC nunicode)
     target_add_mason_package(mbgl-core PUBLIC geojson)
     target_add_mason_package(mbgl-core PUBLIC jni.hpp)
     target_add_mason_package(mbgl-core PUBLIC rapidjson)
     target_add_mason_package(mbgl-core PRIVATE icu)
 
     target_link_libraries(mbgl-core
+        PRIVATE nunicode
         PUBLIC -llog
         PUBLIC -landroid
         PUBLIC -ljnigraphics

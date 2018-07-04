@@ -640,7 +640,7 @@ void GLFWView::toggle3DExtrusions(bool visible) {
     extrusionLayer->setMinZoom(15.0f);
     extrusionLayer->setFilter(Filter(eq(get("extrude"), literal("true"))));
     extrusionLayer->setFillExtrusionColor(SourceFunction<mbgl::Color>(
-        interpolate(linear(), get("height"),
+        interpolate(linear(), number(get("height")),
                     0.f, toColor("#160e23"),
                     50.f, toColor("#00615f"),
                     100.f, toColor("#55e9ff"))));

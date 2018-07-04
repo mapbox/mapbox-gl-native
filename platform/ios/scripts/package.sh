@@ -8,6 +8,7 @@ NAME=Mapbox
 OUTPUT=build/ios/pkg
 DERIVED_DATA=build/ios
 PRODUCTS=${DERIVED_DATA}
+LOG_PATH=build/xcodebuild-$(date +"%Y-%m-%d_%H%M%S").log
 
 BUILDTYPE=${BUILDTYPE:-Debug}
 BUILD_FOR_DEVICE=${BUILD_DEVICE:-true}
@@ -76,7 +77,7 @@ xcodebuild \
     -scheme ${SCHEME} \
     -configuration ${BUILDTYPE} \
     -sdk iphonesimulator \
-    -jobs ${JOBS} | xcpretty
+    -jobs ${JOBS} | tee ${LOG_PATH} | xcpretty
 
 if [[ ${BUILD_FOR_DEVICE} == true ]]; then
     step "Building for iOS devices using scheme ${SCHEME}"
@@ -91,7 +92,7 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
         -scheme ${SCHEME} \
         -configuration ${BUILDTYPE} \
         -sdk iphoneos \
-        -jobs ${JOBS} | xcpretty
+        -jobs ${JOBS} | tee ${LOG_PATH} | xcpretty
 fi
 
 LIBS=(Mapbox.a)
@@ -246,23 +247,6 @@ fi
 if [[ ${BUILD_DYNAMIC} == true && ${BUILD_FOR_DEVICE} == true ]]; then
     step "Copying bitcode symbol maps…"
     find "${PRODUCTS}/${BUILDTYPE}-iphoneos" -name '*.bcsymbolmap' -type f -exec cp -pv {} "${OUTPUT}/dynamic/" \;
-
-    step "Copying demo project and sym linking to published framework…"
-    cp -rv platform/ios/scripts/script_resources/MapboxDemo "${OUTPUT}"
-    cd "${OUTPUT}/MapboxDemo"
-    ln -sv "../dynamic/${NAME}.framework"
-    cd -
-
-    step "Building demo project…"
-    xcodebuild -quiet -project build/ios/pkg/MapboxDemo/MapboxDemo.xcodeproj -scheme MapboxDemo build ONLY_ACTIVE_ARCH=YES -destination 'platform=iOS Simulator,name=iPhone 7' clean build &> /tmp/iosdemobuildoutput || true
-    if grep -Fxq "** BUILD FAILED **" /tmp/iosdemobuildoutput
-    then
-        echo "Could not build demo project with this version of the SDK."
-        rm -rf "${OUTPUT}/MapboxDemo"
-    else
-        echo "Built and packaged demo project."
-    fi
-    rm /tmp/iosdemobuildoutput
 fi
 sed -n -e '/^## /,$p' platform/ios/CHANGELOG.md > "${OUTPUT}/CHANGELOG.md"
 
