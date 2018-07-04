@@ -265,7 +265,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
                 double easing = bearing - routeMap->getBearing();
                 easing += easing > 180.0 ? -360.0 : easing < -180 ? 360.0 : 0;
                 routeMap->setBearing(routeMap->getBearing() + (easing / 20));
-                routeMap->setPitch(60.0);
+                routeMap->setPitch(67.5);
                 routeMap->setZoom(18.0);
             };
             view->animateRouteCallback(view->map);

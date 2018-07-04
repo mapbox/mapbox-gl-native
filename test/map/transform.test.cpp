@@ -599,7 +599,7 @@ TEST(Transform, PitchBounds) {
 
     ASSERT_DOUBLE_EQ(transform.getState().getPitch() * util::RAD2DEG, 0.0);
     ASSERT_DOUBLE_EQ(transform.getState().getMinPitch() * util::RAD2DEG, 0.0);
-    ASSERT_DOUBLE_EQ(transform.getState().getMaxPitch() * util::RAD2DEG, 60.0);
+    ASSERT_NEAR(transform.getState().getMaxPitch() * util::RAD2DEG, 67.5, 1e-5);
 
     transform.setMinPitch(45.0 * util::DEG2RAD);
     transform.setPitch(0.0 * util::DEG2RAD);
