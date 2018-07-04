@@ -7,10 +7,9 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
+import com.mapbox.mapboxsdk.testapp.activity.espresso.DeviceIndependentTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.TestConstants;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
@@ -20,11 +19,10 @@ public class CameraEaseTest extends BaseActivityTest {
 
   @Override
   protected Class getActivityClass() {
-    return EspressoTestActivity.class;
+    return DeviceIndependentTestActivity.class;
   }
 
   @Test
-  @Ignore
   public void testEaseToCameraPositionTarget() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -45,7 +43,6 @@ public class CameraEaseTest extends BaseActivityTest {
   }
 
   @Test
-  @Ignore
   public void testEaseToCameraPositionTargetZoom() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -63,7 +60,6 @@ public class CameraEaseTest extends BaseActivityTest {
   }
 
   @Test
-  @Ignore
   public void testEaseToCameraPosition() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -93,7 +89,6 @@ public class CameraEaseTest extends BaseActivityTest {
   }
 
   @Test
-  @Ignore
   public void testEaseToBounds() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -118,7 +113,6 @@ public class CameraEaseTest extends BaseActivityTest {
   }
 
   @Test
-  @Ignore
   public void testEaseToMoveBy() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -137,7 +131,6 @@ public class CameraEaseTest extends BaseActivityTest {
   }
 
   @Test
-  @Ignore
   public void testEaseToZoomIn() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -151,7 +144,6 @@ public class CameraEaseTest extends BaseActivityTest {
   }
 
   @Test
-  @Ignore
   public void testEaseToZoomOut() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -167,7 +159,6 @@ public class CameraEaseTest extends BaseActivityTest {
   }
 
   @Test
-  @Ignore
   public void testEaseToZoomBy() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -182,7 +173,6 @@ public class CameraEaseTest extends BaseActivityTest {
   }
 
   @Test
-  @Ignore
   public void testEaseToZoomTo() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {

@@ -789,6 +789,9 @@
             android:name=".activity.espresso.EspressoTestActivity"
             android:screenOrientation="portrait" />
         <activity
+                android:name=".activity.espresso.DeviceIndependentTestActivity"
+                android:screenOrientation="portrait" />
+        <activity
             android:name=".activity.style.FillExtrusionStyleTestActivity"
             android:screenOrientation="portrait" />
         <activity

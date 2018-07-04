@@ -1568,7 +1568,7 @@ public final class MapboxMap {
 
 
   /**
-   * Get a camera position that fits a provided bounds and the current camera tilt.
+   * Get a camera position that fits a provided bounds and the current camera tilt and bearing.
    *
    * @param latLngBounds the bounds to set the map with
    * @return the camera position that fits the bounds
@@ -1581,7 +1581,7 @@ public final class MapboxMap {
 
 
   /**
-   * Get a camera position that fits a provided bounds and padding and the current camera tilt.
+   * Get a camera position that fits a provided bounds and padding and the current camera tilt and bearing.
    *
    * @param latLngBounds the bounds to set the map with
    * @param padding      the padding to apply to the bounds
@@ -1596,12 +1596,12 @@ public final class MapboxMap {
 
 
   /**
-   * Get a camera position that fits a provided bounds, padding and tilt.
+   * Get a camera position that fits a provided bounds, bearing and tilt.
    *
    * @param latLngBounds the bounds to set the map with
    * @param bearing      the bearing to transform the camera position with
    * @param tilt         to transform the camera position with
-   * @return the camera position that fits the bounds and padding
+   * @return the camera position that fits the bounds and given bearing and tilt
    */
   @NonNull
   public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
@@ -1614,13 +1614,13 @@ public final class MapboxMap {
 
 
   /**
-   * Get a camera position that fits a provided bounds, padding and tilt.
+   * Get a camera position that fits a provided bounds, padding, bearing and tilt.
    *
    * @param latLngBounds the bounds to set the map with
    * @param padding      the padding to apply to the bounds
    * @param bearing      the bearing to transform the camera position with
    * @param tilt         to transform the camera position with
-   * @return the camera position that fits the bounds and padding
+   * @return the camera position that fits the bounds, bearing and tilt
    */
   @NonNull
   public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
@@ -1633,10 +1633,10 @@ public final class MapboxMap {
   }
 
   /**
-   * Get a camera position that fits a provided shape with a given bearing and padding.
+   * Get a camera position that fits a provided shape.
    *
-   * @param geometry the geometry to constrain the map with
-   * @return the camera position that fits the bounds and padding
+   * @param geometry the geometry to wraps the map with
+   * @return the camera position that fits the geometry inside
    */
   @NonNull
   public CameraPosition getCameraForGeometry(@NonNull Geometry geometry) {
@@ -1645,11 +1645,11 @@ public final class MapboxMap {
   }
 
   /**
-   * Get a camera position that fits a provided shape with a given bearing and padding.
+   * Get a camera position that fits a provided shape and padding.
    *
-   * @param geometry the geometry to constrain the map with
+   * @param geometry the geometry to wraps the map with
    * @param padding  the padding to apply to the bounds
-   * @return the camera position that fits the bounds and padding
+   * @return the camera position that fits the geometry inside and padding
    */
   @NonNull
   public CameraPosition getCameraForGeometry(@NonNull Geometry geometry,
@@ -1659,12 +1659,12 @@ public final class MapboxMap {
   }
 
   /**
-   * Get a camera position that fits a provided shape with a given bearing and padding.
+   * Get a camera position that fits a provided shape with a given bearing and tilt.
    *
-   * @param geometry the geometry to constrain the map with
+   * @param geometry the geometry to wraps the map with
    * @param bearing  the bearing at which to compute the geometry's bounds
    * @param tilt     the tilt at which to compute the geometry's bounds
-   * @return the camera position that fits the bounds and padding
+   * @return the camera position that the geometry inside with bearing and tilt
    */
   @NonNull
   public CameraPosition getCameraForGeometry(@NonNull Geometry geometry,
@@ -1676,13 +1676,13 @@ public final class MapboxMap {
   }
 
   /**
-   * Get a camera position that fits a provided shape with a given bearing and padding.
+   * Get a camera position that fits a provided shape with a given padding, bearing and tilt.
    *
-   * @param geometry the geometry to constrain the map with
+   * @param geometry the geometry to wraps the map with
    * @param padding  the padding to apply to the bounds
    * @param bearing  the bearing at which to compute the geometry's bounds
    * @param tilt     the tilt at which to compute the geometry's bounds
-   * @return the camera position that fits the bounds and padding
+   * @return the camera position that fits the geometry inside with padding, bearing and tilt
    */
   @NonNull
   public CameraPosition getCameraForGeometry(@NonNull Geometry geometry,
@@ -1697,10 +1697,10 @@ public final class MapboxMap {
   /**
    * Get a camera position that fits a provided shape with a given bearing and padding.
    *
-   * @param geometry the geometry to constrain the map with
+   * @param geometry the geometry to wraps the map with
    * @param bearing  the bearing at which to compute the geometry's bounds
    * @param padding  the padding to apply to the bounds
-   * @return the camera position that fits the bounds and padding
+   * @return the camera position that fits the geometry inside with padding and bearing
    * @deprecated use Mapbox{@link #getCameraForGeometry(Geometry, int[], double, double)} instead
    */
   @NonNull

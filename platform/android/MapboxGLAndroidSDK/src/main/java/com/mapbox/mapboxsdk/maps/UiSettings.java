@@ -42,7 +42,7 @@ public final class UiSettings {
   private final View logoView;
   private final int[] logoMargins = new int[4];
 
-  private float pixelRatio;
+  private final float pixelRatio;
 
   private boolean rotateGesturesEnabled = true;
 
@@ -68,15 +68,14 @@ public final class UiSettings {
   private PointF userProvidedFocalPoint;
 
   UiSettings(@NonNull Projection projection, @NonNull FocalPointChangeListener listener,
-             @NonNull CompassView compassView, @NonNull ImageView attributionsView, @NonNull View logoView) {
+             @NonNull CompassView compassView, @NonNull ImageView attributionsView, @NonNull View logoView,
+             float pixelRatio) {
     this.projection = projection;
     this.focalPointChangeListener = listener;
     this.compassView = compassView;
     this.attributionsView = attributionsView;
     this.logoView = logoView;
-    if (logoView.getResources() != null) {
-      this.pixelRatio = logoView.getResources().getDisplayMetrics().density;
-    }
+    this.pixelRatio = pixelRatio;
   }
 
   void initialise(@NonNull Context context, @NonNull MapboxMapOptions options) {

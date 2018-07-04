@@ -42,7 +42,7 @@ public class UiSettingsTest {
 
   @Before
   public void beforeTest() {
-    uiSettings = new UiSettings(projection, focalPointChangeListener, compassView, imageView, logoView);
+    uiSettings = new UiSettings(projection, focalPointChangeListener, compassView, imageView, logoView, 1);
   }
 
   @Test
