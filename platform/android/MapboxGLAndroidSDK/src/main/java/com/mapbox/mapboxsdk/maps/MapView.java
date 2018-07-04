@@ -310,15 +310,19 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       addView(glSurfaceView, 0);
     }
 
-    nativeMapView = new NativeMapView(getContext(), this, mapRenderer);
-    nativeMapView.addOnMapChangedListener(new OnMapChangedListener() {
-      @Override
-      public void onMapChanged(int change) {
-        // dispatch events to external listeners
-        if (!onMapChangedListeners.isEmpty()) {
-          for (OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
-            onMapChangedListener.onMapChanged(change);
-          }
+    // check is user defined his own pixel ratio value
+    float pixelRatio = mapboxMapOptions.getPixelRatio();
+    if (pixelRatio == 0) {
+      // if not, get the one defined by the system
+      pixelRatio = getResources().getDisplayMetrics().density;
+    }
+
+    nativeMapView = new NativeMapView(getContext(), pixelRatio, this, mapRenderer);
+    nativeMapView.addOnMapChangedListener(change -> {
+      // dispatch events to external listeners
+      if (!onMapChangedListeners.isEmpty()) {
+        for (OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
+          onMapChangedListener.onMapChanged(change);
         }
       }
     });
