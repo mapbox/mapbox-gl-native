@@ -140,10 +140,18 @@
             [NSException raise:NSInvalidArgumentException
                         format:@"NSPredicateOperatorType:%lu is not supported.", (unsigned long)self.predicateOperatorType];
     }
-    if (op) {
-        return @[op, self.leftExpression.mgl_jsonExpressionObject, self.rightExpression.mgl_jsonExpressionObject];
+    if (!op) {
+        return nil;
     }
-    return nil;
+    NSArray *comparisonArray = @[op, self.leftExpression.mgl_jsonExpressionObject, self.rightExpression.mgl_jsonExpressionObject];
+    if (self.options) {
+        NSDictionary *collatorObject = @{
+            @"case-sensitive": @(!(self.options & NSCaseInsensitivePredicateOption)),
+            @"diacritic-sensitive": @(!(self.options & NSDiacriticInsensitivePredicateOption)),
+        };
+        return [comparisonArray arrayByAddingObject:@[@"collator", collatorObject]];
+    }
+    return comparisonArray;
 }
 
 @end
