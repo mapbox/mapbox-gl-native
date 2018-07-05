@@ -2,12 +2,6 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-# master
-
-* Added `-[MGLMapView camera:fittingShape:edgePadding:]` and `-[MGLMapView camera:fittingCoordinateBounds:edgePadding:]` allowing you specify the pitch and direction for the calculated camera. ([#12213](https://github.com/mapbox/mapbox-gl-native/pull/12213))
-* `-[MGLStyle localizeLabelsIntoLocale:]` and `-[NSExpression mgl_expressionLocalizedIntoLocale:]` can automatically localize labels into Japanese or Korean based on the system’s language settings. ([#12286](https://github.com/mapbox/mapbox-gl-native/pull/12286))
-* Remove unnecessary memory use when collision debug mode is not enabled ([#12294](https://github.com/mapbox/mapbox-gl-native/issues/12294))
-
 ## 4.2.0
 
 ### Packaging
@@ -17,14 +11,18 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Styles and rendering
 
 * Added an `MGLRasterStyleLayer.rasterResamplingMode` property for configuring how raster style layers are overscaled. ([#12176](https://github.com/mapbox/mapbox-gl-native/pull/12176))
+* `-[MGLStyle localizeLabelsIntoLocale:]` and `-[NSExpression mgl_expressionLocalizedIntoLocale:]` can automatically localize labels into Japanese or Korean based on the system’s language settings. ([#12286](https://github.com/mapbox/mapbox-gl-native/pull/12286))
+* Fixed a crash when trying to parse expressions containing legacy filters. ([#12263](https://github.com/mapbox/mapbox-gl-native/pull/12263))
 
 ### Networking and storage
 
 * Improved caching performance. ([#12072](https://github.com/mapbox/mapbox-gl-native/pull/12072))
 
-### Other changes 
+### Other changes
 
+* Added `-[MGLMapView camera:fittingShape:edgePadding:]` and `-[MGLMapView camera:fittingCoordinateBounds:edgePadding:]` allowing you specify the pitch and direction for the calculated camera. ([#12213](https://github.com/mapbox/mapbox-gl-native/pull/12213))
 * Added `-[MGLMapSnapshot coordinateForPoint:]` that returns a map coordinate for a specified snapshot image point. ([#12221](https://github.com/mapbox/mapbox-gl-native/pull/12221))
+* Reduced memory usage when collision debug mode is disabled. ([#12294](https://github.com/mapbox/mapbox-gl-native/issues/12294))
 
 ## 4.0.3 - June 22, 2018
 
