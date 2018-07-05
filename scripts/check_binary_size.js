@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const github = require('@octokit/rest')();
 const prettyBytes = require('pretty-bytes');
 const fs = require('fs');
-const {execSync} = require('child_process');
 
 const SIZE_CHECK_APP_ID = 14028;
 const SIZE_CHECK_APP_INSTALLATION_ID = 229425;
@@ -30,32 +29,16 @@ const token = jwt.sign(payload, key, {algorithm: 'RS256'});
 github.authenticate({type: 'app', token});
 
 function getPriorSize() {
-    const pr = process.env['CIRCLE_PULL_REQUEST'];
-    if (!pr) {
-        console.log('No pull request available.');
+    const mergeBase = process.env['CIRCLE_MERGE_BASE'];
+    if (!mergeBase) {
+        console.log('No merge base available.');
         return Promise.resolve(null);
     }
 
-    const number = +pr.match(/\/(\d+)\/?$/)[1];
-    console.log(`Pull request ${number}.`);
-
-    return github.pullRequests.get({
+    return github.checks.listForRef({
         owner: 'mapbox',
         repo: 'mapbox-gl-native',
-        number
-    }).then(({data}) => {
-        const head = process.env['CIRCLE_SHA1'];
-        const base = data.base.sha;
-        console.log(`Pull request target is ${base}.`);
-
-        const mergeBase = execSync(`git merge-base ${base} ${head}`).toString().trim();
-        console.log(`Merge base is ${mergeBase}.`);
-
-        return github.checks.listForRef({
-            owner: 'mapbox',
-            repo: 'mapbox-gl-native',
-            ref: mergeBase
-        });
+        ref: mergeBase
     }).then(({data}) => {
         const run = data.check_runs.find(run => run.name === name);
         if (!run) {
