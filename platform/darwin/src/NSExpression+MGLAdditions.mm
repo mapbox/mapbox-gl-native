@@ -1358,11 +1358,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     for (NSUInteger index = minimumIndex; index < arguments.count; index++) {
         NSArray *argumentObject = arguments[index].mgl_jsonExpressionObject;
         // match operators with arrays as matching values should not parse arrays using the literal operator.
-        if (index > 0 && index < arguments.count - 1 && !(index % 2 == 0)
-            && (arguments[index].expressionType == NSAggregateExpressionType ||
-                (arguments[index].expressionType == NSConstantValueExpressionType && [arguments[index].constantValue isKindOfClass:[NSArray class]]))) {
-            
-            argumentObject = argumentObject.count == 2 ? argumentObject[1] : argumentObject;
+        if (index > 0 && index < arguments.count - 1 && !(index % 2 == 0)) {
+            NSExpression *expression = arguments[index];
+            if (![expression isKindOfClass:[NSExpression class]]) {
+                expression = [NSExpression expressionForConstantValue:expression];
+            }
+            if (expression.expressionType == NSAggregateExpressionType ||
+                (expression.expressionType == NSConstantValueExpressionType && [expression.constantValue isKindOfClass:[NSArray class]])) {
+                argumentObject = argumentObject.count == 2 ? argumentObject[1] : argumentObject;
+            }
         }
         [expressionObject addObject:argumentObject];
     }
