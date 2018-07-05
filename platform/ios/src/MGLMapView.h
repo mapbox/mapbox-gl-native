@@ -417,6 +417,17 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, assign) BOOL displayHeadingCalibration;
 
 /**
+ A Boolean value indicating whether extrusions for buildings are diaplayed.
+ 
+ Setting this property to `YES` causes the map to display buildings extrusions
+ for buildings which `extrusion` property is set to `true` and `height` has a
+ greater value than cero.
+ 
+ The default value of this property is `NO`.
+ */
+@property (nonatomic, assign) BOOL showsBuildings;
+
+/**
  The geographic coordinate that is the subject of observation as the user
  location is being tracked.
 

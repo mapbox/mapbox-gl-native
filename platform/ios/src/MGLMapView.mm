@@ -2343,6 +2343,47 @@ public:
     }
 }
 
+- (void)setShowsBuildings:(BOOL)showsBuildings
+{
+    if  (_showsBuildings == showsBuildings) return;
+    
+    NSString *layerIdentifier = @"extrudedBuildings";
+    if (showsBuildings) {
+        MGLSource* source = [self.style sourceWithIdentifier:@"composite"];
+        if (source) {
+            
+            MGLFillExtrusionStyleLayer* layer = [[MGLFillExtrusionStyleLayer alloc] initWithIdentifier:layerIdentifier source:source];
+            layer.sourceLayerIdentifier = @"building";
+            layer.predicate = [NSPredicate predicateWithFormat:@"extrude == 'true' AND CAST(height, 'NSNumber') > 0"];
+            layer.fillExtrusionBase = [NSExpression expressionForKeyPath:@"min_height"];
+            layer.fillExtrusionHeight = [NSExpression expressionForKeyPath:@"height"];
+            
+            // Set the fill color to that of the existing building footprint layer, if it exists.
+            MGLFillStyleLayer* buildingLayer = (MGLFillStyleLayer*)[self.style layerWithIdentifier:@"building"];
+            if (buildingLayer) {
+                if (buildingLayer.fillColor) {
+                    layer.fillExtrusionColor = buildingLayer.fillColor;
+                } else {
+                    layer.fillExtrusionColor = [NSExpression expressionForConstantValue:[UIColor whiteColor]];
+                }
+                
+                layer.fillExtrusionOpacity = [NSExpression expressionForConstantValue:@0.75];
+            }
+            
+            MGLStyleLayer* labelLayer = [self.style layerWithIdentifier:@"waterway-label"];
+            if (labelLayer) {
+                [self.style insertLayer:layer belowLayer:labelLayer];
+            } else {
+                [self.style addLayer:layer];
+            }
+        }
+    } else {
+        MGLStyleLayer *layer = [self.style layerWithIdentifier:layerIdentifier];
+        if (layer) [self.style removeLayer:layer];
+    }
+    _showsBuildings = showsBuildings;
+}
+
 #pragma mark - Accessibility -
 
 - (NSString *)accessibilityValue
@@ -5644,6 +5685,11 @@ public:
     if ([self.delegate respondsToSelector:@selector(mapView:didFinishLoadingStyle:)])
     {
         [self.delegate mapView:self didFinishLoadingStyle:self.style];
+    }
+    
+    if (_showsBuildings) {
+        _showsBuildings = NO; // Forces an update.
+        self.showsBuildings = YES;
     }
 }
 
