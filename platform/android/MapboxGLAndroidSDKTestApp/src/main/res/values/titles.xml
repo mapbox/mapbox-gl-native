@@ -69,4 +69,5 @@
     <string name="activity_hillshade">Hillshade</string>
     <string name="activity_heatmaplayer">Heatmap layer</string>
     <string name="activity_gesture_detector">Gestures detector</string>
+    <string name="activity_draggable_maker">Draggable marker</string>
 </resources>
