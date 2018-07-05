@@ -59,11 +59,29 @@ workflows:
       - ios-release
 
 step-library:
+  - &npm-install
+      run:
+        name: npm install
+        command: npm install --ignore-scripts
+  - &prepare-environment
+      run:
+        name: Prepare environment
+        command: touch "$BASH_ENV" && ./scripts/environment.js | tee -a "$BASH_ENV"
   - &prepare-ccache
       run:
         name: Prepare ccache
         command: |
-          echo "$(date +"%Y-%V")" > .circle-week
+          # CircleCI doesn't have any way to embed arbitrary environment variables or command output
+          # into cache keys, so we're using the workaround of writing the desired content to a file,
+          # and then using `{{ checksum "filename" }}` in the cache key.
+          echo "$CIRCLE_BRANCH"
+          echo "$CIRCLE_BRANCH" > .circle-branch
+          echo "$CIRCLE_SHA1"
+          echo "$CIRCLE_SHA1" > .circle-sha1
+          echo "$CIRCLE_TARGET_BRANCH"
+          echo "${CIRCLE_TARGET_BRANCH:master}" > .circle-target-branch
+          echo "$CIRCLE_MERGE_BASE"
+          echo "${CIRCLE_MERGE_BASE:master}" > .circle-merge-base
           ccache --clear
           ccache --max-size=5G
   - &reset-ccache-stats
@@ -103,14 +121,17 @@ step-library:
   - &save-ccache
       save_cache:
         name: Save ccache
-        key: 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ .Branch }}/{{ checksum ".circle-week" }}'
-        paths: [ "/root/.ccache" ]
+        key: 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-branch" }}/{{ checksum ".circle-sha1" }}'
+        paths: [ "~/.ccache" ]
   - &restore-ccache
       restore_cache:
         name: Restore ccache
         keys:
-          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ .Branch }}/{{ checksum ".circle-week" }}'
-          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/master/{{ checksum ".circle-week" }}'
+          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-branch" }}/{{ checksum ".circle-sha1" }}'
+          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-branch" }}'
+          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-target-branch" }}/{{ checksum ".circle-merge-base" }}'
+          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-target-branch" }}'
+          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}'
   - &save-gradle-cache
       save_cache:
         name: Save gradle cache
@@ -276,12 +297,11 @@ jobs:
     steps:
       - checkout
       - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - run:
           name: Initialize submodule
           command: git submodule update --init mapbox-gl-js
-      - run:
-          name: npm install
-          command: npm install --ignore-scripts
       - run:
           name: Verify submodule pin
           command: scripts/nitpick/submodule-pin.js
@@ -315,8 +335,10 @@ jobs:
       BUILDTYPE: Debug
     steps:
       - checkout
-      - *prepare-ccache
       - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -346,8 +368,10 @@ jobs:
       IS_LOCAL_DEVELOPMENT: false
     steps:
       - checkout
-      - *prepare-ccache
       - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *restore-gradle-cache
@@ -423,8 +447,10 @@ jobs:
       IS_LOCAL_DEVELOPMENT: false
     steps:
       - checkout
-      - *prepare-ccache
       - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *restore-gradle-cache
@@ -482,8 +508,10 @@ jobs:
       WITH_CXX11ABI: 0
     steps:
       - checkout
-      - *prepare-ccache
       - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -509,8 +537,10 @@ jobs:
       WITH_EGL: 1
     steps:
       - checkout
-      - *prepare-ccache
       - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -532,10 +562,12 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
       - *install-node-macos-dependencies
       - *prepare-ccache
-      - *restore-node_modules-cache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -563,8 +595,10 @@ jobs:
       WITH_CXX11ABI: 1
     steps:
       - checkout
-      - *prepare-ccache
       - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -590,8 +624,10 @@ jobs:
       ASAN_OPTIONS: detect_leaks=0:color=always:print_summary=1
     steps:
       - checkout
-      - *prepare-ccache
       - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -624,8 +660,10 @@ jobs:
       UBSAN_OPTIONS: print_stacktrace=1:color=always:print_summary=1
     steps:
       - checkout
-      - *prepare-ccache
       - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -658,8 +696,10 @@ jobs:
       TSAN_OPTIONS: color=always:print_summary=1
     steps:
       - checkout
-      - *prepare-ccache
       - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -691,8 +731,10 @@ jobs:
       DISPLAY: :0
     steps:
       - checkout
-      - *prepare-ccache
       - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -719,8 +761,10 @@ jobs:
       WITH_COVERAGE: 1
     steps:
       - checkout
-      - *prepare-ccache
       - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -746,9 +790,11 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
       - *prepare-ccache
-      - *restore-node_modules-cache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -777,9 +823,11 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
       - *prepare-ccache
-      - *restore-node_modules-cache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -802,9 +850,11 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
       - *prepare-ccache
-      - *restore-node_modules-cache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -827,9 +877,11 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
       - *prepare-ccache
-      - *restore-node_modules-cache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -852,10 +904,12 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
       - *install-ios-packaging-dependencies
       - *prepare-ccache
-      - *restore-node_modules-cache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -887,10 +941,12 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
       - *install-ios-packaging-dependencies
       - *prepare-ccache
-      - *restore-node_modules-cache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -916,9 +972,11 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
       - *prepare-ccache
-      - *restore-node_modules-cache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -954,8 +1012,10 @@ jobs:
       LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
     steps:
       - checkout
-      - *prepare-ccache
       - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -985,8 +1045,10 @@ jobs:
       WITH_QT_I18N: 1
     steps:
       - checkout
-      - *prepare-ccache
       - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
@@ -1016,10 +1078,12 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
       - *install-qt-macos-dependencies
       - *prepare-ccache
-      - *restore-node_modules-cache
       - *restore-mason_packages-cache
       - *restore-ccache
       - *reset-ccache-stats
