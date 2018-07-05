@@ -55,7 +55,7 @@ bool isExpression(const Convertible& filter) {
         return false;
         
     } else if (*op == "==" || *op == "!=" || *op == ">" || *op == ">=" || *op == "<" || *op == "<=") {
-        return arrayLength(filter) == 3 && (isArray(arrayMember(filter, 1)) || isArray(arrayMember(filter, 2)));
+        return arrayLength(filter) != 3 || isArray(arrayMember(filter, 1)) || isArray(arrayMember(filter, 2));
         
     } else if (*op == "any" || *op == "all") {
         for (std::size_t i = 1; i < arrayLength(filter); i++) {
