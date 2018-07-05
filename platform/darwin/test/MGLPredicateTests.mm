@@ -280,6 +280,79 @@
     }
 }
 
+- (void)testComparisonPredicatesWithOptions {
+    {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"a =[c] 'b'"];
+        NSArray *jsonExpression = @[@"==", @[@"get", @"a"], @"b", @[@"collator", @{@"case-sensitive": @NO, @"diacritic-sensitive": @YES}]];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
+        [self testSymmetryWithPredicate:predicate
+                          mustRoundTrip:NO];
+    }
+    {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"a =[d] 'b'"];
+        NSArray *jsonExpression = @[@"==", @[@"get", @"a"], @"b", @[@"collator", @{@"case-sensitive": @YES, @"diacritic-sensitive": @NO}]];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
+        [self testSymmetryWithPredicate:predicate
+                          mustRoundTrip:NO];
+    }
+    {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"a =[cd] 'b'"];
+        NSArray *jsonExpression = @[@"==", @[@"get", @"a"], @"b", @[@"collator", @{@"case-sensitive": @NO, @"diacritic-sensitive": @NO}]];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
+        [self testSymmetryWithPredicate:predicate
+                          mustRoundTrip:NO];
+    }
+    
+    {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"a !=[cd] 'b'"];
+        NSArray *jsonExpression = @[@"!=", @[@"get", @"a"], @"b", @[@"collator", @{@"case-sensitive": @NO, @"diacritic-sensitive": @NO}]];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
+        [self testSymmetryWithPredicate:predicate
+                          mustRoundTrip:NO];
+    }
+    {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(a, 'NSString') <[cd] 'b'"];
+        NSArray *jsonExpression = @[@"<", @[@"to-string", @[@"get", @"a"]], @"b", @[@"collator", @{@"case-sensitive": @NO, @"diacritic-sensitive": @NO}]];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
+        [self testSymmetryWithPredicate:predicate
+                          mustRoundTrip:NO];
+    }
+    {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(a, 'NSString') <=[cd] 'b'"];
+        NSArray *jsonExpression = @[@"<=", @[@"to-string", @[@"get", @"a"]], @"b", @[@"collator", @{@"case-sensitive": @NO, @"diacritic-sensitive": @NO}]];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
+        [self testSymmetryWithPredicate:predicate
+                          mustRoundTrip:NO];
+    }
+    {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(a, 'NSString') >[cd] 'b'"];
+        NSArray *jsonExpression = @[@">", @[@"to-string", @[@"get", @"a"]], @"b", @[@"collator", @{@"case-sensitive": @NO, @"diacritic-sensitive": @NO}]];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
+        [self testSymmetryWithPredicate:predicate
+                          mustRoundTrip:NO];
+    }
+    {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(a, 'NSString') >=[cd] 'b'"];
+        NSArray *jsonExpression = @[@">=", @[@"to-string", @[@"get", @"a"]], @"b", @[@"collator", @{@"case-sensitive": @NO, @"diacritic-sensitive": @NO}]];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
+        [self testSymmetryWithPredicate:predicate
+                          mustRoundTrip:NO];
+    }
+    {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"TRUE = MGL_FUNCTION('==', a, 'b', MGL_FUNCTION('collator', %@))", @{
+            @"case-sensitive": @NO,
+            @"diacritic-sensitive": @NO,
+            @"locale": @"tlh",
+        }];
+        NSArray *jsonExpression = @[@"==", @[@"get", @"a"], @"b",
+                                    @[@"collator",
+                                      @{@"case-sensitive": @NO,
+                                        @"diacritic-sensitive": @NO,
+                                        @"locale": @"tlh"}]];
+        XCTAssertEqualObjects([predicate.mgl_jsonExpressionObject lastObject], jsonExpression);
+    }
+}
+
 - (void)testCompoundPredicates {
     {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"a == 'b' AND c == 'd'"];

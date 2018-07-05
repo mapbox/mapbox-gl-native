@@ -784,6 +784,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             
             return [NSExpression expressionForFunction:functionName
                                              arguments:subexpressions];
+        } else if ([op isEqualToString:@"collator"]) {
+            // Avoid wrapping collator options object in literal expression.
+            return [NSExpression expressionForFunction:@"MGL_FUNCTION" arguments:array];
         } else if ([op isEqualToString:@"literal"]) {
             if ([argumentObjects.firstObject isKindOfClass:[NSArray class]]) {
                 return [NSExpression expressionForAggregate:MGLSubexpressionsWithJSONObjects(argumentObjects.firstObject)];
@@ -1208,6 +1211,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 [NSException raise:NSInvalidArgumentException
                             format:@"Casting expression to %@ not yet implemented.", type];
             } else if ([function isEqualToString:@"MGL_FUNCTION"]) {
+                NSExpression *op = self.arguments.firstObject;
+                if (op.expressionType == NSConstantValueExpressionType
+                    && [op.constantValue isEqualToString:@"collator"]) {
+                    // Avoid wrapping collator options object in literal expression.
+                    return @[@"collator", self.arguments[1].constantValue];
+                }
                 return self.arguments.mgl_jsonExpressionObject;
             } else if (op == [MGLColor class] && [function isEqualToString:@"colorWithRed:green:blue:alpha:"]) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
