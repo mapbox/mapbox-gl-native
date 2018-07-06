@@ -7,6 +7,49 @@
 
 using namespace mbgl;
 
+TEST(Projection, Boundaries) {
+    LatLng sw { -90.0, -180.0 };
+    LatLng ne { 90.0, 180.0 };
+
+    const double minScale = std::pow(2, 0);
+    const double maxScale = std::pow(2, util::DEFAULT_MAX_ZOOM);
+
+    Point<double> projected {};
+    LatLng unprojected {};
+
+    projected = Projection::project(sw, minScale);
+    EXPECT_DOUBLE_EQ(projected.x, 0.0);
+    EXPECT_DOUBLE_EQ(projected.y, util::tileSize);
+
+    unprojected = Projection::unproject(projected, minScale);
+    EXPECT_DOUBLE_EQ(unprojected.latitude(), -util::LATITUDE_MAX);
+    EXPECT_DOUBLE_EQ(unprojected.longitude(), sw.longitude());
+
+    projected = Projection::project(sw, maxScale);
+    EXPECT_DOUBLE_EQ(projected.x, 0.0);
+    EXPECT_DOUBLE_EQ(projected.y, util::tileSize * maxScale);
+
+    unprojected = Projection::unproject(projected, maxScale);
+    EXPECT_DOUBLE_EQ(unprojected.latitude(), -util::LATITUDE_MAX);
+    EXPECT_DOUBLE_EQ(unprojected.longitude(), sw.longitude());
+
+    projected = Projection::project(ne, minScale);
+    EXPECT_DOUBLE_EQ(projected.x, util::tileSize);
+    ASSERT_NEAR(projected.y, 0.0, 1e-10);
+
+    unprojected = Projection::unproject(projected, minScale);
+    EXPECT_DOUBLE_EQ(unprojected.latitude(), util::LATITUDE_MAX);
+    EXPECT_DOUBLE_EQ(unprojected.longitude(), ne.longitude());
+
+    projected = Projection::project(ne, maxScale);
+    EXPECT_DOUBLE_EQ(projected.x, util::tileSize * maxScale);
+    ASSERT_NEAR(projected.y, 0.0, 1e-6);
+
+    unprojected = Projection::unproject(projected, maxScale);
+    EXPECT_DOUBLE_EQ(unprojected.latitude(), util::LATITUDE_MAX);
+    EXPECT_DOUBLE_EQ(unprojected.longitude(), ne.longitude());
+}
+
 TEST(Projection, MetersPerPixelAtLatitude) {
     double zoom = 0;
     EXPECT_DOUBLE_EQ(Projection::getMetersPerPixelAtLatitude(0, zoom), 78271.516964020484);
