@@ -5,7 +5,6 @@ import android.os.Parcelable;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import com.mapbox.mapboxsdk.constants.GeometryConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
 
@@ -435,7 +434,8 @@ public class LatLngBounds implements Parcelable {
    * @param bounds LatLngBounds to add
    * @return LatLngBounds
    */
-  public @NonNull LatLngBounds union(@NonNull LatLngBounds bounds) {
+  @NonNull
+  public LatLngBounds union(@NonNull LatLngBounds bounds) {
     return unionNoParamCheck(bounds.getLatNorth(), bounds.getLonEast(), bounds.getLatSouth(), bounds.getLonWest());
   }
 
@@ -458,26 +458,24 @@ public class LatLngBounds implements Parcelable {
    * @param westLon  Western Longitude corner point
    * @return LatLngBounds
    */
-  public @NonNull LatLngBounds union(
-    @FloatRange(from = GeometryConstants.MIN_LATITUDE, to = GeometryConstants.MAX_LATITUDE)double northLat,
+  @NonNull
+  public LatLngBounds union(
+    @FloatRange(from = GeometryConstants.MIN_LATITUDE, to = GeometryConstants.MAX_LATITUDE) double northLat,
     double eastLon,
     @FloatRange(from = GeometryConstants.MIN_LATITUDE, to = GeometryConstants.MAX_LATITUDE) double southLat,
     double westLon) {
-
     checkParams(northLat, eastLon, southLat, westLon);
-
     return unionNoParamCheck(northLat, eastLon, southLat, westLon);
   }
 
-  private @NonNull LatLngBounds unionNoParamCheck(
-    @FloatRange(from = GeometryConstants.MIN_LATITUDE, to = GeometryConstants.MAX_LATITUDE)double northLat,
+  @NonNull
+  private LatLngBounds unionNoParamCheck(
+    @FloatRange(from = GeometryConstants.MIN_LATITUDE, to = GeometryConstants.MAX_LATITUDE) double northLat,
     double eastLon,
     @FloatRange(from = GeometryConstants.MIN_LATITUDE, to = GeometryConstants.MAX_LATITUDE) double southLat,
     double westLon) {
-
     northLat = (this.latitudeNorth < northLat) ? northLat : this.latitudeNorth;
     southLat = (this.latitudeSouth > southLat) ? southLat : this.latitudeSouth;
-
     eastLon = LatLng.wrap(eastLon, GeometryConstants.MIN_LONGITUDE, GeometryConstants.MAX_LONGITUDE);
     westLon = LatLng.wrap(westLon, GeometryConstants.MIN_LONGITUDE, GeometryConstants.MAX_LONGITUDE);
 
@@ -531,7 +529,8 @@ public class LatLngBounds implements Parcelable {
    * @param box LatLngBounds to intersect with
    * @return LatLngBounds
    */
-  public @Nullable LatLngBounds intersect(@NonNull LatLngBounds box) {
+  @Nullable
+  public LatLngBounds intersect(@NonNull LatLngBounds box) {
     return intersectNoParamCheck(box.getLatNorth(), box.getLonEast(), box.getLatSouth(), box.getLonWest());
   }
 
@@ -548,13 +547,14 @@ public class LatLngBounds implements Parcelable {
    * see {@link GeometryConstants#MIN_LONGITUDE} and {@link GeometryConstants#MAX_LONGITUDE}
    *
    * @param northLat Northern Latitude corner point
-   * @param eastLon Eastern Longitude corner point
+   * @param eastLon  Eastern Longitude corner point
    * @param southLat Southern Latitude corner point
-   * @param westLon Western Longitude corner point
+   * @param westLon  Western Longitude corner point
    * @return LatLngBounds
    */
-  public @Nullable LatLngBounds intersect(
-    @FloatRange(from = GeometryConstants.MIN_LATITUDE, to = GeometryConstants.MAX_LATITUDE)double northLat,
+  @Nullable
+  public LatLngBounds intersect(
+    @FloatRange(from = GeometryConstants.MIN_LATITUDE, to = GeometryConstants.MAX_LATITUDE) double northLat,
     double eastLon,
     @FloatRange(from = GeometryConstants.MIN_LATITUDE, to = GeometryConstants.MAX_LATITUDE) double southLat,
     double westLon) {
@@ -564,8 +564,9 @@ public class LatLngBounds implements Parcelable {
     return intersectNoParamCheck(northLat, eastLon, southLat, westLon);
   }
 
-  private @Nullable LatLngBounds intersectNoParamCheck(
-    @FloatRange(from = GeometryConstants.MIN_LATITUDE, to = GeometryConstants.MAX_LATITUDE)double northLat,
+  @Nullable
+  private LatLngBounds intersectNoParamCheck(
+    @FloatRange(from = GeometryConstants.MIN_LATITUDE, to = GeometryConstants.MAX_LATITUDE) double northLat,
     double eastLon,
     @FloatRange(from = GeometryConstants.MIN_LATITUDE, to = GeometryConstants.MAX_LATITUDE) double southLat,
     double westLon) {
@@ -682,14 +683,7 @@ public class LatLngBounds implements Parcelable {
    */
   public static final class Builder {
 
-    private List<LatLng> latLngList;
-
-    /**
-     * Constructs a builder to compose LatLng objects to a LatLngBounds.
-     */
-    public Builder() {
-      latLngList = new ArrayList<>();
-    }
+    private final List<LatLng> latLngList = new ArrayList<>();
 
     /**
      * Builds a new LatLngBounds.
@@ -713,9 +707,7 @@ public class LatLngBounds implements Parcelable {
      * @return this
      */
     public Builder includes(List<LatLng> latLngs) {
-      for (LatLng point : latLngs) {
-        include(point);
-      }
+      latLngList.addAll(latLngs);
       return this;
     }
 
@@ -726,9 +718,7 @@ public class LatLngBounds implements Parcelable {
      * @return this
      */
     public Builder include(@NonNull LatLng latLng) {
-      if (!latLngList.contains(latLng)) {
-        latLngList.add(latLng);
-      }
+      latLngList.add(latLng);
       return this;
     }
   }
