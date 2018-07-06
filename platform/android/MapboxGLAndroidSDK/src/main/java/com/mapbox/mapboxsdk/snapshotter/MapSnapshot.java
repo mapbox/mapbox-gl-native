@@ -43,6 +43,14 @@ public class MapSnapshot {
   public native PointF pixelForLatLng(LatLng latLng);
 
   /**
+   * Calculate geographical coordinates from a point in pixels on the Image
+   *
+   * @param pointF the point in pixels
+   * @return the geographical coordinates
+   */
+  public native LatLng latLngForPixel(PointF pointF);
+
+  /**
    * @return The attributions for the sources of this snapshot.
    */
   protected String[] getAttributions() {

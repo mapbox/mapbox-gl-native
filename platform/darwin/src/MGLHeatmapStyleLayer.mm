@@ -71,7 +71,7 @@
 - (void)setHeatmapColor:(NSExpression *)heatmapColor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::HeatmapColorPropertyValue>(heatmapColor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::ColorRampPropertyValue>(heatmapColor);
     self.rawLayer->setHeatmapColor(mbglValue);
 }
 

@@ -87,6 +87,15 @@ void MapSnapshotter::Impl::snapshot(ActorRef<MapSnapshotter::Callback> callback)
             return transform.latLngToScreenCoordinate(unwrappedLatLng);
         }};
 
+        // Create lambda that captures the current transform state
+        // and can be used to translate for geographic to screen
+        // coordinates
+        assert (frontend.getTransformState());
+        LatLngForFn latLngForFn { [=, transformState = *frontend.getTransformState()] (const ScreenCoordinate& screenCoordinate) {
+            Transform transform { transformState };
+            return transform.screenCoordinateToLatLng(screenCoordinate);
+        }};
+
         // Collect all source attributions
         std::vector<std::string> attributions;
         for (auto source : map.getStyle().getSources()) {
@@ -102,7 +111,8 @@ void MapSnapshotter::Impl::snapshot(ActorRef<MapSnapshotter::Callback> callback)
                 error,
                 error ? PremultipliedImage() : frontend.readStillImage(),
                 std::move(attributions),
-                std::move(pointForFn)
+                std::move(pointForFn),
+                std::move(latLngForFn)
         );
     });
 }

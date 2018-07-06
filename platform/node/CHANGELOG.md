@@ -1,5 +1,6 @@
 # master
 - The `Map` constructor now accepts a `mode` option which can be either `"static"` (default) or `"tile"`. It must be set to `"tile"` when rendering individual tiles in order for the symbols to match across tiles.
+- Remove unnecessary memory use when collision debug mode is not enabled ([#12294](https://github.com/mapbox/mapbox-gl-native/issues/12294))
 
 # 3.5.8 - October 19, 2017
 - Fixes an issue that causes memory leaks when not deleting the frontend object

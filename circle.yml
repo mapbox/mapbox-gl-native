@@ -10,20 +10,10 @@ workflows:
             branches:
               ignore: master
       - android-debug-arm-v7
-      - android-build-release:
-          filters:
-            branches:
-              ignore: /(master|release-boba|release-chai)/
-      - android-release-snapshot:
-          filters:
-            branches:
-              only: /(master|release-boba|release-chai)/
-      - android-release-tag:
+      - android-release:
           filters:
             tags:
               only: /android-v.*/
-            branches:
-              ignore: /.*/
       - node-clang39-release:
           filters:
             tags:
@@ -383,98 +373,7 @@ jobs:
           path: platform/android/MapboxGLAndroidSDKTestApp/lint-baseline.xml
 
 # ------------------------------------------------------------------------------
-  android-build-release:
-    docker:
-      - image: mbgl/feb0443038:android-ndk-r17
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Release
-      IS_LOCAL_DEVELOPMENT: false
-    steps:
-      - checkout
-      - *generate-cache-key
-      - *restore-cache
-      - *restore-gradle-cache
-      - *reset-ccache-stats
-      - run:
-          name: Generate Maven credentials
-          shell: /bin/bash -euo pipefail
-          command: |
-            aws s3 cp s3://mapbox/android/signing-credentials/secring.gpg platform/android/MapboxGLAndroidSDK/secring.gpg
-            echo "NEXUS_USERNAME=$PUBLISH_NEXUS_USERNAME
-            NEXUS_PASSWORD=$PUBLISH_NEXUS_PASSWORD
-            signing.keyId=$SIGNING_KEYID
-            signing.password=$SIGNING_PASSWORD
-            signing.secretKeyRingFile=secring.gpg" >> platform/android/MapboxGLAndroidSDK/gradle.properties
-      - run:
-          name: Build package
-          command: make apackage
-      - run:
-          name: Build release Test App
-          command: make android
-      - *show-ccache-stats
-      - *save-cache
-      - *save-gradle-cache
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/release
-          destination: .
-      - run:
-          name: Record size
-          command: platform/android/scripts/metrics.sh
-
-
-# ------------------------------------------------------------------------------
-  android-release-snapshot:
-    docker:
-      - image: mbgl/feb0443038:android-ndk-r17
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Release
-      IS_LOCAL_DEVELOPMENT: false
-    steps:
-      - checkout
-      - *generate-cache-key
-      - *restore-cache
-      - *restore-gradle-cache
-      - *reset-ccache-stats
-      - run:
-          name: Generate Maven credentials
-          shell: /bin/bash -euo pipefail
-          command: |
-            aws s3 cp s3://mapbox/android/signing-credentials/secring.gpg platform/android/MapboxGLAndroidSDK/secring.gpg
-            echo "NEXUS_USERNAME=$PUBLISH_NEXUS_USERNAME
-            NEXUS_PASSWORD=$PUBLISH_NEXUS_PASSWORD
-            signing.keyId=$SIGNING_KEYID
-            signing.password=$SIGNING_PASSWORD
-            signing.secretKeyRingFile=secring.gpg" >> platform/android/MapboxGLAndroidSDK/gradle.properties
-      - run:
-          name: Build package
-          command: make apackage
-      - run:
-          name: Build release Test App
-          command: make android
-      - *show-ccache-stats
-      - *save-cache
-      - *save-gradle-cache
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/release
-          destination: .
-      - run:
-          name: Record size
-          command: platform/android/scripts/metrics.sh
-      - deploy:
-          name: Publish to Maven
-          command: make run-android-upload-archives
-
-
-# ------------------------------------------------------------------------------
-  android-release-tag:
+  android-release:
     docker:
       - image: mbgl/feb0443038:android-ndk-r17
     resource_class: large
@@ -502,7 +401,10 @@ jobs:
             signing.secretKeyRingFile=secring.gpg" >> platform/android/MapboxGLAndroidSDK/gradle.properties
       - run:
           name: Update version name
-          command: sed -i -e "s/^VERSION_NAME=.*/VERSION_NAME=${CIRCLE_TAG:9}/" platform/android/MapboxGLAndroidSDK/gradle.properties
+          command: |
+            if [[ $CIRCLE_TAG == android-v* ]]; then
+              sed -i -e "s/^VERSION_NAME=.*/VERSION_NAME=${CIRCLE_TAG:9}/" platform/android/MapboxGLAndroidSDK/gradle.properties
+            fi
       - run:
           name: Build package
           command: make apackage
@@ -520,8 +422,10 @@ jobs:
           command: platform/android/scripts/metrics.sh
       - deploy:
           name: Publish to Maven
-          command: make run-android-upload-archives
-
+          command: |
+            if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]] || [[ $CIRCLE_TAG == android-v* ]]; then
+              make run-android-upload-archives
+            fi
 
 # ------------------------------------------------------------------------------
   node-clang39-release:

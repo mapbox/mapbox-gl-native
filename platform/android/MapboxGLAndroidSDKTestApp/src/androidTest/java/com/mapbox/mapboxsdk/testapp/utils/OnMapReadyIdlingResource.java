@@ -1,6 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.app.Activity;
+import android.os.Handler;
+import android.support.annotation.WorkerThread;
 import android.support.test.espresso.IdlingResource;
 
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -14,14 +16,17 @@ public class OnMapReadyIdlingResource implements IdlingResource, OnMapReadyCallb
   private MapboxMap mapboxMap;
   private IdlingResource.ResourceCallback resourceCallback;
 
+  @WorkerThread
   public OnMapReadyIdlingResource(Activity activity) {
-    try {
-      Field field = activity.getClass().getDeclaredField("mapView");
-      field.setAccessible(true);
-      ((MapView) field.get(activity)).getMapAsync(this);
-    } catch (Exception err) {
-      throw new RuntimeException(err);
-    }
+    new Handler(activity.getMainLooper()).post(() -> {
+      try {
+        Field field = activity.getClass().getDeclaredField("mapView");
+        field.setAccessible(true);
+        ((MapView) field.get(activity)).getMapAsync(OnMapReadyIdlingResource.this);
+      } catch (Exception err) {
+        throw new RuntimeException(err);
+      }
+    });
   }
 
   @Override

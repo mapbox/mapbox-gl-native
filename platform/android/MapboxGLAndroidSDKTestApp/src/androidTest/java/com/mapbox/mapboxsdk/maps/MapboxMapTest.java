@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -22,15 +21,13 @@ import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.TestConstants;
 import com.mapbox.mapboxsdk.testapp.utils.ViewUtils;
-
 import org.hamcrest.Matcher;
 import org.junit.Ignore;
 import org.junit.Test;
+import timber.log.Timber;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import timber.log.Timber;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -125,6 +122,7 @@ public class MapboxMapTest extends BaseActivityTest {
       mapboxMap.setLatLngBoundsForCameraTarget(null);
     }));
   }
+
 
   //
   // MinZoomLevel
@@ -633,6 +631,8 @@ public class MapboxMapTest extends BaseActivityTest {
       assertFalse(mapboxMap.getPrefetchesTiles());
     }));
   }
+
+  //
 
   public class MapboxMapAction implements ViewAction {
 

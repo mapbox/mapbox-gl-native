@@ -234,4 +234,94 @@ NSString* validAccessToken() {
     [self waitForExpectations:@[expectation] timeout:60.0];
 }
 
+- (void)testSnapshotPointConversion {
+    if (!validAccessToken()) {
+        return;
+    }
+
+    CGSize size = self.mapView.bounds.size;
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot"];
+    expectation.expectedFulfillmentCount = 1;
+    expectation.assertForOverFulfill = YES;
+
+    CLLocationCoordinate2D coord = CLLocationCoordinate2DMake(30.0, 30.0);
+
+    MGLMapSnapshotter *snapshotter = snapshotterWithCoordinates(coord, size);
+    XCTAssertNotNil(snapshotter);
+
+    __weak __typeof__(self) weakself = self;
+
+    [snapshotter startWithCompletionHandler:^(MGLMapSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+
+        __typeof__(self) myself = weakself;
+
+        MGLTestAssertNotNil(myself, snapshot);
+
+        CGPoint point = [snapshot pointForCoordinate:coord];
+
+        CGFloat epsilon = 0.000001;
+
+        MGLTestAssertEqualWithAccuracy(myself, point.x, size.width/2.0, epsilon);
+        MGLTestAssertEqualWithAccuracy(myself, point.y, size.height/2.0, epsilon);
+
+        CLLocationCoordinate2D coord2 = [snapshot coordinateForPoint:point];
+
+        MGLTestAssertEqualWithAccuracy(myself, coord.latitude, coord2.latitude, epsilon);
+        MGLTestAssertEqualWithAccuracy(myself, coord.longitude, coord2.longitude, epsilon);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[expectation] timeout:5.0];
+}
+
+- (void)testSnapshotPointConversionCoordinateOrdering {
+    if (!validAccessToken()) {
+        return;
+    }
+
+    CGSize size = self.mapView.bounds.size;
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot"];
+    expectation.expectedFulfillmentCount = 1;
+    expectation.assertForOverFulfill = YES;
+
+    CLLocationCoordinate2D coord = CLLocationCoordinate2DMake(30.0, 30.0);
+
+    MGLMapSnapshotter *snapshotter = snapshotterWithCoordinates(coord, size);
+    XCTAssertNotNil(snapshotter);
+
+    __weak __typeof__(self) weakself = self;
+
+    [snapshotter startWithCompletionHandler:^(MGLMapSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+
+        __typeof__(self) myself = weakself;
+
+        CGFloat epsilon = 0.000001;
+
+        MGLTestAssertNotNil(myself, snapshot);
+
+        CLLocationCoordinate2D coordTL = [snapshot coordinateForPoint:CGPointZero];
+
+        MGLTestAssert(myself, coordTL.longitude < coord.longitude);
+        MGLTestAssert(myself, coordTL.latitude > coord.latitude);
+
+        // And check point
+        CGPoint tl = [snapshot pointForCoordinate:coordTL];
+        MGLTestAssertEqualWithAccuracy(myself, tl.x, 0.0, epsilon);
+        MGLTestAssertEqualWithAccuracy(myself, tl.y, 0.0, epsilon);
+
+        CLLocationCoordinate2D coordBR = [snapshot coordinateForPoint:CGPointMake(size.width, size.height)];
+
+        MGLTestAssert(myself, coordBR.longitude > coord.longitude);
+        MGLTestAssert(myself, coordBR.latitude < coord.latitude);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[expectation] timeout:5.0];
+}
+
+
 @end
