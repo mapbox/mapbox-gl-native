@@ -16,7 +16,7 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
                                    IndexedSubfeature indexedFeature_,
                                    const float overscaling)
         : indexedFeature(std::move(indexedFeature_))
-        , alongLine(placement == style::SymbolPlacementType::Line) {
+        , alongLine(placement != style::SymbolPlacementType::Point) {
     if (top == 0 && bottom == 0 && left == 0 && right == 0) return;
 
     const float y1 = top * boxScale - padding;
@@ -42,7 +42,8 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
 void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoordinate& anchorPoint,
                                     const int segment, const float labelLength, const float boxSize, const float overscaling) {
     const float step = boxSize / 2;
-    const int nBoxes = std::floor(labelLength / step);
+    const int nBoxes = std::max(static_cast<int>(std::floor(labelLength / step)), 1);
+
     // We calculate line collision circles out to 300% of what would normally be our
     // max size, to allow collision detection to work on labels that expand as
     // they move into the distance

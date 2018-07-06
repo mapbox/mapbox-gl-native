@@ -62,6 +62,7 @@ MBGL_DEFINE_ENUM(LineJoinType, {
 MBGL_DEFINE_ENUM(SymbolPlacementType, {
     { SymbolPlacementType::Point, "point" },
     { SymbolPlacementType::Line, "line" },
+    { SymbolPlacementType::LineCenter, "line-center" },
 });
 
 MBGL_DEFINE_ENUM(SymbolAnchorType, {

@@ -94,7 +94,6 @@ Values makeValues(const bool isText,
         uniforms::u_camera_to_center_distance::Value{ state.getCameraToCenterDistance() },
         uniforms::u_pitch::Value{ state.getPitch() },
         uniforms::u_pitch_with_map::Value{ pitchWithMap },
-        uniforms::u_max_camera_distance::Value{ values.maxCameraDistance },
         uniforms::u_rotate_symbol::Value{ rotateInShader },
         uniforms::u_aspect_ratio::Value{ state.getSize().aspectRatio() },
         std::forward<Args>(args)...
