@@ -293,6 +293,8 @@ public:
     BOOL _accessibilityValueAnnouncementIsPending;
 
     MGLReachability *_reachability;
+    
+    BOOL _turnOffTraffic;
 }
 
 #pragma mark - Setup & Teardown -
@@ -2349,7 +2351,7 @@ public:
     
     NSString *layerIdentifier = @"extrudedBuildings";
     if (showsBuildings) {
-        MGLSource* source = [self.style sourceWithIdentifier:@"composite"];
+        MGLSource *source = [self.style sourceWithIdentifier:@"composite"];
         if (source) {
             
             MGLFillExtrusionStyleLayer* layer = [[MGLFillExtrusionStyleLayer alloc] initWithIdentifier:layerIdentifier source:source];
@@ -2382,6 +2384,40 @@ public:
         if (layer) [self.style removeLayer:layer];
     }
     _showsBuildings = showsBuildings;
+}
+
+- (BOOL)showsTraffic {
+    NSString *sourceIdentifier = @"mapbox://mapbox.mapbox-traffic-v1";
+
+    for (MGLStyleLayer *layer in self.style.layers) {
+        if ([layer isKindOfClass:[MGLForegroundStyleLayer class]]) {
+            MGLForegroundStyleLayer *trafficLayer = (MGLForegroundStyleLayer *)layer;
+            if ([trafficLayer.sourceIdentifier isEqualToString:sourceIdentifier]) {
+                return layer.isVisible;
+            }
+            
+        }
+    }
+    
+    return NO;
+}
+
+- (void)setShowsTraffic:(BOOL)showsTraffic
+{
+    NSString *sourceIdentifier = @"mapbox://mapbox.mapbox-traffic-v1";
+    for (MGLStyleLayer *layer in self.style.layers) {
+        if ([layer isKindOfClass:[MGLForegroundStyleLayer class]]) {
+            MGLForegroundStyleLayer *trafficLayer = (MGLForegroundStyleLayer *)layer;
+            if ([trafficLayer.sourceIdentifier isEqualToString:sourceIdentifier]) {
+                [layer setVisible:showsTraffic];
+            }
+            
+        }
+    }
+}
+
+- (void)setShowsTraffic__:(BOOL)showsTraffic__ {
+    _turnOffTraffic = !showsTraffic__;
 }
 
 #pragma mark - Accessibility -
@@ -5691,6 +5727,11 @@ public:
         _showsBuildings = NO; // Forces an update.
         self.showsBuildings = YES;
     }
+    
+    if (_turnOffTraffic) {
+        self.showsTraffic = NO;
+    }
+    
 }
 
 - (void)updateUserLocationAnnotationView

@@ -46,8 +46,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) IBInspectable BOOL showsHeading;
 @property (nonatomic) IBInspectable BOOL showsScale;
 @property (nonatomic) IBInspectable BOOL showsBuildings;
-@property (nonatomic) IBInspectable BOOL showsTraffic;
 @property (nonatomic) IBInspectable BOOL showsPointOfInterest;
+
+// HACK: By default traffic layers are enabled. This inspector
+// behaves as a flag to disable/enable the traffic layer when finishing
+// loading the style.
+@property (nonatomic) IBInspectable BOOL showsTraffic__;
 
 @end
 

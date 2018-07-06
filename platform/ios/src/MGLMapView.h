@@ -428,6 +428,17 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, assign) BOOL showsBuildings;
 
 /**
+ A Boolean value indicating whether the traffic style if set display the
+ traffic layer.
+ 
+ Setting this property to `YES` causes the map to display the traffic layer.
+ 
+ The default value of this property is `YES` if the traffic style was set.
+ NO otherwise.
+ */
+@property (nonatomic, assign) BOOL showsTraffic;
+
+/**
  The geographic coordinate that is the subject of observation as the user
  location is being tracked.
 
