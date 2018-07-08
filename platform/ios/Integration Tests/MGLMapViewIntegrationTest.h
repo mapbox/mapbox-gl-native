@@ -28,6 +28,7 @@
 @property (nonatomic) void (^regionDidChange)(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated);
 
 // Utility methods
+- (NSString*)validAccessToken;
 - (void)waitForMapViewToFinishLoadingStyleWithTimeout:(NSTimeInterval)timeout;
 - (void)waitForMapViewToBeRenderedWithTimeout:(NSTimeInterval)timeout;
 @end
