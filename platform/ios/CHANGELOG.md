@@ -23,6 +23,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added `-[MGLMapView camera:fittingShape:edgePadding:]` and `-[MGLMapView camera:fittingCoordinateBounds:edgePadding:]` allowing you specify the pitch and direction for the calculated camera. ([#12213](https://github.com/mapbox/mapbox-gl-native/pull/12213))
 * Added `-[MGLMapSnapshot coordinateForPoint:]` that returns a map coordinate for a specified snapshot image point. ([#12221](https://github.com/mapbox/mapbox-gl-native/pull/12221))
 * Reduced memory usage when collision debug mode is disabled. ([#12294](https://github.com/mapbox/mapbox-gl-native/issues/12294))
+* Fixed a bug with annotation view touch handling when a non-zero `centerOffset` is specified. ([#12234](https://github.com/mapbox/mapbox-gl-native/pull/12234))
 
 ## 4.0.3 - June 22, 2018
 
