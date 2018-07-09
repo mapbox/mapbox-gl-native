@@ -37,6 +37,14 @@
 
 #pragma mark - MGLMapViewDelegate
 
+- (MGLAnnotationView*)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation {
+    if (self.viewForAnnotation) {
+        return self.viewForAnnotation(mapView, annotation);
+    }
+    
+    return nil;
+}
+
 - (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {
     XCTAssertNotNil(mapView.style);
     XCTAssertEqual(mapView.style, style);
