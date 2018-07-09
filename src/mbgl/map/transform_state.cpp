@@ -32,26 +32,28 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ, bool aligne
         return;
     }
 
+    const double cameraToCenterDistance = getCameraToCenterDistance();
+
      // Find the distance from the center point [width/2, height/2] to the
     // center top point [width/2, 0] in Z units, using the law of sines.
     // 1 Z unit is equivalent to 1 horizontal px at the center of the map
     // (the distance between[width/2, height/2] and [width/2 + 1, height/2])
     const double halfFov = getFieldOfView() / 2.0;
     const double groundAngle = M_PI / 2.0 + getPitch();
-    const double topHalfSurfaceDistance = std::sin(halfFov) * getCameraToCenterDistance() / std::sin(M_PI - groundAngle - halfFov);
-
+    const double topHalfSurfaceDistance = std::sin(halfFov) * cameraToCenterDistance / std::sin(M_PI - groundAngle - halfFov);
 
     // Calculate z distance of the farthest fragment that should be rendered.
-    const double furthestDistance = std::cos(M_PI / 2 - getPitch()) * topHalfSurfaceDistance + getCameraToCenterDistance();
+    const double furthestDistance = std::cos(M_PI / 2 - getPitch()) * topHalfSurfaceDistance + cameraToCenterDistance;
     // Add a bit extra to avoid precision problems when a fragment's distance is exactly `furthestDistance`
     const double farZ = furthestDistance * 1.01;
 
-    matrix::perspective(projMatrix, getFieldOfView(), double(size.width) / size.height, nearZ, farZ);
+    const double aspect = double(size.width) / size.height;
+    matrix::perspective(projMatrix, getFieldOfView(), aspect, nearZ, farZ);
 
     const bool flippedY = viewportMode == ViewportMode::FlippedY;
     matrix::scale(projMatrix, projMatrix, 1, flippedY ? 1 : -1, 1);
 
-    matrix::translate(projMatrix, projMatrix, 0, 0, -getCameraToCenterDistance());
+    matrix::translate(projMatrix, projMatrix, 0, 0, -cameraToCenterDistance);
 
     using NO = NorthOrientation;
     switch (getNorthOrientation()) {
@@ -63,7 +65,8 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ, bool aligne
 
     matrix::rotate_z(projMatrix, projMatrix, getBearing() + getNorthOrientationAngle());
 
-    const double dx = pixel_x() - size.width / 2.0f, dy = pixel_y() - size.height / 2.0f;
+    const double dx = pixel_x() - size.width / 2.0;
+    const double dy = pixel_y() - size.height / 2.0;
     matrix::translate(projMatrix, projMatrix, dx, dy, 0);
 
     if (axonometric) {
