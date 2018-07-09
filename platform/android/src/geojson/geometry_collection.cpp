@@ -30,7 +30,7 @@ jni::Object<GeometryCollection> GeometryCollection::New(jni::JNIEnv& env, const 
 
 mapbox::geometry::geometry_collection<double> GeometryCollection::convert(jni::JNIEnv &env, jni::Object<GeometryCollection> jCollection) {
     // Get geometries
-    static auto getGeometries = javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "getGeometries");
+    static auto getGeometries = javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "geometries");
     auto jList = jCollection.Call(env, getGeometries);
 
     // Turn into array
