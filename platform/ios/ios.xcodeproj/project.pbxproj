@@ -370,6 +370,10 @@
 		CA4EB8C720863487006AB465 /* MGLStyleLayerIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */; };
 		CA55CD41202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA55CD42202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CA8B843320F3117D00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = CA8B843120F3117C00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.m */; };
+		CA8B843420F3117D00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = CA8B843120F3117C00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.m */; };
+		CA8B843520F3117D00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = CA8B843220F3117D00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.h */; };
+		CA8B843620F3117D00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = CA8B843220F3117D00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.h */; };
 		CAA69DA4206DCD0E007279CD /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; };
 		CAA69DA5206DCD0E007279CD /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CABE5DAD2072FAB40003AF3C /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
@@ -1005,6 +1009,8 @@
 		CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLStyleLayerIntegrationTests.m; sourceTree = "<group>"; };
 		CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCameraChangeReason.h; sourceTree = "<group>"; };
 		CA5E5042209BDC5F001A8A81 /* MGLTestUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MGLTestUtility.h; path = ../../darwin/test/MGLTestUtility.h; sourceTree = "<group>"; };
+		CA8B843120F3117C00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEBackgroundLocationServiceTimeoutHandler.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEBackgroundLocationServiceTimeoutHandler.m"; sourceTree = SOURCE_ROOT; };
+		CA8B843220F3117D00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEBackgroundLocationServiceTimeoutHandler.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEBackgroundLocationServiceTimeoutHandler.h"; sourceTree = SOURCE_ROOT; };
 		DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
 		DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAttributionInfo.mm; sourceTree = "<group>"; };
 		DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
@@ -1559,6 +1565,8 @@
 				40834BC31FE05D6F00C1BD0D /* CLLocation+MMEMobileEvents.m */,
 				40834BAB1FE05D6C00C1BD0D /* MMEAPIClient.h */,
 				40834BA51FE05D6B00C1BD0D /* MMEAPIClient.m */,
+				CA8B843220F3117D00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.h */,
+				CA8B843120F3117C00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.m */,
 				40834BB51FE05D6D00C1BD0D /* MMECategoryLoader.h */,
 				40834BC41FE05D6F00C1BD0D /* MMECategoryLoader.m */,
 				40834BAE1FE05D6C00C1BD0D /* MMECommonEventData.h */,
@@ -2271,6 +2279,7 @@
 				DA8847F91CBAFA5100AB86E3 /* MGLPolygon.h in Headers */,
 				4049C2AC1DB6E05500B3F799 /* MGLPointCollection_Private.h in Headers */,
 				DA8847F81CBAFA5100AB86E3 /* MGLPointAnnotation.h in Headers */,
+				CA8B843520F3117D00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.h in Headers */,
 				8989B17C201A48EB0081CF59 /* MGLHeatmapStyleLayer.h in Headers */,
 				353933F21D3FB753003F57D7 /* MGLCircleStyleLayer.h in Headers */,
 				DA8847F31CBAFA5100AB86E3 /* MGLMultiPoint.h in Headers */,
@@ -2394,6 +2403,7 @@
 				DA6408DC1DA4E7D300908C90 /* MGLVectorStyleLayer.h in Headers */,
 				353933F31D3FB753003F57D7 /* MGLCircleStyleLayer.h in Headers */,
 				558DE7A11E5615E400C7916D /* MGLFoundation_Private.h in Headers */,
+				CA8B843620F3117D00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.h in Headers */,
 				96E516F820005A3000A02306 /* MGLCompactCalloutView.h in Headers */,
 				96E516E22000551900A02306 /* MGLPointCollection_Private.h in Headers */,
 				3538AA1E1D542239008EC33D /* MGLForegroundStyleLayer.h in Headers */,
@@ -3012,6 +3022,7 @@
 				AC518E03201BB56000EBC820 /* MGLTelemetryConfig.m in Sources */,
 				DA8848271CBAFA6200AB86E3 /* MGLPolyline.mm in Sources */,
 				DA8848581CBAFB9800AB86E3 /* MGLMapboxEvents.m in Sources */,
+				CA8B843320F3117D00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.m in Sources */,
 				35CE61841D4165D9004F2359 /* UIColor+MGLAdditions.mm in Sources */,
 				3EA93369F61CF70AFA50465D /* MGLRendererConfiguration.mm in Sources */,
 			);
@@ -3138,6 +3149,7 @@
 				DAA4E4271CBB730400178DFB /* MGLTilePyramidOfflineRegion.mm in Sources */,
 				DAA4E41C1CBB730400178DFB /* MGLAccountManager.m in Sources */,
 				35CE61851D4165D9004F2359 /* UIColor+MGLAdditions.mm in Sources */,
+				CA8B843420F3117D00DD909A /* MMEBackgroundLocationServiceTimeoutHandler.m in Sources */,
 				DAA4E4241CBB730400178DFB /* MGLPolyline.mm in Sources */,
 				3EA9366247780E4F252652A8 /* MGLRendererConfiguration.mm in Sources */,
 			);
