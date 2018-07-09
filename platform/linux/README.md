@@ -20,12 +20,10 @@ Ensure you have git and other build essentials:
     sudo apt-get install curl git build-essential zlib1g-dev automake \
                          libtool xutils-dev make cmake pkg-config python-pip \
                          libcurl4-openssl-dev libpng-dev libsqlite3-dev \
-                         libllvm3.4
+                         libllvm3.9
 
 Ensure you have cmake 3.x:
 
-    sudo add-apt-repository --yes ppa:george-edison55/cmake-3.x
-    sudo apt-get update
     sudo apt-get install cmake cmake-data
 
 Install glfw3 dependencies:

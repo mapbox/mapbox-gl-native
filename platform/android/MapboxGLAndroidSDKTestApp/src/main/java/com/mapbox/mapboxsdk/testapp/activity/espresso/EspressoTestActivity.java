@@ -19,7 +19,7 @@ public class EspressoTestActivity extends AppCompatActivity implements OnMapRead
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_camera_test);
+    setContentView(R.layout.activity_espresso_test);
 
     // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);

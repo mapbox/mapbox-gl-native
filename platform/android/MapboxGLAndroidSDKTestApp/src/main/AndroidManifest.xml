@@ -345,15 +345,15 @@
                 android:value=".activity.FeatureOverviewActivity" />
         </activity>
         <activity
-                android:name=".activity.snapshot.MapSnapshotterLocalStyleActivity"
-                android:description="@string/description_map_snapshotter_local_style"
-                android:label="@string/activity_map_snapshotter_local_style">
+            android:name=".activity.snapshot.MapSnapshotterLocalStyleActivity"
+            android:description="@string/description_map_snapshotter_local_style"
+            android:label="@string/activity_map_snapshotter_local_style">
             <meta-data
-                    android:name="@string/category"
-                    android:value="@string/category_imagegenerator" />
+                android:name="@string/category"
+                android:value="@string/category_imagegenerator" />
             <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".activity.FeatureOverviewActivity" />
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity" />
         </activity>
         <activity
             android:name=".activity.maplayout.DoubleMapActivity"
@@ -766,10 +766,22 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity" />
         </activity>
+
+        <activity
+            android:name=".activity.style.DraggableMarkerActivity"
+            android:description="@string/description_draggable_marker"
+            android:label="@string/activity_draggable_maker">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity" />
+        </activity>
         <activity
             android:name=".activity.camera.GestureDetectorActivity"
-            android:label="@string/activity_gesture_detector"
-            android:description="@string/description_gesture_detector">
+            android:description="@string/description_gesture_detector"
+            android:label="@string/activity_gesture_detector">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_camera" />
@@ -789,11 +801,14 @@
             android:name=".activity.espresso.EspressoTestActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".activity.espresso.DeviceIndependentTestActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".activity.style.FillExtrusionStyleTestActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.render.RenderTestActivity"
-            android:screenOrientation="landscape"/>
+            android:screenOrientation="landscape" />
         <!-- Configuration Settings -->
         <meta-data
             android:name="com.mapbox.TestEventsServer"

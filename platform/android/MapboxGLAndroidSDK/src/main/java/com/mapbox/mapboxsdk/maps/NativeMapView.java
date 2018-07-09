@@ -249,28 +249,34 @@ final class NativeMapView {
     return nativeGetLatLng().wrap();
   }
 
-  public CameraPosition getCameraForLatLngBounds(LatLngBounds latLngBounds, int[] padding) {
+  public CameraPosition getCameraForLatLngBounds(LatLngBounds bounds, int[] padding, double bearing, double tilt) {
     if (checkState("getCameraForLatLngBounds")) {
       return null;
     }
     return nativeGetCameraForLatLngBounds(
-      latLngBounds,
+      bounds,
       padding[1] / pixelRatio,
       padding[0] / pixelRatio,
       padding[3] / pixelRatio,
-      padding[2] / pixelRatio);
+      padding[2] / pixelRatio,
+      bearing,
+      tilt
+    );
   }
 
-  public CameraPosition getCameraForGeometry(Geometry geometry, double bearing, int[] padding) {
+  public CameraPosition getCameraForGeometry(Geometry geometry, int[] padding, double bearing, double tilt) {
     if (checkState("getCameraForGeometry")) {
       return null;
     }
     return nativeGetCameraForGeometry(
-      geometry, bearing,
+      geometry,
       padding[1] / pixelRatio,
       padding[0] / pixelRatio,
       padding[3] / pixelRatio,
-      padding[2] / pixelRatio);
+      padding[2] / pixelRatio,
+      bearing,
+      tilt
+    );
   }
 
   public void resetPosition() {
@@ -787,22 +793,29 @@ final class NativeMapView {
     return source;
   }
 
-  public void addImage(@NonNull String name, @NonNull Bitmap image) {
+  public void addImage(@NonNull String name, @NonNull Bitmap image, boolean sdf) {
     if (checkState("addImage")) {
       return;
     }
 
     // Determine pixel ratio, cast to float to avoid rounding, see mapbox-gl-native/issues/11809
     float pixelRatio = (float) image.getDensity() / DisplayMetrics.DENSITY_DEFAULT;
-    nativeAddImage(name, image, pixelRatio);
+    nativeAddImage(name, image, pixelRatio, sdf);
   }
 
   public void addImages(@NonNull HashMap<String, Bitmap> bitmapHashMap) {
     if (checkState("addImages")) {
       return;
     }
+    this.addImages(bitmapHashMap, false);
+  }
+
+  public void addImages(@NonNull HashMap<String, Bitmap> bitmapHashMap, boolean sdf) {
+    if (checkState("addImages")) {
+      return;
+    }
     //noinspection unchecked
-    new BitmapImageConversionTask(this).execute(bitmapHashMap);
+    new BitmapImageConversionTask(this, sdf).execute(bitmapHashMap);
   }
 
   public void removeImage(String name) {
@@ -936,10 +949,10 @@ final class NativeMapView {
   private native LatLng nativeGetLatLng();
 
   private native CameraPosition nativeGetCameraForLatLngBounds(
-    LatLngBounds latLngBounds, double top, double left, double bottom, double right);
+    LatLngBounds latLngBounds, double top, double left, double bottom, double right, double bearing, double tilt);
 
   private native CameraPosition nativeGetCameraForGeometry(
-    Geometry geometry, double bearing, double top, double left, double bottom, double right);
+    Geometry geometry, double top, double left, double bottom, double right, double bearing, double tilt);
 
   private native void nativeResetPosition();
 
@@ -1061,7 +1074,7 @@ final class NativeMapView {
 
   private native void nativeRemoveSource(Source source, long sourcePtr);
 
-  private native void nativeAddImage(String name, Bitmap bitmap, float pixelRatio);
+  private native void nativeAddImage(String name, Bitmap bitmap, float pixelRatio, boolean sdf);
 
   private native void nativeAddImages(Image[] images);
 
@@ -1161,9 +1174,11 @@ final class NativeMapView {
   private static class BitmapImageConversionTask extends AsyncTask<HashMap<String, Bitmap>, Void, List<Image>> {
 
     private NativeMapView nativeMapView;
+    private boolean sdf;
 
-    BitmapImageConversionTask(NativeMapView nativeMapView) {
+    BitmapImageConversionTask(NativeMapView nativeMapView, boolean sdf) {
       this.nativeMapView = nativeMapView;
+      this.sdf = sdf;
     }
 
     @Override
@@ -1186,10 +1201,9 @@ final class NativeMapView {
         buffer = ByteBuffer.allocate(bitmap.getByteCount());
         bitmap.copyPixelsToBuffer(buffer);
 
-        float density = bitmap.getDensity() == Bitmap.DENSITY_NONE ? Bitmap.DENSITY_NONE : bitmap.getDensity();
-        float pixelRatio = density / DisplayMetrics.DENSITY_DEFAULT;
+        float pixelRatio = (float) bitmap.getDensity() / DisplayMetrics.DENSITY_DEFAULT;
 
-        images.add(new Image(buffer.array(), pixelRatio, name, bitmap.getWidth(), bitmap.getHeight()));
+        images.add(new Image(buffer.array(), pixelRatio, name, bitmap.getWidth(), bitmap.getHeight(), sdf));
       }
 
       return images;

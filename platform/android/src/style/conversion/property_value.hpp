@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mbgl/style/property_value.hpp>
+#include <mbgl/style/color_ramp_property_value.hpp>
 #include <mbgl/style/data_driven_property_value.hpp>
-#include <mbgl/style/heatmap_color_property_value.hpp>
+#include <mbgl/style/property_value.hpp>
 #include "../../conversion/conversion.hpp"
 #include "../../conversion/constant.hpp"
 #include "types.hpp"
@@ -75,10 +75,10 @@ struct Converter<jni::jobject*, mbgl::style::DataDrivenPropertyValue<T>> {
  * Convert core heat map color property value to java
  */
 template <>
-struct Converter<jni::jobject*, mbgl::style::HeatmapColorPropertyValue> {
+struct Converter<jni::jobject*, mbgl::style::ColorRampPropertyValue> {
 
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::HeatmapColorPropertyValue value) const {
-        PropertyValueEvaluator<mbgl::style::HeatmapColorPropertyValue> evaluator(env);
+    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::ColorRampPropertyValue value) const {
+        PropertyValueEvaluator<mbgl::style::ColorRampPropertyValue> evaluator(env);
         return *convert<jni::jobject*>(env, value.evaluate(evaluator));
     }
 };

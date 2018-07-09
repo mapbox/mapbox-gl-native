@@ -1,16 +1,12 @@
 #pragma once
 
 #include <mbgl/style/expression/expression.hpp>
+#include <mbgl/style/expression/value.hpp>
+#include <mbgl/style/expression/is_constant.hpp>
 #include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/step.hpp>
 #include <mbgl/style/expression/find_zoom_curve.hpp>
-#include <mbgl/style/expression/value.hpp>
-#include <mbgl/style/expression/is_constant.hpp>
-#include <mbgl/style/function/convert.hpp>
-#include <mbgl/style/function/exponential_stops.hpp>
-#include <mbgl/style/function/interval_stops.hpp>
-#include <mbgl/util/interpolate.hpp>
-#include <mbgl/util/variant.hpp>
+#include <mbgl/util/range.hpp>
 
 namespace mbgl {
 namespace style {
@@ -18,30 +14,14 @@ namespace style {
 template <class T>
 class CameraFunction {
 public:
-    using Stops = std::conditional_t<
-        util::Interpolatable<T>::value,
-        variant<
-            ExponentialStops<T>,
-            IntervalStops<T>>,
-        variant<
-            IntervalStops<T>>>;
-    
-    CameraFunction(std::unique_ptr<expression::Expression> expression_)
-         : isExpression(true),
+    // The second parameter should be used only for conversions from legacy functions.
+    CameraFunction(std::unique_ptr<expression::Expression> expression_, bool isExpression_ = true)
+         : isExpression(isExpression_),
            expression(std::move(expression_)),
-           zoomCurve(expression::findZoomCurveChecked(expression.get()))
-    {
+           zoomCurve(expression::findZoomCurveChecked(expression.get())) {
         assert(!expression::isZoomConstant(*expression));
         assert(expression::isFeatureConstant(*expression));
     }
-
-    CameraFunction(const Stops& stops)
-        : isExpression(false),
-          expression(stops.match([&] (const auto& s) {
-            return expression::Convert::toExpression(s);
-          })),
-          zoomCurve(expression::findZoomCurveChecked(expression.get()))
-    {}
 
     T evaluate(float zoom) const {
         const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext(zoom, nullptr));
@@ -54,7 +34,7 @@ public:
     
     float interpolationFactor(const Range<float>& inputLevels, const float inputValue) const {
         return zoomCurve.match(
-            [&](const expression::InterpolateBase* z) {
+            [&](const expression::Interpolate* z) {
                 return z->interpolationFactor(Range<double> { inputLevels.min, inputLevels.max }, inputValue);
             },
             [&](const expression::Step*) { return 0.0f; }
@@ -82,8 +62,8 @@ public:
     const expression::Expression& getExpression() const { return *expression; }
 
 private:
-    std::shared_ptr<expression::Expression> expression;
-    const variant<const expression::InterpolateBase*, const expression::Step*> zoomCurve;
+    std::shared_ptr<const expression::Expression> expression;
+    const variant<const expression::Interpolate*, const expression::Step*> zoomCurve;
 };
 
 } // namespace style

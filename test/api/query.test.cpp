@@ -8,6 +8,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/source.hpp>
+#include <mbgl/style/expression/dsl.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 
@@ -67,20 +68,20 @@ TEST(Query, QueryRenderedFeaturesFilterLayer) {
 }
 
 TEST(Query, QueryRenderedFeaturesFilter) {
-    QueryTest test;
-    ParsingContext context;
+    using namespace mbgl::style::expression::dsl;
 
+    QueryTest test;
     auto zz = test.map.pixelForLatLng({ 0, 0 });
 
-    const Filter eqFilter(createCompoundExpression("filter-==", createLiteral("key1"), createLiteral("value1"), context));
+    const Filter eqFilter(eq(get("key1"), literal("value1")));
     auto features1 = test.frontend.getRenderer()->queryRenderedFeatures(zz, {{}, { eqFilter }});
     EXPECT_EQ(features1.size(), 1u);
 
-    const Filter idNotEqFilter(createCompoundExpression("!", std::move(*createCompoundExpression("filter-id-==", createLiteral("feature1"), context)), context));
+    const Filter idNotEqFilter(ne(id(), literal("feature1")));
     auto features2 = test.frontend.getRenderer()->queryRenderedFeatures(zz, {{{ "layer4" }}, { idNotEqFilter }});
     EXPECT_EQ(features2.size(), 0u);
 
-    const Filter gtFilter(createCompoundExpression("filter->", createLiteral("key2"), createLiteral(1.0), context));
+    const Filter gtFilter(gt(number(get("key2")), literal(1.0)));
     auto features3 = test.frontend.getRenderer()->queryRenderedFeatures(zz, {{ }, { gtFilter }});
     EXPECT_EQ(features3.size(), 1u);
 }
@@ -109,18 +110,19 @@ TEST(Query, QuerySourceFeaturesOptionValidation) {
 }
 
 TEST(Query, QuerySourceFeaturesFilter) {
-    QueryTest test;
-    ParsingContext context;
+    using namespace mbgl::style::expression::dsl;
 
-    const Filter eqFilter(createCompoundExpression("filter-==", createLiteral("key1"), createLiteral("value1"), context));
+    QueryTest test;
+
+    const Filter eqFilter(eq(get("key1"), literal("value1")));
     auto features1 = test.frontend.getRenderer()->querySourceFeatures("source4", {{}, { eqFilter }});
     EXPECT_EQ(features1.size(), 1u);
 
-    const Filter idNotEqFilter(createCompoundExpression("!", std::move(*createCompoundExpression("filter-id-==", createLiteral("feature1"), context)), context));
+    const Filter idNotEqFilter(ne(id(), literal("feature1")));
     auto features2 = test.frontend.getRenderer()->querySourceFeatures("source4", {{}, { idNotEqFilter }});
     EXPECT_EQ(features2.size(), 0u);
 
-    const Filter gtFilter(createCompoundExpression("filter->", createLiteral("key2"), createLiteral(1.0), context));
+    const Filter gtFilter(gt(number(get("key2")), literal(1.0)));
     auto features3 = test.frontend.getRenderer()->querySourceFeatures("source4", {{}, { gtFilter }});
     EXPECT_EQ(features3.size(), 1u);
 }

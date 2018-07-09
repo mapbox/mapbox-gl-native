@@ -6,7 +6,14 @@ set -u
 
 if [ -z `which jazzy` ]; then
     echo "Installing jazzy…"
-    gem install jazzy --no-document
+
+    CIRCLECI=${CIRCLECI:-false}
+    if [[ "${CIRCLECI}" == true ]]; then
+        sudo gem install jazzy --no-document
+    else
+        gem install jazzy --no-document
+    fi
+
     if [ -z `which jazzy` ]; then
         echo "Unable to install jazzy. See https://github.com/mapbox/mapbox-gl-native/blob/master/platform/ios/INSTALL.md"
         exit 1

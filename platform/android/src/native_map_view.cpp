@@ -288,15 +288,15 @@ void NativeMapView::setLatLng(jni::JNIEnv&, jni::jdouble latitude, jni::jdouble 
     map->setLatLng(mbgl::LatLng(latitude, longitude), insets, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
-jni::Object<CameraPosition> NativeMapView::getCameraForLatLngBounds(jni::JNIEnv& env, jni::Object<LatLngBounds> jBounds, double top, double left, double bottom, double right) {
+jni::Object<CameraPosition> NativeMapView::getCameraForLatLngBounds(jni::JNIEnv& env, jni::Object<LatLngBounds> jBounds, double top, double left, double bottom, double right, double bearing, double tilt) {
     mbgl::EdgeInsets padding = {top, left, bottom, right};
-    return CameraPosition::New(env, map->cameraForLatLngBounds(mbgl::android::LatLngBounds::getLatLngBounds(env, jBounds), padding));
+    return CameraPosition::New(env, map->cameraForLatLngBounds(mbgl::android::LatLngBounds::getLatLngBounds(env, jBounds), padding, bearing, tilt));
 }
 
-jni::Object<CameraPosition> NativeMapView::getCameraForGeometry(jni::JNIEnv& env, jni::Object<geojson::Geometry> jGeometry, double bearing, double top, double left, double bottom, double right) {
+jni::Object<CameraPosition> NativeMapView::getCameraForGeometry(jni::JNIEnv& env, jni::Object<geojson::Geometry> jGeometry, double top, double left, double bottom, double right, double bearing, double tilt) {
     auto geometry = geojson::Geometry::convert(env, jGeometry);
     mbgl::EdgeInsets padding = {top, left, bottom, right};
-    return CameraPosition::New(env, map->cameraForGeometry(geometry, padding, bearing));
+    return CameraPosition::New(env, map->cameraForGeometry(geometry, padding, bearing, tilt));
 }
 
 void NativeMapView::setReachability(jni::JNIEnv&, jni::jboolean reachable) {
@@ -895,14 +895,16 @@ void NativeMapView::removeSource(JNIEnv& env, jni::Object<Source> obj, jlong sou
     source->removeFromMap(env, obj, *map);
 }
 
-void NativeMapView::addImage(JNIEnv& env, jni::String name, jni::Object<Bitmap> bitmap, jni::jfloat scale) {
+void NativeMapView::addImage(JNIEnv& env, jni::String name, jni::Object<Bitmap> bitmap, jni::jfloat scale, jni::jboolean sdf) {
     jni::NullCheck(env, &bitmap);
     mbgl::PremultipliedImage premultipliedImage = Bitmap::GetImage(env, bitmap);
 
     map->getStyle().addImage(std::make_unique<mbgl::style::Image>(
         jni::Make<std::string>(env, name),
         std::move(premultipliedImage),
-        float(scale)));
+        float(scale),
+        sdf)
+    );
 }
 
 void NativeMapView::addImages(JNIEnv& env, jni::Array<jni::Object<mbgl::android::Image>> jimages) {

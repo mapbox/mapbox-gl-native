@@ -13,27 +13,30 @@
   },
   "license": "BSD-2-Clause",
   "dependencies": {
-    "@mapbox/cmake-node-module": "^1.0.0",
-    "node-pre-gyp": "^0.6.37",
+    "@mapbox/cmake-node-module": "^1.1.0",
+    "node-pre-gyp": "^0.10.2",
     "npm-run-all": "^4.0.2"
   },
   "devDependencies": {
+    "@octokit/rest": "^15.9.2",
     "aws-sdk": "^2.3.5",
     "csscolorparser": "^1.0.2",
     "ejs": "^2.4.1",
     "express": "^4.11.1",
     "flow-remove-types": "^1.2.1",
     "json-stringify-pretty-compact": "^1.0.4",
+    "jsonwebtoken": "^8.3.0",
     "lodash": "^4.16.4",
     "mapbox-gl-styles": "2.0.2",
     "pixelmatch": "^4.0.2",
     "pngjs": "^3.0.0",
+    "pretty-bytes": "^5.1.0",
     "request": "^2.72.0",
     "semver": "^5.5.0",
     "tape": "^4.5.1"
   },
   "engines": {
-    "node": ">=4.2.1"
+    "node": ">=6"
   },
   "scripts": {
     "preinstall": "npm install node-pre-gyp",
@@ -47,8 +50,8 @@
   },
   "gypfile": true,
   "binary": {
-    "module_name": "mapbox_gl_native",
-    "module_path": "./lib/",
+    "module_name": "mbgl",
+    "module_path": "./lib/{node_abi}",
     "host": "https://mapbox-node-binary.s3.amazonaws.com",
     "remote_path": "./{name}/v{version}",
     "package_name": "{node_abi}-{platform}-{arch}-{configuration}.tar.gz"

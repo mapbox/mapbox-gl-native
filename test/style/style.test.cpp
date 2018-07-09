@@ -65,7 +65,7 @@ TEST(Style, DuplicateSource) {
     try {
         style.addSource(std::make_unique<VectorSource>("sourceId", "mapbox://mapbox.mapbox-terrain-v2"));
         FAIL() << "Should not have been allowed to add a duplicate source id";
-    } catch (std::runtime_error) {
+    } catch (const std::runtime_error&) {
         // Expected
     }
 }

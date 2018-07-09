@@ -37,45 +37,55 @@ namespace util {
 // - `Object` can use `Timer` and do asynchronous I/O, like wait for sockets events.
 //
 template<class Object>
-class Thread : public Scheduler {
+class Thread {
 public:
     template <class... Args>
     Thread(const std::string& name, Args&&... args) {
-        std::promise<void> running;
 
-        thread = std::thread([&] {
+        std::promise<void> running_;
+        running = running_.get_future();
+
+        auto capturedArgs = std::make_tuple(std::forward<Args>(args)...);
+
+        thread = std::thread([
+            this,
+            name,
+            capturedArgs = std::move(capturedArgs),
+            runningPromise = std::move(running_)
+        ] () mutable {
             platform::setCurrentThreadName(name);
             platform::makeThreadLowPriority();
 
             util::RunLoop loop_(util::RunLoop::Type::New);
             loop = &loop_;
+            EstablishedActor<Object> establishedActor(loop_, object, std::move(capturedArgs));
 
-            object = std::make_unique<Actor<Object>>(*this, std::forward<Args>(args)...);
-            running.set_value();
-
+            runningPromise.set_value();
+            
             loop->run();
+            
+            (void) establishedActor;
+            
             loop = nullptr;
         });
-
-        running.get_future().get();
     }
 
-    ~Thread() override {
+    ~Thread() {
         if (paused) {
             resume();
         }
 
-        std::promise<void> joinable;
+        std::promise<void> stoppable;
+        
+        running.wait();
 
-        // Kill the actor, so we don't get more
-        // messages posted on this scheduler after
-        // we delete the RunLoop.
+        // Invoke a noop task on the run loop to ensure that we're executing
+        // run() before we call stop()
         loop->invoke([&] {
-            object.reset();
-            joinable.set_value();
+            stoppable.set_value();
         });
 
-        joinable.get_future().get();
+        stoppable.get_future().get();
 
         loop->stop();
         thread.join();
@@ -85,8 +95,8 @@ public:
     // can be used to send messages to `Object`. It is safe
     // to the non-owning reference to outlive this object
     // and be used after the `Thread<>` gets destroyed.
-    ActorRef<std::decay_t<Object>> actor() const {
-        return object->self();
+    ActorRef<std::decay_t<Object>> actor() {
+        return object.self();
     }
 
     // Pauses the `Object` thread. It will prevent the object to wake
@@ -102,6 +112,8 @@ public:
         resumed = std::make_unique<std::promise<void>>();
 
         auto pausing = paused->get_future();
+
+        running.wait();
 
         loop->invoke(RunLoop::Priority::High, [this] {
             auto resuming = resumed->get_future();
@@ -127,13 +139,12 @@ public:
 private:
     MBGL_STORE_THREAD(tid);
 
-    void schedule(std::weak_ptr<Mailbox> mailbox) override {
-        loop->schedule(mailbox);
-    }
+    AspiringActor<Object> object;
 
     std::thread thread;
-    std::unique_ptr<Actor<Object>> object;
 
+    std::future<void> running;
+    
     std::unique_ptr<std::promise<void>> paused;
     std::unique_ptr<std::promise<void>> resumed;
 

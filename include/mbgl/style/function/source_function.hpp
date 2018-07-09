@@ -1,15 +1,8 @@
 #pragma once
 
+#include <mbgl/style/expression/expression.hpp>
+#include <mbgl/style/expression/value.hpp>
 #include <mbgl/style/expression/is_constant.hpp>
-#include <mbgl/style/function/convert.hpp>
-#include <mbgl/style/function/exponential_stops.hpp>
-#include <mbgl/style/function/interval_stops.hpp>
-#include <mbgl/style/function/categorical_stops.hpp>
-#include <mbgl/style/function/identity_stops.hpp>
-#include <mbgl/util/interpolate.hpp>
-#include <mbgl/util/variant.hpp>
-
-#include <string>
 
 namespace mbgl {
 namespace style {
@@ -17,36 +10,15 @@ namespace style {
 template <class T>
 class SourceFunction {
 public:
-    using Stops = std::conditional_t<
-        util::Interpolatable<T>::value,
-        variant<
-            ExponentialStops<T>,
-            IntervalStops<T>,
-            CategoricalStops<T>,
-            IdentityStops<T>>,
-        variant<
-            IntervalStops<T>,
-            CategoricalStops<T>,
-            IdentityStops<T>>>;
-
-    SourceFunction(std::unique_ptr<expression::Expression> expression_)
-        : isExpression(true),
-          expression(std::move(expression_))
-    {
+    // The second parameter should be used only for conversions from legacy functions.
+    SourceFunction(std::unique_ptr<expression::Expression> expression_, optional<T> defaultValue_ = {})
+        : isExpression(defaultValue_),
+          expression(std::move(expression_)),
+          defaultValue(std::move(defaultValue_)) {
         assert(expression::isZoomConstant(*expression));
         assert(!expression::isFeatureConstant(*expression));
     }
     
-    SourceFunction(const std::string& property, const Stops& stops, optional<T> defaultValue_ = {})
-        : isExpression(false),
-          defaultValue(std::move(defaultValue_)),
-          expression(stops.match([&] (const IdentityStops<T>&) {
-              return expression::Convert::fromIdentityFunction(expression::valueTypeToExpressionType<T>(), property);
-          }, [&] (const auto& s) {
-              return expression::Convert::toExpression(property, s);
-          }))
-    {}
-
     template <class Feature>
     T evaluate(const Feature& feature, T finalDefaultValue) const {
         const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext(&feature));
@@ -72,8 +44,8 @@ public:
     const expression::Expression& getExpression() const { return *expression; }
 
 private:
+    std::shared_ptr<const expression::Expression> expression;
     optional<T> defaultValue;
-    std::shared_ptr<expression::Expression> expression;
 };
 
 } // namespace style

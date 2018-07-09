@@ -53,6 +53,7 @@ android {
 }
 
 dependencies {
+    implementation dependenciesList.kotlinLib
     api(project(':MapboxGLAndroidSDK'))
     implementation dependenciesList.mapboxJavaServices
 
@@ -82,3 +83,6 @@ apply from: "${rootDir}/gradle/gradle-checkstyle.gradle"
 apply from: "${rootDir}/gradle/gradle-lint.gradle"
 
 
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'

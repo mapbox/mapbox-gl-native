@@ -1,6 +1,6 @@
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11)
 
-mason_use(glfw VERSION 2017-07-13-67c9155)
+mason_use(glfw VERSION 2018-06-27-0be4f3f)
 mason_use(gtest VERSION 1.8.0)
 mason_use(benchmark VERSION 1.2.0)
 mason_use(icu VERSION 58.1-min-size)
@@ -14,6 +14,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/darwin/mbgl/storage/reachability.h
         PRIVATE platform/darwin/mbgl/storage/reachability.m
         PRIVATE platform/darwin/src/CFHandle.hpp
+        PRIVATE platform/darwin/src/collator.mm
         PRIVATE platform/darwin/src/local_glyph_rasterizer.mm
         PRIVATE platform/darwin/src/logging_nslog.mm
         PRIVATE platform/darwin/src/nsthread.mm

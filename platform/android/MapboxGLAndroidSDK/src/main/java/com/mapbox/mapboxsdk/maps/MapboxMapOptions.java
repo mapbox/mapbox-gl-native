@@ -13,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
-
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -76,6 +75,8 @@ public class MapboxMapOptions implements Parcelable {
 
   private String style;
 
+  private float pixelRatio;
+
   /**
    * Creates a new MapboxMapOptions object.
    */
@@ -122,6 +123,7 @@ public class MapboxMapOptions implements Parcelable {
     prefetchesTiles = in.readByte() != 0;
     zMediaOverlay = in.readByte() != 0;
     localIdeographFontFamily = in.readString();
+    pixelRatio = in.readFloat();
   }
 
   /**
@@ -218,6 +220,8 @@ public class MapboxMapOptions implements Parcelable {
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableZMediaOverlay, false));
       mapboxMapOptions.localIdeographFontFamily(
         typedArray.getString(R.styleable.mapbox_MapView_mapbox_localIdeographFontFamily));
+      mapboxMapOptions.pixelRatio(
+        typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_pixelRatio, 0));
     } finally {
       typedArray.recycle();
     }
@@ -546,6 +550,18 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Set the custom pixel ratio configuration to override the default value from resources.
+   * This ratio will be used to initialise the map with.
+   *
+   * @param pixelRatio the custom pixel ratio of the map under construction
+   * @return This
+   */
+  public MapboxMapOptions pixelRatio(float pixelRatio) {
+    this.pixelRatio = pixelRatio;
+    return this;
+  }
+
+  /**
    * Check whether tile pre-fetching is enabled.
    *
    * @return true if enabled
@@ -813,6 +829,15 @@ public class MapboxMapOptions implements Parcelable {
     return localIdeographFontFamily;
   }
 
+  /**
+   * Return the custom configured pixel ratio, returns 0 if not configured.
+   *
+   * @return the pixel ratio used by the map under construction
+   */
+  public float getPixelRatio() {
+    return pixelRatio;
+  }
+
   public static final Parcelable.Creator<MapboxMapOptions> CREATOR = new Parcelable.Creator<MapboxMapOptions>() {
     public MapboxMapOptions createFromParcel(Parcel in) {
       return new MapboxMapOptions(in);
@@ -866,6 +891,7 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeByte((byte) (prefetchesTiles ? 1 : 0));
     dest.writeByte((byte) (zMediaOverlay ? 1 : 0));
     dest.writeString(localIdeographFontFamily);
+    dest.writeFloat(pixelRatio);
   }
 
   @Override
@@ -959,7 +985,10 @@ public class MapboxMapOptions implements Parcelable {
     if (zMediaOverlay != options.zMediaOverlay) {
       return false;
     }
-    if (localIdeographFontFamily != options.localIdeographFontFamily) {
+    if (!localIdeographFontFamily.equals(options.localIdeographFontFamily)) {
+      return false;
+    }
+    if (pixelRatio != options.pixelRatio) {
       return false;
     }
 
@@ -1001,6 +1030,7 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (prefetchesTiles ? 1 : 0);
     result = 31 * result + (zMediaOverlay ? 1 : 0);
     result = 31 * result + (localIdeographFontFamily != null ? localIdeographFontFamily.hashCode() : 0);
+    result = 31 * result + (int) pixelRatio;
     return result;
   }
 }

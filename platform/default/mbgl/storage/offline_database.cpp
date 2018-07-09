@@ -658,7 +658,7 @@ void OfflineDatabase::putRegionResources(int64_t regionID, const std::list<std::
                 status.completedTileCount += 1;
                 status.completedTileSize += resourceSize;
             }
-        } catch (MapboxTileLimitExceededException) {
+        } catch (const MapboxTileLimitExceededException&) {
             // Commit the rest of the batch and retrow
             transaction.commit();
             throw;

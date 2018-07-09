@@ -13,7 +13,7 @@ EvaluationResult toNumber(const Value& v) {
         [](const std::string& s) -> optional<double> {
             try {
                 return util::stof(s);
-            } catch(std::exception) {
+            } catch (const std::exception&) {
                 return optional<double>();
             }
         },
@@ -71,6 +71,7 @@ Coercion::Coercion(type::Type type_, std::vector<std::unique_ptr<Expression>> in
     Expression(std::move(type_)),
     inputs(std::move(inputs_))
 {
+    assert(!inputs.empty());
     type::Type t = getType();
     if (t.is<type::NumberType>()) {
         coerceSingleValue = toNumber;

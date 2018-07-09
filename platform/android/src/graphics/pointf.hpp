@@ -14,6 +14,8 @@ public:
 
     static jni::Object<PointF> New(jni::JNIEnv&, float, float);
 
+    static mbgl::ScreenCoordinate getScreenCoordinate(jni::JNIEnv&, jni::Object<PointF>);
+
     static jni::Class<PointF> javaClass;
 
     static void registerNative(jni::JNIEnv&);

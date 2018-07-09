@@ -104,9 +104,9 @@ public:
 
     void setLatLng(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jlong);
 
-    jni::Object<CameraPosition> getCameraForLatLngBounds(jni::JNIEnv&, jni::Object<mbgl::android::LatLngBounds>, double top, double left, double bottom, double right);
+    jni::Object<CameraPosition> getCameraForLatLngBounds(jni::JNIEnv&, jni::Object<mbgl::android::LatLngBounds>, double top, double left, double bottom, double right, double bearing, double tilt);
 
-    jni::Object<CameraPosition> getCameraForGeometry(jni::JNIEnv&, jni::Object<geojson::Geometry>, double bearing, double top, double left, double bottom, double right);
+    jni::Object<CameraPosition> getCameraForGeometry(jni::JNIEnv&, jni::Object<geojson::Geometry>, double top, double left, double bottom, double right, double bearing, double tilt);
 
     void setReachability(jni::JNIEnv&, jni::jboolean);
 
@@ -236,7 +236,7 @@ public:
 
     void removeSource(JNIEnv&, jni::Object<Source>, jlong nativePtr);
 
-    void addImage(JNIEnv&, jni::String, jni::Object<Bitmap> bitmap, jni::jfloat);
+    void addImage(JNIEnv&, jni::String, jni::Object<Bitmap> bitmap, jni::jfloat, jni::jboolean);
 
     void addImages(JNIEnv&, jni::Array<jni::Object<mbgl::android::Image>>);
 

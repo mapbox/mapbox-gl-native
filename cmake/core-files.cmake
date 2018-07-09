@@ -4,6 +4,8 @@ set(MBGL_CORE_FILES
     # actor
     include/mbgl/actor/actor.hpp
     include/mbgl/actor/actor_ref.hpp
+    include/mbgl/actor/aspiring_actor.hpp
+    include/mbgl/actor/established_actor.hpp
     include/mbgl/actor/mailbox.hpp
     include/mbgl/actor/message.hpp
     include/mbgl/actor/scheduler.hpp
@@ -357,10 +359,10 @@ set(MBGL_CORE_FILES
     src/mbgl/storage/response.cpp
 
     # style
+    include/mbgl/style/color_ramp_property_value.hpp
     include/mbgl/style/conversion.hpp
     include/mbgl/style/data_driven_property_value.hpp
     include/mbgl/style/filter.hpp
-    include/mbgl/style/heatmap_color_property_value.hpp
     include/mbgl/style/image.hpp
     include/mbgl/style/layer.hpp
     include/mbgl/style/layer_type.hpp
@@ -404,6 +406,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/types.cpp
 
     # style/conversion
+    include/mbgl/style/conversion/color_ramp_property_value.hpp
     include/mbgl/style/conversion/constant.hpp
     include/mbgl/style/conversion/coordinate.hpp
     include/mbgl/style/conversion/custom_geometry_source_options.hpp
@@ -413,7 +416,6 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion/geojson.hpp
     include/mbgl/style/conversion/geojson_options.hpp
     include/mbgl/style/conversion/get_json_type.hpp
-    include/mbgl/style/conversion/heatmap_color_property_value.hpp
     include/mbgl/style/conversion/layer.hpp
     include/mbgl/style/conversion/light.hpp
     include/mbgl/style/conversion/position.hpp
@@ -447,12 +449,16 @@ set(MBGL_CORE_FILES
     include/mbgl/style/expression/check_subtype.hpp
     include/mbgl/style/expression/coalesce.hpp
     include/mbgl/style/expression/coercion.hpp
+    include/mbgl/style/expression/collator.hpp
+    include/mbgl/style/expression/collator_expression.hpp
     include/mbgl/style/expression/compound_expression.hpp
+    include/mbgl/style/expression/dsl.hpp
     include/mbgl/style/expression/equals.hpp
     include/mbgl/style/expression/expression.hpp
     include/mbgl/style/expression/find_zoom_curve.hpp
     include/mbgl/style/expression/get_covering_stops.hpp
     include/mbgl/style/expression/interpolate.hpp
+    include/mbgl/style/expression/interpolator.hpp
     include/mbgl/style/expression/is_constant.hpp
     include/mbgl/style/expression/is_expression.hpp
     include/mbgl/style/expression/length.hpp
@@ -471,7 +477,9 @@ set(MBGL_CORE_FILES
     src/mbgl/style/expression/check_subtype.cpp
     src/mbgl/style/expression/coalesce.cpp
     src/mbgl/style/expression/coercion.cpp
+    src/mbgl/style/expression/collator_expression.cpp
     src/mbgl/style/expression/compound_expression.cpp
+    src/mbgl/style/expression/dsl.cpp
     src/mbgl/style/expression/equals.cpp
     src/mbgl/style/expression/find_zoom_curve.cpp
     src/mbgl/style/expression/get_covering_stops.cpp
@@ -501,6 +509,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/function/interval_stops.hpp
     include/mbgl/style/function/source_function.hpp
     src/mbgl/style/function/categorical_stops.cpp
+    src/mbgl/style/function/convert.cpp
     src/mbgl/style/function/expression.cpp
     src/mbgl/style/function/identity_stops.cpp
 
@@ -610,6 +619,8 @@ set(MBGL_CORE_FILES
     src/mbgl/text/glyph_pbf.cpp
     src/mbgl/text/glyph_pbf.hpp
     src/mbgl/text/glyph_range.hpp
+    src/mbgl/text/language_tag.cpp
+    src/mbgl/text/language_tag.hpp
     src/mbgl/text/local_glyph_rasterizer.hpp
     src/mbgl/text/placement.cpp
     src/mbgl/text/placement.hpp

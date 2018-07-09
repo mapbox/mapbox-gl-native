@@ -17,6 +17,7 @@ class MapSnapshot {
 public:
 
     using PointForFn = mbgl::MapSnapshotter::PointForFn;
+    using LatLngForFn = mbgl::MapSnapshotter::LatLngForFn;
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/snapshotter/MapSnapshot"; };
 
@@ -27,19 +28,22 @@ public:
                                         float pixelRatio,
                                         std::vector<std::string> attributions,
                                         bool showLogo,
-                                        PointForFn pointForFn);
+                                        PointForFn pointForFn,
+                                        LatLngForFn latLngForFn);
 
     MapSnapshot(jni::JNIEnv&) {};
-    MapSnapshot(float pixelRatio, PointForFn);
+    MapSnapshot(float pixelRatio, PointForFn, LatLngForFn);
     ~MapSnapshot();
 
     jni::Object<PointF> pixelForLatLng(jni::JNIEnv&, jni::Object<LatLng>);
+    jni::Object<LatLng> latLngForPixel(jni::JNIEnv&, jni::Object<PointF>);
 
 private:
     static jni::Class<MapSnapshot> javaClass;
 
     float pixelRatio;
     mbgl::MapSnapshotter::PointForFn pointForFn;
+    mbgl::MapSnapshotter::LatLngForFn latLngForFn;
 };
 
 } // namespace android

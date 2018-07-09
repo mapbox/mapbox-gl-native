@@ -29,7 +29,7 @@ TEST(Expression, IsExpression) {
 
     for(auto& entry : allExpressions.GetObject()) {
         const std::string name { entry.name.GetString(), entry.name.GetStringLength() };
-        if (name == "collator" || name == "line-progress" || name == "resolved-locale" || name == "feature-state") {
+        if (name == "line-progress" || name == "feature-state") {
             // Not yet implemented
             continue;
         }

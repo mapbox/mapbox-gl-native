@@ -55,6 +55,10 @@
 #include <QString>
 #include <QStringList>
 #include <QThreadStorage>
+#include <QVariant>
+#include <QVariantList>
+#include <QVariantMap>
+#include <QColor>
 
 #include <memory>
 
@@ -1509,7 +1513,7 @@ void QMapboxGL::removeImage(const QString &id)
 
 /*!
     Adds a \a filter to a style \a layer using the format described in the \l
-    {https://www.mapbox.com/mapbox-gl-style-spec/#types-filter}{Mapbox style specification}.
+    {https://www.mapbox.com/mapbox-gl-js/style-spec/#other-filter}{Mapbox style specification}.
 
     Given a layer \c marker from an arbitrary GeoJSON source containing features of type \b
     "Point" and \b "LineString", this example shows how to make sure the layer will only tag
@@ -1517,14 +1521,14 @@ void QMapboxGL::removeImage(const QString &id)
 
     \code
         QVariantList filterExpression;
-        filterExpression.append("==");
-        filterExpression.append("$type");
-        filterExpression.append("Point");
+        filterExpression.push_back(QLatin1String("=="));
+        filterExpression.push_back(QLatin1String("$type"));
+        filterExpression.push_back(QLatin1String("Point"));
 
         QVariantList filter;
-        filter.append(filterExpression);
+        filter.push_back(filterExpression);
 
-        map->setFilter("marker", filter);
+        map->setFilter(QLatin1String("marker"), filter);
     \endcode
 */
 void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
@@ -1570,6 +1574,84 @@ void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
     }
 
     qWarning() << "Layer doesn't support filters";
+}
+
+QVariant QVariantFromValue(const mbgl::Value &value) {
+    return value.match(
+        [](const mbgl::NullValue) {
+            return QVariant();
+        }, [](const bool value_) {
+            return QVariant(value_);
+        }, [](const float value_) {
+            return QVariant(value_);
+        }, [](const int64_t value_) {
+            return QVariant(static_cast<qlonglong>(value_));
+        }, [](const double value_) {
+            return QVariant(value_);
+        }, [](const std::string &value_) {
+           return QVariant(value_.c_str());
+        }, [](const mbgl::Color &value_) {
+            return QColor(value_.r, value_.g, value_.b, value_.a);
+        }, [&](const std::vector<mbgl::Value> &vector) {
+            QVariantList list;
+            list.reserve(vector.size());
+            for (const auto &value_ : vector) {
+                list.push_back(QVariantFromValue(value_));
+            }
+            return list;
+        }, [&](const std::unordered_map<std::string, mbgl::Value> &map) {
+            QVariantMap varMap;
+            for (auto &item : map) {
+                varMap.insert(item.first.c_str(), QVariantFromValue(item.second));
+            }
+            return varMap;
+        }, [](const auto &) {
+            return QVariant();
+        });
+}
+
+/*!
+    Returns the current \a expression-based filter value applied to a style
+    \layer, if any.
+
+    Filter value types are described in the {https://www.mapbox.com/mapbox-gl-js/style-spec/#types}{Mapbox style specification}.
+
+    This function only supports expression-based filters.
+*/
+QVariant QMapboxGL::getFilter(const QString &layer)  const {
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    Layer* layer_ = d_ptr->mapObj->getStyle().getLayer(layer.toStdString());
+    if (!layer_) {
+        qWarning() << "Layer not found:" << layer;
+        return QVariant();
+    }
+
+    Filter filter_;
+
+    if (layer_->is<FillLayer>()) {
+        filter_ = layer_->as<FillLayer>()->getFilter();
+    } else if (layer_->is<LineLayer>()) {
+        filter_ = layer_->as<LineLayer>()->getFilter();
+    } else if (layer_->is<SymbolLayer>()) {
+        filter_ = layer_->as<SymbolLayer>()->getFilter();
+    } else if (layer_->is<CircleLayer>()) {
+        filter_ = layer_->as<CircleLayer>()->getFilter();
+    } else if (layer_->is<FillExtrusionLayer>()) {
+        filter_ = layer_->as<FillExtrusionLayer>()->getFilter();
+    } else {
+        qWarning() << "Layer doesn't support filters";
+        return QVariant();
+    }
+
+    if (!filter_.expression) {
+        qWarning() << "getFilter only supports expression-based filters";
+        return QVariant();
+    }
+
+    auto serialized = (**filter_.expression).serialize();
+    return QVariantFromValue(serialized);
 }
 
 /*!

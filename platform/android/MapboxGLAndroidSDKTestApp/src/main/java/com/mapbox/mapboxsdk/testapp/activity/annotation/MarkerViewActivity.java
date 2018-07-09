@@ -260,7 +260,7 @@ public class MarkerViewActivity extends AppCompatActivity {
     private MapboxMap mapboxMap;
 
     CountryAdapter(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
-      super(context);
+      super(context, CountryMarkerView.class);
       this.inflater = LayoutInflater.from(context);
       this.mapboxMap = mapboxMap;
     }
@@ -333,7 +333,7 @@ public class MarkerViewActivity extends AppCompatActivity {
     private MapboxMap mapboxMap;
 
     public TextAdapter(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
-      super(context);
+      super(context, TextMarkerView.class);
       this.inflater = LayoutInflater.from(context);
       this.mapboxMap = mapboxMap;
     }

@@ -46,6 +46,7 @@
 #include "style/light.hpp"
 #include "snapshotter/map_snapshotter.hpp"
 #include "snapshotter/map_snapshot.hpp"
+#include "text/collator_jni.hpp"
 #include "text/local_glyph_rasterizer_jni.hpp"
 #include "java/lang.hpp"
 
@@ -188,6 +189,8 @@ void registerNatives(JavaVM *vm) {
 
     // text
     LocalGlyphRasterizer::registerNative(env);
+    Locale::registerNative(env);
+    Collator::registerNative(env);
 }
 
 } // namespace android

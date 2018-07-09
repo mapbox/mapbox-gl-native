@@ -25,8 +25,8 @@ class Style;
 
 class MapSnapshotter {
 public:
-    MapSnapshotter(FileSource& fileSource,
-                   Scheduler& scheduler,
+    MapSnapshotter(FileSource* fileSource,
+                   std::shared_ptr<Scheduler> scheduler,
                    const std::pair<bool, std::string> style,
                    const Size&,
                    const float pixelRatio,
@@ -52,8 +52,9 @@ public:
     LatLngBounds getRegion() const;
 
     using PointForFn = std::function<ScreenCoordinate (const LatLng&)>;
+    using LatLngForFn = std::function<LatLng (const ScreenCoordinate&)>;
     using Attributions = std::vector<std::string>;
-    using Callback = std::function<void (std::exception_ptr, PremultipliedImage, Attributions, PointForFn)>;
+    using Callback = std::function<void (std::exception_ptr, PremultipliedImage, Attributions, PointForFn, LatLngForFn)>;
     void snapshot(ActorRef<Callback>);
 
 private:

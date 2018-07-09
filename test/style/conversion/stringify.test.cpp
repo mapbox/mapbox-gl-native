@@ -4,6 +4,7 @@
 #include <mbgl/style/conversion/stringify.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
+#include <mbgl/style/expression/dsl.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
 #include <rapidjson/writer.h>
@@ -76,56 +77,62 @@ TEST(Stringify, Value) {
 }
 
 TEST(Stringify, Filter) {
-    using namespace mbgl::style::expression;
-    
+    using namespace mbgl::style::expression::dsl;
     ASSERT_EQ(stringify(Filter()), "null");
-    
-    ParsingContext context;
-    ASSERT_EQ(stringify(Filter(createCompoundExpression("filter-==", createLiteral("a"), createLiteral(1.0), context))), "[\"filter-==\",\"a\",1.0]");
+    ASSERT_EQ(stringify(Filter(eq(literal("a"), literal("b")))), "[\"==\",\"a\",\"b\"]");
 }
 
 TEST(Stringify, CameraFunction) {
-    ASSERT_EQ(stringify(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 1 })),
-        "[\"interpolate\",[\"linear\"],[\"zoom\"],0.0,1.0]");
-    ASSERT_EQ(stringify(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 2 })),
-        "[\"interpolate\",[\"exponential\",2.0],[\"zoom\"],0.0,1.0]");
-    ASSERT_EQ(stringify(CameraFunction<float>(IntervalStops<float> { {{0, 1}} })),
-        "[\"step\",[\"zoom\"],0.0,1.0]");
+    using namespace mbgl::style::expression::dsl;
+    ASSERT_EQ(stringify(CameraFunction<float>(
+        interpolate(
+            linear(),
+            zoom(),
+            0.0, literal(1.0),
+            1.0, literal(2.0)
+        ))),
+        "[\"interpolate\",[\"linear\"],[\"zoom\"],0.0,1.0,1.0,2.0]");
 }
 
 TEST(Stringify, SourceFunction) {
-    ASSERT_EQ(stringify(SourceFunction<float>("property", ExponentialStops<float> { {{0, 1}}, 2 })),
-        "[\"interpolate\",[\"exponential\",2.0],[\"number\",[\"get\",\"property\"]],0.0,1.0]");
-    ASSERT_EQ(stringify(SourceFunction<float>("property", IntervalStops<float> { {{0, 1}} })),
-        "[\"step\",[\"number\",[\"get\",\"property\"]],0.0,1.0]");
-    ASSERT_EQ(stringify(SourceFunction<float>("property", CategoricalStops<float> { {{CategoricalValue(true), 1}} })),
-        "[\"case\",[\"boolean\",[\"get\",\"property\"]],1.0,[\"error\"]]");
-    ASSERT_EQ(stringify(SourceFunction<float>("property", IdentityStops<float> {})),
-        "[\"number\",[\"get\",\"property\"]]");
-    ASSERT_EQ(stringify(SourceFunction<float>("property", IdentityStops<float> {}, 0.0f)),
-        "[\"number\",[\"get\",\"property\"]]");
+    using namespace mbgl::style::expression::dsl;
+    ASSERT_EQ(stringify(SourceFunction<float>(
+        interpolate(
+            exponential(2.0),
+            number(get("property")),
+            0.0, literal(1.0),
+            1.0, literal(2.0)
+        ))),
+        "[\"interpolate\",[\"exponential\",2.0],[\"number\",[\"get\",\"property\"]],0.0,1.0,1.0,2.0]");
 }
 
 TEST(Stringify, CompositeFunction) {
-    ASSERT_EQ(stringify(CompositeFunction<float>("property",
-        CompositeExponentialStops<float> {
-            {
-                { 0, {{0, 1}} },
-                { 1, {{0, 1}} }
-            },
-            2
-        }, 0.0f)),
+    using namespace mbgl::style::expression::dsl;
+    ASSERT_EQ(stringify(CompositeFunction<float>(
+        interpolate(
+            linear(),
+            zoom(),
+            0.0, interpolate(exponential(2.0), number(get("property")), 0.0, literal(1.0), 1.0, literal(2.0)),
+            1.0, interpolate(exponential(2.0), number(get("property")), 0.0, literal(1.0), 1.0, literal(2.0))
+        ))),
         "[\"interpolate\","
             "[\"linear\"],"
             "[\"zoom\"],"
-            "0.0,[\"interpolate\",[\"exponential\",2.0],[\"number\",[\"get\",\"property\"]],0.0,1.0],"
-            "1.0,[\"interpolate\",[\"exponential\",2.0],[\"number\",[\"get\",\"property\"]],0.0,1.0]]");
+            "0.0,[\"interpolate\",[\"exponential\",2.0],[\"number\",[\"get\",\"property\"]],0.0,1.0,1.0,2.0],"
+            "1.0,[\"interpolate\",[\"exponential\",2.0],[\"number\",[\"get\",\"property\"]],0.0,1.0,1.0,2.0]]");
 }
 
 TEST(Stringify, PropertyValue) {
+    using namespace mbgl::style::expression::dsl;
     ASSERT_EQ(stringify(PropertyValue<float>(1)), "1.0");
-    ASSERT_EQ(stringify(PropertyValue<float>(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 2 }))),
-        "[\"interpolate\",[\"exponential\",2.0],[\"zoom\"],0.0,1.0]");
+    ASSERT_EQ(stringify(PropertyValue<float>(CameraFunction<float>(
+        interpolate(
+            exponential(2.0),
+            zoom(),
+            0.0, literal(1.0),
+            1.0, literal(2.0)
+        )))),
+        "[\"interpolate\",[\"exponential\",2.0],[\"zoom\"],0.0,1.0,1.0,2.0]");
 }
 
 TEST(Stringify, Layout) {

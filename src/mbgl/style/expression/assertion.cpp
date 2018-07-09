@@ -6,6 +6,14 @@ namespace style {
 namespace expression {
 
 using namespace mbgl::style::conversion;
+
+Assertion::Assertion(type::Type type_, std::vector<std::unique_ptr<Expression>> inputs_) :
+    Expression(type_),
+    inputs(std::move(inputs_))
+{
+    assert(!inputs.empty());
+}
+
 ParseResult Assertion::parse(const Convertible& value, ParsingContext& ctx) {
     static std::unordered_map<std::string, type::Type> types {
         {"string", type::String},
