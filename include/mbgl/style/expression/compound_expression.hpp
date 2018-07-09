@@ -33,7 +33,10 @@ namespace expression {
 */
 struct VarargsType { type::Type type; };
 template <typename T>
-struct Varargs : std::vector<T> { using std::vector<T>::vector; };
+struct Varargs : std::vector<T> {
+    template <class... Args>
+    Varargs(Args&&... args) : std::vector<T>(std::forward<Args>(args)...) {}
+};
 
 namespace detail {
 // Base class for the Signature<Fn> structs that are used to determine

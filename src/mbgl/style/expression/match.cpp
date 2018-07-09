@@ -138,7 +138,7 @@ optional<InputType> parseInputValue(const Convertible& input, ParsingContext& pa
                     parentContext.error("Branch labels must be integers no larger than " + util::toString(Value::maxSafeInteger()) + ".", index);
                 } else {
                     type = {type::Number};
-                    result = {static_cast<int64_t>(n)};
+                    result = optional<InputType>{static_cast<int64_t>(n)};
                 }
             },
             [&] (int64_t n) {
@@ -146,7 +146,7 @@ optional<InputType> parseInputValue(const Convertible& input, ParsingContext& pa
                     parentContext.error("Branch labels must be integers no larger than " + util::toString(Value::maxSafeInteger()) + ".", index);
                 } else {
                     type = {type::Number};
-                    result = {n};
+                    result = optional<InputType>{n};
                 }
             },
             [&] (double n) {
@@ -156,7 +156,7 @@ optional<InputType> parseInputValue(const Convertible& input, ParsingContext& pa
                     parentContext.error("Numeric branch labels must be integer values.", index);
                 } else {
                     type = {type::Number};
-                    result = {static_cast<int64_t>(n)};
+                    result = optional<InputType>{static_cast<int64_t>(n)};
                 }
             },
             [&] (const std::string& s) {

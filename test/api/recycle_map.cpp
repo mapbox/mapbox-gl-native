@@ -35,7 +35,7 @@ TEST(API, RecycleMapUpdateImages) {
 
     auto loadStyle = [&](auto markerName, auto markerPath) {
         auto source = std::make_unique<GeoJSONSource>("geometry");
-        source->setGeoJSON({ Point<double> { 0, 0 } });
+        source->setGeoJSON( Geometry<double>{ Point<double>{ 0, 0 } } );
 
         auto layer = std::make_unique<SymbolLayer>("geometry", "geometry");
         layer->setIconImage({ markerName });

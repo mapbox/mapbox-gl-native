@@ -127,23 +127,23 @@ ParseResult Step::parse(const mbgl::style::conversion::Convertible& value, Parsi
             labelValue->match(
                 [&](uint64_t n) {
                     if (n > std::numeric_limits<double>::max()) {
-                        label = {std::numeric_limits<double>::infinity()};
+                        label = optional<double>{std::numeric_limits<double>::infinity()};
                     } else {
-                        label = {static_cast<double>(n)};
+                        label = optional<double>{static_cast<double>(n)};
                     }
                 },
                 [&](int64_t n) {
                     if (n > std::numeric_limits<double>::max()) {
-                        label = {std::numeric_limits<double>::infinity()};
+                        label = optional<double>{std::numeric_limits<double>::infinity()};
                     } else {
-                        label = {static_cast<double>(n)};
+                        label = optional<double>{static_cast<double>(n)};
                     }
                 },
                 [&](double n) {
                     if (n > std::numeric_limits<double>::max()) {
-                        label = {std::numeric_limits<double>::infinity()};
+                        label = optional<double>{std::numeric_limits<double>::infinity()};
                     } else {
-                        label = {static_cast<double>(n)};
+                        label = optional<double>{n};
                     }
                 },
                 [&](const auto&) {}
