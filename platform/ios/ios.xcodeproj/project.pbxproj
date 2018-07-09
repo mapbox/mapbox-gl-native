@@ -37,8 +37,6 @@
 		1F7454A91ED08AB400021D39 /* MGLLightTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F7454A61ED08AB400021D39 /* MGLLightTest.mm */; };
 		1F95931D1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */; };
 		1FC4817D2098CBC0000D09B4 /* NSPredicate+MGLPrivateAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FC4817B2098CBC0000D09B4 /* NSPredicate+MGLPrivateAdditions.h */; };
-		1FB7DAB01F2A4DC200410606 /* MGLVectorSource+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FDD9D6D1F26936400252B09 /* MGLVectorSource+MGLAdditions.h */; };
-		1FB7DAB11F2A4DC800410606 /* MGLVectorSource+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD9D6E1F26936400252B09 /* MGLVectorSource+MGLAdditions.m */; };
 		1FC4817F2098CD80000D09B4 /* NSPredicate+MGLPrivateAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FC4817B2098CBC0000D09B4 /* NSPredicate+MGLPrivateAdditions.h */; };
 		30E578171DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */; };
 		30E578181DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */; };
@@ -373,16 +371,18 @@
 		ACF969F320CB04E600B23FB7 /* MMEEventsService.m in Sources */ = {isa = PBXBuildFile; fileRef = ACF969F020CB04E500B23FB7 /* MMEEventsService.m */; };
 		ACF969F420CB04E600B23FB7 /* MMEEventsService.h in Headers */ = {isa = PBXBuildFile; fileRef = ACF969F120CB04E500B23FB7 /* MMEEventsService.h */; };
 		ACF969F520CB04E600B23FB7 /* MMEEventsService.h in Headers */ = {isa = PBXBuildFile; fileRef = ACF969F120CB04E500B23FB7 /* MMEEventsService.h */; };
-		CA0C27922076C804001CE5B7 /* MGLShapeSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0C27912076C804001CE5B7 /* MGLShapeSourceTests.m */; };
 		CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */; };
-		CA1B4A512099FB2200EDD491 /* MGLMapSnapshotterTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA1B4A502099FB2200EDD491 /* MGLMapSnapshotterTest.m */; };
-		CA34C9C3207FD272005C1A06 /* MGLCameraTransitionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA34C9C2207FD272005C1A06 /* MGLCameraTransitionTests.mm */; };
 		CA4EB8C720863487006AB465 /* MGLStyleLayerIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */; };
 		CA55CD41202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA55CD42202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CAA69DA4206DCD0E007279CD /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; };
 		CAA69DA5206DCD0E007279CD /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CABE5DAD2072FAB40003AF3C /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
+		CFD00DA820F402BE0064D9F2 /* EAGLContext+MGLAddtions.m in Sources */ = {isa = PBXBuildFile; fileRef = CFD00DA620F402BD0064D9F2 /* EAGLContext+MGLAddtions.m */; };
+		CFD00DA920F402BE0064D9F2 /* EAGLContext+MGLAddtions.m in Sources */ = {isa = PBXBuildFile; fileRef = CFD00DA620F402BD0064D9F2 /* EAGLContext+MGLAddtions.m */; };
+		CFD00DAA20F402BE0064D9F2 /* EAGLContext+MGLAddtions.m in Sources */ = {isa = PBXBuildFile; fileRef = CFD00DA620F402BD0064D9F2 /* EAGLContext+MGLAddtions.m */; };
+		CFD00DAB20F402BE0064D9F2 /* EAGLContext+MGLAddtions.h in Headers */ = {isa = PBXBuildFile; fileRef = CFD00DA720F402BE0064D9F2 /* EAGLContext+MGLAddtions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CFD00DAC20F402BE0064D9F2 /* EAGLContext+MGLAddtions.h in Headers */ = {isa = PBXBuildFile; fileRef = CFD00DA720F402BE0064D9F2 /* EAGLContext+MGLAddtions.h */; };
 		DA00FC8E1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8F1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC901D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */; };
@@ -970,8 +970,6 @@
 		632281DD1E6F855900D75A5D /* MBXEmbeddedMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXEmbeddedMapViewController.h; sourceTree = "<group>"; };
 		632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXEmbeddedMapViewController.m; sourceTree = "<group>"; };
 		6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MGLDocumentationExampleTests.swift; path = ../../darwin/test/MGLDocumentationExampleTests.swift; sourceTree = "<group>"; };
-		7E016D7C1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLPolyline+MGLAdditions.h"; sourceTree = "<group>"; };
-		7E016D7D1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLPolyline+MGLAdditions.m"; sourceTree = "<group>"; };
 		8989B17A201A48EA0081CF59 /* MGLHeatmapStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLHeatmapStyleLayer.h; sourceTree = "<group>"; };
 		8989B17B201A48EA0081CF59 /* MGLHeatmapStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLHeatmapStyleLayer.mm; sourceTree = "<group>"; };
 		920A3E5C1E6F995200C16EFC /* MGLSourceQueryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLSourceQueryTests.m; path = ../../darwin/test/MGLSourceQueryTests.m; sourceTree = "<group>"; };
@@ -1015,13 +1013,12 @@
 		AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTelemetryConfig.m; sourceTree = "<group>"; };
 		ACF969F020CB04E500B23FB7 /* MMEEventsService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEEventsService.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventsService.m"; sourceTree = SOURCE_ROOT; };
 		ACF969F120CB04E500B23FB7 /* MMEEventsService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEEventsService.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventsService.h"; sourceTree = SOURCE_ROOT; };
-		CA0C27912076C804001CE5B7 /* MGLShapeSourceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLShapeSourceTests.m; sourceTree = "<group>"; };
 		CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewIntegrationTest.m; sourceTree = "<group>"; };
 		CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLMapViewIntegrationTest.h; sourceTree = "<group>"; };
-		CA1B4A502099FB2200EDD491 /* MGLMapSnapshotterTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapSnapshotterTest.m; sourceTree = "<group>"; };
-		CA34C9C2207FD272005C1A06 /* MGLCameraTransitionTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLCameraTransitionTests.mm; sourceTree = "<group>"; };
 		CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLStyleLayerIntegrationTests.m; sourceTree = "<group>"; };
 		CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCameraChangeReason.h; sourceTree = "<group>"; };
+		CFD00DA620F402BD0064D9F2 /* EAGLContext+MGLAddtions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "EAGLContext+MGLAddtions.m"; sourceTree = "<group>"; };
+		CFD00DA720F402BE0064D9F2 /* EAGLContext+MGLAddtions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "EAGLContext+MGLAddtions.h"; sourceTree = "<group>"; };
 		DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
 		DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAttributionInfo.mm; sourceTree = "<group>"; };
 		DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
@@ -1526,6 +1523,8 @@
 		35CE617F1D4165C2004F2359 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				CFD00DA720F402BE0064D9F2 /* EAGLContext+MGLAddtions.h */,
+				CFD00DA620F402BD0064D9F2 /* EAGLContext+MGLAddtions.m */,
 				357FE2DB1E02D2B20068B753 /* NSCoder+MGLAdditions.h */,
 				357FE2DC1E02D2B20068B753 /* NSCoder+MGLAdditions.mm */,
 				960369FF200565C700510F3D /* NSOrthography+MGLAdditions.h */,
@@ -1722,14 +1721,6 @@
 				DD4823741D94AE6C00EB71B7 /* numeric_filter_style.json */,
 			);
 			name = Fixtures;
-			sourceTree = "<group>";
-		};
-		CA1B4A4F2099FA2800EDD491 /* Snapshotter Tests */ = {
-			isa = PBXGroup;
-			children = (
-				CA1B4A502099FB2200EDD491 /* MGLMapSnapshotterTest.m */,
-			);
-			path = "Snapshotter Tests";
 			sourceTree = "<group>";
 		};
 		DA1DC9411CB6C1C2006E619F = {
@@ -1961,13 +1952,8 @@
 				DA89339F1CCC951200E68420 /* Localizable.strings */,
 				DAC49C5F1CD02BC9009E1AA3 /* Localizable.stringsdict */,
 				DA8933EF1CCD387900E68420 /* strip-frameworks.sh */,
-				40599F001DEE1B2400182B5D /* api_mapbox_staging.der */,
 				AC0C15F2209D0E6000B65675 /* api_mapbox_cn-digicert_2018.der */,
 				AC0C15F1209D0E3600B65675 /* api_mapbox_cn-geotrust_2018.der */,
-				40599F011DEE1B2400182B5D /* api_mapbox_com-digicert_2016.der */,
-				40599F021DEE1B2400182B5D /* api_mapbox_com-geotrust_2016.der */,
-				40EA6BBD1EF4598900FCCDA2 /* api_mapbox_com-digicert_2017.der */,
-				40EA6BBE1EF4598900FCCDA2 /* api_mapbox_com-geotrust_2017.der */,
 			);
 			name = "Kit Resources";
 			path = resources;
@@ -1993,16 +1979,6 @@
 			);
 			name = SMCalloutView;
 			path = ../vendor/SMCalloutView;
-			sourceTree = "<group>";
-		};
-		DA8848911CBB049300AB86E3 /* reachability */ = {
-			isa = PBXGroup;
-			children = (
-				DA88488D1CBB047F00AB86E3 /* reachability.h */,
-				DA88488F1CBB048E00AB86E3 /* reachability.m */,
-			);
-			name = reachability;
-			path = ..;
 			sourceTree = "<group>";
 		};
 		DA8933B91CCD2C6700E68420 /* Foundation Resources */ = {
@@ -2286,6 +2262,7 @@
 				DA8848311CBAFA6200AB86E3 /* NSString+MGLAdditions.h in Headers */,
 				DACA86262019218600E9693A /* MGLRasterDEMSource.h in Headers */,
 				353933F81D3FB79F003F57D7 /* MGLLineStyleLayer.h in Headers */,
+				CFD00DAB20F402BE0064D9F2 /* EAGLContext+MGLAddtions.h in Headers */,
 				92F2C3ED1F0E3C3A00268EC0 /* MGLRendererFrontend.h in Headers */,
 				DAAF722D1DA903C700312FA4 /* MGLStyleValue_Private.h in Headers */,
 				071BBB031EE76146001FB02A /* MGLImageSource.h in Headers */,
@@ -2483,6 +2460,7 @@
 				35D13AC41D3D19DD00AFB4E0 /* MGLFillStyleLayer.h in Headers */,
 				96E5170120005A6400A02306 /* Fabric+FABKits.h in Headers */,
 				DABFB86E1CBE9A0F00D62B32 /* MGLCalloutView.h in Headers */,
+				CFD00DAC20F402BE0064D9F2 /* EAGLContext+MGLAddtions.h in Headers */,
 				96E516FC20005A4400A02306 /* MGLUserLocationHeadingIndicator.h in Headers */,
 				1F7454971ECD450D00021D39 /* MGLLight_Private.h in Headers */,
 				DABFB8601CBE99E500D62B32 /* MGLMapCamera.h in Headers */,
@@ -2825,12 +2803,7 @@
 				DA8933F01CCD387900E68420 /* strip-frameworks.sh in Resources */,
 				DAC49C5C1CD02BC9009E1AA3 /* Localizable.stringsdict in Resources */,
 				DA8933BF1CCD2CAD00E68420 /* Foundation.stringsdict in Resources */,
-				40EA6BC11EF4599600FCCDA2 /* api_mapbox_com-digicert_2017.der in Resources */,
-				408982E91DEE208200754016 /* api_mapbox_staging.der in Resources */,
 				AC0C15F3209D0E6900B65675 /* api_mapbox_cn-geotrust_2018.der in Resources */,
-				408982EA1DEE208B00754016 /* api_mapbox_com-digicert_2016.der in Resources */,
-				40EA6BC31EF4599D00FCCDA2 /* api_mapbox_com-geotrust_2017.der in Resources */,
-				408982EB1DEE209100754016 /* api_mapbox_com-geotrust_2016.der in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2844,11 +2817,7 @@
 				960D0C371ECF5AAF008E151F /* Images.xcassets in Resources */,
 				DA8933DC1CCD31D400E68420 /* Foundation.stringsdict in Resources */,
 				DAC49C5D1CD02BC9009E1AA3 /* Localizable.stringsdict in Resources */,
-				40599F0C1DEE1B7600182B5D /* api_mapbox_staging.der in Resources */,
-				40599F0D1DEE1B7A00182B5D /* api_mapbox_com-digicert_2016.der in Resources */,
-				40599F0E1DEE1B7E00182B5D /* api_mapbox_com-geotrust_2016.der in Resources */,
 				AC0C15F6209D0E7300B65675 /* api_mapbox_cn-digicert_2018.der in Resources */,
-				40EA6BC21EF4599700FCCDA2 /* api_mapbox_com-digicert_2017.der in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2898,6 +2867,7 @@
 				DA1DC96A1CB6C6B7006E619F /* MBXCustomCalloutView.m in Sources */,
 				927FBCFC1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m in Sources */,
 				DA1DC99B1CB6E064006E619F /* MBXViewController.m in Sources */,
+				CFD00DA820F402BE0064D9F2 /* EAGLContext+MGLAddtions.m in Sources */,
 				40FDA76B1CCAAA6800442548 /* MBXAnnotationView.m in Sources */,
 				3E6465D62065767A00685536 /* LimeGreenStyleLayer.m in Sources */,
 				632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */,
@@ -3079,6 +3049,7 @@
 				DA8848581CBAFB9800AB86E3 /* MGLMapboxEvents.m in Sources */,
 				35CE61841D4165D9004F2359 /* UIColor+MGLAdditions.mm in Sources */,
 				3EA93369F61CF70AFA50465D /* MGLRendererConfiguration.mm in Sources */,
+				CFD00DA920F402BE0064D9F2 /* EAGLContext+MGLAddtions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3205,6 +3176,7 @@
 				35CE61851D4165D9004F2359 /* UIColor+MGLAdditions.mm in Sources */,
 				DAA4E4241CBB730400178DFB /* MGLPolyline.mm in Sources */,
 				3EA9366247780E4F252652A8 /* MGLRendererConfiguration.mm in Sources */,
+				CFD00DAA20F402BE0064D9F2 /* EAGLContext+MGLAddtions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

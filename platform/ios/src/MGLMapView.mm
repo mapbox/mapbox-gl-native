@@ -55,6 +55,7 @@
 #import "NSURL+MGLAdditions.h"
 #import "UIImage+MGLAdditions.h"
 #import "UIViewController+MGLAdditions.h"
+#import "EAGLContext+MGLAddtions.h"
 
 #import "MGLFaux3DUserLocationAnnotationView.h"
 #import "MGLUserLocationAnnotationView.h"
@@ -601,6 +602,7 @@ public:
     //
     _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     NSAssert(_context, @"Failed to create OpenGL ES context.");
+    [EAGLContext becomeMapboxContext:_context];
 
     // create GL view
     //
@@ -662,6 +664,7 @@ public:
 
 - (void)dealloc
 {
+    [EAGLContext destoryMapboxContext];
     [_reachability stopNotifier];
 
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
