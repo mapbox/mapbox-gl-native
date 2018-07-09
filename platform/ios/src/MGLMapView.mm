@@ -294,7 +294,7 @@ public:
 
     MGLReachability *_reachability;
     
-    BOOL _turnOffTraffic;
+    BOOL _showsTraffic;
 }
 
 #pragma mark - Setup & Teardown -
@@ -579,6 +579,7 @@ public:
     }
     
     _showsPointOfInterest = YES;
+    _showsTraffic = YES;
 }
 
 - (mbgl::Size)size
@@ -2395,17 +2396,19 @@ public:
         if ([layer isKindOfClass:[MGLForegroundStyleLayer class]]) {
             MGLForegroundStyleLayer *trafficLayer = (MGLForegroundStyleLayer *)layer;
             if ([trafficLayer.sourceIdentifier isEqualToString:sourceIdentifier]) {
-                return layer.isVisible;
+                _showsTraffic = layer.isVisible;
+                return _showsTraffic;
             }
             
         }
     }
-    
-    return NO;
+    _showsTraffic = NO;
+    return _showsTraffic;
 }
 
 - (void)setShowsTraffic:(BOOL)showsTraffic
 {
+    _showsTraffic = showsTraffic;
     NSString *sourceIdentifier = @"mapbox://mapbox.mapbox-traffic-v1";
     for (MGLStyleLayer *layer in self.style.layers) {
         if ([layer isKindOfClass:[MGLForegroundStyleLayer class]]) {
@@ -2416,10 +2419,6 @@ public:
             
         }
     }
-}
-
-- (void)setShowsTraffic__:(BOOL)showsTraffic__ {
-    _turnOffTraffic = !showsTraffic__;
 }
 
 - (void)setShowsPointOfInterest:(BOOL)showsPointOfInterest {
@@ -5729,23 +5728,26 @@ public:
     }
 
     self.style = [[MGLStyle alloc] initWithRawStyle:&_mbglMap->getStyle() mapView:self];
-    if ([self.delegate respondsToSelector:@selector(mapView:didFinishLoadingStyle:)])
-    {
-        [self.delegate mapView:self didFinishLoadingStyle:self.style];
-    }
     
     if (_showsBuildings) {
         _showsBuildings = NO; // Forces an update.
         self.showsBuildings = YES;
     }
     
-    if (_turnOffTraffic) {
-        self.showsTraffic = NO;
+    // If the traffic style is used it will display by default the traffic, it it's
+    // disabled it will force an update.
+    if (!_showsTraffic) {
+        self.showsTraffic = _showsTraffic;
     }
     
     // POI's are enabled by default, if it is disabled it will force an update.
     if (!_showsPointOfInterest) {
         self.showsPointOfInterest = _showsPointOfInterest;
+    }
+    
+    if ([self.delegate respondsToSelector:@selector(mapView:didFinishLoadingStyle:)])
+    {
+        [self.delegate mapView:self didFinishLoadingStyle:self.style];
     }
     
 }
