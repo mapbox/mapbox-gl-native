@@ -577,6 +577,8 @@ public:
         [MGLMapboxEvents pushTurnstileEvent];
         [MGLMapboxEvents pushEvent:MMEEventTypeMapLoad withAttributes:@{}];
     }
+    
+    _showsPointOfInterest = YES;
 }
 
 - (mbgl::Size)size
@@ -2418,6 +2420,15 @@ public:
 
 - (void)setShowsTraffic__:(BOOL)showsTraffic__ {
     _turnOffTraffic = !showsTraffic__;
+}
+
+- (void)setShowsPointOfInterest:(BOOL)showsPointOfInterest {
+    _showsPointOfInterest = showsPointOfInterest;
+    for (MGLStyleLayer *layer in self.style.layers) {
+        if ([layer.identifier hasPrefix:@"poi"]) {
+            [layer setVisible:_showsPointOfInterest];
+        }
+    }
 }
 
 #pragma mark - Accessibility -
@@ -5730,6 +5741,11 @@ public:
     
     if (_turnOffTraffic) {
         self.showsTraffic = NO;
+    }
+    
+    // POI's are enabled by default, if it is disabled it will force an update.
+    if (!_showsPointOfInterest) {
+        self.showsPointOfInterest = _showsPointOfInterest;
     }
     
 }

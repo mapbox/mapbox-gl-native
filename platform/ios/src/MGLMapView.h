@@ -439,6 +439,15 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, assign) BOOL showsTraffic;
 
 /**
+ A Boolean value indicating whether the POIs are displayed.
+ 
+ Setting this property to `YES` causes the map to display the POIs.
+ 
+ The default value of this property is `YES`.
+ */
+@property (nonatomic, assign) BOOL showsPointOfInterest;
+
+/**
  The geographic coordinate that is the subject of observation as the user
  location is being tracked.
 
