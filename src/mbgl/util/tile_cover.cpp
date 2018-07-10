@@ -127,12 +127,12 @@ std::vector<UnwrappedTileID> tileCover(Point<double> tl,
     }
 
     auto scanLine = [&](int32_t x0, int32_t x1, int32_t y) {
-        int32_t x;
-        if (y >= 0 && y <= maxTilesPerAxis) {
-            for (x = x0; x < x1; ++x) {
-                const auto dx = x + 0.5 - c.x, dy = y + 0.5 - c.y;
-                t.emplace_back(ID{ x, y, dx * dx + dy * dy });
-            }
+        double dx, dy;
+        for (int32_t x = x0; x < x1; ++x) {
+            // We don't know which corner of the tile coordinate is the closest,
+            // so add 0.5 to calculate the distance from its tile center.
+            dx = x + 0.5 - c.x; dy = y + 0.5 - c.y;
+            t.emplace_back(ID{ x, y, dx * dx + dy * dy });
         }
     };
 
