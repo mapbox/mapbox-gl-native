@@ -220,10 +220,10 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     _mbglMapSnapshotter->snapshot(_snapshotCallback->self());
 }
 
-+ (UIImage*)drawAttributedSnapshotWorker:(mbgl::MapSnapshotter::Attributions)attributions snapshotImage:(MGLImage *)mglImage pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn latLngForFn:(mbgl::MapSnapshotter::LatLngForFn)latLngForFn scale:(CGFloat)scale size:(CGSize)size {
-    
++ (MGLImage*)drawAttributedSnapshotWorker:(mbgl::MapSnapshotter::Attributions)attributions snapshotImage:(MGLImage *)mglImage pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn latLngForFn:(mbgl::MapSnapshotter::LatLngForFn)latLngForFn scale:(CGFloat)scale size:(CGSize)size {
+
     NSArray<MGLAttributionInfo *>* attributionInfo = [MGLMapSnapshotter generateAttributionInfos:attributions];
-    
+
 #if TARGET_OS_IPHONE
     MGLAttributionInfoStyle attributionInfoStyle = MGLAttributionInfoStyleLong;
     for (NSUInteger styleValue = MGLAttributionInfoStyleLong; styleValue >= MGLAttributionInfoStyleShort; styleValue--) {
@@ -283,8 +283,9 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     UIGraphicsEndImageContext();
 
     return compositedImage;
-    
+
 #else
+
     NSSize targetSize = NSMakeSize(size.width, size.height);
     NSRect targetFrame = NSMakeRect(0, 0, targetSize.width, targetSize.height);
     
@@ -345,7 +346,6 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     [compositedImage unlockFocus];
 
     return compositedImage;
-
 #endif
 }
 
@@ -364,7 +364,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
     dispatch_async(workQueue, ^{
         // Call a class method to ensure we're not accidentally capturing self
-        UIImage *compositedImage = [MGLMapSnapshotter drawAttributedSnapshotWorker:attributions snapshotImage:mglImage pointForFn:pointForFn latLngForFn:latLngForFn scale:scale size:size];
+        MGLImage *compositedImage = [MGLMapSnapshotter drawAttributedSnapshotWorker:attributions snapshotImage:mglImage pointForFn:pointForFn latLngForFn:latLngForFn scale:scale size:size];
 
         // Dispatch result to origin queue
         dispatch_async(originQueue, ^{
