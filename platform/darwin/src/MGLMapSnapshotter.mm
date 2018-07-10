@@ -110,8 +110,9 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 @interface MGLMapSnapshotter()
 @property (nonatomic) BOOL loading;
-@property (nonatomic) dispatch_queue_t queue;
+@property (nonatomic) dispatch_queue_t resultQueue;
 @property (nonatomic, copy) MGLMapSnapshotCompletionHandler completion;
++ (void)completeWithErrorCode:(MGLErrorCode)errorCode description:(nonnull NSString*)description onQueue:(dispatch_queue_t)queue completion:(MGLMapSnapshotCompletionHandler)completion;
 @end
 
 @implementation MGLMapSnapshotter {
@@ -124,18 +125,10 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     if (_snapshotCallback) {
         NSAssert(_loading, @"Snapshot in progress - `loading` should = YES");
 
-        MGLMapSnapshotCompletionHandler completion = _completion;
-
-        // The snapshot hasn't completed, so we should alert the caller
-        if (completion && _queue) {
-            dispatch_async(_queue, ^{
-                NSDictionary *userInfo = @{NSLocalizedDescriptionKey: @"MGLMapSnapshotter deallocated prior to snapshot completion."};
-                NSError *error = [NSError errorWithDomain:MGLErrorDomain
-                                                     code:MGLErrorCodeSnapshotFailed
-                                                 userInfo:userInfo];
-                completion(NULL, error);
-            });
-        }
+        [MGLMapSnapshotter completeWithErrorCode:MGLErrorCodeSnapshotFailed
+                                     description:@"MGLMapSnapshotter deallocated prior to snapshot completion."
+                                         onQueue:_resultQueue
+                                      completion:_completion];
     }
 }
 
@@ -170,8 +163,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     self.loading = true;
 
     self.completion = completion;
-    self.queue = queue;
-
+    self.resultQueue = queue;
 
     __weak __typeof__(self) weakSelf = self;
     // mbgl::Scheduler::GetCurrent() scheduler means "run callback on current (ie UI/main) thread"
@@ -195,7 +187,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
             NSDictionary *userInfo = @{NSLocalizedDescriptionKey: description};
             NSError *error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeSnapshotFailed userInfo:userInfo];
             
-            // Dispatch result to origin queue
+            // Dispatch to result queue
             dispatch_async(queue, ^{
                 strongSelf.completion(nil, error);
                 strongSelf.completion = nil;
@@ -353,7 +345,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     
     // Process image watermark in a work queue
     dispatch_queue_t workQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    dispatch_queue_t originQueue = self.queue;
+    dispatch_queue_t resultQueue = self.resultQueue;
 
     // Capture scale and size by value to avoid accessing self from another thread
     CGFloat scale = self.options.scale;
@@ -367,7 +359,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
         MGLImage *compositedImage = [MGLMapSnapshotter drawAttributedSnapshotWorker:attributions snapshotImage:mglImage pointForFn:pointForFn latLngForFn:latLngForFn scale:scale size:size];
 
         // Dispatch result to origin queue
-        dispatch_async(originQueue, ^{
+        dispatch_async(resultQueue, ^{
             __typeof__(self) strongself = weakself;
 
             if (strongself.completion) {
@@ -512,8 +504,29 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (void)cancel
 {
+    if (_snapshotCallback) {
+        [MGLMapSnapshotter completeWithErrorCode:MGLErrorCodeSnapshotCancelled
+                                     description:@"MGLMapSnapshotter cancelled."
+                                         onQueue:self.resultQueue
+                                      completion:self.completion];
+        self.completion = nil;
+    }
+
     _snapshotCallback.reset();
     _mbglMapSnapshotter.reset();
+}
+
++ (void)completeWithErrorCode:(MGLErrorCode)errorCode description:(nonnull NSString*)description onQueue:(dispatch_queue_t)queue completion:(MGLMapSnapshotCompletionHandler)completion {
+    // The snapshot hasn't completed, so we should alert the caller
+    if (completion && queue) {
+        dispatch_async(queue, ^{
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey: description};
+            NSError *error = [NSError errorWithDomain:MGLErrorDomain
+                                                 code:errorCode
+                                             userInfo:userInfo];
+            completion(NULL, error);
+        });
+    }
 }
 
 - (void)setOptions:(MGLMapSnapshotOptions *)options

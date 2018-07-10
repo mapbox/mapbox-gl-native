@@ -148,6 +148,38 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     [self waitForExpectations:@[expectation] timeout:timeout];
 }
 
+- (void)testCancellingSnapshot {
+    if (![self validAccessToken]) {
+        return;
+    }
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"snapshots"];
+    expectation.assertForOverFulfill = YES;
+    expectation.expectedFulfillmentCount = 1;
+
+    CGSize size                    = self.mapView.bounds.size;
+    CLLocationCoordinate2D coord   = CLLocationCoordinate2DMake(30.0, 30.0);
+
+    MGLMapSnapshotter *snapshotter = snapshotterWithCoordinates(coord, size);
+
+    __weak __typeof__(self) weakself = self;
+
+    [snapshotter startWithCompletionHandler:^(MGLMapSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+        // We expect this completion block to be called with an error
+        __typeof__(self) strongself = weakself;
+
+        MGLTestAssertNil(strongself, snapshot);
+        MGLTestAssert(strongself,
+                      ([error.domain isEqualToString:MGLErrorDomain] && error.code == MGLErrorCodeSnapshotCancelled),
+                      @"Should have been cancelled");
+        [expectation fulfill];
+    }];
+
+    [snapshotter cancel];
+
+    [self waitForExpectations:@[expectation] timeout:0.5];
+}
+
 - (void)testAllocatingSnapshotOnBackgroundQueue {
     if (![self validAccessToken]) {
         return;
