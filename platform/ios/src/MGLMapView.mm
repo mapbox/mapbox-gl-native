@@ -1658,23 +1658,6 @@ public:
         }
     }
     
-    // Handle the case of an offset annotation view by converting the tap point to be the geo location
-    // of the annotation itself that the view represents
-    for (MGLAnnotationView *view in self.annotationContainerView.annotationViews)
-    {
-        if (view.centerOffset.dx != 0 || view.centerOffset.dy != 0) {
-            if (CGRectContainsPoint(view.frame, tapPoint)) {
-                if (!view.annotation) {
-                    [NSException raise:NSInvalidArgumentException
-                                format:@"Annotation view's annotation property should not be nil."];
-                }
-                
-                CGPoint annotationPoint = [self convertCoordinate:view.annotation.coordinate toPointToView:self];
-                tapPoint = annotationPoint;
-            }
-        }
-    }
-
     MGLAnnotationTag hitAnnotationTag = [self annotationTagAtPoint:tapPoint persistingResults:persist];
     if (hitAnnotationTag != MGLAnnotationTagNotFound)
     {
@@ -3819,8 +3802,12 @@ public:
         annotationView.mapView = self;
         CGRect bounds = UIEdgeInsetsInsetRect({ CGPointZero, annotationView.frame.size }, annotationView.alignmentRectInsets);
 
-        _largestAnnotationViewSize = CGSizeMake(MAX(_largestAnnotationViewSize.width, CGRectGetWidth(bounds)),
-                                                MAX(_largestAnnotationViewSize.height, CGRectGetHeight(bounds)));
+        // Take any offset into consideration
+        CGFloat adjustedAnnotationWidth = CGRectGetWidth(bounds) + fabs(annotationView.centerOffset.dx);
+        CGFloat adjustedAnnotationHeight = CGRectGetHeight(bounds) + fabs(annotationView.centerOffset.dx);
+
+        _largestAnnotationViewSize = CGSizeMake(MAX(_largestAnnotationViewSize.width, adjustedAnnotationWidth),
+                                                MAX(_largestAnnotationViewSize.height, adjustedAnnotationHeight));
 
         _unionedAnnotationRepresentationSize = CGSizeMake(MAX(_unionedAnnotationRepresentationSize.width, _largestAnnotationViewSize.width),
                                                           MAX(_unionedAnnotationRepresentationSize.height, _largestAnnotationViewSize.height));
@@ -4089,9 +4076,15 @@ public:
                 {
                     return true;
                 }
-                
+
                 CGPoint calloutAnchorPoint = MGLPointRounded([self convertCoordinate:annotation.coordinate toPointToView:self]);
                 CGRect frame = CGRectInset({ calloutAnchorPoint, CGSizeZero }, -CGRectGetWidth(annotationView.frame) / 2, -CGRectGetHeight(annotationView.frame) / 2);
+
+                // We need to take any offset into consideration. Note that a large offset will result in a
+                // large value for `_unionedAnnotationRepresentationSize` (and thus a larger feature query rect).
+                // Aim to keep the offset as small as possible.
+                frame = CGRectOffset(frame, annotationView.centerOffset.dx, annotationView.centerOffset.dy);
+
                 annotationRect = UIEdgeInsetsInsetRect(frame, annotationView.alignmentRectInsets);
             }
             else

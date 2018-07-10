@@ -784,6 +784,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             
             return [NSExpression expressionForFunction:functionName
                                              arguments:subexpressions];
+        } else if ([op isEqualToString:@"collator"]) {
+            // Avoid wrapping collator options object in literal expression.
+            return [NSExpression expressionForFunction:@"MGL_FUNCTION" arguments:array];
         } else if ([op isEqualToString:@"literal"]) {
             if ([argumentObjects.firstObject isKindOfClass:[NSArray class]]) {
                 return [NSExpression expressionForAggregate:MGLSubexpressionsWithJSONObjects(argumentObjects.firstObject)];
@@ -1208,6 +1211,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 [NSException raise:NSInvalidArgumentException
                             format:@"Casting expression to %@ not yet implemented.", type];
             } else if ([function isEqualToString:@"MGL_FUNCTION"]) {
+                NSExpression *op = self.arguments.firstObject;
+                if (op.expressionType == NSConstantValueExpressionType
+                    && [op.constantValue isEqualToString:@"collator"]) {
+                    // Avoid wrapping collator options object in literal expression.
+                    return @[@"collator", self.arguments[1].constantValue];
+                }
                 return self.arguments.mgl_jsonExpressionObject;
             } else if (op == [MGLColor class] && [function isEqualToString:@"colorWithRed:green:blue:alpha:"]) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
@@ -1358,11 +1367,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     for (NSUInteger index = minimumIndex; index < arguments.count; index++) {
         NSArray *argumentObject = arguments[index].mgl_jsonExpressionObject;
         // match operators with arrays as matching values should not parse arrays using the literal operator.
-        if (index > 0 && index < arguments.count - 1 && !(index % 2 == 0)
-            && (arguments[index].expressionType == NSAggregateExpressionType ||
-                (arguments[index].expressionType == NSConstantValueExpressionType && [arguments[index].constantValue isKindOfClass:[NSArray class]]))) {
-            
-            argumentObject = argumentObject.count == 2 ? argumentObject[1] : argumentObject;
+        if (index > 0 && index < arguments.count - 1 && !(index % 2 == 0)) {
+            NSExpression *expression = arguments[index];
+            if (![expression isKindOfClass:[NSExpression class]]) {
+                expression = [NSExpression expressionForConstantValue:expression];
+            }
+            if (expression.expressionType == NSAggregateExpressionType ||
+                (expression.expressionType == NSConstantValueExpressionType && [expression.constantValue isKindOfClass:[NSArray class]])) {
+                argumentObject = argumentObject.count == 2 ? argumentObject[1] : argumentObject;
+            }
         }
         [expressionObject addObject:argumentObject];
     }

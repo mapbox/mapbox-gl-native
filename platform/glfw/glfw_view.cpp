@@ -497,12 +497,10 @@ void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modi
 void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
     auto *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     if (view->tracking) {
-        double dx = x - view->lastX;
-        double dy = y - view->lastY;
+        const double dx = x - view->lastX;
+        const double dy = y - view->lastY;
         if (dx || dy) {
-            view->map->setLatLng(
-                    view->map->latLngForPixel(mbgl::ScreenCoordinate(x - dx, y - dy)),
-                    mbgl::ScreenCoordinate(x, y));
+            view->map->moveBy(mbgl::ScreenCoordinate { dx, dy });
         }
     } else if (view->rotating) {
         view->map->rotateBy({ view->lastX, view->lastY }, { x, y });

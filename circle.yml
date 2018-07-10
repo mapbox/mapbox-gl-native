@@ -22,14 +22,16 @@ workflows:
           filters:
             tags:
               only: /node-.*/
+      - node-macos-release:
+          filters:
+            tags:
+              only: /node-.*/
       - linux-clang-3.8-libcxx-debug
       - linux-clang4-sanitize-address
       - linux-clang4-sanitize-undefined
       - linux-clang4-sanitize-thread
       - linux-gcc4.9-debug
       - linux-gcc5-debug-coverage
-      - linux-gcc5-release-qt4
-      - linux-gcc5-release-qt5
       - ios-debug
       - ios-sanitize
       - ios-sanitize-address
@@ -42,11 +44,9 @@ workflows:
             branches:
               ignore: /.*/
       - macos-debug
-      - macos-debug-qt5
-      - macos-release-node:
-          filters:
-            tags:
-              only: /node-.*/
+      - qt4-linux-gcc5-release
+      - qt5-linux-gcc5-release
+      - qt5-macos-debug
 
 step-library:
   - &generate-cache-key
@@ -157,16 +157,16 @@ step-library:
         command: |
           brew install cmake ccache
 
-  - &install-macos-node-dependencies
+  - &install-node-macos-dependencies
       run:
-        name: Install macOS Node dependencies
+        name: Install Node macOS dependencies
         command: |
           brew install node@6
           brew link node@6 --force --overwrite
 
-  - &install-macos-qt-dependencies
+  - &install-qt-macos-dependencies
       run:
-        name: Install macOS Qt dependencies
+        name: Install Qt macOS dependencies
         command: |
           brew install qt
           brew link qt --force
@@ -474,6 +474,29 @@ jobs:
       - *upload-render-tests-recycle-map
 
 # ------------------------------------------------------------------------------
+  node-macos-release:
+    macos:
+      xcode: "9.4.0"
+    environment:
+      BUILDTYPE: RelWithDebInfo
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *install-node-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-node
+      - *show-ccache-stats
+      - *save-cache
+      - *run-node-macos-tests
+      - *publish-node-package
+      - *upload-render-tests
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
+
+# ------------------------------------------------------------------------------
   linux-clang-3.8-libcxx-debug:
     docker:
       - image: mbgl/7d2403f42e:linux-clang-3.8-libcxx
@@ -635,65 +658,6 @@ jobs:
           name: Upload coverage results to coveralls
           command: |
             platform/linux/scripts/coveralls.sh
-
-# ------------------------------------------------------------------------------
-  linux-gcc5-release-qt4:
-    docker:
-      - image: mbgl/7d2403f42e:linux-gcc-5-qt-4
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Release
-      GTEST_OUTPUT: xml
-      LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
-    steps:
-      - checkout
-      - *generate-cache-key
-      - *restore-cache
-      - *reset-ccache-stats
-      - *build-qt-app
-      - *build-qt-test
-      - *show-ccache-stats
-      - *save-cache
-      - run:
-          name: Run memory-load tests
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              make run-qt-test-Memory.*:*.Load
-            scripts/log_memory_benchmarks.sh test_detail.xml "Platform=Linux,Compiler=${_CC},Arch=$(uname -m)"
-
-# ------------------------------------------------------------------------------
-  linux-gcc5-release-qt5:
-    docker:
-      - image: mbgl/7d2403f42e:linux-gcc-5-qt-5.9
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Release
-      WITH_QT_I18N: 1
-    steps:
-      - checkout
-      - *generate-cache-key
-      - *restore-cache
-      - *reset-ccache-stats
-      - *build-qt-app
-      - *build-qt-test
-      - run:
-          name: Build qt-docs
-          command: make qt-docs
-      - *show-ccache-stats
-      - *save-cache
-      - run:
-          name: Run valgrind-backed tests
-          environment:
-            JOBS: 1 # https://github.com/mapbox/mapbox-gl-native/issues/9108
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector
 
 # ------------------------------------------------------------------------------
   ios-debug:
@@ -863,7 +827,66 @@ jobs:
       - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
-  macos-debug-qt5:
+  qt4-linux-gcc5-release:
+    docker:
+      - image: mbgl/7d2403f42e:linux-gcc-5-qt-4
+    resource_class: large
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
+      BUILDTYPE: Release
+      GTEST_OUTPUT: xml
+      LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
+    steps:
+      - checkout
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-qt-app
+      - *build-qt-test
+      - *show-ccache-stats
+      - *save-cache
+      - run:
+          name: Run memory-load tests
+          command: |
+            xvfb-run --server-args="-screen 0 1024x768x24" \
+              make run-qt-test-Memory.*:*.Load
+            scripts/log_memory_benchmarks.sh test_detail.xml "Platform=Linux,Compiler=${_CC},Arch=$(uname -m)"
+
+# ------------------------------------------------------------------------------
+  qt5-linux-gcc5-release:
+    docker:
+      - image: mbgl/7d2403f42e:linux-gcc-5-qt-5.9
+    resource_class: large
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
+      BUILDTYPE: Release
+      WITH_QT_I18N: 1
+    steps:
+      - checkout
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-qt-app
+      - *build-qt-test
+      - run:
+          name: Build qt-docs
+          command: make qt-docs
+      - *show-ccache-stats
+      - *save-cache
+      - run:
+          name: Run valgrind-backed tests
+          environment:
+            JOBS: 1 # https://github.com/mapbox/mapbox-gl-native/issues/9108
+          command: |
+            xvfb-run --server-args="-screen 0 1024x768x24" \
+              build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector
+
+# ------------------------------------------------------------------------------
+  qt5-macos-debug:
     macos:
       xcode: "9.3.0"
     environment:
@@ -872,7 +895,7 @@ jobs:
     steps:
       - checkout
       - *install-macos-dependencies
-      - *install-macos-qt-dependencies
+      - *install-qt-macos-dependencies
       - *generate-cache-key
       - *restore-cache
       - *reset-ccache-stats
@@ -886,26 +909,3 @@ jobs:
       - store_artifacts:
           path: test/fixtures
           destination: test/fixtures
-
-# ------------------------------------------------------------------------------
-  macos-release-node:
-    macos:
-      xcode: "9.4.0"
-    environment:
-      BUILDTYPE: RelWithDebInfo
-      HOMEBREW_NO_AUTO_UPDATE: 1
-    steps:
-      - checkout
-      - *install-macos-dependencies
-      - *install-macos-node-dependencies
-      - *generate-cache-key
-      - *restore-cache
-      - *reset-ccache-stats
-      - *build-node
-      - *show-ccache-stats
-      - *save-cache
-      - *run-node-macos-tests
-      - *publish-node-package
-      - *upload-render-tests
-      - *collect-xcode-build-logs
-      - *upload-xcode-build-logs

@@ -1,11 +1,9 @@
 package com.mapbox.mapboxsdk.geometry;
 
 import android.os.Parcelable;
-
 import com.mapbox.mapboxsdk.constants.GeometryConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
 import com.mapbox.mapboxsdk.utils.MockParcel;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -180,6 +178,18 @@ public class LatLngBoundsTest {
       .include(LAT_LNG_NULL_ISLAND)
       .build();
     assertFalse("Should not be empty", latLngBounds.isEmptySpan());
+  }
+
+  @Test
+  public void includeSameLatLngs() {
+    latLngBounds = new LatLngBounds.Builder()
+      .include(LAT_LNG_NOT_NULL_ISLAND)
+      .include(LAT_LNG_NOT_NULL_ISLAND)
+      .include(LAT_LNG_NULL_ISLAND)
+      .include(LAT_LNG_NULL_ISLAND)
+      .build();
+    assertEquals(latLngBounds.getNorthEast(), LAT_LNG_NOT_NULL_ISLAND);
+    assertEquals(latLngBounds.getSouthWest(), LAT_LNG_NULL_ISLAND);
   }
 
   @Test
@@ -554,7 +564,7 @@ public class LatLngBoundsTest {
   @Test
   public void unionOverDateLineReturnWorldLonSpan() {
     LatLngBounds latLngBounds1 = LatLngBounds.from(10, -160, -10, -10);
-    LatLngBounds latLngBounds2 =  LatLngBounds.from(10, 10, -10, 160);
+    LatLngBounds latLngBounds2 = LatLngBounds.from(10, 10, -10, 160);
 
     LatLngBounds union1 = latLngBounds1.union(latLngBounds2);
     LatLngBounds union2 = latLngBounds2.union(latLngBounds1);
@@ -569,7 +579,7 @@ public class LatLngBoundsTest {
     exception.expectMessage("latitude must be between -90 and 90");
     LatLngBounds unionLatLngBounds =
       LatLngBounds.from(10, 10, 0, 0)
-      .union(200, 200, 0, 0);
+        .union(200, 200, 0, 0);
   }
 
   @Test
