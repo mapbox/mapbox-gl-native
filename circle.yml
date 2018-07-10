@@ -47,6 +47,16 @@ workflows:
       - qt4-linux-gcc5-release
       - qt5-linux-gcc5-release
       - qt5-macos-debug
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - ios-release
 
 step-library:
   - &generate-cache-key
@@ -146,10 +156,8 @@ step-library:
   - &install-ios-packaging-dependencies
       run:
         name: Install iOS packaging dependencies
-        command: |
-          echo "ruby-2.3" > ~/.ruby-version
-          sudo gem install jazzy --no-document
-          brew install awscli wget
+        command: brew install awscli wget
+        background: true
 
   - &install-macos-dependencies
       run:
@@ -759,19 +767,26 @@ jobs:
     steps:
       - checkout
       - *install-macos-dependencies
+      - *install-ios-packaging-dependencies
       - *generate-cache-key
       - *restore-cache
       - *reset-ccache-stats
       - run:
           name: Build dynamic framework for device and simulator
           command: make iframework
+      - deploy:
+          name: Upload nightly build to s3
+          command: |
+            if [[ -z $CIRCLE_COMPARE_URL && $CIRCLE_BRANCH == master ]]; then
+              platform/ios/scripts/deploy-nightly.sh
+            fi
+      - run:
+          name: Record size
+          command: platform/ios/scripts/metrics.sh
       - *show-ccache-stats
       - *save-cache
       - *collect-xcode-build-logs
       - *upload-xcode-build-logs
-      - run:
-          name: Record size
-          command: platform/ios/scripts/metrics.sh
 
 # ------------------------------------------------------------------------------
   ios-release-tag:
@@ -780,7 +795,6 @@ jobs:
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
-    shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
       - *install-macos-dependencies
@@ -796,6 +810,8 @@ jobs:
             platform/ios/scripts/deploy-packages.sh
       - *show-ccache-stats
       - *save-cache
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   macos-debug:
