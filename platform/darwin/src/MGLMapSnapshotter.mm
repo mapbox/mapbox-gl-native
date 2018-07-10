@@ -505,8 +505,8 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 - (void)cancel
 {
     if (_snapshotCallback) {
-        [MGLMapSnapshotter completeWithErrorCode:MGLErrorCodeSnapshotCancelled
-                                     description:@"MGLMapSnapshotter cancelled."
+        [MGLMapSnapshotter completeWithErrorCode:MGLErrorCodeSnapshotUserCancelled
+                                     description:[NSString stringWithFormat:@"MGLMapSnapshotter cancelled from %s", __PRETTY_FUNCTION__]
                                          onQueue:self.resultQueue
                                       completion:self.completion];
         self.completion = nil;

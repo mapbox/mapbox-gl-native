@@ -51,7 +51,7 @@ typedef NS_ENUM(NSInteger, MGLErrorCode) {
     /** An error occurred while snapshotting the map. */
     MGLErrorCodeSnapshotFailed = 6,
     /** The user cancelled a map snapshot. */
-    MGLErrorCodeSnapshotCancelled = 7,
+    MGLErrorCodeSnapshotUserCancelled = 7,
 };
 
 /** Options for enabling debugging features in an `MGLMapView` instance. */

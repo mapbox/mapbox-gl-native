@@ -197,6 +197,9 @@ MGL_EXPORT
  
  Once you call this method, you cannot resume the snapshot. In order to obtain
  the snapshot, create a new `MGLMapSnapshotter` object.
+
+ The completion handler will be called with an `NSError` with domain
+ `MGLErrorDomain` and error code `MGLErrorCodeSnapshotUserCancelled`.
  */
 - (void)cancel;
 

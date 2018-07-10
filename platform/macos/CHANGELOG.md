@@ -57,6 +57,8 @@
 * Fixed an issue where `-[MGLMapShapshot pointForCoordinate:]` returned incorrect points. ([#12221](https://github.com/mapbox/mapbox-gl-native/pull/12221))
 * Improved caching performance. ([#12072](https://github.com/mapbox/mapbox-gl-native/pull/12072))
 * Remove unnecessary memory use when collision debug mode is disabled. ([#12294](https://github.com/mapbox/mapbox-gl-native/issues/12294))
+* Changed `-[MGLMapSnapshotter cancel]` to call the completion block (originally passed to `-[MGLMapSnapshotter startWithQueue:completionHandler:]`) with an `NSError` (error code `MGLErrorCodeSnapshotUserCancelled`) if the snapshot has not finished. ([#12355](https://github.com/mapbox/mapbox-gl-native/pull/12355))
+
 
 ## 0.8.0 - June 20, 2018
 

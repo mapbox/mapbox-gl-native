@@ -170,7 +170,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
 
         MGLTestAssertNil(strongself, snapshot);
         MGLTestAssert(strongself,
-                      ([error.domain isEqualToString:MGLErrorDomain] && error.code == MGLErrorCodeSnapshotCancelled),
+                      ([error.domain isEqualToString:MGLErrorDomain] && error.code == MGLErrorCodeSnapshotUserCancelled),
                       @"Should have been cancelled");
         [expectation fulfill];
     }];
