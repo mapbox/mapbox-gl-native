@@ -187,7 +187,8 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
         strongSelf.loading = false;
 
-        MGLMapSnapshotCompletionHandler callback = strongSelf.completion;
+        if (!strongSelf.completion)
+            return;
 
         if (mbglError) {
             NSString *description = @(mbgl::util::toString(mbglError).c_str());
