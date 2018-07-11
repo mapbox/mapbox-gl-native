@@ -8,15 +8,23 @@ namespace algorithm {
 template <typename Iterator>
 bool coveredByChildren(const UnwrappedTileID& id, Iterator it, const Iterator& end) {
     for (const auto& child : id.children()) {
-        it = std::lower_bound(it, end, child, [](auto& a, auto& b) { return std::get<0>(a) < b; });
+        it = std::lower_bound(it, end, child, [](const auto& a, const auto& b) { return std::get<0>(a) < b; });
+
+        // Child is not present, neither its grandchildren.
         if (it == end) {
             return false;
-        } else if (std::get<0>(*it) != child) {
-            return coveredByChildren(child, it, end);
+        }
+
+        // Child is not present, but its grandchildren are.
+        if (std::get<0>(*it) != child) {
+            // This child is not covered by its grandchildren.
+            if (!coveredByChildren(child, it, end)) {
+                return false;
+            }
         }
     }
 
-    // We looked at all four immediate children and verified that they're covered.
+    // We looked at all four children (recursively) and verified that they're covered.
     return true;
 }
 
