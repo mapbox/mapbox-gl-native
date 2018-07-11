@@ -2,9 +2,38 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+# master
+
+* Added `-[MGLMapView camera:fittingShape:edgePadding:]` and `-[MGLMapView camera:fittingCoordinateBounds:edgePadding:]` allowing you specify the pitch and direction for the calculated camera. ([#12213](https://github.com/mapbox/mapbox-gl-native/pull/12213))
+* `-[MGLStyle localizeLabelsIntoLocale:]` and `-[NSExpression mgl_expressionLocalizedIntoLocale:]` can automatically localize labels into Japanese or Korean based on the system’s language settings. ([#12286](https://github.com/mapbox/mapbox-gl-native/pull/12286))
+* Remove unnecessary memory use when collision debug mode is not enabled ([#12294](https://github.com/mapbox/mapbox-gl-native/issues/12294))
+
+## 4.2.0
+
+### Packaging
+
+* When integrating this framework using CocoaPods, the included bcsymbolmap files are now preserved. If you have bitcode enabled and you are seeing incorrectly symbolicated crash logs, you should create a build phase in your Xcode project that copies these bcsymbolmap files to your app’s Products Directory when installing. ([#12257](https://github.com/mapbox/mapbox-gl-native/pull/12257))
+
+### Styles and rendering
+
+* Added an `MGLRasterStyleLayer.rasterResamplingMode` property for configuring how raster style layers are overscaled. ([#12176](https://github.com/mapbox/mapbox-gl-native/pull/12176))
+
+### Networking and storage
+
+* Improved caching performance. ([#12072](https://github.com/mapbox/mapbox-gl-native/pull/12072))
+
+### Other changes 
+
+* Added `-[MGLMapSnapshot coordinateForPoint:]` that returns a map coordinate for a specified snapshot image point. ([#12221](https://github.com/mapbox/mapbox-gl-native/pull/12221))
+
 ## 4.1.1 - June 28, 2018
 
 * Improved compatibility with Mapbox China APIs. ([#12233](https://github.com/mapbox/mapbox-gl-native/pull/12233))
+
+## 4.0.3 - June 22, 2018
+
+* Fixed a crash in `-[MGLStyle localizeLabelsIntoLocale:]` on iOS 9._x_. ([#12123](https://github.com/mapbox/mapbox-gl-native/pull/12123))
+* Improved compatibility with Mapbox China APIs. ([#11845](https://github.com/mapbox/mapbox-gl-native/pull/11845))
 
 ## 4.1.0 - June 20, 2018
 
