@@ -83,12 +83,12 @@ step-library:
           echo "$CIRCLE_MERGE_BASE"
           echo "${CIRCLE_MERGE_BASE:master}" > .circle-merge-base
           ccache --clear
-          ccache --max-size=5G
   - &reset-ccache-stats
       run:
         name: Clear ccache statistics
         command: |
           ccache --zero-stats
+          ccache --max-size=2G
           ccache --show-stats
   - &show-ccache-stats
       run:
