@@ -30,6 +30,7 @@ import java.util.Arrays;
  */
 public class MapboxMapOptions implements Parcelable {
 
+  private static final int LIGHT_GRAY = 0xFFF0E9E1; // RGB(240, 233, 225))
   private static final float FOUR_DP = 4f;
   private static final float NINETY_TWO_DP = 92f;
   private static final int UNDEFINED_COLOR = -1;
@@ -72,6 +73,9 @@ public class MapboxMapOptions implements Parcelable {
 
   private boolean textureMode;
   private boolean translucentTextureSurface;
+
+  @ColorInt
+  private int foregroundLoadColor;
 
   private String style;
 
@@ -124,6 +128,7 @@ public class MapboxMapOptions implements Parcelable {
     zMediaOverlay = in.readByte() != 0;
     localIdeographFontFamily = in.readString();
     pixelRatio = in.readFloat();
+    foregroundLoadColor = in.readInt();
   }
 
   /**
@@ -209,7 +214,6 @@ public class MapboxMapOptions implements Parcelable {
           FOUR_DP * pxlRatio)),
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiAttributionMarginBottom,
           FOUR_DP * pxlRatio))});
-
       mapboxMapOptions.textureMode(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_renderTextureMode, false));
       mapboxMapOptions.translucentTextureSurface(
@@ -222,6 +226,9 @@ public class MapboxMapOptions implements Parcelable {
         typedArray.getString(R.styleable.mapbox_MapView_mapbox_localIdeographFontFamily));
       mapboxMapOptions.pixelRatio(
         typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_pixelRatio, 0));
+      mapboxMapOptions.foregroundLoadColor(
+        typedArray.getInt(R.styleable.mapbox_MapView_mapbox_foregroundLoadColor, LIGHT_GRAY)
+      );
     } finally {
       typedArray.recycle();
     }
@@ -518,6 +525,17 @@ public class MapboxMapOptions implements Parcelable {
 
   public MapboxMapOptions translucentTextureSurface(boolean translucentTextureSurface) {
     this.translucentTextureSurface = translucentTextureSurface;
+    return this;
+  }
+
+  /**
+   * Set the MapView foreground color that is used when the map surface is being created.
+   *
+   * @param loadColor the color to show during map creation
+   * @return This
+   */
+  public MapboxMapOptions foregroundLoadColor(@ColorInt int loadColor) {
+    this.foregroundLoadColor = loadColor;
     return this;
   }
 
@@ -820,6 +838,16 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Returns the current configured foreground color that is used during map creation.
+   *
+   * @return the load color
+   */
+  @ColorInt
+  public int getForegroundLoadColor() {
+    return foregroundLoadColor;
+  }
+
+  /**
    * Returns the font-family for locally overriding generation of glyphs in the
    * &#x27;CJK Unified Ideographs&#x27; and &#x27;Hangul Syllables&#x27; ranges.
    *
@@ -892,6 +920,7 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeByte((byte) (zMediaOverlay ? 1 : 0));
     dest.writeString(localIdeographFontFamily);
     dest.writeFloat(pixelRatio);
+    dest.writeInt(foregroundLoadColor);
   }
 
   @Override

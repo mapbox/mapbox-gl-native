@@ -24,10 +24,10 @@ public abstract class MapRenderer implements MapRendererScheduler {
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
   public MapRenderer(Context context, String localIdeographFontFamily) {
-
     FileSource fileSource = FileSource.getInstance(context);
     float pixelRatio = context.getResources().getDisplayMetrics().density;
     String programCacheDir = context.getCacheDir().getAbsolutePath();
+
     // Initialise native peer
     nativeInitialize(this, fileSource, pixelRatio, programCacheDir, localIdeographFontFamily);
   }
@@ -63,24 +63,6 @@ public abstract class MapRenderer implements MapRendererScheduler {
 
   @CallSuper
   protected void onSurfaceChanged(GL10 gl, int width, int height) {
-    if (width < 0) {
-      throw new IllegalArgumentException("fbWidth cannot be negative.");
-    }
-
-    if (height < 0) {
-      throw new IllegalArgumentException("fbHeight cannot be negative.");
-    }
-
-    if (width > 65535) {
-      throw new IllegalArgumentException(
-        "fbWidth cannot be greater than 65535.");
-    }
-
-    if (height > 65535) {
-      throw new IllegalArgumentException(
-        "fbHeight cannot be greater than 65535.");
-    }
-
     gl.glViewport(0, 0, width, height);
     nativeOnSurfaceChanged(width, height);
   }
@@ -138,5 +120,4 @@ public abstract class MapRenderer implements MapRendererScheduler {
       frames = 0;
     }
   }
-
 }

@@ -21,7 +21,9 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
 
   private final GLSurfaceView glSurfaceView;
 
-  public GLSurfaceViewMapRenderer(Context context, GLSurfaceView glSurfaceView, String localIdeographFontFamily) {
+  public GLSurfaceViewMapRenderer(Context context,
+                                  GLSurfaceView glSurfaceView,
+                                  String localIdeographFontFamily) {
     super(context, localIdeographFontFamily);
     this.glSurfaceView = glSurfaceView;
     glSurfaceView.setEGLContextClientVersion(2);
