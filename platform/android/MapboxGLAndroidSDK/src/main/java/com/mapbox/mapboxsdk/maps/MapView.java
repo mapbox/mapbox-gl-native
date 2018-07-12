@@ -425,6 +425,19 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     }
   }
 
+  /**
+   * Returns if the map has been destroyed.
+   * <p>
+   * This method can be used to determine if the result of an asynchronous operation should be set.
+   * </p>
+   *
+   * @return true, if the map has been destroyed
+   */
+  @UiThread
+  public boolean isDestroyed() {
+    return destroyed;
+  }
+
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     if (!isMapInitialized() || !isZoomButtonControllerInitialized() || !isGestureDetectorInitialized()) {
