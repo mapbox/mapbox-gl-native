@@ -427,7 +427,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    if (!isMapInitialized() || !isZoomButtonControllerInitialized()) {
+    if (!isMapInitialized() || !isZoomButtonControllerInitialized() || !isGestureDetectorInitialized()) {
       return super.onTouchEvent(event);
     }
 
@@ -459,7 +459,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   @Override
   public boolean onGenericMotionEvent(MotionEvent event) {
-    if (mapGestureDetector == null) {
+    if (!isGestureDetectorInitialized()) {
       return super.onGenericMotionEvent(event);
     }
     return mapGestureDetector.onGenericMotionEvent(event) || super.onGenericMotionEvent(event);
@@ -674,6 +674,10 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   private boolean isZoomButtonControllerInitialized() {
     return mapZoomButtonController != null;
+  }
+
+  private boolean isGestureDetectorInitialized() {
+    return mapGestureDetector != null;
   }
 
   MapboxMap getMapboxMap() {
