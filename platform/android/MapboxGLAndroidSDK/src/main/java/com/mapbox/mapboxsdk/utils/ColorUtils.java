@@ -15,6 +15,8 @@ import android.widget.ImageView;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.exceptions.ConversionException;
 
+import java.text.DecimalFormat;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -137,6 +139,58 @@ public class ColorUtils {
     } else {
       throw new ConversionException("Not a valid rgb/rgba value");
     }
+  }
+
+  /**
+   * Converts Android color int to "rbga(r, g, b, a)" String equivalent.
+   * <p>
+   * Alpha value will be converted from 0-255 range to 0-1.
+   * </p>
+   *
+   * @param color Android color int
+   * @return String rgba color
+   */
+  public static String colorToRgbaString(@ColorInt int color) {
+    String alpha = new DecimalFormat("#.###").format(((float)((color >> 24) & 0xFF)) / 255.0f);
+    return String.format(Locale.US, "rgba(%d, %d, %d, %s)",
+      (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, alpha);
+  }
+
+  /**
+   * Converts Android color int to rgba float array.
+   * <p>
+   * Returned RGB values range from 0 to 255.
+   * Alpha value ranges from 0-1.
+   * </p>
+   *
+   * @param color Android color int
+   * @return float rgba array, rgb values range from 0-255, alpha from 0-1
+   */
+  public static float[] colorToRgbaArray(@ColorInt int color) {
+    return new float[] {
+      (color >> 16) & 0xFF,            // r (0-255)
+      (color >> 8) & 0xFF,             // g (0-255)
+      color & 0xFF,                    // b (0-255)
+      ((color >> 24) & 0xFF) / 255.0f  // a (0-1)
+    };
+  }
+
+  /**
+   * Converts Android color int to GL rgba float array.
+   * <p>
+   * Returned values range from 0-1.
+   * </p>
+   *
+   * @param color Android color int
+   * @return float rgba array, values range from 0 to 1
+   */
+  public static float[] colorToGlRgbaArray(@ColorInt int color) {
+    return new float[] {
+      ((color >> 16) & 0xFF) / 255.0f, // r (0-1)
+      ((color >> 8) & 0xFF) / 255.0f,  // g (0-1)
+      (color & 0xFF) / 255.0f,         // b (0-1)
+      ((color >> 24) & 0xFF) / 255.0f  // a (0-1)
+    };
   }
 
   private static int getColorCompat(Context context, int id) {
