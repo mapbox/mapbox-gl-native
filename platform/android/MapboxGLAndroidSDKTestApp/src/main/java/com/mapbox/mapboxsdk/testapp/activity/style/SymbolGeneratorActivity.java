@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -26,13 +25,12 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
+import timber.log.Timber;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
-
-import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.concat;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.division;
@@ -240,6 +238,10 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
   }
 
   public void onDataLoaded(@NonNull FeatureCollection featureCollection) {
+    if (mapView.isDestroyed()) {
+      return;
+    }
+
     // create expressions
     Expression iconImageExpression = string(get(literal(FEATURE_ID)));
     Expression iconSizeExpression = division(number(get(literal(FEATURE_RANK))), literal(2.0f));
