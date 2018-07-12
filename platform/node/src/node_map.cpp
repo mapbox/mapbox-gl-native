@@ -460,20 +460,12 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
 }
 
 void NodeMap::renderFinished() {
-    if (!req) {
-        // In some situations, the render finishes at the same time as we call cancel. Make sure
-        // we are only finishing a render once.
-        return;
-    }
+    assert(req);
 
     Nan::HandleScope scope;
 
     // We're done with this render call, so we're unrefing so that the loop could close.
     uv_unref(reinterpret_cast<uv_handle_t *>(async));
-
-    // There is no render pending anymore, we the GC could now delete this object if it went out
-    // of scope.
-    Unref();
 
     // Move the callback and image out of the way so that the callback can start a new render call.
     auto request = std::move(req);
@@ -527,6 +519,10 @@ void NodeMap::renderFinished() {
         };
         request->runInAsyncScope(target, callback, 1, argv);
     }
+
+    // There is no render pending anymore, we the GC could now delete this object if it went out
+    // of scope.
+    Unref();
 }
 
 /**
@@ -584,6 +580,17 @@ void NodeMap::cancel() {
     
     // Reset map explicitly as it resets the renderer frontend
     map.reset();
+
+    // Remove the existing async handle to flush any scheduled calls to renderFinished.
+    uv_unref(reinterpret_cast<uv_handle_t *>(async));
+    uv_close(reinterpret_cast<uv_handle_t *>(async), [] (uv_handle_t *h) {
+        delete reinterpret_cast<uv_async_t *>(h);
+    });
+    async = new uv_async_t;
+    async->data = this;
+    uv_async_init(uv_default_loop(), async, [](uv_async_t* h) {
+        reinterpret_cast<NodeMap *>(h->data)->renderFinished();
+    });
 
     frontend = std::make_unique<mbgl::HeadlessFrontend>(mbgl::Size{ 256, 256 }, pixelRatio, *this, threadpool);
     map = std::make_unique<mbgl::Map>(*frontend, mapObserver, frontend->getSize(), pixelRatio,
