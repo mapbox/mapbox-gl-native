@@ -100,6 +100,15 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     std::vector<UnwrappedTileID> idealTiles;
     std::vector<UnwrappedTileID> panTiles;
 
+    bool usePanLayers = true;
+    std::vector<Immutable<style::Layer::Impl>> panLayers;
+    panLayers.reserve(layers.size());
+    for (const auto& layer : layers) {
+        if (layer->type == LayerType::Symbol)
+            continue;
+        panLayers.emplace_back(layer);
+    }
+
     if (overscaledZoom >= zoomRange.min) {
         uint8_t idealZoom = std::min(zoomRange.max, overscaledZoom);
 
@@ -141,7 +150,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
         }
 
         if (needsRelayout) {
-            tile.setLayers(layers);
+            tile.setLayers(usePanLayers ? panLayers : layers);
         }
     };
     auto getTileFn = [&](const OverscaledTileID& tileID) -> Tile* {
@@ -165,7 +174,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
             tile = createTile(tileID);
             if (tile) {
                 tile->setObserver(observer);
-                tile->setLayers(layers);
+                tile->setLayers(usePanLayers ? panLayers : layers);
             }
         }
         if (!tile) {
@@ -182,7 +191,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     auto renderTileFn = [&](const UnwrappedTileID& tileID, Tile& tile) {
         renderTiles.emplace_back(tileID, tile);
         previouslyRenderedTiles.erase(tileID); // Still rendering this tile, no need for special fading logic.
-        tile.markRenderedIdeal();
+        if (!usePanLayers) tile.markRenderedIdeal();
     };
 
     renderTiles.clear();
@@ -192,6 +201,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
                                      panTiles, zoomRange, panZoom);
     }
 
+    usePanLayers = false;
     algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn, renderTileFn,
                                  idealTiles, zoomRange, tileZoom);
     
