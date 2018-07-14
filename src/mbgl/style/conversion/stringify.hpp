@@ -138,17 +138,7 @@ void stringify(Writer& writer, const Undefined&) {
 }
 
 template <class Writer, class T>
-void stringify(Writer& writer, const CameraFunction<T>& fn) {
-    stringify(writer, fn.getExpression().serialize());
-}
-
-template <class Writer, class T>
-void stringify(Writer& writer, const SourceFunction<T>& fn) {
-    stringify(writer, fn.getExpression().serialize());
-}
-
-template <class Writer, class T>
-void stringify(Writer& writer, const CompositeFunction<T>& fn) {
+void stringify(Writer& writer, const PropertyExpression<T>& fn) {
     stringify(writer, fn.getExpression().serialize());
 }
 

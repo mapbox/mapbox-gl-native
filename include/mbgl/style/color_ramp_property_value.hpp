@@ -2,7 +2,7 @@
 
 #include <mbgl/util/variant.hpp>
 #include <mbgl/style/undefined.hpp>
-#include <mbgl/style/function/camera_function.hpp>
+#include <mbgl/style/expression/expression.hpp>
 
 namespace mbgl {
 namespace style {

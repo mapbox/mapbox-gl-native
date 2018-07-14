@@ -66,29 +66,6 @@ static bool interpolatable(type::Type type) {
     );
 }
 
-static FunctionType functionType(type::Type type, const Convertible& value) {
-    auto typeValue = objectMember(value, "type");
-    if (!typeValue) {
-        return interpolatable(type) ? FunctionType::Exponential : FunctionType::Interval;
-    }
-
-    optional<std::string> string = toString(*typeValue);
-    if (!string) {
-        return FunctionType::Invalid;
-    }
-
-    if (*string == "interval")
-        return FunctionType::Interval;
-    if (*string == "exponential" && interpolatable(type))
-        return FunctionType::Exponential;
-    if (*string == "categorical")
-        return FunctionType::Categorical;
-    if (*string == "identity")
-        return FunctionType::Identity;
-
-    return FunctionType::Invalid;
-}
-
 static optional<std::unique_ptr<Expression>> convertLiteral(type::Type type, const Convertible& value, Error& error) {
     return type.match(
         [&] (const type::NumberType&) -> optional<std::unique_ptr<Expression>> {
@@ -426,103 +403,13 @@ static optional<std::unique_ptr<Expression>> convertCategoricalFunction(type::Ty
     return {};
 }
 
-optional<std::unique_ptr<Expression>> convertCameraFunctionToExpression(type::Type type,
-                                                                        const Convertible& value,
-                                                                        Error& error) {
-    if (!isObject(value)) {
-        error = { "function must be an object" };
-        return {};
-    }
-
-    switch (functionType(type, value)) {
-    case FunctionType::Interval:
-        return convertIntervalFunction(type, value, error, zoom());
-    case FunctionType::Exponential:
-        return convertExponentialFunction(type, value, error, zoom());
-    default:
-        error = { "unsupported function type" };
-        return {};
-    }
-}
-
-optional<std::unique_ptr<Expression>> convertSourceFunctionToExpression(type::Type type,
-                                                                        const Convertible& value,
-                                                                        Error& error) {
-    if (!isObject(value)) {
-        error = { "function must be an object" };
-        return {};
-    }
-
-    auto propertyValue = objectMember(value, "property");
-    if (!propertyValue) {
-        error = { "function must specify property" };
-        return {};
-    }
-
-    auto property = toString(*propertyValue);
-    if (!property) {
-        error = { "function property must be a string" };
-        return {};
-    }
-
-    switch (functionType(type, value)) {
-    case FunctionType::Interval:
-        return convertIntervalFunction(type, value, error, number(get(literal(*property))));
-    case FunctionType::Exponential:
-        return convertExponentialFunction(type, value, error, number(get(literal(*property))));
-    case FunctionType::Categorical:
-        return convertCategoricalFunction(type, value, error, *property);
-    case FunctionType::Identity:
-        return type.match(
-            [&] (const type::StringType&) -> optional<std::unique_ptr<Expression>> {
-                return string(get(literal(*property)));
-            },
-            [&] (const type::NumberType&) -> optional<std::unique_ptr<Expression>> {
-                return number(get(literal(*property)));
-            },
-            [&] (const type::BooleanType&) -> optional<std::unique_ptr<Expression>> {
-                return boolean(get(literal(*property)));
-            },
-            [&] (const type::ColorType&) -> optional<std::unique_ptr<Expression>> {
-                return toColor(get(literal(*property)));
-            },
-            [&] (const type::Array& array) -> optional<std::unique_ptr<Expression>> {
-                return std::unique_ptr<Expression>(
-                    std::make_unique<ArrayAssertion>(array, get(literal(*property))));
-            },
-            [&] (const auto&) -> optional<std::unique_ptr<Expression>>  {
-                assert(false); // No properties use this type.
-                return {};
-            }
-        );
-    default:
-        error = { "unsupported function type" };
-        return {};
-    }
-}
-
-template <class T>
+template <class T, class Fn>
 optional<std::unique_ptr<Expression>> composite(type::Type type,
                                                 const Convertible& value,
                                                 Error& error,
-                                                std::unique_ptr<Expression> (*makeInnerExpression) (type::Type type,
-                                                                                                    double base,
-                                                                                                    const std::string& property,
-                                                                                                    std::map<T, std::unique_ptr<Expression>>)) {
-    auto propertyValue = objectMember(value, "property");
-    if (!propertyValue) {
-        error = { "function must specify property" };
-        return {};
-    }
-
+                                                const Fn& makeInnerExpression) {
     auto base = convertBase(value, error);
     if (!base) {
-        return {};
-    }
-
-    auto propertyString = toString(*propertyValue);
-    if (!propertyString) {
-        error = { "function property must be a string" };
         return {};
     }
 
@@ -587,7 +474,7 @@ optional<std::unique_ptr<Expression>> composite(type::Type type,
     std::map<double, std::unique_ptr<Expression>> stops;
 
     for (auto& e : map) {
-        stops.emplace(e.first, makeInnerExpression(type, *base, *propertyString, std::move(e.second)));
+        stops.emplace(e.first, makeInnerExpression(type, *base, std::move(e.second)));
     }
 
     if (interpolatable(type)) {
@@ -597,12 +484,81 @@ optional<std::unique_ptr<Expression>> composite(type::Type type,
     }
 }
 
-optional<std::unique_ptr<Expression>> convertCompositeFunctionToExpression(type::Type type,
-                                                                           const Convertible& value,
-                                                                           Error& err) {
+optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type type,
+                                                                  const Convertible& value,
+                                                                  Error& err) {
     if (!isObject(value)) {
         err = { "function must be an object" };
         return {};
+    }
+
+    FunctionType functionType = FunctionType::Invalid;
+
+    auto typeValue = objectMember(value, "type");
+    if (!typeValue) {
+        functionType = interpolatable(type) ? FunctionType::Exponential : FunctionType::Interval;
+    } else {
+        optional<std::string> string = toString(*typeValue);
+        if (string) {
+            if (*string == "interval")
+                functionType = FunctionType::Interval;
+            if (*string == "exponential" && interpolatable(type))
+                functionType = FunctionType::Exponential;
+            if (*string == "categorical")
+                functionType = FunctionType::Categorical;
+            if (*string == "identity")
+                functionType = FunctionType::Identity;
+        }
+    }
+
+    if (!objectMember(value, "property")) {
+        // Camera function.
+        switch (functionType) {
+        case FunctionType::Interval:
+            return convertIntervalFunction(type, value, err, zoom());
+        case FunctionType::Exponential:
+            return convertExponentialFunction(type, value, err, zoom());
+        default:
+            err = { "unsupported function type" };
+            return {};
+        }
+    }
+
+    auto propertyValue = objectMember(value, "property");
+    if (!propertyValue) {
+        err = { "function must specify property" };
+        return {};
+    }
+
+    auto property = toString(*propertyValue);
+    if (!property) {
+        err = { "function property must be a string" };
+        return {};
+    }
+
+    if (functionType == FunctionType::Identity) {
+        return type.match(
+            [&] (const type::StringType&) -> optional<std::unique_ptr<Expression>> {
+                return string(get(literal(*property)));
+            },
+            [&] (const type::NumberType&) -> optional<std::unique_ptr<Expression>> {
+                return number(get(literal(*property)));
+            },
+            [&] (const type::BooleanType&) -> optional<std::unique_ptr<Expression>> {
+                return boolean(get(literal(*property)));
+            },
+            [&] (const type::ColorType&) -> optional<std::unique_ptr<Expression>> {
+                return toColor(get(literal(*property)));
+            },
+            [&] (const type::Array& array) -> optional<std::unique_ptr<Expression>> {
+                return std::unique_ptr<Expression>(
+                    std::make_unique<ArrayAssertion>(array, get(literal(*property))));
+            },
+            [&] (const auto&) -> optional<std::unique_ptr<Expression>>  {
+                assert(false); // No properties use this type.
+                return {};
+            }
+        );
     }
 
     auto stopsValue = objectMember(value, "stops");
@@ -636,62 +592,73 @@ optional<std::unique_ptr<Expression>> convertCompositeFunctionToExpression(type:
     const auto& stop = arrayMember(first, 0);
 
     if (!isObject(stop)) {
-        err = { "stop must be an object" };
-        return {};
-    }
-
-    auto sourceValue = objectMember(stop, "value");
-    if (!sourceValue) {
-        err = { "stop must specify value" };
-        return {};
-    }
-
-    if (toBool(*sourceValue)) {
-        switch (functionType(type, value)) {
-        case FunctionType::Categorical:
-            return composite<bool>(type, value, err, [] (type::Type type_, double, const std::string& property, std::map<bool, std::unique_ptr<Expression>> stops) {
-                return categorical<bool>(type_, property, std::move(stops));
-            });
-        default:
-            err = { "unsupported function type" };
-            return {};
-        }
-    }
-
-    if (toNumber(*sourceValue)) {
-        switch (functionType(type, value)) {
+        // Source function.
+        switch (functionType) {
         case FunctionType::Interval:
-            return composite<double>(type, value, err, [] (type::Type type_, double, const std::string& property, std::map<double, std::unique_ptr<Expression>> stops) {
-                return step(type_, number(get(literal(property))), std::move(stops));
-            });
+            return convertIntervalFunction(type, value, err, number(get(literal(*property))));
         case FunctionType::Exponential:
-            return composite<double>(type, value, err, [] (type::Type type_, double base, const std::string& property, std::map<double, std::unique_ptr<Expression>> stops) {
-                return interpolate(type_, exponential(base), number(get(literal(property))), std::move(stops));
-            });
+            return convertExponentialFunction(type, value, err, number(get(literal(*property))));
         case FunctionType::Categorical:
-            return composite<int64_t>(type, value, err, [] (type::Type type_, double, const std::string& property, std::map<int64_t, std::unique_ptr<Expression>> stops) {
-                return categorical<int64_t>(type_, property, std::move(stops));
-            });
+            return convertCategoricalFunction(type, value, err, *property);
         default:
             err = { "unsupported function type" };
             return {};
         }
-    }
-
-    if (toString(*sourceValue)) {
-        switch (functionType(type, value)) {
-        case FunctionType::Categorical:
-            return composite<std::string>(type, value, err, [] (type::Type type_, double, const std::string& property, std::map<std::string, std::unique_ptr<Expression>> stops) {
-                return categorical<std::string>(type_, property, std::move(stops));
-            });
-        default:
-            err = { "unsupported function type" };
+    } else {
+        // Composite function.
+        auto sourceValue = objectMember(stop, "value");
+        if (!sourceValue) {
+            err = { "stop must specify value" };
             return {};
         }
-    }
 
-    err = { "stop domain value must be a number, string, or boolean" };
-    return {};
+        if (toBool(*sourceValue)) {
+            switch (functionType) {
+            case FunctionType::Categorical:
+                return composite<bool>(type, value, err, [&] (type::Type type_, double, std::map<bool, std::unique_ptr<Expression>> stops) {
+                    return categorical<bool>(type_, *property, std::move(stops));
+                });
+            default:
+                err = { "unsupported function type" };
+                return {};
+            }
+        }
+
+        if (toNumber(*sourceValue)) {
+            switch (functionType) {
+            case FunctionType::Interval:
+                return composite<double>(type, value, err, [&] (type::Type type_, double, std::map<double, std::unique_ptr<Expression>> stops) {
+                    return step(type_, number(get(literal(*property))), std::move(stops));
+                });
+            case FunctionType::Exponential:
+                return composite<double>(type, value, err, [&] (type::Type type_, double base, std::map<double, std::unique_ptr<Expression>> stops) {
+                    return interpolate(type_, exponential(base), number(get(literal(*property))), std::move(stops));
+                });
+            case FunctionType::Categorical:
+                return composite<int64_t>(type, value, err, [&] (type::Type type_, double, std::map<int64_t, std::unique_ptr<Expression>> stops) {
+                    return categorical<int64_t>(type_, *property, std::move(stops));
+                });
+            default:
+                err = { "unsupported function type" };
+                return {};
+            }
+        }
+
+        if (toString(*sourceValue)) {
+            switch (functionType) {
+            case FunctionType::Categorical:
+                return composite<std::string>(type, value, err, [&] (type::Type type_, double, std::map<std::string, std::unique_ptr<Expression>> stops) {
+                    return categorical<std::string>(type_, *property, std::move(stops));
+                });
+            default:
+                err = { "unsupported function type" };
+                return {};
+            }
+        }
+
+        err = { "stop domain value must be a number, string, or boolean" };
+        return {};
+    }
 }
 
 } // namespace conversion

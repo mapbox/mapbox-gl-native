@@ -332,15 +332,7 @@ private: // Private utilities for converting from mbgl to mgl values
             return [NSExpression expressionForConstantValue:constantValue];
         }
 
-        NSExpression *operator()(const mbgl::style::CameraFunction<MBGLType> &mbglValue) const {
-            return [NSExpression expressionWithMGLJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
-        }
-
-        NSExpression *operator()(const mbgl::style::SourceFunction<MBGLType> &mbglValue) const {
-            return [NSExpression expressionWithMGLJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
-        }
-
-        NSExpression *operator()(const mbgl::style::CompositeFunction<MBGLType> &mbglValue) const {
+        NSExpression *operator()(const mbgl::style::PropertyExpression<MBGLType> &mbglValue) const {
             return [NSExpression expressionWithMGLJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
         }
     };
