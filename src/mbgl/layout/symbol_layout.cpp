@@ -10,7 +10,6 @@
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/utf.hpp>
-#include <mbgl/util/token.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
@@ -106,31 +105,10 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
         ft.index = i;
 
-        auto getValue = [&ft](const std::string& key) -> std::string {
-            auto value = ft.getValue(key);
-            if (!value)
-                return std::string();
-            if (value->is<std::string>())
-                return value->get<std::string>();
-            if (value->is<bool>())
-                return value->get<bool>() ? "true" : "false";
-            if (value->is<int64_t>())
-                return util::toString(value->get<int64_t>());
-            if (value->is<uint64_t>())
-                return util::toString(value->get<uint64_t>());
-            if (value->is<double>())
-                return util::toString(value->get<double>());
-            return "null";
-        };
-        
         if (hasText) {
             std::string u8string = layout.evaluate<TextField>(zoom, ft);
-            if (layout.get<TextField>().isConstant() && !leader.layout.get<TextField>().isExpression()) {
-                u8string = util::replaceTokens(u8string, getValue);
-            }
-            
-            auto textTransform = layout.evaluate<TextTransform>(zoom, ft);
 
+            auto textTransform = layout.evaluate<TextTransform>(zoom, ft);
             if (textTransform == TextTransformType::Uppercase) {
                 u8string = platform::uppercase(u8string);
             } else if (textTransform == TextTransformType::Lowercase) {
@@ -157,11 +135,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         }
 
         if (hasIcon) {
-            std::string icon = layout.evaluate<IconImage>(zoom, ft);
-            if (layout.get<IconImage>().isConstant() && !leader.layout.get<IconImage>().isExpression()) {
-                icon = util::replaceTokens(icon, getValue);
-            }
-            ft.icon = icon;
+            ft.icon = layout.evaluate<IconImage>(zoom, ft);
             imageDependencies.insert(*ft.icon);
         }
 

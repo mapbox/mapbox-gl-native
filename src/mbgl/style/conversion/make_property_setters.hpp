@@ -41,7 +41,7 @@ inline auto makeLayoutPropertySetters() {
     result["icon-size"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setIconSize>;
     result["icon-text-fit"] = &setProperty<SymbolLayer, PropertyValue<IconTextFitType>, &SymbolLayer::setIconTextFit>;
     result["icon-text-fit-padding"] = &setProperty<SymbolLayer, PropertyValue<std::array<float, 4>>, &SymbolLayer::setIconTextFitPadding>;
-    result["icon-image"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<std::string>, &SymbolLayer::setIconImage>;
+    result["icon-image"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<std::string>, &SymbolLayer::setIconImage, true>;
     result["icon-rotate"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setIconRotate>;
     result["icon-padding"] = &setProperty<SymbolLayer, PropertyValue<float>, &SymbolLayer::setIconPadding>;
     result["icon-keep-upright"] = &setProperty<SymbolLayer, PropertyValue<bool>, &SymbolLayer::setIconKeepUpright>;
@@ -50,7 +50,7 @@ inline auto makeLayoutPropertySetters() {
     result["icon-pitch-alignment"] = &setProperty<SymbolLayer, PropertyValue<AlignmentType>, &SymbolLayer::setIconPitchAlignment>;
     result["text-pitch-alignment"] = &setProperty<SymbolLayer, PropertyValue<AlignmentType>, &SymbolLayer::setTextPitchAlignment>;
     result["text-rotation-alignment"] = &setProperty<SymbolLayer, PropertyValue<AlignmentType>, &SymbolLayer::setTextRotationAlignment>;
-    result["text-field"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<std::string>, &SymbolLayer::setTextField>;
+    result["text-field"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<std::string>, &SymbolLayer::setTextField, true>;
     result["text-font"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<std::vector<std::string>>, &SymbolLayer::setTextFont>;
     result["text-size"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setTextSize>;
     result["text-max-width"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setTextMaxWidth>;

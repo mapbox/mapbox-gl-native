@@ -16,6 +16,60 @@ namespace conversion {
 using namespace expression;
 using namespace expression::dsl;
 
+const static std::string tokenReservedChars = "{}";
+
+bool hasTokens(const std::string& source) {
+    auto pos = source.begin();
+    const auto end = source.end();
+
+    while (pos != end) {
+        auto brace = std::find(pos, end, '{');
+        if (brace == end)
+            return false;
+        for (brace++; brace != end && tokenReservedChars.find(*brace) == std::string::npos; brace++);
+        if (brace != end && *brace == '}') {
+            return true;
+        }
+        pos = brace;
+    }
+
+    return false;
+}
+
+std::unique_ptr<Expression> convertTokenStringToExpression(const std::string& source) {
+    std::vector<std::unique_ptr<Expression>> inputs;
+
+    auto pos = source.begin();
+    const auto end = source.end();
+
+    while (pos != end) {
+        auto brace = std::find(pos, end, '{');
+        if (pos != brace) {
+            inputs.push_back(literal(std::string(pos, brace)));
+        }
+        pos = brace;
+        if (pos != end) {
+            for (brace++; brace != end && tokenReservedChars.find(*brace) == std::string::npos; brace++);
+            if (brace != end && *brace == '}') {
+                inputs.push_back(toString(get(literal(std::string(pos + 1, brace)))));
+                pos = brace + 1;
+            } else {
+                inputs.push_back(literal(std::string(pos, brace)));
+                pos = brace;
+            }
+        }
+    }
+
+    switch (inputs.size()) {
+    case 0:
+        return literal(source);
+    case 1:
+        return std::move(inputs[0]);
+    default:
+        return concat(std::move(inputs));
+    }
+}
+
 // Ad-hoc Converters for double and int64_t. We should replace float with double wholesale,
 // and promote the int64_t Converter to general use (and it should check that the input is
 // an integer).
@@ -66,7 +120,7 @@ static bool interpolatable(type::Type type) {
     );
 }
 
-static optional<std::unique_ptr<Expression>> convertLiteral(type::Type type, const Convertible& value, Error& error) {
+static optional<std::unique_ptr<Expression>> convertLiteral(type::Type type, const Convertible& value, Error& error, bool convertTokens = false) {
     return type.match(
         [&] (const type::NumberType&) -> optional<std::unique_ptr<Expression>> {
             auto result = convert<float>(value, error);
@@ -87,7 +141,7 @@ static optional<std::unique_ptr<Expression>> convertLiteral(type::Type type, con
             if (!result) {
                 return {};
             }
-            return literal(*result);
+            return convertTokens ? convertTokenStringToExpression(*result) : literal(*result);
         },
         [&] (const type::ColorType&) -> optional<std::unique_ptr<Expression>> {
             auto result = convert<Color>(value, error);
@@ -163,7 +217,8 @@ static optional<std::unique_ptr<Expression>> convertLiteral(type::Type type, con
 
 static optional<std::map<double, std::unique_ptr<Expression>>> convertStops(type::Type type,
                                                                             const Convertible& value,
-                                                                            Error& error) {
+                                                                            Error& error,
+                                                                            bool convertTokens) {
     auto stopsValue = objectMember(value, "stops");
     if (!stopsValue) {
         error = { "function value must specify stops" };
@@ -199,7 +254,7 @@ static optional<std::map<double, std::unique_ptr<Expression>>> convertStops(type
             return {};
         }
 
-        optional<std::unique_ptr<Expression>> e = convertLiteral(type, arrayMember(stopValue, 1), error);
+        optional<std::unique_ptr<Expression>> e = convertLiteral(type, arrayMember(stopValue, 1), error, convertTokens);
         if (!e) {
             return {};
         }
@@ -320,8 +375,9 @@ std::unique_ptr<Expression> categorical<bool>(type::Type type, const std::string
 static optional<std::unique_ptr<Expression>> convertIntervalFunction(type::Type type,
                                                                      const Convertible& value,
                                                                      Error& error,
-                                                                     std::unique_ptr<Expression> input) {
-    auto stops = convertStops(type, value, error);
+                                                                     std::unique_ptr<Expression> input,
+                                                                     bool convertTokens = false) {
+    auto stops = convertStops(type, value, error, convertTokens);
     if (!stops) {
         return {};
     }
@@ -331,8 +387,9 @@ static optional<std::unique_ptr<Expression>> convertIntervalFunction(type::Type 
 static optional<std::unique_ptr<Expression>> convertExponentialFunction(type::Type type,
                                                                         const Convertible& value,
                                                                         Error& error,
-                                                                        std::unique_ptr<Expression> input) {
-    auto stops = convertStops(type, value, error);
+                                                                        std::unique_ptr<Expression> input,
+                                                                        bool convertTokens = false) {
+    auto stops = convertStops(type, value, error, convertTokens);
     if (!stops) {
         return {};
     }
@@ -486,7 +543,8 @@ optional<std::unique_ptr<Expression>> composite(type::Type type,
 
 optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type type,
                                                                   const Convertible& value,
-                                                                  Error& err) {
+                                                                  Error& err,
+																  bool convertTokens) {
     if (!isObject(value)) {
         err = { "function must be an object" };
         return {};
@@ -515,9 +573,9 @@ optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type typ
         // Camera function.
         switch (functionType) {
         case FunctionType::Interval:
-            return convertIntervalFunction(type, value, err, zoom());
+            return convertIntervalFunction(type, value, err, zoom(), convertTokens);
         case FunctionType::Exponential:
-            return convertExponentialFunction(type, value, err, zoom());
+            return convertExponentialFunction(type, value, err, zoom(), convertTokens);
         default:
             err = { "unsupported function type" };
             return {};

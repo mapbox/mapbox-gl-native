@@ -639,9 +639,9 @@ void GLFWView::toggle3DExtrusions(bool visible) {
     extrusionLayer->setFilter(Filter(eq(get("extrude"), literal("true"))));
     extrusionLayer->setFillExtrusionColor(PropertyExpression<mbgl::Color>(
         interpolate(linear(), number(get("height")),
-                    0.f, toColor("#160e23"),
-                    50.f, toColor("#00615f"),
-                    100.f, toColor("#55e9ff"))));
+                    0.f, toColor(literal("#160e23")),
+                    50.f, toColor(literal("#00615f")),
+                    100.f, toColor(literal("#55e9ff")))));
     extrusionLayer->setFillExtrusionOpacity(0.6f);
     extrusionLayer->setFillExtrusionHeight(PropertyExpression<float>(get("height")));
     extrusionLayer->setFillExtrusionBase(PropertyExpression<float>(get("min_height")));

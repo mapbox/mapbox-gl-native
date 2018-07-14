@@ -14,16 +14,9 @@ namespace style {
 template <class T>
 class PropertyExpression {
 public:
-    PropertyExpression(std::unique_ptr<expression::Expression> expression_)
-        : isExpression(true),
-          expression(std::move(expression_)),
-          zoomCurve(expression::findZoomCurveChecked(expression.get())) {
-    }
-
-    // To be used only for conversions from legacy functions.
-    PropertyExpression(std::unique_ptr<expression::Expression> expression_, optional<T> defaultValue_)
-        : isExpression(false),
-          expression(std::move(expression_)),
+    // Second parameter to be used only for conversions from legacy functions.
+    PropertyExpression(std::unique_ptr<expression::Expression> expression_, optional<T> defaultValue_ = {})
+        : expression(std::move(expression_)),
           defaultValue(std::move(defaultValue_)),
           zoomCurve(expression::findZoomCurveChecked(expression.get())) {
     }
@@ -108,7 +101,6 @@ public:
     const expression::Expression& getExpression() const { return *expression; }
 
     bool useIntegerZoom = false;
-    bool isExpression;
 
     friend bool operator==(const PropertyExpression& lhs,
                            const PropertyExpression& rhs) {

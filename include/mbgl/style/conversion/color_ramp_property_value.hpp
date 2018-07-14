@@ -14,7 +14,7 @@ namespace conversion {
 
 template <>
 struct Converter<ColorRampPropertyValue> {
-    optional<ColorRampPropertyValue> operator()(const Convertible& value, Error& error) const {
+    optional<ColorRampPropertyValue> operator()(const Convertible& value, Error& error, bool /* convertTokens */ = false) const {
         using namespace mbgl::style::expression;
         if (isUndefined(value)) {
             return ColorRampPropertyValue();

@@ -7,26 +7,22 @@
 #include <mbgl/style/expression/step.hpp>
 #include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/compound_expression.hpp>
-#include <mbgl/util/ignore.hpp>
 
 namespace mbgl {
 namespace style {
 namespace expression {
 namespace dsl {
 
-template <class... Args>
-static std::vector<std::unique_ptr<Expression>> vec(Args... args) {
-    std::vector<std::unique_ptr<Expression>> result;
-    util::ignore({ (result.push_back(std::move(args)), 0)... });
-    return result;
+static std::unique_ptr<Expression> compound(const char* op, std::vector<std::unique_ptr<Expression>> args) {
+    ParsingContext ctx;
+    ParseResult result =  createCompoundExpression(op, std::move(args), ctx);
+    assert(result);
+    return std::move(*result);
 }
 
 template <class... Args>
 static std::unique_ptr<Expression> compound(const char* op, Args... args) {
-    ParsingContext ctx;
-    ParseResult result =  createCompoundExpression(op, vec(std::move(args)...), ctx);
-    assert(result);
-    return std::move(*result);
+    return compound(op, vec(std::move(args)...));
 }
 
 std::unique_ptr<Expression> error(std::string message) {
@@ -69,12 +65,12 @@ std::unique_ptr<Expression> boolean(std::unique_ptr<Expression> value) {
     return std::make_unique<Assertion>(type::Boolean, vec(std::move(value)));
 }
 
-std::unique_ptr<Expression> toColor(const char* value) {
-    return toColor(literal(value));
-}
-
 std::unique_ptr<Expression> toColor(std::unique_ptr<Expression> value) {
     return std::make_unique<Coercion>(type::Color, vec(std::move(value)));
+}
+
+std::unique_ptr<Expression> toString(std::unique_ptr<Expression> value) {
+    return compound("to-string", std::move(value));
 }
 
 std::unique_ptr<Expression> get(const char* value) {
@@ -175,6 +171,10 @@ std::unique_ptr<Expression> interpolate(Interpolator interpolator,
     ParseResult result = createInterpolate(type, interpolator, std::move(input), std::move(stops), ctx);
     assert(result);
     return std::move(*result);
+}
+
+std::unique_ptr<Expression> concat(std::vector<std::unique_ptr<Expression>> inputs) {
+    return compound("concat", std::move(inputs));
 }
 
 } // namespace dsl
