@@ -5,8 +5,8 @@
 #include <mbgl/style/property_value.hpp>
 #include "../../conversion/conversion.hpp"
 #include "../../conversion/constant.hpp"
+#include "property_expression.hpp"
 #include "types.hpp"
-#include "function.hpp"
 
 namespace mbgl {
 namespace android {
@@ -30,16 +30,8 @@ public:
         return *result;
     }
 
-    jni::jobject* operator()(const mbgl::style::CameraFunction<T> &value) const {
-        return *convert<jni::Object<android::gson::JsonElement>, mbgl::style::CameraFunction<T>>(env, value);
-    }
-
-    jni::jobject* operator()(const mbgl::style::SourceFunction<T> &value) const {
-        return *convert<jni::Object<android::gson::JsonElement>, mbgl::style::SourceFunction<T>>(env, value);
-    }
-
-    jni::jobject* operator()(const mbgl::style::CompositeFunction<T> &value) const {
-        return *convert<jni::Object<android::gson::JsonElement>, mbgl::style::CompositeFunction<T>>(env, value);
+    jni::jobject* operator()(const mbgl::style::PropertyExpression<T> &value) const {
+        return *convert<jni::Object<android::gson::JsonElement>, mbgl::style::PropertyExpression<T>>(env, value);
     }
 
 private:

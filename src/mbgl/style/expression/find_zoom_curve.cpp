@@ -2,6 +2,7 @@
 #include <mbgl/style/expression/compound_expression.hpp>
 #include <mbgl/style/expression/let.hpp>
 #include <mbgl/style/expression/coalesce.hpp>
+#include <mbgl/style/expression/is_constant.hpp>
 
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/optional.hpp>
@@ -59,14 +60,17 @@ optional<variant<const Interpolate*, const Step*, ParsingError>> findZoomCurve(c
     return result;
 }
 
-variant<const Interpolate*, const Step*> findZoomCurveChecked(const expression::Expression* e) {
+variant<std::nullptr_t, const Interpolate*, const Step*> findZoomCurveChecked(const expression::Expression* e) {
+    if (isZoomConstant(*e)) {
+        return nullptr;
+    }
     return findZoomCurve(e)->match(
-        [](const ParsingError&) -> variant<const Interpolate*, const Step*> {
+        [](const ParsingError&) -> variant<std::nullptr_t, const Interpolate*, const Step*> {
             assert(false);
-            return {};
+            return nullptr;
         },
-        [](auto zoomCurve) -> variant<const Interpolate*, const Step*> {
-            return {std::move(zoomCurve)};
+        [](auto zoomCurve) -> variant<std::nullptr_t, const Interpolate*, const Step*> {
+            return zoomCurve;
         }
     );
 }

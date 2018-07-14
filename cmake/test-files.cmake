@@ -68,6 +68,7 @@ set(MBGL_TEST_FILES
     # style
     test/style/filter.test.cpp
     test/style/properties.test.cpp
+    test/style/property_expression.test.cpp
     test/style/source.test.cpp
     test/style/style.test.cpp
     test/style/style_image.test.cpp
@@ -86,11 +87,6 @@ set(MBGL_TEST_FILES
     # style/expression
     test/style/expression/expression.test.cpp
     test/style/expression/util.test.cpp
-
-    # style/function
-    test/style/function/camera_function.test.cpp
-    test/style/function/composite_function.test.cpp
-    test/style/function/source_function.test.cpp
 
     # test
     test/include/mbgl/test.hpp

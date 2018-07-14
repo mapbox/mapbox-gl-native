@@ -2,11 +2,10 @@
 
 #include <mbgl/benchmark/stub_geometry_tile_feature.hpp>
 
-#include <mbgl/style/function/composite_function.hpp>
-
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/function.hpp>
+#include <mbgl/style/conversion/data_driven_property_value.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -34,7 +33,7 @@ static void Parse_CompositeFunction(benchmark::State& state) {
         state.PauseTiming();
         auto doc = createFunctionJSON(stopCount);
         state.ResumeTiming();
-        optional<CompositeFunction<float>> result = conversion::convertJSON<style::CompositeFunction<float>>(doc, error);
+        optional<DataDrivenPropertyValue<float>> result = conversion::convertJSON<DataDrivenPropertyValue<float>>(doc, error);
         if (!result) {
             state.SkipWithError(error.message.c_str());
         }
@@ -46,14 +45,14 @@ static void Evaluate_CompositeFunction(benchmark::State& state) {
     size_t stopCount = state.range(0);
     auto doc = createFunctionJSON(stopCount);
     conversion::Error error;
-    optional<CompositeFunction<float>> function = conversion::convertJSON<CompositeFunction<float>>(doc, error);
+    optional<DataDrivenPropertyValue<float>> function = conversion::convertJSON<DataDrivenPropertyValue<float>>(doc, error);
     if (!function) {
         state.SkipWithError(error.message.c_str());
     }
     
     while(state.KeepRunning()) {
         float z = 24.0f * static_cast<float>(rand() % 100) / 100;
-        function->evaluate(z, StubGeometryTileFeature(PropertyMap { { "x", static_cast<int64_t>(rand() % 100) } }), -1.0f);
+        function->asExpression().evaluate(z, StubGeometryTileFeature(PropertyMap { { "x", static_cast<int64_t>(rand() % 100) } }), -1.0f);
     }
     
     state.SetLabel(std::to_string(stopCount).c_str());

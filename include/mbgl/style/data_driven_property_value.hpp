@@ -2,9 +2,7 @@
 
 #include <mbgl/util/variant.hpp>
 #include <mbgl/style/undefined.hpp>
-#include <mbgl/style/function/camera_function.hpp>
-#include <mbgl/style/function/source_function.hpp>
-#include <mbgl/style/function/composite_function.hpp>
+#include <mbgl/style/property_expression.hpp>
 
 namespace mbgl {
 namespace style {
@@ -15,9 +13,7 @@ private:
     using Value = variant<
         Undefined,
         T,
-        CameraFunction<T>,
-        SourceFunction<T>,
-        CompositeFunction<T>>;
+        PropertyExpression<T>>;
 
     Value value;
 
@@ -33,31 +29,39 @@ private:
 
 public:
     DataDrivenPropertyValue() = default;
-    DataDrivenPropertyValue(                  T  v) : value(std::move(v)) {}
-    DataDrivenPropertyValue(   CameraFunction<T> v) : value(std::move(v)) {}
-    DataDrivenPropertyValue(   SourceFunction<T> v) : value(std::move(v)) {}
-    DataDrivenPropertyValue(CompositeFunction<T> v) : value(std::move(v)) {}
+    DataDrivenPropertyValue(                   T  v) : value(std::move(v)) {}
+    DataDrivenPropertyValue(PropertyExpression<T> v) : value(std::move(v)) {}
 
     bool isUndefined() const {
         return value.template is<Undefined>();
     }
 
     bool isDataDriven() const {
-        return value.template is<SourceFunction<T>>() || value.template is<CompositeFunction<T>>();
+        return value.match(
+            [] (const Undefined&)                { return false; },
+            [] (const T&)                        { return false; },
+            [] (const PropertyExpression<T>& fn) { return !fn.isFeatureConstant(); }
+        );
     }
-    
+
     bool isZoomConstant() const {
-        return !value.template is<CameraFunction<T>>() && !value.template is<CompositeFunction<T>>();
+        return value.match(
+            [] (const Undefined&)                { return true; },
+            [] (const T&)                        { return true; },
+            [] (const PropertyExpression<T>& fn) { return fn.isZoomConstant(); }
+        );
     }
 
     bool isExpression() const {
         return value.match(
-            [] (const Undefined&) { return false; },
-            [] (const T&)         { return false; },
-            [] (const    CameraFunction<T>& fn)   { return fn.isExpression; },
-            [] (const    SourceFunction<T>& fn)   { return fn.isExpression; },
-            [] (const CompositeFunction<T>& fn)   { return fn.isExpression; });
+            [] (const Undefined&)                { return false; },
+            [] (const T&)                        { return false; },
+            [] (const PropertyExpression<T>& fn) { return fn.isExpression; }
+        );
     }
+
+    const                    T & asConstant()   const { return value.template get<                   T >(); }
+    const PropertyExpression<T>& asExpression() const { return value.template get<PropertyExpression<T>>(); }
 
     template <class... Ts>
     auto match(Ts&&... ts) const {

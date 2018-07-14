@@ -368,6 +368,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/layer_type.hpp
     include/mbgl/style/light.hpp
     include/mbgl/style/position.hpp
+    include/mbgl/style/property_expression.hpp
     include/mbgl/style/property_value.hpp
     include/mbgl/style/source.hpp
     include/mbgl/style/style.hpp
@@ -499,9 +500,6 @@ set(MBGL_CORE_FILES
     src/mbgl/style/expression/value.cpp
 
     # style/function
-    include/mbgl/style/function/camera_function.hpp
-    include/mbgl/style/function/composite_function.hpp
-    include/mbgl/style/function/source_function.hpp
     src/mbgl/style/function/expression.cpp
 
     # style/layers

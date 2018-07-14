@@ -86,7 +86,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<<%- mbglType(property) %>>(
+            propertyValue = mbgl::style::PropertyExpression<<%- mbglType(property) %>>(
                 step(zoom(), literal(<%- mbglExpressionTestValue(property, type) %>), 18.0, literal(<%- mbglExpressionTestValue(property, type) %>))
             );
         }
@@ -102,7 +102,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::SourceFunction<<%- mbglType(property) %>>(
+            propertyValue = mbgl::style::PropertyExpression<<%- mbglType(property) %>>(
                 interpolate(linear(), number(get("keyName")), 18.0, literal(<%- mbglExpressionTestValue(property, type) %>))
             );
         }
@@ -118,7 +118,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CompositeFunction<<%- mbglType(property) %>>(
+            propertyValue = mbgl::style::PropertyExpression<<%- mbglType(property) %>>(
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(<%- mbglExpressionTestValue(property, type) %>)))
             );
         }

@@ -123,10 +123,10 @@ TEST(TransitioningDataDrivenPropertyValue, Evaluate) {
     };
 
     using namespace mbgl::style::expression::dsl;
-    SourceFunction<float> sourceFunction(number(get("property_name")));
+    PropertyExpression<float> expression(number(get("property_name")));
 
     Transitioning<DataDrivenPropertyValue<float>> t1 {
-        DataDrivenPropertyValue<float>(sourceFunction),
+        DataDrivenPropertyValue<float>(expression),
         t0,
         transition,
         TimePoint::min()

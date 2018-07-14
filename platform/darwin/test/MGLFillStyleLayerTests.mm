@@ -69,7 +69,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<bool>(
+            propertyValue = mbgl::style::PropertyExpression<bool>(
                 step(zoom(), literal(false), 18.0, literal(false))
             );
         }
@@ -113,7 +113,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<mbgl::Color>(
+            propertyValue = mbgl::style::PropertyExpression<mbgl::Color>(
                 step(zoom(), literal(mbgl::Color(1, 0, 0, 1)), 18.0, literal(mbgl::Color(1, 0, 0, 1)))
             );
         }
@@ -128,7 +128,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::SourceFunction<mbgl::Color>(
+            propertyValue = mbgl::style::PropertyExpression<mbgl::Color>(
                 interpolate(linear(), number(get("keyName")), 18.0, literal(mbgl::Color(1, 0, 0, 1)))
             );
         }
@@ -144,7 +144,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CompositeFunction<mbgl::Color>(
+            propertyValue = mbgl::style::PropertyExpression<mbgl::Color>(
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(mbgl::Color(1, 0, 0, 1))))
             );
         }
@@ -191,7 +191,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<float>(
+            propertyValue = mbgl::style::PropertyExpression<float>(
                 step(zoom(), literal(1.0), 18.0, literal(1.0))
             );
         }
@@ -206,7 +206,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::SourceFunction<float>(
+            propertyValue = mbgl::style::PropertyExpression<float>(
                 interpolate(linear(), number(get("keyName")), 18.0, literal(1.0))
             );
         }
@@ -222,7 +222,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CompositeFunction<float>(
+            propertyValue = mbgl::style::PropertyExpression<float>(
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(1.0)))
             );
         }
@@ -269,7 +269,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<mbgl::Color>(
+            propertyValue = mbgl::style::PropertyExpression<mbgl::Color>(
                 step(zoom(), literal(mbgl::Color(1, 0, 0, 1)), 18.0, literal(mbgl::Color(1, 0, 0, 1)))
             );
         }
@@ -284,7 +284,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::SourceFunction<mbgl::Color>(
+            propertyValue = mbgl::style::PropertyExpression<mbgl::Color>(
                 interpolate(linear(), number(get("keyName")), 18.0, literal(mbgl::Color(1, 0, 0, 1)))
             );
         }
@@ -300,7 +300,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CompositeFunction<mbgl::Color>(
+            propertyValue = mbgl::style::PropertyExpression<mbgl::Color>(
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(mbgl::Color(1, 0, 0, 1))))
             );
         }
@@ -347,7 +347,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<std::string>(
+            propertyValue = mbgl::style::PropertyExpression<std::string>(
                 step(zoom(), literal("Fill Pattern"), 18.0, literal("Fill Pattern"))
             );
         }
@@ -406,7 +406,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<std::array<float, 2>>(
+            propertyValue = mbgl::style::PropertyExpression<std::array<float, 2>>(
                 step(zoom(), literal({ 1, 1 }), 18.0, literal({ 1, 1 }))
             );
         }
@@ -450,7 +450,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<mbgl::style::TranslateAnchorType>(
+            propertyValue = mbgl::style::PropertyExpression<mbgl::style::TranslateAnchorType>(
                 step(zoom(), literal("viewport"), 18.0, literal("viewport"))
             );
         }

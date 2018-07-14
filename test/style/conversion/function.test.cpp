@@ -2,9 +2,8 @@
 
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/constant.hpp>
-#include <mbgl/style/conversion/function.hpp>
+#include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/data_driven_property_value.hpp>
-#include <mbgl/util/rapidjson.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -14,7 +13,7 @@ TEST(StyleConversion, Function) {
     Error error;
 
     auto parseFunction = [&](const std::string& json) {
-        return convertJSON<CameraFunction<float>>(json, error);
+        return convertJSON<PropertyValue<float>>(json, error);
     };
 
     auto fn1 = parseFunction(R"({"stops":[]})");
@@ -46,7 +45,7 @@ TEST(StyleConversion, Function) {
 
     auto fn8 = parseFunction("[]");
     ASSERT_FALSE(fn8);
-    ASSERT_EQ("function must be an object", error.message);
+    ASSERT_EQ("value must be a number", error.message);
 
     auto fn9 = parseFunction(R"({"stops":[[0,0]],"base":false})");
     ASSERT_FALSE(fn9);
@@ -56,10 +55,8 @@ TEST(StyleConversion, Function) {
 TEST(StyleConversion, CompositeFunctionExpression) {
     Error error;
 
-    auto parseFunction = [&](const std::string& src) {
-        JSDocument doc;
-        doc.Parse<0>(src);
-        return convert<DataDrivenPropertyValue<float>>(doc, error);
+    auto parseFunction = [&](const std::string& json) {
+        return convertJSON<DataDrivenPropertyValue<float>>(json, error);
     };
 
     auto fn1 = parseFunction(R"(["interpolate", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10])");
@@ -71,7 +68,7 @@ TEST(StyleConversion, CompositeFunctionExpression) {
     auto fn3 = parseFunction(R"(["let", "a", 0, ["interpolate", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10] ])");
     ASSERT_TRUE(fn3);
 
-    auto fn4 = parseFunction(R"(["coalesce", ["let", "a", 0, ["interpolate", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10], 0 ])");
+    auto fn4 = parseFunction(R"(["coalesce", ["let", "a", 0, ["interpolate", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10]], 0])");
     ASSERT_TRUE(fn4);
 
     auto fn5 = parseFunction(R"(["coalesce", ["interpolate", ["linear"], ["number", ["get", "x"]], 0, ["zoom"], 10, 10], 0])");

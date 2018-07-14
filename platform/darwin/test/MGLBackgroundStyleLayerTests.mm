@@ -48,7 +48,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<mbgl::Color>(
+            propertyValue = mbgl::style::PropertyExpression<mbgl::Color>(
                 step(zoom(), literal(mbgl::Color(1, 0, 0, 1)), 18.0, literal(mbgl::Color(1, 0, 0, 1)))
             );
         }
@@ -101,7 +101,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<float>(
+            propertyValue = mbgl::style::PropertyExpression<float>(
                 step(zoom(), literal(1.0), 18.0, literal(1.0))
             );
         }
@@ -154,7 +154,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<std::string>(
+            propertyValue = mbgl::style::PropertyExpression<std::string>(
                 step(zoom(), literal("Background Pattern"), 18.0, literal("Background Pattern"))
             );
         }
