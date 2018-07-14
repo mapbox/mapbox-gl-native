@@ -59,43 +59,90 @@ workflows:
       - ios-release
 
 step-library:
-  - &generate-cache-key
+  - &npm-install
       run:
-        name: Generate cache key
+        name: npm install
+        command: npm install --ignore-scripts
+  - &prepare-environment
+      run:
+        name: Prepare environment
+        command: touch "$BASH_ENV" && ./scripts/environment.js | tee -a "$BASH_ENV"
+  - &prepare-ccache
+      run:
+        name: Prepare ccache
         command: |
-          echo "$(date +"%Y-%V")" > .circle-week
+          # CircleCI doesn't have any way to embed arbitrary environment variables or command output
+          # into cache keys, so we're using the workaround of writing the desired content to a file,
+          # and then using `{{ checksum "filename" }}` in the cache key.
+          echo "$CIRCLE_BRANCH"
+          echo "$CIRCLE_BRANCH" > .circle-branch
+          echo "$CIRCLE_SHA1"
+          echo "$CIRCLE_SHA1" > .circle-sha1
+          echo "$CIRCLE_TARGET_BRANCH"
+          echo "${CIRCLE_TARGET_BRANCH:master}" > .circle-target-branch
+          echo "$CIRCLE_MERGE_BASE"
+          echo "${CIRCLE_MERGE_BASE:master}" > .circle-merge-base
           ccache --clear
-          ccache --max-size=5G
-  - &restore-cache
-      restore_cache:
-        keys:
-          - 'v3/{{ .Environment.CIRCLE_JOB }}/{{ arch }}/{{ .Branch }}/{{ checksum ".circle-week" }}'
-          - 'v3/{{ .Environment.CIRCLE_JOB }}/{{ arch }}/master/{{ checksum ".circle-week" }}'
-  - &save-cache
-      save_cache:
-        key: 'v3/{{ .Environment.CIRCLE_JOB }}/{{ arch }}/{{ .Branch }}/{{ checksum ".circle-week" }}'
-        paths: [ "node_modules", "/root/.ccache", "~/.ccache", "mason_packages/.binaries" ]
-
-
-  - &restore-gradle-cache
-      restore_cache:
-        keys:
-          - 'v3/{{ checksum "platform/android/gradle/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
-  - &save-gradle-cache
-      save_cache:
-        key: 'v3/{{ checksum "platform/android/gradle/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
-        paths: [ "/root/.gradle" ]
-
   - &reset-ccache-stats
       run:
         name: Clear ccache statistics
         command: |
           ccache --zero-stats
+          ccache --max-size=2G
           ccache --show-stats
   - &show-ccache-stats
       run:
         name: Show ccache statistics
         command: ccache --show-stats
+
+
+  - &save-node_modules-cache
+      save_cache:
+        name: Save node_modules cache
+        key: 'node_modules/v1/{{ arch }}/{{ checksum "package.json" }}'
+        paths: [ "node_modules" ]
+  - &restore-node_modules-cache
+      restore_cache:
+        name: Restore node_modules cache
+        keys:
+          - 'node_modules/v1/{{ arch }}/{{ checksum "package.json" }}'
+          - 'node_modules/v1/{{ arch }}'
+  - &save-mason_packages-cache
+      save_cache:
+        name: Save mason_packages cache
+        key: 'mason_packages/v1/{{ arch }}/{{ checksum "cmake/mason-dependencies.cmake" }}'
+        paths: [ "mason_packages/.binaries" ]
+  - &restore-mason_packages-cache
+      restore_cache:
+        name: Restore mason_packages cache
+        keys:
+          - 'mason_packages/v1/{{ arch }}/{{ checksum "cmake/mason-dependencies.cmake" }}'
+          - 'mason_packages/v1/{{ arch }}'
+  - &save-ccache
+      save_cache:
+        name: Save ccache
+        key: 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-branch" }}/{{ checksum ".circle-sha1" }}'
+        paths: [ "~/.ccache" ]
+  - &restore-ccache
+      restore_cache:
+        name: Restore ccache
+        keys:
+          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-branch" }}/{{ checksum ".circle-sha1" }}'
+          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-branch" }}'
+          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-target-branch" }}/{{ checksum ".circle-merge-base" }}'
+          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-target-branch" }}'
+          - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}'
+  - &save-gradle-cache
+      save_cache:
+        name: Save gradle cache
+        key: 'gradle/v1/{{ checksum "platform/android/gradle/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
+        paths: [ "/root/.gradle" ]
+  - &restore-gradle-cache
+      restore_cache:
+        name: Restore gradle cache
+        keys:
+          - 'gradle/v1/{{ checksum "platform/android/gradle/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
+          - 'gradle/v1'
 
 
   - &setup-llvm-symbolizer
@@ -249,15 +296,12 @@ jobs:
       BUILDTYPE: Debug
     steps:
       - checkout
-      - *generate-cache-key
-      - *restore-cache
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - run:
           name: Initialize submodule
           command: git submodule update --init mapbox-gl-js
-      - run:
-          name: npm install
-          command: npm install --ignore-scripts
-      - *save-cache
       - run:
           name: Verify submodule pin
           command: scripts/nitpick/submodule-pin.js
@@ -291,8 +335,12 @@ jobs:
       BUILDTYPE: Debug
     steps:
       - checkout
-      - *generate-cache-key
-      - *restore-cache
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - run:
           name: Fetch 'origin/master' branch
@@ -300,12 +348,12 @@ jobs:
       - run:
           name: Generate compilation database
           command: make compdb
-      - *show-ccache-stats
-      - *save-cache
       - run:
           name: Run Clang checks
           command: make check
           no_output_timeout: 20m
+      - *show-ccache-stats
+      - *save-ccache
 
 # ------------------------------------------------------------------------------
   android-debug-arm-v7:
@@ -320,8 +368,12 @@ jobs:
       IS_LOCAL_DEVELOPMENT: false
     steps:
       - checkout
-      - *generate-cache-key
-      - *restore-cache
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *restore-gradle-cache
       - *reset-ccache-stats
       - run:
@@ -345,7 +397,9 @@ jobs:
             echo "${MAPBOX_DEVELOPER_CONFIG_XML}" > platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
             make android-ui-test-arm-v7
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - *save-gradle-cache
       - run:
           name: Log in to Google Cloud Platform
@@ -393,8 +447,12 @@ jobs:
       IS_LOCAL_DEVELOPMENT: false
     steps:
       - checkout
-      - *generate-cache-key
-      - *restore-cache
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *restore-gradle-cache
       - *reset-ccache-stats
       - run:
@@ -420,7 +478,9 @@ jobs:
           name: Build release Test App
           command: make android
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - *save-gradle-cache
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/release
@@ -448,12 +508,18 @@ jobs:
       WITH_CXX11ABI: 0
     steps:
       - checkout
-      - *generate-cache-key
-      - *restore-cache
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - *build-node
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - *run-node-linux-tests
       - *publish-node-package
       - *upload-render-tests
@@ -471,12 +537,18 @@ jobs:
       WITH_EGL: 1
     steps:
       - checkout
-      - *generate-cache-key
-      - *restore-cache
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - *build-node
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - *run-node-linux-tests-recycle-map
       - *publish-node-package
       - *upload-render-tests-recycle-map
@@ -490,14 +562,20 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
       - *install-node-macos-dependencies
-      - *generate-cache-key
-      - *restore-cache
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - *build-node
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - *run-node-macos-tests
       - *publish-node-package
       - *upload-render-tests
@@ -517,12 +595,18 @@ jobs:
       WITH_CXX11ABI: 1
     steps:
       - checkout
-      - *generate-cache-key
-      - *restore-cache
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - *build-linux
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
 
 # ------------------------------------------------------------------------------
   linux-clang4-sanitize-address:
@@ -540,13 +624,19 @@ jobs:
       ASAN_OPTIONS: detect_leaks=0:color=always:print_summary=1
     steps:
       - checkout
-      - *generate-cache-key
-      - *restore-cache
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - *setup-llvm-symbolizer
       - *build-test
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - run:
           name: Run tests
           command: |
@@ -570,13 +660,19 @@ jobs:
       UBSAN_OPTIONS: print_stacktrace=1:color=always:print_summary=1
     steps:
       - checkout
-      - *generate-cache-key
-      - *restore-cache
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - *setup-llvm-symbolizer
       - *build-test
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - run:
           name: Run tests
           command: |
@@ -600,13 +696,19 @@ jobs:
       TSAN_OPTIONS: color=always:print_summary=1
     steps:
       - checkout
-      - *generate-cache-key
-      - *restore-cache
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - *setup-llvm-symbolizer
       - *build-test
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - run:
           name: Run tests
           command: |
@@ -629,14 +731,20 @@ jobs:
       DISPLAY: :0
     steps:
       - checkout
-      - *generate-cache-key
-      - *restore-cache
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - *build-linux
       - *build-benchmark
       - *build-test
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - *run-unit-tests
 
 # ------------------------------------------------------------------------------
@@ -653,14 +761,20 @@ jobs:
       WITH_COVERAGE: 1
     steps:
       - checkout
-      - *generate-cache-key
-      - *restore-cache
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - *build-linux
       - *build-benchmark
       - *build-test
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - *run-unit-tests
       - run:
           name: Upload coverage results to coveralls
@@ -676,9 +790,13 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
-      - *generate-cache-key
-      - *restore-cache
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - *build-ios-test
       - *build-ios-integration-test
@@ -690,7 +808,9 @@ jobs:
           name: Nitpick Darwin code generation
           command: scripts/nitpick/generated-code.js darwin
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - *collect-xcode-build-logs
       - *upload-xcode-build-logs
 
@@ -703,15 +823,21 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
-      - *generate-cache-key
-      - *restore-cache
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - run:
           name: Build and run SDK unit tests with thread and undefined behavior sanitizers
           command: make ios-sanitize
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - *collect-xcode-build-logs
       - *upload-xcode-build-logs
 
@@ -724,15 +850,21 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
-      - *generate-cache-key
-      - *restore-cache
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - run:
           name: Build and run SDK unit tests with address sanitizer
           command: make ios-sanitize-address
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - *collect-xcode-build-logs
       - *upload-xcode-build-logs
 
@@ -745,15 +877,21 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
-      - *generate-cache-key
-      - *restore-cache
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - run:
           name: Build and run SDK unit tests with the static analyzer
           command: make ios-static-analyzer
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - *collect-xcode-build-logs
       - *upload-xcode-build-logs
 
@@ -766,10 +904,14 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
       - *install-ios-packaging-dependencies
-      - *generate-cache-key
-      - *restore-cache
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - run:
           name: Build dynamic framework for device and simulator
@@ -784,7 +926,9 @@ jobs:
           name: Record size
           command: platform/ios/scripts/metrics.sh
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - *collect-xcode-build-logs
       - *upload-xcode-build-logs
 
@@ -797,10 +941,14 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
       - *install-ios-packaging-dependencies
-      - *generate-cache-key
-      - *restore-cache
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - run:
           name: Build, package, and upload iOS release
@@ -809,7 +957,9 @@ jobs:
             export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
             platform/ios/scripts/deploy-packages.sh
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - *collect-xcode-build-logs
       - *upload-xcode-build-logs
 
@@ -822,9 +972,13 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
-      - *generate-cache-key
-      - *restore-cache
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - *build-macos-test
       - *check-public-symbols
@@ -835,7 +989,9 @@ jobs:
           name: Nitpick Darwin code generation
           command: scripts/nitpick/generated-code.js darwin
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - store_artifacts:
           path: test/fixtures
           destination: test/fixtures
@@ -856,13 +1012,19 @@ jobs:
       LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
     steps:
       - checkout
-      - *generate-cache-key
-      - *restore-cache
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - *build-qt-app
       - *build-qt-test
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - run:
           name: Run memory-load tests
           command: |
@@ -883,8 +1045,12 @@ jobs:
       WITH_QT_I18N: 1
     steps:
       - checkout
-      - *generate-cache-key
-      - *restore-cache
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - *build-qt-app
       - *build-qt-test
@@ -892,7 +1058,9 @@ jobs:
           name: Build qt-docs
           command: make qt-docs
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - run:
           name: Run valgrind-backed tests
           environment:
@@ -910,10 +1078,14 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
       - *install-macos-dependencies
       - *install-qt-macos-dependencies
-      - *generate-cache-key
-      - *restore-cache
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
       - *reset-ccache-stats
       - *build-qt-app
       - *build-qt-test
@@ -921,7 +1093,9 @@ jobs:
           name: Run qt-test
           command: make run-qt-test
       - *show-ccache-stats
-      - *save-cache
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
       - store_artifacts:
           path: test/fixtures
           destination: test/fixtures

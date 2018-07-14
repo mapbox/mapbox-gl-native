@@ -1,18 +1,5 @@
-mason_use(optional VERSION f27e7908 HEADER_ONLY)
-mason_use(tao_tuple VERSION 28626e99 HEADER_ONLY)
-
 include(platform/qt/qt.cmake)
 include(cmake/nunicode.cmake)
-
-if(NOT WITH_QT_DECODERS)
-    mason_use(libjpeg-turbo VERSION 1.5.0)
-    mason_use(libpng VERSION 1.6.25)
-    mason_use(webp VERSION 0.5.1)
-endif()
-
-if(NOT WITH_QT_I18N)
-    mason_use(icu VERSION 58.1-min-size)
-endif()
 
 macro(mbgl_platform_core)
     target_sources(mbgl-core
@@ -76,8 +63,6 @@ endmacro()
 # FIXME: For now tests are disabled on Windows until we
 # get the node.js dependencies working.
 if (NOT CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-    mason_use(gtest VERSION 1.8.0${MASON_CXXABI_SUFFIX})
-
     macro(mbgl_platform_test)
         target_sources(mbgl-test
             PRIVATE platform/qt/test/main.cpp
