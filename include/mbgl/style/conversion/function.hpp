@@ -10,11 +10,14 @@ namespace mbgl {
 namespace style {
 namespace conversion {
 
-optional<std::unique_ptr<expression::Expression>> convertFunctionToExpression(expression::type::Type, const Convertible&, Error&);
+bool hasTokens(const std::string&);
+std::unique_ptr<expression::Expression> convertTokenStringToExpression(const std::string&);
+
+optional<std::unique_ptr<expression::Expression>> convertFunctionToExpression(expression::type::Type, const Convertible&, Error&, bool convertTokens);
 
 template <class T>
-optional<PropertyExpression<T>> convertFunctionToExpression(const Convertible& value, Error& error) {
-    auto expression = convertFunctionToExpression(expression::valueTypeToExpressionType<T>(), value, error);
+optional<PropertyExpression<T>> convertFunctionToExpression(const Convertible& value, Error& error, bool convertTokens) {
+    auto expression = convertFunctionToExpression(expression::valueTypeToExpressionType<T>(), value, error, convertTokens);
     if (!expression) {
         return {};
     }

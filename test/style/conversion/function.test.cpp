@@ -4,6 +4,7 @@
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/data_driven_property_value.hpp>
+#include <mbgl/style/expression/dsl.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -56,7 +57,7 @@ TEST(StyleConversion, CompositeFunctionExpression) {
     Error error;
 
     auto parseFunction = [&](const std::string& json) {
-        return convertJSON<DataDrivenPropertyValue<float>>(json, error);
+        return convertJSON<DataDrivenPropertyValue<float>>(json, error, false);
     };
 
     auto fn1 = parseFunction(R"(["interpolate", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10])");
@@ -74,4 +75,21 @@ TEST(StyleConversion, CompositeFunctionExpression) {
     auto fn5 = parseFunction(R"(["coalesce", ["interpolate", ["linear"], ["number", ["get", "x"]], 0, ["zoom"], 10, 10], 0])");
     ASSERT_FALSE(fn5);
     ASSERT_EQ(R"("zoom" expression may only be used as input to a top-level "step" or "interpolate" expression.)", error.message);
+}
+
+TEST(StyleConversion, TokenStrings) {
+    ASSERT_FALSE(hasTokens(""));
+    ASSERT_FALSE(hasTokens("{"));
+    ASSERT_FALSE(hasTokens("{token"));
+    ASSERT_TRUE(hasTokens("{token}"));
+    ASSERT_TRUE(hasTokens("token {token}"));
+    ASSERT_TRUE(hasTokens("{token} {token}"));
+
+    using namespace mbgl::style::expression::dsl;
+    ASSERT_EQ(*convertTokenStringToExpression("{token}"), *toString(get(literal("token"))));
+    ASSERT_EQ(*convertTokenStringToExpression("token {token}"), *concat(vec(literal("token "), toString(get(literal("token"))))));
+    ASSERT_EQ(*convertTokenStringToExpression("{token} token"), *concat(vec(toString(get(literal("token"))), literal(" token"))));
+    ASSERT_EQ(*convertTokenStringToExpression("{token} {token}"), *concat(vec(toString(get(literal("token"))), literal(" "), toString(get(literal("token"))))));
+    ASSERT_EQ(*convertTokenStringToExpression("{token} {token"), *concat(vec(toString(get(literal("token"))), literal(" "), literal("{token"))));
+    ASSERT_EQ(*convertTokenStringToExpression("{token {token}"), *concat(vec(literal("{token "), toString(get(literal("token"))))));
 }

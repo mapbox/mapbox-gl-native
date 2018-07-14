@@ -86,7 +86,7 @@ public:
         
         mbgl::style::conversion::Error valueError;
         auto value = mbgl::style::conversion::convert<MBGLValue>(
-            mbgl::style::conversion::makeConvertible(jsonExpression), valueError);
+            mbgl::style::conversion::makeConvertible(jsonExpression), valueError, false);
         if (!value) {
             [NSException raise:NSInvalidArgumentException
                         format:@"Invalid property value: %@", @(valueError.message.c_str())];

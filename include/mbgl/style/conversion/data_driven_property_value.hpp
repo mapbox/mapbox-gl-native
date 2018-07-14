@@ -16,7 +16,7 @@ namespace conversion {
 
 template <class T>
 struct Converter<DataDrivenPropertyValue<T>> {
-    optional<DataDrivenPropertyValue<T>> operator()(const Convertible& value, Error& error) const {
+    optional<DataDrivenPropertyValue<T>> operator()(const Convertible& value, Error& error, bool convertTokens) const {
         using namespace mbgl::style::expression;
 
         if (isUndefined(value)) {
@@ -34,13 +34,13 @@ struct Converter<DataDrivenPropertyValue<T>> {
             }
             expression = PropertyExpression<T>(std::move(*parsed));
         } else if (isObject(value)) {
-            expression = convertFunctionToExpression<T>(value, error);
+            expression = convertFunctionToExpression<T>(value, error, convertTokens);
         } else {
             optional<T> constant = convert<T>(value, error);
             if (!constant) {
                 return {};
             }
-            return DataDrivenPropertyValue<T>(*constant);
+            return convertTokens ? maybeConvertTokens(*constant) : DataDrivenPropertyValue<T>(*constant);
         }
 
         if (!expression) {
@@ -55,6 +55,17 @@ struct Converter<DataDrivenPropertyValue<T>> {
             }
             return DataDrivenPropertyValue<T>(*constant);
         }
+    }
+
+    template <class S>
+    DataDrivenPropertyValue<T> maybeConvertTokens(const S& t) const {
+        return DataDrivenPropertyValue<T>(t);
+    };
+
+    DataDrivenPropertyValue<T> maybeConvertTokens(const std::string& t) const {
+        return hasTokens(t)
+            ? DataDrivenPropertyValue<T>(PropertyExpression<T>(convertTokenStringToExpression(t)))
+            : DataDrivenPropertyValue<T>(t);
     }
 };
 

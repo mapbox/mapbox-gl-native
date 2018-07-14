@@ -52,14 +52,6 @@ public:
         );
     }
 
-    bool isExpression() const {
-        return value.match(
-            [] (const Undefined&)                { return false; },
-            [] (const T&)                        { return false; },
-            [] (const PropertyExpression<T>& fn) { return fn.isExpression; }
-        );
-    }
-
     const                    T & asConstant()   const { return value.template get<                   T >(); }
     const PropertyExpression<T>& asExpression() const { return value.template get<PropertyExpression<T>>(); }
 
