@@ -359,6 +359,7 @@
 		9654C1261FFC1AB900DB6A19 /* MGLPolyline_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */; };
 		9654C1291FFC1CCD00DB6A19 /* MGLPolygon_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9654C1271FFC1CC000DB6A19 /* MGLPolygon_Private.h */; };
 		9658C155204761FC00D8A674 /* MGLMapViewScaleBarTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9658C154204761FC00D8A674 /* MGLMapViewScaleBarTests.m */; };
+		965DF51120F9430500438AAC /* MBXFrameTimeGraphView.m in Sources */ = {isa = PBXBuildFile; fileRef = 965DF51020F9430500438AAC /* MBXFrameTimeGraphView.m */; };
 		966FCF4C1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 966FCF4A1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.h */; };
 		966FCF4E1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 966FCF4B1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m */; };
 		966FCF4F1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 966FCF4B1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m */; };
@@ -1047,6 +1048,8 @@
 		9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLPolyline_Private.h; sourceTree = "<group>"; };
 		9654C1271FFC1CC000DB6A19 /* MGLPolygon_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLPolygon_Private.h; sourceTree = "<group>"; };
 		9658C154204761FC00D8A674 /* MGLMapViewScaleBarTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewScaleBarTests.m; sourceTree = "<group>"; };
+		965DF50F20F9430500438AAC /* MBXFrameTimeGraphView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXFrameTimeGraphView.h; sourceTree = "<group>"; };
+		965DF51020F9430500438AAC /* MBXFrameTimeGraphView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXFrameTimeGraphView.m; sourceTree = "<group>"; };
 		9660916B1E5BBFD700A9A03B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		9660916C1E5BBFD900A9A03B /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		9660916D1E5BBFDB00A9A03B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -1875,6 +1878,8 @@
 				1F26B6C020E189C9007BCC21 /* MBXCustomLocationViewController.m */,
 				DA1DC9531CB6C1C2006E619F /* MBXViewController.h */,
 				DA1DC99A1CB6E064006E619F /* MBXViewController.m */,
+				965DF50F20F9430500438AAC /* MBXFrameTimeGraphView.h */,
+				965DF51020F9430500438AAC /* MBXFrameTimeGraphView.m */,
 				632281DD1E6F855900D75A5D /* MBXEmbeddedMapViewController.h */,
 				632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */,
 				DA821D051CCC6D59007508D4 /* Main.storyboard */,
@@ -2952,6 +2957,7 @@
 			files = (
 				DA1DC9971CB6E046006E619F /* main.m in Sources */,
 				354B839C1D2E9B48005D9406 /* MBXUserLocationAnnotationView.m in Sources */,
+				965DF51120F9430500438AAC /* MBXFrameTimeGraphView.m in Sources */,
 				DA1DC9991CB6E054006E619F /* MBXAppDelegate.m in Sources */,
 				DA1DC96B1CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m in Sources */,
 				DA1DC96A1CB6C6B7006E619F /* MBXCustomCalloutView.m in Sources */,

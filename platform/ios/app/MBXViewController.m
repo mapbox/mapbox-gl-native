@@ -8,6 +8,8 @@
 #import "LimeGreenStyleLayer.h"
 #import "MBXEmbeddedMapViewController.h"
 
+#import "MBXFrameTimeGraphView.h"
+
 #import <Mapbox/Mapbox.h>
 #import "../src/MGLMapView_Experimental.h"
 
@@ -95,6 +97,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MBXSettingsMiscellaneousWorldTour,
     MBXSettingsMiscellaneousRandomTour,
     MBXSettingsMiscellaneousShowZoomLevel,
+    MBXSettingsMiscellaneousShowFrameTimeGraph,
     MBXSettingsMiscellaneousScrollView,
     MBXSettingsMiscellaneousToggleTwoMaps,
     MBXSettingsMiscellaneousLocalizeLabels,
@@ -192,14 +195,17 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
 @property (nonatomic) IBOutlet MGLMapView *mapView;
 @property (weak, nonatomic) IBOutlet UIButton *hudLabel;
+@property (weak, nonatomic) IBOutlet MBXFrameTimeGraphView *frameTimeGraphView;
 @property (nonatomic) NSInteger styleIndex;
 @property (nonatomic) BOOL debugLoggingEnabled;
 @property (nonatomic) BOOL customUserLocationAnnnotationEnabled;
 @property (nonatomic, getter=isLocalizingLabels) BOOL localizingLabels;
 @property (nonatomic) BOOL reuseQueueStatsEnabled;
 @property (nonatomic) BOOL mapInfoHUDEnabled;
+@property (nonatomic) BOOL frameTimeGraphEnabled;
 @property (nonatomic) BOOL shouldLimitCameraChanges;
 @property (nonatomic) BOOL randomWalk;
+
 @end
 
 @interface MGLMapView (MBXViewController)
@@ -238,6 +244,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     self.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
     self.mapView.showsScale = YES;
     self.mapView.showsUserHeadingIndicator = YES;
+    self.mapView.experimental_enableFrameRateMeasurement = YES;
     self.hudLabel.titleLabel.font = [UIFont monospacedDigitSystemFontOfSize:10 weight:UIFontWeightRegular];
 
     if ([MGLAccountManager accessToken].length)
@@ -293,6 +300,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     [defaults setBool:self.mapView.showsUserLocation forKey:@"MBXShowsUserLocation"];
     [defaults setInteger:self.mapView.debugMask forKey:@"MBXDebugMask"];
     [defaults setBool:self.mapInfoHUDEnabled forKey:@"MBXShowsZoomLevelHUD"];
+    [defaults setBool:self.mapInfoHUDEnabled forKey:@"MBXShowsFrameTimeGraph"];
     [defaults synchronize];
 }
 
@@ -323,6 +331,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
         self.mapInfoHUDEnabled = YES;
         [self updateHUD];
     }
+    self.frameTimeGraphEnabled = [defaults boolForKey:@"MBXShowsFrameTimeGraph"];
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations
@@ -452,6 +461,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 @"Start World Tour",
                 @"Random Tour",
                 [NSString stringWithFormat:@"%@ Map Info HUD", (_mapInfoHUDEnabled ? @"Hide" :@"Show")],
+                [NSString stringWithFormat:@"%@ Frame Time Graph", (_frameTimeGraphEnabled ? @"Hide" :@"Show")],
                 @"Embedded Map View",
                 [NSString stringWithFormat:@"%@ Second Map", ([self.view viewWithTag:2] == nil ? @"Show" : @"Hide")],
                 [NSString stringWithFormat:@"Show Labels in %@", (_localizingLabels ? @"Default Language" : [[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier value:[self bestLanguageForUser]])],
@@ -679,6 +689,12 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                     self.hudLabel.hidden = !self.mapInfoHUDEnabled;
                     self.reuseQueueStatsEnabled = NO;
                     [self updateHUD];
+                    break;
+                }
+                case MBXSettingsMiscellaneousShowFrameTimeGraph:
+                {
+                    self.frameTimeGraphEnabled = !self.frameTimeGraphEnabled;
+                    self.frameTimeGraphView.hidden = !self.frameTimeGraphEnabled;
                     break;
                 }
                 case MBXSettingsMiscellaneousScrollView:
@@ -2224,7 +2240,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
         }
         hudString = [NSString stringWithFormat:@"Visible: %ld  Queued: %ld", (unsigned long)self.mapView.visibleAnnotations.count, (unsigned long)queuedAnnotations];
     } else if (self.mapInfoHUDEnabled) {
-        if (!self.mapView.experimental_enableFrameRateMeasurement) self.mapView.experimental_enableFrameRateMeasurement = YES;
         hudString = [NSString stringWithFormat:@"%.f FPS (%.1fms) ∕ %.2f ∕ ↕\U0000FE0E%.f° ∕ %.f°",
                      roundf(self.mapView.averageFrameRate), self.mapView.averageFrameTime,
                      self.mapView.zoomLevel, self.mapView.camera.pitch, self.mapView.direction];
@@ -2279,6 +2294,12 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     }
 
     return features;
+}
+
+- (void)mapViewDidFinishRenderingFrame:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered {
+    if (self.frameTimeGraphEnabled) {
+        [self.frameTimeGraphView updatePathWithFrameDuration:mapView.frameTime];
+    }
 }
 
 @end
