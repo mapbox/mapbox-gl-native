@@ -484,6 +484,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/expression/compound_expression.cpp
     src/mbgl/style/expression/dsl.cpp
     src/mbgl/style/expression/equals.cpp
+    src/mbgl/style/expression/expression.cpp
     src/mbgl/style/expression/find_zoom_curve.cpp
     src/mbgl/style/expression/get_covering_stops.cpp
     src/mbgl/style/expression/interpolate.cpp
@@ -498,9 +499,6 @@ set(MBGL_CORE_FILES
     src/mbgl/style/expression/util.cpp
     src/mbgl/style/expression/util.hpp
     src/mbgl/style/expression/value.cpp
-
-    # style/function
-    src/mbgl/style/function/expression.cpp
 
     # style/layers
     include/mbgl/style/layers/background_layer.hpp
