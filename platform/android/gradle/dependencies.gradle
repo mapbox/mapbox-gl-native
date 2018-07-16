@@ -18,9 +18,9 @@ ext {
             junit          : '4.12',
             mockito        : '2.18.3',
             robolectric    : '3.8',
-            timber         : '4.7.0',
-            okhttp         : '3.10.0',
-            kotlin         : '1.2.50',
+            timber         : '4.7.1',
+            okhttp         : '3.11.0',
+            kotlin         : '1.2.51',
             licenses       : '0.8.41'
     ]
 
