@@ -19,6 +19,7 @@ add_library(mbgl-filesource STATIC
     platform/default/mbgl/storage/offline_database.cpp
     platform/default/mbgl/storage/offline_download.hpp
     platform/default/mbgl/storage/offline_download.cpp
+    platform/default/mbgl/storage/offline_schema.hpp
 
     # Database
     platform/default/sqlite3.hpp

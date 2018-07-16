@@ -1,5 +1,11 @@
-/* THIS IS A GENERATED FILE; EDIT offline_schema.sql INSTEAD */
-static const char * schema = 
+#pragma once
+
+// THIS IS A GENERATED FILE; EDIT offline_schema.sql INSTEAD
+// To regenerate, run `node platform/default/mbgl/storage/offline_schema.js`
+
+namespace mbgl {
+
+static constexpr const char* offlineDatabaseSchema =
 "CREATE TABLE resources (\n"
 "  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
 "  url TEXT NOT NULL,\n"
@@ -53,3 +59,5 @@ static const char * schema =
 "CREATE INDEX region_tiles_tile_id\n"
 "ON region_tiles (tile_id);\n"
 ;
+
+} // namespace mbgl
