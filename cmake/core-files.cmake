@@ -127,8 +127,8 @@ set(MBGL_CORE_FILES
     src/mbgl/math/log2.cpp
 
     # parsedate
-    src/parsedate/parsedate.c
-    src/parsedate/parsedate.h
+    src/parsedate/parsedate.cpp
+    src/parsedate/parsedate.hpp
 
     # programs
     src/mbgl/programs/attributes.hpp

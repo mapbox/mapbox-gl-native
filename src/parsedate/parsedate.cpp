@@ -73,7 +73,7 @@
 
 */
 
-#include "parsedate.h"
+#include "parsedate.hpp"
 
 
 
@@ -671,7 +671,7 @@ static int parsedate(const char *date, time_t *output)
 
 time_t parse_date(const char *p)
 {
-  time_t parsed;
+  time_t parsed = -1;
   int rc = parsedate(p, &parsed);
 
   switch(rc) {
