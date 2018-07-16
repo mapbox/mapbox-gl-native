@@ -323,6 +323,10 @@ test('Map', function(t) {
                 map.load('""');
             }, /Failed to parse style: style must be an object/);
 
+            t.throws(function() {
+                map.load('""');
+            }, mbgl.ParseError);
+
             map.release();
             t.end();
         });
@@ -338,6 +342,10 @@ test('Map', function(t) {
                 map.release();
                 t.end();
             });
+
+            t.throws(function() {
+                map.load('invalid');
+            }, mbgl.ParseError);
 
             t.throws(function() {
                 map.load('invalid');

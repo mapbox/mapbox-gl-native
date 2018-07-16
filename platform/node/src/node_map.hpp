@@ -37,6 +37,7 @@ public:
     ~NodeMap();
 
     static Nan::Persistent<v8::Function> constructor;
+    static Nan::Persistent<v8::Object> parseError;
 
     static void Init(v8::Local<v8::Object>);
 
@@ -66,6 +67,8 @@ public:
     static void SetYSkew(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>&);
+
+    static v8::Local<v8::Value> ParseError(const char* msg);
 
     void startRender(RenderOptions options);
     void renderFinished();
