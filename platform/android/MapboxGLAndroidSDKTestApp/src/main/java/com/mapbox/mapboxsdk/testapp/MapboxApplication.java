@@ -4,7 +4,9 @@ import android.app.Application;
 import android.os.StrictMode;
 import android.text.TextUtils;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.Telemetry;
+import com.mapbox.mapboxsdk.testapp.utils.TimberLogger;
 import com.mapbox.mapboxsdk.testapp.utils.TokenUtils;
 import com.squareup.leakcanary.LeakCanary;
 import timber.log.Timber;
@@ -50,6 +52,7 @@ public class MapboxApplication extends Application {
     if (BuildConfig.DEBUG) {
       Timber.plant(new DebugTree());
     }
+    Logger.setLoggerDefinition(new TimberLogger());
   }
 
   private void initializeStrictMode() {
