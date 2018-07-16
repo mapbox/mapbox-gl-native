@@ -1401,7 +1401,23 @@ NSDictionary<NSNumber *, NSExpression *> *MGLLocalizedStopDictionary(NSDictionar
                         localizedKeyPath = [NSString stringWithFormat:@"name_%@", preferredLanguage];
                     }
                 }
-                return [NSExpression expressionForKeyPath:localizedKeyPath];
+                // If the keypath is `name` or `name_en`, no need to fallback
+                if ([localizedKeyPath isEqualToString:@"name"] || [localizedKeyPath isEqualToString:@"name_en"]) {
+                    return [NSExpression expressionForKeyPath:localizedKeyPath];
+                }
+                // If the keypath is `name_zh-Hans`, fallback to `name_zh`. If `name_zh` is empty, fallback to `name`
+                // The `name_zh-Hans` field was added since Mapbox Streets v7
+                // See the documentation of name fields for detail https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview
+                if ([localizedKeyPath isEqualToString:@"name_zh-Hans"]) {
+                    return [NSExpression expressionWithFormat:@"mgl_coalesce(%@)",
+                            @[[NSExpression expressionForKeyPath:localizedKeyPath],
+                              [NSExpression expressionForKeyPath:@"name_zh"],
+                              [NSExpression expressionForKeyPath:@"name"],]];
+                }
+                // Other keypath fallback to `name`
+                return [NSExpression expressionWithFormat:@"mgl_coalesce(%@)",
+                        @[[NSExpression expressionForKeyPath:localizedKeyPath],
+                          [NSExpression expressionForKeyPath:@"name"],]];
             }
             return self;
         }

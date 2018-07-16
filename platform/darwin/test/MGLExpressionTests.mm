@@ -1023,12 +1023,17 @@ using namespace std::string_literals;
     }
     {
         NSExpression *original = [NSExpression expressionForKeyPath:@"name_en"];
-        NSExpression *expected = [NSExpression expressionForKeyPath:@"name_fr"];
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_coalesce(%@)",
+                                  @[[NSExpression expressionForKeyPath:@"name_fr"],
+                                    [NSExpression expressionForKeyPath:@"name"]]];
         XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:[NSLocale localeWithLocaleIdentifier:@"fr-CA"]], expected);
     }
     {
         NSExpression *original = [NSExpression expressionForKeyPath:@"name_en"];
-        NSExpression *expected = [NSExpression expressionForKeyPath:@"name_zh-Hans"];
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_coalesce(%@)",
+                                  @[[NSExpression expressionForKeyPath:@"name_zh-Hans"],
+                                    [NSExpression expressionForKeyPath:@"name_zh"],
+                                    [NSExpression expressionForKeyPath:@"name"]]];
         XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:[NSLocale localeWithLocaleIdentifier:@"zh-Hans"]], expected);
     }
     {
@@ -1045,7 +1050,9 @@ using namespace std::string_literals;
         NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, short, %@)", @{
             @1: [NSExpression expressionForKeyPath:@"abbr"],
             @2: @"…",
-            @3: [NSExpression expressionForKeyPath:@"name_es"],
+            @3: [NSExpression expressionWithFormat:@"mgl_coalesce(%@)",
+                 @[[NSExpression expressionForKeyPath:@"name_es"],
+                   [NSExpression expressionForKeyPath:@"name"]]]
         }];
         XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:[NSLocale localeWithLocaleIdentifier:@"es-PR"]], expected);
     }
