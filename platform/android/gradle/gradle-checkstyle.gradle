@@ -11,14 +11,16 @@ task checkstyle(type: Checkstyle) {
     configFile file("../checkstyle.xml")
     source 'src'
     include '**/*.java'
-    exclude '**/gen/**'
-    exclude '**/style/*LayerTest.java'
-    exclude '**/style/LightTest.java'
-    exclude '**/style/layers/Property.java'
-    exclude '**/style/layers/PropertyFactory.java'
-    exclude '**/style/layers/*Layer.java'
-    exclude '**/style/light/Light.java'
-    exclude '**/Expression.java' // allowing single character signature as e()
+    exclude '**/gen/**'                              // generated code
+    exclude '**/style/*LayerTest.java'               // generated code
+    exclude '**/style/LightTest.java'                // generated code
+    exclude '**/style/layers/Property.java'          // generated code
+    exclude '**/style/layers/PropertyFactory.java'   // generated code
+    exclude '**/style/layers/*Layer.java'            // generated code
+    exclude '**/style/light/Light.java'              // generated code
+    exclude '**/log/LoggerDefinition.java'           // allow single character signature as v()
+    exclude '**/log/Logger.java'                     // allow single character signature as v()
+    exclude '**/Expression.java'                     // allow single character signature as e()
     classpath = files()
     ignoreFailures = false
 }

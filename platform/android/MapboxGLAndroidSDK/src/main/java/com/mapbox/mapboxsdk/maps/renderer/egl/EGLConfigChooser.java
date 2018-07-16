@@ -7,12 +7,13 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
 
-import timber.log.Timber;
+import com.mapbox.mapboxsdk.log.Logger;
 
 import static com.mapbox.mapboxsdk.utils.Compare.compare;
 import static javax.microedition.khronos.egl.EGL10.EGL_ALPHA_MASK_SIZE;
@@ -72,7 +73,7 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
     // Determine number of possible configurations
     int[] numConfigs = getNumberOfConfigurations(egl, display, configAttribs);
     if (numConfigs[0] < 1) {
-      Timber.e("eglChooseConfig() returned no configs.");
+      Logger.e("eglChooseConfig() returned no configs.");
       throw new EGLConfigException("eglChooseConfig() failed");
     }
 
@@ -82,7 +83,7 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
     // Choose best match
     EGLConfig config = chooseBestMatchConfig(egl, display, possibleConfigurations);
     if (config == null) {
-      Timber.e("No config chosen");
+      Logger.e("No config chosen");
       throw new EGLConfigException("No config chosen");
     }
 
@@ -92,7 +93,7 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
   private int[] getNumberOfConfigurations(EGL10 egl, EGLDisplay display, int[] configAttributes) {
     int[] numConfigs = new int[1];
     if (!egl.eglChooseConfig(display, configAttributes, null, 0, numConfigs)) {
-      Timber.e("eglChooseConfig(NULL) returned error %d", egl.eglGetError());
+      Logger.e(String.format(Locale.getDefault(), "eglChooseConfig(NULL) returned error %d", egl.eglGetError()));
       throw new EGLConfigException("eglChooseConfig() failed");
     }
     return numConfigs;
@@ -102,7 +103,7 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
                                                 int[] configAttributes, int[] numConfigs) {
     EGLConfig[] configs = new EGLConfig[numConfigs[0]];
     if (!egl.eglChooseConfig(display, configAttributes, configs, numConfigs[0], numConfigs)) {
-      Timber.e("eglChooseConfig() returned error %d", egl.eglGetError());
+      Logger.e(String.format(Locale.getDefault(), "eglChooseConfig() returned error %d", egl.eglGetError()));
       throw new EGLConfigException("eglChooseConfig() failed");
     }
     return configs;
@@ -254,11 +255,11 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
     Config bestMatch = matches.get(0);
 
     if (bestMatch.isCaveat) {
-      Timber.w("Chosen config has a caveat.");
+      Logger.w("Chosen config has a caveat.");
     }
 
     if (bestMatch.isNotConformant) {
-      Timber.w("Chosen config is not conformant.");
+      Logger.w("Chosen config is not conformant.");
     }
 
     return bestMatch.config;
@@ -267,7 +268,9 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
   private int getConfigAttr(EGL10 egl, EGLDisplay display, EGLConfig config, int attributeName) {
     int[] attributevalue = new int[1];
     if (!egl.eglGetConfigAttrib(display, config, attributeName, attributevalue)) {
-      Timber.e("eglGetConfigAttrib(%d) returned error %d", attributeName, egl.eglGetError());
+      Logger.e(String.format(Locale.getDefault(), "eglGetConfigAttrib(%d) returned error %d",
+        attributeName, egl.eglGetError())
+      );
       throw new EGLConfigException("eglGetConfigAttrib() failed");
     }
     return attributevalue[0];
@@ -275,7 +278,7 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
 
   private int[] getConfigAttributes() {
     boolean emulator = inEmulator() || inGenymotion();
-    Timber.i("In emulator: %s", emulator);
+    Logger.i(String.format("In emulator: %s", emulator));
 
     // Get all configs at least RGB 565 with 16 depth and 8 stencil
     return new int[] {

@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk;
 
-import timber.log.Timber;
+import com.mapbox.mapboxsdk.log.Logger;
 
 /**
  * Loads the mapbox-gl shared library
@@ -39,7 +39,7 @@ public abstract class LibraryLoader {
     try {
       loader.load("mapbox-gl");
     } catch (UnsatisfiedLinkError error) {
-      Timber.e(error, "Failed to load native shared library.");
+      Logger.e("Failed to load native shared library.", error);
     }
   }
 

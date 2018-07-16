@@ -12,7 +12,7 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.mapboxsdk.maps.Telemetry;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
-import timber.log.Timber;
+import com.mapbox.mapboxsdk.log.Logger;
 
 /**
  * The entry point to initialize the Mapbox Android SDK.
@@ -119,7 +119,7 @@ public final class Mapbox {
     try {
       Telemetry.initialize();
     } catch (Exception exception) {
-      Timber.e(exception);
+      Logger.e("initializeTelemetry", exception);
     }
   }
 
