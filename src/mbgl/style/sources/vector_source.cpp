@@ -6,6 +6,7 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/exception.hpp>
 
 namespace mbgl {
 namespace style {
@@ -56,7 +57,7 @@ void VectorSource::loadDescription(FileSource& fileSource) {
             conversion::Error error;
             optional<Tileset> tileset = conversion::convertJSON<Tileset>(*res.data, error);
             if (!tileset) {
-                observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(error.message)));
+                observer->onSourceError(*this, std::make_exception_ptr(util::StyleParseException(error.message)));
                 return;
             }
 
