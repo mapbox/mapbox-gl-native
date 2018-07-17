@@ -65,9 +65,12 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ, bool aligne
 
     matrix::rotate_z(projMatrix, projMatrix, getBearing() + getNorthOrientationAngle());
 
-    const double dx = pixel_x() - size.width / 2.0;
-    const double dy = pixel_y() - size.height / 2.0;
-    matrix::translate(projMatrix, projMatrix, dx, dy, 0);
+    const double worldSize = Projection::worldSize(scale);
+    Point<double> pixel = {
+        position.x - ((size.width / 2.0) / size.width * worldSize),
+        position.y - ((size.height / 2.0) / size.height * worldSize)
+    };
+    matrix::translate(projMatrix, projMatrix, pixel.x, pixel.y, 0);
 
     if (axonometric) {
         // mat[11] controls perspective
@@ -91,8 +94,8 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ, bool aligne
         const float xShift = float(size.width % 2) / 2, yShift = float(size.height % 2) / 2;
         const double bearingCos = std::cos(bearing), bearingSin = std::sin(bearing);
         double devNull;
-        const float dxa = -std::modf(dx, &devNull) + bearingCos * xShift + bearingSin * yShift;
-        const float dya = -std::modf(dy, &devNull) + bearingCos * yShift + bearingSin * xShift;
+        const float dxa = -std::modf(pixel.x, &devNull) + bearingCos * xShift + bearingSin * yShift;
+        const float dya = -std::modf(pixel.y, &devNull) + bearingCos * yShift + bearingSin * xShift;
         matrix::translate(projMatrix, projMatrix, dxa > 0.5 ? dxa - 1 : dxa, dya > 0.5 ? dya - 1 : dya, 0);
     }
 }
@@ -105,7 +108,7 @@ Size TransformState::getSize() const {
 
 void TransformState::setSize(const Size& size_) {
     size = size_;
-    constrain(scale, x, y);
+    constrain(scale, position.x, position.y);
 }
 
 #pragma mark - North Orientation
@@ -116,7 +119,7 @@ NorthOrientation TransformState::getNorthOrientation() const {
 
 void TransformState::setNorthOrientation(NorthOrientation orientation_) {
     orientation = orientation_;
-    constrain(scale, x, y);
+    constrain(scale, position.x, position.y);
 }
 
 double TransformState::getNorthOrientationAngle() const {
@@ -139,7 +142,7 @@ ConstrainMode TransformState::getConstrainMode() const {
 
 void TransformState::setConstrainMode(ConstrainMode constrainMode_) {
     constrainMode = constrainMode_;
-    constrain(scale, x, y);
+    constrain(scale, position.x, position.y);
 }
 
 #pragma mark - ViewportMode
@@ -201,20 +204,10 @@ CameraOptions TransformState::getCameraOptions(const EdgeInsets& padding) const 
 
 LatLng TransformState::getLatLng(LatLng::WrapMode wrapMode) const {
     return {
-        util::RAD2DEG * (2 * std::atan(std::exp(y / Cc)) - 0.5 * M_PI),
-        -x / Bc,
+        util::RAD2DEG * (2 * std::atan(std::exp(position.y / Cc)) - 0.5 * M_PI),
+        -position.x / Bc,
         wrapMode
     };
-}
-
-double TransformState::pixel_x() const {
-    const double center = (size.width - Projection::worldSize(scale)) / 2;
-    return center + x;
-}
-
-double TransformState::pixel_y() const {
-    const double center = (size.height - Projection::worldSize(scale)) / 2;
-    return center + y;
 }
 
 #pragma mark - Zoom
@@ -252,8 +245,8 @@ void TransformState::setMinZoom(const double minZoom) {
 
 double TransformState::getMinZoom() const {
     double test_scale = min_scale;
-    double unused_x = x;
-    double unused_y = y;
+    double unused_x = position.x;
+    double unused_y = position.y;
     constrain(test_scale, unused_x, unused_y);
 
     return scaleZoom(test_scale);
@@ -479,8 +472,8 @@ void TransformState::setScalePoint(const double newScale, const ScreenCoordinate
     constrain(constrainedScale, constrainedPoint.x, constrainedPoint.y);
 
     scale = constrainedScale;
-    x = constrainedPoint.x;
-    y = constrainedPoint.y;
+    position.x = constrainedPoint.x;
+    position.y = constrainedPoint.y;
     Bc = Projection::worldSize(scale) / util::DEGREES_MAX;
     Cc = Projection::worldSize(scale) / util::M2PI;
 }

@@ -57,8 +57,6 @@ public:
 
     // Position
     LatLng getLatLng(LatLng::WrapMode = LatLng::Unwrapped) const;
-    double pixel_x() const;
-    double pixel_y() const;
 
     // Zoom
     double getZoom() const;
@@ -146,7 +144,7 @@ private:
     bool transitionInProgress = false;
 
     // map position
-    double x = 0, y = 0;
+    Point<double> position { 0, 0 };
     double bearing = 0;
     double scale = 1;
     // This fov value is somewhat arbitrary. The altitude of the camera used
