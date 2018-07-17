@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -10,9 +9,10 @@ import android.support.annotation.UiThread;
 import android.text.TextUtils;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
-import com.mapbox.mapboxsdk.maps.Telemetry;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
-import timber.log.Timber;
+import com.mapbox.mapboxsdk.telemetry.Telemetry;
+import com.mapbox.mapboxsdk.utils.MapboxConfigurationWrapper;
 
 /**
  * The entry point to initialize the Mapbox Android SDK.
@@ -25,10 +25,10 @@ import timber.log.Timber;
 @UiThread
 public final class Mapbox {
 
-  @SuppressLint("StaticFieldLeak")
+  private static final String TAG = "Mapbox";
+
   private static Mapbox INSTANCE;
-  private Context context;
-  private String accessToken;
+  private Telemetry telemetry;
   private Boolean connected;
 
   /**
@@ -41,22 +41,20 @@ public final class Mapbox {
    * @param accessToken Mapbox access token
    * @return the single instance of Mapbox
    */
-  @UiThread
   public static synchronized Mapbox getInstance(@NonNull Context context, @Nullable String accessToken) {
     if (INSTANCE == null) {
-      Context appContext = context.getApplicationContext();
-      INSTANCE = new Mapbox(appContext, accessToken);
-      if (isAccessTokenValid(accessToken)) {
-        initializeTelemetry();
-      }
-      ConnectivityReceiver.instance(appContext);
+      INSTANCE = new Mapbox(context, accessToken);
     }
     return INSTANCE;
   }
 
   Mapbox(@NonNull Context context, @Nullable String accessToken) {
-    this.context = context;
-    this.accessToken = accessToken;
+    Context appContext = context.getApplicationContext();
+    MapboxConfigurationWrapper.initialize(appContext, accessToken);
+    if (isAccessTokenValid(accessToken)) {
+      initializeTelemetry();
+    }
+    ConnectivityReceiver.instance(appContext);
   }
 
   /**
@@ -67,7 +65,7 @@ public final class Mapbox {
   @Nullable
   public static String getAccessToken() {
     validateMapbox();
-    return INSTANCE.accessToken;
+    return MapboxConfigurationWrapper.getAccessToken();
   }
 
   /**
@@ -78,7 +76,21 @@ public final class Mapbox {
   @NonNull
   public static Context getApplicationContext() {
     validateMapbox();
-    return INSTANCE.context;
+    return MapboxConfigurationWrapper.getContext();
+  }
+
+  /**
+   * Telemetry instance
+   * <p>
+   * If no valid mapbox accesstoken was provided, this method returns null.
+   * </p>
+   *
+   * @return the telemetry instance;
+   */
+  @Nullable
+  public static Telemetry getTelemetry() {
+    validateMapbox();
+    return INSTANCE.telemetry;
   }
 
   /**
@@ -107,7 +119,8 @@ public final class Mapbox {
       return INSTANCE.connected;
     }
 
-    ConnectivityManager cm = (ConnectivityManager) INSTANCE.context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    Context context = MapboxConfigurationWrapper.getContext();
+    ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
     return (activeNetwork != null && activeNetwork.isConnected());
   }
@@ -117,9 +130,9 @@ public final class Mapbox {
    */
   private static void initializeTelemetry() {
     try {
-      Telemetry.initialize();
+      INSTANCE.telemetry = new Telemetry();
     } catch (Exception exception) {
-      Timber.e(exception);
+      Logger.e(TAG, "Error occured while initializing telemetry", exception);
     }
   }
 

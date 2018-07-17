@@ -23,9 +23,9 @@ import com.mapbox.mapboxsdk.attribution.AttributionParser;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
-import timber.log.Timber;
 
 /**
  * The map snapshotter creates a large of the map, rendered
@@ -34,6 +34,8 @@ import timber.log.Timber;
  */
 @UiThread
 public class MapSnapshotter {
+
+  private static final String TAG = "MapSnapshotter";
 
   /**
    * Get notified on snapshot completion.
@@ -350,9 +352,10 @@ public class MapSnapshotter {
       drawAttribution(canvas, measure, anchorPoint);
     } else {
       Bitmap snapshot = mapSnapshot.getBitmap();
-      Timber.e("Could not generate attribution for snapshot size: %s x %s."
+      Logger.e(TAG, String.format("Could not generate attribution for snapshot size: %s x %s."
           + " You are required to provide your own attribution for the used sources: %s",
-        snapshot.getWidth(), snapshot.getHeight(), mapSnapshot.getAttributions());
+        snapshot.getWidth(), snapshot.getHeight(), mapSnapshot.getAttributions())
+      );
     }
   }
 

@@ -5,22 +5,22 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
 
 import java.io.File;
-
-import timber.log.Timber;
 
 /**
  * The offline manager is the main entry point for offline-related functionality.
  * It'll help you list and create offline regions.
  */
 public class OfflineManager {
+
+  private final static String TAG = "OfflineManager";
 
   //
   // Static methods
@@ -109,10 +109,10 @@ public class OfflineManager {
           File file = new File(path);
           if (file.exists()) {
             file.delete();
-            Timber.d("Old ambient cache database deleted to save space: %s", path);
+            Logger.d(TAG, String.format("Old ambient cache database deleted to save space: %s", path));
           }
         } catch (Exception exception) {
-          Timber.e(exception, "Failed to delete old ambient cache database: ");
+          Logger.e(TAG, "Failed to delete old ambient cache database: ", exception);
         }
       }
     }).start();

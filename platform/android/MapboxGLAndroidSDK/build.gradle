@@ -2,17 +2,17 @@ apply plugin: 'com.android.library'
 apply plugin: "com.jaredsburrows.license"
 
 dependencies {
-    api (dependenciesList.mapboxAndroidTelemetry) {
-        exclude group: 'com.android.support', module: 'appcompat-v7'
-    }
+    api(project(':MapboxGLAndroidModuleBase'))
+    api(project(':MapboxGLAndroidModuleHttp'))
+    api(project(':MapboxGLAndroidModuleTelemetry'))
+
     api dependenciesList.mapboxJavaGeoJSON
     api (dependenciesList.mapboxAndroidGestures) {
         exclude group: 'com.android.support', module: 'appcompat-v7'
     }
     implementation dependenciesList.supportAnnotations
     implementation dependenciesList.supportFragmentV4
-    implementation dependenciesList.timber
-    implementation dependenciesList.okhttp3
+    implementation dependenciesList.supportUtilV4
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
     testImplementation dependenciesList.robolectric
@@ -25,14 +25,10 @@ android {
     defaultConfig {
         minSdkVersion androidVersions.minSdkVersion
         targetSdkVersion androidVersions.targetSdkVersion
-        buildConfigField "String", "GIT_REVISION_SHORT", String.format("\"%s\"", getGitRevision())
-        buildConfigField "String", "MAPBOX_SDK_IDENTIFIER", String.format("\"%s\"", "mapbox-maps-android")
-        buildConfigField "String", "MAPBOX_SDK_VERSION", String.format("\"%s\"", project.VERSION_NAME)
-        buildConfigField "String", "MAPBOX_VERSION_STRING", String.format("\"Mapbox/%s\"", project.VERSION_NAME)
-        buildConfigField "String", "MAPBOX_EVENTS_USER_AGENT", String.format("\"MapboxEventsAndroid/%s\"", project.VERSION_NAME)
     }
 
     defaultPublishConfig project.hasProperty("mapbox.buildtype") ? project.getProperty("mapbox.buildtype") : "debug"
+
 
     // We sometimes want to invoke Gradle without building a native dependency, e.g. when we just want
     // to invoke the Java tests. When we explicitly specify an ABI of 'none', no native dependencies are
@@ -140,13 +136,6 @@ licenseReport {
     generateJsonReport = true
     copyHtmlReportToAssets = false
     copyJsonReportToAssets = false
-}
-
-def static getGitRevision() {
-    def cmd = "git rev-parse --short HEAD"
-    def proc = cmd.execute()
-    def ref = proc.text.trim()
-    return ref
 }
 
 configurations {

@@ -7,16 +7,17 @@ import android.content.res.AssetManager;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
-
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import timber.log.Timber;
+import com.mapbox.mapboxsdk.log.Logger;
 
 /**
  * Holds a central reference to the core's DefaultFileSource for as long as
  * there are active mapviews / offline managers
  */
 public class FileSource {
+
+  private static final String TAG = "FileSource";
 
   /**
    * This callback allows implementors to transform URLs before they are requested
@@ -73,9 +74,9 @@ public class FileSource {
         MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
         MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL);
     } catch (PackageManager.NameNotFoundException exception) {
-      Timber.e(exception, "Failed to read the package metadata: ");
+      Logger.e(TAG, "Failed to read the package metadata: ", exception);
     } catch (Exception exception) {
-      Timber.e(exception, "Failed to read the storage key: ");
+      Logger.e(TAG, "Failed to read the storage key: ", exception);
     }
 
     String cachePath = null;
@@ -84,7 +85,7 @@ public class FileSource {
         // Try getting the external storage path
         cachePath = context.getExternalFilesDir(null).getAbsolutePath();
       } catch (NullPointerException exception) {
-        Timber.e(exception, "Failed to obtain the external storage path: ");
+        Logger.e(TAG, "Failed to obtain the external storage path: ", exception);
       }
     }
 
@@ -112,7 +113,7 @@ public class FileSource {
       return true;
     }
 
-    Timber.w("External storage was requested but it isn't readable. For API level < 18"
+    Logger.w(TAG, "External storage was requested but it isn't readable. For API level < 18"
       + " make sure you've requested READ_EXTERNAL_STORAGE or WRITE_EXTERNAL_STORAGE"
       + " permissions in your app Manifest (defaulting to internal storage).");
 

@@ -1,14 +1,15 @@
 package com.mapbox.mapboxsdk.http;
 
 import okhttp3.OkHttpClient;
+import okio.Buffer;
 
 /**
- * Utility class for setting HttpRequest configurations
+ * Utility class for setting OkHttpRequest configurations
  */
 public class HttpRequestUtil {
 
   /**
-   * Set the log state of HttpRequest. Default value is true.
+   * Set the log state of OkHttpRequest. Default value is true.
    * <p>
    * This configuration will outlast the lifecycle of the Map.
    * </p>
@@ -16,7 +17,7 @@ public class HttpRequestUtil {
    * @param enabled True will enable logging, false will disable
    */
   public static void setLogEnabled(boolean enabled) {
-    HTTPRequest.enableLog(enabled);
+    HttpRequestImpl.enableLog(enabled);
   }
 
   /**
@@ -31,7 +32,7 @@ public class HttpRequestUtil {
    * @param enabled True will print urls, false will disable
    */
   public static void setPrintRequestUrlOnFailure(boolean enabled) {
-    HTTPRequest.enablePrintRequestUrlOnFailure(enabled);
+    HttpRequestImpl.enablePrintRequestUrlOnFailure(enabled);
   }
 
   /**
@@ -40,7 +41,24 @@ public class HttpRequestUtil {
    * @param client the OkHttpClient
    */
   public static void setOkHttpClient(OkHttpClient client) {
-    HTTPRequest.setOKHttpClient(client);
+    HttpRequestImpl.setOkHttpClient(client);
   }
 
+  static String toHumanReadableAscii(String s) {
+    for (int i = 0, length = s.length(), c; i < length; i += Character.charCount(c)) {
+      c = s.codePointAt(i);
+      if (c > '\u001f' && c < '\u007f') {
+        continue;
+      }
+
+      Buffer buffer = new Buffer();
+      buffer.writeUtf8(s, 0, i);
+      for (int j = i; j < length; j += Character.charCount(c)) {
+        c = s.codePointAt(j);
+        buffer.writeUtf8CodePoint(c > '\u001f' && c < '\u007f' ? c : '?');
+      }
+      return buffer.readUtf8();
+    }
+    return s;
+  }
 }
