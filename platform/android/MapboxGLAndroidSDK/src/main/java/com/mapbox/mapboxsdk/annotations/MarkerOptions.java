@@ -31,6 +31,7 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
     position((LatLng) in.readParcelable(LatLng.class.getClassLoader()));
     snippet(in.readString());
     title(in.readString());
+    draggable(in.readByte() == 1);
     if (in.readByte() != 0) {
       // this means we have an icon
       String iconId = in.readString();
@@ -68,6 +69,7 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
     out.writeParcelable(getPosition(), flags);
     out.writeString(getSnippet());
     out.writeString(getTitle());
+    out.writeByte((byte) (getDraggable() ? 1 : 0));
     Icon icon = getIcon();
     out.writeByte((byte) (icon != null ? 1 : 0));
     if (icon != null) {
@@ -86,7 +88,7 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
       throw new InvalidMarkerPositionException();
     }
 
-    return new Marker(position, icon, title, snippet);
+    return new Marker(position, icon, title, snippet, isDraggable);
   }
 
   /**
@@ -114,6 +116,15 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
    */
   public String getTitle() {
     return title;
+  }
+
+  /**
+   * Gets the draggable state for this {@link MarkerOptions} object.
+   *
+   * @return A boolean indicating if the marker is draggable or not.
+   */
+  public boolean getDraggable() {
+    return isDraggable;
   }
 
   /**

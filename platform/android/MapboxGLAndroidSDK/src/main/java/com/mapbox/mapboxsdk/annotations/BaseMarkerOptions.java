@@ -18,6 +18,7 @@ public abstract class BaseMarkerOptions<U extends Marker, T extends BaseMarkerOp
   protected String snippet;
   protected String title;
   protected Icon icon;
+  protected boolean isDraggable;
 
   /**
    * Set the geographical location of the Marker.
@@ -64,6 +65,17 @@ public abstract class BaseMarkerOptions<U extends Marker, T extends BaseMarkerOp
   }
 
   /**
+   * Set if the marker is draggable.
+   *
+   * @param isDraggable true if dragging is allowed for this {@link Marker}.
+   * @return the object for which the method was called.
+   */
+  public T draggable(boolean isDraggable) {
+    this.isDraggable = isDraggable;
+    return getThis();
+  }
+
+  /**
    * Set the icon of the Marker.
    *
    * @param icon the icon of the {@link Marker}.
@@ -101,6 +113,16 @@ public abstract class BaseMarkerOptions<U extends Marker, T extends BaseMarkerOp
    */
   public T setTitle(String title) {
     return title(title);
+  }
+
+  /**
+   * Set if the marker is draggable.
+   *
+   * @param draggable true if dragging is allowed for this {@link Marker}.
+   * @return the object for which the method was called.
+   */
+  public T setDraggable(boolean draggable) {
+    return draggable(draggable);
   }
 
   /**

@@ -1431,6 +1431,16 @@ public final class MapboxMap {
   }
 
   /**
+   * Sets a callback that's invoked when the user starts dragging a marker.
+   *
+   * @param listener The callback that's invoked when the user drags a marker.
+   *                 To unset the callback, use null.
+   */
+  public void setOnMarkerDragListener(@Nullable OnMarkerDragListener listener) {
+    annotationManager.setOnMarkerDragListener(listener);
+  }
+
+  /**
    * Sets a callback that's invoked when the user clicks on a polygon.
    *
    * @param listener The callback that's invoked when the user clicks on a polygon.
@@ -2618,6 +2628,35 @@ public final class MapboxMap {
      */
     @Nullable
     View getInfoWindow(@NonNull Marker marker);
+  }
+
+  /**
+   * Interface definition for a callback to be invoked when the user drags a marker.
+   *
+   * @see MapboxMap#setOnMarkerDragListener(OnMarkerDragListener)
+   */
+  public interface OnMarkerDragListener {
+
+    /**
+     * Called when the user starts dragging a marker.
+     *
+     * @param marker The marker being dragged.
+     */
+    void onMarkerDragStart(@NonNull Marker marker);
+
+    /**
+     * Called when the marker is being dragged.
+     *
+     * @param marker The marker being dragged.
+     */
+    void onMarkerDrag(@NonNull Marker marker);
+
+    /**
+     * Called when the user stops dragging a marker.
+     *
+     * @param marker The marker that was being dragged.
+     */
+    void onMarkerDragEnd(@NonNull Marker marker);
   }
 
   /**

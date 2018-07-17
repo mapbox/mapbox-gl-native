@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
 import android.view.View;
 
+import com.mapbox.android.gestures.MoveDistancesObject;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
@@ -51,6 +52,7 @@ class AnnotationManager {
 
   private MapboxMap mapboxMap;
   private MapboxMap.OnMarkerClickListener onMarkerClickListener;
+  private MapboxMap.OnMarkerDragListener onMarkerDragListener;
   private MapboxMap.OnPolygonClickListener onPolygonClickListener;
   private MapboxMap.OnPolylineClickListener onPolylineClickListener;
 
@@ -59,6 +61,8 @@ class AnnotationManager {
   private Markers markers;
   private Polygons polygons;
   private Polylines polylines;
+
+  @Nullable private Marker currentMarkerBeingDragged;
 
   AnnotationManager(NativeMapView view, MapView mapView, LongSparseArray<Annotation> annotationsArray,
                     MarkerViewManager markerViewManager, IconManager iconManager, Annotations annotations,
@@ -273,6 +277,10 @@ class AnnotationManager {
     onPolylineClickListener = listener;
   }
 
+  void setOnMarkerDragListener(@Nullable MapboxMap.OnMarkerDragListener listener) {
+    onMarkerDragListener = listener;
+  }
+
   void selectMarker(@NonNull Marker marker) {
     if (selectedMarkers.contains(marker)) {
       return;
@@ -385,9 +393,62 @@ class AnnotationManager {
       }
     }
 
-    MarkerHit markerHit = getMarkerHitFromTouchArea(tapPoint);
+    Marker marker = getMarkerBelowPoint(tapPoint);
+    return marker != null && isClickHandledForMarker(marker);
+  }
+
+  //region Drag Event Handlers
+
+  boolean onMoveBegin(PointF focalPoint) {
+    Marker marker = getMarkerBelowPoint(focalPoint);
+    if (marker != null && marker.isDraggable()) {
+      currentMarkerBeingDragged = marker;
+      if (onMarkerDragListener != null) {
+        onMarkerDragListener.onMarkerDragStart(marker);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  boolean onMove(MoveDistancesObject movedObject, float distanceX, float distanceY) {
+    if (currentMarkerBeingDragged == null || !currentMarkerBeingDragged.isDraggable()) {
+      return false;
+    }
+    PointF screenLocation = new PointF(movedObject.getCurrentX(), movedObject.getCurrentY());
+    screenLocation.offset(-distanceX, -distanceY);
+    currentMarkerBeingDragged.setPosition(mapboxMap.getProjection().fromScreenLocation(screenLocation));
+
+    if (onMarkerDragListener != null) {
+      onMarkerDragListener.onMarkerDrag(currentMarkerBeingDragged);
+    }
+    return true;
+  }
+
+  boolean onMoveEnd() {
+    return finishMarkerDrag();
+  }
+
+  boolean finishMarkerDrag() {
+    if (currentMarkerBeingDragged != null && currentMarkerBeingDragged.isDraggable()) {
+      if (onMarkerDragListener != null) {
+        onMarkerDragListener.onMarkerDragEnd(currentMarkerBeingDragged);
+      }
+      this.currentMarkerBeingDragged = null;
+      return true;
+    }
+    return false;
+  }
+
+  //endregion
+
+  private @Nullable Marker getMarkerBelowPoint(PointF point) {
+    MarkerHit markerHit = getMarkerHitFromTouchArea(point);
     long markerId = new MarkerHitResolver(mapboxMap).execute(markerHit);
-    return markerId != NO_ANNOTATION_ID && isClickHandledForMarker(markerId);
+    if (markerId != NO_ANNOTATION_ID) {
+      return (Marker) getAnnotation(markerId);
+    }
+    return null;
   }
 
   private ShapeAnnotationHit getShapeAnnotationHitFromTap(PointF tapPoint) {
@@ -423,9 +484,8 @@ class AnnotationManager {
     return new MarkerHit(tapRect, getMarkersInRect(tapRect));
   }
 
-  private boolean isClickHandledForMarker(long markerId) {
+  private boolean isClickHandledForMarker(@NonNull Marker marker) {
     boolean handledDefaultClick;
-    Marker marker = (Marker) getAnnotation(markerId);
     if (marker instanceof MarkerView) {
       handledDefaultClick = markerViewManager.onClickMarkerView((MarkerView) marker);
     } else {

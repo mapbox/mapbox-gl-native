@@ -40,6 +40,8 @@ public class Marker extends Annotation {
   private int topOffsetPixels;
   private int rightOffsetPixels;
 
+  private boolean isDraggable;
+
   /**
    * Constructor
    */
@@ -53,7 +55,8 @@ public class Marker extends Annotation {
    * @param baseMarkerOptions The builder used to construct the Marker.
    */
   public Marker(BaseMarkerOptions baseMarkerOptions) {
-    this(baseMarkerOptions.position, baseMarkerOptions.icon, baseMarkerOptions.title, baseMarkerOptions.snippet);
+    this(baseMarkerOptions.position, baseMarkerOptions.icon, baseMarkerOptions.title, baseMarkerOptions.snippet,
+            baseMarkerOptions.isDraggable);
   }
 
   Marker(BaseMarkerViewOptions baseMarkerViewOptions) {
@@ -65,6 +68,14 @@ public class Marker extends Annotation {
     this.position = position;
     this.title = title;
     this.snippet = snippet;
+    setIcon(icon);
+  }
+
+  Marker(LatLng position, Icon icon, String title, String snippet, boolean isDraggable) {
+    this.position = position;
+    this.title = title;
+    this.snippet = snippet;
+    this.isDraggable = isDraggable;
     setIcon(icon);
   }
 
@@ -160,6 +171,13 @@ public class Marker extends Annotation {
    */
   public Icon getIcon() {
     return icon;
+  }
+
+  /**
+   * @return true if marker is draggable.
+   */
+  public boolean isDraggable() {
+    return isDraggable;
   }
 
   /**
