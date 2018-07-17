@@ -23,9 +23,10 @@ function init {
 
 function extract {
     echo ">> Unpacking files from $VENDOR/.cache/$NAME-$VERSION.tar.gz..."
-    tar xzf "$VENDOR/.cache/$NAME-$VERSION.tar.gz" --strip-components=${STRIP_COMPONENTS:-1} -C "$VENDOR/$NAME" $@
+    [ ! -z "$(tar --version | grep "GNU tar")" ] && WC="--wildcards" || WC=""
+    tar xzf "$VENDOR/.cache/$NAME-$VERSION.tar.gz" $WC --strip-components=${STRIP_COMPONENTS:-1} -C "$VENDOR/$NAME" $@
 }
 
 function file_list {
-    (cd "$VENDOR/$NAME" && find $@ | sort > "$VENDOR/$NAME/files.txt")
+    (cd "$VENDOR/$NAME" && find $@ | LC_ALL=C sort > "$VENDOR/$NAME/files.txt")
 }
