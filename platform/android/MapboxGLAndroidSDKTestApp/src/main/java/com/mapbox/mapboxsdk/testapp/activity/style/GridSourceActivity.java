@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.MultiLineString;
@@ -17,7 +16,6 @@ import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.CustomGeometrySource;
 import com.mapbox.mapboxsdk.style.sources.GeometryTileProvider;
 import com.mapbox.mapboxsdk.testapp.R;
-
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +32,7 @@ public class GridSourceActivity extends AppCompatActivity implements OnMapReadyC
   private static final String ID_GRID_LAYER = "grid_layer";
 
   private MapView mapView;
-  private MapboxMap mapboxMap;
+  private CustomGeometrySource source;
 
   /**
    * Implementation of GeometryTileProvider that returns features representing a zoom-dependent
@@ -66,7 +64,7 @@ public class GridSourceActivity extends AppCompatActivity implements OnMapReadyC
         gridSpacing = 20;
       }
 
-      List gridLines = new ArrayList();
+      List<List<Point>> gridLines = new ArrayList<>();
       for (double y = Math.ceil(bounds.getLatNorth() / gridSpacing) * gridSpacing;
            y >= Math.floor(bounds.getLatSouth() / gridSpacing) * gridSpacing; y -= gridSpacing) {
         gridLines.add(Arrays.asList(Point.fromLngLat(bounds.getLonWest(), y),
@@ -74,7 +72,7 @@ public class GridSourceActivity extends AppCompatActivity implements OnMapReadyC
       }
       features.add(Feature.fromGeometry(MultiLineString.fromLngLats(gridLines)));
 
-      gridLines = new ArrayList();
+      gridLines = new ArrayList<>();
       for (double x = Math.floor(bounds.getLonWest() / gridSpacing) * gridSpacing;
            x <= Math.ceil(bounds.getLonEast() / gridSpacing) * gridSpacing; x += gridSpacing) {
         gridLines.add(Arrays.asList(Point.fromLngLat(x, bounds.getLatSouth()),
@@ -91,26 +89,20 @@ public class GridSourceActivity extends AppCompatActivity implements OnMapReadyC
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_grid_source);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
   }
 
   @Override
   public void onMapReady(@NonNull final MapboxMap map) {
-    mapboxMap = map;
-
     // add source
-    CustomGeometrySource source = new CustomGeometrySource(ID_GRID_SOURCE, new GridProvider());
-    mapboxMap.addSource(source);
+    map.addSource(source = new CustomGeometrySource(ID_GRID_SOURCE, new GridProvider()));
 
     // add layer
-    LineLayer layer = new LineLayer(ID_GRID_LAYER, ID_GRID_SOURCE);
-    layer.setProperties(
-      lineColor(Color.parseColor("#000000"))
+    map.addLayer(new LineLayer(ID_GRID_LAYER, ID_GRID_SOURCE)
+      .withProperties(lineColor(Color.parseColor("#000000")))
     );
-
-    mapboxMap.addLayer(layer);
   }
 
   @Override
@@ -134,6 +126,9 @@ public class GridSourceActivity extends AppCompatActivity implements OnMapReadyC
   @Override
   protected void onStop() {
     super.onStop();
+    if (source != null) {
+      source.onStop();
+    }
     mapView.onStop();
   }
 
@@ -148,5 +143,4 @@ public class GridSourceActivity extends AppCompatActivity implements OnMapReadyC
     super.onSaveInstanceState(outState);
     mapView.onSaveInstanceState(outState);
   }
-
 }
