@@ -2,7 +2,6 @@
 
 #include <mbgl/benchmark/stub_geometry_tile_feature.hpp>
 
-#include <mbgl/style/function/composite_exponential_stops.hpp>
 #include <mbgl/style/function/composite_function.hpp>
 
 #include <mbgl/style/conversion.hpp>

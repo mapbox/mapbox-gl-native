@@ -1,16 +1,5 @@
 include(cmake/nunicode.cmake)
 
-mason_use(glfw VERSION 2018-06-27-0be4f3f)
-mason_use(sqlite VERSION 3.14.2)
-mason_use(libuv VERSION 1.9.1)
-mason_use(libpng VERSION 1.6.25)
-mason_use(libjpeg-turbo VERSION 1.5.0)
-mason_use(webp VERSION 0.5.1)
-mason_use(gtest VERSION 1.8.0${MASON_CXXABI_SUFFIX})
-mason_use(benchmark VERSION 1.2.0)
-mason_use(icu VERSION 58.1-min-size)
-mason_use(args VERSION 6.2.0 HEADER_ONLY)
-
 add_library(mbgl-loop-uv STATIC
     platform/default/async_task.cpp
     platform/default/run_loop.cpp
@@ -40,7 +29,6 @@ macro(mbgl_platform_core)
         target_sources(mbgl-core
             PRIVATE platform/linux/src/headless_backend_egl.cpp
         )
-        mason_use(swiftshader VERSION 2017-11-20)
         target_add_mason_package(mbgl-core PUBLIC swiftshader)
     else()
         target_sources(mbgl-core

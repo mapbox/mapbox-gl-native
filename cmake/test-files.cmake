@@ -90,8 +90,6 @@ set(MBGL_TEST_FILES
     # style/function
     test/style/function/camera_function.test.cpp
     test/style/function/composite_function.test.cpp
-    test/style/function/exponential_stops.test.cpp
-    test/style/function/interval_stops.test.cpp
     test/style/function/source_function.test.cpp
 
     # test

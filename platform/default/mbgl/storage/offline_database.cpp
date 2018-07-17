@@ -6,6 +6,8 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/logging.hpp>
 
+#include "offline_schema.hpp"
+
 #include "sqlite3.hpp"
 
 namespace mbgl {
@@ -82,8 +84,6 @@ void OfflineDatabase::ensureSchema() {
     }
 
     try {
-        #include "offline_schema.cpp.include"
-
         // When downgrading the database, or when the database is corrupt, we've deleted the old database handle,
         // so we need to reopen it.
         if (!db) {
@@ -95,7 +95,7 @@ void OfflineDatabase::ensureSchema() {
         db->exec("PRAGMA auto_vacuum = INCREMENTAL");
         db->exec("PRAGMA journal_mode = DELETE");
         db->exec("PRAGMA synchronous = FULL");
-        db->exec(schema);
+        db->exec(offlineDatabaseSchema);
         db->exec("PRAGMA user_version = 6");
     } catch (...) {
         Log::Error(Event::Database, "Unexpected error creating database schema: %s", util::toString(std::current_exception()).c_str());

@@ -315,6 +315,7 @@ In style specification | Method, function, or predicate type | Format string syn
 -----------------------|-------------------------------------|---------------------
 `array`                | |
 `boolean`              | |
+`collator`             | `NSComparisonPredicateOptions` | `'Québec' =[cd] 'QUEBEC'`
 `literal`              | `+[NSExpression expressionForConstantValue:]` | `%@` representing `NSArray` or `NSDictionary`
 `number`               | |
 `string`               | |

@@ -94,9 +94,10 @@ public:
 
 private:
     static Point<double> project_(const LatLng& latLng, double worldSize) {
+        const double latitude = util::clamp(latLng.latitude(), -util::LATITUDE_MAX, util::LATITUDE_MAX);
         return Point<double> {
             util::LONGITUDE_MAX + latLng.longitude(),
-            util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + latLng.latitude() * M_PI / util::DEGREES_MAX))
+            util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + latitude * M_PI / util::DEGREES_MAX))
         } * worldSize / util::DEGREES_MAX;
     }
 };

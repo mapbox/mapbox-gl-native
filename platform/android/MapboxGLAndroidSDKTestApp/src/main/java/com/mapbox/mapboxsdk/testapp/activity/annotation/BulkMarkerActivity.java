@@ -92,7 +92,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
   }
 
   private void showMarkers(int amount) {
-    if (mapboxMap == null || locations == null) {
+    if (mapboxMap == null || locations == null || mapView.isDestroyed()) {
       return;
     }
 
