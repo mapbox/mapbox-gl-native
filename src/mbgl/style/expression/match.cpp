@@ -1,6 +1,7 @@
 #include <mbgl/style/expression/match.hpp>
 #include <mbgl/style/expression/check_subtype.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
+#include <mbgl/style/expression/literal.hpp>
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/string.hpp>
 
@@ -223,10 +224,39 @@ static ParseResult create(type::Type outputType,
     ));
 }
 
+optional<std::vector<InputType>> parseLabel(const Convertible& label, ParsingContext& ctx, std::size_t index, optional<type::Type>& inputType) {
+    std::vector<InputType> labels;
+    // Match pair inputs are provided as either a literal value or a
+    // raw JSON array of string / number / boolean values.
+    if (isArray(label)) {
+        auto groupLength = arrayLength(label);
+        if (groupLength == 0) {
+            ctx.error("Expected at least one branch label.", index);
+            return {};
+        }
+
+        labels.reserve(groupLength);
+        for (size_t j = 0; j < groupLength; j++) {
+            const optional<InputType> inputValue = parseInputValue(arrayMember(label, j), ctx, index, inputType);
+            if (!inputValue) {
+                return {};
+            }
+            labels.push_back(*inputValue);
+        }
+    } else {
+        const optional<InputType> inputValue = parseInputValue(label, ctx, index, inputType);
+        if (!inputValue) {
+            return {};
+        }
+        labels.push_back(*inputValue);
+    }
+    return labels;
+}
+
 ParseResult parseMatch(const Convertible& value, ParsingContext& ctx) {
     assert(isArray(value));
     auto length = arrayLength(value);
-    if (length < 5) {
+    if (length < 5 && length != 3) {
         ctx.error(
             "Expected at least 4 arguments, but found only " + util::toString(length - 1) + "."
         );
@@ -234,6 +264,7 @@ ParseResult parseMatch(const Convertible& value, ParsingContext& ctx) {
     }
 
     // Expect odd-length array: ["match", input, 2 * (n pairs)..., otherwise]
+    //                      or: ["match", input, label]
     if (length % 2 != 1) {
         ctx.error("Expected an even number of arguments.");
         return ParseResult();
@@ -245,59 +276,47 @@ ParseResult parseMatch(const Convertible& value, ParsingContext& ctx) {
         outputType = ctx.getExpected();
     }
 
-    std::vector<std::pair<std::vector<InputType>,
-                          std::unique_ptr<Expression>>> branches;
-
-    branches.reserve((length - 3) / 2);
-    for (size_t i = 2; i + 1 < length; i += 2) {
-        const auto& label = arrayMember(value, i);
-
-        std::vector<InputType> labels;
-        // Match pair inputs are provided as either a literal value or a
-        // raw JSON array of string / number / boolean values.
-        if (isArray(label)) {
-            auto groupLength = arrayLength(label);
-            if (groupLength == 0) {
-                ctx.error("Expected at least one branch label.", i);
-                return ParseResult();
-            }
-            
-            labels.reserve(groupLength);
-            for (size_t j = 0; j < groupLength; j++) {
-                const optional<InputType> inputValue = parseInputValue(arrayMember(label, j), ctx, i, inputType);
-                if (!inputValue) {
-                    return ParseResult();
-                }
-                labels.push_back(*inputValue);
-            }
-        } else {
-            const optional<InputType> inputValue = parseInputValue(label, ctx, i, inputType);
-            if (!inputValue) {
-                return ParseResult();
-            }
-            labels.push_back(*inputValue);
-        }
-        
-        ParseResult output = ctx.parse(arrayMember(value, i + 1), i + 1, outputType);
-        if (!output) {
-            return ParseResult();
-        }
-        
-        if (!outputType) {
-            outputType = (*output)->getType();
-        }
-        
-        branches.push_back(std::make_pair(std::move(labels), std::move(*output)));
-    }
-
     auto input = ctx.parse(arrayMember(value, 1), 1, {type::Value});
     if (!input) {
         return ParseResult();
     }
 
-    auto otherwise = ctx.parse(arrayMember(value, length - 1), length - 1, outputType);
-    if (!otherwise) {
-        return ParseResult();
+    std::vector<std::pair<std::vector<InputType>,
+                          std::unique_ptr<Expression>>> branches;
+    ParseResult otherwise;
+
+    if (length == 3) {
+        auto labels = parseLabel(arrayMember(value, 2), ctx, 2, inputType);
+        if (!labels) {
+            return ParseResult();
+        }
+        branches.push_back(std::make_pair(std::move(*labels), std::make_unique<Literal>(true)));
+        otherwise = { std::make_unique<Literal>(false) };
+        outputType = type::Type(type::Boolean);
+    } else {
+        branches.reserve((length - 3) / 2);
+        for (size_t i = 2; i + 1 < length; i += 2) {
+            auto labels = parseLabel(arrayMember(value, i), ctx, i, inputType);
+            if (!labels) {
+                return ParseResult();
+            }
+
+            ParseResult output = ctx.parse(arrayMember(value, i + 1), i + 1, outputType);
+            if (!output) {
+                return ParseResult();
+            }
+
+            if (!outputType) {
+                outputType = (*output)->getType();
+            }
+
+            branches.push_back(std::make_pair(std::move(*labels), std::move(*output)));
+        }
+
+        otherwise = ctx.parse(arrayMember(value, length - 1), length - 1, outputType);
+        if (!otherwise) {
+            return ParseResult();
+        }
     }
 
     assert(inputType && outputType);
