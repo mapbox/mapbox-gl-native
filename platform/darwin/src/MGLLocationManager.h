@@ -16,6 +16,40 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @protocol MGLLocationManager <NSObject>
 
+@optional
+
+#pragma mark Determining Location Updates Accuracy
+
+/**
+ Specifies the minimum distance (measured in meters) a device must move horizontally
+ before a location update is generated.
+ 
+ The default value of this property is `kCLDistanceFilterNone` when `MGLMapView` uses  its
+ default location manager.
+ */
+@property(nonatomic, assign) CLLocationDistance distanceFilter;
+
+/**
+ Specifies the accuracy of the location data.
+ 
+ The default value is `kCLLocationAccuracyBest` when `MGLMapView` uses  its
+ default location manager.
+ 
+ @note Determining a location with greater accuracy requires more time and more power.
+ */
+@property (nonatomic, assign) CLLocationAccuracy desiredAccuracy;
+
+/**
+ Specifies the type of user activity associated with the location updates.
+ 
+ The location manager uses this property as a cue to determine when location updates
+ may be automatically paused.
+ 
+ The default value is `CLActivityTypeOther` when `MGLMapView` uses  its
+ default location manager.
+ */
+@property (nonatomic, assign) CLActivityType activityType;
+
 @required
 
 /**
@@ -26,10 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, weak) id<MGLLocationManagerDelegate> delegate;
 
-/**
- Specifies a physical device orientation.
- */
-@property (nonatomic) CLDeviceOrientation headingOrientation;
+#pragma mark Requesting Authorization for Location Services
 
 /**
  Returns the current localization authorization status.
@@ -37,26 +68,6 @@ NS_ASSUME_NONNULL_BEGIN
  @see `+[CLLocationManger authorizationStatus]`
  */
 @property (nonatomic, readonly) CLAuthorizationStatus authorizationStatus;
-
-/**
- Starts the generation of location updates that reports the user's current location.
- */
-- (void)startUpdatingLocation;
-
-/**
- Stops the generation of location updates.
- */
-- (void)stopUpdatingLocation;
-
-/**
- Starts the generation of heading updates that reports the user's current hading.
- */
-- (void)startUpdatingHeading;
-
-/**
- Stops the generation of heading updates.
- */
-- (void)stopUpdatingHeading;
 
 /**
  Requests permission to use the location services whenever the app is running.
@@ -69,6 +80,35 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)requestWhenInUseAuthorization;
 
+#pragma mark Initiating Location Updates
+
+/**
+ Starts the generation of location updates that reports the user's current location.
+ */
+- (void)startUpdatingLocation;
+
+/**
+ Stops the generation of location updates.
+ */
+- (void)stopUpdatingLocation;
+
+#pragma mark Initiating Heading Updates
+
+/**
+ Specifies a physical device orientation.
+ */
+@property (nonatomic) CLDeviceOrientation headingOrientation;
+
+/**
+ Starts the generation of heading updates that reports the user's current hading.
+ */
+- (void)startUpdatingHeading;
+
+/**
+ Stops the generation of heading updates.
+ */
+- (void)stopUpdatingHeading;
+
 /**
  Dissmisses immediately the heading calibration view from screen.
  */
@@ -77,10 +117,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- The `MGLLocationManagerDelegate` protocol defines a set of methods that you
- use to receive location updates from the associated location manager.
+ The `MGLLocationManagerDelegate` protocol defines a set of methods that `MGLMapView`
+ uses to receive location updates from the associated location manager.
  */
 @protocol MGLLocationManagerDelegate <NSObject>
+
+#pragma mark Responding to Location Updates
 
 /**
  Notifies the delegate with the new location data.
@@ -93,6 +135,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)locationManager:(id<MGLLocationManager>)manager
      didUpdateLocations:(NSArray<CLLocation *> *)locations;
+
+#pragma mark Responding to Heading Updates
 
 /**
  Notifies the delegate with the new heading data.
@@ -109,6 +153,8 @@ NS_ASSUME_NONNULL_BEGIN
  @param manager The location manager reporting the calibration.
  */
 - (BOOL)locationManagerShouldDisplayHeadingCalibration:(id<MGLLocationManager>)manager;
+
+#pragma mark Responding to Location Updates Errors
 
 /**
  Notifies the delegate that the location manager was unable to retrieve

@@ -1,4 +1,5 @@
 #import "MGLLocationManager.h"
 
-@interface CLLocationManager (MGLAdditions) <MGLLocationManager>
+@interface MGLCLLocationManager : NSObject<MGLLocationManager>
+
 @end
