@@ -87,15 +87,42 @@ public class Projection {
   /**
    * Gets a projection of the viewing frustum for converting between screen coordinates and
    * geo-latitude/longitude coordinates.
+   * <p>
+   * This method ignores the content padding.
    *
    * @return The projection of the viewing frustum in its current state.
    */
   @NonNull
   public VisibleRegion getVisibleRegion() {
-    float left = 0;
-    float right = nativeMapView.getWidth();
-    float top = 0;
-    float bottom = nativeMapView.getHeight();
+    return getVisibleRegion(true);
+  }
+
+  /**
+   * Gets a projection of the viewing frustum for converting between screen coordinates and
+   * geo-latitude/longitude coordinates.
+   *
+   * @param ignorePadding True if the padding should be ignored,
+   *                      false if the returned region should be reduced by the padding.
+   * @return The projection of the viewing frustum in its current state.
+   */
+  @NonNull
+  public VisibleRegion getVisibleRegion(boolean ignorePadding) {
+    float left;
+    float right;
+    float top;
+    float bottom;
+
+    if (ignorePadding) {
+      left = 0;
+      right = nativeMapView.getWidth();
+      top = 0;
+      bottom = nativeMapView.getHeight();
+    } else {
+      left = contentPadding[0];
+      right = nativeMapView.getWidth() - contentPadding[2];
+      top = contentPadding[1];
+      bottom = nativeMapView.getHeight() - contentPadding[3];
+    }
 
     LatLng topLeft = fromScreenLocation(new PointF(left, top));
     LatLng topRight = fromScreenLocation(new PointF(right, top));
@@ -132,7 +159,7 @@ public class Projection {
     double fourthLon = boundsPoints.get(3).getLongitude();
 
     // if it does not go over the date line
-    if (secondLon > fourthLon && firstLon < thridLon)  {
+    if (secondLon > fourthLon && firstLon < thridLon) {
       return new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight,
         LatLngBounds.from(north,
           secondLon > thridLon ? secondLon : thridLon,
