@@ -42,6 +42,9 @@ public:
 
     void setObserver(GlyphManagerObserver*);
 
+    // Remove glyphs for all but the supplied font stacks.
+    void evict(const std::set<FontStack>&);
+
 private:
     Glyph generateLocalSDF(const FontStack& fontStack, GlyphID glyphID);
 

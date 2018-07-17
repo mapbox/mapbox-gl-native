@@ -5,6 +5,7 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/tiny_sdf.hpp>
+#include <mbgl/util/std.hpp>
 
 namespace mbgl {
 
@@ -151,6 +152,12 @@ void GlyphManager::removeRequestor(GlyphRequestor& requestor) {
             range.second.requestors.erase(&requestor);
         }
     }
+}
+
+void GlyphManager::evict(const std::set<FontStack>& keep) {
+    util::erase_if(entries, [&] (const auto& entry) {
+        return keep.count(entry.first) == 0;
+    });
 }
 
 } // namespace mbgl
