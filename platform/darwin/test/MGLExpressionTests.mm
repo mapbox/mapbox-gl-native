@@ -995,47 +995,6 @@ using namespace std::string_literals;
 
 #pragma mark - Localization tests
 
-- (void)testTokenReplacement {
-    {
-        NSExpression *original = MGLConstantExpression(@"");
-        NSExpression *expected = original;
-        XCTAssertEqualObjects(original.mgl_expressionByReplacingTokensWithKeyPaths, expected);
-    }
-    {
-        NSExpression *original = MGLConstantExpression(@"{");
-        NSExpression *expected = original;
-        XCTAssertEqualObjects(original.mgl_expressionByReplacingTokensWithKeyPaths, expected);
-    }
-    {
-        NSExpression *original = MGLConstantExpression(@"{token");
-        NSExpression *expected = original;
-        XCTAssertEqualObjects(original.mgl_expressionByReplacingTokensWithKeyPaths, expected);
-    }
-    {
-        NSExpression *original = MGLConstantExpression(@"{token}");
-        NSExpression *expected = [NSExpression expressionForKeyPath:@"token"];
-        XCTAssertEqualObjects(original.mgl_expressionByReplacingTokensWithKeyPaths, expected);
-    }
-    {
-        NSExpression *original = MGLConstantExpression(@"{token} {token}");
-        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_join({token, ' ', token})"];
-        XCTAssertEqualObjects(original.mgl_expressionByReplacingTokensWithKeyPaths, expected);
-    }
-    {
-        NSExpression *original = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, '{short}', %@)", @{
-            @1: MGLConstantExpression(@"{short}"),
-            @2: @"…",
-            @3: @"{long}",
-        }];
-        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, short, %@)", @{
-            @1: [NSExpression expressionForKeyPath:@"short"],
-            @2: @"…",
-            @3: [NSExpression expressionForKeyPath:@"long"],
-        }];
-        XCTAssertEqualObjects(original.mgl_expressionByReplacingTokensWithKeyPaths, expected);
-    }
-}
-
 - (void)testLocalization {
     {
         NSExpression *original = MGLConstantExpression(@"");

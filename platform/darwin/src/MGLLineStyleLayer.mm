@@ -390,8 +390,7 @@ namespace mbgl {
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefaultLinePattern();
     }
-    NSExpression *expression = MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
-    return expression.mgl_expressionByReplacingTokensWithKeyPaths;
+    return MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
 }
 
 - (void)setLinePatternTransition:(MGLTransition )transition {
