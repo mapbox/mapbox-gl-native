@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
@@ -21,11 +20,10 @@ import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
+import com.mapbox.mapboxsdk.log.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import timber.log.Timber;
 
 /**
  * Responsible for managing and tracking state of Annotations linked to Map. All events related to
@@ -39,6 +37,8 @@ import timber.log.Timber;
  * </p>
  */
 class AnnotationManager {
+
+  private static final String TAG = "Mbgl-AnnotationManager";
 
   private static final long NO_ANNOTATION_ID = -1;
 
@@ -369,7 +369,9 @@ class AnnotationManager {
   }
 
   private void logNonAdded(Annotation annotation) {
-    Timber.w("Attempting to update non-added %s with value %s", annotation.getClass().getCanonicalName(), annotation);
+    Logger.w(TAG, String.format(
+      "Attempting to update non-added %s with value %s", annotation.getClass().getCanonicalName(), annotation)
+    );
   }
 
   //

@@ -49,6 +49,7 @@
 #include "text/collator_jni.hpp"
 #include "text/local_glyph_rasterizer_jni.hpp"
 #include "java/lang.hpp"
+#include "logger.hpp"
 
 namespace mbgl {
 namespace android {
@@ -192,6 +193,9 @@ void registerNatives(JavaVM *vm) {
     LocalGlyphRasterizer::registerNative(env);
     Locale::registerNative(env);
     Collator::registerNative(env);
+
+    // Logger
+    Logger::registerNative(env);
 }
 
 } // namespace android

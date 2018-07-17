@@ -1,8 +1,7 @@
 package com.mapbox.mapboxsdk;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,7 +37,7 @@ public class MapboxTest {
 
   @Test
   public void testApplicationContext() {
-    injectMapboxSingleton("dummy");
+    injectMapboxSingleton("pk.0000000001");
     assertNotNull(Mapbox.getApplicationContext());
     assertNotEquals(context, appContext);
     assertEquals(appContext, appContext);
@@ -71,31 +70,17 @@ public class MapboxTest {
 
   @Test
   public void testConnected() {
-    injectMapboxSingleton("dummy");
-
-    // test Android connectivity
-    ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
-    NetworkInfo networkInfo = mock(NetworkInfo.class);
-    when(appContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(connectivityManager);
-    when(connectivityManager.getActiveNetworkInfo()).thenReturn(networkInfo);
-    when(networkInfo.isConnected()).thenReturn(false);
-    assertFalse(Mapbox.isConnected());
-    when(networkInfo.isConnected()).thenReturn(true);
-    assertTrue(Mapbox.isConnected());
+    injectMapboxSingleton("pk.0000000001");
 
     // test manual connectivity
     Mapbox.setConnected(true);
     assertTrue(Mapbox.isConnected());
     Mapbox.setConnected(false);
     assertFalse(Mapbox.isConnected());
-
-    // reset to Android connectivity
-    Mapbox.setConnected(null);
-    assertTrue(Mapbox.isConnected());
   }
 
   private void injectMapboxSingleton(String accessToken) {
-    Mapbox mapbox = new Mapbox(appContext, accessToken);
+    Mapbox mapbox = new Mapbox(context, accessToken);
     try {
       Field field = Mapbox.class.getDeclaredField("INSTANCE");
       field.setAccessible(true);

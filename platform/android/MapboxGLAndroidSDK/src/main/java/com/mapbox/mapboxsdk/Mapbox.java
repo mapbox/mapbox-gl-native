@@ -9,12 +9,11 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
-import com.mapbox.mapboxsdk.maps.Telemetry;
+import com.mapbox.mapboxsdk.log.Logger;
+import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
-
-import timber.log.Timber;
 
 /**
  * The entry point to initialize the Mapbox Android SDK.
@@ -25,13 +24,18 @@ import timber.log.Timber;
  * </p>
  */
 @UiThread
+@SuppressLint("StaticFieldLeak")
 public final class Mapbox {
 
-  @SuppressLint("StaticFieldLeak")
+  private static final String TAG = "Mbgl-Mapbox";
+
+  private static ModuleProvider moduleProvider;
   private static Mapbox INSTANCE;
+
   private Context context;
   private String accessToken;
   private Boolean connected;
+  private TelemetryDefinition telemetry;
 
   /**
    * Get an instance of Mapbox.
@@ -121,10 +125,33 @@ public final class Mapbox {
    */
   private static void initializeTelemetry() {
     try {
-      Telemetry.initialize();
+      INSTANCE.telemetry = getModuleProvider().obtainTelemetry();
     } catch (Exception exception) {
-      Timber.e(exception);
+      Logger.e(TAG, "Error occured while initializing telemetry", exception);
     }
+  }
+
+  /**
+   * Get an instance of Telemetry if initialised
+   *
+   * @return instance of telemetry
+   */
+  @Nullable
+  public static TelemetryDefinition getTelemetry() {
+    return INSTANCE.telemetry;
+  }
+
+  /**
+   * Get the module provider
+   *
+   * @return moduleProvider
+   */
+  @NonNull
+  public static ModuleProvider getModuleProvider() {
+    if (moduleProvider == null) {
+      moduleProvider = new ModuleProviderImpl();
+    }
+    return moduleProvider;
   }
 
   /**
