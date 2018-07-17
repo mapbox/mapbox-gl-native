@@ -108,7 +108,7 @@ Size TransformState::getSize() const {
 
 void TransformState::setSize(const Size& size_) {
     size = size_;
-    constrain(scale, position.x, position.y);
+    constrainToViewport();
 }
 
 #pragma mark - North Orientation
@@ -119,17 +119,17 @@ NorthOrientation TransformState::getNorthOrientation() const {
 
 void TransformState::setNorthOrientation(NorthOrientation orientation_) {
     orientation = orientation_;
-    constrain(scale, position.x, position.y);
+    constrainToViewport();
 }
 
 double TransformState::getNorthOrientationAngle() const {
     double angleOrientation = 0;
     if (orientation == NorthOrientation::Rightwards) {
-        angleOrientation += M_PI / 2.0f;
+        angleOrientation += M_PI / 2.0;
     } else if (orientation == NorthOrientation::Downwards) {
         angleOrientation += M_PI;
     } else if (orientation == NorthOrientation::Leftwards) {
-        angleOrientation -= M_PI / 2.0f;
+        angleOrientation -= M_PI / 2.0;
     }
     return angleOrientation;
 }
@@ -142,7 +142,7 @@ ConstrainMode TransformState::getConstrainMode() const {
 
 void TransformState::setConstrainMode(ConstrainMode constrainMode_) {
     constrainMode = constrainMode_;
-    constrain(scale, position.x, position.y);
+    constrainToViewport();
 }
 
 #pragma mark - ViewportMode
@@ -244,12 +244,7 @@ void TransformState::setMinZoom(const double minZoom) {
 }
 
 double TransformState::getMinZoom() const {
-    double test_scale = min_scale;
-    double unused_x = position.x;
-    double unused_y = position.y;
-    constrain(test_scale, unused_x, unused_y);
-
-    return scaleZoom(test_scale);
+    return scaleZoom(minimumScaleAtCurrentSize());
 }
 
 void TransformState::setMaxZoom(const double maxZoom) {
@@ -353,12 +348,11 @@ ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) 
     return { p[0] / p[3], size.height - p[1] / p[3] };
 }
 
-LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng::WrapMode wrapMode) const {
+Point<double> TransformState::screenCoordinateToMapPosition(const ScreenCoordinate& point) const {
     if (size.isEmpty()) {
         return {};
     }
 
-    float targetZ = 0;
     mat4 mat = coordinatePointMatrix(getZoom());
 
     mat4 inverted;
@@ -387,9 +381,13 @@ LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, L
 
     double z0 = coord0[2] / w0;
     double z1 = coord1[2] / w1;
-    double t = z0 == z1 ? 0 : (targetZ - z0) / (z1 - z0);
+    double t = z0 == z1 ? 0 : -z0 / (z1 - z0);
 
-    return Projection::unproject(util::interpolate(p0, p1, t), scale / util::tileSize, wrapMode);
+    return util::interpolate(p0, p1, t);
+}
+
+LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng::WrapMode wrapMode) const {
+    return Projection::unproject(screenCoordinateToMapPosition(point), scale / util::tileSize, wrapMode);
 }
 
 mat4 TransformState::coordinatePointMatrix(double z) const {
@@ -418,23 +416,32 @@ bool TransformState::rotatedNorth() const {
     return (orientation == NO::Leftwards || orientation == NO::Rightwards);
 }
 
-void TransformState::constrain(double& scale_, double& x_, double& y_) const {
+double TransformState::minimumScaleAtCurrentSize() const {
+    return util::max(min_scale, static_cast<double>(rotatedNorth() ? size.width : size.height) / util::tileSize);
+}
+
+void TransformState::constrainToViewport() {
     if (constrainMode == ConstrainMode::None) {
         return;
     }
 
     // Constrain scale to avoid zooming out far enough to show off-world areas on the Y axis.
-    const double ratioY = (rotatedNorth() ? size.width : size.height) / util::tileSize;
-    scale_ = util::max(scale_, ratioY);
+    scale = util::max(scale, minimumScaleAtCurrentSize());
+
+    const bool rotated = rotatedNorth();
+    const double worldSize = Projection::worldSize(scale);
 
     // Constrain min/max pan to avoid showing off-world areas on the Y axis.
-    double max_y = (scale_ * util::tileSize - (rotatedNorth() ? size.width : size.height)) / 2;
-    y_ = std::max(-max_y, std::min(y_, max_y));
+    double max_y = (worldSize - (rotated ? size.width : size.height)) / 2.0;
+    position.y = std::max(-max_y, std::min(position.y, max_y));
+
+    Bc = worldSize / util::DEGREES_MAX;
+    Cc = worldSize / util::M2PI;
 
     if (constrainMode == ConstrainMode::WidthAndHeight) {
         // Constrain min/max pan to avoid showing off-world areas on the X axis.
-        double max_x = (scale_ * util::tileSize - (rotatedNorth() ? size.height : size.width)) / 2;
-        x_ = std::max(-max_x, std::min(x_, max_x));
+        double max_x = (worldSize - (rotated ? size.height : size.width)) / 2.0;
+        position.x = std::max(-max_x, std::min(position.x, max_x));
     }
 }
 
@@ -446,36 +453,19 @@ void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& an
 }
 
 void TransformState::setLatLngZoom(const LatLng& latLng, double zoom) {
-    LatLng constrained = latLng;
-    if (bounds) {
-        constrained = bounds->constrain(latLng);
-    }
+    const LatLng constrained = bounds ? bounds->constrain(latLng) : latLng;
 
-    double newScale = util::clamp(zoomScale(zoom), min_scale, max_scale);
-    const double newWorldSize = newScale * util::tileSize;
-    Bc = newWorldSize / util::DEGREES_MAX;
-    Cc = newWorldSize / util::M2PI;
-
-    const double m = 1 - 1e-15;
+    constexpr double m = 1 - 1e-15;
     const double f = util::clamp(std::sin(util::DEG2RAD * constrained.latitude()), -m, m);
 
-    ScreenCoordinate point = {
-        -constrained.longitude() * Bc,
-        0.5 * Cc * std::log((1 + f) / (1 - f)),
-    };
-    setScalePoint(newScale, point);
-}
-
-void TransformState::setScalePoint(const double newScale, const ScreenCoordinate &point) {
-    double constrainedScale = newScale;
-    ScreenCoordinate constrainedPoint = point;
-    constrain(constrainedScale, constrainedPoint.x, constrainedPoint.y);
-
-    scale = constrainedScale;
-    position.x = constrainedPoint.x;
-    position.y = constrainedPoint.y;
+    scale = util::clamp(zoomScale(zoom), min_scale, max_scale);
     Bc = Projection::worldSize(scale) / util::DEGREES_MAX;
     Cc = Projection::worldSize(scale) / util::M2PI;
+
+    position.x = -constrained.longitude() * Bc;
+    position.y = 0.5 * Cc * std::log((1 + f) / (1 - f));
+
+    constrainToViewport();
 }
 
 float TransformState::getCameraToTileDistance(const UnwrappedTileID& tileID) const {

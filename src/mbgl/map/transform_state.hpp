@@ -113,12 +113,14 @@ public:
     /** Recenter the map so that the given coordinate is located at the given
         point on screen. */
     void moveLatLng(const LatLng&, const ScreenCoordinate&);
-    void setScalePoint(const double scale, const ScreenCoordinate& point);
     void setLatLngZoom(const LatLng &latLng, double zoom);
 
 private:
     bool rotatedNorth() const;
-    void constrain(double& scale, double& x, double& y) const;
+    double minimumScaleAtCurrentSize() const;
+    void constrainToViewport();
+
+    Point<double> screenCoordinateToMapPosition(const ScreenCoordinate& point) const;
 
     optional<LatLngBounds> bounds;
 
