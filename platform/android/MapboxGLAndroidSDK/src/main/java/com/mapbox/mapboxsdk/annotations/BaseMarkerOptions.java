@@ -18,7 +18,7 @@ public abstract class BaseMarkerOptions<U extends Marker, T extends BaseMarkerOp
   protected String snippet;
   protected String title;
   protected Icon icon;
-  protected boolean isDraggable = false;
+  protected boolean isDraggable;
 
   /**
    * Set the geographical location of the Marker.

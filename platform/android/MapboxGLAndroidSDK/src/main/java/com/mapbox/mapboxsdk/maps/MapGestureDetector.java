@@ -451,7 +451,10 @@ final class MapGestureDetector {
     public boolean onMove(MoveGestureDetector detector, float distanceX, float distanceY) {
       // first move event is often delivered with no displacement
       if (distanceX != 0 || distanceY != 0) {
-        if (annotationManager.onMove(distanceX, distanceY)) {
+        if (detector.getPointersCount() > 1) {
+          // if any marker is being dragged, finish that event
+          annotationManager.finishMarkerDrag();
+        } else if (annotationManager.onMove(detector.getMoveObject(0), distanceX, distanceY)) {
           return true;
         }
 

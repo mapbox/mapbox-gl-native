@@ -40,7 +40,7 @@ public class Marker extends Annotation {
   private int topOffsetPixels;
   private int rightOffsetPixels;
 
-  private boolean isDraggable = false;
+  private boolean isDraggable;
 
   /**
    * Constructor
