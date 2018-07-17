@@ -211,6 +211,21 @@
                       @"Unsetting iconImageName should return icon-image to the default value.");
         XCTAssertEqualObjects(layer.iconImageName, defaultExpression,
                               @"iconImageName should return the default value after being unset.");
+
+        // Tokens test
+        layer.iconImageName = [NSExpression expressionForConstantValue:@"{token}"];
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<std::string>(
+                toString(get(literal("token")))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getIconImage(), propertyValue,
+                       @"Setting iconImageName to a constant string with tokens should convert to an expression.");
+        XCTAssertEqualObjects(layer.iconImageName, [NSExpression expressionWithFormat:@"CAST(token, \"NSString\")"],
+                              @"Setting iconImageName to a constant string with tokens should convert to an expression.");
     }
 
     // icon-offset
@@ -1065,6 +1080,21 @@
                       @"Unsetting text should return text-field to the default value.");
         XCTAssertEqualObjects(layer.text, defaultExpression,
                               @"text should return the default value after being unset.");
+
+        // Tokens test
+        layer.text = [NSExpression expressionForConstantValue:@"{token}"];
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<std::string>(
+                toString(get(literal("token")))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getTextField(), propertyValue,
+                       @"Setting text to a constant string with tokens should convert to an expression.");
+        XCTAssertEqualObjects(layer.text, [NSExpression expressionWithFormat:@"CAST(token, \"NSString\")"],
+                              @"Setting text to a constant string with tokens should convert to an expression.");
     }
 
     // text-allow-overlap

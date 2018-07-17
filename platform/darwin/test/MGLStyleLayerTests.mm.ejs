@@ -156,6 +156,23 @@
         XCTAssertEqual(<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>Transition.delay, transitionTest.delay);
         XCTAssertEqual(<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %>Transition.duration, transitionTest.duration);
 <% } -%>
+<% if (property.tokens) { -%>
+
+        // Tokens test
+        layer.<%- objCName(property) %> = [NSExpression expressionForConstantValue:@"{token}"];
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<<%- mbglType(property) %>>(
+                toString(get(literal("token")))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->get<%- camelize(originalPropertyName(property)) %>(), propertyValue,
+                       @"Setting <%- objCName(property) %> to a constant string with tokens should convert to an expression.");
+        XCTAssertEqualObjects(layer.<%- objCName(property) %>, [NSExpression expressionWithFormat:@"CAST(token, \"NSString\")"],
+                              @"Setting <%- objCName(property) %> to a constant string with tokens should convert to an expression.");
+<% } -%>
     }
 <% } -%>
 }
