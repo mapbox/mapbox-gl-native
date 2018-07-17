@@ -45,6 +45,8 @@ mbgl_filesource()
 
 create_source_groups(mbgl-filesource)
 
+set_target_properties(mbgl-filesource PROPERTIES FOLDER "Core")
+
 xcode_create_scheme(TARGET mbgl-filesource)
 
 initialize_xcode_cxx_build_settings(mbgl-filesource)

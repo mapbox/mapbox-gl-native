@@ -24,6 +24,8 @@ mbgl_platform_benchmark()
 
 create_source_groups(mbgl-benchmark)
 
+set_target_properties(mbgl-benchmark PROPERTIES FOLDER "Executables")
+
 initialize_xcode_cxx_build_settings(mbgl-benchmark)
 
 xcode_create_scheme(

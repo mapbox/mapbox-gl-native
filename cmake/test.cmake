@@ -43,6 +43,8 @@ create_source_groups(mbgl-test)
 
 initialize_xcode_cxx_build_settings(mbgl-test)
 
+set_target_properties(mbgl-test PROPERTIES FOLDER "Executables")
+
 xcode_create_scheme(
     TARGET mbgl-test
     OPTIONAL_ARGS

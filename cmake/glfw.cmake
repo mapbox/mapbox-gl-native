@@ -31,6 +31,8 @@ mbgl_platform_glfw()
 
 create_source_groups(mbgl-glfw)
 
+set_target_properties(mbgl-glfw PROPERTIES FOLDER "Executables")
+
 initialize_xcode_cxx_build_settings(mbgl-glfw)
 
 xcode_create_scheme(

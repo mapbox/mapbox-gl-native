@@ -32,6 +32,8 @@ if($ENV{CI})
     add_compile_options(-DCI_BUILD=1)
 endif()
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 if(EXISTS ${CMAKE_SOURCE_DIR}/.git/HEAD)
     exec_program(
         "git"
