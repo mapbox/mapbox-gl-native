@@ -19,14 +19,10 @@ import com.mapbox.android.gestures.RotateGestureDetector;
 import com.mapbox.android.gestures.ShoveGestureDetector;
 import com.mapbox.android.gestures.StandardGestureDetector;
 import com.mapbox.android.gestures.StandardScaleGestureDetector;
-import com.mapbox.android.telemetry.Event;
-import com.mapbox.android.telemetry.MapEventFactory;
-import com.mapbox.android.telemetry.MapState;
-import com.mapbox.android.telemetry.MapboxTelemetry;
+
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 
 import java.util.ArrayList;
@@ -887,12 +883,12 @@ final class MapGestureDetector {
     if (cameraPosition != null) {
       double zoom = cameraPosition.zoom;
       if (isZoomValid(zoom)) {
-        MapboxTelemetry telemetry = Telemetry.obtainTelemetry();
-        MapEventFactory mapEventFactory = new MapEventFactory();
-        LatLng latLng = projection.fromScreenLocation(focalPoint);
-        MapState state = new MapState(latLng.getLatitude(), latLng.getLongitude(), zoom);
-        state.setGesture(eventType);
-        telemetry.push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, state));
+          //MapboxTelemetry telemetry = Telemetry.obtainTelemetry();
+          //MapEventFactory mapEventFactory = new MapEventFactory();
+          //LatLng latLng = projection.fromScreenLocation(focalPoint);
+          //MapState state = new MapState(latLng.getLatitude(), latLng.getLongitude(), zoom);
+          //state.setGesture(eventType);
+          //telemetry.push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, state));
       }
     }
   }

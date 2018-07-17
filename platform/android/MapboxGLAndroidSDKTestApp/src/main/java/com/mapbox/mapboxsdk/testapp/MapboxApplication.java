@@ -3,10 +3,13 @@ package com.mapbox.mapboxsdk.testapp;
 import android.app.Application;
 import android.os.StrictMode;
 import android.text.TextUtils;
+
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.maps.Telemetry;
+import com.mapbox.mapboxsdk.http.HttpRequest;
+import com.mapbox.mapboxsdk.testapp.utils.IonHttpRequest;
 import com.mapbox.mapboxsdk.testapp.utils.TokenUtils;
 import com.squareup.leakcanary.LeakCanary;
+
 import timber.log.Timber;
 
 import static timber.log.Timber.DebugTree;
@@ -31,9 +34,14 @@ public class MapboxApplication extends Application {
     if (!initializeLeakCanary()) {
       return;
     }
+    initializeHttpClient();
     initializeLogger();
     initializeStrictMode();
     initializeMapbox();
+  }
+
+  private void initializeHttpClient() {
+    HttpRequest.setHttpRequest(new IonHttpRequest(this));
   }
 
   private boolean initializeLeakCanary() {
@@ -70,7 +78,7 @@ public class MapboxApplication extends Application {
     String accessToken = TokenUtils.getMapboxAccessToken(getApplicationContext());
     validateAccessToken(accessToken);
     Mapbox.getInstance(getApplicationContext(), accessToken);
-    Telemetry.updateDebugLoggingEnabled(true);
+    //Telemetry.updateDebugLoggingEnabled(true);
   }
 
   private static void validateAccessToken(String accessToken) {

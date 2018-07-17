@@ -12,11 +12,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.mapbox.mapboxsdk.snapshotter.MapSnapshotter;
-import okio.BufferedSource;
-import okio.Okio;
+
 import timber.log.Timber;
 
 import java.io.File;
@@ -24,7 +21,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -167,13 +163,13 @@ public class RenderTestActivity extends AppCompatActivity {
   private static List<String> loadIgnoreList(AssetManager assets) {
     List<String> ignores = new ArrayList<>();
     try (InputStream input = assets.open(String.format("%s/ignores.json", TEST_BASE_PATH))) {
-      BufferedSource source = Okio.buffer(Okio.source(input));
-      String styleJson = source.readByteString().string(Charset.forName("utf-8"));
-      JsonObject object = new Gson().fromJson(styleJson, JsonObject.class);
-      for (Map.Entry<String, JsonElement> stringJsonElementEntry : object.entrySet()) {
-        String[] parts = stringJsonElementEntry.getKey().split("/");
-        ignores.add(String.format("%s,%s", parts[2], parts[1]));
-      }
+      //      BufferedSource source = Okio.buffer(Okio.source(input));
+      //      String styleJson = source.readByteString().string(Charset.forName("utf-8"));
+      //      JsonObject object = new Gson().fromJson(styleJson, JsonObject.class);
+      //      for (Map.Entry<String, JsonElement> stringJsonElementEntry : object.entrySet()) {
+      //        String[] parts = stringJsonElementEntry.getKey().split("/");
+      //        ignores.add(String.format("%s,%s", parts[2], parts[1]));
+      //      }
     } catch (IOException exception) {
       Timber.e(exception);
     }
@@ -183,8 +179,8 @@ public class RenderTestActivity extends AppCompatActivity {
   private static String loadStyleJson(AssetManager assets, String category, String test) {
     String styleJson = null;
     try (InputStream input = assets.open(String.format("%s/%s/%s/style.json", RENDER_TEST_BASE_PATH, category, test))) {
-      BufferedSource source = Okio.buffer(Okio.source(input));
-      styleJson = source.readByteString().string(Charset.forName("utf-8"));
+      //      BufferedSource source = Okio.buffer(Okio.source(input));
+      //      styleJson = source.readByteString().string(Charset.forName("utf-8"));
     } catch (IOException exception) {
       Timber.e(exception);
     }

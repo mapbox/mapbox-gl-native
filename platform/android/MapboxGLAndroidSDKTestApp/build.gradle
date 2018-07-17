@@ -54,10 +54,17 @@ android {
 
 dependencies {
     implementation dependenciesList.kotlinLib
-    api(project(':MapboxGLAndroidSDK'))
-    implementation dependenciesList.mapboxJavaServices
 
-    implementation dependenciesList.mapboxJavaTurf
+    api(project(':MapboxGLAndroidSDK')) {
+        exclude group: 'com.squareup.okhttp3', module: 'okhttp'
+    }
+
+    implementation(dependenciesList.mapboxJavaTurf) {
+        exclude group: 'com.squareup.okhttp3', module: 'okhttp'
+        exclude group: 'com.squareup.okhttp3', module: 'logging-interceptor'
+    }
+
+    implementation 'com.koushikdutta.ion:ion:2.2.1'
 
     implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportRecyclerView

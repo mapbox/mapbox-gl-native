@@ -12,6 +12,7 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.mapboxsdk.maps.Telemetry;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
+
 import timber.log.Timber;
 
 /**
@@ -47,7 +48,7 @@ public final class Mapbox {
       Context appContext = context.getApplicationContext();
       INSTANCE = new Mapbox(appContext, accessToken);
       if (isAccessTokenValid(accessToken)) {
-        initializeTelemetry();
+        //initializeTelemetry();
       }
       ConnectivityReceiver.instance(appContext);
     }
