@@ -11,4 +11,6 @@ target_include_directories(mbgl-loop-darwin
 
 create_source_groups(mbgl-loop-darwin)
 
+set_target_properties(mbgl-loop-darwin PROPERTIES FOLDER "Core")
+
 xcode_create_scheme(TARGET mbgl-loop-darwin)

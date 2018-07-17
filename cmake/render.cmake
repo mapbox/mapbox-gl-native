@@ -20,6 +20,8 @@ create_source_groups(mbgl-render)
 
 initialize_xcode_cxx_build_settings(mbgl-render)
 
+set_target_properties(mbgl-render PROPERTIES FOLDER "Executables")
+
 xcode_create_scheme(
     TARGET mbgl-render
     OPTIONAL_ARGS

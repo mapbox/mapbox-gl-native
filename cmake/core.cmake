@@ -27,6 +27,8 @@ mbgl_platform_core()
 
 create_source_groups(mbgl-core)
 
+set_target_properties(mbgl-core PROPERTIES FOLDER "Core")
+
 xcode_create_scheme(TARGET mbgl-core)
 
 initialize_xcode_cxx_build_settings(mbgl-core)
