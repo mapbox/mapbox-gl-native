@@ -83,7 +83,6 @@ TEST(Transform, IntegerZoom) {
         transform.jumpTo(CameraOptions().withZoom(zoom));
         ASSERT_NEAR(transform.getZoom(), zoom, 1e-8);
         ASSERT_EQ(transform.getState().getIntegerZoom(), zoomInt);
-        ASSERT_NEAR(transform.getState().getZoomFraction(), zoom - zoomInt, 1e-8);
     };
 
     for (uint8_t zoomInt = 0; zoomInt < 20; ++zoomInt) {
