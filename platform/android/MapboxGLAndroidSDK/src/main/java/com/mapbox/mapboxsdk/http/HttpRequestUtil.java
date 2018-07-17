@@ -3,8 +3,11 @@ package com.mapbox.mapboxsdk.http;
 import okhttp3.OkHttpClient;
 
 /**
- * Utility class for setting HttpRequest configurations
+ * Utility class for setting HttpRequest configurations.
+ *
+ * @deprecated use {@link com.mapbox.mapboxsdk.module.http.HttpRequestUtil} instead
  */
+@Deprecated
 public class HttpRequestUtil {
 
   /**
@@ -14,9 +17,11 @@ public class HttpRequestUtil {
    * </p>
    *
    * @param enabled True will enable logging, false will disable
+   * @deprecated use {@link com.mapbox.mapboxsdk.module.http.HttpRequestUtil#setLogEnabled(boolean)} instead
    */
+  @Deprecated
   public static void setLogEnabled(boolean enabled) {
-    HTTPRequest.enableLog(enabled);
+    com.mapbox.mapboxsdk.module.http.HttpRequestUtil.setLogEnabled(enabled);
   }
 
   /**
@@ -29,18 +34,22 @@ public class HttpRequestUtil {
    * </p>
    *
    * @param enabled True will print urls, false will disable
+   * @deprecated use {@link com.mapbox.mapboxsdk.module.http.HttpRequestUtil#setPrintRequestUrlOnFailure(boolean)}
+   * instead
    */
+  @Deprecated
   public static void setPrintRequestUrlOnFailure(boolean enabled) {
-    HTTPRequest.enablePrintRequestUrlOnFailure(enabled);
+    com.mapbox.mapboxsdk.module.http.HttpRequestUtil.setPrintRequestUrlOnFailure(enabled);
   }
 
   /**
    * Set the OkHttpClient used for requesting map resources.
    *
    * @param client the OkHttpClient
+   * @deprecated use {@link com.mapbox.mapboxsdk.module.http.HttpRequestUtil#setOkHttpClient(OkHttpClient)} instead.
    */
+  @Deprecated
   public static void setOkHttpClient(OkHttpClient client) {
-    HTTPRequest.setOKHttpClient(client);
+    com.mapbox.mapboxsdk.module.http.HttpRequestUtil.setOkHttpClient(client);
   }
-
 }

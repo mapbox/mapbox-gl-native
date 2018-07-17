@@ -1,42 +1,28 @@
 package com.mapbox.mapboxsdk.maps;
 
-
-import com.mapbox.android.telemetry.MapboxTelemetry;
 import com.mapbox.android.telemetry.SessionInterval;
-import com.mapbox.android.telemetry.TelemetryEnabler;
-import com.mapbox.mapboxsdk.BuildConfig;
-import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.module.telemetry.TelemetryImpl;
 
+/**
+ * @deprecated use {@link TelemetryImpl} instead.
+ */
+@Deprecated
 public class Telemetry {
-  static final String TWO_FINGER_TAP = "TwoFingerTap";
-  static final String DOUBLE_TAP = "DoubleTap";
-  static final String SINGLE_TAP = "SingleTap";
-  static final String PAN = "Pan";
-  static final String PINCH = "Pinch";
-  static final String ROTATION = "Rotation";
-  static final String PITCH = "Pitch";
-  private MapboxTelemetry telemetry;
 
-  private Telemetry() {
-    telemetry = new MapboxTelemetry(Mapbox.getApplicationContext(), Mapbox.getAccessToken(),
-      BuildConfig.MAPBOX_EVENTS_USER_AGENT);
-    TelemetryEnabler.State telemetryState = TelemetryEnabler.retrieveTelemetryStateFromPreferences();
-    if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
-      telemetry.enable();
-    }
-  }
-
+  @Deprecated
   public static void initialize() {
-    obtainTelemetry();
+    // no-op
   }
 
   /**
    * Set the debug logging state of telemetry.
    *
    * @param debugLoggingEnabled true to enable logging
+   * @deprecated use {@link TelemetryImpl#updateDebugLoggingEnabled(boolean)} instead
    */
+  @Deprecated
   public static void updateDebugLoggingEnabled(boolean debugLoggingEnabled) {
-    TelemetryHolder.INSTANCE.telemetry.updateDebugLoggingEnabled(debugLoggingEnabled);
+    TelemetryImpl.updateDebugLoggingEnabled(debugLoggingEnabled);
   }
 
   /**
@@ -44,32 +30,32 @@ public class Telemetry {
    *
    * @param interval the selected session interval
    * @return true if rotation session id was updated
+   * @deprecated use {@link TelemetryImpl#setSessionIdRotationInterval(int)} instead
    */
+  @Deprecated
   public static boolean updateSessionIdRotationInterval(SessionInterval interval) {
-    return TelemetryHolder.INSTANCE.telemetry.updateSessionIdRotationInterval(interval);
+    return TelemetryImpl.updateSessionIdRotationInterval(interval);
   }
 
   /**
    * Method to be called when an end-user has selected to participate in telemetry collection.
+   *
+   * @deprecated use {@link TelemetryImpl#setUserTelemetryRequestState(boolean)}
+   * with parameter true instead
    */
+  @Deprecated
   public static void enableOnUserRequest() {
-    TelemetryEnabler.updateTelemetryState(TelemetryEnabler.State.ENABLED);
-    TelemetryHolder.INSTANCE.telemetry.enable();
+    TelemetryImpl.enableOnUserRequest();
   }
 
   /**
    * Method to be called when an end-user has selected to opt-out of telemetry collection.
+   *
+   * @deprecated use {@link TelemetryImpl#setUserTelemetryRequestState(boolean)}
+   * with parameter false instead
    */
+  @Deprecated
   public static void disableOnUserRequest() {
-    Telemetry.obtainTelemetry().disable();
-    TelemetryEnabler.updateTelemetryState(TelemetryEnabler.State.DISABLED);
-  }
-
-  private static class TelemetryHolder {
-    private static final Telemetry INSTANCE = new Telemetry();
-  }
-
-  static MapboxTelemetry obtainTelemetry() {
-    return TelemetryHolder.INSTANCE.telemetry;
+    TelemetryImpl.disableOnUserRequest();
   }
 }
