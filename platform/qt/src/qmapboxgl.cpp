@@ -1615,8 +1615,6 @@ QVariant QVariantFromValue(const mbgl::Value &value) {
     \layer, if any.
 
     Filter value types are described in the {https://www.mapbox.com/mapbox-gl-js/style-spec/#types}{Mapbox style specification}.
-
-    This function only supports expression-based filters.
 */
 QVariant QMapboxGL::getFilter(const QString &layer)  const {
     using namespace mbgl::style;
@@ -1645,12 +1643,7 @@ QVariant QMapboxGL::getFilter(const QString &layer)  const {
         return QVariant();
     }
 
-    if (!filter_.expression) {
-        qWarning() << "getFilter only supports expression-based filters";
-        return QVariant();
-    }
-
-    auto serialized = (**filter_.expression).serialize();
+    auto serialized = filter_.serialize();
     return QVariantFromValue(serialized);
 }
 
