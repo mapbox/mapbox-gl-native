@@ -167,6 +167,7 @@ void RunLoop::Impl::removeRunnable(Runnable* runnable) {
 }
 
 void RunLoop::Impl::initRunnable(Runnable* runnable) {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
     runnable->iter = runnables.end();
 }
 
