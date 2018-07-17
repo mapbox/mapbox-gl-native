@@ -3,7 +3,8 @@
 #include <mbgl/map/transform.hpp>
 
 #include <algorithm>
-
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>       /* time */
 #include <gtest/gtest.h>
 
 using namespace mbgl;
@@ -137,6 +138,17 @@ TEST(TileCover, GeomLineZ10) {
     
 }
 
+TEST(TileCover, GeomLineRegression11870) {
+    auto lineCover = util::tileCover(LineString<double>{
+        {-121.5063900000001,40.470099999999945},
+        {-121.5065300000001,40.470369999999946},
+        {-121.5065900000001,40.470519999999944},
+    }, 14);
+    EXPECT_EQ((std::vector<UnwrappedTileID>{ { 14, 2662, 6174 } }),
+          lineCover);
+
+}
+
 TEST(TileCover, WrappedGeomLineZ10) {
     auto lineCover = util::tileCover(LineString<double>{
         {-179.93342914581299,38.892101707724315},
@@ -263,6 +275,9 @@ TEST(TileCover, GeomInvalid) {
     auto point = Point<double>{ -122.5744, 97.6609 };
     EXPECT_THROW(util::tileCover(point, 2), std::domain_error);
 
+    auto badLine = LineString<double>{ {1.0,  35.0} };
+    EXPECT_EQ((std::vector<UnwrappedTileID>{ }), util::tileCover(badLine, 16));
+
     auto badPoly = Polygon<double> { { {1.0,  35.0} } };
     EXPECT_EQ((std::vector<UnwrappedTileID>{ }), util::tileCover(badPoly, 16));
 
@@ -298,4 +313,60 @@ TEST(TileCount, BoundsCrossingAntimeridian) {
     EXPECT_EQ(1u, util::tileCount(crossingBounds, 0));
     EXPECT_EQ(4u, util::tileCount(crossingBounds, 3));
     EXPECT_EQ(8u, util::tileCount(crossingBounds, 4));
+}
+
+TEST(TileCover, DISABLED_FuzzPoly) {
+    while(1)
+    {
+        std::srand (time(NULL));
+        std::size_t len = std::rand() % 10000 + 3;
+        Polygon<double> polygon;
+
+        std::size_t num_rings = 1;
+        num_rings += std::rand() % 5;
+        while (num_rings > 0) {
+            LinearRing<double> ring;
+            for (std::size_t i = 0; i < len; ++i) {
+                double x = std::rand() % 180;
+                double y = std::rand() % 90;
+
+                ring.push_back({x,y});
+            }
+            polygon.emplace_back(ring);
+            --num_rings;
+        }
+        
+        std::clog << ".";
+        util::TileCover tc(polygon, 5);
+        while(tc.next()) {
+        };
+    }
+}
+
+TEST(TileCover, DISABLED_FuzzLine) {
+    while(1)
+    {
+        std::srand (time(NULL));
+        std::size_t len = std::rand() % 10000 + 3;
+        MultiLineString<double> mls;
+
+        std::size_t num_lines = 1;
+        num_lines += std::rand() % 5;
+        while (num_lines > 0) {
+            LineString<double> line;
+            for (std::size_t i = 0; i < len; ++i) {
+                double x = std::rand() % 180;
+                double y = std::rand() % 90;
+
+                line.push_back({x,y});
+            }
+            mls.emplace_back(line);
+            --num_lines;
+        }
+        
+        std::clog << ".";
+        util::TileCover tc(mls, 5);
+        while(tc.next()) {
+        };
+    }
 }

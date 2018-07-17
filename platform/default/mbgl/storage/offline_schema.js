@@ -1,24 +1,21 @@
-// To regenerate:
-// (cd platform/default/mbgl/storage && node offline_schema.js)
-
 var fs = require('fs');
-var readline = require('readline');
+fs.writeFileSync('platform/default/mbgl/storage/offline_schema.hpp', `#pragma once
 
-var lineReader = readline.createInterface({
-    input: fs.createReadStream('offline_schema.sql')
-});
+// THIS IS A GENERATED FILE; EDIT offline_schema.sql INSTEAD
+// To regenerate, run \`node platform/default/mbgl/storage/offline_schema.js\`
 
-var lines = [
-    "/* THIS IS A GENERATED FILE; EDIT offline_schema.sql INSTEAD */",
-    "static const char * schema = ",
-];
+namespace mbgl {
 
-lineReader
-    .on('line', function (line) {
-        line = line.replace(/ *--.*/, '');
-        if (line) lines.push('"' + line + '\\n"');
-    })
-    .on('close', function () {
-        lines.push(';\n');
-        fs.writeFileSync('offline_schema.cpp.include', lines.join('\n'));
-    });
+static constexpr const char* offlineDatabaseSchema =
+${fs.readFileSync('platform/default/mbgl/storage/offline_schema.sql', 'utf8')
+    .replace(/ *--.*/g, '')
+    .split('\n')
+    .filter(a => a)
+    .map(line => '"' + line + '\\n"')
+    .join('\n')
+}
+;
+
+} // namespace mbgl
+`);
+
