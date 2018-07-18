@@ -445,7 +445,7 @@ MGL_EXPORT IB_DESIGNABLE
  
  The default value of this property is `YES`.
  */
-@property (nonatomic, assign) BOOL showsPointOfInterest;
+@property (nonatomic, assign) BOOL showsPointsOfInterest;
 
 /**
  The geographic coordinate that is the subject of observation as the user

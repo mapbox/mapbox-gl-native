@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) IBInspectable BOOL showsHeading;
 @property (nonatomic) IBInspectable BOOL showsScale;
 @property (nonatomic) IBInspectable BOOL showsBuildings;
-@property (nonatomic) IBInspectable BOOL showsPointOfInterest;
+@property (nonatomic) IBInspectable BOOL showsPointsOfInterest;
 @property (nonatomic) IBInspectable BOOL showsTraffic;
 
 @end

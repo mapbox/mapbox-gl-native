@@ -578,7 +578,7 @@ public:
         [MGLMapboxEvents pushEvent:MMEEventTypeMapLoad withAttributes:@{}];
     }
     
-    _showsPointOfInterest = YES;
+    _showsPointsOfInterest = YES;
     _showsTraffic = YES;
 }
 
@@ -2308,126 +2308,6 @@ public:
                                                    fromDistance:distance
                                                           pitch:pitch
                                                         heading:heading];
-}
-
-- (void)setZoomEnabled:(BOOL)zoomEnabled
-{
-    _zoomEnabled = zoomEnabled;
-    self.pinch.enabled = zoomEnabled;
-    self.doubleTap.enabled = zoomEnabled;
-    self.quickZoom.enabled = zoomEnabled;
-    self.twoFingerTap.enabled = zoomEnabled;
-}
-
-- (void)setScrollEnabled:(BOOL)scrollEnabled
-{
-    _scrollEnabled = scrollEnabled;
-    self.pan.enabled = scrollEnabled;
-}
-
-- (void)setRotateEnabled:(BOOL)rotateEnabled
-{
-    _rotateEnabled = rotateEnabled;
-    self.rotate.enabled = rotateEnabled;
-}
-
-- (void)setPitchEnabled:(BOOL)pitchEnabled
-{
-    _pitchEnabled = pitchEnabled;
-    self.twoFingerDrag.enabled = pitchEnabled;
-}
-
-- (void)setShowsScale:(BOOL)showsScale
-{
-    _showsScale = showsScale;
-    self.scaleBar.hidden = !showsScale;
-
-    if (showsScale)
-    {
-        [self updateScaleBar];
-    }
-}
-
-- (void)setShowsBuildings:(BOOL)showsBuildings
-{
-    if  (_showsBuildings == showsBuildings) return;
-    
-    NSString *layerIdentifier = @"extrudedBuildings";
-    if (showsBuildings) {
-        MGLSource *source = [self.style sourceWithIdentifier:@"composite"];
-        if (source) {
-            
-            MGLFillExtrusionStyleLayer* layer = [[MGLFillExtrusionStyleLayer alloc] initWithIdentifier:layerIdentifier source:source];
-            layer.sourceLayerIdentifier = @"building";
-            layer.predicate = [NSPredicate predicateWithFormat:@"extrude == 'true' AND CAST(height, 'NSNumber') > 0"];
-            layer.fillExtrusionBase = [NSExpression expressionForKeyPath:@"min_height"];
-            layer.fillExtrusionHeight = [NSExpression expressionForKeyPath:@"height"];
-            
-            // Set the fill color to that of the existing building footprint layer, if it exists.
-            MGLFillStyleLayer* buildingLayer = (MGLFillStyleLayer*)[self.style layerWithIdentifier:@"building"];
-            if (buildingLayer) {
-                if (buildingLayer.fillColor) {
-                    layer.fillExtrusionColor = buildingLayer.fillColor;
-                } else {
-                    layer.fillExtrusionColor = [NSExpression expressionForConstantValue:[UIColor whiteColor]];
-                }
-                
-                layer.fillExtrusionOpacity = [NSExpression expressionForConstantValue:@0.75];
-            }
-            
-            MGLStyleLayer* labelLayer = [self.style layerWithIdentifier:@"waterway-label"];
-            if (labelLayer) {
-                [self.style insertLayer:layer belowLayer:labelLayer];
-            } else {
-                [self.style addLayer:layer];
-            }
-        }
-    } else {
-        MGLStyleLayer *layer = [self.style layerWithIdentifier:layerIdentifier];
-        if (layer) [self.style removeLayer:layer];
-    }
-    _showsBuildings = showsBuildings;
-}
-
-- (BOOL)showsTraffic {
-    NSString *sourceIdentifier = @"mapbox://mapbox.mapbox-traffic-v1";
-
-    for (MGLStyleLayer *layer in self.style.layers) {
-        if ([layer isKindOfClass:[MGLForegroundStyleLayer class]]) {
-            MGLForegroundStyleLayer *trafficLayer = (MGLForegroundStyleLayer *)layer;
-            if ([trafficLayer.sourceIdentifier isEqualToString:sourceIdentifier]) {
-                _showsTraffic = layer.isVisible;
-                return _showsTraffic;
-            }
-            
-        }
-    }
-    _showsTraffic = NO;
-    return _showsTraffic;
-}
-
-- (void)setShowsTraffic:(BOOL)showsTraffic
-{
-    _showsTraffic = showsTraffic;
-    NSString *sourceIdentifier = @"mapbox://mapbox.mapbox-traffic-v1";
-    for (MGLStyleLayer *layer in self.style.layers) {
-        if ([layer isKindOfClass:[MGLForegroundStyleLayer class]]) {
-            MGLForegroundStyleLayer *trafficLayer = (MGLForegroundStyleLayer *)layer;
-            if ([trafficLayer.sourceIdentifier isEqualToString:sourceIdentifier]) {
-                [layer setVisible:showsTraffic];
-            }
-            
-        }
-    }
-}
-
-- (void)setShowsPointOfInterest:(BOOL)showsPointOfInterest {
-    _showsPointOfInterest = showsPointOfInterest;
-    for (MGLStyleLayer *layer in self.style.layers) {
-        if ([layer.identifier hasPrefix:@"poi"]) {
-            [layer setVisible:_showsPointOfInterest];
-        }
-    }
 }
 
 #pragma mark - Accessibility -
@@ -5741,8 +5621,8 @@ public:
     }
     
     // POI's are enabled by default, if it is disabled it will force an update.
-    if (!_showsPointOfInterest) {
-        self.showsPointOfInterest = _showsPointOfInterest;
+    if (!_showsPointsOfInterest) {
+        self.showsPointsOfInterest = _showsPointsOfInterest;
     }
     
     if ([self.delegate respondsToSelector:@selector(mapView:didFinishLoadingStyle:)])
@@ -6482,6 +6362,129 @@ private:
 - (void)setShowsHeading:(BOOL)showsHeading
 {
     self.showsUserHeadingIndicator = showsHeading;
+}
+
+- (void)setZoomEnabled:(BOOL)zoomEnabled
+{
+    _zoomEnabled = zoomEnabled;
+    self.pinch.enabled = zoomEnabled;
+    self.doubleTap.enabled = zoomEnabled;
+    self.quickZoom.enabled = zoomEnabled;
+    self.twoFingerTap.enabled = zoomEnabled;
+}
+
+- (void)setScrollEnabled:(BOOL)scrollEnabled
+{
+    _scrollEnabled = scrollEnabled;
+    self.pan.enabled = scrollEnabled;
+}
+
+- (void)setRotateEnabled:(BOOL)rotateEnabled
+{
+    _rotateEnabled = rotateEnabled;
+    self.rotate.enabled = rotateEnabled;
+}
+
+- (void)setPitchEnabled:(BOOL)pitchEnabled
+{
+    _pitchEnabled = pitchEnabled;
+    self.twoFingerDrag.enabled = pitchEnabled;
+}
+
+- (void)setShowsScale:(BOOL)showsScale
+{
+    _showsScale = showsScale;
+    self.scaleBar.hidden = !showsScale;
+    
+    if (showsScale)
+    {
+        [self updateScaleBar];
+    }
+}
+
+- (void)setShowsBuildings:(BOOL)showsBuildings
+{
+    if  (_showsBuildings == showsBuildings) return;
+    
+    NSString *layerIdentifier = @"extrudedBuildings";
+    MGLFillExtrusionStyleLayer* layer = (MGLFillExtrusionStyleLayer *)[self.style layerWithIdentifier:layerIdentifier];
+    MGLSource *source = [self.style sourceWithIdentifier:@"composite"];
+    
+    if (showsBuildings && source) {
+        if (!layer) {
+            layer = [[MGLFillExtrusionStyleLayer alloc] initWithIdentifier:layerIdentifier source:source];
+            layer.sourceLayerIdentifier = @"building";
+            layer.predicate = [NSPredicate predicateWithFormat:@"extrude == 'true' AND CAST(height, 'NSNumber') > 0"];
+            layer.fillExtrusionBase = [NSExpression expressionForKeyPath:@"min_height"];
+            layer.fillExtrusionHeight = [NSExpression expressionForKeyPath:@"height"];
+            
+            // Set the fill color to that of the existing building footprint layer, if it exists.
+            MGLFillStyleLayer* buildingLayer = (MGLFillStyleLayer*)[self.style layerWithIdentifier:@"building"];
+            if (buildingLayer) {
+                if (buildingLayer.fillColor) {
+                    layer.fillExtrusionColor = buildingLayer.fillColor;
+                } else {
+                    layer.fillExtrusionColor = [NSExpression expressionForConstantValue:[UIColor whiteColor]];
+                }
+                
+                layer.fillExtrusionOpacity = [NSExpression expressionForConstantValue:@0.75];
+            }
+            
+            MGLStyleLayer* labelLayer = [self.style layerWithIdentifier:@"waterway-label"];
+            if (labelLayer) {
+                [self.style insertLayer:layer belowLayer:labelLayer];
+            } else {
+                [self.style addLayer:layer];
+            }
+        }
+        layer.visible = YES;
+        
+    } else if (!showsBuildings && layer) {
+        layer.visible = NO;
+        
+    }
+    _showsBuildings = showsBuildings;
+}
+
+- (BOOL)showsTraffic {
+    NSString *sourceIdentifier = @"mapbox://mapbox.mapbox-traffic-v1";
+    
+    for (MGLStyleLayer *layer in self.style.layers) {
+        if ([layer isKindOfClass:[MGLForegroundStyleLayer class]]) {
+            MGLForegroundStyleLayer *trafficLayer = (MGLForegroundStyleLayer *)layer;
+            if ([trafficLayer.sourceIdentifier isEqualToString:sourceIdentifier]) {
+                _showsTraffic = layer.isVisible;
+                return _showsTraffic;
+            }
+            
+        }
+    }
+    _showsTraffic = NO;
+    return _showsTraffic;
+}
+
+- (void)setShowsTraffic:(BOOL)showsTraffic
+{
+    _showsTraffic = showsTraffic;
+    NSString *sourceIdentifier = @"mapbox://mapbox.mapbox-traffic-v1";
+    for (MGLStyleLayer *layer in self.style.layers) {
+        if ([layer isKindOfClass:[MGLForegroundStyleLayer class]]) {
+            MGLForegroundStyleLayer *trafficLayer = (MGLForegroundStyleLayer *)layer;
+            if ([trafficLayer.sourceIdentifier isEqualToString:sourceIdentifier]) {
+                [layer setVisible:showsTraffic];
+            }
+            
+        }
+    }
+}
+
+- (void)setShowsPointsOfInterest:(BOOL)showsPointsOfInterest {
+    _showsPointsOfInterest = showsPointsOfInterest;
+    for (MGLStyleLayer *layer in self.style.layers) {
+        if ([layer.identifier hasPrefix:@"poi"]) {
+            [layer setVisible:_showsPointsOfInterest];
+        }
+    }
 }
 
 @end
