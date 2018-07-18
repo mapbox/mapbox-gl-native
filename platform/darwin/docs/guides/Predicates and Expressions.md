@@ -538,7 +538,7 @@ expression that contains references to those variables.
 <dt>Selector:</dt>
 <dd><code>MGL_MATCH:</code></dd>
 <dt>Format string syntax:</dt>
-<dd><code>MGL_MATCH(x, 0, 'zero match', 1, 'one match', 'two match', 'default')</code></dd>
+<dd><code>MGL_MATCH(x, 0, 'zero match', 1, 'one match', 2, 'two match', 'default')</code></dd>
 <dt>Arguments:</dt>
 <dd>
    An input expression, then any number of argument pairs, followed by a default
