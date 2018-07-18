@@ -21,6 +21,8 @@ mbgl_platform_offline()
 
 create_source_groups(mbgl-offline)
 
+set_target_properties(mbgl-offline PROPERTIES FOLDER "Executables")
+
 xcode_create_scheme(
     TARGET mbgl-offline
     OPTIONAL_ARGS

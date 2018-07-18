@@ -80,6 +80,7 @@ if(WITH_NODEJS)
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         COMMENT "Updating submodules..."
     )
+    set_target_properties(update-submodules PROPERTIES FOLDER "Misc")
 
     # Run npm install for both directories, and add custom commands, and a target that depends on them.
     _npm_install("${CMAKE_SOURCE_DIR}" mapbox-gl-native update-submodules)
@@ -88,6 +89,7 @@ if(WITH_NODEJS)
         npm-install ALL
         DEPENDS "${CMAKE_SOURCE_DIR}/node_modules/.mapbox-gl-js.stamp"
     )
+    set_target_properties(npm-install PROPERTIES FOLDER "Misc")
 endif()
 
 # Generate source groups so the files are properly sorted in IDEs like Xcode.
