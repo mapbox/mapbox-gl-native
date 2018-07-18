@@ -2,12 +2,15 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.3.0 - July 18, 2018
+ - Harden map events creation [#12406](https://github.com/mapbox/mapbox-gl-native/pull/12406)
+
 ## 6.3.0-beta.1 - July 11, 2018
  - Fix JNI lookup of FeatureCollection, add regression test [#12344](https://github.com/mapbox/mapbox-gl-native/pull/12344)
  - Added draggable marker example activity, add kotlin support to test app [@12326](https://github.com/mapbox/mapbox-gl-native/pull/12326)
  - Telemetry bump to v3.1.4 [#12349](https://github.com/mapbox/mapbox-gl-native/pull/12349)
  - Remove unnecessary memory use when collision debug mode is not enabled ([#12294](https://github.com/mapbox/mapbox-gl-native/issues/12294))
- 
+
 ## 6.3.0-alpha.2 - July 5, 2018
  - Add LatLngForScreenCoordinate to MapSnapshotter API, This allows to convert a LatLng value to the x,y position on the MapSnasphot image [#12221](https://github.com/mapbox/mapbox-gl-native/pull/12221)
  - Expose multiple getCameraFor equivalent methods to convert a geometry or a bounds to a camera position with taking in account padding, tilt and bearing [#12290](https://github.com/mapbox/mapbox-gl-native/pull/12290)
