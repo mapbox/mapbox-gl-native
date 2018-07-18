@@ -31,17 +31,12 @@ workflows:
       - linux-gcc5-debug-coverage
       - linux-gcc5-release-qt4
       - linux-gcc5-release-qt5
-      - ios-debug
-      - ios-sanitize
-      - ios-sanitize-address
-      - ios-static-analyzer
       - ios-release:
           filters:
             tags:
               only: /ios-.*/
             branches:
               ignore: /.*/
-      - macos-debug
       - macos-debug-qt5
       - macos-release-node4:
           filters:
