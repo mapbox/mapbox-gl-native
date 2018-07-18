@@ -11,10 +11,6 @@ workflows:
               ignore: master
       - android-debug-arm-v7
       - android-release-all
-      - node4-clang39-release:
-          filters:
-            tags:
-              only: /node-.*/
       - node6-clang39-release:
           filters:
             tags:
@@ -38,10 +34,6 @@ workflows:
             branches:
               ignore: /.*/
       - macos-debug-qt5
-      - macos-release-node4:
-          filters:
-            tags:
-              only: /node-.*/
       - macos-release-node6:
           filters:
             tags:
