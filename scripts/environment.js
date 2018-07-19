@@ -21,4 +21,15 @@ if (pr) {
         console.log(`export CIRCLE_TARGET_BRANCH=${base}`);
         console.log(`export CIRCLE_MERGE_BASE=${mergeBase}`);
     });
+} else {
+    const head = process.env['CIRCLE_SHA1'];
+    for (const sha of execSync(`git rev-list --max-count=10 ${head}`).toString().trim().split('\n')) {
+        const base = execSync(`git branch -r --contains ${sha} origin/master origin/release-*`).toString().trim().replace(/^origin\//, '');
+        if (base) {
+            const mergeBase = execSync(`git merge-base origin/${base} ${head}`).toString().trim();
+            console.log(`export CIRCLE_TARGET_BRANCH=${base}`);
+            console.log(`export CIRCLE_MERGE_BASE=${mergeBase}`);
+            break;
+        }
+    }
 }
