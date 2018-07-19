@@ -1264,7 +1264,6 @@ public:
 
 - (void)touchesBegan:(__unused NSSet<UITouch *> *)touches withEvent:(__unused UIEvent *)event
 {
-    _changeDelimiterSuppressionDepth = 0;
     _mbglMap->setGestureInProgress(false);
     if (self.userTrackingState == MGLUserTrackingStateBegan)
     {
