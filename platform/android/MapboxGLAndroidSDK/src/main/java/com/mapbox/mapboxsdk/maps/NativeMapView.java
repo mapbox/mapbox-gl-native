@@ -64,7 +64,7 @@ final class NativeMapView {
   private boolean destroyed = false;
 
   // Holds the pointer to JNI NativeMapView
-  private long nativePtr = 0;
+  long nativePtr = 0;
 
   // Listener invoked to return a bitmap of the map
   private MapboxMap.SnapshotReadyCallback snapshotReadyCallback;

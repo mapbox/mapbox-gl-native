@@ -940,6 +940,10 @@ jni::jboolean NativeMapView::getPrefetchesTiles(JNIEnv&) {
     return jni::jboolean(map->getPrefetchZoomDelta() > 0);
 }
 
+mbgl::Map& NativeMapView::getMap() {
+    return *map;
+}
+
 // Static methods //
 
 jni::Class<NativeMapView> NativeMapView::javaClass;
