@@ -272,6 +272,9 @@ public class SymbolLayerTest extends BaseActivityTest {
       // Set and Get
       layer.setProperties(iconImage("undefined"));
       assertEquals((String) layer.getIconImage().getValue(), (String) "undefined");
+
+      layer.setProperties(iconImage("{token}"));
+      assertEquals(layer.getIconImage().getExpression(), Expression.toString(Expression.get("token")));
     });
   }
 
@@ -446,6 +449,9 @@ public class SymbolLayerTest extends BaseActivityTest {
       // Set and Get
       layer.setProperties(textField(""));
       assertEquals((String) layer.getTextField().getValue(), (String) "");
+
+      layer.setProperties(textField("{token}"));
+      assertEquals(layer.getTextField().getExpression(), Expression.toString(Expression.get("token")));
     });
   }
 
