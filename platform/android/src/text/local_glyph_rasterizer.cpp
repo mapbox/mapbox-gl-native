@@ -33,19 +33,27 @@
 namespace mbgl {
 namespace android {
 
+LocalGlyphRasterizer::LocalGlyphRasterizer() {
+    UniqueEnv env { AttachEnv() };
+
+    static auto constructor = javaClass.GetConstructor(*env);
+
+    javaObject = javaClass.New(*env, constructor).NewGlobalRef(*env);
+}
+
 PremultipliedImage LocalGlyphRasterizer::drawGlyphBitmap(const std::string& fontFamily, const bool bold, const GlyphID glyphID) {
     UniqueEnv env { AttachEnv() };
 
     using Signature = jni::Object<Bitmap>(jni::String, jni::jboolean, jni::jchar);
-    auto method = javaClass.GetStaticMethod<Signature>(*env, "drawGlyphBitmap");
+    static auto method = javaClass.GetMethod<Signature>(*env, "drawGlyphBitmap");
 
     jni::String jniFontFamily = jni::Make<jni::String>(*env, fontFamily);
 
-    auto javaBitmap = javaClass.Call(*env,
-                                     method,
-                                     jniFontFamily,
-                                     static_cast<jni::jboolean>(bold),
-                                     static_cast<jni::jchar>(glyphID));
+    auto javaBitmap = javaObject->Call(*env,
+                                       method,
+                                       jniFontFamily,
+                                       static_cast<jni::jboolean>(bold),
+                                       static_cast<jni::jchar>(glyphID));
     jni::DeleteLocalRef(*env, jniFontFamily);
 
     PremultipliedImage result = Bitmap::GetImage(*env, javaBitmap);
@@ -77,13 +85,15 @@ public:
             std::string lowercaseFont = platform::lowercase(font);
             if (lowercaseFont.find("bold") != std::string::npos) {
                 bold = true;
+                break;
             }
         }
-        return android::LocalGlyphRasterizer::drawGlyphBitmap(*fontFamily, bold, glyphID);
+        return androidLocalGlyphRasterizer.drawGlyphBitmap(*fontFamily, bold, glyphID);
     }
 
 private:
     optional<std::string> fontFamily;
+    android::LocalGlyphRasterizer androidLocalGlyphRasterizer;
 };
 
 LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string> fontFamily)
