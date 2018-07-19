@@ -653,6 +653,8 @@ public:
 {
     [_reachability stopNotifier];
 
+    _locationManager.delegate = nil;
+
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_attributionButton removeObserver:self forKeyPath:@"hidden"];
