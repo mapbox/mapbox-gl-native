@@ -4695,8 +4695,8 @@ public:
     if (!locationManager) {
         [self.locationManager stopUpdatingLocation];
         [self.locationManager stopUpdatingHeading];
-        self.locationManager.delegate = nil;
     }
+    self.locationManager.delegate = nil;
     _locationManager = locationManager;
     _locationManager.delegate = self;
 

@@ -117,8 +117,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- The `MGLLocationManagerDelegate` protocol defines a set of methods that `MGLMapView`
- uses to receive location updates from the associated location manager.
+ The `MGLLocationManagerDelegate` protocol defines a set of methods that respond
+ to location updates from an `MGLLocationManager` object that is serving as the
+ location manager of an `MGLMapView`.
  */
 @protocol MGLLocationManagerDelegate <NSObject>
 

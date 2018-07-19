@@ -81,6 +81,7 @@
 {
     [self.locationManager stopUpdatingLocation];
     [self.locationManager stopUpdatingHeading];
+    self.locationManager.delegate = nil;
     self.delegate = nil;
 }
 

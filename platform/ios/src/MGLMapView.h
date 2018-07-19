@@ -300,10 +300,8 @@ MGL_EXPORT IB_DESIGNABLE
  The object that this map view uses to start and stop the delivery of location-related
  updates.
  
- To receive the current user location implement `MGLMapViewDelegate`s delegate methods:
- 
- `-[MGLMapViewDelegate mapView:didUpdateUserLocation:]`
- `-[MGLMapViewDelegate mapView:didFailToLocateUserWithError:]`
+ To receive the current user location, implement the `-[MGLMapViewDelegate mapView:didUpdateUserLocation:]`
+ and `-[MGLMapViewDelegate mapView:didFailToLocateUserWithError:]` methods.
  
  If setting this property to `nil` and setting `showsUserLocation` to `YES`, or
  if no custom manager is provided this property is set to the default
@@ -311,8 +309,8 @@ MGL_EXPORT IB_DESIGNABLE
  
  `MGLMapView` uses a default location manager. If you want to substitute your own
  location manager, you should do so by setting this property before setting
- `showsUserLocation` to `YES`. To restore the default location manager, set this
- property to `nil`.
+ `showsUserLocation` to `YES`. To restore the default location manager,
+ set this property to `nil`.
  */
 @property (nonatomic, null_resettable) id<MGLLocationManager> locationManager;
 
