@@ -5614,9 +5614,7 @@ public:
         self.showsBuildings = YES;
     }
     
-    // If the traffic style is used it will display by default the traffic, it it's
-    // disabled it will force an update.
-    if (!_showsTraffic) {
+    if (_showsTraffic) {
         self.showsTraffic = _showsTraffic;
     }
     
@@ -6465,8 +6463,39 @@ private:
 
 - (void)setShowsTraffic:(BOOL)showsTraffic
 {
-    _showsTraffic = showsTraffic;
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSString *bundleIdentifier = [bundle bundleIdentifier];
+    NSString *trafficSourceIdentifier = [NSString stringWithFormat:@"%@-traffic-source", bundleIdentifier];
     NSString *sourceIdentifier = @"mapbox://mapbox.mapbox-traffic-v1";
+    
+    MGLVectorTileSource *source = (MGLVectorTileSource *)[self.style sourceWithIdentifier:trafficSourceIdentifier];
+    
+    if (!source) {
+        source = [[MGLVectorTileSource alloc] initWithIdentifier:trafficSourceIdentifier configurationURL:[NSURL URLWithString:sourceIdentifier]];
+        [self.style addSource:source];
+        
+        MGLStyleLayer *styleLayer = nil;
+        for (MGLStyleLayer *layer in self.style.layers.reverseObjectEnumerator) {
+            if (![layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
+                styleLayer = layer;
+                break;
+            }
+        }
+        
+        if (styleLayer) {
+            MGLStyleLayer *motorwayStyleLayer = [self styleMotorwayLayer:bundleIdentifier source:source];
+            [self.style insertLayer:motorwayStyleLayer aboveLayer:styleLayer];
+            
+            MGLStyleLayer *primaryStyleLayer = [self stylePrimaryLayer:bundleIdentifier source:source];
+            [self.style insertLayer:primaryStyleLayer aboveLayer:styleLayer];
+            
+            MGLStyleLayer *streetStyleLayer = [self styleStreetLayer:bundleIdentifier source:source];
+            [self.style insertLayer:streetStyleLayer aboveLayer:styleLayer];
+        }
+    }
+    
+    _showsTraffic = showsTraffic;
+    
     for (MGLStyleLayer *layer in self.style.layers) {
         if ([layer isKindOfClass:[MGLForegroundStyleLayer class]]) {
             MGLForegroundStyleLayer *trafficLayer = (MGLForegroundStyleLayer *)layer;
@@ -6476,6 +6505,94 @@ private:
             
         }
     }
+}
+
+- (NSExpression *)trafficColor {
+    static dispatch_once_t onceToken;
+    static NSExpression *trafficColor;
+    dispatch_once(&onceToken, ^{
+        trafficColor = [NSExpression expressionWithFormat:@"MGL_MATCH(congestion, 'low', %@, 'moderate', %@, 'heavy', %@, 'severe', %@, %@)",
+                        [NSExpression expressionForConstantValue: [UIColor colorWithRed:88.0/255.0
+                                                                                  green:195.0/255.0
+                                                                                   blue:35.0/255.0
+                                                                                  alpha:1]],
+                        [NSExpression expressionForConstantValue: [UIColor colorWithRed:88.0/255.0
+                                                                                  green:195.0/255.0
+                                                                                   blue:35.0/255.0
+                                                                                  alpha:1]],
+                        [NSExpression expressionForConstantValue: [UIColor colorWithRed:242.0/255.0
+                                                                                  green:185.0/255.0
+                                                                                   blue:15.0/255.0
+                                                                                  alpha:1]],
+                        [NSExpression expressionForConstantValue: [UIColor colorWithRed:204.0/255.0
+                                                                                  green:0
+                                                                                   blue:0
+                                                                                  alpha:1]],
+                        [NSExpression expressionForConstantValue: [UIColor greenColor]]];
+    });
+    return trafficColor;
+}
+
+- (MGLStyleLayer *)styleMotorwayLayer:(NSString *)bundleIdentifier source:(MGLVectorTileSource *)source {
+    MGLLineStyleLayer *motorwayLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:[NSString stringWithFormat:@"%@-traffic-motorway-layer", bundleIdentifier] source:source];
+    motorwayLayer.sourceLayerIdentifier = @"traffic";
+    motorwayLayer.predicate = [NSPredicate predicateWithFormat:@"class IN { 'motorway', 'motorway_link', 'trunk' } "];
+    
+    motorwayLayer.lineColor = [self trafficColor];
+    
+    NSDictionary *motorwayLineWidthDictionary =  @{
+                                                   @7 : [NSExpression expressionForConstantValue:@1],
+                                                   @18 : [NSExpression expressionForConstantValue:@24]
+                                                   };
+    
+    motorwayLayer.lineWidth = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'exponential', 1.5, %@)",
+                               motorwayLineWidthDictionary];
+    
+    
+    
+    return motorwayLayer;
+}
+
+- (MGLStyleLayer *)stylePrimaryLayer:(NSString *)bundleIdentifier source:(MGLVectorTileSource *)source {
+    MGLLineStyleLayer *primaryLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:[NSString stringWithFormat:@"%@-traffic-primary-layer", bundleIdentifier] source:source];
+    primaryLayer.sourceLayerIdentifier = @"traffic";
+    primaryLayer.predicate = [NSPredicate predicateWithFormat:@"class IN {'primary', 'secondary', 'tertiary'}"];
+    
+    NSDictionary *primaryLineStopsDictionary = @{
+                                                 @11 : [NSExpression expressionForConstantValue:@1.25],
+                                                 @14 : [NSExpression expressionForConstantValue:@2.5],
+                                                 @17 : [NSExpression expressionForConstantValue:@5.5],
+                                                 @20 : [NSExpression expressionForConstantValue:@15.5]
+                                                 };
+    
+    primaryLayer.lineColor = [self trafficColor];
+    
+    primaryLayer.lineWidth = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'exponential', 1.5, %@)",
+                              primaryLineStopsDictionary];
+    
+    return primaryLayer;
+}
+
+- (MGLStyleLayer *)styleStreetLayer:(NSString *)bundleIdentifier source:(MGLVectorTileSource *)source {
+    MGLLineStyleLayer *streetLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:[NSString stringWithFormat:@"%@-traffic-street-layer", bundleIdentifier] source:source];
+    streetLayer.sourceLayerIdentifier = @"traffic";
+    streetLayer.predicate = [NSPredicate predicateWithFormat:@"class IN {'street', 'link', 'service'}"];
+    
+    NSDictionary *streetLineStopsDictionary = @{
+                                                @11 : [NSExpression expressionForConstantValue:@1],
+                                                @14 : [NSExpression expressionForConstantValue:@2],
+                                                @17 : [NSExpression expressionForConstantValue:@4],
+                                                @20 : [NSExpression expressionForConstantValue:@13.5]
+                                                };
+    
+    streetLayer.lineColor = [self trafficColor];
+    
+    
+    streetLayer.lineWidth = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'exponential', 1.5, %@)",
+                             streetLineStopsDictionary];
+    
+    
+    return streetLayer;
 }
 
 - (void)setShowsPointsOfInterest:(BOOL)showsPointsOfInterest {
