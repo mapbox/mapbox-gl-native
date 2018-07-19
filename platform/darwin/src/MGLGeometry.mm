@@ -98,7 +98,7 @@ CLLocationDirection MGLDirectionBetweenCoordinates(CLLocationCoordinate2D firstC
 
 CGPoint MGLPointRounded(CGPoint point) {
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    CGFloat scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [UIScreen mainScreen].nativeScale : [UIScreen mainScreen].scale;
+    CGFloat scaleFactor = [UIScreen mainScreen].nativeScale;
 #elif TARGET_OS_MAC
     CGFloat scaleFactor = [NSScreen mainScreen].backingScaleFactor;
 #endif

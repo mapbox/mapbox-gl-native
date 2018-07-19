@@ -138,6 +138,9 @@ MGLRadianCoordinate2D MGLRadianCoordinateAtDistanceFacingDirection(MGLRadianCoor
  */
 CLLocationDirection MGLDirectionBetweenCoordinates(CLLocationCoordinate2D firstCoordinate, CLLocationCoordinate2D secondCoordinate);
 
+/**
+ Returns a point with coordinates rounded to the nearest logical pixel.
+ */
 CGPoint MGLPointRounded(CGPoint point);
 
 MGLMatrix4 MGLMatrix4Make(std::array<double, 16> mat);
