@@ -11,6 +11,7 @@ dependencies {
     }
     implementation dependenciesList.supportAnnotations
     implementation dependenciesList.supportFragmentV4
+    implementation dependenciesList.supportUtilV4
     implementation dependenciesList.timber
     implementation dependenciesList.okhttp3
     testImplementation dependenciesList.junit

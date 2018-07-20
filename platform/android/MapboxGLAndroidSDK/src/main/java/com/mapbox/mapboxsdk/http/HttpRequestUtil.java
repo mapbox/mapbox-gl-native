@@ -3,12 +3,12 @@ package com.mapbox.mapboxsdk.http;
 import okhttp3.OkHttpClient;
 
 /**
- * Utility class for setting HttpRequest configurations
+ * Utility class for setting OkHttpRequest configurations
  */
 public class HttpRequestUtil {
 
   /**
-   * Set the log state of HttpRequest. Default value is true.
+   * Set the log state of OkHttpRequest. Default value is true.
    * <p>
    * This configuration will outlast the lifecycle of the Map.
    * </p>
@@ -16,7 +16,7 @@ public class HttpRequestUtil {
    * @param enabled True will enable logging, false will disable
    */
   public static void setLogEnabled(boolean enabled) {
-    HTTPRequest.enableLog(enabled);
+    OkHttpRequest.enableLog(enabled);
   }
 
   /**
@@ -31,7 +31,7 @@ public class HttpRequestUtil {
    * @param enabled True will print urls, false will disable
    */
   public static void setPrintRequestUrlOnFailure(boolean enabled) {
-    HTTPRequest.enablePrintRequestUrlOnFailure(enabled);
+    OkHttpRequest.enablePrintRequestUrlOnFailure(enabled);
   }
 
   /**
@@ -40,7 +40,7 @@ public class HttpRequestUtil {
    * @param client the OkHttpClient
    */
   public static void setOkHttpClient(OkHttpClient client) {
-    HTTPRequest.setOKHttpClient(client);
+    OkHttpRequest.setOkHttpClient(client);
   }
 
 }
