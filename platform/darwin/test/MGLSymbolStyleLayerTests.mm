@@ -962,22 +962,22 @@
                       @"symbol-placement should be unset initially.");
         NSExpression *defaultExpression = layer.symbolPlacement;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'line'"];
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'line-center'"];
         layer.symbolPlacement = constantExpression;
-        mbgl::style::PropertyValue<mbgl::style::SymbolPlacementType> propertyValue = { mbgl::style::SymbolPlacementType::Line };
+        mbgl::style::PropertyValue<mbgl::style::SymbolPlacementType> propertyValue = { mbgl::style::SymbolPlacementType::LineCenter };
         XCTAssertEqual(rawLayer->getSymbolPlacement(), propertyValue,
                        @"Setting symbolPlacement to a constant value expression should update symbol-placement.");
         XCTAssertEqualObjects(layer.symbolPlacement, constantExpression,
                               @"symbolPlacement should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"'line'"];
+        constantExpression = [NSExpression expressionWithFormat:@"'line-center'"];
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.symbolPlacement = functionExpression;
 
         {
             using namespace mbgl::style::expression::dsl;
             propertyValue = mbgl::style::PropertyExpression<mbgl::style::SymbolPlacementType>(
-                step(zoom(), literal("line"), 18.0, literal("line"))
+                step(zoom(), literal("line-center"), 18.0, literal("line-center"))
             );
         }
 
@@ -2883,6 +2883,7 @@
     XCTAssertEqual([NSValue valueWithMGLIconTextFit:MGLIconTextFitBoth].MGLIconTextFitValue, MGLIconTextFitBoth);
     XCTAssertEqual([NSValue valueWithMGLSymbolPlacement:MGLSymbolPlacementPoint].MGLSymbolPlacementValue, MGLSymbolPlacementPoint);
     XCTAssertEqual([NSValue valueWithMGLSymbolPlacement:MGLSymbolPlacementLine].MGLSymbolPlacementValue, MGLSymbolPlacementLine);
+    XCTAssertEqual([NSValue valueWithMGLSymbolPlacement:MGLSymbolPlacementLineCenter].MGLSymbolPlacementValue, MGLSymbolPlacementLineCenter);
     XCTAssertEqual([NSValue valueWithMGLTextAnchor:MGLTextAnchorCenter].MGLTextAnchorValue, MGLTextAnchorCenter);
     XCTAssertEqual([NSValue valueWithMGLTextAnchor:MGLTextAnchorLeft].MGLTextAnchorValue, MGLTextAnchorLeft);
     XCTAssertEqual([NSValue valueWithMGLTextAnchor:MGLTextAnchorRight].MGLTextAnchorValue, MGLTextAnchorRight);

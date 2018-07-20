@@ -248,13 +248,20 @@ global.testHelperMessage = function (property, layerType, isFunction) {
 global.propertyDoc = function (propertyName, property, layerType, kind) {
     // Match references to other property names & values.
     // Requires the format 'When `foo` is set to `bar`,'.
-    let doc = property.doc.replace(/`([^`]+?)` is set to `([^`]+?)`/g, function (m, peerPropertyName, propertyValue, offset, str) {
+    let doc = property.doc.replace(/`([^`]+?)` is set to `([^`]+?)`(?: or `([^`]+?)`)?/g, function (m, peerPropertyName, propertyValue, secondPropertyValue, offset, str) {
         let otherProperty = camelizeWithLeadingLowercase(peerPropertyName);
         let otherValue = objCType(layerType, peerPropertyName) + camelize(propertyValue);
         if (property.type == 'array' && kind == 'light') {
             otherValue = propertyValue;
         }
-        return '`' + `${otherProperty}` + '` is set to `' + `${otherValue}` + '`';
+        const firstPropertyValue = '`' + `${otherProperty}` + '` is set to `' + `${otherValue}` + '`';
+        if (secondPropertyValue) {
+            return firstPropertyValue + ' or `' +
+                objCType(layerType, peerPropertyName) + camelize(secondPropertyValue) +
+                '`';
+        } else {
+            return firstPropertyValue;
+        }
     });
     // Match references to our own property values.
     // Requires the format 'is equivalent to `bar`'.

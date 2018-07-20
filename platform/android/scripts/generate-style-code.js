@@ -235,10 +235,15 @@ global.propertyValueDoc = function (property, value) {
 
     // Match references to other property names & values.
     // Requires the format 'When `foo` is set to `bar`,'.
-    let doc = property.values[value].doc.replace(/When `(.+?)` is set to `(.+?)`,/g, function (m, peerPropertyName, propertyValue, offset, str) {
+    let doc = property.values[value].doc.replace(/When `(.+?)` is set to `(.+?)`(?: or `([^`]+?)`)?,/g, function (m, peerPropertyName, propertyValue, secondPropertyValue, offset, str) {
         let otherProperty = snakeCaseUpper(peerPropertyName);
         let otherValue = snakeCaseUpper(peerPropertyName) + '_' + snakeCaseUpper(propertyValue);
-        return 'When {@link ' + `${otherProperty}` + '} is set to {@link Property#' + `${otherValue}` + '},';
+        const firstPropertyValue = 'When {@link ' + `${otherProperty}` + '} is set to {@link Property#' + `${otherValue}` + '}';
+        if (secondPropertyValue) {
+            return firstPropertyValue + ` or {@link Property#${snakeCaseUpper(peerPropertyName) + '_' + snakeCaseUpper(secondPropertyValue)}},`;
+        } else {
+            return firstPropertyValue + ',';
+        }
     });
 
     // Match references to our own property values.
