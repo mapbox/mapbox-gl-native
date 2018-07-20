@@ -47,13 +47,17 @@ struct Converter<DataDrivenPropertyValue<T>> {
             return {};
         } else if (!(*expression).isFeatureConstant() || !(*expression).isZoomConstant()) {
             return { std::move(*expression) };
-        } else {
+        } else if ((*expression).getExpression().getKind() == Kind::Literal) {
             optional<T> constant = fromExpressionValue<T>(
-                dynamic_cast<const Literal&>((*expression).getExpression()).getValue());
+                static_cast<const Literal&>((*expression).getExpression()).getValue());
             if (!constant) {
                 return {};
             }
             return DataDrivenPropertyValue<T>(*constant);
+        } else {
+            assert(false);
+            error = { "expected a literal expression" };
+            return {};
         }
     }
 

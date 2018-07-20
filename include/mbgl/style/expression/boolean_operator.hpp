@@ -12,7 +12,7 @@ namespace expression {
 class Any : public Expression  {
 public:
     Any(std::vector<std::unique_ptr<Expression>> inputs_) :
-        Expression(type::Boolean),
+        Expression(Kind::Any, type::Boolean),
         inputs(std::move(inputs_))
     {}
 
@@ -31,7 +31,7 @@ private:
 class All : public Expression  {
 public:
     All(std::vector<std::unique_ptr<Expression>> inputs_) :
-        Expression(type::Boolean),
+        Expression(Kind::All, type::Boolean),
         inputs(std::move(inputs_))
     {}
 

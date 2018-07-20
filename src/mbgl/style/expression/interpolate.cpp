@@ -264,7 +264,7 @@ Interpolate::Interpolate(const type::Type& type_,
                          Interpolator interpolator_,
                          std::unique_ptr<Expression> input_,
                          std::map<double, std::unique_ptr<Expression>> stops_)
-  : Expression(type_),
+  : Expression(Kind::Interpolate, type_),
     interpolator(std::move(interpolator_)),
     input(std::move(input_)),
     stops(std::move(stops_)) {

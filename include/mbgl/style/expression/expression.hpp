@@ -113,9 +113,32 @@ public:
     ParseResult ExpressionClass::parse(const V&, ParsingContext),
     which handles parsing a style-spec JSON representation of the expression.
 */
+
+enum class Kind : int32_t {
+    Coalesce,
+    CompoundExpression,
+    Literal,
+    ArrayAssertion,
+    At,
+    Interpolate,
+    Assertion,
+    Length,
+    Step,
+    Let,
+    Var,
+    CollatorExpression,
+    Coercion,
+    Match,
+    Error,
+    Case,
+    Any,
+    All,
+    Equals,
+};
+
 class Expression {
 public:
-    Expression(type::Type type_) : type(std::move(type_)) {}
+    Expression(Kind kind_, type::Type type_) : kind(kind_), type(std::move(type_)) {}
     virtual ~Expression() = default;
     
     virtual EvaluationResult evaluate(const EvaluationContext& params) const = 0;
@@ -125,6 +148,7 @@ public:
         return !operator==(rhs);
     }
 
+    Kind getKind() const { return kind; };
     type::Type getType() const { return type; };
     
     EvaluationResult evaluate(optional<float> zoom, const Feature& feature, optional<double> heatmapDensity) const;
@@ -182,6 +206,7 @@ protected:
     }
 
 private:
+    Kind kind;
     type::Type type;
 };
 
