@@ -24,35 +24,35 @@ NS_ASSUME_NONNULL_BEGIN
  Specifies the minimum distance (measured in meters) a device must move horizontally
  before a location update is generated.
  
- @see `[CLLocationManager distanceFilter]`
- 
  The default value of this property is `kCLDistanceFilterNone` when `MGLMapView` uses its
  default location manager.
+ 
+ @see `CLLocationManager.distanceFilter`
  */
 @property(nonatomic, assign) CLLocationDistance distanceFilter;
 
 /**
  Specifies the accuracy of the location data.
  
- @see `[CLLocationManager desiredAccuracy]`
- 
  The default value is `kCLLocationAccuracyBest` when `MGLMapView` uses its
  default location manager.
  
  @note Determining a location with greater accuracy requires more time and more power.
+ 
+ @see `CLLocationManager.desiredAccuracy`
  */
 @property (nonatomic, assign) CLLocationAccuracy desiredAccuracy;
 
 /**
  Specifies the type of user activity associated with the location updates.
  
- @see `[CLLocationManager activityType]`
- 
  The location manager uses this property as a cue to determine when location updates
  may be automatically paused.
  
  The default value is `CLActivityTypeOther` when `MGLMapView` uses its
  default location manager.
+ 
+ @see `CLLocationManager.activityType`
  */
 @property (nonatomic, assign) CLActivityType activityType;
 
