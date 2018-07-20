@@ -4699,7 +4699,6 @@ public:
     self.locationManager.delegate = nil;
     _locationManager = locationManager;
     _locationManager.delegate = self;
-
 }
 
 - (void)validateLocationServices
