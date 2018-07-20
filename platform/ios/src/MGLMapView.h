@@ -2,7 +2,6 @@
 #import "MGLMapCamera.h"
 
 #import <UIKit/UIKit.h>
-#import <CoreLocation/CoreLocation.h>
 
 #import "MGLFoundation.h"
 #import "MGLTypes.h"
@@ -22,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLOverlay;
 @protocol MGLCalloutView;
 @protocol MGLFeature;
+@protocol MGLLocationManager;
 
 /** The default deceleration rate for a map view. */
 extern MGL_EXPORT const CGFloat MGLMapViewDecelerationRateNormal;
@@ -297,6 +297,24 @@ MGL_EXPORT IB_DESIGNABLE
 #pragma mark Displaying the User’s Location
 
 /**
+ The object that this map view uses to start and stop the delivery of location-related
+ updates.
+ 
+ To receive the current user location, implement the `-[MGLMapViewDelegate mapView:didUpdateUserLocation:]`
+ and `-[MGLMapViewDelegate mapView:didFailToLocateUserWithError:]` methods.
+ 
+ If setting this property to `nil` and setting `showsUserLocation` to `YES`, or
+ if no custom manager is provided this property is set to the default
+ location manager.
+ 
+ `MGLMapView` uses a default location manager. If you want to substitute your own
+ location manager, you should do so by setting this property before setting
+ `showsUserLocation` to `YES`. To restore the default location manager,
+ set this property to `nil`.
+ */
+@property (nonatomic, null_resettable) id<MGLLocationManager> locationManager;
+
+/**
  A Boolean value indicating whether the map may display the user location.
 
  Setting this property to `YES` causes the map view to use the Core Location
@@ -312,6 +330,9 @@ MGL_EXPORT IB_DESIGNABLE
  `NSLocationAlwaysUsageDescription` in its `Info.plist` to satisfy the
  requirements of the underlying Core Location framework when enabling this
  property.
+ 
+ If you implement a custom location manager, set the `locationManager` before
+ calling `showsUserLocation`.
  */
 @property (nonatomic, assign) BOOL showsUserLocation;
 
