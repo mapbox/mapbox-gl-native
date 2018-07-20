@@ -92,6 +92,10 @@ public final class Property {
    * The label is placed along the line of the geometry. Can only be used on LineString and Polygon geometries.
    */
   public static final String SYMBOL_PLACEMENT_LINE = "line";
+  /**
+   * The label is placed at the center of the line of the geometry. Can only be used on LineString and Polygon geometries. Note that a single feature in a vector tile may contain multiple line geometries.
+   */
+  public static final String SYMBOL_PLACEMENT_LINE_CENTER = "line-center";
 
   /**
    * Label placement relative to its geometry.
@@ -99,6 +103,7 @@ public final class Property {
   @StringDef({
       SYMBOL_PLACEMENT_POINT,
       SYMBOL_PLACEMENT_LINE,
+      SYMBOL_PLACEMENT_LINE_CENTER,
     })
   @Retention(RetentionPolicy.SOURCE)
   public @interface SYMBOL_PLACEMENT {}
@@ -106,7 +111,7 @@ public final class Property {
   // ICON_ROTATION_ALIGNMENT: In combination with `symbol-placement`, determines the rotation behavior of icons.
 
   /**
-   * When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_POINT}, aligns icons east-west. When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_LINE}, aligns icon x-axes with the line.
+   * When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_POINT}, aligns icons east-west. When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_LINE} or {@link Property#SYMBOL_PLACEMENT_LINE_CENTER}, aligns icon x-axes with the line.
    */
   public static final String ICON_ROTATION_ALIGNMENT_MAP = "map";
   /**
@@ -114,7 +119,7 @@ public final class Property {
    */
   public static final String ICON_ROTATION_ALIGNMENT_VIEWPORT = "viewport";
   /**
-   * When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_POINT}, this is equivalent to {@link Property#ICON_ROTATION_ALIGNMENT_VIEWPORT}. When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_LINE}, this is equivalent to {@link Property#ICON_ROTATION_ALIGNMENT_MAP}.
+   * When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_POINT}, this is equivalent to {@link Property#ICON_ROTATION_ALIGNMENT_VIEWPORT}. When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_LINE} or {@link Property#SYMBOL_PLACEMENT_LINE_CENTER}, this is equivalent to {@link Property#ICON_ROTATION_ALIGNMENT_MAP}.
    */
   public static final String ICON_ROTATION_ALIGNMENT_AUTO = "auto";
 
@@ -271,7 +276,7 @@ public final class Property {
   // TEXT_ROTATION_ALIGNMENT: In combination with `symbol-placement`, determines the rotation behavior of the individual glyphs forming the text.
 
   /**
-   * When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_POINT}, aligns text east-west. When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_LINE}, aligns text x-axes with the line.
+   * When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_POINT}, aligns text east-west. When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_LINE} or {@link Property#SYMBOL_PLACEMENT_LINE_CENTER}, aligns text x-axes with the line.
    */
   public static final String TEXT_ROTATION_ALIGNMENT_MAP = "map";
   /**
@@ -279,7 +284,7 @@ public final class Property {
    */
   public static final String TEXT_ROTATION_ALIGNMENT_VIEWPORT = "viewport";
   /**
-   * When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_POINT}, this is equivalent to {@link Property#TEXT_ROTATION_ALIGNMENT_VIEWPORT}. When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_LINE}, this is equivalent to {@link Property#TEXT_ROTATION_ALIGNMENT_MAP}.
+   * When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_POINT}, this is equivalent to {@link Property#TEXT_ROTATION_ALIGNMENT_VIEWPORT}. When {@link SYMBOL_PLACEMENT} is set to {@link Property#SYMBOL_PLACEMENT_LINE} or {@link Property#SYMBOL_PLACEMENT_LINE_CENTER}, this is equivalent to {@link Property#TEXT_ROTATION_ALIGNMENT_MAP}.
    */
   public static final String TEXT_ROTATION_ALIGNMENT_AUTO = "auto";
 

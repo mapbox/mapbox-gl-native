@@ -67,6 +67,9 @@ namespace conversion {
           case mbgl::style::SymbolPlacementType::Line:
             return "line";
             break;
+          case mbgl::style::SymbolPlacementType::LineCenter:
+            return "line-center";
+            break;
           default:
             throw std::runtime_error("Not implemented");
         }

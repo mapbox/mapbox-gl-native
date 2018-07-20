@@ -47,6 +47,7 @@ namespace mbgl {
     MBGL_DEFINE_ENUM(MGLSymbolPlacement, {
         { MGLSymbolPlacementPoint, "point" },
         { MGLSymbolPlacementLine, "line" },
+        { MGLSymbolPlacementLineCenter, "line-center" },
     });
 
     MBGL_DEFINE_ENUM(MGLTextAnchor, {
