@@ -8,7 +8,7 @@ namespace expression {
 using namespace mbgl::style::conversion;
 
 Assertion::Assertion(type::Type type_, std::vector<std::unique_ptr<Expression>> inputs_) :
-    Expression(type_),
+    Expression(Kind::Assertion, type_),
     inputs(std::move(inputs_))
 {
     assert(!inputs.empty());
@@ -72,7 +72,8 @@ void Assertion::eachChild(const std::function<void(const Expression&)>& visit) c
 };
 
 bool Assertion::operator==(const Expression& e) const {
-    if (auto rhs = dynamic_cast<const Assertion*>(&e)) {
+    if (e.getKind() == Kind::Assertion) {
+        auto rhs = static_cast<const Assertion*>(&e);
         return getType() == rhs->getType() && Expression::childrenEqual(inputs, rhs->inputs);
     }
     return false;

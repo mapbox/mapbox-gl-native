@@ -11,7 +11,7 @@ namespace expression {
 Step::Step(const type::Type& type_,
            std::unique_ptr<Expression> input_,
            std::map<double, std::unique_ptr<Expression>> stops_)
-  : Expression(type_),
+  : Expression(Kind::Step, type_),
     input(std::move(input_)),
     stops(std::move(stops_))
 {
@@ -57,7 +57,8 @@ void Step::eachStop(const std::function<void(double, const Expression&)>& visit)
 }
 
 bool Step::operator==(const Expression& e) const {
-    if (auto rhs = dynamic_cast<const Step*>(&e)) {
+    if (e.getKind() == Kind::Step) {
+        auto rhs = static_cast<const Step*>(&e);
         return *input == *(rhs->input) && Expression::childrenEqual(stops, rhs->stops);
     }
     return false;
