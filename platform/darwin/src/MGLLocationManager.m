@@ -106,4 +106,11 @@
     
     return NO;
 }
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
+    if ([self.delegate respondsToSelector:@selector(locationManager:didFailWithError:)]) {
+        [self.delegate locationManager:self didFailWithError:error];
+    }
+}
+
 @end
