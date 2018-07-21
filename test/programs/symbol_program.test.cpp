@@ -13,7 +13,7 @@ TEST(SymbolProgram, SymbolSizeBinder) {
     EXPECT_EQ(uniformValues.get<uniforms::u_is_size_feature_constant>().t, true);
     EXPECT_EQ(uniformValues.get<uniforms::u_size>().t, 12.0f);
 
-    binder = SymbolSizeBinder::create(1.0f, style::CameraFunction<float>(
+    binder = SymbolSizeBinder::create(1.0f, style::PropertyExpression<float>(
         interpolate(
             linear(),
             zoom(),
@@ -24,7 +24,7 @@ TEST(SymbolProgram, SymbolSizeBinder) {
     EXPECT_EQ(uniformValues.get<uniforms::u_is_size_feature_constant>().t, true);
     EXPECT_EQ(uniformValues.get<uniforms::u_size>().t, 9.5f);
     
-    binder = SymbolSizeBinder::create(0.0f, style::CameraFunction<float>(
+    binder = SymbolSizeBinder::create(0.0f, style::PropertyExpression<float>(
         interpolate(
             linear(),
             zoom(),
@@ -35,7 +35,7 @@ TEST(SymbolProgram, SymbolSizeBinder) {
     EXPECT_EQ(uniformValues.get<uniforms::u_is_size_feature_constant>().t, true);
     EXPECT_EQ(uniformValues.get<uniforms::u_size>().t, 8.0f);
     
-    binder = SymbolSizeBinder::create(12.0f, style::CameraFunction<float>(
+    binder = SymbolSizeBinder::create(12.0f, style::PropertyExpression<float>(
         interpolate(
             linear(),
             zoom(),
@@ -46,7 +46,7 @@ TEST(SymbolProgram, SymbolSizeBinder) {
     EXPECT_EQ(uniformValues.get<uniforms::u_is_size_feature_constant>().t, true);
     EXPECT_EQ(uniformValues.get<uniforms::u_size>().t, 18.0f);
     
-    binder = SymbolSizeBinder::create(0.0f, style::SourceFunction<float>(
+    binder = SymbolSizeBinder::create(0.0f, style::PropertyExpression<float>(
         interpolate(
             linear(),
             number(get("x")),
@@ -56,7 +56,7 @@ TEST(SymbolProgram, SymbolSizeBinder) {
     EXPECT_EQ(uniformValues.get<uniforms::u_is_size_zoom_constant>().t, true);
     EXPECT_EQ(uniformValues.get<uniforms::u_is_size_feature_constant>().t, false);
 
-    binder = SymbolSizeBinder::create(5.0f, style::CompositeFunction<float>(
+    binder = SymbolSizeBinder::create(5.0f, style::PropertyExpression<float>(
         interpolate(
             linear(),
             zoom(),

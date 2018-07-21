@@ -3,11 +3,9 @@
 #include <mbgl/style/color_ramp_property_value.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/constant.hpp>
-#include <mbgl/style/conversion/function.hpp>
 #include <mbgl/style/expression/value.hpp>
 #include <mbgl/style/expression/is_constant.hpp>
 #include <mbgl/style/expression/is_expression.hpp>
-#include <mbgl/style/expression/find_zoom_curve.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
 
 namespace mbgl {
@@ -16,7 +14,7 @@ namespace conversion {
 
 template <>
 struct Converter<ColorRampPropertyValue> {
-    optional<ColorRampPropertyValue> operator()(const Convertible& value, Error& error) const {
+    optional<ColorRampPropertyValue> operator()(const Convertible& value, Error& error, bool /* convertTokens */ = false) const {
         using namespace mbgl::style::expression;
         if (isUndefined(value)) {
             return ColorRampPropertyValue();

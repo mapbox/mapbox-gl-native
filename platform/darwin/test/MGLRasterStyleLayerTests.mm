@@ -51,7 +51,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<float>(
+            propertyValue = mbgl::style::PropertyExpression<float>(
                 step(zoom(), literal(1.0), 18.0, literal(1.0))
             );
         }
@@ -95,7 +95,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<float>(
+            propertyValue = mbgl::style::PropertyExpression<float>(
                 step(zoom(), literal(1.0), 18.0, literal(1.0))
             );
         }
@@ -139,7 +139,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<float>(
+            propertyValue = mbgl::style::PropertyExpression<float>(
                 step(zoom(), literal(1.0), 18.0, literal(1.0))
             );
         }
@@ -192,7 +192,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<float>(
+            propertyValue = mbgl::style::PropertyExpression<float>(
                 step(zoom(), literal(1.0), 18.0, literal(1.0))
             );
         }
@@ -236,7 +236,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<float>(
+            propertyValue = mbgl::style::PropertyExpression<float>(
                 step(zoom(), literal(1.0), 18.0, literal(1.0))
             );
         }
@@ -280,7 +280,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<float>(
+            propertyValue = mbgl::style::PropertyExpression<float>(
                 step(zoom(), literal(1.0), 18.0, literal(1.0))
             );
         }
@@ -333,7 +333,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<mbgl::style::RasterResamplingType>(
+            propertyValue = mbgl::style::PropertyExpression<mbgl::style::RasterResamplingType>(
                 step(zoom(), literal("nearest"), 18.0, literal("nearest"))
             );
         }
@@ -377,7 +377,7 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::CameraFunction<float>(
+            propertyValue = mbgl::style::PropertyExpression<float>(
                 step(zoom(), literal(1.0), 18.0, literal(1.0))
             );
         }

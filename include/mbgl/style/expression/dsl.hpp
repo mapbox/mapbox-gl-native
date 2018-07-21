@@ -3,6 +3,7 @@
 #include <mbgl/style/expression/value.hpp>
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/interpolator.hpp>
+#include <mbgl/util/ignore.hpp>
 
 #include <memory>
 #include <string>
@@ -16,6 +17,13 @@ namespace dsl {
 // This convenience API does little to no expression validation or type-checking, and is intended for
 // use only by test and other non-production code.
 
+template <class... Args>
+std::vector<std::unique_ptr<Expression>> vec(Args... args) {
+    std::vector<std::unique_ptr<Expression>> result;
+    util::ignore({ (result.push_back(std::move(args)), 0)... });
+    return result;
+}
+
 std::unique_ptr<Expression> error(std::string);
 
 std::unique_ptr<Expression> literal(const char* value);
@@ -27,8 +35,8 @@ std::unique_ptr<Expression> number(std::unique_ptr<Expression>);
 std::unique_ptr<Expression> string(std::unique_ptr<Expression>);
 std::unique_ptr<Expression> boolean(std::unique_ptr<Expression>);
 
-std::unique_ptr<Expression> toColor(const char* value);
 std::unique_ptr<Expression> toColor(std::unique_ptr<Expression>);
+std::unique_ptr<Expression> toString(std::unique_ptr<Expression>);
 
 std::unique_ptr<Expression> get(const char* value);
 std::unique_ptr<Expression> get(std::unique_ptr<Expression>);
@@ -67,6 +75,8 @@ std::unique_ptr<Expression> interpolate(Interpolator interpolator,
                                         double input1, std::unique_ptr<Expression> output1,
                                         double input2, std::unique_ptr<Expression> output2,
                                         double input3, std::unique_ptr<Expression> output3);
+
+std::unique_ptr<Expression> concat(std::vector<std::unique_ptr<Expression>> inputs);
 
 } // namespace dsl
 } // namespace expression

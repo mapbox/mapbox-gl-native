@@ -18,7 +18,13 @@ process.on('unhandledRejection', error => {
     process.exit(1)
 });
 
-const key = Buffer.from(process.env['SIZE_CHECK_APP_PRIVATE_KEY'], 'base64').toString('binary');
+const pk = process.env['SIZE_CHECK_APP_PRIVATE_KEY'];
+if (!pk) {
+    console.log('Fork PR; not computing size.');
+    process.exit(0);
+}
+
+const key = Buffer.from(pk, 'base64').toString('binary');
 const payload = {
     exp: Math.floor(Date.now() / 1000) + 60,
     iat: Math.floor(Date.now() / 1000),

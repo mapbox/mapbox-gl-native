@@ -44,9 +44,13 @@ if(WITH_NODEJS)
             execute_process(
                 COMMAND "${NodeJS_EXECUTABLE}" "${npm_EXECUTABLE}" install --ignore-scripts
                 WORKING_DIRECTORY "${DIRECTORY}"
-                RESULT_VARIABLE NPM_INSTALL_FAILED)
+                RESULT_VARIABLE NPM_INSTALL_FAILED
+                OUTPUT_VARIABLE NPM_OUTPUT
+                ERROR_VARIABLE NPM_OUTPUT)
             if(NOT NPM_INSTALL_FAILED)
                 execute_process(COMMAND ${CMAKE_COMMAND} -E touch "${DIRECTORY}/node_modules/.${NAME}.stamp")
+            else()
+                message(FATAL_ERROR "NPM install failed:\n${NPM_OUTPUT}")
             endif()
         endif()
 

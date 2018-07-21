@@ -220,8 +220,7 @@ namespace mbgl {
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefaultFillPattern();
     }
-    NSExpression *expression = MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
-    return expression.mgl_expressionByReplacingTokensWithKeyPaths;
+    return MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
 }
 
 - (void)setFillPatternTransition:(MGLTransition )transition {

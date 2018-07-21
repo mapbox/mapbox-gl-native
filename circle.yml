@@ -322,6 +322,10 @@ jobs:
           name: Android code generation
           command: scripts/nitpick/generated-code.js android
           when: always
+      - run:
+          name: Vendored packages
+          command: scripts/nitpick/vendoring.js
+          when: always
 
 
 # ------------------------------------------------------------------------------

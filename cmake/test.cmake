@@ -1,3 +1,5 @@
+add_vendor_target(gtest STATIC)
+
 if (MBGL_TEST_TARGET_TYPE STREQUAL "library")
     add_library(mbgl-test SHARED
         ${MBGL_TEST_FILES}
@@ -24,13 +26,13 @@ target_include_directories(mbgl-test
 
 target_link_libraries(mbgl-test
     PRIVATE mbgl-core
+    PRIVATE gtest
 )
 
 target_add_mason_package(mbgl-test PRIVATE geometry)
 target_add_mason_package(mbgl-test PRIVATE variant)
 target_add_mason_package(mbgl-test PRIVATE unique_resource)
 target_add_mason_package(mbgl-test PRIVATE rapidjson)
-target_add_mason_package(mbgl-test PRIVATE gtest)
 target_add_mason_package(mbgl-test PRIVATE pixelmatch)
 target_add_mason_package(mbgl-test PRIVATE boost)
 target_add_mason_package(mbgl-test PRIVATE geojson)

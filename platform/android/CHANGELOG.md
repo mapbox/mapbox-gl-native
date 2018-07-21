@@ -2,6 +2,9 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## master
+  - Token string syntax (`"{token}"`) in `SymbolLayer` `textField` and `iconImage` property values is now correctly converted to the appropriate expression equivalent. ([#11659](https://github.com/mapbox/mapbox-gl-native/issues/11659))
+
 ## 6.3.0 - July 18, 2018
  - Harden map events creation [#12406](https://github.com/mapbox/mapbox-gl-native/pull/12406)
 

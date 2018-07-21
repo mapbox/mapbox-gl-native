@@ -17,14 +17,20 @@ std::unique_ptr<SymbolSizeBinder> SymbolSizeBinder::create(const float tileZoom,
                                                     const style::DataDrivenPropertyValue<float>& sizeProperty,
                                                     const float defaultValue) {
     return sizeProperty.match(
-        [&] (const style::CompositeFunction<float>& function) -> std::unique_ptr<SymbolSizeBinder> {
-            return std::make_unique<CompositeFunctionSymbolSizeBinder>(tileZoom, function, defaultValue);
-        },
-        [&] (const style::SourceFunction<float>& function) {
-            return std::make_unique<SourceFunctionSymbolSizeBinder>(tileZoom, function, defaultValue);
-        },
-        [&] (const auto& value) -> std::unique_ptr<SymbolSizeBinder> {
+        [&] (const Undefined& value) -> std::unique_ptr<SymbolSizeBinder> {
             return std::make_unique<ConstantSymbolSizeBinder>(tileZoom, value, defaultValue);
+        },
+        [&] (float value) -> std::unique_ptr<SymbolSizeBinder> {
+            return std::make_unique<ConstantSymbolSizeBinder>(tileZoom, value, defaultValue);
+        },
+        [&] (const style::PropertyExpression<float>& expression) -> std::unique_ptr<SymbolSizeBinder> {
+            if (expression.isFeatureConstant()) {
+                return std::make_unique<ConstantSymbolSizeBinder>(tileZoom, expression, defaultValue);
+            } else if (expression.isZoomConstant()) {
+                return std::make_unique<SourceFunctionSymbolSizeBinder>(tileZoom, expression, defaultValue);
+            } else {
+                return std::make_unique<CompositeFunctionSymbolSizeBinder>(tileZoom, expression, defaultValue);
+            }
         }
     );
 }

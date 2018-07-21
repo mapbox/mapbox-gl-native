@@ -60,6 +60,10 @@ custom_categories:
     children:
       - MGLCalloutView
       - MGLCalloutViewDelegate
+  - name: Location Updates
+    children:
+      - MGLLocationManager
+      - MGLLocationManagerDelegate
   - name: Styling the Map
     children:
       - MGLStyle

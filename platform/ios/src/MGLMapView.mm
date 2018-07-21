@@ -73,6 +73,7 @@
 #import "MGLAnnotationContainerView_Private.h"
 #import "MGLAttributionInfo_Private.h"
 #import "MGLMapAccessibilityElement.h"
+#import "MGLLocationManager_Private.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -184,7 +185,7 @@ public:
 
 @interface MGLMapView () <UIGestureRecognizerDelegate,
                           GLKViewDelegate,
-                          CLLocationManagerDelegate,
+                          MGLLocationManagerDelegate,
                           MGLSMCalloutViewDelegate,
                           MGLCalloutViewDelegate,
                           MGLMultiPointDelegate,
@@ -225,7 +226,6 @@ public:
 
 /// Indicates how thoroughly the map view is tracking the user location.
 @property (nonatomic) MGLUserTrackingState userTrackingState;
-@property (nonatomic) CLLocationManager *locationManager;
 @property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
 @property (nonatomic) CGFloat quickZoomStart;
@@ -694,6 +694,9 @@ public:
     
     [self.attributionButtonConstraints removeAllObjects];
     self.attributionButtonConstraints = nil;
+    
+    self.locationManager.delegate = nil;
+    self.locationManager = nil;
 }
 
 - (void)setDelegate:(nullable id<MGLMapViewDelegate>)delegate
@@ -4687,15 +4690,29 @@ public:
 
 #pragma mark - User Location -
 
+- (void)setLocationManager:(id<MGLLocationManager>)locationManager
+{
+    if (!locationManager) {
+        [self.locationManager stopUpdatingLocation];
+        [self.locationManager stopUpdatingHeading];
+    }
+    self.locationManager.delegate = nil;
+    _locationManager = locationManager;
+    _locationManager.delegate = self;
+}
+
 - (void)validateLocationServices
 {
     BOOL shouldEnableLocationServices = self.showsUserLocation && !self.dormant;
 
-    if (shouldEnableLocationServices && ! self.locationManager)
+    if (shouldEnableLocationServices)
     {
-        self.locationManager = [[CLLocationManager alloc] init];
+        // If no custom location manager is provided will use the internal implementation.
+        if (!self.locationManager) {
+            self.locationManager = [[MGLCLLocationManager alloc] init];
+        }
 
-        if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined)
+        if (self.locationManager.authorizationStatus == kCLAuthorizationStatusNotDetermined)
         {
             BOOL requiresWhenInUseUsageDescription = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){11,0,0}];
             BOOL hasWhenInUseUsageDescription = !![[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"];
@@ -4735,8 +4752,6 @@ public:
     {
         [self.locationManager stopUpdatingLocation];
         [self.locationManager stopUpdatingHeading];
-        self.locationManager.delegate = nil;
-        self.locationManager = nil;
     }
 }
 
@@ -4966,12 +4981,12 @@ public:
     }
 }
 
-- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+- (void)locationManager:(id<MGLLocationManager>)manager didUpdateLocations:(NSArray *)locations
 {
     [self locationManager:manager didUpdateLocations:locations animated:YES];
 }
 
-- (void)locationManager:(__unused CLLocationManager *)manager didUpdateLocations:(NSArray *)locations animated:(BOOL)animated
+- (void)locationManager:(__unused id<MGLLocationManager>)manager didUpdateLocations:(NSArray *)locations animated:(BOOL)animated
 {
     CLLocation *oldLocation = self.userLocation.location;
     CLLocation *newLocation = locations.lastObject;
@@ -5198,16 +5213,21 @@ public:
     return direction;
 }
 
-- (BOOL)locationManagerShouldDisplayHeadingCalibration:(CLLocationManager *)manager
+- (BOOL)locationManagerShouldDisplayHeadingCalibration:(id<MGLLocationManager>)manager
 {
-    if (self.displayHeadingCalibration) [manager performSelector:@selector(dismissHeadingCalibrationDisplay)
-                                                      withObject:nil
+    if (self.displayHeadingCalibration) [self performSelector:@selector(dismissHeadingCalibrationDisplay:)
+                                                      withObject:manager
                                                       afterDelay:10.0];
 
     return self.displayHeadingCalibration;
 }
 
-- (void)locationManager:(__unused CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading
+- (void)dismissHeadingCalibrationDisplay:(id<MGLLocationManager>)manager
+{
+    [manager dismissHeadingCalibrationDisplay];
+}
+
+- (void)locationManager:(__unused id<MGLLocationManager>)manager didUpdateHeading:(CLHeading *)newHeading
 {
     if ( ! _showsUserLocation || self.pan.state == UIGestureRecognizerStateBegan || newHeading.headingAccuracy < 0) return;
 
@@ -5234,7 +5254,7 @@ public:
     }
 }
 
-- (void)locationManager:(__unused CLLocationManager *)manager didFailWithError:(NSError *)error
+- (void)locationManager:(__unused id<MGLLocationManager>)manager didFailWithError:(NSError *)error
 {
     if ([error code] == kCLErrorDenied)
     {

@@ -86,7 +86,7 @@ public:
         
         mbgl::style::conversion::Error valueError;
         auto value = mbgl::style::conversion::convert<MBGLValue>(
-            mbgl::style::conversion::makeConvertible(jsonExpression), valueError);
+            mbgl::style::conversion::makeConvertible(jsonExpression), valueError, false);
         if (!value) {
             [NSException raise:NSInvalidArgumentException
                         format:@"Invalid property value: %@", @(valueError.message.c_str())];
@@ -332,15 +332,7 @@ private: // Private utilities for converting from mbgl to mgl values
             return [NSExpression expressionForConstantValue:constantValue];
         }
 
-        NSExpression *operator()(const mbgl::style::CameraFunction<MBGLType> &mbglValue) const {
-            return [NSExpression expressionWithMGLJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
-        }
-
-        NSExpression *operator()(const mbgl::style::SourceFunction<MBGLType> &mbglValue) const {
-            return [NSExpression expressionWithMGLJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
-        }
-
-        NSExpression *operator()(const mbgl::style::CompositeFunction<MBGLType> &mbglValue) const {
+        NSExpression *operator()(const mbgl::style::PropertyExpression<MBGLType> &mbglValue) const {
             return [NSExpression expressionWithMGLJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
         }
     };

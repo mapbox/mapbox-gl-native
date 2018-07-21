@@ -82,9 +82,9 @@ TEST(Stringify, Filter) {
     ASSERT_EQ(stringify(Filter(eq(literal("a"), literal("b")))), "[\"==\",\"a\",\"b\"]");
 }
 
-TEST(Stringify, CameraFunction) {
+TEST(Stringify, PropertyExpression) {
     using namespace mbgl::style::expression::dsl;
-    ASSERT_EQ(stringify(CameraFunction<float>(
+    ASSERT_EQ(stringify(PropertyExpression<float>(
         interpolate(
             linear(),
             zoom(),
@@ -92,11 +92,8 @@ TEST(Stringify, CameraFunction) {
             1.0, literal(2.0)
         ))),
         "[\"interpolate\",[\"linear\"],[\"zoom\"],0.0,1.0,1.0,2.0]");
-}
 
-TEST(Stringify, SourceFunction) {
-    using namespace mbgl::style::expression::dsl;
-    ASSERT_EQ(stringify(SourceFunction<float>(
+    ASSERT_EQ(stringify(PropertyExpression<float>(
         interpolate(
             exponential(2.0),
             number(get("property")),
@@ -104,11 +101,8 @@ TEST(Stringify, SourceFunction) {
             1.0, literal(2.0)
         ))),
         "[\"interpolate\",[\"exponential\",2.0],[\"number\",[\"get\",\"property\"]],0.0,1.0,1.0,2.0]");
-}
 
-TEST(Stringify, CompositeFunction) {
-    using namespace mbgl::style::expression::dsl;
-    ASSERT_EQ(stringify(CompositeFunction<float>(
+    ASSERT_EQ(stringify(PropertyExpression<float>(
         interpolate(
             linear(),
             zoom(),
@@ -125,7 +119,7 @@ TEST(Stringify, CompositeFunction) {
 TEST(Stringify, PropertyValue) {
     using namespace mbgl::style::expression::dsl;
     ASSERT_EQ(stringify(PropertyValue<float>(1)), "1.0");
-    ASSERT_EQ(stringify(PropertyValue<float>(CameraFunction<float>(
+    ASSERT_EQ(stringify(PropertyValue<float>(PropertyExpression<float>(
         interpolate(
             exponential(2.0),
             zoom(),

@@ -222,6 +222,14 @@ namespace mbgl {
 - (void)setIconImageName:(NSExpression *)iconImageName {
     MGLAssertStyleLayerIsValid();
 
+    if (iconImageName && iconImageName.expressionType == NSConstantValueExpressionType) {
+        std::string string = ((NSString *)iconImageName.constantValue).UTF8String;
+        if (mbgl::style::conversion::hasTokens(string)) {
+            self.rawLayer->setIconImage(mbgl::style::DataDrivenPropertyValue<std::string>(
+                mbgl::style::conversion::convertTokenStringToExpression(string)));
+            return;
+        }
+    }
     auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::DataDrivenPropertyValue<std::string>>(iconImageName);
     self.rawLayer->setIconImage(mbglValue);
 }
@@ -233,8 +241,7 @@ namespace mbgl {
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefaultIconImage();
     }
-    NSExpression *expression = MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
-    return expression.mgl_expressionByReplacingTokensWithKeyPaths;
+    return MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
 }
 
 - (void)setIconImage:(NSExpression *)iconImage {
@@ -568,6 +575,14 @@ namespace mbgl {
 - (void)setText:(NSExpression *)text {
     MGLAssertStyleLayerIsValid();
 
+    if (text && text.expressionType == NSConstantValueExpressionType) {
+        std::string string = ((NSString *)text.constantValue).UTF8String;
+        if (mbgl::style::conversion::hasTokens(string)) {
+            self.rawLayer->setTextField(mbgl::style::DataDrivenPropertyValue<std::string>(
+                mbgl::style::conversion::convertTokenStringToExpression(string)));
+            return;
+        }
+    }
     auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::DataDrivenPropertyValue<std::string>>(text);
     self.rawLayer->setTextField(mbglValue);
 }
@@ -579,8 +594,7 @@ namespace mbgl {
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefaultTextField();
     }
-    NSExpression *expression = MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
-    return expression.mgl_expressionByReplacingTokensWithKeyPaths;
+    return MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
 }
 
 - (void)setTextField:(NSExpression *)textField {

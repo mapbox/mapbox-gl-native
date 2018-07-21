@@ -121,6 +121,16 @@ namespace mbgl {
 - (void)set<%- camelize(property.name) %>:(NSExpression *)<%- objCName(property) %> {
     MGLAssertStyleLayerIsValid();
 
+<% if (property.tokens) { -%>
+    if (<%- objCName(property) %> && <%- objCName(property) %>.expressionType == NSConstantValueExpressionType) {
+        std::string string = ((NSString *)<%- objCName(property) %>.constantValue).UTF8String;
+        if (mbgl::style::conversion::hasTokens(string)) {
+            self.rawLayer->set<%- camelize(originalPropertyName(property)) %>(mbgl::style::DataDrivenPropertyValue<std::string>(
+                mbgl::style::conversion::convertTokenStringToExpression(string)));
+            return;
+        }
+    }
+<% } -%>
 <% if (isDataDriven(property)) { -%>
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue<mbgl::style::DataDrivenPropertyValue<<%- valueTransformerArguments(property)[0] %>>>(<%- objCName(property) %>);
 <% } else { -%>
@@ -136,12 +146,7 @@ namespace mbgl {
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefault<%- camelize(originalPropertyName(property)) %>();
     }
-<% if (property.type === 'string') { -%>
-    NSExpression *expression = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toExpression(propertyValue);
-    return expression.mgl_expressionByReplacingTokensWithKeyPaths;
-<% } else { -%>
     return MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toExpression(propertyValue);
-<% } -%>
 }
 
 <% if (property.original) { -%>
@@ -183,12 +188,7 @@ namespace mbgl {
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefault<%- camelize(originalPropertyName(property)) %>();
     }
-<% if (property.type === 'string') { -%>
-    NSExpression *expression = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toExpression(propertyValue);
-    return expression.mgl_expressionByReplacingTokensWithKeyPaths;
-<% } else { -%>
     return MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toExpression(propertyValue);
-<% } -%>
 }
 <% if (property["transition"]) { -%>
 

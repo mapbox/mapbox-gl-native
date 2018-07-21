@@ -154,10 +154,7 @@ public:
                 [&] (const T& t) {
                     return t;
                 },
-                [&] (const SourceFunction<T>& t) {
-                    return t.evaluate(feature, defaultValue);
-                },
-                [&] (const CompositeFunction<T>& t) {
+                [&] (const PropertyExpression<T>& t) {
                     return t.evaluate(z, feature, defaultValue);
                 });
         }
