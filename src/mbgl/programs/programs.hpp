@@ -49,24 +49,6 @@ public:
           clippingMask(context, programParameters) {
     }
 
-    // We are periodically removing old Program objects from our cache to prevent them from piling up.
-    void evictNotUsedSince(const size_t frameID) {
-        circle.evictNotUsedSince(frameID);
-        fill.evictNotUsedSince(frameID);
-        fillExtrusion.evictNotUsedSince(frameID);
-        fillExtrusionPattern.evictNotUsedSince(frameID);
-        fillPattern.evictNotUsedSince(frameID);
-        fillOutline.evictNotUsedSince(frameID);
-        fillOutlinePattern.evictNotUsedSince(frameID);
-        heatmap.evictNotUsedSince(frameID);
-        line.evictNotUsedSince(frameID);
-        lineSDF.evictNotUsedSince(frameID);
-        linePattern.evictNotUsedSince(frameID);
-        symbolIcon.evictNotUsedSince(frameID);
-        symbolIconSDF.evictNotUsedSince(frameID);
-        symbolGlyph.evictNotUsedSince(frameID);
-    }
-
     BackgroundProgram background;
     BackgroundPatternProgram backgroundPattern;
     ProgramMap<CircleProgram> circle;

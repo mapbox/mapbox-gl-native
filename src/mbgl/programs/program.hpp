@@ -113,37 +113,22 @@ public:
           parameters(std::move(parameters_)) {
     }
 
-    Program& get(size_t frameID, const typename PaintProperties::PossiblyEvaluated& currentProperties) {
+    Program& get(const typename PaintProperties::PossiblyEvaluated& currentProperties) {
         Bitset bits = PaintPropertyBinders::constants(currentProperties);
         auto it = programs.find(bits);
         if (it != programs.end()) {
-            std::get<size_t>(it->second) = frameID;
-            return std::get<Program>(it->second);
+            return it->second;
         }
-        return std::get<Program>(
-            programs.emplace(std::piecewise_construct,
-                std::forward_as_tuple(bits),
-                std::forward_as_tuple<Program, size_t>(
-                    { context, parameters.withAdditionalDefines(PaintPropertyBinders::defines(currentProperties)) },
-                    std::move(frameID)
-                )).first->second);
-    }
-
-    // We are periodically removing old Program objects from our cache to prevent them from piling up.
-    void evictNotUsedSince(const size_t frameID) {
-        for (auto it = programs.begin(); it != programs.end();) {
-            if (std::get<size_t>(it->second) < frameID) {
-                programs.erase(it++);
-            } else {
-                ++it;
-            }
-        }
+        return programs.emplace(std::piecewise_construct,
+                                std::forward_as_tuple(bits),
+                                std::forward_as_tuple(context,
+                                    parameters.withAdditionalDefines(PaintPropertyBinders::defines(currentProperties)))).first->second;
     }
 
 private:
     gl::Context& context;
     ProgramParameters parameters;
-    std::unordered_map<Bitset, std::tuple<Program, size_t>> programs;
+    std::unordered_map<Bitset, Program> programs;
 };
 
 } // namespace mbgl

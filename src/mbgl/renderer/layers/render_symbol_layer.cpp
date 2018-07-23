@@ -88,7 +88,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          const auto& binders,
                          const auto& paintProperties)
         {
-            auto& programInstance = program.get(parameters.frameID, paintProperties);
+            auto& programInstance = program.get(paintProperties);
 
             const auto allUniformValues = programInstance.computeAllUniformValues(
                 std::move(uniformValues),

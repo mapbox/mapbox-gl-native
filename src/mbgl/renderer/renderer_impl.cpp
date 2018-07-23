@@ -256,7 +256,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         backend.getContext(),
         pixelRatio,
         contextMode,
-        frameCount++,
         backend,
         updateParameters,
         renderLight.getEvaluated(),

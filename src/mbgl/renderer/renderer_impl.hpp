@@ -98,7 +98,6 @@ private:
     RenderState renderState = RenderState::Never;
     ZoomHistory zoomHistory;
     TransformState transformState;
-    size_t frameCount = 0;
 
     std::unique_ptr<GlyphManager> glyphManager;
     std::unique_ptr<ImageManager> imageManager;

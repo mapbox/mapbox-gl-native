@@ -61,7 +61,7 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
 
         const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
-        auto& programInstance = parameters.programs.circle.get(parameters.frameID, evaluated);
+        auto& programInstance = parameters.programs.circle.get(evaluated);
    
         const auto allUniformValues = programInstance.computeAllUniformValues(
             CircleProgram::UniformValues {

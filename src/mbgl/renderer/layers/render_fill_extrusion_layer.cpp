@@ -105,7 +105,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                     *reinterpret_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl));
 
                 draw(
-                    parameters.programs.fillExtrusion.get(parameters.frameID, evaluated),
+                    parameters.programs.fillExtrusion.get(evaluated),
                     bucket,
                     FillExtrusionUniforms::values(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
@@ -134,7 +134,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                     *reinterpret_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl));
 
                 draw(
-                    parameters.programs.fillExtrusionPattern.get(parameters.frameID, evaluated),
+                    parameters.programs.fillExtrusionPattern.get(evaluated),
                     bucket,
                     FillExtrusionPatternUniforms::values(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
