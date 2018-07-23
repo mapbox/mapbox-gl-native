@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,6 +42,31 @@ public class MapboxTest {
     assertNotNull(Mapbox.getApplicationContext());
     assertNotEquals(context, appContext);
     assertEquals(appContext, appContext);
+  }
+
+  @Test
+  public void testPkTokenValid() {
+    assertTrue(Mapbox.isAccessTokenValid("pk.0000000001"));
+  }
+
+  @Test
+  public void testSkTokenValid() {
+    assertTrue(Mapbox.isAccessTokenValid("sk.0000000001"));
+  }
+
+  @Test
+  public void testEmptyToken() {
+    assertFalse(Mapbox.isAccessTokenValid(""));
+  }
+
+  @Test
+  public void testNullToken() {
+    assertFalse(Mapbox.isAccessTokenValid(null));
+  }
+
+  @Test
+  public void testBlaBlaToken() {
+    assertFalse(Mapbox.isAccessTokenValid("blabla"));
   }
 
   @Test

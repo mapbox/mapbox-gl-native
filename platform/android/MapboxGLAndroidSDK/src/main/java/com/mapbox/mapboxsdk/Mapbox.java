@@ -7,7 +7,6 @@ import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-import android.text.TextUtils;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.mapboxsdk.maps.Telemetry;
@@ -138,8 +137,12 @@ public final class Mapbox {
    * @param accessToken the access token to validate
    * @return true is valid, false otherwise
    */
-  private static boolean isAccessTokenValid(String accessToken) {
-    return !(TextUtils.isEmpty(accessToken)
-      || (!accessToken.toLowerCase(MapboxConstants.MAPBOX_LOCALE).startsWith("pk.")));
+  static boolean isAccessTokenValid(String accessToken) {
+    if (accessToken == null) {
+      return false;
+    }
+
+    accessToken = accessToken.trim().toLowerCase(MapboxConstants.MAPBOX_LOCALE);
+    return accessToken.length() != 0 && (accessToken.startsWith("pk.") || accessToken.startsWith("sk."));
   }
 }
