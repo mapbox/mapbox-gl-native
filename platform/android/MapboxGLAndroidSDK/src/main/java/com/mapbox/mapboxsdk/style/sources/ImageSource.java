@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -33,6 +34,7 @@ public class ImageSource extends Source {
    *
    * @param nativePtr - pointer to native peer
    */
+  @Keep
   public ImageSource(long nativePtr) {
     super(nativePtr);
   }
@@ -141,16 +143,22 @@ public class ImageSource extends Source {
     nativeSetCoordinates(latLngQuad);
   }
 
+  @Keep
   protected native void initialize(String layerId, LatLngQuad payload);
 
+  @Keep
   protected native void nativeSetUrl(String url);
 
+  @Keep
   protected native String nativeGetUrl();
 
+  @Keep
   protected native void nativeSetImage(Bitmap bitmap);
 
+  @Keep
   protected native void nativeSetCoordinates(LatLngQuad latLngQuad);
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 }

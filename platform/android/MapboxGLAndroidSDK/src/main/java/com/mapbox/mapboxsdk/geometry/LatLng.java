@@ -4,6 +4,7 @@ import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.FloatRange;
+import android.support.annotation.Keep;
 
 import com.mapbox.mapboxsdk.constants.GeometryConstants;
 
@@ -35,7 +36,9 @@ public class LatLng implements ILatLng, Parcelable {
     }
   };
 
+  @Keep
   private double latitude;
+  @Keep
   private double longitude;
   private double altitude = 0.0;
 
@@ -53,6 +56,7 @@ public class LatLng implements ILatLng, Parcelable {
    * @param latitude  Latitude in degrees
    * @param longitude Longitude in degrees
    */
+  @Keep
   public LatLng(double latitude, double longitude) {
     setLatitude(latitude);
     setLongitude(longitude);

@@ -3,6 +3,7 @@
 package com.mapbox.mapboxsdk.style.light;
 
 import android.support.annotation.ColorInt;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 
@@ -19,6 +20,7 @@ import com.mapbox.mapboxsdk.utils.ThreadUtils;
 @UiThread
 public class Light {
 
+  @Keep
   private long nativePtr;
 
   /**
@@ -26,6 +28,7 @@ public class Light {
    *
    * @param nativePtr pointer used by core
    */
+  @Keep
   public Light(long nativePtr) {
     checkThread();
     this.nativePtr = nativePtr;
@@ -185,18 +188,39 @@ public class Light {
     ThreadUtils.checkThread("Light");
   }
 
+  @Keep
   private native void nativeSetAnchor(String anchor);
+
+  @Keep
   private native String nativeGetAnchor();
+  @Keep
   private native void nativeSetPosition(Position position);
+
+  @Keep
   private native Position nativeGetPosition();
+  @Keep
   private native TransitionOptions nativeGetPositionTransition();
+
+  @Keep
   private native void nativeSetPositionTransition(long duration, long delay);
+  @Keep
   private native void nativeSetColor(String color);
+
+  @Keep
   private native String nativeGetColor();
+  @Keep
   private native TransitionOptions nativeGetColorTransition();
+
+  @Keep
   private native void nativeSetColorTransition(long duration, long delay);
+  @Keep
   private native void nativeSetIntensity(float intensity);
+
+  @Keep
   private native float nativeGetIntensity();
+  @Keep
   private native TransitionOptions nativeGetIntensityTransition();
+
+  @Keep
   private native void nativeSetIntensityTransition(long duration, long delay);
 }

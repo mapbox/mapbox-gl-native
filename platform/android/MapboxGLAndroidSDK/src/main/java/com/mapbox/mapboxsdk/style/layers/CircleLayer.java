@@ -3,6 +3,7 @@
 package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.ColorInt;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -26,6 +27,7 @@ public class CircleLayer extends Layer {
    *
    * @param nativePtr pointer used by core
    */
+  @Keep
   public CircleLayer(long nativePtr) {
     super(nativePtr);
   }
@@ -41,6 +43,7 @@ public class CircleLayer extends Layer {
     initialize(layerId, sourceId);
   }
 
+  @Keep
   protected native void initialize(String layerId, String sourceId);
 
   /**
@@ -439,61 +442,89 @@ public class CircleLayer extends Layer {
     nativeSetCircleStrokeOpacityTransition(options.getDuration(), options.getDelay());
   }
 
+  @Keep
   private native Object nativeGetCircleRadius();
 
+  @Keep
   private native TransitionOptions nativeGetCircleRadiusTransition();
 
+  @Keep
   private native void nativeSetCircleRadiusTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetCircleColor();
 
+  @Keep
   private native TransitionOptions nativeGetCircleColorTransition();
 
+  @Keep
   private native void nativeSetCircleColorTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetCircleBlur();
 
+  @Keep
   private native TransitionOptions nativeGetCircleBlurTransition();
 
+  @Keep
   private native void nativeSetCircleBlurTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetCircleOpacity();
 
+  @Keep
   private native TransitionOptions nativeGetCircleOpacityTransition();
 
+  @Keep
   private native void nativeSetCircleOpacityTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetCircleTranslate();
 
+  @Keep
   private native TransitionOptions nativeGetCircleTranslateTransition();
 
+  @Keep
   private native void nativeSetCircleTranslateTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetCircleTranslateAnchor();
 
+  @Keep
   private native Object nativeGetCirclePitchScale();
 
+  @Keep
   private native Object nativeGetCirclePitchAlignment();
 
+  @Keep
   private native Object nativeGetCircleStrokeWidth();
 
+  @Keep
   private native TransitionOptions nativeGetCircleStrokeWidthTransition();
 
+  @Keep
   private native void nativeSetCircleStrokeWidthTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetCircleStrokeColor();
 
+  @Keep
   private native TransitionOptions nativeGetCircleStrokeColorTransition();
 
+  @Keep
   private native void nativeSetCircleStrokeColorTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetCircleStrokeOpacity();
 
+  @Keep
   private native TransitionOptions nativeGetCircleStrokeOpacityTransition();
 
+  @Keep
   private native void nativeSetCircleStrokeOpacityTransition(long duration, long delay);
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
 }

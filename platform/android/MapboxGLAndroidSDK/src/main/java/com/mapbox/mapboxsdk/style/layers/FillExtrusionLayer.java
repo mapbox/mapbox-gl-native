@@ -3,6 +3,7 @@
 package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.ColorInt;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -26,6 +27,7 @@ public class FillExtrusionLayer extends Layer {
    *
    * @param nativePtr pointer used by core
    */
+  @Keep
   public FillExtrusionLayer(long nativePtr) {
     super(nativePtr);
   }
@@ -41,6 +43,7 @@ public class FillExtrusionLayer extends Layer {
     initialize(layerId, sourceId);
   }
 
+  @Keep
   protected native void initialize(String layerId, String sourceId);
 
   /**
@@ -338,45 +341,65 @@ public class FillExtrusionLayer extends Layer {
     nativeSetFillExtrusionBaseTransition(options.getDuration(), options.getDelay());
   }
 
+  @Keep
   private native Object nativeGetFillExtrusionOpacity();
 
+  @Keep
   private native TransitionOptions nativeGetFillExtrusionOpacityTransition();
 
+  @Keep
   private native void nativeSetFillExtrusionOpacityTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetFillExtrusionColor();
 
+  @Keep
   private native TransitionOptions nativeGetFillExtrusionColorTransition();
 
+  @Keep
   private native void nativeSetFillExtrusionColorTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetFillExtrusionTranslate();
 
+  @Keep
   private native TransitionOptions nativeGetFillExtrusionTranslateTransition();
 
+  @Keep
   private native void nativeSetFillExtrusionTranslateTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetFillExtrusionTranslateAnchor();
 
+  @Keep
   private native Object nativeGetFillExtrusionPattern();
 
+  @Keep
   private native TransitionOptions nativeGetFillExtrusionPatternTransition();
 
+  @Keep
   private native void nativeSetFillExtrusionPatternTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetFillExtrusionHeight();
 
+  @Keep
   private native TransitionOptions nativeGetFillExtrusionHeightTransition();
 
+  @Keep
   private native void nativeSetFillExtrusionHeightTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetFillExtrusionBase();
 
+  @Keep
   private native TransitionOptions nativeGetFillExtrusionBaseTransition();
 
+  @Keep
   private native void nativeSetFillExtrusionBaseTransition(long duration, long delay);
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
 }

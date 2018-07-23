@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.LibraryLoader;
@@ -31,6 +32,7 @@ public class OfflineManager {
   }
 
   // Native peer pointer
+  @Keep
   private long nativePtr;
 
   // Reference to the file source to keep it alive for the
@@ -51,6 +53,7 @@ public class OfflineManager {
    * This callback receives an asynchronous response containing a list of all
    * OfflineRegion in the database or an error message otherwise.
    */
+  @Keep
   public interface ListOfflineRegionsCallback {
     /**
      * Receives the list of offline regions.
@@ -71,6 +74,7 @@ public class OfflineManager {
    * This callback receives an asynchronous response containing the newly created
    * OfflineRegion in the database or an error message otherwise.
    */
+  @Keep
   public interface CreateOfflineRegionCallback {
     /**
      * Receives the newly created offline region.
@@ -249,15 +253,20 @@ public class OfflineManager {
    *
    * @param limit the new tile count limit.
    */
+  @Keep
   public native void setOfflineMapboxTileCountLimit(long limit);
 
+  @Keep
   private native void initialize(FileSource fileSource);
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
+  @Keep
   private native void listOfflineRegions(FileSource fileSource, ListOfflineRegionsCallback callback);
 
+  @Keep
   private native void createOfflineRegion(FileSource fileSource, OfflineRegionDefinition definition,
                                           byte[] metadata, CreateOfflineRegionCallback callback);
 

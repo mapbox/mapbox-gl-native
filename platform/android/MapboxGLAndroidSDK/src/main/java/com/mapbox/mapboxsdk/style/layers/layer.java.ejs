@@ -8,6 +8,7 @@
 package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.ColorInt;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -31,6 +32,7 @@ public class <%- camelize(type) %>Layer extends Layer {
    *
    * @param nativePtr pointer used by core
    */
+  @Keep
   public <%- camelize(type) %>Layer(long nativePtr) {
     super(nativePtr);
   }
@@ -46,6 +48,7 @@ public class <%- camelize(type) %>Layer extends Layer {
     initialize(layerId);
   }
 
+  @Keep
   protected native void initialize(String layerId);
 
 <% } else { -%>
@@ -60,6 +63,7 @@ public class <%- camelize(type) %>Layer extends Layer {
     initialize(layerId, sourceId);
   }
 
+  @Keep
   protected native void initialize(String layerId, String sourceId);
 
   /**
@@ -201,16 +205,20 @@ public class <%- camelize(type) %>Layer extends Layer {
 <% } -%>
 
 <% for (const property of properties) { -%>
+  @Keep
   private native Object nativeGet<%- camelize(property.name) %>();
 
 <% if (property.transition) { -%>
+  @Keep
   private native TransitionOptions nativeGet<%- camelize(property.name) %>Transition();
 
+  @Keep
   private native void nativeSet<%- camelize(property.name) %>Transition(long duration, long delay);
 
 <% } -%>
 <% } -%>
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
 }

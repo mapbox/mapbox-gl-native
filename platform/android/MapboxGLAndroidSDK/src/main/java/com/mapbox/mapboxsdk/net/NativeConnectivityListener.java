@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.net;
 
+import android.support.annotation.Keep;
+
 import com.mapbox.mapboxsdk.LibraryLoader;
 
 /**
@@ -11,9 +13,12 @@ class NativeConnectivityListener implements ConnectivityListener {
     LibraryLoader.load();
   }
 
+  @Keep
   private long nativePtr;
+  @Keep
   private boolean invalidated;
 
+  @Keep
   NativeConnectivityListener(long nativePtr) {
     this.nativePtr = nativePtr;
   }
@@ -27,10 +32,13 @@ class NativeConnectivityListener implements ConnectivityListener {
     nativeOnConnectivityStateChanged(connected);
   }
 
+  @Keep
   protected native void nativeOnConnectivityStateChanged(boolean connected);
 
+  @Keep
   protected native void initialize();
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 }

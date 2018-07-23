@@ -3,6 +3,7 @@
 package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.ColorInt;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -26,6 +27,7 @@ public class FillLayer extends Layer {
    *
    * @param nativePtr pointer used by core
    */
+  @Keep
   public FillLayer(long nativePtr) {
     super(nativePtr);
   }
@@ -41,6 +43,7 @@ public class FillLayer extends Layer {
     initialize(layerId, sourceId);
   }
 
+  @Keep
   protected native void initialize(String layerId, String sourceId);
 
   /**
@@ -335,41 +338,59 @@ public class FillLayer extends Layer {
     nativeSetFillPatternTransition(options.getDuration(), options.getDelay());
   }
 
+  @Keep
   private native Object nativeGetFillAntialias();
 
+  @Keep
   private native Object nativeGetFillOpacity();
 
+  @Keep
   private native TransitionOptions nativeGetFillOpacityTransition();
 
+  @Keep
   private native void nativeSetFillOpacityTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetFillColor();
 
+  @Keep
   private native TransitionOptions nativeGetFillColorTransition();
 
+  @Keep
   private native void nativeSetFillColorTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetFillOutlineColor();
 
+  @Keep
   private native TransitionOptions nativeGetFillOutlineColorTransition();
 
+  @Keep
   private native void nativeSetFillOutlineColorTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetFillTranslate();
 
+  @Keep
   private native TransitionOptions nativeGetFillTranslateTransition();
 
+  @Keep
   private native void nativeSetFillTranslateTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetFillTranslateAnchor();
 
+  @Keep
   private native Object nativeGetFillPattern();
 
+  @Keep
   private native TransitionOptions nativeGetFillPatternTransition();
 
+  @Keep
   private native void nativeSetFillPatternTransition(long duration, long delay);
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
 }

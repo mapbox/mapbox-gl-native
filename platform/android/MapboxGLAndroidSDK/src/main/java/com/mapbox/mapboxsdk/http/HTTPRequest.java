@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.http;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.os.Build;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
@@ -48,9 +49,11 @@ class HTTPRequest implements Callback {
   // Reentrancy is not needed, but "Lock" is an abstract class.
   private ReentrantLock lock = new ReentrantLock();
   private String userAgentString;
+  @Keep
   private long nativePtr = 0;
   private Call call;
 
+  @Keep
   private HTTPRequest(long nativePtr, String resourceUrl, String etag, String modified) {
     this.nativePtr = nativePtr;
 
@@ -62,6 +65,7 @@ class HTTPRequest implements Callback {
     executeRequest(resourceUrl, etag, modified);
   }
 
+  @Keep
   public void cancel() {
     // call can be null if the constructor gets aborted (e.g, under a NoRouteToHostException).
     if (call != null) {
@@ -266,8 +270,10 @@ class HTTPRequest implements Callback {
     }
   }
 
+  @Keep
   private native void nativeOnFailure(int type, String message);
 
+  @Keep
   private native void nativeOnResponse(int code, String etag, String modified, String cacheControl, String expires,
                                        String retryAfter, String xRateLimitReset, byte[] body);
 }

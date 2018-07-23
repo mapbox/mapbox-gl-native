@@ -1,5 +1,8 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.support.annotation.Keep;
+
+@Keep
 class Image {
   private final byte[] buffer;
   private final float pixelRatio;

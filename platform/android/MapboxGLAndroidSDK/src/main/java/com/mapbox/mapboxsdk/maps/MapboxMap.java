@@ -15,6 +15,7 @@ import android.support.v4.util.Pools;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.android.gestures.RotateGestureDetector;
@@ -44,10 +45,11 @@ import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.Source;
-import timber.log.Timber;
 
 import java.util.HashMap;
 import java.util.List;
+
+import timber.log.Timber;
 
 /**
  * The general class to interact with in the Android Mapbox SDK. It exposes the entry point for all
@@ -827,7 +829,7 @@ public final class MapboxMap {
   public final void animateCamera(@NonNull final CameraUpdate update, final int durationMs,
                                   @Nullable final MapboxMap.CancelableCallback callback) {
     if (durationMs <= 0) {
-      throw new IllegalArgumentException("Null duration passed into animageCamera");
+      throw new IllegalArgumentException("Null duration passed into animateCamera");
     }
 
     transform.animateCamera(MapboxMap.this, update, durationMs, callback);
@@ -1138,7 +1140,9 @@ public final class MapboxMap {
    * @param markerOptions A marker options object that defines how to render the marker
    * @return The {@code Marker} that was added to the map
    * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
-   * SDK views to be used as a symbol see https://github.com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
+   * SDK views to be used as a symbol see https://github
+   * .com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android
+   * /MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
    */
   @NonNull
   @Deprecated
@@ -1157,7 +1161,9 @@ public final class MapboxMap {
    * @param onMarkerViewAddedListener Callback invoked when the View has been added to the map
    * @return The {@code Marker} that was added to the map
    * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
-   * SDK views to be used as a symbol see https://github.com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
+   * SDK views to be used as a symbol see https://github
+   * .com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android
+   * /MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
    */
   @Deprecated
   @NonNull
@@ -1176,7 +1182,9 @@ public final class MapboxMap {
    * @param markerViewOptions A list of markerView options objects that defines how to render the markers
    * @return A list of the {@code MarkerView}s that were added to the map
    * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
-   * SDK views to be used as a symbol see https://github.com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
+   * SDK views to be used as a symbol see https://github
+   * .com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android
+   * /MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
    */
   @NonNull
   @Deprecated
@@ -1191,7 +1199,9 @@ public final class MapboxMap {
    * @param rect the rectangular area on the map to query for markerViews
    * @return A list of the markerViews that were found in the rectangle
    * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
-   * SDK views to be used as a symbol see https://github.com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
+   * SDK views to be used as a symbol see https://github
+   * .com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android
+   * /MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
    */
   @NonNull
   @Deprecated
@@ -2625,7 +2635,9 @@ public final class MapboxMap {
    *
    * @param <U> the instance type of MarkerView
    * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
-   * SDK views to be used as a symbol see https://github.com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
+   * SDK views to be used as a symbol see https://github
+   * .com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android
+   * /MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
    */
   @Deprecated
   public abstract static class MarkerViewAdapter<U extends MarkerView> {

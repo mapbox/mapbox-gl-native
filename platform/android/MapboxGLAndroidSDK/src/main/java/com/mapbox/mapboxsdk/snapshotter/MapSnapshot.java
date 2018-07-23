@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.snapshotter;
 
 import android.graphics.Bitmap;
 import android.graphics.PointF;
+import android.support.annotation.Keep;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
@@ -12,6 +13,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
  */
 public class MapSnapshot {
 
+  @Keep
   private long nativePtr = 0;
   private Bitmap bitmap;
   private String[] attributions;
@@ -20,6 +22,7 @@ public class MapSnapshot {
   /**
    * Created from native side
    */
+  @Keep
   private MapSnapshot(long nativePtr, Bitmap bitmap, String[] attributions, boolean showLogo) {
     this.nativePtr = nativePtr;
     this.bitmap = bitmap;
@@ -40,6 +43,7 @@ public class MapSnapshot {
    * @param latLng the geographical coordinates
    * @return the point on the image
    */
+  @Keep
   public native PointF pixelForLatLng(LatLng latLng);
 
   /**
@@ -48,6 +52,7 @@ public class MapSnapshot {
    * @param pointF the point in pixels
    * @return the geographical coordinates
    */
+  @Keep
   public native LatLng latLngForPixel(PointF pointF);
 
   /**
@@ -65,7 +70,9 @@ public class MapSnapshot {
   }
 
   // Unused, needed for peer binding
+  @Keep
   private native void initialize();
 
+  @Keep
   protected native void finalize();
 }

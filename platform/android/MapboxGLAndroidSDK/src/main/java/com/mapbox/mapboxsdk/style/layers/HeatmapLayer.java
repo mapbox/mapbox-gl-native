@@ -3,6 +3,7 @@
 package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.ColorInt;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -26,6 +27,7 @@ public class HeatmapLayer extends Layer {
    *
    * @param nativePtr pointer used by core
    */
+  @Keep
   public HeatmapLayer(long nativePtr) {
     super(nativePtr);
   }
@@ -41,6 +43,7 @@ public class HeatmapLayer extends Layer {
     initialize(layerId, sourceId);
   }
 
+  @Keep
   protected native void initialize(String layerId, String sourceId);
 
   /**
@@ -256,29 +259,41 @@ public class HeatmapLayer extends Layer {
     nativeSetHeatmapOpacityTransition(options.getDuration(), options.getDelay());
   }
 
+  @Keep
   private native Object nativeGetHeatmapRadius();
 
+  @Keep
   private native TransitionOptions nativeGetHeatmapRadiusTransition();
 
+  @Keep
   private native void nativeSetHeatmapRadiusTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetHeatmapWeight();
 
+  @Keep
   private native Object nativeGetHeatmapIntensity();
 
+  @Keep
   private native TransitionOptions nativeGetHeatmapIntensityTransition();
 
+  @Keep
   private native void nativeSetHeatmapIntensityTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetHeatmapColor();
 
+  @Keep
   private native Object nativeGetHeatmapOpacity();
 
+  @Keep
   private native TransitionOptions nativeGetHeatmapOpacityTransition();
 
+  @Keep
   private native void nativeSetHeatmapOpacityTransition(long duration, long delay);
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
 }
