@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.annotations;
 
+import android.support.annotation.Keep;
+
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.ArrayList;
@@ -10,7 +12,9 @@ import java.util.List;
  */
 public abstract class BasePointCollection extends Annotation {
 
+  @Keep
   private List<LatLng> points;
+  @Keep
   private float alpha = 1.0f;
 
   protected BasePointCollection() {

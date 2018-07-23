@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.style.sources;
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Size;
@@ -26,6 +27,7 @@ public class VectorSource extends Source {
    *
    * @param nativePtr - pointer to native peer
    */
+  @Keep
   public VectorSource(long nativePtr) {
     super(nativePtr);
   }
@@ -88,13 +90,17 @@ public class VectorSource extends Source {
     return nativeGetUrl();
   }
 
+  @Keep
   protected native void initialize(String layerId, Object payload);
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
+  @Keep
   protected native String nativeGetUrl();
 
+  @Keep
   private native Feature[] querySourceFeatures(String[] sourceLayerId,
                                                Object[] filter);
 

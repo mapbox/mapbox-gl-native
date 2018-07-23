@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.style.sources;
 
+import android.support.annotation.Keep;
+
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
 
 /**
@@ -7,6 +9,7 @@ import com.mapbox.mapboxsdk.utils.ThreadUtils;
  */
 public abstract class Source {
 
+  @Keep
   private long nativePtr;
 
   /**
@@ -14,6 +17,7 @@ public abstract class Source {
    *
    * @param nativePtr - pointer to native peer
    */
+  @Keep
   public Source(long nativePtr) {
     checkThread();
     this.nativePtr = nativePtr;
@@ -62,7 +66,9 @@ public abstract class Source {
     return nativePtr;
   }
 
+  @Keep
   protected native String nativeGetId();
 
+  @Keep
   protected native String nativeGetAttribution();
 }

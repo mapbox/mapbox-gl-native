@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.style.layers;
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
 import com.google.gson.JsonElement;
@@ -11,9 +12,12 @@ import com.mapbox.mapboxsdk.utils.ThreadUtils;
  */
 public abstract class Layer {
 
+  @Keep
   private long nativePtr;
+  @Keep
   private boolean invalidated;
 
+  @Keep
   public Layer(long nativePtr) {
     checkThread();
     this.nativePtr = nativePtr;
@@ -77,30 +81,43 @@ public abstract class Layer {
   }
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
+  @Keep
   protected native String nativeGetId();
 
+  @Keep
   protected native Object nativeGetVisibility();
 
+  @Keep
   protected native void nativeSetLayoutProperty(String name, Object value);
 
+  @Keep
   protected native void nativeSetPaintProperty(String name, Object value);
 
+  @Keep
   protected native void nativeSetFilter(Object[] filter);
 
+  @Keep
   protected native JsonElement nativeGetFilter();
 
+  @Keep
   protected native void nativeSetSourceLayer(String sourceLayer);
 
+  @Keep
   protected native String nativeGetSourceLayer();
 
+  @Keep
   protected native float nativeGetMinZoom();
 
+  @Keep
   protected native float nativeGetMaxZoom();
 
+  @Keep
   protected native void nativeSetMinZoom(float zoom);
 
+  @Keep
   protected native void nativeSetMaxZoom(float zoom);
 
   public long getNativePtr() {

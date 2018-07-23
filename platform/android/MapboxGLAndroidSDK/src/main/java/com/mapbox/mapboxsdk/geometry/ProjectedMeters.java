@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.geometry;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Keep;
 
 /**
  * ProjectedMeters is a projection of longitude, latitude points in Mercator meters.
@@ -35,6 +36,7 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable {
    * @param northing the northing in meters
    * @param easting  the easting in meters
    */
+  @Keep
   public ProjectedMeters(double northing, double easting) {
     this.northing = northing;
     this.easting = easting;

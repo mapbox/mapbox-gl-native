@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.style.sources;
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -108,17 +109,23 @@ public class CustomGeometrySource extends Source {
     return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
   }
 
+  @Keep
   protected native void initialize(String sourceId, Object options);
 
+  @Keep
   private native Feature[] querySourceFeatures(Object[] filter);
 
+  @Keep
   private native void nativeSetTileData(int z, int x, int y, FeatureCollection data);
 
+  @Keep
   private native void nativeInvalidateTile(int z, int x, int y);
 
+  @Keep
   private native void nativeInvalidateBounds(LatLngBounds bounds);
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
   private void setTileData(TileID tileId, FeatureCollection data) {
@@ -127,6 +134,7 @@ public class CustomGeometrySource extends Source {
   }
 
   @WorkerThread
+  @Keep
   private void fetchTile(int z, int x, int y) {
     AtomicBoolean cancelFlag = new AtomicBoolean(false);
     TileID tileID = new TileID(z, x, y);
@@ -136,6 +144,7 @@ public class CustomGeometrySource extends Source {
   }
 
   @WorkerThread
+  @Keep
   private void cancelTile(int z, int x, int y) {
     AtomicBoolean cancelFlag = cancelledTileRequests.get(new TileID(z, x, y));
     if (cancelFlag != null) {

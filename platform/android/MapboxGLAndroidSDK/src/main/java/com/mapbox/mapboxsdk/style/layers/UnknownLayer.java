@@ -1,11 +1,13 @@
 package com.mapbox.mapboxsdk.style.layers;
 
+import android.support.annotation.Keep;
 import android.support.annotation.UiThread;
 
 /**
  * An unknown type of layer
  */
 @UiThread
+@Keep
 public class UnknownLayer extends Layer {
 
   /**

@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.style.sources;
 
+import android.support.annotation.Keep;
 import android.support.annotation.Nullable;
 
 import java.net.URL;
@@ -17,6 +18,7 @@ public class RasterSource extends Source {
    *
    * @param nativePtr - pointer to native peer
    */
+  @Keep
   public RasterSource(long nativePtr) {
     super(nativePtr);
   }
@@ -87,11 +89,14 @@ public class RasterSource extends Source {
     return nativeGetUrl();
   }
 
+  @Keep
   protected native void initialize(String layerId, Object payload, int tileSize);
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
+  @Keep
   protected native String nativeGetUrl();
 
 }

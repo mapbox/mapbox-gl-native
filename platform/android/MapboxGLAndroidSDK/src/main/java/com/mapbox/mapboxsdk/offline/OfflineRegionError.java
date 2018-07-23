@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.offline;
 
+import android.support.annotation.Keep;
 import android.support.annotation.StringDef;
 
 import java.lang.annotation.Retention;
@@ -34,7 +35,7 @@ public class OfflineRegionError {
   private final String message;
 
   // Constructors
-
+  @Keep
   private OfflineRegionError(String reason, String message) {
     // For JNI use only
     this.reason = reason;

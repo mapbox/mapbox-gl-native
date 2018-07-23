@@ -21,7 +21,8 @@ ext {
             timber         : '4.7.1',
             okhttp         : '3.11.0',
             kotlin         : '1.2.51',
-            licenses       : '0.8.41'
+            licenses       : '0.8.41',
+            lint           : '26.1.3'
     ]
 
     dependenciesList = [
@@ -57,6 +58,11 @@ ext {
 
             kotlinLib             : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}",
             kotlinPlugin          : "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
-            licensesPlugin        : "com.jaredsburrows:gradle-license-plugin:${versions.licenses}"
+            licensesPlugin        : "com.jaredsburrows:gradle-license-plugin:${versions.licenses}",
+
+            lint                  : "com.android.tools.lint:lint:${versions.lint}",
+            lintApi               : "com.android.tools.lint:lint-api:${versions.lint}",
+            lintChecks            : "com.android.tools.lint:lint-checks:${versions.lint}",
+            lintTests            : "com.android.tools.lint:lint-tests:${versions.lint}"
     ]
 }

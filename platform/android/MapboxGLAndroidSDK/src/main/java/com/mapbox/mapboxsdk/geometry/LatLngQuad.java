@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.geometry;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Keep;
 
 /**
  * A geographical area representing a non-aligned quadrilateral
@@ -11,15 +12,20 @@ import android.os.Parcelable;
  */
 public class LatLngQuad implements Parcelable {
 
+  @Keep
   private final LatLng topLeft;
+  @Keep
   private final LatLng topRight;
+  @Keep
   private final LatLng bottomRight;
+  @Keep
   private final LatLng bottomLeft;
 
   /**
    * Construct a new LatLngQuad based on its corners,
    * in order top left, top right, bottom left, bottom right
    */
+  @Keep
   public LatLngQuad(final LatLng topLeft, final LatLng topRight, final LatLng bottomRight, final LatLng bottomLeft) {
     this.topLeft = topLeft;
     this.topRight = topRight;
