@@ -142,7 +142,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
         }
     } else {
         for (const RenderTile& tile : renderTiles) {
-            auto bucket_ = dynamic_cast<RasterBucket*>(tile.tile.getBucket(*baseImpl));
+            auto bucket_ = tile.tile.getBucket<RasterBucket>(*baseImpl);
             if (!bucket_) {
                 continue;
             }

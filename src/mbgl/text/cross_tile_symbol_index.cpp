@@ -178,7 +178,7 @@ bool CrossTileSymbolIndex::addLayer(RenderSymbolLayer& symbolLayer, float lng) {
             continue;
         }
 
-        auto bucket = dynamic_cast<SymbolBucket*>(renderTile.tile.getBucket(*symbolLayer.baseImpl));
+        auto bucket = renderTile.tile.getBucket<SymbolBucket>(*symbolLayer.baseImpl);
         if (!bucket) {
             continue;
         }

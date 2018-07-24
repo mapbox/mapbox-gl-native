@@ -20,7 +20,8 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
                            bool sortFeaturesByY_,
                            const std::string bucketName_,
                            const std::vector<SymbolInstance>&& symbolInstances_)
-    : layout(std::move(layout_)),
+    : Bucket(LayerType::Symbol),
+      layout(std::move(layout_)),
       sdfIcons(sdfIcons_),
       iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
       sortFeaturesByY(sortFeaturesByY_),

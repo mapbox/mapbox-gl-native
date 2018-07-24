@@ -100,7 +100,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
 
         if (evaluated.get<FillExtrusionPattern>().from.empty()) {
             for (const RenderTile& tile : renderTiles) {
-                auto bucket_ = dynamic_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl));
+                auto bucket_ = tile.tile.getBucket<FillExtrusionBucket>(*baseImpl);
                 if (!bucket_) {
                     continue;
                 }
@@ -131,7 +131,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             parameters.imageManager.bind(parameters.context, 0);
 
             for (const RenderTile& tile : renderTiles) {
-                auto bucket_ = dynamic_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl));
+                auto bucket_ = tile.tile.getBucket<FillExtrusionBucket>(*baseImpl);
                 if (!bucket_) {
                     continue;
                 }

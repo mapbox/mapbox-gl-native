@@ -27,7 +27,8 @@ using namespace style;
 
 struct GeometryTooLongException : std::exception {};
 
-FillBucket::FillBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) {
+FillBucket::FillBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers)
+    : Bucket(LayerType::Fill) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,

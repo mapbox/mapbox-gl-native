@@ -34,7 +34,8 @@ using namespace style;
 
 struct GeometryTooLongException : std::exception {};
 
-FillExtrusionBucket::FillExtrusionBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) {
+FillExtrusionBucket::FillExtrusionBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers)
+    : Bucket(LayerType::FillExtrusion) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(std::piecewise_construct,
                                      std::forward_as_tuple(layer->getID()),

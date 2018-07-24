@@ -7,12 +7,14 @@ namespace mbgl {
 
 using namespace style;
 
-RasterBucket::RasterBucket(PremultipliedImage&& image_) {
-    image = std::make_shared<PremultipliedImage>(std::move(image_));
+RasterBucket::RasterBucket(PremultipliedImage&& image_)
+    : Bucket(LayerType::Raster),
+      image(std::make_shared<PremultipliedImage>(std::move(image_))) {
 }
 
-RasterBucket::RasterBucket(std::shared_ptr<PremultipliedImage> image_): image(image_) {
-
+RasterBucket::RasterBucket(std::shared_ptr<PremultipliedImage> image_)
+    : Bucket(LayerType::Raster),
+      image(image_) {
 }
 
 void RasterBucket::upload(gl::Context& context) {

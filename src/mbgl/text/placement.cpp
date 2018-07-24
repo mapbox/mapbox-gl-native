@@ -51,7 +51,7 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
         assert(dynamic_cast<GeometryTile*>(&renderTile.tile));
         GeometryTile& geometryTile = static_cast<GeometryTile&>(renderTile.tile);
 
-        auto bucket = dynamic_cast<SymbolBucket*>(geometryTile.getBucket(*symbolLayer.baseImpl));
+        auto bucket = renderTile.tile.getBucket<SymbolBucket>(*symbolLayer.baseImpl);
         if (!bucket) {
             continue;
         }
@@ -232,7 +232,7 @@ void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer) {
             continue;
         }
 
-        auto bucket = dynamic_cast<SymbolBucket*>(renderTile.tile.getBucket(*symbolLayer.baseImpl));
+        auto bucket = renderTile.tile.getBucket<SymbolBucket>(*symbolLayer.baseImpl);
         if (!bucket) {
             continue;
         }
