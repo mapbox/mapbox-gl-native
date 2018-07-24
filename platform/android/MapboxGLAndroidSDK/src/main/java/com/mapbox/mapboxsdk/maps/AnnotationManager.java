@@ -25,7 +25,7 @@ import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
+import com.mapbox.mapboxsdk.log.Logger;
 
 /**
  * Responsible for managing and tracking state of Annotations linked to Map. All events related to
@@ -369,7 +369,9 @@ class AnnotationManager {
   }
 
   private void logNonAdded(Annotation annotation) {
-    Timber.w("Attempting to update non-added %s with value %s", annotation.getClass().getCanonicalName(), annotation);
+    Logger.w(String.format("Attempting to update non-added %s with value %s",
+      annotation.getClass().getCanonicalName(), annotation)
+    );
   }
 
   //

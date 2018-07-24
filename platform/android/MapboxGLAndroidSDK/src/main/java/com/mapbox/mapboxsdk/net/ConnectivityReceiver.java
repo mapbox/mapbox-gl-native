@@ -15,7 +15,7 @@ import com.mapbox.mapboxsdk.Mapbox;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import timber.log.Timber;
+import com.mapbox.mapboxsdk.log.Logger;
 
 /**
  * Interface definition for a callback to be invoked when connectivity changes.
@@ -84,7 +84,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
   @Override
   public void onReceive(Context context, Intent intent) {
     boolean connected = isConnected(context);
-    Timber.v("Connected: %s", connected);
+    Logger.v(String.format("Connected: %s", connected));
 
     // Loop over listeners
     for (ConnectivityListener listener : listeners) {

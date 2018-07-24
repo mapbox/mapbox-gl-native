@@ -18,7 +18,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import timber.log.Timber;
+import com.mapbox.mapboxsdk.log.Logger;
 
 import javax.net.ssl.SSLException;
 import java.io.IOException;
@@ -227,7 +227,7 @@ class HTTPRequest implements Callback {
 
   private void log(int type, String errorMessage) {
     if (logEnabled) {
-      Timber.log(type, errorMessage);
+      Logger.log(type, errorMessage);
     }
   }
 

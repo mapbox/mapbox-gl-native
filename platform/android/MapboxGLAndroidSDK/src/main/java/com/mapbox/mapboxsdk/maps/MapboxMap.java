@@ -44,7 +44,7 @@ import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.Source;
-import timber.log.Timber;
+import com.mapbox.mapboxsdk.log.Logger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -293,7 +293,7 @@ public final class MapboxMap {
       // noinspection unchecked
       return (T) nativeMapView.getLayer(layerId);
     } catch (ClassCastException exception) {
-      Timber.e(exception, "Layer: %s is a different type: ", layerId);
+      Logger.e(String.format("Layer: %s is a different type: ", layerId), exception);
       return null;
     }
   }
@@ -405,7 +405,7 @@ public final class MapboxMap {
       // noinspection unchecked
       return (T) nativeMapView.getSource(sourceId);
     } catch (ClassCastException exception) {
-      Timber.e(exception, "Source: %s is a different type: ", sourceId);
+      Logger.e(String.format("Source: %s is a different type: ", sourceId), exception);
       return null;
     }
   }
@@ -1462,7 +1462,7 @@ public final class MapboxMap {
    */
   public void selectMarker(@NonNull Marker marker) {
     if (marker == null) {
-      Timber.w("marker was null, so just returning");
+      Logger.w("marker was null, so just returning");
       return;
     }
     annotationManager.selectMarker(marker);

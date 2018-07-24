@@ -11,11 +11,13 @@ dependencies {
     }
     implementation dependenciesList.supportAnnotations
     implementation dependenciesList.supportFragmentV4
-    implementation dependenciesList.timber
     implementation dependenciesList.okhttp3
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
     testImplementation dependenciesList.robolectric
+
+    // todo remove timber with next SemVer
+    implementation dependenciesList.timber
 }
 
 android {

@@ -14,7 +14,7 @@ import com.mapbox.mapboxsdk.storage.FileSource;
 
 import java.io.File;
 
-import timber.log.Timber;
+import com.mapbox.mapboxsdk.log.Logger;
 
 /**
  * The offline manager is the main entry point for offline-related functionality.
@@ -109,10 +109,10 @@ public class OfflineManager {
           File file = new File(path);
           if (file.exists()) {
             file.delete();
-            Timber.d("Old ambient cache database deleted to save space: %s", path);
+            Logger.d(String.format("Old ambient cache database deleted to save space: %s", path));
           }
         } catch (Exception exception) {
-          Timber.e(exception, "Failed to delete old ambient cache database: ");
+          Logger.e("Failed to delete old ambient cache database: ", exception);
         }
       }
     }).start();
