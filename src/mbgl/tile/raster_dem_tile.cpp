@@ -15,7 +15,7 @@ namespace mbgl {
 RasterDEMTile::RasterDEMTile(const OverscaledTileID& id_,
                        const TileParameters& parameters,
                        const Tileset& tileset)
-    : Tile(id_),
+    : Tile(Kind::RasterDEM, id_),
       loader(*this, id_, parameters, tileset),
       mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
       worker(parameters.workerScheduler,

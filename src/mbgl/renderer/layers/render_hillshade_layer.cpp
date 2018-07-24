@@ -59,8 +59,8 @@ bool RenderHillshadeLayer::hasTransition() const {
 void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src) {
     if (parameters.pass != RenderPass::Translucent && parameters.pass != RenderPass::Pass3D)
         return;
-    
-    RenderRasterDEMSource* demsrc = dynamic_cast<RenderRasterDEMSource*>(src);
+
+    RenderRasterDEMSource* demsrc = static_cast<RenderRasterDEMSource*>(src);
     const uint8_t TERRAIN_RGB_MAXZOOM = 15;
     const uint8_t maxzoom = demsrc != nullptr ? demsrc->getMaxZoom() : TERRAIN_RGB_MAXZOOM;
 
