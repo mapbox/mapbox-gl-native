@@ -4,12 +4,32 @@ require('flow-remove-types/register');
 
 const path = require('path');
 const outputPath = 'src/mbgl/shaders';
+const zlib = require('zlib');
 
 var shaders = require('../mapbox-gl-js/src/shaders');
 
 delete shaders.lineGradient;
 
 require('./style-code');
+
+function compressedData(src) {
+    return zlib.deflateSync(src, {level: zlib.Z_BEST_COMPRESSION})
+        .toString('hex')
+        .match(/.{1,16}/g)
+        .map(line => line.match(/.{1,2}/g).map(n => `0x${n}`).join(', '))
+        .join(',\n        ')
+        .trim();
+}
+
+function compressedConstant(data) {
+    return `[] () {
+    static const uint8_t compressed[] = {
+        ${compressedData(data)}
+    };
+    static std::string decompressed = util::decompress(std::string(reinterpret_cast<const char*>(compressed), sizeof(compressed)));
+    return decompressed.c_str();
+}()`
+}
 
 writeIfModified(path.join(outputPath, 'preludes.hpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
@@ -28,16 +48,15 @@ extern const char* fragmentPrelude;
 writeIfModified(path.join(outputPath, 'preludes.cpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/shaders/preludes.hpp>
+#include <mbgl/util/compression.hpp>
+
+#include <cstdint>
 
 namespace mbgl {
 namespace shaders {
 
-const char* vertexPrelude = R"MBGL_SHADER(
-${shaders.prelude.vertexSource}
-)MBGL_SHADER";
-const char* fragmentPrelude = R"MBGL_SHADER(
-${shaders.prelude.fragmentSource}
-)MBGL_SHADER";
+const char* vertexPrelude = ${compressedConstant(shaders.prelude.vertexSource)};
+const char* fragmentPrelude = ${compressedConstant(shaders.prelude.fragmentSource)};
 
 } // namespace shaders
 } // namespace mbgl
@@ -70,17 +89,16 @@ public:
     writeIfModified(path.join(outputPath, `${shaderName}.cpp`), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/shaders/${shaderName}.hpp>
+#include <mbgl/util/compression.hpp>
+
+#include <cstdint>
 
 namespace mbgl {
 namespace shaders {
 
 const char* ${shaderName}::name = "${shaderName}";
-const char* ${shaderName}::vertexSource = R"MBGL_SHADER(
-${shaders[key].vertexSource}
-)MBGL_SHADER";
-const char* ${shaderName}::fragmentSource = R"MBGL_SHADER(
-${shaders[key].fragmentSource}
-)MBGL_SHADER";
+const char* ${shaderName}::vertexSource = ${compressedConstant(shaders[key].vertexSource)};
+const char* ${shaderName}::fragmentSource = ${compressedConstant(shaders[key].fragmentSource)};
 
 } // namespace shaders
 } // namespace mbgl
