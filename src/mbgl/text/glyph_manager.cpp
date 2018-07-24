@@ -5,6 +5,7 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/tiny_sdf.hpp>
+#include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 
@@ -19,6 +20,10 @@ GlyphManager::GlyphManager(FileSource& fileSource_, std::unique_ptr<LocalGlyphRa
 GlyphManager::~GlyphManager() = default;
 
 void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphDependencies) {
+    if(glyphURL.empty()) {
+        Log::Error(Event::Style, "getGlyph : no glyphURL available, returning");
+        return;
+    }
     auto dependencies = std::make_shared<GlyphDependencies>(std::move(glyphDependencies));
 
     // Figure out which glyph ranges need to be fetched. For each range that does need to
