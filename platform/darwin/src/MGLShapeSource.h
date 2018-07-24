@@ -24,7 +24,7 @@ typedef NSString *MGLShapeSourceOption NS_STRING_ENUM;
  This option only affects point features within an `MGLShapeSource` object; it
  is ignored when creating an `MGLComputedShapeSource` object.
  */
-extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClustered;
+FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClustered;
 
 /**
  An `NSNumber` object containing an integer; specifies the radius of each
@@ -34,7 +34,7 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClustered;
  This option only affects point features within an `MGLShapeSource` object; it
  is ignored when creating an `MGLComputedShapeSource` object.
  */
-extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
+FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
 
 /**
  An `NSNumber` object containing an integer; specifies the maximum zoom level at
@@ -49,7 +49,7 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
  This option only affects point features within an `MGLShapeSource` object; it
  is ignored when creating an `MGLComputedShapeSource` object.
  */
-extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevelForClustering;
+FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevelForClustering;
 
 /**
  An `NSNumber` object containing an integer; specifies the minimum zoom level at
@@ -59,7 +59,7 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLeve
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-minzoom"><code>minzoom</code></a>
  source property in the Mapbox Style Specification.
  */
-extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMinimumZoomLevel;
+FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMinimumZoomLevel;
 
 /**
  An `NSNumber` object containing an integer; specifies the maximum zoom level at
@@ -70,7 +70,7 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMinimumZoomLeve
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-maxzoom"><code>maxzoom</code></a>
  source property in the Mapbox Style Specification.
  */
-extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevel;
+FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevel;
 
 /**
  An `NSNumber` object containing an integer; specifies the size of the tile
@@ -82,7 +82,7 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLeve
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-buffer"><code>buffer</code></a>
  source property in the Mapbox Style Specification.
  */
-extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionBuffer;
+FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionBuffer;
 
 /**
  An `NSNumber` object containing a double; specifies the Douglas-Peucker
@@ -93,7 +93,7 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionBuffer;
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-tolerance"><code>tolerance</code></a>
  source property in the Mapbox Style Specification.
  */
-extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
+FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
 
 /**
  `MGLShapeSource` is a map content source that supplies vector shapes to be

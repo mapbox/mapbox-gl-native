@@ -79,6 +79,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-extern NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects);
+FOUNDATION_EXTERN NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects);
 
 NS_ASSUME_NONNULL_END

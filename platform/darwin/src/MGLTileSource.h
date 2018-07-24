@@ -25,7 +25,7 @@ typedef NSString *MGLTileSourceOption NS_STRING_ENUM;
  <a href="https://github.com/mapbox/tilejson-spec/tree/master/2.1.0">TileJSON</a>
  specification.
  */
-extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMinimumZoomLevel;
+FOUNDATION_EXTERN MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMinimumZoomLevel;
 
 /**
  An `NSNumber` object containing an unsigned integer that specifies the maximum
@@ -39,7 +39,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMinimumZoomLevel;
  <a href="https://github.com/mapbox/tilejson-spec/tree/master/2.1.0">TileJSON</a>
  specification.
  */
-extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel;
+FOUNDATION_EXTERN MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel;
 
 /**
  An `NSValue` object containing an `MGLCoordinateBounds` struct that specifies
@@ -53,7 +53,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel;
  <a href="https://github.com/mapbox/tilejson-spec/tree/master/2.1.0">TileJSON</a>
  specification.
  */
-extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionCoordinateBounds;
+FOUNDATION_EXTERN MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionCoordinateBounds;
 
 #if TARGET_OS_IPHONE
 /**
@@ -69,7 +69,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionCoordinateBounds;
  <a href="https://github.com/mapbox/tilejson-spec/tree/master/2.1.0">TileJSON</a>
  specification.
  */
-extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString;
+FOUNDATION_EXTERN MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString;
 
 /**
  An array of `MGLAttributionInfo` objects defining the buttons to be displayed
@@ -78,7 +78,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLSt
 
  By default, no attribution statements are displayed.
  */
-extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
+FOUNDATION_EXTERN MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
 #else
 /**
  An HTML string defining the buttons to be displayed in the map view’s
@@ -92,7 +92,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
  <a href="https://github.com/mapbox/tilejson-spec/tree/master/2.1.0">TileJSON</a>
  specification.
  */
-extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString;
+FOUNDATION_EXTERN MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString;
 
 /**
  An array of `MGLAttributionInfo` objects defining the buttons to be displayed
@@ -101,7 +101,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLSt
 
  By default, no attribution statements are displayed.
  */
-extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
+FOUNDATION_EXTERN MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
 #endif
 
 /**
@@ -115,7 +115,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
  <a href="https://github.com/mapbox/tilejson-spec/tree/master/2.1.0">TileJSON</a>
  specification.
  */
-extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem;
+FOUNDATION_EXTERN MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem;
 
 /**
  Tile coordinate systems that determine how tile coordinates in tile URLs are

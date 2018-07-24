@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 
 /** Indicates an error occurred in the Mapbox SDK. */
-extern MGL_EXPORT NSErrorDomain const MGLErrorDomain;
+FOUNDATION_EXTERN MGL_EXPORT NSErrorDomain const MGLErrorDomain;
 
 /** Error constants for the Mapbox SDK. */
 typedef NS_ENUM(NSInteger, MGLErrorCode) {

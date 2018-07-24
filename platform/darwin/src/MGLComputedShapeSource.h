@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  This option is used with the `MGLComputedShapeSource` class; it is ignored when
  creating an `MGLShapeSource` object.
  */
-extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionWrapsCoordinates;
+FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionWrapsCoordinates;
 
 /**
  An `NSNumber` object containing a Boolean value; specifies whether the shape of
@@ -30,7 +30,7 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionWrapsCoordinate
  This option is used with the `MGLComputedShapeSource` class; it is ignored when
  creating an `MGLShapeSource` object.
  */
-extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClipsCoordinates;
+FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClipsCoordinates;
 
 /**
  Data source for `MGLComputedShapeSource`. This protocol defines two optional methods for fetching

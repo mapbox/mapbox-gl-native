@@ -18,7 +18,7 @@ typedef NSString *MGLExpressionInterpolationMode NS_TYPED_ENUM;
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate"><code>interpolate</code></a>
  expression operator in the Mapbox Style Specification.
  */
-extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolationModeLinear;
+FOUNDATION_EXTERN MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolationModeLinear;
 
 /**
  An `NSString` identifying the `expotential` interpolation type in an `NSExpression`.
@@ -27,7 +27,7 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate"><code>interpolate</code></a>
  expression operator in the Mapbox Style Specification.
  */
-extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolationModeExponential;
+FOUNDATION_EXTERN MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolationModeExponential;
 
 /**
  An `NSString` identifying the `cubic-bezier` interpolation type in an `NSExpression`.
@@ -36,7 +36,7 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate"><code>interpolate</code></a>
  expression operator in the Mapbox Style Specification.
  */
-extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier;
+FOUNDATION_EXTERN MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier;
 
 /**
  Methods for creating expressions that use Mapbox-specific functionality and for
