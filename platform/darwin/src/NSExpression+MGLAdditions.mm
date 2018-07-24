@@ -1220,7 +1220,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     NSDictionary<NSNumber *, NSExpression *> *stops = self.arguments[curveTypeIndex + 2].constantValue;
 
     if (stops.count == 0) {
-        [NSException raise:NSInvalidArgumentException format:@"‘stops‘ dictionary argument to ‘%@’ function must not be empty.", self.function];
+        [NSException raise:NSInvalidArgumentException format:@"‘stops’ dictionary argument to ‘%@’ function must not be empty.", self.function];
     }
 
     NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"interpolate", interpolationArray, nil];
@@ -1239,7 +1239,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     NSDictionary<NSNumber *, NSExpression *> *stops = self.arguments[minimumIndex + 1].constantValue;
 
     if (stops.count == 0) {
-        [NSException raise:NSInvalidArgumentException format:@"‘stops‘ dictionary argument to ‘%@’ function must not be empty.", self.function];
+        [NSException raise:NSInvalidArgumentException format:@"‘stops’ dictionary argument to ‘%@’ function must not be empty.", self.function];
     }
 
     NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"step", (isAftermarketFunction ? self.arguments.firstObject : self.operand).mgl_jsonExpressionObject, minimum, nil];
