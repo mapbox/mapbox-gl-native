@@ -4,7 +4,7 @@ namespace mbgl {
 namespace style {
 
 bool HeatmapLayer::Impl::hasLayoutDifference(const Layer::Impl& other) const {
-    assert(dynamic_cast<const HeatmapLayer::Impl*>(&other));
+    assert(other.type == LayerType::Heatmap);
     const auto& impl = static_cast<const style::HeatmapLayer::Impl&>(other);
     return filter     != impl.filter ||
            visibility != impl.visibility ||

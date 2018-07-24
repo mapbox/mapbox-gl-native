@@ -48,7 +48,7 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
         if (!renderTile.tile.isRenderable()) {
             continue;
         }
-        assert(dynamic_cast<GeometryTile*>(&renderTile.tile));
+        assert(renderTile.tile.kind == Tile::Kind::Geometry);
         GeometryTile& geometryTile = static_cast<GeometryTile&>(renderTile.tile);
 
         auto bucket = renderTile.tile.getBucket<SymbolBucket>(*symbolLayer.baseImpl);
