@@ -10,7 +10,6 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.http.HttpRequestUtil;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -52,7 +51,6 @@ public class LatLngBoundsActivity extends AppCompatActivity implements View.OnCl
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    HttpRequestUtil.setLogEnabled(false);
     setContentView(R.layout.activity_latlngbounds);
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
@@ -151,7 +149,6 @@ public class LatLngBoundsActivity extends AppCompatActivity implements View.OnCl
   protected void onDestroy() {
     super.onDestroy();
     mapView.onDestroy();
-    HttpRequestUtil.setLogEnabled(true);
   }
 
   @Override

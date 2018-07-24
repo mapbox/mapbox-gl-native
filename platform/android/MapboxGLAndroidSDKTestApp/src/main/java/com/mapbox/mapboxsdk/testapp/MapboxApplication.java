@@ -3,10 +3,11 @@ package com.mapbox.mapboxsdk.testapp;
 import android.app.Application;
 import android.os.StrictMode;
 import android.text.TextUtils;
+
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.maps.Telemetry;
 import com.mapbox.mapboxsdk.testapp.utils.TokenUtils;
 import com.squareup.leakcanary.LeakCanary;
+
 import timber.log.Timber;
 
 import static timber.log.Timber.DebugTree;
@@ -70,7 +71,7 @@ public class MapboxApplication extends Application {
     String accessToken = TokenUtils.getMapboxAccessToken(getApplicationContext());
     validateAccessToken(accessToken);
     Mapbox.getInstance(getApplicationContext(), accessToken);
-    Telemetry.updateDebugLoggingEnabled(true);
+    //TelemetryBase.updateDebugLoggingEnabled(true);
   }
 
   private static void validateAccessToken(String accessToken) {

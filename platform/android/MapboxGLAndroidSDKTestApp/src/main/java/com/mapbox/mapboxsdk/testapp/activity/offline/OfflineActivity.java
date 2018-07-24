@@ -70,7 +70,7 @@ public class OfflineActivity extends AppCompatActivity
 
     // You can use Mapbox.setConnected(Boolean) to manually set the connectivity
     // state of your app. This will override any checks performed via the ConnectivityManager.
-    // Mapbox.getInstance().setConnected(false);
+    // Mapbox.initialize().setConnected(false);
     Boolean connected = Mapbox.isConnected();
     Timber.d("Mapbox is connected: %s", connected);
 

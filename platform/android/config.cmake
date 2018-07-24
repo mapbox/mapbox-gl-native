@@ -73,6 +73,10 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/map/map_snapshotter.cpp
         PRIVATE platform/default/mbgl/map/map_snapshotter.hpp
         PRIVATE platform/linux/src/headless_backend_egl.cpp
+        
+        # Logger
+        PRIVATE platform/android/src/logger.cpp
+        PRIVATE platform/android/src/logger.hpp
     )
 
     target_include_directories(mbgl-core

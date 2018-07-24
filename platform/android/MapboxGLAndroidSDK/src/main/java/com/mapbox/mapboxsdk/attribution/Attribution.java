@@ -4,7 +4,7 @@ public class Attribution {
 
   private static final String OPENSTREETMAP = "OpenStreetMap";
   private static final String OPENSTREETMAP_ABBR = "OSM";
-  static final String TELEMETRY = "Telemetry Settings";
+  static final String TELEMETRY = "TelemetryBase Settings";
 
   static final String IMPROVE_MAP_URL = "https://www.mapbox.com/map-feedback/";
   static final String MAPBOX_URL = "https://www.mapbox.com/about/maps/";

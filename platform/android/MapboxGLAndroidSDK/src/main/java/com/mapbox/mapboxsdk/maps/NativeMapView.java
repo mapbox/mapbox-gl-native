@@ -23,6 +23,7 @@ import com.mapbox.mapboxsdk.exceptions.CalledFromWorkerThreadException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
@@ -32,7 +33,6 @@ import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
-import timber.log.Timber;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -44,6 +44,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 // Class that wraps the native methods for convenience
 final class NativeMapView {
+
+  private final static String TAG = "NativeMapView";
 
   //Hold a reference to prevent it from being GC'd as long as it's used on the native side
   private final FileSource fileSource;
@@ -109,9 +111,9 @@ final class NativeMapView {
 
     // validate if map has already been destroyed
     if (destroyed && !TextUtils.isEmpty(callingMethod)) {
-      Timber.e(
+      Logger.e(TAG, String.format(
         "You're calling `%s` after the `MapView` was destroyed, were you invoking it after `onDestroy()`?",
-        callingMethod
+        callingMethod)
       );
     }
     return destroyed;
@@ -149,15 +151,17 @@ final class NativeMapView {
 
     if (width > 65535) {
       // we have seen edge cases where devices return incorrect values #6111
-      Timber.e("Device returned an out of range width size, "
-        + "capping value at 65535 instead of %s", width);
+      Logger.e(TAG, String.format("Device returned an out of range width size, "
+        + "capping value at 65535 instead of %s", width)
+      );
       width = 65535;
     }
 
     if (height > 65535) {
       // we have seen edge cases where devices return incorrect values #6111
-      Timber.e("Device returned an out of range height size, "
-        + "capping value at 65535 instead of %s", height);
+      Logger.e(TAG, String.format("Device returned an out of range height size, "
+        + "capping value at 65535 instead of %s", height)
+      );
       height = 65535;
     }
 
@@ -899,7 +903,7 @@ final class NativeMapView {
       try {
         onMapChangedListener.onMapChanged(rawChange);
       } catch (RuntimeException err) {
-        Timber.e(err, "Exception in MapView.OnMapChangedListener");
+        Logger.e(TAG, "Exception in MapView.OnMapChangedListener", err);
       }
     }
   }
