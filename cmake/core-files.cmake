@@ -327,6 +327,8 @@ set(MBGL_CORE_FILES
     src/mbgl/shaders/raster.hpp
     src/mbgl/shaders/shaders.cpp
     src/mbgl/shaders/shaders.hpp
+    src/mbgl/shaders/source.cpp
+    src/mbgl/shaders/source.hpp
     src/mbgl/shaders/symbol_icon.cpp
     src/mbgl/shaders/symbol_icon.hpp
     src/mbgl/shaders/symbol_sdf.cpp
