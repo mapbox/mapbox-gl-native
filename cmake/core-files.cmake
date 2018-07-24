@@ -679,6 +679,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/logging.hpp
     include/mbgl/util/noncopyable.hpp
     include/mbgl/util/optional.hpp
+    include/mbgl/util/peer.hpp
     include/mbgl/util/platform.hpp
     include/mbgl/util/premultiply.hpp
     include/mbgl/util/projection.hpp
@@ -692,7 +693,6 @@ set(MBGL_CORE_FILES
     include/mbgl/util/traits.hpp
     include/mbgl/util/tuple.hpp
     include/mbgl/util/type_list.hpp
-    include/mbgl/util/unique_any.hpp
     include/mbgl/util/unitbezier.hpp
     include/mbgl/util/util.hpp
     include/mbgl/util/variant.hpp
