@@ -57,7 +57,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
     layout = leader.layout.evaluate(PropertyEvaluationParameters(zoom));
 
     if (layout.get<IconRotationAlignment>() == AlignmentType::Auto) {
-        if (layout.get<SymbolPlacement>() == SymbolPlacementType::Line) {
+        if (layout.get<SymbolPlacement>() != SymbolPlacementType::Point) {
             layout.get<IconRotationAlignment>() = AlignmentType::Map;
         } else {
             layout.get<IconRotationAlignment>() = AlignmentType::Viewport;
@@ -65,7 +65,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
     }
 
     if (layout.get<TextRotationAlignment>() == AlignmentType::Auto) {
-        if (layout.get<SymbolPlacement>() == SymbolPlacementType::Line) {
+        if (layout.get<SymbolPlacement>() != SymbolPlacementType::Point) {
             layout.get<TextRotationAlignment>() = AlignmentType::Map;
         } else {
             layout.get<TextRotationAlignment>() = AlignmentType::Viewport;
@@ -117,7 +117,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
             ft.text = applyArabicShaping(util::utf8_to_utf16::convert(u8string));
             const bool canVerticalizeText = layout.get<TextRotationAlignment>() == AlignmentType::Map
-                                         && layout.get<SymbolPlacement>() == SymbolPlacementType::Line
+                                         && layout.get<SymbolPlacement>() != SymbolPlacementType::Point
                                          && util::i18n::allowsVerticalWritingMode(*ft.text);
 
             FontStack fontStack = layout.evaluate<TextFont>(zoom, ft);
@@ -156,7 +156,7 @@ bool SymbolLayout::hasSymbolInstances() const {
 void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyphPositions,
                            const ImageMap& imageMap, const ImagePositions& imagePositions) {
     const bool textAlongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map &&
-        layout.get<SymbolPlacement>() == SymbolPlacementType::Line;
+        layout.get<SymbolPlacement>() != SymbolPlacementType::Point;
 
     for (auto it = features.begin(); it != features.end(); ++it) {
         auto& feature = *it;
@@ -181,7 +181,7 @@ void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyph
                 const float oneEm = 24.0f;
                 const Shaping result = getShaping(
                     /* string */ text,
-                    /* maxWidth: ems */ layout.get<SymbolPlacement>() != SymbolPlacementType::Line ?
+                    /* maxWidth: ems */ layout.get<SymbolPlacement>() == SymbolPlacementType::Point ?
                         layout.evaluate<TextMaxWidth>(zoom, feature) * oneEm : 0,
                     /* lineHeight: ems */ layout.get<TextLineHeight>() * oneEm,
                     /* anchor */ layout.evaluate<TextAnchor>(zoom, feature),
@@ -258,6 +258,10 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
     const float textMaxBoxScale = tilePixelRatio * textMaxSize / glyphSize;
     const float iconBoxScale = tilePixelRatio * layoutIconSize;
     const float symbolSpacing = tilePixelRatio * layout.get<SymbolSpacing>();
+    // CJL: I'm not sure why SymbolPlacementType::Line -> avoidEdges = false. It seems redundant since
+    // getAnchors will already avoid generating anchors outside the tile bounds.
+    // However, SymbolPlacementType::LineCenter allows anchors outside tile boundaries, so its behavior
+    // here should match SymbolPlacement::Point
     const bool avoidEdges = layout.get<SymbolAvoidEdges>() && layout.get<SymbolPlacement>() != SymbolPlacementType::Line;
     const float textPadding = layout.get<TextPadding>() * tilePixelRatio;
     const float iconPadding = layout.get<IconPadding>() * tilePixelRatio;
@@ -316,6 +320,24 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
             for (auto& anchor : anchors) {
                 if (!feature.text || !anchorIsTooClose(*feature.text, textRepeatDistance, anchor)) {
                     addSymbolInstance(line, anchor);
+                }
+            }
+        }
+    } else if (layout.get<SymbolPlacement>() == SymbolPlacementType::LineCenter) {
+        // No clipping, multiple lines per feature are allowed
+        // "lines" with only one point are ignored as in clipLines
+        for (const auto& line : feature.geometry) {
+            if (line.size() > 1) {
+                optional<Anchor> anchor = getCenterAnchor(line,
+                                                          textMaxAngle,
+                                                          (shapedTextOrientations.second ?: shapedTextOrientations.first).left,
+                                                          (shapedTextOrientations.second ?: shapedTextOrientations.first).right,
+                                                          (shapedIcon ? shapedIcon->left() : 0),
+                                                          (shapedIcon ? shapedIcon->right() : 0),
+                                                          glyphSize,
+                                                          textMaxBoxScale);
+                if (anchor) {
+                    addSymbolInstance(line, *anchor);
                 }
             }
         }

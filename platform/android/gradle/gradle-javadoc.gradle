@@ -4,7 +4,7 @@ android.libraryVariants.all { variant ->
         description = "Generates javadoc for build $name"
         failOnError = false
         destinationDir = new File(destinationDir, variant.baseName)
-        source = variant.javaCompile.source
+        source = variant.getJavaCompiler().source
         options.windowTitle("Mapbox Maps SDK for Android $VERSION_NAME Reference")
         options.docTitle("Mapbox Maps SDK for Android $VERSION_NAME")
         options.header("Mapbox Maps SDK for Android $VERSION_NAME Reference")

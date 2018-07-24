@@ -63,9 +63,10 @@ enum class CirclePitchScaleType : bool {
     Viewport,
 };
 
-enum class SymbolPlacementType : bool {
+enum class SymbolPlacementType : uint8_t {
     Point,
     Line,
+    LineCenter
 };
 
 enum class AlignmentType : uint8_t {

@@ -7,6 +7,20 @@
 #include <cmath>
 
 namespace mbgl {
+  
+float getAngleWindowSize(const float textLeft, const float textRight, const float glyphSize, const float boxScale) {
+    return (textLeft - textRight) != 0.0f ?
+        3.0f / 5.0f * glyphSize * boxScale :
+        0;
+}
+
+float getLineLength(const GeometryCoordinates& line) {
+    float lineLength = 0;
+    for (auto it = line.begin(), end = line.end() - 1; it != end; it++) {
+        lineLength += util::dist<float>(*(it), *(it + 1));
+    }
+    return lineLength;
+}
 
 static Anchors resample(const GeometryCoordinates& line,
                         const float offset,
@@ -17,10 +31,7 @@ static Anchors resample(const GeometryCoordinates& line,
                         const bool continuedLine,
                         const bool placeAtMiddle) {
     const float halfLabelLength = labelLength / 2.0f;
-    float lineLength = 0;
-    for (auto it = line.begin(), end = line.end() - 1; it != end; it++) {
-        lineLength += util::dist<float>(*(it), *(it + 1));
-    }
+    const float lineLength = getLineLength(line);
 
     float distance = 0;
     float markedDistance = offset - spacing;
@@ -91,19 +102,18 @@ Anchors getAnchors(const GeometryCoordinates& line,
     // potential label passes text-max-angle check and has enough froom to fit
     // on the line.
 
-    const float angleWindowSize = (textLeft - textRight) != 0.0f ?
-        3.0f / 5.0f * glyphSize * boxScale :
-        0;
+    const float angleWindowSize = getAngleWindowSize(textLeft, textRight, glyphSize, boxScale);
 
-    const float labelLength = fmax(textRight - textLeft, iconRight - iconLeft);
+    const float shapedLabelLength = fmax(textRight - textLeft, iconRight - iconLeft);
+    const float labelLength = shapedLabelLength * boxScale;
 
     // Is the line continued from outside the tile boundary?
     const bool continuedLine = (line[0].x == 0 || line[0].x == util::EXTENT || line[0].y == 0 || line[0].y == util::EXTENT);
 
     // Is the label long, relative to the spacing?
     // If so, adjust the spacing so there is always a minimum space of `spacing / 4` between label edges.
-    if (spacing - labelLength * boxScale  < spacing / 4) {
-        spacing = labelLength * boxScale + spacing / 4;
+    if (spacing - labelLength < spacing / 4) {
+        spacing = labelLength + spacing / 4;
     }
 
     // Offset the first anchor by:
@@ -114,10 +124,53 @@ Anchors getAnchors(const GeometryCoordinates& line,
     const float fixedExtraOffset = glyphSize * 2;
 
     const float offset = !continuedLine ?
-    std::fmod((labelLength / 2 + fixedExtraOffset) * boxScale * overscaling, spacing) :
+    std::fmod((shapedLabelLength / 2 + fixedExtraOffset) * boxScale * overscaling, spacing) :
     std::fmod(spacing / 2 * overscaling, spacing);
 
-    return resample(line, offset, spacing, angleWindowSize, maxAngle, labelLength * boxScale, continuedLine, false);
+    return resample(line, offset, spacing, angleWindowSize, maxAngle, labelLength, continuedLine, false);
+}
+
+optional<Anchor> getCenterAnchor(const GeometryCoordinates& line,
+                                 const float maxAngle,
+                                 const float textLeft,
+                                 const float textRight,
+                                 const float iconLeft,
+                                 const float iconRight,
+                                 const float glyphSize,
+                                 const float boxScale) {
+    if (line.empty()) {
+        return {};
+    }
+    
+    const float angleWindowSize = getAngleWindowSize(textLeft, textRight, glyphSize, boxScale);
+    const float labelLength = fmax(textRight - textLeft, iconRight - iconLeft) * boxScale;
+    
+    float prevDistance = 0;
+    const float centerDistance = getLineLength(line) / 2;
+    
+    int i = 0;
+    for (auto it = line.begin(), end = line.end() - 1; it != end; it++, i++) {
+        const GeometryCoordinate& a = *(it);
+        const GeometryCoordinate& b = *(it + 1);
+        
+        const auto segmentDistance = util::dist<float>(a, b);
+        
+        if (prevDistance + segmentDistance > centerDistance) {
+            // The center is on this segment
+            float t = (centerDistance - prevDistance) / segmentDistance,
+                  x = util::interpolate(float(a.x), float(b.x), t),
+                  y = util::interpolate(float(a.y), float(b.y), t);
+            
+            Anchor anchor(::round(x), ::round(y), util::angle_to(b, a), 0.5f, i);
+            
+            if (!angleWindowSize || checkMaxAngle(line, anchor, labelLength, angleWindowSize, maxAngle)) {
+                return anchor;
+            }
+        }
+        
+        prevDistance += segmentDistance;
+    }
+    return {};
 }
 
 } // namespace mbgl

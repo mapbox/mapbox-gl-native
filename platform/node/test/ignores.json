@@ -56,6 +56,7 @@
   "render-tests/runtime-styling/image-add-sdf": "https://github.com/mapbox/mapbox-gl-native/issues/9847",
   "render-tests/runtime-styling/paint-property-fill-flat-to-extrude": "https://github.com/mapbox/mapbox-gl-native/issues/6745",
   "render-tests/runtime-styling/set-style-paint-property-fill-flat-to-extrude": "https://github.com/mapbox/mapbox-gl-native/issues/6745",
+  "render-tests/symbol-cross-fade/chinese": "https://github.com/mapbox/mapbox-gl-native/issues/10619",
   "render-tests/symbol-placement/line-overscaled": "https://github.com/mapbox/mapbox-gl-js/issues/5654",
   "render-tests/symbol-visibility/visible": "https://github.com/mapbox/mapbox-gl-native/issues/10409",
   "render-tests/text-no-cross-source-collision/default": "skip - gl-js only",
