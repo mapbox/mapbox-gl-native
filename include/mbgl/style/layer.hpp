@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/unique_any.hpp>
+#include <mbgl/util/peer.hpp>
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/style/layer_type.hpp>
 #include <mbgl/style/types.hpp>
@@ -132,7 +132,7 @@ public:
     // For use in SDK bindings, which store a reference to a platform-native peer
     // object here, so that separately-obtained references to this object share
     // identical platform-native peers.
-    util::unique_any peer;
+    util::peer peer;
 };
 
 } // namespace style

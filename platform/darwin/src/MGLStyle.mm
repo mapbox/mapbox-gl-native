@@ -177,7 +177,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 }
 
 - (MGLSource *)sourceFromMBGLSource:(mbgl::style::Source *)rawSource {
-    if (MGLSource *source = rawSource->peer.has_value() ? mbgl::util::any_cast<SourceWrapper>(rawSource->peer).source : nil) {
+    if (MGLSource *source = rawSource->peer.has_value() ? rawSource->peer.get<SourceWrapper>().source : nil) {
         return source;
     }
 
@@ -341,7 +341,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 {
     NSParameterAssert(rawLayer);
 
-    if (MGLStyleLayer *layer = rawLayer->peer.has_value() ? mbgl::util::any_cast<LayerWrapper>(&(rawLayer->peer))->layer : nil) {
+    if (MGLStyleLayer *layer = rawLayer->peer.has_value() ? rawLayer->peer.get<LayerWrapper>().layer : nil) {
         return layer;
     }
 
