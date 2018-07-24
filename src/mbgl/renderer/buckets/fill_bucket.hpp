@@ -39,4 +39,9 @@ public:
     std::map<std::string, FillProgram::PaintPropertyBinders> paintPropertyBinders;
 };
 
+template <>
+inline bool Bucket::is<FillBucket>() const {
+    return layerType == style::LayerType::Fill;
+}
+
 } // namespace mbgl

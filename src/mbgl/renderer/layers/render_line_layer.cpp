@@ -58,7 +58,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
     }
 
     for (const RenderTile& tile : renderTiles) {
-        auto bucket_ = dynamic_cast<LineBucket*>(tile.tile.getBucket(*baseImpl));
+        auto bucket_ = tile.tile.getBucket<LineBucket>(*baseImpl);
         if (!bucket_) {
             continue;
         }

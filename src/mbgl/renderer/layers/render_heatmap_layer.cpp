@@ -83,7 +83,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {});
 
         for (const RenderTile& tile : renderTiles) {
-            auto bucket_ = dynamic_cast<HeatmapBucket*>(tile.tile.getBucket(*baseImpl));
+            auto bucket_ = tile.tile.getBucket<HeatmapBucket>(*baseImpl);
             if (!bucket_) {
                 continue;
             }

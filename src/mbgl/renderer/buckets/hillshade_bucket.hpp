@@ -56,4 +56,9 @@ private:
     bool prepared = false;
 };
 
+template <>
+inline bool Bucket::is<HillshadeBucket>() const {
+    return layerType == style::LayerType::Hillshade;
+}
+
 } // namespace mbgl
