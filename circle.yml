@@ -10,6 +10,7 @@ workflows:
             branches:
               ignore: master
       - android-debug-arm-v7
+      - android-gnustl-arm-v7
       - android-release:
           filters:
             tags:
@@ -452,6 +453,86 @@ jobs:
             gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/armeabi-v7a/libmapbox-gl.so 
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/armeabi-v7a/libmapbox-gl.so.gz              
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
+          destination: .
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDK/build/reports/lint-results.html
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDK/build/reports/lint-results.xml
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDK/lint-baseline.xml
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDKTestApp/build/reports/lint-results.html
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDKTestApp/build/reports/lint-results.xml
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDKTestApp/lint-baseline.xml
+
+# ------------------------------------------------------------------------------
+  android-gnustl-arm-v7:
+    docker:
+      - image: mbgl/feb0443038:android-ndk-r17
+    resource_class: large
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
+      BUILDTYPE: Debug
+      IS_LOCAL_DEVELOPMENT: false
+      MBGL_ANDROID_STL: gnustl_shared
+    steps:
+      - checkout
+      - *restore-node_modules-cache
+      - *npm-install
+      - *prepare-environment
+      - *prepare-ccache
+      - *restore-mason_packages-cache
+      - *restore-ccache
+      - *restore-gradle-cache
+      - *reset-ccache-stats
+      - run:
+          name: Check code style
+          command: make android-check
+      - run:
+          name: Build libmapbox-gl.so for arm-v7
+          command: make android-lib-arm-v7
+      - run:
+          name: Compile Core tests for arm-v7
+          command: make android-test-lib-arm-v7
+      - run:
+          name: Test phone module
+          command: make run-android-unit-test
+      - run:
+          name: Generate Espresso sanity tests
+          command: make test-code-android
+      - run:
+          name: Build Test APK
+          command: |
+            echo "${MAPBOX_DEVELOPER_CONFIG_XML}" > platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
+            make android-ui-test-arm-v7
+      - *show-ccache-stats
+      - *save-node_modules-cache
+      - *save-mason_packages-cache
+      - *save-ccache
+      - *save-gradle-cache
+      - run:
+          name: Log in to Google Cloud Platform
+          shell: /bin/bash -euo pipefail
+          command: |
+            echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
+            gcloud auth activate-service-account --key-file secret.json --project android-gl-native
+            rm secret.json
+      - run:
+          name: Run instrumentation tests on Firebase
+          no_output_timeout: 1200
+          shell: /bin/bash -euo pipefail
+          command: |
+            gcloud firebase test android models list
+            gcloud firebase test android run --type instrumentation \
+              --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
+              --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
+              --device-ids sailfish --os-version-ids 26 --locales en --orientations portrait --timeout 20m
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
           destination: .
