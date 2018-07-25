@@ -472,9 +472,12 @@ class AnnotationManager {
 
     private final MarkerViewManager markerViewManager;
     private final Projection projection;
+    private final int minimalTouchSize;
 
     private View view;
     private Bitmap bitmap;
+    private int bitmapWidth;
+    private int bitmapHeight;
     private PointF markerLocation;
 
     private Rect hitRectView = new Rect();
@@ -486,6 +489,7 @@ class AnnotationManager {
     MarkerHitResolver(@NonNull MapboxMap mapboxMap) {
       this.markerViewManager = mapboxMap.getMarkerViewManager();
       this.projection = mapboxMap.getProjection();
+      this.minimalTouchSize = (int) (32 * Mapbox.getApplicationContext().getResources().getDisplayMetrics().density);
     }
 
     public long execute(MarkerHit markerHit) {
@@ -515,10 +519,21 @@ class AnnotationManager {
     private void resolveForMarker(MarkerHit markerHit, Marker marker) {
       markerLocation = projection.toScreenLocation(marker.getPosition());
       bitmap = marker.getIcon().getBitmap();
-      hitRectMarker.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+      bitmapHeight = bitmap.getHeight();
+      if (bitmapHeight < minimalTouchSize) {
+        bitmapHeight = minimalTouchSize;
+      }
+
+      bitmapWidth = bitmap.getWidth();
+      if (bitmapWidth < minimalTouchSize) {
+        bitmapWidth = minimalTouchSize;
+      }
+
+      hitRectMarker.set(0, 0, bitmapWidth, bitmapHeight);
       hitRectMarker.offsetTo(
-        markerLocation.x - bitmap.getWidth() / 2,
-        markerLocation.y - bitmap.getHeight() / 2
+        markerLocation.x - bitmapWidth / 2,
+        markerLocation.y - bitmapHeight / 2
       );
       hitTestMarker(markerHit, marker, hitRectMarker);
     }
