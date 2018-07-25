@@ -24,13 +24,13 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLLocationManager;
 
 /** The default deceleration rate for a map view. */
-extern MGL_EXPORT const CGFloat MGLMapViewDecelerationRateNormal;
+FOUNDATION_EXTERN MGL_EXPORT const CGFloat MGLMapViewDecelerationRateNormal;
 
 /** A fast deceleration rate for a map view. */
-extern MGL_EXPORT const CGFloat MGLMapViewDecelerationRateFast;
+FOUNDATION_EXTERN MGL_EXPORT const CGFloat MGLMapViewDecelerationRateFast;
 
 /** Disables deceleration in a map view. */
-extern MGL_EXPORT const CGFloat MGLMapViewDecelerationRateImmediate;
+FOUNDATION_EXTERN MGL_EXPORT const CGFloat MGLMapViewDecelerationRateImmediate;
 
 /**
  The vertical alignment of an annotation within a map view. Used with

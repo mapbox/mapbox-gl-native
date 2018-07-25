@@ -142,8 +142,11 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
         }
     } else {
         for (const RenderTile& tile : renderTiles) {
-            assert(dynamic_cast<RasterBucket*>(tile.tile.getBucket(*baseImpl)));
-            RasterBucket& bucket = *reinterpret_cast<RasterBucket*>(tile.tile.getBucket(*baseImpl));
+            auto bucket_ = tile.tile.getBucket<RasterBucket>(*baseImpl);
+            if (!bucket_) {
+                continue;
+            }
+            RasterBucket& bucket = *bucket_;
 
             if (!bucket.hasData())
                 continue;

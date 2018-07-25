@@ -6,7 +6,7 @@ namespace mbgl {
 }
 
 /// Minimum size of an annotation’s accessibility element.
-extern const CGSize MGLAnnotationAccessibilityElementMinimumSize;
+FOUNDATION_EXTERN const CGSize MGLAnnotationAccessibilityElementMinimumSize;
 
 @interface MGLMapView (Private)
 

@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
  alternatively observe KVO change notifications to the pack’s `progress` key
  path.
  */
-extern MGL_EXPORT const NSNotificationName MGLOfflinePackProgressChangedNotification;
+FOUNDATION_EXTERN MGL_EXPORT const NSNotificationName MGLOfflinePackProgressChangedNotification;
 
 /**
  Posted by the shared `MGLOfflineStorage` object whenever an `MGLOfflinePack`
@@ -40,7 +40,7 @@ extern MGL_EXPORT const NSNotificationName MGLOfflinePackProgressChangedNotifica
  `userInfo` dictionary contains the error object in the
  `MGLOfflinePackErrorUserInfoKey` key.
  */
-extern MGL_EXPORT const NSNotificationName MGLOfflinePackErrorNotification;
+FOUNDATION_EXTERN MGL_EXPORT const NSNotificationName MGLOfflinePackErrorNotification;
 
 /**
  Posted by the shared `MGLOfflineStorage` object when the maximum number of
@@ -55,7 +55,7 @@ extern MGL_EXPORT const NSNotificationName MGLOfflinePackErrorNotification;
  calling the `-[MGLOfflineStorage removePack:withCompletionHandler:]` method.
  Contact your Mapbox sales representative to have the limit raised.
  */
-extern MGL_EXPORT const NSNotificationName MGLOfflinePackMaximumMapboxTilesReachedNotification;
+FOUNDATION_EXTERN MGL_EXPORT const NSNotificationName MGLOfflinePackMaximumMapboxTilesReachedNotification;
 
 /**
  A key in the `userInfo` property of a notification posted by `MGLOfflinePack`.
@@ -68,9 +68,9 @@ typedef NSString *MGLOfflinePackUserInfoKey NS_EXTENSIBLE_STRING_ENUM;
  `MGLOfflinePackProgressChangedNotification` notification. Call `-integerValue`
  on the object to receive the `MGLOfflinePackState`-typed state.
  */
-extern MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyState;
+FOUNDATION_EXTERN MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyState;
 
-extern MGL_EXPORT NSString * const MGLOfflinePackStateUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyState")));
+FOUNDATION_EXTERN MGL_EXPORT NSString * const MGLOfflinePackStateUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyState")));
 
 /**
  The key for an `NSValue` object that indicates an offline pack’s current
@@ -79,9 +79,9 @@ extern MGL_EXPORT NSString * const MGLOfflinePackStateUserInfoKey __attribute__(
  `-MGLOfflinePackProgressValue` on the object to receive the
  `MGLOfflinePackProgress`-typed progress.
  */
-extern MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyProgress;
+FOUNDATION_EXTERN MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyProgress;
 
-extern MGL_EXPORT NSString * const MGLOfflinePackProgressUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyProgress")));
+FOUNDATION_EXTERN MGL_EXPORT NSString * const MGLOfflinePackProgressUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyProgress")));
 
 /**
  The key for an `NSError` object that is encountered in the course of
@@ -89,9 +89,9 @@ extern MGL_EXPORT NSString * const MGLOfflinePackProgressUserInfoKey __attribute
  an `MGLOfflinePackErrorNotification` notification. The error’s domain is
  `MGLErrorDomain`. See `MGLErrorCode` for possible error codes.
  */
-extern MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyError;
+FOUNDATION_EXTERN MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyError;
 
-extern MGL_EXPORT NSString * const MGLOfflinePackErrorUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyError")));
+FOUNDATION_EXTERN MGL_EXPORT NSString * const MGLOfflinePackErrorUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyError")));
 
 /**
  The key for an `NSNumber` object that indicates the maximum number of
@@ -101,9 +101,9 @@ extern MGL_EXPORT NSString * const MGLOfflinePackErrorUserInfoKey __attribute__(
  `-unsignedLongLongValue` on the object to receive the `uint64_t`-typed tile
  limit.
  */
-extern MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount;
+FOUNDATION_EXTERN MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount;
 
-extern MGL_EXPORT NSString * const MGLOfflinePackMaximumCountUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyMaximumCount")));
+FOUNDATION_EXTERN MGL_EXPORT NSString * const MGLOfflinePackMaximumCountUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyMaximumCount")));
 
 /**
  A block to be called once an offline pack has been completely created and

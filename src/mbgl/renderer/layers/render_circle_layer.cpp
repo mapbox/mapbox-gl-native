@@ -56,8 +56,11 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
     const bool pitchWithMap = evaluated.get<CirclePitchAlignment>() == AlignmentType::Map;
 
     for (const RenderTile& tile : renderTiles) {
-        assert(dynamic_cast<CircleBucket*>(tile.tile.getBucket(*baseImpl)));
-        CircleBucket& bucket = *reinterpret_cast<CircleBucket*>(tile.tile.getBucket(*baseImpl));
+        auto bucket_ = tile.tile.getBucket<CircleBucket>(*baseImpl);
+        if (!bucket_) {
+            continue;
+        }
+        CircleBucket& bucket = *bucket_;
 
         const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 

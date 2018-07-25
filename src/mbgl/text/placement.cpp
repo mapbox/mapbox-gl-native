@@ -50,12 +50,13 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
         }
         assert(dynamic_cast<GeometryTile*>(&renderTile.tile));
         GeometryTile& geometryTile = static_cast<GeometryTile&>(renderTile.tile);
-        
-        
-        auto bucket = geometryTile.getBucket(*symbolLayer.baseImpl);
-        assert(dynamic_cast<SymbolBucket*>(bucket));
-        SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
-        
+
+        auto bucket = renderTile.tile.getBucket<SymbolBucket>(*symbolLayer.baseImpl);
+        if (!bucket) {
+            continue;
+        }
+        SymbolBucket& symbolBucket = *bucket;
+
         if (symbolBucket.bucketLeaderID != symbolLayer.getID()) {
             // Only place this layer if it's the "group leader" for the bucket
             continue;
@@ -231,9 +232,12 @@ void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer) {
             continue;
         }
 
-        auto bucket = renderTile.tile.getBucket(*symbolLayer.baseImpl);
-        assert(dynamic_cast<SymbolBucket*>(bucket));
-        SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
+        auto bucket = renderTile.tile.getBucket<SymbolBucket>(*symbolLayer.baseImpl);
+        if (!bucket) {
+            continue;
+        }
+        SymbolBucket& symbolBucket = *bucket;
+
         if (symbolBucket.bucketLeaderID != symbolLayer.getID()) {
             // Only update opacities this layer if it's the "group leader" for the bucket
             continue;

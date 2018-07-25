@@ -114,8 +114,12 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
     matrix::translate(mat, mat, 0, -util::EXTENT, 0);
 
     for (const RenderTile& tile : renderTiles) {
-        assert(dynamic_cast<HillshadeBucket*>(tile.tile.getBucket(*baseImpl)));
-        HillshadeBucket& bucket = *reinterpret_cast<HillshadeBucket*>(tile.tile.getBucket(*baseImpl));
+        auto bucket_ = tile.tile.getBucket<HillshadeBucket>(*baseImpl);
+        if (!bucket_) {
+            continue;
+        }
+        HillshadeBucket& bucket = *bucket_;
+
         if (!bucket.hasData()){
             continue;
         }

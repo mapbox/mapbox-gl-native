@@ -64,7 +64,7 @@ NS_INLINE BOOL MGLCoordinateSpanEqualToCoordinateSpan(MGLCoordinateSpan span1, M
 }
 
 /** An area of zero width and zero height. */
-extern MGL_EXPORT const MGLCoordinateSpan MGLCoordinateSpanZero;
+FOUNDATION_EXTERN MGL_EXPORT const MGLCoordinateSpan MGLCoordinateSpanZero;
 
 /** A rectangular area as measured on a two-dimensional map projection. */
 typedef struct __attribute__((objc_boxable)) MGLCoordinateBounds {
@@ -211,6 +211,6 @@ NS_INLINE CLLocationDegrees MGLDegreesFromRadians(CGFloat radians) {
 }
 
 /** Returns Mercator projection of a WGS84 coordinate at the specified zoom level. */
-extern MGL_EXPORT MGLMapPoint MGLMapPointForCoordinate(CLLocationCoordinate2D coordinate, double zoomLevel);
+FOUNDATION_EXTERN MGL_EXPORT MGLMapPoint MGLMapPointForCoordinate(CLLocationCoordinate2D coordinate, double zoomLevel);
 
 NS_ASSUME_NONNULL_END

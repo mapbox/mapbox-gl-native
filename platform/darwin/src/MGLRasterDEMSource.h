@@ -13,7 +13,7 @@
  with the `MGLRasterDEMSource` class and is ignored when creating an
  `MGLRasterTileSource` or `MGLVectorTileSource` object.
  */
-extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionDEMEncoding;
+FOUNDATION_EXTERN MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionDEMEncoding;
 
 /**
  `MGLRasterDEMSource` is a map content source that supplies rasterized

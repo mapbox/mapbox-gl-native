@@ -58,8 +58,11 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
     }
 
     for (const RenderTile& tile : renderTiles) {
-        assert(dynamic_cast<LineBucket*>(tile.tile.getBucket(*baseImpl)));
-        LineBucket& bucket = *reinterpret_cast<LineBucket*>(tile.tile.getBucket(*baseImpl));
+        auto bucket_ = tile.tile.getBucket<LineBucket>(*baseImpl);
+        if (!bucket_) {
+            continue;
+        }
+        LineBucket& bucket = *bucket_;
 
         auto draw = [&] (auto& program, auto&& uniformValues) {
             auto& programInstance = program.get(evaluated);

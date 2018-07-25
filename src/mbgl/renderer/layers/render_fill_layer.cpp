@@ -61,8 +61,11 @@ bool RenderFillLayer::hasTransition() const {
 void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
     if (evaluated.get<FillPattern>().from.empty()) {
         for (const RenderTile& tile : renderTiles) {
-            assert(dynamic_cast<FillBucket*>(tile.tile.getBucket(*baseImpl)));
-            FillBucket& bucket = *reinterpret_cast<FillBucket*>(tile.tile.getBucket(*baseImpl));
+            auto bucket_ = tile.tile.getBucket<FillBucket>(*baseImpl);
+            if (!bucket_) {
+                continue;
+            }
+            FillBucket& bucket = *bucket_;
 
             auto draw = [&] (auto& program,
                              const auto& drawMode,
@@ -146,8 +149,11 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
         parameters.imageManager.bind(parameters.context, 0);
 
         for (const RenderTile& tile : renderTiles) {
-            assert(dynamic_cast<FillBucket*>(tile.tile.getBucket(*baseImpl)));
-            FillBucket& bucket = *reinterpret_cast<FillBucket*>(tile.tile.getBucket(*baseImpl));
+            auto bucket_ = tile.tile.getBucket<FillBucket>(*baseImpl);
+            if (!bucket_) {
+                continue;
+            }
+            FillBucket& bucket = *bucket_;
 
             auto draw = [&] (auto& program,
                              const auto& drawMode,

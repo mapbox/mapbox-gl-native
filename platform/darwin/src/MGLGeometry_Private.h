@@ -99,7 +99,7 @@ NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(NSEdgeInsets insets) {
     @param latitude The latitude of the point at the center of the viewport.
     @param size The size of the viewport.
     @return An altitude measured in meters. */
-CLLocationDistance MGLAltitudeForZoomLevel(double zoomLevel, CGFloat pitch, CLLocationDegrees latitude, CGSize size);
+MGL_EXPORT CLLocationDistance MGLAltitudeForZoomLevel(double zoomLevel, CGFloat pitch, CLLocationDegrees latitude, CGSize size);
 
 /** Converts a camera altitude to a map zoom level.
 
@@ -108,7 +108,7 @@ CLLocationDistance MGLAltitudeForZoomLevel(double zoomLevel, CGFloat pitch, CLLo
     @param latitude The latitude of the point at the center of the viewport.
     @param size The size of the viewport.
     @return A zero-based zoom level. */
-double MGLZoomLevelForAltitude(CLLocationDistance altitude, CGFloat pitch, CLLocationDegrees latitude, CGSize size);
+MGL_EXPORT double MGLZoomLevelForAltitude(CLLocationDistance altitude, CGFloat pitch, CLLocationDegrees latitude, CGSize size);
 
 /** Returns MGLRadianCoordinate2D, converted from CLLocationCoordinate2D. */
 NS_INLINE MGLRadianCoordinate2D MGLRadianCoordinateFromLocationCoordinate(CLLocationCoordinate2D locationCoordinate) {
@@ -138,6 +138,9 @@ MGLRadianCoordinate2D MGLRadianCoordinateAtDistanceFacingDirection(MGLRadianCoor
  */
 CLLocationDirection MGLDirectionBetweenCoordinates(CLLocationCoordinate2D firstCoordinate, CLLocationCoordinate2D secondCoordinate);
 
+/**
+ Returns a point with coordinates rounded to the nearest logical pixel.
+ */
 CGPoint MGLPointRounded(CGPoint point);
 
 MGLMatrix4 MGLMatrix4Make(std::array<double, 16> mat);

@@ -83,8 +83,11 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {});
 
         for (const RenderTile& tile : renderTiles) {
-            assert(dynamic_cast<HeatmapBucket*>(tile.tile.getBucket(*baseImpl)));
-            HeatmapBucket& bucket = *reinterpret_cast<HeatmapBucket*>(tile.tile.getBucket(*baseImpl));
+            auto bucket_ = tile.tile.getBucket<HeatmapBucket>(*baseImpl);
+            if (!bucket_) {
+                continue;
+            }
+            HeatmapBucket& bucket = *bucket_;
 
             const auto extrudeScale = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
 

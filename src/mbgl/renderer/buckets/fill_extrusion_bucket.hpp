@@ -34,4 +34,9 @@ public:
     std::unordered_map<std::string, FillExtrusionProgram::PaintPropertyBinders> paintPropertyBinders;
 };
 
+template <>
+inline bool Bucket::is<FillExtrusionBucket>() const {
+    return layerType == style::LayerType::FillExtrusion;
+}
+
 } // namespace mbgl

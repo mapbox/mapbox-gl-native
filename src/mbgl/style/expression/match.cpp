@@ -18,7 +18,8 @@ void Match<T>::eachChild(const std::function<void(const Expression&)>& visit) co
 
 template <typename T>
 bool Match<T>::operator==(const Expression& e) const {
-    if (auto rhs = dynamic_cast<const Match*>(&e)) {
+    if (e.getKind() == Kind::Match) {
+        auto rhs = static_cast<const Match*>(&e);
         return (*input == *(rhs->input) &&
                 *otherwise == *(rhs->otherwise) &&
                 Expression::childrenEqual(branches, rhs->branches));

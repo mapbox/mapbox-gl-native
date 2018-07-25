@@ -8,9 +8,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef NSString *MGLStyleFunctionOption NS_STRING_ENUM NS_UNAVAILABLE;
 
-extern MGL_EXPORT const MGLStyleFunctionOption MGLStyleFunctionOptionInterpolationBase __attribute__((unavailable("Use NSExpression instead, applying the mgl_interpolate:withCurveType:parameters:stops: function with a curve type of “exponential” and a non-nil parameter.")));
+FOUNDATION_EXTERN MGL_EXPORT const MGLStyleFunctionOption MGLStyleFunctionOptionInterpolationBase __attribute__((unavailable("Use NSExpression instead, applying the mgl_interpolate:withCurveType:parameters:stops: function with a curve type of “exponential” and a non-nil parameter.")));
 
-extern MGL_EXPORT const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue __attribute__((unavailable("Use +[NSExpression expressionForConditional:trueExpression:falseExpression:] instead.")));
+FOUNDATION_EXTERN MGL_EXPORT const MGLStyleFunctionOption MGLStyleFunctionOptionDefaultValue __attribute__((unavailable("Use +[NSExpression expressionForConditional:trueExpression:falseExpression:] instead.")));
 
 typedef NS_ENUM(NSUInteger, MGLInterpolationMode) {
     MGLInterpolationModeExponential __attribute__((unavailable("Use NSExpression instead, applying the mgl_interpolate:withCurveType:parameters:stops: function with a curve type of “exponential”."))) = 0,

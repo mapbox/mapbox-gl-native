@@ -2,6 +2,7 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/style/layer_type.hpp>
 
 #include <atomic>
 
@@ -15,8 +16,26 @@ class RenderLayer;
 
 class Bucket : private util::noncopyable {
 public:
-    Bucket() = default;
+    Bucket(style::LayerType layerType_)
+        : layerType(layerType_) {
+    }
+
     virtual ~Bucket() = default;
+
+    // Check whether this bucket is of the given subtype.
+    template <class T>
+    bool is() const;
+
+    // Dynamically cast this bucket to the given subtype.
+    template <class T>
+    T* as() {
+        return is<T>() ? reinterpret_cast<T*>(this) : nullptr;
+    }
+
+    template <class T>
+    const T* as() const {
+        return is<T>() ? reinterpret_cast<const T*>(this) : nullptr;
+    }
 
     // Feature geometries are also used to populate the feature index.
     // Obtaining these is a costly operation, so we do it only once, and
@@ -39,6 +58,7 @@ public:
     }
 
 protected:
+    style::LayerType layerType;
     std::atomic<bool> uploaded { false };
 };
 

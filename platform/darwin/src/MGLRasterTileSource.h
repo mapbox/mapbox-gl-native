@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
  This option is only applicable to `MGLRasterTileSource` objects; it is ignored
  when initializing `MGLVectorTileSource` objects.
  */
-extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionTileSize;
+FOUNDATION_EXTERN MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionTileSize;
 
 /**
  `MGLRasterTileSource` is a map content source that supplies raster image tiles

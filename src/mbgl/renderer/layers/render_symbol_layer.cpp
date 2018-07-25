@@ -75,8 +75,11 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
     }
 
     for (const RenderTile& tile : renderTiles) {
-        assert(dynamic_cast<SymbolBucket*>(tile.tile.getBucket(*baseImpl)));
-        SymbolBucket& bucket = *reinterpret_cast<SymbolBucket*>(tile.tile.getBucket(*baseImpl));
+        auto bucket_ = tile.tile.getBucket<SymbolBucket>(*baseImpl);
+        if (!bucket_) {
+            continue;
+        }
+        SymbolBucket& bucket = *bucket_;
 
         const auto& layout = bucket.layout;
 

@@ -45,7 +45,6 @@ mbgl::LatLng MGLLatLngFromLocationCoordinate2D(CLLocationCoordinate2D coordinate
     }
 }
 
-MGL_EXPORT
 CLLocationDistance MGLAltitudeForZoomLevel(double zoomLevel, CGFloat pitch, CLLocationDegrees latitude, CGSize size) {
     CLLocationDistance metersPerPixel = mbgl::Projection::getMetersPerPixelAtLatitude(latitude, zoomLevel);
     CLLocationDistance metersTall = metersPerPixel * size.height;
@@ -53,7 +52,6 @@ CLLocationDistance MGLAltitudeForZoomLevel(double zoomLevel, CGFloat pitch, CLLo
     return altitude * std::sin(M_PI_2 - MGLRadiansFromDegrees(pitch)) / std::sin(M_PI_2);
 }
 
-MGL_EXPORT
 double MGLZoomLevelForAltitude(CLLocationDistance altitude, CGFloat pitch, CLLocationDegrees latitude, CGSize size) {
     CLLocationDistance eyeAltitude = altitude / std::sin(M_PI_2 - MGLRadiansFromDegrees(pitch)) * std::sin(M_PI_2);
     CLLocationDistance metersTall = eyeAltitude * 2 * std::tan(MGLRadiansFromDegrees(MGLAngularFieldOfView) / 2.);
@@ -100,7 +98,7 @@ CLLocationDirection MGLDirectionBetweenCoordinates(CLLocationCoordinate2D firstC
 
 CGPoint MGLPointRounded(CGPoint point) {
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    CGFloat scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [UIScreen mainScreen].nativeScale : [UIScreen mainScreen].scale;
+    CGFloat scaleFactor = [UIScreen mainScreen].nativeScale;
 #elif TARGET_OS_MAC
     CGFloat scaleFactor = [NSScreen mainScreen].backingScaleFactor;
 #endif

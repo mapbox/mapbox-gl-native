@@ -13,7 +13,7 @@ static bool isComparableType(const type::Type& type) {
 }
 
 Equals::Equals(std::unique_ptr<Expression> lhs_, std::unique_ptr<Expression> rhs_, optional<std::unique_ptr<Expression>> collator_, bool negate_)
-    : Expression(type::Boolean),
+    : Expression(Kind::Equals, type::Boolean),
       lhs(std::move(lhs_)),
       rhs(std::move(rhs_)),
       collator(std::move(collator_)),
@@ -53,7 +53,8 @@ void Equals::eachChild(const std::function<void(const Expression&)>& visit) cons
 }
 
 bool Equals::operator==(const Expression& e) const {
-    if (auto eq = dynamic_cast<const Equals*>(&e)) {
+    if (e.getKind() == Kind::Equals) {
+        auto eq = static_cast<const Equals*>(&e);
         return eq->negate == negate && *eq->lhs == *lhs && *eq->rhs == *rhs;
     }
     return false;

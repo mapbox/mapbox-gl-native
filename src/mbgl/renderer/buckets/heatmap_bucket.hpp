@@ -37,4 +37,9 @@ public:
     const MapMode mode;
 };
 
+template <>
+inline bool Bucket::is<HeatmapBucket>() const {
+    return layerType == style::LayerType::Heatmap;
+}
+
 } // namespace mbgl

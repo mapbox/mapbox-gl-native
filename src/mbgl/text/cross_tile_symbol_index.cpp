@@ -178,9 +178,12 @@ bool CrossTileSymbolIndex::addLayer(RenderSymbolLayer& symbolLayer, float lng) {
             continue;
         }
 
-        auto bucket = renderTile.tile.getBucket(*symbolLayer.baseImpl);
-        assert(dynamic_cast<SymbolBucket*>(bucket));
-        SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
+        auto bucket = renderTile.tile.getBucket<SymbolBucket>(*symbolLayer.baseImpl);
+        if (!bucket) {
+            continue;
+        }
+        SymbolBucket& symbolBucket = *bucket;
+
         if (symbolBucket.bucketLeaderID != symbolLayer.getID()) {
             // Only add this layer if it's the "group leader" for the bucket
             continue;

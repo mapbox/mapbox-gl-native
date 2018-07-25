@@ -14,9 +14,14 @@ namespace expression {
 optional<variant<const Interpolate*, const Step*, ParsingError>> findZoomCurve(const expression::Expression* e) {
     optional<variant<const Interpolate*, const Step*, ParsingError>> result;
     
-    if (auto let = dynamic_cast<const Let*>(e)) {
+    switch (e->getKind()) {
+    case Kind::Let: {
+        auto let = static_cast<const Let*>(e);
         result = findZoomCurve(let->getResult());
-    } else if (auto coalesce = dynamic_cast<const Coalesce*>(e)) {
+        break;
+    }
+    case Kind::Coalesce: {
+        auto coalesce = static_cast<const Coalesce*>(e);
         std::size_t length = coalesce->getLength();
         for (std::size_t i = 0; i < length; i++) {
             result = findZoomCurve(coalesce->getChild(i));
@@ -24,16 +29,30 @@ optional<variant<const Interpolate*, const Step*, ParsingError>> findZoomCurve(c
                 break;
             }
         }
-    } else if (auto curve = dynamic_cast<const Interpolate*>(e)) {
-        auto z = dynamic_cast<CompoundExpressionBase*>(curve->getInput().get());
-        if (z && z->getName() == "zoom") {
-            result = {curve};
+        break;
+    }
+    case Kind::Interpolate: {
+        auto curve = static_cast<const Interpolate*>(e);
+        if (curve->getInput()->getKind() == Kind::CompoundExpression) {
+            auto z = static_cast<CompoundExpressionBase*>(curve->getInput().get());
+            if (z && z->getName() == "zoom") {
+                result = {curve};
+            }
         }
-    } else if (auto step = dynamic_cast<const Step*>(e)) {
-        auto z = dynamic_cast<CompoundExpressionBase*>(step->getInput().get());
-        if (z && z->getName() == "zoom") {
-            result = {step};
+        break;
+    }
+    case Kind::Step: {
+        auto step = static_cast<const Step*>(e);
+        if (step->getInput()->getKind() == Kind::CompoundExpression) {
+            auto z = static_cast<CompoundExpressionBase*>(step->getInput().get());
+            if (z && z->getName() == "zoom") {
+                result = {step};
+            }
         }
+        break;
+    }
+    default:
+        break;
     }
     
     if (result && result->is<ParsingError>()) {

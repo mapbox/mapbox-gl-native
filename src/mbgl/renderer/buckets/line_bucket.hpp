@@ -64,4 +64,9 @@ private:
     float getLineWidth(const RenderLineLayer& layer) const;
 };
 
+template <>
+inline bool Bucket::is<LineBucket>() const {
+    return layerType == style::LayerType::Line;
+}
+
 } // namespace mbgl

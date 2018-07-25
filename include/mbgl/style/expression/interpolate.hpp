@@ -51,7 +51,8 @@ public:
     }
 
     bool operator==(const Expression& e) const override {
-        if (auto rhs = dynamic_cast<const Interpolate*>(&e)) {
+        if (e.getKind() == Kind::Interpolate) {
+            auto rhs = static_cast<const Interpolate*>(&e);
             if (interpolator != rhs->interpolator ||
                 *input != *(rhs->input) ||
                 stops.size() != rhs->stops.size())

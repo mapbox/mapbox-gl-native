@@ -100,9 +100,11 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
 
         if (evaluated.get<FillExtrusionPattern>().from.empty()) {
             for (const RenderTile& tile : renderTiles) {
-                assert(dynamic_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl)));
-                FillExtrusionBucket& bucket =
-                    *reinterpret_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl));
+                auto bucket_ = tile.tile.getBucket<FillExtrusionBucket>(*baseImpl);
+                if (!bucket_) {
+                    continue;
+                }
+                FillExtrusionBucket& bucket = *bucket_;
 
                 draw(
                     parameters.programs.fillExtrusion.get(evaluated),
@@ -129,9 +131,11 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             parameters.imageManager.bind(parameters.context, 0);
 
             for (const RenderTile& tile : renderTiles) {
-                assert(dynamic_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl)));
-                FillExtrusionBucket& bucket =
-                    *reinterpret_cast<FillExtrusionBucket*>(tile.tile.getBucket(*baseImpl));
+                auto bucket_ = tile.tile.getBucket<FillExtrusionBucket>(*baseImpl);
+                if (!bucket_) {
+                    continue;
+                }
+                FillExtrusionBucket& bucket = *bucket_;
 
                 draw(
                     parameters.programs.fillExtrusionPattern.get(evaluated),
