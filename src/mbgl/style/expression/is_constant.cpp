@@ -10,8 +10,8 @@ constexpr static const char filter[] = "filter-";
 
 bool isFeatureConstant(const Expression& expression) {
     if (expression.getKind() == Kind::CompoundExpression) {
-        auto e = static_cast<const CompoundExpressionBase*>(&expression);
-        const std::string name = e->getName();
+        auto e = static_cast<const CompoundExpression*>(&expression);
+        const std::string name = e->getOperator();
         optional<std::size_t> parameterCount = e->getParameterCount();
         if (name == "get" && parameterCount && *parameterCount == 1) {
             return false;

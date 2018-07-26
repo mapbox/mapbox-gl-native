@@ -34,8 +34,8 @@ optional<variant<const Interpolate*, const Step*, ParsingError>> findZoomCurve(c
     case Kind::Interpolate: {
         auto curve = static_cast<const Interpolate*>(e);
         if (curve->getInput()->getKind() == Kind::CompoundExpression) {
-            auto z = static_cast<CompoundExpressionBase*>(curve->getInput().get());
-            if (z && z->getName() == "zoom") {
+            auto z = static_cast<CompoundExpression*>(curve->getInput().get());
+            if (z && z->getOperator() == "zoom") {
                 result = {curve};
             }
         }
@@ -44,8 +44,8 @@ optional<variant<const Interpolate*, const Step*, ParsingError>> findZoomCurve(c
     case Kind::Step: {
         auto step = static_cast<const Step*>(e);
         if (step->getInput()->getKind() == Kind::CompoundExpression) {
-            auto z = static_cast<CompoundExpressionBase*>(step->getInput().get());
-            if (z && z->getName() == "zoom") {
+            auto z = static_cast<CompoundExpression*>(step->getInput().get());
+            if (z && z->getOperator() == "zoom") {
                 result = {step};
             }
         }
