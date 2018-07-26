@@ -32,6 +32,8 @@
 		1F06668D1EC64F8E001C16D7 /* MGLLight.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F0666891EC64F8E001C16D7 /* MGLLight.mm */; };
 		1F26B6C120E189C9007BCC21 /* MBXCustomLocationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F26B6C020E189C9007BCC21 /* MBXCustomLocationViewController.m */; };
 		1F26B6C320E1A351007BCC21 /* simple_route.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F26B6C220E1A351007BCC21 /* simple_route.json */; };
+		1F4F0CDF21068FC40088FDE6 /* Aspects.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F4F0CDE21068FC30088FDE6 /* Aspects.m */; };
+		1F4F0CE32107D3AF0088FDE6 /* chinapolyline.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 1F4F0CE22107D3AF0088FDE6 /* chinapolyline.geojson */; };
 		1F7454921ECBB42C00021D39 /* MGLLight.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F0666891EC64F8E001C16D7 /* MGLLight.mm */; };
 		1F7454931ECBB43F00021D39 /* MGLLight.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F0666881EC64F8E001C16D7 /* MGLLight.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1F7454961ECD450D00021D39 /* MGLLight_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F7454941ECD450D00021D39 /* MGLLight_Private.h */; };
@@ -763,6 +765,9 @@
 		1F26B6BF20E189C9007BCC21 /* MBXCustomLocationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXCustomLocationViewController.h; sourceTree = "<group>"; };
 		1F26B6C020E189C9007BCC21 /* MBXCustomLocationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXCustomLocationViewController.m; sourceTree = "<group>"; };
 		1F26B6C220E1A351007BCC21 /* simple_route.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = simple_route.json; sourceTree = "<group>"; };
+		1F4F0CDD21068FC30088FDE6 /* Aspects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Aspects.h; sourceTree = "<group>"; };
+		1F4F0CDE21068FC30088FDE6 /* Aspects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Aspects.m; sourceTree = "<group>"; };
+		1F4F0CE22107D3AF0088FDE6 /* chinapolyline.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = chinapolyline.geojson; sourceTree = "<group>"; };
 		1F7454941ECD450D00021D39 /* MGLLight_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight_Private.h; sourceTree = "<group>"; };
 		1F7454A61ED08AB400021D39 /* MGLLightTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLLightTest.mm; path = ../../darwin/test/MGLLightTest.mm; sourceTree = "<group>"; };
 		1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLNSDateAdditionsTests.mm; path = ../../darwin/test/MGLNSDateAdditionsTests.mm; sourceTree = "<group>"; };
@@ -1389,6 +1394,15 @@
 			path = "Integration Test Harness";
 			sourceTree = "<group>";
 		};
+		1F4F0CDC21068F9A0088FDE6 /* Aspects */ = {
+			isa = PBXGroup;
+			children = (
+				1F4F0CDD21068FC30088FDE6 /* Aspects.h */,
+				1F4F0CDE21068FC30088FDE6 /* Aspects.m */,
+			);
+			name = Aspects;
+			sourceTree = "<group>";
+		};
 		35136D491D4277EA00C20EFD /* Sources */ = {
 			isa = PBXGroup;
 			children = (
@@ -1771,6 +1785,7 @@
 		DA1DC94C1CB6C1C2006E619F /* Demo App */ = {
 			isa = PBXGroup;
 			children = (
+				1F4F0CDC21068F9A0088FDE6 /* Aspects */,
 				3E6465D52065767A00685536 /* LimeGreenStyleLayer.h */,
 				3E6465D42065767A00685536 /* LimeGreenStyleLayer.m */,
 				DA1DC9501CB6C1C2006E619F /* MBXAppDelegate.h */,
@@ -1806,6 +1821,7 @@
 		DA1DC94D1CB6C1C2006E619F /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				1F4F0CE22107D3AF0088FDE6 /* chinapolyline.geojson */,
 				DA1DC9961CB6E046006E619F /* main.m */,
 			);
 			name = "Supporting Files";
@@ -2754,6 +2770,7 @@
 				DD4823771D94AE6C00EB71B7 /* numeric_filter_style.json in Resources */,
 				DA1DC9701CB6C6CE006E619F /* points.geojson in Resources */,
 				353BAEF61D646370009A8DA9 /* amsterdam.geojson in Resources */,
+				1F4F0CE32107D3AF0088FDE6 /* chinapolyline.geojson in Resources */,
 				DA1DC9711CB6C6CE006E619F /* polyline.geojson in Resources */,
 				DD4823761D94AE6C00EB71B7 /* line_filter_style.json in Resources */,
 				DA821D071CCC6D59007508D4 /* Main.storyboard in Resources */,
@@ -2864,6 +2881,7 @@
 				1F26B6C120E189C9007BCC21 /* MBXCustomLocationViewController.m in Sources */,
 				3E6465D62065767A00685536 /* LimeGreenStyleLayer.m in Sources */,
 				632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */,
+				1F4F0CDF21068FC40088FDE6 /* Aspects.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

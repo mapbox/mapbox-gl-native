@@ -7,6 +7,7 @@
 #import "MBXUserLocationAnnotationView.h"
 #import "LimeGreenStyleLayer.h"
 #import "MBXEmbeddedMapViewController.h"
+#import "Aspects.h"
 
 #import <Mapbox/Mapbox.h>
 
@@ -227,6 +228,20 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 {
     [super viewDidLoad];
 
+    [MGLMapView aspect_hookSelector:@selector(addAnnotations:)
+                        withOptions:AspectPositionInstead
+                         usingBlock:^(id<AspectInfo> aspectInfo, NSArray<id <MGLAnnotation>> *annotations) {
+                             NSLog(@"annotations: %@", annotations);
+                             NSInvocation *invocation = aspectInfo.originalInvocation;
+                             // preprocessing
+                             NSArray<id <MGLAnnotation>> *newannotations = @[annotations.firstObject];
+                             [invocation setArgument:&newannotations atIndex:2];
+                             [invocation invoke];
+                             
+                         }
+                              error:NULL];
+    
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(restoreState:) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationWillTerminateNotification object:nil];
@@ -832,7 +847,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     //
     NSDictionary *hike = [NSJSONSerialization JSONObjectWithData:
                              [NSData dataWithContentsOfFile:
-                                 [[NSBundle mainBundle] pathForResource:@"polyline" ofType:@"geojson"]]
+                                 [[NSBundle mainBundle] pathForResource:@"chinapolyline" ofType:@"geojson"]]
                                                          options:0
                                                            error:nil];
 
