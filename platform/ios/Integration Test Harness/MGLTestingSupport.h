@@ -1,0 +1,14 @@
+@import Foundation;
+
+typedef NSString *MGLTestingSupportNotification NS_TYPED_ENUM;
+
+extern NSString * const MGLTestingSupportMapViewID;
+
+extern const MGLTestingSupportNotification MGLTestingSupportNotificationMapViewStyleLoaded;
+extern const MGLTestingSupportNotification MGLTestingSupportNotificationMapViewRendered;
+extern const MGLTestingSupportNotification MGLTestingSupportNotificationMapViewRegionWillChange;
+extern const MGLTestingSupportNotification MGLTestingSupportNotificationMapViewRegionIsChanging;
+extern const MGLTestingSupportNotification MGLTestingSupportNotificationMapViewRegionDidChanged;
+
+
+FOUNDATION_EXTERN void testingSupportPostNotification(MGLTestingSupportNotification name);

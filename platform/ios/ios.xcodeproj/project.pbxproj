@@ -289,6 +289,11 @@
 		55E2AD131E5B125400E8C587 /* MGLOfflineStorageTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55E2AD121E5B125400E8C587 /* MGLOfflineStorageTests.mm */; };
 		632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */; };
 		6407D6701E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */; };
+		6FC77FCE20EB7B31009BB375 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6FC77FCD20EB7B31009BB375 /* Main.storyboard */; };
+		6FC77FD120EB7CA4009BB375 /* MGLTestHarnessViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FC77FD020EB7CA4009BB375 /* MGLTestHarnessViewController.m */; };
+		6FC77FF120ECB0F4009BB375 /* MGLMapRegionChangeEventsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FC77FF020ECB0F4009BB375 /* MGLMapRegionChangeEventsTests.m */; };
+		6FC77FFA20ECC043009BB375 /* MGLTestingSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FC77FF920ECC043009BB375 /* MGLTestingSupport.m */; };
+		6FC77FFB20ECC13E009BB375 /* MGLTestingSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FC77FF920ECC043009BB375 /* MGLTestingSupport.m */; };
 		8989B17C201A48EB0081CF59 /* MGLHeatmapStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8989B17A201A48EA0081CF59 /* MGLHeatmapStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8989B17D201A48EB0081CF59 /* MGLHeatmapStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8989B17A201A48EA0081CF59 /* MGLHeatmapStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8989B17E201A48EB0081CF59 /* MGLHeatmapStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8989B17B201A48EA0081CF59 /* MGLHeatmapStyleLayer.mm */; };
@@ -640,7 +645,21 @@
 			remoteGlobalIDString = DA8847D11CBAF91600AB86E3;
 			remoteInfo = dynamic;
 		};
-		CABE5DAB2072FA660003AF3C /* PBXContainerItemProxy */ = {
+		6FC77FD220EB9D8B009BB375 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16376B2E1FFDB4B40000563E;
+			remoteInfo = "Integration Test Harness";
+		};
+		6FC77FD620EBA802009BB375 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DA1DC9491CB6C1C2006E619F;
+			remoteInfo = iosapp;
+		};
+		6FC77FF320ECB0F4009BB375 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
 			proxyType = 1;
@@ -966,6 +985,14 @@
 		632281DD1E6F855900D75A5D /* MBXEmbeddedMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXEmbeddedMapViewController.h; sourceTree = "<group>"; };
 		632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXEmbeddedMapViewController.m; sourceTree = "<group>"; };
 		6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MGLDocumentationExampleTests.swift; path = ../../darwin/test/MGLDocumentationExampleTests.swift; sourceTree = "<group>"; };
+		6FC77FCD20EB7B31009BB375 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		6FC77FCF20EB7CA4009BB375 /* MGLTestHarnessViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTestHarnessViewController.h; sourceTree = "<group>"; };
+		6FC77FD020EB7CA4009BB375 /* MGLTestHarnessViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTestHarnessViewController.m; sourceTree = "<group>"; };
+		6FC77FEE20ECB0F4009BB375 /* Integration UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Integration UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6FC77FF020ECB0F4009BB375 /* MGLMapRegionChangeEventsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapRegionChangeEventsTests.m; sourceTree = "<group>"; };
+		6FC77FF220ECB0F4009BB375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6FC77FF820ECC043009BB375 /* MGLTestingSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTestingSupport.h; sourceTree = "<group>"; };
+		6FC77FF920ECC043009BB375 /* MGLTestingSupport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTestingSupport.m; sourceTree = "<group>"; };
 		8989B17A201A48EA0081CF59 /* MGLHeatmapStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLHeatmapStyleLayer.h; sourceTree = "<group>"; };
 		8989B17B201A48EA0081CF59 /* MGLHeatmapStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLHeatmapStyleLayer.mm; sourceTree = "<group>"; };
 		920A3E5C1E6F995200C16EFC /* MGLSourceQueryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLSourceQueryTests.m; path = ../../darwin/test/MGLSourceQueryTests.m; sourceTree = "<group>"; };
@@ -1310,6 +1337,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6FC77FEB20ECB0F4009BB375 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DA1DC9471CB6C1C2006E619F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1385,6 +1419,11 @@
 				16376B3C1FFDB4B40000563E /* LaunchScreen.storyboard */,
 				16376B3F1FFDB4B40000563E /* Info.plist */,
 				16376B401FFDB4B40000563E /* main.m */,
+				6FC77FCD20EB7B31009BB375 /* Main.storyboard */,
+				6FC77FCF20EB7CA4009BB375 /* MGLTestHarnessViewController.h */,
+				6FC77FD020EB7CA4009BB375 /* MGLTestHarnessViewController.m */,
+				6FC77FF820ECC043009BB375 /* MGLTestingSupport.h */,
+				6FC77FF920ECC043009BB375 /* MGLTestingSupport.m */,
 			);
 			path = "Integration Test Harness";
 			sourceTree = "<group>";
@@ -1705,6 +1744,15 @@
 			name = Sources;
 			sourceTree = "<group>";
 		};
+		6FC77FEF20ECB0F4009BB375 /* Integration UI Tests */ = {
+			isa = PBXGroup;
+			children = (
+				6FC77FF020ECB0F4009BB375 /* MGLMapRegionChangeEventsTests.m */,
+				6FC77FF220ECB0F4009BB375 /* Info.plist */,
+			);
+			path = "Integration UI Tests";
+			sourceTree = "<group>";
+		};
 		9604FC341F313A5E003EEA02 /* Fixtures */ = {
 			isa = PBXGroup;
 			children = (
@@ -1746,6 +1794,7 @@
 				DA2E88521CC036F400F24E7B /* SDK Tests */,
 				16376B301FFDB4B40000563E /* Integration Test Harness */,
 				16376B081FFD9DAF0000563E /* Integration Tests */,
+				6FC77FEF20ECB0F4009BB375 /* Integration UI Tests */,
 				DA1DC9921CB6DF24006E619F /* Frameworks */,
 				DAC07C951CBB2CAD000CB309 /* Configuration */,
 				DA1DC94B1CB6C1C2006E619F /* Products */,
@@ -1764,6 +1813,7 @@
 				DA25D5B91CCD9EDE00607828 /* Settings.bundle */,
 				16376B071FFD9DAF0000563E /* integration.xctest */,
 				16376B2F1FFDB4B40000563E /* Integration Test Harness.app */,
+				6FC77FEE20ECB0F4009BB375 /* Integration UI Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2484,7 +2534,8 @@
 			);
 			dependencies = (
 				165D0CE620005351009A3C66 /* PBXTargetDependency */,
-				CABE5DAC2072FA660003AF3C /* PBXTargetDependency */,
+				6FC77FD320EB9D8B009BB375 /* PBXTargetDependency */,
+				6FC77FD720EBA802009BB375 /* PBXTargetDependency */,
 			);
 			name = integration;
 			productName = "integration-tests";
@@ -2508,6 +2559,24 @@
 			productName = "Integration Test Harness";
 			productReference = 16376B2F1FFDB4B40000563E /* Integration Test Harness.app */;
 			productType = "com.apple.product-type.application";
+		};
+		6FC77FED20ECB0F4009BB375 /* Integration UI Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6FC77FF720ECB0F4009BB375 /* Build configuration list for PBXNativeTarget "Integration UI Tests" */;
+			buildPhases = (
+				6FC77FEA20ECB0F4009BB375 /* Sources */,
+				6FC77FEB20ECB0F4009BB375 /* Frameworks */,
+				6FC77FEC20ECB0F4009BB375 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6FC77FF420ECB0F4009BB375 /* PBXTargetDependency */,
+			);
+			name = "Integration UI Tests";
+			productName = "Integration UI Tests";
+			productReference = 6FC77FEE20ECB0F4009BB375 /* Integration UI Tests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 		DA1DC9491CB6C1C2006E619F /* iosapp */ = {
 			isa = PBXNativeTarget;
@@ -2647,11 +2716,16 @@
 					16376B061FFD9DAF0000563E = {
 						CreatedOnToolsVersion = 9.2;
 						ProvisioningStyle = Automatic;
-						TestTargetID = DA1DC9491CB6C1C2006E619F;
+						TestTargetID = 16376B2E1FFDB4B40000563E;
 					};
 					16376B2E1FFDB4B40000563E = {
 						CreatedOnToolsVersion = 9.2;
 						ProvisioningStyle = Automatic;
+					};
+					6FC77FED20ECB0F4009BB375 = {
+						CreatedOnToolsVersion = 9.4;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 16376B2E1FFDB4B40000563E;
 					};
 					DA1DC9491CB6C1C2006E619F = {
 						CreatedOnToolsVersion = 7.3;
@@ -2724,6 +2798,7 @@
 				DA2E88501CC036F400F24E7B /* test */,
 				16376B061FFD9DAF0000563E /* integration */,
 				16376B2E1FFDB4B40000563E /* Integration Test Harness */,
+				6FC77FED20ECB0F4009BB375 /* Integration UI Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -2741,8 +2816,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6FC77FCE20EB7B31009BB375 /* Main.storyboard in Resources */,
 				16376B3E1FFDB4B40000563E /* LaunchScreen.storyboard in Resources */,
 				16376B3B1FFDB4B40000563E /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6FC77FEC20ECB0F4009BB375 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2845,7 +2928,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				16376B411FFDB4B40000563E /* main.m in Sources */,
+				6FC77FD120EB7CA4009BB375 /* MGLTestHarnessViewController.m in Sources */,
 				16376B331FFDB4B40000563E /* AppDelegate.m in Sources */,
+				6FC77FFA20ECC043009BB375 /* MGLTestingSupport.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6FC77FEA20ECB0F4009BB375 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6FC77FF120ECB0F4009BB375 /* MGLMapRegionChangeEventsTests.m in Sources */,
+				6FC77FFB20ECC13E009BB375 /* MGLTestingSupport.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3192,10 +3286,20 @@
 			target = DA8847D11CBAF91600AB86E3 /* dynamic */;
 			targetProxy = 165D0CE520005351009A3C66 /* PBXContainerItemProxy */;
 		};
-		CABE5DAC2072FA660003AF3C /* PBXTargetDependency */ = {
+		6FC77FD320EB9D8B009BB375 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 16376B2E1FFDB4B40000563E /* Integration Test Harness */;
-			targetProxy = CABE5DAB2072FA660003AF3C /* PBXContainerItemProxy */;
+			targetProxy = 6FC77FD220EB9D8B009BB375 /* PBXContainerItemProxy */;
+		};
+		6FC77FD720EBA802009BB375 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DA1DC9491CB6C1C2006E619F /* iosapp */;
+			targetProxy = 6FC77FD620EBA802009BB375 /* PBXContainerItemProxy */;
+		};
+		6FC77FF420ECB0F4009BB375 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16376B2E1FFDB4B40000563E /* Integration Test Harness */;
+			targetProxy = 6FC77FF320ECB0F4009BB375 /* PBXContainerItemProxy */;
 		};
 		DA25D5C81CCDA0C100607828 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3507,6 +3611,46 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mapbox.Integration-Test-Harness";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		6FC77FF520ECB0F4009BB375 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = "Integration UI Tests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mapbox.Integration-UI-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Integration Test Harness";
+			};
+			name = Debug;
+		};
+		6FC77FF620ECB0F4009BB375 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = "Integration UI Tests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mapbox.Integration-UI-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Integration Test Harness";
 			};
 			name = Release;
 		};
@@ -3927,6 +4071,15 @@
 			buildConfigurations = (
 				16376B431FFDB4B40000563E /* Debug */,
 				16376B441FFDB4B40000563E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6FC77FF720ECB0F4009BB375 /* Build configuration list for PBXNativeTarget "Integration UI Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6FC77FF520ECB0F4009BB375 /* Debug */,
+				6FC77FF620ECB0F4009BB375 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
