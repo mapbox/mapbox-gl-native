@@ -121,3 +121,48 @@ used/needed but we had one incident fixed by #9665.
 ### Workarounds
 
 - Copy & Paste™ the code.
+
+
+## [Inheriting Constructors](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2540.htm)
+
+Compilers with only partial C++11 support causes compilation errors when using-declaration is used in derived class to inherit its base class's constructors `(e.g. using Base::Base;)`.
+
+```C++
+#include <vector>
+
+template <typename T>
+struct Varargs : std::vector<T>
+{
+    using std::vector<T>::vector;
+};
+
+// error: conflicts with version inherited from 'std::__1::vector<int, std::__1::allocator<int> >'
+int main()
+{
+    Varargs<int> v;
+    return 0;
+}
+```
+
+### Workarounds
+
+- Replace using-declaration (e.g. using Base::Base;) in derived class with `universal forwarding constructor`.
+
+```C++
+#include <vector>
+
+template <typename T>
+struct Varargs : std::vector<T>
+{
+    template <class... Args>
+    Varargs(Args&&... args) : std::vector<T>(std::forward<Args>(args)...) {}
+};
+
+int main()
+{
+    Varargs<int> v;
+    return 0;
+}
+```
+
+Note: Using `universal forwarding constructor` may not be appropriate when derived class has additional members that are not in base class. Write constructors for the derived class explicitly instead of using `universal forwarding constructor` when the derived class has additional members.
