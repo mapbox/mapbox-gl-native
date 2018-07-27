@@ -1,11 +1,11 @@
 # All dependencies in a single separate file so its checksum can be used in a CI cache key name
 
-mason_use(geometry VERSION 0.9.2 HEADER_ONLY)
+mason_use(geometry VERSION 0.9.3 HEADER_ONLY)
 mason_use(variant VERSION 1.1.4 HEADER_ONLY)
 mason_use(unique_resource VERSION cba309e HEADER_ONLY)
 mason_use(rapidjson VERSION 1.1.0 HEADER_ONLY)
 mason_use(boost VERSION 1.65.1 HEADER_ONLY)
-mason_use(geojsonvt VERSION 6.3.0 HEADER_ONLY)
+mason_use(geojsonvt VERSION 6.5.1 HEADER_ONLY)
 mason_use(supercluster VERSION 0.2.2 HEADER_ONLY)
 mason_use(kdbush VERSION 0.1.1-1 HEADER_ONLY)
 mason_use(earcut VERSION 0.12.4 HEADER_ONLY)
@@ -16,7 +16,7 @@ mason_use(polylabel VERSION 1.0.3 HEADER_ONLY)
 mason_use(wagyu VERSION 0.4.3 HEADER_ONLY)
 mason_use(shelf-pack VERSION 2.1.1 HEADER_ONLY)
 mason_use(cheap-ruler VERSION 2.5.3 HEADER_ONLY)
-mason_use(vector-tile VERSION 1.0.1 HEADER_ONLY)
+mason_use(vector-tile VERSION 1.0.2 HEADER_ONLY)
 
 if(MBGL_PLATFORM STREQUAL "android")
     mason_use(jni.hpp VERSION 3.0.0 HEADER_ONLY)
