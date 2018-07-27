@@ -5,6 +5,7 @@ macro(initialize_ios_target target)
     set_xcode_property(${target} ENABLE_BITCODE "YES")
     set_xcode_property(${target} BITCODE_GENERATION_MODE bitcode)
     set_xcode_property(${target} ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
+    set_xcode_property(${target} LLVM_LTO $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebugInfo>>:YES>)
 
     target_compile_options(${target}
         PRIVATE -fobjc-arc

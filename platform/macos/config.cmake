@@ -1,8 +1,15 @@
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11)
 
+macro(initialize_macos_target target)
+    set_xcode_property(${target} LLVM_LTO $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebugInfo>>:YES>)
+endmacro()
+
 include(cmake/loop-darwin.cmake)
+initialize_macos_target(mbgl-loop-darwin)
 
 macro(mbgl_platform_core)
+    initialize_macos_target(mbgl-core)
+
     target_sources(mbgl-core
         # Misc
         PRIVATE platform/darwin/mbgl/storage/reachability.h
@@ -67,6 +74,8 @@ endmacro()
 
 
 macro(mbgl_filesource)
+    initialize_macos_target(mbgl-filesource)
+
     target_sources(mbgl-filesource
         # File source
         PRIVATE platform/darwin/src/http_file_source.mm
@@ -87,6 +96,8 @@ endmacro()
 
 
 macro(mbgl_platform_glfw)
+    initialize_macos_target(mbgl-glfw)
+
     target_link_libraries(mbgl-glfw
         PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-darwin
@@ -95,6 +106,8 @@ endmacro()
 
 
 macro(mbgl_platform_render)
+    initialize_macos_target(mbgl-render)
+
     target_link_libraries(mbgl-render
         PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-darwin
@@ -103,6 +116,8 @@ endmacro()
 
 
 macro(mbgl_platform_offline)
+    initialize_macos_target(mbgl-offline)
+
     target_link_libraries(mbgl-offline
         PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-darwin
@@ -111,6 +126,8 @@ endmacro()
 
 
 macro(mbgl_platform_test)
+    initialize_macos_target(mbgl-test)
+
     target_sources(mbgl-test
         PRIVATE platform/default/mbgl/test/main.cpp
     )
@@ -132,6 +149,8 @@ macro(mbgl_platform_test)
 endmacro()
 
 macro(mbgl_platform_benchmark)
+    initialize_macos_target(mbgl-benchmark)
+
     target_sources(mbgl-benchmark
         PRIVATE benchmark/src/main.cpp
     )
@@ -149,6 +168,8 @@ macro(mbgl_platform_benchmark)
 endmacro()
 
 macro(mbgl_platform_node)
+    initialize_macos_target(mbgl-node)
+
     target_link_libraries(mbgl-node INTERFACE
         -exported_symbols_list ${CMAKE_SOURCE_DIR}/platform/node/symbol-list
         -dead_strip
