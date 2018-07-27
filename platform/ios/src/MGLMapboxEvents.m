@@ -195,4 +195,8 @@ static NSString * const MGLVariableGeofence = @"VariableGeofence";
     }
 }
 
++ (void)displayLogFileFromDate:(NSDate *)logDate {
+    [[[self sharedInstance] eventsManager] displayLogFileFromDate:logDate];
+}
+
 @end
