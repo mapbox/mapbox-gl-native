@@ -409,7 +409,6 @@ jobs:
       - *save-gradle-cache
       - run:
           name: Log in to Google Cloud Platform
-          shell: /bin/bash -euo pipefail
           command: |
             if [ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" ]; then
               echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
@@ -419,7 +418,6 @@ jobs:
       - run:
           name: Run instrumentation tests on Firebase
           no_output_timeout: 1200
-          shell: /bin/bash -euo pipefail
           command: |
             if [ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" ]; then
               gcloud firebase test android models list
@@ -467,7 +465,6 @@ jobs:
       - *reset-ccache-stats
       - run:
           name: Generate Maven credentials
-          shell: /bin/bash -euo pipefail
           command: |
             if [ -n "${PUBLISH_NEXUS_USERNAME}" ]; then
               aws s3 cp s3://mapbox/android/signing-credentials/secring.gpg platform/android/MapboxGLAndroidSDK/secring.gpg
