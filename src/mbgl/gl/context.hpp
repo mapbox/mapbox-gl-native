@@ -36,10 +36,12 @@ class Debugging;
 class ProgramBinary;
 } // namespace extension
 
-class Context : private util::noncopyable {
+class Context {
 public:
     Context();
     ~Context();
+    Context(const Context&) = delete;
+    Context& operator=(const Context& other) = delete;
 
     void initializeExtensions(const std::function<gl::ProcAddress(const char*)>&);
 
