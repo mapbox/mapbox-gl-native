@@ -2,6 +2,8 @@ package com.mapbox.mapboxsdk.testapp.maps
 
 import android.graphics.PointF
 import android.support.test.espresso.UiController
+import com.mapbox.mapboxsdk.camera.CameraPosition
+import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
@@ -335,6 +337,52 @@ class VisibleRegionTest : BaseActivityTest() {
       assertFalse(filtered.contains(mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height.toFloat())))
     }
   }
+
+  @Test
+  fun visibleRotatedRegionTest() {
+    validateTestSetup()
+    invoke(mapboxMap) { _: UiController, mapboxMap: MapboxMap ->
+      mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(0.0, 0.0), 8.0))
+      val d = Math.min(mapboxMap.width, mapboxMap.height) / 4;
+      val latLngs = listOf(
+              mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f),
+              mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f - d / 2f, mapView.height / 2f),
+              mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f + d / 2f, mapView.height / 2f),
+              mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f - d / 2f),
+              mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f + d / 2f)
+      )
+
+
+      for (bearing in 45 until 360 step 45) {
+        mapboxMap.moveCamera(CameraUpdateFactory.bearingTo(bearing.toDouble()));
+        val visibleRegion = mapboxMap.projection.visibleRegion
+        assertTrue(latLngs.all { visibleRegion.latLngBounds.contains(it) })
+      }
+    }
+  }
+
+    @Test
+    fun visibleRotatedRegionOverDatelineTest() {
+        validateTestSetup()
+        invoke(mapboxMap) { _: UiController, mapboxMap: MapboxMap ->
+            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(0.0, 180.0), 8.0))
+            val d = Math.min(mapboxMap.width, mapboxMap.height) / 4;
+            val latLngs = listOf(
+                    mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f),
+                    mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f - d / 2f, mapView.height / 2f),
+                    mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f + d / 2f, mapView.height / 2f),
+                    mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f - d / 2f),
+                    mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f + d / 2f)
+            )
+
+
+            for (bearing in 45 until 360 step 45) {
+                mapboxMap.moveCamera(CameraUpdateFactory.bearingTo(bearing.toDouble()));
+                val visibleRegion = mapboxMap.projection.visibleRegion
+                assertTrue(latLngs.all { visibleRegion.latLngBounds.contains(it) })
+            }
+        }
+    }
 
   private fun MapboxMap.getLatLngFromScreenCoords(x: Float, y: Float): LatLng {
     return this.projection.fromScreenLocation(PointF(x, y))
