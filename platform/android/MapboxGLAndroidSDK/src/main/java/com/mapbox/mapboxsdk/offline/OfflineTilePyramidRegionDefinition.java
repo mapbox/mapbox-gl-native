@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.offline;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Keep;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -19,10 +20,15 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
  */
 public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefinition, Parcelable {
 
+  @Keep
   private String styleURL;
+  @Keep
   private LatLngBounds bounds;
+  @Keep
   private double minZoom;
+  @Keep
   private double maxZoom;
+  @Keep
   private float pixelRatio;
 
   /**
@@ -34,6 +40,7 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
    * @param maxZoom    max zoom
    * @param pixelRatio pixel ratio of the device
    */
+  @Keep
   public OfflineTilePyramidRegionDefinition(
     String styleURL, LatLngBounds bounds, double minZoom, double maxZoom, float pixelRatio) {
     // Note: Also used in JNI

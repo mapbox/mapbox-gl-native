@@ -3,6 +3,7 @@
 package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.ColorInt;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -26,6 +27,7 @@ public class RasterLayer extends Layer {
    *
    * @param nativePtr pointer used by core
    */
+  @Keep
   public RasterLayer(long nativePtr) {
     super(nativePtr);
   }
@@ -41,6 +43,7 @@ public class RasterLayer extends Layer {
     initialize(layerId, sourceId);
   }
 
+  @Keep
   protected native void initialize(String layerId, String sourceId);
 
   /**
@@ -285,47 +288,68 @@ public class RasterLayer extends Layer {
     return (PropertyValue<Float>) new PropertyValue("raster-fade-duration", nativeGetRasterFadeDuration());
   }
 
+  @Keep
   private native Object nativeGetRasterOpacity();
 
+  @Keep
   private native TransitionOptions nativeGetRasterOpacityTransition();
 
+  @Keep
   private native void nativeSetRasterOpacityTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetRasterHueRotate();
 
+  @Keep
   private native TransitionOptions nativeGetRasterHueRotateTransition();
 
+  @Keep
   private native void nativeSetRasterHueRotateTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetRasterBrightnessMin();
 
+  @Keep
   private native TransitionOptions nativeGetRasterBrightnessMinTransition();
 
+  @Keep
   private native void nativeSetRasterBrightnessMinTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetRasterBrightnessMax();
 
+  @Keep
   private native TransitionOptions nativeGetRasterBrightnessMaxTransition();
 
+  @Keep
   private native void nativeSetRasterBrightnessMaxTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetRasterSaturation();
 
+  @Keep
   private native TransitionOptions nativeGetRasterSaturationTransition();
 
+  @Keep
   private native void nativeSetRasterSaturationTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetRasterContrast();
 
+  @Keep
   private native TransitionOptions nativeGetRasterContrastTransition();
 
+  @Keep
   private native void nativeSetRasterContrastTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetRasterResampling();
 
+  @Keep
   private native Object nativeGetRasterFadeDuration();
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
 }

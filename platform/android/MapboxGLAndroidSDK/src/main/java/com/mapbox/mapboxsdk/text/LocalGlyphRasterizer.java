@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.support.annotation.Keep;
 import android.support.annotation.WorkerThread;
 
 /**
@@ -24,6 +25,7 @@ public class LocalGlyphRasterizer {
    * @return Return a {@link Bitmap} to be displayed in the requested tile.
    */
   @WorkerThread
+  @Keep
   protected static Bitmap drawGlyphBitmap(String fontFamily, boolean bold, char glyphID) {
     /*
       35x35px dimensions are hardwired to match local_glyph_rasterizer.cpp

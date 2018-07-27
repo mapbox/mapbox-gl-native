@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.geometry;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.FloatRange;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.mapbox.mapboxsdk.constants.GeometryConstants;
@@ -19,9 +20,13 @@ import java.util.List;
  */
 public class LatLngBounds implements Parcelable {
 
+  @Keep
   private final double latitudeNorth;
+  @Keep
   private final double latitudeSouth;
+  @Keep
   private final double longitudeEast;
+  @Keep
   private final double longitudeWest;
 
   /**
@@ -37,6 +42,7 @@ public class LatLngBounds implements Parcelable {
    * @param southLatitude Southern Latitude
    * @param westLongitude Western Longitude
    */
+  @Keep
   LatLngBounds(final double northLatitude, final double eastLongitude, final double southLatitude,
                final double westLongitude) {
     this.latitudeNorth = northLatitude;

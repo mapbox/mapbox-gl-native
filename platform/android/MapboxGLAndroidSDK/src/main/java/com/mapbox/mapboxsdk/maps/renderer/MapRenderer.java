@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.maps.renderer;
 
 import android.content.Context;
 import android.support.annotation.CallSuper;
+import android.support.annotation.Keep;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.storage.FileSource;
@@ -16,6 +17,7 @@ import javax.microedition.khronos.opengles.GL10;
  * render on the one end and acts as a scheduler to request work to
  * be performed on the GL thread on the other.
  */
+@Keep
 public abstract class MapRenderer implements MapRendererScheduler {
 
   // Holds the pointer to the native peer after initialisation

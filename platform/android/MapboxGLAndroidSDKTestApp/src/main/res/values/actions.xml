@@ -36,7 +36,7 @@
     <string name="dynamic_marker_arsenal_title">Arsenal</string>
     <string name="dynamic_marker_arsenal_snippet">Emirates Stadium</string>
     <string name="debug_zoom">Zoom: %.2f</string>
-    <string name="viewcache_size">ViewCache size %.2f</string>
+    <string name="viewcache_size">ViewCache size %d</string>
     <string name="latitude">Latitude</string>
     <string name="min_value">-180</string>
     <string name="longitude">Longitude</string>

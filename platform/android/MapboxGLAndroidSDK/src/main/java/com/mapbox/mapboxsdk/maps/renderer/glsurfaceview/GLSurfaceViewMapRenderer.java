@@ -77,5 +77,4 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
     glSurfaceView.queueEvent(runnable);
   }
 
-
 }

@@ -4,8 +4,10 @@
 -keepattributes Signature, *Annotation*, EnclosingMethod
 
 # config for the SDK
--keep class com.mapbox.mapboxsdk.** { *; }
--keep interface com.mapbox.mapboxsdk.** { *; }
+-keep class com.google.gson.JsonArray { *; }
+-keep class com.google.gson.JsonElement { *; }
+-keep class com.google.gson.JsonObject { *; }
+-keep class com.google.gson.JsonPrimitive { *; }
 
 # config for okhttp 3.8.0, https://github.com/square/okhttp/pull/3354
 -dontwarn okio.**
@@ -23,7 +25,6 @@
 
 # config for mapbox-sdk-geojson:3.0.1
 -keep class com.mapbox.geojson.** { *; }
--keep class com.google.gson.** { *; }
 -dontnote com.google.gson.internal.UnsafeAllocator
 
 # config for mapbox-android-gestures:0.0.1-20180228.152340-13

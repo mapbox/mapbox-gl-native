@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.offline;
 
+import android.support.annotation.Keep;
+
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 
 /**
@@ -7,6 +9,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
  * <p>
  * For the present, a tile pyramid is the only type of offline region.
  */
+@Keep
 public interface OfflineRegionDefinition {
 
   LatLngBounds getBounds();

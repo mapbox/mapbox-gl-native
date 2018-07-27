@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.style.layers;
 
+import android.support.annotation.Keep;
+
 /**
  * Custom layer.
  * <p>
@@ -13,6 +15,7 @@ public class CustomLayer extends Layer {
     initialize(id, host);
   }
 
+  @Keep
   public CustomLayer(long nativePtr) {
     super(nativePtr);
   }
@@ -21,11 +24,14 @@ public class CustomLayer extends Layer {
     nativeUpdate();
   }
 
+  @Keep
   protected native void initialize(String id, long host);
 
+  @Keep
   protected native void nativeUpdate();
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
 }

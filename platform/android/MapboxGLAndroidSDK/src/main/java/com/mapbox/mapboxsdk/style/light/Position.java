@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.style.light;
 
+import android.support.annotation.Keep;
+
 /**
  * Position of the light source relative to lit (extruded) geometries.
  * <p>
@@ -13,8 +15,11 @@ package com.mapbox.mapboxsdk.style.light;
  */
 public class Position {
 
+  @Keep
   private float radialCoordinate;
+  @Keep
   private float azimuthalAngle;
+  @Keep
   private float polarAngle;
 
   /**
@@ -38,6 +43,7 @@ public class Position {
    * @param polarAngle the polar angle
    * @return the created Position object
    */
+  @Keep
   public static Position fromPosition(float radialCoordinate, float azimuthalAngle, float polarAngle) {
     return new Position(radialCoordinate, azimuthalAngle, polarAngle);
   }

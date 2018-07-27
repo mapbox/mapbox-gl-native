@@ -3,6 +3,7 @@
 package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.ColorInt;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -26,6 +27,7 @@ public class LineLayer extends Layer {
    *
    * @param nativePtr pointer used by core
    */
+  @Keep
   public LineLayer(long nativePtr) {
     super(nativePtr);
   }
@@ -41,6 +43,7 @@ public class LineLayer extends Layer {
     initialize(layerId, sourceId);
   }
 
+  @Keep
   protected native void initialize(String layerId, String sourceId);
 
   /**
@@ -475,71 +478,104 @@ public class LineLayer extends Layer {
     nativeSetLinePatternTransition(options.getDuration(), options.getDelay());
   }
 
+  @Keep
   private native Object nativeGetLineCap();
 
+  @Keep
   private native Object nativeGetLineJoin();
 
+  @Keep
   private native Object nativeGetLineMiterLimit();
 
+  @Keep
   private native Object nativeGetLineRoundLimit();
 
+  @Keep
   private native Object nativeGetLineOpacity();
 
+  @Keep
   private native TransitionOptions nativeGetLineOpacityTransition();
 
+  @Keep
   private native void nativeSetLineOpacityTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetLineColor();
 
+  @Keep
   private native TransitionOptions nativeGetLineColorTransition();
 
+  @Keep
   private native void nativeSetLineColorTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetLineTranslate();
 
+  @Keep
   private native TransitionOptions nativeGetLineTranslateTransition();
 
+  @Keep
   private native void nativeSetLineTranslateTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetLineTranslateAnchor();
 
+  @Keep
   private native Object nativeGetLineWidth();
 
+  @Keep
   private native TransitionOptions nativeGetLineWidthTransition();
 
+  @Keep
   private native void nativeSetLineWidthTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetLineGapWidth();
 
+  @Keep
   private native TransitionOptions nativeGetLineGapWidthTransition();
 
+  @Keep
   private native void nativeSetLineGapWidthTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetLineOffset();
 
+  @Keep
   private native TransitionOptions nativeGetLineOffsetTransition();
 
+  @Keep
   private native void nativeSetLineOffsetTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetLineBlur();
 
+  @Keep
   private native TransitionOptions nativeGetLineBlurTransition();
 
+  @Keep
   private native void nativeSetLineBlurTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetLineDasharray();
 
+  @Keep
   private native TransitionOptions nativeGetLineDasharrayTransition();
 
+  @Keep
   private native void nativeSetLineDasharrayTransition(long duration, long delay);
 
+  @Keep
   private native Object nativeGetLinePattern();
 
+  @Keep
   private native TransitionOptions nativeGetLinePatternTransition();
 
+  @Keep
   private native void nativeSetLinePatternTransition(long duration, long delay);
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
 }

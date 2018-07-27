@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.style.layers;
 
+import android.support.annotation.Keep;
+
 /**
  * Resembles transition property from the style specification.
  *
@@ -28,6 +30,7 @@ public class TransitionOptions {
    * @param delay    the delay to start the transition
    * @return a new transition property object
    */
+  @Keep
   public static TransitionOptions fromTransitionOptions(long duration, long delay) {
     return new TransitionOptions(duration, delay);
   }

@@ -7,6 +7,7 @@
 package com.mapbox.mapboxsdk.style.light;
 
 import android.support.annotation.ColorInt;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 
@@ -23,6 +24,7 @@ import com.mapbox.mapboxsdk.utils.ThreadUtils;
 @UiThread
 public class Light {
 
+  @Keep
   private long nativePtr;
 
   /**
@@ -30,6 +32,7 @@ public class Light {
    *
    * @param nativePtr pointer used by core
    */
+  @Keep
   public Light(long nativePtr) {
     checkThread();
     this.nativePtr = nativePtr;
@@ -120,14 +123,23 @@ public class Light {
 
 <% for (const property of properties) { -%>
 <% if (property.name == "position") {-%>
+  @Keep
   private native void nativeSet<%- camelize(property.name) %>(Position position);
+
+  @Keep
   private native Position nativeGet<%- camelize(property.name) %>();
 <% } else { -%>
+  @Keep
   private native void nativeSet<%- camelize(property.name) %>(<%- propertyJavaType(property) -%> <%- property.name %>);
+
+  @Keep
   private native <%- propertyJavaType(property) -%> nativeGet<%- camelize(property.name) %>();
 <% } -%>
 <% if (property.transition) { -%>
+  @Keep
   private native TransitionOptions nativeGet<%- camelize(property.name) %>Transition();
+
+  @Keep
   private native void nativeSet<%- camelize(property.name) %>Transition(long duration, long delay);
 <% } -%>
 <% } -%>

@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.style.sources;
 
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -27,6 +28,7 @@ public class GeoJsonSource extends Source {
    *
    * @param nativePtr - pointer to native peer
    */
+  @Keep
   public GeoJsonSource(long nativePtr) {
     super(nativePtr);
   }
@@ -267,23 +269,32 @@ public class GeoJsonSource extends Source {
     return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
   }
 
+  @Keep
   protected native void initialize(String layerId, Object options);
 
+  @Keep
   protected native void nativeSetUrl(String url);
 
+  @Keep
   protected native String nativeGetUrl();
 
+  @Keep
   private native void nativeSetGeoJsonString(String geoJson);
 
+  @Keep
   private native void nativeSetFeatureCollection(FeatureCollection geoJson);
 
+  @Keep
   private native void nativeSetFeature(Feature feature);
 
+  @Keep
   private native void nativeSetGeometry(Geometry geometry);
 
+  @Keep
   private native Feature[] querySourceFeatures(Object[] filter);
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
 }

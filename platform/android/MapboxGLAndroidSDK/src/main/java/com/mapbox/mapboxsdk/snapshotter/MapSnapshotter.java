@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.os.Handler;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -71,6 +72,7 @@ public class MapSnapshotter {
   private static final int LOGO_MARGIN_DP = 4;
 
   // Holds the pointer to JNI NativeMapView
+  @Keep
   private long nativePtr = 0;
 
   private final Context context;
@@ -255,6 +257,7 @@ public class MapSnapshotter {
    * @param width  the width
    * @param height the height
    */
+  @Keep
   public native void setSize(int width, int height);
 
   /**
@@ -262,6 +265,7 @@ public class MapSnapshotter {
    *
    * @param cameraPosition the camera position
    */
+  @Keep
   public native void setCameraPosition(CameraPosition cameraPosition);
 
   /**
@@ -269,6 +273,7 @@ public class MapSnapshotter {
    *
    * @param region the region
    */
+  @Keep
   public native void setRegion(LatLngBounds region);
 
   /**
@@ -276,6 +281,7 @@ public class MapSnapshotter {
    *
    * @param styleUrl the style url
    */
+  @Keep
   public native void setStyleUrl(String styleUrl);
 
   /**
@@ -283,6 +289,7 @@ public class MapSnapshotter {
    *
    * @param styleJson the style json
    */
+  @Keep
   public native void setStyleJson(String styleJson);
 
   /**
@@ -446,6 +453,7 @@ public class MapSnapshotter {
    *
    * @param snapshot the generated snapshot
    */
+  @Keep
   protected void onSnapshotReady(final MapSnapshot snapshot) {
     new Handler().post(new Runnable() {
       @Override
@@ -465,6 +473,7 @@ public class MapSnapshotter {
    *
    * @param reason the exception string
    */
+  @Keep
   protected void onSnapshotFailed(String reason) {
     if (errorHandler != null) {
       errorHandler.onError(reason);
@@ -481,17 +490,21 @@ public class MapSnapshotter {
     errorHandler = null;
   }
 
+  @Keep
   protected native void nativeInitialize(MapSnapshotter mapSnapshotter,
                                          FileSource fileSource, float pixelRatio,
                                          int width, int height, String styleUrl, String styleJson,
                                          LatLngBounds region, CameraPosition position,
                                          boolean showLogo, String programCacheDir);
 
+  @Keep
   protected native void nativeStart();
 
+  @Keep
   protected native void nativeCancel();
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
   private class Logo {
