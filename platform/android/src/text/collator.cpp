@@ -30,8 +30,18 @@ void Collator::setStrength(jni::JNIEnv& env, const jni::Object<Collator>& collat
 
 jni::jint Collator::compare(jni::JNIEnv& env, const jni::Object<Collator>& collator, const jni::String& lhs, const jni::String& rhs) {
     static auto& javaClass = jni::Class<Collator>::Singleton(env);
-    auto static method = javaClass.GetMethod<jni::jint (jni::String, jni::String)>(env, "compare");
+    static auto method = javaClass.GetMethod<jni::jint (jni::String, jni::String)>(env, "compare");
     return collator.Call(env, method, lhs, rhs);
+}
+
+void StringUtils::registerNative(jni::JNIEnv& env) {
+    jni::Class<StringUtils>::Singleton(env);
+}
+
+jni::Local<jni::String> StringUtils::unaccent(jni::JNIEnv& env, const jni::String& value) {
+    static auto& javaClass = jni::Class<StringUtils>::Singleton(env);
+    static auto method = javaClass.GetStaticMethod<jni::String (jni::String)>(env, "unaccent");
+    return javaClass.Call(env, method, value);
 }
 
 void Locale::registerNative(jni::JNIEnv& env) {

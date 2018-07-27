@@ -11,10 +11,10 @@ platform/android/src/text/local_glyph_rasterizer.cpp
 platform/android/src/text/local_glyph_rasterizer_jni.hpp
 platform/android/src/logging_android.cpp
 platform/android/src/thread.cpp
-platform/default/string_stdlib.cpp
+platform/android/src/string_util.cpp
 platform/default/bidi.cpp
 platform/default/thread_local.cpp
-platform/default/unaccent.cpp
+platform/android/src/unaccent.cpp
 platform/default/unaccent.hpp
 platform/default/utf.cpp
 

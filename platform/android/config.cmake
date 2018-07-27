@@ -1,6 +1,5 @@
 set(USE_GLES2 ON)
 
-include(cmake/nunicode.cmake)
 include(cmake/sqlite.cmake)
 include(cmake/icu.cmake)
 
@@ -49,7 +48,6 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC rapidjson)
 
     target_link_libraries(mbgl-core
-        PRIVATE nunicode
         PRIVATE icu
         PUBLIC expected
         PUBLIC -llog

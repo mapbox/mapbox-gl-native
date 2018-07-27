@@ -56,6 +56,7 @@ public class RenderTestActivity extends AppCompatActivity {
       add("overlapping,raster-masking");
       add("missing,raster-loading");
       add("pitchAndBearing,line-pitch");
+      add("overdraw,sparse-tileset");
     }
   };
 
@@ -292,7 +293,7 @@ public class RenderTestActivity extends AppCompatActivity {
   }
 
   public void onLoadIgnoreList(List<String> ignoreList) {
-    Timber.e("We loaded %s amount of tests to be ignored", ignoreList.size());
+    Timber.e("We loaded %s of tests to be ignored", ignoreList.size());
     EXCLUDED_TESTS.addAll(ignoreList);
     new LoadRenderDefinitionTask(this).execute();
   }

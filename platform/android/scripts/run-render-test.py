@@ -3,7 +3,7 @@
 import os
 import shutil
 
-catPath = os.getcwd() + "/platform/android/build/render-test/render/"
+catPath = os.getcwd() + "/platform/android/build/render-test/"
 failCounter = 0
 testCounter = 0
 for cat in os.listdir(catPath):
