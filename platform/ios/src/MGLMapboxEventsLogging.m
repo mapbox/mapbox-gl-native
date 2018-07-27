@@ -1,4 +1,5 @@
 #import "MGLMapboxEventsLogging.h"
+#import "MGLMapboxEvents.h"
 
 @implementation MGLMapboxEventsLogging
 
