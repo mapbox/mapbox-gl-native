@@ -10,6 +10,10 @@ TEST(HTTPHeader, Parsing) {
     ASSERT_FALSE(bool(cc.maxAge));
     EXPECT_FALSE(cc.mustRevalidate);
 
+    cc = http::CacheControl::parse(R"#("max-age=34)#");
+    ASSERT_FALSE(bool(cc.maxAge));
+    EXPECT_FALSE(cc.mustRevalidate);
+
     cc = http::CacheControl::parse(R"#(max-age =34)#");
     ASSERT_TRUE(bool(cc.maxAge));
     EXPECT_EQ(34u, *cc.maxAge);
@@ -34,6 +38,11 @@ TEST(HTTPHeader, Parsing) {
     EXPECT_FALSE(cc.mustRevalidate);
 
     cc = http::CacheControl::parse(R"#(max-age=3,max-age="34)#");
+    ASSERT_TRUE(bool(cc.maxAge));
+    EXPECT_EQ(3u, *cc.maxAge);
+    EXPECT_FALSE(cc.mustRevalidate);
+
+    cc = http::CacheControl::parse(R"#(max-age=3,max-age=""34)#");
     ASSERT_TRUE(bool(cc.maxAge));
     EXPECT_EQ(3u, *cc.maxAge);
     EXPECT_FALSE(cc.mustRevalidate);
