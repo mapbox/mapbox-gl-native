@@ -5,9 +5,7 @@ package com.mapbox.mapboxsdk.style.layers;
 import android.support.annotation.ColorInt;
 
 import com.mapbox.mapboxsdk.style.expressions.Expression;
-
-import java.text.DecimalFormat;
-import java.util.Locale;
+import com.mapbox.mapboxsdk.utils.ColorUtils;
 
 /**
  * Constructs paint/layout properties for Layers
@@ -2404,11 +2402,11 @@ public class PropertyFactory {
    *
    * @param color Android color int
    * @return String rgba color
+   * @deprecated use {@link com.mapbox.mapboxsdk.utils.ColorUtils#colorToRgbaString(int)} instead
    */
+  @Deprecated
   public static String colorToRgbaString(@ColorInt int color) {
-    String alpha = new DecimalFormat("#.###").format(((float)((color >> 24) & 0xFF)) / 255.0f);
-    return String.format(Locale.US, "rgba(%d, %d, %d, %s)",
-      (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, alpha);
+    return ColorUtils.colorToRgbaString(color);
   }
 
   /**
@@ -2419,8 +2417,10 @@ public class PropertyFactory {
    *
    * @param color Android color int
    * @return int rgba array
+   * @deprecated use {@link com.mapbox.mapboxsdk.utils.ColorUtils#colorToRgbaArray(int)} instead
    */
+  @Deprecated
   public static float[] colorToRgbaArray(@ColorInt int color) {
-    return new float[] {(color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, ((color >> 24) & 0xFF) / 255.0f};
+    return ColorUtils.colorToRgbaArray(color);
   }
 }
