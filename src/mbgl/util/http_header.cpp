@@ -2,34 +2,20 @@
 
 #include <mbgl/util/string.hpp>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunknown-pragmas"
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#pragma GCC diagnostic ignored "-Wshadow"
-#pragma clang diagnostic push
-
-#pragma clang diagnostic ignored "-Wshorten-64-to-32"
-#pragma clang diagnostic ignored "-Wunknown-warning-option"
-#pragma clang diagnostic ignored "-Wtautological-constant-compare"
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#pragma clang diagnostic pop
-#pragma GCC diagnostic pop
+#include <regex>
 
 namespace mbgl {
 namespace http {
 
 CacheControl CacheControl::parse(const std::string& value) {
-    namespace qi = boost::spirit::qi;
-    namespace phoenix = boost::phoenix;
+    std::regex maxAgeRegex(R"((?:[^"]*"[^"]*[^\\]")*[^"]*max-age[\s]*=[\s]*([\d]+).*)");
+    std::smatch maxAgeMatch;
 
     CacheControl result;
-    qi::phrase_parse(value.begin(), value.end(), (
-        (qi::lit("must-revalidate") [ phoenix::ref(result.mustRevalidate) = true ]) |
-        (qi::lit("max-age") >> '=' >> qi::ulong_long [ phoenix::ref(result.maxAge) = qi::_1 ]) |
-        (*(('"' >> *(('\\' >> qi::char_) | (qi::char_ - '"')) >> '"') | (qi::char_ - '"' - ',')))
-    ) % ',', qi::ascii::space);
+    result.mustRevalidate = value.find("must-revalidate") != std::string::npos;
+    if (std::regex_match(value, maxAgeMatch, maxAgeRegex) && maxAgeMatch.size() == 2) {
+        result.maxAge = ::atoll(maxAgeMatch[1].str().c_str());
+    }
     return result;
 }
 
