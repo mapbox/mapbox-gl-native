@@ -426,8 +426,10 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion/source.hpp
     include/mbgl/style/conversion/tileset.hpp
     include/mbgl/style/conversion/transition_options.hpp
+    src/mbgl/style/conversion/color_ramp_property_value.cpp
     src/mbgl/style/conversion/constant.cpp
     src/mbgl/style/conversion/coordinate.cpp
+    src/mbgl/style/conversion/custom_geometry_source_options.cpp
     src/mbgl/style/conversion/filter.cpp
     src/mbgl/style/conversion/function.cpp
     src/mbgl/style/conversion/geojson.cpp

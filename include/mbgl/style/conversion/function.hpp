@@ -19,7 +19,7 @@ template <class T>
 optional<PropertyExpression<T>> convertFunctionToExpression(const Convertible& value, Error& error, bool convertTokens) {
     auto expression = convertFunctionToExpression(expression::valueTypeToExpressionType<T>(), value, error, convertTokens);
     if (!expression) {
-        return {};
+        return nullopt;
     }
 
     optional<T> defaultValue;
@@ -28,8 +28,8 @@ optional<PropertyExpression<T>> convertFunctionToExpression(const Convertible& v
     if (defaultValueValue) {
         defaultValue = convert<T>(*defaultValueValue, error);
         if (!defaultValue) {
-            error = { R"(wrong type for "default": )" + error.message };
-            return {};
+            error.message = R"(wrong type for "default": )" + error.message;
+            return nullopt;
         }
     }
 

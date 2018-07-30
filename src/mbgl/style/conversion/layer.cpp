@@ -37,7 +37,7 @@ optional<Error> setPaintProperty(Layer& layer, const std::string& name, const Co
 optional<Error> setPaintProperties(Layer& layer, const Convertible& value) {
     auto paintValue = objectMember(value, "paint");
     if (!paintValue) {
-        return {};
+        return nullopt;
     }
     if (!isObject(*paintValue)) {
         return { { "paint must be an object" } };
@@ -51,14 +51,14 @@ template <class LayerType>
 optional<std::unique_ptr<Layer>> convertVectorLayer(const std::string& id, const Convertible& value, Error& error) {
     auto sourceValue = objectMember(value, "source");
     if (!sourceValue) {
-        error = { "layer must have a source" };
-        return {};
+        error.message = "layer must have a source";
+        return nullopt;
     }
 
     optional<std::string> source = toString(*sourceValue);
     if (!source) {
-        error = { "layer source must be a string" };
-        return {};
+        error.message = "layer source must be a string";
+        return nullopt;
     }
 
     std::unique_ptr<LayerType> layer = std::make_unique<LayerType>(id, *source);
@@ -67,8 +67,8 @@ optional<std::unique_ptr<Layer>> convertVectorLayer(const std::string& id, const
     if (sourceLayerValue) {
         optional<std::string> sourceLayer = toString(*sourceLayerValue);
         if (!sourceLayer) {
-            error = { "layer source-layer must be a string" };
-            return {};
+            error.message = "layer source-layer must be a string";
+            return nullopt;
         }
         layer->setSourceLayer(*sourceLayer);
     }
@@ -77,7 +77,7 @@ optional<std::unique_ptr<Layer>> convertVectorLayer(const std::string& id, const
     if (filterValue) {
         optional<Filter> filter = convert<Filter>(*filterValue, error);
         if (!filter) {
-            return {};
+            return nullopt;
         }
         layer->setFilter(*filter);
     }
@@ -88,14 +88,14 @@ optional<std::unique_ptr<Layer>> convertVectorLayer(const std::string& id, const
 static optional<std::unique_ptr<Layer>> convertRasterLayer(const std::string& id, const Convertible& value, Error& error) {
     auto sourceValue = objectMember(value, "source");
     if (!sourceValue) {
-        error = { "layer must have a source" };
-        return {};
+        error.message = "layer must have a source";
+        return nullopt;
     }
 
     optional<std::string> source = toString(*sourceValue);
     if (!source) {
-        error = { "layer source must be a string" };
-        return {};
+        error.message = "layer source must be a string";
+        return nullopt;
     }
 
     return { std::make_unique<RasterLayer>(id, *source) };
@@ -104,14 +104,14 @@ static optional<std::unique_ptr<Layer>> convertRasterLayer(const std::string& id
 static optional<std::unique_ptr<Layer>> convertHillshadeLayer(const std::string& id, const Convertible& value, Error& error) {
     auto sourceValue = objectMember(value, "source");
     if (!sourceValue) {
-        error = { "layer must have a source" };
-        return {};
+        error.message = "layer must have a source";
+        return nullopt;
     }
 
     optional<std::string> source = toString(*sourceValue);
     if (!source) {
-        error = { "layer source must be a string" };
-        return {};
+        error.message = "layer source must be a string";
+        return nullopt;
     }
 
     return { std::make_unique<HillshadeLayer>(id, *source) };
@@ -124,32 +124,32 @@ static optional<std::unique_ptr<Layer>> convertBackgroundLayer(const std::string
 
 optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(const Convertible& value, Error& error) const {
     if (!isObject(value)) {
-        error = { "layer must be an object" };
-        return {};
+        error.message = "layer must be an object";
+        return nullopt;
     }
 
     auto idValue = objectMember(value, "id");
     if (!idValue) {
-        error = { "layer must have an id" };
-        return {};
+        error.message = "layer must have an id";
+        return nullopt;
     }
 
     optional<std::string> id = toString(*idValue);
     if (!id) {
-        error = { "layer id must be a string" };
-        return {};
+        error.message = "layer id must be a string";
+        return nullopt;
     }
 
     auto typeValue = objectMember(value, "type");
     if (!typeValue) {
-        error = { "layer must have a type" };
-        return {};
+        error.message = "layer must have a type";
+        return nullopt;
     }
 
     optional<std::string> type = toString(*typeValue);
     if (!type) {
-        error = { "layer type must be a string" };
-        return {};
+        error.message = "layer type must be a string";
+        return nullopt;
     }
 
     optional<std::unique_ptr<Layer>> converted;
@@ -173,8 +173,8 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
     } else if (*type == "background") {
         converted = convertBackgroundLayer(*id, value, error);
     } else {
-        error = { "invalid layer type" };
-        return {};
+        error.message = "invalid layer type";
+        return nullopt;
     }
 
     if (!converted) {
@@ -187,8 +187,8 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
     if (minzoomValue) {
         optional<float> minzoom = toNumber(*minzoomValue);
         if (!minzoom) {
-            error = { "minzoom must be numeric" };
-            return {};
+            error.message = "minzoom must be numeric";
+            return nullopt;
         }
         layer->setMinZoom(*minzoom);
     }
@@ -197,8 +197,8 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
     if (maxzoomValue) {
         optional<float> maxzoom = toNumber(*maxzoomValue);
         if (!maxzoom) {
-            error = { "maxzoom must be numeric" };
-            return {};
+            error.message = "maxzoom must be numeric";
+            return nullopt;
         }
         layer->setMaxZoom(*maxzoom);
     }
@@ -206,22 +206,22 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
     auto layoutValue = objectMember(value, "layout");
     if (layoutValue) {
         if (!isObject(*layoutValue)) {
-            error = { "layout must be an object" };
-            return {};
+            error.message = "layout must be an object";
+            return nullopt;
         }
         optional<Error> error_ = eachMember(*layoutValue, [&] (const std::string& k, const Convertible& v) {
             return setLayoutProperty(*layer, k, v);
         });
         if (error_) {
             error = *error_;
-            return {};
+            return nullopt;
         }
     }
 
     optional<Error> error_ = setPaintProperties(*layer, value);
     if (error_) {
         error = *error_;
-        return {};
+        return nullopt;
     }
 
     return std::move(layer);
