@@ -5,7 +5,7 @@
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/function.hpp>
-#include <mbgl/style/conversion/data_driven_property_value.hpp>
+#include <mbgl/style/conversion/property_value.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -27,13 +27,13 @@ static std::string createFunctionJSON(size_t stopCount) {
 
 static void Parse_CompositeFunction(benchmark::State& state) {
     size_t stopCount = state.range(0);
-    
+
     while (state.KeepRunning()) {
         conversion::Error error;
         state.PauseTiming();
         auto doc = createFunctionJSON(stopCount);
         state.ResumeTiming();
-        optional<DataDrivenPropertyValue<float>> result = conversion::convertJSON<DataDrivenPropertyValue<float>>(doc, error, false);
+        optional<PropertyValue<float>> result = conversion::convertJSON<PropertyValue<float>>(doc, error, true, false);
         if (!result) {
             state.SkipWithError(error.message.c_str());
         }
@@ -45,16 +45,16 @@ static void Evaluate_CompositeFunction(benchmark::State& state) {
     size_t stopCount = state.range(0);
     auto doc = createFunctionJSON(stopCount);
     conversion::Error error;
-    optional<DataDrivenPropertyValue<float>> function = conversion::convertJSON<DataDrivenPropertyValue<float>>(doc, error, false);
+    optional<PropertyValue<float>> function = conversion::convertJSON<PropertyValue<float>>(doc, error, true, false);
     if (!function) {
         state.SkipWithError(error.message.c_str());
     }
-    
+
     while(state.KeepRunning()) {
         float z = 24.0f * static_cast<float>(rand() % 100) / 100;
         function->asExpression().evaluate(z, StubGeometryTileFeature(PropertyMap { { "x", static_cast<int64_t>(rand() % 100) } }), -1.0f);
     }
-    
+
     state.SetLabel(std::to_string(stopCount).c_str());
 }
 

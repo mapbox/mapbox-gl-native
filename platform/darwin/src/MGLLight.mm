@@ -18,14 +18,14 @@ namespace mbgl {
         { MGLLightAnchorMap, "map" },
         { MGLLightAnchorViewport, "viewport" },
     });
-    
+
 }
 
 NS_INLINE MGLTransition MGLTransitionFromOptions(const mbgl::style::TransitionOptions& options) {
     MGLTransition transition;
     transition.duration = MGLTimeIntervalFromDuration(options.duration.value_or(mbgl::Duration::zero()));
     transition.delay = MGLTimeIntervalFromDuration(options.delay.value_or(mbgl::Duration::zero()));
-    
+
     return transition;
 }
 
@@ -60,27 +60,21 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
         } else {
             _position = MGLStyleValueTransformer<mbgl::style::Position, NSValue *>().toExpression(positionValue);
         }
-        
         _positionTransition = MGLTransitionFromOptions(mbglLight->getPositionTransition());
- 
         auto colorValue = mbglLight->getColor();
         if (colorValue.isUndefined()) {
             _color = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toExpression(mbglLight->getDefaultColor());
         } else {
             _color = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toExpression(colorValue);
         }
-        
         _colorTransition = MGLTransitionFromOptions(mbglLight->getColorTransition());
- 
         auto intensityValue = mbglLight->getIntensity();
         if (intensityValue.isUndefined()) {
             _intensity = MGLStyleValueTransformer<float, NSNumber *>().toExpression(mbglLight->getDefaultIntensity());
         } else {
             _intensity = MGLStyleValueTransformer<float, NSNumber *>().toExpression(intensityValue);
         }
-        
         _intensityTransition = MGLTransitionFromOptions(mbglLight->getIntensityTransition());
- 
     }
 
     return self;
@@ -89,25 +83,25 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 - (mbgl::style::Light)mbglLight
 {
     mbgl::style::Light mbglLight;
-    auto anchor = MGLStyleValueTransformer<mbgl::style::LightAnchorType, NSValue *, mbgl::style::LightAnchorType, MGLLightAnchor>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::LightAnchorType>>(self.anchor);
+    auto anchor = MGLStyleValueTransformer<mbgl::style::LightAnchorType, NSValue *, mbgl::style::LightAnchorType, MGLLightAnchor>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::LightAnchorType>>(self.anchor, false);
     mbglLight.setAnchor(anchor);
 
-    auto position = MGLStyleValueTransformer<mbgl::style::Position, NSValue *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::Position>>(self.position);
+    auto position = MGLStyleValueTransformer<mbgl::style::Position, NSValue *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::Position>>(self.position, false);
     mbglLight.setPosition(position);
- 
+
     mbglLight.setPositionTransition(MGLOptionsFromTransition(self.positionTransition));
 
-    auto color = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(self.color);
+    auto color = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(self.color, false);
     mbglLight.setColor(color);
- 
+
     mbglLight.setColorTransition(MGLOptionsFromTransition(self.colorTransition));
 
-    auto intensity = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(self.intensity);
+    auto intensity = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(self.intensity, false);
     mbglLight.setIntensity(intensity);
- 
+
     mbglLight.setIntensityTransition(MGLOptionsFromTransition(self.intensityTransition));
 
-    
+
     return mbglLight;
 }
 

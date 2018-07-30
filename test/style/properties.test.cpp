@@ -27,7 +27,7 @@ float evaluate(Transitioning<PropertyValue<float>>& property, Duration delta = D
     return property.evaluate(evaluator, parameters.now);
 }
 
-PossiblyEvaluatedPropertyValue<float> evaluate(Transitioning<DataDrivenPropertyValue<float>>& property, Duration delta = Duration::zero()) {
+PossiblyEvaluatedPropertyValue<float> evaluateDataExpression(Transitioning<PropertyValue<float>>& property, Duration delta = Duration::zero()) {
     ZoomHistory zoomHistory;
     zoomHistory.update(0, TimePoint::min() + delta);
 
@@ -36,12 +36,12 @@ PossiblyEvaluatedPropertyValue<float> evaluate(Transitioning<DataDrivenPropertyV
         TimePoint::min() + delta,
         Duration::zero()
     };
-    
+
     DataDrivenPropertyEvaluator<float> evaluator {
         parameters,
         0.0f
     };
-    
+
     return property.evaluate(evaluator, parameters.now);
 }
 
@@ -114,10 +114,10 @@ TEST(TransitioningDataDrivenPropertyValue, Evaluate) {
     TransitionOptions transition;
     transition.delay = { 1000ms };
     transition.duration = { 1000ms };
-    
-    Transitioning<DataDrivenPropertyValue<float>> t0 {
-        DataDrivenPropertyValue<float>(0.0f),
-        Transitioning<DataDrivenPropertyValue<float>>(),
+
+    Transitioning<PropertyValue<float>> t0 {
+        PropertyValue<float>(0.0f),
+        Transitioning<PropertyValue<float>>(),
         TransitionOptions(),
         TimePoint::min()
     };
@@ -125,14 +125,14 @@ TEST(TransitioningDataDrivenPropertyValue, Evaluate) {
     using namespace mbgl::style::expression::dsl;
     PropertyExpression<float> expression(number(get("property_name")));
 
-    Transitioning<DataDrivenPropertyValue<float>> t1 {
-        DataDrivenPropertyValue<float>(expression),
+    Transitioning<PropertyValue<float>> t1 {
+        PropertyValue<float>(expression),
         t0,
         transition,
         TimePoint::min()
     };
-    
-    ASSERT_TRUE(evaluate(t0, 0ms).isConstant());
-    ASSERT_FALSE(evaluate(t1, 0ms).isConstant()) <<
+
+    ASSERT_TRUE(evaluateDataExpression(t0, 0ms).isConstant());
+    ASSERT_FALSE(evaluateDataExpression(t1, 0ms).isConstant()) <<
         "A paint property transition to a data-driven evaluates immediately to the final value (see https://github.com/mapbox/mapbox-gl-native/issues/8237).";
 }

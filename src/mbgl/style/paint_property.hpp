@@ -3,7 +3,6 @@
 #include <mbgl/style/color_ramp_property_value.hpp>
 #include <mbgl/style/properties.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/data_driven_property_value.hpp>
 #include <mbgl/renderer/property_evaluator.hpp>
 #include <mbgl/renderer/cross_faded_property_evaluator.hpp>
 #include <mbgl/renderer/data_driven_property_evaluator.hpp>
@@ -27,8 +26,8 @@ public:
 template <class T, class A, class U>
 class DataDrivenPaintProperty {
 public:
-    using TransitionableType = Transitionable<DataDrivenPropertyValue<T>>;
-    using UnevaluatedType = Transitioning<DataDrivenPropertyValue<T>>;
+    using TransitionableType = Transitionable<PropertyValue<T>>;
+    using UnevaluatedType = Transitioning<PropertyValue<T>>;
     using EvaluatorType = DataDrivenPropertyEvaluator<T>;
     using PossiblyEvaluatedType = PossiblyEvaluatedPropertyValue<T>;
     using Type = T;
@@ -67,7 +66,7 @@ public:
     using PossiblyEvaluatedType = Color;
     using Type = Color;
     static constexpr bool IsDataDriven = false;
-    
+
     static Color defaultValue() { return {}; }
 };
 

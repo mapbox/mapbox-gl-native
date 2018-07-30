@@ -10,7 +10,7 @@ namespace mbgl {
 namespace style {
 namespace conversion {
 
-optional<ColorRampPropertyValue> Converter<ColorRampPropertyValue>::operator()(const Convertible& value, Error& error, bool) const {
+optional<ColorRampPropertyValue> Converter<ColorRampPropertyValue>::operator()(const Convertible& value, Error& error, bool, bool) const {
     using namespace mbgl::style::expression;
     if (isUndefined(value)) {
         return ColorRampPropertyValue();

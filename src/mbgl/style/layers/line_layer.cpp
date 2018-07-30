@@ -110,15 +110,15 @@ void LineLayer::setLineCap(PropertyValue<LineCapType> value) {
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
-DataDrivenPropertyValue<LineJoinType> LineLayer::getDefaultLineJoin() {
+PropertyValue<LineJoinType> LineLayer::getDefaultLineJoin() {
     return LineJoin::defaultValue();
 }
 
-DataDrivenPropertyValue<LineJoinType> LineLayer::getLineJoin() const {
+PropertyValue<LineJoinType> LineLayer::getLineJoin() const {
     return impl().layout.get<LineJoin>();
 }
 
-void LineLayer::setLineJoin(DataDrivenPropertyValue<LineJoinType> value) {
+void LineLayer::setLineJoin(PropertyValue<LineJoinType> value) {
     if (value == getLineJoin())
         return;
     auto impl_ = mutableImpl();
@@ -161,15 +161,15 @@ void LineLayer::setLineRoundLimit(PropertyValue<float> value) {
 
 // Paint properties
 
-DataDrivenPropertyValue<float> LineLayer::getDefaultLineOpacity() {
+PropertyValue<float> LineLayer::getDefaultLineOpacity() {
     return { 1 };
 }
 
-DataDrivenPropertyValue<float> LineLayer::getLineOpacity() const {
+PropertyValue<float> LineLayer::getLineOpacity() const {
     return impl().paint.template get<LineOpacity>().value;
 }
 
-void LineLayer::setLineOpacity(DataDrivenPropertyValue<float> value) {
+void LineLayer::setLineOpacity(PropertyValue<float> value) {
     if (value == getLineOpacity())
         return;
     auto impl_ = mutableImpl();
@@ -188,15 +188,15 @@ TransitionOptions LineLayer::getLineOpacityTransition() const {
     return impl().paint.template get<LineOpacity>().options;
 }
 
-DataDrivenPropertyValue<Color> LineLayer::getDefaultLineColor() {
+PropertyValue<Color> LineLayer::getDefaultLineColor() {
     return { Color::black() };
 }
 
-DataDrivenPropertyValue<Color> LineLayer::getLineColor() const {
+PropertyValue<Color> LineLayer::getLineColor() const {
     return impl().paint.template get<LineColor>().value;
 }
 
-void LineLayer::setLineColor(DataDrivenPropertyValue<Color> value) {
+void LineLayer::setLineColor(PropertyValue<Color> value) {
     if (value == getLineColor())
         return;
     auto impl_ = mutableImpl();
@@ -269,15 +269,15 @@ TransitionOptions LineLayer::getLineTranslateAnchorTransition() const {
     return impl().paint.template get<LineTranslateAnchor>().options;
 }
 
-DataDrivenPropertyValue<float> LineLayer::getDefaultLineWidth() {
+PropertyValue<float> LineLayer::getDefaultLineWidth() {
     return { 1 };
 }
 
-DataDrivenPropertyValue<float> LineLayer::getLineWidth() const {
+PropertyValue<float> LineLayer::getLineWidth() const {
     return impl().paint.template get<LineWidth>().value;
 }
 
-void LineLayer::setLineWidth(DataDrivenPropertyValue<float> value) {
+void LineLayer::setLineWidth(PropertyValue<float> value) {
     if (value == getLineWidth())
         return;
     auto impl_ = mutableImpl();
@@ -296,15 +296,15 @@ TransitionOptions LineLayer::getLineWidthTransition() const {
     return impl().paint.template get<LineWidth>().options;
 }
 
-DataDrivenPropertyValue<float> LineLayer::getDefaultLineGapWidth() {
+PropertyValue<float> LineLayer::getDefaultLineGapWidth() {
     return { 0 };
 }
 
-DataDrivenPropertyValue<float> LineLayer::getLineGapWidth() const {
+PropertyValue<float> LineLayer::getLineGapWidth() const {
     return impl().paint.template get<LineGapWidth>().value;
 }
 
-void LineLayer::setLineGapWidth(DataDrivenPropertyValue<float> value) {
+void LineLayer::setLineGapWidth(PropertyValue<float> value) {
     if (value == getLineGapWidth())
         return;
     auto impl_ = mutableImpl();
@@ -323,15 +323,15 @@ TransitionOptions LineLayer::getLineGapWidthTransition() const {
     return impl().paint.template get<LineGapWidth>().options;
 }
 
-DataDrivenPropertyValue<float> LineLayer::getDefaultLineOffset() {
+PropertyValue<float> LineLayer::getDefaultLineOffset() {
     return { 0 };
 }
 
-DataDrivenPropertyValue<float> LineLayer::getLineOffset() const {
+PropertyValue<float> LineLayer::getLineOffset() const {
     return impl().paint.template get<LineOffset>().value;
 }
 
-void LineLayer::setLineOffset(DataDrivenPropertyValue<float> value) {
+void LineLayer::setLineOffset(PropertyValue<float> value) {
     if (value == getLineOffset())
         return;
     auto impl_ = mutableImpl();
@@ -350,15 +350,15 @@ TransitionOptions LineLayer::getLineOffsetTransition() const {
     return impl().paint.template get<LineOffset>().options;
 }
 
-DataDrivenPropertyValue<float> LineLayer::getDefaultLineBlur() {
+PropertyValue<float> LineLayer::getDefaultLineBlur() {
     return { 0 };
 }
 
-DataDrivenPropertyValue<float> LineLayer::getLineBlur() const {
+PropertyValue<float> LineLayer::getLineBlur() const {
     return impl().paint.template get<LineBlur>().value;
 }
 
-void LineLayer::setLineBlur(DataDrivenPropertyValue<float> value) {
+void LineLayer::setLineBlur(PropertyValue<float> value) {
     if (value == getLineBlur())
         return;
     auto impl_ = mutableImpl();

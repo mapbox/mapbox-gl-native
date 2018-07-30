@@ -5,7 +5,6 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/data_driven_property_value.hpp>
 
 #include <mbgl/util/color.hpp>
 
@@ -42,9 +41,9 @@ public:
     PropertyValue<LineCapType> getLineCap() const;
     void setLineCap(PropertyValue<LineCapType>);
 
-    static DataDrivenPropertyValue<LineJoinType> getDefaultLineJoin();
-    DataDrivenPropertyValue<LineJoinType> getLineJoin() const;
-    void setLineJoin(DataDrivenPropertyValue<LineJoinType>);
+    static PropertyValue<LineJoinType> getDefaultLineJoin();
+    PropertyValue<LineJoinType> getLineJoin() const;
+    void setLineJoin(PropertyValue<LineJoinType>);
 
     static PropertyValue<float> getDefaultLineMiterLimit();
     PropertyValue<float> getLineMiterLimit() const;
@@ -56,15 +55,15 @@ public:
 
     // Paint properties
 
-    static DataDrivenPropertyValue<float> getDefaultLineOpacity();
-    DataDrivenPropertyValue<float> getLineOpacity() const;
-    void setLineOpacity(DataDrivenPropertyValue<float>);
+    static PropertyValue<float> getDefaultLineOpacity();
+    PropertyValue<float> getLineOpacity() const;
+    void setLineOpacity(PropertyValue<float>);
     void setLineOpacityTransition(const TransitionOptions&);
     TransitionOptions getLineOpacityTransition() const;
 
-    static DataDrivenPropertyValue<Color> getDefaultLineColor();
-    DataDrivenPropertyValue<Color> getLineColor() const;
-    void setLineColor(DataDrivenPropertyValue<Color>);
+    static PropertyValue<Color> getDefaultLineColor();
+    PropertyValue<Color> getLineColor() const;
+    void setLineColor(PropertyValue<Color>);
     void setLineColorTransition(const TransitionOptions&);
     TransitionOptions getLineColorTransition() const;
 
@@ -80,27 +79,27 @@ public:
     void setLineTranslateAnchorTransition(const TransitionOptions&);
     TransitionOptions getLineTranslateAnchorTransition() const;
 
-    static DataDrivenPropertyValue<float> getDefaultLineWidth();
-    DataDrivenPropertyValue<float> getLineWidth() const;
-    void setLineWidth(DataDrivenPropertyValue<float>);
+    static PropertyValue<float> getDefaultLineWidth();
+    PropertyValue<float> getLineWidth() const;
+    void setLineWidth(PropertyValue<float>);
     void setLineWidthTransition(const TransitionOptions&);
     TransitionOptions getLineWidthTransition() const;
 
-    static DataDrivenPropertyValue<float> getDefaultLineGapWidth();
-    DataDrivenPropertyValue<float> getLineGapWidth() const;
-    void setLineGapWidth(DataDrivenPropertyValue<float>);
+    static PropertyValue<float> getDefaultLineGapWidth();
+    PropertyValue<float> getLineGapWidth() const;
+    void setLineGapWidth(PropertyValue<float>);
     void setLineGapWidthTransition(const TransitionOptions&);
     TransitionOptions getLineGapWidthTransition() const;
 
-    static DataDrivenPropertyValue<float> getDefaultLineOffset();
-    DataDrivenPropertyValue<float> getLineOffset() const;
-    void setLineOffset(DataDrivenPropertyValue<float>);
+    static PropertyValue<float> getDefaultLineOffset();
+    PropertyValue<float> getLineOffset() const;
+    void setLineOffset(PropertyValue<float>);
     void setLineOffsetTransition(const TransitionOptions&);
     TransitionOptions getLineOffsetTransition() const;
 
-    static DataDrivenPropertyValue<float> getDefaultLineBlur();
-    DataDrivenPropertyValue<float> getLineBlur() const;
-    void setLineBlur(DataDrivenPropertyValue<float>);
+    static PropertyValue<float> getDefaultLineBlur();
+    PropertyValue<float> getLineBlur() const;
+    void setLineBlur(PropertyValue<float>);
     void setLineBlurTransition(const TransitionOptions&);
     TransitionOptions getLineBlurTransition() const;
 

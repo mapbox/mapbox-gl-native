@@ -100,15 +100,15 @@ void HeatmapLayer::setMaxZoom(float maxZoom) {
 
 // Paint properties
 
-DataDrivenPropertyValue<float> HeatmapLayer::getDefaultHeatmapRadius() {
+PropertyValue<float> HeatmapLayer::getDefaultHeatmapRadius() {
     return { 30 };
 }
 
-DataDrivenPropertyValue<float> HeatmapLayer::getHeatmapRadius() const {
+PropertyValue<float> HeatmapLayer::getHeatmapRadius() const {
     return impl().paint.template get<HeatmapRadius>().value;
 }
 
-void HeatmapLayer::setHeatmapRadius(DataDrivenPropertyValue<float> value) {
+void HeatmapLayer::setHeatmapRadius(PropertyValue<float> value) {
     if (value == getHeatmapRadius())
         return;
     auto impl_ = mutableImpl();
@@ -127,15 +127,15 @@ TransitionOptions HeatmapLayer::getHeatmapRadiusTransition() const {
     return impl().paint.template get<HeatmapRadius>().options;
 }
 
-DataDrivenPropertyValue<float> HeatmapLayer::getDefaultHeatmapWeight() {
+PropertyValue<float> HeatmapLayer::getDefaultHeatmapWeight() {
     return { 1 };
 }
 
-DataDrivenPropertyValue<float> HeatmapLayer::getHeatmapWeight() const {
+PropertyValue<float> HeatmapLayer::getHeatmapWeight() const {
     return impl().paint.template get<HeatmapWeight>().value;
 }
 
-void HeatmapLayer::setHeatmapWeight(DataDrivenPropertyValue<float> value) {
+void HeatmapLayer::setHeatmapWeight(PropertyValue<float> value) {
     if (value == getHeatmapWeight())
         return;
     auto impl_ = mutableImpl();

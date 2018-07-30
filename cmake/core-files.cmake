@@ -363,7 +363,6 @@ set(MBGL_CORE_FILES
     # style
     include/mbgl/style/color_ramp_property_value.hpp
     include/mbgl/style/conversion.hpp
-    include/mbgl/style/data_driven_property_value.hpp
     include/mbgl/style/filter.hpp
     include/mbgl/style/image.hpp
     include/mbgl/style/layer.hpp
@@ -413,7 +412,6 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion/constant.hpp
     include/mbgl/style/conversion/coordinate.hpp
     include/mbgl/style/conversion/custom_geometry_source_options.hpp
-    include/mbgl/style/conversion/data_driven_property_value.hpp
     include/mbgl/style/conversion/filter.hpp
     include/mbgl/style/conversion/function.hpp
     include/mbgl/style/conversion/geojson.hpp

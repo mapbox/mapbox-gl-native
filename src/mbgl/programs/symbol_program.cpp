@@ -14,7 +14,7 @@ using namespace style;
 static_assert(sizeof(SymbolLayoutVertex) == 16, "expected SymbolLayoutVertex size");
 
 std::unique_ptr<SymbolSizeBinder> SymbolSizeBinder::create(const float tileZoom,
-                                                    const style::DataDrivenPropertyValue<float>& sizeProperty,
+                                                    const style::PropertyValue<float>& sizeProperty,
                                                     const float defaultValue) {
     return sizeProperty.match(
         [&] (const Undefined& value) -> std::unique_ptr<SymbolSizeBinder> {
@@ -46,7 +46,7 @@ Values makeValues(const bool isText,
                   const float symbolFadeChange,
                   Args&&... args) {
     std::array<float, 2> extrudeScale;
-    
+
     if (values.pitchAlignment == AlignmentType::Map) {
         extrudeScale.fill(tile.id.pixelsToTileUnits(1, state.getZoom()));
     } else {
@@ -59,7 +59,7 @@ Values makeValues(const bool isText,
     const float pixelsToTileUnits = tile.id.pixelsToTileUnits(1.0, state.getZoom());
     const bool pitchWithMap = values.pitchAlignment == style::AlignmentType::Map;
     const bool rotateWithMap = values.rotationAlignment == style::AlignmentType::Map;
-    
+
     // Line label rotation happens in `updateLineLabels`
     // Pitched point labels are automatically rotated by the labelPlaneMatrix projection
     // Unpitched point labels need to have their rotation applied after projection
@@ -75,7 +75,7 @@ Values makeValues(const bool isText,
     }
 
     mat4 glCoordMatrix = getGlCoordMatrix(tile.matrix, pitchWithMap, rotateWithMap, state, pixelsToTileUnits);
-        
+
     return Values {
         uniforms::u_matrix::Value{ tile.translatedMatrix(values.translate,
                                    values.translateAnchor,
@@ -137,7 +137,7 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
     const float gammaScale = (values.pitchAlignment == AlignmentType::Map
                               ? std::cos(state.getPitch()) * state.getCameraToCenterDistance()
                               : 1.0);
-    
+
     return makeValues<SymbolSDFProgram<PaintProperties>::UniformValues>(
         isText,
         values,

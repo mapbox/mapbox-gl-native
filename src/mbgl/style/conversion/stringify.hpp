@@ -2,7 +2,6 @@
 
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/data_driven_property_value.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/feature.hpp>
@@ -149,19 +148,6 @@ void stringify(Writer& writer, const PropertyValue<T>& v) {
 
 template <class Property, class Writer, class T>
 void stringify(Writer& writer, const PropertyValue<T>& value) {
-    if (!value.isUndefined()) {
-        writer.Key(Property::key);
-        stringify(writer, value);
-    }
-}
-
-template <class Writer, class T>
-void stringify(Writer& writer, const DataDrivenPropertyValue<T>& v) {
-    v.evaluate([&] (const auto& v_) { stringify(writer, v_); });
-}
-
-template <class Property, class Writer, class T>
-void stringify(Writer& writer, const DataDrivenPropertyValue<T>& value) {
     if (!value.isUndefined()) {
         writer.Key(Property::key);
         stringify(writer, value);
