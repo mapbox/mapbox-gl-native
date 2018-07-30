@@ -1,0 +1,179 @@
+<%
+  const type = locals.type;
+  const layoutProperties = locals.layoutProperties;
+  const paintProperties = locals.paintProperties;
+-%>
+// This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
+
+#include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
+#include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer_impl.hpp>
+#include <mbgl/style/layer_observer.hpp>
+<% if (type === 'heatmap') { -%>
+// for constructing default heatmap-color ramp expression from style JSON
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/color_ramp_property_value.hpp>
+#include <mbgl/style/conversion/json.hpp>
+<% } -%>
+
+namespace mbgl {
+namespace style {
+
+<% if (type === 'background') { -%>
+<%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID)
+    : Layer(makeMutable<Impl>(LayerType::<%- camelize(type) %>, layerID, std::string())) {
+}
+<% } else { -%>
+<%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID, const std::string& sourceID)
+    : Layer(makeMutable<Impl>(LayerType::<%- camelize(type) %>, layerID, sourceID)) {
+}
+<% } -%>
+
+<%- camelize(type) %>Layer::<%- camelize(type) %>Layer(Immutable<Impl> impl_)
+    : Layer(std::move(impl_)) {
+}
+
+<%- camelize(type) %>Layer::~<%- camelize(type) %>Layer() = default;
+
+const <%- camelize(type) %>Layer::Impl& <%- camelize(type) %>Layer::impl() const {
+    return static_cast<const Impl&>(*baseImpl);
+}
+
+Mutable<<%- camelize(type) %>Layer::Impl> <%- camelize(type) %>Layer::mutableImpl() const {
+    return makeMutable<Impl>(impl());
+}
+
+std::unique_ptr<Layer> <%- camelize(type) %>Layer::cloneRef(const std::string& id_) const {
+    auto impl_ = mutableImpl();
+    impl_->id = id_;
+    impl_->paint = <%- camelize(type) %>PaintProperties::Transitionable();
+    return std::make_unique<<%- camelize(type) %>Layer>(std::move(impl_));
+}
+
+<% if (layoutProperties.length) { -%>
+void <%- camelize(type) %>Layer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>& writer) const {
+    layout.stringify(writer);
+}
+<% } else { -%>
+void <%- camelize(type) %>Layer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
+}
+<% } -%>
+
+<% if (type !== 'background') { -%>
+// Source
+
+const std::string& <%- camelize(type) %>Layer::getSourceID() const {
+    return impl().source;
+}
+
+<% if (type !== 'raster' && type !== 'hillshade') { -%>
+void <%- camelize(type) %>Layer::setSourceLayer(const std::string& sourceLayer) {
+    auto impl_ = mutableImpl();
+    impl_->sourceLayer = sourceLayer;
+    baseImpl = std::move(impl_);
+}
+
+const std::string& <%- camelize(type) %>Layer::getSourceLayer() const {
+    return impl().sourceLayer;
+}
+
+// Filter
+
+void <%- camelize(type) %>Layer::setFilter(const Filter& filter) {
+    auto impl_ = mutableImpl();
+    impl_->filter = filter;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+const Filter& <%- camelize(type) %>Layer::getFilter() const {
+    return impl().filter;
+}
+<% } -%>
+<% } -%>
+
+// Visibility
+
+void <%- camelize(type) %>Layer::setVisibility(VisibilityType value) {
+    if (value == getVisibility())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->visibility = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+// Zoom range
+
+void <%- camelize(type) %>Layer::setMinZoom(float minZoom) {
+    auto impl_ = mutableImpl();
+    impl_->minZoom = minZoom;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void <%- camelize(type) %>Layer::setMaxZoom(float maxZoom) {
+    auto impl_ = mutableImpl();
+    impl_->maxZoom = maxZoom;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+// Layout properties
+
+<% for (const property of layoutProperties) { -%>
+<%- propertyValueType(property) %> <%- camelize(type) %>Layer::getDefault<%- camelize(property.name) %>() {
+    return <%- camelize(property.name) %>::defaultValue();
+}
+
+<%- propertyValueType(property) %> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
+    return impl().layout.get<<%- camelize(property.name) %>>();
+}
+
+void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyValueType(property) %> value) {
+    if (value == get<%- camelize(property.name) %>())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->layout.get<<%- camelize(property.name) %>>() = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+<% } -%>
+
+// Paint properties
+<% for (const property of paintProperties) { %>
+<%- propertyValueType(property) %> <%- camelize(type) %>Layer::getDefault<%- camelize(property.name) %>() {
+<% if (property.name === 'heatmap-color') { -%>
+    conversion::Error error;
+    std::string rawValue = R"JSON(<%- JSON.stringify(property.default) %>)JSON";
+    return *conversion::convertJSON<<%- propertyValueType(property)%>>(rawValue, error);
+<% } else { -%>
+    return { <%- defaultValue(property) %> };
+<% } -%>
+}
+
+<%- propertyValueType(property) %> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
+    return impl().paint.template get<<%- camelize(property.name) %>>().value;
+}
+
+void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyValueType(property) %> value) {
+    if (value == get<%- camelize(property.name) %>())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<<%- camelize(property.name) %>>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>Transition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<<%- camelize(property.name) %>>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions <%- camelize(type) %>Layer::get<%- camelize(property.name) %>Transition() const {
+    return impl().paint.template get<<%- camelize(property.name) %>>().options;
+}
+<% } -%>
+
+} // namespace style
+} // namespace mbgl

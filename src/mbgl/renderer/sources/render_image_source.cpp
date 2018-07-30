@@ -58,24 +58,32 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
     static const style::Properties<>::PossiblyEvaluated properties {};
     static const DebugProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
+    auto& programInstance = parameters.programs.debug;
+
     for (auto matrix : matrices) {
-        parameters.programs.debug.draw(
+        programInstance.draw(
             parameters.context,
             gl::LineStrip { 4.0f * parameters.pixelRatio },
             gl::DepthMode::disabled(),
             gl::StencilMode::disabled(),
             gl::ColorMode::unblended(),
-            DebugProgram::UniformValues {
-             uniforms::u_matrix::Value{ matrix },
-             uniforms::u_color::Value{ Color::red() }
-            },
-            parameters.staticData.tileVertexBuffer,
             parameters.staticData.tileBorderIndexBuffer,
             parameters.staticData.tileBorderSegments,
-            paintAttributeData,
-            properties,
-            parameters.state.getZoom(),
-            "debug"
+            programInstance.computeAllUniformValues(
+                DebugProgram::UniformValues {
+                    uniforms::u_matrix::Value{ matrix },
+                    uniforms::u_color::Value{ Color::red() }
+                },
+                paintAttributeData,
+                properties,
+                parameters.state.getZoom()
+            ),
+            programInstance.computeAllAttributeBindings(
+                parameters.staticData.tileVertexBuffer,
+                paintAttributeData,
+                properties
+            ),
+            "image"
         );
     }
 }
@@ -131,7 +139,7 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
     auto dx = nePoint.x - swPoint.x;
     auto dy = nePoint.y - swPoint.y;
     auto dMax = std::max(dx, dy);
-    double zoom = std::max(0.0, std::floor(-util::log2(dMax)));
+    double zoom = std::max(0.0, std::floor(-::log2(dMax)));
 
     // Only enable if the long side of the image is > 2 pixels. Resulting in a
     // display of at least 2 x 1 px image

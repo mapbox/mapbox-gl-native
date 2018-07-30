@@ -6,6 +6,8 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/logging.hpp>
 
+#include "offline_schema.hpp"
+
 #include "sqlite3.hpp"
 
 namespace mbgl {
@@ -27,58 +29,73 @@ OfflineDatabase::~OfflineDatabase() {
     }
 }
 
-void OfflineDatabase::connect(int flags) {
-    db = std::make_unique<mapbox::sqlite::Database>(path.c_str(), flags);
-    db->setBusyTimeout(Milliseconds::max());
-    db->exec("PRAGMA foreign_keys = ON");
-}
-
 void OfflineDatabase::ensureSchema() {
-    if (path != ":memory:") {
-        try {
-            connect(mapbox::sqlite::ReadWrite);
-
-            switch (userVersion()) {
-            case 0: break; // cache-only database; ok to delete
-            case 1: break; // cache-only database; ok to delete
-            case 2: migrateToVersion3(); // fall through
-            case 3: // no-op and fall through
-            case 4: migrateToVersion5(); // fall through
-            case 5: migrateToVersion6(); // fall through
-            case 6: return;
-            default: break; // downgrade, delete the database
-            }
-
+    auto result = mapbox::sqlite::Database::tryOpen(path, mapbox::sqlite::ReadWriteCreate);
+    if (result.is<mapbox::sqlite::Exception>()) {
+        const auto& ex = result.get<mapbox::sqlite::Exception>();
+        if (ex.code == mapbox::sqlite::ResultCode::NotADB) {
+            // Corrupted; blow it away.
             removeExisting();
-            connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
-        } catch (mapbox::sqlite::Exception& ex) {
-            if (ex.code != mapbox::sqlite::ResultCode::CantOpen && ex.code != mapbox::sqlite::ResultCode::NotADB) {
-                Log::Error(Event::Database, "Unexpected error connecting to database: %s", ex.what());
-                throw;
-            }
-
-            try {
-                if (ex.code == mapbox::sqlite::ResultCode::NotADB) {
-                    removeExisting();
-                }
-                connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
-            } catch (...) {
-                Log::Error(Event::Database, "Unexpected error creating database: %s", util::toString(std::current_exception()).c_str());
-                throw;
-            }
+            result = mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadWriteCreate);
+        } else {
+            Log::Error(Event::Database, "Unexpected error connecting to database: %s", ex.what());
+            throw ex;
         }
     }
 
     try {
-        #include "offline_schema.cpp.include"
+        assert(result.is<mapbox::sqlite::Database>());
+        db = std::make_unique<mapbox::sqlite::Database>(std::move(result.get<mapbox::sqlite::Database>()));
+        db->setBusyTimeout(Milliseconds::max());
+        db->exec("PRAGMA foreign_keys = ON");
 
-        connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
+        switch (userVersion()) {
+        case 0:
+        case 1:
+            // Newly created database, or old cache-only database; remove old table if it exists.
+            removeOldCacheTable();
+            break;
+        case 2:
+            migrateToVersion3();
+            // fall through
+        case 3:
+        case 4:
+            migrateToVersion5();
+            // fall through
+        case 5:
+            migrateToVersion6();
+            // fall through
+        case 6:
+            // happy path; we're done
+            return;
+        default:
+            // downgrade, delete the database
+            removeExisting();
+            break;
+        }
+    } catch (const mapbox::sqlite::Exception& ex) {
+        // Unfortunately, SQLITE_NOTADB is not always reported upon opening the database.
+        // Apparently sometimes it is delayed until the first read operation.
+        if (ex.code == mapbox::sqlite::ResultCode::NotADB) {
+            removeExisting();
+        } else {
+            throw;
+        }
+    }
 
-        // If you change the schema you must write a migration from the previous version.
+    try {
+        // When downgrading the database, or when the database is corrupt, we've deleted the old database handle,
+        // so we need to reopen it.
+        if (!db) {
+            db = std::make_unique<mapbox::sqlite::Database>(mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadWriteCreate));
+            db->setBusyTimeout(Milliseconds::max());
+            db->exec("PRAGMA foreign_keys = ON");
+        }
+
         db->exec("PRAGMA auto_vacuum = INCREMENTAL");
         db->exec("PRAGMA journal_mode = DELETE");
         db->exec("PRAGMA synchronous = FULL");
-        db->exec(schema);
+        db->exec(offlineDatabaseSchema);
         db->exec("PRAGMA user_version = 6");
     } catch (...) {
         Log::Error(Event::Database, "Unexpected error creating database schema: %s", util::toString(std::current_exception()).c_str());
@@ -93,6 +110,7 @@ int OfflineDatabase::userVersion() {
 void OfflineDatabase::removeExisting() {
     Log::Warning(Event::Database, "Removing existing incompatible offline database");
 
+    statements.clear();
     db.reset();
 
     try {
@@ -100,6 +118,11 @@ void OfflineDatabase::removeExisting() {
     } catch (util::IOException& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
     }
+}
+
+void OfflineDatabase::removeOldCacheTable() {
+    db->exec("DROP TABLE IF EXISTS http_cache");
+    db->exec("VACUUM");
 }
 
 void OfflineDatabase::migrateToVersion3() {
@@ -160,7 +183,10 @@ optional<int64_t> OfflineDatabase::hasInternal(const Resource& resource) {
 }
 
 std::pair<bool, uint64_t> OfflineDatabase::put(const Resource& resource, const Response& response) {
-    return putInternal(resource, response, true);
+    mapbox::sqlite::Transaction transaction(*db, mapbox::sqlite::Transaction::Immediate);
+    auto result = putInternal(resource, response, true);
+    transaction.commit();
+    return result;
 }
 
 std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource, const Response& response, bool evict_) {
@@ -179,7 +205,7 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
     }
 
     if (evict_ && !evict(size)) {
-        Log::Debug(Event::Database, "Unable to make space for entry");
+        Log::Info(Event::Database, "Unable to make space for entry");
         return { false, 0 };
     }
 
@@ -277,11 +303,6 @@ bool OfflineDatabase::putResource(const Resource& resource,
     }
 
     // We can't use REPLACE because it would change the id value.
-
-    // Begin an immediate-mode transaction to ensure that two writers do not attempt
-    // to INSERT a resource at the same moment.
-    mapbox::sqlite::Transaction transaction(*db, mapbox::sqlite::Transaction::Immediate);
-
     // clang-format off
     mapbox::sqlite::Query updateQuery{ getStatement(
         "UPDATE resources "
@@ -314,7 +335,6 @@ bool OfflineDatabase::putResource(const Resource& resource,
 
     updateQuery.run();
     if (updateQuery.changes() != 0) {
-        transaction.commit();
         return false;
     }
 
@@ -341,7 +361,6 @@ bool OfflineDatabase::putResource(const Resource& resource,
     }
 
     insertQuery.run();
-    transaction.commit();
 
     return true;
 }
@@ -469,10 +488,6 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
 
     // We can't use REPLACE because it would change the id value.
 
-    // Begin an immediate-mode transaction to ensure that two writers do not attempt
-    // to INSERT a resource at the same moment.
-    mapbox::sqlite::Transaction transaction(*db, mapbox::sqlite::Transaction::Immediate);
-
     // clang-format off
     mapbox::sqlite::Query updateQuery{ getStatement(
         "UPDATE tiles "
@@ -511,7 +526,6 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
 
     updateQuery.run();
     if (updateQuery.changes() != 0) {
-        transaction.commit();
         return false;
     }
 
@@ -541,7 +555,6 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
     }
 
     insertQuery.run();
-    transaction.commit();
 
     return true;
 }
@@ -624,6 +637,43 @@ optional<int64_t> OfflineDatabase::hasRegionResource(int64_t regionID, const Res
 }
 
 uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& resource, const Response& response) {
+    mapbox::sqlite::Transaction transaction(*db);
+    auto size = putRegionResourceInternal(regionID, resource, response);
+    transaction.commit();
+    return size;
+}
+
+void OfflineDatabase::putRegionResources(int64_t regionID, const std::list<std::tuple<Resource, Response>>& resources, OfflineRegionStatus& status) {
+    mapbox::sqlite::Transaction transaction(*db);
+
+    for (const auto& elem : resources) {
+        const auto& resource = std::get<0>(elem);
+        const auto& response = std::get<1>(elem);
+
+        try {
+            uint64_t resourceSize = putRegionResourceInternal(regionID, resource, response);
+            status.completedResourceCount++;
+            status.completedResourceSize += resourceSize;
+            if (resource.kind == Resource::Kind::Tile) {
+                status.completedTileCount += 1;
+                status.completedTileSize += resourceSize;
+            }
+        } catch (const MapboxTileLimitExceededException&) {
+            // Commit the rest of the batch and retrow
+            transaction.commit();
+            throw;
+        }
+    }
+
+    // Commit the completed batch
+    transaction.commit();
+}
+
+uint64_t OfflineDatabase::putRegionResourceInternal(int64_t regionID, const Resource& resource, const Response& response) {
+    if (exceedsOfflineMapboxTileCountLimit(resource)) {
+        throw MapboxTileLimitExceededException();
+    }
+
     uint64_t size = putInternal(resource, response, false).second;
     bool previouslyUnused = markUsed(regionID, resource);
 
@@ -892,6 +942,12 @@ uint64_t OfflineDatabase::getOfflineMapboxTileCount() {
 
     offlineMapboxTileCount = query.get<int64_t>(0);
     return *offlineMapboxTileCount;
+}
+
+bool OfflineDatabase::exceedsOfflineMapboxTileCountLimit(const Resource& resource) {
+    return resource.kind == Resource::Kind::Tile
+        && util::mapbox::isMapboxURL(resource.url)
+        && offlineMapboxTileCountLimitExceeded();
 }
 
 } // namespace mbgl

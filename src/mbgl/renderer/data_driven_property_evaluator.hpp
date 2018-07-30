@@ -23,19 +23,16 @@ public:
         return ResultType(constant);
     }
 
-    ResultType operator()(const style::CameraFunction<T>& function) const {
-        if (!parameters.useIntegerZoom) {
-            return ResultType(function.evaluate(parameters.z));
+    ResultType operator()(const style::PropertyExpression<T>& expression) const {
+        if (!expression.isFeatureConstant()) {
+            auto returnExpression = expression;
+            returnExpression.useIntegerZoom = parameters.useIntegerZoom;
+            return ResultType(returnExpression);
+        } else if (!parameters.useIntegerZoom) {
+            return ResultType(expression.evaluate(parameters.z));
         } else {
-            return ResultType(function.evaluate(floor(parameters.z)));
+            return ResultType(expression.evaluate(floor(parameters.z)));
         }
-    }
-
-    template <class Function>
-    ResultType operator()(const Function& function) const {
-        auto returnFunction = function;
-        returnFunction.useIntegerZoom = parameters.useIntegerZoom;
-        return ResultType(returnFunction);
     }
 
 private:

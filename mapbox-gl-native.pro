@@ -70,6 +70,7 @@ SOURCES += \
     platform/qt/src/qmapboxgl_map_observer.cpp \
     platform/qt/src/qmapboxgl_map_renderer.cpp \
     platform/qt/src/qmapboxgl_renderer_backend.cpp \
+    platform/qt/src/qmapboxgl_scheduler.cpp \
     platform/qt/src/qt_geojson.cpp \
     platform/qt/src/qt_image.cpp \
     platform/qt/src/qt_logging.cpp \
@@ -196,6 +197,7 @@ SOURCES += \
     src/mbgl/shaders/preludes.cpp \
     src/mbgl/shaders/raster.cpp \
     src/mbgl/shaders/shaders.cpp \
+    src/mbgl/shaders/source.cpp \
     src/mbgl/shaders/symbol_icon.cpp \
     src/mbgl/shaders/symbol_sdf.cpp \
     src/mbgl/sprite/sprite_loader.cpp \
@@ -208,6 +210,7 @@ SOURCES += \
     src/mbgl/style/conversion/constant.cpp \
     src/mbgl/style/conversion/coordinate.cpp \
     src/mbgl/style/conversion/filter.cpp \
+    src/mbgl/style/conversion/function.cpp \
     src/mbgl/style/conversion/geojson.cpp \
     src/mbgl/style/conversion/geojson_options.cpp \
     src/mbgl/style/conversion/get_json_type.cpp \
@@ -226,8 +229,11 @@ SOURCES += \
     src/mbgl/style/expression/check_subtype.cpp \
     src/mbgl/style/expression/coalesce.cpp \
     src/mbgl/style/expression/coercion.cpp \
+    src/mbgl/style/expression/collator_expression.cpp \
     src/mbgl/style/expression/compound_expression.cpp \
+    src/mbgl/style/expression/dsl.cpp \
     src/mbgl/style/expression/equals.cpp \
+    src/mbgl/style/expression/expression.cpp \
     src/mbgl/style/expression/find_zoom_curve.cpp \
     src/mbgl/style/expression/get_covering_stops.cpp \
     src/mbgl/style/expression/interpolate.cpp \
@@ -242,10 +248,6 @@ SOURCES += \
     src/mbgl/style/expression/util.cpp \
     src/mbgl/style/expression/value.cpp \
     src/mbgl/style/filter.cpp \
-    src/mbgl/style/filter_evaluator.cpp \
-    src/mbgl/style/function/categorical_stops.cpp \
-    src/mbgl/style/function/expression.cpp \
-    src/mbgl/style/function/identity_stops.cpp \
     src/mbgl/style/image.cpp \
     src/mbgl/style/image_impl.cpp \
     src/mbgl/style/layer.cpp \
@@ -307,6 +309,7 @@ SOURCES += \
     src/mbgl/text/glyph_atlas.cpp \
     src/mbgl/text/glyph_manager.cpp \
     src/mbgl/text/glyph_pbf.cpp \
+    src/mbgl/text/language_tag.cpp \
     src/mbgl/text/placement.cpp \
     src/mbgl/text/quads.cpp \
     src/mbgl/text/shaping.cpp \
@@ -358,8 +361,9 @@ SOURCES += \
     src/mbgl/util/url.cpp \
     src/mbgl/util/version.cpp \
     src/mbgl/util/work_request.cpp \
-    src/parsedate/parsedate.c \
+    src/parsedate/parsedate.cpp \
     platform/default/asset_file_source.cpp \
+    platform/default/collator.cpp \
     platform/default/default_file_source.cpp \
     platform/default/file_source_request.cpp \
     platform/default/local_file_source.cpp \
@@ -369,7 +373,16 @@ SOURCES += \
     platform/default/mbgl/storage/offline_download.cpp \
     platform/default/mbgl/util/default_thread_pool.cpp \
     platform/default/mbgl/util/shared_thread_pool.cpp \
-    platform/default/online_file_source.cpp
+    platform/default/online_file_source.cpp \
+    platform/default/unaccent.cpp \
+    vendor/nunicode/src/libnu/ducet.c \
+    vendor/nunicode/src/libnu/strcoll.c \
+    vendor/nunicode/src/libnu/strings.c \
+    vendor/nunicode/src/libnu/tolower.c \
+    vendor/nunicode/src/libnu/tounaccent.c \
+    vendor/nunicode/src/libnu/toupper.c \
+    vendor/nunicode/src/libnu/utf8.c
+
 
 HEADERS += \
     platform/qt/include/qmapbox.hpp \
@@ -382,6 +395,7 @@ HEADERS += \
     platform/qt/src/qmapboxgl_p.hpp \
     platform/qt/src/qmapboxgl_renderer_backend.hpp \
     platform/qt/src/qmapboxgl_renderer_observer.hpp \
+    platform/qt/src/qmapboxgl_scheduler.hpp \
     platform/qt/src/qt_conversion.hpp \
     platform/qt/src/qt_geojson.hpp \
     platform/qt/src/run_loop_impl.hpp \
@@ -390,22 +404,18 @@ HEADERS += \
 INCLUDEPATH += \
     deps/boost/1.65.1 \
     deps/boost/1.65.1/include \
-    deps/cheap-ruler/2.5.3 \
-    deps/cheap-ruler/2.5.3/include \
     deps/earcut/0.12.4 \
     deps/earcut/0.12.4/include \
     deps/geojson/0.4.2 \
     deps/geojson/0.4.2/include \
-    deps/geojsonvt/6.3.0 \
-    deps/geojsonvt/6.3.0/include \
-    deps/geometry/0.9.2 \
-    deps/geometry/0.9.2/include \
+    deps/geojsonvt/6.5.1 \
+    deps/geojsonvt/6.5.1/include \
+    deps/geometry/0.9.3 \
+    deps/geometry/0.9.3/include \
     deps/kdbush/0.1.1-1 \
     deps/kdbush/0.1.1-1/include \
     deps/optional/f27e7908 \
     deps/optional/f27e7908/include \
-    deps/pixelmatch/0.10.0 \
-    deps/pixelmatch/0.10.0/include \
     deps/polylabel/1.0.3 \
     deps/polylabel/1.0.3/include \
     deps/protozero/1.5.2 \
@@ -422,15 +432,16 @@ INCLUDEPATH += \
     deps/unique_resource/cba309e/include \
     deps/variant/1.1.4 \
     deps/variant/1.1.4/include \
-    deps/vector-tile/1.0.1 \
-    deps/vector-tile/1.0.1/include \
+    deps/vector-tile/1.0.2 \
+    deps/vector-tile/1.0.2/include \
     deps/wagyu/0.4.3 \
     deps/wagyu/0.4.3/include \
     include \
     platform/default \
     platform/qt \
     platform/qt/include \
-    src
+    src \
+    vendor/nunicode/include
 
 QMAKE_CXXFLAGS += \
-    -DMBGL_VERSION_REV=\\\"qt-v1.4.0\\\"
+    -DMBGL_VERSION_REV=\\\"qt-v1.5.0\\\"

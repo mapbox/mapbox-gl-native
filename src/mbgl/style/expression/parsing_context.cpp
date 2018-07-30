@@ -32,19 +32,21 @@ namespace style {
 namespace expression {
 
 bool isConstant(const Expression& expression) {
-    if (auto varExpression = dynamic_cast<const Var*>(&expression)) {
+    if (expression.getKind() == Kind::Var) {
+        auto varExpression = static_cast<const Var*>(&expression);
         return isConstant(*varExpression->getBoundExpression());
     }
 
-    if (auto compound = dynamic_cast<const CompoundExpressionBase*>(&expression)) {
+    if (expression.getKind() == Kind::CompoundExpression) {
+        auto compound = static_cast<const CompoundExpressionBase*>(&expression);
         if (compound->getName() == "error") {
             return false;
         }
     }
 
-    bool isTypeAnnotation = dynamic_cast<const Coercion*>(&expression) ||
-        dynamic_cast<const Assertion*>(&expression) ||
-        dynamic_cast<const ArrayAssertion*>(&expression);
+    bool isTypeAnnotation = expression.getKind() == Kind::Coercion ||
+        expression.getKind() == Kind::Assertion ||
+        expression.getKind() == Kind::ArrayAssertion;
     
     bool childrenConstant = true;
     expression.eachChild([&](const Expression& child) {
@@ -58,7 +60,7 @@ bool isConstant(const Expression& expression) {
         if (isTypeAnnotation) {
             childrenConstant = childrenConstant && isConstant(child);
         } else {
-            childrenConstant = childrenConstant && dynamic_cast<const Literal*>(&child);
+            childrenConstant = childrenConstant && child.getKind() == Kind::Literal;
         }
     });
     if (!childrenConstant) {
@@ -102,6 +104,7 @@ const ExpressionRegistry& getExpressionRegistry() {
         {"boolean", Assertion::parse},
         {"case", Case::parse},
         {"coalesce", Coalesce::parse},
+        {"collator", CollatorExpression::parse},
         {"interpolate", parseInterpolate},
         {"length", Length::parse},
         {"let", Let::parse},
@@ -185,7 +188,7 @@ ParseResult ParsingContext::parse(const Convertible& value, TypeAnnotationOption
     // If an expression's arguments are all constant, we can evaluate
     // it immediately and replace it with a literal value in the
     // parsed result.
-    if (!dynamic_cast<Literal *>(parsed->get()) && isConstant(**parsed)) {
+    if ((*parsed)->getKind() != Kind::Literal && isConstant(**parsed)) {
         EvaluationContext params(nullptr);
         EvaluationResult evaluated((*parsed)->evaluate(params));
         if (!evaluated) {
@@ -216,7 +219,7 @@ ParseResult ParsingContext::parseExpression(const Convertible& value, TypeAnnota
 ParseResult ParsingContext::parseLayerPropertyExpression(const Convertible& value, TypeAnnotationOption typeAnnotationOption) {
     ParseResult parsed = parse(value, typeAnnotationOption);
     if (parsed && !isZoomConstant(**parsed)) {
-        optional<variant<const InterpolateBase*, const Step*, ParsingError>> zoomCurve = findZoomCurve(parsed->get());
+        optional<variant<const Interpolate*, const Step*, ParsingError>> zoomCurve = findZoomCurve(parsed->get());
         if (!zoomCurve) {
             error(R"("zoom" expression may only be used as input to a top-level "step" or "interpolate" expression.)");
             return ParseResult();

@@ -56,17 +56,17 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
     const bool pitchWithMap = evaluated.get<CirclePitchAlignment>() == AlignmentType::Map;
 
     for (const RenderTile& tile : renderTiles) {
-        assert(dynamic_cast<CircleBucket*>(tile.tile.getBucket(*baseImpl)));
-        CircleBucket& bucket = *reinterpret_cast<CircleBucket*>(tile.tile.getBucket(*baseImpl));
+        auto bucket_ = tile.tile.getBucket<CircleBucket>(*baseImpl);
+        if (!bucket_) {
+            continue;
+        }
+        CircleBucket& bucket = *bucket_;
 
-        parameters.programs.circle.get(evaluated).draw(
-            parameters.context,
-            gl::Triangles(),
-            parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
-            parameters.mapMode != MapMode::Continuous
-                ? parameters.stencilModeForClipping(tile.clip)
-                : gl::StencilMode::disabled(),
-            parameters.colorModeForRenderPass(),
+        const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
+
+        auto& programInstance = parameters.programs.circle.get(evaluated);
+   
+        const auto allUniformValues = programInstance.computeAllUniformValues(
             CircleProgram::UniformValues {
                 uniforms::u_matrix::Value{
                     tile.translatedMatrix(evaluated.get<CircleTranslate>(),
@@ -82,12 +82,30 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
                 uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() },
                 uniforms::u_pitch_with_map::Value{ pitchWithMap }
             },
+            paintPropertyBinders,
+            evaluated,
+            parameters.state.getZoom()
+        );
+        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
             *bucket.vertexBuffer,
+            paintPropertyBinders,
+            evaluated
+        );
+
+        checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
+        programInstance.draw(
+            parameters.context,
+            gl::Triangles(),
+            parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+            parameters.mapMode != MapMode::Continuous
+                ? parameters.stencilModeForClipping(tile.clip)
+                : gl::StencilMode::disabled(),
+            parameters.colorModeForRenderPass(),
             *bucket.indexBuffer,
             bucket.segments,
-            bucket.paintPropertyBinders.at(getID()),
-            evaluated,
-            parameters.state.getZoom(),
+            allUniformValues,
+            allAttributeBindings,
             getID()
         );
     }

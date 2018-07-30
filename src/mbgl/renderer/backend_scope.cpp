@@ -4,12 +4,20 @@
 
 #include <cassert>
 
+namespace {
+
+mbgl::util::ThreadLocal<mbgl::BackendScope>& currentScope() {
+    static mbgl::util::ThreadLocal<mbgl::BackendScope> backendScope;
+
+    return backendScope;
+}
+
+} // namespace
+
 namespace mbgl {
 
-static util::ThreadLocal<BackendScope> currentScope;
-
 BackendScope::BackendScope(RendererBackend& backend_, ScopeType scopeType_)
-    : priorScope(currentScope.get()),
+    : priorScope(currentScope().get()),
       nextScope(nullptr),
       backend(backend_),
       scopeType(scopeType_) {
@@ -21,7 +29,7 @@ BackendScope::BackendScope(RendererBackend& backend_, ScopeType scopeType_)
 
     activate();
 
-    currentScope.set(this);
+    currentScope().set(this);
 }
 
 BackendScope::~BackendScope() {
@@ -30,11 +38,11 @@ BackendScope::~BackendScope() {
 
     if (priorScope) {
         priorScope->activate();
-        currentScope.set(priorScope);
+        currentScope().set(priorScope);
         assert(priorScope->nextScope == this);
         priorScope->nextScope = nullptr;
     } else {
-        currentScope.set(nullptr);
+        currentScope().set(nullptr);
     }
 }
 
@@ -60,7 +68,7 @@ void BackendScope::deactivate() {
 }
 
 bool BackendScope::exists() {
-    return currentScope.get();
+    return currentScope().get();
 }
 
 } // namespace mbgl

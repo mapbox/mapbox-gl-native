@@ -83,8 +83,11 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {});
 
         for (const RenderTile& tile : renderTiles) {
-            assert(dynamic_cast<HeatmapBucket*>(tile.tile.getBucket(*baseImpl)));
-            HeatmapBucket& bucket = *reinterpret_cast<HeatmapBucket*>(tile.tile.getBucket(*baseImpl));
+            auto bucket_ = tile.tile.getBucket<HeatmapBucket>(*baseImpl);
+            if (!bucket_) {
+                continue;
+            }
+            HeatmapBucket& bucket = *bucket_;
 
             const auto extrudeScale = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
 
@@ -92,23 +95,38 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
                 ? parameters.stencilModeForClipping(tile.clip)
                 : gl::StencilMode::disabled();
 
-            parameters.programs.heatmap.get(evaluated).draw(
+            const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
+
+            auto& programInstance = parameters.programs.heatmap.get(evaluated);
+       
+            const auto allUniformValues = programInstance.computeAllUniformValues(
+                HeatmapProgram::UniformValues {
+                    uniforms::u_intensity::Value{ evaluated.get<style::HeatmapIntensity>() },
+                    uniforms::u_matrix::Value{ tile.matrix },
+                    uniforms::heatmap::u_extrude_scale::Value{ extrudeScale }
+                },
+                paintPropertyBinders,
+                evaluated,
+                parameters.state.getZoom()
+            );
+            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
+                *bucket.vertexBuffer,
+                paintPropertyBinders,
+                evaluated
+            );
+
+            checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
+            programInstance.draw(
                 parameters.context,
                 gl::Triangles(),
                 parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
                 stencilMode,
                 gl::ColorMode::additive(),
-                HeatmapProgram::UniformValues {
-                    uniforms::u_intensity::Value{evaluated.get<style::HeatmapIntensity>()},
-                    uniforms::u_matrix::Value{tile.matrix},
-                    uniforms::heatmap::u_extrude_scale::Value{extrudeScale}
-                },
-                *bucket.vertexBuffer,
                 *bucket.indexBuffer,
                 bucket.segments,
-                bucket.paintPropertyBinders.at(getID()),
-                evaluated,
-                parameters.state.getZoom(),
+                allUniformValues,
+                allAttributeBindings,
                 getID()
             );
         }
@@ -123,20 +141,41 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
 
         const Properties<>::PossiblyEvaluated properties;
+        const HeatmapTextureProgram::PaintPropertyBinders paintAttributeData{ properties, 0 };
 
-        parameters.programs.heatmapTexture.draw(
-            parameters.context, gl::Triangles(), gl::DepthMode::disabled(),
-            gl::StencilMode::disabled(), parameters.colorModeForRenderPass(),
+        auto& programInstance = parameters.programs.heatmapTexture;
+
+        const auto allUniformValues = programInstance.computeAllUniformValues(
             HeatmapTextureProgram::UniformValues{
                 uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
                 uniforms::u_image::Value{ 0 },
                 uniforms::u_color_ramp::Value{ 1 },
-                uniforms::u_opacity::Value{ evaluated.get<HeatmapOpacity>() } },
+                uniforms::u_opacity::Value{ evaluated.get<HeatmapOpacity>() }
+            },
+            paintAttributeData,
+            properties,
+            parameters.state.getZoom()
+        );
+        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
             parameters.staticData.extrusionTextureVertexBuffer,
+            paintAttributeData,
+            properties
+        );
+
+        checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
+        programInstance.draw(
+            parameters.context,
+            gl::Triangles(),
+            gl::DepthMode::disabled(),
+            gl::StencilMode::disabled(),
+            parameters.colorModeForRenderPass(),
             parameters.staticData.quadTriangleIndexBuffer,
             parameters.staticData.extrusionTextureSegments,
-            HeatmapTextureProgram::PaintPropertyBinders{ properties, 0 }, properties,
-            parameters.state.getZoom(), getID());
+            allUniformValues,
+            allAttributeBindings,
+            getID()
+        );
     }
 }
 

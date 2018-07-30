@@ -18,7 +18,7 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
     const auto anchor = objectMember(value, "anchor");
     if (anchor) {
         optional<PropertyValue<LightAnchorType>> convertedAnchor =
-            convert<PropertyValue<LightAnchorType>>(*anchor, error);
+            convert<PropertyValue<LightAnchorType>>(*anchor, error, false);
 
         if (convertedAnchor) {
             light.setAnchor(*convertedAnchor);
@@ -41,7 +41,7 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
     const auto color = objectMember(value, "color");
     if (color) {
         optional<PropertyValue<Color>> convertedColor =
-            convert<PropertyValue<Color>>(*color, error);
+            convert<PropertyValue<Color>>(*color, error, false);
 
         if (convertedColor) {
             light.setColor(*convertedColor);
@@ -64,7 +64,7 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
     const auto position = objectMember(value, "position");
     if (position) {
         optional<PropertyValue<Position>> convertedPosition =
-            convert<PropertyValue<Position>>(*position, error);
+            convert<PropertyValue<Position>>(*position, error, false);
 
         if (convertedPosition) {
             light.setPosition(*convertedPosition);
@@ -87,7 +87,7 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
     const auto intensity = objectMember(value, "intensity");
     if (intensity) {
         optional<PropertyValue<float>> convertedIntensity =
-            convert<PropertyValue<float>>(*intensity, error);
+            convert<PropertyValue<float>>(*intensity, error, false);
 
         if (convertedIntensity) {
             light.setIntensity(*convertedIntensity);

@@ -1,0 +1,40 @@
+<%
+  const properties = locals.properties;
+-%>
+// This file is generated. Do not edit.
+
+#pragma once
+
+#include <mbgl/style/property_value.hpp>
+#include <mbgl/style/transition_options.hpp>
+#include <mbgl/style/types.hpp>
+#include <mbgl/util/immutable.hpp>
+
+namespace mbgl {
+namespace style {
+
+class LightObserver;
+
+class Light {
+public:
+    Light();
+    ~Light();
+
+<% for (const property of properties) { -%>
+    static <%- evaluatedType(property) %> getDefault<%- camelize(property.name) %>();
+    <%- propertyValueType(property) %> get<%- camelize(property.name) %>() const;
+    void set<%- camelize(property.name) %>(<%- propertyValueType(property) %>);
+    void set<%- camelize(property.name) %>Transition(const TransitionOptions&);
+    TransitionOptions get<%- camelize(property.name) %>Transition() const;
+
+<% } -%>
+    class Impl;
+    Immutable<Impl> impl;
+    Mutable<Impl> mutableImpl() const;
+
+    LightObserver* observer = nullptr;
+    void setObserver(LightObserver*);
+};
+
+} // namespace style
+} // namespace mbgl

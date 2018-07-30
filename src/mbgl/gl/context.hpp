@@ -36,10 +36,12 @@ class Debugging;
 class ProgramBinary;
 } // namespace extension
 
-class Context : private util::noncopyable {
+class Context {
 public:
     Context();
     ~Context();
+    Context(const Context&) = delete;
+    Context& operator=(const Context& other) = delete;
 
     void initializeExtensions(const std::function<gl::ProcAddress(const char*)>&);
 
@@ -226,7 +228,7 @@ public:
     State<value::BindVertexBuffer> vertexBuffer;
 
     State<value::BindVertexArray, const Context&> bindVertexArray { *this };
-    VertexArrayState globalVertexArrayState { UniqueVertexArray(0, { this }), *this };
+    VertexArrayState globalVertexArrayState { UniqueVertexArray(0, { this }) };
 
     State<value::PixelStorePack> pixelStorePack;
     State<value::PixelStoreUnpack> pixelStoreUnpack;
@@ -239,6 +241,8 @@ public:
 #endif // MBGL_USE_GLES2
 
     bool supportsHalfFloatTextures = false;
+    const uint32_t maximumVertexBindingCount;
+    static constexpr const uint32_t minimumRequiredVertexBindingCount = 8;
     
 private:
     State<value::StencilFunc> stencilFunc;

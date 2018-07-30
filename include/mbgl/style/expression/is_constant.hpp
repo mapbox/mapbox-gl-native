@@ -9,7 +9,8 @@ namespace expression {
 
 template <typename T>
 bool isGlobalPropertyConstant(const Expression& expression, const T& properties) {
-    if (auto e = dynamic_cast<const CompoundExpressionBase*>(&expression)) {
+    if (expression.getKind() == Kind::CompoundExpression) {
+        auto e = static_cast<const CompoundExpressionBase*>(&expression);
         for (const std::string& property : properties) {
             if (e->getName() == property) {
                 return false;

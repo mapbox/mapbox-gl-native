@@ -1,0 +1,93 @@
+<%
+  const type = locals.type;
+  const layoutProperties = locals.layoutProperties;
+  const paintProperties = locals.paintProperties;
+-%>
+// This file is generated. Do not edit.
+
+#pragma once
+
+<% if (type === 'heatmap') { -%>
+#include <mbgl/style/color_ramp_property_value.hpp>
+<% } -%>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/filter.hpp>
+#include <mbgl/style/property_value.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
+
+#include <mbgl/util/color.hpp>
+
+<% if (type === 'line' || type === 'symbol') { -%>
+#include <vector>
+
+<% } -%>
+namespace mbgl {
+namespace style {
+
+class TransitionOptions;
+
+class <%- camelize(type) %>Layer : public Layer {
+public:
+<% if (type === 'background') { -%>
+    <%- camelize(type) %>Layer(const std::string& layerID);
+<% } else { -%>
+    <%- camelize(type) %>Layer(const std::string& layerID, const std::string& sourceID);
+<% } -%>
+    ~<%- camelize(type) %>Layer() final;
+
+<% if (type !== 'background') { -%>
+    // Source
+    const std::string& getSourceID() const;
+<% if (type !== 'raster' && type !== 'hillshade') { -%>
+    const std::string& getSourceLayer() const;
+    void setSourceLayer(const std::string& sourceLayer);
+
+    void setFilter(const Filter&);
+    const Filter& getFilter() const;
+<% } -%>
+
+<% } -%>
+    // Visibility
+    void setVisibility(VisibilityType) final;
+
+    // Zoom range
+    void setMinZoom(float) final;
+    void setMaxZoom(float) final;
+
+<% if (layoutProperties.length) { -%>
+    // Layout properties
+
+<% for (const property of layoutProperties) { -%>
+    static <%- propertyValueType(property) %> getDefault<%- camelize(property.name) %>();
+    <%- propertyValueType(property) %> get<%- camelize(property.name) %>() const;
+    void set<%- camelize(property.name) %>(<%- propertyValueType(property) %>);
+
+<% } -%>
+<% } -%>
+    // Paint properties
+
+<% for (const property of paintProperties) { -%>
+    static <%- propertyValueType(property) %> getDefault<%- camelize(property.name) %>();
+    <%- propertyValueType(property) %> get<%- camelize(property.name) %>() const;
+    void set<%- camelize(property.name) %>(<%- propertyValueType(property) %>);
+    void set<%- camelize(property.name) %>Transition(const TransitionOptions&);
+    TransitionOptions get<%- camelize(property.name) %>Transition() const;
+
+<% } -%>
+    // Private implementation
+
+    class Impl;
+    const Impl& impl() const;
+
+    Mutable<Impl> mutableImpl() const;
+    <%- camelize(type) %>Layer(Immutable<Impl>);
+    std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
+};
+
+template <>
+inline bool Layer::is<<%- camelize(type) %>Layer>() const {
+    return getType() == LayerType::<%- camelize(type) %>;
+}
+
+} // namespace style
+} // namespace mbgl

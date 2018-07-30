@@ -256,5 +256,18 @@
         "LicenseId": "MIT",
         "License": "MIT License",
         "Copyright": "Copyright (c) 2010-2015, Angus Johnson, 2016 Mapbox"
+    },
+    {
+        "Id": "mapboxgl-nunicode",
+        "Name": "nunicode",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "vendor/nunicode",
+        "Description": "nunicode is i18n library implementing Unicode 11.0.",
+        "Homepage": "https://bitbucket.org/alekseyt/nunicode.git",
+        "LicenseId": "MIT",
+        "License": "MIT License",
+        "Copyright": "Copyright (c) 2013 Aleksey Tulinov <aleksey.tulinov@gmail.com>"
     }
 ]

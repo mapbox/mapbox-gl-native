@@ -61,6 +61,32 @@ void TileLayerIndex::findMatches(std::vector<SymbolInstance>& symbolInstances, c
 CrossTileSymbolLayerIndex::CrossTileSymbolLayerIndex() {
 }
 
+/*
+ * Sometimes when a user pans across the antimeridian the longitude value gets wrapped.
+ * To prevent labels from flashing out and in we adjust the tileID values in the indexes
+ * so that they match the new wrapped version of the map.
+ */
+void CrossTileSymbolLayerIndex::handleWrapJump(float newLng) {
+
+    const int wrapDelta = ::round((newLng - lng) / 360);
+    if (wrapDelta != 0) {
+        std::map<uint8_t, std::map<OverscaledTileID,TileLayerIndex>> newIndexes;
+        for (auto& zoomIndex : indexes) {
+            std::map<OverscaledTileID,TileLayerIndex> newZoomIndex;
+            for (auto& index : zoomIndex.second) {
+                // change the tileID's wrap and move its index
+                index.second.coord = index.second.coord.unwrapTo(index.second.coord.wrap + wrapDelta);
+                newZoomIndex.emplace(index.second.coord, std::move(index.second));
+            }
+            newIndexes.emplace(zoomIndex.first, std::move(newZoomIndex));
+        }
+
+        indexes = std::move(newIndexes);
+    }
+
+    lng = newLng;
+}
+
 bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& tileID, SymbolBucket& bucket, uint32_t& maxCrossTileID) {
     const auto& thisZoomIndexes = indexes[tileID.overscaledZ];
     auto previousIndex = thisZoomIndexes.find(tileID);
@@ -138,21 +164,26 @@ bool CrossTileSymbolLayerIndex::removeStaleBuckets(const std::unordered_set<uint
 
 CrossTileSymbolIndex::CrossTileSymbolIndex() {}
 
-bool CrossTileSymbolIndex::addLayer(RenderSymbolLayer& symbolLayer) {
+bool CrossTileSymbolIndex::addLayer(RenderSymbolLayer& symbolLayer, float lng) {
 
     auto& layerIndex = layerIndexes[symbolLayer.getID()];
 
     bool symbolBucketsChanged = false;
     std::unordered_set<uint32_t> currentBucketIDs;
 
+    layerIndex.handleWrapJump(lng);
+
     for (RenderTile& renderTile : symbolLayer.renderTiles) {
         if (!renderTile.tile.isRenderable()) {
             continue;
         }
 
-        auto bucket = renderTile.tile.getBucket(*symbolLayer.baseImpl);
-        assert(dynamic_cast<SymbolBucket*>(bucket));
-        SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
+        auto bucket = renderTile.tile.getBucket<SymbolBucket>(*symbolLayer.baseImpl);
+        if (!bucket) {
+            continue;
+        }
+        SymbolBucket& symbolBucket = *bucket;
+
         if (symbolBucket.bucketLeaderID != symbolLayer.getID()) {
             // Only add this layer if it's the "group leader" for the bucket
             continue;

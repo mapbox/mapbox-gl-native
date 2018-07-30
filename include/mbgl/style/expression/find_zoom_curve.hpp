@@ -11,9 +11,9 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-optional<variant<const InterpolateBase*, const Step*, ParsingError>> findZoomCurve(const expression::Expression* e);
+optional<variant<const Interpolate*, const Step*, ParsingError>> findZoomCurve(const expression::Expression* e);
 
-variant<const InterpolateBase*, const Step*> findZoomCurveChecked(const expression::Expression* e);
+variant<std::nullptr_t, const Interpolate*, const Step*> findZoomCurveChecked(const expression::Expression* e);
 
 } // namespace expression
 } // namespace style

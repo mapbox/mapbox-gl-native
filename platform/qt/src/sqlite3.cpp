@@ -52,15 +52,6 @@ void checkDatabaseError(const QSqlDatabase &db) {
     }
 }
 
-void checkDatabaseOpenError(const QSqlDatabase &db) {
-    // Assume every error when opening the data as CANTOPEN. Qt
-    // always returns -1 for `nativeErrorCode()` on database errors.
-    QSqlError lastError = db.lastError();
-    if (lastError.type() != QSqlError::NoError) {
-        throw Exception { ResultCode::CantOpen, "Error opening the database." };
-    }
-}
-
 namespace {
     QString incrementCounter() {
         static QAtomicInt count = 0;
@@ -70,32 +61,9 @@ namespace {
 
 class DatabaseImpl {
 public:
-    DatabaseImpl(const char* filename, int flags)
-        : connectionName(QString::number(uint64_t(QThread::currentThread())) + incrementCounter())
+    DatabaseImpl(QString connectionName_)
+        : connectionName(std::move(connectionName_))
     {
-        if (!QSqlDatabase::drivers().contains("QSQLITE")) {
-            throw Exception { ResultCode::CantOpen, "SQLite driver not found." };
-        }
-
-        assert(!QSqlDatabase::contains(connectionName));
-        auto db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
-
-        QString connectOptions = db.connectOptions();
-        if (flags & OpenFlag::ReadOnly) {
-            if (!connectOptions.isEmpty()) connectOptions.append(';');
-            connectOptions.append("QSQLITE_OPEN_READONLY");
-        }
-        if (flags & OpenFlag::SharedCache) {
-            if (!connectOptions.isEmpty()) connectOptions.append(';');
-            connectOptions.append("QSQLITE_ENABLE_SHARED_CACHE");
-        }
-
-        db.setConnectOptions(connectOptions);
-        db.setDatabaseName(QString(filename));
-
-        if (!db.open()) {
-            checkDatabaseOpenError(db);
-        }
     }
 
     ~DatabaseImpl() {
@@ -103,6 +71,9 @@ public:
         db.close();
         checkDatabaseError(db);
     }
+
+    void setBusyTimeout(std::chrono::milliseconds timeout);
+    void exec(const std::string& sql);
 
     QString connectionName;
 };
@@ -127,11 +98,46 @@ public:
 template <typename T>
 using optional = std::experimental::optional<T>;
 
+mapbox::util::variant<Database, Exception> Database::tryOpen(const std::string &filename, int flags) {
+    if (!QSqlDatabase::drivers().contains("QSQLITE")) {
+        return Exception { ResultCode::CantOpen, "SQLite driver not found." };
+    }
 
-Database::Database(const std::string& file, int flags)
-        : impl(std::make_unique<DatabaseImpl>(file.c_str(), flags)) {
-    assert(impl);
+    QString connectionName = QString::number(uint64_t(QThread::currentThread())) + incrementCounter();
+
+    assert(!QSqlDatabase::contains(connectionName));
+    auto db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+
+    QString connectOptions = db.connectOptions();
+    if (flags & OpenFlag::ReadOnly) {
+        if (!connectOptions.isEmpty()) connectOptions.append(';');
+        connectOptions.append("QSQLITE_OPEN_READONLY");
+    }
+
+    db.setConnectOptions(connectOptions);
+    db.setDatabaseName(QString(filename.c_str()));
+
+    if (!db.open()) {
+        // Assume every error when opening the data as CANTOPEN. Qt
+        // always returns -1 for `nativeErrorCode()` on database errors.
+        return Exception { ResultCode::CantOpen, "Error opening the database." };
+    }
+
+    return Database(std::make_unique<DatabaseImpl>(connectionName));
 }
+
+Database Database::open(const std::string &filename, int flags) {
+    auto result = tryOpen(filename, flags);
+    if (result.is<Exception>()) {
+        throw result.get<Exception>();
+    } else {
+        return std::move(result.get<Database>());
+    }
+}
+
+Database::Database(std::unique_ptr<DatabaseImpl> impl_)
+    : impl(std::move(impl_))
+{}
 
 Database::Database(Database &&other)
         : impl(std::move(other.impl)) {
@@ -149,12 +155,15 @@ Database::~Database() {
 
 void Database::setBusyTimeout(std::chrono::milliseconds timeout) {
     assert(impl);
+    impl->setBusyTimeout(timeout);
+}
 
+void DatabaseImpl::setBusyTimeout(std::chrono::milliseconds timeout) {
     // std::chrono::milliseconds.count() is a long and Qt will cast
     // internally to int, so we need to make sure the limits apply.
     std::string timeoutStr = mbgl::util::toString(timeout.count() & INT_MAX);
 
-    auto db = QSqlDatabase::database(impl->connectionName);
+    auto db = QSqlDatabase::database(connectionName);
     QString connectOptions = db.connectOptions();
     if (connectOptions.isEmpty()) {
         if (!connectOptions.isEmpty()) connectOptions.append(';');
@@ -165,19 +174,25 @@ void Database::setBusyTimeout(std::chrono::milliseconds timeout) {
     }
     db.setConnectOptions(connectOptions);
     if (!db.open()) {
-        checkDatabaseOpenError(db);
+        // Assume every error when opening the data as CANTOPEN. Qt
+        // always returns -1 for `nativeErrorCode()` on database errors.
+        throw Exception { ResultCode::CantOpen, "Error opening the database." };
     }
 }
 
 void Database::exec(const std::string &sql) {
     assert(impl);
+    impl->exec(sql);
+}
+
+void DatabaseImpl::exec(const std::string& sql) {
     QStringList statements = QString::fromStdString(sql).split(';', QString::SkipEmptyParts);
     statements.removeAll("\n");
     for (QString statement : statements) {
         if (!statement.endsWith(';')) {
             statement.append(';');
         }
-        QSqlQuery query(QSqlDatabase::database(impl->connectionName));
+        QSqlQuery query(QSqlDatabase::database(connectionName));
         query.prepare(statement);
 
         if (!query.exec()) {
@@ -424,16 +439,16 @@ uint64_t Query::changes() const {
 }
 
 Transaction::Transaction(Database& db_, Mode mode)
-        : db(db_) {
+    : dbImpl(*db_.impl) {
     switch (mode) {
     case Deferred:
-        db.exec("BEGIN DEFERRED TRANSACTION");
+        dbImpl.exec("BEGIN DEFERRED TRANSACTION");
         break;
     case Immediate:
-        db.exec("BEGIN IMMEDIATE TRANSACTION");
+        dbImpl.exec("BEGIN IMMEDIATE TRANSACTION");
         break;
     case Exclusive:
-        db.exec("BEGIN EXCLUSIVE TRANSACTION");
+        dbImpl.exec("BEGIN EXCLUSIVE TRANSACTION");
         break;
     }
 }
@@ -450,12 +465,12 @@ Transaction::~Transaction() {
 
 void Transaction::commit() {
     needRollback = false;
-    db.exec("COMMIT TRANSACTION");
+    dbImpl.exec("COMMIT TRANSACTION");
 }
 
 void Transaction::rollback() {
     needRollback = false;
-    db.exec("ROLLBACK TRANSACTION");
+    dbImpl.exec("ROLLBACK TRANSACTION");
 }
 
 } // namespace sqlite

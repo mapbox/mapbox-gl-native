@@ -8,10 +8,14 @@ namespace mbgl {
 
 using namespace style;
 
-HillshadeBucket::HillshadeBucket(PremultipliedImage&& image_, Tileset::DEMEncoding encoding): demdata(image_, encoding) {
+HillshadeBucket::HillshadeBucket(PremultipliedImage&& image_, Tileset::DEMEncoding encoding)
+    : Bucket(LayerType::Hillshade),
+      demdata(image_, encoding) {
 }
 
-HillshadeBucket::HillshadeBucket(DEMData&& demdata_) : demdata(std::move(demdata_)) {
+HillshadeBucket::HillshadeBucket(DEMData&& demdata_)
+    : Bucket(LayerType::Hillshade),
+      demdata(std::move(demdata_)) {
 }
 
 const DEMData& HillshadeBucket::getDEMData() const {

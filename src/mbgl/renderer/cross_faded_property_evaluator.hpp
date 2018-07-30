@@ -27,7 +27,7 @@ public:
 
     Faded<T> operator()(const style::Undefined&) const;
     Faded<T> operator()(const T& constant) const;
-    Faded<T> operator()(const style::CameraFunction<T>&) const;
+    Faded<T> operator()(const style::PropertyExpression<T>&) const;
 
 private:
     Faded<T> calculate(const T& min, const T& mid, const T& max) const;

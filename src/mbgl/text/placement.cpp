@@ -38,7 +38,6 @@ Placement::Placement(const TransformState& state_, MapMode mapMode_)
     : collisionIndex(state_)
     , state(state_)
     , mapMode(mapMode_)
-    , recentUntil(TimePoint::min())
 {}
 
 void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatrix, bool showCollisionBoxes) {
@@ -51,12 +50,13 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
         }
         assert(dynamic_cast<GeometryTile*>(&renderTile.tile));
         GeometryTile& geometryTile = static_cast<GeometryTile&>(renderTile.tile);
-        
-        
-        auto bucket = geometryTile.getBucket(*symbolLayer.baseImpl);
-        assert(dynamic_cast<SymbolBucket*>(bucket));
-        SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
-        
+
+        auto bucket = renderTile.tile.getBucket<SymbolBucket>(*symbolLayer.baseImpl);
+        if (!bucket) {
+            continue;
+        }
+        SymbolBucket& symbolBucket = *bucket;
+
         if (symbolBucket.bucketLeaderID != symbolLayer.getID()) {
             // Only place this layer if it's the "group leader" for the bucket
             continue;
@@ -188,7 +188,7 @@ void Placement::placeLayerBucket(
     bucket.justReloaded = false;
 }
 
-bool Placement::commit(const Placement& prevPlacement, TimePoint now) {
+void Placement::commit(const Placement& prevPlacement, TimePoint now) {
     commitTime = now;
 
     bool placementChanged = false;
@@ -222,7 +222,7 @@ bool Placement::commit(const Placement& prevPlacement, TimePoint now) {
         }
     }
 
-    return placementChanged;
+    fadeStartTime = placementChanged ? commitTime : prevPlacement.fadeStartTime;
 }
 
 void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer) {
@@ -232,9 +232,12 @@ void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer) {
             continue;
         }
 
-        auto bucket = renderTile.tile.getBucket(*symbolLayer.baseImpl);
-        assert(dynamic_cast<SymbolBucket*>(bucket));
-        SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
+        auto bucket = renderTile.tile.getBucket<SymbolBucket>(*symbolLayer.baseImpl);
+        if (!bucket) {
+            continue;
+        }
+        SymbolBucket& symbolBucket = *bucket;
+
         if (symbolBucket.bucketLeaderID != symbolLayer.getID()) {
             // Only update opacities this layer if it's the "group leader" for the bucket
             continue;
@@ -302,24 +305,36 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
         }
         
         auto updateCollisionBox = [&](const auto& feature, const bool placed) {
-            for (const CollisionBox& box : feature.boxes) {
-                if (feature.alongLine) {
-                   auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, !box.used);
-                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                } else {
-                    auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, false);
-                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
-                }
+            if (feature.alongLine) {
+                return;
+            }
+            auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, false);
+            for (size_t i = 0; i < feature.boxes.size() * 4; i++) {
+                bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
             }
         };
-        updateCollisionBox(symbolInstance.textCollisionFeature, opacityState.text.placed);
-        updateCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
+        
+        auto updateCollisionCircles = [&](const auto& feature, const bool placed) {
+            if (!feature.alongLine) {
+                return;
+            }
+            for (const CollisionBox& box : feature.boxes) {
+                auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, !box.used);
+                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+            }
+        };
+        
+        if (bucket.hasCollisionBoxData()) {
+            updateCollisionBox(symbolInstance.textCollisionFeature, opacityState.text.placed);
+            updateCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
+        }
+        if (bucket.hasCollisionCircleData()) {
+            updateCollisionCircles(symbolInstance.textCollisionFeature, opacityState.text.placed);
+            updateCollisionCircles(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
+        }
     }
 
     bucket.updateOpacity();
@@ -339,18 +354,15 @@ float Placement::symbolFadeChange(TimePoint now) const {
 }
 
 bool Placement::hasTransitions(TimePoint now) const {
-    return symbolFadeChange(now) < 1.0 || stale;
+    if (mapMode == MapMode::Continuous) {
+        return stale || std::chrono::duration<float>(now - fadeStartTime) < Duration(std::chrono::milliseconds(300));
+    } else {
+        return false;
+    }
 }
 
 bool Placement::stillRecent(TimePoint now) const {
-    return mapMode == MapMode::Continuous && recentUntil > now;
-}
-void Placement::setRecent(TimePoint now) {
-    stale = false;
-    if (mapMode == MapMode::Continuous) {
-        // Only set in continuous mode because "now" isn't defined in still mode
-        recentUntil = now + Duration(std::chrono::milliseconds(300));
-    }
+    return mapMode == MapMode::Continuous && commitTime + Duration(std::chrono::milliseconds(300)) > now;
 }
 
 void Placement::setStale() {

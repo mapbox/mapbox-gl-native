@@ -21,7 +21,7 @@ static std::string getQuadKey(int32_t x, int32_t y, int8_t z) {
 }
 
 static mapbox::geometry::point<double> getMercCoord(int32_t x, int32_t y, int8_t z) {
-    double resolution = (util::M2PI * util::EARTH_RADIUS_M / 256) / std::pow(2.0f, z);
+    double resolution = (util::M2PI * util::EARTH_RADIUS_M / 256) / std::pow(2, z);
     return {
         x * resolution - util::M2PI * util::EARTH_RADIUS_M / 2,
         y * resolution - util::M2PI * util::EARTH_RADIUS_M / 2,
@@ -30,7 +30,7 @@ static mapbox::geometry::point<double> getMercCoord(int32_t x, int32_t y, int8_t
 
 static std::string getTileBBox(int32_t x, int32_t y, int8_t z) {
     // Alter the y for the Google/OSM tile scheme.
-    y = std::pow(2.0f, z) - y - 1;
+    y = std::pow(2, z) - y - 1;
 
     auto min = getMercCoord(x * 256, y * 256, z);
     auto max = getMercCoord((x + 1) * 256, (y + 1) * 256, z);
@@ -79,13 +79,13 @@ Resource Resource::spriteJSON(const std::string& base, float pixelRatio) {
 Resource Resource::glyphs(const std::string& urlTemplate, const FontStack& fontStack, const std::pair<uint16_t, uint16_t>& glyphRange) {
     return Resource {
         Resource::Kind::Glyphs,
-        util::replaceTokens(urlTemplate, [&](const std::string& token) {
+        util::replaceTokens(urlTemplate, [&](const std::string& token) -> optional<std::string> {
             if (token == "fontstack") {
                 return util::percentEncode(fontStackToString(fontStack));
             } else if (token == "range") {
                 return util::toString(glyphRange.first) + "-" + util::toString(glyphRange.second);
             } else {
-                return std::string();
+                return {};
             }
         })
     };
@@ -104,7 +104,7 @@ Resource Resource::tile(const std::string& urlTemplate,
     }
     return Resource {
         Resource::Kind::Tile,
-        util::replaceTokens(urlTemplate, [&](const std::string& token) {
+        util::replaceTokens(urlTemplate, [&](const std::string& token) -> optional<std::string> {
             if (token == "z") {
                 return util::toString(z);
             } else if (token == "x") {
@@ -123,7 +123,7 @@ Resource Resource::tile(const std::string& urlTemplate,
             } else if (token == "ratio") {
                 return std::string(pixelRatio > 1.0 ? "@2x" : "");
             } else {
-                return std::string();
+                return {};
             }
         }),
         Resource::TileData {

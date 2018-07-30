@@ -67,8 +67,8 @@ public:
 
 private:
     static void record(EventSeverity severity, Event event, const std::string &msg);
-    static void record(EventSeverity severity, Event event, const char* format, ...);
-    static void record(EventSeverity severity, Event event, int64_t code);
+    static void record(EventSeverity severity, Event event, const char* format = "", ...);
+    static void record(EventSeverity severity, Event event, int64_t code, const char* format = "", ...);
     static void record(EventSeverity severity, Event event, int64_t code, const std::string &msg);
 
     // This method is the data sink that must be implemented by each platform we

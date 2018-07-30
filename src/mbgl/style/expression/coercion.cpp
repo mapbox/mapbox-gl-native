@@ -13,7 +13,7 @@ EvaluationResult toNumber(const Value& v) {
         [](const std::string& s) -> optional<double> {
             try {
                 return util::stof(s);
-            } catch(std::exception) {
+            } catch (const std::exception&) {
                 return optional<double>();
             }
         },
@@ -68,9 +68,10 @@ EvaluationResult toColor(const Value& colorValue) {
 }
 
 Coercion::Coercion(type::Type type_, std::vector<std::unique_ptr<Expression>> inputs_) :
-    Expression(std::move(type_)),
+    Expression(Kind::Coercion, std::move(type_)),
     inputs(std::move(inputs_))
 {
+    assert(!inputs.empty());
     type::Type t = getType();
     if (t.is<type::NumberType>()) {
         coerceSingleValue = toNumber;
@@ -137,7 +138,8 @@ void Coercion::eachChild(const std::function<void(const Expression&)>& visit) co
 };
 
 bool Coercion::operator==(const Expression& e) const {
-    if (auto rhs = dynamic_cast<const Coercion*>(&e)) {
+    if (e.getKind() == Kind::Coercion) {
+        auto rhs = static_cast<const Coercion*>(&e);
         return getType() == rhs->getType() && Expression::childrenEqual(inputs, rhs->inputs);
     }
     return false;

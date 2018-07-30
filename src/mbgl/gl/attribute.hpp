@@ -17,8 +17,6 @@
 namespace mbgl {
 namespace gl {
 
-static constexpr std::size_t MAX_ATTRIBUTES = 8;
-
 template <class> struct DataTypeOf;
 template <> struct DataTypeOf< int8_t>  : std::integral_constant<DataType, DataType::Byte> {};
 template <> struct DataTypeOf<uint8_t>  : std::integral_constant<DataType, DataType::UnsignedByte> {};
@@ -45,7 +43,7 @@ public:
     }
 };
 
-using AttributeBindingArray = std::array<optional<AttributeBinding>, MAX_ATTRIBUTES>;
+using AttributeBindingArray = std::vector<optional<AttributeBinding>>;
 
 /*
     gl::Attribute<T,N> manages the binding of a vertex buffer to a GL program attribute.
@@ -214,7 +212,8 @@ const std::size_t Vertex<A1, A2, A3, A4, A5>::attributeOffsets[5] = {
 
 } // namespace detail
 
-void bindAttributeLocation(ProgramID, AttributeLocation, const char * name);
+class Context;
+void bindAttributeLocation(Context&, ProgramID, AttributeLocation, const char * name);
 std::set<std::string> getActiveAttributes(ProgramID);
 
 template <class... As>
@@ -231,13 +230,13 @@ public:
 
     using Vertex = detail::Vertex<typename As::Type...>;
 
-    static Locations bindLocations(const ProgramID& id) {
+    static Locations bindLocations(Context& context, const ProgramID& id) {
         std::set<std::string> activeAttributes = getActiveAttributes(id);
 
         AttributeLocation location = 0;
         auto maybeBindLocation = [&](const char* name) -> optional<AttributeLocation> {
             if (activeAttributes.count(name)) {
-                bindAttributeLocation(id, location, name);
+                bindAttributeLocation(context, id, location, name);
                 return location++;
             } else {
                 return {};
@@ -277,6 +276,7 @@ public:
 
     static AttributeBindingArray toBindingArray(const Locations& locations, const Bindings& bindings) {
         AttributeBindingArray result;
+        result.resize(sizeof...(As));
 
         auto maybeAddBinding = [&] (const optional<AttributeLocation>& location,
                                     const optional<AttributeBinding>& binding) {
@@ -287,6 +287,12 @@ public:
 
         util::ignore({ (maybeAddBinding(locations.template get<As>(), bindings.template get<As>()), 0)... });
 
+        return result;
+    }
+
+    static uint32_t activeBindingCount(const Bindings& bindings) {
+        uint32_t result = 0;
+        util::ignore({ ((result += bool(bindings.template get<As>())), 0)... });
         return result;
     }
 };
