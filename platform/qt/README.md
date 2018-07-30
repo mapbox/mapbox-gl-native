@@ -53,7 +53,7 @@ At runtime, you will also need installed:
 
 ### Build instructions
 
-Public API headers can be found in the [platform/qt/include](qt/include) directory.
+Public API headers can be found in the [platform/qt/include](include) directory.
 
 #### Linux and macOS
 
