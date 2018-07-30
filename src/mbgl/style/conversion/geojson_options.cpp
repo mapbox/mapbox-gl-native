@@ -12,8 +12,8 @@ optional<GeoJSONOptions> Converter<GeoJSONOptions>::operator()(const Convertible
         if (toNumber(*minzoomValue)) {
             options.minzoom = static_cast<uint8_t>(*toNumber(*minzoomValue));
         } else {
-            error = { "GeoJSON source minzoom value must be a number" };
-            return {};
+            error.message = "GeoJSON source minzoom value must be a number";
+            return nullopt;
         }
     }
 
@@ -22,8 +22,8 @@ optional<GeoJSONOptions> Converter<GeoJSONOptions>::operator()(const Convertible
         if (toNumber(*maxzoomValue)) {
             options.maxzoom = static_cast<uint8_t>(*toNumber(*maxzoomValue));
         } else {
-            error = { "GeoJSON source maxzoom value must be a number" };
-            return {};
+            error.message = "GeoJSON source maxzoom value must be a number";
+            return nullopt;
         }
     }
 
@@ -32,8 +32,8 @@ optional<GeoJSONOptions> Converter<GeoJSONOptions>::operator()(const Convertible
         if (toNumber(*bufferValue)) {
             options.buffer = static_cast<uint16_t>(*toNumber(*bufferValue));
         } else {
-            error = { "GeoJSON source buffer value must be a number" };
-            return {};
+            error.message = "GeoJSON source buffer value must be a number";
+            return nullopt;
         }
     }
 
@@ -42,8 +42,8 @@ optional<GeoJSONOptions> Converter<GeoJSONOptions>::operator()(const Convertible
         if (toNumber(*toleranceValue)) {
             options.tolerance = static_cast<double>(*toNumber(*toleranceValue));
         } else {
-            error = { "GeoJSON source tolerance value must be a number" };
-            return {};
+            error.message = "GeoJSON source tolerance value must be a number";
+            return nullopt;
         }
     }
 
@@ -52,8 +52,8 @@ optional<GeoJSONOptions> Converter<GeoJSONOptions>::operator()(const Convertible
         if (toBool(*clusterValue)) {
             options.cluster = *toBool(*clusterValue);
         } else {
-            error = { "GeoJSON source cluster value must be a boolean" };
-            return {};
+            error.message = "GeoJSON source cluster value must be a boolean";
+            return nullopt;
         }
     }
 
@@ -62,8 +62,8 @@ optional<GeoJSONOptions> Converter<GeoJSONOptions>::operator()(const Convertible
         if (toNumber(*clusterMaxZoomValue)) {
             options.clusterMaxZoom = static_cast<uint8_t>(*toNumber(*clusterMaxZoomValue));
         } else {
-            error = { "GeoJSON source clusterMaxZoom value must be a number" };
-            return {};
+            error.message = "GeoJSON source clusterMaxZoom value must be a number";
+            return nullopt;
         }
     }
 
@@ -72,8 +72,8 @@ optional<GeoJSONOptions> Converter<GeoJSONOptions>::operator()(const Convertible
         if (toNumber(*clusterRadiusValue)) {
             options.clusterRadius = static_cast<double>(*toNumber(*clusterRadiusValue));
         } else {
-            error = { "GeoJSON source clusterRadius value must be a number" };
-            return {};
+            error.message = "GeoJSON source clusterRadius value must be a number";
+            return nullopt;
         }
     }
 

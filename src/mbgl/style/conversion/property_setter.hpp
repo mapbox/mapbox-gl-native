@@ -31,7 +31,7 @@ optional<Error> setProperty(Layer& layer, const Convertible& value) {
     }
 
     (typedLayer->*setter)(*typedValue);
-    return {};
+    return nullopt;
 }
 
 template <class L, void (L::*setter)(const TransitionOptions&)>
@@ -48,13 +48,13 @@ optional<Error> setTransition(Layer& layer, const Convertible& value) {
     }
 
     (typedLayer->*setter)(*transition);
-    return {};
+    return nullopt;
 }
 
 inline optional<Error> setVisibility(Layer& layer, const Convertible& value) {
     if (isUndefined(value)) {
         layer.setVisibility(VisibilityType::Visible);
-        return {};
+        return nullopt;
     }
 
     Error error;
@@ -64,7 +64,7 @@ inline optional<Error> setVisibility(Layer& layer, const Convertible& value) {
     }
 
     layer.setVisibility(*visibility);
-    return {};
+    return nullopt;
 }
 
 } // namespace conversion
