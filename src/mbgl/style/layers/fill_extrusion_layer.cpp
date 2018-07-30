@@ -3,6 +3,12 @@
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
 #include <mbgl/style/layer_observer.hpp>
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/color_ramp_property_value.hpp>
+#include <mbgl/style/conversion/constant.hpp>
+#include <mbgl/style/conversion/property_value.hpp>
+#include <mbgl/style/conversion/transition_options.hpp>
+#include <mbgl/style/conversion/json.hpp>
 
 namespace mbgl {
 namespace style {
@@ -283,6 +289,181 @@ void FillExtrusionLayer::setFillExtrusionBaseTransition(const TransitionOptions&
 
 TransitionOptions FillExtrusionLayer::getFillExtrusionBaseTransition() const {
     return impl().paint.template get<FillExtrusionBase>().options;
+}
+
+using namespace conversion;
+
+optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, const Convertible& value) {
+    
+    if (name == "fill-extrusion-opacity") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setFillExtrusionOpacity(*typedValue);
+        return nullopt;
+    }
+    if (name == "fill-extrusion-opacity-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setFillExtrusionOpacityTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "fill-extrusion-color") {
+        Error error;
+        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setFillExtrusionColor(*typedValue);
+        return nullopt;
+    }
+    if (name == "fill-extrusion-color-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setFillExtrusionColorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "fill-extrusion-translate") {
+        Error error;
+        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setFillExtrusionTranslate(*typedValue);
+        return nullopt;
+    }
+    if (name == "fill-extrusion-translate-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setFillExtrusionTranslateTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "fill-extrusion-translate-anchor") {
+        Error error;
+        optional<PropertyValue<TranslateAnchorType>> typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setFillExtrusionTranslateAnchor(*typedValue);
+        return nullopt;
+    }
+    if (name == "fill-extrusion-translate-anchor-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setFillExtrusionTranslateAnchorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "fill-extrusion-pattern") {
+        Error error;
+        optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setFillExtrusionPattern(*typedValue);
+        return nullopt;
+    }
+    if (name == "fill-extrusion-pattern-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setFillExtrusionPatternTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "fill-extrusion-height") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setFillExtrusionHeight(*typedValue);
+        return nullopt;
+    }
+    if (name == "fill-extrusion-height-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setFillExtrusionHeightTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "fill-extrusion-base") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setFillExtrusionBase(*typedValue);
+        return nullopt;
+    }
+    if (name == "fill-extrusion-base-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setFillExtrusionBaseTransition(*transition);
+        return nullopt;
+    }
+    
+    return Error { "layer doesn't support this property" };
+}
+
+optional<Error> FillExtrusionLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
+    if (name == "visibility") {
+        if (isUndefined(value)) {
+            setVisibility(VisibilityType::Visible);
+            return nullopt;
+        }
+
+        Error error;
+        optional<VisibilityType> visibility = convert<VisibilityType>(value, error);
+        if (!visibility) {
+            return error;
+        }
+
+        setVisibility(*visibility);
+        return nullopt;
+    }
+
+    
+    return Error { "layer doesn't support this property" };
 }
 
 } // namespace style

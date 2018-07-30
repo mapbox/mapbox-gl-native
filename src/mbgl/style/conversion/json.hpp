@@ -1,3 +1,5 @@
+#pragma once
+
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
 

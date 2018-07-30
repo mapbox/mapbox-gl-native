@@ -5,6 +5,7 @@
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/style/layer_type.hpp>
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/conversion.hpp>
 
 #include <cassert>
 #include <memory>
@@ -98,7 +99,6 @@ public:
             return std::forward<V>(visitor)(*as<HeatmapLayer>());
         }
 
-
         // Not reachable, but placate GCC.
         assert(false);
         throw new std::runtime_error("unknown layer type");
@@ -116,6 +116,10 @@ public:
     float getMaxZoom() const;
     virtual void setMinZoom(float) = 0;
     virtual void setMaxZoom(float) = 0;
+
+    // Dynamic properties
+    virtual optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) = 0;
+    virtual optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) = 0;
 
     // Private implementation
     class Impl;

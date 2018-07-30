@@ -3,9 +3,11 @@
 #include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layers/heatmap_layer_impl.hpp>
 #include <mbgl/style/layer_observer.hpp>
-// for constructing default heatmap-color ramp expression from style JSON
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/color_ramp_property_value.hpp>
+#include <mbgl/style/conversion/constant.hpp>
+#include <mbgl/style/conversion/property_value.hpp>
+#include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 
 namespace mbgl {
@@ -235,6 +237,139 @@ void HeatmapLayer::setHeatmapOpacityTransition(const TransitionOptions& options)
 
 TransitionOptions HeatmapLayer::getHeatmapOpacityTransition() const {
     return impl().paint.template get<HeatmapOpacity>().options;
+}
+
+using namespace conversion;
+
+optional<Error> HeatmapLayer::setPaintProperty(const std::string& name, const Convertible& value) {
+    
+    if (name == "heatmap-radius") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setHeatmapRadius(*typedValue);
+        return nullopt;
+    }
+    if (name == "heatmap-radius-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setHeatmapRadiusTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "heatmap-weight") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setHeatmapWeight(*typedValue);
+        return nullopt;
+    }
+    if (name == "heatmap-weight-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setHeatmapWeightTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "heatmap-intensity") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setHeatmapIntensity(*typedValue);
+        return nullopt;
+    }
+    if (name == "heatmap-intensity-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setHeatmapIntensityTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "heatmap-color") {
+        Error error;
+        optional<ColorRampPropertyValue> typedValue = convert<ColorRampPropertyValue>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setHeatmapColor(*typedValue);
+        return nullopt;
+    }
+    if (name == "heatmap-color-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setHeatmapColorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "heatmap-opacity") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setHeatmapOpacity(*typedValue);
+        return nullopt;
+    }
+    if (name == "heatmap-opacity-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setHeatmapOpacityTransition(*transition);
+        return nullopt;
+    }
+    
+    return Error { "layer doesn't support this property" };
+}
+
+optional<Error> HeatmapLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
+    if (name == "visibility") {
+        if (isUndefined(value)) {
+            setVisibility(VisibilityType::Visible);
+            return nullopt;
+        }
+
+        Error error;
+        optional<VisibilityType> visibility = convert<VisibilityType>(value, error);
+        if (!visibility) {
+            return error;
+        }
+
+        setVisibility(*visibility);
+        return nullopt;
+    }
+
+    
+    return Error { "layer doesn't support this property" };
 }
 
 } // namespace style

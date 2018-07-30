@@ -3,6 +3,12 @@
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/style/layer_observer.hpp>
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/color_ramp_property_value.hpp>
+#include <mbgl/style/conversion/constant.hpp>
+#include <mbgl/style/conversion/property_value.hpp>
+#include <mbgl/style/conversion/transition_options.hpp>
+#include <mbgl/style/conversion/json.hpp>
 
 namespace mbgl {
 namespace style {
@@ -429,6 +435,288 @@ void LineLayer::setLinePatternTransition(const TransitionOptions& options) {
 
 TransitionOptions LineLayer::getLinePatternTransition() const {
     return impl().paint.template get<LinePattern>().options;
+}
+
+using namespace conversion;
+
+optional<Error> LineLayer::setPaintProperty(const std::string& name, const Convertible& value) {
+    
+    if (name == "line-opacity") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLineOpacity(*typedValue);
+        return nullopt;
+    }
+    if (name == "line-opacity-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setLineOpacityTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "line-color") {
+        Error error;
+        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLineColor(*typedValue);
+        return nullopt;
+    }
+    if (name == "line-color-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setLineColorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "line-translate") {
+        Error error;
+        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLineTranslate(*typedValue);
+        return nullopt;
+    }
+    if (name == "line-translate-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setLineTranslateTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "line-translate-anchor") {
+        Error error;
+        optional<PropertyValue<TranslateAnchorType>> typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLineTranslateAnchor(*typedValue);
+        return nullopt;
+    }
+    if (name == "line-translate-anchor-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setLineTranslateAnchorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "line-width") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLineWidth(*typedValue);
+        return nullopt;
+    }
+    if (name == "line-width-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setLineWidthTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "line-gap-width") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLineGapWidth(*typedValue);
+        return nullopt;
+    }
+    if (name == "line-gap-width-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setLineGapWidthTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "line-offset") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLineOffset(*typedValue);
+        return nullopt;
+    }
+    if (name == "line-offset-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setLineOffsetTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "line-blur") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLineBlur(*typedValue);
+        return nullopt;
+    }
+    if (name == "line-blur-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setLineBlurTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "line-dasharray") {
+        Error error;
+        optional<PropertyValue<std::vector<float>>> typedValue = convert<PropertyValue<std::vector<float>>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLineDasharray(*typedValue);
+        return nullopt;
+    }
+    if (name == "line-dasharray-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setLineDasharrayTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "line-pattern") {
+        Error error;
+        optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLinePattern(*typedValue);
+        return nullopt;
+    }
+    if (name == "line-pattern-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setLinePatternTransition(*transition);
+        return nullopt;
+    }
+    
+    return Error { "layer doesn't support this property" };
+}
+
+optional<Error> LineLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
+    if (name == "visibility") {
+        if (isUndefined(value)) {
+            setVisibility(VisibilityType::Visible);
+            return nullopt;
+        }
+
+        Error error;
+        optional<VisibilityType> visibility = convert<VisibilityType>(value, error);
+        if (!visibility) {
+            return error;
+        }
+
+        setVisibility(*visibility);
+        return nullopt;
+    }
+
+    
+    if (name == "line-cap") {
+        Error error;
+        optional<PropertyValue<LineCapType>> typedValue = convert<PropertyValue<LineCapType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLineCap(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "line-join") {
+        Error error;
+        optional<PropertyValue<LineJoinType>> typedValue = convert<PropertyValue<LineJoinType>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLineJoin(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "line-miter-limit") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLineMiterLimit(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "line-round-limit") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setLineRoundLimit(*typedValue);
+        return nullopt;
+    }
+    
+    return Error { "layer doesn't support this property" };
 }
 
 } // namespace style

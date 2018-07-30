@@ -3,6 +3,12 @@
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
 #include <mbgl/style/layer_observer.hpp>
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/color_ramp_property_value.hpp>
+#include <mbgl/style/conversion/constant.hpp>
+#include <mbgl/style/conversion/property_value.hpp>
+#include <mbgl/style/conversion/transition_options.hpp>
+#include <mbgl/style/conversion/json.hpp>
 
 namespace mbgl {
 namespace style {
@@ -391,6 +397,265 @@ void CircleLayer::setCircleStrokeOpacityTransition(const TransitionOptions& opti
 
 TransitionOptions CircleLayer::getCircleStrokeOpacityTransition() const {
     return impl().paint.template get<CircleStrokeOpacity>().options;
+}
+
+using namespace conversion;
+
+optional<Error> CircleLayer::setPaintProperty(const std::string& name, const Convertible& value) {
+    
+    if (name == "circle-radius") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setCircleRadius(*typedValue);
+        return nullopt;
+    }
+    if (name == "circle-radius-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setCircleRadiusTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "circle-color") {
+        Error error;
+        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setCircleColor(*typedValue);
+        return nullopt;
+    }
+    if (name == "circle-color-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setCircleColorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "circle-blur") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setCircleBlur(*typedValue);
+        return nullopt;
+    }
+    if (name == "circle-blur-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setCircleBlurTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "circle-opacity") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setCircleOpacity(*typedValue);
+        return nullopt;
+    }
+    if (name == "circle-opacity-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setCircleOpacityTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "circle-translate") {
+        Error error;
+        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setCircleTranslate(*typedValue);
+        return nullopt;
+    }
+    if (name == "circle-translate-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setCircleTranslateTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "circle-translate-anchor") {
+        Error error;
+        optional<PropertyValue<TranslateAnchorType>> typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setCircleTranslateAnchor(*typedValue);
+        return nullopt;
+    }
+    if (name == "circle-translate-anchor-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setCircleTranslateAnchorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "circle-pitch-scale") {
+        Error error;
+        optional<PropertyValue<CirclePitchScaleType>> typedValue = convert<PropertyValue<CirclePitchScaleType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setCirclePitchScale(*typedValue);
+        return nullopt;
+    }
+    if (name == "circle-pitch-scale-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setCirclePitchScaleTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "circle-pitch-alignment") {
+        Error error;
+        optional<PropertyValue<AlignmentType>> typedValue = convert<PropertyValue<AlignmentType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setCirclePitchAlignment(*typedValue);
+        return nullopt;
+    }
+    if (name == "circle-pitch-alignment-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setCirclePitchAlignmentTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "circle-stroke-width") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setCircleStrokeWidth(*typedValue);
+        return nullopt;
+    }
+    if (name == "circle-stroke-width-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setCircleStrokeWidthTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "circle-stroke-color") {
+        Error error;
+        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setCircleStrokeColor(*typedValue);
+        return nullopt;
+    }
+    if (name == "circle-stroke-color-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setCircleStrokeColorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "circle-stroke-opacity") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setCircleStrokeOpacity(*typedValue);
+        return nullopt;
+    }
+    if (name == "circle-stroke-opacity-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setCircleStrokeOpacityTransition(*transition);
+        return nullopt;
+    }
+    
+    return Error { "layer doesn't support this property" };
+}
+
+optional<Error> CircleLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
+    if (name == "visibility") {
+        if (isUndefined(value)) {
+            setVisibility(VisibilityType::Visible);
+            return nullopt;
+        }
+
+        Error error;
+        optional<VisibilityType> visibility = convert<VisibilityType>(value, error);
+        if (!visibility) {
+            return error;
+        }
+
+        setVisibility(*visibility);
+        return nullopt;
+    }
+
+    
+    return Error { "layer doesn't support this property" };
 }
 
 } // namespace style

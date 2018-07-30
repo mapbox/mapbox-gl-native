@@ -3,6 +3,12 @@
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/style/layer_observer.hpp>
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/color_ramp_property_value.hpp>
+#include <mbgl/style/conversion/constant.hpp>
+#include <mbgl/style/conversion/property_value.hpp>
+#include <mbgl/style/conversion/transition_options.hpp>
+#include <mbgl/style/conversion/json.hpp>
 
 namespace mbgl {
 namespace style {
@@ -1049,6 +1055,724 @@ void SymbolLayer::setTextTranslateAnchorTransition(const TransitionOptions& opti
 
 TransitionOptions SymbolLayer::getTextTranslateAnchorTransition() const {
     return impl().paint.template get<TextTranslateAnchor>().options;
+}
+
+using namespace conversion;
+
+optional<Error> SymbolLayer::setPaintProperty(const std::string& name, const Convertible& value) {
+    
+    if (name == "icon-opacity") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconOpacity(*typedValue);
+        return nullopt;
+    }
+    if (name == "icon-opacity-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setIconOpacityTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "icon-color") {
+        Error error;
+        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconColor(*typedValue);
+        return nullopt;
+    }
+    if (name == "icon-color-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setIconColorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "icon-halo-color") {
+        Error error;
+        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconHaloColor(*typedValue);
+        return nullopt;
+    }
+    if (name == "icon-halo-color-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setIconHaloColorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "icon-halo-width") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconHaloWidth(*typedValue);
+        return nullopt;
+    }
+    if (name == "icon-halo-width-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setIconHaloWidthTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "icon-halo-blur") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconHaloBlur(*typedValue);
+        return nullopt;
+    }
+    if (name == "icon-halo-blur-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setIconHaloBlurTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "icon-translate") {
+        Error error;
+        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconTranslate(*typedValue);
+        return nullopt;
+    }
+    if (name == "icon-translate-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setIconTranslateTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "icon-translate-anchor") {
+        Error error;
+        optional<PropertyValue<TranslateAnchorType>> typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconTranslateAnchor(*typedValue);
+        return nullopt;
+    }
+    if (name == "icon-translate-anchor-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setIconTranslateAnchorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "text-opacity") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextOpacity(*typedValue);
+        return nullopt;
+    }
+    if (name == "text-opacity-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setTextOpacityTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "text-color") {
+        Error error;
+        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextColor(*typedValue);
+        return nullopt;
+    }
+    if (name == "text-color-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setTextColorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "text-halo-color") {
+        Error error;
+        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextHaloColor(*typedValue);
+        return nullopt;
+    }
+    if (name == "text-halo-color-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setTextHaloColorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "text-halo-width") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextHaloWidth(*typedValue);
+        return nullopt;
+    }
+    if (name == "text-halo-width-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setTextHaloWidthTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "text-halo-blur") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextHaloBlur(*typedValue);
+        return nullopt;
+    }
+    if (name == "text-halo-blur-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setTextHaloBlurTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "text-translate") {
+        Error error;
+        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextTranslate(*typedValue);
+        return nullopt;
+    }
+    if (name == "text-translate-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setTextTranslateTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "text-translate-anchor") {
+        Error error;
+        optional<PropertyValue<TranslateAnchorType>> typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextTranslateAnchor(*typedValue);
+        return nullopt;
+    }
+    if (name == "text-translate-anchor-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setTextTranslateAnchorTransition(*transition);
+        return nullopt;
+    }
+    
+    return Error { "layer doesn't support this property" };
+}
+
+optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
+    if (name == "visibility") {
+        if (isUndefined(value)) {
+            setVisibility(VisibilityType::Visible);
+            return nullopt;
+        }
+
+        Error error;
+        optional<VisibilityType> visibility = convert<VisibilityType>(value, error);
+        if (!visibility) {
+            return error;
+        }
+
+        setVisibility(*visibility);
+        return nullopt;
+    }
+
+    
+    if (name == "symbol-placement") {
+        Error error;
+        optional<PropertyValue<SymbolPlacementType>> typedValue = convert<PropertyValue<SymbolPlacementType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setSymbolPlacement(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "symbol-spacing") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setSymbolSpacing(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "symbol-avoid-edges") {
+        Error error;
+        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setSymbolAvoidEdges(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "icon-allow-overlap") {
+        Error error;
+        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconAllowOverlap(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "icon-ignore-placement") {
+        Error error;
+        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconIgnorePlacement(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "icon-optional") {
+        Error error;
+        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconOptional(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "icon-rotation-alignment") {
+        Error error;
+        optional<PropertyValue<AlignmentType>> typedValue = convert<PropertyValue<AlignmentType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconRotationAlignment(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "icon-size") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconSize(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "icon-text-fit") {
+        Error error;
+        optional<PropertyValue<IconTextFitType>> typedValue = convert<PropertyValue<IconTextFitType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconTextFit(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "icon-text-fit-padding") {
+        Error error;
+        optional<PropertyValue<std::array<float, 4>>> typedValue = convert<PropertyValue<std::array<float, 4>>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconTextFitPadding(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "icon-image") {
+        Error error;
+        optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, true, true);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconImage(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "icon-rotate") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconRotate(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "icon-padding") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconPadding(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "icon-keep-upright") {
+        Error error;
+        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconKeepUpright(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "icon-offset") {
+        Error error;
+        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconOffset(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "icon-anchor") {
+        Error error;
+        optional<PropertyValue<SymbolAnchorType>> typedValue = convert<PropertyValue<SymbolAnchorType>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconAnchor(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "icon-pitch-alignment") {
+        Error error;
+        optional<PropertyValue<AlignmentType>> typedValue = convert<PropertyValue<AlignmentType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setIconPitchAlignment(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-pitch-alignment") {
+        Error error;
+        optional<PropertyValue<AlignmentType>> typedValue = convert<PropertyValue<AlignmentType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextPitchAlignment(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-rotation-alignment") {
+        Error error;
+        optional<PropertyValue<AlignmentType>> typedValue = convert<PropertyValue<AlignmentType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextRotationAlignment(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-field") {
+        Error error;
+        optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, true, true);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextField(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-font") {
+        Error error;
+        optional<PropertyValue<std::vector<std::string>>> typedValue = convert<PropertyValue<std::vector<std::string>>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextFont(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-size") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextSize(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-max-width") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextMaxWidth(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-line-height") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextLineHeight(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-letter-spacing") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextLetterSpacing(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-justify") {
+        Error error;
+        optional<PropertyValue<TextJustifyType>> typedValue = convert<PropertyValue<TextJustifyType>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextJustify(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-anchor") {
+        Error error;
+        optional<PropertyValue<SymbolAnchorType>> typedValue = convert<PropertyValue<SymbolAnchorType>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextAnchor(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-max-angle") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextMaxAngle(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-rotate") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextRotate(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-padding") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextPadding(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-keep-upright") {
+        Error error;
+        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextKeepUpright(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-transform") {
+        Error error;
+        optional<PropertyValue<TextTransformType>> typedValue = convert<PropertyValue<TextTransformType>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextTransform(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-offset") {
+        Error error;
+        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextOffset(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-allow-overlap") {
+        Error error;
+        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextAllowOverlap(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-ignore-placement") {
+        Error error;
+        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextIgnorePlacement(*typedValue);
+        return nullopt;
+    }
+    
+    if (name == "text-optional") {
+        Error error;
+        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setTextOptional(*typedValue);
+        return nullopt;
+    }
+    
+    return Error { "layer doesn't support this property" };
 }
 
 } // namespace style

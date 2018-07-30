@@ -33,6 +33,10 @@ public:
     void setMinZoom(float) final;
     void setMaxZoom(float) final;
 
+    // Dynamic properties
+    optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
+    optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
+
     // Paint properties
 
     static PropertyValue<float> getDefaultCircleRadius();
