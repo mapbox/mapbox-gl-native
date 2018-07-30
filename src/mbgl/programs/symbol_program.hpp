@@ -41,7 +41,6 @@ MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_size_zoom_constant);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_size_feature_constant);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_size_t);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_size);
-MBGL_DEFINE_UNIFORM_SCALAR(float, u_max_camera_distance);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_rotate_symbol);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_aspect_ratio);
 } // namespace uniforms
@@ -143,13 +142,13 @@ public:
     ConstantSymbolSizeBinder(const float /*tileZoom*/, const style::Undefined&, const float defaultValue)
       : layoutSize(defaultValue) {}
     
-    ConstantSymbolSizeBinder(const float tileZoom, const style::CameraFunction<float>& function_, const float /*defaultValue*/)
-      : layoutSize(function_.evaluate(tileZoom + 1)),
-        function(function_) {
-        const Range<float> zoomLevels = function_.getCoveringStops(tileZoom, tileZoom + 1);
+    ConstantSymbolSizeBinder(const float tileZoom, const style::PropertyExpression<float>& expression_, const float /*defaultValue*/)
+      : layoutSize(expression_.evaluate(tileZoom + 1)),
+        expression(expression_) {
+        const Range<float> zoomLevels = expression_.getCoveringStops(tileZoom, tileZoom + 1);
         coveringRanges = std::make_tuple(
             zoomLevels,
-            Range<float> { function_.evaluate(zoomLevels.min), function_.evaluate(zoomLevels.max) }
+            Range<float> { expression_.evaluate(zoomLevels.min), expression_.evaluate(zoomLevels.max) }
         );
     }
     
@@ -157,7 +156,7 @@ public:
     
     ZoomEvaluatedSize evaluateForZoom(float currentZoom) const override {
         float size = layoutSize;
-        bool isZoomConstant = !(coveringRanges || function);
+        bool isZoomConstant = !(coveringRanges || expression);
         if (coveringRanges) {
             // Even though we could get the exact value of the camera function
             // at z = currentZoom, we intentionally do not: instead, we interpolate
@@ -167,12 +166,12 @@ public:
             const Range<float>& zoomLevels = std::get<0>(*coveringRanges);
             const Range<float>& sizeLevels = std::get<1>(*coveringRanges);
             float t = util::clamp(
-                function->interpolationFactor(zoomLevels, currentZoom),
+                expression->interpolationFactor(zoomLevels, currentZoom),
                 0.0f, 1.0f
             );
             size = sizeLevels.min + t * (sizeLevels.max - sizeLevels.min);
-        } else if (function) {
-            size = function->evaluate(currentZoom);
+        } else if (expression) {
+            size = expression->evaluate(currentZoom);
         }
 
         const float unused = 0.0f;
@@ -181,7 +180,7 @@ public:
     
     float layoutSize;
     optional<std::tuple<Range<float>, Range<float>>> coveringRanges;
-    optional<style::CameraFunction<float>> function;
+    optional<style::PropertyExpression<float>> expression;
 };
 
 class SourceFunctionSymbolSizeBinder final : public SymbolSizeBinder {
@@ -190,13 +189,13 @@ public:
     using VertexVector = gl::VertexVector<Vertex>;
     using VertexBuffer = gl::VertexBuffer<Vertex>;
     
-    SourceFunctionSymbolSizeBinder(const float /*tileZoom*/, const style::SourceFunction<float>& function_, const float defaultValue_)
-        : function(function_),
+    SourceFunctionSymbolSizeBinder(const float /*tileZoom*/, style::PropertyExpression<float> expression_, const float defaultValue_)
+        : expression(std::move(expression_)),
           defaultValue(defaultValue_) {
     }
 
     Range<float> getVertexSizeData(const GeometryTileFeature& feature) override {
-        const float size = function.evaluate(feature, defaultValue);
+        const float size = expression.evaluate(feature, defaultValue);
         return { size, size };
     };
     
@@ -205,30 +204,30 @@ public:
         return { true, false, unused, unused, unused };
     }
     
-    style::SourceFunction<float> function;
+    style::PropertyExpression<float> expression;
     const float defaultValue;
 };
 
 class CompositeFunctionSymbolSizeBinder final : public SymbolSizeBinder {
 public:
     
-    CompositeFunctionSymbolSizeBinder(const float tileZoom, const style::CompositeFunction<float>& function_, const float defaultValue_)
-        : function(function_),
+    CompositeFunctionSymbolSizeBinder(const float tileZoom, style::PropertyExpression<float> expression_, const float defaultValue_)
+        : expression(std::move(expression_)),
           defaultValue(defaultValue_),
           layoutZoom(tileZoom + 1),
-          coveringZoomStops(function.getCoveringStops(tileZoom, tileZoom + 1))
+          coveringZoomStops(expression.getCoveringStops(tileZoom, tileZoom + 1))
     {}
 
     Range<float> getVertexSizeData(const GeometryTileFeature& feature) override {
         return {
-            function.evaluate(coveringZoomStops.min, feature, defaultValue),
-            function.evaluate(coveringZoomStops.max, feature, defaultValue)
+            expression.evaluate(coveringZoomStops.min, feature, defaultValue),
+            expression.evaluate(coveringZoomStops.max, feature, defaultValue)
         };
     };
     
     ZoomEvaluatedSize evaluateForZoom(float currentZoom) const override {
         float sizeInterpolationT = util::clamp(
-            function.interpolationFactor(coveringZoomStops, currentZoom),
+            expression.interpolationFactor(coveringZoomStops, currentZoom),
             0.0f, 1.0f
         );
 
@@ -236,7 +235,7 @@ public:
         return { false, false, sizeInterpolationT, unused, unused };
     }
     
-    style::CompositeFunction<float> function;
+    style::PropertyExpression<float> expression;
     const float defaultValue;
     float layoutZoom;
     Range<float> coveringZoomStops;
@@ -278,35 +277,45 @@ public:
             Shaders::fragmentSource)) {
     }
 
+    static typename AllUniforms::Values computeAllUniformValues(
+        const UniformValues& uniformValues,
+        const SymbolSizeBinder& symbolSizeBinder,
+        const PaintPropertyBinders& paintPropertyBinders,
+        const typename PaintProperties::PossiblyEvaluated& currentProperties,
+        float currentZoom) {
+        return uniformValues.concat(symbolSizeBinder.uniformValues(currentZoom))
+            .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
+    }
+
+    static typename Attributes::Bindings computeAllAttributeBindings(
+        const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
+        const gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>& dynamicLayoutVertexBuffer,
+        const gl::VertexBuffer<SymbolOpacityAttributes::Vertex>& opacityVertexBuffer,
+        const PaintPropertyBinders& paintPropertyBinders,
+        const typename PaintProperties::PossiblyEvaluated& currentProperties) {
+        assert(layoutVertexBuffer.vertexCount == dynamicLayoutVertexBuffer.vertexCount &&
+               layoutVertexBuffer.vertexCount == opacityVertexBuffer.vertexCount);
+        return LayoutAttributes::bindings(layoutVertexBuffer)
+            .concat(SymbolDynamicLayoutAttributes::bindings(dynamicLayoutVertexBuffer))
+            .concat(SymbolOpacityAttributes::bindings(opacityVertexBuffer))
+            .concat(paintPropertyBinders.attributeBindings(currentProperties));
+    }
+
+    static uint32_t activeBindingCount(const typename Attributes::Bindings& allAttributeBindings) {
+        return Attributes::activeBindingCount(allAttributeBindings);
+    }
+
     template <class DrawMode>
     void draw(gl::Context& context,
               DrawMode drawMode,
               gl::DepthMode depthMode,
               gl::StencilMode stencilMode,
               gl::ColorMode colorMode,
-              const UniformValues& uniformValues,
-              const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
-              const gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>& dynamicLayoutVertexBuffer,
-              const gl::VertexBuffer<SymbolOpacityAttributes::Vertex>& opacityVertexBuffer,
-              const SymbolSizeBinder& symbolSizeBinder,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
               const SegmentVector<Attributes>& segments,
-              const PaintPropertyBinders& paintPropertyBinders,
-              const typename PaintProperties::PossiblyEvaluated& currentProperties,
-              float currentZoom,
+              const typename AllUniforms::Values& allUniformValues,
+              const typename Attributes::Bindings& allAttributeBindings,
               const std::string& layerID) {
-        typename AllUniforms::Values allUniformValues = uniformValues
-            .concat(symbolSizeBinder.uniformValues(currentZoom))
-            .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
-
-        typename Attributes::Bindings allAttributeBindings = LayoutAttributes::bindings(layoutVertexBuffer)
-            .concat(SymbolDynamicLayoutAttributes::bindings(dynamicLayoutVertexBuffer))
-            .concat(SymbolOpacityAttributes::bindings(opacityVertexBuffer))
-            .concat(paintPropertyBinders.attributeBindings(currentProperties));
-
-        assert(layoutVertexBuffer.vertexCount == dynamicLayoutVertexBuffer.vertexCount &&
-                layoutVertexBuffer.vertexCount == opacityVertexBuffer.vertexCount);
-
         for (auto& segment : segments) {
             auto vertexArrayIt = segment.vertexArrays.find(layerID);
 
@@ -346,7 +355,6 @@ class SymbolIconProgram : public SymbolProgram<
         uniforms::u_camera_to_center_distance,
         uniforms::u_pitch,
         uniforms::u_pitch_with_map,
-        uniforms::u_max_camera_distance,
         uniforms::u_rotate_symbol,
         uniforms::u_aspect_ratio>,
     style::IconPaintProperties>
@@ -386,7 +394,6 @@ class SymbolSDFProgram : public SymbolProgram<
         uniforms::u_camera_to_center_distance,
         uniforms::u_pitch,
         uniforms::u_pitch_with_map,
-        uniforms::u_max_camera_distance,
         uniforms::u_rotate_symbol,
         uniforms::u_aspect_ratio,
         uniforms::u_gamma_scale,
@@ -408,8 +415,7 @@ public:
             uniforms::u_is_text,
             uniforms::u_camera_to_center_distance,
             uniforms::u_pitch,
-            uniforms::u_pitch_with_map,            
-            uniforms::u_max_camera_distance,
+            uniforms::u_pitch_with_map,
             uniforms::u_rotate_symbol,
             uniforms::u_aspect_ratio,
             uniforms::u_gamma_scale,

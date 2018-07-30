@@ -36,6 +36,10 @@ struct RasterContrast : PaintProperty<float> {
     static float defaultValue() { return 0; }
 };
 
+struct RasterResampling : PaintProperty<RasterResamplingType> {
+    static RasterResamplingType defaultValue() { return RasterResamplingType::Linear; }
+};
+
 struct RasterFadeDuration : PaintProperty<float> {
     static float defaultValue() { return 300; }
 };
@@ -47,6 +51,7 @@ class RasterPaintProperties : public Properties<
     RasterBrightnessMax,
     RasterSaturation,
     RasterContrast,
+    RasterResampling,
     RasterFadeDuration
 > {};
 

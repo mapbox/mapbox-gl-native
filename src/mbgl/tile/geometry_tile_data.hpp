@@ -22,19 +22,19 @@ class GeometryCoordinates : public std::vector<GeometryCoordinate> {
 public:
     using coordinate_type = int16_t;
 
-    GeometryCoordinates() = default;
-    GeometryCoordinates(const std::vector<GeometryCoordinate>& v)
-        : std::vector<GeometryCoordinate>(v) {}
-    GeometryCoordinates(std::vector<GeometryCoordinate>&& v)
-        : std::vector<GeometryCoordinate>(std::move(v)) {}
-
-    using std::vector<GeometryCoordinate>::vector;
+    template <class... Args>
+    GeometryCoordinates(Args&&... args) : std::vector<GeometryCoordinate>(std::forward<Args>(args)...) {}
+    GeometryCoordinates(std::initializer_list<GeometryCoordinate> args)
+      : std::vector<GeometryCoordinate>(std::move(args)) {}
 };
 
 class GeometryCollection : public std::vector<GeometryCoordinates> {
 public:
     using coordinate_type = int16_t;
-    using std::vector<GeometryCoordinates>::vector;
+    template <class... Args>
+    GeometryCollection(Args&&... args) : std::vector<GeometryCoordinates>(std::forward<Args>(args)...) {}
+    GeometryCollection(std::initializer_list<GeometryCoordinates> args)
+      : std::vector<GeometryCoordinates>(std::move(args)) {}
 };
 
 class GeometryTileFeature {

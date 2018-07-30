@@ -16,10 +16,10 @@ Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const T& constant) const {
 }
 
 template <typename T>
-Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const style::CameraFunction<T>& function) const {
-    return calculate(function.evaluate(parameters.z - 1.0f),
-                     function.evaluate(parameters.z),
-                     function.evaluate(parameters.z + 1.0f));
+Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const style::PropertyExpression<T>& expression) const {
+    return calculate(expression.evaluate(parameters.z - 1.0f),
+                     expression.evaluate(parameters.z),
+                     expression.evaluate(parameters.z + 1.0f));
 }
 
 template <typename T>

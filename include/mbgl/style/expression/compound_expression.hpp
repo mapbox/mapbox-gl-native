@@ -33,10 +33,13 @@ namespace expression {
 */
 struct VarargsType { type::Type type; };
 template <typename T>
-struct Varargs : std::vector<T> { using std::vector<T>::vector; };
+struct Varargs : std::vector<T> {
+    template <class... Args>
+    Varargs(Args&&... args) : std::vector<T>(std::forward<Args>(args)...) {}
+};
 
 namespace detail {
-// Base class for the Signature<Fn> structs that are used to determine the
+// Base class for the Signature<Fn> structs that are used to determine
 // each CompoundExpression definition's type::Type data from the type of its
 // "evaluate" function.
 struct SignatureBase {
@@ -62,7 +65,7 @@ struct SignatureBase {
 class CompoundExpressionBase : public Expression {
 public:
     CompoundExpressionBase(std::string name_, const detail::SignatureBase& signature) :
-        Expression(signature.result),
+        Expression(Kind::CompoundExpression, signature.result),
         name(std::move(name_)),
         params(signature.params)
     {}
@@ -108,7 +111,8 @@ public:
     }
 
     bool operator==(const Expression& e) const override {
-        if (auto rhs = dynamic_cast<const CompoundExpression*>(&e)) {
+        if (e.getKind() == Kind::CompoundExpression) {
+            auto rhs = static_cast<const CompoundExpression*>(&e);
             return getName() == rhs->getName() && Expression::childrenEqual(args, rhs->args);
         }
         return false;
@@ -134,10 +138,6 @@ struct CompoundExpressionRegistry {
 
 ParseResult parseCompoundExpression(const std::string name, const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
 
-ParseResult createCompoundExpression(const CompoundExpressionRegistry::Definition& definition,
-                                     std::vector<std::unique_ptr<Expression>> args,
-                                     ParsingContext& ctx);
-    
 ParseResult createCompoundExpression(const std::string& name,
                                      std::vector<std::unique_ptr<Expression>> args,
                                      ParsingContext& ctx);

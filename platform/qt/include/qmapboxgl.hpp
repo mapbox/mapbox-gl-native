@@ -236,8 +236,10 @@ public:
     bool layerExists(const QString &id);
     void removeLayer(const QString &id);
 
-    void setFilter(const QString &layer, const QVariant &filter);
+    QList<QString> layerIds() const;
 
+    void setFilter(const QString &layer, const QVariant &filter);
+    QVariant getFilter(const QString &layer) const;
     // When rendering on a different thread,
     // should be called on the render thread.
     void createRenderer();

@@ -1,8 +1,5 @@
 #include <mbgl/util/platform.hpp>
-#define NU_WITH_TOUPPER
-#define NU_WITH_TOLOWER
-#define NU_WITH_UTF8_WRITER
-#include <libnu/libnu.h>
+#include <libnu/casemap.h>
 #include <cstring>
 #include <sstream>
 

@@ -185,7 +185,6 @@ optional<Color> parse(const std::string& css_str) {
     // Convert to lowercase.
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 
-
     for (const auto& namedColor : namedColors) {
         if (str == namedColor.name) {
             return { namedColor.color };
@@ -262,8 +261,9 @@ optional<Color> parse(const std::string& css_str) {
             }
 
             float h = parseFloat(params[0]) / 360.0f;
-            while (h < 0.0f) h++;
-            while (h > 1.0f) h--;
+            float i;
+            // Normalize the hue to [0..1[
+            h = std::modf(h, &i);
 
             // NOTE(deanm): According to the CSS spec s/l should only be
             // percentages, but we don't bother and let float or percentage.

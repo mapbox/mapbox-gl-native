@@ -8,6 +8,7 @@
 #include <mbgl/style/style_impl.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/style/expression/dsl.hpp>
 #include <mbgl/storage/file_source.hpp>
 
 #include <boost/function_output_iterator.hpp>
@@ -160,8 +161,9 @@ void AnnotationManager::updateStyle() {
 
         std::unique_ptr<SymbolLayer> layer = std::make_unique<SymbolLayer>(PointLayerID, SourceID);
 
+        using namespace expression::dsl;
         layer->setSourceLayer(PointLayerID);
-        layer->setIconImage({SourceID + ".{sprite}"});
+        layer->setIconImage(PropertyExpression<std::string>(concat(vec(literal(SourceID + "."), toString(get("sprite"))))));
         layer->setIconAllowOverlap(true);
         layer->setIconIgnorePlacement(true);
 

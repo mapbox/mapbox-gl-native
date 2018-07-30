@@ -94,7 +94,13 @@ static_assert(underlying_type(BufferUsage::DynamicDraw) == GL_DYNAMIC_DRAW, "Ope
 
 static_assert(std::is_same<BinaryProgramFormat, GLenum>::value, "OpenGL type mismatch");
 
-Context::Context() = default;
+Context::Context()
+    : maximumVertexBindingCount([] {
+          GLint value;
+          MBGL_CHECK_ERROR(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &value));
+          return value;
+      }()) {
+}
 
 Context::~Context() {
     if (cleanupOnDestruction) {
@@ -281,7 +287,7 @@ UniqueTexture Context::createTexture() {
 
 bool Context::supportsVertexArrays() const {
     static bool blacklisted = []() {
-        const std::string renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+        const std::string renderer = reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_RENDERER)));
 
         Log::Info(Event::General, "GPU Identifier: %s", renderer.c_str());
 
@@ -312,7 +318,7 @@ bool Context::supportsProgramBinaries() const {
     // https://chromium.googlesource.com/chromium/src/gpu/+/master/config/gpu_driver_bug_list.json#2316
     // Blacklist Vivante GC4000 due to bugs when linking loaded programs:
     // https://github.com/mapbox/mapbox-gl-native/issues/10704
-    const std::string renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+    const std::string renderer = reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_RENDERER)));
     if (renderer.find("Adreno (TM) 3") != std::string::npos
      || renderer.find("Adreno (TM) 4") != std::string::npos
      || renderer.find("Adreno (TM) 5") != std::string::npos
@@ -351,7 +357,7 @@ VertexArray Context::createVertexArray() {
         VertexArrayID id = 0;
         MBGL_CHECK_ERROR(vertexArray->genVertexArrays(1, &id));
         UniqueVertexArray vao(std::move(id), { this });
-        return { UniqueVertexArrayState(new VertexArrayState(std::move(vao), *this), VertexArrayStateDeleter { true })};
+        return { UniqueVertexArrayState(new VertexArrayState(std::move(vao)), VertexArrayStateDeleter { true })};
     } else {
         // On GL implementations which do not support vertex arrays, attribute bindings are global state.
         // So return a VertexArray which shares our global state tracking and whose deleter is a no-op.

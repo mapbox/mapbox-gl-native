@@ -2,7 +2,6 @@
 #include <mbgl/tile/geojson_tile_data.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
-#include <mbgl/style/filter_evaluator.hpp>
 
 namespace mbgl {
 

@@ -18,7 +18,8 @@ void Match<T>::eachChild(const std::function<void(const Expression&)>& visit) co
 
 template <typename T>
 bool Match<T>::operator==(const Expression& e) const {
-    if (auto rhs = dynamic_cast<const Match*>(&e)) {
+    if (e.getKind() == Kind::Match) {
+        auto rhs = static_cast<const Match*>(&e);
         return (*input == *(rhs->input) &&
                 *otherwise == *(rhs->otherwise) &&
                 Expression::childrenEqual(branches, rhs->branches));
@@ -83,6 +84,10 @@ template<> EvaluationResult Match<std::string>::evaluate(const EvaluationContext
         return inputValue.error();
     }
 
+    if (!inputValue->is<std::string>()) {
+        return otherwise->evaluate(params);
+    }
+
     auto it = branches.find(inputValue->get<std::string>());
     if (it != branches.end()) {
         return (*it).second->evaluate(params);
@@ -96,7 +101,11 @@ template<> EvaluationResult Match<int64_t>::evaluate(const EvaluationContext& pa
     if (!inputValue) {
         return inputValue.error();
     }
-    
+
+    if (!inputValue->is<double>()) {
+        return otherwise->evaluate(params);
+    }
+
     const auto numeric = inputValue->get<double>();
     int64_t rounded = std::floor(numeric);
     if (numeric == rounded) {
@@ -129,7 +138,7 @@ optional<InputType> parseInputValue(const Convertible& input, ParsingContext& pa
                     parentContext.error("Branch labels must be integers no larger than " + util::toString(Value::maxSafeInteger()) + ".", index);
                 } else {
                     type = {type::Number};
-                    result = {static_cast<int64_t>(n)};
+                    result = optional<InputType>{static_cast<int64_t>(n)};
                 }
             },
             [&] (int64_t n) {
@@ -137,7 +146,7 @@ optional<InputType> parseInputValue(const Convertible& input, ParsingContext& pa
                     parentContext.error("Branch labels must be integers no larger than " + util::toString(Value::maxSafeInteger()) + ".", index);
                 } else {
                     type = {type::Number};
-                    result = {n};
+                    result = optional<InputType>{n};
                 }
             },
             [&] (double n) {
@@ -147,7 +156,7 @@ optional<InputType> parseInputValue(const Convertible& input, ParsingContext& pa
                     parentContext.error("Numeric branch labels must be integer values.", index);
                 } else {
                     type = {type::Number};
-                    result = {static_cast<int64_t>(n)};
+                    result = optional<InputType>{static_cast<int64_t>(n)};
                 }
             },
             [&] (const std::string& s) {
@@ -280,7 +289,7 @@ ParseResult parseMatch(const Convertible& value, ParsingContext& ctx) {
         branches.push_back(std::make_pair(std::move(labels), std::move(*output)));
     }
 
-    auto input = ctx.parse(arrayMember(value, 1), 1, inputType);
+    auto input = ctx.parse(arrayMember(value, 1), 1, {type::Value});
     if (!input) {
         return ParseResult();
     }
@@ -291,6 +300,12 @@ ParseResult parseMatch(const Convertible& value, ParsingContext& ctx) {
     }
 
     assert(inputType && outputType);
+
+    optional<std::string> err;
+    if ((*input)->getType() != type::Value && (err = type::checkSubtype(*inputType, (*input)->getType()))) {
+        ctx.error(*err, 1);
+        return ParseResult();
+    }
 
     return inputType->match(
         [&](const type::NumberType&) {

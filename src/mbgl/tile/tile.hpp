@@ -48,6 +48,12 @@ public:
     virtual void upload(gl::Context&) = 0;
     virtual Bucket* getBucket(const style::Layer::Impl&) const = 0;
 
+    template <class T>
+    T* getBucket(const style::Layer::Impl& layer) const {
+        Bucket* bucket = getBucket(layer);
+        return bucket ? bucket->as<T>() : nullptr;
+    }
+
     virtual void setShowCollisionBoxes(const bool) {}
     virtual void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) {}
     virtual void setMask(TileMask&&) {}
@@ -113,7 +119,7 @@ public:
     
     void dumpDebugLogs() const;
 
-    const OverscaledTileID id;
+    OverscaledTileID id;
     optional<Timestamp> modified;
     optional<Timestamp> expires;
 

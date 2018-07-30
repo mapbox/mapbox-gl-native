@@ -1,7 +1,6 @@
 #pragma once
 
-#include <mbgl/style/function/source_function.hpp>
-#include <mbgl/style/function/composite_function.hpp>
+#include <mbgl/style/property_expression.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/variant.hpp>
 
@@ -12,8 +11,7 @@ class PossiblyEvaluatedPropertyValue {
 private:
     using Value = variant<
         T,
-        style::SourceFunction<T>,
-        style::CompositeFunction<T>>;
+        style::PropertyExpression<T>>;
 
     Value value;
 
@@ -45,17 +43,14 @@ public:
     template <class Feature>
     T evaluate(const Feature& feature, float zoom, T defaultValue) const {
         return this->match(
-                [&] (const T& constant_) { return constant_; },
-                [&] (const style::SourceFunction<T>& function) {
-                    return function.evaluate(feature, defaultValue);
-                },
-                [&] (const style::CompositeFunction<T>& function) {
-                    if (useIntegerZoom) {
-                        return function.evaluate(floor(zoom), feature, defaultValue);
-                    } else {
-                        return function.evaluate(zoom, feature, defaultValue);
-                    }
+            [&] (const T& constant_) { return constant_; },
+            [&] (const style::PropertyExpression<T>& expression) {
+                if (useIntegerZoom) {
+                    return expression.evaluate(floor(zoom), feature, defaultValue);
+                } else {
+                    return expression.evaluate(zoom, feature, defaultValue);
                 }
+            }
         );
     }
 

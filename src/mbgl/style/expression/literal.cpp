@@ -113,4 +113,3 @@ mbgl::Value Literal::serialize() const {
 } // namespace expression
 } // namespace style
 } // namespace mbgl
-

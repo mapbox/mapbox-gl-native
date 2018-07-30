@@ -130,13 +130,13 @@ public:
     using Attribute = ZoomInterpolatedAttributeType<A>;
     using AttributeBinding = typename Attribute::Binding;
 
-    SourceFunctionPaintPropertyBinder(style::SourceFunction<T> function_, T defaultValue_)
-        : function(std::move(function_)),
+    SourceFunctionPaintPropertyBinder(style::PropertyExpression<T> expression_, T defaultValue_)
+        : expression(std::move(expression_)),
           defaultValue(std::move(defaultValue_)) {
     }
 
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length) override {
-        auto evaluated = function.evaluate(feature, defaultValue);
+        auto evaluated = expression.evaluate(feature, defaultValue);
         this->statistics.add(evaluated);
         auto value = attributeValue(evaluated);
         for (std::size_t i = vertexVector.vertexSize(); i < length; ++i) {
@@ -170,7 +170,7 @@ public:
     }
 
 private:
-    style::SourceFunction<T> function;
+    style::PropertyExpression<T> expression;
     T defaultValue;
     gl::VertexVector<BaseVertex> vertexVector;
     optional<gl::VertexBuffer<BaseVertex>> vertexBuffer;
@@ -187,14 +187,14 @@ public:
     using AttributeBinding = typename Attribute::Binding;
     using Vertex = gl::detail::Vertex<Attribute>;
 
-    CompositeFunctionPaintPropertyBinder(style::CompositeFunction<T> function_, float zoom, T defaultValue_)
-        : function(std::move(function_)),
+    CompositeFunctionPaintPropertyBinder(style::PropertyExpression<T> expression_, float zoom, T defaultValue_)
+        : expression(std::move(expression_)),
           defaultValue(std::move(defaultValue_)),
           zoomRange({zoom, zoom + 1}) {
     }
 
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length) override {
-        Range<T> range = function.evaluate(zoomRange, feature, defaultValue);
+        Range<T> range = expression.evaluate(zoomRange, feature, defaultValue);
         this->statistics.add(range.min);
         this->statistics.add(range.max);
         AttributeValue value = zoomInterpolatedAttributeValue(
@@ -218,10 +218,10 @@ public:
     }
 
     float interpolationFactor(float currentZoom) const override {
-        if (function.useIntegerZoom) {
-            return function.interpolationFactor(zoomRange, std::floor(currentZoom));
+        if (expression.useIntegerZoom) {
+            return expression.interpolationFactor(zoomRange, std::floor(currentZoom));
         } else {
-            return function.interpolationFactor(zoomRange, currentZoom);
+            return expression.interpolationFactor(zoomRange, currentZoom);
         }
     }
 
@@ -235,7 +235,7 @@ public:
     }
 
 private:
-    style::CompositeFunction<T> function;
+    style::PropertyExpression<T> expression;
     T defaultValue;
     Range<float> zoomRange;
     gl::VertexVector<Vertex> vertexVector;
@@ -249,11 +249,12 @@ PaintPropertyBinder<T, A>::create(const PossiblyEvaluatedPropertyValue<T>& value
         [&] (const T& constant) -> std::unique_ptr<PaintPropertyBinder<T, A>> {
             return std::make_unique<ConstantPaintPropertyBinder<T, A>>(constant);
         },
-        [&] (const style::SourceFunction<T>& function) {
-            return std::make_unique<SourceFunctionPaintPropertyBinder<T, A>>(function, defaultValue);
-        },
-        [&] (const style::CompositeFunction<T>& function) {
-            return std::make_unique<CompositeFunctionPaintPropertyBinder<T, A>>(function, zoom, defaultValue);
+        [&] (const style::PropertyExpression<T>& expression) -> std::unique_ptr<PaintPropertyBinder<T, A>> {
+            if (expression.isZoomConstant()) {
+                return std::make_unique<SourceFunctionPaintPropertyBinder<T, A>>(expression, defaultValue);
+            } else {
+                return std::make_unique<CompositeFunctionPaintPropertyBinder<T, A>>(expression, zoom, defaultValue);
+            }
         }
     );
 }

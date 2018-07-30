@@ -117,7 +117,7 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
         const float rectBuffer = 3.0f + glyphPadding;
 
         const float halfAdvance = glyph.metrics.advance / 2.0;
-        const bool alongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map && placement == SymbolPlacementType::Line;
+        const bool alongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map && placement != SymbolPlacementType::Point;
 
         const Point<float> glyphOffset = alongLine ?
             Point<float>{ positionedGlyph.x + halfAdvance, positionedGlyph.y } :

@@ -46,26 +46,38 @@ public:
             Shaders::fragmentSource)) {
     }
 
+    static typename AllUniforms::Values computeAllUniformValues(
+        const UniformValues& uniformValues,
+        const PaintPropertyBinders& paintPropertyBinders,
+        const typename PaintProperties::PossiblyEvaluated& currentProperties,
+        float currentZoom) {
+        return uniformValues
+            .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
+    }
+
+    static typename Attributes::Bindings computeAllAttributeBindings(
+        const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
+        const PaintPropertyBinders& paintPropertyBinders,
+        const typename PaintProperties::PossiblyEvaluated& currentProperties) {
+        return LayoutAttributes::bindings(layoutVertexBuffer)
+            .concat(paintPropertyBinders.attributeBindings(currentProperties));
+    }
+
+    static uint32_t activeBindingCount(const typename Attributes::Bindings& allAttributeBindings) {
+        return Attributes::activeBindingCount(allAttributeBindings);
+    }
+
     template <class DrawMode>
     void draw(gl::Context& context,
               DrawMode drawMode,
               gl::DepthMode depthMode,
               gl::StencilMode stencilMode,
               gl::ColorMode colorMode,
-              const UniformValues& uniformValues,
-              const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
               const SegmentVector<Attributes>& segments,
-              const PaintPropertyBinders& paintPropertyBinders,
-              const typename PaintProperties::PossiblyEvaluated& currentProperties,
-              float currentZoom,
+              const typename AllUniforms::Values& allUniformValues,
+              const typename Attributes::Bindings& allAttributeBindings,
               const std::string& layerID) {
-        typename AllUniforms::Values allUniformValues = uniformValues
-            .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
-
-        typename Attributes::Bindings allAttributeBindings = LayoutAttributes::bindings(layoutVertexBuffer)
-            .concat(paintPropertyBinders.attributeBindings(currentProperties));
-
         for (auto& segment : segments) {
             auto vertexArrayIt = segment.vertexArrays.find(layerID);
 

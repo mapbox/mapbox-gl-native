@@ -11,7 +11,8 @@ namespace mbgl {
 using namespace style;
 
 HeatmapBucket::HeatmapBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers)
-    : mode(parameters.mode) {
+    : Bucket(LayerType::Heatmap),
+      mode(parameters.mode) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,

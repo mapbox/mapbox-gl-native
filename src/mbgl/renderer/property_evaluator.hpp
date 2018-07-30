@@ -16,7 +16,7 @@ public:
 
     T operator()(const style::Undefined&) const { return defaultValue; }
     T operator()(const T& constant) const { return constant; }
-    T operator()(const style::CameraFunction<T>& fn) const { return fn.evaluate(parameters.z); }
+    T operator()(const style::PropertyExpression<T>& fn) const { return fn.evaluate(parameters.z); }
 
 private:
     const PropertyEvaluationParameters& parameters;

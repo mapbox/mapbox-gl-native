@@ -41,6 +41,10 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
     const uint8_t dashheight = 2 * n + 1;
     const uint8_t offset = 128;
 
+    if (dasharray.size() < 2) {
+        return LinePatternPos();
+    }
+
     if (nextRow + dashheight > image.size.height) {
         Log::Warning(Event::OpenGL, "line atlas bitmap overflow");
         return LinePatternPos();
@@ -73,6 +77,9 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
 
             while (right < x / stretch) {
                 left = right;
+                if (partIndex >= dasharray.size()) {
+                    return LinePatternPos();
+                }
                 right = right + dasharray[partIndex];
 
                 if (oddLength && partIndex == dasharray.size() - 1) {

@@ -138,4 +138,9 @@ public:
     std::shared_ptr<std::vector<size_t>> featureSortOrder;
 };
 
+template <>
+inline bool Bucket::is<SymbolBucket>() const {
+    return layerType == style::LayerType::Symbol;
+}
+
 } // namespace mbgl

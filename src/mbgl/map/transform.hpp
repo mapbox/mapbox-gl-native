@@ -165,7 +165,7 @@ private:
 
     TimePoint transitionStart;
     Duration transitionDuration;
-    std::function<void(const TimePoint)> transitionFrameFn;
+    std::function<bool(const TimePoint)> transitionFrameFn;
     std::function<void()> transitionFinishFn;
 };
 

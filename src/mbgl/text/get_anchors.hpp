@@ -17,4 +17,14 @@ Anchors getAnchors(const GeometryCoordinates& line,
                    const float boxScale,
                    const float overscaling);
 
+optional<Anchor> getCenterAnchor(const GeometryCoordinates& line,
+                                 const float maxAngle,
+                                 const float textLeft,
+                                 const float textRight,
+                                 const float iconLeft,
+                                 const float iconRight,
+                                 const float glyphSize,
+                                 const float boxScale);
+    
+
 } // namespace mbgl

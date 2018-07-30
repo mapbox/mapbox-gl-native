@@ -3,7 +3,6 @@
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/actor/scheduler.hpp>
-#include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/tile/tile_observer.hpp>
 #include <mbgl/style/custom_tile_loader.hpp>
@@ -39,9 +38,9 @@ void CustomGeometryTile::setTileData(const GeoJSON& geoJSON) {
         vtOptions.extent = util::EXTENT;
         vtOptions.buffer = ::round(scale * options.buffer);
         vtOptions.tolerance = scale * options.tolerance;
-        featureData = mapbox::geojsonvt::geoJSONToTile(geoJSON, id.canonical.z, id.canonical.x, id.canonical.y, vtOptions, options.wrap, options.clip).features;
-    } else {
-        setNecessity(TileNecessity::Optional);
+        featureData = mapbox::geojsonvt::geoJSONToTile(geoJSON,
+            id.canonical.z, id.canonical.x, id.canonical.y,
+            vtOptions, options.wrap, options.clip).features;
     }
     setData(std::make_unique<GeoJSONTileData>(std::move(featureData)));
 }

@@ -9,7 +9,11 @@ void VertexArray::bind(Context& context, BufferID indexBuffer, const AttributeBi
     context.bindVertexArray = state->vertexArray;
     state->indexBuffer = indexBuffer;
 
-    for (AttributeLocation location = 0; location < MAX_ATTRIBUTES; ++location) {
+    state->bindings.reserve(bindings.size());
+    for (AttributeLocation location = 0; location < bindings.size(); ++location) {
+        if (state->bindings.size() <= location) {
+            state->bindings.emplace_back(context, AttributeLocation(location));
+        }
         state->bindings[location] = bindings[location];
     }
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/style/expression/collator_expression.hpp>
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/style/conversion.hpp>
@@ -12,7 +13,7 @@ namespace expression {
 
 class Equals : public Expression {
 public:
-    Equals(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, bool negate);
+    Equals(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs, optional<std::unique_ptr<Expression>> collator, bool negate);
 
     static ParseResult parse(const mbgl::style::conversion::Convertible&, ParsingContext&);
 
@@ -25,6 +26,7 @@ public:
 private:
     std::unique_ptr<Expression> lhs;
     std::unique_ptr<Expression> rhs;
+    optional<std::unique_ptr<Expression>> collator;
     bool negate;
 };
 

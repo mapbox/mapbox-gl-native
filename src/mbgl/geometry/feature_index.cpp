@@ -7,7 +7,6 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/style/filter.hpp>
-#include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/tile/tile_id.hpp>
 
 #include <mapbox/geometry/envelope.hpp>
@@ -78,11 +77,12 @@ void FeatureIndex::query(
     }
 }
     
-std::unordered_map<std::string, std::vector<Feature>> FeatureIndex::lookupSymbolFeatures(const std::vector<IndexedSubfeature>& symbolFeatures,
-                                                                                         const RenderedQueryOptions& queryOptions,
-                                                                                         const std::vector<const RenderLayer*>& layers,
-                                                                                         const OverscaledTileID& tileID,
-                                                                                        const std::shared_ptr<std::vector<size_t>>& featureSortOrder) const {
+std::unordered_map<std::string, std::vector<Feature>>
+FeatureIndex::lookupSymbolFeatures(const std::vector<IndexedSubfeature>& symbolFeatures,
+                                   const RenderedQueryOptions& queryOptions,
+                                   const std::vector<const RenderLayer*>& layers,
+                                   const OverscaledTileID& tileID,
+                                   const std::shared_ptr<std::vector<size_t>>& featureSortOrder) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
     if (!tileData) {
         return result;

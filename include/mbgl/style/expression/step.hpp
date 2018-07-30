@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <mbgl/style/expression/expression.hpp>
@@ -10,7 +9,6 @@
 #include <memory>
 #include <map>
 
-
 namespace mbgl {
 namespace style {
 namespace expression {
@@ -18,12 +16,8 @@ namespace expression {
 class Step : public Expression {
 public:
     Step(const type::Type& type_,
-          std::unique_ptr<Expression> input_,
-          std::map<double, std::unique_ptr<Expression>> stops_
-    ) : Expression(type_),
-        input(std::move(input_)),
-        stops(std::move(stops_))
-    {}
+         std::unique_ptr<Expression> input_,
+         std::map<double, std::unique_ptr<Expression>> stops_);
 
     EvaluationResult evaluate(const EvaluationContext& params) const override;
     void eachChild(const std::function<void(const Expression&)>& visit) const override;
@@ -40,6 +34,7 @@ public:
 
     mbgl::Value serialize() const override;
     std::string getOperator() const override { return "step"; }
+
 private:
     const std::unique_ptr<Expression> input;
     const std::map<double, std::unique_ptr<Expression>> stops;

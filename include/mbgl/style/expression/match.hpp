@@ -19,7 +19,7 @@ public:
           std::unique_ptr<Expression> input_,
           Branches branches_,
           std::unique_ptr<Expression> otherwise_
-    ) : Expression(type_),
+    ) : Expression(Kind::Match, type_),
         input(std::move(input_)),
         branches(std::move(branches_)),
         otherwise(std::move(otherwise_))

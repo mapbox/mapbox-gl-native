@@ -37,4 +37,9 @@ public:
     const MapMode mode;
 };
 
+template <>
+inline bool Bucket::is<CircleBucket>() const {
+    return layerType == style::LayerType::Circle;
+}
+
 } // namespace mbgl

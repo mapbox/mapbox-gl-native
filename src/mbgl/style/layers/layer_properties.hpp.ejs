@@ -1,0 +1,54 @@
+<%
+  const type = locals.type;
+  const layoutProperties = locals.layoutProperties;
+  const paintProperties = locals.paintProperties;
+-%>
+// This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
+
+#pragma once
+
+#include <mbgl/style/types.hpp>
+#include <mbgl/style/layout_property.hpp>
+#include <mbgl/style/paint_property.hpp>
+#include <mbgl/style/properties.hpp>
+#include <mbgl/programs/attributes.hpp>
+#include <mbgl/programs/uniforms.hpp>
+
+namespace mbgl {
+namespace style {
+
+<% for (const property of layoutProperties) { -%>
+struct <%- camelize(property.name) %> : <%- layoutPropertyType(property, type) %> {
+    static constexpr const char * key = "<%- property.name %>";
+    static <%- evaluatedType(property) %> defaultValue() { return <%- defaultValue(property) %>; }
+};
+
+<% } -%>
+<% for (const property of paintProperties) { -%>
+<%   if (property['property-type'] === 'color-ramp') { -%>
+using <%- camelize(property.name) %> = ColorRampProperty;
+<%   } else { -%>
+struct <%- camelize(property.name) %> : <%- paintPropertyType(property, type) %> {
+    static <%- evaluatedType(property) %> defaultValue() { return <%- defaultValue(property) %>; }
+};
+<%   } -%>
+
+<% } -%>
+<% if (layoutProperties.length) { -%>
+class <%- camelize(type) %>LayoutProperties : public Properties<
+<% for (const property of layoutProperties.slice(0, -1)) { -%>
+    <%- camelize(property.name) %>,
+<% } -%>
+    <%- camelize(layoutProperties.slice(-1)[0].name) %>
+> {};
+
+<% } -%>
+class <%- camelize(type) %>PaintProperties : public Properties<
+<% for (const property of paintProperties.slice(0, -1)) { -%>
+    <%- camelize(property.name) %>,
+<% } -%>
+    <%- camelize(paintProperties.slice(-1)[0].name) %>
+> {};
+
+} // namespace style
+} // namespace mbgl

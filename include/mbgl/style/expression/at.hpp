@@ -11,7 +11,7 @@ namespace expression {
 class At : public Expression {
 public:
     At(std::unique_ptr<Expression> index_, std::unique_ptr<Expression> input_) :
-        Expression(input_->getType().get<type::Array>().itemType),
+        Expression(Kind::At, input_->getType().get<type::Array>().itemType),
         index(std::move(index_)),
         input(std::move(input_))
     {}
@@ -22,7 +22,8 @@ public:
     void eachChild(const std::function<void(const Expression&)>&) const override;
 
     bool operator==(const Expression& e) const override {
-        if (auto rhs = dynamic_cast<const At*>(&e)) {
+        if (e.getKind() == Kind::At) {
+            auto rhs = static_cast<const At*>(&e);
             return *index == *(rhs->index) && *input == *(rhs->input);
         }
         return false;

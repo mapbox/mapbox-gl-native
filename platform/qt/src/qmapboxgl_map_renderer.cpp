@@ -1,27 +1,52 @@
 #include "qmapboxgl_map_renderer.hpp"
+#include "qmapboxgl_scheduler.hpp"
 
+#include <QThreadStorage>
 #include <QtGlobal>
+
+static bool needsToForceScheduler() {
+    static QThreadStorage<bool> force;
+
+    if (!force.hasLocalData()) {
+        force.setLocalData(mbgl::Scheduler::GetCurrent() == nullptr);
+    }
+
+    return force.localData();
+};
+
+static auto *getScheduler() {
+    static QThreadStorage<std::shared_ptr<QMapboxGLScheduler>> scheduler;
+
+    if (!scheduler.hasLocalData()) {
+        scheduler.setLocalData(std::make_shared<QMapboxGLScheduler>());
+    }
+
+    return scheduler.localData().get();
+};
 
 QMapboxGLMapRenderer::QMapboxGLMapRenderer(qreal pixelRatio,
         mbgl::DefaultFileSource &fs, mbgl::ThreadPool &tp, QMapboxGLSettings::GLContextMode mode)
     : m_renderer(std::make_unique<mbgl::Renderer>(m_backend, pixelRatio, fs, tp, static_cast<mbgl::GLContextMode>(mode)))
-    , m_threadWithScheduler(Scheduler::GetCurrent() != nullptr)
+    , m_forceScheduler(needsToForceScheduler())
 {
+    // If we don't have a Scheduler on this thread, which
+    // is usually the case for render threads, use a shared
+    // dummy scheduler that needs to be explicitly forced to
+    // process events.
+    if (m_forceScheduler) {
+        auto scheduler = getScheduler();
+
+        if (mbgl::Scheduler::GetCurrent() == nullptr) {
+            mbgl::Scheduler::SetCurrent(scheduler);
+        }
+
+        connect(scheduler, SIGNAL(needsProcessing()), this, SIGNAL(needsRendering()));
+    }
 }
 
 QMapboxGLMapRenderer::~QMapboxGLMapRenderer()
 {
     MBGL_VERIFY_THREAD(tid);
-}
-
-void QMapboxGLMapRenderer::schedule(std::weak_ptr<mbgl::Mailbox> mailbox)
-{
-    std::lock_guard<std::mutex> lock(m_taskQueueMutex);
-    m_taskQueue.push(mailbox);
-
-    // Need to force the main thread to wake
-    // up this thread and process the events.
-    emit needsRendering();
 }
 
 void QMapboxGLMapRenderer::updateParameters(std::shared_ptr<mbgl::UpdateParameters> newParameters)
@@ -57,26 +82,10 @@ void QMapboxGLMapRenderer::render()
     // The OpenGL implementation automatically enables the OpenGL context for us.
     mbgl::BackendScope scope(m_backend, mbgl::BackendScope::ScopeType::Implicit);
 
-    // If we don't have a Scheduler on this thread, which
-    // is usually the case for render threads, use this
-    // object as scheduler.
-    if (!m_threadWithScheduler) {
-        Scheduler::SetCurrent(this);
-    }
-
     m_renderer->render(*params);
 
-    if (!m_threadWithScheduler) {
-        std::queue<std::weak_ptr<mbgl::Mailbox>> taskQueue;
-        {
-            std::unique_lock<std::mutex> lock(m_taskQueueMutex);
-            std::swap(taskQueue, m_taskQueue);
-        }
-
-        while (!taskQueue.empty()) {
-            mbgl::Mailbox::maybeReceive(taskQueue.front());
-            taskQueue.pop();
-        }
+    if (m_forceScheduler) {
+        getScheduler()->processEvents();
     }
 }
 

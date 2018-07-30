@@ -72,10 +72,8 @@ mbgl::Value asMapboxGLPropertyValue(const QVariant &value) {
     auto valueMap = [](const QVariantMap &map) {
         std::unordered_map<std::string, mbgl::Value> mbglMap;
         mbglMap.reserve(map.size());
-        auto it = map.constBegin();
-        while (it != map.constEnd()) {
+        for (auto it = map.constBegin(); it != map.constEnd(); ++it) {
             mbglMap.emplace(std::make_pair(it.key().toStdString(), asMapboxGLPropertyValue(it.value())));
-            ++it;
         }
         return mbglMap;
     };
@@ -132,8 +130,7 @@ mbgl::FeatureIdentifier asMapboxGLFeatureIdentifier(const QVariant &id) {
 mbgl::Feature asMapboxGLFeature(const QMapbox::Feature &feature) {
     mbgl::PropertyMap properties;
     properties.reserve(feature.properties.size());
-    auto it = feature.properties.constBegin();
-    while (it != feature.properties.constEnd()) {
+    for (auto it = feature.properties.constBegin(); it != feature.properties.constEnd(); ++it) {
         properties.emplace(std::make_pair(it.key().toStdString(), asMapboxGLPropertyValue(it.value())));
     }
 

@@ -85,6 +85,11 @@ public:
     friend std::string layoutKey(const RenderLayer&);
 
 protected:
+    // Checks whether the current hardware can render this layer. If it can't, we'll show a warning
+    // in the console to inform the developer.
+    void checkRenderability(const PaintParameters&, uint32_t activeBindingCount);
+
+protected:
     // renderTiles are exposed directly to CrossTileSymbolIndex and Placement so they
     // can update opacities in the symbol buckets immediately before rendering
     friend class CrossTileSymbolIndex;
@@ -95,6 +100,12 @@ protected:
     // Stores what render passes this layer is currently enabled for. This depends on the
     // evaluated StyleProperties object and is updated accordingly.
     RenderPass passes = RenderPass::None;
+
+private:
+    // Some layers may not render correctly on some hardware when the vertex attribute limit of
+    // that GPU is exceeded. More attributes are used when adding many data driven paint properties
+    // to a layer.
+    bool hasRenderFailures = false;
 };
 
 } // namespace mbgl

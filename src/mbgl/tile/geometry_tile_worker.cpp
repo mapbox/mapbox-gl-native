@@ -5,7 +5,6 @@
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/group_by_layout.hpp>
 #include <mbgl/style/filter.hpp>
-#include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
@@ -13,6 +12,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/stopwatch.hpp>
 
 #include <unordered_set>
 
@@ -320,6 +320,7 @@ void GeometryTileWorker::parse() {
         return;
     }
 
+    MBGL_TIMING_START(watch)
     std::vector<std::string> symbolOrder;
     for (auto it = layers->rbegin(); it != layers->rend(); it++) {
         if ((*it)->type == LayerType::Symbol) {
@@ -404,6 +405,11 @@ void GeometryTileWorker::parse() {
     requestNewGlyphs(glyphDependencies);
     requestNewImages(imageDependencies);
 
+    MBGL_TIMING_FINISH(watch,
+                       " Action: " << "Parsing," <<
+                       " SourceID: " << sourceID.c_str() <<
+                       " Canonical: " << static_cast<int>(id.canonical.z) << "/" << id.canonical.x << "/" << id.canonical.y <<
+                       " Time");
     performSymbolLayout();
 }
 
@@ -425,6 +431,7 @@ void GeometryTileWorker::performSymbolLayout() {
         return;
     }
     
+    MBGL_TIMING_START(watch)
     optional<AlphaImage> glyphAtlasImage;
     optional<PremultipliedImage> iconAtlasImage;
 
@@ -467,6 +474,11 @@ void GeometryTileWorker::performSymbolLayout() {
 
     firstLoad = false;
     
+    MBGL_TIMING_FINISH(watch,
+                       " Action: " << "SymbolLayout," <<
+                       " SourceID: " << sourceID.c_str() <<
+                       " Canonical: " << static_cast<int>(id.canonical.z) << "/" << id.canonical.x << "/" << id.canonical.y <<
+                       " Time");
     parent.invoke(&GeometryTile::onLayout, GeometryTile::LayoutResult {
         std::move(buckets),
         std::move(featureIndex),

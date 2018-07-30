@@ -130,7 +130,7 @@ Path::Path(const std::string& str, const size_t pos, const size_t count)
 }
 
 std::string transformURL(const std::string& tpl, const std::string& str, const URL& url) {
-    auto result = util::replaceTokens(tpl, [&](const std::string& token) -> std::string {
+    auto result = util::replaceTokens(tpl, [&](const std::string& token) -> optional<std::string> {
         if (token == "path") {
             return str.substr(url.path.first, url.path.second);
         } else if (token == "domain") {
@@ -146,8 +146,9 @@ std::string transformURL(const std::string& tpl, const std::string& str, const U
         } else if (token == "extension") {
             const Path path(str, url.path.first, url.path.second);
             return str.substr(path.extension.first, path.extension.second);
+        } else {
+            return {};
         }
-        return "";
     });
 
     // Append the query string if it exists.

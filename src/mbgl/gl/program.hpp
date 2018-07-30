@@ -35,7 +35,7 @@ public:
               context.createProgram(context.createShader(ShaderType::Vertex, vertexSource),
                                     context.createShader(ShaderType::Fragment, fragmentSource))),
           uniformsState((context.linkProgram(program), Uniforms::bindLocations(program))),
-          attributeLocations(Attributes::bindLocations(program)) {
+          attributeLocations(Attributes::bindLocations(context, program)) {
 
         // Re-link program after manually binding only active attributes in Attributes::bindLocations
         context.linkProgram(program);

@@ -38,4 +38,9 @@ public:
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
 };
 
+template <>
+inline bool Bucket::is<RasterBucket>() const {
+    return layerType == style::LayerType::Raster;
+}
+
 } // namespace mbgl

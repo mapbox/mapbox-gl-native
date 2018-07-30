@@ -1,6 +1,6 @@
 #include <mbgl/util/chrono.hpp>
 
-#include <parsedate/parsedate.h>
+#include <parsedate/parsedate.hpp>
 
 #include <cstdio>
 #include <ctime>

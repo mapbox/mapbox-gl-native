@@ -12,6 +12,7 @@ type::Type typeOf(const Value& value) {
         [&](double) -> type::Type { return type::Number; },
         [&](const std::string&) -> type::Type { return type::String; },
         [&](const Color&) -> type::Type { return type::Color; },
+        [&](const Collator&) -> type::Type { return type::Collator; },
         [&](const NullValue&) -> type::Type { return type::Null; },
         [&](const std::unordered_map<std::string, Value>&) -> type::Type { return type::Object; },
         [&](const std::vector<Value>& arr) -> type::Type {
@@ -43,6 +44,11 @@ void writeJSON(rapidjson::Writer<rapidjson::StringBuffer>& writer, const Value& 
         },
         [&] (const std::string& s) { writer.String(s); },
         [&] (const Color& c) { writer.String(c.stringify()); },
+        [&] (const Collator&) {
+            // Collators are excluded from constant folding and there's no Literal parser
+            // for them so there shouldn't be any way to serialize this value.
+            assert(false);
+        },
         [&] (const std::vector<Value>& arr) {
             writer.StartArray();
             for(const auto& item : arr) {
@@ -114,6 +120,12 @@ mbgl::Value ValueConverter<mbgl::Value>::fromExpressionValue(const Value& value)
                 array[2],
                 array[3],
             };
+        },
+        [&](const Collator&)->mbgl::Value {
+            // fromExpressionValue can't be used for Collator values,
+            // because they have no meaningful representation as an mbgl::Value
+            assert(false);
+            return mbgl::Value();
         },
         [&](const std::vector<Value>& values)->mbgl::Value {
             std::vector<mbgl::Value> converted;
@@ -229,27 +241,6 @@ optional<T> ValueConverter<T, std::enable_if_t< std::is_enum<T>::value >>::fromE
     );
 }
 
-
-Value toExpressionValue(const Value& v) {
-    return v;
-}
-
-template <typename T, typename Enable>
-Value toExpressionValue(const T& value) {
-    return ValueConverter<T>::toExpressionValue(value);
-}
-
-optional<Value> fromExpressionValue(const Value& v) {
-    return optional<Value>(v);
-}
-
-template <typename T>
-std::enable_if_t< !std::is_convertible<T, Value>::value,
-optional<T>> fromExpressionValue(const Value& v)
-{
-    return ValueConverter<T>::fromExpressionValue(v);
-}
-
 template <typename T>
 type::Type valueTypeToExpressionType() {
     return ValueConverter<T>::expressionType();
@@ -261,6 +252,7 @@ template <> type::Type valueTypeToExpressionType<bool>() { return type::Boolean;
 template <> type::Type valueTypeToExpressionType<double>() { return type::Number; }
 template <> type::Type valueTypeToExpressionType<std::string>() { return type::String; }
 template <> type::Type valueTypeToExpressionType<Color>() { return type::Color; }
+template <> type::Type valueTypeToExpressionType<Collator>() { return type::Collator; }
 template <> type::Type valueTypeToExpressionType<std::unordered_map<std::string, Value>>() { return type::Object; }
 template <> type::Type valueTypeToExpressionType<std::vector<Value>>() { return type::Array(type::Value); }
 
@@ -268,86 +260,64 @@ template <> type::Type valueTypeToExpressionType<std::vector<Value>>() { return 
 template <> type::Type valueTypeToExpressionType<type::ErrorType>() { return type::Error; }
 
 
-template Value toExpressionValue(const mbgl::Value&);
-template optional<mbgl::Value> fromExpressionValue<mbgl::Value>(const Value&);
-
 // for to_rgba expression
 template type::Type valueTypeToExpressionType<std::array<double, 4>>();
-template optional<std::array<double, 4>> fromExpressionValue<std::array<double, 4>>(const Value&);
-template Value toExpressionValue(const std::array<double, 4>&);
+template struct ValueConverter<std::array<double, 4>>;
 
 // layout/paint property types
 template type::Type valueTypeToExpressionType<float>();
-template optional<float> fromExpressionValue<float>(const Value&);
-template Value toExpressionValue(const float&);
+template type::Type valueTypeToExpressionType<Position>();
 
 template type::Type valueTypeToExpressionType<std::array<float, 2>>();
-template optional<std::array<float, 2>> fromExpressionValue<std::array<float, 2>>(const Value&);
-template Value toExpressionValue(const std::array<float, 2>&);
+template struct ValueConverter<std::array<float, 2>>;
 
 template type::Type valueTypeToExpressionType<std::array<float, 4>>();
-template optional<std::array<float, 4>> fromExpressionValue<std::array<float, 4>>(const Value&);
-template Value toExpressionValue(const std::array<float, 4>&);
+template struct ValueConverter<std::array<float, 4>>;
 
 template type::Type valueTypeToExpressionType<std::vector<float>>();
-template optional<std::vector<float>> fromExpressionValue<std::vector<float>>(const Value&);
-template Value toExpressionValue(const std::vector<float>&);
+template struct ValueConverter<std::vector<float>>;
 
 template type::Type valueTypeToExpressionType<std::vector<std::string>>();
-template optional<std::vector<std::string>> fromExpressionValue<std::vector<std::string>>(const Value&);
-template Value toExpressionValue(const std::vector<std::string>&);
+template struct ValueConverter<std::vector<std::string>>;
 
 template type::Type valueTypeToExpressionType<AlignmentType>();
-template optional<AlignmentType> fromExpressionValue<AlignmentType>(const Value&);
-template Value toExpressionValue(const AlignmentType&);
+template struct ValueConverter<AlignmentType>;
 
 template type::Type valueTypeToExpressionType<CirclePitchScaleType>();
-template optional<CirclePitchScaleType> fromExpressionValue<CirclePitchScaleType>(const Value&);
-template Value toExpressionValue(const CirclePitchScaleType&);
+template struct ValueConverter<CirclePitchScaleType>;
 
 template type::Type valueTypeToExpressionType<IconTextFitType>();
-template optional<IconTextFitType> fromExpressionValue<IconTextFitType>(const Value&);
-template Value toExpressionValue(const IconTextFitType&);
+template struct ValueConverter<IconTextFitType>;
 
 template type::Type valueTypeToExpressionType<LineCapType>();
-template optional<LineCapType> fromExpressionValue<LineCapType>(const Value&);
-template Value toExpressionValue(const LineCapType&);
+template struct ValueConverter<LineCapType>;
 
 template type::Type valueTypeToExpressionType<LineJoinType>();
-template optional<LineJoinType> fromExpressionValue<LineJoinType>(const Value&);
-template Value toExpressionValue(const LineJoinType&);
+template struct ValueConverter<LineJoinType>;
 
 template type::Type valueTypeToExpressionType<SymbolPlacementType>();
-template optional<SymbolPlacementType> fromExpressionValue<SymbolPlacementType>(const Value&);
-template Value toExpressionValue(const SymbolPlacementType&);
+template struct ValueConverter<SymbolPlacementType>;
 
 template type::Type valueTypeToExpressionType<SymbolAnchorType>();
-template optional<SymbolAnchorType> fromExpressionValue<SymbolAnchorType>(const Value&);
-template Value toExpressionValue(const SymbolAnchorType&);
+template struct ValueConverter<SymbolAnchorType>;
 
 template type::Type valueTypeToExpressionType<TextJustifyType>();
-template optional<TextJustifyType> fromExpressionValue<TextJustifyType>(const Value&);
-template Value toExpressionValue(const TextJustifyType&);
+template struct ValueConverter<TextJustifyType>;
 
 template type::Type valueTypeToExpressionType<TextTransformType>();
-template optional<TextTransformType> fromExpressionValue<TextTransformType>(const Value&);
-template Value toExpressionValue(const TextTransformType&);
+template struct ValueConverter<TextTransformType>;
 
 template type::Type valueTypeToExpressionType<TranslateAnchorType>();
-template optional<TranslateAnchorType> fromExpressionValue<TranslateAnchorType>(const Value&);
-template Value toExpressionValue(const TranslateAnchorType&);
+template struct ValueConverter<TranslateAnchorType>;
+
+template type::Type valueTypeToExpressionType<RasterResamplingType>();
+template struct ValueConverter<RasterResamplingType>;
 
 template type::Type valueTypeToExpressionType<HillshadeIlluminationAnchorType>();
-template optional<HillshadeIlluminationAnchorType> fromExpressionValue<HillshadeIlluminationAnchorType>(const Value&);
-template Value toExpressionValue(const HillshadeIlluminationAnchorType&);
+template struct ValueConverter<HillshadeIlluminationAnchorType>;
 
 template type::Type valueTypeToExpressionType<LightAnchorType>();
-template optional<LightAnchorType> fromExpressionValue<LightAnchorType>(const Value&);
-template Value toExpressionValue(const LightAnchorType&);
-
-template type::Type valueTypeToExpressionType<Position>();
-template optional<Position> fromExpressionValue<Position>(const Value&);
-template Value toExpressionValue(const Position&);
+template struct ValueConverter<LightAnchorType>;
 
 } // namespace expression
 } // namespace style

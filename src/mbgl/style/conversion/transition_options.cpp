@@ -10,7 +10,7 @@ optional<TransitionOptions> Converter<TransitionOptions>::operator()(const Conve
         return {};
     }
 
-    TransitionOptions result;
+    optional<TransitionOptions> result = TransitionOptions{};
 
     auto duration = objectMember(value, "duration");
     if (duration) {
@@ -19,7 +19,7 @@ optional<TransitionOptions> Converter<TransitionOptions>::operator()(const Conve
             error = { "duration must be a number" };
             return {};
         }
-        result.duration = { std::chrono::milliseconds(int64_t(*number)) };
+        result->duration = { std::chrono::milliseconds(int64_t(*number)) };
     }
 
     auto delay = objectMember(value, "delay");
@@ -29,7 +29,7 @@ optional<TransitionOptions> Converter<TransitionOptions>::operator()(const Conve
             error = { "delay must be a number" };
             return {};
         }
-        result.delay = { std::chrono::milliseconds(int64_t(*number)) };
+        result->delay = { std::chrono::milliseconds(int64_t(*number)) };
     }
 
     return result;

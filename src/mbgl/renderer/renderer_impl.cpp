@@ -380,12 +380,15 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
     for (auto it = order.rbegin(); it != order.rend(); ++it) {
         if (it->layer.is<RenderSymbolLayer>()) {
-            if (crossTileSymbolIndex.addLayer(*it->layer.as<RenderSymbolLayer>())) symbolBucketsChanged = true;
+            const float lng = parameters.state.getLatLng().longitude();
+            if (crossTileSymbolIndex.addLayer(*it->layer.as<RenderSymbolLayer>(), lng)) symbolBucketsChanged = true;
         }
     }
 
     bool placementChanged = false;
     if (!placement->stillRecent(parameters.timePoint)) {
+        placementChanged = true;
+
         auto newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode);
         std::set<std::string> usedSymbolLayers;
         for (auto it = order.rbegin(); it != order.rend(); ++it) {
@@ -395,13 +398,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             }
         }
 
-        placementChanged = newPlacement->commit(*placement, parameters.timePoint);
+        newPlacement->commit(*placement, parameters.timePoint);
         crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
-        if (placementChanged || symbolBucketsChanged) {
-            placement = std::move(newPlacement);
-        }
-
-        placement->setRecent(parameters.timePoint);
+        placement = std::move(newPlacement);
         
         updateFadingTiles();
     } else {
@@ -486,7 +485,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         static const ClippingMaskProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
         for (const auto& clipID : parameters.clipIDGenerator.getClipIDs()) {
-            parameters.staticData.programs.clippingMask.draw(
+            auto& program = parameters.staticData.programs.clippingMask;
+
+            program.draw(
                 parameters.context,
                 gl::Triangles(),
                 gl::DepthMode::disabled(),
@@ -499,15 +500,21 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                     gl::StencilMode::Replace
                 },
                 gl::ColorMode::disabled(),
-                ClippingMaskProgram::UniformValues {
-                    uniforms::u_matrix::Value{ parameters.matrixForTile(clipID.first) },
-                },
-                parameters.staticData.tileVertexBuffer,
                 parameters.staticData.quadTriangleIndexBuffer,
                 parameters.staticData.tileTriangleSegments,
-                paintAttributeData,
-                properties,
-                parameters.state.getZoom(),
+                program.computeAllUniformValues(
+                    ClippingMaskProgram::UniformValues {
+                        uniforms::u_matrix::Value{ parameters.matrixForTile(clipID.first) },
+                    },
+                    paintAttributeData,
+                    properties,
+                    parameters.state.getZoom()
+                ),
+                program.computeAllAttributeBindings(
+                    parameters.staticData.tileVertexBuffer,
+                    paintAttributeData,
+                    properties
+                ),
                 "clipping"
             );
         }
