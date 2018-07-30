@@ -110,6 +110,13 @@ void Placement::placeLayerBucket(
     auto partiallyEvaluatedTextSize = bucket.textSizeBinder->evaluateForZoom(state.getZoom());
     auto partiallyEvaluatedIconSize = bucket.iconSizeBinder->evaluateForZoom(state.getZoom());
 
+    optional<CollisionTileBoundaries> avoidEdges;
+    if (mapMode == MapMode::Tile &&
+        (bucket.layout.get<style::SymbolAvoidEdges>() ||
+         bucket.layout.get<style::SymbolPlacement>() == style::SymbolPlacementType::Line)) {
+        avoidEdges = collisionIndex.projectTileBoundaries(posMatrix);
+    }
+    
     for (auto& symbolInstance : bucket.symbolInstances) {
 
         if (seenCrossTileIDs.count(symbolInstance.crossTileID) == 0) {
@@ -133,7 +140,7 @@ void Placement::placeLayerBucket(
                         placedSymbol, scale, fontSize,
                         bucket.layout.get<style::TextAllowOverlap>(),
                         bucket.layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map,
-                        showCollisionBoxes);
+                        showCollisionBoxes, avoidEdges);
                 placeText = placed.first;
                 offscreen &= placed.second;
             }
@@ -147,7 +154,7 @@ void Placement::placeLayerBucket(
                         placedSymbol, scale, fontSize,
                         bucket.layout.get<style::IconAllowOverlap>(),
                         bucket.layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map,
-                        showCollisionBoxes);
+                        showCollisionBoxes, avoidEdges);
                 placeIcon = placed.first;
                 offscreen &= placed.second;
             }
