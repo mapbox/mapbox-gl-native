@@ -258,11 +258,6 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
     const float textMaxBoxScale = tilePixelRatio * textMaxSize / glyphSize;
     const float iconBoxScale = tilePixelRatio * layoutIconSize;
     const float symbolSpacing = tilePixelRatio * layout.get<SymbolSpacing>();
-    // CJL: I'm not sure why SymbolPlacementType::Line -> avoidEdges = false. It seems redundant since
-    // getAnchors will already avoid generating anchors outside the tile bounds.
-    // However, SymbolPlacementType::LineCenter allows anchors outside tile boundaries, so its behavior
-    // here should match SymbolPlacement::Point
-    const bool avoidEdges = layout.get<SymbolAvoidEdges>() && layout.get<SymbolPlacement>() != SymbolPlacementType::Line;
     const float textPadding = layout.get<TextPadding>() * tilePixelRatio;
     const float iconPadding = layout.get<IconPadding>() * tilePixelRatio;
     const float textMaxAngle = layout.get<TextMaxAngle>() * util::DEG2RAD;
@@ -274,25 +269,14 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
     IndexedSubfeature indexedFeature(feature.index, sourceLayer->getName(), bucketLeaderID, symbolInstances.size());
 
     auto addSymbolInstance = [&] (const GeometryCoordinates& line, Anchor& anchor) {
-        // https://github.com/mapbox/vector-tile-spec/tree/master/2.1#41-layers
-        // +-------------------+ Symbols with anchors located on tile edges
-        // |(0,0)             || are duplicated on neighbor tiles.
-        // |                  ||
-        // |                  || In continuous mode, to avoid overdraw we
-        // |                  || skip symbols located on the extent edges.
-        // |       Tile       || In still mode, we include the features in
-        // |                  || the buffers for both tiles and clip them
-        // |                  || at draw time.
-        // |                  ||
-        // +-------------------| In this scenario, the inner bounding box
-        // +-------------------+ is called 'withinPlus0', and the outer
-        //       (extent,extent) is called 'inside'.
-        const bool withinPlus0 = anchor.point.x >= 0 && anchor.point.x < util::EXTENT && anchor.point.y >= 0 && anchor.point.y < util::EXTENT;
-        const bool inside = withinPlus0 || anchor.point.x == util::EXTENT || anchor.point.y == util::EXTENT;
+        const bool anchorInsideTile = anchor.point.x >= 0 && anchor.point.x < util::EXTENT && anchor.point.y >= 0 && anchor.point.y < util::EXTENT;
 
-        if (avoidEdges && !inside) return;
-
-        if (mode == MapMode::Tile || withinPlus0) {
+        if (mode == MapMode::Tile || anchorInsideTile) {
+            // For static/continuous rendering, only add symbols anchored within this tile:
+            //  neighboring symbols will be added as part of the neighboring tiles.
+            // In tiled rendering mode, add all symbols in the buffers so that we can:
+            //  (1) render symbols that overlap into this tile
+            //  (2) approximate collision detection effects from neighboring symbols
             symbolInstances.emplace_back(anchor, line, shapedTextOrientations, shapedIcon,
                     layout.evaluate(zoom, feature), layoutTextSize,
                     textBoxScale, textPadding, textPlacement, textOffset,

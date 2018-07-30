@@ -62,6 +62,21 @@ bool CollisionIndex::isOffscreen(const CollisionBox& box) const {
 bool CollisionIndex::isInsideGrid(const CollisionBox& box) const {
     return box.px2 >= 0 && box.px1 < gridRightBoundary && box.py2 >= 0 && box.py1 < gridBottomBoundary;
 }
+    
+CollisionTileBoundaries CollisionIndex::projectTileBoundaries(const mat4& posMatrix) const {
+    Point<float> topLeft = projectPoint(posMatrix, { 0, 0 });
+    Point<float> bottomRight = projectPoint(posMatrix, { util::EXTENT, util::EXTENT });
+
+    return {{ topLeft.x, topLeft.y, bottomRight.x, bottomRight.y }};
+    
+}
+
+bool CollisionIndex::isInsideTile(const CollisionBox& box, const CollisionTileBoundaries& tileBoundaries) const {
+    // This check is only well defined when the tile boundaries are axis-aligned
+    // We are relying on it only being used in MapMode::Tile, where that is always the case
+
+    return box.px1 >= tileBoundaries[0] && box.py1 >= tileBoundaries[1] && box.px2 < tileBoundaries[2] && box.py2 < tileBoundaries[3];
+}
 
 
 std::pair<bool,bool> CollisionIndex::placeFeature(CollisionFeature& feature,
@@ -73,7 +88,8 @@ std::pair<bool,bool> CollisionIndex::placeFeature(CollisionFeature& feature,
                                       const float fontSize,
                                       const bool allowOverlap,
                                       const bool pitchWithMap,
-                                      const bool collisionDebug) {
+                                      const bool collisionDebug,
+                                      const optional<CollisionTileBoundaries>& avoidEdges) {
     if (!feature.alongLine) {
         CollisionBox& box = feature.boxes.front();
         const auto projectedPoint = projectAndGetPerspectiveRatio(posMatrix, box.anchor);
@@ -82,15 +98,17 @@ std::pair<bool,bool> CollisionIndex::placeFeature(CollisionFeature& feature,
         box.py1 = box.y1 * tileToViewport + projectedPoint.first.y;
         box.px2 = box.x2 * tileToViewport + projectedPoint.first.x;
         box.py2 = box.y2 * tileToViewport + projectedPoint.first.y;
+    
 
-        if (!isInsideGrid(box) ||
+        if ((avoidEdges && !isInsideTile(box, *avoidEdges)) ||
+            !isInsideGrid(box) ||
             (!allowOverlap && collisionGrid.hitTest({{ box.px1, box.py1 }, { box.px2, box.py2 }}))) {
             return { false, false };
         }
 
         return {true, isOffscreen(box)};
     } else {
-        return placeLineFeature(feature, posMatrix, labelPlaneMatrix, textPixelRatio, symbol, scale, fontSize, allowOverlap, pitchWithMap, collisionDebug);
+        return placeLineFeature(feature, posMatrix, labelPlaneMatrix, textPixelRatio, symbol, scale, fontSize, allowOverlap, pitchWithMap, collisionDebug, avoidEdges);
     }
 }
 
@@ -103,7 +121,8 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
                                       const float fontSize,
                                       const bool allowOverlap,
                                       const bool pitchWithMap,
-                                      const bool collisionDebug) {
+                                      const bool collisionDebug,
+                                      const optional<CollisionTileBoundaries>& avoidEdges) {
 
     const auto tileUnitAnchorPoint = symbol.anchorPoint;
     const auto projectedAnchor = projectAnchor(posMatrix, tileUnitAnchorPoint);
@@ -202,15 +221,14 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
         entirelyOffscreen &= isOffscreen(circle);
         inGrid |= isInsideGrid(circle);
 
-        if (!allowOverlap) {
-            if (collisionGrid.hitTest({{circle.px, circle.py}, circle.radius})) {
-                if (!collisionDebug) {
-                    return {false, false};
-                } else {
-                    // Don't early exit if we're showing the debug circles because we still want to calculate
-                    // which circles are in use
-                    collisionDetected = true;
-                }
+        if ((avoidEdges && !isInsideTile(circle, *avoidEdges)) ||
+            (!allowOverlap && collisionGrid.hitTest({{circle.px, circle.py}, circle.radius}))) {
+            if (!collisionDebug) {
+                return {false, false};
+            } else {
+                // Don't early exit if we're showing the debug circles because we still want to calculate
+                // which circles are in use
+                collisionDetected = true;
             }
         }
     }

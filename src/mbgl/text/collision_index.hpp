@@ -3,13 +3,18 @@
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/util/grid_index.hpp>
+#include <mbgl/util/optional.hpp>
 #include <mbgl/map/transform_state.hpp>
+
+#include <array>
 
 namespace mbgl {
 
 class PlacedSymbol;
 
 struct TileDistance;
+    
+using CollisionTileBoundaries = std::array<float,4>;
 
 class CollisionIndex {
 public:
@@ -26,15 +31,19 @@ public:
                                       const float fontSize,
                                       const bool allowOverlap,
                                       const bool pitchWithMap,
-                                      const bool collisionDebug);
+                                      const bool collisionDebug,
+                                      const optional<CollisionTileBoundaries>& avoidEdges);
 
     void insertFeature(CollisionFeature& feature, bool ignorePlacement, uint32_t bucketInstanceId);
 
     std::unordered_map<uint32_t, std::vector<IndexedSubfeature>> queryRenderedSymbols(const ScreenLineString&) const;
+    
+    CollisionTileBoundaries projectTileBoundaries(const mat4& posMatrix) const;
 
 private:
     bool isOffscreen(const CollisionBox&) const;
     bool isInsideGrid(const CollisionBox&) const;
+    bool isInsideTile(const CollisionBox&, const CollisionTileBoundaries& tileBoundaries) const;
 
     std::pair<bool,bool> placeLineFeature(CollisionFeature& feature,
                                   const mat4& posMatrix,
@@ -45,7 +54,8 @@ private:
                                   const float fontSize,
                                   const bool allowOverlap,
                                   const bool pitchWithMap,
-                                  const bool collisionDebug);
+                                  const bool collisionDebug,
+                                  const optional<CollisionTileBoundaries>& avoidEdges);
     
     float approximateTileDistance(const TileDistance& tileDistance, const float lastSegmentAngle, const float pixelsToTileUnits, const float cameraToAnchorDistance, const bool pitchWithMap);
     
