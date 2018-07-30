@@ -3,6 +3,12 @@
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/style/layer_observer.hpp>
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/color_ramp_property_value.hpp>
+#include <mbgl/style/conversion/constant.hpp>
+#include <mbgl/style/conversion/property_value.hpp>
+#include <mbgl/style/conversion/transition_options.hpp>
+#include <mbgl/style/conversion/json.hpp>
 
 namespace mbgl {
 namespace style {
@@ -283,6 +289,181 @@ void FillLayer::setFillPatternTransition(const TransitionOptions& options) {
 
 TransitionOptions FillLayer::getFillPatternTransition() const {
     return impl().paint.template get<FillPattern>().options;
+}
+
+using namespace conversion;
+
+optional<Error> FillLayer::setPaintProperty(const std::string& name, const Convertible& value) {
+    
+    if (name == "fill-antialias") {
+        Error error;
+        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setFillAntialias(*typedValue);
+        return nullopt;
+    }
+    if (name == "fill-antialias-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setFillAntialiasTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "fill-opacity") {
+        Error error;
+        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setFillOpacity(*typedValue);
+        return nullopt;
+    }
+    if (name == "fill-opacity-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setFillOpacityTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "fill-color") {
+        Error error;
+        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setFillColor(*typedValue);
+        return nullopt;
+    }
+    if (name == "fill-color-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setFillColorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "fill-outline-color") {
+        Error error;
+        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setFillOutlineColor(*typedValue);
+        return nullopt;
+    }
+    if (name == "fill-outline-color-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setFillOutlineColorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "fill-translate") {
+        Error error;
+        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setFillTranslate(*typedValue);
+        return nullopt;
+    }
+    if (name == "fill-translate-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setFillTranslateTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "fill-translate-anchor") {
+        Error error;
+        optional<PropertyValue<TranslateAnchorType>> typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setFillTranslateAnchor(*typedValue);
+        return nullopt;
+    }
+    if (name == "fill-translate-anchor-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setFillTranslateAnchorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (name == "fill-pattern") {
+        Error error;
+        optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+
+        setFillPattern(*typedValue);
+        return nullopt;
+    }
+    if (name == "fill-pattern-transition") {
+        Error error;
+        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+        if (!transition) {
+            return error;
+        }
+
+        setFillPatternTransition(*transition);
+        return nullopt;
+    }
+    
+    return Error { "layer doesn't support this property" };
+}
+
+optional<Error> FillLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
+    if (name == "visibility") {
+        if (isUndefined(value)) {
+            setVisibility(VisibilityType::Visible);
+            return nullopt;
+        }
+
+        Error error;
+        optional<VisibilityType> visibility = convert<VisibilityType>(value, error);
+        if (!visibility) {
+            return error;
+        }
+
+        setVisibility(*visibility);
+        return nullopt;
+    }
+
+    
+    return Error { "layer doesn't support this property" };
 }
 
 } // namespace style

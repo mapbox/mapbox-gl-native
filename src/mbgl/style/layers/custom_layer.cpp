@@ -50,6 +50,16 @@ void CustomLayer::setMaxZoom(float maxZoom) {
     baseImpl = std::move(impl_);
 }
 
+using namespace conversion;
+
+optional<Error> CustomLayer::setPaintProperty(const std::string&, const Convertible&) {
+    return Error { "layer doesn't support this property" };
+}
+
+optional<Error> CustomLayer::setLayoutProperty(const std::string&, const Convertible&) {
+    return Error { "layer doesn't support this property" };
+}
+
 template <>
 bool Layer::is<CustomLayer>() const {
     return getType() == LayerType::Custom;
