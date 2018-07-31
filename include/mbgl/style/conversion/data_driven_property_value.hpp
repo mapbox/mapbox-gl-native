@@ -29,8 +29,8 @@ struct Converter<DataDrivenPropertyValue<T>> {
             ParsingContext ctx(valueTypeToExpressionType<T>());
             ParseResult parsed = ctx.parseLayerPropertyExpression(value);
             if (!parsed) {
-                error = { ctx.getCombinedErrors() };
-                return {};
+                error.message = ctx.getCombinedErrors();
+                return nullopt;
             }
             expression = PropertyExpression<T>(std::move(*parsed));
         } else if (isObject(value)) {
@@ -38,26 +38,26 @@ struct Converter<DataDrivenPropertyValue<T>> {
         } else {
             optional<T> constant = convert<T>(value, error);
             if (!constant) {
-                return {};
+                return nullopt;
             }
             return convertTokens ? maybeConvertTokens(*constant) : DataDrivenPropertyValue<T>(*constant);
         }
 
         if (!expression) {
-            return {};
+            return nullopt;
         } else if (!(*expression).isFeatureConstant() || !(*expression).isZoomConstant()) {
             return { std::move(*expression) };
         } else if ((*expression).getExpression().getKind() == Kind::Literal) {
             optional<T> constant = fromExpressionValue<T>(
                 static_cast<const Literal&>((*expression).getExpression()).getValue());
             if (!constant) {
-                return {};
+                return nullopt;
             }
             return DataDrivenPropertyValue<T>(*constant);
         } else {
             assert(false);
-            error = { "expected a literal expression" };
-            return {};
+            error.message = "expected a literal expression";
+            return nullopt;
         }
     }
 

@@ -9,13 +9,50 @@
 #include <mbgl/util/ignore.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/platform.hpp>
+#include <mbgl/util/variant.hpp>
+
 #include <cmath>
 
 namespace mbgl {
 namespace style {
 namespace expression {
 
+/*
+    Represents the parameter list for an expression that takes an arbitrary
+    number of arguments (of a specific type).
+*/
+struct VarargsType { type::Type type; };
+
+bool operator==(const VarargsType& lhs, const VarargsType& rhs) {
+    return lhs.type == rhs.type;
+}
+
+template <typename T>
+struct Varargs : std::vector<T> {
+    template <class... Args>
+    Varargs(Args&&... args) : std::vector<T>(std::forward<Args>(args)...) {}
+};
+
 namespace detail {
+// Base class for the Signature<Fn> structs that are used to determine
+// each CompoundExpression definition's type::Type data from the type of its
+// "evaluate" function.
+struct SignatureBase {
+    using Args = std::vector<std::unique_ptr<Expression>>;
+
+    SignatureBase(type::Type result_, variant<std::vector<type::Type>, VarargsType> params_, std::string name_) :
+        result(std::move(result_)),
+        params(std::move(params_)),
+        name(std::move(name_))
+    {}
+    virtual ~SignatureBase() = default;
+
+    virtual EvaluationResult apply(const EvaluationContext&, const Args&) const = 0;
+
+    type::Type result;
+    variant<std::vector<type::Type>, VarargsType> params;
+    std::string name;
+};
 
 /*
     The Signature<Fn> structs are wrappers around an "evaluate()" function whose
@@ -44,8 +81,6 @@ struct Signature;
 // Simple evaluate function (const T0&, const T1&, ...) -> Result<U>
 template <class R, class... Params>
 struct Signature<R (Params...)> : SignatureBase {
-    using Args = std::array<std::unique_ptr<Expression>, sizeof...(Params)>;
-
     Signature(R (*evaluate_)(Params...), std::string name_) :
         SignatureBase(
             valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
@@ -53,26 +88,23 @@ struct Signature<R (Params...)> : SignatureBase {
             std::move(name_)
         ),
         evaluate(evaluate_)    {}
-    
-    EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const {
+
+    EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const override {
         return applyImpl(evaluationParameters, args, std::index_sequence_for<Params...>{});
     }
 
-    std::unique_ptr<Expression> makeExpression(std::vector<std::unique_ptr<Expression>> args) const override {
-        typename Signature::Args argsArray;
-        std::copy_n(std::make_move_iterator(args.begin()), sizeof...(Params), argsArray.begin());
-        return std::make_unique<CompoundExpression<Signature>>(name, *this, std::move(argsArray));
-    }
-
     R (*evaluate)(Params...);
+
 private:
     template <std::size_t ...I>
     EvaluationResult applyImpl(const EvaluationContext& evaluationParameters, const Args& args, std::index_sequence<I...>) const {
-        const std::array<EvaluationResult, sizeof...(I)> evaluated = {{std::get<I>(args)->evaluate(evaluationParameters)...}};
-        for (const auto& arg : evaluated) {
-            if(!arg) return arg.error();
+        std::array<Value, sizeof...(Params)> evaluated;
+        for (std::size_t i = 0; i < sizeof...(Params); ++i) {
+            const EvaluationResult evaluatedArg = args.at(i)->evaluate(evaluationParameters);
+            if (!evaluatedArg) return evaluatedArg.error();
+            evaluated[i] = std::move(*evaluatedArg);
         }
-        const R value = evaluate(*fromExpressionValue<std::decay_t<Params>>(*(evaluated[I]))...);
+        const R value = evaluate(*fromExpressionValue<std::decay_t<Params>>(evaluated[I])...);
         if (!value) return value.error();
         return *value;
     }
@@ -81,8 +113,6 @@ private:
 // Varargs evaluate function (const Varargs<T>&) -> Result<U>
 template <class R, typename T>
 struct Signature<R (const Varargs<T>&)> : SignatureBase {
-    using Args = std::vector<std::unique_ptr<Expression>>;
-
     Signature(R (*evaluate_)(const Varargs<T>&), std::string name_) :
         SignatureBase(
             valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
@@ -92,11 +122,7 @@ struct Signature<R (const Varargs<T>&)> : SignatureBase {
         evaluate(evaluate_)
     {}
 
-    std::unique_ptr<Expression> makeExpression(std::vector<std::unique_ptr<Expression>> args) const override  {
-        return std::make_unique<CompoundExpression<Signature>>(name, *this, std::move(args));
-    };
-
-    EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const {
+    EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const override {
         Varargs<T> evaluated;
         evaluated.reserve(args.size());
         for (const auto& arg : args) {
@@ -108,7 +134,7 @@ struct Signature<R (const Varargs<T>&)> : SignatureBase {
         if (!value) return value.error();
         return *value;
     }
-    
+
     R (*evaluate)(const Varargs<T>&);
 };
 
@@ -116,8 +142,6 @@ struct Signature<R (const Varargs<T>&)> : SignatureBase {
 // (const EvaluationParams&, const T0&, const T1&, ...) -> Result<U>
 template <class R, class... Params>
 struct Signature<R (const EvaluationContext&, Params...)> : SignatureBase {
-    using Args = std::array<std::unique_ptr<Expression>, sizeof...(Params)>;
-
     Signature(R (*evaluate_)(const EvaluationContext&, Params...), std::string name_) :
         SignatureBase(
             valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
@@ -127,29 +151,24 @@ struct Signature<R (const EvaluationContext&, Params...)> : SignatureBase {
         evaluate(evaluate_)
     {}
 
-    std::unique_ptr<Expression> makeExpression(std::vector<std::unique_ptr<Expression>> args) const override {
-        typename Signature::Args argsArray;
-        std::copy_n(std::make_move_iterator(args.begin()), sizeof...(Params), argsArray.begin());
-        return std::make_unique<CompoundExpression<Signature>>(name, *this, std::move(argsArray));
-    }
-
-    EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const {
+    EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const override {
         return applyImpl(evaluationParameters, args, std::index_sequence_for<Params...>{});
     }
 
 private:
     template <std::size_t ...I>
     EvaluationResult applyImpl(const EvaluationContext& evaluationParameters, const Args& args, std::index_sequence<I...>) const {
-        const std::array<EvaluationResult, sizeof...(I)> evaluated = {{std::get<I>(args)->evaluate(evaluationParameters)...}};
-        for (const auto& arg : evaluated) {
-            if(!arg) return arg.error();
+        std::array<Value, sizeof...(Params)> evaluated;
+        for (std::size_t i = 0; i < sizeof...(Params); ++i) {
+            const EvaluationResult evaluatedArg = args.at(i)->evaluate(evaluationParameters);
+            if (!evaluatedArg) return evaluatedArg.error();
+            evaluated[i] = std::move(*evaluatedArg);
         }
-        // TODO: assert correct runtime type of each arg value
-        const R value = evaluate(evaluationParameters, *fromExpressionValue<std::decay_t<Params>>(*(evaluated[I]))...);
+        const R value = evaluate(evaluationParameters, *fromExpressionValue<std::decay_t<Params>>(evaluated[I])...);
         if (!value) return value.error();
         return *value;
     }
-    
+
     R (*evaluate)(const EvaluationContext&, Params...);
 };
     
@@ -157,8 +176,6 @@ private:
 // (const EvaluationContext&, const Varargs<T>&) -> Result<U>
 template <class R, typename T>
 struct Signature<R (const EvaluationContext&, const Varargs<T>&)> : SignatureBase {
-    using Args = std::vector<std::unique_ptr<Expression>>;
-    
     Signature(R (*evaluate_)(const EvaluationContext&, const Varargs<T>&), std::string name_) :
     SignatureBase(
                   valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
@@ -167,12 +184,8 @@ struct Signature<R (const EvaluationContext&, const Varargs<T>&)> : SignatureBas
                   ),
     evaluate(evaluate_)
     {}
-    
-    std::unique_ptr<Expression> makeExpression(std::vector<std::unique_ptr<Expression>> args) const override  {
-        return std::make_unique<CompoundExpression<Signature>>(name, *this, std::move(args));
-    };
-    
-    EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const {
+
+    EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const override {
         Varargs<T> evaluated;
         evaluated.reserve(args.size());
         for (const auto& arg : args) {
@@ -184,39 +197,30 @@ struct Signature<R (const EvaluationContext&, const Varargs<T>&)> : SignatureBas
         if (!value) return value.error();
         return *value;
     }
-    
+
     R (*evaluate)(const EvaluationContext&, const Varargs<T>&);
 };
 
-// Machinery to pull out function types from class methods, lambdas, etc.
-template <class R, class... Params>
-struct Signature<R (*)(Params...)>
-    : Signature<R (Params...)>
-{ using Signature<R (Params...)>::Signature; };
+// Machinery to pull out function type from lambdas.
+template <class, class = void>
+struct SignatureType;
 
 template <class T, class R, class... Params>
-struct Signature<R (T::*)(Params...) const>
-    : Signature<R (Params...)>
-{ using Signature<R (Params...)>::Signature;  };
-
-template <class T, class R, class... Params>
-struct Signature<R (T::*)(Params...)>
-    : Signature<R (Params...)>
-{ using Signature<R (Params...)>::Signature; };
+struct SignatureType<R (T::*)(Params...) const>
+{ using Type = R (Params...);  };
 
 template <class Lambda>
-struct Signature<Lambda, std::enable_if_t<std::is_class<Lambda>::value>>
-    : Signature<decltype(&Lambda::operator())>
-{ using Signature<decltype(&Lambda::operator())>::Signature; };
+struct SignatureType<Lambda, std::enable_if_t<std::is_class<Lambda>::value>>
+{ using Type = typename SignatureType<decltype(&Lambda::operator())>::Type; };
+
+template <typename Fn>
+static std::unique_ptr<detail::SignatureBase> makeSignature(Fn evaluateFunction, std::string name) {
+    return std::make_unique<Signature<typename SignatureType<Fn>::Type>>(evaluateFunction, std::move(name));
+}
 
 } // namespace detail
 
 using Definition = CompoundExpressionRegistry::Definition;
-
-template <typename Fn>
-static std::unique_ptr<detail::SignatureBase> makeSignature(Fn evaluateFunction, std::string name) {
-    return std::make_unique<detail::Signature<Fn>>(evaluateFunction, std::move(name));
-}
 
 Value featureIdAsExpressionValue(EvaluationContext params) {
     assert(params.feature);
@@ -295,7 +299,7 @@ optional<std::string> featureIdAsString(EvaluationContext params) {
 std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initializeDefinitions() {
     std::unordered_map<std::string, CompoundExpressionRegistry::Definition> definitions;
     auto define = [&](std::string name, auto fn) {
-        definitions[name].push_back(makeSignature(fn, name));
+        definitions[name].push_back(detail::makeSignature(fn, name));
     };
 
     define("e", []() -> Result<double> { return 2.718281828459045; });
@@ -326,7 +330,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         return color.toArray();
     });
 
-    define("rgba", rgba);
+    define("rgba", [](double r, double g, double b, double a) { return rgba(r, g, b, a); });
     define("rgb", [](double r, double g, double b) { return rgba(r, g, b, 1.0f); });
 
     define("zoom", [](const EvaluationContext& params) -> Result<double> {
@@ -346,7 +350,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         }
         return *(params.heatmapDensity);
     });
-    
+
     define("has", [](const EvaluationContext& params, const std::string& key) -> Result<bool> {
         if (!params.feature) {
             return EvaluationError {
@@ -359,7 +363,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("has", [](const std::string& key, const std::unordered_map<std::string, Value>& object) -> Result<bool> {
         return object.find(key) != object.end();
     });
-    
+
     define("get", [](const EvaluationContext& params, const std::string& key) -> Result<Value> {
         if (!params.feature) {
             return EvaluationError {
@@ -475,7 +479,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         }
         return result;
     });
-    
+
     define("round", [](double x) -> Result<double> { return ::round(x); });
     define("floor", [](double x) -> Result<double> { return std::floor(x); });
     define("ceil", [](double x) -> Result<double> { return std::ceil(x); });
@@ -495,7 +499,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("<=", [](const std::string& lhs, const std::string& rhs, const Collator& c) -> Result<bool> { return c.compare(lhs, rhs) <= 0; });
 
     define("!", [](bool e) -> Result<bool> { return !e; });
-    
+
     define("is-supported-script", [](const std::string& x) -> Result<bool> {
         return util::i18n::isStringInSupportedScript(x);
     });
@@ -516,7 +520,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("resolved-locale", [](const Collator& collator) -> Result<std::string> {
         return collator.resolvedLocale();
     });
-    
+
     define("error", [](const std::string& input) -> Result<type::ErrorType> {
         return EvaluationError { input };
     });
@@ -580,7 +584,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         auto rhs = featurePropertyAsDouble(params, key);
         return rhs ? rhs <= lhs : false;
     });
-    
+
     define("filter-<=", [](const EvaluationContext& params, const std::string& key, std::string lhs) -> Result<bool> {
         auto rhs = featurePropertyAsString(params, key);
         return rhs ? rhs <= lhs : false;
@@ -590,7 +594,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         auto rhs = featureIdAsDouble(params);
         return rhs ? rhs <= lhs : false;
     });
-    
+
     define("filter-id-<=", [](const EvaluationContext& params, std::string lhs) -> Result<bool> {
         auto rhs = featureIdAsString(params);
         return rhs ? rhs <= lhs : false;
@@ -600,7 +604,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         auto rhs = featurePropertyAsDouble(params, key);
         return rhs ? rhs >= lhs : false;
     });
-    
+
     define("filter->=", [](const EvaluationContext& params, const std::string& key, std::string lhs) -> Result<bool> {
         auto rhs = featurePropertyAsString(params, key);
         return rhs ? rhs >= lhs : false;
@@ -631,7 +635,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         optional<std::string> type = featureTypeAsString(params.feature->getType());
         return std::find(types.begin(), types.end(), type) != types.end();
     });
-    
+
     define("filter-id-in", [](const EvaluationContext& params, const Varargs<Value>& ids) -> Result<bool> {
         auto id = featureIdAsExpressionValue(params);
         return std::find(ids.begin(), ids.end(), id) != ids.end();
@@ -689,7 +693,7 @@ static ParseResult createCompoundExpression(const Definition& definition,
         }
 
         if (signatureContext.getErrors().size() == 0) {
-            return ParseResult(signature->makeExpression(std::move(args)));
+            return ParseResult(std::make_unique<CompoundExpression>(*signature, std::move(args)));
         }
     }
 
@@ -799,6 +803,48 @@ ParseResult createCompoundExpression(const std::string& name,
                                      ParsingContext& ctx)
 {
     return createCompoundExpression(CompoundExpressionRegistry::definitions.at(name), std::move(args), ctx);
+}
+
+CompoundExpression::CompoundExpression(const detail::SignatureBase& signature_, std::vector<std::unique_ptr<Expression>> args_) :
+    Expression(Kind::CompoundExpression, signature_.result),
+    signature(signature_),
+    args(std::move(args_))
+{}
+
+std::string CompoundExpression::getOperator() const {
+    return signature.name;
+}
+
+EvaluationResult CompoundExpression::evaluate(const EvaluationContext& evaluationParams) const {
+    return signature.apply(evaluationParams, args);
+}
+
+optional<std::size_t> CompoundExpression::getParameterCount() const {
+    return signature.params.match(
+        [&](const VarargsType&) { return optional<std::size_t>(); },
+        [&](const std::vector<type::Type>& p) -> optional<std::size_t> { return p.size(); }
+    );
+}
+
+std::vector<optional<Value>> CompoundExpression::possibleOutputs() const {
+    return { nullopt };
+}
+
+void CompoundExpression::eachChild(const std::function<void(const Expression&)>& visit) const {
+    for (const std::unique_ptr<Expression>& e : args) {
+        visit(*e);
+    }
+}
+
+bool CompoundExpression::operator==(const Expression& e) const {
+    if (e.getKind() == Kind::CompoundExpression) {
+        auto rhs = static_cast<const CompoundExpression*>(&e);
+        return signature.name == rhs->signature.name &&
+            signature.result == rhs->signature.result &&
+            signature.params == rhs->signature.params &&
+            Expression::childrenEqual(args, rhs->args);
+    }
+    return false;
 }
 
 } // namespace expression

@@ -38,8 +38,8 @@ bool isConstant(const Expression& expression) {
     }
 
     if (expression.getKind() == Kind::CompoundExpression) {
-        auto compound = static_cast<const CompoundExpressionBase*>(&expression);
-        if (compound->getName() == "error") {
+        auto compound = static_cast<const CompoundExpression*>(&expression);
+        if (compound->getOperator() == "error") {
             return false;
         }
     }

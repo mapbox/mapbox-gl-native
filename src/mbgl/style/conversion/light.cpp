@@ -9,8 +9,8 @@ namespace conversion {
 
 optional<Light> Converter<Light>::operator()(const Convertible& value, Error& error) const {
     if (!isObject(value)) {
-        error = { "light must be an object" };
-        return {};
+        error.message = "light must be an object";
+        return nullopt;
     }
 
     Light light;
@@ -23,7 +23,7 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
         if (convertedAnchor) {
             light.setAnchor(*convertedAnchor);
         } else {
-            return {};
+            return nullopt;
         }
     }
 
@@ -34,7 +34,7 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
         if (transition) {
             light.setAnchorTransition(*transition);
         } else {
-            return {};
+            return nullopt;
         }
     }
 
@@ -46,7 +46,7 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
         if (convertedColor) {
             light.setColor(*convertedColor);
         } else {
-            return {};
+            return nullopt;
         }
     }
 
@@ -57,7 +57,7 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
         if (transition) {
             light.setColorTransition(*transition);
         } else {
-            return {};
+            return nullopt;
         }
     }
 
@@ -69,7 +69,7 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
         if (convertedPosition) {
             light.setPosition(*convertedPosition);
         } else {
-            return {};
+            return nullopt;
         }
     }
 
@@ -80,7 +80,7 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
         if (transition) {
             light.setPositionTransition(*transition);
         } else {
-            return {};
+            return nullopt;
         }
     }
 
@@ -92,7 +92,7 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
         if (convertedIntensity) {
             light.setIntensity(*convertedIntensity);
         } else {
-            return {};
+            return nullopt;
         }
     }
 
@@ -103,7 +103,7 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
         if (transition) {
             light.setIntensityTransition(*transition);
         } else {
-            return {};
+            return nullopt;
         }
     }
 
