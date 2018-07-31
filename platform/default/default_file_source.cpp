@@ -297,8 +297,8 @@ void DefaultFileSource::setOfflineMapboxTileCountLimit(uint64_t limit) const {
     impl->actor().invoke(&Impl::setOfflineMapboxTileCountLimit, limit);
 }
     
-void DefaultFileSource::startPutRegionResources(OfflineRegion& region, const std::list<std::tuple<Resource, Response, bool>>& resources, std::function<void (std::exception_ptr)> callback) {
-    impl->actor().invoke(&Impl::startPutRegionResources, region.getID(), resources, callback);
+void DefaultFileSource::startPutRegionResources(const int64_t regionID, const std::list<std::tuple<Resource, Response, bool>>& resources, std::function<void (std::exception_ptr)> callback) {
+    impl->actor().invoke(&Impl::startPutRegionResources, regionID, resources, callback);
 }
 
 void DefaultFileSource::pause() {

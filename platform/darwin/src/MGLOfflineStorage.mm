@@ -435,7 +435,7 @@ const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount = @"Maximu
         _resourcesToInsertByRegionID.erase(it++);
     }
     
-    _mbglFileSource->startPutRegionResources(*pack.mbglOfflineRegion, resources, [&, completion](std::exception_ptr exception) {
+    _mbglFileSource->startPutRegionResources(*pack.mbglOfflineRegion->getID(), resources, [&, completion](std::exception_ptr exception) {
         NSError *error;
         if (exception) {
             error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
