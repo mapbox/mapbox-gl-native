@@ -203,6 +203,9 @@ macro(initialize_xcode_cxx_build_settings target)
 
     # -Wrange-loop-analysis
     set_xcode_property(${target} CLANG_WARN_RANGE_LOOP_ANALYSIS YES)
+
+    # -flto
+    set_xcode_property(${target} LLVM_LTO $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebugInfo>>:YES>)
 endmacro(initialize_xcode_cxx_build_settings)
 
 # CMake 3.1 does not have this yet.

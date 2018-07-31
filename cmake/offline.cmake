@@ -21,6 +21,8 @@ mbgl_platform_offline()
 
 create_source_groups(mbgl-offline)
 
+initialize_xcode_cxx_build_settings(mbgl-offline)
+
 set_target_properties(mbgl-offline PROPERTIES FOLDER "Executables")
 
 xcode_create_scheme(
