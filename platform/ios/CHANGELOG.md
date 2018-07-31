@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 4.3.0
 
+### Styles and rendering
+
+* Added an `MGLMapView.preferredFramesPerSecond` property that controls the rate at which the map view is rendered. The default rate now adapts to device capabilities to provide a smoother experience. ([#12501](https://github.com/mapbox/mapbox-gl-native/issues/12501))
+
 ### Other changes
 
 * Fixed a crash that occurred when the user started a gesture before the drift animation for a previous gesture was complete. ([#12148](https://github.com/mapbox/mapbox-gl-native/pull/12148))

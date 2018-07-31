@@ -53,6 +53,7 @@
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
 #import "NSURL+MGLAdditions.h"
+#import "UIDevice+MGLAdditions.h"
 #import "UIImage+MGLAdditions.h"
 #import "UIViewController+MGLAdditions.h"
 
@@ -87,6 +88,10 @@ const CGFloat MGLMapViewDecelerationRateNormal = UIScrollViewDecelerationRateNor
 const CGFloat MGLMapViewDecelerationRateFast = UIScrollViewDecelerationRateFast;
 const CGFloat MGLMapViewDecelerationRateImmediate = 0.0;
 
+const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondDefault = -1;
+const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondLowPower = 30;
+const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondMaximum = 60;
+
 /// Indicates the manner in which the map view is tracking the user location.
 typedef NS_ENUM(NSUInteger, MGLUserTrackingState) {
     /// The map view is not yet tracking the user location.
@@ -117,8 +122,6 @@ const double MGLMinimumZoomLevelForUserTracking = 10.5;
 
 /// Initial zoom level when entering user tracking mode from a low zoom level.
 const double MGLDefaultZoomLevelForUserTracking = 14.0;
-
-const NSUInteger MGLTargetFrameInterval = 1;  // Target FPS will be 60 divided by this value
 
 /// Tolerance for snapping to true north, measured in degrees in either direction.
 const CLLocationDirection MGLToleranceForSnappingToNorth = 7;
@@ -403,6 +406,9 @@ public:
     self.backgroundColor = [UIColor clearColor];
     self.clipsToBounds = YES;
     if (@available(iOS 11.0, *)) { self.accessibilityIgnoresInvertColors = YES; }
+
+    self.preferredFramesPerSecond = MGLMapViewPreferredFramesPerSecondDefault;
+
     // setup mbgl view
     _mbglView = new MBGLView(self);
 
@@ -1125,7 +1131,7 @@ public:
         }
 
         _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateFromDisplayLink)];
-        _displayLink.frameInterval = MGLTargetFrameInterval;
+        [self updateDisplayLinkPreferredFramesPerSecond];
         [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
         _needsDisplayRefresh = YES;
         [self updateFromDisplayLink];
@@ -1135,6 +1141,49 @@ public:
         [_displayLink invalidate];
         _displayLink = nil;
     }
+}
+
+- (void)updateDisplayLinkPreferredFramesPerSecond
+{
+    if (!_displayLink)
+    {
+        return;
+    }
+
+    NSInteger newFrameRate;
+    if (_preferredFramesPerSecond == MGLMapViewPreferredFramesPerSecondDefault)
+    {
+        // On legacy devices that cannot maintain a reasonable frame rate, set
+        // a lower limit to avoid jank.
+        newFrameRate = UIDevice.currentDevice.mgl_isLegacyDevice ? MGLMapViewPreferredFramesPerSecondLowPower : MGLMapViewPreferredFramesPerSecondMaximum;
+    }
+    else
+    {
+        newFrameRate = _preferredFramesPerSecond;
+    }
+
+    if (@available(iOS 10.0, *))
+    {
+        _displayLink.preferredFramesPerSecond = newFrameRate;
+    }
+    else
+    {
+        // CADisplayLink.frameInterval does not support more than 60 FPS (and
+        // no device that supports >60 FPS ever supported iOS 9).
+        NSInteger maximumFrameRate = 60;
+        _displayLink.frameInterval = maximumFrameRate / MIN(newFrameRate, maximumFrameRate);
+    }
+}
+
+- (void)setPreferredFramesPerSecond:(MGLMapViewPreferredFramesPerSecond)preferredFramesPerSecond
+{
+    if (_preferredFramesPerSecond == preferredFramesPerSecond)
+    {
+        return;
+    }
+
+    _preferredFramesPerSecond = preferredFramesPerSecond;
+    [self updateDisplayLinkPreferredFramesPerSecond];
 }
 
 - (void)didMoveToWindow

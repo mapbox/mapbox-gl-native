@@ -322,6 +322,10 @@
 		966FCF531F3C322400F2B6DE /* MGLUserLocationHeadingArrowLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 966FCF501F3C321000F2B6DE /* MGLUserLocationHeadingArrowLayer.h */; };
 		966FCF541F3C323300F2B6DE /* MGLUserLocationHeadingArrowLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 966FCF511F3C321000F2B6DE /* MGLUserLocationHeadingArrowLayer.m */; };
 		966FCF551F3C323500F2B6DE /* MGLUserLocationHeadingArrowLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 966FCF511F3C321000F2B6DE /* MGLUserLocationHeadingArrowLayer.m */; };
+		967C864B210A9D3C004DF794 /* UIDevice+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 967C8649210A9D3C004DF794 /* UIDevice+MGLAdditions.h */; };
+		967C864C210A9D3C004DF794 /* UIDevice+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 967C8649210A9D3C004DF794 /* UIDevice+MGLAdditions.h */; };
+		967C864D210A9D3C004DF794 /* UIDevice+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 967C864A210A9D3C004DF794 /* UIDevice+MGLAdditions.m */; };
+		967C864E210A9D3C004DF794 /* UIDevice+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 967C864A210A9D3C004DF794 /* UIDevice+MGLAdditions.m */; };
 		968F36B51E4D128D003A5522 /* MGLDistanceFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3557F7AE1E1D27D300CCA5E6 /* MGLDistanceFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E027231E57C76E004B8E66 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96E027251E57C76E004B8E66 /* Localizable.strings */; };
 		96E516DC2000547000A02306 /* MGLPolyline_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */; };
@@ -992,6 +996,8 @@
 		966FCF4B1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLUserLocationHeadingBeamLayer.m; sourceTree = "<group>"; };
 		966FCF501F3C321000F2B6DE /* MGLUserLocationHeadingArrowLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationHeadingArrowLayer.h; sourceTree = "<group>"; };
 		966FCF511F3C321000F2B6DE /* MGLUserLocationHeadingArrowLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLUserLocationHeadingArrowLayer.m; sourceTree = "<group>"; };
+		967C8649210A9D3C004DF794 /* UIDevice+MGLAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIDevice+MGLAdditions.h"; sourceTree = "<group>"; };
+		967C864A210A9D3C004DF794 /* UIDevice+MGLAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+MGLAdditions.m"; sourceTree = "<group>"; };
 		968F36B41E4D0FC6003A5522 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		96E027241E57C76E004B8E66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		96E027271E57C77A004B8E66 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -1526,6 +1532,8 @@
 				96036A00200565C700510F3D /* NSOrthography+MGLAdditions.m */,
 				35CE61801D4165D9004F2359 /* UIColor+MGLAdditions.h */,
 				35CE61811D4165D9004F2359 /* UIColor+MGLAdditions.mm */,
+				967C8649210A9D3C004DF794 /* UIDevice+MGLAdditions.h */,
+				967C864A210A9D3C004DF794 /* UIDevice+MGLAdditions.m */,
 				30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */,
 				30E578121DAA7D690050F07E /* UIImage+MGLAdditions.mm */,
 				DD9BE4F51EB263C50079A3AF /* UIViewController+MGLAdditions.h */,
@@ -2258,6 +2266,7 @@
 				35D3A1E61E9BE7EB002B38EE /* MGLScaleBar.h in Headers */,
 				0778DD431F67556700A73B34 /* MGLComputedShapeSource.h in Headers */,
 				DA8848311CBAFA6200AB86E3 /* NSString+MGLAdditions.h in Headers */,
+				967C864B210A9D3C004DF794 /* UIDevice+MGLAdditions.h in Headers */,
 				1FCAE2A220B872A400C577DD /* MGLLocationManager.h in Headers */,
 				DACA86262019218600E9693A /* MGLRasterDEMSource.h in Headers */,
 				353933F81D3FB79F003F57D7 /* MGLLineStyleLayer.h in Headers */,
@@ -2356,6 +2365,7 @@
 				4049C29E1DB6CD6C00B3F799 /* MGLPointCollection.h in Headers */,
 				3566C7671D4A77BA008152BC /* MGLShapeSource.h in Headers */,
 				DA35A29F1CC9E94C00E826B2 /* MGLCoordinateFormatter.h in Headers */,
+				967C864C210A9D3C004DF794 /* UIDevice+MGLAdditions.h in Headers */,
 				404C26E31D89B877000AA13D /* MGLTileSource.h in Headers */,
 				96E516F6200059EC00A02306 /* MGLRendererFrontend.h in Headers */,
 				071BBB041EE76147001FB02A /* MGLImageSource.h in Headers */,
@@ -2949,6 +2959,7 @@
 				40834BF71FE05E1800C1BD0D /* MMEUniqueIdentifier.m in Sources */,
 				3566C7681D4A77BA008152BC /* MGLShapeSource.mm in Sources */,
 				40834C4A1FE05F7500C1BD0D /* TSKPinningValidator.m in Sources */,
+				967C864D210A9D3C004DF794 /* UIDevice+MGLAdditions.m in Sources */,
 				400533021DB0862B0069F638 /* NSArray+MGLAdditions.mm in Sources */,
 				96036A03200565C700510F3D /* NSOrthography+MGLAdditions.m in Sources */,
 				40834BF31FE05E1800C1BD0D /* MMETimerManager.m in Sources */,
@@ -3076,6 +3087,7 @@
 				400533031DB086490069F638 /* NSArray+MGLAdditions.mm in Sources */,
 				40834C571FE05F7600C1BD0D /* TSKPinningValidator.m in Sources */,
 				35136D431D42274500C20EFD /* MGLRasterStyleLayer.mm in Sources */,
+				967C864E210A9D3C004DF794 /* UIDevice+MGLAdditions.m in Sources */,
 				96036A04200565C700510F3D /* NSOrthography+MGLAdditions.m in Sources */,
 				40834C071FE05E1800C1BD0D /* MMETimerManager.m in Sources */,
 				3538AA201D542239008EC33D /* MGLForegroundStyleLayer.mm in Sources */,
