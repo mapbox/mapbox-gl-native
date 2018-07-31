@@ -563,6 +563,13 @@ MGL_EXPORT IB_DESIGNABLE
 @property(nonatomic, getter=isHapticFeedbackEnabled) BOOL hapticFeedbackEnabled;
 
 /**
+ A Boolean value that determines whether the updating pitch will also affect the altitude.
+ 
+ When this property is set to `YES`, pitch will work independently from altitude.
+ */
+@property(nonatomic, getter=isAltitudeUnaffectedByPitch) BOOL altitudeUnaffectedByPitch;
+
+/**
  A floating-point value that determines the rate of deceleration after the user
  lifts their finger.
 
@@ -966,6 +973,18 @@ MGL_EXPORT IB_DESIGNABLE
  @param completion The block to execute after the animation finishes.
  */
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion;
+
+/**
+ Moves the viewpoint to a different location without using a transition.
+ 
+ Transition animations can be defined by other classes and use this method to
+ update the map.
+ 
+ @param camera The new viewpoint.
+ @param padding The minimum padding (in screen points) that would be visible
+ 
+ */
+- (void)jumpToCamera:(MGLMapCamera *)camera edgePadding:(UIEdgeInsets)insets;
 
 /**
  Returns the camera that best fits the given coordinate bounds.
