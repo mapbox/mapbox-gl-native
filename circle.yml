@@ -565,7 +565,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node-macos-release:
     macos:
-      xcode: "9.4.0"
+      xcode: "9.4.1"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -793,7 +793,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-debug:
     macos:
-      xcode: "9.4.0"
+      xcode: "9.4.1"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -826,7 +826,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize:
     macos:
-      xcode: "9.4.0"
+      xcode: "9.4.1"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -853,7 +853,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-address:
     macos:
-      xcode: "9.4.0"
+      xcode: "9.4.1"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -880,7 +880,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-static-analyzer:
     macos:
-      xcode: "9.4.0"
+      xcode: "9.4.1"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -907,7 +907,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-release:
     macos:
-      xcode: "9.4.0"
+      xcode: "9.4.1"
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -944,7 +944,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-release-tag:
     macos:
-      xcode: "9.4.0"
+      xcode: "9.4.1"
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -975,7 +975,7 @@ jobs:
 # ------------------------------------------------------------------------------
   macos-debug:
     macos:
-      xcode: "9.4.0"
+      xcode: "9.4.1"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
