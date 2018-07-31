@@ -87,6 +87,13 @@ public class OfflineManager {
     void onError(String error);
   }
 
+  public interface PutOfflineCallback {
+
+      void onPut();
+
+      void onError(String error);
+  }
+
   /*
    * Constructor
    */
@@ -260,5 +267,43 @@ public class OfflineManager {
 
   private native void createOfflineRegion(FileSource fileSource, OfflineRegionDefinition definition,
                                           byte[] metadata, CreateOfflineRegionCallback callback);
+
+  /**
+   * Add a resource to be inserted into the cache. Call commitResourcesForPack for every batch.
+   *
+   * @param url url to resource.
+   * @param data a byte array with the content of the resource.
+   * @param compressed boolean true if the data content is compressed.
+   * @param modified a long with the number of *seconds* since epoc. or 0 if not set.
+   * @param expires a long with the number of *seconds* since epoc. or 0 if not set.
+   * @param eTag
+   * @param regionId
+   */
+  public native void putResourceWithUrl(String url, byte[] data, boolean compressed, long modified,
+                                        long expires, String eTag, long regionId);
+
+  /**
+   * Add a tile to be inserted into the cache. Call commitResourcesForPack for every batch.
+   *
+   * @param url a String with url template of the tile.
+   * @param pixelRatio
+   * @param x
+   * @param y
+   * @param z
+   * @param data a byte array with the content of the resource.
+   * @param compressed boolean true if the data content is compressed.
+   * @param modified a long with the number of *seconds* since epoc. or 0 if not set.
+   * @param expires a long with the number of *seconds* since epoc. or 0 if not set.
+   * @param eTag
+   * @param regionId
+   */
+  public native void putTileWithUrlTemplate(String url, float pixelRatio,
+                                            int x, int y, int z, byte[] data, boolean compressed,
+                                            long modified, long expires, String eTag, long regionId);
+
+  /**
+   * Insert a batch of tiles and resources into the cache. Call after some putTileWithUrlTemplate/putResourceWithUrl.
+   */
+  public native void commitResourcesForPack(long regionId, PutOfflineCallback callback);
 
 }

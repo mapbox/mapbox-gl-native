@@ -5,6 +5,9 @@
 #include "../attach_env.hpp"
 #include "../jni/generic_global_ref_deleter.hpp"
 
+#include <list>
+#include <map>
+
 namespace mbgl {
 namespace android {
 
@@ -76,11 +79,111 @@ void OfflineManager::createOfflineRegion(jni::JNIEnv& env_,
     });
 }
 
+std::multimap<int64_t, std::tuple<mbgl::Resource, mbgl::Response, bool>> _resourcesToInsertByRegionID;
+
+void OfflineManager::putResourceWithUrl(jni::JNIEnv& env,
+                                jni::String url_,
+                                jni::Array<jni::jbyte> arr,
+                                jboolean compressed,
+                                jlong modified,
+                                jlong expires,
+                                jni::String eTag_,
+                                jlong regionId) {
+    auto url =  jni::Make<std::string>(env, url_);
+
+    auto data = std::make_shared<std::string>(arr.Length(env), char());
+    jni::GetArrayRegion(env, *arr, 0, data->size(), reinterpret_cast<jbyte*>(&(*data)[0]));
+
+    mbgl::Resource resource = mbgl::Resource(mbgl::Resource::Kind::Unknown, url);
+    mbgl::Response response = mbgl::Response();
+    response.data = data;
+
+    if (eTag_) {
+        response.etag = jni::Make<std::string>(env, eTag_);
+    }
+
+    if (modified > 0) {
+        response.modified = Timestamp{ mbgl::Seconds(modified) };
+    }
+
+    if (expires > 0) {
+        response.expires = Timestamp{ mbgl::Seconds(expires) };
+    }
+
+    _resourcesToInsertByRegionID.insert(std::pair<int64_t, std::tuple<mbgl::Resource, mbgl::Response, bool>>(regionId, {resource, response, compressed}));
+}
+
+void OfflineManager::putTileWithUrlTemplate(jni::JNIEnv& env,
+                                    jni::String urlTemplate_,
+                                    jfloat pixelRatio,
+                                    jint x,
+                                    jint y,
+                                    jint z,
+                                    jni::Array<jni::jbyte> arr,
+                                    jboolean compressed,
+                                    jlong modified,
+                                    jlong expires,
+                                    jni::String eTag_,
+                                    jlong regionId) {
+    auto urlTemplate = jni::Make<std::string>(env, urlTemplate_);
+
+    auto data = std::make_shared<std::string>(arr.Length(env), char());
+    jni::GetArrayRegion(env, *arr, 0, data->size(), reinterpret_cast<jbyte*>(&(*data)[0]));
+
+    mbgl::Resource resource = mbgl::Resource::tile(urlTemplate, pixelRatio, x, y, z, mbgl::Tileset::Scheme::XYZ);
+    mbgl::Response response = mbgl::Response();
+    response.data = data;
+
+    if (eTag_) {
+        response.etag = jni::Make<std::string>(env, eTag_);
+    }
+
+    if (modified > 0) {
+        response.modified = Timestamp{ mbgl::Seconds(modified) };
+    }
+
+    if (expires > 0) {
+        response.expires = Timestamp{ mbgl::Seconds(expires) };
+    }
+
+    _resourcesToInsertByRegionID.insert(std::pair<int64_t, std::tuple<mbgl::Resource, mbgl::Response, bool>>(regionId, {resource, response, compressed}));
+}
+
+void OfflineManager::commitResourcesForPack(jni::JNIEnv& env_, jlong regionId, jni::Object<OfflineManager::PutOfflineCallback> callback_)
+{
+    std::list<std::tuple<mbgl::Resource, mbgl::Response, bool>> resources;
+    auto its = _resourcesToInsertByRegionID.equal_range(regionId);
+    auto it = its.first;
+    const auto end = its.second;
+    while (it != end) {
+        resources.push_back(it->second);
+        _resourcesToInsertByRegionID.erase(it++);
+    }
+
+    fileSource.startPutRegionResources(regionId, resources, [
+            //Keep a shared ptr to a global reference of the callback and file source so they are not GC'd in the meanwhile
+            callback = std::shared_ptr<jni::jobject>(callback_.NewGlobalRef(env_).release()->Get(), GenericGlobalRefDeleter())
+    ](std::exception_ptr error) mutable {
+
+        // Reattach, the callback comes from a different thread
+        android::UniqueEnv env = android::AttachEnv();
+
+        if (error) {
+            OfflineManager::PutOfflineCallback::onError(*env, jni::Object<OfflineManager::PutOfflineCallback>(*callback), error);
+        } else {
+            OfflineManager::PutOfflineCallback::onPut(*env, jni::Object<OfflineManager::PutOfflineCallback>(*callback));
+        }
+
+    });
+
+}
+
 jni::Class<OfflineManager> OfflineManager::javaClass;
 
 void OfflineManager::registerNative(jni::JNIEnv& env) {
     OfflineManager::ListOfflineRegionsCallback::registerNative(env);
     OfflineManager::CreateOfflineRegionCallback::registerNative(env);
+    OfflineManager::PutOfflineCallback::registerNative(env);
 
     javaClass = *jni::Class<OfflineManager>::Find(env).NewGlobalRef(env).release();
 
@@ -163,6 +266,26 @@ jni::Class<OfflineManager::CreateOfflineRegionCallback> OfflineManager::CreateOf
 void OfflineManager::CreateOfflineRegionCallback::registerNative(jni::JNIEnv& env) {
     javaClass = *jni::Class<OfflineManager::CreateOfflineRegionCallback>::Find(env).NewGlobalRef(env).release();
 }
+
+        void OfflineManager::PutOfflineCallback::onError(jni::JNIEnv& env,
+                                                         jni::Object<OfflineManager::PutOfflineCallback> callback,
+                                                         std::exception_ptr error) {
+            static auto method = javaClass.GetMethod<void (jni::String)>(env, "onError");
+            std::string message = mbgl::util::toString(error);
+            callback.Call(env, method, jni::Make<jni::String>(env, message));
+        }
+
+        void OfflineManager::PutOfflineCallback::onPut(jni::JNIEnv& env,
+                                                       jni::Object<OfflineManager::PutOfflineCallback> callback) {
+            static auto method = javaClass.GetMethod<void (void)>(env, "onPut");
+            callback.Call(env, method);
+        }
+
+        jni::Class<OfflineManager::PutOfflineCallback> OfflineManager::PutOfflineCallback::javaClass;
+
+        void OfflineManager::PutOfflineCallback::registerNative(jni::JNIEnv& env) {
+            javaClass = *jni::Class<OfflineManager::PutOfflineCallback>::Find(env).NewGlobalRef(env).release();
+        }
 
 } // namespace android
 } // namespace mbgl
