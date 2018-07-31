@@ -442,6 +442,9 @@ public:
         _isWaitingForRedundantReachableNotification = YES;
     }
     [_reachability startNotifier];
+    
+    // setup default location manager
+    self.locationManager = nil;
 
     // Set up annotation management and selection state.
     _annotationImagesByIdentifier = [NSMutableDictionary dictionary];
@@ -701,8 +704,10 @@ public:
     [self.attributionButtonConstraints removeAllObjects];
     self.attributionButtonConstraints = nil;
     
-    self.locationManager.delegate = nil;
-    self.locationManager = nil;
+    [_locationManager stopUpdatingLocation];
+    [_locationManager stopUpdatingHeading];
+    _locationManager.delegate = nil;
+
 }
 
 - (void)setDelegate:(nullable id<MGLMapViewDelegate>)delegate
@@ -4739,13 +4744,15 @@ public:
 
 #pragma mark - User Location -
 
-- (void)setLocationManager:(id<MGLLocationManager>)locationManager
+- (void)setLocationManager:(nullable id<MGLLocationManager>)locationManager
 {
     if (!locationManager) {
-        [self.locationManager stopUpdatingLocation];
-        [self.locationManager stopUpdatingHeading];
+        locationManager = [[MGLCLLocationManager alloc] init];
     }
-    self.locationManager.delegate = nil;
+    [_locationManager stopUpdatingLocation];
+    [_locationManager stopUpdatingHeading];
+    _locationManager.delegate = nil;
+    
     _locationManager = locationManager;
     _locationManager.delegate = self;
 }
@@ -4756,11 +4763,6 @@ public:
 
     if (shouldEnableLocationServices)
     {
-        // If no custom location manager is provided will use the internal implementation.
-        if (!self.locationManager) {
-            self.locationManager = [[MGLCLLocationManager alloc] init];
-        }
-
         if (self.locationManager.authorizationStatus == kCLAuthorizationStatusNotDetermined)
         {
             BOOL requiresWhenInUseUsageDescription = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){11,0,0}];
@@ -4792,7 +4794,6 @@ public:
             }
         }
 
-        self.locationManager.delegate = self;
         [self.locationManager startUpdatingLocation];
 
         [self validateUserHeadingUpdating];
