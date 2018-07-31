@@ -975,7 +975,7 @@ void QMapboxGL::removeAnnotation(QMapbox::AnnotationID id)
 /*!
     Sets a layout \a property_ \a value to an existing \a layer. The \a property_ string can be any
     as defined by the \l {https://www.mapbox.com/mapbox-gl-style-spec/} {Mapbox style specification}
-    for layout properties.
+    for layout properties. Returns true if the operation succeeds, and false otherwise.
 
     This example hides the layer \c route:
 
@@ -1007,26 +1007,29 @@ void QMapboxGL::removeAnnotation(QMapbox::AnnotationID id)
         \li QVariantList
     \endtable
 */
-void QMapboxGL::setLayoutProperty(const QString& layer, const QString& property_, const QVariant& value)
+bool QMapboxGL::setLayoutProperty(const QString& layer, const QString& property_, const QVariant& value)
 {
     using namespace mbgl::style;
 
     Layer* layer_ = d_ptr->mapObj->getStyle().getLayer(layer.toStdString());
     if (!layer_) {
         qWarning() << "Layer not found:" << layer;
-        return;
+        return false;
     }
 
-    if (conversion::setLayoutProperty(*layer_, property_.toStdString(), value)) {
-        qWarning() << "Error setting layout property:" << layer << "-" << property_;
-        return;
+    auto result = conversion::setLayoutProperty(*layer_, property_.toStdString(), value);
+    if (result) {
+        qWarning() << "Error setting layout property" << property_ << "on layer" << layer << ":" << QString::fromStdString(result->message);
+        return false;
     }
+
+    return true;
 }
 
 /*!
     Sets a paint \a property_ \a value to an existing \a layer. The \a property_ string can be any
     as defined by the \l {https://www.mapbox.com/mapbox-gl-style-spec/} {Mapbox style specification}
-    for paint properties.
+    for paint properties. Returns true if the operation succeeds, and false otherwise.
 
     For paint properties that take a color as \a value, such as \c fill-color, a string such as
     \c blue can be passed or a QColor.
@@ -1073,20 +1076,23 @@ void QMapboxGL::setLayoutProperty(const QString& layer, const QString& property_
         map->setPaintProperty("route","line-dasharray", lineDashArray);
     \endcode
 */
-void QMapboxGL::setPaintProperty(const QString& layer, const QString& property_, const QVariant& value)
+bool QMapboxGL::setPaintProperty(const QString& layer, const QString& property_, const QVariant& value)
 {
     using namespace mbgl::style;
 
     Layer* layer_ = d_ptr->mapObj->getStyle().getLayer(layer.toStdString());
     if (!layer_) {
         qWarning() << "Layer not found:" << layer;
-        return;
+        return false;
     }
 
-    if (conversion::setPaintProperty(*layer_, property_.toStdString(), value)) {
-        qWarning() << "Error setting paint property:" << layer << "-" << property_;
-        return;
+    auto result = conversion::setPaintProperty(*layer_, property_.toStdString(), value);
+    if (result) {
+        qWarning() << "Error setting paint property" << property_ << "on layer" << layer << ":" << QString::fromStdString(result->message);
+        return false;
     }
+
+    return true;
 }
 
 /*!
