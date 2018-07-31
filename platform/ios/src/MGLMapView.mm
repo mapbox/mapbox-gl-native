@@ -554,8 +554,8 @@ public:
     [self addGestureRecognizer:_twoFingerTap];
 
     _hapticFeedbackEnabled = YES;
-    
-    _altitudeUnaffectedByPitch = NO;
+
+    _cameraAltitudeAffectedByPitch = YES;
 
     _cameraAltitudeAffectedByPitch = YES;
 
@@ -3423,12 +3423,6 @@ public:
     self.cameraChangeReasonBitmask &= ~MGLCameraChangeReasonTransitionCancelled;
 }
 
-- (void)jumpToCamera:(MGLMapCamera *)camera edgePadding:(UIEdgeInsets)insets
-{
-    mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:insets];
-    _mbglMap->jumpTo(options);
-}
-
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds
 {
     return [self cameraThatFitsCoordinateBounds:bounds edgePadding:UIEdgeInsetsZero];
@@ -5221,7 +5215,6 @@ public:
     MGLMapCamera *camera = self.camera;
     camera.centerCoordinate = self.userLocation.location.coordinate;
     camera.heading = self.directionByFollowingWithCourse;
-
     CLLocationDegrees pitch = (self.isCameraAltitudeAffectedByPitch) ? camera.pitch : 0.0;
     if (self.zoomLevel < MGLMinimumZoomLevelForUserTracking)
     {

@@ -63,7 +63,7 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
         The default user location annotation displays a fan-shaped indicator with
         the current heading. The heading indicator represents the direction the
         device is facing, which is sized according to the reported accuracy.
-     
+
         This tracking mode is disabled if the user pans the map view, but
         remains enabled if the user zooms in. If the user rotates the map
         view, this tracking mode will fall back to `MGLUserTrackingModeFollow`.
@@ -74,7 +74,7 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
         Course represents the direction in which the device is traveling.
         The default user location annotation shows a puck-shaped indicator
         that rotates as the course changes.
-     
+
         This tracking mode is disabled if the user pans the map view, but
         remains enabled if the user zooms in. If the user rotates the map view,
         this tracking mode will fall back to `MGLUserTrackingModeFollow`.
@@ -336,13 +336,13 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  The object that this map view uses to start and stop the delivery of location-related
  updates.
- 
+
  To receive the current user location, implement the `-[MGLMapViewDelegate mapView:didUpdateUserLocation:]`
  and `-[MGLMapViewDelegate mapView:didFailToLocateUserWithError:]` methods.
- 
+
  If setting this property to `nil` or if no custom manager is provided this property
  is set to the default location manager.
- 
+
  `MGLMapView` uses a default location manager. If you want to substitute your own
  location manager, you should do so by setting this property before setting
  `showsUserLocation` to `YES`. To restore the default location manager,
@@ -366,7 +366,7 @@ MGL_EXPORT IB_DESIGNABLE
  `NSLocationAlwaysUsageDescription` in its `Info.plist` to satisfy the
  requirements of the underlying Core Location framework when enabling this
  property.
- 
+
  If you implement a custom location manager, set the `locationManager` before
  calling `showsUserLocation`.
  */
@@ -564,10 +564,15 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  A Boolean value that determines whether the updating pitch will also affect the altitude.
- 
- When this property is set to `YES`, pitch will work independently from altitude.
+
+ When this property is set to `NO`, pitch will work independently from altitude.
+ The default value of this property is YES.
+
+ Setting this property to NO will allow animation libraries outside of this SDK to control the
+ map camera without the built-in side effect that pitch influences altitude. This will make the
+ results of using outside animation more predictable and easier to control.
  */
-@property(nonatomic, getter=isAltitudeUnaffectedByPitch) BOOL altitudeUnaffectedByPitch;
+@property(nonatomic, getter=isCameraAltitudeAffectedByPitch) BOOL cameraAltitudeAffectedByPitch;
 
 /**
  A floating-point value that determines the rate of deceleration after the user
@@ -744,7 +749,7 @@ MGL_EXPORT IB_DESIGNABLE
  Changing the value of this property updates the receiver immediately. If you
  want to animate the change, call `-setVisibleCoordinateBounds:animated:`
  instead.
- 
+
  If a longitude is less than −180 degrees or greater than 180 degrees, the
  visible bounds straddles the antimeridian or international date line. For
  example, if both Tokyo and San Francisco are visible, the visible bounds might
@@ -755,7 +760,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit the given coordinate bounds,
  optionally animating the change.
- 
+
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
  example, to show both Tokyo and San Francisco simultaneously, you could set the
@@ -770,7 +775,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit the given coordinate bounds and
  optionally some additional padding on each side.
- 
+
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
  example, to show both Tokyo and San Francisco simultaneously, you could set the
@@ -787,7 +792,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit all of the given coordinates and
  optionally some additional padding on each side.
- 
+
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
  example, to show both Tokyo and San Francisco simultaneously, you could set the
@@ -806,7 +811,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit all of the given coordinates and
  optionally some additional padding on each side.
- 
+
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
  example, to show both Tokyo and San Francisco simultaneously, you could set the
@@ -872,10 +877,10 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Moves the viewpoint to a different location without using a transition.
- 
+
  @param camera The new viewpoint.
  @param edgePadding The minimum padding (in screen points) that would be visible
- 
+
  */
 - (void)setCamera:(MGLMapCamera *)camera edgePadding:(UIEdgeInsets)edgePadding;
 
@@ -911,7 +916,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Moves the viewpoint to a different location with respect to the map with an
  optional transition duration and timing function.
- 
+
  @param camera The new viewpoint.
  @param duration The amount of time, measured in seconds, that the transition
  animation should take. Specify `0` to jump to the new viewpoint
@@ -975,18 +980,6 @@ MGL_EXPORT IB_DESIGNABLE
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion;
 
 /**
- Moves the viewpoint to a different location without using a transition.
- 
- Transition animations can be defined by other classes and use this method to
- update the map.
- 
- @param camera The new viewpoint.
- @param padding The minimum padding (in screen points) that would be visible
- 
- */
-- (void)jumpToCamera:(MGLMapCamera *)camera edgePadding:(UIEdgeInsets)insets;
-
-/**
  Returns the camera that best fits the given coordinate bounds.
 
  @param bounds The coordinate bounds to fit to the receiver’s viewport.
@@ -1014,7 +1007,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns the camera that best fits the given coordinate bounds, with the specified camera,
  optionally with some additional padding on each side.
- 
+
  @param camera The camera that the return camera should adhere to. All values
     on this camera will be manipulated except for pitch and direction.
  @param bounds The coordinate bounds to fit to the receiver’s viewport.
@@ -1030,7 +1023,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns the camera that best fits the given shape, with the specified camera,
  optionally with some additional padding on each side.
- 
+
  @param camera The camera that the return camera should adhere to. All values
     on this camera will be manipulated except for pitch and direction.
  @param shape The shape to fit to the receiver’s viewport.
@@ -1050,7 +1043,7 @@ MGL_EXPORT IB_DESIGNABLE
  @param direction The direction of the viewport, measured in degrees clockwise from true north.
  @param insets The minimum padding (in screen points) that would be visible
     around the returned camera object if it were set as the receiver’s camera.
- @return A camera object centered on the shape's center with zoom level as high 
+ @return A camera object centered on the shape's center with zoom level as high
     (close to the ground) as possible while still including the entire shape. The
     camera object uses the current pitch.
  */
@@ -1145,7 +1138,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Converts a rectangle in the given view’s coordinate system to a geographic
  bounding box.
- 
+
  If the returned coordinate bounds contains a longitude is less than −180 degrees
  or greater than 180 degrees, the bounding box straddles the antimeridian or
  international date line.
@@ -1159,7 +1152,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Converts a geographic bounding box to a rectangle in the given view’s
  coordinate system.
- 
+
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
  example, to show both Tokyo and San Francisco simultaneously, you could set the
@@ -1428,18 +1421,18 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns an array of rendered map features that intersect with a given point,
  restricted to the given style layers.
- 
+
  This method returns all the intersecting features from the specified layers. To
  filter the returned features, use the
  `-visibleFeaturesAtPoint:inStyleLayersWithIdentifiers:predicate:` method. For
  more information about searching for map features, see that method’s
  documentation.
- 
+
  @param point A point expressed in the map view’s coordinate system.
- @param styleLayerIdentifiers A set of strings that correspond to the names 
-    of layers defined in the current style. Only the features contained in 
+ @param styleLayerIdentifiers A set of strings that correspond to the names
+    of layers defined in the current style. Only the features contained in
     these layers are included in the returned array.
- @return An array of objects conforming to the `MGLFeature` protocol that 
+ @return An array of objects conforming to the `MGLFeature` protocol that
     represent features in the sources used by the current style.
  */
 - (NSArray<id <MGLFeature>> *)visibleFeaturesAtPoint:(CGPoint)point inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)styleLayerIdentifiers NS_SWIFT_NAME(visibleFeatures(at:styleLayerIdentifiers:));
@@ -1529,11 +1522,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns an array of rendered map features that intersect with the given
  rectangle, restricted to the given style layers.
- 
+
  This method returns all the intersecting features from the specified layers. To
  filter the returned features, use the
  `-visibleFeaturesAtPoint:inStyleLayersWithIdentifiers:predicate:` method. For
- more information about searching for map features, see that method’s 
+ more information about searching for map features, see that method’s
  documentation.
 
  @param rect A rectangle expressed in the map view’s coordinate system.
@@ -1549,7 +1542,7 @@ MGL_EXPORT IB_DESIGNABLE
  Returns an array of rendered map features that intersect with the given
  rectangle, restricted to the given style layers and filtered by the given
  predicate.
- 
+
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant map
  content sources. The returned array includes features loaded by
@@ -1598,7 +1591,7 @@ MGL_EXPORT IB_DESIGNABLE
  inspectable in Interface Builder, or a manually constructed `NSURL`. This
  approach also avoids layer identifer name changes that will occur in the
  default style’s layers over time.
- 
+
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set
     the style URL to an explicitly versioned style using a convenience method
@@ -1606,7 +1599,7 @@ MGL_EXPORT IB_DESIGNABLE
     inspectable in Interface Builder, or a manually constructed `NSURL`. This
     approach also avoids layer identifer name changes that will occur in the
     default style’s layers over time.
- 
+
  @param rect A rectangle expressed in the map view’s coordinate system.
  @param styleLayerIdentifiers A set of strings that correspond to the names of
     layers defined in the current style. Only the features contained in these
