@@ -1,5 +1,4 @@
-#ifndef HEADER_PARSEDATE_H
-#define HEADER_PARSEDATE_H
+#pragma once
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -11,7 +10,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -34,5 +33,3 @@ time_t parse_date(const char *p);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* HEADER_PARSEDATE_H */
