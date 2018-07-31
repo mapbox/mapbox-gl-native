@@ -57,7 +57,7 @@
 
         NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.fillExtrusionBase = constantExpression;
-        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 1.0 };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getFillExtrusionBase(), propertyValue,
                        @"Setting fillExtrusionBase to a constant value expression should update fill-extrusion-base.");
         XCTAssertEqualObjects(layer.fillExtrusionBase, constantExpression,
@@ -104,7 +104,7 @@
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(1.0)))
             );
         }
-        
+
         XCTAssertEqual(rawLayer->getFillExtrusionBase(), propertyValue,
                        @"Setting fillExtrusionBase to a camera-data expression should update fill-extrusion-base.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
@@ -135,7 +135,7 @@
 
         NSExpression *constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
         layer.fillExtrusionColor = constantExpression;
-        mbgl::style::DataDrivenPropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
+        mbgl::style::PropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
         XCTAssertEqual(rawLayer->getFillExtrusionColor(), propertyValue,
                        @"Setting fillExtrusionColor to a constant value expression should update fill-extrusion-color.");
         XCTAssertEqualObjects(layer.fillExtrusionColor, constantExpression,
@@ -182,7 +182,7 @@
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(mbgl::Color(1, 0, 0, 1))))
             );
         }
-        
+
         XCTAssertEqual(rawLayer->getFillExtrusionColor(), propertyValue,
                        @"Setting fillExtrusionColor to a camera-data expression should update fill-extrusion-color.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
@@ -213,7 +213,7 @@
 
         NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.fillExtrusionHeight = constantExpression;
-        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 1.0 };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getFillExtrusionHeight(), propertyValue,
                        @"Setting fillExtrusionHeight to a constant value expression should update fill-extrusion-height.");
         XCTAssertEqualObjects(layer.fillExtrusionHeight, constantExpression,
@@ -260,7 +260,7 @@
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(1.0)))
             );
         }
-        
+
         XCTAssertEqual(rawLayer->getFillExtrusionHeight(), propertyValue,
                        @"Setting fillExtrusionHeight to a camera-data expression should update fill-extrusion-height.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];

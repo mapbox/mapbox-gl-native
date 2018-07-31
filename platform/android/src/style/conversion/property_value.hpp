@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/style/color_ramp_property_value.hpp>
-#include <mbgl/style/data_driven_property_value.hpp>
 #include <mbgl/style/property_value.hpp>
 #include "../../conversion/conversion.hpp"
 #include "../../conversion/constant.hpp"
@@ -46,18 +45,6 @@ template <class T>
 struct Converter<jni::jobject*, mbgl::style::PropertyValue<T>> {
 
     Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::PropertyValue<T>& value) const {
-        PropertyValueEvaluator<T> evaluator(env);
-        return value.evaluate(evaluator);
-    }
-};
-
-/**
- * Convert core data driven property values to java
- */
-template <class T>
-struct Converter<jni::jobject*, mbgl::style::DataDrivenPropertyValue<T>> {
-
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::DataDrivenPropertyValue<T>& value) const {
         PropertyValueEvaluator<T> evaluator(env);
         return value.evaluate(evaluator);
     }

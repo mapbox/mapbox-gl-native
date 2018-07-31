@@ -278,9 +278,6 @@ global.isLightProperty = function (property) {
 
 global.propertyValueType = function (property) {
   switch (property['property-type']) {
-    case 'data-driven':
-    case 'cross-faded-data-driven':
-      return `DataDrivenPropertyValue<${evaluatedType(property)}>`;
     default:
       return `PropertyValue<${evaluatedType(property)}>`;
   }

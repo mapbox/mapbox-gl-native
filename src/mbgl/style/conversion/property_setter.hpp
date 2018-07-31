@@ -6,7 +6,6 @@
 #include <mbgl/style/conversion/color_ramp_property_value.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
-#include <mbgl/style/conversion/data_driven_property_value.hpp>
 #include <mbgl/style/conversion/transition_options.hpp>
 
 #include <string>
@@ -17,7 +16,7 @@ namespace conversion {
 
 using PropertySetter = optional<Error> (*) (Layer&, const Convertible&);
 
-template <class L, class PropertyValue, void (L::*setter)(PropertyValue), bool convertTokens = false>
+template <class L, class PropertyValue, void (L::*setter)(PropertyValue), bool allowDataExpressions, bool convertTokens>
 optional<Error> setProperty(Layer& layer, const Convertible& value) {
     auto* typedLayer = layer.as<L>();
     if (!typedLayer) {
@@ -25,7 +24,7 @@ optional<Error> setProperty(Layer& layer, const Convertible& value) {
     }
 
     Error error;
-    optional<PropertyValue> typedValue = convert<PropertyValue>(value, error, convertTokens);
+    optional<PropertyValue> typedValue = convert<PropertyValue>(value, error, allowDataExpressions, convertTokens);
     if (!typedValue) {
         return error;
     }

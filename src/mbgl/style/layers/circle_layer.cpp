@@ -96,15 +96,15 @@ void CircleLayer::setMaxZoom(float maxZoom) {
 
 // Paint properties
 
-DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleRadius() {
+PropertyValue<float> CircleLayer::getDefaultCircleRadius() {
     return { 5 };
 }
 
-DataDrivenPropertyValue<float> CircleLayer::getCircleRadius() const {
+PropertyValue<float> CircleLayer::getCircleRadius() const {
     return impl().paint.template get<CircleRadius>().value;
 }
 
-void CircleLayer::setCircleRadius(DataDrivenPropertyValue<float> value) {
+void CircleLayer::setCircleRadius(PropertyValue<float> value) {
     if (value == getCircleRadius())
         return;
     auto impl_ = mutableImpl();
@@ -123,15 +123,15 @@ TransitionOptions CircleLayer::getCircleRadiusTransition() const {
     return impl().paint.template get<CircleRadius>().options;
 }
 
-DataDrivenPropertyValue<Color> CircleLayer::getDefaultCircleColor() {
+PropertyValue<Color> CircleLayer::getDefaultCircleColor() {
     return { Color::black() };
 }
 
-DataDrivenPropertyValue<Color> CircleLayer::getCircleColor() const {
+PropertyValue<Color> CircleLayer::getCircleColor() const {
     return impl().paint.template get<CircleColor>().value;
 }
 
-void CircleLayer::setCircleColor(DataDrivenPropertyValue<Color> value) {
+void CircleLayer::setCircleColor(PropertyValue<Color> value) {
     if (value == getCircleColor())
         return;
     auto impl_ = mutableImpl();
@@ -150,15 +150,15 @@ TransitionOptions CircleLayer::getCircleColorTransition() const {
     return impl().paint.template get<CircleColor>().options;
 }
 
-DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleBlur() {
+PropertyValue<float> CircleLayer::getDefaultCircleBlur() {
     return { 0 };
 }
 
-DataDrivenPropertyValue<float> CircleLayer::getCircleBlur() const {
+PropertyValue<float> CircleLayer::getCircleBlur() const {
     return impl().paint.template get<CircleBlur>().value;
 }
 
-void CircleLayer::setCircleBlur(DataDrivenPropertyValue<float> value) {
+void CircleLayer::setCircleBlur(PropertyValue<float> value) {
     if (value == getCircleBlur())
         return;
     auto impl_ = mutableImpl();
@@ -177,15 +177,15 @@ TransitionOptions CircleLayer::getCircleBlurTransition() const {
     return impl().paint.template get<CircleBlur>().options;
 }
 
-DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleOpacity() {
+PropertyValue<float> CircleLayer::getDefaultCircleOpacity() {
     return { 1 };
 }
 
-DataDrivenPropertyValue<float> CircleLayer::getCircleOpacity() const {
+PropertyValue<float> CircleLayer::getCircleOpacity() const {
     return impl().paint.template get<CircleOpacity>().value;
 }
 
-void CircleLayer::setCircleOpacity(DataDrivenPropertyValue<float> value) {
+void CircleLayer::setCircleOpacity(PropertyValue<float> value) {
     if (value == getCircleOpacity())
         return;
     auto impl_ = mutableImpl();
@@ -312,15 +312,15 @@ TransitionOptions CircleLayer::getCirclePitchAlignmentTransition() const {
     return impl().paint.template get<CirclePitchAlignment>().options;
 }
 
-DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleStrokeWidth() {
+PropertyValue<float> CircleLayer::getDefaultCircleStrokeWidth() {
     return { 0 };
 }
 
-DataDrivenPropertyValue<float> CircleLayer::getCircleStrokeWidth() const {
+PropertyValue<float> CircleLayer::getCircleStrokeWidth() const {
     return impl().paint.template get<CircleStrokeWidth>().value;
 }
 
-void CircleLayer::setCircleStrokeWidth(DataDrivenPropertyValue<float> value) {
+void CircleLayer::setCircleStrokeWidth(PropertyValue<float> value) {
     if (value == getCircleStrokeWidth())
         return;
     auto impl_ = mutableImpl();
@@ -339,15 +339,15 @@ TransitionOptions CircleLayer::getCircleStrokeWidthTransition() const {
     return impl().paint.template get<CircleStrokeWidth>().options;
 }
 
-DataDrivenPropertyValue<Color> CircleLayer::getDefaultCircleStrokeColor() {
+PropertyValue<Color> CircleLayer::getDefaultCircleStrokeColor() {
     return { Color::black() };
 }
 
-DataDrivenPropertyValue<Color> CircleLayer::getCircleStrokeColor() const {
+PropertyValue<Color> CircleLayer::getCircleStrokeColor() const {
     return impl().paint.template get<CircleStrokeColor>().value;
 }
 
-void CircleLayer::setCircleStrokeColor(DataDrivenPropertyValue<Color> value) {
+void CircleLayer::setCircleStrokeColor(PropertyValue<Color> value) {
     if (value == getCircleStrokeColor())
         return;
     auto impl_ = mutableImpl();
@@ -366,15 +366,15 @@ TransitionOptions CircleLayer::getCircleStrokeColorTransition() const {
     return impl().paint.template get<CircleStrokeColor>().options;
 }
 
-DataDrivenPropertyValue<float> CircleLayer::getDefaultCircleStrokeOpacity() {
+PropertyValue<float> CircleLayer::getDefaultCircleStrokeOpacity() {
     return { 1 };
 }
 
-DataDrivenPropertyValue<float> CircleLayer::getCircleStrokeOpacity() const {
+PropertyValue<float> CircleLayer::getCircleStrokeOpacity() const {
     return impl().paint.template get<CircleStrokeOpacity>().value;
 }
 
-void CircleLayer::setCircleStrokeOpacity(DataDrivenPropertyValue<float> value) {
+void CircleLayer::setCircleStrokeOpacity(PropertyValue<float> value) {
     if (value == getCircleStrokeOpacity())
         return;
     auto impl_ = mutableImpl();

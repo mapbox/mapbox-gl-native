@@ -88,7 +88,7 @@
 - (void)setHeatmapIntensity:(NSExpression *)heatmapIntensity {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(heatmapIntensity);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(heatmapIntensity, false);
     self.rawLayer->setHeatmapIntensity(mbglValue);
 }
 
@@ -123,7 +123,7 @@
 - (void)setHeatmapOpacity:(NSExpression *)heatmapOpacity {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(heatmapOpacity);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(heatmapOpacity, false);
     self.rawLayer->setHeatmapOpacity(mbglValue);
 }
 
@@ -158,7 +158,7 @@
 - (void)setHeatmapRadius:(NSExpression *)heatmapRadius {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::DataDrivenPropertyValue<float>>(heatmapRadius);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(heatmapRadius, true);
     self.rawLayer->setHeatmapRadius(mbglValue);
 }
 
@@ -193,7 +193,7 @@
 - (void)setHeatmapWeight:(NSExpression *)heatmapWeight {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::DataDrivenPropertyValue<float>>(heatmapWeight);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(heatmapWeight, true);
     self.rawLayer->setHeatmapWeight(mbglValue);
 }
 
