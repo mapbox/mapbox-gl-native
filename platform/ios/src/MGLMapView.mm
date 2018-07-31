@@ -536,6 +536,8 @@ public:
     [self addGestureRecognizer:_twoFingerTap];
 
     _hapticFeedbackEnabled = YES;
+    
+    _altitudeUnaffectedByPitch = NO;
 
     _decelerationRate = MGLMapViewDecelerationRateNormal;
 
@@ -2352,7 +2354,8 @@ public:
     auto camera = _mbglMap->getStyle().getDefaultCamera();
     CGFloat pitch = *camera.pitch;
     CLLocationDirection heading = mbgl::util::wrap(*camera.angle, 0., 360.);
-    CLLocationDistance distance = MGLAltitudeForZoomLevel(*camera.zoom, pitch, 0, self.frame.size);
+    CLLocationDegrees pitchForAltitude = self.altitudeUnaffectedByPitch ? 0.0 : pitch;
+    CLLocationDistance distance = MGLAltitudeForZoomLevel(*camera.zoom, pitchForAltitude, 0, self.frame.size);
     self.camera = [MGLMapCamera cameraLookingAtCenterCoordinate:MGLLocationCoordinate2DFromLatLng(*camera.center)
                                                    fromDistance:distance
                                                           pitch:pitch
@@ -3374,6 +3377,12 @@ public:
     self.cameraChangeReasonBitmask &= ~MGLCameraChangeReasonTransitionCancelled;
 }
 
+- (void)jumpToCamera:(MGLMapCamera *)camera edgePadding:(UIEdgeInsets)insets
+{
+    mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:insets];
+    _mbglMap->jumpTo(options);
+}
+
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds
 {
     return [self cameraThatFitsCoordinateBounds:bounds edgePadding:UIEdgeInsetsZero];
@@ -3428,7 +3437,8 @@ public:
     double zoomLevel = cameraOptions.zoom ? *cameraOptions.zoom : self.zoomLevel;
     CLLocationDirection direction = cameraOptions.angle ? mbgl::util::wrap(-MGLDegreesFromRadians(*cameraOptions.angle), 0., 360.) : self.direction;
     CGFloat pitch = cameraOptions.pitch ? MGLDegreesFromRadians(*cameraOptions.pitch) : _mbglMap->getPitch();
-    CLLocationDistance altitude = MGLAltitudeForZoomLevel(zoomLevel, pitch, centerCoordinate.latitude, self.frame.size);
+    CLLocationDegrees pitchForAltitude = self.altitudeUnaffectedByPitch ? 0.0 : pitch;
+    CLLocationDistance altitude = MGLAltitudeForZoomLevel(zoomLevel, pitchForAltitude, centerCoordinate.latitude, self.frame.size);
     return [MGLMapCamera cameraLookingAtCenterCoordinate:centerCoordinate fromDistance:altitude pitch:pitch heading:direction];
 }
 
@@ -3442,7 +3452,8 @@ public:
         options.center = MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate);
     }
     options.padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
-    options.zoom = MGLZoomLevelForAltitude(camera.altitude, camera.pitch,
+    CLLocationDegrees pitch = (self.altitudeUnaffectedByPitch) ? 0.0 : camera.pitch;
+    options.zoom = MGLZoomLevelForAltitude(camera.altitude, pitch,
                                            camera.centerCoordinate.latitude,
                                            self.frame.size);
     if (camera.heading >= 0)
@@ -5144,10 +5155,11 @@ public:
     MGLMapCamera *camera = self.camera;
     camera.centerCoordinate = self.userLocation.location.coordinate;
     camera.heading = self.directionByFollowingWithCourse;
+    CLLocationDegrees pitch = (self.altitudeUnaffectedByPitch) ? 0.0 : camera.pitch;
     if (self.zoomLevel < MGLMinimumZoomLevelForUserTracking)
     {
         camera.altitude = MGLAltitudeForZoomLevel(MGLDefaultZoomLevelForUserTracking,
-                                                  camera.pitch,
+                                                  pitch,
                                                   camera.centerCoordinate.latitude,
                                                   self.frame.size);
     }
