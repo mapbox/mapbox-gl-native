@@ -303,9 +303,8 @@ MGL_EXPORT IB_DESIGNABLE
  To receive the current user location, implement the `-[MGLMapViewDelegate mapView:didUpdateUserLocation:]`
  and `-[MGLMapViewDelegate mapView:didFailToLocateUserWithError:]` methods.
  
- If setting this property to `nil` and setting `showsUserLocation` to `YES`, or
- if no custom manager is provided this property is set to the default
- location manager.
+ If setting this property to `nil` or if no custom manager is provided this property
+ is set to the default location manager.
  
  `MGLMapView` uses a default location manager. If you want to substitute your own
  location manager, you should do so by setting this property before setting
