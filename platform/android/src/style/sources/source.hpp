@@ -35,9 +35,11 @@ public:
 
     virtual ~Source();
 
-    void addToMap(JNIEnv&, jni::Object<Source>, mbgl::Map&, AndroidRendererFrontend&);
+    virtual void addToMap(JNIEnv&, jni::Object<Source>, mbgl::Map&, AndroidRendererFrontend&);
 
-    void removeFromMap(JNIEnv&, jni::Object<Source>, mbgl::Map&);
+    virtual bool removeFromMap(JNIEnv&, jni::Object<Source>, mbgl::Map&);
+
+    void releaseJavaPeer();
 
     jni::String getId(jni::JNIEnv&);
 

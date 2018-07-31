@@ -30,11 +30,15 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
  */
 public class GridSourceActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-  private static final String ID_GRID_SOURCE = "grid_source";
-  private static final String ID_GRID_LAYER = "grid_layer";
+  public static final String ID_GRID_SOURCE = "grid_source";
+  public static final String ID_GRID_LAYER = "grid_layer";
 
   private MapView mapView;
   private MapboxMap mapboxMap;
+
+  // public for testing purposes
+  public CustomGeometrySource source;
+  public LineLayer layer;
 
   /**
    * Implementation of GeometryTileProvider that returns features representing a zoom-dependent
@@ -101,11 +105,11 @@ public class GridSourceActivity extends AppCompatActivity implements OnMapReadyC
     mapboxMap = map;
 
     // add source
-    CustomGeometrySource source = new CustomGeometrySource(ID_GRID_SOURCE, new GridProvider());
+    source = new CustomGeometrySource(ID_GRID_SOURCE, new GridProvider());
     mapboxMap.addSource(source);
 
     // add layer
-    LineLayer layer = new LineLayer(ID_GRID_LAYER, ID_GRID_SOURCE);
+    layer = new LineLayer(ID_GRID_LAYER, ID_GRID_SOURCE);
     layer.setProperties(
       lineColor(Color.parseColor("#000000"))
     );
