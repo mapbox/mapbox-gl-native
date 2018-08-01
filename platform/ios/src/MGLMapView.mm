@@ -240,6 +240,9 @@ public:
 @property (nonatomic) MGLUserLocation *userLocation;
 @property (nonatomic) NSMutableDictionary<NSString *, NSMutableArray<MGLAnnotationView *> *> *annotationViewReuseQueueByIdentifier;
 
+/// A Boolean value that determines whether the updating pitch will also affect the altitude.
+@property(nonatomic, getter=isCameraAltitudeAffectedByPitch) BOOL cameraAltitudeAffectedByPitch;
+
 @end
 
 @implementation MGLMapView

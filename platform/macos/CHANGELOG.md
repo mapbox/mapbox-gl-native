@@ -7,6 +7,10 @@
 * Token string syntax (`"{token}"`) in `MGLSymbolStyleLayer` `text` and `iconImageName` properties is now correctly converted to the appropriate `NSExpression` equivalent. ([#11659](https://github.com/mapbox/mapbox-gl-native/issues/11659))
 * Fixed a crash when switching between two styles having layers with the same identifier but different layer types. ([#12432](https://github.com/mapbox/mapbox-gl-native/issues/12432))
 
+## Other changes
+
+* Added a new method `-[MGLMapView setCamera:edgePadding:]` that sets the camera with arbitrary insets. ([#12518](https://github.com/mapbox/mapbox-gl-native/pull/12518))
+
 # 0.9.0 - July 18, 2018
 
 ## Styles and rendering
