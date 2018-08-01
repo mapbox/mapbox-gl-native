@@ -251,7 +251,7 @@ public:
 @property (nonatomic) CFTimeInterval averageFrameTime;
 
 /// A Boolean value that determines whether the updating pitch will also affect the altitude.
-@property(nonatomic, getter=isCameraAltitudeAffectedByPitch) BOOL cameraAltitudeAffectedByPitch;
+@property (nonatomic, getter=isCameraAltitudeAffectedByPitch) BOOL cameraAltitudeAffectedByPitch;
 
 @end
 
