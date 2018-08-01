@@ -2,6 +2,15 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.4.0-alpha.2 - August 1, 2018
+ - Compress shader source code [#12477](https://github.com/mapbox/mapbox-gl-native/pull/12477)
+ - Add minimal touch target to marker click detection [#12482](https://github.com/mapbox/mapbox-gl-native/pull/12482)
+ - Improve resulting APK size by using @Keep annotation [#12490](https://github.com/mapbox/mapbox-gl-native/pull/12490)
+ - Reuse Bitmap, Paint & Canvas instances in LocalGlyphRasterizer [#12488](https://github.com/mapbox/mapbox-gl-native/pull/12488)
+ - Remove black surface during map start up [#12377](https://github.com/mapbox/mapbox-gl-native/pull/12377)
+ - Corrected VisibleRegion on rotated map [#12255](https://github.com/mapbox/mapbox-gl-native/pull/12255)
+ - Tweak conversions to reduce binary size [#12511](https://github.com/mapbox/mapbox-gl-native/pull/12511)
+
 ## 6.4.0-alpha.1 - July 25, 2018
  - Validate if gesture detector is able to handle gesture [#12375](https://github.com/mapbox/mapbox-gl-native/pull/12375)
  - Add a convenience method to check whether the map is in a destroyed state, MapView#isDestroyed [#12373](https://github.com/mapbox/mapbox-gl-native/pull/12373)
