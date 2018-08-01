@@ -250,6 +250,9 @@ public:
 @property (nonatomic) CFTimeInterval frameTime;
 @property (nonatomic) CFTimeInterval averageFrameTime;
 
+/// A Boolean value that determines whether the updating pitch will also affect the altitude.
+@property(nonatomic, getter=isCameraAltitudeAffectedByPitch) BOOL cameraAltitudeAffectedByPitch;
+
 @end
 
 @implementation MGLMapView
