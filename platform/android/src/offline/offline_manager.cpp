@@ -195,7 +195,10 @@ void OfflineManager::registerNative(jni::JNIEnv& env) {
         "finalize",
         METHOD(&OfflineManager::setOfflineMapboxTileCountLimit, "setOfflineMapboxTileCountLimit"),
         METHOD(&OfflineManager::listOfflineRegions, "listOfflineRegions"),
-        METHOD(&OfflineManager::createOfflineRegion, "createOfflineRegion"));
+        METHOD(&OfflineManager::createOfflineRegion, "createOfflineRegion"),
+        METHOD(&OfflineManager::putResourceWithUrl, "putResourceWithUrl"),
+        METHOD(&OfflineManager::putTileWithUrlTemplate, "putTileWithUrlTemplate"),
+        METHOD(&OfflineManager::commitResourcesForPack, "commitResourcesForPack"));
 }
 
 // OfflineManager::ListOfflineRegionsCallback //
