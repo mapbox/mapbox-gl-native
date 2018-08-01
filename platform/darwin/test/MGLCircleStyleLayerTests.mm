@@ -57,7 +57,7 @@
 
         NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.circleBlur = constantExpression;
-        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 1.0 };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getCircleBlur(), propertyValue,
                        @"Setting circleBlur to a constant value expression should update circle-blur.");
         XCTAssertEqualObjects(layer.circleBlur, constantExpression,
@@ -104,7 +104,7 @@
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(1.0)))
             );
         }
-        
+
         XCTAssertEqual(rawLayer->getCircleBlur(), propertyValue,
                        @"Setting circleBlur to a camera-data expression should update circle-blur.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
@@ -135,7 +135,7 @@
 
         NSExpression *constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
         layer.circleColor = constantExpression;
-        mbgl::style::DataDrivenPropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
+        mbgl::style::PropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
         XCTAssertEqual(rawLayer->getCircleColor(), propertyValue,
                        @"Setting circleColor to a constant value expression should update circle-color.");
         XCTAssertEqualObjects(layer.circleColor, constantExpression,
@@ -182,7 +182,7 @@
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(mbgl::Color(1, 0, 0, 1))))
             );
         }
-        
+
         XCTAssertEqual(rawLayer->getCircleColor(), propertyValue,
                        @"Setting circleColor to a camera-data expression should update circle-color.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
@@ -213,7 +213,7 @@
 
         NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.circleOpacity = constantExpression;
-        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 1.0 };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getCircleOpacity(), propertyValue,
                        @"Setting circleOpacity to a constant value expression should update circle-opacity.");
         XCTAssertEqualObjects(layer.circleOpacity, constantExpression,
@@ -260,7 +260,7 @@
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(1.0)))
             );
         }
-        
+
         XCTAssertEqual(rawLayer->getCircleOpacity(), propertyValue,
                        @"Setting circleOpacity to a camera-data expression should update circle-opacity.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
@@ -335,7 +335,7 @@
 
         NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.circleRadius = constantExpression;
-        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 1.0 };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getCircleRadius(), propertyValue,
                        @"Setting circleRadius to a constant value expression should update circle-radius.");
         XCTAssertEqualObjects(layer.circleRadius, constantExpression,
@@ -382,7 +382,7 @@
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(1.0)))
             );
         }
-        
+
         XCTAssertEqual(rawLayer->getCircleRadius(), propertyValue,
                        @"Setting circleRadius to a camera-data expression should update circle-radius.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
@@ -457,7 +457,7 @@
 
         NSExpression *constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
         layer.circleStrokeColor = constantExpression;
-        mbgl::style::DataDrivenPropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
+        mbgl::style::PropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
         XCTAssertEqual(rawLayer->getCircleStrokeColor(), propertyValue,
                        @"Setting circleStrokeColor to a constant value expression should update circle-stroke-color.");
         XCTAssertEqualObjects(layer.circleStrokeColor, constantExpression,
@@ -504,7 +504,7 @@
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(mbgl::Color(1, 0, 0, 1))))
             );
         }
-        
+
         XCTAssertEqual(rawLayer->getCircleStrokeColor(), propertyValue,
                        @"Setting circleStrokeColor to a camera-data expression should update circle-stroke-color.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
@@ -535,7 +535,7 @@
 
         NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.circleStrokeOpacity = constantExpression;
-        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 1.0 };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getCircleStrokeOpacity(), propertyValue,
                        @"Setting circleStrokeOpacity to a constant value expression should update circle-stroke-opacity.");
         XCTAssertEqualObjects(layer.circleStrokeOpacity, constantExpression,
@@ -582,7 +582,7 @@
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(1.0)))
             );
         }
-        
+
         XCTAssertEqual(rawLayer->getCircleStrokeOpacity(), propertyValue,
                        @"Setting circleStrokeOpacity to a camera-data expression should update circle-stroke-opacity.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
@@ -613,7 +613,7 @@
 
         NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.circleStrokeWidth = constantExpression;
-        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 1.0 };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getCircleStrokeWidth(), propertyValue,
                        @"Setting circleStrokeWidth to a constant value expression should update circle-stroke-width.");
         XCTAssertEqualObjects(layer.circleStrokeWidth, constantExpression,
@@ -660,7 +660,7 @@
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(1.0)))
             );
         }
-        
+
         XCTAssertEqual(rawLayer->getCircleStrokeWidth(), propertyValue,
                        @"Setting circleStrokeWidth to a camera-data expression should update circle-stroke-width.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];

@@ -4,7 +4,7 @@
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/data_driven_property_value.hpp>
+#include <mbgl/style/property_value.hpp>
 
 #include <cstdint>
 #include <vector>
@@ -34,35 +34,35 @@ using ShapeAnnotationGeometry = variant<
 class LineAnnotation {
 public:
     LineAnnotation(ShapeAnnotationGeometry geometry_,
-                   style::DataDrivenPropertyValue<float> opacity_ = 1.0f,
-                   style::DataDrivenPropertyValue<float> width_ = 1.0f,
-                   style::DataDrivenPropertyValue<Color> color_ = Color::black())
+                   style::PropertyValue<float> opacity_ = 1.0f,
+                   style::PropertyValue<float> width_ = 1.0f,
+                   style::PropertyValue<Color> color_ = Color::black())
         : geometry(std::move(geometry_)),
           opacity(std::move(opacity_)),
           width(std::move(width_)),
           color(std::move(color_)) {}
 
     ShapeAnnotationGeometry geometry;
-    style::DataDrivenPropertyValue<float> opacity;
-    style::DataDrivenPropertyValue<float> width;
-    style::DataDrivenPropertyValue<Color> color;
+    style::PropertyValue<float> opacity;
+    style::PropertyValue<float> width;
+    style::PropertyValue<Color> color;
 };
 
 class FillAnnotation {
 public:
     FillAnnotation(ShapeAnnotationGeometry geometry_,
-                   style::DataDrivenPropertyValue<float> opacity_ = 1.0f,
-                   style::DataDrivenPropertyValue<Color> color_ = Color::black(),
-                   style::DataDrivenPropertyValue<Color> outlineColor_ = {})
+                   style::PropertyValue<float> opacity_ = 1.0f,
+                   style::PropertyValue<Color> color_ = Color::black(),
+                   style::PropertyValue<Color> outlineColor_ = {})
         : geometry(std::move(geometry_)),
           opacity(std::move(opacity_)),
           color(std::move(color_)),
           outlineColor(std::move(outlineColor_)) {}
 
     ShapeAnnotationGeometry geometry;
-    style::DataDrivenPropertyValue<float> opacity;
-    style::DataDrivenPropertyValue<Color> color;
-    style::DataDrivenPropertyValue<Color> outlineColor;
+    style::PropertyValue<float> opacity;
+    style::PropertyValue<Color> color;
+    style::PropertyValue<Color> outlineColor;
 };
 
 using Annotation = variant<

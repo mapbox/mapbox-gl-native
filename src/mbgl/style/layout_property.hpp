@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/data_driven_property_value.hpp>
 #include <mbgl/renderer/property_evaluator.hpp>
 #include <mbgl/renderer/data_driven_property_evaluator.hpp>
 
@@ -23,7 +22,7 @@ template <class T>
 class DataDrivenLayoutProperty {
 public:
     using TransitionableType = std::nullptr_t;
-    using UnevaluatedType = DataDrivenPropertyValue<T>;
+    using UnevaluatedType = PropertyValue<T>;
     using EvaluatorType = DataDrivenPropertyEvaluator<T>;
     using PossiblyEvaluatedType = PossiblyEvaluatedPropertyValue<T>;
     using Type = T;

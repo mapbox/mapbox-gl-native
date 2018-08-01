@@ -163,7 +163,7 @@
 
         NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.heatmapRadius = constantExpression;
-        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 1.0 };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getHeatmapRadius(), propertyValue,
                        @"Setting heatmapRadius to a constant value expression should update heatmap-radius.");
         XCTAssertEqualObjects(layer.heatmapRadius, constantExpression,
@@ -210,7 +210,7 @@
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(1.0)))
             );
         }
-        
+
         XCTAssertEqual(rawLayer->getHeatmapRadius(), propertyValue,
                        @"Setting heatmapRadius to a camera-data expression should update heatmap-radius.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
@@ -241,7 +241,7 @@
 
         NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.heatmapWeight = constantExpression;
-        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 1.0 };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getHeatmapWeight(), propertyValue,
                        @"Setting heatmapWeight to a constant value expression should update heatmap-weight.");
         XCTAssertEqualObjects(layer.heatmapWeight, constantExpression,
@@ -288,7 +288,7 @@
                 interpolate(linear(), zoom(), 10.0, interpolate(linear(), number(get("keyName")), 18.0, literal(1.0)))
             );
         }
-        
+
         XCTAssertEqual(rawLayer->getHeatmapWeight(), propertyValue,
                        @"Setting heatmapWeight to a camera-data expression should update heatmap-weight.");
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];

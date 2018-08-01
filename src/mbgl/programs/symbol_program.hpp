@@ -92,7 +92,7 @@ struct SymbolOpacityAttributes : gl::Attributes<attributes::a_fade_opacity> {
         };
     }
 };
-    
+
 struct ZoomEvaluatedSize {
     bool isZoomConstant;
     bool isFeatureConstant;
@@ -114,9 +114,9 @@ public:
         uniforms::u_size_t,
         uniforms::u_size>;
     using UniformValues = Uniforms::Values;
-    
+
     static std::unique_ptr<SymbolSizeBinder> create(const float tileZoom,
-                                                    const style::DataDrivenPropertyValue<float>& sizeProperty,
+                                                    const style::PropertyValue<float>& sizeProperty,
                                                     const float defaultValue);
 
     virtual Range<float> getVertexSizeData(const GeometryTileFeature& feature) = 0;
@@ -138,10 +138,10 @@ class ConstantSymbolSizeBinder final : public SymbolSizeBinder {
 public:
     ConstantSymbolSizeBinder(const float /*tileZoom*/, const float& size, const float /*defaultValue*/)
       : layoutSize(size) {}
-    
+
     ConstantSymbolSizeBinder(const float /*tileZoom*/, const style::Undefined&, const float defaultValue)
       : layoutSize(defaultValue) {}
-    
+
     ConstantSymbolSizeBinder(const float tileZoom, const style::PropertyExpression<float>& expression_, const float /*defaultValue*/)
       : layoutSize(expression_.evaluate(tileZoom + 1)),
         expression(expression_) {
@@ -151,9 +151,9 @@ public:
             Range<float> { expression_.evaluate(zoomLevels.min), expression_.evaluate(zoomLevels.max) }
         );
     }
-    
+
     Range<float> getVertexSizeData(const GeometryTileFeature&) override { return { 0.0f, 0.0f }; };
-    
+
     ZoomEvaluatedSize evaluateForZoom(float currentZoom) const override {
         float size = layoutSize;
         bool isZoomConstant = !(coveringRanges || expression);
@@ -177,7 +177,7 @@ public:
         const float unused = 0.0f;
         return { isZoomConstant, true, unused, size, layoutSize };
     }
-    
+
     float layoutSize;
     optional<std::tuple<Range<float>, Range<float>>> coveringRanges;
     optional<style::PropertyExpression<float>> expression;
@@ -188,7 +188,7 @@ public:
     using Vertex = gl::detail::Vertex<gl::Attribute<uint16_t, 1>>;
     using VertexVector = gl::VertexVector<Vertex>;
     using VertexBuffer = gl::VertexBuffer<Vertex>;
-    
+
     SourceFunctionSymbolSizeBinder(const float /*tileZoom*/, style::PropertyExpression<float> expression_, const float defaultValue_)
         : expression(std::move(expression_)),
           defaultValue(defaultValue_) {
@@ -198,19 +198,19 @@ public:
         const float size = expression.evaluate(feature, defaultValue);
         return { size, size };
     };
-    
+
     ZoomEvaluatedSize evaluateForZoom(float) const override {
         const float unused = 0.0f;
         return { true, false, unused, unused, unused };
     }
-    
+
     style::PropertyExpression<float> expression;
     const float defaultValue;
 };
 
 class CompositeFunctionSymbolSizeBinder final : public SymbolSizeBinder {
 public:
-    
+
     CompositeFunctionSymbolSizeBinder(const float tileZoom, style::PropertyExpression<float> expression_, const float defaultValue_)
         : expression(std::move(expression_)),
           defaultValue(defaultValue_),
@@ -224,7 +224,7 @@ public:
             expression.evaluate(coveringZoomStops.max, feature, defaultValue)
         };
     };
-    
+
     ZoomEvaluatedSize evaluateForZoom(float currentZoom) const override {
         float sizeInterpolationT = util::clamp(
             expression.interpolationFactor(coveringZoomStops, currentZoom),
@@ -234,7 +234,7 @@ public:
         const float unused = 0.0f;
         return { false, false, sizeInterpolationT, unused, unused };
     }
-    
+
     style::PropertyExpression<float> expression;
     const float defaultValue;
     float layoutZoom;
@@ -251,7 +251,7 @@ class SymbolProgram {
 public:
     using LayoutAttributes = LayoutAttrs;
     using LayoutVertex = typename LayoutAttributes::Vertex;
-    
+
     using LayoutAndSizeAttributes = gl::ConcatenateAttributes<LayoutAttributes, gl::ConcatenateAttributes<SymbolDynamicLayoutAttributes, SymbolOpacityAttributes>>;
 
     using PaintProperties = PaintProps;
@@ -421,11 +421,11 @@ public:
             uniforms::u_gamma_scale,
             uniforms::u_is_halo>,
         PaintProperties>;
-    
-    using UniformValues = typename BaseProgram::UniformValues;
-    
 
-    
+    using UniformValues = typename BaseProgram::UniformValues;
+
+
+
     using BaseProgram::BaseProgram;
 
     static UniformValues uniformValues(const bool isText,

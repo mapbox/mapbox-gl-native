@@ -79,6 +79,21 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
     MGLUserTrackingModeFollowWithCourse,
 };
 
+/** Options for `MGLMapView.preferredFramesPerSecond`. */
+typedef NSInteger MGLMapViewPreferredFramesPerSecond NS_TYPED_EXTENSIBLE_ENUM;
+
+/**
+ The default frame rate. This can be either 30 FPS or 60 FPS, depending on
+ device capabilities.
+ */
+FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondDefault;
+
+/** A conservative frame rate; typically 30 FPS. */
+FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondLowPower;
+
+/** The maximum supported frame rate; typically 60 FPS. */
+FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondMaximum;
+
 /**
  An interactive, customizable map view with an interface similar to the one
  provided by Apple’s MapKit.
@@ -285,6 +300,21 @@ MGL_EXPORT IB_DESIGNABLE
  attribution button, you should add this action to the button.
  */
 - (IBAction)showAttribution:(id)sender;
+
+/**
+ The preferred frame rate at which the map view is rendered.
+
+ The default value for this property is
+ `MGLMapViewPreferredFramesPerSecondDefault`, which will adaptively set the
+ preferred frame rate based on the capability of the user’s device to maintain
+ a smooth experience.
+
+ In addition to the provided `MGLMapViewPreferredFramesPerSecond` options, this
+ property can be set to arbitrary integer values.
+
+ @see `CADisplayLink.preferredFramesPerSecond`
+ */
+@property (nonatomic, assign) MGLMapViewPreferredFramesPerSecond preferredFramesPerSecond;
 
 @property (nonatomic) NSArray<NSString *> *styleClasses __attribute__((unavailable("Support for style classes has been removed.")));
 

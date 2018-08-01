@@ -123,15 +123,15 @@ TransitionOptions FillExtrusionLayer::getFillExtrusionOpacityTransition() const 
     return impl().paint.template get<FillExtrusionOpacity>().options;
 }
 
-DataDrivenPropertyValue<Color> FillExtrusionLayer::getDefaultFillExtrusionColor() {
+PropertyValue<Color> FillExtrusionLayer::getDefaultFillExtrusionColor() {
     return { Color::black() };
 }
 
-DataDrivenPropertyValue<Color> FillExtrusionLayer::getFillExtrusionColor() const {
+PropertyValue<Color> FillExtrusionLayer::getFillExtrusionColor() const {
     return impl().paint.template get<FillExtrusionColor>().value;
 }
 
-void FillExtrusionLayer::setFillExtrusionColor(DataDrivenPropertyValue<Color> value) {
+void FillExtrusionLayer::setFillExtrusionColor(PropertyValue<Color> value) {
     if (value == getFillExtrusionColor())
         return;
     auto impl_ = mutableImpl();
@@ -231,15 +231,15 @@ TransitionOptions FillExtrusionLayer::getFillExtrusionPatternTransition() const 
     return impl().paint.template get<FillExtrusionPattern>().options;
 }
 
-DataDrivenPropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionHeight() {
+PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionHeight() {
     return { 0 };
 }
 
-DataDrivenPropertyValue<float> FillExtrusionLayer::getFillExtrusionHeight() const {
+PropertyValue<float> FillExtrusionLayer::getFillExtrusionHeight() const {
     return impl().paint.template get<FillExtrusionHeight>().value;
 }
 
-void FillExtrusionLayer::setFillExtrusionHeight(DataDrivenPropertyValue<float> value) {
+void FillExtrusionLayer::setFillExtrusionHeight(PropertyValue<float> value) {
     if (value == getFillExtrusionHeight())
         return;
     auto impl_ = mutableImpl();
@@ -258,15 +258,15 @@ TransitionOptions FillExtrusionLayer::getFillExtrusionHeightTransition() const {
     return impl().paint.template get<FillExtrusionHeight>().options;
 }
 
-DataDrivenPropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionBase() {
+PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionBase() {
     return { 0 };
 }
 
-DataDrivenPropertyValue<float> FillExtrusionLayer::getFillExtrusionBase() const {
+PropertyValue<float> FillExtrusionLayer::getFillExtrusionBase() const {
     return impl().paint.template get<FillExtrusionBase>().value;
 }
 
-void FillExtrusionLayer::setFillExtrusionBase(DataDrivenPropertyValue<float> value) {
+void FillExtrusionLayer::setFillExtrusionBase(PropertyValue<float> value) {
     if (value == getFillExtrusionBase())
         return;
     auto impl_ = mutableImpl();

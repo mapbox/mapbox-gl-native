@@ -51,7 +51,7 @@ namespace mbgl {
 - (void)setHillshadeAccentColor:(NSExpression *)hillshadeAccentColor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(hillshadeAccentColor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(hillshadeAccentColor, false);
     self.rawLayer->setHillshadeAccentColor(mbglValue);
 }
 
@@ -86,7 +86,7 @@ namespace mbgl {
 - (void)setHillshadeExaggeration:(NSExpression *)hillshadeExaggeration {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(hillshadeExaggeration);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(hillshadeExaggeration, false);
     self.rawLayer->setHillshadeExaggeration(mbglValue);
 }
 
@@ -121,7 +121,7 @@ namespace mbgl {
 - (void)setHillshadeHighlightColor:(NSExpression *)hillshadeHighlightColor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(hillshadeHighlightColor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(hillshadeHighlightColor, false);
     self.rawLayer->setHillshadeHighlightColor(mbglValue);
 }
 
@@ -156,7 +156,7 @@ namespace mbgl {
 - (void)setHillshadeIlluminationAnchor:(NSExpression *)hillshadeIlluminationAnchor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::HillshadeIlluminationAnchorType, NSValue *, mbgl::style::HillshadeIlluminationAnchorType, MGLHillshadeIlluminationAnchor>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::HillshadeIlluminationAnchorType>>(hillshadeIlluminationAnchor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::HillshadeIlluminationAnchorType, NSValue *, mbgl::style::HillshadeIlluminationAnchorType, MGLHillshadeIlluminationAnchor>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::HillshadeIlluminationAnchorType>>(hillshadeIlluminationAnchor, false);
     self.rawLayer->setHillshadeIlluminationAnchor(mbglValue);
 }
 
@@ -173,7 +173,7 @@ namespace mbgl {
 - (void)setHillshadeIlluminationDirection:(NSExpression *)hillshadeIlluminationDirection {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(hillshadeIlluminationDirection);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(hillshadeIlluminationDirection, false);
     self.rawLayer->setHillshadeIlluminationDirection(mbglValue);
 }
 
@@ -190,7 +190,7 @@ namespace mbgl {
 - (void)setHillshadeShadowColor:(NSExpression *)hillshadeShadowColor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(hillshadeShadowColor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(hillshadeShadowColor, false);
     self.rawLayer->setHillshadeShadowColor(mbglValue);
 }
 

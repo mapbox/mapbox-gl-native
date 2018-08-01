@@ -123,15 +123,15 @@ TransitionOptions FillLayer::getFillAntialiasTransition() const {
     return impl().paint.template get<FillAntialias>().options;
 }
 
-DataDrivenPropertyValue<float> FillLayer::getDefaultFillOpacity() {
+PropertyValue<float> FillLayer::getDefaultFillOpacity() {
     return { 1 };
 }
 
-DataDrivenPropertyValue<float> FillLayer::getFillOpacity() const {
+PropertyValue<float> FillLayer::getFillOpacity() const {
     return impl().paint.template get<FillOpacity>().value;
 }
 
-void FillLayer::setFillOpacity(DataDrivenPropertyValue<float> value) {
+void FillLayer::setFillOpacity(PropertyValue<float> value) {
     if (value == getFillOpacity())
         return;
     auto impl_ = mutableImpl();
@@ -150,15 +150,15 @@ TransitionOptions FillLayer::getFillOpacityTransition() const {
     return impl().paint.template get<FillOpacity>().options;
 }
 
-DataDrivenPropertyValue<Color> FillLayer::getDefaultFillColor() {
+PropertyValue<Color> FillLayer::getDefaultFillColor() {
     return { Color::black() };
 }
 
-DataDrivenPropertyValue<Color> FillLayer::getFillColor() const {
+PropertyValue<Color> FillLayer::getFillColor() const {
     return impl().paint.template get<FillColor>().value;
 }
 
-void FillLayer::setFillColor(DataDrivenPropertyValue<Color> value) {
+void FillLayer::setFillColor(PropertyValue<Color> value) {
     if (value == getFillColor())
         return;
     auto impl_ = mutableImpl();
@@ -177,15 +177,15 @@ TransitionOptions FillLayer::getFillColorTransition() const {
     return impl().paint.template get<FillColor>().options;
 }
 
-DataDrivenPropertyValue<Color> FillLayer::getDefaultFillOutlineColor() {
+PropertyValue<Color> FillLayer::getDefaultFillOutlineColor() {
     return { {} };
 }
 
-DataDrivenPropertyValue<Color> FillLayer::getFillOutlineColor() const {
+PropertyValue<Color> FillLayer::getFillOutlineColor() const {
     return impl().paint.template get<FillOutlineColor>().value;
 }
 
-void FillLayer::setFillOutlineColor(DataDrivenPropertyValue<Color> value) {
+void FillLayer::setFillOutlineColor(PropertyValue<Color> value) {
     if (value == getFillOutlineColor())
         return;
     auto impl_ = mutableImpl();

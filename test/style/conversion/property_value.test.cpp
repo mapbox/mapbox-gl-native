@@ -14,7 +14,7 @@ TEST(StyleConversion, PropertyValue) {
     JSDocument doc;
     doc.Parse<0>(R"(["literal", [1, 2]])");
     auto expected = std::array<float, 2>{{1, 2}};
-    auto result = convert<PropertyValue<std::array<float, 2>>>(doc, error);
+    auto result = convert<PropertyValue<std::array<float, 2>>>(doc, error, false, false);
     ASSERT_TRUE(result);
     ASSERT_TRUE(result->isConstant());
     ASSERT_EQ(result->asConstant(), expected);

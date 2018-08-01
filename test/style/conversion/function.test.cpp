@@ -3,7 +3,6 @@
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
-#include <mbgl/style/conversion/data_driven_property_value.hpp>
 #include <mbgl/style/expression/dsl.hpp>
 
 using namespace mbgl;
@@ -14,7 +13,7 @@ TEST(StyleConversion, Function) {
     Error error;
 
     auto parseFunction = [&](const std::string& json) {
-        return convertJSON<PropertyValue<float>>(json, error);
+        return convertJSON<PropertyValue<float>>(json, error, false, false);
     };
 
     auto fn1 = parseFunction(R"({"stops":[]})");
@@ -57,12 +56,12 @@ TEST(StyleConversion, CompositeFunctionExpression) {
     Error error;
 
     auto parseFunction = [&](const std::string& json) {
-        return convertJSON<DataDrivenPropertyValue<float>>(json, error, false);
+        return convertJSON<PropertyValue<float>>(json, error, true, false);
     };
 
     auto fn1 = parseFunction(R"(["interpolate", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10])");
     ASSERT_TRUE(fn1);
-    
+
     auto fn2 = parseFunction(R"(["coalesce", ["interpolate", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10], 0])");
     ASSERT_TRUE(fn2);
 
