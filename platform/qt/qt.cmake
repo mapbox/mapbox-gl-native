@@ -79,6 +79,7 @@ add_library(qmapboxgl SHARED
 
 target_include_directories(qmapboxgl
     PUBLIC platform/qt/include
+    PRIVATE src
 )
 
 target_compile_definitions(qmapboxgl

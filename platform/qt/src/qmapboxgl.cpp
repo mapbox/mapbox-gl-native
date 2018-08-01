@@ -27,6 +27,7 @@
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/image.hpp>
@@ -38,6 +39,7 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/projection.hpp>
+#include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/traits.hpp>
@@ -60,7 +62,9 @@
 #include <QVariantMap>
 #include <QColor>
 
+#include <functional>
 #include <memory>
+#include <sstream>
 
 using namespace QMapbox;
 
@@ -977,6 +981,10 @@ void QMapboxGL::removeAnnotation(QMapbox::AnnotationID id)
     as defined by the \l {https://www.mapbox.com/mapbox-gl-style-spec/} {Mapbox style specification}
     for layout properties. Returns true if the operation succeeds, and false otherwise.
 
+    The implementation attempts to treat \a value as a JSON string, if the
+    QVariant inner type is a string. If not a valid JSON string, then it'll
+    proceed with the mapping described below.
+
     This example hides the layer \c route:
 
     \code
@@ -1007,29 +1015,19 @@ void QMapboxGL::removeAnnotation(QMapbox::AnnotationID id)
         \li QVariantList
     \endtable
 */
-bool QMapboxGL::setLayoutProperty(const QString& layer, const QString& property_, const QVariant& value)
+bool QMapboxGL::setLayoutProperty(const QString& layer, const QString& propertyName, const QVariant& value)
 {
-    using namespace mbgl::style;
-
-    Layer* layer_ = d_ptr->mapObj->getStyle().getLayer(layer.toStdString());
-    if (!layer_) {
-        qWarning() << "Layer not found:" << layer;
-        return false;
-    }
-
-    auto result = conversion::setLayoutProperty(*layer_, property_.toStdString(), value);
-    if (result) {
-        qWarning() << "Error setting layout property" << property_ << "on layer" << layer << ":" << QString::fromStdString(result->message);
-        return false;
-    }
-
-    return true;
+    return d_ptr->setProperty(&mbgl::style::conversion::setLayoutProperty, layer, propertyName, value);
 }
 
 /*!
     Sets a paint \a property_ \a value to an existing \a layer. The \a property_ string can be any
     as defined by the \l {https://www.mapbox.com/mapbox-gl-style-spec/} {Mapbox style specification}
     for paint properties. Returns true if the operation succeeds, and false otherwise.
+
+    The implementation attempts to treat \a value as a JSON string, if the
+    QVariant inner type is a string. If not a valid JSON string, then it'll
+    proceed with the mapping described below.
 
     For paint properties that take a color as \a value, such as \c fill-color, a string such as
     \c blue can be passed or a QColor.
@@ -1076,23 +1074,10 @@ bool QMapboxGL::setLayoutProperty(const QString& layer, const QString& property_
         map->setPaintProperty("route","line-dasharray", lineDashArray);
     \endcode
 */
-bool QMapboxGL::setPaintProperty(const QString& layer, const QString& property_, const QVariant& value)
+
+bool QMapboxGL::setPaintProperty(const QString& layer, const QString& propertyName, const QVariant& value)
 {
-    using namespace mbgl::style;
-
-    Layer* layer_ = d_ptr->mapObj->getStyle().getLayer(layer.toStdString());
-    if (!layer_) {
-        qWarning() << "Layer not found:" << layer;
-        return false;
-    }
-
-    auto result = conversion::setPaintProperty(*layer_, property_.toStdString(), value);
-    if (result) {
-        qWarning() << "Error setting paint property" << property_ << "on layer" << layer << ":" << QString::fromStdString(result->message);
-        return false;
-    }
-
-    return true;
+    return d_ptr->setProperty(&mbgl::style::conversion::setPaintProperty, layer, propertyName, value);
 }
 
 /*!
@@ -1916,4 +1901,39 @@ void QMapboxGLPrivate::requestRendering()
     if (!m_renderQueued.test_and_set()) {
         emit needsRendering();
     }
+}
+
+bool QMapboxGLPrivate::setProperty(const PropertySetter& setter, const QString& layer, const QString& name, const QVariant& value) {
+    using namespace mbgl::style;
+
+    Layer* layerObject = mapObj->getStyle().getLayer(layer.toStdString());
+    if (!layerObject) {
+        qWarning() << "Layer not found:" << layer;
+        return false;
+    }
+
+    const std::string& propertyString = name.toStdString();
+
+    mbgl::optional<conversion::Error> result;
+
+    if (value.type() == QVariant::String) {
+        mbgl::JSDocument document;
+        document.Parse<0>(value.toString().toStdString());
+        if (!document.HasParseError()) {
+            // Treat value as a valid JSON.
+            const mbgl::JSValue* jsonValue = &document;
+            result = setter(*layerObject, propertyString, jsonValue);
+        } else {
+            result = setter(*layerObject, propertyString, value);
+        }
+    } else {
+        result = setter(*layerObject, propertyString, value);
+    }
+
+    if (result) {
+        qWarning() << "Error setting paint property" << name << "on layer" << layer << ":" << QString::fromStdString(result->message);
+        return false;
+    }
+
+    return true;
 }
