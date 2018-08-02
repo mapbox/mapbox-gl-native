@@ -267,10 +267,6 @@ ParseResult parseComparison(const Convertible& value, ParsingContext& ctx) {
         return ParseResult(std::make_unique<CollatorComparison>(op, std::move(*lhs), std::move(*rhs), std::move(*collatorParseResult)));
     }
     
-    bool (*compare) (Value, Value);
-    if (op == "==") compare = eq;
-    else if (op == "!=") compare = neq;
-
     return ParseResult(std::make_unique<BasicComparison>(op, std::move(*lhs), std::move(*rhs)));
 }
 

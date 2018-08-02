@@ -15,12 +15,12 @@ ParseResult parseComparison(const mbgl::style::conversion::Convertible&, Parsing
 
 class BasicComparison : public Expression {
 public:
+    using CompareFunctionType = bool (*) (Value, Value);
+
     BasicComparison(
         std::string op,
         std::unique_ptr<Expression> lhs,
         std::unique_ptr<Expression> rhs);
-
-    typedef bool (*CompareFunctionType) (Value, Value);
 
     void eachChild(const std::function<void(const Expression&)>& visit) const override;
     bool operator==(const Expression&) const override;
@@ -38,7 +38,7 @@ private:
 
 class CollatorComparison : public Expression {
 public:
-    typedef bool (*CompareFunctionType) (std::string, std::string, Collator);
+    using CompareFunctionType = bool (*) (std::string, std::string, Collator);
 
     CollatorComparison(
         std::string op,
