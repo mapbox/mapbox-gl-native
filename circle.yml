@@ -301,7 +301,7 @@ step-library:
 jobs:
   nitpick:
     docker:
-      - image: mbgl/7d2403f42e:linux-clang-4
+      - image: mbgl/80dbb7f452:linux-clang-4
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -344,7 +344,7 @@ jobs:
 # ------------------------------------------------------------------------------
   clang-tidy:
     docker:
-      - image: mbgl/7d2403f42e:linux-clang-3.9
+      - image: mbgl/80dbb7f452:linux-clang-3.9
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -375,7 +375,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-debug-arm-v7:
     docker:
-      - image: mbgl/feb0443038:android-ndk-r17
+      - image: mbgl/80dbb7f452:android-ndk-r17
     resource_class: large
     working_directory: /src
     environment:
@@ -472,7 +472,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-gnustl-arm-v7:
     docker:
-      - image: mbgl/feb0443038:android-ndk-r17
+      - image: mbgl/80dbb7f452:android-ndk-r17
     resource_class: large
     working_directory: /src
     environment:
@@ -552,7 +552,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-release:
     docker:
-      - image: mbgl/feb0443038:android-ndk-r17
+      - image: mbgl/80dbb7f452:android-ndk-r17
     resource_class: large
     working_directory: /src
     environment:
@@ -629,7 +629,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node-clang39-release:
     docker:
-      - image: mbgl/7d2403f42e:linux-clang-3.9
+      - image: mbgl/80dbb7f452:linux-clang-3.9
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -658,7 +658,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node-gcc6-debug:
     docker:
-      - image: mbgl/7d2403f42e:linux-gcc-6
+      - image: mbgl/80dbb7f452:linux-gcc-6
     resource_class: large
     working_directory: /src
     environment:
@@ -716,7 +716,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-clang-3.8-libcxx-debug:
     docker:
-      - image: mbgl/7d2403f42e:linux-clang-3.8-libcxx
+      - image: mbgl/80dbb7f452:linux-clang-3.8-libcxx
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -742,7 +742,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-clang4-sanitize-address:
     docker:
-      - image: mbgl/7d2403f42e:linux-clang-4
+      - image: mbgl/80dbb7f452:linux-clang-4
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -778,7 +778,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-clang4-sanitize-undefined:
     docker:
-      - image: mbgl/7d2403f42e:linux-clang-4
+      - image: mbgl/80dbb7f452:linux-clang-4
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -814,7 +814,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-clang4-sanitize-thread:
     docker:
-      - image: mbgl/7d2403f42e:linux-clang-4
+      - image: mbgl/80dbb7f452:linux-clang-4
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -850,7 +850,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-gcc4.9-debug:
     docker:
-      - image: mbgl/7d2403f42e:linux-gcc-4.9
+      - image: mbgl/80dbb7f452:linux-gcc-4.9
     resource_class: large
     working_directory: /src
     environment:
@@ -881,7 +881,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-gcc5-debug-coverage:
     docker:
-      - image: mbgl/7d2403f42e:linux-gcc-5
+      - image: mbgl/80dbb7f452:linux-gcc-5
     resource_class: large
     working_directory: /src
     environment:
@@ -1160,7 +1160,7 @@ jobs:
 # ------------------------------------------------------------------------------
   qt4-linux-gcc5-release:
     docker:
-      - image: mbgl/7d2403f42e:linux-gcc-5-qt-4
+      - image: mbgl/80dbb7f452:linux-gcc-5-qt-4
     resource_class: large
     working_directory: /src
     environment:
@@ -1194,7 +1194,7 @@ jobs:
 # ------------------------------------------------------------------------------
   qt5-linux-gcc5-release:
     docker:
-      - image: mbgl/7d2403f42e:linux-gcc-5-qt-5.9
+      - image: mbgl/80dbb7f452:linux-gcc-5-qt-5.9
     resource_class: large
     working_directory: /src
     environment:
