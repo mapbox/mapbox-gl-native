@@ -457,9 +457,9 @@ set(MBGL_CORE_FILES
     include/mbgl/style/expression/coercion.hpp
     include/mbgl/style/expression/collator.hpp
     include/mbgl/style/expression/collator_expression.hpp
+    include/mbgl/style/expression/comparison.hpp
     include/mbgl/style/expression/compound_expression.hpp
     include/mbgl/style/expression/dsl.hpp
-    include/mbgl/style/expression/equals.hpp
     include/mbgl/style/expression/error.hpp
     include/mbgl/style/expression/expression.hpp
     include/mbgl/style/expression/find_zoom_curve.hpp
@@ -485,9 +485,9 @@ set(MBGL_CORE_FILES
     src/mbgl/style/expression/coalesce.cpp
     src/mbgl/style/expression/coercion.cpp
     src/mbgl/style/expression/collator_expression.cpp
+    src/mbgl/style/expression/comparison.cpp
     src/mbgl/style/expression/compound_expression.cpp
     src/mbgl/style/expression/dsl.cpp
-    src/mbgl/style/expression/equals.cpp
     src/mbgl/style/expression/expression.cpp
     src/mbgl/style/expression/find_zoom_curve.cpp
     src/mbgl/style/expression/get_covering_stops.cpp
