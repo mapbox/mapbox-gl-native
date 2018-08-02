@@ -29,22 +29,32 @@ const payload = {
 const token = jwt.sign(payload, key, {algorithm: 'RS256'});
 github.authenticate({type: 'app', token});
 
-github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATION_ID})
-    .then(({data}) => {
-        github.authenticate({type: 'token', token: data.token});
-        return github.request({
-            method: 'POST',
-            url: '/graphql',
-            headers: {
-                // https://developer.github.com/changes/2018-07-11-graphql-checks-preview/
-                accept: 'application/vnd.github.antiope-preview'
-            },
-            query: `query {
+// Must be in sync with the definition in metrics/binary-size/index.html on the gh-pages branch.
+const platforms = [
+    { 'platform': 'iOS', 'arch': 'armv7' },
+    { 'platform': 'iOS', 'arch': 'arm64' },
+    { 'platform': 'Android', 'arch': 'arm-v7' },
+    { 'platform': 'Android', 'arch': 'arm-v8' },
+    { 'platform': 'Android', 'arch': 'x86' },
+    { 'platform': 'Android', 'arch': 'x86_64' }
+];
+
+const rows = [];
+
+function query(after) {
+    return github.request({
+        method: 'POST',
+        url: '/graphql',
+        headers: {
+            // https://developer.github.com/changes/2018-07-11-graphql-checks-preview/
+            accept: 'application/vnd.github.antiope-preview'
+        },
+        query: `query {
               repository(owner: "mapbox", name: "mapbox-gl-native") {
                 ref(qualifiedName: "master") {
                   target {
                     ... on Commit {
-                      history(first: 100, since: "2018-07-01T00:00:00Z") {
+                      history(first: 100, since: "2018-07-01T00:00:00Z" ${after ? `, after: "${after}"` : ''}) {
                         pageInfo {
                           hasNextPage
                           endCursor
@@ -73,46 +83,38 @@ github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATIO
                 }
               }
             }`
-        }).then((result) => {
-            // Must be in sync with the definition in metrics/binary-size/index.html on the gh-pages branch.
-            const platforms = [
-                { 'platform': 'iOS', 'arch': 'armv7' },
-                { 'platform': 'iOS', 'arch': 'arm64' },
-                { 'platform': 'Android', 'arch': 'arm-v7' },
-                { 'platform': 'Android', 'arch': 'arm-v8' },
-                { 'platform': 'Android', 'arch': 'x86' },
-                { 'platform': 'Android', 'arch': 'x86_64' }
-            ];
+    }).then((result) => {
+        const history = result.data.data.repository.ref.target.history;
 
-            const commits = result.data.data.repository.ref.target.history.edges.reverse();
-            const rows = [];
+        for (const edge of history.edges) {
+            const commit = edge.node;
+            const suite = commit.checkSuites.nodes[0];
 
-            for (const edge of commits) {
-                const commit = edge.node;
-                const suite = commit.checkSuites.nodes[0];
+            if (!suite)
+                continue;
 
-                if (!suite)
-                    continue;
+            const runs = commit.checkSuites.nodes[0].checkRuns.nodes;
+            const row = [`${commit.oid.slice(0, 7)} - ${commit.messageHeadline}`];
 
-                const runs = commit.checkSuites.nodes[0].checkRuns.nodes;
-                const row = [`${commit.oid.slice(0, 7)} - ${commit.messageHeadline}`];
+            for (let i = 0; i < platforms.length; i++) {
+                const {platform, arch} = platforms[i];
 
-                for (let i = 0; i < platforms.length; i++) {
-                    const {platform, arch} = platforms[i];
+                const run = runs.find((run) => {
+                    const [, p, a] = run.name.match(/Size - (\w+) ([\w-]+)/);
+                    return platform === p && arch === a;
+                });
 
-                    const run = runs.find((run) => {
-                        const [, p, a] = run.name.match(/Size - (\w+) ([\w-]+)/);
-                        return platform === p && arch === a;
-                    });
-
-                    row[i + 1] = run ? +run.summary.match(/is (\d+) bytes/)[1] : undefined;
-                }
-
-                rows.push(row);
+                row[i + 1] = run ? +run.summary.match(/is (\d+) bytes/)[1] : undefined;
             }
 
+            rows.push(row);
+        }
+
+        if (history.pageInfo.hasNextPage) {
+            return query(history.pageInfo.endCursor);
+        } else {
             return new AWS.S3({region: 'us-east-1'}).putObject({
-                Body: zlib.gzipSync(JSON.stringify(rows)),
+                Body: zlib.gzipSync(JSON.stringify(rows.reverse())),
                 Bucket: 'mapbox',
                 Key: 'mapbox-gl-native/metrics/binary-size/data.json',
                 ACL: 'public-read',
@@ -120,5 +122,12 @@ github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATIO
                 ContentEncoding: 'gzip',
                 ContentType: 'application/json'
             }).promise();
-        });
+        }
+    });
+}
+
+github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATION_ID})
+    .then(({data}) => {
+        github.authenticate({type: 'token', token: data.token});
+        return query();
     });
