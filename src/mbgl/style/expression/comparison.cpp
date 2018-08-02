@@ -59,27 +59,26 @@ bool lteqCollate(std::string a, std::string b, Collator c) { return c.compare(a,
 bool gteqCollate(std::string a, std::string b, Collator c) { return c.compare(a, b) >= 0; }
 
 static BasicComparison::CompareFunctionType getBasicCompareFunction(const std::string& op) {
-    static std::unordered_map<std::string, const BasicComparison::CompareFunctionType> map {
-        {"==", eq},
-        {"!=", neq},
-        {">", gt},
-        {"<", lt},
-        {">=", gteq},
-        {"<=", lteq},
-    };
-    return map[op];
+    if (op == "==") return eq;
+    else if (op == "!=") return neq;
+    else if (op == ">") return gt;
+    else if (op == "<") return lt;
+    else if (op == ">=") return gteq;
+    else if (op == "<=") return lteq;
+    assert(false);
+    return nullptr;
 }
 
 static CollatorComparison::CompareFunctionType getCollatorComparisonFunction(const std::string& op) {
-    static std::unordered_map<std::string, const CollatorComparison::CompareFunctionType> map {
-        {"==", eqCollate},
-        {"!=", neqCollate},
-        {">", gtCollate},
-        {"<", ltCollate},
-        {">=", gteqCollate},
-        {"<=", lteqCollate},
-    };
-    return map[op];
+    if (op == "==") return eqCollate;
+    else if (op == "!=") return neqCollate;
+    else if (op == ">") return gtCollate;
+    else if (op == "<") return ltCollate;
+    else if (op == ">=") return gteqCollate;
+    else if (op == "<=") return lteqCollate;
+    assert(false);
+    return nullptr;
+
 }
 
 
@@ -88,7 +87,7 @@ BasicComparison::BasicComparison(
         std::unique_ptr<Expression> lhs_,
         std::unique_ptr<Expression> rhs_)
     : Expression(Kind::Comparison, type::Boolean),
-      op(op_),
+      op(std::move(op_)),
       compare(getBasicCompareFunction(op)),
       lhs(std::move(lhs_)),
       rhs(std::move(rhs_)) {
@@ -184,9 +183,7 @@ EvaluationResult CollatorComparison::evaluate(const EvaluationContext& params) c
 void CollatorComparison::eachChild(const std::function<void(const Expression&)>& visit) const {
     visit(*lhs);
     visit(*rhs);
-    if (collator) {
-        visit(*collator);
-    }
+    visit(*collator);
 }
 
 std::string CollatorComparison::getOperator() const { return op; }
@@ -195,7 +192,7 @@ bool CollatorComparison::operator==(const Expression& e) const {
     if (e.getKind() == Kind::Comparison) {
         auto comp = static_cast<const CollatorComparison*>(&e);
         return comp->op == op &&
-            comp->collator && *comp->collator == *collator &&
+            *comp->collator == *collator &&
             *comp->lhs == *lhs &&
             *comp->rhs == *rhs;
     }
