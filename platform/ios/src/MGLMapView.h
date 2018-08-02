@@ -859,9 +859,6 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Moves the viewpoint to a different location without using a transition.
  
- Transition animations can be defined by other classes and use this method to
- update the map.
- 
  @param camera The new viewpoint.
  @param edgePadding The minimum padding (in screen points) that would be visible
  
