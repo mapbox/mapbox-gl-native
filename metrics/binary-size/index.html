@@ -3,115 +3,59 @@
 <title>Mapbox GL Binary Size</title>
 <script src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
-var data;
 google.charts.load('current', {'packages': ['corechart']});
-google.charts.setOnLoadCallback(function() {
-    var platforms = [
+google.charts.setOnLoadCallback(() => {
+    // Must be in sync with the definition in scripts/check_binary_size.js on the master branch.
+    const platforms = [
         { 'platform': 'iOS', 'arch': 'armv7' },
         { 'platform': 'iOS', 'arch': 'arm64' },
-        { 'platform': 'macOS', 'arch': 'x86_64' },
         { 'platform': 'Android', 'arch': 'arm-v7' },
         { 'platform': 'Android', 'arch': 'arm-v8' },
         { 'platform': 'Android', 'arch': 'x86' },
         { 'platform': 'Android', 'arch': 'x86_64' }
     ];
 
-    data = new google.visualization.DataTable();
-    data.addColumn('datetime', 'Date');
+    const data = new google.visualization.DataTable();
+    data.addColumn('string', 'Title');
     platforms.forEach(function(item) {
         data.addColumn('number', item.platform + '/' + item.arch);
     });
 
-    const beginDate = new Date('2016-11-16');
-
-    var dateFormatter = new google.visualization.DateFormat({formatType: 'long'});
-    var byteFormatter = new google.visualization.NumberFormat({pattern:'###,### bytes'});
-
-    function addDataset(platform, arch, index) {
-        getLogs(platform, arch, function(err, json) {
-            if (err) throw err;
-            for (var i = 0; i < json.Datapoints.length; i++) {
-                var item = json.Datapoints[i];
-                var row = [new Date(item.Timestamp)];
-                if (row[0] < beginDate) continue;
-                for (var j = 0; j < platforms.length; j++) {
-                    if (j == index) {
-                        row.push(item.Maximum);
-                    } else {
-                        row.push(null);
-                    }
-                }
+    fetch('https://mapbox.s3.amazonaws.com/mapbox-gl-native/metrics/binary-size/data.json')
+        .then(response => response.json())
+        .then(rows => {
+            for (const row of rows) {
                 data.addRow(row);
             }
 
-            data.sort([{column: 0}]);
+            const options = {
+                title: 'Mapbox GL Binary size',
+                chartArea: { height: '90%', width: '90%' },
+                series: [
+                    { color: '#dc464c', targetAxisIndex: 1, pointSize: 2 }, // iOS/armv7
+                    { color: '#a01d22', targetAxisIndex: 1, pointSize: 2 }, // iOS/arm64
+                    { color: '#7774c0', targetAxisIndex: 1, pointSize: 2 }, // Android/arm-v7
+                    { color: '#5f5c99', targetAxisIndex: 1, pointSize: 2 }, // Android/arm-v8
+                    { color: '#48ad6e', targetAxisIndex: 1, pointSize: 2 }, // Android/x86
+                    { color: '#357f51', targetAxisIndex: 1, pointSize: 2 }, // Android/x86_64
+                ],
+                legend: { position: 'in' },
+                pointsVisible: true,
+                vAxis: {
+                    ticks: [ 1e6, 1.5e6, 2e6, 2.5e6, 3e6, 3.5e6, 4e6, 4.5e6, 5e6, 5.5e6, 6e6, 6.5e6, 7e6, 7.5e6, 8e6, 8.5e6, 9e6 ],
+                    gridlines: { color: '#999' },
+                    minorGridlines: { count: 4, color: '#EEE' },
+                    textPosition: 'out',
+                    format: 'short',
+                    viewWindow: { min: 2.5e6, max: 9e6 }
+                },
+                interpolateNulls: true
+            };
 
-            drawChart();
+            const chart = new google.visualization.LineChart(document.getElementById('chart'));
+            chart.draw(data, options);
         });
-    }
-
-    platforms.forEach(function(item, index) {
-        addDataset(item.platform, item.arch, index);
-    });
 });
-
-function drawChart() {
-    var options = {
-        title: 'Mapbox GL Binary size',
-        chartArea: { height: '90%', width: '90%' },
-        series: [
-            { color: '#dc464c', targetAxisIndex: 1, pointSize: 2 }, // iOS/armv7
-            { color: '#a01d22', targetAxisIndex: 1, pointSize: 2 }, // iOS/arm64
-
-            { color: '#1a2c41', targetAxisIndex: 1, pointSize: 2 }, // macOS/x86_64
-
-            { color: '#8b87e0', targetAxisIndex: 1, pointSize: 2 }, // Android/arm-v5
-            { color: '#7774c0', targetAxisIndex: 1, pointSize: 2 }, // Android/arm-v7
-            { color: '#5f5c99', targetAxisIndex: 1, pointSize: 2 }, // Android/arm-v7
-
-            { color: '#48ad6e', targetAxisIndex: 1, pointSize: 2 }, // Android/x86
-            { color: '#357f51', targetAxisIndex: 1, pointSize: 2 }, // Android/x86_64
-
-            { color: '#f9a12e', targetAxisIndex: 1, pointSize: 2 }, // Android/mips
-        ],
-        legend: { position: 'in' },
-        pointsVisible: true,
-        vAxis: {
-            ticks: [ 1e6, 1.5e6, 2e6, 2.5e6, 3e6, 3.5e6, 4e6, 4.5e6, 5e6, 5.5e6, 6e6, 6.5e6, 7e6, 7.5e6, 8e6, 8.5e6, 9e6 ],
-            gridlines: { color: '#999' },
-            minorGridlines: { count: 4, color: '#EEE' },
-            textPosition: 'out',
-            format: 'short',
-            viewWindow: { min: 2.5e6, max: 9e6 }
-        },
-        interpolateNulls: true
-    };
-
-    var chart = new google.visualization.LineChart(document.getElementById('chart'));
-    chart.draw(data, options);
-}
-
-function getLogs(platform, arch, callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'https://mapbox.s3.amazonaws.com/mapbox-gl-native/metrics/binary-size/Platform=' + platform + ',Arch=' + arch + '.json', true);
-    xhr.onload = function() {
-        if (xhr.status == 200) {
-            try {
-                var logs = JSON.parse(xhr.responseText);
-            } catch(err) {
-                callback(err);
-                return;
-            }
-            callback(null, logs);
-        } else {
-            callback(new Error(xhr.responseText));
-        }
-    };
-    xhr.onerror = function() {
-        callback(new Error(xhr.responseText));
-    };
-    xhr.send();
-}
 </script>
 </head>
 
