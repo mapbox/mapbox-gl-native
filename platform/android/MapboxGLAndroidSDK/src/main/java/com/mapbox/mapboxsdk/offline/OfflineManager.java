@@ -10,9 +10,11 @@ import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.MapStrictMode;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.log.Logger;
+import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.utils.FileUtils;
@@ -415,6 +417,12 @@ public class OfflineManager {
         });
       }
     });
+
+    TelemetryDefinition telemetry = Mapbox.getTelemetry();
+    if (telemetry != null) {
+      LatLngBounds bounds = definition.getBounds();
+      telemetry.onCreateOfflineRegion(definition);
+    }
   }
 
   /**
