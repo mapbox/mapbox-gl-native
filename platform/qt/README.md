@@ -51,6 +51,28 @@ At runtime, you will also need installed:
 - [OpenSSL 1.0.2+](https://slproweb.com/products/Win32OpenSSL.html)
 - DirectX
 
+#### QNX 7.0
+
+To build for QNX 7.0, you need to install the QNX Software Development Platform (SDP) on a Linux host.
+
+http://www.qnx.com/developers/docs/7.0.0/#com.qnx.doc.qnxsdp.nav/topic/bookset.html
+
+After installing the SDP, you need to source the QNX environment script:
+
+```
+source <SDP_DIRECTORY>/qnxsdp-env.sh
+```
+
+You also need to Build Qt for QNX.
+
+http://wiki.qt.io/Building_Qt_for_QNX_Neutrino_OS
+
+After building Qt for QNX, you need to add Qt installation's bin directory to the path.
+
+```
+export PATH=<INSTALLFOLDER>/bin:$PATH
+```
+
 ### Build instructions
 
 Public API headers can be found in the [platform/qt/include](include) directory.
@@ -78,4 +100,12 @@ $ mkdir build
 $ cd build
 $ cmake -G "Visual Studio 14 2015 Win64" -T LLVM-vs2014 -DMBGL_PLATFORM=qt -DWITH_QT_DECODERS=ON -DWITH_QT_I18N=ON -DWITH_NODEJS=OFF ..
 $ cmake --build . --config Release --target qmapboxgl -- /m
+```
+
+#### QNX 7.0
+
+Building the repository for QNX 7.0 is very similar to other platforms (e.g. Linux and macOS).
+
+```
+$ make qnx-qt-lib      # Will build libqmapboxgl.so
 ```
