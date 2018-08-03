@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.4)
 project(mbgl LANGUAGES CXX C)
-set(CMAKE_CXX_STANDARD 14)
 
 option(WITH_CXX11ABI "Use the C++11 ABI" OFF)
 option(WITH_COVERAGE "Enable coverage reports" OFF)
@@ -57,8 +56,28 @@ endif(WITH_COVERAGE)
 
 set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebugInfo Sanitize)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -ftemplate-depth=1024 -fPIC -fvisibility=hidden -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wno-variadic-macros -Wno-unknown-pragmas")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -fPIC -fvisibility=hidden -Wall -Wextra -Wshadow -Wno-variadic-macros -Wno-unknown-pragmas")
+# Compiler configuration
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
+# Required to avoid warnings when setting visibility
+cmake_policy(SET CMP0063 NEW)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
+if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-backtrace-limit=0 -w")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth=1024 -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wno-variadic-macros -Wno-unknown-pragmas")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wshadow -Wno-variadic-macros -Wno-unknown-pragmas")
+endif()
 
 if (WITH_ERROR)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
