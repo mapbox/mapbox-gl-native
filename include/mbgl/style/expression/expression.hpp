@@ -133,7 +133,7 @@ enum class Kind : int32_t {
     Case,
     Any,
     All,
-    Equals,
+    Comparison,
 };
 
 class Expression {

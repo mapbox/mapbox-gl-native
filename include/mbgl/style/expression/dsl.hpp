@@ -31,6 +31,7 @@ std::unique_ptr<Expression> literal(Value value);
 std::unique_ptr<Expression> literal(std::initializer_list<double> value);
 std::unique_ptr<Expression> literal(std::initializer_list<const char *> value);
 
+std::unique_ptr<Expression> assertion(type::Type, std::unique_ptr<Expression>);
 std::unique_ptr<Expression> number(std::unique_ptr<Expression>);
 std::unique_ptr<Expression> string(std::unique_ptr<Expression>);
 std::unique_ptr<Expression> boolean(std::unique_ptr<Expression>);

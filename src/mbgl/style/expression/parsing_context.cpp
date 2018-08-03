@@ -13,7 +13,7 @@
 #include <mbgl/style/expression/coalesce.hpp>
 #include <mbgl/style/expression/coercion.hpp>
 #include <mbgl/style/expression/compound_expression.hpp>
-#include <mbgl/style/expression/equals.hpp>
+#include <mbgl/style/expression/comparison.hpp>
 #include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/length.hpp>
 #include <mbgl/style/expression/let.hpp>
@@ -95,8 +95,12 @@ ParseResult ParsingContext::parse(const Convertible& value, std::size_t index_, 
 
 const ExpressionRegistry& getExpressionRegistry() {
     static ExpressionRegistry registry {{
-        {"==", Equals::parse},
-        {"!=", Equals::parse},
+        {"==", parseComparison},
+        {"!=", parseComparison},
+        {">", parseComparison},
+        {"<", parseComparison},
+        {">=", parseComparison},
+        {"<=", parseComparison},
         {"all", All::parse},
         {"any", Any::parse},
         {"array", ArrayAssertion::parse},

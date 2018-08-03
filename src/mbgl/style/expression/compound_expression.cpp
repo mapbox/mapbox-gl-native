@@ -485,19 +485,6 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("ceil", [](double x) -> Result<double> { return std::ceil(x); });
     define("abs", [](double x) -> Result<double> { return std::abs(x); });
 
-    define(">", [](double lhs, double rhs) -> Result<bool> { return lhs > rhs; });
-    define(">", [](const std::string& lhs, const std::string& rhs) -> Result<bool> { return lhs > rhs; });
-    define(">", [](const std::string& lhs, const std::string& rhs, const Collator& c) -> Result<bool> { return c.compare(lhs, rhs) > 0; });
-    define(">=", [](double lhs, double rhs) -> Result<bool> { return lhs >= rhs; });
-    define(">=",[](const std::string& lhs, const std::string& rhs) -> Result<bool> { return lhs >= rhs; });
-    define(">=", [](const std::string& lhs, const std::string& rhs, const Collator& c) -> Result<bool> { return c.compare(lhs, rhs) >= 0; });
-    define("<", [](double lhs, double rhs) -> Result<bool> { return lhs < rhs; });
-    define("<", [](const std::string& lhs, const std::string& rhs) -> Result<bool> { return lhs < rhs; });
-    define("<", [](const std::string& lhs, const std::string& rhs, const Collator& c) -> Result<bool> { return c.compare(lhs, rhs) < 0; });
-    define("<=", [](double lhs, double rhs) -> Result<bool> { return lhs <= rhs; });
-    define("<=", [](const std::string& lhs, const std::string& rhs) -> Result<bool> { return lhs <= rhs; });
-    define("<=", [](const std::string& lhs, const std::string& rhs, const Collator& c) -> Result<bool> { return c.compare(lhs, rhs) <= 0; });
-
     define("!", [](bool e) -> Result<bool> { return !e; });
 
     define("is-supported-script", [](const std::string& x) -> Result<bool> {
