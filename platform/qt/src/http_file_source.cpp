@@ -29,6 +29,9 @@ void HTTPFileSource::Impl::request(HTTPRequest* req)
     }
 
     QNetworkRequest networkRequest = req->networkRequest();
+#if QT_VERSION >= 0x050600
+    networkRequest.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+#endif
 
     data.first = m_manager->get(networkRequest);
     connect(data.first, SIGNAL(finished()), this, SLOT(onReplyFinished()));
@@ -72,7 +75,7 @@ void HTTPFileSource::Impl::cancel(HTTPRequest* req)
 void HTTPFileSource::Impl::onReplyFinished()
 {
     QNetworkReply* reply = qobject_cast<QNetworkReply *>(sender());
-    const QUrl& url = reply->url();
+    const QUrl& url = reply->request().url();
 
     auto it = m_pending.find(url);
     if (it == m_pending.end()) {
