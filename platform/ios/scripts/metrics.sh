@@ -17,3 +17,7 @@ scripts/check_binary_size.js "build/ios/pkg/dynamic/Mapbox-stripped-x86_64"  "iO
 
 # Track overall library size
 scripts/check_binary_size.js "build/ios/pkg/dynamic/Mapbox-stripped"         "iOS Dynamic"
+
+if [[ $CIRCLE_BRANCH == master ]]; then
+    scripts/publish_binary_size.js
+fi
