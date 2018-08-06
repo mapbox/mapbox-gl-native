@@ -1,5 +1,7 @@
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/fake_file_source.hpp>
+#include <mbgl/test/fixture_log_observer.hpp>
+#include <mbgl/test/sqlite3_test_fs.hpp>
 
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/storage/offline_database.hpp>
@@ -10,11 +12,29 @@
 #include <mbgl/util/compression.hpp>
 #include <mbgl/util/string.hpp>
 
+#include <sqlite3.hpp>
 #include <gtest/gtest.h>
 #include <iostream>
 
 using namespace mbgl;
 using namespace std::literals::string_literals;
+using mapbox::sqlite::ResultCode;
+
+#ifndef __QT__ // Qt doesn't expose the ability to register virtual file system handlers.
+static constexpr const char* filename = "test/fixtures/offline_download/offline.db";
+static constexpr const char* filename_test_fs = "file:test/fixtures/offline_download/offline.db?vfs=test_fs";
+
+static void deleteDatabaseFiles() {
+    // Delete leftover journaling files as well.
+    util::deleteFile(filename);
+    util::deleteFile(filename + "-wal"s);
+    util::deleteFile(filename + "-journal"s);
+}
+
+static FixtureLog::Message warning(ResultCode code, const char* message) {
+    return { EventSeverity::Warning, Event::Database, static_cast<int64_t>(code), message };
+}
+#endif
 
 class MockObserver : public OfflineRegionObserver {
 public:
@@ -37,9 +57,12 @@ public:
 
 class OfflineTest {
 public:
+    OfflineTest(const std::string& path = ":memory:") : db(path) {
+    }
+
     util::RunLoop loop;
     StubFileSource fileSource;
-    OfflineDatabase db { ":memory:" };
+    OfflineDatabase db;
     std::size_t size = 0;
 
     optional<OfflineRegion> createRegion() {
@@ -636,3 +659,56 @@ TEST(OfflineDownload, Deactivate) {
 
     test.loop.run();
 }
+
+#ifndef __QT__ // Qt doesn't expose the ability to register virtual file system handlers.
+TEST(OfflineDownload, DiskFull) {
+    FixtureLog log;
+    deleteDatabaseFiles();
+    test::SQLite3TestFS fs;
+
+    OfflineTest test{ filename_test_fs };
+    EXPECT_EQ(0u, log.uncheckedCount());
+
+    auto region = test.createRegion();
+    ASSERT_TRUE(region);
+    EXPECT_EQ(0u, log.uncheckedCount());
+
+    // Simulate a full disk.
+    fs.setWriteLimit(8192);
+
+    OfflineDownload download(
+        region->getID(),
+        OfflineTilePyramidRegionDefinition("http://127.0.0.1:3000/style.json", LatLngBounds::world(), 0.0, 0.0, 1.0),
+        test.db, test.fileSource);
+
+    bool hasRequestedStyle = false;
+
+    test.fileSource.styleResponse = [&] (const Resource& resource) {
+        EXPECT_EQ("http://127.0.0.1:3000/style.json", resource.url);
+        hasRequestedStyle = true;
+        return test.response("empty.style.json");
+    };
+
+    auto observer = std::make_unique<MockObserver>();
+
+    observer->statusChangedFn = [&] (OfflineRegionStatus status) {
+        EXPECT_EQ(OfflineRegionDownloadState::Active, status.downloadState);
+        EXPECT_EQ(0u, status.completedResourceCount);
+        EXPECT_EQ(0u, status.completedResourceSize);
+        EXPECT_EQ(hasRequestedStyle, status.requiredResourceCountIsPrecise);
+        EXPECT_FALSE(status.complete());
+
+        if (hasRequestedStyle) {
+            EXPECT_EQ(1u, log.count(warning(ResultCode::Full, "Can't write region resources: database or disk is full")));
+            EXPECT_EQ(0u, log.uncheckedCount());
+            test.loop.stop();
+        }
+    };
+
+    download.setObserver(std::move(observer));
+    download.setState(OfflineRegionDownloadState::Active);
+
+    test.loop.run();
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
+#endif // __QT__
