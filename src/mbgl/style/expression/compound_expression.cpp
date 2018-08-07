@@ -343,12 +343,12 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     });
 
     define("heatmap-density", [](const EvaluationContext& params) -> Result<double> {
-        if (!params.heatmapDensity) {
+        if (!params.colorRampParameter) {
             return EvaluationError {
                 "The 'heatmap-density' expression is unavailable in the current evaluation context."
             };
         }
-        return *(params.heatmapDensity);
+        return *(params.colorRampParameter);
     });
 
     define("has", [](const EvaluationContext& params, const std::string& key) -> Result<bool> {
