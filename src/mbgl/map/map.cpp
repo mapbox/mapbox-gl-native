@@ -129,7 +129,7 @@ Map::Impl::Impl(Map& map_,
       mode(mode_),
       pixelRatio(pixelRatio_),
       style(std::make_unique<Style>(scheduler, fileSource, pixelRatio)),
-      annotationManager(*style) {
+      annotationManager(mode == MapMode::Continuous ? style.get() : NULL) {
 
     style->impl->setObserver(this);
     rendererFrontend.setObserver(*this);
@@ -233,7 +233,7 @@ void Map::setStyle(std::unique_ptr<Style> style) {
     assert(style);
     impl->onStyleLoading();
     impl->style = std::move(style);
-    impl->annotationManager.setStyle(*impl->style);
+    impl->annotationManager.setStyle(impl->mode == MapMode::Continuous ? impl->style.get() : NULL);
 }
 
 #pragma mark - Transitions

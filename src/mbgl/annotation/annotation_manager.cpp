@@ -21,13 +21,13 @@ const std::string AnnotationManager::SourceID = "com.mapbox.annotations";
 const std::string AnnotationManager::PointLayerID = "com.mapbox.annotations.points";
 const std::string AnnotationManager::ShapeLayerID = "com.mapbox.annotations.shape.";
 
-AnnotationManager::AnnotationManager(Style& style_)
+AnnotationManager::AnnotationManager(Style* style_)
         : style(style_) {
 };
 
 AnnotationManager::~AnnotationManager() = default;
 
-void AnnotationManager::setStyle(Style& style_) {
+void AnnotationManager::setStyle(Style* style_) {
     style = style_;
 }
 
@@ -66,15 +66,21 @@ void AnnotationManager::add(const AnnotationID& id, const SymbolAnnotation& anno
 }
 
 void AnnotationManager::add(const AnnotationID& id, const LineAnnotation& annotation) {
+    if (!style) {
+        return;
+    }
     ShapeAnnotationImpl& impl = *shapeAnnotations.emplace(id,
         std::make_unique<LineAnnotationImpl>(id, annotation)).first->second;
-    impl.updateStyle(*style.get().impl);
+    impl.updateStyle(*style->impl);
 }
 
 void AnnotationManager::add(const AnnotationID& id, const FillAnnotation& annotation) {
+    if (!style) {
+        return;
+    }
     ShapeAnnotationImpl& impl = *shapeAnnotations.emplace(id,
         std::make_unique<FillAnnotationImpl>(id, annotation)).first->second;
-    impl.updateStyle(*style.get().impl);
+    impl.updateStyle(*style->impl);
 }
 
 void AnnotationManager::update(const AnnotationID& id, const SymbolAnnotation& annotation) {
@@ -119,12 +125,15 @@ void AnnotationManager::update(const AnnotationID& id, const FillAnnotation& ann
 }
 
 void AnnotationManager::remove(const AnnotationID& id) {
+    if (!style) {
+        return;
+    }
     if (symbolAnnotations.find(id) != symbolAnnotations.end()) {
         symbolTree.remove(symbolAnnotations.at(id));
         symbolAnnotations.erase(id);
     } else if (shapeAnnotations.find(id) != shapeAnnotations.end()) {
         auto it = shapeAnnotations.find(id);
-        *style.get().impl->removeLayer(it->second->layerID);
+        *style->impl->removeLayer(it->second->layerID);
         shapeAnnotations.erase(it);
     } else {
         assert(false); // Should never happen
@@ -154,10 +163,13 @@ std::unique_ptr<AnnotationTileData> AnnotationManager::getTileData(const Canonic
 }
 
 void AnnotationManager::updateStyle() {
+    if (!style) {
+        return;
+    }
     // Create annotation source, point layer, and point bucket. We do everything via Style::Impl
     // because we don't want annotation mutations to trigger Style::Impl::styleMutated to be set.
-    if (!style.get().impl->getSource(SourceID)) {
-        style.get().impl->addSource(std::make_unique<AnnotationSource>());
+    if (!style->impl->getSource(SourceID)) {
+        style->impl->addSource(std::make_unique<AnnotationSource>());
 
         std::unique_ptr<SymbolLayer> layer = std::make_unique<SymbolLayer>(PointLayerID, SourceID);
 
@@ -167,13 +179,13 @@ void AnnotationManager::updateStyle() {
         layer->setIconAllowOverlap(true);
         layer->setIconIgnorePlacement(true);
 
-        style.get().impl->addLayer(std::move(layer));
+        style->impl->addLayer(std::move(layer));
     }
 
     std::lock_guard<std::mutex> lock(mutex);
 
     for (const auto& shape : shapeAnnotations) {
-        shape.second->updateStyle(*style.get().impl);
+        shape.second->updateStyle(*style->impl);
     }
 
     for (const auto& image : images) {
@@ -183,7 +195,7 @@ void AnnotationManager::updateStyle() {
         // of which images need to be added because we don't know if the style is the same
         // instance as in the last updateStyle call. If it's a new style, we need to add all
         // images.)
-        style.get().impl->addImage(std::make_unique<style::Image>(image.second));
+        style->impl->addImage(std::make_unique<style::Image>(image.second));
     }
 }
 
@@ -215,19 +227,25 @@ static std::string prefixedImageID(const std::string& id) {
 }
 
 void AnnotationManager::addImage(std::unique_ptr<style::Image> image) {
+    if (!style) {
+        return;
+    }
     std::lock_guard<std::mutex> lock(mutex);
     const std::string id = prefixedImageID(image->getID());
     images.erase(id);
     auto inserted = images.emplace(id, style::Image(id, image->getImage().clone(),
                                                     image->getPixelRatio(), image->isSdf()));
-    style.get().impl->addImage(std::make_unique<style::Image>(inserted.first->second));
+    style->impl->addImage(std::make_unique<style::Image>(inserted.first->second));
 }
 
 void AnnotationManager::removeImage(const std::string& id_) {
+    if (!style) {
+        return;
+    }
     std::lock_guard<std::mutex> lock(mutex);
     const std::string id = prefixedImageID(id_);
     images.erase(id);
-    style.get().impl->removeImage(id);
+    style->impl->removeImage(id);
 }
 
 double AnnotationManager::getTopOffsetPixelsForImage(const std::string& id_) {

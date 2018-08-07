@@ -25,7 +25,7 @@ class Style;
 
 class AnnotationManager : private util::noncopyable {
 public:
-    AnnotationManager(style::Style&);
+    AnnotationManager(style::Style*);
     ~AnnotationManager();
 
     AnnotationID addAnnotation(const Annotation&);
@@ -36,7 +36,7 @@ public:
     void removeImage(const std::string&);
     double getTopOffsetPixelsForImage(const std::string&);
 
-    void setStyle(style::Style&);
+    void setStyle(style::Style*);
     void onStyleLoaded();
 
     void updateData();
@@ -63,7 +63,7 @@ private:
 
     std::unique_ptr<AnnotationTileData> getTileData(const CanonicalTileID&);
 
-    std::reference_wrapper<style::Style> style;
+    style::Style* style;
 
     std::mutex mutex;
 
