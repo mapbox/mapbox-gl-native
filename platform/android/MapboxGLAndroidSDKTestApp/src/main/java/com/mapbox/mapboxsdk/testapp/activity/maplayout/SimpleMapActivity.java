@@ -17,7 +17,6 @@ public class SimpleMapActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_map_simple);
-
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
   }
