@@ -229,7 +229,21 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
 
             m_map->setFilter("3d-buildings", buildingsFilterExpression);
 
-            m_map->setPaintProperty("3d-buildings", "fill-extrusion-color", "#aaa");
+            QString fillExtrusionColorJSON = R"JSON(
+              [
+                "interpolate",
+                ["linear"],
+                ["get", "height"],
+                  0.0, "blue",
+                 20.0, "royalblue",
+                 40.0, "cyan",
+                 60.0, "lime",
+                 80.0, "yellow",
+                100.0, "red"
+              ]
+            )JSON";
+
+            m_map->setPaintProperty("3d-buildings", "fill-extrusion-color", fillExtrusionColorJSON);
             m_map->setPaintProperty("3d-buildings", "fill-extrusion-opacity", .6);
 
             QVariantMap extrusionHeight;
