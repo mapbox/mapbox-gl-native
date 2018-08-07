@@ -32,6 +32,7 @@ TEST(GeoJSONOptions, RetainsDefaults) {
     ASSERT_EQ(converted.maxzoom, defaults.maxzoom);
     ASSERT_EQ(converted.buffer, defaults.buffer);
     ASSERT_EQ(converted.tolerance, defaults.tolerance);
+    ASSERT_EQ(converted.lineMetrics, defaults.lineMetrics);
 
     // Supercluster
     ASSERT_EQ(converted.cluster, defaults.cluster);
@@ -47,7 +48,8 @@ TEST(GeoJSONOptions, FullConversion) {
         "tolerance": 3,
         "cluster": true,
         "clusterRadius": 4,
-        "clusterMaxZoom": 5
+        "clusterMaxZoom": 5,
+        "lineMetrics": true
     })JSON", error);
 
     // GeoJSON-VT
@@ -55,6 +57,7 @@ TEST(GeoJSONOptions, FullConversion) {
     ASSERT_EQ(converted.maxzoom, 1);
     ASSERT_EQ(converted.buffer, 2);
     ASSERT_EQ(converted.tolerance, 3);
+    ASSERT_TRUE(converted.lineMetrics);
 
     // Supercluster
     ASSERT_EQ(converted.cluster, true);
