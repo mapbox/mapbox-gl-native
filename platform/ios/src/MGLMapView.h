@@ -97,6 +97,10 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewPreferredFramesPerSecond MGLMapView
 /** The maximum supported frame rate; typically 60 FPS. */
 FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondMaximum;
 
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLMissingLocationServicesUsageDescriptionException;
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUserLocationAnnotationTypeException;
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLResourceNotFoundException;
+
 /**
  An interactive, customizable map view with an interface similar to the one
  provided by Apple’s MapKit.

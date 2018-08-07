@@ -30,6 +30,11 @@ NS_ASSUME_NONNULL_BEGIN
     typedef NSString *NSNotificationName;
 #endif
 
+typedef NSString *MGLExceptionName NS_EXTENSIBLE_STRING_ENUM;
+
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLAbstractClassException;
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUnavailableMethodException;
+
 /** Indicates an error occurred in the Mapbox SDK. */
 FOUNDATION_EXTERN MGL_EXPORT NSErrorDomain const MGLErrorDomain;
 

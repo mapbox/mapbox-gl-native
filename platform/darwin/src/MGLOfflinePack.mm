@@ -8,6 +8,8 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 
+const MGLExceptionName MGLInvalidOfflinePackException = @"MGLInvalidOfflinePackException";
+
 /**
  Assert that the current offline pack is valid.
 
@@ -17,7 +19,7 @@
 #define MGLAssertOfflinePackIsValid() \
     do { \
         if (_state == MGLOfflinePackStateInvalid) { \
-            [NSException raise:@"Invalid offline pack" \
+            [NSException raise:MGLInvalidOfflinePackException \
                         format: \
              @"-[MGLOfflineStorage removePack:withCompletionHandler:] has been called " \
              @"on this instance of MGLOfflinePack, rendering it invalid. It is an " \

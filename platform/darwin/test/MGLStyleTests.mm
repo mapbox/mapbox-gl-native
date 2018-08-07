@@ -156,15 +156,15 @@
 - (void)testAddingSourcesTwice {
     MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
     [self.style addSource:shapeSource];
-    XCTAssertThrowsSpecificNamed([self.style addSource:shapeSource], NSException, @"MGLRedundantSourceException");
+    XCTAssertThrowsSpecificNamed([self.style addSource:shapeSource], NSException, MGLRedundantSourceException);
 
     MGLRasterTileSource *rasterTileSource = [[MGLRasterTileSource alloc] initWithIdentifier:@"rasterTileSource" configurationURL:[NSURL URLWithString:@".json"] tileSize:42];
     [self.style addSource:rasterTileSource];
-    XCTAssertThrowsSpecificNamed([self.style addSource:rasterTileSource], NSException, @"MGLRedundantSourceException");
+    XCTAssertThrowsSpecificNamed([self.style addSource:rasterTileSource], NSException, MGLRedundantSourceException);
 
     MGLVectorTileSource *vectorTileSource = [[MGLVectorTileSource alloc] initWithIdentifier:@"vectorTileSource" configurationURL:[NSURL URLWithString:@".json"]];
     [self.style addSource:vectorTileSource];
-    XCTAssertThrowsSpecificNamed([self.style addSource:vectorTileSource], NSException, @"MGLRedundantSourceException");
+    XCTAssertThrowsSpecificNamed([self.style addSource:vectorTileSource], NSException, MGLRedundantSourceException);
 }
 
 - (void)testAddingSourcesWithDuplicateIdentifiers {
@@ -172,7 +172,7 @@
     MGLVectorTileSource *source2 = [[MGLVectorTileSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
 
     [self.style addSource: source1];
-    XCTAssertThrowsSpecificNamed([self.style addSource: source2], NSException, @"MGLRedundantSourceIdentifierException");
+    XCTAssertThrowsSpecificNamed([self.style addSource: source2], NSException, MGLRedundantSourceIdentifierException);
 }
 
 - (void)testRemovingSourcesBeforeAddingThem {
@@ -265,27 +265,27 @@
 
     MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"backgroundLayer"];
     [self.style addLayer:backgroundLayer];
-    XCTAssertThrowsSpecificNamed([self.style addLayer:backgroundLayer], NSException, @"MGLRedundantLayerException");
+    XCTAssertThrowsSpecificNamed([self.style addLayer:backgroundLayer], NSException, MGLRedundantLayerException);
 
     MGLCircleStyleLayer *circleLayer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"circleLayer" source:source];
     [self.style addLayer:circleLayer];
-    XCTAssertThrowsSpecificNamed([self.style addLayer:circleLayer], NSException, @"MGLRedundantLayerException");
+    XCTAssertThrowsSpecificNamed([self.style addLayer:circleLayer], NSException, MGLRedundantLayerException);
 
     MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fillLayer" source:source];
     [self.style addLayer:fillLayer];
-    XCTAssertThrowsSpecificNamed([self.style addLayer:fillLayer], NSException, @"MGLRedundantLayerException");
+    XCTAssertThrowsSpecificNamed([self.style addLayer:fillLayer], NSException, MGLRedundantLayerException);
 
     MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"lineLayer" source:source];
     [self.style addLayer:lineLayer];
-    XCTAssertThrowsSpecificNamed([self.style addLayer:lineLayer], NSException, @"MGLRedundantLayerException");
+    XCTAssertThrowsSpecificNamed([self.style addLayer:lineLayer], NSException, MGLRedundantLayerException);
 
     MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"rasterLayer" source:source];
     [self.style addLayer:rasterLayer];
-    XCTAssertThrowsSpecificNamed([self.style addLayer:rasterLayer], NSException, @"MGLRedundantLayerException");
+    XCTAssertThrowsSpecificNamed([self.style addLayer:rasterLayer], NSException, MGLRedundantLayerException);
 
     MGLSymbolStyleLayer *symbolLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"symbolLayer" source:source];
     [self.style addLayer:symbolLayer];
-    XCTAssertThrowsSpecificNamed([self.style addLayer:symbolLayer], NSException, @"MGLRedundantLayerException");
+    XCTAssertThrowsSpecificNamed([self.style addLayer:symbolLayer], NSException, MGLRedundantLayerException);
 }
 
 - (void)testAddingLayersWithDuplicateIdentifiers {

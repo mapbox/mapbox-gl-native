@@ -12,10 +12,10 @@
 
     XCTAssertEqual(invalidPack.state, MGLOfflinePackStateInvalid, @"Offline pack should be invalid when initialized independently of MGLOfflineStorage.");
 
-    XCTAssertThrowsSpecificNamed(invalidPack.region, NSException, @"Invalid offline pack", @"Invalid offline pack should raise an exception when accessing its region.");
-    XCTAssertThrowsSpecificNamed(invalidPack.context, NSException, @"Invalid offline pack", @"Invalid offline pack should raise an exception when accessing its context.");
-    XCTAssertThrowsSpecificNamed([invalidPack resume], NSException, @"Invalid offline pack", @"Invalid offline pack should raise an exception when being resumed.");
-    XCTAssertThrowsSpecificNamed([invalidPack suspend], NSException, @"Invalid offline pack", @"Invalid offline pack should raise an exception when being suspended.");
+    XCTAssertThrowsSpecificNamed(invalidPack.region, NSException, MGLInvalidOfflinePackException, @"Invalid offline pack should raise an exception when accessing its region.");
+    XCTAssertThrowsSpecificNamed(invalidPack.context, NSException, MGLInvalidOfflinePackException, @"Invalid offline pack should raise an exception when accessing its context.");
+    XCTAssertThrowsSpecificNamed([invalidPack resume], NSException, MGLInvalidOfflinePackException, @"Invalid offline pack should raise an exception when being resumed.");
+    XCTAssertThrowsSpecificNamed([invalidPack suspend], NSException, MGLInvalidOfflinePackException, @"Invalid offline pack should raise an exception when being suspended.");
 }
 
 - (void)testProgressBoxing {
