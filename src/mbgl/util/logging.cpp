@@ -35,7 +35,7 @@ void Log::record(EventSeverity severity, Event event, const char* format, ...) {
     vsnprintf(msg, sizeof(msg), format, args);
     va_end(args);
 
-    record(severity, event, -1, msg);
+    record(severity, event, -1, std::string{ msg });
 }
 
 void Log::record(EventSeverity severity, Event event, int64_t code, const char* format, ...) {
