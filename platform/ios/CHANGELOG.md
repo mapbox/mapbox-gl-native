@@ -2,6 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## master
+
+* Improved the Swift interface for `MGLMapView.decelerationRate`. ([#12584](https://github.com/mapbox/mapbox-gl-native/issues/12584))
+
 ## 4.3.0
 
 ### Styles and rendering

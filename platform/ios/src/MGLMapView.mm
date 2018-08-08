@@ -84,9 +84,9 @@
 class MBGLView;
 class MGLAnnotationContext;
 
-const CGFloat MGLMapViewDecelerationRateNormal = UIScrollViewDecelerationRateNormal;
-const CGFloat MGLMapViewDecelerationRateFast = UIScrollViewDecelerationRateFast;
-const CGFloat MGLMapViewDecelerationRateImmediate = 0.0;
+const MGLMapViewDecelerationRate MGLMapViewDecelerationRateNormal = UIScrollViewDecelerationRateNormal;
+const MGLMapViewDecelerationRate MGLMapViewDecelerationRateFast = UIScrollViewDecelerationRateFast;
+const MGLMapViewDecelerationRate MGLMapViewDecelerationRateImmediate = 0.0;
 
 const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondDefault = -1;
 const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondLowPower = 30;
