@@ -4,6 +4,7 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/shaders/line.hpp>
+#include <mbgl/shaders/line_gradient.hpp>
 #include <mbgl/shaders/line_pattern.hpp>
 #include <mbgl/shaders/line_sdf.hpp>
 #include <mbgl/util/geometry.hpp>
@@ -157,6 +158,26 @@ public:
                                        const LinePatternPos& posA,
                                        const LinePatternPos& posB,
                                        float atlasWidth);
+};
+
+class LineGradientProgram : public Program<
+    shaders::line_gradient,
+    gl::Triangle,
+    LineLayoutAttributes,
+    gl::Uniforms<
+        uniforms::u_matrix,
+        uniforms::u_ratio,
+        uniforms::u_gl_units_to_pixels,
+        uniforms::u_image>,
+    RenderLinePaintProperties>
+{
+public:
+    using Program::Program;
+
+    static UniformValues uniformValues(const RenderLinePaintProperties::PossiblyEvaluated&,
+                                       const RenderTile&,
+                                       const TransformState&,
+                                       const std::array<float, 2>& pixelsToGLUnits);
 };
 
 using LineLayoutVertex = LineProgram::LayoutVertex;

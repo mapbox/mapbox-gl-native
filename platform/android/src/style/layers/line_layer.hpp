@@ -74,6 +74,8 @@ public:
     jni::Object<jni::ObjectTag> getLinePattern(jni::JNIEnv&);
     void setLinePatternTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Object<TransitionOptions> getLinePatternTransition(jni::JNIEnv&);
+
+    jni::Object<jni::ObjectTag> getLineGradient(jni::JNIEnv&);
     jni::jobject* createJavaPeer(jni::JNIEnv&);
 
 }; // class LineLayer

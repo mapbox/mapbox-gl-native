@@ -43,8 +43,6 @@
   "render-tests/geojson/inline-polygon-symbol": "behavior needs reconciliation with gl-js",
   "render-tests/icon-rotate/with-offset": "https://github.com/mapbox/mapbox-gl-native/issues/11872",
   "render-tests/icon-no-cross-source-collision/default": "skip - gl-js only",
-  "render-tests/line-gradient/gradient": "https://github.com/mapbox/mapbox-gl-native/issues/11718",
-  "render-tests/line-gradient/translucent": "https://github.com/mapbox/mapbox-gl-native/issues/11718",
   "render-tests/mixed-zoom/z10-z11": "https://github.com/mapbox/mapbox-gl-native/issues/10397",
   "render-tests/raster-masking/overlapping-zoom": "https://github.com/mapbox/mapbox-gl-native/issues/10195",
   "render-tests/real-world/bangkok": "https://github.com/mapbox/mapbox-gl-native/issues/10412",

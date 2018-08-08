@@ -438,6 +438,33 @@ TransitionOptions LineLayer::getLinePatternTransition() const {
     return impl().paint.template get<LinePattern>().options;
 }
 
+ColorRampPropertyValue LineLayer::getDefaultLineGradient() {
+    return { {} };
+}
+
+ColorRampPropertyValue LineLayer::getLineGradient() const {
+    return impl().paint.template get<LineGradient>().value;
+}
+
+void LineLayer::setLineGradient(ColorRampPropertyValue value) {
+    if (value == getLineGradient())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<LineGradient>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void LineLayer::setLineGradientTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<LineGradient>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions LineLayer::getLineGradientTransition() const {
+    return impl().paint.template get<LineGradient>().options;
+}
+
 using namespace conversion;
 
 optional<Error> LineLayer::setPaintProperty(const std::string& name, const Convertible& value) {
@@ -453,6 +480,7 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
         LineBlur,
         LineDasharray,
         LinePattern,
+        LineGradient,
         LineOpacityTransition,
         LineColorTransition,
         LineTranslateTransition,
@@ -463,6 +491,7 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
         LineBlurTransition,
         LineDasharrayTransition,
         LinePatternTransition,
+        LineGradientTransition,
     };
 
     Property property = Property::Unknown;
@@ -567,6 +596,16 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
             property = Property::LinePatternTransition;
         }
         break;
+    case util::hashFNV1a("line-gradient"):
+        if (name == "line-gradient") {
+            property = Property::LineGradient;
+        }
+        break;
+    case util::hashFNV1a("line-gradient-transition"):
+        if (name == "line-gradient-transition") {
+            property = Property::LineGradientTransition;
+        }
+        break;
     
     }
 
@@ -669,6 +708,18 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
         
     }
     
+    if (property == Property::LineGradient) {
+        Error error;
+        optional<ColorRampPropertyValue> typedValue = convert<ColorRampPropertyValue>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+        
+        setLineGradient(*typedValue);
+        return nullopt;
+        
+    }
+    
 
     Error error;
     optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
@@ -723,6 +774,11 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
     
     if (property == Property::LinePatternTransition) {
         setLinePatternTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::LineGradientTransition) {
+        setLineGradientTransition(*transition);
         return nullopt;
     }
     

@@ -8,8 +8,6 @@ const zlib = require('zlib');
 
 var shaders = require('../mapbox-gl-js/src/shaders');
 
-delete shaders.lineGradient;
-
 require('./style-code');
 
 let concatenated = '';
