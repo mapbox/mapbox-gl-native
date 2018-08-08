@@ -18,7 +18,8 @@ using namespace style;
 
 RenderLineLayer::RenderLineLayer(Immutable<style::LineLayer::Impl> _impl)
     : RenderLayer(style::LayerType::Line, _impl),
-      unevaluated(impl().paint.untransitioned()) {
+      unevaluated(impl().paint.untransitioned()),
+      colorRamp({256, 1}) {
 }
 
 const style::LineLayer::Impl& RenderLineLayer::impl() const {
@@ -134,7 +135,18 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      parameters.imageManager.getPixelSize(),
                      *posA,
                      *posB));
+        } else if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
+            if (!colorRampTexture) {
+                colorRampTexture = parameters.context.createTexture(colorRamp);
+            }
+            parameters.context.bindTexture(*colorRampTexture, 0, gl::TextureFilter::Linear);
 
+            draw(parameters.programs.lineGradient,
+                 LineGradientProgram::uniformValues(
+                    evaluated,
+                    tile,
+                    parameters.state,
+                    parameters.pixelsToGLUnits));
         } else {
             draw(parameters.programs.line,
                  LineProgram::uniformValues(
@@ -205,6 +217,27 @@ bool RenderLineLayer::queryIntersectsFeature(
             translatedQueryGeometry.value_or(queryGeometry),
             offsetGeometry.value_or(feature.getGeometries()),
             halfWidth);
+}
+
+void RenderLineLayer::updateColorRamp() {
+    auto colorValue = unevaluated.get<LineGradient>().getValue();
+    if (colorValue.isUndefined()) {
+        return;
+    }
+
+    const auto length = colorRamp.bytes();
+
+    for (uint32_t i = 0; i < length; i += 4) {
+        const auto color = colorValue.evaluate(static_cast<double>(i) / length);
+        colorRamp.data[i] = std::floor(color.r * 255);
+        colorRamp.data[i + 1] = std::floor(color.g * 255);
+        colorRamp.data[i + 2] = std::floor(color.b * 255);
+        colorRamp.data[i + 3] = std::floor(color.a * 255);
+    }
+
+    if (colorRampTexture) {
+        colorRampTexture = nullopt;
+    }
 }
 
 float RenderLineLayer::getLineWidth(const GeometryTileFeature& feature, const float zoom) const {

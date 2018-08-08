@@ -116,4 +116,18 @@ LinePatternProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvalu
     );
 }
 
+LineGradientProgram::UniformValues
+LineGradientProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
+                           const RenderTile& tile,
+                           const TransformState& state,
+                           const std::array<float, 2>& pixelsToGLUnits) {
+    return makeValues<LineGradientProgram::UniformValues>(
+        properties,
+        tile,
+        state,
+        pixelsToGLUnits,
+        uniforms::u_image::Value{ 0 }
+    );
+}
+
 } // namespace mbgl

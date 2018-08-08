@@ -352,6 +352,15 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         return *(params.colorRampParameter);
     });
 
+    define("line-progress", [](const EvaluationContext& params) -> Result<double> {
+        if (!params.colorRampParameter) {
+            return EvaluationError {
+                "The 'line-progress' expression is unavailable in the current evaluation context."
+            };
+        }
+        return *(params.colorRampParameter);
+    });
+
     define("has", [](const EvaluationContext& params, const std::string& key) -> Result<bool> {
         if (!params.feature) {
             return EvaluationError {

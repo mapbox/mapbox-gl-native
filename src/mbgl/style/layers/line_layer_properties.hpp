@@ -72,6 +72,9 @@ struct LinePattern : CrossFadedPaintProperty<std::string> {
     static std::string defaultValue() { return ""; }
 };
 
+struct LineGradient : ColorRampProperty {
+};
+
 class LineLayoutProperties : public Properties<
     LineCap,
     LineJoin,
@@ -89,7 +92,8 @@ class LinePaintProperties : public Properties<
     LineOffset,
     LineBlur,
     LineDasharray,
-    LinePattern
+    LinePattern,
+    LineGradient
 > {};
 
 } // namespace style

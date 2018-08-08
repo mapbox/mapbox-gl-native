@@ -118,7 +118,7 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
 
 <% } -%>
 <% for (const property of properties) { -%>
-<% if (property.name != 'heatmap-color') { -%>
+<% if (property['property-type'] !== 'color-ramp') { -%>
 <% if (property.transition) { -%>
 
   @Test

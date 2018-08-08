@@ -7,8 +7,8 @@ namespace mbgl {
 namespace shaders {
 
 const char* raster::name = "raster";
-const char* raster::vertexSource = source() + 57390;
-const char* raster::fragmentSource = source() + 58203;
+const char* raster::vertexSource = source() + 62984;
+const char* raster::fragmentSource = source() + 63797;
 
 } // namespace shaders
 } // namespace mbgl

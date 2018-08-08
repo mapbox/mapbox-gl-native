@@ -395,6 +395,36 @@ public class PropertyFactory {
   }
 
   /**
+   * Defines a gradient with which to color a line feature. Can only be used with GeoJSON sources that specify `"lineMetrics": true`.
+   *
+   * @param value a int color value
+   * @return property wrapper around String color
+   */
+  public static PropertyValue<String> lineGradient(@ColorInt int value) {
+    return new PaintPropertyValue<>("line-gradient", colorToRgbaString(value));
+  }
+
+  /**
+   * Defines a gradient with which to color a line feature. Can only be used with GeoJSON sources that specify `"lineMetrics": true`.
+   *
+   * @param value a String value
+   * @return property wrapper around String
+   */
+  public static PropertyValue<String> lineGradient(String value) {
+    return new PaintPropertyValue<>("line-gradient", value);
+  }
+
+  /**
+   * Defines a gradient with which to color a line feature. Can only be used with GeoJSON sources that specify `"lineMetrics": true`.
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> lineGradient(Expression expression) {
+    return new PaintPropertyValue<>("line-gradient", expression);
+  }
+
+  /**
    * The opacity at which the icon will be drawn.
    *
    * @param value a Float value

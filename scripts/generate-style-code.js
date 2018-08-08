@@ -114,7 +114,7 @@ global.defaultValue = function (property) {
     return '{}';
   }
 
-  if (property.name === 'heatmap-color') {
+  if (property['property-type'] === 'color-ramp') {
       return '{}';
   }
 
