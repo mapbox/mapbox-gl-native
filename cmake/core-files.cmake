@@ -317,6 +317,8 @@ set(MBGL_CORE_FILES
     src/mbgl/shaders/hillshade_prepare.hpp
     src/mbgl/shaders/line.cpp
     src/mbgl/shaders/line.hpp
+    src/mbgl/shaders/line_gradient.cpp
+    src/mbgl/shaders/line_gradient.hpp
     src/mbgl/shaders/line_pattern.cpp
     src/mbgl/shaders/line_pattern.hpp
     src/mbgl/shaders/line_sdf.cpp

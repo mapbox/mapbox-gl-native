@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <mbgl/style/color_ramp_property_value.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
@@ -118,6 +119,12 @@ public:
     void setLinePattern(PropertyValue<std::string>);
     void setLinePatternTransition(const TransitionOptions&);
     TransitionOptions getLinePatternTransition() const;
+
+    static ColorRampPropertyValue getDefaultLineGradient();
+    ColorRampPropertyValue getLineGradient() const;
+    void setLineGradient(ColorRampPropertyValue);
+    void setLineGradientTransition(const TransitionOptions&);
+    TransitionOptions getLineGradientTransition() const;
 
     // Private implementation
 

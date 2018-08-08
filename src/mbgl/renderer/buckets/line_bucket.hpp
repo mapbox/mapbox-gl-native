@@ -47,12 +47,17 @@ private:
         TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {}
         uint16_t a, b, c;
     };
+
+    class Distances;
     void addCurrentVertex(const GeometryCoordinate& currentVertex, double& distance,
             const Point<double>& normal, double endLeft, double endRight, bool round,
-            std::size_t startVertex, std::vector<LineBucket::TriangleElement>& triangleStore);
+            std::size_t startVertex, std::vector<LineBucket::TriangleElement>& triangleStore,
+            optional<Distances> distances);
+
     void addPieSliceVertex(const GeometryCoordinate& currentVertex, double distance,
             const Point<double>& extrude, bool lineTurnsLeft, std::size_t startVertex,
-            std::vector<TriangleElement>& triangleStore);
+            std::vector<TriangleElement>& triangleStore,
+            optional<Distances> distances);
 
     std::ptrdiff_t e1;
     std::ptrdiff_t e2;

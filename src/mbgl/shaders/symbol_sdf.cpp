@@ -7,8 +7,8 @@ namespace mbgl {
 namespace shaders {
 
 const char* symbol_sdf::name = "symbol_sdf";
-const char* symbol_sdf::vertexSource = source() + 63461;
-const char* symbol_sdf::fragmentSource = source() + 69382;
+const char* symbol_sdf::vertexSource = source() + 69055;
+const char* symbol_sdf::fragmentSource = source() + 74976;
 
 } // namespace shaders
 } // namespace mbgl
