@@ -17,6 +17,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue where the symbols for `MGLMapPointForCoordinate` could not be found. ([#12445](https://github.com/mapbox/mapbox-gl-native/issues/12445))
 * Fixed an issue causing country and ocean labels to disappear after calling `-[MGLStyle localizeLabelsIntoLocale:]` when the system language is set to Simplified Chinese. ([#12164](https://github.com/mapbox/mapbox-gl-native/issues/12164))
 * Fixed a crash that occurred when `MMELocationManager` was deallocated and the delegate was reporting updates. ([#12542](https://github.com/mapbox/mapbox-gl-native/pull/12542))
+* Various security related improvements.
 
 ## 4.2.0 - July 18, 2018
 
