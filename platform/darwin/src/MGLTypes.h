@@ -37,7 +37,6 @@ typedef NSString *MGLExceptionName NS_TYPED_EXTENSIBLE_ENUM;
  that are unique to a class or class-cluster should be defined in those headers.
  */
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLAbstractClassException;
-FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUnavailableMethodException;
 
 /** Indicates an error occurred in the Mapbox SDK. */
 FOUNDATION_EXTERN MGL_EXPORT NSErrorDomain const MGLErrorDomain;

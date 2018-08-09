@@ -23,8 +23,7 @@
 }
 
 - (instancetype)init {
-    [NSException raise:MGLUnavailableMethodException
-                format:
+    [NSException raise:NSGenericException format:
      @"-[MGLTilePyramidOfflineRegion init] is unavailable. "
      @"Use -initWithStyleURL:bounds:fromZoomLevel:toZoomLevel: instead."];
     return nil;
