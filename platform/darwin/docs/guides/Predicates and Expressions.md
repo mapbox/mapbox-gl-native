@@ -154,6 +154,7 @@ NSExpression(forFunction: "lowercase:",
 
 If a feature attribute name contains a dot, the string can be wrapped in a
 `MGL_FUNCTION`. For a feature attribute named `us.state`, you could use:
+
 ```objc
 [NSExpression expressionWithFormat: @"MGL_FUNCTION('get', 'us.state')"];
 ```
@@ -831,7 +832,7 @@ operator.
    The first argument is an expression that evaluates to a number, specifying
    the minimum value in case the target is less than any of the stops in the
    second argument.
-
+   
    The second argument is an <code>NSDictionary</code> object representing the
    interpolation’s stops, with numeric zoom levels as keys and expressions as
    values.
