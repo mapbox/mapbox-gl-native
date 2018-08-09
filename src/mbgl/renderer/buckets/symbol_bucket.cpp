@@ -193,8 +193,8 @@ void SymbolBucket::sortFeatures(const float angle) {
     std::sort(symbolInstanceIndexes.begin(), symbolInstanceIndexes.end(), [sin, cos, this](size_t &aIndex, size_t &bIndex) {
         const SymbolInstance& a = symbolInstances[aIndex];
         const SymbolInstance& b = symbolInstances[bIndex];
-        const int32_t aRotated = static_cast<int32_t>(std::lround(sin * a.anchor.point.x + cos * a.anchor.point.y));
-        const int32_t bRotated = static_cast<int32_t>(std::lround(sin * b.anchor.point.x + cos * b.anchor.point.y));
+        const int32_t aRotated = static_cast<int32_t>(::lround(sin * a.anchor.point.x + cos * a.anchor.point.y));
+        const int32_t bRotated = static_cast<int32_t>(::lround(sin * b.anchor.point.x + cos * b.anchor.point.y));
         return aRotated != bRotated ?
             aRotated < bRotated :
             a.dataFeatureIndex > b.dataFeatureIndex;
