@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
     typedef NSString *NSNotificationName;
 #endif
 
-typedef NSString *MGLExceptionName NS_EXTENSIBLE_STRING_ENUM;
+typedef NSString *MGLExceptionName NS_TYPED_EXTENSIBLE_ENUM;
 
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLAbstractClassException;
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUnavailableMethodException;
