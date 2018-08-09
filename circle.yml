@@ -110,14 +110,14 @@ step-library:
   - &save-mason_packages-cache
       save_cache:
         name: Save mason_packages cache
-        key: 'mason_packages/v1/{{ arch }}/{{ checksum "cmake/mason-dependencies.cmake" }}'
+        key: 'mason_packages/v3/{{ arch }}/{{ checksum "cmake/mason-dependencies.cmake" }}'
         paths: [ "mason_packages/.binaries" ]
   - &restore-mason_packages-cache
       restore_cache:
         name: Restore mason_packages cache
         keys:
-          - 'mason_packages/v1/{{ arch }}/{{ checksum "cmake/mason-dependencies.cmake" }}'
-          - 'mason_packages/v1/{{ arch }}'
+          - 'mason_packages/v3/{{ arch }}/{{ checksum "cmake/mason-dependencies.cmake" }}'
+          - 'mason_packages/v3/{{ arch }}'
   - &save-ccache
       save_cache:
         name: Save ccache
