@@ -137,6 +137,7 @@ set(MBGL_TEST_FILES
     test/util/merge_lines.test.cpp
     test/util/number_conversions.test.cpp
     test/util/offscreen_texture.test.cpp
+    test/util/peer.test.cpp
     test/util/position.test.cpp
     test/util/projection.test.cpp
     test/util/run_loop.test.cpp
@@ -147,7 +148,6 @@ set(MBGL_TEST_FILES
     test/util/tile_range.test.cpp
     test/util/timer.test.cpp
     test/util/token.test.cpp
-    test/util/unique_any.test.cpp
     test/util/url.test.cpp
 
 )

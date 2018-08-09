@@ -35,7 +35,13 @@ class Context;
 
 class Tile : private util::noncopyable {
 public:
-    Tile(OverscaledTileID);
+    enum class Kind : uint8_t {
+        Geometry,
+        Raster,
+        RasterDEM
+    };
+
+    Tile(Kind, OverscaledTileID);
     virtual ~Tile();
 
     void setObserver(TileObserver* observer);
@@ -119,6 +125,7 @@ public:
     
     void dumpDebugLogs() const;
 
+    const Kind kind;
     OverscaledTileID id;
     optional<Timestamp> modified;
     optional<Timestamp> expires;

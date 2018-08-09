@@ -77,6 +77,16 @@ optional<GeoJSONOptions> Converter<GeoJSONOptions>::operator()(const Convertible
         }
     }
 
+    const auto lineMetricsValue = objectMember(value, "lineMetrics");
+    if (lineMetricsValue) {
+        if (toBool(*lineMetricsValue)) {
+            options.lineMetrics = *toBool(*lineMetricsValue);
+        } else {
+            error = { "GeoJSON source lineMetrics value must be a boolean" };
+            return nullopt;
+        }
+    }
+
     return { options };
 }
 

@@ -506,6 +506,7 @@ test-node-recycle-map: node
 	npm test
 	npm run test-render -- --recycle-map --shuffle
 	npm run test-query
+	npm run test-expressions
 
 #### Android targets ###########################################################
 

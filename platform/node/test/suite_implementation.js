@@ -1,24 +1,24 @@
-'use strict';
-
-var mbgl = require('../index');
-var request = require('request');
-var PNG = require('pngjs').PNG;
-var fs = require('fs');
-var path = require('path');
+import mbgl from '../index';
+import request from 'request';
+import {PNG} from 'pngjs';
+import * as fs from 'fs';
+import * as path from 'path';
 
 mbgl.on('message', function(msg) {
     console.log('%s (%s): %s', msg.severity, msg.class, msg.text);
 });
 
 // Map of map objects by pixel ratio
-var maps = new Map();
+const maps = new Map();
 
-module.exports = function (style, options, callback) {
-    var tileMode = options.mapMode === 'tile';
+export default function (style, options, callback) {
+    const tileMode = options.mapMode === 'tile';
+    let map;
+
     if (options.recycleMap) {
-        var key = options.pixelRatio + '/' + tileMode;
+        const key = options.pixelRatio + '/' + tileMode;
         if (maps.has(key)) {
-            var map = maps.get(key);
+            map = maps.get(key);
             map.request = mapRequest;
         } else {
             maps.set(key, new mbgl.Map({
@@ -26,18 +26,18 @@ module.exports = function (style, options, callback) {
                 request: mapRequest,
                 mode: options.mapMode
             }));
-            var map = maps.get(key);
+            map = maps.get(key);
         }
     } else {
-        var map = new mbgl.Map({
+        map = new mbgl.Map({
             ratio: options.pixelRatio,
             request: mapRequest,
             mode: options.mapMode
         });
     }
 
-    var timedOut = false;
-    var watchdog = setTimeout(function () {
+    let timedOut = false;
+    const watchdog = setTimeout(function () {
         timedOut = true;
         map.dumpDebugLogs();
         callback(new Error('timed out after 20 seconds'));
@@ -61,19 +61,19 @@ module.exports = function (style, options, callback) {
         request(req.url, {encoding: null}, function (err, response, body) {
             if (err) {
                 callback(err);
-            } else if (response.statusCode == 404) {
+            } else if (response.statusCode === 404) {
                 callback();
-            } else if (response.statusCode != 200) {
+            } else if (response.statusCode !== 200) {
                 callback(new Error(response.statusMessage));
             } else {
                 callback(null, {data: body});
             }
         });
-    };
+    }
 
     applyOperations(options.operations, function() {
         map.render(options, function (err, pixels) {
-            var results = options.queryGeometry ?
+            const results = options.queryGeometry ?
               map.queryRenderedFeatures(options.queryGeometry, options.queryOptions || {}) :
               [];
             if (!options.recycleMap) {
@@ -86,7 +86,7 @@ module.exports = function (style, options, callback) {
     });
 
     function applyOperations(operations, callback) {
-        var operation = operations && operations[0];
+        const operation = operations && operations[0];
         if (!operations || operations.length === 0) {
             callback();
 
@@ -102,7 +102,7 @@ module.exports = function (style, options, callback) {
                 applyOperations(operations.slice(1), callback);
             }, operation[1]);
         } else if (operation[0] === 'addImage' || operation[0] === 'updateImage') {
-            var img = PNG.sync.read(fs.readFileSync(path.join(__dirname, '../../../mapbox-gl-js/test/integration', operation[2])));
+            const img = PNG.sync.read(fs.readFileSync(path.join(__dirname, '../../../mapbox-gl-js/test/integration', operation[2])));
             const testOpts = (operation.length > 3) ? operation[3] : {};
 
             const options = {
@@ -110,7 +110,7 @@ module.exports = function (style, options, callback) {
                 width: img.width,
                 pixelRatio: testOpts.pixelRatio || 1,
                 sdf: testOpts.sdf || false
-            }
+            };
 
             map.addImage(operation[1], img.data, options);
 

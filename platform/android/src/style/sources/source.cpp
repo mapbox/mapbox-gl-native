@@ -51,7 +51,7 @@ namespace android {
         if (!coreSource.peer.has_value()) {
             coreSource.peer = createSourcePeer(env, coreSource, frontend);
         }
-        return *mbgl::util::any_cast<std::unique_ptr<Source>>(&coreSource.peer)->get()->javaPeer;
+        return *coreSource.peer.get<std::unique_ptr<Source>>()->javaPeer;
     }
 
     Source::Source(jni::JNIEnv& env, mbgl::style::Source& coreSource, jni::Object<Source> obj, AndroidRendererFrontend& frontend)
@@ -125,7 +125,7 @@ namespace android {
 
         // Release the peer relationships. These will be re-established when the source is added to a map
         assert(ownedSource->peer.has_value());
-        util::any_cast<std::unique_ptr<Source>>(&(ownedSource->peer))->release();
+        ownedSource->peer.get<std::unique_ptr<Source>>().release();
         ownedSource->peer.reset();
 
         // Release the strong reference to the java peer
