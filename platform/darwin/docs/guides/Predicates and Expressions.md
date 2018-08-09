@@ -152,6 +152,16 @@ NSExpression(forFunction: "lowercase:",
              arguments: [NSExpression(forKeyPath: "ISO 3166-1:2006")])
 ```
 
+If a feature attribute name contains a dot, the string can be wrapped in a
+`MGL_FUNCTION`. For a feature attribute named `us.state`, you could use:
+```objc
+[NSExpression expressionWithFormat: @"MGL_FUNCTION('get', 'us.state')"];
+```
+
+```swift
+NSExpression(format: "MGL_FUNCTION('get', 'us.state')")
+```
+
 ### Functions
 
 Of the
@@ -544,9 +554,9 @@ expression that contains references to those variables.
    An input expression, then any number of argument pairs, followed by a default
    expression. Each argument pair consists of a constant value followed by an
    expression to produce as a result of matching that constant value.
-   If the input value is an aggregate expression, then any of the constant values within 
-   that aggregate expression result in the following argument. This is shorthand for 
-   specifying an argument pair for each of the constant values within that aggregate 
+   If the input value is an aggregate expression, then any of the constant values within
+   that aggregate expression result in the following argument. This is shorthand for
+   specifying an argument pair for each of the constant values within that aggregate
    expression. It is not possible to match the aggregate expression itself.
 </dd>
 </dl>
@@ -720,9 +730,9 @@ operator in the Mapbox Style Specification. See also the
 <dd>
    The first argument is one of the following strings denoting curve types:
    <code>linear</code>, <code>exponential</code>, or <code>cubic-bezier</code>.
-   
+
    The second argument is an expression providing parameters for the curve:
-   
+
    <ul>
       <li>If the curve type is <code>linear</code>, the argument is <code>NIL</code>.</li>
       <li>
@@ -737,7 +747,7 @@ operator in the Mapbox Style Specification. See also the
          cubic Bézier curve.
       </li>
    </ul>
-   
+
    The third argument is an <code>NSDictionary</code> object representing the
    interpolation’s stops, with numeric zoom levels as keys and expressions as
    values.
@@ -821,7 +831,7 @@ operator.
    The first argument is an expression that evaluates to a number, specifying
    the minimum value in case the target is less than any of the stops in the
    second argument.
-   
+
    The second argument is an <code>NSDictionary</code> object representing the
    interpolation’s stops, with numeric zoom levels as keys and expressions as
    values.
