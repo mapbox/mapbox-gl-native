@@ -2,6 +2,12 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.4.0-beta.1 - August 9, 2018
+ - Don't prefetch tiles for geojson sources [#12529](https://github.com/mapbox/mapbox-gl-native/pull/12529)
+ - Enable LTO in release builds [#12546](https://github.com/mapbox/mapbox-gl-native/pull/12546)
+ - Update Java Services to v3.4.0 [#12564](https://github.com/mapbox/mapbox-gl-native/pull/12564)
+ - Telemetry bump to 3.1.5 [#12589](https://github.com/mapbox/mapbox-gl-native/pull/12589)
+
 ## 6.4.0-alpha.2 - August 1, 2018
  - Compress shader source code [#12477](https://github.com/mapbox/mapbox-gl-native/pull/12477)
  - Add minimal touch target to marker click detection [#12482](https://github.com/mapbox/mapbox-gl-native/pull/12482)
