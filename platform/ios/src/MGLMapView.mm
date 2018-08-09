@@ -92,6 +92,10 @@ const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondDefau
 const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondLowPower = 30;
 const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondMaximum = 60;
 
+const MGLExceptionName MGLMissingLocationServicesUsageDescriptionException = @"MGLMissingLocationServicesUsageDescriptionException";
+const MGLExceptionName MGLUserLocationAnnotationTypeException = @"MGLUserLocationAnnotationTypeException";
+const MGLExceptionName MGLResourceNotFoundException = @"MGLResourceNotFoundException";
+
 /// Indicates the manner in which the map view is tracking the user location.
 typedef NS_ENUM(NSUInteger, MGLUserTrackingState) {
     /// The map view is not yet tracking the user location.
@@ -138,7 +142,7 @@ static NSString * const MGLInvisibleStyleMarkerSymbolName = @"invisible_marker";
 
 /// Prefix that denotes a sprite installed by MGLMapView, to avoid collisions
 /// with style-defined sprites.
-NSString *const MGLAnnotationSpritePrefix = @"com.mapbox.sprites.";
+NSString * const MGLAnnotationSpritePrefix = @"com.mapbox.sprites.";
 
 /// Slop area around the hit testing point, allowing for imprecise annotation selection.
 const CGFloat MGLAnnotationImagePaddingForHitTest = 5;
@@ -4790,7 +4794,8 @@ public:
                 NSString *suggestedUsageKeys = requiresWhenInUseUsageDescription ?
                     @"NSLocationWhenInUseUsageDescription and (optionally) NSLocationAlwaysAndWhenInUseUsageDescription" :
                     @"NSLocationWhenInUseUsageDescription and/or NSLocationAlwaysUsageDescription";
-                [NSException raise:@"Missing Location Services usage description" format:@"This app must have a value for %@ in its Info.plist.", suggestedUsageKeys];
+                [NSException raise:MGLMissingLocationServicesUsageDescriptionException
+                            format:@"This app must have a value for %@ in its Info.plist.", suggestedUsageKeys];
             }
         }
 
@@ -4827,7 +4832,7 @@ public:
             userLocationAnnotationView = (MGLUserLocationAnnotationView *)[self.delegate mapView:self viewForAnnotation:self.userLocation];
             if (userLocationAnnotationView && ! [userLocationAnnotationView isKindOfClass:MGLUserLocationAnnotationView.class])
             {
-                [NSException raise:@"MGLUserLocationAnnotationTypeException"
+                [NSException raise:MGLUserLocationAnnotationTypeException
                             format:@"User location annotation view must be a kind of MGLUserLocationAnnotationView. %@", userLocationAnnotationView.debugDescription];
             }
         }
@@ -6007,7 +6012,7 @@ public:
 
     if ( ! image)
     {
-        [NSException raise:@"MGLResourceNotFoundException" format:
+        [NSException raise:MGLResourceNotFoundException format:
          @"The resource named “%@” could not be found in the Mapbox framework bundle.", imageName];
     }
 
@@ -6296,8 +6301,8 @@ private:
     NSURL *url = URLString.length ? [NSURL URLWithString:URLString] : nil;
     if (URLString.length && !url)
     {
-        [NSException raise:@"Invalid style URL" format:
-         @"“%@” is not a valid style URL.", URLString];
+        [NSException raise:MGLInvalidStyleURLException
+                    format:@"“%@” is not a valid style URL.", URLString];
     }
     self.styleURL = url;
 }

@@ -14,7 +14,7 @@
     XCTAssertEqualObjects(region.styleURL, [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion], @"Streets isn’t the default style.");
 
     NSURL *localURL = [NSURL URLWithString:@"beautiful.style"];
-    XCTAssertThrowsSpecificNamed([[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:localURL bounds:bounds fromZoomLevel:0 toZoomLevel:DBL_MAX], NSException, @"Invalid style URL", @"No exception raised when initializing region with a local file URL as the style URL.");
+    XCTAssertThrowsSpecificNamed([[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:localURL bounds:bounds fromZoomLevel:0 toZoomLevel:DBL_MAX], NSException, MGLInvalidStyleURLException, @"No exception raised when initializing region with a local file URL as the style URL.");
 }
 
 - (void)testEquality {

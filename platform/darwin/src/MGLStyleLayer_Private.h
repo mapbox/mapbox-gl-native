@@ -24,7 +24,7 @@ struct LayerWrapper {
 #define MGLAssertStyleLayerIsValid() \
     do { \
         if (!self.rawLayer) { \
-            [NSException raise:@"Invalid style layer" \
+            [NSException raise:MGLInvalidStyleLayerException \
                         format: \
             @"-[MGLStyle removeLayer:] has been called " \
             @"with this instance but another style layer instance was added with the same identifer. It is an " \

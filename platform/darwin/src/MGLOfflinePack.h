@@ -1,9 +1,12 @@
 #import <Foundation/Foundation.h>
 
 #import "MGLFoundation.h"
+#import "MGLTypes.h"
 #import "MGLOfflineRegion.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLInvalidOfflinePackException;
 
 /**
  The state an offline pack is currently in.

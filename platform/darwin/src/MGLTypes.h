@@ -30,6 +30,14 @@ NS_ASSUME_NONNULL_BEGIN
     typedef NSString *NSNotificationName;
 #endif
 
+typedef NSString *MGLExceptionName NS_TYPED_EXTENSIBLE_ENUM;
+
+/**
+ :nodoc: Generic exceptions used across multiple disparate classes. Exceptions
+ that are unique to a class or class-cluster should be defined in those headers.
+ */
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLAbstractClassException;
+
 /** Indicates an error occurred in the Mapbox SDK. */
 FOUNDATION_EXTERN MGL_EXPORT NSErrorDomain const MGLErrorDomain;
 
