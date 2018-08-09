@@ -29,6 +29,10 @@ android|win32|darwin|qnx {
         platform/default/thread.cpp
 }
 
+android|gcc {
+    QMAKE_CFLAGS += -std=c99
+}
+
 darwin {
     LIBS += \
         -framework Foundation
