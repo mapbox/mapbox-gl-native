@@ -953,6 +953,7 @@ NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *sha
             if (error) {
                 [[NSAlert alertWithError:error] runModal];
             } else {
+                [(AppDelegate *)NSApp.delegate watchOfflinePack:pack];
                 [pack resume];
             }
         }];
