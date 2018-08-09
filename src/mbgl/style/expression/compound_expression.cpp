@@ -633,6 +633,48 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
 std::unordered_map<std::string, Definition> CompoundExpressionRegistry::definitions = initializeDefinitions();
 
 using namespace mbgl::style::conversion;
+    
+std::string expectedTypesError(const Definition& definition,
+                               const std::vector<std::unique_ptr<Expression>>& args) {
+    std::vector<std::string> availableOverloads; // Only used if there are no overloads with matching number of args
+    std::vector<std::string> overloads;
+    for (const auto& signature : definition) {
+        signature->params.match(
+        [&](const VarargsType& varargs) {
+            std::string overload = "(" + toString(varargs.type) + ")";
+            overloads.push_back(overload);
+        },
+        [&](const std::vector<type::Type>& params) {
+            std::string overload = "(";
+            bool first = true;
+            for (const type::Type& param : params) {
+                if (!first) overload += ", ";
+                overload += toString(param);
+                first = false;
+            }
+            overload += ")";
+            if (params.size() == args.size()) {
+                overloads.push_back(overload);
+            } else {
+                availableOverloads.push_back(overload);
+            }
+        }
+        );
+    }
+    std::string signatures = overloads.empty() ?
+        boost::algorithm::join(availableOverloads, " | ") :
+        boost::algorithm::join(overloads, " | ");
+    
+    std::string actualTypes;
+    for (const auto& arg : args) {
+        if (actualTypes.size() > 0) {
+            actualTypes += ", ";
+        }
+        actualTypes += toString(arg->getType());
+    }
+    
+    return "Expected arguments of type " + signatures + ", but found (" + actualTypes + ") instead.";
+}
 
 static ParseResult createCompoundExpression(const Definition& definition,
                                             std::vector<std::unique_ptr<Expression>> args,
@@ -679,43 +721,7 @@ static ParseResult createCompoundExpression(const Definition& definition,
     if (definition.size() == 1) {
         ctx.appendErrors(std::move(signatureContext));
     } else {
-        std::vector<std::string> availableOverloads; // Only used if there are no overloads with matching number of args
-        std::vector<std::string> overloads;
-        for (const auto& signature : definition) {
-            signature->params.match(
-                [&](const VarargsType& varargs) {
-                    std::string overload = "(" + toString(varargs.type) + ")";
-                    overloads.push_back(overload);
-                },
-                [&](const std::vector<type::Type>& params) {
-                    std::string overload = "(";
-                    bool first = true;
-                    for (const type::Type& param : params) {
-                        if (!first) overload += ", ";
-                        overload += toString(param);
-                        first = false;
-                    }
-                    overload += ")";
-                    if (params.size() == args.size()) {
-                        overloads.push_back(overload);
-                    } else {
-                        availableOverloads.push_back(overload);
-                    }
-                }
-            );
-
-        }
-        std::string signatures = overloads.empty() ?
-            boost::algorithm::join(availableOverloads, " | ") :
-            boost::algorithm::join(overloads, " | ");
-        std::string actualTypes;
-        for (const auto& arg : args) {
-            if (actualTypes.size() > 0) {
-                actualTypes += ", ";
-            }
-            actualTypes += toString(arg->getType());
-        }
-        ctx.error("Expected arguments of type " + signatures + ", but found (" + actualTypes + ") instead.");
+        ctx.error(expectedTypesError(definition, args));
     }
 
     return ParseResult();
@@ -735,46 +741,67 @@ ParseResult parseCompoundExpression(const std::string name, const Convertible& v
     const CompoundExpressionRegistry::Definition& definition = it->second;
 
     auto length = arrayLength(value);
-
-    // Check if we have a single signature with the correct number of
-    // parameters. If so, then use that signature's parameter types for parsing
-    // (and inferring the types of) the arguments.
-    optional<std::size_t> singleMatchingSignature;
+    
+    bool attemptedParse = false;
+    
     for (std::size_t j = 0; j < definition.size(); j++) {
         const std::unique_ptr<detail::SignatureBase>& signature = definition[j];
+
         if (
             signature->params.is<VarargsType>() ||
             signature->params.get<std::vector<type::Type>>().size() == length - 1
-        ) {
-            if (singleMatchingSignature) {
-                singleMatchingSignature = {};
+            ) {
+            // First parse all the args, potentially coercing to the
+            // types expected by this overload.
+            bool argParseFailed = false;
+            std::vector<std::unique_ptr<Expression>> args;
+            args.reserve(length - 1);
+
+            for (std::size_t i = 1; i < length; i++) {
+                optional<type::Type> expected = definition[j]->params.match(
+                    [](const VarargsType& varargs) { return varargs.type; },
+                    [&](const std::vector<type::Type>& params_) { return params_[i - 1]; }
+                );
+
+                auto parsed = ctx.parse(arrayMember(value, i), i, expected);
+                if (!parsed) {
+                    argParseFailed = true;
+                    break;
+                }
+                args.push_back(std::move(*parsed));
+            }
+            if (argParseFailed) {
+                // Couldn't coerce args of this overload to expected type, move
+                // on to next one.
+                ctx.clearErrors();
+                continue;
             } else {
-                singleMatchingSignature = j;
+                attemptedParse = true;
+                ParseResult parseWithArgs = createCompoundExpression(definition, std::move(args), ctx);
+                if (parseWithArgs) {
+                    return parseWithArgs;
+                }
             }
         }
     }
-
-    // parse subexpressions first
-    std::vector<std::unique_ptr<Expression>> args;
-    args.reserve(length - 1);
-    for (std::size_t i = 1; i < length; i++) {
-        optional<type::Type> expected;
-
-        if (singleMatchingSignature) {
-            expected = definition[*singleMatchingSignature]->params.match(
-                [](const VarargsType& varargs) { return varargs.type; },
-                [&](const std::vector<type::Type>& params_) { return params_[i - 1]; }
-            );
+    if (!attemptedParse) {
+        // The args couldn't be coerced to any of the expected types.
+        // Parse the arguments again without expected types just for the error message
+        std::vector<std::unique_ptr<Expression>> args;
+        args.reserve(length - 1);
+        
+        for (std::size_t i = 1; i < length; i++) {
+            auto parsed = ctx.parse(arrayMember(value, i), i);
+            if (!parsed) {
+                return ParseResult();
+            }
+            args.push_back(std::move(*parsed));
         }
 
-        auto parsed = ctx.parse(arrayMember(value, i), i, expected);
-        if (!parsed) {
-            return parsed;
-        }
-        args.push_back(std::move(*parsed));
+        ctx.error(expectedTypesError(definition, args));
     }
 
-    return createCompoundExpression(definition, std::move(args), ctx);
+    return ParseResult();
 }
 
 ParseResult createCompoundExpression(const std::string& name,
