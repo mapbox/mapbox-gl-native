@@ -135,6 +135,8 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:nil object:nil];
+
     if (![[NSUserDefaults standardUserDefaults] boolForKey:@"NSQuitAlwaysKeepsWindows"]) {
         NSDocument *currentDocument = [NSDocumentController sharedDocumentController].currentDocument;
         if ([currentDocument isKindOfClass:[MapDocument class]]) {
@@ -204,6 +206,7 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
 
 - (IBAction)delete:(id)sender {
     for (MGLOfflinePack *pack in self.offlinePacksArrayController.selectedObjects) {
+        [self unwatchOfflinePack:pack];
         [[MGLOfflineStorage sharedOfflineStorage] removePack:pack withCompletionHandler:^(NSError * _Nullable error) {
             if (error) {
                 [[NSAlert alertWithError:error] runModal];
@@ -228,17 +231,40 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
             }
 
             case MGLOfflinePackStateInactive:
+                [self watchOfflinePack:pack];
                 [pack resume];
                 break;
 
             case MGLOfflinePackStateActive:
                 [pack suspend];
+                [self unwatchOfflinePack:pack];
                 break;
 
             default:
                 break;
         }
     }
+}
+
+- (void)watchOfflinePack:(MGLOfflinePack *)pack {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(offlinePackDidChangeProgress:) name:MGLOfflinePackProgressChangedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(offlinePackDidReceiveError:) name:MGLOfflinePackErrorNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(offlinePackDidReceiveError:) name:MGLOfflinePackMaximumMapboxTilesReachedNotification object:nil];
+}
+
+- (void)unwatchOfflinePack:(MGLOfflinePack *)pack {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:nil object:pack];
+}
+
+- (void)offlinePackDidChangeProgress:(NSNotification *)notification {
+    MGLOfflinePack *pack = notification.object;
+    if (pack.state == MGLOfflinePackStateComplete) {
+        [[NSSound soundNamed:@"Glass"] play];
+    }
+}
+
+- (void)offlinePackDidReceiveError:(NSNotification *)notification {
+    [[NSSound soundNamed:@"Basso"] play];
 }
 
 #pragma mark Help methods
