@@ -21,4 +21,6 @@ extern NSString * const MGLMapboxAccessTokenDefaultsKey;
 @property (copy) NSURL *pendingStyleURL;
 @property (assign) MGLMapDebugMaskOptions pendingDebugMask;
 
+- (void)watchOfflinePack:(MGLOfflinePack *)pack;
+
 @end
