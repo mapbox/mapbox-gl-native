@@ -18,7 +18,8 @@
                               MGLShapeSourceOptionMaximumZoomLevelForClustering: @98,
                               MGLShapeSourceOptionMaximumZoomLevel: @99,
                               MGLShapeSourceOptionBuffer: @1976,
-                              MGLShapeSourceOptionSimplificationTolerance: @0.42};
+                              MGLShapeSourceOptionSimplificationTolerance: @0.42,
+                              MGLShapeSourceOptionLineDistanceMetrics: @YES};
 
     auto mbglOptions = MGLGeoJSONOptionsFromDictionary(options);
     XCTAssertTrue(mbglOptions.cluster);
@@ -27,6 +28,7 @@
     XCTAssertEqual(mbglOptions.maxzoom, 99);
     XCTAssertEqual(mbglOptions.buffer, 1976);
     XCTAssertEqual(mbglOptions.tolerance, 0.42);
+    XCTAssertTrue(mbglOptions.lineMetrics);
 
     options = @{MGLShapeSourceOptionClustered: @"number 1"};
     XCTAssertThrows(MGLGeoJSONOptionsFromDictionary(options));

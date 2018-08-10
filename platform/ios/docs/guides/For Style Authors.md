@@ -171,6 +171,7 @@ In style JSON    | In the SDK
 `cluster`        | `MGLShapeSourceOptionClustered`
 `clusterRadius`  | `MGLShapeSourceOptionClusterRadius`
 `clusterMaxZoom` | `MGLShapeSourceOptionMaximumZoomLevelForClustering`
+`lineMetrics`    | `MGLShapeSourceOptionLineDistanceMetrics`
 
 To create a shape source from local GeoJSON data, first
 [convert the GeoJSON data into a shape](working-with-geojson-data.html#converting-geojson-data-into-shape-objects),
