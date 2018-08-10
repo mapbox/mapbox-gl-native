@@ -9,6 +9,7 @@
 #include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
+#include <mbgl/util/fnv_hash.hpp>
 
 namespace mbgl {
 namespace style {
@@ -440,217 +441,292 @@ TransitionOptions LineLayer::getLinePatternTransition() const {
 using namespace conversion;
 
 optional<Error> LineLayer::setPaintProperty(const std::string& name, const Convertible& value) {
+    enum class Property {
+        Unknown,
+        LineOpacity,
+        LineColor,
+        LineTranslate,
+        LineTranslateAnchor,
+        LineWidth,
+        LineGapWidth,
+        LineOffset,
+        LineBlur,
+        LineDasharray,
+        LinePattern,
+        LineOpacityTransition,
+        LineColorTransition,
+        LineTranslateTransition,
+        LineTranslateAnchorTransition,
+        LineWidthTransition,
+        LineGapWidthTransition,
+        LineOffsetTransition,
+        LineBlurTransition,
+        LineDasharrayTransition,
+        LinePatternTransition,
+    };
+
+    Property property = Property::Unknown;
+    switch (util::hashFNV1a(name.c_str())) {
+    case util::hashFNV1a("line-opacity"):
+        if (name == "line-opacity") {
+            property = Property::LineOpacity;
+        }
+        break;
+    case util::hashFNV1a("line-opacity-transition"):
+        if (name == "line-opacity-transition") {
+            property = Property::LineOpacityTransition;
+        }
+        break;
+    case util::hashFNV1a("line-color"):
+        if (name == "line-color") {
+            property = Property::LineColor;
+        }
+        break;
+    case util::hashFNV1a("line-color-transition"):
+        if (name == "line-color-transition") {
+            property = Property::LineColorTransition;
+        }
+        break;
+    case util::hashFNV1a("line-translate"):
+        if (name == "line-translate") {
+            property = Property::LineTranslate;
+        }
+        break;
+    case util::hashFNV1a("line-translate-transition"):
+        if (name == "line-translate-transition") {
+            property = Property::LineTranslateTransition;
+        }
+        break;
+    case util::hashFNV1a("line-translate-anchor"):
+        if (name == "line-translate-anchor") {
+            property = Property::LineTranslateAnchor;
+        }
+        break;
+    case util::hashFNV1a("line-translate-anchor-transition"):
+        if (name == "line-translate-anchor-transition") {
+            property = Property::LineTranslateAnchorTransition;
+        }
+        break;
+    case util::hashFNV1a("line-width"):
+        if (name == "line-width") {
+            property = Property::LineWidth;
+        }
+        break;
+    case util::hashFNV1a("line-width-transition"):
+        if (name == "line-width-transition") {
+            property = Property::LineWidthTransition;
+        }
+        break;
+    case util::hashFNV1a("line-gap-width"):
+        if (name == "line-gap-width") {
+            property = Property::LineGapWidth;
+        }
+        break;
+    case util::hashFNV1a("line-gap-width-transition"):
+        if (name == "line-gap-width-transition") {
+            property = Property::LineGapWidthTransition;
+        }
+        break;
+    case util::hashFNV1a("line-offset"):
+        if (name == "line-offset") {
+            property = Property::LineOffset;
+        }
+        break;
+    case util::hashFNV1a("line-offset-transition"):
+        if (name == "line-offset-transition") {
+            property = Property::LineOffsetTransition;
+        }
+        break;
+    case util::hashFNV1a("line-blur"):
+        if (name == "line-blur") {
+            property = Property::LineBlur;
+        }
+        break;
+    case util::hashFNV1a("line-blur-transition"):
+        if (name == "line-blur-transition") {
+            property = Property::LineBlurTransition;
+        }
+        break;
+    case util::hashFNV1a("line-dasharray"):
+        if (name == "line-dasharray") {
+            property = Property::LineDasharray;
+        }
+        break;
+    case util::hashFNV1a("line-dasharray-transition"):
+        if (name == "line-dasharray-transition") {
+            property = Property::LineDasharrayTransition;
+        }
+        break;
+    case util::hashFNV1a("line-pattern"):
+        if (name == "line-pattern") {
+            property = Property::LinePattern;
+        }
+        break;
+    case util::hashFNV1a("line-pattern-transition"):
+        if (name == "line-pattern-transition") {
+            property = Property::LinePatternTransition;
+        }
+        break;
     
-    if (name == "line-opacity") {
+    }
+
+    if (property == Property::Unknown) {
+        return Error { "layer doesn't support this property" };
+    }
+
+        
+    if (property == Property::LineOpacity || property == Property::LineWidth || property == Property::LineGapWidth || property == Property::LineOffset || property == Property::LineBlur) {
         Error error;
         optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-
-        setLineOpacity(*typedValue);
-        return nullopt;
-    }
-    if (name == "line-opacity-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
+        
+        if (property == Property::LineOpacity) {
+            setLineOpacity(*typedValue);
+            return nullopt;
         }
-
-        setLineOpacityTransition(*transition);
-        return nullopt;
+        
+        if (property == Property::LineWidth) {
+            setLineWidth(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::LineGapWidth) {
+            setLineGapWidth(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::LineOffset) {
+            setLineOffset(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::LineBlur) {
+            setLineBlur(*typedValue);
+            return nullopt;
+        }
+        
     }
     
-    if (name == "line-color") {
+    if (property == Property::LineColor) {
         Error error;
         optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setLineColor(*typedValue);
         return nullopt;
-    }
-    if (name == "line-color-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setLineColorTransition(*transition);
-        return nullopt;
+        
     }
     
-    if (name == "line-translate") {
+    if (property == Property::LineTranslate) {
         Error error;
         optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setLineTranslate(*typedValue);
         return nullopt;
-    }
-    if (name == "line-translate-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setLineTranslateTransition(*transition);
-        return nullopt;
+        
     }
     
-    if (name == "line-translate-anchor") {
+    if (property == Property::LineTranslateAnchor) {
         Error error;
         optional<PropertyValue<TranslateAnchorType>> typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setLineTranslateAnchor(*typedValue);
         return nullopt;
-    }
-    if (name == "line-translate-anchor-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setLineTranslateAnchorTransition(*transition);
-        return nullopt;
+        
     }
     
-    if (name == "line-width") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setLineWidth(*typedValue);
-        return nullopt;
-    }
-    if (name == "line-width-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setLineWidthTransition(*transition);
-        return nullopt;
-    }
-    
-    if (name == "line-gap-width") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setLineGapWidth(*typedValue);
-        return nullopt;
-    }
-    if (name == "line-gap-width-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setLineGapWidthTransition(*transition);
-        return nullopt;
-    }
-    
-    if (name == "line-offset") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setLineOffset(*typedValue);
-        return nullopt;
-    }
-    if (name == "line-offset-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setLineOffsetTransition(*transition);
-        return nullopt;
-    }
-    
-    if (name == "line-blur") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setLineBlur(*typedValue);
-        return nullopt;
-    }
-    if (name == "line-blur-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setLineBlurTransition(*transition);
-        return nullopt;
-    }
-    
-    if (name == "line-dasharray") {
+    if (property == Property::LineDasharray) {
         Error error;
         optional<PropertyValue<std::vector<float>>> typedValue = convert<PropertyValue<std::vector<float>>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setLineDasharray(*typedValue);
         return nullopt;
-    }
-    if (name == "line-dasharray-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setLineDasharrayTransition(*transition);
-        return nullopt;
+        
     }
     
-    if (name == "line-pattern") {
+    if (property == Property::LinePattern) {
         Error error;
         optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setLinePattern(*typedValue);
         return nullopt;
+        
     }
-    if (name == "line-pattern-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
+    
 
+    Error error;
+    optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+    if (!transition) {
+        return error;
+    }
+    
+    if (property == Property::LineOpacityTransition) {
+        setLineOpacityTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::LineColorTransition) {
+        setLineColorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::LineTranslateTransition) {
+        setLineTranslateTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::LineTranslateAnchorTransition) {
+        setLineTranslateAnchorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::LineWidthTransition) {
+        setLineWidthTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::LineGapWidthTransition) {
+        setLineGapWidthTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::LineOffsetTransition) {
+        setLineOffsetTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::LineBlurTransition) {
+        setLineBlurTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::LineDasharrayTransition) {
+        setLineDasharrayTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::LinePatternTransition) {
         setLinePatternTransition(*transition);
         return nullopt;
     }
     
+
     return Error { "layer doesn't support this property" };
 }
 
@@ -671,51 +747,92 @@ optional<Error> LineLayer::setLayoutProperty(const std::string& name, const Conv
         return nullopt;
     }
 
+    enum class Property {
+        Unknown,
+        LineCap,
+        LineJoin,
+        LineMiterLimit,
+        LineRoundLimit,
+    };
+
+    Property property = Property::Unknown;
+    switch (util::hashFNV1a(name.c_str())) {
     
-    if (name == "line-cap") {
+    case util::hashFNV1a("line-cap"):
+        if (name == "line-cap") {
+            property = Property::LineCap;
+        }
+        break;
+    
+    case util::hashFNV1a("line-join"):
+        if (name == "line-join") {
+            property = Property::LineJoin;
+        }
+        break;
+    
+    case util::hashFNV1a("line-miter-limit"):
+        if (name == "line-miter-limit") {
+            property = Property::LineMiterLimit;
+        }
+        break;
+    
+    case util::hashFNV1a("line-round-limit"):
+        if (name == "line-round-limit") {
+            property = Property::LineRoundLimit;
+        }
+        break;
+    
+    }
+
+    if (property == Property::Unknown) {
+        return Error { "layer doesn't support this property" };
+    }
+
+        
+    if (property == Property::LineCap) {
         Error error;
         optional<PropertyValue<LineCapType>> typedValue = convert<PropertyValue<LineCapType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setLineCap(*typedValue);
         return nullopt;
+        
     }
     
-    if (name == "line-join") {
+    if (property == Property::LineJoin) {
         Error error;
         optional<PropertyValue<LineJoinType>> typedValue = convert<PropertyValue<LineJoinType>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setLineJoin(*typedValue);
         return nullopt;
+        
     }
     
-    if (name == "line-miter-limit") {
+    if (property == Property::LineMiterLimit || property == Property::LineRoundLimit) {
         Error error;
         optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
-        setLineMiterLimit(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "line-round-limit") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
+        
+        if (property == Property::LineMiterLimit) {
+            setLineMiterLimit(*typedValue);
+            return nullopt;
         }
-
-        setLineRoundLimit(*typedValue);
-        return nullopt;
+        
+        if (property == Property::LineRoundLimit) {
+            setLineRoundLimit(*typedValue);
+            return nullopt;
+        }
+        
     }
     
+
     return Error { "layer doesn't support this property" };
 }
 

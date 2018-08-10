@@ -9,6 +9,7 @@
 #include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
+#include <mbgl/util/fnv_hash.hpp>
 
 namespace mbgl {
 namespace style {
@@ -1060,301 +1061,372 @@ TransitionOptions SymbolLayer::getTextTranslateAnchorTransition() const {
 using namespace conversion;
 
 optional<Error> SymbolLayer::setPaintProperty(const std::string& name, const Convertible& value) {
+    enum class Property {
+        Unknown,
+        IconOpacity,
+        IconColor,
+        IconHaloColor,
+        IconHaloWidth,
+        IconHaloBlur,
+        IconTranslate,
+        IconTranslateAnchor,
+        TextOpacity,
+        TextColor,
+        TextHaloColor,
+        TextHaloWidth,
+        TextHaloBlur,
+        TextTranslate,
+        TextTranslateAnchor,
+        IconOpacityTransition,
+        IconColorTransition,
+        IconHaloColorTransition,
+        IconHaloWidthTransition,
+        IconHaloBlurTransition,
+        IconTranslateTransition,
+        IconTranslateAnchorTransition,
+        TextOpacityTransition,
+        TextColorTransition,
+        TextHaloColorTransition,
+        TextHaloWidthTransition,
+        TextHaloBlurTransition,
+        TextTranslateTransition,
+        TextTranslateAnchorTransition,
+    };
+
+    Property property = Property::Unknown;
+    switch (util::hashFNV1a(name.c_str())) {
+    case util::hashFNV1a("icon-opacity"):
+        if (name == "icon-opacity") {
+            property = Property::IconOpacity;
+        }
+        break;
+    case util::hashFNV1a("icon-opacity-transition"):
+        if (name == "icon-opacity-transition") {
+            property = Property::IconOpacityTransition;
+        }
+        break;
+    case util::hashFNV1a("icon-color"):
+        if (name == "icon-color") {
+            property = Property::IconColor;
+        }
+        break;
+    case util::hashFNV1a("icon-color-transition"):
+        if (name == "icon-color-transition") {
+            property = Property::IconColorTransition;
+        }
+        break;
+    case util::hashFNV1a("icon-halo-color"):
+        if (name == "icon-halo-color") {
+            property = Property::IconHaloColor;
+        }
+        break;
+    case util::hashFNV1a("icon-halo-color-transition"):
+        if (name == "icon-halo-color-transition") {
+            property = Property::IconHaloColorTransition;
+        }
+        break;
+    case util::hashFNV1a("icon-halo-width"):
+        if (name == "icon-halo-width") {
+            property = Property::IconHaloWidth;
+        }
+        break;
+    case util::hashFNV1a("icon-halo-width-transition"):
+        if (name == "icon-halo-width-transition") {
+            property = Property::IconHaloWidthTransition;
+        }
+        break;
+    case util::hashFNV1a("icon-halo-blur"):
+        if (name == "icon-halo-blur") {
+            property = Property::IconHaloBlur;
+        }
+        break;
+    case util::hashFNV1a("icon-halo-blur-transition"):
+        if (name == "icon-halo-blur-transition") {
+            property = Property::IconHaloBlurTransition;
+        }
+        break;
+    case util::hashFNV1a("icon-translate"):
+        if (name == "icon-translate") {
+            property = Property::IconTranslate;
+        }
+        break;
+    case util::hashFNV1a("icon-translate-transition"):
+        if (name == "icon-translate-transition") {
+            property = Property::IconTranslateTransition;
+        }
+        break;
+    case util::hashFNV1a("icon-translate-anchor"):
+        if (name == "icon-translate-anchor") {
+            property = Property::IconTranslateAnchor;
+        }
+        break;
+    case util::hashFNV1a("icon-translate-anchor-transition"):
+        if (name == "icon-translate-anchor-transition") {
+            property = Property::IconTranslateAnchorTransition;
+        }
+        break;
+    case util::hashFNV1a("text-opacity"):
+        if (name == "text-opacity") {
+            property = Property::TextOpacity;
+        }
+        break;
+    case util::hashFNV1a("text-opacity-transition"):
+        if (name == "text-opacity-transition") {
+            property = Property::TextOpacityTransition;
+        }
+        break;
+    case util::hashFNV1a("text-color"):
+        if (name == "text-color") {
+            property = Property::TextColor;
+        }
+        break;
+    case util::hashFNV1a("text-color-transition"):
+        if (name == "text-color-transition") {
+            property = Property::TextColorTransition;
+        }
+        break;
+    case util::hashFNV1a("text-halo-color"):
+        if (name == "text-halo-color") {
+            property = Property::TextHaloColor;
+        }
+        break;
+    case util::hashFNV1a("text-halo-color-transition"):
+        if (name == "text-halo-color-transition") {
+            property = Property::TextHaloColorTransition;
+        }
+        break;
+    case util::hashFNV1a("text-halo-width"):
+        if (name == "text-halo-width") {
+            property = Property::TextHaloWidth;
+        }
+        break;
+    case util::hashFNV1a("text-halo-width-transition"):
+        if (name == "text-halo-width-transition") {
+            property = Property::TextHaloWidthTransition;
+        }
+        break;
+    case util::hashFNV1a("text-halo-blur"):
+        if (name == "text-halo-blur") {
+            property = Property::TextHaloBlur;
+        }
+        break;
+    case util::hashFNV1a("text-halo-blur-transition"):
+        if (name == "text-halo-blur-transition") {
+            property = Property::TextHaloBlurTransition;
+        }
+        break;
+    case util::hashFNV1a("text-translate"):
+        if (name == "text-translate") {
+            property = Property::TextTranslate;
+        }
+        break;
+    case util::hashFNV1a("text-translate-transition"):
+        if (name == "text-translate-transition") {
+            property = Property::TextTranslateTransition;
+        }
+        break;
+    case util::hashFNV1a("text-translate-anchor"):
+        if (name == "text-translate-anchor") {
+            property = Property::TextTranslateAnchor;
+        }
+        break;
+    case util::hashFNV1a("text-translate-anchor-transition"):
+        if (name == "text-translate-anchor-transition") {
+            property = Property::TextTranslateAnchorTransition;
+        }
+        break;
     
-    if (name == "icon-opacity") {
+    }
+
+    if (property == Property::Unknown) {
+        return Error { "layer doesn't support this property" };
+    }
+
+        
+    if (property == Property::IconOpacity || property == Property::IconHaloWidth || property == Property::IconHaloBlur || property == Property::TextOpacity || property == Property::TextHaloWidth || property == Property::TextHaloBlur) {
         Error error;
         optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-
-        setIconOpacity(*typedValue);
-        return nullopt;
+        
+        if (property == Property::IconOpacity) {
+            setIconOpacity(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::IconHaloWidth) {
+            setIconHaloWidth(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::IconHaloBlur) {
+            setIconHaloBlur(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextOpacity) {
+            setTextOpacity(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextHaloWidth) {
+            setTextHaloWidth(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextHaloBlur) {
+            setTextHaloBlur(*typedValue);
+            return nullopt;
+        }
+        
     }
-    if (name == "icon-opacity-transition") {
+    
+    if (property == Property::IconColor || property == Property::IconHaloColor || property == Property::TextColor || property == Property::TextHaloColor) {
         Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
+        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
+        if (!typedValue) {
             return error;
         }
+        
+        if (property == Property::IconColor) {
+            setIconColor(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::IconHaloColor) {
+            setIconHaloColor(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextColor) {
+            setTextColor(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextHaloColor) {
+            setTextHaloColor(*typedValue);
+            return nullopt;
+        }
+        
+    }
+    
+    if (property == Property::IconTranslate || property == Property::TextTranslate) {
+        Error error;
+        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+        
+        if (property == Property::IconTranslate) {
+            setIconTranslate(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextTranslate) {
+            setTextTranslate(*typedValue);
+            return nullopt;
+        }
+        
+    }
+    
+    if (property == Property::IconTranslateAnchor || property == Property::TextTranslateAnchor) {
+        Error error;
+        optional<PropertyValue<TranslateAnchorType>> typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+        
+        if (property == Property::IconTranslateAnchor) {
+            setIconTranslateAnchor(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextTranslateAnchor) {
+            setTextTranslateAnchor(*typedValue);
+            return nullopt;
+        }
+        
+    }
+    
 
+    Error error;
+    optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+    if (!transition) {
+        return error;
+    }
+    
+    if (property == Property::IconOpacityTransition) {
         setIconOpacityTransition(*transition);
         return nullopt;
     }
     
-    if (name == "icon-color") {
-        Error error;
-        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setIconColor(*typedValue);
-        return nullopt;
-    }
-    if (name == "icon-color-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
+    if (property == Property::IconColorTransition) {
         setIconColorTransition(*transition);
         return nullopt;
     }
     
-    if (name == "icon-halo-color") {
-        Error error;
-        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setIconHaloColor(*typedValue);
-        return nullopt;
-    }
-    if (name == "icon-halo-color-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
+    if (property == Property::IconHaloColorTransition) {
         setIconHaloColorTransition(*transition);
         return nullopt;
     }
     
-    if (name == "icon-halo-width") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setIconHaloWidth(*typedValue);
-        return nullopt;
-    }
-    if (name == "icon-halo-width-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
+    if (property == Property::IconHaloWidthTransition) {
         setIconHaloWidthTransition(*transition);
         return nullopt;
     }
     
-    if (name == "icon-halo-blur") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setIconHaloBlur(*typedValue);
-        return nullopt;
-    }
-    if (name == "icon-halo-blur-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
+    if (property == Property::IconHaloBlurTransition) {
         setIconHaloBlurTransition(*transition);
         return nullopt;
     }
     
-    if (name == "icon-translate") {
-        Error error;
-        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setIconTranslate(*typedValue);
-        return nullopt;
-    }
-    if (name == "icon-translate-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
+    if (property == Property::IconTranslateTransition) {
         setIconTranslateTransition(*transition);
         return nullopt;
     }
     
-    if (name == "icon-translate-anchor") {
-        Error error;
-        optional<PropertyValue<TranslateAnchorType>> typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setIconTranslateAnchor(*typedValue);
-        return nullopt;
-    }
-    if (name == "icon-translate-anchor-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
+    if (property == Property::IconTranslateAnchorTransition) {
         setIconTranslateAnchorTransition(*transition);
         return nullopt;
     }
     
-    if (name == "text-opacity") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextOpacity(*typedValue);
-        return nullopt;
-    }
-    if (name == "text-opacity-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
+    if (property == Property::TextOpacityTransition) {
         setTextOpacityTransition(*transition);
         return nullopt;
     }
     
-    if (name == "text-color") {
-        Error error;
-        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextColor(*typedValue);
-        return nullopt;
-    }
-    if (name == "text-color-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
+    if (property == Property::TextColorTransition) {
         setTextColorTransition(*transition);
         return nullopt;
     }
     
-    if (name == "text-halo-color") {
-        Error error;
-        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextHaloColor(*typedValue);
-        return nullopt;
-    }
-    if (name == "text-halo-color-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
+    if (property == Property::TextHaloColorTransition) {
         setTextHaloColorTransition(*transition);
         return nullopt;
     }
     
-    if (name == "text-halo-width") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextHaloWidth(*typedValue);
-        return nullopt;
-    }
-    if (name == "text-halo-width-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
+    if (property == Property::TextHaloWidthTransition) {
         setTextHaloWidthTransition(*transition);
         return nullopt;
     }
     
-    if (name == "text-halo-blur") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextHaloBlur(*typedValue);
-        return nullopt;
-    }
-    if (name == "text-halo-blur-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
+    if (property == Property::TextHaloBlurTransition) {
         setTextHaloBlurTransition(*transition);
         return nullopt;
     }
     
-    if (name == "text-translate") {
-        Error error;
-        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextTranslate(*typedValue);
-        return nullopt;
-    }
-    if (name == "text-translate-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
+    if (property == Property::TextTranslateTransition) {
         setTextTranslateTransition(*transition);
         return nullopt;
     }
     
-    if (name == "text-translate-anchor") {
-        Error error;
-        optional<PropertyValue<TranslateAnchorType>> typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextTranslateAnchor(*typedValue);
-        return nullopt;
-    }
-    if (name == "text-translate-anchor-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
+    if (property == Property::TextTranslateAnchorTransition) {
         setTextTranslateAnchorTransition(*transition);
         return nullopt;
     }
     
+
     return Error { "layer doesn't support this property" };
 }
 
@@ -1375,403 +1447,558 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         return nullopt;
     }
 
+    enum class Property {
+        Unknown,
+        SymbolPlacement,
+        SymbolSpacing,
+        SymbolAvoidEdges,
+        IconAllowOverlap,
+        IconIgnorePlacement,
+        IconOptional,
+        IconRotationAlignment,
+        IconSize,
+        IconTextFit,
+        IconTextFitPadding,
+        IconImage,
+        IconRotate,
+        IconPadding,
+        IconKeepUpright,
+        IconOffset,
+        IconAnchor,
+        IconPitchAlignment,
+        TextPitchAlignment,
+        TextRotationAlignment,
+        TextField,
+        TextFont,
+        TextSize,
+        TextMaxWidth,
+        TextLineHeight,
+        TextLetterSpacing,
+        TextJustify,
+        TextAnchor,
+        TextMaxAngle,
+        TextRotate,
+        TextPadding,
+        TextKeepUpright,
+        TextTransform,
+        TextOffset,
+        TextAllowOverlap,
+        TextIgnorePlacement,
+        TextOptional,
+    };
+
+    Property property = Property::Unknown;
+    switch (util::hashFNV1a(name.c_str())) {
     
-    if (name == "symbol-placement") {
+    case util::hashFNV1a("symbol-placement"):
+        if (name == "symbol-placement") {
+            property = Property::SymbolPlacement;
+        }
+        break;
+    
+    case util::hashFNV1a("symbol-spacing"):
+        if (name == "symbol-spacing") {
+            property = Property::SymbolSpacing;
+        }
+        break;
+    
+    case util::hashFNV1a("symbol-avoid-edges"):
+        if (name == "symbol-avoid-edges") {
+            property = Property::SymbolAvoidEdges;
+        }
+        break;
+    
+    case util::hashFNV1a("icon-allow-overlap"):
+        if (name == "icon-allow-overlap") {
+            property = Property::IconAllowOverlap;
+        }
+        break;
+    
+    case util::hashFNV1a("icon-ignore-placement"):
+        if (name == "icon-ignore-placement") {
+            property = Property::IconIgnorePlacement;
+        }
+        break;
+    
+    case util::hashFNV1a("icon-optional"):
+        if (name == "icon-optional") {
+            property = Property::IconOptional;
+        }
+        break;
+    
+    case util::hashFNV1a("icon-rotation-alignment"):
+        if (name == "icon-rotation-alignment") {
+            property = Property::IconRotationAlignment;
+        }
+        break;
+    
+    case util::hashFNV1a("icon-size"):
+        if (name == "icon-size") {
+            property = Property::IconSize;
+        }
+        break;
+    
+    case util::hashFNV1a("icon-text-fit"):
+        if (name == "icon-text-fit") {
+            property = Property::IconTextFit;
+        }
+        break;
+    
+    case util::hashFNV1a("icon-text-fit-padding"):
+        if (name == "icon-text-fit-padding") {
+            property = Property::IconTextFitPadding;
+        }
+        break;
+    
+    case util::hashFNV1a("icon-image"):
+        if (name == "icon-image") {
+            property = Property::IconImage;
+        }
+        break;
+    
+    case util::hashFNV1a("icon-rotate"):
+        if (name == "icon-rotate") {
+            property = Property::IconRotate;
+        }
+        break;
+    
+    case util::hashFNV1a("icon-padding"):
+        if (name == "icon-padding") {
+            property = Property::IconPadding;
+        }
+        break;
+    
+    case util::hashFNV1a("icon-keep-upright"):
+        if (name == "icon-keep-upright") {
+            property = Property::IconKeepUpright;
+        }
+        break;
+    
+    case util::hashFNV1a("icon-offset"):
+        if (name == "icon-offset") {
+            property = Property::IconOffset;
+        }
+        break;
+    
+    case util::hashFNV1a("icon-anchor"):
+        if (name == "icon-anchor") {
+            property = Property::IconAnchor;
+        }
+        break;
+    
+    case util::hashFNV1a("icon-pitch-alignment"):
+        if (name == "icon-pitch-alignment") {
+            property = Property::IconPitchAlignment;
+        }
+        break;
+    
+    case util::hashFNV1a("text-pitch-alignment"):
+        if (name == "text-pitch-alignment") {
+            property = Property::TextPitchAlignment;
+        }
+        break;
+    
+    case util::hashFNV1a("text-rotation-alignment"):
+        if (name == "text-rotation-alignment") {
+            property = Property::TextRotationAlignment;
+        }
+        break;
+    
+    case util::hashFNV1a("text-field"):
+        if (name == "text-field") {
+            property = Property::TextField;
+        }
+        break;
+    
+    case util::hashFNV1a("text-font"):
+        if (name == "text-font") {
+            property = Property::TextFont;
+        }
+        break;
+    
+    case util::hashFNV1a("text-size"):
+        if (name == "text-size") {
+            property = Property::TextSize;
+        }
+        break;
+    
+    case util::hashFNV1a("text-max-width"):
+        if (name == "text-max-width") {
+            property = Property::TextMaxWidth;
+        }
+        break;
+    
+    case util::hashFNV1a("text-line-height"):
+        if (name == "text-line-height") {
+            property = Property::TextLineHeight;
+        }
+        break;
+    
+    case util::hashFNV1a("text-letter-spacing"):
+        if (name == "text-letter-spacing") {
+            property = Property::TextLetterSpacing;
+        }
+        break;
+    
+    case util::hashFNV1a("text-justify"):
+        if (name == "text-justify") {
+            property = Property::TextJustify;
+        }
+        break;
+    
+    case util::hashFNV1a("text-anchor"):
+        if (name == "text-anchor") {
+            property = Property::TextAnchor;
+        }
+        break;
+    
+    case util::hashFNV1a("text-max-angle"):
+        if (name == "text-max-angle") {
+            property = Property::TextMaxAngle;
+        }
+        break;
+    
+    case util::hashFNV1a("text-rotate"):
+        if (name == "text-rotate") {
+            property = Property::TextRotate;
+        }
+        break;
+    
+    case util::hashFNV1a("text-padding"):
+        if (name == "text-padding") {
+            property = Property::TextPadding;
+        }
+        break;
+    
+    case util::hashFNV1a("text-keep-upright"):
+        if (name == "text-keep-upright") {
+            property = Property::TextKeepUpright;
+        }
+        break;
+    
+    case util::hashFNV1a("text-transform"):
+        if (name == "text-transform") {
+            property = Property::TextTransform;
+        }
+        break;
+    
+    case util::hashFNV1a("text-offset"):
+        if (name == "text-offset") {
+            property = Property::TextOffset;
+        }
+        break;
+    
+    case util::hashFNV1a("text-allow-overlap"):
+        if (name == "text-allow-overlap") {
+            property = Property::TextAllowOverlap;
+        }
+        break;
+    
+    case util::hashFNV1a("text-ignore-placement"):
+        if (name == "text-ignore-placement") {
+            property = Property::TextIgnorePlacement;
+        }
+        break;
+    
+    case util::hashFNV1a("text-optional"):
+        if (name == "text-optional") {
+            property = Property::TextOptional;
+        }
+        break;
+    
+    }
+
+    if (property == Property::Unknown) {
+        return Error { "layer doesn't support this property" };
+    }
+
+        
+    if (property == Property::SymbolPlacement) {
         Error error;
         optional<PropertyValue<SymbolPlacementType>> typedValue = convert<PropertyValue<SymbolPlacementType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setSymbolPlacement(*typedValue);
         return nullopt;
+        
     }
     
-    if (name == "symbol-spacing") {
+    if (property == Property::SymbolSpacing || property == Property::IconPadding || property == Property::TextLineHeight || property == Property::TextMaxAngle || property == Property::TextPadding) {
         Error error;
         optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
-        setSymbolSpacing(*typedValue);
-        return nullopt;
+        
+        if (property == Property::SymbolSpacing) {
+            setSymbolSpacing(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::IconPadding) {
+            setIconPadding(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextLineHeight) {
+            setTextLineHeight(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextMaxAngle) {
+            setTextMaxAngle(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextPadding) {
+            setTextPadding(*typedValue);
+            return nullopt;
+        }
+        
     }
     
-    if (name == "symbol-avoid-edges") {
+    if (property == Property::SymbolAvoidEdges || property == Property::IconAllowOverlap || property == Property::IconIgnorePlacement || property == Property::IconOptional || property == Property::IconKeepUpright || property == Property::TextKeepUpright || property == Property::TextAllowOverlap || property == Property::TextIgnorePlacement || property == Property::TextOptional) {
         Error error;
         optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
-        setSymbolAvoidEdges(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "icon-allow-overlap") {
-        Error error;
-        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
+        
+        if (property == Property::SymbolAvoidEdges) {
+            setSymbolAvoidEdges(*typedValue);
+            return nullopt;
         }
-
-        setIconAllowOverlap(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "icon-ignore-placement") {
-        Error error;
-        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
+        
+        if (property == Property::IconAllowOverlap) {
+            setIconAllowOverlap(*typedValue);
+            return nullopt;
         }
-
-        setIconIgnorePlacement(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "icon-optional") {
-        Error error;
-        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
+        
+        if (property == Property::IconIgnorePlacement) {
+            setIconIgnorePlacement(*typedValue);
+            return nullopt;
         }
-
-        setIconOptional(*typedValue);
-        return nullopt;
+        
+        if (property == Property::IconOptional) {
+            setIconOptional(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::IconKeepUpright) {
+            setIconKeepUpright(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextKeepUpright) {
+            setTextKeepUpright(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextAllowOverlap) {
+            setTextAllowOverlap(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextIgnorePlacement) {
+            setTextIgnorePlacement(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextOptional) {
+            setTextOptional(*typedValue);
+            return nullopt;
+        }
+        
     }
     
-    if (name == "icon-rotation-alignment") {
+    if (property == Property::IconRotationAlignment || property == Property::IconPitchAlignment || property == Property::TextPitchAlignment || property == Property::TextRotationAlignment) {
         Error error;
         optional<PropertyValue<AlignmentType>> typedValue = convert<PropertyValue<AlignmentType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
-        setIconRotationAlignment(*typedValue);
-        return nullopt;
+        
+        if (property == Property::IconRotationAlignment) {
+            setIconRotationAlignment(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::IconPitchAlignment) {
+            setIconPitchAlignment(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextPitchAlignment) {
+            setTextPitchAlignment(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextRotationAlignment) {
+            setTextRotationAlignment(*typedValue);
+            return nullopt;
+        }
+        
     }
     
-    if (name == "icon-size") {
+    if (property == Property::IconSize || property == Property::IconRotate || property == Property::TextSize || property == Property::TextMaxWidth || property == Property::TextLetterSpacing || property == Property::TextRotate) {
         Error error;
         optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-
-        setIconSize(*typedValue);
-        return nullopt;
+        
+        if (property == Property::IconSize) {
+            setIconSize(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::IconRotate) {
+            setIconRotate(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextSize) {
+            setTextSize(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextMaxWidth) {
+            setTextMaxWidth(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextLetterSpacing) {
+            setTextLetterSpacing(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextRotate) {
+            setTextRotate(*typedValue);
+            return nullopt;
+        }
+        
     }
     
-    if (name == "icon-text-fit") {
+    if (property == Property::IconTextFit) {
         Error error;
         optional<PropertyValue<IconTextFitType>> typedValue = convert<PropertyValue<IconTextFitType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setIconTextFit(*typedValue);
         return nullopt;
+        
     }
     
-    if (name == "icon-text-fit-padding") {
+    if (property == Property::IconTextFitPadding) {
         Error error;
         optional<PropertyValue<std::array<float, 4>>> typedValue = convert<PropertyValue<std::array<float, 4>>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setIconTextFitPadding(*typedValue);
         return nullopt;
+        
     }
     
-    if (name == "icon-image") {
+    if (property == Property::IconImage || property == Property::TextField) {
         Error error;
         optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, true, true);
         if (!typedValue) {
             return error;
         }
-
-        setIconImage(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "icon-rotate") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
+        
+        if (property == Property::IconImage) {
+            setIconImage(*typedValue);
+            return nullopt;
         }
-
-        setIconRotate(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "icon-padding") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
+        
+        if (property == Property::TextField) {
+            setTextField(*typedValue);
+            return nullopt;
         }
-
-        setIconPadding(*typedValue);
-        return nullopt;
+        
     }
     
-    if (name == "icon-keep-upright") {
-        Error error;
-        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setIconKeepUpright(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "icon-offset") {
+    if (property == Property::IconOffset || property == Property::TextOffset) {
         Error error;
         optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-
-        setIconOffset(*typedValue);
-        return nullopt;
+        
+        if (property == Property::IconOffset) {
+            setIconOffset(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::TextOffset) {
+            setTextOffset(*typedValue);
+            return nullopt;
+        }
+        
     }
     
-    if (name == "icon-anchor") {
+    if (property == Property::IconAnchor || property == Property::TextAnchor) {
         Error error;
         optional<PropertyValue<SymbolAnchorType>> typedValue = convert<PropertyValue<SymbolAnchorType>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-
-        setIconAnchor(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "icon-pitch-alignment") {
-        Error error;
-        optional<PropertyValue<AlignmentType>> typedValue = convert<PropertyValue<AlignmentType>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
+        
+        if (property == Property::IconAnchor) {
+            setIconAnchor(*typedValue);
+            return nullopt;
         }
-
-        setIconPitchAlignment(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "text-pitch-alignment") {
-        Error error;
-        optional<PropertyValue<AlignmentType>> typedValue = convert<PropertyValue<AlignmentType>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
+        
+        if (property == Property::TextAnchor) {
+            setTextAnchor(*typedValue);
+            return nullopt;
         }
-
-        setTextPitchAlignment(*typedValue);
-        return nullopt;
+        
     }
     
-    if (name == "text-rotation-alignment") {
-        Error error;
-        optional<PropertyValue<AlignmentType>> typedValue = convert<PropertyValue<AlignmentType>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextRotationAlignment(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "text-field") {
-        Error error;
-        optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, true, true);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextField(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "text-font") {
+    if (property == Property::TextFont) {
         Error error;
         optional<PropertyValue<std::vector<std::string>>> typedValue = convert<PropertyValue<std::vector<std::string>>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setTextFont(*typedValue);
         return nullopt;
+        
     }
     
-    if (name == "text-size") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextSize(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "text-max-width") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextMaxWidth(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "text-line-height") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextLineHeight(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "text-letter-spacing") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextLetterSpacing(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "text-justify") {
+    if (property == Property::TextJustify) {
         Error error;
         optional<PropertyValue<TextJustifyType>> typedValue = convert<PropertyValue<TextJustifyType>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setTextJustify(*typedValue);
         return nullopt;
+        
     }
     
-    if (name == "text-anchor") {
-        Error error;
-        optional<PropertyValue<SymbolAnchorType>> typedValue = convert<PropertyValue<SymbolAnchorType>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextAnchor(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "text-max-angle") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextMaxAngle(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "text-rotate") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextRotate(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "text-padding") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextPadding(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "text-keep-upright") {
-        Error error;
-        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextKeepUpright(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "text-transform") {
+    if (property == Property::TextTransform) {
         Error error;
         optional<PropertyValue<TextTransformType>> typedValue = convert<PropertyValue<TextTransformType>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setTextTransform(*typedValue);
         return nullopt;
+        
     }
     
-    if (name == "text-offset") {
-        Error error;
-        optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
 
-        setTextOffset(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "text-allow-overlap") {
-        Error error;
-        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextAllowOverlap(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "text-ignore-placement") {
-        Error error;
-        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextIgnorePlacement(*typedValue);
-        return nullopt;
-    }
-    
-    if (name == "text-optional") {
-        Error error;
-        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setTextOptional(*typedValue);
-        return nullopt;
-    }
-    
     return Error { "layer doesn't support this property" };
 }
 
