@@ -732,19 +732,7 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
 
 optional<Error> LineLayer::setLayoutProperty(const std::string& name, const Convertible& value) {
     if (name == "visibility") {
-        if (isUndefined(value)) {
-            setVisibility(VisibilityType::Visible);
-            return nullopt;
-        }
-
-        Error error;
-        optional<VisibilityType> visibility = convert<VisibilityType>(value, error);
-        if (!visibility) {
-            return error;
-        }
-
-        setVisibility(*visibility);
-        return nullopt;
+        return Layer::setVisibility(value);
     }
 
     enum class Property {
