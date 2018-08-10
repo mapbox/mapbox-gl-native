@@ -9,6 +9,7 @@
 #include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
+#include <mbgl/util/fnv_hash.hpp>
 
 namespace mbgl {
 namespace style {
@@ -299,175 +300,220 @@ TransitionOptions RasterLayer::getRasterFadeDurationTransition() const {
 using namespace conversion;
 
 optional<Error> RasterLayer::setPaintProperty(const std::string& name, const Convertible& value) {
+    enum class Property {
+        Unknown,
+        RasterOpacity,
+        RasterHueRotate,
+        RasterBrightnessMin,
+        RasterBrightnessMax,
+        RasterSaturation,
+        RasterContrast,
+        RasterResampling,
+        RasterFadeDuration,
+        RasterOpacityTransition,
+        RasterHueRotateTransition,
+        RasterBrightnessMinTransition,
+        RasterBrightnessMaxTransition,
+        RasterSaturationTransition,
+        RasterContrastTransition,
+        RasterResamplingTransition,
+        RasterFadeDurationTransition,
+    };
+
+    Property property = Property::Unknown;
+    switch (util::hashFNV1a(name.c_str())) {
+    case util::hashFNV1a("raster-opacity"):
+        if (name == "raster-opacity") {
+            property = Property::RasterOpacity;
+        }
+        break;
+    case util::hashFNV1a("raster-opacity-transition"):
+        if (name == "raster-opacity-transition") {
+            property = Property::RasterOpacityTransition;
+        }
+        break;
+    case util::hashFNV1a("raster-hue-rotate"):
+        if (name == "raster-hue-rotate") {
+            property = Property::RasterHueRotate;
+        }
+        break;
+    case util::hashFNV1a("raster-hue-rotate-transition"):
+        if (name == "raster-hue-rotate-transition") {
+            property = Property::RasterHueRotateTransition;
+        }
+        break;
+    case util::hashFNV1a("raster-brightness-min"):
+        if (name == "raster-brightness-min") {
+            property = Property::RasterBrightnessMin;
+        }
+        break;
+    case util::hashFNV1a("raster-brightness-min-transition"):
+        if (name == "raster-brightness-min-transition") {
+            property = Property::RasterBrightnessMinTransition;
+        }
+        break;
+    case util::hashFNV1a("raster-brightness-max"):
+        if (name == "raster-brightness-max") {
+            property = Property::RasterBrightnessMax;
+        }
+        break;
+    case util::hashFNV1a("raster-brightness-max-transition"):
+        if (name == "raster-brightness-max-transition") {
+            property = Property::RasterBrightnessMaxTransition;
+        }
+        break;
+    case util::hashFNV1a("raster-saturation"):
+        if (name == "raster-saturation") {
+            property = Property::RasterSaturation;
+        }
+        break;
+    case util::hashFNV1a("raster-saturation-transition"):
+        if (name == "raster-saturation-transition") {
+            property = Property::RasterSaturationTransition;
+        }
+        break;
+    case util::hashFNV1a("raster-contrast"):
+        if (name == "raster-contrast") {
+            property = Property::RasterContrast;
+        }
+        break;
+    case util::hashFNV1a("raster-contrast-transition"):
+        if (name == "raster-contrast-transition") {
+            property = Property::RasterContrastTransition;
+        }
+        break;
+    case util::hashFNV1a("raster-resampling"):
+        if (name == "raster-resampling") {
+            property = Property::RasterResampling;
+        }
+        break;
+    case util::hashFNV1a("raster-resampling-transition"):
+        if (name == "raster-resampling-transition") {
+            property = Property::RasterResamplingTransition;
+        }
+        break;
+    case util::hashFNV1a("raster-fade-duration"):
+        if (name == "raster-fade-duration") {
+            property = Property::RasterFadeDuration;
+        }
+        break;
+    case util::hashFNV1a("raster-fade-duration-transition"):
+        if (name == "raster-fade-duration-transition") {
+            property = Property::RasterFadeDurationTransition;
+        }
+        break;
     
-    if (name == "raster-opacity") {
+    }
+
+    if (property == Property::Unknown) {
+        return Error { "layer doesn't support this property" };
+    }
+
+        
+    if (property == Property::RasterOpacity || property == Property::RasterHueRotate || property == Property::RasterBrightnessMin || property == Property::RasterBrightnessMax || property == Property::RasterSaturation || property == Property::RasterContrast || property == Property::RasterFadeDuration) {
         Error error;
         optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
-        setRasterOpacity(*typedValue);
-        return nullopt;
-    }
-    if (name == "raster-opacity-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
+        
+        if (property == Property::RasterOpacity) {
+            setRasterOpacity(*typedValue);
+            return nullopt;
         }
-
-        setRasterOpacityTransition(*transition);
-        return nullopt;
+        
+        if (property == Property::RasterHueRotate) {
+            setRasterHueRotate(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::RasterBrightnessMin) {
+            setRasterBrightnessMin(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::RasterBrightnessMax) {
+            setRasterBrightnessMax(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::RasterSaturation) {
+            setRasterSaturation(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::RasterContrast) {
+            setRasterContrast(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::RasterFadeDuration) {
+            setRasterFadeDuration(*typedValue);
+            return nullopt;
+        }
+        
     }
     
-    if (name == "raster-hue-rotate") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setRasterHueRotate(*typedValue);
-        return nullopt;
-    }
-    if (name == "raster-hue-rotate-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setRasterHueRotateTransition(*transition);
-        return nullopt;
-    }
-    
-    if (name == "raster-brightness-min") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setRasterBrightnessMin(*typedValue);
-        return nullopt;
-    }
-    if (name == "raster-brightness-min-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setRasterBrightnessMinTransition(*transition);
-        return nullopt;
-    }
-    
-    if (name == "raster-brightness-max") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setRasterBrightnessMax(*typedValue);
-        return nullopt;
-    }
-    if (name == "raster-brightness-max-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setRasterBrightnessMaxTransition(*transition);
-        return nullopt;
-    }
-    
-    if (name == "raster-saturation") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setRasterSaturation(*typedValue);
-        return nullopt;
-    }
-    if (name == "raster-saturation-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setRasterSaturationTransition(*transition);
-        return nullopt;
-    }
-    
-    if (name == "raster-contrast") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setRasterContrast(*typedValue);
-        return nullopt;
-    }
-    if (name == "raster-contrast-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setRasterContrastTransition(*transition);
-        return nullopt;
-    }
-    
-    if (name == "raster-resampling") {
+    if (property == Property::RasterResampling) {
         Error error;
         optional<PropertyValue<RasterResamplingType>> typedValue = convert<PropertyValue<RasterResamplingType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setRasterResampling(*typedValue);
         return nullopt;
+        
     }
-    if (name == "raster-resampling-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
+    
 
+    Error error;
+    optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+    if (!transition) {
+        return error;
+    }
+    
+    if (property == Property::RasterOpacityTransition) {
+        setRasterOpacityTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::RasterHueRotateTransition) {
+        setRasterHueRotateTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::RasterBrightnessMinTransition) {
+        setRasterBrightnessMinTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::RasterBrightnessMaxTransition) {
+        setRasterBrightnessMaxTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::RasterSaturationTransition) {
+        setRasterSaturationTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::RasterContrastTransition) {
+        setRasterContrastTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::RasterResamplingTransition) {
         setRasterResamplingTransition(*transition);
         return nullopt;
     }
     
-    if (name == "raster-fade-duration") {
-        Error error;
-        optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, false, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setRasterFadeDuration(*typedValue);
-        return nullopt;
-    }
-    if (name == "raster-fade-duration-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
+    if (property == Property::RasterFadeDurationTransition) {
         setRasterFadeDurationTransition(*transition);
         return nullopt;
     }
     
+
     return Error { "layer doesn't support this property" };
 }
 
@@ -488,7 +534,21 @@ optional<Error> RasterLayer::setLayoutProperty(const std::string& name, const Co
         return nullopt;
     }
 
+    enum class Property {
+        Unknown,
+    };
+
+    Property property = Property::Unknown;
+    switch (util::hashFNV1a(name.c_str())) {
     
+    }
+
+    if (property == Property::Unknown) {
+        return Error { "layer doesn't support this property" };
+    }
+
+        
+
     return Error { "layer doesn't support this property" };
 }
 

@@ -9,6 +9,7 @@
 #include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
+#include <mbgl/util/fnv_hash.hpp>
 
 namespace mbgl {
 namespace style {
@@ -294,154 +295,226 @@ TransitionOptions FillLayer::getFillPatternTransition() const {
 using namespace conversion;
 
 optional<Error> FillLayer::setPaintProperty(const std::string& name, const Convertible& value) {
+    enum class Property {
+        Unknown,
+        FillAntialias,
+        FillOpacity,
+        FillColor,
+        FillOutlineColor,
+        FillTranslate,
+        FillTranslateAnchor,
+        FillPattern,
+        FillAntialiasTransition,
+        FillOpacityTransition,
+        FillColorTransition,
+        FillOutlineColorTransition,
+        FillTranslateTransition,
+        FillTranslateAnchorTransition,
+        FillPatternTransition,
+    };
+
+    Property property = Property::Unknown;
+    switch (util::hashFNV1a(name.c_str())) {
+    case util::hashFNV1a("fill-antialias"):
+        if (name == "fill-antialias") {
+            property = Property::FillAntialias;
+        }
+        break;
+    case util::hashFNV1a("fill-antialias-transition"):
+        if (name == "fill-antialias-transition") {
+            property = Property::FillAntialiasTransition;
+        }
+        break;
+    case util::hashFNV1a("fill-opacity"):
+        if (name == "fill-opacity") {
+            property = Property::FillOpacity;
+        }
+        break;
+    case util::hashFNV1a("fill-opacity-transition"):
+        if (name == "fill-opacity-transition") {
+            property = Property::FillOpacityTransition;
+        }
+        break;
+    case util::hashFNV1a("fill-color"):
+        if (name == "fill-color") {
+            property = Property::FillColor;
+        }
+        break;
+    case util::hashFNV1a("fill-color-transition"):
+        if (name == "fill-color-transition") {
+            property = Property::FillColorTransition;
+        }
+        break;
+    case util::hashFNV1a("fill-outline-color"):
+        if (name == "fill-outline-color") {
+            property = Property::FillOutlineColor;
+        }
+        break;
+    case util::hashFNV1a("fill-outline-color-transition"):
+        if (name == "fill-outline-color-transition") {
+            property = Property::FillOutlineColorTransition;
+        }
+        break;
+    case util::hashFNV1a("fill-translate"):
+        if (name == "fill-translate") {
+            property = Property::FillTranslate;
+        }
+        break;
+    case util::hashFNV1a("fill-translate-transition"):
+        if (name == "fill-translate-transition") {
+            property = Property::FillTranslateTransition;
+        }
+        break;
+    case util::hashFNV1a("fill-translate-anchor"):
+        if (name == "fill-translate-anchor") {
+            property = Property::FillTranslateAnchor;
+        }
+        break;
+    case util::hashFNV1a("fill-translate-anchor-transition"):
+        if (name == "fill-translate-anchor-transition") {
+            property = Property::FillTranslateAnchorTransition;
+        }
+        break;
+    case util::hashFNV1a("fill-pattern"):
+        if (name == "fill-pattern") {
+            property = Property::FillPattern;
+        }
+        break;
+    case util::hashFNV1a("fill-pattern-transition"):
+        if (name == "fill-pattern-transition") {
+            property = Property::FillPatternTransition;
+        }
+        break;
     
-    if (name == "fill-antialias") {
+    }
+
+    if (property == Property::Unknown) {
+        return Error { "layer doesn't support this property" };
+    }
+
+        
+    if (property == Property::FillAntialias) {
         Error error;
         optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setFillAntialias(*typedValue);
         return nullopt;
-    }
-    if (name == "fill-antialias-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setFillAntialiasTransition(*transition);
-        return nullopt;
+        
     }
     
-    if (name == "fill-opacity") {
+    if (property == Property::FillOpacity) {
         Error error;
         optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setFillOpacity(*typedValue);
         return nullopt;
-    }
-    if (name == "fill-opacity-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setFillOpacityTransition(*transition);
-        return nullopt;
+        
     }
     
-    if (name == "fill-color") {
+    if (property == Property::FillColor || property == Property::FillOutlineColor) {
         Error error;
         optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
         if (!typedValue) {
             return error;
         }
-
-        setFillColor(*typedValue);
-        return nullopt;
-    }
-    if (name == "fill-color-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
+        
+        if (property == Property::FillColor) {
+            setFillColor(*typedValue);
+            return nullopt;
         }
-
-        setFillColorTransition(*transition);
-        return nullopt;
+        
+        if (property == Property::FillOutlineColor) {
+            setFillOutlineColor(*typedValue);
+            return nullopt;
+        }
+        
     }
     
-    if (name == "fill-outline-color") {
-        Error error;
-        optional<PropertyValue<Color>> typedValue = convert<PropertyValue<Color>>(value, error, true, false);
-        if (!typedValue) {
-            return error;
-        }
-
-        setFillOutlineColor(*typedValue);
-        return nullopt;
-    }
-    if (name == "fill-outline-color-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setFillOutlineColorTransition(*transition);
-        return nullopt;
-    }
-    
-    if (name == "fill-translate") {
+    if (property == Property::FillTranslate) {
         Error error;
         optional<PropertyValue<std::array<float, 2>>> typedValue = convert<PropertyValue<std::array<float, 2>>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setFillTranslate(*typedValue);
         return nullopt;
-    }
-    if (name == "fill-translate-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setFillTranslateTransition(*transition);
-        return nullopt;
+        
     }
     
-    if (name == "fill-translate-anchor") {
+    if (property == Property::FillTranslateAnchor) {
         Error error;
         optional<PropertyValue<TranslateAnchorType>> typedValue = convert<PropertyValue<TranslateAnchorType>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setFillTranslateAnchor(*typedValue);
         return nullopt;
-    }
-    if (name == "fill-translate-anchor-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
-
-        setFillTranslateAnchorTransition(*transition);
-        return nullopt;
+        
     }
     
-    if (name == "fill-pattern") {
+    if (property == Property::FillPattern) {
         Error error;
         optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, false, false);
         if (!typedValue) {
             return error;
         }
-
+        
         setFillPattern(*typedValue);
         return nullopt;
+        
     }
-    if (name == "fill-pattern-transition") {
-        Error error;
-        optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
-        if (!transition) {
-            return error;
-        }
+    
 
+    Error error;
+    optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+    if (!transition) {
+        return error;
+    }
+    
+    if (property == Property::FillAntialiasTransition) {
+        setFillAntialiasTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::FillOpacityTransition) {
+        setFillOpacityTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::FillColorTransition) {
+        setFillColorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::FillOutlineColorTransition) {
+        setFillOutlineColorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::FillTranslateTransition) {
+        setFillTranslateTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::FillTranslateAnchorTransition) {
+        setFillTranslateAnchorTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::FillPatternTransition) {
         setFillPatternTransition(*transition);
         return nullopt;
     }
     
+
     return Error { "layer doesn't support this property" };
 }
 
@@ -462,7 +535,21 @@ optional<Error> FillLayer::setLayoutProperty(const std::string& name, const Conv
         return nullopt;
     }
 
+    enum class Property {
+        Unknown,
+    };
+
+    Property property = Property::Unknown;
+    switch (util::hashFNV1a(name.c_str())) {
     
+    }
+
+    if (property == Property::Unknown) {
+        return Error { "layer doesn't support this property" };
+    }
+
+        
+
     return Error { "layer doesn't support this property" };
 }
 
