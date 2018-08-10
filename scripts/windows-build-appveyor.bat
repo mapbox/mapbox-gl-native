@@ -28,18 +28,20 @@ IF %ERRORLEVEL% NEQ 0 GOTO ERROR
 CD %APPVEYOR_BUILD_FOLDER%\build
 IF %ERRORLEVEL% NEQ 0 GOTO ERROR
 
-REM call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64
-call "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" amd64
+SET VSCMD=C:\Program Files (x86)\Microsoft Visual Studio\Preview\Enterprise\VC\Auxiliary\Build\vcvarsall.bat
+IF "%APPVEYOR%"=="True" SET VSCMD=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
+CALL "%VSCMD%" amd64
 IF %ERRORLEVEL% NEQ 0 GOTO ERROR
 
-cmake -G "Visual Studio 15 Win64" ^
+REM -T v141_clang_c2 ^
+cmake -G "Visual Studio 15 2017 Win64" ^
+-DCMAKE_BUILD_TYPE=%configuration% ^
 -DMBGL_PLATFORM=qt ^
 -DWITH_QT_DECODERS=ON ^
 -DWITH_QT_I18N=ON ^
 -DWITH_NODEJS=OFF ^
 -DCMAKE_BUILD_TYPE=Release ^
--DCMAKE_PREFIX_PATH=C:\Qt\5.11.1\msvc2017_64\lib\cmake ^
--DCMAKE_MAKE_PROGRAM="%APPVEYOR_BUILD_FOLDER%\platform\qt\ninja.exe" ..
+-DCMAKE_PREFIX_PATH=C:\Qt\5.11.1\msvc2017_64\lib\cmake  ..
 IF %ERRORLEVEL% NEQ 0 GOTO ERROR
 
 REM cmake --build . -- -j %NUMBER_OF_PROCESSORS%

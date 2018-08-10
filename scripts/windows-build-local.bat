@@ -8,6 +8,8 @@ REM otherwise path references will not work
 IF NOT EXIST C:\Qt\5.11.1\msvc2017_64\lib SET EL=1 && ECHO QT not found && GOTO ERROR
 SET PATH=C:\Program Files\7-Zip;%PATH%
 
+REM set env vars normally set by AppVeyor
+SET configuration=Release
 SET APPVEYOR_BUILD_FOLDER=%CD%
 SET CMAKE_VERSION=cmake-3.10.1-win64-x64
 SET CMAKE_URL=https://cmake.org/files/v3.10/%CMAKE_VERSION%.zip
