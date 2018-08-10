@@ -10,6 +10,8 @@
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/geojson.hpp>
 
+const MGLExceptionName MGLInvalidDatasourceException = @"MGLInvalidDatasourceException";
+
 const MGLShapeSourceOption MGLShapeSourceOptionWrapsCoordinates = @"MGLShapeSourceOptionWrapsCoordinates";
 const MGLShapeSourceOption MGLShapeSourceOptionClipsCoordinates = @"MGLShapeSourceOptionClipsCoordinates";
 
@@ -205,10 +207,12 @@ mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDi
     self.dataSourceImplementsFeaturesForTile = [dataSource respondsToSelector:@selector(featuresInTileAtX:y:zoomLevel:)];
     self.dataSourceImplementsFeaturesForBounds = [dataSource respondsToSelector:@selector(featuresInCoordinateBounds:zoomLevel:)];
 
-    if(!self.dataSourceImplementsFeaturesForBounds && !self.dataSourceImplementsFeaturesForTile) {
-        [NSException raise:@"Invalid Datasource" format:@"Datasource does not implement any MGLComputedShapeSourceDataSource methods"];
-    } else if(self.dataSourceImplementsFeaturesForBounds && self.dataSourceImplementsFeaturesForTile) {
-        [NSException raise:@"Invalid Datasource" format:@"Datasource implements multiple MGLComputedShapeSourceDataSource methods"];
+    if (!self.dataSourceImplementsFeaturesForBounds && !self.dataSourceImplementsFeaturesForTile) {
+        [NSException raise:MGLInvalidDatasourceException
+                    format:@"Datasource does not implement any MGLComputedShapeSourceDataSource methods"];
+    } else if (self.dataSourceImplementsFeaturesForBounds && self.dataSourceImplementsFeaturesForTile) {
+        [NSException raise:MGLInvalidDatasourceException
+                    format:@"Datasource implements multiple MGLComputedShapeSourceDataSource methods"];
     }
 
     _dataSource = dataSource;

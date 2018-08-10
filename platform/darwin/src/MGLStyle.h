@@ -31,6 +31,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 static MGL_EXPORT const NSInteger MGLStyleDefaultVersion = 10;
 
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLInvalidStyleURLException;
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLRedundantLayerException;
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLRedundantLayerIdentifierException;
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLRedundantSourceException;
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLRedundantSourceIdentifierException;
+
 /**
  The proxy object for the current map style.
 

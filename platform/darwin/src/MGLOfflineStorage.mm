@@ -30,6 +30,8 @@ const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyProgress = @"Progress";
 const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyError = @"Error";
 const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount = @"MaximumCount";
 
+const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegionTypeException";
+
 @interface MGLOfflineStorage ()
 
 @property (nonatomic, strong, readwrite) NSMutableArray<MGLOfflinePack *> *packs;
@@ -278,8 +280,8 @@ const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount = @"Maximu
 
 - (void)_addPackForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflinePackAdditionCompletionHandler)completion {
     if (![region conformsToProtocol:@protocol(MGLOfflineRegion_Private)]) {
-        [NSException raise:@"Unsupported region type" format:
-         @"Regions of type %@ are unsupported.", NSStringFromClass([region class])];
+        [NSException raise:MGLUnsupportedRegionTypeException
+                    format:@"Regions of type %@ are unsupported.", NSStringFromClass([region class])];
         return;
     }
 

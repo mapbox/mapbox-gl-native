@@ -25,7 +25,7 @@ const MGLTileSourceOption MGLTileSourceOptionDEMEncoding = @"MGLTileSourceOption
 @implementation MGLTileSource
 
 - (NSURL *)configurationURL {
-    [NSException raise:@"MGLAbstractClassException"
+    [NSException raise:MGLAbstractClassException
                 format:@"MGLTileSource is an abstract class"];
     return nil;
 }
@@ -41,7 +41,7 @@ const MGLTileSourceOption MGLTileSourceOptionDEMEncoding = @"MGLTileSourceOption
 }
 
 - (NSString *)attributionHTMLString {
-    [NSException raise:@"MGLAbstractClassException"
+    [NSException raise:MGLAbstractClassException
                 format:@"MGLTileSource is an abstract class"];
     return nil;
 }

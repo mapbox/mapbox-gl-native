@@ -23,8 +23,7 @@
 }
 
 - (instancetype)init {
-    [NSException raise:@"Method unavailable"
-                format:
+    [NSException raise:NSGenericException format:
      @"-[MGLTilePyramidOfflineRegion init] is unavailable. "
      @"Use -initWithStyleURL:bounds:fromZoomLevel:toZoomLevel: instead."];
     return nil;
@@ -37,7 +36,7 @@
         }
 
         if (!styleURL.scheme) {
-            [NSException raise:@"Invalid style URL" format:
+            [NSException raise:MGLInvalidStyleURLException format:
              @"%@ does not support setting a relative file URL as the style URL. "
              @"To download the online resources required by this style, "
              @"specify a URL to an online copy of this style. "

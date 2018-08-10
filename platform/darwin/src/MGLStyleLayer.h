@@ -5,6 +5,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLInvalidStyleLayerException;
+
 /**
  `MGLStyleLayer` is an abstract base class for style layers. A style layer
  manages the layout and appearance of content at a specific z-index in a style.
