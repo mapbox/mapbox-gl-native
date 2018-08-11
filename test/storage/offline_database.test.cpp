@@ -49,8 +49,12 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Invalid)) {
 
 #ifndef __QT__
     // Only non-Qt platforms are setting a logger on the SQLite object.
-    EXPECT_EQ(1u, log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::NotADB),
-        "statement aborts at 1: [PRAGMA user_version] file is encrypted or is not a database" }, true));
+    // Checking two possibilities for the error string because it apparently changes between SQLite versions.
+    EXPECT_EQ(1u,
+        log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::NotADB),
+            "statement aborts at 1: [PRAGMA user_version] file is encrypted or is not a database" }, true) +
+        log.count({ EventSeverity::Info, Event::Database, static_cast<int64_t>(mapbox::sqlite::ResultCode::NotADB),
+            "statement aborts at 1: [PRAGMA user_version] file is not a database" }, true));
 #endif
     EXPECT_EQ(1u, log.count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
     EXPECT_EQ(0u, log.uncheckedCount());
@@ -618,15 +622,15 @@ TEST(OfflineDatabase, BatchInsertionMapboxTileCountExceeded) {
     db.setOfflineMapboxTileCountLimit(1);
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
     OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
-    
+
     Response response;
     response.data = randomString(1024);
     std::list<std::tuple<Resource, Response>> resources;
-    
+
     resources.emplace_back(Resource::style("http://example.com/"), response);
     resources.emplace_back(Resource::tile("mapbox://tiles/1", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), response);
     resources.emplace_back(Resource::tile("mapbox://tiles/2", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), response);
-    
+
     OfflineRegionStatus status;
     try {
         db.putRegionResources(region.getID(), resources, status);
@@ -634,7 +638,7 @@ TEST(OfflineDatabase, BatchInsertionMapboxTileCountExceeded) {
     } catch (const MapboxTileLimitExceededException&) {
         // Expected
     }
-    
+
     EXPECT_EQ(status.completedTileCount, 1u);
     EXPECT_EQ(status.completedResourceCount, 2u);
     EXPECT_EQ(db.getRegionCompletedStatus(region.getID()).completedTileCount, 1u);

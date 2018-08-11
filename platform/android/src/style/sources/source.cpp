@@ -109,7 +109,7 @@ namespace android {
         rendererFrontend = &frontend;
     }
 
-    void Source::removeFromMap(JNIEnv&, jni::Object<Source>, mbgl::Map& map) {
+    bool Source::removeFromMap(JNIEnv&, jni::Object<Source>, mbgl::Map& map) {
         // Cannot remove if not attached yet
         if (ownedSource) {
             throw std::runtime_error("Cannot remove detached source");
@@ -119,6 +119,11 @@ namespace android {
         ownedSource = map.getStyle().removeSource(source.getID());
 
         // The source may not be removed if any layers still reference it
+        return ownedSource != nullptr;
+    }
+
+    void Source::releaseJavaPeer() {
+        // We can't release the peer if the source was not removed from the map
         if (!ownedSource) {
             return;
         }

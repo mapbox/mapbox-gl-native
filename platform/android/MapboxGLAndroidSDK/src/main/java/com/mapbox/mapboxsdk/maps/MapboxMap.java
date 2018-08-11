@@ -433,7 +433,7 @@ public final class MapboxMap {
   }
 
   /**
-   * Removes the source, preserving the reverence for re-use
+   * Removes the source, preserving the reference for re-use
    *
    * @param source the source to remove
    * @return the source
