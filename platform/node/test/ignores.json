@@ -82,8 +82,6 @@
   "query-tests/feature-state/default": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue",
   "query-tests/regressions/mapbox-gl-js#6555": "skip - no querySourceFeatures in mbgl-node; needs issue",
   "render-tests/background-color/transition": "https://github.com/mapbox/mapbox-gl-native/issues/10619",
-  "render-tests/basic-v9/z0-wide": "https://github.com/mapbox/mapbox-gl-native/pull/12611",
-  "render-tests/bright-v9/z0-wide": "https://github.com/mapbox/mapbox-gl-native/pull/12611",
   "render-tests/collator/resolved-locale": "Some test platforms don't resolve 'en' locale",
   "render-tests/collator/default": "Some test platforms don't resolve 'en' locale",
   "render-tests/custom-layer-js/null-island": "skip - js specific",
@@ -127,7 +125,6 @@
   "render-tests/runtime-styling/image-add-sdf": "https://github.com/mapbox/mapbox-gl-native/issues/9847",
   "render-tests/runtime-styling/paint-property-fill-flat-to-extrude": "https://github.com/mapbox/mapbox-gl-native/issues/6745",
   "render-tests/runtime-styling/set-style-paint-property-fill-flat-to-extrude": "https://github.com/mapbox/mapbox-gl-native/issues/6745",
-  "render-tests/satellite-v9/z0-wide": "https://github.com/mapbox/mapbox-gl-native/pull/12611",
   "render-tests/symbol-cross-fade/chinese": "https://github.com/mapbox/mapbox-gl-native/issues/10619",
   "render-tests/symbol-placement/line-overscaled": "https://github.com/mapbox/mapbox-gl-js/issues/5654",
   "render-tests/symbol-visibility/visible": "https://github.com/mapbox/mapbox-gl-native/issues/10409",
@@ -160,8 +157,8 @@
   "render-tests/combinations/line-translucent--fill-extrusion-translucent": "needs investigation",
   "render-tests/combinations/raster-translucent--fill-extrusion-translucent": "needs investigation",
   "render-tests/combinations/symbol-translucent--fill-extrusion-translucent": "needs investigation",
-  "render-tests/feature-state/composite-expression": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue",
-  "render-tests/feature-state/data-expression": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue",
+  "render-tests/feature-state/composite-expression": "https://github.com/mapbox/mapbox-gl-native/issues/12613",
+  "render-tests/feature-state/data-expression": "https://github.com/mapbox/mapbox-gl-native/issues/12613",
   "render-tests/feature-state/set-paint-property": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue",
-  "render-tests/feature-state/vector-source": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue"
+  "render-tests/feature-state/vector-source": "https://github.com/mapbox/mapbox-gl-native/issues/12613"
 }
