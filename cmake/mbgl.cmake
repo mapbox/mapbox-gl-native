@@ -115,13 +115,15 @@ endfunction()
 
 # Creates a library target for a vendored dependency
 function(add_vendor_target NAME TYPE)
-    add_library(${NAME} ${TYPE} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/empty.cpp")
     set(INCLUDE_TYPE "INTERFACE")
     set(SOURCE_TYPE "INTERFACE")
     if (TYPE STREQUAL "STATIC" OR TYPE STREQUAL "SHARED")
+        add_library(${NAME} ${TYPE} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/empty.cpp")
         set(INCLUDE_TYPE "PUBLIC")
         set(SOURCE_TYPE "PRIVATE")
         set_target_properties(${NAME} PROPERTIES SOURCES "")
+    else()
+        add_library(${NAME} ${TYPE})
     endif()
     set_target_properties(${NAME} PROPERTIES INTERFACE_SOURCES "")
     file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/vendor/${NAME}/files.txt" FILES)
@@ -137,48 +139,25 @@ macro(set_xcode_property TARGET XCODE_PROPERTY XCODE_VALUE)
     set_property(TARGET ${TARGET} PROPERTY XCODE_ATTRIBUTE_${XCODE_PROPERTY} ${XCODE_VALUE})
 endmacro (set_xcode_property)
 
-function(_get_xcconfig_property target var)
-    get_property(result TARGET ${target} PROPERTY INTERFACE_${var} SET)
-    if (result)
-        get_property(result TARGET ${target} PROPERTY INTERFACE_${var})
-        if (var STREQUAL "LINK_LIBRARIES")
-            # Remove target names from the list of linker flags, since Xcode can't deal with them.
-            set(link_flags)
-            foreach(item IN LISTS result)
-                if (NOT TARGET ${item})
-                    list(APPEND link_flags ${item})
-                endif()
-            endforeach()
-            set(result "${link_flags}")
+function(set_xcconfig_target_properties target)
+    # Create a list of linked libraries for use in the xcconfig generation script.
+    get_property(result TARGET ${target} PROPERTY INTERFACE_LINK_LIBRARIES)
+    string(GENEX_STRIP "${result}" result)
+    # Remove target names from the list of linker flags, since Xcode can't deal with them.
+    set(link_flags)
+    foreach(item IN LISTS result)
+        if (NOT TARGET ${item})
+            list(APPEND link_flags ${item})
         endif()
-        string(REPLACE ";-framework " ";-framework;" result "${result}")
-        string(REPLACE ";" "\" \"" result "${result}")
-        string(REPLACE "-" "_" target "${target}")
-        set(${target}_${var} "${result}" PARENT_SCOPE)
-    endif()
-endfunction()
-
-if(MBGL_PLATFORM STREQUAL "ios")
-    execute_process(
-        COMMAND git submodule update --init platform/ios/vendor/mapbox-events-ios
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-endif()
-
-function(write_xcconfig_target_properties)
-    foreach(target ${ARGN})
-        _get_xcconfig_property(${target} INCLUDE_DIRECTORIES)
-        _get_xcconfig_property(${target} LINK_LIBRARIES)
     endforeach()
-    configure_file(
-        "${CMAKE_SOURCE_DIR}/scripts/config.xcconfig.in"
-        "${CMAKE_BINARY_DIR}/config.xcconfig"
-        @ONLY
-    )
+    string(REPLACE ";-framework " ";-framework;" link_flags "${link_flags}")
+    string(REPLACE ";" "\" \"" link_flags "${link_flags}")
+    set_xcode_property(${target} XCCONFIG_LINK_LIBRARIES "${link_flags}")
 endfunction()
 
 # Set Xcode project build settings to be consistent with the CXX flags we're
 # using. (Otherwise, Xcode's defaults may override some of these.)
-macro(initialize_xcode_cxx_build_settings target)
+function(initialize_xcode_cxx_build_settings target)
     # -Wall
     set_xcode_property(${target} GCC_WARN_SIGN_COMPARE YES)
     set_xcode_property(${target} GCC_WARN_UNINITIALIZED_AUTOS YES)
@@ -206,7 +185,7 @@ macro(initialize_xcode_cxx_build_settings target)
 
     # -flto
     set_xcode_property(${target} LLVM_LTO $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebugInfo>>:YES>)
-endmacro(initialize_xcode_cxx_build_settings)
+endfunction()
 
 # CMake 3.1 does not have this yet.
 set(CMAKE_CXX14_STANDARD_COMPILE_OPTION "-std=c++14")

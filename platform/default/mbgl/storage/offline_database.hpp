@@ -7,6 +7,7 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/expected.hpp>
 
 #include <unordered_map>
 #include <memory>
@@ -47,14 +48,15 @@ public:
     // Return value is (inserted, stored size)
     std::pair<bool, uint64_t> put(const Resource&, const Response&);
 
-    std::vector<OfflineRegion> listRegions();
+    expected<OfflineRegions, std::exception_ptr> listRegions();
 
-    optional<OfflineRegion> createRegion(const OfflineRegionDefinition&,
-                                         const OfflineRegionMetadata&);
+    expected<OfflineRegion, std::exception_ptr> createRegion(const OfflineRegionDefinition&,
+                                                             const OfflineRegionMetadata&);
 
-    optional<OfflineRegionMetadata> updateMetadata(const int64_t regionID, const OfflineRegionMetadata&);
+    expected<OfflineRegionMetadata, std::exception_ptr>
+    updateMetadata(const int64_t regionID, const OfflineRegionMetadata&);
 
-    void deleteRegion(OfflineRegion&&);
+    std::exception_ptr deleteRegion(OfflineRegion&&);
 
     // Return value is (response, stored size)
     optional<std::pair<Response, uint64_t>> getRegionResource(int64_t regionID, const Resource&);
@@ -62,8 +64,8 @@ public:
     uint64_t putRegionResource(int64_t regionID, const Resource&, const Response&);
     void putRegionResources(int64_t regionID, const std::list<std::tuple<Resource, Response>>&, OfflineRegionStatus&);
 
-    optional<OfflineRegionDefinition> getRegionDefinition(int64_t regionID);
-    optional<OfflineRegionStatus> getRegionCompletedStatus(int64_t regionID);
+    expected<OfflineRegionDefinition, std::exception_ptr> getRegionDefinition(int64_t regionID);
+    expected<OfflineRegionStatus, std::exception_ptr> getRegionCompletedStatus(int64_t regionID);
 
     void setOfflineMapboxTileCountLimit(uint64_t);
     uint64_t getOfflineMapboxTileCountLimit();

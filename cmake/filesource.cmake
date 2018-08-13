@@ -1,3 +1,5 @@
+add_vendor_target(expected INTERFACE)
+
 add_library(mbgl-filesource STATIC
     # File source
     include/mbgl/storage/default_file_source.hpp
@@ -39,6 +41,7 @@ target_include_directories(mbgl-filesource
 
 target_link_libraries(mbgl-filesource
     PUBLIC mbgl-core
+    PUBLIC expected
 )
 
 mbgl_filesource()

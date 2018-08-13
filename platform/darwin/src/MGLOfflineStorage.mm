@@ -288,16 +288,16 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     const mbgl::OfflineTilePyramidRegionDefinition regionDefinition = [(id <MGLOfflineRegion_Private>)region offlineRegionDefinition];
     mbgl::OfflineRegionMetadata metadata(context.length);
     [context getBytes:&metadata[0] length:metadata.size()];
-    self.mbglFileSource->createOfflineRegion(regionDefinition, metadata, [&, completion](std::exception_ptr exception, mbgl::optional<mbgl::OfflineRegion> mbglOfflineRegion) {
+    self.mbglFileSource->createOfflineRegion(regionDefinition, metadata, [&, completion](mbgl::expected<mbgl::OfflineRegion, std::exception_ptr> mbglOfflineRegion) {
         NSError *error;
-        if (exception) {
-            NSString *errorDescription = @(mbgl::util::toString(exception).c_str());
+        if (!mbglOfflineRegion) {
+            NSString *errorDescription = @(mbgl::util::toString(mbglOfflineRegion.error()).c_str());
             error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:errorDescription ? @{
                 NSLocalizedDescriptionKey: errorDescription,
             } : nil];
         }
         if (completion) {
-            MGLOfflinePack *pack = mbglOfflineRegion ? [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(*mbglOfflineRegion))] : nil;
+            MGLOfflinePack *pack = mbglOfflineRegion ? [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(mbglOfflineRegion.value()))] : nil;
             dispatch_async(dispatch_get_main_queue(), [&, completion, error, pack](void) {
                 completion(pack, error);
             });
@@ -347,17 +347,17 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 }
 
 - (void)getPacksWithCompletionHandler:(void (^)(NSArray<MGLOfflinePack *> *packs, NSError * _Nullable error))completion {
-    self.mbglFileSource->listOfflineRegions([&, completion](std::exception_ptr exception, mbgl::optional<std::vector<mbgl::OfflineRegion>> regions) {
+    self.mbglFileSource->listOfflineRegions([&, completion](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> result) {
         NSError *error;
-        if (exception) {
-            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
-                NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
-            }];
-        }
         NSMutableArray *packs;
-        if (regions) {
-            packs = [NSMutableArray arrayWithCapacity:regions->size()];
-            for (mbgl::OfflineRegion &region : *regions) {
+        if (!result) {
+            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
+                NSLocalizedDescriptionKey: @(mbgl::util::toString(result.error()).c_str()),
+            }];
+        } else {
+            auto& regions = result.value();
+            packs = [NSMutableArray arrayWithCapacity:regions.size()];
+            for (auto &region : regions) {
                 MGLOfflinePack *pack = [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(region))];
                 [packs addObject:pack];
             }

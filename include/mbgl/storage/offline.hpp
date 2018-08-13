@@ -210,4 +210,6 @@ private:
     const OfflineRegionMetadata metadata;
 };
 
+using OfflineRegions = std::vector<OfflineRegion>;
+
 } // namespace mbgl
