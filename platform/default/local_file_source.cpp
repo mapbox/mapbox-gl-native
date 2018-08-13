@@ -75,7 +75,7 @@ std::unique_ptr<AsyncRequest> LocalFileSource::request(const Resource& resource,
 }
 
 bool LocalFileSource::acceptsURL(const std::string& url) {
-    return std::equal(fileProtocol.begin(), fileProtocol.end(), url.begin());
+    return 0 == url.find(fileProtocol);
 }
 
 } // namespace mbgl
