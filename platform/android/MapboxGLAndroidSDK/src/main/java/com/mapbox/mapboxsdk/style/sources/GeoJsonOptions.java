@@ -45,6 +45,17 @@ public class GeoJsonOptions extends HashMap<String, Object> {
   }
 
   /**
+   * Initialises whether to calculate line distance metrics.
+   *
+   * @param lineMetrics true to calculate line distance metrics.
+   * @return the current instance for chaining
+   */
+  public GeoJsonOptions withLineMetrics(boolean lineMetrics) {
+    this.put("lineMetrics", lineMetrics);
+    return this;
+  }
+
+  /**
    * Douglas-Peucker simplification tolerance (higher means simpler geometries and faster performance).
    *
    * @param tolerance the tolerance - Defaults to 0.375
@@ -88,5 +99,4 @@ public class GeoJsonOptions extends HashMap<String, Object> {
     this.put("clusterRadius", clusterRadius);
     return this;
   }
-
 }
