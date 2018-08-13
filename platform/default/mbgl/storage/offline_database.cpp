@@ -592,14 +592,15 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
     return true;
 }
 
-std::vector<OfflineRegion> OfflineDatabase::listRegions() try {
+expected<OfflineRegions, std::exception_ptr> OfflineDatabase::listRegions() try {
     mapbox::sqlite::Query query{ getStatement("SELECT id, definition, description FROM regions") };
-    std::vector<OfflineRegion> result;
+    OfflineRegions result;
     while (query.run()) {
         const auto id = query.get<int64_t>(0);
         const auto definition = query.get<std::string>(1);
         const auto description = query.get<std::vector<uint8_t>>(2);
         try {
+            // Construct, then move because this constructor is private.
             OfflineRegion region(id, decodeOfflineRegionDefinition(definition), description);
             result.emplace_back(std::move(region));
         } catch (const std::exception& ex) {
@@ -608,14 +609,16 @@ std::vector<OfflineRegion> OfflineDatabase::listRegions() try {
             Log::Error(Event::General, "%s", ex.what());
         }
     }
-    return result;
+    // Explicit move to avoid triggering the copy constructor.
+    return { std::move(result) };
 } catch (const mapbox::sqlite::Exception& ex) {
     handleError(ex, "list regions");
-    return {};
+    return unexpected<std::exception_ptr>(std::current_exception());
 }
 
-optional<OfflineRegion> OfflineDatabase::createRegion(const OfflineRegionDefinition& definition,
-                                                      const OfflineRegionMetadata& metadata) try {
+expected<OfflineRegion, std::exception_ptr>
+OfflineDatabase::createRegion(const OfflineRegionDefinition& definition,
+                              const OfflineRegionMetadata& metadata) try {
     // clang-format off
     mapbox::sqlite::Query query{ getStatement(
         "INSERT INTO regions (definition, description) "
@@ -628,10 +631,11 @@ optional<OfflineRegion> OfflineDatabase::createRegion(const OfflineRegionDefinit
     return OfflineRegion(query.lastInsertRowId(), definition, metadata);
 } catch (const mapbox::sqlite::Exception& ex) {
     handleError(ex, "create region");
-    return nullopt;
+    return unexpected<std::exception_ptr>(std::current_exception());
 }
 
-optional<OfflineRegionMetadata> OfflineDatabase::updateMetadata(const int64_t regionID, const OfflineRegionMetadata& metadata) try {
+expected<OfflineRegionMetadata, std::exception_ptr>
+OfflineDatabase::updateMetadata(const int64_t regionID, const OfflineRegionMetadata& metadata) try {
     // clang-format off
     mapbox::sqlite::Query query{ getStatement(
                                   "UPDATE regions SET description = ?1 "
@@ -644,10 +648,10 @@ optional<OfflineRegionMetadata> OfflineDatabase::updateMetadata(const int64_t re
     return metadata;
 } catch (const mapbox::sqlite::Exception& ex) {
     handleError(ex, "update region metadata");
-    return nullopt;
+    return unexpected<std::exception_ptr>(std::current_exception());
 }
 
-void OfflineDatabase::deleteRegion(OfflineRegion&& region) try {
+std::exception_ptr OfflineDatabase::deleteRegion(OfflineRegion&& region) try {
     {
         mapbox::sqlite::Query query{ getStatement("DELETE FROM regions WHERE id = ?") };
         query.bind(1, region.getID());
@@ -660,9 +664,10 @@ void OfflineDatabase::deleteRegion(OfflineRegion&& region) try {
 
     // Ensure that the cached offlineTileCount value is recalculated.
     offlineMapboxTileCount = {};
+    return nullptr;
 } catch (const mapbox::sqlite::Exception& ex) {
     handleError(ex, "delete region");
-    return;
+    return std::current_exception();
 }
 
 optional<std::pair<Response, uint64_t>> OfflineDatabase::getRegionResource(int64_t regionID, const Resource& resource) try {
@@ -848,7 +853,7 @@ bool OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
     }
 }
 
-optional<OfflineRegionDefinition> OfflineDatabase::getRegionDefinition(int64_t regionID) try {
+expected<OfflineRegionDefinition, std::exception_ptr> OfflineDatabase::getRegionDefinition(int64_t regionID) try {
     mapbox::sqlite::Query query{ getStatement("SELECT definition FROM regions WHERE id = ?1") };
     query.bind(1, regionID);
     query.run();
@@ -856,10 +861,10 @@ optional<OfflineRegionDefinition> OfflineDatabase::getRegionDefinition(int64_t r
     return decodeOfflineRegionDefinition(query.get<std::string>(0));
 } catch (const mapbox::sqlite::Exception& ex) {
     handleError(ex, "load region");
-    return nullopt;
+    return unexpected<std::exception_ptr>(std::current_exception());
 }
 
-optional<OfflineRegionStatus> OfflineDatabase::getRegionCompletedStatus(int64_t regionID) try {
+expected<OfflineRegionStatus, std::exception_ptr> OfflineDatabase::getRegionCompletedStatus(int64_t regionID) try {
     OfflineRegionStatus result;
 
     std::tie(result.completedResourceCount, result.completedResourceSize)
@@ -873,7 +878,7 @@ optional<OfflineRegionStatus> OfflineDatabase::getRegionCompletedStatus(int64_t 
     return result;
 } catch (const mapbox::sqlite::Exception& ex) {
     handleError(ex, "get region status");
-    return nullopt;
+    return unexpected<std::exception_ptr>(std::current_exception());
 }
 
 std::pair<int64_t, int64_t> OfflineDatabase::getCompletedResourceCountAndSize(int64_t regionID) {

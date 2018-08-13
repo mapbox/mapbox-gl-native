@@ -5,6 +5,7 @@
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/expected.hpp>
 
 #include <vector>
 #include <mutex>
@@ -55,8 +56,7 @@ public:
      * callback, which will be executed on the database thread; it is the responsibility
      * of the SDK bindings to re-execute a user-provided callback on the main thread.
      */
-    void listOfflineRegions(std::function<void (std::exception_ptr,
-                                                optional<std::vector<OfflineRegion>>)>);
+    void listOfflineRegions(std::function<void (expected<OfflineRegions, std::exception_ptr>)>);
 
     /*
      * Create an offline region in the database.
@@ -71,16 +71,14 @@ public:
      */
     void createOfflineRegion(const OfflineRegionDefinition& definition,
                              const OfflineRegionMetadata& metadata,
-                             std::function<void (std::exception_ptr,
-                                                 optional<OfflineRegion>)>);
+                             std::function<void (expected<OfflineRegion, std::exception_ptr>)>);
 
     /*
      * Update an offline region metadata in the database.
      */
     void updateOfflineMetadata(const int64_t regionID,
                                const OfflineRegionMetadata& metadata,
-                               std::function<void (std::exception_ptr,
-                                                   optional<OfflineRegionMetadata>)>);
+                               std::function<void (expected<OfflineRegionMetadata, std::exception_ptr>)>);
     /*
      * Register an observer to be notified when the state of the region changes.
      */
@@ -97,8 +95,9 @@ public:
      * executed on the database thread; it is the responsibility of the SDK bindings
      * to re-execute a user-provided callback on the main thread.
      */
-    void getOfflineRegionStatus(OfflineRegion&, std::function<void (std::exception_ptr,
-                                                                    optional<OfflineRegionStatus>)>) const;
+    void getOfflineRegionStatus(
+        OfflineRegion&,
+        std::function<void (expected<OfflineRegionStatus, std::exception_ptr>)>) const;
 
     /*
      * Remove an offline region from the database and perform any resources evictions

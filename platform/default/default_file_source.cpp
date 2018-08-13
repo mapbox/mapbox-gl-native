@@ -45,61 +45,44 @@ public:
         onlineFileSource.setResourceTransform(std::move(transform));
     }
 
-    void listRegions(std::function<void (std::exception_ptr, optional<std::vector<OfflineRegion>>)> callback) {
-        try {
-            callback({}, offlineDatabase->listRegions());
-        } catch (...) {
-            callback(std::current_exception(), {});
-        }
+    void listRegions(std::function<void (expected<OfflineRegions, std::exception_ptr>)> callback) {
+        callback(offlineDatabase->listRegions());
     }
 
     void createRegion(const OfflineRegionDefinition& definition,
                       const OfflineRegionMetadata& metadata,
-                      std::function<void (std::exception_ptr, optional<OfflineRegion>)> callback) {
-        try {
-            callback({}, offlineDatabase->createRegion(definition, metadata));
-        } catch (...) {
-            callback(std::current_exception(), {});
-        }
+                      std::function<void (expected<OfflineRegion, std::exception_ptr>)> callback) {
+        callback(offlineDatabase->createRegion(definition, metadata));
     }
 
     void updateMetadata(const int64_t regionID,
                       const OfflineRegionMetadata& metadata,
-                      std::function<void (std::exception_ptr, optional<OfflineRegionMetadata>)> callback) {
-        try {
-            callback({}, offlineDatabase->updateMetadata(regionID, metadata));
-        } catch (...) {
-            callback(std::current_exception(), {});
-        }
+                      std::function<void (expected<OfflineRegionMetadata, std::exception_ptr>)> callback) {
+        callback(offlineDatabase->updateMetadata(regionID, metadata));
     }
 
-    void getRegionStatus(int64_t regionID, std::function<void (std::exception_ptr, optional<OfflineRegionStatus>)> callback) {
+    void getRegionStatus(int64_t regionID, std::function<void (expected<OfflineRegionStatus, std::exception_ptr>)> callback) {
         if (auto download = getDownload(regionID)) {
-            callback({}, download->getStatus());
+            callback(download.value()->getStatus());
         } else {
-            callback(std::current_exception(), {});
+            callback(unexpected<std::exception_ptr>(download.error()));
         }
     }
 
     void deleteRegion(OfflineRegion&& region, std::function<void (std::exception_ptr)> callback) {
-        try {
-            downloads.erase(region.getID());
-            offlineDatabase->deleteRegion(std::move(region));
-            callback({});
-        } catch (...) {
-            callback(std::current_exception());
-        }
+        downloads.erase(region.getID());
+        callback(offlineDatabase->deleteRegion(std::move(region)));
     }
 
     void setRegionObserver(int64_t regionID, std::unique_ptr<OfflineRegionObserver> observer) {
         if (auto download = getDownload(regionID)) {
-            download->setObserver(std::move(observer));
+            download.value()->setObserver(std::move(observer));
         }
     }
 
     void setRegionDownloadState(int64_t regionID, OfflineRegionDownloadState state) {
         if (auto download = getDownload(regionID)) {
-            download->setState(state);
+            download.value()->setState(state);
         }
     }
 
@@ -185,17 +168,16 @@ public:
     }
 
 private:
-    OfflineDownload* getDownload(int64_t regionID) {
+    expected<OfflineDownload*, std::exception_ptr> getDownload(int64_t regionID) {
         auto it = downloads.find(regionID);
         if (it != downloads.end()) {
             return it->second.get();
         }
         auto definition = offlineDatabase->getRegionDefinition(regionID);
         if (!definition) {
-            return nullptr;
+            return unexpected<std::exception_ptr>(definition.error());
         }
-
-        auto download = std::make_unique<OfflineDownload>(regionID, std::move(*definition),
+        auto download = std::make_unique<OfflineDownload>(regionID, std::move(definition.value()),
                                                           *offlineDatabase, onlineFileSource);
         return downloads.emplace(regionID, std::move(download)).first->second.get();
     }
@@ -266,19 +248,19 @@ std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resourc
     return std::move(req);
 }
 
-void DefaultFileSource::listOfflineRegions(std::function<void (std::exception_ptr, optional<std::vector<OfflineRegion>>)> callback) {
+void DefaultFileSource::listOfflineRegions(std::function<void (expected<OfflineRegions, std::exception_ptr>)> callback) {
     impl->actor().invoke(&Impl::listRegions, callback);
 }
 
 void DefaultFileSource::createOfflineRegion(const OfflineRegionDefinition& definition,
                                             const OfflineRegionMetadata& metadata,
-                                            std::function<void (std::exception_ptr, optional<OfflineRegion>)> callback) {
+                                            std::function<void (expected<OfflineRegion, std::exception_ptr>)> callback) {
     impl->actor().invoke(&Impl::createRegion, definition, metadata, callback);
 }
 
 void DefaultFileSource::updateOfflineMetadata(const int64_t regionID,
                                             const OfflineRegionMetadata& metadata,
-                                            std::function<void (std::exception_ptr, optional<OfflineRegionMetadata>)> callback) {
+                                            std::function<void (expected<OfflineRegionMetadata, std::exception_ptr>)> callback) {
     impl->actor().invoke(&Impl::updateMetadata, regionID, metadata, callback);
 }
 
@@ -294,7 +276,7 @@ void DefaultFileSource::setOfflineRegionDownloadState(OfflineRegion& region, Off
     impl->actor().invoke(&Impl::setRegionDownloadState, region.getID(), state);
 }
 
-void DefaultFileSource::getOfflineRegionStatus(OfflineRegion& region, std::function<void (std::exception_ptr, optional<OfflineRegionStatus>)> callback) const {
+void DefaultFileSource::getOfflineRegionStatus(OfflineRegion& region, std::function<void (expected<OfflineRegionStatus, std::exception_ptr>)> callback) const {
     impl->actor().invoke(&Impl::getRegionStatus, region.getID(), callback);
 }
 

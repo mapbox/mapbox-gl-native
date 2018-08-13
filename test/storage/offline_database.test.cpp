@@ -436,7 +436,8 @@ TEST(OfflineDatabase, UpdateMetadata) {
 
     OfflineRegionMetadata newmetadata {{ 4, 5, 6 }};
     db.updateMetadata(region->getID(), newmetadata);
-    EXPECT_EQ(db.listRegions().at(0).getMetadata(), newmetadata);
+    auto regions = db.listRegions().value();
+    EXPECT_EQ(regions.at(0).getMetadata(), newmetadata);
 
     EXPECT_EQ(0u, log.uncheckedCount());
 }
@@ -449,7 +450,7 @@ TEST(OfflineDatabase, ListRegions) {
 
     auto region = db.createRegion(definition, metadata);
     ASSERT_TRUE(region);
-    std::vector<OfflineRegion> regions = db.listRegions();
+    auto regions = db.listRegions().value();
 
     ASSERT_EQ(1u, regions.size());
     EXPECT_EQ(region->getID(), regions.at(0).getID());
@@ -499,7 +500,8 @@ TEST(OfflineDatabase, DeleteRegion) {
 
     db.deleteRegion(std::move(*region));
 
-    ASSERT_EQ(0u, db.listRegions().size());
+    auto regions = db.listRegions().value();
+    ASSERT_EQ(0u, regions.size());
 
     EXPECT_EQ(0u, log.uncheckedCount());
 }
@@ -841,10 +843,9 @@ TEST(OfflineDatabase, BatchInsertionMapboxTileCountExceeded) {
 
     EXPECT_EQ(0u, status.completedTileCount);
     EXPECT_EQ(0u, status.completedResourceCount);
-    const auto completedStatus = db.getRegionCompletedStatus(region->getID());
-    ASSERT_TRUE(completedStatus);
-    EXPECT_EQ(1u, completedStatus->completedTileCount);
-    EXPECT_EQ(2u, completedStatus->completedResourceCount);
+    const auto completedStatus = db.getRegionCompletedStatus(region->getID()).value();
+    EXPECT_EQ(1u, completedStatus.completedTileCount);
+    EXPECT_EQ(2u, completedStatus.completedResourceCount);
 
     EXPECT_EQ(0u, log.uncheckedCount());
 }
@@ -858,7 +859,8 @@ TEST(OfflineDatabase, MigrateFromV2Schema) {
     {
         OfflineDatabase db(filename, 0);
         auto regions = db.listRegions();
-        for (auto& region : regions) {
+        ASSERT_TRUE(regions);
+        for (auto& region : regions.value()) {
             db.deleteRegion(std::move(region));
         }
     }
@@ -878,7 +880,7 @@ TEST(OfflineDatabase, MigrateFromV3Schema) {
 
     {
         OfflineDatabase db(filename, 0);
-        auto regions = db.listRegions();
+        auto regions = db.listRegions().value();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
         }
@@ -897,7 +899,7 @@ TEST(OfflineDatabase, MigrateFromV4Schema) {
 
     {
         OfflineDatabase db(filename, 0);
-        auto regions = db.listRegions();
+        auto regions = db.listRegions().value();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
         }
@@ -923,7 +925,7 @@ TEST(OfflineDatabase, MigrateFromV5Schema) {
 
     {
         OfflineDatabase db(filename, 0);
-        auto regions = db.listRegions();
+        auto regions = db.listRegions().value();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
         }
@@ -1046,16 +1048,15 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DisallowedIO)) {
     EXPECT_EQ(1u, log.count(warning(ResultCode::Auth, "Can't write resource: authorization denied")));
     EXPECT_EQ(0u, log.uncheckedCount());
 
-    const auto regions = db.listRegions();
-    EXPECT_TRUE(regions.empty());
+    EXPECT_FALSE(db.listRegions());
     EXPECT_EQ(1u, log.count(warning(ResultCode::Auth, "Can't list regions: authorization denied")));
     EXPECT_EQ(0u, log.uncheckedCount());
 
-    EXPECT_EQ(nullopt, db.createRegion(definition, {}));
+    EXPECT_FALSE(db.createRegion(definition, {}));
     EXPECT_EQ(1u, log.count(warning(ResultCode::Auth, "Can't create region: authorization denied")));
     EXPECT_EQ(0u, log.uncheckedCount());
 
-    EXPECT_EQ(nullopt, db.updateMetadata(region->getID(), {}));
+    EXPECT_FALSE(db.updateMetadata(region->getID(), {}));
     EXPECT_EQ(1u, log.count(warning(ResultCode::Auth, "Can't update region metadata: authorization denied")));
     EXPECT_EQ(0u, log.uncheckedCount());
 
@@ -1077,15 +1078,15 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DisallowedIO)) {
     EXPECT_EQ(1u, log.count(warning(ResultCode::Auth, "Can't write region resources: authorization denied")));
     EXPECT_EQ(0u, log.uncheckedCount());
 
-    EXPECT_EQ(nullopt, db.getRegionDefinition(region->getID()));
+    EXPECT_FALSE(db.getRegionDefinition(region->getID()));
     EXPECT_EQ(1u, log.count(warning(ResultCode::Auth, "Can't load region: authorization denied")));
     EXPECT_EQ(0u, log.uncheckedCount());
 
-    EXPECT_EQ(nullopt, db.getRegionCompletedStatus(region->getID()));
+    EXPECT_FALSE(db.getRegionCompletedStatus(region->getID()));
     EXPECT_EQ(1u, log.count(warning(ResultCode::Auth, "Can't get region status: authorization denied")));
     EXPECT_EQ(0u, log.uncheckedCount());
 
-    db.deleteRegion(std::move(*region));
+    EXPECT_TRUE(db.deleteRegion(std::move(*region)));
     EXPECT_EQ(1u, log.count(warning(ResultCode::Auth, "Can't delete region: authorization denied")));
     EXPECT_EQ(0u, log.uncheckedCount());
 
