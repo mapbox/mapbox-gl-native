@@ -1144,6 +1144,32 @@ public class Expression {
   }
 
   /**
+   * Gets the progress along a gradient line. Can only be used in the line-gradient property.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * LineLayer layer = new LineLayer("layer-id", "source-id");
+   * layer.setProperties(
+   *     lineGradient(interpolate(
+   *         linear(), lineProgress(),
+   *         stop(0f, rgb(0, 0, 255)),
+   *         stop(0.5f, rgb(0, 255, 0)),
+   *         stop(1f, rgb(255, 0, 0)))
+   *     )
+   * )
+   * }
+   * </pre>
+   *
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-line-progress">Style specification</a>
+   */
+  public static Expression lineProgress() {
+    return new Expression("line-progress");
+  }
+
+  /**
    * Retrieves an item from an array.
    *
    * @param number     the index expression

@@ -433,6 +433,17 @@
                 android:value=".activity.FeatureOverviewActivity" />
         </activity>
         <activity
+                android:name=".activity.style.GradientLineActivity"
+                android:description="@string/description_gradient_line"
+                android:label="@string/activity_gradient_line">
+            <meta-data
+                    android:name="@string/category"
+                    android:value="@string/category_style" />
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activity.FeatureOverviewActivity" />
+        </activity>
+        <activity
             android:name=".activity.style.DataDrivenStyleActivity"
             android:description="@string/description_data_driven_style"
             android:label="@string/activity_data_driven_style">
