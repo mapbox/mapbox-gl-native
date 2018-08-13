@@ -17,7 +17,7 @@ bool isFeatureConstant(const Expression& expression) {
             return false;
         } else if (name == "has" && parameterCount && *parameterCount == 1) {
             return false;
-        } else if (std::equal(std::begin(filter), std::end(filter) - 1, name.begin())) {
+        } else if (0 == name.rfind(filter, 0)) {
             // Legacy filters begin with "filter-" and are never constant.
             return false;
         } else if (
@@ -28,7 +28,7 @@ bool isFeatureConstant(const Expression& expression) {
             return false;
         }
     }
-    
+
     if (expression.getKind() == Kind::CollatorExpression) {
         // Although the results of a Collator expression with fixed arguments
         // generally shouldn't change between executions, we can't serialize them
