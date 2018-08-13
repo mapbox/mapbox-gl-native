@@ -1,21 +1,22 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
 import android.support.annotation.RawRes;
-import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.runner.AndroidJUnit4;
 import android.view.View;
 
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Point;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
-import com.mapbox.geojson.Feature;
-import com.mapbox.geojson.FeatureCollection;
-import com.mapbox.geojson.Point;
 
 import org.hamcrest.Matcher;
 import org.junit.Test;
@@ -25,9 +26,8 @@ import java.io.IOException;
 
 import timber.log.Timber;
 
-import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for {@link GeoJsonSource}
@@ -41,60 +41,69 @@ public class GeoJsonSourceTests extends BaseActivityTest {
   }
 
   @Test
-  public void testFeatureCollection() throws Exception {
+  public void testFeatureCollection() {
     validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new BaseViewAction() {
-
-      @Override
-      public void perform(UiController uiController, View view) {
-        GeoJsonSource source = null;
-        try {
-          source = new GeoJsonSource("source", FeatureCollection
-            .fromJson(ResourceUtils.readRawResource(rule.getActivity(), R.raw.test_feature_collection)));
-        } catch (IOException exception) {
-          Timber.e(exception);
-        }
-        mapboxMap.addSource(source);
-        mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
+    MapboxMapAction.invoke(mapboxMap, (uiController, mapboxMap) -> {
+      GeoJsonSource source = null;
+      try {
+        source = new GeoJsonSource("source", FeatureCollection
+          .fromJson(ResourceUtils.readRawResource(rule.getActivity(), R.raw.test_feature_collection)));
+      } catch (IOException exception) {
+        Timber.e(exception);
       }
+      mapboxMap.addSource(source);
+      mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
     });
   }
 
   @Test
   public void testPointGeometry() {
     validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new BaseViewAction() {
-
-      @Override
-      public void perform(UiController uiController, View view) {
-        GeoJsonSource source = new GeoJsonSource("source", Point.fromLngLat(0d, 0d));
-        mapboxMap.addSource(source);
-
-        mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
-      }
-
+    MapboxMapAction.invoke(mapboxMap, (uiController, mapboxMap) -> {
+      GeoJsonSource source = new GeoJsonSource("source", Point.fromLngLat(0d, 0d));
+      mapboxMap.addSource(source);
+      mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
     });
   }
 
   @Test
-  public void testFeatureProperties() throws IOException {
+  public void testFeatureProperties() {
     validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new BaseViewAction() {
+    MapboxMapAction.invoke(mapboxMap, (uiController, mapboxMap) -> {
+      GeoJsonSource source = null;
+      try {
+        source = new GeoJsonSource("source",
+          ResourceUtils.readRawResource(rule.getActivity(), R.raw.test_feature_properties));
+      } catch (IOException exception) {
+        Timber.e(exception);
+      }
+      mapboxMap.addSource(source);
+      mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
+    });
+  }
 
-      @Override
-      public void perform(UiController uiController, View view) {
-        GeoJsonSource source = null;
-        try {
-          source = new GeoJsonSource("source",
-            ResourceUtils.readRawResource(rule.getActivity(), R.raw.test_feature_properties));
-        } catch (IOException exception) {
-          Timber.e(exception);
-        }
-        mapboxMap.addSource(source);
+  @Test
+  public void testUpdateCoalescing() {
+    validateTestSetup();
+    MapboxMapAction.invoke(mapboxMap, (uiController, mapboxMap) -> {
+      GeoJsonSource source = new GeoJsonSource("source");
+      mapboxMap.addSource(source);
+      mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
 
-        mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
+      source.setGeoJson(Point.fromLngLat(0, 0));
+      source.setGeoJson(Point.fromLngLat(-25, -25));
+      try {
+        source.setGeoJson(ResourceUtils.readRawResource(rule.getActivity(), R.raw.test_feature_properties));
+      } catch (IOException exception) {
+        Timber.e(exception);
       }
 
+      source.setGeoJson(Point.fromLngLat(20, 55));
+      uiController.loopMainThreadForAtLeast(1000);
+      assertTrue(
+        mapboxMap.queryRenderedFeatures(
+          mapboxMap.getProjection().toScreenLocation(
+            new LatLng(55, 20)), "layer").size() == 1);
     });
   }
 
@@ -135,25 +144,20 @@ public class GeoJsonSourceTests extends BaseActivityTest {
 
   protected void testFeatureFromResource(final @RawRes int resource) {
     validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new BaseViewAction() {
+    MapboxMapAction.invoke(mapboxMap, (uiController, mapboxMap) -> {
+      GeoJsonSource source = new GeoJsonSource("source");
+      mapboxMap.addSource(source);
+      Layer layer = new CircleLayer("layer", source.getId());
+      mapboxMap.addLayer(layer);
 
-      @Override
-      public void perform(UiController uiController, View view) {
-        GeoJsonSource source = new GeoJsonSource("source");
-        mapboxMap.addSource(source);
-        Layer layer = new CircleLayer("layer", source.getId());
-        mapboxMap.addLayer(layer);
-
-        try {
-          source.setGeoJson(Feature.fromJson(ResourceUtils.readRawResource(rule.getActivity(), resource)));
-        } catch (IOException exception) {
-          Timber.e(exception);
-        }
-
-        mapboxMap.removeLayer(layer);
-        mapboxMap.removeSource(source);
+      try {
+        source.setGeoJson(Feature.fromJson(ResourceUtils.readRawResource(rule.getActivity(), resource)));
+      } catch (IOException exception) {
+        Timber.e(exception);
       }
 
+      mapboxMap.removeLayer(layer);
+      mapboxMap.removeSource(source);
     });
   }
 
