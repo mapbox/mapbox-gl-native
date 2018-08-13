@@ -97,6 +97,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MBXSettingsMiscellaneousLocalizeLabels,
     MBXSettingsMiscellaneousShowSnapshots,
     MBXSettingsMiscellaneousShouldLimitCameraChanges,
+    MBXSettingsMiscellaneousShowCustomLocationManager,
     MBXSettingsMiscellaneousPrintLogFile,
     MBXSettingsMiscellaneousDeleteLogFile,
 };
@@ -388,6 +389,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 [NSString stringWithFormat:@"Show Labels in %@", (_localizingLabels ? @"Default Language" : [[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier value:[self bestLanguageForUser]])],
                 @"Show Snapshots",
                 [NSString stringWithFormat:@"%@ Camera Changes", (_shouldLimitCameraChanges ? @"Unlimit" : @"Limit")],
+                @"View Route Simulation",
             ]];
 
             if (self.debugLoggingEnabled)
@@ -692,6 +694,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 case MBXSettingsMiscellaneousShowSnapshots:
                 {
                     [self performSegueWithIdentifier:@"ShowSnapshots" sender:nil];
+                    break;
+                }
+                case MBXSettingsMiscellaneousShowCustomLocationManager:
+                {
+                    [self performSegueWithIdentifier:@"ShowCustomLocationManger" sender:nil];
                     break;
                 }
                 case MBXSettingsMiscellaneousShouldLimitCameraChanges:
