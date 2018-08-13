@@ -742,8 +742,6 @@ ParseResult parseCompoundExpression(const std::string name, const Convertible& v
 
     auto length = arrayLength(value);
     
-    bool attemptedParse = false;
-    
     for (std::size_t j = 0; j < definition.size(); j++) {
         const std::unique_ptr<detail::SignatureBase>& signature = definition[j];
 
@@ -753,6 +751,7 @@ ParseResult parseCompoundExpression(const std::string name, const Convertible& v
             ) {
             // First parse all the args, potentially coercing to the
             // types expected by this overload.
+            ctx.clearErrors();
             bool argParseFailed = false;
             std::vector<std::unique_ptr<Expression>> args;
             args.reserve(length - 1);
@@ -773,10 +772,8 @@ ParseResult parseCompoundExpression(const std::string name, const Convertible& v
             if (argParseFailed) {
                 // Couldn't coerce args of this overload to expected type, move
                 // on to next one.
-                ctx.clearErrors();
                 continue;
             } else {
-                attemptedParse = true;
                 ParseResult parseWithArgs = createCompoundExpression(definition, std::move(args), ctx);
                 if (parseWithArgs) {
                     return parseWithArgs;
@@ -784,22 +781,21 @@ ParseResult parseCompoundExpression(const std::string name, const Convertible& v
             }
         }
     }
-    if (!attemptedParse) {
-        // The args couldn't be coerced to any of the expected types.
-        // Parse the arguments again without expected types just for the error message
-        std::vector<std::unique_ptr<Expression>> args;
-        args.reserve(length - 1);
-        
-        for (std::size_t i = 1; i < length; i++) {
-            auto parsed = ctx.parse(arrayMember(value, i), i);
-            if (!parsed) {
-                return ParseResult();
-            }
-            args.push_back(std::move(*parsed));
+    // The args couldn't be coerced to any of the expected types.
+    // Parse the arguments again without expected types just for the error message
+    ctx.clearErrors();
+    std::vector<std::unique_ptr<Expression>> args;
+    args.reserve(length - 1);
+    
+    for (std::size_t i = 1; i < length; i++) {
+        auto parsed = ctx.parse(arrayMember(value, i), i);
+        if (!parsed) {
+            return ParseResult();
         }
-
-        ctx.error(expectedTypesError(definition, args));
+        args.push_back(std::move(*parsed));
     }
+
+    ctx.error(expectedTypesError(definition, args));
 
     return ParseResult();
 }
