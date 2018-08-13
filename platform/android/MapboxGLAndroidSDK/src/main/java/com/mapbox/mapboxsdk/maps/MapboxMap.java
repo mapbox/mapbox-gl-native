@@ -1601,7 +1601,7 @@ public final class MapboxMap {
   public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
                                                  @NonNull @Size(value = 4) int[] padding) {
     // we use current camera tilt/bearing value to provide expected transformations as #11993
-    return getCameraForLatLngBounds(latLngBounds, padding, transform.getBearing(), transform.getTilt());
+    return getCameraForLatLngBounds(latLngBounds, padding, transform.getRawBearing(), transform.getTilt());
   }
 
 
