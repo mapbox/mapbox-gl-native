@@ -91,7 +91,7 @@ Current syntax:
 
 If you previously used an interpolation base greater than `0` (other than `1`), you can use `MGLExpressionInterpolationMode.exponential` as the curve type for `+[NSExpression(MGLAdditions) mgl_expressionForInterpolatingExpression:withCurveType:parameters:stops:]` or `'exponential'` as the curve type for [`mgl_interpolate:withCurveType:parameters:stops:`](predicates-and-expressions.html#code-mgl_interpolate-withcurvetype-parameters-stops-code). The `parameters` argument takes that interpolation base. This interpolates between values exponentially, creating an accelerated ramp effect.
 
-Here’s a visualization from Mapbox Studio (see [Working with Mapbox Studio](https://www.mapbox.com/ios-sdk/maps/overview/mapbox-studio/)) comparing interpolation base values of `1.5` and `0.5` based on zoom. In order to convert camera style functions, use `$zoomLevel` or `MGL_FUNCTION('zoomLevel')` as the attribute key.
+Here’s a visualization from Mapbox Studio (see [Mapbox Studio and iOS](https://www.mapbox.com/ios-sdk/maps/overview/mapbox-studio/)) comparing interpolation base values of `1.5` and `0.5` based on zoom. In order to convert camera style functions, use `$zoomLevel` or `MGL_FUNCTION('zoomLevel')` as the attribute key.
 
 <img src="img/data-driven-styling/exponential-function.png" height=344/>
 <img src="img/data-driven-styling/exponential-function-1.png" height=344/>
