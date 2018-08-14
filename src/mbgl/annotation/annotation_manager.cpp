@@ -140,7 +140,13 @@ std::unique_ptr<AnnotationTileData> AnnotationManager::getTileData(const Canonic
     auto pointLayer = tileData->addLayer(PointLayerID);
 
     LatLngBounds tileBounds(tileID);
-
+    // Hack for https://github.com/mapbox/mapbox-gl-native/issues/12472
+    // To handle precision issues, query a slightly larger area than the tile bounds
+    // Symbols at a border can be included in vector data for both tiles
+    // The rendering/querying logic will make sure the symbols show up in only one of the tiles
+    tileBounds.extend(LatLng(tileBounds.south() - 0.000000001, tileBounds.west() - 0.000000001));
+    tileBounds.extend(LatLng(tileBounds.north() + 0.000000001, tileBounds.east() + 0.000000001));
+    
     symbolTree.query(boost::geometry::index::intersects(tileBounds),
         boost::make_function_output_iterator([&](const auto& val){
             val->updateLayer(tileID, *pointLayer);
