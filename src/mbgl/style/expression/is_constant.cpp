@@ -17,7 +17,7 @@ bool isFeatureConstant(const Expression& expression) {
             return false;
         } else if (name == "has" && parameterCount && *parameterCount == 1) {
             return false;
-        } else if (0 == name.find(filter)) {
+        } else if (0 == name.rfind(filter, 0)) {
             // Legacy filters begin with "filter-" and are never constant.
             return false;
         } else if (
