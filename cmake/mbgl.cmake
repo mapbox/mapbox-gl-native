@@ -64,9 +64,14 @@ if(WITH_NODEJS)
     endfunction()
 
     # Run submodule update
+    set(MBGL_SUBMODULES mapbox-gl-js)
+    if (MBGL_PLATFORM STREQUAL "ios")
+        list(APPEND MBGL_SUBMODULES platform/ios/vendor/mapbox-events-ios)
+    endif()
+
     message(STATUS "Updating submodules...")
     execute_process(
-        COMMAND git submodule update --init mapbox-gl-js
+        COMMAND git submodule update --init ${MBGL_SUBMODULES}
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
     if(NOT EXISTS "${CMAKE_SOURCE_DIR}/mapbox-gl-js/node_modules")
@@ -80,7 +85,7 @@ if(WITH_NODEJS)
     # Add target for running submodule update during builds
     add_custom_target(
         update-submodules ALL
-        COMMAND git submodule update --init mapbox-gl-js
+        COMMAND git submodule update --init ${MBGL_SUBMODULES}
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         COMMENT "Updating submodules..."
     )
