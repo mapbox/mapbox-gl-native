@@ -36,7 +36,7 @@ void RenderHeatmapLayer::transition(const TransitionParameters& parameters) {
 void RenderHeatmapLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     evaluated = unevaluated.evaluate(parameters);
 
-    passes = (evaluated.get<style::HeatmapOpacity>() > 0)
+    passes = (evaluated.heatmapOpacity > 0)
             ? (RenderPass::Translucent | RenderPass::Pass3D)
             : RenderPass::None;
 }
@@ -101,7 +101,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
        
             const auto allUniformValues = programInstance.computeAllUniformValues(
                 HeatmapProgram::UniformValues {
-                    uniforms::u_intensity::Value{ evaluated.get<style::HeatmapIntensity>() },
+                    uniforms::u_intensity::Value{ evaluated.heatmapIntensity },
                     uniforms::u_matrix::Value{ tile.matrix },
                     uniforms::heatmap::u_extrude_scale::Value{ extrudeScale }
                 },
@@ -140,8 +140,8 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         mat4 viewportMat;
         matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
 
-        const Properties<>::PossiblyEvaluated properties;
-        const HeatmapTextureProgram::PaintPropertyBinders paintAttributeData{ properties, 0 };
+        static const NoProperties::PossiblyEvaluated properties;
+        static const NoProperties::Binders binders;
 
         auto& programInstance = parameters.programs.heatmapTexture;
 
@@ -150,15 +150,15 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
                 uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
                 uniforms::u_image::Value{ 0 },
                 uniforms::u_color_ramp::Value{ 1 },
-                uniforms::u_opacity::Value{ evaluated.get<HeatmapOpacity>() }
+                uniforms::u_opacity::Value{ evaluated.heatmapOpacity }
             },
-            paintAttributeData,
+            binders,
             properties,
             parameters.state.getZoom()
         );
         const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
             parameters.staticData.extrusionTextureVertexBuffer,
-            paintAttributeData,
+            binders,
             properties
         );
 
@@ -180,7 +180,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
 }
 
 void RenderHeatmapLayer::updateColorRamp() {
-    auto colorValue = unevaluated.get<HeatmapColor>().getValue();
+    auto colorValue = unevaluated.heatmapColor.getValue();
     if (colorValue.isUndefined()) {
         colorValue = HeatmapLayer::getDefaultHeatmapColor();
     }

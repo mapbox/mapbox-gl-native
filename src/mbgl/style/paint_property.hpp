@@ -15,10 +15,7 @@ namespace style {
 template <class T>
 class PaintProperty {
 public:
-    using TransitionableType = Transitionable<PropertyValue<T>>;
-    using UnevaluatedType = Transitioning<PropertyValue<T>>;
     using EvaluatorType = PropertyEvaluator<T>;
-    using PossiblyEvaluatedType = T;
     using Type = T;
     static constexpr bool IsDataDriven = false;
 };
@@ -26,10 +23,7 @@ public:
 template <class T, class A, class U>
 class DataDrivenPaintProperty {
 public:
-    using TransitionableType = Transitionable<PropertyValue<T>>;
-    using UnevaluatedType = Transitioning<PropertyValue<T>>;
     using EvaluatorType = DataDrivenPropertyEvaluator<T>;
-    using PossiblyEvaluatedType = PossiblyEvaluatedPropertyValue<T>;
     using Type = T;
     static constexpr bool IsDataDriven = true;
 
@@ -40,10 +34,7 @@ public:
 template <class T>
 class CrossFadedPaintProperty {
 public:
-    using TransitionableType = Transitionable<PropertyValue<T>>;
-    using UnevaluatedType = Transitioning<PropertyValue<T>>;
     using EvaluatorType = CrossFadedPropertyEvaluator<T>;
-    using PossiblyEvaluatedType = Faded<T>;
     using Type = T;
     static constexpr bool IsDataDriven = false;
 };
@@ -60,10 +51,7 @@ public:
  */
 class ColorRampProperty {
 public:
-    using TransitionableType = Transitionable<ColorRampPropertyValue>;
-    using UnevaluatedType = Transitioning<ColorRampPropertyValue>;
     using EvaluatorType = PropertyEvaluator<Color>;
-    using PossiblyEvaluatedType = Color;
     using Type = Color;
     static constexpr bool IsDataDriven = false;
 

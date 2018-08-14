@@ -25,7 +25,7 @@ class HillshadePrepareProgram : public Program<
         uniforms::u_zoom,
         uniforms::u_maxzoom,
         uniforms::u_image>,
-    style::Properties<>> {
+    style::NoProperties> {
 public:
     using Program::Program;
 

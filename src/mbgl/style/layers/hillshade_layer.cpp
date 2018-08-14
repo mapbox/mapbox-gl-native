@@ -86,26 +86,26 @@ PropertyValue<float> HillshadeLayer::getDefaultHillshadeIlluminationDirection() 
 }
 
 PropertyValue<float> HillshadeLayer::getHillshadeIlluminationDirection() const {
-    return impl().paint.template get<HillshadeIlluminationDirection>().value;
+    return impl().paint.hillshadeIlluminationDirection.value;
 }
 
 void HillshadeLayer::setHillshadeIlluminationDirection(PropertyValue<float> value) {
     if (value == getHillshadeIlluminationDirection())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HillshadeIlluminationDirection>().value = value;
+    impl_->paint.hillshadeIlluminationDirection.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void HillshadeLayer::setHillshadeIlluminationDirectionTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HillshadeIlluminationDirection>().options = options;
+    impl_->paint.hillshadeIlluminationDirection.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions HillshadeLayer::getHillshadeIlluminationDirectionTransition() const {
-    return impl().paint.template get<HillshadeIlluminationDirection>().options;
+    return impl().paint.hillshadeIlluminationDirection.options;
 }
 
 PropertyValue<HillshadeIlluminationAnchorType> HillshadeLayer::getDefaultHillshadeIlluminationAnchor() {
@@ -113,26 +113,26 @@ PropertyValue<HillshadeIlluminationAnchorType> HillshadeLayer::getDefaultHillsha
 }
 
 PropertyValue<HillshadeIlluminationAnchorType> HillshadeLayer::getHillshadeIlluminationAnchor() const {
-    return impl().paint.template get<HillshadeIlluminationAnchor>().value;
+    return impl().paint.hillshadeIlluminationAnchor.value;
 }
 
 void HillshadeLayer::setHillshadeIlluminationAnchor(PropertyValue<HillshadeIlluminationAnchorType> value) {
     if (value == getHillshadeIlluminationAnchor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HillshadeIlluminationAnchor>().value = value;
+    impl_->paint.hillshadeIlluminationAnchor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void HillshadeLayer::setHillshadeIlluminationAnchorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HillshadeIlluminationAnchor>().options = options;
+    impl_->paint.hillshadeIlluminationAnchor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions HillshadeLayer::getHillshadeIlluminationAnchorTransition() const {
-    return impl().paint.template get<HillshadeIlluminationAnchor>().options;
+    return impl().paint.hillshadeIlluminationAnchor.options;
 }
 
 PropertyValue<float> HillshadeLayer::getDefaultHillshadeExaggeration() {
@@ -140,26 +140,26 @@ PropertyValue<float> HillshadeLayer::getDefaultHillshadeExaggeration() {
 }
 
 PropertyValue<float> HillshadeLayer::getHillshadeExaggeration() const {
-    return impl().paint.template get<HillshadeExaggeration>().value;
+    return impl().paint.hillshadeExaggeration.value;
 }
 
 void HillshadeLayer::setHillshadeExaggeration(PropertyValue<float> value) {
     if (value == getHillshadeExaggeration())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HillshadeExaggeration>().value = value;
+    impl_->paint.hillshadeExaggeration.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void HillshadeLayer::setHillshadeExaggerationTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HillshadeExaggeration>().options = options;
+    impl_->paint.hillshadeExaggeration.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions HillshadeLayer::getHillshadeExaggerationTransition() const {
-    return impl().paint.template get<HillshadeExaggeration>().options;
+    return impl().paint.hillshadeExaggeration.options;
 }
 
 PropertyValue<Color> HillshadeLayer::getDefaultHillshadeShadowColor() {
@@ -167,26 +167,26 @@ PropertyValue<Color> HillshadeLayer::getDefaultHillshadeShadowColor() {
 }
 
 PropertyValue<Color> HillshadeLayer::getHillshadeShadowColor() const {
-    return impl().paint.template get<HillshadeShadowColor>().value;
+    return impl().paint.hillshadeShadowColor.value;
 }
 
 void HillshadeLayer::setHillshadeShadowColor(PropertyValue<Color> value) {
     if (value == getHillshadeShadowColor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HillshadeShadowColor>().value = value;
+    impl_->paint.hillshadeShadowColor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void HillshadeLayer::setHillshadeShadowColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HillshadeShadowColor>().options = options;
+    impl_->paint.hillshadeShadowColor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions HillshadeLayer::getHillshadeShadowColorTransition() const {
-    return impl().paint.template get<HillshadeShadowColor>().options;
+    return impl().paint.hillshadeShadowColor.options;
 }
 
 PropertyValue<Color> HillshadeLayer::getDefaultHillshadeHighlightColor() {
@@ -194,26 +194,26 @@ PropertyValue<Color> HillshadeLayer::getDefaultHillshadeHighlightColor() {
 }
 
 PropertyValue<Color> HillshadeLayer::getHillshadeHighlightColor() const {
-    return impl().paint.template get<HillshadeHighlightColor>().value;
+    return impl().paint.hillshadeHighlightColor.value;
 }
 
 void HillshadeLayer::setHillshadeHighlightColor(PropertyValue<Color> value) {
     if (value == getHillshadeHighlightColor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HillshadeHighlightColor>().value = value;
+    impl_->paint.hillshadeHighlightColor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void HillshadeLayer::setHillshadeHighlightColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HillshadeHighlightColor>().options = options;
+    impl_->paint.hillshadeHighlightColor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions HillshadeLayer::getHillshadeHighlightColorTransition() const {
-    return impl().paint.template get<HillshadeHighlightColor>().options;
+    return impl().paint.hillshadeHighlightColor.options;
 }
 
 PropertyValue<Color> HillshadeLayer::getDefaultHillshadeAccentColor() {
@@ -221,26 +221,26 @@ PropertyValue<Color> HillshadeLayer::getDefaultHillshadeAccentColor() {
 }
 
 PropertyValue<Color> HillshadeLayer::getHillshadeAccentColor() const {
-    return impl().paint.template get<HillshadeAccentColor>().value;
+    return impl().paint.hillshadeAccentColor.value;
 }
 
 void HillshadeLayer::setHillshadeAccentColor(PropertyValue<Color> value) {
     if (value == getHillshadeAccentColor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HillshadeAccentColor>().value = value;
+    impl_->paint.hillshadeAccentColor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void HillshadeLayer::setHillshadeAccentColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HillshadeAccentColor>().options = options;
+    impl_->paint.hillshadeAccentColor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions HillshadeLayer::getHillshadeAccentColorTransition() const {
-    return impl().paint.template get<HillshadeAccentColor>().options;
+    return impl().paint.hillshadeAccentColor.options;
 }
 
 using namespace conversion;

@@ -60,7 +60,7 @@ class BackgroundProgram : public Program<
     gl::Triangle,
     BackgroundLayoutAttributes,
     BackgroundUniforms,
-    style::Properties<>>
+    style::NoProperties>
 {
 public:
     using Program::Program;
@@ -71,7 +71,7 @@ class BackgroundPatternProgram : public Program<
     gl::Triangle,
     BackgroundLayoutAttributes,
     BackgroundPatternUniforms,
-    style::Properties<>>
+    style::NoProperties>
 {
 public:
     using Program::Program;

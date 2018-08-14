@@ -37,7 +37,7 @@ void RenderFillExtrusionLayer::transition(const TransitionParameters& parameters
 void RenderFillExtrusionLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     evaluated = unevaluated.evaluate(parameters);
 
-    passes = (evaluated.get<style::FillExtrusionOpacity>() > 0)
+    passes = (evaluated.fillExtrusionOpacity > 0)
                  ? (RenderPass::Translucent | RenderPass::Pass3D)
                  : RenderPass::None;
 }
@@ -98,7 +98,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 getID());
         };
 
-        if (evaluated.get<FillExtrusionPattern>().from.empty()) {
+        if (evaluated.fillExtrusionPattern.from.empty()) {
             for (const RenderTile& tile : renderTiles) {
                 auto bucket_ = tile.tile.getBucket<FillExtrusionBucket>(*baseImpl);
                 if (!bucket_) {
@@ -110,8 +110,8 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                     parameters.programs.fillExtrusion.get(evaluated),
                     bucket,
                     FillExtrusionUniforms::values(
-                        tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
-                                                  evaluated.get<FillExtrusionTranslateAnchor>(),
+                        tile.translatedClipMatrix(evaluated.fillExtrusionTranslate,
+                                                  evaluated.fillExtrusionTranslateAnchor,
                                                   parameters.state),
                         parameters.state,
                         parameters.evaluatedLight
@@ -120,9 +120,9 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             }
         } else {
             optional<ImagePosition> imagePosA =
-                parameters.imageManager.getPattern(evaluated.get<FillExtrusionPattern>().from);
+                parameters.imageManager.getPattern(evaluated.fillExtrusionPattern.from);
             optional<ImagePosition> imagePosB =
-                parameters.imageManager.getPattern(evaluated.get<FillExtrusionPattern>().to);
+                parameters.imageManager.getPattern(evaluated.fillExtrusionPattern.to);
 
             if (!imagePosA || !imagePosB) {
                 return;
@@ -141,11 +141,11 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                     parameters.programs.fillExtrusionPattern.get(evaluated),
                     bucket,
                     FillExtrusionPatternUniforms::values(
-                        tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
-                                                  evaluated.get<FillExtrusionTranslateAnchor>(),
+                        tile.translatedClipMatrix(evaluated.fillExtrusionTranslate,
+                                                  evaluated.fillExtrusionTranslateAnchor,
                                                   parameters.state),
                         parameters.imageManager.getPixelSize(), *imagePosA, *imagePosB,
-                        evaluated.get<FillExtrusionPattern>(), tile.id, parameters.state,
+                        evaluated.fillExtrusionPattern, tile.id, parameters.state,
                         -std::pow(2, tile.id.canonical.z) / util::tileSize / 8.0f,
                         parameters.evaluatedLight
                     )
@@ -161,24 +161,24 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         mat4 viewportMat;
         matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);
 
-        const Properties<>::PossiblyEvaluated properties;
-        const ExtrusionTextureProgram::PaintPropertyBinders paintAttributeData{ properties, 0 };
-        
+        static const NoProperties::PossiblyEvaluated properties;
+        static const NoProperties::Binders binders;
+
         auto& programInstance = parameters.programs.extrusionTexture;
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
             ExtrusionTextureProgram::UniformValues{
                 uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
                 uniforms::u_image::Value{ 0 },
-                uniforms::u_opacity::Value{ evaluated.get<FillExtrusionOpacity>() }
+                uniforms::u_opacity::Value{ evaluated.fillExtrusionOpacity }
             },
-            paintAttributeData,
+            binders,
             properties,
             parameters.state.getZoom()
         );
         const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
             parameters.staticData.extrusionTextureVertexBuffer,
-            paintAttributeData,
+            binders,
             properties
         );
 
@@ -208,8 +208,8 @@ bool RenderFillExtrusionLayer::queryIntersectsFeature(
 
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,
-            evaluated.get<style::FillExtrusionTranslate>(),
-            evaluated.get<style::FillExtrusionTranslateAnchor>(),
+            evaluated.fillExtrusionTranslate,
+            evaluated.fillExtrusionTranslateAnchor,
             transformState.getAngle(),
             pixelsToTileUnits);
 

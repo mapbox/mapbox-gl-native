@@ -108,26 +108,26 @@ PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionOpacity() {
 }
 
 PropertyValue<float> FillExtrusionLayer::getFillExtrusionOpacity() const {
-    return impl().paint.template get<FillExtrusionOpacity>().value;
+    return impl().paint.fillExtrusionOpacity.value;
 }
 
 void FillExtrusionLayer::setFillExtrusionOpacity(PropertyValue<float> value) {
     if (value == getFillExtrusionOpacity())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillExtrusionOpacity>().value = value;
+    impl_->paint.fillExtrusionOpacity.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void FillExtrusionLayer::setFillExtrusionOpacityTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillExtrusionOpacity>().options = options;
+    impl_->paint.fillExtrusionOpacity.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions FillExtrusionLayer::getFillExtrusionOpacityTransition() const {
-    return impl().paint.template get<FillExtrusionOpacity>().options;
+    return impl().paint.fillExtrusionOpacity.options;
 }
 
 PropertyValue<Color> FillExtrusionLayer::getDefaultFillExtrusionColor() {
@@ -135,26 +135,26 @@ PropertyValue<Color> FillExtrusionLayer::getDefaultFillExtrusionColor() {
 }
 
 PropertyValue<Color> FillExtrusionLayer::getFillExtrusionColor() const {
-    return impl().paint.template get<FillExtrusionColor>().value;
+    return impl().paint.fillExtrusionColor.value;
 }
 
 void FillExtrusionLayer::setFillExtrusionColor(PropertyValue<Color> value) {
     if (value == getFillExtrusionColor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillExtrusionColor>().value = value;
+    impl_->paint.fillExtrusionColor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void FillExtrusionLayer::setFillExtrusionColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillExtrusionColor>().options = options;
+    impl_->paint.fillExtrusionColor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions FillExtrusionLayer::getFillExtrusionColorTransition() const {
-    return impl().paint.template get<FillExtrusionColor>().options;
+    return impl().paint.fillExtrusionColor.options;
 }
 
 PropertyValue<std::array<float, 2>> FillExtrusionLayer::getDefaultFillExtrusionTranslate() {
@@ -162,26 +162,26 @@ PropertyValue<std::array<float, 2>> FillExtrusionLayer::getDefaultFillExtrusionT
 }
 
 PropertyValue<std::array<float, 2>> FillExtrusionLayer::getFillExtrusionTranslate() const {
-    return impl().paint.template get<FillExtrusionTranslate>().value;
+    return impl().paint.fillExtrusionTranslate.value;
 }
 
 void FillExtrusionLayer::setFillExtrusionTranslate(PropertyValue<std::array<float, 2>> value) {
     if (value == getFillExtrusionTranslate())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillExtrusionTranslate>().value = value;
+    impl_->paint.fillExtrusionTranslate.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void FillExtrusionLayer::setFillExtrusionTranslateTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillExtrusionTranslate>().options = options;
+    impl_->paint.fillExtrusionTranslate.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions FillExtrusionLayer::getFillExtrusionTranslateTransition() const {
-    return impl().paint.template get<FillExtrusionTranslate>().options;
+    return impl().paint.fillExtrusionTranslate.options;
 }
 
 PropertyValue<TranslateAnchorType> FillExtrusionLayer::getDefaultFillExtrusionTranslateAnchor() {
@@ -189,26 +189,26 @@ PropertyValue<TranslateAnchorType> FillExtrusionLayer::getDefaultFillExtrusionTr
 }
 
 PropertyValue<TranslateAnchorType> FillExtrusionLayer::getFillExtrusionTranslateAnchor() const {
-    return impl().paint.template get<FillExtrusionTranslateAnchor>().value;
+    return impl().paint.fillExtrusionTranslateAnchor.value;
 }
 
 void FillExtrusionLayer::setFillExtrusionTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
     if (value == getFillExtrusionTranslateAnchor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillExtrusionTranslateAnchor>().value = value;
+    impl_->paint.fillExtrusionTranslateAnchor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void FillExtrusionLayer::setFillExtrusionTranslateAnchorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillExtrusionTranslateAnchor>().options = options;
+    impl_->paint.fillExtrusionTranslateAnchor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions FillExtrusionLayer::getFillExtrusionTranslateAnchorTransition() const {
-    return impl().paint.template get<FillExtrusionTranslateAnchor>().options;
+    return impl().paint.fillExtrusionTranslateAnchor.options;
 }
 
 PropertyValue<std::string> FillExtrusionLayer::getDefaultFillExtrusionPattern() {
@@ -216,26 +216,26 @@ PropertyValue<std::string> FillExtrusionLayer::getDefaultFillExtrusionPattern() 
 }
 
 PropertyValue<std::string> FillExtrusionLayer::getFillExtrusionPattern() const {
-    return impl().paint.template get<FillExtrusionPattern>().value;
+    return impl().paint.fillExtrusionPattern.value;
 }
 
 void FillExtrusionLayer::setFillExtrusionPattern(PropertyValue<std::string> value) {
     if (value == getFillExtrusionPattern())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillExtrusionPattern>().value = value;
+    impl_->paint.fillExtrusionPattern.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void FillExtrusionLayer::setFillExtrusionPatternTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillExtrusionPattern>().options = options;
+    impl_->paint.fillExtrusionPattern.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions FillExtrusionLayer::getFillExtrusionPatternTransition() const {
-    return impl().paint.template get<FillExtrusionPattern>().options;
+    return impl().paint.fillExtrusionPattern.options;
 }
 
 PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionHeight() {
@@ -243,26 +243,26 @@ PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionHeight() {
 }
 
 PropertyValue<float> FillExtrusionLayer::getFillExtrusionHeight() const {
-    return impl().paint.template get<FillExtrusionHeight>().value;
+    return impl().paint.fillExtrusionHeight.value;
 }
 
 void FillExtrusionLayer::setFillExtrusionHeight(PropertyValue<float> value) {
     if (value == getFillExtrusionHeight())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillExtrusionHeight>().value = value;
+    impl_->paint.fillExtrusionHeight.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void FillExtrusionLayer::setFillExtrusionHeightTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillExtrusionHeight>().options = options;
+    impl_->paint.fillExtrusionHeight.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions FillExtrusionLayer::getFillExtrusionHeightTransition() const {
-    return impl().paint.template get<FillExtrusionHeight>().options;
+    return impl().paint.fillExtrusionHeight.options;
 }
 
 PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionBase() {
@@ -270,26 +270,26 @@ PropertyValue<float> FillExtrusionLayer::getDefaultFillExtrusionBase() {
 }
 
 PropertyValue<float> FillExtrusionLayer::getFillExtrusionBase() const {
-    return impl().paint.template get<FillExtrusionBase>().value;
+    return impl().paint.fillExtrusionBase.value;
 }
 
 void FillExtrusionLayer::setFillExtrusionBase(PropertyValue<float> value) {
     if (value == getFillExtrusionBase())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillExtrusionBase>().value = value;
+    impl_->paint.fillExtrusionBase.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void FillExtrusionLayer::setFillExtrusionBaseTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillExtrusionBase>().options = options;
+    impl_->paint.fillExtrusionBase.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions FillExtrusionLayer::getFillExtrusionBaseTransition() const {
-    return impl().paint.template get<FillExtrusionBase>().options;
+    return impl().paint.fillExtrusionBase.options;
 }
 
 using namespace conversion;

@@ -34,12 +34,12 @@ void RenderCircleLayer::transition(const TransitionParameters& parameters) {
 void RenderCircleLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     evaluated = unevaluated.evaluate(parameters);
 
-    passes = ((evaluated.get<style::CircleRadius>().constantOr(1) > 0 ||
-               evaluated.get<style::CircleStrokeWidth>().constantOr(1) > 0)
-              && (evaluated.get<style::CircleColor>().constantOr(Color::black()).a > 0 ||
-                  evaluated.get<style::CircleStrokeColor>().constantOr(Color::black()).a > 0)
-              && (evaluated.get<style::CircleOpacity>().constantOr(1) > 0 ||
-                  evaluated.get<style::CircleStrokeOpacity>().constantOr(1) > 0))
+    passes = ((evaluated.circleRadius.constantOr(1) > 0 ||
+               evaluated.circleStrokeWidth.constantOr(1) > 0)
+              && (evaluated.circleColor.constantOr(Color::black()).a > 0 ||
+                  evaluated.circleStrokeColor.constantOr(Color::black()).a > 0)
+              && (evaluated.circleOpacity.constantOr(1) > 0 ||
+                  evaluated.circleStrokeOpacity.constantOr(1) > 0))
              ? RenderPass::Translucent : RenderPass::None;
 }
 
@@ -52,8 +52,8 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
         return;
     }
 
-    const bool scaleWithMap = evaluated.get<CirclePitchScale>() == CirclePitchScaleType::Map;
-    const bool pitchWithMap = evaluated.get<CirclePitchAlignment>() == AlignmentType::Map;
+    const bool scaleWithMap = evaluated.circlePitchScale == CirclePitchScaleType::Map;
+    const bool pitchWithMap = evaluated.circlePitchAlignment == AlignmentType::Map;
 
     for (const RenderTile& tile : renderTiles) {
         auto bucket_ = tile.tile.getBucket<CircleBucket>(*baseImpl);
@@ -69,8 +69,8 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
         const auto allUniformValues = programInstance.computeAllUniformValues(
             CircleProgram::UniformValues {
                 uniforms::u_matrix::Value{
-                    tile.translatedMatrix(evaluated.get<CircleTranslate>(),
-                                          evaluated.get<CircleTranslateAnchor>(),
+                    tile.translatedMatrix(evaluated.circleTranslate,
+                                          evaluated.circleTranslateAnchor,
                                           parameters.state)
                 },
                 uniforms::u_scale_with_map::Value{ scaleWithMap },
@@ -139,21 +139,21 @@ bool RenderCircleLayer::queryIntersectsFeature(
     // Translate query geometry
     const GeometryCoordinates& translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,
-            evaluated.get<style::CircleTranslate>(),
-            evaluated.get<style::CircleTranslateAnchor>(),
+            evaluated.circleTranslate,
+            evaluated.circleTranslateAnchor,
             transformState.getAngle(),
             pixelsToTileUnits).value_or(queryGeometry);
 
     // Evaluate functions
-    auto radius = evaluated.evaluate<style::CircleRadius>(zoom, feature);
-    auto stroke = evaluated.evaluate<style::CircleStrokeWidth>(zoom, feature);
+    auto radius = evaluated.circleRadius.evaluate(feature, zoom, CircleRadius::defaultValue());
+    auto stroke = evaluated.circleStrokeWidth.evaluate(feature, zoom, CircleStrokeWidth::defaultValue());
     auto size = radius + stroke;
 
     // For pitch-alignment: map, compare feature geometry to query geometry in the plane of the tile
     // Otherwise, compare geometry in the plane of the viewport
     // A circle with fixed scaling relative to the viewport gets larger in tile space as it moves into the distance
     // A circle with fixed scaling relative to the map gets smaller in viewport space as it moves into the distance
-    bool alignWithMap = evaluated.evaluate<style::CirclePitchAlignment>(zoom, feature) == AlignmentType::Map;
+    bool alignWithMap = evaluated.circlePitchAlignment == AlignmentType::Map;
     const GeometryCoordinates& transformedQueryGeometry = alignWithMap ?
         translatedQueryGeometry :
         projectQueryGeometry(translatedQueryGeometry, posMatrix, transformState.getSize());
@@ -167,8 +167,8 @@ bool RenderCircleLayer::queryIntersectsFeature(
             float adjustedSize = transformedSize;
             vec4 center = {{ static_cast<double>(point.x), static_cast<double>(point.y), 0, 1 }};
             matrix::transformMat4(center, center, posMatrix);
-            auto pitchScale = evaluated.evaluate<style::CirclePitchScale>(zoom, feature);
-            auto pitchAlignment = evaluated.evaluate<style::CirclePitchAlignment>(zoom, feature);
+            auto pitchScale = evaluated.circlePitchScale;
+            auto pitchAlignment = evaluated.circlePitchAlignment;
             if (pitchScale == CirclePitchScaleType::Viewport && pitchAlignment == AlignmentType::Map) {
                 adjustedSize *= center[3] / transformState.getCameraToCenterDistance();
             } else if (pitchScale == CirclePitchScaleType::Map && pitchAlignment == AlignmentType::Viewport) {

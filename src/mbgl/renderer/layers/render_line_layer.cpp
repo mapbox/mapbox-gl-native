@@ -34,17 +34,18 @@ void RenderLineLayer::transition(const TransitionParameters& parameters) {
 }
 
 void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
-    style::Properties<LineFloorwidth>::Unevaluated extra(unevaluated.get<style::LineWidth>());
+//    style::Properties<LineFloorwidth>::Unevaluated extra(unevaluated.lineWidth);
+//
+//    auto dashArrayParams = parameters;
+//    dashArrayParams.useIntegerZoom = true;
+//
+//    evaluated = RenderLinePaintProperties::PossiblyEvaluated(
+//        unevaluated.evaluate(parameters).concat(extra.evaluate(dashArrayParams)));
+    evaluated = unevaluated.evaluate(parameters);
 
-    auto dashArrayParams = parameters;
-    dashArrayParams.useIntegerZoom = true;
-
-    evaluated = RenderLinePaintProperties::PossiblyEvaluated(
-        unevaluated.evaluate(parameters).concat(extra.evaluate(dashArrayParams)));
-
-    passes = (evaluated.get<style::LineOpacity>().constantOr(1.0) > 0
-              && evaluated.get<style::LineColor>().constantOr(Color::black()).a > 0
-              && evaluated.get<style::LineWidth>().constantOr(1.0) > 0)
+    passes = (evaluated.lineOpacity.constantOr(1.0) > 0
+              && evaluated.lineColor.constantOr(Color::black()).a > 0
+              && evaluated.lineWidth.constantOr(1.0) > 0)
              ? RenderPass::Translucent : RenderPass::None;
 }
 
@@ -97,11 +98,11 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             );
         };
 
-        if (!evaluated.get<LineDasharray>().from.empty()) {
-            const LinePatternCap cap = bucket.layout.get<LineCap>() == LineCapType::Round
+        if (!evaluated.lineDasharray.from.empty()) {
+            const LinePatternCap cap = bucket.layout.lineCap == LineCapType::Round
                 ? LinePatternCap::Round : LinePatternCap::Square;
-            LinePatternPos posA = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().from, cap);
-            LinePatternPos posB = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
+            LinePatternPos posA = parameters.lineAtlas.getDashPosition(evaluated.lineDasharray.from, cap);
+            LinePatternPos posB = parameters.lineAtlas.getDashPosition(evaluated.lineDasharray.to, cap);
 
             parameters.lineAtlas.bind(parameters.context, 0);
 
@@ -116,9 +117,9 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      posB,
                      parameters.lineAtlas.getSize().width));
 
-        } else if (!evaluated.get<LinePattern>().from.empty()) {
-            optional<ImagePosition> posA = parameters.imageManager.getPattern(evaluated.get<LinePattern>().from);
-            optional<ImagePosition> posB = parameters.imageManager.getPattern(evaluated.get<LinePattern>().to);
+        } else if (!evaluated.linePattern.from.empty()) {
+            optional<ImagePosition> posA = parameters.imageManager.getPattern(evaluated.linePattern.from);
+            optional<ImagePosition> posB = parameters.imageManager.getPattern(evaluated.linePattern.to);
 
             if (!posA || !posB)
                 return;
@@ -187,13 +188,13 @@ bool RenderLineLayer::queryIntersectsFeature(
     // Translate query geometry
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,
-            evaluated.get<style::LineTranslate>(),
-            evaluated.get<style::LineTranslateAnchor>(),
+            evaluated.lineTranslate,
+            evaluated.lineTranslateAnchor,
             transformState.getAngle(),
             pixelsToTileUnits);
 
     // Evaluate function
-    auto offset = evaluated.get<style::LineOffset>()
+    auto offset = evaluated.lineOffset
                           .evaluate(feature, zoom, style::LineOffset::defaultValue()) * pixelsToTileUnits;
 
     // Apply offset to geometry
@@ -208,9 +209,9 @@ bool RenderLineLayer::queryIntersectsFeature(
 }
 
 float RenderLineLayer::getLineWidth(const GeometryTileFeature& feature, const float zoom) const {
-    float lineWidth = evaluated.get<style::LineWidth>()
+    float lineWidth = evaluated.lineWidth
             .evaluate(feature, zoom, style::LineWidth::defaultValue());
-    float gapWidth = evaluated.get<style::LineGapWidth>()
+    float gapWidth = evaluated.lineGapWidth
             .evaluate(feature, zoom, style::LineGapWidth::defaultValue());
     if (gapWidth) {
         return gapWidth + 2 * lineWidth;

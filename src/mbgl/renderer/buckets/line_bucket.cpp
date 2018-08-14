@@ -20,11 +20,8 @@ LineBucket::LineBucket(const BucketParameters& parameters,
       zoom(parameters.tileID.overscaledZ) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(
-            std::piecewise_construct,
-            std::forward_as_tuple(layer->getID()),
-            std::forward_as_tuple(
-                layer->as<RenderLineLayer>()->evaluated,
-                parameters.tileID.overscaledZ));
+            layer->getID(),
+            layer->as<RenderLineLayer>()->evaluated.createBinders(parameters.tileID.overscaledZ));
     }
 }
 
@@ -89,15 +86,15 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, const Geome
         return;
     }
 
-    const LineJoinType joinType = layout.evaluate<LineJoin>(zoom, feature);
+    const LineJoinType joinType = layout.lineJoin.evaluate(feature, zoom, LineJoin::defaultValue());
 
-    const float miterLimit = joinType == LineJoinType::Bevel ? 1.05f : float(layout.get<LineMiterLimit>());
+    const float miterLimit = joinType == LineJoinType::Bevel ? 1.05f : float(layout.lineMiterLimit);
 
     const double sharpCornerOffset = SHARP_CORNER_OFFSET * (float(util::EXTENT) / (util::tileSize * overscaling));
 
     const GeometryCoordinate firstCoordinate = coordinates[first];
-    const LineCapType beginCap = layout.get<LineCap>();
-    const LineCapType endCap = type == FeatureType::Polygon ? LineCapType::Butt : LineCapType(layout.get<LineCap>());
+    const LineCapType beginCap = layout.lineCap;
+    const LineCapType endCap = type == FeatureType::Polygon ? LineCapType::Butt : LineCapType(layout.lineCap);
 
     double distance = 0;
     bool startOfLine = true;
@@ -203,7 +200,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, const Geome
 
         if (middleVertex) {
             if (currentJoin == LineJoinType::Round) {
-                if (miterLength < layout.get<LineRoundLimit>()) {
+                if (miterLength < layout.lineRoundLimit) {
                     currentJoin = LineJoinType::Miter;
                 } else if (miterLength <= 2) {
                     currentJoin = LineJoinType::FakeRound;
@@ -466,19 +463,36 @@ bool LineBucket::hasData() const {
     return !segments.empty();
 }
 
-template <class Property>
-static float get(const RenderLineLayer& layer, const std::map<std::string, LineProgram::PaintPropertyBinders>& paintPropertyBinders) {
+static float getLineWidth(const RenderLineLayer& layer, const std::map<std::string, LineProgram::PaintPropertyBinders>& paintPropertyBinders) {
     auto it = paintPropertyBinders.find(layer.getID());
-    if (it == paintPropertyBinders.end() || !it->second.statistics<Property>().max()) {
-        return layer.evaluated.get<Property>().constantOr(Property::defaultValue());
+    if (it == paintPropertyBinders.end() || !it->second.lineWidth->statistics.max()) {
+        return layer.evaluated.lineWidth.constantOr(LineWidth::defaultValue());
     } else {
-        return *it->second.statistics<Property>().max();
+        return *it->second.lineWidth->statistics.max();
+    }
+}
+
+static float getLineGapWidth(const RenderLineLayer& layer, const std::map<std::string, LineProgram::PaintPropertyBinders>& paintPropertyBinders) {
+    auto it = paintPropertyBinders.find(layer.getID());
+    if (it == paintPropertyBinders.end() || !it->second.lineGapWidth->statistics.max()) {
+        return layer.evaluated.lineGapWidth.constantOr(LineGapWidth::defaultValue());
+    } else {
+        return *it->second.lineGapWidth->statistics.max();
+    }
+}
+
+static float getLineOffset(const RenderLineLayer& layer, const std::map<std::string, LineProgram::PaintPropertyBinders>& paintPropertyBinders) {
+    auto it = paintPropertyBinders.find(layer.getID());
+    if (it == paintPropertyBinders.end() || !it->second.lineOffset->statistics.max()) {
+        return layer.evaluated.lineOffset.constantOr(LineOffset::defaultValue());
+    } else {
+        return *it->second.lineOffset->statistics.max();
     }
 }
 
 float LineBucket::getLineWidth(const RenderLineLayer& layer) const {
-    float lineWidth = get<LineWidth>(layer, paintPropertyBinders);
-    float gapWidth = get<LineGapWidth>(layer, paintPropertyBinders);
+    float lineWidth = ::mbgl::getLineWidth(layer, paintPropertyBinders);
+    float gapWidth = ::mbgl::getLineGapWidth(layer, paintPropertyBinders);
 
     if (gapWidth) {
         return gapWidth + 2 * lineWidth;
@@ -494,8 +508,8 @@ float LineBucket::getQueryRadius(const RenderLayer& layer) const {
 
     auto lineLayer = layer.as<RenderLineLayer>();
 
-    const std::array<float, 2>& translate = lineLayer->evaluated.get<LineTranslate>();
-    float offset = get<LineOffset>(*lineLayer, paintPropertyBinders);
+    const std::array<float, 2>& translate = lineLayer->evaluated.lineTranslate;
+    float offset = getLineOffset(*lineLayer, paintPropertyBinders);
     return getLineWidth(*lineLayer) / 2.0 + std::abs(offset) + util::length(translate[0], translate[1]);
 }
 

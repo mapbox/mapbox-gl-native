@@ -46,19 +46,21 @@ public:
             Shaders::fragmentSource)) {
     }
 
+    template <class PossiblyEvaluatedProperties>
     static typename AllUniforms::Values computeAllUniformValues(
         const UniformValues& uniformValues,
         const PaintPropertyBinders& paintPropertyBinders,
-        const typename PaintProperties::PossiblyEvaluated& currentProperties,
+        const PossiblyEvaluatedProperties& currentProperties,
         float currentZoom) {
         return uniformValues
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
     }
 
+    template <class PossiblyEvaluatedProperties>
     static typename Attributes::Bindings computeAllAttributeBindings(
         const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
         const PaintPropertyBinders& paintPropertyBinders,
-        const typename PaintProperties::PossiblyEvaluated& currentProperties) {
+        const PossiblyEvaluatedProperties& currentProperties) {
         return LayoutAttributes::bindings(layoutVertexBuffer)
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
     }
@@ -105,8 +107,7 @@ template <class Program>
 class ProgramMap {
 public:
     using PaintProperties = typename Program::PaintProperties;
-    using PaintPropertyBinders = typename Program::PaintPropertyBinders;
-    using Bitset = typename PaintPropertyBinders::Bitset;
+    using Bitset = std::bitset<8>;
 
     ProgramMap(gl::Context& context_, ProgramParameters parameters_)
         : context(context_),
@@ -114,7 +115,7 @@ public:
     }
 
     Program& get(const typename PaintProperties::PossiblyEvaluated& currentProperties) {
-        Bitset bits = PaintPropertyBinders::constants(currentProperties);
+        Bitset bits = currentProperties.constants();
         auto it = programs.find(bits);
         if (it != programs.end()) {
             return it->second;
@@ -122,7 +123,7 @@ public:
         return programs.emplace(std::piecewise_construct,
                                 std::forward_as_tuple(bits),
                                 std::forward_as_tuple(context,
-                                    parameters.withAdditionalDefines(PaintPropertyBinders::defines(currentProperties)))).first->second;
+                                    parameters.withAdditionalDefines(currentProperties.defines()))).first->second;
     }
 
 private:

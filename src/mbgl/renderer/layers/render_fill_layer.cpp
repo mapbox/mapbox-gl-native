@@ -35,19 +35,19 @@ void RenderFillLayer::transition(const TransitionParameters& parameters) {
 void RenderFillLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     evaluated = unevaluated.evaluate(parameters);
 
-    if (unevaluated.get<style::FillOutlineColor>().isUndefined()) {
-        evaluated.get<style::FillOutlineColor>() = evaluated.get<style::FillColor>();
+    if (unevaluated.fillOutlineColor.isUndefined()) {
+        evaluated.fillOutlineColor = evaluated.fillColor;
     }
 
     passes = RenderPass::None;
 
-    if (evaluated.get<style::FillAntialias>()) {
+    if (evaluated.fillAntialias) {
         passes |= RenderPass::Translucent;
     }
 
-    if (!unevaluated.get<style::FillPattern>().isUndefined()
-        || evaluated.get<style::FillColor>().constantOr(Color()).a < 1.0f
-        || evaluated.get<style::FillOpacity>().constantOr(0) < 1.0f) {
+    if (!unevaluated.fillPattern.isUndefined()
+        || evaluated.fillColor.constantOr(Color()).a < 1.0f
+        || evaluated.fillOpacity.constantOr(0) < 1.0f) {
         passes |= RenderPass::Translucent;
     } else {
         passes |= RenderPass::Opaque;
@@ -59,7 +59,7 @@ bool RenderFillLayer::hasTransition() const {
 }
 
 void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
-    if (evaluated.get<FillPattern>().from.empty()) {
+    if (evaluated.fillPattern.from.empty()) {
         for (const RenderTile& tile : renderTiles) {
             auto bucket_ = tile.tile.getBucket<FillBucket>(*baseImpl);
             if (!bucket_) {
@@ -79,8 +79,8 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                 const auto allUniformValues = programInstance.computeAllUniformValues(
                     FillProgram::UniformValues {
                         uniforms::u_matrix::Value{
-                            tile.translatedMatrix(evaluated.get<FillTranslate>(),
-                                                  evaluated.get<FillTranslateAnchor>(),
+                            tile.translatedMatrix(evaluated.fillTranslate,
+                                                  evaluated.fillTranslateAnchor,
                                                   parameters.state)
                         },
                         uniforms::u_world::Value{ parameters.context.viewport.getCurrentValue().size },
@@ -113,8 +113,8 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
 
             // Only draw the fill when it's opaque and we're drawing opaque fragments,
             // or when it's translucent and we're drawing translucent fragments.
-            if ((evaluated.get<FillColor>().constantOr(Color()).a >= 1.0f
-              && evaluated.get<FillOpacity>().constantOr(0) >= 1.0f) == (parameters.pass == RenderPass::Opaque)) {
+            if ((evaluated.fillColor.constantOr(Color()).a >= 1.0f
+              && evaluated.fillOpacity.constantOr(0) >= 1.0f) == (parameters.pass == RenderPass::Opaque)) {
                 draw(parameters.programs.fill,
                      gl::Triangles(),
                      parameters.depthModeForSublayer(1, parameters.pass == RenderPass::Opaque
@@ -124,11 +124,11 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                      bucket.triangleSegments);
             }
 
-            if (evaluated.get<FillAntialias>() && parameters.pass == RenderPass::Translucent) {
+            if (evaluated.fillAntialias && parameters.pass == RenderPass::Translucent) {
                 draw(parameters.programs.fillOutline,
                      gl::Lines{ 2.0f },
                      parameters.depthModeForSublayer(
-                         unevaluated.get<FillOutlineColor>().isUndefined() ? 2 : 0,
+                         unevaluated.fillOutlineColor.isUndefined() ? 2 : 0,
                          gl::DepthMode::ReadOnly),
                      *bucket.lineIndexBuffer,
                      bucket.lineSegments);
@@ -139,8 +139,8 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
             return;
         }
 
-        optional<ImagePosition> imagePosA = parameters.imageManager.getPattern(evaluated.get<FillPattern>().from);
-        optional<ImagePosition> imagePosB = parameters.imageManager.getPattern(evaluated.get<FillPattern>().to);
+        optional<ImagePosition> imagePosA = parameters.imageManager.getPattern(evaluated.fillPattern.from);
+        optional<ImagePosition> imagePosB = parameters.imageManager.getPattern(evaluated.fillPattern.to);
 
         if (!imagePosA || !imagePosB) {
             return;
@@ -166,14 +166,14 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
 
                 const auto allUniformValues = programInstance.computeAllUniformValues(
                     FillPatternUniforms::values(
-                        tile.translatedMatrix(evaluated.get<FillTranslate>(),
-                                              evaluated.get<FillTranslateAnchor>(),
+                        tile.translatedMatrix(evaluated.fillTranslate,
+                                              evaluated.fillTranslateAnchor,
                                               parameters.state),
                         parameters.context.viewport.getCurrentValue().size,
                         parameters.imageManager.getPixelSize(),
                         *imagePosA,
                         *imagePosB,
-                        evaluated.get<FillPattern>(),
+                        evaluated.fillPattern,
                         tile.id,
                         parameters.state
                     ),
@@ -209,7 +209,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                  *bucket.triangleIndexBuffer,
                  bucket.triangleSegments);
 
-            if (evaluated.get<FillAntialias>() && unevaluated.get<FillOutlineColor>().isUndefined()) {
+            if (evaluated.fillAntialias && unevaluated.fillOutlineColor.isUndefined()) {
                 draw(parameters.programs.fillOutlinePattern,
                      gl::Lines { 2.0f },
                      parameters.depthModeForSublayer(2, gl::DepthMode::ReadOnly),
@@ -230,8 +230,8 @@ bool RenderFillLayer::queryIntersectsFeature(
 
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,
-            evaluated.get<style::FillTranslate>(),
-            evaluated.get<style::FillTranslateAnchor>(),
+            evaluated.fillTranslate,
+            evaluated.fillTranslateAnchor,
             transformState.getAngle(),
             pixelsToTileUnits);
 

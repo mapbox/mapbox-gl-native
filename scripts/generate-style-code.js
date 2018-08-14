@@ -53,24 +53,43 @@ global.evaluatedType = function (property) {
   }
 };
 
-function attributeUniformType(property, type) {
+function attributeUniformName(property, type) {
     const attributeNameExceptions = {
-      'text-opacity': 'opacity',
-      'icon-opacity': 'opacity',
-      'text-color': 'fill_color',
-      'icon-color': 'fill_color',
-      'text-halo-color': 'halo_color',
-      'icon-halo-color': 'halo_color',
-      'text-halo-blur': 'halo_blur',
-      'icon-halo-blur': 'halo_blur',
-      'text-halo-width': 'halo_width',
-      'icon-halo-width': 'halo_width',
-      'line-gap-width': 'gapwidth'
-    }
-    const name = attributeNameExceptions[property.name] ||
+        'text-opacity': 'opacity',
+        'icon-opacity': 'opacity',
+        'text-color': 'fill_color',
+        'icon-color': 'fill_color',
+        'text-halo-color': 'halo_color',
+        'icon-halo-color': 'halo_color',
+        'text-halo-blur': 'halo_blur',
+        'icon-halo-blur': 'halo_blur',
+        'text-halo-width': 'halo_width',
+        'icon-halo-width': 'halo_width',
+        'line-gap-width': 'gapwidth'
+    };
+    return attributeNameExceptions[property.name] ||
         property.name.replace(type + '-', '').replace(/-/g, '_');
-    return `attributes::a_${name}${name === 'offset' ? '<1>' : ''}, uniforms::u_${name}`;
 }
+
+global.attributeType = function(property, type) {
+    const name = attributeUniformName(property, type);
+    return `attributes::a_${name}${name === 'offset' ? '<1>' : ''}`;
+};
+
+global.uniformType = function(property, type) {
+    const name = attributeUniformName(property, type);
+    return `uniforms::u_${name}`;
+};
+
+global.isDataDriven = function (property) {
+  switch (property['property-type']) {
+    case 'data-driven':
+    case 'cross-faded-data-driven':
+      return true;
+    default:
+      return false;
+  }
+};
 
 global.layoutPropertyType = function (property) {
   switch (property['property-type']) {
@@ -86,11 +105,23 @@ global.paintPropertyType = function (property, type) {
   switch (property['property-type']) {
     case 'data-driven':
     case 'cross-faded-data-driven':
-      return `DataDrivenPaintProperty<${evaluatedType(property)}, ${attributeUniformType(property, type)}>`;
+      return `DataDrivenPaintProperty<${evaluatedType(property)}, ${attributeType(property, type)}, ${uniformType(property, type)}>`;
     case 'cross-faded':
       return `CrossFadedPaintProperty<${evaluatedType(property)}>`;
     default:
       return `PaintProperty<${evaluatedType(property)}>`;
+  }
+};
+
+global.possiblyEvaluatedType = function (property) {
+  switch (property['property-type']) {
+    case 'data-driven':
+    case 'cross-faded-data-driven':
+      return `PossiblyEvaluatedPropertyValue<${evaluatedType(property)}>`;
+    case 'cross-faded':
+      return `Faded<${evaluatedType(property)}>`;
+    default:
+      return evaluatedType(property);
   }
 };
 
@@ -203,5 +234,10 @@ const lightProperties = Object.keys(spec[`light`]).reduce((memo, name) => {
 
 const lightHpp = ejs.compile(fs.readFileSync('include/mbgl/style/light.hpp.ejs', 'utf8'), {strict: true});
 const lightCpp = ejs.compile(fs.readFileSync('src/mbgl/style/light.cpp.ejs', 'utf8'), {strict: true});
+const lightPropertiesHpp = ejs.compile(fs.readFileSync('src/mbgl/style/light_properties.hpp.ejs', 'utf8'), {strict: true});
+const lightPropertiesCpp = ejs.compile(fs.readFileSync('src/mbgl/style/light_properties.cpp.ejs', 'utf8'), {strict: true});
+
 writeIfModified(`include/mbgl/style/light.hpp`, lightHpp({properties: lightProperties}));
 writeIfModified(`src/mbgl/style/light.cpp`, lightCpp({properties: lightProperties}));
+writeIfModified(`src/mbgl/style/light_properties.hpp`, lightPropertiesHpp({properties: lightProperties}));
+writeIfModified(`src/mbgl/style/light_properties.cpp`, lightPropertiesCpp({properties: lightProperties}));

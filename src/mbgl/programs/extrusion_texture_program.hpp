@@ -18,7 +18,7 @@ class ExtrusionTextureProgram : public Program<
         uniforms::u_world,
         uniforms::u_image,
         uniforms::u_opacity>,
-    style::Properties<>> {
+    style::NoProperties> {
 public:
     using Program::Program;
 

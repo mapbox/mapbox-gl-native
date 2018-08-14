@@ -392,6 +392,9 @@ set(MBGL_CORE_FILES
     src/mbgl/style/light_impl.cpp
     src/mbgl/style/light_impl.hpp
     src/mbgl/style/light_observer.hpp
+    src/mbgl/style/light_properties.cpp
+    src/mbgl/style/light_properties.hpp
+    src/mbgl/style/light_property.hpp
     src/mbgl/style/observer.hpp
     src/mbgl/style/paint_property.hpp
     src/mbgl/style/parser.cpp

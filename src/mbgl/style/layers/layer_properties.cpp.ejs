@@ -10,5 +10,207 @@
 namespace mbgl {
 namespace style {
 
+<% if (layoutProperties.length) { -%>
+bool operator==(const <%- camelize(type) %>LayoutProperties::Unevaluated& lhs, const <%- camelize(type) %>LayoutProperties::Unevaluated& rhs) {
+    return true
+<% for (const property of layoutProperties) { -%>
+        && lhs.<%- camelizeWithLeadingLowercase(property.name) %> == rhs.<%- camelizeWithLeadingLowercase(property.name) %>
+<% } -%>
+        ;
+}
+
+<%- camelize(type) %>LayoutProperties::PossiblyEvaluated <%- camelize(type) %>LayoutProperties::Unevaluated::evaluate(const PropertyEvaluationParameters& parameters) const {
+    return PossiblyEvaluated {
+<% for (const property of layoutProperties) { -%>
+        <%- camelizeWithLeadingLowercase(property.name) %>.evaluate(typename <%- camelize(property.name) %>::EvaluatorType(parameters, <%- camelize(property.name) %>::defaultValue()), parameters.now),
+<% } -%>
+    };
+}
+
+<%- camelize(type) %>LayoutProperties::Evaluated <%- camelize(type) %>LayoutProperties::PossiblyEvaluated::evaluate(float z, const GeometryTileFeature& feature) const {
+    return Evaluated {
+<% for (const property of layoutProperties) { -%>
+<% if (isDataDriven(property)) { -%>
+        <%- camelizeWithLeadingLowercase(property.name) %>.evaluate(feature, z, <%- camelize(property.name) %>::defaultValue()),
+<% } else { -%>
+        <%- camelizeWithLeadingLowercase(property.name) %>,
+<% } -%>
+<% } -%>
+    };
+}
+
+<% } -%>
+<%- camelize(type) %>PaintProperties::Unevaluated <%- camelize(type) %>PaintProperties::Transitionable::transitioned(const TransitionParameters& parameters, Unevaluated&& prior) const {
+    return Unevaluated {
+<% for (const property of paintProperties) { -%>
+        <%- camelizeWithLeadingLowercase(property.name) %>.transition(parameters, std::move(prior.<%- camelizeWithLeadingLowercase(property.name) %>)),
+<% } -%>
+    };
+}
+
+<%- camelize(type) %>PaintProperties::Unevaluated <%- camelize(type) %>PaintProperties::Transitionable::untransitioned() const {
+    return Unevaluated {
+<% for (const property of paintProperties) { -%>
+        Transitioning<<%- propertyValueType(property) %>>(<%- camelizeWithLeadingLowercase(property.name) %>.value),
+<% } -%>
+    };
+}
+
+bool <%- camelize(type) %>PaintProperties::Transitionable::hasDataDrivenPropertyDifference(const Transitionable& other) const {
+    return false
+<% for (const property of paintProperties) { -%>
+        || <%- camelizeWithLeadingLowercase(property.name) %>.value.hasDataDrivenPropertyDifference(other.<%- camelizeWithLeadingLowercase(property.name) %>.value)
+<% } -%>
+        ;
+}
+
+bool <%- camelize(type) %>PaintProperties::Unevaluated::hasTransition() const {
+    return false
+<% for (const property of paintProperties) { -%>
+        || <%- camelizeWithLeadingLowercase(property.name) %>.hasTransition()
+<% } -%>
+        ;
+}
+
+<%- camelize(type) %>PaintProperties::PossiblyEvaluated <%- camelize(type) %>PaintProperties::Unevaluated::evaluate(const PropertyEvaluationParameters& parameters) const {
+    return PossiblyEvaluated {
+<% for (const property of paintProperties) { -%>
+        <%- camelizeWithLeadingLowercase(property.name) %>.evaluate(typename <%- camelize(property.name) %>::EvaluatorType(parameters, <%- camelize(property.name) %>::defaultValue()), parameters.now),
+<% } -%>
+    };
+}
+
+<% if (type !== "symbol" && type !== "background" && type !== "raster" && type !== "hillshade") { -%>
+<%- camelize(type) %>PaintProperties::Binders <%- camelize(type) %>PaintProperties::PossiblyEvaluated::createBinders(float z) const {
+    return Binders {
+<% for (const property of paintProperties.filter(isDataDriven)) { -%>
+        PaintPropertyBinder<<%- evaluatedType(property) %>, typename <%- attributeType(property, type) %>::Type>::create(<%- camelizeWithLeadingLowercase(property.name) %>, z, <%- camelize(property.name) %>::defaultValue()),
+<% } -%>
+    };
+}
+
+std::bitset<8> <%- camelize(type) %>PaintProperties::PossiblyEvaluated::constants() const {
+    std::bitset<8> result;
+<% for (let i = 0; i < paintProperties.filter(isDataDriven).length; i++) { -%>
+    result.set(<%- i %>, <%- camelizeWithLeadingLowercase(paintProperties.filter(isDataDriven)[i].name) %>.isConstant());
+<% } -%>
+    return result;
+}
+
+std::vector<std::string> <%- camelize(type) %>PaintProperties::PossiblyEvaluated::defines() const {
+    std::vector<std::string> result;
+<% for (const property of paintProperties.filter(isDataDriven)) { -%>
+    result.push_back(<%- camelizeWithLeadingLowercase(property.name) %>.isConstant()
+        ? std::string("#define HAS_UNIFORM_") + <%- camelize(property.name) %>::Uniform::name()
+        : std::string());
+<% } -%>
+    return result;
+}
+
+void <%- camelize(type) %>PaintProperties::Binders::populateVertexVectors(const GeometryTileFeature& feature, std::size_t length) {
+<% for (const property of paintProperties.filter(isDataDriven)) { -%>
+    <%- camelizeWithLeadingLowercase(property.name) %>->populateVertexVector(feature, length);
+<% } -%>
+}
+
+void <%- camelize(type) %>PaintProperties::Binders::upload(gl::Context& context) {
+<% for (const property of paintProperties.filter(isDataDriven)) { -%>
+    <%- camelizeWithLeadingLowercase(property.name) %>->upload(context);
+<% } -%>
+}
+
+<%- camelize(type) %>PaintProperties::Binders::AttributeBindings <%- camelize(type) %>PaintProperties::Binders::attributeBindings(const PossiblyEvaluated& currentProperties) const {
+    return AttributeBindings {
+<% for (const property of paintProperties.filter(isDataDriven)) { -%>
+        <%- camelizeWithLeadingLowercase(property.name) %>->attributeBinding(currentProperties.<%- camelizeWithLeadingLowercase(property.name) %>),
+<% } -%>
+    };
+}
+
+<%- camelize(type) %>PaintProperties::Binders::UniformValues <%- camelize(type) %>PaintProperties::Binders::uniformValues(float currentZoom, const PossiblyEvaluated& currentProperties) const {
+    return UniformValues {
+<% for (const property of paintProperties.filter(isDataDriven)) { -%>
+        typename InterpolationUniform<<%- attributeType(property, type) %>>::Value {
+            <%- camelizeWithLeadingLowercase(property.name) %>->interpolationFactor(currentZoom)
+        },
+<% } -%>
+<% for (const property of paintProperties.filter(isDataDriven)) { -%>
+        typename <%- uniformType(property, type) %>::Value {
+            <%- camelizeWithLeadingLowercase(property.name) %>->uniformValue(currentProperties.<%- camelizeWithLeadingLowercase(property.name) %>)
+        },
+<% } -%>
+    };
+}
+<% } -%>
+
+<% if (type === "symbol") { -%>
+<% for (const subtype of ['icon', 'text']) {
+    const properties = paintProperties.filter(({name}) => name.startsWith(`${subtype}-`));
+%>
+
+<%- camelize(subtype) %>PaintProperties::Binders <%- camelize(subtype) %>PaintProperties::PossiblyEvaluated::createBinders(float z) const {
+    return Binders {
+<% for (const property of properties.filter(isDataDriven)) { -%>
+        PaintPropertyBinder<<%- evaluatedType(property) %>, typename <%- attributeType(property, type) %>::Type>::create(<%- camelizeWithLeadingLowercase(property.name) %>, z, <%- camelize(property.name) %>::defaultValue()),
+<% } -%>
+    };
+}
+
+std::bitset<8> <%- camelize(subtype) %>PaintProperties::PossiblyEvaluated::constants() const {
+    std::bitset<8> result;
+<% for (let i = 0; i < properties.filter(isDataDriven).length; i++) { -%>
+    result.set(<%- i %>, <%- camelizeWithLeadingLowercase(properties.filter(isDataDriven)[i].name) %>.isConstant());
+<% } -%>
+    return result;
+}
+
+std::vector<std::string> <%- camelize(subtype) %>PaintProperties::PossiblyEvaluated::defines() const {
+    std::vector<std::string> result;
+<% for (const property of properties.filter(isDataDriven)) { -%>
+    result.push_back(<%- camelizeWithLeadingLowercase(property.name) %>.isConstant()
+        ? std::string("#define HAS_UNIFORM_") + <%- camelize(property.name) %>::Uniform::name()
+        : std::string());
+<% } -%>
+    return result;
+}
+
+void <%- camelize(subtype) %>PaintProperties::Binders::populateVertexVectors(const GeometryTileFeature& feature, std::size_t length) {
+<% for (const property of properties.filter(isDataDriven)) { -%>
+    <%- camelizeWithLeadingLowercase(property.name) %>->populateVertexVector(feature, length);
+<% } -%>
+}
+
+void <%- camelize(subtype) %>PaintProperties::Binders::upload(gl::Context& context) {
+<% for (const property of properties.filter(isDataDriven)) { -%>
+    <%- camelizeWithLeadingLowercase(property.name) %>->upload(context);
+<% } -%>
+}
+
+<%- camelize(subtype) %>PaintProperties::Binders::AttributeBindings <%- camelize(subtype) %>PaintProperties::Binders::attributeBindings(const PossiblyEvaluated& currentProperties) const {
+    return AttributeBindings {
+<% for (const property of properties.filter(isDataDriven)) { -%>
+        <%- camelizeWithLeadingLowercase(property.name) %>->attributeBinding(currentProperties.<%- camelizeWithLeadingLowercase(property.name) %>),
+<% } -%>
+    };
+}
+
+<%- camelize(subtype) %>PaintProperties::Binders::UniformValues <%- camelize(subtype) %>PaintProperties::Binders::uniformValues(float currentZoom, const PossiblyEvaluated& currentProperties) const {
+    return UniformValues {
+<% for (const property of properties.filter(isDataDriven)) { -%>
+        typename InterpolationUniform<<%- attributeType(property, type) %>>::Value {
+            <%- camelizeWithLeadingLowercase(property.name) %>->interpolationFactor(currentZoom)
+        },
+<% } -%>
+<% for (const property of properties.filter(isDataDriven)) { -%>
+        typename <%- uniformType(property, type) %>::Value {
+            <%- camelizeWithLeadingLowercase(property.name) %>->uniformValue(currentProperties.<%- camelizeWithLeadingLowercase(property.name) %>)
+        },
+<% } -%>
+    };
+}
+
+<% } -%>
+<% } -%>
+
 } // namespace style
 } // namespace mbgl

@@ -27,7 +27,7 @@ TEST(StyleConversion, LayerTransition) {
     })JSON");
 
     ASSERT_EQ(400ms, *layer->as<BackgroundLayer>()->impl().paint
-        .get<BackgroundColor>().options.duration);
+        .backgroundColor.options.duration);
     ASSERT_EQ(500ms, *layer->as<BackgroundLayer>()->impl().paint
-        .get<BackgroundColor>().options.delay);
+        .backgroundColor.options.delay);
 }

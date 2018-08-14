@@ -55,13 +55,13 @@ void RenderSymbolLayer::transition(const TransitionParameters& parameters) {
 void RenderSymbolLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     evaluated = unevaluated.evaluate(parameters);
 
-    auto hasIconOpacity = evaluated.get<style::IconColor>().constantOr(Color::black()).a > 0 ||
-                          evaluated.get<style::IconHaloColor>().constantOr(Color::black()).a > 0;
-    auto hasTextOpacity = evaluated.get<style::TextColor>().constantOr(Color::black()).a > 0 ||
-                          evaluated.get<style::TextHaloColor>().constantOr(Color::black()).a > 0;
+    auto hasIconOpacity = evaluated.iconColor.constantOr(Color::black()).a > 0 ||
+                          evaluated.iconHaloColor.constantOr(Color::black()).a > 0;
+    auto hasTextOpacity = evaluated.textColor.constantOr(Color::black()).a > 0 ||
+                          evaluated.textHaloColor.constantOr(Color::black()).a > 0;
 
-    passes = ((evaluated.get<style::IconOpacity>().constantOr(1) > 0 && hasIconOpacity && iconSize > 0)
-              || (evaluated.get<style::TextOpacity>().constantOr(1) > 0 && hasTextOpacity && textSize > 0))
+    passes = ((evaluated.iconOpacity.constantOr(1) > 0 && hasIconOpacity && iconSize > 0)
+              || (evaluated.textOpacity.constantOr(1) > 0 && hasTextOpacity && textSize > 0))
              ? RenderPass::Translucent : RenderPass::None;
 }
 
@@ -133,8 +133,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             auto values = iconPropertyValues(layout);
             auto paintPropertyValues = iconPaintProperties();
 
-            const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
-                layout.get<IconRotationAlignment>() == AlignmentType::Map;
+            const bool alongLine = layout.symbolPlacement != SymbolPlacementType::Point &&
+                layout.iconRotationAlignment == AlignmentType::Map;
 
             if (alongLine) {
                 reprojectLineLabels(bucket.icon.dynamicVertices,
@@ -148,7 +148,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.context.updateVertexBuffer(*bucket.icon.dynamicVertexBuffer, std::move(bucket.icon.dynamicVertices));
             }
 
-            const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
+            const bool iconScaled = layout.iconSize.constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
             const bool iconTransformed = values.rotationAlignment == AlignmentType::Map || parameters.state.getPitch() != 0;
 
             parameters.context.bindTexture(*geometryTile.iconAtlasTexture, 0,
@@ -194,8 +194,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             auto values = textPropertyValues(layout);
             auto paintPropertyValues = textPaintProperties();
 
-            const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
-                layout.get<TextRotationAlignment>() == AlignmentType::Map;
+            const bool alongLine = layout.symbolPlacement != SymbolPlacementType::Point &&
+                layout.textRotationAlignment == AlignmentType::Map;
 
             if (alongLine) {
                 reprojectLineLabels(bucket.text.dynamicVertices,
@@ -233,9 +233,6 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         }
 
         if (bucket.hasCollisionBoxData()) {
-            static const style::Properties<>::PossiblyEvaluated properties {};
-            static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0);
-
             auto pixelRatio = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
             const float scale = std::pow(2, parameters.state.getZoom() - tile.tile.id.overscaledZ);
             std::array<float,2> extrudeScale =
@@ -259,16 +256,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 *bucket.collisionBox.dynamicVertexBuffer,
                 *bucket.collisionBox.indexBuffer,
                 bucket.collisionBox.segments,
-                paintAttributeData,
-                properties,
-                parameters.state.getZoom(),
                 getID()
             );
         }
         if (bucket.hasCollisionCircleData()) {
-            static const style::Properties<>::PossiblyEvaluated properties {};
-            static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0);
-
             auto pixelRatio = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
             const float scale = std::pow(2, parameters.state.getZoom() - tile.tile.id.overscaledZ);
             std::array<float,2> extrudeScale =
@@ -294,9 +285,6 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 *bucket.collisionCircle.dynamicVertexBuffer,
                 *bucket.collisionCircle.indexBuffer,
                 bucket.collisionCircle.segments,
-                paintAttributeData,
-                properties,
-                parameters.state.getZoom(),
                 getID()
             );
 
@@ -306,52 +294,52 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
 style::IconPaintProperties::PossiblyEvaluated RenderSymbolLayer::iconPaintProperties() const {
     return style::IconPaintProperties::PossiblyEvaluated {
-            evaluated.get<style::IconOpacity>(),
-            evaluated.get<style::IconColor>(),
-            evaluated.get<style::IconHaloColor>(),
-            evaluated.get<style::IconHaloWidth>(),
-            evaluated.get<style::IconHaloBlur>(),
-            evaluated.get<style::IconTranslate>(),
-            evaluated.get<style::IconTranslateAnchor>()
+        evaluated.iconOpacity,
+        evaluated.iconColor,
+        evaluated.iconHaloColor,
+        evaluated.iconHaloWidth,
+        evaluated.iconHaloBlur,
+        evaluated.iconTranslate,
+        evaluated.iconTranslateAnchor
     };
 }
 
 style::TextPaintProperties::PossiblyEvaluated RenderSymbolLayer::textPaintProperties() const {
     return style::TextPaintProperties::PossiblyEvaluated {
-            evaluated.get<style::TextOpacity>(),
-            evaluated.get<style::TextColor>(),
-            evaluated.get<style::TextHaloColor>(),
-            evaluated.get<style::TextHaloWidth>(),
-            evaluated.get<style::TextHaloBlur>(),
-            evaluated.get<style::TextTranslate>(),
-            evaluated.get<style::TextTranslateAnchor>()
+        evaluated.textOpacity,
+        evaluated.textColor,
+        evaluated.textHaloColor,
+        evaluated.textHaloWidth,
+        evaluated.textHaloBlur,
+        evaluated.textTranslate,
+        evaluated.textTranslateAnchor
     };
 }
 
 
 style::SymbolPropertyValues RenderSymbolLayer::iconPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated& layout_) const {
     return style::SymbolPropertyValues {
-            layout_.get<style::IconPitchAlignment>(),
-            layout_.get<style::IconRotationAlignment>(),
-            layout_.get<style::IconKeepUpright>(),
-            evaluated.get<style::IconTranslate>(),
-            evaluated.get<style::IconTranslateAnchor>(),
-            evaluated.get<style::IconHaloColor>().constantOr(Color::black()).a > 0 &&
-            evaluated.get<style::IconHaloWidth>().constantOr(1),
-            evaluated.get<style::IconColor>().constantOr(Color::black()).a > 0
+        layout_.iconPitchAlignment,
+        layout_.iconRotationAlignment,
+        layout_.iconKeepUpright,
+        evaluated.iconTranslate,
+        evaluated.iconTranslateAnchor,
+        evaluated.iconHaloColor.constantOr(Color::black()).a > 0 &&
+        evaluated.iconHaloWidth.constantOr(1),
+        evaluated.iconColor.constantOr(Color::black()).a > 0
     };
 }
 
 style::SymbolPropertyValues RenderSymbolLayer::textPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated& layout_) const {
     return style::SymbolPropertyValues {
-            layout_.get<style::TextPitchAlignment>(),
-            layout_.get<style::TextRotationAlignment>(),
-            layout_.get<style::TextKeepUpright>(),
-            evaluated.get<style::TextTranslate>(),
-            evaluated.get<style::TextTranslateAnchor>(),
-            evaluated.get<style::TextHaloColor>().constantOr(Color::black()).a > 0 &&
-            evaluated.get<style::TextHaloWidth>().constantOr(1),
-            evaluated.get<style::TextColor>().constantOr(Color::black()).a > 0
+        layout_.textPitchAlignment,
+        layout_.textRotationAlignment,
+        layout_.textKeepUpright,
+        evaluated.textTranslate,
+        evaluated.textTranslateAnchor,
+        evaluated.textHaloColor.constantOr(Color::black()).a > 0 &&
+        evaluated.textHaloWidth.constantOr(1),
+        evaluated.textColor.constantOr(Color::black()).a > 0
     };
 }
 

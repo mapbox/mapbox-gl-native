@@ -108,26 +108,26 @@ PropertyValue<float> CircleLayer::getDefaultCircleRadius() {
 }
 
 PropertyValue<float> CircleLayer::getCircleRadius() const {
-    return impl().paint.template get<CircleRadius>().value;
+    return impl().paint.circleRadius.value;
 }
 
 void CircleLayer::setCircleRadius(PropertyValue<float> value) {
     if (value == getCircleRadius())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleRadius>().value = value;
+    impl_->paint.circleRadius.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void CircleLayer::setCircleRadiusTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleRadius>().options = options;
+    impl_->paint.circleRadius.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions CircleLayer::getCircleRadiusTransition() const {
-    return impl().paint.template get<CircleRadius>().options;
+    return impl().paint.circleRadius.options;
 }
 
 PropertyValue<Color> CircleLayer::getDefaultCircleColor() {
@@ -135,26 +135,26 @@ PropertyValue<Color> CircleLayer::getDefaultCircleColor() {
 }
 
 PropertyValue<Color> CircleLayer::getCircleColor() const {
-    return impl().paint.template get<CircleColor>().value;
+    return impl().paint.circleColor.value;
 }
 
 void CircleLayer::setCircleColor(PropertyValue<Color> value) {
     if (value == getCircleColor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleColor>().value = value;
+    impl_->paint.circleColor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void CircleLayer::setCircleColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleColor>().options = options;
+    impl_->paint.circleColor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions CircleLayer::getCircleColorTransition() const {
-    return impl().paint.template get<CircleColor>().options;
+    return impl().paint.circleColor.options;
 }
 
 PropertyValue<float> CircleLayer::getDefaultCircleBlur() {
@@ -162,26 +162,26 @@ PropertyValue<float> CircleLayer::getDefaultCircleBlur() {
 }
 
 PropertyValue<float> CircleLayer::getCircleBlur() const {
-    return impl().paint.template get<CircleBlur>().value;
+    return impl().paint.circleBlur.value;
 }
 
 void CircleLayer::setCircleBlur(PropertyValue<float> value) {
     if (value == getCircleBlur())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleBlur>().value = value;
+    impl_->paint.circleBlur.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void CircleLayer::setCircleBlurTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleBlur>().options = options;
+    impl_->paint.circleBlur.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions CircleLayer::getCircleBlurTransition() const {
-    return impl().paint.template get<CircleBlur>().options;
+    return impl().paint.circleBlur.options;
 }
 
 PropertyValue<float> CircleLayer::getDefaultCircleOpacity() {
@@ -189,26 +189,26 @@ PropertyValue<float> CircleLayer::getDefaultCircleOpacity() {
 }
 
 PropertyValue<float> CircleLayer::getCircleOpacity() const {
-    return impl().paint.template get<CircleOpacity>().value;
+    return impl().paint.circleOpacity.value;
 }
 
 void CircleLayer::setCircleOpacity(PropertyValue<float> value) {
     if (value == getCircleOpacity())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleOpacity>().value = value;
+    impl_->paint.circleOpacity.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void CircleLayer::setCircleOpacityTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleOpacity>().options = options;
+    impl_->paint.circleOpacity.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions CircleLayer::getCircleOpacityTransition() const {
-    return impl().paint.template get<CircleOpacity>().options;
+    return impl().paint.circleOpacity.options;
 }
 
 PropertyValue<std::array<float, 2>> CircleLayer::getDefaultCircleTranslate() {
@@ -216,26 +216,26 @@ PropertyValue<std::array<float, 2>> CircleLayer::getDefaultCircleTranslate() {
 }
 
 PropertyValue<std::array<float, 2>> CircleLayer::getCircleTranslate() const {
-    return impl().paint.template get<CircleTranslate>().value;
+    return impl().paint.circleTranslate.value;
 }
 
 void CircleLayer::setCircleTranslate(PropertyValue<std::array<float, 2>> value) {
     if (value == getCircleTranslate())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleTranslate>().value = value;
+    impl_->paint.circleTranslate.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void CircleLayer::setCircleTranslateTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleTranslate>().options = options;
+    impl_->paint.circleTranslate.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions CircleLayer::getCircleTranslateTransition() const {
-    return impl().paint.template get<CircleTranslate>().options;
+    return impl().paint.circleTranslate.options;
 }
 
 PropertyValue<TranslateAnchorType> CircleLayer::getDefaultCircleTranslateAnchor() {
@@ -243,26 +243,26 @@ PropertyValue<TranslateAnchorType> CircleLayer::getDefaultCircleTranslateAnchor(
 }
 
 PropertyValue<TranslateAnchorType> CircleLayer::getCircleTranslateAnchor() const {
-    return impl().paint.template get<CircleTranslateAnchor>().value;
+    return impl().paint.circleTranslateAnchor.value;
 }
 
 void CircleLayer::setCircleTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
     if (value == getCircleTranslateAnchor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleTranslateAnchor>().value = value;
+    impl_->paint.circleTranslateAnchor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void CircleLayer::setCircleTranslateAnchorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleTranslateAnchor>().options = options;
+    impl_->paint.circleTranslateAnchor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions CircleLayer::getCircleTranslateAnchorTransition() const {
-    return impl().paint.template get<CircleTranslateAnchor>().options;
+    return impl().paint.circleTranslateAnchor.options;
 }
 
 PropertyValue<CirclePitchScaleType> CircleLayer::getDefaultCirclePitchScale() {
@@ -270,26 +270,26 @@ PropertyValue<CirclePitchScaleType> CircleLayer::getDefaultCirclePitchScale() {
 }
 
 PropertyValue<CirclePitchScaleType> CircleLayer::getCirclePitchScale() const {
-    return impl().paint.template get<CirclePitchScale>().value;
+    return impl().paint.circlePitchScale.value;
 }
 
 void CircleLayer::setCirclePitchScale(PropertyValue<CirclePitchScaleType> value) {
     if (value == getCirclePitchScale())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CirclePitchScale>().value = value;
+    impl_->paint.circlePitchScale.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void CircleLayer::setCirclePitchScaleTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CirclePitchScale>().options = options;
+    impl_->paint.circlePitchScale.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions CircleLayer::getCirclePitchScaleTransition() const {
-    return impl().paint.template get<CirclePitchScale>().options;
+    return impl().paint.circlePitchScale.options;
 }
 
 PropertyValue<AlignmentType> CircleLayer::getDefaultCirclePitchAlignment() {
@@ -297,26 +297,26 @@ PropertyValue<AlignmentType> CircleLayer::getDefaultCirclePitchAlignment() {
 }
 
 PropertyValue<AlignmentType> CircleLayer::getCirclePitchAlignment() const {
-    return impl().paint.template get<CirclePitchAlignment>().value;
+    return impl().paint.circlePitchAlignment.value;
 }
 
 void CircleLayer::setCirclePitchAlignment(PropertyValue<AlignmentType> value) {
     if (value == getCirclePitchAlignment())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CirclePitchAlignment>().value = value;
+    impl_->paint.circlePitchAlignment.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void CircleLayer::setCirclePitchAlignmentTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CirclePitchAlignment>().options = options;
+    impl_->paint.circlePitchAlignment.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions CircleLayer::getCirclePitchAlignmentTransition() const {
-    return impl().paint.template get<CirclePitchAlignment>().options;
+    return impl().paint.circlePitchAlignment.options;
 }
 
 PropertyValue<float> CircleLayer::getDefaultCircleStrokeWidth() {
@@ -324,26 +324,26 @@ PropertyValue<float> CircleLayer::getDefaultCircleStrokeWidth() {
 }
 
 PropertyValue<float> CircleLayer::getCircleStrokeWidth() const {
-    return impl().paint.template get<CircleStrokeWidth>().value;
+    return impl().paint.circleStrokeWidth.value;
 }
 
 void CircleLayer::setCircleStrokeWidth(PropertyValue<float> value) {
     if (value == getCircleStrokeWidth())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleStrokeWidth>().value = value;
+    impl_->paint.circleStrokeWidth.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void CircleLayer::setCircleStrokeWidthTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleStrokeWidth>().options = options;
+    impl_->paint.circleStrokeWidth.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions CircleLayer::getCircleStrokeWidthTransition() const {
-    return impl().paint.template get<CircleStrokeWidth>().options;
+    return impl().paint.circleStrokeWidth.options;
 }
 
 PropertyValue<Color> CircleLayer::getDefaultCircleStrokeColor() {
@@ -351,26 +351,26 @@ PropertyValue<Color> CircleLayer::getDefaultCircleStrokeColor() {
 }
 
 PropertyValue<Color> CircleLayer::getCircleStrokeColor() const {
-    return impl().paint.template get<CircleStrokeColor>().value;
+    return impl().paint.circleStrokeColor.value;
 }
 
 void CircleLayer::setCircleStrokeColor(PropertyValue<Color> value) {
     if (value == getCircleStrokeColor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleStrokeColor>().value = value;
+    impl_->paint.circleStrokeColor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void CircleLayer::setCircleStrokeColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleStrokeColor>().options = options;
+    impl_->paint.circleStrokeColor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions CircleLayer::getCircleStrokeColorTransition() const {
-    return impl().paint.template get<CircleStrokeColor>().options;
+    return impl().paint.circleStrokeColor.options;
 }
 
 PropertyValue<float> CircleLayer::getDefaultCircleStrokeOpacity() {
@@ -378,26 +378,26 @@ PropertyValue<float> CircleLayer::getDefaultCircleStrokeOpacity() {
 }
 
 PropertyValue<float> CircleLayer::getCircleStrokeOpacity() const {
-    return impl().paint.template get<CircleStrokeOpacity>().value;
+    return impl().paint.circleStrokeOpacity.value;
 }
 
 void CircleLayer::setCircleStrokeOpacity(PropertyValue<float> value) {
     if (value == getCircleStrokeOpacity())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleStrokeOpacity>().value = value;
+    impl_->paint.circleStrokeOpacity.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void CircleLayer::setCircleStrokeOpacityTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<CircleStrokeOpacity>().options = options;
+    impl_->paint.circleStrokeOpacity.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions CircleLayer::getCircleStrokeOpacityTransition() const {
-    return impl().paint.template get<CircleStrokeOpacity>().options;
+    return impl().paint.circleStrokeOpacity.options;
 }
 
 using namespace conversion;

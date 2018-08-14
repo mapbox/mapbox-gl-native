@@ -12,15 +12,15 @@ using namespace style;
 static_assert(sizeof(FillExtrusionLayoutVertex) == 12, "expected FillExtrusionLayoutVertex size");
 
 std::array<float, 3> lightColor(const EvaluatedLight& light) {
-    const auto color = light.get<LightColor>();
+    const auto color = light.color;
     return {{ color.r, color.g, color.b }};
 }
 
 std::array<float, 3> lightPosition(const EvaluatedLight& light, const TransformState& state) {
-    auto lightPos = light.get<LightPosition>().getCartesian();
+    auto lightPos = light.position.getCartesian();
     mat3 lightMat;
     matrix::identity(lightMat);
-    if (light.get<LightAnchor>() == LightAnchorType::Viewport) {
+    if (light.anchor == LightAnchorType::Viewport) {
         matrix::rotate(lightMat, lightMat, -state.getAngle());
     }
     matrix::transformMat3f(lightPos, lightPos, lightMat);
@@ -28,7 +28,7 @@ std::array<float, 3> lightPosition(const EvaluatedLight& light, const TransformS
 }
 
 float lightIntensity(const EvaluatedLight& light) {
-    return light.get<LightIntensity>();
+    return light.intensity;
 }
 
 FillExtrusionUniforms::Values

@@ -36,9 +36,9 @@ const std::array<float, 2> RenderHillshadeLayer::getLatRange(const UnwrappedTile
 }
 
 const std::array<float, 2> RenderHillshadeLayer::getLight(const PaintParameters& parameters){
-    float azimuthal = evaluated.get<HillshadeIlluminationDirection>() * util::DEG2RAD;
-    if (evaluated.get<HillshadeIlluminationAnchor>() == HillshadeIlluminationAnchorType::Viewport) azimuthal = azimuthal - parameters.state.getAngle();
-    return {{evaluated.get<HillshadeExaggeration>(), azimuthal}};
+    float azimuthal = evaluated.hillshadeIlluminationDirection * util::DEG2RAD;
+    if (evaluated.hillshadeIlluminationAnchor == HillshadeIlluminationAnchorType::Viewport) azimuthal = azimuthal - parameters.state.getAngle();
+    return {{evaluated.hillshadeExaggeration, azimuthal}};
 }
 
 void RenderHillshadeLayer::transition(const TransitionParameters& parameters) {
@@ -47,7 +47,7 @@ void RenderHillshadeLayer::transition(const TransitionParameters& parameters) {
 
 void RenderHillshadeLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     evaluated = unevaluated.evaluate(parameters);
-    passes = (evaluated.get<style::HillshadeExaggeration >() > 0)
+    passes = (evaluated.hillshadeExaggeration > 0)
                  ? (RenderPass::Translucent | RenderPass::Pass3D)
                  : RenderPass::None;
 }
@@ -71,25 +71,25 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                      const UnwrappedTileID& id) {
         auto& programInstance = parameters.programs.hillshade;
 
-        const HillshadeProgram::PaintPropertyBinders paintAttributeData{ evaluated, 0 };
+        static const NoProperties::Binders binders;
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
             HillshadeProgram::UniformValues {
                 uniforms::u_matrix::Value{ matrix },
                 uniforms::u_image::Value{ 0 },
-                uniforms::u_highlight::Value{ evaluated.get<HillshadeHighlightColor>() },
-                uniforms::u_shadow::Value{ evaluated.get<HillshadeShadowColor>() },
-                uniforms::u_accent::Value{ evaluated.get<HillshadeAccentColor>() },
+                uniforms::u_highlight::Value{ evaluated.hillshadeHighlightColor },
+                uniforms::u_shadow::Value{ evaluated.hillshadeShadowColor },
+                uniforms::u_accent::Value{ evaluated.hillshadeAccentColor },
                 uniforms::u_light::Value{ getLight(parameters) },
                 uniforms::u_latrange::Value{ getLatRange(id) },
             },
-            paintAttributeData,
+            binders,
             evaluated,
             parameters.state.getZoom()
         );
         const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
             vertexBuffer,
-            paintAttributeData,
+            binders,
             evaluated
         );
 
@@ -130,9 +130,10 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
             view.bind();
             
             parameters.context.bindTexture(*bucket.dem, 0, gl::TextureFilter::Nearest, gl::TextureMipMap::No, gl::TextureWrap::Clamp, gl::TextureWrap::Clamp);
-            const Properties<>::PossiblyEvaluated properties;
-            const HillshadePrepareProgram::PaintPropertyBinders paintAttributeData{ properties, 0 };
-            
+
+            static const NoProperties::PossiblyEvaluated properties;
+            static const NoProperties::Binders binders;
+
             auto& programInstance = parameters.programs.hillshadePrepare;
 
             const auto allUniformValues = programInstance.computeAllUniformValues(
@@ -143,13 +144,13 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                     uniforms::u_maxzoom::Value{ float(maxzoom) },
                     uniforms::u_image::Value{ 0 }
                 },
-                paintAttributeData,
+                binders,
                 properties,
                 parameters.state.getZoom()
             );
             const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
                 parameters.staticData.rasterVertexBuffer,
-                paintAttributeData,
+                binders,
                 properties
             );
 
@@ -189,8 +190,6 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                      tile.id);
             }
         }
-        
-
     }
 }
 

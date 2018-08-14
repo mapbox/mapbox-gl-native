@@ -96,149 +96,31 @@ public:
     }
 };
 
-template <class P>
-struct IsDataDriven : std::integral_constant<bool, P::IsDataDriven> {};
-
-template <class... Ps>
-class Properties {
+class NoProperties {
 public:
-    /*
-        For style properties we implement a two step evaluation process: if you have a zoom level,
-        you can evaluate a set of unevaluated property values, producing a set of possibly evaluated
-        values, where undefined, constant, or camera function values have been fully evaluated, and
-        source or composite function values have not.
+    class PossiblyEvaluated {};
 
-        Once you also have a particular feature, you can evaluate that set of possibly evaluated values
-        fully, producing a set of fully evaluated values.
-
-        This is in theory maximally efficient in terms of avoiding repeated evaluation of camera
-        functions, though it's more of a historical accident than a purposeful optimization.
-    */
-
-    using          PropertyTypes = TypeList<Ps...>;
-    using    TransitionableTypes = TypeList<typename Ps::TransitionableType...>;
-    using       UnevaluatedTypes = TypeList<typename Ps::UnevaluatedType...>;
-    using PossiblyEvaluatedTypes = TypeList<typename Ps::PossiblyEvaluatedType...>;
-    using         EvaluatedTypes = TypeList<typename Ps::Type...>;
-
-    using DataDrivenProperties = FilteredTypeList<PropertyTypes, IsDataDriven>;
-    using Binders = PaintPropertyBinders<DataDrivenProperties>;
-
-    template <class TypeList>
-    using Tuple = IndexedTuple<PropertyTypes, TypeList>;
-
-    class Evaluated : public Tuple<EvaluatedTypes> {
+    class Binders {
     public:
-        template <class... Us>
-        Evaluated(Us&&... us)
-            : Tuple<EvaluatedTypes>(std::forward<Us>(us)...) {
+        void populateVertexVectors(const GeometryTileFeature&, std::size_t length);
+        void upload(gl::Context&);
+
+        using Attributes = gl::Attributes<>;
+        using Uniforms = gl::Uniforms<>;
+
+        using AttributeBindings = typename Attributes::Bindings;
+        using UniformValues = typename Uniforms::Values;
+
+        template <class PossiblyEvaluated>
+        AttributeBindings attributeBindings(const PossiblyEvaluated&) const {
+            return {};
+        }
+
+        template <class PossiblyEvaluated>
+        UniformValues uniformValues(float, const PossiblyEvaluated&) const {
+            return {};
         }
     };
-
-    class PossiblyEvaluated : public Tuple<PossiblyEvaluatedTypes> {
-    public:
-        template <class... Us>
-        PossiblyEvaluated(Us&&... us)
-            : Tuple<PossiblyEvaluatedTypes>(std::forward<Us>(us)...) {
-        }
-
-        template <class T>
-        static T evaluate(float, const GeometryTileFeature&, const T& t, const T&) {
-            return t;
-        }
-
-        template <class T>
-        static T evaluate(float z, const GeometryTileFeature& feature,
-                          const PossiblyEvaluatedPropertyValue<T>& v, const T& defaultValue) {
-            return v.match(
-                [&] (const T& t) {
-                    return t;
-                },
-                [&] (const PropertyExpression<T>& t) {
-                    return t.evaluate(z, feature, defaultValue);
-                });
-        }
-
-        template <class P>
-        auto evaluate(float z, const GeometryTileFeature& feature) const {
-            return evaluate(z, feature, this->template get<P>(), P::defaultValue());
-        }
-
-        Evaluated evaluate(float z, const GeometryTileFeature& feature) const {
-            return Evaluated {
-                evaluate<Ps>(z, feature)...
-            };
-        }
-    };
-
-    class Unevaluated : public Tuple<UnevaluatedTypes> {
-    public:
-        template <class... Us>
-        Unevaluated(Us&&... us)
-            : Tuple<UnevaluatedTypes>(std::forward<Us>(us)...) {
-        }
-
-        bool hasTransition() const {
-            bool result = false;
-            util::ignore({ result |= this->template get<Ps>().hasTransition()... });
-            return result;
-        }
-
-        template <class P>
-        auto evaluate(const PropertyEvaluationParameters& parameters) const {
-            using Evaluator = typename P::EvaluatorType;
-            return this->template get<P>()
-                .evaluate(Evaluator(parameters, P::defaultValue()), parameters.now);
-        }
-
-        PossiblyEvaluated evaluate(const PropertyEvaluationParameters& parameters) const {
-            return PossiblyEvaluated {
-                evaluate<Ps>(parameters)...
-            };
-        }
-
-        template <class Writer>
-        void stringify(Writer& writer) const {
-            writer.StartObject();
-            util::ignore({ (conversion::stringify<Ps>(writer, this->template get<Ps>()), 0)... });
-            writer.EndObject();
-        }
-    };
-
-    class Transitionable : public Tuple<TransitionableTypes> {
-    public:
-        template <class... Us>
-        Transitionable(Us&&... us)
-            : Tuple<TransitionableTypes>(std::forward<Us>(us)...) {
-        }
-
-        Unevaluated transitioned(const TransitionParameters& parameters, Unevaluated&& prior) const {
-            return Unevaluated {
-                this->template get<Ps>()
-                    .transition(parameters, std::move(prior.template get<Ps>()))...
-            };
-        }
-
-        Unevaluated untransitioned() const {
-            return Unevaluated {
-                typename Ps::UnevaluatedType(this->template get<Ps>().value)...
-            };
-        }
-
-        bool hasDataDrivenPropertyDifference(const Transitionable& other) const {
-            bool result = false;
-            util::ignore({ (result |= this->template get<Ps>().value.hasDataDrivenPropertyDifference(other.template get<Ps>().value))... });
-            return result;
-        }
-    };
-};
-
-template <class...>
-struct ConcatenateProperties;
-
-template <class... As, class... Bs>
-struct ConcatenateProperties<TypeList<As...>, TypeList<Bs...>> {
-    using Type = Properties<As..., Bs...>;
 };
 
 } // namespace style

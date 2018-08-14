@@ -71,8 +71,8 @@ void RenderTile::finishRender(PaintParameters& parameters) {
     if (!used || parameters.debugOptions == MapDebugOptions::NoDebug)
         return;
 
-    static const style::Properties<>::PossiblyEvaluated properties {};
-    static const DebugProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+    static const NoProperties::PossiblyEvaluated properties;
+    static const NoProperties::Binders paintAttributeData;
 
     auto& program = parameters.programs.debug;
 

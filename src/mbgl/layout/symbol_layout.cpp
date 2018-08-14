@@ -27,10 +27,10 @@ namespace mbgl {
 
 using namespace style;
 
-template <class Property>
-static bool has(const style::SymbolLayoutProperties::PossiblyEvaluated& layout) {
-    return layout.get<Property>().match(
-        [&] (const typename Property::Type& t) { return !t.empty(); },
+template <class T>
+static bool has(const PossiblyEvaluatedPropertyValue<T>& value) {
+    return value.match(
+        [&] (const T& t) { return !t.empty(); },
         [&] (const auto&) { return true; }
     );
 }
@@ -48,40 +48,40 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
       pixelRatio(parameters.pixelRatio),
       tileSize(util::tileSize * overscaling),
       tilePixelRatio(float(util::EXTENT) / tileSize),
-      textSize(layers.at(0)->as<RenderSymbolLayer>()->impl().layout.get<TextSize>()),
-      iconSize(layers.at(0)->as<RenderSymbolLayer>()->impl().layout.get<IconSize>())
+      textSize(layers.at(0)->as<RenderSymbolLayer>()->impl().layout.textSize),
+      iconSize(layers.at(0)->as<RenderSymbolLayer>()->impl().layout.iconSize)
     {
 
     const SymbolLayer::Impl& leader = layers.at(0)->as<RenderSymbolLayer>()->impl();
 
     layout = leader.layout.evaluate(PropertyEvaluationParameters(zoom));
 
-    if (layout.get<IconRotationAlignment>() == AlignmentType::Auto) {
-        if (layout.get<SymbolPlacement>() != SymbolPlacementType::Point) {
-            layout.get<IconRotationAlignment>() = AlignmentType::Map;
+    if (layout.iconRotationAlignment == AlignmentType::Auto) {
+        if (layout.symbolPlacement != SymbolPlacementType::Point) {
+            layout.iconRotationAlignment = AlignmentType::Map;
         } else {
-            layout.get<IconRotationAlignment>() = AlignmentType::Viewport;
+            layout.iconRotationAlignment = AlignmentType::Viewport;
         }
     }
 
-    if (layout.get<TextRotationAlignment>() == AlignmentType::Auto) {
-        if (layout.get<SymbolPlacement>() != SymbolPlacementType::Point) {
-            layout.get<TextRotationAlignment>() = AlignmentType::Map;
+    if (layout.textRotationAlignment == AlignmentType::Auto) {
+        if (layout.symbolPlacement != SymbolPlacementType::Point) {
+            layout.textRotationAlignment = AlignmentType::Map;
         } else {
-            layout.get<TextRotationAlignment>() = AlignmentType::Viewport;
+            layout.textRotationAlignment = AlignmentType::Viewport;
         }
     }
 
     // If unspecified `*-pitch-alignment` inherits `*-rotation-alignment`
-    if (layout.get<TextPitchAlignment>() == AlignmentType::Auto) {
-        layout.get<TextPitchAlignment>() = layout.get<TextRotationAlignment>();
+    if (layout.textPitchAlignment == AlignmentType::Auto) {
+        layout.textPitchAlignment = layout.textRotationAlignment;
     }
-    if (layout.get<IconPitchAlignment>() == AlignmentType::Auto) {
-        layout.get<IconPitchAlignment>() = layout.get<IconRotationAlignment>();
+    if (layout.iconPitchAlignment == AlignmentType::Auto) {
+        layout.iconPitchAlignment = layout.iconRotationAlignment;
     }
 
-    const bool hasText = has<TextField>(layout) && has<TextFont>(layout);
-    const bool hasIcon = has<IconImage>(layout);
+    const bool hasText = has(layout.textField) && has(layout.textFont);
+    const bool hasIcon = has(layout.iconImage);
 
     if (!hasText && !hasIcon) {
         return;
@@ -106,9 +106,9 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         ft.index = i;
 
         if (hasText) {
-            std::string u8string = layout.evaluate<TextField>(zoom, ft);
+            std::string u8string = layout.textField.evaluate(ft, zoom, TextField::defaultValue());
 
-            auto textTransform = layout.evaluate<TextTransform>(zoom, ft);
+            auto textTransform = layout.textTransform.evaluate(ft, zoom, TextTransform::defaultValue());
             if (textTransform == TextTransformType::Uppercase) {
                 u8string = platform::uppercase(u8string);
             } else if (textTransform == TextTransformType::Lowercase) {
@@ -116,11 +116,11 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
             }
 
             ft.text = applyArabicShaping(util::utf8_to_utf16::convert(u8string));
-            const bool canVerticalizeText = layout.get<TextRotationAlignment>() == AlignmentType::Map
-                                         && layout.get<SymbolPlacement>() != SymbolPlacementType::Point
+            const bool canVerticalizeText = layout.textRotationAlignment == AlignmentType::Map
+                                         && layout.symbolPlacement != SymbolPlacementType::Point
                                          && util::i18n::allowsVerticalWritingMode(*ft.text);
 
-            FontStack fontStack = layout.evaluate<TextFont>(zoom, ft);
+            FontStack fontStack = layout.textFont.evaluate(ft, zoom, TextFont::defaultValue());
             GlyphIDs& dependencies = glyphDependencies[fontStack];
 
             // Loop through all characters of this text and collect unique codepoints.
@@ -135,7 +135,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         }
 
         if (hasIcon) {
-            ft.icon = layout.evaluate<IconImage>(zoom, ft);
+            ft.icon = layout.iconImage.evaluate(ft, zoom, IconImage::defaultValue());
             imageDependencies.insert(*ft.icon);
         }
 
@@ -144,7 +144,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         }
     }
 
-    if (layout.get<SymbolPlacement>() == SymbolPlacementType::Line) {
+    if (layout.symbolPlacement == SymbolPlacementType::Line) {
         util::mergeLines(features);
     }
 }
@@ -155,14 +155,14 @@ bool SymbolLayout::hasSymbolInstances() const {
 
 void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyphPositions,
                            const ImageMap& imageMap, const ImagePositions& imagePositions) {
-    const bool textAlongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map &&
-        layout.get<SymbolPlacement>() != SymbolPlacementType::Point;
+    const bool textAlongLine = layout.textRotationAlignment == AlignmentType::Map &&
+        layout.symbolPlacement != SymbolPlacementType::Point;
 
     for (auto it = features.begin(); it != features.end(); ++it) {
         auto& feature = *it;
         if (feature.geometry.empty()) continue;
 
-        FontStack fontStack = layout.evaluate<TextFont>(zoom, feature);
+        FontStack fontStack = layout.textFont.evaluate(feature, zoom, TextFont::defaultValue());
 
         auto glyphMapIt = glyphMap.find(fontStack);
         const Glyphs& glyphs = glyphMapIt != glyphMap.end()
@@ -179,15 +179,16 @@ void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyph
         if (feature.text) {
             auto applyShaping = [&] (const std::u16string& text, WritingModeType writingMode) {
                 const float oneEm = 24.0f;
+                const auto offset = layout.textOffset.evaluate(feature, zoom, TextOffset::defaultValue());
                 const Shaping result = getShaping(
                     /* string */ text,
-                    /* maxWidth: ems */ layout.get<SymbolPlacement>() == SymbolPlacementType::Point ?
-                        layout.evaluate<TextMaxWidth>(zoom, feature) * oneEm : 0,
-                    /* lineHeight: ems */ layout.get<TextLineHeight>() * oneEm,
-                    /* anchor */ layout.evaluate<TextAnchor>(zoom, feature),
-                    /* justify */ layout.evaluate<TextJustify>(zoom, feature),
-                    /* spacing: ems */ util::i18n::allowsLetterSpacing(*feature.text) ? layout.evaluate<TextLetterSpacing>(zoom, feature) * oneEm : 0.0f,
-                    /* translate */ Point<float>(layout.evaluate<TextOffset>(zoom, feature)[0] * oneEm, layout.evaluate<TextOffset>(zoom, feature)[1] * oneEm),
+                    /* maxWidth: ems */ layout.symbolPlacement == SymbolPlacementType::Point ?
+                        layout.textMaxWidth.evaluate(feature, zoom, TextMaxWidth::defaultValue()) * oneEm : 0,
+                    /* lineHeight: ems */ layout.textLineHeight * oneEm,
+                    /* anchor */ layout.textAnchor.evaluate(feature, zoom, TextAnchor::defaultValue()),
+                    /* justify */ layout.textJustify.evaluate(feature, zoom, TextJustify::defaultValue()),
+                    /* spacing: ems */ util::i18n::allowsLetterSpacing(*feature.text) ? layout.textLetterSpacing.evaluate(feature, zoom, TextLetterSpacing::defaultValue()) * oneEm : 0.0f,
+                    /* translate */ Point<float>(offset[0] * oneEm, offset[1] * oneEm),
                     /* verticalHeight */ oneEm,
                     /* writingMode */ writingMode,
                     /* bidirectional algorithm object */ bidi,
@@ -209,15 +210,15 @@ void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyph
             if (image != imageMap.end()) {
                 shapedIcon = PositionedIcon::shapeIcon(
                     imagePositions.at(*feature.icon),
-                    layout.evaluate<IconOffset>(zoom, feature),
-                    layout.evaluate<IconAnchor>(zoom, feature),
-                    layout.evaluate<IconRotate>(zoom, feature) * util::DEG2RAD);
+                    layout.iconOffset.evaluate(feature, zoom, IconOffset::defaultValue()),
+                    layout.iconAnchor.evaluate(feature, zoom, IconAnchor::defaultValue()),
+                    layout.iconRotate.evaluate(feature, zoom, IconRotate::defaultValue()) * util::DEG2RAD);
                 if (image->second->sdf) {
                     sdfIcons = true;
                 }
                 if (image->second->pixelRatio != pixelRatio) {
                     iconsNeedLinear = true;
-                } else if (layout.get<IconRotate>().constantOr(1) != 0) {
+                } else if (layout.iconRotate.constantOr(1) != 0) {
                     iconsNeedLinear = true;
                 }
             }
@@ -242,33 +243,33 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
     
-    const float layoutTextSize = layout.evaluate<TextSize>(zoom + 1, feature);
-    const float layoutIconSize = layout.evaluate<IconSize>(zoom + 1, feature);
-    const std::array<float, 2> textOffset = layout.evaluate<TextOffset>(zoom, feature);
-    const std::array<float, 2> iconOffset = layout.evaluate<IconOffset>(zoom, feature);
+    const float layoutTextSize = layout.textSize.evaluate(feature, zoom + 1, TextSize::defaultValue());
+    const float layoutIconSize = layout.iconSize.evaluate(feature, zoom + 1, IconSize::defaultValue());
+    const std::array<float, 2> textOffset = layout.textOffset.evaluate(feature, zoom, TextOffset::defaultValue());
+    const std::array<float, 2> iconOffset = layout.iconOffset.evaluate(feature, zoom, IconOffset::defaultValue());
     
     // To reduce the number of labels that jump around when zooming we need
     // to use a text-size value that is the same for all zoom levels.
     // This calculates text-size at a high zoom level so that all tiles can
     // use the same value when calculating anchor positions.
-    const float textMaxSize = layout.evaluate<TextSize>(18, feature);
+    const float textMaxSize = layout.textSize.evaluate(feature, 18, TextSize::defaultValue());
     
     const float fontScale = layoutTextSize / glyphSize;
     const float textBoxScale = tilePixelRatio * fontScale;
     const float textMaxBoxScale = tilePixelRatio * textMaxSize / glyphSize;
     const float iconBoxScale = tilePixelRatio * layoutIconSize;
-    const float symbolSpacing = tilePixelRatio * layout.get<SymbolSpacing>();
+    const float symbolSpacing = tilePixelRatio * layout.symbolSpacing;
     // CJL: I'm not sure why SymbolPlacementType::Line -> avoidEdges = false. It seems redundant since
     // getAnchors will already avoid generating anchors outside the tile bounds.
     // However, SymbolPlacementType::LineCenter allows anchors outside tile boundaries, so its behavior
     // here should match SymbolPlacement::Point
-    const bool avoidEdges = layout.get<SymbolAvoidEdges>() && layout.get<SymbolPlacement>() != SymbolPlacementType::Line;
-    const float textPadding = layout.get<TextPadding>() * tilePixelRatio;
-    const float iconPadding = layout.get<IconPadding>() * tilePixelRatio;
-    const float textMaxAngle = layout.get<TextMaxAngle>() * util::DEG2RAD;
-    const SymbolPlacementType textPlacement = layout.get<TextRotationAlignment>() != AlignmentType::Map
+    const bool avoidEdges = layout.symbolAvoidEdges && layout.symbolPlacement != SymbolPlacementType::Line;
+    const float textPadding = layout.textPadding * tilePixelRatio;
+    const float iconPadding = layout.iconPadding * tilePixelRatio;
+    const float textMaxAngle = layout.textMaxAngle * util::DEG2RAD;
+    const SymbolPlacementType textPlacement = layout.textRotationAlignment != AlignmentType::Map
                                                   ? SymbolPlacementType::Point
-                                                  : layout.get<SymbolPlacement>();
+                                                  : layout.symbolPlacement;
 
     const float textRepeatDistance = symbolSpacing / 2;
     IndexedSubfeature indexedFeature(feature.index, sourceLayer->getName(), bucketLeaderID, symbolInstances.size());
@@ -303,7 +304,7 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
     
     const auto& type = feature.getType();
 
-    if (layout.get<SymbolPlacement>() == SymbolPlacementType::Line) {
+    if (layout.symbolPlacement == SymbolPlacementType::Line) {
         auto clippedLines = util::clipLines(feature.geometry, 0, 0, util::EXTENT, util::EXTENT);
         for (const auto& line : clippedLines) {
             Anchors anchors = getAnchors(line,
@@ -323,7 +324,7 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                 }
             }
         }
-    } else if (layout.get<SymbolPlacement>() == SymbolPlacementType::LineCenter) {
+    } else if (layout.symbolPlacement == SymbolPlacementType::LineCenter) {
         // No clipping, multiple lines per feature are allowed
         // "lines" with only one point are ignored as in clipLines
         for (const auto& line : feature.geometry) {
@@ -411,8 +412,8 @@ std::vector<float> CalculateTileDistances(const GeometryCoordinates& line, const
 }
 
 std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes) {
-    const bool mayOverlap = layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
-        layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>();
+    const bool mayOverlap = layout.textAllowOverlap || layout.iconAllowOverlap ||
+        layout.textIgnorePlacement || layout.iconIgnorePlacement;
     
     auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, mayOverlap, bucketLeaderID, std::move(symbolInstances));
 

@@ -21,8 +21,8 @@ Values makeValues(const RenderLinePaintProperties::PossiblyEvaluated& properties
 
     return Values {
         uniforms::u_matrix::Value{
-            tile.translatedMatrix(properties.get<LineTranslate>(),
-                                  properties.get<LineTranslateAnchor>(),
+            tile.translatedMatrix(properties.lineTranslate,
+                                  properties.lineTranslateAnchor,
                                   state)
         },
         uniforms::u_ratio::Value{ 1.0f / tile.id.pixelsToTileUnits(1.0, state.getZoom()) },
@@ -53,8 +53,8 @@ LineSDFProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated
                               const LinePatternPos& posA,
                               const LinePatternPos& posB,
                               float atlasWidth) {
-    const float widthA = posA.width * properties.get<LineDasharray>().fromScale;
-    const float widthB = posB.width * properties.get<LineDasharray>().toScale;
+    const float widthA = posA.width * properties.lineDasharray.fromScale;
+    const float widthB = posB.width * properties.lineDasharray.toScale;
 
     std::array<float, 2> scaleA {{
         1.0f / tile.id.pixelsToTileUnits(widthA, state.getIntegerZoom()),
@@ -75,7 +75,7 @@ LineSDFProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated
         uniforms::u_patternscale_b::Value{ scaleB },
         uniforms::u_tex_y_a::Value{ posA.y },
         uniforms::u_tex_y_b::Value{ posB.y },
-        uniforms::u_mix::Value{ properties.get<LineDasharray>().t },
+        uniforms::u_mix::Value{ properties.lineDasharray.t },
         uniforms::u_sdfgamma::Value{ atlasWidth / (std::min(widthA, widthB) * 256.0f * pixelRatio) / 2.0f },
         uniforms::u_image::Value{ 0 }
     );
@@ -90,12 +90,12 @@ LinePatternProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvalu
                                   const ImagePosition& posA,
                                   const ImagePosition& posB) {
      std::array<float, 2> sizeA {{
-         tile.id.pixelsToTileUnits(posA.displaySize()[0] * properties.get<LinePattern>().fromScale, state.getIntegerZoom()),
+         tile.id.pixelsToTileUnits(posA.displaySize()[0] * properties.linePattern.fromScale, state.getIntegerZoom()),
          posA.displaySize()[1]
      }};
 
      std::array<float, 2> sizeB {{
-         tile.id.pixelsToTileUnits(posB.displaySize()[0] * properties.get<LinePattern>().toScale, state.getIntegerZoom()),
+         tile.id.pixelsToTileUnits(posB.displaySize()[0] * properties.linePattern.toScale, state.getIntegerZoom()),
          posB.displaySize()[1]
      }};
 
@@ -111,7 +111,7 @@ LinePatternProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvalu
         uniforms::u_pattern_size_a::Value{ sizeA },
         uniforms::u_pattern_size_b::Value{ sizeB },
         uniforms::u_texsize::Value{ atlasSize },
-        uniforms::u_fade::Value{ properties.get<LinePattern>().t },
+        uniforms::u_fade::Value{ properties.linePattern.t },
         uniforms::u_image::Value{ 0 }
     );
 }

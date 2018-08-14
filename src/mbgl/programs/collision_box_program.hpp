@@ -33,7 +33,7 @@ class CollisionBoxProgram : public Program<
         uniforms::u_matrix,
         uniforms::u_extrude_scale,
         uniforms::u_camera_to_center_distance>,
-    style::Properties<>>
+    style::NoProperties>
 {
 public:
     using Program::Program;
@@ -66,16 +66,9 @@ public:
               const gl::VertexBuffer<CollisionBoxDynamicAttributes::Vertex>& dynamicVertexBuffer,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
               const SegmentVector<Attributes>& segments,
-              const PaintPropertyBinders& paintPropertyBinders,
-              const typename PaintProperties::PossiblyEvaluated& currentProperties,
-              float currentZoom,
               const std::string& layerID) {
-        typename AllUniforms::Values allUniformValues = uniformValues
-            .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
-
         typename Attributes::Bindings allAttributeBindings = CollisionBoxLayoutAttributes::bindings(layoutVertexBuffer)
-            .concat(CollisionBoxDynamicAttributes::bindings(dynamicVertexBuffer))
-            .concat(paintPropertyBinders.attributeBindings(currentProperties));
+            .concat(CollisionBoxDynamicAttributes::bindings(dynamicVertexBuffer));
 
         assert(layoutVertexBuffer.vertexCount == dynamicVertexBuffer.vertexCount);
 
@@ -92,7 +85,7 @@ public:
                     std::move(depthMode),
                     std::move(stencilMode),
                     std::move(colorMode),
-                    allUniformValues,
+                    uniformValues,
                     vertexArrayIt->second,
                     Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
                     indexBuffer,
@@ -112,7 +105,7 @@ class CollisionCircleProgram : public Program<
         uniforms::u_extrude_scale,
         uniforms::u_overscale_factor,
         uniforms::u_camera_to_center_distance>,
-    style::Properties<>>
+    style::NoProperties>
 {
 public:
     using Program::Program;
@@ -145,16 +138,9 @@ public:
               const gl::VertexBuffer<CollisionBoxDynamicAttributes::Vertex>& dynamicVertexBuffer,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
               const SegmentVector<Attributes>& segments,
-              const PaintPropertyBinders& paintPropertyBinders,
-              const typename PaintProperties::PossiblyEvaluated& currentProperties,
-              float currentZoom,
               const std::string& layerID) {
-        typename AllUniforms::Values allUniformValues = uniformValues
-            .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
-
         typename Attributes::Bindings allAttributeBindings = CollisionBoxLayoutAttributes::bindings(layoutVertexBuffer)
-            .concat(CollisionBoxDynamicAttributes::bindings(dynamicVertexBuffer))
-            .concat(paintPropertyBinders.attributeBindings(currentProperties));
+            .concat(CollisionBoxDynamicAttributes::bindings(dynamicVertexBuffer));
 
         for (auto& segment : segments) {
             auto vertexArrayIt = segment.vertexArrays.find(layerID);
@@ -169,7 +155,7 @@ public:
                     std::move(depthMode),
                     std::move(stencilMode),
                     std::move(colorMode),
-                    allUniformValues,
+                    uniformValues,
                     vertexArrayIt->second,
                     Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
                     indexBuffer,

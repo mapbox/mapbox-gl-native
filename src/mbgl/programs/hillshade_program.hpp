@@ -31,7 +31,7 @@ class HillshadeProgram : public Program<
         uniforms::u_accent,
         uniforms::u_light,
         uniforms::u_latrange>,
-    style::HillshadePaintProperties>{
+    style::NoProperties>{
 public:
     using Program::Program;
 

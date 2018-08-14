@@ -108,26 +108,26 @@ PropertyValue<bool> FillLayer::getDefaultFillAntialias() {
 }
 
 PropertyValue<bool> FillLayer::getFillAntialias() const {
-    return impl().paint.template get<FillAntialias>().value;
+    return impl().paint.fillAntialias.value;
 }
 
 void FillLayer::setFillAntialias(PropertyValue<bool> value) {
     if (value == getFillAntialias())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillAntialias>().value = value;
+    impl_->paint.fillAntialias.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void FillLayer::setFillAntialiasTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillAntialias>().options = options;
+    impl_->paint.fillAntialias.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions FillLayer::getFillAntialiasTransition() const {
-    return impl().paint.template get<FillAntialias>().options;
+    return impl().paint.fillAntialias.options;
 }
 
 PropertyValue<float> FillLayer::getDefaultFillOpacity() {
@@ -135,26 +135,26 @@ PropertyValue<float> FillLayer::getDefaultFillOpacity() {
 }
 
 PropertyValue<float> FillLayer::getFillOpacity() const {
-    return impl().paint.template get<FillOpacity>().value;
+    return impl().paint.fillOpacity.value;
 }
 
 void FillLayer::setFillOpacity(PropertyValue<float> value) {
     if (value == getFillOpacity())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillOpacity>().value = value;
+    impl_->paint.fillOpacity.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void FillLayer::setFillOpacityTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillOpacity>().options = options;
+    impl_->paint.fillOpacity.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions FillLayer::getFillOpacityTransition() const {
-    return impl().paint.template get<FillOpacity>().options;
+    return impl().paint.fillOpacity.options;
 }
 
 PropertyValue<Color> FillLayer::getDefaultFillColor() {
@@ -162,26 +162,26 @@ PropertyValue<Color> FillLayer::getDefaultFillColor() {
 }
 
 PropertyValue<Color> FillLayer::getFillColor() const {
-    return impl().paint.template get<FillColor>().value;
+    return impl().paint.fillColor.value;
 }
 
 void FillLayer::setFillColor(PropertyValue<Color> value) {
     if (value == getFillColor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillColor>().value = value;
+    impl_->paint.fillColor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void FillLayer::setFillColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillColor>().options = options;
+    impl_->paint.fillColor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions FillLayer::getFillColorTransition() const {
-    return impl().paint.template get<FillColor>().options;
+    return impl().paint.fillColor.options;
 }
 
 PropertyValue<Color> FillLayer::getDefaultFillOutlineColor() {
@@ -189,26 +189,26 @@ PropertyValue<Color> FillLayer::getDefaultFillOutlineColor() {
 }
 
 PropertyValue<Color> FillLayer::getFillOutlineColor() const {
-    return impl().paint.template get<FillOutlineColor>().value;
+    return impl().paint.fillOutlineColor.value;
 }
 
 void FillLayer::setFillOutlineColor(PropertyValue<Color> value) {
     if (value == getFillOutlineColor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillOutlineColor>().value = value;
+    impl_->paint.fillOutlineColor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void FillLayer::setFillOutlineColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillOutlineColor>().options = options;
+    impl_->paint.fillOutlineColor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions FillLayer::getFillOutlineColorTransition() const {
-    return impl().paint.template get<FillOutlineColor>().options;
+    return impl().paint.fillOutlineColor.options;
 }
 
 PropertyValue<std::array<float, 2>> FillLayer::getDefaultFillTranslate() {
@@ -216,26 +216,26 @@ PropertyValue<std::array<float, 2>> FillLayer::getDefaultFillTranslate() {
 }
 
 PropertyValue<std::array<float, 2>> FillLayer::getFillTranslate() const {
-    return impl().paint.template get<FillTranslate>().value;
+    return impl().paint.fillTranslate.value;
 }
 
 void FillLayer::setFillTranslate(PropertyValue<std::array<float, 2>> value) {
     if (value == getFillTranslate())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillTranslate>().value = value;
+    impl_->paint.fillTranslate.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void FillLayer::setFillTranslateTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillTranslate>().options = options;
+    impl_->paint.fillTranslate.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions FillLayer::getFillTranslateTransition() const {
-    return impl().paint.template get<FillTranslate>().options;
+    return impl().paint.fillTranslate.options;
 }
 
 PropertyValue<TranslateAnchorType> FillLayer::getDefaultFillTranslateAnchor() {
@@ -243,26 +243,26 @@ PropertyValue<TranslateAnchorType> FillLayer::getDefaultFillTranslateAnchor() {
 }
 
 PropertyValue<TranslateAnchorType> FillLayer::getFillTranslateAnchor() const {
-    return impl().paint.template get<FillTranslateAnchor>().value;
+    return impl().paint.fillTranslateAnchor.value;
 }
 
 void FillLayer::setFillTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
     if (value == getFillTranslateAnchor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillTranslateAnchor>().value = value;
+    impl_->paint.fillTranslateAnchor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void FillLayer::setFillTranslateAnchorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillTranslateAnchor>().options = options;
+    impl_->paint.fillTranslateAnchor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions FillLayer::getFillTranslateAnchorTransition() const {
-    return impl().paint.template get<FillTranslateAnchor>().options;
+    return impl().paint.fillTranslateAnchor.options;
 }
 
 PropertyValue<std::string> FillLayer::getDefaultFillPattern() {
@@ -270,26 +270,26 @@ PropertyValue<std::string> FillLayer::getDefaultFillPattern() {
 }
 
 PropertyValue<std::string> FillLayer::getFillPattern() const {
-    return impl().paint.template get<FillPattern>().value;
+    return impl().paint.fillPattern.value;
 }
 
 void FillLayer::setFillPattern(PropertyValue<std::string> value) {
     if (value == getFillPattern())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillPattern>().value = value;
+    impl_->paint.fillPattern.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void FillLayer::setFillPatternTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<FillPattern>().options = options;
+    impl_->paint.fillPattern.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions FillLayer::getFillPatternTransition() const {
-    return impl().paint.template get<FillPattern>().options;
+    return impl().paint.fillPattern.options;
 }
 
 using namespace conversion;

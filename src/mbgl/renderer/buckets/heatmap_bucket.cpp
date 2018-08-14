@@ -15,11 +15,8 @@ HeatmapBucket::HeatmapBucket(const BucketParameters& parameters, const std::vect
       mode(parameters.mode) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(
-            std::piecewise_construct,
-            std::forward_as_tuple(layer->getID()),
-            std::forward_as_tuple(
-                layer->as<RenderHeatmapLayer>()->evaluated,
-                parameters.tileID.overscaledZ));
+            layer->getID(),
+            layer->as<RenderHeatmapLayer>()->evaluated.createBinders(parameters.tileID.overscaledZ));
     }
 }
 

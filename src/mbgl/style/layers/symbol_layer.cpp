@@ -40,7 +40,44 @@ std::unique_ptr<Layer> SymbolLayer::cloneRef(const std::string& id_) const {
 }
 
 void SymbolLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>& writer) const {
-    layout.stringify(writer);
+    writer.StartObject();
+    conversion::stringify<SymbolPlacement>(writer, layout.symbolPlacement);
+    conversion::stringify<SymbolSpacing>(writer, layout.symbolSpacing);
+    conversion::stringify<SymbolAvoidEdges>(writer, layout.symbolAvoidEdges);
+    conversion::stringify<IconAllowOverlap>(writer, layout.iconAllowOverlap);
+    conversion::stringify<IconIgnorePlacement>(writer, layout.iconIgnorePlacement);
+    conversion::stringify<IconOptional>(writer, layout.iconOptional);
+    conversion::stringify<IconRotationAlignment>(writer, layout.iconRotationAlignment);
+    conversion::stringify<IconSize>(writer, layout.iconSize);
+    conversion::stringify<IconTextFit>(writer, layout.iconTextFit);
+    conversion::stringify<IconTextFitPadding>(writer, layout.iconTextFitPadding);
+    conversion::stringify<IconImage>(writer, layout.iconImage);
+    conversion::stringify<IconRotate>(writer, layout.iconRotate);
+    conversion::stringify<IconPadding>(writer, layout.iconPadding);
+    conversion::stringify<IconKeepUpright>(writer, layout.iconKeepUpright);
+    conversion::stringify<IconOffset>(writer, layout.iconOffset);
+    conversion::stringify<IconAnchor>(writer, layout.iconAnchor);
+    conversion::stringify<IconPitchAlignment>(writer, layout.iconPitchAlignment);
+    conversion::stringify<TextPitchAlignment>(writer, layout.textPitchAlignment);
+    conversion::stringify<TextRotationAlignment>(writer, layout.textRotationAlignment);
+    conversion::stringify<TextField>(writer, layout.textField);
+    conversion::stringify<TextFont>(writer, layout.textFont);
+    conversion::stringify<TextSize>(writer, layout.textSize);
+    conversion::stringify<TextMaxWidth>(writer, layout.textMaxWidth);
+    conversion::stringify<TextLineHeight>(writer, layout.textLineHeight);
+    conversion::stringify<TextLetterSpacing>(writer, layout.textLetterSpacing);
+    conversion::stringify<TextJustify>(writer, layout.textJustify);
+    conversion::stringify<TextAnchor>(writer, layout.textAnchor);
+    conversion::stringify<TextMaxAngle>(writer, layout.textMaxAngle);
+    conversion::stringify<TextRotate>(writer, layout.textRotate);
+    conversion::stringify<TextPadding>(writer, layout.textPadding);
+    conversion::stringify<TextKeepUpright>(writer, layout.textKeepUpright);
+    conversion::stringify<TextTransform>(writer, layout.textTransform);
+    conversion::stringify<TextOffset>(writer, layout.textOffset);
+    conversion::stringify<TextAllowOverlap>(writer, layout.textAllowOverlap);
+    conversion::stringify<TextIgnorePlacement>(writer, layout.textIgnorePlacement);
+    conversion::stringify<TextOptional>(writer, layout.textOptional);
+    writer.EndObject();
 }
 
 // Source
@@ -106,14 +143,14 @@ PropertyValue<SymbolPlacementType> SymbolLayer::getDefaultSymbolPlacement() {
 }
 
 PropertyValue<SymbolPlacementType> SymbolLayer::getSymbolPlacement() const {
-    return impl().layout.get<SymbolPlacement>();
+    return impl().layout.symbolPlacement;
 }
 
 void SymbolLayer::setSymbolPlacement(PropertyValue<SymbolPlacementType> value) {
     if (value == getSymbolPlacement())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<SymbolPlacement>() = value;
+    impl_->layout.symbolPlacement = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -122,14 +159,14 @@ PropertyValue<float> SymbolLayer::getDefaultSymbolSpacing() {
 }
 
 PropertyValue<float> SymbolLayer::getSymbolSpacing() const {
-    return impl().layout.get<SymbolSpacing>();
+    return impl().layout.symbolSpacing;
 }
 
 void SymbolLayer::setSymbolSpacing(PropertyValue<float> value) {
     if (value == getSymbolSpacing())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<SymbolSpacing>() = value;
+    impl_->layout.symbolSpacing = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -138,14 +175,14 @@ PropertyValue<bool> SymbolLayer::getDefaultSymbolAvoidEdges() {
 }
 
 PropertyValue<bool> SymbolLayer::getSymbolAvoidEdges() const {
-    return impl().layout.get<SymbolAvoidEdges>();
+    return impl().layout.symbolAvoidEdges;
 }
 
 void SymbolLayer::setSymbolAvoidEdges(PropertyValue<bool> value) {
     if (value == getSymbolAvoidEdges())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<SymbolAvoidEdges>() = value;
+    impl_->layout.symbolAvoidEdges = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -154,14 +191,14 @@ PropertyValue<bool> SymbolLayer::getDefaultIconAllowOverlap() {
 }
 
 PropertyValue<bool> SymbolLayer::getIconAllowOverlap() const {
-    return impl().layout.get<IconAllowOverlap>();
+    return impl().layout.iconAllowOverlap;
 }
 
 void SymbolLayer::setIconAllowOverlap(PropertyValue<bool> value) {
     if (value == getIconAllowOverlap())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<IconAllowOverlap>() = value;
+    impl_->layout.iconAllowOverlap = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -170,14 +207,14 @@ PropertyValue<bool> SymbolLayer::getDefaultIconIgnorePlacement() {
 }
 
 PropertyValue<bool> SymbolLayer::getIconIgnorePlacement() const {
-    return impl().layout.get<IconIgnorePlacement>();
+    return impl().layout.iconIgnorePlacement;
 }
 
 void SymbolLayer::setIconIgnorePlacement(PropertyValue<bool> value) {
     if (value == getIconIgnorePlacement())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<IconIgnorePlacement>() = value;
+    impl_->layout.iconIgnorePlacement = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -186,14 +223,14 @@ PropertyValue<bool> SymbolLayer::getDefaultIconOptional() {
 }
 
 PropertyValue<bool> SymbolLayer::getIconOptional() const {
-    return impl().layout.get<IconOptional>();
+    return impl().layout.iconOptional;
 }
 
 void SymbolLayer::setIconOptional(PropertyValue<bool> value) {
     if (value == getIconOptional())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<IconOptional>() = value;
+    impl_->layout.iconOptional = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -202,14 +239,14 @@ PropertyValue<AlignmentType> SymbolLayer::getDefaultIconRotationAlignment() {
 }
 
 PropertyValue<AlignmentType> SymbolLayer::getIconRotationAlignment() const {
-    return impl().layout.get<IconRotationAlignment>();
+    return impl().layout.iconRotationAlignment;
 }
 
 void SymbolLayer::setIconRotationAlignment(PropertyValue<AlignmentType> value) {
     if (value == getIconRotationAlignment())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<IconRotationAlignment>() = value;
+    impl_->layout.iconRotationAlignment = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -218,14 +255,14 @@ PropertyValue<float> SymbolLayer::getDefaultIconSize() {
 }
 
 PropertyValue<float> SymbolLayer::getIconSize() const {
-    return impl().layout.get<IconSize>();
+    return impl().layout.iconSize;
 }
 
 void SymbolLayer::setIconSize(PropertyValue<float> value) {
     if (value == getIconSize())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<IconSize>() = value;
+    impl_->layout.iconSize = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -234,14 +271,14 @@ PropertyValue<IconTextFitType> SymbolLayer::getDefaultIconTextFit() {
 }
 
 PropertyValue<IconTextFitType> SymbolLayer::getIconTextFit() const {
-    return impl().layout.get<IconTextFit>();
+    return impl().layout.iconTextFit;
 }
 
 void SymbolLayer::setIconTextFit(PropertyValue<IconTextFitType> value) {
     if (value == getIconTextFit())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<IconTextFit>() = value;
+    impl_->layout.iconTextFit = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -250,14 +287,14 @@ PropertyValue<std::array<float, 4>> SymbolLayer::getDefaultIconTextFitPadding() 
 }
 
 PropertyValue<std::array<float, 4>> SymbolLayer::getIconTextFitPadding() const {
-    return impl().layout.get<IconTextFitPadding>();
+    return impl().layout.iconTextFitPadding;
 }
 
 void SymbolLayer::setIconTextFitPadding(PropertyValue<std::array<float, 4>> value) {
     if (value == getIconTextFitPadding())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<IconTextFitPadding>() = value;
+    impl_->layout.iconTextFitPadding = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -266,14 +303,14 @@ PropertyValue<std::string> SymbolLayer::getDefaultIconImage() {
 }
 
 PropertyValue<std::string> SymbolLayer::getIconImage() const {
-    return impl().layout.get<IconImage>();
+    return impl().layout.iconImage;
 }
 
 void SymbolLayer::setIconImage(PropertyValue<std::string> value) {
     if (value == getIconImage())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<IconImage>() = value;
+    impl_->layout.iconImage = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -282,14 +319,14 @@ PropertyValue<float> SymbolLayer::getDefaultIconRotate() {
 }
 
 PropertyValue<float> SymbolLayer::getIconRotate() const {
-    return impl().layout.get<IconRotate>();
+    return impl().layout.iconRotate;
 }
 
 void SymbolLayer::setIconRotate(PropertyValue<float> value) {
     if (value == getIconRotate())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<IconRotate>() = value;
+    impl_->layout.iconRotate = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -298,14 +335,14 @@ PropertyValue<float> SymbolLayer::getDefaultIconPadding() {
 }
 
 PropertyValue<float> SymbolLayer::getIconPadding() const {
-    return impl().layout.get<IconPadding>();
+    return impl().layout.iconPadding;
 }
 
 void SymbolLayer::setIconPadding(PropertyValue<float> value) {
     if (value == getIconPadding())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<IconPadding>() = value;
+    impl_->layout.iconPadding = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -314,14 +351,14 @@ PropertyValue<bool> SymbolLayer::getDefaultIconKeepUpright() {
 }
 
 PropertyValue<bool> SymbolLayer::getIconKeepUpright() const {
-    return impl().layout.get<IconKeepUpright>();
+    return impl().layout.iconKeepUpright;
 }
 
 void SymbolLayer::setIconKeepUpright(PropertyValue<bool> value) {
     if (value == getIconKeepUpright())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<IconKeepUpright>() = value;
+    impl_->layout.iconKeepUpright = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -330,14 +367,14 @@ PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultIconOffset() {
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getIconOffset() const {
-    return impl().layout.get<IconOffset>();
+    return impl().layout.iconOffset;
 }
 
 void SymbolLayer::setIconOffset(PropertyValue<std::array<float, 2>> value) {
     if (value == getIconOffset())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<IconOffset>() = value;
+    impl_->layout.iconOffset = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -346,14 +383,14 @@ PropertyValue<SymbolAnchorType> SymbolLayer::getDefaultIconAnchor() {
 }
 
 PropertyValue<SymbolAnchorType> SymbolLayer::getIconAnchor() const {
-    return impl().layout.get<IconAnchor>();
+    return impl().layout.iconAnchor;
 }
 
 void SymbolLayer::setIconAnchor(PropertyValue<SymbolAnchorType> value) {
     if (value == getIconAnchor())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<IconAnchor>() = value;
+    impl_->layout.iconAnchor = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -362,14 +399,14 @@ PropertyValue<AlignmentType> SymbolLayer::getDefaultIconPitchAlignment() {
 }
 
 PropertyValue<AlignmentType> SymbolLayer::getIconPitchAlignment() const {
-    return impl().layout.get<IconPitchAlignment>();
+    return impl().layout.iconPitchAlignment;
 }
 
 void SymbolLayer::setIconPitchAlignment(PropertyValue<AlignmentType> value) {
     if (value == getIconPitchAlignment())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<IconPitchAlignment>() = value;
+    impl_->layout.iconPitchAlignment = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -378,14 +415,14 @@ PropertyValue<AlignmentType> SymbolLayer::getDefaultTextPitchAlignment() {
 }
 
 PropertyValue<AlignmentType> SymbolLayer::getTextPitchAlignment() const {
-    return impl().layout.get<TextPitchAlignment>();
+    return impl().layout.textPitchAlignment;
 }
 
 void SymbolLayer::setTextPitchAlignment(PropertyValue<AlignmentType> value) {
     if (value == getTextPitchAlignment())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextPitchAlignment>() = value;
+    impl_->layout.textPitchAlignment = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -394,14 +431,14 @@ PropertyValue<AlignmentType> SymbolLayer::getDefaultTextRotationAlignment() {
 }
 
 PropertyValue<AlignmentType> SymbolLayer::getTextRotationAlignment() const {
-    return impl().layout.get<TextRotationAlignment>();
+    return impl().layout.textRotationAlignment;
 }
 
 void SymbolLayer::setTextRotationAlignment(PropertyValue<AlignmentType> value) {
     if (value == getTextRotationAlignment())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextRotationAlignment>() = value;
+    impl_->layout.textRotationAlignment = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -410,14 +447,14 @@ PropertyValue<std::string> SymbolLayer::getDefaultTextField() {
 }
 
 PropertyValue<std::string> SymbolLayer::getTextField() const {
-    return impl().layout.get<TextField>();
+    return impl().layout.textField;
 }
 
 void SymbolLayer::setTextField(PropertyValue<std::string> value) {
     if (value == getTextField())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextField>() = value;
+    impl_->layout.textField = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -426,14 +463,14 @@ PropertyValue<std::vector<std::string>> SymbolLayer::getDefaultTextFont() {
 }
 
 PropertyValue<std::vector<std::string>> SymbolLayer::getTextFont() const {
-    return impl().layout.get<TextFont>();
+    return impl().layout.textFont;
 }
 
 void SymbolLayer::setTextFont(PropertyValue<std::vector<std::string>> value) {
     if (value == getTextFont())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextFont>() = value;
+    impl_->layout.textFont = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -442,14 +479,14 @@ PropertyValue<float> SymbolLayer::getDefaultTextSize() {
 }
 
 PropertyValue<float> SymbolLayer::getTextSize() const {
-    return impl().layout.get<TextSize>();
+    return impl().layout.textSize;
 }
 
 void SymbolLayer::setTextSize(PropertyValue<float> value) {
     if (value == getTextSize())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextSize>() = value;
+    impl_->layout.textSize = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -458,14 +495,14 @@ PropertyValue<float> SymbolLayer::getDefaultTextMaxWidth() {
 }
 
 PropertyValue<float> SymbolLayer::getTextMaxWidth() const {
-    return impl().layout.get<TextMaxWidth>();
+    return impl().layout.textMaxWidth;
 }
 
 void SymbolLayer::setTextMaxWidth(PropertyValue<float> value) {
     if (value == getTextMaxWidth())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextMaxWidth>() = value;
+    impl_->layout.textMaxWidth = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -474,14 +511,14 @@ PropertyValue<float> SymbolLayer::getDefaultTextLineHeight() {
 }
 
 PropertyValue<float> SymbolLayer::getTextLineHeight() const {
-    return impl().layout.get<TextLineHeight>();
+    return impl().layout.textLineHeight;
 }
 
 void SymbolLayer::setTextLineHeight(PropertyValue<float> value) {
     if (value == getTextLineHeight())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextLineHeight>() = value;
+    impl_->layout.textLineHeight = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -490,14 +527,14 @@ PropertyValue<float> SymbolLayer::getDefaultTextLetterSpacing() {
 }
 
 PropertyValue<float> SymbolLayer::getTextLetterSpacing() const {
-    return impl().layout.get<TextLetterSpacing>();
+    return impl().layout.textLetterSpacing;
 }
 
 void SymbolLayer::setTextLetterSpacing(PropertyValue<float> value) {
     if (value == getTextLetterSpacing())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextLetterSpacing>() = value;
+    impl_->layout.textLetterSpacing = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -506,14 +543,14 @@ PropertyValue<TextJustifyType> SymbolLayer::getDefaultTextJustify() {
 }
 
 PropertyValue<TextJustifyType> SymbolLayer::getTextJustify() const {
-    return impl().layout.get<TextJustify>();
+    return impl().layout.textJustify;
 }
 
 void SymbolLayer::setTextJustify(PropertyValue<TextJustifyType> value) {
     if (value == getTextJustify())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextJustify>() = value;
+    impl_->layout.textJustify = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -522,14 +559,14 @@ PropertyValue<SymbolAnchorType> SymbolLayer::getDefaultTextAnchor() {
 }
 
 PropertyValue<SymbolAnchorType> SymbolLayer::getTextAnchor() const {
-    return impl().layout.get<TextAnchor>();
+    return impl().layout.textAnchor;
 }
 
 void SymbolLayer::setTextAnchor(PropertyValue<SymbolAnchorType> value) {
     if (value == getTextAnchor())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextAnchor>() = value;
+    impl_->layout.textAnchor = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -538,14 +575,14 @@ PropertyValue<float> SymbolLayer::getDefaultTextMaxAngle() {
 }
 
 PropertyValue<float> SymbolLayer::getTextMaxAngle() const {
-    return impl().layout.get<TextMaxAngle>();
+    return impl().layout.textMaxAngle;
 }
 
 void SymbolLayer::setTextMaxAngle(PropertyValue<float> value) {
     if (value == getTextMaxAngle())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextMaxAngle>() = value;
+    impl_->layout.textMaxAngle = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -554,14 +591,14 @@ PropertyValue<float> SymbolLayer::getDefaultTextRotate() {
 }
 
 PropertyValue<float> SymbolLayer::getTextRotate() const {
-    return impl().layout.get<TextRotate>();
+    return impl().layout.textRotate;
 }
 
 void SymbolLayer::setTextRotate(PropertyValue<float> value) {
     if (value == getTextRotate())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextRotate>() = value;
+    impl_->layout.textRotate = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -570,14 +607,14 @@ PropertyValue<float> SymbolLayer::getDefaultTextPadding() {
 }
 
 PropertyValue<float> SymbolLayer::getTextPadding() const {
-    return impl().layout.get<TextPadding>();
+    return impl().layout.textPadding;
 }
 
 void SymbolLayer::setTextPadding(PropertyValue<float> value) {
     if (value == getTextPadding())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextPadding>() = value;
+    impl_->layout.textPadding = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -586,14 +623,14 @@ PropertyValue<bool> SymbolLayer::getDefaultTextKeepUpright() {
 }
 
 PropertyValue<bool> SymbolLayer::getTextKeepUpright() const {
-    return impl().layout.get<TextKeepUpright>();
+    return impl().layout.textKeepUpright;
 }
 
 void SymbolLayer::setTextKeepUpright(PropertyValue<bool> value) {
     if (value == getTextKeepUpright())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextKeepUpright>() = value;
+    impl_->layout.textKeepUpright = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -602,14 +639,14 @@ PropertyValue<TextTransformType> SymbolLayer::getDefaultTextTransform() {
 }
 
 PropertyValue<TextTransformType> SymbolLayer::getTextTransform() const {
-    return impl().layout.get<TextTransform>();
+    return impl().layout.textTransform;
 }
 
 void SymbolLayer::setTextTransform(PropertyValue<TextTransformType> value) {
     if (value == getTextTransform())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextTransform>() = value;
+    impl_->layout.textTransform = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -618,14 +655,14 @@ PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultTextOffset() {
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getTextOffset() const {
-    return impl().layout.get<TextOffset>();
+    return impl().layout.textOffset;
 }
 
 void SymbolLayer::setTextOffset(PropertyValue<std::array<float, 2>> value) {
     if (value == getTextOffset())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextOffset>() = value;
+    impl_->layout.textOffset = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -634,14 +671,14 @@ PropertyValue<bool> SymbolLayer::getDefaultTextAllowOverlap() {
 }
 
 PropertyValue<bool> SymbolLayer::getTextAllowOverlap() const {
-    return impl().layout.get<TextAllowOverlap>();
+    return impl().layout.textAllowOverlap;
 }
 
 void SymbolLayer::setTextAllowOverlap(PropertyValue<bool> value) {
     if (value == getTextAllowOverlap())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextAllowOverlap>() = value;
+    impl_->layout.textAllowOverlap = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -650,14 +687,14 @@ PropertyValue<bool> SymbolLayer::getDefaultTextIgnorePlacement() {
 }
 
 PropertyValue<bool> SymbolLayer::getTextIgnorePlacement() const {
-    return impl().layout.get<TextIgnorePlacement>();
+    return impl().layout.textIgnorePlacement;
 }
 
 void SymbolLayer::setTextIgnorePlacement(PropertyValue<bool> value) {
     if (value == getTextIgnorePlacement())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextIgnorePlacement>() = value;
+    impl_->layout.textIgnorePlacement = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -666,14 +703,14 @@ PropertyValue<bool> SymbolLayer::getDefaultTextOptional() {
 }
 
 PropertyValue<bool> SymbolLayer::getTextOptional() const {
-    return impl().layout.get<TextOptional>();
+    return impl().layout.textOptional;
 }
 
 void SymbolLayer::setTextOptional(PropertyValue<bool> value) {
     if (value == getTextOptional())
         return;
     auto impl_ = mutableImpl();
-    impl_->layout.get<TextOptional>() = value;
+    impl_->layout.textOptional = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
@@ -685,26 +722,26 @@ PropertyValue<float> SymbolLayer::getDefaultIconOpacity() {
 }
 
 PropertyValue<float> SymbolLayer::getIconOpacity() const {
-    return impl().paint.template get<IconOpacity>().value;
+    return impl().paint.iconOpacity.value;
 }
 
 void SymbolLayer::setIconOpacity(PropertyValue<float> value) {
     if (value == getIconOpacity())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<IconOpacity>().value = value;
+    impl_->paint.iconOpacity.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void SymbolLayer::setIconOpacityTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<IconOpacity>().options = options;
+    impl_->paint.iconOpacity.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions SymbolLayer::getIconOpacityTransition() const {
-    return impl().paint.template get<IconOpacity>().options;
+    return impl().paint.iconOpacity.options;
 }
 
 PropertyValue<Color> SymbolLayer::getDefaultIconColor() {
@@ -712,26 +749,26 @@ PropertyValue<Color> SymbolLayer::getDefaultIconColor() {
 }
 
 PropertyValue<Color> SymbolLayer::getIconColor() const {
-    return impl().paint.template get<IconColor>().value;
+    return impl().paint.iconColor.value;
 }
 
 void SymbolLayer::setIconColor(PropertyValue<Color> value) {
     if (value == getIconColor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<IconColor>().value = value;
+    impl_->paint.iconColor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void SymbolLayer::setIconColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<IconColor>().options = options;
+    impl_->paint.iconColor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions SymbolLayer::getIconColorTransition() const {
-    return impl().paint.template get<IconColor>().options;
+    return impl().paint.iconColor.options;
 }
 
 PropertyValue<Color> SymbolLayer::getDefaultIconHaloColor() {
@@ -739,26 +776,26 @@ PropertyValue<Color> SymbolLayer::getDefaultIconHaloColor() {
 }
 
 PropertyValue<Color> SymbolLayer::getIconHaloColor() const {
-    return impl().paint.template get<IconHaloColor>().value;
+    return impl().paint.iconHaloColor.value;
 }
 
 void SymbolLayer::setIconHaloColor(PropertyValue<Color> value) {
     if (value == getIconHaloColor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<IconHaloColor>().value = value;
+    impl_->paint.iconHaloColor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void SymbolLayer::setIconHaloColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<IconHaloColor>().options = options;
+    impl_->paint.iconHaloColor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions SymbolLayer::getIconHaloColorTransition() const {
-    return impl().paint.template get<IconHaloColor>().options;
+    return impl().paint.iconHaloColor.options;
 }
 
 PropertyValue<float> SymbolLayer::getDefaultIconHaloWidth() {
@@ -766,26 +803,26 @@ PropertyValue<float> SymbolLayer::getDefaultIconHaloWidth() {
 }
 
 PropertyValue<float> SymbolLayer::getIconHaloWidth() const {
-    return impl().paint.template get<IconHaloWidth>().value;
+    return impl().paint.iconHaloWidth.value;
 }
 
 void SymbolLayer::setIconHaloWidth(PropertyValue<float> value) {
     if (value == getIconHaloWidth())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<IconHaloWidth>().value = value;
+    impl_->paint.iconHaloWidth.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void SymbolLayer::setIconHaloWidthTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<IconHaloWidth>().options = options;
+    impl_->paint.iconHaloWidth.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions SymbolLayer::getIconHaloWidthTransition() const {
-    return impl().paint.template get<IconHaloWidth>().options;
+    return impl().paint.iconHaloWidth.options;
 }
 
 PropertyValue<float> SymbolLayer::getDefaultIconHaloBlur() {
@@ -793,26 +830,26 @@ PropertyValue<float> SymbolLayer::getDefaultIconHaloBlur() {
 }
 
 PropertyValue<float> SymbolLayer::getIconHaloBlur() const {
-    return impl().paint.template get<IconHaloBlur>().value;
+    return impl().paint.iconHaloBlur.value;
 }
 
 void SymbolLayer::setIconHaloBlur(PropertyValue<float> value) {
     if (value == getIconHaloBlur())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<IconHaloBlur>().value = value;
+    impl_->paint.iconHaloBlur.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void SymbolLayer::setIconHaloBlurTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<IconHaloBlur>().options = options;
+    impl_->paint.iconHaloBlur.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions SymbolLayer::getIconHaloBlurTransition() const {
-    return impl().paint.template get<IconHaloBlur>().options;
+    return impl().paint.iconHaloBlur.options;
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultIconTranslate() {
@@ -820,26 +857,26 @@ PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultIconTranslate() {
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getIconTranslate() const {
-    return impl().paint.template get<IconTranslate>().value;
+    return impl().paint.iconTranslate.value;
 }
 
 void SymbolLayer::setIconTranslate(PropertyValue<std::array<float, 2>> value) {
     if (value == getIconTranslate())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<IconTranslate>().value = value;
+    impl_->paint.iconTranslate.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void SymbolLayer::setIconTranslateTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<IconTranslate>().options = options;
+    impl_->paint.iconTranslate.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions SymbolLayer::getIconTranslateTransition() const {
-    return impl().paint.template get<IconTranslate>().options;
+    return impl().paint.iconTranslate.options;
 }
 
 PropertyValue<TranslateAnchorType> SymbolLayer::getDefaultIconTranslateAnchor() {
@@ -847,26 +884,26 @@ PropertyValue<TranslateAnchorType> SymbolLayer::getDefaultIconTranslateAnchor() 
 }
 
 PropertyValue<TranslateAnchorType> SymbolLayer::getIconTranslateAnchor() const {
-    return impl().paint.template get<IconTranslateAnchor>().value;
+    return impl().paint.iconTranslateAnchor.value;
 }
 
 void SymbolLayer::setIconTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
     if (value == getIconTranslateAnchor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<IconTranslateAnchor>().value = value;
+    impl_->paint.iconTranslateAnchor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void SymbolLayer::setIconTranslateAnchorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<IconTranslateAnchor>().options = options;
+    impl_->paint.iconTranslateAnchor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions SymbolLayer::getIconTranslateAnchorTransition() const {
-    return impl().paint.template get<IconTranslateAnchor>().options;
+    return impl().paint.iconTranslateAnchor.options;
 }
 
 PropertyValue<float> SymbolLayer::getDefaultTextOpacity() {
@@ -874,26 +911,26 @@ PropertyValue<float> SymbolLayer::getDefaultTextOpacity() {
 }
 
 PropertyValue<float> SymbolLayer::getTextOpacity() const {
-    return impl().paint.template get<TextOpacity>().value;
+    return impl().paint.textOpacity.value;
 }
 
 void SymbolLayer::setTextOpacity(PropertyValue<float> value) {
     if (value == getTextOpacity())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<TextOpacity>().value = value;
+    impl_->paint.textOpacity.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void SymbolLayer::setTextOpacityTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<TextOpacity>().options = options;
+    impl_->paint.textOpacity.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions SymbolLayer::getTextOpacityTransition() const {
-    return impl().paint.template get<TextOpacity>().options;
+    return impl().paint.textOpacity.options;
 }
 
 PropertyValue<Color> SymbolLayer::getDefaultTextColor() {
@@ -901,26 +938,26 @@ PropertyValue<Color> SymbolLayer::getDefaultTextColor() {
 }
 
 PropertyValue<Color> SymbolLayer::getTextColor() const {
-    return impl().paint.template get<TextColor>().value;
+    return impl().paint.textColor.value;
 }
 
 void SymbolLayer::setTextColor(PropertyValue<Color> value) {
     if (value == getTextColor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<TextColor>().value = value;
+    impl_->paint.textColor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void SymbolLayer::setTextColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<TextColor>().options = options;
+    impl_->paint.textColor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions SymbolLayer::getTextColorTransition() const {
-    return impl().paint.template get<TextColor>().options;
+    return impl().paint.textColor.options;
 }
 
 PropertyValue<Color> SymbolLayer::getDefaultTextHaloColor() {
@@ -928,26 +965,26 @@ PropertyValue<Color> SymbolLayer::getDefaultTextHaloColor() {
 }
 
 PropertyValue<Color> SymbolLayer::getTextHaloColor() const {
-    return impl().paint.template get<TextHaloColor>().value;
+    return impl().paint.textHaloColor.value;
 }
 
 void SymbolLayer::setTextHaloColor(PropertyValue<Color> value) {
     if (value == getTextHaloColor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<TextHaloColor>().value = value;
+    impl_->paint.textHaloColor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void SymbolLayer::setTextHaloColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<TextHaloColor>().options = options;
+    impl_->paint.textHaloColor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions SymbolLayer::getTextHaloColorTransition() const {
-    return impl().paint.template get<TextHaloColor>().options;
+    return impl().paint.textHaloColor.options;
 }
 
 PropertyValue<float> SymbolLayer::getDefaultTextHaloWidth() {
@@ -955,26 +992,26 @@ PropertyValue<float> SymbolLayer::getDefaultTextHaloWidth() {
 }
 
 PropertyValue<float> SymbolLayer::getTextHaloWidth() const {
-    return impl().paint.template get<TextHaloWidth>().value;
+    return impl().paint.textHaloWidth.value;
 }
 
 void SymbolLayer::setTextHaloWidth(PropertyValue<float> value) {
     if (value == getTextHaloWidth())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<TextHaloWidth>().value = value;
+    impl_->paint.textHaloWidth.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void SymbolLayer::setTextHaloWidthTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<TextHaloWidth>().options = options;
+    impl_->paint.textHaloWidth.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions SymbolLayer::getTextHaloWidthTransition() const {
-    return impl().paint.template get<TextHaloWidth>().options;
+    return impl().paint.textHaloWidth.options;
 }
 
 PropertyValue<float> SymbolLayer::getDefaultTextHaloBlur() {
@@ -982,26 +1019,26 @@ PropertyValue<float> SymbolLayer::getDefaultTextHaloBlur() {
 }
 
 PropertyValue<float> SymbolLayer::getTextHaloBlur() const {
-    return impl().paint.template get<TextHaloBlur>().value;
+    return impl().paint.textHaloBlur.value;
 }
 
 void SymbolLayer::setTextHaloBlur(PropertyValue<float> value) {
     if (value == getTextHaloBlur())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<TextHaloBlur>().value = value;
+    impl_->paint.textHaloBlur.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void SymbolLayer::setTextHaloBlurTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<TextHaloBlur>().options = options;
+    impl_->paint.textHaloBlur.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions SymbolLayer::getTextHaloBlurTransition() const {
-    return impl().paint.template get<TextHaloBlur>().options;
+    return impl().paint.textHaloBlur.options;
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultTextTranslate() {
@@ -1009,26 +1046,26 @@ PropertyValue<std::array<float, 2>> SymbolLayer::getDefaultTextTranslate() {
 }
 
 PropertyValue<std::array<float, 2>> SymbolLayer::getTextTranslate() const {
-    return impl().paint.template get<TextTranslate>().value;
+    return impl().paint.textTranslate.value;
 }
 
 void SymbolLayer::setTextTranslate(PropertyValue<std::array<float, 2>> value) {
     if (value == getTextTranslate())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<TextTranslate>().value = value;
+    impl_->paint.textTranslate.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void SymbolLayer::setTextTranslateTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<TextTranslate>().options = options;
+    impl_->paint.textTranslate.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions SymbolLayer::getTextTranslateTransition() const {
-    return impl().paint.template get<TextTranslate>().options;
+    return impl().paint.textTranslate.options;
 }
 
 PropertyValue<TranslateAnchorType> SymbolLayer::getDefaultTextTranslateAnchor() {
@@ -1036,26 +1073,26 @@ PropertyValue<TranslateAnchorType> SymbolLayer::getDefaultTextTranslateAnchor() 
 }
 
 PropertyValue<TranslateAnchorType> SymbolLayer::getTextTranslateAnchor() const {
-    return impl().paint.template get<TextTranslateAnchor>().value;
+    return impl().paint.textTranslateAnchor.value;
 }
 
 void SymbolLayer::setTextTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
     if (value == getTextTranslateAnchor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<TextTranslateAnchor>().value = value;
+    impl_->paint.textTranslateAnchor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void SymbolLayer::setTextTranslateAnchorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<TextTranslateAnchor>().options = options;
+    impl_->paint.textTranslateAnchor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions SymbolLayer::getTextTranslateAnchorTransition() const {
-    return impl().paint.template get<TextTranslateAnchor>().options;
+    return impl().paint.textTranslateAnchor.options;
 }
 
 using namespace conversion;

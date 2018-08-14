@@ -34,7 +34,7 @@ void RenderRasterLayer::transition(const TransitionParameters& parameters) {
 void RenderRasterLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     evaluated = unevaluated.evaluate(parameters);
 
-    passes = evaluated.get<style::RasterOpacity>() > 0 ? RenderPass::Translucent : RenderPass::None;
+    passes = evaluated.rasterOpacity > 0 ? RenderPass::Translucent : RenderPass::None;
 }
 
 bool RenderRasterLayer::hasTransition() const {
@@ -73,7 +73,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
     if (parameters.pass != RenderPass::Translucent)
         return;
 
-    RasterProgram::PaintPropertyBinders paintAttributeData{ evaluated, 0 };
+    static const NoProperties::Binders binders;
 
     auto draw = [&] (const mat4& matrix,
                      const auto& vertexBuffer,
@@ -86,24 +86,24 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                 uniforms::u_matrix::Value{ matrix },
                 uniforms::u_image0::Value{ 0 },
                 uniforms::u_image1::Value{ 1 },
-                uniforms::u_opacity::Value{ evaluated.get<RasterOpacity>() },
+                uniforms::u_opacity::Value{ evaluated.rasterOpacity },
                 uniforms::u_fade_t::Value{ 1 },
-                uniforms::u_brightness_low::Value{ evaluated.get<RasterBrightnessMin>() },
-                uniforms::u_brightness_high::Value{ evaluated.get<RasterBrightnessMax>() },
-                uniforms::u_saturation_factor::Value{ saturationFactor(evaluated.get<RasterSaturation>()) },
-                uniforms::u_contrast_factor::Value{ contrastFactor(evaluated.get<RasterContrast>()) },
-                uniforms::u_spin_weights::Value{ spinWeights(evaluated.get<RasterHueRotate>()) },
+                uniforms::u_brightness_low::Value{ evaluated.rasterBrightnessMin },
+                uniforms::u_brightness_high::Value{ evaluated.rasterBrightnessMax },
+                uniforms::u_saturation_factor::Value{ saturationFactor(evaluated.rasterSaturation) },
+                uniforms::u_contrast_factor::Value{ contrastFactor(evaluated.rasterContrast) },
+                uniforms::u_spin_weights::Value{ spinWeights(evaluated.rasterHueRotate) },
                 uniforms::u_buffer_scale::Value{ 1.0f },
                 uniforms::u_scale_parent::Value{ 1.0f },
                 uniforms::u_tl_parent::Value{ std::array<float, 2> {{ 0.0f, 0.0f }} },
             },
-            paintAttributeData,
+            binders,
             evaluated,
             parameters.state.getZoom()
         );
         const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
             vertexBuffer,
-            paintAttributeData,
+            binders,
             evaluated
         );
 
@@ -123,7 +123,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
         );
     };
 
-    const gl::TextureFilter filter = evaluated.get<RasterResampling>() == RasterResamplingType::Nearest ? gl::TextureFilter::Nearest : gl::TextureFilter::Linear;
+    const gl::TextureFilter filter = evaluated.rasterResampling == RasterResamplingType::Nearest ? gl::TextureFilter::Nearest : gl::TextureFilter::Linear;
 
     if (RenderImageSource* imageSource = source->as<RenderImageSource>()) {
         if (imageSource->isEnabled() && imageSource->isLoaded() && !imageSource->bucket->needsUpload()) {

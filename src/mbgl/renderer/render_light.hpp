@@ -9,7 +9,7 @@ class TransitionParameters;
 class PropertyEvaluationParameters;
 
 using TransitioningLight = style::LightProperties::Unevaluated;
-using EvaluatedLight     = style::LightProperties::PossiblyEvaluated;
+using EvaluatedLight     = style::LightProperties::Evaluated;
 
 class RenderLight {
 public:

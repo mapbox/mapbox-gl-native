@@ -31,11 +31,8 @@ FillBucket::FillBucket(const BucketParameters& parameters, const std::vector<con
     : Bucket(LayerType::Fill) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(
-            std::piecewise_construct,
-            std::forward_as_tuple(layer->getID()),
-            std::forward_as_tuple(
-                layer->as<RenderFillLayer>()->evaluated,
-                parameters.tileID.overscaledZ));
+            layer->getID(),
+            layer->as<RenderFillLayer>()->evaluated.createBinders(parameters.tileID.overscaledZ));
     }
 }
 
@@ -130,7 +127,7 @@ float FillBucket::getQueryRadius(const RenderLayer& layer) const {
         return 0;
     }
 
-    const std::array<float, 2>& translate = layer.as<RenderFillLayer>()->evaluated.get<FillTranslate>();
+    const std::array<float, 2>& translate = layer.as<RenderFillLayer>()->evaluated.fillTranslate;
     return util::length(translate[0], translate[1]);
 
 }

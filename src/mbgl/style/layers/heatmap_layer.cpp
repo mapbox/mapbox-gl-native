@@ -108,26 +108,26 @@ PropertyValue<float> HeatmapLayer::getDefaultHeatmapRadius() {
 }
 
 PropertyValue<float> HeatmapLayer::getHeatmapRadius() const {
-    return impl().paint.template get<HeatmapRadius>().value;
+    return impl().paint.heatmapRadius.value;
 }
 
 void HeatmapLayer::setHeatmapRadius(PropertyValue<float> value) {
     if (value == getHeatmapRadius())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HeatmapRadius>().value = value;
+    impl_->paint.heatmapRadius.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void HeatmapLayer::setHeatmapRadiusTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HeatmapRadius>().options = options;
+    impl_->paint.heatmapRadius.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions HeatmapLayer::getHeatmapRadiusTransition() const {
-    return impl().paint.template get<HeatmapRadius>().options;
+    return impl().paint.heatmapRadius.options;
 }
 
 PropertyValue<float> HeatmapLayer::getDefaultHeatmapWeight() {
@@ -135,26 +135,26 @@ PropertyValue<float> HeatmapLayer::getDefaultHeatmapWeight() {
 }
 
 PropertyValue<float> HeatmapLayer::getHeatmapWeight() const {
-    return impl().paint.template get<HeatmapWeight>().value;
+    return impl().paint.heatmapWeight.value;
 }
 
 void HeatmapLayer::setHeatmapWeight(PropertyValue<float> value) {
     if (value == getHeatmapWeight())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HeatmapWeight>().value = value;
+    impl_->paint.heatmapWeight.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void HeatmapLayer::setHeatmapWeightTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HeatmapWeight>().options = options;
+    impl_->paint.heatmapWeight.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions HeatmapLayer::getHeatmapWeightTransition() const {
-    return impl().paint.template get<HeatmapWeight>().options;
+    return impl().paint.heatmapWeight.options;
 }
 
 PropertyValue<float> HeatmapLayer::getDefaultHeatmapIntensity() {
@@ -162,26 +162,26 @@ PropertyValue<float> HeatmapLayer::getDefaultHeatmapIntensity() {
 }
 
 PropertyValue<float> HeatmapLayer::getHeatmapIntensity() const {
-    return impl().paint.template get<HeatmapIntensity>().value;
+    return impl().paint.heatmapIntensity.value;
 }
 
 void HeatmapLayer::setHeatmapIntensity(PropertyValue<float> value) {
     if (value == getHeatmapIntensity())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HeatmapIntensity>().value = value;
+    impl_->paint.heatmapIntensity.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void HeatmapLayer::setHeatmapIntensityTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HeatmapIntensity>().options = options;
+    impl_->paint.heatmapIntensity.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions HeatmapLayer::getHeatmapIntensityTransition() const {
-    return impl().paint.template get<HeatmapIntensity>().options;
+    return impl().paint.heatmapIntensity.options;
 }
 
 ColorRampPropertyValue HeatmapLayer::getDefaultHeatmapColor() {
@@ -191,26 +191,26 @@ ColorRampPropertyValue HeatmapLayer::getDefaultHeatmapColor() {
 }
 
 ColorRampPropertyValue HeatmapLayer::getHeatmapColor() const {
-    return impl().paint.template get<HeatmapColor>().value;
+    return impl().paint.heatmapColor.value;
 }
 
 void HeatmapLayer::setHeatmapColor(ColorRampPropertyValue value) {
     if (value == getHeatmapColor())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HeatmapColor>().value = value;
+    impl_->paint.heatmapColor.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void HeatmapLayer::setHeatmapColorTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HeatmapColor>().options = options;
+    impl_->paint.heatmapColor.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions HeatmapLayer::getHeatmapColorTransition() const {
-    return impl().paint.template get<HeatmapColor>().options;
+    return impl().paint.heatmapColor.options;
 }
 
 PropertyValue<float> HeatmapLayer::getDefaultHeatmapOpacity() {
@@ -218,26 +218,26 @@ PropertyValue<float> HeatmapLayer::getDefaultHeatmapOpacity() {
 }
 
 PropertyValue<float> HeatmapLayer::getHeatmapOpacity() const {
-    return impl().paint.template get<HeatmapOpacity>().value;
+    return impl().paint.heatmapOpacity.value;
 }
 
 void HeatmapLayer::setHeatmapOpacity(PropertyValue<float> value) {
     if (value == getHeatmapOpacity())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HeatmapOpacity>().value = value;
+    impl_->paint.heatmapOpacity.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void HeatmapLayer::setHeatmapOpacityTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<HeatmapOpacity>().options = options;
+    impl_->paint.heatmapOpacity.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions HeatmapLayer::getHeatmapOpacityTransition() const {
-    return impl().paint.template get<HeatmapOpacity>().options;
+    return impl().paint.heatmapOpacity.options;
 }
 
 using namespace conversion;

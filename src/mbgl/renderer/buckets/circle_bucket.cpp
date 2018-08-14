@@ -15,11 +15,8 @@ CircleBucket::CircleBucket(const BucketParameters& parameters, const std::vector
       mode(parameters.mode) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(
-            std::piecewise_construct,
-            std::forward_as_tuple(layer->getID()),
-            std::forward_as_tuple(
-                layer->as<RenderCircleLayer>()->evaluated,
-                parameters.tileID.overscaledZ));
+            layer->getID(),
+            layer->as<RenderCircleLayer>()->evaluated.createBinders(parameters.tileID.overscaledZ));
     }
 }
 
@@ -92,13 +89,14 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
 }
 
 template <class Property>
-static float get(const RenderCircleLayer& layer, const std::map<std::string, CircleProgram::PaintPropertyBinders>& paintPropertyBinders) {
-    auto it = paintPropertyBinders.find(layer.getID());
-    if (it == paintPropertyBinders.end() || !it->second.statistics<Property>().max()) {
-        return layer.evaluated.get<Property>().constantOr(Property::defaultValue());
-    } else {
-        return *it->second.statistics<Property>().max();
-    }
+static float get(const RenderCircleLayer&, const std::map<std::string, CircleProgram::PaintPropertyBinders>&) {
+//    auto it = paintPropertyBinders.find(layer.getID());
+//    if (it == paintPropertyBinders.end() || !it->second.statistics<Property>().max()) {
+//        return layer.evaluated.get<Property>().constantOr(Property::defaultValue());
+//    } else {
+//        return *it->second.statistics<Property>().max();
+//    }
+    return 0;
 }
 
 float CircleBucket::getQueryRadius(const RenderLayer& layer) const {
@@ -110,7 +108,7 @@ float CircleBucket::getQueryRadius(const RenderLayer& layer) const {
 
     float radius = get<CircleRadius>(*circleLayer, paintPropertyBinders);
     float stroke = get<CircleStrokeWidth>(*circleLayer, paintPropertyBinders);
-    auto translate = circleLayer->evaluated.get<CircleTranslate>();
+    auto translate = circleLayer->evaluated.circleTranslate;
     return radius + stroke + util::length(translate[0], translate[1]);
 }
 

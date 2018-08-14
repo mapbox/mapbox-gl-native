@@ -35,7 +35,7 @@ void RenderBackgroundLayer::transition(const TransitionParameters &parameters) {
 void RenderBackgroundLayer::evaluate(const PropertyEvaluationParameters &parameters) {
     evaluated = unevaluated.evaluate(parameters);
 
-    passes = evaluated.get<style::BackgroundOpacity>() > 0 ? RenderPass::Translucent
+    passes = evaluated.backgroundOpacity > 0 ? RenderPass::Translucent
                                                            : RenderPass::None;
 }
 
@@ -47,19 +47,19 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
     // Note that for bottommost layers without a pattern, the background color is drawn with
     // glClear rather than this method.
 
-    const Properties<>::PossiblyEvaluated properties;
-    const BackgroundProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+    static const NoProperties::PossiblyEvaluated properties;
+    static const NoProperties::Binders binders;
 
     auto draw = [&](auto& program, auto&& uniformValues) {
         const auto allUniformValues = program.computeAllUniformValues(
             std::move(uniformValues),
-            paintAttributeData,
+            binders,
             properties,
             parameters.state.getZoom()
         );
         const auto allAttributeBindings = program.computeAllAttributeBindings(
             parameters.staticData.tileVertexBuffer,
-            paintAttributeData,
+            binders,
             properties
         );
 
@@ -79,9 +79,9 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
         );
     };
 
-    if (!evaluated.get<BackgroundPattern>().to.empty()) {
-        optional<ImagePosition> imagePosA = parameters.imageManager.getPattern(evaluated.get<BackgroundPattern>().from);
-        optional<ImagePosition> imagePosB = parameters.imageManager.getPattern(evaluated.get<BackgroundPattern>().to);
+    if (!evaluated.backgroundPattern.to.empty()) {
+        optional<ImagePosition> imagePosA = parameters.imageManager.getPattern(evaluated.backgroundPattern.from);
+        optional<ImagePosition> imagePosB = parameters.imageManager.getPattern(evaluated.backgroundPattern.to);
 
         if (!imagePosA || !imagePosB)
             return;
@@ -93,11 +93,11 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.programs.backgroundPattern,
                 BackgroundPatternUniforms::values(
                     parameters.matrixForTile(tileID),
-                    evaluated.get<BackgroundOpacity>(),
+                    evaluated.backgroundOpacity,
                     parameters.imageManager.getPixelSize(),
                     *imagePosA,
                     *imagePosB,
-                    evaluated.get<BackgroundPattern>(),
+                    evaluated.backgroundPattern,
                     tileID,
                     parameters.state
                 )
@@ -109,8 +109,8 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.programs.background,
                 BackgroundProgram::UniformValues {
                     uniforms::u_matrix::Value{ parameters.matrixForTile(tileID) },
-                    uniforms::u_color::Value{ evaluated.get<BackgroundColor>() },
-                    uniforms::u_opacity::Value{ evaluated.get<BackgroundOpacity>() },
+                    uniforms::u_color::Value{ evaluated.backgroundColor },
+                    uniforms::u_opacity::Value{ evaluated.backgroundOpacity },
                 }
             );
         }

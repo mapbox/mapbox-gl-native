@@ -37,11 +37,9 @@ struct GeometryTooLongException : std::exception {};
 FillExtrusionBucket::FillExtrusionBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers)
     : Bucket(LayerType::FillExtrusion) {
     for (const auto& layer : layers) {
-        paintPropertyBinders.emplace(std::piecewise_construct,
-                                     std::forward_as_tuple(layer->getID()),
-                                     std::forward_as_tuple(
-                                                           layer->as<RenderFillExtrusionLayer>()->evaluated,
-                                                           parameters.tileID.overscaledZ));
+        paintPropertyBinders.emplace(
+            layer->getID(),
+            layer->as<RenderFillExtrusionLayer>()->evaluated.createBinders(parameters.tileID.overscaledZ));
     }
 }
 
@@ -167,7 +165,7 @@ float FillExtrusionBucket::getQueryRadius(const RenderLayer& layer) const {
         return 0;
     }
 
-    const std::array<float, 2>& translate = layer.as<RenderFillExtrusionLayer>()->evaluated.get<FillExtrusionTranslate>();
+    const std::array<float, 2>& translate = layer.as<RenderFillExtrusionLayer>()->evaluated.fillExtrusionTranslate;
     return util::length(translate[0], translate[1]);
 }
 

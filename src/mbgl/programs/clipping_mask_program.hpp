@@ -14,7 +14,7 @@ class ClippingMaskProgram : public Program<
     PositionOnlyLayoutAttributes,
     gl::Uniforms<
         uniforms::u_matrix>,
-    style::Properties<>>
+    style::NoProperties>
 {
 public:
     using Program::Program;

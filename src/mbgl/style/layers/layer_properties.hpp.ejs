@@ -36,20 +36,158 @@ struct <%- camelize(property.name) %> : <%- paintPropertyType(property, type) %>
 
 <% } -%>
 <% if (layoutProperties.length) { -%>
-class <%- camelize(type) %>LayoutProperties : public Properties<
-<% for (const property of layoutProperties.slice(0, -1)) { -%>
-    <%- camelize(property.name) %>,
+class <%- camelize(type) %>LayoutProperties {
+public:
+    class Evaluated {
+    public:
+<% for (const property of layoutProperties) { -%>
+        <%- evaluatedType(property) %> <%- camelizeWithLeadingLowercase(property.name) %>;
 <% } -%>
-    <%- camelize(layoutProperties.slice(-1)[0].name) %>
-> {};
+    };
+
+    class PossiblyEvaluated {
+    public:
+<% for (const property of layoutProperties) { -%>
+        <%- possiblyEvaluatedType(property) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+<% } -%>
+
+        Evaluated evaluate(float z, const GeometryTileFeature& feature) const;
+    };
+
+    class Unevaluated {
+    public:
+<% for (const property of layoutProperties) { -%>
+        <%- propertyValueType(property) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+<% } -%>
+
+        PossiblyEvaluated evaluate(const PropertyEvaluationParameters&) const;
+
+        friend bool operator==(const Unevaluated&, const Unevaluated&);
+        friend inline bool operator!=(const Unevaluated& lhs, const Unevaluated& rhs) { return !(lhs == rhs); }
+    };
+};
 
 <% } -%>
-class <%- camelize(type) %>PaintProperties : public Properties<
-<% for (const property of paintProperties.slice(0, -1)) { -%>
-    <%- camelize(property.name) %>,
+class <%- camelize(type) %>PaintProperties {
+public:
+<% if (type !== "symbol" && type !== "background" && type !== "raster" && type !== "hillshade") { -%>
+    class PossiblyEvaluated;
+
+    class Binders {
+    public:
+<% for (const property of paintProperties.filter(isDataDriven)) { -%>
+        std::unique_ptr<PaintPropertyBinder<<%- evaluatedType(property) %>, typename <%- attributeType(property, type) %>::Type>> <%- camelizeWithLeadingLowercase(property.name) %>;
 <% } -%>
-    <%- camelize(paintProperties.slice(-1)[0].name) %>
-> {};
+
+        void populateVertexVectors(const GeometryTileFeature&, std::size_t length);
+        void upload(gl::Context&);
+
+        using Attributes = gl::Attributes<
+            <%- paintProperties.filter(isDataDriven).map(property => `ZoomInterpolatedAttribute<${attributeType(property, type)}>`).join(',\n            ') %>
+        >;
+
+        using Uniforms = gl::Uniforms<
+            <%- paintProperties.filter(isDataDriven).map(property => `InterpolationUniform<${attributeType(property, type)}>`)
+            .concat(paintProperties.filter(isDataDriven).map(property => uniformType(property, type))).join(',\n            ') %>
+        >;
+
+        using AttributeBindings = typename Attributes::Bindings;
+        using UniformValues = typename Uniforms::Values;
+
+        AttributeBindings attributeBindings(const PossiblyEvaluated&) const;
+        UniformValues uniformValues(float z, const PossiblyEvaluated&) const;
+    };
+<% } -%>
+
+    class PossiblyEvaluated {
+    public:
+<% for (const property of paintProperties) { -%>
+        <%- possiblyEvaluatedType(property) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+<% } -%>
+<% if (type !== "symbol" && type !== "background" && type !== "raster" && type !== "hillshade") { -%>
+
+        Binders createBinders(float z) const;
+
+        std::bitset<8> constants() const;
+        std::vector<std::string> defines() const;
+<% } -%>
+    };
+
+    class Unevaluated {
+    public:
+<% for (const property of paintProperties) { -%>
+        style::Transitioning<<%- propertyValueType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %>;
+<% } -%>
+
+        bool hasTransition() const;
+        PossiblyEvaluated evaluate(const PropertyEvaluationParameters&) const;
+    };
+
+    class Transitionable {
+    public:
+<% for (const property of paintProperties) { -%>
+        style::Transitionable<<%- propertyValueType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %>;
+<% } -%>
+
+        Unevaluated transitioned(const TransitionParameters&, Unevaluated&& prior) const;
+        Unevaluated untransitioned() const;
+
+        bool hasDataDrivenPropertyDifference(const Transitionable& other) const;
+    };
+};
+
+<% if (type === "symbol") { -%>
+// {icon,text}-specific paint-property packs for use in the symbol Programs.
+// Since each program deals either with icons or text, using a smaller property set
+// lets us avoid unnecessarily binding attributes for properties the program wouldn't use.
+
+<% for (const subtype of ['icon', 'text']) {
+    const properties = paintProperties.filter(({name}) => name.startsWith(`${subtype}-`));
+%>
+class <%- camelize(subtype) %>PaintProperties {
+public:
+    class PossiblyEvaluated;
+
+    class Binders {
+    public:
+<% for (const property of properties.filter(isDataDriven)) { -%>
+        std::unique_ptr<PaintPropertyBinder<<%- evaluatedType(property) %>, typename <%- attributeType(property, type) %>::Type>> <%- camelizeWithLeadingLowercase(property.name) %>;
+<% } -%>
+
+        void populateVertexVectors(const GeometryTileFeature&, std::size_t length);
+        void upload(gl::Context&);
+
+        using Attributes = gl::Attributes<
+            <%- properties.filter(isDataDriven).map(property => `ZoomInterpolatedAttribute<${attributeType(property, type)}>`).join(',\n            ') %>
+        >;
+
+        using Uniforms = gl::Uniforms<
+            <%- properties.filter(isDataDriven).map(property => `InterpolationUniform<${attributeType(property, type)}>`).join(',\n            ') %>,
+            <%- properties.filter(isDataDriven).map(property => uniformType(property, type)).join(',\n            ') %>
+        >;
+
+        using AttributeBindings = typename Attributes::Bindings;
+        using UniformValues = typename Uniforms::Values;
+
+        AttributeBindings attributeBindings(const PossiblyEvaluated&) const;
+        UniformValues uniformValues(float z, const PossiblyEvaluated&) const;
+    };
+
+    class PossiblyEvaluated {
+    public:
+<% for (const property of properties) { -%>
+        <%- possiblyEvaluatedType(property) %> <%- camelizeWithLeadingLowercase(property.name) %>;
+<% } -%>
+
+        Binders createBinders(float z) const;
+
+        std::bitset<8> constants() const;
+        std::vector<std::string> defines() const;
+    };
+};
+
+<% } -%>
+<% } -%>
 
 } // namespace style
 } // namespace mbgl

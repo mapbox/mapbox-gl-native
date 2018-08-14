@@ -81,9 +81,9 @@ private:
 
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
-    
-    style::TextSize::UnevaluatedType textSize;
-    style::IconSize::UnevaluatedType iconSize;
+
+    style::PropertyValue<float> textSize;
+    style::PropertyValue<float> iconSize;
 
     std::vector<SymbolFeature> features;
 

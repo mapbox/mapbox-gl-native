@@ -1,0 +1,44 @@
+<%
+  const properties = locals.properties;
+-%>
+// This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
+
+#include <mbgl/style/light_properties.hpp>
+
+namespace mbgl {
+namespace style {
+
+LightProperties::Unevaluated LightProperties::Transitionable::transitioned(const TransitionParameters& parameters, Unevaluated&& prior) const {
+    return Unevaluated {
+<% for (const property of properties) { -%>
+        <%- camelizeWithLeadingLowercase(property.name) %>.transition(parameters, std::move(prior.<%- camelizeWithLeadingLowercase(property.name) %>)),
+<% } -%>
+    };
+}
+
+LightProperties::Unevaluated LightProperties::Transitionable::untransitioned() const {
+    return Unevaluated {
+<% for (const property of properties) { -%>
+        Transitioning<<%- propertyValueType(property) %>>(<%- camelizeWithLeadingLowercase(property.name) %>.value),
+<% } -%>
+    };
+}
+
+bool LightProperties::Unevaluated::hasTransition() const {
+    return false
+<% for (const property of properties) { -%>
+        || <%- camelizeWithLeadingLowercase(property.name) %>.hasTransition()
+<% } -%>
+        ;
+}
+
+LightProperties::Evaluated LightProperties::Unevaluated::evaluate(const PropertyEvaluationParameters& parameters) const {
+    return Evaluated {
+<% for (const property of properties) { -%>
+        <%- camelizeWithLeadingLowercase(property.name) %>.evaluate(typename Light<%- camelize(property.name) %>::EvaluatorType(parameters, Light<%- camelize(property.name) %>::defaultValue()), parameters.now),
+<% } -%>
+    };
+}
+
+} // namespace style
+} // namespace mbgl

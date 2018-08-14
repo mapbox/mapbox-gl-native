@@ -10,29 +10,6 @@ namespace mbgl {
 
 namespace style {
 
-// {icon,text}-specific paint-property packs for use in the symbol Programs.
-// Since each program deals either with icons or text, using a smaller property set
-// lets us avoid unnecessarily binding attributes for properties the program wouldn't use.
-class IconPaintProperties : public Properties<
-        IconOpacity,
-        IconColor,
-        IconHaloColor,
-        IconHaloWidth,
-        IconHaloBlur,
-        IconTranslate,
-        IconTranslateAnchor
-> {};
-
-class TextPaintProperties : public Properties<
-        TextOpacity,
-        TextColor,
-        TextHaloColor,
-        TextHaloWidth,
-        TextHaloBlur,
-        TextTranslate,
-        TextTranslateAnchor
-> {};
-
 // Repackaging evaluated values from SymbolLayoutProperties + SymbolPaintProperties
 // for genericity over icons vs. text.
 class SymbolPropertyValues {

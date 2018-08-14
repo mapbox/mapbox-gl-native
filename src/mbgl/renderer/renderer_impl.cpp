@@ -306,9 +306,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             const BackgroundPaintProperties::PossiblyEvaluated& paint = background->evaluated;
             if (parameters.contextMode == GLContextMode::Unique
                     && layerImpl.get() == layerImpls->at(0).get()
-                    && paint.get<BackgroundPattern>().from.empty()) {
+                    && paint.backgroundPattern.from.empty()) {
                 // This is a solid background. We can use glClear().
-                backgroundColor = paint.get<BackgroundColor>() * paint.get<BackgroundOpacity>();
+                backgroundColor = paint.backgroundColor * paint.backgroundOpacity;
             } else {
                 // This is a textured background, or not the bottommost layer. We need to render it with a quad.
                 order.emplace_back(RenderItem { *layer, nullptr });
@@ -481,8 +481,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     {
         MBGL_DEBUG_GROUP(parameters.context, "clipping masks");
 
-        static const Properties<>::PossiblyEvaluated properties {};
-        static const ClippingMaskProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+        static const NoProperties::PossiblyEvaluated properties;
+        static const NoProperties::Binders binders;
 
         for (const auto& clipID : parameters.clipIDGenerator.getClipIDs()) {
             auto& program = parameters.staticData.programs.clippingMask;
@@ -506,13 +506,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                     ClippingMaskProgram::UniformValues {
                         uniforms::u_matrix::Value{ parameters.matrixForTile(clipID.first) },
                     },
-                    paintAttributeData,
+                    binders,
                     properties,
                     parameters.state.getZoom()
                 ),
                 program.computeAllAttributeBindings(
                     parameters.staticData.tileVertexBuffer,
-                    paintAttributeData,
+                    binders,
                     properties
                 ),
                 "clipping"

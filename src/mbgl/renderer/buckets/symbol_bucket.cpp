@@ -32,12 +32,10 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
 
     for (const auto& pair : layerPaintProperties) {
         paintPropertyBinders.emplace(
-            std::piecewise_construct,
-            std::forward_as_tuple(pair.first),
-            std::forward_as_tuple(
-                std::piecewise_construct,
-                std::forward_as_tuple(pair.second.first, zoom),
-                std::forward_as_tuple(pair.second.second, zoom)));
+            pair.first,
+            std::make_pair(
+                pair.second.first.createBinders(zoom),
+                pair.second.second.createBinders(zoom)));
     }
 }
 

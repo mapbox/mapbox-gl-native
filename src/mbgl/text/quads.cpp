@@ -33,7 +33,7 @@ SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
     Point<float> br;
     Point<float> bl;
 
-    if (layout.get<IconTextFit>() != IconTextFitType::None && shapedText) {
+    if (layout.iconTextFit != IconTextFitType::None && shapedText) {
         auto iconWidth = right - left;
         auto iconHeight = bottom - top;
         auto size = layoutTextSize / 24.0f;
@@ -43,14 +43,14 @@ SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
         auto textBottom = shapedText.bottom * size;
         auto textWidth = textRight - textLeft;
         auto textHeight = textBottom - textTop;
-        auto padT = layout.get<IconTextFitPadding>()[0];
-        auto padR = layout.get<IconTextFitPadding>()[1];
-        auto padB = layout.get<IconTextFitPadding>()[2];
-        auto padL = layout.get<IconTextFitPadding>()[3];
-        auto offsetY = layout.get<IconTextFit>() == IconTextFitType::Width ? (textHeight - iconHeight) * 0.5 : 0;
-        auto offsetX = layout.get<IconTextFit>() == IconTextFitType::Height ? (textWidth - iconWidth) * 0.5 : 0;
-        auto width = layout.get<IconTextFit>() == IconTextFitType::Width || layout.get<IconTextFit>() == IconTextFitType::Both ? textWidth : iconWidth;
-        auto height = layout.get<IconTextFit>() == IconTextFitType::Height || layout.get<IconTextFit>() == IconTextFitType::Both ? textHeight : iconHeight;
+        auto padT = layout.iconTextFitPadding[0];
+        auto padR = layout.iconTextFitPadding[1];
+        auto padB = layout.iconTextFitPadding[2];
+        auto padL = layout.iconTextFitPadding[3];
+        auto offsetY = layout.iconTextFit == IconTextFitType::Width ? (textHeight - iconHeight) * 0.5 : 0;
+        auto offsetX = layout.iconTextFit == IconTextFitType::Height ? (textWidth - iconWidth) * 0.5 : 0;
+        auto width = layout.iconTextFit == IconTextFitType::Width || layout.iconTextFit == IconTextFitType::Both ? textWidth : iconWidth;
+        auto height = layout.iconTextFit == IconTextFitType::Height || layout.iconTextFit == IconTextFitType::Both ? textHeight : iconHeight;
         left = textLeft + offsetX - padL;
         top = textTop + offsetY - padT;
         right = textLeft + offsetX + padR + width;
@@ -95,10 +95,10 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
                           const SymbolLayoutProperties::Evaluated& layout,
                           const style::SymbolPlacementType placement,
                           const GlyphPositionMap& positions) {
-    const float textRotate = layout.get<TextRotate>() * util::DEG2RAD;
+    const float textRotate = layout.textRotate * util::DEG2RAD;
 
     const float oneEm = 24.0;
-    std::array<float, 2> textOffset = layout.get<TextOffset>();
+    std::array<float, 2> textOffset = layout.textOffset;
     textOffset[0] *= oneEm;
     textOffset[1] *= oneEm;
 
@@ -117,7 +117,7 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
         const float rectBuffer = 3.0f + glyphPadding;
 
         const float halfAdvance = glyph.metrics.advance / 2.0;
-        const bool alongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map && placement != SymbolPlacementType::Point;
+        const bool alongLine = layout.textRotationAlignment == AlignmentType::Map && placement != SymbolPlacementType::Point;
 
         const Point<float> glyphOffset = alongLine ?
             Point<float>{ positionedGlyph.x + halfAdvance, positionedGlyph.y } :

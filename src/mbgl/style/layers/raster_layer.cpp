@@ -86,26 +86,26 @@ PropertyValue<float> RasterLayer::getDefaultRasterOpacity() {
 }
 
 PropertyValue<float> RasterLayer::getRasterOpacity() const {
-    return impl().paint.template get<RasterOpacity>().value;
+    return impl().paint.rasterOpacity.value;
 }
 
 void RasterLayer::setRasterOpacity(PropertyValue<float> value) {
     if (value == getRasterOpacity())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterOpacity>().value = value;
+    impl_->paint.rasterOpacity.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void RasterLayer::setRasterOpacityTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterOpacity>().options = options;
+    impl_->paint.rasterOpacity.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions RasterLayer::getRasterOpacityTransition() const {
-    return impl().paint.template get<RasterOpacity>().options;
+    return impl().paint.rasterOpacity.options;
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterHueRotate() {
@@ -113,26 +113,26 @@ PropertyValue<float> RasterLayer::getDefaultRasterHueRotate() {
 }
 
 PropertyValue<float> RasterLayer::getRasterHueRotate() const {
-    return impl().paint.template get<RasterHueRotate>().value;
+    return impl().paint.rasterHueRotate.value;
 }
 
 void RasterLayer::setRasterHueRotate(PropertyValue<float> value) {
     if (value == getRasterHueRotate())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterHueRotate>().value = value;
+    impl_->paint.rasterHueRotate.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void RasterLayer::setRasterHueRotateTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterHueRotate>().options = options;
+    impl_->paint.rasterHueRotate.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions RasterLayer::getRasterHueRotateTransition() const {
-    return impl().paint.template get<RasterHueRotate>().options;
+    return impl().paint.rasterHueRotate.options;
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMin() {
@@ -140,26 +140,26 @@ PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMin() {
 }
 
 PropertyValue<float> RasterLayer::getRasterBrightnessMin() const {
-    return impl().paint.template get<RasterBrightnessMin>().value;
+    return impl().paint.rasterBrightnessMin.value;
 }
 
 void RasterLayer::setRasterBrightnessMin(PropertyValue<float> value) {
     if (value == getRasterBrightnessMin())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterBrightnessMin>().value = value;
+    impl_->paint.rasterBrightnessMin.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void RasterLayer::setRasterBrightnessMinTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterBrightnessMin>().options = options;
+    impl_->paint.rasterBrightnessMin.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions RasterLayer::getRasterBrightnessMinTransition() const {
-    return impl().paint.template get<RasterBrightnessMin>().options;
+    return impl().paint.rasterBrightnessMin.options;
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMax() {
@@ -167,26 +167,26 @@ PropertyValue<float> RasterLayer::getDefaultRasterBrightnessMax() {
 }
 
 PropertyValue<float> RasterLayer::getRasterBrightnessMax() const {
-    return impl().paint.template get<RasterBrightnessMax>().value;
+    return impl().paint.rasterBrightnessMax.value;
 }
 
 void RasterLayer::setRasterBrightnessMax(PropertyValue<float> value) {
     if (value == getRasterBrightnessMax())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterBrightnessMax>().value = value;
+    impl_->paint.rasterBrightnessMax.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void RasterLayer::setRasterBrightnessMaxTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterBrightnessMax>().options = options;
+    impl_->paint.rasterBrightnessMax.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions RasterLayer::getRasterBrightnessMaxTransition() const {
-    return impl().paint.template get<RasterBrightnessMax>().options;
+    return impl().paint.rasterBrightnessMax.options;
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterSaturation() {
@@ -194,26 +194,26 @@ PropertyValue<float> RasterLayer::getDefaultRasterSaturation() {
 }
 
 PropertyValue<float> RasterLayer::getRasterSaturation() const {
-    return impl().paint.template get<RasterSaturation>().value;
+    return impl().paint.rasterSaturation.value;
 }
 
 void RasterLayer::setRasterSaturation(PropertyValue<float> value) {
     if (value == getRasterSaturation())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterSaturation>().value = value;
+    impl_->paint.rasterSaturation.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void RasterLayer::setRasterSaturationTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterSaturation>().options = options;
+    impl_->paint.rasterSaturation.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions RasterLayer::getRasterSaturationTransition() const {
-    return impl().paint.template get<RasterSaturation>().options;
+    return impl().paint.rasterSaturation.options;
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterContrast() {
@@ -221,26 +221,26 @@ PropertyValue<float> RasterLayer::getDefaultRasterContrast() {
 }
 
 PropertyValue<float> RasterLayer::getRasterContrast() const {
-    return impl().paint.template get<RasterContrast>().value;
+    return impl().paint.rasterContrast.value;
 }
 
 void RasterLayer::setRasterContrast(PropertyValue<float> value) {
     if (value == getRasterContrast())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterContrast>().value = value;
+    impl_->paint.rasterContrast.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void RasterLayer::setRasterContrastTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterContrast>().options = options;
+    impl_->paint.rasterContrast.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions RasterLayer::getRasterContrastTransition() const {
-    return impl().paint.template get<RasterContrast>().options;
+    return impl().paint.rasterContrast.options;
 }
 
 PropertyValue<RasterResamplingType> RasterLayer::getDefaultRasterResampling() {
@@ -248,26 +248,26 @@ PropertyValue<RasterResamplingType> RasterLayer::getDefaultRasterResampling() {
 }
 
 PropertyValue<RasterResamplingType> RasterLayer::getRasterResampling() const {
-    return impl().paint.template get<RasterResampling>().value;
+    return impl().paint.rasterResampling.value;
 }
 
 void RasterLayer::setRasterResampling(PropertyValue<RasterResamplingType> value) {
     if (value == getRasterResampling())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterResampling>().value = value;
+    impl_->paint.rasterResampling.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void RasterLayer::setRasterResamplingTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterResampling>().options = options;
+    impl_->paint.rasterResampling.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions RasterLayer::getRasterResamplingTransition() const {
-    return impl().paint.template get<RasterResampling>().options;
+    return impl().paint.rasterResampling.options;
 }
 
 PropertyValue<float> RasterLayer::getDefaultRasterFadeDuration() {
@@ -275,26 +275,26 @@ PropertyValue<float> RasterLayer::getDefaultRasterFadeDuration() {
 }
 
 PropertyValue<float> RasterLayer::getRasterFadeDuration() const {
-    return impl().paint.template get<RasterFadeDuration>().value;
+    return impl().paint.rasterFadeDuration.value;
 }
 
 void RasterLayer::setRasterFadeDuration(PropertyValue<float> value) {
     if (value == getRasterFadeDuration())
         return;
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterFadeDuration>().value = value;
+    impl_->paint.rasterFadeDuration.value = value;
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
 
 void RasterLayer::setRasterFadeDurationTransition(const TransitionOptions& options) {
     auto impl_ = mutableImpl();
-    impl_->paint.template get<RasterFadeDuration>().options = options;
+    impl_->paint.rasterFadeDuration.options = options;
     baseImpl = std::move(impl_);
 }
 
 TransitionOptions RasterLayer::getRasterFadeDurationTransition() const {
-    return impl().paint.template get<RasterFadeDuration>().options;
+    return impl().paint.rasterFadeDuration.options;
 }
 
 using namespace conversion;

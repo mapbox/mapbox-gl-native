@@ -55,8 +55,8 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
         return;
     }
 
-    static const style::Properties<>::PossiblyEvaluated properties {};
-    static const DebugProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+    static const NoProperties::PossiblyEvaluated properties;
+    static const NoProperties::Binders binders;
 
     auto& programInstance = parameters.programs.debug;
 
@@ -74,13 +74,13 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
                     uniforms::u_matrix::Value{ matrix },
                     uniforms::u_color::Value{ Color::red() }
                 },
-                paintAttributeData,
+                binders,
                 properties,
                 parameters.state.getZoom()
             ),
             programInstance.computeAllAttributeBindings(
                 parameters.staticData.tileVertexBuffer,
-                paintAttributeData,
+                binders,
                 properties
             ),
             "image"
