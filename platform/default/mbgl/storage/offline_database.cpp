@@ -79,8 +79,11 @@ void OfflineDatabase::initialize() {
 
 void OfflineDatabase::handleError(const mapbox::sqlite::Exception& ex, const char* action) {
     if (ex.code == mapbox::sqlite::ResultCode::NotADB ||
-        ex.code == mapbox::sqlite::ResultCode::Corrupt) {
-        // Corrupted; delete database so that we have a clean slate for the next operation.
+        ex.code == mapbox::sqlite::ResultCode::Corrupt ||
+        (ex.code == mapbox::sqlite::ResultCode::ReadOnly &&
+         ex.extendedCode == mapbox::sqlite::ExtendedResultCode::ReadOnlyDBMoved)) {
+        // The database was corruped, moved away, or deleted. We're going to start fresh with a
+        // clean slate for the next operation.
         Log::Error(Event::Database, static_cast<int>(ex.code), "Can't %s: %s", action, ex.what());
         try {
             removeExisting();

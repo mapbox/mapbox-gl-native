@@ -15,7 +15,7 @@ enum OpenFlag : int {
     ReadWriteCreate = 0b110,
 };
 
-enum class ResultCode : int {
+enum class ResultCode : uint8_t {
     OK = 0,
     Error = 1,
     Internal = 2,
@@ -40,24 +40,25 @@ enum class ResultCode : int {
     NoLFS = 22,
     Auth = 23,
     Range = 25,
-    NotADB = 26
+    NotADB = 26,
+};
+
+enum class ExtendedResultCode : uint8_t {
+    Unknown = 0,
+    ReadOnlyDBMoved = 4,
 };
 
 class Exception : public std::runtime_error {
 public:
-    Exception(int err, const char* msg)
-        : std::runtime_error(msg), code(static_cast<ResultCode>(err)) {
-    }
-    Exception(ResultCode err, const char* msg)
-        : std::runtime_error(msg), code(err) {
-    }
+    Exception(ResultCode err, const char* msg) : Exception(static_cast<int>(err), msg) {}
+    Exception(int err, const char* msg) : Exception(err, std::string{ msg }) {}
     Exception(int err, const std::string& msg)
-        : std::runtime_error(msg), code(static_cast<ResultCode>(err)) {
-    }
-    Exception(ResultCode err, const std::string& msg)
-        : std::runtime_error(msg), code(err) {
+        : std::runtime_error(msg),
+          code(static_cast<ResultCode>(err)),
+          extendedCode(static_cast<ExtendedResultCode>(err >> 8)) {
     }
     const ResultCode code = ResultCode::OK;
+    const ExtendedResultCode extendedCode = ExtendedResultCode::Unknown;
 };
 
 class DatabaseImpl;
