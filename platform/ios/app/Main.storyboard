@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="PSe-Ot-7Ff">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="PSe-Ot-7Ff">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
@@ -109,6 +109,7 @@
                         <outlet property="hudLabel" destination="58y-pX-YyB" id="aGG-7a-bZR"/>
                         <outlet property="mapView" destination="kNe-zV-9ha" id="VNR-WO-1q4"/>
                         <segue destination="zvf-Qd-4Ru" kind="show" identifier="ShowSnapshots" id="hzX-Jp-UJq"/>
+                        <segue destination="rDA-Op-Bn4" kind="show" identifier="ShowCustomLocationManger" id="Vf5-KJ-D1o"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AAd-8J-9UU" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -439,6 +440,24 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5xV-Ua-pqK" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1365.5999999999999" y="1083.5082458770617"/>
+        </scene>
+        <!--Custom Location View Controller-->
+        <scene sceneID="FxN-mZ-P8g">
+            <objects>
+                <viewController id="rDA-Op-Bn4" customClass="MBXCustomLocationViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="fey-Kw-zgT"/>
+                        <viewControllerLayoutGuide type="bottom" id="vIO-D1-Cjc"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="M5Z-IF-OVV">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dXz-mZ-pkS" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2071" y="1084"/>
         </scene>
     </scenes>
     <resources>
