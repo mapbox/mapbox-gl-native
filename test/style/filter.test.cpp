@@ -251,3 +251,7 @@ TEST(Filter, ZoomExpressionNested) {
 TEST(Filter, Internal) {
     filter(R"(["filter-==","class","snow"])");
 }
+
+TEST(Filter, Short) {
+    filter(R"(["==", ["id"], "foo"])");
+}
