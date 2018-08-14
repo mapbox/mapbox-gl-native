@@ -1,6 +1,7 @@
 #import "MGLShapeCollection.h"
 
 #import "MGLShape_Private.h"
+#import "MGLFeature.h"
 
 #import <mbgl/style/conversion/geojson.hpp>
 
