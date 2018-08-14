@@ -1,5 +1,6 @@
 # master
 - Don't default-show text/icons that depend on the placement of a paired icon/text [#12483](https://github.com/mapbox/mapbox-gl-native/issues/12483)
+- Fix symbol querying for annotations near tile boundaries at high zoom. ([#12472](https://github.com/mapbox/mapbox-gl-native/issues/12472))
 - The `Map` constructor now accepts a `mode` option which can be either `"static"` (default) or `"tile"`. It must be set to `"tile"` when rendering individual tiles in order for the symbols to match across tiles.
 - Remove unnecessary memory use when collision debug mode is not enabled ([#12294](https://github.com/mapbox/mapbox-gl-native/issues/12294))
 - Added support for rendering `symbol-placement: line-center` ([#12337](https://github.com/mapbox/mapbox-gl-native/pull/12337))
