@@ -426,6 +426,12 @@ jobs:
                 --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
                 --device-ids sailfish --os-version-ids 26 --locales en --orientations portrait --timeout 20m
             fi
+      - run:
+          name: gzip debugable .so files
+          command: |
+            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/armeabi-v7a/libmapbox-gl.so 
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/armeabi-v7a/libmapbox-gl.so.gz              
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
           destination: .
@@ -491,9 +497,24 @@ jobs:
       - *save-mason_packages-cache
       - *save-ccache
       - *save-gradle-cache
+      - run:
+          name: gzip debugable .so files
+          command: |
+            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/arm64-v8a/libmapbox-gl.so && \
+            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/armeabi-v7a/libmapbox-gl.so && \
+            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86/libmapbox-gl.so && \
+            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86_64/libmapbox-gl.so
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/release
           destination: .
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/arm64-v8a/libmapbox-gl.so.gz
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/armeabi-v7a/libmapbox-gl.so.gz
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86/libmapbox-gl.so.gz
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/release/obj/x86_64/libmapbox-gl.so.gz
       - run:
           name: Record size
           command: platform/android/scripts/metrics.sh
