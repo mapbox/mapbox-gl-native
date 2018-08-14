@@ -1,6 +1,7 @@
 #include "sqlite3.hpp"
 #include <sqlite3.h>
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <cstdio>
