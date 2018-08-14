@@ -41,8 +41,7 @@ Studio, especially when multitasking is enabled. Your user’s viewing distance
 may be shorter than on a desktop computer. Some of your users may use the Larger
 Dynamic Type and Accessibility Text features to increase the size of all text on
 the device. You can use the
-[runtime styling API](#manipulating-the-style-at-runtime) to adjust your style’s to adjust your style’s
-font and icon sizes accordingly.
+[runtime styling API](#manipulating-the-style-at-runtime) to adjust your style’s font and icon sizes accordingly.
 
 Design sprite images and choose font weights that look crisp on both
 standard-resolution displays and Retina displays. This SDK supports the same
