@@ -244,6 +244,18 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark Selecting Annotations
 
 /**
+ Returns a Boolean value indicating whether the annotation can be selected.
+ 
+ If the return value is `YES`, or if this method is absent from the delegate,
+ the annotation will be selected.
+ 
+ @param mapView The map view that has selected the annotation.
+ @param annotation The object representing the annotation.
+ @return A Boolean value indicating whether the annotation can be selected.
+ */
+- (BOOL)mapView:(MGLMapView *)mapView canSelectAnnotation:(id <MGLAnnotation>)annotation;
+
+/**
  Tells the delegate that one of its annotations has been selected.
 
  You can use this method to track changes to the selection state of annotations.
