@@ -13,6 +13,7 @@ import com.mapbox.mapboxsdk.testapp.activity.style.GridSourceActivity
 import com.mapbox.mapboxsdk.testapp.activity.style.GridSourceActivity.ID_GRID_LAYER
 import com.mapbox.mapboxsdk.testapp.activity.style.GridSourceActivity.ID_GRID_SOURCE
 import org.junit.Assert
+import org.junit.Ignore
 import org.junit.Test
 
 class CustomGeometrySourceTest : BaseActivityTest() {
@@ -34,6 +35,7 @@ class CustomGeometrySourceTest : BaseActivityTest() {
   }
 
   @Test
+  @Ignore
   fun threadsShutdownWhenSourceRemovedTest() {
     validateTestSetup()
     invoke(mapboxMap) { uiController, mapboxMap ->
@@ -49,6 +51,7 @@ class CustomGeometrySourceTest : BaseActivityTest() {
   }
 
   @Test
+  @Ignore
   fun threadsRestartedWhenSourceReAddedTest() {
     validateTestSetup()
     invoke(mapboxMap) { uiController, mapboxMap ->

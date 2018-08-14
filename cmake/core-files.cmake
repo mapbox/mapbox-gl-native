@@ -436,9 +436,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/conversion/json.hpp
     src/mbgl/style/conversion/layer.cpp
     src/mbgl/style/conversion/light.cpp
-    src/mbgl/style/conversion/make_property_setters.hpp
     src/mbgl/style/conversion/position.cpp
-    src/mbgl/style/conversion/property_setter.hpp
     src/mbgl/style/conversion/source.cpp
     src/mbgl/style/conversion/stringify.hpp
     src/mbgl/style/conversion/tileset.cpp
@@ -709,6 +707,7 @@ set(MBGL_CORE_FILES
     src/mbgl/util/dtoa.cpp
     src/mbgl/util/dtoa.hpp
     src/mbgl/util/event.cpp
+    src/mbgl/util/fnv_hash.hpp
     src/mbgl/util/font_stack.cpp
     src/mbgl/util/geo.cpp
     src/mbgl/util/geojson_impl.cpp

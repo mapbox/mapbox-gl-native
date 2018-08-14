@@ -6,12 +6,14 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Improved the Swift interface for `MGLMapView.decelerationRate`. ([#12584](https://github.com/mapbox/mapbox-gl-native/issues/12584))
 * Fixed inconsistencies in exception naming. ([#12583](https://github.com/mapbox/mapbox-gl-native/issues/12583))
+* Don't default-show text/icons that depend on the placement of a paired icon/text [#12483](https://github.com/mapbox/mapbox-gl-native/issues/12483)
 
 ## 4.3.0
 
 ### Styles and rendering
 
 * Added an `MGLMapView.preferredFramesPerSecond` property that controls the rate at which the map view is rendered. The default rate now adapts to device capabilities to provide a smoother experience. ([#12501](https://github.com/mapbox/mapbox-gl-native/issues/12501))
+* Added a new option to `MGLSymbolPlacement`, `MGLSymbolPlacementLineCenter`, that places the label relative to the center of the geometry. ([#12337](https://github.com/mapbox/mapbox-gl-native/pull/12337))
 
 ### Other changes
 
