@@ -15,7 +15,7 @@ umbrella_header: src/Mapbox.h
 framework_root: ../darwin/src
 
 custom_categories:
-  - name: Guides
+  - name: Appendices
     children:
       - Working with GeoJSON Data
       - Predicates and Expressions
