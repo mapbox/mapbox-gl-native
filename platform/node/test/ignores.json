@@ -88,5 +88,11 @@
   "render-tests/combinations/symbol-translucent--fill-extrusion-translucent": "needs investigation",
   "render-tests/feature-state/composite-expression": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue",
   "render-tests/feature-state/data-expression": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue",
-  "render-tests/feature-state/vector-source": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue"
+  "render-tests/feature-state/vector-source": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue",
+  "render-tests/text-field/formatted-arabic": "https://github.com/mapbox/mapbox-gl-native/issues/12612",
+  "render-tests/text-field/formatted-line": "https://github.com/mapbox/mapbox-gl-native/issues/12612",
+  "render-tests/text-field/formatted": "https://github.com/mapbox/mapbox-gl-native/issues/12612",
+  "render-tests/basic-v9/z0-wide": "https://github.com/mapbox/mapbox-gl-native/pull/12611",
+  "render-tests/bright-v9/z0-wide": "https://github.com/mapbox/mapbox-gl-native/pull/12611",
+  "render-tests/satellite-v9/z0-wide": "https://github.com/mapbox/mapbox-gl-native/pull/12611"
 }
