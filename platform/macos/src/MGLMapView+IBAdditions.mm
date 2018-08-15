@@ -1,5 +1,7 @@
 #import "MGLMapView+IBAdditions.h"
 
+#import "MGLStyle.h"
+
 #import "MGLMapView_Private.h"
 
 @implementation MGLMapView (IBAdditions)
@@ -17,7 +19,7 @@
                  [NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSURL *url = URLString.length ? [NSURL URLWithString:URLString] : nil;
     if (URLString.length && !url) {
-        [NSException raise:@"Invalid style URL"
+        [NSException raise:MGLInvalidStyleURLException
                     format:@"“%@” is not a valid style URL.", URLString];
     }
     self.styleURL = url;
