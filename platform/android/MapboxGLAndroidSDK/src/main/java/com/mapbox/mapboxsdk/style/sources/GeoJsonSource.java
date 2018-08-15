@@ -29,7 +29,7 @@ public class GeoJsonSource extends Source {
    * @param nativePtr - pointer to native peer
    */
   @Keep
-  public GeoJsonSource(long nativePtr) {
+  GeoJsonSource(long nativePtr) {
     super(nativePtr);
   }
 

@@ -18,7 +18,7 @@ public abstract class Layer {
   private boolean invalidated;
 
   @Keep
-  public Layer(long nativePtr) {
+  protected Layer(long nativePtr) {
     checkThread();
     this.nativePtr = nativePtr;
   }

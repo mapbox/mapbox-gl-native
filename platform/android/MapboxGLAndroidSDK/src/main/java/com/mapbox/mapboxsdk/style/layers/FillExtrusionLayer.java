@@ -28,7 +28,7 @@ public class FillExtrusionLayer extends Layer {
    * @param nativePtr pointer used by core
    */
   @Keep
-  public FillExtrusionLayer(long nativePtr) {
+  FillExtrusionLayer(long nativePtr) {
     super(nativePtr);
   }
 

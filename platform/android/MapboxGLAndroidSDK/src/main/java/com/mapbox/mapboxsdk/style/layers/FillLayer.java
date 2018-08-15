@@ -28,7 +28,7 @@ public class FillLayer extends Layer {
    * @param nativePtr pointer used by core
    */
   @Keep
-  public FillLayer(long nativePtr) {
+  FillLayer(long nativePtr) {
     super(nativePtr);
   }
 

@@ -28,7 +28,7 @@ public class BackgroundLayer extends Layer {
    * @param nativePtr pointer used by core
    */
   @Keep
-  public BackgroundLayer(long nativePtr) {
+  BackgroundLayer(long nativePtr) {
     super(nativePtr);
   }
 
