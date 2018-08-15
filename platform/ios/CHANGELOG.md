@@ -31,7 +31,6 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Closed a security vulnerability introduced in 4.1.0 that would potentially allow the owner of a style to compromise apps loading that style. ([#12571](https://github.com/mapbox/mapbox-gl-native/pull/12571))
 * Reduced binary size and improved performance by enabling LTO. ([#12502](https://github.com/mapbox/mapbox-gl-native/pull/12502))
 
-
 ## 4.2.0 - July 18, 2018
 
 ### Packaging
