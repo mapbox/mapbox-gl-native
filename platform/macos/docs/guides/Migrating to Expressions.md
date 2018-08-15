@@ -5,7 +5,7 @@
 
 # Migrating from Style Functions to Expressions
 
-[Runtime Styling](runtime-styling.html) enables you to modify every aspect of the map’s appearance dynamically as a user interacts with your application. Developers can specify in advance how a layout or paint attribute will vary as the zoom level changes or how the appearance of individual features vary based on metadata provided by a content source.
+[Runtime Styling](https://www.mapbox.com/ios-sdk/maps/overview/runtime-styling/) enables you to modify every aspect of the map’s appearance dynamically as a user interacts with your application. Developers can specify in advance how a layout or paint attribute will vary as the zoom level changes or how the appearance of individual features vary based on metadata provided by a content source.
 
 With Mapbox Maps SDK for macOS v0.7.0, style functions have been replaced with expressions. These provide even more tools for developers who want to style their maps dynamically. This guide outlines some tips for migrating from style functions to expressions, and offers an overview of some things that developers can do with expressions.
 
@@ -113,7 +113,7 @@ mapView.style?.insertLayer(layer, below: symbolLayer)
 
 If you previously used an interpolation base greater than `0` (other than `1`), you can use `MGLExpressionInterpolationMode.exponential` as the curve type for `+[NSExpression(MGLAdditions) mgl_expressionForInterpolatingExpression:withCurveType:parameters:stops:]` or `'exponential'` as the curve type for [`mgl_interpolate:withCurveType:parameters:stops:`](predicates-and-expressions.html#code-mgl_interpolate-withcurvetype-parameters-stops-code). The `parameters` argument takes that interpolation base. This interpolates between values exponentially, creating an accelerated ramp effect.
 
-Here’s a visualization from Mapbox Studio (see [Working with Mapbox Studio](working-with-mapbox-studio.html)) comparing interpolation base values of `1.5` and `0.5` based on zoom. In order to convert camera style functions, use `$zoomLevel` or `MGL_FUNCTION('zoomLevel')` as the attribute key.
+Here’s a visualization from Mapbox Studio (see [Mapbox Studio and iOS](https://www.mapbox.com/ios-sdk/maps/overview/mapbox-studio/)) comparing interpolation base values of `1.5` and `0.5` based on zoom. In order to convert camera style functions, use `$zoomLevel` or `MGL_FUNCTION('zoomLevel')` as the attribute key.
 
 <img src="img/data-driven-styling/exponential-function.png" height=344/>
 <img src="img/data-driven-styling/exponential-function-1.png" height=344/>

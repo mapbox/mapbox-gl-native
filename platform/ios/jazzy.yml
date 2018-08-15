@@ -15,11 +15,8 @@ umbrella_header: src/Mapbox.h
 framework_root: ../darwin/src
 
 custom_categories:
-  - name: Guides
+  - name: Appendices
     children:
-      - Adding Markers to a Map
-      - Runtime Styling
-      - Working with Mapbox Studio
       - Working with GeoJSON Data
       - Predicates and Expressions
       - Migrating to Expressions

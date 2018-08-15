@@ -42,7 +42,7 @@ may be shorter than on a desktop computer. Some of your users may use the Larger
 Dynamic Type and Accessibility Text features to increase the size of all text on
 the device. You can use the
 [runtime styling API](#manipulating-the-style-at-runtime) to adjust your style’s
-font and icon sizes accordingly.
+ font and icon sizes accordingly.
 
 Design sprite images and choose font weights that look crisp on both
 standard-resolution displays and Retina displays. This SDK supports the same
@@ -98,7 +98,7 @@ represented at runtime by an `MGLStyle` object, which provides access to various
 `MGLSource` and `MGLStyleLayer` objects that represent content sources and style
 layers, respectively.
 For more information about the capabilities exposed by the runtime styling API,
-see “[Runtime Styling](runtime-styling.html)”.
+see “[Runtime Styling](https://www.mapbox.com/ios-sdk/maps/overview/runtime-styling/)”.
 
 The names of runtime styling classes and properties on iOS are generally
 consistent with the style specification and Mapbox Studio’s Styles editor. Any
