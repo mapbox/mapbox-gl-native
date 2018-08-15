@@ -40,7 +40,7 @@ Create a [Podfile](https://guides.cocoapods.org/syntax/podfile.html) with the fo
 platform :osx, '10.11'
 
 target 'TargetNameForYourApp' do
-  pod 'Mapbox-iOS-SDK', '~> x.y'
+  pod 'Mapbox-macOS-SDK', '~> x.y'
 end
 ```
 
