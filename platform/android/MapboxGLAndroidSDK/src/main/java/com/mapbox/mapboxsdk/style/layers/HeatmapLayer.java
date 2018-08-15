@@ -28,7 +28,7 @@ public class HeatmapLayer extends Layer {
    * @param nativePtr pointer used by core
    */
   @Keep
-  public HeatmapLayer(long nativePtr) {
+  HeatmapLayer(long nativePtr) {
     super(nativePtr);
   }
 

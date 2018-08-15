@@ -21,7 +21,7 @@ public class RasterDemSource extends Source {
    * @param nativePtr - pointer to native peer
    */
   @Keep
-  private RasterDemSource(long nativePtr) {
+  RasterDemSource(long nativePtr) {
     super(nativePtr);
   }
 

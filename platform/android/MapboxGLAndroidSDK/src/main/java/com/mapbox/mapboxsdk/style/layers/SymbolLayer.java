@@ -28,7 +28,7 @@ public class SymbolLayer extends Layer {
    * @param nativePtr pointer used by core
    */
   @Keep
-  public SymbolLayer(long nativePtr) {
+  SymbolLayer(long nativePtr) {
     super(nativePtr);
   }
 

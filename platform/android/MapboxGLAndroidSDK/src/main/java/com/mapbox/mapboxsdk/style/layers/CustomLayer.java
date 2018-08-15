@@ -16,7 +16,7 @@ public class CustomLayer extends Layer {
   }
 
   @Keep
-  public CustomLayer(long nativePtr) {
+  CustomLayer(long nativePtr) {
     super(nativePtr);
   }
 

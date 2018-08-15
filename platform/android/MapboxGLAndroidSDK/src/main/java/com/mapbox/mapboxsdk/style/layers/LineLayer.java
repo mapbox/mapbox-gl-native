@@ -28,7 +28,7 @@ public class LineLayer extends Layer {
    * @param nativePtr pointer used by core
    */
   @Keep
-  public LineLayer(long nativePtr) {
+  LineLayer(long nativePtr) {
     super(nativePtr);
   }
 

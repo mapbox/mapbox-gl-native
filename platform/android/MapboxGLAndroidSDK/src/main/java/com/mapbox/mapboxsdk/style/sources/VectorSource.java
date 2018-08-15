@@ -28,7 +28,7 @@ public class VectorSource extends Source {
    * @param nativePtr - pointer to native peer
    */
   @Keep
-  public VectorSource(long nativePtr) {
+  VectorSource(long nativePtr) {
     super(nativePtr);
   }
 

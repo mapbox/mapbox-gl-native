@@ -35,7 +35,7 @@ public class ImageSource extends Source {
    * @param nativePtr - pointer to native peer
    */
   @Keep
-  public ImageSource(long nativePtr) {
+  ImageSource(long nativePtr) {
     super(nativePtr);
   }
 

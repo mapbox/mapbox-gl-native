@@ -28,7 +28,7 @@ public class HillshadeLayer extends Layer {
    * @param nativePtr pointer used by core
    */
   @Keep
-  public HillshadeLayer(long nativePtr) {
+  HillshadeLayer(long nativePtr) {
     super(nativePtr);
   }
 
