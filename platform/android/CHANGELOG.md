@@ -9,6 +9,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 ## 6.4.0 - August 15, 2018
  - Use unconverted bearing value for LatLngBounds calculation [#12616](https://github.com/mapbox/mapbox-gl-native/pull/12616)
  - Store release so files with debugging information [#12628](https://github.com/mapbox/mapbox-gl-native/pull/12628)
+ - Close a security vulnerability introduced in v6.2.0 that would potentially allow the owner of a style to compromise apps loading that style.
 
 ## 6.4.0-beta.1 - August 9, 2018
  - Don't prefetch tiles for geojson sources [#12529](https://github.com/mapbox/mapbox-gl-native/pull/12529)
