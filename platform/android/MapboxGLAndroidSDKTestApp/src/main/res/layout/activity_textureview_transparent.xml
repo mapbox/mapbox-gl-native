@@ -21,8 +21,7 @@
         app:mapbox_cameraTargetLng="8.363795"
         app:mapbox_cameraZoom="2"
         app:mapbox_renderTextureMode="true"
-        app:mapbox_renderTextureTranslucentSurface="true"
-        app:mapbox_styleUrl="mapbox://styles/agerace-globant/cja02de7193b02suvy4gpbt2c"/>
+        app:mapbox_renderTextureTranslucentSurface="true"/>
 
 </android.support.design.widget.CoordinatorLayout>
 

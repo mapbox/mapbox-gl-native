@@ -136,9 +136,9 @@ int main(int argc, char *argv[]) {
 
     std::signal(SIGINT, [] (int) { stop(); });
 
-    fileSource.createOfflineRegion(definition, metadata, [&] (std::exception_ptr error, optional<OfflineRegion> region_) {
-        if (error) {
-            std::cerr << "Error creating region: " << util::toString(error) << std::endl;
+    fileSource.createOfflineRegion(definition, metadata, [&] (mbgl::expected<OfflineRegion, std::exception_ptr> region_) {
+        if (!region_) {
+            std::cerr << "Error creating region: " << util::toString(region_.error()) << std::endl;
             loop.stop();
             exit(1);
         } else {

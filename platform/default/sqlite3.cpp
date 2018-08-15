@@ -1,29 +1,61 @@
 #include "sqlite3.hpp"
 #include <sqlite3.h>
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <cstdio>
 #include <chrono>
 #include <experimental/optional>
 
+#include <mbgl/util/traits.hpp>
 #include <mbgl/util/logging.hpp>
 
 namespace mapbox {
 namespace sqlite {
+
+static_assert(mbgl::underlying_type(ResultCode::OK) == SQLITE_OK, "error");
+static_assert(mbgl::underlying_type(ResultCode::Error) == SQLITE_ERROR, "error");
+static_assert(mbgl::underlying_type(ResultCode::Internal) == SQLITE_INTERNAL, "error");
+static_assert(mbgl::underlying_type(ResultCode::Perm) == SQLITE_PERM, "error");
+static_assert(mbgl::underlying_type(ResultCode::Abort) == SQLITE_ABORT, "error");
+static_assert(mbgl::underlying_type(ResultCode::Busy) == SQLITE_BUSY, "error");
+static_assert(mbgl::underlying_type(ResultCode::Locked) == SQLITE_LOCKED, "error");
+static_assert(mbgl::underlying_type(ResultCode::NoMem) == SQLITE_NOMEM, "error");
+static_assert(mbgl::underlying_type(ResultCode::ReadOnly) == SQLITE_READONLY, "error");
+static_assert(mbgl::underlying_type(ResultCode::Interrupt) == SQLITE_INTERRUPT, "error");
+static_assert(mbgl::underlying_type(ResultCode::IOErr) == SQLITE_IOERR, "error");
+static_assert(mbgl::underlying_type(ResultCode::Corrupt) == SQLITE_CORRUPT, "error");
+static_assert(mbgl::underlying_type(ResultCode::NotFound) == SQLITE_NOTFOUND, "error");
+static_assert(mbgl::underlying_type(ResultCode::Full) == SQLITE_FULL, "error");
+static_assert(mbgl::underlying_type(ResultCode::CantOpen) == SQLITE_CANTOPEN, "error");
+static_assert(mbgl::underlying_type(ResultCode::Protocol) == SQLITE_PROTOCOL, "error");
+static_assert(mbgl::underlying_type(ResultCode::Schema) == SQLITE_SCHEMA, "error");
+static_assert(mbgl::underlying_type(ResultCode::TooBig) == SQLITE_TOOBIG, "error");
+static_assert(mbgl::underlying_type(ResultCode::Constraint) == SQLITE_CONSTRAINT, "error");
+static_assert(mbgl::underlying_type(ResultCode::Mismatch) == SQLITE_MISMATCH, "error");
+static_assert(mbgl::underlying_type(ResultCode::Misuse) == SQLITE_MISUSE, "error");
+static_assert(mbgl::underlying_type(ResultCode::NoLFS) == SQLITE_NOLFS, "error");
+static_assert(mbgl::underlying_type(ResultCode::Auth) == SQLITE_AUTH, "error");
+static_assert(mbgl::underlying_type(ResultCode::Range) == SQLITE_RANGE, "error");
+static_assert(mbgl::underlying_type(ResultCode::NotADB) == SQLITE_NOTADB, "error");
 
 class DatabaseImpl {
 public:
     DatabaseImpl(sqlite3* db_)
         : db(db_)
     {
+        const int error = sqlite3_extended_result_codes(db, true);
+        if (error != SQLITE_OK) {
+            mbgl::Log::Warning(mbgl::Event::Database, error, "Failed to enable extended result codes: %s", sqlite3_errmsg(db));
+        }
     }
 
     ~DatabaseImpl()
     {
         const int error = sqlite3_close(db);
         if (error != SQLITE_OK) {
-            mbgl::Log::Error(mbgl::Event::Database, "%s (Code %i)", sqlite3_errmsg(db), error);
+            mbgl::Log::Error(mbgl::Event::Database, error, "Failed to close database: %s", sqlite3_errmsg(db));
         }
     }
 
@@ -65,11 +97,8 @@ public:
 template <typename T>
 using optional = std::experimental::optional<T>;
 
-static void errorLogCallback(void *, const int err, const char *msg) {
-    mbgl::Log::Record(mbgl::EventSeverity::Info, mbgl::Event::Database, err, "%s", msg);
-}
-
-const static bool sqliteVersionCheck __attribute__((unused)) = []() {
+__attribute__((constructor))
+static void initalize() {
     if (sqlite3_libversion_number() / 1000000 != SQLITE_VERSION_NUMBER / 1000000) {
         char message[96];
         snprintf(message, 96,
@@ -78,15 +107,17 @@ const static bool sqliteVersionCheck __attribute__((unused)) = []() {
         throw std::runtime_error(message);
     }
 
+#ifndef NDEBUG
     // Enable SQLite logging before initializing the database.
-    sqlite3_config(SQLITE_CONFIG_LOG, errorLogCallback, nullptr);
-
-    return true;
-}();
+    sqlite3_config(SQLITE_CONFIG_LOG, [](void *, const int err, const char *msg) {
+        mbgl::Log::Record(mbgl::EventSeverity::Debug, mbgl::Event::Database, err, "%s", msg);
+    }, nullptr);
+#endif
+}
 
 mapbox::util::variant<Database, Exception> Database::tryOpen(const std::string &filename, int flags) {
     sqlite3* db = nullptr;
-    const int error = sqlite3_open_v2(filename.c_str(), &db, flags, nullptr);
+    const int error = sqlite3_open_v2(filename.c_str(), &db, flags | SQLITE_OPEN_URI, nullptr);
     if (error != SQLITE_OK) {
         const auto message = sqlite3_errmsg(db);
         return Exception { error, message };

@@ -664,6 +664,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/enum.hpp
     include/mbgl/util/event.hpp
     include/mbgl/util/exception.hpp
+    include/mbgl/util/expected.hpp
     include/mbgl/util/feature.hpp
     include/mbgl/util/font_stack.hpp
     include/mbgl/util/geo.hpp

@@ -7,6 +7,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Improved the Swift interface for `MGLMapView.decelerationRate`. ([#12584](https://github.com/mapbox/mapbox-gl-native/issues/12584))
 * Fixed inconsistencies in exception naming. ([#12583](https://github.com/mapbox/mapbox-gl-native/issues/12583))
 * Don't default-show text/icons that depend on the placement of a paired icon/text [#12483](https://github.com/mapbox/mapbox-gl-native/issues/12483)
+* Fix the behavior of `-[MGLMapView visibleFeaturesAtPoint:]` near tile boundaries at high zoom. ([#12472](https://github.com/mapbox/mapbox-gl-native/issues/12472))
 
 ## 4.3.0
 

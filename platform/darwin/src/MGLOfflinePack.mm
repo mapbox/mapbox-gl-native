@@ -141,7 +141,7 @@ private:
     mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
 
     __weak MGLOfflinePack *weakSelf = self;
-    mbglFileSource->getOfflineRegionStatus(*_mbglOfflineRegion, [&, weakSelf](__unused std::exception_ptr exception, mbgl::optional<mbgl::OfflineRegionStatus> status) {
+    mbglFileSource->getOfflineRegionStatus(*_mbglOfflineRegion, [&, weakSelf](mbgl::expected<mbgl::OfflineRegionStatus, std::exception_ptr> status) {
         if (status) {
             mbgl::OfflineRegionStatus checkedStatus = *status;
             dispatch_async(dispatch_get_main_queue(), ^{

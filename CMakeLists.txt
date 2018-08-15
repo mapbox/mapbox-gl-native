@@ -176,8 +176,10 @@ if(WITH_NODEJS AND COMMAND mbgl_platform_node)
 endif()
 
 if(CMAKE_GENERATOR STREQUAL "Xcode")
-    write_xcconfig_target_properties(
-        mbgl-core
-        mbgl-filesource
+    set_xcconfig_target_properties(mbgl-core)
+    set_xcconfig_target_properties(mbgl-filesource)
+    file(GENERATE
+        OUTPUT "${CMAKE_BINARY_DIR}/config.xcconfig"
+        INPUT "${CMAKE_SOURCE_DIR}/scripts/config.xcconfig.in"
     )
 endif()

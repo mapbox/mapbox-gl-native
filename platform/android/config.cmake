@@ -97,6 +97,7 @@ macro(mbgl_platform_core)
 
     target_link_libraries(mbgl-core
         PRIVATE nunicode
+        PUBLIC expected
         PUBLIC -llog
         PUBLIC -landroid
         PUBLIC -ljnigraphics

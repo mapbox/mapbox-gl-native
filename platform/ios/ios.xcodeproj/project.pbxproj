@@ -3690,7 +3690,10 @@
 			baseConfigurationReference = 55D8C9941D0F133500F42F10 /* config.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
+				HEADER_SEARCH_PATHS = (
+					"$(mbgl_core_INCLUDE_DIRECTORIES)",
+					"$(mbgl_filesource_INCLUDE_DIRECTORIES)",
+				);
 				INFOPLIST_FILE = test/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_CFLAGS = "-fvisibility=hidden";
@@ -3714,7 +3717,10 @@
 			baseConfigurationReference = 55D8C9941D0F133500F42F10 /* config.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
+				HEADER_SEARCH_PATHS = (
+					"$(mbgl_core_INCLUDE_DIRECTORIES)",
+					"$(mbgl_filesource_INCLUDE_DIRECTORIES)",
+				);
 				INFOPLIST_FILE = test/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_CFLAGS = "-fvisibility=hidden";

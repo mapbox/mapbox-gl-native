@@ -7,6 +7,7 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/expected.hpp>
 
 #include <unordered_map>
 #include <memory>
@@ -18,6 +19,7 @@ namespace sqlite {
 class Database;
 class Statement;
 class Query;
+class Exception;
 } // namespace sqlite
 } // namespace mapbox
 
@@ -25,6 +27,10 @@ namespace mbgl {
 
 class Response;
 class TileID;
+
+namespace util {
+struct IOException;
+} // namespace util
 
 struct MapboxTileLimitExceededException :  util::Exception {
     MapboxTileLimitExceededException() : util::Exception("Mapbox tile limit exceeded") {}
@@ -42,14 +48,15 @@ public:
     // Return value is (inserted, stored size)
     std::pair<bool, uint64_t> put(const Resource&, const Response&);
 
-    std::vector<OfflineRegion> listRegions();
+    expected<OfflineRegions, std::exception_ptr> listRegions();
 
-    OfflineRegion createRegion(const OfflineRegionDefinition&,
-                               const OfflineRegionMetadata&);
+    expected<OfflineRegion, std::exception_ptr> createRegion(const OfflineRegionDefinition&,
+                                                             const OfflineRegionMetadata&);
 
-    OfflineRegionMetadata updateMetadata(const int64_t regionID, const OfflineRegionMetadata&);
+    expected<OfflineRegionMetadata, std::exception_ptr>
+    updateMetadata(const int64_t regionID, const OfflineRegionMetadata&);
 
-    void deleteRegion(OfflineRegion&&);
+    std::exception_ptr deleteRegion(OfflineRegion&&);
 
     // Return value is (response, stored size)
     optional<std::pair<Response, uint64_t>> getRegionResource(int64_t regionID, const Resource&);
@@ -57,8 +64,8 @@ public:
     uint64_t putRegionResource(int64_t regionID, const Resource&, const Response&);
     void putRegionResources(int64_t regionID, const std::list<std::tuple<Resource, Response>>&, OfflineRegionStatus&);
 
-    OfflineRegionDefinition getRegionDefinition(int64_t regionID);
-    OfflineRegionStatus getRegionCompletedStatus(int64_t regionID);
+    expected<OfflineRegionDefinition, std::exception_ptr> getRegionDefinition(int64_t regionID);
+    expected<OfflineRegionStatus, std::exception_ptr> getRegionCompletedStatus(int64_t regionID);
 
     void setOfflineMapboxTileCountLimit(uint64_t);
     uint64_t getOfflineMapboxTileCountLimit();
@@ -67,12 +74,15 @@ public:
     bool exceedsOfflineMapboxTileCountLimit(const Resource&);
 
 private:
-    int userVersion();
-    void ensureSchema();
+    void initialize();
+    void handleError(const mapbox::sqlite::Exception&, const char* action);
+    void handleError(const util::IOException&, const char* action);
+
     void removeExisting();
     void removeOldCacheTable();
-    void migrateToVersion3();
+    void createSchema();
     void migrateToVersion5();
+    void migrateToVersion3();
     void migrateToVersion6();
 
     mapbox::sqlite::Statement& getStatement(const char *);
