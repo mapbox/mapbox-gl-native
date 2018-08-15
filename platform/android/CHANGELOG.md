@@ -6,6 +6,10 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 - Don't default-show text/icons that depend on the placement of a paired icon/text [#12483](https://github.com/mapbox/mapbox-gl-native/issues/12483)
 - Fix symbol querying for markers near tile boundaries at high zoom. ([#12472](https://github.com/mapbox/mapbox-gl-native/issues/12472))
 
+## 6.4.0 - August 15, 2018
+ - Use unconverted bearing value for LatLngBounds calculation [#12616](https://github.com/mapbox/mapbox-gl-native/pull/12616)
+ - Store release so files with debugging information [#12628](https://github.com/mapbox/mapbox-gl-native/pull/12628)
+
 ## 6.4.0-beta.1 - August 9, 2018
  - Don't prefetch tiles for geojson sources [#12529](https://github.com/mapbox/mapbox-gl-native/pull/12529)
  - Enable LTO in release builds [#12546](https://github.com/mapbox/mapbox-gl-native/pull/12546)
