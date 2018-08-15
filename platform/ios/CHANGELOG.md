@@ -2,13 +2,13 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## 4.0.5 - August 14, 2018
+## 4.0.5 - August 15, 2018
 
 ### Packaging
 
 * When integrating this framework using CocoaPods, the included bcsymbolmap files are now preserved. If you have bitcode enabled and you are seeing incorrectly symbolicated crash logs, you should create a build phase in your Xcode project that copies these bcsymbolmap files to your app’s Products Directory when installing. ([#12257](https://github.com/mapbox/mapbox-gl-native/pull/12257))
 
-### Other Changes
+### Other changes
 
 * Added an `MGLMapView.locationManager` property and `MGLLocationManager` protocol for tracking user location using a custom alternative to `CLLocationManager`. ([#12013](https://github.com/mapbox/mapbox-gl-native/pull/12013))
 
