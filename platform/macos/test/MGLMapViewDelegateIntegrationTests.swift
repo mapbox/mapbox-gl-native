@@ -27,7 +27,7 @@ extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
 
     func mapViewDidFailLoadingMap(_ mapView: MGLMapView, withError error: Error) {}
     
-    func mapView(_ mapView: MGLMapView, canSelect annotation: MGLAnnotation) -> Bool { return false }
+    func mapView(_ mapView: MGLMapView, shapeAnnotationIsEnabled annotation: MGLShape) -> Bool { return false }
 
     func mapView(_ mapView: MGLMapView, didDeselect annotation: MGLAnnotation) {}
 

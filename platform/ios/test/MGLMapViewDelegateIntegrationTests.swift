@@ -59,7 +59,7 @@ extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
 
     func mapViewDidFinishRenderingFrame(_ mapView: MGLMapView, fullyRendered: Bool) {}
     
-    func mapView(_ mapView: MGLMapView, canSelect annotation: MGLAnnotation) -> Bool { return false }
+    func mapView(_ mapView: MGLMapView, shapeAnnotationIsEnabled annotation: MGLShape) -> Bool { return false }
 
     func mapView(_ mapView: MGLMapView, didAdd annotationViews: [MGLAnnotationView]) {}
 

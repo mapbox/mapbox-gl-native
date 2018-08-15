@@ -2106,14 +2106,14 @@ public:
                 return true;
             }
             
-            if ([self.delegate respondsToSelector:@selector(mapView:canSelectAnnotation:)] &&
-                ![self.delegate mapView:self canSelectAnnotation:annotation]) {
-                return true;
-            }
-            
             if ([annotation isKindOfClass:[MGLMultiPoint class]])
             {
-                return false;
+                if ([self.delegate respondsToSelector:@selector(mapView:shapeAnnotationIsEnabled:)] &&
+                    ![self.delegate mapView:self shapeAnnotationIsEnabled:(MGLMultiPoint *)annotation]) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
             
             MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
