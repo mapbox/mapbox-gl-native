@@ -1,11 +1,5 @@
 # Changelog for Mapbox Maps SDK for macOS
 
-# master
-
-- Don't default-show text/icons that depend on the placement of a paired icon/text [#12483](https://github.com/mapbox/mapbox-gl-native/issues/12483)
-- Fix the `-[MGLMapView annotationAtPoint:]` method near tile boundaries at high zoom. ([#12472](https://github.com/mapbox/mapbox-gl-native/issues/12472))
-* Fixed inconsistencies in exception naming. ([#12583](https://github.com/mapbox/mapbox-gl-native/issues/12583))
-
 # 0.10.0 - August 15, 2018
 
 ## Styles and rendering
