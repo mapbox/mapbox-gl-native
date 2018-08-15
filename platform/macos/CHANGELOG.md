@@ -18,7 +18,7 @@
 
 * Fixed an issue where the symbols for `MGLMapPointForCoordinate` could not be found. ([#12445](https://github.com/mapbox/mapbox-gl-native/issues/12445))
 * Fixed an issue causing country and ocean labels to disappear after calling `-[MGLStyle localizeLabelsIntoLocale:]` when the system language is set to Simplified Chinese. ([#12164](https://github.com/mapbox/mapbox-gl-native/issues/12164))
-* Various security related improvements.
+* Closed a security vulnerability introduced in 0.8.0 that would potentially allow the owner of a style to compromise apps loading that style. ([#12571](https://github.com/mapbox/mapbox-gl-native/pull/12571))
 
 # 0.9.0 - July 18, 2018
 
