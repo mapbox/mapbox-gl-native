@@ -111,7 +111,10 @@ public:
     }
 
     void queueRequest(OnlineFileRequest* request) {
-        auto it = pendingRequestsList.insert(pendingRequestsList.end(), request);
+        auto it = pendingRequestsList.insert(
+            // prioritise style loading so an ongoing offline download doesn't block showing a new map
+            request->resource.kind == Resource::Style ? pendingRequestsList.begin() : pendingRequestsList.end(), request
+        );
         pendingRequestsMap.emplace(request, std::move(it));
         assert(pendingRequestsMap.size() == pendingRequestsList.size());
     }
