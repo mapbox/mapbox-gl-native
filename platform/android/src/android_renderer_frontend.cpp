@@ -4,6 +4,7 @@
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -56,7 +57,11 @@ private:
 
 AndroidRendererFrontend::AndroidRendererFrontend(MapRenderer& mapRenderer_)
         : mapRenderer(mapRenderer_)
-        , mapRunLoop(util::RunLoop::Get()) {
+        , mapRunLoop(util::RunLoop::Get())
+        , updateAsyncTask(std::make_unique<util::AsyncTask>([this]() {
+              mapRenderer.update(std::move(updateParams));
+              mapRenderer.requestRender();
+          })) {
 }
 
 AndroidRendererFrontend::~AndroidRendererFrontend() = default;
@@ -73,8 +78,8 @@ void AndroidRendererFrontend::setObserver(RendererObserver& observer) {
 }
 
 void AndroidRendererFrontend::update(std::shared_ptr<UpdateParameters> params) {
-    mapRenderer.update(std::move(params));
-    mapRenderer.requestRender();
+    updateParams = std::move(params);
+    updateAsyncTask->send();
 }
 
 void AndroidRendererFrontend::reduceMemoryUse() {
