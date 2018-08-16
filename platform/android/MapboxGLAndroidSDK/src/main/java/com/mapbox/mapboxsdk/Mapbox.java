@@ -11,6 +11,9 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.mapboxsdk.maps.Telemetry;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
+import com.mapbox.mapboxsdk.storage.FileSource;
+import com.mapbox.mapboxsdk.utils.ThreadUtils;
+
 import timber.log.Timber;
 
 /**
@@ -42,8 +45,10 @@ public final class Mapbox {
    */
   @UiThread
   public static synchronized Mapbox getInstance(@NonNull Context context, @Nullable String accessToken) {
+    ThreadUtils.checkThread("Mapbox");
     if (INSTANCE == null) {
       Context appContext = context.getApplicationContext();
+      FileSource.initializeFileDirsPaths(appContext);
       INSTANCE = new Mapbox(appContext, accessToken);
       if (isAccessTokenValid(accessToken)) {
         initializeTelemetry();
