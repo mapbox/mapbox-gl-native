@@ -51,7 +51,7 @@ void FileSource::setResourceTransform(jni::JNIEnv& env, jni::Object<FileSource::
             // a subsequent call.
             // Note: we're converting it to shared_ptr because this lambda is converted to a std::function,
             // which requires copyability of its captured variables.
-            [callback = std::shared_ptr<jni::jobject>(transformCallback.NewGlobalRef(env).release()->Get(), GenericGlobalRefDeleter())]
+            [callback = std::shared_ptr<jni::jobject>(transformCallback.NewGlobalRef(env).release().Get(), GenericGlobalRefDeleter())]
             (mbgl::Resource::Kind kind, const std::string&& url_) {
                 android::UniqueEnv _env = android::AttachEnv();
                 return FileSource::ResourceTransformCallback::onURL(*_env, jni::Object<FileSource::ResourceTransformCallback>(*callback), int(kind), url_);
@@ -92,10 +92,9 @@ jni::jboolean FileSource::isResumed(jni::JNIEnv&) {
     return (jboolean) false;
 }
 
-jni::Class<FileSource> FileSource::javaClass;
-
 FileSource* FileSource::getNativePeer(jni::JNIEnv& env, jni::Object<FileSource> jFileSource) {
-    static auto field = FileSource::javaClass.GetField<jlong>(env, "nativePtr");
+    static auto javaClass = jni::Class<FileSource>::Singleton(env);
+    static auto field = javaClass.GetField<jlong>(env, "nativePtr");
     return reinterpret_cast<FileSource *>(jFileSource.Get(env, field));
 }
 
@@ -106,15 +105,18 @@ mbgl::DefaultFileSource& FileSource::getDefaultFileSource(jni::JNIEnv& env, jni:
 }
 
 void FileSource::registerNative(jni::JNIEnv& env) {
-    //Register classes
-    FileSource::javaClass = *jni::Class<FileSource>::Find(env).NewGlobalRef(env).release();
-    FileSource::ResourceTransformCallback::javaClass = *jni::Class<FileSource::ResourceTransformCallback>::Find(env).NewGlobalRef(env).release();
+    // Ensure the class for ResourceTransformCallback is cached. If it's requested for the
+    // first time on a background thread, Android's class loader heuristics will fail.
+    // https://developer.android.com/training/articles/perf-jni#faq_FindClass
+    jni::Class<ResourceTransformCallback>::Singleton(env);
+
+    static auto javaClass = jni::Class<FileSource>::Singleton(env);
 
     #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
     // Register the peer
     jni::RegisterNativePeer<FileSource>(
-        env, FileSource::javaClass, "nativePtr",
+        env, javaClass, "nativePtr",
         std::make_unique<FileSource, JNIEnv&, jni::String, jni::String, jni::Object<AssetManager>>,
         "initialize",
         "finalize",
@@ -131,16 +133,13 @@ void FileSource::registerNative(jni::JNIEnv& env) {
 
 // FileSource::ResourceTransformCallback //
 
-jni::Class<FileSource::ResourceTransformCallback> FileSource::ResourceTransformCallback::javaClass;
-
 std::string FileSource::ResourceTransformCallback::onURL(jni::JNIEnv& env, jni::Object<FileSource::ResourceTransformCallback> callback, int kind, std::string url_) {
-    static auto method = FileSource::ResourceTransformCallback::javaClass.GetMethod<jni::String (jni::jint, jni::String)>(env, "onURL");
-    auto url = jni::Make<jni::String>(env, url_);
+    static auto javaClass = jni::Class<FileSource::ResourceTransformCallback>::Singleton(env);
+    static auto method = javaClass.GetMethod<jni::String (jni::jint, jni::String)>(env, "onURL");
 
-    url = callback.Call(env, method, kind, url);
-    auto urlStr = jni::Make<std::string>(env, url);
-    jni::DeleteLocalRef(env, url);
-    return urlStr;
+    return jni::Make<std::string>(env,
+        *jni::SeizeLocal(env, callback.Call(env, method, kind,
+            *jni::SeizeLocal(env, jni::Make<jni::String>(env, url_)))));
 }
 
 } // namespace android

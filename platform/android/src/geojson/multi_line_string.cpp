@@ -8,22 +8,19 @@ namespace android {
 namespace geojson {
 
 jni::Object<MultiLineString> MultiLineString::New(jni::JNIEnv& env, const mbgl::MultiLineString<double>& multiLineString) {
-    auto jList = asPointsListsList(env, multiLineString);
-
+    static auto javaClass = jni::Class<MultiLineString>::Singleton(env);
     static auto method = javaClass.GetStaticMethod<jni::Object<MultiLineString> (jni::Object<java::util::List>)>(env, "fromLngLats");
-    auto jMultiLineString = javaClass.Call(env, method, jList);
 
-    jni::DeleteLocalRef(env, jList);
-    return jMultiLineString;
+    return javaClass.Call(env, method,
+        *jni::SeizeLocal(env, asPointsListsList(env, multiLineString)));
 }
 
 mapbox::geojson::multi_line_string MultiLineString::convert(jni::JNIEnv &env, jni::Object<MultiLineString> jMultiLineString) {
     mapbox::geojson::multi_line_string multiLineString;
 
     if (jMultiLineString) {
-        auto jPointListsList = MultiLineString::coordinates(env, jMultiLineString);
-        multiLineString = MultiLineString::convert(env, jPointListsList);
-        jni::DeleteLocalRef(env, jPointListsList);
+        multiLineString = MultiLineString::convert(env,
+            *jni::SeizeLocal(env, MultiLineString::coordinates(env, jMultiLineString)));
     }
 
     return multiLineString;
@@ -33,34 +30,28 @@ mapbox::geojson::multi_line_string MultiLineString::convert(jni::JNIEnv &env, jn
     mapbox::geojson::multi_line_string multiLineString;
 
     if (jPointListsList) {
-        auto jPositionListsArray = java::util::List::toArray<java::util::List>(env, jPointListsList);
+        auto jPositionListsArray = jni::SeizeLocal(env, java::util::List::toArray<java::util::List>(env, jPointListsList));
 
-        auto size = jPositionListsArray.Length(env);
+        auto size = jPositionListsArray->Length(env);
         multiLineString.reserve(size);
 
         for (std::size_t i = 0; i < size; i++) {
-            auto jPointsList = jPositionListsArray.Get(env, i);
-            multiLineString.push_back(LineString::convert(env, jPointsList));
-            jni::DeleteLocalRef(env, jPointsList);
+            multiLineString.push_back(LineString::convert(env, *jni::SeizeLocal(env, jPositionListsArray->Get(env, i))));
         }
-
-        jni::DeleteLocalRef(env, jPositionListsArray);
     }
 
     return multiLineString;
 }
 
 jni::Object<java::util::List> MultiLineString::coordinates(jni::JNIEnv &env, jni::Object<MultiLineString> jLineString) {
-    static auto method = MultiLineString::javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "coordinates");
+    static auto javaClass = jni::Class<MultiLineString>::Singleton(env);
+    static auto method = javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "coordinates");
     return jLineString.Call(env, method);
 }
 
 void MultiLineString::registerNative(jni::JNIEnv &env) {
-    // Lookup the class
-    javaClass = *jni::Class<MultiLineString>::Find(env).NewGlobalRef(env).release();
+    jni::Class<MultiLineString>::Singleton(env);
 }
-
-jni::Class<MultiLineString> MultiLineString::javaClass;
 
 } // namespace geojson
 } // namespace android

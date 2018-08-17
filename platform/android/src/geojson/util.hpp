@@ -24,17 +24,13 @@ To convertExplicit(From&& src) {
  */
 template <class T>
 static jni::Object<java::util::List> asPointsList(jni::JNIEnv& env, const T& pointsList) {
-    auto jarray = jni::Array<jni::Object<Point>>::New(env, pointsList.size(), Point::javaClass);
+    auto jarray = jni::SeizeLocal(env, jni::Array<jni::Object<Point>>::New(env, pointsList.size()));
 
     for (jni::jsize i = 0; i < pointsList.size(); i++) {
-        auto jPoint = Point::New(env, pointsList.at(i));
-        jarray.Set(env, i, jPoint);
-        jni::DeleteLocalRef(env, jPoint);
+        jarray->Set(env, i, *jni::SeizeLocal(env, Point::New(env, pointsList.at(i))));
     }
 
-    auto jList = java::util::Arrays::asList(env, jarray);
-    jni::DeleteLocalRef(env, jarray);
-    return jList;
+    return java::util::Arrays::asList(env, *jarray);
 }
 
 /**
@@ -42,17 +38,13 @@ static jni::Object<java::util::List> asPointsList(jni::JNIEnv& env, const T& poi
  */
 template <class SHAPE>
 static jni::Object<java::util::List> asPointsListsList(JNIEnv& env, SHAPE value) {
-    auto jarray = jni::Array<jni::Object<java::util::List>>::New(env, value.size(), java::util::List::javaClass);
+    auto jarray = jni::SeizeLocal(env, jni::Array<jni::Object<java::util::List>>::New(env, value.size()));
 
-    for (size_t i = 0; i < value.size(); i = i + 1) {
-        auto pointsList = asPointsList(env, value[i]);
-        jarray.Set(env, i, pointsList);
-        jni::DeleteLocalRef(env, pointsList);
+    for (size_t i = 0; i < value.size(); i++) {
+        jarray->Set(env, i, *jni::SeizeLocal(env, asPointsList(env, value[i])));
     }
 
-    auto jList = java::util::Arrays::asList(env, jarray);
-    jni::DeleteLocalRef(env, jarray);
-    return jList;
+    return java::util::Arrays::asList(env, *jarray);
 }
 
 } // namespace geojson

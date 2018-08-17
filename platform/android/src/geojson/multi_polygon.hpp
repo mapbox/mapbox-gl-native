@@ -24,8 +24,6 @@ public:
 
     static jni::Object<java::util::List> coordinates(jni::JNIEnv&, jni::Object<MultiPolygon>);
 
-    static jni::Class<MultiPolygon> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 };
 

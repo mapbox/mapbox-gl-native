@@ -12,8 +12,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/sources/UnknownSource"; };
 
-    static jni::Class<UnknownSource> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     UnknownSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);

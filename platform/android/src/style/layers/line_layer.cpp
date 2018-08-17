@@ -243,22 +243,21 @@ namespace android {
     }
 
 
-    jni::Class<LineLayer> LineLayer::javaClass;
-
     jni::jobject* LineLayer::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = LineLayer::javaClass.template GetConstructor<jni::jlong>(env);
-        return LineLayer::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        static auto javaClass = jni::Class<LineLayer>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
     void LineLayer::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        LineLayer::javaClass = *jni::Class<LineLayer>::Find(env).NewGlobalRef(env).release();
+        static auto javaClass = jni::Class<LineLayer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<LineLayer>(
-            env, LineLayer::javaClass, "nativePtr",
+            env, javaClass, "nativePtr",
             std::make_unique<LineLayer, JNIEnv&, jni::String, jni::String>,
             "initialize",
             "finalize",

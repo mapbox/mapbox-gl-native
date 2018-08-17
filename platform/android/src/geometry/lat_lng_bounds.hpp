@@ -18,10 +18,7 @@ public:
 
     static mbgl::LatLngBounds getLatLngBounds(jni::JNIEnv&, jni::Object<LatLngBounds>);
 
-    static jni::Class<LatLngBounds> javaClass;
-
     static void registerNative(jni::JNIEnv&);
-
 };
 
 

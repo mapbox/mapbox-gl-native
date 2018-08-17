@@ -23,11 +23,10 @@ jni::jobject* Light::createJavaLightPeer(jni::JNIEnv& env, Map& map, mbgl::style
     return result;
 }
 
-jni::Class<Light> Light::javaClass;
-
 jni::jobject* Light::createJavaPeer(jni::JNIEnv& env) {
-    static auto constructor = Light::javaClass.template GetConstructor<jni::jlong>(env);
-    return Light::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+    static auto javaClass = jni::Class<Light>::Singleton(env);
+    static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+    return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
 }
 
 void Light::setAnchor(jni::JNIEnv& env, jni::String property) {
@@ -121,11 +120,11 @@ void Light::setIntensityTransition(jni::JNIEnv&, jlong duration, jlong delay) {
 
 void Light::registerNative(jni::JNIEnv& env) {
     // Lookup the class
-    Light::javaClass = *jni::Class<Light>::Find(env).NewGlobalRef(env).release();
+    static auto javaClass = jni::Class<Light>::Singleton(env);
 
 #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
     // Register the peer
-    jni::RegisterNativePeer<Light>(env, Light::javaClass, "nativePtr",
+    jni::RegisterNativePeer<Light>(env, javaClass, "nativePtr",
     METHOD(&Light::getAnchor, "nativeGetAnchor"),
     METHOD(&Light::setAnchor, "nativeSetAnchor"),
     METHOD(&Light::getPositionTransition, "nativeGetPositionTransition"),

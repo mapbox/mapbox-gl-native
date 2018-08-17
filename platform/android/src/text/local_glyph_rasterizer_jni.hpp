@@ -19,8 +19,6 @@ class LocalGlyphRasterizer {
 public:
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/text/LocalGlyphRasterizer"; };
 
-    static jni::Class<LocalGlyphRasterizer> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     LocalGlyphRasterizer();
@@ -28,7 +26,7 @@ public:
     PremultipliedImage drawGlyphBitmap(const std::string& fontFamily, const bool bold, const char16_t glyphID);
 
 private:
-    jni::UniqueObject<LocalGlyphRasterizer> javaObject;
+    jni::Global<jni::Object<LocalGlyphRasterizer>> javaObject;
 };
 
 } // namespace android

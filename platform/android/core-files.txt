@@ -137,8 +137,6 @@ platform/android/src/map_renderer_runnable.cpp
 platform/android/src/map_renderer_runnable.hpp
 
 # Java core classes
-platform/android/src/java/lang.cpp
-platform/android/src/java/lang.hpp
 platform/android/src/java/util.cpp
 platform/android/src/java/util.hpp
 

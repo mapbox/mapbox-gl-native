@@ -18,8 +18,6 @@ public:
 
     static mapbox::geometry::geometry_collection<double> convert(jni::JNIEnv&, jni::Object<GeometryCollection>);
 
-    static jni::Class<GeometryCollection> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 };
 

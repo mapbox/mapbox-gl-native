@@ -18,14 +18,10 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/sources/CustomGeometrySource"; };
 
-    static jni::Class<CustomGeometrySource> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     CustomGeometrySource(jni::JNIEnv&, jni::String, jni::Object<>);
-
     CustomGeometrySource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
-
     ~CustomGeometrySource();
 
     bool removeFromMap(JNIEnv&, jni::Object<Source>, mbgl::Map&) override;
@@ -36,6 +32,8 @@ public:
     bool isCancelled(jni::jint z, jni::jint x, jni::jint y);
     void startThreads();
     void releaseThreads();
+
+private:
     void setTileData(jni::JNIEnv& env, jni::jint z, jni::jint x, jni::jint y, jni::Object<geojson::FeatureCollection> jf);
 
     void invalidateTile(jni::JNIEnv& env, jni::jint z, jni::jint x, jni::jint y);
@@ -44,7 +42,6 @@ public:
     jni::Array<jni::Object<geojson::Feature>> querySourceFeatures(jni::JNIEnv&,
                                                                   jni::Array<jni::Object<>> );
 
-private:
     jni::Object<Source> createJavaPeer(jni::JNIEnv&);
 
 }; // class CustomGeometrySource

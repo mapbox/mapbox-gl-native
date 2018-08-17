@@ -17,8 +17,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/Layer"; };
 
-    static jni::Class<Layer> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     /*

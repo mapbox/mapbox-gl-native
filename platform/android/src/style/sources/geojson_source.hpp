@@ -30,35 +30,26 @@ struct Update {
 
 class GeoJSONSource : public Source {
 public:
-
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/sources/GeoJsonSource"; };
-
-    static jni::Class<GeoJSONSource> javaClass;
 
     static void registerNative(jni::JNIEnv&);
 
     GeoJSONSource(jni::JNIEnv&, jni::String, jni::Object<>);
-
     GeoJSONSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
-
     ~GeoJSONSource();
 
+private:
     void setGeoJSONString(jni::JNIEnv&, jni::String);
-
     void setFeatureCollection(jni::JNIEnv&, jni::Object<geojson::FeatureCollection>);
-
     void setFeature(jni::JNIEnv&, jni::Object<geojson::Feature>);
-
     void setGeometry(jni::JNIEnv&, jni::Object<geojson::Geometry>);
-
     void setURL(jni::JNIEnv&, jni::String);
+
+    jni::Array<jni::Object<geojson::Feature>> querySourceFeatures(jni::JNIEnv&,
+                                                                  jni::Array<jni::Object<>>);
 
     jni::String getURL(jni::JNIEnv&);
 
-    jni::Array<jni::Object<geojson::Feature>> querySourceFeatures(jni::JNIEnv&,
-                                                                  jni::Array<jni::Object<>> jfilter);
-
-private:
     jni::Object<Source> createJavaPeer(jni::JNIEnv&);
     std::unique_ptr<Update> awaitingUpdate;
     std::unique_ptr<Update> update;

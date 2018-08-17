@@ -15,8 +15,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/RasterLayer"; };
 
-    static jni::Class<RasterLayer> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     RasterLayer(jni::JNIEnv&, jni::String, jni::String);

@@ -27,8 +27,6 @@ public:
 
     static jni::Object<java::util::List> coordinates(jni::JNIEnv&, jni::Object<Polygon>);
 
-    static jni::Class<Polygon> javaClass;
-
     static void registerNative(jni::JNIEnv &);
 };
 

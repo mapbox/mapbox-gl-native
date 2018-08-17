@@ -15,8 +15,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/LineLayer"; };
 
-    static jni::Class<LineLayer> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     LineLayer(jni::JNIEnv&, jni::String, jni::String);

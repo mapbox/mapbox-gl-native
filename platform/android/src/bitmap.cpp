@@ -15,6 +15,7 @@ public:
             throw std::runtime_error("bitmap decoding: could not lock pixels");
         }
     }
+
     ~PixelGuard() {
         const int result = AndroidBitmap_unlockPixels(&env, jni::Unwrap(*bitmap));
         if (result != ANDROID_BITMAP_RESULT_SUCCESS) {
@@ -26,23 +27,14 @@ public:
         return address;
     }
 
-    const auto* get() const {
-        return address;
-    }
-
 private:
     jni::JNIEnv& env;
     jni::Object<Bitmap> bitmap;
     uint8_t* address;
 };
 
-void Bitmap::Config::registerNative(jni::JNIEnv& env) {
-    _class = *jni::Class<Config>::Find(env).NewGlobalRef(env).release();
-}
-
-jni::Class<Bitmap::Config> Bitmap::Config::_class;
-
 jni::Object<Bitmap::Config> Bitmap::Config::Create(jni::JNIEnv& env, Value value) {
+    static auto _class = jni::Class<Config>::Singleton(env);
     switch (value) {
     case ALPHA_8:
         return _class.Get(env,
@@ -62,18 +54,17 @@ jni::Object<Bitmap::Config> Bitmap::Config::Create(jni::JNIEnv& env, Value value
 }
 
 void Bitmap::registerNative(jni::JNIEnv& env) {
-    _class = *jni::Class<Bitmap>::Find(env).NewGlobalRef(env).release();
-    Config::registerNative(env);
+    jni::Class<Bitmap>::Singleton(env);
+    jni::Class<Bitmap::Config>::Singleton(env);
 }
-
-jni::Class<Bitmap> Bitmap::_class;
 
 jni::Object<Bitmap> Bitmap::CreateBitmap(jni::JNIEnv& env,
                                          jni::jint width,
                                          jni::jint height,
                                          jni::Object<Config> config) {
-    using Signature = jni::Object<Bitmap>(jni::jint, jni::jint, jni::Object<Config>);
-    auto method = _class.GetStaticMethod<Signature>(env, "createBitmap");
+    static auto _class = jni::Class<Bitmap>::Singleton(env);
+    static auto method = _class.GetStaticMethod<jni::Object<Bitmap> (jni::jint, jni::jint, jni::Object<Config>)>(env, "createBitmap");
+
     return _class.Call(env, method, width, height, config);
 }
 
@@ -106,15 +97,13 @@ PremultipliedImage Bitmap::GetImage(jni::JNIEnv& env, jni::Object<Bitmap> bitmap
     AndroidBitmapInfo info;
     const int result = AndroidBitmap_getInfo(&env, jni::Unwrap(*bitmap), &info);
     if (result != ANDROID_BITMAP_RESULT_SUCCESS) {
-        // TODO: more specific information
         throw std::runtime_error("bitmap decoding: couldn't get bitmap info");
     }
-
     if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
-        bitmap = Bitmap::Copy(env, bitmap);
+        return Bitmap::GetImage(env, Bitmap::Copy(env, bitmap));
     }
 
-    const PixelGuard guard(env, bitmap);
+    PixelGuard guard(env, bitmap);
 
     // Copy the Android Bitmap into the PremultipliedImage.
     auto pixels =
@@ -129,10 +118,10 @@ PremultipliedImage Bitmap::GetImage(jni::JNIEnv& env, jni::Object<Bitmap> bitmap
 }
 
 jni::Object<Bitmap> Bitmap::Copy(jni::JNIEnv& env, jni::Object<Bitmap> bitmap) {
-    using Signature = jni::Object<Bitmap>(jni::Object<Config>, jni::jboolean);
-    auto static method = _class.GetMethod<Signature>(env, "copy");
-    auto config = Bitmap::Config::Create(env, Bitmap::Config::Value::ARGB_8888);
-    return bitmap.Call(env, method, config, (jni::jboolean) false);
+    static auto klass = jni::Class<Bitmap>::Singleton(env);
+    static auto copy = klass.GetMethod<jni::Object<Bitmap> (jni::Object<Config>, jni::jboolean)>(env, "copy");
+
+    return bitmap.Call(env, copy, Bitmap::Config::Create(env, Bitmap::Config::Value::ARGB_8888), jni::jni_false);
 }
 
 } // namespace android

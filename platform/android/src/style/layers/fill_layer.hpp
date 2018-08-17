@@ -15,8 +15,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/FillLayer"; };
 
-    static jni::Class<FillLayer> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     FillLayer(jni::JNIEnv&, jni::String, jni::String);

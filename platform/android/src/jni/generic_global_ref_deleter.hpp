@@ -12,39 +12,33 @@ namespace android {
 struct GenericGlobalRefDeleter {
     void operator()(jni::jobject* p) const {
         if (p) {
-            auto env = AttachEnv();
-            env->DeleteGlobalRef(jni::Unwrap(p));
+            AttachEnv()->DeleteGlobalRef(jni::Unwrap(p));
         }
     }
 };
 
-
-template < class TagType >
-class GenericWeakObjectRefDeleter;
-
-template < class TagType = jni::ObjectTag >
-using GenericUniqueWeakObject = std::unique_ptr< const jni::Object<TagType>, GenericWeakObjectRefDeleter<TagType> >;
-
-template < class TagType >
-class GenericWeakObjectRefDeleter
-{
-public:
-    using pointer = jni::PointerToValue< jni::Object<TagType> >;
-
-    void operator()(pointer p) const
-    {
-        if (p)
-        {
-            auto env = AttachEnv();
-            env->DeleteWeakGlobalRef(jni::Unwrap(p->Get()));
+struct GenericWeakGlobalRefDeleter {
+    void operator()(jni::jobject* p) const {
+        if (p) {
+            AttachEnv()->DeleteWeakGlobalRef(jni::Unwrap(p));
         }
     }
 };
 
-template < class TagType >
-GenericUniqueWeakObject<TagType> SeizeGenericWeakRef(JNIEnv&, jni::Object<TagType>&& object)
-{
-    return GenericUniqueWeakObject<TagType>(jni::PointerToValue<jni::Object<TagType>>(std::move(object)), GenericWeakObjectRefDeleter<TagType>());
+template < class T >
+using GenericGlobal = jni::UniquePointerlike< T, GenericGlobalRefDeleter >;
+
+template < class T >
+using GenericWeak = jni::UniquePointerlike< T, GenericWeakGlobalRefDeleter >;
+
+template < class T >
+GenericGlobal<T> SeizeGenericGlobal(T&& t) {
+    return GenericGlobal<T>(std::move(t), GenericGlobalRefDeleter());
+};
+
+template < class T >
+GenericWeak<T> SeizeGenericWeak(T&& t) {
+    return GenericWeak<T>(std::move(t), GenericWeakGlobalRefDeleter());
 };
 
 } // namespace android
