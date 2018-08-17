@@ -12,8 +12,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/net/NativeConnectivityListener"; };
 
-    static jni::Class<ConnectivityListener> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     /*

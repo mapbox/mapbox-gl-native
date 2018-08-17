@@ -84,22 +84,21 @@ namespace android {
 <% } -%>
 <% } -%>
 
-    jni::Class<<%- camelize(type) %>Layer> <%- camelize(type) %>Layer::javaClass;
-
     jni::jobject* <%- camelize(type) %>Layer::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = <%- camelize(type) %>Layer::javaClass.template GetConstructor<jni::jlong>(env);
-        return <%- camelize(type) %>Layer::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        static auto javaClass = jni::Class<<%- camelize(type) %>Layer>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
     void <%- camelize(type) %>Layer::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        <%- camelize(type) %>Layer::javaClass = *jni::Class<<%- camelize(type) %>Layer>::Find(env).NewGlobalRef(env).release();
+        static auto javaClass = jni::Class<<%- camelize(type) %>Layer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<<%- camelize(type) %>Layer>(
-            env, <%- camelize(type) %>Layer::javaClass, "nativePtr",
+            env, javaClass, "nativePtr",
 <% if (type === 'background') { -%>
             std::make_unique<<%- camelize(type) %>Layer, JNIEnv&, jni::String>,
 <% } else { -%>

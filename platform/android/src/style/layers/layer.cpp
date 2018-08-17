@@ -93,7 +93,7 @@ namespace android {
 
     void Layer::setLayoutProperty(jni::JNIEnv& env, jni::String jname, jni::Object<> jvalue) {
         // Convert and set property
-        optional<mbgl::style::conversion::Error> error = layer.setLayoutProperty(jni::Make<std::string>(env, jname), Value(env, jvalue));
+        optional<mbgl::style::conversion::Error> error = layer.setLayoutProperty(jni::Make<std::string>(env, jname), Value(env, jni::SeizeLocal(env, std::move(jvalue))));
         if (error) {
             mbgl::Log::Error(mbgl::Event::JNI, "Error setting property: " + jni::Make<std::string>(env, jname) + " " + error->message);
             return;
@@ -102,7 +102,7 @@ namespace android {
 
     void Layer::setPaintProperty(jni::JNIEnv& env, jni::String jname, jni::Object<> jvalue) {
         // Convert and set property
-        optional<mbgl::style::conversion::Error> error = layer.setPaintProperty(jni::Make<std::string>(env, jname), Value(env, jvalue));
+        optional<mbgl::style::conversion::Error> error = layer.setPaintProperty(jni::Make<std::string>(env, jname), Value(env, jni::SeizeLocal(env, std::move(jvalue))));
         if (error) {
             mbgl::Log::Error(mbgl::Event::JNI, "Error setting property: " + jni::Make<std::string>(env, jname) + " " + error->message);
             return;
@@ -128,7 +128,7 @@ namespace android {
         using namespace mbgl::style::conversion;
 
         Error error;
-        optional<Filter> converted = convert<Filter>(Value(env, jfilter), error);
+        optional<Filter> converted = convert<Filter>(Value(env, jni::SeizeLocal(env, std::move(jfilter))), error);
         if (!converted) {
             mbgl::Log::Error(mbgl::Event::JNI, "Error setting filter: " + error.message);
             return;
@@ -246,16 +246,14 @@ namespace android {
         return jni::Object<jni::ObjectTag>(*convert<jni::jobject*>(env, layer.getVisibility()));
     }
 
-    jni::Class<Layer> Layer::javaClass;
-
     void Layer::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        Layer::javaClass = *jni::Class<Layer>::Find(env).NewGlobalRef(env).release();
+        static auto javaClass = jni::Class<Layer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
-        jni::RegisterNativePeer<Layer>(env, Layer::javaClass, "nativePtr",
+        jni::RegisterNativePeer<Layer>(env, javaClass, "nativePtr",
             METHOD(&Layer::getId, "nativeGetId"),
             METHOD(&Layer::setLayoutProperty, "nativeSetLayoutProperty"),
             METHOD(&Layer::setPaintProperty, "nativeSetPaintProperty"),

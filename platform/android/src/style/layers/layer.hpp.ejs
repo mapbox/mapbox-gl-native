@@ -19,8 +19,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/<%- camelize(type) %>Layer"; };
 
-    static jni::Class<<%- camelize(type) %>Layer> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
 <% if (type === 'background') { -%>

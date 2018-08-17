@@ -48,7 +48,6 @@
 #include "snapshotter/map_snapshot.hpp"
 #include "text/collator_jni.hpp"
 #include "text/local_glyph_rasterizer_jni.hpp"
-#include "java/lang.hpp"
 #include "logger.hpp"
 
 namespace mbgl {
@@ -115,11 +114,6 @@ void registerNatives(JavaVM *vm) {
     java::util::registerNative(env);
     PointF::registerNative(env);
     RectF::registerNative(env);
-    java::lang::Number::registerNative(env);
-    java::lang::Float::registerNative(env);
-    java::lang::Boolean::registerNative(env);
-    java::lang::Double::registerNative(env);
-    java::lang::Long::registerNative(env);
 
     // GeoJSON
     geojson::Feature::registerNative(env);

@@ -18,8 +18,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/annotations/Polygon"; };
 
-    static jni::Class<Polygon> javaClass;
-
     static mbgl::FillAnnotation toAnnotation(jni::JNIEnv&, jni::Object<Polygon>);
 
     static void registerNative(jni::JNIEnv&);

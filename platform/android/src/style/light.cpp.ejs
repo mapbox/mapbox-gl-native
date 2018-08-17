@@ -26,11 +26,10 @@ jni::jobject* Light::createJavaLightPeer(jni::JNIEnv& env, Map& map, mbgl::style
     return result;
 }
 
-jni::Class<Light> Light::javaClass;
-
 jni::jobject* Light::createJavaPeer(jni::JNIEnv& env) {
-    static auto constructor = Light::javaClass.template GetConstructor<jni::jlong>(env);
-    return Light::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+    static auto javaClass = jni::Class<Light>::Singleton(env);
+    static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+    return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
 }
 
 <% for (const property of properties) { -%>
@@ -106,11 +105,11 @@ void Light::set<%- camelize(property.name) %>Transition(jni::JNIEnv&, jlong dura
 <% } -%>
 void Light::registerNative(jni::JNIEnv& env) {
     // Lookup the class
-    Light::javaClass = *jni::Class<Light>::Find(env).NewGlobalRef(env).release();
+    static auto javaClass = jni::Class<Light>::Singleton(env);
 
 #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
     // Register the peer
-    jni::RegisterNativePeer<Light>(env, Light::javaClass, "nativePtr",<% for(var i = 0; i < properties.length; i++) {%>
+    jni::RegisterNativePeer<Light>(env, javaClass, "nativePtr",<% for(var i = 0; i < properties.length; i++) {%>
 <% if (properties[i].transition) { -%>
     METHOD(&Light::get<%- camelize(properties[i].name) %>Transition, "nativeGet<%- camelize(properties[i].name) %>Transition"),
     METHOD(&Light::set<%- camelize(properties[i].name) %>Transition, "nativeSet<%- camelize(properties[i].name) %>Transition"),

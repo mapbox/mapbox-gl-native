@@ -33,22 +33,21 @@ namespace android {
         }
     }
 
-    jni::Class<CustomLayer> CustomLayer::javaClass;
-
     jni::jobject* CustomLayer::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = CustomLayer::javaClass.template GetConstructor<jni::jlong>(env);
-        return CustomLayer::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        static auto javaClass = jni::Class<CustomLayer>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
     void CustomLayer::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        CustomLayer::javaClass = *jni::Class<CustomLayer>::Find(env).NewGlobalRef(env).release();
+        static auto javaClass = jni::Class<CustomLayer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<CustomLayer>(
-            env, CustomLayer::javaClass, "nativePtr",
+            env, javaClass, "nativePtr",
             std::make_unique<CustomLayer, JNIEnv&, jni::String, jni::jlong>,
             "initialize",
             "finalize",

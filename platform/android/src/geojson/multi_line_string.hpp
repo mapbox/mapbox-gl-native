@@ -26,8 +26,6 @@ public:
 
     static jni::Object<java::util::List> coordinates(jni::JNIEnv&, jni::Object<MultiLineString>);
 
-    static jni::Class<MultiLineString> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 };
 

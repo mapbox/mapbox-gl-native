@@ -25,8 +25,6 @@ public:
 
     static jni::Object<java::util::List> coordinates(jni::JNIEnv&, jni::Object<MultiPoint>);
 
-    static jni::Class<MultiPoint> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 };
 

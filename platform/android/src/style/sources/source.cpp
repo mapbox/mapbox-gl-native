@@ -76,6 +76,7 @@ namespace android {
         if (ownedSource.get() == nullptr && javaPeer.get() != nullptr) {
             // Manually clear the java peer
             android::UniqueEnv env = android::AttachEnv();
+            static auto javaClass = jni::Class<Source>::Singleton(*env);
             static auto nativePtrField = javaClass.GetField<jlong>(*env, "nativePtr");
             javaPeer->Set(*env, nativePtrField, (jlong) 0);
             javaPeer.reset();
@@ -140,16 +141,14 @@ namespace android {
         rendererFrontend = nullptr;
     }
 
-    jni::Class<Source> Source::javaClass;
-
     void Source::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        Source::javaClass = *jni::Class<Source>::Find(env).NewGlobalRef(env).release();
+        static auto javaClass = jni::Class<Source>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
-        jni::RegisterNativePeer<Source>(env, Source::javaClass, "nativePtr",
+        jni::RegisterNativePeer<Source>(env, javaClass, "nativePtr",
             METHOD(&Source::getId, "nativeGetId"),
             METHOD(&Source::getAttribution, "nativeGetAttribution")
         );

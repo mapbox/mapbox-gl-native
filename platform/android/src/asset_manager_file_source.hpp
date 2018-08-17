@@ -22,7 +22,7 @@ public:
 private:
     class Impl;
 
-    jni::UniqueObject<android::AssetManager> assetManager;
+    jni::Global<jni::Object<android::AssetManager>> assetManager;
     std::unique_ptr<util::Thread<Impl>> impl;
 };
 

@@ -9,19 +9,13 @@ namespace android {
 
 class CustomLayer : public Layer {
 public:
-
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/CustomLayer"; };
-
-    static jni::Class<CustomLayer> javaClass;
 
     static void registerNative(jni::JNIEnv&);
 
     CustomLayer(jni::JNIEnv&, jni::String, jni::jlong);
-
     CustomLayer(mbgl::Map&, mbgl::style::CustomLayer&);
-
     CustomLayer(mbgl::Map&, std::unique_ptr<mbgl::style::CustomLayer>);
-
     ~CustomLayer();
 
     void update(jni::JNIEnv&);

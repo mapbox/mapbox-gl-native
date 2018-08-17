@@ -23,8 +23,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/snapshotter/MapSnapshotter"; };
 
-    static jni::Class<MapSnapshotter> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     MapSnapshotter(jni::JNIEnv&,
@@ -60,7 +58,7 @@ private:
     MBGL_STORE_THREAD(tid);
 
     JavaVM *vm = nullptr;
-    GenericUniqueWeakObject<MapSnapshotter> javaPeer;
+    GenericWeak<jni::Object<MapSnapshotter>> javaPeer;
 
     float pixelRatio;
     bool showLogo;

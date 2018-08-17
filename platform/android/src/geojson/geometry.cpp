@@ -23,31 +23,31 @@ public:
     jni::JNIEnv& env;
 
     jni::Object<Geometry> operator()(const mbgl::Point<double> &geometry) const {
-        return jni::Cast(env, Point::New(env, geometry), Geometry::javaClass);
+        return Point::New(env, geometry);
     }
 
     jni::Object<Geometry> operator()(const mbgl::LineString<double> &geometry) const {
-        return jni::Cast(env, LineString::New(env, geometry), Geometry::javaClass);
+        return LineString::New(env, geometry);
     }
 
     jni::Object<Geometry>  operator()(const mbgl::MultiLineString<double> &geometry) const {
-        return jni::Cast(env, MultiLineString::New(env, geometry), Geometry::javaClass);
+        return MultiLineString::New(env, geometry);
     }
 
     jni::Object<Geometry> operator()(const mbgl::MultiPoint<double> &geometry) const {
-        return jni::Cast(env, MultiPoint::New(env, geometry), Geometry::javaClass);
+        return MultiPoint::New(env, geometry);
     }
 
     jni::Object<Geometry> operator()(const mbgl::Polygon<double> &geometry) const {
-        return jni::Cast(env, Polygon::New(env, geometry), Geometry::javaClass);
+        return Polygon::New(env, geometry);
     }
 
     jni::Object<Geometry>  operator()(const mbgl::MultiPolygon<double> &geometry) const {
-        return jni::Cast(env, MultiPolygon::New(env, geometry), Geometry::javaClass);
+        return MultiPolygon::New(env, geometry);
     }
 
     jni::Object<Geometry>  operator()(const mapbox::geometry::geometry_collection<double> &geometry) const {
-        return jni::Cast(env, GeometryCollection::New(env, geometry), Geometry::javaClass);
+        return GeometryCollection::New(env, geometry);
     }
 };
 
@@ -78,19 +78,14 @@ mbgl::Geometry<double> Geometry::convert(jni::JNIEnv &env, jni::Object<Geometry>
 }
 
 std::string Geometry::getType(jni::JNIEnv &env, jni::Object<Geometry> jGeometry) {
-    static auto method = Geometry::javaClass.GetMethod<jni::String ()>(env, "type");
-    auto jType = jGeometry.Call(env, method);
-    auto type = jni::Make<std::string>(env, jType);
-    jni::DeleteLocalRef(env, jType);
-    return type;
+    static auto javaClass = jni::Class<Geometry>::Singleton(env);
+    static auto method = javaClass.GetMethod<jni::String ()>(env, "type");
+    return jni::Make<std::string>(env, *jni::SeizeLocal(env, jGeometry.Call(env, method)));
 }
 
 void Geometry::registerNative(jni::JNIEnv &env) {
-    // Lookup the class
-    javaClass = *jni::Class<Geometry>::Find(env).NewGlobalRef(env).release();
+    jni::Class<Geometry>::Singleton(env);
 }
-
-jni::Class<Geometry> Geometry::javaClass;
 
 } // namespace geojson
 } // namespace android

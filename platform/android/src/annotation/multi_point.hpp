@@ -15,25 +15,17 @@ protected:
 
   template <class Geometry>
   static Geometry toGeometry(JNIEnv& env, jni::Object<java::util::List> pointsList) {
-      NullCheck(env, &pointsList);
-      auto jarray = java::util::List::toArray<LatLng>(env, pointsList);
-      NullCheck(env, &jarray);
+      auto jarray = jni::SeizeLocal(env, java::util::List::toArray<LatLng>(env, pointsList));
 
-      std::size_t size = jarray.Length(env);
+      std::size_t size = jarray->Length(env);
 
       Geometry geometry;
       geometry.reserve(size);
 
       for (std::size_t i = 0; i < size; i++) {
-          auto latLng = jarray.Get(env, i);
-          NullCheck(env, &latLng);
-
-          geometry.push_back(LatLng::getGeometry(env, latLng));
-
-          jni::DeleteLocalRef(env, latLng);
+          geometry.push_back(LatLng::getGeometry(env, *jni::SeizeLocal(env, jarray->Get(env, i))));
       }
 
-      jni::DeleteLocalRef(env, jarray);
       return geometry;
   }
 };

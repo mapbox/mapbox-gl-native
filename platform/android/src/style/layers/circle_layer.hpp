@@ -15,8 +15,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/CircleLayer"; };
 
-    static jni::Class<CircleLayer> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     CircleLayer(jni::JNIEnv&, jni::String, jni::String);

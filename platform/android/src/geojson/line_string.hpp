@@ -28,8 +28,6 @@ public:
 
     static jni::Object<java::util::List> coordinates(jni::JNIEnv&, jni::Object<LineString>);
 
-    static jni::Class<LineString> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 };
 

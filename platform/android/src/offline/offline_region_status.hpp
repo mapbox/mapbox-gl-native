@@ -12,8 +12,6 @@ public:
 
     static jni::Object<OfflineRegionStatus> New(jni::JNIEnv&, mbgl::OfflineRegionStatus status);
 
-    static jni::Class<OfflineRegionStatus> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 };
 

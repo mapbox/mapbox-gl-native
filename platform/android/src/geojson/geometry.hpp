@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/util/geometry.hpp>
-#include <mbgl/util/noncopyable.hpp>
 
 #include "../java/util.hpp"
 
@@ -11,7 +10,7 @@ namespace mbgl {
 namespace android {
 namespace geojson {
 
-class Geometry : private mbgl::util::noncopyable {
+class Geometry {
 public:
     static constexpr auto Name() { return "com/mapbox/geojson/Geometry"; };
 
@@ -20,8 +19,6 @@ public:
     static mbgl::Geometry<double> convert(jni::JNIEnv&, jni::Object<Geometry>);
 
     static std::string getType(jni::JNIEnv&, jni::Object<Geometry>);
-
-    static jni::Class<Geometry> javaClass;
 
     static void registerNative(jni::JNIEnv&);
 };

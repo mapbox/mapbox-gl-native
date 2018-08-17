@@ -31,10 +31,8 @@ public:
     static jni::Object<Locale> New(jni::JNIEnv&, jni::String);
     static jni::Object<Locale> New(jni::JNIEnv&, jni::String, jni::String);
 
-    static jni::Class<Locale> javaClass;
 
     static void registerNative(jni::JNIEnv&);
-
 };
 
 class Collator {
@@ -47,10 +45,8 @@ public:
 
     static jni::jint compare(jni::JNIEnv&, jni::Object<Collator>, jni::String, jni::String);
 
-    static jni::Class<Collator> javaClass;
 
     static void registerNative(jni::JNIEnv&);
-
 };
 
 } // namespace android

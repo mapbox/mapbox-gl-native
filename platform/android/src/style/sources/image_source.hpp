@@ -15,8 +15,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/sources/ImageSource"; };
 
-    static jni::Class<ImageSource> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     ImageSource(jni::JNIEnv&, jni::String, jni::Object<LatLngQuad>);

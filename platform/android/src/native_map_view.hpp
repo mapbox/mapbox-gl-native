@@ -45,8 +45,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/maps/NativeMapView"; };
 
-    static jni::Class<NativeMapView> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     NativeMapView(jni::JNIEnv&,
@@ -254,7 +252,7 @@ private:
     std::unique_ptr<AndroidRendererFrontend> rendererFrontend;
 
     JavaVM *vm = nullptr;
-    jni::UniqueWeakObject<NativeMapView> javaPeer;
+    jni::Weak<jni::Object<NativeMapView>> javaPeer;
 
     MapRenderer& mapRenderer;
 

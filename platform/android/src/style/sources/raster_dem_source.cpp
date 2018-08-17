@@ -17,7 +17,7 @@ namespace android {
             env,
             std::make_unique<mbgl::style::RasterDEMSource>(
                 jni::Make<std::string>(env, sourceId),
-                convertURLOrTileset(Value(env, urlOrTileSet)),
+                convertURLOrTileset(Value(env, jni::SeizeLocal(env, std::move(urlOrTileSet)))),
                 tileSize
             )
         ) {
@@ -36,22 +36,21 @@ namespace android {
         return url ? jni::Make<jni::String>(env, *url) : jni::String();
     }
 
-    jni::Class<RasterDEMSource> RasterDEMSource::javaClass;
-
     jni::Object<Source> RasterDEMSource::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = RasterDEMSource::javaClass.template GetConstructor<jni::jlong>(env);
-        return jni::Object<Source>(RasterDEMSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
+        static auto javaClass = jni::Class<RasterDEMSource>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+        return jni::Object<Source>(javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
     }
 
     void RasterDEMSource::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        RasterDEMSource::javaClass = *jni::Class<RasterDEMSource>::Find(env).NewGlobalRef(env).release();
+        static auto javaClass = jni::Class<RasterDEMSource>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<RasterDEMSource>(
-            env, RasterDEMSource::javaClass, "nativePtr",
+            env, javaClass, "nativePtr",
             std::make_unique<RasterDEMSource, JNIEnv&, jni::String, jni::Object<>, jni::jint>,
             "initialize",
             "finalize",

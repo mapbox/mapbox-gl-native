@@ -156,22 +156,21 @@ namespace android {
     }
 
 
-    jni::Class<FillExtrusionLayer> FillExtrusionLayer::javaClass;
-
     jni::jobject* FillExtrusionLayer::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = FillExtrusionLayer::javaClass.template GetConstructor<jni::jlong>(env);
-        return FillExtrusionLayer::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        static auto javaClass = jni::Class<FillExtrusionLayer>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
     void FillExtrusionLayer::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        FillExtrusionLayer::javaClass = *jni::Class<FillExtrusionLayer>::Find(env).NewGlobalRef(env).release();
+        static auto javaClass = jni::Class<FillExtrusionLayer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<FillExtrusionLayer>(
-            env, FillExtrusionLayer::javaClass, "nativePtr",
+            env, javaClass, "nativePtr",
             std::make_unique<FillExtrusionLayer, JNIEnv&, jni::String, jni::String>,
             "initialize",
             "finalize",

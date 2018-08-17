@@ -38,8 +38,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/maps/renderer/MapRenderer"; };
 
-    static jni::Class<MapRenderer> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     static MapRenderer& getNativePeer(JNIEnv&, jni::Object<MapRenderer>);
@@ -99,7 +97,7 @@ private:
     void onSurfaceChanged(JNIEnv&, jint width, jint height);
 
 private:
-    GenericUniqueWeakObject<MapRenderer> javaPeer;
+    GenericWeak<jni::Object<MapRenderer>> javaPeer;
 
     float pixelRatio;
     DefaultFileSource& fileSource;
