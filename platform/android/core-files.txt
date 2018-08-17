@@ -48,12 +48,27 @@ platform/default/mbgl/map/map_snapshotter.hpp
 platform/linux/src/headless_backend_egl.cpp
 
 # Conversion C++ -> Java
+platform/android/src/conversion/collection.cpp
+platform/android/src/conversion/collection.hpp
+platform/android/src/conversion/color.cpp
+platform/android/src/conversion/color.hpp
+platform/android/src/conversion/constant.cpp
 platform/android/src/conversion/constant.hpp
 platform/android/src/conversion/conversion.hpp
+platform/android/src/geojson/conversion/feature.cpp
+platform/android/src/geojson/conversion/feature.hpp
+platform/android/src/style/conversion/filter.cpp
+platform/android/src/style/conversion/filter.hpp
+platform/android/src/style/conversion/position.cpp
+platform/android/src/style/conversion/position.hpp
 platform/android/src/style/conversion/property_expression.hpp
 platform/android/src/style/conversion/property_value.hpp
+platform/android/src/style/conversion/transition_options.cpp
+platform/android/src/style/conversion/transition_options.hpp
 platform/android/src/style/conversion/types.hpp
 platform/android/src/style/conversion/types_string_values.hpp
+platform/android/src/style/conversion/url_or_tileset.cpp
+platform/android/src/style/conversion/url_or_tileset.hpp
 platform/android/src/map/camera_position.cpp
 platform/android/src/map/camera_position.hpp
 platform/android/src/map/image.cpp
