@@ -5,7 +5,7 @@
 
 // C++ -> Java conversion
 #include "../../conversion/conversion.hpp"
-#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/premultiply.hpp>
 
 #include "../../bitmap.hpp"

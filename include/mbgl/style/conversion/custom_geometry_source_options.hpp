@@ -2,6 +2,7 @@
 
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/sources/custom_geometry_source.hpp>
+#include <mbgl/util/optional.hpp>
 
 namespace mbgl {
 namespace style {

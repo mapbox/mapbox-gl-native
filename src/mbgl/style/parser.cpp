@@ -1,12 +1,12 @@
 #include <mbgl/style/parser.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/coordinate.hpp>
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/light.hpp>
 #include <mbgl/style/conversion/transition_options.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/string.hpp>

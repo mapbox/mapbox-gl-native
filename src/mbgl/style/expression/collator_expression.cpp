@@ -1,6 +1,7 @@
 #include <mbgl/style/expression/collator.hpp>
 #include <mbgl/style/expression/collator_expression.hpp>
 #include <mbgl/style/expression/literal.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/string.hpp>
 
 namespace mbgl {

@@ -5,8 +5,8 @@
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 #include <jni/jni.hpp>
 

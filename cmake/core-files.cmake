@@ -363,6 +363,7 @@ set(MBGL_CORE_FILES
     # style
     include/mbgl/style/color_ramp_property_value.hpp
     include/mbgl/style/conversion.hpp
+    include/mbgl/style/conversion_impl.hpp
     include/mbgl/style/filter.hpp
     include/mbgl/style/image.hpp
     include/mbgl/style/layer.hpp
@@ -437,6 +438,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/conversion/layer.cpp
     src/mbgl/style/conversion/light.cpp
     src/mbgl/style/conversion/position.cpp
+    src/mbgl/style/conversion/property_value.cpp
     src/mbgl/style/conversion/source.cpp
     src/mbgl/style/conversion/stringify.hpp
     src/mbgl/style/conversion/tileset.cpp

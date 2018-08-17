@@ -1,4 +1,5 @@
 #include <mbgl/style/conversion/custom_geometry_source_options.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 namespace mbgl {
 namespace style {

@@ -345,6 +345,11 @@ add_library(example-custom-layer SHARED
     platform/android/src/example_custom_layer.cpp
 )
 
+target_include_directories(example-custom-layer
+    PRIVATE include
+)
+
 target_link_libraries(example-custom-layer
-    PRIVATE mbgl-core
+    PRIVATE -llog
+    PRIVATE -lGLESv2
 )

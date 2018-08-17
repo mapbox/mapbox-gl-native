@@ -1,10 +1,11 @@
 #include <mbgl/style/conversion/filter.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/expression/literal.hpp>
-#include <mbgl/util/geometry.hpp>
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/style/expression/compound_expression.hpp>
 #include <mbgl/style/expression/boolean_operator.hpp>
+#include <mbgl/util/geometry.hpp>
 
 namespace mbgl {
 namespace style {

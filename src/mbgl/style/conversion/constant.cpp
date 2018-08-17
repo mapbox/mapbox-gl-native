@@ -1,4 +1,5 @@
 #include <mbgl/style/conversion/constant.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 namespace mbgl {
 namespace style {
@@ -31,6 +32,38 @@ optional<std::string> Converter<std::string>::operator()(const Convertible& valu
     return *converted;
 }
 
+template <class T>
+optional<T> Converter<T, typename std::enable_if_t<std::is_enum<T>::value>>::operator()(const Convertible& value, Error& error) const {
+    optional<std::string> string = toString(value);
+    if (!string) {
+        error.message = "value must be a string";
+        return nullopt;
+    }
+
+    const auto result = Enum<T>::toEnum(*string);
+    if (!result) {
+        error.message = "value must be a valid enumeration value";
+        return nullopt;
+    }
+
+    return *result;
+}
+
+template optional<AlignmentType> Converter<AlignmentType>::operator()(const Convertible&, Error&) const;
+template optional<CirclePitchScaleType> Converter<CirclePitchScaleType>::operator()(const Convertible&, Error&) const;
+template optional<HillshadeIlluminationAnchorType> Converter<HillshadeIlluminationAnchorType>::operator()(const Convertible&, Error&) const;
+template optional<IconTextFitType> Converter<IconTextFitType>::operator()(const Convertible&, Error&) const;
+template optional<LightAnchorType> Converter<LightAnchorType>::operator()(const Convertible&, Error&) const;
+template optional<LineCapType> Converter<LineCapType>::operator()(const Convertible&, Error&) const;
+template optional<LineJoinType> Converter<LineJoinType>::operator()(const Convertible&, Error&) const;
+template optional<RasterResamplingType> Converter<RasterResamplingType>::operator()(const Convertible&, Error&) const;
+template optional<SymbolAnchorType> Converter<SymbolAnchorType>::operator()(const Convertible&, Error&) const;
+template optional<SymbolPlacementType> Converter<SymbolPlacementType>::operator()(const Convertible&, Error&) const;
+template optional<TextJustifyType> Converter<TextJustifyType>::operator()(const Convertible&, Error&) const;
+template optional<TextTransformType> Converter<TextTransformType>::operator()(const Convertible&, Error&) const;
+template optional<TranslateAnchorType> Converter<TranslateAnchorType>::operator()(const Convertible&, Error&) const;
+template optional<VisibilityType> Converter<VisibilityType>::operator()(const Convertible&, Error&) const;
+
 optional<Color> Converter<Color>::operator()(const Convertible& value, Error& error) const {
     optional<std::string> string = toString(value);
     if (!string) {
@@ -46,6 +79,29 @@ optional<Color> Converter<Color>::operator()(const Convertible& value, Error& er
 
     return *color;
 }
+
+template <size_t N>
+optional<std::array<float, N>> Converter<std::array<float, N>>::operator()(const Convertible& value, Error& error) const {
+    if (!isArray(value) || arrayLength(value) != N) {
+        error.message = "value must be an array of " + util::toString(N) + " numbers";
+        return nullopt;
+    }
+
+    std::array<float, N> result;
+    for (size_t i = 0; i < N; i++) {
+        optional<float> n = toNumber(arrayMember(value, i));
+        if (!n) {
+            error.message = "value must be an array of " + util::toString(N) + " numbers";
+            return nullopt;
+        }
+        result[i] = *n;
+    }
+    return result;
+}
+
+template optional<std::array<float, 2>> Converter<std::array<float, 2>>::operator()(const Convertible&, Error&) const;
+template optional<std::array<float, 3>> Converter<std::array<float, 3>>::operator()(const Convertible&, Error&) const;
+template optional<std::array<float, 4>> Converter<std::array<float, 4>>::operator()(const Convertible&, Error&) const;
 
 optional<std::vector<float>> Converter<std::vector<float>>::operator()(const Convertible& value, Error& error) const {
     if (!isArray(value)) {

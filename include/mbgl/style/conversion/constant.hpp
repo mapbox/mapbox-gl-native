@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/types.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/util/string.hpp>
@@ -30,21 +31,7 @@ struct Converter<std::string> {
 
 template <class T>
 struct Converter<T, typename std::enable_if_t<std::is_enum<T>::value>> {
-    optional<T> operator()(const Convertible& value, Error& error) const {
-        optional<std::string> string = toString(value);
-        if (!string) {
-            error.message = "value must be a string";
-            return nullopt;
-        }
-
-        const auto result = Enum<T>::toEnum(*string);
-        if (!result) {
-            error.message = "value must be a valid enumeration value";
-            return nullopt;
-        }
-
-        return *result;
-    }
+    optional<T> operator()(const Convertible& value, Error& error) const;
 };
 
 template <>
@@ -54,23 +41,7 @@ struct Converter<Color> {
 
 template <size_t N>
 struct Converter<std::array<float, N>> {
-    optional<std::array<float, N>> operator()(const Convertible& value, Error& error) const {
-        if (!isArray(value) || arrayLength(value) != N) {
-            error.message = "value must be an array of " + util::toString(N) + " numbers";
-            return nullopt;
-        }
-
-        std::array<float, N> result;
-        for (size_t i = 0; i < N; i++) {
-            optional<float> n = toNumber(arrayMember(value, i));
-            if (!n) {
-                error.message = "value must be an array of " + util::toString(N) + " numbers";
-                return nullopt;
-            }
-            result[i] = *n;
-        }
-        return result;
-    }
+    optional<std::array<float, N>> operator()(const Convertible& value, Error& error) const;
 };
 
 template <>

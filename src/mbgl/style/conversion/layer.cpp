@@ -1,6 +1,7 @@
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/filter.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>

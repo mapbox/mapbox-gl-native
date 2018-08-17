@@ -3,6 +3,7 @@
 #include <mbgl/style/expression/compound_expression.hpp>
 #include <mbgl/style/expression/check_subtype.hpp>
 #include <mbgl/style/expression/util.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/math/log2.hpp>
 #include <mbgl/util/i18n.hpp>
