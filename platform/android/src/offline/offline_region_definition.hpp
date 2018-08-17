@@ -10,8 +10,6 @@ class OfflineRegionDefinition {
 public:
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineRegionDefinition"; };
 
-    static jni::Class<OfflineRegionDefinition> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     static mbgl::OfflineRegionDefinition getDefinition(JNIEnv& env, jni::Object<OfflineRegionDefinition> jDefinition);
@@ -25,10 +23,7 @@ public:
 
     static mbgl::OfflineTilePyramidRegionDefinition getDefinition(jni::JNIEnv&, jni::Object<OfflineTilePyramidRegionDefinition>);
 
-    static jni::Class<OfflineTilePyramidRegionDefinition> javaClass;
-
     static void registerNative(jni::JNIEnv&);
-
 };
 
 class OfflineGeometryRegionDefinition: public OfflineRegionDefinition {
@@ -39,10 +34,7 @@ public:
 
     static mbgl::OfflineGeometryRegionDefinition getDefinition(jni::JNIEnv&, jni::Object<OfflineGeometryRegionDefinition>);
 
-    static jni::Class<OfflineGeometryRegionDefinition> javaClass;
-
     static void registerNative(jni::JNIEnv&);
-
 };
 
 } // namespace android

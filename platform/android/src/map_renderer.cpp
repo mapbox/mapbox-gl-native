@@ -18,7 +18,8 @@ MapRenderer::MapRenderer(jni::JNIEnv& _env, jni::Object<MapRenderer> obj,
                          jni::Object<FileSource> _fileSource, jni::jfloat pixelRatio_,
                          jni::String programCacheDir_,
                          jni::String localIdeographFontFamily_)
-        : javaPeer(SeizeGenericWeakRef(_env, jni::Object<MapRenderer>(jni::NewWeakGlobalRef(_env, obj.Get()).release()))), pixelRatio(pixelRatio_)
+        : javaPeer(SeizeGenericWeak(obj.NewWeakGlobalRef(_env).release()))
+        , pixelRatio(pixelRatio_)
         , fileSource(FileSource::getDefaultFileSource(_env, _fileSource))
         , programCacheDir(jni::Make<std::string>(_env, programCacheDir_))
         , localIdeographFontFamily(localIdeographFontFamily_ == nullptr ? optional<std::string>{} : jni::Make<std::string>(_env, localIdeographFontFamily_ ))
@@ -52,6 +53,7 @@ void MapRenderer::schedule(std::weak_ptr<Mailbox> scheduled) {
     auto peer = runnable->peer();
 
     // Queue the event on the Java Peer
+    static auto javaClass = jni::Class<MapRenderer>::Singleton(*_env);
     static auto queueEvent = javaClass.GetMethod<void(
             jni::Object<MapRendererRunnable>)>(*_env, "queueEvent");
     javaPeer->Call(*_env, queueEvent, *peer);
@@ -62,6 +64,7 @@ void MapRenderer::schedule(std::weak_ptr<Mailbox> scheduled) {
 
 void MapRenderer::requestRender() {
     android::UniqueEnv _env = android::AttachEnv();
+    static auto javaClass = jni::Class<MapRenderer>::Singleton(*_env);
     static auto onInvalidate = javaClass.GetMethod<void()>(*_env, "requestRender");
     javaPeer->Call(*_env, onInvalidate);
 }
@@ -179,16 +182,14 @@ void MapRenderer::onSurfaceChanged(JNIEnv&, jint width, jint height) {
 
 // Static methods //
 
-jni::Class<MapRenderer> MapRenderer::javaClass;
-
 void MapRenderer::registerNative(jni::JNIEnv& env) {
     // Lookup the class
-    MapRenderer::javaClass = *jni::Class<MapRenderer>::Find(env).NewGlobalRef(env).release();
+    static auto javaClass = jni::Class<MapRenderer>::Singleton(env);
 
 #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
     // Register the peer
-    jni::RegisterNativePeer<MapRenderer>(env, MapRenderer::javaClass, "nativePtr",
+    jni::RegisterNativePeer<MapRenderer>(env, javaClass, "nativePtr",
                                          std::make_unique<MapRenderer, JNIEnv&, jni::Object<MapRenderer>, jni::Object<FileSource>, jni::jfloat, jni::String, jni::String>,
                                          "nativeInitialize", "finalize",
                                          METHOD(&MapRenderer::render, "nativeRender"),
@@ -199,7 +200,8 @@ void MapRenderer::registerNative(jni::JNIEnv& env) {
 }
 
 MapRenderer& MapRenderer::getNativePeer(JNIEnv& env, jni::Object<MapRenderer> jObject) {
-    static auto field = MapRenderer::javaClass.GetField<jlong>(env, "nativePtr");
+    static auto javaClass = jni::Class<MapRenderer>::Singleton(env);
+    static auto field = javaClass.GetField<jlong>(env, "nativePtr");
     MapRenderer* mapRenderer = reinterpret_cast<MapRenderer*>(jObject.Get(env, field));
     assert(mapRenderer != nullptr);
     return *mapRenderer;

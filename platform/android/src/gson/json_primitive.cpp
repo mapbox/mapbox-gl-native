@@ -1,5 +1,4 @@
 #include "json_primitive.hpp"
-#include "../java/lang.hpp"
 
 namespace mbgl {
 namespace android {
@@ -24,58 +23,55 @@ public:
      * Create a primitive containing a string value
      */
     jni::Object<JsonPrimitive> operator()(const std::string value) const {
-        static auto constructor = JsonPrimitive::javaClass.GetConstructor<jni::String>(env);
-        auto jvalue = jni::Make<jni::String>(env, value);
-        auto jsonPrimitive = JsonPrimitive::javaClass.New(env, constructor, jvalue);
-        jni::DeleteLocalRef(env, jvalue);
-        return jsonPrimitive;
+        static auto javaClass = jni::Class<JsonPrimitive>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::String>(env);
+
+        return javaClass.New(env, constructor,
+            *jni::SeizeLocal(env, jni::Make<jni::String>(env, value)));
     }
 
     /**
      * Create a primitive containing a number value with type double
      */
     jni::Object<JsonPrimitive> operator()(const double value) const {
-        static auto constructor = JsonPrimitive::javaClass.GetConstructor<jni::Object<java::lang::Number>>(env);
-        auto boxedValue = java::lang::Double::valueOf(env, value);
-        auto number = jni::Cast(env, boxedValue, java::lang::Number::javaClass);
-        auto jsonPrimitive = JsonPrimitive::javaClass.New(env, constructor, number);
-        jni::DeleteLocalRef(env, boxedValue);
-        return jsonPrimitive;
+        static auto javaClass = jni::Class<JsonPrimitive>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::Number>(env);
+
+        return javaClass.New(env, constructor,
+            *jni::SeizeLocal(env, jni::Number(jni::Box(env, value))));
     }
 
     /**
      * Create a primitive containing a number value with type long
      */
     jni::Object<JsonPrimitive> operator()(const int64_t value) const {
-        static auto constructor = JsonPrimitive::javaClass.GetConstructor<jni::Object<java::lang::Number>>(env);
-        auto boxedValue = java::lang::Long::valueOf(env, value);
-        auto number = jni::Cast(env, boxedValue, java::lang::Number::javaClass);
-        auto jsonPrimitive =  JsonPrimitive::javaClass.New(env, constructor, number);
-        jni::DeleteLocalRef(env, boxedValue);
-        return jsonPrimitive;
+        static auto javaClass = jni::Class<JsonPrimitive>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::Number>(env);
+
+        return javaClass.New(env, constructor,
+            *jni::SeizeLocal(env, jni::Number(jni::Box(env, value))));
     }
 
     /**
      * Create a primitive containing a number value with type long
      */
     jni::Object<JsonPrimitive> operator()(const uint64_t value) const {
-        static auto constructor = JsonPrimitive::javaClass.GetConstructor<jni::Object<java::lang::Number>>(env);
-        auto boxedValue = java::lang::Long::valueOf(env, value);
-        auto number = jni::Cast(env, boxedValue, java::lang::Number::javaClass);
-        auto jsonPrimitive = JsonPrimitive::javaClass.New(env, constructor, number);
-        jni::DeleteLocalRef(env, boxedValue);
-        return jsonPrimitive;
+        static auto javaClass = jni::Class<JsonPrimitive>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::Number>(env);
+
+        return javaClass.New(env, constructor,
+            *jni::SeizeLocal(env, jni::Number(jni::Box(env, int64_t(value))))); // TODO: should use BigInteger
     }
 
     /**
      * Create a primitive containing a boolean value
      */
     jni::Object<JsonPrimitive> operator()(const bool value) const {
-        static auto constructor = JsonPrimitive::javaClass.GetConstructor<jni::Object<java::lang::Boolean>>(env);
-        auto boxedValue = java::lang::Boolean::valueOf(env, value);
-        auto jsonPrimitive = JsonPrimitive::javaClass.New(env, constructor, boxedValue);
-        jni::DeleteLocalRef(env, boxedValue);
-        return jsonPrimitive;
+        static auto javaClass = jni::Class<JsonPrimitive>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::Boolean>(env);
+
+        return javaClass.New(env, constructor,
+            *jni::SeizeLocal(env, jni::Box(env, value ? jni::jni_true : jni::jni_false)));
     }
 };
 
@@ -102,44 +98,44 @@ JsonPrimitive::value JsonPrimitive::convert(jni::JNIEnv &env, jni::Object<JsonPr
 }
 
 bool JsonPrimitive::isBoolean(JNIEnv& env, jni::Object<JsonPrimitive> jsonPrimitive) {
-    static auto method = JsonPrimitive::javaClass.GetMethod<jni::jboolean ()>(env, "isBoolean");
+    static auto javaClass = jni::Class<JsonPrimitive>::Singleton(env);
+    static auto method = javaClass.GetMethod<jni::jboolean ()>(env, "isBoolean");
     return jsonPrimitive.Call(env, method);
 }
 
 bool JsonPrimitive::isString(JNIEnv& env, jni::Object<JsonPrimitive> jsonPrimitive) {
-    static auto method = JsonPrimitive::javaClass.GetMethod<jni::jboolean ()>(env, "isString");
+    static auto javaClass = jni::Class<JsonPrimitive>::Singleton(env);
+    static auto method = javaClass.GetMethod<jni::jboolean ()>(env, "isString");
     return jsonPrimitive.Call(env, method);
 }
 
 bool JsonPrimitive::isNumber(JNIEnv& env, jni::Object<JsonPrimitive> jsonPrimitive) {
-    static auto method = JsonPrimitive::javaClass.GetMethod<jni::jboolean ()>(env, "isNumber");
+    static auto javaClass = jni::Class<JsonPrimitive>::Singleton(env);
+    static auto method = javaClass.GetMethod<jni::jboolean ()>(env, "isNumber");
     return jsonPrimitive.Call(env, method);
 }
 
 bool JsonPrimitive::getAsBoolean(JNIEnv& env, jni::Object<JsonPrimitive> jsonPrimitive) {
-    static auto method = JsonPrimitive::javaClass.GetMethod<jni::jboolean ()>(env, "getAsBoolean");
+    static auto javaClass = jni::Class<JsonPrimitive>::Singleton(env);
+    static auto method = javaClass.GetMethod<jni::jboolean ()>(env, "getAsBoolean");
     return jsonPrimitive.Call(env, method);
 }
 
 std::string JsonPrimitive::getAsString(JNIEnv& env, jni::Object<JsonPrimitive> jsonPrimitive) {
-    static auto method = JsonPrimitive::javaClass.GetMethod<jni::String ()>(env, "getAsString");
-    auto jString = jsonPrimitive.Call(env, method);
-    auto string = jni::Make<std::string>(env, jString);
-    jni::DeleteLocalRef(env, jString);
-    return string;
+    static auto javaClass = jni::Class<JsonPrimitive>::Singleton(env);
+    static auto method = javaClass.GetMethod<jni::String ()>(env, "getAsString");
+    return jni::Make<std::string>(env, *jni::SeizeLocal(env, jsonPrimitive.Call(env, method)));
 }
 
 double JsonPrimitive::getAsDouble(JNIEnv& env, jni::Object<JsonPrimitive> jsonPrimitive) {
-    static auto method = JsonPrimitive::javaClass.GetMethod<jni::jdouble ()>(env, "getAsDouble");
+    static auto javaClass = jni::Class<JsonPrimitive>::Singleton(env);
+    static auto method = javaClass.GetMethod<jni::jdouble ()>(env, "getAsDouble");
     return jsonPrimitive.Call(env, method);
 }
 
 void JsonPrimitive::registerNative(jni::JNIEnv &env) {
-    // Lookup the class
-    javaClass = *jni::Class<JsonPrimitive>::Find(env).NewGlobalRef(env).release();
+    jni::Class<JsonPrimitive>::Singleton(env);
 }
-
-jni::Class<JsonPrimitive> JsonPrimitive::javaClass;
 
 } // namespace gson
 } // namespace android

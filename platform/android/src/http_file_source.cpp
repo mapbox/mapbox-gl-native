@@ -32,8 +32,7 @@ public:
                     jni::String retryAfter, jni::String xRateLimitReset,
                     jni::Array<jni::jbyte> body);
 
-    static jni::Class<HTTPRequest> javaClass;
-    jni::UniqueObject<HTTPRequest> javaRequest;
+    jni::Global<jni::Object<HTTPRequest>> javaRequest;
 
 private:
     Resource resource;
@@ -52,16 +51,14 @@ private:
     static const int permanentError = 2;
 };
 
-jni::Class<HTTPRequest> HTTPRequest::javaClass;
-
 namespace android {
 
 void RegisterNativeHTTPRequest(jni::JNIEnv& env) {
-    HTTPRequest::javaClass = *jni::Class<HTTPRequest>::Find(env).NewGlobalRef(env).release();
+    static auto javaClass = jni::Class<HTTPRequest>::Singleton(env);
 
     #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-    jni::RegisterNativePeer<HTTPRequest>(env, HTTPRequest::javaClass, "nativePtr",
+    jni::RegisterNativePeer<HTTPRequest>(env, javaClass, "nativePtr",
         METHOD(&HTTPRequest::onFailure, "nativeOnFailure"),
         METHOD(&HTTPRequest::onResponse, "nativeOnResponse"));
 }
@@ -82,6 +79,7 @@ HTTPRequest::HTTPRequest(jni::JNIEnv& env, const Resource& resource_, FileSource
 
     jni::UniqueLocalFrame frame = jni::PushLocalFrame(env, 10);
 
+    static auto javaClass = jni::Class<HTTPRequest>::Singleton(env);
     static auto constructor =
         javaClass.GetConstructor<jni::jlong, jni::String, jni::String, jni::String>(env);
 
@@ -95,6 +93,7 @@ HTTPRequest::HTTPRequest(jni::JNIEnv& env, const Resource& resource_, FileSource
 HTTPRequest::~HTTPRequest() {
     android::UniqueEnv env = android::AttachEnv();
 
+    static auto javaClass = jni::Class<HTTPRequest>::Singleton(*env);
     static auto cancel = javaClass.GetMethod<void ()>(*env, "cancel");
 
     javaRequest->Call(*env, cancel);

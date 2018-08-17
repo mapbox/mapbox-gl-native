@@ -124,22 +124,21 @@ namespace android {
     }
 
 
-    jni::Class<HillshadeLayer> HillshadeLayer::javaClass;
-
     jni::jobject* HillshadeLayer::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = HillshadeLayer::javaClass.template GetConstructor<jni::jlong>(env);
-        return HillshadeLayer::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        static auto javaClass = jni::Class<HillshadeLayer>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
     void HillshadeLayer::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        HillshadeLayer::javaClass = *jni::Class<HillshadeLayer>::Find(env).NewGlobalRef(env).release();
+        static auto javaClass = jni::Class<HillshadeLayer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<HillshadeLayer>(
-            env, HillshadeLayer::javaClass, "nativePtr",
+            env, javaClass, "nativePtr",
             std::make_unique<HillshadeLayer, JNIEnv&, jni::String, jni::String>,
             "initialize",
             "finalize",

@@ -19,10 +19,7 @@ public:
 
     static std::array<mbgl::LatLng, 4> getLatLngArray(jni::JNIEnv&, jni::Object<LatLngQuad>);
 
-    static jni::Class<LatLngQuad> javaClass;
-
     static void registerNative(jni::JNIEnv&);
-
 };
 
 

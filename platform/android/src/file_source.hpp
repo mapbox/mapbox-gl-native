@@ -25,8 +25,6 @@ public:
         static constexpr auto Name() { return "com/mapbox/mapboxsdk/storage/FileSource$ResourceTransformCallback"; }
 
         static std::string onURL(jni::JNIEnv&, jni::Object<FileSource::ResourceTransformCallback>, int, std::string);
-
-        static jni::Class<ResourceTransformCallback> javaClass;
     };
 
     FileSource(jni::JNIEnv&, jni::String, jni::String, jni::Object<AssetManager>);
@@ -46,8 +44,6 @@ public:
     void pause(jni::JNIEnv&);
 
     jni::jboolean isResumed(jni::JNIEnv&);
-
-    static jni::Class<FileSource> javaClass;
 
     static FileSource* getNativePeer(jni::JNIEnv&, jni::Object<FileSource>);
 

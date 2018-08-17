@@ -8,6 +8,7 @@ namespace android {
 namespace geojson {
 
 jni::Object<Point> Point::New(jni::JNIEnv& env, const mbgl::Point<double>& point) {
+    static auto javaClass = jni::Class<Point>::Singleton(env);
     static auto method = javaClass.GetStaticMethod<jni::Object<Point> (jni::jdouble, jni::jdouble)>(env, "fromLngLat");
     return javaClass.Call(env, method, point.x, point.y);
 }
@@ -16,9 +17,7 @@ mapbox::geojson::point Point::convert(jni::JNIEnv &env, jni::Object<Point> jPoin
     mapbox::geojson::point point;
 
     if (jPoint) {
-        auto jDoubleList = Point::coordinates(env, jPoint);
-        point = Point::convert(env, jDoubleList);
-        jni::DeleteLocalRef(env, jDoubleList);
+        point = Point::convert(env, *jni::SeizeLocal(env, Point::coordinates(env, jPoint)));
     }
 
     return point;
@@ -28,34 +27,28 @@ mapbox::geojson::point Point::convert(jni::JNIEnv &env, jni::Object<java::util::
     mapbox::geojson::point point;
 
     if (jDoubleList) {
-        auto jDoubleArray = java::util::List::toArray<jobject>(env, jDoubleList);
+        auto jDoubleArray = jni::SeizeLocal(env, java::util::List::toArray<jobject>(env, jDoubleList));
 
-        auto lonObject = jDoubleArray.Get(env, 0);
-        auto latObject = jDoubleArray.Get(env, 1);
+        auto lonObject = jni::SeizeLocal(env, jDoubleArray->Get(env, 0));
+        auto latObject = jni::SeizeLocal(env, jDoubleArray->Get(env, 1));
 
-        point.x = jni::CallMethod<jni::jdouble>(env, lonObject,
+        point.x = jni::CallMethod<jni::jdouble>(env, *lonObject,
                                                 *java::Number::doubleValueMethodId);
-        point.y = jni::CallMethod<jni::jdouble>(env, latObject,
+        point.y = jni::CallMethod<jni::jdouble>(env, *latObject,
                                                 *java::Number::doubleValueMethodId);
-
-        jni::DeleteLocalRef(env, lonObject);
-        jni::DeleteLocalRef(env, latObject);
-        jni::DeleteLocalRef(env, jDoubleArray);
     }
     return point;
 }
 
 jni::Object<java::util::List> Point::coordinates(jni::JNIEnv &env, jni::Object<Point> jPoint) {
-     static auto method = Point::javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "coordinates");
-     return jPoint.Call(env, method);
+    static auto javaClass = jni::Class<Point>::Singleton(env);
+    static auto method = javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "coordinates");
+    return jPoint.Call(env, method);
 }
 
 void Point::registerNative(jni::JNIEnv &env) {
-    // Lookup the class
-    javaClass = *jni::Class<Point>::Find(env).NewGlobalRef(env).release();
+    jni::Class<Point>::Singleton(env);
 }
-
-jni::Class<Point> Point::javaClass;
 
 } // namespace geojson
 } // namespace android

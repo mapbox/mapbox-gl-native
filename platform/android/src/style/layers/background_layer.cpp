@@ -93,22 +93,21 @@ namespace android {
     }
 
 
-    jni::Class<BackgroundLayer> BackgroundLayer::javaClass;
-
     jni::jobject* BackgroundLayer::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = BackgroundLayer::javaClass.template GetConstructor<jni::jlong>(env);
-        return BackgroundLayer::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        static auto javaClass = jni::Class<BackgroundLayer>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
     void BackgroundLayer::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        BackgroundLayer::javaClass = *jni::Class<BackgroundLayer>::Find(env).NewGlobalRef(env).release();
+        static auto javaClass = jni::Class<BackgroundLayer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<BackgroundLayer>(
-            env, BackgroundLayer::javaClass, "nativePtr",
+            env, javaClass, "nativePtr",
             std::make_unique<BackgroundLayer, JNIEnv&, jni::String>,
             "initialize",
             "finalize",

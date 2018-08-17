@@ -26,10 +26,6 @@ public:
                             jni::Object<FileSource>,
                             jni::Object<OfflineManager::ListOfflineRegionsCallback>,
                             mbgl::optional<std::vector<mbgl::OfflineRegion>>);
-
-        static jni::Class<OfflineManager::ListOfflineRegionsCallback> javaClass;
-
-        static void registerNative(jni::JNIEnv&);
     };
 
     class CreateOfflineRegionCallback {
@@ -42,15 +38,9 @@ public:
                             jni::Object<FileSource>,
                             jni::Object<OfflineManager::CreateOfflineRegionCallback>,
                             mbgl::optional<mbgl::OfflineRegion>);
-
-        static jni::Class<OfflineManager::CreateOfflineRegionCallback> javaClass;
-
-        static void registerNative(jni::JNIEnv&);
     };
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineManager"; };
-
-    static jni::Class<OfflineManager> javaClass;
 
     static void registerNative(jni::JNIEnv&);
 

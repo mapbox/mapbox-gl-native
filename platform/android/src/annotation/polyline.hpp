@@ -18,8 +18,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/annotations/Polyline"; };
 
-    static jni::Class<Polyline> javaClass;
-
     static mbgl::LineAnnotation toAnnotation(jni::JNIEnv&, jni::Object<Polyline>);
 
     static void registerNative(jni::JNIEnv&);

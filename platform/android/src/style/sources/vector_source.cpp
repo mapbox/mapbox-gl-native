@@ -25,7 +25,7 @@ namespace android {
             env,
             std::make_unique<mbgl::style::VectorSource>(
                 jni::Make<std::string>(env, sourceId),
-                convertURLOrTileset(Value(env, urlOrTileSet))
+                convertURLOrTileset(Value(env, jni::SeizeLocal(env, std::move(urlOrTileSet))))
             )
         ) {
     }
@@ -51,27 +51,27 @@ namespace android {
 
         std::vector<mbgl::Feature> features;
         if (rendererFrontend) {
-            features = rendererFrontend->querySourceFeatures(source.getID(), { toVector(env, jSourceLayerIds), toFilter(env, jfilter) });
+            features = rendererFrontend->querySourceFeatures(source.getID(),
+                { toVector(env, jSourceLayerIds), toFilter(env, jni::SeizeLocal(env, std::move(jfilter))) });
         }
         return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, features);
     }
 
-    jni::Class<VectorSource> VectorSource::javaClass;
-
     jni::Object<Source> VectorSource::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = VectorSource::javaClass.template GetConstructor<jni::jlong>(env);
-        return jni::Object<Source>(VectorSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
+        static auto javaClass = jni::Class<VectorSource>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+        return jni::Object<Source>(javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
     }
 
     void VectorSource::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        VectorSource::javaClass = *jni::Class<VectorSource>::Find(env).NewGlobalRef(env).release();
+        static auto javaClass = jni::Class<VectorSource>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<VectorSource>(
-            env, VectorSource::javaClass, "nativePtr",
+            env, javaClass, "nativePtr",
             std::make_unique<VectorSource, JNIEnv&, jni::String, jni::Object<>>,
             "initialize",
             "finalize",

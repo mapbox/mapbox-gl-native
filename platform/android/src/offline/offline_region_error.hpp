@@ -12,8 +12,6 @@ public:
 
     static jni::Object<OfflineRegionError> New(jni::JNIEnv&, mbgl::Response::Error);
 
-    static jni::Class<OfflineRegionError> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 };
 

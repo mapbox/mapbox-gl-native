@@ -39,8 +39,6 @@ public:
     jni::Object<LatLng> latLngForPixel(jni::JNIEnv&, jni::Object<PointF>);
 
 private:
-    static jni::Class<MapSnapshot> javaClass;
-
     float pixelRatio;
     mbgl::MapSnapshotter::PointForFn pointForFn;
     mbgl::MapSnapshotter::LatLngForFn latLngForFn;

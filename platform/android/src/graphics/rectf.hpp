@@ -20,10 +20,7 @@ public:
 
     static float getBottom(jni::JNIEnv&, jni::Object<RectF>);
 
-    static jni::Class<RectF> javaClass;
-
     static void registerNative(jni::JNIEnv&);
-
 };
 
 

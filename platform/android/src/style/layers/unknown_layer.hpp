@@ -12,8 +12,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/UnknownLayer"; };
 
-    static jni::Class<UnknownLayer> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     UnknownLayer(mbgl::Map&, mbgl::style::Layer&);

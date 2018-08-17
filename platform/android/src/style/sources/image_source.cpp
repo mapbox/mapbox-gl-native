@@ -50,22 +50,21 @@ namespace android {
                 LatLngQuad::getLatLngArray(env, coordinatesObject));
     }
 
-    jni::Class<ImageSource> ImageSource::javaClass;
-
     jni::Object<Source> ImageSource::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = ImageSource::javaClass.template GetConstructor<jni::jlong>(env);
-        return jni::Object<Source>(ImageSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
+        static auto javaClass = jni::Class<ImageSource>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+        return jni::Object<Source>(javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
     }
 
     void ImageSource::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        ImageSource::javaClass = *jni::Class<ImageSource>::Find(env).NewGlobalRef(env).release();
+        static auto javaClass = jni::Class<ImageSource>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<ImageSource>(
-                env, ImageSource::javaClass, "nativePtr",
+                env, javaClass, "nativePtr",
                 std::make_unique<ImageSource, JNIEnv&, jni::String, jni::Object<LatLngQuad>>,
                 "initialize",
                 "finalize",

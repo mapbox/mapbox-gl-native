@@ -15,8 +15,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/HeatmapLayer"; };
 
-    static jni::Class<HeatmapLayer> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     HeatmapLayer(jni::JNIEnv&, jni::String, jni::String);

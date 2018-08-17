@@ -17,8 +17,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/sources/Source"; };
 
-    static jni::Class<Source> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     static jni::Object<Source> peerForCoreSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
@@ -53,7 +51,7 @@ protected:
     mbgl::style::Source& source;
 
     // Set when the source is added to a map.
-    jni::UniqueObject<Source> javaPeer;
+    jni::Global<jni::Object<Source>> javaPeer;
 
     // RendererFrontend pointer is valid only when added to the map.
     AndroidRendererFrontend* rendererFrontend { nullptr };

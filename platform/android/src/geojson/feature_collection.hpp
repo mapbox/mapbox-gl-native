@@ -19,8 +19,6 @@ public:
 
     static jni::Object<java::util::List> features(jni::JNIEnv&, jni::Object<FeatureCollection>);
 
-    static jni::Class<FeatureCollection> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 };
 

@@ -206,22 +206,21 @@ namespace android {
     }
 
 
-    jni::Class<CircleLayer> CircleLayer::javaClass;
-
     jni::jobject* CircleLayer::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = CircleLayer::javaClass.template GetConstructor<jni::jlong>(env);
-        return CircleLayer::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        static auto javaClass = jni::Class<CircleLayer>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
     void CircleLayer::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        CircleLayer::javaClass = *jni::Class<CircleLayer>::Find(env).NewGlobalRef(env).release();
+        static auto javaClass = jni::Class<CircleLayer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<CircleLayer>(
-            env, CircleLayer::javaClass, "nativePtr",
+            env, javaClass, "nativePtr",
             std::make_unique<CircleLayer, JNIEnv&, jni::String, jni::String>,
             "initialize",
             "finalize",

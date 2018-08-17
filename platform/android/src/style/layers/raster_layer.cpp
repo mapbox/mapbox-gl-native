@@ -162,22 +162,21 @@ namespace android {
     }
 
 
-    jni::Class<RasterLayer> RasterLayer::javaClass;
-
     jni::jobject* RasterLayer::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = RasterLayer::javaClass.template GetConstructor<jni::jlong>(env);
-        return RasterLayer::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        static auto javaClass = jni::Class<RasterLayer>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
     void RasterLayer::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        RasterLayer::javaClass = *jni::Class<RasterLayer>::Find(env).NewGlobalRef(env).release();
+        static auto javaClass = jni::Class<RasterLayer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<RasterLayer>(
-            env, RasterLayer::javaClass, "nativePtr",
+            env, javaClass, "nativePtr",
             std::make_unique<RasterLayer, JNIEnv&, jni::String, jni::String>,
             "initialize",
             "finalize",

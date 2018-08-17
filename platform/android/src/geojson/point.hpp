@@ -26,8 +26,6 @@ public:
 
     static jni::Object<java::util::List> coordinates(JNIEnv&, jni::Object<Point>);
 
-    static jni::Class<Point> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 };
 

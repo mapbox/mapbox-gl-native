@@ -15,8 +15,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/SymbolLayer"; };
 
-    static jni::Class<SymbolLayer> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     SymbolLayer(jni::JNIEnv&, jni::String, jni::String);

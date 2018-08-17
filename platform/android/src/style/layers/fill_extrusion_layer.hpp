@@ -15,8 +15,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/FillExtrusionLayer"; };
 
-    static jni::Class<FillExtrusionLayer> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     FillExtrusionLayer(jni::JNIEnv&, jni::String, jni::String);

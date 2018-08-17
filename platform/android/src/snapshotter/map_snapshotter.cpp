@@ -25,7 +25,7 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
                                jni::Object<CameraPosition> position,
                                jni::jboolean _showLogo,
                                jni::String _programCacheDir)
-        : javaPeer(SeizeGenericWeakRef(_env, jni::Object<MapSnapshotter>(jni::NewWeakGlobalRef(_env, _obj.Get()).release())))
+        : javaPeer(SeizeGenericWeak(_obj.NewWeakGlobalRef(_env).release()))
         , pixelRatio(_pixelRatio)
         , threadPool(sharedThreadPool()) {
 
@@ -80,13 +80,13 @@ void MapSnapshotter::start(JNIEnv& env) {
             [this](std::exception_ptr err, PremultipliedImage image, std::vector<std::string> attributions, mbgl::MapSnapshotter::PointForFn pointForFn, mbgl::MapSnapshotter::LatLngForFn latLngForFn) {
         MBGL_VERIFY_THREAD(tid);
         android::UniqueEnv _env = android::AttachEnv();
+        static auto javaClass = jni::Class<MapSnapshotter>::Singleton(*_env);
 
         if (err) {
             // error handler callback
             static auto onSnapshotFailed = javaClass.GetMethod<void (jni::String)>(*_env, "onSnapshotFailed");
-            auto message = jni::Make<jni::String>(*_env, util::toString(err));
-            javaPeer->Call(*_env, onSnapshotFailed, message);
-            jni::DeleteLocalRef(*_env, message);
+            javaPeer->Call(*_env, onSnapshotFailed,
+                *jni::SeizeLocal(*_env, jni::Make<jni::String>(*_env, util::toString(err))));
         } else {
             // Create the wrapper
             auto mapSnapshot = android::MapSnapshot::New(*_env, std::move(image), pixelRatio, attributions, showLogo, pointForFn, latLngForFn);
@@ -149,16 +149,14 @@ void MapSnapshotter::deactivateFilesource(JNIEnv& env) {
 
 // Static methods //
 
-jni::Class<MapSnapshotter> MapSnapshotter::javaClass;
-
 void MapSnapshotter::registerNative(jni::JNIEnv& env) {
     // Lookup the class
-    MapSnapshotter::javaClass = *jni::Class<MapSnapshotter>::Find(env).NewGlobalRef(env).release();
+    static auto javaClass = jni::Class<MapSnapshotter>::Singleton(env);
 
 #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
     // Register the peer
-    jni::RegisterNativePeer<MapSnapshotter>(env, MapSnapshotter::javaClass, "nativePtr",
+    jni::RegisterNativePeer<MapSnapshotter>(env, javaClass, "nativePtr",
                                             std::make_unique<MapSnapshotter, JNIEnv&, jni::Object<MapSnapshotter>, jni::Object<FileSource>, jni::jfloat, jni::jint, jni::jint, jni::String, jni::String, jni::Object<LatLngBounds>, jni::Object<CameraPosition>, jni::jboolean, jni::String>,
                                            "nativeInitialize",
                                            "finalize",

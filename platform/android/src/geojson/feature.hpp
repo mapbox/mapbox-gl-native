@@ -28,10 +28,7 @@ public:
 
     static jni::Object<gson::JsonObject> properties(jni::JNIEnv&, jni::Object<Feature>);
 
-    static jni::Class<Feature> javaClass;
-
     static void registerNative(jni::JNIEnv&);
-
 };
 
 } // namespace geojson

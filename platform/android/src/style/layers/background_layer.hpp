@@ -15,8 +15,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/BackgroundLayer"; };
 
-    static jni::Class<BackgroundLayer> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     BackgroundLayer(jni::JNIEnv&, jni::String);

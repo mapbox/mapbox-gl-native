@@ -20,10 +20,8 @@ public:
 
     static mbgl::LatLng getLatLng(jni::JNIEnv&, jni::Object<LatLng>);
 
-    static jni::Class<LatLng> javaClass;
 
     static void registerNative(jni::JNIEnv&);
-
 };
 
 

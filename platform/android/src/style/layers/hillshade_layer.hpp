@@ -15,8 +15,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/HillshadeLayer"; };
 
-    static jni::Class<HillshadeLayer> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     HillshadeLayer(jni::JNIEnv&, jni::String, jni::String);
