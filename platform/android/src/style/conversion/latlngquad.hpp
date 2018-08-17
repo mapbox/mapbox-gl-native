@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mapbox/geojson.hpp>
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <jni/jni.hpp>
 
 namespace mbgl {

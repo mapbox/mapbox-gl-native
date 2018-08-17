@@ -3,12 +3,12 @@
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/style/layer_observer.hpp>
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/color_ramp_property_value.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/fnv_hash.hpp>
 
 namespace mbgl {

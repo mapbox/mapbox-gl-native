@@ -1,9 +1,9 @@
 #include <benchmark/benchmark.h>
 
 #include <mbgl/style/filter.hpp>
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/filter.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/benchmark/stub_geometry_tile_feature.hpp>
 

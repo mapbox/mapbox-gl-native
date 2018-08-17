@@ -2,6 +2,7 @@
 #include <mbgl/style/conversion/position.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/transition_options.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 namespace mbgl {
 namespace style {

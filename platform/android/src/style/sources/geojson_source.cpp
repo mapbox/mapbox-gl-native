@@ -5,9 +5,9 @@
 // Java -> C++ conversion
 #include "../android_conversion.hpp"
 #include "../conversion/filter.hpp"
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
 #include <mbgl/style/conversion/geojson_options.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 // C++ -> Java conversion
 #include "../../conversion/conversion.hpp"

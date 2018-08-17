@@ -1,4 +1,5 @@
 #include <mbgl/style/conversion/coordinate.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 namespace mbgl {
 namespace style {

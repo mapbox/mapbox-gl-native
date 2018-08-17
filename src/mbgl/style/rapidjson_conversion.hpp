@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/util/rapidjson.hpp>
-#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 #include <mapbox/geojson.hpp>
 #include <mapbox/geojson/rapidjson.hpp>

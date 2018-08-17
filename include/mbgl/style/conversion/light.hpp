@@ -2,6 +2,7 @@
 
 #include <mbgl/style/light.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/util/optional.hpp>
 
 namespace mbgl {
 namespace style {

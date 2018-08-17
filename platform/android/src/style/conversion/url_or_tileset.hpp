@@ -4,8 +4,8 @@
 #include <mbgl/util/variant.hpp>
 
 #include <mbgl/util/tileset.hpp>
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 #include <jni/jni.hpp>
 

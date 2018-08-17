@@ -1,8 +1,7 @@
 #include <mbgl/style/expression/is_expression.hpp>
 #include <mbgl/style/expression/compound_expression.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
-
-#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 #include <unordered_set>
 
