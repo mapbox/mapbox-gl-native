@@ -42,11 +42,12 @@ if(WITH_NODEJS)
         if("${DIRECTORY}/package.json" IS_NEWER_THAN "${DIRECTORY}/node_modules/.${NAME}.stamp")
             message(STATUS "Running 'npm install' for ${NAME}...")
             execute_process(
-                COMMAND "${NodeJS_EXECUTABLE}" "${npm_EXECUTABLE}" install --ignore-scripts
+                COMMAND "${NodeJS_EXECUTABLE}" "${npm_EXECUTABLE}" install --verbose --ignore-scripts
                 WORKING_DIRECTORY "${DIRECTORY}"
                 RESULT_VARIABLE NPM_INSTALL_FAILED
                 OUTPUT_VARIABLE NPM_OUTPUT
                 ERROR_VARIABLE NPM_OUTPUT)
+            message(STATUS "Finished 'npm install' for ${NAME}...")
             if(NOT NPM_INSTALL_FAILED)
                 execute_process(COMMAND ${CMAKE_COMMAND} -E touch "${DIRECTORY}/node_modules/.${NAME}.stamp")
             else()

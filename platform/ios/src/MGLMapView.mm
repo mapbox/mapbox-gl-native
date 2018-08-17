@@ -244,6 +244,12 @@ public:
 @property (nonatomic) MGLUserLocation *userLocation;
 @property (nonatomic) NSMutableDictionary<NSString *, NSMutableArray<MGLAnnotationView *> *> *annotationViewReuseQueueByIdentifier;
 
+/// Experimental rendering performance measurement.
+@property (nonatomic) BOOL experimental_enableFrameRateMeasurement;
+@property (nonatomic) CGFloat averageFrameRate;
+@property (nonatomic) CFTimeInterval frameTime;
+@property (nonatomic) CFTimeInterval averageFrameTime;
+
 @end
 
 @implementation MGLMapView
@@ -300,6 +306,11 @@ public:
     BOOL _accessibilityValueAnnouncementIsPending;
 
     MGLReachability *_reachability;
+
+    /// Experimental rendering performance measurement.
+    CFTimeInterval _frameCounterStartTime;
+    NSInteger _frameCount;
+    CFTimeInterval _frameDurations;
 }
 
 #pragma mark - Setup & Teardown -
@@ -1107,6 +1118,27 @@ public:
         _needsDisplayRefresh = NO;
 
         [self.glView display];
+    }
+
+    if (self.experimental_enableFrameRateMeasurement)
+    {
+        CFTimeInterval now = CACurrentMediaTime();
+
+        self.frameTime = now - _displayLink.timestamp;
+        _frameDurations += self.frameTime;
+
+        _frameCount++;
+
+        CFTimeInterval elapsed = now - _frameCounterStartTime;
+
+        if (elapsed >= 1.0) {
+            self.averageFrameRate = _frameCount / elapsed;
+            self.averageFrameTime = (_frameDurations / _frameCount) * 1000;
+
+            _frameCount = 0;
+            _frameDurations = 0;
+            _frameCounterStartTime = now;
+        }
     }
 }
 
