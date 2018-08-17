@@ -10,6 +10,7 @@
     <!-- Exposed attrs.xml -->
     <!--Configuration-->
     <public name="mapbox_styleUrl" type="attr" />
+    <public name="mapbox_styleJson" type="attr" />
     <public name="mapbox_apiBaseUrl" type="attr" />
     <public name="mapbox_localIdeographFontFamily" type="attr" />
     <public name="mapbox_pixelRatio"  type="float" />
