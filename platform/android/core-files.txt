@@ -65,8 +65,6 @@ platform/android/src/style/conversion/property_expression.hpp
 platform/android/src/style/conversion/property_value.hpp
 platform/android/src/style/conversion/transition_options.cpp
 platform/android/src/style/conversion/transition_options.hpp
-platform/android/src/style/conversion/types.hpp
-platform/android/src/style/conversion/types_string_values.hpp
 platform/android/src/style/conversion/url_or_tileset.cpp
 platform/android/src/style/conversion/url_or_tileset.hpp
 platform/android/src/map/camera_position.cpp

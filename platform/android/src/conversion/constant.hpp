@@ -3,6 +3,8 @@
 #include "conversion.hpp"
 
 #include <mbgl/util/color.hpp>
+#include <mbgl/util/enum.hpp>
+
 #include <jni/jni.hpp>
 
 #include <string>
@@ -72,6 +74,13 @@ struct Converter<jni::jobject*, std::vector<std::string>> {
 template <>
 struct Converter<jni::jobject*, std::vector<float>> {
     Result<jni::jobject*> operator()(jni::JNIEnv& env, const std::vector<float>& value) const;
+};
+
+template <class T>
+struct Converter<jni::jobject*, T, typename std::enable_if_t<std::is_enum<T>::value>> {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env, const T& value) const {
+        return convert<jni::jobject*, std::string>(env, Enum<T>::toString(value));
+    }
 };
 
 // Java -> C++
