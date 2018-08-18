@@ -12,18 +12,10 @@ Result<jni::jobject*> Converter<jni::jobject*, bool>::operator()(jni::JNIEnv& en
     return {&jni::NewObject(env, *javaClass, *constructor, (jboolean) value)};
 }
 
-Result<jni::jboolean> Converter<jni::jboolean, bool>::operator()(jni::JNIEnv&, const bool& value) const {
-    return {(jni::jboolean) value};
-}
-
 Result<jni::jobject*> Converter<jni::jobject*, float>::operator()(jni::JNIEnv& env, const float& value) const {
     static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "java/lang/Float")).release();
     static jni::jmethodID* constructor = &jni::GetMethodID(env, *javaClass, "<init>", "(F)V");
     return {&jni::NewObject(env, *javaClass, *constructor, (jfloat) value)};
-}
-
-Result<jni::jfloat> Converter<jni::jfloat, float>::operator()(jni::JNIEnv&, const float& value) const {
-    return {(jni::jfloat) value};
 }
 
 Result<jni::jobject*> Converter<jni::jobject*, double>::operator()(jni::JNIEnv& env, const double& value) const {
@@ -32,15 +24,7 @@ Result<jni::jobject*> Converter<jni::jobject*, double>::operator()(jni::JNIEnv& 
     return {&jni::NewObject(env, *javaClass, *constructor, (jfloat) value)};
 }
 
-Result<jni::jdouble> Converter<jni::jdouble, float>::operator()(jni::JNIEnv&, const double& value) const {
-    return {(jni::jdouble) value};
-}
-
 Result<jni::jobject*> Converter<jni::jobject*, std::string>::operator()(jni::JNIEnv& env, const std::string& value) const {
-    return {jni::Make<jni::String>(env, value).Get()};
-}
-
-Result<jni::jstring*> Converter<jni::jstring*, std::string>::operator()(jni::JNIEnv& env, const std::string& value) const {
     return {jni::Make<jni::String>(env, value).Get()};
 }
 
