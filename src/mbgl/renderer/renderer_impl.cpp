@@ -173,6 +173,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         renderLayers.at(entry.first)->setImpl(entry.second.after);
     }
 
+    if (!layerDiff.removed.empty() || !layerDiff.added.empty() || !layerDiff.changed.empty()) {
+        glyphManager->evict(fontStacks(*updateParameters.layers));
+    }
+
     // Update layers for class and zoom changes.
     for (const auto& entry : renderLayers) {
         RenderLayer& layer = *entry.second;
