@@ -6,7 +6,6 @@
 #include "../../conversion/conversion.hpp"
 #include "../../conversion/constant.hpp"
 #include "property_expression.hpp"
-#include "types.hpp"
 
 namespace mbgl {
 namespace android {

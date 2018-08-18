@@ -363,20 +363,3 @@ writeIfModified(
     `platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/layers/Property.java`,
     enumPropertyJavaTemplate({properties: enumProperties})
 );
-
-// De-duplicate enum properties before processing jni property templates
-const enumPropertiesDeDup = _(enumProperties).uniqBy(global.propertyNativeType).value();
-
-// JNI Enum property conversion templates
-const enumPropertyHppTypeStringValueTemplate = ejs.compile(fs.readFileSync('platform/android/src/style/conversion/types_string_values.hpp.ejs', 'utf8'), {strict: true});
-writeIfModified(
-    `platform/android/src/style/conversion/types_string_values.hpp`,
-    enumPropertyHppTypeStringValueTemplate({properties: enumPropertiesDeDup})
-);
-
-// JNI property value types conversion templates
-const enumPropertyHppTypeTemplate = ejs.compile(fs.readFileSync('platform/android/src/style/conversion/types.hpp.ejs', 'utf8'), {strict: true});
-writeIfModified(
-    `platform/android/src/style/conversion/types.hpp`,
-    enumPropertyHppTypeTemplate({properties: enumPropertiesDeDup})
-);
