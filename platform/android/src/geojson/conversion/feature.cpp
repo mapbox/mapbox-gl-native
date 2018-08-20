@@ -1,5 +1,4 @@
 #include "feature.hpp"
-#include "geometry.hpp"
 
 #include "../../conversion/constant.hpp"
 #include "../../conversion/conversion.hpp"
@@ -161,7 +160,7 @@ Result<jni::Object<android::geojson::Feature>> Converter<jni::Object<android::ge
     auto properties = jni::Object<gson::JsonObject>(*convert<jni::jobject*>(env, value.properties));
 
     // Convert geometry
-    auto geometry = *convert<jni::Object<android::geojson::Geometry>>(env, value.geometry);
+    auto geometry = android::geojson::Geometry::New(env, value.geometry);
 
     // Create feature
     auto feature = android::geojson::Feature::fromGeometry(env, geometry, properties, jid);
