@@ -2,20 +2,30 @@ package com.mapbox.mapboxsdk.testapp.style;
 
 import android.graphics.Color;
 import android.support.test.runner.AndroidJUnit4;
+
+import com.mapbox.geojson.Point;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
+import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
+import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
+import com.mapbox.mapboxsdk.utils.ColorUtils;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import timber.log.Timber;
 
 import java.io.IOException;
 
+import timber.log.Timber;
+
+import static com.mapbox.mapboxsdk.style.expressions.Expression.collator;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
@@ -26,13 +36,16 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.rgba;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.step;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.string;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.switchCase;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.toColor;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillAntialias;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOutlineColor;
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 @RunWith(AndroidJUnit4.class)
 public class ExpressionTest extends BaseActivityTest {
@@ -201,6 +214,54 @@ public class ExpressionTest extends BaseActivityTest {
         fillColor(expression)
       );
       expression.toArray();
+    });
+  }
+
+  @Test
+  public void testCollatorExpression() {
+    validateTestSetup();
+    setupStyle();
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      LatLng latLng = new LatLng(51, 17);
+
+      Expression expression1 = eq(literal("Łukasz"), literal("lukasz"), collator(true, true));
+      Expression expression2 = eq(literal("Łukasz"), literal("lukasz"), collator(literal(false), eq(literal(1),
+        literal(1)), literal("en")));
+      Expression expression3 = eq(literal("Łukasz"), literal("lukasz"), collator(literal(false), eq(literal(2),
+        literal(1))));
+
+      mapboxMap.addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      Layer layer = new CircleLayer("layer", "source")
+        .withProperties(circleColor(
+          switchCase(
+            expression1, literal(ColorUtils.colorToRgbaString(Color.GREEN)),
+            literal(ColorUtils.colorToRgbaString(Color.RED))
+          )
+        ));
+      mapboxMap.addLayer(layer);
+      uiController.loopMainThreadForAtLeast(1000);
+      assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
+        .isEmpty());
+
+      layer.setProperties(circleColor(
+        switchCase(
+          expression2, literal(ColorUtils.colorToRgbaString(Color.GREEN)),
+          literal(ColorUtils.colorToRgbaString(Color.RED))
+        )
+      ));
+      uiController.loopMainThreadForAtLeast(1000);
+      assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
+        .isEmpty());
+
+      layer.setProperties(circleColor(
+        switchCase(
+          expression3, literal(ColorUtils.colorToRgbaString(Color.GREEN)),
+          literal(ColorUtils.colorToRgbaString(Color.RED))
+        )
+      ));
+      uiController.loopMainThreadForAtLeast(1000);
+      assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
+        .isEmpty());
     });
   }
 
