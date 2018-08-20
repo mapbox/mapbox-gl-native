@@ -3854,7 +3854,7 @@
 				BITCODE_GENERATION_MODE = bitcode;
 				HEADER_SEARCH_PATHS = (
 					"$(mbgl_core_INCLUDE_DIRECTORIES)",
-					"$(mbgl_filesource_LINK_LIBRARIES)",
+					"$(mbgl_filesource_INCLUDE_DIRECTORIES)",
 				);
 				OTHER_CFLAGS = "-fvisibility=hidden";
 				OTHER_CPLUSPLUSFLAGS = (
@@ -3885,7 +3885,7 @@
 				BITCODE_GENERATION_MODE = bitcode;
 				HEADER_SEARCH_PATHS = (
 					"$(mbgl_core_INCLUDE_DIRECTORIES)",
-					"$(mbgl_filesource_LINK_LIBRARIES)",
+					"$(mbgl_filesource_INCLUDE_DIRECTORIES)",
 				);
 				LLVM_LTO = YES;
 				OTHER_CFLAGS = "-fvisibility=hidden";
