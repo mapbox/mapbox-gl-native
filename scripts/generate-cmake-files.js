@@ -6,7 +6,7 @@ const ejs = require('ejs');
 
 require('./style-code');
 
-function generateCMakeListFile(name, regex, patterns) {
+function generateFileList(name, regex, patterns) {
     const files = child_process.execSync(`git ls-files ${patterns.map((p) => '"' + p + '"').join(' ')}`).toString().trim().split('\n');
     var groups = {};
     for (const file of files) {
@@ -18,15 +18,15 @@ function generateCMakeListFile(name, regex, patterns) {
         groups[group].push(file);
     }
 
-    const fileListCmake = ejs.compile(fs.readFileSync('cmake/files.cmake.ejs', 'utf8'), {strict: true});
-    writeIfModified(`cmake/${name}-files.cmake`, fileListCmake({ name: name, groups: groups }));
+    const fileListCmake = ejs.compile(fs.readFileSync('cmake/files.txt.ejs', 'utf8'), {strict: true});
+    writeIfModified(`cmake/${name}-files.txt`, fileListCmake({ groups: groups }));
 }
 
-generateCMakeListFile('core', /^(?:src|include)\/(?:mbgl\/)?(.+)\/[^\/]+$/,
+generateFileList('core', /^(?:src|include)\/(?:mbgl\/)?(.+)\/[^\/]+$/,
     [ 'include/*.hpp', 'include/*.h', 'src/*.hpp', 'src/*.cpp', 'src/*.h', 'src/*.c' ]);
 
-generateCMakeListFile('benchmark', /^benchmark\/(?:(?:src|include)\/)?(?:mbgl\/)?(?:(.+)\/)?[^\/]+$/,
+generateFileList('benchmark', /^benchmark\/(?:(?:src|include)\/)?(?:mbgl\/)?(?:(.+)\/)?[^\/]+$/,
     [ 'benchmark/*.hpp', 'benchmark/*.cpp', 'benchmark/*.h', 'benchmark/*.c' ]);
 
-generateCMakeListFile('test', /^test\/(?:(?:src|include)\/)?(?:mbgl\/)?(?:(.+)\/)?[^\/]+$/,
+generateFileList('test', /^test\/(?:(?:src|include)\/)?(?:mbgl\/)?(?:(.+)\/)?[^\/]+$/,
     [ 'test/*.hpp', 'test/*.cpp', 'test/*.h', 'test/*.c' ]);
