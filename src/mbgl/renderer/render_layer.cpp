@@ -91,7 +91,7 @@ void RenderLayer::checkRenderability(const PaintParameters& parameters,
                    activeBindingCount - parameters.context.minimumRequiredVertexBindingCount);
         hasRenderFailures = true;
     } else if (activeBindingCount > parameters.context.minimumRequiredVertexBindingCount) {
-        Log::Error(Event::OpenGL,
+        Log::Warning(Event::OpenGL,
                    "The layer '%s' uses more data-driven properties than some devices may support. "
                    "Though it will render correctly on this device, it may have rendering errors "
                    "on other devices. To ensure compatibility with all devices, use %d fewer "
