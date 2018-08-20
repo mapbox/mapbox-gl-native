@@ -6,6 +6,7 @@
 * The `-[MGLMapView annotationAtPoint:]` method can now return annotations near tile boundaries at high zoom levels. ([#12570](https://github.com/mapbox/mapbox-gl-native/pull/12570))
 * Fixed inconsistencies in exception naming. ([#12583](https://github.com/mapbox/mapbox-gl-native/issues/12583))
 * Added `MGLShapeOfflineRegion` for defining arbitrarily shaped offline regions [#11447](https://github.com/mapbox/mapbox-gl-native/pull/11447)
+* Added an `-[MGLMapViewDelegate mapView:shapeAnnotationIsEnabled:]` method to specify whether an annotation is selectable. ([#12352](https://github.com/mapbox/mapbox-gl-native/pull/12352))
 
 # 0.10.0 - August 15, 2018
 

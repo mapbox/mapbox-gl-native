@@ -10,6 +10,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed inconsistencies in exception naming. ([#12583](https://github.com/mapbox/mapbox-gl-native/issues/12583))
 * Added `MGLShapeOfflineRegion` for defining arbitrarily shaped offline regions [#11447](https://github.com/mapbox/mapbox-gl-native/pull/11447)
 * Added a one-time warning about possible attribute loss when initializing an `MGLShapeSource` with an `MGLShapeCollection` [#12625](https://github.com/mapbox/mapbox-gl-native/pull/12625)
+* Added an `-[MGLMapViewDelegate mapView:shapeAnnotationIsEnabled:]` method to specify whether an annotation is selectable. ([#12352](https://github.com/mapbox/mapbox-gl-native/pull/12352))
 
 ## 4.3.0 - August 15, 2018
 

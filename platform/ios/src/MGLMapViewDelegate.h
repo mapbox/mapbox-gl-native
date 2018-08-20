@@ -433,6 +433,18 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark Selecting Annotations
 
 /**
+ Returns a Boolean value indicating whether the shape annotation can be selected.
+ 
+ If the return value is `YES`, the user can select the annotation by tapping
+ on it. If the delegate does not implement this method, the default value is `YES`.
+ 
+ @param mapView The map view that has selected the annotation.
+ @param annotation The object representing the shape annotation.
+ @return A Boolean value indicating whether the annotation can be selected.
+ */
+- (BOOL)mapView:(MGLMapView *)mapView shapeAnnotationIsEnabled:(MGLShape *)annotation;
+
+/**
  Tells the delegate that one of its annotations was selected.
 
  You can use this method to track changes in the selection state of annotations.
