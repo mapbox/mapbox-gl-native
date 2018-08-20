@@ -1,9 +1,9 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/light.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/position.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/chrono.hpp>

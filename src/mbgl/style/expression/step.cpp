@@ -1,5 +1,6 @@
 #include <mbgl/style/expression/step.hpp>
 #include <mbgl/style/expression/get_covering_stops.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <cmath>

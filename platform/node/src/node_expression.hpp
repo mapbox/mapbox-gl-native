@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/expression/expression.hpp>
 #include <exception>
 #include <memory>

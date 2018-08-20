@@ -1,9 +1,9 @@
 #include <benchmark/benchmark.h>
 
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/function.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;

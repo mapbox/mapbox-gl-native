@@ -30,8 +30,8 @@
 
 // Java -> C++ conversion
 #include "style/android_conversion.hpp"
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/filter.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 // C++ -> Java conversion
 #include "conversion/conversion.hpp"

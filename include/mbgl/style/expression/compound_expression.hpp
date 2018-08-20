@@ -1,10 +1,10 @@
 #pragma once
 
 #include <mbgl/style/expression/expression.hpp>
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/style/expression/value.hpp>
+#include <mbgl/style/conversion.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <memory>
