@@ -1,0 +1,28 @@
+# File source
+platform/android/src/http_file_source.cpp
+platform/android/src/asset_manager.hpp
+platform/android/src/asset_manager_file_source.cpp
+platform/android/src/asset_manager_file_source.hpp
+
+# FileSource holder
+platform/android/src/file_source.cpp
+platform/android/src/file_source.hpp
+
+# Connectivity
+platform/android/src/connectivity_listener.cpp
+platform/android/src/connectivity_listener.hpp
+
+# Offline
+platform/android/src/offline/offline_manager.cpp
+platform/android/src/offline/offline_manager.hpp
+platform/android/src/offline/offline_region.cpp
+platform/android/src/offline/offline_region.hpp
+platform/android/src/offline/offline_region_definition.cpp
+platform/android/src/offline/offline_region_definition.hpp
+platform/android/src/offline/offline_region_error.cpp
+platform/android/src/offline/offline_region_error.hpp
+platform/android/src/offline/offline_region_status.cpp
+platform/android/src/offline/offline_region_status.hpp
+
+# Database
+platform/default/sqlite3.cpp
