@@ -435,8 +435,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns a Boolean value indicating whether the shape annotation can be selected.
  
- If the return value is YES, the user can select the annotation by tapping [clicking]
- on it. If the delegate does not implement this method, the default value is YES.
+ If the return value is `YES`, the user can select the annotation by tapping
+ on it. If the delegate does not implement this method, the default value is `YES`.
  
  @param mapView The map view that has selected the annotation.
  @param annotation The object representing the shape annotation.

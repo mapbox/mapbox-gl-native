@@ -4183,9 +4183,8 @@ public:
             {
                 if ([annotation isKindOfClass:[MGLMultiPoint class]])
                 {
-                    if ([self.delegate respondsToSelector:@selector(mapView:shapeAnnotationIsEnabled:)] &&
-                        ![self.delegate mapView:self shapeAnnotationIsEnabled:(MGLMultiPoint *)annotation]) {
-                        return true;
+                    if ([self.delegate respondsToSelector:@selector(mapView:shapeAnnotationIsEnabled:)]) {
+                        return !!(![self.delegate mapView:self shapeAnnotationIsEnabled:(MGLMultiPoint *)annotation]);
                     } else {
                         return false;
                     }
