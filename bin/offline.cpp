@@ -62,18 +62,21 @@ int main(int argc, char *argv[]) {
     args::ValueFlag<std::string> outputValue(argumentParser, "file", "Output database file name", {'o', "output"});
     args::ValueFlag<std::string> apiBaseValue(argumentParser, "URL", "API Base URL", {'a', "apiBaseURL"});
     
+    args::Group mergeGroup(argumentParser, "Merge databases:", args::Group::Validators::AllOrNone);
+    args::ValueFlag<std::string> mergePathValue(mergeGroup, "merge", "Database to merge from", {'m', "merge"});
+    args::ValueFlag<std::string> inputValue(mergeGroup, "input", "Database to merge into. Use with --merge option.", {'i', "input"});
+
     // LatLngBounds
     args::Group latLngBoundsGroup(argumentParser, "LatLng bounds:", args::Group::Validators::AllOrNone);
     args::ValueFlag<double> northValue(latLngBoundsGroup, "degrees", "North latitude", {"north"});
     args::ValueFlag<double> westValue(latLngBoundsGroup, "degrees", "West longitude", {"west"});
     args::ValueFlag<double> southValue(latLngBoundsGroup, "degrees", "South latitude", {"south"});
     args::ValueFlag<double> eastValue(latLngBoundsGroup, "degrees", "East longitude", {"east"});
-    
+
     // Geometry
     args::Group geoJSONGroup(argumentParser, "GeoJson geometry:", args::Group::Validators::AllOrNone);
     args::ValueFlag<std::string> geometryValue(geoJSONGroup, "file", "GeoJSON file containing the region geometry", {"geojson"});
-    
-    
+
     args::ValueFlag<double> minZoomValue(argumentParser, "number", "Min zoom level", {"minZoom"});
     args::ValueFlag<double> maxZoomValue(argumentParser, "number", "Max zoom level", {"maxZoom"});
     args::ValueFlag<double> pixelRatioValue(argumentParser, "number", "Pixel ratio", {"pixelRatio"});
@@ -94,6 +97,11 @@ int main(int argc, char *argv[]) {
     }
 
     std::string style = styleValue ? args::get(styleValue) : mbgl::util::default_styles::streets.url;
+
+    mbgl::optional<std::string> mergePath = {};
+    if (mergePathValue) mergePath = args::get(mergePathValue);
+    mbgl::optional<std::string> inputDb = {};
+    if (inputValue) inputDb = args::get(inputValue);
 
     const double minZoom = minZoomValue ? args::get(minZoomValue) : 0.0;
     const double maxZoom = maxZoomValue ? args::get(maxZoomValue) : 15.0;
@@ -136,15 +144,37 @@ int main(int argc, char *argv[]) {
     fileSource.setAccessToken(token);
     fileSource.setAPIBaseURL(apiBaseURL);
 
+    if (inputDb && mergePath) {
+        DefaultFileSource inputSource(*inputDb, ".");
+        inputSource.setAccessToken(token);
+        inputSource.setAPIBaseURL(apiBaseURL);
+        
+        int retCode = 0;
+        std::cout << "Start Merge" << std::endl;
+        inputSource.mergeOfflineRegions(*mergePath,  [&] (mbgl::expected<std::vector<OfflineRegion>, std::exception_ptr> result) {
+
+            if (!result) {
+                std::cerr << "Error merging database: " << util::toString(result.error()) << std::endl;
+                retCode = 1;
+            } else {
+                std::cout << " Added " << result->size() << " Regions" << std::endl;
+                std::cout << "Finished Merge" << std::endl;
+            }
+            loop.stop();
+        });
+        loop.run();
+        return retCode;
+    }
 
     OfflineRegionMetadata metadata;
 
     class Observer : public OfflineRegionObserver {
     public:
-        Observer(OfflineRegion& region_, DefaultFileSource& fileSource_, util::RunLoop& loop_)
+        Observer(OfflineRegion& region_, DefaultFileSource& fileSource_, util::RunLoop& loop_, mbgl::optional<std::string> mergePath_)
             : region(region_),
               fileSource(fileSource_),
               loop(loop_),
+              mergePath(mergePath_),
               start(util::now()) {
         }
 
@@ -170,7 +200,7 @@ int main(int argc, char *argv[]) {
                       << std::endl;
 
             if (status.complete()) {
-                std::cout << "Finished" << std::endl;
+                std::cout << "Finished Download" << std::endl;
                 loop.stop();
             }
         }
@@ -186,6 +216,7 @@ int main(int argc, char *argv[]) {
         OfflineRegion& region;
         DefaultFileSource& fileSource;
         util::RunLoop& loop;
+        mbgl::optional<std::string> mergePath;
         Timestamp start;
     };
 
@@ -206,7 +237,7 @@ int main(int argc, char *argv[]) {
         } else {
             assert(region_);
             region = std::make_unique<OfflineRegion>(std::move(*region_));
-            fileSource.setOfflineRegionObserver(*region, std::make_unique<Observer>(*region, fileSource, loop));
+            fileSource.setOfflineRegionObserver(*region, std::make_unique<Observer>(*region, fileSource, loop, mergePath));
             fileSource.setOfflineRegionDownloadState(*region, OfflineRegionDownloadState::Active);
         }
     });

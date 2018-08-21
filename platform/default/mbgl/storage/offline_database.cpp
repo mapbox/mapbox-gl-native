@@ -7,6 +7,7 @@
 #include <mbgl/util/logging.hpp>
 
 #include "offline_schema.hpp"
+#include "merge_sideloaded.hpp"
 
 #include "sqlite3.hpp"
 
@@ -635,6 +636,58 @@ OfflineDatabase::createRegion(const OfflineRegionDefinition& definition,
 } catch (const mapbox::sqlite::Exception& ex) {
     handleError(ex, "create region");
     return unexpected<std::exception_ptr>(std::current_exception());
+}
+
+expected<OfflineRegions, std::exception_ptr>
+OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
+    try {
+        // clang-format off
+        mapbox::sqlite::Query query{ getStatement("ATTACH DATABASE ?1 AS side") };
+        // clang-format on
+
+        query.bind(1, sideDatabasePath);
+        query.run();
+    } catch (const mapbox::sqlite::Exception& ex) {
+        handleError(ex, "merge databse attach");
+        return unexpected<std::exception_ptr>(std::current_exception());
+    }
+    try {
+        // Attaching an accessible path without a db file creates a new temporary
+        //database and attaches it. Check for matching schema version.
+        auto sideUserVersion = static_cast<int>(getPragma<int64_t>("PRAGMA side.user_version"));
+        if (sideUserVersion != 6) {
+            Log::Warning(Event::Database, "Merge database does not match user_version of main database");
+            throw std::runtime_error("merge database does not match schema or has incorrect user_version");
+        }
+
+        mapbox::sqlite::Transaction transaction(*db);
+        db->exec(mergeSideloadedDatabaseSQL);
+        transaction.commit();
+
+        // clang-format off
+        mapbox::sqlite::Query query{ getStatement(
+            "SELECT r.id, r.definition, r.description "
+            "FROM side.regions sr "
+            "JOIN regions r ON sr.definition = r.definition") };
+        // clang-format on
+
+        OfflineRegions result;
+        while (query.run()) {
+            // Construct, then move because this constructor is private.
+            OfflineRegion region(query.get<int64_t>(0),
+                decodeOfflineRegionDefinition(query.get<std::string>(1)),
+                query.get<std::vector<uint8_t>>(2));
+            result.emplace_back(std::move(region));
+        }
+        db->exec("DETACH DATABASE side");
+        // Explicit move to avoid triggering the copy constructor.
+        return { std::move(result) };
+    } catch (const mapbox::sqlite::Exception& ex) {
+        db->exec("DETACH DATABASE side");
+        handleError(ex, "merge databse post merge sql");
+        return unexpected<std::exception_ptr>(std::current_exception());
+    }
+    return {};
 }
 
 expected<OfflineRegionMetadata, std::exception_ptr>
