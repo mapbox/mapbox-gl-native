@@ -55,7 +55,7 @@ void deleteFile(const std::string& filename) {
 void copyFile(const std::string& destination, const std::string& source) {
     std::ifstream src(source, std::ios::binary);
     if (!src.good()) {
-        throw IOException(errno, "Cannot read file " + destination);
+        throw IOException(errno, "Cannot read file " + source);
     }
     std::ofstream dst(destination, std::ios::binary);
     if (!dst.good()) {

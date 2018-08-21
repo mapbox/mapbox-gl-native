@@ -648,7 +648,7 @@ OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
         query.bind(1, sideDatabasePath);
         query.run();
     } catch (const mapbox::sqlite::Exception& ex) {
-        handleError(ex, "merge databse attach");
+        Log::Error(Event::Database, static_cast<int>(ex.code), "Can't attach database (%s) for merge: %s", sideDatabasePath.c_str(), ex.what());
         return unexpected<std::exception_ptr>(std::current_exception());
     }
     try {
@@ -656,8 +656,7 @@ OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
         //database and attaches it. Check for matching schema version.
         auto sideUserVersion = static_cast<int>(getPragma<int64_t>("PRAGMA side.user_version"));
         if (sideUserVersion != 6) {
-            Log::Warning(Event::Database, "Merge database does not match user_version of main database");
-            throw std::runtime_error("merge database does not match schema or has incorrect user_version");
+            throw std::runtime_error("Merge database does not match schema or has incorrect user_version");
         }
 
         mapbox::sqlite::Transaction transaction(*db);
@@ -682,9 +681,10 @@ OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
         db->exec("DETACH DATABASE side");
         // Explicit move to avoid triggering the copy constructor.
         return { std::move(result) };
-    } catch (const mapbox::sqlite::Exception& ex) {
+    } catch (const std::runtime_error& ex) {
         db->exec("DETACH DATABASE side");
-        handleError(ex, "merge databse post merge sql");
+        Log::Error(Event::Database, "%s", ex.what());
+
         return unexpected<std::exception_ptr>(std::current_exception());
     }
     return {};
