@@ -1,6 +1,5 @@
-add_library(mbgl-core STATIC
-    ${MBGL_CORE_FILES}
-)
+load_sources_list(MBGL_CORE_FILES cmake/core-files.txt)
+add_library(mbgl-core STATIC ${MBGL_CORE_FILES})
 
 target_include_directories(mbgl-core
     PUBLIC include

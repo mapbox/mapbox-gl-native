@@ -2108,7 +2108,11 @@ public:
             
             if ([annotation isKindOfClass:[MGLMultiPoint class]])
             {
-                return false;
+                if ([self.delegate respondsToSelector:@selector(mapView:shapeAnnotationIsEnabled:)]) {
+                    return !!(![self.delegate mapView:self shapeAnnotationIsEnabled:(MGLMultiPoint *)annotation]);
+                } else {
+                    return false;
+                }
             }
             
             MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];

@@ -105,6 +105,14 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
     auto geoJSONOptions = MGLGeoJSONOptionsFromDictionary(options);
     auto source = std::make_unique<mbgl::style::GeoJSONSource>(identifier.UTF8String, geoJSONOptions);
     if (self = [super initWithPendingSource:std::move(source)]) {
+        if ([shape isMemberOfClass:[MGLShapeCollection class]]) {
+            static dispatch_once_t onceToken;
+            dispatch_once(&onceToken, ^{
+                NSLog(@"MGLShapeCollection initialized with MGLFeatures will not retain attributes."
+                        @"Use MGLShapeCollectionFeature to retain attributes instead."
+                        @"This will be logged only once.");
+            });
+        }
         self.shape = shape;
     }
     return self;

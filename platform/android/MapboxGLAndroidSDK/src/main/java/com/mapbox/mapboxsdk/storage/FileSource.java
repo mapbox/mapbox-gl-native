@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
@@ -11,6 +12,10 @@ import android.support.annotation.UiThread;
 
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.utils.ThreadUtils;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import timber.log.Timber;
 
@@ -19,6 +24,11 @@ import timber.log.Timber;
  * there are active mapviews / offline managers
  */
 public class FileSource {
+
+  private static String resourcesCachePath;
+  private static String internalCachePath;
+  private static final Lock resourcesCachePathLoaderLock = new ReentrantLock();
+  private static final Lock internalCachePathLoaderLock = new ReentrantLock();
 
   /**
    * This callback allows implementors to transform URLs before they are requested
@@ -51,19 +61,20 @@ public class FileSource {
   @UiThread
   public static synchronized FileSource getInstance(Context context) {
     if (INSTANCE == null) {
-      String cachePath = getCachePath(context);
-      INSTANCE = new FileSource(cachePath, context.getResources().getAssets());
+      INSTANCE = new FileSource(getResourcesCachePath(context), context.getResources().getAssets());
     }
 
     return INSTANCE;
   }
 
   /**
-   * Get the cache path for a context.
+   * Get files directory path for a context.
    *
-   * @param context the context to derive the cache path from
-   * @return the cache path
+   * @param context the context to derive the files directory path from
+   * @return the files directory path
+   * @deprecated Use {@link #getResourcesCachePath(Context)} instead.
    */
+  @Deprecated
   public static String getCachePath(Context context) {
     // Default value
     boolean setStorageExternal = MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL;
@@ -120,6 +131,89 @@ public class FileSource {
       + " permissions in your app Manifest (defaulting to internal storage).");
 
     return false;
+  }
+
+  /**
+   * Initializes file directories paths.
+   *
+   * @param context the context to derive paths from
+   */
+  @UiThread
+  public static void initializeFileDirsPaths(Context context) {
+    ThreadUtils.checkThread("FileSource");
+    lockPathLoaders();
+    if (resourcesCachePath == null || internalCachePath == null) {
+      new FileDirsPathsTask().execute(context);
+    }
+  }
+
+  private static class FileDirsPathsTask extends AsyncTask<Context, Void, String[]> {
+
+    @Override
+    protected void onCancelled() {
+      unlockPathLoaders();
+    }
+
+    @Override
+    protected String[] doInBackground(Context... contexts) {
+      return new String[] {
+        getCachePath(contexts[0]),
+        contexts[0].getCacheDir().getAbsolutePath()
+      };
+    }
+
+    @Override
+    protected void onPostExecute(String[] paths) {
+      resourcesCachePath = paths[0];
+      internalCachePath = paths[1];
+      unlockPathLoaders();
+    }
+  }
+
+  /**
+   * Get files directory path for a context.
+   *
+   * @param context the context to derive the files directory path from
+   * @return the files directory path
+   */
+  public static String getResourcesCachePath(Context context) {
+    resourcesCachePathLoaderLock.lock();
+    try {
+      if (resourcesCachePath == null) {
+        resourcesCachePath = getCachePath(context);
+      }
+      return resourcesCachePath;
+    } finally {
+      resourcesCachePathLoaderLock.unlock();
+    }
+  }
+
+  /**
+   * Get internal cache path for a context.
+   *
+   * @param context the context to derive the internal cache path from
+   * @return the internal cache path
+   */
+  public static String getInternalCachePath(Context context) {
+    internalCachePathLoaderLock.lock();
+    try {
+      if (internalCachePath == null) {
+        internalCachePath = context.getCacheDir().getAbsolutePath();
+      }
+      return internalCachePath;
+    } finally {
+      internalCachePathLoaderLock.unlock();
+    }
+  }
+
+  private static void lockPathLoaders() {
+    internalCachePathLoaderLock.lock();
+    resourcesCachePathLoaderLock.lock();
+  }
+
+  private static void unlockPathLoaders() {
+    resourcesCachePathLoaderLock.unlock();
+    internalCachePathLoaderLock.unlock();
   }
 
   @Keep

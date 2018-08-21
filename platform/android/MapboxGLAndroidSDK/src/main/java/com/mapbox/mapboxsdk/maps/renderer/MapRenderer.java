@@ -28,7 +28,7 @@ public abstract class MapRenderer implements MapRendererScheduler {
   public MapRenderer(Context context, String localIdeographFontFamily) {
     FileSource fileSource = FileSource.getInstance(context);
     float pixelRatio = context.getResources().getDisplayMetrics().density;
-    String programCacheDir = context.getCacheDir().getAbsolutePath();
+    String programCacheDir = FileSource.getInternalCachePath(context);
 
     // Initialise native peer
     nativeInitialize(this, fileSource, pixelRatio, programCacheDir, localIdeographFontFamily);
