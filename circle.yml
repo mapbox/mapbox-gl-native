@@ -33,9 +33,6 @@ workflows:
       - linux-gcc4.9-debug
       - linux-gcc5-debug-coverage
       - ios-debug
-      - ios-sanitize
-      - ios-sanitize-address
-      - ios-static-analyzer
       - ios-release
       - ios-release-tag:
           filters:
@@ -57,6 +54,9 @@ workflows:
                 - master
     jobs:
       - ios-release
+      - ios-sanitize
+      - ios-sanitize-address
+      - ios-static-analyzer
 
 step-library:
   - &npm-install
