@@ -1277,7 +1277,7 @@ TEST(OfflineDatabase, MergeDatabaseWithInvalidPath) {
     auto result = db.mergeDatabase(filename_sideload);
     EXPECT_FALSE(result);
 
-    EXPECT_EQ(1u, log.count({ EventSeverity::Error, Event::Database, -1, "Merge database does not match schema or has incorrect user_version" }));
+    EXPECT_EQ(1u, log.count({ EventSeverity::Error, Event::Database, -1, "Merge database has incorrect user_version" }));
     EXPECT_EQ(0u, log.uncheckedCount());
 }
 
