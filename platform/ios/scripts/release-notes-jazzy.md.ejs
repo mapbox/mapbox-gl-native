@@ -4,6 +4,20 @@ The Mapbox Maps SDK for iOS is an open-source framework for embedding interactiv
 
 ![Mapbox Maps SDK for iOS screenshots](img/screenshot.png)
 
-For setup information, check out the [Mapbox Maps SDK for iOS homepage](https://www.mapbox.com/ios-sdk/). For detailed usage instructions, read “[First steps with the Mapbox Maps SDK for iOS](https://www.mapbox.com/help/first-steps-ios-sdk/)” and consult the [online examples](https://www.mapbox.com/ios-sdk/examples/). A [full changelog](https://github.com/mapbox/mapbox-gl-native/blob/master/platform/ios/CHANGELOG.md) is also available.
+For setup information, check out the [Mapbox Maps SDK for iOS homepage](https://www.mapbox.com/ios-sdk/). For detailed usage instructions, read “[First steps with the Mapbox Maps SDK for iOS](https://www.mapbox.com/help/first-steps-ios-sdk/)” and consult the [online examples](https://www.mapbox.com/ios-sdk/examples/).
 
 If you have any questions, please see [our help page](https://www.mapbox.com/help/). We welcome your [bug reports, feature requests, and contributions](https://github.com/mapbox/mapbox-gl-native/issues/).
+
+## Changes in version <%-CURRENTVERSION%>
+
+<%-CURRENTCHANGELOG%>
+
+## Recent changes
+
+<% OTHERRELEASES.forEach(function(release) { %>
+### <%-release.version%>
+
+<%-release.changelog%>
+<% }) -%>
+
+See the [full changelog](https://github.com/mapbox/mapbox-gl-native/blob/ios-v<%-CURRENTVERSION%>/platform/ios/CHANGELOG.md) for previous releases.

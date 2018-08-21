@@ -8,6 +8,15 @@ const semver = require('semver');
 
 const changelog = fs.readFileSync('platform/ios/CHANGELOG.md', 'utf8');
 
+let outputMode = {};
+switch(process.argv[2]) {
+    case "jazzy":
+        outputMode.isJazzy = true; break;
+    case "github":
+    default:
+        outputMode.isGitHub = true;
+}
+
 /*
   Find current and immediately previous releases by parsing git tags.
 */
@@ -55,11 +64,34 @@ const currentReleaseNotes = _.find(releaseNotes, { version: bestReleaseNotesForC
 /*
   Fill and print the release notes template.
 */
-const templatedReleaseNotes = ejs.render(fs.readFileSync('platform/ios/scripts/release-notes.md.ejs', 'utf8'), {
-    'CURRENTVERSION': currentVersion,
-    'PREVIOUSVERSION': previousVersion,
-    'CHANGELOG': currentReleaseNotes.changelog,
-    'isPrerelease': semver.prerelease(currentVersion)
-});
+let templatedReleaseNotes;
+
+if (outputMode.isGitHub) {
+    templatedReleaseNotes = ejs.render(fs.readFileSync('platform/ios/scripts/release-notes-github.md.ejs', 'utf8'), {
+        'CURRENTVERSION': currentVersion,
+        'PREVIOUSVERSION': previousVersion,
+        'CHANGELOG': currentReleaseNotes.changelog,
+        'isPrerelease': semver.prerelease(currentVersion)
+    });
+}
+
+if (outputMode.isJazzy) {
+    const minorReleaseSeries = semver.major(currentVersion) + "." + semver.minor(currentVersion) + ".0";
+    const range = ">=" + minorReleaseSeries + " <" + currentVersion;
+    const otherReleasesInSeries = _.filter(releaseNotes, function(release) {
+        return semver.satisfies(release.version, range);
+    });
+
+    otherReleasesInSeries.forEach(function(release) {
+        // Bump section headings from h3 to h4.
+        release.changelog = release.changelog.replace(/^### /gm, '#### ');
+    });
+
+    templatedReleaseNotes = ejs.render(fs.readFileSync('platform/ios/scripts/release-notes-jazzy.md.ejs', 'utf8'), {
+        'CURRENTVERSION': currentVersion,
+        'CURRENTCHANGELOG': currentReleaseNotes.changelog,
+        'OTHERRELEASES': otherReleasesInSeries
+    });
+}
 
 process.stdout.write(templatedReleaseNotes);
