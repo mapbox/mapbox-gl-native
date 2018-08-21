@@ -22,7 +22,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added a new option to `MGLSymbolPlacement`, `MGLSymbolPlacementLineCenter`, that places the label relative to the center of the geometry. ([#12337](https://github.com/mapbox/mapbox-gl-native/pull/12337))
 * Added a `MGLShapeSourceOptionLineDistanceMetrics` property that enables or disables calculating line distance metrics.
 
-## User location
+### User location
 
 * Added an `MGLMapView.locationManager` property and `MGLLocationManager` protocol for tracking user location using a custom alternative to `CLLocationManager`. ([#12013](https://github.com/mapbox/mapbox-gl-native/pull/12013))
 * Fixed a crash that occurred when `MMELocationManager` was deallocated and the delegate was reporting updates. ([#12542](https://github.com/mapbox/mapbox-gl-native/pull/12542))
