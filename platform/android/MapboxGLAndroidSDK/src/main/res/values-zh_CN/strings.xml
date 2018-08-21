@@ -12,4 +12,4 @@
     <string name="mapbox_attributionErrorNoBrowser">设备中未安装任何浏览器，不能打开该网页</string>
     <string name="mapbox_offline_error_region_definition_invalid">提供的OfflineRegionDefinition不符合标准地理范围：%s</string>
     <string name="mapbox_telemetrySettings">Telemetry设置</string>
-    </resources>
+</resources>
