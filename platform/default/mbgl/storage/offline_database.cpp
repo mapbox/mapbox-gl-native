@@ -652,11 +652,13 @@ OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
         return unexpected<std::exception_ptr>(std::current_exception());
     }
     try {
-        // Attaching an accessible path without a db file creates a new temporary
-        //database and attaches it. Check for matching schema version.
+        // Support sideloaded databases at user_version = 6. Future schema version
+        // changes will need to implement migration paths for sideloaded databases at
+        // version 6.
         auto sideUserVersion = static_cast<int>(getPragma<int64_t>("PRAGMA side.user_version"));
-        if (sideUserVersion != 6) {
-            throw std::runtime_error("Merge database does not match schema or has incorrect user_version");
+        const auto mainUserVersion = getPragma<int64_t>("PRAGMA user_version");
+        if (sideUserVersion < 6 || sideUserVersion != mainUserVersion) {
+            throw std::runtime_error("Merge database has incorrect user_version");
         }
 
         mapbox::sqlite::Transaction transaction(*db);
