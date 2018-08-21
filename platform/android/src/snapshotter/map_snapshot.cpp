@@ -1,7 +1,7 @@
 #include "map_snapshot.hpp"
 
 #include "../bitmap.hpp"
-#include "../jni/collection.hpp"
+#include "../conversion/collection.hpp"
 
 #include <memory>
 
@@ -40,7 +40,7 @@ jni::Object<MapSnapshot> MapSnapshot::New(JNIEnv& env,
     // Create the Mapsnapshot peers
     static auto constructor = javaClass.GetConstructor<jni::jlong, jni::Object<Bitmap>, jni::Array<jni::String>, jni::jboolean>(env);
     auto nativePeer = std::make_unique<MapSnapshot>(pixelRatio, pointForFn, latLngForFn);
-    return javaClass.New(env, constructor, reinterpret_cast<jlong>(nativePeer.release()), bitmap, jni::Make<jni::Array<jni::String>>(env, attributions), (jni::jboolean) showLogo);
+    return javaClass.New(env, constructor, reinterpret_cast<jlong>(nativePeer.release()), bitmap, conversion::toArray(env, attributions), (jni::jboolean) showLogo);
 }
 
 jni::Class<MapSnapshot> MapSnapshot::javaClass;
