@@ -17,6 +17,7 @@ using namespace mbgl;
 using mapbox::sqlite::ResultCode;
 
 static constexpr const char* filename = "test/fixtures/offline_database/offline.db";
+static constexpr const char* filename_sideload = "test/fixtures/offline_database/offline_sideload.db";
 #ifndef __QT__ // Qt doesn't expose the ability to register virtual file system handlers.
 static constexpr const char* filename_test_fs = "file:test/fixtures/offline_database/offline.db?vfs=test_fs";
 #endif
@@ -1115,3 +1116,205 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(DisallowedIO)) {
     fs.reset();
 }
 #endif // __QT__
+
+TEST(OfflineDatabase, MergeDatabaseWithSingleRegion_New) {
+    util::deleteFile(filename_sideload);
+    util::copyFile(filename_sideload, "test/fixtures/offline_database/sideload_sat.db");
+
+    OfflineDatabase db(":memory:");
+    EXPECT_EQ(0u, db.listRegions()->size());
+
+    auto result = db.mergeDatabase(filename_sideload);
+    EXPECT_EQ(1u, result->size());
+    EXPECT_EQ(1u, db.listRegions()->size());
+
+    auto regionId = result->front().getID();
+    auto status =  db.getRegionCompletedStatus(regionId);
+    EXPECT_EQ(2u, status->completedResourceCount);
+    EXPECT_EQ(1u, status->completedTileCount);
+}
+
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(MergeDatabaseWithSingleRegion_Update)) {
+    deleteDatabaseFiles();
+    util::deleteFile(filename_sideload);
+    util::copyFile(filename, "test/fixtures/offline_database/satellite_test.db");
+    util::copyFile(filename_sideload, "test/fixtures/offline_database/sideload_sat.db");
+    int64_t regionId;
+
+    {
+        OfflineDatabase db(filename);
+        auto regions = db.listRegions();
+        EXPECT_EQ(1u, db.listRegions()->size());
+        regionId = regions->front().getID();
+
+        auto result = db.mergeDatabase(filename_sideload);
+        EXPECT_EQ(1u, result->size());
+        // When updating an identical region, the region id remains unchanged.
+        EXPECT_EQ(regionId, result->front().getID());
+
+        auto status = db.getRegionCompletedStatus(regionId);
+        EXPECT_EQ(5u, status->completedResourceCount);
+        EXPECT_EQ(1u, status->completedTileCount);
+
+        //Verify the modified timestamp matches the tile in the sideloaded db.
+        auto updatedTile = db.getRegionResource(regionId,
+            Resource::tile("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.webp",
+                1, 0, 0, 1, Tileset::Scheme::XYZ));
+        EXPECT_EQ(Timestamp{ Seconds(1520409600) }, *(updatedTile->first.modified));
+    }
+}
+
+TEST(OfflineDatabase, MergeDatabaseWithSingleRegion_NoUpdate) {
+    deleteDatabaseFiles();
+    util::deleteFile(filename_sideload);
+
+    //Swap sideload/main database from update test and ensure that an older tile is not copied over
+    util::copyFile(filename_sideload, "test/fixtures/offline_database/satellite_test.db");
+    util::copyFile(filename, "test/fixtures/offline_database/sideload_sat.db");
+
+    OfflineDatabase db(filename);
+    auto result = db.mergeDatabase(filename_sideload);
+    EXPECT_EQ(1u, result->size());
+    EXPECT_EQ(1u, db.listRegions()->size());
+
+    auto regionId = result->front().getID();
+    auto updatedTile = db.getRegionResource(regionId,
+        Resource::tile("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.webp",
+            1, 0, 0, 1, Tileset::Scheme::XYZ));
+
+    //Verify the modified timestamp matches the tile in the main db.
+    EXPECT_EQ(Timestamp{ Seconds(1520409600) }, *(updatedTile->first.modified));
+}
+
+TEST(OfflineDatabase, MergeDatabaseWithSingleRegion_AmbientTiles) {
+    util::deleteFile(filename_sideload);
+    util::copyFile(filename_sideload, "test/fixtures/offline_database/sideload_ambient.db");
+
+    OfflineDatabase db(":memory:");
+    auto result = db.mergeDatabase(filename_sideload);
+    auto regionId = result->front().getID();
+
+    EXPECT_TRUE(bool(db.hasRegionResource(regionId, Resource::tile("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.png", 1, 0, 0, 1, Tileset::Scheme::XYZ))));
+
+    //Ambient resources should not be copied
+    EXPECT_FALSE(bool(db.hasRegionResource(regionId, Resource::style("mapbox://styles/mapbox/streets-v9"))));
+    EXPECT_FALSE(bool(db.hasRegionResource(regionId, Resource::tile("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.png", 1, 0, 1, 2, Tileset::Scheme::XYZ))));
+    EXPECT_FALSE(bool(db.hasRegionResource(regionId, Resource::tile("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.png", 1, 1, 1, 2, Tileset::Scheme::XYZ))));
+}
+
+TEST(OfflineDatabase, MergeDatabaseWithMultipleRegions_New) {
+    util::deleteFile(filename_sideload);
+    util::copyFile(filename_sideload, "test/fixtures/offline_database/sideload_sat_multiple.db");
+
+    OfflineDatabase db(":memory:");
+    EXPECT_EQ(0u, db.listRegions()->size());
+
+    auto result = db.mergeDatabase(filename_sideload);
+    EXPECT_EQ(2u, result->size());
+    EXPECT_EQ(2u, db.listRegions()->size());
+    
+    auto region1Id = result->front().getID();
+    auto status = db.getRegionCompletedStatus(region1Id);
+    EXPECT_EQ(4u, status->completedResourceCount);
+    EXPECT_EQ(3u, status->completedTileCount);
+
+    auto region2Id = result->back().getID();
+    status = db.getRegionCompletedStatus(region2Id);
+    EXPECT_EQ(1u, status->completedTileCount);
+    EXPECT_EQ(2u, status->completedResourceCount);
+}
+
+TEST(OfflineDatabase, MergeDatabaseWithMultipleRegionsWithOverlap) {
+    deleteDatabaseFiles();
+    util::deleteFile(filename_sideload);
+    util::copyFile(filename, "test/fixtures/offline_database/sideload_sat.db");
+    util::copyFile(filename_sideload, "test/fixtures/offline_database/sideload_sat_multiple.db");
+
+    {
+        OfflineDatabase db(filename);
+        EXPECT_EQ(1u, db.listRegions()->size());
+
+        auto result = db.mergeDatabase(filename_sideload);
+        EXPECT_EQ(2u, result->size());
+        EXPECT_EQ(3u, db.listRegions()->size());
+    }
+
+    mapbox::sqlite::Database db = mapbox::sqlite::Database::open(filename, mapbox::sqlite::ReadOnly);
+    {
+        // clang-format off
+        mapbox::sqlite::Statement stmt { db, "SELECT COUNT(*) "
+                                        "FROM region_tiles "
+                                        "JOIN tiles WHERE tile_id = id" };
+        // clang-format on
+        mapbox::sqlite::Query query { stmt };
+        query.run();
+
+        // Ensure multiple entries for tiles shared between regions
+        EXPECT_EQ(1 + 3 + 1, query.get<int>(0));
+    }
+    {
+        // clang-format off
+        mapbox::sqlite::Statement stmt { db, "SELECT COUNT(*) "
+                                        "FROM region_resources "
+                                        "JOIN resources WHERE resource_id = id" };
+        // clang-format on
+        mapbox::sqlite::Query query { stmt };
+        query.run();
+
+        // Ensure multiple entries for resources shared between regions
+        EXPECT_EQ(1 + 1 + 1, query.get<int>(0));
+    }
+}
+
+TEST(OfflineDatabase, MergeDatabaseWithInvalidPath) {
+    FixtureLog log;
+
+    util::deleteFile(filename_sideload);
+    util::copyFile(filename_sideload, "test/fixtures/offline_database");
+
+    OfflineDatabase db(":memory:");
+
+    auto result = db.mergeDatabase(filename_sideload);
+    EXPECT_FALSE(result);
+
+    EXPECT_EQ(1u, log.count({ EventSeverity::Error, Event::Database, -1, "Merge database does not match schema or has incorrect user_version" }));
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
+
+TEST(OfflineDatabase, MergeDatabaseWithInvalidDb) {
+    FixtureLog log;
+
+    util::deleteFile(filename_sideload);
+    util::copyFile(filename_sideload, "test/fixtures/offline_database/corrupt-immediate.db");
+
+    OfflineDatabase db(":memory:");
+
+    auto result = db.mergeDatabase(filename_sideload);
+    EXPECT_FALSE(result);
+
+    EXPECT_EQ(1u, log.count(error(ResultCode::Corrupt, "Can't attach database (test/fixtures/offline_database/offline_sideload.db) for merge: database disk image is malformed")));
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
+
+#ifndef __QT__ // Qt doesn't expose the ability to register virtual file system handlers.
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(MergeDatabaseWithDiskFull)) {
+    FixtureLog log;
+    test::SQLite3TestFS fs;
+    
+    deleteDatabaseFiles();
+    util::deleteFile(filename_sideload);
+    util::copyFile(filename, "test/fixtures/offline_database/satellite_test.db");
+    util::copyFile(filename_sideload, "test/fixtures/offline_database/sideload_sat.db");
+
+    OfflineDatabase db(filename_test_fs);
+
+    fs.setWriteLimit(0);
+
+    auto result = db.mergeDatabase(filename_sideload);
+    EXPECT_FALSE(result.has_value());
+
+    EXPECT_EQ(1u, log.count({ EventSeverity::Error, Event::Database, -1, "database or disk is full"}));
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
+#endif // __QT__
+
