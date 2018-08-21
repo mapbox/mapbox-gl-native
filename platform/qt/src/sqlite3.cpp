@@ -27,9 +27,9 @@ void checkQueryError(const QSqlQuery& query) {
     QSqlError lastError = query.lastError();
     if (lastError.type() != QSqlError::NoError) {
 #if QT_VERSION >= 0x050300
-        throw Exception { lastError.nativeErrorCode().toInt(), lastError.text().toStdString() };
+        throw Exception { lastError.nativeErrorCode().toInt(), lastError.databaseText().toStdString() };
 #else
-        throw Exception { lastError.number(), lastError.text().toStdString() };
+        throw Exception { lastError.number(), lastError.databaseText().toStdString() };
 #endif
     }
 }
@@ -38,9 +38,9 @@ void checkDatabaseError(const QSqlDatabase &db) {
     QSqlError lastError = db.lastError();
     if (lastError.type() != QSqlError::NoError) {
 #if QT_VERSION >= 0x050300
-        throw Exception { lastError.nativeErrorCode().toInt(), lastError.text().toStdString() };
+        throw Exception { lastError.nativeErrorCode().toInt(), lastError.databaseText().toStdString() };
 #else
-        throw Exception { lastError.number(), lastError.text().toStdString() };
+        throw Exception { lastError.number(), lastError.databaseText().toStdString() };
 #endif
     }
 }
