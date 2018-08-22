@@ -52,7 +52,7 @@ public class LatLngBoundsActivity extends AppCompatActivity implements View.OnCl
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_latlngbounds);
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
@@ -64,7 +64,7 @@ public class LatLngBoundsActivity extends AppCompatActivity implements View.OnCl
     addMarkers();
     initFab();
     initBottomSheet();
-    moveToBounds(bottomSheet.getMeasuredHeight(), BOUNDS_PADDING_DIVIDER_SMALL, 0);
+    moveToBounds(bottomSheet.getMeasuredHeight(), BOUNDS_PADDING_DIVIDER_SMALL, ANIMATION_DURATION_SHORT);
   }
 
   private void addMarkers() {
