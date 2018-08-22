@@ -2,9 +2,24 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
-## master
-- Don't default-show text/icons that depend on the placement of a paired icon/text [#12483](https://github.com/mapbox/mapbox-gl-native/issues/12483)
-- Fix symbol querying for markers near tile boundaries at high zoom. ([#12472](https://github.com/mapbox/mapbox-gl-native/issues/12472))
+## 6.5.0-alpha.1 - August 22, 2018
+ - Don't default-show text/icons that depend on the placement of a paired icon/text [#12483](https://github.com/mapbox/mapbox-gl-native/issues/12483)
+ - Fix symbol querying for markers near tile boundaries at high zoom. ([#12472](https://github.com/mapbox/mapbox-gl-native/issues/12472))
+ - Hide peer constructors [#12639](https://github.com/mapbox/mapbox-gl-native/pull/12639)
+ - Shutting down thread pool of the CustomGeometrySource when the source is destroyed [#12517](https://github.com/mapbox/mapbox-gl-native/pull/12517)
+ - Harden offline database [#12224](https://github.com/mapbox/mapbox-gl-native/pull/12224)
+ - Obtain paths to file directories on a worker thread [#12657](https://github.com/mapbox/mapbox-gl-native/pull/12657)
+ - Arbitrary offline region shapes [#11447](https://github.com/mapbox/mapbox-gl-native/pull/11447)
+ - Make AndroidRendererFrontend to request render once per event loop [#12586](https://github.com/mapbox/mapbox-gl-native/issues/12586)
+ - Converting GeoJsonSource features asynchronously [#12580](https://github.com/mapbox/mapbox-gl-native/pull/12580)
+ - StyleJson configuration on MapboxMapOptions [#12664](https://github.com/mapbox/mapbox-gl-native/pull/12664)
+ - Update MapInitializer for OfflineRegionDefinition [#12686](https://github.com/mapbox/mapbox-gl-native/pull/12686)
+ - Offline symbol render example using AssetFileSource [#12676](https://github.com/mapbox/mapbox-gl-native/pull/12676)
+ - Added Chinese translations [#12696](https://github.com/mapbox/mapbox-gl-native/pull/12696)
+ - Collator and resolved-locale expressions [#12688](https://github.com/mapbox/mapbox-gl-native/pull/12688)
+ - Update telemetry user-agent [#12706](https://github.com/mapbox/mapbox-gl-native/pull/12706)
+ - Replace hardcoded telemetry settings string with resources [#12707](https://github.com/mapbox/mapbox-gl-native/pull/12707)
+ - Update GeoJsonOptions javadoc [#12709](https://github.com/mapbox/mapbox-gl-native/pull/12709)
 
 ## 6.4.0 - August 15, 2018
  - Use unconverted bearing value for LatLngBounds calculation [#12616](https://github.com/mapbox/mapbox-gl-native/pull/12616)
