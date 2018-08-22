@@ -8,12 +8,13 @@ namespace mbgl {
 namespace android {
 namespace gson {
 
-class JsonObject : public JsonElement {
+class JsonObject {
 public:
+    using SuperTag = JsonElement;
     static constexpr auto Name() { return "com/google/gson/JsonObject"; };
 
-    static jni::Object<JsonObject> New(jni::JNIEnv&, const mbgl::PropertyMap&);
-    static mbgl::PropertyMap convert(JNIEnv&, jni::Object<JsonObject>);
+    static jni::Local<jni::Object<JsonObject>> New(jni::JNIEnv&, const mbgl::PropertyMap&);
+    static mbgl::PropertyMap convert(JNIEnv&, const jni::Object<JsonObject>&);
 
     static void registerNative(jni::JNIEnv&);
 };

@@ -11,7 +11,7 @@ class Polyline : private MultiPoint {
 public:
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/annotations/Polyline"; };
 
-    static mbgl::LineAnnotation toAnnotation(jni::JNIEnv&, jni::Object<Polyline>);
+    static mbgl::LineAnnotation toAnnotation(jni::JNIEnv&, const jni::Object<Polyline>&);
 
     static void registerNative(jni::JNIEnv&);
 };

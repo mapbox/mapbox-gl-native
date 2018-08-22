@@ -9,7 +9,7 @@ namespace android {
 
 class UnknownLayer : public Layer {
 public:
-
+    using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/UnknownLayer"; };
 
     static void registerNative(jni::JNIEnv&);
@@ -20,7 +20,7 @@ public:
 
     ~UnknownLayer() = default;
 
-    jni::jobject* createJavaPeer(jni::JNIEnv&);
+    jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&);
 
 }; // class UnknownLayer
 

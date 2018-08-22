@@ -18,15 +18,15 @@ namespace android {
         : Source(env, coreSource, createJavaPeer(env), frontend) {
     }
 
-    jni::Object<Source> UnknownSource::createJavaPeer(jni::JNIEnv& env) {
-        static auto javaClass = jni::Class<UnknownSource>::Singleton(env);
+    jni::Local<jni::Object<Source>> UnknownSource::createJavaPeer(jni::JNIEnv& env) {
+        static auto& javaClass = jni::Class<UnknownSource>::Singleton(env);
         static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
-        return jni::Object<Source>(javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
+        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
     void UnknownSource::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        static auto javaClass = jni::Class<UnknownSource>::Singleton(env);
+        static auto& javaClass = jni::Class<UnknownSource>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 

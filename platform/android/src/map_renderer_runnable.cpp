@@ -12,10 +12,10 @@ MapRendererRunnable::MapRendererRunnable(jni::JNIEnv& env, std::weak_ptr<Mailbox
     // Not using a weak reference here as this might oerflow
     // the weak reference table on some devices
     jni::UniqueLocalFrame frame = jni::PushLocalFrame(env, 5);
-    static auto javaClass = jni::Class<MapRendererRunnable>::Singleton(env);
+    static auto& javaClass = jni::Class<MapRendererRunnable>::Singleton(env);
     static auto constructor = javaClass.GetConstructor<jlong>(env);
     auto instance = javaClass.New(env, constructor, reinterpret_cast<jlong>(this));
-    javaPeer = instance.NewGlobalRef(env);
+    javaPeer = jni::NewGlobal(env, instance);
 }
 
 MapRendererRunnable::~MapRendererRunnable() = default;
@@ -32,7 +32,7 @@ jni::Global<jni::Object<MapRendererRunnable>> MapRendererRunnable::peer() {
 
 void MapRendererRunnable::registerNative(jni::JNIEnv& env) {
     // Lookup the class
-    static auto javaClass = jni::Class<MapRendererRunnable>::Singleton(env);
+    static auto& javaClass = jni::Class<MapRendererRunnable>::Singleton(env);
 
 #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 

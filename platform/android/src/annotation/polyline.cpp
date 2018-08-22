@@ -5,15 +5,15 @@
 namespace mbgl {
 namespace android {
 
-mbgl::LineAnnotation Polyline::toAnnotation(jni::JNIEnv& env, jni::Object<Polyline> polyline) {
-    static auto javaClass = jni::Class<Polyline>::Singleton(env);
+mbgl::LineAnnotation Polyline::toAnnotation(jni::JNIEnv& env, const jni::Object<Polyline>& polyline) {
+    static auto& javaClass = jni::Class<Polyline>::Singleton(env);
     static auto points = javaClass.GetField<jni::Object<java::util::List>>(env, "points");
     static auto alpha = javaClass.GetField<float>(env, "alpha");
     static auto color = javaClass.GetField<int>(env, "color");
     static auto width = javaClass.GetField<float>(env, "width");
 
     mbgl::LineAnnotation annotation {
-        MultiPoint::toGeometry<mbgl::LineString<double>>(env, *jni::SeizeLocal(env, polyline.Get(env, points)))
+        MultiPoint::toGeometry<mbgl::LineString<double>>(env, polyline.Get(env, points))
     };
 
     annotation.opacity = polyline.Get(env, alpha);

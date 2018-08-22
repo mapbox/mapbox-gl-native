@@ -11,12 +11,12 @@
 namespace mbgl {
 namespace android {
 
-    RasterSource::RasterSource(jni::JNIEnv& env, jni::String sourceId, jni::Object<> urlOrTileSet, jni::jint tileSize)
+    RasterSource::RasterSource(jni::JNIEnv& env, const jni::String& sourceId, const jni::Object<>& urlOrTileSet, jni::jint tileSize)
         : Source(
             env,
             std::make_unique<mbgl::style::RasterSource>(
                 jni::Make<std::string>(env, sourceId),
-                convertURLOrTileset(Value(env, jni::SeizeLocal(env, std::move(urlOrTileSet)))),
+                convertURLOrTileset(Value(env, urlOrTileSet)),
                 tileSize
             )
         ) {
@@ -30,27 +30,27 @@ namespace android {
 
     RasterSource::~RasterSource() = default;
 
-    jni::String RasterSource::getURL(jni::JNIEnv& env) {
+    jni::Local<jni::String> RasterSource::getURL(jni::JNIEnv& env) {
         optional<std::string> url = source.as<mbgl::style::RasterSource>()->RasterSource::getURL();
-        return url ? jni::Make<jni::String>(env, *url) : jni::String();
+        return url ? jni::Make<jni::String>(env, *url) : jni::Local<jni::String>();
     }
 
-    jni::Object<Source> RasterSource::createJavaPeer(jni::JNIEnv& env) {
-        static auto javaClass = jni::Class<RasterSource>::Singleton(env);
+    jni::Local<jni::Object<Source>> RasterSource::createJavaPeer(jni::JNIEnv& env) {
+        static auto& javaClass = jni::Class<RasterSource>::Singleton(env);
         static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
-        return jni::Object<Source>(javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
+        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
     void RasterSource::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        static auto javaClass = jni::Class<RasterSource>::Singleton(env);
+        static auto& javaClass = jni::Class<RasterSource>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<RasterSource>(
             env, javaClass, "nativePtr",
-            std::make_unique<RasterSource, JNIEnv&, jni::String, jni::Object<>, jni::jint>,
+            jni::MakePeer<RasterSource, const jni::String&, const jni::Object<>&, jni::jint>,
             "initialize",
             "finalize",
             METHOD(&RasterSource::getURL, "nativeGetUrl")

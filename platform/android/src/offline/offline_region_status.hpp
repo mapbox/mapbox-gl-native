@@ -10,7 +10,7 @@ class OfflineRegionStatus {
 public:
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineRegionStatus"; };
 
-    static jni::Object<OfflineRegionStatus> New(jni::JNIEnv&, mbgl::OfflineRegionStatus status);
+    static jni::Local<jni::Object<OfflineRegionStatus>> New(jni::JNIEnv&, mbgl::OfflineRegionStatus status);
 
     static void registerNative(jni::JNIEnv&);
 };

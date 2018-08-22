@@ -3,8 +3,8 @@
 namespace mbgl {
 namespace android {
 
-jni::Object<TransitionOptions> TransitionOptions::fromTransitionOptions(jni::JNIEnv& env, jlong duration, jlong delay) {
-    static auto javaClass = jni::Class<TransitionOptions>::Singleton(env);
+jni::Local<jni::Object<TransitionOptions>> TransitionOptions::fromTransitionOptions(jni::JNIEnv& env, jlong duration, jlong delay) {
+    static auto& javaClass = jni::Class<TransitionOptions>::Singleton(env);
     static auto method = javaClass.GetStaticMethod<jni::Object<TransitionOptions> (jlong, jlong)>(env, "fromTransitionOptions");
     return javaClass.Call(env, method, duration, delay);
 }

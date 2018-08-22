@@ -12,8 +12,8 @@ namespace android {
 namespace conversion {
 
 template<>
-struct Converter<jni::Object<TransitionOptions>, mbgl::style::TransitionOptions> {
-    Result<jni::Object<TransitionOptions>> operator()(jni::JNIEnv&, const mbgl::style::TransitionOptions&) const;
+struct Converter<jni::Local<jni::Object<TransitionOptions>>, mbgl::style::TransitionOptions> {
+    Result<jni::Local<jni::Object<TransitionOptions>>> operator()(jni::JNIEnv&, const mbgl::style::TransitionOptions&) const;
 };
 
 }

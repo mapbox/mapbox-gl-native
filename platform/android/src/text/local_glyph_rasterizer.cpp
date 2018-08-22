@@ -36,25 +36,24 @@ namespace android {
 LocalGlyphRasterizer::LocalGlyphRasterizer() {
     UniqueEnv env { AttachEnv() };
 
-    static auto javaClass = jni::Class<LocalGlyphRasterizer>::Singleton(*env);
+    static auto& javaClass = jni::Class<LocalGlyphRasterizer>::Singleton(*env);
     static auto constructor = javaClass.GetConstructor(*env);
 
-    javaObject = javaClass.New(*env, constructor).NewGlobalRef(*env);
+    javaObject = jni::NewGlobal(*env, javaClass.New(*env, constructor));
 }
 
 PremultipliedImage LocalGlyphRasterizer::drawGlyphBitmap(const std::string& fontFamily, const bool bold, const GlyphID glyphID) {
     UniqueEnv env { AttachEnv() };
 
-    static auto javaClass = jni::Class<LocalGlyphRasterizer>::Singleton(*env);
+    static auto& javaClass = jni::Class<LocalGlyphRasterizer>::Singleton(*env);
     static auto drawGlyphBitmap = javaClass.GetMethod<jni::Object<Bitmap> (jni::String, jni::jboolean, jni::jchar)>(*env, "drawGlyphBitmap");
 
-    auto javaBitmap = jni::SeizeLocal(*env,
-        javaObject->Call(*env, drawGlyphBitmap,
-                         *jni::SeizeLocal(*env, jni::Make<jni::String>(*env, fontFamily)),
-                         static_cast<jni::jboolean>(bold),
-                         static_cast<jni::jchar>(glyphID)));
-
-    return Bitmap::GetImage(*env, *javaBitmap);
+    return Bitmap::GetImage(*env,
+        javaObject.Call(*env,
+            drawGlyphBitmap,
+            jni::Make<jni::String>(*env, fontFamily),
+            static_cast<jni::jboolean>(bold),
+            static_cast<jni::jchar>(glyphID)));
 }
 
 void LocalGlyphRasterizer::registerNative(jni::JNIEnv& env) {

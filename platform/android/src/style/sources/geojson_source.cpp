@@ -1,4 +1,5 @@
 #include "geojson_source.hpp"
+#include "../../attach_env.hpp"
 
 #include <mbgl/renderer/query.hpp>
 
@@ -29,24 +30,24 @@ namespace android {
     // This conversion is expected not to fail because it's used only in contexts where
     // the value was originally a GeoJsonOptions object on the Java side. If it fails
     // to convert, it's a bug in our serialization or Java-side static typing.
-    static style::GeoJSONOptions convertGeoJSONOptions(jni::JNIEnv& env, jni::Local<jni::Object<>> options) {
+    static style::GeoJSONOptions convertGeoJSONOptions(jni::JNIEnv& env, const jni::Object<>& options) {
         using namespace mbgl::style::conversion;
         if (!options) {
             return style::GeoJSONOptions();
         }
         Error error;
         optional<style::GeoJSONOptions> result = convert<style::GeoJSONOptions>(
-            mbgl::android::Value(env, std::move(options)), error);
+            mbgl::android::Value(env, options), error);
         if (!result) {
             throw std::logic_error(error.message);
         }
         return *result;
     }
 
-    GeoJSONSource::GeoJSONSource(jni::JNIEnv& env, jni::String sourceId, jni::Object<> options)
+    GeoJSONSource::GeoJSONSource(jni::JNIEnv& env, const jni::String& sourceId, const jni::Object<>& options)
         : Source(env, std::make_unique<mbgl::style::GeoJSONSource>(
                 jni::Make<std::string>(env, sourceId),
-                convertGeoJSONOptions(env, jni::SeizeLocal(env, std::move(options)))))
+                convertGeoJSONOptions(env, options)))
         , threadPool(sharedThreadPool())
         , converter(std::make_unique<Actor<FeatureConverter>>(*threadPool)) {
     }
@@ -61,7 +62,7 @@ namespace android {
 
     GeoJSONSource::~GeoJSONSource() = default;
 
-    void GeoJSONSource::setGeoJSONString(jni::JNIEnv& env, jni::String jString) {
+    void GeoJSONSource::setGeoJSONString(jni::JNIEnv& env, const jni::String& jString) {
 
         std::shared_ptr<std::string> json = std::make_shared<std::string>(jni::Make<std::string>(env, jString));
 
@@ -72,54 +73,54 @@ namespace android {
         setAsync(converterFn);
     }
 
-    void GeoJSONSource::setFeatureCollection(jni::JNIEnv& env, jni::Object<geojson::FeatureCollection> jFeatures) {
+    void GeoJSONSource::setFeatureCollection(jni::JNIEnv& env, const jni::Object<geojson::FeatureCollection>& jFeatures) {
         setCollectionAsync(env, jFeatures);
     }
 
-    void GeoJSONSource::setFeature(jni::JNIEnv& env, jni::Object<geojson::Feature> jFeature) {
+    void GeoJSONSource::setFeature(jni::JNIEnv& env, const jni::Object<geojson::Feature>& jFeature) {
         setCollectionAsync(env, jFeature);
     }
 
-    void GeoJSONSource::setGeometry(jni::JNIEnv& env, jni::Object<geojson::Geometry> jGeometry) {
+    void GeoJSONSource::setGeometry(jni::JNIEnv& env, const jni::Object<geojson::Geometry>& jGeometry) {
         setCollectionAsync(env, jGeometry);
     }
 
-    void GeoJSONSource::setURL(jni::JNIEnv& env, jni::String url) {
+    void GeoJSONSource::setURL(jni::JNIEnv& env, const jni::String& url) {
         // Update the core source
         source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::setURL(jni::Make<std::string>(env, url));
     }
 
-    jni::String GeoJSONSource::getURL(jni::JNIEnv& env) {
+    jni::Local<jni::String> GeoJSONSource::getURL(jni::JNIEnv& env) {
         optional<std::string> url = source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::getURL();
-        return url ? jni::Make<jni::String>(env, *url) : jni::String();
+        return url ? jni::Make<jni::String>(env, *url) : jni::Local<jni::String>();
     }
 
-    jni::Array<jni::Object<geojson::Feature>> GeoJSONSource::querySourceFeatures(jni::JNIEnv& env,
-                                                                        jni::Array<jni::Object<>> jfilter) {
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> GeoJSONSource::querySourceFeatures(jni::JNIEnv& env,
+                                                                        const jni::Array<jni::Object<>>& jfilter) {
         using namespace mbgl::android::conversion;
         using namespace mbgl::android::geojson;
 
         std::vector<mbgl::Feature> features;
         if (rendererFrontend) {
             features = rendererFrontend->querySourceFeatures(source.getID(),
-                { {}, toFilter(env, jni::SeizeLocal(env, std::move(jfilter))) });
+                { {}, toFilter(env, jfilter) });
         }
         return Feature::convert(env, features);
     }
 
-    jni::Object<Source> GeoJSONSource::createJavaPeer(jni::JNIEnv& env) {
-        static auto javaClass = jni::Class<GeoJSONSource>::Singleton(env);
+    jni::Local<jni::Object<Source>> GeoJSONSource::createJavaPeer(jni::JNIEnv& env) {
+        static auto& javaClass = jni::Class<GeoJSONSource>::Singleton(env);
         static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
-        return jni::Object<Source>(javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
+        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
     template <class JNIType>
-    void GeoJSONSource::setCollectionAsync(jni::JNIEnv& env, jni::Object<JNIType> jObject) {
-
-        std::shared_ptr<jni::jobject> object = std::shared_ptr<jni::jobject>(jObject.NewGlobalRef(env).release().Get(), GenericGlobalRefDeleter());
+    void GeoJSONSource::setCollectionAsync(jni::JNIEnv& env, const jni::Object<JNIType>& jObject) {
+        auto global = jni::NewGlobal<jni::EnvAttachingDeleter>(env, jObject);
+        auto object = std::make_shared<decltype(global)>(std::move(global));
 
         Update::Converter converterFn = [this, object](ActorRef<Callback> _callback) {
-            converter->self().invoke(&FeatureConverter::convertObject<JNIType>, jni::Object<JNIType>(*object), _callback);
+            converter->self().invoke(&FeatureConverter::convertObject<JNIType>, object, _callback);
         };
 
         setAsync(converterFn);
@@ -159,14 +160,14 @@ namespace android {
 
     void GeoJSONSource::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        static auto javaClass = jni::Class<GeoJSONSource>::Singleton(env);
+        static auto& javaClass = jni::Class<GeoJSONSource>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<GeoJSONSource>(
             env, javaClass, "nativePtr",
-            std::make_unique<GeoJSONSource, JNIEnv&, jni::String, jni::Object<>>,
+            jni::MakePeer<GeoJSONSource, const jni::String&, const jni::Object<>&>,
             "initialize",
             "finalize",
             METHOD(&GeoJSONSource::setGeoJSONString, "nativeSetGeoJsonString"),
@@ -196,13 +197,13 @@ namespace android {
         callback.invoke(&Callback::operator(), *converted);
     }
 
-    template<class JNIType>
-    void FeatureConverter::convertObject(jni::Object<JNIType> jObject, ActorRef<Callback> callback) {
+    template <class JNIType>
+    void FeatureConverter::convertObject(std::shared_ptr<jni::Global<jni::Object<JNIType>, jni::EnvAttachingDeleter>> jObject, ActorRef<Callback> callback) {
         using namespace mbgl::android::geojson;
 
         android::UniqueEnv _env = android::AttachEnv();
         // Convert the jni object
-        auto geometry = JNIType::convert(*_env, jObject);
+        auto geometry = JNIType::convert(*_env, *jObject);
         callback.invoke(&Callback::operator(), GeoJSON(geometry));
     }
 

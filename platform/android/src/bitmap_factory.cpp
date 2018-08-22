@@ -7,11 +7,11 @@ void BitmapFactory::registerNative(jni::JNIEnv& env) {
     jni::Class<BitmapFactory>::Singleton(env);
 }
 
-jni::Object<Bitmap> BitmapFactory::DecodeByteArray(jni::JNIEnv& env,
-                                                   jni::Array<jni::jbyte> data,
-                                                   jni::jint offset,
-                                                   jni::jint length) {
-    static auto _class = jni::Class<BitmapFactory>::Singleton(env);
+jni::Local<jni::Object<Bitmap>> BitmapFactory::DecodeByteArray(jni::JNIEnv& env,
+                                                               jni::Array<jni::jbyte>& data,
+                                                               jni::jint offset,
+                                                               jni::jint length) {
+    static auto& _class = jni::Class<BitmapFactory>::Singleton(env);
 
     // Images are loaded with ARGB_8888 config, and premultiplied by default, which is exactly
     // what we want, so we're not providing a BitmapFactory.Options object.
