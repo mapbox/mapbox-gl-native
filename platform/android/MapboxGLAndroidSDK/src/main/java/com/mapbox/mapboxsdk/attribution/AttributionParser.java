@@ -1,10 +1,13 @@
 package com.mapbox.mapboxsdk.attribution;
 
+import android.content.Context;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.URLSpan;
+import com.mapbox.mapboxsdk.R;
 
+import java.lang.ref.WeakReference;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -17,6 +20,7 @@ import java.util.Set;
  */
 public class AttributionParser {
 
+  private final WeakReference<Context> context;
   private final Set<Attribution> attributions = new LinkedHashSet<>();
   private final String attributionData;
   private final boolean withImproveMap;
@@ -24,8 +28,9 @@ public class AttributionParser {
   private final boolean withTelemetryAttribution;
   private final boolean withMapboxAttribution;
 
-  AttributionParser(String attributionData, boolean withImproveMap, boolean withCopyrightSign,
-                    boolean withTelemetryAttribution, boolean withMapboxAttribution) {
+  AttributionParser(WeakReference<Context> context, String attributionData, boolean withImproveMap,
+                    boolean withCopyrightSign, boolean withTelemetryAttribution, boolean withMapboxAttribution) {
+    this.context = context;
     this.attributionData = attributionData;
     this.withImproveMap = withImproveMap;
     this.withCopyrightSign = withCopyrightSign;
@@ -167,7 +172,13 @@ public class AttributionParser {
    */
   private void addAdditionalAttributions() {
     if (withTelemetryAttribution) {
-      attributions.add(new Attribution(Attribution.TELEMETRY, Attribution.TELEMETRY_URL));
+      Context context = this.context.get();
+      attributions.add(
+        new Attribution(
+          context != null ? context.getString(R.string.mapbox_telemetrySettings) : Attribution.TELEMETRY,
+          Attribution.TELEMETRY_URL
+        )
+      );
     }
   }
 
@@ -196,6 +207,7 @@ public class AttributionParser {
    * </p>
    */
   public static class Options {
+    private WeakReference<Context> context;
     private boolean withImproveMap = true;
     private boolean withCopyrightSign = true;
     private boolean withTelemetryAttribution = false;
@@ -227,6 +239,11 @@ public class AttributionParser {
       return this;
     }
 
+    public Options withContext(Context context) {
+      this.context = new WeakReference<>(context);
+      return this;
+    }
+
     public AttributionParser build() {
       if (attributionDataStringArray == null) {
         throw new IllegalStateException("Using builder without providing attribution data");
@@ -234,6 +251,7 @@ public class AttributionParser {
 
       String fullAttributionString = parseAttribution(attributionDataStringArray);
       AttributionParser attributionParser = new AttributionParser(
+        context,
         fullAttributionString,
         withImproveMap,
         withCopyrightSign,
