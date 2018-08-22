@@ -15,6 +15,12 @@ class GeoJSONData {
 public:
     virtual ~GeoJSONData() = default;
     virtual mapbox::geometry::feature_collection<int16_t> getTile(const CanonicalTileID&) = 0;
+
+    // SuperclusterData
+    virtual mapbox::geometry::feature_collection<double> getChildren(const std::uint32_t) = 0;
+    virtual mapbox::geometry::feature_collection<double> getLeaves(const std::uint32_t, const std::uint32_t,
+                                                                   const std::uint32_t) = 0;
+    virtual std::uint8_t getClusterExpansionZoom(std::uint32_t) = 0;
 };
 
 class GeoJSONSource::Impl : public Source::Impl {
