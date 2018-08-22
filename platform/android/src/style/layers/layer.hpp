@@ -36,7 +36,7 @@ public:
 
     virtual ~Layer();
 
-    virtual jni::jobject* createJavaPeer(jni::JNIEnv&) = 0;
+    virtual jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&) = 0;
 
     /**
      * Set core layer (ie return ownership after remove)
@@ -45,15 +45,15 @@ public:
 
     void addToMap(mbgl::Map&, mbgl::optional<std::string>);
 
-    jni::String getId(jni::JNIEnv&);
+    jni::Local<jni::String> getId(jni::JNIEnv&);
 
-    jni::String getSourceId(jni::JNIEnv&);
+    jni::Local<jni::String> getSourceId(jni::JNIEnv&);
 
     style::Layer& get();
 
-    void setLayoutProperty(jni::JNIEnv&, jni::String, jni::Object<> value);
+    void setLayoutProperty(jni::JNIEnv&, const jni::String&, const jni::Object<>& value);
 
-    void setPaintProperty(jni::JNIEnv&, jni::String, jni::Object<> value);
+    void setPaintProperty(jni::JNIEnv&, const jni::String&, const jni::Object<>& value);
 
     // Zoom
 
@@ -67,17 +67,17 @@ public:
 
     /* common properties, but not shared by all */
 
-    void setFilter(jni::JNIEnv&, jni::Array<jni::Object<>>);
+    void setFilter(jni::JNIEnv&, const jni::Array<jni::Object<>>&);
 
-    jni::Object<gson::JsonElement> getFilter(jni::JNIEnv&);
+    jni::Local<jni::Object<gson::JsonElement>> getFilter(jni::JNIEnv&);
 
-    void setSourceLayer(jni::JNIEnv&, jni::String);
+    void setSourceLayer(jni::JNIEnv&, const jni::String&);
 
-    jni::String getSourceLayer(jni::JNIEnv&);
+    jni::Local<jni::String> getSourceLayer(jni::JNIEnv&);
 
     // Property getters
 
-    jni::Object<jni::ObjectTag> getVisibility(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getVisibility(jni::JNIEnv&);
 
 protected:
     // Release the owned view and return it

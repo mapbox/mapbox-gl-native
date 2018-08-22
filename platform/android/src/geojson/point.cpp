@@ -4,14 +4,14 @@ namespace mbgl {
 namespace android {
 namespace geojson {
 
-jni::Object<Point> Point::New(jni::JNIEnv& env, const mbgl::Point<double>& point) {
-    static auto javaClass = jni::Class<Point>::Singleton(env);
+jni::Local<jni::Object<Point>> Point::New(jni::JNIEnv& env, const mbgl::Point<double>& point) {
+    static auto& javaClass = jni::Class<Point>::Singleton(env);
     static auto method = javaClass.GetStaticMethod<jni::Object<Point> (jni::jdouble, jni::jdouble)>(env, "fromLngLat");
     return javaClass.Call(env, method, point.x, point.y);
 }
 
-mbgl::Point<double> Point::convert(jni::JNIEnv &env, jni::Object<Point> jPoint) {
-    static auto javaClass = jni::Class<Point>::Singleton(env);
+mbgl::Point<double> Point::convert(jni::JNIEnv &env, const jni::Object<Point>& jPoint) {
+    static auto& javaClass = jni::Class<Point>::Singleton(env);
     static auto longitude = javaClass.GetMethod<jni::jdouble ()>(env, "longitude");
     static auto latitude = javaClass.GetMethod<jni::jdouble ()>(env, "latitude");
 

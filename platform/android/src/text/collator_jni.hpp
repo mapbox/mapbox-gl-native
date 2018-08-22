@@ -24,12 +24,12 @@ public:
     static jni::Object<Locale> forLanguageTag(jni::JNIEnv&, jni::String);
     static jni::String toLanguageTag(jni::JNIEnv&, jni::Object<Locale>);
     */
-    static jni::Object<Locale> getDefault(jni::JNIEnv&);
-    static jni::String getLanguage(jni::JNIEnv&, jni::Object<Locale>);
-    static jni::String getCountry(jni::JNIEnv&, jni::Object<Locale>);
+    static jni::Local<jni::Object<Locale>> getDefault(jni::JNIEnv&);
+    static jni::Local<jni::String> getLanguage(jni::JNIEnv&, const jni::Object<Locale>&);
+    static jni::Local<jni::String> getCountry(jni::JNIEnv&, const jni::Object<Locale>&);
 
-    static jni::Object<Locale> New(jni::JNIEnv&, jni::String);
-    static jni::Object<Locale> New(jni::JNIEnv&, jni::String, jni::String);
+    static jni::Local<jni::Object<Locale>> New(jni::JNIEnv&, const jni::String&);
+    static jni::Local<jni::Object<Locale>> New(jni::JNIEnv&, const jni::String&, const jni::String&);
 
 
     static void registerNative(jni::JNIEnv&);
@@ -39,11 +39,11 @@ class Collator {
 public:
     static constexpr auto Name() { return "java/text/Collator"; };
 
-    static jni::Object<Collator> getInstance(jni::JNIEnv&, jni::Object<Locale>);
+    static jni::Local<jni::Object<Collator>> getInstance(jni::JNIEnv&, const jni::Object<Locale>&);
 
-    static void setStrength(jni::JNIEnv&, jni::Object<Collator>, jni::jint);
+    static void setStrength(jni::JNIEnv&, const jni::Object<Collator>&, jni::jint);
 
-    static jni::jint compare(jni::JNIEnv&, jni::Object<Collator>, jni::String, jni::String);
+    static jni::jint compare(jni::JNIEnv&, const jni::Object<Collator>&, const jni::String&, const jni::String&);
 
 
     static void registerNative(jni::JNIEnv&);

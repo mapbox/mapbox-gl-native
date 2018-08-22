@@ -8,24 +8,24 @@ namespace mbgl {
 namespace android {
 namespace geojson {
 
-jni::Object<Polygon> Polygon::New(jni::JNIEnv& env, const mbgl::Polygon<double>& polygon) {
-    static auto javaClass = jni::Class<Polygon>::Singleton(env);
+jni::Local<jni::Object<Polygon>> Polygon::New(jni::JNIEnv& env, const mbgl::Polygon<double>& polygon) {
+    static auto& javaClass = jni::Class<Polygon>::Singleton(env);
     static auto method = javaClass.GetStaticMethod<jni::Object<Polygon> (jni::Object<java::util::List>)>(env, "fromLngLats");
 
-    return javaClass.Call(env, method, *jni::SeizeLocal(env, asPointsListsList(env, polygon)));
+    return javaClass.Call(env, method, asPointsListsList(env, polygon));
 }
 
-mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, jni::Object<Polygon> jPolygon) {
+mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, const jni::Object<Polygon>& jPolygon) {
     mapbox::geojson::polygon polygon;
 
     if (jPolygon) {
-        polygon = Polygon::convert(env, *jni::SeizeLocal(env, Polygon::coordinates(env, jPolygon)));
+        polygon = Polygon::convert(env, Polygon::coordinates(env, jPolygon));
     }
 
     return polygon;
 }
 
-mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, jni::Object<java::util::List/*<java::util::List<Point>>*/> jPointListsList) {
+mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, const jni::Object<java::util::List/*<java::util::List<Point>>*/>& jPointListsList) {
     mapbox::geojson::polygon polygon;
 
     if (jPointListsList) {
@@ -40,8 +40,8 @@ mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, jni::Object<java::ut
 }
 
 
-jni::Object<java::util::List> Polygon::coordinates(jni::JNIEnv &env, jni::Object<Polygon> jPolygon) {
-    static auto javaClass = jni::Class<Polygon>::Singleton(env);
+jni::Local<jni::Object<java::util::List>> Polygon::coordinates(jni::JNIEnv &env, const jni::Object<Polygon>& jPolygon) {
+    static auto& javaClass = jni::Class<Polygon>::Singleton(env);
     static auto method = javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "coordinates");
     return jPolygon.Call(env, method);
 }

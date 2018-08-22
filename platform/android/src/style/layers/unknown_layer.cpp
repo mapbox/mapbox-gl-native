@@ -22,15 +22,15 @@ namespace android {
         : Layer(map, std::move(coreLayer)) {
     }
 
-    jni::jobject* UnknownLayer::createJavaPeer(jni::JNIEnv& env) {
-        static auto javaClass = jni::Class<UnknownLayer>::Singleton(env);
+    jni::Local<jni::Object<Layer>> UnknownLayer::createJavaPeer(jni::JNIEnv& env) {
+        static auto& javaClass = jni::Class<UnknownLayer>::Singleton(env);
         static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
         return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
     void UnknownLayer::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        static auto javaClass = jni::Class<UnknownLayer>::Singleton(env);
+        static auto& javaClass = jni::Class<UnknownLayer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 

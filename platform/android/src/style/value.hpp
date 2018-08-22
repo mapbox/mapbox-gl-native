@@ -10,6 +10,7 @@ namespace android {
 class Value {
 public:
     Value(jni::JNIEnv&, jni::Local<jni::Object<>>);
+    Value(jni::JNIEnv&, const jni::Object<>&);
 
     Value(Value&&)                 = default;
     Value& operator=(Value&&)      = default;

@@ -8,12 +8,12 @@ namespace mbgl {
 namespace android {
 namespace geojson {
 
-class Feature : public jni::ObjectTag {
+class Feature {
 public:
     static constexpr auto Name() { return "com/mapbox/geojson/Feature"; };
 
-    static mbgl::Feature convert(jni::JNIEnv&, jni::Object<Feature>);
-    static jni::Array<jni::Object<Feature>> convert(jni::JNIEnv&, const std::vector<mbgl::Feature>&);
+    static mbgl::Feature convert(jni::JNIEnv&, const jni::Object<Feature>&);
+    static jni::Local<jni::Array<jni::Object<Feature>>> convert(jni::JNIEnv&, const std::vector<mbgl::Feature>&);
 
     static void registerNative(jni::JNIEnv&);
 };

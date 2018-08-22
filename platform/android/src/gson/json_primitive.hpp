@@ -8,8 +8,9 @@ namespace mbgl {
 namespace android {
 namespace gson {
 
-class JsonPrimitive : public JsonElement {
+class JsonPrimitive {
 public:
+    using SuperTag = JsonElement;
     static constexpr auto Name() { return "com/google/gson/JsonPrimitive"; };
 
     static void registerNative(jni::JNIEnv&);

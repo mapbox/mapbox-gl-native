@@ -77,16 +77,16 @@ static Layer* initializeLayerPeer(Map& map, std::unique_ptr<mbgl::style::Layer> 
     return layer ? layer : new UnknownLayer(map, std::move(coreLayer));
 }
 
-jni::jobject* createJavaLayerPeer(jni::JNIEnv& env, Map& map, style::Layer& coreLayer) {
+jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, Map& map, style::Layer& coreLayer) {
     std::unique_ptr<Layer> peerLayer = std::unique_ptr<Layer>(initializeLayerPeer(map, coreLayer));
-    jni::jobject* result = peerLayer->createJavaPeer(env);
+    jni::Local<jni::Object<Layer>> result = peerLayer->createJavaPeer(env);
     peerLayer.release();
     return result;
 }
 
-jni::jobject* createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> coreLayer) {
+jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> coreLayer) {
     std::unique_ptr<Layer> peerLayer = std::unique_ptr<Layer>(initializeLayerPeer(map, std::move(coreLayer)));
-    jni::jobject* result = peerLayer->createJavaPeer(env);
+    jni::Local<jni::Object<Layer>> result = peerLayer->createJavaPeer(env);
     peerLayer.release();
     return result;
 }

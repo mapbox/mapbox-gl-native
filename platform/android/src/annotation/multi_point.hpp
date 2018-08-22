@@ -14,16 +14,16 @@ class MultiPoint : protected mbgl::util::noncopyable {
 protected:
 
   template <class Geometry>
-  static Geometry toGeometry(JNIEnv& env, jni::Object<java::util::List> pointsList) {
-      auto jarray = jni::SeizeLocal(env, java::util::List::toArray<LatLng>(env, pointsList));
+  static Geometry toGeometry(JNIEnv& env, const jni::Object<java::util::List>& pointsList) {
+      auto jarray = java::util::List::toArray<LatLng>(env, pointsList);
 
-      std::size_t size = jarray->Length(env);
+      std::size_t size = jarray.Length(env);
 
       Geometry geometry;
       geometry.reserve(size);
 
       for (std::size_t i = 0; i < size; i++) {
-          geometry.push_back(LatLng::getGeometry(env, *jni::SeizeLocal(env, jarray->Get(env, i))));
+          geometry.push_back(LatLng::getGeometry(env, jarray.Get(env, i)));
       }
 
       return geometry;

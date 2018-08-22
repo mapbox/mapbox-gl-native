@@ -4,7 +4,7 @@ namespace mbgl {
 namespace android {
 namespace conversion {
 
-Result<jni::Object<Position>> Converter<jni::Object<Position>, mbgl::style::Position>::operator()(jni::JNIEnv &env, const mbgl::style::Position &value) const {
+Result<jni::Local<jni::Object<Position>>> Converter<jni::Local<jni::Object<Position>>, mbgl::style::Position>::operator()(jni::JNIEnv &env, const mbgl::style::Position &value) const {
     std::array<float, 3> cartPosition = value.getSpherical();
     return Position::fromPosition(env, cartPosition[0], cartPosition[1], cartPosition[2]);
 }

@@ -3,14 +3,14 @@
 namespace mbgl {
 namespace android {
 
-jni::Object<LatLngBounds> LatLngBounds::New(jni::JNIEnv& env, mbgl::LatLngBounds bounds) {
-    static auto javaClass = jni::Class<LatLngBounds>::Singleton(env);
+jni::Local<jni::Object<LatLngBounds>> LatLngBounds::New(jni::JNIEnv& env, mbgl::LatLngBounds bounds) {
+    static auto& javaClass = jni::Class<LatLngBounds>::Singleton(env);
     static auto constructor = javaClass.GetConstructor<double, double, double, double>(env);
     return javaClass.New(env, constructor, bounds.north(), bounds.east(), bounds.south(), bounds.west());
 }
 
-mbgl::LatLngBounds LatLngBounds::getLatLngBounds(jni::JNIEnv& env, jni::Object<LatLngBounds> bounds) {
-    static auto javaClass = jni::Class<LatLngBounds>::Singleton(env);
+mbgl::LatLngBounds LatLngBounds::getLatLngBounds(jni::JNIEnv& env, const jni::Object<LatLngBounds>& bounds) {
+    static auto& javaClass = jni::Class<LatLngBounds>::Singleton(env);
     static auto swLatField = javaClass.GetField<jni::jdouble>(env, "latitudeSouth");
     static auto swLonField = javaClass.GetField<jni::jdouble>(env, "longitudeWest");
     static auto neLatField = javaClass.GetField<jni::jdouble>(env, "latitudeNorth");

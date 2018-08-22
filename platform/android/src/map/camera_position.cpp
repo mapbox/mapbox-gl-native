@@ -4,8 +4,8 @@
 namespace mbgl {
 namespace android {
 
-jni::Object<CameraPosition> CameraPosition::New(jni::JNIEnv &env, mbgl::CameraOptions options) {
-    static auto javaClass = jni::Class<CameraPosition>::Singleton(env);
+jni::Local<jni::Object<CameraPosition>> CameraPosition::New(jni::JNIEnv &env, mbgl::CameraOptions options) {
+    static auto& javaClass = jni::Class<CameraPosition>::Singleton(env);
     static auto constructor = javaClass.GetConstructor<jni::Object<LatLng>, double, double, double>(env);
 
     // wrap LatLng values coming from core
@@ -28,14 +28,14 @@ jni::Object<CameraPosition> CameraPosition::New(jni::JNIEnv &env, mbgl::CameraOp
     return javaClass.New(env, constructor, LatLng::New(env, center), options.zoom.value_or(0), tilt_degrees, bearing_degrees);
 }
 
-mbgl::CameraOptions CameraPosition::getCameraOptions(jni::JNIEnv& env, jni::Object<CameraPosition> position) {
-    static auto javaClass = jni::Class<CameraPosition>::Singleton(env);
+mbgl::CameraOptions CameraPosition::getCameraOptions(jni::JNIEnv& env, const jni::Object<CameraPosition>& position) {
+    static auto& javaClass = jni::Class<CameraPosition>::Singleton(env);
     static auto bearing = javaClass.GetField<jni::jdouble>(env, "bearing");
     static auto target = javaClass.GetField<jni::Object<LatLng>>(env, "target");
     static auto tilt = javaClass.GetField<jni::jdouble>(env, "tilt");
     static auto zoom = javaClass.GetField<jni::jdouble>(env, "zoom");
 
-    auto center = LatLng::getLatLng(env, *jni::SeizeLocal(env, position.Get(env, target)));
+    auto center = LatLng::getLatLng(env, position.Get(env, target));
 
     return mbgl::CameraOptions {
             center,

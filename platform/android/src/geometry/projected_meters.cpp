@@ -3,8 +3,8 @@
 namespace mbgl {
 namespace android {
 
-jni::Object<ProjectedMeters> ProjectedMeters::New(jni::JNIEnv& env, double northing, double easting) {
-    static auto javaClass = jni::Class<ProjectedMeters>::Singleton(env);
+jni::Local<jni::Object<ProjectedMeters>> ProjectedMeters::New(jni::JNIEnv& env, double northing, double easting) {
+    static auto& javaClass = jni::Class<ProjectedMeters>::Singleton(env);
     static auto constructor = javaClass.GetConstructor<double, double>(env);
     return javaClass.New(env, constructor, northing, easting);
 }

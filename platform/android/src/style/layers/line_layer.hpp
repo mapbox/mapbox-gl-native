@@ -12,12 +12,12 @@ namespace android {
 
 class LineLayer : public Layer {
 public:
-
+    using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/LineLayer"; };
 
     static void registerNative(jni::JNIEnv&);
 
-    LineLayer(jni::JNIEnv&, jni::String, jni::String);
+    LineLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
     LineLayer(mbgl::Map&, mbgl::style::LineLayer&);
 
@@ -27,54 +27,54 @@ public:
 
     // Properties
 
-    jni::Object<jni::ObjectTag> getLineCap(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getLineCap(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getLineJoin(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getLineJoin(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getLineMiterLimit(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getLineMiterLimit(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getLineRoundLimit(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getLineRoundLimit(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getLineOpacity(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getLineOpacity(jni::JNIEnv&);
     void setLineOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getLineOpacityTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getLineOpacityTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getLineColor(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getLineColor(jni::JNIEnv&);
     void setLineColorTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getLineColorTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getLineColorTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getLineTranslate(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getLineTranslate(jni::JNIEnv&);
     void setLineTranslateTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getLineTranslateTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getLineTranslateTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getLineTranslateAnchor(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getLineTranslateAnchor(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getLineWidth(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getLineWidth(jni::JNIEnv&);
     void setLineWidthTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getLineWidthTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getLineWidthTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getLineGapWidth(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getLineGapWidth(jni::JNIEnv&);
     void setLineGapWidthTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getLineGapWidthTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getLineGapWidthTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getLineOffset(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getLineOffset(jni::JNIEnv&);
     void setLineOffsetTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getLineOffsetTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getLineOffsetTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getLineBlur(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getLineBlur(jni::JNIEnv&);
     void setLineBlurTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getLineBlurTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getLineBlurTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getLineDasharray(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getLineDasharray(jni::JNIEnv&);
     void setLineDasharrayTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getLineDasharrayTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getLineDasharrayTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getLinePattern(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getLinePattern(jni::JNIEnv&);
     void setLinePatternTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getLinePatternTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getLinePatternTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getLineGradient(jni::JNIEnv&);
-    jni::jobject* createJavaPeer(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getLineGradient(jni::JNIEnv&);
+    jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&);
 
 }; // class LineLayer
 

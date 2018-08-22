@@ -38,10 +38,10 @@ private:
     AAssetManager* assetManager;
 };
 
-AssetManagerFileSource::AssetManagerFileSource(jni::JNIEnv& env, jni::Object<android::AssetManager> assetManager_)
-    : assetManager(assetManager_.NewGlobalRef(env)),
+AssetManagerFileSource::AssetManagerFileSource(jni::JNIEnv& env, const jni::Object<android::AssetManager>& assetManager_)
+    : assetManager(jni::NewGlobal(env, assetManager_)),
       impl(std::make_unique<util::Thread<Impl>>("AssetManagerFileSource",
-          AAssetManager_fromJava(&env, jni::Unwrap(**assetManager)))) {
+          AAssetManager_fromJava(&env, jni::Unwrap(assetManager.get())))) {
 }
 
 AssetManagerFileSource::~AssetManagerFileSource() = default;

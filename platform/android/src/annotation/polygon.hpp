@@ -11,7 +11,7 @@ class Polygon : private MultiPoint {
 public:
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/annotations/Polygon"; };
 
-    static mbgl::FillAnnotation toAnnotation(jni::JNIEnv&, jni::Object<Polygon>);
+    static mbgl::FillAnnotation toAnnotation(jni::JNIEnv&, const jni::Object<Polygon>&);
 
     static void registerNative(jni::JNIEnv&);
 };

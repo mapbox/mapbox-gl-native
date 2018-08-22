@@ -25,12 +25,12 @@ public:
     HTTPRequest(jni::JNIEnv&, const Resource&, FileSource::Callback);
     ~HTTPRequest();
 
-    void onFailure(jni::JNIEnv&, int type, jni::String message);
+    void onFailure(jni::JNIEnv&, int type, const jni::String& message);
     void onResponse(jni::JNIEnv&, int code,
-                    jni::String etag, jni::String modified,
-                    jni::String cacheControl, jni::String expires,
-                    jni::String retryAfter, jni::String xRateLimitReset,
-                    jni::Array<jni::jbyte> body);
+                    const jni::String& etag, const jni::String& modified,
+                    const jni::String& cacheControl, const jni::String& expires,
+                    const jni::String& retryAfter, const jni::String& xRateLimitReset,
+                    const jni::Array<jni::jbyte>& body);
 
     jni::Global<jni::Object<HTTPRequest>> javaRequest;
 
@@ -54,7 +54,7 @@ private:
 namespace android {
 
 void RegisterNativeHTTPRequest(jni::JNIEnv& env) {
-    static auto javaClass = jni::Class<HTTPRequest>::Singleton(env);
+    static auto& javaClass = jni::Class<HTTPRequest>::Singleton(env);
 
     #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
@@ -79,31 +79,32 @@ HTTPRequest::HTTPRequest(jni::JNIEnv& env, const Resource& resource_, FileSource
 
     jni::UniqueLocalFrame frame = jni::PushLocalFrame(env, 10);
 
-    static auto javaClass = jni::Class<HTTPRequest>::Singleton(env);
+    static auto& javaClass = jni::Class<HTTPRequest>::Singleton(env);
     static auto constructor =
         javaClass.GetConstructor<jni::jlong, jni::String, jni::String, jni::String>(env);
 
-    javaRequest = javaClass.New(env, constructor,
-        reinterpret_cast<jlong>(this),
-        jni::Make<jni::String>(env, resource.url),
-        jni::Make<jni::String>(env, etagStr),
-        jni::Make<jni::String>(env, modifiedStr)).NewGlobalRef(env);
+    javaRequest = jni::NewGlobal(env,
+        javaClass.New(env, constructor,
+            reinterpret_cast<jlong>(this),
+            jni::Make<jni::String>(env, resource.url),
+            jni::Make<jni::String>(env, etagStr),
+            jni::Make<jni::String>(env, modifiedStr)));
 }
 
 HTTPRequest::~HTTPRequest() {
     android::UniqueEnv env = android::AttachEnv();
 
-    static auto javaClass = jni::Class<HTTPRequest>::Singleton(*env);
+    static auto& javaClass = jni::Class<HTTPRequest>::Singleton(*env);
     static auto cancel = javaClass.GetMethod<void ()>(*env, "cancel");
 
-    javaRequest->Call(*env, cancel);
+    javaRequest.Call(*env, cancel);
 }
 
 void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
-                             jni::String etag, jni::String modified,
-                             jni::String cacheControl, jni::String expires,
-                             jni::String jRetryAfter, jni::String jXRateLimitReset,
-                             jni::Array<jni::jbyte> body) {
+                             const jni::String& etag, const jni::String& modified,
+                             const jni::String& cacheControl, const jni::String& expires,
+                             const jni::String& jRetryAfter, const jni::String& jXRateLimitReset,
+                             const jni::Array<jni::jbyte>& body) {
 
     using Error = Response::Error;
 
@@ -158,7 +159,7 @@ void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
     async.send();
 }
 
-void HTTPRequest::onFailure(jni::JNIEnv& env, int type, jni::String message) {
+void HTTPRequest::onFailure(jni::JNIEnv& env, int type, const jni::String& message) {
     std::string messageStr = jni::Make<std::string>(env, message);
 
     using Error = Response::Error;

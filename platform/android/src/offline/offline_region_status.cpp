@@ -3,7 +3,7 @@
 namespace mbgl {
 namespace android {
 
-jni::Object<OfflineRegionStatus> OfflineRegionStatus::New(jni::JNIEnv& env, mbgl::OfflineRegionStatus status) {
+jni::Local<jni::Object<OfflineRegionStatus>> OfflineRegionStatus::New(jni::JNIEnv& env, mbgl::OfflineRegionStatus status) {
 
     // Convert to jint
     jint downloadState;
@@ -17,7 +17,7 @@ jni::Object<OfflineRegionStatus> OfflineRegionStatus::New(jni::JNIEnv& env, mbgl
     }
 
     // Create java object
-    static auto javaClass = jni::Class<OfflineRegionStatus>::Singleton(env);
+    static auto& javaClass = jni::Class<OfflineRegionStatus>::Singleton(env);
     static auto constructor = javaClass.GetConstructor<jint, jlong, jlong, jlong, jlong, jlong, jboolean>(env);
     return javaClass.New(env, constructor,
         downloadState,

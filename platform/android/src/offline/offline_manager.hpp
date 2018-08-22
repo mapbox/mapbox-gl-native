@@ -20,11 +20,11 @@ public:
     public:
         static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineManager$ListOfflineRegionsCallback";}
 
-        static void onError(jni::JNIEnv&, jni::Object<OfflineManager::ListOfflineRegionsCallback>, std::exception_ptr);
+        static void onError(jni::JNIEnv&, const jni::Object<OfflineManager::ListOfflineRegionsCallback>&, std::exception_ptr);
 
         static void onList(jni::JNIEnv&,
-                            jni::Object<FileSource>,
-                            jni::Object<OfflineManager::ListOfflineRegionsCallback>,
+                            const jni::Object<FileSource>&,
+                            const jni::Object<OfflineManager::ListOfflineRegionsCallback>&,
                             mbgl::optional<std::vector<mbgl::OfflineRegion>>);
     };
 
@@ -32,11 +32,11 @@ public:
     public:
         static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineManager$CreateOfflineRegionCallback"; }
 
-        static void onError(jni::JNIEnv&, jni::Object<OfflineManager::CreateOfflineRegionCallback>, std::exception_ptr);
+        static void onError(jni::JNIEnv&, const jni::Object<OfflineManager::CreateOfflineRegionCallback>&, std::exception_ptr);
 
         static void onCreate(jni::JNIEnv&,
-                            jni::Object<FileSource>,
-                            jni::Object<OfflineManager::CreateOfflineRegionCallback>,
+                            const jni::Object<FileSource>&,
+                            const jni::Object<OfflineManager::CreateOfflineRegionCallback>&,
                             mbgl::optional<mbgl::OfflineRegion>);
     };
 
@@ -44,18 +44,18 @@ public:
 
     static void registerNative(jni::JNIEnv&);
 
-    OfflineManager(jni::JNIEnv&, jni::Object<FileSource>);
+    OfflineManager(jni::JNIEnv&, const jni::Object<FileSource>&);
     ~OfflineManager();
 
     void setOfflineMapboxTileCountLimit(jni::JNIEnv&, jni::jlong limit);
 
-    void listOfflineRegions(jni::JNIEnv&, jni::Object<FileSource>, jni::Object<ListOfflineRegionsCallback> callback);
+    void listOfflineRegions(jni::JNIEnv&, const jni::Object<FileSource>&, const jni::Object<ListOfflineRegionsCallback>& callback);
 
     void createOfflineRegion(jni::JNIEnv&,
-                             jni::Object<FileSource> jFileSource_,
-                             jni::Object<OfflineRegionDefinition> definition,
-                             jni::Array<jni::jbyte> metadata,
-                             jni::Object<OfflineManager::CreateOfflineRegionCallback> callback);
+                             const jni::Object<FileSource>& jFileSource_,
+                             const jni::Object<OfflineRegionDefinition>& definition,
+                             const jni::Array<jni::jbyte>& metadata,
+                             const jni::Object<OfflineManager::CreateOfflineRegionCallback>& callback);
 
 private:
     mbgl::DefaultFileSource& fileSource;

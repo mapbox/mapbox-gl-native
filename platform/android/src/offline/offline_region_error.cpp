@@ -3,7 +3,7 @@
 namespace mbgl {
 namespace android {
 
-jni::Object<OfflineRegionError> OfflineRegionError::New(jni::JNIEnv& env, mbgl::Response::Error error) {
+jni::Local<jni::Object<OfflineRegionError>> OfflineRegionError::New(jni::JNIEnv& env, mbgl::Response::Error error) {
 
     // Handle the value of reason independently of the underlying int value
     std::string reason;
@@ -28,12 +28,12 @@ jni::Object<OfflineRegionError> OfflineRegionError::New(jni::JNIEnv& env, mbgl::
             break;
     }
 
-    static auto javaClass = jni::Class<OfflineRegionError>::Singleton(env);
+    static auto& javaClass = jni::Class<OfflineRegionError>::Singleton(env);
     static auto constructor = javaClass.GetConstructor<jni::String, jni::String>(env);
 
     return javaClass.New(env, constructor,
-        *jni::SeizeLocal(env, jni::Make<jni::String>(env, reason)),
-        *jni::SeizeLocal(env, jni::Make<jni::String>(env, error.message)));
+        jni::Make<jni::String>(env, reason),
+        jni::Make<jni::String>(env, error.message));
 }
 
 void OfflineRegionError::registerNative(jni::JNIEnv& env) {

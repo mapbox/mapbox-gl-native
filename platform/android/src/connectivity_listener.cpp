@@ -21,7 +21,7 @@ namespace android {
 
     void ConnectivityListener::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        static auto javaClass = jni::Class<ConnectivityListener>::Singleton(env);
+        static auto& javaClass = jni::Class<ConnectivityListener>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 

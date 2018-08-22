@@ -12,7 +12,7 @@ class Image : private mbgl::util::noncopyable {
 public:
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/maps/Image"; };
 
-    static mbgl::style::Image getImage(jni::JNIEnv&, jni::Object<Image>);
+    static mbgl::style::Image getImage(jni::JNIEnv&, const jni::Object<Image>&);
 
     static void registerNative(jni::JNIEnv&);
 };

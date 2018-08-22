@@ -19,12 +19,12 @@ public:
 
     static void registerNative(jni::JNIEnv&);
 
-    static jni::Object<Source> peerForCoreSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
+    static const jni::Object<Source>& peerForCoreSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
 
     /*
      * Called when a Java object is created for a core source that belongs to a map.
      */
-    Source(jni::JNIEnv&, mbgl::style::Source&, jni::Object<Source>, AndroidRendererFrontend&);
+    Source(jni::JNIEnv&, mbgl::style::Source&, const jni::Object<Source>&, AndroidRendererFrontend&);
 
     /*
      * Called when a Java object is created for a new core source that does not belong to a map.
@@ -33,15 +33,15 @@ public:
 
     virtual ~Source();
 
-    virtual void addToMap(JNIEnv&, jni::Object<Source>, mbgl::Map&, AndroidRendererFrontend&);
+    virtual void addToMap(JNIEnv&, const jni::Object<Source>&, mbgl::Map&, AndroidRendererFrontend&);
 
-    virtual bool removeFromMap(JNIEnv&, jni::Object<Source>, mbgl::Map&);
+    virtual bool removeFromMap(JNIEnv&, const jni::Object<Source>&, mbgl::Map&);
 
     void releaseJavaPeer();
 
-    jni::String getId(jni::JNIEnv&);
+    jni::Local<jni::String> getId(jni::JNIEnv&);
 
-    jni::String getAttribution(jni::JNIEnv&);
+    jni::Local<jni::String> getAttribution(jni::JNIEnv&);
 
 protected:
     // Set on newly created sources until added to the map.
