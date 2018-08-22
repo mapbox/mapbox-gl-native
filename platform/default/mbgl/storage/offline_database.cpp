@@ -661,23 +661,45 @@ OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
             throw std::runtime_error("Merge database has incorrect user_version");
         }
 
+        auto currentTileCount = getOfflineMapboxTileCount();
+        // clang-format off
+         mapbox::sqlite::Query queryTiles{ getStatement(
+            "SELECT COUNT(DISTINCT st.id) "
+            "FROM side.tiles st "
+            //only consider region tiles, and not ambient tiles.
+            "JOIN side.region_tiles srt ON srt.tile_id = st.id "
+            "LEFT JOIN tiles t ON st.url_template = t.url_template AND "
+                "st.pixel_ratio = t.pixel_ratio AND "
+                "st.z = t.z AND "
+                "st.x = t.x AND "
+                "st.y = t.y "
+            "WHERE t.id IS NULL "
+            "AND st.url_template LIKE 'mapbox://%' ") };
+        // clang-format on
+        queryTiles.run();
+        auto countOfTilesToMerge = queryTiles.get<int64_t>(0);
+        if ((countOfTilesToMerge + currentTileCount) > offlineMapboxTileCountLimit) {
+            throw MapboxTileLimitExceededException();
+        }
+        queryTiles.reset();
+
         mapbox::sqlite::Transaction transaction(*db);
         db->exec(mergeSideloadedDatabaseSQL);
         transaction.commit();
 
         // clang-format off
-        mapbox::sqlite::Query query{ getStatement(
+        mapbox::sqlite::Query queryRegions{ getStatement(
             "SELECT r.id, r.definition, r.description "
             "FROM side.regions sr "
             "JOIN regions r ON sr.definition = r.definition") };
         // clang-format on
 
         OfflineRegions result;
-        while (query.run()) {
+        while (queryRegions.run()) {
             // Construct, then move because this constructor is private.
-            OfflineRegion region(query.get<int64_t>(0),
-                decodeOfflineRegionDefinition(query.get<std::string>(1)),
-                query.get<std::vector<uint8_t>>(2));
+            OfflineRegion region(queryRegions.get<int64_t>(0),
+                decodeOfflineRegionDefinition(queryRegions.get<std::string>(1)),
+                queryRegions.get<std::vector<uint8_t>>(2));
             result.emplace_back(std::move(region));
         }
         db->exec("DETACH DATABASE side");
@@ -797,7 +819,7 @@ void OfflineDatabase::putRegionResources(int64_t regionID,
                 completedTileSize += resourceSize;
             }
         } catch (const MapboxTileLimitExceededException&) {
-            // Commit the rest of the batch and retrow
+            // Commit the rest of the batch and rethrow
             transaction.commit();
             throw;
         }
