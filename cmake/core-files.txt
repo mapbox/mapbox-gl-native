@@ -694,7 +694,6 @@ include/mbgl/util/thread.hpp
 include/mbgl/util/tileset.hpp
 include/mbgl/util/timer.hpp
 include/mbgl/util/traits.hpp
-include/mbgl/util/tuple.hpp
 include/mbgl/util/type_list.hpp
 include/mbgl/util/unitbezier.hpp
 include/mbgl/util/util.hpp
