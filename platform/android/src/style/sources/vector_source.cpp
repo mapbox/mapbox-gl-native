@@ -9,7 +9,7 @@
 // C++ -> Java conversion
 #include "../../conversion/conversion.hpp"
 #include "../../conversion/collection.hpp"
-#include "../../geojson/conversion/feature.hpp"
+#include "../../geojson/feature.hpp"
 #include "../conversion/url_or_tileset.hpp"
 
 #include <mbgl/util/variant.hpp>
@@ -54,7 +54,7 @@ namespace android {
             features = rendererFrontend->querySourceFeatures(source.getID(),
                 { toVector(env, jSourceLayerIds), toFilter(env, jni::SeizeLocal(env, std::move(jfilter))) });
         }
-        return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, features);
+        return Feature::convert(env, features);
     }
 
     jni::Object<Source> VectorSource::createJavaPeer(jni::JNIEnv& env) {

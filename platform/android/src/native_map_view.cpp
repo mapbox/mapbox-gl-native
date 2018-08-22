@@ -37,7 +37,7 @@
 #include "conversion/conversion.hpp"
 #include "conversion/collection.hpp"
 #include "style/conversion/filter.hpp"
-#include "geojson/conversion/feature.hpp"
+#include "geojson/feature.hpp"
 
 #include "jni.hpp"
 #include "attach_env.hpp"
@@ -658,7 +658,7 @@ jni::Array<jni::Object<geojson::Feature>> NativeMapView::queryRenderedFeaturesFo
     }
     mapbox::geometry::point<double> point = {x, y};
 
-    return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(
+    return Feature::convert(
             env,
             rendererFrontend->queryRenderedFeatures(point, { layers, toFilter(env, jni::SeizeLocal(env, std::move(jfilter))) }));
 }
@@ -678,7 +678,7 @@ jni::Array<jni::Object<geojson::Feature>> NativeMapView::queryRenderedFeaturesFo
             mapbox::geometry::point<double>{ right, bottom }
     };
 
-    return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(
+    return Feature::convert(
             env,
             rendererFrontend->queryRenderedFeatures(box, { layers, toFilter(env, jni::SeizeLocal(env, std::move(jfilter))) }));
 }
