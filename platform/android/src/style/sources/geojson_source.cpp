@@ -12,7 +12,7 @@
 // C++ -> Java conversion
 #include "../../conversion/conversion.hpp"
 #include "../../conversion/collection.hpp"
-#include "../../geojson/conversion/feature.hpp"
+#include "../../geojson/feature.hpp"
 #include "../conversion/url_or_tileset.hpp"
 
 #include <string>
@@ -104,7 +104,7 @@ namespace android {
             features = rendererFrontend->querySourceFeatures(source.getID(),
                 { {}, toFilter(env, jni::SeizeLocal(env, std::move(jfilter))) });
         }
-        return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, features);
+        return Feature::convert(env, features);
     }
 
     jni::Object<Source> GeoJSONSource::createJavaPeer(jni::JNIEnv& env) {

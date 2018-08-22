@@ -55,8 +55,6 @@ platform/android/src/conversion/color.hpp
 platform/android/src/conversion/constant.cpp
 platform/android/src/conversion/constant.hpp
 platform/android/src/conversion/conversion.hpp
-platform/android/src/geojson/conversion/feature.cpp
-platform/android/src/geojson/conversion/feature.hpp
 platform/android/src/style/conversion/filter.cpp
 platform/android/src/style/conversion/filter.hpp
 platform/android/src/style/conversion/position.cpp
