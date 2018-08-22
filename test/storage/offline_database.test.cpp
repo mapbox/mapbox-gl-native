@@ -1266,6 +1266,37 @@ TEST(OfflineDatabase, MergeDatabaseWithMultipleRegionsWithOverlap) {
     }
 }
 
+TEST(OfflineDatabase, MergeDatabaseWithSingleRegionTooManyNewTiles) {
+    FixtureLog log;
+    util::deleteFile(filename_sideload);
+    util::copyFile(filename_sideload, "test/fixtures/offline_database/sideload_sat_multiple.db");
+
+    OfflineDatabase db(":memory:");
+    db.setOfflineMapboxTileCountLimit(1);
+
+    auto result = db.mergeDatabase(filename_sideload);
+    EXPECT_FALSE(result);
+    EXPECT_EQ(1u, log.count({ EventSeverity::Error, Event::Database, -1, "Mapbox tile limit exceeded" }));
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
+
+TEST(OfflineDatabase, MergeDatabaseWithSingleRegionTooManyExistingTiles) {
+    FixtureLog log;
+    deleteDatabaseFiles();
+    util::deleteFile(filename_sideload);
+    util::copyFile(filename, "test/fixtures/offline_database/sideload_sat_multiple.db");
+    util::copyFile(filename_sideload, "test/fixtures/offline_database/satellite_test.db");
+
+    OfflineDatabase db(filename);
+    db.setOfflineMapboxTileCountLimit(2);
+
+    auto result = db.mergeDatabase(filename_sideload);
+    EXPECT_THROW(std::rethrow_exception(result.error()), MapboxTileLimitExceededException);
+
+    EXPECT_EQ(1u, log.count({ EventSeverity::Error, Event::Database, -1, "Mapbox tile limit exceeded" }));
+    EXPECT_EQ(0u, log.uncheckedCount());
+}
+
 TEST(OfflineDatabase, MergeDatabaseWithInvalidPath) {
     FixtureLog log;
 
