@@ -509,6 +509,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                     gl::StencilMode::Replace
                 },
                 gl::ColorMode::disabled(),
+                gl::CullFaceMode::disabled(),
                 parameters.staticData.quadTriangleIndexBuffer,
                 parameters.staticData.tileTriangleSegments,
                 program.computeAllUniformValues(

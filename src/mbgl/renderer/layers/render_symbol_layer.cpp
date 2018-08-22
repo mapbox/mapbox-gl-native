@@ -122,6 +122,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                     : gl::DepthMode::disabled(),
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
+                gl::CullFaceMode::disabled(),
                 *buffers.indexBuffer,
                 buffers.segments,
                 allUniformValues,
@@ -254,6 +255,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 gl::DepthMode::disabled(),
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
+                gl::CullFaceMode::disabled(),
                 CollisionBoxProgram::UniformValues {
                     uniforms::u_matrix::Value( tile.matrix ),
                     uniforms::u_extrude_scale::Value( extrudeScale ),
@@ -288,6 +290,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 gl::DepthMode::disabled(),
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
+                gl::CullFaceMode::disabled(),
                 CollisionCircleProgram::UniformValues {
                     uniforms::u_matrix::Value( tile.matrix ),
                     uniforms::u_extrude_scale::Value( extrudeScale ),
