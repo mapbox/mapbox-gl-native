@@ -2,6 +2,9 @@
 SETLOCAL
 SET EL=0
 
+7z > null
+IF %ERRORLEVEL% NEQ 0 ECHO 7z not availabe && GOTO ERROR
+
 ECHO Powershell version^:
 powershell $PSVersionTable.PSVersion
 IF %ERRORLEVEL% NEQ 0 ECHO powershell not availabe && GOTO ERROR
