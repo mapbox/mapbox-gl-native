@@ -66,4 +66,8 @@
         android:id="@+id/action_numeric_filter"
         android:title="@string/apply_numeric_fill_filter"
         mapbox:showAsAction="never" />
+    <item
+        android:id="@+id/action_bring_water_to_front"
+        android:title="@string/bring_water_to_front"
+        mapbox:showAsAction="never" />
 </menu>

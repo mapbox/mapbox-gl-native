@@ -96,6 +96,18 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionBuff
 FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
 
 /**
+ An `NSNumber` object containing a Boolean enabling or disabling calculating line distance metrics. 
+ 
+ Set this property to `YES` in order for the `MGLLineStyleLayer.lineGradient` property to have its intended effect.
+ The default value is `NO`.
+ 
+ This option corresponds to the
+ <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#sources-geojson-lineMetrics"><code>lineMetrics</code></a>
+ source property in the Mapbox Style Specification.
+ */
+FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionLineDistanceMetrics;
+
+/**
  `MGLShapeSource` is a map content source that supplies vector shapes to be
  shown on the map. The shapes may be instances of `MGLShape` or `MGLFeature`,
  or they may be defined by local or external

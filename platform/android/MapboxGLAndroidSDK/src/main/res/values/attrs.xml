@@ -4,6 +4,7 @@
 
         <!--Configuration-->
         <attr name="mapbox_styleUrl" format="string"/>
+        <attr name="mapbox_styleJson" format="string"/>
         <attr name="mapbox_apiBaseUrl" format="string"/>
         <attr name="mapbox_localIdeographFontFamily" format="string"/>
 

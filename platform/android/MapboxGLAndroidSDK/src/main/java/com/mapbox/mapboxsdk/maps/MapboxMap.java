@@ -95,6 +95,7 @@ public final class MapboxMap {
     setDebugActive(options.getDebugActive());
     setApiBaseUrl(options);
     setStyleUrl(options);
+    setStyleJson(options);
     setPrefetchesTiles(options);
   }
 
@@ -1058,7 +1059,7 @@ public final class MapboxMap {
    * @param options the object containing the style url
    */
   private void setStyleUrl(@NonNull MapboxMapOptions options) {
-    String style = options.getStyle();
+    String style = options.getStyleUrl();
     if (!TextUtils.isEmpty(style)) {
       setStyleUrl(style, null);
     }
@@ -1084,6 +1085,18 @@ public final class MapboxMap {
    */
   public void setStyleJson(@NonNull String styleJson) {
     nativeMapView.setStyleJson(styleJson);
+  }
+
+  /**
+   * Loads a new map style json from MapboxMapOptions if available.
+   *
+   * @param options the object containing the style json
+   */
+  private void setStyleJson(@NonNull MapboxMapOptions options) {
+    String styleJson = options.getStyleJson();
+    if (!TextUtils.isEmpty(styleJson)) {
+      setStyleJson(styleJson);
+    }
   }
 
   /**

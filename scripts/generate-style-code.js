@@ -37,6 +37,7 @@ global.evaluatedType = function (property) {
     return 'bool';
   case 'number':
     return 'float';
+  case 'formatted':
   case 'string':
     return 'std::string';
   case 'enum':
@@ -120,6 +121,7 @@ global.defaultValue = function (property) {
   switch (property.type) {
   case 'number':
     return property.default;
+  case 'formatted':
   case 'string':
     return JSON.stringify(property.default || "");
   case 'enum':

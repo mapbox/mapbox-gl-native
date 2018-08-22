@@ -2055,7 +2055,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Value to use for a text label.
+   * Value to use for a text label. If a plain `string` is provided, it will be treated as a `formatted` with default/inherited formatting options.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -2065,7 +2065,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Value to use for a text label.
+   * Value to use for a text label. If a plain `string` is provided, it will be treated as a `formatted` with default/inherited formatting options.
    *
    * @param value a String value
    * @return property wrapper around String

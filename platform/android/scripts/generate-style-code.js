@@ -55,6 +55,7 @@ global.propertyType = function propertyType(property) {
         return 'Boolean';
       case 'number':
         return 'Float';
+      case 'formatted':
       case 'string':
         return 'String';
       case 'enum':
@@ -74,6 +75,7 @@ global.propertyJavaType = function propertyType(property) {
          return 'boolean';
        case 'number':
          return 'float';
+       case 'formatted':
        case 'string':
          return 'String';
        case 'enum':
@@ -121,6 +123,7 @@ global.propertyNativeType = function (property) {
     return 'bool';
   case 'number':
     return 'float';
+  case 'formatted':
   case 'string':
     return 'std::string';
   case 'enum':
@@ -155,6 +158,7 @@ global.defaultExpressionJava = function(property) {
         return 'boolean';
       case 'number':
         return 'number';
+      case 'formatted':
       case 'string':
         return "string";
       case 'enum':
@@ -179,6 +183,7 @@ global.defaultValueJava = function(property) {
         return 'true';
       case 'number':
         return '0.3f';
+      case 'formatted':
       case 'string':
         return '"' + property['default'] + '"';
       case 'enum':
@@ -187,6 +192,7 @@ global.defaultValueJava = function(property) {
         return '"rgba(0, 0, 0, 1)"';
       case 'array':
              switch (property.value) {
+              case 'formatted':
               case 'string':
                 return '[' + property['default'] + "]";
               case 'number':
@@ -301,6 +307,7 @@ global.evaluatedType = function (property) {
     return 'bool';
   case 'number':
     return 'float';
+  case 'formatted':
   case 'string':
     return 'std::string';
   case 'enum':
@@ -362,21 +369,4 @@ const enumPropertyJavaTemplate = ejs.compile(fs.readFileSync('platform/android/M
 writeIfModified(
     `platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/layers/Property.java`,
     enumPropertyJavaTemplate({properties: enumProperties})
-);
-
-// De-duplicate enum properties before processing jni property templates
-const enumPropertiesDeDup = _(enumProperties).uniqBy(global.propertyNativeType).value();
-
-// JNI Enum property conversion templates
-const enumPropertyHppTypeStringValueTemplate = ejs.compile(fs.readFileSync('platform/android/src/style/conversion/types_string_values.hpp.ejs', 'utf8'), {strict: true});
-writeIfModified(
-    `platform/android/src/style/conversion/types_string_values.hpp`,
-    enumPropertyHppTypeStringValueTemplate({properties: enumPropertiesDeDup})
-);
-
-// JNI property value types conversion templates
-const enumPropertyHppTypeTemplate = ejs.compile(fs.readFileSync('platform/android/src/style/conversion/types.hpp.ejs', 'utf8'), {strict: true});
-writeIfModified(
-    `platform/android/src/style/conversion/types.hpp`,
-    enumPropertyHppTypeTemplate({properties: enumPropertiesDeDup})
 );

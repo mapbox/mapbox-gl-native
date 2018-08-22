@@ -18,6 +18,12 @@ namespace mbgl {
 class RenderedQueryOptions;
 class SourceQueryOptions;
 
+namespace util {
+
+class AsyncTask;
+
+} // namespace util
+
 namespace android {
 
 class AndroidRendererFrontend : public RendererFrontend {
@@ -44,6 +50,8 @@ public:
 private:
     MapRenderer& mapRenderer;
     util::RunLoop* mapRunLoop;
+    std::unique_ptr<util::AsyncTask> updateAsyncTask;
+    std::shared_ptr<UpdateParameters> updateParams;
 };
 
 } // namespace android
