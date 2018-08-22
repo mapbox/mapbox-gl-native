@@ -12,6 +12,14 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added a one-time warning about possible attribute loss when initializing an `MGLShapeSource` with an `MGLShapeCollection` [#12625](https://github.com/mapbox/mapbox-gl-native/pull/12625)
 * Added an `-[MGLMapViewDelegate mapView:shapeAnnotationIsEnabled:]` method to specify whether an annotation is selectable. ([#12352](https://github.com/mapbox/mapbox-gl-native/pull/12352))
 
+### Offline
+* Improved SQLite error handling for offline databases that return specific errors. [#12224](https://github.com/mapbox/mapbox-gl-native/pull/12224)
+* Added the ability to define an offline region with an arbitrary shape. [#11447](https://github.com/mapbox/mapbox-gl-native/pull/11447)
+
+### Styles
+* Reduced the amount of memory consumed by font data after changing the style. [#12414](https://github.com/mapbox/mapbox-gl-native/pull/12414)
+* Modified how invalid values for "text-font" are handled. These are now warnings instead of errors. [#12414](https://github.com/mapbox/mapbox-gl-native/pull/12414)
+
 ## 4.3.0 - August 15, 2018
 
 ### Styles and rendering
