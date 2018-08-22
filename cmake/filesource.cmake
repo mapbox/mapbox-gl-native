@@ -1,5 +1,6 @@
 add_vendor_target(expected INTERFACE)
 
+# Modify cmake/filesource-files.txt to change the source files for this target.
 load_sources_list(MBGL_FILESOURCE_FILES cmake/filesource-files.txt)
 add_library(mbgl-filesource STATIC ${MBGL_FILESOURCE_FILES})
 

@@ -1,3 +1,4 @@
+# Modify cmake/benchmark-files.txt to change the source files for this target.
 load_sources_list(MBGL_BENCHMARK_FILES cmake/benchmark-files.txt)
 add_executable(mbgl-benchmark ${MBGL_BENCHMARK_FILES})
 

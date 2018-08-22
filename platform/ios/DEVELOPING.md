@@ -84,6 +84,7 @@ To add an Objective-C header or implementation file to the iOS maps SDK:
 1. Audit new headers for nullability. Typically, you will wrap a header with `NS_ASSUME_NONNULL_BEGIN` and `NS_ASSUME_NONNULL_END`.
 1. _(Optional.)_ If it’s a public header, change its visibility from Project to Public and import it in [the iOS SDK’s umbrella header](./src/Mapbox.h).
 1. _(Optional.)_ If the file would also be used by the macOS maps SDK, make sure it’s in [platform/darwin/src/](../darwin/src/), then consult [the companion macOS document](../macos/DEVELOPING.md#adding-a-source-code-file) for further instructions.
+1. Run `scripts/generate-cmake-files.js` to update the generated source file list for third party build systems.
 
 ### Adding a resource
 
