@@ -99,6 +99,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             gl::DepthMode::disabled(),
             parameters.stencilModeForClipping(clip),
             gl::ColorMode::unblended(),
+            gl::CullFaceMode::disabled(),
             *tile.debugBucket->indexBuffer,
             tile.debugBucket->segments,
             program.computeAllUniformValues(
@@ -120,6 +121,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             gl::DepthMode::disabled(),
             parameters.stencilModeForClipping(clip),
             gl::ColorMode::unblended(),
+            gl::CullFaceMode::disabled(),
             *tile.debugBucket->indexBuffer,
             tile.debugBucket->segments,
             program.computeAllUniformValues(
@@ -143,6 +145,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             gl::DepthMode::disabled(),
             parameters.stencilModeForClipping(clip),
             gl::ColorMode::unblended(),
+            gl::CullFaceMode::disabled(),
             parameters.staticData.tileBorderIndexBuffer,
             parameters.staticData.tileBorderSegments,
             program.computeAllUniformValues(

@@ -4,6 +4,7 @@
 #include <mbgl/gl/depth_mode.hpp>
 #include <mbgl/gl/stencil_mode.hpp>
 #include <mbgl/gl/color_mode.hpp>
+#include <mbgl/gl/cull_face_mode.hpp>
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/size.hpp>
@@ -208,6 +209,27 @@ struct BindFramebuffer {
 struct BindRenderbuffer {
     using Type = RenderbufferID;
     static const constexpr Type Default = 0;
+    static void Set(const Type&);
+    static Type Get();
+};
+
+struct CullFace {
+    using Type = CullFaceMode::CullFace;
+    static const constexpr Type Default = CullFaceMode::Disable;
+    static void Set(const Type&);
+    static Type Get();
+};
+
+struct CullFaceSide {
+    using Type = CullFaceMode::CullFaceSide;
+    static const constexpr Type Default = CullFaceMode::Back;
+    static void Set(const Type&);
+    static Type Get();
+};
+
+struct FrontFace {
+    using Type = CullFaceMode::FrontFace;
+    static const constexpr Type Default = CullFaceMode::CounterClockwise;
     static void Set(const Type&);
     static Type Get();
 };

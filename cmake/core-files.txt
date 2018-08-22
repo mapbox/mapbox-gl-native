@@ -59,6 +59,8 @@ src/mbgl/gl/color_mode.cpp
 src/mbgl/gl/color_mode.hpp
 src/mbgl/gl/context.cpp
 src/mbgl/gl/context.hpp
+src/mbgl/gl/cull_face_mode.cpp
+src/mbgl/gl/cull_face_mode.hpp
 src/mbgl/gl/debugging.cpp
 src/mbgl/gl/debugging.hpp
 src/mbgl/gl/debugging_extension.cpp
