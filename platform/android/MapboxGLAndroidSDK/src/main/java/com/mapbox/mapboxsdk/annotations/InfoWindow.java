@@ -2,11 +2,13 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.content.res.Resources;
 import android.graphics.PointF;
+import android.os.Build;
 import android.support.annotation.LayoutRes;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.R;
@@ -38,6 +40,7 @@ public class InfoWindow {
   private float markerHeightOffset;
   private float markerWidthOffset;
   private float viewWidthOffset;
+  private float viewHeightOffset;
   private PointF coordinates;
   private boolean isVisible;
 
@@ -124,8 +127,7 @@ public class InfoWindow {
     if (view != null && mapboxMap != null) {
       view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 
-      // Calculate y-offset for update method
-      markerHeightOffset = -view.getMeasuredHeight() + offsetY;
+      markerHeightOffset = offsetY;
       markerWidthOffset = -offsetX;
 
       // Calculate default Android x,y coordinate
@@ -194,8 +196,10 @@ public class InfoWindow {
       view.setX(x);
       view.setY(y);
 
-      // Calculate x-offset for update method
+      // Calculate x-offset and y-offset for update method
       viewWidthOffset = x - coordinates.x - offsetX;
+      viewHeightOffset = -view.getMeasuredHeight() + offsetY;
+
 
       close(); // if it was already opened
       mapView.addView(view, lp);
@@ -288,9 +292,37 @@ public class InfoWindow {
       } else {
         view.setX(coordinates.x - (view.getMeasuredWidth() / 2) - markerWidthOffset);
       }
-      view.setY(coordinates.y + markerHeightOffset);
+      view.setY(coordinates.y + viewHeightOffset);
     }
   }
+
+  void onContentUpdate() {
+    //recalculate y-offset and update position
+    View view = this.view.get();
+    if (view != null) {
+      ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
+      if (viewTreeObserver.isAlive()) {
+        viewTreeObserver.addOnGlobalLayoutListener(contentUpdateListener);
+      }
+    }
+  }
+
+  private final ViewTreeObserver.OnGlobalLayoutListener contentUpdateListener =
+    new ViewTreeObserver.OnGlobalLayoutListener() {
+      @Override
+      public void onGlobalLayout() {
+        View view = InfoWindow.this.view.get();
+        if (view != null) {
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+          } else {
+            view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+          }
+          viewHeightOffset = -view.getMeasuredHeight() + markerHeightOffset;
+          update();
+        }
+      }
+    };
 
   /**
    * Retrieve this {@link InfoWindow}'s current view being used.
