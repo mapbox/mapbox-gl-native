@@ -1,8 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.activity.maplayout;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -10,12 +10,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Toast;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.utils.MapFragmentUtils;
 
 /**
  * Test activity showcasing having 2 maps on top of each other.
@@ -26,9 +30,9 @@ import com.mapbox.mapboxsdk.testapp.R;
 public class DoubleMapActivity extends AppCompatActivity {
 
   private static final String TAG_FRAGMENT = "map";
-
-  // used for ui tests
-  private MapboxMap mapboxMap;
+  private static final LatLng MACHU_PICCHU = new LatLng(-13.1650709, -72.5447154);
+  private static final double ZOOM_IN = 12;
+  private static final double ZOOM_OUT = 4;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -36,18 +40,21 @@ public class DoubleMapActivity extends AppCompatActivity {
     setContentView(R.layout.activity_map_fragment);
 
     if (savedInstanceState == null) {
+      MapboxMapOptions options = new MapboxMapOptions();
+      options.styleUrl(Style.DARK);
+      options.camera(new CameraPosition.Builder()
+        .target(MACHU_PICCHU)
+        .zoom(ZOOM_IN)
+        .build()
+      );
+
+      DoubleMapFragment doubleMapFragment = new DoubleMapFragment();
+      doubleMapFragment.setArguments(MapFragmentUtils.createFragmentArgs(options));
+
       FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-      transaction.add(R.id.fragment_container, new DoubleMapFragment(), TAG_FRAGMENT);
+      transaction.add(R.id.fragment_container, doubleMapFragment, TAG_FRAGMENT);
       transaction.commit();
     }
-  }
-
-  public void setMapboxMap(MapboxMap map) {
-    // we need to set mapboxmap on the parent activity,
-    // for auto-generated ui tests
-    mapboxMap = map;
-    mapboxMap.setStyleUrl(Style.DARK);
-    mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(18));
   }
 
   /**
@@ -55,40 +62,34 @@ public class DoubleMapActivity extends AppCompatActivity {
    */
   public static class DoubleMapFragment extends Fragment {
 
-    private DoubleMapActivity activity;
     private MapView mapView;
     private MapView mapViewMini;
 
     @Override
-    public void onAttach(Context context) {
-      super.onAttach(context);
-      activity = (DoubleMapActivity) context;
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
       return inflater.inflate(R.layout.fragment_double_map, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
       super.onViewCreated(view, savedInstanceState);
 
       // MapView large
-      mapView = (MapView) view.findViewById(R.id.mapView);
+      mapView = new MapView(view.getContext(), MapFragmentUtils.resolveArgs(view.getContext(), getArguments()));
       mapView.onCreate(savedInstanceState);
-      mapView.getMapAsync(mapboxMap -> {
-        if (activity != null) {
-          activity.setMapboxMap(mapboxMap);
-        }
-      });
+      ((ViewGroup) view.findViewById(R.id.container)).addView(mapView, 0);
 
       // MapView mini
-      mapViewMini = (MapView) view.findViewById(R.id.mini_map);
+      mapViewMini = view.findViewById(R.id.mini_map);
       mapViewMini.onCreate(savedInstanceState);
+      mapViewMini.setStyleUrl(Style.LIGHT);
       mapViewMini.getMapAsync(mapboxMap -> {
-        mapboxMap.setStyleUrl(Style.LIGHT);
-        mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(4));
+        mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
+          new CameraPosition.Builder().target(MACHU_PICCHU)
+            .zoom(ZOOM_OUT)
+            .build()
+          )
+        );
 
         UiSettings uiSettings = mapboxMap.getUiSettings();
         uiSettings.setAllGesturesEnabled(false);
@@ -98,6 +99,7 @@ public class DoubleMapActivity extends AppCompatActivity {
 
         mapboxMap.setOnMapClickListener(point -> {
           // test if we can open 2 activities after each other
+          Toast.makeText(mapViewMini.getContext(), "Creating a new Activity instance",Toast.LENGTH_SHORT).show();
           startActivity(new Intent(mapViewMini.getContext(), DoubleMapActivity.class));
         });
       });
