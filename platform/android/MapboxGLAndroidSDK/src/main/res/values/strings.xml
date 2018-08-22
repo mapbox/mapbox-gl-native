@@ -12,6 +12,7 @@
     <string name="mapbox_attributionTelemetryNeutral">More info</string>
     <string name="mapbox_attributionErrorNoBrowser">No web browser installed on device, can\'t open web page.</string>
     <string name="mapbox_offline_error_region_definition_invalid">Provided OfflineRegionDefinition doesn\'t fit the world bounds: %s</string>
+    <string name="mapbox_telemetryImproveMap">Improve This Map</string>
     <string name="mapbox_telemetrySettings">Telemetry Settings</string>
     <string name="mapbox_telemetryLink" translatable="false">https://www.mapbox.com/telemetry/</string>
 

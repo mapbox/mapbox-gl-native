@@ -46,7 +46,7 @@ type = STRINGS
 
 [mapbox-gl-native.stringsxml-android]
 file_filter = platform/android/MapboxGLAndroidSDK/src/main/res/values-<lang>/strings.xml
-lang_map = pt_PT: pt-rPT, zh_CN: zh-rCN
+lang_map = pt_PT: pt-rPT, zh_CN: zh-rCN, zh_TW: zh-rTW, zh_HK: zh-rHK
 source_file = platform/android/MapboxGLAndroidSDK/src/main/res/values/strings.xml
 source_lang = en
 type = ANDROID
