@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mapbox/geometry.hpp>
+#include <mbgl/util/feature.hpp>
 
 #include <jni/jni.hpp>
 
@@ -12,13 +12,8 @@ class JsonElement : public jni::ObjectTag {
 public:
     static constexpr auto Name() { return "com/google/gson/JsonElement"; };
 
-    static jni::Object<JsonElement> New(jni::JNIEnv&, const mapbox::geometry::value&);
-    static mapbox::geometry::value convert(JNIEnv&, jni::Object<JsonElement>);
-
-    static bool isJsonObject(JNIEnv&, jni::Object<JsonElement>);
-    static bool isJsonArray(JNIEnv&, jni::Object<JsonElement>);
-    static bool isJsonPrimitive(JNIEnv&, jni::Object<JsonElement>);
-    static bool isJsonNull(JNIEnv&, jni::Object<JsonElement>);
+    static jni::Object<JsonElement> New(jni::JNIEnv&, const mbgl::Value&);
+    static mbgl::Value convert(JNIEnv&, jni::Object<JsonElement>);
 
     static void registerNative(jni::JNIEnv&);
 };

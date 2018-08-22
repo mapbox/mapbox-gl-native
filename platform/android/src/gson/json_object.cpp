@@ -9,7 +9,7 @@ namespace android {
 namespace gson {
 
 
-jni::Object<JsonObject> JsonObject::New(jni::JNIEnv& env, const std::unordered_map<std::string, mapbox::geometry::value>& values) {
+jni::Object<JsonObject> JsonObject::New(jni::JNIEnv& env, const mbgl::PropertyMap& values) {
     static auto javaClass = jni::Class<JsonObject>::Singleton(env);
     static auto constructor = javaClass.GetConstructor(env);
     static auto addMethod = javaClass.GetMethod<void (jni::String, jni::Object<JsonElement>)>(env, "add");
@@ -46,8 +46,8 @@ static void iterateEntrySet(jni::JNIEnv& env, jni::Object<JsonObject> jsonObject
     }
 }
 
-mapbox::geometry::property_map JsonObject::convert(jni::JNIEnv &env, jni::Object<JsonObject> jsonObject) {
-    mapbox::geometry::property_map map;
+mbgl::PropertyMap JsonObject::convert(jni::JNIEnv &env, jni::Object<JsonObject> jsonObject) {
+    mbgl::PropertyMap map;
 
     if (jsonObject) {
         iterateEntrySet(env, jsonObject, [&map, &env](jni::String jId, jni::Object<gson::JsonElement> jsonElement) {
