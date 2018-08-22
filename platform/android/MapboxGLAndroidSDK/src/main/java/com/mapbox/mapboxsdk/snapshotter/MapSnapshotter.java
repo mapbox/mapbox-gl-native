@@ -217,7 +217,7 @@ public class MapSnapshotter {
     checkThread();
     this.context = context.getApplicationContext();
     FileSource fileSource = FileSource.getInstance(context);
-    String programCacheDir = context.getCacheDir().getAbsolutePath();
+    String programCacheDir = FileSource.getInternalCachePath(context);
 
     nativeInitialize(this, fileSource, options.pixelRatio, options.width,
       options.height, options.styleUrl, options.styleJson, options.region, options.cameraPosition,

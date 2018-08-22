@@ -84,13 +84,17 @@
 class MBGLView;
 class MGLAnnotationContext;
 
-const CGFloat MGLMapViewDecelerationRateNormal = UIScrollViewDecelerationRateNormal;
-const CGFloat MGLMapViewDecelerationRateFast = UIScrollViewDecelerationRateFast;
-const CGFloat MGLMapViewDecelerationRateImmediate = 0.0;
+const MGLMapViewDecelerationRate MGLMapViewDecelerationRateNormal = UIScrollViewDecelerationRateNormal;
+const MGLMapViewDecelerationRate MGLMapViewDecelerationRateFast = UIScrollViewDecelerationRateFast;
+const MGLMapViewDecelerationRate MGLMapViewDecelerationRateImmediate = 0.0;
 
 const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondDefault = -1;
 const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondLowPower = 30;
 const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondMaximum = 60;
+
+const MGLExceptionName MGLMissingLocationServicesUsageDescriptionException = @"MGLMissingLocationServicesUsageDescriptionException";
+const MGLExceptionName MGLUserLocationAnnotationTypeException = @"MGLUserLocationAnnotationTypeException";
+const MGLExceptionName MGLResourceNotFoundException = @"MGLResourceNotFoundException";
 
 /// Indicates the manner in which the map view is tracking the user location.
 typedef NS_ENUM(NSUInteger, MGLUserTrackingState) {
@@ -138,7 +142,7 @@ static NSString * const MGLInvisibleStyleMarkerSymbolName = @"invisible_marker";
 
 /// Prefix that denotes a sprite installed by MGLMapView, to avoid collisions
 /// with style-defined sprites.
-NSString *const MGLAnnotationSpritePrefix = @"com.mapbox.sprites.";
+NSString * const MGLAnnotationSpritePrefix = @"com.mapbox.sprites.";
 
 /// Slop area around the hit testing point, allowing for imprecise annotation selection.
 const CGFloat MGLAnnotationImagePaddingForHitTest = 5;
@@ -240,6 +244,12 @@ public:
 @property (nonatomic) MGLUserLocation *userLocation;
 @property (nonatomic) NSMutableDictionary<NSString *, NSMutableArray<MGLAnnotationView *> *> *annotationViewReuseQueueByIdentifier;
 
+/// Experimental rendering performance measurement.
+@property (nonatomic) BOOL experimental_enableFrameRateMeasurement;
+@property (nonatomic) CGFloat averageFrameRate;
+@property (nonatomic) CFTimeInterval frameTime;
+@property (nonatomic) CFTimeInterval averageFrameTime;
+
 @end
 
 @implementation MGLMapView
@@ -296,6 +306,11 @@ public:
     BOOL _accessibilityValueAnnouncementIsPending;
 
     MGLReachability *_reachability;
+
+    /// Experimental rendering performance measurement.
+    CFTimeInterval _frameCounterStartTime;
+    NSInteger _frameCount;
+    CFTimeInterval _frameDurations;
 }
 
 #pragma mark - Setup & Teardown -
@@ -1103,6 +1118,27 @@ public:
         _needsDisplayRefresh = NO;
 
         [self.glView display];
+    }
+
+    if (self.experimental_enableFrameRateMeasurement)
+    {
+        CFTimeInterval now = CACurrentMediaTime();
+
+        self.frameTime = now - _displayLink.timestamp;
+        _frameDurations += self.frameTime;
+
+        _frameCount++;
+
+        CFTimeInterval elapsed = now - _frameCounterStartTime;
+
+        if (elapsed >= 1.0) {
+            self.averageFrameRate = _frameCount / elapsed;
+            self.averageFrameTime = (_frameDurations / _frameCount) * 1000;
+
+            _frameCount = 0;
+            _frameDurations = 0;
+            _frameCounterStartTime = now;
+        }
     }
 }
 
@@ -4147,7 +4183,11 @@ public:
             {
                 if ([annotation isKindOfClass:[MGLMultiPoint class]])
                 {
-                    return false;
+                    if ([self.delegate respondsToSelector:@selector(mapView:shapeAnnotationIsEnabled:)]) {
+                        return !!(![self.delegate mapView:self shapeAnnotationIsEnabled:(MGLMultiPoint *)annotation]);
+                    } else {
+                        return false;
+                    }
                 }
                 
                 MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
@@ -4790,7 +4830,8 @@ public:
                 NSString *suggestedUsageKeys = requiresWhenInUseUsageDescription ?
                     @"NSLocationWhenInUseUsageDescription and (optionally) NSLocationAlwaysAndWhenInUseUsageDescription" :
                     @"NSLocationWhenInUseUsageDescription and/or NSLocationAlwaysUsageDescription";
-                [NSException raise:@"Missing Location Services usage description" format:@"This app must have a value for %@ in its Info.plist.", suggestedUsageKeys];
+                [NSException raise:MGLMissingLocationServicesUsageDescriptionException
+                            format:@"This app must have a value for %@ in its Info.plist.", suggestedUsageKeys];
             }
         }
 
@@ -4827,7 +4868,7 @@ public:
             userLocationAnnotationView = (MGLUserLocationAnnotationView *)[self.delegate mapView:self viewForAnnotation:self.userLocation];
             if (userLocationAnnotationView && ! [userLocationAnnotationView isKindOfClass:MGLUserLocationAnnotationView.class])
             {
-                [NSException raise:@"MGLUserLocationAnnotationTypeException"
+                [NSException raise:MGLUserLocationAnnotationTypeException
                             format:@"User location annotation view must be a kind of MGLUserLocationAnnotationView. %@", userLocationAnnotationView.debugDescription];
             }
         }
@@ -6007,7 +6048,7 @@ public:
 
     if ( ! image)
     {
-        [NSException raise:@"MGLResourceNotFoundException" format:
+        [NSException raise:MGLResourceNotFoundException format:
          @"The resource named “%@” could not be found in the Mapbox framework bundle.", imageName];
     }
 
@@ -6296,8 +6337,8 @@ private:
     NSURL *url = URLString.length ? [NSURL URLWithString:URLString] : nil;
     if (URLString.length && !url)
     {
-        [NSException raise:@"Invalid style URL" format:
-         @"“%@” is not a valid style URL.", URLString];
+        [NSException raise:MGLInvalidStyleURLException
+                    format:@"“%@” is not a valid style URL.", URLString];
     }
     self.styleURL = url;
 }

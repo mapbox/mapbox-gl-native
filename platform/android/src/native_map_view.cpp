@@ -30,8 +30,8 @@
 
 // Java -> C++ conversion
 #include "style/android_conversion.hpp"
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/filter.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 // C++ -> Java conversion
 #include "conversion/conversion.hpp"
@@ -892,7 +892,9 @@ void NativeMapView::removeSource(JNIEnv& env, jni::Object<Source> obj, jlong sou
     assert(sourcePtr != 0);
 
     mbgl::android::Source *source = reinterpret_cast<mbgl::android::Source *>(sourcePtr);
-    source->removeFromMap(env, obj, *map);
+    if (source->removeFromMap(env, obj, *map)) {
+        source->releaseJavaPeer();
+    }
 }
 
 void NativeMapView::addImage(JNIEnv& env, jni::String name, jni::Object<Bitmap> bitmap, jni::jfloat scale, jni::jboolean sdf) {

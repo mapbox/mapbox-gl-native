@@ -1,5 +1,6 @@
 #include <mbgl/style/expression/coalesce.hpp>
 #include <mbgl/style/expression/check_subtype.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 namespace mbgl {
 namespace style {

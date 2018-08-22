@@ -59,6 +59,18 @@ TEST(Annotations, SymbolAnnotation) {
 //    }
 }
 
+TEST(Annotations, SymbolAnnotationTileBoundary) {
+    // Almost exactly the same as SymbolAnnotation test above, but offset my fractions of a degree
+    // tests precision issue from https://github.com/mapbox/mapbox-gl-native/issues/12472
+    AnnotationTest test;
+    
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.addAnnotationImage(namedMarker("default_marker"));
+    test.map.addAnnotation(SymbolAnnotation { Point<double>(0.000000000000001, 0.00000000000001), "default_marker" });
+    test.map.setZoom(10);
+    test.checkRendering("point_annotation");
+}
+
 TEST(Annotations, LineAnnotation) {
     AnnotationTest test;
 
@@ -475,3 +487,4 @@ TEST(Annotations, ChangeMaxZoom) {
     test.map.setZoom(test.map.getMaxZoom());
     test.checkRendering("line_annotation_max_zoom");
 }
+

@@ -1,13 +1,12 @@
 #include <mbgl/style/parser.hpp>
 #include <mbgl/style/layer_impl.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/coordinate.hpp>
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/light.hpp>
 #include <mbgl/style/conversion/transition_options.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/string.hpp>
@@ -274,31 +273,12 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
 }
 
 std::vector<FontStack> Parser::fontStacks() const {
-    std::set<FontStack> result;
-
+    std::vector<Immutable<Layer::Impl>> impls;
+    impls.reserve(layers.size());
     for (const auto& layer : layers) {
-        if (layer->is<SymbolLayer>() && !layer->as<SymbolLayer>()->getTextField().isUndefined()) {
-            layer->as<SymbolLayer>()->getTextFont().match(
-                [&] (Undefined) {
-                    result.insert({"Open Sans Regular", "Arial Unicode MS Regular"});
-                },
-                [&] (const FontStack& constant) {
-                    result.insert(constant);
-                },
-                [&] (const auto& function) {
-                    for (const auto& value : function.possibleOutputs()) {
-                        if (value) {
-                            result.insert(*value);
-                        } else {
-                            Log::Warning(Event::ParseStyle, "Layer '%s' has an invalid value for text-font and will not work offline. Output values must be contained as literals within the expression.", layer->getID().c_str());
-                            break;
-                        }
-                    }
-                }
-            );
-        }
+        impls.emplace_back(layer->baseImpl);
     }
-
+    std::set<FontStack> result = mbgl::fontStacks(impls);
     return std::vector<FontStack>(result.begin(), result.end());
 }
 

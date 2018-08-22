@@ -8,12 +8,13 @@
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer_impl.hpp>
 #include <mbgl/style/layer_observer.hpp>
-<% if (type === 'heatmap') { -%>
-// for constructing default heatmap-color ramp expression from style JSON
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/color_ramp_property_value.hpp>
+#include <mbgl/style/conversion/constant.hpp>
+#include <mbgl/style/conversion/property_value.hpp>
+#include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
-<% } -%>
+#include <mbgl/style/conversion_impl.hpp>
+#include <mbgl/util/fnv_hash.hpp>
 
 namespace mbgl {
 namespace style {
@@ -174,6 +175,146 @@ TransitionOptions <%- camelize(type) %>Layer::get<%- camelize(property.name) %>T
     return impl().paint.template get<<%- camelize(property.name) %>>().options;
 }
 <% } -%>
+
+using namespace conversion;
+
+optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& name, const Convertible& value) {
+    enum class Property {
+        Unknown,
+<% for (const property of paintProperties) { -%>
+        <%- camelize(property.name) %>,
+<% } -%>
+<% for (const property of paintProperties) { -%>
+        <%- camelize(property.name) %>Transition,
+<% } -%>
+    };
+
+    Property property = Property::Unknown;
+    switch (util::hashFNV1a(name.c_str())) {
+    <% for (const property of paintProperties) { -%>
+case util::hashFNV1a("<%- property.name %>"):
+        if (name == "<%- property.name %>") {
+            property = Property::<%- camelize(property.name) %>;
+        }
+        break;
+    case util::hashFNV1a("<%- property.name %>-transition"):
+        if (name == "<%- property.name %>-transition") {
+            property = Property::<%- camelize(property.name) %>Transition;
+        }
+        break;
+    <% } %>
+    }
+
+    if (property == Property::Unknown) {
+        return Error { "layer doesn't support this property" };
+    }
+
+    <%
+        const paintConversions = {};
+        for (const property of paintProperties) {
+            const dataDriven = property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
+            const convertTokens = property.name === 'icon-image' || property.name === 'text-field';
+            const conversion = `optional<${propertyValueType(property)}> typedValue = convert<${propertyValueType(property)}>(value, error, ${dataDriven}, ${convertTokens})`;
+            paintConversions[conversion] = paintConversions[conversion] || [];
+            paintConversions[conversion].push(property);
+        }
+    -%>
+    <% for (const key in paintConversions) {
+        const properties = paintConversions[key];
+    %>
+    if (<%- properties.map(p => `property == Property::${camelize(p.name)}`).join(' || ') %>) {
+        Error error;
+        <%- key %>;
+        if (!typedValue) {
+            return error;
+        }
+        <% if (properties.length == 1) { %>
+        set<%- camelize(properties[0].name) %>(*typedValue);
+        return nullopt;
+        <% } else for (const property of properties) { %>
+        if (property == Property::<%- camelize(property.name) %>) {
+            set<%- camelize(property.name) %>(*typedValue);
+            return nullopt;
+        }
+        <% } %>
+    }
+    <% } %>
+
+    Error error;
+    optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+    if (!transition) {
+        return error;
+    }
+    <% for (const property of paintProperties) { %>
+    if (property == Property::<%- camelize(property.name) %>Transition) {
+        set<%- camelize(property.name) %>Transition(*transition);
+        return nullopt;
+    }
+    <% } %>
+
+    return Error { "layer doesn't support this property" };
+}
+
+optional<Error> <%- camelize(type) %>Layer::setLayoutProperty(const std::string& name, const Convertible& value) {
+    if (name == "visibility") {
+        return Layer::setVisibility(value);
+    }
+
+    enum class Property {
+        Unknown,
+<% for (const property of layoutProperties) { -%>
+        <%- camelize(property.name) %>,
+<% } -%>
+    };
+
+    Property property = Property::Unknown;
+    switch (util::hashFNV1a(name.c_str())) {
+    <% for (const property of layoutProperties) { %>
+    case util::hashFNV1a("<%- property.name %>"):
+        if (name == "<%- property.name %>") {
+            property = Property::<%- camelize(property.name) %>;
+        }
+        break;
+    <% } %>
+    }
+
+    if (property == Property::Unknown) {
+        return Error { "layer doesn't support this property" };
+    }
+
+    <%
+        const layoutConversions = {};
+        for (const property of layoutProperties) {
+            const dataDriven = property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
+            const convertTokens = property.name === 'icon-image' || property.name === 'text-field';
+            const conversion = `optional<${propertyValueType(property)}> typedValue = convert<${propertyValueType(property)}>(value, error, ${dataDriven}, ${convertTokens})`;
+            layoutConversions[conversion] = layoutConversions[conversion] || [];
+            layoutConversions[conversion].push(property);
+        }
+    -%>
+    <% for (const key in layoutConversions) {
+        const properties = layoutConversions[key];
+    %>
+    if (<%- properties.map(p => `property == Property::${camelize(p.name)}`).join(' || ') %>) {
+        Error error;
+        <%- key %>;
+        if (!typedValue) {
+            return error;
+        }
+        <% if (properties.length == 1) { %>
+        set<%- camelize(properties[0].name) %>(*typedValue);
+        return nullopt;
+        <% } else for (const property of properties) { %>
+        if (property == Property::<%- camelize(property.name) %>) {
+            set<%- camelize(property.name) %>(*typedValue);
+            return nullopt;
+        }
+        <% } %>
+    }
+    <% } %>
+
+    return Error { "layer doesn't support this property" };
+}
 
 } // namespace style
 } // namespace mbgl

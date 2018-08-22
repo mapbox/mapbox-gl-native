@@ -17,10 +17,12 @@ import com.mapbox.mapboxsdk.attribution.AttributionParser;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.style.sources.Source;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
+import java.util.Locale;
 
 /**
  * Responsible for managing attribution interactions on the map.
@@ -47,7 +49,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
   // Called when someone presses the attribution icon on the map
   @Override
   public void onClick(View view) {
-    attributionSet = new AttributionBuilder(mapboxMap).build();
+    attributionSet = new AttributionBuilder(mapboxMap, view.getContext()).build();
 
     boolean isActivityFinishing = false;
     if (context instanceof Activity) {
@@ -148,12 +150,19 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
   private static class AttributionBuilder {
 
     private final MapboxMap mapboxMap;
+    private final WeakReference<Context> context;
 
-    AttributionBuilder(MapboxMap mapboxMap) {
+    AttributionBuilder(MapboxMap mapboxMap, Context context) {
       this.mapboxMap = mapboxMap;
+      this.context = new WeakReference<>(context);
     }
 
     private Set<Attribution> build() {
+      Context context = this.context.get();
+      if (context == null) {
+        return Collections.emptySet();
+      }
+
       List<String> attributions = new ArrayList<>();
       for (Source source : mapboxMap.getSources()) {
         attributions.add(source.getAttribution());
@@ -162,6 +171,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
       return new AttributionParser.Options()
         .withCopyrightSign(true)
         .withImproveMap(true)
+        .withContext(context)
         .withTelemetryAttribution(true)
         .withAttributionData(attributions.toArray(new String[attributions.size()]))
         .build().getAttributions();

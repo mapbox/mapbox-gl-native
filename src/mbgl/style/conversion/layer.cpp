@@ -1,7 +1,7 @@
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/filter.hpp>
-#include <mbgl/style/conversion/make_property_setters.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
@@ -16,24 +16,6 @@ namespace mbgl {
 namespace style {
 namespace conversion {
 
-optional<Error> setLayoutProperty(Layer& layer, const std::string& name, const Convertible& value) {
-    static const auto setters = makeLayoutPropertySetters();
-    auto it = setters.find(name);
-    if (it == setters.end()) {
-        return Error { "property not found" };
-    }
-    return it->second(layer, value);
-}
-
-optional<Error> setPaintProperty(Layer& layer, const std::string& name, const Convertible& value) {
-    static const auto setters = makePaintPropertySetters();
-    auto it = setters.find(name);
-    if (it == setters.end()) {
-        return Error { "property not found" };
-    }
-    return it->second(layer, value);
-}
-
 optional<Error> setPaintProperties(Layer& layer, const Convertible& value) {
     auto paintValue = objectMember(value, "paint");
     if (!paintValue) {
@@ -43,7 +25,7 @@ optional<Error> setPaintProperties(Layer& layer, const Convertible& value) {
         return { { "paint must be an object" } };
     }
     return eachMember(*paintValue, [&] (const std::string& k, const Convertible& v) {
-        return setPaintProperty(layer, k, v);
+        return layer.setPaintProperty(k, v);
     });
 }
 
@@ -210,7 +192,7 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
             return nullopt;
         }
         optional<Error> error_ = eachMember(*layoutValue, [&] (const std::string& k, const Convertible& v) {
-            return setLayoutProperty(*layer, k, v);
+            return layer->setLayoutProperty(k, v);
         });
         if (error_) {
             error = *error_;

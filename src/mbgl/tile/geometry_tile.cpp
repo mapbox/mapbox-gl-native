@@ -44,7 +44,7 @@ using namespace style;
 GeometryTile::GeometryTile(const OverscaledTileID& id_,
                            std::string sourceID_,
                            const TileParameters& parameters)
-    : Tile(id_),
+    : Tile(Kind::Geometry, id_),
       sourceID(std::move(sourceID_)),
       mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
       worker(parameters.workerScheduler,

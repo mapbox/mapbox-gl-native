@@ -79,6 +79,7 @@
     <string name="apply_filtered_fill">Apply filtered fill</string>
     <string name="apply_filtered_line">Apply filtered line</string>
     <string name="apply_numeric_fill_filter">Apply numeric fill filter</string>
+    <string name="bring_water_to_front">Bring water to front</string>
     <string name="toggle_text_size">Toggle text size</string>
     <string name="toggle_text_field_contents">Toggle text field contents</string>
     <string name="toggle_text_font">Toggle text font</string>

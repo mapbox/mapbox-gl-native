@@ -19,7 +19,7 @@ public class RasterSource extends Source {
    * @param nativePtr - pointer to native peer
    */
   @Keep
-  public RasterSource(long nativePtr) {
+  RasterSource(long nativePtr) {
     super(nativePtr);
   }
 

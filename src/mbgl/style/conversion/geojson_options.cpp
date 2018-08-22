@@ -1,4 +1,5 @@
 #include <mbgl/style/conversion/geojson_options.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 namespace mbgl {
 namespace style {
@@ -73,6 +74,16 @@ optional<GeoJSONOptions> Converter<GeoJSONOptions>::operator()(const Convertible
             options.clusterRadius = static_cast<double>(*toNumber(*clusterRadiusValue));
         } else {
             error.message = "GeoJSON source clusterRadius value must be a number";
+            return nullopt;
+        }
+    }
+
+    const auto lineMetricsValue = objectMember(value, "lineMetrics");
+    if (lineMetricsValue) {
+        if (toBool(*lineMetricsValue)) {
+            options.lineMetrics = *toBool(*lineMetricsValue);
+        } else {
+            error = { "GeoJSON source lineMetrics value must be a boolean" };
             return nullopt;
         }
     }

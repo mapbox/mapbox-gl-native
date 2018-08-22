@@ -1,10 +1,12 @@
 #pragma once
 
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/unique_any.hpp>
+#include <mbgl/util/peer.hpp>
 #include <mbgl/util/immutable.hpp>
+#include <mbgl/util/optional.hpp>
 #include <mbgl/style/layer_type.hpp>
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/conversion.hpp>
 
 #include <cassert>
 #include <memory>
@@ -98,7 +100,6 @@ public:
             return std::forward<V>(visitor)(*as<HeatmapLayer>());
         }
 
-
         // Not reachable, but placate GCC.
         assert(false);
         throw new std::runtime_error("unknown layer type");
@@ -117,6 +118,11 @@ public:
     virtual void setMinZoom(float) = 0;
     virtual void setMaxZoom(float) = 0;
 
+    // Dynamic properties
+    virtual optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) = 0;
+    virtual optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) = 0;
+    optional<conversion::Error> setVisibility(const conversion::Convertible& value);
+
     // Private implementation
     class Impl;
     Immutable<Impl> baseImpl;
@@ -132,7 +138,7 @@ public:
     // For use in SDK bindings, which store a reference to a platform-native peer
     // object here, so that separately-obtained references to this object share
     // identical platform-native peers.
-    util::unique_any peer;
+    util::peer peer;
 };
 
 } // namespace style

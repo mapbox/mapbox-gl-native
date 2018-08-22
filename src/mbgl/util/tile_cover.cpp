@@ -4,6 +4,7 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/tile_cover_impl.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
+#include <mbgl/math/log2.hpp>
 
 #include <functional>
 #include <list>

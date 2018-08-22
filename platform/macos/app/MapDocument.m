@@ -75,6 +75,12 @@ NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *sha
 @property (weak) IBOutlet NSTableView *styleLayersTableView;
 @property (weak) IBOutlet NSMenu *mapViewContextMenu;
 @property (weak) IBOutlet NSSplitView *splitView;
+@property (weak) IBOutlet NSWindow *addOfflinePackWindow;
+@property (weak) IBOutlet NSTextField *offlinePackNameField;
+@property (weak) IBOutlet NSTextField *minimumOfflinePackZoomLevelField;
+@property (weak) IBOutlet NSNumberFormatter *minimumOfflinePackZoomLevelFormatter;
+@property (weak) IBOutlet NSTextField *maximumOfflinePackZoomLevelField;
+@property (weak) IBOutlet NSNumberFormatter *maximumOfflinePackZoomLevelFormatter;
 
 @end
 
@@ -915,31 +921,47 @@ NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *sha
 #pragma mark Offline packs
 
 - (IBAction)addOfflinePack:(id)sender {
-    NSAlert *namePrompt = [[NSAlert alloc] init];
-    namePrompt.messageText = @"Add offline pack";
-    namePrompt.informativeText = @"Choose a name for the pack:";
-    NSTextField *nameTextField = [[NSTextField alloc] initWithFrame:NSZeroRect];
-    nameTextField.placeholderString = MGLStringFromCoordinateBounds(self.mapView.visibleCoordinateBounds);
-    [nameTextField sizeToFit];
-    NSRect textFieldFrame = nameTextField.frame;
-    textFieldFrame.size.width = 300;
-    nameTextField.frame = textFieldFrame;
-    namePrompt.accessoryView = nameTextField;
-    [namePrompt addButtonWithTitle:@"Add"];
-    [namePrompt addButtonWithTitle:@"Cancel"];
-    if ([namePrompt runModal] != NSAlertFirstButtonReturn) {
-        return;
-    }
-
-    id <MGLOfflineRegion> region = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:self.mapView.styleURL bounds:self.mapView.visibleCoordinateBounds fromZoomLevel:self.mapView.zoomLevel toZoomLevel:self.mapView.maximumZoomLevel];
-    NSData *context = [[NSValueTransformer valueTransformerForName:@"OfflinePackNameValueTransformer"] reverseTransformedValue:nameTextField.stringValue];
-    [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack * _Nullable pack, NSError * _Nullable error) {
-        if (error) {
-            [[NSAlert alertWithError:error] runModal];
-        } else {
-            [pack resume];
+    self.offlinePackNameField.stringValue = @"";
+    self.offlinePackNameField.placeholderString = MGLStringFromCoordinateBounds(self.mapView.visibleCoordinateBounds);
+    self.minimumOfflinePackZoomLevelField.doubleValue = floor(self.mapView.zoomLevel);
+    self.maximumOfflinePackZoomLevelField.doubleValue = ceil(self.mapView.maximumZoomLevel);
+    self.minimumOfflinePackZoomLevelFormatter.minimum = @(floor(self.mapView.minimumZoomLevel));
+    self.maximumOfflinePackZoomLevelFormatter.minimum = @(floor(self.mapView.minimumZoomLevel));
+    self.minimumOfflinePackZoomLevelFormatter.maximum = @(ceil(self.mapView.maximumZoomLevel));
+    self.maximumOfflinePackZoomLevelFormatter.maximum = @(ceil(self.mapView.maximumZoomLevel));
+    
+    [self.addOfflinePackWindow makeFirstResponder:self.offlinePackNameField];
+    
+    __weak __typeof__(self) weakSelf = self;
+    [self.window beginSheet:self.addOfflinePackWindow completionHandler:^(NSModalResponse returnCode) {
+        __typeof__(self) strongSelf = weakSelf;
+        if (!strongSelf || returnCode != NSModalResponseOK) {
+            return;
         }
+        
+        id <MGLOfflineRegion> region =
+            [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:strongSelf.mapView.styleURL
+                                                           bounds:strongSelf.mapView.visibleCoordinateBounds
+                                                    fromZoomLevel:strongSelf.minimumOfflinePackZoomLevelField.integerValue
+                                                      toZoomLevel:strongSelf.maximumOfflinePackZoomLevelField.integerValue];
+        NSString *name = strongSelf.offlinePackNameField.stringValue;
+        if (!name.length) {
+            name = strongSelf.offlinePackNameField.placeholderString;
+        }
+        NSData *context = [[NSValueTransformer valueTransformerForName:@"OfflinePackNameValueTransformer"] reverseTransformedValue:name];
+        [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack * _Nullable pack, NSError * _Nullable error) {
+            if (error) {
+                [[NSAlert alertWithError:error] runModal];
+            } else {
+                [(AppDelegate *)NSApp.delegate watchOfflinePack:pack];
+                [pack resume];
+            }
+        }];
     }];
+}
+
+- (IBAction)confirmAddingOfflinePack:(id)sender {
+    [self.window endSheet:self.addOfflinePackWindow returnCode:[sender tag] ? NSModalResponseOK : NSModalResponseCancel];
 }
 
 #pragma mark Mouse events

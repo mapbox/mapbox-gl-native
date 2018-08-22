@@ -29,7 +29,7 @@ public class GeoJsonSource extends Source {
    * @param nativePtr - pointer to native peer
    */
   @Keep
-  public GeoJsonSource(long nativePtr) {
+  GeoJsonSource(long nativePtr) {
     super(nativePtr);
   }
 
@@ -188,7 +188,8 @@ public class GeoJsonSource extends Source {
   }
 
   /**
-   * Updates the GeoJson with a single feature
+   * Updates the GeoJson with a single feature. The update is performed asynchronously,
+   * so the data won't be immediately visible or available to query when this method returns.
    *
    * @param feature the GeoJSON {@link Feature} to set
    */
@@ -198,7 +199,8 @@ public class GeoJsonSource extends Source {
   }
 
   /**
-   * Updates the GeoJson with a single geometry
+   * Updates the GeoJson with a single geometry. The update is performed asynchronously,
+   * so the data won't be immediately visible or available to query when this method returns.
    *
    * @param geometry the GeoJSON {@link Geometry} to set
    */
@@ -208,7 +210,8 @@ public class GeoJsonSource extends Source {
   }
 
   /**
-   * Updates the GeoJson
+   * Updates the GeoJson. The update is performed asynchronously,
+   * so the data won't be immediately visible or available to query when this method returns.
    *
    * @param features the GeoJSON FeatureCollection
    */
@@ -218,7 +221,8 @@ public class GeoJsonSource extends Source {
   }
 
   /**
-   * Updates the GeoJson
+   * Updates the GeoJson. The update is performed asynchronously,
+   * so the data won't be immediately visible or available to query when this method returns.
    *
    * @param json the raw GeoJson FeatureCollection string
    */

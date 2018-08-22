@@ -1,5 +1,4 @@
 add_definitions(-DMBGL_USE_GLES2=1)
-include(cmake/test-files.cmake)
 include(cmake/nunicode.cmake)
 
 # Build thin archives.
@@ -34,56 +33,7 @@ set(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_SHARED_LINKER_FLAGS_RELWIT
 ## mbgl core ##
 
 macro(mbgl_platform_core)
-    target_sources(mbgl-core
-        # Loop
-        PRIVATE platform/android/src/async_task.cpp
-        PRIVATE platform/android/src/run_loop.cpp
-        PRIVATE platform/android/src/run_loop_impl.hpp
-        PRIVATE platform/android/src/timer.cpp
-
-        # Misc
-        PRIVATE platform/android/src/text/collator.cpp
-        PRIVATE platform/android/src/text/collator_jni.hpp
-        PRIVATE platform/android/src/text/local_glyph_rasterizer.cpp
-        PRIVATE platform/android/src/text/local_glyph_rasterizer_jni.hpp
-        PRIVATE platform/android/src/logging_android.cpp
-        PRIVATE platform/android/src/thread.cpp
-        PRIVATE platform/default/string_stdlib.cpp
-        PRIVATE platform/default/bidi.cpp
-        PRIVATE platform/default/thread_local.cpp
-        PRIVATE platform/default/unaccent.cpp
-        PRIVATE platform/default/unaccent.hpp
-        PRIVATE platform/default/utf.cpp
-
-        # Image handling
-        PRIVATE platform/default/png_writer.cpp
-        PRIVATE platform/android/src/bitmap.cpp
-        PRIVATE platform/android/src/bitmap.hpp
-        PRIVATE platform/android/src/bitmap_factory.cpp
-        PRIVATE platform/android/src/bitmap_factory.hpp
-        PRIVATE platform/android/src/image.cpp
-
-        # Thread pool
-        PRIVATE platform/default/mbgl/util/shared_thread_pool.cpp
-        PRIVATE platform/default/mbgl/util/shared_thread_pool.hpp
-        PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
-        PRIVATE platform/default/mbgl/util/default_thread_pool.hpp
-
-        # Rendering
-        PRIVATE platform/android/src/android_renderer_backend.cpp
-        PRIVATE platform/android/src/android_renderer_backend.hpp
-        PRIVATE platform/android/src/android_renderer_frontend.cpp
-        PRIVATE platform/android/src/android_renderer_frontend.hpp
-
-        # Snapshots (core)
-        PRIVATE platform/default/mbgl/gl/headless_backend.cpp
-        PRIVATE platform/default/mbgl/gl/headless_backend.hpp
-        PRIVATE platform/default/mbgl/gl/headless_frontend.cpp
-        PRIVATE platform/default/mbgl/gl/headless_frontend.hpp
-        PRIVATE platform/default/mbgl/map/map_snapshotter.cpp
-        PRIVATE platform/default/mbgl/map/map_snapshotter.hpp
-        PRIVATE platform/linux/src/headless_backend_egl.cpp
-    )
+    target_sources_from_file(mbgl-core PRIVATE platform/android/core-files.txt)
 
     target_include_directories(mbgl-core
         PUBLIC platform/default
@@ -97,6 +47,7 @@ macro(mbgl_platform_core)
 
     target_link_libraries(mbgl-core
         PRIVATE nunicode
+        PUBLIC expected
         PUBLIC -llog
         PUBLIC -landroid
         PUBLIC -ljnigraphics
@@ -110,16 +61,7 @@ endmacro()
 
 
 macro(mbgl_filesource)
-    target_sources(mbgl-filesource
-        # File source
-        PRIVATE platform/android/src/http_file_source.cpp
-        PRIVATE platform/android/src/asset_manager.hpp
-        PRIVATE platform/android/src/asset_manager_file_source.cpp
-        PRIVATE platform/android/src/asset_manager_file_source.hpp
-
-        # Database
-        PRIVATE platform/default/sqlite3.cpp
-    )
+    target_sources_from_file(mbgl-filesource PRIVATE platform/android/filesource-files.txt)
 
     target_add_mason_package(mbgl-filesource PUBLIC sqlite)
     target_add_mason_package(mbgl-filesource PUBLIC jni.hpp)
@@ -132,190 +74,6 @@ macro(mbgl_filesource)
     )
 endmacro()
 
-
-## Main library ##
-
-add_library(mbgl-android STATIC
-    # Conversion C++ -> Java
-    platform/android/src/conversion/constant.hpp
-    platform/android/src/conversion/conversion.hpp
-    platform/android/src/style/conversion/property_expression.hpp
-    platform/android/src/style/conversion/property_value.hpp
-    platform/android/src/style/conversion/types.hpp
-    platform/android/src/style/conversion/types_string_values.hpp
-    platform/android/src/map/camera_position.cpp
-    platform/android/src/map/camera_position.hpp
-    platform/android/src/map/image.cpp
-    platform/android/src/map/image.hpp
-
-    # Style conversion Java -> C++
-    platform/android/src/style/android_conversion.hpp
-    platform/android/src/style/value.cpp
-    platform/android/src/style/value.hpp
-    platform/android/src/style/conversion/url_or_tileset.hpp
-
-    # Style
-    platform/android/src/style/transition_options.cpp
-    platform/android/src/style/transition_options.hpp
-    platform/android/src/style/layers/background_layer.cpp
-    platform/android/src/style/layers/background_layer.hpp
-    platform/android/src/style/layers/circle_layer.cpp
-    platform/android/src/style/layers/circle_layer.hpp
-    platform/android/src/style/layers/custom_layer.cpp
-    platform/android/src/style/layers/custom_layer.hpp
-    platform/android/src/style/layers/fill_extrusion_layer.cpp
-    platform/android/src/style/layers/fill_extrusion_layer.hpp
-    platform/android/src/style/layers/fill_layer.cpp
-    platform/android/src/style/layers/fill_layer.hpp
-    platform/android/src/style/layers/heatmap_layer.cpp
-    platform/android/src/style/layers/heatmap_layer.hpp
-    platform/android/src/style/layers/hillshade_layer.cpp
-    platform/android/src/style/layers/hillshade_layer.hpp
-    platform/android/src/style/layers/layer.cpp
-    platform/android/src/style/layers/layer.hpp
-    platform/android/src/style/layers/layers.cpp
-    platform/android/src/style/layers/layers.hpp
-    platform/android/src/style/layers/line_layer.cpp
-    platform/android/src/style/layers/line_layer.hpp
-    platform/android/src/style/layers/raster_layer.cpp
-    platform/android/src/style/layers/raster_layer.hpp
-    platform/android/src/style/layers/symbol_layer.cpp
-    platform/android/src/style/layers/symbol_layer.hpp
-    platform/android/src/style/layers/unknown_layer.cpp
-    platform/android/src/style/layers/unknown_layer.hpp
-    platform/android/src/style/sources/geojson_source.cpp
-    platform/android/src/style/sources/geojson_source.hpp
-    platform/android/src/style/sources/custom_geometry_source.cpp
-    platform/android/src/style/sources/custom_geometry_source.hpp
-    platform/android/src/style/sources/source.cpp
-    platform/android/src/style/sources/source.hpp
-    platform/android/src/style/sources/raster_source.cpp
-    platform/android/src/style/sources/raster_source.hpp
-    platform/android/src/style/sources/unknown_source.cpp
-    platform/android/src/style/sources/unknown_source.hpp
-    platform/android/src/style/sources/vector_source.cpp
-    platform/android/src/style/sources/vector_source.hpp
-    platform/android/src/style/sources/image_source.hpp
-    platform/android/src/style/sources/image_source.cpp
-    platform/android/src/style/sources/raster_dem_source.cpp
-    platform/android/src/style/sources/raster_dem_source.hpp
-    platform/android/src/style/position.cpp
-    platform/android/src/style/position.hpp
-    platform/android/src/style/light.cpp
-    platform/android/src/style/light.hpp
-
-    # FileSource holder
-    platform/android/src/file_source.cpp
-    platform/android/src/file_source.hpp
-
-    # Connectivity
-    platform/android/src/connectivity_listener.cpp
-    platform/android/src/connectivity_listener.hpp
-
-    # Native map
-    platform/android/src/native_map_view.cpp
-    platform/android/src/native_map_view.hpp
-    platform/android/src/map_renderer.cpp
-    platform/android/src/map_renderer.hpp
-    platform/android/src/map_renderer_runnable.cpp
-    platform/android/src/map_renderer_runnable.hpp
-
-    # Java core classes
-    platform/android/src/java/lang.cpp
-    platform/android/src/java/lang.hpp
-    platform/android/src/java/util.cpp
-    platform/android/src/java/util.hpp
-
-    # Graphics
-    platform/android/src/graphics/pointf.cpp
-    platform/android/src/graphics/pointf.hpp
-    platform/android/src/graphics/rectf.cpp
-    platform/android/src/graphics/rectf.hpp
-
-    # GeoJSON
-    platform/android/src/geojson/feature.cpp
-    platform/android/src/geojson/feature.hpp
-    platform/android/src/geojson/feature_collection.cpp
-    platform/android/src/geojson/feature_collection.hpp
-    platform/android/src/geojson/geometry.cpp
-    platform/android/src/geojson/geometry.hpp
-    platform/android/src/geojson/geometry_collection.cpp
-    platform/android/src/geojson/geometry_collection.hpp
-    platform/android/src/geojson/line_string.cpp
-    platform/android/src/geojson/line_string.hpp
-    platform/android/src/geojson/multi_line_string.cpp
-    platform/android/src/geojson/multi_line_string.hpp
-    platform/android/src/geojson/multi_point.cpp
-    platform/android/src/geojson/multi_point.hpp
-    platform/android/src/geojson/multi_polygon.cpp
-    platform/android/src/geojson/multi_polygon.hpp
-    platform/android/src/geojson/point.cpp
-    platform/android/src/geojson/point.hpp
-    platform/android/src/geojson/polygon.cpp
-    platform/android/src/geojson/polygon.hpp
-
-    # Geometry
-    platform/android/src/geometry/lat_lng.cpp
-    platform/android/src/geometry/lat_lng.hpp
-    platform/android/src/geometry/lat_lng_bounds.cpp
-    platform/android/src/geometry/lat_lng_bounds.hpp
-    platform/android/src/geometry/lat_lng_quad.cpp
-    platform/android/src/geometry/lat_lng_quad.hpp
-    platform/android/src/geometry/projected_meters.cpp
-    platform/android/src/geometry/projected_meters.hpp
-
-    # GSon
-    platform/android/src/gson/json_array.cpp
-    platform/android/src/gson/json_array.hpp
-    platform/android/src/gson/json_element.cpp
-    platform/android/src/gson/json_element.hpp
-    platform/android/src/gson/json_object.cpp
-    platform/android/src/gson/json_object.hpp
-    platform/android/src/gson/json_primitive.cpp
-    platform/android/src/gson/json_primitive.hpp
-
-    # Annotation
-    platform/android/src/annotation/marker.cpp
-    platform/android/src/annotation/marker.hpp
-    platform/android/src/annotation/polygon.cpp
-    platform/android/src/annotation/polygon.hpp
-    platform/android/src/annotation/polyline.cpp
-    platform/android/src/annotation/polyline.hpp
-
-    # Offline
-    platform/android/src/offline/offline_manager.cpp
-    platform/android/src/offline/offline_manager.hpp
-    platform/android/src/offline/offline_region.cpp
-    platform/android/src/offline/offline_region.hpp
-    platform/android/src/offline/offline_region_definition.cpp
-    platform/android/src/offline/offline_region_definition.hpp
-    platform/android/src/offline/offline_region_error.cpp
-    platform/android/src/offline/offline_region_error.hpp
-    platform/android/src/offline/offline_region_status.cpp
-    platform/android/src/offline/offline_region_status.hpp
-
-    # Snapshots (SDK)
-    platform/android/src/snapshotter/map_snapshotter.cpp
-    platform/android/src/snapshotter/map_snapshotter.hpp
-    platform/android/src/snapshotter/map_snapshot.cpp
-    platform/android/src/snapshotter/map_snapshot.hpp
-
-    # Main jni bindings
-    platform/android/src/attach_env.cpp
-    platform/android/src/attach_env.hpp
-    platform/android/src/java_types.cpp
-    platform/android/src/java_types.hpp
-
-    # Main entry point
-    platform/android/src/jni.hpp
-    platform/android/src/jni.cpp
-)
-
-target_link_libraries(mbgl-android
-    PUBLIC mbgl-filesource
-    PUBLIC mbgl-core
-)
-
 ## Shared library
 
 add_library(mapbox-gl SHARED
@@ -323,7 +81,8 @@ add_library(mapbox-gl SHARED
 )
 
 target_link_libraries(mapbox-gl
-    PRIVATE mbgl-android
+    PRIVATE mbgl-core
+    PRIVATE mbgl-filesource
 )
 
 ## Test library ##
@@ -342,7 +101,8 @@ macro(mbgl_platform_test)
     )
 
     target_link_libraries(mbgl-test
-        PRIVATE mbgl-android
+        PRIVATE mbgl-core
+        PRIVATE mbgl-filesource
     )
 endmacro()
 
@@ -352,6 +112,11 @@ add_library(example-custom-layer SHARED
     platform/android/src/example_custom_layer.cpp
 )
 
+target_include_directories(example-custom-layer
+    PRIVATE include
+)
+
 target_link_libraries(example-custom-layer
-    PRIVATE mbgl-core
+    PRIVATE -llog
+    PRIVATE -lGLESv2
 )

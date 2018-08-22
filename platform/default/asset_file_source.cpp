@@ -75,7 +75,7 @@ std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource,
 }
 
 bool AssetFileSource::acceptsURL(const std::string& url) {
-    return std::equal(assetProtocol.begin(), assetProtocol.end(), url.begin());
+    return 0 == url.rfind(assetProtocol, 0);
 }
 
 } // namespace mbgl

@@ -5,10 +5,11 @@
 #endif
 
 #import "MGLOfflineRegion_Private.h"
+#import "MGLTilePyramidOfflineRegion_Private.h"
 #import "MGLGeometry_Private.h"
 #import "MGLStyle.h"
 
-@interface MGLTilePyramidOfflineRegion () <MGLOfflineRegion_Private>
+@interface MGLTilePyramidOfflineRegion () <MGLOfflineRegion_Private, MGLTilePyramidOfflineRegion_Private>
 
 @end
 
@@ -23,8 +24,7 @@
 }
 
 - (instancetype)init {
-    [NSException raise:@"Method unavailable"
-                format:
+    [NSException raise:NSGenericException format:
      @"-[MGLTilePyramidOfflineRegion init] is unavailable. "
      @"Use -initWithStyleURL:bounds:fromZoomLevel:toZoomLevel: instead."];
     return nil;
@@ -37,7 +37,7 @@
         }
 
         if (!styleURL.scheme) {
-            [NSException raise:@"Invalid style URL" format:
+            [NSException raise:MGLInvalidStyleURLException format:
              @"%@ does not support setting a relative file URL as the style URL. "
              @"To download the online resources required by this style, "
              @"specify a URL to an online copy of this style. "
@@ -53,7 +53,7 @@
     return self;
 }
 
-- (instancetype)initWithOfflineRegionDefinition:(const mbgl::OfflineRegionDefinition &)definition {
+- (instancetype)initWithOfflineRegionDefinition:(const mbgl::OfflineTilePyramidRegionDefinition &)definition {
     NSURL *styleURL = [NSURL URLWithString:@(definition.styleURL.c_str())];
     MGLCoordinateBounds bounds = MGLCoordinateBoundsFromLatLngBounds(definition.bounds);
     return [self initWithStyleURL:styleURL bounds:bounds fromZoomLevel:definition.minZoom toZoomLevel:definition.maxZoom];

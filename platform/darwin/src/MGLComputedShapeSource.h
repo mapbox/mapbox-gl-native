@@ -32,6 +32,8 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionWrap
  */
 FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClipsCoordinates;
 
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLInvalidDatasourceException;
+
 /**
  Data source for `MGLComputedShapeSource`. This protocol defines two optional methods for fetching
  data, one based on tile coordinates, and one based on a bounding box. Classes that implement this

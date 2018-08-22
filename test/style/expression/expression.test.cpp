@@ -1,6 +1,6 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/util/io.hpp>
-#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/expression/is_expression.hpp>
@@ -29,7 +29,11 @@ TEST(Expression, IsExpression) {
 
     for(auto& entry : allExpressions.GetObject()) {
         const std::string name { entry.name.GetString(), entry.name.GetStringLength() };
-        if (name == "line-progress" || name == "feature-state") {
+        if (name == "line-progress" ||
+            name == "feature-state" ||
+            name == "interpolate-hcl" ||
+            name == "interpolate-lab" ||
+            name == "format") {
             // Not yet implemented
             continue;
         }

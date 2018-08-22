@@ -1,4 +1,5 @@
 #include <mbgl/style/expression/at.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/string.hpp>
 
 

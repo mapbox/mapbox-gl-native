@@ -1,5 +1,6 @@
 #include <mbgl/style/conversion/position.hpp>
 #include <mbgl/style/conversion/constant.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 #include <array>
 

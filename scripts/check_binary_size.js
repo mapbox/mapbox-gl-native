@@ -51,9 +51,7 @@ function getPriorSize() {
             console.log('No matching check found.');
             return Promise.resolve(null);
         }
-        const prior = +run.output.summary.match(/`.*` is (\d+) bytes/)[1];
-        console.log(`Prior size was ${prettyBytes(prior)}.`);
-        return prior;
+        return +run.output.summary.match(/`.*` is (\d+) bytes/)[1];
     });
 }
 
@@ -70,6 +68,8 @@ github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATIO
                     return prettyBytes(size);
                 }
             })();
+
+            console.log(`${label}: ${title} (${size} bytes)`);
 
             return github.checks.create({
                 owner: 'mapbox',

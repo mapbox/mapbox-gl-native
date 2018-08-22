@@ -28,7 +28,7 @@ public class RasterLayer extends Layer {
    * @param nativePtr pointer used by core
    */
   @Keep
-  public RasterLayer(long nativePtr) {
+  RasterLayer(long nativePtr) {
     super(nativePtr);
   }
 

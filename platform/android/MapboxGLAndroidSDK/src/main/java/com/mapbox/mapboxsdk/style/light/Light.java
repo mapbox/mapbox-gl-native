@@ -29,7 +29,7 @@ public class Light {
    * @param nativePtr pointer used by core
    */
   @Keep
-  public Light(long nativePtr) {
+  Light(long nativePtr) {
     checkThread();
     this.nativePtr = nativePtr;
   }

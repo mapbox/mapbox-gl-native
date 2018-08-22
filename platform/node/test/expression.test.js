@@ -1,10 +1,8 @@
-'use strict';
+import {run} from '../../../mapbox-gl-js/test/integration/lib/expression';
+import mbgl from '../index';
+import ignores from './ignores.json';
 
-var suite = require('../../../mapbox-gl-js/test/integration').expression;
-var mbgl = require('../index');
-var ignores = require('./ignores.json');
-
-var tests;
+let tests;
 
 if (process.argv[1] === __filename && process.argv.length > 2) {
     tests = process.argv.slice(2);
@@ -30,7 +28,7 @@ function getExpectedType(spec) {
     return typeof spec.type === 'string' ? {kind: spec.type} : null;
 }
 
-suite.run('native', {ignores: ignores, tests: tests}, (fixture) => {
+run('native', {ignores, tests}, (fixture) => {
     const compiled = {};
     const recompiled = {};
     const result = {
@@ -55,7 +53,7 @@ suite.run('native', {ignores: ignores, tests: tests}, (fixture) => {
                     type: 'Feature',
                     properties: {},
                     geometry: { type: 'Point', coordinates: [0, 0] }
-                }, input[1])
+                }, input[1]);
 
                 const output = expression.evaluate(input[0], feature);
                 evaluateResults.push(output);
@@ -68,7 +66,7 @@ suite.run('native', {ignores: ignores, tests: tests}, (fixture) => {
             compilationResult.result = 'error';
             compilationResult.errors = expression;
         }
-    }
+    };
 
     result.outputs = evaluateExpression(expression, compiled);
     if (expression instanceof mbgl.Expression) {

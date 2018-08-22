@@ -37,6 +37,7 @@ global.evaluatedType = function (property) {
     return 'bool';
   case 'number':
     return 'float';
+  case 'formatted':
   case 'string':
     return 'std::string';
   case 'enum':
@@ -120,6 +121,7 @@ global.defaultValue = function (property) {
   switch (property.type) {
   case 'number':
     return property.default;
+  case 'formatted':
   case 'string':
     return JSON.stringify(property.default || "");
   case 'enum':
@@ -191,9 +193,6 @@ for (const layer of layers) {
   writeIfModified(`src/mbgl/style/layers/${layerFileName}_layer_properties.hpp`, propertiesHpp(layer));
   writeIfModified(`src/mbgl/style/layers/${layerFileName}_layer_properties.cpp`, propertiesCpp(layer));
 }
-
-const propertySettersHpp = ejs.compile(fs.readFileSync('src/mbgl/style/conversion/make_property_setters.hpp.ejs', 'utf8'), {strict: true});
-writeIfModified('src/mbgl/style/conversion/make_property_setters.hpp', propertySettersHpp({layers: layers}));
 
 // Light
 const lightProperties = Object.keys(spec[`light`]).reduce((memo, name) => {

@@ -23,14 +23,17 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLFeature;
 @protocol MGLLocationManager;
 
+/** Options for `MGLMapView.decelerationRate`. */
+typedef CGFloat MGLMapViewDecelerationRate NS_TYPED_EXTENSIBLE_ENUM;
+
 /** The default deceleration rate for a map view. */
-FOUNDATION_EXTERN MGL_EXPORT const CGFloat MGLMapViewDecelerationRateNormal;
+FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewDecelerationRate MGLMapViewDecelerationRateNormal;
 
 /** A fast deceleration rate for a map view. */
-FOUNDATION_EXTERN MGL_EXPORT const CGFloat MGLMapViewDecelerationRateFast;
+FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewDecelerationRate MGLMapViewDecelerationRateFast;
 
 /** Disables deceleration in a map view. */
-FOUNDATION_EXTERN MGL_EXPORT const CGFloat MGLMapViewDecelerationRateImmediate;
+FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewDecelerationRate MGLMapViewDecelerationRateImmediate;
 
 /**
  The vertical alignment of an annotation within a map view. Used with
@@ -93,6 +96,10 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewPreferredFramesPerSecond MGLMapView
 
 /** The maximum supported frame rate; typically 60 FPS. */
 FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondMaximum;
+
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLMissingLocationServicesUsageDescriptionException;
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUserLocationAnnotationTypeException;
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLResourceNotFoundException;
 
 /**
  An interactive, customizable map view with an interface similar to the one

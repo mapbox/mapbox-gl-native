@@ -64,6 +64,7 @@ GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON)
         vtOptions.extent = util::EXTENT;
         vtOptions.buffer = ::round(scale * options.buffer);
         vtOptions.tolerance = scale * options.tolerance;
+        vtOptions.lineMetrics = options.lineMetrics;
         data = std::make_unique<GeoJSONVTData>(geoJSON, vtOptions);
     }
 }

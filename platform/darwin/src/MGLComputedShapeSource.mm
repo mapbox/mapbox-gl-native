@@ -4,11 +4,14 @@
 #import "MGLSource_Private.h"
 #import "MGLShape_Private.h"
 #import "MGLGeometry_Private.h"
+#import "MGLShapeCollection.h"
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/sources/custom_geometry_source.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/geojson.hpp>
+
+const MGLExceptionName MGLInvalidDatasourceException = @"MGLInvalidDatasourceException";
 
 const MGLShapeSourceOption MGLShapeSourceOptionWrapsCoordinates = @"MGLShapeSourceOptionWrapsCoordinates";
 const MGLShapeSourceOption MGLShapeSourceOptionClipsCoordinates = @"MGLShapeSourceOptionClipsCoordinates";
@@ -129,6 +132,14 @@ mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDi
         mbgl::FeatureCollection featureCollection;
         featureCollection.reserve(data.count);
         for (MGLShape <MGLFeature> * feature in data) {
+            if ([feature isMemberOfClass:[MGLShapeCollection class]]) {
+                static dispatch_once_t onceToken;
+                dispatch_once(&onceToken, ^{
+                    NSLog(@"MGLShapeCollection initialized with MGLFeatures will not retain attributes."
+                          @"Use MGLShapeCollectionFeature to retain attributes instead."
+                          @"This will be logged only once.");
+                });
+            }
             mbgl::Feature geoJsonObject = [feature geoJSONObject].get<mbgl::Feature>();
             featureCollection.push_back(geoJsonObject);
         }
@@ -194,6 +205,14 @@ mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDi
     for (MGLShape <MGLFeature> * feature in features) {
         mbgl::Feature geoJsonObject = [feature geoJSONObject].get<mbgl::Feature>();
         featureCollection.push_back(geoJsonObject);
+        if ([feature isMemberOfClass:[MGLShapeCollection class]]) {
+            static dispatch_once_t onceToken;
+            dispatch_once(&onceToken, ^{
+                NSLog(@"MGLShapeCollection initialized with MGLFeatures will not retain attributes."
+                      @"Use MGLShapeCollectionFeature to retain attributes instead."
+                      @"This will be logged only once.");
+            });
+        }
     }
     const auto geojson = mbgl::GeoJSON{featureCollection};
     static_cast<mbgl::style::CustomGeometrySource *>(self.rawSource)->setTileData(tileID, geojson);
@@ -205,10 +224,12 @@ mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDi
     self.dataSourceImplementsFeaturesForTile = [dataSource respondsToSelector:@selector(featuresInTileAtX:y:zoomLevel:)];
     self.dataSourceImplementsFeaturesForBounds = [dataSource respondsToSelector:@selector(featuresInCoordinateBounds:zoomLevel:)];
 
-    if(!self.dataSourceImplementsFeaturesForBounds && !self.dataSourceImplementsFeaturesForTile) {
-        [NSException raise:@"Invalid Datasource" format:@"Datasource does not implement any MGLComputedShapeSourceDataSource methods"];
-    } else if(self.dataSourceImplementsFeaturesForBounds && self.dataSourceImplementsFeaturesForTile) {
-        [NSException raise:@"Invalid Datasource" format:@"Datasource implements multiple MGLComputedShapeSourceDataSource methods"];
+    if (!self.dataSourceImplementsFeaturesForBounds && !self.dataSourceImplementsFeaturesForTile) {
+        [NSException raise:MGLInvalidDatasourceException
+                    format:@"Datasource does not implement any MGLComputedShapeSourceDataSource methods"];
+    } else if (self.dataSourceImplementsFeaturesForBounds && self.dataSourceImplementsFeaturesForTile) {
+        [NSException raise:MGLInvalidDatasourceException
+                    format:@"Datasource implements multiple MGLComputedShapeSourceDataSource methods"];
     }
 
     _dataSource = dataSource;

@@ -28,7 +28,7 @@ public class CircleLayer extends Layer {
    * @param nativePtr pointer used by core
    */
   @Keep
-  public CircleLayer(long nativePtr) {
+  CircleLayer(long nativePtr) {
     super(nativePtr);
   }
 

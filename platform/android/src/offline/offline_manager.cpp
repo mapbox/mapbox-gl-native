@@ -26,15 +26,18 @@ void OfflineManager::listOfflineRegions(jni::JNIEnv& env_, jni::Object<FileSourc
         //Keep a shared ptr to a global reference of the callback and file source so they are not GC'd in the meanwhile
         callback = std::shared_ptr<jni::jobject>(callback_.NewGlobalRef(env_).release()->Get(), GenericGlobalRefDeleter()),
         jFileSource = std::shared_ptr<jni::jobject>(jFileSource_.NewGlobalRef(env_).release()->Get(), GenericGlobalRefDeleter())
-    ](std::exception_ptr error, mbgl::optional<std::vector<mbgl::OfflineRegion>> regions) mutable {
+    ](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> regions) mutable {
 
         // Reattach, the callback comes from a different thread
         android::UniqueEnv env = android::AttachEnv();
 
-        if (error) {
-            OfflineManager::ListOfflineRegionsCallback::onError(*env, jni::Object<ListOfflineRegionsCallback>(*callback), error);
-        } else if (regions) {
-            OfflineManager::ListOfflineRegionsCallback::onList(*env, jni::Object<FileSource>(*jFileSource), jni::Object<ListOfflineRegionsCallback>(*callback), std::move(regions));
+        if (regions) {
+            OfflineManager::ListOfflineRegionsCallback::onList(
+                *env, jni::Object<FileSource>(*jFileSource),
+                jni::Object<ListOfflineRegionsCallback>(*callback), std::move(*regions));
+        } else {
+            OfflineManager::ListOfflineRegionsCallback::onError(
+                *env, jni::Object<ListOfflineRegionsCallback>(*callback), regions.error());
         }
     });
 }
@@ -45,9 +48,7 @@ void OfflineManager::createOfflineRegion(jni::JNIEnv& env_,
                                          jni::Array<jni::jbyte> metadata_,
                                          jni::Object<CreateOfflineRegionCallback> callback_) {
     // Convert
-
-    // XXX hardcoded cast for now as we only support OfflineTilePyramidRegionDefinition
-    auto definition = OfflineTilePyramidRegionDefinition::getDefinition(env_, jni::Object<OfflineTilePyramidRegionDefinition>(*definition_));
+    auto definition = OfflineRegionDefinition::getDefinition(env_, definition_);
 
     mbgl::OfflineRegionMetadata metadata;
     if (metadata_) {
@@ -59,19 +60,19 @@ void OfflineManager::createOfflineRegion(jni::JNIEnv& env_,
         //Keep a shared ptr to a global reference of the callback and file source so they are not GC'd in the meanwhile
         callback = std::shared_ptr<jni::jobject>(callback_.NewGlobalRef(env_).release()->Get(), GenericGlobalRefDeleter()),
         jFileSource = std::shared_ptr<jni::jobject>(jFileSource_.NewGlobalRef(env_).release()->Get(), GenericGlobalRefDeleter())
-    ](std::exception_ptr error, mbgl::optional<mbgl::OfflineRegion> region) mutable {
+    ](mbgl::expected<mbgl::OfflineRegion, std::exception_ptr> region) mutable {
 
         // Reattach, the callback comes from a different thread
         android::UniqueEnv env = android::AttachEnv();
 
-        if (error) {
-            OfflineManager::CreateOfflineRegionCallback::onError(*env, jni::Object<CreateOfflineRegionCallback>(*callback), error);
-        } else if (region) {
+        if (region) {
             OfflineManager::CreateOfflineRegionCallback::onCreate(
                 *env,
                 jni::Object<FileSource>(*jFileSource),
-                jni::Object<CreateOfflineRegionCallback>(*callback), std::move(region)
+                jni::Object<CreateOfflineRegionCallback>(*callback), std::move(*region)
             );
+        } else {
+            OfflineManager::CreateOfflineRegionCallback::onError(*env, jni::Object<CreateOfflineRegionCallback>(*callback), region.error());
         }
     });
 }
@@ -149,7 +150,7 @@ void OfflineManager::CreateOfflineRegionCallback::onCreate(jni::JNIEnv& env,
                                                         jni::Object<FileSource> jFileSource,
                                                         jni::Object<OfflineManager::CreateOfflineRegionCallback> callback,
                                                         mbgl::optional<mbgl::OfflineRegion> region) {
-    //Convert the region to java peer object
+    // Convert the region to java peer object
     auto jregion = OfflineRegion::New(env, jFileSource, std::move(*region));
 
     // Trigger callback

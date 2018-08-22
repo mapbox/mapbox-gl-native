@@ -13,11 +13,11 @@
 #include <mbgl/math/log2.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
@@ -1017,7 +1017,7 @@ void QMapboxGL::removeAnnotation(QMapbox::AnnotationID id)
 */
 bool QMapboxGL::setLayoutProperty(const QString& layer, const QString& propertyName, const QVariant& value)
 {
-    return d_ptr->setProperty(&mbgl::style::conversion::setLayoutProperty, layer, propertyName, value);
+    return d_ptr->setProperty(&mbgl::style::Layer::setLayoutProperty, layer, propertyName, value);
 }
 
 /*!
@@ -1077,7 +1077,7 @@ bool QMapboxGL::setLayoutProperty(const QString& layer, const QString& propertyN
 
 bool QMapboxGL::setPaintProperty(const QString& layer, const QString& propertyName, const QVariant& value)
 {
-    return d_ptr->setProperty(&mbgl::style::conversion::setPaintProperty, layer, propertyName, value);
+    return d_ptr->setProperty(&mbgl::style::Layer::setPaintProperty, layer, propertyName, value);
 }
 
 /*!
@@ -1379,7 +1379,7 @@ void QMapboxGL::addCustomLayer(const QString &id,
          }
 
         void initialize() {
-            ptr->initialize(); 
+            ptr->initialize();
         }
 
         void render(const mbgl::style::CustomLayerRenderParameters& params) {
@@ -1922,16 +1922,16 @@ bool QMapboxGLPrivate::setProperty(const PropertySetter& setter, const QString& 
         if (!document.HasParseError()) {
             // Treat value as a valid JSON.
             const mbgl::JSValue* jsonValue = &document;
-            result = setter(*layerObject, propertyString, jsonValue);
+            result = (layerObject->*setter)(propertyString, jsonValue);
         } else {
-            result = setter(*layerObject, propertyString, value);
+            result = (layerObject->*setter)(propertyString, value);
         }
     } else {
-        result = setter(*layerObject, propertyString, value);
+        result = (layerObject->*setter)(propertyString, value);
     }
 
     if (result) {
-        qWarning() << "Error setting paint property" << name << "on layer" << layer << ":" << QString::fromStdString(result->message);
+        qWarning() << "Error setting property" << name << "on layer" << layer << ":" << QString::fromStdString(result->message);
         return false;
     }
 

@@ -66,8 +66,8 @@ struct SymbolLayoutAttributes : gl::Attributes<
             {{
                 tx,
                 ty,
-                static_cast<uint16_t>(sizeData.min * 10),
-                static_cast<uint16_t>(sizeData.max * 10)
+                static_cast<uint16_t>(sizeData.min * 256),
+                static_cast<uint16_t>(sizeData.max * 256)
             }}
         };
     }

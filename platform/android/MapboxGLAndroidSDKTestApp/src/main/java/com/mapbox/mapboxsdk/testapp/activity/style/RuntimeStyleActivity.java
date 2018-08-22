@@ -197,6 +197,9 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       case R.id.action_numeric_filter:
         styleNumericFillLayer();
         return true;
+      case R.id.action_bring_water_to_front:
+        bringWaterToFront();
+        return true;
       default:
         return super.onOptionsItemSelected(item);
     }
@@ -570,6 +573,16 @@ public class RuntimeStyleActivity extends AppCompatActivity {
         Toast.makeText(RuntimeStyleActivity.this, "No regions layer in this style", Toast.LENGTH_SHORT).show();
       }
     }, 2000);
+  }
+
+  private void bringWaterToFront() {
+    Layer water = mapboxMap.getLayer("water");
+    if (water != null) {
+      mapboxMap.removeLayer(water);
+      mapboxMap.addLayerAt(water, mapboxMap.getLayers().size() - 1);
+    } else {
+      Toast.makeText(this, "No water layer in this style", Toast.LENGTH_SHORT).show();
+    }
   }
 
   private static class DefaultCallback implements MapboxMap.CancelableCallback {

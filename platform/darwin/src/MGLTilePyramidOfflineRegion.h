@@ -9,20 +9,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  An offline region defined by a style URL, geographic coordinate bounds, and
  range of zoom levels.
+ 
+ To minimize the resources required by an irregularly shaped offline region,
+ use the MGLShapeOfflineRegion class instead.
  */
 MGL_EXPORT
 @interface MGLTilePyramidOfflineRegion : NSObject <MGLOfflineRegion, NSSecureCoding, NSCopying>
-
-/**
- URL of the style whose resources are required for offline viewing.
-
- In addition to the JSON stylesheet, different styles may require different font
- glyphs, sprite sheets, and other resources.
-
- The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the style’s
- map ID (`mapbox://styles/{user}/{style}`).
- */
-@property (nonatomic, readonly) NSURL *styleURL;
 
 /**
  The coordinate bounds for the geographic region covered by the downloaded

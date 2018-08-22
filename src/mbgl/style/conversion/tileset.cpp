@@ -1,4 +1,5 @@
 #include <mbgl/style/conversion/tileset.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/math/clamp.hpp>
 

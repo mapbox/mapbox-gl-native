@@ -95,6 +95,7 @@ public final class MapboxMap {
     setDebugActive(options.getDebugActive());
     setApiBaseUrl(options);
     setStyleUrl(options);
+    setStyleJson(options);
     setPrefetchesTiles(options);
   }
 
@@ -433,7 +434,7 @@ public final class MapboxMap {
   }
 
   /**
-   * Removes the source, preserving the reverence for re-use
+   * Removes the source, preserving the reference for re-use
    *
    * @param source the source to remove
    * @return the source
@@ -1058,7 +1059,7 @@ public final class MapboxMap {
    * @param options the object containing the style url
    */
   private void setStyleUrl(@NonNull MapboxMapOptions options) {
-    String style = options.getStyle();
+    String style = options.getStyleUrl();
     if (!TextUtils.isEmpty(style)) {
       setStyleUrl(style, null);
     }
@@ -1084,6 +1085,18 @@ public final class MapboxMap {
    */
   public void setStyleJson(@NonNull String styleJson) {
     nativeMapView.setStyleJson(styleJson);
+  }
+
+  /**
+   * Loads a new map style json from MapboxMapOptions if available.
+   *
+   * @param options the object containing the style json
+   */
+  private void setStyleJson(@NonNull MapboxMapOptions options) {
+    String styleJson = options.getStyleJson();
+    if (!TextUtils.isEmpty(styleJson)) {
+      setStyleJson(styleJson);
+    }
   }
 
   /**
@@ -1601,7 +1614,7 @@ public final class MapboxMap {
   public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
                                                  @NonNull @Size(value = 4) int[] padding) {
     // we use current camera tilt/bearing value to provide expected transformations as #11993
-    return getCameraForLatLngBounds(latLngBounds, padding, transform.getBearing(), transform.getTilt());
+    return getCameraForLatLngBounds(latLngBounds, padding, transform.getRawBearing(), transform.getTilt());
   }
 
 

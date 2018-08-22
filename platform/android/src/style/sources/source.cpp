@@ -7,8 +7,8 @@
 #include <mbgl/util/logging.hpp>
 
 // Java -> C++ conversion
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/source.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 // C++ -> Java conversion
 #include "../conversion/property_value.hpp"
@@ -51,7 +51,7 @@ namespace android {
         if (!coreSource.peer.has_value()) {
             coreSource.peer = createSourcePeer(env, coreSource, frontend);
         }
-        return *mbgl::util::any_cast<std::unique_ptr<Source>>(&coreSource.peer)->get()->javaPeer;
+        return *coreSource.peer.get<std::unique_ptr<Source>>()->javaPeer;
     }
 
     Source::Source(jni::JNIEnv& env, mbgl::style::Source& coreSource, jni::Object<Source> obj, AndroidRendererFrontend& frontend)
@@ -109,7 +109,7 @@ namespace android {
         rendererFrontend = &frontend;
     }
 
-    void Source::removeFromMap(JNIEnv&, jni::Object<Source>, mbgl::Map& map) {
+    bool Source::removeFromMap(JNIEnv&, jni::Object<Source>, mbgl::Map& map) {
         // Cannot remove if not attached yet
         if (ownedSource) {
             throw std::runtime_error("Cannot remove detached source");
@@ -119,13 +119,18 @@ namespace android {
         ownedSource = map.getStyle().removeSource(source.getID());
 
         // The source may not be removed if any layers still reference it
+        return ownedSource != nullptr;
+    }
+
+    void Source::releaseJavaPeer() {
+        // We can't release the peer if the source was not removed from the map
         if (!ownedSource) {
             return;
         }
 
         // Release the peer relationships. These will be re-established when the source is added to a map
         assert(ownedSource->peer.has_value());
-        util::any_cast<std::unique_ptr<Source>>(&(ownedSource->peer))->release();
+        ownedSource->peer.get<std::unique_ptr<Source>>().release();
         ownedSource->peer.reset();
 
         // Release the strong reference to the java peer

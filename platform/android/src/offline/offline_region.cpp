@@ -107,14 +107,14 @@ void OfflineRegion::getOfflineRegionStatus(jni::JNIEnv& env_, jni::Object<Offlin
     fileSource.getOfflineRegionStatus(*region, [
         //Ensure the object is not gc'd in the meanwhile
         callback = std::shared_ptr<jni::jobject>(callback_.NewGlobalRef(env_).release()->Get(), GenericGlobalRefDeleter())
-    ](std::exception_ptr error, mbgl::optional<mbgl::OfflineRegionStatus> status) mutable {
+    ](mbgl::expected<mbgl::OfflineRegionStatus, std::exception_ptr> status) mutable {
         // Reattach, the callback comes from a different thread
         android::UniqueEnv env = android::AttachEnv();
 
-        if (error) {
-            OfflineRegionStatusCallback::onError(*env, jni::Object<OfflineRegionStatusCallback>(*callback), error);
-        } else if (status) {
-            OfflineRegionStatusCallback::onStatus(*env, jni::Object<OfflineRegionStatusCallback>(*callback), std::move(status));
+        if (status) {
+            OfflineRegionStatusCallback::onStatus(*env, jni::Object<OfflineRegionStatusCallback>(*callback), std::move(*status));
+        } else {
+            OfflineRegionStatusCallback::onError(*env, jni::Object<OfflineRegionStatusCallback>(*callback), status.error());
         }
     });
 }
@@ -144,14 +144,14 @@ void OfflineRegion::updateOfflineRegionMetadata(jni::JNIEnv& env_, jni::Array<jn
     fileSource.updateOfflineMetadata(region->getID(), metadata, [
         //Ensure the object is not gc'd in the meanwhile
         callback = std::shared_ptr<jni::jobject>(callback_.NewGlobalRef(env_).release()->Get(), GenericGlobalRefDeleter())
-    ](std::exception_ptr error, mbgl::optional<mbgl::OfflineRegionMetadata> data) mutable {
+    ](mbgl::expected<mbgl::OfflineRegionMetadata, std::exception_ptr> data) mutable {
         // Reattach, the callback comes from a different thread
         android::UniqueEnv env = android::AttachEnv();
 
-        if (error) {
-            OfflineRegionUpdateMetadataCallback::onError(*env, jni::Object<OfflineRegionUpdateMetadataCallback>(*callback), error);
-        } else if (data) {
-            OfflineRegionUpdateMetadataCallback::onUpdate(*env, jni::Object<OfflineRegionUpdateMetadataCallback>(*callback), std::move(data));
+        if (data) {
+            OfflineRegionUpdateMetadataCallback::onUpdate(*env, jni::Object<OfflineRegionUpdateMetadataCallback>(*callback), std::move(*data));
+        } else {
+            OfflineRegionUpdateMetadataCallback::onError(*env, jni::Object<OfflineRegionUpdateMetadataCallback>(*callback), data.error());
         }
     });
 }
@@ -159,7 +159,14 @@ void OfflineRegion::updateOfflineRegionMetadata(jni::JNIEnv& env_, jni::Array<jn
 jni::Object<OfflineRegion> OfflineRegion::New(jni::JNIEnv& env, jni::Object<FileSource> jFileSource, mbgl::OfflineRegion region) {
 
     // Definition
-    auto definition = jni::Object<OfflineRegionDefinition>(*OfflineTilePyramidRegionDefinition::New(env, region.getDefinition()));
+    auto definition = region.getDefinition().match(
+            [&](const mbgl::OfflineTilePyramidRegionDefinition def) {
+                return jni::Object<OfflineRegionDefinition>(
+                        *OfflineTilePyramidRegionDefinition::New(env, def));
+            }, [&](const mbgl::OfflineGeometryRegionDefinition def) {
+                return jni::Object<OfflineRegionDefinition>(
+                        *OfflineGeometryRegionDefinition::New(env, def));
+            });
 
     // Metadata
     auto metadata = OfflineRegion::metadata(env, region.getMetadata());

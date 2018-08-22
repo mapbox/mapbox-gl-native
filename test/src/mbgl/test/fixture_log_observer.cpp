@@ -32,7 +32,9 @@ bool FixtureLog::Observer::onRecord(EventSeverity severity,
                                     const std::string& msg) {
     std::lock_guard<std::mutex> lock(messagesMutex);
 
-    messages.emplace_back(severity, event, code, msg);
+    if (severity != EventSeverity::Debug) {
+        messages.emplace_back(severity, event, code, msg);
+    }
 
     return true;
 }
@@ -48,7 +50,7 @@ size_t FixtureLog::Observer::count(const Message& message, bool substring) const
 
     size_t message_count = 0;
     for (const auto& msg : messages) {
-        if (msg.matches(message, substring)) {
+        if (!msg.checked && msg.matches(message, substring)) {
             message_count++;
             msg.checked = true;
         }

@@ -55,6 +55,12 @@
     #import "NSImage+MGLAdditions.h"
 #endif
 
+const MGLExceptionName MGLInvalidStyleURLException = @"MGLInvalidStyleURLException";
+const MGLExceptionName MGLRedundantLayerException = @"MGLRedundantLayerException";
+const MGLExceptionName MGLRedundantLayerIdentifierException = @"MGLRedundantLayerIdentifierException";
+const MGLExceptionName MGLRedundantSourceException = @"MGLRedundantSourceException";
+const MGLExceptionName MGLRedundantSourceIdentifierException = @"MGLRedundantSourceIdentifierException";
+
 /**
  Model class for localization changes.
  */
@@ -177,7 +183,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 }
 
 - (MGLSource *)sourceFromMBGLSource:(mbgl::style::Source *)rawSource {
-    if (MGLSource *source = rawSource->peer.has_value() ? mbgl::util::any_cast<SourceWrapper>(rawSource->peer).source : nil) {
+    if (MGLSource *source = rawSource->peer.has_value() ? rawSource->peer.get<SourceWrapper>().source : nil) {
         return source;
     }
 
@@ -210,7 +216,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     try {
         [source addToMapView:self.mapView];
     } catch (std::runtime_error & err) {
-        [NSException raise:@"MGLRedundantSourceIdentifierException" format:@"%s", err.what()];
+        [NSException raise:MGLRedundantSourceIdentifierException format:@"%s", err.what()];
     }
 }
 
@@ -313,14 +319,14 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
             MGLStyleLayer *sibling = layers.size() ? [self layerFromMBGLLayer:layers.at(0)] : nil;
             [styleLayer addToStyle:self belowLayer:sibling];
         } catch (const std::runtime_error & err) {
-            [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
+            [NSException raise:MGLRedundantLayerIdentifierException format:@"%s", err.what()];
         }
     } else {
         try {
             MGLStyleLayer *sibling = [self layerFromMBGLLayer:layers.at(index)];
             [styleLayer addToStyle:self belowLayer:sibling];
         } catch (std::runtime_error & err) {
-            [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
+            [NSException raise:MGLRedundantLayerIdentifierException format:@"%s", err.what()];
         }
     }
 }
@@ -341,7 +347,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 {
     NSParameterAssert(rawLayer);
 
-    if (MGLStyleLayer *layer = rawLayer->peer.has_value() ? mbgl::util::any_cast<LayerWrapper>(&(rawLayer->peer))->layer : nil) {
+    if (MGLStyleLayer *layer = rawLayer->peer.has_value() ? rawLayer->peer.get<LayerWrapper>().layer : nil) {
         return layer;
     }
 
@@ -402,7 +408,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     try {
         [layer addToStyle:self belowLayer:nil];
     } catch (std::runtime_error & err) {
-        [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
+        [NSException raise:MGLRedundantLayerIdentifierException format:@"%s", err.what()];
     }
     [self didChangeValueForKey:@"layers"];
 }
@@ -431,7 +437,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     try {
         [layer addToStyle:self belowLayer:sibling];
     } catch (std::runtime_error & err) {
-        [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
+        [NSException raise:MGLRedundantLayerIdentifierException format:@"%s", err.what()];
     }
     [self didChangeValueForKey:@"layers"];
 }
@@ -473,14 +479,14 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
         try {
             [layer addToStyle:self belowLayer:nil];
         } catch (std::runtime_error & err) {
-            [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
+            [NSException raise:MGLRedundantLayerIdentifierException format:@"%s", err.what()];
         }
     } else {
         MGLStyleLayer *sibling = [self layerFromMBGLLayer:layers.at(index + 1)];
         try {
             [layer addToStyle:self belowLayer:sibling];
         } catch (std::runtime_error & err) {
-            [NSException raise:@"MGLRedundantLayerIdentifierException" format:@"%s", err.what()];
+            [NSException raise:MGLRedundantLayerIdentifierException format:@"%s", err.what()];
         }
     }
     [self didChangeValueForKey:@"layers"];

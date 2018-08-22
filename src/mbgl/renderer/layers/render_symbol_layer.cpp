@@ -126,7 +126,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             );
         };
 
-        assert(dynamic_cast<GeometryTile*>(&tile.tile));
+        assert(tile.tile.kind == Tile::Kind::Geometry);
         GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
 
         if (bucket.hasIconData()) {

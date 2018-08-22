@@ -18,7 +18,7 @@ public abstract class Source {
    * @param nativePtr - pointer to native peer
    */
   @Keep
-  public Source(long nativePtr) {
+  protected Source(long nativePtr) {
     checkThread();
     this.nativePtr = nativePtr;
   }

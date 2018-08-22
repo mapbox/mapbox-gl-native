@@ -1,6 +1,8 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layer_observer.hpp>
+#include <mbgl/style/conversion/constant.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 namespace mbgl {
 namespace style {
@@ -36,6 +38,24 @@ float Layer::getMaxZoom() const {
 
 void Layer::setObserver(LayerObserver* observer_) {
     observer = observer_ ? observer_ : &nullObserver;
+}
+
+optional<conversion::Error> Layer::setVisibility(const conversion::Convertible& value) {
+    using namespace conversion;
+
+    if (isUndefined(value)) {
+        setVisibility(VisibilityType::Visible);
+        return nullopt;
+    }
+
+    Error error;
+    optional<VisibilityType> visibility = convert<VisibilityType>(value, error);
+    if (!visibility) {
+        return error;
+    }
+
+    setVisibility(*visibility);
+    return nullopt;
 }
 
 } // namespace style

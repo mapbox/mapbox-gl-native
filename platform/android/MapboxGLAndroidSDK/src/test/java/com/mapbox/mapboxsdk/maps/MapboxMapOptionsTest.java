@@ -155,9 +155,9 @@ public class MapboxMapOptionsTest {
 
   @Test
   public void testStyleUrl() {
-    assertEquals(Style.DARK, new MapboxMapOptions().styleUrl(Style.DARK).getStyle());
-    assertNotEquals(Style.LIGHT, new MapboxMapOptions().styleUrl(Style.DARK).getStyle());
-    assertNull(new MapboxMapOptions().getStyle());
+    assertEquals(Style.DARK, new MapboxMapOptions().styleUrl(Style.DARK).getStyleUrl());
+    assertNotEquals(Style.LIGHT, new MapboxMapOptions().styleUrl(Style.DARK).getStyleUrl());
+    assertNull(new MapboxMapOptions().getStyleUrl());
   }
 
   @Test

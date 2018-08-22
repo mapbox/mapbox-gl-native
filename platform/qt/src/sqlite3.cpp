@@ -23,13 +23,6 @@
 namespace mapbox {
 namespace sqlite {
 
-// https://www.sqlite.org/rescode.html#ok
-static_assert(mbgl::underlying_type(ResultCode::OK) == 0, "error");
-// https://www.sqlite.org/rescode.html#cantopen
-static_assert(mbgl::underlying_type(ResultCode::CantOpen) == 14, "error");
-// https://www.sqlite.org/rescode.html#notadb
-static_assert(mbgl::underlying_type(ResultCode::NotADB) == 26, "error");
-
 void checkQueryError(const QSqlQuery& query) {
     QSqlError lastError = query.lastError();
     if (lastError.type() != QSqlError::NoError) {
@@ -112,6 +105,11 @@ mapbox::util::variant<Database, Exception> Database::tryOpen(const std::string &
     if (flags & OpenFlag::ReadOnly) {
         if (!connectOptions.isEmpty()) connectOptions.append(';');
         connectOptions.append("QSQLITE_OPEN_READONLY");
+    }
+
+    if (filename.compare(0, 5, "file:") == 0) {
+        if (!connectOptions.isEmpty()) connectOptions.append(';');
+        connectOptions.append("QSQLITE_OPEN_URI");
     }
 
     db.setConnectOptions(connectOptions);

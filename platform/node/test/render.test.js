@@ -1,7 +1,5 @@
-'use strict';
+import {run} from '../../../mapbox-gl-js/test/integration/lib/render';
+import implementation from './suite_implementation';
+import ignores from './ignores.json';
 
-const suite = require('../../../mapbox-gl-js/test/integration').render;
-const suiteImplementation = require('./suite_implementation');
-const ignores = require('./ignores.json');
-
-suite.run('native', ignores, suiteImplementation);
+run('native', ignores, implementation);
