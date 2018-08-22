@@ -1,12 +1,11 @@
 #include "json_array.hpp"
-
 #include "json_element.hpp"
 
 namespace mbgl {
 namespace android {
 namespace gson {
 
-jni::Object<JsonArray> JsonArray::New(jni::JNIEnv& env, const std::vector<mapbox::geometry::value>& values){
+jni::Object<JsonArray> JsonArray::New(jni::JNIEnv& env, const std::vector<mbgl::Value>& values){
     static auto javaClass = jni::Class<JsonArray>::Singleton(env);
     static auto constructor = javaClass.GetConstructor(env);
     static auto addMethod = javaClass.GetMethod<void (jni::Object<JsonElement>)>(env, "add");
@@ -20,8 +19,8 @@ jni::Object<JsonArray> JsonArray::New(jni::JNIEnv& env, const std::vector<mapbox
     return jsonArray;
 }
 
-std::vector<mapbox::geometry::value> JsonArray::convert(jni::JNIEnv& env, const jni::Object<JsonArray> jsonArray) {
-    std::vector<mapbox::geometry::value> values;
+std::vector<mbgl::Value> JsonArray::convert(jni::JNIEnv& env, const jni::Object<JsonArray> jsonArray) {
+    std::vector<mbgl::Value> values;
 
     if (jsonArray) {
         static auto javaClass = jni::Class<JsonArray>::Singleton(env);
