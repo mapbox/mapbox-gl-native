@@ -33,6 +33,7 @@ set(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_SHARED_LINKER_FLAGS_RELWIT
 ## mbgl core ##
 
 macro(mbgl_platform_core)
+    # Modify platform/android/core-files.txt to change the source files for this target.
     target_sources_from_file(mbgl-core PRIVATE platform/android/core-files.txt)
 
     target_include_directories(mbgl-core
@@ -61,6 +62,7 @@ endmacro()
 
 
 macro(mbgl_filesource)
+    # Modify platform/android/filesource-files.txt to change the source files for this target.
     target_sources_from_file(mbgl-filesource PRIVATE platform/android/filesource-files.txt)
 
     target_add_mason_package(mbgl-filesource PUBLIC sqlite)
