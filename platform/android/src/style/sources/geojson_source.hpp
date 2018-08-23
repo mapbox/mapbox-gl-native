@@ -51,7 +51,14 @@ private:
 
     jni::Local<jni::String> getURL(jni::JNIEnv&);
 
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> getChildren(jni::JNIEnv&, jni::jlong);
+
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> getLeaves(jni::JNIEnv&, jni::jlong, jni::jlong, jni::jlong);
+
+    jni::jdouble getClusterExpansionZoom(jni::JNIEnv&, jni::jlong);
+
     jni::Local<jni::Object<Source>> createJavaPeer(jni::JNIEnv&);
+
     std::unique_ptr<Update> awaitingUpdate;
     std::unique_ptr<Update> update;
     std::shared_ptr<ThreadPool> threadPool;

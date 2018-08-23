@@ -1,10 +1,12 @@
 package com.mapbox.mapboxsdk.testapp.activity.style;
 
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -20,9 +22,9 @@ import timber.log.Timber;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.division;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.gt;
@@ -36,9 +38,10 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.toNumber;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
@@ -52,6 +55,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
 
   private MapView mapView;
   private MapboxMap mapboxMap;
+  private GeoJsonSource source;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +63,8 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
     setContentView(R.layout.activity_geojson_clustering);
 
     // Initialize map as normal
-    mapView = (MapView) findViewById(R.id.mapView);
-    // noinspection ConstantConditions
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-
     mapView.getMapAsync(map -> {
       mapboxMap = map;
       mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.7749, 122.4194), 0));
@@ -132,7 +134,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
   private void addClusteredGeoJsonSource() {
     // Add a clustered source
     try {
-      mapboxMap.addSource(
+      mapboxMap.addSource(source =
         new GeoJsonSource("earthquakes",
           new URL("https://www.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson"),
           new GeoJsonOptions()
@@ -155,11 +157,8 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
     SymbolLayer unclustered = new SymbolLayer("unclustered-points", "earthquakes");
     unclustered.setProperties(
       iconImage("icon-id"),
-      iconSize(
-        division(
-          get("mag"), literal(4.0f)
-        )
-      ),
+      iconAllowOverlap(true),
+      iconIgnorePlacement(true),
       iconColor(
         interpolate(exponential(1), get("mag"),
           stop(2.0, rgb(0, 255, 0)),
@@ -171,9 +170,13 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
 
     mapboxMap.addLayer(unclustered);
 
+
+    String[] layerIds = new String[layers.length];
+
     for (int i = 0; i < layers.length; i++) {
       // Add some nice circles
-      CircleLayer circles = new CircleLayer("cluster-" + i, "earthquakes");
+      layerIds[i] = "cluster-" + i;
+      CircleLayer circles = new CircleLayer(layerIds[i], "earthquakes");
       circles.setProperties(
         circleColor(layers[i][1]),
         circleRadius(18f)
@@ -204,7 +207,43 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
     mapboxMap.addLayer(count);
 
 
+    mapboxMap.addOnMapClickListener(latLng -> {
+      PointF point = mapboxMap.getProjection().toScreenLocation(latLng);
+      List<Feature> features = mapboxMap.queryRenderedFeatures(point, layerIds);
+      if (!features.isEmpty()) {
+        moveCameraToClusterExpansion(features.get(0), latLng);
+        recursiveLoopClusterFeatures(features);
+      }
+    });
+
     // Zoom out to start
     mapboxMap.animateCamera(CameraUpdateFactory.zoomTo(1));
+  }
+
+  private void moveCameraToClusterExpansion(Feature feature, LatLng latLng) {
+    if (feature.hasProperty("cluster") && feature.getBooleanProperty("cluster")) {
+      double newZoom = source.getClusterExpansionZoom((long) feature.getNumberProperty("cluster_id"));
+      mapboxMap.animateCamera(
+        CameraUpdateFactory.newLatLngZoom(latLng, newZoom + 0.01), 750
+      );
+    }
+  }
+
+  private void recursiveLoopClusterFeatures(List<Feature> features) {
+    for (Feature feature : features) {
+      boolean cluster = feature.hasProperty("cluster") && feature.getBooleanProperty("cluster");
+      if (cluster) {
+        long pointCount = (long) feature.getNumberProperty("point_count");
+        long clusterId = (long) feature.getNumberProperty("cluster_id");
+        double expansionZoom = source.getClusterExpansionZoom(clusterId);
+        Timber.e(
+          "Cluster= (id=%s) with %s points, cluster will expand at zoom %s",
+          clusterId, pointCount, expansionZoom
+        );
+        recursiveLoopClusterFeatures(source.getLeaves(clusterId, 10, 0));
+      } else {
+        Timber.e("Point data: %s", feature.toJson());
+      }
+    }
   }
 }

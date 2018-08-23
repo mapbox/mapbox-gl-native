@@ -108,6 +108,26 @@ namespace android {
         return Feature::convert(env, features);
     }
 
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> GeoJSONSource::getChildren(jni::JNIEnv& env, jni::jlong clusterId) {
+        using namespace mbgl::android::conversion;
+        using namespace mbgl::android::geojson;
+
+        std::vector<mbgl::Feature> features = source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::getChildren(clusterId);
+        return Feature::convert(env, features);
+    }
+
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> GeoJSONSource::getLeaves(jni::JNIEnv& env, jni::jlong clusterId, jni::jlong limit, jni::jlong offset) {
+        using namespace mbgl::android::conversion;
+        using namespace mbgl::android::geojson;
+
+        std::vector<mbgl::Feature> features = source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::getLeaves(clusterId, limit, offset);
+        return Feature::convert(env, features);
+    }
+
+    jni::jdouble GeoJSONSource::getClusterExpansionZoom(jni::JNIEnv&, jni::jlong clusterId) {
+        return source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::getClusterExpansionZoom(clusterId);
+    }
+
     jni::Local<jni::Object<Source>> GeoJSONSource::createJavaPeer(jni::JNIEnv& env) {
         static auto& javaClass = jni::Class<GeoJSONSource>::Singleton(env);
         static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
@@ -176,7 +196,10 @@ namespace android {
             METHOD(&GeoJSONSource::setGeometry, "nativeSetGeometry"),
             METHOD(&GeoJSONSource::setURL, "nativeSetUrl"),
             METHOD(&GeoJSONSource::getURL, "nativeGetUrl"),
-            METHOD(&GeoJSONSource::querySourceFeatures, "querySourceFeatures")
+            METHOD(&GeoJSONSource::querySourceFeatures, "querySourceFeatures"),
+            METHOD(&GeoJSONSource::getLeaves, "nativeGetLeaves"),
+            METHOD(&GeoJSONSource::getChildren, "nativeGetChildren"),
+            METHOD(&GeoJSONSource::getClusterExpansionZoom, "nativeGetClusterExpansionZoom")
         );
     }
 
