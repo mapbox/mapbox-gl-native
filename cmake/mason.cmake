@@ -208,8 +208,8 @@ endif()
 
 mason_detect_platform()
 
-# Execute commands if CMake is run in command mode
-if (CMAKE_ARGC)
+# Execute commands if CMake is run in command mode\
+if (CMAKE_ARGC AND "${CMAKE_SCRIPT_MODE_FILE}" STREQUAL "${CMAKE_CURRENT_LIST_DIR}/mason.cmake")
     # Collect remaining arguments for passing to mason_use
     set(_MASON_ARGS)
     foreach(I RANGE 4 ${CMAKE_ARGC})
