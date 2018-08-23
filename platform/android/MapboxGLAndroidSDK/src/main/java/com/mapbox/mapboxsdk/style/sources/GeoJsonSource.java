@@ -270,7 +270,26 @@ public class GeoJsonSource extends Source {
   public List<Feature> querySourceFeatures(@Nullable Expression filter) {
     checkThread();
     Feature[] features = querySourceFeatures(filter != null ? filter.toArray() : null);
-    return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
+    return features != null ? Arrays.asList(features) : new ArrayList<>();
+  }
+
+  @NonNull
+  public List<Feature> getChildren(long clusterId) {
+    checkThread();
+    Feature[] features = nativeGetChildren(clusterId);
+    return features != null ? Arrays.asList(features) : new ArrayList<>();
+  }
+
+  @NonNull
+  public List<Feature> getLeaves(long clusterId, long limit, long offset) {
+    checkThread();
+    Feature[] features = nativeGetLeaves(clusterId, limit, offset);
+    return features != null ? Arrays.asList(features) : new ArrayList<>();
+  }
+
+  public double getClusterExpansionZoom(long clusterId) {
+    checkThread();
+    return nativeGetClusterExpansionZoom(clusterId);
   }
 
   @Keep
@@ -296,6 +315,15 @@ public class GeoJsonSource extends Source {
 
   @Keep
   private native Feature[] querySourceFeatures(Object[] filter);
+
+  @Keep
+  private native Feature[] nativeGetChildren(long clusterId);
+
+  @Keep
+  private native Feature[]  nativeGetLeaves(long clusterId, long limit, long offset);
+
+  @Keep
+  private native double nativeGetClusterExpansionZoom(long clusterId);
 
   @Override
   @Keep
