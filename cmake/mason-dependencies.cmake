@@ -21,7 +21,7 @@ mason_use(vector-tile VERSION 1.0.2 HEADER_ONLY)
 if(MBGL_PLATFORM STREQUAL "android")
     mason_use(jni.hpp VERSION 4.0.0 HEADER_ONLY)
 elseif(MBGL_PLATFORM STREQUAL "ios")
-    mason_use(icu VERSION 58.1-min-size)
+    # noop
 elseif(MBGL_PLATFORM STREQUAL "linux")
     mason_use(glfw VERSION 2018-06-27-0be4f3f)
     mason_use(libuv VERSION 1.9.1)

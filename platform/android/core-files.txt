@@ -213,3 +213,6 @@ platform/android/src/java_types.hpp
 # Main entry point
 platform/android/src/jni.hpp
 platform/android/src/jni.cpp
+
+# GL
+platform/android/mbgl/gl/gl_impl.hpp
