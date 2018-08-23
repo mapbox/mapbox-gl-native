@@ -97,12 +97,12 @@ optional<Tileset> Converter<Tileset>::operator()(const Convertible& value, Error
         bottom = util::clamp(*bottom, -90.0, 90.0);
         top = util::clamp(*top, -90.0, 90.0);
         if (*top < *bottom){
-            error.message = "bounds bottom latitude must be smaller than top latitude";
+            error.message = "bounds bottom latitude must be less than or equal to top latitude";
             return nullopt;
         }
 
         if(*left > *right) {
-            error.message = "bounds left longitude should be less than right longitude";
+            error.message = "bounds left longitude must be less than or equal to right longitude";
             return nullopt;
         }
         left = util::max(-180.0, *left);

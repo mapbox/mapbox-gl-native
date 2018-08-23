@@ -1,12 +1,16 @@
 package com.mapbox.mapboxsdk.style.expressions;
 
 import android.graphics.Color;
+
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Locale;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.abs;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.acos;
@@ -19,6 +23,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.atan;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.bool;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.ceil;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.coalesce;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.collator;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.color;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.concat;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.cos;
@@ -60,6 +65,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.pow;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.product;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.properties;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.raw;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.resolvedLocale;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.rgb;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.rgba;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.round;
@@ -1289,5 +1295,76 @@ public class ExpressionTest {
     String color = PropertyFactory.colorToRgbaString(Color.parseColor("#41FF0000")).split(" ")[3];
     String alpha = color.substring(0, color.length() - 1);
     assertEquals("alpha value should match", 0.254f, Float.valueOf(alpha), 0.001f);
+  }
+
+  @Test
+  public void testCollator() {
+    Object[] expected = new Object[] {"collator",
+      new HashMap<String, Object>() {
+        {
+          put("case-sensitive", true);
+          put("diacritic-sensitive", true);
+          put("locale", "it-IT");
+        }
+      }
+    };
+    Object[] actual = collator(true, true, Locale.ITALY).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testStringCollator() {
+    String expected = "[\"collator\", {\"diacritic-sensitive\": true, \"case-sensitive\": true, \"locale\": "
+      + "\"it\"}]";
+    String actual = collator(true, true, Locale.ITALIAN).toString();
+    assertEquals("expression should match", expected, actual);
+  }
+
+  @Test
+  public void testResolvedLocale() {
+    Object[] expected = new Object[] {"resolved-locale",
+      new Object[] {"collator",
+        new HashMap<String, Object>() {
+          {
+            put("case-sensitive", false);
+            put("diacritic-sensitive", false);
+            put("locale", "it");
+          }
+        }
+      }
+    };
+    Object[] actual = resolvedLocale(collator(false, false, Locale.ITALIAN)).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testRawCollator() {
+    Object[] expected = new Object[] {"collator",
+      new HashMap<String, Object>() {
+        {
+          put("case-sensitive", true);
+          put("diacritic-sensitive", true);
+          put("locale", "it-IT");
+        }
+      }
+    };
+    Object[] actual = raw("[\"collator\", {\"diacritic-sensitive\": true, \"case-sensitive\": true, \"locale\": "
+      + "\"it-IT\"}]").toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testRawCollatorDoubleConversion() {
+    Expression expected = collator(false, false, Locale.ITALIAN);
+    Object[] actual = raw(expected.toString()).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected.toArray(), actual));
+  }
+
+  @Test
+  public void testStringNestedCollator() {
+    String expected = "[\"collator\", {\"diacritic-sensitive\": [\"==\", 2.0, 1.0], \"case-sensitive\": false,"
+      + " \"locale\": \"it\"}]";
+    String actual = collator(literal(false), eq(literal(2), literal(1)), literal("it")).toString();
+    assertEquals("expression should match", expected, actual);
   }
 }
