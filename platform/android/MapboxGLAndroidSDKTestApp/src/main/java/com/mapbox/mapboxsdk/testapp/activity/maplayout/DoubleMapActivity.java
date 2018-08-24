@@ -97,7 +97,7 @@ public class DoubleMapActivity extends AppCompatActivity {
         uiSettings.setAttributionEnabled(false);
         uiSettings.setLogoEnabled(false);
 
-        mapboxMap.setOnMapClickListener(point -> {
+        mapboxMap.addOnMapClickListener(point -> {
           // test if we can open 2 activities after each other
           Toast.makeText(mapViewMini.getContext(), "Creating a new Activity instance",Toast.LENGTH_SHORT).show();
           startActivity(new Intent(mapViewMini.getContext(), DoubleMapActivity.class));
