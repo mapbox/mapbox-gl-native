@@ -13,6 +13,9 @@ platform/darwin/src/MGLAttributionInfo_Private.h
 platform/darwin/src/MGLFoundation.h
 platform/darwin/src/MGLFoundation.mm
 platform/darwin/src/MGLFoundation_Private.h
+platform/darwin/src/MGLLoggingConfiguration.h
+platform/darwin/src/MGLLoggingConfiguration.m
+platform/darwin/src/MGLLoggingConfiguration_Private.h
 platform/darwin/src/MGLMapCamera.h
 platform/darwin/src/MGLMapCamera.mm
 platform/darwin/src/MGLMapSnapshotter.h
