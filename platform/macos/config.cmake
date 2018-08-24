@@ -67,13 +67,8 @@ endmacro()
 
 
 macro(mbgl_filesource)
-    target_sources(mbgl-filesource
-        # File source
-        PRIVATE platform/darwin/src/http_file_source.mm
-
-        # Database
-        PRIVATE platform/default/sqlite3.cpp
-    )
+    # Modify platform/darwin/filesource-files.txt to change the source files for this target.
+    target_sources_from_file(mbgl-filesource PRIVATE platform/darwin/filesource-files.txt)
 
     target_compile_options(mbgl-filesource
         PRIVATE -fobjc-arc

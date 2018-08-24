@@ -366,6 +366,50 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition lineGapWidthTransition;
 
+#if TARGET_OS_IPHONE
+/**
+ Defines a gradient with which to color a line feature. Can only be used with
+ GeoJSON sources that specify `"lineMetrics": true`.
+ 
+ This property is only applied to the style if `lineDasharray` is set to `nil`,
+ and `linePattern` is set to `nil`, and the data source requirements are met.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `UIColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$lineProgress` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *lineGradient;
+#else
+/**
+ Defines a gradient with which to color a line feature. Can only be used with
+ GeoJSON sources that specify `"lineMetrics": true`.
+ 
+ This property is only applied to the style if `lineDasharray` is set to `nil`,
+ and `linePattern` is set to `nil`, and the data source requirements are met.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$lineProgress` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *lineGradient;
+#endif
+
 /**
  The line's offset. For linear features, a positive value offsets the line to
  the right, relative to the direction of the line, and a negative value to the

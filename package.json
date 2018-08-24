@@ -34,7 +34,8 @@
     "pretty-bytes": "^5.1.0",
     "request": "^2.72.0",
     "semver": "^5.5.0",
-    "tape": "^4.5.1"
+    "tape": "^4.5.1",
+    "xcode": "^1.0.0"
   },
   "engines": {
     "node": ">=6"

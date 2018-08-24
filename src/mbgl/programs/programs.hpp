@@ -37,6 +37,7 @@ public:
           hillshade(context, programParameters),
           hillshadePrepare(context, programParameters),
           line(context, programParameters),
+          lineGradient(context, programParameters),
           lineSDF(context, programParameters),
           linePattern(context, programParameters),
           raster(context, programParameters),
@@ -64,6 +65,7 @@ public:
     HillshadeProgram hillshade;
     HillshadePrepareProgram hillshadePrepare;
     ProgramMap<LineProgram> line;
+    ProgramMap<LineGradientProgram> lineGradient;
     ProgramMap<LineSDFProgram> lineSDF;
     ProgramMap<LinePatternProgram> linePattern;
     RasterProgram raster;

@@ -189,6 +189,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             if (layer.is<RenderHeatmapLayer>()) {
                 layer.as<RenderHeatmapLayer>()->updateColorRamp();
             }
+
+            if (layer.is<RenderLineLayer>()) {
+                layer.as<RenderLineLayer>()->updateColorRamp();
+            }
         }
 
         if (layerAdded || layerChanged || zoomChanged || layer.hasTransition()) {

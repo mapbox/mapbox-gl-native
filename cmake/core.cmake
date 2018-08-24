@@ -1,3 +1,4 @@
+# Modify cmake/core-files.txt to change the source files for this target.
 load_sources_list(MBGL_CORE_FILES cmake/core-files.txt)
 add_library(mbgl-core STATIC ${MBGL_CORE_FILES})
 

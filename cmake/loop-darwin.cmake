@@ -1,8 +1,6 @@
-add_library(mbgl-loop-darwin STATIC
-    platform/darwin/src/async_task.cpp
-    platform/darwin/src/run_loop.cpp
-    platform/darwin/src/timer.cpp
-)
+# Modify platform/darwin/loop-files.txt to change the source files for this target.
+load_sources_list(MBGL_LOOP_DARWIN_FILES platform/darwin/loop-files.txt)
+add_library(mbgl-loop-darwin STATIC ${MBGL_LOOP_DARWIN_FILES})
 
 target_include_directories(mbgl-loop-darwin
     PRIVATE include

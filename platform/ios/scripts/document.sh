@@ -35,6 +35,7 @@ mkdir -p /tmp/mbgl/
 
 step "Generating readme and release notes"
 README=/tmp/mbgl/README.md
+npm install --ignore-scripts
 node platform/ios/scripts/release-notes.js jazzy >> "${README}"
 
 rm -rf ${OUTPUT}
