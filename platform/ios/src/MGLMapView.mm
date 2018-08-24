@@ -1,7 +1,5 @@
 #import "MGLMapView_Private.h"
 
-#include <mbgl/util/logging.hpp>
-
 #import <GLKit/GLKit.h>
 #import <OpenGLES/EAGL.h>
 
@@ -75,6 +73,7 @@
 #import "MGLAttributionInfo_Private.h"
 #import "MGLMapAccessibilityElement.h"
 #import "MGLLocationManager_Private.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -378,7 +377,7 @@ public:
     {
         styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
     }
-
+    MGLLogDebug(@"Setting styleURL: %@", styleURL);
     styleURL = styleURL.mgl_URLByStandardizingScheme;
     self.style = nil;
     _mbglMap->getStyle().loadURL([[styleURL absoluteString] UTF8String]);
@@ -402,6 +401,7 @@ public:
 
 - (void)commonInit
 {
+    MGLLogInfo(@"Initializing.");
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
     _opaque = NO;
 
@@ -600,6 +600,9 @@ public:
         [MGLMapboxEvents pushTurnstileEvent];
         [MGLMapboxEvents pushEvent:MMEEventTypeMapLoad withAttributes:@{}];
     }
+
+    MGLLogInfo(@"Initialization completed.");
+
 }
 
 - (mbgl::Size)size
