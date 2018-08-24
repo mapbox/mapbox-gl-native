@@ -68,7 +68,7 @@ public class PolylineActivity extends AppCompatActivity {
 
       mapboxMap.setOnPolylineClickListener(polyline -> Toast.makeText(
         PolylineActivity.this,
-        "You clicked on polygon with id = " + polyline.getId(),
+        "You clicked on polyline with id = " + polyline.getId(),
         Toast.LENGTH_SHORT
       ).show());
 
