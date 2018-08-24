@@ -285,6 +285,18 @@ step-library:
       store_artifacts:
         path: build/logs
 
+
+  - &notify-slack-nightly-failure
+      run:
+        name: Send a Slack notification on nightly failure
+        when: on_fail
+        command: |
+          if [[ -z $CIRCLE_COMPARE_URL && $CIRCLE_BRANCH == master ]]; then
+            export SLACK_MESSAGE="Nightly build of \`$CIRCLE_JOB\` <$CIRCLE_BUILD_URL|failed>."
+            export SLACK_COLOR="danger"
+            scripts/notify-slack.sh
+          fi
+
 jobs:
   nitpick:
     docker:
@@ -851,6 +863,7 @@ jobs:
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
+      SLACK_CHANNEL: C0ACM9Q2C
     steps:
       - checkout
       - *restore-node_modules-cache
@@ -870,6 +883,7 @@ jobs:
       - *save-ccache
       - *collect-xcode-build-logs
       - *upload-xcode-build-logs
+      - *notify-slack-nightly-failure
 
 # ------------------------------------------------------------------------------
   ios-sanitize-address:
@@ -878,6 +892,7 @@ jobs:
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
+      SLACK_CHANNEL: C0ACM9Q2C
     steps:
       - checkout
       - *restore-node_modules-cache
@@ -897,6 +912,7 @@ jobs:
       - *save-ccache
       - *collect-xcode-build-logs
       - *upload-xcode-build-logs
+      - *notify-slack-nightly-failure
 
 # ------------------------------------------------------------------------------
   ios-static-analyzer:
@@ -905,6 +921,7 @@ jobs:
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
+      SLACK_CHANNEL: C0ACM9Q2C
     steps:
       - checkout
       - *restore-node_modules-cache
@@ -924,6 +941,7 @@ jobs:
       - *save-ccache
       - *collect-xcode-build-logs
       - *upload-xcode-build-logs
+      - *notify-slack-nightly-failure
 
 # ------------------------------------------------------------------------------
   ios-release:
@@ -932,6 +950,7 @@ jobs:
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
+      SLACK_CHANNEL: C0ACM9Q2C
     steps:
       - checkout
       - *restore-node_modules-cache
@@ -961,6 +980,7 @@ jobs:
       - *save-ccache
       - *collect-xcode-build-logs
       - *upload-xcode-build-logs
+      - *notify-slack-nightly-failure
 
 # ------------------------------------------------------------------------------
   ios-release-tag:
@@ -969,7 +989,13 @@ jobs:
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
+      SLACK_CHANNEL: C0ACM9Q2C
     steps:
+      - run:
+          name: Send a Slack notification on start
+          command: |
+            export SLACK_MESSAGE="Release build for <$CIRCLE_COMPARE_URL|\`$CIRCLE_TAG\`> <$CIRCLE_BUILD_URL|started>."
+            scripts/notify-slack.sh
       - checkout
       - *restore-node_modules-cache
       - *npm-install
@@ -992,6 +1018,20 @@ jobs:
       - *save-ccache
       - *collect-xcode-build-logs
       - *upload-xcode-build-logs
+      - run:
+          name: Send a Slack notification on failure
+          when: on_fail
+          command: |
+            export SLACK_MESSAGE="Release build for <$CIRCLE_COMPARE_URL|\`$CIRCLE_TAG\`> <$CIRCLE_BUILD_URL|failed>."
+            export SLACK_COLOR="danger"
+            scripts/notify-slack.sh
+      - run:
+          name: Send a Slack notification on success
+          when: on_success
+          command: |
+            export SLACK_MESSAGE="Release build for <$CIRCLE_COMPARE_URL|\`$CIRCLE_TAG\`> <$CIRCLE_BUILD_URL|succeeded>."
+            export SLACK_COLOR="good"
+            scripts/notify-slack.sh
 
 # ------------------------------------------------------------------------------
   macos-debug:
