@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.offline;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Keep;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
@@ -21,10 +22,15 @@ import com.mapbox.turf.TurfMeasurement;
  */
 public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition, Parcelable {
 
+  @Keep
   private String styleURL;
+  @Keep
   private Geometry geometry;
+  @Keep
   private double minZoom;
+  @Keep
   private double maxZoom;
+  @Keep
   private float pixelRatio;
 
   /**
@@ -36,6 +42,7 @@ public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition,
    * @param maxZoom    max zoom
    * @param pixelRatio pixel ratio of the device
    */
+  @Keep
   public OfflineGeometryRegionDefinition(
     String styleURL, Geometry geometry, double minZoom, double maxZoom, float pixelRatio) {
     // Note: Also used in JNI
