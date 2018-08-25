@@ -4,7 +4,9 @@ import android.app.Application;
 import android.os.StrictMode;
 import android.text.TextUtils;
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.maps.Telemetry;
+import com.mapbox.mapboxsdk.log.Logger;
+import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
+import com.mapbox.mapboxsdk.testapp.utils.TimberLogger;
 import com.mapbox.mapboxsdk.testapp.utils.TokenUtils;
 import com.squareup.leakcanary.LeakCanary;
 import timber.log.Timber;
@@ -47,6 +49,7 @@ public class MapboxApplication extends Application {
   }
 
   private void initializeLogger() {
+    Logger.setLoggerDefinition(new TimberLogger());
     if (BuildConfig.DEBUG) {
       Timber.plant(new DebugTree());
     }
@@ -70,7 +73,11 @@ public class MapboxApplication extends Application {
     String accessToken = TokenUtils.getMapboxAccessToken(getApplicationContext());
     validateAccessToken(accessToken);
     Mapbox.getInstance(getApplicationContext(), accessToken);
-    Telemetry.updateDebugLoggingEnabled(true);
+    TelemetryDefinition telemetry = Mapbox.getTelemetry();
+    if (telemetry == null) {
+      throw new IllegalStateException("Telemetry was unavailable during test application start.");
+    }
+    telemetry.setDebugLoggingEnabled(true);
   }
 
   private static void validateAccessToken(String accessToken) {

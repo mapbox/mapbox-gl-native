@@ -3,18 +3,18 @@ package com.mapbox.mapboxsdk.style.layers;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import com.google.gson.JsonArray;
 import com.mapbox.mapboxsdk.exceptions.ConversionException;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
-
-import timber.log.Timber;
 
 /**
  * Properties for Layer
  */
 public class PropertyValue<T> {
+
+  private static final String TAG = "Mbgl-PropertyValue";
 
   public final String name;
   public final T value;
@@ -59,7 +59,7 @@ public class PropertyValue<T> {
     if (isExpression()) {
       return Expression.Converter.convert((JsonArray) value);
     } else {
-      Timber.w("not a expression, try value");
+      Logger.w(TAG, "not a expression, try value");
       return null;
     }
   }
@@ -84,7 +84,7 @@ public class PropertyValue<T> {
       // noinspection unchecked
       return value;
     } else {
-      Timber.w("not a value, try function");
+      Logger.w(TAG, "not a value, try function");
       return null;
     }
   }
@@ -98,14 +98,14 @@ public class PropertyValue<T> {
   @Nullable
   public Integer getColorInt() {
     if (!isValue() || !(value instanceof String)) {
-      Timber.e("%s is not a String value and can not be converted to a color it", name);
+      Logger.e(TAG, String.format("%s is not a String value and can not be converted to a color it", name));
       return null;
     }
 
     try {
       return ColorUtils.rgbaToColor((String) value);
     } catch (ConversionException ex) {
-      Timber.e("%s could not be converted to a Color int: %s", name, ex.getMessage());
+      Logger.e(TAG, String.format("%s could not be converted to a Color int: %s", name, ex.getMessage()));
       return null;
     }
   }

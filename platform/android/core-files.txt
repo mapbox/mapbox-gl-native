@@ -204,6 +204,10 @@ platform/android/src/snapshotter/map_snapshotter.hpp
 platform/android/src/snapshotter/map_snapshot.cpp
 platform/android/src/snapshotter/map_snapshot.hpp
 
+# Logger
+platform/android/src/logger.cpp
+platform/android/src/logger.hpp
+
 # Main jni bindings
 platform/android/src/attach_env.cpp
 platform/android/src/attach_env.hpp
