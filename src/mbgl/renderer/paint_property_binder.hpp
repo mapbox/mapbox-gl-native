@@ -434,7 +434,7 @@ private:
     };
 
     template <class P>
-    using Property = Detail<typename P::Type, typename P::Uniform::Type, typename P::PossiblyEvaluatedType, typename P::Attributes>;
+    using Property = Detail<typename P::Type, typename P::Uniform::Value, typename P::PossiblyEvaluatedType, typename P::Attributes>;
 
 public:
     template <class P>

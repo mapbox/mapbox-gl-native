@@ -35,16 +35,13 @@ ActiveUniforms activeUniforms(ProgramID);
 template <class Tag, class T>
 class Uniform {
 public:
-    // TODO should maybe remove this altogether bc it is now redundant?
     using Value = T;
-
-    using Type = T;
 
     class State {
     public:
         State(UniformLocation location_) : location(std::move(location_)) {}
 
-        void operator=(const Type& value) {
+        void operator=(const Value& value) {
             if (location >= 0 && (!current || *current != value)) {
                 current = value;
                 bindUniform(location, value);
@@ -93,7 +90,7 @@ public:
             { // Some shader programs have uniforms declared, but not used, so they're not active.
               // Therefore, we'll only verify them when they are indeed active.
               (active.find(Us::name()) != active.end()
-                   ? verifyUniform<typename Us::Type>(active.at(Us::name()))
+                   ? verifyUniform<typename Us::Value>(active.at(Us::name()))
                    : false)... });
 #endif
 
