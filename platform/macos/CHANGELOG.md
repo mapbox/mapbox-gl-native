@@ -21,6 +21,7 @@
 * The `-[MGLMapView annotationAtPoint:]` method can now return annotations near tile boundaries at high zoom levels. ([#12570](https://github.com/mapbox/mapbox-gl-native/pull/12570))
 * Added an `-[MGLMapViewDelegate mapView:shapeAnnotationIsEnabled:]` method to specify whether an annotation is selectable. ([#12352](https://github.com/mapbox/mapbox-gl-native/pull/12352))
 * Fixed inconsistencies in exception naming. ([#12583](https://github.com/mapbox/mapbox-gl-native/issues/12583))
+* Fixed an issue where `-[MGLMapView convertCoordinateBounds:toRectToView:]` would return an empty CGRect if the bounds crossed the antimeridian. ([#12758](https://github.com/mapbox/mapbox-gl-native/pull/12758))
 
 # 0.10.0 - August 15, 2018
 

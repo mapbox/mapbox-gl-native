@@ -12,6 +12,7 @@
 		071BBB031EE76146001FB02A /* MGLImageSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071BBB041EE76147001FB02A /* MGLImageSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071BBB071EE77631001FB02A /* MGLImageSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 071BBB051EE7761A001FB02A /* MGLImageSourceTests.m */; };
+		076171C32139C70900668A35 /* MGLMapViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 076171C22139C70900668A35 /* MGLMapViewTests.m */; };
 		0778DD431F67556700A73B34 /* MGLComputedShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 0778DD401F67555F00A73B34 /* MGLComputedShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0778DD441F67556C00A73B34 /* MGLComputedShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0778DD411F67555F00A73B34 /* MGLComputedShapeSource.mm */; };
 		07D8C6FB1F67560100381808 /* MGLComputedShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0778DD411F67555F00A73B34 /* MGLComputedShapeSource.mm */; };
@@ -752,6 +753,7 @@
 		071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLImageSource.h; sourceTree = "<group>"; };
 		071BBAFD1EE75CD4001FB02A /* MGLImageSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLImageSource.mm; sourceTree = "<group>"; };
 		071BBB051EE7761A001FB02A /* MGLImageSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLImageSourceTests.m; path = ../../darwin/test/MGLImageSourceTests.m; sourceTree = "<group>"; };
+		076171C22139C70900668A35 /* MGLMapViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLMapViewTests.m; path = ../../darwin/test/MGLMapViewTests.m; sourceTree = "<group>"; };
 		0778DD401F67555F00A73B34 /* MGLComputedShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLComputedShapeSource.h; sourceTree = "<group>"; };
 		0778DD411F67555F00A73B34 /* MGLComputedShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLComputedShapeSource.mm; sourceTree = "<group>"; };
 		07D8C6FD1F67562800381808 /* MGLComputedShapeSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLComputedShapeSourceTests.m; path = ../../darwin/test/MGLComputedShapeSourceTests.m; sourceTree = "<group>"; };
@@ -1881,6 +1883,7 @@
 				DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */,
 				DA2E885C1CC0382C00F24E7B /* MGLGeometryTests.mm */,
 				DA5DB1291FABF1EE001C2326 /* MGLMapAccessibilityElementTests.m */,
+				076171C22139C70900668A35 /* MGLMapViewTests.m */,
 				16376B481FFEED010000563E /* MGLMapViewLayoutTests.m */,
 				9658C154204761FC00D8A674 /* MGLMapViewScaleBarTests.m */,
 				35E208A61D24210F00EC9A46 /* MGLNSDataAdditionsTests.m */,
@@ -2917,6 +2920,7 @@
 				357579801D501E09000B822E /* MGLFillStyleLayerTests.mm in Sources */,
 				35D9DDE21DA25EEC00DAAD69 /* MGLCodingTests.m in Sources */,
 				DA1F8F3D1EBD287B00367E42 /* MGLDocumentationGuideTests.swift in Sources */,
+				076171C32139C70900668A35 /* MGLMapViewTests.m in Sources */,
 				3598544D1E1D38AA00B29F84 /* MGLDistanceFormatterTests.m in Sources */,
 				071BBB071EE77631001FB02A /* MGLImageSourceTests.m in Sources */,
 				DA2DBBCE1D51E80400D38FF9 /* MGLStyleLayerTests.m in Sources */,
