@@ -93,9 +93,6 @@ private:
     optional<std::vector<Immutable<style::Layer::Impl>>> layers;
     optional<std::unique_ptr<const GeometryTileData>> data;
 
-    bool symbolLayoutsNeedPreparation = false;
-    bool patternNeedsLayout = false;
-
     std::vector<std::unique_ptr<SymbolLayout>> symbolLayouts;
 
     using LinePatternLayout = PatternLayout<LineBucket>;
