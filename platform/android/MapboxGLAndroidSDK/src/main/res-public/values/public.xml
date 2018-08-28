@@ -107,4 +107,45 @@
 
     <!-- Exposed colors -->
     <public name="mapbox_blue" type="color" />
+
+    <public name="mapbox_LocationLayer" type="style"/>
+
+    <public name="mapbox_foregroundDrawable" format="reference" type="attr"/>
+    <public name="mapbox_foregroundTintColor" format="color" type="attr"/>
+    <public name="mapbox_backgroundDrawable" format="reference" type="attr"/>
+    <public name="mapbox_backgroundTintColor" format="color" type="attr"/>
+    <public name="mapbox_bearingDrawable" format="reference" type="attr"/>
+    <public name="mapbox_bearingTintColor" format="color" type="attr"/>
+    <public name="mapbox_navigationDrawable" format="reference" type="attr"/>
+
+    <public name="mapbox_foregroundDrawableStale" format="reference" type="attr"/>
+    <public name="mapbox_foregroundStaleTintColor" format="color" type="attr"/>
+    <public name="mapbox_backgroundDrawableStale" format="reference" type="attr"/>
+    <public name="mapbox_backgroundStaleTintColor" format="color" type="attr"/>
+
+    <public name="mapbox_accuracyAlpha" format="float" type="attr"/>
+    <public name="mapbox_accuracyColor" format="color" type="attr"/>
+
+    <public name="mapbox_elevation" format="dimension" type="attr"/>
+
+    <public name="mapbox_enableStaleState" format="boolean" type="attr"/>
+    <public name="mapbox_staleStateTimeout" format="integer" min="0" type="attr"/>
+
+    <!-- Location icon padding -->
+    <public name="mapbox_iconPaddingLeft" format="integer" type="attr"/>
+    <public name="mapbox_iconPaddingTop" format="integer" type="attr"/>
+    <public name="mapbox_iconPaddingRight" format="integer" type="attr"/>
+    <public name="mapbox_iconPaddingBottom" format="integer" type="attr"/>
+
+    <!-- Map zoom levels -->
+    <public name="mapbox_maxZoom" format="float" type="attr"/>
+    <public name="mapbox_minZoom" format="float" type="attr"/>
+
+    <!-- Icon scale based on map zoom levels -->
+    <public name="mapbox_maxZoomIconScale" format="float" type="attr"/>
+    <public name="mapbox_minZoomIconScale" format="float" type="attr"/>
+
+    <!-- Camera tracking settings -->
+    <public name="mapbox_trackingInitialMoveThreshold" format="float" type="attr"/>
+    <public name="mapbox_trackingMultiFingerMoveThreshold" format="float" type="attr"/>
 </resources>
