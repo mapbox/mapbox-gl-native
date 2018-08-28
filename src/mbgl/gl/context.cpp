@@ -127,7 +127,11 @@ void Context::initializeExtensions(const std::function<gl::ProcAddress(const cha
         const std::string renderer = reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_RENDERER)));
         Log::Info(Event::General, "GPU Identifier: %s", renderer.c_str());
 
-        debugging = std::make_unique<extension::Debugging>(fn);
+        // Block ANGLE on Direct3D since the debugging extension is causing crashes
+        if (!(renderer.find("ANGLE") != std::string::npos
+              && renderer.find("Direct3D") != std::string::npos)) {
+            debugging = std::make_unique<extension::Debugging>(fn);
+        }
 
         // Block Adreno 2xx, 3xx as it crashes on glBuffer(Sub)Data
         // Block ARM Mali-T720 (in some MT8163 chipsets) as it crashes on glBindVertexArray
