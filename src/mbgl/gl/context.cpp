@@ -124,10 +124,24 @@ void Context::initializeExtensions(const std::function<gl::ProcAddress(const cha
             return nullptr;
         };
 
+        const std::string renderer = reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_RENDERER)));
+        Log::Info(Event::General, "GPU Identifier: %s", renderer.c_str());
+
         debugging = std::make_unique<extension::Debugging>(fn);
-        if (!disableVAOExtension) {
-            vertexArray = std::make_unique<extension::VertexArray>(fn);
+
+        // Block Adreno 2xx, 3xx as it crashes on glBuffer(Sub)Data
+        // Block ARM Mali-T720 (in some MT8163 chipsets) as it crashes on glBindVertexArray
+        // Block ANGLE on Direct3D as the combination of Qt + Windows + ANGLE leads to crashes
+        if (renderer.find("Adreno (TM) 2") == std::string::npos
+            && renderer.find("Adreno (TM) 3") == std::string::npos
+            && (!(renderer.find("ANGLE") != std::string::npos
+                  && renderer.find("Direct3D") != std::string::npos))
+            && renderer.find("Mali-T720") == std::string::npos
+            && renderer.find("Sapphire 650") == std::string::npos
+            && !disableVAOExtension) {
+                vertexArray = std::make_unique<extension::VertexArray>(fn);
         }
+
 #if MBGL_HAS_BINARY_PROGRAMS
         programBinary = std::make_unique<extension::ProgramBinary>(fn);
 #endif
@@ -286,22 +300,7 @@ UniqueTexture Context::createTexture() {
 }
 
 bool Context::supportsVertexArrays() const {
-    static bool blacklisted = []() {
-        const std::string renderer = reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_RENDERER)));
-
-        Log::Info(Event::General, "GPU Identifier: %s", renderer.c_str());
-
-        // Blacklist Adreno 2xx, 3xx as it crashes on glBuffer(Sub)Data
-        // Blacklist ARM Mali-T720 (in some MT8163 chipsets) as it crashes on glBindVertexArray
-        return renderer.find("Adreno (TM) 2") != std::string::npos
-            || renderer.find("Adreno (TM) 3") != std::string::npos
-            || renderer.find("Mali-T720") != std::string::npos
-            || renderer.find("Sapphire 650") != std::string::npos;
-
-    }();
-
-    return !blacklisted &&
-           vertexArray &&
+    return vertexArray &&
            vertexArray->genVertexArrays &&
            vertexArray->bindVertexArray &&
            vertexArray->deleteVertexArrays;
