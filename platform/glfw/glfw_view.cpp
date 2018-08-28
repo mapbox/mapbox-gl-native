@@ -54,13 +54,19 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
         height = videoMode->height;
     }
 
+#if __APPLE__
     glfwWindowHint(GLFW_COCOA_GRAPHICS_SWITCHING, GL_TRUE);
+#endif
+
+#if MBGL_WITH_EGL
+    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
+#endif
 
 #ifdef DEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
 
-#ifdef GL_ES_VERSION_2_0
+#if MBGL_USE_GLES2
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -652,7 +658,7 @@ void GLFWView::toggle3DExtrusions(bool visible) {
 namespace mbgl {
 namespace platform {
 
-#ifndef GL_ES_VERSION_2_0
+#ifndef MBGL_USE_GLES2
 void showDebugImage(std::string name, const char *data, size_t width, size_t height) {
     glfwInit();
 
