@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0721493F1EE200E900085505 /* MGLImageSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 07A019EB1ED662D800ACD43E /* MGLImageSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		076171C5213A0DC200668A35 /* MGLMapViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 076171C4213A0DC200668A35 /* MGLMapViewTests.m */; };
 		07A019EF1ED665CD00ACD43E /* MGLImageSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 07A019EC1ED662D800ACD43E /* MGLImageSource.mm */; };
 		07A240941F675674002C8210 /* MGLComputedShapeSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07A240921F67566F002C8210 /* MGLComputedShapeSourceTests.m */; };
 		07BA4CAC1EE21887004528F5 /* MGLImageSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BA4CAB1EE21887004528F5 /* MGLImageSourceTests.m */; };
@@ -298,6 +299,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		076171C4213A0DC200668A35 /* MGLMapViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLMapViewTests.m; path = ../../darwin/test/MGLMapViewTests.m; sourceTree = "<group>"; };
 		07A019EB1ED662D800ACD43E /* MGLImageSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLImageSource.h; sourceTree = "<group>"; };
 		07A019EC1ED662D800ACD43E /* MGLImageSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLImageSource.mm; sourceTree = "<group>"; };
 		07A240921F67566F002C8210 /* MGLComputedShapeSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLComputedShapeSourceTests.m; sourceTree = "<group>"; };
@@ -1108,6 +1110,7 @@
 				1F95931A1E6DE2B600D5B294 /* MGLNSDateAdditionsTests.mm */,
 				DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */,
 				DAE6C3C81CC34BD800DB3429 /* MGLGeometryTests.mm */,
+				076171C4213A0DC200668A35 /* MGLMapViewTests.m */,
 				DAE7DEC31E24549F007505A6 /* MGLNSStringAdditionsTests.m */,
 				DAE6C3C91CC34BD800DB3429 /* MGLOfflinePackTests.m */,
 				DAE6C3CA1CC34BD800DB3429 /* MGLOfflineRegionTests.m */,
@@ -1610,6 +1613,7 @@
 				DAE6C3D21CC34C9900DB3429 /* MGLGeometryTests.mm in Sources */,
 				DA87A9A41DCACC5000810D09 /* MGLSymbolStyleLayerTests.mm in Sources */,
 				40E1601D1DF217D6005EA6D9 /* MGLStyleLayerTests.m in Sources */,
+				076171C5213A0DC200668A35 /* MGLMapViewTests.m in Sources */,
 				170A82BF201BDD1B00943087 /* MGLHeatmapStyleLayerTests.mm in Sources */,
 				1F95931B1E6DE2B600D5B294 /* MGLNSDateAdditionsTests.mm in Sources */,
 				DAF25721201902C100367EF5 /* MGLHillshadeStyleLayerTests.mm in Sources */,
