@@ -1,22 +1,25 @@
 apply plugin: 'com.android.library'
 apply plugin: "com.jaredsburrows.license"
+apply plugin: 'kotlin-android'
 
 dependencies {
     lintChecks project(":MapboxGLAndroidSDKLint")
-    api (dependenciesList.mapboxAndroidTelemetry) {
+    api(dependenciesList.mapboxAndroidTelemetry) {
         exclude group: 'com.android.support', module: 'appcompat-v7'
     }
     api dependenciesList.mapboxJavaGeoJSON
-    api (dependenciesList.mapboxAndroidGestures) {
+    api(dependenciesList.mapboxAndroidGestures) {
         exclude group: 'com.android.support', module: 'appcompat-v7'
     }
     implementation dependenciesList.mapboxJavaTurf
+    implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportAnnotations
     implementation dependenciesList.supportFragmentV4
     implementation dependenciesList.okhttp3
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
     testImplementation dependenciesList.robolectric
+    testImplementation dependenciesList.kotlinLib
 }
 
 android {
@@ -24,6 +27,7 @@ android {
     buildToolsVersion androidVersions.buildToolsVersion
 
     defaultConfig {
+        vectorDrawables.useSupportLibrary = true
         minSdkVersion androidVersions.minSdkVersion
         targetSdkVersion androidVersions.targetSdkVersion
         buildConfigField "String", "GIT_REVISION_SHORT", String.format("\"%s\"", getGitRevision())
