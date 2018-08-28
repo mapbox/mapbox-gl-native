@@ -252,7 +252,7 @@ private:
     std::unique_ptr<AndroidRendererFrontend> rendererFrontend;
 
     JavaVM *vm = nullptr;
-    jni::Weak<jni::Object<NativeMapView>> javaPeer;
+    jni::WeakReference<jni::Object<NativeMapView>> javaPeer;
 
     MapRenderer& mapRenderer;
 

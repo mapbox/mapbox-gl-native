@@ -1,5 +1,6 @@
 #include "source.hpp"
 #include "../android_conversion.hpp"
+#include "../../attach_env.hpp"
 
 #include <jni/jni.hpp>
 

@@ -1,4 +1,5 @@
 #include "file_source.hpp"
+#include "attach_env.hpp"
 
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
@@ -6,7 +7,6 @@
 #include <mbgl/util/logging.hpp>
 
 #include "asset_manager_file_source.hpp"
-#include "jni/generic_global_ref_deleter.hpp"
 
 namespace mbgl {
 namespace android {
@@ -45,16 +45,17 @@ void FileSource::setAPIBaseUrl(jni::JNIEnv& env, jni::String url) {
 
 void FileSource::setResourceTransform(jni::JNIEnv& env, jni::Object<FileSource::ResourceTransformCallback> transformCallback) {
     if (transformCallback) {
+        auto global = transformCallback.NewGlobalRef<jni::EnvAttachingDeleter>(env);
         resourceTransform = std::make_unique<Actor<ResourceTransform>>(*Scheduler::GetCurrent(),
             // Capture the ResourceTransformCallback object as a managed global into
             // the lambda. It is released automatically when we're setting a new ResourceTransform in
             // a subsequent call.
             // Note: we're converting it to shared_ptr because this lambda is converted to a std::function,
             // which requires copyability of its captured variables.
-            [callback = std::shared_ptr<jni::jobject>(transformCallback.NewGlobalRef(env).release().Get(), GenericGlobalRefDeleter())]
+            [callback = std::make_shared<decltype(global)>(std::move(global))]
             (mbgl::Resource::Kind kind, const std::string&& url_) {
                 android::UniqueEnv _env = android::AttachEnv();
-                return FileSource::ResourceTransformCallback::onURL(*_env, jni::Object<FileSource::ResourceTransformCallback>(*callback), int(kind), url_);
+                return FileSource::ResourceTransformCallback::onURL(*_env, **callback, int(kind), url_);
             });
         fileSource->setResourceTransform(resourceTransform->self());
     } else {

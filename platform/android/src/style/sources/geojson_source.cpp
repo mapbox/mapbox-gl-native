@@ -1,4 +1,5 @@
 #include "geojson_source.hpp"
+#include "../../attach_env.hpp"
 
 #include <mbgl/renderer/query.hpp>
 
@@ -113,11 +114,11 @@ namespace android {
 
     template <class JNIType>
     void GeoJSONSource::setCollectionAsync(jni::JNIEnv& env, jni::Object<JNIType> jObject) {
-
-        std::shared_ptr<jni::jobject> object = std::shared_ptr<jni::jobject>(jObject.NewGlobalRef(env).release().Get(), GenericGlobalRefDeleter());
+        auto global = jObject.template NewGlobalRef<jni::EnvAttachingDeleter>(env);
+        auto object = std::make_shared<decltype(global)>(std::move(global));
 
         Update::Converter converterFn = [this, object](ActorRef<Callback> _callback) {
-            converter->self().invoke(&FeatureConverter::convertObject<JNIType>, jni::Object<JNIType>(*object), _callback);
+            converter->self().invoke(&FeatureConverter::convertObject<JNIType>, **object, _callback);
         };
 
         setAsync(converterFn);

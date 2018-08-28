@@ -7,7 +7,6 @@
 #include "offline_region_error.hpp"
 #include "offline_region_status.hpp"
 #include "../attach_env.hpp"
-#include "../jni/generic_global_ref_deleter.hpp"
 
 namespace mbgl {
 namespace android {
@@ -93,55 +92,56 @@ void OfflineRegion::setOfflineRegionDownloadState(jni::JNIEnv&, jni::jint jState
 }
 
 void OfflineRegion::getOfflineRegionStatus(jni::JNIEnv& env_, jni::Object<OfflineRegionStatusCallback> callback_) {
+    auto globalCallback = callback_.NewGlobalRef<jni::EnvAttachingDeleter>(env_);
 
     fileSource.getOfflineRegionStatus(*region, [
         //Ensure the object is not gc'd in the meanwhile
-        callback = std::shared_ptr<jni::jobject>(callback_.NewGlobalRef(env_).release().Get(), GenericGlobalRefDeleter())
+        callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))
     ](mbgl::expected<mbgl::OfflineRegionStatus, std::exception_ptr> status) mutable {
         // Reattach, the callback comes from a different thread
         android::UniqueEnv env = android::AttachEnv();
 
         if (status) {
-            OfflineRegionStatusCallback::onStatus(*env, jni::Object<OfflineRegionStatusCallback>(*callback), std::move(*status));
+            OfflineRegionStatusCallback::onStatus(*env, **callback, std::move(*status));
         } else {
-            OfflineRegionStatusCallback::onError(*env, jni::Object<OfflineRegionStatusCallback>(*callback), status.error());
+            OfflineRegionStatusCallback::onError(*env, **callback, status.error());
         }
     });
 }
 
 void OfflineRegion::deleteOfflineRegion(jni::JNIEnv& env_, jni::Object<OfflineRegionDeleteCallback> callback_) {
-    // Delete
+    auto globalCallback = callback_.NewGlobalRef<jni::EnvAttachingDeleter>(env_);
+
     fileSource.deleteOfflineRegion(std::move(*region), [
         //Ensure the object is not gc'd in the meanwhile
-        callback = std::shared_ptr<jni::jobject>(callback_.NewGlobalRef(env_).release().Get(), GenericGlobalRefDeleter())
+        callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))
     ](std::exception_ptr error) mutable {
         // Reattach, the callback comes from a different thread
         android::UniqueEnv env = android::AttachEnv();
 
         if (error) {
-            OfflineRegionDeleteCallback::onError(*env, jni::Object<OfflineRegionDeleteCallback>(*callback), error);
+            OfflineRegionDeleteCallback::onError(*env, **callback, error);
         } else {
-            OfflineRegionDeleteCallback::onDelete(*env, jni::Object<OfflineRegionDeleteCallback>(*callback));
+            OfflineRegionDeleteCallback::onDelete(*env, **callback);
         }
     });
 }
 
 void OfflineRegion::updateOfflineRegionMetadata(jni::JNIEnv& env_, jni::Array<jni::jbyte> jMetadata, jni::Object<OfflineRegionUpdateMetadataCallback> callback_) {
-
-    // Convert
     auto metadata = OfflineRegion::metadata(env_, jMetadata);
+    auto globalCallback = callback_.NewGlobalRef<jni::EnvAttachingDeleter>(env_);
 
     fileSource.updateOfflineMetadata(region->getID(), metadata, [
         //Ensure the object is not gc'd in the meanwhile
-        callback = std::shared_ptr<jni::jobject>(callback_.NewGlobalRef(env_).release().Get(), GenericGlobalRefDeleter())
+        callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback))
     ](mbgl::expected<mbgl::OfflineRegionMetadata, std::exception_ptr> data) mutable {
         // Reattach, the callback comes from a different thread
         android::UniqueEnv env = android::AttachEnv();
 
         if (data) {
-            OfflineRegionUpdateMetadataCallback::onUpdate(*env, jni::Object<OfflineRegionUpdateMetadataCallback>(*callback), std::move(*data));
+            OfflineRegionUpdateMetadataCallback::onUpdate(*env, **callback, std::move(*data));
         } else {
-            OfflineRegionUpdateMetadataCallback::onError(*env, jni::Object<OfflineRegionUpdateMetadataCallback>(*callback), data.error());
+            OfflineRegionUpdateMetadataCallback::onError(*env, **callback, data.error());
         }
     });
 }

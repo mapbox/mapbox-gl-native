@@ -1,4 +1,5 @@
 #include "custom_geometry_source.hpp"
+#include "../../attach_env.hpp"
 
 #include <mbgl/renderer/query.hpp>
 

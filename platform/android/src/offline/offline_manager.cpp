@@ -3,7 +3,6 @@
 #include <mbgl/util/string.hpp>
 
 #include "../attach_env.hpp"
-#include "../jni/generic_global_ref_deleter.hpp"
 
 namespace mbgl {
 namespace android {
@@ -21,11 +20,13 @@ void OfflineManager::setOfflineMapboxTileCountLimit(jni::JNIEnv&, jni::jlong lim
 }
 
 void OfflineManager::listOfflineRegions(jni::JNIEnv& env_, jni::Object<FileSource> jFileSource_, jni::Object<ListOfflineRegionsCallback> callback_) {
-    // list regions
+    auto globalCallback = callback_.NewGlobalRef<jni::EnvAttachingDeleter>(env_);
+    auto globalFilesource = jFileSource_.NewGlobalRef<jni::EnvAttachingDeleter>(env_);
+
     fileSource.listOfflineRegions([
         //Keep a shared ptr to a global reference of the callback and file source so they are not GC'd in the meanwhile
-        callback = std::shared_ptr<jni::jobject>(callback_.NewGlobalRef(env_).release().Get(), GenericGlobalRefDeleter()),
-        jFileSource = std::shared_ptr<jni::jobject>(jFileSource_.NewGlobalRef(env_).release().Get(), GenericGlobalRefDeleter())
+        callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback)),
+        jFileSource = std::make_shared<decltype(globalFilesource)>(std::move(globalFilesource))
     ](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> regions) mutable {
 
         // Reattach, the callback comes from a different thread
@@ -33,11 +34,10 @@ void OfflineManager::listOfflineRegions(jni::JNIEnv& env_, jni::Object<FileSourc
 
         if (regions) {
             OfflineManager::ListOfflineRegionsCallback::onList(
-                *env, jni::Object<FileSource>(*jFileSource),
-                jni::Object<ListOfflineRegionsCallback>(*callback), std::move(*regions));
+                *env, **jFileSource, **callback, std::move(*regions));
         } else {
             OfflineManager::ListOfflineRegionsCallback::onError(
-                *env, jni::Object<ListOfflineRegionsCallback>(*callback), regions.error());
+                *env, **callback, regions.error());
         }
     });
 }
@@ -55,11 +55,14 @@ void OfflineManager::createOfflineRegion(jni::JNIEnv& env_,
         metadata = OfflineRegion::metadata(env_, metadata_);
     }
 
+    auto globalCallback = callback_.NewGlobalRef<jni::EnvAttachingDeleter>(env_);
+    auto globalFilesource = jFileSource_.NewGlobalRef<jni::EnvAttachingDeleter>(env_);
+
     // Create region
     fileSource.createOfflineRegion(definition, metadata, [
         //Keep a shared ptr to a global reference of the callback and file source so they are not GC'd in the meanwhile
-        callback = std::shared_ptr<jni::jobject>(callback_.NewGlobalRef(env_).release().Get(), GenericGlobalRefDeleter()),
-        jFileSource = std::shared_ptr<jni::jobject>(jFileSource_.NewGlobalRef(env_).release().Get(), GenericGlobalRefDeleter())
+        callback = std::make_shared<decltype(globalCallback)>(std::move(globalCallback)),
+        jFileSource = std::make_shared<decltype(globalFilesource)>(std::move(globalFilesource))
     ](mbgl::expected<mbgl::OfflineRegion, std::exception_ptr> region) mutable {
 
         // Reattach, the callback comes from a different thread
@@ -67,12 +70,11 @@ void OfflineManager::createOfflineRegion(jni::JNIEnv& env_,
 
         if (region) {
             OfflineManager::CreateOfflineRegionCallback::onCreate(
-                *env,
-                jni::Object<FileSource>(*jFileSource),
-                jni::Object<CreateOfflineRegionCallback>(*callback), std::move(*region)
+                *env, **jFileSource, **callback, std::move(*region)
             );
         } else {
-            OfflineManager::CreateOfflineRegionCallback::onError(*env, jni::Object<CreateOfflineRegionCallback>(*callback), region.error());
+            OfflineManager::CreateOfflineRegionCallback::onError(
+                *env, **callback, region.error());
         }
     });
 }
