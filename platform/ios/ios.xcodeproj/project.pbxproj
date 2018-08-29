@@ -992,7 +992,7 @@
 		927FBCFA1F4DAA8300F8BF1F /* MBXSnapshotsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXSnapshotsViewController.h; sourceTree = "<group>"; };
 		927FBCFB1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXSnapshotsViewController.m; sourceTree = "<group>"; };
 		927FBCFD1F4DB05500F8BF1F /* MGLMapSnapshotter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapSnapshotter.h; sourceTree = "<group>"; };
-		927FBCFE1F4DB05500F8BF1F /* MGLMapSnapshotter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLMapSnapshotter.mm; sourceTree = "<group>"; };
+		927FBCFE1F4DB05500F8BF1F /* MGLMapSnapshotter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLMapSnapshotter.mm; sourceTree = "<group>"; wrapsLines = 0; };
 		92F2C3EC1F0E3C3A00268EC0 /* MGLRendererFrontend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLRendererFrontend.h; sourceTree = "<group>"; };
 		92FC0AE7207CEE16007B6B54 /* MGLShapeOfflineRegion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLShapeOfflineRegion.h; sourceTree = "<group>"; };
 		92FC0AE8207CEE16007B6B54 /* MGLShapeOfflineRegion_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLShapeOfflineRegion_Private.h; sourceTree = "<group>"; };

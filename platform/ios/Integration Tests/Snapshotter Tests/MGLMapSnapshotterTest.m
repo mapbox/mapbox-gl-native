@@ -1,5 +1,10 @@
 #import "MGLMapViewIntegrationTest.h"
 
+@interface MGLMapSnapshotter ()
+@property (nonatomic) BOOL cancelled;
+@end
+
+
 @interface MGLMapSnapshotterTest : MGLMapViewIntegrationTest
 @end
 
@@ -79,7 +84,8 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
 
         dispatch_async(dispatch_get_main_queue(), ^{
             MGLMapSnapshotter *snapshotter = snapshotterWithCoordinates(coord, size);
-
+            __weak MGLMapSnapshotter *weakSnapshotter = snapshotter;
+            
             [snapshotter startWithCompletionHandler:^(MGLMapSnapshot * _Nullable snapshot, NSError * _Nullable error) {
                 // We expect this completion block to be called with an error
                 __typeof__(self) strongself = weakself;
@@ -88,6 +94,8 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
                 MGLTestAssert(strongself,
                               ([error.domain isEqualToString:MGLErrorDomain] && error.code == MGLErrorCodeSnapshotFailed),
                               @"Should have errored");
+                MGLTestAssertNil(strongself, weakSnapshotter, @"Snapshotter should have been deallocated");
+
                 dispatch_group_leave(dg);
             }];
         });
@@ -170,8 +178,9 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
 
         MGLTestAssertNil(strongself, snapshot);
         MGLTestAssert(strongself,
-                      ([error.domain isEqualToString:MGLErrorDomain] && error.code == MGLErrorCodeSnapshotUserCancelled),
+                      ([error.domain isEqualToString:MGLErrorDomain] && error.code == MGLErrorCodeSnapshotFailed),
                       @"Should have been cancelled");
+        MGLTestAssert(strongself, snapshotter.cancelled, @"Should have been cancelled");
         [expectation fulfill];
     }];
 

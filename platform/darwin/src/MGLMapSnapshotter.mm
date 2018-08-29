@@ -109,7 +109,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 @end
 
 @interface MGLMapSnapshotter()
-@property (nonatomic) BOOL loading;
+@property (nonatomic) BOOL cancelled;
 @property (nonatomic) dispatch_queue_t resultQueue;
 @property (nonatomic, copy) MGLMapSnapshotCompletionHandler completion;
 + (void)completeWithErrorCode:(MGLErrorCode)errorCode description:(nonnull NSString*)description onQueue:(dispatch_queue_t)queue completion:(MGLMapSnapshotCompletionHandler)completion;
@@ -122,8 +122,8 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 }
 
 - (void)dealloc {
-    if (_snapshotCallback) {
-        NSAssert(_loading, @"Snapshot in progress - `loading` should = YES");
+    if (_completion) {
+        NSAssert(_snapshotCallback, @"Snapshot in progress - there should be a valid callback");
 
         [MGLMapSnapshotter completeWithErrorCode:MGLErrorCodeSnapshotFailed
                                      description:@"MGLMapSnapshotter deallocated prior to snapshot completion."
@@ -137,8 +137,6 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     self = [super init];
     if (self) {
         [self setOptions:options];
-        _loading = false;
-
     }
     return self;
 }
@@ -155,15 +153,15 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
                     format:@"startWithQueue:completionHandler: must be called from a thread with an active run loop."];
     }
 
-    if ([self isLoading]) {
+    if (self.completion) {
+        // Consider replacing this exception with an error passed to the completion block.
         [NSException raise:NSInternalInconsistencyException
                     format:@"Already started this snapshotter."];
     }
     
-    self.loading = true;
-
     self.completion = completion;
     self.resultQueue = queue;
+    self.cancelled = NO;
 
     __weak __typeof__(self) weakSelf = self;
     // mbgl::Scheduler::GetCurrent() scheduler means "run callback on current (ie UI/main) thread"
@@ -176,8 +174,6 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
         __typeof__(self) strongSelf = weakSelf;
         // If self had died, _snapshotCallback would have been destroyed and this block would not be executed
         NSCAssert(strongSelf, @"Snapshot callback executed after being destroyed.");
-
-        strongSelf.loading = false;
 
         if (!strongSelf.completion)
             return;
@@ -504,8 +500,10 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (void)cancel
 {
+    self.cancelled = YES;
+    
     if (_snapshotCallback) {
-        [MGLMapSnapshotter completeWithErrorCode:MGLErrorCodeSnapshotUserCancelled
+        [MGLMapSnapshotter completeWithErrorCode:MGLErrorCodeSnapshotFailed
                                      description:[NSString stringWithFormat:@"MGLMapSnapshotter cancelled from %s", __PRETTY_FUNCTION__]
                                          onQueue:self.resultQueue
                                       completion:self.completion];
