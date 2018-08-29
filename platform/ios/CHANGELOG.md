@@ -15,10 +15,12 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Offline
 * Improved SQLite error handling for offline databases that return specific errors. [#12224](https://github.com/mapbox/mapbox-gl-native/pull/12224)
 * Added the ability to define an offline region with an arbitrary shape. [#11447](https://github.com/mapbox/mapbox-gl-native/pull/11447)
+* Added the ability to merge offline regions from an externally prepared database into the main offline database. [#12608](https://github.com/mapbox/mapbox-gl-native/pull/12608)
 
-### Styles
+### Styles and rendering
 * Reduced the amount of memory consumed by font data after changing the style. [#12414](https://github.com/mapbox/mapbox-gl-native/pull/12414)
 * Modified how invalid values for "text-font" are handled. These are now warnings instead of errors. [#12414](https://github.com/mapbox/mapbox-gl-native/pull/12414)
+* Added an `MGLLineStyleLayer.lineGradient` property that can be used to define a gradient with which to color a line feature. [#12575](https://github.com/mapbox/mapbox-gl-native/pull/12575/)
 
 ## 4.3.0 - August 15, 2018
 
