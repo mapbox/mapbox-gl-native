@@ -127,7 +127,9 @@ public final class Mapbox {
     try {
       INSTANCE.telemetry = getModuleProvider().obtainTelemetry();
     } catch (Exception exception) {
-      Logger.e(TAG, "Error occured while initializing telemetry", exception);
+      String message = "Error occurred while initializing telemetry";
+      Logger.e(TAG, message, exception);
+      MapStrictMode.strictModeViolation(message, exception);
     }
   }
 

@@ -3,6 +3,8 @@ package com.mapbox.mapboxsdk.testapp;
 import android.app.Application;
 import android.os.StrictMode;
 import android.text.TextUtils;
+
+import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
@@ -78,6 +80,8 @@ public class MapboxApplication extends Application {
       throw new IllegalStateException("Telemetry was unavailable during test application start.");
     }
     telemetry.setDebugLoggingEnabled(true);
+
+    MapStrictMode.setStrictModeEnabled(true);
   }
 
   private static void validateAccessToken(String accessToken) {

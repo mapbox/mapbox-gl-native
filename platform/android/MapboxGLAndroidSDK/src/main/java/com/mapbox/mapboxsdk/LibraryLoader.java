@@ -41,7 +41,9 @@ public abstract class LibraryLoader {
     try {
       loader.load("mapbox-gl");
     } catch (UnsatisfiedLinkError error) {
-      Logger.e(TAG, "Failed to load native shared library.", error);
+      String message = "Failed to load native shared library.";
+      Logger.e(TAG, message, error);
+      MapStrictMode.strictModeViolation(message, error);
     }
   }
 

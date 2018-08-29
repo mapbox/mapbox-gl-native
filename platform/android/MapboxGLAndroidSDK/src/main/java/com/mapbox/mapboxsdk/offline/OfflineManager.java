@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.LibraryLoader;
+import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.log.Logger;
@@ -117,6 +118,7 @@ public class OfflineManager {
           }
         } catch (Exception exception) {
           Logger.e(TAG, "Failed to delete old ambient cache database: ", exception);
+          MapStrictMode.strictModeViolation(exception);
         }
       }
     }).start();

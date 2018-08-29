@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.exceptions.TooManyIconsException;
 
@@ -148,6 +149,7 @@ public final class IconFactory {
     try {
       is = context.getAssets().open(assetName);
     } catch (IOException ioException) {
+      MapStrictMode.strictModeViolation(ioException);
       return null;
     }
     return fromInputStream(is);
@@ -178,6 +180,7 @@ public final class IconFactory {
     try {
       is = context.openFileInput(fileName);
     } catch (FileNotFoundException fileNotFoundException) {
+      MapStrictMode.strictModeViolation(fileNotFoundException);
       return null;
     }
     return fromInputStream(is);
