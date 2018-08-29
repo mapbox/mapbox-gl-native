@@ -9,6 +9,7 @@ import com.mapbox.android.telemetry.MapboxTelemetry;
 import com.mapbox.android.telemetry.SessionInterval;
 import com.mapbox.android.telemetry.TelemetryEnabler;
 import com.mapbox.mapboxsdk.BuildConfig;
+import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
@@ -141,6 +142,7 @@ public class TelemetryImpl implements TelemetryDefinition {
       }
     } catch (Exception exception) {
       Logger.e(TAG, "Exception occurred when updating session id rotation interval", exception);
+      MapStrictMode.strictModeViolation(exception);
     }
     return false;
   }
