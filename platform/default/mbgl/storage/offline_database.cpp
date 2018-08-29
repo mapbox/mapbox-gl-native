@@ -7,6 +7,7 @@
 #include <mbgl/util/logging.hpp>
 
 #include "offline_schema.hpp"
+#include "merge_sideloaded.hpp"
 
 #include "sqlite3.hpp"
 
@@ -637,6 +638,82 @@ OfflineDatabase::createRegion(const OfflineRegionDefinition& definition,
     return unexpected<std::exception_ptr>(std::current_exception());
 }
 
+expected<OfflineRegions, std::exception_ptr>
+OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
+    try {
+        // clang-format off
+        mapbox::sqlite::Query query{ getStatement("ATTACH DATABASE ?1 AS side") };
+        // clang-format on
+
+        query.bind(1, sideDatabasePath);
+        query.run();
+    } catch (const mapbox::sqlite::Exception& ex) {
+        Log::Error(Event::Database, static_cast<int>(ex.code), "Can't attach database (%s) for merge: %s", sideDatabasePath.c_str(), ex.what());
+        return unexpected<std::exception_ptr>(std::current_exception());
+    }
+    try {
+        // Support sideloaded databases at user_version = 6. Future schema version
+        // changes will need to implement migration paths for sideloaded databases at
+        // version 6.
+        auto sideUserVersion = static_cast<int>(getPragma<int64_t>("PRAGMA side.user_version"));
+        const auto mainUserVersion = getPragma<int64_t>("PRAGMA user_version");
+        if (sideUserVersion < 6 || sideUserVersion != mainUserVersion) {
+            throw std::runtime_error("Merge database has incorrect user_version");
+        }
+
+        auto currentTileCount = getOfflineMapboxTileCount();
+        // clang-format off
+         mapbox::sqlite::Query queryTiles{ getStatement(
+            "SELECT COUNT(DISTINCT st.id) "
+            "FROM side.tiles st "
+            //only consider region tiles, and not ambient tiles.
+            "JOIN side.region_tiles srt ON srt.tile_id = st.id "
+            "LEFT JOIN tiles t ON st.url_template = t.url_template AND "
+                "st.pixel_ratio = t.pixel_ratio AND "
+                "st.z = t.z AND "
+                "st.x = t.x AND "
+                "st.y = t.y "
+            "WHERE t.id IS NULL "
+            "AND st.url_template LIKE 'mapbox://%' ") };
+        // clang-format on
+        queryTiles.run();
+        auto countOfTilesToMerge = queryTiles.get<int64_t>(0);
+        if ((countOfTilesToMerge + currentTileCount) > offlineMapboxTileCountLimit) {
+            throw MapboxTileLimitExceededException();
+        }
+        queryTiles.reset();
+
+        mapbox::sqlite::Transaction transaction(*db);
+        db->exec(mergeSideloadedDatabaseSQL);
+        transaction.commit();
+
+        // clang-format off
+        mapbox::sqlite::Query queryRegions{ getStatement(
+            "SELECT r.id, r.definition, r.description "
+            "FROM side.regions sr "
+            "JOIN regions r ON sr.definition = r.definition") };
+        // clang-format on
+
+        OfflineRegions result;
+        while (queryRegions.run()) {
+            // Construct, then move because this constructor is private.
+            OfflineRegion region(queryRegions.get<int64_t>(0),
+                decodeOfflineRegionDefinition(queryRegions.get<std::string>(1)),
+                queryRegions.get<std::vector<uint8_t>>(2));
+            result.emplace_back(std::move(region));
+        }
+        db->exec("DETACH DATABASE side");
+        // Explicit move to avoid triggering the copy constructor.
+        return { std::move(result) };
+    } catch (const std::runtime_error& ex) {
+        db->exec("DETACH DATABASE side");
+        Log::Error(Event::Database, "%s", ex.what());
+
+        return unexpected<std::exception_ptr>(std::current_exception());
+    }
+    return {};
+}
+
 expected<OfflineRegionMetadata, std::exception_ptr>
 OfflineDatabase::updateMetadata(const int64_t regionID, const OfflineRegionMetadata& metadata) try {
     // clang-format off
@@ -742,7 +819,7 @@ void OfflineDatabase::putRegionResources(int64_t regionID,
                 completedTileSize += resourceSize;
             }
         } catch (const MapboxTileLimitExceededException&) {
-            // Commit the rest of the batch and retrow
+            // Commit the rest of the batch and rethrow
             transaction.commit();
             throw;
         }

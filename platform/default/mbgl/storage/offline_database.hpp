@@ -53,6 +53,9 @@ public:
     expected<OfflineRegion, std::exception_ptr> createRegion(const OfflineRegionDefinition&,
                                                              const OfflineRegionMetadata&);
 
+    expected<OfflineRegions, std::exception_ptr>
+    mergeDatabase(const std::string& sideDatabasePath);
+
     expected<OfflineRegionMetadata, std::exception_ptr>
     updateMetadata(const int64_t regionID, const OfflineRegionMetadata&);
 
