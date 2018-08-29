@@ -46,7 +46,7 @@ public class PropertyValue<T> {
    * @return true if this is a expression, false if not
    */
   public boolean isExpression() {
-    return !isNull() && value instanceof JsonArray;
+    return !isNull() && (value instanceof JsonArray || value instanceof Expression);
   }
 
   /**
@@ -57,7 +57,9 @@ public class PropertyValue<T> {
   @Nullable
   public Expression getExpression() {
     if (isExpression()) {
-      return Expression.Converter.convert((JsonArray) value);
+      return value instanceof JsonArray
+        ? Expression.Converter.convert((JsonArray) value)
+        : (Expression) value;
     } else {
       Logger.w(TAG, "not a expression, try value");
       return null;

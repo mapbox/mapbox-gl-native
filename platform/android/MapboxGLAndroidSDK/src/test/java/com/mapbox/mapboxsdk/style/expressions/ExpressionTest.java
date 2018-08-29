@@ -4,6 +4,7 @@ import android.graphics.Color;
 
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 
+import com.mapbox.mapboxsdk.style.layers.PropertyValue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -87,6 +88,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.upcase;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.var;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineOpacity;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
@@ -95,6 +97,18 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(RobolectricTestRunner.class)
 public class ExpressionTest {
+
+  @Test
+  public void testPropertyValueIsExpression() {
+    PropertyValue<?> property = lineWidth(Expression.get("width"));
+    assertTrue(property.isExpression());
+  }
+
+  @Test
+  public void testPropertyValueEqualsExpression() {
+    PropertyValue<?> property = lineWidth(Expression.get("width"));
+    assertEquals(Expression.get("width"), property.getExpression());
+  }
 
   @Test
   public void testRgb() throws Exception {
