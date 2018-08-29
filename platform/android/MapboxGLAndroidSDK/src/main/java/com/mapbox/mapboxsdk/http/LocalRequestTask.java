@@ -2,6 +2,8 @@ package com.mapbox.mapboxsdk.http;
 
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
+
+import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.log.Logger;
 
@@ -42,7 +44,9 @@ class LocalRequestTask extends AsyncTask<String, Void, byte[]> {
       buffer = new byte[size];
       input.read(buffer);
     } catch (IOException exception) {
-      Logger.e(TAG, "Load file failed", exception);
+      String message = "Load file failed";
+      Logger.e(TAG, message, exception);
+      MapStrictMode.strictModeViolation(message, exception);
     }
     return buffer;
   }

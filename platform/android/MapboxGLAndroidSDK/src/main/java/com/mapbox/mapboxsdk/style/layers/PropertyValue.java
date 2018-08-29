@@ -4,6 +4,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.google.gson.JsonArray;
+import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.exceptions.ConversionException;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
@@ -108,6 +109,7 @@ public class PropertyValue<T> {
       return ColorUtils.rgbaToColor((String) value);
     } catch (ConversionException ex) {
       Logger.e(TAG, String.format("%s could not be converted to a Color int: %s", name, ex.getMessage()));
+      MapStrictMode.strictModeViolation(ex);
       return null;
     }
   }

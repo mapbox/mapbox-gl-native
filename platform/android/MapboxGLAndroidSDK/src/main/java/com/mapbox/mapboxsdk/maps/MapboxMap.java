@@ -23,6 +23,7 @@ import com.mapbox.android.gestures.ShoveGestureDetector;
 import com.mapbox.android.gestures.StandardScaleGestureDetector;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
+import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
@@ -297,7 +298,9 @@ public final class MapboxMap {
       // noinspection unchecked
       return (T) nativeMapView.getLayer(layerId);
     } catch (ClassCastException exception) {
-      Logger.e(TAG, String.format("Layer: %s is a different type: ", layerId), exception);
+      String message = String.format("Layer: %s is a different type: ", layerId);
+      Logger.e(TAG, message, exception);
+      MapStrictMode.strictModeViolation(message, exception);
       return null;
     }
   }
@@ -409,7 +412,9 @@ public final class MapboxMap {
       // noinspection unchecked
       return (T) nativeMapView.getSource(sourceId);
     } catch (ClassCastException exception) {
-      Logger.e(TAG, String.format("Source: %s is a different type: ", sourceId), exception);
+      String message = String.format("Source: %s is a different type: ", sourceId);
+      Logger.e(TAG, message, exception);
+      MapStrictMode.strictModeViolation(message, exception);
       return null;
     }
   }
