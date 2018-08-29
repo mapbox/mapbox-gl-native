@@ -422,7 +422,7 @@ jobs:
       - run:
           name: Check if Firebase should be skipped
           command: |
-            SHOULD_SKIP=$( git log -1 | grep -i -E -e "\[(skip.firebase|firebase.skip)\]" -e "\[((i|mac)os)+(, (i|mac)os)?\]" )
+            SHOULD_SKIP=$( git log -1 | grep -i -E -e "\[(skip.firebase|firebase.skip)\]" -e "\[((i|mac)os)+(, (i|mac)os)?\]" -e "\[darwin\]" )
             if [ -n "${SHOULD_SKIP}" ]; then
               echo "Skipping Firebase tests."
               echo 'export SKIP_FIREBASE=1' >> $BASH_ENV
