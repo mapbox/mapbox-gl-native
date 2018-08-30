@@ -345,7 +345,7 @@ In style specification | Method, function, or predicate type | Format string syn
 `coalesce`             | `mgl_coalesce:` | `mgl_coalesce({x, y, z})`
 `match`                | `MGL_MATCH` or `+[NSExpression mgl_expressionForMatchingExpression:inDictionary:defaultExpression:]` | `MGL_MATCH(x, 0, 'zero match', 1, 'one match', 'two match', 'default')`
 `interpolate`          | `mgl_interpolate:withCurveType:parameters:stops:` or `+[NSExpression mgl_expressionForInterpolatingExpression:withCurveType:parameters:stops:]` |
-`step`                 | `mgl_step:withMinimum:stops:` or `+[NSExpression mgl_expressionForSteppingExpression:fromExpression:stops:]` |
+`step`                 | `mgl_step:from:stops:` or `+[NSExpression mgl_expressionForSteppingExpression:fromExpression:stops:]` |
 `let`                  | `mgl_expressionWithContext:` | `MGL_LET('ios', 11, 'macos', 10.13, $ios + $macos)`
 `var`                  | `+[NSExpression expressionForVariable:]` | `$variable`
 `concat`               | `mgl_join:` or `-[NSExpression mgl_expressionByAppendingExpression:]` | `mgl_join({'Old', ' ', 'MacDonald'})`

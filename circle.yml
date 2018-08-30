@@ -991,12 +991,12 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
       SLACK_CHANNEL: C0ACM9Q2C
     steps:
+      - checkout
       - run:
           name: Send a Slack notification on start
           command: |
             export SLACK_MESSAGE="Release build for <$CIRCLE_COMPARE_URL|\`$CIRCLE_TAG\`> <$CIRCLE_BUILD_URL|started>."
             scripts/notify-slack.sh
-      - checkout
       - *restore-node_modules-cache
       - *npm-install
       - *prepare-environment
