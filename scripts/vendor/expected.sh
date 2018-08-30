@@ -7,7 +7,7 @@ ROOT=expected-lite-$VERSION
 
 download "https://github.com/martinmoene/expected-lite/archive/$VERSION.tar.gz"
 init
-extract "$ROOT/include" "$ROOT/LICENSE.txt"
+extract_gzip "$ROOT/include" "$ROOT/LICENSE.txt"
 mv include/nonstd/expected.hpp include
 rm -rf include/nonstd
 file_list include -name "*.hpp"
