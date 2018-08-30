@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/gl/object.hpp>
 #include <mbgl/gl/attribute.hpp>
+#include <mbgl/gl/object.hpp>
 #include <mbgl/gl/state.hpp>
 #include <mbgl/gl/value.hpp>
 
@@ -15,8 +15,7 @@ class Context;
 
 class VertexArrayState {
 public:
-    VertexArrayState(UniqueVertexArray vertexArray_)
-        : vertexArray(std::move(vertexArray_)) {
+    VertexArrayState(UniqueVertexArray vertexArray_) : vertexArray(std::move(vertexArray_)) {
     }
 
     void setDirty() {
@@ -35,8 +34,8 @@ public:
 
 class VertexArrayStateDeleter {
 public:
-    VertexArrayStateDeleter(bool destroy_)
-        : destroy(destroy_) {}
+    VertexArrayStateDeleter(bool destroy_) : destroy(destroy_) {
+    }
 
     void operator()(VertexArrayState* ptr) const {
         if (destroy) {
@@ -52,9 +51,9 @@ using UniqueVertexArrayState = std::unique_ptr<VertexArrayState, VertexArrayStat
 
 class VertexArray {
 public:
-    VertexArray(UniqueVertexArrayState state_)
-        : state(std::move(state_)) {
+    VertexArray(UniqueVertexArrayState state_) : state(std::move(state_)) {
     }
+    VertexArray(VertexArray&& other) = default;
 
     void bind(Context&, BufferID indexBuffer, const AttributeBindingArray&);
 
