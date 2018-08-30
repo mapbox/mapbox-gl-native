@@ -6,11 +6,11 @@ CXX=${CXX:-clang++}
 CC=${CC:-clang}
 
 function download {
-    if [ ! -f "$VENDOR/.cache/$NAME-$VERSION.tar.gz" ]; then
+    if [ ! -f "$VENDOR/.cache/$NAME-$VERSION" ]; then
         echo ">> Downloading $1..."
         mkdir -p "$VENDOR/.cache"
-        curl --retry 3 -f -S -L $1 -o "$VENDOR/.cache/$NAME-$VERSION.tar.gz.tmp"
-        mv "$VENDOR/.cache/$NAME-$VERSION.tar.gz.tmp" "$VENDOR/.cache/$NAME-$VERSION.tar.gz"
+        curl --retry 3 -f -S -L $1 -o "$VENDOR/.cache/$NAME-$VERSION.tmp"
+        mv "$VENDOR/.cache/$NAME-$VERSION.tmp" "$VENDOR/.cache/$NAME-$VERSION"
     fi
 }
 
@@ -21,10 +21,17 @@ function init {
     cd "$VENDOR/$NAME"
 }
 
-function extract {
-    echo ">> Unpacking files from $VENDOR/.cache/$NAME-$VERSION.tar.gz..."
+function extract_gzip {
+    echo ">> Unpacking files from $VENDOR/.cache/$NAME-$VERSION..."
     [ ! -z "$(tar --version | grep "GNU tar")" ] && WC="--wildcards" || WC=""
-    tar xzf "$VENDOR/.cache/$NAME-$VERSION.tar.gz" $WC --strip-components=${STRIP_COMPONENTS:-1} -C "$VENDOR/$NAME" $@
+    tar xzf "$VENDOR/.cache/$NAME-$VERSION" $WC --strip-components=${STRIP_COMPONENTS:-1} -C "$VENDOR/$NAME" $@
+}
+
+function extract_zip {
+    echo ">> Unpacking files from $VENDOR/.cache/$NAME-$VERSION..."
+    unzip -qq "$VENDOR/.cache/$NAME-$VERSION" $@ -d "$VENDOR/.cache/staging"
+    mv "$VENDOR/.cache/staging"/*/* "$VENDOR/$NAME"
+    rm -rf "$VENDOR/.cache/staging"
 }
 
 function file_list {

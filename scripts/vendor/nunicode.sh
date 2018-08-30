@@ -7,7 +7,7 @@ ROOT=alekseyt-nunicode-246bb27014ab
 
 download "https://bitbucket.org/alekseyt/nunicode/get/$VERSION.tar.gz"
 init
-extract "$ROOT/libnu/*.c" "$ROOT/libnu/*.h" "$ROOT/LICENSE"
+extract_gzip "$ROOT/libnu/*.c" "$ROOT/libnu/*.h" "$ROOT/LICENSE"
 
 # Augment config.h with just the defines we need.
 head -n 2 libnu/config.h > config.h
