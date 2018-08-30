@@ -144,8 +144,8 @@ CameraOptions TransformState::getCameraOptions(const EdgeInsets& padding) const 
     }
     camera.padding = padding;
     camera.zoom = getZoom();
-    camera.angle = -angle * util::RAD2DEG;
-    camera.pitch = pitch * util::RAD2DEG;
+    camera.angle = angle;
+    camera.pitch = pitch;
 
     return camera;
 }
