@@ -83,15 +83,15 @@ GeometryTileWorker::~GeometryTileWorker() = default;
    It is nevertheless possible to restart an in-progress request:
  
     - [Idle] setData -> parse()
-        sends getGlyphs, hasPendingSymbolDependencies() is true
+        sends getGlyphs, hasPendingDependencies() is true
         enters [Coalescing], sends coalesced
     - [Coalescing] coalesced -> [Idle]
     - [Idle] setData -> new parse(), interrupts old parse()
-        sends getGlyphs, hasPendingSymbolDependencies() is true
+        sends getGlyphs, hasPendingDependencies() is true
         enters [Coalescing], sends coalesced
     - [Coalescing] onGlyphsAvailable -> [NeedsSymbolLayout]
-           hasPendingSymbolDependencies() may or may not be true
-    - [NeedsSymbolLayout] coalesced -> performSymbolLayout()
+           hasPendingDependencies() may or may not be true
+    - [NeedsSymbolLayout] coalesced -> finalizeLayout()
            Generates result depending on whether dependencies are met
            -> [Idle]
  
@@ -192,17 +192,17 @@ void GeometryTileWorker::symbolDependenciesChanged() {
     try {
         switch (state) {
         case Idle:
-            if (!symbolLayouts.empty() || !patternLayouts.empty()) {
+            if (!layouts.empty()) {
                 // Layouts are created only by parsing and the parse result can only be
-                // cleared by performSymbolLayout, which also clears the layouts.
+                // cleared by performLayout, which also clears the layouts.
                 assert(hasPendingParseResult());
-                performSymbolLayout();
+                finalizeLayout();
                 coalesce();
             }
             break;
 
         case Coalescing:
-            if (!symbolLayouts.empty() || !patternLayouts.empty()) {
+            if (!layouts.empty()) {
                 state = NeedsSymbolLayout;
             }
             break;
@@ -234,9 +234,9 @@ void GeometryTileWorker::coalesced() {
 
         case NeedsSymbolLayout:
             // We may have entered NeedsSymbolLayout while coalescing
-            // after a performSymbolLayout. In that case, we need to
+            // after a performLayout. In that case, we need to
             // start over with parsing in order to do another layout.
-            hasPendingParseResult() ? performSymbolLayout() : parse();
+            hasPendingParseResult() ? finalizeLayout() : parse();
             coalesce();
             break;
         }
@@ -320,23 +320,6 @@ static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vecto
     return renderLayers;
 }
 
-// Helper function that takes a PatternLayout and either adds it to patternLayouts to await the
-// availability of the imageDependencies or, if the layergroup does not use a *-pattern property,
-// creates the Bucket and adds it to GeometryTileWorker::buckets.
-template <typename B>
-void GeometryTileWorker::checkPatternLayout(std::unique_ptr<PatternLayout<B>> layout) {
-    if (layout->pattern()) {
-        patternLayouts.push_back(std::move(layout));
-    } else {
-        std::shared_ptr<B> bucket = layout->createBucket({}, featureIndex);
-        if (bucket->hasData()) {
-            for (const auto& pair : layout->layerPaintProperties) {
-                buckets.emplace(pair.first, bucket);
-            }
-        }
-    }
-}
-
 void GeometryTileWorker::parse() {
     if (!data || !layers) {
         return;
@@ -347,8 +330,7 @@ void GeometryTileWorker::parse() {
     std::unordered_map<std::string, std::unique_ptr<SymbolLayout>> symbolLayoutMap;
 
     buckets.clear();
-    symbolLayouts.clear();
-    patternLayouts.clear();
+    layouts.clear();
 
     featureIndex = std::make_unique<FeatureIndex>(*data ? (*data)->clone() : nullptr);
     BucketParameters parameters { id, mode, pixelRatio };
@@ -382,26 +364,18 @@ void GeometryTileWorker::parse() {
         }
 
         featureIndex->setBucketLayerIDs(leader.getID(), layerIDs);
-        if (leader.is<RenderSymbolLayer>()) {
-            auto layout = leader.as<RenderSymbolLayer>()->createLayout(
-                parameters, group, std::move(geometryLayer), glyphDependencies, imageDependencies);
-            symbolLayouts.push_back(std::move(layout));
-        } else if (leader.is<RenderLineLayer>()) {
-        // Layers that support pattern properties have an extra step at layout time to figure out what images
-        // are needed to render the layer. They use the intermediate PatternLayout data structure to accomplish this,
-        // and either immediately create a bucket if no pattern properties are used, or the PatternLayout is stored until
-        // the images are available to add the features to the buckets.
-            std::unique_ptr<PatternLayout<LineBucket>> layout = leader.as<RenderLineLayer>()->createLayout(
-                parameters, group, std::move(geometryLayer), imageDependencies);
-            checkPatternLayout(std::move(layout));
-        } else if (leader.is<RenderFillLayer>()) {
-            std::unique_ptr<PatternLayout<FillBucket>> layout = leader.as<RenderFillLayer>()->createLayout(
-                parameters, group, std::move(geometryLayer), imageDependencies);
-            checkPatternLayout(std::move(layout));
-        } else if (leader.is<RenderFillExtrusionLayer>()) {
-            std::unique_ptr<PatternLayout<FillExtrusionBucket>> layout = leader.as<RenderFillExtrusionLayer>()->createLayout(
-                parameters, group, std::move(geometryLayer), imageDependencies);
-            checkPatternLayout(std::move(layout));
+
+        // Symbol layers and layers that support pattern properties have an extra step at layout time to figure out what images/glyphs
+        // are needed to render the layer. They use the intermediate Layout data structure to accomplish this,
+        // and either immediately create a bucket if no images/glyphs are used, or the Layout is stored until
+        // the images/glyphs are available to add the features to the buckets.
+        if (leader.as<RenderSymbolLayer>() ||leader.as<RenderLineLayer>() || leader.as<RenderFillLayer>() || leader.as<RenderFillExtrusionLayer>()) {
+            auto layout = leader.createLayout(parameters, group, std::move(geometryLayer), glyphDependencies, imageDependencies);
+            if (layout->hasDependencies()) {
+                layouts.push_back(std::move(layout));
+            } else {
+                layout->createBucket({}, featureIndex, buckets, firstLoad, showCollisionBoxes);
+            }
         } else {
             const Filter& filter = leader.baseImpl->filter;
             const std::string& sourceLayerID = leader.baseImpl->sourceLayer;
@@ -436,10 +410,10 @@ void GeometryTileWorker::parse() {
                        " SourceID: " << sourceID.c_str() <<
                        " Canonical: " << static_cast<int>(id.canonical.z) << "/" << id.canonical.x << "/" << id.canonical.y <<
                        " Time");
-    performSymbolLayout();
+    finalizeLayout();
 }
 
-bool GeometryTileWorker::hasPendingSymbolDependencies() const {
+bool GeometryTileWorker::hasPendingDependencies() const {
     for (auto& glyphDependency : pendingGlyphDependencies) {
         if (!glyphDependency.second.empty()) {
             return true;
@@ -452,69 +426,36 @@ bool GeometryTileWorker::hasPendingParseResult() const {
     return bool(featureIndex);
 }
 
-void GeometryTileWorker::performSymbolLayout() {
-    if (!data || !layers || !hasPendingParseResult() || hasPendingSymbolDependencies()) {
+void GeometryTileWorker::finalizeLayout() {
+    if (!data || !layers || !hasPendingParseResult() || hasPendingDependencies()) {
         return;
     }
     
     MBGL_TIMING_START(watch)
     optional<AlphaImage> glyphAtlasImage;
     ImageAtlas iconAtlas = makeImageAtlas(imageMap, patternMap);
-
-    if (!symbolLayouts.empty()) {
+    if (!layouts.empty()) {
         GlyphAtlas glyphAtlas = makeGlyphAtlas(glyphMap);
         glyphAtlasImage = std::move(glyphAtlas.image);
 
-        for (auto& symbolLayout : symbolLayouts) {
+        for (auto& layout : layouts) {
             if (obsolete) {
                 return;
             }
 
-            symbolLayout->prepare(glyphMap, glyphAtlas.positions,
+            layout->prepareSymbols(glyphMap, glyphAtlas.positions,
                                   imageMap, iconAtlas.iconPositions);
 
-            if (!symbolLayout->hasSymbolInstances()) {
+            if (!layout->hasSymbolInstances()) {
                 continue;
             }
 
-            std::shared_ptr<SymbolBucket> bucket = symbolLayout->place(showCollisionBoxes);
-            for (const auto& pair : symbolLayout->layerPaintProperties) {
-                if (!firstLoad) {
-                    bucket->justReloaded = true;
-                }
-                buckets.emplace(pair.first, bucket);
-            }
+            // layout adds the bucket to buckets
+            layout->createBucket(iconAtlas.patternPositions, featureIndex, buckets, firstLoad, showCollisionBoxes);
         }
     }
-    symbolLayouts.clear();
 
-    for (auto& value : patternLayouts) {
-        if (obsolete) {
-            return;
-        }
-
-        value.match(
-             [&] (const std::unique_ptr<PatternLayout<LineBucket>>& linePatternLayout) {
-                 std::shared_ptr<LineBucket> bucket = linePatternLayout->createBucket(iconAtlas.patternPositions, featureIndex);
-                 for (const auto& pair : linePatternLayout->layerPaintProperties) {
-                    buckets.emplace(pair.first, bucket);
-                }
-             },
-             [&] (const std::unique_ptr<PatternLayout<FillBucket>>& fillPatternLayout) {
-                 std::shared_ptr<FillBucket> bucket = fillPatternLayout->createBucket(iconAtlas.patternPositions, featureIndex);
-                 for (const auto& pair : fillPatternLayout->layerPaintProperties) {
-                    buckets.emplace(pair.first, bucket);
-                }
-             },
-             [&] (const std::unique_ptr<PatternLayout<FillExtrusionBucket>>& fillExtrusionLayout) {
-                 std::shared_ptr<FillExtrusionBucket> bucket = fillExtrusionLayout->createBucket(iconAtlas.patternPositions, featureIndex);
-                 for (const auto& pair : fillExtrusionLayout->layerPaintProperties) {
-                    buckets.emplace(pair.first, bucket);
-                }
-             }
-        );
-    }
-    patternLayouts.clear();
+    layouts.clear();
 
     firstLoad = false;
     

@@ -32,11 +32,11 @@ std::unique_ptr<Bucket> RenderLineLayer::createBucket(const BucketParameters&, c
     return nullptr;
 }
 
-std::unique_ptr<PatternLayout<LineBucket>>
-RenderLineLayer::createLayout(const BucketParameters& parameters,
-                              const std::vector<const RenderLayer*>& group,
-                              std::unique_ptr<GeometryTileLayer> layer,
-                              ImageDependencies& imageDependencies) const {
+std::unique_ptr<Layout> RenderLineLayer::createLayout(const BucketParameters& parameters,
+                                                      const std::vector<const RenderLayer*>& group,
+                                                      std::unique_ptr<GeometryTileLayer> layer,
+                                                      GlyphDependencies&,
+                                                      ImageDependencies& imageDependencies) const {
     return std::make_unique<PatternLayout<LineBucket>>(parameters, group, std::move(layer), imageDependencies);
 }
 

@@ -33,11 +33,11 @@ std::unique_ptr<Bucket> RenderFillExtrusionLayer::createBucket(const BucketParam
 }
 
 
-std::unique_ptr<PatternLayout<FillExtrusionBucket>>
-RenderFillExtrusionLayer::createLayout(const BucketParameters& parameters,
-                              const std::vector<const RenderLayer*>& group,
-                              std::unique_ptr<GeometryTileLayer> layer,
-                              ImageDependencies& imageDependencies) const {
+std::unique_ptr<Layout> RenderFillExtrusionLayer::createLayout(const BucketParameters& parameters,
+                        const std::vector<const RenderLayer*>& group,
+                        std::unique_ptr<GeometryTileLayer> layer,
+                        GlyphDependencies&,
+                        ImageDependencies& imageDependencies) const {
     return std::make_unique<PatternLayout<FillExtrusionBucket>>(parameters, group, std::move(layer), imageDependencies);
 }
 

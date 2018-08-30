@@ -36,7 +36,7 @@ std::unique_ptr<Bucket> RenderSymbolLayer::createBucket(const BucketParameters&,
     return nullptr;
 }
 
-std::unique_ptr<SymbolLayout> RenderSymbolLayer::createLayout(const BucketParameters& parameters,
+std::unique_ptr<Layout> RenderSymbolLayer::createLayout(const BucketParameters& parameters,
                                                               const std::vector<const RenderLayer*>& group,
                                                               std::unique_ptr<GeometryTileLayer> layer,
                                                               GlyphDependencies& glyphDependencies,

@@ -21,7 +21,7 @@ namespace mbgl {
 
 class GeometryTile;
 class GeometryTileData;
-class SymbolLayout;
+class Layout;
 
 template <class B>
 class PatternLayout;
@@ -52,7 +52,7 @@ public:
 private:
     void coalesced();
     void parse();
-    void performSymbolLayout();
+    void finalizeLayout();
     
     void coalesce();
 
@@ -60,11 +60,10 @@ private:
     void requestNewImages(const ImageDependencies&);
    
     void symbolDependenciesChanged();
-    bool hasPendingSymbolDependencies() const;
+    bool hasPendingDependencies() const;
     bool hasPendingParseResult() const;
 
-    template <typename B>
-    void checkPatternLayout(std::unique_ptr<PatternLayout<B>> layout);
+    void checkPatternLayout(std::unique_ptr<Layout> layout);
 
     ActorRef<GeometryTileWorker> self;
     ActorRef<GeometryTile> parent;
@@ -93,13 +92,7 @@ private:
     optional<std::vector<Immutable<style::Layer::Impl>>> layers;
     optional<std::unique_ptr<const GeometryTileData>> data;
 
-    std::vector<std::unique_ptr<SymbolLayout>> symbolLayouts;
-
-    using LinePatternLayout = PatternLayout<LineBucket>;
-    using FillPatternLayout = PatternLayout<FillBucket>;
-    using FillExtrusionPatternLayout = PatternLayout<FillExtrusionBucket>;
-
-    std::vector<variant<std::unique_ptr<LinePatternLayout>, std::unique_ptr<FillPatternLayout>, std::unique_ptr<FillExtrusionPatternLayout>>> patternLayouts;
+    std::vector<std::unique_ptr<Layout>> layouts;
 
     GlyphDependencies pendingGlyphDependencies;
     ImageDependencies pendingImageDependencies;

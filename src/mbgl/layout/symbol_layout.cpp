@@ -1,3 +1,4 @@
+#include <mbgl/layout/layout.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/layout/merge_lines.hpp>
 #include <mbgl/layout/clip_lines.hpp>
@@ -40,7 +41,8 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                            std::unique_ptr<GeometryTileLayer> sourceLayer_,
                            ImageDependencies& imageDependencies,
                            GlyphDependencies& glyphDependencies)
-    : bucketLeaderID(layers.at(0)->getID()),
+    : Layout(),
+      bucketLeaderID(layers.at(0)->getID()),
       sourceLayer(std::move(sourceLayer_)),
       overscaling(parameters.tileID.overscaleFactor()),
       zoom(parameters.tileID.overscaledZ),
@@ -149,11 +151,15 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
     }
 }
 
+bool SymbolLayout::hasDependencies() const {
+    return features.size() != 0;
+}
+
 bool SymbolLayout::hasSymbolInstances() const {
     return !symbolInstances.empty();
 }
 
-void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyphPositions,
+void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions& glyphPositions,
                            const ImageMap& imageMap, const ImagePositions& imagePositions) {
     const bool textAlongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map &&
         layout.get<SymbolPlacement>() != SymbolPlacementType::Point;
@@ -394,11 +400,11 @@ std::vector<float> CalculateTileDistances(const GeometryCoordinates& line, const
     return tileDistances;
 }
 
-std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes) {
+void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIndex>&, std::unordered_map<std::string, std::shared_ptr<Bucket>>& buckets, const bool firstLoad, const bool showCollisionBoxes) {
     const bool mayOverlap = layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
         layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>();
     
-    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, mayOverlap, bucketLeaderID, std::move(symbolInstances));
+    auto bucket = std::make_shared<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, mayOverlap, bucketLeaderID, std::move(symbolInstances));
 
     for (SymbolInstance &symbolInstance : bucket->symbolInstances) {
 
@@ -469,8 +475,15 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
     if (showCollisionBoxes) {
         addToDebugBuffers(*bucket);
     }
+    if (bucket->hasData()){
+        for (const auto& pair : layerPaintProperties) {
+            if (!firstLoad) {
+                bucket->justReloaded = true;
+            }
+            buckets.emplace(pair.first, bucket);
+        }
+    }
 
-    return bucket;
 }
 
 template <typename Buffer>

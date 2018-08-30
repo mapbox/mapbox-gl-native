@@ -95,6 +95,7 @@ src/mbgl/gl/vertex_buffer.hpp
 # layout
 src/mbgl/layout/clip_lines.cpp
 src/mbgl/layout/clip_lines.hpp
+src/mbgl/layout/layout.hpp
 src/mbgl/layout/merge_lines.cpp
 src/mbgl/layout/merge_lines.hpp
 src/mbgl/layout/pattern_layout.hpp
