@@ -130,6 +130,26 @@ ViewportMode TransformState::getViewportMode() const {
     return viewportMode;
 }
 
+#pragma mark - Camera options
+
+CameraOptions TransformState::getCameraOptions(const EdgeInsets& padding) const {
+    CameraOptions camera;
+
+    if (padding.isFlush()) {
+        camera.center = getLatLng();
+    } else {
+        ScreenCoordinate point = padding.getCenter(size.width, size.height);
+        point.y = size.height - point.y;
+        camera.center = screenCoordinateToLatLng(point).wrapped();
+    }
+    camera.padding = padding;
+    camera.zoom = getZoom();
+    camera.angle = -angle * util::RAD2DEG;
+    camera.pitch = pitch * util::RAD2DEG;
+
+    return camera;
+}
+
 #pragma mark - Position
 
 LatLng TransformState::getLatLng(LatLng::WrapMode wrapMode) const {

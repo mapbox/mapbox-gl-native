@@ -55,6 +55,14 @@ RendererBackend* HeadlessFrontend::getBackend() {
     return &backend;
 }
 
+CameraOptions HeadlessFrontend::getCameraOptions() {
+    if (updateParameters)
+        return RendererState::getCameraOptions(*updateParameters);
+
+    static CameraOptions nullCamera;
+    return nullCamera;
+}
+
 void HeadlessFrontend::setSize(Size size_) {
     if (size != size_) {
         size = size_;
