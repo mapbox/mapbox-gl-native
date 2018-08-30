@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/map/mode.hpp>
+#include <mbgl/map/camera.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/constants.hpp>
@@ -39,6 +40,8 @@ public:
 
     // Viewport mode
     ViewportMode getViewportMode() const;
+
+    CameraOptions getCameraOptions(const EdgeInsets&) const;
 
     // Position
     LatLng getLatLng(LatLng::WrapMode = LatLng::Unwrapped) const;
