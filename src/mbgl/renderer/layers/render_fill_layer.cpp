@@ -30,10 +30,11 @@ std::unique_ptr<Bucket> RenderFillLayer::createBucket(const BucketParameters&, c
     return nullptr;
 }
 
-std::unique_ptr<PatternLayout<FillBucket>>
+std::unique_ptr<Layout>
 RenderFillLayer::createLayout(const BucketParameters& parameters,
                               const std::vector<const RenderLayer*>& group,
                               std::unique_ptr<GeometryTileLayer> layer,
+                              GlyphDependencies&,
                               ImageDependencies& imageDependencies) const {
     return std::make_unique<PatternLayout<FillBucket>>(parameters, group, std::move(layer), imageDependencies);
 }

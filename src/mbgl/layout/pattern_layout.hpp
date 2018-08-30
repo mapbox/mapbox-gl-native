@@ -1,4 +1,5 @@
 #pragma once
+#include <mbgl/layout/layout.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/renderer/render_layer.hpp>
@@ -22,13 +23,14 @@ public:
 };
 
 template <class B>
-class PatternLayout {
+class PatternLayout : public Layout {
 public:
     PatternLayout(const BucketParameters& parameters,
                   const std::vector<const RenderLayer*>& layers,
                   std::unique_ptr<GeometryTileLayer> sourceLayer_,
                   ImageDependencies& patternDependencies)
-                  : bucketLeaderID(layers.at(0)->getID()),
+                  : Layout(),
+                    bucketLeaderID(layers.at(0)->getID()),
                     sourceLayer(std::move(sourceLayer_)),
                     zoom(parameters.tileID.overscaledZ),
                     overscaling(parameters.tileID.overscaleFactor()),
@@ -90,12 +92,14 @@ public:
         }
     };
 
-    bool pattern() {
+    ~PatternLayout() final = default;
+
+    bool hasDependencies() const override {
         return hasPattern;
     }
 
-    std::unique_ptr<B> createBucket(const ImagePositions& patternPositions, std::unique_ptr<FeatureIndex>& featureIndex) {
-        auto bucket = std::make_unique<B>(layout, layerPaintProperties, zoom, overscaling);
+    void createBucket(const ImagePositions& patternPositions, std::unique_ptr<FeatureIndex>& featureIndex, std::unordered_map<std::string, std::shared_ptr<Bucket>>& buckets, const bool, const bool) override {
+        auto bucket = std::make_shared<B>(layout, layerPaintProperties, zoom, overscaling);
         for (auto & patternFeature : features) {
             const auto i = patternFeature.i;
             std::unique_ptr<GeometryTileFeature> feature = std::move(patternFeature.feature);
@@ -105,7 +109,11 @@ public:
             bucket->addFeature(*feature, geometries, patternPositions, patterns);
             featureIndex->insert(geometries, i, sourceLayerID, groupID);
         }
-        return bucket;
+        if (bucket->hasData()) {
+            for (const auto& pair : layerPaintProperties) {
+                buckets.emplace(pair.first, bucket);
+            }
+        }
     };
 
     std::map<std::string, typename B::PossiblyEvaluatedPaintProperties> layerPaintProperties;
