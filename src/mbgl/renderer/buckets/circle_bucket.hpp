@@ -12,10 +12,17 @@
 namespace mbgl {
 
 class BucketParameters;
+class RenderCircleLayer;
 
 class CircleBucket : public Bucket {
 public:
-    CircleBucket(const BucketParameters&, const std::vector<const RenderLayer*>&);
+
+    using RenderLayerType = RenderCircleLayer;
+    using PossiblyEvaluatedPaintProperties = style::CirclePaintProperties::PossiblyEvaluated;
+
+    CircleBucket(std::map<std::string, PossiblyEvaluatedPaintProperties>,
+                const float,
+                MapMode);
 
     void addFeature(const GeometryTileFeature&,
                     const GeometryCollection&,

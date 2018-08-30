@@ -27,12 +27,6 @@ const style::FillExtrusionLayer::Impl& RenderFillExtrusionLayer::impl() const {
     return static_cast<const style::FillExtrusionLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Bucket> RenderFillExtrusionLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
-    assert(false); // Should be calling createLayout() instead.
-    return nullptr;
-}
-
-
 std::unique_ptr<Layout> RenderFillExtrusionLayer::createLayout(const BucketParameters& parameters,
                         const std::vector<const RenderLayer*>& group,
                         std::unique_ptr<GeometryTileLayer> layer,

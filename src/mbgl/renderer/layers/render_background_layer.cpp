@@ -22,8 +22,10 @@ const style::BackgroundLayer::Impl& RenderBackgroundLayer::impl() const {
     return static_cast<const style::BackgroundLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Bucket> RenderBackgroundLayer::createBucket(const BucketParameters &,
-                                                            const std::vector<const RenderLayer *> &) const {
+std::unique_ptr<Layout>
+RenderBackgroundLayer::createLayout(const BucketParameters&, const std::vector<const RenderLayer*>&,
+                                    std::unique_ptr<GeometryTileLayer>, GlyphDependencies&,
+                                    ImageDependencies&) const {
     assert(false);
     return nullptr;
 }

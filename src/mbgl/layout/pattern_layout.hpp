@@ -41,7 +41,6 @@ public:
         const typename PatternLayer::StyleLayerImpl& leader = renderLayer->impl();
         layout = leader.layout.evaluate(PropertyEvaluationParameters(zoom));
         sourceLayerID = leader.sourceLayer;
-        groupID = renderLayer->getID();
 
         for (const auto& layer : layers) {
             const typename B::PossiblyEvaluatedPaintProperties evaluatedProps = layer->as<PatternLayer>()->paintProperties();
@@ -107,7 +106,7 @@ public:
             GeometryCollection geometries = feature->getGeometries();
 
             bucket->addFeature(*feature, geometries, patternPositions, patterns);
-            featureIndex->insert(geometries, i, sourceLayerID, groupID);
+            featureIndex->insert(geometries, i, sourceLayerID, bucketLeaderID);
         }
         if (bucket->hasData()) {
             for (const auto& pair : layerPaintProperties) {
@@ -118,8 +117,6 @@ public:
 
     std::map<std::string, typename B::PossiblyEvaluatedPaintProperties> layerPaintProperties;
     const std::string bucketLeaderID;
-
-
 private:
     const std::unique_ptr<GeometryTileLayer> sourceLayer;
     std::vector<PatternFeature> features;
@@ -128,7 +125,6 @@ private:
     const float zoom;
     const uint32_t overscaling;
     std::string sourceLayerID;
-    std::string groupID;
     bool hasPattern;
 };
 

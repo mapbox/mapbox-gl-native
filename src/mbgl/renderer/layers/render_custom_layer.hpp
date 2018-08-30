@@ -15,7 +15,10 @@ public:
     bool hasTransition() const override;
     bool hasCrossfade() const override;
 
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const final;
+    std::unique_ptr<Layout> createLayout(const BucketParameters&, const std::vector<const RenderLayer*>&,
+                                         std::unique_ptr<GeometryTileLayer>, GlyphDependencies&,
+                                         ImageDependencies&) const final;
+
     void render(PaintParameters&, RenderSource*) final;
 
     const style::CustomLayer::Impl& impl() const;

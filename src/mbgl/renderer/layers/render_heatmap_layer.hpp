@@ -5,6 +5,7 @@
 #include <mbgl/style/layers/heatmap_layer_properties.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/offscreen_texture.hpp>
+#include <mbgl/layout/circle_layout.hpp>
 
 namespace mbgl {
 
@@ -13,11 +14,15 @@ public:
     RenderHeatmapLayer(Immutable<style::HeatmapLayer::Impl>);
     ~RenderHeatmapLayer() final = default;
 
+    using StyleLayerImpl = style::HeatmapLayer::Impl;
+
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
     bool hasCrossfade() const override;
     void render(PaintParameters&, RenderSource*) override;
+
+    style::HeatmapPaintProperties::PossiblyEvaluated paintProperties() const;
 
     bool queryIntersectsFeature(
             const GeometryCoordinates&,
@@ -29,8 +34,9 @@ public:
 
     void updateColorRamp();
 
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
-
+    std::unique_ptr<Layout> createLayout(const BucketParameters&, const std::vector<const RenderLayer*>&,
+                                         std::unique_ptr<GeometryTileLayer>, GlyphDependencies&,
+                                         ImageDependencies&) const override;
     // Paint properties
     style::HeatmapPaintProperties::Unevaluated unevaluated;
     style::HeatmapPaintProperties::PossiblyEvaluated evaluated;

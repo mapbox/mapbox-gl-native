@@ -93,6 +93,7 @@ src/mbgl/gl/vertex_array_extension.hpp
 src/mbgl/gl/vertex_buffer.hpp
 
 # layout
+src/mbgl/layout/circle_layout.hpp
 src/mbgl/layout/clip_lines.cpp
 src/mbgl/layout/clip_lines.hpp
 src/mbgl/layout/layout.hpp

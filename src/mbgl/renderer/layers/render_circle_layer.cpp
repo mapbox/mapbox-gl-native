@@ -23,8 +23,11 @@ const style::CircleLayer::Impl& RenderCircleLayer::impl() const {
     return static_cast<const style::CircleLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Bucket> RenderCircleLayer::createBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) const {
-    return std::make_unique<CircleBucket>(parameters, layers);
+std::unique_ptr<Layout>
+RenderCircleLayer::createLayout(const BucketParameters& parameters, const std::vector<const RenderLayer*>& group,
+                                std::unique_ptr<GeometryTileLayer> layer, GlyphDependencies&,
+                                ImageDependencies& imageDependencies) const {
+    return std::make_unique<CircleLayout<CircleBucket>>(parameters, group, std::move(layer), imageDependencies);
 }
 
 void RenderCircleLayer::transition(const TransitionParameters& parameters) {
@@ -130,6 +133,22 @@ GeometryCoordinates projectQueryGeometry(const GeometryCoordinates& queryGeometr
         projectedGeometry.push_back(projectPoint(p, posMatrix, size));
     }
     return projectedGeometry;
+}
+
+style::CirclePaintProperties::PossiblyEvaluated RenderCircleLayer::paintProperties() const {
+    return CirclePaintProperties::PossiblyEvaluated {
+        evaluated.get<style::CircleRadius>(),
+        evaluated.get<style::CircleColor>(),
+        evaluated.get<style::CircleBlur>(),
+        evaluated.get<style::CircleOpacity>(),
+        evaluated.get<style::CircleTranslate>(),
+        evaluated.get<style::CircleTranslateAnchor>(),
+        evaluated.get<style::CirclePitchScale>(),
+        evaluated.get<style::CirclePitchAlignment>(),
+        evaluated.get<style::CircleStrokeWidth>(),
+        evaluated.get<style::CircleStrokeColor>(),
+        evaluated.get<style::CircleStrokeOpacity>()
+    };
 }
 
 bool RenderCircleLayer::queryIntersectsFeature(

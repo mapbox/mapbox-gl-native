@@ -10,16 +10,18 @@ namespace mbgl {
 
 using namespace style;
 
-CircleBucket::CircleBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers)
+CircleBucket::CircleBucket(std::map<std::string, CircleBucket::PossiblyEvaluatedPaintProperties> layerPaintProperties,
+                           const float zoom,
+                           MapMode mode_)
     : Bucket(LayerType::Circle),
-      mode(parameters.mode) {
-    for (const auto& layer : layers) {
+      mode(mode_) {
+    for (const auto& pair : layerPaintProperties) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,
-            std::forward_as_tuple(layer->getID()),
+            std::forward_as_tuple(pair.first),
             std::forward_as_tuple(
-                layer->as<RenderCircleLayer>()->evaluated,
-                parameters.tileID.overscaledZ));
+                pair.second,
+                zoom));
     }
 }
 

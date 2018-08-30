@@ -369,36 +369,11 @@ void GeometryTileWorker::parse() {
         // are needed to render the layer. They use the intermediate Layout data structure to accomplish this,
         // and either immediately create a bucket if no images/glyphs are used, or the Layout is stored until
         // the images/glyphs are available to add the features to the buckets.
-        if (leader.as<RenderSymbolLayer>() ||leader.as<RenderLineLayer>() || leader.as<RenderFillLayer>() || leader.as<RenderFillExtrusionLayer>()) {
-            auto layout = leader.createLayout(parameters, group, std::move(geometryLayer), glyphDependencies, imageDependencies);
-            if (layout->hasDependencies()) {
-                layouts.push_back(std::move(layout));
-            } else {
-                layout->createBucket({}, featureIndex, buckets, firstLoad, showCollisionBoxes);
-            }
+        auto layout = leader.createLayout(parameters, group, std::move(geometryLayer), glyphDependencies, imageDependencies);
+        if (layout->hasDependencies()) {
+            layouts.push_back(std::move(layout));
         } else {
-            const Filter& filter = leader.baseImpl->filter;
-            const std::string& sourceLayerID = leader.baseImpl->sourceLayer;
-            std::shared_ptr<Bucket> bucket = leader.createBucket(parameters, group);
-
-            for (std::size_t i = 0; !obsolete && i < geometryLayer->featureCount(); i++) {
-                std::unique_ptr<GeometryTileFeature> feature = geometryLayer->getFeature(i);
-
-                if (!filter(expression::EvaluationContext { static_cast<float>(this->id.overscaledZ), feature.get() }))
-                    continue;
-
-                GeometryCollection geometries = feature->getGeometries();
-                bucket->addFeature(*feature, geometries, {}, PatternLayerMap ());
-                featureIndex->insert(geometries, i, sourceLayerID, leader.getID());
-            }
-
-            if (!bucket->hasData()) {
-                continue;
-            }
-
-            for (const auto& layer : group) {
-                buckets.emplace(layer->getID(), bucket);
-            }
+            layout->createBucket({}, featureIndex, buckets, firstLoad, showCollisionBoxes);
         }
     }
 

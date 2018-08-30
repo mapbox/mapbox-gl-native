@@ -12,10 +12,16 @@
 namespace mbgl {
 
 class BucketParameters;
+class RenderHeatmapLayer;
 
 class HeatmapBucket : public Bucket {
 public:
-    HeatmapBucket(const BucketParameters&, const std::vector<const RenderLayer*>&);
+    using RenderLayerType = RenderHeatmapLayer;
+    using PossiblyEvaluatedPaintProperties = style::HeatmapPaintProperties::PossiblyEvaluated;
+
+    HeatmapBucket(std::map<std::string, PossiblyEvaluatedPaintProperties> layerPaintProperties,
+                  const float zoom,
+                  MapMode mode_);
 
     void addFeature(const GeometryTileFeature&,
                             const GeometryCollection&,
