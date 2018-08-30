@@ -1,28 +1,27 @@
 #pragma once
 
-#include <mbgl/gl/features.hpp>
-#include <mbgl/gl/object.hpp>
-#include <mbgl/gl/state.hpp>
-#include <mbgl/gl/value.hpp>
-#include <mbgl/gl/texture.hpp>
-#include <mbgl/gl/renderbuffer.hpp>
-#include <mbgl/gl/framebuffer.hpp>
-#include <mbgl/gl/vertex_buffer.hpp>
-#include <mbgl/gl/index_buffer.hpp>
-#include <mbgl/gl/vertex_array.hpp>
-#include <mbgl/gl/types.hpp>
-#include <mbgl/gl/draw_mode.hpp>
-#include <mbgl/gl/depth_mode.hpp>
-#include <mbgl/gl/stencil_mode.hpp>
 #include <mbgl/gl/color_mode.hpp>
+#include <mbgl/gl/depth_mode.hpp>
+#include <mbgl/gl/draw_mode.hpp>
+#include <mbgl/gl/features.hpp>
+#include <mbgl/gl/framebuffer.hpp>
+#include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gl/object.hpp>
+#include <mbgl/gl/renderbuffer.hpp>
+#include <mbgl/gl/state.hpp>
+#include <mbgl/gl/stencil_mode.hpp>
+#include <mbgl/gl/texture.hpp>
+#include <mbgl/gl/types.hpp>
+#include <mbgl/gl/value.hpp>
+#include <mbgl/gl/vertex_array.hpp>
+#include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
-
+#include <array>
 #include <functional>
 #include <memory>
-#include <vector>
-#include <array>
 #include <string>
+#include <vector>
 
 namespace mbgl {
 namespace gl {
@@ -58,32 +57,34 @@ public:
 #if MBGL_HAS_BINARY_PROGRAMS
     bool supportsProgramBinaries() const;
 #else
-    constexpr bool supportsProgramBinaries() const { return false; }
+    constexpr bool supportsProgramBinaries() const {
+        return false;
+    }
 #endif
     optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
     template <class Vertex, class DrawMode>
-    VertexBuffer<Vertex, DrawMode> createVertexBuffer(VertexVector<Vertex, DrawMode>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
-        return VertexBuffer<Vertex, DrawMode> {
-            v.vertexSize(),
-            createVertexBuffer(v.data(), v.byteSize(), usage)
-        };
+    VertexBuffer<Vertex, DrawMode>
+    createVertexBuffer(VertexVector<Vertex, DrawMode>&& v,
+                       const BufferUsage usage = BufferUsage::StaticDraw) {
+        return VertexBuffer<Vertex, DrawMode>{ v.vertexSize(),
+                                               createVertexBuffer(v.data(), v.byteSize(), usage) };
     }
 
     template <class Vertex, class DrawMode>
-    void updateVertexBuffer(VertexBuffer<Vertex, DrawMode>& buffer, VertexVector<Vertex, DrawMode>&& v) {
+    void updateVertexBuffer(VertexBuffer<Vertex, DrawMode>& buffer,
+                            VertexVector<Vertex, DrawMode>&& v) {
         assert(v.vertexSize() == buffer.vertexCount);
         updateVertexBuffer(buffer.buffer, v.data(), v.byteSize());
     }
 
     template <class DrawMode>
-    IndexBuffer<DrawMode> createIndexBuffer(IndexVector<DrawMode>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
-        return IndexBuffer<DrawMode> {
-            v.indexSize(),
-            createIndexBuffer(v.data(), v.byteSize(), usage)
-        };
+    IndexBuffer<DrawMode> createIndexBuffer(IndexVector<DrawMode>&& v,
+                                            const BufferUsage usage = BufferUsage::StaticDraw) {
+        return IndexBuffer<DrawMode>{ v.indexSize(),
+                                      createIndexBuffer(v.data(), v.byteSize(), usage) };
     }
-    
+
     template <class DrawMode>
     void updateIndexBuffer(IndexBuffer<DrawMode>& buffer, IndexVector<DrawMode>&& v) {
         assert(v.indexSize() == buffer.indexCount);
@@ -92,9 +93,8 @@ public:
 
     template <RenderbufferType type>
     Renderbuffer<type> createRenderbuffer(const Size size) {
-        static_assert(type == RenderbufferType::RGBA ||
-                      type == RenderbufferType::DepthStencil ||
-                      type == RenderbufferType::DepthComponent,
+        static_assert(type == RenderbufferType::RGBA || type == RenderbufferType::DepthStencil ||
+                          type == RenderbufferType::DepthComponent,
                       "invalid renderbuffer type");
         return { size, createRenderbuffer(type, size) };
     }
@@ -159,9 +159,7 @@ public:
                      TextureWrap wrapX = TextureWrap::Clamp,
                      TextureWrap wrapY = TextureWrap::Clamp);
 
-    void clear(optional<mbgl::Color> color,
-               optional<float> depth,
-               optional<int32_t> stencil);
+    void clear(optional<mbgl::Color> color, optional<float> depth, optional<int32_t> stencil);
 
     void setDrawMode(const Points&);
     void setDrawMode(const Lines&);
@@ -173,9 +171,7 @@ public:
     void setStencilMode(const StencilMode&);
     void setColorMode(const ColorMode&);
 
-    void draw(PrimitiveType,
-              std::size_t indexOffset,
-              std::size_t indexLength);
+    void draw(PrimitiveType, std::size_t indexOffset, std::size_t indexLength);
 
     // Actually remove the objects we marked as abandoned with the above methods.
     // Only call this while the OpenGL context is exclusive to this thread.
@@ -186,13 +182,9 @@ public:
     void reset();
 
     bool empty() const {
-        return pooledTextures.empty()
-            && abandonedPrograms.empty()
-            && abandonedShaders.empty()
-            && abandonedBuffers.empty()
-            && abandonedTextures.empty()
-            && abandonedVertexArrays.empty()
-            && abandonedFramebuffers.empty();
+        return pooledTextures.empty() && abandonedPrograms.empty() && abandonedShaders.empty() &&
+               abandonedBuffers.empty() && abandonedTextures.empty() &&
+               abandonedVertexArrays.empty() && abandonedFramebuffers.empty();
     }
 
     void setDirtyState();
@@ -227,8 +219,8 @@ public:
     State<value::Program> program;
     State<value::BindVertexBuffer> vertexBuffer;
 
-    State<value::BindVertexArray, const Context&> bindVertexArray { *this };
-    VertexArrayState globalVertexArrayState { UniqueVertexArray(0, { this }) };
+    State<value::BindVertexArray, const Context&> bindVertexArray{ *this };
+    VertexArrayState globalVertexArrayState{ UniqueVertexArray(0, { const_cast<Context*>(this) }) };
 
     State<value::PixelStorePack> pixelStorePack;
     State<value::PixelStoreUnpack> pixelStoreUnpack;
@@ -243,7 +235,7 @@ public:
     bool supportsHalfFloatTextures = false;
     const uint32_t maximumVertexBindingCount;
     static constexpr const uint32_t minimumRequiredVertexBindingCount = 8;
-    
+
 private:
     State<value::StencilFunc> stencilFunc;
     State<value::StencilMask> stencilMask;
@@ -271,8 +263,10 @@ private:
     void updateVertexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size);
     UniqueBuffer createIndexBuffer(const void* data, std::size_t size, const BufferUsage usage);
     void updateIndexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size);
-    UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit, TextureType);
-    void updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit, TextureType);
+    UniqueTexture
+    createTexture(Size size, const void* data, TextureFormat, TextureUnit, TextureType);
+    void
+    updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit, TextureType);
     UniqueFramebuffer createFramebuffer();
     UniqueRenderbuffer createRenderbuffer(RenderbufferType, Size size);
     std::unique_ptr<uint8_t[]> readFramebuffer(Size, TextureFormat, bool flip);
