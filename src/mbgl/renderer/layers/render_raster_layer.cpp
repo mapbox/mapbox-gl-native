@@ -22,7 +22,7 @@ const style::RasterLayer::Impl& RenderRasterLayer::impl() const {
     return static_cast<const style::RasterLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Bucket> RenderRasterLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
+std::unique_ptr<Layout> RenderRasterLayer::createLayout(const BucketParameters&, const std::vector<const RenderLayer*>&, std::unique_ptr<GeometryTileLayer>, GlyphDependencies&, ImageDependencies&) const {
     assert(false);
     return nullptr;
 }

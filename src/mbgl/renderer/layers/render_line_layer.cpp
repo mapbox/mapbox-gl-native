@@ -27,12 +27,6 @@ const style::LineLayer::Impl& RenderLineLayer::impl() const {
     return static_cast<const style::LineLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Bucket> RenderLineLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
-    // Should be calling createLayout() instead.
-    assert(baseImpl->getTypeInfo()->layout == LayerTypeInfo::Layout::NotRequired);
-    return nullptr;
-}
-
 std::unique_ptr<Layout> RenderLineLayer::createLayout(const BucketParameters& parameters,
                                                       const std::vector<const RenderLayer*>& group,
                                                       std::unique_ptr<GeometryTileLayer> layer,

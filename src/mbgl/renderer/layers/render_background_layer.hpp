@@ -18,8 +18,9 @@ public:
     optional<Color> getSolidBackground() const final;
     void render(PaintParameters&, RenderSource*) override;
 
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
-
+    std::unique_ptr<Layout> createLayout(const BucketParameters&, const std::vector<const RenderLayer*>&,
+                                         std::unique_ptr<GeometryTileLayer>, GlyphDependencies&,
+                                         ImageDependencies&) const override;
     // Paint properties
     style::BackgroundPaintProperties::Unevaluated unevaluated;
     style::BackgroundPaintProperties::PossiblyEvaluated evaluated;

@@ -101,6 +101,7 @@ src/mbgl/layermanager/layer_factory.cpp
 src/mbgl/layermanager/layer_manager.cpp
 
 # layout
+src/mbgl/layout/circle_layout.hpp
 src/mbgl/layout/clip_lines.cpp
 src/mbgl/layout/clip_lines.hpp
 src/mbgl/layout/layout.hpp

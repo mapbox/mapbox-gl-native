@@ -25,8 +25,12 @@ const style::HeatmapLayer::Impl& RenderHeatmapLayer::impl() const {
     return static_cast<const style::HeatmapLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Bucket> RenderHeatmapLayer::createBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) const {
-    return std::make_unique<HeatmapBucket>(parameters, layers);
+std::unique_ptr<Layout> RenderHeatmapLayer::createLayout(const BucketParameters& parameters,
+                                                      const std::vector<const RenderLayer*>& group,
+                                                      std::unique_ptr<GeometryTileLayer> layer,
+                                                      GlyphDependencies&,
+                                                      ImageDependencies& imageDependencies) const {
+    return std::make_unique<CircleLayout<HeatmapBucket>>(parameters, group, std::move(layer), imageDependencies);
 }
 
 void RenderHeatmapLayer::transition(const TransitionParameters& parameters) {
@@ -208,6 +212,15 @@ void RenderHeatmapLayer::updateColorRamp() {
     if (colorRampTexture) {
         colorRampTexture = nullopt;
     }
+}
+style::HeatmapPaintProperties::PossiblyEvaluated RenderHeatmapLayer::paintProperties() const {
+    return HeatmapPaintProperties::PossiblyEvaluated {
+        evaluated.get<style::HeatmapRadius>(),
+        evaluated.get<style::HeatmapWeight>(),
+        evaluated.get<style::HeatmapIntensity>(),
+        evaluated.get<style::HeatmapColor>(),
+        evaluated.get<style::HeatmapOpacity>()
+    };
 }
 
 bool RenderHeatmapLayer::queryIntersectsFeature(

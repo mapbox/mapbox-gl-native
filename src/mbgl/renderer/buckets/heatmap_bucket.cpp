@@ -10,16 +10,18 @@ namespace mbgl {
 
 using namespace style;
 
-HeatmapBucket::HeatmapBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers)
+HeatmapBucket::HeatmapBucket(std::map<std::string, HeatmapBucket::PossiblyEvaluatedPaintProperties> layerPaintProperties,
+                             const float zoom,
+                             MapMode mode_)
     : Bucket(LayerType::Heatmap),
-      mode(parameters.mode) {
-    for (const auto& layer : layers) {
+      mode(mode_) {
+    for (const auto& pair : layerPaintProperties) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,
-            std::forward_as_tuple(layer->getID()),
+            std::forward_as_tuple(pair.first),
             std::forward_as_tuple(
-                toRenderHeatmapLayer(layer)->evaluated,
-                parameters.tileID.overscaledZ));
+                pair.second,
+                zoom));
     }
 }
 

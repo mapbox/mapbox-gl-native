@@ -41,12 +41,14 @@ bool RenderCustomLayer::hasTransition() const {
 bool RenderCustomLayer::hasCrossfade() const {
     return false;
 }
-
 void RenderCustomLayer::markContextDestroyed() {
     contextDestroyed = true;
 }
 
-std::unique_ptr<Bucket> RenderCustomLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
+std::unique_ptr<Layout>
+RenderCustomLayer::createLayout(const BucketParameters&, const std::vector<const RenderLayer*>&,
+                                std::unique_ptr<GeometryTileLayer>, GlyphDependencies&,
+                                ImageDependencies&) const {
     assert(false);
     return nullptr;
 }

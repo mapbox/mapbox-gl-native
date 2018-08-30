@@ -25,12 +25,6 @@ const style::FillLayer::Impl& RenderFillLayer::impl() const {
     return static_cast<const style::FillLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Bucket> RenderFillLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
-    // Should be calling createLayout() instead.
-    assert(baseImpl->getTypeInfo()->layout == LayerTypeInfo::Layout::NotRequired);
-    return nullptr;
-}
-
 std::unique_ptr<Layout>
 RenderFillLayer::createLayout(const BucketParameters& parameters,
                               const std::vector<const RenderLayer*>& group,

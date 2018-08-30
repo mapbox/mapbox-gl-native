@@ -24,7 +24,7 @@ const style::HillshadeLayer::Impl& RenderHillshadeLayer::impl() const {
     return static_cast<const style::HillshadeLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Bucket> RenderHillshadeLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
+std::unique_ptr<Layout> RenderHillshadeLayer::createLayout(const BucketParameters&, const std::vector<const RenderLayer*>&, std::unique_ptr<GeometryTileLayer>, GlyphDependencies&, ImageDependencies&) const {
     assert(false);
     return nullptr;
 }
