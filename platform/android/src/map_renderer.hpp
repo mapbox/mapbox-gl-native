@@ -9,8 +9,6 @@
 #include <jni/jni.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 
-#include "jni/generic_global_ref_deleter.hpp"
-
 namespace mbgl {
 
 template <class>
@@ -97,7 +95,7 @@ private:
     void onSurfaceChanged(JNIEnv&, jint width, jint height);
 
 private:
-    GenericWeak<jni::Object<MapRenderer>> javaPeer;
+    jni::WeakReference<jni::Object<MapRenderer>, jni::EnvAttachingDeleter> javaPeer;
 
     float pixelRatio;
     DefaultFileSource& fileSource;

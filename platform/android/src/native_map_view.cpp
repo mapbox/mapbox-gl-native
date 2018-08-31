@@ -37,7 +37,7 @@
 #include "conversion/conversion.hpp"
 #include "conversion/collection.hpp"
 #include "style/conversion/filter.hpp"
-#include "geojson/conversion/feature.hpp"
+#include "geojson/feature.hpp"
 
 #include "jni.hpp"
 #include "attach_env.hpp"
@@ -61,7 +61,7 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
                              jni::Object<FileSource> jFileSource,
                              jni::Object<MapRenderer> jMapRenderer,
                              jni::jfloat _pixelRatio)
-    : javaPeer(_obj.NewWeakGlobalRef(_env))
+    : javaPeer(_env, _obj)
     , mapRenderer(MapRenderer::getNativePeer(_env, jMapRenderer))
     , pixelRatio(_pixelRatio)
     , threadPool(sharedThreadPool()) {
@@ -105,7 +105,7 @@ void NativeMapView::notifyMapChange(mbgl::MapChange change) {
     android::UniqueEnv _env = android::AttachEnv();
     static auto javaClass = jni::Class<NativeMapView>::Singleton(*_env);
     static auto onMapChanged = javaClass.GetMethod<void (int)>(*_env, "onMapChanged");
-    javaPeer->Call(*_env, onMapChanged, (int) change);
+    javaPeer.get(*_env)->Call(*_env, onMapChanged, (int) change);
 }
 
 void NativeMapView::onCameraWillChange(MapObserver::CameraChangeMode mode) {
@@ -410,7 +410,7 @@ void NativeMapView::scheduleSnapshot(jni::JNIEnv&) {
         // invoke Mapview#OnSnapshotReady
         static auto javaClass = jni::Class<NativeMapView>::Singleton(*_env);
         static auto onSnapshotReady = javaClass.GetMethod<void (jni::Object<Bitmap>)>(*_env, "onSnapshotReady");
-        javaPeer->Call(*_env, onSnapshotReady, bitmap);
+        javaPeer.get(*_env)->Call(*_env, onSnapshotReady, bitmap);
     });
 }
 
@@ -658,7 +658,7 @@ jni::Array<jni::Object<geojson::Feature>> NativeMapView::queryRenderedFeaturesFo
     }
     mapbox::geometry::point<double> point = {x, y};
 
-    return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(
+    return Feature::convert(
             env,
             rendererFrontend->queryRenderedFeatures(point, { layers, toFilter(env, jni::SeizeLocal(env, std::move(jfilter))) }));
 }
@@ -678,7 +678,7 @@ jni::Array<jni::Object<geojson::Feature>> NativeMapView::queryRenderedFeaturesFo
             mapbox::geometry::point<double>{ right, bottom }
     };
 
-    return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(
+    return Feature::convert(
             env,
             rendererFrontend->queryRenderedFeatures(box, { layers, toFilter(env, jni::SeizeLocal(env, std::move(jfilter))) }));
 }

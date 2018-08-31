@@ -1,4 +1,5 @@
 #include "geojson_source.hpp"
+#include "../../attach_env.hpp"
 
 #include <mbgl/renderer/query.hpp>
 
@@ -12,7 +13,7 @@
 // C++ -> Java conversion
 #include "../../conversion/conversion.hpp"
 #include "../../conversion/collection.hpp"
-#include "../../geojson/conversion/feature.hpp"
+#include "../../geojson/feature.hpp"
 #include "../conversion/url_or_tileset.hpp"
 
 #include <string>
@@ -102,7 +103,7 @@ namespace android {
             features = rendererFrontend->querySourceFeatures(source.getID(),
                 { {}, toFilter(env, jni::SeizeLocal(env, std::move(jfilter))) });
         }
-        return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, features);
+        return Feature::convert(env, features);
     }
 
     jni::Object<Source> GeoJSONSource::createJavaPeer(jni::JNIEnv& env) {
@@ -113,11 +114,11 @@ namespace android {
 
     template <class JNIType>
     void GeoJSONSource::setCollectionAsync(jni::JNIEnv& env, jni::Object<JNIType> jObject) {
-
-        std::shared_ptr<jni::jobject> object = std::shared_ptr<jni::jobject>(jObject.NewGlobalRef(env).release().Get(), GenericGlobalRefDeleter());
+        auto global = jObject.template NewGlobalRef<jni::EnvAttachingDeleter>(env);
+        auto object = std::make_shared<decltype(global)>(std::move(global));
 
         Update::Converter converterFn = [this, object](ActorRef<Callback> _callback) {
-            converter->self().invoke(&FeatureConverter::convertObject<JNIType>, jni::Object<JNIType>(*object), _callback);
+            converter->self().invoke(&FeatureConverter::convertObject<JNIType>, **object, _callback);
         };
 
         setAsync(converterFn);

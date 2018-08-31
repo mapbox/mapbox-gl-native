@@ -9,7 +9,6 @@
 #include "../map/camera_position.hpp"
 
 #include <jni/jni.hpp>
-#include "../jni/generic_global_ref_deleter.hpp"
 
 #include <memory>
 
@@ -58,7 +57,7 @@ private:
     MBGL_STORE_THREAD(tid);
 
     JavaVM *vm = nullptr;
-    GenericWeak<jni::Object<MapSnapshotter>> javaPeer;
+    jni::WeakReference<jni::Object<MapSnapshotter>, jni::EnvAttachingDeleter> javaPeer;
 
     float pixelRatio;
     bool showLogo;

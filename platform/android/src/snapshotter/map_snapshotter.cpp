@@ -25,7 +25,7 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
                                jni::Object<CameraPosition> position,
                                jni::jboolean _showLogo,
                                jni::String _programCacheDir)
-        : javaPeer(SeizeGenericWeak(_obj.NewWeakGlobalRef(_env).release()))
+        : javaPeer(_env, _obj)
         , pixelRatio(_pixelRatio)
         , threadPool(sharedThreadPool()) {
 
@@ -85,7 +85,7 @@ void MapSnapshotter::start(JNIEnv& env) {
         if (err) {
             // error handler callback
             static auto onSnapshotFailed = javaClass.GetMethod<void (jni::String)>(*_env, "onSnapshotFailed");
-            javaPeer->Call(*_env, onSnapshotFailed,
+            javaPeer.get(*_env)->Call(*_env, onSnapshotFailed,
                 *jni::SeizeLocal(*_env, jni::Make<jni::String>(*_env, util::toString(err))));
         } else {
             // Create the wrapper
@@ -93,7 +93,7 @@ void MapSnapshotter::start(JNIEnv& env) {
 
             // invoke callback
             static auto onSnapshotReady = javaClass.GetMethod<void (jni::Object<MapSnapshot>)>(*_env, "onSnapshotReady");
-            javaPeer->Call(*_env, onSnapshotReady, mapSnapshot);
+            javaPeer.get(*_env)->Call(*_env, onSnapshotReady, mapSnapshot);
         }
 
         deactivateFilesource(*_env);

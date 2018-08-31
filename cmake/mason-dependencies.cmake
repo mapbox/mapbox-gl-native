@@ -19,7 +19,7 @@ mason_use(cheap-ruler VERSION 2.5.3 HEADER_ONLY)
 mason_use(vector-tile VERSION 1.0.2 HEADER_ONLY)
 
 if(MBGL_PLATFORM STREQUAL "android")
-    mason_use(jni.hpp VERSION 4.0.0-rc8 HEADER_ONLY)
+    mason_use(jni.hpp VERSION 4.0.0-rc10 HEADER_ONLY)
     mason_use(sqlite VERSION 3.24.0-min-size)
     mason_use(icu VERSION 58.1-min-size)
 elseif(MBGL_PLATFORM STREQUAL "ios")
