@@ -50,6 +50,11 @@ namespace android {
         return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getSymbolAvoidEdges()));
     }
 
+    jni::Local<jni::Object<>> SymbolLayer::getSymbolZOrder(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getSymbolZOrder()));
+    }
+
     jni::Local<jni::Object<>> SymbolLayer::getIconAllowOverlap(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getIconAllowOverlap()));
@@ -463,6 +468,7 @@ namespace android {
             METHOD(&SymbolLayer::getSymbolPlacement, "nativeGetSymbolPlacement"),
             METHOD(&SymbolLayer::getSymbolSpacing, "nativeGetSymbolSpacing"),
             METHOD(&SymbolLayer::getSymbolAvoidEdges, "nativeGetSymbolAvoidEdges"),
+            METHOD(&SymbolLayer::getSymbolZOrder, "nativeGetSymbolZOrder"),
             METHOD(&SymbolLayer::getIconAllowOverlap, "nativeGetIconAllowOverlap"),
             METHOD(&SymbolLayer::getIconIgnorePlacement, "nativeGetIconIgnorePlacement"),
             METHOD(&SymbolLayer::getIconOptional, "nativeGetIconOptional"),

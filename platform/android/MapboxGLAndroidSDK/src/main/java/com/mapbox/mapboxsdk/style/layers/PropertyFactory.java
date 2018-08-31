@@ -1765,6 +1765,26 @@ public class PropertyFactory {
   }
 
   /**
+   * Controls the order in which overlapping symbols in the same layer are rendered
+   *
+   * @param value a String value
+   * @return property wrapper around String
+   */
+  public static PropertyValue<String> symbolZOrder(@Property.SYMBOL_Z_ORDER String value) {
+    return new LayoutPropertyValue<>("symbol-z-order", value);
+  }
+
+  /**
+   * Controls the order in which overlapping symbols in the same layer are rendered
+   *
+   * @param value a String value
+   * @return property wrapper around String
+   */
+  public static PropertyValue<Expression> symbolZOrder(Expression value) {
+    return new LayoutPropertyValue<>("symbol-z-order", value);
+  }
+
+  /**
    * If true, the icon will be visible even if it collides with other previously drawn symbols.
    *
    * @param value a Boolean value

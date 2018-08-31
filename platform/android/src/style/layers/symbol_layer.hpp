@@ -33,6 +33,8 @@ public:
 
     jni::Local<jni::Object<jni::ObjectTag>> getSymbolAvoidEdges(jni::JNIEnv&);
 
+    jni::Local<jni::Object<jni::ObjectTag>> getSymbolZOrder(jni::JNIEnv&);
+
     jni::Local<jni::Object<jni::ObjectTag>> getIconAllowOverlap(jni::JNIEnv&);
 
     jni::Local<jni::Object<jni::ObjectTag>> getIconIgnorePlacement(jni::JNIEnv&);

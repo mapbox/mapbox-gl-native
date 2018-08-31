@@ -2,6 +2,9 @@
 
 ## master
 
+### Styles and rendering
+* Add `symbol-z-order` symbol layout property to style spec [#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783)
+
 ### Other changes
 
 * Fixed bug where completion block passed to `-[MGLMapSnapshotter startWithQueue:completionHandler:]` was not being called in all code paths. ([#12355](https://github.com/mapbox/mapbox-gl-native/pull/12355))

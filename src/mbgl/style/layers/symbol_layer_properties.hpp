@@ -27,6 +27,11 @@ struct SymbolAvoidEdges : LayoutProperty<bool> {
     static bool defaultValue() { return false; }
 };
 
+struct SymbolZOrder : LayoutProperty<SymbolZOrderType> {
+    static constexpr const char * key = "symbol-z-order";
+    static SymbolZOrderType defaultValue() { return SymbolZOrderType::ViewportY; }
+};
+
 struct IconAllowOverlap : LayoutProperty<bool> {
     static constexpr const char * key = "icon-allow-overlap";
     static bool defaultValue() { return false; }
@@ -252,6 +257,7 @@ class SymbolLayoutProperties : public Properties<
     SymbolPlacement,
     SymbolSpacing,
     SymbolAvoidEdges,
+    SymbolZOrder,
     IconAllowOverlap,
     IconIgnorePlacement,
     IconOptional,

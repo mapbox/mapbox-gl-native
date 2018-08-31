@@ -3,6 +3,7 @@
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
 ## master
+- Add `symbol-z-order` symbol layout property to style spec [#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783)
 
 ## 6.5.0-beta.1 - September 5, 2018
  - Retain shared thread pool reference [#12811](https://github.com/mapbox/mapbox-gl-native/pull/12811)
