@@ -20,6 +20,7 @@ import java.util.Set;
  */
 public class AttributionParser {
 
+  private static final String IMPROVE_THIS_MAP = "Improve this map";
   private final WeakReference<Context> context;
   private final Set<Attribution> attributions = new LinkedHashSet<>();
   private final String attributionData;
@@ -104,6 +105,9 @@ public class AttributionParser {
     String url = urlSpan.getURL();
     if (isUrlValid(url)) {
       String anchor = parseAnchorValue(htmlBuilder, urlSpan);
+      if (isImproveThisMapAnchor(anchor)) {
+        anchor = translateImproveThisMapAnchor(anchor);
+      }
       attributions.add(new Attribution(anchor, url));
     }
   }
@@ -116,6 +120,30 @@ public class AttributionParser {
    */
   private boolean isUrlValid(String url) {
     return isValidForImproveThisMap(url) && isValidForMapbox(url);
+  }
+
+  /**
+   * Invoked to validate if an anchor is equal to Improve this map coming from tilesets.
+   *
+   * @param anchor the anchor to be validated
+   * @return if the url is valid
+   */
+  private boolean isImproveThisMapAnchor(String anchor) {
+    return anchor.equals(IMPROVE_THIS_MAP);
+  }
+
+  /**
+   * Invoked to replace the english Improve this map with localized variant.
+   *
+   * @param anchor the anchor to be translated
+   * @return the translated anchor
+   */
+  private String translateImproveThisMapAnchor(String anchor) {
+    Context context = this.context.get();
+    if (context != null) {
+      anchor = context.getString(R.string.mapbox_telemetryImproveMap);
+    }
+    return anchor;
   }
 
   /**
