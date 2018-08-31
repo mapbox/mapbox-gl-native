@@ -264,6 +264,34 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     }
 }
 
+#pragma mark Offline merge methods
+
+- (void)addContentesOfFile:(NSString *)filePath withCompletionHandler:(MGLOfflinePacksAdditionCompletionHandler)completion {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSAssert([fileManager isWritableFileAtPath:filePath], @"The file %@ must be writable.", filePath);
+    self.mbglFileSource->mergeOfflineRegions(std::string(static_cast<const char *>([filePath UTF8String])), [&, completion](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> result) {
+        NSError *error;
+        NSMutableArray *packs;
+        if (!result) {
+            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
+                                                                               NSLocalizedDescriptionKey: @(mbgl::util::toString(result.error()).c_str()),
+                                                                               }];
+        } else {
+            auto& regions = result.value();
+            packs = [NSMutableArray arrayWithCapacity:regions.size()];
+            for (auto &region : regions) {
+                MGLOfflinePack *pack = [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(region))];
+                [packs addObject:pack];
+            }
+        }
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), [&, completion, error, packs](void) {
+                completion(packs, error);
+            });
+        }
+    });
+}
+
 #pragma mark Pack management methods
 
 - (void)addPackForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflinePackAdditionCompletionHandler)completion {
