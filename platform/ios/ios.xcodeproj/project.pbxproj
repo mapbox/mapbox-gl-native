@@ -1243,6 +1243,8 @@
 		DAA4E4061CBB5CBF00178DFB /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		DAA4E4131CBB71D400178DFB /* libMapbox.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMapbox.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAABF73B1CBC59BB005B1825 /* libmbgl-core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libmbgl-core.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAAE9B1B213A634700F7D722 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Root.strings; sourceTree = "<group>"; };
+		DAAE9B1C213A636B00F7D722 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ar; path = ar.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		DAAF72291DA903C700312FA4 /* MGLStyleValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLStyleValue.h; sourceTree = "<group>"; };
 		DAAF722A1DA903C700312FA4 /* MGLStyleValue_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLStyleValue_Private.h; sourceTree = "<group>"; };
 		DABCABA81CB80692000A7C39 /* Bench GL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bench GL.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3332,6 +3334,7 @@
 				DAD88E0C202AD06500AAA536 /* da */,
 				DA93409F208563440059919A /* pt-PT */,
 				DAFEB3792093AEA100A86A83 /* ko */,
+				DAAE9B1B213A634700F7D722 /* ar */,
 			);
 			name = Root.strings;
 			sourceTree = "<group>";
@@ -3439,6 +3442,7 @@
 				DAD88E0B202AD04D00AAA536 /* da */,
 				DA93409E208563360059919A /* pt-PT */,
 				DAFEB3782093AE9200A86A83 /* ko */,
+				DAAE9B1C213A636B00F7D722 /* ar */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";
