@@ -2,29 +2,28 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## master
-
-* Add support for feature expressions in `line-pattern`, `fill-pattern`, and `fill-extrusion-pattern` properties. [#12284](https://github.com/mapbox/mapbox-gl-native/pull/12284)
-
 ## 4.4.0
 
-* The predefined values of `MGLMapView.decelerationRate` are now typed as `MGLMapViewDecelerationRate`s for improved bridging to Swift. ([#12584](https://github.com/mapbox/mapbox-gl-native/pull/12584))
+### Styles and rendering
+
 * When a symbol in an `MGLSymbolStyleLayer` has both an icon and text, both are shown or hidden together based on available space. ([#12521](https://github.com/mapbox/mapbox-gl-native/pull/12521))
+* Invalid values of `MGLSymbolStyleLayer.textFontNames` are treated as warnings instead of errors. ([#12414](https://github.com/mapbox/mapbox-gl-native/pull/12414))
+* Added an `MGLLineStyleLayer.lineGradient` property that can be used to define a gradient with which to color a line feature. ([#12575](https://github.com/mapbox/mapbox-gl-native/pull/12575/))
+* The `MGLLineStyleLayer.linePattern`, `MGLFillStyleLayer.fillPattern`, and `MGLFillStyleLayer.fillExtrusionPattern` properties can now be set to expressions that refer to feature attributes. ([#12284](https://github.com/mapbox/mapbox-gl-native/pull/12284))
+* Reduced the amount of memory consumed by font data after changing the style. ([#12414](https://github.com/mapbox/mapbox-gl-native/pull/12414))
+* `-[MGLShapeSource initWithIdentifier:shape:options:]` warns about possible attribute loss when passing in an `MGLShapeCollection` object. ([#12625](https://github.com/mapbox/mapbox-gl-native/pull/12625))
+
+### Offline maps
+
+* Added the `MGLShapeOfflineRegion` class for creating an offline pack that covers an arbitrary shape. ([#11447](https://github.com/mapbox/mapbox-gl-native/pull/11447))
+* Fixed crashes when offline storage encountered certain SQLite errors. ([#12224](https://github.com/mapbox/mapbox-gl-native/pull/12224))
+
+### Other changes
+
+* The predefined values of `MGLMapView.decelerationRate` are now typed as `MGLMapViewDecelerationRate`s for improved bridging to Swift. ([#12584](https://github.com/mapbox/mapbox-gl-native/pull/12584))
+* Added an `-[MGLMapViewDelegate mapView:shapeAnnotationIsEnabled:]` method to specify whether an annotation is selectable. ([#12352](https://github.com/mapbox/mapbox-gl-native/pull/12352))
 * The `-[MGLMapView visibleFeaturesAtPoint:]` method can now return features near tile boundaries at high zoom levels. ([#12570](https://github.com/mapbox/mapbox-gl-native/pull/12570))
 * Fixed inconsistencies in exception naming. ([#12583](https://github.com/mapbox/mapbox-gl-native/issues/12583))
-* Added `MGLShapeOfflineRegion` for defining arbitrarily shaped offline regions [#11447](https://github.com/mapbox/mapbox-gl-native/pull/11447)
-* Added a one-time warning about possible attribute loss when initializing an `MGLShapeSource` with an `MGLShapeCollection` [#12625](https://github.com/mapbox/mapbox-gl-native/pull/12625)
-* Added an `-[MGLMapViewDelegate mapView:shapeAnnotationIsEnabled:]` method to specify whether an annotation is selectable. ([#12352](https://github.com/mapbox/mapbox-gl-native/pull/12352))
-
-### Offline
-* Improved SQLite error handling for offline databases that return specific errors. [#12224](https://github.com/mapbox/mapbox-gl-native/pull/12224)
-* Added the ability to define an offline region with an arbitrary shape. [#11447](https://github.com/mapbox/mapbox-gl-native/pull/11447)
-* Added the ability to merge offline regions from an externally prepared database into the main offline database. [#12608](https://github.com/mapbox/mapbox-gl-native/pull/12608)
-
-### Styles and rendering
-* Reduced the amount of memory consumed by font data after changing the style. [#12414](https://github.com/mapbox/mapbox-gl-native/pull/12414)
-* Modified how invalid values for "text-font" are handled. These are now warnings instead of errors. [#12414](https://github.com/mapbox/mapbox-gl-native/pull/12414)
-* Added an `MGLLineStyleLayer.lineGradient` property that can be used to define a gradient with which to color a line feature. [#12575](https://github.com/mapbox/mapbox-gl-native/pull/12575/)
 
 ## 4.3.0 - August 15, 2018
 
