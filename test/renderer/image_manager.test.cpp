@@ -108,11 +108,11 @@ TEST(ImageManager, RemoveReleasesBinPackRect) {
 
 class StubImageRequestor : public ImageRequestor {
 public:
-    void onImagesAvailable(ImageMap images, uint64_t imageCorrelationID_) final {
-        if (imagesAvailable && imageCorrelationID == imageCorrelationID_) imagesAvailable(images);
+    void onImagesAvailable(ImageMap icons, ImageMap patterns, uint64_t imageCorrelationID_) final {
+        if (imagesAvailable && imageCorrelationID == imageCorrelationID_) imagesAvailable(icons, patterns);
     }
 
-    std::function<void (ImageMap)> imagesAvailable;
+    std::function<void (ImageMap, ImageMap)> imagesAvailable;
     uint64_t imageCorrelationID = 0;
 };
 
@@ -121,12 +121,14 @@ TEST(ImageManager, NotifiesRequestorWhenSpriteIsLoaded) {
     StubImageRequestor requestor;
     bool notified = false;
 
-    requestor.imagesAvailable = [&] (ImageMap) {
+    requestor.imagesAvailable = [&] (ImageMap, ImageMap) {
         notified = true;
     };
 
     uint64_t imageCorrelationID = 0;
-    imageManager.getImages(requestor, std::make_pair(std::set<std::string> {"one"}, imageCorrelationID));
+    ImageDependencies dependencies;
+    dependencies.emplace("one", ImageType::Icon);
+    imageManager.getImages(requestor, std::make_pair(dependencies, imageCorrelationID));
     ASSERT_FALSE(notified);
 
     imageManager.setLoaded(true);
@@ -138,13 +140,15 @@ TEST(ImageManager, NotifiesRequestorImmediatelyIfDependenciesAreSatisfied) {
     StubImageRequestor requestor;
     bool notified = false;
 
-    requestor.imagesAvailable = [&] (ImageMap) {
+    requestor.imagesAvailable = [&] (ImageMap, ImageMap) {
         notified = true;
     };
 
     uint64_t imageCorrelationID = 0;
+    ImageDependencies dependencies;
+    dependencies.emplace("one", ImageType::Icon);
     imageManager.addImage(makeMutable<style::Image::Impl>("one", PremultipliedImage({ 16, 16 }), 2));
-    imageManager.getImages(requestor, std::make_pair(std::set<std::string> {"one"}, imageCorrelationID));
+    imageManager.getImages(requestor, std::make_pair(dependencies, imageCorrelationID));
 
     ASSERT_TRUE(notified);
 }

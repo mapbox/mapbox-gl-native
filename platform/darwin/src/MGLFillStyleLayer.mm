@@ -209,7 +209,7 @@ namespace mbgl {
 - (void)setFillPattern:(NSExpression *)fillPattern {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(fillPattern, false);
+    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(fillPattern, true);
     self.rawLayer->setFillPattern(mbglValue);
 }
 

@@ -49,7 +49,6 @@ elseif(MBGL_PLATFORM STREQUAL "macos")
     endif()
 elseif(MBGL_PLATFORM STREQUAL "qt")
     mason_use(optional VERSION f27e7908 HEADER_ONLY)
-    mason_use(tao_tuple VERSION 28626e99 HEADER_ONLY)
 
     if(NOT WITH_QT_DECODERS)
         mason_use(libjpeg-turbo VERSION 1.5.0)

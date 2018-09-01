@@ -14,6 +14,7 @@
 #include <mbgl/renderer/layers/render_background_layer.hpp>
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
+#include <mbgl/renderer/layers/render_fill_layer.hpp>
 #include <mbgl/renderer/layers/render_heatmap_layer.hpp>
 #include <mbgl/renderer/layers/render_hillshade_layer.hpp>
 #include <mbgl/renderer/style_diff.hpp>
@@ -195,7 +196,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             }
         }
 
-        if (layerAdded || layerChanged || zoomChanged || layer.hasTransition()) {
+        if (layerAdded || layerChanged || zoomChanged || layer.hasTransition() || layer.hasCrossfade()) {
             layer.evaluate(evaluationParameters);
         }
     }
@@ -512,7 +513,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                 parameters.staticData.tileTriangleSegments,
                 program.computeAllUniformValues(
                     ClippingMaskProgram::UniformValues {
-                        uniforms::u_matrix::Value{ parameters.matrixForTile(clipID.first) },
+                        uniforms::u_matrix::Value( parameters.matrixForTile(clipID.first) ),
                     },
                     paintAttributeData,
                     properties,

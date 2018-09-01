@@ -40,7 +40,6 @@ macro(mbgl_platform_core)
 
     if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         target_add_mason_package(mbgl-core PRIVATE optional)
-        target_add_mason_package(mbgl-core PRIVATE tao_tuple)
     endif()
 endmacro()
 
@@ -56,7 +55,6 @@ macro(mbgl_filesource)
 
     if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         target_add_mason_package(mbgl-filesource PRIVATE optional)
-        target_add_mason_package(mbgl-filesource PRIVATE tao_tuple)
     endif()
 endmacro()
 

@@ -1,5 +1,4 @@
 #pragma once
-
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
@@ -7,6 +6,7 @@
 #include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/line_program.hpp>
 #include <mbgl/style/layers/line_layer_properties.hpp>
+#include <mbgl/style/image_impl.hpp>
 
 #include <vector>
 
@@ -17,19 +17,29 @@ class RenderLineLayer;
 
 class LineBucket : public Bucket {
 public:
-    LineBucket(const BucketParameters&,
-               const std::vector<const RenderLayer*>&,
-               const style::LineLayoutProperties::Unevaluated&);
+
+    // These aliases are used by the PatternLayout template
+    using RenderLayerType = RenderLineLayer;
+    using PossiblyEvaluatedPaintProperties = RenderLinePaintProperties::PossiblyEvaluated;
+    using PossiblyEvaluatedLayoutProperties = style::LineLayoutProperties::PossiblyEvaluated;
+
+    LineBucket(const PossiblyEvaluatedLayoutProperties layout,
+               std::map<std::string, PossiblyEvaluatedPaintProperties> layerPaintProperties,
+               const float zoom,
+               const uint32_t overscaling);
 
     void addFeature(const GeometryTileFeature&,
-                    const GeometryCollection&) override;
+                    const GeometryCollection&,
+                    const mbgl::ImagePositions& patternPositions,
+                    const PatternLayerMap&) override;
+
     bool hasData() const override;
 
     void upload(gl::Context&) override;
 
     float getQueryRadius(const RenderLayer&) const override;
 
-    style::LineLayoutProperties::PossiblyEvaluated layout;
+    PossiblyEvaluatedLayoutProperties layout;
 
     gl::VertexVector<LineLayoutVertex> vertices;
     gl::IndexVector<gl::Triangles> triangles;
@@ -63,8 +73,8 @@ private:
     std::ptrdiff_t e2;
     std::ptrdiff_t e3;
 
-    const uint32_t overscaling;
     const float zoom;
+    const uint32_t overscaling;
 
     float getLineWidth(const RenderLineLayer& layer) const;
 };

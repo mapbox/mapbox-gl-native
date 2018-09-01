@@ -545,4 +545,20 @@ public class LineLayerTest extends BaseActivityTest {
       assertEquals((String) layer.getLinePattern().getValue(), (String) "pedestrian-polygon");
     });
   }
+
+  @Test
+  public void testLinePatternAsExpression() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("line-pattern-expression");
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+
+      // Set and Get
+      Expression expression = string(Expression.get("undefined"));
+      layer.setProperties(linePattern(expression));
+      assertEquals(layer.getLinePattern().getExpression(), expression);
+    });
+  }
+
 }

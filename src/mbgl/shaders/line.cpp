@@ -7,8 +7,8 @@ namespace mbgl {
 namespace shaders {
 
 const char* line::name = "line";
-const char* line::vertexSource = source() + 37744;
-const char* line::fragmentSource = source() + 42206;
+const char* line::vertexSource = source() + 42145;
+const char* line::fragmentSource = source() + 46608;
 
 } // namespace shaders
 } // namespace mbgl

@@ -28,7 +28,7 @@ struct FillExtrusionTranslateAnchor : PaintProperty<TranslateAnchorType> {
     static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
 };
 
-struct FillExtrusionPattern : CrossFadedPaintProperty<std::string> {
+struct FillExtrusionPattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::a_pattern_to, uniforms::u_pattern_to, attributes::a_pattern_from, uniforms::u_pattern_from> {
     static std::string defaultValue() { return ""; }
 };
 

@@ -1,5 +1,5 @@
 #pragma once
-
+#include <mbgl/layout/layout.hpp>
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layer_type.hpp>
@@ -40,6 +40,9 @@ public:
     // Returns true if any paint properties have active transitions.
     virtual bool hasTransition() const = 0;
 
+    // Returns true if the layer has a pattern property and is actively crossfading.
+    virtual bool hasCrossfade() const = 0;
+
     // Check whether this layer is of the given subtype.
     template <class T>
     bool is() const;
@@ -76,7 +79,13 @@ public:
             const mat4&) const { return false; };
 
     virtual std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const = 0;
-
+    virtual std::unique_ptr<Layout> createLayout(const BucketParameters&,
+                                               const std::vector<const RenderLayer*>&,
+                                               std::unique_ptr<GeometryTileLayer>,
+                                               GlyphDependencies&,
+                                               ImageDependencies&) const {
+        return nullptr;
+    }
     void setRenderTiles(std::vector<std::reference_wrapper<RenderTile>>);
     // Private implementation
     Immutable<style::Layer::Impl> baseImpl;

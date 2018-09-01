@@ -2,10 +2,14 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
+#include <mbgl/layout/pattern_layout.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/group_by_layout.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/renderer/layers/render_fill_layer.hpp>
+#include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
+#include <mbgl/renderer/layers/render_line_layer.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/util/logging.hpp>
@@ -79,15 +83,15 @@ GeometryTileWorker::~GeometryTileWorker() = default;
    It is nevertheless possible to restart an in-progress request:
  
     - [Idle] setData -> parse()
-        sends getGlyphs, hasPendingSymbolDependencies() is true
+        sends getGlyphs, hasPendingDependencies() is true
         enters [Coalescing], sends coalesced
     - [Coalescing] coalesced -> [Idle]
     - [Idle] setData -> new parse(), interrupts old parse()
-        sends getGlyphs, hasPendingSymbolDependencies() is true
+        sends getGlyphs, hasPendingDependencies() is true
         enters [Coalescing], sends coalesced
     - [Coalescing] onGlyphsAvailable -> [NeedsSymbolLayout]
-           hasPendingSymbolDependencies() may or may not be true
-    - [NeedsSymbolLayout] coalesced -> performSymbolLayout()
+           hasPendingDependencies() may or may not be true
+    - [NeedsSymbolLayout] coalesced -> finalizeLayout()
            Generates result depending on whether dependencies are met
            -> [Idle]
  
@@ -188,18 +192,17 @@ void GeometryTileWorker::symbolDependenciesChanged() {
     try {
         switch (state) {
         case Idle:
-            if (symbolLayoutsNeedPreparation) {
-                // symbolLayoutsNeedPreparation can only be set true by parsing
-                // and the parse result can only be cleared by performSymbolLayout
-                // which also clears symbolLayoutsNeedPreparation
+            if (!layouts.empty()) {
+                // Layouts are created only by parsing and the parse result can only be
+                // cleared by performLayout, which also clears the layouts.
                 assert(hasPendingParseResult());
-                performSymbolLayout();
+                finalizeLayout();
                 coalesce();
             }
             break;
 
         case Coalescing:
-            if (symbolLayoutsNeedPreparation) {
+            if (!layouts.empty()) {
                 state = NeedsSymbolLayout;
             }
             break;
@@ -231,9 +234,9 @@ void GeometryTileWorker::coalesced() {
 
         case NeedsSymbolLayout:
             // We may have entered NeedsSymbolLayout while coalescing
-            // after a performSymbolLayout. In that case, we need to
+            // after a performLayout. In that case, we need to
             // start over with parsing in order to do another layout.
-            hasPendingParseResult() ? performSymbolLayout() : parse();
+            hasPendingParseResult() ? finalizeLayout() : parse();
             coalesce();
             break;
         }
@@ -267,11 +270,12 @@ void GeometryTileWorker::onGlyphsAvailable(GlyphMap newGlyphMap) {
     symbolDependenciesChanged();
 }
 
-void GeometryTileWorker::onImagesAvailable(ImageMap newImageMap, uint64_t imageCorrelationID_) {
+void GeometryTileWorker::onImagesAvailable(ImageMap newIconMap, ImageMap newPatternMap, uint64_t imageCorrelationID_) {
     if (imageCorrelationID != imageCorrelationID_) {
         return; // Ignore outdated image request replies.
     }
-    imageMap = std::move(newImageMap);
+    imageMap = std::move(newIconMap);
+    patternMap = std::move(newPatternMap);
     pendingImageDependencies.clear();
     symbolDependenciesChanged();
 }
@@ -292,6 +296,7 @@ void GeometryTileWorker::requestNewGlyphs(const GlyphDependencies& glyphDependen
 
 void GeometryTileWorker::requestNewImages(const ImageDependencies& imageDependencies) {
     pendingImageDependencies = imageDependencies;
+
     if (!pendingImageDependencies.empty()) {
         parent.invoke(&GeometryTile::getImages, std::make_pair(pendingImageDependencies, ++imageCorrelationID));
     }
@@ -321,15 +326,12 @@ void GeometryTileWorker::parse() {
     }
 
     MBGL_TIMING_START(watch)
-    std::vector<std::string> symbolOrder;
-    for (auto it = layers->rbegin(); it != layers->rend(); it++) {
-        if ((*it)->type == LayerType::Symbol) {
-            symbolOrder.push_back((*it)->id);
-        }
-    }
 
     std::unordered_map<std::string, std::unique_ptr<SymbolLayout>> symbolLayoutMap;
+
     buckets.clear();
+    layouts.clear();
+
     featureIndex = std::make_unique<FeatureIndex>(*data ? (*data)->clone() : nullptr);
     BucketParameters parameters { id, mode, pixelRatio };
 
@@ -363,11 +365,17 @@ void GeometryTileWorker::parse() {
 
         featureIndex->setBucketLayerIDs(leader.getID(), layerIDs);
 
-        if (leader.is<RenderSymbolLayer>()) {
-            auto layout = leader.as<RenderSymbolLayer>()->createLayout(
-                parameters, group, std::move(geometryLayer), glyphDependencies, imageDependencies);
-            symbolLayoutMap.emplace(leader.getID(), std::move(layout));
-            symbolLayoutsNeedPreparation = true;
+        // Symbol layers and layers that support pattern properties have an extra step at layout time to figure out what images/glyphs
+        // are needed to render the layer. They use the intermediate Layout data structure to accomplish this,
+        // and either immediately create a bucket if no images/glyphs are used, or the Layout is stored until
+        // the images/glyphs are available to add the features to the buckets.
+        if (leader.as<RenderSymbolLayer>() ||leader.as<RenderLineLayer>() || leader.as<RenderFillLayer>() || leader.as<RenderFillExtrusionLayer>()) {
+            auto layout = leader.createLayout(parameters, group, std::move(geometryLayer), glyphDependencies, imageDependencies);
+            if (layout->hasDependencies()) {
+                layouts.push_back(std::move(layout));
+            } else {
+                layout->createBucket({}, featureIndex, buckets, firstLoad, showCollisionBoxes);
+            }
         } else {
             const Filter& filter = leader.baseImpl->filter;
             const std::string& sourceLayerID = leader.baseImpl->sourceLayer;
@@ -380,7 +388,7 @@ void GeometryTileWorker::parse() {
                     continue;
 
                 GeometryCollection geometries = feature->getGeometries();
-                bucket->addFeature(*feature, geometries);
+                bucket->addFeature(*feature, geometries, {}, PatternLayerMap ());
                 featureIndex->insert(geometries, i, sourceLayerID, leader.getID());
             }
 
@@ -394,14 +402,6 @@ void GeometryTileWorker::parse() {
         }
     }
 
-    symbolLayouts.clear();
-    for (const auto& symbolLayerID : symbolOrder) {
-        auto it = symbolLayoutMap.find(symbolLayerID);
-        if (it != symbolLayoutMap.end()) {
-            symbolLayouts.push_back(std::move(it->second));
-        }
-    }
-
     requestNewGlyphs(glyphDependencies);
     requestNewImages(imageDependencies);
 
@@ -410,10 +410,10 @@ void GeometryTileWorker::parse() {
                        " SourceID: " << sourceID.c_str() <<
                        " Canonical: " << static_cast<int>(id.canonical.z) << "/" << id.canonical.x << "/" << id.canonical.y <<
                        " Time");
-    performSymbolLayout();
+    finalizeLayout();
 }
 
-bool GeometryTileWorker::hasPendingSymbolDependencies() const {
+bool GeometryTileWorker::hasPendingDependencies() const {
     for (auto& glyphDependency : pendingGlyphDependencies) {
         if (!glyphDependency.second.empty()) {
             return true;
@@ -426,51 +426,36 @@ bool GeometryTileWorker::hasPendingParseResult() const {
     return bool(featureIndex);
 }
 
-void GeometryTileWorker::performSymbolLayout() {
-    if (!data || !layers || !hasPendingParseResult() || hasPendingSymbolDependencies()) {
+void GeometryTileWorker::finalizeLayout() {
+    if (!data || !layers || !hasPendingParseResult() || hasPendingDependencies()) {
         return;
     }
     
     MBGL_TIMING_START(watch)
     optional<AlphaImage> glyphAtlasImage;
-    optional<PremultipliedImage> iconAtlasImage;
-
-    if (symbolLayoutsNeedPreparation) {
+    ImageAtlas iconAtlas = makeImageAtlas(imageMap, patternMap);
+    if (!layouts.empty()) {
         GlyphAtlas glyphAtlas = makeGlyphAtlas(glyphMap);
-        ImageAtlas imageAtlas = makeImageAtlas(imageMap);
-
         glyphAtlasImage = std::move(glyphAtlas.image);
-        iconAtlasImage = std::move(imageAtlas.image);
 
-        for (auto& symbolLayout : symbolLayouts) {
+        for (auto& layout : layouts) {
             if (obsolete) {
                 return;
             }
 
-            symbolLayout->prepare(glyphMap, glyphAtlas.positions,
-                                  imageMap, imageAtlas.positions);
-        }
+            layout->prepareSymbols(glyphMap, glyphAtlas.positions,
+                                  imageMap, iconAtlas.iconPositions);
 
-        symbolLayoutsNeedPreparation = false;
-    }
-
-    for (auto& symbolLayout : symbolLayouts) {
-        if (obsolete) {
-            return;
-        }
-
-        if (!symbolLayout->hasSymbolInstances()) {
-            continue;
-        }
-
-        std::shared_ptr<SymbolBucket> bucket = symbolLayout->place(showCollisionBoxes);
-        for (const auto& pair : symbolLayout->layerPaintProperties) {
-            if (!firstLoad) {
-                bucket->justReloaded = true;
+            if (!layout->hasSymbolInstances()) {
+                continue;
             }
-            buckets.emplace(pair.first, bucket);
+
+            // layout adds the bucket to buckets
+            layout->createBucket(iconAtlas.patternPositions, featureIndex, buckets, firstLoad, showCollisionBoxes);
         }
     }
+
+    layouts.clear();
 
     firstLoad = false;
     
@@ -479,11 +464,12 @@ void GeometryTileWorker::performSymbolLayout() {
                        " SourceID: " << sourceID.c_str() <<
                        " Canonical: " << static_cast<int>(id.canonical.z) << "/" << id.canonical.x << "/" << id.canonical.y <<
                        " Time");
+
     parent.invoke(&GeometryTile::onLayout, GeometryTile::LayoutResult {
         std::move(buckets),
         std::move(featureIndex),
         std::move(glyphAtlasImage),
-        std::move(iconAtlasImage)
+        std::move(iconAtlas)
     }, correlationID);
 }
 

@@ -125,10 +125,10 @@ public:
     UniformValues uniformValues(float currentZoom) const {
         const ZoomEvaluatedSize u = evaluateForZoom(currentZoom);
         return UniformValues {
-            uniforms::u_is_size_zoom_constant::Value{ u.isZoomConstant },
-            uniforms::u_is_size_feature_constant::Value{ u.isFeatureConstant},
-            uniforms::u_size_t::Value{ u.sizeT },
-            uniforms::u_size::Value{ u.size }
+            uniforms::u_is_size_zoom_constant::Value( u.isZoomConstant ),
+            uniforms::u_is_size_feature_constant::Value( u.isFeatureConstant),
+            uniforms::u_size_t::Value( u.sizeT ),
+            uniforms::u_size::Value( u.size )
         };
     }
 };
@@ -185,7 +185,7 @@ public:
 
 class SourceFunctionSymbolSizeBinder final : public SymbolSizeBinder {
 public:
-    using Vertex = gl::detail::Vertex<gl::Attribute<uint16_t, 1>>;
+    using Vertex = gl::detail::Vertex<gl::AttributeType<uint16_t, 1>>;
     using VertexVector = gl::VertexVector<Vertex>;
     using VertexBuffer = gl::VertexBuffer<Vertex>;
 
@@ -252,7 +252,7 @@ public:
     using LayoutAttributes = LayoutAttrs;
     using LayoutVertex = typename LayoutAttributes::Vertex;
 
-    using LayoutAndSizeAttributes = gl::ConcatenateAttributes<LayoutAttributes, gl::ConcatenateAttributes<SymbolDynamicLayoutAttributes, SymbolOpacityAttributes>>;
+    using LayoutAndSizeAttributes = gl::ConcatenateAttributes<LayoutAttributes, SymbolDynamicLayoutAttributes, SymbolOpacityAttributes>;
 
     using PaintProperties = PaintProps;
     using PaintPropertyBinders = typename PaintProperties::Binders;
@@ -262,7 +262,7 @@ public:
     using UniformValues = typename Uniforms::Values;
     using SizeUniforms = typename SymbolSizeBinder::Uniforms;
     using PaintUniforms = typename PaintPropertyBinders::Uniforms;
-    using AllUniforms = gl::ConcatenateUniforms<Uniforms, gl::ConcatenateUniforms<SizeUniforms, PaintUniforms>>;
+    using AllUniforms = gl::ConcatenateUniforms<Uniforms, SizeUniforms, PaintUniforms>;
 
     using ProgramType = gl::Program<Primitive, Attributes, AllUniforms>;
 

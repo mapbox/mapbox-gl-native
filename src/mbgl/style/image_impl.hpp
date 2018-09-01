@@ -26,8 +26,13 @@ public:
 
 } // namespace style
 
+enum class ImageType : bool {
+    Icon,
+    Pattern
+};
+
 using ImageMap = std::unordered_map<std::string, Immutable<style::Image::Impl>>;
-using ImageDependencies = std::set<std::string>;
+using ImageDependencies = std::unordered_map<std::string, ImageType>;
 using ImageRequestPair = std::pair<ImageDependencies, uint64_t>;
 
 } // namespace mbgl

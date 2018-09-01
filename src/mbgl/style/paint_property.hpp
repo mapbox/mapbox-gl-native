@@ -34,7 +34,25 @@ public:
     static constexpr bool IsDataDriven = true;
 
     using Attribute = A;
+    using Attributes = TypeList<A>;
     using Uniform = U;
+    using Uniforms = TypeList<U>;
+};
+
+template <class T, class A1, class U1, class A2, class U2>
+class CrossFadedDataDrivenPaintProperty {
+public:
+    using TransitionableType = Transitionable<PropertyValue<T>>;
+    using UnevaluatedType = Transitioning<PropertyValue<T>>;
+    using EvaluatorType = DataDrivenPropertyEvaluator<Faded<T>>;
+    using PossiblyEvaluatedType = PossiblyEvaluatedPropertyValue<Faded<T>>;
+    using Type = T;
+    static constexpr bool IsDataDriven = true;
+
+    using Attribute = A1;
+    using Attributes = TypeList<A1, A2>;
+    using Uniforms = TypeList<U1, U2>;
+    using Uniform = U1;
 };
 
 template <class T>

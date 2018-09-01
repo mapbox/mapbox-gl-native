@@ -10,6 +10,9 @@
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/renderer/bucket.hpp>
+#include <mbgl/renderer/buckets/fill_bucket.hpp>
+#include <mbgl/renderer/buckets/fill_extrusion_bucket.hpp>
+#include <mbgl/renderer/buckets/line_bucket.hpp>
 
 #include <atomic>
 #include <memory>
@@ -18,7 +21,10 @@ namespace mbgl {
 
 class GeometryTile;
 class GeometryTileData;
-class SymbolLayout;
+class Layout;
+
+template <class B>
+class PatternLayout;
 
 namespace style {
 class Layer;
@@ -41,12 +47,12 @@ public:
     void setShowCollisionBoxes(bool showCollisionBoxes_, uint64_t correlationID_);
     
     void onGlyphsAvailable(GlyphMap glyphs);
-    void onImagesAvailable(ImageMap images, uint64_t imageCorrelationID);
+    void onImagesAvailable(ImageMap icons, ImageMap patterns, uint64_t imageCorrelationID);
 
 private:
     void coalesced();
     void parse();
-    void performSymbolLayout();
+    void finalizeLayout();
     
     void coalesce();
 
@@ -54,8 +60,10 @@ private:
     void requestNewImages(const ImageDependencies&);
    
     void symbolDependenciesChanged();
-    bool hasPendingSymbolDependencies() const;
+    bool hasPendingDependencies() const;
     bool hasPendingParseResult() const;
+
+    void checkPatternLayout(std::unique_ptr<Layout> layout);
 
     ActorRef<GeometryTileWorker> self;
     ActorRef<GeometryTile> parent;
@@ -84,12 +92,13 @@ private:
     optional<std::vector<Immutable<style::Layer::Impl>>> layers;
     optional<std::unique_ptr<const GeometryTileData>> data;
 
-    bool symbolLayoutsNeedPreparation = false;
-    std::vector<std::unique_ptr<SymbolLayout>> symbolLayouts;
+    std::vector<std::unique_ptr<Layout>> layouts;
+
     GlyphDependencies pendingGlyphDependencies;
     ImageDependencies pendingImageDependencies;
     GlyphMap glyphMap;
     ImageMap imageMap;
+    ImageMap patternMap;
     
     bool showCollisionBoxes;
     bool firstLoad = true;

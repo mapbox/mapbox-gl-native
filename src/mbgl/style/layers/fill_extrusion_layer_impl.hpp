@@ -14,6 +14,7 @@ public:
     bool hasLayoutDifference(const Layer::Impl&) const override;
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
+    Properties<>::Unevaluated layout;
     FillExtrusionPaintProperties::Transitionable paint;
 };
 

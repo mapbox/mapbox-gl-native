@@ -30,6 +30,12 @@ public:
         }};
     }
 
+    std::array<uint16_t, 4> tlbr() const {
+        const auto _tl = tl();
+        const auto _br = br();
+        return {{ _tl[0], _tl[1], _br[0], _br[1] }};
+    }
+
     std::array<float, 2> displaySize() const {
         return {{
             textureRect.w / pixelRatio,
@@ -43,9 +49,10 @@ using ImagePositions = std::map<std::string, ImagePosition>;
 class ImageAtlas {
 public:
     PremultipliedImage image;
-    ImagePositions positions;
+    ImagePositions iconPositions;
+    ImagePositions patternPositions;
 };
 
-ImageAtlas makeImageAtlas(const ImageMap&);
+ImageAtlas makeImageAtlas(const ImageMap&, const ImageMap&);
 
 } // namespace mbgl

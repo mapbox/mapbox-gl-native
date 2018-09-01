@@ -28,6 +28,9 @@ void Logger::log(jni::JNIEnv& env, EventSeverity severity, const std::string &ms
         auto static error = _class.GetStaticMethod<Signature>(env, "e");
         _class.Call(env, error, tag, message);
     }
+
+    DeleteLocalRef(env, tag);
+    DeleteLocalRef(env, message);
 }
 
 } // namespace android

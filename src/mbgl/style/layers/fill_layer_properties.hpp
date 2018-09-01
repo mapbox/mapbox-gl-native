@@ -36,7 +36,7 @@ struct FillTranslateAnchor : PaintProperty<TranslateAnchorType> {
     static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
 };
 
-struct FillPattern : CrossFadedPaintProperty<std::string> {
+struct FillPattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::a_pattern_to, uniforms::u_pattern_to, attributes::a_pattern_from, uniforms::u_pattern_from> {
     static std::string defaultValue() { return ""; }
 };
 

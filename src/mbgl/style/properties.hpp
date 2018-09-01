@@ -233,13 +233,8 @@ public:
     };
 };
 
-template <class...>
-struct ConcatenateProperties;
-
-template <class... As, class... Bs>
-struct ConcatenateProperties<TypeList<As...>, TypeList<Bs...>> {
-    using Type = Properties<As..., Bs...>;
-};
+template <class... Ps>
+using ConcatenateProperties = typename TypeListConcat<typename Ps::PropertyTypes...>::template ExpandInto<Properties>;
 
 } // namespace style
 } // namespace mbgl

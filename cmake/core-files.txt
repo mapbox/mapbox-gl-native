@@ -95,8 +95,10 @@ src/mbgl/gl/vertex_buffer.hpp
 # layout
 src/mbgl/layout/clip_lines.cpp
 src/mbgl/layout/clip_lines.hpp
+src/mbgl/layout/layout.hpp
 src/mbgl/layout/merge_lines.cpp
 src/mbgl/layout/merge_lines.hpp
+src/mbgl/layout/pattern_layout.hpp
 src/mbgl/layout/symbol_feature.hpp
 src/mbgl/layout/symbol_instance.cpp
 src/mbgl/layout/symbol_instance.hpp
@@ -693,7 +695,6 @@ include/mbgl/util/thread.hpp
 include/mbgl/util/tileset.hpp
 include/mbgl/util/timer.hpp
 include/mbgl/util/traits.hpp
-include/mbgl/util/tuple.hpp
 include/mbgl/util/type_list.hpp
 include/mbgl/util/unitbezier.hpp
 include/mbgl/util/util.hpp
