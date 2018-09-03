@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.log;
 
+import android.support.annotation.Keep;
 import android.util.Log;
 
 /**
@@ -9,6 +10,7 @@ import android.util.Log;
  * Alternative implementations can be set with {@link #setLoggerDefinition(LoggerDefinition)}.
  * </p>
  */
+@Keep
 public final class Logger {
 
   private static final LoggerDefinition DEFAULT = new LoggerDefinition() {
