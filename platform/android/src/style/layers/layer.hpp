@@ -49,6 +49,8 @@ public:
 
     jni::String getId(jni::JNIEnv&);
 
+    jni::String getSourceId(jni::JNIEnv&);
+
     style::Layer& get();
 
     void setLayoutProperty(jni::JNIEnv&, jni::String, jni::Object<> value);
