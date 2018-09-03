@@ -43,6 +43,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.log.Logger;
+import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
@@ -75,6 +76,7 @@ public final class MapboxMap {
 
   private final OnGesturesManagerInteractionListener onGesturesManagerInteractionListener;
 
+  private LocationLayerPlugin locationLayerPlugin;
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
   MapboxMap(NativeMapView map, Transform transform, UiSettings ui, Projection projection,
@@ -110,12 +112,14 @@ public final class MapboxMap {
       // if user hasn't loaded a Style yet
       nativeMapView.setStyleUrl(Style.MAPBOX_STREETS);
     }
+    locationLayerPlugin.onStart();
   }
 
   /**
    * Called when the hosting Activity/Fragment onStop() method is called.
    */
   void onStop() {
+    locationLayerPlugin.onStop();
   }
 
   /**
@@ -172,6 +176,20 @@ public final class MapboxMap {
    */
   void onPostMapReady() {
     invalidateCameraPosition();
+  }
+
+  /**
+   * Called when the map will start loading style.
+   */
+  void onStartLoadingMap() {
+    locationLayerPlugin.onStartLoadingMap();
+  }
+
+  /**
+   * Called the map finished loading style.
+   */
+  void onFinishLoadingStyle() {
+    locationLayerPlugin.onFinishLoadingStyle();
   }
 
   /**
@@ -2281,6 +2299,23 @@ public final class MapboxMap {
                                              @Nullable Expression filter,
                                              @Nullable String... layerIds) {
     return nativeMapView.queryRenderedFeatures(coordinates, layerIds, filter);
+  }
+
+  //
+  // LocationLayerPlugin
+  //
+
+  void injectLocationLayerPlugin(LocationLayerPlugin locationLayerPlugin) {
+    this.locationLayerPlugin = locationLayerPlugin;
+  }
+
+  /**
+   * Returns an object that can be used to display user's location on the Map.
+   * @return the location layer
+   */
+  @NonNull
+  public LocationLayerPlugin getLocationLayerPlugin() {
+    return locationLayerPlugin;
   }
 
   //
