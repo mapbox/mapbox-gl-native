@@ -346,10 +346,6 @@ final class LocationLayer implements PluginAnimator.OnLayerAnimationsValuesChang
   }
 
   void setLocationsStale(boolean isStale) {
-    // If options has stale state disabled, just return here.
-    if (!options.enableStaleState()) {
-      return;
-    }
     locationFeature.addBooleanProperty(PROPERTY_LOCATION_STALE, isStale);
     refreshSource();
     if (renderMode != RenderMode.GPS) {

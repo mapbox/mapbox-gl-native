@@ -18,6 +18,10 @@ public class SingleActivity extends AppCompatActivity {
     mapView.onCreate(savedInstanceState);
   }
 
+  public MapView getMapView() {
+    return mapView;
+  }
+
   @Override
   protected void onStart() {
     super.onStart();

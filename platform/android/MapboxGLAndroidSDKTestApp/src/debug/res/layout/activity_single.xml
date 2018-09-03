@@ -8,6 +8,6 @@
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:mapbox_cameraZoom="2.0" />
+        app:mapbox_cameraZoomMin="2.0" />
 
 </RelativeLayout>

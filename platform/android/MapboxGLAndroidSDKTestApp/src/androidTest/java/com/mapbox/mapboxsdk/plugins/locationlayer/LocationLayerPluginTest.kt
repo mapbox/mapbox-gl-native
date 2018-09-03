@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.plugins.locationlayer
 
 import android.Manifest
 import android.R
-import android.arch.lifecycle.Lifecycle
 import android.content.Context
 import android.graphics.Color
 import android.graphics.RectF
@@ -12,93 +11,69 @@ import android.support.test.espresso.IdlingRegistry
 import android.support.test.espresso.UiController
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.*
-import android.support.test.filters.LargeTest
-import android.support.test.rule.ActivityTestRule
 import android.support.test.rule.GrantPermissionRule
-import android.support.test.runner.AndroidJUnit4
 import android.support.v4.content.ContextCompat
 import com.mapbox.geojson.Point
-import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.constants.Style
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.MapboxMapOptions
-import com.mapbox.mapboxsdk.maps.SupportMapFragment
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.*
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode
 import com.mapbox.mapboxsdk.plugins.utils.*
 import com.mapbox.mapboxsdk.plugins.utils.MapboxTestingUtils.Companion.MAPBOX_HEAVY_STYLE
+import com.mapbox.mapboxsdk.plugins.utils.MapboxTestingUtils.Companion.MAP_CONNECTION_DELAY
+import com.mapbox.mapboxsdk.plugins.utils.MapboxTestingUtils.Companion.MAP_RENDER_DELAY
 import com.mapbox.mapboxsdk.plugins.utils.MapboxTestingUtils.Companion.pushSourceUpdates
-import com.mapbox.mapboxsdk.plugins.utils.PluginGenerationUtil.Companion.MAP_CONNECTION_DELAY
-import com.mapbox.mapboxsdk.plugins.utils.PluginGenerationUtil.Companion.MAP_RENDER_DELAY
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import com.mapbox.mapboxsdk.testapp.activity.SingleFragmentActivity
+import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest
+import com.mapbox.mapboxsdk.testapp.activity.SingleActivity
+import com.mapbox.mapboxsdk.utils.ColorUtils
 import org.hamcrest.CoreMatchers.*
 import org.junit.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
-import org.junit.rules.TestName
-import org.junit.runner.RunWith
-import timber.log.Timber
 
-/**
- * Test class that uses a map fragment to keep onMapReady actions isolated to within the test
- */
-@RunWith(AndroidJUnit4::class)
-@LargeTest
-class LocationLayerPluginTest {
-
-  @Rule
-  @JvmField
-  val activityRule = ActivityTestRule(SingleFragmentActivity::class.java, true, true)
-
-  @Rule
-  @JvmField
-  val nameRule = TestName()
+class LocationLayerPluginTest : BaseActivityTest() {
 
   @Rule
   @JvmField
   val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION)
 
-  private lateinit var idlingResource: OnMapFragmentReadyIdlingResource
+  override fun getActivityClass(): Class<*> {
+    return SingleActivity::class.java
+  }
+
   private lateinit var styleChangeIdlingResource: StyleChangeIdlingResource
-  private lateinit var fragment: SupportMapFragment
-  private lateinit var mapboxMap: MapboxMap
   private val location: Location by lazy {
     val initLocation = Location("test")
     initLocation.latitude = 15.0
     initLocation.longitude = 17.0
+    initLocation.bearing = 10f
+    initLocation.accuracy = 150f
     initLocation
   }
 
   @Before
-  fun beforeTest() {
+  override fun beforeTest() {
+    super.beforeTest()
 
-    // Create a default support map fragment and pass it into the empty activity
-    val options = MapboxMapOptions()
-      .camera(CameraPosition.Builder().zoom(2.0).build()) // to match plugins min zoom
-    fragment = SupportMapFragment.newInstance(options)
-    activityRule.activity.setFragment(fragment)
+    location.latitude = 15.0
+    location.longitude = 17.0
+    location.bearing = 10f
+    location.accuracy = 150f
 
-    Timber.e("@Before: ${nameRule.methodName} - register idle resource")
-    // If idlingResource is null, throw Kotlin exception
-    idlingResource = OnMapFragmentReadyIdlingResource(fragment)
     styleChangeIdlingResource = StyleChangeIdlingResource()
-    IdlingRegistry.getInstance().register(idlingResource)
     IdlingRegistry.getInstance().register(styleChangeIdlingResource)
-    onView(withId(R.id.content)).check(matches(isDisplayed()))
-    mapboxMap = idlingResource.mapboxMap
   }
 
   @Test
   fun locationLayerPlugin_initializesLocationEngineCorrectlyWhenOnesNotProvided() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    validateTestSetup()
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context)
 
         val locationEngine = plugin.locationEngine
         assertThat(locationEngine, notNullValue())
@@ -108,14 +83,23 @@ class LocationLayerPluginTest {
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, true))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun locationLayerPlugin_initializesLocationEngineCorrectlyWhenOnesNotProvidedButHasOptions() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    validateTestSetup()
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(
+          context,
+          LocationLayerOptions.builder(context)
+            .staleStateTimeout(200)
+            .enableStaleState(false)
+            .accuracyAlpha(.5f)
+            .accuracyColor(Color.BLUE)
+            .build())
 
         val locationEngine = plugin.locationEngine
         val pluginOptions = plugin.locationLayerOptions
@@ -130,24 +114,49 @@ class LocationLayerPluginTest {
       }
     }
 
-    val options = LocationLayerOptions.builder(fragment.activity)
-      .staleStateTimeout(200)
-      .enableStaleState(false)
-      .accuracyAlpha(.5f)
-      .accuracyColor(Color.BLUE)
-      .build()
+    executePluginTest(pluginAction)
+  }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(
-      activityRule.activity, true, null, options))
+  @Test
+  fun locationLayerPlugin_doesntInitializeEngineWhenNullProvided() {
+    validateTestSetup()
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(
+          null,
+          LocationLayerOptions.builder(context)
+            .staleStateTimeout(200)
+            .enableStaleState(false)
+            .accuracyAlpha(.5f)
+            .accuracyColor(Color.BLUE)
+            .build())
+
+        val locationEngine = plugin.locationEngine
+        val pluginOptions = plugin.locationLayerOptions
+
+        assertThat(locationEngine, nullValue())
+        assertThat(pluginOptions, notNullValue())
+
+        uiController.loopMainThreadForAtLeast(MAP_CONNECTION_DELAY)
+        assertThat(pluginOptions?.accuracyAlpha(), `is`(.5f))
+        assertThat(pluginOptions?.accuracyColor(), `is`(Color.BLUE))
+      }
+    }
+
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun settingMapStyleImmediatelyBeforeLoadingPlugin_doesStillLoadLayersProperly() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-
-        uiController.loopMainThreadForAtLeast(MAP_CONNECTION_DELAY)
+    validateTestSetup()
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        mapboxMap.setStyle(Style.LIGHT)
+        plugin.activateLocationLayerPlugin(context, false)
+        plugin.forceLocationUpdate(location)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
 
         assertThat(plugin.renderMode, `is`(equalTo(RenderMode.NORMAL)))
         assertThat(mapboxMap.isLayerVisible(FOREGROUND_LAYER), `is`(true))
@@ -158,39 +167,26 @@ class LocationLayerPluginTest {
       }
     }
 
-    executePluginTest(pluginAction, object : GenericPluginAction.PluginProvider<LocationLayerPlugin> {
-      override fun providePlugin(mapView: MapView, mapboxMap: MapboxMap, context: Context): LocationLayerPlugin {
-        // changing the style just before instantiating the plugin
-        mapboxMap.setStyleUrl(Style.LIGHT)
-        val plugin =
-          PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, null, false)
-            .providePlugin(mapView, mapboxMap, context)
-        plugin.forceLocationUpdate(location)
-        return plugin
-      }
-
-      override fun isPluginDataReady(plugin: LocationLayerPlugin, mapboxMap: MapboxMap): Boolean {
-        val source = mapboxMap.getSource(LOCATION_SOURCE)
-        return source != null && (source as GeoJsonSource).querySourceFeatures(null).isNotEmpty()
-      }
-    })
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun locationLayer_doesntShowUntilFirstLocationFix() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    validateTestSetup()
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
 
         // Source should be present but empty
-        val mapView = fragment.view as MapView
+        val mapView = (rule.activity as SingleActivity).mapView
         assertThat(mapboxMap.queryRenderedFeatures(
           RectF(0f, 0f, mapView.width.toFloat(), mapView.height.toFloat()), FOREGROUND_LAYER)
           .isEmpty(), `is`(true))
 
         // Force the first location update
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(MAP_CONNECTION_DELAY)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
 
         // Check if the puck is visible
         assertThat(mapboxMap.queryRenderedFeatures(location, FOREGROUND_LAYER).isEmpty(), `is`(false))
@@ -205,11 +201,18 @@ class LocationLayerPluginTest {
 
   @Test
   fun locationLayerOptions_disablingStaleStateDoesWorkCorrectly() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    validateTestSetup()
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context,
+          LocationLayerOptions.builder(context)
+            .staleStateTimeout(200)
+            .enableStaleState(false)
+            .build())
 
         plugin.forceLocationUpdate(location)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
         uiController.loopMainThreadForAtLeast(200)
         uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
 
@@ -221,28 +224,34 @@ class LocationLayerPluginTest {
       }
     }
 
-    val options = LocationLayerOptions.builder(fragment.activity)
-      .staleStateTimeout(200)
-      .enableStaleState(false)
-      .build()
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, options))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun locationLayerOptions_loadsForegroundBitmapFromNameOption() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context,
+          LocationLayerOptions.builder(context)
+            .foregroundName("custom-foreground-bitmap")
+            .backgroundName("custom-background-bitmap")
+            .foregroundStaleName("custom-foreground-stale-bitmap")
+            .backgroundStaleName("custom-background-stale-bitmap")
+            .bearingName("custom-bearing-bitmap")
+            .build())
+
         val foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.ic_media_play)
-        mapboxMap.addImageFromDrawable("custom-foreground-bitmap", foregroundDrawable!!)
-        mapboxMap.addImageFromDrawable("custom-background-bitmap", foregroundDrawable)
-        mapboxMap.addImageFromDrawable("custom-foreground-stale-bitmap", foregroundDrawable)
-        mapboxMap.addImageFromDrawable("custom-background-stale-bitmap", foregroundDrawable)
-        mapboxMap.addImageFromDrawable("custom-bearing-bitmap", foregroundDrawable)
+        foregroundDrawable?.let {
+          mapboxMap.addImageFromDrawable("custom-foreground-bitmap", it)
+          mapboxMap.addImageFromDrawable("custom-background-bitmap", it)
+          mapboxMap.addImageFromDrawable("custom-foreground-stale-bitmap", it)
+          mapboxMap.addImageFromDrawable("custom-background-stale-bitmap", it)
+          mapboxMap.addImageFromDrawable("custom-bearing-bitmap", it)
+        }
 
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(MAP_CONNECTION_DELAY)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
         assertThat(mapboxMap.queryRenderedFeatures(location, FOREGROUND_LAYER).isEmpty(), `is`(false))
 
         val feature = mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0]
@@ -254,55 +263,56 @@ class LocationLayerPluginTest {
       }
     }
 
-    val options = LocationLayerOptions.builder(fragment.activity)
-      .foregroundName("custom-foreground-bitmap")
-      .backgroundName("custom-background-bitmap")
-      .foregroundStaleName("custom-foreground-stale-bitmap")
-      .backgroundStaleName("custom-background-stale-bitmap")
-      .bearingName("custom-bearing-bitmap")
-      .build()
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, options))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun locationLayerOptions_loadsGpsNameWithGpsRenderMode() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context,
+          LocationLayerOptions.builder(context)
+            .foregroundName("custom-foreground-bitmap")
+            .gpsName("custom-gps-bitmap")
+            .build())
+
         plugin.renderMode = RenderMode.GPS
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
         val foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.ic_media_play)
-        mapboxMap.addImageFromDrawable("custom-foreground-bitmap", foregroundDrawable!!)
-        mapboxMap.addImageFromDrawable("custom-gps-bitmap", foregroundDrawable)
+        foregroundDrawable?.let {
+          mapboxMap.addImageFromDrawable("custom-foreground-bitmap", it)
+          mapboxMap.addImageFromDrawable("custom-gps-bitmap", it)
+        }
 
         val foregroundId = mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getStringProperty(PROPERTY_FOREGROUND_ICON)
         assertThat(foregroundId, `is`(equalTo("custom-gps-bitmap")))
       }
     }
 
-    val options = LocationLayerOptions.builder(fragment.activity)
-      .foregroundName("custom-foreground-bitmap")
-      .gpsName("custom-gps-bitmap")
-      .build()
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, options))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun locationLayerOptions_customIconNameRevertsToDefault() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context,
+          LocationLayerOptions.builder(context)
+            .foregroundName("custom-foreground-bitmap")
+            .gpsName("custom-gps-bitmap")
+            .build())
+
         plugin.renderMode = RenderMode.GPS
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
 
         val foregroundId = mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getStringProperty(PROPERTY_FOREGROUND_ICON)
         assertThat(foregroundId, `is`(equalTo("custom-gps-bitmap")))
 
-        plugin.applyStyle(LocationLayerOptions.builder(fragment.activity).build())
+        plugin.applyStyle(LocationLayerOptions.builder(context).build())
         uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
 
         val revertedForegroundId = mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getStringProperty(PROPERTY_FOREGROUND_ICON)
@@ -310,22 +320,23 @@ class LocationLayerPluginTest {
       }
     }
 
-    val options = LocationLayerOptions.builder(fragment.activity)
-      .foregroundName("custom-foreground-bitmap")
-      .gpsName("custom-gps-bitmap")
-      .build()
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, options))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun locationLayerOptions_customGpsIconNameChangeBackWithMode() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+
+        plugin.activateLocationLayerPlugin(context,
+          LocationLayerOptions.builder(context)
+            .gpsName("custom-gps-bitmap")
+            .build())
+
         plugin.renderMode = RenderMode.GPS
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
 
         val foregroundId = mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getStringProperty(PROPERTY_FOREGROUND_ICON)
         assertThat(foregroundId, `is`(equalTo("custom-gps-bitmap")))
@@ -338,75 +349,73 @@ class LocationLayerPluginTest {
       }
     }
 
-    val options = LocationLayerOptions.builder(fragment.activity)
-      .gpsName("custom-gps-bitmap")
-      .build()
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, options))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun stillStaleAfterResuming() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-        val testLifecycleOwner = TestLifecycleOwner()
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
-        testLifecycleOwner.lifecycle.addObserver(plugin)
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context,
+          LocationLayerOptions.builder(context)
+            .staleStateTimeout(200)
+            .build())
 
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(300) // engaging stale state
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
+        uiController.loopMainThreadForAtLeast(250) // engaging stale state
         uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
         assertThat(mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getBooleanProperty(PROPERTY_LOCATION_STALE), `is`(true))
 
-        testLifecycleOwner.markState(Lifecycle.State.CREATED)
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        plugin.onStop()
+        plugin.onStart()
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
 
         assertThat(mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getBooleanProperty(PROPERTY_LOCATION_STALE), `is`(true))
         assertThat(mapboxMap.isLayerVisible(ACCURACY_LAYER), `is`(false))
       }
     }
-    val options = LocationLayerOptions.builder(fragment.activity)
-      .staleStateTimeout(200)
-      .build()
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, options, false))
+
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun stillNotStaleAfterResuming() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-        val testLifecycleOwner = TestLifecycleOwner()
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
-        testLifecycleOwner.lifecycle.addObserver(plugin)
-
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
         assertThat(mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getBooleanProperty(PROPERTY_LOCATION_STALE), `is`(false))
 
-        testLifecycleOwner.markState(Lifecycle.State.CREATED)
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
+        plugin.onStop()
+        plugin.onStart()
         uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
 
         assertThat(mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getBooleanProperty(PROPERTY_LOCATION_STALE), `is`(false))
         assertThat(mapboxMap.isLayerVisible(ACCURACY_LAYER), `is`(true))
       }
     }
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun locationLayerOptions_accuracyRingWithColor() {
     val color = Color.parseColor("#4A90E2")
-    val rgbaColor = PropertyFactory.colorToRgbaString(color)
+    val rgbaColor = ColorUtils.colorToRgbaString(color)
 
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context,
+          LocationLayerOptions.builder(context)
+            .accuracyColor(color)
+            .build())
+
+        plugin.forceLocationUpdate(location)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
 
         // Check that the source property changes correctly
         mapboxMap.querySourceFeatures(LOCATION_SOURCE).also {
@@ -417,22 +426,17 @@ class LocationLayerPluginTest {
       }
     }
 
-    val options = LocationLayerOptions.builder(fragment.activity)
-      .accuracyColor(color)
-      .build()
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, options))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun forceLocationUpdate_doesMoveLocationLayerIconToCorrectPosition() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.forceLocationUpdate(location)
-
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
 
         val point: Point = mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].geometry() as Point
 
@@ -446,19 +450,20 @@ class LocationLayerPluginTest {
 
   @Test
   fun disablingPluginHidesPuck() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
-        val point: Point = mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].geometry() as Point
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
+
+        val point: Point = mapboxMap.queryRenderedFeatures(location, FOREGROUND_LAYER)[0].geometry() as Point
         assertEquals(point.latitude(), location.latitude, 0.1)
         assertEquals(point.longitude(), location.longitude, 0.1)
 
-        plugin.isLocationLayerEnabled = false
+        plugin.deactivateLocationLayerPlugin()
         uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
-        assertThat(mapboxMap.querySourceFeatures(LOCATION_SOURCE).isEmpty(), `is`(true))
+        assertThat(mapboxMap.queryRenderedFeatures(location, FOREGROUND_LAYER).isEmpty(), `is`(true))
       }
     }
     executePluginTest(pluginAction)
@@ -466,19 +471,18 @@ class LocationLayerPluginTest {
 
   @Test
   fun disablingPluginAndChangingStyleAllowsToEnableAgain() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
 
-        plugin.isLocationLayerEnabled = false
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        plugin.deactivateLocationLayerPlugin()
         mapboxMap.setStyle(Style.LIGHT)
-        uiController.loopMainThreadForAtLeast(MAP_CONNECTION_DELAY)
-        plugin.isLocationLayerEnabled = true
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+
+        plugin.activateLocationLayerPlugin(context, false)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
         assertThat(mapboxMap.isLayerVisible(FOREGROUND_LAYER), `is`(true))
       }
     }
@@ -486,148 +490,131 @@ class LocationLayerPluginTest {
   }
 
   @Test
-  fun lifecycle_keepsEnabledWhenStoppedAndStarted() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-        val testLifecycleOwner = TestLifecycleOwner()
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
-        testLifecycleOwner.lifecycle.addObserver(plugin)
-
-        assertThat(plugin.isLocationLayerEnabled, `is`(true))
-        testLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-        testLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
+  fun lifecycle_isDisabledOnStart() {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        assertThat(plugin.isLocationLayerEnabled, `is`(false))
+        plugin.onStop()
+        plugin.onStart()
+        assertThat(plugin.isLocationLayerEnabled, `is`(false))
+        plugin.activateLocationLayerPlugin(context, false)
         assertThat(plugin.isLocationLayerEnabled, `is`(true))
       }
     }
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, null, false))
+    executePluginTest(pluginAction)
+  }
+
+  @Test
+  fun lifecycle_keepsEnabledWhenStoppedAndStarted() {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
+        assertThat(plugin.isLocationLayerEnabled, `is`(true))
+        plugin.onStop()
+        plugin.onStart()
+        assertThat(plugin.isLocationLayerEnabled, `is`(true))
+      }
+    }
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun lifecycle_keepsDisabledWhenStoppedAndStarted() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-        plugin.isLocationLayerEnabled = false
-
-        val testLifecycleOwner = TestLifecycleOwner()
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
-        testLifecycleOwner.lifecycle.addObserver(plugin)
-
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
+        plugin.deactivateLocationLayerPlugin()
         assertThat(plugin.isLocationLayerEnabled, `is`(false))
-        testLifecycleOwner.markState(Lifecycle.State.CREATED)
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
+        plugin.onStop()
+        plugin.onStart()
         assertThat(plugin.isLocationLayerEnabled, `is`(false))
       }
     }
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, null, false))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun lifecycle_ableToChangeStyleAfterResuming() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
 
-        val testLifecycleOwner = TestLifecycleOwner()
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
-        testLifecycleOwner.lifecycle.addObserver(plugin)
-
-        testLifecycleOwner.markState(Lifecycle.State.CREATED)
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
+        plugin.onStop()
+        plugin.onStart()
 
         mapboxMap.setStyle(Style.DARK)
         uiController.loopMainThreadForAtLeast(MAP_CONNECTION_DELAY)
       }
     }
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, null, false))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun lifecycle_interruptedDuringStyleChange() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-
-        val testLifecycleOwner = TestLifecycleOwner()
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
-        testLifecycleOwner.lifecycle.addObserver(plugin)
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         mapboxMap.setStyle(Style.DARK)
-
-        testLifecycleOwner.markState(Lifecycle.State.CREATED)
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
+        plugin.onStop()
+        plugin.onStart()
         uiController.loopMainThreadForAtLeast(MAP_CONNECTION_DELAY)
       }
     }
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, null, false))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun lifecycle_forceLocationUpdateAfterStopped() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-
-        val testLifecycleOwner = TestLifecycleOwner()
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
-        testLifecycleOwner.lifecycle.addObserver(plugin)
-
-        testLifecycleOwner.markState(Lifecycle.State.CREATED)
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
+        plugin.onStop()
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
 
         assertThat(mapboxMap.querySourceFeatures(LOCATION_SOURCE).isEmpty(), `is`(true))
       }
     }
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, null, false))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun lifecycle_acceptAndReuseLocationUpdatesBeforeLayerStarted() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-
-        val testLifecycleOwner = TestLifecycleOwner()
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
-        testLifecycleOwner.lifecycle.addObserver(plugin)
-
-        testLifecycleOwner.markState(Lifecycle.State.CREATED)
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
+        plugin.onStop()
         plugin.forceLocationUpdate(location)
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        plugin.onStart()
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
 
         val point: Point = mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].geometry() as Point
         assertEquals(point.latitude(), location.latitude, 0.1)
         assertEquals(point.longitude(), location.longitude, 0.1)
       }
     }
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, null, false))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun lifecycle_lifecycleChangeRightAfterStyleReload() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-
-        val testLifecycleOwner = TestLifecycleOwner()
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
-        testLifecycleOwner.lifecycle.addObserver(plugin)
-
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.forceLocationUpdate(location)
         mapboxMap.setStyle(Style.LIGHT)
-        testLifecycleOwner.markState(Lifecycle.State.CREATED)
+        plugin.onStop()
         uiController.loopMainThreadForAtLeast(MAP_CONNECTION_DELAY)
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        plugin.onStart()
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
 
         val point: Point = mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].geometry() as Point
         assertEquals(point.latitude(), location.latitude, 0.1)
@@ -640,17 +627,17 @@ class LocationLayerPluginTest {
         assertThat(mapboxMap.isLayerVisible(BEARING_LAYER), `is`(false))
       }
     }
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, null, false))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun mapChange_settingPluginStyle() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-        styleChangeIdlingResource.waitForStyle(fragment.view as MapView, mapboxMap, MAPBOX_HEAVY_STYLE)
-        val options = LocationLayerOptions.builder(fragment.activity)
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
+        styleChangeIdlingResource.waitForStyle((rule.activity as SingleActivity).mapView, mapboxMap, MAPBOX_HEAVY_STYLE)
+        val options = LocationLayerOptions.builder(context)
           .accuracyColor(Color.RED)
           .build()
 
@@ -661,8 +648,7 @@ class LocationLayerPluginTest {
         uiController.loopMainThreadForAtLeast(MAP_CONNECTION_DELAY)
       }
     }
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
 
     // Waiting for style to finish loading while pushing updates
     onView(withId(R.id.content)).check(matches(isDisplayed()))
@@ -670,10 +656,11 @@ class LocationLayerPluginTest {
 
   @Test
   fun mapChange_forcingLocation() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-        styleChangeIdlingResource.waitForStyle(fragment.view as MapView, mapboxMap, MAPBOX_HEAVY_STYLE)
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
+        styleChangeIdlingResource.waitForStyle((rule.activity as SingleActivity).mapView, mapboxMap, MAPBOX_HEAVY_STYLE)
 
         pushSourceUpdates(styleChangeIdlingResource) {
           plugin.forceLocationUpdate(location)
@@ -682,8 +669,7 @@ class LocationLayerPluginTest {
         uiController.loopMainThreadForAtLeast(MAP_CONNECTION_DELAY)
       }
     }
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
 
     // Waiting for style to finish loading while pushing updates
     onView(withId(R.id.content)).check(matches(isDisplayed()))
@@ -691,10 +677,13 @@ class LocationLayerPluginTest {
 
   @Test
   fun mapChange_settingMapStyleBeforePluginCreation() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-        val options = LocationLayerOptions.builder(fragment.activity)
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        styleChangeIdlingResource.waitForStyle((rule.activity as SingleActivity).mapView, mapboxMap, MAPBOX_HEAVY_STYLE)
+        plugin.activateLocationLayerPlugin(context, false)
+
+        val options = LocationLayerOptions.builder(context)
           .accuracyColor(Color.RED)
           .build()
 
@@ -704,19 +693,7 @@ class LocationLayerPluginTest {
         }
       }
     }
-
-    executePluginTest(pluginAction, object : GenericPluginAction.PluginProvider<LocationLayerPlugin> {
-      override fun providePlugin(mapView: MapView, mapboxMap: MapboxMap, context: Context): LocationLayerPlugin {
-        // changing the style just before instantiating the plugin
-        styleChangeIdlingResource.waitForStyle(mapView, mapboxMap, MAPBOX_HEAVY_STYLE)
-        return PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, null, false)
-          .providePlugin(mapView, mapboxMap, context)
-      }
-
-      override fun isPluginDataReady(plugin: LocationLayerPlugin, mapboxMap: MapboxMap): Boolean {
-        return true
-      }
-    })
+    executePluginTest(pluginAction)
 
     // Waiting for style to finish loading while pushing updates
     onView(withId(R.id.content)).check(matches(isDisplayed()))
@@ -724,34 +701,36 @@ class LocationLayerPluginTest {
 
   @Test
   fun animators_layerBearingCorrect() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.renderMode = RenderMode.GPS
         location.bearing = 77f
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(1000)
+        uiController.loopMainThreadForAtLeast(MAX_ANIMATION_DURATION_MS + MAP_RENDER_DELAY)
         assertEquals(77.0, mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getNumberProperty(PROPERTY_GPS_BEARING) as Double, 0.1)
 
         location.bearing = 92f
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(2000) // Waiting for the animation to finish
+        uiController.loopMainThreadForAtLeast(MAX_ANIMATION_DURATION_MS + MAP_RENDER_DELAY) // Waiting for the animation to finish
         assertEquals(92.0, mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getNumberProperty(PROPERTY_GPS_BEARING) as Double, 0.1)
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun animators_cameraLatLngBearingCorrect() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING_GPS
         location.bearing = 77f
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(1000)
+        uiController.loopMainThreadForAtLeast(MAX_ANIMATION_DURATION_MS + MAP_RENDER_DELAY)
         assertEquals(77.0, mapboxMap.cameraPosition.bearing, 0.1)
         assertEquals(location.latitude, mapboxMap.cameraPosition.target.latitude, 0.1)
         assertEquals(location.longitude, mapboxMap.cameraPosition.target.longitude, 0.1)
@@ -760,28 +739,29 @@ class LocationLayerPluginTest {
         location.latitude = 30.0
         location.longitude = 35.0
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(2000) // Waiting for the animation to finish
+        uiController.loopMainThreadForAtLeast(MAX_ANIMATION_DURATION_MS + MAP_RENDER_DELAY) // Waiting for the animation to finish
         assertEquals(92.0, mapboxMap.cameraPosition.bearing, 0.1)
         assertEquals(location.latitude, mapboxMap.cameraPosition.target.latitude, 0.1)
         assertEquals(location.longitude, mapboxMap.cameraPosition.target.longitude, 0.1)
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun animators_cameraBearingCorrect() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.NONE_GPS
         val latitude = mapboxMap.cameraPosition.target.latitude
         val longitude = mapboxMap.cameraPosition.target.longitude
 
         location.bearing = 77f
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(1000)
+        uiController.loopMainThreadForAtLeast(MAX_ANIMATION_DURATION_MS + MAP_RENDER_DELAY)
         assertEquals(77.0, mapboxMap.cameraPosition.bearing, 0.1)
         assertEquals(latitude, mapboxMap.cameraPosition.target.latitude, 0.1)
         assertEquals(longitude, mapboxMap.cameraPosition.target.longitude, 0.1)
@@ -790,21 +770,22 @@ class LocationLayerPluginTest {
         location.latitude = 30.0
         location.longitude = 35.0
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(2000) // Waiting for the animation to finish
+        uiController.loopMainThreadForAtLeast(MAX_ANIMATION_DURATION_MS + MAP_RENDER_DELAY)
         assertEquals(92.0, mapboxMap.cameraPosition.bearing, 0.1)
         assertEquals(latitude, mapboxMap.cameraPosition.target.latitude, 0.1)
         assertEquals(longitude, mapboxMap.cameraPosition.target.longitude, 0.1)
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun animators_cameraNoneCorrect() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.NONE
         val latitude = mapboxMap.cameraPosition.target.latitude
         val longitude = mapboxMap.cameraPosition.target.longitude
@@ -812,7 +793,7 @@ class LocationLayerPluginTest {
 
         location.bearing = 77f
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(1000)
+        uiController.loopMainThreadForAtLeast(MAX_ANIMATION_DURATION_MS + MAP_RENDER_DELAY)
         assertEquals(bearing, mapboxMap.cameraPosition.bearing, 0.1)
         assertEquals(latitude, mapboxMap.cameraPosition.target.latitude, 0.1)
         assertEquals(longitude, mapboxMap.cameraPosition.target.longitude, 0.1)
@@ -821,38 +802,40 @@ class LocationLayerPluginTest {
         location.latitude = 30.0
         location.longitude = 35.0
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(2000) // Waiting for the animation to finish
+        uiController.loopMainThreadForAtLeast(MAX_ANIMATION_DURATION_MS + MAP_RENDER_DELAY) // Waiting for the animation to finish
         assertEquals(bearing, mapboxMap.cameraPosition.bearing, 0.1)
         assertEquals(latitude, mapboxMap.cameraPosition.target.latitude, 0.1)
         assertEquals(longitude, mapboxMap.cameraPosition.target.longitude, 0.1)
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun animators_focalPointAdjustment() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING
         plugin.cameraMode = CameraMode.NONE
         plugin.forceLocationUpdate(location)
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
 
         assertThat(mapboxMap.uiSettings.focalPoint, nullValue())
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun animators_dontZoomWhileNotTracking() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.NONE
         val zoom = mapboxMap.cameraPosition.zoom
         plugin.zoomWhileTracking(10.0)
@@ -862,14 +845,15 @@ class LocationLayerPluginTest {
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun animators_zoomWhileTracking() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING
         plugin.zoomWhileTracking(10.0)
         uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION)
@@ -878,15 +862,16 @@ class LocationLayerPluginTest {
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
   }
 
   @Test
   @Ignore
   fun animators_zoomWhileTrackingCanceledOnModeChange() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING
         plugin.zoomWhileTracking(15.0)
         uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION / 2)
@@ -897,24 +882,21 @@ class LocationLayerPluginTest {
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun animators_dontZoomWhileStopped() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-
-        val testLifecycleOwner = TestLifecycleOwner()
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
-        testLifecycleOwner.lifecycle.addObserver(plugin)
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
 
         plugin.cameraMode = CameraMode.TRACKING
         uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
         val zoom = mapboxMap.cameraPosition.zoom
 
-        testLifecycleOwner.markState(Lifecycle.State.CREATED)
+        plugin.onStop()
         plugin.zoomWhileTracking(10.0)
         uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION)
 
@@ -922,16 +904,16 @@ class LocationLayerPluginTest {
       }
     }
 
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, null, false))
+    executePluginTest(pluginAction)
   }
 
   @Test
   @Ignore
   fun animators_cancelZoomWhileTracking() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING
         plugin.zoomWhileTracking(15.0)
         uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION / 2)
@@ -942,14 +924,15 @@ class LocationLayerPluginTest {
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun animators_dontTiltWhileNotTracking() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.NONE
         val tilt = mapboxMap.cameraPosition.tilt
         plugin.tiltWhileTracking(30.0)
@@ -959,14 +942,15 @@ class LocationLayerPluginTest {
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun animators_tiltWhileTracking() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING
         plugin.tiltWhileTracking(30.0)
         uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIMATION_DURATION)
@@ -975,15 +959,16 @@ class LocationLayerPluginTest {
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
   }
 
   @Test
   @Ignore
   fun animators_tiltWhileTrackingCanceledOnModeChange() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING
         plugin.tiltWhileTracking(30.0)
         uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIMATION_DURATION / 2)
@@ -994,23 +979,19 @@ class LocationLayerPluginTest {
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun animators_dontTiltWhileStopped() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
-
-        val testLifecycleOwner = TestLifecycleOwner()
-        testLifecycleOwner.markState(Lifecycle.State.RESUMED)
-        testLifecycleOwner.lifecycle.addObserver(plugin)
-
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING
         val tilt = mapboxMap.cameraPosition.tilt
 
-        testLifecycleOwner.markState(Lifecycle.State.CREATED)
+        plugin.onStop()
         plugin.tiltWhileTracking(30.0)
         uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIMATION_DURATION)
 
@@ -1018,16 +999,16 @@ class LocationLayerPluginTest {
       }
     }
 
-    executePluginTest(pluginAction,
-      PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity, false, null, null, false))
+    executePluginTest(pluginAction)
   }
 
   @Test
   @Ignore
   fun animators_cancelTiltWhileTracking() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING
         plugin.tiltWhileTracking(30.0)
         uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIMATION_DURATION / 2)
@@ -1038,21 +1019,22 @@ class LocationLayerPluginTest {
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
   }
 
   @Test
   fun cameraPositionAdjustedToTrackingModeWhenPluginEnabled() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING_GPS
         plugin.forceLocationUpdate(location)
-        plugin.isLocationLayerEnabled = false
+        plugin.deactivateLocationLayerPlugin()
         mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(51.0, 17.0)))
         mapboxMap.moveCamera(CameraUpdateFactory.bearingTo(90.0))
-        plugin.isLocationLayerEnabled = true
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        plugin.activateLocationLayerPlugin(context, false)
+        uiController.loopMainThreadForAtLeast(MAX_ANIMATION_DURATION_MS + MAP_RENDER_DELAY)
 
         assertEquals(location.bearing.toDouble(), mapboxMap.cameraPosition.bearing, 0.1)
         assertEquals(location.latitude, mapboxMap.cameraPosition.target.latitude, 0.1)
@@ -1060,30 +1042,66 @@ class LocationLayerPluginTest {
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
   }
 
   @Test
-  fun onPluginInitialized_defaultCompassEngineIsProvided() {
-    val pluginAction = object : GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin> {
-      override fun onGenericPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
-                                         uiController: UiController, context: Context) {
+  fun compassEngine_onPluginInitializedDefaultIsProvided() {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
         assertTrue(plugin.compassEngine is LocationLayerCompassEngine)
       }
     }
 
-    executePluginTest(pluginAction, PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity))
+    executePluginTest(pluginAction)
+  }
+
+  @Test
+  fun compassEngine_changesWhenNewProvided() {
+    val pluginAction = object : LocationLayerPluginAction.OnPerformLocationLayerPluginAction {
+      override fun onLocationLayerPluginAction(plugin: LocationLayerPlugin, mapboxMap: MapboxMap,
+                                               uiController: UiController, context: Context) {
+        plugin.activateLocationLayerPlugin(context, false)
+        val engine: CompassEngine = object : CompassEngine {
+          override fun addCompassListener(compassListener: CompassListener) {
+          }
+
+          override fun removeCompassListener(compassListener: CompassListener) {
+          }
+
+          override fun getLastHeading(): Float {
+            return 0f
+          }
+
+          override fun getLastAccuracySensorStatus(): Int {
+            return 0
+          }
+
+          override fun onStart() {
+          }
+
+          override fun onStop() {
+          }
+        }
+
+        plugin.compassEngine = engine
+        assertThat(plugin.compassEngine, notNullValue())
+        assertThat(plugin.compassEngine, `is`(equalTo(engine)))
+      }
+    }
+
+    executePluginTest(pluginAction)
   }
 
   @After
-  fun afterTest() {
-    Timber.e("@After: ${nameRule.methodName} - unregister idle resource")
-    IdlingRegistry.getInstance().unregister(idlingResource)
+  override fun afterTest() {
+    super.afterTest()
     IdlingRegistry.getInstance().unregister(styleChangeIdlingResource)
   }
 
-  private fun executePluginTest(listener: GenericPluginAction.OnPerformGenericPluginAction<LocationLayerPlugin>,
-                                pluginProvider: GenericPluginAction.PluginProvider<LocationLayerPlugin> = PluginGenerationUtil.getLocationLayerPluginProvider(activityRule.activity)) {
-    onView(withId(R.id.content)).perform(GenericPluginAction(fragment.view as MapView, mapboxMap, pluginProvider, listener))
+  private fun executePluginTest(listener: LocationLayerPluginAction.OnPerformLocationLayerPluginAction) {
+    onView(withId(R.id.content)).perform(LocationLayerPluginAction(mapboxMap, listener))
   }
 }
