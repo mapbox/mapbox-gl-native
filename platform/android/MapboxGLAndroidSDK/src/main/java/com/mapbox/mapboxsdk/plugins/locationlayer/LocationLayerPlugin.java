@@ -1,9 +1,6 @@
 package com.mapbox.mapboxsdk.plugins.locationlayer;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.location.Location;
@@ -22,8 +19,7 @@ import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapView.OnMapChangedListener;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraIdleListener;
 import com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveListener;
@@ -32,8 +28,6 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
 
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import timber.log.Timber;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -66,10 +60,10 @@ import static com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.
  * {@link LocationLayerOptions#MAX_ZOOM_DEFAULT} and {@link LocationLayerOptions#MIN_ZOOM_DEFAULT} respectively.
  * You can adjust the zoom range with {@link LocationLayerOptions#maxZoom()} and {@link LocationLayerOptions#minZoom()}.
  */
-public final class LocationLayerPlugin implements LifecycleObserver {
+public final class LocationLayerPlugin {
+  private static final String TAG = "Mbgl-LocationLayerPlugin";
 
   private final MapboxMap mapboxMap;
-  private final MapView mapView;
   private LocationLayerOptions options;
   private LocationEngine locationEngine;
   private CompassEngine compassEngine;
@@ -101,7 +95,7 @@ public final class LocationLayerPlugin implements LifecycleObserver {
    * Initialized in a started state because the plugin can be instantiated after lifecycle's onStart() and
    * the developer might not register the lifecycle observer but call lifecycle methods manually instead.
    */
-  private boolean isPluginStarted = true;
+  private boolean isPluginStarted;
 
   /**
    * Indicates if Mapbox components are ready to be interacted with. This can differ from {@link #isPluginStarted}
@@ -121,102 +115,13 @@ public final class LocationLayerPlugin implements LifecycleObserver {
 
   /**
    * Construct a LocationLayerPlugin
-   * <p>
-   * <strong>Note</strong>: This constructor will initialize and use an internal {@link LocationEngine}.
-   * </p>
    *
-   * @param mapView   the MapView to apply the LocationLayerPlugin to
    * @param mapboxMap the MapboxMap to apply the LocationLayerPlugin with
    */
-  public LocationLayerPlugin(@NonNull MapView mapView, @NonNull MapboxMap mapboxMap) {
+  public LocationLayerPlugin(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
-    this.mapView = mapView;
-    options = LocationLayerOptions.createFromAttributes(mapView.getContext(), R.style.mapbox_LocationLayer);
-    initializeLocationEngine();
-    initialize();
-  }
-
-  /**
-   * Construct a LocationLayerPlugin
-   * <p>
-   * <strong>Note</strong>: This constructor will initialize and use an internal {@link LocationEngine}.
-   * </p>
-   *
-   * @param mapView   the MapView to apply the LocationLayerPlugin to
-   * @param mapboxMap the MapboxMap to apply the LocationLayerPlugin with
-   * @param options   to customize the user location icons inside your apps
-   */
-  public LocationLayerPlugin(@NonNull MapView mapView, @NonNull MapboxMap mapboxMap,
-                             @NonNull LocationLayerOptions options) {
-    this.mapboxMap = mapboxMap;
-    this.mapView = mapView;
-    this.options = options;
-    initializeLocationEngine();
-    initialize();
-  }
-
-  /**
-   * Construct a LocationLayerPlugin
-   * <p>
-   * <strong>Note</strong>: This constructor will initialize and use an internal {@link LocationEngine}.
-   * </p>
-   *
-   * @param mapView   the MapView to apply the LocationLayerPlugin to
-   * @param mapboxMap the MapboxMap to apply the LocationLayerPlugin with
-   */
-  public LocationLayerPlugin(@NonNull MapView mapView, @NonNull MapboxMap mapboxMap,
-                             @StyleRes int styleRes) {
-    this.mapboxMap = mapboxMap;
-    this.mapView = mapView;
-    this.options = LocationLayerOptions.createFromAttributes(mapView.getContext(), styleRes);
-    initializeLocationEngine();
-    initialize();
-  }
-
-  /**
-   * Construct a LocationLayerPlugin
-   *
-   * @param mapView        the MapView to apply the LocationLayerPlugin to
-   * @param mapboxMap      the MapboxMap to apply the LocationLayerPlugin with
-   * @param locationEngine the {@link LocationEngine} this plugin should use to update
-   */
-  public LocationLayerPlugin(@NonNull MapView mapView, @NonNull MapboxMap mapboxMap,
-                             @Nullable LocationEngine locationEngine) {
-    this(mapView, mapboxMap, locationEngine,
-      LocationLayerOptions.createFromAttributes(mapView.getContext(),
-        R.style.mapbox_LocationLayer));
-  }
-
-  /**
-   * Construct a LocationLayerPlugin
-   *
-   * @param mapView        the MapView to apply the LocationLayerPlugin to
-   * @param mapboxMap      the MapboxMap to apply the LocationLayerPlugin with
-   * @param locationEngine the {@link LocationEngine} this plugin should use to update
-   * @param styleRes       customize the user location icons inside your apps {@code style.xml}
-   */
-  public LocationLayerPlugin(@NonNull MapView mapView, @NonNull MapboxMap mapboxMap,
-                             @Nullable LocationEngine locationEngine, @StyleRes int styleRes) {
-    this(mapView, mapboxMap, locationEngine,
-      LocationLayerOptions.createFromAttributes(mapView.getContext(), styleRes));
-  }
-
-  /**
-   * Construct a LocationLayerPlugin
-   *
-   * @param mapView        the MapView to apply the LocationLayerPlugin to
-   * @param mapboxMap      the MapboxMap to apply the LocationLayerPlugin with
-   * @param locationEngine the {@link LocationEngine} this plugin should use to update
-   * @param options        to customize the user location icons inside your apps
-   */
-  public LocationLayerPlugin(@NonNull MapView mapView, @NonNull MapboxMap mapboxMap,
-                             @Nullable LocationEngine locationEngine,
-                             @NonNull LocationLayerOptions options) {
-    this.locationEngine = locationEngine;
-    this.mapboxMap = mapboxMap;
-    this.mapView = mapView;
-    this.options = options;
-    initialize();
+    options = LocationLayerOptions.createFromAttributes(context, R.style.mapbox_LocationLayer);
+    initialize(context);
   }
 
   /**
@@ -225,12 +130,92 @@ public final class LocationLayerPlugin implements LifecycleObserver {
    *
    * @param isEnabled true to show layers and enable camera, false otherwise
    */
-  public void setLocationLayerEnabled(boolean isEnabled) {
+  private void setLocationLayerEnabled(boolean isEnabled) {
     if (isEnabled) {
       enableLocationLayerPlugin();
     } else {
       disableLocationLayerPlugin();
     }
+  }
+
+  /**
+   * This method will show the location icon and enable the camera tracking the location.
+   * <p>
+   * <strong>Note</strong>: This constructor will initialize and use an internal {@link LocationEngine}.
+   *
+   * @param context the context
+   */
+  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  public void activateLocationLayerPlugin(@NonNull Context context) {
+    activateLocationLayerPlugin(context, LocationLayerOptions.createFromAttributes(context, R.style
+      .mapbox_LocationLayer));
+  }
+
+  /**
+   * This method will show the location icon and enable the camera tracking the location.
+   * <p>
+   * <strong>Note</strong>: This constructor will initialize and use an internal {@link LocationEngine}.
+   *
+   * @param context  the context
+   * @param styleRes the LocationLayerPlugin style res
+   */
+  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  public void activateLocationLayerPlugin(@NonNull Context context, @StyleRes int styleRes) {
+    activateLocationLayerPlugin(context, LocationLayerOptions.createFromAttributes(context, styleRes));
+  }
+
+  /**
+   * This method will show the location icon and enable the camera tracking the location.
+   * <p>
+   * <strong>Note</strong>: This constructor will initialize and use an internal {@link LocationEngine}.
+   * </p>
+   *
+   * @param context the context
+   * @param options the options
+   */
+  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  public void activateLocationLayerPlugin(@NonNull Context context, @NonNull LocationLayerOptions options) {
+    applyStyle(options);
+    initializeLocationEngine(context);
+    setLocationLayerEnabled(true);
+  }
+
+  /**
+   * This method will show the location icon and enable the camera tracking the location.
+   * <p>
+   * <strong>Note</strong>: This constructor will initialize and use an internal {@link LocationEngine}.
+   * </p>
+   *
+   * @param context        the context
+   * @param locationEngine the engine, or null if you'd like to only force location updates
+   * @param styleRes       the LocationLayerPlugin style res
+   */
+  public void activateLocationLayerPlugin(@NonNull Context context, @Nullable LocationEngine locationEngine,
+                                          @StyleRes int styleRes) {
+    activateLocationLayerPlugin(locationEngine, LocationLayerOptions.createFromAttributes(context, styleRes));
+  }
+
+  /**
+   * This method will show the location icon and enable the camera tracking the location.
+   * <p>
+   * <strong>Note</strong>: This constructor will initialize and use an internal {@link LocationEngine}.
+   * </p>
+   *
+   * @param locationEngine the engine, or null if you'd like to only force location updates
+   * @param options        the options
+   */
+  public void activateLocationLayerPlugin(@Nullable LocationEngine locationEngine,
+                                          @NonNull LocationLayerOptions options) {
+    setLocationEngine(locationEngine);
+    applyStyle(options);
+    setLocationLayerEnabled(true);
+  }
+
+  /**
+   * This method will hide the location icon and disable the camera tracking the location.
+   */
+  public void deactivateLocationLayerPlugin() {
+    setLocationLayerEnabled(false);
   }
 
   /**
@@ -315,8 +300,8 @@ public final class LocationLayerPlugin implements LifecycleObserver {
    *
    * @param styleRes a XML style overriding some or all the options
    */
-  public void applyStyle(@StyleRes int styleRes) {
-    applyStyle(LocationLayerOptions.createFromAttributes(mapView.getContext(), styleRes));
+  public void applyStyle(@NonNull Context context, @StyleRes int styleRes) {
+    applyStyle(LocationLayerOptions.createFromAttributes(context, styleRes));
   }
 
   /**
@@ -350,9 +335,9 @@ public final class LocationLayerPlugin implements LifecycleObserver {
     if (!isLocationLayerStarted) {
       return;
     } else if (getCameraMode() == CameraMode.NONE) {
-      Timber.e("%s%s",
+      Logger.e(TAG, String.format("%s%s",
         "LocationLayerPlugin#zoomWhileTracking method can only be used",
-        " when a camera mode other than CameraMode#NONE is engaged.");
+        " when a camera mode other than CameraMode#NONE is engaged."));
       return;
     }
     pluginAnimatorCoordinator.feedNewZoomLevel(zoomLevel, mapboxMap.getCameraPosition(), animationDuration, callback);
@@ -408,9 +393,9 @@ public final class LocationLayerPlugin implements LifecycleObserver {
     if (!isLocationLayerStarted) {
       return;
     } else if (getCameraMode() == CameraMode.NONE) {
-      Timber.e("%s%s",
+      Logger.e(TAG, String.format("%s%s",
         "LocationLayerPlugin#tiltWhileTracking method can only be used",
-        " when a camera mode other than CameraMode#NONE is engaged.");
+        " when a camera mode other than CameraMode#NONE is engaged."));
       return;
     }
     pluginAnimatorCoordinator.feedNewTilt(tilt, mapboxMap.getCameraPosition(), animationDuration, callback);
@@ -645,26 +630,41 @@ public final class LocationLayerPlugin implements LifecycleObserver {
   }
 
   /**
-   * You must call this method from the parent's Activity#onStart() or Fragment#onStart()
+   * Internal use.
    */
-  @OnLifecycleEvent(Lifecycle.Event.ON_START)
   public void onStart() {
-    if (mapView.isDestroyed()) {
-      Timber.e("You are calling plugins #onStart after the map was destroyed. Re-create the plugin before using it.");
+    // TODO: 03.09.18 LLP when map destroyed
+    /*if (context.isDestroyed()) {
+      Logger.e("You are calling plugins #onStart after the map was destroyed. Re-create the plugin before using it.");
       return;
-    }
+    }*/
 
     isPluginStarted = true;
     onLocationLayerStart();
   }
 
   /**
-   * You must call this method from the parent's Activity#onStop() or Fragment#onStop().
+   * Internal use.
    */
-  @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
   public void onStop() {
     onLocationLayerStop();
     isPluginStarted = false;
+  }
+
+  /**
+   * Internal use.
+   */
+  public void onStartLoadingMap() {
+    onLocationLayerStop();
+  }
+
+  /**
+   * Internal use.
+   */
+  public void onFinishLoadingStyle() {
+    locationLayer.initializeComponents(options);
+    locationLayerCamera.initializeOptions(options);
+    onLocationLayerStart();
   }
 
   @SuppressLint("MissingPermission")
@@ -720,25 +720,22 @@ public final class LocationLayerPlugin implements LifecycleObserver {
     }
   }
 
-  private void initialize() {
+  private void initialize(@NonNull Context context) {
     AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-
-    mapView.addOnMapChangedListener(onMapChangedListener);
 
     mapboxMap.addOnMapClickListener(onMapClickListener);
     mapboxMap.addOnMapLongClickListener(onMapLongClickListener);
 
     LayerSourceProvider sourceProvider = new LayerSourceProvider();
     LayerFeatureProvider featureProvider = new LayerFeatureProvider();
-    LayerBitmapProvider bitmapProvider = new LayerBitmapProvider(mapView.getContext());
+    LayerBitmapProvider bitmapProvider = new LayerBitmapProvider(context);
     locationLayer = new LocationLayer(mapboxMap, sourceProvider, featureProvider, bitmapProvider, options);
     locationLayerCamera = new LocationLayerCamera(
-      mapView.getContext(), mapboxMap, cameraTrackingChangedListener, options, onCameraMoveInvalidateListener);
+      context, mapboxMap, cameraTrackingChangedListener, options, onCameraMoveInvalidateListener);
     pluginAnimatorCoordinator = new PluginAnimatorCoordinator();
     pluginAnimatorCoordinator.addLayerListener(locationLayer);
     pluginAnimatorCoordinator.addCameraListener(locationLayerCamera);
 
-    Context context = mapView.getContext();
     WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
     SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
     compassEngine = new LocationLayerCompassEngine(windowManager, sensorManager);
@@ -747,14 +744,13 @@ public final class LocationLayerPlugin implements LifecycleObserver {
 
     updateMapWithOptions(options);
 
-    enableLocationLayerPlugin();
     setRenderMode(RenderMode.NORMAL);
     setCameraMode(CameraMode.NONE);
   }
 
-  private void initializeLocationEngine() {
+  private void initializeLocationEngine(@NonNull Context context) {
     usingInternalLocationEngine = true;
-    locationEngine = new LocationEngineProvider(mapView.getContext()).obtainBestLocationEngineAvailable();
+    locationEngine = new LocationEngineProvider(context).obtainBestLocationEngineAvailable();
     locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
     locationEngine.setFastestInterval(1000);
     locationEngine.addLocationEngineListener(locationEngineListener);
@@ -894,20 +890,6 @@ public final class LocationLayerPlugin implements LifecycleObserver {
 
       for (OnLocationStaleListener listener : onLocationStaleListeners) {
         listener.onStaleStateChange(isStale);
-      }
-    }
-  };
-
-  private OnMapChangedListener onMapChangedListener = new OnMapChangedListener() {
-    @SuppressLint("MissingPermission")
-    @Override
-    public void onMapChanged(int change) {
-      if (change == MapView.WILL_START_LOADING_MAP) {
-        onLocationLayerStop();
-      } else if (change == MapView.DID_FINISH_LOADING_STYLE) {
-        locationLayer.initializeComponents(options);
-        locationLayerCamera.initializeOptions(options);
-        onLocationLayerStart();
       }
     }
   };
