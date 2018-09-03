@@ -25,6 +25,8 @@
 
 // C++ -> Java conversion
 #include "../conversion/property_value.hpp"
+#include "custom_layer.hpp"
+#include "background_layer.hpp"
 #include <mbgl/style/filter.hpp>
 
 #include <string>
@@ -204,6 +206,25 @@ namespace android {
         return jni::Make<jni::String>(env, layer.accept(GetSourceLayerEvaluator()));
     }
 
+    struct GetSourceIdEvaluator {
+        std::string noop(std::string layerType) {
+            Log::Warning(mbgl::Event::JNI, "%s doesn't support get source id", layerType.c_str());
+            return {};
+        }
+
+        std::string operator()(style::BackgroundLayer&) { return noop("BackgroundLayer"); }
+        std::string operator()(style::CustomLayer&) { return noop("CustomLayer"); }
+
+        template <class LayerType>
+        std::string operator()(LayerType& layer) {
+            return layer.getSourceID();
+        }
+    };
+
+    jni::String Layer::getSourceId(jni::JNIEnv& env) {
+        return jni::Make<jni::String>(env, layer.accept(GetSourceIdEvaluator()));
+    }
+
     jni::jfloat Layer::getMinZoom(jni::JNIEnv&){
         return layer.getMinZoom();
     }
@@ -242,6 +263,7 @@ namespace android {
             METHOD(&Layer::getFilter, "nativeGetFilter"),
             METHOD(&Layer::setSourceLayer, "nativeSetSourceLayer"),
             METHOD(&Layer::getSourceLayer, "nativeGetSourceLayer"),
+            METHOD(&Layer::getSourceId, "nativeGetSourceId"),
             METHOD(&Layer::getMinZoom, "nativeGetMinZoom"),
             METHOD(&Layer::getMaxZoom, "nativeGetMaxZoom"),
             METHOD(&Layer::setMinZoom, "nativeSetMinZoom"),

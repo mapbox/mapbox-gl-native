@@ -88,6 +88,18 @@ public class <%- camelize(type) %>Layer extends Layer {
   }
 
 <% } -%>
+<% if (type !== 'background' && type !== 'custom') { -%>
+  /**
+   * Get the source id.
+   *
+   * @return id of the source
+   */
+  public String getSourceId() {
+    checkThread();
+    return nativeGetSourceId();
+  }
+
+<% } -%>
 <% if (type !== 'background' && type !== 'raster' && type !== 'hillshade') { -%>
   /**
    * Get the source layer.

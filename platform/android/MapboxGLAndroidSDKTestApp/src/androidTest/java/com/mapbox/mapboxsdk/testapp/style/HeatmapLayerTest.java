@@ -51,6 +51,18 @@ public class HeatmapLayerTest extends BaseActivityTest {
   }
 
   @Test
+  public void testSourceId() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("SourceId");
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+      // Get source id
+      assertEquals(layer.getSourceId(), "composite");
+    });
+  }
+
+  @Test
   public void testSetVisibility() {
     validateTestSetup();
     setupLayer();

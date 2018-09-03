@@ -68,6 +68,16 @@ public class HillshadeLayer extends Layer {
   }
 
   /**
+   * Get the source id.
+   *
+   * @return id of the source
+   */
+  public String getSourceId() {
+    checkThread();
+    return nativeGetSourceId();
+  }
+
+  /**
    * Set a property or properties.
    *
    * @param properties the var-args properties
