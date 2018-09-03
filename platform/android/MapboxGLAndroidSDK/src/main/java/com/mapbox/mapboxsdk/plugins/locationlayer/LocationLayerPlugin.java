@@ -114,7 +114,9 @@ public final class LocationLayerPlugin {
     = new CopyOnWriteArrayList<>();
 
   /**
-   * Construct a LocationLayerPlugin
+   * Construct a LocationLayerPlugin. In order to display location,
+   * the location layer has to be activated with {@link LocationLayerPlugin#activateLocationLayerPlugin(Context)},
+   * or one of the overloads.
    *
    * @param mapboxMap the MapboxMap to apply the LocationLayerPlugin with
    */
@@ -149,6 +151,22 @@ public final class LocationLayerPlugin {
   public void activateLocationLayerPlugin(@NonNull Context context) {
     activateLocationLayerPlugin(context, LocationLayerOptions.createFromAttributes(context, R.style
       .mapbox_LocationLayer));
+  }
+
+  /**
+   * This method will show the location icon and enable the camera tracking the location.
+   * <p>
+   * <strong>Note</strong>: This constructor will initialize and use an internal {@link LocationEngine}.
+   *
+   * @param context the context
+   */
+  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  public void activateLocationLayerPlugin(@NonNull Context context, boolean useDefaultLocationEngine) {
+    if (useDefaultLocationEngine) {
+      activateLocationLayerPlugin(context, R.style.mapbox_LocationLayer);
+    } else {
+      activateLocationLayerPlugin(context, null, R.style.mapbox_LocationLayer);
+    }
   }
 
   /**
@@ -312,9 +330,7 @@ public final class LocationLayerPlugin {
   public void applyStyle(LocationLayerOptions options) {
     this.options = options;
     locationLayer.applyStyle(options);
-    if (!options.enableStaleState()) {
-      staleStateManager.onStop();
-    }
+    staleStateManager.setEnabled(options.enableStaleState());
     staleStateManager.setDelayTime(options.staleStateTimeout());
     updateMapWithOptions(options);
   }
@@ -740,7 +756,7 @@ public final class LocationLayerPlugin {
     SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
     compassEngine = new LocationLayerCompassEngine(windowManager, sensorManager);
     compassEngine.addCompassListener(compassListener);
-    staleStateManager = new StaleStateManager(onLocationStaleListener, options.staleStateTimeout());
+    staleStateManager = new StaleStateManager(onLocationStaleListener, options);
 
     updateMapWithOptions(options);
 

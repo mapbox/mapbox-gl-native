@@ -4,19 +4,24 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.test.espresso.Espresso;
+import android.support.test.espresso.IdlingRegistry;
 import android.support.test.espresso.IdlingResourceTimeoutException;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
+
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
 import com.mapbox.mapboxsdk.testapp.action.WaitAction;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
+
 import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.rules.TestName;
+
 import timber.log.Timber;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -28,15 +33,19 @@ public abstract class BaseActivityTest {
 
   @Rule
   public ActivityTestRule<Activity> rule = new ActivityTestRule<>(getActivityClass());
+
+  @Rule
+  public TestName testNameRule = new TestName();
+
   protected MapboxMap mapboxMap;
   protected OnMapReadyIdlingResource idlingResource;
 
   @Before
   public void beforeTest() {
     try {
-      Timber.e("@Before test: register idle resource");
+      Timber.e(String.format("%s - %s", testNameRule.getMethodName(), "@Before test: register idle resource"));
       idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
-      Espresso.registerIdlingResources(idlingResource);
+      IdlingRegistry.getInstance().register(idlingResource);
       checkViewIsDisplayed(R.id.mapView);
       mapboxMap = idlingResource.getMapboxMap();
     } catch (IdlingResourceTimeoutException idlingResourceTimeoutException) {
@@ -91,8 +100,8 @@ public abstract class BaseActivityTest {
 
   @After
   public void afterTest() {
-    Timber.e("@After test: unregister idle resource");
-    Espresso.unregisterIdlingResources(idlingResource);
+    Timber.e(String.format("%s - %s", testNameRule.getMethodName(), "@After test: unregister idle resource"));
+    IdlingRegistry.getInstance().unregister(idlingResource);
   }
 }
 

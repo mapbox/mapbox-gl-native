@@ -10,35 +10,42 @@ import android.os.Handler;
  */
 class StaleStateManager {
 
+  private boolean isEnabled;
   private final OnLocationStaleListener innerOnLocationStaleListeners;
   private final Handler handler;
   private boolean isStale = true;
   private long delayTime;
 
-  StaleStateManager(OnLocationStaleListener innerListener, long delayTime) {
+  StaleStateManager(OnLocationStaleListener innerListener, LocationLayerOptions options) {
     innerOnLocationStaleListeners = innerListener;
-    this.delayTime = delayTime;
     handler = new Handler();
-    innerOnLocationStaleListeners.onStaleStateChange(true);
+    isEnabled = options.enableStaleState();
+    delayTime = options.staleStateTimeout();
   }
 
   private Runnable staleStateRunnable = new Runnable() {
     @Override
     public void run() {
-      isStale = true;
-      innerOnLocationStaleListeners.onStaleStateChange(true);
+      setState(true);
     }
   };
+
+  void setEnabled(boolean enabled) {
+    if (enabled) {
+      setState(isStale);
+    } else if (isEnabled) {
+      onStop();
+      innerOnLocationStaleListeners.onStaleStateChange(false);
+    }
+    isEnabled = enabled;
+  }
 
   boolean isStale() {
     return isStale;
   }
 
   void updateLatestLocationTime() {
-    if (isStale) {
-      isStale = false;
-      innerOnLocationStaleListeners.onStaleStateChange(false);
-    }
+    setState(false);
     postTheCallback();
   }
 
@@ -60,5 +67,14 @@ class StaleStateManager {
   private void postTheCallback() {
     handler.removeCallbacksAndMessages(null);
     handler.postDelayed(staleStateRunnable, delayTime);
+  }
+
+  private void setState(boolean stale) {
+    if (stale != isStale) {
+      isStale = stale;
+      if (isEnabled) {
+        innerOnLocationStaleListeners.onStaleStateChange(stale);
+      }
+    }
   }
 }
