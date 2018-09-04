@@ -45,15 +45,17 @@ namespace android {
     GeoJSONSource::GeoJSONSource(jni::JNIEnv& env, jni::String sourceId, jni::Object<> options)
         : Source(env, std::make_unique<mbgl::style::GeoJSONSource>(
                 jni::Make<std::string>(env, sourceId),
-                convertGeoJSONOptions(env, options))
-            ), converter(std::make_unique<Actor<FeatureConverter>>(*sharedThreadPool())) {
+                convertGeoJSONOptions(env, options)))
+        , threadPool(sharedThreadPool())
+        , converter(std::make_unique<Actor<FeatureConverter>>(*threadPool)) {
     }
 
     GeoJSONSource::GeoJSONSource(jni::JNIEnv& env,
                                  mbgl::style::Source& coreSource,
                                  AndroidRendererFrontend& frontend)
-            : Source(env, coreSource, createJavaPeer(env), frontend)
-            , converter(std::make_unique<Actor<FeatureConverter>>(*sharedThreadPool())) {
+        : Source(env, coreSource, createJavaPeer(env), frontend)
+        , threadPool(sharedThreadPool())
+        , converter(std::make_unique<Actor<FeatureConverter>>(*threadPool)) {
     }
 
     GeoJSONSource::~GeoJSONSource() = default;
