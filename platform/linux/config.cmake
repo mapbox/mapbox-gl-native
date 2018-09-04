@@ -1,5 +1,6 @@
 include(cmake/nunicode.cmake)
 include(cmake/sqlite.cmake)
+include(cmake/icu.cmake)
 
 add_library(mbgl-loop-uv STATIC
     platform/default/async_task.cpp
@@ -81,11 +82,11 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC libpng)
     target_add_mason_package(mbgl-core PUBLIC libjpeg-turbo)
     target_add_mason_package(mbgl-core PUBLIC webp)
-    target_add_mason_package(mbgl-core PRIVATE icu)
     target_add_mason_package(mbgl-core PUBLIC geojson)
 
     target_link_libraries(mbgl-core
         PRIVATE nunicode
+        PRIVATE icu
         PUBLIC -lz
     )
 

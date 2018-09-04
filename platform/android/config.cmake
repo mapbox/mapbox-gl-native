@@ -2,6 +2,7 @@ set(USE_GLES2 ON)
 
 include(cmake/nunicode.cmake)
 include(cmake/sqlite.cmake)
+include(cmake/icu.cmake)
 
 # Build thin archives.
 set(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> cruT <TARGET> <LINK_FLAGS> <OBJECTS>")
@@ -46,10 +47,10 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC geojson)
     target_add_mason_package(mbgl-core PUBLIC jni.hpp)
     target_add_mason_package(mbgl-core PUBLIC rapidjson)
-    target_add_mason_package(mbgl-core PRIVATE icu)
 
     target_link_libraries(mbgl-core
         PRIVATE nunicode
+        PRIVATE icu
         PUBLIC expected
         PUBLIC -llog
         PUBLIC -landroid
