@@ -143,7 +143,7 @@ public final class LocationLayerPlugin {
   /**
    * This method will show the location icon and enable the camera tracking the location.
    * <p>
-   * <strong>Note</strong>: This constructor will initialize and use an internal {@link LocationEngine}.
+   * <strong>Note</strong>: This method will initialize and use an internal {@link LocationEngine}.
    *
    * @param context the context
    */
@@ -155,10 +155,10 @@ public final class LocationLayerPlugin {
 
   /**
    * This method will show the location icon and enable the camera tracking the location.
-   * <p>
-   * <strong>Note</strong>: This constructor will initialize and use an internal {@link LocationEngine}.
    *
-   * @param context the context
+   * @param context                  the context
+   * @param useDefaultLocationEngine true if you want to initialize and use the built-in location engine or false if
+   *                                 there should be no location engine initialized
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   public void activateLocationLayerPlugin(@NonNull Context context, boolean useDefaultLocationEngine) {
@@ -172,7 +172,7 @@ public final class LocationLayerPlugin {
   /**
    * This method will show the location icon and enable the camera tracking the location.
    * <p>
-   * <strong>Note</strong>: This constructor will initialize and use an internal {@link LocationEngine}.
+   * <strong>Note</strong>: This method will initialize and use an internal {@link LocationEngine}.
    *
    * @param context  the context
    * @param styleRes the LocationLayerPlugin style res
@@ -185,7 +185,7 @@ public final class LocationLayerPlugin {
   /**
    * This method will show the location icon and enable the camera tracking the location.
    * <p>
-   * <strong>Note</strong>: This constructor will initialize and use an internal {@link LocationEngine}.
+   * <strong>Note</strong>: This method will initialize and use an internal {@link LocationEngine}.
    * </p>
    *
    * @param context the context
@@ -200,9 +200,6 @@ public final class LocationLayerPlugin {
 
   /**
    * This method will show the location icon and enable the camera tracking the location.
-   * <p>
-   * <strong>Note</strong>: This constructor will initialize and use an internal {@link LocationEngine}.
-   * </p>
    *
    * @param context        the context
    * @param locationEngine the engine, or null if you'd like to only force location updates
@@ -215,9 +212,16 @@ public final class LocationLayerPlugin {
 
   /**
    * This method will show the location icon and enable the camera tracking the location.
-   * <p>
-   * <strong>Note</strong>: This constructor will initialize and use an internal {@link LocationEngine}.
-   * </p>
+   *
+   * @param context        the context
+   * @param locationEngine the engine
+   */
+  public void activateLocationLayerPlugin(@NonNull Context context, @NonNull LocationEngine locationEngine) {
+    activateLocationLayerPlugin(context, locationEngine, R.style.mapbox_LocationLayer);
+  }
+
+  /**
+   * This method will show the location icon and enable the camera tracking the location.
    *
    * @param locationEngine the engine, or null if you'd like to only force location updates
    * @param options        the options
