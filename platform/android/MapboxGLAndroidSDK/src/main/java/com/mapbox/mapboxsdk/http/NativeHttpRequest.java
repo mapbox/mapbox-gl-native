@@ -5,6 +5,7 @@ import com.mapbox.mapboxsdk.Mapbox;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+@Keep
 public class NativeHttpRequest implements HttpResponder {
 
   private final HttpRequest httpRequest = Mapbox.getModuleProvider().createHttpRequest();
