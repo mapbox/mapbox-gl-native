@@ -300,7 +300,7 @@ step-library:
 jobs:
   nitpick:
     docker:
-      - image: mbgl/7d2403f42e:base
+      - image: mbgl/7d2403f42e:linux-clang-4
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
