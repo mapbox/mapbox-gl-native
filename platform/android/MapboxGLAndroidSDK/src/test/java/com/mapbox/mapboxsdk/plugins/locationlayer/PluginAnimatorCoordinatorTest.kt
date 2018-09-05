@@ -3,8 +3,8 @@ package com.mapbox.mapboxsdk.plugins.locationlayer
 import android.location.Location
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.DEFAULT_TRACKING_TILT_ANIMATION_DURATION
-import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION
+import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.DEFAULT_TRACKING_TILT_ANIM_DURATION
+import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.DEFAULT_TRACKING_ZOOM_ANIM_DURATION
 import com.mapbox.mapboxsdk.plugins.locationlayer.PluginAnimator.*
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
@@ -154,7 +154,7 @@ class PluginAnimatorCoordinatorTest {
     pluginAnimatorCoordinator.feedNewZoomLevel(
       15.0,
       cameraPosition,
-      DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION,
+      DEFAULT_TRACKING_ZOOM_ANIM_DURATION,
       null
     )
 
@@ -167,12 +167,12 @@ class PluginAnimatorCoordinatorTest {
     pluginAnimatorCoordinator.feedNewZoomLevel(
       zoom.toDouble(),
       cameraPosition,
-      DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION,
+      DEFAULT_TRACKING_ZOOM_ANIM_DURATION,
       null
     )
 
     val animationDuration = pluginAnimatorCoordinator.animatorMap[ANIMATOR_ZOOM]?.duration as Long
-    assertEquals(DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION, animationDuration)
+    assertEquals(DEFAULT_TRACKING_ZOOM_ANIM_DURATION, animationDuration)
 
     val target = pluginAnimatorCoordinator.animatorMap[ANIMATOR_ZOOM]?.target as Float
     assertEquals(zoom, target)
@@ -183,7 +183,7 @@ class PluginAnimatorCoordinatorTest {
     pluginAnimatorCoordinator.feedNewTilt(
       30.0,
       cameraPosition,
-      DEFAULT_TRACKING_TILT_ANIMATION_DURATION,
+      DEFAULT_TRACKING_TILT_ANIM_DURATION,
       null
     )
 
@@ -196,12 +196,12 @@ class PluginAnimatorCoordinatorTest {
     pluginAnimatorCoordinator.feedNewTilt(
       tilt.toDouble(),
       cameraPosition,
-      DEFAULT_TRACKING_TILT_ANIMATION_DURATION,
+      DEFAULT_TRACKING_TILT_ANIM_DURATION,
       null
     )
 
     val animationDuration = pluginAnimatorCoordinator.animatorMap[ANIMATOR_TILT]?.duration as Long
-    assertEquals(DEFAULT_TRACKING_TILT_ANIMATION_DURATION, animationDuration)
+    assertEquals(DEFAULT_TRACKING_TILT_ANIM_DURATION, animationDuration)
 
     val target = pluginAnimatorCoordinator.animatorMap[ANIMATOR_TILT]?.target as Float
     assertEquals(tilt, target)
@@ -220,7 +220,7 @@ class PluginAnimatorCoordinatorTest {
     pluginAnimatorCoordinator.feedNewZoomLevel(
       15.0,
       cameraPosition,
-      DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION,
+      DEFAULT_TRACKING_ZOOM_ANIM_DURATION,
       null
     )
     pluginAnimatorCoordinator.cancelZoomAnimation()
@@ -233,7 +233,7 @@ class PluginAnimatorCoordinatorTest {
     pluginAnimatorCoordinator.feedNewTilt(
       30.0,
       cameraPosition,
-      DEFAULT_TRACKING_TILT_ANIMATION_DURATION,
+      DEFAULT_TRACKING_TILT_ANIM_DURATION,
       null
     )
 
