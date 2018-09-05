@@ -393,6 +393,7 @@
 		CAA69DA4206DCD0E007279CD /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; };
 		CAA69DA5206DCD0E007279CD /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CABE5DAD2072FAB40003AF3C /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
+		CAE7AD5520F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAE7AD5420F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift */; };
 		DA00FC8E1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8F1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC901D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */; };
@@ -991,7 +992,7 @@
 		927FBCFA1F4DAA8300F8BF1F /* MBXSnapshotsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXSnapshotsViewController.h; sourceTree = "<group>"; };
 		927FBCFB1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXSnapshotsViewController.m; sourceTree = "<group>"; };
 		927FBCFD1F4DB05500F8BF1F /* MGLMapSnapshotter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapSnapshotter.h; sourceTree = "<group>"; };
-		927FBCFE1F4DB05500F8BF1F /* MGLMapSnapshotter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLMapSnapshotter.mm; sourceTree = "<group>"; };
+		927FBCFE1F4DB05500F8BF1F /* MGLMapSnapshotter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLMapSnapshotter.mm; sourceTree = "<group>"; wrapsLines = 0; };
 		92F2C3EC1F0E3C3A00268EC0 /* MGLRendererFrontend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLRendererFrontend.h; sourceTree = "<group>"; };
 		92FC0AE7207CEE16007B6B54 /* MGLShapeOfflineRegion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLShapeOfflineRegion.h; sourceTree = "<group>"; };
 		92FC0AE8207CEE16007B6B54 /* MGLShapeOfflineRegion_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLShapeOfflineRegion_Private.h; sourceTree = "<group>"; };
@@ -1041,6 +1042,8 @@
 		CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCameraChangeReason.h; sourceTree = "<group>"; };
 		CA5E5042209BDC5F001A8A81 /* MGLTestUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MGLTestUtility.h; path = ../../darwin/test/MGLTestUtility.h; sourceTree = "<group>"; };
 		CA6914B420E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLAnnotationViewIntegrationTests.m; path = "Annotation Tests/MGLAnnotationViewIntegrationTests.m"; sourceTree = "<group>"; };
+		CAE7AD5320F46EF5003B6782 /* integration-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "integration-Bridging-Header.h"; sourceTree = "<group>"; };
+		CAE7AD5420F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MGLMapSnapshotterSwiftTests.swift; sourceTree = "<group>"; };
 		DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
 		DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAttributionInfo.mm; sourceTree = "<group>"; };
 		DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
@@ -1393,6 +1396,7 @@
 			isa = PBXGroup;
 			children = (
 				CA6914B320E67F07002DB0EE /* Annotations */,
+				CAE7AD5320F46EF5003B6782 /* integration-Bridging-Header.h */,
 				CA1B4A4F2099FA2800EDD491 /* Snapshotter Tests */,
 				16376B091FFD9DAF0000563E /* MBGLIntegrationTests.m */,
 				16376B0B1FFD9DAF0000563E /* Info.plist */,
@@ -1755,6 +1759,7 @@
 			isa = PBXGroup;
 			children = (
 				CA1B4A502099FB2200EDD491 /* MGLMapSnapshotterTest.m */,
+				CAE7AD5420F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift */,
 			);
 			path = "Snapshotter Tests";
 			sourceTree = "<group>";
@@ -2693,6 +2698,7 @@
 				TargetAttributes = {
 					16376B061FFD9DAF0000563E = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 0940;
 						ProvisioningStyle = Automatic;
 						TestTargetID = DA1DC9491CB6C1C2006E619F;
 					};
@@ -2881,6 +2887,7 @@
 				CA34C9C3207FD272005C1A06 /* MGLCameraTransitionTests.mm in Sources */,
 				16376B0A1FFD9DAF0000563E /* MBGLIntegrationTests.m in Sources */,
 				CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */,
+				CAE7AD5520F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift in Sources */,
 				CA0C27922076C804001CE5B7 /* MGLShapeSourceTests.m in Sources */,
 				CA6914B520E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m in Sources */,
 				CA1B4A512099FB2200EDD491 /* MGLMapSnapshotterTest.m in Sources */,
@@ -3469,6 +3476,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
@@ -3484,6 +3492,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mapbox.integration-tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Integration Tests/integration-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Integration Test Harness.app/Integration Test Harness";
 			};
@@ -3496,6 +3507,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
@@ -3511,6 +3523,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mapbox.integration-tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Integration Tests/integration-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Integration Test Harness.app/Integration Test Harness";
 			};

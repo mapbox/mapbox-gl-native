@@ -1,5 +1,10 @@
 #import "MGLMapViewIntegrationTest.h"
 
+@interface MGLMapSnapshotter ()
+@property (nonatomic) BOOL cancelled;
+@end
+
+
 @interface MGLMapSnapshotterTest : MGLMapViewIntegrationTest
 @end
 
@@ -19,21 +24,10 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
     return snapshotter;
 }
 
-NSString* validAccessToken() {
-    NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
-    if (!accessToken) {
-        printf("warning: MAPBOX_ACCESS_TOKEN env var is required for this test - skipping.\n");
-        return nil;
-    }
-
-    [MGLAccountManager setAccessToken:accessToken];
-    return accessToken;
-}
-
 @implementation MGLMapSnapshotterTest
 
 - (void)testMultipleSnapshotsWithASingleSnapshotter {
-    if (!validAccessToken()) {
+    if (![self validAccessToken]) {
         return;
     }
 
@@ -66,8 +60,137 @@ NSString* validAccessToken() {
     [self waitForExpectations:@[expectation] timeout:10.0];
 }
 
+- (void)testDeallocatingSnapshotterDuringSnapshot {
+    // See also https://github.com/mapbox/mapbox-gl-native/issues/12336
+    if (![self validAccessToken]) {
+        return;
+    }
+
+    NSTimeInterval timeout         = 5.0;
+    XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot"];
+    CGSize size                    = self.mapView.bounds.size;
+    CLLocationCoordinate2D coord   = CLLocationCoordinate2DMake(30.0, 30.0);
+
+    // Test triggering to main queue
+    dispatch_queue_t backgroundQueue = dispatch_get_main_queue();
+//  dispatch_queue_t backgroundQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+
+    __weak __typeof__(self) weakself = self;
+
+    dispatch_async(backgroundQueue, ^{
+
+        dispatch_group_t dg = dispatch_group_create();
+        dispatch_group_enter(dg);
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            MGLMapSnapshotter *snapshotter = snapshotterWithCoordinates(coord, size);
+            __weak MGLMapSnapshotter *weakSnapshotter = snapshotter;
+            
+            [snapshotter startWithCompletionHandler:^(MGLMapSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+                // We expect this completion block to be called with an error
+                __typeof__(self) strongself = weakself;
+
+                MGLTestAssertNil(strongself, snapshot);
+                MGLTestAssert(strongself,
+                              ([error.domain isEqualToString:MGLErrorDomain] && error.code == MGLErrorCodeSnapshotFailed),
+                              @"Should have errored");
+                MGLTestAssertNil(strongself, weakSnapshotter, @"Snapshotter should have been deallocated");
+
+                dispatch_group_leave(dg);
+            }];
+        });
+
+        dispatch_group_notify(dg, dispatch_get_main_queue(), ^{
+            [expectation fulfill];
+        });
+    });
+
+    [self waitForExpectations:@[expectation] timeout:timeout];
+}
+
+- (void)testSnapshotterUsingNestedDispatchQueues {
+    // This is the opposite pair to the above test `testDeallocatingSnapshotterDuringSnapshot`
+    // The only significant difference is that the snapshotter is a `__block` variable, so
+    // its lifetime should continue until it's set to nil in the completion block.
+    // See also https://github.com/mapbox/mapbox-gl-native/issues/12336
+
+    if (![self validAccessToken]) {
+        return;
+    }
+
+    NSTimeInterval timeout         = 5.0;
+    XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot"];
+    CGSize size                    = self.mapView.bounds.size;
+    CLLocationCoordinate2D coord   = CLLocationCoordinate2DMake(30.0, 30.0);
+
+    // Test triggering to main queue
+    dispatch_queue_t backgroundQueue = dispatch_get_main_queue();
+    //  dispatch_queue_t backgroundQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+
+    __weak __typeof__(self) weakself = self;
+
+    dispatch_async(backgroundQueue, ^{
+
+        dispatch_group_t dg = dispatch_group_create();
+        dispatch_group_enter(dg);
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+
+            __block MGLMapSnapshotter *snapshotter = snapshotterWithCoordinates(coord, size);
+
+            [snapshotter startWithCompletionHandler:^(MGLMapSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+                // We expect this completion block to be called with an error
+                __typeof__(self) strongself = weakself;
+                MGLTestAssertNotNil(strongself, snapshot);
+                MGLTestAssertNil(strongself, error, @"Snapshotter should have completed");
+                dispatch_group_leave(dg);
+                snapshotter = nil;
+            }];
+        });
+
+        dispatch_group_notify(dg, dispatch_get_main_queue(), ^{
+            [expectation fulfill];
+        });
+    });
+
+    [self waitForExpectations:@[expectation] timeout:timeout];
+}
+
+- (void)testCancellingSnapshot {
+    if (![self validAccessToken]) {
+        return;
+    }
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"snapshots"];
+    expectation.assertForOverFulfill = YES;
+    expectation.expectedFulfillmentCount = 1;
+
+    CGSize size                    = self.mapView.bounds.size;
+    CLLocationCoordinate2D coord   = CLLocationCoordinate2DMake(30.0, 30.0);
+
+    MGLMapSnapshotter *snapshotter = snapshotterWithCoordinates(coord, size);
+
+    __weak __typeof__(self) weakself = self;
+
+    [snapshotter startWithCompletionHandler:^(MGLMapSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+        // We expect this completion block to be called with an error
+        __typeof__(self) strongself = weakself;
+
+        MGLTestAssertNil(strongself, snapshot);
+        MGLTestAssert(strongself,
+                      ([error.domain isEqualToString:MGLErrorDomain] && error.code == MGLErrorCodeSnapshotFailed),
+                      @"Should have been cancelled");
+        MGLTestAssert(strongself, snapshotter.cancelled, @"Should have been cancelled");
+        [expectation fulfill];
+    }];
+
+    [snapshotter cancel];
+
+    [self waitForExpectations:@[expectation] timeout:0.5];
+}
+
 - (void)testAllocatingSnapshotOnBackgroundQueue {
-    if (!validAccessToken()) {
+    if (![self validAccessToken]) {
         return;
     }
 
@@ -79,7 +202,6 @@ NSString* validAccessToken() {
     dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, QOS_MIN_RELATIVE_PRIORITY);
     dispatch_queue_t backgroundQueue = dispatch_queue_create(__PRETTY_FUNCTION__, attr);
 
-    // This crashes maybe 1 in 10 times.
     dispatch_async(backgroundQueue, ^{
 
         // Create the snapshotter - DO NOT START.
@@ -104,8 +226,8 @@ NSString* validAccessToken() {
     [self waitForExpectations:@[expectation] timeout:2.0];
 }
 
-- (void)testSnapshotterFromBackgroundQueue {
-    if (!validAccessToken()) {
+- (void)testSnapshotterFromBackgroundQueueShouldFail {
+    if (![self validAccessToken]) {
         return;
     }
 
@@ -121,12 +243,10 @@ NSString* validAccessToken() {
     dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, QOS_MIN_RELATIVE_PRIORITY); // also for concurrent
     dispatch_queue_t backgroundQueue = dispatch_queue_create(__PRETTY_FUNCTION__, attr);
 
-
     // Use dispatch_group to keep the backgroundQueue block around (and
     // so also the MGLMapSnapshotter
     dispatch_group_t group = dispatch_group_create();
     dispatch_group_enter(group);
-
 
     dispatch_async(backgroundQueue, ^{
 
@@ -134,28 +254,14 @@ NSString* validAccessToken() {
         XCTAssertNotNil(snapshotter);
 
         MGLMapSnapshotCompletionHandler completion = ^(MGLMapSnapshot * _Nullable snapshot, NSError * _Nullable error) {
-
-            // This should be the main queue
-            __typeof__(self) strongself = weakself;
-
-            MGLTestAssertNotNil(strongself, strongself);
-
-            MGLTestAssertNotNil(strongself, snapshot);
-            MGLTestAssertNotNil(strongself, snapshot.image);
-            MGLTestAssertNil(strongself, error, @"Snapshot should not error with: %@", error);
-
-            // Change this to XCTAttachmentLifetimeKeepAlways to be able to look at the snapshots after running
-            XCTAttachment *attachment = [XCTAttachment attachmentWithImage:snapshot.image];
-            attachment.lifetime = XCTAttachmentLifetimeDeleteOnSuccess;
-            [strongself addAttachment:attachment];
-
+            // The completion block should not be called
+            MGLTestFail(weakself);
             dispatch_group_leave(group);
         };
 
-        // untested
         @try {
             [snapshotter startWithCompletionHandler:completion];
-            MGLTestFail(weakself);
+            MGLTestFail(weakself, @"startWithCompletionHandler: should raise an exception");
         }
         @catch (NSException *exception) {
             MGLTestAssert(weakself, exception.name == NSInvalidArgumentException);
@@ -177,7 +283,7 @@ NSString* validAccessToken() {
 
 - (void)testMultipleSnapshottersPENDING {
     MGL_CHECK_IF_PENDING_TEST_SHOULD_RUN();
-    if (!validAccessToken()) {
+    if (![self validAccessToken]) {
         return;
     }
 
@@ -235,7 +341,7 @@ NSString* validAccessToken() {
 }
 
 - (void)testSnapshotPointConversion {
-    if (!validAccessToken()) {
+    if (![self validAccessToken]) {
         return;
     }
 
@@ -277,7 +383,7 @@ NSString* validAccessToken() {
 }
 
 - (void)testSnapshotPointConversionCoordinateOrdering {
-    if (!validAccessToken()) {
+    if (![self validAccessToken]) {
         return;
     }
 
