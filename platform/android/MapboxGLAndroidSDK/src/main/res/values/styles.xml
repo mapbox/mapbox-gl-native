@@ -18,7 +18,6 @@
     <item name="mapbox_enableStaleState">true</item>
     <item name="mapbox_staleStateTimeout">30000</item>
 
-
     <!-- Location icon padding -->
     <item name="mapbox_iconPaddingLeft">0</item>
     <item name="mapbox_iconPaddingTop">0</item>
@@ -34,6 +33,7 @@
     <item name="mapbox_minZoomIconScale">0.6</item>
 
     <!-- Camera tracking settings -->
+    <item name="mapbox_trackingGesturesManagement">false</item>
     <item name="mapbox_trackingInitialMoveThreshold">@dimen/mapbox_locationComponentTrackingInitialMoveThreshold</item>
     <item name="mapbox_trackingMultiFingerMoveThreshold">@dimen/mapbox_locationComponentTrackingMultiFingerMoveThreshold</item>
 

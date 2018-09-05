@@ -15,7 +15,7 @@ import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class MapboxAnimatorCoordinatorTest {
+class LocationAnimatorCoordinatorTest {
 
   private lateinit var locationAnimatorCoordinator: LocationAnimatorCoordinator
   private val cameraPosition: CameraPosition = CameraPosition.DEFAULT

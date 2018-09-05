@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.location;
 
 import android.content.Context;
 import android.graphics.PointF;
+import android.support.annotation.NonNull;
 import android.view.MotionEvent;
 
 import com.mapbox.android.gestures.AndroidGesturesManager;
@@ -9,11 +10,8 @@ import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.android.gestures.RotateGestureDetector;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
-
-import java.util.List;
-import java.util.Set;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 final class LocationCameraController implements MapboxAnimator.OnCameraAnimationsValuesChangeListener {
 
@@ -28,6 +26,9 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
   private final MoveGestureDetector moveGestureDetector;
   private final OnCameraMoveInvalidateListener onCameraMoveInvalidateListener;
 
+  private final AndroidGesturesManager initialGesturesManager;
+  private final AndroidGesturesManager internalGesturesManager;
+
   LocationCameraController(
     Context context,
     MapboxMap mapboxMap,
@@ -35,12 +36,13 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
     LocationComponentOptions options,
     OnCameraMoveInvalidateListener onCameraMoveInvalidateListener) {
     this.mapboxMap = mapboxMap;
-    mapboxMap.setGesturesManager(
-      new LocationGesturesManager(context), true, true);
-    moveGestureDetector = mapboxMap.getGesturesManager().getMoveGestureDetector();
-    mapboxMap.addOnMoveListener(onMoveListener);
+
+    initialGesturesManager = mapboxMap.getGesturesManager();
+    internalGesturesManager = new LocationGesturesManager(context);
+    moveGestureDetector = internalGesturesManager.getMoveGestureDetector();
     mapboxMap.addOnRotateListener(onRotateListener);
     mapboxMap.addOnFlingListener(onFlingListener);
+    mapboxMap.addOnMoveListener(onMoveListener);
 
     this.internalCameraTrackingChangedListener = internalCameraTrackingChangedListener;
     this.onCameraMoveInvalidateListener = onCameraMoveInvalidateListener;
@@ -51,15 +53,24 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
   LocationCameraController(MapboxMap mapboxMap,
                            MoveGestureDetector moveGestureDetector,
                            OnCameraTrackingChangedListener internalCameraTrackingChangedListener,
-                           OnCameraMoveInvalidateListener onCameraMoveInvalidateListener) {
+                           OnCameraMoveInvalidateListener onCameraMoveInvalidateListener,
+                           AndroidGesturesManager androidGesturesManager) {
     this.mapboxMap = mapboxMap;
     this.moveGestureDetector = moveGestureDetector;
     this.internalCameraTrackingChangedListener = internalCameraTrackingChangedListener;
     this.onCameraMoveInvalidateListener = onCameraMoveInvalidateListener;
+    this.internalGesturesManager = androidGesturesManager;
+    this.initialGesturesManager = androidGesturesManager;
   }
 
   void initializeOptions(LocationComponentOptions options) {
     this.options = options;
+    if (options.trackingGesturesManagement()) {
+      mapboxMap.setGesturesManager(internalGesturesManager, true, true);
+      adjustGesturesThresholds();
+    } else {
+      mapboxMap.setGesturesManager(initialGesturesManager, true, true);
+    }
   }
 
   void setCameraMode(@CameraMode.Mode int cameraMode) {
@@ -141,11 +152,13 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
   }
 
   private void adjustGesturesThresholds() {
-    if (isLocationTracking()) {
-      adjustFocalPoint = true;
-      moveGestureDetector.setMoveThreshold(options.trackingInitialMoveThreshold());
-    } else {
-      moveGestureDetector.setMoveThreshold(0f);
+    if (options.trackingGesturesManagement()) {
+      if (isLocationTracking()) {
+        adjustFocalPoint = true;
+        moveGestureDetector.setMoveThreshold(options.trackingInitialMoveThreshold());
+      } else {
+        moveGestureDetector.setMoveThreshold(0f);
+      }
     }
   }
 
@@ -176,29 +189,31 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
     private boolean interrupt;
 
     @Override
-    public void onMoveBegin(MoveGestureDetector detector) {
-      if (detector.getPointersCount() > 1
+    public void onMoveBegin(@NonNull MoveGestureDetector detector) {
+      if (options.trackingGesturesManagement()
+        && detector.getPointersCount() > 1
         && detector.getMoveThreshold() != options.trackingMultiFingerMoveThreshold()
         && isLocationTracking()) {
         detector.setMoveThreshold(options.trackingMultiFingerMoveThreshold());
         interrupt = true;
+      } else {
+        setCameraMode(CameraMode.NONE);
       }
     }
 
     @Override
-    public void onMove(MoveGestureDetector detector) {
+    public void onMove(@NonNull MoveGestureDetector detector) {
       if (interrupt) {
         detector.interrupt();
         return;
       }
-
       setCameraMode(CameraMode.NONE);
     }
 
     @Override
-    public void onMoveEnd(MoveGestureDetector detector) {
-      if (!interrupt && isLocationTracking()) {
-        moveGestureDetector.setMoveThreshold(options.trackingInitialMoveThreshold());
+    public void onMoveEnd(@NonNull MoveGestureDetector detector) {
+      if (options.trackingGesturesManagement() && !interrupt && isLocationTracking()) {
+        detector.setMoveThreshold(options.trackingInitialMoveThreshold());
       }
       interrupt = false;
     }
@@ -206,19 +221,19 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
 
   private MapboxMap.OnRotateListener onRotateListener = new MapboxMap.OnRotateListener() {
     @Override
-    public void onRotateBegin(RotateGestureDetector detector) {
+    public void onRotateBegin(@NonNull RotateGestureDetector detector) {
       if (isBearingTracking()) {
         setCameraMode(CameraMode.NONE);
       }
     }
 
     @Override
-    public void onRotate(RotateGestureDetector detector) {
+    public void onRotate(@NonNull RotateGestureDetector detector) {
       // no implementation
     }
 
     @Override
-    public void onRotateEnd(RotateGestureDetector detector) {
+    public void onRotateEnd(@NonNull RotateGestureDetector detector) {
       // no implementation
     }
   };
@@ -232,21 +247,8 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
 
   private class LocationGesturesManager extends AndroidGesturesManager {
 
-    public LocationGesturesManager(Context context) {
+    LocationGesturesManager(Context context) {
       super(context);
-    }
-
-    public LocationGesturesManager(Context context, boolean applyDefaultThresholds) {
-      super(context, applyDefaultThresholds);
-    }
-
-    public LocationGesturesManager(Context context, Set<Integer>[] exclusiveGestures) {
-      super(context, exclusiveGestures);
-    }
-
-    public LocationGesturesManager(Context context, List<Set<Integer>> exclusiveGestures,
-                                   boolean applyDefaultThresholds) {
-      super(context, exclusiveGestures, applyDefaultThresholds);
     }
 
     @Override
