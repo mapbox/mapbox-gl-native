@@ -3527,18 +3527,33 @@ public:
 
 - (CGRect)convertCoordinateBounds:(MGLCoordinateBounds)bounds toRectToView:(nullable UIView *)view
 {
-    if ( ! CLLocationCoordinate2DIsValid(bounds.sw) || ! CLLocationCoordinate2DIsValid(bounds.ne))
-    {
-        return CGRectNull;
-    }
     return [self convertLatLngBounds:MGLLatLngBoundsFromCoordinateBounds(bounds) toRectToView:view];
 }
 
 /// Converts a geographic bounding box to a rectangle in the view’s coordinate
 /// system.
 - (CGRect)convertLatLngBounds:(mbgl::LatLngBounds)bounds toRectToView:(nullable UIView *)view {
-    CGRect rect = { [self convertLatLng:bounds.southwest() toPointToView:view], CGSizeZero };
-    rect = MGLExtendRect(rect, [self convertLatLng:bounds.northeast() toPointToView:view]);
+    auto northwest = bounds.northwest();
+    auto northeast = bounds.northeast();
+    auto southwest = bounds.southwest();
+    auto southeast = bounds.southeast();
+
+    auto center = [self convertPoint:{ CGRectGetMidX(view.bounds), CGRectGetMidY(view.bounds) } toLatLngFromView:view];
+
+    // Extend bounds to account for the antimeridian
+    northwest.unwrapForShortestPath(center);
+    northeast.unwrapForShortestPath(center);
+    southwest.unwrapForShortestPath(center);
+    southeast.unwrapForShortestPath(center);
+
+    auto correctedLatLngBounds = mbgl::LatLngBounds::empty();
+    correctedLatLngBounds.extend(northwest);
+    correctedLatLngBounds.extend(northeast);
+    correctedLatLngBounds.extend(southwest);
+    correctedLatLngBounds.extend(southeast);
+    
+    CGRect rect = { [self convertLatLng:correctedLatLngBounds.southwest() toPointToView:view], CGSizeZero };
+    rect = MGLExtendRect(rect, [self convertLatLng:correctedLatLngBounds.northeast() toPointToView:view]);
     return rect;
 }
 

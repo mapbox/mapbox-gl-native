@@ -11,6 +11,8 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
+
+import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.attribution.Attribution;
@@ -151,6 +153,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
     } catch (ActivityNotFoundException exception) {
       // explicitly handling if the device hasn't have a web browser installed. #8899
       Toast.makeText(context, R.string.mapbox_attributionErrorNoBrowser, Toast.LENGTH_LONG).show();
+      MapStrictMode.strictModeViolation(exception);
     }
   }
 
@@ -171,8 +174,12 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
       }
 
       List<String> attributions = new ArrayList<>();
+      String attribution;
       for (Source source : mapboxMap.getSources()) {
-        attributions.add(source.getAttribution());
+        attribution = source.getAttribution();
+        if (!attribution.isEmpty()) {
+          attributions.add(source.getAttribution());
+        }
       }
 
       return new AttributionParser.Options()

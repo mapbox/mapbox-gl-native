@@ -4,6 +4,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.google.gson.JsonArray;
+import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.exceptions.ConversionException;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
@@ -46,7 +47,7 @@ public class PropertyValue<T> {
    * @return true if this is a expression, false if not
    */
   public boolean isExpression() {
-    return !isNull() && value instanceof JsonArray;
+    return !isNull() && (value instanceof JsonArray || value instanceof Expression);
   }
 
   /**
@@ -57,7 +58,9 @@ public class PropertyValue<T> {
   @Nullable
   public Expression getExpression() {
     if (isExpression()) {
-      return Expression.Converter.convert((JsonArray) value);
+      return value instanceof JsonArray
+        ? Expression.Converter.convert((JsonArray) value)
+        : (Expression) value;
     } else {
       Logger.w(TAG, "not a expression, try value");
       return null;
@@ -106,6 +109,7 @@ public class PropertyValue<T> {
       return ColorUtils.rgbaToColor((String) value);
     } catch (ConversionException ex) {
       Logger.e(TAG, String.format("%s could not be converted to a Color int: %s", name, ex.getMessage()));
+      MapStrictMode.strictModeViolation(ex);
       return null;
     }
   }

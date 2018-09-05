@@ -68,6 +68,16 @@ public class HeatmapLayer extends Layer {
   }
 
   /**
+   * Get the source id.
+   *
+   * @return id of the source
+   */
+  public String getSourceId() {
+    checkThread();
+    return nativeGetSourceId();
+  }
+
+  /**
    * Get the source layer.
    *
    * @return sourceLayer the source layer to get

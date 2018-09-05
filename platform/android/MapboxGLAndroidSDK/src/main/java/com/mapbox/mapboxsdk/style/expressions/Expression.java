@@ -2834,8 +2834,8 @@ public class Expression {
    * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
    * circleLayer.setProperties(
    * circleColor(switchCase(
-     eq(literal("it"), resolvedLocale(collator(true, true, "it"))), literal(ColorUtils.colorToRgbaString(Color.GREEN)),
-          literal(ColorUtils.colorToRgbaString(Color.RED))))
+   * eq(literal("it"), resolvedLocale(collator(true, true, "it"))), literal(ColorUtils.colorToRgbaString(Color.GREEN)),
+   * literal(ColorUtils.colorToRgbaString(Color.RED))))
    * );
    * }
    * </pre>
@@ -3921,13 +3921,10 @@ public class Expression {
 
           // special case for handling unusual input like 'rgba(r, g, b, a)'
           if (literalValue instanceof String) {
-            if (((String) literalValue).contains(",")) {
-              builder.append("\"").append(literalValue).append("\"");
-              continue;
-            }
+            builder.append("\"").append(literalValue).append("\"");
+          } else {
+            builder.append(literalValue);
           }
-
-          builder.append(literalValue);
         } else {
           builder.append(argument.toString());
         }

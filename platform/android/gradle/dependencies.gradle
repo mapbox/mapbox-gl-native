@@ -14,7 +14,7 @@ ext {
             supportLib     : '27.1.1',
             espresso       : '3.0.2',
             testRunner     : '1.0.2',
-            leakCanary     : '1.5.4',
+            leakCanary     : '1.6.1',
             junit          : '4.12',
             mockito        : '2.18.3',
             robolectric    : '3.8',

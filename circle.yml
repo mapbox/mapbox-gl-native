@@ -420,9 +420,17 @@ jobs:
       - *save-ccache
       - *save-gradle-cache
       - run:
+          name: Check if Firebase should be skipped
+          command: |
+            SKIPPABLE_TAG=$( git log -1 | grep -ioE -e "\[(skip.firebase|firebase.skip)\]" -e "\[((i|mac)os)+(, (i|mac)os)?\]" -e "\[darwin\]" || true )
+            if [ -n "${SKIPPABLE_TAG}" ]; then
+              echo "Skipping Firebase tests because commit message contained: '${SKIPPABLE_TAG}'"
+              echo 'export SKIP_FIREBASE=1' >> $BASH_ENV
+            fi
+      - run:
           name: Log in to Google Cloud Platform
           command: |
-            if [ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" ]; then
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE}" ]]; then
               echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
               gcloud auth activate-service-account --key-file secret.json --project android-gl-native
               rm secret.json
@@ -431,7 +439,7 @@ jobs:
           name: Run instrumentation tests on Firebase
           no_output_timeout: 1200
           command: |
-            if [ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" ]; then
+            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE}" ]]; then
               gcloud firebase test android models list
               gcloud firebase test android run --type instrumentation \
                 --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \

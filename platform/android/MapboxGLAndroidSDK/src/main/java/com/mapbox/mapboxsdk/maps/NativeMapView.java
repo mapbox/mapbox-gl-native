@@ -12,9 +12,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.LibraryLoader;
+import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.Polygon;
@@ -113,10 +115,12 @@ final class NativeMapView {
 
     // validate if map has already been destroyed
     if (destroyed && !TextUtils.isEmpty(callingMethod)) {
-      Logger.e(TAG, String.format(
+      String message = String.format(
         "You're calling `%s` after the `MapView` was destroyed, were you invoking it after `onDestroy()`?",
-        callingMethod)
-      );
+        callingMethod);
+      Logger.e(TAG, message);
+
+      MapStrictMode.strictModeViolation(message);
     }
     return destroyed;
   }
@@ -907,6 +911,7 @@ final class NativeMapView {
         onMapChangedListener.onMapChanged(rawChange);
       } catch (RuntimeException err) {
         Logger.e(TAG, "Exception in MapView.OnMapChangedListener", err);
+        MapStrictMode.strictModeViolation(err);
       }
     }
   }

@@ -109,6 +109,9 @@ public abstract class Layer {
   protected native String nativeGetSourceLayer();
 
   @Keep
+  protected native String nativeGetSourceId();
+
+  @Keep
   protected native float nativeGetMinZoom();
 
   @Keep

@@ -24,7 +24,9 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
+
 import com.mapbox.android.gestures.AndroidGesturesManager;
+import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
@@ -45,8 +47,6 @@ import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
@@ -54,6 +54,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
@@ -1270,5 +1273,15 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
         defaultDialogManager.onClick(v);
       }
     }
+  }
+
+  /**
+   * Sets the strict mode that will throw the {@link com.mapbox.mapboxsdk.MapStrictModeException}
+   * whenever the map would fail silently otherwise.
+   *
+   * @param strictModeEnabled true to enable the strict mode, false otherwise
+   */
+  public static void setMapStrictModeEnabled(boolean strictModeEnabled) {
+    MapStrictMode.setStrictModeEnabled(strictModeEnabled);
   }
 }

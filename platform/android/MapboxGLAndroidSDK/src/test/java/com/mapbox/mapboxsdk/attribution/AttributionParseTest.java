@@ -41,7 +41,7 @@ public class AttributionParseTest {
           break;
         case 2:
           assertEquals("URL improve map should match", "https://www.mapbox.com/map-feedback/", attribution.getUrl());
-          assertEquals("Title improve map should match", "Improve this map", attribution.getTitle());
+          assertEquals("Title improve map should match", "Improve This Map", attribution.getTitle());
           break;
         case 3:
           assertEquals("URL digital globe should match", "https://www.digitalglobe.com/", attribution.getUrl());
@@ -75,7 +75,7 @@ public class AttributionParseTest {
           break;
         case 2:
           assertEquals("URL improve map should match", "https://www.mapbox.com/map-feedback/", attribution.getUrl());
-          assertEquals("Title improve map should match", "Improve this map", attribution.getTitle());
+          assertEquals("Title improve map should match", "Improve This Map", attribution.getTitle());
           break;
       }
       counter++;
@@ -102,7 +102,7 @@ public class AttributionParseTest {
           break;
         case 1:
           assertEquals("URL improve map should match", "https://www.mapbox.com/map-feedback/", attribution.getUrl());
-          assertEquals("Title improve map should match", "Improve this map", attribution.getTitle());
+          assertEquals("Title improve map should match", "Improve This Map", attribution.getTitle());
           break;
       }
       counter++;
@@ -131,7 +131,7 @@ public class AttributionParseTest {
           break;
         case 2:
           assertEquals("URL improve map should match", "https://www.mapbox.com/map-feedback/", attribution.getUrl());
-          assertEquals("Title improve map should match", "Improve this map", attribution.getTitle());
+          assertEquals("Title improve map should match", "Improve This Map", attribution.getTitle());
           break;
         case 3:
           assertEquals("URL digital globe should match", "https://www.digitalglobe.com/", attribution.getUrl());
@@ -195,7 +195,7 @@ public class AttributionParseTest {
           break;
         case 2:
           assertEquals("URL improve map should match", "https://www.mapbox.com/map-feedback/", attribution.getUrl());
-          assertEquals("Title improve map should match", "Improve this map", attribution.getTitle());
+          assertEquals("Title improve map should match", "Improve This Map", attribution.getTitle());
           break;
         case 3:
           assertEquals("URL digital globe should match", "https://www.digitalglobe.com/", attribution.getUrl());

@@ -9,6 +9,8 @@ import android.os.Environment;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
+
+import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
@@ -88,8 +90,10 @@ public class FileSource {
         MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL);
     } catch (PackageManager.NameNotFoundException exception) {
       Logger.e(TAG, "Failed to read the package metadata: ", exception);
+      MapStrictMode.strictModeViolation(exception);
     } catch (Exception exception) {
       Logger.e(TAG, "Failed to read the storage key: ", exception);
+      MapStrictMode.strictModeViolation(exception);
     }
 
     String cachePath = null;
@@ -99,6 +103,7 @@ public class FileSource {
         cachePath = context.getExternalFilesDir(null).getAbsolutePath();
       } catch (NullPointerException exception) {
         Logger.e(TAG, "Failed to obtain the external storage path: ", exception);
+        MapStrictMode.strictModeViolation(exception);
       }
     }
 
