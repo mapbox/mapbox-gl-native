@@ -3,7 +3,21 @@
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
 ## master
-- Add support for feature expressions in `line-pattern`, `fill-pattern`, and `fill-extrusion-pattern` properties. [#12284](https://github.com/mapbox/mapbox-gl-native/pull/12284)
+
+## 6.5.0-beta.1 - September 5, 2018
+ - Retain shared thread pool reference [#12811](https://github.com/mapbox/mapbox-gl-native/pull/12811)
+ - MapStrictMode configuration [#12817](https://github.com/mapbox/mapbox-gl-native/pull/12817)
+ - Provide correct expression integration for newly created properties [#12809](https://github.com/mapbox/mapbox-gl-native/pull/12809)
+ - Get source id for supported layer types [#12801](https://github.com/mapbox/mapbox-gl-native/pull/12801)
+ - Check if map is destroyed before saving state in a fragment [#12804](https://github.com/mapbox/mapbox-gl-native/pull/12804)
+ - Bump leak canary to 1.6.1 [#12767](https://github.com/mapbox/mapbox-gl-native/pull/12767)
+ - Add quotes to string representation of string literal [#12768](https://github.com/mapbox/mapbox-gl-native/pull/12768)
+ - Make improve this map translatable [#12785](https://github.com/mapbox/mapbox-gl-native/pull/12785)
+ - Add Keep annotation to abstract components [#12796](https://github.com/mapbox/mapbox-gl-native/pull/12796)
+ - Gradle tools 3.1.4 [#12795](https://github.com/mapbox/mapbox-gl-native/pull/12795)
+ - Explicitly remove local references [#12774](https://github.com/mapbox/mapbox-gl-native/pull/12774)
+ - Add more languages to tx config file [#12719](https://github.com/mapbox/mapbox-gl-native/pull/12719)
+ - Add support for feature expressions in `line-pattern`, `fill-pattern`, and `fill-extrusion-pattern` properties. [#12284](https://github.com/mapbox/mapbox-gl-native/pull/12284)
 
 ## 6.5.0-alpha.2 - August 29, 2018
  - Keep arbitrary region fields and constructor of OfflineGeometryRegionDefinition while obfuscating [#12734](https://github.com/mapbox/mapbox-gl-native/pull/12734)
