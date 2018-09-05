@@ -44,6 +44,9 @@ class DraggableMarkerActivity : AppCompatActivity() {
     supportActionBar?.height ?: 0
   }
 
+  // View property is required for activity sanity tests
+  // we perform reflection on this requires using findViewById
+  private lateinit var mapView: MapView
   private lateinit var mapboxMap: MapboxMap
   private val featureCollection = FeatureCollection.fromFeatures(mutableListOf())
   private val source = GeoJsonSource(sourceId, featureCollection)
@@ -59,6 +62,7 @@ class DraggableMarkerActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_draggable_marker)
 
+    mapView = findViewById(R.id.mapView)
     mapView.onCreate(savedInstanceState)
     mapView.getMapAsync { mapboxMap ->
       this.mapboxMap = mapboxMap
