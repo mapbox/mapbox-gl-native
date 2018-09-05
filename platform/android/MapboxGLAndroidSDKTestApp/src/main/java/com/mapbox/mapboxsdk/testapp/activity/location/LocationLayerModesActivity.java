@@ -50,14 +50,7 @@ public class LocationLayerModesActivity extends AppCompatActivity implements OnM
   private MapboxMap mapboxMap;
   private boolean customStyle;
 
-  private static final String SAVED_STATE_CAMERA = "saved_state_camera";
-  private static final String SAVED_STATE_RENDER = "saved_state_render";
-
-  @CameraMode.Mode
-  private int cameraMode = CameraMode.TRACKING;
-
-  @RenderMode.Mode
-  private int renderMode = RenderMode.NORMAL;
+  private Bundle savedInstanceState;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -88,12 +81,6 @@ public class LocationLayerModesActivity extends AppCompatActivity implements OnM
       }
     });
 
-
-    if (savedInstanceState != null) {
-      cameraMode = savedInstanceState.getInt(SAVED_STATE_CAMERA);
-      renderMode = savedInstanceState.getInt(SAVED_STATE_RENDER);
-    }
-
     mapView.onCreate(savedInstanceState);
 
     if (PermissionsManager.areLocationPermissionsGranted(this)) {
@@ -117,6 +104,8 @@ public class LocationLayerModesActivity extends AppCompatActivity implements OnM
       });
       permissionsManager.requestLocationPermissions(this);
     }
+
+    this.savedInstanceState = savedInstanceState;
   }
 
   @Override
@@ -139,8 +128,7 @@ public class LocationLayerModesActivity extends AppCompatActivity implements OnM
     locationLayerPlugin = mapboxMap.getLocationLayerPlugin();
     locationLayerPlugin.addOnLocationClickListener(this);
     locationLayerPlugin.addOnCameraTrackingChangedListener(this);
-    locationLayerPlugin.setCameraMode(cameraMode);
-    setRendererMode(renderMode);
+
     activateLocationLayer();
   }
 
@@ -184,12 +172,23 @@ public class LocationLayerModesActivity extends AppCompatActivity implements OnM
         padding = new int[] {0, 250, 0, 0};
       }
 
-      LocationLayerOptions options = LocationLayerOptions.builder(this)
-        .padding(padding)
-        .layerBelow("waterway-label")
-        .build();
+      if (savedInstanceState == null) {
+        LocationLayerOptions options = LocationLayerOptions.builder(this)
+          .padding(padding)
+          .layerBelow("waterway-label")
+          .build();
 
-      locationLayerPlugin.activateLocationLayerPlugin(locationEngine, options);
+        locationLayerPlugin.activateLocationLayerPlugin(locationEngine, options);
+      } else {
+        LocationLayerOptions options = locationLayerPlugin
+          .getLocationLayerOptions()
+          .toBuilder()
+          .padding(padding)
+          .build();
+
+        locationLayerPlugin.setLocationEngine(locationEngine);
+        locationLayerPlugin.applyStyle(options);
+      }
     }
   }
 
@@ -203,10 +202,6 @@ public class LocationLayerModesActivity extends AppCompatActivity implements OnM
   public void toggleMapStyle() {
     String styleUrl = mapboxMap.getStyleUrl().contentEquals(Style.DARK) ? Style.LIGHT : Style.DARK;
     mapboxMap.setStyle(styleUrl);
-  }
-
-  public LocationLayerPlugin getLocationLayerPlugin() {
-    return locationLayerPlugin;
   }
 
   @Override
@@ -250,8 +245,6 @@ public class LocationLayerModesActivity extends AppCompatActivity implements OnM
   protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
     mapView.onSaveInstanceState(outState);
-    outState.putInt(SAVED_STATE_CAMERA, cameraMode);
-    outState.putInt(SAVED_STATE_RENDER, renderMode);
   }
 
   @Override
@@ -311,7 +304,6 @@ public class LocationLayerModesActivity extends AppCompatActivity implements OnM
   }
 
   private void setRendererMode(@RenderMode.Mode int mode) {
-    renderMode = mode;
     locationLayerPlugin.setRenderMode(mode);
     if (mode == RenderMode.NORMAL) {
       locationModeBtn.setText("Normal");
@@ -376,17 +368,15 @@ public class LocationLayerModesActivity extends AppCompatActivity implements OnM
 
   @Override
   public void onCameraTrackingChanged(int currentMode) {
-    this.cameraMode = currentMode;
-
-    if (cameraMode == CameraMode.NONE) {
+    if (currentMode == CameraMode.NONE) {
       locationTrackingBtn.setText("None");
-    } else if (cameraMode == CameraMode.TRACKING) {
+    } else if (currentMode == CameraMode.TRACKING) {
       locationTrackingBtn.setText("Tracking");
-    } else if (cameraMode == CameraMode.TRACKING_COMPASS) {
+    } else if (currentMode == CameraMode.TRACKING_COMPASS) {
       locationTrackingBtn.setText("Tracking Compass");
-    } else if (cameraMode == CameraMode.TRACKING_GPS) {
+    } else if (currentMode == CameraMode.TRACKING_GPS) {
       locationTrackingBtn.setText("Tracking GPS");
-    } else if (cameraMode == CameraMode.TRACKING_GPS_NORTH) {
+    } else if (currentMode == CameraMode.TRACKING_GPS_NORTH) {
       locationTrackingBtn.setText("Tracking GPS North");
     }
   }

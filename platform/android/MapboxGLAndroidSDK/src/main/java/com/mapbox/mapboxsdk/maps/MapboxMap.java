@@ -132,6 +132,7 @@ public final class MapboxMap {
     outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, nativeMapView.getDebug());
     outState.putString(MapboxConstants.STATE_STYLE_URL, nativeMapView.getStyleUrl());
     uiSettings.onSaveInstanceState(outState);
+    locationLayerPlugin.onSaveInstanceState(outState);
   }
 
   /**
@@ -156,6 +157,7 @@ public final class MapboxMap {
     if (!TextUtils.isEmpty(styleUrl)) {
       nativeMapView.setStyleUrl(savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL));
     }
+    locationLayerPlugin.onRestoreInstanceState(savedInstanceState);
   }
 
   /**

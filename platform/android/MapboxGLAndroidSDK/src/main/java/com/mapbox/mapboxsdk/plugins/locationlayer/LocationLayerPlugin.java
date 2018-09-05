@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
@@ -31,8 +32,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.DEFAULT_TRACKING_TILT_ANIMATION_DURATION;
-import static com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION;
+import static com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.DEFAULT_TRACKING_TILT_ANIM_DURATION;
+import static com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.DEFAULT_TRACKING_ZOOM_ANIM_DURATION;
+import static com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.STATE_LOCATION_CAMERA_MODE;
+import static com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.STATE_LOCATION_ENABLED;
+import static com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.STATE_LOCATION_LAST_LOCATION;
+import static com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.STATE_LOCATION_OPTIONS;
+import static com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.STATE_LOCATION_RENDER_MODE;
 
 /**
  * The Location layer plugin provides location awareness to your mobile application. Enabling this
@@ -59,6 +65,16 @@ import static com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerConstants.
  * When instantiating the plugin for the first time, the map's max/min zoom levels will be set to
  * {@link LocationLayerOptions#MAX_ZOOM_DEFAULT} and {@link LocationLayerOptions#MIN_ZOOM_DEFAULT} respectively.
  * You can adjust the zoom range with {@link LocationLayerOptions#maxZoom()} and {@link LocationLayerOptions#minZoom()}.
+ * <p>
+ * When an activity, or a fragment, that contains the plugin is destroyed and recreated,
+ * the plugin will restore its state, which is:
+ * <br/>
+ * - If the plugin was enabled, last location will be displayed.
+ * You still need to activate the plugin, or just provide the {@link LocationEngine}.
+ * <br/>
+ * - {@link CameraMode} and {@link RenderMode} will be restored.
+ * <br/>
+ * - {@link LocationLayerOptions} will be restored.
  */
 public final class LocationLayerPlugin {
   private static final String TAG = "Mbgl-LocationLayerPlugin";
@@ -265,9 +281,9 @@ public final class LocationLayerPlugin {
    * @param cameraMode one of the modes found in {@link CameraMode}
    */
   public void setCameraMode(@CameraMode.Mode int cameraMode) {
+    locationLayerCamera.setCameraMode(cameraMode);
     boolean isGpsNorth = cameraMode == CameraMode.TRACKING_GPS_NORTH;
     pluginAnimatorCoordinator.resetAllCameraAnimations(mapboxMap.getCameraPosition(), isGpsNorth);
-    locationLayerCamera.setCameraMode(cameraMode);
   }
 
   /**
@@ -387,7 +403,7 @@ public final class LocationLayerPlugin {
    * @param zoomLevel The desired zoom level.
    */
   public void zoomWhileTracking(double zoomLevel) {
-    zoomWhileTracking(zoomLevel, DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION, null);
+    zoomWhileTracking(zoomLevel, DEFAULT_TRACKING_ZOOM_ANIM_DURATION, null);
   }
 
   /**
@@ -445,7 +461,7 @@ public final class LocationLayerPlugin {
    * @param tilt The desired camera tilt.
    */
   public void tiltWhileTracking(double tilt) {
-    tiltWhileTracking(tilt, DEFAULT_TRACKING_TILT_ANIMATION_DURATION, null);
+    tiltWhileTracking(tilt, DEFAULT_TRACKING_TILT_ANIM_DURATION, null);
   }
 
   /**
@@ -668,6 +684,28 @@ public final class LocationLayerPlugin {
   /**
    * Internal use.
    */
+  public void onSaveInstanceState(@NonNull Bundle outState) {
+    outState.putBoolean(STATE_LOCATION_ENABLED, isEnabled);
+    outState.putParcelable(STATE_LOCATION_OPTIONS, options);
+    outState.putInt(STATE_LOCATION_RENDER_MODE, locationLayer.getRenderMode());
+    outState.putInt(STATE_LOCATION_CAMERA_MODE, locationLayerCamera.getCameraMode());
+    outState.putParcelable(STATE_LOCATION_LAST_LOCATION, lastLocation);
+  }
+
+  /**
+   * Internal use.
+   */
+  public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+    updateLocation(savedInstanceState.getParcelable(STATE_LOCATION_LAST_LOCATION), true);
+    setCameraMode(savedInstanceState.getInt(STATE_LOCATION_CAMERA_MODE));
+    setRenderMode(savedInstanceState.getInt(STATE_LOCATION_RENDER_MODE));
+    applyStyle(savedInstanceState.getParcelable(STATE_LOCATION_OPTIONS));
+    setLocationLayerEnabled(savedInstanceState.getBoolean(STATE_LOCATION_ENABLED));
+  }
+
+  /**
+   * Internal use.
+   */
   public void onDestroy() {
     if (locationEngine != null && usingInternalLocationEngine) {
       locationEngine.deactivate();
@@ -772,6 +810,14 @@ public final class LocationLayerPlugin {
   }
 
   private void initializeLocationEngine(@NonNull Context context) {
+    if (this.locationEngine != null) {
+      if (usingInternalLocationEngine) {
+        this.locationEngine.removeLocationUpdates();
+        this.locationEngine.deactivate();
+      }
+      this.locationEngine.removeLocationEngineListener(locationEngineListener);
+    }
+
     usingInternalLocationEngine = true;
     locationEngine = new LocationEngineProvider(context).obtainBestLocationEngineAvailable();
     locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);

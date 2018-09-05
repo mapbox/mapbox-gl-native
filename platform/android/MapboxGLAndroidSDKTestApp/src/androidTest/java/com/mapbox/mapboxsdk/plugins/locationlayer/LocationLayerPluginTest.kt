@@ -12,6 +12,7 @@ import android.support.test.espresso.UiController
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.GrantPermissionRule
+import android.support.test.runner.AndroidJUnit4
 import android.support.v4.content.ContextCompat
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -33,7 +34,9 @@ import org.hamcrest.CoreMatchers.*
 import org.junit.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class LocationLayerPluginTest : BaseActivityTest() {
 
   @Rule
@@ -57,12 +60,6 @@ class LocationLayerPluginTest : BaseActivityTest() {
   @Before
   override fun beforeTest() {
     super.beforeTest()
-
-    location.latitude = 15.0
-    location.longitude = 17.0
-    location.bearing = 10f
-    location.accuracy = 150f
-
     styleChangeIdlingResource = StyleChangeIdlingResource()
     IdlingRegistry.getInstance().register(styleChangeIdlingResource)
   }
@@ -839,7 +836,7 @@ class LocationLayerPluginTest : BaseActivityTest() {
         plugin.cameraMode = CameraMode.NONE
         val zoom = mapboxMap.cameraPosition.zoom
         plugin.zoomWhileTracking(10.0)
-        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION)
+        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIM_DURATION)
 
         assertEquals(zoom, mapboxMap.cameraPosition.zoom, 0.1)
       }
@@ -856,7 +853,7 @@ class LocationLayerPluginTest : BaseActivityTest() {
         plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING
         plugin.zoomWhileTracking(10.0)
-        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION)
+        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIM_DURATION)
 
         assertEquals(10.0, mapboxMap.cameraPosition.zoom, 0.1)
       }
@@ -874,9 +871,9 @@ class LocationLayerPluginTest : BaseActivityTest() {
         plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING
         plugin.zoomWhileTracking(15.0)
-        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION / 2)
+        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIM_DURATION / 2)
         plugin.cameraMode = CameraMode.NONE
-        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION / 2)
+        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIM_DURATION / 2)
 
         assertEquals(15.0 / 2.0, mapboxMap.cameraPosition.zoom, 3.0)
       }
@@ -898,7 +895,7 @@ class LocationLayerPluginTest : BaseActivityTest() {
 
         plugin.onStop()
         plugin.zoomWhileTracking(10.0)
-        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION)
+        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIM_DURATION)
 
         assertEquals(zoom, mapboxMap.cameraPosition.zoom, 0.1)
       }
@@ -916,9 +913,9 @@ class LocationLayerPluginTest : BaseActivityTest() {
         plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING
         plugin.zoomWhileTracking(15.0)
-        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION / 2)
+        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIM_DURATION / 2)
         plugin.cancelZoomWhileTrackingAnimation()
-        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION / 2)
+        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_ZOOM_ANIM_DURATION / 2)
 
         assertEquals(15.0 / 2.0, mapboxMap.cameraPosition.zoom, 3.0)
       }
@@ -936,7 +933,7 @@ class LocationLayerPluginTest : BaseActivityTest() {
         plugin.cameraMode = CameraMode.NONE
         val tilt = mapboxMap.cameraPosition.tilt
         plugin.tiltWhileTracking(30.0)
-        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIMATION_DURATION)
+        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIM_DURATION)
 
         assertEquals(tilt, mapboxMap.cameraPosition.tilt, 0.1)
       }
@@ -953,7 +950,7 @@ class LocationLayerPluginTest : BaseActivityTest() {
         plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING
         plugin.tiltWhileTracking(30.0)
-        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIMATION_DURATION)
+        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIM_DURATION)
 
         assertEquals(30.0, mapboxMap.cameraPosition.tilt, 0.1)
       }
@@ -971,9 +968,9 @@ class LocationLayerPluginTest : BaseActivityTest() {
         plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING
         plugin.tiltWhileTracking(30.0)
-        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIMATION_DURATION / 2)
+        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIM_DURATION / 2)
         plugin.cameraMode = CameraMode.NONE
-        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIMATION_DURATION / 2)
+        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIM_DURATION / 2)
 
         assertEquals(30.0 / 2.0, mapboxMap.cameraPosition.tilt, 3.0)
       }
@@ -993,7 +990,7 @@ class LocationLayerPluginTest : BaseActivityTest() {
 
         plugin.onStop()
         plugin.tiltWhileTracking(30.0)
-        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIMATION_DURATION)
+        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIM_DURATION)
 
         assertEquals(tilt, mapboxMap.cameraPosition.tilt, 0.1)
       }
@@ -1011,9 +1008,9 @@ class LocationLayerPluginTest : BaseActivityTest() {
         plugin.activateLocationLayerPlugin(context, false)
         plugin.cameraMode = CameraMode.TRACKING
         plugin.tiltWhileTracking(30.0)
-        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIMATION_DURATION / 2)
+        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIM_DURATION / 2)
         plugin.cancelTiltWhileTrackingAnimation()
-        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIMATION_DURATION / 2)
+        uiController.loopMainThreadForAtLeast(DEFAULT_TRACKING_TILT_ANIM_DURATION / 2)
 
         assertEquals(30.0 / 2.0, mapboxMap.cameraPosition.tilt, 3.0)
       }

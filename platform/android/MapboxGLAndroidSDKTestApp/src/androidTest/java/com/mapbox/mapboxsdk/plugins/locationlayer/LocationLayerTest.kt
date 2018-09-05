@@ -12,6 +12,7 @@ import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
 import android.support.test.espresso.matcher.ViewMatchers.withId
 import android.support.test.rule.GrantPermissionRule
 import android.support.test.rule.GrantPermissionRule.grant
+import android.support.test.runner.AndroidJUnit4
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.constants.Style
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -35,7 +36,9 @@ import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class LocationLayerTest : BaseActivityTest() {
 
   @Rule
@@ -52,7 +55,7 @@ class LocationLayerTest : BaseActivityTest() {
     initLocation.latitude = 15.0
     initLocation.longitude = 17.0
     initLocation.bearing = 10f
-    initLocation.accuracy = 2000f
+    initLocation.accuracy = 150f
     initLocation
   }
 
@@ -218,10 +221,6 @@ class LocationLayerTest : BaseActivityTest() {
     }
     executePluginTest(pluginAction)
   }
-
-//
-// Stale state test
-//
 
   @Test
   fun whenStyleChanged_continuesUsingStaleIcons() {

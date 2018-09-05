@@ -5,6 +5,12 @@ package com.mapbox.mapboxsdk.plugins.locationlayer;
  */
 final class LocationLayerConstants {
 
+  static final String STATE_LOCATION_ENABLED = "mapbox_location_locationEnabled";
+  static final String STATE_LOCATION_OPTIONS = "mapbox_location_options";
+  static final String STATE_LOCATION_LAST_LOCATION = "mapbox_location_lastLocation";
+  static final String STATE_LOCATION_RENDER_MODE = "mapbox_location_renderMode";
+  static final String STATE_LOCATION_CAMERA_MODE = "mapbox_location_cameraMode";
+
   // Controls the compass update rate in milliseconds
   static final int COMPASS_UPDATE_RATE_MS = 500;
 
@@ -18,10 +24,10 @@ final class LocationLayerConstants {
   static final long ACCURACY_RADIUS_ANIMATION_DURATION = 250;
 
   // Default animation duration for zooming while tracking.
-  static final long DEFAULT_TRACKING_ZOOM_ANIMATION_DURATION = 750;
+  static final long DEFAULT_TRACKING_ZOOM_ANIM_DURATION = 750;
 
   // Default animation duration for tilting while tracking.
-  static final long DEFAULT_TRACKING_TILT_ANIMATION_DURATION = 1250;
+  static final long DEFAULT_TRACKING_TILT_ANIM_DURATION = 1250;
 
   // Sources
   static final String LOCATION_SOURCE = "mapbox-location-source";
