@@ -170,6 +170,7 @@
         <attr name="mapbox_minZoomIconScale" format="float"/>
 
         <!-- Camera tracking settings -->
+        <attr name="mapbox_trackingGesturesManagement" format="boolean"/>
         <attr name="mapbox_trackingInitialMoveThreshold" format="dimension"/>
         <attr name="mapbox_trackingMultiFingerMoveThreshold" format="dimension"/>
 

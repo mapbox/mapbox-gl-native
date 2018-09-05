@@ -158,6 +158,12 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
     } else if (id == R.id.action_component_enabled) {
       activateLocationComponent();
       return true;
+    } else if (id == R.id.action_gestures_management_disabled) {
+      disableGesturesManagement();
+      return true;
+    } else if (id == R.id.action_gestures_management_enabled) {
+      enableGesturesManagement();
+      return true;
     }
 
     return super.onOptionsItemSelected(item);
@@ -192,16 +198,34 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
     }
   }
 
-  public void toggleStyle() {
+  private void toggleStyle() {
     customStyle = !customStyle;
     locationComponent.applyStyle(
       this,
       customStyle ? R.style.CustomLocationComponent : R.style.mapbox_LocationComponent);
   }
 
-  public void toggleMapStyle() {
+  private void toggleMapStyle() {
     String styleUrl = mapboxMap.getStyleUrl().contentEquals(Style.DARK) ? Style.LIGHT : Style.DARK;
     mapboxMap.setStyle(styleUrl);
+  }
+
+  private void disableGesturesManagement() {
+    LocationComponentOptions options = locationComponent
+      .getLocationComponentOptions()
+      .toBuilder()
+      .trackingGesturesManagement(false)
+      .build();
+    locationComponent.applyStyle(options);
+  }
+
+  private void enableGesturesManagement() {
+    LocationComponentOptions options = locationComponent
+      .getLocationComponentOptions()
+      .toBuilder()
+      .trackingGesturesManagement(true)
+      .build();
+    locationComponent.applyStyle(options);
   }
 
   @Override

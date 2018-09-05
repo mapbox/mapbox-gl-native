@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StyleRes;
 
+import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 
@@ -100,6 +101,7 @@ public class LocationComponentOptions implements Parcelable {
   private double minZoom;
   private float maxZoomIconScale;
   private float minZoomIconScale;
+  private boolean trackingGesturesManagement;
   private float trackingInitialMoveThreshold;
   private float trackingMultiFingerMoveThreshold;
   private String layerBelow;
@@ -132,6 +134,7 @@ public class LocationComponentOptions implements Parcelable {
     double minZoom,
     float maxZoomIconScale,
     float minZoomIconScale,
+    boolean trackingGesturesManagement,
     float trackingInitialMoveThreshold,
     float trackingMultiFingerMoveThreshold,
     String layerBelow) {
@@ -165,6 +168,7 @@ public class LocationComponentOptions implements Parcelable {
     this.minZoom = minZoom;
     this.maxZoomIconScale = maxZoomIconScale;
     this.minZoomIconScale = minZoomIconScale;
+    this.trackingGesturesManagement = trackingGesturesManagement;
     this.trackingInitialMoveThreshold = trackingInitialMoveThreshold;
     this.trackingMultiFingerMoveThreshold = trackingMultiFingerMoveThreshold;
     this.layerBelow = layerBelow;
@@ -243,10 +247,11 @@ public class LocationComponentOptions implements Parcelable {
       R.styleable.mapbox_LocationComponent_mapbox_accuracyAlpha, ACCURACY_ALPHA_DEFAULT));
     builder.elevation(elevation);
 
+    builder.trackingGesturesManagement(typedArray.getBoolean(
+      R.styleable.mapbox_LocationComponent_mapbox_trackingGesturesManagement, false));
     builder.trackingInitialMoveThreshold(typedArray.getDimension(
       R.styleable.mapbox_LocationComponent_mapbox_trackingInitialMoveThreshold,
       context.getResources().getDimension(R.dimen.mapbox_locationComponentTrackingInitialMoveThreshold)));
-
     builder.trackingMultiFingerMoveThreshold(typedArray.getDimension(
       R.styleable.mapbox_LocationComponent_mapbox_trackingMultiFingerMoveThreshold,
       context.getResources().getDimension(R.dimen.mapbox_locationComponentTrackingMultiFingerMoveThreshold)));
@@ -654,6 +659,23 @@ public class LocationComponentOptions implements Parcelable {
   }
 
   /**
+   * Returns whether gesture threshold should be adjusted when camera is in one of the tracking modes.
+   * This will adjust the focal point and increase thresholds to enable camera manipulation,
+   * like zooming in and out, without breaking tracking.
+   * <p>
+   * <strong>Note</strong>: If set to true, this can overwrite some of the gesture thresholds
+   * and the custom {@link com.mapbox.android.gestures.AndroidGesturesManager} that was set with
+   * {@link com.mapbox.mapboxsdk.maps.MapboxMap#setGesturesManager(AndroidGesturesManager, boolean, boolean)}.
+   *
+   * @return true if gestures are adjusted when in one of the camera tracking modes, false otherwise
+   * @see Builder#trackingInitialMoveThreshold(float)
+   * @see Builder#trackingMultiFingerMoveThreshold(float)
+   */
+  public boolean trackingGesturesManagement() {
+    return trackingGesturesManagement;
+  }
+
+  /**
    * Minimum single pointer movement in pixels required to break camera tracking.
    *
    * @return the minimum movement
@@ -710,6 +732,7 @@ public class LocationComponentOptions implements Parcelable {
       + "minZoom=" + minZoom + ", "
       + "maxZoomIconScale=" + maxZoomIconScale + ", "
       + "minZoomIconScale=" + minZoomIconScale + ", "
+      + "trackingGesturesManagement=" + trackingGesturesManagement + ", "
       + "trackingInitialMoveThreshold=" + trackingInitialMoveThreshold + ", "
       + "trackingMultiFingerMoveThreshold=" + trackingMultiFingerMoveThreshold + ", "
       + "layerBelow=" + layerBelow
@@ -760,6 +783,7 @@ public class LocationComponentOptions implements Parcelable {
         && (Double.doubleToLongBits(this.minZoom) == Double.doubleToLongBits(that.minZoom()))
         && (Float.floatToIntBits(this.maxZoomIconScale) == Float.floatToIntBits(that.maxZoomIconScale()))
         && (Float.floatToIntBits(this.minZoomIconScale) == Float.floatToIntBits(that.minZoomIconScale()))
+        && (this.trackingGesturesManagement == that.trackingGesturesManagement())
         && (Float.floatToIntBits(this.trackingInitialMoveThreshold)
         == Float.floatToIntBits(that.trackingInitialMoveThreshold()))
         && (Float.floatToIntBits(this.trackingMultiFingerMoveThreshold)
@@ -827,6 +851,8 @@ public class LocationComponentOptions implements Parcelable {
     h$ *= 1000003;
     h$ ^= Float.floatToIntBits(minZoomIconScale);
     h$ *= 1000003;
+    h$ ^= trackingGesturesManagement ? 1231 : 1237;
+    h$ *= 1000003;
     h$ ^= Float.floatToIntBits(trackingInitialMoveThreshold);
     h$ *= 1000003;
     h$ ^= Float.floatToIntBits(trackingMultiFingerMoveThreshold);
@@ -865,6 +891,7 @@ public class LocationComponentOptions implements Parcelable {
           in.readDouble(),
           in.readFloat(),
           in.readFloat(),
+          in.readInt() == 1,
           in.readFloat(),
           in.readFloat(),
           in.readString()
@@ -961,6 +988,7 @@ public class LocationComponentOptions implements Parcelable {
     dest.writeDouble(minZoom());
     dest.writeFloat(maxZoomIconScale());
     dest.writeFloat(minZoomIconScale());
+    dest.writeInt(trackingGesturesManagement() ? 1 : 0);
     dest.writeFloat(trackingInitialMoveThreshold());
     dest.writeFloat(trackingMultiFingerMoveThreshold());
     dest.writeString(layerBelow());
@@ -1023,6 +1051,7 @@ public class LocationComponentOptions implements Parcelable {
     private Double minZoom;
     private Float maxZoomIconScale;
     private Float minZoomIconScale;
+    private Boolean trackingGesturesManagement;
     private Float trackingInitialMoveThreshold;
     private Float trackingMultiFingerMoveThreshold;
     private String layerBelow;
@@ -1058,6 +1087,7 @@ public class LocationComponentOptions implements Parcelable {
       this.minZoom = source.minZoom();
       this.maxZoomIconScale = source.maxZoomIconScale();
       this.minZoomIconScale = source.minZoomIconScale();
+      this.trackingGesturesManagement = source.trackingGesturesManagement();
       this.trackingInitialMoveThreshold = source.trackingInitialMoveThreshold();
       this.trackingMultiFingerMoveThreshold = source.trackingMultiFingerMoveThreshold();
       this.layerBelow = source.layerBelow();
@@ -1436,6 +1466,25 @@ public class LocationComponentOptions implements Parcelable {
     }
 
     /**
+     * Set whether gesture threshold should be adjusted when camera is in one of the tracking modes.
+     * This will adjust the focal point and increase thresholds to enable camera manipulation,
+     * like zooming in and out, without breaking tracking.
+     * <p>
+     * <strong>Note</strong>: This can overwrite some of the gesture thresholds
+     * and the custom {@link com.mapbox.android.gestures.AndroidGesturesManager} that was set with
+     * {@link com.mapbox.mapboxsdk.maps.MapboxMap#setGesturesManager(AndroidGesturesManager, boolean, boolean)}.
+     *
+     * @param trackingGesturesManagement true if gestures should be adjusted when in one of the camera tracking modes,
+     *                                   false otherwise
+     * @see Builder#trackingInitialMoveThreshold(float)
+     * @see Builder#trackingMultiFingerMoveThreshold(float)
+     */
+    public LocationComponentOptions.Builder trackingGesturesManagement(boolean trackingGesturesManagement) {
+      this.trackingGesturesManagement = trackingGesturesManagement;
+      return this;
+    }
+
+    /**
      * Sets minimum single pointer movement (map pan) in pixels required to break camera tracking.
      *
      * @param moveThreshold the minimum movement
@@ -1516,6 +1565,9 @@ public class LocationComponentOptions implements Parcelable {
       if (this.minZoomIconScale == null) {
         missing += " minZoomIconScale";
       }
+      if (this.trackingGesturesManagement == null) {
+        missing += " trackingGesturesManagement";
+      }
       if (this.trackingInitialMoveThreshold == null) {
         missing += " trackingInitialMoveThreshold";
       }
@@ -1553,6 +1605,7 @@ public class LocationComponentOptions implements Parcelable {
         this.minZoom,
         this.maxZoomIconScale,
         this.minZoomIconScale,
+        trackingGesturesManagement,
         this.trackingInitialMoveThreshold,
         this.trackingMultiFingerMoveThreshold,
         this.layerBelow);

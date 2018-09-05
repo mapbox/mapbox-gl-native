@@ -351,6 +351,7 @@ public final class LocationComponent {
   public void applyStyle(LocationComponentOptions options) {
     this.options = options;
     locationLayerController.applyStyle(options);
+    locationCameraController.initializeOptions(options);
     staleStateManager.setEnabled(options.enableStaleState());
     staleStateManager.setDelayTime(options.staleStateTimeout());
     updateMapWithOptions(options);
