@@ -2,12 +2,6 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## master
-
-### Other changes
-
-* Fixed bug where completion block passed to `-[MGLMapSnapshotter startWithQueue:completionHandler:]` was not being called in all code paths. ([#12355](https://github.com/mapbox/mapbox-gl-native/pull/12355))
-
 ## 4.4.0
 
 ### Styles and rendering
@@ -31,6 +25,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * The `-[MGLMapView visibleFeaturesAtPoint:]` method can now return features near tile boundaries at high zoom levels. ([#12570](https://github.com/mapbox/mapbox-gl-native/pull/12570))
 * Fixed inconsistencies in exception naming. ([#12583](https://github.com/mapbox/mapbox-gl-native/issues/12583))
 * Fixed an issue where `-[MGLMapView convertCoordinateBounds:toRectToView:]` would return an empty CGRect if the bounds crossed the antimeridian. ([#12758](https://github.com/mapbox/mapbox-gl-native/pull/12758))
+* Fixed bug where the completion block passed to `-[MGLMapSnapshotter startWithQueue:completionHandler:]` was not being called in all code paths. ([#12355](https://github.com/mapbox/mapbox-gl-native/pull/12355))
+* Fixed a sporadic crash with location updates. ([#12584](https://github.com/mapbox/mapbox-gl-native/pull/12584))
+* Fixed a crash that occurred during power state changes. ([#12584](https://github.com/mapbox/mapbox-gl-native/pull/12584))
+* Fixed a crash related to telemetry upload. ([#12584](https://github.com/mapbox/mapbox-gl-native/pull/12584))
 
 ## 4.3.0 - August 15, 2018
 
