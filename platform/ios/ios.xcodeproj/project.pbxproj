@@ -382,6 +382,8 @@
 		ACA65F4C214066AC00537748 /* MMEHashProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F49214066A900537748 /* MMEHashProvider.m */; };
 		ACA65F53214066E600537748 /* MMEConfigurator.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F50214066E600537748 /* MMEConfigurator.m */; };
 		ACA65F54214066E600537748 /* MMEConfigurator.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F50214066E600537748 /* MMEConfigurator.m */; };
+		ACA65F592140697200537748 /* MMEDispatchManager.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F562140697100537748 /* MMEDispatchManager.m */; };
+		ACA65F5A2140697200537748 /* MMEDispatchManager.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F562140697100537748 /* MMEDispatchManager.m */; };
 		CA0C27922076C804001CE5B7 /* MGLShapeSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0C27912076C804001CE5B7 /* MGLShapeSourceTests.m */; };
 		CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */; };
 		CA1B4A512099FB2200EDD491 /* MGLMapSnapshotterTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA1B4A502099FB2200EDD491 /* MGLMapSnapshotterTest.m */; };
@@ -1035,6 +1037,8 @@
 		ACA65F4A214066AB00537748 /* MMEHashProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMEHashProvider.h; sourceTree = "<group>"; };
 		ACA65F4F214066E200537748 /* MMEConfigurator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMEConfigurator.h; sourceTree = "<group>"; };
 		ACA65F50214066E600537748 /* MMEConfigurator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMEConfigurator.m; sourceTree = "<group>"; };
+		ACA65F552140696B00537748 /* MMEDispatchManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMEDispatchManager.h; sourceTree = "<group>"; };
+		ACA65F562140697100537748 /* MMEDispatchManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMEDispatchManager.m; sourceTree = "<group>"; };
 		CA0C27912076C804001CE5B7 /* MGLShapeSourceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLShapeSourceTests.m; sourceTree = "<group>"; };
 		CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewIntegrationTest.m; sourceTree = "<group>"; };
 		CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLMapViewIntegrationTest.h; sourceTree = "<group>"; };
@@ -1648,6 +1652,8 @@
 				406E99B21FFEFED500D9FFCC /* MMEUINavigation.m */,
 				40834BBF1FE05D6E00C1BD0D /* MMEUniqueIdentifier.h */,
 				40834BAD1FE05D6C00C1BD0D /* MMEUniqueIdentifier.m */,
+				ACA65F552140696B00537748 /* MMEDispatchManager.h */,
+				ACA65F562140697100537748 /* MMEDispatchManager.m */,
 				40834BCF1FE05D7100C1BD0D /* NSData+MMEGZIP.h */,
 				40834BAF1FE05D6C00C1BD0D /* NSData+MMEGZIP.m */,
 				40834BCB1FE05D7100C1BD0D /* Reachability */,
@@ -3009,6 +3015,7 @@
 				967C864D210A9D3C004DF794 /* UIDevice+MGLAdditions.m in Sources */,
 				400533021DB0862B0069F638 /* NSArray+MGLAdditions.mm in Sources */,
 				96036A03200565C700510F3D /* NSOrthography+MGLAdditions.m in Sources */,
+				ACA65F592140697200537748 /* MMEDispatchManager.m in Sources */,
 				40834BF31FE05E1800C1BD0D /* MMETimerManager.m in Sources */,
 				35136D421D42274500C20EFD /* MGLRasterStyleLayer.mm in Sources */,
 				3538AA1F1D542239008EC33D /* MGLForegroundStyleLayer.mm in Sources */,
@@ -3139,6 +3146,7 @@
 				967C864E210A9D3C004DF794 /* UIDevice+MGLAdditions.m in Sources */,
 				96036A04200565C700510F3D /* NSOrthography+MGLAdditions.m in Sources */,
 				40834C071FE05E1800C1BD0D /* MMETimerManager.m in Sources */,
+				ACA65F5A2140697200537748 /* MMEDispatchManager.m in Sources */,
 				3538AA201D542239008EC33D /* MGLForegroundStyleLayer.mm in Sources */,
 				DA00FC911D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */,
 				40834C051FE05E1800C1BD0D /* MMENSDateWrapper.m in Sources */,
