@@ -212,7 +212,6 @@
 		40834BF11FE05E1800C1BD0D /* MMENSDateWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BBC1FE05D6E00C1BD0D /* MMENSDateWrapper.m */; };
 		40834BF21FE05E1800C1BD0D /* MMENSURLSessionWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC61FE05D7000C1BD0D /* MMENSURLSessionWrapper.m */; };
 		40834BF31FE05E1800C1BD0D /* MMETimerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BB91FE05D6E00C1BD0D /* MMETimerManager.m */; };
-		40834BF41FE05E1800C1BD0D /* MMETrustKitWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC11FE05D6F00C1BD0D /* MMETrustKitWrapper.m */; };
 		40834BF51FE05E1800C1BD0D /* MMETypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BBD1FE05D6E00C1BD0D /* MMETypes.m */; };
 		40834BF61FE05E1800C1BD0D /* MMEUIApplicationWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BCA1FE05D7000C1BD0D /* MMEUIApplicationWrapper.m */; };
 		40834BF71FE05E1800C1BD0D /* MMEUniqueIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BAD1FE05D6C00C1BD0D /* MMEUniqueIdentifier.m */; };
@@ -232,7 +231,6 @@
 		40834C051FE05E1800C1BD0D /* MMENSDateWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BBC1FE05D6E00C1BD0D /* MMENSDateWrapper.m */; };
 		40834C061FE05E1800C1BD0D /* MMENSURLSessionWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC61FE05D7000C1BD0D /* MMENSURLSessionWrapper.m */; };
 		40834C071FE05E1800C1BD0D /* MMETimerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BB91FE05D6E00C1BD0D /* MMETimerManager.m */; };
-		40834C081FE05E1800C1BD0D /* MMETrustKitWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC11FE05D6F00C1BD0D /* MMETrustKitWrapper.m */; };
 		40834C091FE05E1800C1BD0D /* MMETypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BBD1FE05D6E00C1BD0D /* MMETypes.m */; };
 		40834C0A1FE05E1800C1BD0D /* MMEUIApplicationWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BCA1FE05D7000C1BD0D /* MMEUIApplicationWrapper.m */; };
 		40834C0B1FE05E1800C1BD0D /* MMEUniqueIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BAD1FE05D6C00C1BD0D /* MMEUniqueIdentifier.m */; };
@@ -378,10 +376,14 @@
 		AC518E00201BB55A00EBC820 /* MGLTelemetryConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = AC518DFD201BB55A00EBC820 /* MGLTelemetryConfig.h */; };
 		AC518E03201BB56000EBC820 /* MGLTelemetryConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */; };
 		AC518E04201BB56100EBC820 /* MGLTelemetryConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */; };
-		ACF969F220CB04E600B23FB7 /* MMEEventsService.m in Sources */ = {isa = PBXBuildFile; fileRef = ACF969F020CB04E500B23FB7 /* MMEEventsService.m */; };
-		ACF969F320CB04E600B23FB7 /* MMEEventsService.m in Sources */ = {isa = PBXBuildFile; fileRef = ACF969F020CB04E500B23FB7 /* MMEEventsService.m */; };
-		ACF969F420CB04E600B23FB7 /* MMEEventsService.h in Headers */ = {isa = PBXBuildFile; fileRef = ACF969F120CB04E500B23FB7 /* MMEEventsService.h */; };
-		ACF969F520CB04E600B23FB7 /* MMEEventsService.h in Headers */ = {isa = PBXBuildFile; fileRef = ACF969F120CB04E500B23FB7 /* MMEEventsService.h */; };
+		ACA65F472140669000537748 /* MMETrustKitProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F452140668100537748 /* MMETrustKitProvider.m */; };
+		ACA65F482140669100537748 /* MMETrustKitProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F452140668100537748 /* MMETrustKitProvider.m */; };
+		ACA65F4B214066AC00537748 /* MMEHashProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F49214066A900537748 /* MMEHashProvider.m */; };
+		ACA65F4C214066AC00537748 /* MMEHashProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F49214066A900537748 /* MMEHashProvider.m */; };
+		ACA65F53214066E600537748 /* MMEConfigurator.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F50214066E600537748 /* MMEConfigurator.m */; };
+		ACA65F54214066E600537748 /* MMEConfigurator.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F50214066E600537748 /* MMEConfigurator.m */; };
+		ACA65F592140697200537748 /* MMEDispatchManager.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F562140697100537748 /* MMEDispatchManager.m */; };
+		ACA65F5A2140697200537748 /* MMEDispatchManager.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F562140697100537748 /* MMEDispatchManager.m */; };
 		CA0C27922076C804001CE5B7 /* MGLShapeSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0C27912076C804001CE5B7 /* MGLShapeSourceTests.m */; };
 		CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */; };
 		CA1B4A512099FB2200EDD491 /* MGLMapSnapshotterTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA1B4A502099FB2200EDD491 /* MGLMapSnapshotterTest.m */; };
@@ -889,7 +891,6 @@
 		40834BA41FE05D6B00C1BD0D /* MMEEventsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEEventsManager.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventsManager.m"; sourceTree = SOURCE_ROOT; };
 		40834BA51FE05D6B00C1BD0D /* MMEAPIClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEAPIClient.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEAPIClient.m"; sourceTree = SOURCE_ROOT; };
 		40834BA61FE05D6B00C1BD0D /* MMEEventLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEEventLogger.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventLogger.h"; sourceTree = SOURCE_ROOT; };
-		40834BA71FE05D6B00C1BD0D /* MMETrustKitWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMETrustKitWrapper.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMETrustKitWrapper.h"; sourceTree = SOURCE_ROOT; };
 		40834BAA1FE05D6C00C1BD0D /* MMENSURLSessionWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMENSURLSessionWrapper.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMENSURLSessionWrapper.h"; sourceTree = SOURCE_ROOT; };
 		40834BAB1FE05D6C00C1BD0D /* MMEAPIClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEAPIClient.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEAPIClient.h"; sourceTree = SOURCE_ROOT; };
 		40834BAC1FE05D6C00C1BD0D /* MapboxMobileEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapboxMobileEvents.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MapboxMobileEvents.h"; sourceTree = SOURCE_ROOT; };
@@ -913,7 +914,6 @@
 		40834BBE1FE05D6E00C1BD0D /* MMEUIApplicationWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEUIApplicationWrapper.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEUIApplicationWrapper.h"; sourceTree = SOURCE_ROOT; };
 		40834BBF1FE05D6E00C1BD0D /* MMEUniqueIdentifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEUniqueIdentifier.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEUniqueIdentifier.h"; sourceTree = SOURCE_ROOT; };
 		40834BC01FE05D6E00C1BD0D /* MMEConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEConstants.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEConstants.m"; sourceTree = SOURCE_ROOT; };
-		40834BC11FE05D6F00C1BD0D /* MMETrustKitWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMETrustKitWrapper.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMETrustKitWrapper.m"; sourceTree = SOURCE_ROOT; };
 		40834BC21FE05D6F00C1BD0D /* CLLocation+MMEMobileEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "CLLocation+MMEMobileEvents.h"; path = "vendor/mapbox-events-ios/MapboxMobileEvents/CLLocation+MMEMobileEvents.h"; sourceTree = SOURCE_ROOT; };
 		40834BC31FE05D6F00C1BD0D /* CLLocation+MMEMobileEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "CLLocation+MMEMobileEvents.m"; path = "vendor/mapbox-events-ios/MapboxMobileEvents/CLLocation+MMEMobileEvents.m"; sourceTree = SOURCE_ROOT; };
 		40834BC41FE05D6F00C1BD0D /* MMECategoryLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMECategoryLoader.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMECategoryLoader.m"; sourceTree = SOURCE_ROOT; };
@@ -1031,8 +1031,14 @@
 		96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationHeadingIndicator.h; sourceTree = "<group>"; };
 		AC518DFD201BB55A00EBC820 /* MGLTelemetryConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTelemetryConfig.h; sourceTree = "<group>"; };
 		AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTelemetryConfig.m; sourceTree = "<group>"; };
-		ACF969F020CB04E500B23FB7 /* MMEEventsService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEEventsService.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventsService.m"; sourceTree = SOURCE_ROOT; };
-		ACF969F120CB04E500B23FB7 /* MMEEventsService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEEventsService.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventsService.h"; sourceTree = SOURCE_ROOT; };
+		ACA65F442140667D00537748 /* MMETrustKitProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMETrustKitProvider.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMETrustKitProvider.h"; sourceTree = SOURCE_ROOT; };
+		ACA65F452140668100537748 /* MMETrustKitProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMETrustKitProvider.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMETrustKitProvider.m"; sourceTree = SOURCE_ROOT; };
+		ACA65F49214066A900537748 /* MMEHashProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEHashProvider.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEHashProvider.m"; sourceTree = SOURCE_ROOT; };
+		ACA65F4A214066AB00537748 /* MMEHashProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEHashProvider.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEHashProvider.h"; sourceTree = SOURCE_ROOT; };
+		ACA65F4F214066E200537748 /* MMEConfigurator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEConfigurator.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEConfigurator.h"; sourceTree = SOURCE_ROOT; };
+		ACA65F50214066E600537748 /* MMEConfigurator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEConfigurator.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEConfigurator.m"; sourceTree = SOURCE_ROOT; };
+		ACA65F552140696B00537748 /* MMEDispatchManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEDispatchManager.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEDispatchManager.h"; sourceTree = SOURCE_ROOT; };
+		ACA65F562140697100537748 /* MMEDispatchManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEDispatchManager.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEDispatchManager.m"; sourceTree = SOURCE_ROOT; };
 		CA0C27912076C804001CE5B7 /* MGLShapeSourceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLShapeSourceTests.m; sourceTree = "<group>"; };
 		CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewIntegrationTest.m; sourceTree = "<group>"; };
 		CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLMapViewIntegrationTest.h; sourceTree = "<group>"; };
@@ -1620,10 +1626,14 @@
 				40834BB71FE05D6D00C1BD0D /* MMEEventLogger.m */,
 				406E99B51FFEFED600D9FFCC /* MMEEventLogReportViewController.h */,
 				406E99B11FFEFED500D9FFCC /* MMEEventLogReportViewController.m */,
-				ACF969F120CB04E500B23FB7 /* MMEEventsService.h */,
-				ACF969F020CB04E500B23FB7 /* MMEEventsService.m */,
 				40834BBB1FE05D6E00C1BD0D /* MMEEventsConfiguration.h */,
 				40834BB21FE05D6D00C1BD0D /* MMEEventsConfiguration.m */,
+				ACA65F4A214066AB00537748 /* MMEHashProvider.h */,
+				ACA65F49214066A900537748 /* MMEHashProvider.m */,
+				ACA65F442140667D00537748 /* MMETrustKitProvider.h */,
+				ACA65F452140668100537748 /* MMETrustKitProvider.m */,
+				ACA65F4F214066E200537748 /* MMEConfigurator.h */,
+				ACA65F50214066E600537748 /* MMEConfigurator.m */,
 				40834BA31FE05D6B00C1BD0D /* MMEEventsManager.h */,
 				40834BA41FE05D6B00C1BD0D /* MMEEventsManager.m */,
 				40834BB31FE05D6D00C1BD0D /* MMELocationManager.h */,
@@ -1634,8 +1644,6 @@
 				40834BC61FE05D7000C1BD0D /* MMENSURLSessionWrapper.m */,
 				40834BC91FE05D7000C1BD0D /* MMETimerManager.h */,
 				40834BB91FE05D6E00C1BD0D /* MMETimerManager.m */,
-				40834BA71FE05D6B00C1BD0D /* MMETrustKitWrapper.h */,
-				40834BC11FE05D6F00C1BD0D /* MMETrustKitWrapper.m */,
 				40834BB61FE05D6D00C1BD0D /* MMETypes.h */,
 				40834BBD1FE05D6E00C1BD0D /* MMETypes.m */,
 				40834BBE1FE05D6E00C1BD0D /* MMEUIApplicationWrapper.h */,
@@ -1644,6 +1652,8 @@
 				406E99B21FFEFED500D9FFCC /* MMEUINavigation.m */,
 				40834BBF1FE05D6E00C1BD0D /* MMEUniqueIdentifier.h */,
 				40834BAD1FE05D6C00C1BD0D /* MMEUniqueIdentifier.m */,
+				ACA65F552140696B00537748 /* MMEDispatchManager.h */,
+				ACA65F562140697100537748 /* MMEDispatchManager.m */,
 				40834BCF1FE05D7100C1BD0D /* NSData+MMEGZIP.h */,
 				40834BAF1FE05D6C00C1BD0D /* NSData+MMEGZIP.m */,
 				40834BCB1FE05D7100C1BD0D /* Reachability */,
@@ -2356,7 +2366,6 @@
 				3538AA1D1D542239008EC33D /* MGLForegroundStyleLayer.h in Headers */,
 				DA8847F51CBAFA5100AB86E3 /* MGLOfflineRegion.h in Headers */,
 				DA737EE11D056A4E005BDA16 /* MGLMapViewDelegate.h in Headers */,
-				ACF969F420CB04E600B23FB7 /* MMEEventsService.h in Headers */,
 				92FC0AEC207CEE16007B6B54 /* MGLShapeOfflineRegion_Private.h in Headers */,
 				AC518DFF201BB55A00EBC820 /* MGLTelemetryConfig.h in Headers */,
 				DA88481B1CBAFA6200AB86E3 /* MGLGeometry_Private.h in Headers */,
@@ -2517,7 +2526,6 @@
 				3EA934623AD0000B7D99C3FB /* MGLRendererConfiguration.h in Headers */,
 				DACA86272019218600E9693A /* MGLRasterDEMSource.h in Headers */,
 				9621F2502091020E005B3800 /* NSExpression+MGLAdditions.h in Headers */,
-				ACF969F520CB04E600B23FB7 /* MMEEventsService.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3007,12 +3015,14 @@
 				967C864D210A9D3C004DF794 /* UIDevice+MGLAdditions.m in Sources */,
 				400533021DB0862B0069F638 /* NSArray+MGLAdditions.mm in Sources */,
 				96036A03200565C700510F3D /* NSOrthography+MGLAdditions.m in Sources */,
+				ACA65F592140697200537748 /* MMEDispatchManager.m in Sources */,
 				40834BF31FE05E1800C1BD0D /* MMETimerManager.m in Sources */,
 				35136D421D42274500C20EFD /* MGLRasterStyleLayer.mm in Sources */,
 				3538AA1F1D542239008EC33D /* MGLForegroundStyleLayer.mm in Sources */,
 				40834BF11FE05E1800C1BD0D /* MMENSDateWrapper.m in Sources */,
 				40834C461FE05F7500C1BD0D /* TSKPinFailureReport.m in Sources */,
 				406E99B91FFEFF1B00D9FFCC /* MMEEventLogReportViewController.m in Sources */,
+				ACA65F53214066E600537748 /* MMEConfigurator.m in Sources */,
 				40834BE61FE05E1800C1BD0D /* CLLocation+MMEMobileEvents.m in Sources */,
 				DA00FC901D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */,
 				DA88482D1CBAFA6200AB86E3 /* NSBundle+MGLAdditions.m in Sources */,
@@ -3037,6 +3047,7 @@
 				0778DD441F67556C00A73B34 /* MGLComputedShapeSource.mm in Sources */,
 				3557F7B21E1D27D300CCA5E6 /* MGLDistanceFormatter.m in Sources */,
 				40834C4B1FE05F7500C1BD0D /* TSKPinningValidatorResult.m in Sources */,
+				ACA65F472140669000537748 /* MMETrustKitProvider.m in Sources */,
 				40834BE71FE05E1800C1BD0D /* MMEAPIClient.m in Sources */,
 				DA8848591CBAFB9800AB86E3 /* MGLMapView.mm in Sources */,
 				DA8848501CBAFB9800AB86E3 /* MGLAnnotationImage.m in Sources */,
@@ -3045,7 +3056,6 @@
 				DA35A2B31CCA141D00E826B2 /* MGLCompassDirectionFormatter.m in Sources */,
 				DD0902A91DB1929D00C5BDCE /* MGLNetworkConfiguration.m in Sources */,
 				35D13AB91D3D15E300AFB4E0 /* MGLStyleLayer.mm in Sources */,
-				ACF969F220CB04E600B23FB7 /* MMEEventsService.m in Sources */,
 				40834C4C1FE05F7500C1BD0D /* TSKTrustKitConfig.m in Sources */,
 				DA35A2CB1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */,
 				071BBB001EE7613F001FB02A /* MGLImageSource.mm in Sources */,
@@ -3082,7 +3092,6 @@
 				DA8848301CBAFA6200AB86E3 /* NSProcessInfo+MGLAdditions.m in Sources */,
 				40834BED1FE05E1800C1BD0D /* MMEEventLogger.m in Sources */,
 				353AFA161D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */,
-				40834BF41FE05E1800C1BD0D /* MMETrustKitWrapper.m in Sources */,
 				1FCAE2A420B872A400C577DD /* MGLLocationManager.m in Sources */,
 				40834BEF1FE05E1800C1BD0D /* MMEEventsManager.m in Sources */,
 				35D13AC51D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm in Sources */,
@@ -3095,6 +3104,7 @@
 				DA72620D1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm in Sources */,
 				DA88481A1CBAFA6200AB86E3 /* MGLAccountManager.m in Sources */,
 				3510FFFB1D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.mm in Sources */,
+				ACA65F4B214066AC00537748 /* MMEHashProvider.m in Sources */,
 				AC518E03201BB56000EBC820 /* MGLTelemetryConfig.m in Sources */,
 				DA8848271CBAFA6200AB86E3 /* MGLPolyline.mm in Sources */,
 				DA8848581CBAFB9800AB86E3 /* MGLMapboxEvents.m in Sources */,
@@ -3136,12 +3146,14 @@
 				967C864E210A9D3C004DF794 /* UIDevice+MGLAdditions.m in Sources */,
 				96036A04200565C700510F3D /* NSOrthography+MGLAdditions.m in Sources */,
 				40834C071FE05E1800C1BD0D /* MMETimerManager.m in Sources */,
+				ACA65F5A2140697200537748 /* MMEDispatchManager.m in Sources */,
 				3538AA201D542239008EC33D /* MGLForegroundStyleLayer.mm in Sources */,
 				DA00FC911D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */,
 				40834C051FE05E1800C1BD0D /* MMENSDateWrapper.m in Sources */,
 				40834C531FE05F7600C1BD0D /* TSKPinFailureReport.m in Sources */,
 				40834BFA1FE05E1800C1BD0D /* CLLocation+MMEMobileEvents.m in Sources */,
 				406E99BA1FFEFF1B00D9FFCC /* MMEEventLogReportViewController.m in Sources */,
+				ACA65F54214066E600537748 /* MMEConfigurator.m in Sources */,
 				DAA4E4201CBB730400178DFB /* MGLOfflinePack.mm in Sources */,
 				966FCF551F3C323500F2B6DE /* MGLUserLocationHeadingArrowLayer.m in Sources */,
 				DAA4E4331CBB730400178DFB /* MGLUserLocation.m in Sources */,
@@ -3166,6 +3178,7 @@
 				DAA4E41D1CBB730400178DFB /* MGLGeometry.mm in Sources */,
 				40834C581FE05F7600C1BD0D /* TSKPinningValidatorResult.m in Sources */,
 				40834BFB1FE05E1800C1BD0D /* MMEAPIClient.m in Sources */,
+				ACA65F482140669100537748 /* MMETrustKitProvider.m in Sources */,
 				DAA4E41F1CBB730400178DFB /* MGLMultiPoint.mm in Sources */,
 				DD0902AA1DB1929D00C5BDCE /* MGLNetworkConfiguration.m in Sources */,
 				40834C041FE05E1800C1BD0D /* MMELocationManager.m in Sources */,
@@ -3174,7 +3187,6 @@
 				071BBAFF1EE7613E001FB02A /* MGLImageSource.mm in Sources */,
 				DA35A2CC1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */,
 				40834C591FE05F7600C1BD0D /* TSKTrustKitConfig.m in Sources */,
-				ACF969F320CB04E600B23FB7 /* MMEEventsService.m in Sources */,
 				408AA8591DAEDA1E00022900 /* NSDictionary+MGLAdditions.mm in Sources */,
 				DAA4E4281CBB730400178DFB /* MGLTypes.m in Sources */,
 				DA35A2A21CC9E95F00E826B2 /* MGLCoordinateFormatter.m in Sources */,
@@ -3211,7 +3223,6 @@
 				353AFA171D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */,
 				40834C011FE05E1800C1BD0D /* MMEEventLogger.m in Sources */,
 				35D13AC61D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm in Sources */,
-				40834C081FE05E1800C1BD0D /* MMETrustKitWrapper.m in Sources */,
 				1FCAE2A520B872A400C577DD /* MGLLocationManager.m in Sources */,
 				40834C031FE05E1800C1BD0D /* MMEEventsManager.m in Sources */,
 				DAA4E42A1CBB730400178DFB /* NSProcessInfo+MGLAdditions.m in Sources */,
@@ -3224,6 +3235,7 @@
 				DAA4E42F1CBB730400178DFB /* MGLCompactCalloutView.m in Sources */,
 				3510FFFC1D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.mm in Sources */,
 				AC518E04201BB56100EBC820 /* MGLTelemetryConfig.m in Sources */,
+				ACA65F4C214066AC00537748 /* MMEHashProvider.m in Sources */,
 				DAA4E4271CBB730400178DFB /* MGLTilePyramidOfflineRegion.mm in Sources */,
 				DAA4E41C1CBB730400178DFB /* MGLAccountManager.m in Sources */,
 				35CE61851D4165D9004F2359 /* UIColor+MGLAdditions.mm in Sources */,
