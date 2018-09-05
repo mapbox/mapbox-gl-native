@@ -10,6 +10,7 @@ import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.DeviceIndependentTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.TestConstants;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
@@ -23,6 +24,7 @@ public class CameraAnimateTest extends BaseActivityTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToCameraPositionTarget() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -43,6 +45,7 @@ public class CameraAnimateTest extends BaseActivityTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToCameraPositionTargetZoom() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -60,6 +63,7 @@ public class CameraAnimateTest extends BaseActivityTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToCameraPosition() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -89,6 +93,7 @@ public class CameraAnimateTest extends BaseActivityTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToBounds() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -113,6 +118,7 @@ public class CameraAnimateTest extends BaseActivityTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToMoveBy() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -131,6 +137,7 @@ public class CameraAnimateTest extends BaseActivityTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToZoomIn() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -144,6 +151,7 @@ public class CameraAnimateTest extends BaseActivityTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToZoomOut() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -159,6 +167,7 @@ public class CameraAnimateTest extends BaseActivityTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToZoomBy() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
@@ -173,6 +182,7 @@ public class CameraAnimateTest extends BaseActivityTest {
   }
 
   @Test
+  @Ignore
   public void testAnimateToZoomTo() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
