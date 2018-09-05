@@ -426,6 +426,10 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     onMapChangedListeners.clear();
     mapCallback.clearOnMapReadyCallbacks();
 
+    if (mapboxMap != null) {
+      mapboxMap.onDestroy();
+    }
+
     if (nativeMapView != null && hasSurface) {
       // null when destroying an activity programmatically mapbox-navigation-android/issues/503
       nativeMapView.destroy();

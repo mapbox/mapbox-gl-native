@@ -653,12 +653,6 @@ public final class LocationLayerPlugin {
    * Internal use.
    */
   public void onStart() {
-    // TODO: 03.09.18 LLP when map destroyed
-    /*if (context.isDestroyed()) {
-      Logger.e("You are calling plugins #onStart after the map was destroyed. Re-create the plugin before using it.");
-      return;
-    }*/
-
     isPluginStarted = true;
     onLocationLayerStart();
   }
@@ -669,6 +663,15 @@ public final class LocationLayerPlugin {
   public void onStop() {
     onLocationLayerStop();
     isPluginStarted = false;
+  }
+
+  /**
+   * Internal use.
+   */
+  public void onDestroy() {
+    if (locationEngine != null && usingInternalLocationEngine) {
+      locationEngine.deactivate();
+    }
   }
 
   /**

@@ -159,6 +159,13 @@ public final class MapboxMap {
   }
 
   /**
+   * Called when the hosting Activity/Fragment onDestroy()/onDestroyView() method is called.
+   */
+  void onDestroy() {
+    locationLayerPlugin.onDestroy();
+  }
+
+  /**
    * Called before the OnMapReadyCallback is invoked.
    */
   void onPreMapReady() {
