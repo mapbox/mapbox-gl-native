@@ -44,7 +44,7 @@ import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.offline.OfflineGeometryRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
-import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
+import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
@@ -199,8 +199,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     compassView.injectCompassAnimationListener(createCompassAnimationListener(cameraChangeDispatcher));
     compassView.setOnClickListener(createCompassClickListener(cameraChangeDispatcher));
 
-    // LocationLayerPlugin
-    mapboxMap.injectLocationLayerPlugin(new LocationLayerPlugin(context, mapboxMap));
+    // LocationComponent
+    mapboxMap.injectLocationComponent(new LocationComponent(context, mapboxMap));
 
     // inject widgets with MapboxMap
     attrView.setOnClickListener(new AttributionClickListener(context, mapboxMap));

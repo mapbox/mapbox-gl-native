@@ -816,7 +816,7 @@
                 android:value="com.mapbox.mapboxsdk.testapp.activity.FeatureOverviewActivity" />
         </activity>
         <activity
-            android:name=".activity.location.LocationLayerMapChangeActivity"
+            android:name=".activity.location.LocationMapChangeActivity"
             android:description="@string/description_location_map_change"
             android:label="@string/activity_location_map_change">
             <meta-data
@@ -827,7 +827,7 @@
                 android:value=".activity.FeatureOverviewActivity" />
         </activity>
         <activity
-            android:name=".activity.location.LocationLayerModesActivity"
+            android:name=".activity.location.LocationModesActivity"
             android:description="@string/description_location_modes"
             android:label="@string/activity_location_modes">
             <meta-data
@@ -838,7 +838,7 @@
                 android:value=".activity.FeatureOverviewActivity" />
         </activity>
         <activity
-            android:name=".activity.location.LocationLayerFragmentActivity"
+            android:name=".activity.location.LocationFragmentActivity"
             android:description="@string/description_location_fragment"
             android:label="@string/activity_location_fragment">
             <meta-data

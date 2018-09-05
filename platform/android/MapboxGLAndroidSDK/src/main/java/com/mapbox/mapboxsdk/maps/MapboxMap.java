@@ -43,7 +43,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.log.Logger;
-import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
+import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
@@ -76,7 +76,7 @@ public final class MapboxMap {
 
   private final OnGesturesManagerInteractionListener onGesturesManagerInteractionListener;
 
-  private LocationLayerPlugin locationLayerPlugin;
+  private LocationComponent locationComponent;
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
   MapboxMap(NativeMapView map, Transform transform, UiSettings ui, Projection projection,
@@ -112,14 +112,14 @@ public final class MapboxMap {
       // if user hasn't loaded a Style yet
       nativeMapView.setStyleUrl(Style.MAPBOX_STREETS);
     }
-    locationLayerPlugin.onStart();
+    locationComponent.onStart();
   }
 
   /**
    * Called when the hosting Activity/Fragment onStop() method is called.
    */
   void onStop() {
-    locationLayerPlugin.onStop();
+    locationComponent.onStop();
   }
 
   /**
@@ -132,7 +132,7 @@ public final class MapboxMap {
     outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, nativeMapView.getDebug());
     outState.putString(MapboxConstants.STATE_STYLE_URL, nativeMapView.getStyleUrl());
     uiSettings.onSaveInstanceState(outState);
-    locationLayerPlugin.onSaveInstanceState(outState);
+    locationComponent.onSaveInstanceState(outState);
   }
 
   /**
@@ -157,14 +157,14 @@ public final class MapboxMap {
     if (!TextUtils.isEmpty(styleUrl)) {
       nativeMapView.setStyleUrl(savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL));
     }
-    locationLayerPlugin.onRestoreInstanceState(savedInstanceState);
+    locationComponent.onRestoreInstanceState(savedInstanceState);
   }
 
   /**
    * Called when the hosting Activity/Fragment onDestroy()/onDestroyView() method is called.
    */
   void onDestroy() {
-    locationLayerPlugin.onDestroy();
+    locationComponent.onDestroy();
   }
 
   /**
@@ -191,14 +191,14 @@ public final class MapboxMap {
    * Called when the map will start loading style.
    */
   void onStartLoadingMap() {
-    locationLayerPlugin.onStartLoadingMap();
+    locationComponent.onStartLoadingMap();
   }
 
   /**
    * Called the map finished loading style.
    */
   void onFinishLoadingStyle() {
-    locationLayerPlugin.onFinishLoadingStyle();
+    locationComponent.onFinishLoadingStyle();
   }
 
   /**
@@ -2311,11 +2311,11 @@ public final class MapboxMap {
   }
 
   //
-  // LocationLayerPlugin
+  // LocationComponent
   //
 
-  void injectLocationLayerPlugin(LocationLayerPlugin locationLayerPlugin) {
-    this.locationLayerPlugin = locationLayerPlugin;
+  void injectLocationComponent(LocationComponent locationComponent) {
+    this.locationComponent = locationComponent;
   }
 
   /**
@@ -2323,8 +2323,8 @@ public final class MapboxMap {
    * @return the location layer
    */
   @NonNull
-  public LocationLayerPlugin getLocationLayerPlugin() {
-    return locationLayerPlugin;
+  public LocationComponent getLocationComponent() {
+    return locationComponent;
   }
 
   //
