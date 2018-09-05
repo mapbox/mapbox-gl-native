@@ -18,8 +18,8 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
-import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
+import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
   LocationEngineListener {
 
   private MapView mapView;
-  private LocationLayerPlugin locationLayerPlugin;
+  private LocationComponent locationComponent;
   private LocationEngine locationEngine;
   private PermissionsManager permissionsManager;
 
@@ -43,8 +43,8 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
     fabManualUpdate.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        if (locationLayerPlugin != null && locationLayerPlugin.getLocationEngine() == null) {
-          locationLayerPlugin.forceLocationUpdate(
+        if (locationComponent != null && locationComponent.getLocationEngine() == null) {
+          locationComponent.forceLocationUpdate(
             Utils.getRandomLocation(LatLngBounds.from(60, 25, 40, -5)));
         }
       }
@@ -55,11 +55,11 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
     fabToggle.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        if (locationLayerPlugin != null) {
-          locationLayerPlugin.setLocationEngine(locationLayerPlugin.getLocationEngine() == null ? locationEngine :
+        if (locationComponent != null) {
+          locationComponent.setLocationEngine(locationComponent.getLocationEngine() == null ? locationEngine :
             null);
 
-          if (locationLayerPlugin.getLocationEngine() == null) {
+          if (locationComponent.getLocationEngine() == null) {
             fabToggle.setImageResource(R.drawable.ic_layers_clear);
             fabManualUpdate.setEnabled(true);
             fabManualUpdate.setAlpha(1f);
@@ -118,9 +118,9 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
     locationEngine.addLocationEngineListener(this);
     locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
     locationEngine.activate();
-    locationLayerPlugin = mapboxMap.getLocationLayerPlugin();
-    locationLayerPlugin.activateLocationLayerPlugin(this, locationEngine);
-    locationLayerPlugin.setRenderMode(RenderMode.COMPASS);
+    locationComponent = mapboxMap.getLocationComponent();
+    locationComponent.activateLocationComponent(this, locationEngine);
+    locationComponent.setRenderMode(RenderMode.COMPASS);
   }
 
   @Override

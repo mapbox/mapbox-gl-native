@@ -16,6 +16,6 @@
     <!--Minimum angular velocity required to start rotation animation-->
     <dimen name="mapbox_minimum_angular_velocity">0.025dp</dimen>
 
-    <dimen name="mapbox_locationLayerTrackingInitialMoveThreshold">25dp</dimen>
-    <dimen name="mapbox_locationLayerTrackingMultiFingerMoveThreshold">125dp</dimen>
+    <dimen name="mapbox_locationComponentTrackingInitialMoveThreshold">25dp</dimen>
+    <dimen name="mapbox_locationComponentTrackingMultiFingerMoveThreshold">125dp</dimen>
 </resources>

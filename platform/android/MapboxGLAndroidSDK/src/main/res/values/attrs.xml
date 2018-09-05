@@ -129,7 +129,7 @@
         </attr>
     </declare-styleable>
 
-    <declare-styleable name="mapbox_LocationLayer">
+    <declare-styleable name="mapbox_LocationComponent">
         <attr name="mapbox_foregroundDrawable" format="reference"/>
         <attr name="mapbox_foregroundTintColor" format="color"/>
         <attr name="mapbox_backgroundDrawable" format="reference"/>

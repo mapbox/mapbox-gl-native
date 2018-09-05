@@ -108,7 +108,7 @@
     <!-- Exposed colors -->
     <public name="mapbox_blue" type="color" />
 
-    <public name="mapbox_LocationLayer" type="style"/>
+    <public name="mapbox_LocationComponent" type="style"/>
 
     <public name="mapbox_foregroundDrawable" format="reference" type="attr"/>
     <public name="mapbox_foregroundTintColor" format="color" type="attr"/>

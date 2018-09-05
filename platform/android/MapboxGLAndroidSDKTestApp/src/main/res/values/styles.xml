@@ -38,7 +38,7 @@
 
     <style name="AppTheme" parent="AppBaseTheme" />
 
-    <style name="CustomLocationLayer" parent="mapbox_LocationLayer">
+    <style name="CustomLocationComponent" parent="mapbox_LocationComponent">
         <item name="mapbox_foregroundDrawable">@drawable/custom_user_icon</item>
 
         <item name="mapbox_bearingDrawable">@drawable/custom_user_arrow</item>

@@ -9,12 +9,12 @@
         android:title="Toggle custom Map style"
         app:showAsAction="never"/>
 
-    <item android:id="@+id/action_plugin_disable"
+    <item android:id="@+id/action_component_disable"
         android:title="Disable"
         app:showAsAction="never"/>
 
 
-    <item android:id="@+id/action_plugin_enabled"
+    <item android:id="@+id/action_component_enabled"
         android:title="Enabled"
         app:showAsAction="never"/>
 </menu>
