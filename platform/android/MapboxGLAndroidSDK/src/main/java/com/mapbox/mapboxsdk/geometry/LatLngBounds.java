@@ -331,7 +331,7 @@ public class LatLngBounds implements Parcelable {
     }
 
     if (latNorth < latSouth) {
-      throw new IllegalArgumentException("LatSouth cannot be less than latNorth");
+      throw new IllegalArgumentException("latNorth cannot be less than latSouth");
     }
   }
 

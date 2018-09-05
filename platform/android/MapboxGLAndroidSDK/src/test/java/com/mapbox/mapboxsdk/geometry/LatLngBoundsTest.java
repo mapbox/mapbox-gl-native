@@ -387,7 +387,7 @@ public class LatLngBoundsTest {
   @Test
   public void intersectSouthLessThanNorthCheck() {
     exception.expect(IllegalArgumentException.class);
-    exception.expectMessage("LatSouth cannot be less than latNorth");
+    exception.expectMessage("latNorth cannot be less than latSouth");
 
     LatLngBounds intersectLatLngBounds =
       LatLngBounds.from(10, 10, 0, 0)
@@ -594,7 +594,7 @@ public class LatLngBoundsTest {
   @Test
   public void unionSouthLessThanNorthCheck() {
     exception.expect(IllegalArgumentException.class);
-    exception.expectMessage("LatSouth cannot be less than latNorth");
+    exception.expectMessage("latNorth cannot be less than latSouth");
 
     LatLngBounds unionLatLngBounds =
       LatLngBounds.from(10, 10, 0, 0)
@@ -786,7 +786,7 @@ public class LatLngBoundsTest {
   @Test
   public void testConstructorCheckLatSouthGreaterLatNorth() {
     exception.expect(IllegalArgumentException.class);
-    exception.expectMessage("LatSouth cannot be less than latNorth");
+    exception.expectMessage("latNorth cannot be less than latSouth");
     LatLngBounds.from(0, 20, 20, 0);
   }
 }
