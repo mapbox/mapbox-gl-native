@@ -30,6 +30,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed a crash that occurred during power state changes. ([#12584](https://github.com/mapbox/mapbox-gl-native/pull/12584))
 * Fixed a crash related to telemetry upload. ([#12584](https://github.com/mapbox/mapbox-gl-native/pull/12584))
 * Fixed a cubic-bezier interpolation bug. ([#12812] (https://github.com/mapbox/mapbox-gl-native/issues/12812))
+* Fixed an issue that could cause "allow-overlap" symbols to fade in during pan operations instead of always showing. ([#12683] (https://github.com/mapbox/mapbox-gl-native/issues/12683))
 
 ## 4.3.0 - August 15, 2018
 

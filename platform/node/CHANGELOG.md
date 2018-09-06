@@ -6,6 +6,7 @@
 - Added support for rendering `symbol-placement: line-center` ([#12337](https://github.com/mapbox/mapbox-gl-native/pull/12337))
 - Add support for feature expressions in `line-pattern`, `fill-pattern`, and `fill-extrusion-pattern` properties. [#12284](https://github.com/mapbox/mapbox-gl-native/pull/12284)
 - Fixed a cubic-bezier interpolation bug. ([#12812] (https://github.com/mapbox/mapbox-gl-native/issues/12812))
+- Fixed an issue that could cause "allow-overlap" symbols to fade in during pan operations instead of always showing. ([#12683] (https://github.com/mapbox/mapbox-gl-native/issues/12683))
 
 # 3.5.8 - October 19, 2017
 - Fixes an issue that causes memory leaks when not deleting the frontend object
