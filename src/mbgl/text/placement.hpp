@@ -59,9 +59,27 @@ struct RetainedQueryData {
         , tileID(std::move(tileID_)) {}
 };
     
+class CollisionGroups {
+public:
+    using Predicate = std::function<bool(const IndexedSubfeature&)>;
+    using CollisionGroup = std::pair<uint16_t, optional<Predicate>>;
+    
+    CollisionGroups(const bool crossSourceCollisions_)
+        : maxGroupID(0)
+        , crossSourceCollisions(crossSourceCollisions_)
+    {}
+    
+    const CollisionGroup& get(const std::string& sourceID);
+    
+private:
+    std::map<std::string, CollisionGroup> collisionGroups;
+    uint16_t maxGroupID;
+    bool crossSourceCollisions;
+};
+    
 class Placement {
 public:
-    Placement(const TransformState&, MapMode mapMode);
+    Placement(const TransformState&, MapMode mapMode, const bool crossSourceCollisions);
     void placeLayer(RenderSymbolLayer&, const mat4&, bool showCollisionBoxes);
     void commit(const Placement& prevPlacement, TimePoint);
     void updateLayerOpacities(RenderSymbolLayer&);
@@ -86,7 +104,8 @@ private:
             const float pixelRatio,
             const bool showCollisionBoxes,
             std::unordered_set<uint32_t>& seenCrossTileIDs,
-            const bool holdingForFade);
+            const bool holdingForFade,
+            const CollisionGroups::CollisionGroup& collisionGroup);
 
     void updateBucketOpacities(SymbolBucket&, std::set<uint32_t>&);
 
@@ -103,6 +122,7 @@ private:
     bool stale = false;
     
     std::unordered_map<uint32_t, RetainedQueryData> retainedQueryData;
+    CollisionGroups collisionGroups;
 };
 
 } // namespace mbgl

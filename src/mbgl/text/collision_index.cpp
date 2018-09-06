@@ -89,7 +89,8 @@ std::pair<bool,bool> CollisionIndex::placeFeature(CollisionFeature& feature,
                                       const bool allowOverlap,
                                       const bool pitchWithMap,
                                       const bool collisionDebug,
-                                      const optional<CollisionTileBoundaries>& avoidEdges) {
+                                      const optional<CollisionTileBoundaries>& avoidEdges,
+                                      const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate) {
     if (!feature.alongLine) {
         CollisionBox& box = feature.boxes.front();
         const auto projectedPoint = projectAndGetPerspectiveRatio(posMatrix, box.anchor);
@@ -102,13 +103,13 @@ std::pair<bool,bool> CollisionIndex::placeFeature(CollisionFeature& feature,
 
         if ((avoidEdges && !isInsideTile(box, *avoidEdges)) ||
             !isInsideGrid(box) ||
-            (!allowOverlap && collisionGrid.hitTest({{ box.px1, box.py1 }, { box.px2, box.py2 }}))) {
+            (!allowOverlap && collisionGrid.hitTest({{ box.px1, box.py1 }, { box.px2, box.py2 }}, collisionGroupPredicate))) {
             return { false, false };
         }
 
         return {true, isOffscreen(box)};
     } else {
-        return placeLineFeature(feature, posMatrix, labelPlaneMatrix, textPixelRatio, symbol, scale, fontSize, allowOverlap, pitchWithMap, collisionDebug, avoidEdges);
+        return placeLineFeature(feature, posMatrix, labelPlaneMatrix, textPixelRatio, symbol, scale, fontSize, allowOverlap, pitchWithMap, collisionDebug, avoidEdges, collisionGroupPredicate);
     }
 }
 
@@ -122,7 +123,8 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
                                       const bool allowOverlap,
                                       const bool pitchWithMap,
                                       const bool collisionDebug,
-                                      const optional<CollisionTileBoundaries>& avoidEdges) {
+                                      const optional<CollisionTileBoundaries>& avoidEdges,
+                                      const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate) {
 
     const auto tileUnitAnchorPoint = symbol.anchorPoint;
     const auto projectedAnchor = projectAnchor(posMatrix, tileUnitAnchorPoint);
@@ -222,7 +224,7 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
         inGrid |= isInsideGrid(circle);
 
         if ((avoidEdges && !isInsideTile(circle, *avoidEdges)) ||
-            (!allowOverlap && collisionGrid.hitTest({{circle.px, circle.py}, circle.radius}))) {
+            (!allowOverlap && collisionGrid.hitTest({{circle.px, circle.py}, circle.radius}, collisionGroupPredicate))) {
             if (!collisionDebug) {
                 return {false, false};
             } else {
@@ -237,7 +239,7 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
 }
 
 
-void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlacement, uint32_t bucketInstanceId) {
+void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlacement, uint32_t bucketInstanceId, uint16_t collisionGroupId) {
     if (feature.alongLine) {
         for (auto& circle : feature.boxes) {
             if (!circle.used) {
@@ -245,18 +247,30 @@ void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlaceme
             }
 
             if (ignorePlacement) {
-                ignoredGrid.insert(IndexedSubfeature(feature.indexedFeature, bucketInstanceId), {{ circle.px, circle.py }, circle.radius});
+                ignoredGrid.insert(
+                    IndexedSubfeature(feature.indexedFeature, bucketInstanceId, collisionGroupId),
+                    {{ circle.px, circle.py }, circle.radius}
+                );
             } else {
-                collisionGrid.insert(IndexedSubfeature(feature.indexedFeature, bucketInstanceId), {{ circle.px, circle.py }, circle.radius});
+                collisionGrid.insert(
+                    IndexedSubfeature(feature.indexedFeature, bucketInstanceId, collisionGroupId),
+                    {{ circle.px, circle.py }, circle.radius}
+                );
             }
         }
     } else {
         assert(feature.boxes.size() == 1);
         auto& box = feature.boxes[0];
         if (ignorePlacement) {
-            ignoredGrid.insert(IndexedSubfeature(feature.indexedFeature, bucketInstanceId), {{ box.px1, box.py1 }, { box.px2, box.py2 }});
+            ignoredGrid.insert(
+                IndexedSubfeature(feature.indexedFeature, bucketInstanceId, collisionGroupId),
+                {{ box.px1, box.py1 }, { box.px2, box.py2 }}
+            );
         } else {
-            collisionGrid.insert(IndexedSubfeature(feature.indexedFeature, bucketInstanceId), {{ box.px1, box.py1 }, { box.px2, box.py2 }});
+            collisionGrid.insert(
+                IndexedSubfeature(feature.indexedFeature, bucketInstanceId, collisionGroupId),
+                {{ box.px1, box.py1 }, { box.px2, box.py2 }}
+            );
         }
     }
 }
