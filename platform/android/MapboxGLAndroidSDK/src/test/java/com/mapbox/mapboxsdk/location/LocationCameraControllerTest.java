@@ -40,6 +40,7 @@ public class LocationCameraControllerTest {
     LocationComponentOptions options = mock(LocationComponentOptions.class);
     float moveThreshold = 5f;
     when(options.trackingInitialMoveThreshold()).thenReturn(moveThreshold);
+    when(options.trackingGesturesManagement()).thenReturn(true);
     camera.initializeOptions(options);
 
     camera.setCameraMode(CameraMode.TRACKING_GPS);
@@ -48,14 +49,32 @@ public class LocationCameraControllerTest {
   }
 
   @Test
+  public void setCameraMode_gestureThresholdNotAdjustedWhenDisabled() {
+    MoveGestureDetector moveGestureDetector = mock(MoveGestureDetector.class);
+    LocationCameraController camera = buildCamera(moveGestureDetector);
+    LocationComponentOptions options = mock(LocationComponentOptions.class);
+    float moveThreshold = 5f;
+    when(options.trackingInitialMoveThreshold()).thenReturn(moveThreshold);
+    when(options.trackingGesturesManagement()).thenReturn(false);
+    camera.initializeOptions(options);
+
+    camera.setCameraMode(CameraMode.TRACKING_GPS);
+
+    verify(moveGestureDetector, times(0)).setMoveThreshold(moveThreshold);
+    verify(moveGestureDetector, times(0)).setMoveThreshold(0f);
+  }
+
+  @Test
   public void setCameraMode_gestureThresholdIsResetWhenNotTracking() {
     MoveGestureDetector moveGestureDetector = mock(MoveGestureDetector.class);
     LocationCameraController camera = buildCamera(moveGestureDetector);
-    camera.initializeOptions(mock(LocationComponentOptions.class));
+    LocationComponentOptions options = mock(LocationComponentOptions.class);
+    when(options.trackingGesturesManagement()).thenReturn(true);
+    camera.initializeOptions(options);
 
     camera.setCameraMode(CameraMode.NONE);
 
-    verify(moveGestureDetector).setMoveThreshold(0f);
+    verify(moveGestureDetector, times(2)).setMoveThreshold(0f); // one for initialization
   }
 
   @Test
@@ -180,7 +199,9 @@ public class LocationCameraControllerTest {
     when(projection.toScreenLocation(any(LatLng.class))).thenReturn(pointF);
     when(mapboxMap.getProjection()).thenReturn(projection);
     LocationCameraController camera = buildCamera(mapboxMap);
-    camera.initializeOptions(mock(LocationComponentOptions.class));
+    LocationComponentOptions options = mock(LocationComponentOptions.class);
+    when(options.trackingGesturesManagement()).thenReturn(true);
+    camera.initializeOptions(options);
     camera.setCameraMode(CameraMode.TRACKING);
     LatLng latLng = mock(LatLng.class);
 
@@ -310,14 +331,41 @@ public class LocationCameraControllerTest {
     verify(mapboxMap).moveCamera(any(CameraUpdate.class));
   }
 
+  @Test
+  public void gesturesManagement_enabled() {
+    MapboxMap mapboxMap = mock(MapboxMap.class);
+    AndroidGesturesManager initialGesturesManager = mock(AndroidGesturesManager.class);
+    AndroidGesturesManager internalGesturesManager = mock(AndroidGesturesManager.class);
+    LocationCameraController camera = buildCamera(mapboxMap, initialGesturesManager, internalGesturesManager);
+    LocationComponentOptions options = mock(LocationComponentOptions.class);
+    when(options.trackingGesturesManagement()).thenReturn(true);
+    camera.initializeOptions(options);
+
+    verify(mapboxMap).setGesturesManager(internalGesturesManager, true, true);
+  }
+
+  @Test
+  public void gesturesManagement_disabled() {
+    MapboxMap mapboxMap = mock(MapboxMap.class);
+    AndroidGesturesManager initialGesturesManager = mock(AndroidGesturesManager.class);
+    AndroidGesturesManager internalGesturesManager = mock(AndroidGesturesManager.class);
+    LocationCameraController camera = buildCamera(mapboxMap, initialGesturesManager, internalGesturesManager);
+    LocationComponentOptions options = mock(LocationComponentOptions.class);
+    when(options.trackingGesturesManagement()).thenReturn(false);
+    camera.initializeOptions(options);
+
+    verify(mapboxMap).setGesturesManager(initialGesturesManager, true, true);
+  }
+
   private LocationCameraController buildCamera(OnCameraTrackingChangedListener onCameraTrackingChangedListener) {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getUiSettings()).thenReturn(mock(UiSettings.class));
     MoveGestureDetector moveGestureDetector = mock(MoveGestureDetector.class);
     OnCameraMoveInvalidateListener onCameraMoveInvalidateListener = mock(OnCameraMoveInvalidateListener.class);
-    AndroidGesturesManager androidGesturesManager = mock(AndroidGesturesManager.class);
+    AndroidGesturesManager initialGesturesManager = mock(AndroidGesturesManager.class);
+    AndroidGesturesManager internalGesturesManager = mock(AndroidGesturesManager.class);
     return new LocationCameraController(mapboxMap, moveGestureDetector,
-      onCameraTrackingChangedListener, onCameraMoveInvalidateListener, androidGesturesManager);
+      onCameraTrackingChangedListener, onCameraMoveInvalidateListener, initialGesturesManager, internalGesturesManager);
   }
 
   private LocationCameraController buildCamera(MoveGestureDetector moveGestureDetector) {
@@ -325,17 +373,28 @@ public class LocationCameraControllerTest {
     when(mapboxMap.getUiSettings()).thenReturn(mock(UiSettings.class));
     OnCameraTrackingChangedListener onCameraTrackingChangedListener = mock(OnCameraTrackingChangedListener.class);
     OnCameraMoveInvalidateListener onCameraMoveInvalidateListener = mock(OnCameraMoveInvalidateListener.class);
-    AndroidGesturesManager androidGesturesManager = mock(AndroidGesturesManager.class);
+    AndroidGesturesManager initialGesturesManager = mock(AndroidGesturesManager.class);
+    AndroidGesturesManager internalGesturesManager = mock(AndroidGesturesManager.class);
     return new LocationCameraController(mapboxMap, moveGestureDetector,
-      onCameraTrackingChangedListener, onCameraMoveInvalidateListener, androidGesturesManager);
+      onCameraTrackingChangedListener, onCameraMoveInvalidateListener, initialGesturesManager, internalGesturesManager);
   }
 
   private LocationCameraController buildCamera(MapboxMap mapboxMap) {
     MoveGestureDetector moveGestureDetector = mock(MoveGestureDetector.class);
     OnCameraTrackingChangedListener onCameraTrackingChangedListener = mock(OnCameraTrackingChangedListener.class);
     OnCameraMoveInvalidateListener onCameraMoveInvalidateListener = mock(OnCameraMoveInvalidateListener.class);
-    AndroidGesturesManager androidGesturesManager = mock(AndroidGesturesManager.class);
+    AndroidGesturesManager initialGesturesManager = mock(AndroidGesturesManager.class);
+    AndroidGesturesManager internalGesturesManager = mock(AndroidGesturesManager.class);
     return new LocationCameraController(mapboxMap, moveGestureDetector,
-      onCameraTrackingChangedListener, onCameraMoveInvalidateListener, androidGesturesManager);
+      onCameraTrackingChangedListener, onCameraMoveInvalidateListener, initialGesturesManager, internalGesturesManager);
+  }
+
+  private LocationCameraController buildCamera(MapboxMap mapboxMap, AndroidGesturesManager initialGesturesManager,
+                                               AndroidGesturesManager internalGesturesManager) {
+    MoveGestureDetector moveGestureDetector = mock(MoveGestureDetector.class);
+    OnCameraTrackingChangedListener onCameraTrackingChangedListener = mock(OnCameraTrackingChangedListener.class);
+    OnCameraMoveInvalidateListener onCameraMoveInvalidateListener = mock(OnCameraMoveInvalidateListener.class);
+    return new LocationCameraController(mapboxMap, moveGestureDetector,
+      onCameraTrackingChangedListener, onCameraMoveInvalidateListener, initialGesturesManager, internalGesturesManager);
   }
 }
