@@ -4,6 +4,8 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+- Fixed a cubic-bezier interpolation bug. ([#12812] (https://github.com/mapbox/mapbox-gl-native/issues/12812))
+
 ## 6.5.0-beta.1 - September 5, 2018
  - Retain shared thread pool reference [#12811](https://github.com/mapbox/mapbox-gl-native/pull/12811)
  - MapStrictMode configuration [#12817](https://github.com/mapbox/mapbox-gl-native/pull/12817)
