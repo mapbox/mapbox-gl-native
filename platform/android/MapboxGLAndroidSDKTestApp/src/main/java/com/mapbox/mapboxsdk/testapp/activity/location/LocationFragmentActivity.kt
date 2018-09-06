@@ -102,6 +102,7 @@ class LocationFragmentActivity : AppCompatActivity() {
         mapboxMap = it
         component = mapboxMap.locationComponent
         component?.activateLocationComponent(activity)
+        component?.isLocationComponentEnabled = true
         component?.locationEngine?.addLocationEngineListener(this)
       }
     }

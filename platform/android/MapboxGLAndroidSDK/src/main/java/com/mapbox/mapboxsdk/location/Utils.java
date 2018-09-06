@@ -23,20 +23,20 @@ public final class Utils {
   }
 
   /**
-   * Util for finding the shortest path from the current icon rotated degree to the new degree.
+   * Util for finding the shortest path from the current rotated degree to the new degree.
    *
-   * @param magneticHeading         the new position of the rotation
-   * @param previousMagneticHeading the current position of the rotation
+   * @param heading         the new position of the rotation
+   * @param previousHeading the current position of the rotation
    * @return the shortest degree of rotation possible
    */
-  public static float shortestRotation(float magneticHeading, float previousMagneticHeading) {
-    double diff = previousMagneticHeading - magneticHeading;
+  public static float shortestRotation(float heading, float previousHeading) {
+    double diff = previousHeading - heading;
     if (diff > 180.0f) {
-      magneticHeading += 360.0f;
+      heading += 360.0f;
     } else if (diff < -180.0f) {
-      magneticHeading -= 360.f;
+      heading -= 360.f;
     }
-    return magneticHeading;
+    return heading;
   }
 
   static Bitmap getBitmapFromDrawable(Drawable drawable) {

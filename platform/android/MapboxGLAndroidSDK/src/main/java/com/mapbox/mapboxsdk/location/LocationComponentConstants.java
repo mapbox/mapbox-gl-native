@@ -5,12 +5,6 @@ package com.mapbox.mapboxsdk.location;
  */
 final class LocationComponentConstants {
 
-  static final String STATE_LOCATION_ENABLED = "mapbox_location_locationEnabled";
-  static final String STATE_LOCATION_OPTIONS = "mapbox_location_options";
-  static final String STATE_LOCATION_LAST_LOCATION = "mapbox_location_lastLocation";
-  static final String STATE_LOCATION_RENDER_MODE = "mapbox_location_renderMode";
-  static final String STATE_LOCATION_CAMERA_MODE = "mapbox_location_cameraMode";
-
   // Controls the compass update rate in milliseconds
   static final int COMPASS_UPDATE_RATE_MS = 500;
 

@@ -22,13 +22,13 @@ import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.location.OnLocationClickListener;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.location.LocationComponentOptions;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.OnCameraTrackingChangedListener;
-import com.mapbox.mapboxsdk.location.OnLocationComponentClickListener;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LocationModesActivity extends AppCompatActivity implements OnMapReadyCallback,
-  LocationEngineListener, OnLocationComponentClickListener, OnCameraTrackingChangedListener {
+  LocationEngineListener, OnLocationClickListener, OnCameraTrackingChangedListener {
 
   private MapView mapView;
   private Button locationModeBtn;
@@ -50,7 +50,17 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
   private MapboxMap mapboxMap;
   private boolean customStyle;
 
-  private Bundle savedInstanceState;
+  private static final String SAVED_STATE_CAMERA = "saved_state_camera";
+  private static final String SAVED_STATE_RENDER = "saved_state_render";
+  private static final String SAVED_STATE_LOCATION = "saved_state_location";
+
+  @CameraMode.Mode
+  private int cameraMode = CameraMode.TRACKING;
+
+  @RenderMode.Mode
+  private int renderMode = RenderMode.NORMAL;
+
+  private Location lastLocation;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +91,13 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
       }
     });
 
+
+    if (savedInstanceState != null) {
+      cameraMode = savedInstanceState.getInt(SAVED_STATE_CAMERA);
+      renderMode = savedInstanceState.getInt(SAVED_STATE_RENDER);
+      lastLocation = savedInstanceState.getParcelable(SAVED_STATE_LOCATION);
+    }
+
     mapView.onCreate(savedInstanceState);
 
     if (PermissionsManager.areLocationPermissionsGranted(this)) {
@@ -104,8 +121,6 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
       });
       permissionsManager.requestLocationPermissions(this);
     }
-
-    this.savedInstanceState = savedInstanceState;
   }
 
   @Override
@@ -125,11 +140,26 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
     locationEngine.addLocationEngineListener(this);
     locationEngine.activate();
 
+    int[] padding;
+    if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+      padding = new int[] {0, 750, 0, 0};
+    } else {
+      padding = new int[] {0, 250, 0, 0};
+    }
+
+    LocationComponentOptions options = LocationComponentOptions.builder(this)
+      .padding(padding)
+      .layerBelow("waterway-label")
+      .build();
+
     locationComponent = mapboxMap.getLocationComponent();
+    locationComponent.activateLocationComponent(this, locationEngine, options);
+    locationComponent.setLocationComponentEnabled(true);
     locationComponent.addOnLocationClickListener(this);
     locationComponent.addOnCameraTrackingChangedListener(this);
-
-    activateLocationComponent();
+    locationComponent.setCameraMode(cameraMode);
+    setRendererMode(renderMode);
+    locationComponent.forceLocationUpdate(lastLocation);
   }
 
   @Override
@@ -153,10 +183,10 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
       toggleMapStyle();
       return true;
     } else if (id == R.id.action_component_disable) {
-      locationComponent.deactivateLocationComponent();
+      locationComponent.setLocationComponentEnabled(false);
       return true;
     } else if (id == R.id.action_component_enabled) {
-      activateLocationComponent();
+      locationComponent.setLocationComponentEnabled(true);
       return true;
     } else if (id == R.id.action_gestures_management_disabled) {
       disableGesturesManagement();
@@ -167,35 +197,6 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
     }
 
     return super.onOptionsItemSelected(item);
-  }
-
-  private void activateLocationComponent() {
-    if (locationComponent != null) {
-      int[] padding;
-      if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-        padding = new int[] {0, 750, 0, 0};
-      } else {
-        padding = new int[] {0, 250, 0, 0};
-      }
-
-      if (savedInstanceState == null) {
-        LocationComponentOptions options = LocationComponentOptions.builder(this)
-          .padding(padding)
-          .layerBelow("waterway-label")
-          .build();
-
-        locationComponent.activateLocationComponent(locationEngine, options);
-      } else {
-        LocationComponentOptions options = locationComponent
-          .getLocationComponentOptions()
-          .toBuilder()
-          .padding(padding)
-          .build();
-
-        locationComponent.setLocationEngine(locationEngine);
-        locationComponent.applyStyle(options);
-      }
-    }
   }
 
   private void toggleStyle() {
@@ -265,10 +266,16 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
     }
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
     mapView.onSaveInstanceState(outState);
+    outState.putInt(SAVED_STATE_CAMERA, cameraMode);
+    outState.putInt(SAVED_STATE_RENDER, renderMode);
+    if (locationComponent != null) {
+      outState.putParcelable(SAVED_STATE_LOCATION, locationComponent.getLastKnownLocation());
+    }
   }
 
   @Override
@@ -299,7 +306,7 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
 
   @Override
   public void onLocationComponentClick() {
-    Toast.makeText(this, "OnlocationComponentClick", Toast.LENGTH_LONG).show();
+    Toast.makeText(this, "OnLocationComponentClick", Toast.LENGTH_LONG).show();
   }
 
   private void showModeListDialog() {
@@ -328,6 +335,7 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
   }
 
   private void setRendererMode(@RenderMode.Mode int mode) {
+    renderMode = mode;
     locationComponent.setRenderMode(mode);
     if (mode == RenderMode.NORMAL) {
       locationModeBtn.setText("Normal");
@@ -392,6 +400,7 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
 
   @Override
   public void onCameraTrackingChanged(int currentMode) {
+    this.cameraMode = currentMode;
     if (currentMode == CameraMode.NONE) {
       locationTrackingBtn.setText("None");
     } else if (currentMode == CameraMode.TRACKING) {

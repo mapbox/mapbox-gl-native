@@ -84,6 +84,7 @@ public class LocationMapChangeActivity extends AppCompatActivity implements OnMa
   private void activateLocationComponent() {
     LocationComponent locationComponent = mapboxMap.getLocationComponent();
     locationComponent.activateLocationComponent(this);
+    locationComponent.setLocationComponentEnabled(true);
     locationComponent.setRenderMode(RenderMode.COMPASS);
   }
 

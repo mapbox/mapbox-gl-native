@@ -76,6 +76,7 @@ class LocationLayerControllerTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                                uiController: UiController, context: Context) {
         component.activateLocationComponent(context, false)
+        component.isLocationComponentEnabled = true
         component.renderMode = RenderMode.NORMAL
         uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
         assertThat(mapboxMap.getSource(LOCATION_SOURCE), notNullValue())
@@ -94,6 +95,7 @@ class LocationLayerControllerTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                                uiController: UiController, context: Context) {
         component.activateLocationComponent(context, false)
+        component.isLocationComponentEnabled = true
         component.renderMode = RenderMode.NORMAL
         component.forceLocationUpdate(location)
         mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
@@ -113,6 +115,7 @@ class LocationLayerControllerTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                                uiController: UiController, context: Context) {
         component.activateLocationComponent(context, false)
+        component.isLocationComponentEnabled = true
         component.renderMode = RenderMode.COMPASS
         component.forceLocationUpdate(location)
         mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
@@ -132,6 +135,7 @@ class LocationLayerControllerTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                                uiController: UiController, context: Context) {
         component.activateLocationComponent(context, false)
+        component.isLocationComponentEnabled = true
         component.renderMode = RenderMode.GPS
         component.forceLocationUpdate(location)
         mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
@@ -151,9 +155,10 @@ class LocationLayerControllerTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                                uiController: UiController, context: Context) {
         component.activateLocationComponent(context, false)
+        component.isLocationComponentEnabled = true
         component.forceLocationUpdate(location)
         mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
-        component.deactivateLocationComponent()
+        component.isLocationComponentEnabled = false
         mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER, shouldDisappear = true)
         component.renderMode = RenderMode.GPS
         uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
@@ -173,10 +178,11 @@ class LocationLayerControllerTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                                uiController: UiController, context: Context) {
         component.activateLocationComponent(context, false)
+        component.isLocationComponentEnabled = true
         component.renderMode = RenderMode.NORMAL
         component.forceLocationUpdate(location)
         mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
-        component.deactivateLocationComponent()
+        component.isLocationComponentEnabled = false
         mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER, shouldDisappear = true)
         uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
 
@@ -197,6 +203,7 @@ class LocationLayerControllerTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                                uiController: UiController, context: Context) {
         component.activateLocationComponent(context, false)
+        component.isLocationComponentEnabled = true
         component.renderMode = RenderMode.NORMAL
         component.forceLocationUpdate(location)
         mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
@@ -228,6 +235,7 @@ class LocationLayerControllerTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                                uiController: UiController, context: Context) {
         component.activateLocationComponent(context, false)
+        component.isLocationComponentEnabled = true
         component.applyStyle(LocationComponentOptions.builder(context).staleStateTimeout(100).build())
         component.forceLocationUpdate(location)
         mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
@@ -252,6 +260,7 @@ class LocationLayerControllerTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                                uiController: UiController, context: Context) {
         component.activateLocationComponent(context, false)
+        component.isLocationComponentEnabled = true
         component.applyStyle(LocationComponentOptions.builder(context).staleStateTimeout(1).build())
         styleChangeIdlingResource.waitForStyle((rule.activity as SingleActivity).mapView, mapboxMap, MAPBOX_HEAVY_STYLE)
         pushSourceUpdates(styleChangeIdlingResource) {
@@ -272,12 +281,9 @@ class LocationLayerControllerTest : BaseActivityTest() {
                                                uiController: UiController, context: Context) {
         styleChangeIdlingResource.waitForStyle((rule.activity as SingleActivity).mapView, mapboxMap, MAPBOX_HEAVY_STYLE)
         var show = true
+        component.activateLocationComponent(context, false)
         pushSourceUpdates(styleChangeIdlingResource) {
-          if (show) {
-            component.activateLocationComponent(context, false)
-          } else {
-            component.deactivateLocationComponent()
-          }
+          component.isLocationComponentEnabled = show
           show = !show
         }
 
@@ -296,6 +302,7 @@ class LocationLayerControllerTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                                uiController: UiController, context: Context) {
         component.activateLocationComponent(context, false)
+        component.isLocationComponentEnabled = true
         mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location), 16.0))
         component.forceLocationUpdate(location)
         mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
@@ -315,6 +322,7 @@ class LocationLayerControllerTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                                uiController: UiController, context: Context) {
         component.activateLocationComponent(context, false)
+        component.isLocationComponentEnabled = true
         component.forceLocationUpdate(location)
         mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
         mapboxMap.easeCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location), 16.0), 300)
@@ -334,6 +342,7 @@ class LocationLayerControllerTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                                uiController: UiController, context: Context) {
         component.activateLocationComponent(context, false)
+        component.isLocationComponentEnabled = true
         uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
         component.forceLocationUpdate(location)
         uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)

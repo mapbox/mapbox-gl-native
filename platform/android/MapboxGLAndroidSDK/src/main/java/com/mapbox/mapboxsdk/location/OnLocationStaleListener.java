@@ -9,5 +9,9 @@ package com.mapbox.mapboxsdk.location;
  */
 public interface OnLocationStaleListener {
 
+  /**
+   * Called when the stale state changes.
+   * @param isStale true if location is stale, false otherwise
+   */
   void onStaleStateChange(boolean isStale);
 }

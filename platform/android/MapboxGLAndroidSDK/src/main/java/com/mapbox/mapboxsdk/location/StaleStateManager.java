@@ -3,9 +3,9 @@ package com.mapbox.mapboxsdk.location;
 import android.os.Handler;
 
 /**
- * Class controls the location layer stale state when the {@link android.location.Location} hasn't
+ * Class controls the location stale state when the {@link android.location.Location} hasn't
  * been updated in 'x' amount of time. {@link LocationComponentOptions#staleStateTimeout()} can be used to
- * control the amount of time before the locations considered stale.
+ * control the amount of time before the location's considered stale.
  * {@link LocationComponentOptions#enableStaleState()} is available for disabling this behaviour.
  */
 class StaleStateManager {

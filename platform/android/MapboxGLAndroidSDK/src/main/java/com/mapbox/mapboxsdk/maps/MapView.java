@@ -200,7 +200,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     compassView.setOnClickListener(createCompassClickListener(cameraChangeDispatcher));
 
     // LocationComponent
-    mapboxMap.injectLocationComponent(new LocationComponent(context, mapboxMap));
+    mapboxMap.injectLocationComponent(new LocationComponent(mapboxMap));
 
     // inject widgets with MapboxMap
     attrView.setOnClickListener(new AttributionClickListener(context, mapboxMap));
@@ -1224,7 +1224,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
     @Override
     public void onMapChanged(@MapChange int change) {
-      if (change == WILL_START_LOADING_MAP) {
+      if (change == WILL_START_LOADING_MAP && !initialLoad) {
         mapboxMap.onStartLoadingMap();
       } else if (change == DID_FINISH_LOADING_STYLE) {
         if (initialLoad) {
@@ -1232,8 +1232,9 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
           mapboxMap.onPreMapReady();
           onMapReady();
           mapboxMap.onPostMapReady();
+        } else {
+          mapboxMap.onFinishLoadingStyle();
         }
-        mapboxMap.onFinishLoadingStyle();
       } else if (change == DID_FINISH_RENDERING_FRAME || change == DID_FINISH_RENDERING_FRAME_FULLY_RENDERED) {
         mapboxMap.onUpdateFullyRendered();
       } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE || change == DID_FINISH_LOADING_MAP) {
