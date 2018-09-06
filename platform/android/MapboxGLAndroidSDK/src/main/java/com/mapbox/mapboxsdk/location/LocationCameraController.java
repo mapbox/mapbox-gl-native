@@ -54,13 +54,14 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
                            MoveGestureDetector moveGestureDetector,
                            OnCameraTrackingChangedListener internalCameraTrackingChangedListener,
                            OnCameraMoveInvalidateListener onCameraMoveInvalidateListener,
-                           AndroidGesturesManager androidGesturesManager) {
+                           AndroidGesturesManager initialGesturesManager,
+                           AndroidGesturesManager internalGesturesManager) {
     this.mapboxMap = mapboxMap;
     this.moveGestureDetector = moveGestureDetector;
     this.internalCameraTrackingChangedListener = internalCameraTrackingChangedListener;
     this.onCameraMoveInvalidateListener = onCameraMoveInvalidateListener;
-    this.internalGesturesManager = androidGesturesManager;
-    this.initialGesturesManager = androidGesturesManager;
+    this.internalGesturesManager = internalGesturesManager;
+    this.initialGesturesManager = initialGesturesManager;
   }
 
   void initializeOptions(LocationComponentOptions options) {

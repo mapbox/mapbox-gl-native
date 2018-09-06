@@ -36,5 +36,6 @@
   "TextureViewTransparentBackgroundActivity",
   "SimpleMapActivity",
   "RenderTestActivity",
-  "SymbolLayerActivity"
+  "SymbolLayerActivity",
+  "LocationFragmentActivity"
 ]

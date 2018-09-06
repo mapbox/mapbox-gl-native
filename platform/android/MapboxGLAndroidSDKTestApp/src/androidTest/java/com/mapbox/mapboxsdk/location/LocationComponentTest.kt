@@ -210,6 +210,7 @@ class LocationComponentTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                              uiController: UiController, context: Context) {
         component.activateLocationComponent(context,
+          null,
           LocationComponentOptions.builder(context)
             .staleStateTimeout(200)
             .enableStaleState(false)
@@ -238,6 +239,7 @@ class LocationComponentTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                              uiController: UiController, context: Context) {
         component.activateLocationComponent(context,
+          null,
           LocationComponentOptions.builder(context)
             .foregroundName("custom-foreground-bitmap")
             .backgroundName("custom-background-bitmap")
@@ -278,6 +280,7 @@ class LocationComponentTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                              uiController: UiController, context: Context) {
         component.activateLocationComponent(context,
+          null,
           LocationComponentOptions.builder(context)
             .foregroundName("custom-foreground-bitmap")
             .gpsName("custom-gps-bitmap")
@@ -307,6 +310,7 @@ class LocationComponentTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                              uiController: UiController, context: Context) {
         component.activateLocationComponent(context,
+          null,
           LocationComponentOptions.builder(context)
             .foregroundName("custom-foreground-bitmap")
             .gpsName("custom-gps-bitmap")
@@ -338,6 +342,7 @@ class LocationComponentTest : BaseActivityTest() {
                                              uiController: UiController, context: Context) {
 
         component.activateLocationComponent(context,
+          null,
           LocationComponentOptions.builder(context)
             .gpsName("custom-gps-bitmap")
             .build())
@@ -367,6 +372,7 @@ class LocationComponentTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                              uiController: UiController, context: Context) {
         component.activateLocationComponent(context,
+          null,
           LocationComponentOptions.builder(context)
             .staleStateTimeout(200)
             .build())
@@ -421,6 +427,7 @@ class LocationComponentTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                              uiController: UiController, context: Context) {
         component.activateLocationComponent(context,
+          null,
           LocationComponentOptions.builder(context)
             .accuracyColor(color)
             .build())
