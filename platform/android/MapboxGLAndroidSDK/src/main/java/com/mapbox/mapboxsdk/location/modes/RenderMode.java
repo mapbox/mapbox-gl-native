@@ -19,7 +19,7 @@ public final class RenderMode {
 
   /**
    * One of these constants should be used with {@link LocationComponent#setRenderMode(int)}.
-   * mode can be switched at anytime by calling the {@code setLocationLayerMode} method passing
+   * Mode can be switched at anytime by calling the {@code setLocationLayerMode} method passing
    * in the new mode you'd like the location layer to be in.
    */
   @IntDef( {COMPASS, GPS, NORMAL})

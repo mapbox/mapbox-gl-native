@@ -19,11 +19,11 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import java.util.Arrays;
 
 /**
- * This class exposes options for the Location Layer Plugin. The options can be set by defining a
+ * This class exposes options for the Location Component. The options can be set by defining a
  * style in your apps style.xml file and passing in directly into the {@link LocationComponent}
  * class. Alternatively, if properties need to be changed at runtime depending on a specific state,
  * you can build an instance of this class, setting the values you desire, and then passing it into
- * either the {@link LocationComponent} constructor (if it isn't initialized yet) or
+ * either the {@link LocationComponent} activation method (if it isn't initialized yet) or
  * {@link LocationComponent#applyStyle(LocationComponentOptions)}.
  * <p>
  * When the {@link #createFromAttributes(Context, int)} methods called, any attributes not found
@@ -35,7 +35,7 @@ import java.util.Arrays;
  * get the currently used options object using {@link LocationComponent#getLocationComponentOptions()}
  * and it's {@code toBuilder} method to modify a single entry while also maintaining the other
  * settings. Once your modifications have been made, you'll need to pass it back into the location
- * layer plugin using {@link LocationComponent#applyStyle(LocationComponentOptions)}.
+ * component using {@link LocationComponent#applyStyle(LocationComponentOptions)}.
  */
 public class LocationComponentOptions implements Parcelable {
 
@@ -72,7 +72,7 @@ public class LocationComponentOptions implements Parcelable {
   /**
    * The default value which is used when the stale state is enabled
    */
-  private static final long STALE_STATE_DELAY_MS = 30000;
+  private static final long STALE_STATE_DELAY_MS = 30_000L;
 
   private float accuracyAlpha;
   private int accuracyColor;
@@ -175,7 +175,7 @@ public class LocationComponentOptions implements Parcelable {
   }
 
   /**
-   * Construct a new Location Layer Options class using the attributes found within a style
+   * Construct a new Location Component Options class using the attributes found within a style
    * resource. It's important to note that you only need to define the attributes you plan to
    * change and can safely ignore the other attributes which will be set to their default value.
    *
@@ -300,8 +300,7 @@ public class LocationComponentOptions implements Parcelable {
    * with all the values set matching the values in this instance. This allows you to modify a
    * single attribute and then rebuild the object.
    *
-   * @return the Location Layer builder which contains the values defined in this current instance
-   * as defaults.
+   * @return the builder which contains the values defined in this current instance as defaults.
    */
   public Builder toBuilder() {
     return new Builder(this);
@@ -313,8 +312,7 @@ public class LocationComponentOptions implements Parcelable {
    * attributes while leaving the rest alone and maintaining their default behavior.
    *
    * @param context your activities context used to acquire the style resource
-   * @return the Location Layer builder which contains the default values defined by the style
-   * resource
+   * @return the builder which contains the default values defined by the style resource
    */
   public static Builder builder(Context context) {
     return LocationComponentOptions.createFromAttributes(context,
@@ -326,7 +324,7 @@ public class LocationComponentOptions implements Parcelable {
    * completely transparent and 1 means the view is completely opaque.
    *
    * @return the opacity of the accuracy view
-   * @attr ref R.styleable#LocationLayer_accuracyAlpha
+   * @attr ref R.styleable#LocationComponent_accuracyAlpha
    */
   public float accuracyAlpha() {
     return accuracyAlpha;
@@ -336,7 +334,7 @@ public class LocationComponentOptions implements Parcelable {
    * Solid color to use as the accuracy view color property.
    *
    * @return the color of the accuracy view
-   * @attr ref R.styleable#LocationLayer_accuracyColor
+   * @attr ref R.styleable#LocationComponent_accuracyColor
    */
   @ColorInt
   public int accuracyColor() {
@@ -347,7 +345,7 @@ public class LocationComponentOptions implements Parcelable {
    * Defines the drawable used for the stale background icon.
    *
    * @return the drawable resource ID
-   * @attr ref R.styleable#LocationLayer_backgroundDrawableStale
+   * @attr ref R.styleable#LocationComponent_backgroundDrawableStale
    */
   @DrawableRes
   public int backgroundDrawableStale() {
@@ -357,7 +355,7 @@ public class LocationComponentOptions implements Parcelable {
   /**
    * String image name, identical to one used in
    * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
-   * plugin, will used this image in place of the provided or default mapbox_foregroundDrawableStale.
+   * component, will use this image in place of the provided or default mapbox_foregroundDrawableStale.
    * <p>
    * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
    * with certain styles.  Note, this will fail if the provided icon name is not provided by the loaded map style.
@@ -374,7 +372,7 @@ public class LocationComponentOptions implements Parcelable {
    * Defines the drawable used for the stale foreground icon.
    *
    * @return the drawable resource ID
-   * @attr ref R.styleable#LocationLayer_foregroundDrawableStale
+   * @attr ref R.styleable#LocationComponent_foregroundDrawableStale
    */
   @DrawableRes
   public int foregroundDrawableStale() {
@@ -384,7 +382,7 @@ public class LocationComponentOptions implements Parcelable {
   /**
    * String image name, identical to one used in
    * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
-   * plugin, will used this image in place of the provided or default mapbox_foregroundDrawableStale.
+   * component, will used this image in place of the provided or default mapbox_foregroundDrawableStale.
    * <p>
    * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
    * with certain styles.  Note, this will fail if the provided icon name is not provided by the loaded map style.
@@ -401,7 +399,7 @@ public class LocationComponentOptions implements Parcelable {
    * Defines the drawable used for the navigation state icon.
    *
    * @return the drawable resource ID
-   * @attr ref R.styleable#LocationLayer_gpsDrawable
+   * @attr ref R.styleable#LocationComponent_gpsDrawable
    */
   @DrawableRes
   public int gpsDrawable() {
@@ -411,7 +409,7 @@ public class LocationComponentOptions implements Parcelable {
   /**
    * String image name, identical to one used in
    * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
-   * plugin, will used this image in place of the provided or default mapbox_gpsDrawable.
+   * component, will used this image in place of the provided or default mapbox_gpsDrawable.
    * <p>
    * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
    * with certain styles.  Note, this will fail if the provided icon name is not provided by the loaded map style.
@@ -425,11 +423,10 @@ public class LocationComponentOptions implements Parcelable {
   }
 
   /**
-   * Supply a Drawable that is to be rendered on top of all of the content in the Location Layer
-   * Plugin layer stack.
+   * Supply a Drawable that is to be rendered on top of all of the content in the Location LayerComponent layer stack.
    *
    * @return the drawable resource used for the foreground layer
-   * @attr ref R.styleable#LocationLayer_foregroundDrawable
+   * @attr ref R.styleable#LocationComponent_foregroundDrawable
    */
   @DrawableRes
   public int foregroundDrawable() {
@@ -439,7 +436,7 @@ public class LocationComponentOptions implements Parcelable {
   /**
    * String image name, identical to one used in
    * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
-   * plugin, will used this image in place of the provided or default mapbox_foregroundDrawable.
+   * component, will used this image in place of the provided or default mapbox_foregroundDrawable.
    * <p>
    * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
    * with certain styles.  Note, this will fail if the provided icon name is not provided by the loaded map style.
@@ -456,7 +453,7 @@ public class LocationComponentOptions implements Parcelable {
    * Defines the drawable used for the background state icon.
    *
    * @return the drawable resource ID
-   * @attr ref R.styleable#LocationLayer_backgroundDrawable
+   * @attr ref R.styleable#LocationComponent_backgroundDrawable
    */
   @DrawableRes
   public int backgroundDrawable() {
@@ -466,7 +463,7 @@ public class LocationComponentOptions implements Parcelable {
   /**
    * String image name, identical to one used in
    * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
-   * plugin, will used this image in place of the provided or default mapbox_backgroundDrawable.
+   * component, will used this image in place of the provided or default mapbox_backgroundDrawable.
    * <p>
    * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
    * with certain styles.  Note, this will fail if the provided icon name is not provided by the loaded map style.
@@ -483,7 +480,7 @@ public class LocationComponentOptions implements Parcelable {
    * Defines the drawable used for the bearing icon.
    *
    * @return the drawable resource ID
-   * @attr ref R.styleable#LocationLayer_bearingDrawable
+   * @attr ref R.styleable#LocationComponent_bearingDrawable
    */
   @DrawableRes
   public int bearingDrawable() {
@@ -493,7 +490,7 @@ public class LocationComponentOptions implements Parcelable {
   /**
    * String image name, identical to one used in
    * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
-   * plugin, will used this image in place of the provided or default mapbox_bearingDrawable.
+   * component, will used this image in place of the provided or default mapbox_bearingDrawable.
    * <p>
    * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
    * with certain styles.  Note, this will fail if the provided icon name is not provided by the loaded map style.
@@ -510,7 +507,7 @@ public class LocationComponentOptions implements Parcelable {
    * Defines the bearing icon color as an integer.
    *
    * @return the color integer resource
-   * @attr ref R.styleable#LocationLayer_bearingTintColor
+   * @attr ref R.styleable#LocationComponent_bearingTintColor
    */
   @ColorInt
   @Nullable
@@ -522,7 +519,7 @@ public class LocationComponentOptions implements Parcelable {
    * Defines the foreground color as an integer.
    *
    * @return the color integer resource
-   * @attr ref R.styleable#LocationLayer_foregroundTintColor
+   * @attr ref R.styleable#LocationComponent_foregroundTintColor
    */
   @ColorInt
   @Nullable
@@ -534,7 +531,7 @@ public class LocationComponentOptions implements Parcelable {
    * Defines the background color as an integer.
    *
    * @return the color integer resource
-   * @attr ref R.styleable#LocationLayer_backgroundTintColor
+   * @attr ref R.styleable#LocationComponent_backgroundTintColor
    */
   @ColorInt
   @Nullable
@@ -546,7 +543,7 @@ public class LocationComponentOptions implements Parcelable {
    * Defines the foreground stale color as an integer.
    *
    * @return the color integer resource
-   * @attr ref R.styleable#LocationLayer_foregroundStaleTintColor
+   * @attr ref R.styleable#LocationComponent_foregroundStaleTintColor
    */
   @ColorInt
   @Nullable
@@ -558,7 +555,7 @@ public class LocationComponentOptions implements Parcelable {
    * Defines the background stale color as an integer.
    *
    * @return the color integer resource
-   * @attr ref R.styleable#LocationLayer_backgroundStaleTintColor
+   * @attr ref R.styleable#LocationComponent_backgroundStaleTintColor
    */
   @ColorInt
   @Nullable
@@ -569,8 +566,8 @@ public class LocationComponentOptions implements Parcelable {
   /**
    * Sets the base elevation of this view, in pixels.
    *
-   * @return the elevation currently set for the location layer icon
-   * @attr ref R.styleable#LocationLayer_elevation
+   * @return the elevation currently set for the location component icon
+   * @attr ref R.styleable#LocationComponent_elevation
    */
   @Dimension
   public float elevation() {
@@ -582,7 +579,7 @@ public class LocationComponentOptions implements Parcelable {
    * displayed on the map hasn't been updated in a specific amount of time.
    *
    * @return whether the stale state mode is enabled or not
-   * @attr ref R.styleable#LocationLayer_enableStaleState
+   * @attr ref R.styleable#LocationComponent_enableStaleState
    */
   public boolean enableStaleState() {
     return enableStaleState;
@@ -593,9 +590,9 @@ public class LocationComponentOptions implements Parcelable {
    * location update comes in and using this defined time, if an update hasn't occured by the end,
    * the location is considered stale.
    *
-   * @return the duration in milliseconds which it should take before the location layer is
+   * @return the duration in milliseconds which it should take before the location is
    * considered stale
-   * @attr ref R.styleable#LocationLayer_staleStateDelay
+   * @attr ref R.styleable#LocationComponent_staleStateDelay
    */
   public long staleStateTimeout() {
     return staleStateTimeout;
@@ -694,9 +691,9 @@ public class LocationComponentOptions implements Parcelable {
   }
 
   /**
-   * Gets the id of the layer to add the location layer above to.
+   * Gets the id of the layer to add the location component above to.
    *
-   * @return layerBelow the id of the layer to add the location layer above to
+   * @return layerBelow the id of the layer to add the location component above to
    */
   public String layerBelow() {
     return layerBelow;
@@ -1099,7 +1096,7 @@ public class LocationComponentOptions implements Parcelable {
      *
      * @param accuracyAlpha the opacity of the accuracy view
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_accuracyAlpha
+     * @attr ref R.styleable#LocationComponent_accuracyAlpha
      */
     public LocationComponentOptions.Builder accuracyAlpha(float accuracyAlpha) {
       this.accuracyAlpha = accuracyAlpha;
@@ -1111,7 +1108,7 @@ public class LocationComponentOptions implements Parcelable {
      *
      * @param accuracyColor the color of the accuracy view
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_accuracyColor
+     * @attr ref R.styleable#LocationComponent_accuracyColor
      */
     public LocationComponentOptions.Builder accuracyColor(int accuracyColor) {
       this.accuracyColor = accuracyColor;
@@ -1123,7 +1120,7 @@ public class LocationComponentOptions implements Parcelable {
      *
      * @param backgroundDrawableStale the drawable resource ID
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_backgroundDrawableStale
+     * @attr ref R.styleable#LocationComponent_backgroundDrawableStale
      */
     public LocationComponentOptions.Builder backgroundDrawableStale(int backgroundDrawableStale) {
       this.backgroundDrawableStale = backgroundDrawableStale;
@@ -1133,7 +1130,7 @@ public class LocationComponentOptions implements Parcelable {
     /**
      * Given a String image name, identical to one used in
      * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
-     * plugin, will used this image in place of the provided or default mapbox_backgroundDrawableStale.
+     * component, will used this image in place of the provided or default mapbox_backgroundDrawableStale.
      * <p>
      * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
      * with certain styles.  Note, this will fail if the provided icon name is not provided by the loaded map style.
@@ -1152,7 +1149,7 @@ public class LocationComponentOptions implements Parcelable {
      *
      * @param foregroundDrawableStale the drawable resource ID
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_foregroundDrawableStale
+     * @attr ref R.styleable#LocationComponent_foregroundDrawableStale
      */
     public LocationComponentOptions.Builder foregroundDrawableStale(int foregroundDrawableStale) {
       this.foregroundDrawableStale = foregroundDrawableStale;
@@ -1162,7 +1159,7 @@ public class LocationComponentOptions implements Parcelable {
     /**
      * Given a String image name, identical to one used in
      * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
-     * plugin, will used this image in place of the provided or default mapbox_foregroundDrawableStale.
+     * component, will used this image in place of the provided or default mapbox_foregroundDrawableStale.
      * <p>
      * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
      * with certain styles.  Note, this will fail if the provided icon name is not provided by the loaded map style.
@@ -1181,7 +1178,7 @@ public class LocationComponentOptions implements Parcelable {
      *
      * @param gpsDrawable the drawable resource ID
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_gpsDrawable
+     * @attr ref R.styleable#LocationComponent_gpsDrawable
      */
     public LocationComponentOptions.Builder gpsDrawable(int gpsDrawable) {
       this.gpsDrawable = gpsDrawable;
@@ -1191,7 +1188,7 @@ public class LocationComponentOptions implements Parcelable {
     /**
      * Given a String image name, identical to one used in
      * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
-     * plugin, will used this image in place of the provided or default mapbox_gpsDrawable.
+     * component, will used this image in place of the provided or default mapbox_gpsDrawable.
      * <p>
      * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
      * with certain styles.  Note, this will fail if the provided icon name is not provided by the loaded map style.
@@ -1206,12 +1203,11 @@ public class LocationComponentOptions implements Parcelable {
     }
 
     /**
-     * Supply a Drawable that is to be rendered on top of all of the content in the Location Layer
-     * Plugin layer stack.
+     * Supply a Drawable that is to be rendered on top of all of the content in the Location Component layer stack.
      *
      * @param foregroundDrawable the drawable resource used for the foreground layer
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_foregroundDrawable
+     * @attr ref R.styleable#LocationComponent_foregroundDrawable
      */
     public LocationComponentOptions.Builder foregroundDrawable(int foregroundDrawable) {
       this.foregroundDrawable = foregroundDrawable;
@@ -1221,7 +1217,7 @@ public class LocationComponentOptions implements Parcelable {
     /**
      * Given a String image name, identical to one used in
      * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
-     * plugin, will used this image in place of the provided or default mapbox_foregroundDrawable.
+     * component, will used this image in place of the provided or default mapbox_foregroundDrawable.
      * <p>
      * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
      * with certain styles.  Note, this will fail if the provided icon name is not provided by the loaded map style.
@@ -1240,7 +1236,7 @@ public class LocationComponentOptions implements Parcelable {
      *
      * @param backgroundDrawable the drawable resource ID
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_backgroundDrawable
+     * @attr ref R.styleable#LocationComponent_backgroundDrawable
      */
     public LocationComponentOptions.Builder backgroundDrawable(int backgroundDrawable) {
       this.backgroundDrawable = backgroundDrawable;
@@ -1250,7 +1246,7 @@ public class LocationComponentOptions implements Parcelable {
     /**
      * Given a String image name, identical to one used in
      * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
-     * plugin, will used this image in place of the provided or default mapbox_backgroundDrawable.
+     * component, will used this image in place of the provided or default mapbox_backgroundDrawable.
      * <p>
      * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
      * with certain styles.  Note, this will fail if the provided icon name is not provided by the loaded map style.
@@ -1269,7 +1265,7 @@ public class LocationComponentOptions implements Parcelable {
      *
      * @param bearingDrawable the drawable resource ID
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_bearingDrawable
+     * @attr ref R.styleable#LocationComponent_bearingDrawable
      */
     public LocationComponentOptions.Builder bearingDrawable(int bearingDrawable) {
       this.bearingDrawable = bearingDrawable;
@@ -1279,7 +1275,7 @@ public class LocationComponentOptions implements Parcelable {
     /**
      * Given a String image name, identical to one used in
      * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
-     * plugin, will used this image in place of the provided or default mapbox_bearingDrawable.
+     * component, will used this image in place of the provided or default mapbox_bearingDrawable.
      * <p>
      * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
      * with certain styles.  Note, this will fail if the provided icon name is not provided by the loaded map style.
@@ -1298,7 +1294,7 @@ public class LocationComponentOptions implements Parcelable {
      *
      * @param bearingTintColor the color integer resource
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_bearingTintColor
+     * @attr ref R.styleable#LocationComponent_bearingTintColor
      */
     public LocationComponentOptions.Builder bearingTintColor(@Nullable Integer bearingTintColor) {
       this.bearingTintColor = bearingTintColor;
@@ -1310,7 +1306,7 @@ public class LocationComponentOptions implements Parcelable {
      *
      * @param foregroundTintColor the color integer resource
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_foregroundTintColor
+     * @attr ref R.styleable#LocationComponent_foregroundTintColor
      */
     public LocationComponentOptions.Builder foregroundTintColor(@Nullable Integer foregroundTintColor) {
       this.foregroundTintColor = foregroundTintColor;
@@ -1322,7 +1318,7 @@ public class LocationComponentOptions implements Parcelable {
      *
      * @param backgroundTintColor the color integer resource
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_backgroundTintColor
+     * @attr ref R.styleable#LocationComponent_backgroundTintColor
      */
     public LocationComponentOptions.Builder backgroundTintColor(@Nullable Integer backgroundTintColor) {
       this.backgroundTintColor = backgroundTintColor;
@@ -1334,7 +1330,7 @@ public class LocationComponentOptions implements Parcelable {
      *
      * @param foregroundStaleTintColor the color integer resource
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_foregroundStaleTintColor
+     * @attr ref R.styleable#LocationComponent_foregroundStaleTintColor
      */
     public LocationComponentOptions.Builder foregroundStaleTintColor(@Nullable Integer foregroundStaleTintColor) {
       this.foregroundStaleTintColor = foregroundStaleTintColor;
@@ -1346,7 +1342,7 @@ public class LocationComponentOptions implements Parcelable {
      *
      * @param backgroundStaleTintColor the color integer resource
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_backgroundStaleTintColor
+     * @attr ref R.styleable#LocationComponent_backgroundStaleTintColor
      */
     public LocationComponentOptions.Builder backgroundStaleTintColor(@Nullable Integer backgroundStaleTintColor) {
       this.backgroundStaleTintColor = backgroundStaleTintColor;
@@ -1356,9 +1352,9 @@ public class LocationComponentOptions implements Parcelable {
     /**
      * Sets the base elevation of this view, in pixels.
      *
-     * @param elevation the elevation currently set for the location layer icon
+     * @param elevation the elevation currently set for the location icon
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_elevation
+     * @attr ref R.styleable#LocationComponent_elevation
      */
     public LocationComponentOptions.Builder elevation(float elevation) {
       this.elevation = elevation;
@@ -1371,7 +1367,7 @@ public class LocationComponentOptions implements Parcelable {
      *
      * @param enabled whether the stale state mode is enabled or not
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_enableStaleState
+     * @attr ref R.styleable#LocationComponent_enableStaleState
      */
     public LocationComponentOptions.Builder enableStaleState(boolean enabled) {
       this.enableStaleState = enabled;
@@ -1383,10 +1379,10 @@ public class LocationComponentOptions implements Parcelable {
      * new location update comes in and using this defined time, if an update hasn't occurred by the
      * end, the location is considered stale.
      *
-     * @param timeout the duration in milliseconds which it should take before the location layer is
+     * @param timeout the duration in milliseconds which it should take before the location is
      *                considered stale
      * @return this builder for chaining options together
-     * @attr ref R.styleable#LocationLayer_staleStateTimeout
+     * @attr ref R.styleable#LocationComponent_staleStateTimeout
      */
     public LocationComponentOptions.Builder staleStateTimeout(long timeout) {
       this.staleStateTimeout = timeout;
@@ -1506,9 +1502,9 @@ public class LocationComponentOptions implements Parcelable {
     }
 
     /**
-     * Sets the layer id to set the location layer plugin below to.
+     * Sets the layer id to set the location component below to.
      *
-     * @param layerBelow the id to set the location layer plugin below to.
+     * @param layerBelow the id to set the location component below to.
      */
     public LocationComponentOptions.Builder layerBelow(String layerBelow) {
       this.layerBelow = layerBelow;

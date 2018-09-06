@@ -42,8 +42,8 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
@@ -132,7 +132,6 @@ public final class MapboxMap {
     outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, nativeMapView.getDebug());
     outState.putString(MapboxConstants.STATE_STYLE_URL, nativeMapView.getStyleUrl());
     uiSettings.onSaveInstanceState(outState);
-    locationComponent.onSaveInstanceState(outState);
   }
 
   /**
@@ -157,7 +156,6 @@ public final class MapboxMap {
     if (!TextUtils.isEmpty(styleUrl)) {
       nativeMapView.setStyleUrl(savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL));
     }
-    locationComponent.onRestoreInstanceState(savedInstanceState);
   }
 
   /**
@@ -2319,8 +2317,14 @@ public final class MapboxMap {
   }
 
   /**
-   * Returns an object that can be used to display user's location on the Map.
-   * @return the location layer
+   * Returns the {@link LocationComponent} that can be used to display user's location on the map.
+   * <p>
+   * Use {@link LocationComponent#activateLocationComponent(Context)} or any overload to activate the component,
+   * then, enable it with {@link LocationComponent#setLocationComponentEnabled(boolean)}.
+   * <p>
+   * You can customize the location icon and more with {@link com.mapbox.mapboxsdk.location.LocationComponentOptions}.
+   *
+   * @return the Location Component
    */
   @NonNull
   public LocationComponent getLocationComponent() {

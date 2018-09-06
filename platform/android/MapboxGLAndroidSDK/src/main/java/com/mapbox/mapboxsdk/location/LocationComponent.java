@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.location.Location;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
@@ -34,15 +33,10 @@ import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.DEFAULT_TRACKING_TILT_ANIM_DURATION;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.DEFAULT_TRACKING_ZOOM_ANIM_DURATION;
-import static com.mapbox.mapboxsdk.location.LocationComponentConstants.STATE_LOCATION_CAMERA_MODE;
-import static com.mapbox.mapboxsdk.location.LocationComponentConstants.STATE_LOCATION_ENABLED;
-import static com.mapbox.mapboxsdk.location.LocationComponentConstants.STATE_LOCATION_LAST_LOCATION;
-import static com.mapbox.mapboxsdk.location.LocationComponentConstants.STATE_LOCATION_OPTIONS;
-import static com.mapbox.mapboxsdk.location.LocationComponentConstants.STATE_LOCATION_RENDER_MODE;
 
 /**
- * The Location layer plugin provides location awareness to your mobile application. Enabling this
- * plugin provides a contextual experience to your users by showing an icon representing the users
+ * The Location Component provides location awareness to your mobile application. Enabling this
+ * component provides a contextual experience to your users by showing an icon representing the users
  * current location. A few different modes are offered to provide the right context to your users at
  * the correct time. {@link RenderMode#NORMAL} simply shows the users location on the map
  * represented as a dot. {@link RenderMode#COMPASS} mode allows you to display an arrow icon
@@ -50,32 +44,33 @@ import static com.mapbox.mapboxsdk.location.LocationComponentConstants.STATE_LOC
  * {@link RenderMode#GPS} can be used in conjunction with our Navigation SDK to
  * display a larger icon (customized with {@link LocationComponentOptions#gpsDrawable()}) we call the user puck.
  * <p>
- * This plugin also offers the ability to set a map camera behavior for tracking the user
+ * This component also offers the ability to set a map camera behavior for tracking the user
  * location. These different {@link CameraMode}s will track, stop tracking the location based on the
  * mode set with {@link LocationComponent#setCameraMode(int)}.
  * <p>
- * Lastly, {@link LocationComponent#setLocationComponentEnabled(boolean)} can be used
- * to disable the Location Layer but keep the instance around till the activity is destroyed.
+ * <strong>
+ * To get the component object use {@link MapboxMap#getLocationComponent()} and activate it with
+ * {@link #activateLocationComponent(Context)} or one of the overloads.
+ * Then, manage its visibility with {@link #setLocationComponentEnabled(boolean)}.
+ * </strong>
  * <p>
- * Using this plugin requires you to request permission beforehand manually or using
+ * Using this component requires you to request permission beforehand manually or using
  * {@link com.mapbox.android.core.permissions.PermissionsManager}. Either
  * {@code ACCESS_COARSE_LOCATION} or {@code ACCESS_FINE_LOCATION} permissions can be requested and
  * this plugin work as expected.
  * <p>
- * When instantiating the plugin for the first time, the map's max/min zoom levels will be set to
+ * This component offers a default, built-in {@link LocationEngine} with some of the activation methods.
+ * This engine will be obtained by {@link LocationEngineProvider#obtainBestLocationEngineAvailable} which defaults
+ * to the {@link com.mapbox.android.core.location.AndroidLocationEngine}. If you'd like to utilize Google Play Services
+ * for more precise location updates, simply add the Google Play Location Services dependency in your build script.
+ * This will make the default engine the {@link com.mapbox.android.core.location.GoogleLocationEngine} instead.
+ * <p>
+ * When activating the component for the first time, the map's max/min zoom levels will be set to
  * {@link LocationComponentOptions#MAX_ZOOM_DEFAULT} and {@link LocationComponentOptions#MIN_ZOOM_DEFAULT} respectively.
  * You can adjust the zoom range with {@link LocationComponentOptions#maxZoom()} and
  * {@link LocationComponentOptions#minZoom()}.
  * <p>
- * When an activity, or a fragment, that contains the plugin is destroyed and recreated,
- * the plugin will restore its state, which is:
- * <br/>
- * - If the plugin was enabled, last location will be displayed.
- * You still need to activate the plugin, or just provide the {@link LocationEngine}.
- * <br/>
- * - {@link CameraMode} and {@link RenderMode} will be restored.
- * <br/>
- * - {@link LocationComponentOptions} will be restored.
+ * Location Component doesn't support state saving out-of-the-box.
  */
 public final class LocationComponent {
   private static final String TAG = "Mbgl-LocationComponent";
@@ -99,18 +94,20 @@ public final class LocationComponent {
   private CameraPosition lastCameraPosition;
 
   /**
-   * Indicates that the plugin is enabled and should be displaying location if Mapbox components are available and
-   * the lifecycle is in a resumed state.
+   * Indicates whether the component has been initialized.
+   */
+  private boolean isInitialized;
+
+  /**
+   * Indicates that the component is enabled and should be displaying location if Mapbox components are available and
+   * the lifecycle is in a started state.
    */
   private boolean isEnabled;
 
   /**
-   * Indicated that plugin's lifecycle {@link #onStart()} method has been called or the plugin is initialized..
+   * Indicated that component's lifecycle {@link #onStart()} method has been called.
    * This allows Mapbox components enter started state and display data, and adds state safety for methods like
    * {@link #setLocationComponentEnabled(boolean)}
-   * <p>
-   * Initialized in a started state because the plugin can be instantiated after lifecycle's onStart() and
-   * the developer might not register the lifecycle observer but call lifecycle methods manually instead.
    */
   private boolean isComponentStarted;
 
@@ -123,44 +120,27 @@ public final class LocationComponent {
   private StaleStateManager staleStateManager;
   private final CopyOnWriteArrayList<OnLocationStaleListener> onLocationStaleListeners
     = new CopyOnWriteArrayList<>();
-  private final CopyOnWriteArrayList<OnLocationComponentClickListener> onLocationComponentClickListeners
+  private final CopyOnWriteArrayList<OnLocationClickListener> onLocationClickListeners
     = new CopyOnWriteArrayList<>();
-  private final CopyOnWriteArrayList<OnLocationComponentLongClickListener> onLocationComponentLongClickListeners
+  private final CopyOnWriteArrayList<OnLocationLongClickListener> onLocationLongClickListeners
     = new CopyOnWriteArrayList<>();
   private final CopyOnWriteArrayList<OnCameraTrackingChangedListener> onCameraTrackingChangedListeners
     = new CopyOnWriteArrayList<>();
 
   /**
-   * Construct a LocationComponent. In order to display location,
-   * the location layer has to be activated with {@link LocationComponent#activateLocationComponent(Context)},
-   * or one of the overloads.
-   *
-   * @param mapboxMap the MapboxMap to apply the LocationComponent with
-   */
-  public LocationComponent(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
-    this.mapboxMap = mapboxMap;
-    options = LocationComponentOptions.createFromAttributes(context, R.style.mapbox_LocationComponent);
-    initialize(context);
-  }
-
-  /**
-   * This method will show or hide the location icon and enable or disable the camera
-   * tracking the location.
-   *
-   * @param isEnabled true to show layers and enable camera, false otherwise
-   */
-  private void setLocationComponentEnabled(boolean isEnabled) {
-    if (isEnabled) {
-      enableLocationComponent();
-    } else {
-      disableLocationComponent();
-    }
-  }
-
-  /**
-   * This method will show the location icon and enable the camera tracking the location.
+   * Internal use.
    * <p>
-   * <strong>Note</strong>: This method will initialize and use an internal {@link LocationEngine}.
+   * To get the component object use {@link MapboxMap#getLocationComponent()}.
+   */
+  public LocationComponent(@NonNull MapboxMap mapboxMap) {
+    this.mapboxMap = mapboxMap;
+  }
+
+  /**
+   * This method initializes the component and needs to be called before any other operations are performed.
+   * Afterwards, you can manage component's visibility by {@link #setLocationComponentEnabled(boolean)}.
+   * <p>
+   * <strong>Note</strong>: This method will initialize and use an internal {@link LocationEngine} when enabled.
    *
    * @param context the context
    */
@@ -171,7 +151,8 @@ public final class LocationComponent {
   }
 
   /**
-   * This method will show the location icon and enable the camera tracking the location.
+   * This method initializes the component and needs to be called before any other operations are performed.
+   * Afterwards, you can manage component's visibility by {@link #setLocationComponentEnabled(boolean)}.
    *
    * @param context                  the context
    * @param useDefaultLocationEngine true if you want to initialize and use the built-in location engine or false if
@@ -187,9 +168,10 @@ public final class LocationComponent {
   }
 
   /**
-   * This method will show the location icon and enable the camera tracking the location.
+   * This method initializes the component and needs to be called before any other operations are performed.
+   * Afterwards, you can manage component's visibility by {@link #setLocationComponentEnabled(boolean)}.
    * <p>
-   * <strong>Note</strong>: This method will initialize and use an internal {@link LocationEngine}.
+   * <strong>Note</strong>: This method will initialize and use an internal {@link LocationEngine} when enabled.
    *
    * @param context  the context
    * @param styleRes the LocationComponent style res
@@ -200,9 +182,10 @@ public final class LocationComponent {
   }
 
   /**
-   * This method will show the location icon and enable the camera tracking the location.
+   * This method initializes the component and needs to be called before any other operations are performed.
+   * Afterwards, you can manage component's visibility by {@link #setLocationComponentEnabled(boolean)}.
    * <p>
-   * <strong>Note</strong>: This method will initialize and use an internal {@link LocationEngine}.
+   * <strong>Note</strong>: This method will initialize and use an internal {@link LocationEngine} when enabled.
    * </p>
    *
    * @param context the context
@@ -210,13 +193,14 @@ public final class LocationComponent {
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   public void activateLocationComponent(@NonNull Context context, @NonNull LocationComponentOptions options) {
-    applyStyle(options);
+    initialize(context, options);
     initializeLocationEngine(context);
-    setLocationComponentEnabled(true);
+    applyStyle(options);
   }
 
   /**
-   * This method will show the location icon and enable the camera tracking the location.
+   * This method initializes the component and needs to be called before any other operations are performed.
+   * Afterwards, you can manage component's visibility by {@link #setLocationComponentEnabled(boolean)}.
    *
    * @param context        the context
    * @param locationEngine the engine, or null if you'd like to only force location updates
@@ -224,7 +208,8 @@ public final class LocationComponent {
    */
   public void activateLocationComponent(@NonNull Context context, @Nullable LocationEngine locationEngine,
                                         @StyleRes int styleRes) {
-    activateLocationComponent(locationEngine, LocationComponentOptions.createFromAttributes(context, styleRes));
+    activateLocationComponent(context, locationEngine,
+      LocationComponentOptions.createFromAttributes(context, styleRes));
   }
 
   /**
@@ -238,23 +223,30 @@ public final class LocationComponent {
   }
 
   /**
-   * This method will show the location icon and enable the camera tracking the location.
+   * This method initializes the component and needs to be called before any other operations are performed.
+   * Afterwards, you can manage component's visibility by {@link #setLocationComponentEnabled(boolean)}.
    *
    * @param locationEngine the engine, or null if you'd like to only force location updates
    * @param options        the options
    */
-  public void activateLocationComponent(@Nullable LocationEngine locationEngine,
+  public void activateLocationComponent(@NonNull Context context, @Nullable LocationEngine locationEngine,
                                         @NonNull LocationComponentOptions options) {
+    initialize(context, options);
     setLocationEngine(locationEngine);
     applyStyle(options);
-    setLocationComponentEnabled(true);
   }
 
   /**
-   * This method will hide the location icon and disable the camera tracking the location.
+   * Manage component's visibility after activation.
+   *
+   * @param isEnabled true if the plugin should be visible and listen for location updates, false otherwise.
    */
-  public void deactivateLocationComponent() {
-    setLocationComponentEnabled(false);
+  public void setLocationComponentEnabled(boolean isEnabled) {
+    if (isEnabled) {
+      enableLocationComponent();
+    } else {
+      disableLocationComponent();
+    }
   }
 
   /**
@@ -288,8 +280,7 @@ public final class LocationComponent {
   }
 
   /**
-   * Provides the current camera mode being used to track
-   * the location or compass updates.
+   * Provides the current camera mode being used to track the location or compass updates.
    *
    * @return the current camera mode
    */
@@ -335,7 +326,7 @@ public final class LocationComponent {
   }
 
   /**
-   * Apply a new LocationLayerController style with a style resource.
+   * Apply a new component style with a style resource.
    *
    * @param styleRes a XML style overriding some or all the options
    */
@@ -344,7 +335,7 @@ public final class LocationComponent {
   }
 
   /**
-   * Apply a new LocationLayerController style with location layer options.
+   * Apply a new component style with location component options.
    *
    * @param options to update the current style
    */
@@ -486,10 +477,10 @@ public final class LocationComponent {
   /**
    * Set the location engine to update the current user location.
    * <p>
-   * If {@code null} is passed in, all updates will occur through the
+   * If {@code null} is passed in, all updates will have to occur through the
    * {@link LocationComponent#forceLocationUpdate(Location)} method.
    *
-   * @param locationEngine a {@link LocationEngine} this plugin should use to handle updates
+   * @param locationEngine a {@link LocationEngine} this component should use to handle updates
    */
   public void setLocationEngine(@Nullable LocationEngine locationEngine) {
     if (this.locationEngine != null) {
@@ -513,9 +504,9 @@ public final class LocationComponent {
   }
 
   /**
-   * Returns the current {@link LocationEngine} being used for updating the user location layer.
+   * Returns the current {@link LocationEngine} being used for updating the user location.
    *
-   * @return the {@link LocationEngine} being used to update the user location layer
+   * @return the {@link LocationEngine} being used to update the user location
    */
   @Nullable
   public LocationEngine getLocationEngine() {
@@ -544,7 +535,7 @@ public final class LocationComponent {
   }
 
   /**
-   * Get the last know location of the location layer plugin.
+   * Get the last know location of the location component.
    *
    * @return the last known location
    */
@@ -559,7 +550,7 @@ public final class LocationComponent {
   }
 
   /**
-   * Return the last known {@link CompassEngine} accuracy status of the location layer plugin.
+   * Return the last known {@link CompassEngine} accuracy status of the location component.
    * <p>
    * The last known accuracy of the compass sensor, one of SensorManager.SENSOR_STATUS_*
    *
@@ -591,13 +582,13 @@ public final class LocationComponent {
   }
 
   /**
-   * Adds a listener that gets invoked when the user clicks the location layer.
+   * Adds a listener that gets invoked when the user clicks the displayed location.
    *
-   * @param listener The location layer click listener that is invoked when the
-   *                 location layer is clicked
+   * @param listener The location click listener that is invoked when the
+   *                 location is clicked
    */
-  public void addOnLocationClickListener(@NonNull OnLocationComponentClickListener listener) {
-    onLocationComponentClickListeners.add(listener);
+  public void addOnLocationClickListener(@NonNull OnLocationClickListener listener) {
+    onLocationClickListeners.add(listener);
   }
 
   /**
@@ -605,18 +596,18 @@ public final class LocationComponent {
    *
    * @param listener to be removed
    */
-  public void removeOnLocationClickListener(@NonNull OnLocationComponentClickListener listener) {
-    onLocationComponentClickListeners.remove(listener);
+  public void removeOnLocationClickListener(@NonNull OnLocationClickListener listener) {
+    onLocationClickListeners.remove(listener);
   }
 
   /**
-   * Adds a listener that gets invoked when the user long clicks the location layer.
+   * Adds a listener that gets invoked when the user long clicks the displayed location.
    *
-   * @param listener The location layer click listener that is invoked when the
-   *                 location layer is clicked
+   * @param listener The location click listener that is invoked when the
+   *                 location is clicked
    */
-  public void addOnLocationLongClickListener(@NonNull OnLocationComponentLongClickListener listener) {
-    onLocationComponentLongClickListeners.add(listener);
+  public void addOnLocationLongClickListener(@NonNull OnLocationLongClickListener listener) {
+    onLocationLongClickListeners.add(listener);
   }
 
   /**
@@ -624,8 +615,8 @@ public final class LocationComponent {
    *
    * @param listener to be removed
    */
-  public void removeOnLocationLongClickListener(@NonNull OnLocationComponentLongClickListener listener) {
-    onLocationComponentLongClickListeners.remove(listener);
+  public void removeOnLocationLongClickListener(@NonNull OnLocationLongClickListener listener) {
+    onLocationLongClickListeners.remove(listener);
   }
 
   /**
@@ -686,28 +677,6 @@ public final class LocationComponent {
   /**
    * Internal use.
    */
-  public void onSaveInstanceState(@NonNull Bundle outState) {
-    outState.putBoolean(STATE_LOCATION_ENABLED, isEnabled);
-    outState.putParcelable(STATE_LOCATION_OPTIONS, options);
-    outState.putInt(STATE_LOCATION_RENDER_MODE, locationLayerController.getRenderMode());
-    outState.putInt(STATE_LOCATION_CAMERA_MODE, locationCameraController.getCameraMode());
-    outState.putParcelable(STATE_LOCATION_LAST_LOCATION, lastLocation);
-  }
-
-  /**
-   * Internal use.
-   */
-  public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-    updateLocation(savedInstanceState.getParcelable(STATE_LOCATION_LAST_LOCATION), true);
-    setCameraMode(savedInstanceState.getInt(STATE_LOCATION_CAMERA_MODE));
-    setRenderMode(savedInstanceState.getInt(STATE_LOCATION_RENDER_MODE));
-    applyStyle(savedInstanceState.getParcelable(STATE_LOCATION_OPTIONS));
-    setLocationComponentEnabled(savedInstanceState.getBoolean(STATE_LOCATION_ENABLED));
-  }
-
-  /**
-   * Internal use.
-   */
   public void onDestroy() {
     if (locationEngine != null && usingInternalLocationEngine) {
       locationEngine.deactivate();
@@ -725,23 +694,23 @@ public final class LocationComponent {
    * Internal use.
    */
   public void onFinishLoadingStyle() {
-    locationLayerController.initializeComponents(options);
-    locationCameraController.initializeOptions(options);
+    if (isInitialized) {
+      locationLayerController.initializeComponents(options);
+      locationCameraController.initializeOptions(options);
+    }
     onLocationLayerStart();
   }
 
   @SuppressLint("MissingPermission")
   private void onLocationLayerStart() {
-    if (!isComponentStarted) {
+    if (!isInitialized || !isComponentStarted) {
       return;
     }
 
     if (!isLayerReady) {
       isLayerReady = true;
-      if (mapboxMap != null) {
-        mapboxMap.addOnCameraMoveListener(onCameraMoveListener);
-        mapboxMap.addOnCameraIdleListener(onCameraIdleListener);
-      }
+      mapboxMap.addOnCameraMoveListener(onCameraMoveListener);
+      mapboxMap.addOnCameraIdleListener(onCameraIdleListener);
       if (options.enableStaleState()) {
         staleStateManager.onStart();
       }
@@ -762,7 +731,7 @@ public final class LocationComponent {
   }
 
   private void onLocationLayerStop() {
-    if (!isLayerReady || !isComponentStarted) {
+    if (!isInitialized || !isLayerReady || !isComponentStarted) {
       return;
     }
 
@@ -777,13 +746,17 @@ public final class LocationComponent {
       }
       locationEngine.removeLocationEngineListener(locationEngineListener);
     }
-    if (mapboxMap != null) {
-      mapboxMap.removeOnCameraMoveListener(onCameraMoveListener);
-      mapboxMap.removeOnCameraIdleListener(onCameraIdleListener);
-    }
+    mapboxMap.removeOnCameraMoveListener(onCameraMoveListener);
+    mapboxMap.removeOnCameraIdleListener(onCameraIdleListener);
   }
 
-  private void initialize(@NonNull Context context) {
+  private void initialize(@NonNull Context context, @NonNull LocationComponentOptions options) {
+    if (isInitialized) {
+      return;
+    }
+    isInitialized = true;
+    this.options = options;
+
     AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
     mapboxMap.addOnMapClickListener(onMapClickListener);
@@ -810,6 +783,8 @@ public final class LocationComponent {
 
     setRenderMode(RenderMode.NORMAL);
     setCameraMode(CameraMode.NONE);
+
+    onLocationLayerStart();
   }
 
   private void initializeLocationEngine(@NonNull Context context) {
@@ -936,8 +911,8 @@ public final class LocationComponent {
   private OnMapClickListener onMapClickListener = new OnMapClickListener() {
     @Override
     public void onMapClick(@NonNull LatLng point) {
-      if (!onLocationComponentClickListeners.isEmpty() && locationLayerController.onMapClick(point)) {
-        for (OnLocationComponentClickListener listener : onLocationComponentClickListeners) {
+      if (!onLocationClickListeners.isEmpty() && locationLayerController.onMapClick(point)) {
+        for (OnLocationClickListener listener : onLocationClickListeners) {
           listener.onLocationComponentClick();
         }
       }
@@ -947,8 +922,8 @@ public final class LocationComponent {
   private MapboxMap.OnMapLongClickListener onMapLongClickListener = new MapboxMap.OnMapLongClickListener() {
     @Override
     public void onMapLongClick(@NonNull LatLng point) {
-      if (!onLocationComponentLongClickListeners.isEmpty() && locationLayerController.onMapClick(point)) {
-        for (OnLocationComponentLongClickListener listener : onLocationComponentLongClickListeners) {
+      if (!onLocationLongClickListeners.isEmpty() && locationLayerController.onMapClick(point)) {
+        for (OnLocationLongClickListener listener : onLocationLongClickListeners) {
           listener.onLocationComponentLongClick();
         }
       }

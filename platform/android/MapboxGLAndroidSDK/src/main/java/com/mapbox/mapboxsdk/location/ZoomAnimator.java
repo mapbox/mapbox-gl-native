@@ -25,5 +25,4 @@ class ZoomAnimator extends MapboxCameraAnimatorAdapter {
       listener.onNewZoomValue((Float) animation.getAnimatedValue());
     }
   }
-
 }

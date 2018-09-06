@@ -120,6 +120,7 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
     locationEngine.activate();
     locationComponent = mapboxMap.getLocationComponent();
     locationComponent.activateLocationComponent(this, locationEngine);
+    locationComponent.setLocationComponentEnabled(true);
     locationComponent.setRenderMode(RenderMode.COMPASS);
   }
 

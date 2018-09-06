@@ -21,14 +21,8 @@ class LocationComponentAction(private val mapboxMap: MapboxMap,
   }
 
   override fun perform(uiController: UiController, view: View) {
-    val component = mapboxMap.locationComponent
-
-    while (mapboxMap.getSource("mapbox-location-source") == null) {
-      uiController.loopMainThreadForAtLeast(MapboxTestingUtils.MAP_RENDER_DELAY)
-    }
-
     onPerformLocationComponentAction.onLocationComponentAction(
-      component,
+      mapboxMap.locationComponent,
       mapboxMap,
       uiController,
       view.context)
