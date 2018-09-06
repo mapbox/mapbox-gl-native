@@ -49,7 +49,7 @@ typedef NS_ENUM(NSInteger, MGLErrorCode) {
     /** An attempt to load the style failed. */
     MGLErrorCodeLoadStyleFailed = 5,
     /** An error occurred while snapshotting the map. */
-    MGLErrorCodeSnapshotFailed = 6,
+    MGLErrorCodeSnapshotFailed = 6
 };
 
 /** Options for enabling debugging features in an `MGLMapView` instance. */

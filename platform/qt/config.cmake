@@ -1,6 +1,10 @@
 include(platform/qt/qt.cmake)
 include(cmake/nunicode.cmake)
 
+if(NOT WITH_QT_I18N)
+    include(cmake/icu.cmake)
+endif()
+
 macro(mbgl_platform_core)
     target_sources(mbgl-core
         ${MBGL_QT_CORE_FILES}
@@ -33,7 +37,7 @@ macro(mbgl_platform_core)
 
     if(NOT WITH_QT_I18N)
         target_sources(mbgl-core PRIVATE platform/default/bidi.cpp)
-        target_add_mason_package(mbgl-core PRIVATE icu)
+        target_link_libraries(mbgl-core PRIVATE icu)
     else()
         target_sources(mbgl-core PRIVATE platform/qt/src/bidi.cpp)
     endif()

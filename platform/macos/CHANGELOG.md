@@ -1,5 +1,11 @@
 # Changelog for Mapbox Maps SDK for macOS
 
+## master
+
+### Other changes
+
+* Fixed bug where completion block passed to `-[MGLMapSnapshotter startWithQueue:completionHandler:]` was not being called in all code paths. ([#12355](https://github.com/mapbox/mapbox-gl-native/pull/12355))
+
 # 0.11.0
 
 ### Styles and rendering

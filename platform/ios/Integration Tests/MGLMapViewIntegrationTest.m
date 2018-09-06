@@ -6,6 +6,17 @@
 
 @implementation MGLMapViewIntegrationTest
 
+- (NSString*)validAccessToken {
+    NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
+    if (!accessToken) {
+        printf("warning: MAPBOX_ACCESS_TOKEN env var is required for this test - skipping.\n");
+        return nil;
+    }
+
+    [MGLAccountManager setAccessToken:accessToken];
+    return accessToken;
+}
+
 - (void)setUp {
     [super setUp];
 

@@ -1,4 +1,6 @@
 include(cmake/nunicode.cmake)
+include(cmake/sqlite.cmake)
+include(cmake/icu.cmake)
 
 add_library(mbgl-loop-uv STATIC
     platform/default/async_task.cpp
@@ -80,11 +82,11 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC libpng)
     target_add_mason_package(mbgl-core PUBLIC libjpeg-turbo)
     target_add_mason_package(mbgl-core PUBLIC webp)
-    target_add_mason_package(mbgl-core PRIVATE icu)
     target_add_mason_package(mbgl-core PUBLIC geojson)
 
     target_link_libraries(mbgl-core
         PRIVATE nunicode
+        PRIVATE icu
         PUBLIC -lz
     )
 
@@ -107,11 +109,10 @@ macro(mbgl_filesource)
         PRIVATE platform/default/sqlite3.cpp
     )
 
-    target_add_mason_package(mbgl-filesource PUBLIC sqlite)
-
     # We're not referencing any cURL symbols since we're dynamically loading it. However, we want to
     # link the library anyway since we're definitely going to load it on startup anyway.
     target_link_libraries(mbgl-filesource
+        PUBLIC sqlite
         PUBLIC -Wl,--no-as-needed -lcurl -Wl,--as-needed
     )
 endmacro()
