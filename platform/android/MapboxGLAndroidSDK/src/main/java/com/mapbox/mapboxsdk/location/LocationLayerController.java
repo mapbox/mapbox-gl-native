@@ -188,6 +188,10 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
     }
   }
 
+  boolean isHidden() {
+    return isHidden;
+  }
+
   private void setLayerVisibility(String layerId, boolean visible) {
     Layer layer = mapboxMap.getLayer(layerId);
     if (layer != null) {

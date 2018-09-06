@@ -836,9 +836,7 @@ public final class LocationComponent {
       return;
     }
 
-    if (isEnabled && isComponentStarted) {
-      locationLayerController.show();
-    }
+    showLocationLayerIfHidden();
 
     if (!fromLastLocation) {
       staleStateManager.updateLatestLocationTime();
@@ -848,6 +846,13 @@ public final class LocationComponent {
     locationAnimatorCoordinator.feedNewLocation(location, currentCameraPosition, isGpsNorth);
     updateAccuracyRadius(location, false);
     lastLocation = location;
+  }
+
+  private void showLocationLayerIfHidden() {
+    boolean isLocationLayerHidden = locationLayerController.isHidden();
+    if (isEnabled && isComponentStarted && isLocationLayerHidden) {
+      locationLayerController.show();
+    }
   }
 
   private void updateCompassHeading(float heading) {
