@@ -44,7 +44,8 @@ public:
          Scheduler&,
          MapMode,
          ConstrainMode,
-         ViewportMode);
+         ViewportMode,
+         bool);
 
     ~Impl();
 
@@ -73,6 +74,7 @@ public:
 
     const MapMode mode;
     const float pixelRatio;
+    const bool crossSourceCollisions;
 
     MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
 
@@ -96,7 +98,8 @@ Map::Map(RendererFrontend& rendererFrontend,
          Scheduler& scheduler,
          MapMode mapMode,
          ConstrainMode constrainMode,
-         ViewportMode viewportMode)
+         ViewportMode viewportMode,
+         bool crossSourceCollisions)
     : impl(std::make_unique<Impl>(*this,
                                   rendererFrontend,
                                   mapObserver,
@@ -105,7 +108,8 @@ Map::Map(RendererFrontend& rendererFrontend,
                                   scheduler,
                                   mapMode,
                                   constrainMode,
-                                  viewportMode)) {
+                                  viewportMode,
+                                  crossSourceCollisions)) {
     impl->transform.resize(size);
 }
 
@@ -117,7 +121,8 @@ Map::Impl::Impl(Map& map_,
                 Scheduler& scheduler_,
                 MapMode mode_,
                 ConstrainMode constrainMode_,
-                ViewportMode viewportMode_)
+                ViewportMode viewportMode_,
+                bool crossSourceCollisions_)
     : map(map_),
       observer(mapObserver),
       rendererFrontend(frontend),
@@ -128,6 +133,7 @@ Map::Impl::Impl(Map& map_,
                 viewportMode_),
       mode(mode_),
       pixelRatio(pixelRatio_),
+      crossSourceCollisions(crossSourceCollisions_),
       style(std::make_unique<Style>(scheduler, fileSource, pixelRatio)),
       annotationManager(*style) {
 
@@ -783,7 +789,8 @@ void Map::Impl::onUpdate() {
         style->impl->getLayerImpls(),
         annotationManager,
         prefetchZoomDelta,
-        bool(stillImageRequest)
+        bool(stillImageRequest),
+        crossSourceCollisions
     };
 
     rendererFrontend.update(std::make_shared<UpdateParameters>(std::move(params)));

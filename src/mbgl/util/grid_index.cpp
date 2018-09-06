@@ -82,21 +82,29 @@ std::vector<std::pair<T, typename GridIndex<T>::BBox>> GridIndex<T>::queryWithBo
 }
 
 template <class T>
-bool GridIndex<T>::hitTest(const BBox& queryBBox) const {
+bool GridIndex<T>::hitTest(const BBox& queryBBox, optional<std::function<bool(const T&)>> predicate) const {
     bool hit = false;
-    query(queryBBox, [&](const T&, const BBox&) -> bool {
-        hit = true;
-        return true;
+    query(queryBBox, [&](const T& t, const BBox&) -> bool {
+        if (!predicate || (*predicate)(t)) {
+            hit = true;
+            return true;
+        } else {
+            return false;
+        }
     });
     return hit;
 }
 
 template <class T>
-bool GridIndex<T>::hitTest(const BCircle& queryBCircle) const {
+bool GridIndex<T>::hitTest(const BCircle& queryBCircle, optional<std::function<bool(const T&)>> predicate) const {
     bool hit = false;
-    query(queryBCircle, [&](const T&, const BBox&) -> bool {
-        hit = true;
-        return true;
+    query(queryBCircle, [&](const T& t, const BBox&) -> bool {
+        if (!predicate || (*predicate)(t)) {
+            hit = true;
+            return true;
+        } else {
+            return false;
+        }
     });
     return hit;
 }
