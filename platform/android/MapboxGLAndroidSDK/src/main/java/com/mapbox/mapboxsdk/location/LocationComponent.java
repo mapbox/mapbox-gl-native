@@ -262,7 +262,7 @@ public final class LocationComponent {
    *
    * @return true if the plugin is enabled, false otherwise
    */
-  public boolean isLocationLayerEnabled() {
+  public boolean isLocationComponentEnabled() {
     return isEnabled;
   }
 

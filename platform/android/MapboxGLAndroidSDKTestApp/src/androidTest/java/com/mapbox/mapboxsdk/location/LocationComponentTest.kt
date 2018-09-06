@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.RectF
 import android.location.Location
+import android.os.Bundle
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.IdlingRegistry
 import android.support.test.espresso.UiController
@@ -491,12 +492,12 @@ class LocationComponentTest : BaseActivityTest() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                                uiController: UiController, context: Context) {
-        assertThat(component.isLocationLayerEnabled, `is`(false))
+        assertThat(component.isLocationComponentEnabled, `is`(false))
         component.onStop()
         component.onStart()
-        assertThat(component.isLocationLayerEnabled, `is`(false))
+        assertThat(component.isLocationComponentEnabled, `is`(false))
         component.activateLocationComponent(context, false)
-        assertThat(component.isLocationLayerEnabled, `is`(true))
+        assertThat(component.isLocationComponentEnabled, `is`(true))
       }
     }
     executeComponentTest(componentAction)
@@ -508,10 +509,10 @@ class LocationComponentTest : BaseActivityTest() {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
                                                uiController: UiController, context: Context) {
         component.activateLocationComponent(context, false)
-        assertThat(component.isLocationLayerEnabled, `is`(true))
+        assertThat(component.isLocationComponentEnabled, `is`(true))
         component.onStop()
         component.onStart()
-        assertThat(component.isLocationLayerEnabled, `is`(true))
+        assertThat(component.isLocationComponentEnabled, `is`(true))
       }
     }
     executeComponentTest(componentAction)
@@ -524,10 +525,10 @@ class LocationComponentTest : BaseActivityTest() {
                                                uiController: UiController, context: Context) {
         component.activateLocationComponent(context, false)
         component.deactivateLocationComponent()
-        assertThat(component.isLocationLayerEnabled, `is`(false))
+        assertThat(component.isLocationComponentEnabled, `is`(false))
         component.onStop()
         component.onStart()
-        assertThat(component.isLocationLayerEnabled, `is`(false))
+        assertThat(component.isLocationComponentEnabled, `is`(false))
       }
     }
     executeComponentTest(componentAction)
@@ -1086,6 +1087,97 @@ class LocationComponentTest : BaseActivityTest() {
         component.compassEngine = engine
         assertThat(component.compassEngine, notNullValue())
         assertThat(component.compassEngine, `is`(equalTo(engine)))
+      }
+    }
+
+    executeComponentTest(componentAction)
+  }
+
+  @Test
+  fun savedState_bundleCreationDeactivated() {
+    val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
+      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
+                                             uiController: UiController, context: Context) {
+        val bundle = Bundle()
+        component.onSaveInstanceState(bundle)
+        assertThat(bundle.getBoolean(STATE_LOCATION_ENABLED), `is`(component.isLocationComponentEnabled))
+        assertThat(bundle.getParcelable(STATE_LOCATION_OPTIONS), `is`(equalTo(component.locationComponentOptions)))
+        assertThat(bundle.getInt(STATE_LOCATION_RENDER_MODE), `is`(equalTo(component.renderMode)))
+        assertThat(bundle.getInt(STATE_LOCATION_CAMERA_MODE), `is`(equalTo(component.cameraMode)))
+        assertThat(bundle.getParcelable(STATE_LOCATION_LAST_LOCATION), `is`(equalTo(component.lastKnownLocation)))
+      }
+    }
+
+    executeComponentTest(componentAction)
+  }
+
+  @Test
+  fun savedState_bundleCreationActivated() {
+    val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
+      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
+                                             uiController: UiController, context: Context) {
+        val options = LocationComponentOptions.builder(context)
+          .accuracyColor(Color.RED)
+          .build()
+        component.activateLocationComponent(null, options)
+        component.cameraMode = CameraMode.TRACKING
+        component.renderMode = RenderMode.GPS
+        component.forceLocationUpdate(location)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
+
+        val bundle = Bundle()
+        component.onSaveInstanceState(bundle)
+        assertThat(bundle.getBoolean(STATE_LOCATION_ENABLED), `is`(component.isLocationComponentEnabled))
+        assertThat(bundle.getParcelable(STATE_LOCATION_OPTIONS), `is`(equalTo(component.locationComponentOptions)))
+        assertThat(bundle.getInt(STATE_LOCATION_RENDER_MODE), `is`(component.renderMode))
+        assertThat(bundle.getInt(STATE_LOCATION_CAMERA_MODE), `is`(component.cameraMode))
+        assertThat(bundle.getParcelable(STATE_LOCATION_LAST_LOCATION), `is`(equalTo(component.lastKnownLocation)))
+      }
+    }
+
+    executeComponentTest(componentAction)
+  }
+
+  @Test
+  fun savedState_componentRecreated() {
+    val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
+      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
+                                             uiController: UiController, context: Context) {
+        val options = LocationComponentOptions.builder(context)
+          .accuracyColor(Color.RED)
+          .build()
+
+        val bundle = Bundle()
+        bundle.putBoolean(STATE_LOCATION_ENABLED, true)
+        bundle.putParcelable(STATE_LOCATION_OPTIONS, options)
+        bundle.putInt(STATE_LOCATION_RENDER_MODE, RenderMode.GPS)
+        bundle.putInt(STATE_LOCATION_CAMERA_MODE, CameraMode.TRACKING)
+        bundle.putParcelable(STATE_LOCATION_LAST_LOCATION, location)
+
+        component.onRestoreInstanceState(bundle)
+        assertThat(component.isLocationComponentEnabled, `is`(true))
+        assertThat(component.locationComponentOptions, `is`(equalTo(options)))
+        assertThat(component.renderMode, `is`(RenderMode.GPS))
+        assertThat(component.cameraMode, `is`(CameraMode.TRACKING))
+        assertThat(component.lastKnownLocation, `is`(equalTo(location)))
+      }
+    }
+
+    executeComponentTest(componentAction)
+  }
+
+  @Test
+  fun defaultLocationEngine_deactivatedWhenDestroyed() {
+    val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
+      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
+                                             uiController: UiController, context: Context) {
+        component.activateLocationComponent(context)
+        uiController.loopMainThreadForAtLeast(MAP_CONNECTION_DELAY)
+        assertThat(component.locationEngine?.isConnected, `is`(true))
+
+        component.onStop()
+        component.onDestroy()
+        assertThat(component.locationEngine?.isConnected, `is`(false))
       }
     }
 
