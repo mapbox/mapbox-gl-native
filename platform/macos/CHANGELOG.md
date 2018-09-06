@@ -22,6 +22,7 @@
 * Added an `-[MGLMapViewDelegate mapView:shapeAnnotationIsEnabled:]` method to specify whether an annotation is selectable. ([#12352](https://github.com/mapbox/mapbox-gl-native/pull/12352))
 * Fixed inconsistencies in exception naming. ([#12583](https://github.com/mapbox/mapbox-gl-native/issues/12583))
 * Fixed a cubic-bezier interpolation bug. ([#12812] (https://github.com/mapbox/mapbox-gl-native/issues/12812))
+* Fixed an issue that could cause "allow-overlap" symbols to fade in during pan operations instead of always showing. ([#12683] (https://github.com/mapbox/mapbox-gl-native/issues/12683))
 
 # 0.10.0 - August 15, 2018
 
