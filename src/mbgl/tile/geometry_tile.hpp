@@ -91,6 +91,8 @@ public:
     const optional<ImagePosition> getPattern(const std::string& pattern);
     const std::shared_ptr<FeatureIndex> getFeatureIndex() const { return latestFeatureIndex; }
     
+    const std::string sourceID;
+    
 protected:
     const GeometryTileData* getData() {
         return latestFeatureIndex ? latestFeatureIndex->getData() : nullptr;
@@ -98,8 +100,6 @@ protected:
 
 private:
     void markObsolete();
-
-    const std::string sourceID;
 
     // Used to signal the worker that it should abandon parsing this tile as soon as possible.
     std::atomic<bool> obsolete { false };

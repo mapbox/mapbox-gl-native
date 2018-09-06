@@ -33,11 +33,33 @@ JointOpacityState::JointOpacityState(const JointOpacityState& prevOpacityState, 
 bool JointOpacityState::isHidden() const {
     return icon.isHidden() && text.isHidden();
 }
+    
+const CollisionGroups::CollisionGroup& CollisionGroups::get(const std::string& sourceID) {
+    // The predicate/groupID mechanism allows for arbitrary grouping,
+    // but the current interface defines one source == one group when
+    // crossSourceCollisions == true.
+    if (!crossSourceCollisions) {
+        if (collisionGroups.find(sourceID) == collisionGroups.end()) {
+            uint16_t nextGroupID = ++maxGroupID;
+            collisionGroups.emplace(sourceID, CollisionGroup(
+                nextGroupID,
+                optional<Predicate>([nextGroupID](const IndexedSubfeature& feature) -> bool {
+                    return feature.collisionGroupId == nextGroupID;
+                })
+            ));
+        }
+        return collisionGroups[sourceID];
+    } else {
+        static CollisionGroup nullGroup{0, nullopt};
+        return nullGroup;
+    }
+}
 
-Placement::Placement(const TransformState& state_, MapMode mapMode_)
+Placement::Placement(const TransformState& state_, MapMode mapMode_, const bool crossSourceCollisions)
     : collisionIndex(state_)
     , state(state_)
     , mapMode(mapMode_)
+    , collisionGroups(crossSourceCollisions)
 {}
 
 void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatrix, bool showCollisionBoxes) {
@@ -92,7 +114,9 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
                                   std::forward_as_tuple(symbolBucket.bucketInstanceId),
                                   std::forward_as_tuple(symbolBucket.bucketInstanceId, geometryTile.getFeatureIndex(), geometryTile.id));
         
-        placeLayerBucket(symbolBucket, posMatrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, textPixelRatio, showCollisionBoxes, seenCrossTileIDs, renderTile.tile.holdForFade());
+        const auto collisionGroup = collisionGroups.get(geometryTile.sourceID);
+        
+        placeLayerBucket(symbolBucket, posMatrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, textPixelRatio, showCollisionBoxes, seenCrossTileIDs, renderTile.tile.holdForFade(), collisionGroup);
     }
 }
 
@@ -105,7 +129,8 @@ void Placement::placeLayerBucket(
         const float textPixelRatio,
         const bool showCollisionBoxes,
         std::unordered_set<uint32_t>& seenCrossTileIDs,
-        const bool holdingForFade) {
+        const bool holdingForFade,
+        const CollisionGroups::CollisionGroup& collisionGroup) {
 
     auto partiallyEvaluatedTextSize = bucket.textSizeBinder->evaluateForZoom(state.getZoom());
     auto partiallyEvaluatedIconSize = bucket.iconSizeBinder->evaluateForZoom(state.getZoom());
@@ -159,7 +184,7 @@ void Placement::placeLayerBucket(
                         placedSymbol, scale, fontSize,
                         bucket.layout.get<style::TextAllowOverlap>(),
                         bucket.layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map,
-                        showCollisionBoxes, avoidEdges);
+                        showCollisionBoxes, avoidEdges, collisionGroup.second);
                 placeText = placed.first;
                 offscreen &= placed.second;
             }
@@ -173,7 +198,7 @@ void Placement::placeLayerBucket(
                         placedSymbol, scale, fontSize,
                         bucket.layout.get<style::IconAllowOverlap>(),
                         bucket.layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map,
-                        showCollisionBoxes, avoidEdges);
+                        showCollisionBoxes, avoidEdges, collisionGroup.second);
                 placeIcon = placed.first;
                 offscreen &= placed.second;
             }
@@ -191,11 +216,11 @@ void Placement::placeLayerBucket(
             }
 
             if (placeText) {
-                collisionIndex.insertFeature(symbolInstance.textCollisionFeature, bucket.layout.get<style::TextIgnorePlacement>(), bucket.bucketInstanceId);
+                collisionIndex.insertFeature(symbolInstance.textCollisionFeature, bucket.layout.get<style::TextIgnorePlacement>(), bucket.bucketInstanceId, collisionGroup.first);
             }
 
             if (placeIcon) {
-                collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<style::IconIgnorePlacement>(), bucket.bucketInstanceId);
+                collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<style::IconIgnorePlacement>(), bucket.bucketInstanceId, collisionGroup.first);
             }
 
             assert(symbolInstance.crossTileID != 0);
