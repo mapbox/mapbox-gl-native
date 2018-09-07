@@ -36,6 +36,10 @@ public:
 
     bool hasData() const override;
 
+    void setFeatureState(const GeometryTileData*,
+                const std::string&,
+                const FeatureStates&) override;
+
     void upload(gl::Context&) override;
 
     float getQueryRadius(const RenderLayer&) const override;
@@ -49,8 +53,9 @@ public:
     optional<gl::VertexBuffer<LineLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
 
+    //TODO: AHM: Can these two be combined? Also need to store if bucket needs to be re-uploaded
     std::map<std::string, LineProgram::PaintPropertyBinders> paintPropertyBinders;
-
+    std::set<std::string> stateDependentLayers;
 private:
     void addGeometry(const GeometryCoordinates&, const GeometryTileFeature&);
 

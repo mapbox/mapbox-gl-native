@@ -529,8 +529,7 @@ public:
         });
     }
 
-    bool updateVertexVectors(const std::vector<std::pair<FeatureIdentifier, PropertyMap>>& featureStates,
-        const GeometryTileLayer& layer) {
+    bool updateVertexVectors(const FeatureStates& featureStates, const GeometryTileLayer& layer) {
         bool dirty = false;
         for (const auto& pair : featureStates) {
             const auto& posArray = idMap[pair.first];

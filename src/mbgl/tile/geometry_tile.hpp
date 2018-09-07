@@ -36,6 +36,8 @@ public:
     void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) override;
     void setShowCollisionBoxes(const bool showCollisionBoxes) override;
 
+    void setFeatureState(std::shared_ptr<FeatureStatesMap>) override;
+
     void onGlyphsAvailable(GlyphMap) override;
     void onImagesAvailable(ImageMap, ImageMap, uint64_t imageCorrelationID) override;
     
@@ -113,7 +115,8 @@ private:
     uint64_t correlationID = 0;
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
-    
+    std::unordered_map<std::string, std::string> sourceLayers;
+    std::shared_ptr<FeatureStatesMap> featureStates;
     std::shared_ptr<FeatureIndex> latestFeatureIndex;
 
     optional<AlphaImage> glyphAtlasImage;

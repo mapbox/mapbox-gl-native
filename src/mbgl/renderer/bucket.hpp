@@ -52,6 +52,10 @@ public:
     virtual void populateFeatureBuffers(const ImagePositions&) {};
     virtual void addPatternDependencies(const std::vector<const RenderLayer*>&, ImageDependencies&) {};
 
+    virtual void setFeatureState(const GeometryTileData*,
+        const std::string&,
+        const FeatureStates&) {};
+
     // As long as this bucket has a Prepare render pass, this function is getting called. Typically,
     // this only happens once when the bucket is being rendered for the first time.
     virtual void upload(gl::Context&) = 0;

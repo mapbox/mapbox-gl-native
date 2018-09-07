@@ -107,7 +107,7 @@ void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) 
             layer->visibility == VisibilityType::None) {
             continue;
         }
-
+        sourceLayers.insert(std::make_pair(layer->id, layer->sourceLayer));
         impls.push_back(layer);
     }
 
@@ -120,6 +120,24 @@ void GeometryTile::setShowCollisionBoxes(const bool showCollisionBoxes_) {
         showCollisionBoxes = showCollisionBoxes_;
         ++correlationID;
         worker.self().invoke(&GeometryTileWorker::setShowCollisionBoxes, showCollisionBoxes, correlationID);
+    }
+}
+
+void GeometryTile::setFeatureState(std::shared_ptr<FeatureStatesMap> featureStatesMap_) {
+    if (featureStatesMap_->empty() || pending == true) {
+        return;
+    }
+
+    const auto tileData = latestFeatureIndex->getData();
+    for (auto& entry : buckets) {
+        auto& bucket = *entry.second;
+        if (!bucket.hasData()) { continue; }
+        const auto& sourceLayer = sourceLayers.at(entry.first);
+        const auto& perLayerFeatureStates = featureStates->find(sourceLayer);
+        if (perLayerFeatureStates != featureStates->end() &&
+            !perLayerFeatureStates->second.empty()) {
+            bucket.setFeatureState(tileData, sourceLayer, perLayerFeatureStates->second);
+        }
     }
 }
 

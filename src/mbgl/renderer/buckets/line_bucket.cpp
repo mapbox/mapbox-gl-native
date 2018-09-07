@@ -26,6 +26,9 @@ LineBucket::LineBucket(const style::LineLayoutProperties::PossiblyEvaluated layo
             std::forward_as_tuple(
                 pair.second,
                 zoom));
+        if (pair.second.isFeatureStateDependent()) {
+            stateDependentLayers.emplace(pair.first);
+        }
     }
 }
 
@@ -49,6 +52,20 @@ void LineBucket::addFeature(const GeometryTileFeature& feature,
     }
 }
 
+void LineBucket::setFeatureState(const GeometryTileData* tileData,
+                        const std::string& sourceLayer,
+                        const FeatureStates& featureStates) {
+    if (featureStates.empty() || stateDependentLayers.empty()) { return; }
+
+    auto sourceLayerData = tileData->getLayer(sourceLayer);
+    if (sourceLayerData) {
+        for (auto& pair : paintPropertyBinders) {
+            if (stateDependentLayers.count(pair.first) > 0) {
+                pair.second.updateVertexVectors(featureStates,  *sourceLayerData);
+            }
+        }
+    }
+}
 
 /*
  * Sharp corners cause dashed lines to tilt because the distance along the line

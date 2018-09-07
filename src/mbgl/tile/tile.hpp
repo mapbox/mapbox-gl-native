@@ -63,6 +63,7 @@ public:
     virtual void setShowCollisionBoxes(const bool) {}
     virtual void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) {}
     virtual void setMask(TileMask&&) {}
+    virtual void setFeatureState(std::shared_ptr<FeatureStatesMap>) {}
 
     virtual void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,
