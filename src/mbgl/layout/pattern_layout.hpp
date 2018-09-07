@@ -106,7 +106,7 @@ public:
             PatternLayerMap patterns = patternFeature.patterns;
             GeometryCollection geometries = feature->getGeometries();
 
-            bucket->addFeature(*feature, geometries, patternPositions, patterns);
+            bucket->addFeature(*feature, geometries, i, patternPositions, patterns);
             featureIndex->insert(geometries, i, sourceLayerID, groupID);
         }
         if (bucket->hasData()) {

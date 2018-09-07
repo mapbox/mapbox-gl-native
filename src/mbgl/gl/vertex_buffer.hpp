@@ -22,6 +22,12 @@ public:
         util::ignore({(v.emplace_back(std::forward<Args>(args)), 0)...});
     }
 
+    template<class... Args>
+    void emplace(size_t startAt, Args&&... args) {
+        static_assert(sizeof...(args) == groupSize, "wrong buffer element count");
+        auto emplaceIter = v.begin() + (startAt * groupSize);
+        util::ignore({(v.emplace(emplaceIter++, std::forward<Args>(args)), 0)...});
+    }
     std::size_t vertexSize() const { return v.size(); }
     std::size_t byteSize() const { return v.size() * sizeof(Vertex); }
 

@@ -468,8 +468,8 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
         }
         
         for (auto& pair : bucket->paintPropertyBinders) {
-            pair.second.first.populateVertexVectors(feature, bucket->icon.vertices.vertexSize(), {}, {});
-            pair.second.second.populateVertexVectors(feature, bucket->text.vertices.vertexSize(), {}, {});
+            pair.second.first.populateVertexVectors(feature, feature.index, bucket->icon.vertices.vertexSize(), {}, {});
+            pair.second.second.populateVertexVectors(feature, feature.index, bucket->text.vertices.vertexSize(), {}, {});
         }
     }
 

@@ -85,6 +85,7 @@ public:
     virtual ~PaintPropertyBinder() = default;
 
     virtual void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, const ImagePositions&, const optional<PatternDependency>&) = 0;
+    virtual void updateVertexVector(size_t start, size_t end, const GeometryTileFeature& feature, const PropertyMap& featureState) = 0;
     virtual void upload(gl::Context& context) = 0;
     virtual void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) = 0;
     virtual std::tuple<ExpandToType<As, optional<gl::AttributeBinding>>...> attributeBinding(const PossiblyEvaluatedType& currentValue) const = 0;
@@ -104,6 +105,8 @@ public:
     }
 
     void populateVertexVector(const GeometryTileFeature&, std::size_t, const ImagePositions&, const optional<PatternDependency>&) override {}
+    void updateVertexVector(size_t, size_t, const GeometryTileFeature&, const PropertyMap&) override {}
+
     void upload(gl::Context&) override {}
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
 
@@ -131,6 +134,8 @@ public:
     }
 
     void populateVertexVector(const GeometryTileFeature&, std::size_t, const ImagePositions&, const optional<PatternDependency>&) override {}
+    void updateVertexVector(size_t, size_t, const GeometryTileFeature&, const PropertyMap&) override {}
+
     void upload(gl::Context&) override {}
 
     void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, CrossfadeParameters&) override {
@@ -169,9 +174,11 @@ public:
 
     SourceFunctionPaintPropertyBinder(style::PropertyExpression<T> expression_, T defaultValue_)
         : expression(std::move(expression_)),
-          defaultValue(std::move(defaultValue_)) {
+          defaultValue(std::move(defaultValue_)),
+          isUpdateable(!expression.isFeatureStateConstant()) {
     }
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
+
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, const ImagePositions&, const optional<PatternDependency>&) override {
         auto evaluated = expression.evaluate(feature, {}, defaultValue);
         this->statistics.add(evaluated);
@@ -181,8 +188,21 @@ public:
         }
     }
 
+    void updateVertexVector(size_t start, size_t end, const GeometryTileFeature& feature, const PropertyMap& featureState) override {
+        if (!isUpdateable) { return; }
+        assert(start < end && end < vertexVector.vertexSize());
+        auto evaluated = expression.evaluate(feature, featureState, defaultValue);
+        this->statistics.add(evaluated);
+        auto value = attributeValue(evaluated);
+
+        for (std::size_t i = start; i < end; ++i) {
+            vertexVector.emplace(i, BaseVertex { value });
+        }
+    };
+
     void upload(gl::Context& context) override {
-        vertexBuffer = context.createVertexBuffer(std::move(vertexVector));
+        vertexBuffer = context.createVertexBuffer(std::move(vertexVector),
+            isUpdateable ? gl::BufferUsage::StaticDraw : gl::BufferUsage::DynamicDraw);
     }
 
     std::tuple<optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
@@ -211,6 +231,7 @@ private:
     T defaultValue;
     gl::VertexVector<BaseVertex> vertexVector;
     optional<gl::VertexBuffer<BaseVertex>> vertexBuffer;
+    bool isUpdateable;
 };
 
 template <class T, class A>
@@ -224,9 +245,11 @@ public:
     CompositeFunctionPaintPropertyBinder(style::PropertyExpression<T> expression_, float zoom, T defaultValue_)
         : expression(std::move(expression_)),
           defaultValue(std::move(defaultValue_)),
-          zoomRange({zoom, zoom + 1}) {
+          zoomRange({zoom, zoom + 1}),
+          isUpdateable(!expression.isFeatureStateConstant()) {
     }
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
+
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, const ImagePositions&, const optional<PatternDependency>&) override {
         Range<T> range = expression.evaluate(zoomRange, feature, {}, defaultValue);
         this->statistics.add(range.min);
@@ -239,8 +262,23 @@ public:
         }
     }
 
+    void updateVertexVector(size_t start, size_t end, const GeometryTileFeature& feature, const PropertyMap& featureState) override {
+        if (!isUpdateable) { return; }
+        assert(start < end && end < vertexVector.vertexSize());
+        Range<T> range = expression.evaluate(zoomRange, feature, featureState, defaultValue);
+        this->statistics.add(range.min);
+        this->statistics.add(range.max);
+        AttributeValue value = zoomInterpolatedAttributeValue(
+            attributeValue(range.min),
+            attributeValue(range.max));
+        for (std::size_t i = start; i < end; ++i) {
+            vertexVector.emplace(i, Vertex { value });
+        }
+    };
+
     void upload(gl::Context& context) override {
-        vertexBuffer = context.createVertexBuffer(std::move(vertexVector));
+        vertexBuffer = context.createVertexBuffer(std::move(vertexVector),
+            isUpdateable ? gl::BufferUsage::StaticDraw : gl::BufferUsage::DynamicDraw);
     }
 
     std::tuple<optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
@@ -274,6 +312,7 @@ private:
     Range<float> zoomRange;
     gl::VertexVector<Vertex> vertexVector;
     optional<gl::VertexBuffer<Vertex>> vertexBuffer;
+    bool isUpdateable;
 };
 
 template <class T, class A1, class A2>
@@ -294,7 +333,8 @@ public:
     CompositeCrossFadedPaintPropertyBinder(style::PropertyExpression<T> expression_, float zoom, T defaultValue_)
         : expression(std::move(expression_)),
           defaultValue(std::move(defaultValue_)),
-          zoomRange({zoom, zoom + 1}) {
+          zoomRange({zoom, zoom + 1}),
+          isUpdateable(!expression.isFeatureStateConstant())  {
     }
 
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters& crossfade_) override {
@@ -332,11 +372,18 @@ public:
         }
     }
 
+
     void upload(gl::Context& context) override {
         patternToVertexBuffer = context.createVertexBuffer(std::move(patternToVertexVector));
         zoomInVertexBuffer = context.createVertexBuffer(std::move(zoomInVertexVector));
         zoomOutVertexBuffer = context.createVertexBuffer(std::move(zoomOutVertexVector));
     }
+
+    void updateVertexVector(size_t, size_t, const GeometryTileFeature&, const PropertyMap&) override {
+        if (!isUpdateable) return;
+        //TODO: AHM: How to evaluate expression with feature-state to determine
+        // patterns and pattern positions synchronously
+    };
 
     std::tuple<optional<gl::AttributeBinding>, optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<Faded<T>>& currentValue) const override {
         if (currentValue.isConstant()) {
@@ -370,6 +417,7 @@ private:
     optional<gl::VertexBuffer<Vertex2>> zoomInVertexBuffer;
     optional<gl::VertexBuffer<Vertex2>> zoomOutVertexBuffer;
     CrossfadeParameters crossfade;
+    bool isUpdateable;
 };
 
 template <class T, class PossiblyEvaluatedType>
@@ -457,21 +505,45 @@ public:
     PaintPropertyBinders(const EvaluatedProperties& properties, float z)
         : binders(Binder<Ps>::create(properties.template get<Ps>(), z, Ps::defaultValue())...) {
         (void)z; // Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=56958
+        binderBufferOffset = 0;
     }
 
     PaintPropertyBinders(PaintPropertyBinders&&) = default;
     PaintPropertyBinders(const PaintPropertyBinders&) = delete;
 
-    void populateVertexVectors(const GeometryTileFeature& feature, std::size_t length, const ImagePositions& patternPositions, const optional<PatternDependency>& patternDependencies) {
+    void populateVertexVectors(const GeometryTileFeature& feature, size_t index, std::size_t length, const ImagePositions& patternPositions, const optional<PatternDependency>& patternDependencies) {
         util::ignore({
             (binders.template get<Ps>()->populateVertexVector(feature, length, patternPositions, patternDependencies), 0)...
         });
+        auto featureId = feature.getID();
+        if (featureId) {
+            auto posArray = idMap[*featureId];
+            posArray.emplace_back(index, binderBufferOffset, length);
+        }
+        binderBufferOffset = length;
     }
 
     void setPatternParameters(const optional<ImagePosition>& posA, const optional<ImagePosition>& posB, CrossfadeParameters& crossfade) const {
         util::ignore({
             (binders.template get<Ps>()->setPatternParameters(posA, posB, crossfade), 0)...
         });
+    }
+
+    bool updateVertexVectors(const std::vector<std::pair<FeatureIdentifier, PropertyMap>>& featureStates,
+        const GeometryTileLayer& layer) {
+        bool dirty = false;
+        for (const auto& pair : featureStates) {
+            const auto& posArray = idMap[pair.first];
+            for (const auto& info : posArray) {
+                std::unique_ptr<GeometryTileFeature> feature = layer.getFeature(std::get<0>(info));
+                const size_t startVertex = std::get<1>(info);
+                const size_t endVertex = std::get<2>(info);
+                util::ignore({ (binders.template get<Ps>()->updateVertexVector(startVertex,
+                        endVertex, *feature, pair.second), 0)... });
+                dirty = true;
+            }
+        }
+        return dirty;
     }
 
     void upload(gl::Context& context) {
@@ -550,8 +622,13 @@ public:
         return result;
     }
 
+    // Map Feature Id to a list of feature index, vertex start position, and length.
+    using IdMap = std::unordered_map<FeatureIdentifier, std::vector<std::tuple<size_t, size_t, size_t>>>;
+
 private:
     Binders binders;
+    IdMap idMap;
+    uint32_t binderBufferOffset;
 };
 
 } // namespace mbgl

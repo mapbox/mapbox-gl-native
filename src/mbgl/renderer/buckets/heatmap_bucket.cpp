@@ -40,6 +40,7 @@ bool HeatmapBucket::hasData() const {
 
 void HeatmapBucket::addFeature(const GeometryTileFeature& feature,
                                const GeometryCollection& geometry,
+                               size_t featureIndex,
                                const ImagePositions&,
                                const PatternLayerMap&) {
     constexpr const uint16_t vertexLength = 4;
@@ -89,7 +90,7 @@ void HeatmapBucket::addFeature(const GeometryTileFeature& feature,
     }
 
     for (auto& pair : paintPropertyBinders) {
-        pair.second.populateVertexVectors(feature, vertices.vertexSize(), {}, {});
+        pair.second.populateVertexVectors(feature, featureIndex, vertices.vertexSize(), {}, {});
     }
 }
 

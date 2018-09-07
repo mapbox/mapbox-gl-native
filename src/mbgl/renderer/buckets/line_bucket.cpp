@@ -32,6 +32,7 @@ LineBucket::LineBucket(const style::LineLayoutProperties::PossiblyEvaluated layo
 
 void LineBucket::addFeature(const GeometryTileFeature& feature,
                             const GeometryCollection& geometryCollection,
+                            size_t featureIndex,
                             const ImagePositions& patternPositions,
                             const PatternLayerMap& patternDependencies) {
     for (auto& line : geometryCollection) {
@@ -41,9 +42,9 @@ void LineBucket::addFeature(const GeometryTileFeature& feature,
     for (auto& pair : paintPropertyBinders) {
         const auto it = patternDependencies.find(pair.first);
         if (it != patternDependencies.end()){
-            pair.second.populateVertexVectors(feature, vertices.vertexSize(), patternPositions, it->second);
+            pair.second.populateVertexVectors(feature, featureIndex, vertices.vertexSize(), patternPositions, it->second);
         } else {
-            pair.second.populateVertexVectors(feature, vertices.vertexSize(), patternPositions, {});
+            pair.second.populateVertexVectors(feature, featureIndex, vertices.vertexSize(), patternPositions, {});
         }
     }
 }

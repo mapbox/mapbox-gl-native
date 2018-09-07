@@ -45,6 +45,7 @@ public:
     // pass-by-const-ref the geometries as a second parameter.
     virtual void addFeature(const GeometryTileFeature&,
                             const GeometryCollection&,
+                            size_t,
                             const ImagePositions&,
                             const PatternLayerMap&) {};
 

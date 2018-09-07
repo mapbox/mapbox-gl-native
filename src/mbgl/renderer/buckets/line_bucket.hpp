@@ -30,6 +30,7 @@ public:
 
     void addFeature(const GeometryTileFeature&,
                     const GeometryCollection&,
+                    size_t,
                     const mbgl::ImagePositions& patternPositions,
                     const PatternLayerMap&) override;
 

@@ -19,6 +19,7 @@ public:
 
     void addFeature(const GeometryTileFeature&,
                     const GeometryCollection&,
+                    size_t,
                     const ImagePositions&,
                     const PatternLayerMap&) override;
 
