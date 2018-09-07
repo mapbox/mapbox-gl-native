@@ -137,12 +137,10 @@ typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error
 /**
  A block to be called once the contents of a file are copied into the current packs.
  
- @param packs Contains an array of all known offline packs, or `nil` if there was
- an error creating or adding the pack.
  @param error Contains a pointer to an error object (if any) indicating why the
  pack could not be created or added.
  */
-typedef void (^MGLOfflinePacksAdditionCompletionHandler)(NSArray<MGLOfflinePack *> *packs, NSError * _Nullable error);
+typedef void (^MGLOfflinePacksAdditionCompletionHandler)(NSError * _Nullable error);
 
 /**
  The type of resource that is requested.
@@ -187,17 +185,44 @@ MGL_EXPORT
 #pragma mark - Adding Contents of File
 
 /**
- Adds the contents of the file path.
+ Adds the offline packs located at the given file path to offline storage.
  
- Once the content is added, then the `completion` block is executed with the
- packs passed in.
+ The file must be a valid offline region database bundled with the application
+ or downloaded separately.
+ 
+ Refer to this <a href="https://www.mapbox.com/ios-sdk/maps/examples/offline-pack/">example</a>
+ to learn how to create additional offline packs.
+ 
+ The resulting packs are added or updated to the shared offline storage object’s `packs`
+ property, then the `completion` block is executed.
  
  @param filePath A string representation of the file path. The file path must be
  writable as schema updates may be perfomed.
- @param completion The completion handler to call once the file has been added.
- This handler is executed asynchronously on the main queue.
+ @param completion The completion handler to call once the contents of the given
+ file has been added to offline storage. This handler is executed asynchronously
+ on the main queue.
  */
-- (void)addContentesOfFile:(NSString *)filePath withCompletionHandler:(nullable MGLOfflinePacksAdditionCompletionHandler)completion;
+- (void)addContentsOfFile:(NSString *)filePath withCompletionHandler:(nullable MGLOfflinePacksAdditionCompletionHandler)completion;
+
+/**
+ Adds the offline packs located at the given URL to offline storage.
+ 
+ The file must be a valid offline region database bundled with the application
+ or downloaded separately.
+ 
+ Refer to this <a href="https://www.mapbox.com/ios-sdk/maps/examples/offline-pack/">example</a>
+ to learn how to create additional offline packs.
+ 
+ The resulting packs are added or updated to the shared offline storage object’s `packs`
+ property, then the `completion` block is executed.
+ 
+ @param fileURL An URL representation of the file. The file URL must be
+ writable as schema updates may be perfomed.
+ @param completion The completion handler to call once the contents of the given
+ file has been added to offline storage. This handler is executed asynchronously
+ on the main queue.
+ */
+- (void)addContentsOfURL:(NSURL *)fileURL withCompletionHandler:(nullable MGLOfflinePacksAdditionCompletionHandler)completion;
 
 #pragma mark - Accessing the Delegate
 
