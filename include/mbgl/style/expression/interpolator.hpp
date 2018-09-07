@@ -33,7 +33,13 @@ public:
     CubicBezierInterpolator(double x1_, double y1_, double x2_, double y2_) : ub(x1_, y1_, x2_, y2_) {}
     
     double interpolationFactor(const Range<double>& inputLevels, const double input) const {
-        return ub.solve(input / (inputLevels.max - inputLevels.min), 1e-6);
+        return ub.solve(util::interpolationFactor(1.0,
+                                                  Range<float> {
+                                                      static_cast<float>(inputLevels.min),
+                                                      static_cast<float>(inputLevels.max)
+                                                  },
+                                                  input),
+                        1e-6);
     }
     
     bool operator==(const CubicBezierInterpolator& rhs) const {

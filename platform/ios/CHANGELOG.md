@@ -26,9 +26,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed inconsistencies in exception naming. ([#12583](https://github.com/mapbox/mapbox-gl-native/issues/12583))
 * Fixed an issue where `-[MGLMapView convertCoordinateBounds:toRectToView:]` would return an empty CGRect if the bounds crossed the antimeridian. ([#12758](https://github.com/mapbox/mapbox-gl-native/pull/12758))
 * Fixed bug where the completion block passed to `-[MGLMapSnapshotter startWithQueue:completionHandler:]` was not being called in all code paths. ([#12355](https://github.com/mapbox/mapbox-gl-native/pull/12355))
-* Fixed a sporadic crash with location updates. ([#12584](https://github.com/mapbox/mapbox-gl-native/pull/12584))
-* Fixed a crash that occurred during power state changes. ([#12584](https://github.com/mapbox/mapbox-gl-native/pull/12584))
-* Fixed a crash related to telemetry upload. ([#12584](https://github.com/mapbox/mapbox-gl-native/pull/12584))
+* Fixed several crashes related to telemetry collection. ([#12825](https://github.com/mapbox/mapbox-gl-native/pull/12825))
 
 ## 4.3.0 - August 15, 2018
 

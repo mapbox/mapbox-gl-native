@@ -306,7 +306,14 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
    * Detect if we are in emulator.
    */
   private boolean inEmulator() {
-    return System.getProperty("ro.kernel.qemu") != null;
+    return Build.FINGERPRINT.startsWith("generic")
+      || Build.FINGERPRINT.startsWith("unknown")
+      || Build.MODEL.contains("google_sdk")
+      || Build.MODEL.contains("Emulator")
+      || Build.MODEL.contains("Android SDK built for x86")
+      || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+      || "google_sdk".equals(Build.PRODUCT)
+      || System.getProperty("ro.kernel.qemu") != null;
   }
 
   /**
