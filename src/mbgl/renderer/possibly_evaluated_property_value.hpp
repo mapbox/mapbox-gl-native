@@ -26,6 +26,15 @@ public:
         return value.template is<T>();
     }
 
+    bool isFeatureStateDependent() const {
+        return this->match(
+            [&] (const T&) { return false; },
+            [&] (const style::PropertyExpression<T>& expression) {
+                return !expression.isFeatureStateConstant();
+            }
+        );
+    }
+
     optional<T> constant() const {
         return value.match(
             [&] (const T& t) { return optional<T>(t); },
@@ -81,6 +90,15 @@ public:
         return value.match(
             [&] (const Faded<T>& t) { return optional<Faded<T>>(t); },
             [&] (const auto&) { return optional<Faded<T>>(); });
+    }
+
+    bool isFeatureStateDependent() const {
+        return value.match(
+            [&] (const Faded<T>&) { return false; },
+            [&] (const style::PropertyExpression<T>& expression) {
+                return !expression.isFeatureStateConstant();
+            }
+        );
     }
 
     Faded<T> constantOr(const Faded<T>& t) const {

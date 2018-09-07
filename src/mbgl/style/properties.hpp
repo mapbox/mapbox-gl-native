@@ -169,6 +169,28 @@ public:
                 evaluate<Ps>(z, feature)...
             };
         }
+
+        template <class T>
+        static bool isFeatureStateDependent(const T&) {
+            return false;
+        }
+
+        template <class T>
+        static bool isFeatureStateDependent(const PossiblyEvaluatedPropertyValue<T>& v) {
+            return v.isFeatureStateDependent();
+        }
+
+        template <class P>
+        bool isFeatureStateDependent() const {
+            return isFeatureStateDependent(this->template get<P>());
+        }
+
+        bool isFeatureStateDependent() const {
+           bool result = false;
+            util::ignore({ result |= isFeatureStateDependent<Ps>()... });
+            return result;
+         }
+
     };
 
     class Unevaluated : public Tuple<UnevaluatedTypes> {
