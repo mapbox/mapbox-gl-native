@@ -2849,6 +2849,66 @@ public class Expression {
   }
 
   /**
+   * Returns true if the input string is expected to render legibly.
+   * Returns false if the input string contains sections that cannot be rendered without potential loss of meaning
+   * (e.g. Indic scripts that require complex text shaping,
+   * or right-to-left scripts if the the mapbox-gl-rtl-text plugin is not in use in Mapbox GL JS).
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * mapboxMap.addLayer(new SymbolLayer("layer-id", "source-id")
+   *   .withProperties(
+   *     textField(
+   *       switchCase(
+   *         isSupportedScript(get("name_property")), get("name_property"),
+   *         literal("not-compatible")
+   *       )
+   *     )
+   *   ));
+   * }
+   * </pre>
+   *
+   * @param expression the expression to evaluate
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-is-supported-script">Style specification</a>
+   */
+  public static Expression isSupportedScript(Expression expression) {
+    return new Expression("is-supported-script", expression);
+  }
+
+  /**
+   * Returns true if the input string is expected to render legibly.
+   * Returns false if the input string contains sections that cannot be rendered without potential loss of meaning
+   * (e.g. Indic scripts that require complex text shaping,
+   * or right-to-left scripts if the the mapbox-gl-rtl-text plugin is not in use in Mapbox GL JS).
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * mapboxMap.addLayer(new SymbolLayer("layer-id", "source-id")
+   * .withProperties(
+   *   textField(
+   *     switchCase(
+   *       isSupportedScript("ಗೌರವಾರ್ಥವಾಗಿ"), literal("ಗೌರವಾರ್ಥವಾಗಿ"),
+   *       literal("not-compatible")
+   *     )
+   *   )
+   * );
+   * }
+   * </pre>
+   *
+   * @param string the string to evaluate
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-is-supported-script">Style specification</a>
+   */
+  public static Expression isSupportedScript(String string) {
+    return new Expression("is-supported-script", literal(string));
+  }
+
+  /**
    * Returns the input string converted to uppercase.
    * <p>
    * Follows the Unicode Default Case Conversion algorithm
