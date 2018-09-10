@@ -29,10 +29,10 @@ class LocationAnimatorCoordinatorTest {
   fun feedNewLocation_animatorsAreCreated() {
     locationAnimatorCoordinator.feedNewLocation(Location(""), cameraPosition, false)
 
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_CAMERA_LATLNG] != null)
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_CAMERA_GPS_BEARING] != null)
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_LATLNG] != null)
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_GPS_BEARING] != null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_CAMERA_LATLNG] != null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_CAMERA_GPS_BEARING] != null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_LATLNG] != null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_GPS_BEARING] != null)
   }
 
   @Test
@@ -43,16 +43,16 @@ class LocationAnimatorCoordinatorTest {
     location.bearing = 35f
     locationAnimatorCoordinator.feedNewLocation(location, cameraPosition, false)
 
-    val cameraLatLngTarget = locationAnimatorCoordinator.animatorMap[ANIMATOR_CAMERA_LATLNG]?.target as LatLng
+    val cameraLatLngTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_CAMERA_LATLNG]?.target as LatLng
     assertEquals(cameraLatLngTarget.latitude, cameraLatLngTarget.latitude)
 
-    val layerLatLngTarget = locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_LATLNG]?.target as LatLng
+    val layerLatLngTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_LATLNG]?.target as LatLng
     assertEquals(layerLatLngTarget.latitude, layerLatLngTarget.latitude)
 
-    val cameraBearingTarget = locationAnimatorCoordinator.animatorMap[ANIMATOR_CAMERA_GPS_BEARING]?.target as Float
+    val cameraBearingTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_CAMERA_GPS_BEARING]?.target as Float
     assertEquals(location.bearing, cameraBearingTarget)
 
-    val layerBearingTarget = locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_GPS_BEARING]?.target as Float
+    val layerBearingTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_GPS_BEARING]?.target as Float
     assertEquals(location.bearing, layerBearingTarget)
   }
 
@@ -64,10 +64,10 @@ class LocationAnimatorCoordinatorTest {
     location.bearing = 35f
     locationAnimatorCoordinator.feedNewLocation(location, cameraPosition, false)
 
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_CAMERA_LATLNG] != null)
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_CAMERA_GPS_BEARING] != null)
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_LATLNG] != null)
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_GPS_BEARING] != null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_CAMERA_LATLNG] != null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_CAMERA_GPS_BEARING] != null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_LATLNG] != null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_GPS_BEARING] != null)
   }
 
   @Test
@@ -78,16 +78,16 @@ class LocationAnimatorCoordinatorTest {
     location.bearing = 35f
     locationAnimatorCoordinator.feedNewLocation(location, cameraPosition, true)
 
-    val cameraLatLngTarget = locationAnimatorCoordinator.animatorMap[ANIMATOR_CAMERA_LATLNG]?.target as LatLng
+    val cameraLatLngTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_CAMERA_LATLNG]?.target as LatLng
     assertEquals(cameraLatLngTarget.latitude, cameraLatLngTarget.latitude)
 
-    val layerLatLngTarget = locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_LATLNG]?.target as LatLng
+    val layerLatLngTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_LATLNG]?.target as LatLng
     assertEquals(layerLatLngTarget.latitude, layerLatLngTarget.latitude)
 
-    val cameraBearingTarget = locationAnimatorCoordinator.animatorMap[ANIMATOR_CAMERA_GPS_BEARING]?.target as Float
+    val cameraBearingTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_CAMERA_GPS_BEARING]?.target as Float
     assertEquals(0f, cameraBearingTarget)
 
-    val layerBearingTarget = locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_GPS_BEARING]?.target as Float
+    val layerBearingTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_GPS_BEARING]?.target as Float
     assertEquals(location.bearing, layerBearingTarget)
   }
 
@@ -95,8 +95,8 @@ class LocationAnimatorCoordinatorTest {
   fun feedNewCompassBearing_animatorsAreCreated() {
     locationAnimatorCoordinator.feedNewCompassBearing(77f, cameraPosition)
 
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_CAMERA_COMPASS_BEARING] != null)
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_COMPASS_BEARING] != null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_CAMERA_COMPASS_BEARING] != null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_COMPASS_BEARING] != null)
   }
 
   @Test
@@ -104,10 +104,10 @@ class LocationAnimatorCoordinatorTest {
     val bearing = 77f
     locationAnimatorCoordinator.feedNewCompassBearing(bearing, cameraPosition)
 
-    val cameraBearingTarget = locationAnimatorCoordinator.animatorMap[ANIMATOR_CAMERA_COMPASS_BEARING]?.target as Float
+    val cameraBearingTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_CAMERA_COMPASS_BEARING]?.target as Float
     assertEquals(bearing, cameraBearingTarget)
 
-    val layerBearingTarget = locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_COMPASS_BEARING]?.target as Float
+    val layerBearingTarget = locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_COMPASS_BEARING]?.target as Float
     assertEquals(bearing, layerBearingTarget)
   }
 
@@ -115,7 +115,7 @@ class LocationAnimatorCoordinatorTest {
   fun feedNewAccuracyRadius_animatorsCreated() {
     locationAnimatorCoordinator.feedNewAccuracyRadius(150f, false)
 
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_ACCURACY] != null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_ACCURACY] != null)
   }
 
   @Test
@@ -123,10 +123,10 @@ class LocationAnimatorCoordinatorTest {
     val accuracy = 150f
     locationAnimatorCoordinator.feedNewAccuracyRadius(accuracy, false)
 
-    val layerAccuracy = locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_ACCURACY]?.target as Float
+    val layerAccuracy = locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_ACCURACY]?.target as Float
     assertEquals(layerAccuracy, accuracy)
 
-    val animationDuration = locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_ACCURACY]?.duration as Long
+    val animationDuration = locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_ACCURACY]?.duration as Long
     assertEquals(LocationComponentConstants.ACCURACY_RADIUS_ANIMATION_DURATION, animationDuration)
   }
 
@@ -134,7 +134,7 @@ class LocationAnimatorCoordinatorTest {
   fun feedNewAccuracyRadius_noAnimation_animatorsCreated() {
     locationAnimatorCoordinator.feedNewAccuracyRadius(150f, true)
 
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_ACCURACY] != null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_ACCURACY] != null)
   }
 
   @Test
@@ -142,10 +142,10 @@ class LocationAnimatorCoordinatorTest {
     val accuracy = 150f
     locationAnimatorCoordinator.feedNewAccuracyRadius(accuracy, true)
 
-    val layerAccuracy = locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_ACCURACY]?.target as Float
+    val layerAccuracy = locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_ACCURACY]?.target as Float
     assertEquals(layerAccuracy, accuracy)
 
-    val animationDuration = locationAnimatorCoordinator.animatorMap[ANIMATOR_LAYER_ACCURACY]?.duration as Long
+    val animationDuration = locationAnimatorCoordinator.animatorArray[ANIMATOR_LAYER_ACCURACY]?.duration as Long
     assertEquals(0L, animationDuration)
   }
 
@@ -158,7 +158,7 @@ class LocationAnimatorCoordinatorTest {
       null
     )
 
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_ZOOM] != null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_ZOOM] != null)
   }
 
   @Test
@@ -171,10 +171,10 @@ class LocationAnimatorCoordinatorTest {
       null
     )
 
-    val animationDuration = locationAnimatorCoordinator.animatorMap[ANIMATOR_ZOOM]?.duration as Long
+    val animationDuration = locationAnimatorCoordinator.animatorArray[ANIMATOR_ZOOM]?.duration as Long
     assertEquals(DEFAULT_TRACKING_ZOOM_ANIM_DURATION, animationDuration)
 
-    val target = locationAnimatorCoordinator.animatorMap[ANIMATOR_ZOOM]?.target as Float
+    val target = locationAnimatorCoordinator.animatorArray[ANIMATOR_ZOOM]?.target as Float
     assertEquals(zoom, target)
   }
 
@@ -187,7 +187,7 @@ class LocationAnimatorCoordinatorTest {
       null
     )
 
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_TILT] != null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_TILT] != null)
   }
 
   @Test
@@ -200,10 +200,10 @@ class LocationAnimatorCoordinatorTest {
       null
     )
 
-    val animationDuration = locationAnimatorCoordinator.animatorMap[ANIMATOR_TILT]?.duration as Long
+    val animationDuration = locationAnimatorCoordinator.animatorArray[ANIMATOR_TILT]?.duration as Long
     assertEquals(DEFAULT_TRACKING_TILT_ANIM_DURATION, animationDuration)
 
-    val target = locationAnimatorCoordinator.animatorMap[ANIMATOR_TILT]?.target as Float
+    val target = locationAnimatorCoordinator.animatorArray[ANIMATOR_TILT]?.target as Float
     assertEquals(tilt, target)
   }
 
@@ -212,7 +212,7 @@ class LocationAnimatorCoordinatorTest {
     locationAnimatorCoordinator.feedNewLocation(Location(""), cameraPosition, true)
     locationAnimatorCoordinator.cancelAllAnimations()
 
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_CAMERA_LATLNG] == null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_CAMERA_LATLNG] == null)
   }
 
   @Test
@@ -225,7 +225,7 @@ class LocationAnimatorCoordinatorTest {
     )
     locationAnimatorCoordinator.cancelZoomAnimation()
 
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_ZOOM] == null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_ZOOM] == null)
   }
 
   @Test
@@ -239,13 +239,13 @@ class LocationAnimatorCoordinatorTest {
 
     locationAnimatorCoordinator.cancelTiltAnimation()
 
-    assertTrue(locationAnimatorCoordinator.animatorMap[ANIMATOR_TILT] == null)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_TILT] == null)
   }
 
   @Test
   fun resetAllCameraAnimations_empty() {
     locationAnimatorCoordinator.resetAllCameraAnimations(cameraPosition, false)
-    assertTrue(locationAnimatorCoordinator.animatorMap.isEmpty())
+    assertTrue(locationAnimatorCoordinator.animatorArray.size() == 0)
   }
 
   @Test

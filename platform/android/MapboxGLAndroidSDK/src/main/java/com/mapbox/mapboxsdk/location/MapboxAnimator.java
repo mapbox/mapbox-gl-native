@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
 /**
- * Abstract class for all of the plugin animators.
+ * Abstract class for all of the location component animators.
  *
  * @param <K> Data type that will be animated.
  * @param <L> Listener of animation updates.
