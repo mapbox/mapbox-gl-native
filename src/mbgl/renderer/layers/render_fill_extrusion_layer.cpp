@@ -109,7 +109,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 parameters.depthModeFor3D(gl::DepthMode::ReadWrite),
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
-                gl::CullFaceMode::disabled(),
+                gl::CullFaceMode::backCCW(),
                 *tileBucket.indexBuffer,
                 tileBucket.triangleSegments,
                 allUniformValues,
