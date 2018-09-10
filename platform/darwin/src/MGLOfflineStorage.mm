@@ -266,7 +266,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
 #pragma mark Offline merge methods
 
-- (void)addContentsOfFile:(NSString *)filePath withCompletionHandler:(MGLOfflinePacksAdditionCompletionHandler)completion {
+- (void)addContentsOfFile:(NSString *)filePath withCompletionHandler:(MGLBatchedOfflinePackAdditionCompletionHandler)completion {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if (![fileManager isWritableFileAtPath:filePath]) {
         [NSException raise:NSInvalidArgumentException format:@"The file path must be writable"];
@@ -292,11 +292,11 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     }];
 }
 
-- (void)addContentsOfURL:(NSURL *)fileURL withCompletionHandler:(MGLOfflinePacksAdditionCompletionHandler)completion {
+- (void)addContentsOfURL:(NSURL *)fileURL withCompletionHandler:(MGLBatchedOfflinePackAdditionCompletionHandler)completion {
     [self addContentsOfFile:fileURL.absoluteString withCompletionHandler:completion];
 }
 
-- (void)_addContentsOfFile:(NSString *)filePath withCompletionHandler:(MGLOfflinePacksAdditionCompletionHandler)completion {
+- (void)_addContentsOfFile:(NSString *)filePath withCompletionHandler:(MGLBatchedOfflinePackAdditionCompletionHandler)completion {
     self.mbglFileSource->mergeOfflineRegions(std::string(static_cast<const char *>([filePath UTF8String])), [&, completion](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> result) {
         NSError *error;
         NSMutableArray *packs;
