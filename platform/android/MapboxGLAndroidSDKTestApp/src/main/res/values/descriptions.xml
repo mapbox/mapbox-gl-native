@@ -70,6 +70,7 @@
     <string name="description_hillshade">Example raster-dem source and hillshade layer</string>
     <string name="description_heatmaplayer">Use HeatmapLayer to visualise earthquakes</string>
     <string name="description_gesture_detector">Manipulate gestures detector\'s settings</string>
+    <string name="description_offline_merge">Merge external offline database</string>
     <string name="description_draggable_marker">Click to add a marker, long-click to drag</string>
     <string name="description_location_map_change">Change map\'s style while location is displayed</string>
     <string name="description_location_modes">Showcases location render and tracking modes</string>

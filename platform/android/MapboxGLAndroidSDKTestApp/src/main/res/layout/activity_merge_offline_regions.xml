@@ -4,11 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activity.maplayout.SimpleMapActivity">
+    tools:context=".activity.offline.MergeOfflineRegionsActivity">
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <Button
+        android:id="@+id/load_region_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MERGE OFFLINE DB" />
 
 </RelativeLayout>

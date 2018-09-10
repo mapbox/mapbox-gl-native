@@ -37,5 +37,6 @@
   "SimpleMapActivity",
   "RenderTestActivity",
   "SymbolLayerActivity",
-  "LocationFragmentActivity"
+  "LocationFragmentActivity",
+  "MergeOfflineRegionsActivity"
 ]

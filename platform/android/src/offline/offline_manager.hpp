@@ -8,6 +8,7 @@
 #include "../file_source.hpp"
 #include "offline_region.hpp"
 #include "offline_region_definition.hpp"
+#include "../java_types.hpp"
 
 
 namespace mbgl {
@@ -25,7 +26,7 @@ public:
         static void onList(jni::JNIEnv&,
                             const jni::Object<FileSource>&,
                             const jni::Object<OfflineManager::ListOfflineRegionsCallback>&,
-                            mbgl::optional<std::vector<mbgl::OfflineRegion>>);
+                            mbgl::OfflineRegions&);
     };
 
     class CreateOfflineRegionCallback {
@@ -37,7 +38,19 @@ public:
         static void onCreate(jni::JNIEnv&,
                             const jni::Object<FileSource>&,
                             const jni::Object<OfflineManager::CreateOfflineRegionCallback>&,
-                            mbgl::optional<mbgl::OfflineRegion>);
+                            mbgl::OfflineRegion&);
+    };
+
+    class MergeOfflineRegionsCallback {
+    public:
+        static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineManager$MergeOfflineRegionsCallback";}
+
+        static void onError(jni::JNIEnv&, const jni::Object<OfflineManager::MergeOfflineRegionsCallback>&, std::exception_ptr);
+
+        static void onMerge(jni::JNIEnv&,
+                            const jni::Object<FileSource>&,
+                            const jni::Object<MergeOfflineRegionsCallback>&,
+                            mbgl::OfflineRegions&);
     };
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineManager"; };
@@ -56,6 +69,11 @@ public:
                              const jni::Object<OfflineRegionDefinition>& definition,
                              const jni::Array<jni::jbyte>& metadata,
                              const jni::Object<OfflineManager::CreateOfflineRegionCallback>& callback);
+
+    void mergeOfflineRegions(jni::JNIEnv&,
+                             const jni::Object<FileSource>&,
+                             const jni::String&,
+                             const jni::Object<MergeOfflineRegionsCallback>&);
 
 private:
     mbgl::DefaultFileSource& fileSource;
