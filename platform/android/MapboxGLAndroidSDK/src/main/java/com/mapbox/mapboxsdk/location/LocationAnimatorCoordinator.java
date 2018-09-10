@@ -2,11 +2,11 @@ package com.mapbox.mapboxsdk.location;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
-import android.annotation.SuppressLint;
 import android.location.Location;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.SparseArray;
 import android.view.animation.LinearInterpolator;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -14,9 +14,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.ACCURACY_RADIUS_ANIMATION_DURATION;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.COMPASS_UPDATE_RATE_MS;
@@ -34,8 +32,7 @@ import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_ZOOM;
 
 final class LocationAnimatorCoordinator {
 
-  @SuppressLint("UseSparseArrays")
-  final Map<Integer, MapboxAnimator> animatorMap = new HashMap<>();
+  final SparseArray<MapboxAnimator> animatorArray = new SparseArray<>();
 
   final List<MapboxAnimator.OnLayerAnimationsValuesChangeListener> layerListeners = new ArrayList<>();
   final List<MapboxAnimator.OnCameraAnimationsValuesChangeListener> cameraListeners = new ArrayList<>();
@@ -126,7 +123,7 @@ final class LocationAnimatorCoordinator {
 
   private LatLng getPreviousLayerLatLng() {
     LatLng previousLatLng;
-    MapboxAnimator latLngAnimator = animatorMap.get(ANIMATOR_LAYER_LATLNG);
+    MapboxAnimator latLngAnimator = animatorArray.get(ANIMATOR_LAYER_LATLNG);
     if (latLngAnimator != null) {
       previousLatLng = (LatLng) latLngAnimator.getAnimatedValue();
     } else {
@@ -136,7 +133,7 @@ final class LocationAnimatorCoordinator {
   }
 
   private float getPreviousLayerGpsBearing() {
-    LayerGpsBearingAnimator animator = (LayerGpsBearingAnimator) animatorMap.get(ANIMATOR_LAYER_GPS_BEARING);
+    LayerGpsBearingAnimator animator = (LayerGpsBearingAnimator) animatorArray.get(ANIMATOR_LAYER_GPS_BEARING);
     float previousBearing;
     if (animator != null) {
       previousBearing = (float) animator.getAnimatedValue();
@@ -148,7 +145,7 @@ final class LocationAnimatorCoordinator {
 
   private float getPreviousLayerCompassBearing() {
     LayerCompassBearingAnimator animator =
-      (LayerCompassBearingAnimator) animatorMap.get(ANIMATOR_LAYER_COMPASS_BEARING);
+      (LayerCompassBearingAnimator) animatorArray.get(ANIMATOR_LAYER_COMPASS_BEARING);
 
     float previousBearing;
     if (animator != null) {
@@ -160,7 +157,7 @@ final class LocationAnimatorCoordinator {
   }
 
   private float getPreviousAccuracyRadius() {
-    LayerAccuracyAnimator animator = (LayerAccuracyAnimator) animatorMap.get(ANIMATOR_LAYER_ACCURACY);
+    LayerAccuracyAnimator animator = (LayerAccuracyAnimator) animatorArray.get(ANIMATOR_LAYER_ACCURACY);
     float previousRadius;
     if (animator != null) {
       previousRadius = (float) animator.getAnimatedValue();
@@ -243,10 +240,10 @@ final class LocationAnimatorCoordinator {
 
   private void playLocationAnimators(long duration) {
     List<Animator> locationAnimators = new ArrayList<>();
-    locationAnimators.add(animatorMap.get(ANIMATOR_LAYER_LATLNG));
-    locationAnimators.add(animatorMap.get(ANIMATOR_LAYER_GPS_BEARING));
-    locationAnimators.add(animatorMap.get(ANIMATOR_CAMERA_LATLNG));
-    locationAnimators.add(animatorMap.get(ANIMATOR_CAMERA_GPS_BEARING));
+    locationAnimators.add(animatorArray.get(ANIMATOR_LAYER_LATLNG));
+    locationAnimators.add(animatorArray.get(ANIMATOR_LAYER_GPS_BEARING));
+    locationAnimators.add(animatorArray.get(ANIMATOR_CAMERA_LATLNG));
+    locationAnimators.add(animatorArray.get(ANIMATOR_CAMERA_GPS_BEARING));
     AnimatorSet locationAnimatorSet = new AnimatorSet();
     locationAnimatorSet.playTogether(locationAnimators);
     locationAnimatorSet.setInterpolator(new LinearInterpolator());
@@ -256,8 +253,8 @@ final class LocationAnimatorCoordinator {
 
   private void playCompassAnimators(long duration) {
     List<Animator> compassAnimators = new ArrayList<>();
-    compassAnimators.add(animatorMap.get(ANIMATOR_LAYER_COMPASS_BEARING));
-    compassAnimators.add(animatorMap.get(ANIMATOR_CAMERA_COMPASS_BEARING));
+    compassAnimators.add(animatorArray.get(ANIMATOR_LAYER_COMPASS_BEARING));
+    compassAnimators.add(animatorArray.get(ANIMATOR_CAMERA_COMPASS_BEARING));
     AnimatorSet compassAnimatorSet = new AnimatorSet();
     compassAnimatorSet.playTogether(compassAnimators);
     compassAnimatorSet.setDuration(duration);
@@ -265,27 +262,27 @@ final class LocationAnimatorCoordinator {
   }
 
   private void playAccuracyAnimator(long duration) {
-    MapboxAnimator animator = animatorMap.get(ANIMATOR_LAYER_ACCURACY);
+    MapboxAnimator animator = animatorArray.get(ANIMATOR_LAYER_ACCURACY);
     animator.setDuration(duration);
     animator.start();
   }
 
   private void playZoomAnimator(long duration) {
-    MapboxAnimator animator = animatorMap.get(ANIMATOR_ZOOM);
+    MapboxAnimator animator = animatorArray.get(ANIMATOR_ZOOM);
     animator.setDuration(duration);
     animator.start();
   }
 
   private void playTiltAnimator(long duration) {
-    MapboxAnimator animator = animatorMap.get(ANIMATOR_TILT);
+    MapboxAnimator animator = animatorArray.get(ANIMATOR_TILT);
     animator.setDuration(duration);
     animator.start();
   }
 
   private void playCameraLocationAnimators(long duration) {
     List<Animator> locationAnimators = new ArrayList<>();
-    locationAnimators.add(animatorMap.get(ANIMATOR_CAMERA_LATLNG));
-    locationAnimators.add(animatorMap.get(ANIMATOR_CAMERA_GPS_BEARING));
+    locationAnimators.add(animatorArray.get(ANIMATOR_CAMERA_LATLNG));
+    locationAnimators.add(animatorArray.get(ANIMATOR_CAMERA_GPS_BEARING));
     AnimatorSet locationAnimatorSet = new AnimatorSet();
     locationAnimatorSet.playTogether(locationAnimators);
     locationAnimatorSet.setInterpolator(new LinearInterpolator());
@@ -305,7 +302,7 @@ final class LocationAnimatorCoordinator {
   }
 
   private void resetCameraLatLngAnimation(CameraPosition currentCameraPosition) {
-    CameraLatLngAnimator animator = (CameraLatLngAnimator) animatorMap.get(ANIMATOR_CAMERA_LATLNG);
+    CameraLatLngAnimator animator = (CameraLatLngAnimator) animatorArray.get(ANIMATOR_CAMERA_LATLNG);
     if (animator == null) {
       return;
     }
@@ -317,7 +314,7 @@ final class LocationAnimatorCoordinator {
   }
 
   private void resetCameraGpsBearingAnimation(CameraPosition currentCameraPosition, boolean isGpsNorth) {
-    CameraGpsBearingAnimator animator = (CameraGpsBearingAnimator) animatorMap.get(ANIMATOR_CAMERA_GPS_BEARING);
+    CameraGpsBearingAnimator animator = (CameraGpsBearingAnimator) animatorArray.get(ANIMATOR_CAMERA_GPS_BEARING);
     if (animator == null) {
       return;
     }
@@ -332,7 +329,7 @@ final class LocationAnimatorCoordinator {
 
   private void resetCameraCompassAnimation(CameraPosition currentCameraPosition) {
     CameraCompassBearingAnimator animator =
-      (CameraCompassBearingAnimator) animatorMap.get(ANIMATOR_CAMERA_COMPASS_BEARING);
+      (CameraCompassBearingAnimator) animatorArray.get(ANIMATOR_CAMERA_COMPASS_BEARING);
     if (animator == null) {
       return;
     }
@@ -346,7 +343,7 @@ final class LocationAnimatorCoordinator {
 
   private void createNewAnimator(@MapboxAnimator.Type int animatorType, MapboxAnimator animator) {
     cancelAnimator(animatorType);
-    animatorMap.put(animatorType, animator);
+    animatorArray.put(animatorType, animator);
   }
 
   void cancelZoomAnimation() {
@@ -358,18 +355,19 @@ final class LocationAnimatorCoordinator {
   }
 
   void cancelAllAnimations() {
-    for (@MapboxAnimator.Type int animatorType : animatorMap.keySet()) {
+    for (int i = 0; i < animatorArray.size(); i++) {
+      @MapboxAnimator.Type int animatorType = animatorArray.keyAt(i);
       cancelAnimator(animatorType);
     }
   }
 
   private void cancelAnimator(@MapboxAnimator.Type int animatorType) {
-    MapboxAnimator animator = animatorMap.get(animatorType);
+    MapboxAnimator animator = animatorArray.get(animatorType);
     if (animator != null) {
       animator.cancel();
       animator.removeAllUpdateListeners();
       animator.removeAllListeners();
-      animatorMap.put(animatorType, null);
+      animatorArray.put(animatorType, null);
     }
   }
 }
