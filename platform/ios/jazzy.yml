@@ -107,6 +107,7 @@ custom_categories:
       - MGLOfflinePackProgress
       - MGLOfflinePackState
       - MGLTilePyramidOfflineRegion
+      - MGLShapeOfflineRegion
   - name: Geometry
     children:
       - MGLCoordinateBounds
