@@ -243,6 +243,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             filteredLayers.push_back(layer);
         }
 
+        //TODO: AHM: Send feature states
         renderSources.at(source->id)->update(source,
                                              filteredLayers,
                                              needsRendering,

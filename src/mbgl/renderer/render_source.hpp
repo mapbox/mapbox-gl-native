@@ -49,6 +49,13 @@ public:
     virtual bool isLoaded() const = 0;
 
     virtual void update(Immutable<style::Source::Impl>,
+                const std::vector<Immutable<style::Layer::Impl>>&,
+                const FeatureStatesMap&,
+                bool,
+                bool,
+                const TileParameters&) {}
+
+    virtual void update(Immutable<style::Source::Impl>,
                         const std::vector<Immutable<style::Layer::Impl>>&,
                         bool needsRendering,
                         bool needsRelayout,

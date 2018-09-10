@@ -25,7 +25,8 @@ using namespace style;
 static TileObserver nullObserver;
 
 TilePyramid::TilePyramid()
-    : observer(&nullObserver) {
+    : observer(&nullObserver),
+    featureStates(std::make_shared<FeatureStatesMap>()) {
 }
 
 TilePyramid::~TilePyramid() = default;
@@ -62,6 +63,30 @@ Tile* TilePyramid::getTile(const OverscaledTileID& tileID){
 }
 
 void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layers,
+                         const bool needsRendering,
+                         const bool needsRelayout,
+                         const TileParameters& parameters,
+                         const SourceType type,
+                         const uint16_t tileSize,
+                         const Range<uint8_t> zoomRange,
+                         optional<LatLngBounds> bounds,
+                         std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile) {
+    update(layers, {}, needsRendering, needsRelayout, parameters, type, tileSize, zoomRange, bounds, createTile);
+}
+
+void extend(PropertyMap& a, const PropertyMap& b) {
+    for (const auto& pair: b) {
+        auto it = a.find(pair.first);
+        if (it != a.end()) {
+            a.emplace(pair);
+        } else {
+            it->second = pair.second;
+        }
+    }
+}
+
+void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layers,
+                         const FeatureStatesMap& newStates,
                          const bool needsRendering,
                          const bool needsRelayout,
                          const TileParameters& parameters,
@@ -125,6 +150,21 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
         idealTiles = util::tileCover(parameters.transformState, idealZoom);
     }
 
+    //Coalesce changes to the feature state before applying to tiles.
+    std::shared_ptr<FeatureStatesMap> changedStates = std::make_shared<FeatureStatesMap>();
+    for( const auto& sourceLayer: newStates) {
+        auto& existing = (*featureStates)[sourceLayer.first];
+        auto& changed = sourceLayer.second;
+        FeatureStates newChanges;
+        //for each feature id in this sourceLayer, get and merge the PropertyMap from newStates
+        for (const auto& id: changed) {
+            auto& e = existing[id.first];
+            extend(e, id.second);
+            newChanges[id.first] = e;
+        }
+        changedStates->emplace(sourceLayer.first, newChanges);
+    }
+
     // Stores a list of all the tiles that we're definitely going to retain. There are two
     // kinds of tiles we need: the ideal tiles determined by the tile cover. They may not yet be in
     // use because they're still loading. In addition to that, we also need to retain all tiles that
@@ -164,6 +204,9 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
                 tile->setObserver(observer);
                 tile->setLayers(layers);
             }
+        } else {
+            // Set full feature state when returning from cache.
+            tile->setFeatureState(featureStates);
         }
         if (!tile) {
             return nullptr;
@@ -181,6 +224,8 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
         rendered.emplace(tileID);
         previouslyRenderedTiles.erase(tileID); // Still rendering this tile, no need for special fading logic.
         tile.markRenderedIdeal();
+        //Pass coalesced state, instead of entire state
+        tile.setFeatureState(changedStates);
     };
 
     renderTiles.clear();

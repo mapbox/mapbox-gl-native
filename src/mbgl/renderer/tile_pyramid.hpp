@@ -43,6 +43,17 @@ public:
                 optional<LatLngBounds> bounds,
                 std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);
 
+    void update(const std::vector<Immutable<style::Layer::Impl>>&,
+                const FeatureStatesMap& newStates,
+                bool needsRendering,
+                bool needsRelayout,
+                const TileParameters&,
+                style::SourceType type,
+                uint16_t tileSize,
+                Range<uint8_t> zoomRange,
+                optional<LatLngBounds> bounds,
+                std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);
+
     void startRender(PaintParameters&);
     void finishRender(PaintParameters&);
 
@@ -75,6 +86,7 @@ public:
 
     TileObserver* observer = nullptr;
 
+    std::shared_ptr<FeatureStatesMap> featureStates;
     float prevLng = 0;
 };
 

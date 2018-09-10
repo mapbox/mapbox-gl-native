@@ -25,6 +25,7 @@ bool RenderVectorSource::isLoaded() const {
 
 void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
                                 const std::vector<Immutable<Layer::Impl>>& layers,
+                                const FeatureStatesMap& newStates,
                                 const bool needsRendering,
                                 const bool needsRelayout,
                                 const TileParameters& parameters) {
@@ -50,6 +51,7 @@ void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
     }
 
     tilePyramid.update(layers,
+                       newStates,
                        needsRendering,
                        needsRelayout,
                        parameters,
@@ -60,6 +62,20 @@ void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
                        [&] (const OverscaledTileID& tileID) {
                            return std::make_unique<VectorTile>(tileID, impl().id, parameters, *tileset);
                        });
+}
+
+
+void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
+                                const std::vector<Immutable<Layer::Impl>>& layers,
+                                const bool needsRendering,
+                                const bool needsRelayout,
+                                const TileParameters& parameters) {
+    update(baseImpl_,
+           layers,
+           {},
+           needsRendering,
+           needsRelayout,
+           parameters);
 }
 
 void RenderVectorSource::startRender(PaintParameters& parameters) {
