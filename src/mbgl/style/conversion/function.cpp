@@ -6,7 +6,6 @@
 #include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/match.hpp>
 #include <mbgl/style/expression/case.hpp>
-#include <mbgl/style/expression/array_assertion.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <cassert>
@@ -679,8 +678,7 @@ optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type typ
                 return toColor(get(literal(*property)));
             },
             [&] (const type::Array& array) -> optional<std::unique_ptr<Expression>> {
-                return std::unique_ptr<Expression>(
-                    std::make_unique<ArrayAssertion>(array, get(literal(*property))));
+                return assertion(array, get(literal(*property)));
             },
             [&] (const auto&) -> optional<std::unique_ptr<Expression>>  {
                 assert(false); // No properties use this type.
