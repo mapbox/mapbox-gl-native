@@ -4,6 +4,10 @@
       "idiom" : "universal",
       "filename" : "heatmap.pdf",
       "language-direction" : "left-to-right"
+    },
+    {
+      "idiom" : "universal",
+      "language-direction" : "right-to-left"
     }
   ],
   "info" : {
