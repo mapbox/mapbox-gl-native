@@ -6,7 +6,6 @@
 
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/at.hpp>
-#include <mbgl/style/expression/array_assertion.hpp>
 #include <mbgl/style/expression/assertion.hpp>
 #include <mbgl/style/expression/boolean_operator.hpp>
 #include <mbgl/style/expression/case.hpp>
@@ -46,8 +45,7 @@ bool isConstant(const Expression& expression) {
     }
 
     bool isTypeAnnotation = expression.getKind() == Kind::Coercion ||
-        expression.getKind() == Kind::Assertion ||
-        expression.getKind() == Kind::ArrayAssertion;
+        expression.getKind() == Kind::Assertion;
     
     bool childrenConstant = true;
     expression.eachChild([&](const Expression& child) {
@@ -105,7 +103,7 @@ const ExpressionRegistry& getExpressionRegistry() {
         {"<=", parseComparison},
         {"all", All::parse},
         {"any", Any::parse},
-        {"array", ArrayAssertion::parse},
+        {"array", Assertion::parse},
         {"at", At::parse},
         {"boolean", Assertion::parse},
         {"case", Case::parse},
@@ -171,13 +169,9 @@ ParseResult ParsingContext::parse(const Convertible& value, TypeAnnotationOption
 
     if (expected) {
         const type::Type actual = (*parsed)->getType();
-        if ((*expected == type::String || *expected == type::Number || *expected == type::Boolean || *expected == type::Object) && actual == type::Value) {
+        if ((*expected == type::String || *expected == type::Number || *expected == type::Boolean || *expected == type::Object || expected->is<type::Array>()) && actual == type::Value) {
             if (typeAnnotationOption == includeTypeAnnotations) {
                 parsed = { std::make_unique<Assertion>(*expected, array(std::move(*parsed))) };
-            }
-        } else if (expected->is<type::Array>() && actual == type::Value) {
-            if (typeAnnotationOption == includeTypeAnnotations) {
-                parsed = { std::make_unique<ArrayAssertion>(expected->get<type::Array>(), std::move(*parsed)) };
             }
         } else if (*expected == type::Color && (actual == type::Value || actual == type::String)) {
             if (typeAnnotationOption == includeTypeAnnotations) {
