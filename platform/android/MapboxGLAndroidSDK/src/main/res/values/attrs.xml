@@ -7,6 +7,7 @@
         <attr name="mapbox_styleJson" format="string"/>
         <attr name="mapbox_apiBaseUrl" format="string"/>
         <attr name="mapbox_localIdeographFontFamily" format="string"/>
+        <attr name="mapbox_cross_source_collisions" format="boolean"/>
 
         <!--Camera-->
         <attr name="mapbox_cameraTargetLat" format="float"/>

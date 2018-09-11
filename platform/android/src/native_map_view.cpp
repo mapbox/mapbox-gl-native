@@ -60,7 +60,8 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
                              const jni::Object<NativeMapView>& _obj,
                              const jni::Object<FileSource>& jFileSource,
                              const jni::Object<MapRenderer>& jMapRenderer,
-                             jni::jfloat _pixelRatio)
+                             jni::jfloat _pixelRatio,
+                             jni::jboolean _crossSourceCollisions)
     : javaPeer(_env, _obj)
     , mapRenderer(MapRenderer::getNativePeer(_env, jMapRenderer))
     , pixelRatio(_pixelRatio)
@@ -83,7 +84,7 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
                                       mbgl::Size{ static_cast<uint32_t>(width),
                                                   static_cast<uint32_t>(height) }, pixelRatio,
                                       fileSource, *threadPool, MapMode::Continuous,
-                                      ConstrainMode::HeightOnly, ViewportMode::Default);
+                                      ConstrainMode::HeightOnly, ViewportMode::Default, _crossSourceCollisions);
 }
 
 /**
@@ -942,7 +943,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
 
     // Register the peer
     jni::RegisterNativePeer<NativeMapView>(env, javaClass, "nativePtr",
-            jni::MakePeer<NativeMapView, const jni::Object<NativeMapView>&, const jni::Object<FileSource>&, const jni::Object<MapRenderer>&, jni::jfloat>,
+            jni::MakePeer<NativeMapView, const jni::Object<NativeMapView>&, const jni::Object<FileSource>&, const jni::Object<MapRenderer>&, jni::jfloat, jni::jboolean>,
             "nativeInitialize",
             "nativeDestroy",
             METHOD(&NativeMapView::resizeView, "nativeResizeView"),
