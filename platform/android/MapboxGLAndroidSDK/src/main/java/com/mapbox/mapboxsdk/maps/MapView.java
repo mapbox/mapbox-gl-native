@@ -24,7 +24,6 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
-
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -47,6 +46,8 @@ import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
@@ -54,9 +55,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
@@ -316,7 +314,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       addView(glSurfaceView, 0);
     }
 
-    nativeMapView = new NativeMapView(getContext(), getPixelRatio(), this, mapRenderer);
+    boolean crossSourceCollisions = mapboxMapOptions.getCrossSourceCollisions();
+    nativeMapView = new NativeMapView(getContext(), getPixelRatio(), crossSourceCollisions, this, mapRenderer);
     nativeMapView.addOnMapChangedListener(change -> {
       // dispatch events to external listeners
       if (!onMapChangedListeners.isEmpty()) {
