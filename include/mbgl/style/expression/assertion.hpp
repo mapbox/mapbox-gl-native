@@ -24,6 +24,7 @@ public:
 
     std::vector<optional<Value>> possibleOutputs() const override;
     
+    mbgl::Value serialize() const override;
     std::string getOperator() const override;
 
 private:
