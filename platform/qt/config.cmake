@@ -25,12 +25,10 @@ macro(mbgl_platform_core)
         target_sources(mbgl-core
             PRIVATE platform/default/jpeg_reader.cpp
             PRIVATE platform/default/png_reader.cpp
-            PRIVATE platform/default/webp_reader.cpp
         )
 
         target_add_mason_package(mbgl-core PRIVATE libjpeg-turbo)
         target_add_mason_package(mbgl-core PRIVATE libpng)
-        target_add_mason_package(mbgl-core PRIVATE webp)
     else()
         add_definitions(-DQT_IMAGE_DECODERS)
     endif()
@@ -84,6 +82,7 @@ if (NOT CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         target_link_libraries(mbgl-test
             PRIVATE qmapboxgl
             PRIVATE mbgl-filesource
+            PRIVATE -pthread
         )
     endmacro()
 endif()

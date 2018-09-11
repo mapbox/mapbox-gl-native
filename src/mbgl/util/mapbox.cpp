@@ -136,19 +136,7 @@ canonicalizeTileURL(const std::string& str, const style::SourceType type, const 
     if (type == style::SourceType::Raster || type == style::SourceType::RasterDEM) {
         result += tileSize == util::tileSize ? "@2x" : "{ratio}";
     }
-
-#if !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
-    const bool forceWebP = str.compare(path.extension.first, path.extension.second, ".png") == 0;
-#else
-    const bool forceWebP = false;
-#endif // !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
-
-    // Replace PNG with WebP if necessary.
-    if (forceWebP) {
-        result += ".webp";
-    } else {
-        result.append(str, path.extension.first, path.extension.second);
-    }
+    result.append(str, path.extension.first, path.extension.second);
 
     // Append the query string, minus the access token parameter.
     if (url.query.second > 1) {
