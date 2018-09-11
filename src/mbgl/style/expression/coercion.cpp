@@ -30,6 +30,9 @@ EvaluationResult toNumber(const Value& v) {
 
 EvaluationResult toColor(const Value& colorValue) {
     return colorValue.match(
+        [&](const Color& color) -> EvaluationResult {
+            return color;
+        },
         [&](const std::string& colorString) -> EvaluationResult {
             const optional<Color> result = Color::parse(colorString);
             if (result) {
