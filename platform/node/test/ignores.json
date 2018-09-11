@@ -76,6 +76,8 @@
   "render-tests/bright-v9/z0-wide": "https://github.com/mapbox/mapbox-gl-native/pull/12611",
   "render-tests/collator/resolved-locale": "Some test platforms don't resolve 'en' locale",
   "render-tests/collator/default": "Some test platforms don't resolve 'en' locale",
+  "render-tests/custom-layer-js/null-island": "Not implemented",
+  "render-tests/custom-layer-js/tent-3d": "Not implemented",
   "render-tests/debug/collision": "https://github.com/mapbox/mapbox-gl-native/issues/3841",
   "render-tests/debug/collision-lines": "https://github.com/mapbox/mapbox-gl-native/issues/10412",
   "render-tests/debug/collision-lines-overscaled": "https://github.com/mapbox/mapbox-gl-native/issues/10412",
