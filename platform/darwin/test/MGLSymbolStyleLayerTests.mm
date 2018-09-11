@@ -1044,6 +1044,50 @@
         XCTAssertThrowsSpecificNamed(layer.symbolSpacing = functionExpression, NSException, NSInvalidArgumentException, @"MGLSymbolLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
+    // symbol-z-order
+    {
+        XCTAssertTrue(rawLayer->getSymbolZOrder().isUndefined(),
+                      @"symbol-z-order should be unset initially.");
+        NSExpression *defaultExpression = layer.symbolZOrder;
+
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'source'"];
+        layer.symbolZOrder = constantExpression;
+        mbgl::style::PropertyValue<mbgl::style::SymbolZOrderType> propertyValue = { mbgl::style::SymbolZOrderType::Source };
+        XCTAssertEqual(rawLayer->getSymbolZOrder(), propertyValue,
+                       @"Setting symbolZOrder to a constant value expression should update symbol-z-order.");
+        XCTAssertEqualObjects(layer.symbolZOrder, constantExpression,
+                              @"symbolZOrder should round-trip constant value expressions.");
+
+        constantExpression = [NSExpression expressionWithFormat:@"'source'"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.symbolZOrder = functionExpression;
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<mbgl::style::SymbolZOrderType>(
+                step(zoom(), literal("source"), 18.0, literal("source"))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getSymbolZOrder(), propertyValue,
+                       @"Setting symbolZOrder to a camera expression should update symbol-z-order.");
+        XCTAssertEqualObjects(layer.symbolZOrder, functionExpression,
+                              @"symbolZOrder should round-trip camera expressions.");
+
+
+        layer.symbolZOrder = nil;
+        XCTAssertTrue(rawLayer->getSymbolZOrder().isUndefined(),
+                      @"Unsetting symbolZOrder should return symbol-z-order to the default value.");
+        XCTAssertEqualObjects(layer.symbolZOrder, defaultExpression,
+                              @"symbolZOrder should return the default value after being unset.");
+
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.symbolZOrder = functionExpression, NSException, NSInvalidArgumentException, @"MGLSymbolLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.symbolZOrder = functionExpression, NSException, NSInvalidArgumentException, @"MGLSymbolLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+    }
+
     // text-field
     {
         XCTAssertTrue(rawLayer->getTextField().isUndefined(),
@@ -2829,6 +2873,7 @@
     [self testPropertyName:@"symbol-avoids-edges" isBoolean:YES];
     [self testPropertyName:@"symbol-placement" isBoolean:NO];
     [self testPropertyName:@"symbol-spacing" isBoolean:NO];
+    [self testPropertyName:@"symbol-z-order" isBoolean:NO];
     [self testPropertyName:@"text" isBoolean:NO];
     [self testPropertyName:@"text-allows-overlap" isBoolean:YES];
     [self testPropertyName:@"text-anchor" isBoolean:NO];
@@ -2884,6 +2929,8 @@
     XCTAssertEqual([NSValue valueWithMGLSymbolPlacement:MGLSymbolPlacementPoint].MGLSymbolPlacementValue, MGLSymbolPlacementPoint);
     XCTAssertEqual([NSValue valueWithMGLSymbolPlacement:MGLSymbolPlacementLine].MGLSymbolPlacementValue, MGLSymbolPlacementLine);
     XCTAssertEqual([NSValue valueWithMGLSymbolPlacement:MGLSymbolPlacementLineCenter].MGLSymbolPlacementValue, MGLSymbolPlacementLineCenter);
+    XCTAssertEqual([NSValue valueWithMGLSymbolZOrder:MGLSymbolZOrderViewportY].MGLSymbolZOrderValue, MGLSymbolZOrderViewportY);
+    XCTAssertEqual([NSValue valueWithMGLSymbolZOrder:MGLSymbolZOrderSource].MGLSymbolZOrderValue, MGLSymbolZOrderSource);
     XCTAssertEqual([NSValue valueWithMGLTextAnchor:MGLTextAnchorCenter].MGLTextAnchorValue, MGLTextAnchorCenter);
     XCTAssertEqual([NSValue valueWithMGLTextAnchor:MGLTextAnchorLeft].MGLTextAnchorValue, MGLTextAnchorLeft);
     XCTAssertEqual([NSValue valueWithMGLTextAnchor:MGLTextAnchorRight].MGLTextAnchorValue, MGLTextAnchorRight);

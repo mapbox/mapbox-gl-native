@@ -12,28 +12,26 @@ class Bitmap;
 
 class ImageSource : public Source {
 public:
-
+    using SuperTag = Source;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/sources/ImageSource"; };
-
-    static jni::Class<ImageSource> javaClass;
 
     static void registerNative(jni::JNIEnv&);
 
-    ImageSource(jni::JNIEnv&, jni::String, jni::Object<LatLngQuad>);
+    ImageSource(jni::JNIEnv&, const jni::String&, const jni::Object<LatLngQuad>&);
 
     ImageSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
 
     ~ImageSource();
 
-    void setURL(jni::JNIEnv&, jni::String);
-    jni::String getURL(jni::JNIEnv&);
+    void setURL(jni::JNIEnv&, const jni::String&);
+    jni::Local<jni::String> getURL(jni::JNIEnv&);
 
-    void setImage(jni::JNIEnv&, jni::Object<Bitmap>);
+    void setImage(jni::JNIEnv&, const jni::Object<Bitmap>&);
 
-    void setCoordinates(jni::JNIEnv&, jni::Object<LatLngQuad>);
+    void setCoordinates(jni::JNIEnv&, const jni::Object<LatLngQuad>&);
 
 private:
-    jni::Object<Source> createJavaPeer(jni::JNIEnv&);
+    jni::Local<jni::Object<Source>> createJavaPeer(jni::JNIEnv&);
 
 }; // class ImageSource
 

@@ -14,21 +14,19 @@ namespace android {
 namespace geojson {
 
 
-class LineString : public Geometry {
+class LineString {
 public:
+    using SuperTag = Geometry;
     static constexpr auto Name() { return "com/mapbox/geojson/LineString"; };
-
     static constexpr auto Type() { return "LineString"; };
 
-    static jni::Object<LineString> New(jni::JNIEnv&, const mbgl::LineString<double>&);
+    static jni::Local<jni::Object<LineString>> New(jni::JNIEnv&, const mbgl::LineString<double>&);
 
-    static mapbox::geojson::line_string convert(jni::JNIEnv&, jni::Object<LineString>);
+    static mapbox::geojson::line_string convert(jni::JNIEnv&, const jni::Object<LineString>&);
 
-    static mapbox::geojson::line_string convert(jni::JNIEnv&, jni::Object<java::util::List/*<Point>*/>);
+    static mapbox::geojson::line_string convert(jni::JNIEnv&, const jni::Object<java::util::List/*<Point>*/>&);
 
-    static jni::Object<java::util::List> coordinates(jni::JNIEnv&, jni::Object<LineString>);
-
-    static jni::Class<LineString> javaClass;
+    static jni::Local<jni::Object<java::util::List>> coordinates(jni::JNIEnv&, const jni::Object<LineString>&);
 
     static void registerNative(jni::JNIEnv&);
 };

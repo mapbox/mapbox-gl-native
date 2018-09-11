@@ -12,19 +12,17 @@ namespace mbgl {
 namespace android {
 namespace geojson {
 
-class MultiPolygon : public Geometry {
+class MultiPolygon {
 public:
+    using SuperTag = Geometry;
     static constexpr auto Name() { return "com/mapbox/geojson/MultiPolygon"; };
-
     static constexpr auto Type() { return "MultiPolygon"; };
 
-    static jni::Object<MultiPolygon> New(jni::JNIEnv&, const mbgl::MultiPolygon<double>&);
+    static jni::Local<jni::Object<MultiPolygon>> New(jni::JNIEnv&, const mbgl::MultiPolygon<double>&);
 
-    static mapbox::geojson::multi_polygon convert(jni::JNIEnv&, jni::Object<MultiPolygon>);
+    static mapbox::geojson::multi_polygon convert(jni::JNIEnv&, const jni::Object<MultiPolygon>&);
 
-    static jni::Object<java::util::List> coordinates(jni::JNIEnv&, jni::Object<MultiPolygon>);
-
-    static jni::Class<MultiPolygon> javaClass;
+    static jni::Local<jni::Object<java::util::List>> coordinates(jni::JNIEnv&, const jni::Object<MultiPolygon>&);
 
     static void registerNative(jni::JNIEnv&);
 };

@@ -171,6 +171,17 @@ public class SymbolLayer extends Layer {
   }
 
   /**
+   * Get the SymbolZOrder property
+   *
+   * @return property wrapper value around String
+   */
+  @SuppressWarnings("unchecked")
+  public PropertyValue<String> getSymbolZOrder() {
+    checkThread();
+    return (PropertyValue<String>) new PropertyValue("symbol-z-order", nativeGetSymbolZOrder());
+  }
+
+  /**
    * Get the IconAllowOverlap property
    *
    * @return property wrapper value around Boolean
@@ -1003,6 +1014,9 @@ public class SymbolLayer extends Layer {
 
   @Keep
   private native Object nativeGetSymbolAvoidEdges();
+
+  @Keep
+  private native Object nativeGetSymbolZOrder();
 
   @Keep
   private native Object nativeGetIconAllowOverlap();

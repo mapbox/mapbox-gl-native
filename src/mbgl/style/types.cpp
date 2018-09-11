@@ -76,6 +76,11 @@ MBGL_DEFINE_ENUM(SymbolAnchorType, {
     { SymbolAnchorType::BottomLeft, "bottom-left" },
     { SymbolAnchorType::BottomRight, "bottom-right" }
 });
+    
+MBGL_DEFINE_ENUM(SymbolZOrderType, {
+    { SymbolZOrderType::ViewportY, "viewport-y" },
+    { SymbolZOrderType::Source, "source" }
+});
 
 MBGL_DEFINE_ENUM(TextJustifyType, {
     { TextJustifyType::Center, "center" },

@@ -13,19 +13,17 @@ namespace mbgl {
 namespace android {
 namespace geojson {
 
-class MultiPoint : public Geometry {
+class MultiPoint {
 public:
+    using SuperTag = Geometry;
     static constexpr auto Name() { return "com/mapbox/geojson/MultiPoint"; };
-
     static constexpr auto Type() { return "MultiPoint"; };
 
-    static jni::Object<MultiPoint> New(jni::JNIEnv&, const mbgl::MultiPoint<double>&);
+    static jni::Local<jni::Object<MultiPoint>> New(jni::JNIEnv&, const mbgl::MultiPoint<double>&);
 
-    static mapbox::geojson::multi_point convert(jni::JNIEnv&, jni::Object<MultiPoint>);
+    static mapbox::geojson::multi_point convert(jni::JNIEnv&, const jni::Object<MultiPoint>&);
 
-    static jni::Object<java::util::List> coordinates(jni::JNIEnv&, jni::Object<MultiPoint>);
-
-    static jni::Class<MultiPoint> javaClass;
+    static jni::Local<jni::Object<java::util::List>> coordinates(jni::JNIEnv&, const jni::Object<MultiPoint>&);
 
     static void registerNative(jni::JNIEnv&);
 };

@@ -9,10 +9,8 @@ namespace android {
 
 class UnknownSource : public Source {
 public:
-
+    using SuperTag = Source;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/sources/UnknownSource"; };
-
-    static jni::Class<UnknownSource> javaClass;
 
     static void registerNative(jni::JNIEnv&);
 
@@ -21,7 +19,7 @@ public:
     ~UnknownSource() = default;
 
 private:
-    jni::Object<Source> createJavaPeer(jni::JNIEnv&);
+    jni::Local<jni::Object<Source>> createJavaPeer(jni::JNIEnv&);
 
 }; // class UnknownSource
 

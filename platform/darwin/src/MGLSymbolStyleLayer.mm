@@ -50,6 +50,11 @@ namespace mbgl {
         { MGLSymbolPlacementLineCenter, "line-center" },
     });
 
+    MBGL_DEFINE_ENUM(MGLSymbolZOrder, {
+        { MGLSymbolZOrderViewportY, "viewport-y" },
+        { MGLSymbolZOrderSource, "source" },
+    });
+
     MBGL_DEFINE_ENUM(MGLTextAnchor, {
         { MGLTextAnchorCenter, "center" },
         { MGLTextAnchorLeft, "left" },
@@ -571,6 +576,23 @@ namespace mbgl {
         propertyValue = self.rawLayer->getDefaultSymbolSpacing();
     }
     return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
+}
+
+- (void)setSymbolZOrder:(NSExpression *)symbolZOrder {
+    MGLAssertStyleLayerIsValid();
+
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::SymbolZOrderType, NSValue *, mbgl::style::SymbolZOrderType, MGLSymbolZOrder>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::SymbolZOrderType>>(symbolZOrder, false);
+    self.rawLayer->setSymbolZOrder(mbglValue);
+}
+
+- (NSExpression *)symbolZOrder {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getSymbolZOrder();
+    if (propertyValue.isUndefined()) {
+        propertyValue = self.rawLayer->getDefaultSymbolZOrder();
+    }
+    return MGLStyleValueTransformer<mbgl::style::SymbolZOrderType, NSValue *, mbgl::style::SymbolZOrderType, MGLSymbolZOrder>().toExpression(propertyValue);
 }
 
 - (void)setText:(NSExpression *)text {
@@ -1438,6 +1460,16 @@ namespace mbgl {
     MGLSymbolPlacement symbolPlacement;
     [self getValue:&symbolPlacement];
     return symbolPlacement;
+}
+
++ (NSValue *)valueWithMGLSymbolZOrder:(MGLSymbolZOrder)symbolZOrder {
+    return [NSValue value:&symbolZOrder withObjCType:@encode(MGLSymbolZOrder)];
+}
+
+- (MGLSymbolZOrder)MGLSymbolZOrderValue {
+    MGLSymbolZOrder symbolZOrder;
+    [self getValue:&symbolZOrder];
+    return symbolZOrder;
 }
 
 + (NSValue *)valueWithMGLTextAnchor:(MGLTextAnchor)textAnchor {

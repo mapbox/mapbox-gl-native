@@ -53,6 +53,10 @@ public:
     PropertyValue<bool> getSymbolAvoidEdges() const;
     void setSymbolAvoidEdges(PropertyValue<bool>);
 
+    static PropertyValue<SymbolZOrderType> getDefaultSymbolZOrder();
+    PropertyValue<SymbolZOrderType> getSymbolZOrder() const;
+    void setSymbolZOrder(PropertyValue<SymbolZOrderType>);
+
     static PropertyValue<bool> getDefaultIconAllowOverlap();
     PropertyValue<bool> getIconAllowOverlap() const;
     void setIconAllowOverlap(PropertyValue<bool>);

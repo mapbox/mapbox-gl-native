@@ -10,26 +10,22 @@ namespace android {
 
 class VectorSource : public Source {
 public:
-
+    using SuperTag = Source;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/sources/VectorSource"; };
-
-    static jni::Class<VectorSource> javaClass;
 
     static void registerNative(jni::JNIEnv&);
 
-    VectorSource(jni::JNIEnv&, jni::String, jni::Object<>);
-
+    VectorSource(jni::JNIEnv&, const jni::String&, const jni::Object<>&);
     VectorSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
-
     ~VectorSource();
 
-    jni::Array<jni::Object<geojson::Feature>> querySourceFeatures(jni::JNIEnv&, jni::Array<jni::String>,
-                                                                  jni::Array<jni::Object<>> jfilter);
-
-    jni::String getURL(jni::JNIEnv&);
-
 private:
-    jni::Object<Source> createJavaPeer(jni::JNIEnv&);
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> querySourceFeatures(jni::JNIEnv&, const jni::Array<jni::String>&,
+                                                                  const jni::Array<jni::Object<>>& jfilter);
+
+    jni::Local<jni::String> getURL(jni::JNIEnv&);
+
+    jni::Local<jni::Object<Source>> createJavaPeer(jni::JNIEnv&);
 
 }; // class VectorSource
 

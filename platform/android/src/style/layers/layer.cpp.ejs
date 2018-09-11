@@ -18,13 +18,13 @@ namespace android {
     /**
      * Creates an owning peer object (for layers not attached to the map) from the JVM side
      */
-    <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(jni::JNIEnv& env, jni::String layerId)
+    <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(jni::JNIEnv& env, jni::String& layerId)
         : Layer(env, std::make_unique<mbgl::style::<%- camelize(type) %>Layer>(jni::Make<std::string>(env, layerId))) {
 <% } else { -%>
     /**
      * Creates an owning peer object (for layers not attached to the map) from the JVM side
      */
-    <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(jni::JNIEnv& env, jni::String layerId, jni::String sourceId)
+    <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(jni::JNIEnv& env, jni::String& layerId, jni::String& sourceId)
         : Layer(env, std::make_unique<mbgl::style::<%- camelize(type) %>Layer>(jni::Make<std::string>(env, layerId), jni::Make<std::string>(env, sourceId))) {
 <% } -%>
     }
@@ -49,29 +49,27 @@ namespace android {
 
 <% for (const property of properties) { -%>
 <% if (property.name != 'heatmap-color') { -%>
-    jni::Object<jni::ObjectTag> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::<%- camelize(type) %>Layer>()-><%- camelize(type) %>Layer::get<%- camelize(property.name) %>());
-        return jni::Object<jni::ObjectTag>(*converted);
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::<%- camelize(type) %>Layer>()-><%- camelize(type) %>Layer::get<%- camelize(property.name) %>()));
     }
 
 <% } else { -%>
-    jni::Object<jni::ObjectTag> HeatmapLayer::getHeatmapColor(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> HeatmapLayer::getHeatmapColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         auto propertyValue = layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getHeatmapColor();
         if (propertyValue.isUndefined()) {
             propertyValue = layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getDefaultHeatmapColor();
         }
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, propertyValue);
-        return jni::Object<jni::ObjectTag>(*converted);
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, propertyValue));
     }
 
 <% } -%>
 <% if (property.transition) { -%>
-    jni::Object<TransitionOptions> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>Transition(jni::JNIEnv& env) {
+    jni::Local<jni::Object<TransitionOptions>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>Transition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         mbgl::style::TransitionOptions options = layer.as<mbgl::style::<%- camelize(type) %>Layer>()-><%- camelize(type) %>Layer::get<%- camelize(property.name) %>Transition();
-        return *convert<jni::Object<TransitionOptions>>(env, options);
+        return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
     void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>Transition(jni::JNIEnv&, jlong duration, jlong delay) {
@@ -84,26 +82,25 @@ namespace android {
 <% } -%>
 <% } -%>
 
-    jni::Class<<%- camelize(type) %>Layer> <%- camelize(type) %>Layer::javaClass;
-
-    jni::jobject* <%- camelize(type) %>Layer::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = <%- camelize(type) %>Layer::javaClass.template GetConstructor<jni::jlong>(env);
-        return <%- camelize(type) %>Layer::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+    jni::Local<jni::Object<Layer>> <%- camelize(type) %>Layer::createJavaPeer(jni::JNIEnv& env) {
+        static auto& javaClass = jni::Class<<%- camelize(type) %>Layer>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
     void <%- camelize(type) %>Layer::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        <%- camelize(type) %>Layer::javaClass = *jni::Class<<%- camelize(type) %>Layer>::Find(env).NewGlobalRef(env).release();
+        static auto& javaClass = jni::Class<<%- camelize(type) %>Layer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<<%- camelize(type) %>Layer>(
-            env, <%- camelize(type) %>Layer::javaClass, "nativePtr",
+            env, javaClass, "nativePtr",
 <% if (type === 'background') { -%>
-            std::make_unique<<%- camelize(type) %>Layer, JNIEnv&, jni::String>,
+            jni::MakePeer<<%- camelize(type) %>Layer, jni::String&>,
 <% } else { -%>
-            std::make_unique<<%- camelize(type) %>Layer, JNIEnv&, jni::String, jni::String>,
+            jni::MakePeer<<%- camelize(type) %>Layer, jni::String&, jni::String&>,
 <% } -%>
             "initialize",
             "finalize",<% for(var i = 0; i < properties.length; i++) {%>

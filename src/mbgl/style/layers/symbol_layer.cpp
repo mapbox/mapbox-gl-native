@@ -149,6 +149,22 @@ void SymbolLayer::setSymbolAvoidEdges(PropertyValue<bool> value) {
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
+PropertyValue<SymbolZOrderType> SymbolLayer::getDefaultSymbolZOrder() {
+    return SymbolZOrder::defaultValue();
+}
+
+PropertyValue<SymbolZOrderType> SymbolLayer::getSymbolZOrder() const {
+    return impl().layout.get<SymbolZOrder>();
+}
+
+void SymbolLayer::setSymbolZOrder(PropertyValue<SymbolZOrderType> value) {
+    if (value == getSymbolZOrder())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->layout.get<SymbolZOrder>() = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
 PropertyValue<bool> SymbolLayer::getDefaultIconAllowOverlap() {
     return IconAllowOverlap::defaultValue();
 }
@@ -1440,6 +1456,7 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         SymbolPlacement,
         SymbolSpacing,
         SymbolAvoidEdges,
+        SymbolZOrder,
         IconAllowOverlap,
         IconIgnorePlacement,
         IconOptional,
@@ -1493,6 +1510,12 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
     case util::hashFNV1a("symbol-avoid-edges"):
         if (name == "symbol-avoid-edges") {
             property = Property::SymbolAvoidEdges;
+        }
+        break;
+    
+    case util::hashFNV1a("symbol-z-order"):
+        if (name == "symbol-z-order") {
+            property = Property::SymbolZOrder;
         }
         break;
     
@@ -1798,6 +1821,18 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
             setTextOptional(*typedValue);
             return nullopt;
         }
+        
+    }
+    
+    if (property == Property::SymbolZOrder) {
+        Error error;
+        optional<PropertyValue<SymbolZOrderType>> typedValue = convert<PropertyValue<SymbolZOrderType>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+        
+        setSymbolZOrder(*typedValue);
+        return nullopt;
         
     }
     

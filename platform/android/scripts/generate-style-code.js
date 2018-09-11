@@ -335,12 +335,8 @@ global.supportsPropertyFunction = function (property) {
 // Template processing //
 
 // Java + JNI Light (Peer model)
-const lightHpp = ejs.compile(fs.readFileSync('platform/android/src/style/light.hpp.ejs', 'utf8'), {strict: true});;
-const lightCpp = ejs.compile(fs.readFileSync('platform/android/src/style/light.cpp.ejs', 'utf8'), {strict: true});;
 const lightJava = ejs.compile(fs.readFileSync('platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/light/light.java.ejs', 'utf8'), {strict: true});
 const lightJavaUnitTests = ejs.compile(fs.readFileSync('platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/style/light.junit.ejs', 'utf8'), {strict: true});
-writeIfModified(`platform/android/src/style/light.hpp`, lightHpp({properties: lightProperties}));
-writeIfModified(`platform/android/src/style/light.cpp`, lightCpp({properties: lightProperties}));
 writeIfModified(`platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/light/Light.java`, lightJava({properties: lightProperties}));
 writeIfModified(`platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/style/LightTest.java`, lightJavaUnitTests({properties: lightProperties}));
 

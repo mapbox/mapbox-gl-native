@@ -1,4 +1,5 @@
 #include "custom_geometry_source.hpp"
+#include "../../attach_env.hpp"
 
 #include <mbgl/renderer/query.hpp>
 
@@ -9,7 +10,7 @@
 // C++ -> Java conversion
 #include "../../conversion/conversion.hpp"
 #include "../../conversion/collection.hpp"
-#include "../../geojson/conversion/feature.hpp"
+#include "../../geojson/feature.hpp"
 #include <mbgl/style/conversion/custom_geometry_source_options.hpp>
 
 #include <string>
@@ -21,7 +22,7 @@ namespace android {
     // the value was originally a CustomGeometrySourceOptions object on the Java side. If it fails
     // to convert, it's a bug in our serialization or Java-side static typing.
     static style::CustomGeometrySource::Options convertCustomGeometrySourceOptions(jni::JNIEnv& env,
-                                                                                   jni::Object<> options,
+                                                                                   const jni::Object<>& options,
                                                                                    style::TileFunction fetchFn,
                                                                                    style::TileFunction cancelFn) {
         using namespace mbgl::style::conversion;
@@ -39,8 +40,8 @@ namespace android {
     }
 
     CustomGeometrySource::CustomGeometrySource(jni::JNIEnv& env,
-                                               jni::String sourceId,
-                                               jni::Object<> options)
+                                               const jni::String& sourceId,
+                                               const jni::Object<>& options)
         : Source(env, std::make_unique<mbgl::style::CustomGeometrySource>(
                          jni::Make<std::string>(env, sourceId),
                          convertCustomGeometrySourceOptions(env, options,
@@ -61,44 +62,48 @@ namespace android {
     void CustomGeometrySource::fetchTile (const mbgl::CanonicalTileID& tileID) {
         android::UniqueEnv _env = android::AttachEnv();
 
+        static auto& javaClass = jni::Class<CustomGeometrySource>::Singleton(*_env);
         static auto fetchTile = javaClass.GetMethod<void (jni::jint, jni::jint, jni::jint)>(*_env, "fetchTile");
 
         assert(javaPeer);
 
-        auto peer = jni::Cast(*_env, *javaPeer, javaClass);
+        auto peer = jni::Cast(*_env, javaClass, javaPeer);
         peer.Call(*_env, fetchTile, (int)tileID.z, (int)tileID.x, (int)tileID.y);
     };
 
     void CustomGeometrySource::cancelTile(const mbgl::CanonicalTileID& tileID) {
         android::UniqueEnv _env = android::AttachEnv();
 
+        static auto& javaClass = jni::Class<CustomGeometrySource>::Singleton(*_env);
         static auto cancelTile = javaClass.GetMethod<void (jni::jint, jni::jint, jni::jint)>(*_env, "cancelTile");
 
         assert(javaPeer);
 
-        auto peer = jni::Cast(*_env, *javaPeer, javaClass);
+        auto peer = jni::Cast(*_env, javaClass, javaPeer);
         peer.Call(*_env, cancelTile, (int)tileID.z, (int)tileID.x, (int)tileID.y);
     };
 
     void CustomGeometrySource::startThreads() {
         android::UniqueEnv _env = android::AttachEnv();
 
+        static auto& javaClass = jni::Class<CustomGeometrySource>::Singleton(*_env);
         static auto startThreads = javaClass.GetMethod<void ()>(*_env, "startThreads");
 
         assert(javaPeer);
 
-        auto peer = jni::Cast(*_env, *javaPeer, javaClass);
+        auto peer = jni::Cast(*_env, javaClass, javaPeer);
         peer.Call(*_env, startThreads);
     }
 
     void CustomGeometrySource::releaseThreads() {
         android::UniqueEnv _env = android::AttachEnv();
 
+        static auto& javaClass = jni::Class<CustomGeometrySource>::Singleton(*_env);
         static auto releaseThreads = javaClass.GetMethod<void ()>(*_env, "releaseThreads");
 
         assert(javaPeer);
 
-        auto peer = jni::Cast(*_env, *javaPeer, javaClass);
+        auto peer = jni::Cast(*_env, javaClass, javaPeer);
         peer.Call(*_env, releaseThreads);
     };
 
@@ -107,11 +112,12 @@ namespace android {
                                                 jni::jint y) {
         android::UniqueEnv _env = android::AttachEnv();
 
+        static auto& javaClass = jni::Class<CustomGeometrySource>::Singleton(*_env);
         static auto isCancelled = javaClass.GetMethod<jboolean (jni::jint, jni::jint, jni::jint)>(*_env, "isCancelled");
 
         assert(javaPeer);
 
-        auto peer = jni::Cast(*_env, *javaPeer, javaClass);
+        auto peer = jni::Cast(*_env, javaClass, javaPeer);
         return peer.Call(*_env, isCancelled, z, x, y);
     };
 
@@ -119,7 +125,7 @@ namespace android {
                                            jni::jint z,
                                            jni::jint x,
                                            jni::jint y,
-                                           jni::Object<geojson::FeatureCollection> jFeatures) {
+                                           const jni::Object<geojson::FeatureCollection>& jFeatures) {
         using namespace mbgl::android::geojson;
 
         // Convert the jni object
@@ -135,13 +141,13 @@ namespace android {
         source.as<mbgl::style::CustomGeometrySource>()->CustomGeometrySource::invalidateTile(CanonicalTileID(z, x, y));
     }
 
-    void CustomGeometrySource::invalidateBounds(jni::JNIEnv& env, jni::Object<LatLngBounds> jBounds) {
+    void CustomGeometrySource::invalidateBounds(jni::JNIEnv& env, const jni::Object<LatLngBounds>& jBounds) {
         auto bounds = LatLngBounds::getLatLngBounds(env, jBounds);
         source.as<mbgl::style::CustomGeometrySource>()->CustomGeometrySource::invalidateRegion(bounds);
     }
 
-    jni::Array<jni::Object<geojson::Feature>> CustomGeometrySource::querySourceFeatures(jni::JNIEnv& env,
-                                                                        jni::Array<jni::Object<>> jfilter) {
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> CustomGeometrySource::querySourceFeatures(jni::JNIEnv& env,
+                                                                        const jni::Array<jni::Object<>>& jfilter) {
         using namespace mbgl::android::conversion;
         using namespace mbgl::android::geojson;
 
@@ -149,22 +155,21 @@ namespace android {
         if (rendererFrontend) {
             features = rendererFrontend->querySourceFeatures(source.getID(), { {},  toFilter(env, jfilter) });
         }
-        return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, features);
+        return Feature::convert(env, features);
     }
 
-    jni::Class<CustomGeometrySource> CustomGeometrySource::javaClass;
-
-    jni::Object<Source> CustomGeometrySource::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = CustomGeometrySource::javaClass.template GetConstructor<jni::jlong>(env);
-        return jni::Object<Source>(CustomGeometrySource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
+    jni::Local<jni::Object<Source>> CustomGeometrySource::createJavaPeer(jni::JNIEnv& env) {
+        static auto& javaClass = jni::Class<CustomGeometrySource>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
-    void CustomGeometrySource::addToMap(JNIEnv& env, jni::Object<Source> obj, mbgl::Map& map, AndroidRendererFrontend& frontend) {
+    void CustomGeometrySource::addToMap(JNIEnv& env, const jni::Object<Source>& obj, mbgl::Map& map, AndroidRendererFrontend& frontend) {
         Source::addToMap(env, obj, map, frontend);
         startThreads();
     }
 
-    bool CustomGeometrySource::removeFromMap(JNIEnv& env, jni::Object<Source> source, mbgl::Map& map) {
+    bool CustomGeometrySource::removeFromMap(JNIEnv& env, const jni::Object<Source>& source, mbgl::Map& map) {
         bool successfullyRemoved = Source::removeFromMap(env, source, map);
         if (successfullyRemoved) {
             releaseThreads();
@@ -174,14 +179,14 @@ namespace android {
 
     void CustomGeometrySource::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        CustomGeometrySource::javaClass = *jni::Class<CustomGeometrySource>::Find(env).NewGlobalRef(env).release();
+        static auto& javaClass = jni::Class<CustomGeometrySource>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<CustomGeometrySource>(
-            env, CustomGeometrySource::javaClass, "nativePtr",
-            std::make_unique<CustomGeometrySource, JNIEnv&, jni::String, jni::Object<>>,
+            env, javaClass, "nativePtr",
+            jni::MakePeer<CustomGeometrySource, const jni::String&, const jni::Object<>&>,
             "initialize",
             "finalize",
             METHOD(&CustomGeometrySource::querySourceFeatures, "querySourceFeatures"),

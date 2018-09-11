@@ -3,7 +3,7 @@
 namespace mbgl {
 namespace android {
 
-jni::Object<OfflineRegionError> OfflineRegionError::New(jni::JNIEnv& env, mbgl::Response::Error error) {
+jni::Local<jni::Object<OfflineRegionError>> OfflineRegionError::New(jni::JNIEnv& env, mbgl::Response::Error error) {
 
     // Handle the value of reason independently of the underlying int value
     std::string reason;
@@ -28,25 +28,16 @@ jni::Object<OfflineRegionError> OfflineRegionError::New(jni::JNIEnv& env, mbgl::
             break;
     }
 
-    // Convert
-    auto jReason = jni::Make<jni::String>(env, reason);
-    auto jMessage = jni::Make<jni::String>(env, error.message);
-
-    // Create java object
+    static auto& javaClass = jni::Class<OfflineRegionError>::Singleton(env);
     static auto constructor = javaClass.GetConstructor<jni::String, jni::String>(env);
-    auto jError = javaClass.New(env, constructor, jReason, jMessage);
 
-    // Delete references
-    jni::DeleteLocalRef(env, jReason);
-    jni::DeleteLocalRef(env, jMessage);
-
-    return jError;
+    return javaClass.New(env, constructor,
+        jni::Make<jni::String>(env, reason),
+        jni::Make<jni::String>(env, error.message));
 }
 
-jni::Class<OfflineRegionError> OfflineRegionError::javaClass;
-
 void OfflineRegionError::registerNative(jni::JNIEnv& env) {
-    javaClass = *jni::Class<OfflineRegionError>::Find(env).NewGlobalRef(env).release();
+    jni::Class<OfflineRegionError>::Singleton(env);
 }
 
 } // namespace android

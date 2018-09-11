@@ -5,58 +5,42 @@ namespace mbgl {
 namespace android {
 namespace geojson {
 
-jni::Object<GeometryCollection> GeometryCollection::New(jni::JNIEnv& env, const mapbox::geometry::geometry_collection<double>& collection) {
+jni::Local<jni::Object<GeometryCollection>> GeometryCollection::New(jni::JNIEnv& env, const mapbox::geometry::geometry_collection<double>& collection) {
     // Create an array of geometries
-    auto jarray = jni::Array<jni::Object<Geometry>>::New(env, collection.size(), Geometry::javaClass);
+    auto jarray = jni::Array<jni::Object<Geometry>>::New(env, collection.size());
 
     for (size_t i = 0; i < collection.size(); i++) {
-        auto& geometry = collection.at(i);
-        auto jGeometry = Geometry::New(env, geometry);
-        jarray.Set(env, i, jGeometry);
-        jni::DeleteLocalRef(env, jGeometry);
+        jarray.Set(env, i, Geometry::New(env, collection.at(i)));
     }
 
-    // Turn into array list
-    auto jList = java::util::Arrays::asList(env, jarray);
-    jni::DeleteLocalRef(env, jarray);
-
     // create the GeometryCollection
+    static auto& javaClass = jni::Class<GeometryCollection>::Singleton(env);
     static auto method = javaClass.GetStaticMethod<jni::Object<GeometryCollection> (jni::Object<java::util::List>)>(env, "fromGeometries");
-    auto jCollection = javaClass.Call(env, method, jList);
-
-    jni::DeleteLocalRef(env, jList);
-    return jCollection;
+    return javaClass.Call(env, method, java::util::Arrays::asList(env, jarray));
 }
 
-mapbox::geometry::geometry_collection<double> GeometryCollection::convert(jni::JNIEnv &env, jni::Object<GeometryCollection> jCollection) {
+mapbox::geometry::geometry_collection<double> GeometryCollection::convert(jni::JNIEnv &env, const jni::Object<GeometryCollection>& jCollection) {
     // Get geometries
+    static auto& javaClass = jni::Class<GeometryCollection>::Singleton(env);
     static auto getGeometries = javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "geometries");
-    auto jList = jCollection.Call(env, getGeometries);
 
     // Turn into array
-    auto jarray = java::util::List::toArray<Geometry>(env, jList);
-    jni::DeleteLocalRef(env, jList);
+    auto jarray = java::util::List::toArray<Geometry>(env, jCollection.Call(env, getGeometries));
 
     // Convert each geometry
     mapbox::geometry::geometry_collection<double> collection{};
 
     auto size = jarray.Length(env);
     for (jni::jsize i = 0; i < size; i++) {
-        auto element = jarray.Get(env, i);
-        collection.push_back(Geometry::convert(env, element));
-        jni::DeleteLocalRef(env, element);
+        collection.push_back(Geometry::convert(env, jarray.Get(env, i)));
     }
 
-    jni::DeleteLocalRef(env, jarray);
     return collection;
 }
 
 void GeometryCollection::registerNative(jni::JNIEnv &env) {
-    // Lookup the class
-    javaClass = *jni::Class<GeometryCollection>::Find(env).NewGlobalRef(env).release();
+    jni::Class<GeometryCollection>::Singleton(env);
 }
-
-jni::Class<GeometryCollection> GeometryCollection::javaClass;
 
 } // namespace geojson
 } // namespace android

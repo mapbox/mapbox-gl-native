@@ -160,6 +160,20 @@ public class SymbolLayerTest extends BaseActivityTest {
   }
 
   @Test
+  public void testSymbolZOrderAsConstant() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("symbol-z-order");
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+
+      // Set and Get
+      layer.setProperties(symbolZOrder(SYMBOL_Z_ORDER_VIEWPORT_Y));
+      assertEquals((String) layer.getSymbolZOrder().getValue(), (String) SYMBOL_Z_ORDER_VIEWPORT_Y);
+    });
+  }
+
+  @Test
   public void testIconAllowOverlapAsConstant() {
     validateTestSetup();
     setupLayer();

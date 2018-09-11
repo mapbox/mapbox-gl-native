@@ -11,8 +11,8 @@ namespace android {
 namespace conversion {
 
 template <>
-struct Converter<jni::Object<Position>, mbgl::style::Position> {
-    Result<jni::Object<Position>> operator()(jni::JNIEnv &env, const mbgl::style::Position &value) const;
+struct Converter<jni::Local<jni::Object<Position>>, mbgl::style::Position> {
+    Result<jni::Local<jni::Object<Position>>> operator()(jni::JNIEnv &env, const mbgl::style::Position &value) const;
 };
 
 template <>

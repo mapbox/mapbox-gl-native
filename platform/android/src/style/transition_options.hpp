@@ -9,17 +9,12 @@ namespace android {
 
 class TransitionOptions : private mbgl::util::noncopyable {
 public:
-
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/TransitionOptions"; };
 
-    static jni::Object<TransitionOptions> fromTransitionOptions(jni::JNIEnv&, jlong duration, jlong offset);
-
-    static jni::Class<TransitionOptions> javaClass;
+    static jni::Local<jni::Object<TransitionOptions>> fromTransitionOptions(jni::JNIEnv&, jlong duration, jlong offset);
 
     static void registerNative(jni::JNIEnv&);
-
 };
-
 
 } // namespace android
 } // namespace mbgl

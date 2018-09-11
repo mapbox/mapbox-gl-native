@@ -7,29 +7,20 @@ namespace mbgl {
 namespace android {
 namespace geojson {
 
-jni::Object<MultiPolygon> MultiPolygon::New(JNIEnv& env, const mbgl::MultiPolygon<double>& multiPolygon) {
-    auto jarray = jni::Array<jni::Object<java::util::List>>::New(env, multiPolygon.size(), java::util::List::javaClass);
+jni::Local<jni::Object<MultiPolygon>> MultiPolygon::New(JNIEnv& env, const mbgl::MultiPolygon<double>& multiPolygon) {
+    static auto& javaClass = jni::Class<MultiPolygon>::Singleton(env);
+    static auto method = javaClass.GetStaticMethod<jni::Object<MultiPolygon> (jni::Object<java::util::List>)>(env, "fromLngLats");
+
+    auto jarray = jni::Array<jni::Object<java::util::List>>::New(env, multiPolygon.size());
 
     for (size_t i = 0; i < multiPolygon.size(); i++) {
-        auto& geometry = multiPolygon.at(i);
-        auto jPolygon = asPointsListsList(env, geometry);
-        jarray.Set(env, i, jPolygon);
-        jni::DeleteLocalRef(env, jPolygon);
+        jarray.Set(env, i, asPointsListsList(env, multiPolygon.at(i)));
     }
 
-    // Turn into array list
-    auto jList = java::util::Arrays::asList(env, jarray);
-    jni::DeleteLocalRef(env, jarray);
-
-    // create the MultiPolygon
-    static auto method = javaClass.GetStaticMethod<jni::Object<MultiPolygon> (jni::Object<java::util::List>)>(env, "fromLngLats");
-    auto jMultiPolygon = javaClass.Call(env, method, jList);
-
-    jni::DeleteLocalRef(env, jList);
-    return jMultiPolygon;
+    return javaClass.Call(env, method, java::util::Arrays::asList(env, jarray));
 }
 
-mapbox::geojson::multi_polygon MultiPolygon::convert(jni::JNIEnv &env, jni::Object<MultiPolygon> jMultiPolygon) {
+mapbox::geojson::multi_polygon MultiPolygon::convert(jni::JNIEnv& env, const jni::Object<MultiPolygon>& jMultiPolygon) {
     mapbox::geojson::multi_polygon multiPolygon;
 
     if (jMultiPolygon) {
@@ -40,29 +31,22 @@ mapbox::geojson::multi_polygon MultiPolygon::convert(jni::JNIEnv &env, jni::Obje
         multiPolygon.reserve(size);
 
         for (size_t i = 0; i < size; i++) {
-            auto jPositionListsList = jPointListsListArray.Get(env, i);
-            multiPolygon.push_back(Polygon::convert(env, jPositionListsList));
-            jni::DeleteLocalRef(env, jPositionListsList);
+            multiPolygon.push_back(Polygon::convert(env, jPointListsListArray.Get(env, i)));
         }
-
-        jni::DeleteLocalRef(env, jPointListsListArray);
-        jni::DeleteLocalRef(env, jPointListsListList);
     }
 
     return multiPolygon;
 }
 
-jni::Object<java::util::List> MultiPolygon::coordinates(jni::JNIEnv &env, jni::Object<MultiPolygon> jPolygon) {
-    static auto method = MultiPolygon::javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "coordinates");
+jni::Local<jni::Object<java::util::List>> MultiPolygon::coordinates(jni::JNIEnv& env, const jni::Object<MultiPolygon>& jPolygon) {
+    static auto& javaClass = jni::Class<MultiPolygon>::Singleton(env);
+    static auto method = javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "coordinates");
     return jPolygon.Call(env, method);
 }
 
 void MultiPolygon::registerNative(jni::JNIEnv &env) {
-    // Lookup the class
-    javaClass = *jni::Class<MultiPolygon>::Find(env).NewGlobalRef(env).release();
+    jni::Class<MultiPolygon>::Singleton(env);
 }
-
-jni::Class<MultiPolygon> MultiPolygon::javaClass;
 
 } // namespace geojson
 } // namespace android

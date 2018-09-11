@@ -64,14 +64,12 @@ public class MapSnapshotterReuseActivity extends AppCompatActivity implements Ma
   }
 
   private LatLngBounds getRandomBounds() {
-    return new LatLngBounds.Builder()
-      .include(new LatLng(
-        randomInRange(-5, 5),
-        randomInRange(-5, 5)))
-      .include(new LatLng(
-        randomInRange(5, 10),
-        randomInRange(5, 10))
-      ).build();
+    return LatLngBounds.from(
+      randomInRange(5, 10),
+      randomInRange(-5, 5),
+      randomInRange(-5, 5),
+      randomInRange(5, 10)
+    );
   }
 
   private CameraPosition getRandomCameraPosition() {

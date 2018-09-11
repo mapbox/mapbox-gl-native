@@ -94,7 +94,7 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
   }
 
   private void addSymbolClickListener() {
-    mapboxMap.setOnMapClickListener(point -> {
+    mapboxMap.addOnMapClickListener(point -> {
       PointF screenPoint = mapboxMap.getProjection().toScreenLocation(point);
       List<Feature> features = mapboxMap.queryRenderedFeatures(screenPoint, LAYER_ID);
       if (!features.isEmpty()) {
