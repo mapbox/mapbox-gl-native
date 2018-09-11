@@ -12,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.LibraryLoader;
@@ -85,18 +84,19 @@ final class NativeMapView {
   // Constructors
   //
 
-  public NativeMapView(final Context context, final ViewCallback viewCallback, final MapRenderer mapRenderer) {
-    this(context, context.getResources().getDisplayMetrics().density, viewCallback, mapRenderer);
+  public NativeMapView(final Context context, final boolean crossSourceCollisions, final ViewCallback viewCallback,
+                       final MapRenderer mapRenderer) {
+    this(context, context.getResources().getDisplayMetrics().density, crossSourceCollisions, viewCallback, mapRenderer);
   }
 
-  public NativeMapView(final Context context, float pixelRatio,
+  public NativeMapView(final Context context, final float pixelRatio, final boolean crossSourceCollisions,
                        final ViewCallback viewCallback, final MapRenderer mapRenderer) {
     this.mapRenderer = mapRenderer;
     this.viewCallback = viewCallback;
     this.fileSource = FileSource.getInstance(context);
     this.pixelRatio = pixelRatio;
     this.thread = Thread.currentThread();
-    nativeInitialize(this, fileSource, mapRenderer, pixelRatio);
+    nativeInitialize(this, fileSource, mapRenderer, pixelRatio, crossSourceCollisions);
   }
 
   //
@@ -936,7 +936,8 @@ final class NativeMapView {
   private native void nativeInitialize(NativeMapView nativeMapView,
                                        FileSource fileSource,
                                        MapRenderer mapRenderer,
-                                       float pixelRatio);
+                                       float pixelRatio,
+                                       boolean crossSourceCollisions);
 
   @Keep
   private native void nativeDestroy();

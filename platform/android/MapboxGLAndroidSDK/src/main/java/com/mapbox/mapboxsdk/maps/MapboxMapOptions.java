@@ -82,6 +82,8 @@ public class MapboxMapOptions implements Parcelable {
 
   private float pixelRatio;
 
+  private boolean crossSourceCollisions = true;
+
   /**
    * Creates a new MapboxMapOptions object.
    */
@@ -131,6 +133,7 @@ public class MapboxMapOptions implements Parcelable {
     localIdeographFontFamily = in.readString();
     pixelRatio = in.readFloat();
     foregroundLoadColor = in.readInt();
+    crossSourceCollisions = in.readByte() != 0;
   }
 
   /**
@@ -231,6 +234,9 @@ public class MapboxMapOptions implements Parcelable {
         typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_pixelRatio, 0));
       mapboxMapOptions.foregroundLoadColor(
         typedArray.getInt(R.styleable.mapbox_MapView_mapbox_foregroundLoadColor, LIGHT_GRAY)
+      );
+      mapboxMapOptions.crossSourceCollisions(
+        typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_cross_source_collisions, true)
       );
     } finally {
       typedArray.recycle();
@@ -567,6 +573,21 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Enable cross-source symbol collision detection, defaults to true.
+   * <p>
+   * If set to false, symbol layers will only run collision detection against
+   * other symbol layers that are part of the same source.
+   * </p>
+   *
+   * @param crossSourceCollisions true to enable, false to disable
+   * @return This
+   */
+  public MapboxMapOptions crossSourceCollisions(boolean crossSourceCollisions) {
+    this.crossSourceCollisions = crossSourceCollisions;
+    return this;
+  }
+
+  /**
    * Set the font family for generating glyphs locally for ideographs in the &#x27;CJK Unified Ideographs&#x27;
    * and &#x27;Hangul Syllables&#x27; ranges.
    * <p>
@@ -602,6 +623,14 @@ public class MapboxMapOptions implements Parcelable {
     return prefetchesTiles;
   }
 
+  /**
+   * Check whether cross-source symbol collision detection is enabled.
+   *
+   * @return true if enabled
+   */
+  public boolean getCrossSourceCollisions() {
+    return crossSourceCollisions;
+  }
 
   /**
    * Set the flag to render the map surface on top of another surface.
@@ -945,6 +974,7 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeString(localIdeographFontFamily);
     dest.writeFloat(pixelRatio);
     dest.writeInt(foregroundLoadColor);
+    dest.writeByte((byte) (crossSourceCollisions ? 1 : 0));
   }
 
   @Override
@@ -1050,6 +1080,10 @@ public class MapboxMapOptions implements Parcelable {
       return false;
     }
 
+    if (crossSourceCollisions != options.crossSourceCollisions) {
+      return false;
+    }
+
     return false;
   }
 
@@ -1090,6 +1124,7 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (zMediaOverlay ? 1 : 0);
     result = 31 * result + (localIdeographFontFamily != null ? localIdeographFontFamily.hashCode() : 0);
     result = 31 * result + (int) pixelRatio;
+    result = 31 * result + (crossSourceCollisions ? 1 : 0);
     return result;
   }
 }

@@ -53,7 +53,8 @@ public:
                   jni::Object<NativeMapView>,
                   jni::Object<FileSource>,
                   jni::Object<MapRenderer>,
-                  jni::jfloat pixelRatio);
+                  jni::jfloat,
+                  jni::jboolean);
 
     virtual ~NativeMapView();
 
