@@ -18,6 +18,7 @@
 		170A82BF201BDD1B00943087 /* MGLHeatmapStyleLayerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 170A82BE201BDD1B00943087 /* MGLHeatmapStyleLayerTests.mm */; };
 		170A82C4201FB6EC00943087 /* MGLHeatmapColorTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 170A82C2201FAFF800943087 /* MGLHeatmapColorTests.mm */; };
 		1753ED401E53CE6100A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED3F1E53CE5200A9FD90 /* MGLConversion.h */; };
+		1F5627F9214838A300038ED1 /* barcelona.db in Resources */ = {isa = PBXBuildFile; fileRef = 1F5627F8214838A200038ED1 /* barcelona.db */; };
 		1F7454A31ECFB00300021D39 /* MGLLight_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F7454A01ECFB00300021D39 /* MGLLight_Private.h */; };
 		1F7454A41ECFB00300021D39 /* MGLLight.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F7454A11ECFB00300021D39 /* MGLLight.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1F7454A51ECFB00300021D39 /* MGLLight.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F7454A21ECFB00300021D39 /* MGLLight.mm */; };
@@ -311,6 +312,7 @@
 		170A82BE201BDD1B00943087 /* MGLHeatmapStyleLayerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLHeatmapStyleLayerTests.mm; sourceTree = "<group>"; };
 		170A82C2201FAFF800943087 /* MGLHeatmapColorTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLHeatmapColorTests.mm; sourceTree = "<group>"; };
 		1753ED3F1E53CE5200A9FD90 /* MGLConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLConversion.h; sourceTree = "<group>"; };
+		1F5627F8214838A200038ED1 /* barcelona.db */ = {isa = PBXFileReference; lastKnownFileType = file; name = barcelona.db; path = ../../darwin/test/barcelona.db; sourceTree = "<group>"; };
 		1F7454A01ECFB00300021D39 /* MGLLight_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight_Private.h; sourceTree = "<group>"; };
 		1F7454A11ECFB00300021D39 /* MGLLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight.h; sourceTree = "<group>"; };
 		1F7454A21ECFB00300021D39 /* MGLLight.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLight.mm; sourceTree = "<group>"; };
@@ -1125,6 +1127,7 @@
 				DAE6C33A1CC30DB200DB3429 /* Info.plist */,
 				DA2784FD1DF03060001D5B8D /* Media.xcassets */,
 				DA35D0891E1A631B007DED41 /* one-liner.json */,
+				1F5627F8214838A200038ED1 /* barcelona.db */,
 			);
 			name = "SDK Tests";
 			path = test;
@@ -1500,6 +1503,7 @@
 				35724FC41D630502002A4AB4 /* amsterdam.geojson in Resources */,
 				DA2784FE1DF03060001D5B8D /* Media.xcassets in Resources */,
 				DA35D08A1E1A631B007DED41 /* one-liner.json in Resources */,
+				1F5627F9214838A300038ED1 /* barcelona.db in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
