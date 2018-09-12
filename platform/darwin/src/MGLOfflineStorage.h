@@ -137,10 +137,13 @@ typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error
 /**
  A block to be called once the contents of a file are copied into the current packs.
  
+ @param fileURL Contains the URL to the file packs used.
+ @param packs Contains an array of all known offline packs, or `nil` if there was
+ an error creating or adding the pack.
  @param error Contains a pointer to an error object (if any) indicating why the
  pack could not be created or added.
  */
-typedef void (^MGLBatchedOfflinePackAdditionCompletionHandler)(NSError * _Nullable error);
+typedef void (^MGLBatchedOfflinePackAdditionCompletionHandler)(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error);
 
 /**
  The type of resource that is requested.

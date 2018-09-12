@@ -267,36 +267,55 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 #pragma mark Offline merge methods
 
 - (void)addContentsOfFile:(NSString *)filePath withCompletionHandler:(MGLBatchedOfflinePackAdditionCompletionHandler)completion {
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if (![fileManager isWritableFileAtPath:filePath]) {
-        [NSException raise:NSInvalidArgumentException format:@"The file path must be writable"];
-    }
+    NSURL *fileURL = [NSURL fileURLWithPath:filePath];
     
-    __weak MGLOfflineStorage *weakSelf = self;
-    [self _addContentsOfFile:filePath withCompletionHandler:^(NSError * _Nullable error) {
-        if (error && completion) {
-            completion(error);
-        } else {
-            MGLOfflineStorage *strongSelf = weakSelf;
-            [strongSelf getPacksWithCompletionHandler:^(NSArray<MGLOfflinePack *> *packs, NSError * _Nullable error) {
-                for (MGLOfflinePack *pack in strongSelf.packs) {
-                    [pack invalidate];
-                }
-                strongSelf.packs = [packs mutableCopy];
-                if (completion) {
-                    completion(error);
-                }
-            }];
-        }
-        
-    }];
+    [self addContentsOfURL:fileURL withCompletionHandler:completion];
+
 }
 
 - (void)addContentsOfURL:(NSURL *)fileURL withCompletionHandler:(MGLBatchedOfflinePackAdditionCompletionHandler)completion {
-    [self addContentsOfFile:fileURL.absoluteString withCompletionHandler:completion];
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    if (!fileURL.isFileURL) {
+        [NSException raise:NSInvalidArgumentException format:@"%@ must be a valid file path", fileURL.absoluteString];
+    }
+    if (![fileManager isWritableFileAtPath:fileURL.path]) {
+        [NSException raise:NSInvalidArgumentException format:@"The file path: %@ must be writable", fileURL.absoluteString];
+    }
+    
+    __weak MGLOfflineStorage *weakSelf = self;
+    [self _addContentsOfFile:fileURL.path withCompletionHandler:^(NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
+        if (packs) {
+            NSMutableDictionary *packsDictionary = [NSMutableDictionary dictionary];
+            NSMutableDictionary *packsIndex = [NSMutableDictionary dictionary];
+            NSInteger index = 0;
+            
+            MGLOfflineStorage *strongSelf = weakSelf;
+            for (MGLOfflinePack *pack in strongSelf.packs) {
+                [packsDictionary setObject:pack forKey:@(pack.mbglOfflineRegion->getID())];
+                [packsIndex setObject:@(index) forKey:@(pack.mbglOfflineRegion->getID())];
+                index++;
+            }
+            
+            for (MGLOfflinePack *pack in packs) {
+                MGLOfflinePack *existingPack = [packsDictionary objectForKey:@(pack.mbglOfflineRegion->getID())];
+                if (existingPack) {
+                    [existingPack invalidate];
+                    NSNumber *index = [packsIndex objectForKey:@(pack.mbglOfflineRegion->getID())];
+                    [[strongSelf mutableArrayValueForKey:@"packs"] replaceObjectAtIndex:index.unsignedIntegerValue withObject:pack];
+                } else {
+                    [[strongSelf mutableArrayValueForKey:@"packs"] addObject:pack];
+                }
+            }
+        }
+        if (completion) {
+            completion(fileURL, packs, error);
+        }
+    }];
 }
 
-- (void)_addContentsOfFile:(NSString *)filePath withCompletionHandler:(MGLBatchedOfflinePackAdditionCompletionHandler)completion {
+- (void)_addContentsOfFile:(NSString *)filePath withCompletionHandler:(void (^)(NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error))completion {
     self.mbglFileSource->mergeOfflineRegions(std::string(static_cast<const char *>([filePath UTF8String])), [&, completion](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> result) {
         NSError *error;
         NSMutableArray *packs;
@@ -314,7 +333,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         }
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), [&, completion, error, packs](void) {
-                completion(error);
+                completion(packs, error);
             });
         }
     });

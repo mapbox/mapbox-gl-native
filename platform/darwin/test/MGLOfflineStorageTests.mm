@@ -265,33 +265,7 @@
 }
 
 - (void)testAddingFileContent {
-    
-    NSURL *styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
-    
-    // Barcelona.
-    MGLCoordinateBounds bounds = {
-        { .latitude = 41.2724, .longitude = 2.0407 },
-        { .latitude = 41.4664, .longitude = 2.2680 },
-    };
-    double zoomLevel = 20;
-    MGLTilePyramidOfflineRegion *region = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:styleURL bounds:bounds fromZoomLevel:zoomLevel toZoomLevel:zoomLevel];
-    
-    NSString *nameKey = @"Name";
-    NSString *name = @"Barcelona";
-    
-    NSData *context = [NSKeyedArchiver archivedDataWithRootObject:@{
-                                                                    nameKey: name,
-                                                                    }];
-    
-
-    XCTestExpectation *additionCompletionHandlerExpectation = [self expectationWithDescription:@"add pack completion handler"];
-    [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack * _Nullable completionHandlerPack, NSError * _Nullable error) {
-        XCTAssertNotNil(completionHandlerPack, @"Added pack should exist.");
-        XCTAssertEqual(completionHandlerPack.state, MGLOfflinePackStateInactive, @"New pack should initially have inactive state.");
-        [additionCompletionHandlerExpectation fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2 handler:nil];
-    
+    NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
     // Valid database
     {
         NSURL *resourceURL = [NSURL fileURLWithPath:[[NSBundle bundleForClass:[self class]] pathForResource:@"barcelona" ofType:@"db"]];
@@ -310,33 +284,38 @@
         
         XCTestExpectation *fileAdditionCompletionHandlerExpectation = [self expectationWithDescription:@"add database content completion handler"];
         MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
-        [os addContentsOfFile:filePath withCompletionHandler:^(NSError * _Nullable error) {
+        [os addContentsOfFile:filePath withCompletionHandler:^(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
+            XCTAssertNotNil(fileURL, @"The fileURL should not be nil.");
+            XCTAssertNotNil(packs, @"Adding the contents of the barcelona.db should update one pack.");
             XCTAssertNil(error, @"Adding contents to a file should not return an error.");
             [fileAdditionCompletionHandlerExpectation fulfill];
         }];
         [self waitForExpectationsWithTimeout:2 handler:nil];
+        // Depending on the database it may update or add a pack. For this case specifically the offline database updates the current pack.
+        XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks, @"Adding contents of barcelona.db should not add any new pack.");
     }
     // Invalid database type
     {
         NSURL *resourceURL = [NSURL fileURLWithPath:[[NSBundle bundleForClass:[self class]] pathForResource:@"one-liner" ofType:@"json"]];
         NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentDir = [documentPaths objectAtIndex:0];
-        NSString *filePath = [documentDir stringByAppendingPathComponent:@"barcelona.db"];
+        NSString *filePath = [documentDir stringByAppendingPathComponent:@"on-liner-copy.json"];
         NSFileManager *fileManager = [NSFileManager defaultManager];
-        
+
         BOOL exists = [fileManager fileExistsAtPath:filePath];
         if (exists) {
             [fileManager removeItemAtPath:filePath error:nil];
         }
-        
+
         NSError *error;
-        [fileManager moveItemAtURL:resourceURL toURL:[NSURL fileURLWithPath:filePath] error:&error];
+        [fileManager copyItemAtURL:resourceURL toURL:[NSURL fileURLWithPath:filePath] error:&error];
         
-        XCTestExpectation *fileAdditionCompletionHandlerExpectation = [self expectationWithDescription:@"add database content completion handler"];
+        XCTestExpectation *invalidFileCompletionHandlerExpectation = [self expectationWithDescription:@"invalid content database completion handler"];
         MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
-        [os addContentsOfFile:filePath withCompletionHandler:^(NSError * _Nullable error) {
+        [os addContentsOfFile:filePath withCompletionHandler:^(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
             XCTAssertNotNil(error, @"Passing an invalid offline database file should return an error.");
-            [fileAdditionCompletionHandlerExpectation fulfill];
+            XCTAssertNil(packs, @"Passing an invalid offline database file should not add packs to the offline database.");
+            [invalidFileCompletionHandlerExpectation fulfill];
         }];
         [self waitForExpectationsWithTimeout:2 handler:nil];
     }
