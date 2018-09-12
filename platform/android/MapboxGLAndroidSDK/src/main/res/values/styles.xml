@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <style name="mapbox_LocationComponent">
+    <item name="mapbox_foregroundDrawable">@drawable/mapbox_user_icon</item>
+    <item name="mapbox_backgroundDrawable">@drawable/mapbox_user_stroke_icon</item>
+    <item name="mapbox_bearingDrawable">@drawable/mapbox_user_bearing_icon</item>
+    <item name="mapbox_gpsDrawable">@drawable/mapbox_user_puck_icon</item>
+
+    <item name="mapbox_foregroundDrawableStale">@drawable/mapbox_user_icon_stale</item>
+    <item name="mapbox_backgroundDrawableStale">@drawable/mapbox_user_stroke_icon</item>
+
+    <item name="mapbox_accuracyAlpha">0.15</item>
+    <item name="mapbox_accuracyColor">@color/mapbox_location_layer_blue</item>
+
+    <item name="mapbox_elevation">12dp</item>
+
+    <item name="mapbox_enableStaleState">true</item>
+    <item name="mapbox_staleStateTimeout">30000</item>
+
+    <!-- Location icon padding -->
+    <item name="mapbox_iconPaddingLeft">0</item>
+    <item name="mapbox_iconPaddingTop">0</item>
+    <item name="mapbox_iconPaddingRight">0</item>
+    <item name="mapbox_iconPaddingBottom">0</item>
+
+    <!-- Map zoom levels -->
+    <item name="mapbox_maxZoom">18</item>
+    <item name="mapbox_minZoom">2</item>
+
+    <!-- Location icon scale based on map zoom levels -->
+    <item name="mapbox_maxZoomIconScale">1</item>
+    <item name="mapbox_minZoomIconScale">0.6</item>
+
+    <!-- Camera tracking settings -->
+    <item name="mapbox_trackingGesturesManagement">false</item>
+    <item name="mapbox_trackingInitialMoveThreshold">@dimen/mapbox_locationComponentTrackingInitialMoveThreshold</item>
+    <item name="mapbox_trackingMultiFingerMoveThreshold">@dimen/mapbox_locationComponentTrackingMultiFingerMoveThreshold</item>
+
+  </style>
+</resources>

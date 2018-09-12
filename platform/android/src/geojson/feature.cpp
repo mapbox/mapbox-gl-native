@@ -1,62 +1,73 @@
 #include "feature.hpp"
-
 #include "geometry.hpp"
+#include "../gson/json_object.hpp"
+
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 namespace android {
 namespace geojson {
 
-mbgl::Feature Feature::convert(jni::JNIEnv& env, jni::Object<Feature> jFeature) {
-    // Convert
-    auto jGeometry = geometry(env, jFeature);
-    auto jProperties = Feature::properties(env, jFeature);
+using namespace gson;
 
-    std::experimental::optional<mapbox::geometry::identifier> id;
-    auto jId = Feature::id(env, jFeature);
-    if (jId) {
-        id = {  jni::Make<std::string>(env, jId) };
+mbgl::Feature Feature::convert(jni::JNIEnv& env, const jni::Object<Feature>& jFeature) {
+    static auto& javaClass = jni::Class<Feature>::Singleton(env);
+    static auto id = javaClass.GetMethod<jni::String ()>(env, "id");
+    static auto geometry = javaClass.GetMethod<jni::Object<Geometry> ()>(env, "geometry");
+    static auto properties = javaClass.GetMethod<jni::Object<gson::JsonObject> ()>(env, "properties");
+
+    auto jId = jFeature.Call(env, id);
+
+    return mbgl::Feature {
+        Geometry::convert(env, jFeature.Call(env, geometry)),
+        JsonObject::convert(env, jFeature.Call(env, properties)),
+        jId ? std::experimental::optional<mapbox::geometry::identifier>(jni::Make<std::string>(env, jId))
+            : std::experimental::nullopt
+    };
+}
+
+/**
+ * Turn feature identifier into std::string
+ */
+class FeatureIdVisitor {
+public:
+    template<class T>
+    std::string operator()(const T& i) const {
+        return std::to_string(i);
     }
 
-    auto feature = mbgl::Feature {
-            Geometry::convert(env, jGeometry),
-            gson::JsonObject::convert(env, jProperties),
-            id
-    };
+    std::string operator()(const std::string& i) const {
+        return i;
+    }
 
-    // Cleanup
-    jni::DeleteLocalRef(env, jGeometry);
-    jni::DeleteLocalRef(env, jProperties);
-    jni::DeleteLocalRef(env, jId);
+    std::string operator()(const std::nullptr_t&) const {
+        return "";
+    }
+};
 
-    return feature;
+jni::Local<jni::Object<Feature>> convertFeature(jni::JNIEnv& env, const mbgl::Feature& value) {
+    static auto& javaClass = jni::Class<Feature>::Singleton(env);
+    static auto method = javaClass.GetStaticMethod<jni::Object<Feature> (jni::Object<Geometry>, jni::Object<JsonObject>, jni::String)>(env, "fromGeometry");
+
+    return javaClass.Call(env, method,
+        Geometry::New(env, value.geometry),
+        JsonObject::New(env, value.properties),
+        jni::Make<jni::String>(env, value.id ? value.id.value().match(FeatureIdVisitor()) : ""));
 }
 
-jni::Object<Geometry> Feature::geometry(jni::JNIEnv& env, jni::Object<Feature> jFeature) {
-    static auto method = Feature::javaClass.GetMethod<jni::Object<Geometry> ()>(env, "geometry");
-    return jFeature.Call(env, method);
-}
+jni::Local<jni::Array<jni::Object<Feature>>> Feature::convert(jni::JNIEnv& env, const std::vector<mbgl::Feature>& value) {
+    auto features = jni::Array<jni::Object<Feature>>::New(env, value.size());
 
-jni::Object<gson::JsonObject> Feature::properties(jni::JNIEnv& env, jni::Object<Feature> jFeature) {
-    static auto method = Feature::javaClass.GetMethod<jni::Object<gson::JsonObject> ()>(env, "properties");
-    return jFeature.Call(env, method);
-}
+    for (size_t i = 0; i < value.size(); i = i + 1) {
+        features.Set(env, i, convertFeature(env, value.at(i)));
+    }
 
-jni::String Feature::id(jni::JNIEnv& env, jni::Object<Feature> jFeature) {
-    static auto method = Feature::javaClass.GetMethod<jni::String ()>(env, "id");
-    return jFeature.Call(env, method);
-}
-
-jni::Object<Feature> Feature::fromGeometry(jni::JNIEnv& env, jni::Object<Geometry> geometry, jni::Object<gson::JsonObject> properties, jni::String id) {
-    static auto method = Feature::javaClass.GetStaticMethod<jni::Object<Feature> (jni::Object<Geometry>, jni::Object<gson::JsonObject>, jni::String)>(env, "fromGeometry");
-    return Feature::javaClass.Call(env, method, geometry, properties, id);
+    return features;
 }
 
 void Feature::registerNative(jni::JNIEnv& env) {
-    // Lookup the class
-    Feature::javaClass = *jni::Class<Feature>::Find(env).NewGlobalRef(env).release();
+    jni::Class<Feature>::Singleton(env);
 }
-
-jni::Class<Feature> Feature::javaClass;
 
 } // namespace geojson
 } // namespace android

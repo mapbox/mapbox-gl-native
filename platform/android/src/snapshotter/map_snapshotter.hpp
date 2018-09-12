@@ -9,7 +9,6 @@
 #include "../map/camera_position.hpp"
 
 #include <jni/jni.hpp>
-#include "../jni/generic_global_ref_deleter.hpp"
 
 #include <memory>
 
@@ -23,34 +22,32 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/snapshotter/MapSnapshotter"; };
 
-    static jni::Class<MapSnapshotter> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     MapSnapshotter(jni::JNIEnv&,
-                   jni::Object<MapSnapshotter>,
-                   jni::Object<FileSource>,
+                   const jni::Object<MapSnapshotter>&,
+                   const jni::Object<FileSource>&,
                    jni::jfloat pixelRatio,
                    jni::jint width,
                    jni::jint height,
-                   jni::String styleURL,
-                   jni::String styleJSON,
-                   jni::Object<LatLngBounds> region,
-                   jni::Object<CameraPosition> position,
+                   const jni::String& styleURL,
+                   const jni::String& styleJSON,
+                   const jni::Object<LatLngBounds>& region,
+                   const jni::Object<CameraPosition>& position,
                    jni::jboolean showLogo,
-                   jni::String programCacheDir);
+                   const jni::String& programCacheDir);
 
     ~MapSnapshotter();
 
-    void setStyleUrl(JNIEnv&, jni::String styleURL);
+    void setStyleUrl(JNIEnv&, const jni::String& styleURL);
 
-    void setStyleJson(JNIEnv&, jni::String styleJSON);
+    void setStyleJson(JNIEnv&, const jni::String& styleJSON);
 
     void setSize(JNIEnv&, jni::jint width, jni::jint height);
 
-    void setCameraPosition(JNIEnv&, jni::Object<CameraPosition> position);
+    void setCameraPosition(JNIEnv&, const jni::Object<CameraPosition>& position);
 
-    void setRegion(JNIEnv&, jni::Object<LatLngBounds> region);
+    void setRegion(JNIEnv&, const jni::Object<LatLngBounds>& region);
 
     void start(JNIEnv&);
 
@@ -60,7 +57,7 @@ private:
     MBGL_STORE_THREAD(tid);
 
     JavaVM *vm = nullptr;
-    GenericUniqueWeakObject<MapSnapshotter> javaPeer;
+    jni::WeakReference<jni::Object<MapSnapshotter>, jni::EnvAttachingDeleter> javaPeer;
 
     float pixelRatio;
     bool showLogo;

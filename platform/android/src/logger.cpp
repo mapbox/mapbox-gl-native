@@ -5,12 +5,12 @@ namespace mbgl {
 namespace android {
 
 void Logger::registerNative(jni::JNIEnv& env) {
-    _class = *jni::Class<Logger>::Find(env).NewGlobalRef(env).release();
+    jni::Class<Logger>::Singleton(env);
 }
 
-jni::Class<Logger> Logger::_class;
-
 void Logger::log(jni::JNIEnv& env, EventSeverity severity, const std::string &msg) {
+    static auto& _class = jni::Class<Logger>::Singleton(env);
+
     auto tag = jni::Make<jni::String>(env, "Mbgl");
     auto message = jni::Make<jni::String>(env, msg);
     using Signature = void(jni::String, jni::String);
@@ -28,9 +28,6 @@ void Logger::log(jni::JNIEnv& env, EventSeverity severity, const std::string &ms
         auto static error = _class.GetStaticMethod<Signature>(env, "e");
         _class.Call(env, error, tag, message);
     }
-
-    DeleteLocalRef(env, tag);
-    DeleteLocalRef(env, message);
 }
 
 } // namespace android

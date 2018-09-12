@@ -22,16 +22,15 @@ namespace android {
         : Layer(map, std::move(coreLayer)) {
     }
 
-    jni::Class<UnknownLayer> UnknownLayer::javaClass;
-
-    jni::jobject* UnknownLayer::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = UnknownLayer::javaClass.template GetConstructor<jni::jlong>(env);
-        return UnknownLayer::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+    jni::Local<jni::Object<Layer>> UnknownLayer::createJavaPeer(jni::JNIEnv& env) {
+        static auto& javaClass = jni::Class<UnknownLayer>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
     void UnknownLayer::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        UnknownLayer::javaClass = *jni::Class<UnknownLayer>::Find(env).NewGlobalRef(env).release();
+        static auto& javaClass = jni::Class<UnknownLayer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
@@ -39,7 +38,7 @@ namespace android {
 
         // Register the peer
         jni::RegisterNativePeer<UnknownLayer>(
-            env, UnknownLayer::javaClass, "nativePtr",
+            env, javaClass, "nativePtr",
             init,
             "initialize",
             "finalize");

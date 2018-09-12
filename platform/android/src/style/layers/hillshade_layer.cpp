@@ -13,7 +13,7 @@ namespace android {
     /**
      * Creates an owning peer object (for layers not attached to the map) from the JVM side
      */
-    HillshadeLayer::HillshadeLayer(jni::JNIEnv& env, jni::String layerId, jni::String sourceId)
+    HillshadeLayer::HillshadeLayer(jni::JNIEnv& env, jni::String& layerId, jni::String& sourceId)
         : Layer(env, std::make_unique<mbgl::style::HillshadeLayer>(jni::Make<std::string>(env, layerId), jni::Make<std::string>(env, sourceId))) {
     }
 
@@ -35,28 +35,25 @@ namespace android {
 
     // Property getters
 
-    jni::Object<jni::ObjectTag> HillshadeLayer::getHillshadeIlluminationDirection(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> HillshadeLayer::getHillshadeIlluminationDirection(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeIlluminationDirection());
-        return jni::Object<jni::ObjectTag>(*converted);
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeIlluminationDirection()));
     }
 
-    jni::Object<jni::ObjectTag> HillshadeLayer::getHillshadeIlluminationAnchor(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> HillshadeLayer::getHillshadeIlluminationAnchor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeIlluminationAnchor());
-        return jni::Object<jni::ObjectTag>(*converted);
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeIlluminationAnchor()));
     }
 
-    jni::Object<jni::ObjectTag> HillshadeLayer::getHillshadeExaggeration(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> HillshadeLayer::getHillshadeExaggeration(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeExaggeration());
-        return jni::Object<jni::ObjectTag>(*converted);
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeExaggeration()));
     }
 
-    jni::Object<TransitionOptions> HillshadeLayer::getHillshadeExaggerationTransition(jni::JNIEnv& env) {
+    jni::Local<jni::Object<TransitionOptions>> HillshadeLayer::getHillshadeExaggerationTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         mbgl::style::TransitionOptions options = layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeExaggerationTransition();
-        return *convert<jni::Object<TransitionOptions>>(env, options);
+        return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
     void HillshadeLayer::setHillshadeExaggerationTransition(jni::JNIEnv&, jlong duration, jlong delay) {
@@ -66,16 +63,15 @@ namespace android {
         layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::setHillshadeExaggerationTransition(options);
     }
 
-    jni::Object<jni::ObjectTag> HillshadeLayer::getHillshadeShadowColor(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> HillshadeLayer::getHillshadeShadowColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeShadowColor());
-        return jni::Object<jni::ObjectTag>(*converted);
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeShadowColor()));
     }
 
-    jni::Object<TransitionOptions> HillshadeLayer::getHillshadeShadowColorTransition(jni::JNIEnv& env) {
+    jni::Local<jni::Object<TransitionOptions>> HillshadeLayer::getHillshadeShadowColorTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         mbgl::style::TransitionOptions options = layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeShadowColorTransition();
-        return *convert<jni::Object<TransitionOptions>>(env, options);
+        return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
     void HillshadeLayer::setHillshadeShadowColorTransition(jni::JNIEnv&, jlong duration, jlong delay) {
@@ -85,16 +81,15 @@ namespace android {
         layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::setHillshadeShadowColorTransition(options);
     }
 
-    jni::Object<jni::ObjectTag> HillshadeLayer::getHillshadeHighlightColor(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> HillshadeLayer::getHillshadeHighlightColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeHighlightColor());
-        return jni::Object<jni::ObjectTag>(*converted);
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeHighlightColor()));
     }
 
-    jni::Object<TransitionOptions> HillshadeLayer::getHillshadeHighlightColorTransition(jni::JNIEnv& env) {
+    jni::Local<jni::Object<TransitionOptions>> HillshadeLayer::getHillshadeHighlightColorTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         mbgl::style::TransitionOptions options = layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeHighlightColorTransition();
-        return *convert<jni::Object<TransitionOptions>>(env, options);
+        return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
     void HillshadeLayer::setHillshadeHighlightColorTransition(jni::JNIEnv&, jlong duration, jlong delay) {
@@ -104,16 +99,15 @@ namespace android {
         layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::setHillshadeHighlightColorTransition(options);
     }
 
-    jni::Object<jni::ObjectTag> HillshadeLayer::getHillshadeAccentColor(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> HillshadeLayer::getHillshadeAccentColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeAccentColor());
-        return jni::Object<jni::ObjectTag>(*converted);
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeAccentColor()));
     }
 
-    jni::Object<TransitionOptions> HillshadeLayer::getHillshadeAccentColorTransition(jni::JNIEnv& env) {
+    jni::Local<jni::Object<TransitionOptions>> HillshadeLayer::getHillshadeAccentColorTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         mbgl::style::TransitionOptions options = layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeAccentColorTransition();
-        return *convert<jni::Object<TransitionOptions>>(env, options);
+        return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
     void HillshadeLayer::setHillshadeAccentColorTransition(jni::JNIEnv&, jlong duration, jlong delay) {
@@ -124,23 +118,22 @@ namespace android {
     }
 
 
-    jni::Class<HillshadeLayer> HillshadeLayer::javaClass;
-
-    jni::jobject* HillshadeLayer::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = HillshadeLayer::javaClass.template GetConstructor<jni::jlong>(env);
-        return HillshadeLayer::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+    jni::Local<jni::Object<Layer>> HillshadeLayer::createJavaPeer(jni::JNIEnv& env) {
+        static auto& javaClass = jni::Class<HillshadeLayer>::Singleton(env);
+        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
     }
 
     void HillshadeLayer::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        HillshadeLayer::javaClass = *jni::Class<HillshadeLayer>::Find(env).NewGlobalRef(env).release();
+        static auto& javaClass = jni::Class<HillshadeLayer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<HillshadeLayer>(
-            env, HillshadeLayer::javaClass, "nativePtr",
-            std::make_unique<HillshadeLayer, JNIEnv&, jni::String, jni::String>,
+            env, javaClass, "nativePtr",
+            jni::MakePeer<HillshadeLayer, jni::String&, jni::String&>,
             "initialize",
             "finalize",
             METHOD(&HillshadeLayer::getHillshadeIlluminationDirection, "nativeGetHillshadeIlluminationDirection"),

@@ -9,23 +9,19 @@ namespace android {
 
 class RasterSource : public Source {
 public:
-
+    using SuperTag = Source;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/sources/RasterSource"; };
-
-    static jni::Class<RasterSource> javaClass;
 
     static void registerNative(jni::JNIEnv&);
 
-    RasterSource(jni::JNIEnv&, jni::String, jni::Object<>, jni::jint);
-
+    RasterSource(jni::JNIEnv&, const jni::String&, const jni::Object<>&, jni::jint);
     RasterSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
-
     ~RasterSource();
 
-    jni::String getURL(jni::JNIEnv&);
+    jni::Local<jni::String> getURL(jni::JNIEnv&);
 
 private:
-    jni::Object<Source> createJavaPeer(jni::JNIEnv&);
+    jni::Local<jni::Object<Source>> createJavaPeer(jni::JNIEnv&);
 
 }; // class RasterSource
 

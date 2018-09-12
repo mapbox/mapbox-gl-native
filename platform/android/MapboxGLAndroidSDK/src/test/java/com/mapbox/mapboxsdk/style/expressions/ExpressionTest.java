@@ -43,6 +43,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.has;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.heatmapDensity;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.id;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.isSupportedScript;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.length;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.let;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.linear;
@@ -1387,5 +1388,19 @@ public class ExpressionTest {
     String expected = "[\"to-string\", [\"get\", \"name_en\"]]";
     String actual = Expression.toString(get("name_en")).toString();
     assertEquals("Reverse string conversion should match", expected, actual);
+  }
+
+  @Test
+  public void testIsSupportedScriptLiteral() {
+    Object[] expected = new Object[] {"is-supported-script", "ಗೌರವಾರ್ಥವಾಗಿ"};
+    Object[] actual = isSupportedScript("ಗೌರವಾರ್ಥವಾಗಿ").toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testIsSupportedScriptExpressions() {
+    Object[] expected = new Object[] {"is-supported-script", new Object[] {"get", "property_name"}};
+    Object[] actual = isSupportedScript(get("property_name")).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 }

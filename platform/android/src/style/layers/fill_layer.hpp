@@ -12,14 +12,12 @@ namespace android {
 
 class FillLayer : public Layer {
 public:
-
+    using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/FillLayer"; };
-
-    static jni::Class<FillLayer> javaClass;
 
     static void registerNative(jni::JNIEnv&);
 
-    FillLayer(jni::JNIEnv&, jni::String, jni::String);
+    FillLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
     FillLayer(mbgl::Map&, mbgl::style::FillLayer&);
 
@@ -29,30 +27,30 @@ public:
 
     // Properties
 
-    jni::Object<jni::ObjectTag> getFillAntialias(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getFillAntialias(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getFillOpacity(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getFillOpacity(jni::JNIEnv&);
     void setFillOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getFillOpacityTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getFillOpacityTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getFillColor(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getFillColor(jni::JNIEnv&);
     void setFillColorTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getFillColorTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getFillColorTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getFillOutlineColor(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getFillOutlineColor(jni::JNIEnv&);
     void setFillOutlineColorTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getFillOutlineColorTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getFillOutlineColorTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getFillTranslate(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getFillTranslate(jni::JNIEnv&);
     void setFillTranslateTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getFillTranslateTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getFillTranslateTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getFillTranslateAnchor(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getFillTranslateAnchor(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getFillPattern(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getFillPattern(jni::JNIEnv&);
     void setFillPatternTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getFillPatternTransition(jni::JNIEnv&);
-    jni::jobject* createJavaPeer(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getFillPatternTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&);
 
 }; // class FillLayer
 

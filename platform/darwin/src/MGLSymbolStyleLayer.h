@@ -151,6 +151,26 @@ typedef NS_ENUM(NSUInteger, MGLSymbolPlacement) {
 };
 
 /**
+ Controls the order in which overlapping symbols in the same layer are rendered
+
+ Values of this type are used in the `MGLSymbolStyleLayer.symbolZOrder`
+ property.
+ */
+typedef NS_ENUM(NSUInteger, MGLSymbolZOrder) {
+    /**
+     Specify this z order if symbols’ appearance relies on lower features
+     overlapping higher features. For example, symbols with a pin-like
+     appearance would require this z order.
+     */
+    MGLSymbolZOrderViewportY,
+    /**
+     Specify this z order if the order in which features appear in the source is
+     significant.
+     */
+    MGLSymbolZOrderSource,
+};
+
+/**
  Part of the text placed closest to the anchor.
 
  Values of this type are used in the `MGLSymbolStyleLayer.textAnchor`
@@ -1003,6 +1023,32 @@ MGL_EXPORT
  feature attributes.
  */
 @property (nonatomic, null_resettable) NSExpression *symbolSpacing;
+
+/**
+ Controls the order in which overlapping symbols in the same layer are rendered
+ 
+ The default value of this property is an expression that evaluates to
+ `viewport-y`. Set this property to `nil` to reset it to the default value.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `MGLSymbolZOrder` values
+ * Any of the following constant string values:
+   * `viewport-y`: Specify this z order if symbols’ appearance relies on lower
+ features overlapping higher features. For example, symbols with a pin-like
+ appearance would require this z order.
+   * `source`: Specify this z order if the order in which features appear in the
+ source is significant.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *symbolZOrder;
 
 /**
  Value to use for a text label.
@@ -2139,6 +2185,19 @@ MGL_EXPORT
  The `MGLSymbolPlacement` enumeration representation of the value.
  */
 @property (readonly) MGLSymbolPlacement MGLSymbolPlacementValue;
+
+/**
+ Creates a new value object containing the given `MGLSymbolZOrder` enumeration.
+
+ @param symbolZOrder The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLSymbolZOrder:(MGLSymbolZOrder)symbolZOrder;
+
+/**
+ The `MGLSymbolZOrder` enumeration representation of the value.
+ */
+@property (readonly) MGLSymbolZOrder MGLSymbolZOrderValue;
 
 /**
  Creates a new value object containing the given `MGLTextAnchor` enumeration.

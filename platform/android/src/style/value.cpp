@@ -4,28 +4,18 @@
 
 namespace mbgl {
 namespace android {
-
-    class ObjectDeleter {
-    public:
-        ObjectDeleter() = default;
-        ObjectDeleter(JNIEnv& e) : env(e) {}
-
-        void operator()(jni::jobject* p) const {
-          if (p) {
-              jni::DeleteLocalRef(env, p);
-          }
-        }
-
-    private:
-        JNIEnv& env;
-    };
-
     // Instance
 
-    Value::Value(jni::JNIEnv& _env, jni::jobject* _value) : env(_env), value(_value, ObjectDeleter(env)) {}
+    Value::Value(jni::JNIEnv& _env, jni::Local<jni::Object<>> _value)
+        : env(_env),
+          value(std::move(_value)) {}
+
+    Value::Value(jni::JNIEnv& _env, const jni::Object<>& _value)
+        : env(_env),
+          value(jni::NewLocal(_env, _value)) {}
 
     bool Value::isNull() const {
-        return value == nullptr;
+        return !value;
     }
 
     bool Value::isArray() const {
@@ -33,7 +23,7 @@ namespace android {
     }
 
     bool Value::isObject() const {
-        return jni::IsInstanceOf(env, value.get(), *java::Map::jclass);;
+        return jni::IsInstanceOf(env, value.get(), *java::Map::jclass);
     }
 
     bool Value::isString() const {
@@ -49,8 +39,7 @@ namespace android {
     }
 
     std::string Value::toString() const {
-        jni::jstring* string = reinterpret_cast<jni::jstring*>(value.get());
-        return jni::Make<std::string>(env, jni::String(string));
+        return jni::Make<std::string>(env, jni::Cast(env, jni::Class<jni::StringTag>::Singleton(env), value));
     }
 
     float Value::toFloat() const {
@@ -70,8 +59,8 @@ namespace android {
     }
 
     Value Value::get(const char* key) const {
-        jni::jobject* member = jni::CallMethod<jni::jobject*>(env, value.get(), *java::Map::getMethodId, jni::Make<jni::String>(env, std::string(key)).Get());
-        return Value(env, member);
+        jni::jobject* member = jni::CallMethod<jni::jobject*>(env, value.get(), *java::Map::getMethodId, jni::Make<jni::String>(env, std::string(key)).get());
+        return Value(env, jni::Local<jni::Object<>>(env, member));
     }
 
     int Value::getLength() const {
@@ -81,7 +70,7 @@ namespace android {
 
     Value Value::get(const int index) const {
         auto array = (jni::jarray<jni::jobject>*) value.get();
-        return Value(env, jni::GetObjectArrayElement(env, *array, index));
+        return Value(env, jni::Local<jni::Object<>>(env, jni::GetObjectArrayElement(env, *array, index)));
     }
 }
 }

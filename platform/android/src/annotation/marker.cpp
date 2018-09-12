@@ -3,29 +3,21 @@
 namespace mbgl {
 namespace android {
 
-jni::Class<Marker> Marker::javaClass;
-
-mbgl::Point<double> Marker::getPosition(jni::JNIEnv& env, jni::Object<Marker> marker) {
-    static auto positionField = Marker::javaClass.GetField<jni::Object<LatLng>>(env, "position");
-    auto jPosition = marker.Get(env, positionField);
-    auto position = LatLng::getGeometry(env, jPosition);
-    jni::DeleteLocalRef(env, jPosition);
-    return position;
+mbgl::Point<double> Marker::getPosition(jni::JNIEnv& env, const jni::Object<Marker>& marker) {
+    static auto& javaClass = jni::Class<Marker>::Singleton(env);
+    static auto positionField = javaClass.GetField<jni::Object<LatLng>>(env, "position");
+    return LatLng::getGeometry(env, marker.Get(env, positionField));
 }
 
-std::string Marker::getIconId(jni::JNIEnv& env, jni::Object<Marker> marker) {
-    static auto iconIdField = Marker::javaClass.GetField<jni::String>(env, "iconId");
-    auto jIconId = marker.Get(env, iconIdField);
-    auto iconId = jni::Make<std::string>(env, jIconId);
-    jni::DeleteLocalRef(env, jIconId);
-    return iconId;
+std::string Marker::getIconId(jni::JNIEnv& env, const jni::Object<Marker>& marker) {
+    static auto& javaClass = jni::Class<Marker>::Singleton(env);
+    static auto iconIdField = javaClass.GetField<jni::String>(env, "iconId");
+    return jni::Make<std::string>(env, marker.Get(env, iconIdField));
 }
 
 void Marker::registerNative(jni::JNIEnv& env) {
-    // Lookup the class
-    Marker::javaClass = *jni::Class<Marker>::Find(env).NewGlobalRef(env).release();
+    jni::Class<Marker>::Singleton(env);
 }
-
 
 } // namespace android
 } // namespace mbgl

@@ -83,7 +83,7 @@ namespace android {
         return std::move(ownedLayer);
     }
 
-    jni::String Layer::getId(jni::JNIEnv& env) {
+    jni::Local<jni::String> Layer::getId(jni::JNIEnv& env) {
         return jni::Make<jni::String>(env, layer.getID());
     }
 
@@ -91,7 +91,7 @@ namespace android {
         return layer;
     }
 
-    void Layer::setLayoutProperty(jni::JNIEnv& env, jni::String jname, jni::Object<> jvalue) {
+    void Layer::setLayoutProperty(jni::JNIEnv& env, const jni::String& jname, const jni::Object<>& jvalue) {
         // Convert and set property
         optional<mbgl::style::conversion::Error> error = layer.setLayoutProperty(jni::Make<std::string>(env, jname), Value(env, jvalue));
         if (error) {
@@ -100,7 +100,7 @@ namespace android {
         }
     }
 
-    void Layer::setPaintProperty(jni::JNIEnv& env, jni::String jname, jni::Object<> jvalue) {
+    void Layer::setPaintProperty(jni::JNIEnv& env, const jni::String& jname, const jni::Object<>& jvalue) {
         // Convert and set property
         optional<mbgl::style::conversion::Error> error = layer.setPaintProperty(jni::Make<std::string>(env, jname), Value(env, jvalue));
         if (error) {
@@ -123,7 +123,7 @@ namespace android {
         }
     };
 
-    void Layer::setFilter(jni::JNIEnv& env, jni::Array<jni::Object<>> jfilter) {
+    void Layer::setFilter(jni::JNIEnv& env, const jni::Array<jni::Object<>>& jfilter) {
         using namespace mbgl::style;
         using namespace mbgl::style::conversion;
 
@@ -154,7 +154,7 @@ namespace android {
         }
     };
 
-    jni::Object<gson::JsonElement> Layer::getFilter(jni::JNIEnv& env) {
+    jni::Local<jni::Object<gson::JsonElement>> Layer::getFilter(jni::JNIEnv& env) {
         using namespace mbgl::style;
         using namespace mbgl::style::conversion;
 
@@ -163,7 +163,7 @@ namespace android {
             mbgl::Value expressionValue = (*filter.expression)->serialize();
             return gson::JsonElement::New(env, expressionValue);
         } else {
-            return jni::Object<gson::JsonElement>();
+            return jni::Local<jni::Object<gson::JsonElement>>(env, nullptr);
         }
     }
 
@@ -181,7 +181,7 @@ namespace android {
         }
     };
 
-    void Layer::setSourceLayer(jni::JNIEnv& env, jni::String sourceLayer) {
+    void Layer::setSourceLayer(jni::JNIEnv& env, const jni::String& sourceLayer) {
         layer.accept(SetSourceLayerEvaluator {jni::Make<std::string>(env, sourceLayer)});
     }
 
@@ -202,7 +202,7 @@ namespace android {
         }
     };
 
-    jni::String Layer::getSourceLayer(jni::JNIEnv& env) {
+    jni::Local<jni::String> Layer::getSourceLayer(jni::JNIEnv& env) {
         return jni::Make<jni::String>(env, layer.accept(GetSourceLayerEvaluator()));
     }
 
@@ -221,7 +221,7 @@ namespace android {
         }
     };
 
-    jni::String Layer::getSourceId(jni::JNIEnv& env) {
+    jni::Local<jni::String> Layer::getSourceId(jni::JNIEnv& env) {
         return jni::Make<jni::String>(env, layer.accept(GetSourceIdEvaluator()));
     }
 
@@ -241,21 +241,19 @@ namespace android {
         layer.setMaxZoom(zoom);
     }
 
-    jni::Object<jni::ObjectTag> Layer::getVisibility(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> Layer::getVisibility(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return jni::Object<jni::ObjectTag>(*convert<jni::jobject*>(env, layer.getVisibility()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.getVisibility()));
     }
-
-    jni::Class<Layer> Layer::javaClass;
 
     void Layer::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        Layer::javaClass = *jni::Class<Layer>::Find(env).NewGlobalRef(env).release();
+        static auto& javaClass = jni::Class<Layer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
-        jni::RegisterNativePeer<Layer>(env, Layer::javaClass, "nativePtr",
+        jni::RegisterNativePeer<Layer>(env, javaClass, "nativePtr",
             METHOD(&Layer::getId, "nativeGetId"),
             METHOD(&Layer::setLayoutProperty, "nativeSetLayoutProperty"),
             METHOD(&Layer::setPaintProperty, "nativeSetPaintProperty"),

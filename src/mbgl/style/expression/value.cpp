@@ -297,6 +297,9 @@ template struct ValueConverter<LineJoinType>;
 
 template type::Type valueTypeToExpressionType<SymbolPlacementType>();
 template struct ValueConverter<SymbolPlacementType>;
+    
+template type::Type valueTypeToExpressionType<SymbolZOrderType>();
+template struct ValueConverter<SymbolZOrderType>;
 
 template type::Type valueTypeToExpressionType<SymbolAnchorType>();
 template struct ValueConverter<SymbolAnchorType>;

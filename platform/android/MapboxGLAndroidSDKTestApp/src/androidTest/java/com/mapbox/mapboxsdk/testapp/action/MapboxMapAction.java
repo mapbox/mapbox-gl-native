@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.action;
 
+import android.support.annotation.NonNull;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.view.View;
@@ -42,7 +43,7 @@ public class MapboxMapAction implements ViewAction {
   }
 
   public interface OnInvokeActionListener {
-    void onInvokeAction(UiController uiController, MapboxMap mapboxMap);
+    void onInvokeAction(@NonNull UiController uiController, @NonNull MapboxMap mapboxMap);
   }
 }
 

@@ -12,14 +12,11 @@ public:
 
     static constexpr auto Name() { return "android/graphics/PointF"; };
 
-    static jni::Object<PointF> New(jni::JNIEnv&, float, float);
+    static jni::Local<jni::Object<PointF>> New(jni::JNIEnv&, float, float);
 
-    static mbgl::ScreenCoordinate getScreenCoordinate(jni::JNIEnv&, jni::Object<PointF>);
-
-    static jni::Class<PointF> javaClass;
+    static mbgl::ScreenCoordinate getScreenCoordinate(jni::JNIEnv&, const jni::Object<PointF>&);
 
     static void registerNative(jni::JNIEnv&);
-
 };
 
 

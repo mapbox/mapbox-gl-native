@@ -24,22 +24,20 @@ public:
     struct ResourceTransformCallback {
         static constexpr auto Name() { return "com/mapbox/mapboxsdk/storage/FileSource$ResourceTransformCallback"; }
 
-        static std::string onURL(jni::JNIEnv&, jni::Object<FileSource::ResourceTransformCallback>, int, std::string);
-
-        static jni::Class<ResourceTransformCallback> javaClass;
+        static std::string onURL(jni::JNIEnv&, const jni::Object<FileSource::ResourceTransformCallback>&, int, std::string);
     };
 
-    FileSource(jni::JNIEnv&, jni::String, jni::String, jni::Object<AssetManager>);
+    FileSource(jni::JNIEnv&, const jni::String&, const jni::String&, const jni::Object<AssetManager>&);
 
     ~FileSource();
 
-    jni::String getAccessToken(jni::JNIEnv&);
+    jni::Local<jni::String> getAccessToken(jni::JNIEnv&);
 
-    void setAccessToken(jni::JNIEnv&, jni::String);
+    void setAccessToken(jni::JNIEnv&, const jni::String&);
 
-    void setAPIBaseUrl(jni::JNIEnv&, jni::String);
+    void setAPIBaseUrl(jni::JNIEnv&, const jni::String&);
 
-    void setResourceTransform(jni::JNIEnv&, jni::Object<FileSource::ResourceTransformCallback>);
+    void setResourceTransform(jni::JNIEnv&, const jni::Object<FileSource::ResourceTransformCallback>&);
 
     void resume(jni::JNIEnv&);
 
@@ -47,11 +45,9 @@ public:
 
     jni::jboolean isResumed(jni::JNIEnv&);
 
-    static jni::Class<FileSource> javaClass;
+    static FileSource* getNativePeer(jni::JNIEnv&, const jni::Object<FileSource>&);
 
-    static FileSource* getNativePeer(jni::JNIEnv&, jni::Object<FileSource>);
-
-    static mbgl::DefaultFileSource& getDefaultFileSource(jni::JNIEnv&, jni::Object<FileSource>);
+    static mbgl::DefaultFileSource& getDefaultFileSource(jni::JNIEnv&, const jni::Object<FileSource>&);
 
     static void registerNative(jni::JNIEnv&);
 

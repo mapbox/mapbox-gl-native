@@ -16,18 +16,18 @@ namespace android {
 namespace conversion {
 
 template <>
-struct Converter<jni::jobject*, bool> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const bool& value) const;
+struct Converter<jni::Local<jni::Object<>>, bool> {
+    Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const bool& value) const;
 };
 
 template <>
-struct Converter<jni::jobject*, float> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const float& value) const;
+struct Converter<jni::Local<jni::Object<>>, float> {
+    Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const float& value) const;
 };
 
 template <>
-struct Converter<jni::jobject*, double> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const double& value) const;
+struct Converter<jni::Local<jni::Object<>>, double> {
+    Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const double& value) const;
 };
 
 /**
@@ -35,61 +35,52 @@ struct Converter<jni::jobject*, double> {
  * TODO: use BigDecimal for > 64 / unsigned?
  */
 template<typename T>
-struct Converter<jni::jobject*, T, typename std::enable_if<std::is_integral<T>::value>::type> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const T& value) const {
-        static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "java/lang/Long")).release();
-        static jni::jmethodID* constructor = &jni::GetMethodID(env, *javaClass, "<init>", "(J)V");
-        return {&jni::NewObject(env, *javaClass, *constructor, (jlong) value)};
+struct Converter<jni::Local<jni::Object<>>, T, typename std::enable_if<std::is_integral<T>::value>::type> {
+    Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const T& value) const {
+        return jni::Box(env, jni::jlong(value));
     }
 };
 
 // TODO: convert integral types to primitive jni types
 
 template <>
-struct Converter<jni::jobject*, std::string> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const std::string& value) const;
+struct Converter<jni::Local<jni::Object<>>, std::string> {
+    Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const std::string& value) const;
 };
 
 template <>
-struct Converter<jni::jobject*, Color> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const Color& value) const;
+struct Converter<jni::Local<jni::Object<>>, Color> {
+    Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const Color& value) const;
 };
 
 template <std::size_t N>
-struct Converter<jni::jobject*, std::array<float, N>> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const std::array<float, N>& value) const {
+struct Converter<jni::Local<jni::Object<>>, std::array<float, N>> {
+    Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const std::array<float, N>& value) const {
         std::vector<float> v;
         for (const float& id : value) {
             v.push_back(id);
         }
-        return convert<jni::jobject*, std::vector<float>>(env, v);
+        return convert<jni::Local<jni::Object<>>, std::vector<float>>(env, v);
     }
 };
 
 template <>
-struct Converter<jni::jobject*, std::vector<std::string>> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const std::vector<std::string>& value) const;
+struct Converter<jni::Local<jni::Object<>>, std::vector<std::string>> {
+    Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const std::vector<std::string>& value) const;
 };
 
 template <>
-struct Converter<jni::jobject*, std::vector<float>> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const std::vector<float>& value) const;
+struct Converter<jni::Local<jni::Object<>>, std::vector<float>> {
+    Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const std::vector<float>& value) const;
 };
 
 template <class T>
-struct Converter<jni::jobject*, T, typename std::enable_if_t<std::is_enum<T>::value>> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const T& value) const {
-        return convert<jni::jobject*, std::string>(env, Enum<T>::toString(value));
+struct Converter<jni::Local<jni::Object<>>, T, typename std::enable_if_t<std::is_enum<T>::value>> {
+    Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const T& value) const {
+        return convert<jni::Local<jni::Object<>>, std::string>(env, Enum<T>::toString(value));
     }
 };
 
-// Java -> C++
-
-template <>
-struct Converter<std::string, jni::String> {
-    Result<std::string> operator()(jni::JNIEnv& env, const jni::String& value) const;
-};
-
 } // namespace conversion
-} // namespace style
+} // namespace android
 } // namespace mbgl

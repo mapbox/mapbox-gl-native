@@ -131,6 +131,8 @@ template optional<PropertyExpression<SymbolAnchorType>>
     convertFunctionToExpression<SymbolAnchorType>(const Convertible&, Error&, bool);
 template optional<PropertyExpression<SymbolPlacementType>>
     convertFunctionToExpression<SymbolPlacementType>(const Convertible&, Error&, bool);
+template optional<PropertyExpression<SymbolZOrderType>>
+    convertFunctionToExpression<SymbolZOrderType>(const Convertible&, Error&, bool);
 template optional<PropertyExpression<TextJustifyType>>
     convertFunctionToExpression<TextJustifyType>(const Convertible&, Error&, bool);
 template optional<PropertyExpression<TextTransformType>>
