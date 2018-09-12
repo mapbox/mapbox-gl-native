@@ -49,5 +49,16 @@ public:
     static void registerNative(jni::JNIEnv&);
 };
 
+
+class StringUtils {
+public:
+    static constexpr auto Name() { return "com/mapbox/mapboxsdk/utils/StringUtils"; };
+
+    static jni::Local<jni::String> unaccent(jni::JNIEnv&, const jni::String&);
+
+
+    static void registerNative(jni::JNIEnv&);
+};
+
 } // namespace android
 } // namespace mbgl

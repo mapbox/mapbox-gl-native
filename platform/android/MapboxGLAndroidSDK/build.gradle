@@ -59,12 +59,18 @@ android {
         }
     }
 
+    // Allow determining the C++ STL we're using when building Mapbox GL.
+    def stl = 'c++_static'
+    if (project.hasProperty("mapbox.stl")) {
+        stl = project.getProperty("mapbox.stl")
+    }
+
     defaultConfig {
         if (abi != 'none') {
             externalNativeBuild {
                 cmake {
                     arguments "-DANDROID_TOOLCHAIN=clang"
-                    arguments "-DANDROID_STL=c++_static"
+                    arguments "-DANDROID_STL=" + stl
                     arguments "-DANDROID_CPP_FEATURES=rtti;exceptions"
                     arguments "-DMBGL_PLATFORM=android"
                     arguments "-DMASON_PLATFORM=android"

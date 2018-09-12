@@ -270,7 +270,7 @@ double TransformState::zoomScale(double zoom) const {
 }
 
 double TransformState::scaleZoom(double s) const {
-    return ::log2(s);
+    return util::log2(s);
 }
 
 ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) const {
