@@ -48,13 +48,21 @@ fun MapboxMap.waitForLayer(uiController: UiController, location: Location, layer
   }
 }
 
+inline fun waitForRenderResult(uiController: UiController, checkFunction: () -> Boolean, expectedResult: Boolean) {
+  var counter = 0
+  val delay = MapboxTestingUtils.MAP_RENDER_DELAY
+  while (checkFunction.invoke() != expectedResult && delay * counter < MapboxTestingUtils.RENDER_TIMEOUT) {
+    uiController.loopMainThreadForAtLeast(delay)
+    counter++
+  }
+}
 
 class MapboxTestingUtils {
   companion object {
 
     const val MAP_RENDER_DELAY = 250L
     const val MAP_CONNECTION_DELAY = 1000L
-    const val RENDER_TIMEOUT = 3_000L
+    const val RENDER_TIMEOUT = 2_500L
 
     /**
      * Used to increase style load time for stress testing.
