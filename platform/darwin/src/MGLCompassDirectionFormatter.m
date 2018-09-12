@@ -15,8 +15,8 @@
 }
 
 - (NSString *)stringFromDirection:(CLLocationDirection)direction {
-    static NSArray<NSString *> *shortStrings;
-    static NSArray<NSString *> *longStrings;
+    static NS_ARRAY_OF(NSString *) *shortStrings;
+    static NS_ARRAY_OF(NSString *) *longStrings;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         shortStrings = @[
