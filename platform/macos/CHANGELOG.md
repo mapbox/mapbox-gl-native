@@ -1,6 +1,6 @@
 # Changelog for Mapbox Maps SDK for macOS
 
-# 0.11.0
+# 0.11.0 - September 12, 2018
 
 ### Styles and rendering
 
@@ -10,6 +10,8 @@
 * The `MGLLineStyleLayer.linePattern`, `MGLFillStyleLayer.fillPattern`, and `MGLFillStyleLayer.fillExtrusionPattern` properties can now be set to expressions that refer to feature attributes. ([#12284](https://github.com/mapbox/mapbox-gl-native/pull/12284))
 * Reduced the amount of memory consumed by font data after changing the style. ([#12414](https://github.com/mapbox/mapbox-gl-native/pull/12414))
 * `-[MGLShapeSource initWithIdentifier:shape:options:]` and `-[MGLComputedShapeSource setFeatures:inTileAtX:y:zoomLevel:]` warn about possible attribute loss when passing in an `MGLShapeCollection` object. ([#12625](https://github.com/mapbox/mapbox-gl-native/pull/12625))
+* Fixed an issue where the `cubic-bezier` curve type for `mgl_interpolate:withCurveType:parameters:stops:` expressions was misinterpreted for some style layer properties. ([#12826] (https://github.com/mapbox/mapbox-gl-native/issues/12826))
+* Fixed an issue that could cause symbols to fade in during pan operations instead of always showing when using `MGLSymbolStyleLayer.iconAllowsOverlap` or `MGLSymbolStyleLayer.textAllowsOverlap` properties. ([#12683] (https://github.com/mapbox/mapbox-gl-native/issues/12683))
 
 ### Offline maps
 
@@ -21,8 +23,7 @@
 * The `-[MGLMapView annotationAtPoint:]` method can now return annotations near tile boundaries at high zoom levels. ([#12570](https://github.com/mapbox/mapbox-gl-native/pull/12570))
 * Added an `-[MGLMapViewDelegate mapView:shapeAnnotationIsEnabled:]` method to specify whether an annotation is selectable. ([#12352](https://github.com/mapbox/mapbox-gl-native/pull/12352))
 * Fixed inconsistencies in exception naming. ([#12583](https://github.com/mapbox/mapbox-gl-native/issues/12583))
-* Fixed a cubic-bezier interpolation bug. ([#12812] (https://github.com/mapbox/mapbox-gl-native/issues/12812))
-* Fixed an issue that could cause "allow-overlap" symbols to fade in during pan operations instead of always showing. ([#12683] (https://github.com/mapbox/mapbox-gl-native/issues/12683))
+* Fixed an issue where `-[MGLMapView convertCoordinateBounds:toRectToView:]` would return an empty CGRect if the bounds crossed the antimeridian. ([#12758](https://github.com/mapbox/mapbox-gl-native/pull/12758))
 
 # 0.10.0 - August 15, 2018
 
