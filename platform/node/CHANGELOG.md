@@ -1,9 +1,19 @@
 # master
+- Many new features and enhancements, including:
+   - Expressions
+   - Hillshade layer type
+   - Heatmap layer type
+   - Line gradients
+   - Improve label collision
+   - Support for data-driven values for more style properties
+   - Support for rendering with SwiftShader rather than hardware GPU
+- Improved performance and stability
 - Don't default-show text/icons that depend on the placement of a paired icon/text [#12483](https://github.com/mapbox/mapbox-gl-native/issues/12483)
 - Fix symbol querying for annotations near tile boundaries at high zoom. ([#12472](https://github.com/mapbox/mapbox-gl-native/issues/12472))
 - The `Map` constructor now accepts a `mode` option which can be either `"static"` (default) or `"tile"`. It must be set to `"tile"` when rendering individual tiles in order for the symbols to match across tiles.
 - Remove unnecessary memory use when collision debug mode is not enabled ([#12294](https://github.com/mapbox/mapbox-gl-native/issues/12294))
 - Added support for rendering `symbol-placement: line-center` ([#12337](https://github.com/mapbox/mapbox-gl-native/pull/12337))
+- Fix rendering of fill outlines that have a different color than the fill itself ([#9699](https://github.com/mapbox/mapbox-gl-native/pull/9699))
 - Add support for feature expressions in `line-pattern`, `fill-pattern`, and `fill-extrusion-pattern` properties. [#12284](https://github.com/mapbox/mapbox-gl-native/pull/12284)
 - Fixed a cubic-bezier interpolation bug. ([#12812] (https://github.com/mapbox/mapbox-gl-native/issues/12812))
 - Fixed an issue that could cause "allow-overlap" symbols to fade in during pan operations instead of always showing. ([#12683] (https://github.com/mapbox/mapbox-gl-native/issues/12683))
