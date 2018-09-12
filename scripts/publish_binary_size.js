@@ -54,7 +54,7 @@ function query(after) {
                 ref(qualifiedName: "master") {
                   target {
                     ... on Commit {
-                      history(first: 100, since: "2018-07-01T00:00:00Z" ${after ? `, after: "${after}"` : ''}) {
+                      history(first: 100, before: "36c6a8ea79bbd2596abb58ffb58debf65a4ea13d" ${after ? `, after: "${after}"` : ''}) {
                         pageInfo {
                           hasNextPage
                           endCursor
