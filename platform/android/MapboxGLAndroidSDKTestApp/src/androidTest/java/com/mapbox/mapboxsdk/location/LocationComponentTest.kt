@@ -6,7 +6,6 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.RectF
 import android.location.Location
-import android.os.Bundle
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.IdlingRegistry
 import android.support.test.espresso.UiController
@@ -219,8 +218,7 @@ class LocationComponentTest : BaseActivityTest() {
 
         component.forceLocationUpdate(location)
         mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
-        uiController.loopMainThreadForAtLeast(200)
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        uiController.loopMainThreadForAtLeast(500)
 
         mapboxMap.querySourceFeatures(LOCATION_SOURCE).also {
           it.forEach {
@@ -325,10 +323,12 @@ class LocationComponentTest : BaseActivityTest() {
         assertThat(foregroundId, `is`(equalTo("custom-gps-bitmap")))
 
         component.applyStyle(LocationComponentOptions.builder(context).build())
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
 
-        val revertedForegroundId = mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getStringProperty(PROPERTY_FOREGROUND_ICON)
-        assertThat(revertedForegroundId, `is`(equalTo(FOREGROUND_ICON)))
+        val renderCheck = {
+          mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getStringProperty(PROPERTY_FOREGROUND_ICON) == FOREGROUND_ICON
+        }
+        waitForRenderResult(uiController, renderCheck, true)
+        assertThat(renderCheck.invoke(), `is`(true))
       }
     }
 
@@ -356,10 +356,12 @@ class LocationComponentTest : BaseActivityTest() {
         assertThat(foregroundId, `is`(equalTo("custom-gps-bitmap")))
 
         component.renderMode = RenderMode.NORMAL
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
 
-        val revertedForegroundId = mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getStringProperty(PROPERTY_FOREGROUND_ICON)
-        assertThat(revertedForegroundId, `is`(equalTo(FOREGROUND_ICON)))
+        val renderCheck = {
+          mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getStringProperty(PROPERTY_FOREGROUND_ICON) == FOREGROUND_ICON
+        }
+        waitForRenderResult(uiController, renderCheck, true)
+        assertThat(renderCheck.invoke(), `is`(true))
       }
     }
 
@@ -381,8 +383,12 @@ class LocationComponentTest : BaseActivityTest() {
         component.forceLocationUpdate(location)
         mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
         uiController.loopMainThreadForAtLeast(250) // engaging stale state
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
-        assertThat(mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getBooleanProperty(PROPERTY_LOCATION_STALE), `is`(true))
+
+        val renderCheck = {
+          mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getBooleanProperty(PROPERTY_LOCATION_STALE)
+        }
+        waitForRenderResult(uiController, renderCheck, true)
+        assertThat(renderCheck.invoke(), `is`(true))
 
         component.onStop()
         component.onStart()
@@ -409,7 +415,7 @@ class LocationComponentTest : BaseActivityTest() {
 
         component.onStop()
         component.onStart()
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
 
         assertThat(mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getBooleanProperty(PROPERTY_LOCATION_STALE), `is`(false))
         assertThat(mapboxMap.isLayerVisible(ACCURACY_LAYER), `is`(true))
@@ -483,7 +489,7 @@ class LocationComponentTest : BaseActivityTest() {
         assertEquals(point.longitude(), location.longitude, 0.1)
 
         component.isLocationComponentEnabled = false
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER, true)
         assertThat(mapboxMap.queryRenderedFeatures(location, FOREGROUND_LAYER).isEmpty(), `is`(true))
       }
     }
@@ -935,7 +941,6 @@ class LocationComponentTest : BaseActivityTest() {
         component.isLocationComponentEnabled = true
 
         component.cameraMode = CameraMode.TRACKING
-        uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
         val zoom = mapboxMap.cameraPosition.zoom
 
         component.onStop()
