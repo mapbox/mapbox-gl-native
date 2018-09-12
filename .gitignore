@@ -5,6 +5,7 @@
 *.gcda
 *~
 offline.db
+cmake.zip
 xcuserdata
 /platform/node/test/actual
 /platform/node/test/diff
