@@ -97,6 +97,13 @@ public:
 template <typename T>
 using optional = std::experimental::optional<T>;
 
+
+#ifndef NDEBUG
+void logSqlMessage(void *, const int err, const char *msg) {
+    mbgl::Log::Record(mbgl::EventSeverity::Debug, mbgl::Event::Database, err, "%s", msg);
+}
+#endif
+
 __attribute__((constructor))
 static void initalize() {
     if (sqlite3_libversion_number() / 1000000 != SQLITE_VERSION_NUMBER / 1000000) {
@@ -109,9 +116,7 @@ static void initalize() {
 
 #ifndef NDEBUG
     // Enable SQLite logging before initializing the database.
-    sqlite3_config(SQLITE_CONFIG_LOG, [](void *, const int err, const char *msg) {
-        mbgl::Log::Record(mbgl::EventSeverity::Debug, mbgl::Event::Database, err, "%s", msg);
-    }, nullptr);
+    sqlite3_config(SQLITE_CONFIG_LOG, &logSqlMessage, nullptr);
 #endif
 }
 
