@@ -2,7 +2,7 @@
 SETLOCAL
 SET EL=0
 
-7z > null
+7z > NUL
 IF %ERRORLEVEL% NEQ 0 ECHO 7z not availabe && GOTO ERROR
 
 ECHO Powershell version^:
