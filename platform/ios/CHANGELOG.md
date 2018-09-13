@@ -3,7 +3,14 @@
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
 ## master
-* Added an `MGLSymbolStyleLayer.symbolZOrder` property for forcing point features in a symbol layer to be layered in the same order that they are specified in the layer’s associated source. [#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783)
+
+### Styles and rendering
+
+* Added an `MGLSymbolStyleLayer.symbolZOrder` property for forcing point features in a symbol layer to be layered in the same order that they are specified in the layer’s associated source. ([#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783))
+
+### Other changes	
+
+* Fixed an issue where `-[MGLMapSnapshotter startWithQueue:completionHandler:]` failed to call its completion handler in some cases. ([#12355](https://github.com/mapbox/mapbox-gl-native/pull/12355))
 
 ## 4.4.0 - September 12, 2018
 
