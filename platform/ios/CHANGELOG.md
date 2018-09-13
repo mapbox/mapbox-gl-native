@@ -2,6 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## 4.4.1
+
+* Fixed a crash when the network connection was offline. ([#12889](https://github.com/mapbox/mapbox-gl-native/pull/12889))
+
 ## 4.4.0 - September 12, 2018
 
 ### Styles and rendering
