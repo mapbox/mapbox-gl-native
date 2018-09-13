@@ -52,7 +52,7 @@ std::unique_ptr<Expression> convertTokenStringToExpression(const std::string& so
         if (pos != end) {
             for (brace++; brace != end && tokenReservedChars.find(*brace) == std::string::npos; brace++);
             if (brace != end && *brace == '}') {
-                inputs.push_back(toString(get(literal(std::string(pos + 1, brace)))));
+                inputs.push_back(get(literal(std::string(pos + 1, brace))));
                 pos = brace + 1;
             } else {
                 inputs.push_back(literal(std::string(pos, brace)));
@@ -65,7 +65,7 @@ std::unique_ptr<Expression> convertTokenStringToExpression(const std::string& so
     case 0:
         return literal(source);
     case 1:
-        return std::move(inputs[0]);
+        return toString(std::move(inputs[0]));
     default:
         return concat(std::move(inputs));
     }

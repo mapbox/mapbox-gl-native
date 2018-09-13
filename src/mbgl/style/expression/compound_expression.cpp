@@ -309,19 +309,6 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
 
     define("typeof", [](const Value& v) -> Result<std::string> { return toString(typeOf(v)); });
 
-    define("to-string", [](const Value& value) -> Result<std::string> {
-        return toString(value);
-    });
-
-    define("to-boolean", [](const Value& v) -> Result<bool> {
-        return v.match(
-            [&] (double f) { return static_cast<bool>(f); },
-            [&] (const std::string& s) { return s.length() > 0; },
-            [&] (bool b) { return b; },
-            [&] (const NullValue&) { return false; },
-            [&] (const auto&) { return true; }
-        );
-    });
     define("to-rgba", [](const Color& color) -> Result<std::array<double, 4>> {
         return color.toArray();
     });
