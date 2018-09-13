@@ -42,6 +42,7 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.Layer;
@@ -75,6 +76,7 @@ public final class MapboxMap {
 
   private final OnGesturesManagerInteractionListener onGesturesManagerInteractionListener;
 
+  private LocationComponent locationComponent;
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
   MapboxMap(NativeMapView map, Transform transform, UiSettings ui, Projection projection,
@@ -110,12 +112,14 @@ public final class MapboxMap {
       // if user hasn't loaded a Style yet
       nativeMapView.setStyleUrl(Style.MAPBOX_STREETS);
     }
+    locationComponent.onStart();
   }
 
   /**
    * Called when the hosting Activity/Fragment onStop() method is called.
    */
   void onStop() {
+    locationComponent.onStop();
   }
 
   /**
@@ -155,6 +159,13 @@ public final class MapboxMap {
   }
 
   /**
+   * Called when the hosting Activity/Fragment onDestroy()/onDestroyView() method is called.
+   */
+  void onDestroy() {
+    locationComponent.onDestroy();
+  }
+
+  /**
    * Called before the OnMapReadyCallback is invoked.
    */
   void onPreMapReady() {
@@ -172,6 +183,20 @@ public final class MapboxMap {
    */
   void onPostMapReady() {
     invalidateCameraPosition();
+  }
+
+  /**
+   * Called when the map will start loading style.
+   */
+  void onStartLoadingMap() {
+    locationComponent.onStartLoadingMap();
+  }
+
+  /**
+   * Called the map finished loading style.
+   */
+  void onFinishLoadingStyle() {
+    locationComponent.onFinishLoadingStyle();
   }
 
   /**
@@ -2281,6 +2306,29 @@ public final class MapboxMap {
                                              @Nullable Expression filter,
                                              @Nullable String... layerIds) {
     return nativeMapView.queryRenderedFeatures(coordinates, layerIds, filter);
+  }
+
+  //
+  // LocationComponent
+  //
+
+  void injectLocationComponent(LocationComponent locationComponent) {
+    this.locationComponent = locationComponent;
+  }
+
+  /**
+   * Returns the {@link LocationComponent} that can be used to display user's location on the map.
+   * <p>
+   * Use {@link LocationComponent#activateLocationComponent(Context)} or any overload to activate the component,
+   * then, enable it with {@link LocationComponent#setLocationComponentEnabled(boolean)}.
+   * <p>
+   * You can customize the location icon and more with {@link com.mapbox.mapboxsdk.location.LocationComponentOptions}.
+   *
+   * @return the Location Component
+   */
+  @NonNull
+  public LocationComponent getLocationComponent() {
+    return locationComponent;
   }
 
   //

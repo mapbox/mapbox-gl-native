@@ -11,6 +11,9 @@ android {
         versionCode 13
         versionName "6.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
     }
 
     compileOptions {
@@ -63,6 +66,7 @@ dependencies {
     implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportRecyclerView
     implementation dependenciesList.supportDesign
+    implementation dependenciesList.supportConstraintLayout
 
     // implementation dependenciesList.lost
     implementation dependenciesList.gmsLocation

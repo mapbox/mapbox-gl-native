@@ -82,6 +82,7 @@ public:
 
     const float pixelRatio;
     mbgl::MapMode mode;
+    bool crossSourceCollisions;
     NodeThreadPool threadpool;
     NodeMapObserver mapObserver;
     std::unique_ptr<mbgl::HeadlessFrontend> frontend;

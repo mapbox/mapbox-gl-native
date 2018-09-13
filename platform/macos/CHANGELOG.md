@@ -2,14 +2,13 @@
 
 ## master
 
-### Styles and rendering
-* Add `symbol-z-order` symbol layout property to style spec [#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783)
+### Styles and rendering	
+* Add `symbol-z-order` symbol layout property to style spec [#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783)	
 
-### Other changes
-
+### Other changes	
 * Fixed bug where completion block passed to `-[MGLMapSnapshotter startWithQueue:completionHandler:]` was not being called in all code paths. ([#12355](https://github.com/mapbox/mapbox-gl-native/pull/12355))
 
-# 0.11.0
+# 0.11.0 - September 12, 2018
 
 ### Styles and rendering
 
@@ -19,6 +18,8 @@
 * The `MGLLineStyleLayer.linePattern`, `MGLFillStyleLayer.fillPattern`, and `MGLFillStyleLayer.fillExtrusionPattern` properties can now be set to expressions that refer to feature attributes. ([#12284](https://github.com/mapbox/mapbox-gl-native/pull/12284))
 * Reduced the amount of memory consumed by font data after changing the style. ([#12414](https://github.com/mapbox/mapbox-gl-native/pull/12414))
 * `-[MGLShapeSource initWithIdentifier:shape:options:]` and `-[MGLComputedShapeSource setFeatures:inTileAtX:y:zoomLevel:]` warn about possible attribute loss when passing in an `MGLShapeCollection` object. ([#12625](https://github.com/mapbox/mapbox-gl-native/pull/12625))
+* Fixed an issue where the `cubic-bezier` curve type for `mgl_interpolate:withCurveType:parameters:stops:` expressions was misinterpreted for some style layer properties. ([#12826] (https://github.com/mapbox/mapbox-gl-native/issues/12826))
+* Fixed an issue that could cause symbols to fade in during pan operations instead of always showing when using `MGLSymbolStyleLayer.iconAllowsOverlap` or `MGLSymbolStyleLayer.textAllowsOverlap` properties. ([#12683] (https://github.com/mapbox/mapbox-gl-native/issues/12683))
 
 ### Offline maps
 

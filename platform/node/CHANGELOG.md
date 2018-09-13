@@ -6,6 +6,7 @@
 - Remove unnecessary memory use when collision debug mode is not enabled ([#12294](https://github.com/mapbox/mapbox-gl-native/issues/12294))
 - Added support for rendering `symbol-placement: line-center` ([#12337](https://github.com/mapbox/mapbox-gl-native/pull/12337))
 - Add support for feature expressions in `line-pattern`, `fill-pattern`, and `fill-extrusion-pattern` properties. [#12284](https://github.com/mapbox/mapbox-gl-native/pull/12284)
+- Add `crossSourceCollisions` map option, with default of `true`. When set to `false`, cross-source collision detection is disabled. ([#12820] (https://github.com/mapbox/mapbox-gl-native/issues/12820))
 
 # 3.5.8 - October 19, 2017
 - Fixes an issue that causes memory leaks when not deleting the frontend object

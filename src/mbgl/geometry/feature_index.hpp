@@ -28,15 +28,17 @@ public:
         , bucketLeaderID(std::move(bucketName_))
         , sortIndex(sortIndex_)
         , bucketInstanceId(0)
+        , collisionGroupId(0)
     {}
     
     
-    IndexedSubfeature(const IndexedSubfeature& other, uint32_t bucketInstanceId_)
+    IndexedSubfeature(const IndexedSubfeature& other, uint32_t bucketInstanceId_, uint16_t collisionGroupId_)
         : index(other.index)
         , sourceLayerName(other.sourceLayerName)
         , bucketLeaderID(other.bucketLeaderID)
         , sortIndex(other.sortIndex)
         , bucketInstanceId(bucketInstanceId_)
+        , collisionGroupId(collisionGroupId_)
     {}
     size_t index;
     std::string sourceLayerName;
@@ -45,6 +47,7 @@ public:
 
     // Only used for symbol features
     uint32_t bucketInstanceId;
+    uint16_t collisionGroupId;
 };
 
 class FeatureIndex {
