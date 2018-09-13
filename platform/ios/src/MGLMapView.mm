@@ -5955,12 +5955,8 @@ public:
     {
         // Smoothly move the user location annotation view and callout view to
         // the new location.
-        [UIView animateWithDuration:duration
-                              delay:0
-                            options:(UIViewAnimationOptionCurveLinear |
-                                     UIViewAnimationOptionAllowUserInteraction |
-                                     UIViewAnimationOptionBeginFromCurrentState)
-                         animations:^{
+        
+        dispatch_block_t animation = ^{
             if (self.selectedAnnotation == self.userLocation)
             {
                 UIView <MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
@@ -5969,7 +5965,20 @@ public:
                                                  userPoint.y - annotationView.center.y);
             }
             annotationView.center = userPoint;
-        } completion:NULL];
+        };
+        
+        if (duration > 0) {
+            [UIView animateWithDuration:duration
+                                  delay:0
+                                options:(UIViewAnimationOptionCurveLinear |
+                                         UIViewAnimationOptionAllowUserInteraction |
+                                         UIViewAnimationOptionBeginFromCurrentState)
+                             animations:animation
+                             completion:NULL];
+        }
+        else {
+            animation();
+        }
         _userLocationAnimationCompletionDate = [NSDate dateWithTimeIntervalSinceNow:duration];
 
         annotationView.hidden = NO;
