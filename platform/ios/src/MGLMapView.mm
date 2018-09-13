@@ -5771,9 +5771,6 @@ public:
         return;
     }
 
-    [CATransaction begin];
-    [CATransaction setDisableActions:YES];
-
     // If the map is pitched consider the viewport to be exactly the same as the bounds.
     // Otherwise, add a small buffer.
     CGFloat largestWidth = MAX(_largestAnnotationViewSize.width, CGRectGetWidth(self.frame));
@@ -5868,8 +5865,6 @@ public:
             }
         }
     }
-
-    [CATransaction commit];
 }
 
 - (void)updateCalloutView
