@@ -11,10 +11,13 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * When a symbol in an `MGLSymbolStyleLayer` has both an icon and text, both are shown or hidden together based on available space. ([#12521](https://github.com/mapbox/mapbox-gl-native/pull/12521))
 * Invalid values of `MGLSymbolStyleLayer.textFontNames` are treated as warnings instead of errors. ([#12414](https://github.com/mapbox/mapbox-gl-native/pull/12414))
-* Added an `MGLLineStyleLayer.lineGradient` property that can be used to define a gradient with which to color a line feature. ([#12575](https://github.com/mapbox/mapbox-gl-native/pull/12575/))
+* Added an `MGLLineStyleLayer.lineGradient` property that can be used to define a gradient with which to color a line feature. ([#12575](https://github.com/mapbox/mapbox-gl-native/pull/12575))
 * The `MGLLineStyleLayer.linePattern`, `MGLFillStyleLayer.fillPattern`, and `MGLFillStyleLayer.fillExtrusionPattern` properties can now be set to expressions that refer to feature attributes. ([#12284](https://github.com/mapbox/mapbox-gl-native/pull/12284))
 * Reduced the amount of memory consumed by font data after changing the style. ([#12414](https://github.com/mapbox/mapbox-gl-native/pull/12414))
 * `-[MGLShapeSource initWithIdentifier:shape:options:]` warns about possible attribute loss when passing in an `MGLShapeCollection` object. ([#12625](https://github.com/mapbox/mapbox-gl-native/pull/12625))
+* Added an `MGLShapeSourceOptionLineDistanceMetrics` option that enables or disables calculating line distance metrics. ([#12604](https://github.com/mapbox/mapbox-gl-native/pull/12604))
+* Fixed an issue where the `cubic-bezier` curve type for `mgl_interpolate:withCurveType:parameters:stops:` expressions was misinterpreted for some style layer properties. ([#12826](https://github.com/mapbox/mapbox-gl-native/pull/12826))
+* Fixed an issue that could cause symbols to fade in during pan operations instead of always showing when using `MGLSymbolStyleLayer.iconAllowsOverlap` or `MGLSymbolStyleLayer.textAllowsOverlap` properties. ([#12698](https://github.com/mapbox/mapbox-gl-native/pull/12698))
 
 ### Offline maps
 
@@ -28,7 +31,6 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * The `-[MGLMapView visibleFeaturesAtPoint:]` method can now return features near tile boundaries at high zoom levels. ([#12570](https://github.com/mapbox/mapbox-gl-native/pull/12570))
 * Fixed inconsistencies in exception naming. ([#12583](https://github.com/mapbox/mapbox-gl-native/issues/12583))
 * Fixed an issue where `-[MGLMapView convertCoordinateBounds:toRectToView:]` would return an empty CGRect if the bounds crossed the antimeridian. ([#12758](https://github.com/mapbox/mapbox-gl-native/pull/12758))
-* Fixed bug where the completion block passed to `-[MGLMapSnapshotter startWithQueue:completionHandler:]` was not being called in all code paths. ([#12355](https://github.com/mapbox/mapbox-gl-native/pull/12355))
 * Fixed several crashes related to telemetry collection. ([#12825](https://github.com/mapbox/mapbox-gl-native/pull/12825))
 
 ## 4.3.0 - August 15, 2018
@@ -39,9 +41,6 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Token string syntax (`"{token}"`) in `MGLSymbolStyleLayer` `text` and `iconImageName` properties is now correctly converted to the appropriate `NSExpression` equivalent. ([#11659](https://github.com/mapbox/mapbox-gl-native/issues/11659))
 * Fixed a crash when switching between two styles having layers with the same identifier but different layer types. ([#12432](https://github.com/mapbox/mapbox-gl-native/issues/12432))
 * Added a new option to `MGLSymbolPlacement`, `MGLSymbolPlacementLineCenter`, that places the label relative to the center of the geometry. ([#12337](https://github.com/mapbox/mapbox-gl-native/pull/12337))
-* Added a `MGLShapeSourceOptionLineDistanceMetrics` property that enables or disables calculating line distance metrics.
-* Fixed an issue where the `cubic-bezier` curve type for `mgl_interpolate:withCurveType:parameters:stops:` expressions was misinterpreted for some style layer properties. ([#12826] (https://github.com/mapbox/mapbox-gl-native/issues/12826))
-* Fixed an issue that could cause symbols to fade in during pan operations instead of always showing when using `MGLSymbolStyleLayer.iconAllowsOverlap` or `MGLSymbolStyleLayer.textAllowsOverlap` properties. ([#12683] (https://github.com/mapbox/mapbox-gl-native/issues/12683))
 
 ### User location
 
