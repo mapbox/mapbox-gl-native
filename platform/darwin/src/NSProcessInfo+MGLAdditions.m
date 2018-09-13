@@ -3,7 +3,8 @@
 @implementation NSProcessInfo (MGLAdditions)
 
 - (BOOL)mgl_isInterfaceBuilderDesignablesAgent {
-    return [self.processName hasPrefix:@"IBDesignablesAgent"];
+    NSString *processName = self.processName;
+    return [processName hasPrefix:@"IBAgent"] || [processName hasPrefix:@"IBDesignablesAgent"];
 }
 
 @end
