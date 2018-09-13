@@ -320,7 +320,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         NSError *error;
         NSMutableArray *packs;
         if (!result) {
-            NSString *description = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"ADD_FILE_CONTENTS_FAILED_DESC", nil, nil, @"Unable to add offline packs from the file at %@.", @"User-friendly error description"), filePath];
+            NSString *description = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"ADD_FILE_CONTENTS_FAILED_DESC", @"Foundation", nil, @"Unable to add offline packs from the file at %@.", @"User-friendly error description"), filePath];
             error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
                                                                                NSLocalizedDescriptionKey: description,
                                                                                NSLocalizedFailureReasonErrorKey: @(mbgl::util::toString(result.error()).c_str())
