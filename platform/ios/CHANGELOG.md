@@ -12,6 +12,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Fixed an issue where `-[MGLMapSnapshotter startWithQueue:completionHandler:]` failed to call its completion handler in some cases. ([#12355](https://github.com/mapbox/mapbox-gl-native/pull/12355))
 * Fixed a crash when connectivity was offline ([#12889](https://github.com/mapbox/mapbox-gl-native/pull/12889))
+* Fixed bugs in coercion expression operators ("to-array" applied to empty arrays, "to-color" applied to colors, and "to-number" applied to null) [#12864](https://github.com/mapbox/mapbox-gl-native/pull/12864)
 
 ## 4.4.0 - September 12, 2018
 
