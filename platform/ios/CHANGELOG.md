@@ -11,6 +11,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Other changes	
 
 * Fixed an issue where `-[MGLMapSnapshotter startWithQueue:completionHandler:]` failed to call its completion handler in some cases. ([#12355](https://github.com/mapbox/mapbox-gl-native/pull/12355))
+* Fixed a crash when connectivity was offline ([#12889](https://github.com/mapbox/mapbox-gl-native/pull/12889))
 
 ## 4.4.0 - September 12, 2018
 
