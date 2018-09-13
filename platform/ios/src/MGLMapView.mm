@@ -989,8 +989,6 @@ public:
     if ( ! self.dormant || ! _rendererFrontend)
     {
         _rendererFrontend->render();
-
-        [self updateUserLocationAnnotationView];
     }
 }
 
@@ -1121,6 +1119,11 @@ public:
     {
         _needsDisplayRefresh = NO;
 
+        // Update UIKit elements, prior to rendering
+        [self updateUserLocationAnnotationView];
+        [self updateAnnotationViews];
+        [self updateCalloutView];
+        
         [self.glView display];
     }
 
@@ -5713,8 +5716,7 @@ public:
         _isChangingAnnotationLayers = NO;
         [self.style didChangeValueForKey:@"layers"];
     }
-    [self updateAnnotationViews];
-    [self updateCalloutView];
+
     if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingFrame:fullyRendered:)])
     {
         [self.delegate mapViewDidFinishRenderingFrame:self fullyRendered:fullyRendered];
