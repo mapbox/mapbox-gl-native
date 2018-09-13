@@ -137,7 +137,8 @@ typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error
 /**
  A block to be called once the contents of a file are copied into the current packs.
  
- @param fileURL Contains the URL to the file packs used.
+ @param fileURL The file URL of the offline database containing the offline packs
+ that were copied.
  @param packs Contains an array of all known offline packs, or `nil` if there was
  an error creating or adding the pack.
  @param error Contains a pointer to an error object (if any) indicating why the

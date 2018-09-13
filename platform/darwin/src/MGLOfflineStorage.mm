@@ -287,27 +287,26 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     __weak MGLOfflineStorage *weakSelf = self;
     [self _addContentsOfFile:fileURL.path withCompletionHandler:^(NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
         if (packs) {
-            NSMutableDictionary *packsDictionary = [NSMutableDictionary dictionary];
-            NSMutableDictionary *packsIndex = [NSMutableDictionary dictionary];
-            NSInteger index = 0;
+            NSMutableDictionary *packsByIdentifier = [NSMutableDictionary dictionary];
             
             MGLOfflineStorage *strongSelf = weakSelf;
-            for (MGLOfflinePack *pack in strongSelf.packs) {
-                [packsDictionary setObject:pack forKey:@(pack.mbglOfflineRegion->getID())];
-                [packsIndex setObject:@(index) forKey:@(pack.mbglOfflineRegion->getID())];
-                index++;
+            for (MGLOfflinePack *pack in packs) {
+                [packsByIdentifier setObject:pack forKey:@(pack.mbglOfflineRegion->getID())];
             }
             
-            for (MGLOfflinePack *pack in packs) {
-                MGLOfflinePack *existingPack = [packsDictionary objectForKey:@(pack.mbglOfflineRegion->getID())];
-                if (existingPack) {
-                    [existingPack invalidate];
-                    NSNumber *index = [packsIndex objectForKey:@(pack.mbglOfflineRegion->getID())];
-                    [[strongSelf mutableArrayValueForKey:@"packs"] replaceObjectAtIndex:index.unsignedIntegerValue withObject:pack];
-                } else {
-                    [[strongSelf mutableArrayValueForKey:@"packs"] addObject:pack];
+            id mutablePacks = [strongSelf mutableArrayValueForKey:@"packs"];
+            [strongSelf.packs enumerateObjectsUsingBlock:^(MGLOfflinePack * _Nonnull pack, NSUInteger idx, BOOL * _Nonnull stop) {
+                MGLOfflinePack *newPack = packsByIdentifier[@(pack.mbglOfflineRegion->getID())];
+                if (newPack) {
+                    MGLOfflinePack *previousPack = [mutablePacks objectAtIndex:idx];
+                    [previousPack invalidate];
+                    [mutablePacks replaceObjectAtIndex:idx withObject:newPack];
+                    packsByIdentifier[@(newPack.mbglOfflineRegion->getID())] = nil;
                 }
-            }
+
+            }];
+            
+            [mutablePacks addObjectsFromArray:packsByIdentifier.allValues];
         }
         if (completion) {
             completion(fileURL, packs, error);
@@ -316,12 +315,14 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 }
 
 - (void)_addContentsOfFile:(NSString *)filePath withCompletionHandler:(void (^)(NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error))completion {
-    self.mbglFileSource->mergeOfflineRegions(std::string(static_cast<const char *>([filePath UTF8String])), [&, completion](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> result) {
+    self.mbglFileSource->mergeOfflineRegions(std::string(static_cast<const char *>([filePath UTF8String])), [&, completion, filePath](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> result) {
         NSError *error;
         NSMutableArray *packs;
         if (!result) {
+            NSString *description = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"ADD_FILE_CONTENTS_FAILED_DESC", nil, nil, @"Unable to add offline packs from the file at %@.", @"User-friendly error description"), filePath];
             error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
-                                                                               NSLocalizedDescriptionKey: @(mbgl::util::toString(result.error()).c_str()),
+                                                                               NSLocalizedDescriptionKey: description,
+                                                                               NSLocalizedFailureReasonErrorKey: @(mbgl::util::toString(result.error()).c_str())
                                                                                }];
         } else {
             auto& regions = result.value();
