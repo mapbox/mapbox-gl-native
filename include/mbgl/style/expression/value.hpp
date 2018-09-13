@@ -46,6 +46,8 @@ struct Value : ValueBase {
 constexpr NullValue Null = NullValue();
 
 type::Type typeOf(const Value& value);
+
+std::string toString(const Value& value);
 std::string stringify(const Value& value);
 
 /*

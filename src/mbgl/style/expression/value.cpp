@@ -34,6 +34,15 @@ type::Type typeOf(const Value& value) {
     );
 }
 
+std::string toString(const Value& value) {
+    return value.match(
+        [](const NullValue&) { return std::string(); },
+        [](const Color& c) { return c.stringify(); }, // avoid quoting
+        [](const std::string& s) { return s; }, // avoid quoting
+        [](const auto& v_) { return stringify(v_); }
+    );
+}
+
 void writeJSON(rapidjson::Writer<rapidjson::StringBuffer>& writer, const Value& value) {
     value.match(
         [&] (const NullValue&) { writer.Null(); },

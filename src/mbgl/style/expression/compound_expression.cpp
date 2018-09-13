@@ -310,12 +310,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("typeof", [](const Value& v) -> Result<std::string> { return toString(typeOf(v)); });
 
     define("to-string", [](const Value& value) -> Result<std::string> {
-        return value.match(
-            [](const NullValue&) -> Result<std::string> { return std::string(); },
-            [](const Color& c) -> Result<std::string> { return c.stringify(); }, // avoid quoting
-            [](const std::string& s) -> Result<std::string> { return s; }, // avoid quoting
-            [](const auto& v) -> Result<std::string> { return stringify(v); }
-        );
+        return toString(value);
     });
 
     define("to-boolean", [](const Value& v) -> Result<bool> {
@@ -507,10 +502,10 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("downcase", [](const std::string& input) -> Result<std::string> {
         return platform::lowercase(input);
     });
-    define("concat", [](const Varargs<std::string>& args) -> Result<std::string> {
+    define("concat", [](const Varargs<Value>& args) -> Result<std::string> {
         std::string s;
-        for (const std::string& arg : args) {
-            s += arg;
+        for (const Value& arg : args) {
+            s += toString(arg);
         }
         return s;
     });
