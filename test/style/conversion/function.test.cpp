@@ -86,9 +86,9 @@ TEST(StyleConversion, TokenStrings) {
 
     using namespace mbgl::style::expression::dsl;
     ASSERT_EQ(*convertTokenStringToExpression("{token}"), *toString(get(literal("token"))));
-    ASSERT_EQ(*convertTokenStringToExpression("token {token}"), *concat(vec(literal("token "), toString(get(literal("token"))))));
-    ASSERT_EQ(*convertTokenStringToExpression("{token} token"), *concat(vec(toString(get(literal("token"))), literal(" token"))));
-    ASSERT_EQ(*convertTokenStringToExpression("{token} {token}"), *concat(vec(toString(get(literal("token"))), literal(" "), toString(get(literal("token"))))));
-    ASSERT_EQ(*convertTokenStringToExpression("{token} {token"), *concat(vec(toString(get(literal("token"))), literal(" "), literal("{token"))));
-    ASSERT_EQ(*convertTokenStringToExpression("{token {token}"), *concat(vec(literal("{token "), toString(get(literal("token"))))));
+    ASSERT_EQ(*convertTokenStringToExpression("token {token}"), *concat(vec(literal("token "), get(literal("token")))));
+    ASSERT_EQ(*convertTokenStringToExpression("{token} token"), *concat(vec(get(literal("token")), literal(" token"))));
+    ASSERT_EQ(*convertTokenStringToExpression("{token} {token}"), *concat(vec(get(literal("token")), literal(" "), get(literal("token")))));
+    ASSERT_EQ(*convertTokenStringToExpression("{token} {token"), *concat(vec(get(literal("token")), literal(" "), literal("{token"))));
+    ASSERT_EQ(*convertTokenStringToExpression("{token {token}"), *concat(vec(literal("{token "), get(literal("token")))));
 }

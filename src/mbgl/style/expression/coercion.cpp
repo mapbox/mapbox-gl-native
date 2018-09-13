@@ -8,6 +8,16 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
+EvaluationResult toBoolean(const Value& v) {
+    return v.match(
+        [&] (double f) { return static_cast<bool>(f); },
+        [&] (const std::string& s) { return s.length() > 0; },
+        [&] (bool b) { return b; },
+        [&] (const NullValue&) { return false; },
+        [&] (const auto&) { return true; }
+    );
+}
+
 EvaluationResult toNumber(const Value& v) {
     optional<double> result = v.match(
         [](NullValue) -> optional<double> { return 0.0; },
@@ -78,10 +88,14 @@ Coercion::Coercion(type::Type type_, std::vector<std::unique_ptr<Expression>> in
 {
     assert(!inputs.empty());
     type::Type t = getType();
-    if (t.is<type::NumberType>()) {
-        coerceSingleValue = toNumber;
+    if (t.is<type::BooleanType>()) {
+        coerceSingleValue = toBoolean;
     } else if (t.is<type::ColorType>()) {
         coerceSingleValue = toColor;
+    } else if (t.is<type::NumberType>()) {
+        coerceSingleValue = toNumber;
+    } else if (t.is<type::StringType>()) {
+        coerceSingleValue = [] (const Value& v) -> EvaluationResult { return toString(v); };
     } else {
         assert(false);
     }
@@ -89,16 +103,20 @@ Coercion::Coercion(type::Type type_, std::vector<std::unique_ptr<Expression>> in
 
 std::string Coercion::getOperator() const {
     return getType().match(
-      [](const type::NumberType&) { return "to-number"; },
+      [](const type::BooleanType&) { return "to-boolean"; },
       [](const type::ColorType&) { return "to-color"; },
+      [](const type::NumberType&) { return "to-number"; },
+      [](const type::StringType&) { return "to-string"; },
       [](const auto&) { assert(false); return ""; });
 }
 
 using namespace mbgl::style::conversion;
 ParseResult Coercion::parse(const Convertible& value, ParsingContext& ctx) {
     static std::unordered_map<std::string, type::Type> types {
+        {"to-boolean", type::Boolean},
+        {"to-color", type::Color},
         {"to-number", type::Number},
-        {"to-color", type::Color}
+        {"to-string", type::String}
     };
 
     std::size_t length = arrayLength(value);
@@ -110,7 +128,12 @@ ParseResult Coercion::parse(const Convertible& value, ParsingContext& ctx) {
 
     auto it = types.find(*toString(arrayMember(value, 0)));
     assert(it != types.end());
-    
+
+    if ((it->second == type::Boolean || it->second == type::String) && length != 2) {
+        ctx.error("Expected one argument.");
+        return ParseResult();
+    }
+
     std::vector<std::unique_ptr<Expression>> parsed;
     parsed.reserve(length - 1);
     for (std::size_t i = 1; i < length; i++) {

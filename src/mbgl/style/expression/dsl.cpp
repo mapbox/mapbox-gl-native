@@ -74,7 +74,7 @@ std::unique_ptr<Expression> toColor(std::unique_ptr<Expression> value) {
 }
 
 std::unique_ptr<Expression> toString(std::unique_ptr<Expression> value) {
-    return compound("to-string", std::move(value));
+    return std::make_unique<Coercion>(type::String, vec(std::move(value)));
 }
 
 std::unique_ptr<Expression> get(const char* value) {

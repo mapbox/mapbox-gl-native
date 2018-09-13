@@ -1,0 +1,3 @@
+{
+  "core": "Arguments to the `concat` expression operator are now automatically converted to string values as if via `to-string`, as are values for the `text-field`, `icon-image`, and `*-pattern` properties. Previously, such values were required to be strings, and if they were not, an error occurred."
+}
