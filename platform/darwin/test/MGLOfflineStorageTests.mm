@@ -12,6 +12,24 @@
 
 @implementation MGLOfflineStorageTests
 
++ (void)tearDown {
+    NSURL *cacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory
+                                                                      inDomain:NSUserDomainMask
+                                                             appropriateForURL:nil
+                                                                        create:NO
+                                                                         error:nil];
+    // Unit tests don't use the main bundle; use com.mapbox.ios.sdk instead.
+    NSString *bundleIdentifier = [NSBundle bundleForClass:[MGLMapView class]].bundleIdentifier;
+    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
+    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@".mapbox"];
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:cacheDirectoryURL.path], @"Cache subdirectory should exist.");
+    
+    NSURL *cacheURL = [cacheDirectoryURL URLByAppendingPathComponent:@"cache.db"];
+    
+    [[NSFileManager defaultManager] removeItemAtURL:cacheURL error:nil];
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:cacheURL.path], @"Cache subdirectory should not exist.");
+}
+
 - (void)setUp {
     [super setUp];
 
@@ -264,8 +282,9 @@
     [os setDelegate:nil];
 }
 
-- (void)testAddingFileContent {
-    NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
+- (void)testAddFileContent {
+    
+    
     // Valid database
     {
         NSURL *resourceURL = [NSURL fileURLWithPath:[[NSBundle bundleForClass:[self class]] pathForResource:@"barcelona" ofType:@"db"]];
@@ -281,6 +300,21 @@
         
         NSError *error;
         [fileManager moveItemAtURL:resourceURL toURL:[NSURL fileURLWithPath:filePath] error:&error];
+        NSDictionary *atributes = @{ NSFilePosixPermissions: @0777 };
+        error = nil;
+        [fileManager setAttributes:atributes ofItemAtPath:filePath error:&error];
+        XCTAssertNil(error, @"Changing the file's permissions:%@ should not return an error.", filePath);
+        error = nil;
+        NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:filePath error:&error];
+        
+        NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
+        long long fileSize = [fileSizeNumber longLongValue];
+        long long dabaseFileSize = 32391168;
+        // Merging databases creates an empty file if the file does not exist at the given path.
+        XCTAssertEqual(fileSize, dabaseFileSize, @"The dabase file size must be:%l actual size:%l", dabaseFileSize, fileSize);
+        
+        NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
+        
         
         XCTestExpectation *fileAdditionCompletionHandlerExpectation = [self expectationWithDescription:@"add database content completion handler"];
         MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
@@ -288,11 +322,14 @@
             XCTAssertNotNil(fileURL, @"The fileURL should not be nil.");
             XCTAssertNotNil(packs, @"Adding the contents of the barcelona.db should update one pack.");
             XCTAssertNil(error, @"Adding contents to a file should not return an error.");
+            for (MGLOfflinePack *pack in [MGLOfflineStorage sharedOfflineStorage].packs) {
+                NSLog(@"PACK:%@", pack);
+            }
             [fileAdditionCompletionHandlerExpectation fulfill];
         }];
         [self waitForExpectationsWithTimeout:2 handler:nil];
-        // Depending on the database it may update or add a pack. For this case specifically the offline database updates the current pack.
-        XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks, @"Adding contents of barcelona.db should not add any new pack.");
+        // Depending on the database it may update or add a pack. For this case specifically the offline database adds one pack.
+        XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Adding contents of barcelona.db should add one pack.");
     }
     // Invalid database type
     {

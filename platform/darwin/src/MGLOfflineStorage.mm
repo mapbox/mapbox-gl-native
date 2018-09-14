@@ -306,7 +306,11 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
                 }
 
             }];
-            [mutablePacks replaceObjectsAtIndexes:replaceIndexSet withObjects:packs];
+            
+            if (replaceIndexSet.count > 0) {
+                [mutablePacks replaceObjectsAtIndexes:replaceIndexSet withObjects:packs];
+            }
+            
             [mutablePacks addObjectsFromArray:packsByIdentifier.allValues];
         }
         if (completion) {
