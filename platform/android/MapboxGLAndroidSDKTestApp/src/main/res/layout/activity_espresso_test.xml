@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
+        app:mapbox_styleUrl="asset://streets.json"
         app:mapbox_cameraZoom="1"/>
 
 </RelativeLayout>
