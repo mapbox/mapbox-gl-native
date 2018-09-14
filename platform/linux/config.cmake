@@ -60,7 +60,6 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/jpeg_reader.cpp
         PRIVATE platform/default/png_writer.cpp
         PRIVATE platform/default/png_reader.cpp
-        PRIVATE platform/default/webp_reader.cpp
 
         # Headless view
         PRIVATE platform/default/mbgl/gl/headless_frontend.cpp
@@ -81,7 +80,6 @@ macro(mbgl_platform_core)
 
     target_add_mason_package(mbgl-core PUBLIC libpng)
     target_add_mason_package(mbgl-core PUBLIC libjpeg-turbo)
-    target_add_mason_package(mbgl-core PUBLIC webp)
     target_add_mason_package(mbgl-core PUBLIC geojson)
 
     target_link_libraries(mbgl-core

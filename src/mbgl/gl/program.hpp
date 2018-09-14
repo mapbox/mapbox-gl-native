@@ -118,6 +118,7 @@ public:
               DepthMode depthMode,
               StencilMode stencilMode,
               ColorMode colorMode,
+              CullFaceMode cullFaceMode,
               const UniformValues& uniformValues,
               VertexArray& vertexArray,
               const AttributeBindings& attributeBindings,
@@ -130,6 +131,7 @@ public:
         context.setDepthMode(depthMode);
         context.setStencilMode(stencilMode);
         context.setColorMode(colorMode);
+        context.setCullFaceMode(cullFaceMode);
 
         context.program = program;
 
