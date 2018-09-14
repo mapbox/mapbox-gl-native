@@ -67,6 +67,10 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/gl/headless_backend.cpp
         PRIVATE platform/default/mbgl/gl/headless_backend.hpp
 
+        # Snapshotting
+        PRIVATE platform/default/mbgl/map/map_snapshotter.cpp
+        PRIVATE platform/default/mbgl/map/map_snapshotter.hpp
+
         # Thread pool
         PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
         PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
