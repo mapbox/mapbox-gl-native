@@ -172,6 +172,7 @@ public:
     void setDepthMode(const DepthMode&);
     void setStencilMode(const StencilMode&);
     void setColorMode(const ColorMode&);
+    void setCullFaceMode(const CullFaceMode&);
 
     void draw(PrimitiveType,
               std::size_t indexOffset,
@@ -263,6 +264,9 @@ private:
     State<value::ClearStencil> clearStencil;
     State<value::LineWidth> lineWidth;
     State<value::BindRenderbuffer> bindRenderbuffer;
+    State<value::CullFace> cullFace;
+    State<value::CullFaceSide> cullFaceSide;
+    State<value::FrontFace> frontFace;
 #if not MBGL_USE_GLES2
     State<value::PointSize> pointSize;
 #endif // MBGL_USE_GLES2
@@ -301,13 +305,8 @@ private:
     std::vector<RenderbufferID> abandonedRenderbuffers;
 
 public:
-    // For testing and Windows because Qt + ANGLE
-    // crashes with VAO enabled.
-#if defined(_WINDOWS)
-    bool disableVAOExtension = true;
-#else
+    // For testing
     bool disableVAOExtension = false;
-#endif
 };
 
 } // namespace gl

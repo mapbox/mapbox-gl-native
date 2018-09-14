@@ -108,6 +108,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
                 parameters.stencilModeForClipping(tile.clip),
                 parameters.colorModeForRenderPass(),
+                gl::CullFaceMode::disabled(),
                 *bucket.indexBuffer,
                 bucket.segments,
                 allUniformValues,

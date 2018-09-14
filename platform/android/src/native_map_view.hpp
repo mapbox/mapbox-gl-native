@@ -45,15 +45,14 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/maps/NativeMapView"; };
 
-    static jni::Class<NativeMapView> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     NativeMapView(jni::JNIEnv&,
-                  jni::Object<NativeMapView>,
-                  jni::Object<FileSource>,
-                  jni::Object<MapRenderer>,
-                  jni::jfloat pixelRatio);
+                  const jni::Object<NativeMapView>&,
+                  const jni::Object<FileSource>&,
+                  const jni::Object<MapRenderer>&,
+                  jni::jfloat,
+                  jni::jboolean);
 
     virtual ~NativeMapView();
 
@@ -78,15 +77,15 @@ public:
 
     void resizeView(jni::JNIEnv&, int, int);
 
-    jni::String getStyleUrl(jni::JNIEnv&);
+    jni::Local<jni::String> getStyleUrl(jni::JNIEnv&);
 
-    void setStyleUrl(jni::JNIEnv&, jni::String);
+    void setStyleUrl(jni::JNIEnv&, const jni::String&);
 
-    jni::String getStyleJson(jni::JNIEnv&);
+    jni::Local<jni::String> getStyleJson(jni::JNIEnv&);
 
-    void setStyleJson(jni::JNIEnv&, jni::String);
+    void setStyleJson(jni::JNIEnv&, const jni::String&);
 
-    void setLatLngBounds(jni::JNIEnv&, jni::Object<mbgl::android::LatLngBounds>);
+    void setLatLngBounds(jni::JNIEnv&, const jni::Object<mbgl::android::LatLngBounds>&);
 
     void cancelTransitions(jni::JNIEnv&);
 
@@ -100,13 +99,13 @@ public:
 
     void flyTo(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble, jni::jlong, jni::jdouble, jni::jdouble);
 
-    jni::Object<LatLng> getLatLng(JNIEnv&);
+    jni::Local<jni::Object<LatLng>> getLatLng(JNIEnv&);
 
     void setLatLng(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jlong);
 
-    jni::Object<CameraPosition> getCameraForLatLngBounds(jni::JNIEnv&, jni::Object<mbgl::android::LatLngBounds>, double top, double left, double bottom, double right, double bearing, double tilt);
+    jni::Local<jni::Object<CameraPosition>> getCameraForLatLngBounds(jni::JNIEnv&, const jni::Object<mbgl::android::LatLngBounds>&, double top, double left, double bottom, double right, double bearing, double tilt);
 
-    jni::Object<CameraPosition> getCameraForGeometry(jni::JNIEnv&, jni::Object<geojson::Geometry>, double top, double left, double bottom, double right, double bearing, double tilt);
+    jni::Local<jni::Object<CameraPosition>> getCameraForGeometry(jni::JNIEnv&, const jni::Object<geojson::Geometry>&, double top, double left, double bottom, double right, double bearing, double tilt);
 
     void setReachability(jni::JNIEnv&, jni::jboolean);
 
@@ -140,17 +139,17 @@ public:
 
     void resetNorth(jni::JNIEnv&);
 
-    void setVisibleCoordinateBounds(JNIEnv&, jni::Array<jni::Object<LatLng>>, jni::Object<RectF>, jni::jdouble, jni::jlong);
+    void setVisibleCoordinateBounds(JNIEnv&, const jni::Array<jni::Object<LatLng>>&, const jni::Object<RectF>&, jni::jdouble, jni::jlong);
 
     void setContentPadding(JNIEnv&, double, double, double, double);
 
     void scheduleSnapshot(jni::JNIEnv&);
 
-    jni::Object<CameraPosition> getCameraPosition(jni::JNIEnv&);
+    jni::Local<jni::Object<CameraPosition>> getCameraPosition(jni::JNIEnv&);
 
-    void updateMarker(jni::JNIEnv&, jni::jlong, jni::jdouble, jni::jdouble, jni::String);
+    void updateMarker(jni::JNIEnv&, jni::jlong, jni::jdouble, jni::jdouble, const jni::String&);
 
-    jni::Array<jni::jlong> addMarkers(jni::JNIEnv&, jni::Array<jni::Object<Marker>>);
+    jni::Local<jni::Array<jni::jlong>> addMarkers(jni::JNIEnv&, const jni::Array<jni::Object<Marker>>&);
 
     void onLowMemory(JNIEnv& env);
 
@@ -164,29 +163,29 @@ public:
 
     jni::jdouble getMetersPerPixelAtLatitude(JNIEnv&, jni::jdouble, jni::jdouble);
 
-    jni::Object<ProjectedMeters> projectedMetersForLatLng(JNIEnv&, jni::jdouble, jni::jdouble);
+    jni::Local<jni::Object<ProjectedMeters>> projectedMetersForLatLng(JNIEnv&, jni::jdouble, jni::jdouble);
 
-    jni::Object<PointF> pixelForLatLng(JNIEnv&, jdouble, jdouble);
+    jni::Local<jni::Object<PointF>> pixelForLatLng(JNIEnv&, jdouble, jdouble);
 
-    jni::Object<LatLng> latLngForProjectedMeters(JNIEnv&, jdouble, jdouble);
+    jni::Local<jni::Object<LatLng>> latLngForProjectedMeters(JNIEnv&, jdouble, jdouble);
 
-    jni::Object<LatLng> latLngForPixel(JNIEnv&, jfloat, jfloat);
+    jni::Local<jni::Object<LatLng>> latLngForPixel(JNIEnv&, jfloat, jfloat);
 
-    jni::Array<jlong> addPolylines(JNIEnv&, jni::Array<jni::Object<Polyline>>);
+    jni::Local<jni::Array<jlong>> addPolylines(JNIEnv&, const jni::Array<jni::Object<Polyline>>&);
 
-    jni::Array<jlong> addPolygons(JNIEnv&, jni::Array<jni::Object<Polygon>>);
+    jni::Local<jni::Array<jlong>> addPolygons(JNIEnv&, const jni::Array<jni::Object<Polygon>>&);
 
-    void updatePolyline(JNIEnv&, jlong, jni::Object<Polyline>);
+    void updatePolyline(JNIEnv&, jlong, const jni::Object<Polyline>&);
 
-    void updatePolygon(JNIEnv&, jlong, jni::Object<Polygon>);
+    void updatePolygon(JNIEnv&, jlong, const jni::Object<Polygon>&);
 
-    void removeAnnotations(JNIEnv&, jni::Array<jlong>);
+    void removeAnnotations(JNIEnv&, const jni::Array<jlong>&);
 
-    void addAnnotationIcon(JNIEnv&, jni::String, jint, jint, jfloat, jni::Array<jbyte>);
+    void addAnnotationIcon(JNIEnv&, const jni::String&, jint, jint, jfloat, const jni::Array<jbyte>&);
 
-    void removeAnnotationIcon(JNIEnv&, jni::String);
+    void removeAnnotationIcon(JNIEnv&, const jni::String&);
 
-    jni::jdouble getTopOffsetPixelsForAnnotationSymbol(JNIEnv&, jni::String);
+    jni::jdouble getTopOffsetPixelsForAnnotationSymbol(JNIEnv&, const jni::String&);
 
     jni::jlong getTransitionDuration(JNIEnv&);
 
@@ -196,53 +195,53 @@ public:
 
     void setTransitionDelay(JNIEnv&, jni::jlong);
 
-    jni::Array<jlong> queryPointAnnotations(JNIEnv&, jni::Object<RectF>);
+    jni::Local<jni::Array<jlong>> queryPointAnnotations(JNIEnv&, const jni::Object<RectF>&);
 
-    jni::Array<jlong> queryShapeAnnotations(JNIEnv&, jni::Object<RectF>);
+    jni::Local<jni::Array<jlong>> queryShapeAnnotations(JNIEnv&, const jni::Object<RectF>&);
 
-    jni::Array<jni::Object<geojson::Feature>> queryRenderedFeaturesForPoint(JNIEnv&, jni::jfloat, jni::jfloat,
-                                                                   jni::Array<jni::String>,
-                                                                   jni::Array<jni::Object<>> jfilter);
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> queryRenderedFeaturesForPoint(JNIEnv&, jni::jfloat, jni::jfloat,
+                                                                   const jni::Array<jni::String>&,
+                                                                   const jni::Array<jni::Object<>>& jfilter);
 
-    jni::Array<jni::Object<geojson::Feature>> queryRenderedFeaturesForBox(JNIEnv&, jni::jfloat, jni::jfloat, jni::jfloat,
-                                                                 jni::jfloat, jni::Array<jni::String>,
-                                                                 jni::Array<jni::Object<>> jfilter);
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> queryRenderedFeaturesForBox(JNIEnv&, jni::jfloat, jni::jfloat, jni::jfloat,
+                                                                 jni::jfloat, const jni::Array<jni::String>&,
+                                                                 const jni::Array<jni::Object<>>& jfilter);
 
-    jni::Object<Light> getLight(JNIEnv&);
+    jni::Local<jni::Object<Light>> getLight(JNIEnv&);
 
-    jni::Array<jni::Object<Layer>> getLayers(JNIEnv&);
+    jni::Local<jni::Array<jni::Object<Layer>>> getLayers(JNIEnv&);
 
-    jni::Object<Layer> getLayer(JNIEnv&, jni::String);
+    jni::Local<jni::Object<Layer>> getLayer(JNIEnv&, const jni::String&);
 
-    void addLayer(JNIEnv&, jlong, jni::String);
+    void addLayer(JNIEnv&, jlong, const jni::String&);
 
-    void addLayerAbove(JNIEnv&, jlong, jni::String);
+    void addLayerAbove(JNIEnv&, jlong, const jni::String&);
 
     void addLayerAt(JNIEnv&, jni::jlong, jni::jint);
 
-    jni::Object<Layer> removeLayerById(JNIEnv&, jni::String);
+    jni::Local<jni::Object<Layer>> removeLayerById(JNIEnv&, const jni::String&);
 
-    jni::Object<Layer> removeLayerAt(JNIEnv&, jni::jint);
+    jni::Local<jni::Object<Layer>> removeLayerAt(JNIEnv&, jni::jint);
 
     void removeLayer(JNIEnv&, jlong);
 
-    jni::Array<jni::Object<Source>> getSources(JNIEnv&);
+    jni::Local<jni::Array<jni::Object<Source>>> getSources(JNIEnv&);
 
-    jni::Object<Source> getSource(JNIEnv&, jni::String);
+    jni::Local<jni::Object<Source>> getSource(JNIEnv&, const jni::String&);
 
-    void addSource(JNIEnv&, jni::Object<Source>, jlong nativePtr);
+    void addSource(JNIEnv&, const jni::Object<Source>&, jlong nativePtr);
 
-    jni::Object<Source> removeSourceById(JNIEnv&, jni::String);
+    jni::Local<jni::Object<Source>> removeSourceById(JNIEnv&, const jni::String&);
 
-    void removeSource(JNIEnv&, jni::Object<Source>, jlong nativePtr);
+    void removeSource(JNIEnv&, const jni::Object<Source>&, jlong nativePtr);
 
-    void addImage(JNIEnv&, jni::String, jni::Object<Bitmap> bitmap, jni::jfloat, jni::jboolean);
+    void addImage(JNIEnv&, const jni::String&, const jni::Object<Bitmap>& bitmap, jni::jfloat, jni::jboolean);
 
-    void addImages(JNIEnv&, jni::Array<jni::Object<mbgl::android::Image>>);
+    void addImages(JNIEnv&, const jni::Array<jni::Object<mbgl::android::Image>>&);
 
-    void removeImage(JNIEnv&, jni::String);
+    void removeImage(JNIEnv&, const jni::String&);
 
-    jni::Object<Bitmap> getImage(JNIEnv&, jni::String);
+    jni::Local<jni::Object<Bitmap>> getImage(JNIEnv&, const jni::String&);
 
     void setPrefetchesTiles(JNIEnv&, jni::jboolean);
 
@@ -254,7 +253,7 @@ private:
     std::unique_ptr<AndroidRendererFrontend> rendererFrontend;
 
     JavaVM *vm = nullptr;
-    jni::UniqueWeakObject<NativeMapView> javaPeer;
+    jni::WeakReference<jni::Object<NativeMapView>> javaPeer;
 
     MapRenderer& mapRenderer;
 

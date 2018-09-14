@@ -68,6 +68,11 @@ enum class SymbolPlacementType : uint8_t {
     Line,
     LineCenter
 };
+    
+enum class SymbolZOrderType : uint8_t {
+    ViewportY,
+    Source
+};
 
 enum class AlignmentType : uint8_t {
     Map,

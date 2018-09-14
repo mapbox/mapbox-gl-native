@@ -67,6 +67,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
             gl::DepthMode::disabled(),
             gl::StencilMode::disabled(),
             gl::ColorMode::unblended(),
+            gl::CullFaceMode::disabled(),
             parameters.staticData.tileBorderIndexBuffer,
             parameters.staticData.tileBorderSegments,
             programInstance.computeAllUniformValues(
@@ -139,7 +140,7 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
     auto dx = nePoint.x - swPoint.x;
     auto dy = nePoint.y - swPoint.y;
     auto dMax = std::max(dx, dy);
-    double zoom = std::max(0.0, std::floor(-::log2(dMax)));
+    double zoom = std::max(0.0, std::floor(-util::log2(dMax)));
 
     // Only enable if the long side of the image is > 2 pixels. Resulting in a
     // display of at least 2 x 1 px image

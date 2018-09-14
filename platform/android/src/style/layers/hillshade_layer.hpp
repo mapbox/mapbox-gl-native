@@ -12,14 +12,12 @@ namespace android {
 
 class HillshadeLayer : public Layer {
 public:
-
+    using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/HillshadeLayer"; };
-
-    static jni::Class<HillshadeLayer> javaClass;
 
     static void registerNative(jni::JNIEnv&);
 
-    HillshadeLayer(jni::JNIEnv&, jni::String, jni::String);
+    HillshadeLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
     HillshadeLayer(mbgl::Map&, mbgl::style::HillshadeLayer&);
 
@@ -29,26 +27,26 @@ public:
 
     // Properties
 
-    jni::Object<jni::ObjectTag> getHillshadeIlluminationDirection(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getHillshadeIlluminationDirection(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getHillshadeIlluminationAnchor(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getHillshadeIlluminationAnchor(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getHillshadeExaggeration(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getHillshadeExaggeration(jni::JNIEnv&);
     void setHillshadeExaggerationTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getHillshadeExaggerationTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getHillshadeExaggerationTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getHillshadeShadowColor(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getHillshadeShadowColor(jni::JNIEnv&);
     void setHillshadeShadowColorTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getHillshadeShadowColorTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getHillshadeShadowColorTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getHillshadeHighlightColor(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getHillshadeHighlightColor(jni::JNIEnv&);
     void setHillshadeHighlightColorTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getHillshadeHighlightColorTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getHillshadeHighlightColorTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getHillshadeAccentColor(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getHillshadeAccentColor(jni::JNIEnv&);
     void setHillshadeAccentColorTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getHillshadeAccentColorTransition(jni::JNIEnv&);
-    jni::jobject* createJavaPeer(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getHillshadeAccentColorTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&);
 
 }; // class HillshadeLayer
 

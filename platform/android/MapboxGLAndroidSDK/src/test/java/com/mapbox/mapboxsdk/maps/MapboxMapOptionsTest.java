@@ -2,12 +2,10 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.Color;
 import android.view.Gravity;
-
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -176,6 +174,16 @@ public class MapboxMapOptionsTest {
     // Check mutations
     assertTrue(new MapboxMapOptions().setPrefetchesTiles(true).getPrefetchesTiles());
     assertFalse(new MapboxMapOptions().setPrefetchesTiles(false).getPrefetchesTiles());
+  }
+
+  @Test
+  public void testCrossSourceCollisions() {
+    // Default value
+    assertTrue(new MapboxMapOptions().getCrossSourceCollisions());
+
+    // check mutations
+    assertTrue(new MapboxMapOptions().crossSourceCollisions(true).getCrossSourceCollisions());
+    assertFalse(new MapboxMapOptions().crossSourceCollisions(false).getCrossSourceCollisions());
   }
 }
 

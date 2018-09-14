@@ -9,8 +9,6 @@
 #include <jni/jni.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 
-#include "jni/generic_global_ref_deleter.hpp"
-
 namespace mbgl {
 
 template <class>
@@ -38,18 +36,16 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/maps/renderer/MapRenderer"; };
 
-    static jni::Class<MapRenderer> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
-    static MapRenderer& getNativePeer(JNIEnv&, jni::Object<MapRenderer>);
+    static MapRenderer& getNativePeer(JNIEnv&, const jni::Object<MapRenderer>&);
 
     MapRenderer(jni::JNIEnv& _env,
-                jni::Object<MapRenderer>,
-                jni::Object<FileSource>,
+                const jni::Object<MapRenderer>&,
+                const jni::Object<FileSource>&,
                 jni::jfloat pixelRatio,
-                jni::String programCacheDir,
-                jni::String localIdeographFontFamily);
+                const jni::String& programCacheDir,
+                const jni::String& localIdeographFontFamily);
 
     ~MapRenderer() override;
 
@@ -99,7 +95,7 @@ private:
     void onSurfaceChanged(JNIEnv&, jint width, jint height);
 
 private:
-    GenericUniqueWeakObject<MapRenderer> javaPeer;
+    jni::WeakReference<jni::Object<MapRenderer>, jni::EnvAttachingDeleter> javaPeer;
 
     float pixelRatio;
     DefaultFileSource& fileSource;

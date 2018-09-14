@@ -303,6 +303,42 @@ BindRenderbuffer::Type BindRenderbuffer::Get() {
     return binding;
 }
 
+const constexpr CullFace::Type CullFace::Default;
+
+void CullFace::Set(const Type& value) {
+    MBGL_CHECK_ERROR(value == CullFaceMode::Enable ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE));
+}
+
+CullFace::Type CullFace::Get() {
+    GLboolean cullFace;
+    MBGL_CHECK_ERROR(cullFace = glIsEnabled(GL_CULL_FACE));
+    return cullFace ? CullFaceMode::Enable : CullFaceMode::Disable;
+}
+
+const constexpr CullFaceSide::Type CullFaceSide::Default;
+
+void CullFaceSide::Set(const Type& value) {
+    MBGL_CHECK_ERROR(glCullFace(static_cast<GLenum>(value)));
+}
+
+CullFaceSide::Type CullFaceSide::Get() {
+    GLint cullFaceMode;
+    MBGL_CHECK_ERROR(glGetIntegerv(GL_CULL_FACE_MODE, &cullFaceMode));
+    return static_cast<Type>(cullFaceMode);
+}
+
+const constexpr FrontFace::Type FrontFace::Default;
+
+void FrontFace::Set(const Type& value) {
+    MBGL_CHECK_ERROR(glFrontFace(static_cast<GLenum>(value)));
+}
+
+FrontFace::Type FrontFace::Get() {
+    GLint frontFace;
+    MBGL_CHECK_ERROR(glGetIntegerv(GL_FRONT_FACE, &frontFace));
+    return static_cast<Type>(frontFace);
+}
+
 const constexpr BindTexture::Type BindTexture::Default;
 
 void BindTexture::Set(const Type& value) {

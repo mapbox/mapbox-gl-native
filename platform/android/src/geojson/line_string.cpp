@@ -7,29 +7,24 @@ namespace mbgl {
 namespace android {
 namespace geojson {
 
-jni::Object<LineString> LineString::New(jni::JNIEnv& env, const mbgl::LineString<double>& lineString) {
-    auto jList = asPointsList(env, lineString);
-
+jni::Local<jni::Object<LineString>> LineString::New(jni::JNIEnv& env, const mbgl::LineString<double>& lineString) {
+    static auto& javaClass = jni::Class<LineString>::Singleton(env);
     static auto method = javaClass.GetStaticMethod<jni::Object<LineString>(jni::Object<java::util::List>)>(env, "fromLngLats");
-    auto jLineString = javaClass.Call(env, method, jList);
 
-    jni::DeleteLocalRef(env, jList);
-    return jLineString;
+    return javaClass.Call(env, method, asPointsList(env, lineString));
 }
 
-mapbox::geojson::line_string LineString::convert(jni::JNIEnv &env, jni::Object<LineString> jLineString) {
+mapbox::geojson::line_string LineString::convert(jni::JNIEnv &env, const jni::Object<LineString>& jLineString) {
     mapbox::geojson::line_string lineString;
 
     if (jLineString) {
-        auto jPointList = LineString::coordinates(env, jLineString);
-        lineString = LineString::convert(env, jPointList);
-        jni::DeleteLocalRef(env, jPointList);
+        lineString = LineString::convert(env, LineString::coordinates(env, jLineString));
     }
 
     return lineString;
 }
 
-mapbox::geojson::line_string LineString::convert(jni::JNIEnv &env, jni::Object<java::util::List/*<Point>*/> jPointList) {
+mapbox::geojson::line_string LineString::convert(jni::JNIEnv &env, const jni::Object<java::util::List/*<Point>*/>& jPointList) {
     mapbox::geojson::line_string lineString;
 
     if (jPointList) {
@@ -38,28 +33,22 @@ mapbox::geojson::line_string LineString::convert(jni::JNIEnv &env, jni::Object<j
         lineString.reserve(size);
 
         for (std::size_t i = 0; i < size; i++) {
-            auto jPoint = jPointArray.Get(env, i);
-            lineString.push_back(Point::convert(env, jPoint));
-            jni::DeleteLocalRef(env, jPoint);
+            lineString.push_back(Point::convert(env, jPointArray.Get(env, i)));
         }
-
-        jni::DeleteLocalRef(env, jPointArray);
     }
 
     return lineString;
 }
 
-jni::Object<java::util::List> LineString::coordinates(jni::JNIEnv &env, jni::Object<LineString> jLineString) {
-    static auto method = LineString::javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "coordinates");
+jni::Local<jni::Object<java::util::List>> LineString::coordinates(jni::JNIEnv &env, const jni::Object<LineString>& jLineString) {
+    static auto& javaClass = jni::Class<LineString>::Singleton(env);
+    static auto method = javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "coordinates");
     return jLineString.Call(env, method);
 }
 
 void LineString::registerNative(jni::JNIEnv &env) {
-    // Lookup the class
-    javaClass = *jni::Class<LineString>::Find(env).NewGlobalRef(env).release();
+    jni::Class<LineString>::Singleton(env);
 }
-
-jni::Class<LineString> LineString::javaClass;
 
 } // namespace geojson
 } // namespace android

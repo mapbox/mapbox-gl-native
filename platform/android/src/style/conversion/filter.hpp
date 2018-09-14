@@ -9,7 +9,7 @@ namespace mbgl {
 namespace android {
 namespace conversion {
 
-optional<mbgl::style::Filter> toFilter(jni::JNIEnv&, jni::Array<jni::Object<>>);
+optional<mbgl::style::Filter> toFilter(jni::JNIEnv&, const jni::Array<jni::Object<>>&);
 
 } // namespace conversion
 } // namespace android

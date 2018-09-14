@@ -36,36 +36,29 @@ namespace android {
 LocalGlyphRasterizer::LocalGlyphRasterizer() {
     UniqueEnv env { AttachEnv() };
 
+    static auto& javaClass = jni::Class<LocalGlyphRasterizer>::Singleton(*env);
     static auto constructor = javaClass.GetConstructor(*env);
 
-    javaObject = javaClass.New(*env, constructor).NewGlobalRef(*env);
+    javaObject = jni::NewGlobal(*env, javaClass.New(*env, constructor));
 }
 
 PremultipliedImage LocalGlyphRasterizer::drawGlyphBitmap(const std::string& fontFamily, const bool bold, const GlyphID glyphID) {
     UniqueEnv env { AttachEnv() };
 
-    using Signature = jni::Object<Bitmap>(jni::String, jni::jboolean, jni::jchar);
-    static auto method = javaClass.GetMethod<Signature>(*env, "drawGlyphBitmap");
+    static auto& javaClass = jni::Class<LocalGlyphRasterizer>::Singleton(*env);
+    static auto drawGlyphBitmap = javaClass.GetMethod<jni::Object<Bitmap> (jni::String, jni::jboolean, jni::jchar)>(*env, "drawGlyphBitmap");
 
-    jni::String jniFontFamily = jni::Make<jni::String>(*env, fontFamily);
-
-    auto javaBitmap = javaObject->Call(*env,
-                                       method,
-                                       jniFontFamily,
-                                       static_cast<jni::jboolean>(bold),
-                                       static_cast<jni::jchar>(glyphID));
-    jni::DeleteLocalRef(*env, jniFontFamily);
-
-    PremultipliedImage result = Bitmap::GetImage(*env, javaBitmap);
-    jni::DeleteLocalRef(*env, javaBitmap);
-    return result;
+    return Bitmap::GetImage(*env,
+        javaObject.Call(*env,
+            drawGlyphBitmap,
+            jni::Make<jni::String>(*env, fontFamily),
+            static_cast<jni::jboolean>(bold),
+            static_cast<jni::jchar>(glyphID)));
 }
 
 void LocalGlyphRasterizer::registerNative(jni::JNIEnv& env) {
-    javaClass = *jni::Class<LocalGlyphRasterizer>::Find(env).NewGlobalRef(env).release();
+    jni::Class<LocalGlyphRasterizer>::Singleton(env);
 }
-
-jni::Class<LocalGlyphRasterizer> LocalGlyphRasterizer::javaClass;
 
 } // namespace android
 

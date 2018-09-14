@@ -130,6 +130,7 @@ function(load_sources_list VAR FILELIST)
         endif()
     endforeach()
     set(${VAR} "${_FILES}" PARENT_SCOPE)
+    set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${FILELIST}")
 endfunction()
 
 function(target_sources_from_file TARGET TYPE FILELIST)

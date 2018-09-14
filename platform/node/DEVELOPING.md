@@ -36,10 +36,12 @@ To clean up your pull request and prepare it for merging, update your local `mas
 
 ## Publishing
 
-To publish a new version of the `@mapbox/mapbox-gl-native` package:
-- [ ] make a commit in the branch being published including:
-    - [ ] updated version number in [`package.json`](../../package.json#L3)
-    - [ ] an entry in [`platform/node/CHANGELOG.md`](CHANGELOG.md) describing the changes in your release
+We aim to publish the `@mapbox/mapbox-gl-native` package on the same four-week cadence as the iOS, Android, and JavaScript SDKs, including a beta release one week prior to the final release. Responsibility for publishing rotates between team members.
+
+To publish a new version of the package:
+- [ ] make a commit in the release branch which includes:
+    - [ ] an updated version number in [`package.json`](../../package.json#L3)
+    - [ ] an entry in [`platform/node/CHANGELOG.md`](CHANGELOG.md) describing the changes in the release
 - [ ] run `git tag node-v{VERSION}` where `{VERSION}` matches the version in `package.json`, e.g. `git tag node-v3.3.2`
 - [ ] run `git push && git push --gs`
 

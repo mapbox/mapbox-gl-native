@@ -38,6 +38,8 @@ public:
     
     // For still image requests, render requested
     const bool stillImageRequest;
+    
+    const bool crossSourceCollisions;
 };
 
 } // namespace mbgl

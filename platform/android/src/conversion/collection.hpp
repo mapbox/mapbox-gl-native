@@ -10,7 +10,8 @@ namespace mbgl {
 namespace android {
 namespace conversion {
 
-std::vector<std::string> toVector(JNIEnv& env, jni::Array<jni::String> array);
+std::vector<std::string> toVector(JNIEnv& env, const jni::Array<jni::String>& array);
+jni::Local<jni::Array<jni::String>> toArray(JNIEnv& env, const std::vector<std::string>&);
 
 }
 }

@@ -16,7 +16,7 @@ export default function (style, options, callback) {
     let map;
 
     if (options.recycleMap) {
-        const key = options.pixelRatio + '/' + tileMode;
+        const key = options.pixelRatio + '/' + tileMode + '/' + options.crossSourceCollisions;
         if (maps.has(key)) {
             map = maps.get(key);
             map.request = mapRequest;
@@ -24,7 +24,8 @@ export default function (style, options, callback) {
             maps.set(key, new mbgl.Map({
                 ratio: options.pixelRatio,
                 request: mapRequest,
-                mode: options.mapMode
+                mode: options.mapMode,
+                crossSourceCollisions: typeof options.crossSourceCollisions === "undefined" ? true : options.crossSourceCollisions
             }));
             map = maps.get(key);
         }
@@ -32,7 +33,8 @@ export default function (style, options, callback) {
         map = new mbgl.Map({
             ratio: options.pixelRatio,
             request: mapRequest,
-            mode: options.mapMode
+            mode: options.mapMode,
+            crossSourceCollisions: typeof options.crossSourceCollisions === "undefined" ? true : options.crossSourceCollisions
         });
     }
 

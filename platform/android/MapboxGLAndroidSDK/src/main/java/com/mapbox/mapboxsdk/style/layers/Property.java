@@ -108,6 +108,27 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface SYMBOL_PLACEMENT {}
 
+  // SYMBOL_Z_ORDER: Controls the order in which overlapping symbols in the same layer are rendered
+
+  /**
+   * Symbols will be sorted by their y-position relative to the viewport.
+   */
+  public static final String SYMBOL_Z_ORDER_VIEWPORT_Y = "viewport-y";
+  /**
+   * Symbols will be rendered in the same order as the source data with no sorting applied.
+   */
+  public static final String SYMBOL_Z_ORDER_SOURCE = "source";
+
+  /**
+   * Controls the order in which overlapping symbols in the same layer are rendered
+   */
+  @StringDef({
+      SYMBOL_Z_ORDER_VIEWPORT_Y,
+      SYMBOL_Z_ORDER_SOURCE,
+    })
+  @Retention(RetentionPolicy.SOURCE)
+  public @interface SYMBOL_Z_ORDER {}
+
   // ICON_ROTATION_ALIGNMENT: In combination with `symbol-placement`, determines the rotation behavior of icons.
 
   /**

@@ -37,7 +37,8 @@ public:
                  Scheduler&,
                  MapMode mapMode = MapMode::Continuous,
                  ConstrainMode constrainMode = ConstrainMode::HeightOnly,
-                 ViewportMode viewportMode = ViewportMode::Default);
+                 ViewportMode viewportMode = ViewportMode::Default,
+                 bool crossSourceCollisions = true);
     ~Map();
 
     // Register a callback that will get called (on the render thread) when all resources have

@@ -1,0 +1,6 @@
+{
+    "core": "Add map-global 'crossSourceCollisions' option. Setting 'crossSourceCollisions' to 'false' disables collision detection between symbol layers in different sources.",
+    "node": "Add 'crossSourceCollisions' option to NodeMap constructor. Setting 'crossSourceCollisions' to 'false' disables collision detection between symbol layers in different sources.",
+    "android": "Add 'crossSourceCollisions' option to MapboxMapOptions. Setting 'crossSourceCollisions' to 'false' disables collision detection between symbol layers in different sources.",
+    "issue": 12820
+}

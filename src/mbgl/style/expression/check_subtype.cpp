@@ -15,11 +15,19 @@ optional<std::string> checkSubtype(const Type& expected, const Type& t) {
     
     optional<std::string> result = expected.match(
         [&] (const Array& expectedArray) -> optional<std::string> {
-            if (!t.is<Array>()) { return {errorMessage(expected, t)}; }
+            if (!t.is<Array>()) {
+                return {errorMessage(expected, t)};
+            }
             const auto& actualArray = t.get<Array>();
-            const auto err = checkSubtype(expectedArray.itemType, actualArray.itemType);
-            if (err) return { errorMessage(expected, t) };
-            if (expectedArray.N && expectedArray.N != actualArray.N) return { errorMessage(expected, t) };
+            if (!actualArray.N || *actualArray.N != 0 || actualArray.itemType != type::Value) {
+                const auto err = checkSubtype(expectedArray.itemType, actualArray.itemType);
+                if (err) {
+                    return { errorMessage(expected, t) };
+                }
+            }
+            if (expectedArray.N && expectedArray.N != actualArray.N) {
+                return { errorMessage(expected, t) };
+            }
             return {};
         },
         [&] (const ValueType&) -> optional<std::string> {

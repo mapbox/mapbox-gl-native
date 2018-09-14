@@ -124,10 +124,28 @@ void Context::initializeExtensions(const std::function<gl::ProcAddress(const cha
             return nullptr;
         };
 
-        debugging = std::make_unique<extension::Debugging>(fn);
-        if (!disableVAOExtension) {
-            vertexArray = std::make_unique<extension::VertexArray>(fn);
+        const std::string renderer = reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_RENDERER)));
+        Log::Info(Event::General, "GPU Identifier: %s", renderer.c_str());
+
+        // Block ANGLE on Direct3D since the debugging extension is causing crashes
+        if (!(renderer.find("ANGLE") != std::string::npos
+              && renderer.find("Direct3D") != std::string::npos)) {
+            debugging = std::make_unique<extension::Debugging>(fn);
         }
+
+        // Block Adreno 2xx, 3xx as it crashes on glBuffer(Sub)Data
+        // Block ARM Mali-T720 (in some MT8163 chipsets) as it crashes on glBindVertexArray
+        // Block ANGLE on Direct3D as the combination of Qt + Windows + ANGLE leads to crashes
+        if (renderer.find("Adreno (TM) 2") == std::string::npos
+            && renderer.find("Adreno (TM) 3") == std::string::npos
+            && (!(renderer.find("ANGLE") != std::string::npos
+                  && renderer.find("Direct3D") != std::string::npos))
+            && renderer.find("Mali-T720") == std::string::npos
+            && renderer.find("Sapphire 650") == std::string::npos
+            && !disableVAOExtension) {
+                vertexArray = std::make_unique<extension::VertexArray>(fn);
+        }
+
 #if MBGL_HAS_BINARY_PROGRAMS
         programBinary = std::make_unique<extension::ProgramBinary>(fn);
 #endif
@@ -286,22 +304,7 @@ UniqueTexture Context::createTexture() {
 }
 
 bool Context::supportsVertexArrays() const {
-    static bool blacklisted = []() {
-        const std::string renderer = reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_RENDERER)));
-
-        Log::Info(Event::General, "GPU Identifier: %s", renderer.c_str());
-
-        // Blacklist Adreno 2xx, 3xx as it crashes on glBuffer(Sub)Data
-        // Blacklist ARM Mali-T720 (in some MT8163 chipsets) as it crashes on glBindVertexArray
-        return renderer.find("Adreno (TM) 2") != std::string::npos
-            || renderer.find("Adreno (TM) 3") != std::string::npos
-            || renderer.find("Mali-T720") != std::string::npos
-            || renderer.find("Sapphire 650") != std::string::npos;
-
-    }();
-
-    return !blacklisted &&
-           vertexArray &&
+    return vertexArray &&
            vertexArray->genVertexArrays &&
            vertexArray->bindVertexArray &&
            vertexArray->deleteVertexArrays;
@@ -617,6 +620,9 @@ void Context::setDirtyState() {
     clearDepth.setDirty();
     clearColor.setDirty();
     clearStencil.setDirty();
+    cullFace.setDirty();
+    cullFaceSide.setDirty();
+    frontFace.setDirty();
     program.setDirty();
     lineWidth.setDirty();
     activeTextureUnit.setDirty();
@@ -661,6 +667,16 @@ void Context::clear(optional<mbgl::Color> color,
     }
 
     MBGL_CHECK_ERROR(glClear(mask));
+}
+
+void Context::setCullFaceMode(const CullFaceMode& mode) {
+    cullFace = mode.cullFace;
+
+    // These shouldn't need to be updated when face culling is disabled, but we
+    // might end up having the same isssues with Adreno 2xx GPUs as noted in
+    // Context::setDepthMode.
+    cullFaceSide = mode.side;
+    frontFace = mode.frontFace;
 }
 
 #if not MBGL_USE_GLES2

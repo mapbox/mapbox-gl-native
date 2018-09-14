@@ -126,7 +126,12 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
                     vertices.emplace_back(
                         FillExtrusionProgram::layoutVertex(p2, perp.x, perp.y, 0, 1, edgeDistance));
 
-                    triangles.emplace_back(triangleIndex, triangleIndex + 1, triangleIndex + 2);
+                    // ┌──────┐
+                    // │ 0  1 │ Counter-Clockwise winding order.
+                    // │      │ Triangle 1: 0 => 2 => 1
+                    // │ 2  3 │ Triangle 2: 1 => 2 => 3
+                    // └──────┘
+                    triangles.emplace_back(triangleIndex, triangleIndex + 2, triangleIndex + 1);
                     triangles.emplace_back(triangleIndex + 1, triangleIndex + 2, triangleIndex + 3);
                     triangleIndex += 4;
                     triangleSegment.vertexLength += 4;
@@ -141,8 +146,9 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
         assert(nIndices % 3 == 0);
 
         for (uint32_t i = 0; i < nIndices; i += 3) {
-            triangles.emplace_back(flatIndices[indices[i]], flatIndices[indices[i + 1]],
-                                   flatIndices[indices[i + 2]]);
+            // Counter-Clockwise winding order.
+            triangles.emplace_back(flatIndices[indices[i]], flatIndices[indices[i + 2]],
+                                   flatIndices[indices[i + 1]]);
         }
 
         triangleSegment.vertexLength += totalVertices;

@@ -14,7 +14,7 @@ template <typename T> class Thread;
 
 class AssetManagerFileSource : public FileSource {
 public:
-    AssetManagerFileSource(jni::JNIEnv&, jni::Object<android::AssetManager>);
+    AssetManagerFileSource(jni::JNIEnv&, const jni::Object<android::AssetManager>&);
     ~AssetManagerFileSource() override;
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
@@ -22,7 +22,7 @@ public:
 private:
     class Impl;
 
-    jni::UniqueObject<android::AssetManager> assetManager;
+    jni::Global<jni::Object<android::AssetManager>> assetManager;
     std::unique_ptr<util::Thread<Impl>> impl;
 };
 

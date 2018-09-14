@@ -12,14 +12,12 @@ namespace android {
 
 class FillExtrusionLayer : public Layer {
 public:
-
+    using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/FillExtrusionLayer"; };
-
-    static jni::Class<FillExtrusionLayer> javaClass;
 
     static void registerNative(jni::JNIEnv&);
 
-    FillExtrusionLayer(jni::JNIEnv&, jni::String, jni::String);
+    FillExtrusionLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
     FillExtrusionLayer(mbgl::Map&, mbgl::style::FillExtrusionLayer&);
 
@@ -29,32 +27,32 @@ public:
 
     // Properties
 
-    jni::Object<jni::ObjectTag> getFillExtrusionOpacity(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getFillExtrusionOpacity(jni::JNIEnv&);
     void setFillExtrusionOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getFillExtrusionOpacityTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getFillExtrusionOpacityTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getFillExtrusionColor(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getFillExtrusionColor(jni::JNIEnv&);
     void setFillExtrusionColorTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getFillExtrusionColorTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getFillExtrusionColorTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getFillExtrusionTranslate(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getFillExtrusionTranslate(jni::JNIEnv&);
     void setFillExtrusionTranslateTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getFillExtrusionTranslateTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getFillExtrusionTranslateTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getFillExtrusionTranslateAnchor(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getFillExtrusionTranslateAnchor(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getFillExtrusionPattern(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getFillExtrusionPattern(jni::JNIEnv&);
     void setFillExtrusionPatternTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getFillExtrusionPatternTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getFillExtrusionPatternTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getFillExtrusionHeight(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getFillExtrusionHeight(jni::JNIEnv&);
     void setFillExtrusionHeightTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getFillExtrusionHeightTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getFillExtrusionHeightTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getFillExtrusionBase(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getFillExtrusionBase(jni::JNIEnv&);
     void setFillExtrusionBaseTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getFillExtrusionBaseTransition(jni::JNIEnv&);
-    jni::jobject* createJavaPeer(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getFillExtrusionBaseTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&);
 
 }; // class FillExtrusionLayer
 

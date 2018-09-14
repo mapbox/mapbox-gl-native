@@ -10,6 +10,7 @@ namespace expression {
 
 EvaluationResult toNumber(const Value& v) {
     optional<double> result = v.match(
+        [](NullValue) -> optional<double> { return 0.0; },
         [](const double f) -> optional<double> { return f; },
         [](const std::string& s) -> optional<double> {
             try {
@@ -30,6 +31,9 @@ EvaluationResult toNumber(const Value& v) {
 
 EvaluationResult toColor(const Value& colorValue) {
     return colorValue.match(
+        [&](const Color& color) -> EvaluationResult {
+            return color;
+        },
         [&](const std::string& colorString) -> EvaluationResult {
             const optional<Color> result = Color::parse(colorString);
             if (result) {

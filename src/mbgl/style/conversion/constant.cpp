@@ -59,6 +59,7 @@ template optional<LineJoinType> Converter<LineJoinType>::operator()(const Conver
 template optional<RasterResamplingType> Converter<RasterResamplingType>::operator()(const Convertible&, Error&) const;
 template optional<SymbolAnchorType> Converter<SymbolAnchorType>::operator()(const Convertible&, Error&) const;
 template optional<SymbolPlacementType> Converter<SymbolPlacementType>::operator()(const Convertible&, Error&) const;
+template optional<SymbolZOrderType> Converter<SymbolZOrderType>::operator()(const Convertible&, Error&) const;
 template optional<TextJustifyType> Converter<TextJustifyType>::operator()(const Convertible&, Error&) const;
 template optional<TextTransformType> Converter<TextTransformType>::operator()(const Convertible&, Error&) const;
 template optional<TranslateAnchorType> Converter<TranslateAnchorType>::operator()(const Convertible&, Error&) const;

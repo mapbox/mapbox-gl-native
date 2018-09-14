@@ -32,9 +32,10 @@ public:
                                       const bool allowOverlap,
                                       const bool pitchWithMap,
                                       const bool collisionDebug,
-                                      const optional<CollisionTileBoundaries>& avoidEdges);
+                                      const optional<CollisionTileBoundaries>& avoidEdges,
+                                      const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate);
 
-    void insertFeature(CollisionFeature& feature, bool ignorePlacement, uint32_t bucketInstanceId);
+    void insertFeature(CollisionFeature& feature, bool ignorePlacement, uint32_t bucketInstanceId, uint16_t collisionGroupId);
 
     std::unordered_map<uint32_t, std::vector<IndexedSubfeature>> queryRenderedSymbols(const ScreenLineString&) const;
     
@@ -55,7 +56,8 @@ private:
                                   const bool allowOverlap,
                                   const bool pitchWithMap,
                                   const bool collisionDebug,
-                                  const optional<CollisionTileBoundaries>& avoidEdges);
+                                  const optional<CollisionTileBoundaries>& avoidEdges,
+                                  const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate);
     
     float approximateTileDistance(const TileDistance& tileDistance, const float lastSegmentAngle, const float pixelsToTileUnits, const float cameraToAnchorDistance, const bool pitchWithMap);
     

@@ -12,14 +12,12 @@ namespace android {
 
 class HeatmapLayer : public Layer {
 public:
-
+    using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/HeatmapLayer"; };
-
-    static jni::Class<HeatmapLayer> javaClass;
 
     static void registerNative(jni::JNIEnv&);
 
-    HeatmapLayer(jni::JNIEnv&, jni::String, jni::String);
+    HeatmapLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
     HeatmapLayer(mbgl::Map&, mbgl::style::HeatmapLayer&);
 
@@ -29,22 +27,22 @@ public:
 
     // Properties
 
-    jni::Object<jni::ObjectTag> getHeatmapRadius(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getHeatmapRadius(jni::JNIEnv&);
     void setHeatmapRadiusTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getHeatmapRadiusTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getHeatmapRadiusTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getHeatmapWeight(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getHeatmapWeight(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getHeatmapIntensity(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getHeatmapIntensity(jni::JNIEnv&);
     void setHeatmapIntensityTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getHeatmapIntensityTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getHeatmapIntensityTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getHeatmapColor(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getHeatmapColor(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getHeatmapOpacity(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getHeatmapOpacity(jni::JNIEnv&);
     void setHeatmapOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getHeatmapOpacityTransition(jni::JNIEnv&);
-    jni::jobject* createJavaPeer(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getHeatmapOpacityTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&);
 
 }; // class HeatmapLayer
 

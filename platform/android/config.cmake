@@ -1,6 +1,5 @@
 set(USE_GLES2 ON)
 
-include(cmake/nunicode.cmake)
 include(cmake/sqlite.cmake)
 include(cmake/icu.cmake)
 
@@ -49,7 +48,6 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC rapidjson)
 
     target_link_libraries(mbgl-core
-        PRIVATE nunicode
         PRIVATE icu
         PUBLIC expected
         PUBLIC -llog
@@ -71,6 +69,7 @@ macro(mbgl_filesource)
     target_add_mason_package(mbgl-filesource PUBLIC jni.hpp)
 
     target_link_libraries(mbgl-filesource
+        PRIVATE codecvt
         PUBLIC sqlite
         PUBLIC -llog
         PUBLIC -landroid
@@ -86,6 +85,7 @@ add_library(mapbox-gl SHARED
 )
 
 target_link_libraries(mapbox-gl
+    PRIVATE codecvt
     PRIVATE mbgl-core
     PRIVATE mbgl-filesource
 )
@@ -106,6 +106,7 @@ macro(mbgl_platform_test)
     )
 
     target_link_libraries(mbgl-test
+        PRIVATE codecvt
         PRIVATE mbgl-core
         PRIVATE mbgl-filesource
     )

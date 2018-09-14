@@ -467,7 +467,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("sqrt", [](double x) -> Result<double> { return sqrt(x); });
     define("log10", [](double x) -> Result<double> { return log10(x); });
     define("ln", [](double x) -> Result<double> { return log(x); });
-    define("log2", [](double x) -> Result<double> { return log2(x); });
+    define("log2", [](double x) -> Result<double> { return util::log2(x); });
     define("sin", [](double x) -> Result<double> { return sin(x); });
     define("cos", [](double x) -> Result<double> { return cos(x); });
     define("tan", [](double x) -> Result<double> { return tan(x); });

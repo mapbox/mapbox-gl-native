@@ -24,7 +24,6 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
-
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -44,9 +43,12 @@ import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.offline.OfflineGeometryRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
+import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
@@ -54,9 +56,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
@@ -178,9 +177,9 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     Transform transform = new Transform(nativeMapView, annotationManager.getMarkerViewManager(),
       cameraChangeDispatcher);
 
+    // MapboxMap
     mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, proj, registerTouchListener,
       annotationManager, cameraChangeDispatcher);
-
     mapCallback.attachMapboxMap(mapboxMap);
 
     // user input
@@ -194,8 +193,13 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       mapGestureDetector, cameraChangeDispatcher, getWidth(), getHeight());
     mapZoomButtonController.bind(uiSettings, zoomListener);
 
+    // compass
     compassView.injectCompassAnimationListener(createCompassAnimationListener(cameraChangeDispatcher));
     compassView.setOnClickListener(createCompassClickListener(cameraChangeDispatcher));
+
+    // LocationComponent
+    mapboxMap.injectLocationComponent(new LocationComponent(mapboxMap));
+
     // inject widgets with MapboxMap
     attrView.setOnClickListener(new AttributionClickListener(context, mapboxMap));
 
@@ -316,7 +320,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       addView(glSurfaceView, 0);
     }
 
-    nativeMapView = new NativeMapView(getContext(), getPixelRatio(), this, mapRenderer);
+    boolean crossSourceCollisions = mapboxMapOptions.getCrossSourceCollisions();
+    nativeMapView = new NativeMapView(getContext(), getPixelRatio(), crossSourceCollisions, this, mapRenderer);
     nativeMapView.addOnMapChangedListener(change -> {
       // dispatch events to external listeners
       if (!onMapChangedListeners.isEmpty()) {
@@ -419,6 +424,10 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     destroyed = true;
     onMapChangedListeners.clear();
     mapCallback.clearOnMapReadyCallbacks();
+
+    if (mapboxMap != null) {
+      mapboxMap.onDestroy();
+    }
 
     if (nativeMapView != null && hasSurface) {
       // null when destroying an activity programmatically mapbox-navigation-android/issues/503
@@ -1214,11 +1223,17 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
     @Override
     public void onMapChanged(@MapChange int change) {
-      if (change == DID_FINISH_LOADING_STYLE && initialLoad) {
-        initialLoad = false;
-        mapboxMap.onPreMapReady();
-        onMapReady();
-        mapboxMap.onPostMapReady();
+      if (change == WILL_START_LOADING_MAP && !initialLoad) {
+        mapboxMap.onStartLoadingMap();
+      } else if (change == DID_FINISH_LOADING_STYLE) {
+        if (initialLoad) {
+          initialLoad = false;
+          mapboxMap.onPreMapReady();
+          onMapReady();
+          mapboxMap.onPostMapReady();
+        } else {
+          mapboxMap.onFinishLoadingStyle();
+        }
       } else if (change == DID_FINISH_RENDERING_FRAME || change == DID_FINISH_RENDERING_FRAME_FULLY_RENDERED) {
         mapboxMap.onUpdateFullyRendered();
       } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE || change == DID_FINISH_LOADING_MAP) {

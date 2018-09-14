@@ -15,9 +15,6 @@ public:
    static void registerNative(jni::JNIEnv&);
 
    static void log(jni::JNIEnv&, EventSeverity severity, const std::string &msg);
-
-private:
-   static jni::Class<Logger> _class;
 };
 
 } // namespace android

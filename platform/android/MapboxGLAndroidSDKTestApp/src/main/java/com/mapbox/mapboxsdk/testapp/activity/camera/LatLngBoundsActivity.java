@@ -61,10 +61,16 @@ public class LatLngBoundsActivity extends AppCompatActivity implements View.OnCl
   }
 
   private void initMap() {
+    disableGestures();
     addMarkers();
     initFab();
     initBottomSheet();
     moveToBounds(bottomSheet.getMeasuredHeight(), BOUNDS_PADDING_DIVIDER_SMALL, ANIMATION_DURATION_SHORT);
+  }
+
+  private void disableGestures() {
+    mapboxMap.getUiSettings().setTiltGesturesEnabled(false);
+    mapboxMap.getUiSettings().setRotateGesturesEnabled(false);
   }
 
   private void addMarkers() {

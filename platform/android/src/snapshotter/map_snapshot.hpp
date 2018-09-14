@@ -23,7 +23,7 @@ public:
 
     static void registerNative(jni::JNIEnv&);
 
-    static jni::Object<MapSnapshot> New(JNIEnv& env,
+    static jni::Local<jni::Object<MapSnapshot>> New(JNIEnv& env,
                                         PremultipliedImage&& image,
                                         float pixelRatio,
                                         std::vector<std::string> attributions,
@@ -35,12 +35,10 @@ public:
     MapSnapshot(float pixelRatio, PointForFn, LatLngForFn);
     ~MapSnapshot();
 
-    jni::Object<PointF> pixelForLatLng(jni::JNIEnv&, jni::Object<LatLng>);
-    jni::Object<LatLng> latLngForPixel(jni::JNIEnv&, jni::Object<PointF>);
+    jni::Local<jni::Object<PointF>> pixelForLatLng(jni::JNIEnv&, jni::Object<LatLng>&);
+    jni::Local<jni::Object<LatLng>> latLngForPixel(jni::JNIEnv&, jni::Object<PointF>&);
 
 private:
-    static jni::Class<MapSnapshot> javaClass;
-
     float pixelRatio;
     mbgl::MapSnapshotter::PointForFn pointForFn;
     mbgl::MapSnapshotter::LatLngForFn latLngForFn;

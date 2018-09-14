@@ -21,7 +21,6 @@ std::string encodePNG(const PremultipliedImage& pre) {
 
 #if !defined(QT_IMAGE_DECODERS)
 PremultipliedImage decodeJPEG(const uint8_t*, size_t);
-PremultipliedImage decodeWebP(const uint8_t*, size_t);
 #endif
 
 PremultipliedImage decodeImage(const std::string& string) {
@@ -29,14 +28,6 @@ PremultipliedImage decodeImage(const std::string& string) {
     const size_t size = string.size();
 
 #if !defined(QT_IMAGE_DECODERS)
-    if (size >= 12) {
-        uint32_t riff_magic = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
-        uint32_t webp_magic = (data[8] << 24) | (data[9] << 16) | (data[10] << 8) | data[11];
-        if (riff_magic == 0x52494646 && webp_magic == 0x57454250) {
-            return decodeWebP(data, size);
-        }
-    }
-
     if (size >= 2) {
         uint16_t magic = ((data[0] << 8) | data[1]) & 0xffff;
         if (magic == 0xFFD8) {

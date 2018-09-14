@@ -39,6 +39,16 @@
     }
   },
   "layout_symbol": {
+    "symbol-z-order": {
+      "values": {
+        "viewport-y": {
+          "doc": "Specify this z order if symbols’ appearance relies on lower features overlapping higher features. For example, symbols with a pin-like appearance would require this z order."
+        },
+        "source": {
+          "doc": "Specify this z order if the order in which features appear in the source is significant."
+        }
+      }
+    },
     "icon-text-fit-padding": {
       "doc": "Size of the additional area added to dimensions determined by `icon-text-fit`."
     },
