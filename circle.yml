@@ -185,6 +185,7 @@ step-library:
       run:
         name: Build ios-test
         command: make ios-test
+        no_output_timeout: 2m
   - &build-ios-integration-test
       run:
         name: Build ios-integration-test
@@ -193,6 +194,7 @@ step-library:
       run:
         name: Build and run macOS tests
         command: make run-test
+        no_output_timeout: 2m
 
 
   - &check-public-symbols
@@ -1054,6 +1056,7 @@ jobs:
       - run:
           name: Build dynamic framework for device and simulator
           command: make iframework
+          no_output_timeout: 2m
       - deploy:
           name: Upload nightly build to s3
           command: |
