@@ -26,6 +26,7 @@
 @property (nonatomic) void (^regionWillChange)(MGLMapView *mapView, BOOL animated);
 @property (nonatomic) void (^regionIsChanging)(MGLMapView *mapView);
 @property (nonatomic) void (^regionDidChange)(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated);
+@property (nonatomic) CGPoint (^mapViewUserLocationAnchorPoint)(MGLMapView *mapView);
 
 // Utility methods
 - (NSString*)validAccessToken;

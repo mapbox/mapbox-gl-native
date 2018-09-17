@@ -11,6 +11,12 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed a crash when a style layer `*-pattern` property evaluates to nil for a particular feature. ([#12896](https://github.com/mapbox/mapbox-gl-native/pull/12896))
 * Fixed an issue with view annotations (including the user location annotation) and the GL map lagging relative to each other. ([#12895](https://github.com/mapbox/mapbox-gl-native/pull/12895))
 
+### User location
+* Added `-[MGLMapViewDelegate mapViewUserLocationAnchorPoint:]` to customize the position of the user location annotation.. ([#12907](https://github.com/mapbox/mapbox-gl-native/pull/12907))
+* Marked `-[MGLMapView setUserLocationVerticalAlignment:]` as deprecated. Use `-[MGLMapViewDelegate mapViewUserLocationAnchorPoint:]` instead. ([#12907](https://github.com/mapbox/mapbox-gl-native/pull/12907))
+* Added the `-[MGLMapView updateUserLocationAnnotationView]` and `-[MGLMapView updateUserLocationAnnotationView:animated:]` methods to update the position of the user location annotation between location updates. ([#12907](https://github.com/mapbox/mapbox-gl-native/pull/12907))
+* Fixed an issue where the user location annotation was positioned incorrectly when the map view had a left or right content inset. ([#12907](https://github.com/mapbox/mapbox-gl-native/pull/12907)) inset
+
 ### Offline maps
 
 * Added `-[MGLOfflineStorage addContentsOfFile:withCompletionHandler:]` and `-[MGLOfflineStorage addContentsOfURL:withCompletionHandler:]` methods to add pregenerated offline packs to offline storage. ([#12791](https://github.com/mapbox/mapbox-gl-native/pull/12791))
