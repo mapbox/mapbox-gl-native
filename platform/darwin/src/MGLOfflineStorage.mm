@@ -296,19 +296,21 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
             
             id mutablePacks = [strongSelf mutableArrayValueForKey:@"packs"];
             NSMutableIndexSet *replaceIndexSet = [NSMutableIndexSet indexSet];
+            NSMutableArray *replacePacksArray = [NSMutableArray array];
             [strongSelf.packs enumerateObjectsUsingBlock:^(MGLOfflinePack * _Nonnull pack, NSUInteger idx, BOOL * _Nonnull stop) {
                 MGLOfflinePack *newPack = packsByIdentifier[@(pack.mbglOfflineRegion->getID())];
                 if (newPack) {
                     MGLOfflinePack *previousPack = [mutablePacks objectAtIndex:idx];
                     [previousPack invalidate];
                     [replaceIndexSet addIndex:idx];
+                    [replacePacksArray addObject:[packsByIdentifier objectForKey:@(newPack.mbglOfflineRegion->getID())]];
                     [packsByIdentifier removeObjectForKey:@(newPack.mbglOfflineRegion->getID())];
                 }
 
             }];
             
             if (replaceIndexSet.count > 0) {
-                [mutablePacks replaceObjectsAtIndexes:replaceIndexSet withObjects:packs];
+                [mutablePacks replaceObjectsAtIndexes:replaceIndexSet withObjects:replacePacksArray];
             }
             
             [mutablePacks addObjectsFromArray:packsByIdentifier.allValues];

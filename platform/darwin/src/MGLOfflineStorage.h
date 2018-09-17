@@ -139,10 +139,10 @@ typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error
  
  @param fileURL The file URL of the offline database containing the offline packs
  that were copied.
- @param packs Contains an array of all known offline packs, or `nil` if there was
- an error creating or adding the pack.
- @param error Contains a pointer to an error object (if any) indicating why the
- pack could not be created or added.
+ @param packs An array of all known offline packs, or `nil` if there was an error
+ creating or adding the pack.
+ @param error A pointer to an error object (if any) indicating why the pack could
+ not be created or added.
  */
 typedef void (^MGLBatchedOfflinePackAdditionCompletionHandler)(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error);
 
@@ -194,9 +194,6 @@ MGL_EXPORT
  The file must be a valid offline region database bundled with the application
  or downloaded separately.
  
- Refer to this <a href="https://www.mapbox.com/ios-sdk/maps/examples/offline-pack/">example</a>
- to learn how to download offline packs.
- 
  The resulting packs are added or updated to the shared offline storage object’s `packs`
  property, then the `completion` block is executed.
  
@@ -213,9 +210,6 @@ MGL_EXPORT
  
  The file must be a valid offline region database bundled with the application
  or downloaded separately.
- 
- Refer to this <a href="https://www.mapbox.com/ios-sdk/maps/examples/offline-pack/">example</a>
- to learn how to download offline packs.
  
  The resulting packs are added or updated to the shared offline storage object’s `packs`
  property, then the `completion` block is executed.

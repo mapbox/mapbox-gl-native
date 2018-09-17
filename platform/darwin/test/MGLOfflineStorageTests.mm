@@ -315,6 +315,11 @@
         
         NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
         
+        [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
+            const auto changeKind = static_cast<NSKeyValueChange>([change[NSKeyValueChangeKindKey] unsignedLongValue]);
+            NSIndexSet *indices = change[NSKeyValueChangeIndexesKey];
+            return changeKind == NSKeyValueChangeInsertion && indices.count == 1;
+        }];
         
         XCTestExpectation *fileAdditionCompletionHandlerExpectation = [self expectationWithDescription:@"add database content completion handler"];
         MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
