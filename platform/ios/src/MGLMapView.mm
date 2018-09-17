@@ -5280,9 +5280,9 @@ public:
                                                    correctPoint.x - CGRectGetMidX(bounds),
                                                    correctPoint.y - CGRectGetMidY(bounds));
     return UIEdgeInsetsMake(CGRectGetMinY(boundsAroundCorrectPoint) - CGRectGetMinY(bounds),
-                            self.contentInset.left,
+                            CGRectGetMaxX(boundsAroundCorrectPoint) - CGRectGetMaxX(bounds),
                             CGRectGetMaxY(bounds) - CGRectGetMaxY(boundsAroundCorrectPoint),
-                            self.contentInset.right);
+                            CGRectGetMaxX(bounds) - CGRectGetMaxX(boundsAroundCorrectPoint));
 }
 
 /// Returns the edge padding to apply during bifocal course tracking.
@@ -5998,15 +5998,21 @@ public:
 /// the overall map view (but respecting the content inset).
 - (CGPoint)userLocationAnnotationViewCenter
 {
+    if ([self.delegate respondsToSelector:@selector(mapViewUserLocationAnchorPoint:)])
+    {
+        CGPoint anchorPoint = [self.delegate mapViewUserLocationAnchorPoint:self];
+        return CGPointMake(anchorPoint.x + self.contentInset.left, anchorPoint.y + self.contentInset.top);
+    }
+    
     CGRect contentFrame = UIEdgeInsetsInsetRect(self.contentFrame, self.edgePaddingForFollowingWithCourse);
+    
     if (CGRectIsEmpty(contentFrame))
     {
         contentFrame = self.contentFrame;
     }
+    
     CGPoint center = CGPointMake(CGRectGetMidX(contentFrame), CGRectGetMidY(contentFrame));
-
-    // When tracking course, it’s more important to see the road ahead, so
-    // weight the user dot down towards the bottom.
+    
     switch (self.userLocationVerticalAlignment) {
         case MGLAnnotationVerticalAlignmentCenter:
             break;
@@ -6017,7 +6023,7 @@ public:
             center.y = CGRectGetMaxY(contentFrame);
             break;
     }
-
+    
     return center;
 }
 

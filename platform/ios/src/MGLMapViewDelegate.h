@@ -308,6 +308,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)mapView:(MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated;
 
+/**
+ Returns a CGPoint value to offset the user location annotation, relative to the
+ map view’s origin after applying the map view’s content insets.
+ 
+ This method will offset the user location annotation by the specified
+ X and Y values determined by the CGPoint.
+ 
+ @param mapView The map view that is tracking the user's location.
+ */
+- (CGPoint)mapViewUserLocationAnchorPoint:(MGLMapView *)mapView;
+
 #pragma mark Managing the Appearance of Annotations
 
 /**

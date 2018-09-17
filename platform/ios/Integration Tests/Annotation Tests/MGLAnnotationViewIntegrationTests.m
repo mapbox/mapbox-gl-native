@@ -1,6 +1,7 @@
 #import "MGLMapViewIntegrationTest.h"
 #import "MGLTestUtility.h"
 #import "MGLMapAccessibilityElement.h"
+#import "MGLTestLocationManager.h"
 
 @interface MGLMapView (Tests)
 - (MGLAnnotationTag)annotationTagAtPoint:(CGPoint)point persistingResults:(BOOL)persist;
@@ -89,6 +90,31 @@
         XCTAssert(tagAtPoint == UINT32_MAX, @"Tap should to the side of the annotation");
         testPoint++;
     }
+}
+
+- (void)testUserLocationWithOffsetAnchorPoint {
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(37.787357, -122.39899)];
+    MGLTestLocationManager *locationManager = [[MGLTestLocationManager alloc] init];
+    self.mapView.locationManager = locationManager;
+
+    [self.mapView setUserTrackingMode:MGLUserTrackingModeFollow animated:NO];
+    CGRect originalFrame = [self.mapView viewForAnnotation:self.mapView.userLocation].frame;
+    
+    // Temporarily disable location tracking so we can save the value of
+    // the originalFrame in memory
+    [self.mapView setUserTrackingMode:MGLUserTrackingModeNone animated:NO];
+    
+    CGPoint offset = CGPointMake(20, 20);
+    
+    self.mapViewUserLocationAnchorPoint = ^CGPoint (MGLMapView *mapView) {
+        return offset;;
+    };
+    
+    [self.mapView setUserTrackingMode:MGLUserTrackingModeFollow animated:NO];
+    CGRect offsetFrame = [self.mapView viewForAnnotation:self.mapView.userLocation].frame;
+    
+    XCTAssertEqual(originalFrame.origin.x + offset.x, offsetFrame.origin.x);
+    XCTAssertEqual(originalFrame.origin.y + offset.y, offsetFrame.origin.y);
 }
 
 - (void)waitForCollisionDetectionToRun {
