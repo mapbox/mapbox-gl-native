@@ -308,6 +308,21 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)mapView:(MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated;
 
+/**
+ Returns a screen coordinate at which to position the user location annotation.
+ This coordinate is relative to the map view’s origin after applying the map view’s
+ content insets.
+ 
+ When unimplemented, the user location annotation is aligned within the center of
+ the map view with respect to the content insets.
+ 
+ This method will override any values set by `MGLMapView.userLocationVerticalAlignment`
+ or `-[MGLMapView setUserLocationVerticalAlignment:]`.
+ 
+ @param mapView The map view that is tracking the user's location.
+ */
+- (CGPoint)mapViewUserLocationAnchorPoint:(MGLMapView *)mapView;
+
 #pragma mark Managing the Appearance of Annotations
 
 /**

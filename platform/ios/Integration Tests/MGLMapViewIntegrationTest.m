@@ -101,6 +101,13 @@
     }
 }
 
+- (CGPoint)mapViewUserLocationAnchorPoint:(MGLMapView *)mapView {
+    if (self.mapViewUserLocationAnchorPoint) {
+        return self.mapViewUserLocationAnchorPoint(mapView);
+    }
+    return CGPointZero;
+}
+
 #pragma mark - Utilities
 
 - (void)waitForMapViewToFinishLoadingStyleWithTimeout:(NSTimeInterval)timeout {

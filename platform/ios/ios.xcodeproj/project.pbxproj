@@ -14,6 +14,8 @@
 		071BBB071EE77631001FB02A /* MGLImageSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 071BBB051EE7761A001FB02A /* MGLImageSourceTests.m */; };
 		076171C32139C70900668A35 /* MGLMapViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 076171C22139C70900668A35 /* MGLMapViewTests.m */; };
 		076171C72141A91700668A35 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 076171C62141A91700668A35 /* Settings.bundle */; };
+		077061D6215D97EF000FEF62 /* simple_route.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F26B6C220E1A351007BCC21 /* simple_route.json */; };
+		077061DA215DA00E000FEF62 /* MGLTestLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 077061D9215DA00E000FEF62 /* MGLTestLocationManager.m */; };
 		0778DD431F67556700A73B34 /* MGLComputedShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 0778DD401F67555F00A73B34 /* MGLComputedShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0778DD441F67556C00A73B34 /* MGLComputedShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0778DD411F67555F00A73B34 /* MGLComputedShapeSource.mm */; };
 		07D8C6FB1F67560100381808 /* MGLComputedShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0778DD411F67555F00A73B34 /* MGLComputedShapeSource.mm */; };
@@ -747,6 +749,8 @@
 		071BBB051EE7761A001FB02A /* MGLImageSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLImageSourceTests.m; path = ../../darwin/test/MGLImageSourceTests.m; sourceTree = "<group>"; };
 		076171C22139C70900668A35 /* MGLMapViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLMapViewTests.m; path = ../../darwin/test/MGLMapViewTests.m; sourceTree = "<group>"; };
 		076171C62141A91700668A35 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Settings.bundle; path = app/Settings.bundle; sourceTree = SOURCE_ROOT; };
+		077061D9215DA00E000FEF62 /* MGLTestLocationManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTestLocationManager.m; sourceTree = "<group>"; };
+		077061DB215DA11F000FEF62 /* MGLTestLocationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTestLocationManager.h; sourceTree = "<group>"; };
 		0778DD401F67555F00A73B34 /* MGLComputedShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLComputedShapeSource.h; sourceTree = "<group>"; };
 		0778DD411F67555F00A73B34 /* MGLComputedShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLComputedShapeSource.mm; sourceTree = "<group>"; };
 		07D8C6FD1F67562800381808 /* MGLComputedShapeSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLComputedShapeSourceTests.m; path = ../../darwin/test/MGLComputedShapeSourceTests.m; sourceTree = "<group>"; };
@@ -1376,6 +1380,8 @@
 				CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */,
 				CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */,
 				CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */,
+				077061DB215DA11F000FEF62 /* MGLTestLocationManager.h */,
+				077061D9215DA00E000FEF62 /* MGLTestLocationManager.m */,
 			);
 			path = "Integration Tests";
 			sourceTree = "<group>";
@@ -2825,6 +2831,7 @@
 				CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */,
 				CAE7AD5520F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift in Sources */,
 				CA0C27922076C804001CE5B7 /* MGLShapeSourceTests.m in Sources */,
+				077061DA215DA00E000FEF62 /* MGLTestLocationManager.m in Sources */,
 				CA6914B520E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m in Sources */,
 				CA1B4A512099FB2200EDD491 /* MGLMapSnapshotterTest.m in Sources */,
 			);
