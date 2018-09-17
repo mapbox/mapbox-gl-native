@@ -1056,7 +1056,7 @@ jobs:
       - run:
           name: Build dynamic framework for device and simulator
           command: make iframework
-          no_output_timeout: 2m
+          no_output_timeout: 5m
       - deploy:
           name: Upload nightly build to s3
           command: |
