@@ -1,3 +1,6 @@
+/* User-friendly error description */
+"ADD_FILE_CONTENTS_FAILED_DESC" = "Unable to add offline packs from the file at %@.";
+
 /* Clock position format, long: {hours} o’clock */
 "CLOCK_FMT_LONG" = "%@ o’clock";
 

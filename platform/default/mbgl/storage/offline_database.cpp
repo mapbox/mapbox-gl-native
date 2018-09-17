@@ -689,9 +689,9 @@ OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
 
         // clang-format off
         mapbox::sqlite::Query queryRegions{ getStatement(
-            "SELECT r.id, r.definition, r.description "
+            "SELECT DISTINCT r.id, r.definition, r.description "
             "FROM side.regions sr "
-            "JOIN regions r ON sr.definition = r.definition") };
+            "JOIN regions r ON sr.definition = r.definition  AND sr.description IS r.description") };
         // clang-format on
 
         OfflineRegions result;

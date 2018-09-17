@@ -12,6 +12,24 @@
 
 @implementation MGLOfflineStorageTests
 
++ (void)tearDown {
+    NSURL *cacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory
+                                                                      inDomain:NSUserDomainMask
+                                                             appropriateForURL:nil
+                                                                        create:NO
+                                                                         error:nil];
+    // Unit tests don't use the main bundle; use com.mapbox.ios.sdk instead.
+    NSString *bundleIdentifier = [NSBundle bundleForClass:[MGLMapView class]].bundleIdentifier;
+    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
+    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@".mapbox"];
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:cacheDirectoryURL.path], @"Cache subdirectory should exist.");
+    
+    NSURL *cacheURL = [cacheDirectoryURL URLByAppendingPathComponent:@"cache.db"];
+    
+    [[NSFileManager defaultManager] removeItemAtURL:cacheURL error:nil];
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:cacheURL.path], @"Cache subdirectory should not exist.");
+}
+
 - (void)setUp {
     [super setUp];
 
@@ -262,6 +280,112 @@
     CFRunLoopRun();
 
     [os setDelegate:nil];
+}
+
+- (void)testAddFileContent {
+    
+    
+    // Valid database
+    {
+        NSURL *resourceURL = [NSURL fileURLWithPath:[[NSBundle bundleForClass:[self class]] pathForResource:@"barcelona" ofType:@"db"]];
+        NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentDir = [documentPaths objectAtIndex:0];
+        NSString *filePath = [documentDir stringByAppendingPathComponent:@"barcelona.db"];
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        
+        BOOL exists = [fileManager fileExistsAtPath:filePath];
+        if (exists) {
+            [fileManager removeItemAtPath:filePath error:nil];
+        }
+        
+        NSError *error;
+        [fileManager moveItemAtURL:resourceURL toURL:[NSURL fileURLWithPath:filePath] error:&error];
+        NSDictionary *atributes = @{ NSFilePosixPermissions: @0777 };
+        error = nil;
+        [fileManager setAttributes:atributes ofItemAtPath:filePath error:&error];
+        XCTAssertNil(error, @"Changing the file's permissions:%@ should not return an error.", filePath);
+        error = nil;
+        NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:filePath error:&error];
+        
+        NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
+        long long fileSize = [fileSizeNumber longLongValue];
+        long long dabaseFileSize = 32391168;
+        // Merging databases creates an empty file if the file does not exist at the given path.
+        XCTAssertEqual(fileSize, dabaseFileSize, @"The dabase file size must be:%l actual size:%l", dabaseFileSize, fileSize);
+        
+        NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
+        
+        [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
+            const auto changeKind = static_cast<NSKeyValueChange>([change[NSKeyValueChangeKindKey] unsignedLongValue]);
+            NSIndexSet *indices = change[NSKeyValueChangeIndexesKey];
+            return changeKind == NSKeyValueChangeInsertion && indices.count == 1;
+        }];
+        
+        XCTestExpectation *fileAdditionCompletionHandlerExpectation = [self expectationWithDescription:@"add database content completion handler"];
+        MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+        [os addContentsOfFile:filePath withCompletionHandler:^(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
+            XCTAssertNotNil(fileURL, @"The fileURL should not be nil.");
+            XCTAssertNotNil(packs, @"Adding the contents of the barcelona.db should update one pack.");
+            XCTAssertNil(error, @"Adding contents to a file should not return an error.");
+            for (MGLOfflinePack *pack in [MGLOfflineStorage sharedOfflineStorage].packs) {
+                NSLog(@"PACK:%@", pack);
+            }
+            [fileAdditionCompletionHandlerExpectation fulfill];
+        }];
+        [self waitForExpectationsWithTimeout:2 handler:nil];
+        // Depending on the database it may update or add a pack. For this case specifically the offline database adds one pack.
+        XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Adding contents of barcelona.db should add one pack.");
+    }
+    // Invalid database type
+    {
+        NSURL *resourceURL = [NSURL fileURLWithPath:[[NSBundle bundleForClass:[self class]] pathForResource:@"one-liner" ofType:@"json"]];
+        NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentDir = [documentPaths objectAtIndex:0];
+        NSString *filePath = [documentDir stringByAppendingPathComponent:@"on-liner-copy.json"];
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+
+        BOOL exists = [fileManager fileExistsAtPath:filePath];
+        if (exists) {
+            [fileManager removeItemAtPath:filePath error:nil];
+        }
+
+        NSError *error;
+        [fileManager copyItemAtURL:resourceURL toURL:[NSURL fileURLWithPath:filePath] error:&error];
+        
+        XCTestExpectation *invalidFileCompletionHandlerExpectation = [self expectationWithDescription:@"invalid content database completion handler"];
+        MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+        [os addContentsOfFile:filePath withCompletionHandler:^(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
+            XCTAssertNotNil(error, @"Passing an invalid offline database file should return an error.");
+            XCTAssertNil(packs, @"Passing an invalid offline database file should not add packs to the offline database.");
+            [invalidFileCompletionHandlerExpectation fulfill];
+        }];
+        [self waitForExpectationsWithTimeout:2 handler:nil];
+    }
+    // File non existent
+    {
+        NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentDir = [documentPaths objectAtIndex:0];
+        NSString *filePath = [documentDir stringByAppendingPathComponent:@"nonexistent.db"];
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        
+        BOOL exists = [fileManager fileExistsAtPath:filePath];
+        if (exists) {
+            [fileManager removeItemAtPath:filePath error:nil];
+        }
+        
+        MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+        XCTAssertThrowsSpecificNamed([os addContentsOfFile:filePath withCompletionHandler:nil], NSException, NSInvalidArgumentException, "MGLOfflineStorage should rise an exception if an invalid database file is passed.");
+
+    }
+    // URL to a non-file
+    {
+        NSURL *resourceURL = [NSURL URLWithString:@"https://www.mapbox.com"];
+        
+        MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+        XCTAssertThrowsSpecificNamed([os addContentsOfURL:resourceURL withCompletionHandler:nil], NSException, NSInvalidArgumentException, "MGLOfflineStorage should rise an exception if an invalid URL file is passed.");
+        
+    }
+    
 }
 
 @end
