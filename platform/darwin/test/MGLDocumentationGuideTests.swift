@@ -37,7 +37,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         mapView = MGLMapView(frame: CGRect(x: 0, y: 0, width: 256, height: 256), styleURL: styleURL)
         mapView.delegate = self
         styleLoadingExpectation = expectation(description: "Map view should finish loading style")
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
     }
     
     override func tearDown() {

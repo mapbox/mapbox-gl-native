@@ -33,7 +33,7 @@
     self.mapView.delegate = self;
     if (!self.mapView.style) {
         _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
-        [self waitForExpectationsWithTimeout:1 handler:nil];
+        [self waitForExpectationsWithTimeout:5 handler:nil];
     }
 }
 

@@ -43,7 +43,7 @@
             [expectation fulfill];
             [self waitForExpectationsWithTimeout:0 handler:nil];
         } else {
-            [self waitForExpectationsWithTimeout:2 handler:nil];
+            [self waitForExpectationsWithTimeout:5 handler:nil];
         }
 
         XCTAssertNotNil([MGLOfflineStorage sharedOfflineStorage].packs, @"Shared offline storage object should have a non-nil collection of packs by this point.");
@@ -86,7 +86,7 @@
         pack = completionHandlerPack;
         [additionCompletionHandlerExpectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:2 handler:nil];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
 
     XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Added pack should have been added to the canonical collection of packs owned by the shared offline storage object. This assertion can fail if this test is run before -testAAALoadPacks.");
 
@@ -124,7 +124,7 @@
         return notificationPack == pack && pack.state == MGLOfflinePackStateInactive;
     }];
     [pack requestProgress];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
 }
 
 - (void)testAddPackForGeometry {
@@ -157,7 +157,7 @@
         pack = completionHandlerPack;
         [additionCompletionHandlerExpectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:2 handler:nil];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
     
     XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Added pack should have been added to the canonical collection of packs owned by the shared offline storage object. This assertion can fail if this test is run before -testAAALoadPacks.");
     
@@ -195,7 +195,7 @@
         return notificationPack == pack && pack.state == MGLOfflinePackStateInactive;
     }];
     [pack requestProgress];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
     pack = nil;
 }
 
@@ -239,7 +239,7 @@
         XCTAssertEqual(pack.state, MGLOfflinePackStateInvalid, @"Removed pack should be invalid in the completion handler.");
         [completionHandlerExpectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
 
     XCTAssertEqual(pack.state, MGLOfflinePackStateInvalid, @"Removed pack should have been invalidated synchronously.");
 
@@ -314,9 +314,9 @@
         
         NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
         long long fileSize = [fileSizeNumber longLongValue];
-        long long dabaseFileSize = 32391168;
+        long long databaseFileSize = 32391168;
         // Merging databases creates an empty file if the file does not exist at the given path.
-        XCTAssertEqual(fileSize, dabaseFileSize, @"The dabase file size must be:%lld actual size:%lld", dabaseFileSize, fileSize);
+        XCTAssertEqual(fileSize, databaseFileSize, @"The database file size must be:%lld actual size:%lld", databaseFileSize, fileSize);
         
         NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
         
@@ -337,7 +337,7 @@
             }
             [fileAdditionCompletionHandlerExpectation fulfill];
         }];
-        [self waitForExpectationsWithTimeout:2 handler:nil];
+        [self waitForExpectationsWithTimeout:5 handler:nil];
         // Depending on the database it may update or add a pack. For this case specifically the offline database adds one pack.
         XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Adding contents of barcelona.db should add one pack.");
     }
@@ -364,7 +364,7 @@
             XCTAssertNil(packs, @"Passing an invalid offline database file should not add packs to the offline database.");
             [invalidFileCompletionHandlerExpectation fulfill];
         }];
-        [self waitForExpectationsWithTimeout:2 handler:nil];
+        [self waitForExpectationsWithTimeout:5 handler:nil];
     }
     // File non existent
     {

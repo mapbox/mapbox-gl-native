@@ -33,7 +33,7 @@
     [window makeKeyAndVisible];
 
     if (!self.mapView.style) {
-        [self waitForMapViewToFinishLoadingStyleWithTimeout:1];
+        [self waitForMapViewToFinishLoadingStyleWithTimeout:5];
     }
 }
 

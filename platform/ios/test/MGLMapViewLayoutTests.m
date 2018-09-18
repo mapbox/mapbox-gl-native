@@ -35,7 +35,7 @@
     [self.superView addConstraints:[verticalConstraints arrayByAddingObjectsFromArray:horizonatalConstraints]];
 
     self.styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
 
     self.mapView.showsScale = YES;
 

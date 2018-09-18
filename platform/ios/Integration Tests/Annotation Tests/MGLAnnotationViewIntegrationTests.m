@@ -102,7 +102,7 @@
         [timerExpired fulfill];
     });
 
-    [self waitForExpectations:@[timerExpired, self.renderFinishedExpectation] timeout:1.0];
+    [self waitForExpectations:@[timerExpired, self.renderFinishedExpectation] timeout:5];
 }
 
 @end

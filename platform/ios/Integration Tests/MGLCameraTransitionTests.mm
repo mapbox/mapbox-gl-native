@@ -34,7 +34,7 @@
     [self.mapView setDirection:90 animated:YES];
 
     // loop, render, and wait
-    [self waitForExpectations:@[expectation] timeout:1.5];
+    [self waitForExpectations:@[expectation] timeout:5];
 }
 
 
@@ -62,7 +62,7 @@
     };
 
     [self.mapView setDirection:90 animated:YES];
-    [self waitForExpectations:@[expectation] timeout:1.5];
+    [self waitForExpectations:@[expectation] timeout:5];
 }
 
 - (void)testInterruptingAndResetNorthOnlyOnceInIsChanging {
@@ -106,7 +106,7 @@
     };
 
     [self.mapView setDirection:90 animated:YES];
-    [self waitForExpectations:@[expectation] timeout:1.5];
+    [self waitForExpectations:@[expectation] timeout:5];
 
     XCTAssertEqualWithAccuracy(self.mapView.direction, 0.0, 0.001, @"Camera should have reset to north. %0.3f", self.mapView.direction);
 }
@@ -222,7 +222,7 @@
 
     // Should take MGLAnimationDuration seconds (0.3)
     [self.mapView setCenterCoordinate:target zoomLevel:15.0 animated:YES];
-    [self waitForExpectations:@[expectation] timeout:1.5];
+    [self waitForExpectations:@[expectation] timeout:5];
 }
 
 - (void)testFlyToCameraInDelegateMethod {
@@ -323,7 +323,7 @@
     // Should take MGLAnimationDuration
     [self.mapView setCenterCoordinate:target zoomLevel:zoomLevel animated:YES];
 
-    [self waitForExpectations:@[expectation] timeout:2.0];
+    [self waitForExpectations:@[expectation] timeout:5];
 
     NSLog(@"setCenterCoordinate: %0.4fs", stop1 - stop0);
     NSLog(@"flyToCamera: %0.4fs", stop2 - stop1);
@@ -362,7 +362,7 @@
     };
 
     [self.mapView setDirection:90 animated:YES];
-    [self waitForExpectations:@[expectation] timeout:1.5];
+    [self waitForExpectations:@[expectation] timeout:5];
 
     XCTAssertEqualWithAccuracy(self.mapView.direction, 0.0, 0.001, @"Camera should have reset to north. %0.3f", self.mapView.direction);
 }
@@ -389,7 +389,7 @@
     };
 
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(40.0, 40.0) animated:YES];
-    [self waitForExpectations:@[expectation] timeout:1.5];
+    [self waitForExpectations:@[expectation] timeout:5];
 
     XCTAssertEqualWithAccuracy(self.mapView.direction, 0.0, 0.001, @"Camera should have reset to north. %0.3f", self.mapView.direction);
 }
