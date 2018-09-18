@@ -204,6 +204,39 @@ step-library:
         command: make check-public-symbols
 
 
+  - &conditionally-skip-firebase
+      run:
+        name: Check if Firebase should be skipped
+        command: |
+          SKIPPABLE_TAG=$( git log -1 | grep -ioE -e "\[(skip.firebase|firebase.skip)\]" -e "\[((i|mac)os)+(, (i|mac)os)?\]" -e "\[darwin\]" || true )
+          if [ -n "${SKIPPABLE_TAG}" ]; then
+            echo "Skipping Firebase tests because commit message contained: '${SKIPPABLE_TAG}'"
+            echo 'export SKIP_FIREBASE=1' >> $BASH_ENV
+          fi
+  - &login-google-cloud-platform
+      run:
+        name: Log in to Google Cloud Platform
+        shell: /bin/bash -euo pipefail
+        command: |
+          if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
+            echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
+            gcloud auth activate-service-account --key-file secret.json --project android-gl-native
+            rm secret.json
+          fi
+  - &run-android-instrumentation-tests
+      run:
+        name: Run instrumentation tests on Firebase
+        no_output_timeout: 20m
+        command: |
+          if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
+            gcloud firebase test android models list
+            gcloud firebase test android run --type instrumentation \
+              --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
+              --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
+              --device-ids sailfish --os-version-ids 26 --locales en --orientations portrait --timeout 20m
+          fi
+
+
   - &install-ios-packaging-dependencies
       run:
         name: Install iOS packaging dependencies
@@ -423,33 +456,9 @@ jobs:
       - *save-mason_packages-cache
       - *save-ccache
       - *save-gradle-cache
-      - run:
-          name: Check if Firebase should be skipped
-          command: |
-            SKIPPABLE_TAG=$( git log -1 | grep -ioE -e "\[(skip.firebase|firebase.skip)\]" -e "\[((i|mac)os)+(, (i|mac)os)?\]" -e "\[darwin\]" || true )
-            if [ -n "${SKIPPABLE_TAG}" ]; then
-              echo "Skipping Firebase tests because commit message contained: '${SKIPPABLE_TAG}'"
-              echo 'export SKIP_FIREBASE=1' >> $BASH_ENV
-            fi
-      - run:
-          name: Log in to Google Cloud Platform
-          command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE}" ]]; then
-              echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
-              gcloud auth activate-service-account --key-file secret.json --project android-gl-native
-              rm secret.json
-            fi
-      - run:
-          name: Run instrumentation tests on Firebase
-          no_output_timeout: 1200
-          command: |
-            if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE}" ]]; then
-              gcloud firebase test android models list
-              gcloud firebase test android run --type instrumentation \
-                --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
-                --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
-                --device-ids sailfish --os-version-ids 26 --locales en --orientations portrait --timeout 20m
-            fi
+      - *conditionally-skip-firebase
+      - *login-google-cloud-platform
+      - *run-android-instrumentation-tests
       - run:
           name: gzip debugable .so files
           command: |
@@ -519,23 +528,9 @@ jobs:
       - *save-mason_packages-cache
       - *save-ccache
       - *save-gradle-cache
-      - run:
-          name: Log in to Google Cloud Platform
-          shell: /bin/bash -euo pipefail
-          command: |
-            echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
-            gcloud auth activate-service-account --key-file secret.json --project android-gl-native
-            rm secret.json
-      - run:
-          name: Run instrumentation tests on Firebase
-          no_output_timeout: 1200
-          shell: /bin/bash -euo pipefail
-          command: |
-            gcloud firebase test android models list
-            gcloud firebase test android run --type instrumentation \
-              --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
-              --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
-              --device-ids sailfish --os-version-ids 26 --locales en --orientations portrait --timeout 20m
+      - *conditionally-skip-firebase
+      - *login-google-cloud-platform
+      - *run-android-instrumentation-tests
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
           destination: .
