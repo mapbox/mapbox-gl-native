@@ -6,6 +6,8 @@
 #include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/util/logging.hpp>
 
+#include <sqlite3.hpp>
+
 #include "asset_manager_file_source.hpp"
 
 namespace mbgl {
@@ -17,6 +19,8 @@ FileSource::FileSource(jni::JNIEnv& _env,
                        const jni::String& accessToken,
                        const jni::String& _cachePath,
                        const jni::Object<AssetManager>& assetManager) {
+    mapbox::sqlite::setTempPath(jni::Make<std::string>(_env, _cachePath));
+
     // Create a core default file source
     fileSource = std::make_unique<mbgl::DefaultFileSource>(
         jni::Make<std::string>(_env, _cachePath) + "/mbgl-offline.db",

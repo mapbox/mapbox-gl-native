@@ -40,6 +40,10 @@ static_assert(mbgl::underlying_type(ResultCode::Auth) == SQLITE_AUTH, "error");
 static_assert(mbgl::underlying_type(ResultCode::Range) == SQLITE_RANGE, "error");
 static_assert(mbgl::underlying_type(ResultCode::NotADB) == SQLITE_NOTADB, "error");
 
+void setTempPath(const std::string& path) {
+    sqlite3_temp_directory = sqlite3_mprintf("%s", path.c_str());
+}
+
 class DatabaseImpl {
 public:
     DatabaseImpl(sqlite3* db_)
