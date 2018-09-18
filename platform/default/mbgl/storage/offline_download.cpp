@@ -88,7 +88,8 @@ OfflineDownload::OfflineDownload(int64_t id_,
     : id(id_),
       definition(definition_),
       offlineDatabase(offlineDatabase_),
-      onlineFileSource(onlineFileSource_) {
+      onlineFileSource(onlineFileSource_),
+      maximumConcurrentRequests(std::max<uint32_t>(HTTPFileSource::maximumConcurrentRequests() / 2, 1)) {
     setObserver(nullptr);
 }
 
@@ -338,7 +339,7 @@ void OfflineDownload::continueDownload() {
         return;
     }
 
-    while (!resourcesRemaining.empty() && requests.size() < HTTPFileSource::maximumConcurrentRequests()) {
+    while (!resourcesRemaining.empty() && requests.size() < maximumConcurrentRequests) {
         ensureResource(resourcesRemaining.front());
         resourcesRemaining.pop_front();
     }
