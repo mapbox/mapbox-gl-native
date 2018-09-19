@@ -293,8 +293,13 @@
         NSString *filePath = [documentDir stringByAppendingPathComponent:@"barcelona.db"];
         NSFileManager *fileManager = [NSFileManager defaultManager];
         
-        BOOL exists = [fileManager fileExistsAtPath:filePath];
-        if (exists) {
+        BOOL directoryExists = [fileManager fileExistsAtPath:documentDir];
+        if (!directoryExists) {
+            [fileManager createDirectoryAtPath:documentDir withIntermediateDirectories:YES attributes:nil error:nil];
+        }
+        
+        BOOL databaseExists = [fileManager fileExistsAtPath:filePath];
+        if (databaseExists) {
             [fileManager removeItemAtPath:filePath error:nil];
         }
         
@@ -311,7 +316,7 @@
         long long fileSize = [fileSizeNumber longLongValue];
         long long dabaseFileSize = 32391168;
         // Merging databases creates an empty file if the file does not exist at the given path.
-        XCTAssertEqual(fileSize, dabaseFileSize, @"The dabase file size must be:%l actual size:%l", dabaseFileSize, fileSize);
+        XCTAssertEqual(fileSize, dabaseFileSize, @"The dabase file size must be:%lld actual size:%lld", dabaseFileSize, fileSize);
         
         NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
         
