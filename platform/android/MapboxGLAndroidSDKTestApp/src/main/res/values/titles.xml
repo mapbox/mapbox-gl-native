@@ -9,7 +9,6 @@
     <string name="activity_polyline">Polyline</string>
     <string name="activity_polygon">Polygon</string>
     <string name="activity_press_for_marker">Press Map For Marker</string>
-    <string name="activity_view_marker">View Marker API</string>
     <string name="activity_add_remove_markers">Zoom function with SymbolLayer</string>
     <string name="activity_info_window">Standard InfoWindow</string>
     <string name="activity_infowindow_adapter">Custom InfoWindow</string>
@@ -48,7 +47,6 @@
     <string name="activity_map_change">Map Change Events</string>
     <string name="activity_map_visibility">Visibility Map</string>
     <string name="activity_map_in_dialog">Dialog with map</string>
-    <string name="activity_marker_view_rectangle">Marker views in rectangle</string>
     <string name="activity_url_transform">Url transform</string>
     <string name="activity_restricted_bounds">Restrict camera to a bounds</string>
     <string name="activity_fill_extrusion_layer">Fill extrusions</string>

@@ -34,7 +34,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconRotate;
 
 /**
- * Test activity showcasing animating MarkerViews.
+ * Test activity showcasing animating a SymbolLayer.
  */
 public class AnimatedSymbolLayerActivity extends AppCompatActivity {
 

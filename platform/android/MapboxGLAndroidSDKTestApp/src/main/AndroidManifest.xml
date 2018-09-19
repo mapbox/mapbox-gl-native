@@ -372,17 +372,6 @@
                 android:value=".activity.FeatureOverviewActivity" />
         </activity>
         <activity
-            android:name=".activity.annotation.MarkerViewActivity"
-            android:description="@string/description_view_marker"
-            android:label="@string/activity_view_marker">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_annotation" />
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity" />
-        </activity>
-        <activity
             android:name=".activity.fragment.ViewPagerActivity"
             android:description="@string/description_viewpager"
             android:label="@string/activity_viewpager">
@@ -665,17 +654,6 @@
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_maplayout" />
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity" />
-        </activity>
-        <activity
-            android:name=".activity.annotation.MarkerViewsInRectangleActivity"
-            android:description="@string/description_marker_view_rectangle"
-            android:label="@string/activity_marker_view_rectangle">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_annotation" />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity" />

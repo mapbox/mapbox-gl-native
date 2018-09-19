@@ -8,8 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
-import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
+import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -29,7 +29,7 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
 
   private MapboxMap mapboxMap;
   private MapView mapView;
-  private MarkerView marker;
+  private Marker marker;
 
   private MapboxMap.OnMapClickListener mapClickListener = new MapboxMap.OnMapClickListener() {
     @Override
@@ -87,9 +87,9 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
     mapboxMap.animateCamera(CameraUpdateFactory.newLatLng(PARIS));
   }
 
-  private MarkerView addMarker(MapboxMap mapboxMap) {
+  private Marker addMarker(MapboxMap mapboxMap) {
     return mapboxMap.addMarker(
-      new MarkerViewOptions()
+      new MarkerOptions()
         .position(PARIS)
         .icon(IconUtils.drawableToIcon(this, R.drawable.ic_location_city,
           ResourcesCompat.getColor(getResources(), R.color.mapbox_blue, getTheme()))

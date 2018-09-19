@@ -11,10 +11,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Size;
 import android.support.annotation.UiThread;
-import android.support.v4.util.Pools;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
@@ -26,11 +24,8 @@ import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
-import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
-import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
@@ -172,20 +167,9 @@ public final class MapboxMap {
    * Called before the OnMapReadyCallback is invoked.
    */
   void onPreMapReady() {
-    invalidateCameraPosition();
+    transform.invalidateCameraPosition();
     annotationManager.reloadMarkers();
     annotationManager.adjustTopOffsetPixels(this);
-  }
-
-  /**
-   * Called when the OnMapReadyCallback has finished executing.
-   * <p>
-   * Invalidation of the camera position is required to update the added components in
-   * OnMapReadyCallback with the correct transformation.
-   * </p>
-   */
-  void onPostMapReady() {
-    invalidateCameraPosition();
   }
 
   /**
@@ -858,16 +842,6 @@ public final class MapboxMap {
   }
 
   /**
-   * Invalidates the current camera position by reconstructing it from mbgl
-   */
-  private void invalidateCameraPosition() {
-    CameraPosition cameraPosition = transform.invalidateCameraPosition();
-    if (cameraPosition != null) {
-      transform.updateCameraPosition(cameraPosition);
-    }
-  }
-
-  /**
    * Scrolls the camera over the map, shifting the center of view by the specified number of pixels in the x and y
    * directions.
    *
@@ -1187,85 +1161,6 @@ public final class MapboxMap {
 
   /**
    * <p>
-   * Adds a marker to this map.
-   * </p>
-   * The marker's icon is rendered on the map at the location {@code Marker.position}.
-   * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
-   *
-   * @param markerOptions A marker options object that defines how to render the marker
-   * @return The {@code Marker} that was added to the map
-   * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
-   * SDK views to be used as a symbol see https://github
-   * .com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android
-   * /MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
-   */
-  @NonNull
-  @Deprecated
-  public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions) {
-    return annotationManager.addMarker(markerOptions, this, null);
-  }
-
-  /**
-   * <p>
-   * Adds a marker to this map.
-   * </p>
-   * The marker's icon is rendered on the map at the location {@code Marker.position}.
-   * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
-   *
-   * @param markerOptions             A marker options object that defines how to render the marker
-   * @param onMarkerViewAddedListener Callback invoked when the View has been added to the map
-   * @return The {@code Marker} that was added to the map
-   * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
-   * SDK views to be used as a symbol see https://github
-   * .com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android
-   * /MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
-   */
-  @Deprecated
-  @NonNull
-  public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions,
-                              final MarkerViewManager.OnMarkerViewAddedListener onMarkerViewAddedListener) {
-    return annotationManager.addMarker(markerOptions, this, onMarkerViewAddedListener);
-  }
-
-  /**
-   * Adds multiple markersViews to this map.
-   * <p>
-   * The marker's icon is rendered on the map at the location {@code Marker.position}.
-   * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
-   * </p>
-   *
-   * @param markerViewOptions A list of markerView options objects that defines how to render the markers
-   * @return A list of the {@code MarkerView}s that were added to the map
-   * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
-   * SDK views to be used as a symbol see https://github
-   * .com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android
-   * /MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
-   */
-  @NonNull
-  @Deprecated
-  public List<MarkerView> addMarkerViews(@NonNull List<? extends
-    BaseMarkerViewOptions> markerViewOptions) {
-    return annotationManager.addMarkerViews(markerViewOptions, this);
-  }
-
-  /**
-   * Returns markerViews found inside of a rectangle on this map.
-   *
-   * @param rect the rectangular area on the map to query for markerViews
-   * @return A list of the markerViews that were found in the rectangle
-   * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
-   * SDK views to be used as a symbol see https://github
-   * .com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android
-   * /MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
-   */
-  @NonNull
-  @Deprecated
-  public List<MarkerView> getMarkerViewsInRect(@NonNull RectF rect) {
-    return annotationManager.getMarkerViewsInRect(rect);
-  }
-
-  /**
-   * <p>
    * Adds multiple markers to this map.
    * </p>
    * The marker's icon is rendered on the map at the location {@code Marker.position}.
@@ -1557,16 +1452,6 @@ public final class MapboxMap {
   @NonNull
   public List<Marker> getSelectedMarkers() {
     return annotationManager.getSelectedMarkers();
-  }
-
-  /**
-   * Get the MarkerViewManager associated to the MapView.
-   *
-   * @return the associated MarkerViewManager
-   */
-  @NonNull
-  public MarkerViewManager getMarkerViewManager() {
-    return annotationManager.getMarkerViewManager();
   }
 
   //
@@ -2541,145 +2426,6 @@ public final class MapboxMap {
      */
     @Nullable
     View getInfoWindow(@NonNull Marker marker);
-  }
-
-  /**
-   * Interface definition for a callback to be invoked when an MarkerView will be shown.
-   *
-   * @param <U> the instance type of MarkerView
-   * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
-   * SDK views to be used as a symbol see https://github
-   * .com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android
-   * /MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
-   */
-  @Deprecated
-  public abstract static class MarkerViewAdapter<U extends MarkerView> {
-
-    private Context context;
-    private final Class<U> persistentClass;
-    @NonNull
-    private final Pools.SimplePool<View> viewReusePool;
-
-    /**
-     * Create an instance of MarkerViewAdapter.
-     *
-     * @param context the context associated to a MapView
-     */
-    public MarkerViewAdapter(Context context, Class<U> persistentClass) {
-      this.context = context;
-      this.persistentClass = persistentClass;
-      viewReusePool = new Pools.SimplePool<>(10000);
-    }
-
-    /**
-     * Called when an MarkerView will be added to the MapView.
-     *
-     * @param marker      the model representing the MarkerView
-     * @param convertView the reusable view
-     * @param parent      the parent ViewGroup of the convertview
-     * @return the View that is adapted to the contents of MarkerView
-     */
-    @Nullable
-    public abstract View getView(@NonNull U marker, @Nullable View convertView, @NonNull ViewGroup parent);
-
-    /**
-     * Called when an MarkerView is removed from the MapView or the View object is going to be reused.
-     * <p>
-     * This method should be used to reset an animated view back to it's original state for view reuse.
-     * </p>
-     * <p>
-     * Returning true indicates you want to the view reuse to be handled automatically.
-     * Returning false indicates you want to perform an animation and you are required calling
-     * {@link #releaseView(View)} yourself.
-     * </p>
-     *
-     * @param marker      the model representing the MarkerView
-     * @param convertView the reusable view
-     * @return true if you want reuse to occur automatically, false if you want to manage this yourself.
-     */
-    public boolean prepareViewForReuse(@NonNull MarkerView marker, @NonNull View convertView) {
-      return true;
-    }
-
-    /**
-     * Called when a MarkerView is selected from the MapView.
-     * <p>
-     * Returning true from this method indicates you want to move the MarkerView to the selected state.
-     * Returning false indicates you want to animate the View first an manually select the MarkerView when appropriate.
-     * </p>
-     *
-     * @param marker                   the model representing the MarkerView
-     * @param convertView              the reusable view
-     * @param reselectionFromRecycling indicates if the onSelect callback is the initial selection
-     *                                 callback or that selection occurs due to recreation of selected marker
-     * @return true if you want to select the Marker immediately, false if you want to manage this yourself.
-     */
-    public boolean onSelect(@NonNull U marker, @NonNull View convertView, boolean reselectionFromRecycling) {
-      return true;
-    }
-
-    /**
-     * Called when a MarkerView is deselected from the MapView.
-     *
-     * @param marker      the model representing the MarkerView
-     * @param convertView the reusable view
-     */
-    public void onDeselect(@NonNull U marker, @NonNull View convertView) {
-    }
-
-    /**
-     * Returns the generic type of the used MarkerView.
-     *
-     * @return the generic type
-     */
-    public final Class<U> getMarkerClass() {
-      return persistentClass;
-    }
-
-    /**
-     * Returns the pool used to store reusable Views.
-     *
-     * @return the pool associated to this adapter
-     */
-    @NonNull
-    public final Pools.SimplePool<View> getViewReusePool() {
-      return viewReusePool;
-    }
-
-    /**
-     * Returns the context associated to the hosting MapView.
-     *
-     * @return the context used
-     */
-    public final Context getContext() {
-      return context;
-    }
-
-    /**
-     * Release a View to the ViewPool.
-     *
-     * @param view the view to be released
-     */
-    public final void releaseView(View view) {
-      view.setVisibility(View.GONE);
-      viewReusePool.release(view);
-    }
-  }
-
-  /**
-   * Interface definition for a callback to be invoked when the user clicks on a MarkerView.
-   */
-  public interface OnMarkerViewClickListener {
-
-    /**
-     * Called when the user clicks on a MarkerView.
-     *
-     * @param marker  the MarkerView associated to the clicked View
-     * @param view    the clicked View
-     * @param adapter the adapter used to adapt the MarkerView to the View
-     * @return If true the listener has consumed the event and the info window will not be shown
-     */
-    boolean onMarkerClick(@NonNull Marker marker, @NonNull View view, @NonNull MarkerViewAdapter adapter);
   }
 
   /**

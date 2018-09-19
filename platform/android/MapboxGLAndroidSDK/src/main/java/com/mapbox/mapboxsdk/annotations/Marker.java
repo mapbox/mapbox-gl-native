@@ -17,10 +17,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
  * {@link LatLng} and using {@link MapboxMap#addMarker(MarkerOptions)}. The marker icon will be
  * centered at this position so it is common to add padding to the icon image before usage.
  * <p>
- * If more customization is needed, we offer {@link MarkerView} which places a {@link View} on top
- * of the map at a geographical location.
- * </p>
- * <p>
  * Markers are designed to be interactive. They receive click events by default, and are often used
  * with event listeners to bring up info windows. An {@link InfoWindow} is displayed by default when
  * either a title or snippet is provided.
@@ -60,11 +56,6 @@ public class Marker extends Annotation {
    */
   public Marker(BaseMarkerOptions baseMarkerOptions) {
     this(baseMarkerOptions.position, baseMarkerOptions.icon, baseMarkerOptions.title, baseMarkerOptions.snippet);
-  }
-
-  Marker(BaseMarkerViewOptions baseMarkerViewOptions) {
-    this(baseMarkerViewOptions.position, baseMarkerViewOptions.icon,
-      baseMarkerViewOptions.title, baseMarkerViewOptions.snippet);
   }
 
   Marker(LatLng position, Icon icon, String title, String snippet) {

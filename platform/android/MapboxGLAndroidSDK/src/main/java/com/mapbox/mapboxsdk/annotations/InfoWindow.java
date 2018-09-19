@@ -21,15 +21,14 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import java.lang.ref.WeakReference;
 
 /**
- * {@code InfoWindow} is a tooltip shown when a {@link Marker} or {@link MarkerView} is tapped. Only
+ * {@code InfoWindow} is a tooltip shown when a {@link Marker} is tapped. Only
  * one info window is displayed at a time. When the user clicks on a marker, the currently open info
  * window will be closed and the new info window will be displayed. If the user clicks the same
  * marker while its info window is currently open, the info window will be closed.
  * <p>
  * The info window is drawn oriented against the device's screen, centered above its associated
- * marker by default. The info window anchoring can be adjusted using
- * {@link MarkerView#setInfoWindowAnchor(float, float)} for {@link MarkerView}. The default info
- * window contains the title in bold and snippet text below the title. While either the title and
+ * marker by default. The default info window contains the title in bold and snippet text below the title.
+ * While either the title and
  * snippet are optional, at least one is required to open the info window.
  * </p>
  */
