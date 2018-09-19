@@ -43,6 +43,7 @@ int main(int argc, char *argv[]) {
     args::Flag offlineFlag(argumentParser, "offline", "Toggle offline", {'o', "offline"});
 
     args::ValueFlag<std::string> styleValue(argumentParser, "URL", "Map stylesheet", {'s', "style"});
+    args::ValueFlag<std::string> cacheDBValue(argumentParser, "file", "Cache database file name", {'c', "cache"});
     args::ValueFlag<double> lonValue(argumentParser, "degrees", "Longitude", {'x', "lon"});
     args::ValueFlag<double> latValue(argumentParser, "degrees", "Latitude", {'y', "lat"});
     args::ValueFlag<double> zoomValue(argumentParser, "number", "Zoom level", {'z', "zoom"});
@@ -76,6 +77,7 @@ int main(int argc, char *argv[]) {
     const bool fullscreen = fullscreenFlag ? args::get(fullscreenFlag) : false;
     const bool benchmark = benchmarkFlag ? args::get(benchmarkFlag) : false;
     std::string style = styleValue ? args::get(styleValue) : "";
+    const std::string cacheDB = cacheDBValue ? args::get(cacheDBValue) : "/tmp/mbgl-cache.db";
 
     // sigint handling
     struct sigaction sigIntHandler;
@@ -91,7 +93,7 @@ int main(int argc, char *argv[]) {
     GLFWView backend(fullscreen, benchmark);
     view = &backend;
 
-    mbgl::DefaultFileSource fileSource("/tmp/mbgl-cache.db", ".");
+    mbgl::DefaultFileSource fileSource(cacheDB, ".");
     if (!settings.online) {
         fileSource.setOnlineStatus(false);
         mbgl::Log::Warning(mbgl::Event::Setup, "Application is offline. Press `O` to toggle online status.");
