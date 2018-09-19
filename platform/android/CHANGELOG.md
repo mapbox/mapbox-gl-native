@@ -3,8 +3,17 @@
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
 ## master
-- Add `symbol-z-order` symbol layout property to style spec [#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783)
-- Fixed bugs in coercion expression operators ("to-array" applied to empty arrays, "to-color" applied to colors, and "to-number" applied to null) [#12864](https://github.com/mapbox/mapbox-gl-native/pull/12864)
+
+## 6.6.0-alpha.1 - September 19, 2018
+ - Merge LocationLayerPlugin to the Maps SDK [#12786](https://github.com/mapbox/mapbox-gl-native/pull/12786)
+ - Add `symbol-z-order` symbol layout property to style spec [#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783)
+ - Add "crossSourceCollisions" map option [#12842](https://github.com/mapbox/mapbox-gl-native/pull/12842)
+ - "is-supported-script" expression support [#12845](https://github.com/mapbox/mapbox-gl-native/pull/12845)
+ - Update isEmulator check [#12832](https://github.com/mapbox/mapbox-gl-native/pull/12832)
+ - Prevent crash when expression evaluates to default, no pattern [#12896](https://github.com/mapbox/mapbox-gl-native/pull/12896)
+ - Fixed bugs in coercion expression operators ("to-array" applied to empty arrays, "to-color" applied to colors, and "to-number" applied to null) [#12864](https://github.com/mapbox/mapbox-gl-native/pull/12864)
+ - Remove nunicode from android binding [#12497](https://github.com/mapbox/mapbox-gl-native/pull/12497)
+ - Correct LatLngBounds exception message [#12816](https://github.com/mapbox/mapbox-gl-native/pull/12816)
 
 ## 6.5.0 - September 11, 2018
  - Fixed a cubic-bezier interpolation bug. [#12812](https://github.com/mapbox/mapbox-gl-native/issues/12812)
