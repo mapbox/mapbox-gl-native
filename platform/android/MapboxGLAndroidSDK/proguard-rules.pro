@@ -25,6 +25,7 @@
 
 # config for mapbox-sdk-geojson:3.0.1
 -keep class com.mapbox.geojson.** { *; }
+-dontwarn com.google.auto.value.**
 -dontnote com.google.gson.internal.UnsafeAllocator
 
 # config for mapbox-android-gestures:0.0.1-20180228.152340-13
