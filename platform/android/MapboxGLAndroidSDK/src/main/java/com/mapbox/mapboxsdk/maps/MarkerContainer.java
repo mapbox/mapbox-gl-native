@@ -1,19 +1,13 @@
 package com.mapbox.mapboxsdk.maps;
 
-
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
 
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
-import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
-import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,18 +18,13 @@ import java.util.List;
 class MarkerContainer implements Markers {
 
   private final NativeMapView nativeMapView;
-  private final MapView mapView;
   private final LongSparseArray<Annotation> annotations;
   private final IconManager iconManager;
-  private final MarkerViewManager markerViewManager;
 
-  MarkerContainer(NativeMapView nativeMapView, MapView mapView, LongSparseArray<Annotation> annotations, IconManager
-    iconManager, MarkerViewManager markerViewManager) {
+  MarkerContainer(NativeMapView nativeMapView, LongSparseArray<Annotation> annotations, IconManager iconManager) {
     this.nativeMapView = nativeMapView;
-    this.mapView = mapView;
     this.annotations = annotations;
     this.iconManager = iconManager;
-    this.markerViewManager = markerViewManager;
   }
 
   @Override
@@ -121,78 +110,6 @@ class MarkerContainer implements Markers {
   }
 
   @Override
-  public MarkerView addViewBy(@NonNull BaseMarkerViewOptions markerOptions, @NonNull MapboxMap mapboxMap, @Nullable
-    MarkerViewManager.OnMarkerViewAddedListener onMarkerViewAddedListener) {
-    final MarkerView marker = prepareViewMarker(markerOptions);
-
-    // add marker to map
-    marker.setMapboxMap(mapboxMap);
-    long id = nativeMapView.addMarker(marker);
-    marker.setId(id);
-    annotations.put(id, marker);
-
-    if (onMarkerViewAddedListener != null) {
-      markerViewManager.addOnMarkerViewAddedListener(marker, onMarkerViewAddedListener);
-    }
-    markerViewManager.setEnabled(true);
-    markerViewManager.setWaitingForRenderInvoke(true);
-    return marker;
-  }
-
-  @NonNull
-  @Override
-  public List<MarkerView> addViewsBy(@NonNull List<? extends BaseMarkerViewOptions> markerViewOptions, @NonNull
-    MapboxMap mapboxMap) {
-    List<MarkerView> markers = new ArrayList<>();
-    for (BaseMarkerViewOptions markerViewOption : markerViewOptions) {
-      // if last marker
-      if (markerViewOptions.indexOf(markerViewOption) == markerViewOptions.size() - 1) {
-        // get notified when render occurs to invalidate and draw MarkerViews
-        markerViewManager.setWaitingForRenderInvoke(true);
-      }
-      // add marker to map
-      MarkerView marker = prepareViewMarker(markerViewOption);
-      marker.setMapboxMap(mapboxMap);
-      long id = nativeMapView.addMarker(marker);
-      marker.setId(id);
-      annotations.put(id, marker);
-      markers.add(marker);
-    }
-    markerViewManager.setEnabled(true);
-    markerViewManager.update();
-    return markers;
-  }
-
-  @NonNull
-  @Override
-  public List<MarkerView> obtainViewsIn(@NonNull RectF rectangle) {
-    float pixelRatio = nativeMapView.getPixelRatio();
-    RectF rect = new RectF(rectangle.left / pixelRatio,
-      rectangle.top / pixelRatio,
-      rectangle.right / pixelRatio,
-      rectangle.bottom / pixelRatio);
-
-    long[] ids = nativeMapView.queryPointAnnotations(rect);
-
-    List<Long> idsList = new ArrayList<>(ids.length);
-    for (long id : ids) {
-      idsList.add(id);
-    }
-
-    List<MarkerView> annotations = new ArrayList<>(ids.length);
-    List<Annotation> annotationList = obtainAnnotations();
-    int count = annotationList.size();
-    for (int i = 0; i < count; i++) {
-      Annotation annotation = annotationList.get(i);
-      if (annotation instanceof MarkerView && idsList.contains(annotation.getId())) {
-        annotations.add((MarkerView) annotation);
-      }
-    }
-
-    return new ArrayList<>(annotations);
-  }
-
-  @Override
   public void reload() {
     iconManager.reloadIcons();
     int count = annotations.size();
@@ -215,9 +132,7 @@ class MarkerContainer implements Markers {
   }
 
   private void ensureIconLoaded(Marker marker, @NonNull MapboxMap mapboxMap) {
-    if (!(marker instanceof MarkerView)) {
-      iconManager.ensureIconLoaded(marker, mapboxMap);
-    }
+    iconManager.ensureIconLoaded(marker, mapboxMap);
   }
 
   @NonNull
@@ -227,16 +142,5 @@ class MarkerContainer implements Markers {
       annotations.add(this.annotations.get(this.annotations.keyAt(i)));
     }
     return annotations;
-  }
-
-  private MarkerView prepareViewMarker(BaseMarkerViewOptions markerViewOptions) {
-    MarkerView marker = markerViewOptions.getMarker();
-    Icon icon = markerViewOptions.getIcon();
-    if (icon == null) {
-      icon = IconFactory.getInstance(mapView.getContext()).defaultMarkerView();
-    }
-    iconManager.loadIconForMarkerView(marker);
-    marker.setIcon(icon);
-    return marker;
   }
 }

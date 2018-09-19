@@ -5,6 +5,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.Keep;
 
 import android.support.annotation.NonNull;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.storage.FileSource;
 
@@ -20,6 +21,8 @@ import javax.microedition.khronos.opengles.GL10;
  */
 @Keep
 public abstract class MapRenderer implements MapRendererScheduler {
+
+  private static final String TAG = "Mbgl-MapRenderer";
 
   // Holds the pointer to the native peer after initialisation
   private long nativePtr = 0;
@@ -72,8 +75,11 @@ public abstract class MapRenderer implements MapRendererScheduler {
 
   @CallSuper
   protected void onDrawFrame(GL10 gl) {
-    nativeRender();
-
+    try {
+      nativeRender();
+    } catch (java.lang.Error error) {
+      Logger.e(TAG, error.getMessage());
+    }
     if (onFpsChangedListener != null) {
       updateFps();
     }

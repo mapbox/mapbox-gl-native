@@ -25,7 +25,7 @@ import java.io.InputStream;
 /**
  * Factory for creating Icons from bitmap images.
  * <p>
- * icon is used to display bitmaps on top of the map using {@link Marker} and {@link MarkerView}.
+ * icon is used to display bitmaps on top of the map using {@link Marker}.
  * </p>
  *
  * @see Icon
@@ -33,14 +33,11 @@ import java.io.InputStream;
 public final class IconFactory {
 
   private static final String ICON_ID_PREFIX = "com.mapbox.icons.icon_";
-  public static final Bitmap ICON_MARKERVIEW_BITMAP = Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8);
-  public static final String ICON_MARKERVIEW_ID = ICON_ID_PREFIX + "marker_view";
 
   private Context context;
   @SuppressLint("StaticFieldLeak")
   private static IconFactory instance;
   private Icon defaultMarker;
-  private Icon defaultMarkerView;
   private BitmapFactory.Options options;
 
   private int nextId = 0;
@@ -119,18 +116,6 @@ public final class IconFactory {
       defaultMarker = fromResource(R.drawable.mapbox_marker_icon_default);
     }
     return defaultMarker;
-  }
-
-  /**
-   * Provides an icon using the default marker icon used for {@link MarkerView}.
-   *
-   * @return An icon with the default {@link MarkerView} icon.
-   */
-  public Icon defaultMarkerView() {
-    if (defaultMarkerView == null) {
-      defaultMarkerView = fromResource(R.drawable.mapbox_markerview_icon_default);
-    }
-    return defaultMarkerView;
   }
 
   private Icon fromInputStream(@NonNull InputStream is) {

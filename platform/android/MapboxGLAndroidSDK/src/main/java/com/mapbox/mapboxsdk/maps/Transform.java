@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -27,14 +26,12 @@ final class Transform implements MapView.OnCameraDidChangeListener {
 
   private final NativeMapView nativeMapView;
   private final MapView mapView;
-  private final MarkerViewManager markerViewManager;
   private final Handler handler = new Handler();
 
   @Nullable
   private CameraPosition cameraPosition;
   @Nullable
   private MapboxMap.CancelableCallback cameraCancelableCallback;
-
   private CameraChangeDispatcher cameraChangeDispatcher;
 
   private final MapView.OnCameraDidChangeListener moveByChangeListener = new MapView.OnCameraDidChangeListener() {
@@ -47,11 +44,9 @@ final class Transform implements MapView.OnCameraDidChangeListener {
     }
   };
 
-  Transform(MapView mapView, NativeMapView nativeMapView, MarkerViewManager markerViewManager,
-            CameraChangeDispatcher cameraChangeDispatcher) {
+  Transform(MapView mapView, NativeMapView nativeMapView, CameraChangeDispatcher cameraChangeDispatcher) {
     this.mapView = mapView;
     this.nativeMapView = nativeMapView;
-    this.markerViewManager = markerViewManager;
     this.cameraChangeDispatcher = cameraChangeDispatcher;
   }
 
@@ -77,15 +72,10 @@ final class Transform implements MapView.OnCameraDidChangeListener {
     return cameraPosition;
   }
 
-  @UiThread
-  void updateCameraPosition(@NonNull CameraPosition position) {
-    markerViewManager.setTilt((float) position.tilt);
-  }
-
   @Override
   public void onCameraDidChange(boolean animated) {
     if (animated) {
-      updateCameraPosition(invalidateCameraPosition());
+      invalidateCameraPosition();
       if (cameraCancelableCallback != null) {
         handler.post(new Runnable() {
           @Override
@@ -170,18 +160,9 @@ final class Transform implements MapView.OnCameraDidChangeListener {
         cameraChangeDispatcher.onCameraMove();
       }
 
-      if (isComponentUpdateRequired(cameraPosition)) {
-        updateCameraPosition(cameraPosition);
-      }
-
       this.cameraPosition = cameraPosition;
     }
     return cameraPosition;
-  }
-
-  private boolean isComponentUpdateRequired(@NonNull CameraPosition cameraPosition) {
-    return this.cameraPosition != null && (this.cameraPosition.tilt != cameraPosition.tilt
-      || this.cameraPosition.bearing != cameraPosition.bearing);
   }
 
   void cancelTransitions() {
@@ -279,7 +260,6 @@ final class Transform implements MapView.OnCameraDidChangeListener {
   }
 
   void setTilt(Double pitch) {
-    markerViewManager.setTilt(pitch.floatValue());
     nativeMapView.setPitch(pitch, 0);
   }
 
