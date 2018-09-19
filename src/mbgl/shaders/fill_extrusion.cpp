@@ -8,7 +8,7 @@ namespace shaders {
 
 const char* fill_extrusion::name = "fill_extrusion";
 const char* fill_extrusion::vertexSource = source() + 27816;
-const char* fill_extrusion::fragmentSource = source() + 30653;
+const char* fill_extrusion::fragmentSource = source() + 30616;
 
 } // namespace shaders
 } // namespace mbgl
