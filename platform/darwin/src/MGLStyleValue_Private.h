@@ -162,6 +162,11 @@ private: // Private utilities for converting from mgl to mbgl values
         mbglValue = rawValue.UTF8String;
     }
 
+    // Formatted
+    void getMBGLValue(NSString *rawValue, mbgl::style::expression::Formatted &mbglValue) {
+        mbglValue = mbgl::style::expression::Formatted(rawValue.UTF8String);
+    }
+
     // Offsets
     void getMBGLValue(id rawValue, std::array<float, 2> &mbglValue) {
         if ([rawValue isKindOfClass:[NSValue class]]) {
@@ -248,6 +253,11 @@ private: // Private utilities for converting from mbgl to mgl values
     // String
     static NSString *toMGLRawStyleValue(const std::string &mbglStopValue) {
         return @(mbglStopValue.c_str());
+    }
+
+    // Formatted
+    static NSString *toMGLRawStyleValue(const mbgl::style::expression::Formatted &mbglStopValue) {
+        return @(mbglStopValue.toString().c_str());
     }
 
     // Offsets

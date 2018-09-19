@@ -601,12 +601,12 @@ namespace mbgl {
     if (text && text.expressionType == NSConstantValueExpressionType) {
         std::string string = ((NSString *)text.constantValue).UTF8String;
         if (mbgl::style::conversion::hasTokens(string)) {
-            self.rawLayer->setTextField(mbgl::style::PropertyValue<std::string>(
-                mbgl::style::conversion::convertTokenStringToExpression(string)));
+            self.rawLayer->setTextField(mbgl::style::PropertyValue<mbgl::style::expression::Formatted>(
+                mbgl::style::conversion::convertTokenStringToFormatExpression(string)));
             return;
         }
     }
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(text, true);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::expression::Formatted, NSString *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::expression::Formatted>>(text, true);
     self.rawLayer->setTextField(mbglValue);
 }
 
@@ -617,7 +617,7 @@ namespace mbgl {
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefaultTextField();
     }
-    return MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::expression::Formatted, NSString *>().toExpression(propertyValue);
 }
 
 - (void)setTextField:(NSExpression *)textField {

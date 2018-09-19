@@ -38,7 +38,8 @@ std::unique_ptr<Expression> boolean(std::unique_ptr<Expression>);
 
 std::unique_ptr<Expression> toColor(std::unique_ptr<Expression>);
 std::unique_ptr<Expression> toString(std::unique_ptr<Expression>);
-
+std::unique_ptr<Expression> toFormatted(std::unique_ptr<Expression>);
+    
 std::unique_ptr<Expression> get(const char* value);
 std::unique_ptr<Expression> get(std::unique_ptr<Expression>);
 
@@ -78,6 +79,9 @@ std::unique_ptr<Expression> interpolate(Interpolator interpolator,
                                         double input3, std::unique_ptr<Expression> output3);
 
 std::unique_ptr<Expression> concat(std::vector<std::unique_ptr<Expression>> inputs);
+    
+std::unique_ptr<Expression> format(const char* value);
+std::unique_ptr<Expression> format(std::unique_ptr<Expression>);
 
 } // namespace dsl
 } // namespace expression

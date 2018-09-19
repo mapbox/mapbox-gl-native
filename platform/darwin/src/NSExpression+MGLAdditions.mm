@@ -1111,6 +1111,11 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     // Avoid wrapping collator options object in literal expression.
                     return @[@"collator", self.arguments[1].constantValue];
                 }
+                if (op.expressionType == NSConstantValueExpressionType
+                    && [op.constantValue isEqualToString:@"format"]) {
+                    // Avoid wrapping format options object in literal expression.
+                    return @[@"format", self.arguments[1].mgl_jsonExpressionObject, self.arguments[2].constantValue];
+                }
                 return self.arguments.mgl_jsonExpressionObject;
             } else if (op == [MGLColor class] && [function isEqualToString:@"colorWithRed:green:blue:alpha:"]) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
