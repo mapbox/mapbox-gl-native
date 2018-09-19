@@ -25,19 +25,17 @@ varying vec4 v_color;
 
 #ifndef HAS_UNIFORM_u_base
 uniform lowp float a_base_t;
-attribute lowp vec2 a_base;
-varying lowp float base;
+attribute highp vec2 a_base;
 #else
-uniform lowp float u_base;
+uniform highp float u_base;
 #endif
 
 
 #ifndef HAS_UNIFORM_u_height
 uniform lowp float a_height_t;
-attribute lowp vec2 a_height;
-varying lowp float height;
+attribute highp vec2 a_height;
 #else
-uniform lowp float u_height;
+uniform highp float u_height;
 #endif
 
 
@@ -45,7 +43,6 @@ uniform lowp float u_height;
 #ifndef HAS_UNIFORM_u_color
 uniform lowp float a_color_t;
 attribute highp vec4 a_color;
-varying highp vec4 color;
 #else
 uniform highp vec4 u_color;
 #endif
@@ -54,21 +51,21 @@ uniform highp vec4 u_color;
 void main() {
     
 #ifndef HAS_UNIFORM_u_base
-    base = unpack_mix_vec2(a_base, a_base_t);
+    highp float base = unpack_mix_vec2(a_base, a_base_t);
 #else
-    lowp float base = u_base;
+    highp float base = u_base;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_height
-    height = unpack_mix_vec2(a_height, a_height_t);
+    highp float height = unpack_mix_vec2(a_height, a_height_t);
 #else
-    lowp float height = u_height;
+    highp float height = u_height;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_color
-    color = unpack_mix_color(a_color, a_color_t);
+    highp vec4 color = unpack_mix_color(a_color, a_color_t);
 #else
     highp vec4 color = u_color;
 #endif
@@ -120,44 +117,7 @@ void main() {
 /*
 varying vec4 v_color;
 
-#ifndef HAS_UNIFORM_u_base
-varying lowp float base;
-#else
-uniform lowp float u_base;
-#endif
-
-
-#ifndef HAS_UNIFORM_u_height
-varying lowp float height;
-#else
-uniform lowp float u_height;
-#endif
-
-
-#ifndef HAS_UNIFORM_u_color
-varying highp vec4 color;
-#else
-uniform highp vec4 u_color;
-#endif
-
-
 void main() {
-    
-#ifdef HAS_UNIFORM_u_base
-    lowp float base = u_base;
-#endif
-
-    
-#ifdef HAS_UNIFORM_u_height
-    lowp float height = u_height;
-#endif
-
-    
-#ifdef HAS_UNIFORM_u_color
-    highp vec4 color = u_color;
-#endif
-
-
     gl_FragColor = v_color;
 
 #ifdef OVERDRAW_INSPECTOR
