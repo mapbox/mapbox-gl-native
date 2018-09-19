@@ -17,6 +17,10 @@ import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+<% if (type === 'symbol') { -%>
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+<% } -%>
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.*;
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
@@ -165,7 +169,22 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
 <% if (property.tokens) { -%>
 
       layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>("{token}"));
+<% if (property.type === 'formatted') { -%>
+      JsonArray formatExpression = new JsonArray();
+      formatExpression.add("format");
+      JsonArray getExpression = new JsonArray();
+      getExpression.add("get");
+      getExpression.add("token");
+      JsonArray stringCoercion = new JsonArray();
+      stringCoercion.add("to-string");
+      stringCoercion.add(getExpression);
+      formatExpression.add(stringCoercion);
+      formatExpression.add(new JsonObject());
+      assertEquals(layer.getTextField().getExpression(),
+         Converter.convert(formatExpression));
+<% } else { -%>
       assertEquals(layer.get<%- camelize(property.name) %>().getExpression(), Expression.toString(Expression.get("token")));
+<% } -%>
 <% } -%>
     });
   }
@@ -181,7 +200,21 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
       assertNotNull(layer);
 
       // Set and Get
+<% if (property.type === 'formatted') { -%>
+      JsonArray formatExpression = new JsonArray();
+      formatExpression.add("format");
+      JsonArray getExpression = new JsonArray();
+      getExpression.add("get");
+      getExpression.add("undefined");
+      JsonArray stringAssertion = new JsonArray();
+      stringAssertion.add("string");
+      stringAssertion.add(getExpression);
+      formatExpression.add(stringAssertion);
+      formatExpression.add(new JsonObject());
+      Expression expression = Converter.convert(formatExpression);
+<% } else { -%>
       Expression expression = <%- defaultExpressionJava(property) %>(Expression.get("undefined"));
+<% } -%>
       layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>(expression));
       assertEquals(layer.get<%- camelize(property.name) %>().getExpression(), expression);
     });

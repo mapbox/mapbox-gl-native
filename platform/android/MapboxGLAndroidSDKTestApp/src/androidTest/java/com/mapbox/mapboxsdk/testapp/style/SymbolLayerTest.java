@@ -13,6 +13,8 @@ import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.*;
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
@@ -477,7 +479,18 @@ public class SymbolLayerTest extends BaseActivityTest {
       assertEquals((String) layer.getTextField().getValue(), (String) "");
 
       layer.setProperties(textField("{token}"));
-      assertEquals(layer.getTextField().getExpression(), Expression.toString(Expression.get("token")));
+      JsonArray formatExpression = new JsonArray();
+      formatExpression.add("format");
+      JsonArray getExpression = new JsonArray();
+      getExpression.add("get");
+      getExpression.add("token");
+      JsonArray stringCoercion = new JsonArray();
+      stringCoercion.add("to-string");
+      stringCoercion.add(getExpression);
+      formatExpression.add(stringCoercion);
+      formatExpression.add(new JsonObject());
+      assertEquals(layer.getTextField().getExpression(),
+         Converter.convert(formatExpression));
     });
   }
 
@@ -490,7 +503,17 @@ public class SymbolLayerTest extends BaseActivityTest {
       assertNotNull(layer);
 
       // Set and Get
-      Expression expression = string(Expression.get("undefined"));
+      JsonArray formatExpression = new JsonArray();
+      formatExpression.add("format");
+      JsonArray getExpression = new JsonArray();
+      getExpression.add("get");
+      getExpression.add("undefined");
+      JsonArray stringAssertion = new JsonArray();
+      stringAssertion.add("string");
+      stringAssertion.add(getExpression);
+      formatExpression.add(stringAssertion);
+      formatExpression.add(new JsonObject());
+      Expression expression = Converter.convert(formatExpression);
       layer.setProperties(textField(expression));
       assertEquals(layer.getTextField().getExpression(), expression);
     });
