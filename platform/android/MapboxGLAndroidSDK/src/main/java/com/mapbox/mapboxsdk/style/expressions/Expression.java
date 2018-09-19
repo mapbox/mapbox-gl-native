@@ -3224,6 +3224,11 @@ public class Expression {
     return new Expression("collator", new ExpressionMap(map));
   }
 
+  public static Expression format(Expression input) {
+    Map<String, Expression> map = new HashMap<>();
+    return new Expression("format", input, new ExpressionMap(map));
+  }
+
   /**
    * Asserts that the input value is an object. If it is not, the expression is an error
    * The asserted input value is returned as result.
