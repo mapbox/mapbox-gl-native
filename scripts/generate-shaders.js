@@ -136,6 +136,16 @@ const char* ${shaderName}::name = "${shaderName}";
 const char* ${shaderName}::vertexSource = ${sourceOffset(key, 'vertex')};
 const char* ${shaderName}::fragmentSource = ${sourceOffset(key, 'fragment')};
 
+// Uncompressed source of ${shaderName}.vertex.glsl:
+/*
+${shaders[key].vertexSource}
+*/
+
+// Uncompressed source of ${shaderName}.fragment.glsl:
+/*
+${shaders[key].fragmentSource}
+*/
+
 } // namespace shaders
 } // namespace mbgl
 `);
