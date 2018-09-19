@@ -2,35 +2,16 @@
 
 #include <mbgl/text/bidi.hpp>
 
-#include <QString>
-
 namespace mbgl {
 
+// This stub implementation is stateless and doesn't implement the private
+// methods used by the ICU BiDi
 class BiDiImpl {
-public:
-    QString string;
+    // Used by the ICU implementation to hold onto internal BiDi state
 };
 
 std::u16string applyArabicShaping(const std::u16string& input) {
     return input;
-}
-
-void BiDi::mergeParagraphLineBreaks(std::set<std::size_t>& lineBreakPoints) {
-    lineBreakPoints.insert(static_cast<std::size_t>(impl->string.length()));
-}
-
-std::vector<std::u16string>
-BiDi::applyLineBreaking(std::set<std::size_t> lineBreakPoints) {
-    mergeParagraphLineBreaks(lineBreakPoints);
-
-    std::vector<std::u16string> transformedLines;
-    std::size_t start = 0;
-    for (std::size_t lineBreakPoint : lineBreakPoints) {
-        transformedLines.push_back(getLine(start, lineBreakPoint));
-        start = lineBreakPoint;
-    }
-
-    return transformedLines;
 }
 
 BiDi::BiDi() : impl(std::make_unique<BiDiImpl>())
@@ -40,13 +21,31 @@ BiDi::BiDi() : impl(std::make_unique<BiDiImpl>())
 BiDi::~BiDi() = default;
 
 std::vector<std::u16string> BiDi::processText(const std::u16string& input, std::set<std::size_t> lineBreakPoints) {
-    impl->string = QString::fromUtf16(reinterpret_cast<const ushort*>(input.data()), int(input.size()));
-    return applyLineBreaking(lineBreakPoints);
+    lineBreakPoints.insert(input.length());
+
+    std::vector<std::u16string> transformedLines;
+    std::size_t start = 0;
+    for (std::size_t lineBreakPoint : lineBreakPoints) {
+        transformedLines.push_back(input.substr(start, lineBreakPoint - start));
+        start = lineBreakPoint;
+    }
+
+    return transformedLines;
 }
 
-std::u16string BiDi::getLine(std::size_t start, std::size_t end) {
-    auto utf16 = impl->string.mid(static_cast<int32_t>(start), static_cast<int32_t>(end - start));
-    return std::u16string(reinterpret_cast<const char16_t*>(utf16.utf16()), utf16.length());
+std::vector<StyledText> BiDi::processStyledText(const StyledText& input, std::set<std::size_t> lineBreakPoints) {
+    lineBreakPoints.insert(input.first.length());
+
+    std::vector<StyledText> transformedLines;
+    std::size_t start = 0;
+    for (std::size_t lineBreakPoint : lineBreakPoints) {
+        transformedLines.emplace_back(
+            input.first.substr(start, lineBreakPoint - start),
+            std::vector<uint8_t>(input.second.begin() + start, input.second.begin() + lineBreakPoint));
+        start = lineBreakPoint;
+    }
+
+    return transformedLines;
 }
 
 } // end namespace mbgl
