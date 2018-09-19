@@ -125,8 +125,13 @@ namespace mbgl {
     if (<%- objCName(property) %> && <%- objCName(property) %>.expressionType == NSConstantValueExpressionType) {
         std::string string = ((NSString *)<%- objCName(property) %>.constantValue).UTF8String;
         if (mbgl::style::conversion::hasTokens(string)) {
+<% if (property.type === 'formatted') { -%>
+            self.rawLayer->set<%- camelize(originalPropertyName(property)) %>(mbgl::style::PropertyValue<mbgl::style::expression::Formatted>(
+                mbgl::style::conversion::convertTokenStringToFormatExpression(string)));
+<% } else { -%>
             self.rawLayer->set<%- camelize(originalPropertyName(property)) %>(mbgl::style::PropertyValue<std::string>(
                 mbgl::style::conversion::convertTokenStringToExpression(string)));
+<% } -%>
             return;
         }
     }

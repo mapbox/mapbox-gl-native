@@ -224,7 +224,9 @@
 
         XCTAssertEqual(rawLayer->getIconImage(), propertyValue,
                        @"Setting iconImageName to a constant string with tokens should convert to an expression.");
-        XCTAssertEqualObjects(layer.iconImageName, [NSExpression expressionWithFormat:@"CAST(token, \"NSString\")"],
+
+        NSExpression* tokenExpression = [NSExpression expressionWithFormat:@"CAST(token, \"NSString\")"];
+        XCTAssertEqualObjects(layer.iconImageName, tokenExpression,
                               @"Setting iconImageName to a constant string with tokens should convert to an expression.");
     }
 
@@ -1096,20 +1098,20 @@
 
         NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'Text Field'"];
         layer.text = constantExpression;
-        mbgl::style::PropertyValue<std::string> propertyValue = { "Text Field" };
+        mbgl::style::PropertyValue<mbgl::style::expression::Formatted> propertyValue = { "Text Field" };
         XCTAssertEqual(rawLayer->getTextField(), propertyValue,
                        @"Setting text to a constant value expression should update text-field.");
         XCTAssertEqualObjects(layer.text, constantExpression,
                               @"text should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"'Text Field'"];
+        constantExpression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('format', 'Text Field', %@)", @{}];
         NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.text = functionExpression;
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::PropertyExpression<std::string>(
-                step(zoom(), literal("Text Field"), 18.0, literal("Text Field"))
+            propertyValue = mbgl::style::PropertyExpression<mbgl::style::expression::Formatted>(
+                step(zoom(), format("Text Field"), 18.0, format("Text Field"))
             );
         }
 
@@ -1130,14 +1132,16 @@
 
         {
             using namespace mbgl::style::expression::dsl;
-            propertyValue = mbgl::style::PropertyExpression<std::string>(
-                toString(get(literal("token")))
+            propertyValue = mbgl::style::PropertyExpression<mbgl::style::expression::Formatted>(
+                format(toString(get(literal("token"))))
             );
         }
 
         XCTAssertEqual(rawLayer->getTextField(), propertyValue,
                        @"Setting text to a constant string with tokens should convert to an expression.");
-        XCTAssertEqualObjects(layer.text, [NSExpression expressionWithFormat:@"CAST(token, \"NSString\")"],
+
+        NSExpression* tokenExpression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('format', CAST(token, 'NSString'), %@)", @{}];
+        XCTAssertEqualObjects(layer.text, tokenExpression,
                               @"Setting text to a constant string with tokens should convert to an expression.");
     }
 
