@@ -21,7 +21,7 @@ void updateRenderables(GetTileFn getTile,
                        const IdealTileIDs& idealTileIDs,
                        const Range<uint8_t>& zoomRange,
                        const uint8_t dataTileZoom) {
-    std::unordered_set<UnwrappedTileID> checked;
+    std::unordered_set<OverscaledTileID> checked;
     bool covered;
     int32_t overscaledZ;
 
@@ -85,14 +85,13 @@ void updateRenderables(GetTileFn getTile,
                 // We couldn't find child tiles that entirely cover the ideal tile.
                 for (overscaledZ = dataTileZoom - 1; overscaledZ >= zoomRange.min; --overscaledZ) {
                     const auto parentDataTileID = idealDataTileID.scaledTo(overscaledZ);
-                    const auto parentRenderTileID = parentDataTileID.toUnwrapped();
 
-                    if (checked.find(parentRenderTileID) != checked.end()) {
+                    if (checked.find(parentDataTileID) != checked.end()) {
                         // Break parent tile ascent, this route has been checked by another child
                         // tile before.
                         break;
                     } else {
-                        checked.emplace(parentRenderTileID);
+                        checked.emplace(parentDataTileID);
                     }
 
                     tile = getTile(parentDataTileID);
@@ -117,7 +116,7 @@ void updateRenderables(GetTileFn getTile,
                         parentIsLoaded = tile->isLoaded();
 
                         if (tile->isRenderable()) {
-                            renderTile(parentRenderTileID, *tile);
+                            renderTile(parentDataTileID.toUnwrapped(), *tile);
                             // Break parent tile ascent, since we found one.
                             break;
                         }
