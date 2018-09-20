@@ -299,17 +299,6 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Moves the viewpoint to a different location with respect to the map with an
- optional transition animation.
-
- @param camera The new viewpoint.
- @param animated Specify `YES` if you want the map view to animate the change to
-    the new viewpoint or `NO` if you want the map to display the new viewpoint
-    immediately.
- */
-- (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated;
-
-/**
- Moves the viewpoint to a different location with respect to the map with an
  optional transition duration and timing function.
 
  @param camera The new viewpoint.
@@ -326,7 +315,7 @@ MGL_EXPORT IB_DESIGNABLE
  /**
  Moves the viewpoint to a different location with respect to the map with an
  optional transition duration and timing function.
- 
+
  @param camera The new viewpoint.
  @param duration The amount of time, measured in seconds, that the transition
  animation should take. Specify `0` to jump to the new viewpoint
@@ -396,7 +385,7 @@ MGL_EXPORT IB_DESIGNABLE
  Changing the value of this property updates the receiver immediately. If you
  want to animate the change, use the `-setVisibleCoordinateBounds:animated:`
  method instead.
- 
+
  If a longitude is less than −180 degrees or greater than 180 degrees, the
  visible bounds straddles the antimeridian or international date line. For
  example, if both Tokyo and San Francisco are visible, the visible bounds might
@@ -407,7 +396,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit the given coordinate bounds, optionally
  animating the change.
- 
+
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
  example, to show both Tokyo and San Francisco simultaneously, you could set the
@@ -488,7 +477,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns the camera that best fits the given coordinate bounds, with the specified camera,
  optionally with some additional padding on each side.
- 
+
  @param camera The camera that the return camera should adhere to. All values
     on this camera will be manipulated except for pitch and direction.
  @param bounds The coordinate bounds to fit to the receiver’s viewport.
@@ -504,7 +493,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns the camera that best fits the given shape, with the specified camera,
  optionally with some additional padding on each side.
- 
+
  @param camera The camera that the return camera should adhere to. All values
     on this camera will be manipulated except for pitch and direction.
  @param shape The shape to fit to the receiver’s viewport.
@@ -524,7 +513,7 @@ MGL_EXPORT IB_DESIGNABLE
  @param direction The direction of the viewport, measured in degrees clockwise from true north.
  @param insets The minimum padding (in screen points) that would be visible
     around the returned camera object if it were set as the receiver’s camera.
- @return A camera object centered on the shape's center with zoom level as high 
+ @return A camera object centered on the shape's center with zoom level as high
     (close to the ground) as possible while still including the entire shape. The
     camera object uses the current pitch.
  */
@@ -902,7 +891,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns an array of rendered map features that intersect with a given point,
  restricted to the given style layers and filtered by the given predicate.
- 
+
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant map
  content sources. The returned array includes features loaded by
@@ -937,7 +926,7 @@ MGL_EXPORT IB_DESIGNABLE
 
  To find out the layer names in a particular style, view the style in
  <a href="https://www.mapbox.com/studio/">Mapbox Studio</a>.
- 
+
  Only visible features are returned. To obtain features regardless of
  visibility, use the
  `-[MGLVectorTileSource featuresInSourceLayersWithIdentifiers:predicate:]` and
@@ -950,7 +939,7 @@ MGL_EXPORT IB_DESIGNABLE
     inspectable in Interface Builder, or a manually constructed `NSURL`. This
     approach also avoids layer identifer name changes that will occur in the
     default style’s layers over time.
- 
+
  @param point A point expressed in the map view’s coordinate system.
  @param styleLayerIdentifiers A set of strings that correspond to the names of
     layers defined in the current style. Only the features contained in these
@@ -979,7 +968,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns an array of rendered map features that intersect with the given
  rectangle, restricted to the given style layers.
- 
+
  This method returns all the intersecting features from the specified layers. To
  filter the returned features, use the
  `-visibleFeaturesAtPoint:inStyleLayersWithIdentifiers:predicate:` method. For
@@ -999,7 +988,7 @@ MGL_EXPORT IB_DESIGNABLE
  Returns an array of rendered map features that intersect with the given
  rectangle, restricted to the given style layers and filtered by the given
  predicate.
- 
+
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant map
  content sources. The returned array includes features loaded by
@@ -1035,7 +1024,7 @@ MGL_EXPORT IB_DESIGNABLE
 
  To find out the layer names in a particular style, view the style in
  <a href="https://www.mapbox.com/studio/">Mapbox Studio</a>.
- 
+
  Only visible features are returned. To obtain features regardless of
  visibility, use the
  `-[MGLVectorTileSource featuresInSourceLayersWithIdentifiers:predicate:]` and
@@ -1048,7 +1037,7 @@ MGL_EXPORT IB_DESIGNABLE
     inspectable in Interface Builder, or a manually constructed `NSURL`. This
     approach also avoids layer identifer name changes that will occur in the
     default style’s layers over time.
- 
+
  @param rect A rectangle expressed in the map view’s coordinate system.
  @param styleLayerIdentifiers A set of strings that correspond to the names of
     layers defined in the current style. Only the features contained in these
@@ -1088,7 +1077,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Converts a geographic bounding box to a rectangle in the given view’s
  coordinate system.
- 
+
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
  example, to show both Tokyo and San Francisco simultaneously, you could set the
@@ -1105,7 +1094,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Converts a rectangle in the given view’s coordinate system to a geographic
  bounding box.
- 
+
  If a longitude is less than −180 degrees or greater than 180 degrees, the
  bounding box straddles the antimeridian or international date line.
 

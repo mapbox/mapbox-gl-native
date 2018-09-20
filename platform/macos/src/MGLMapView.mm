@@ -629,7 +629,7 @@ public:
     if (!styleURL) {
         styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
     }
-    
+
     // An access token is required to load any default style, including Streets.
     if (![MGLAccountManager accessToken] && [styleURL.scheme isEqualToString:@"mapbox"]) {
         NSLog(@"Cannot set the style URL to %@ because no access token has been specified.", styleURL);
@@ -1120,10 +1120,6 @@ public:
     [self setCamera:camera animated:NO];
 }
 
-- (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated {
-    [self setCamera:camera withDuration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:NULL];
-}
-
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion {
     [self setCamera:camera withDuration:duration animationTimingFunction:function edgePadding:self.contentInsets completionHandler:completion];
 }
@@ -1144,7 +1140,7 @@ public:
             });
         };
     }
-    
+
     if ([self.camera isEqualToMapCamera:camera]) {
         if (completion) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -1190,7 +1186,7 @@ public:
             });
         };
     }
-    
+
     if ([self.camera isEqualToMapCamera:camera]) {
         if (completion) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -1251,7 +1247,7 @@ public:
     if (animated) {
         animationOptions.duration = MGLDurationFromTimeInterval(MGLAnimationDuration);
     }
-    
+
     MGLMapCamera *camera = [self cameraForCameraOptions:cameraOptions];
     if ([self.camera isEqualToMapCamera:camera]) {
         return;
@@ -1279,11 +1275,11 @@ public:
 {
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
     padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
-    
+
     MGLMapCamera *currentCamera = self.camera;
     CGFloat pitch = camera.pitch < 0 ? currentCamera.pitch : camera.pitch;
     CLLocationDirection direction = camera.heading < 0 ? currentCamera.heading : camera.heading;
-    
+
     mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), padding, direction, pitch);
     return [self cameraForCameraOptions:cameraOptions];
 }
@@ -1291,13 +1287,13 @@ public:
 - (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingShape:(MGLShape *)shape edgePadding:(NSEdgeInsets)insets {
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
     padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
-    
+
     MGLMapCamera *currentCamera = self.camera;
     CGFloat pitch = camera.pitch < 0 ? currentCamera.pitch : camera.pitch;
     CLLocationDirection direction = camera.heading < 0 ? currentCamera.heading : camera.heading;
-    
+
     mbgl::CameraOptions cameraOptions = _mbglMap->cameraForGeometry([shape geometryObject], padding, direction, pitch);
-    
+
     return [self cameraForCameraOptions: cameraOptions];
 }
 
@@ -1445,7 +1441,7 @@ public:
                 _mbglMap->setPitch(_pitchAtBeginningOfGesture + delta.y / 5, center);
                 didChangeCamera = YES;
             }
-            
+
             if (didChangeCamera
                 && [self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
                 && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera]) {
@@ -1570,11 +1566,11 @@ public:
         _directionAtBeginningOfGesture = self.direction;
     } else if (gestureRecognizer.state == NSGestureRecognizerStateChanged) {
         MGLMapCamera *oldCamera = self.camera;
-        
+
         NSPoint rotationPoint = [gestureRecognizer locationInView:self];
         mbgl::ScreenCoordinate center(rotationPoint.x, self.bounds.size.height - rotationPoint.y);
         _mbglMap->setBearing(_directionAtBeginningOfGesture + gestureRecognizer.rotationInDegrees, center);
-        
+
         if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
             && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:self.camera]) {
             self.camera = oldCamera;
@@ -1685,12 +1681,12 @@ public:
         case '-':
             [self moveToEndOfParagraph:nil];
             break;
-            
+
         case '+':
         case '=':
             [self moveToBeginningOfParagraph:nil];
             break;
-            
+
         default:
             [super insertText:insertString];
             break;
@@ -1821,11 +1817,11 @@ public:
 
     std::vector<MGLAnnotationTag> annotationTags = [self annotationTagsInRect:rect];
     std::vector<MGLAnnotationTag> shapeAnnotationTags = [self shapeAnnotationTagsInRect:rect];
-    
+
     if (shapeAnnotationTags.size()) {
         annotationTags.insert(annotationTags.end(), shapeAnnotationTags.begin(), shapeAnnotationTags.end());
     }
-    
+
     if (annotationTags.size())
     {
         NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:annotationTags.size()];
@@ -2086,7 +2082,7 @@ public:
                             -MGLAnnotationImagePaddingForHitTest);
     std::vector<MGLAnnotationTag> nearbyAnnotations = [self annotationTagsInRect:queryRect];
     std::vector<MGLAnnotationTag> nearbyShapeAnnotations = [self shapeAnnotationTagsInRect:queryRect];
-    
+
     if (nearbyShapeAnnotations.size()) {
         nearbyAnnotations.insert(nearbyAnnotations.end(), nearbyShapeAnnotations.begin(), nearbyShapeAnnotations.end());
     }
@@ -2096,7 +2092,7 @@ public:
         NSRect hitRect = NSInsetRect({ point, NSZeroSize },
                                      -MGLAnnotationImagePaddingForHitTest,
                                      -MGLAnnotationImagePaddingForHitTest);
-        
+
         // Filter out any annotation whose image is unselectable or for which
         // hit testing fails.
         auto end = std::remove_if(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag annotationTag) {
@@ -2105,7 +2101,7 @@ public:
             if (!annotation) {
                 return true;
             }
-            
+
             if ([annotation isKindOfClass:[MGLMultiPoint class]])
             {
                 if ([self.delegate respondsToSelector:@selector(mapView:shapeAnnotationIsEnabled:)]) {
@@ -2114,12 +2110,12 @@ public:
                     return false;
                 }
             }
-            
+
             MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
             if (!annotationImage.selectable) {
                 return true;
             }
-            
+
             // Filter out the annotation if the fattened finger didn’t land on a
             // translucent or opaque pixel in the image.
             NSRect annotationRect = [self frameOfImage:annotationImage.image
@@ -2145,7 +2141,7 @@ public:
                                              coordinateB.longitude - currentCoordinate.longitude);
             return deltaA < deltaB;
         });
-        
+
         if (nearbyAnnotations == _annotationsNearbyLastClick) {
             // The last time we persisted a set of annotations, we had the same
             // set of annotations as we do now. Cycle through them.
@@ -2208,7 +2204,7 @@ public:
         _selectedAnnotationTag == MGLAnnotationTagNotFound) {
         return nil;
     }
-    
+
     MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(_selectedAnnotationTag);
     return annotationContext.annotation;
 }
@@ -2446,9 +2442,9 @@ public:
         CLLocationCoordinate2D origin = annotation.coordinate;
         CGPoint originPoint = [self convertCoordinate:origin toPointToView:self];
         return CGRectMake(originPoint.x, originPoint.y, MGLAnnotationImagePaddingForHitTest, MGLAnnotationImagePaddingForHitTest);
-        
+
     }
-    
+
     NSImage *image = [self imageOfAnnotationWithTag:annotationTag].image;
     if (!image) {
         image = [self dequeueReusableAnnotationImageWithIdentifier:MGLDefaultStyleMarkerSymbolName].image;
@@ -2713,12 +2709,12 @@ public:
         }];
         optionalLayerIDs = layerIDs;
     }
-    
+
     mbgl::optional<mbgl::style::Filter> optionalFilter;
     if (predicate) {
         optionalFilter = predicate.mgl_filter;
     }
-    
+
     std::vector<mbgl::Feature> features = _rendererFrontend->getRenderer()->queryRenderedFeatures(screenCoordinate, { optionalLayerIDs, optionalFilter });
     return MGLFeaturesFromMBGLFeatures(features);
 }
@@ -2747,12 +2743,12 @@ public:
         }];
         optionalLayerIDs = layerIDs;
     }
-    
+
     mbgl::optional<mbgl::style::Filter> optionalFilter;
     if (predicate) {
         optionalFilter = predicate.mgl_filter;
     }
-    
+
     std::vector<mbgl::Feature> features = _rendererFrontend->getRenderer()->queryRenderedFeatures(screenBox, { optionalLayerIDs, optionalFilter });
     return MGLFeaturesFromMBGLFeatures(features);
 }
@@ -2832,19 +2828,19 @@ public:
     auto southeast = bounds.southeast();
 
     auto center = [self convertPoint:{ NSMidX(view.bounds), NSMidY(view.bounds) } toLatLngFromView:view];
-    
+
     // Extend bounds to account for the antimeridian
     northwest.unwrapForShortestPath(center);
     northeast.unwrapForShortestPath(center);
     southwest.unwrapForShortestPath(center);
     southeast.unwrapForShortestPath(center);
-    
+
     auto correctedLatLngBounds = mbgl::LatLngBounds::empty();
     correctedLatLngBounds.extend(northwest);
     correctedLatLngBounds.extend(northeast);
     correctedLatLngBounds.extend(southwest);
     correctedLatLngBounds.extend(southeast);
-    
+
     NSRect rect = { [self convertLatLng:correctedLatLngBounds.southwest() toPointToView:view], CGSizeZero };
     rect = MGLExtendRect(rect, [self convertLatLng:correctedLatLngBounds.northeast() toPointToView:view]);
     return rect;
@@ -2862,7 +2858,7 @@ public:
     auto bottomRight = [self convertPoint:{ NSMaxX(rect), NSMinY(rect) } toLatLngFromView:view];
     auto topRight = [self convertPoint:{ NSMaxX(rect), NSMaxY(rect) } toLatLngFromView:view];
     auto topLeft = [self convertPoint:{ NSMinX(rect), NSMaxY(rect) } toLatLngFromView:view];
-    
+
     // If the bounds straddles the antimeridian, unwrap it so that one side
     // extends beyond ±180° longitude.
     auto center = [self convertPoint:{ NSMidX(rect), NSMidY(rect) } toLatLngFromView:view];
@@ -2870,7 +2866,7 @@ public:
     bottomRight.unwrapForShortestPath(center);
     topRight.unwrapForShortestPath(center);
     topLeft.unwrapForShortestPath(center);
-    
+
     bounds.extend(bottomLeft);
     bounds.extend(bottomRight);
     bounds.extend(topRight);
