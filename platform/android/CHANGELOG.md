@@ -12,6 +12,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Update isEmulator check [#12832](https://github.com/mapbox/mapbox-gl-native/pull/12832)
  - Prevent crash when expression evaluates to default, no pattern [#12896](https://github.com/mapbox/mapbox-gl-native/pull/12896)
  - Fixed bugs in coercion expression operators ("to-array" applied to empty arrays, "to-color" applied to colors, and "to-number" applied to null) [#12864](https://github.com/mapbox/mapbox-gl-native/pull/12864)
+ - Update proguard config to not warn about AutoValue [#12920](https://github.com/mapbox/mapbox-gl-native/pull/12920)
  - Remove nunicode from android binding [#12497](https://github.com/mapbox/mapbox-gl-native/pull/12497)
  - Correct LatLngBounds exception message [#12816](https://github.com/mapbox/mapbox-gl-native/pull/12816)
 
