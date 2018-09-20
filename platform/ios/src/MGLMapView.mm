@@ -557,8 +557,6 @@ public:
 
     _cameraAltitudeAffectedByPitch = YES;
 
-    _cameraAltitudeAffectedByPitch = YES;
-
     _decelerationRate = MGLMapViewDecelerationRateNormal;
 
     _quickZoom = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleQuickZoomGesture:)];
@@ -3299,6 +3297,11 @@ public:
 - (void)setCamera:(MGLMapCamera *)camera
 {
     [self setCamera:camera animated:NO];
+}
+
+- (void)setCamera:(MGLMapCamera *)camera edgePadding:(UIEdgeInsets)edgePadding
+{
+    [self setCamera:camera withDuration:0 animationTimingFunction:nil edgePadding:edgePadding completionHandler:nil];
 }
 
 - (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated
