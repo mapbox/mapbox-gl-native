@@ -310,6 +310,19 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  Moves the viewpoint to a different location with respect to the map with an
+ optional transition animation.
+ 
+ @param camera The new viewpoint.
+ @param edgePadding The minimum padding (in screen points) that would be visible.
+ @param animated Specify `YES` if you want the map view to animate the change to
+ the new viewpoint or `NO` if you want the map to display the new viewpoint
+ immediately.
+ 
+ */
+- (void)setCamera:(MGLMapCamera *)camera edgePadding:(NSEdgeInsets)edgePadding animated:(BOOL)animated;
+
+/**
+ Moves the viewpoint to a different location with respect to the map with an
  optional transition duration and timing function.
 
  @param camera The new viewpoint.

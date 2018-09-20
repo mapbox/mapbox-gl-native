@@ -1120,6 +1120,11 @@ public:
     [self setCamera:camera animated:NO];
 }
 
+- (void)setCamera:(MGLMapCamera *)camera edgePadding:(NSEdgeInsets)edgePadding animated:(BOOL)animated
+{
+    [self setCamera:camera withDuration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil edgePadding:edgePadding completionHandler:nil];
+}
+
 - (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated {
     [self setCamera:camera withDuration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:NULL];
 }
