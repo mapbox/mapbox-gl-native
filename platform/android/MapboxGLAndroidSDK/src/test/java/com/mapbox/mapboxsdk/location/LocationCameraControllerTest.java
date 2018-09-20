@@ -357,6 +357,62 @@ public class LocationCameraControllerTest {
     verify(mapboxMap).setGesturesManager(initialGesturesManager, true, true);
   }
 
+  @Test
+  public void onMove_cancellingTransitionWhileNone() {
+    MapboxMap mapboxMap = mock(MapboxMap.class);
+    when(mapboxMap.getUiSettings()).thenReturn(mock(UiSettings.class));
+    MoveGestureDetector moveGestureDetector = mock(MoveGestureDetector.class);
+    LocationCameraController camera = buildCamera(mapboxMap);
+    camera.initializeOptions(mock(LocationComponentOptions.class));
+
+    camera.setCameraMode(CameraMode.NONE);
+    camera.onMoveListener.onMove(moveGestureDetector);
+    verify(mapboxMap, times(1)).cancelTransitions();
+    verify(moveGestureDetector, times(0)).interrupt();
+
+    // testing subsequent calls
+    camera.onMoveListener.onMove(moveGestureDetector);
+    verify(mapboxMap, times(1)).cancelTransitions();
+    verify(moveGestureDetector, times(0)).interrupt();
+  }
+
+  @Test
+  public void onMove_cancellingTransitionWhileGps() {
+    MapboxMap mapboxMap = mock(MapboxMap.class);
+    when(mapboxMap.getUiSettings()).thenReturn(mock(UiSettings.class));
+    MoveGestureDetector moveGestureDetector = mock(MoveGestureDetector.class);
+    LocationCameraController camera = buildCamera(mapboxMap);
+    camera.initializeOptions(mock(LocationComponentOptions.class));
+
+    camera.setCameraMode(CameraMode.TRACKING);
+    camera.onMoveListener.onMove(moveGestureDetector);
+    verify(mapboxMap, times(2)).cancelTransitions();
+    verify(moveGestureDetector, times(1)).interrupt();
+
+    // testing subsequent calls
+    camera.onMoveListener.onMove(moveGestureDetector);
+    verify(mapboxMap, times(2)).cancelTransitions();
+    verify(moveGestureDetector, times(1)).interrupt();
+  }
+
+  @Test
+  public void onMove_cancellingTransitionWhileBearing() {
+    MapboxMap mapboxMap = mock(MapboxMap.class);
+    MoveGestureDetector moveGestureDetector = mock(MoveGestureDetector.class);
+    LocationCameraController camera = buildCamera(mapboxMap);
+    camera.initializeOptions(mock(LocationComponentOptions.class));
+
+    camera.setCameraMode(CameraMode.NONE_COMPASS);
+    camera.onMoveListener.onMove(moveGestureDetector);
+    verify(mapboxMap, times(2)).cancelTransitions();
+    verify(moveGestureDetector, times(1)).interrupt();
+
+    // testing subsequent calls
+    camera.onMoveListener.onMove(moveGestureDetector);
+    verify(mapboxMap, times(2)).cancelTransitions();
+    verify(moveGestureDetector, times(1)).interrupt();
+  }
+
   private LocationCameraController buildCamera(OnCameraTrackingChangedListener onCameraTrackingChangedListener) {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getUiSettings()).thenReturn(mock(UiSettings.class));
