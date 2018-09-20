@@ -298,17 +298,6 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, copy) MGLMapCamera *camera;
 
 /**
- Moves the viewpoint to a different location with respect to the map with an
- optional transition animation.
-
- @param camera The new viewpoint.
- @param animated Specify `YES` if you want the map view to animate the change to
-    the new viewpoint or `NO` if you want the map to display the new viewpoint
-    immediately.
- */
-- (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated;
-
-/**
  Moves the viewpoint to a different location without using a transition.
  
  @param camera The new viewpoint.
