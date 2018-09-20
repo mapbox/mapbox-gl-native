@@ -209,7 +209,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
     }
 
     if (!parser.spriteURL.empty()) {
-        result->requiredResourceCount += 2;
+        result->requiredResourceCount += 4;
     }
 
     return *result;
@@ -306,9 +306,11 @@ void OfflineDownload::activateDownload() {
         }
 
         if (!parser.spriteURL.empty()) {
-            auto pixelRatio = definition.match([](auto& reg){ return reg.pixelRatio; });
-            queueResource(Resource::spriteImage(parser.spriteURL, pixelRatio));
-            queueResource(Resource::spriteJSON(parser.spriteURL, pixelRatio));
+            // Always request 1x and @2x sprite images for portability.
+            queueResource(Resource::spriteImage(parser.spriteURL, 1));
+            queueResource(Resource::spriteImage(parser.spriteURL, 2));
+            queueResource(Resource::spriteJSON(parser.spriteURL, 1));
+            queueResource(Resource::spriteJSON(parser.spriteURL, 2));
         }
 
         continueDownload();
