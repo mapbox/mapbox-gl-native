@@ -876,15 +876,6 @@ MGL_EXPORT IB_DESIGNABLE
 - (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated;
 
 /**
- Moves the viewpoint to a different location without using a transition.
- 
- @param camera The new viewpoint.
- @param edgePadding The minimum padding (in screen points) that would be visible
- 
- */
-- (void)setCamera:(MGLMapCamera *)camera edgePadding:(UIEdgeInsets)edgePadding;
-
-/**
  Moves the viewpoint to a different location with respect to the map with an
  optional transition duration and timing function.
 

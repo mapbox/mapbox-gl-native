@@ -1120,16 +1120,6 @@ public:
     [self setCamera:camera animated:NO];
 }
 
-- (void)setCamera:(MGLMapCamera *)camera edgePadding:(NSEdgeInsets)edgePadding
-{
-    [self setCamera:camera withDuration:0 animationTimingFunction:nil edgePadding:edgePadding completionHandler:nil];
-}
-
-- (void)setCamera:(MGLMapCamera *)camera edgePadding:(NSEdgeInsets)edgePadding
-{
-    [self setCamera:camera withDuration:0 animationTimingFunction:nil edgePadding:edgePadding completionHandler:nil];
-}
-
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion {
     [self setCamera:camera withDuration:duration animationTimingFunction:function edgePadding:self.contentInsets completionHandler:completion];
 }
