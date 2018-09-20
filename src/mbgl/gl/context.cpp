@@ -124,8 +124,11 @@ void Context::initializeExtensions(const std::function<gl::ProcAddress(const cha
             return nullptr;
         };
 
-        const std::string renderer = reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_RENDERER)));
-        Log::Info(Event::General, "GPU Identifier: %s", renderer.c_str());
+        static const std::string renderer = []() {
+            std::string r = reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_RENDERER)));
+            Log::Info(Event::General, "GPU Identifier: %s", r.c_str());
+            return r;
+        }();
 
         // Block ANGLE on Direct3D since the debugging extension is causing crashes
         if (!(renderer.find("ANGLE") != std::string::npos
