@@ -2,29 +2,30 @@ package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.app.Activity;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.WorkerThread;
 import android.support.test.espresso.IdlingResource;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-
-import java.lang.reflect.Field;
+import com.mapbox.mapboxsdk.testapp.R;
 
 public class OnMapReadyIdlingResource implements IdlingResource, OnMapReadyCallback {
 
   private MapboxMap mapboxMap;
   private IdlingResource.ResourceCallback resourceCallback;
+  private final Handler handler = new Handler(Looper.getMainLooper());
 
   @WorkerThread
-  public OnMapReadyIdlingResource(Activity activity) {
-    new Handler(activity.getMainLooper()).post(() -> {
-      try {
-        Field field = activity.getClass().getDeclaredField("mapView");
-        field.setAccessible(true);
-        ((MapView) field.get(activity)).getMapAsync(OnMapReadyIdlingResource.this);
-      } catch (Exception err) {
-        throw new RuntimeException(err);
+  public OnMapReadyIdlingResource(final Activity activity) {
+    handler.post(new Runnable() {
+      @Override
+      public void run() {
+        MapView mapView = (MapView) activity.findViewById(R.id.mapView);
+        if (mapView != null) {
+          mapView.getMapAsync(OnMapReadyIdlingResource.this);
+        }
       }
     });
   }
