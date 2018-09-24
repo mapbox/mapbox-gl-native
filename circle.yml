@@ -337,12 +337,13 @@ step-library:
 jobs:
   nitpick:
     docker:
-      - image: mbgl/7d2403f42e:linux-clang-4
+      - image: mbgl/clang-6.0:2018-09-24-UfwJCwhu
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
       JOBS: 4
       BUILDTYPE: Debug
+      CLANG_FORMAT: clang-format-6.0
     steps:
       - checkout
       - *restore-node_modules-cache
@@ -354,6 +355,10 @@ jobs:
       - run:
           name: Verify submodule pin
           command: scripts/nitpick/submodule-pin.js
+          when: always
+      - run:
+          name: Code formatting
+          command: scripts/nitpick/format.js
           when: always
       - run:
           name: CMake file list generation

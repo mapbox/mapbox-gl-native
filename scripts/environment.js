@@ -6,29 +6,42 @@
 const github = require('@octokit/rest')();
 const {execSync} = require('child_process');
 
-const pr = process.env['CIRCLE_PULL_REQUEST'];
-const head = process.env['CIRCLE_SHA1'] || 'HEAD';
-if (pr) {
-    const number = +pr.match(/\/(\d+)\/?$/)[1];
-    return github.pullRequests.get({
-        owner: 'mapbox',
-        repo: 'mapbox-gl-native',
-        number
-    }).then(({data}) => {
+let environment = module.exports = async function() {
+    const head = process.env['CIRCLE_SHA1'] || 'HEAD';
+
+    if (process.env['CIRCLE_TARGET_BRANCH'] && process.env['CIRCLE_MERGE_BASE']) {
+        return {
+            head,
+            base: process.env['CIRCLE_TARGET_BRANCH'],
+            mergeBase: process.env['CIRCLE_MERGE_BASE']
+        };
+    }
+
+    const pr = process.env['CIRCLE_PULL_REQUEST'];
+    if (pr) {
+        const number = +pr.match(/\/(\d+)\/?$/)[1];
+        const data = (await github.pullRequests.get({ owner: 'mapbox', repo: 'mapbox-gl-native', number })).data;
         const base = data.base.ref;
         const mergeBase = execSync(`git merge-base origin/${base} ${head}`).toString().trim();
-
-        console.log(`export CIRCLE_TARGET_BRANCH=${base}`);
-        console.log(`export CIRCLE_MERGE_BASE=${mergeBase}`);
-    });
-} else {
-    for (const sha of execSync(`git rev-list --max-count=10 ${head}`).toString().trim().split('\n')) {
-        const base = execSync(`git branch -r --contains ${sha} origin/master origin/release-*`).toString().split('\n')[0].trim().replace(/^origin\//, '');
-        if (base.match(/^(master|release-[a-z]+)$/)) {
-            const mergeBase = execSync(`git merge-base origin/${base} ${head}`).toString().trim();
-            console.log(`export CIRCLE_TARGET_BRANCH=${base}`);
-            console.log(`export CIRCLE_MERGE_BASE=${mergeBase}`);
-            break;
+        return { head, base, mergeBase };
+    } else {
+        for (const sha of execSync(`git rev-list --max-count=10 ${head}`).toString().trim().split('\n')) {
+            const base = execSync(`git branch -r --contains ${sha} origin/master origin/release-*`).toString().split('\n')[0].trim().replace(/^origin\//, '');
+            if (base.match(/^(master|release-[a-z]+)$/)) {
+                const mergeBase = execSync(`git merge-base origin/${base} ${head}`).toString().trim();
+                return { head, base, mergeBase };
+            }
         }
+        return { head, base: null, mergeBase: null };
     }
+}
+
+async function main() {
+    const env = await environment();
+    console.log(`export CIRCLE_TARGET_BRANCH=${env.base}`);
+    console.log(`export CIRCLE_MERGE_BASE=${env.mergeBase}`);
+}
+
+if (require.main === module) {
+    main();
 }
