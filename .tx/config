@@ -38,9 +38,9 @@ source_lang = en
 type = STRINGS
 
 [mapbox-gl-native.rootstrings-ios]
-file_filter = platform/ios/framework/Settings.bundle/<lang>.lproj/Root.strings
+file_filter = platform/ios/app/Settings.bundle/<lang>.lproj/Root.strings
 lang_map = pt_BR: pt-BR, pt_PT: pt-PT, zh_CN: zh-Hans, zh_TW: zh-Hant
-source_file = platform/ios/framework/Settings.bundle/Base.lproj/Root.strings
+source_file = platform/ios/app/Settings.bundle/Base.lproj/Root.strings
 source_lang = en
 type = STRINGS
 
