@@ -17,6 +17,7 @@ class MergeOfflineRegionsActivity : AppCompatActivity() {
   companion object {
     private const val LOG_TAG = "Mbgl-MergeOfflineRegionsActivity"
     private const val TEST_DB_FILE_NAME = "offline.db"
+    private const val TEST_STYLE = Style.SATELLITE
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,11 +27,14 @@ class MergeOfflineRegionsActivity : AppCompatActivity() {
     // forcing offline state
     Mapbox.setConnected(false)
 
-    mapView.setStyleUrl(Style.SATELLITE)
+    mapView.setStyleUrl(TEST_STYLE)
 
     mapView.onCreate(savedInstanceState)
     load_region_btn.setOnClickListener {
       copyAsset()
+    }
+    mapView.getMapAsync {
+      it.isDebugActive = true
     }
   }
 
@@ -55,7 +59,7 @@ class MergeOfflineRegionsActivity : AppCompatActivity() {
       FileSource.getResourcesCachePath(this) + "/" + TEST_DB_FILE_NAME,
       object : OfflineManager.MergeOfflineRegionsCallback {
         override fun onMerge(offlineRegions: Array<OfflineRegion>) {
-          mapView.setStyleUrl(Style.SATELLITE)
+          mapView.setStyleUrl(TEST_STYLE)
           Toast.makeText(
             this@MergeOfflineRegionsActivity,
             String.format("Merged %d regions.", offlineRegions.size),
