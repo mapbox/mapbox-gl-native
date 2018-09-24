@@ -184,4 +184,63 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
     return MGLFeaturesFromMBGLFeatures(features);
 }
 
+#pragma mark - MGLPointCluster management
+
+// TODO: doc
+// For clustered sources, fetches the original points that belong to the cluster (as an array of GeoJSON features).
+// clusterId(number)The value of the cluster's  cluster_id property.
+// limit(number)The maximum number of features to return.
+// offset(number)The number of features to skip (e.g. for pagination).
+- (NSArray<id <MGLFeature>> *)leavesOfCluster:(id<MGLPointCluster>)cluster offset:(uint32_t)offset limit:(uint32_t)limit {
+    if(!self.rawSource) {
+        return nil;
+    }
+    
+    std::vector<mbgl::Feature> leaves = self.rawSource->getLeaves(cluster.clusterId, limit, offset);
+    return MGLFeaturesFromMBGLFeatures(leaves);
+}
+
+// TODO: doc
+// For clustered sources, fetches the children of the given cluster on the next zoom level (as an array of GeoJSON features).
+- (NSArray<id <MGLFeature>> *)childrenOfCluster:(id<MGLPointCluster>)cluster {
+    if(!self.rawSource) {
+        return nil;
+    }
+
+    std::vector<mbgl::Feature> children = self.rawSource->getChildren(cluster.clusterId);
+    return MGLFeaturesFromMBGLFeatures(children);
+}
+
+// For clustered sources, fetches the zoom at which the given cluster expands.
+- (double)zoomLevelForExpandingCluster:(id<MGLPointCluster>)cluster {
+    if(!self.rawSource) {
+        return -1.0;
+    }
+
+    uint8_t zoom = self.rawSource->getClusterExpansionZoom(cluster.clusterId);
+    return static_cast<double>(zoom);
+}
+
+- (void)debugRecursiveLogForFeature:(id <MGLFeature>)feature indent:(NSInteger)indent {
+
+    MGLPointFeature *pointFeature = MGL_OBJC_DYNAMIC_CAST(feature, MGLPointFeature);
+    id<MGLPointCluster> cluster = [pointFeature cluster];
+    
+    if (cluster) {
+        double zoom = [self zoomLevelForExpandingCluster:cluster];
+
+        NSString *log = [NSString stringWithFormat:@"Cluster %d [count=%ld, zoom=%0.1g]", cluster.clusterId, cluster.pointCount, zoom];
+        
+        printf("%*s%s\n", (int)indent, "", log.UTF8String);
+        
+        NSArray<id <MGLFeature>> *children = [self childrenOfCluster:cluster];
+        for (id <MGLFeature> child in children) {
+            [self debugRecursiveLogForFeature:child indent:indent + 2];
+        }
+    }
+    else {
+        printf("%*sLeaf\n", (int)indent, "");
+    }
+}
+
 @end

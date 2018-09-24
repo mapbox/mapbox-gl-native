@@ -474,6 +474,8 @@
 		CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */; };
 		CA1B4A512099FB2200EDD491 /* MGLMapSnapshotterTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA1B4A502099FB2200EDD491 /* MGLMapSnapshotterTest.m */; };
 		CA34C9C3207FD272005C1A06 /* MGLCameraTransitionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA34C9C2207FD272005C1A06 /* MGLCameraTransitionTests.mm */; };
+		CA42323B2159242400BB7C18 /* MGLPointCluster.h in Headers */ = {isa = PBXBuildFile; fileRef = CA42323A2159242400BB7C18 /* MGLPointCluster.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CA42323C2159242400BB7C18 /* MGLPointCluster.h in Headers */ = {isa = PBXBuildFile; fileRef = CA42323A2159242400BB7C18 /* MGLPointCluster.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA4EB8C720863487006AB465 /* MGLStyleLayerIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */; };
 		CA55CD41202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA55CD42202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1140,6 +1142,7 @@
 		CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLMapViewIntegrationTest.h; sourceTree = "<group>"; };
 		CA1B4A502099FB2200EDD491 /* MGLMapSnapshotterTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapSnapshotterTest.m; sourceTree = "<group>"; };
 		CA34C9C2207FD272005C1A06 /* MGLCameraTransitionTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLCameraTransitionTests.mm; sourceTree = "<group>"; };
+		CA42323A2159242400BB7C18 /* MGLPointCluster.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLPointCluster.h; sourceTree = "<group>"; };
 		CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLStyleLayerIntegrationTests.m; sourceTree = "<group>"; };
 		CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCameraChangeReason.h; sourceTree = "<group>"; };
 		CA5E5042209BDC5F001A8A81 /* MGLTestUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MGLTestUtility.h; path = ../../darwin/test/MGLTestUtility.h; sourceTree = "<group>"; };
@@ -2234,6 +2237,7 @@
 				DA88480E1CBAFA6200AB86E3 /* MGLShape.mm */,
 				DAD165761CF4CDFF001FF4B9 /* MGLShapeCollection.h */,
 				DAD165771CF4CDFF001FF4B9 /* MGLShapeCollection.mm */,
+				CA42323A2159242400BB7C18 /* MGLPointCluster.h */,
 			);
 			name = Geometry;
 			sourceTree = "<group>";
@@ -2538,6 +2542,7 @@
 				55E5666C21C2A2080008B8B5 /* MMEDispatchManager.h in Headers */,
 				55E5666121C2A2080008B8B5 /* MMEEventsManager.h in Headers */,
 				55E5666D21C2A2080008B8B5 /* NSData+MMEGZIP.h in Headers */,
+				CA42323B2159242400BB7C18 /* MGLPointCluster.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2655,6 +2660,7 @@
 				DAC25FCD200FD83F009BE98E /* NSExpression+MGLPrivateAdditions.h in Headers */,
 				74CB5ED2219B286400102936 /* MGLSymbolStyleLayer_Private.h in Headers */,
 				354B83971D2E873E005D9406 /* MGLUserLocationAnnotationView.h in Headers */,
+				CA42323C2159242400BB7C18 /* MGLPointCluster.h in Headers */,
 				DAF0D8111DFE0EA000B28378 /* MGLRasterTileSource_Private.h in Headers */,
 				96E516FF20005A4F00A02306 /* MGLMapboxEvents.h in Headers */,
 				1F6A82A321360F9D00BA5B41 /* MGLLoggingConfiguration.h in Headers */,
