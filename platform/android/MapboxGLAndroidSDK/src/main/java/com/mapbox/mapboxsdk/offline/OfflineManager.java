@@ -15,6 +15,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
+import com.mapbox.mapboxsdk.utils.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -235,20 +236,32 @@ public class OfflineManager {
    */
   public void mergeOfflineRegions(@NonNull String path, @NonNull final MergeOfflineRegionsCallback callback) {
     File src = new File(path);
-    if (!src.canRead()) {
-      // path not readable, abort
-      callback.onError("Secondary database needs to be located in a readable path.");
-      return;
-    }
+    new FileUtils.CheckFileReadPermissionTask(new FileUtils.OnCheckFileReadPermissionListener() {
+      @Override
+      public void onReadPermissionGranted() {
+        new FileUtils.CheckFileWritePermissionTask(new FileUtils.OnCheckFileWritePermissionListener() {
+          @Override
+          public void onWritePermissionGranted() {
+            // path writable, merge and update schema in place if necessary
+            mergeOfflineDatabaseFiles(src, callback, false);
+          }
 
-    if (src.canWrite()) {
-      // path writable, merge and update schema in place if necessary
-      mergeOfflineDatabaseFiles(src, callback, false);
-    } else {
-      // path not writable, copy the the file to temp directory, then merge and update schema on a copy if necessary
-      File dst = new File(FileSource.getInternalCachePath(context), src.getName());
-      new CopyTempDatabaseFileTask(this, callback).execute(src, dst);
-    }
+          @Override
+          public void onError() {
+            // path not writable, copy the the file to temp directory, then merge and update schema on a copy if
+            // necessary
+            File dst = new File(FileSource.getInternalCachePath(context), src.getName());
+            new CopyTempDatabaseFileTask(OfflineManager.this, callback).execute(src, dst);
+          }
+        }).execute(src);
+      }
+
+      @Override
+      public void onError() {
+        // path not readable, abort
+        callback.onError("Secondary database needs to be located in a readable path.");
+      }
+    }).execute(src);
   }
 
   private static final class CopyTempDatabaseFileTask extends AsyncTask<Object, Void, Object> {
