@@ -33,7 +33,7 @@ public class BottomSheetActivity extends AppCompatActivity {
 
   private static final String TAG_MAIN_FRAGMENT = "com.mapbox.mapboxsdk.fragment.tag.main";
   private static final String TAG_BOTTOM_FRAGMENT = "com.mapbox.mapboxsdk.fragment.tag.bottom";
-
+  private static final String AMOUNT_OF_MAIN_MAP_FRAGMENTS = "Amount of main map fragments: %s";
   private boolean bottomSheetFragmentAdded;
 
   @Override
@@ -88,7 +88,10 @@ public class BottomSheetActivity extends AppCompatActivity {
     }
     fragmentTransaction.addToBackStack(String.valueOf(mainMapFragment.hashCode()));
     fragmentTransaction.commit();
-    Toast.makeText(this, "Amount of main map fragments: " + (fragmentCount + 1), Toast.LENGTH_SHORT).show();
+    Toast.makeText(getApplicationContext(),
+      String.format(AMOUNT_OF_MAIN_MAP_FRAGMENTS, (fragmentCount + 1)),
+      Toast.LENGTH_SHORT
+    ).show();
   }
 
   private void toggleBottomSheetMapFragment() {
