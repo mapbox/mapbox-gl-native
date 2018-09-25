@@ -22,32 +22,35 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import timber.log.Timber;
 
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 
 /**
  * Test activity showcasing adding a sprite image and use it in a Symbol Layer
  */
 public class CustomSpriteActivity extends AppCompatActivity {
+
   private static final String CUSTOM_ICON = "custom-icon";
 
+  private GeoJsonSource source;
   private MapboxMap mapboxMap;
   private MapView mapView;
   private Layer layer;
-  private GeoJsonSource source;
-
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_add_sprite);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+      final FloatingActionButton fab = findViewById(R.id.fab);
       fab.setColorFilter(ContextCompat.getColor(CustomSpriteActivity.this, R.color.primary));
       fab.setOnClickListener(new View.OnClickListener() {
+
         private Point point;
 
         @Override
@@ -69,7 +72,9 @@ public class CustomSpriteActivity extends AppCompatActivity {
             layer = new SymbolLayer("layer", "point");
             layer.setProperties(
               // Set the id of the sprite to use
-              iconImage(CUSTOM_ICON)
+              iconImage(CUSTOM_ICON),
+              iconAllowOverlap(true),
+              iconIgnorePlacement(true)
             );
 
             // lets add a circle below labels!
