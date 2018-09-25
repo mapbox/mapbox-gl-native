@@ -66,6 +66,15 @@ workflows:
               only: /node-.*/
 
 step-library:
+  - &npm-install
+      run:
+        name: npm install
+        command: npm install --ignore-scripts
+  - &prepare-environment
+      run:
+        name: Prepare environment
+        command: touch "$BASH_ENV" && ./scripts/environment.js | tee -a "$BASH_ENV"
+
   - &generate-cache-key
       run:
         name: Generate cache key
@@ -299,12 +308,11 @@ jobs:
       BUILDTYPE: Debug
     steps:
       - checkout
+      - *npm-install
+      - *prepare-environment
       - *generate-cache-key
       - *restore-cache
       - *reset-ccache-stats
-      - run:
-          name: Fetch 'origin/master' branch
-          command: git fetch origin master:refs/remotes/origin/master
       - run:
           name: Generate compilation database
           command: make compdb
