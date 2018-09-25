@@ -26,6 +26,26 @@ public class CameraAnimationTypeActivity extends AppCompatActivity implements On
   private static final LatLng LAT_LNG_LONDON_EYE = new LatLng(51.50325, -0.11968);
   private static final LatLng LAT_LNG_TOWER_BRIDGE = new LatLng(51.50550, -0.07520);
 
+  private final MapboxMap.CancelableCallback callback = new MapboxMap.CancelableCallback() {
+    @Override
+    public void onCancel() {
+      Timber.i("Duration onCancel Callback called.");
+      Toast.makeText(
+        CameraAnimationTypeActivity.this.getApplicationContext(),
+        "Ease onCancel Callback called.",
+        Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onFinish() {
+      Timber.i("Duration onFinish Callback called.");
+      Toast.makeText(
+        CameraAnimationTypeActivity.this.getApplicationContext(),
+        "Ease onFinish Callback called.",
+        Toast.LENGTH_LONG).show();
+    }
+  };
+
   private MapboxMap mapboxMap;
   private MapView mapView;
   private boolean cameraState;
@@ -34,8 +54,7 @@ public class CameraAnimationTypeActivity extends AppCompatActivity implements On
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_camera_animation_types);
-
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     if (mapView != null) {
       mapView.onCreate(savedInstanceState);
       mapView.getMapAsync(this);
@@ -73,27 +92,6 @@ public class CameraAnimationTypeActivity extends AppCompatActivity implements On
           .bearing(180)
           .tilt(30)
           .build();
-
-        MapboxMap.CancelableCallback callback = new MapboxMap.CancelableCallback() {
-          @Override
-          public void onCancel() {
-            Timber.i("Duration onCancel Callback called.");
-            Toast.makeText(
-              CameraAnimationTypeActivity.this,
-              "Ease onCancel Callback called.",
-              Toast.LENGTH_LONG).show();
-          }
-
-          @Override
-          public void onFinish() {
-            Timber.i("Duration onFinish Callback called.");
-            Toast.makeText(
-              CameraAnimationTypeActivity.this,
-              "Ease onFinish Callback called.",
-              Toast.LENGTH_LONG).show();
-          }
-        };
-
         mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 7500, callback);
       });
     }
@@ -107,26 +105,6 @@ public class CameraAnimationTypeActivity extends AppCompatActivity implements On
           .bearing(270)
           .tilt(20)
           .build();
-
-        MapboxMap.CancelableCallback callback = new MapboxMap.CancelableCallback() {
-          @Override
-          public void onCancel() {
-            Timber.i("Duration onCancel Callback called.");
-            Toast.makeText(
-              CameraAnimationTypeActivity.this,
-              "Duration onCancel Callback called.",
-              Toast.LENGTH_LONG).show();
-          }
-
-          @Override
-          public void onFinish() {
-            Timber.i("Duration onFinish Callback called.");
-            Toast.makeText(
-              CameraAnimationTypeActivity.this,
-              "Duration onFinish Callback called.",
-              Toast.LENGTH_LONG).show();
-          }
-        };
 
         mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 7500, callback);
       });
