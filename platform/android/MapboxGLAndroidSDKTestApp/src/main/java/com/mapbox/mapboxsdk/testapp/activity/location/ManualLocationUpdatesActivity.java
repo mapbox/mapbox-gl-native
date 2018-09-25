@@ -64,7 +64,7 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
             fabManualUpdate.setEnabled(true);
             fabManualUpdate.setAlpha(1f);
             Toast.makeText(
-              ManualLocationUpdatesActivity.this,
+              ManualLocationUpdatesActivity.this.getApplicationContext(),
               "LocationEngine disable, use manual updates",
               Toast.LENGTH_SHORT).show();
           } else {
@@ -72,7 +72,7 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
             fabManualUpdate.setEnabled(false);
             fabManualUpdate.setAlpha(0.5f);
             Toast.makeText(
-              ManualLocationUpdatesActivity.this,
+              ManualLocationUpdatesActivity.this.getApplicationContext(),
               "LocationEngine enabled",
               Toast.LENGTH_SHORT).show();
           }
@@ -89,8 +89,10 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
       permissionsManager = new PermissionsManager(new PermissionsListener() {
         @Override
         public void onExplanationNeeded(List<String> permissionsToExplain) {
-          Toast.makeText(ManualLocationUpdatesActivity.this, "You need to accept location permissions.",
-            Toast.LENGTH_SHORT).show();
+          Toast.makeText(ManualLocationUpdatesActivity.this.getApplicationContext(),
+            "You need to accept location permissions.",
+            Toast.LENGTH_SHORT
+          ).show();
         }
 
         @Override
