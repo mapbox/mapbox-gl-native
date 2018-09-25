@@ -223,9 +223,7 @@ final class MapGestureDetector {
       case MotionEvent.ACTION_UP:
         transform.setGestureInProgress(false);
 
-        if (scheduledAnimators.isEmpty()) {
-          cameraChangeDispatcher.onCameraIdle();
-        } else  {
+        if (!scheduledAnimators.isEmpty()) {
           // Start all awaiting velocity animations
           animationsTimeoutHandler.removeCallbacksAndMessages(null);
           for (Animator animator : scheduledAnimators) {
@@ -251,6 +249,8 @@ final class MapGestureDetector {
 
     cancelAnimator(scaleAnimator);
     cancelAnimator(rotateAnimator);
+
+    dispatchCameraIdle();
   }
 
   private void cancelAnimator(Animator animator) {
@@ -441,7 +441,7 @@ final class MapGestureDetector {
         return false;
       }
 
-      transform.cancelTransitions();
+      cancelTransitionsIfRequired();
       sendTelemetryEvent(TelemetryConstants.PAN, detector.getFocalPoint());
       notifyOnMoveBeginListeners(detector);
       return true;
@@ -465,7 +465,7 @@ final class MapGestureDetector {
 
     @Override
     public void onMoveEnd(MoveGestureDetector detector, float velocityX, float velocityY) {
-      cameraChangeDispatcher.onCameraIdle();
+      dispatchCameraIdle();
       notifyOnMoveEndListeners(detector);
     }
   }
@@ -487,7 +487,7 @@ final class MapGestureDetector {
         return false;
       }
 
-      transform.cancelTransitions();
+      cancelTransitionsIfRequired();
 
       quickZoom = detector.getPointersCount() == 1;
       if (quickZoom) {
@@ -550,7 +550,7 @@ final class MapGestureDetector {
 
       if (!uiSettings.isScaleVelocityAnimationEnabled() || velocityXY < minimumVelocity) {
         // notifying listeners that camera is idle only if there is no follow-up animation
-        cameraChangeDispatcher.onCameraIdle();
+        dispatchCameraIdle();
         return;
       }
 
@@ -615,7 +615,7 @@ final class MapGestureDetector {
         return false;
       }
 
-      transform.cancelTransitions();
+      cancelTransitionsIfRequired();
 
       if (uiSettings.isIncreaseScaleThresholdWhenRotating()) {
         // when rotation starts, interrupting scale and increasing the threshold
@@ -664,7 +664,7 @@ final class MapGestureDetector {
 
       if (!uiSettings.isRotateVelocityAnimationEnabled() || Math.abs(angularVelocity) < minimumAngularVelocity) {
         // notifying listeners that camera is idle only if there is no follow-up animation
-        cameraChangeDispatcher.onCameraIdle();
+        dispatchCameraIdle();
         return;
       }
 
@@ -718,12 +718,12 @@ final class MapGestureDetector {
 
         @Override
         public void onAnimationCancel(Animator animation) {
-          cameraChangeDispatcher.onCameraIdle();
+          transform.cancelTransitions();
         }
 
         @Override
         public void onAnimationEnd(Animator animation) {
-          cameraChangeDispatcher.onCameraIdle();
+          dispatchCameraIdle();
         }
       });
 
@@ -738,7 +738,7 @@ final class MapGestureDetector {
         return false;
       }
 
-      transform.cancelTransitions();
+      cancelTransitionsIfRequired();
 
       sendTelemetryEvent(TelemetryConstants.PITCH, detector.getFocalPoint());
 
@@ -770,7 +770,7 @@ final class MapGestureDetector {
 
     @Override
     public void onShoveEnd(ShoveGestureDetector detector, float velocityX, float velocityY) {
-      cameraChangeDispatcher.onCameraIdle();
+      dispatchCameraIdle();
 
       // re-enabling move gesture
       gesturesManager.getMoveGestureDetector().setEnabled(true);
@@ -835,7 +835,7 @@ final class MapGestureDetector {
 
       @Override
       public void onAnimationEnd(Animator animation) {
-        cameraChangeDispatcher.onCameraIdle();
+        dispatchCameraIdle();
       }
     });
     return animator;
@@ -878,6 +878,27 @@ final class MapGestureDetector {
     } else {
       scheduleAnimator(scaleAnimator);
     }
+  }
+
+  private void dispatchCameraIdle() {
+    // we need to dispatch camera idle callback only if there is no other gestures in progress
+    if (noGesturesInProgress()) {
+      cameraChangeDispatcher.onCameraIdle();
+    }
+  }
+
+  private void cancelTransitionsIfRequired() {
+    // we need to cancel core transitions only if there is no started gesture yet
+    if (noGesturesInProgress()) {
+      transform.cancelTransitions();
+    }
+  }
+
+  private boolean noGesturesInProgress() {
+    return (!uiSettings.isScrollGesturesEnabled() || !gesturesManager.getMoveGestureDetector().isInProgress())
+      && (!uiSettings.isZoomGesturesEnabled() || !gesturesManager.getStandardScaleGestureDetector().isInProgress())
+      && (!uiSettings.isRotateGesturesEnabled() || !gesturesManager.getRotateGestureDetector().isInProgress())
+      && (!uiSettings.isTiltGesturesEnabled() || !gesturesManager.getShoveGestureDetector().isInProgress());
   }
 
   private void sendTelemetryEvent(String eventType, PointF focalPoint) {
