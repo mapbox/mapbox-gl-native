@@ -111,8 +111,6 @@ if [[ "${GITHUB_RELEASE}" == true ]]; then
         --description "${RELEASE_NOTES}"
 fi
 
-buildPackageStyle "ipackage" "symbols"
-buildPackageStyle "ipackage-strip"
 buildPackageStyle "iframework" "symbols-dynamic"
 buildPackageStyle "iframework SYMBOLS=NO" "dynamic"
 
