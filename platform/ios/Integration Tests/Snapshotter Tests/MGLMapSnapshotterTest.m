@@ -282,7 +282,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
 }
 
 - (void)testMultipleSnapshottersPENDING {
-    MGL_CHECK_IF_PENDING_TEST_SHOULD_RUN();
+
     if (![self validAccessToken]) {
         return;
     }

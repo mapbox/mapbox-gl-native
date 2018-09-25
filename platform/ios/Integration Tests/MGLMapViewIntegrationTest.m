@@ -6,6 +6,21 @@
 
 @implementation MGLMapViewIntegrationTest
 
+- (void)invokeTest {
+    NSString *selector = NSStringFromSelector(self.invocation.selector);
+    BOOL isPendingTest = [selector hasSuffix:@"PENDING"];
+    
+    if (isPendingTest) {
+        NSString *runPendingTests = [[NSProcessInfo processInfo] environment][@"MAPBOX_RUN_PENDING_TESTS"];
+        if (![runPendingTests boolValue]) {
+            printf("warning: '%s' is a pending test - skipping\n", selector.UTF8String);
+            return;
+        }
+    }
+
+    [super invokeTest];
+}
+
 - (NSString*)validAccessToken {
     NSString *accessToken = [[NSProcessInfo processInfo] environment][@"MAPBOX_ACCESS_TOKEN"];
     if (!accessToken) {
