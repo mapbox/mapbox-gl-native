@@ -686,6 +686,23 @@ public final class MapboxMap {
   }
 
   /**
+   * Gradually move the camera by the default duration, zoom will not be affected unless specified
+   * within {@link CameraUpdate}. If {@link #getCameraPosition()} is called during the animation,
+   * it will return the current location of the camera in flight.
+   *
+   * @param update   The change that should be applied to the camera.
+   * @param callback An optional callback to be notified from the main thread when the animation
+   *                 stops. If the animation stops due to its natural completion, the callback
+   *                 will be notified with onFinish(). If the animation stops due to interruption
+   *                 by a later camera movement or a user gesture, onCancel() will be called.
+   *                 Do not update or ease the camera from within onCancel().
+   * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
+   */
+  public final void easeCamera(CameraUpdate update, @Nullable final MapboxMap.CancelableCallback callback) {
+    easeCamera(update, MapboxConstants.ANIMATION_DURATION, callback);
+  }
+
+  /**
    * Gradually move the camera by a specified duration in milliseconds, zoom will not be affected
    * unless specified within {@link CameraUpdate}. If {@link #getCameraPosition()} is called
    * during the animation, it will return the current location of the camera in flight.
