@@ -2395,9 +2395,9 @@ public:
     auto camera = _mbglMap->getStyle().getDefaultCamera();
     CGFloat pitch = *camera.pitch;
     CLLocationDirection heading = mbgl::util::wrap(*camera.angle, 0., 360.);
-    CLLocationDistance distance = MGLAltitudeForZoomLevel(*camera.zoom, pitch, 0, self.frame.size);
+    CLLocationDistance altitude = MGLAltitudeForZoomLevel(*camera.zoom, pitch, 0, self.frame.size);
     self.camera = [MGLMapCamera cameraLookingAtCenterCoordinate:MGLLocationCoordinate2DFromLatLng(*camera.center)
-                                                   fromDistance:distance
+                                                       altitude:altitude
                                                           pitch:pitch
                                                         heading:heading];
 }
@@ -3472,7 +3472,7 @@ public:
     CLLocationDirection direction = cameraOptions.angle ? mbgl::util::wrap(-MGLDegreesFromRadians(*cameraOptions.angle), 0., 360.) : self.direction;
     CGFloat pitch = cameraOptions.pitch ? MGLDegreesFromRadians(*cameraOptions.pitch) : _mbglMap->getPitch();
     CLLocationDistance altitude = MGLAltitudeForZoomLevel(zoomLevel, pitch, centerCoordinate.latitude, self.frame.size);
-    return [MGLMapCamera cameraLookingAtCenterCoordinate:centerCoordinate fromDistance:altitude pitch:pitch heading:direction];
+    return [MGLMapCamera cameraLookingAtCenterCoordinate:centerCoordinate altitude:altitude pitch:pitch heading:direction];
 }
 
 /// Returns a CameraOptions object that specifies parameters for animating to

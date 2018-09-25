@@ -450,6 +450,7 @@
 		DA6408DC1DA4E7D300908C90 /* MGLVectorStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = DA6408D91DA4E7D300908C90 /* MGLVectorStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA6408DD1DA4E7D300908C90 /* MGLVectorStyleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = DA6408DA1DA4E7D300908C90 /* MGLVectorStyleLayer.m */; };
 		DA6408DE1DA4E7D300908C90 /* MGLVectorStyleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = DA6408DA1DA4E7D300908C90 /* MGLVectorStyleLayer.m */; };
+		DA695426215B1E76002041A4 /* MGLMapCameraTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA695425215B1E75002041A4 /* MGLMapCameraTests.m */; };
 		DA704CC21F65A475004B3F28 /* MGLMapAccessibilityElement.h in Headers */ = {isa = PBXBuildFile; fileRef = DA704CC01F65A475004B3F28 /* MGLMapAccessibilityElement.h */; };
 		DA704CC31F65A475004B3F28 /* MGLMapAccessibilityElement.h in Headers */ = {isa = PBXBuildFile; fileRef = DA704CC01F65A475004B3F28 /* MGLMapAccessibilityElement.h */; };
 		DA704CC41F65A475004B3F28 /* MGLMapAccessibilityElement.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA704CC11F65A475004B3F28 /* MGLMapAccessibilityElement.mm */; };
@@ -1110,6 +1111,7 @@
 		DA618B2B1E68932D00CB7F44 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA6408D91DA4E7D300908C90 /* MGLVectorStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLVectorStyleLayer.h; sourceTree = "<group>"; };
 		DA6408DA1DA4E7D300908C90 /* MGLVectorStyleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLVectorStyleLayer.m; sourceTree = "<group>"; };
+		DA695425215B1E75002041A4 /* MGLMapCameraTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLMapCameraTests.m; path = ../../darwin/test/MGLMapCameraTests.m; sourceTree = "<group>"; };
 		DA704CBB1F637311004B3F28 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Foundation.strings; sourceTree = "<group>"; };
 		DA704CBC1F637405004B3F28 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = uk; path = uk.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		DA704CBD1F63746E004B3F28 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
@@ -1859,6 +1861,7 @@
 				DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */,
 				DA2E885C1CC0382C00F24E7B /* MGLGeometryTests.mm */,
 				DA5DB1291FABF1EE001C2326 /* MGLMapAccessibilityElementTests.m */,
+				DA695425215B1E75002041A4 /* MGLMapCameraTests.m */,
 				076171C22139C70900668A35 /* MGLMapViewTests.m */,
 				16376B481FFEED010000563E /* MGLMapViewLayoutTests.m */,
 				9658C154204761FC00D8A674 /* MGLMapViewScaleBarTests.m */,
@@ -2885,6 +2888,7 @@
 				35B8E08C1D6C8B5100E768D2 /* MGLPredicateTests.mm in Sources */,
 				96036A0620059BBA00510F3D /* MGLNSOrthographyAdditionsTests.m in Sources */,
 				1F95931D1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm in Sources */,
+				DA695426215B1E76002041A4 /* MGLMapCameraTests.m in Sources */,
 				DD58A4C61D822BD000E1F038 /* MGLExpressionTests.mm in Sources */,
 				3575798B1D502B0C000B822E /* MGLBackgroundStyleLayerTests.mm in Sources */,
 				9658C155204761FC00D8A674 /* MGLMapViewScaleBarTests.m in Sources */,
