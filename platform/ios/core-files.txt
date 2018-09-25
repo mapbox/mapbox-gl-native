@@ -90,10 +90,10 @@ platform/darwin/src/MGLMultiPoint_Private.h
 platform/darwin/src/MGLOverlay.h
 platform/darwin/src/MGLPointAnnotation.h
 platform/darwin/src/MGLPointAnnotation.mm
+platform/darwin/src/MGLPointCluster.h
 platform/darwin/src/MGLPointCollection.h
 platform/darwin/src/MGLPointCollection.mm
 platform/darwin/src/MGLPointCollection_Private.h
-platform/darwin/src/MGLPointCluster.h
 platform/darwin/src/MGLPolygon.h
 platform/darwin/src/MGLPolygon.mm
 platform/darwin/src/MGLPolygon_Private.h
