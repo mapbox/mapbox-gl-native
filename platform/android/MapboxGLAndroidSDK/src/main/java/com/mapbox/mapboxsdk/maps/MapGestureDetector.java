@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.animation.DecelerateInterpolator;
+
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.gestures.Constants;
 import com.mapbox.android.gestures.MoveGestureDetector;
@@ -222,16 +223,21 @@ final class MapGestureDetector {
       case MotionEvent.ACTION_UP:
         transform.setGestureInProgress(false);
 
-        // Start all awaiting velocity animations
-        animationsTimeoutHandler.removeCallbacksAndMessages(null);
-        for (Animator animator : scheduledAnimators) {
-          animator.start();
+        if (scheduledAnimators.isEmpty()) {
+          cameraChangeDispatcher.onCameraIdle();
+        } else  {
+          // Start all awaiting velocity animations
+          animationsTimeoutHandler.removeCallbacksAndMessages(null);
+          for (Animator animator : scheduledAnimators) {
+            animator.start();
+          }
+          scheduledAnimators.clear();
         }
-        scheduledAnimators.clear();
         break;
 
       case MotionEvent.ACTION_CANCEL:
         scheduledAnimators.clear();
+        transform.cancelTransitions();
         transform.setGestureInProgress(false);
         break;
     }
@@ -526,8 +532,6 @@ final class MapGestureDetector {
 
     @Override
     public void onScaleEnd(StandardScaleGestureDetector detector, float velocityX, float velocityY) {
-      cameraChangeDispatcher.onCameraIdle();
-
       if (quickZoom) {
         //if quickzoom, re-enabling move gesture detector
         gesturesManager.getMoveGestureDetector().setEnabled(true);
@@ -542,18 +546,19 @@ final class MapGestureDetector {
 
       notifyOnScaleEndListeners(detector);
 
-      if (!uiSettings.isScaleVelocityAnimationEnabled()) {
+      float velocityXY = Math.abs(velocityX) + Math.abs(velocityY);
+
+      if (!uiSettings.isScaleVelocityAnimationEnabled() || velocityXY < minimumVelocity) {
+        // notifying listeners that camera is idle only if there is no follow-up animation
+        cameraChangeDispatcher.onCameraIdle();
         return;
       }
 
-      float velocityXY = Math.abs(velocityX) + Math.abs(velocityY);
-      if (velocityXY > minimumVelocity) {
-        double zoomAddition = calculateScale(velocityXY, detector.isScalingOut());
-        double currentZoom = transform.getRawZoom();
-        long animationTime = (long) (Math.abs(zoomAddition) * 1000 / 4);
-        scaleAnimator = createScaleAnimator(currentZoom, zoomAddition, scaleFocalPoint, animationTime);
-        scheduleAnimator(scaleAnimator);
-      }
+      double zoomAddition = calculateScale(velocityXY, detector.isScalingOut());
+      double currentZoom = transform.getRawZoom();
+      long animationTime = (long) (Math.abs(zoomAddition) * 1000 / 4);
+      scaleAnimator = createScaleAnimator(currentZoom, zoomAddition, scaleFocalPoint, animationTime);
+      scheduleAnimator(scaleAnimator);
     }
 
     private void setScaleFocalPoint(StandardScaleGestureDetector detector) {
@@ -650,8 +655,6 @@ final class MapGestureDetector {
 
     @Override
     public void onRotateEnd(RotateGestureDetector detector, float velocityX, float velocityY, float angularVelocity) {
-      cameraChangeDispatcher.onCameraIdle();
-
       if (uiSettings.isIncreaseScaleThresholdWhenRotating()) {
         // resetting default scale threshold values
         gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(defaultSpanSinceStartThreshold);
@@ -659,11 +662,9 @@ final class MapGestureDetector {
 
       notifyOnRotateEndListeners(detector);
 
-      if (!uiSettings.isRotateVelocityAnimationEnabled()) {
-        return;
-      }
-
-      if (Math.abs(angularVelocity) < minimumAngularVelocity) {
+      if (!uiSettings.isRotateVelocityAnimationEnabled() || Math.abs(angularVelocity) < minimumAngularVelocity) {
+        // notifying listeners that camera is idle only if there is no follow-up animation
+        cameraChangeDispatcher.onCameraIdle();
         return;
       }
 
