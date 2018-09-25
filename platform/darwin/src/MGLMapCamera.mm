@@ -47,14 +47,43 @@ BOOL MGLEqualFloatWithAccuracy(CGFloat left, CGFloat right, CGFloat accuracy)
 }
 
 + (instancetype)cameraLookingAtCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate
-                                   fromDistance:(CLLocationDistance)distance
+                                 acrossDistance:(CLLocationDistance)distance
+                                          pitch:(CGFloat)pitch
+                                        heading:(CLLocationDirection)heading
+{
+    // Angle at the viewpoint formed by the straight lines running perpendicular
+    // to the ground and toward the center coordinate.
+    CLLocationDirection eyeAngle = 90 - pitch;
+    CLLocationDistance altitude = distance * sin(MGLRadiansFromDegrees(eyeAngle));
+    
+    return [[self alloc] initWithCenterCoordinate:centerCoordinate
+                                         altitude:altitude
+                                            pitch:pitch
+                                          heading:heading];
+}
+
++ (instancetype)cameraLookingAtCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate
+                                       altitude:(CLLocationDistance)altitude
                                           pitch:(CGFloat)pitch
                                         heading:(CLLocationDirection)heading
 {
     return [[self alloc] initWithCenterCoordinate:centerCoordinate
-                                         altitude:distance
+                                         altitude:altitude
                                             pitch:pitch
                                           heading:heading];
+}
+
++ (instancetype)cameraLookingAtCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate
+                                   fromDistance:(CLLocationDistance)distance
+                                          pitch:(CGFloat)pitch
+                                        heading:(CLLocationDirection)heading
+{
+    // TODO: Remove this compatibility shim in favor of `-cameraLookingAtCenterCoordinate:acrossDistance:pitch:heading:.
+    // https://github.com/mapbox/mapbox-gl-native/issues/12943
+    return [MGLMapCamera cameraLookingAtCenterCoordinate:centerCoordinate
+                                                altitude:distance
+                                                   pitch:pitch
+                                                 heading:heading];
 }
 
 - (instancetype)initWithCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate

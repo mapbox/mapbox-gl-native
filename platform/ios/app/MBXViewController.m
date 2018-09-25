@@ -1561,7 +1561,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
     [annotations removeObjectAtIndex:0];
     MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:nextAnnotation.coordinate
-                                                            fromDistance:10
+                                                          acrossDistance:10
                                                                    pitch:arc4random_uniform(60)
                                                                  heading:arc4random_uniform(360)];
     __weak MBXViewController *weakSelf = self;
@@ -1740,7 +1740,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     [self addAnnotations:50 aroundCoordinate:annotation.coordinate radius:100000.0]; // 100km
 
     MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:annotation.coordinate
-                                                            fromDistance:10000.0
+                                                                altitude:10000.0
                                                                    pitch:drand48()*60.0
                                                                  heading:drand48()*360];
     [self.mapView flyToCamera:camera
