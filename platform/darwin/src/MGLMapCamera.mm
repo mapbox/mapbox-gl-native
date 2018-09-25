@@ -131,6 +131,20 @@ BOOL MGLEqualFloatWithAccuracy(CGFloat left, CGFloat right, CGFloat accuracy)
                                                                heading:_heading];
 }
 
++ (NSSet<NSString *> *)keyPathsForValuesAffectingViewingDistance {
+    return [NSSet setWithObjects:@"altitude", @"pitch", nil];
+}
+
+- (CLLocationDistance)viewingDistance {
+    CLLocationDirection eyeAngle = 90 - self.pitch;
+    return self.altitude / sin(MGLRadiansFromDegrees(eyeAngle));
+}
+
+- (void)setViewingDistance:(CLLocationDistance)distance {
+    CLLocationDirection eyeAngle = 90 - self.pitch;
+    self.altitude = distance * sin(MGLRadiansFromDegrees(eyeAngle));
+}
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p; centerCoordinate = %f, %f; altitude = %.0fm; heading = %.0f°; pitch = %.0f°>",

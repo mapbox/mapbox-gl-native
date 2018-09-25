@@ -9,7 +9,7 @@
 
 @implementation MGLMapCameraTests
 
-- (void)testViewingDistance {
+- (void)testViewingDistanceInitialization {
     CLLocationCoordinate2D fountainSquare = CLLocationCoordinate2DMake(39.10152215, -84.5124439696089);
     MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:fountainSquare
                                                           acrossDistance:10000
@@ -44,6 +44,24 @@
                                                      pitch:60
                                                    heading:0];
     XCTAssertEqual(camera.altitude, 10000, @"Tilted camera should use altitude verbatim.");
+}
+
+- (void)testViewingDistance {
+    MGLMapCamera *camera = [MGLMapCamera camera];
+    camera.altitude = 10000;
+    XCTAssertEqual(camera.altitude, 10000);
+    XCTAssertEqual(camera.viewingDistance, 10000);
+    camera.viewingDistance = 10000;
+    XCTAssertEqual(camera.altitude, 10000);
+    XCTAssertEqual(camera.viewingDistance, 10000);
+    
+    camera.pitch = 60;
+    camera.altitude = 10000;
+    XCTAssertEqual(camera.altitude, 10000);
+    XCTAssertEqualWithAccuracy(camera.viewingDistance, 20000, 0.01);
+    camera.viewingDistance = 10000;
+    XCTAssertEqualWithAccuracy(camera.altitude, 5000, 0.01);
+    XCTAssertEqual(camera.viewingDistance, 10000);
 }
 
 @end
