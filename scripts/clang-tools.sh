@@ -2,6 +2,7 @@
 
 set -e
 set -o pipefail
+set -u
 
 CLANG_TIDY_PREFIX=${CLANG_TIDY_PREFIX:-$(scripts/mason.sh PREFIX clang-tidy VERSION 4.0.1)}
 CLANG_TIDY=${CLANG_TIDY:-${CLANG_TIDY_PREFIX}/bin/clang-tidy}
@@ -33,7 +34,7 @@ function run_clang_tidy() {
 }
 
 function run_clang_tidy_diff() {
-    OUTPUT=$(git diff origin/master --src-prefix=${CDUP} --dst-prefix=${CDUP} | \
+    OUTPUT=$(git diff ${CIRCLE_MERGE_BASE} --src-prefix=${CDUP} --dst-prefix=${CDUP} | \
                 ${CLANG_TIDY_PREFIX}/share/clang-tidy-diff.py \
                     -clang-tidy-binary ${CLANG_TIDY} \
                     2>/dev/null)
@@ -45,7 +46,7 @@ function run_clang_tidy_diff() {
 
 function run_clang_format() {
     echo "Running clang-format on $0..."
-    DIFF_FILES=$(git diff origin/master --name-only *cpp)
+    DIFF_FILES=$(git diff ${CIRCLE_MERGE_BASE} --name-only *cpp)
     echo "${DIFF_FILES}" | xargs -I{} -P ${JOBS} bash -c 'run_clang_format' {}
     ${CLANG_FORMAT} -i ${CDUP}/$0 || exit 1
 }
