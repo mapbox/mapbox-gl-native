@@ -36,17 +36,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) mbgl::optional<std::string> localFontFamilyName;
 
 /**
- A Boolean value indicating whether symbol layers may enable cross-source symbol
+ A Boolean value indicating whether symbol layers may enable per-source symbol
  collision detection.
  
- Set `MGLCrossSourceCollisions` in your containing app's Info.plist
+ Set `MGLCollisionBehaviorPre4_0` in your containing app's Info.plist.
  
- Setting this property to `NO`, symbol layers will only run collision detection
- against other symbol layers that are part of the same source.
- 
- The default value of this property is `YES`.
-*/
-@property (nonatomic, readonly) BOOL crossSourceCollisions;
+ Setting this property to `YES` in the plist results in symbol layers only running
+ collision detection against other symbol layers that are part of the same source.
+ */
+@property (nonatomic, readonly) BOOL perSourceCollisions;
 
 @end
 
