@@ -14,7 +14,6 @@ import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.DeviceIndependentTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.TestConstants;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
@@ -285,6 +284,8 @@ public class CameraEaseTest extends BaseActivityTest {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       final float zoomTo = 2.45f;
+
+      animationIdlingResource.increment();
       mapboxMap.easeCamera(CameraUpdateFactory.zoomTo(zoomTo), new MapboxMap.CancelableCallback() {
         @Override
         public void onCancel() {
