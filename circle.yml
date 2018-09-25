@@ -347,9 +347,6 @@ jobs:
       - *restore-ccache
       - *reset-ccache-stats
       - run:
-          name: Fetch 'origin/master' branch
-          command: git fetch origin master:refs/remotes/origin/master
-      - run:
           name: Generate compilation database
           command: make compdb
       - run:
