@@ -334,8 +334,6 @@
 #pragma mark - Pending tests
 
 - (void)testContinuallyResettingNorthInIsChangingPENDING {
-    MGL_CHECK_IF_PENDING_TEST_SHOULD_RUN();
-
     // See https://github.com/mapbox/mapbox-gl-native/pull/11614
     // This test currently fails, unsurprisingly, since we're continually
     // setting the camera to the same parameters during its update.
@@ -369,7 +367,6 @@
 
 - (void)testContinuallySettingCoordinateInIsChangingPENDING {
     // See above comment in `-testContinuallyResettingNorthInIsChangingPENDING`
-    MGL_CHECK_IF_PENDING_TEST_SHOULD_RUN();
 
     // Reset to non-zero, prior to testing
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(0.0, 0.0) animated:NO];
