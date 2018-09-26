@@ -636,7 +636,6 @@ public:
     _glView.layer.opaque = _opaque;
     _glView.delegate = self;
 
-    // `CAEAGLLayer.presentsWithTransaction` was introduced in iOS 9.
     CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
     eaglLayer.presentsWithTransaction = YES;
     
