@@ -35,6 +35,17 @@ NS_ASSUME_NONNULL_BEGIN
  which will be available at run time, e.g. "PingFang". */
 @property (nonatomic, readonly) mbgl::optional<std::string> localFontFamilyName;
 
+/**
+ A Boolean value indicating whether symbol layers may enable per-source symbol
+ collision detection.
+ 
+ Set `MGLCollisionBehaviorPre4_0` in your containing app's Info.plist.
+ 
+ Setting this property to `YES` in the plist results in symbol layers only running
+ collision detection against other symbol layers that are part of the same source.
+ */
+@property (nonatomic, readonly) BOOL perSourceCollisions;
+
 @end
 
 NS_ASSUME_NONNULL_END

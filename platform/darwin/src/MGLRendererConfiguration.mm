@@ -40,4 +40,10 @@
     return fontFamilyName ? std::string([fontFamilyName UTF8String]) : mbgl::optional<std::string>();
 }
 
+- (BOOL)perSourceCollisions {
+    NSNumber *boolWrapper = [[[NSBundle mainBundle] infoDictionary] valueForKey:@"MGLCollisionBehaviorPre4_0"];
+    
+    return boolWrapper.boolValue;
+}
+
 @end
