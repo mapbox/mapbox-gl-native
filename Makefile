@@ -253,23 +253,13 @@ ios-static-analyzer: $(IOS_PROJ_PATH)
 	set -o pipefail && $(IOS_XCODEBUILD_SIM) analyze -scheme 'CI' test $(XCPRETTY)
 
 .PHONY: ipackage
-ipackage: $(IOS_PROJ_PATH)
-	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
-	./platform/ios/scripts/package.sh
-
-.PHONY: ipackage-strip
-ipackage-strip: $(IOS_PROJ_PATH)
-	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO \
-	./platform/ios/scripts/package.sh
-
-.PHONY: ipackage-sim
-ipackage-sim: $(IOS_PROJ_PATH)
-	BUILDTYPE=Debug FORMAT=dynamic BUILD_DEVICE=false SYMBOLS=$(SYMBOLS) \
-	./platform/ios/scripts/package.sh
+ipackage: ipackage*
+ipackage%:
+	@echo make ipackage is deprecated — use make iframework.
 
 .PHONY: iframework
 iframework: $(IOS_PROJ_PATH)
-	FORMAT=dynamic BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
+	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
 	./platform/ios/scripts/package.sh
 
 .PHONY: ideploy
@@ -293,6 +283,7 @@ darwin-update-examples:
 .PHONY: check-public-symbols
 check-public-symbols:
 	node platform/darwin/scripts/check-public-symbols.js macOS iOS
+
 endif
 
 #### Linux targets #####################################################

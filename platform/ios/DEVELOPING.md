@@ -36,14 +36,7 @@ Install [jazzy](https://github.com/realm/jazzy) for generating API documentation
 [sudo] gem install jazzy
 ```
 
-Build and package the SDK by using one of the following commands:
-
-* `make ipackage` builds both dynamic and static frameworks in the Debug configuration for devices and the iOS Simulator.
-* `make iframework` builds a dynamic framework in the Debug configuration for devices and the iOS Simulator. The CocoaPods pod downloads the output of this target.
-* `make ipackage-sim` builds a dynamic framework in the Debug configuration for the iOS simulator. This is the fastest target.
-* `make ipackage-strip` builds both dynamic and static frameworks in the Debug configuration, stripped of debug symbols, for devices and the iOS Simulator.
-
-You can customize the build output by passing the following arguments into the `make` invocation:
+Build and package the SDK by using the `make iframework` command. You can customize the build output by passing the following arguments into the `make` invocation:
 
 * `BUILDTYPE=Release` will optimize for distribution. Defaults to `Debug`.
 * `BUILD_DEVICE=false` builds only for the iOS Simulator.
