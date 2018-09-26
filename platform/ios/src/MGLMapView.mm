@@ -152,9 +152,6 @@ const CGFloat MGLAnnotationImagePaddingForCallout = 1;
 
 const CGSize MGLAnnotationAccessibilityElementMinimumSize = CGSizeMake(10, 10);
 
-/// Padding to edge of view that an offscreen annotation must have when being brought onscreen (by being selected)
-const UIEdgeInsets MGLMapViewOffscreenAnnotationPadding = UIEdgeInsetsMake(-20.0f, -20.0f, -20.0f, -20.0f);
-
 /// An indication that the requested annotation was not found or is nonexistent.
 enum { MGLAnnotationTagNotFound = UINT32_MAX };
 
@@ -229,6 +226,11 @@ public:
 
 /// Currently shown popover representing the selected annotation.
 @property (nonatomic) UIView<MGLCalloutView> *calloutViewForSelectedAnnotation;
+
+/// Anchor coordinate from which to present callout views (for example, for shapes this
+/// could be the touch point rather than its centroid)
+@property (nonatomic) CLLocationCoordinate2D anchorCoordinateForSelectedAnnotation;
+
 @property (nonatomic) MGLUserLocationAnnotationView *userLocationAnnotationView;
 
 /// Indicates how thoroughly the map view is tracking the user location.
@@ -4644,11 +4646,12 @@ public:
         CGPoint originPoint = [self convertCoordinate:origin toPointToView:self];
         calloutPositioningRect = { .origin = originPoint, .size = CGSizeZero };
     }
-
-    CGRect expandedPositioningRect = UIEdgeInsetsInsetRect(calloutPositioningRect, MGLMapViewOffscreenAnnotationPadding);
+    
+    CGRect expandedPositioningRect = calloutPositioningRect;
 
     // Used for callout positioning, and moving offscreen annotations onscreen.
-    CGRect constrainedRect = UIEdgeInsetsInsetRect(self.bounds, self.contentInset);
+    CGRect constrainedRect = self.contentFrame;
+    CGRect bounds = constrainedRect;
 
     UIView <MGLCalloutView> *calloutView = nil;
 
@@ -4717,40 +4720,58 @@ public:
 
         // If the callout view provides inset (outset) information, we can use it to expand our positioning
         // rect, which we then use to help move the annotation on-screen if want need to.
-        if (moveIntoView && [calloutView respondsToSelector:@selector(marginInsetsHintForPresentationFromRect:)]) {
-            UIEdgeInsets margins = [calloutView marginInsetsHintForPresentationFromRect:calloutPositioningRect];
+        if (moveIntoView) {
+            UIEdgeInsets margins = UIEdgeInsetsZero;
+            
+            if ([calloutView respondsToSelector:@selector(marginInsetsHintForPresentationFromRect:)]) {
+                margins = [calloutView marginInsetsHintForPresentationFromRect:calloutPositioningRect];
+            }
+            
             expandedPositioningRect = UIEdgeInsetsInsetRect(expandedPositioningRect, margins);
         }
     }
+    else
+    {
+        // No callout, so update our bounds to handle cases where annotations
+        // are partially off-screen, but don't have a callout (and so shouldn't
+        // be moved. We may want to consider an MGLMapViewDelegate equivalent of
+        // the callout's marginInsetsHintForPresentationFromRect:
+        bounds = CGRectInset(bounds, -calloutPositioningRect.size.width, -calloutPositioningRect.size.height);
+    }        
 
     if (moveIntoView)
     {
         moveIntoView = NO;
 
-        // Need to consider the content insets.
-        CGRect bounds = UIEdgeInsetsInsetRect(self.bounds, self.contentInset);
-
         // Any one of these cases should trigger a move onscreen
-        if (CGRectGetMinX(calloutPositioningRect) < CGRectGetMinX(bounds))
-        {
-            constrainedRect.origin.x = expandedPositioningRect.origin.x;
+        CGFloat minX = CGRectGetMinX(expandedPositioningRect);
+        
+        if (minX < CGRectGetMinX(bounds)) {
+            constrainedRect.origin.x = minX;
             moveIntoView = YES;
         }
-        else if (CGRectGetMaxX(calloutPositioningRect) > CGRectGetMaxX(bounds))
-        {
-            constrainedRect.origin.x = CGRectGetMaxX(expandedPositioningRect) - constrainedRect.size.width;
-            moveIntoView = YES;
+        else {
+            CGFloat maxX = CGRectGetMaxX(expandedPositioningRect);
+            
+            if (maxX > CGRectGetMaxX(bounds)) {
+                constrainedRect.origin.x = maxX - CGRectGetWidth(constrainedRect);
+                moveIntoView = YES;
+            }
         }
 
-        if (CGRectGetMinY(calloutPositioningRect) < CGRectGetMinY(bounds))
-        {
-            constrainedRect.origin.y = expandedPositioningRect.origin.y;
+        CGFloat minY = CGRectGetMinY(expandedPositioningRect);
+        
+        if (minY < CGRectGetMinY(bounds)) {
+            constrainedRect.origin.y = minY;
             moveIntoView = YES;
         }
-        else if (CGRectGetMaxY(calloutPositioningRect) > CGRectGetMaxY(bounds))
-        {
-            constrainedRect.origin.y = CGRectGetMaxY(expandedPositioningRect) - constrainedRect.size.height;
-            moveIntoView = YES;
+        else {
+            CGFloat maxY = CGRectGetMaxY(expandedPositioningRect);
+            
+            if (maxY > CGRectGetMaxY(bounds)) {
+                constrainedRect.origin.y = maxY - CGRectGetHeight(constrainedRect);
+                moveIntoView = YES;
+            }
         }
     }
 
@@ -4760,6 +4781,17 @@ public:
                       constrainedToRect:constrainedRect
                                animated:animateSelection];
 
+    // Save the anchor coordinate
+    if ([annotation isKindOfClass:[MGLPointAnnotation class]]) {
+        self.anchorCoordinateForSelectedAnnotation = annotation.coordinate;
+    }
+    else {
+        // This is used for features like polygons, so that if the map is dragged
+        // the callout doesn't ping to its coordinate.
+        CGPoint anchorPoint = CGPointMake(CGRectGetMidX(calloutPositioningRect), CGRectGetMidY(calloutPositioningRect));
+        self.anchorCoordinateForSelectedAnnotation = [self convertPoint:anchorPoint toCoordinateFromView:self];
+    }
+        
     // notify delegate
     if ([self.delegate respondsToSelector:@selector(mapView:didSelectAnnotation:)])
     {
@@ -4824,8 +4856,18 @@ public:
         return CGRectNull;
     }
     
+    CLLocationCoordinate2D coordinate;
+    
+    if ((annotation == self.selectedAnnotation) &&
+        CLLocationCoordinate2DIsValid(self.anchorCoordinateForSelectedAnnotation)) {
+        coordinate = self.anchorCoordinateForSelectedAnnotation;
+    }
+    else {
+        coordinate = annotation.coordinate;
+    }
+    
     if ([annotation isKindOfClass:[MGLMultiPoint class]]) {
-        CLLocationCoordinate2D origin = annotation.coordinate;
+        CLLocationCoordinate2D origin = coordinate;
         CGPoint originPoint = [self convertCoordinate:origin toPointToView:self];
         return CGRectMake(originPoint.x, originPoint.y, MGLAnnotationImagePaddingForHitTest, MGLAnnotationImagePaddingForHitTest);
     }
@@ -4840,7 +4882,7 @@ public:
         return CGRectZero;
     }
 
-    CGRect positioningRect = [self frameOfImage:image centeredAtCoordinate:annotation.coordinate];
+    CGRect positioningRect = [self frameOfImage:image centeredAtCoordinate:coordinate];
     positioningRect.origin.x -= 0.5;
 
     return CGRectInset(positioningRect, -MGLAnnotationImagePaddingForCallout,
@@ -4895,6 +4937,7 @@ public:
         // clean up
         self.calloutViewForSelectedAnnotation = nil;
         self.selectedAnnotation = nil;
+        self.anchorCoordinateForSelectedAnnotation = kCLLocationCoordinate2DInvalid;
 
         // notify delegate
         if ([self.delegate respondsToSelector:@selector(mapView:didDeselectAnnotation:)])
@@ -6158,7 +6201,9 @@ public:
             annotationView = self.userLocationAnnotationView;
         }
 
-        CGRect positioningRect = annotationView ? annotationView.frame : [self positioningRectForCalloutForAnnotationWithTag:tag];
+        CGRect positioningRect = annotationView ?
+            annotationView.frame :
+            [self positioningRectForCalloutForAnnotationWithTag:tag];
 
         MGLAssert( ! CGRectIsNull(positioningRect), @"Positioning rect should not be CGRectNull by this point");
 

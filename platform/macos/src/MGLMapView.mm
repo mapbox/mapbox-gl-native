@@ -2365,7 +2365,7 @@ public:
 
         NSRect (^edgeInsetsInsetRect)(NSRect, NSEdgeInsets) = ^(NSRect rect, NSEdgeInsets insets) {
             return NSMakeRect(rect.origin.x + insets.left,
-                              rect.origin.y + insets.top,
+                              rect.origin.y + insets.bottom,
                               rect.size.width - insets.left - insets.right,
                               rect.size.height - insets.top - insets.bottom);
         };
@@ -2378,26 +2378,34 @@ public:
         CGRect bounds          = constrainedRect;
 
         // Any one of these cases should trigger a move onscreen
-        if (CGRectGetMinX(positioningRect) < CGRectGetMinX(bounds))
-        {
-            constrainedRect.origin.x = expandedPositioningRect.origin.x;
+        CGFloat minX = CGRectGetMinX(expandedPositioningRect);
+        
+        if (minX < CGRectGetMinX(bounds)) {
+            constrainedRect.origin.x = minX;
             moveIntoView = YES;
         }
-        else if (CGRectGetMaxX(positioningRect) > CGRectGetMaxX(bounds))
-        {
-            constrainedRect.origin.x = CGRectGetMaxX(expandedPositioningRect) - constrainedRect.size.width;
+        else {
+            CGFloat maxX = CGRectGetMaxX(expandedPositioningRect);
+            
+            if (maxX > CGRectGetMaxX(bounds)) {
+                constrainedRect.origin.x = maxX - CGRectGetWidth(constrainedRect);
+                moveIntoView = YES;
+            }
+        }
+        
+        CGFloat minY = CGRectGetMinY(expandedPositioningRect);
+        
+        if (minY < CGRectGetMinY(bounds)) {
+            constrainedRect.origin.y = minY;
             moveIntoView = YES;
         }
-
-        if (CGRectGetMinY(positioningRect) < CGRectGetMinY(bounds))
-        {
-            constrainedRect.origin.y = expandedPositioningRect.origin.y;
-            moveIntoView = YES;
-        }
-        else if (CGRectGetMaxY(positioningRect) > CGRectGetMaxY(bounds))
-        {
-            constrainedRect.origin.y = CGRectGetMaxY(expandedPositioningRect) - constrainedRect.size.height;
-            moveIntoView = YES;
+        else {
+            CGFloat maxY = CGRectGetMaxY(expandedPositioningRect);
+            
+            if (maxY > CGRectGetMaxY(bounds)) {
+                constrainedRect.origin.y = maxY - CGRectGetHeight(constrainedRect);
+                moveIntoView = YES;
+            }
         }
 
         if (moveIntoView)
