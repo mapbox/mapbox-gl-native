@@ -9,4 +9,6 @@
   m.module_name = 'Mapbox'
   m.xcconfig = { 'OTHER_LDFLAGS' => '-ObjC' }
 
+  m.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
+
 end
