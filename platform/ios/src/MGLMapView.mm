@@ -636,6 +636,9 @@ public:
     _glView.layer.opaque = _opaque;
     _glView.delegate = self;
 
+    CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+    eaglLayer.presentsWithTransaction = YES;
+    
     [_glView bindDrawable];
     [self insertSubview:_glView atIndex:0];
     _glView.contentMode = UIViewContentModeCenter;
@@ -985,8 +988,6 @@ public:
     if ( ! self.dormant || ! _rendererFrontend)
     {
         _rendererFrontend->render();
-
-        [self updateUserLocationAnnotationView];
     }
 }
 
@@ -1117,6 +1118,11 @@ public:
     {
         _needsDisplayRefresh = NO;
 
+        // Update UIKit elements, prior to rendering
+        [self updateUserLocationAnnotationView];
+        [self updateAnnotationViews];
+        [self updateCalloutView];
+        
         [self.glView display];
     }
 
@@ -5709,8 +5715,7 @@ public:
         _isChangingAnnotationLayers = NO;
         [self.style didChangeValueForKey:@"layers"];
     }
-    [self updateAnnotationViews];
-    [self updateCalloutView];
+
     if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingFrame:fullyRendered:)])
     {
         [self.delegate mapViewDidFinishRenderingFrame:self fullyRendered:fullyRendered];
@@ -5766,9 +5771,6 @@ public:
     {
         return;
     }
-
-    [CATransaction begin];
-    [CATransaction setDisableActions:YES];
 
     // If the map is pitched consider the viewport to be exactly the same as the bounds.
     // Otherwise, add a small buffer.
@@ -5864,8 +5866,6 @@ public:
             }
         }
     }
-
-    [CATransaction commit];
 }
 
 - (void)updateCalloutView
@@ -5951,12 +5951,8 @@ public:
     {
         // Smoothly move the user location annotation view and callout view to
         // the new location.
-        [UIView animateWithDuration:duration
-                              delay:0
-                            options:(UIViewAnimationOptionCurveLinear |
-                                     UIViewAnimationOptionAllowUserInteraction |
-                                     UIViewAnimationOptionBeginFromCurrentState)
-                         animations:^{
+        
+        dispatch_block_t animation = ^{
             if (self.selectedAnnotation == self.userLocation)
             {
                 UIView <MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
@@ -5965,7 +5961,20 @@ public:
                                                  userPoint.y - annotationView.center.y);
             }
             annotationView.center = userPoint;
-        } completion:NULL];
+        };
+        
+        if (duration > 0) {
+            [UIView animateWithDuration:duration
+                                  delay:0
+                                options:(UIViewAnimationOptionCurveLinear |
+                                         UIViewAnimationOptionAllowUserInteraction |
+                                         UIViewAnimationOptionBeginFromCurrentState)
+                             animations:animation
+                             completion:NULL];
+        }
+        else {
+            animation();
+        }
         _userLocationAnimationCompletionDate = [NSDate dateWithTimeIntervalSinceNow:duration];
 
         annotationView.hidden = NO;
