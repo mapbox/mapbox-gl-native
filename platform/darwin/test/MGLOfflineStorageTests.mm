@@ -43,7 +43,7 @@
             [expectation fulfill];
             [self waitForExpectationsWithTimeout:0 handler:nil];
         } else {
-            [self waitForExpectationsWithTimeout:5 handler:nil];
+            [self waitForExpectationsWithTimeout:10 handler:nil];
         }
 
         XCTAssertNotNil([MGLOfflineStorage sharedOfflineStorage].packs, @"Shared offline storage object should have a non-nil collection of packs by this point.");
@@ -283,8 +283,7 @@
 }
 
 - (void)testAddFileContent {
-    
-    
+
     // Valid database
     {
         NSURL *resourceURL = [NSURL fileURLWithPath:[[NSBundle bundleForClass:[self class]] pathForResource:@"barcelona" ofType:@"db"]];
