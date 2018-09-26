@@ -4325,12 +4325,6 @@ public:
     });
 }
 
-
-- (BOOL)isBringingAnnotationOnscreenSupportedForAnnotation:(id<MGLAnnotation>)annotation animated:(BOOL)animated {
-    // Consider delegating
-    return animated && [annotation isKindOfClass:[MGLPointAnnotation class]];
-}
-
 - (id <MGLAnnotation>)selectedAnnotation
 {
     if (_userLocationAnnotationIsSelected)
@@ -4433,7 +4427,7 @@ public:
     CGRect expandedPositioningRect = UIEdgeInsetsInsetRect(calloutPositioningRect, MGLMapViewOffscreenAnnotationPadding);
 
     // Used for callout positioning, and moving offscreen annotations onscreen.
-    CGRect constrainedRect = UIEdgeInsetsInsetRect(self.bounds, self.contentInset);
+    CGRect constrainedRect = self.contentFrame;
 
     UIView <MGLCalloutView> *calloutView = nil;
 
