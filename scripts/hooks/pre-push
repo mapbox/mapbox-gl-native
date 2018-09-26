@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+cd "$(git rev-parse --show-toplevel 2>/dev/null)"
+HOOK=$(basename "${BASH_SOURCE[0]}")
+source "scripts/hooks/common.sh"
+
+echo -n "Checking code formatting..."
+RESULT=$(scripts/nitpick/format.js)
+if [ ! -z "$RESULT" ]; then
+    echo -e " \033[1;31mChanged\033[0m"
+    echo -e -n "\033[1mDo you want to see the diff [y/N]?\033[0m "
+    read < /dev/tty
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo "$RESULT"
+        echo ""
+    fi
+
+    echo -e -n "\033[1mContinue to push? [Y/n]?\033[0m "
+    read < /dev/tty
+    if [[ $REPLY =~ ^[Nn]$ ]]; then
+        exit 1
+    fi
+else
+    echo -e " \033[32mOK\033[0m"
+fi
