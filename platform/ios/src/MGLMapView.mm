@@ -1712,7 +1712,14 @@ public:
     {
         CGPoint calloutPoint = [singleTap locationInView:self];
         CGRect positionRect = [self positioningRectForAnnotation:annotation defaultCalloutPoint:calloutPoint];
-        [self selectAnnotation:annotation moveOnscreen:YES animateSelection:YES calloutPositioningRect:positionRect];
+        
+        BOOL moveOnscreen = YES;
+        
+        if ([self.delegate respondsToSelector:@selector(mapView:shouldMoveOnscreenWhenSelectingAnnotation:)]) {
+            moveOnscreen = [self.delegate mapView:self shouldMoveOnscreenWhenSelectingAnnotation:annotation];
+        }
+        
+        [self selectAnnotation:annotation moveOnscreen:moveOnscreen calloutPositioningRect:positionRect];
     }
     else if (self.selectedAnnotation)
     {
@@ -4370,10 +4377,11 @@ public:
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
     CGRect positioningRect = [self positioningRectForAnnotation:annotation defaultCalloutPoint:CGPointZero];
-    [self selectAnnotation:annotation moveOnscreen:animated animateSelection:YES calloutPositioningRect:positioningRect];
+    
+    [self selectAnnotation:annotation moveOnscreen:animated calloutPositioningRect:positioningRect];
 }
 
-- (void)selectAnnotation:(id <MGLAnnotation>)annotation moveOnscreen:(BOOL)moveOnscreen animateSelection:(BOOL)animateSelection calloutPositioningRect:(CGRect)calloutPositioningRect
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation moveOnscreen:(BOOL)moveOnscreen calloutPositioningRect:(CGRect)calloutPositioningRect
 {
     if ( ! annotation) return;
 
@@ -4381,6 +4389,12 @@ public:
 
     [self deselectAnnotation:self.selectedAnnotation animated:NO];
 
+    BOOL animateSelection = YES;
+    
+    if ([self.delegate respondsToSelector:@selector(mapView:shouldAnimateAnnotationSelection:)]) {
+        animateSelection = [self.delegate mapView:self shouldAnimateAnnotationSelection:annotation];
+    }
+    
     // Add the annotation to the map if it hasn’t been added yet.
     MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
     if (annotationTag == MGLAnnotationTagNotFound && annotation != self.userLocation)
@@ -4406,11 +4420,6 @@ public:
         }
 
     self.selectedAnnotation = annotation;
-
-    // Determine if we're allowed to move this offscreen annotation on screen, even though we've asked it to
-    if (moveOnscreen) {
-        moveOnscreen = [self isBringingAnnotationOnscreenSupportedForAnnotation:annotation animated:animateSelection];
-    }
 
     // If we have an invalid positioning rect, we need to provide a suitable default.
     // This (currently) happens if you select an annotation that has NOT yet been
@@ -4504,29 +4513,37 @@ public:
         moveOnscreen = NO;
 
         // Need to consider the content insets.
-        CGRect bounds = UIEdgeInsetsInsetRect(self.bounds, self.contentInset);
+        CGRect bounds = constrainedRect;
 
         // Any one of these cases should trigger a move onscreen
-        if (CGRectGetMinX(calloutPositioningRect) < CGRectGetMinX(bounds))
-        {
-            constrainedRect.origin.x = expandedPositioningRect.origin.x;
+        CGFloat minX = CGRectGetMinX(expandedPositioningRect);
+        
+        if (minX < CGRectGetMinX(bounds)) {
+            constrainedRect.origin.x = minX;
             moveOnscreen = YES;
         }
-        else if (CGRectGetMaxX(calloutPositioningRect) > CGRectGetMaxX(bounds))
-        {
-            constrainedRect.origin.x = CGRectGetMaxX(expandedPositioningRect) - constrainedRect.size.width;
-            moveOnscreen = YES;
+        else {
+            CGFloat maxX = CGRectGetMaxX(expandedPositioningRect);
+            
+            if (maxX > CGRectGetMaxX(bounds)) {
+                constrainedRect.origin.x = maxX - CGRectGetWidth(constrainedRect);
+                moveOnscreen = YES;
+            }
         }
 
-        if (CGRectGetMinY(calloutPositioningRect) < CGRectGetMinY(bounds))
-        {
-            constrainedRect.origin.y = expandedPositioningRect.origin.y;
+        CGFloat minY = CGRectGetMinY(expandedPositioningRect);
+        
+        if (minY < CGRectGetMinY(bounds)) {
+            constrainedRect.origin.y = minY;
             moveOnscreen = YES;
         }
-        else if (CGRectGetMaxY(calloutPositioningRect) > CGRectGetMaxY(bounds))
-        {
-            constrainedRect.origin.y = CGRectGetMaxY(expandedPositioningRect) - constrainedRect.size.height;
-            moveOnscreen = YES;
+        else {
+            CGFloat maxY = CGRectGetMaxY(expandedPositioningRect);
+            
+            if (maxY > CGRectGetMaxY(bounds)) {
+                constrainedRect.origin.y = maxY - CGRectGetHeight(constrainedRect);
+                moveOnscreen = YES;
+            }
         }
     }
 
