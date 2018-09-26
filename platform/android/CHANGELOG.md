@@ -4,6 +4,15 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 6.6.0-alpha.2 - September 26, 2018
+ - Expose offline database merge API [#12860](https://github.com/mapbox/mapbox-gl-native/pull/12860)
+ - Remove unnecessary camera callbacks loops [#12973](https://github.com/mapbox/mapbox-gl-native/pull/12973)
+ - Fix an issue where `OnCameraMoveListener#onCameraMove` would not get invoked while using `LocationComponent` [#12932](https://github.com/mapbox/mapbox-gl-native/pull/12932)
+ - Try not to re-draw tiles when coming back from background [#12844](https://github.com/mapbox/mapbox-gl-native/pull/12844)
+ - Proguard config revision [#12929](https://github.com/mapbox/mapbox-gl-native/pull/12929)
+ - Improve compatibility of offline packs between devices [#12933](https://github.com/mapbox/mapbox-gl-native/pull/12933)
+ - Update telemetry dependency to 3.2.1 [#12974](https://github.com/mapbox/mapbox-gl-native/pull/12974)
+ 
 ## 6.6.0-alpha.1 - September 19, 2018
  - Merge LocationLayerPlugin to the Maps SDK [#12786](https://github.com/mapbox/mapbox-gl-native/pull/12786)
  - Add `symbol-z-order` symbol layout property to style spec [#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783)
