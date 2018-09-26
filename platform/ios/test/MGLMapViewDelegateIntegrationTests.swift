@@ -33,6 +33,10 @@ extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
 
     func mapView(_ mapView: MGLMapView, didFinishLoading style: MGLStyle) {}
 
+    func mapView(_ mapView: MGLMapView, shouldMoveOnscreenWhenSelecting annotation: MGLAnnotation) -> Bool {}
+    
+    func mapView(_ mapView: MGLMapView, shouldAnimateAnnotationSelection annotation: MGLAnnotation) -> Bool {}
+    
     func mapView(_ mapView: MGLMapView, didSelect annotation: MGLAnnotation) {}
 
     func mapView(_ mapView: MGLMapView, didDeselect annotation: MGLAnnotation) {}
