@@ -1,7 +1,9 @@
 #import "MGLMapCamera.h"
 #import "MGLGeometry_Private.h"
 
-#include <mbgl/util/projection.hpp>
+#import <CoreLocation/CoreLocation.h>
+
+#include <mbgl/math/wrap.hpp>
 
 BOOL MGLEqualFloatWithAccuracy(CGFloat left, CGFloat right, CGFloat accuracy)
 {
@@ -27,17 +29,15 @@ BOOL MGLEqualFloatWithAccuracy(CGFloat left, CGFloat right, CGFloat accuracy)
     CLLocationDirection heading = -1;
     CGFloat pitch = -1;
     if (CLLocationCoordinate2DIsValid(centerCoordinate) && CLLocationCoordinate2DIsValid(eyeCoordinate)) {
-        mbgl::LatLng centerLatLng = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
-        mbgl::LatLng eyeLatLng = MGLLatLngFromLocationCoordinate2D(eyeCoordinate);
+        heading = MGLDirectionBetweenCoordinates(eyeCoordinate, centerCoordinate);
         
-        mbgl::ProjectedMeters centerMeters = mbgl::Projection::projectedMetersForLatLng(centerLatLng);
-        mbgl::ProjectedMeters eyeMeters = mbgl::Projection::projectedMetersForLatLng(eyeLatLng);
-        heading = std::atan((centerMeters.northing() - eyeMeters.northing()) /
-                            (centerMeters.easting() - eyeMeters.easting()));
-        
-        double groundDistance = std::hypot(centerMeters.northing() - eyeMeters.northing(),
-                                           centerMeters.easting() - eyeMeters.easting());
-        pitch = std::atan(eyeAltitude / groundDistance);
+        CLLocation *centerLocation = [[CLLocation alloc] initWithLatitude:centerCoordinate.latitude
+                                                                longitude:centerCoordinate.longitude];
+        CLLocation *eyeLocation = [[CLLocation alloc] initWithLatitude:eyeCoordinate.latitude
+                                                             longitude:eyeCoordinate.longitude];
+        CLLocationDistance groundDistance = [eyeLocation distanceFromLocation:centerLocation];
+        CGFloat radianPitch = atan2(eyeAltitude, groundDistance);
+        pitch = mbgl::util::wrap(90 - MGLDegreesFromRadians(radianPitch), 0.0, 360.0);
     }
 
     return [[self alloc] initWithCenterCoordinate:centerCoordinate

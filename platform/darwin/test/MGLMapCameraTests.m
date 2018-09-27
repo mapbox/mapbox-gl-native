@@ -9,6 +9,45 @@
 
 @implementation MGLMapCameraTests
 
+- (void)testEyeCoordinateInitialization {
+    CLLocationCoordinate2D fountainSquare = CLLocationCoordinate2DMake(39.10152215, -84.5124439696089);
+    CLLocationCoordinate2D unionTerminal = CLLocationCoordinate2DMake(39.10980955, -84.5352778794236);
+    
+    MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:fountainSquare
+                                                       fromEyeCoordinate:fountainSquare
+                                                             eyeAltitude:1000];
+    MKMapCamera *mkCamera = [MKMapCamera cameraLookingAtCenterCoordinate:fountainSquare
+                                                       fromEyeCoordinate:fountainSquare
+                                                             eyeAltitude:1000];
+    XCTAssertEqual(camera.centerCoordinate.latitude, fountainSquare.latitude);
+    XCTAssertEqual(camera.centerCoordinate.longitude, fountainSquare.longitude);
+    XCTAssertEqual(camera.centerCoordinate.latitude, mkCamera.centerCoordinate.latitude);
+    XCTAssertEqual(camera.centerCoordinate.longitude, mkCamera.centerCoordinate.longitude);
+    XCTAssertEqual(camera.altitude, 1000, @"Eye altitude should be equivalent to altitude in untilted camera.");
+    XCTAssertEqual(camera.altitude, mkCamera.altitude, @"Eye altitude in untilted camera should match MapKit.");
+    XCTAssertEqual(camera.pitch, 0, @"Camera directly over center coordinate should be untilted.");
+    XCTAssertEqual(camera.pitch, mkCamera.pitch, @"Camera directly over center coordinate should have same pitch as MapKit.");
+    XCTAssertEqual(camera.heading, 0, @"Camera directly over center coordinate should be unrotated.");
+    XCTAssertEqual(camera.heading, mkCamera.heading, @"Camera directly over center coordinate should have same heading as MapKit.");
+    
+    camera = [MGLMapCamera cameraLookingAtCenterCoordinate:fountainSquare
+                                         fromEyeCoordinate:unionTerminal
+                                               eyeAltitude:1000];
+    mkCamera = [MKMapCamera cameraLookingAtCenterCoordinate:fountainSquare
+                                          fromEyeCoordinate:unionTerminal
+                                                eyeAltitude:1000];
+    XCTAssertEqual(camera.centerCoordinate.latitude, fountainSquare.latitude);
+    XCTAssertEqual(camera.centerCoordinate.longitude, fountainSquare.longitude);
+    XCTAssertEqual(camera.centerCoordinate.latitude, mkCamera.centerCoordinate.latitude);
+    XCTAssertEqual(camera.centerCoordinate.longitude, mkCamera.centerCoordinate.longitude);
+    XCTAssertEqual(camera.altitude, 1000);
+    XCTAssertEqual(camera.altitude, mkCamera.altitude, @"Eye altitude in tilted camera should match MapKit.");
+    XCTAssertEqualWithAccuracy(camera.pitch, 65.3469146074, 0.01);
+    XCTAssertEqual(camera.pitch, mkCamera.pitch);
+    XCTAssertEqualWithAccuracy(camera.heading, 115.066396383, 0.01);
+    XCTAssertEqualWithAccuracy(camera.heading, mkCamera.heading, 0.01);
+}
+
 - (void)testViewingDistanceInitialization {
     CLLocationCoordinate2D fountainSquare = CLLocationCoordinate2DMake(39.10152215, -84.5124439696089);
     MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:fountainSquare
