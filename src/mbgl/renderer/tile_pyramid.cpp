@@ -110,7 +110,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
         }
 
         // Only attempt prefetching in continuous mode.
-        if (parameters.mode == MapMode::Continuous && type != style::SourceType::GeoJSON) {
+        if (parameters.mode == MapMode::Continuous && type != style::SourceType::GeoJSON && type != style::SourceType::Annotations) {
             // Request lower zoom level tiles (if configured to do so) in an attempt
             // to show something on the screen faster at the cost of a little of bandwidth.
             if (parameters.prefetchZoomDelta) {
