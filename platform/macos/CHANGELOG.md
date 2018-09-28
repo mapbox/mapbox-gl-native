@@ -13,6 +13,7 @@
 
 ### Other changes	
 
+* Added `MGLAltitudeForZoomLevel` and `MGLZoomLevelForAltitude` to public API for conversion between zoom levels and altitudes. ([#12986](https://github.com/mapbox/mapbox-gl-native/pull/12986))
 * Fixed an issue where `-[MGLMapSnapshotter startWithQueue:completionHandler:]` failed to call its completion handler in some cases. ([#12355](https://github.com/mapbox/mapbox-gl-native/pull/12355))
 * Fixed an issue where `MGLMapView` produced a designable error in Interface Builder storyboards in Xcode 10. ([#12883](https://github.com/mapbox/mapbox-gl-native/pull/12883))
 * Fixed bugs in coercion expression operators ("to-array" applied to empty arrays, "to-color" applied to colors, and "to-number" applied to null) [#12864](https://github.com/mapbox/mapbox-gl-native/pull/12864)
