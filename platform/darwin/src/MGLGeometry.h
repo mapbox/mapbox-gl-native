@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
-#import <CoreGraphics/CGBase.h>
+#import <CoreGraphics/CoreGraphics.h>
 
 #import "MGLFoundation.h"
 
@@ -212,5 +212,24 @@ NS_INLINE CLLocationDegrees MGLDegreesFromRadians(CGFloat radians) {
 
 /** Returns Mercator projection of a WGS84 coordinate at the specified zoom level. */
 FOUNDATION_EXTERN MGL_EXPORT MGLMapPoint MGLMapPointForCoordinate(CLLocationCoordinate2D coordinate, double zoomLevel);
+
+
+/** Converts a map zoom level to a camera altitude.
+ 
+ @param zoomLevel The zoom level to convert.
+ @param pitch The camera pitch, measured in degrees.
+ @param latitude The latitude of the point at the center of the viewport.
+ @param size The size of the viewport.
+ @return An altitude measured in meters. */
+FOUNDATION_EXTERN MGL_EXPORT CLLocationDistance MGLAltitudeForZoomLevel(double zoomLevel, CGFloat pitch, CLLocationDegrees latitude, CGSize size);
+
+/** Converts a camera altitude to a map zoom level.
+ 
+ @param altitude The altitude to convert, measured in meters.
+ @param pitch The camera pitch, measured in degrees.
+ @param latitude The latitude of the point at the center of the viewport.
+ @param size The size of the viewport.
+ @return A zero-based zoom level. */
+FOUNDATION_EXTERN MGL_EXPORT double MGLZoomLevelForAltitude(CLLocationDistance altitude, CGFloat pitch, CLLocationDegrees latitude, CGSize size);
 
 NS_ASSUME_NONNULL_END
