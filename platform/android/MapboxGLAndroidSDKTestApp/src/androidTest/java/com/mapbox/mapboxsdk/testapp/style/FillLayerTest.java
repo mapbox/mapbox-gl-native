@@ -175,7 +175,6 @@ public class FillLayerTest extends BaseActivityTest {
     });
   }
 
-
   @Test
   public void testFillColorTransition() {
     validateTestSetup();
@@ -219,7 +218,6 @@ public class FillLayerTest extends BaseActivityTest {
       assertEquals(layer.getFillColor().getExpression(), expression);
     });
   }
-
 
   @Test
   public void testFillColorAsIntConstant() {
@@ -278,7 +276,6 @@ public class FillLayerTest extends BaseActivityTest {
       assertEquals(layer.getFillOutlineColor().getExpression(), expression);
     });
   }
-
 
   @Test
   public void testFillOutlineColorAsIntConstant() {
@@ -380,5 +377,4 @@ public class FillLayerTest extends BaseActivityTest {
       assertEquals(layer.getFillPattern().getExpression(), expression);
     });
   }
-
 }

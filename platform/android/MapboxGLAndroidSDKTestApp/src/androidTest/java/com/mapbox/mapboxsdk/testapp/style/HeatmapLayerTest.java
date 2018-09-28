@@ -161,7 +161,6 @@ public class HeatmapLayerTest extends BaseActivityTest {
     });
   }
 
-
   @Test
   public void testHeatmapWeightAsConstant() {
     validateTestSetup();
@@ -190,7 +189,6 @@ public class HeatmapLayerTest extends BaseActivityTest {
       assertEquals(layer.getHeatmapWeight().getExpression(), expression);
     });
   }
-
 
   @Test
   public void testHeatmapIntensityTransition() {

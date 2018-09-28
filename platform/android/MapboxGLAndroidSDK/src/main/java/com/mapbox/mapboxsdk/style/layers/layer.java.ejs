@@ -18,6 +18,10 @@ import static com.mapbox.mapboxsdk.utils.ColorUtils.rgbaToColor;
 import com.google.gson.JsonArray;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+<% if (type === 'symbol') { -%>
+import com.mapbox.mapboxsdk.style.types.Formatted;
+import com.mapbox.mapboxsdk.style.types.FormattedSection;
+<% } -%>
 
 /**
  * <%- doc %>
@@ -171,8 +175,38 @@ public class <%- camelize(type) %>Layer extends Layer {
   @SuppressWarnings("unchecked")
   public PropertyValue<<%- propertyType(property) %>> get<%- camelize(property.name) %>() {
     checkThread();
+<% if (property.name === 'text-field' && property.type === 'formatted') { -%>
+
+    PropertyValue propertyValue = new PropertyValue<>("text-field", nativeGetTextField());
+    if (propertyValue.isExpression()) {
+      return (PropertyValue<String>) propertyValue;
+    } else {
+      Formatted formatted = (Formatted) nativeGetTextField();
+      StringBuilder builder = new StringBuilder();
+      for (FormattedSection section : formatted.getFormattedSections()) {
+        builder.append(section.getText());
+      }
+
+      return (PropertyValue<String>) new PropertyValue("text-field", builder.toString());
+    }
+<% } else { -%>
     return (PropertyValue<<%- propertyType(property) %>>) new PropertyValue("<%- property.name %>", nativeGet<%- camelize(property.name) %>());
+<% } -%>
   }
+<% if (property.name === 'text-field' && property.type === 'formatted') { -%>
+
+  /**
+   * Get the <%- camelize(property.name) %> property as {@link Formatted} object
+   *
+   * @return property wrapper value around <%- propertyType(property) %>
+   * @see Expression#format(Expression...)
+   */
+  @SuppressWarnings("unchecked")
+  public PropertyValue<Formatted> getFormatted<%- camelize(property.name) %>() {
+    checkThread();
+    return (PropertyValue<Formatted>) new PropertyValue("<%- property.name %>", nativeGet<%- camelize(property.name) %>());
+  }
+<% } -%>
 <% if (property.type == 'color') { -%>
 
   /**

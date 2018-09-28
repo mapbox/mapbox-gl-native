@@ -183,7 +183,7 @@ public class Expression {
    */
   public static Expression literal(@NonNull Object object) {
     if (object.getClass().isArray()) {
-      return literal(ExpressionArray.toObjectArray(object));
+      return literal(toObjectArray(object));
     } else if (object instanceof Expression) {
       throw new RuntimeException("Can't convert an expression to a literal");
     }
@@ -197,7 +197,7 @@ public class Expression {
    * @return the expression
    */
   public static Expression literal(@NonNull Object[] array) {
-    return new ExpressionArray(array);
+    return new Expression("literal", new ExpressionLiteralArray(array));
   }
 
   /**
@@ -2872,7 +2872,8 @@ public class Expression {
    *
    * @param expression the expression to evaluate
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-is-supported-script">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-is-supported-script">Style
+   * specification</a>
    */
   public static Expression isSupportedScript(Expression expression) {
     return new Expression("is-supported-script", expression);
@@ -2902,7 +2903,8 @@ public class Expression {
    *
    * @param string the string to evaluate
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-is-supported-script">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-is-supported-script">Style
+   * specification</a>
    */
   public static Expression isSupportedScript(String string) {
     return new Expression("is-supported-script", literal(string));
@@ -3224,9 +3226,121 @@ public class Expression {
     return new Expression("collator", new ExpressionMap(map));
   }
 
-  public static Expression format(Expression input) {
-    Map<String, Expression> map = new HashMap<>();
-    return new Expression("format", input, new ExpressionMap(map));
+  /**
+   * Returns formatted text containing annotations for use in mixed-format text-field entries.
+   * <p>
+   * To build the expression, use {@link #formatEntry(Expression, FormatOption...)}.
+   * <p>
+   * "format" expression can be used, for example, with the {@link PropertyFactory#textField(Expression)}
+   * and accepts unlimited numbers of formatted sections.
+   * <p>
+   * Each section consist of the input, the displayed text, and options, like font-scale and text-font.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *   textField(
+   *     format(
+   *       formatEntry(
+   *         get("header_property"),
+   *         fontScale(2.0),
+   *         textFont(new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"})
+   *       ),
+   *       formatEntry(concat(literal("\n"), get("description_property")), fontScale(1.5)),
+   * }
+   * </pre>
+   *
+   * @param formatEntries format entries
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-format">Style specification</a>
+   */
+  public static Expression format(@NonNull FormatEntry... formatEntries) {
+    // for each entry we are going to build an input and parameters
+    Expression[] mappedExpressions = new Expression[formatEntries.length * 2];
+
+    int mappedIndex = 0;
+    for (FormatEntry formatEntry : formatEntries) {
+      // input
+      mappedExpressions[mappedIndex++] = formatEntry.text;
+
+      // parameters
+      Map<String, Expression> map = new HashMap<>();
+
+      if (formatEntry.options != null) {
+        for (FormatOption option : formatEntry.options) {
+          map.put(option.type, option.value);
+        }
+      }
+
+      mappedExpressions[mappedIndex++] = new ExpressionMap(map);
+    }
+
+    return new Expression("format", mappedExpressions);
+  }
+
+  /**
+   * Returns a format entry that can be used in {@link #format(FormatEntry...)} to create formatted text fields.
+   * <p>
+   * Text is required to be of a resulting type string.
+   * <p>
+   * Text is required to be passed; {@link FormatOption}s are optional and will default to the base values defined
+   * for the symbol.
+   *
+   * @param text          displayed text
+   * @param formatOptions format options
+   * @return format entry
+   */
+  public static FormatEntry formatEntry(@NonNull Expression text, @Nullable FormatOption... formatOptions) {
+    return new FormatEntry(text, formatOptions);
+  }
+
+  /**
+   * Returns a format entry that can be used in {@link #format(FormatEntry...)} to create formatted text fields.
+   * <p>
+   * Text is required to be of a resulting type string.
+   * <p>
+   * Text is required to be passed; {@link FormatOption}s are optional and will default to the base values defined
+   * for the symbol.
+   *
+   * @param text displayed text
+   * @return format entry
+   */
+  public static FormatEntry formatEntry(@NonNull Expression text) {
+    return new FormatEntry(text, null);
+  }
+
+  /**
+   * Returns a format entry that can be used in {@link #format(FormatEntry...)} to create formatted text fields.
+   * <p>
+   * Text is required to be of a resulting type string.
+   * <p>
+   * Text is required to be passed; {@link FormatOption}s are optional and will default to the base values defined
+   * for the symbol.
+   *
+   * @param text          displayed text
+   * @param formatOptions format options
+   * @return format entry
+   */
+  public static FormatEntry formatEntry(@NonNull String text, @Nullable FormatOption... formatOptions) {
+    return new FormatEntry(literal(text), formatOptions);
+  }
+
+  /**
+   * Returns a format entry that can be used in {@link #format(FormatEntry...)} to create formatted text fields.
+   * <p>
+   * Text is required to be of a resulting type string.
+   * <p>
+   * Text is required to be passed; {@link FormatOption}s are optional and will default to the base values defined
+   * for the symbol.
+   *
+   * @param text displayed text
+   * @return format entry
+   */
+  public static FormatEntry formatEntry(@NonNull String text) {
+    return new FormatEntry(literal(text), null);
   }
 
   /**
@@ -3981,18 +4095,7 @@ public class Expression {
     if (arguments != null) {
       for (Object argument : arguments) {
         builder.append(", ");
-        if (argument instanceof ExpressionLiteral) {
-          Object literalValue = ((ExpressionLiteral) argument).toValue();
-
-          // special case for handling unusual input like 'rgba(r, g, b, a)'
-          if (literalValue instanceof String) {
-            builder.append("\"").append(literalValue).append("\"");
-          } else {
-            builder.append(literalValue);
-          }
-        } else {
-          builder.append(argument.toString());
-        }
+        builder.append(argument.toString());
       }
     }
     builder.append("]");
@@ -4231,6 +4334,99 @@ public class Expression {
   }
 
   /**
+   * Holds format entries used in a {@link #format(FormatEntry...)} expression.
+   */
+  public static class FormatEntry {
+    @NonNull
+    private Expression text;
+    @Nullable
+    private FormatOption[] options;
+
+    FormatEntry(@NonNull Expression text, @Nullable FormatOption[] options) {
+      this.text = text;
+      this.options = options;
+    }
+  }
+
+  /**
+   * Holds format options used in a {@link #formatEntry(Expression, FormatOption...)} that builds
+   * a {@link #format(FormatEntry...)} expression.
+   * <p>
+   * If an option is not set, it defaults to the base value defined for the symbol.
+   */
+  public static class FormatOption {
+    @NonNull
+    private String type;
+    @NonNull
+    private Expression value;
+
+    FormatOption(@NonNull String type, @NonNull Expression value) {
+      this.type = type;
+      this.value = value;
+    }
+
+    /**
+     * If set, the font-scale argument specifies a scaling factor relative to the text-size
+     * specified in the root layout properties.
+     * <p>
+     * "font-scale" is required to be of a resulting type number.
+     *
+     * @param expression expression
+     * @return format option
+     */
+    @NonNull
+    public static FormatOption fontScale(@NonNull Expression expression) {
+      return new FormatOption("font-scale", expression);
+    }
+
+    /**
+     * If set, the font-scale argument specifies a scaling factor relative to the text-size
+     * specified in the root layout properties.
+     * <p>
+     * "font-scale" is required to be of a resulting type number.
+     *
+     * @param scale value
+     * @return format option
+     */
+    @NonNull
+    public static FormatOption fontScale(double scale) {
+      return new FormatOption("font-scale", literal(scale));
+    }
+
+    /**
+     * If set, the text-font argument overrides the font specified by the root layout properties.
+     * <p>
+     * "text-font" is required to a literal array.
+     * <p>
+     * The requested font stack has to be a part of the used style.
+     * For more information see <a href="https://www.mapbox.com/help/define-font-stack/">the documentation</a>.
+     *
+     * @param expression expression
+     * @return format option
+     */
+    @NonNull
+    public static FormatOption textFont(@NonNull Expression expression) {
+      return new FormatOption("text-font", expression);
+    }
+
+    /**
+     * If set, the text-font argument overrides the font specified by the root layout properties.
+     * <p>
+     * "text-font" is required to a literal array.
+     * <p>
+     * The requested font stack has to be a part of the used style.
+     * For more information see <a href="https://www.mapbox.com/help/define-font-stack/">the documentation</a>.
+     *
+     * @param fontStack value
+     * @return format option
+     */
+    @NonNull
+    public static FormatOption textFont(@NonNull String[] fontStack) {
+      return new FormatOption("text-font", literal(fontStack));
+    }
+  }
+
+  /**
    * Converts a JsonArray or a raw expression to a Java expression.
    */
   public final static class Converter {
@@ -4251,10 +4447,24 @@ public class Expression {
       final String operator = jsonArray.get(0).getAsString();
       final List<Expression> arguments = new ArrayList<>();
 
-      JsonElement jsonElement;
       for (int i = 1; i < jsonArray.size(); i++) {
-        jsonElement = jsonArray.get(i);
-        arguments.add(convert(jsonElement));
+        JsonElement jsonElement = jsonArray.get(i);
+        if (operator.equals("literal") && jsonElement instanceof JsonArray) {
+          JsonArray nestedArray = (JsonArray) jsonElement;
+          Object[] array = new Object[nestedArray.size()];
+          for (int j = 0; j < nestedArray.size(); j++) {
+            JsonElement element = nestedArray.get(j);
+            if (element instanceof JsonPrimitive) {
+              array[j] = convertToValue((JsonPrimitive) element);
+            } else {
+              throw new IllegalArgumentException("Nested literal arrays are not supported.");
+            }
+          }
+
+          arguments.add(new ExpressionLiteralArray(array));
+        } else {
+          arguments.add(convert(jsonElement));
+        }
       }
       return new Expression(operator, arguments.toArray(new Expression[arguments.size()]));
     }
@@ -4290,12 +4500,22 @@ public class Expression {
      * @return the expression literal
      */
     private static Expression convert(@NonNull JsonPrimitive jsonPrimitive) {
+      return new ExpressionLiteral(convertToValue(jsonPrimitive));
+    }
+
+    /**
+     * Converts a JsonPrimitive to value
+     *
+     * @param jsonPrimitive the json primitive to convert
+     * @return the value
+     */
+    private static Object convertToValue(@NonNull JsonPrimitive jsonPrimitive) {
       if (jsonPrimitive.isBoolean()) {
-        return new Expression.ExpressionLiteral(jsonPrimitive.getAsBoolean());
+        return jsonPrimitive.getAsBoolean();
       } else if (jsonPrimitive.isNumber()) {
-        return new Expression.ExpressionLiteral(jsonPrimitive.getAsFloat());
+        return jsonPrimitive.getAsFloat();
       } else if (jsonPrimitive.isString()) {
-        return new Expression.ExpressionLiteral(jsonPrimitive.getAsString());
+        return jsonPrimitive.getAsString();
       } else {
         throw new RuntimeException("Unsupported literal expression conversion for " + jsonPrimitive.getClass());
       }
@@ -4316,20 +4536,15 @@ public class Expression {
   /**
    * Expression to wrap Object[] as a literal
    */
-  private static class ExpressionArray extends Expression {
+  private static class ExpressionLiteralArray extends ExpressionLiteral {
 
-    private Object[] array;
-
-    ExpressionArray(Object[] array) {
-      this.array = array;
-    }
-
-    @NonNull
-    @Override
-    public Object[] toArray() {
-      return new Object[] {
-        "literal", array
-      };
+    /**
+     * Create an expression literal.
+     *
+     * @param object the object to be treated as literal
+     */
+    ExpressionLiteralArray(@NonNull Object[] object) {
+      super(object);
     }
 
     /**
@@ -4339,10 +4554,10 @@ public class Expression {
      */
     @Override
     public String toString() {
-      StringBuilder builder = new StringBuilder("[\"literal\"], [");
-      Object argument;
+      Object[] array = (Object[]) literal;
+      StringBuilder builder = new StringBuilder("[");
       for (int i = 0; i < array.length; i++) {
-        argument = array[i];
+        Object argument = array[i];
         if (argument instanceof String) {
           builder.append("\"").append(argument).append("\"");
         } else {
@@ -4353,8 +4568,22 @@ public class Expression {
           builder.append(", ");
         }
       }
-      builder.append("]]");
+      builder.append("]");
       return builder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      ExpressionLiteralArray that = (ExpressionLiteralArray) o;
+
+      return Arrays.equals((Object[]) this.literal, (Object[]) that.literal);
     }
   }
 
@@ -4373,8 +4602,8 @@ public class Expression {
       Map<String, Object> unwrappedMap = new HashMap<>();
       for (String key : map.keySet()) {
         Expression expression = map.get(key);
-        if (expression instanceof Expression.ExpressionLiteral) {
-          unwrappedMap.put(key, ((ExpressionLiteral) expression).toValue());
+        if (expression instanceof ValueExpression) {
+          unwrappedMap.put(key, ((ValueExpression) expression).toValue());
         } else {
           unwrappedMap.put(key, expression.toArray());
         }
@@ -4437,7 +4666,7 @@ public class Expression {
    * @param object the object to convert to an object array
    * @return the converted object array
    */
-  static Object[] toObjectArray(Object object) {
+  private static Object[] toObjectArray(Object object) {
     // object is a primitive array
     int len = java.lang.reflect.Array.getLength(object);
     Object[] objects = new Object[len];

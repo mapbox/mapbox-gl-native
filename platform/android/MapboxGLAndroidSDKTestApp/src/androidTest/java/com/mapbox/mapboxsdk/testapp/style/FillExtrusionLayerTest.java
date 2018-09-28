@@ -190,7 +190,6 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
     });
   }
 
-
   @Test
   public void testFillExtrusionColorAsIntConstant() {
     validateTestSetup();
@@ -292,7 +291,6 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
     });
   }
 
-
   @Test
   public void testFillExtrusionHeightTransition() {
     validateTestSetup();
@@ -337,7 +335,6 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
     });
   }
 
-
   @Test
   public void testFillExtrusionBaseTransition() {
     validateTestSetup();
@@ -381,5 +378,4 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
       assertEquals(layer.getFillExtrusionBase().getExpression(), expression);
     });
   }
-
 }

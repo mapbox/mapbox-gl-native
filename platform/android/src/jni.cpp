@@ -1,6 +1,8 @@
 #include "jni.hpp"
 
 #include <mbgl/util/logging.hpp>
+#include <src/style/formatted.hpp>
+#include <src/style/formatted_section.hpp>
 
 #include "annotation/marker.hpp"
 #include "annotation/polygon.hpp"
@@ -162,6 +164,8 @@ void registerNatives(JavaVM *vm) {
     Source::registerNative(env);
     Light::registerNative(env);
     Position::registerNative(env);
+    Formatted::registerNative(env);
+    FormattedSection::registerNative(env);
 
     // Map
     CameraPosition::registerNative(env);
