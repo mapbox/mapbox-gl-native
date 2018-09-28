@@ -125,6 +125,10 @@ platform/android/src/style/position.cpp
 platform/android/src/style/position.hpp
 platform/android/src/style/light.cpp
 platform/android/src/style/light.hpp
+platform/android/src/style/formatted.cpp
+platform/android/src/style/formatted.hpp
+platform/android/src/style/formatted_section.cpp
+platform/android/src/style/formatted_section.hpp
 
 # Native map
 platform/android/src/native_map_view.cpp

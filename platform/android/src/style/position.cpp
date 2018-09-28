@@ -31,5 +31,5 @@ float Position::getPolarAngle(jni::JNIEnv& env, const jni::Object<Position>& pos
     return position.Get(env, field);
 }
 
-} // namespace andr[oid
+} // namespace android
 } // namespace mbgl

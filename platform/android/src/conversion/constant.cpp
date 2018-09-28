@@ -1,5 +1,6 @@
 #include "constant.hpp"
 #include "collection.hpp"
+#include "../style/formatted.hpp"
 
 #include <mbgl/util/string.hpp>
 
@@ -39,7 +40,7 @@ Result<jni::Local<jni::Object<>>> Converter<jni::Local<jni::Object<>>, Color>::o
 }
 
 Result<jni::Local<jni::Object<>>> Converter<jni::Local<jni::Object<>>, style::expression::Formatted>::operator()(jni::JNIEnv& env, const style::expression::Formatted& value) const {
-    return jni::Make<jni::String>(env, value.toString());
+    return Formatted::New(env, value);
 }
 
 Result<jni::Local<jni::Object<>>> Converter<jni::Local<jni::Object<>>, std::vector<std::string>>::operator()(jni::JNIEnv& env, const std::vector<std::string>& value) const {

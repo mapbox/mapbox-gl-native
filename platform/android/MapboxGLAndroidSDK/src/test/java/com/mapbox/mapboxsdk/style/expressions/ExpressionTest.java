@@ -3,8 +3,8 @@ package com.mapbox.mapboxsdk.style.expressions;
 import android.graphics.Color;
 
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
-
 import com.mapbox.mapboxsdk.style.layers.PropertyValue;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -12,7 +12,10 @@ import org.robolectric.RobolectricTestRunner;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
+import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.fontScale;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.textFont;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.abs;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.acos;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
@@ -35,6 +38,8 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.e;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.floor;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.format;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.formatEntry;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.geometryType;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.gt;
@@ -1148,7 +1153,7 @@ public class ExpressionTest {
   @Test
   public void testLiteralArrayString() throws Exception {
     Object[] array = new Object[] {1, "text"};
-    String expected = "[\"literal\"], [1, \"text\"]]";
+    String expected = "[\"literal\", [1, \"text\"]]";
     String actual = literal(array).toString();
     assertEquals("literal array should match", expected, actual);
   }
@@ -1402,5 +1407,111 @@ public class ExpressionTest {
     Object[] expected = new Object[] {"is-supported-script", new Object[] {"get", "property_name"}};
     Object[] actual = isSupportedScript(get("property_name")).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testFormatSingleArgument() {
+    Object[] expected = new Object[] {"format", "test",
+      new TestableExpressionHashMap() {
+        {
+          put("font-scale", 1.5f);
+          put("text-font", new Object[] {"literal", new String[] {"awesome"}});
+        }
+      }
+    };
+    Object[] actual = format(
+      formatEntry(literal("test"), fontScale(literal(1.5)), textFont(literal(new String[] {"awesome"})))
+    ).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testFormatMultipleArgument() {
+    Object[] expected = new Object[] {
+      "format",
+      "test",
+      new TestableExpressionHashMap() {
+        {
+          put("text-font", new Object[] {"literal", new String[] {"awesome"}});
+        }
+      },
+      "test2",
+      new TestableExpressionHashMap() {
+        {
+          put("font-scale", 1.5f);
+        }
+      },
+      "test3",
+      new TestableExpressionHashMap() {
+        {
+        }
+      },
+      "test4",
+      new TestableExpressionHashMap() {
+        {
+          put("font-scale", 1.5f);
+          put("text-font", new Object[] {"literal", new String[] {"awesome"}});
+        }
+      }
+    };
+    Object[] actual = format(
+      formatEntry(literal("test"), textFont(new String[] {"awesome"})),
+      formatEntry("test2", fontScale(1.5)),
+      formatEntry(literal("test3")),
+      formatEntry(literal("test4"), fontScale(literal(1.5)), textFont(new String[] {"awesome"}))
+    ).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  /**
+   * This class overrides {@link java.util.AbstractMap#equals(Object)}
+   * in order to correctly compare nodes values if they are arrays,
+   * which is the case for {@link Expression#format(Expression.FormatEntry...)}'s "text-format" argument.
+   */
+  private class TestableExpressionHashMap extends HashMap<String, Object> {
+
+    @Override
+    public boolean equals(Object o) {
+      if (o == this) {
+        return true;
+      }
+
+      if (!(o instanceof Map)) {
+        return false;
+      }
+      Map<?, ?> m = (Map<?, ?>) o;
+      if (m.size() != size()) {
+        return false;
+      }
+
+      try {
+        for (Entry<String, Object> e : entrySet()) {
+          String key = e.getKey();
+          Object value = e.getValue();
+          if (value == null) {
+            if (!(m.get(key) == null && m.containsKey(key))) {
+              return false;
+            }
+          } else {
+            if (value instanceof Object[]) {
+              // Use Arrays.deepEquals() if values are Object arrays.
+              if (!Arrays.deepEquals((Object[]) value, (Object[]) m.get(key))) {
+                return false;
+              }
+            } else {
+              if (!value.equals(m.get(key))) {
+                return false;
+              }
+            }
+          }
+        }
+      } catch (ClassCastException unused) {
+        return false;
+      } catch (NullPointerException unused) {
+        return false;
+      }
+
+      return true;
+    }
   }
 }

@@ -13,6 +13,10 @@ import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.<%- camelize(type) %>Layer;
+<% if (type === 'symbol') { -%>
+import com.mapbox.mapboxsdk.style.types.Formatted;
+import com.mapbox.mapboxsdk.style.types.FormattedSection;
+<% } -%>
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 
 import org.junit.Test;
@@ -166,14 +170,38 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
 
       layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>("{token}"));
 <% if (property.type === 'formatted') { -%>
-      assertEquals(layer.get<%- camelize(property.name) %>().getExpression(),
-         Expression.format(Expression.toString(Expression.get("token"))));
-<% } else { -%>
+      assertEquals(layer.getTextField().getExpression(), Expression.format(Expression.formatEntry(Expression.toString(Expression.get("token")))));
+<% } else {-%>
       assertEquals(layer.get<%- camelize(property.name) %>().getExpression(), Expression.toString(Expression.get("token")));
 <% } -%>
 <% } -%>
     });
   }
+<% if (property.name === 'text-field' && property.type === 'formatted') { -%>
+
+  @Test
+  public void testFormatted<%- camelize(property.name) %>AsConstant() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("<%- property.name %>-formatted");
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+
+      Formatted expected = new Formatted(new FormattedSection[] {
+        new FormattedSection("", 1.0)
+      });
+
+      // Set and Get
+      layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>));
+      assertEquals(layer.getFormatted<%- camelize(property.name) %>().getValue(), expected/*(<%- propertyType(property) %>) <%- defaultValueJava(property) %>*/);
+<% if (property.tokens) { -%>
+
+      layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>("{token}"));
+      assertEquals(layer.getFormattedTextField().getExpression(), Expression.format(Expression.formatEntry(Expression.toString(Expression.get("token")))));
+<% } -%>
+    });
+  }
+<% } -%>
 <% if (property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven') { -%>
 <% if (!(property.name.endsWith("-font")||property.name.endsWith("-offset"))) { -%>
 
@@ -186,16 +214,32 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
       assertNotNull(layer);
 
       // Set and Get
-<% if (property.type === 'formatted') { -%>
-      Expression expression = Expression.format(<%- defaultExpressionJava(property) %>(Expression.get("undefined")));
-<% } else { -%>
       Expression expression = <%- defaultExpressionJava(property) %>(Expression.get("undefined"));
-<% } -%>
       layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>(expression));
+<% if (property.type === 'formatted') { -%>
+      assertEquals(layer.getTextField().getExpression(), Expression.format(Expression.formatEntry(expression)));
+<% } else { -%>
       assertEquals(layer.get<%- camelize(property.name) %>().getExpression(), expression);
+<% } -%>
     });
   }
+<% if (property.name === 'text-field' && property.type === 'formatted') { -%>
 
+  @Test
+  public void testFormatted<%- camelize(property.name) %>AsExpression() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("<%- property.name %>-formatted-expression");
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+
+      // Set and Get
+      Expression expression = <%- defaultExpressionJava(property) %>(Expression.get("undefined"));
+      layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>(expression));
+      assertEquals(layer.getFormattedTextField().getExpression(), Expression.format(Expression.formatEntry(Expression.string(Expression.get("undefined")))));
+    });
+  }
+<% } -%>
 <% } -%>
 <% } -%>
 <% if (property.type == 'color') { -%>
