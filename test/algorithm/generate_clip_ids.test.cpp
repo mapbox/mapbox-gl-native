@@ -335,6 +335,47 @@ TEST(GenerateClipIDs, MultipleSources) {
               clipIDs);
 }
 
+TEST(GenerateClipIDs, SomeUnclippedTiles) {
+    std::vector<Renderable> renderables1{
+        Renderable { UnwrappedTileID { 7, 36, 49 }, {}, true, true },
+        Renderable { UnwrappedTileID { 7, 36, 48 }, {}, true, true },
+        Renderable { UnwrappedTileID { 7, 35, 48 }, {}, true, false },
+        Renderable { UnwrappedTileID { 7, 35, 49 }, {}, true, false },
+        Renderable { UnwrappedTileID { 7, 37, 48 }, {}, true, false },
+        Renderable { UnwrappedTileID { 7, 37, 49 }, {}, true, false }
+    };
+    std::vector<Renderable> renderables2{
+        Renderable { UnwrappedTileID { 7, 36, 49 }, {}, true, true },
+        Renderable { UnwrappedTileID { 7, 36, 48 }, {}, true, true }
+    };
+
+    algorithm::ClipIDGenerator generator;
+    generator.update<Renderable>({ renderables1.begin(), renderables1.end() });
+    generator.update<Renderable>({ renderables2.begin(), renderables2.end() });
+    EXPECT_EQ(decltype(renderables1)({
+                Renderable { UnwrappedTileID { 7, 36, 49 }, ClipID {"00000011","00000010"} },
+                Renderable { UnwrappedTileID { 7, 36, 48 }, ClipID {"00000011","00000001"} },
+                Renderable { UnwrappedTileID { 7, 35, 48 }, ClipID {"00000000","00000000"} },
+                Renderable { UnwrappedTileID { 7, 35, 49 }, ClipID {"00000000","00000000"} },
+                Renderable { UnwrappedTileID { 7, 37, 48 }, ClipID {"00000000","00000000"} },
+                Renderable { UnwrappedTileID { 7, 37, 49 }, ClipID {"00000000","00000000"} }
+              }),
+              renderables1);
+    EXPECT_EQ(decltype(renderables2)({
+                Renderable { UnwrappedTileID { 7, 36, 49 }, ClipID {"00000011","00000010"} },
+                Renderable { UnwrappedTileID { 7, 36, 48 }, ClipID {"00000011","00000001"} }
+              }),
+              renderables2);
+
+    const auto clipIDs = generator.getClipIDs();
+
+    EXPECT_EQ(decltype(clipIDs)({
+                { UnwrappedTileID { 7, 36, 48 }, ClipID {"00000011","00000001"} },
+                { UnwrappedTileID { 7, 36, 49 }, ClipID {"00000011","00000010"} }
+              }),
+              clipIDs);
+}
+
 TEST(GenerateClipIDs, DuplicateIDs) {
     std::vector<Renderable> renderables1{
         Renderable{ UnwrappedTileID{ 2, 0, 0 }, {} },
