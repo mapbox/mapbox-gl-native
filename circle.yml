@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 workflows:
   version: 2
@@ -9,8 +9,11 @@ workflows:
           filters:
             branches:
               ignore: master
-      - android-debug-arm-v7
-      - android-gnustl-arm-v7
+      - android-arm-v7-template:
+          name: android-debug-arm-v7
+      - android-arm-v7-template:
+          name: android-gnustl-arm-v7
+          stl: gnustl_shared
       - android-release:
           filters:
             tags:
@@ -27,15 +30,22 @@ workflows:
           filters:
             tags:
               only: /node-.*/
-      - linux-clang-3.8-libcxx-debug
+      - linux-clang-38-libcxx-debug:
+          name: linux-clang-3.8-libcxx-debug
       - linux-clang4-sanitize-address
       - linux-clang4-sanitize-undefined
       - linux-clang4-sanitize-thread
-      - linux-gcc4.9-debug
+      - linux-gcc49-debug:
+          name: linux-gcc4.9-debug
       - linux-gcc5-debug-coverage
-      - ios-debug
-      - ios-debug-xcode10
-      - ios-release
+      - ios-debug-template:
+          name: ios-debug
+          xcode: "9.4.1"
+      - ios-debug-template:
+          name: ios-debug-xcode10
+          xcode: "10.0.0"
+      - ios-release-template:
+          name: ios-release
       - ios-release-tag:
           filters:
             tags:
@@ -55,22 +65,26 @@ workflows:
               only:
                 - master
     jobs:
-      - ios-release
-      - ios-sanitize
-      - ios-sanitize-address
-      - ios-static-analyzer
+      - ios-release-template:
+          name: ios-release-nightly
+      - ios-sanitize-nightly
+      - ios-sanitize-address-nightly
+      - ios-static-analyzer-nightly
 
-step-library:
-  - &npm-install
-      run:
+commands:
+  npm-install:
+    steps:
+    - run:
         name: npm install
         command: npm install --ignore-scripts
-  - &prepare-environment
-      run:
+  prepare-environment:
+    steps:
+    - run:
         name: Prepare environment
         command: touch "$BASH_ENV" && ./scripts/environment.js | tee -a "$BASH_ENV"
-  - &prepare-ccache
-      run:
+  prepare-ccache:
+    steps:
+    - run:
         name: Prepare ccache
         command: |
           # CircleCI doesn't have any way to embed arbitrary environment variables or command output
@@ -85,48 +99,56 @@ step-library:
           echo "$CIRCLE_MERGE_BASE"
           echo "${CIRCLE_MERGE_BASE:master}" > .circle-merge-base
           ccache --clear
-  - &reset-ccache-stats
-      run:
+  reset-ccache-stats:
+    steps:
+    - run:
         name: Clear ccache statistics
         command: |
           ccache --zero-stats
           ccache --max-size=2G
           ccache --show-stats
-  - &show-ccache-stats
-      run:
+  show-ccache-stats:
+    steps:
+    - run:
         name: Show ccache statistics
         command: ccache --show-stats
 
 
-  - &save-node_modules-cache
-      save_cache:
+  save-node_modules-cache:
+    steps:
+    - save_cache:
         name: Save node_modules cache
         key: 'node_modules/v1/{{ arch }}/{{ checksum "package.json" }}'
         paths: [ "node_modules" ]
-  - &restore-node_modules-cache
-      restore_cache:
+  restore-node_modules-cache:
+    steps:
+    - restore_cache:
         name: Restore node_modules cache
         keys:
           - 'node_modules/v1/{{ arch }}/{{ checksum "package.json" }}'
           - 'node_modules/v1/{{ arch }}'
-  - &save-mason_packages-cache
-      save_cache:
+  save-mason_packages-cache:
+    steps:
+    - save_cache:
         name: Save mason_packages cache
         key: 'mason_packages/v3/{{ arch }}/{{ checksum "cmake/mason-dependencies.cmake" }}'
         paths: [ "mason_packages/.binaries" ]
-  - &restore-mason_packages-cache
-      restore_cache:
+  restore-mason_packages-cache:
+    steps:
+    - restore_cache:
         name: Restore mason_packages cache
         keys:
           - 'mason_packages/v3/{{ arch }}/{{ checksum "cmake/mason-dependencies.cmake" }}'
           - 'mason_packages/v3/{{ arch }}'
-  - &save-ccache
-      save_cache:
+  save-ccache:
+    steps:
+    - save_cache:
         name: Save ccache
         key: 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-branch" }}/{{ checksum ".circle-sha1" }}'
         paths: [ "~/.ccache" ]
-  - &restore-ccache
-      restore_cache:
+  restore-ccache:
+    steps:
+    - restore_cache:
         name: Restore ccache
         keys:
           - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-branch" }}/{{ checksum ".circle-sha1" }}'
@@ -134,21 +156,82 @@ step-library:
           - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-target-branch" }}/{{ checksum ".circle-merge-base" }}'
           - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}/{{ checksum ".circle-target-branch" }}'
           - 'ccache/v1/{{ arch }}/{{ .Environment.CIRCLE_JOB }}'
-  - &save-gradle-cache
-      save_cache:
+  save-gradle-cache:
+    steps:
+    - save_cache:
         name: Save gradle cache
         key: 'gradle/v1/{{ checksum "platform/android/gradle/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
         paths: [ "/root/.gradle" ]
-  - &restore-gradle-cache
-      restore_cache:
+  restore-gradle-cache:
+    steps:
+    - restore_cache:
         name: Restore gradle cache
         keys:
           - 'gradle/v1/{{ checksum "platform/android/gradle/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
           - 'gradle/v1'
 
 
-  - &setup-llvm-symbolizer
-      run:
+  install-dependencies:
+    parameters:
+      node_modules:
+        type: boolean
+        default: true
+      ccache:
+        type: boolean
+        default: true
+      mason:
+        type: boolean
+        default: true
+      gradle:
+        type: boolean
+        default: false
+    steps:
+      - checkout
+      - when:
+          condition: << parameters.node_modules >>
+          steps: [ restore-node_modules-cache, npm-install ]
+      - prepare-environment
+      - when:
+          condition: << parameters.ccache >>
+          steps: [ prepare-ccache, restore-ccache, reset-ccache-stats ]
+      - when:
+          condition: << parameters.mason >>
+          steps: [ restore-mason_packages-cache ]
+      - when:
+          condition: << parameters.gradle >>
+          steps: [ restore-gradle-cache ]
+  save-dependencies:
+    parameters:
+      node_modules:
+        type: boolean
+        default: true
+      ccache:
+        type: boolean
+        default: true
+      mason:
+        type: boolean
+        default: true
+      gradle:
+        type: boolean
+        default: false
+    steps:
+      - when:
+          condition: << parameters.node_modules >>
+          steps: [ save-node_modules-cache ]
+      - when:
+          condition: << parameters.ccache >>
+          steps: [ save-ccache ]
+      - when:
+          condition: << parameters.mason >>
+          steps: [ save-mason_packages-cache ]
+      - when:
+          condition: << parameters.gradle >>
+          steps: [ save-gradle-cache ]
+
+
+  setup-llvm-symbolizer:
+    steps:
+    - run:
         name: Environment Setup
         command: |
           # LLVM has a hard check for "llvm-symbolizer" and doesn't support suffixed executables
@@ -158,54 +241,65 @@ step-library:
           sed -i 's/"$@" 2>&1/"$@"/' /usr/bin/xvfb-run
 
 
-  - &build-node
-      run:
+  build-node:
+    steps:
+    - run:
         name: Build node
         command: make node-all
-  - &build-linux
-      run:
+  build-linux:
+    steps:
+    - run:
         name: Build linux
         command: make linux
-  - &build-benchmark
-      run:
+  build-benchmark:
+    steps:
+    - run:
         name: Build benchmark
         command: make benchmark
-  - &build-test
-      run:
+  build-test:
+    steps:
+    - run:
         name: Build test
         command: make test
-  - &build-qt-app
-      run:
+  build-qt-app:
+    steps:
+    - run:
         name: Build qt-app
         command: make qt-app
-  - &build-qt-test
-      run:
+  build-qt-test:
+    steps:
+    - run:
         name: Build qt-test
         command: make qt-test
-  - &build-ios-test
-      run:
+  build-ios-test:
+    steps:
+    - run:
         name: Build ios-test
         command: make ios-test
         no_output_timeout: 2m
-  - &build-ios-integration-test
-      run:
+  build-ios-integration-test:
+    steps:
+    - run:
         name: Build ios-integration-test
         command: make ios-integration-test
-  - &build-macos-test
-      run:
+  build-macos-test:
+    steps:
+    - run:
         name: Build and run macOS tests
         command: make run-test
         no_output_timeout: 2m
 
 
-  - &check-public-symbols
-      run:
+  check-public-symbols:
+    steps:
+    - run:
         name: Check public symbols
         command: make check-public-symbols
 
 
-  - &conditionally-skip-firebase
-      run:
+  conditionally-skip-firebase:
+    steps:
+    - run:
         name: Check if Firebase should be skipped
         command: |
           SKIPPABLE_TAG=$( git log -1 | grep -ioE -e "\[(skip.firebase|firebase.skip)\]" -e "\[((i|mac)os)+(, (i|mac)os)?\]" -e "\[darwin\]" || true )
@@ -213,8 +307,9 @@ step-library:
             echo "Skipping Firebase tests because commit message contained: '${SKIPPABLE_TAG}'"
             echo 'export SKIP_FIREBASE=1' >> $BASH_ENV
           fi
-  - &login-google-cloud-platform
-      run:
+  login-google-cloud-platform:
+    steps:
+    - run:
         name: Log in to Google Cloud Platform
         shell: /bin/bash -euo pipefail
         command: |
@@ -223,8 +318,9 @@ step-library:
             gcloud auth activate-service-account --key-file secret.json --project android-gl-native
             rm secret.json
           fi
-  - &run-android-instrumentation-tests
-      run:
+  run-android-instrumentation-tests:
+    steps:
+    - run:
         name: Run instrumentation tests on Firebase
         no_output_timeout: 20m
         command: |
@@ -237,27 +333,31 @@ step-library:
           fi
 
 
-  - &install-ios-packaging-dependencies
-      run:
+  install-ios-packaging-dependencies:
+    steps:
+    - run:
         name: Install iOS packaging dependencies
         command: brew install awscli wget
         background: true
 
-  - &install-macos-dependencies
-      run:
+  install-macos-dependencies:
+    steps:
+    - run:
         name: Install macOS dependencies
         command: |
           brew install cmake ccache
 
-  - &install-node-macos-dependencies
-      run:
+  install-node-macos-dependencies:
+    steps:
+    - run:
         name: Install Node macOS dependencies
         command: |
           brew install node@6
           brew link node@6 --force --overwrite
 
-  - &install-qt-macos-dependencies
-      run:
+  install-qt-macos-dependencies:
+    steps:
+    - run:
         name: Install Qt macOS dependencies
         command: |
           brew install qt
@@ -267,64 +367,74 @@ step-library:
           sudo ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs
           sudo ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
 
-  - &run-node-macos-tests
-      run:
+  run-node-macos-tests:
+    steps:
+    - run:
         name: Run node tests
         command: make test-node
 
-  - &run-node-linux-tests
-      run:
+  run-node-linux-tests:
+    steps:
+    - run:
         name: Run node tests
         command: |
           xvfb-run --server-args="-screen 0 1024x768x24" \
             logbt -- apitrace trace --api=egl -v make test-node
 
-  - &run-node-linux-tests-recycle-map
-      run:
+  run-node-linux-tests-recycle-map:
+    steps:
+    - run:
         name: Run node tests (recycling the map object)
         command: |
           xvfb-run --server-args="-screen 0 1024x768x24" \
             logbt -- apitrace trace --api=egl -v make test-node-recycle-map
 
-  - &run-unit-tests
-      run:
+  run-unit-tests:
+    steps:
+    - run:
         name: Run tests
         command: |
           xvfb-run --server-args="-screen 0 1024x768x24" \
             make run-test
 
 
-  - &publish-node-package
-      run:
+  publish-node-package:
+    steps:
+    - run:
         name: Publish node package
         when: on_success
         command: platform/node/scripts/publish.sh
 
 
-  - &upload-render-tests
-      store_artifacts:
+  upload-render-tests:
+    steps:
+    - store_artifacts:
         path: mapbox-gl-js/test/integration/render-tests/index.html
         destination: render-tests
-  - &upload-render-tests-recycle-map
-      store_artifacts:
+  upload-render-tests-recycle-map:
+    steps:
+    - store_artifacts:
         path: mapbox-gl-js/test/integration/render-tests/index-recycle-map.html
         destination: render-tests
 
-  - &collect-xcode-build-logs
-      run:
+  collect-xcode-build-logs:
+    steps:
+    - run:
         name: Collect Xcode build logs
         when: always
         command: |
           export XCODE_LOG_DIR=build/logs
           mkdir -p $XCODE_LOG_DIR
           cp build/*.log $XCODE_LOG_DIR
-  - &upload-xcode-build-logs
-      store_artifacts:
+  upload-xcode-build-logs:
+    steps:
+    - store_artifacts:
         path: build/logs
 
 
-  - &notify-slack-nightly-failure
-      run:
+  notify-slack-nightly-failure:
+    steps:
+    - run:
         name: Send a Slack notification on nightly failure
         when: on_fail
         command: |
@@ -344,10 +454,7 @@ jobs:
       JOBS: 4
       BUILDTYPE: Debug
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
+      - install-dependencies: { mason: false, ccache: false }
       - run:
           name: Initialize submodule
           command: git submodule update --init mapbox-gl-js
@@ -387,14 +494,7 @@ jobs:
       JOBS: 4
       BUILDTYPE: Debug
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
+      - install-dependencies: { ccache: false }
       - run:
           name: Fetch 'origin/master' branch
           command: git fetch origin master:refs/remotes/origin/master
@@ -405,11 +505,14 @@ jobs:
           name: Run Clang checks
           command: make check
           no_output_timeout: 20m
-      - *show-ccache-stats
-      - *save-ccache
+      - save-dependencies: { ccache: false }
 
 # ------------------------------------------------------------------------------
-  android-debug-arm-v7:
+  android-arm-v7-template:
+    parameters:
+      stl:
+        type: string
+        default: "c++_static"
     docker:
       - image: mbgl/feb0443038:android-ndk-r17
     resource_class: large
@@ -419,16 +522,9 @@ jobs:
       JOBS: 4
       BUILDTYPE: Debug
       IS_LOCAL_DEVELOPMENT: false
+      MBGL_ANDROID_STL: << parameters.stl >>
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *restore-gradle-cache
-      - *reset-ccache-stats
+      - install-dependencies: { gradle: true }
       - run:
           name: Check code style
           command: make android-check
@@ -451,86 +547,16 @@ jobs:
               echo "${MAPBOX_DEVELOPER_CONFIG_XML}" > platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
               make android-ui-test-arm-v7
             fi
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
-      - *save-gradle-cache
-      - *conditionally-skip-firebase
-      - *login-google-cloud-platform
-      - *run-android-instrumentation-tests
+      - save-dependencies: { gradle: true }
+      - conditionally-skip-firebase
+      - login-google-cloud-platform
+      - run-android-instrumentation-tests
       - run:
           name: gzip debugable .so files
           command: |
-            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/armeabi-v7a/libmapbox-gl.so 
+            gzip platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/armeabi-v7a/libmapbox-gl.so
       - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/armeabi-v7a/libmapbox-gl.so.gz              
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
-          destination: .
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/reports/lint-results.html
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/build/reports/lint-results.xml
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDK/lint-baseline.xml
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/reports/lint-results.html
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/reports/lint-results.xml
-      - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/lint-baseline.xml
-
-# ------------------------------------------------------------------------------
-  android-gnustl-arm-v7:
-    docker:
-      - image: mbgl/feb0443038:android-ndk-r17
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Debug
-      IS_LOCAL_DEVELOPMENT: false
-      MBGL_ANDROID_STL: gnustl_shared
-    steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *restore-gradle-cache
-      - *reset-ccache-stats
-      - run:
-          name: Check code style
-          command: make android-check
-      - run:
-          name: Build libmapbox-gl.so for arm-v7
-          command: make android-lib-arm-v7
-      - run:
-          name: Compile Core tests for arm-v7
-          command: make android-test-lib-arm-v7
-      - run:
-          name: Test phone module
-          command: make run-android-unit-test
-      - run:
-          name: Generate Espresso sanity tests
-          command: make test-code-android
-      - run:
-          name: Build Test APK
-          command: |
-            echo "${MAPBOX_DEVELOPER_CONFIG_XML}" > platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
-            make android-ui-test-arm-v7
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
-      - *save-gradle-cache
-      - *conditionally-skip-firebase
-      - *login-google-cloud-platform
-      - *run-android-instrumentation-tests
+          path: platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/armeabi-v7a/libmapbox-gl.so.gz
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
           destination: .
@@ -559,15 +585,7 @@ jobs:
       BUILDTYPE: Release
       IS_LOCAL_DEVELOPMENT: false
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *restore-gradle-cache
-      - *reset-ccache-stats
+      - install-dependencies: { gradle: true }
       - run:
           name: Generate Maven credentials
           command: |
@@ -591,11 +609,7 @@ jobs:
       - run:
           name: Build release Test App
           command: make android
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
-      - *save-gradle-cache
+      - save-dependencies: { gradle: true }
       - run:
           name: gzip debugable .so files
           command: |
@@ -636,22 +650,12 @@ jobs:
       WITH_EGL: 1
       WITH_CXX11ABI: 0
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
-      - *build-node
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
-      - *run-node-linux-tests
-      - *publish-node-package
-      - *upload-render-tests
+      - install-dependencies
+      - build-node
+      - save-dependencies
+      - run-node-linux-tests
+      - publish-node-package
+      - upload-render-tests
 
 # ------------------------------------------------------------------------------
   node-gcc6-debug:
@@ -665,22 +669,12 @@ jobs:
       BUILDTYPE: Debug
       WITH_EGL: 1
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
-      - *build-node
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
-      - *run-node-linux-tests-recycle-map
-      - *publish-node-package
-      - *upload-render-tests-recycle-map
+      - install-dependencies
+      - build-node
+      - save-dependencies
+      - run-node-linux-tests-recycle-map
+      - publish-node-package
+      - upload-render-tests-recycle-map
 
 # ------------------------------------------------------------------------------
   node-macos-release:
@@ -690,29 +684,19 @@ jobs:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *install-macos-dependencies
-      - *install-node-macos-dependencies
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
-      - *build-node
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
-      - *run-node-macos-tests
-      - *publish-node-package
-      - *upload-render-tests
-      - *collect-xcode-build-logs
-      - *upload-xcode-build-logs
+      - install-macos-dependencies
+      - install-node-macos-dependencies
+      - install-dependencies
+      - build-node
+      - save-dependencies
+      - run-node-macos-tests
+      - publish-node-package
+      - upload-render-tests
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
-  linux-clang-3.8-libcxx-debug:
+  linux-clang-38-libcxx-debug:
     docker:
       - image: mbgl/7d2403f42e:linux-clang-3.8-libcxx
     working_directory: /src
@@ -723,19 +707,9 @@ jobs:
       WITH_EGL: 1
       WITH_CXX11ABI: 1
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
-      - *build-linux
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
+      - install-dependencies
+      - build-linux
+      - save-dependencies
 
 # ------------------------------------------------------------------------------
   linux-clang4-sanitize-address:
@@ -752,20 +726,10 @@ jobs:
       LDFLAGS: -fsanitize=address
       ASAN_OPTIONS: detect_leaks=0:color=always:print_summary=1
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
-      - *setup-llvm-symbolizer
-      - *build-test
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
+      - install-dependencies
+      - setup-llvm-symbolizer
+      - build-test
+      - save-dependencies
       - run:
           name: Run tests
           command: |
@@ -788,20 +752,10 @@ jobs:
       LDFLAGS: -fsanitize=undefined
       UBSAN_OPTIONS: print_stacktrace=1:color=always:print_summary=1
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
-      - *setup-llvm-symbolizer
-      - *build-test
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
+      - install-dependencies
+      - setup-llvm-symbolizer
+      - build-test
+      - save-dependencies
       - run:
           name: Run tests
           command: |
@@ -824,20 +778,10 @@ jobs:
       LDFLAGS: -fsanitize=thread
       TSAN_OPTIONS: color=always:print_summary=1
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
-      - *setup-llvm-symbolizer
-      - *build-test
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
+      - install-dependencies
+      - setup-llvm-symbolizer
+      - build-test
+      - save-dependencies
       - run:
           name: Run tests
           command: |
@@ -846,7 +790,7 @@ jobs:
             [ -z "$(sed -n '/^SUMMARY: ThreadSanitizer:/p' sanitizer)" ]
 
 # ------------------------------------------------------------------------------
-  linux-gcc4.9-debug:
+  linux-gcc49-debug:
     docker:
       - image: mbgl/7d2403f42e:linux-gcc-4.9
     resource_class: large
@@ -859,22 +803,12 @@ jobs:
       WITH_CXX11ABI: 0
       DISPLAY: :0
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
-      - *build-linux
-      - *build-benchmark
-      - *build-test
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
-      - *run-unit-tests
+      - install-dependencies
+      - build-linux
+      - build-benchmark
+      - build-test
+      - save-dependencies
+      - run-unit-tests
 
 # ------------------------------------------------------------------------------
   linux-gcc5-debug-coverage:
@@ -889,95 +823,45 @@ jobs:
       WITH_EGL: 1
       WITH_COVERAGE: 1
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
-      - *build-linux
-      - *build-benchmark
-      - *build-test
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
-      - *run-unit-tests
+      - install-dependencies
+      - build-linux
+      - build-benchmark
+      - build-test
+      - save-dependencies
+      - run-unit-tests
       - run:
           name: Upload coverage results to coveralls
           command: |
             platform/linux/scripts/coveralls.sh
 
 # ------------------------------------------------------------------------------
-  ios-debug:
+  ios-debug-template:
+    parameters:
+      xcode:
+        type: string
     macos:
-      xcode: "9.4.1"
+      xcode: << parameters.xcode >>
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *install-macos-dependencies
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
-      - *build-ios-test
-      - *build-ios-integration-test
-      - *check-public-symbols
+      - install-macos-dependencies
+      - install-dependencies
+      - build-ios-test
+      - build-ios-integration-test
+      - check-public-symbols
       - run:
           name: Lint plist files
           command: make ios-lint
       - run:
           name: Nitpick Darwin code generation
           command: scripts/nitpick/generated-code.js darwin
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
-      - *collect-xcode-build-logs
-      - *upload-xcode-build-logs
+      - save-dependencies
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
-  ios-debug-xcode10:
-    macos:
-      xcode: "10.0.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-    steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *install-macos-dependencies
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
-      - *build-ios-test
-      - *build-ios-integration-test
-      - *check-public-symbols
-      - run:
-          name: Lint plist files
-          command: make ios-lint
-      - run:
-          name: Nitpick Darwin code generation
-          command: scripts/nitpick/generated-code.js darwin
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
-      - *collect-xcode-build-logs
-      - *upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  ios-sanitize:
+  ios-sanitize-nightly:
     macos:
       xcode: "9.4.1"
     environment:
@@ -985,28 +869,18 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
       SLACK_CHANNEL: C0ACM9Q2C
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *install-macos-dependencies
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
+      - install-macos-dependencies
+      - install-dependencies
       - run:
           name: Build and run SDK unit tests with thread and undefined behavior sanitizers
           command: make ios-sanitize
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
-      - *collect-xcode-build-logs
-      - *upload-xcode-build-logs
-      - *notify-slack-nightly-failure
+      - save-dependencies
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
+      - notify-slack-nightly-failure
 
 # ------------------------------------------------------------------------------
-  ios-sanitize-address:
+  ios-sanitize-address-nightly:
     macos:
       xcode: "9.4.1"
     environment:
@@ -1014,28 +888,18 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
       SLACK_CHANNEL: C0ACM9Q2C
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *install-macos-dependencies
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
+      - install-macos-dependencies
+      - install-dependencies
       - run:
           name: Build and run SDK unit tests with address sanitizer
           command: make ios-sanitize-address
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
-      - *collect-xcode-build-logs
-      - *upload-xcode-build-logs
-      - *notify-slack-nightly-failure
+      - save-dependencies
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
+      - notify-slack-nightly-failure
 
 # ------------------------------------------------------------------------------
-  ios-static-analyzer:
+  ios-static-analyzer-nightly:
     macos:
       xcode: "9.4.1"
     environment:
@@ -1043,28 +907,18 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
       SLACK_CHANNEL: C0ACM9Q2C
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *install-macos-dependencies
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
+      - install-macos-dependencies
+      - install-dependencies
       - run:
           name: Build and run SDK unit tests with the static analyzer
           command: make ios-static-analyzer
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
-      - *collect-xcode-build-logs
-      - *upload-xcode-build-logs
-      - *notify-slack-nightly-failure
+      - save-dependencies
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
+      - notify-slack-nightly-failure
 
 # ------------------------------------------------------------------------------
-  ios-release:
+  ios-release-template:
     macos:
       xcode: "10.0.0"
     environment:
@@ -1072,16 +926,9 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
       SLACK_CHANNEL: C0ACM9Q2C
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *install-macos-dependencies
-      - *install-ios-packaging-dependencies
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
+      - install-macos-dependencies
+      - install-ios-packaging-dependencies
+      - install-dependencies
       - run:
           name: Build dynamic framework for device and simulator
           command: make iframework
@@ -1095,13 +942,10 @@ jobs:
       - run:
           name: Record size
           command: platform/ios/scripts/metrics.sh
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
-      - *collect-xcode-build-logs
-      - *upload-xcode-build-logs
-      - *notify-slack-nightly-failure
+      - save-dependencies
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
+      - notify-slack-nightly-failure
 
 # ------------------------------------------------------------------------------
   ios-release-tag:
@@ -1118,27 +962,18 @@ jobs:
           command: |
             export SLACK_MESSAGE="<$CIRCLE_BUILD_URL|Release build for \`$CIRCLE_TAG\` started.>"
             scripts/notify-slack.sh
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *install-macos-dependencies
-      - *install-ios-packaging-dependencies
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
+      - install-macos-dependencies
+      - install-ios-packaging-dependencies
+      - install-dependencies
       - run:
           name: Build, package, and upload iOS release
           command: |
             export VERSION_TAG=${CIRCLE_TAG}
             export GITHUB_TOKEN=${DANGER_GITHUB_API_TOKEN}
             platform/ios/scripts/deploy-packages.sh
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
-      - *collect-xcode-build-logs
-      - *upload-xcode-build-logs
+      - save-dependencies
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
       - run:
           name: Send a Slack notification on failure
           when: on_fail
@@ -1162,32 +997,22 @@ jobs:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *install-macos-dependencies
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
-      - *build-macos-test
-      - *check-public-symbols
+      - install-macos-dependencies
+      - install-dependencies
+      - build-macos-test
+      - check-public-symbols
       - run:
           name: Lint plist files
           command: make macos-lint
       - run:
           name: Nitpick Darwin code generation
           command: scripts/nitpick/generated-code.js darwin
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
+      - save-dependencies
       - store_artifacts:
           path: test/fixtures
           destination: test/fixtures
-      - *collect-xcode-build-logs
-      - *upload-xcode-build-logs
+      - collect-xcode-build-logs
+      - upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   qt4-linux-gcc5-release:
@@ -1202,20 +1027,10 @@ jobs:
       GTEST_OUTPUT: xml
       LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
-      - *build-qt-app
-      - *build-qt-test
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
+      - install-dependencies
+      - build-qt-app
+      - build-qt-test
+      - save-dependencies
       - run:
           name: Run memory-load tests
           command: |
@@ -1235,23 +1050,13 @@ jobs:
       BUILDTYPE: Release
       WITH_QT_I18N: 1
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
-      - *build-qt-app
-      - *build-qt-test
+      - install-dependencies
+      - build-qt-app
+      - build-qt-test
       - run:
           name: Build qt-docs
           command: make qt-docs
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
+      - save-dependencies
       - run:
           name: Run valgrind-backed tests
           environment:
@@ -1268,25 +1073,15 @@ jobs:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
-      - checkout
-      - *restore-node_modules-cache
-      - *npm-install
-      - *prepare-environment
-      - *install-macos-dependencies
-      - *install-qt-macos-dependencies
-      - *prepare-ccache
-      - *restore-mason_packages-cache
-      - *restore-ccache
-      - *reset-ccache-stats
-      - *build-qt-app
-      - *build-qt-test
+      - install-macos-dependencies
+      - install-qt-macos-dependencies
+      - install-dependencies
+      - build-qt-app
+      - build-qt-test
       - run:
           name: Run qt-test
           command: make run-qt-test
-      - *show-ccache-stats
-      - *save-node_modules-cache
-      - *save-mason_packages-cache
-      - *save-ccache
+      - save-dependencies
       - store_artifacts:
           path: test/fixtures
           destination: test/fixtures
