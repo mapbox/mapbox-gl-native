@@ -71,9 +71,8 @@ void QMapboxGLMapRenderer::render()
         // Lock on the parameters
         std::lock_guard<std::mutex> lock(m_updateMutex);
 
-        if (!m_updateParameters) {
-            return;
-        }
+        // UpdateParameters should always be available when rendering.
+        assert(m_updateParameters);
 
         // Hold on to the update parameters during render
         params = m_updateParameters;

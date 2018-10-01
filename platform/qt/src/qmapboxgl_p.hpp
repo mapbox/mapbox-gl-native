@@ -54,6 +54,7 @@ private:
 
     std::recursive_mutex m_mapRendererMutex;
     std::shared_ptr<mbgl::RendererObserver> m_rendererObserver;
+    std::shared_ptr<mbgl::UpdateParameters> m_updateParameters;
 
     std::unique_ptr<QMapboxGLMapObserver> m_mapObserver;
     std::shared_ptr<mbgl::DefaultFileSource> m_fileSourceObj;
