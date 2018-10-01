@@ -700,6 +700,9 @@ optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type typ
             [&] (const type::Array& array) -> optional<std::unique_ptr<Expression>> {
                 return assertion(array, get(literal(*property)));
             },
+            [&] (const type::FormattedType&) -> optional<std::unique_ptr<Expression>> {
+                return format(get(literal(*property)));
+            },
             [&] (const auto&) -> optional<std::unique_ptr<Expression>>  {
                 assert(false); // No properties use this type.
                 return nullopt;

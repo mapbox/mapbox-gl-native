@@ -92,3 +92,21 @@ TEST(StyleConversion, TokenStrings) {
     ASSERT_EQ(*convertTokenStringToExpression("{token} {token"), *concat(vec(get(literal("token")), literal(" "), literal("{token"))));
     ASSERT_EQ(*convertTokenStringToExpression("{token {token}"), *concat(vec(literal("{token "), get(literal("token")))));
 }
+
+
+TEST(StyleConversion, FormattedIdentityFunction) {
+    // See https://github.com/mapbox/mapbox-gl-js/issues/7311
+    // We never introduced this bug on gl-native, but we _almost_ did
+    Error error;
+
+    auto parseFunction = [&](const std::string& json) {
+        return convertJSON<PropertyValue<mbgl::style::expression::Formatted>>(json, error, true, false);
+    };
+    
+    using namespace mbgl::style::expression::dsl;
+
+    auto fn1 = parseFunction(R"({ "property": "name", "type": "identity" })");
+    ASSERT_TRUE(bool(fn1));
+    ASSERT_TRUE(fn1->isExpression());
+    ASSERT_EQ(fn1->asExpression().getExpression(), *format(get(literal("name"))));
+}
