@@ -229,6 +229,12 @@ public:
 
 /// Currently shown popover representing the selected annotation.
 @property (nonatomic) UIView<MGLCalloutView> *calloutViewForSelectedAnnotation;
+
+/// Anchor coordinate from which to present callout views (for example, for shapes this
+/// could be the touch point rather than its centroid)
+@property (nonatomic) CLLocationCoordinate2D anchorCoordinateForSelectedAnnotation;
+
+
 @property (nonatomic) MGLUserLocationAnnotationView *userLocationAnnotationView;
 
 /// Indicates how thoroughly the map view is tracking the user location.
@@ -4423,7 +4429,8 @@ public:
         calloutPositioningRect = { .origin = originPoint, .size = CGSizeZero };
     }
 
-    CGRect expandedPositioningRect = UIEdgeInsetsInsetRect(calloutPositioningRect, MGLMapViewOffscreenAnnotationPadding);
+    
+    CGRect expandedPositioningRect = calloutPositioningRect;
 
     // Used for callout positioning, and moving offscreen annotations onscreen.
     CGRect constrainedRect = self.contentFrame;
@@ -4495,8 +4502,14 @@ public:
 
         // If the callout view provides inset (outset) information, we can use it to expand our positioning
         // rect, which we then use to help move the annotation on-screen if want need to.
-        if (moveOnscreen && [calloutView respondsToSelector:@selector(marginInsetsHintForPresentationFromRect:)]) {
-            UIEdgeInsets margins = [calloutView marginInsetsHintForPresentationFromRect:calloutPositioningRect];
+        if (moveOnscreen) {
+            
+            UIEdgeInsets margins = MGLMapViewOffscreenAnnotationPadding;
+            
+            if ([calloutView respondsToSelector:@selector(marginInsetsHintForPresentationFromRect:)]) {
+                margins = [calloutView marginInsetsHintForPresentationFromRect:calloutPositioningRect];
+            }
+            
             expandedPositioningRect = UIEdgeInsetsInsetRect(expandedPositioningRect, margins);
         }
     }
@@ -4546,6 +4559,10 @@ public:
                       constrainedToRect:constrainedRect
                                animated:animated];
 
+    // Save the anchor coordinate
+    CGPoint anchorPoint = CGPointMake(CGRectGetMidX(calloutPositioningRect), CGRectGetMidY(calloutPositioningRect));
+    self.anchorCoordinateForSelectedAnnotation = [self convertPoint:anchorPoint toCoordinateFromView:self];
+    
     // notify delegate
     if ([self.delegate respondsToSelector:@selector(mapView:didSelectAnnotation:)])
     {
@@ -4561,6 +4578,7 @@ public:
     {
         CGPoint center = CGPointMake(CGRectGetMidX(constrainedRect), CGRectGetMidY(constrainedRect));
         CLLocationCoordinate2D centerCoord = [self convertPoint:center toCoordinateFromView:self];
+        
         [self setCenterCoordinate:centerCoord animated:animated];
     }
 }
@@ -4610,8 +4628,18 @@ public:
         return CGRectNull;
     }
     
+    CLLocationCoordinate2D coordinate;
+    
+    if ((annotation == self.selectedAnnotation) &&
+        CLLocationCoordinate2DIsValid(self.anchorCoordinateForSelectedAnnotation)) {
+        coordinate = self.anchorCoordinateForSelectedAnnotation;
+    }
+    else {
+        coordinate = annotation.coordinate;
+    }
+    
     if ([annotation isKindOfClass:[MGLMultiPoint class]]) {
-        CLLocationCoordinate2D origin = annotation.coordinate;
+        CLLocationCoordinate2D origin = coordinate;
         CGPoint originPoint = [self convertCoordinate:origin toPointToView:self];
         return CGRectMake(originPoint.x, originPoint.y, MGLAnnotationImagePaddingForHitTest, MGLAnnotationImagePaddingForHitTest);
     }
@@ -4626,7 +4654,7 @@ public:
         return CGRectZero;
     }
 
-    CGRect positioningRect = [self frameOfImage:image centeredAtCoordinate:annotation.coordinate];
+    CGRect positioningRect = [self frameOfImage:image centeredAtCoordinate:coordinate];
     positioningRect.origin.x -= 0.5;
 
     return CGRectInset(positioningRect, -MGLAnnotationImagePaddingForCallout,
@@ -4680,6 +4708,7 @@ public:
         // clean up
         self.calloutViewForSelectedAnnotation = nil;
         self.selectedAnnotation = nil;
+        self.anchorCoordinateForSelectedAnnotation = kCLLocationCoordinate2DInvalid;
 
         // notify delegate
         if ([self.delegate respondsToSelector:@selector(mapView:didDeselectAnnotation:)])
@@ -5889,6 +5918,7 @@ public:
 
 - (void)updateCalloutView
 {
+    // If we're moving the annotation and callout, don't update
     UIView <MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
     id <MGLAnnotation> annotation = calloutView.representedObject;
 
@@ -6014,6 +6044,7 @@ public:
 
 /// Intended center point of the user location annotation view with respect to
 /// the overall map view (but respecting the content inset).
+
 - (CGPoint)userLocationAnnotationViewCenter
 {
     if ([self.delegate respondsToSelector:@selector(mapViewUserLocationAnchorPoint:)])
