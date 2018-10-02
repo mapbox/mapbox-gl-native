@@ -1331,7 +1331,7 @@ MGL_EXPORT IB_DESIGNABLE
  Note that a selection initiated by a single tap gesture is always animated.
  
  @param annotation The annotation object to select.
- @param animated If `YES`, the annotation and callout view are moved on-screen.
+ @param animated If `YES`, the annotation and callout view are animated on-screen.
 
  @note In versions prior to `4.0.0` selecting an offscreen annotation did not
  change the camera.

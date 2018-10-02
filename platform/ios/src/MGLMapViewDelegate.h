@@ -474,7 +474,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)mapView:(MGLMapView *)mapView shouldMoveAnnotationOnscreenInResponseToUserSelection:(id <MGLAnnotation>)annotation;
 
-
 /**
  Tells the delegate that one of its annotations was selected.
 

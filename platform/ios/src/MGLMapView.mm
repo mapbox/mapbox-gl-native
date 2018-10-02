@@ -234,7 +234,6 @@ public:
 /// could be the touch point rather than its centroid)
 @property (nonatomic) CLLocationCoordinate2D anchorCoordinateForSelectedAnnotation;
 
-
 @property (nonatomic) MGLUserLocationAnnotationView *userLocationAnnotationView;
 
 /// Indicates how thoroughly the map view is tracking the user location.
@@ -4428,7 +4427,6 @@ public:
         CGPoint originPoint = [self convertCoordinate:origin toPointToView:self];
         calloutPositioningRect = { .origin = originPoint, .size = CGSizeZero };
     }
-
     
     CGRect expandedPositioningRect = calloutPositioningRect;
 
@@ -4503,7 +4501,6 @@ public:
         // If the callout view provides inset (outset) information, we can use it to expand our positioning
         // rect, which we then use to help move the annotation on-screen if want need to.
         if (moveOnscreen) {
-            
             UIEdgeInsets margins = MGLMapViewOffscreenAnnotationPadding;
             
             if ([calloutView respondsToSelector:@selector(marginInsetsHintForPresentationFromRect:)]) {
@@ -4578,7 +4575,6 @@ public:
     {
         CGPoint center = CGPointMake(CGRectGetMidX(constrainedRect), CGRectGetMidY(constrainedRect));
         CLLocationCoordinate2D centerCoord = [self convertPoint:center toCoordinateFromView:self];
-        
         [self setCenterCoordinate:centerCoord animated:animated];
     }
 }
@@ -5918,7 +5914,6 @@ public:
 
 - (void)updateCalloutView
 {
-    // If we're moving the annotation and callout, don't update
     UIView <MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
     id <MGLAnnotation> annotation = calloutView.representedObject;
 
@@ -6044,7 +6039,6 @@ public:
 
 /// Intended center point of the user location annotation view with respect to
 /// the overall map view (but respecting the content inset).
-
 - (CGPoint)userLocationAnnotationViewCenter
 {
     if ([self.delegate respondsToSelector:@selector(mapViewUserLocationAnchorPoint:)])
