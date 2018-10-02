@@ -252,6 +252,10 @@ ios-sanitize-address: $(IOS_PROJ_PATH)
 ios-static-analyzer: $(IOS_PROJ_PATH)
 	set -o pipefail && $(IOS_XCODEBUILD_SIM) analyze -scheme 'CI' test $(XCPRETTY)
 
+.PHONY: ios-check-events-symbols
+ios-check-events-symbols:
+	./platform/ios/scripts/check-events-symbols.sh
+
 .PHONY: ipackage
 ipackage: ipackage*
 ipackage%:
