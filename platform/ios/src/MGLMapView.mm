@@ -3457,10 +3457,14 @@ public:
 }
 
 - (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(UIEdgeInsets)insets {
+    return [self cameraThatFitsShape:shape direction:direction pitch:0 edgePadding:insets];
+}
+
+- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction pitch:(CGFloat)pitch edgePadding:(UIEdgeInsets)insets {
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
     padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
     
-    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForGeometry([shape geometryObject], padding, direction);
+    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForGeometry([shape geometryObject], padding, direction, pitch);
     
     return [self cameraForCameraOptions:cameraOptions];
 }

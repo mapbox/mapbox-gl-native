@@ -531,6 +531,20 @@ MGL_EXPORT IB_DESIGNABLE
 - (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(NSEdgeInsets)insets;
 
 /**
+ Returns the camera that best fits the given shape, with the specified direction and pitch,
+ optionally with some additional padding on each side.
+ 
+ @param shape The shape to fit to the receiver’s viewport.
+ @param direction The direction of the viewport, measured in degrees clockwise from true north.
+ @param pitch of the map to use in evaluating the shape to fit.
+ @param insets The minimum padding (in screen points) that would be visible
+ around the returned camera object if it were set as the receiver’s camera.
+ @return A camera object centered on the shape's center with zoom level as high
+ (close to the ground) as possible while still including the entire shape.
+ */
+- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction pitch:(CGFloat)pitch edgePadding:(NSEdgeInsets)insets;
+
+/**
  A Boolean value indicating whether the receiver automatically adjusts its
  content insets.
 
