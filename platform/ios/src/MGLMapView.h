@@ -1318,10 +1318,6 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, copy) NSArray<id <MGLAnnotation>> *selectedAnnotations;
 
 /**
- TODO: update documentation
- TODO: consider deprecation, and replacing with a `selectAnnotation:` that uses the proposed delegate
- methods.
-
  Selects an annotation and displays its callout view.
 
  The `animated` parameter determines whether the map is panned to bring the
@@ -1330,17 +1326,15 @@ MGL_EXPORT IB_DESIGNABLE
  | `animated` parameter | Effect |
  |------------------|--------|
  | `NO`             | The annotation is selected, and the callout is presented. However the map is not panned to bring the annotation or callout onscreen.
- | `YES`            | The annotation is selected, and the callout is presented. If the annotation is offscreen *and* is of type `MGLPointAnnotation`, the map is panned so that the annotation and its callout are brought just onscreen. The annotation is *not* centered within the viewport. |
+ | `YES`            | The annotation is selected, and the callout is presented. If the annotation is offscreen, the map is panned so that the annotation and its callout are brought just onscreen. The annotation is *not* centered within the viewport. |
 
+ Note that a selection initiated by a single tap gesture is always animated.
+ 
  @param annotation The annotation object to select.
  @param animated If `YES`, the annotation and callout view are moved on-screen.
 
  @note In versions prior to `4.0.0` selecting an offscreen annotation did not
  change the camera.
- 
- @note The `animated` parameter can be considered the same as the value returned from
- `-[MGLMapViewDelgate mapView:shouldMoveOnscreenWhenSelectingAnnotation:]`.
- See also `-[MGLMapViewDelegate mapView:shouldAnimateAnnotationSelection:` for animation control
  */
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
 

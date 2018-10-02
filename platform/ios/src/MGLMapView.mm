@@ -1715,11 +1715,11 @@ public:
         
         BOOL moveOnscreen = YES;
         
-        if ([self.delegate respondsToSelector:@selector(mapView:shouldMoveOnscreenWhenSelectingAnnotation:)]) {
-            moveOnscreen = [self.delegate mapView:self shouldMoveOnscreenWhenSelectingAnnotation:annotation];
+        if ([self.delegate respondsToSelector:@selector(mapView:shouldMoveAnnotationOnscreenInResponseToUserSelection:)]) {
+            moveOnscreen = [self.delegate mapView:self shouldMoveAnnotationOnscreenInResponseToUserSelection:annotation];
         }
         
-        [self selectAnnotation:annotation moveOnscreen:moveOnscreen calloutPositioningRect:positionRect];
+        [self selectAnnotation:annotation animated:YES moveOnscreen:moveOnscreen calloutPositioningRect:positionRect];
     }
     else if (self.selectedAnnotation)
     {
@@ -4370,12 +4370,17 @@ public:
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
-    CGRect positioningRect = [self positioningRectForAnnotation:annotation defaultCalloutPoint:CGPointZero];
-    
-    [self selectAnnotation:annotation moveOnscreen:animated calloutPositioningRect:positioningRect];
+    [self selectAnnotation:annotation animated:animated moveOnscreen:animated];
 }
 
-- (void)selectAnnotation:(id <MGLAnnotation>)annotation moveOnscreen:(BOOL)moveOnscreen calloutPositioningRect:(CGRect)calloutPositioningRect
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated moveOnscreen:(BOOL)moveOnscreen
+{
+    CGRect positioningRect = [self positioningRectForAnnotation:annotation defaultCalloutPoint:CGPointZero];
+    
+    [self selectAnnotation:annotation animated:animated moveOnscreen:moveOnscreen calloutPositioningRect:positioningRect];
+}
+
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated moveOnscreen:(BOOL)moveOnscreen calloutPositioningRect:(CGRect)calloutPositioningRect
 {
     if ( ! annotation) return;
 
@@ -4383,12 +4388,6 @@ public:
 
     [self deselectAnnotation:self.selectedAnnotation animated:NO];
 
-    BOOL animateSelection = YES;
-    
-    if ([self.delegate respondsToSelector:@selector(mapView:shouldAnimateAnnotationSelection:)]) {
-        animateSelection = [self.delegate mapView:self shouldAnimateAnnotationSelection:annotation];
-    }
-    
     // Add the annotation to the map if it hasn’t been added yet.
     MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
     if (annotationTag == MGLAnnotationTagNotFound && annotation != self.userLocation)
@@ -4409,7 +4408,7 @@ public:
                 calloutPositioningRect = annotationView.frame;
                 [annotationView.superview bringSubviewToFront:annotationView];
 
-                [annotationView setSelected:YES animated:animateSelection];
+                [annotationView setSelected:YES animated:animated];
             }
         }
 
@@ -4545,7 +4544,7 @@ public:
     [calloutView presentCalloutFromRect:calloutPositioningRect
                                  inView:self.glView
                       constrainedToRect:constrainedRect
-                               animated:animateSelection];
+                               animated:animated];
 
     // notify delegate
     if ([self.delegate respondsToSelector:@selector(mapView:didSelectAnnotation:)])
@@ -4562,7 +4561,7 @@ public:
     {
         CGPoint center = CGPointMake(CGRectGetMidX(constrainedRect), CGRectGetMidY(constrainedRect));
         CLLocationCoordinate2D centerCoord = [self convertPoint:center toCoordinateFromView:self];
-        [self setCenterCoordinate:centerCoord animated:animateSelection];
+        [self setCenterCoordinate:centerCoord animated:animated];
     }
 }
 

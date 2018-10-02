@@ -461,32 +461,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 /**
- TODO: document
- Returns a Boolean value indicating whether the annotation should be moved on-screen.
+ Returns a Boolean value indicating whether the annotation should be moved on-screen
+ in response to a single tap selection.
  
- If the delegate does not implement this method, the default is `YES`.
+ If the delegate does not implement this method, the default value is `YES`.
  
- This method is useful in cases where the selection is not programmatic (e.g. user taps an annotation)
- The value returned from this method can be considered the same as the `animated` parameter passed to
- `-selectAnnotation:animated:`
+ Note that user-initiated selections are always animated.
+ 
+ @param mapView The map view that has selected the annotation.
+ @param annotation The object representing the shape annotation.
+ @return A Boolean value indicating whether the annotation should be moved onscreen if it and its callout (if it has one) are offscreen.
  */
-- (BOOL)mapView:(MGLMapView *)mapView shouldMoveOnscreenWhenSelectingAnnotation:(id <MGLAnnotation>)annotation;
+- (BOOL)mapView:(MGLMapView *)mapView shouldMoveAnnotationOnscreenInResponseToUserSelection:(id <MGLAnnotation>)annotation;
 
-
-/**
- TODO: document
- Returns a Boolean value indicating whether the annotation's visual changes should be animated.
- Specifically this controls:
- - The annotation's selection change
- - The presentation of the annotation's callout (if applicable)
- - When moving an off-screen annotation, whether that movement is animated.
- 
- If the delegate does not implement this method, the default is `YES`.
- 
- The value returned from this method is NOT the same as the `animated` parameter passed to
- `-selectAnnotation:animated:`
- */
-- (BOOL)mapView:(MGLMapView *)mapView shouldAnimateAnnotationSelection:(id <MGLAnnotation>)annotation;
 
 /**
  Tells the delegate that one of its annotations was selected.
