@@ -55,6 +55,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsAnnotationsRows) {
     MBXSettingsAnnotationsCustomCallout,
     MBXSettingsAnnotationsQueryAnnotations,
     MBXSettingsAnnotationsCustomUserDot,
+    MBXSettingsOffsetUserLocationAnnotation,
+    MBXSettingsResetUserLocationAnnotationOffset,
     MBXSettingsAnnotationsRemoveAnnotations,
     MBXSettingsAnnotationSelectRandomOffscreenPointAnnotation,
     MBXSettingsAnnotationCenterSelectedAnnotation,
@@ -199,6 +201,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 @property (nonatomic) BOOL mapInfoHUDEnabled;
 @property (nonatomic) BOOL shouldLimitCameraChanges;
 @property (nonatomic) BOOL randomWalk;
+@property (nonatomic) CGPoint userLocationOffset;
 @end
 
 @interface MGLMapView (MBXViewController)
@@ -237,6 +240,12 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     self.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
     self.mapView.showsScale = YES;
     self.mapView.showsUserHeadingIndicator = YES;
+    
+    if (self.mapView.showsUserLocation) {
+        self.userLocationOffset = [self centerUserLocationAnchorPoint];
+        [self.mapView updateUserLocationAnnotationView];
+    }
+    
     self.hudLabel.titleLabel.font = [UIFont monospacedDigitSystemFontOfSize:10 weight:UIFontWeightRegular];
 
     if ([MGLAccountManager accessToken].length)
@@ -410,6 +419,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 @"Add Point With Custom Callout",
                 @"Query Annotations",
                 [NSString stringWithFormat:@"%@ Custom User Dot", (_customUserLocationAnnnotationEnabled ? @"Disable" : @"Enable")],
+                @"Offset user location annotation",
+                @"Reset user location annotation offset",
                 @"Remove Annotations",
                 @"Select an offscreen point annotation",
                 @"Center selected annotation",
@@ -541,6 +552,12 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                     break;
                 case MBXSettingsAnnotationsCustomUserDot:
                     [self toggleCustomUserDot];
+                    break;
+                case MBXSettingsOffsetUserLocationAnnotation:
+                    [self offsetUserLocationAnnotation];
+                    break;
+                case MBXSettingsResetUserLocationAnnotationOffset:
+                    [self resetUserLocationAnnotationOffset];
                     break;
                 case MBXSettingsAnnotationsRemoveAnnotations:
                     [self.mapView removeAnnotations:self.mapView.annotations];
@@ -1580,6 +1597,47 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     self.mapView.userTrackingMode = MGLUserTrackingModeFollow;
 }
 
+- (void)offsetUserLocationAnnotation
+{
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Set anchor point"
+                                                                   message:@"Enter a X/Y value"
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.keyboardType = UIKeyboardTypeDecimalPad;
+        textField.placeholder = @"Center X offset";
+    }];
+    
+    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.keyboardType = UIKeyboardTypeDecimalPad;
+        textField.placeholder = @"Center Y offset";
+    }];
+    
+    UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * action) {
+                                                              CGFloat xOffset = [alert.textFields[0].text floatValue];
+                                                              CGFloat yOffset = [alert.textFields[1].text floatValue];
+                                                              
+                                                              self.userLocationOffset = CGPointMake(xOffset, yOffset);
+                                                              [self.mapView updateUserLocationAnnotationView];
+                                                          }];
+    
+    [alert addAction:defaultAction];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+- (void)resetUserLocationAnnotationOffset
+{
+    self.userLocationOffset = [self centerUserLocationAnchorPoint];
+    [self.mapView updateUserLocationAnnotationView];
+}
+
+-(CGPoint)centerUserLocationAnchorPoint
+{
+    CGFloat centerX = CGRectGetMidX(self.mapView.frame);
+    CGFloat centerY = CGRectGetMidY(self.mapView.frame) - self.mapView.contentInset.top;
+    return CGPointMake(centerX, centerY);
+}
+
 - (void)testQueryPointAnnotations {
     NSNumber *visibleAnnotationCount = @(self.mapView.visibleAnnotations.count);
     NSString *message;
@@ -2112,6 +2170,10 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     [UIView animateWithDuration:0.25 animations:^{
         self.navigationItem.rightBarButtonItem.image = newButtonImage;
     }];
+}
+
+- (CGPoint)mapViewUserLocationAnchorPoint:(MGLMapView *)mapView {
+    return self.userLocationOffset;
 }
 
 - (nullable id <MGLCalloutView>)mapView:(__unused MGLMapView *)mapView calloutViewForAnnotation:(id<MGLAnnotation>)annotation
