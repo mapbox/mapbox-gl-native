@@ -12,6 +12,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Proguard config revision [#12929](https://github.com/mapbox/mapbox-gl-native/pull/12929)
  - Improve compatibility of offline packs between devices [#12933](https://github.com/mapbox/mapbox-gl-native/pull/12933)
  - Update telemetry dependency to 3.2.1 [#12974](https://github.com/mapbox/mapbox-gl-native/pull/12974)
+ - Fix an issue where some tiles weren't rendered correctly when no internet connectivity was available [#12931](https://github.com/mapbox/mapbox-gl-native/pull/12931)
  
 ## 6.6.0-alpha.1 - September 19, 2018
  - Merge LocationLayerPlugin to the Maps SDK [#12786](https://github.com/mapbox/mapbox-gl-native/pull/12786)
