@@ -18,6 +18,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Other changes	
 
+* Added `[MGLMapView cameraThatFitsShape: direction: pitch: edgePadding:]` for getting a camera that fits shape with a specific pitch.([#13007](https://github.com/mapbox/mapbox-gl-native/pull/13007))
 * Added `MGLAltitudeForZoomLevel` and `MGLZoomLevelForAltitude` to public API for conversion between zoom levels and altitudes. ([#12986](https://github.com/mapbox/mapbox-gl-native/pull/12986))
 * Deprecated the `+[MGLMapCamera cameraLookingAtCenterCoordinate:fromDistance:pitch:heading:]` method in favor of `+[MGLMapCamera cameraLookingAtCenterCoordinate:altitude:pitch:heading:]` and `+[MGLMapCamera cameraLookingAtCenterCoordinate:acrossDistance:pitch:heading:]`. ([#12966](https://github.com/mapbox/mapbox-gl-native/pull/12966))
 * Fixed an issue where `+[MGLMapCamera cameraLookingAtCenterCoordinate:fromEyeCoordinate:eyeAltitude:]` created a camera looking from the wrong eye coordinate. ([#12966](https://github.com/mapbox/mapbox-gl-native/pull/12966))
