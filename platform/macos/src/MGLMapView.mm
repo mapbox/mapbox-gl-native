@@ -1303,12 +1303,17 @@ public:
 }
 
 - (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(NSEdgeInsets)insets {
-    return [self cameraThatFitsShape:shape direction:direction pitch:0 edgePadding:insets];
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
+    padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
+
+    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForGeometry([shape geometryObject], padding, direction);
+    
+    return [self cameraForCameraOptions:cameraOptions];
 }
 
 - (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction pitch:(CGFloat)pitch edgePadding:(NSEdgeInsets)insets {
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
-    padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
+    padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
     
     mbgl::CameraOptions cameraOptions = _mbglMap->cameraForGeometry([shape geometryObject], padding, direction, pitch);
     
