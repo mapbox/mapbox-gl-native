@@ -294,7 +294,7 @@ commands:
     steps:
     - run:
         name: Check public symbols
-        command: make check-public-symbols
+        command: make darwin-check-public-symbols
 
 
   conditionally-skip-firebase:

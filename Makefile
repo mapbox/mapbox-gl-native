@@ -280,8 +280,8 @@ style-code: darwin-style-code
 darwin-update-examples:
 	node platform/darwin/scripts/update-examples.js
 
-.PHONY: check-public-symbols
-check-public-symbols:
+.PHONY: darwin-check-public-symbols
+darwin-check-public-symbols:
 	node platform/darwin/scripts/check-public-symbols.js macOS iOS
 
 endif
