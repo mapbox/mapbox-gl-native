@@ -361,6 +361,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
 
         std::vector<std::reference_wrapper<RenderTile>> sortedTilesForInsertion;
+        const bool fillLayer = layer->is<RenderFillLayer>();
+        const bool lineLayer = layer->is<RenderLineLayer>();
+
         for (auto& sortedTile : sortedTiles) {
             auto& tile = sortedTile.get();
             if (!tile.tile.isRenderable()) {
@@ -372,8 +375,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                 sortedTilesForInsertion.emplace_back(tile);
                 tile.used = true;
 
-                // We only need clipping when we're _not_ drawing a symbol layer.
-                if (!symbolLayer) {
+                // We only need clipping when we're drawing fill or line layers.
+                if (fillLayer || lineLayer) {
                     tile.needsClipping = true;
                 }
             }
