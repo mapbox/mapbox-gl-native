@@ -64,13 +64,7 @@ void Transform::resize(const Size size) {
 #pragma mark - Camera
 
 CameraOptions Transform::getCameraOptions(const EdgeInsets& padding) const {
-    CameraOptions camera;
-    camera.center = getLatLng(padding);
-    camera.padding = padding;
-    camera.zoom = getZoom();
-    camera.angle = getAngle();
-    camera.pitch = getPitch();
-    return camera;
+    return state.getCameraOptions(padding);
 }
 
 /**
