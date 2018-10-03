@@ -90,15 +90,19 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     const bool zoomChanged = zoomHistory.update(updateParameters.transformState.getZoom(), updateParameters.timePoint);
 
+    const bool isMapModeContinuous = updateParameters.mode == MapMode::Continuous;
+
+    const TransitionOptions transitionOptions = isMapModeContinuous ? updateParameters.transitionOptions : TransitionOptions();
+
     const TransitionParameters transitionParameters {
         updateParameters.timePoint,
-        updateParameters.mode == MapMode::Continuous ? updateParameters.transitionOptions : TransitionOptions()
+        transitionOptions
     };
 
     const PropertyEvaluationParameters evaluationParameters {
         zoomHistory,
         updateParameters.timePoint,
-        updateParameters.mode == MapMode::Continuous ? util::DEFAULT_TRANSITION_DURATION : Duration::zero()
+        transitionOptions.duration.value_or(isMapModeContinuous ? util::DEFAULT_TRANSITION_DURATION : Duration::zero())
     };
 
     const TileParameters tileParameters {
