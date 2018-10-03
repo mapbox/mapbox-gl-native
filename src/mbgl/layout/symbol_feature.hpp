@@ -2,6 +2,7 @@
 
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/text/tagged_string.hpp>
 
 #include <array>
 #include <string>
@@ -23,7 +24,7 @@ public:
 
     std::unique_ptr<GeometryTileFeature> feature;
     GeometryCollection geometry;
-    optional<std::u16string> text;
+    optional<TaggedString> formattedText;
     optional<std::string> icon;
     std::size_t index;
 };

@@ -421,15 +421,15 @@ void SymbolLayer::setTextRotationAlignment(PropertyValue<AlignmentType> value) {
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
-PropertyValue<std::string> SymbolLayer::getDefaultTextField() {
+PropertyValue<expression::Formatted> SymbolLayer::getDefaultTextField() {
     return TextField::defaultValue();
 }
 
-PropertyValue<std::string> SymbolLayer::getTextField() const {
+PropertyValue<expression::Formatted> SymbolLayer::getTextField() const {
     return impl().layout.get<TextField>();
 }
 
-void SymbolLayer::setTextField(PropertyValue<std::string> value) {
+void SymbolLayer::setTextField(PropertyValue<expression::Formatted> value) {
     if (value == getTextField())
         return;
     auto impl_ = mutableImpl();
@@ -1928,22 +1928,15 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         
     }
     
-    if (property == Property::IconImage || property == Property::TextField) {
+    if (property == Property::IconImage) {
         Error error;
         optional<PropertyValue<std::string>> typedValue = convert<PropertyValue<std::string>>(value, error, true, true);
         if (!typedValue) {
             return error;
         }
         
-        if (property == Property::IconImage) {
-            setIconImage(*typedValue);
-            return nullopt;
-        }
-        
-        if (property == Property::TextField) {
-            setTextField(*typedValue);
-            return nullopt;
-        }
+        setIconImage(*typedValue);
+        return nullopt;
         
     }
     
@@ -1982,6 +1975,18 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
             setTextAnchor(*typedValue);
             return nullopt;
         }
+        
+    }
+    
+    if (property == Property::TextField) {
+        Error error;
+        optional<PropertyValue<expression::Formatted>> typedValue = convert<PropertyValue<expression::Formatted>>(value, error, true, true);
+        if (!typedValue) {
+            return error;
+        }
+        
+        setTextField(*typedValue);
+        return nullopt;
         
     }
     

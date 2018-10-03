@@ -465,6 +465,8 @@ include/mbgl/style/expression/dsl.hpp
 include/mbgl/style/expression/error.hpp
 include/mbgl/style/expression/expression.hpp
 include/mbgl/style/expression/find_zoom_curve.hpp
+include/mbgl/style/expression/format_expression.hpp
+include/mbgl/style/expression/formatted.hpp
 include/mbgl/style/expression/get_covering_stops.hpp
 include/mbgl/style/expression/interpolate.hpp
 include/mbgl/style/expression/interpolator.hpp
@@ -491,6 +493,8 @@ src/mbgl/style/expression/compound_expression.cpp
 src/mbgl/style/expression/dsl.cpp
 src/mbgl/style/expression/expression.cpp
 src/mbgl/style/expression/find_zoom_curve.cpp
+src/mbgl/style/expression/format_expression.cpp
+src/mbgl/style/expression/formatted.cpp
 src/mbgl/style/expression/get_covering_stops.cpp
 src/mbgl/style/expression/interpolate.cpp
 src/mbgl/style/expression/is_constant.cpp
@@ -620,6 +624,8 @@ src/mbgl/text/quads.cpp
 src/mbgl/text/quads.hpp
 src/mbgl/text/shaping.cpp
 src/mbgl/text/shaping.hpp
+src/mbgl/text/tagged_string.cpp
+src/mbgl/text/tagged_string.hpp
 
 # tile
 include/mbgl/tile/tile_id.hpp

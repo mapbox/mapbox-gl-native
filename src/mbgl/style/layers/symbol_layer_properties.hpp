@@ -112,9 +112,9 @@ struct TextRotationAlignment : LayoutProperty<AlignmentType> {
     static AlignmentType defaultValue() { return AlignmentType::Auto; }
 };
 
-struct TextField : DataDrivenLayoutProperty<std::string> {
+struct TextField : DataDrivenLayoutProperty<expression::Formatted> {
     static constexpr const char * key = "text-field";
-    static std::string defaultValue() { return ""; }
+    static expression::Formatted defaultValue() { return ""; }
 };
 
 struct TextFont : DataDrivenLayoutProperty<std::vector<std::string>> {

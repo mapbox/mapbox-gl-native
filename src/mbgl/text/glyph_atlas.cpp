@@ -14,7 +14,7 @@ GlyphAtlas makeGlyphAtlas(const GlyphMap& glyphs) {
     mapbox::ShelfPack pack(0, 0, options);
 
     for (const auto& glyphMapEntry : glyphs) {
-        const FontStack& fontStack = glyphMapEntry.first;
+        FontStackHash fontStack = glyphMapEntry.first;
         GlyphPositionMap& positions = result.positions[fontStack];
 
         for (const auto& entry : glyphMapEntry.second) {

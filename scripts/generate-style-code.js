@@ -38,6 +38,7 @@ global.evaluatedType = function (property) {
   case 'number':
     return 'float';
   case 'formatted':
+    return 'expression::Formatted';
   case 'string':
     return 'std::string';
   case 'enum':

@@ -7,6 +7,7 @@
 #include <mbgl/style/expression/step.hpp>
 #include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/compound_expression.hpp>
+#include <mbgl/style/expression/format_expression.hpp>
 
 namespace mbgl {
 namespace style {
@@ -77,6 +78,10 @@ std::unique_ptr<Expression> toString(std::unique_ptr<Expression> value) {
     return std::make_unique<Coercion>(type::String, vec(std::move(value)));
 }
 
+std::unique_ptr<Expression> toFormatted(std::unique_ptr<Expression> value) {
+    return std::make_unique<Coercion>(type::Formatted, vec(std::move(value)));
+}
+    
 std::unique_ptr<Expression> get(const char* value) {
     return get(literal(value));
 }
@@ -181,6 +186,16 @@ std::unique_ptr<Expression> concat(std::vector<std::unique_ptr<Expression>> inpu
     return compound("concat", std::move(inputs));
 }
 
+std::unique_ptr<Expression> format(const char* value) {
+    return std::make_unique<Literal>(Formatted(value));
+}
+    
+std::unique_ptr<Expression> format(std::unique_ptr<Expression> input) {
+    std::vector<FormatExpressionSection> sections;
+    sections.emplace_back(std::move(input), nullopt, nullopt);
+    return std::make_unique<FormatExpression>(sections);
+}
+    
 } // namespace dsl
 } // namespace expression
 } // namespace style
