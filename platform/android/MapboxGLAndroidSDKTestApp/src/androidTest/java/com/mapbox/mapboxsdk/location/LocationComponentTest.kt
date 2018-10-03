@@ -1100,6 +1100,29 @@ class LocationComponentTest : BaseActivityTest() {
   }
 
   @Test
+  fun cameraPositionSnappedToTargetIfExceedsThreshold() {
+    val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
+      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
+                                             uiController: UiController, context: Context) {
+        component.activateLocationComponent(context, false)
+        component.isLocationComponentEnabled = true
+        val target = LatLng(51.0, 17.0)
+        assertTrue(target.distanceTo(LatLng(location)) > LocationComponentConstants.INSTANT_LOCATION_TRANSITION_THRESHOLD)
+        component.cameraMode = CameraMode.NONE
+        component.forceLocationUpdate(location)
+        mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(target))
+        mapboxMap.moveCamera(CameraUpdateFactory.bearingTo(90.0))
+        component.cameraMode = CameraMode.TRACKING_GPS
+        assertEquals(location.bearing.toDouble(), mapboxMap.cameraPosition.bearing, 0.1)
+        assertEquals(location.latitude, mapboxMap.cameraPosition.target.latitude, 0.1)
+        assertEquals(location.longitude, mapboxMap.cameraPosition.target.longitude, 0.1)
+      }
+    }
+
+    executeComponentTest(componentAction)
+  }
+
+  @Test
   fun compassEngine_onComponentInitializedDefaultIsProvided() {
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
       override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
