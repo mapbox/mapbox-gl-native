@@ -149,4 +149,7 @@
     <!-- Camera tracking settings -->
     <public name="mapbox_trackingInitialMoveThreshold" format="float" type="attr"/>
     <public name="mapbox_trackingMultiFingerMoveThreshold" format="float" type="attr"/>
+
+    <!-- Animation duration multiplier -->
+    <public name="mapbox_trackingAnimationDurationMultiplier" format="float" type="attr" />
 </resources>
