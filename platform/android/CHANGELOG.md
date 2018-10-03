@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 6.6.0-beta.1 - October 3, 2018
+ - Add configuration to change the animation duration multiplier when tracking location [#13011](https://github.com/mapbox/mapbox-gl-native/pull/13011)
+ - Move camera and puck immediately when starting to track and displacement is big [#13013](https://github.com/mapbox/mapbox-gl-native/pull/13013)
+
 ## 6.6.0-alpha.2 - September 26, 2018
  - Expose offline database merge API [#12860](https://github.com/mapbox/mapbox-gl-native/pull/12860)
  - Remove unnecessary camera callbacks loops [#12973](https://github.com/mapbox/mapbox-gl-native/pull/12973)
