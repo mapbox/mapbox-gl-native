@@ -5254,10 +5254,15 @@ public:
         self.targetCoordinate,
     };
     UIEdgeInsets inset = self.edgePaddingForFollowingWithCourse;
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     if (self.userLocationVerticalAlignment == MGLAnnotationVerticalAlignmentCenter)
     {
         inset.bottom = CGRectGetMaxY(self.bounds) - CGRectGetMidY(self.contentFrame);
     }
+#pragma clang diagnostic pop
+
     [self _setVisibleCoordinates:foci
                            count:sizeof(foci) / sizeof(foci[0])
                      edgePadding:inset
@@ -5317,10 +5322,13 @@ public:
 
         if (direction >= 0)
         {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
             if (self.userLocationVerticalAlignment == MGLAnnotationVerticalAlignmentTop)
             {
                 direction += 180;
             }
+#pragma clang diagnostic pop
         }
     }
     return direction;
@@ -6012,7 +6020,9 @@ public:
     }
     
     CGPoint center = CGPointMake(CGRectGetMidX(contentFrame), CGRectGetMidY(contentFrame));
-    
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     switch (self.userLocationVerticalAlignment) {
         case MGLAnnotationVerticalAlignmentCenter:
             break;
@@ -6023,6 +6033,7 @@ public:
             center.y = CGRectGetMaxY(contentFrame);
             break;
     }
+#pragma clang dianostic pop
     
     return center;
 }
