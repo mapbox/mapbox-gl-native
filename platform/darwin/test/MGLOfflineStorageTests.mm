@@ -295,10 +295,8 @@
     
     // Valid database
     {
-        // TODO: Fix the size of barcelone.db that is causing timeouts.
-        /**
-        NSURL *resourceURL = [NSURL fileURLWithPath:[[NSBundle bundleForClass:[self class]] pathForResource:@"barcelona" ofType:@"db"]];
-        NSString *filePath = [documentDir stringByAppendingPathComponent:@"barcelona.db"];
+        NSURL *resourceURL = [NSURL fileURLWithPath:[[NSBundle bundleForClass:[self class]] pathForResource:@"sideload_sat" ofType:@"db"]];
+        NSString *filePath = [documentDir stringByAppendingPathComponent:@"sideload_sat.db"];
       
         BOOL databaseExists = [fileManager fileExistsAtPath:filePath];
         if (databaseExists) {
@@ -316,7 +314,7 @@
         
         NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
         long long fileSize = [fileSizeNumber longLongValue];
-        long long databaseFileSize = 32391168;
+        long long databaseFileSize = 73728;
         // Merging databases creates an empty file if the file does not exist at the given path.
         XCTAssertEqual(fileSize, databaseFileSize, @"The database file size must be:%lld actual size:%lld", databaseFileSize, fileSize);
         
@@ -339,10 +337,10 @@
             }
             [fileAdditionCompletionHandlerExpectation fulfill];
         }];
-        [self waitForExpectationsWithTimeout:5 handler:nil];
+        [self waitForExpectationsWithTimeout:10 handler:nil];
         // Depending on the database it may update or add a pack. For this case specifically the offline database adds one pack.
         XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Adding contents of barcelona.db should add one pack.");
-         */
+
     }
     // Invalid database type
     {
@@ -367,7 +365,7 @@
             XCTAssertNil(packs, @"Passing an invalid offline database file should not add packs to the offline database.");
             [invalidFileCompletionHandlerExpectation fulfill];
         }];
-        [self waitForExpectationsWithTimeout:5 handler:nil];
+        [self waitForExpectationsWithTimeout:10 handler:nil];
     }
     // File non existent
     {
