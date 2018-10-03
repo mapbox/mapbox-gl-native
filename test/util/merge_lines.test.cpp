@@ -24,7 +24,9 @@ public:
                       optional<std::string> icon_, std::size_t index_) :
         SymbolFeature(std::make_unique<StubGeometryTileFeature>(std::move(id_), type_, std::move(geometry_), std::move(properties_)))
     {
-        text = std::move(text_);
+        if (text_) {
+            formattedText = TaggedString(*text_, SectionOptions(1.0, 0));
+        }
         icon = std::move(icon_);
         index = index_;
     }

@@ -94,7 +94,7 @@ SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
 SymbolQuads getGlyphQuads(const Shaping& shapedText,
                           const SymbolLayoutProperties::Evaluated& layout,
                           const style::SymbolPlacementType placement,
-                          const GlyphPositionMap& positions) {
+                          const GlyphPositions& positions) {
     const float textRotate = layout.get<TextRotate>() * util::DEG2RAD;
 
     const float oneEm = 24.0;
@@ -105,8 +105,12 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
     SymbolQuads quads;
 
     for (const PositionedGlyph &positionedGlyph: shapedText.positionedGlyphs) {
-        auto positionsIt = positions.find(positionedGlyph.glyph);
-        if (positionsIt == positions.end())
+        auto fontPositions = positions.find(positionedGlyph.font);
+        if (fontPositions == positions.end())
+            continue;
+        
+        auto positionsIt = fontPositions->second.find(positionedGlyph.glyph);
+        if (positionsIt == fontPositions->second.end())
             continue;
 
         const GlyphPosition& glyph = positionsIt->second;
@@ -116,7 +120,7 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
         const float glyphPadding = 1.0f;
         const float rectBuffer = 3.0f + glyphPadding;
 
-        const float halfAdvance = glyph.metrics.advance / 2.0;
+        const float halfAdvance = glyph.metrics.advance * positionedGlyph.scale / 2.0;
         const bool alongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map && placement != SymbolPlacementType::Point;
 
         const Point<float> glyphOffset = alongLine ?
@@ -128,10 +132,10 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
             Point<float>{ positionedGlyph.x + halfAdvance + textOffset[0], positionedGlyph.y + textOffset[1] };
 
 
-        const float x1 = glyph.metrics.left - rectBuffer - halfAdvance + builtInOffset.x;
-        const float y1 = -glyph.metrics.top - rectBuffer + builtInOffset.y;
-        const float x2 = x1 + rect.w;
-        const float y2 = y1 + rect.h;
+        const float x1 = (glyph.metrics.left - rectBuffer) * positionedGlyph.scale - halfAdvance + builtInOffset.x;
+        const float y1 = (-glyph.metrics.top - rectBuffer) * positionedGlyph.scale + builtInOffset.y;
+        const float x2 = x1 + rect.w * positionedGlyph.scale;
+        const float y2 = y1 + rect.h * positionedGlyph.scale;
 
         Point<float> tl{x1, y1};
         Point<float> tr{x2, y1};

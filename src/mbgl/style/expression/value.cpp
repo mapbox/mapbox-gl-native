@@ -1,6 +1,7 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 #include <mbgl/style/expression/value.hpp>
+#include <mbgl/style/conversion/stringify.hpp>
 
 namespace mbgl {
 namespace style {
@@ -13,6 +14,7 @@ type::Type typeOf(const Value& value) {
         [&](const std::string&) -> type::Type { return type::String; },
         [&](const Color&) -> type::Type { return type::Color; },
         [&](const Collator&) -> type::Type { return type::Collator; },
+        [&](const Formatted&) -> type::Type { return type::Formatted; },
         [&](const NullValue&) -> type::Type { return type::Null; },
         [&](const std::unordered_map<std::string, Value>&) -> type::Type { return type::Object; },
         [&](const std::vector<Value>& arr) -> type::Type {
@@ -38,6 +40,7 @@ std::string toString(const Value& value) {
     return value.match(
         [](const NullValue&) { return std::string(); },
         [](const Color& c) { return c.stringify(); }, // avoid quoting
+        [](const Formatted& f) { return f.toString(); },
         [](const std::string& s) { return s; }, // avoid quoting
         [](const auto& v_) { return stringify(v_); }
     );
@@ -57,6 +60,12 @@ void writeJSON(rapidjson::Writer<rapidjson::StringBuffer>& writer, const Value& 
             // Collators are excluded from constant folding and there's no Literal parser
             // for them so there shouldn't be any way to serialize this value.
             assert(false);
+        },
+        [&] (const Formatted& f) {
+            // `stringify` in turns calls ValueConverter::fromExpressionValue below
+            // Serialization strategy for Formatted objects is to return the constant
+            // expression that would generate them.
+            mbgl::style::conversion::stringify(writer, f);
         },
         [&] (const std::vector<Value>& arr) {
             writer.StartArray();
@@ -135,6 +144,31 @@ mbgl::Value ValueConverter<mbgl::Value>::fromExpressionValue(const Value& value)
             // because they have no meaningful representation as an mbgl::Value
             assert(false);
             return mbgl::Value();
+        },
+        [&](const Formatted& formatted)->mbgl::Value {
+            // Serialization strategy for Formatted objects is to return the constant
+            // expression that would generate them.
+            std::vector<mbgl::Value> serialized;
+            static std::string formatOperator("format");
+            serialized.emplace_back(formatOperator);
+            for (const auto& section : formatted.sections) {
+                serialized.emplace_back(section.text);
+                std::unordered_map<std::string, mbgl::Value> options;
+                
+                if (section.fontScale) {
+                    options.emplace("font-scale", *section.fontScale);
+                }
+                
+                if (section.fontStack) {
+                    std::vector<mbgl::Value> fontStack;
+                    for (const auto& font : *section.fontStack) {
+                        fontStack.emplace_back(font);
+                    }
+                    options.emplace("text-font", std::vector<mbgl::Value>{ std::string("literal"), fontStack });
+                }
+                serialized.push_back(options);
+            }
+            return serialized;
         },
         [&](const std::vector<Value>& values)->mbgl::Value {
             std::vector<mbgl::Value> converted;
@@ -262,6 +296,7 @@ template <> type::Type valueTypeToExpressionType<double>() { return type::Number
 template <> type::Type valueTypeToExpressionType<std::string>() { return type::String; }
 template <> type::Type valueTypeToExpressionType<Color>() { return type::Color; }
 template <> type::Type valueTypeToExpressionType<Collator>() { return type::Collator; }
+template <> type::Type valueTypeToExpressionType<Formatted>() { return type::Formatted; }
 template <> type::Type valueTypeToExpressionType<std::unordered_map<std::string, Value>>() { return type::Object; }
 template <> type::Type valueTypeToExpressionType<std::vector<Value>>() { return type::Array(type::Value); }
 

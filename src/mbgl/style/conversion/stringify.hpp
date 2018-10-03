@@ -2,6 +2,8 @@
 
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
+#include <mbgl/style/expression/value.hpp>
+#include <mbgl/style/expression/formatted.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/feature.hpp>
@@ -128,6 +130,15 @@ template <class Writer>
 void stringify(Writer& writer, const Filter& filter) {
     if (!filter.expression) writer.Null();
     else stringify(writer, (*filter.expression)->serialize());
+}
+    
+    
+template <class Writer>
+void stringify(Writer& writer, const expression::Formatted& v) {
+    // Convert to mbgl::Value and then use the existing stringify
+    // Serialization strategy for Formatted objects is to return the constant
+    // expression that would generate them.
+    stringify(writer, expression::ValueConverter<mbgl::Value>::fromExpressionValue(v));
 }
 
 template <class Writer>

@@ -28,6 +28,17 @@ struct Converter<PropertyValue<T>> {
             ? PropertyValue<T>(PropertyExpression<T>(convertTokenStringToExpression(t)))
             : PropertyValue<T>(t);
     }
+    
+    PropertyValue<T> maybeConvertTokens(const expression::Formatted& t) const {
+        // This only works with a single-section `Formatted` created automatically
+        // by parsing a plain-text `text-field` property.
+        // Token conversion happens later than the initial string->Formatted conversion
+        // General purpose `format` expressions with embedded tokens are not supported
+        const std::string& firstUnformattedSection = t.sections[0].text;
+        return hasTokens(firstUnformattedSection)
+            ? PropertyValue<T>(PropertyExpression<T>(convertTokenStringToFormatExpression(firstUnformattedSection)))
+            : PropertyValue<T>(t);
+    }
 };
 
 } // namespace conversion

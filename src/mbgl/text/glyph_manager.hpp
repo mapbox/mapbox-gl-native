@@ -62,7 +62,7 @@ private:
         std::map<GlyphID, Immutable<Glyph>> glyphs;
     };
 
-    std::unordered_map<FontStack, Entry, FontStackHash> entries;
+    std::unordered_map<FontStack, Entry, FontStackHasher> entries;
 
     void requestRange(GlyphRequest&, const FontStack&, const GlyphRange&);
     void processResponse(const Response&, const FontStack&, const GlyphRange&);

@@ -55,17 +55,21 @@ public:
 };
 
 using Glyphs = std::map<GlyphID, optional<Immutable<Glyph>>>;
-using GlyphMap = std::map<FontStack, Glyphs>;
+using GlyphMap = std::map<FontStackHash, Glyphs>;
 
 class PositionedGlyph {
 public:
-    explicit PositionedGlyph(GlyphID glyph_, float x_, float y_, bool vertical_)
-        : glyph(glyph_), x(x_), y(y_), vertical(vertical_) {}
+    explicit PositionedGlyph(GlyphID glyph_, float x_, float y_, bool vertical_, FontStackHash font_, float scale_)
+        : glyph(glyph_), x(x_), y(y_), vertical(vertical_), font(font_), scale(scale_)
+    {}
 
     GlyphID glyph = 0;
     float x = 0;
     float y = 0;
     bool vertical = false;
+    
+    FontStackHash font = 0;
+    float scale = 0.0;
 };
 
 enum class WritingModeType : uint8_t;

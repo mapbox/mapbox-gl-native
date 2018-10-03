@@ -6,12 +6,12 @@ using namespace mbgl;
 
 SymbolInstance makeSymbolInstance(float x, float y, std::u16string key) {
     GeometryCoordinates line;
-    GlyphPositionMap gpm;
+    GlyphPositions positions;
     const std::pair<Shaping, Shaping> shaping(Shaping{}, Shaping{});
     style::SymbolLayoutProperties::Evaluated layout_;
     IndexedSubfeature subfeature(0, "", "", 0);
     Anchor anchor(x, y, 0, 0);
-    return {anchor, line, shaping, {}, layout_, 0, 0, 0, style::SymbolPlacementType::Point, {{0, 0}}, 0, 0, {{0, 0}}, gpm, subfeature, 0, 0, key, 0 };
+    return {anchor, line, shaping, {}, layout_, 0, 0, 0, style::SymbolPlacementType::Point, {{0, 0}}, 0, 0, {{0, 0}}, positions, subfeature, 0, 0, key, 0 };
 }
 
 

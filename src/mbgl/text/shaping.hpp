@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/text/glyph.hpp>
+#include <mbgl/text/tagged_string.hpp>
 #include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/style/types.hpp>
 
@@ -45,7 +46,7 @@ public:
     float angle() const { return _angle; }
 };
 
-const Shaping getShaping(const std::u16string& string,
+const Shaping getShaping(const TaggedString& string,
                          float maxWidth,
                          float lineHeight,
                          style::SymbolAnchorType textAnchor,
@@ -55,6 +56,6 @@ const Shaping getShaping(const std::u16string& string,
                          float verticalHeight,
                          const WritingModeType,
                          BiDi& bidi,
-                         const Glyphs& glyphs);
+                         const GlyphMap& glyphs);
 
 } // namespace mbgl

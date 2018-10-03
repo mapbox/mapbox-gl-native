@@ -48,6 +48,6 @@ SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
 SymbolQuads getGlyphQuads(const Shaping& shapedText,
                           const style::SymbolLayoutProperties::Evaluated&,
                           style::SymbolPlacementType placement,
-                          const GlyphPositionMap& positions);
+                          const GlyphPositions& positions);
 
 } // namespace mbgl

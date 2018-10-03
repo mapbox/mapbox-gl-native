@@ -11,6 +11,7 @@ namespace style {
 namespace conversion {
 
 bool hasTokens(const std::string&);
+std::unique_ptr<expression::Expression> convertTokenStringToFormatExpression(const std::string&);
 std::unique_ptr<expression::Expression> convertTokenStringToExpression(const std::string&);
 
 optional<std::unique_ptr<expression::Expression>> convertFunctionToExpression(expression::type::Type, const Convertible&, Error&, bool convertTokens);
