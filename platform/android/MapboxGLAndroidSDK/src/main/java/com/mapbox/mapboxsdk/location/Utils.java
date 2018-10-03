@@ -84,8 +84,7 @@ public final class Utils {
     if (location == null) {
       return 0;
     }
-    double metersPerPixel = mapboxMap.getProjection().getMetersPerPixelAtLatitude(
-      location.getLatitude());
+    double metersPerPixel = mapboxMap.getProjection().getMetersPerPixelAtLatitude(location.getLatitude());
     return (float) (location.getAccuracy() * (1 / metersPerPixel));
   }
 
