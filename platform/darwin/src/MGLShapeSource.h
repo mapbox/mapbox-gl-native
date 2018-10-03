@@ -5,7 +5,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MGLFeature;
-@protocol MGLPointCluster;
+@protocol MGLCluster;
 @class MGLPointFeature;
 @class MGLShape;
 
@@ -324,9 +324,9 @@ MGL_EXPORT
 - (NSArray<id <MGLFeature>> *)featuresMatchingPredicate:(nullable NSPredicate *)predicate;
 
 // TODO: doc
-- (NSArray<id <MGLFeature>> *)leavesOfCluster:(id<MGLPointCluster>)cluster offset:(uint32_t)offset limit:(uint32_t)limit;
-- (NSArray<id <MGLFeature>> *)childrenOfCluster:(id<MGLPointCluster>)cluster;
-- (double)zoomLevelForExpandingCluster:(id<MGLPointCluster>)cluster;
+- (NSArray<id <MGLFeature>> *)leavesOfCluster:(id<MGLCluster>)cluster offset:(uint32_t)offset limit:(uint32_t)limit;
+- (NSArray<id <MGLFeature>> *)childrenOfCluster:(id<MGLCluster>)cluster;
+- (double)zoomLevelForExpandingCluster:(id<MGLCluster>)cluster;
 @end
 
 NS_ASSUME_NONNULL_END

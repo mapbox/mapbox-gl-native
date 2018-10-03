@@ -5,6 +5,7 @@
 #import "MGLSource_Private.h"
 #import "MGLFeature_Private.h"
 #import "MGLShape_Private.h"
+#import "MGLCluster_Private.h"
 
 #import "NSPredicate+MGLPrivateAdditions.h"
 #import "NSURL+MGLAdditions.h"
@@ -184,52 +185,55 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
     return MGLFeaturesFromMBGLFeatures(features);
 }
 
-#pragma mark - MGLPointCluster management
+#pragma mark - MGLCluster management
 
 // TODO: doc
 // For clustered sources, fetches the original points that belong to the cluster (as an array of GeoJSON features).
 // clusterId(number)The value of the cluster's  cluster_id property.
 // limit(number)The maximum number of features to return.
 // offset(number)The number of features to skip (e.g. for pagination).
-- (NSArray<id <MGLFeature>> *)leavesOfCluster:(id<MGLPointCluster>)cluster offset:(uint32_t)offset limit:(uint32_t)limit {
+- (NSArray<id <MGLFeature>> *)leavesOfCluster:(id<MGLCluster>)cluster offset:(uint32_t)offset limit:(uint32_t)limit {
     if(!self.rawSource) {
         return nil;
     }
     
-    std::vector<mbgl::Feature> leaves = self.rawSource->getLeaves(cluster.clusterId, limit, offset);
+    std::vector<mbgl::Feature> leaves = self.rawSource->getLeaves((uint32_t)cluster.clusterIdentifier, limit, offset);
     return MGLFeaturesFromMBGLFeatures(leaves);
 }
 
 // TODO: doc
 // For clustered sources, fetches the children of the given cluster on the next zoom level (as an array of GeoJSON features).
-- (NSArray<id <MGLFeature>> *)childrenOfCluster:(id<MGLPointCluster>)cluster {
+- (NSArray<id <MGLFeature>> *)childrenOfCluster:(id<MGLCluster>)cluster {
     if(!self.rawSource) {
         return nil;
     }
 
-    std::vector<mbgl::Feature> children = self.rawSource->getChildren(cluster.clusterId);
+    std::vector<mbgl::Feature> children = self.rawSource->getChildren((uint32_t)cluster.clusterIdentifier);
     return MGLFeaturesFromMBGLFeatures(children);
 }
 
 // For clustered sources, fetches the zoom at which the given cluster expands.
-- (double)zoomLevelForExpandingCluster:(id<MGLPointCluster>)cluster {
+- (double)zoomLevelForExpandingCluster:(id<MGLCluster>)cluster {
     if(!self.rawSource) {
         return -1.0;
     }
 
-    uint8_t zoom = self.rawSource->getClusterExpansionZoom(cluster.clusterId);
+    uint8_t zoom = self.rawSource->getClusterExpansionZoom((uint32_t)cluster.clusterIdentifier);
     return static_cast<double>(zoom);
 }
 
 - (void)debugRecursiveLogForFeature:(id <MGLFeature>)feature indent:(NSInteger)indent {
 
-    MGLPointFeature *pointFeature = MGL_OBJC_DYNAMIC_CAST(feature, MGLPointFeature);
-    id<MGLPointCluster> cluster = [pointFeature cluster];
+    id<MGLCluster> cluster = nil;
+    
+    if ([feature conformsToProtocol:@protocol(MGLCluster)]) {
+        cluster = (id<MGLCluster>)feature;
+    }
     
     if (cluster) {
         double zoom = [self zoomLevelForExpandingCluster:cluster];
 
-        NSString *log = [NSString stringWithFormat:@"Cluster %d [count=%ld, zoom=%0.1g]", cluster.clusterId, cluster.pointCount, zoom];
+        NSString *log = [NSString stringWithFormat:@"Cluster %ld [count=%ld, zoom=%0.1g]", cluster.clusterIdentifier, cluster.clusterPointCount, zoom];
         
         printf("%*s%s\n", (int)indent, "", log.UTF8String);
         

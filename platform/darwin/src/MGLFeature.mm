@@ -5,6 +5,7 @@
 #import "MGLPolygon.h"
 #import "MGLValueEvaluator.h"
 
+#import "MGLCluster_Private.h"
 #import "MGLShape_Private.h"
 #import "MGLPointCollection_Private.h"
 #import "MGLPolyline_Private.h"
@@ -55,14 +56,7 @@ MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 @end
 
-NSString * const MGLPointClusterBoolKey              = @"cluster";
-NSString * const MGLPointClusterIdKey                = @"cluster_id";
-NSString * const MGLPointClusterCountKey             = @"point_count";
-NSString * const MGLPointClusterCountAbbreviationKey = @"cluster_abbreviated";
-
-// TODO: privately conform to MGLPointCluster, so we can return the same object OR create a *new*
-// object, or even have a subclass of MGLPointFeature?
-@interface MGLPointFeature () <MGLPointCluster>
+@interface MGLPointFeature ()
 @end
 
 @implementation MGLPointFeature
@@ -95,56 +89,6 @@ MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
             self.identifier ? [NSString stringWithFormat:@"\"%@\"", self.identifier] : self.identifier,
             self.coordinate.latitude, self.coordinate.longitude,
             self.attributes.count ? self.attributes : @"none"];
-}
-
-- (id<MGLPointCluster>)cluster {
-    return self.cluster ? self : nil;
-}
-
-#pragma mark - MGLPointCluster
-
-- (BOOL)isCluster {
-    NSNumber *isCluster = MGL_OBJC_DYNAMIC_CAST(self.attributes[MGLPointClusterBoolKey], NSNumber);
-    return [isCluster boolValue];
-}
-
-- (uint32_t)clusterId {
-    NSNumber *clusterNumber = MGL_OBJC_DYNAMIC_CAST(self.attributes[MGLPointClusterIdKey], NSNumber);
-    
-    NSAssert(clusterNumber, @"Clusters should have a cluster_id");
-    if (!clusterNumber) {
-        return -1;
-    }
-
-    NSUInteger clusterId = [clusterNumber unsignedIntegerValue];
-
-    NSAssert(clusterId < (1UL << 32), @"Cluster IDs are 32bit");
-    NSAssert([self.identifier isKindOfClass:[NSNumber class]], @"The identifier should be an NSNumber");
-    NSAssert(clusterId == [self.identifier unsignedIntegerValue], @"The cluster id should match the feature's identifier.");
-    
-    return (uint32_t)clusterId;
-}
-
-- (NSUInteger)pointCount {
-    NSNumber *pointCount = MGL_OBJC_DYNAMIC_CAST(self.attributes[MGLPointClusterCountKey], NSNumber);
-    
-    NSAssert(pointCount, @"Clusters should have a point_count");
-    if (!pointCount) {
-        return -1;
-    }
-
-    return [pointCount unsignedIntegerValue];
-}
-
-- (NSString*)clusterAbbreviated {
-    NSString *abbreviation = MGL_OBJC_DYNAMIC_CAST(self.attributes[MGLPointClusterCountAbbreviationKey], NSString);
-
-    NSAssert(abbreviation, @"Clusters should have a cluster_abbreviated");
-    if (!abbreviation) {
-        return @"<invalid>";
-    }
-
-    return abbreviation;
 }
 
 @end
@@ -507,6 +451,10 @@ id <MGLFeature> MGLFeatureFromMBGLFeature(const mbgl::Feature &feature) {
     }
     shape.attributes = attributes;
 
+    if (MGLFeatureHasClusterAttribute(shape)) {
+        MGLConvertFeatureToClusterSubclass(shape);
+    }
+    
     return shape;
 }
 

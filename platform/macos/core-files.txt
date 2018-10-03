@@ -1,7 +1,7 @@
 # This file is generated. Do not edit. Regenerate this with scripts/generate-cmake-files.js
 
 # SDK
-platform/ios/src/Mapbox.h
+platform/macos/src/Mapbox.h
 
 # SDK/Foundation
 platform/darwin/src/MGLAccountManager.h
@@ -13,9 +13,6 @@ platform/darwin/src/MGLAttributionInfo_Private.h
 platform/darwin/src/MGLFoundation.h
 platform/darwin/src/MGLFoundation.mm
 platform/darwin/src/MGLFoundation_Private.h
-platform/darwin/src/MGLLocationManager.h
-platform/darwin/src/MGLLocationManager.m
-platform/darwin/src/MGLLocationManager_Private.h
 platform/darwin/src/MGLLoggingConfiguration.h
 platform/darwin/src/MGLLoggingConfiguration.m
 platform/darwin/src/MGLLoggingConfiguration_Private.h
@@ -40,12 +37,12 @@ platform/darwin/src/NSArray+MGLAdditions.h
 platform/darwin/src/NSArray+MGLAdditions.mm
 platform/darwin/src/NSBundle+MGLAdditions.h
 platform/darwin/src/NSBundle+MGLAdditions.m
+platform/darwin/src/NSCoder+MGLAdditions.h
+platform/darwin/src/NSCoder+MGLAdditions.mm
 platform/darwin/src/NSComparisonPredicate+MGLAdditions.h
 platform/darwin/src/NSComparisonPredicate+MGLAdditions.mm
 platform/darwin/src/NSCompoundPredicate+MGLAdditions.h
 platform/darwin/src/NSCompoundPredicate+MGLAdditions.mm
-platform/darwin/src/NSData+MGLAdditions.h
-platform/darwin/src/NSData+MGLAdditions.mm
 platform/darwin/src/NSDate+MGLAdditions.h
 platform/darwin/src/NSDate+MGLAdditions.mm
 platform/darwin/src/NSDictionary+MGLAdditions.h
@@ -203,121 +200,25 @@ platform/darwin/src/MGLVectorTileSource.mm
 platform/darwin/src/MGLVectorTileSource_Private.h
 
 # SDK/Kit
-platform/ios/src/MGLCameraChangeReason.h
-platform/ios/src/MGLMapAccessibilityElement.h
-platform/ios/src/MGLMapAccessibilityElement.mm
-platform/ios/src/MGLMapView+IBAdditions.h
-platform/ios/src/MGLMapView.h
-platform/ios/src/MGLMapView.mm
-platform/ios/src/MGLMapViewDelegate.h
-platform/ios/src/MGLMapView_Private.h
-
-# SDK/Kit/Annotations
-platform/ios/src/MGLAnnotationContainerView.h
-platform/ios/src/MGLAnnotationContainerView.m
-platform/ios/src/MGLAnnotationContainerView_Private.h
-platform/ios/src/MGLAnnotationImage.h
-platform/ios/src/MGLAnnotationImage.m
-platform/ios/src/MGLAnnotationImage_Private.h
-platform/ios/src/MGLAnnotationView.h
-platform/ios/src/MGLAnnotationView.mm
-platform/ios/src/MGLAnnotationView_Private.h
-platform/ios/src/MGLCalloutView.h
-platform/ios/src/MGLCompactCalloutView.h
-platform/ios/src/MGLCompactCalloutView.m
-platform/ios/src/MGLFaux3DUserLocationAnnotationView.h
-platform/ios/src/MGLFaux3DUserLocationAnnotationView.m
-platform/ios/src/MGLUserLocation.h
-platform/ios/src/MGLUserLocation.m
-platform/ios/src/MGLUserLocationAnnotationView.h
-platform/ios/src/MGLUserLocationAnnotationView.m
-platform/ios/src/MGLUserLocationAnnotationView_Private.h
-platform/ios/src/MGLUserLocationHeadingArrowLayer.h
-platform/ios/src/MGLUserLocationHeadingArrowLayer.m
-platform/ios/src/MGLUserLocationHeadingBeamLayer.h
-platform/ios/src/MGLUserLocationHeadingBeamLayer.m
-platform/ios/src/MGLUserLocationHeadingIndicator.h
-platform/ios/src/MGLUserLocation_Private.h
+platform/macos/src/MGLAnnotationImage.h
+platform/macos/src/MGLAnnotationImage.m
+platform/macos/src/MGLAnnotationImage_Private.h
+platform/macos/src/MGLAttributionButton.h
+platform/macos/src/MGLAttributionButton.mm
+platform/macos/src/MGLCompassCell.h
+platform/macos/src/MGLCompassCell.m
+platform/macos/src/MGLMapView+IBAdditions.h
+platform/macos/src/MGLMapView+IBAdditions.mm
+platform/macos/src/MGLMapView.h
+platform/macos/src/MGLMapView.mm
+platform/macos/src/MGLMapViewDelegate.h
+platform/macos/src/MGLMapView_Private.h
+platform/macos/src/MGLOpenGLLayer.h
+platform/macos/src/MGLOpenGLLayer.mm
 
 # SDK/Kit/Categories
-platform/darwin/src/NSCoder+MGLAdditions.h
-platform/darwin/src/NSCoder+MGLAdditions.mm
-platform/ios/src/NSOrthography+MGLAdditions.h
-platform/ios/src/NSOrthography+MGLAdditions.m
-platform/ios/src/UIColor+MGLAdditions.h
-platform/ios/src/UIColor+MGLAdditions.mm
-platform/ios/src/UIDevice+MGLAdditions.h
-platform/ios/src/UIDevice+MGLAdditions.m
-platform/ios/src/UIImage+MGLAdditions.h
-platform/ios/src/UIImage+MGLAdditions.mm
-platform/ios/src/UIViewController+MGLAdditions.h
-platform/ios/src/UIViewController+MGLAdditions.m
-
-# SDK/Kit/SMCalloutView
-platform/ios/vendor/SMCalloutView/SMCalloutView.h
-platform/ios/vendor/SMCalloutView/SMCalloutView.m
-
-# SDK/Kit/Telemetry
-platform/ios/src/MGLTelemetryConfig.h
-platform/ios/src/MGLTelemetryConfig.m
-
-# SDK/Kit/Telemetry/Development
-platform/ios/src/MGLSDKUpdateChecker.h
-platform/ios/src/MGLSDKUpdateChecker.mm
-
-# SDK/Kit/Telemetry/Runtime
-platform/ios/src/MGLMapboxEvents.h
-platform/ios/src/MGLMapboxEvents.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/CLLocation+MMEMobileEvents.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEAPIClient.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMECategoryLoader.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMECommonEventData.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEConfigurator.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEConstants.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEDependencyManager.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEDispatchManager.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEEvent.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventLogReportViewController.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventLogger.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventsConfiguration.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventsManager.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEHashProvider.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMELocationManager.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEMetrics.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEMetricsManager.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMENSDateWrapper.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMENSURLSessionWrapper.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMETimerManager.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMETrustKitProvider.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMETypes.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEUIApplicationWrapper.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEUINavigation.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEUniqueIdentifier.m
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/NSData+MMEGZIP.m
-
-# SDK/Kit/Telemetry/Runtime/Reachability
-platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/Reachability/MMEReachability.m
-
-# SDK/Kit/Telemetry/Runtime/TrustKit
-platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/TSKPinningValidator.m
-platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/TSKPinningValidatorResult.m
-platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/TSKTrustKitConfig.m
-platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/TrustKit.m
-platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/configuration_utils.m
-platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/parse_configuration.m
-
-# SDK/Kit/Telemetry/Runtime/TrustKit/Pinning
-platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/Pinning/TSKSPKIHashCache.m
-platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/Pinning/ssl_pin_verifier.m
-
-# SDK/Kit/Telemetry/Runtime/TrustKit/Reporting
-platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/Reporting/TSKBackgroundReporter.m
-platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/Reporting/TSKPinFailureReport.m
-platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/Reporting/TSKReportsRateLimiter.m
-platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/Reporting/reporting_utils.m
-platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/Reporting/vendor_identifier.m
-
-# SDK/Kit/Views
-platform/ios/src/MGLScaleBar.h
-platform/ios/src/MGLScaleBar.mm
+platform/macos/src/NSColor+MGLAdditions.h
+platform/macos/src/NSColor+MGLAdditions.mm
+platform/macos/src/NSImage+MGLAdditions.h
+platform/macos/src/NSImage+MGLAdditions.mm
 
