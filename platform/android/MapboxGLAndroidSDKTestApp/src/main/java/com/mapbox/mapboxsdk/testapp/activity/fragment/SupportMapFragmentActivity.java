@@ -75,7 +75,7 @@ public class SupportMapFragmentActivity extends AppCompatActivity implements Map
 
   @Override
   public void onMapChanged(int change) {
-    if (initialCameraAnimation && change == MapView.DID_FINISH_RENDERING_MAP_FULLY_RENDERED) {
+    if (initialCameraAnimation && change == MapView.DID_FINISH_RENDERING_MAP_FULLY_RENDERED && mapboxMap != null) {
       mapboxMap.animateCamera(
         CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().tilt(45.0).build()), 5000);
       initialCameraAnimation = false;
