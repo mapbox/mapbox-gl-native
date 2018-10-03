@@ -345,6 +345,7 @@ public final class LocationComponent {
     locationCameraController.initializeOptions(options);
     staleStateManager.setEnabled(options.enableStaleState());
     staleStateManager.setDelayTime(options.staleStateTimeout());
+    locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options.trackingAnimationDurationMultiplier());
     updateMapWithOptions(options);
   }
 
@@ -769,9 +770,11 @@ public final class LocationComponent {
       options);
     locationCameraController = new LocationCameraController(
       context, mapboxMap, cameraTrackingChangedListener, options, onCameraMoveInvalidateListener);
+
     locationAnimatorCoordinator = new LocationAnimatorCoordinator();
     locationAnimatorCoordinator.addLayerListener(locationLayerController);
     locationAnimatorCoordinator.addCameraListener(locationCameraController);
+    locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options.trackingAnimationDurationMultiplier());
 
     WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
     SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
