@@ -55,10 +55,11 @@ const CollisionGroups::CollisionGroup& CollisionGroups::get(const std::string& s
     }
 }
 
-Placement::Placement(const TransformState& state_, MapMode mapMode_, const bool crossSourceCollisions)
+Placement::Placement(const TransformState& state_, MapMode mapMode_, style::TransitionOptions transitionOptions_, const bool crossSourceCollisions)
     : collisionIndex(state_)
     , state(state_)
     , mapMode(mapMode_)
+    , transitionOptions(transitionOptions_)
     , collisionGroups(crossSourceCollisions)
 {}
 
@@ -244,8 +245,8 @@ void Placement::commit(const Placement& prevPlacement, TimePoint now) {
 
     bool placementChanged = false;
 
-    float increment = mapMode == MapMode::Continuous ?
-        std::chrono::duration<float>(commitTime - prevPlacement.commitTime) / Duration(std::chrono::milliseconds(300)) :
+    float increment = mapMode == MapMode::Continuous && transitionOptions.enablePlacementTransitions ?
+        std::chrono::duration<float>(commitTime - prevPlacement.commitTime) / transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION) :
         1.0;
 
     // add the opacities from the current placement, and copy their current values from the previous placement
@@ -404,23 +405,27 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
 }
 
 float Placement::symbolFadeChange(TimePoint now) const {
-    if (mapMode == MapMode::Continuous) {
-        return std::chrono::duration<float>(now - commitTime) / Duration(std::chrono::milliseconds(300));
+    if (mapMode == MapMode::Continuous && transitionOptions.enablePlacementTransitions) {
+        return std::chrono::duration<float>(now - commitTime) / transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION);
     } else {
         return 1.0;
     }
 }
 
 bool Placement::hasTransitions(TimePoint now) const {
-    if (mapMode == MapMode::Continuous) {
-        return stale || std::chrono::duration<float>(now - fadeStartTime) < Duration(std::chrono::milliseconds(300));
+    if (mapMode == MapMode::Continuous && transitionOptions.enablePlacementTransitions) {
+        return stale || std::chrono::duration<float>(now - fadeStartTime) < transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION);
     } else {
         return false;
     }
 }
 
 bool Placement::stillRecent(TimePoint now) const {
-    return mapMode == MapMode::Continuous && commitTime + Duration(std::chrono::milliseconds(300)) > now;
+    // Even if transitionOptions.duration is set to a value < 300ms, we still wait for this default transition duration
+    // before attempting another placement operation.
+    return mapMode == MapMode::Continuous &&
+        transitionOptions.enablePlacementTransitions &&
+        commitTime + std::max(util::DEFAULT_TRANSITION_DURATION, transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION)) > now;
 }
 
 void Placement::setStale() {
