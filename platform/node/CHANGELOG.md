@@ -1,10 +1,12 @@
-# master
+# 4.1.0
 - Add `symbol-z-order` symbol layout property to style spec [#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783)
 - Add `crossSourceCollisions` map option, with default of `true`. When set to `false`, cross-source collision detection is disabled. ([#12820] (https://github.com/mapbox/mapbox-gl-native/issues/12820))
 - Fixed bugs in coercion expression operators ("to-array" applied to empty arrays, "to-color" applied to colors, and "to-number" applied to null) [#12864](https://github.com/mapbox/mapbox-gl-native/pull/12864)
 - Fixed an issue where fill and line layers would occasionally flicker on zoom ([#12982](https://github.com/mapbox/mapbox-gl-native/pull/12982))
+- Prevent crash when expression evaluates to default, no pattern [#12896](https://github.com/mapbox/mapbox-gl-native/pull/12896)
+ - "is-supported-script" expression support [#12845](https://github.com/mapbox/mapbox-gl-native/pull/12845)
 
-# 4.0.0
+# 4.0.0 - September 12, 2018
 - Many new features and enhancements, including:
    - Expressions
    - Hillshade layer type
