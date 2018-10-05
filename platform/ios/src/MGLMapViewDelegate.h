@@ -459,9 +459,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)mapView:(MGLMapView *)mapView shapeAnnotationIsEnabled:(MGLShape *)annotation;
 
-
 /**
- Returns a Boolean value indicating whether the annotation should be moved on-screen
+ Returns a Boolean value indicating whether the annotation should be brought into view
  in response to a single tap selection.
  
  If the delegate does not implement this method, the default value is `YES`.
@@ -470,7 +469,8 @@ NS_ASSUME_NONNULL_BEGIN
  
  @param mapView The map view that has selected the annotation.
  @param annotation The object representing the shape annotation.
- @return A Boolean value indicating whether the annotation should be moved onscreen if it and its callout (if it has one) are offscreen.
+ @return A Boolean value indicating whether the annotation should be moved into view. This value
+ can be considered to be the same as the `expose` parameter passed to `-[MGLMapView selectAnnotation:animated:expose:]`
  */
 - (BOOL)mapView:(MGLMapView *)mapView shouldExposeAnnotationInResponseToUserSelection:(id <MGLAnnotation>)annotation;
 
