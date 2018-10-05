@@ -266,6 +266,7 @@
 
     auto fs = os.mbglFileSource;
 
+    // TODO JK - Getting failures
     // Delegate returns "https://api.mapbox.com" as a replacement URL.
     const mbgl::Resource resource { mbgl::Resource::Unknown, "test://api" };
     std::unique_ptr<mbgl::AsyncRequest> req;

@@ -49,7 +49,7 @@
              @"coordinates": self.mgl_coordinates};
 }
 
-- (NSArray<id> *)mgl_coordinates {
+- (NS_ARRAY_OF(id) *)mgl_coordinates {
     NSMutableArray *coordinates = [[NSMutableArray alloc] initWithCapacity:self.pointCount];
     for (NSUInteger index = 0; index < self.pointCount; index++) {
         CLLocationCoordinate2D coordinate = self.coordinates[index];
@@ -123,7 +123,7 @@
 
 @interface MGLMultiPolyline ()
 
-@property (nonatomic, copy, readwrite) NSArray<MGLPolyline *> *polylines;
+@property (nonatomic, copy, readwrite) NS_ARRAY_OF(MGLPolyline *) *polylines;
 
 @end
 
@@ -133,11 +133,11 @@
 
 @synthesize overlayBounds = _overlayBounds;
 
-+ (instancetype)multiPolylineWithPolylines:(NSArray<MGLPolyline *> *)polylines {
++ (instancetype)multiPolylineWithPolylines:(NS_ARRAY_OF(MGLPolyline *) *)polylines {
     return [[self alloc] initWithPolylines:polylines];
 }
 
-- (instancetype)initWithPolylines:(NSArray<MGLPolyline *> *)polylines {
+- (instancetype)initWithPolylines:(NS_ARRAY_OF(MGLPolyline *) *)polylines {
     if (self = [super init]) {
         _polylines = polylines;
 

@@ -41,18 +41,22 @@
 }
 
 - (NSString *)mgl_stringByTransliteratingIntoScript:(NSString *)script {
-    NSMutableString *string = self.mutableCopy;
-    NSStringTransform transform;
-    if ([script isEqualToString:@"Latn"]) {
-        transform = NSStringTransformToLatin;
-    } else if ([script isEqualToString:@"Hans"]) {
-        // No transform available.
-    } else if ([script isEqualToString:@"Cyrl"]) {
-        transform = @"Any-Latin; Latin-Cyrillic";
-    } else if ([script isEqualToString:@"Arab"]) {
-        transform = @"Any-Latin; Latin-Arabic";
+    if (@available(iOS 9.0, *)) {
+        NSMutableString *string = self.mutableCopy;
+        NSStringTransform transform;
+        if ([script isEqualToString:@"Latn"]) {
+            transform = NSStringTransformToLatin;
+        } else if ([script isEqualToString:@"Hans"]) {
+            // No transform available.
+        } else if ([script isEqualToString:@"Cyrl"]) {
+            transform = @"Any-Latin; Latin-Cyrillic";
+        } else if ([script isEqualToString:@"Arab"]) {
+            transform = @"Any-Latin; Latin-Arabic";
+        }
+        return transform ? [string stringByApplyingTransform:transform reverse:NO] : string;
+    } else {
+        return self;
     }
-    return transform ? [string stringByApplyingTransform:transform reverse:NO] : string;
 }
 
 @end

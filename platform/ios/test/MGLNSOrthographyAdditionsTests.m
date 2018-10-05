@@ -10,9 +10,11 @@
 @implementation MGLNSOrthographyAdditionsTests
 
 - (void)testStreetsLanguages {
-    for (NSString *language in [MGLVectorTileSource mapboxStreetsLanguages]) {
-        NSString *dominantScript = [NSOrthography mgl_dominantScriptForMapboxStreetsLanguage:language];
-        XCTAssertNotEqualObjects(dominantScript, @"Zyyy", @"Mapbox Streets languages should have dominant script");
+    if (@available(iOS 11.0, *)) {
+        for (NSString *language in [MGLVectorTileSource mapboxStreetsLanguages]) {
+            NSString *dominantScript = [NSOrthography mgl_dominantScriptForMapboxStreetsLanguage:language];
+            XCTAssertNotEqualObjects(dominantScript, @"Zyyy", @"Mapbox Streets languages should have dominant script");
+        }
     }
 }
 

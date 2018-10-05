@@ -30,11 +30,11 @@ const MGLTileSourceOption MGLTileSourceOptionDEMEncoding = @"MGLTileSourceOption
     return nil;
 }
 
-- (NSArray<MGLAttributionInfo *> *)attributionInfos {
+- (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfos {
     return [self attributionInfosWithFontSize:0 linkColor:nil];
 }
 
-- (NSArray<MGLAttributionInfo *> *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
+- (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
     return [MGLAttributionInfo attributionInfosFromHTMLString:self.attributionHTMLString
                                                      fontSize:fontSize
                                                     linkColor:linkColor];
@@ -48,7 +48,7 @@ const MGLTileSourceOption MGLTileSourceOptionDEMEncoding = @"MGLTileSourceOption
 
 @end
 
-mbgl::Tileset MGLTileSetFromTileURLTemplates(NSArray<NSString *> *tileURLTemplates, NSDictionary<MGLTileSourceOption, id> * _Nullable options) {
+mbgl::Tileset MGLTileSetFromTileURLTemplates(NS_ARRAY_OF(NSString *) *tileURLTemplates, NS_DICTIONARY_OF(MGLTileSourceOption, id) * _Nullable options) {
     mbgl::Tileset tileSet;
 
     for (NSString *tileURLTemplate in tileURLTemplates) {
