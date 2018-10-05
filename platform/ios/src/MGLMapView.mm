@@ -1718,13 +1718,13 @@ public:
         CGPoint calloutPoint = [singleTap locationInView:self];
         CGRect positionRect = [self positioningRectForAnnotation:annotation defaultCalloutPoint:calloutPoint];
         
-        BOOL moveOnscreen = YES;
+        BOOL expose = YES;
         
-        if ([self.delegate respondsToSelector:@selector(mapView:shouldMoveAnnotationOnscreenInResponseToUserSelection:)]) {
-            moveOnscreen = [self.delegate mapView:self shouldMoveAnnotationOnscreenInResponseToUserSelection:annotation];
+        if ([self.delegate respondsToSelector:@selector(mapView:shouldExposeAnnotationInResponseToUserSelection:)]) {
+            expose = [self.delegate mapView:self shouldExposeAnnotationInResponseToUserSelection:annotation];
         }
         
-        [self selectAnnotation:annotation animated:YES moveOnscreen:moveOnscreen calloutPositioningRect:positionRect];
+        [self selectAnnotation:annotation animated:YES expose:expose calloutPositioningRect:positionRect];
     }
     else if (self.selectedAnnotation)
     {
@@ -4375,17 +4375,17 @@ public:
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
-    [self selectAnnotation:annotation animated:animated moveOnscreen:animated];
+    [self selectAnnotation:annotation animated:animated expose:animated];
 }
 
-- (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated moveOnscreen:(BOOL)moveOnscreen
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated expose:(BOOL)expose
 {
     CGRect positioningRect = [self positioningRectForAnnotation:annotation defaultCalloutPoint:CGPointZero];
     
-    [self selectAnnotation:annotation animated:animated moveOnscreen:moveOnscreen calloutPositioningRect:positioningRect];
+    [self selectAnnotation:annotation animated:animated expose:expose calloutPositioningRect:positioningRect];
 }
 
-- (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated moveOnscreen:(BOOL)moveOnscreen calloutPositioningRect:(CGRect)calloutPositioningRect
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated expose:(BOOL)expose calloutPositioningRect:(CGRect)calloutPositioningRect
 {
     if ( ! annotation) return;
 
@@ -4500,7 +4500,7 @@ public:
 
         // If the callout view provides inset (outset) information, we can use it to expand our positioning
         // rect, which we then use to help move the annotation on-screen if want need to.
-        if (moveOnscreen) {
+        if (expose) {
             UIEdgeInsets margins = MGLMapViewOffscreenAnnotationPadding;
             
             if ([calloutView respondsToSelector:@selector(marginInsetsHintForPresentationFromRect:)]) {
@@ -4511,9 +4511,9 @@ public:
         }
     }
 
-    if (moveOnscreen)
+    if (expose)
     {
-        moveOnscreen = NO;
+        expose = NO;
 
         // Need to consider the content insets.
         CGRect bounds = constrainedRect;
@@ -4523,14 +4523,14 @@ public:
         
         if (minX < CGRectGetMinX(bounds)) {
             constrainedRect.origin.x = minX;
-            moveOnscreen = YES;
+            expose = YES;
         }
         else {
             CGFloat maxX = CGRectGetMaxX(expandedPositioningRect);
             
             if (maxX > CGRectGetMaxX(bounds)) {
                 constrainedRect.origin.x = maxX - CGRectGetWidth(constrainedRect);
-                moveOnscreen = YES;
+                expose = YES;
             }
         }
 
@@ -4538,14 +4538,14 @@ public:
         
         if (minY < CGRectGetMinY(bounds)) {
             constrainedRect.origin.y = minY;
-            moveOnscreen = YES;
+            expose = YES;
         }
         else {
             CGFloat maxY = CGRectGetMaxY(expandedPositioningRect);
             
             if (maxY > CGRectGetMaxY(bounds)) {
                 constrainedRect.origin.y = maxY - CGRectGetHeight(constrainedRect);
-                moveOnscreen = YES;
+                expose = YES;
             }
         }
     }
@@ -4571,7 +4571,7 @@ public:
         [self.delegate mapView:self didSelectAnnotationView:annotationView];
     }
 
-    if (moveOnscreen)
+    if (expose)
     {
         CGPoint center = CGPointMake(CGRectGetMidX(constrainedRect), CGRectGetMidY(constrainedRect));
         CLLocationCoordinate2D centerCoord = [self convertPoint:center toCoordinateFromView:self];

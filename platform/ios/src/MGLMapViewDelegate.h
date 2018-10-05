@@ -472,7 +472,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param annotation The object representing the shape annotation.
  @return A Boolean value indicating whether the annotation should be moved onscreen if it and its callout (if it has one) are offscreen.
  */
-- (BOOL)mapView:(MGLMapView *)mapView shouldMoveAnnotationOnscreenInResponseToUserSelection:(id <MGLAnnotation>)annotation;
+- (BOOL)mapView:(MGLMapView *)mapView shouldExposeAnnotationInResponseToUserSelection:(id <MGLAnnotation>)annotation;
 
 /**
  Tells the delegate that one of its annotations was selected.
