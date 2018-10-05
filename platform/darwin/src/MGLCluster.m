@@ -60,16 +60,15 @@ static NSString *MGLClusterPointCountAbbreviationIMP(id self, SEL _cmd) {
 }
 
 static IMP MGLFeatureClusterIMPFromSelector(SEL selector) {
-    if (selector == NSSelectorFromString(@"clusterIdentifier")) {
+    if (selector == @selector(clusterIdentifier)) {
         return (IMP)MGLClusterIdentifierIMP;
     }
-    else if (selector == NSSelectorFromString(@"clusterPointCount")) {
+    else if (selector == @selector(clusterPointCount)) {
         return (IMP)MGLClusterPointCountIMP;
     }
-    else if (selector == NSSelectorFromString(@"clusterPointCountAbbreviation")) {
+    else if (selector == @selector(clusterPointCountAbbreviation)) {
         return (IMP)MGLClusterPointCountAbbreviationIMP;
     }
-
     assert(0);
     return NULL;
 }

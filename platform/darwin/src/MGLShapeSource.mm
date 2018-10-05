@@ -224,27 +224,22 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 }
 
 - (void)debugRecursiveLogForFeature:(id <MGLFeature>)feature indent:(NSUInteger)indent {
-
-    id<MGLCluster> cluster = nil;
+    NSString *description = feature.description;
     
-    if ([feature conformsToProtocol:@protocol(MGLCluster)]) {
-        cluster = (id<MGLCluster>)feature;
-    }
+    // Want our recursive log on a single line
+    NSString *log = [description stringByReplacingOccurrencesOfString:@"\\s+"
+                                                           withString:@" "
+                                                              options:NSRegularExpressionSearch
+                                                                range:NSMakeRange(0, description.length)];
+    
+    printf("%*s%s\n", (int)indent, "", log.UTF8String);
+
+    id<MGLCluster> cluster = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(feature, MGLCluster);
     
     if (cluster) {
-        double zoom = [self zoomLevelForExpandingCluster:cluster];
-
-        NSString *log = [NSString stringWithFormat:@"Cluster %ld [count=%ld, zoom=%0.1g]", cluster.clusterIdentifier, cluster.clusterPointCount, zoom];
-        
-        printf("%*s%s\n", (int)indent, "", log.UTF8String);
-        
-        NSArray<id <MGLFeature>> *children = [self childrenOfCluster:cluster];
-        for (id <MGLFeature> child in children) {
-            [self debugRecursiveLogForFeature:child indent:indent + 2];
+        for (id <MGLFeature> child in [self childrenOfCluster:cluster]) {
+            [self debugRecursiveLogForFeature:child indent:indent + 4];
         }
-    }
-    else {
-        printf("%*sLeaf\n", (int)indent, "");
     }
 }
 
