@@ -12,6 +12,10 @@
 #import "MGLShape_Private.h"
 #import "MGLStyle.h"
 
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#import "MMEConstants.h"
+#endif
+
 @interface MGLShapeOfflineRegion () <MGLOfflineRegion_Private, MGLShapeOfflineRegion_Private>
 
 @end
@@ -21,6 +25,17 @@
 }
 
 @synthesize styleURL = _styleURL;
+
+-(NSDictionary *)offlineStartEventAttributes {
+    return @{
+             #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+             MMEEventKeyShapeForOfflineRegion: @"shaperegion",
+             MMEEventKeyMinZoomLevel: @(self.minimumZoomLevel),
+             MMEEventKeyMaxZoomLevel: @(self.maximumZoomLevel),
+             MMEEventKeyStyleURL: self.styleURL
+             #endif
+             };
+}
 
 + (BOOL)supportsSecureCoding {
     return YES;

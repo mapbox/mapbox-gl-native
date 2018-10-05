@@ -7,10 +7,16 @@
 #import "MGLOfflinePack_Private.h"
 #import "MGLOfflineRegion_Private.h"
 #import "MGLTilePyramidOfflineRegion.h"
+#import "MGLShapeOfflineRegion.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSValue+MGLAdditions.h"
 #import "NSDate+MGLAdditions.h"
 #import "NSData+MGLAdditions.h"
+
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#import "MMEConstants.h"
+#import "MGLMapboxEvents.h"
+#endif
 
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
@@ -361,6 +367,17 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         if (completion) {
             completion(pack, error);
         }
+            
+        #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+            NSMutableDictionary *offlineDownloadStartEventAttributes = [NSMutableDictionary dictionaryWithObject:MMEventTypeOfflineDownloadStart forKey:MMEEventKeyEvent];
+        
+            if ([region conformsToProtocol:@protocol(MGLOfflineRegion_Private)]) {
+                NSDictionary *regionAttributes = ((id<MGLOfflineRegion_Private>)region).offlineStartEventAttributes;
+                [offlineDownloadStartEventAttributes addEntriesFromDictionary:regionAttributes];
+            }
+        
+            [MGLMapboxEvents pushEvent:MMEventTypeOfflineDownloadStart withAttributes:offlineDownloadStartEventAttributes];
+        #endif
     }];
 }
 
