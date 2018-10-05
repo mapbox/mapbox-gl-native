@@ -67,7 +67,7 @@
     NSString *subclassName = MGLClusterSubclassNameForFeature(pointFeature);
     XCTAssert([unarchivedPointFeature isMemberOfClass:NSClassFromString(subclassName)]);
     
-    id<MGLCluster> cluster = MGL_OBJC_AS_PROTOCOL_OR_NIL(unarchivedPointFeature, MGLCluster);
+    id<MGLCluster> cluster = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(unarchivedPointFeature, MGLCluster);
     
     XCTAssert(cluster);
     XCTAssert(cluster.clusterIdentifier == 456);

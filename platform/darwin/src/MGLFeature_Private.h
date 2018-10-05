@@ -18,6 +18,7 @@ NSArray<MGLShape <MGLFeature> *> *MGLFeaturesFromMBGLFeatures(const std::vector<
 /**
  Returns an `MGLFeature` object converted from the given mbgl::Feature
  */
+MGL_EXPORT
 id <MGLFeature> MGLFeatureFromMBGLFeature(const mbgl::Feature &feature);
 
 /**

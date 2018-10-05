@@ -22,7 +22,7 @@ NSString *MGLClusterSubclassNameForFeature(id<MGLFeature> feature) {
 
 static NSUInteger MGLClusterIdentifierIMP(id self, SEL _cmd) {
     
-    id<MGLFeature> feature = MGL_OBJC_AS_PROTOCOL_OR_NIL(self, MGLFeature);
+    id<MGLFeature> feature = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(self, MGLFeature);
     
     NSNumber *clusterNumber = MGL_OBJC_DYNAMIC_CAST([feature attributeForKey:MGLClusterIdentifierKey], NSNumber);
     NSAssert(clusterNumber, @"Clusters should have a cluster_id");
@@ -38,7 +38,7 @@ static NSUInteger MGLClusterIdentifierIMP(id self, SEL _cmd) {
 }
 
 static NSUInteger MGLClusterPointCountIMP(id self, SEL _cmd) {
-    id<MGLFeature> feature = MGL_OBJC_AS_PROTOCOL_OR_NIL(self, MGLFeature);
+    id<MGLFeature> feature = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(self, MGLFeature);
 
     NSNumber *count = MGL_OBJC_DYNAMIC_CAST([feature attributeForKey:MGLClusterCountKey], NSNumber);
     NSAssert(count, @"Clusters should have a point_count");
@@ -47,7 +47,7 @@ static NSUInteger MGLClusterPointCountIMP(id self, SEL _cmd) {
 }
 
 static NSString *MGLClusterPointCountAbbreviationIMP(id self, SEL _cmd) {
-    id<MGLFeature> feature = MGL_OBJC_AS_PROTOCOL_OR_NIL(self, MGLFeature);
+    id<MGLFeature> feature = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(self, MGLFeature);
 
     NSString *abbreviation = MGL_OBJC_DYNAMIC_CAST([feature attributeForKey:MGLClusterCountAbbreviationKey], NSString);
     NSAssert(abbreviation, @"Clusters should have a point_count_abbreviated");

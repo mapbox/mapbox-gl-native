@@ -192,7 +192,8 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 // clusterId(number)The value of the cluster's  cluster_id property.
 // limit(number)The maximum number of features to return.
 // offset(number)The number of features to skip (e.g. for pagination).
-- (NSArray<id <MGLFeature>> *)leavesOfCluster:(id<MGLCluster>)cluster offset:(uint32_t)offset limit:(uint32_t)limit {
+
+- (NSArray<id <MGLFeature>> *)leavesOfCluster:(id<MGLCluster>)cluster offset:(UInt32)offset limit:(UInt32)limit {
     if(!self.rawSource) {
         return nil;
     }
@@ -222,7 +223,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
     return static_cast<double>(zoom);
 }
 
-- (void)debugRecursiveLogForFeature:(id <MGLFeature>)feature indent:(NSInteger)indent {
+- (void)debugRecursiveLogForFeature:(id <MGLFeature>)feature indent:(NSUInteger)indent {
 
     id<MGLCluster> cluster = nil;
     
