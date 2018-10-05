@@ -14,6 +14,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (const mbgl::OfflineRegionDefinition)offlineRegionDefinition;
 
+/**
+ Attributes to be passed into the offline download start event
+ */
+@property (nonatomic, readonly) NSDictionary *offlineStartEventAttributes;
+
 @end
 
 NS_ASSUME_NONNULL_END
