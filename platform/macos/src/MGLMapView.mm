@@ -1518,7 +1518,14 @@ public:
         if (hitAnnotationTag != _selectedAnnotationTag) {
             id <MGLAnnotation> annotation = [self annotationWithTag:hitAnnotationTag];
             NSAssert(annotation, @"Cannot select nonexistent annotation with tag %u", hitAnnotationTag);
-            [self selectAnnotation:annotation atPoint:gesturePoint];
+            
+            BOOL expose = YES;
+            
+            if ([self.delegate respondsToSelector:@selector(mapView:shouldExposeAnnotationInResponseToUserSelection:)]) {
+                expose = [self.delegate mapView:self shouldExposeAnnotationInResponseToUserSelection:annotation];
+            }
+            
+            [self selectAnnotation:annotation atPoint:gesturePoint animated:YES expose:expose];
         }
     } else {
         [self deselectAnnotation:self.selectedAnnotation];
@@ -2254,10 +2261,15 @@ public:
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint
 {
-    [self selectAnnotation:annotation atPoint:gesturePoint moveOnscreen:YES animateSelection:YES];
+    [self selectAnnotation:annotation atPoint:gesturePoint animated:YES];
 }
 
-- (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint moveOnscreen:(BOOL)moveOnscreen animateSelection:(BOOL)animateSelection
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint animated:(BOOL)animated
+{
+    [self selectAnnotation:annotation atPoint:gesturePoint animated:animated expose:animated];
+}
+
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint animated:(BOOL)animated expose:(BOOL)expose
 {
     id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
     if (annotation == selectedAnnotation) {
@@ -2273,10 +2285,6 @@ public:
         [self addAnnotation:annotation];
     }
 
-    if (moveOnscreen) {
-        moveOnscreen = [self isBringingAnnotationOnscreenSupportedForAnnotation:annotation animated:animateSelection];
-    }
-
     // The annotation's anchor will bounce to the current click.
     NSRect positioningRect = [self positioningRectForCalloutForAnnotationWithTag:annotationTag];
 
@@ -2286,7 +2294,7 @@ public:
         positioningRect.origin = [self convertCoordinate:origin toPointToView:self];
     }
 
-    if (!moveOnscreen && NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
+    if (!expose && NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
         if (!NSEqualPoints(gesturePoint, NSZeroPoint)) {
             positioningRect = CGRectMake(gesturePoint.x, gesturePoint.y, positioningRect.size.width, positioningRect.size.height);
         }
@@ -2319,13 +2327,13 @@ public:
         [callout showRelativeToRect:positioningRect ofView:self preferredEdge:edge];
     }
 
-    if (moveOnscreen)
+    if (expose)
     {
-        moveOnscreen = NO;
+        expose = NO;
 
         NSRect (^edgeInsetsInsetRect)(NSRect, NSEdgeInsets) = ^(NSRect rect, NSEdgeInsets insets) {
             return NSMakeRect(rect.origin.x + insets.left,
-                              rect.origin.y + insets.top,
+                              rect.origin.y + insets.bottom,
                               rect.size.width - insets.left - insets.right,
                               rect.size.height - insets.top - insets.bottom);
         };
@@ -2338,33 +2346,41 @@ public:
         CGRect bounds          = constrainedRect;
 
         // Any one of these cases should trigger a move onscreen
-        if (CGRectGetMinX(positioningRect) < CGRectGetMinX(bounds))
-        {
-            constrainedRect.origin.x = expandedPositioningRect.origin.x;
-            moveOnscreen = YES;
+        CGFloat minX = CGRectGetMinX(expandedPositioningRect);
+        
+        if (minX < CGRectGetMinX(bounds)) {
+            constrainedRect.origin.x = minX;
+            expose = YES;
         }
-        else if (CGRectGetMaxX(positioningRect) > CGRectGetMaxX(bounds))
-        {
-            constrainedRect.origin.x = CGRectGetMaxX(expandedPositioningRect) - constrainedRect.size.width;
-            moveOnscreen = YES;
+        else {
+            CGFloat maxX = CGRectGetMaxX(expandedPositioningRect);
+            
+            if (maxX > CGRectGetMaxX(bounds)) {
+                constrainedRect.origin.x = maxX - CGRectGetWidth(constrainedRect);
+                expose = YES;
+            }
+        }
+        
+        CGFloat minY = CGRectGetMinY(expandedPositioningRect);
+        
+        if (minY < CGRectGetMinY(bounds)) {
+            constrainedRect.origin.y = minY;
+            expose = YES;
+        }
+        else {
+            CGFloat maxY = CGRectGetMaxY(expandedPositioningRect);
+            
+            if (maxY > CGRectGetMaxY(bounds)) {
+                constrainedRect.origin.y = maxY - CGRectGetHeight(constrainedRect);
+                expose = YES;
+            }
         }
 
-        if (CGRectGetMinY(positioningRect) < CGRectGetMinY(bounds))
-        {
-            constrainedRect.origin.y = expandedPositioningRect.origin.y;
-            moveOnscreen = YES;
-        }
-        else if (CGRectGetMaxY(positioningRect) > CGRectGetMaxY(bounds))
-        {
-            constrainedRect.origin.y = CGRectGetMaxY(expandedPositioningRect) - constrainedRect.size.height;
-            moveOnscreen = YES;
-        }
-
-        if (moveOnscreen)
+        if (expose)
         {
             CGPoint center = CGPointMake(CGRectGetMidX(constrainedRect), CGRectGetMidY(constrainedRect));
             CLLocationCoordinate2D centerCoord = [self convertPoint:center toCoordinateFromView:self];
-            [self setCenterCoordinate:centerCoord animated:animateSelection];
+            [self setCenterCoordinate:centerCoord animated:animated];
         }
     }
 }
