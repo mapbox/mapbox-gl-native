@@ -35,7 +35,8 @@
     "request": "^2.72.0",
     "semver": "^5.5.0",
     "tape": "^4.5.1",
-    "xcode": "^1.0.0"
+    "xcode": "^1.0.0",
+    "@mapbox/mapbox-bindgen": "https://mapbox-npm.s3.amazonaws.com/package/mapbox-mapbox-bindgen-2.0.9-6a475a9b8d135813bf80e03f5f0f2a1236915590.tgz"
   },
   "engines": {
     "node": ">=6"

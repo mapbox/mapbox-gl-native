@@ -1,0 +1,1 @@
+../node_modules/@mapbox/mapbox-bindgen/src/support/mapbox_bindgen.cmake
