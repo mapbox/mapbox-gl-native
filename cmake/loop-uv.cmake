@@ -7,6 +7,7 @@ target_sources(mbgl-loop-uv INTERFACE
 )
 
 target_include_directories(mbgl-loop-uv INTERFACE
+    optional
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )

@@ -1,0 +1,15 @@
+#pragma once
+
+#include <nonstd/optional.hpp>
+
+namespace std {
+namespace experimental {
+
+template <typename T>
+using optional = nonstd::optional<T>;
+
+using nullopt_t = nonstd::nullopt_t;
+constexpr nullopt_t nullopt = nonstd::nullopt;
+
+} // namespace experimental
+} // namespace std
