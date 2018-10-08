@@ -56,9 +56,6 @@ public:
 
     virtual ~NativeMapView();
 
-    // Deprecated //
-    void notifyMapChange(mbgl::MapChange);
-
     // mbgl::RendererBackend (mbgl::MapObserver) //
     void onCameraWillChange(MapObserver::CameraChangeMode) override;
     void onCameraIsChanging() override;

@@ -58,8 +58,11 @@ final class NativeMapView {
   // Used to validate if methods are called from the correct thread
   private final Thread thread;
 
-  // Used for callbacks
+  // Used for view callbacks
   private ViewCallback viewCallback;
+
+  // Used for map change callbacks
+  private StateCallback stateCallback;
 
   // Device density
   private final float pixelRatio;
@@ -85,17 +88,20 @@ final class NativeMapView {
   //
 
   public NativeMapView(final Context context, final boolean crossSourceCollisions, final ViewCallback viewCallback,
-                       final MapRenderer mapRenderer) {
-    this(context, context.getResources().getDisplayMetrics().density, crossSourceCollisions, viewCallback, mapRenderer);
+                       final StateCallback stateCallback, final MapRenderer mapRenderer) {
+    this(context, context.getResources().getDisplayMetrics().density, crossSourceCollisions, viewCallback,
+      stateCallback, mapRenderer);
   }
 
   public NativeMapView(final Context context, final float pixelRatio, final boolean crossSourceCollisions,
-                       final ViewCallback viewCallback, final MapRenderer mapRenderer) {
+                       final ViewCallback viewCallback, final StateCallback stateCallback,
+                       final MapRenderer mapRenderer) {
     this.mapRenderer = mapRenderer;
     this.viewCallback = viewCallback;
     this.fileSource = FileSource.getInstance(context);
     this.pixelRatio = pixelRatio;
     this.thread = Thread.currentThread();
+    this.stateCallback = stateCallback;
     nativeInitialize(this, fileSource, mapRenderer, pixelRatio, crossSourceCollisions);
   }
 
@@ -917,6 +923,90 @@ final class NativeMapView {
   }
 
   @Keep
+  private void onCameraWillChange(boolean animated) {
+    stateCallback.onCameraWillChange(animated);
+    // deprecated API
+    onMapChanged(animated ? MapView.REGION_WILL_CHANGE_ANIMATED : MapView.REGION_WILL_CHANGE);
+  }
+
+  @Keep
+  private void onCameraIsChanging() {
+    stateCallback.onCameraIsChanging();
+    // deprecated API
+    onMapChanged(MapView.REGION_IS_CHANGING);
+  }
+
+  @Keep
+  private void onCameraDidChange(boolean animated) {
+    stateCallback.onCameraDidChange(animated);
+    // deprecated API
+    onMapChanged(animated ? MapView.REGION_DID_CHANGE_ANIMATED : MapView.REGION_DID_CHANGE);
+  }
+
+  @Keep
+  private void onWillStartLoadingMap() {
+    stateCallback.onWillStartLoadingMap();
+    // deprecated API
+    onMapChanged(MapView.WILL_START_LOADING_MAP);
+  }
+
+  @Keep
+  private void onDidFinishLoadingMap() {
+    stateCallback.onDidFinishLoadingMap();
+    // deprecated API
+    onMapChanged(MapView.DID_FINISH_LOADING_MAP);
+  }
+
+  @Keep
+  private void onDidFailLoadingMap(String error) {
+    stateCallback.onDidFailLoadingMap(error);
+    // deprecated API
+    onMapChanged(MapView.DID_FAIL_LOADING_MAP);
+  }
+
+  @Keep
+  private void onWillStartRenderingFrame() {
+    stateCallback.onWillStartRenderingFrame();
+    // deprecated API
+    onMapChanged(MapView.WILL_START_RENDERING_FRAME);
+  }
+
+  @Keep
+  private void onDidFinishRenderingFrame(boolean fully) {
+    stateCallback.onDidFinishRenderingFrame(fully);
+    // deprecated API
+    onMapChanged(fully ? MapView.DID_FINISH_RENDERING_FRAME_FULLY_RENDERED : MapView.DID_FINISH_RENDERING_FRAME);
+  }
+
+  @Keep
+  private void onWillStartRenderingMap() {
+    stateCallback.onWillStartRenderingMap();
+    // deprecated API
+    onMapChanged(MapView.WILL_START_RENDERING_MAP);
+  }
+
+  @Keep
+  private void onDidFinishRenderingMap(boolean fully) {
+    stateCallback.onDidFinishRenderingMap(fully);
+    // deprecated API
+    onMapChanged(fully ? MapView.DID_FINISH_RENDERING_MAP_FULLY_RENDERED : MapView.DID_FINISH_RENDERING_MAP);
+  }
+
+  @Keep
+  private void onDidFinishLoadingStyle() {
+    stateCallback.onDidFinishLoadingStyle();
+    // deprecated API
+    onMapChanged(MapView.DID_FINISH_LOADING_STYLE);
+  }
+
+  @Keep
+  private void onSourceChanged(String sourceId) {
+    stateCallback.onSourceChanged(sourceId);
+    // deprecated API
+    onMapChanged(MapView.SOURCE_DID_CHANGE);
+  }
+
+  @Keep
   protected void onSnapshotReady(Bitmap mapContent) {
     if (checkState("OnSnapshotReady")) {
       return;
@@ -1220,10 +1310,17 @@ final class NativeMapView {
   // MapChangeEvents
   //
 
+  /**
+   * @deprecated use {@link StateCallback} instead
+   */
+  @Deprecated
   void addOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
     onMapChangedListeners.add(listener);
   }
 
+  /**
+   * @deprecated use {@link StateCallback} instead
+   */
   void removeOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
     if (onMapChangedListeners.contains(listener)) {
       onMapChangedListeners.remove(listener);
@@ -1323,5 +1420,31 @@ final class NativeMapView {
     int getHeight();
 
     Bitmap getViewContent();
+  }
+
+  public interface StateCallback {
+    void onCameraWillChange(boolean animated);
+
+    void onCameraIsChanging();
+
+    void onCameraDidChange(boolean animated);
+
+    void onWillStartLoadingMap();
+
+    void onDidFinishLoadingMap();
+
+    void onDidFailLoadingMap(String error);
+
+    void onWillStartRenderingFrame();
+
+    void onDidFinishRenderingFrame(boolean fully);
+
+    void onWillStartRenderingMap();
+
+    void onDidFinishRenderingMap(boolean fully);
+
+    void onDidFinishLoadingStyle();
+
+    void onSourceChanged(String sourceId);
   }
 }
