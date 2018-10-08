@@ -15,6 +15,7 @@ workflows:
       - android-arm-v7-template:
           name: android-gnustl-arm-v7
           stl: gnustl_shared
+          image: android-ndk-r17c:1d5db0eb34
       - android-release:
           filters:
             tags:
@@ -519,8 +520,11 @@ jobs:
       stl:
         type: string
         default: "c++_static"
+      image:
+        type: string
+        default: android-ndk-r19:8e91a7ebab
     docker:
-      - image: mbgl/android-ndk-r17c:dd161efed6
+      - image: mbgl/<< parameters.image >>
     resource_class: large
     working_directory: /src
     environment:
@@ -582,7 +586,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-release:
     docker:
-      - image: mbgl/android-ndk-r17c:dd161efed6
+      - image: mbgl/android-ndk-r19:8e91a7ebab
     resource_class: large
     working_directory: /src
     environment:

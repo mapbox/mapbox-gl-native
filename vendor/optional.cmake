@@ -1,9 +1,8 @@
 add_library(optional INTERFACE)
 
-# This polyfill is really only needed for
-# Windows. We need to be careful to not leak
-# it into any of our public interfaces.
-if(WIN32)
+# This polyfill is needed for Windows and Android since these standard libraries don't ship with
+# usable versions of <experimental/optional>
+if(WIN32 OR MBGL_PLATFORM STREQUAL "android")
     target_include_directories(optional SYSTEM INTERFACE
         ${CMAKE_SOURCE_DIR}/vendor/optional/include
     )
