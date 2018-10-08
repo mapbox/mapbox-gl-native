@@ -1219,6 +1219,10 @@ public:
         // CADisplayLink.frameInterval does not support more than 60 FPS (and
         // no device that supports >60 FPS ever supported iOS 9).
         NSInteger maximumFrameRate = 60;
+
+        // `0` is an alias for maximum frame rate.
+        newFrameRate = newFrameRate ?: maximumFrameRate;
+
         _displayLink.frameInterval = maximumFrameRate / MIN(newFrameRate, maximumFrameRate);
     }
 }
