@@ -81,12 +81,10 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
         }
         LineBucket& bucket = *bucket_;
 
-        auto draw = [&] (auto& program, auto&& uniformValues, const optional<ImagePosition>& patternPositionA, const optional<ImagePosition>& patternPositionB) {
+        auto draw = [&] (auto& program, auto&& uniformValues) {
             auto& programInstance = program.get(evaluated);
 
             const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
-
-            paintPropertyBinders.setPatternParameters(patternPositionA, patternPositionB, crossfade);
 
             const auto allUniformValues = programInstance.computeAllUniformValues(
                 std::move(uniformValues),
@@ -135,7 +133,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      posA,
                      posB,
                      crossfade,
-                     parameters.lineAtlas.getSize().width), {}, {});
+                     parameters.lineAtlas.getSize().width));
 
         } else if (!unevaluated.get<LinePattern>().isUndefined()) {
             const auto linePatternValue =  evaluated.get<LinePattern>().constantOr(Faded<std::basic_string<char>>{ "", ""});
@@ -146,6 +144,12 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
 
             optional<ImagePosition> posA = geometryTile.getPattern(linePatternValue.from);
             optional<ImagePosition> posB = geometryTile.getPattern(linePatternValue.to);
+            // if pattern property is constant and patterns aren't available, don't draw
+            if (!linePatternValue.to.empty() && (!posA || !posB)) continue;
+
+            const auto& binders = bucket.paintPropertyBinders.at(getID());
+            binders.setPatternParameters(posA, posB, crossfade);
+
 
             draw(parameters.programs.linePattern,
                  LinePatternProgram::uniformValues(
@@ -155,9 +159,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      parameters.pixelsToGLUnits,
                      texsize,
                      crossfade,
-                     parameters.pixelRatio),
-                     *posA,
-                     *posB);
+                     parameters.pixelRatio));
         } else if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
             if (!colorRampTexture) {
                 colorRampTexture = parameters.context.createTexture(colorRamp);
@@ -169,14 +171,14 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                     evaluated,
                     tile,
                     parameters.state,
-                    parameters.pixelsToGLUnits), {}, {});
+                    parameters.pixelsToGLUnits));
         } else {
             draw(parameters.programs.line,
                  LineProgram::uniformValues(
                      evaluated,
                      tile,
                      parameters.state,
-                     parameters.pixelsToGLUnits), {}, {});
+                     parameters.pixelsToGLUnits));
         }
     }
 }
