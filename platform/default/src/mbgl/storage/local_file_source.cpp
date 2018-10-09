@@ -46,12 +46,13 @@ public:
         } else if (result == -1 && errno == ENOENT) {
             response.error = std::make_unique<Response::Error>(Response::Error::Reason::NotFound);
         } else {
-            try {
-                response.data = std::make_shared<std::string>(util::read_file(path));
-            } catch (...) {
+            auto data = util::readFile(path);
+            if (!data) {
                 response.error = std::make_unique<Response::Error>(
                     Response::Error::Reason::Other,
-                    util::toString(std::current_exception()));
+                    std::string("Cannot read file ") + path);
+            } else {
+                response.data = std::make_shared<std::string>(std::move(*data));
             }
         }
 
