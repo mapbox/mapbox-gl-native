@@ -409,6 +409,20 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         }
     });
 
+    define("feature-state", [](const EvaluationContext& params, const std::string& key) -> Result<Value> {
+        if (!params.feature || !params.featureState) {
+            return EvaluationError {
+                "Feature state data is unavailable in the current evaluation context."
+            };
+        }
+
+        auto statePair = params.featureState->find(key);
+        if (statePair == params.featureState->end()) {
+            return Null;
+        }
+        return Value(toExpressionValue(statePair->second));
+    });
+
     define("id", [](const EvaluationContext& params) -> Result<Value> {
         if (!params.feature) {
             return EvaluationError {

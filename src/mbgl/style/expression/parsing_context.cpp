@@ -197,7 +197,7 @@ ParseResult ParsingContext::parse(const Convertible& value, optional<TypeAnnotat
     // it immediately and replace it with a literal value in the
     // parsed result.
     if ((*parsed)->getKind() != Kind::Literal && isConstant(**parsed)) {
-        EvaluationContext params(nullptr);
+        EvaluationContext params(nullptr, {});
         EvaluationResult evaluated((*parsed)->evaluate(params));
         if (!evaluated) {
             error(evaluated.error().message);

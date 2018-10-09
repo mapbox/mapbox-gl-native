@@ -29,7 +29,7 @@ bool isGlobalPropertyConstant(const Expression& expression, const T& properties)
 
 bool isFeatureConstant(const Expression& expression);
 bool isZoomConstant(const Expression& e);
-
+bool isFeatureStateConstant(const Expression& e);
 
 } // namespace expression
 } // namespace style

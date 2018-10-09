@@ -31,7 +31,7 @@ bool filter(const char * json,
     EXPECT_EQ(error.message, "");
     
     StubGeometryTileFeature feature { featureId, featureType, featureGeometry, featureProperties };
-    expression::EvaluationContext context = { zoom, &feature };
+    expression::EvaluationContext context = { zoom, &feature, {} };
     
     return (*filter)(context);
 }

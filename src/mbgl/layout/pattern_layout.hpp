@@ -62,7 +62,7 @@ public:
         const size_t featureCount = sourceLayer->featureCount();
         for (size_t i = 0; i < featureCount; ++i) {
             auto feature = sourceLayer->getFeature(i);
-            if (!leader.filter(style::expression::EvaluationContext { this->zoom, feature.get() }))
+            if (!leader.filter(style::expression::EvaluationContext { this->zoom, feature.get(), {} }))
                 continue;
 
             std::unordered_map<std::string, PatternDependency> patternDependencyMap;

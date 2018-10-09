@@ -34,7 +34,7 @@ public:
     Color evaluate(const Evaluator&, TimePoint = {}) const { return {}; }
 
     Color evaluate(double rampEvaluationParameter) const {
-        const auto result = value->evaluate(expression::EvaluationContext({}, nullptr, {rampEvaluationParameter}));
+        const auto result = value->evaluate(expression::EvaluationContext({}, nullptr, optional<PropertyMap>{}, {rampEvaluationParameter}));
         return *expression::fromExpressionValue<Color>(*result);
     }
 

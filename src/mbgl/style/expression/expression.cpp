@@ -28,9 +28,9 @@ public:
 };
 
 
-EvaluationResult Expression::evaluate(optional<float> zoom, const Feature& feature, optional<double> colorRampParameter) const {
+EvaluationResult Expression::evaluate(optional<float> zoom, const Feature& feature, optional<PropertyMap> featureState, optional<double> colorRampParameter) const {
     GeoJSONFeature f(feature);
-    return this->evaluate(EvaluationContext(zoom, &f, colorRampParameter));
+    return this->evaluate(EvaluationContext(zoom, &f, featureState, colorRampParameter));
 }
 
 } // namespace expression

@@ -26,16 +26,20 @@ public:
 class EvaluationContext {
 public:
     EvaluationContext(float zoom_) : zoom(zoom_), feature(nullptr) {}
-    EvaluationContext(GeometryTileFeature const * feature_) : zoom(optional<float>()), feature(feature_) {}
-    EvaluationContext(float zoom_, GeometryTileFeature const * feature_) :
-        zoom(zoom_), feature(feature_)
+    EvaluationContext(GeometryTileFeature const * feature_, optional<PropertyMap> featureState_) : zoom(optional<float>()), feature(feature_), featureState(std::move(featureState_)) {}
+    EvaluationContext(float zoom_, GeometryTileFeature const * feature_, optional<PropertyMap> featureState_) :
+        zoom(zoom_), feature(feature_), featureState(std::move(featureState_))
     {}
-    EvaluationContext(optional<float> zoom_, GeometryTileFeature const * feature_, optional<double> colorRampParameter_) :
-        zoom(std::move(zoom_)), feature(feature_), colorRampParameter(std::move(colorRampParameter_))
+    EvaluationContext(optional<float> zoom_, GeometryTileFeature const * feature_, optional<PropertyMap> featureState_, optional<double> colorRampParameter_) :
+        zoom(std::move(zoom_)),
+        feature(feature_),
+        featureState(std::move(featureState_)),
+        colorRampParameter(std::move(colorRampParameter_))
     {}
     
     optional<float> zoom;
     GeometryTileFeature const * feature;
+    optional<PropertyMap> featureState;
     optional<double> colorRampParameter;
 };
 
@@ -150,7 +154,7 @@ public:
     Kind getKind() const { return kind; };
     type::Type getType() const { return type; };
     
-    EvaluationResult evaluate(optional<float> zoom, const Feature& feature, optional<double> colorRampParameter) const;
+    EvaluationResult evaluate(optional<float> zoom, const Feature& feature, optional<PropertyMap> featureState, optional<double> colorRampParameter) const;
 
     /**
      * Statically analyze the expression, attempting to enumerate possible outputs. Returns

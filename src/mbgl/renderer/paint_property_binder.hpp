@@ -173,7 +173,7 @@ public:
     }
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, const ImagePositions&, const optional<PatternDependency>&) override {
-        auto evaluated = expression.evaluate(feature, defaultValue);
+        auto evaluated = expression.evaluate(feature, {}, defaultValue);
         this->statistics.add(evaluated);
         auto value = attributeValue(evaluated);
         for (std::size_t i = vertexVector.vertexSize(); i < length; ++i) {
@@ -228,7 +228,7 @@ public:
     }
     void setPatternParameters(const optional<ImagePosition>&, const optional<ImagePosition>&, CrossfadeParameters&) override {};
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length, const ImagePositions&, const optional<PatternDependency>&) override {
-        Range<T> range = expression.evaluate(zoomRange, feature, defaultValue);
+        Range<T> range = expression.evaluate(zoomRange, feature, {}, defaultValue);
         this->statistics.add(range.min);
         this->statistics.add(range.max);
         AttributeValue value = zoomInterpolatedAttributeValue(

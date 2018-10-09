@@ -23,11 +23,12 @@ public:
 
     bool isZoomConstant() const { return expression::isZoomConstant(*expression); }
     bool isFeatureConstant() const { return expression::isFeatureConstant(*expression); }
+    bool isFeatureStateConstant() const { return expression::isFeatureStateConstant(*expression); }
 
     T evaluate(float zoom) const {
         assert(!expression::isZoomConstant(*expression));
         assert(expression::isFeatureConstant(*expression));
-        const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext(zoom, nullptr));
+        const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext(zoom, nullptr, {}));
         if (result) {
             const optional<T> typed = expression::fromExpressionValue<T>(*result);
             return typed ? *typed : defaultValue ? *defaultValue : T();
@@ -36,10 +37,10 @@ public:
     }
 
     template <class Feature>
-    T evaluate(const Feature& feature, T finalDefaultValue) const {
+    T evaluate(const Feature& feature, optional<PropertyMap> featureState, T finalDefaultValue) const {
         assert(expression::isZoomConstant(*expression));
         assert(!expression::isFeatureConstant(*expression));
-        const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext(&feature));
+        const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext(&feature, featureState));
         if (result) {
             const optional<T> typed = expression::fromExpressionValue<T>(*result);
             return typed ? *typed : defaultValue ? *defaultValue : finalDefaultValue;
@@ -48,9 +49,9 @@ public:
     }
 
     template <class Feature>
-    T evaluate(float zoom, const Feature& feature, T finalDefaultValue) const {
+    T evaluate(float zoom, const Feature& feature, optional<PropertyMap> featureState, T finalDefaultValue) const {
         assert(!expression::isFeatureConstant(*expression));
-        const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext({zoom}, &feature));
+        const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext({zoom}, &feature, featureState));
         if (result) {
             const optional<T> typed = expression::fromExpressionValue<T>(*result);
             return typed ? *typed : defaultValue ? *defaultValue : finalDefaultValue;
@@ -87,10 +88,10 @@ public:
 
     // Return the range obtained by evaluating the function at each of the zoom levels in zoomRange
     template <class Feature>
-    Range<T> evaluate(const Range<float>& zoomRange, const Feature& feature, T finalDefaultValue) {
+    Range<T> evaluate(const Range<float>& zoomRange, const Feature& feature, optional<PropertyMap> featureState, T finalDefaultValue) {
         return Range<T> {
-            evaluate(zoomRange.min, feature, finalDefaultValue),
-            evaluate(zoomRange.max, feature, finalDefaultValue)
+            evaluate(zoomRange.min, feature, featureState, finalDefaultValue),
+            evaluate(zoomRange.max, feature, featureState, finalDefaultValue)
         };
     }
 

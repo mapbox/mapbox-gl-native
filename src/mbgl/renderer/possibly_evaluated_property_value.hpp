@@ -47,9 +47,9 @@ public:
             [&] (const T& constant_) { return constant_; },
             [&] (const style::PropertyExpression<T>& expression) {
                 if (useIntegerZoom) {
-                    return expression.evaluate(floor(zoom), feature, defaultValue);
+                    return expression.evaluate(floor(zoom), feature, {}, defaultValue);
                 } else {
-                    return expression.evaluate(zoom, feature, defaultValue);
+                    return expression.evaluate(zoom, feature, {}, defaultValue);
                 }
             }
         );
@@ -98,11 +98,11 @@ public:
             [&] (const Faded<T>& constant_) { return constant_; },
             [&] (const style::PropertyExpression<T>& expression) {
                 if (!expression.isZoomConstant()) {
-                    const T min = expression.evaluate(floor(zoom), feature, defaultValue);
-                    const T max = expression.evaluate(floor(zoom) + 1, feature, defaultValue);
+                    const T min = expression.evaluate(floor(zoom), feature, {}, defaultValue);
+                    const T max = expression.evaluate(floor(zoom) + 1, feature, {}, defaultValue);
                     return Faded<T> {min, max};
                 } else {
-                    const T evaluated = expression.evaluate(feature, defaultValue);
+                    const T evaluated = expression.evaluate(feature, {}, defaultValue);
                     return Faded<T> {evaluated, evaluated};
                 }
             }

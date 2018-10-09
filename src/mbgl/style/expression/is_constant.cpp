@@ -23,7 +23,8 @@ bool isFeatureConstant(const Expression& expression) {
         } else if (
             name == "properties" ||
             name == "geometry-type" ||
-            name == "id"
+            name == "id" ||
+            name == "feature-state"
         ) {
             return false;
         }
@@ -47,6 +48,9 @@ bool isFeatureConstant(const Expression& expression) {
 
 bool isZoomConstant(const Expression& e) {
     return isGlobalPropertyConstant(e, std::array<std::string, 1>{{"zoom"}});
+}
+bool isFeatureStateConstant(const Expression& e) {
+    return isGlobalPropertyConstant(e, std::array<std::string, 1>{{"feature-state"}});
 }
 
 

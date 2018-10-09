@@ -195,7 +195,7 @@ public:
     }
 
     Range<float> getVertexSizeData(const GeometryTileFeature& feature) override {
-        const float size = expression.evaluate(feature, defaultValue);
+        const float size = expression.evaluate(feature, {}, defaultValue);
         return { size, size };
     };
 
@@ -220,8 +220,8 @@ public:
 
     Range<float> getVertexSizeData(const GeometryTileFeature& feature) override {
         return {
-            expression.evaluate(coveringZoomStops.min, feature, defaultValue),
-            expression.evaluate(coveringZoomStops.max, feature, defaultValue)
+            expression.evaluate(coveringZoomStops.min, feature, {}, defaultValue),
+            expression.evaluate(coveringZoomStops.max, feature, {}, defaultValue)
         };
     };
 

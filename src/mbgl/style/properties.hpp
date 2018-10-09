@@ -155,7 +155,7 @@ public:
                     return t;
                 },
                 [&] (const PropertyExpression<T>& t) {
-                    return t.evaluate(z, feature, defaultValue);
+                    return t.evaluate(z, feature, {}, defaultValue);
                 });
         }
 

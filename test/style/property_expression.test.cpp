@@ -48,13 +48,13 @@ TEST(PropertyExpression, Expression) {
 
 TEST(PropertyExpression, Defaults) {
     EXPECT_EQ(1.0f, PropertyExpression<float>(number(get("property")), 0.0)
-        .evaluate(oneInteger, 2.0f));
+        .evaluate(oneInteger, {}, 2.0f));
     EXPECT_EQ(1.0f, PropertyExpression<float>(number(get("property")), 0.0)
-        .evaluate(oneDouble, 2.0f));
+        .evaluate(oneDouble, {}, 2.0f));
     EXPECT_EQ(0.0f, PropertyExpression<float>(number(get("property")), 0.0)
-        .evaluate(oneString, 2.0f));
+        .evaluate(oneString, {}, 2.0f));
     EXPECT_EQ(2.0f, PropertyExpression<float>(number(get("property")))
-        .evaluate(oneString, 2.0f));
+        .evaluate(oneString, {}, 2.0f));
 }
 
 TEST(PropertyExpression, ZoomInterpolation) {
@@ -64,35 +64,35 @@ TEST(PropertyExpression, ZoomInterpolation) {
             1.5, interpolate(linear(), number(get("property")), 1.0, literal(36.0)),
             3.0, interpolate(linear(), number(get("property")), 1.0, literal(48.0))
         ), 0.0f)
-    .evaluate(2.0f, oneInteger, -1.0f)) << "Should interpolate between stops";
+    .evaluate(2.0f, oneInteger, {}, -1.0f)) << "Should interpolate between stops";
     
     EXPECT_EQ(33.0, PropertyExpression<float>(
         interpolate(linear(), zoom(),
             5.0, interpolate(linear(), number(get("property")), 1.0, literal(33.0)),
             10.0, interpolate(linear(), number(get("property")), 1.0, literal(66.0))
         ), 0.0f)
-    .evaluate(0.0f, oneInteger, -1.0f)) << "Use first stop output for input values from -inf to first stop";
+    .evaluate(0.0f, oneInteger, {}, -1.0f)) << "Use first stop output for input values from -inf to first stop";
     
     EXPECT_EQ(66.0, PropertyExpression<float>(
         interpolate(linear(), zoom(),
             0.0, interpolate(linear(), number(get("property")), 1.0, literal(33.0)),
             10.0, interpolate(linear(), number(get("property")), 1.0, literal(66.0))
         ), 0.0f)
-    .evaluate(20.0f, oneInteger, -1.0f)) << "Use last stop output for input values from last stop to +inf";
+    .evaluate(20.0f, oneInteger, {}, -1.0f)) << "Use last stop output for input values from last stop to +inf";
 
     EXPECT_EQ(66.0f, PropertyExpression<float>(
         interpolate(linear(), zoom(),
             0.0, interpolate(linear(), number(get("property")), 1.0, literal(33.0)),
             10.0, interpolate(linear(), number(get("property")), 1.0, literal(66.0))
         ), 0.0f)
-    .evaluate(10.0f, oneInteger, -1.0f)) << "Should interpolate TO the last stop.";
+    .evaluate(10.0f, oneInteger, {}, -1.0f)) << "Should interpolate TO the last stop.";
     
     EXPECT_EQ(33.0f, PropertyExpression<float>(
         interpolate(linear(), zoom(),
             0.0, interpolate(linear(), number(get("property")), 1.0, literal(33.0)),
             10.0, interpolate(linear(), number(get("property")), 1.0, literal(66.0))
         ), 0.0f)
-    .evaluate(0.0f, oneInteger, -1.0f)) << "Should interpolate TO the first stop";
+    .evaluate(0.0f, oneInteger, {}, -1.0f)) << "Should interpolate TO the first stop";
 }
 
 TEST(PropertyExpression, Issue8460) {
@@ -102,10 +102,10 @@ TEST(PropertyExpression, Issue8460) {
             15.2, interpolate(linear(), number(get("property")), 1.0, literal(600.0))
         ), 0.0f);
 
-    EXPECT_NEAR(  0.0f, fn1.evaluate(15.0f, oneInteger, -1.0f), 0.00);
-    EXPECT_NEAR(300.0f, fn1.evaluate(15.1f, oneInteger, -1.0f), 0.01);
-    EXPECT_NEAR(600.0f, fn1.evaluate(15.2f, oneInteger, -1.0f), 0.00);
-    EXPECT_NEAR(600.0f, fn1.evaluate(16.0f, oneInteger, -1.0f), 0.00);
+    EXPECT_NEAR(  0.0f, fn1.evaluate(15.0f, oneInteger, {}, -1.0f), 0.00);
+    EXPECT_NEAR(300.0f, fn1.evaluate(15.1f, oneInteger, {}, -1.0f), 0.01);
+    EXPECT_NEAR(600.0f, fn1.evaluate(15.2f, oneInteger, {}, -1.0f), 0.00);
+    EXPECT_NEAR(600.0f, fn1.evaluate(16.0f, oneInteger, {}, -1.0f), 0.00);
 
     PropertyExpression<float> fn2(
         interpolate(linear(), zoom(),
@@ -114,10 +114,10 @@ TEST(PropertyExpression, Issue8460) {
             18.0, interpolate(linear(), number(get("property")), 1.0, literal(600.0))
         ), 0.0f);
 
-    EXPECT_NEAR(  0.0f, fn2.evaluate(15.0f, oneInteger, -1.0f), 0.00);
-    EXPECT_NEAR(150.0f, fn2.evaluate(15.1f, oneInteger, -1.0f), 0.01);
-    EXPECT_NEAR(300.0f, fn2.evaluate(15.2f, oneInteger, -1.0f), 0.00);
-    EXPECT_NEAR(385.71f, fn2.evaluate(16.0f, oneInteger, -1.0f), 0.01);
-    EXPECT_NEAR(600.0f, fn2.evaluate(18.0f, oneInteger, -1.0f), 0.00);
-    EXPECT_NEAR(600.0f, fn2.evaluate(19.0f, oneInteger, -1.0f), 0.00);
+    EXPECT_NEAR(  0.0f, fn2.evaluate(15.0f, oneInteger, {}, -1.0f), 0.00);
+    EXPECT_NEAR(150.0f, fn2.evaluate(15.1f, oneInteger, {}, -1.0f), 0.01);
+    EXPECT_NEAR(300.0f, fn2.evaluate(15.2f, oneInteger, {}, -1.0f), 0.00);
+    EXPECT_NEAR(385.71f, fn2.evaluate(16.0f, oneInteger, {}, -1.0f), 0.01);
+    EXPECT_NEAR(600.0f, fn2.evaluate(18.0f, oneInteger, {}, -1.0f), 0.00);
+    EXPECT_NEAR(600.0f, fn2.evaluate(19.0f, oneInteger, {}, -1.0f), 0.00);
 }
