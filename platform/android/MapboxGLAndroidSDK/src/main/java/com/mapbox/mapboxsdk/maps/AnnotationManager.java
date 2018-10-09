@@ -379,17 +379,17 @@ class AnnotationManager {
   //
 
   boolean onTap(PointF tapPoint) {
-    ShapeAnnotationHit shapeAnnotationHit = getShapeAnnotationHitFromTap(tapPoint);
-    Annotation annotation = new ShapeAnnotationHitResolver(shapeAnnotations).execute(shapeAnnotationHit);
-    if (annotation != null) {
-      if (handleClickForShapeAnnotation(annotation)) {
+    MarkerHit markerHit = getMarkerHitFromTouchArea(tapPoint);
+    long markerId = new MarkerHitResolver(mapboxMap).execute(markerHit);
+    if (markerId != NO_ANNOTATION_ID) {
+      if (isClickHandledForMarker(markerId)) {
         return true;
       }
     }
 
-    MarkerHit markerHit = getMarkerHitFromTouchArea(tapPoint);
-    long markerId = new MarkerHitResolver(mapboxMap).execute(markerHit);
-    return markerId != NO_ANNOTATION_ID && isClickHandledForMarker(markerId);
+    ShapeAnnotationHit shapeAnnotationHit = getShapeAnnotationHitFromTap(tapPoint);
+    Annotation annotation = new ShapeAnnotationHitResolver(shapeAnnotations).execute(shapeAnnotationHit);
+    return annotation != null && handleClickForShapeAnnotation(annotation);
   }
 
   private ShapeAnnotationHit getShapeAnnotationHitFromTap(PointF tapPoint) {
