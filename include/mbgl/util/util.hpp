@@ -19,3 +19,10 @@
 #else
 #define MBGL_CONSTEXPR inline
 #endif
+
+// Control inlining
+#ifdef _MSC_VER
+#define MBGL_NOINLINE __declspec(noinline)
+#else
+#define MBGL_NOINLINE __attribute__((noinline))
+#endif
