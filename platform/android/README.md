@@ -46,7 +46,7 @@ These dependencies are required for all operating systems and all platform targe
 - [ccache](https://ccache.samba.org/) (optional)
 
 **Note**: We partially support C++14 because GCC 4.9 does not fully implement the
-final draft of the C++14 standard. More information in [DEVELOPING.md](DEVELOPING.md).
+final draft of the C++14 standard. More information in [DEVELOPING.md](../../DEVELOPING.md).
 
 **Note**: On macOS you can install clang with installing the [Apple command line developer tools](https://developer.apple.com/download/).
 
