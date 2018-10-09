@@ -1,0 +1,4 @@
+interface Greeter {
+  constructor(greeting: string)
+  greeting(name: string): string
+}

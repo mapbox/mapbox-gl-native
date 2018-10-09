@@ -196,3 +196,16 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
         INPUT "${CMAKE_SOURCE_DIR}/scripts/config.xcconfig.in"
     )
 endif()
+
+cmake_minimum_required(VERSION 3.4)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-exit-time-destructors -Wno-padded -Wno-weak-vtables -Werror")
+
+include(cmake/mapbox_bindgen.cmake)
+
+add_library(jni SHARED ${MAPBOX_BINDGEN_JNI_MAIN})
+target_add_cpp_bindings(jni greeter.mbg)
+target_add_jni_bindings(jni greeter.mbg)
+target_add_java_bindings(jni greeter.mbg)

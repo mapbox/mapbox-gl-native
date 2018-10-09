@@ -1,0 +1,2 @@
+/usr/bin/ar qc libgtest.a  CMakeFiles/gtest.dir/vendor/gtest/src/gtest-death-test.cc.o CMakeFiles/gtest.dir/vendor/gtest/src/gtest-filepath.cc.o CMakeFiles/gtest.dir/vendor/gtest/src/gtest-port.cc.o CMakeFiles/gtest.dir/vendor/gtest/src/gtest-printers.cc.o CMakeFiles/gtest.dir/vendor/gtest/src/gtest-test-part.cc.o CMakeFiles/gtest.dir/vendor/gtest/src/gtest-typed-test.cc.o CMakeFiles/gtest.dir/vendor/gtest/src/gtest.cc.o
+/usr/bin/ranlib libgtest.a

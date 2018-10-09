@@ -1,0 +1,2 @@
+/usr/bin/ar qc libmbgl-loop-darwin.a  CMakeFiles/mbgl-loop-darwin.dir/platform/darwin/src/async_task.cpp.o CMakeFiles/mbgl-loop-darwin.dir/platform/darwin/src/run_loop.cpp.o CMakeFiles/mbgl-loop-darwin.dir/platform/darwin/src/timer.cpp.o
+/usr/bin/ranlib libmbgl-loop-darwin.a
