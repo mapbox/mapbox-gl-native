@@ -62,8 +62,10 @@ public:
         if (!expression.isFeatureConstant()) {
             return ResultType(expression);
         } else {
-            const T evaluated = expression.evaluate(floor(parameters.z));
-            return ResultType(calculate(evaluated, evaluated, evaluated));
+            const T min = expression.evaluate(floor(parameters.z - 1));
+            const T mid = expression.evaluate(floor(parameters.z));
+            const T max = expression.evaluate(floor(parameters.z + 1));
+            return ResultType(calculate(min, mid, max));
         }
     }
 

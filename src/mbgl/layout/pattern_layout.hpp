@@ -22,6 +22,27 @@ public:
     PatternLayerMap patterns;
 };
 
+class PatternUtil {
+public:
+    static std::string getPatternForZoom(style::PropertyValue<std::string>& value, float z)  {
+        return value.match(
+            [&] (const style::Undefined&) {
+                return std::string("");
+            },
+            [&] (const std::string& _value) {
+                return _value;
+            },
+            [&] (const style::PropertyExpression<std::string>& expression) {
+                if (expression.isFeatureConstant() && !expression.isZoomConstant()) {
+                    return expression.evaluate(z);
+                } else {
+                    return std::string("");
+                }
+            }
+        );
+    }
+};
+
 template <class B>
 class PatternLayout : public Layout {
 public:
@@ -35,10 +56,10 @@ public:
                     zoom(parameters.tileID.overscaledZ),
                     overscaling(parameters.tileID.overscaleFactor()),
                     hasPattern(false) {
-
         using PatternLayer = typename B::RenderLayerType;
         const auto renderLayer = layers.at(0)->as<PatternLayer>();
         const typename PatternLayer::StyleLayerImpl& leader = renderLayer->impl();
+
         layout = leader.layout.evaluate(PropertyEvaluationParameters(zoom));
         sourceLayerID = leader.sourceLayer;
         groupID = renderLayer->getID();
@@ -54,8 +75,12 @@ public:
                 hasPattern = true;
             } else if (!constantPattern.to.empty()){
                 hasPattern = true;
+                auto patternPropertyValue = layer->as<PatternLayer>()->unevaluated.template get<typename PatternLayer::PatternProperty>().getValue();
+                std::string lowZoom = PatternUtil::getPatternForZoom(patternPropertyValue, zoom - 1);
+                std::string highZoom = PatternUtil::getPatternForZoom(patternPropertyValue, zoom + 1);
+                patternDependencies.emplace(highZoom, ImageType::Pattern);
                 patternDependencies.emplace(constantPattern.to, ImageType::Pattern);
-                patternDependencies.emplace(constantPattern.from, ImageType::Pattern);
+                patternDependencies.emplace(lowZoom, ImageType::Pattern);
             }
         }
 
@@ -118,7 +143,6 @@ public:
 
     std::map<std::string, typename B::PossiblyEvaluatedPaintProperties> layerPaintProperties;
     const std::string bucketLeaderID;
-
 
 private:
     const std::unique_ptr<GeometryTileLayer> sourceLayer;

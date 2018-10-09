@@ -54,7 +54,6 @@ void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     unevaluated.evaluate(parameters).concat(extra.evaluate(dashArrayParams)));
 
     crossfade = parameters.getCrossfadeParameters();
-
     passes = (evaluated.get<style::LineOpacity>().constantOr(1.0) > 0
               && evaluated.get<style::LineColor>().constantOr(Color::black()).a > 0
               && evaluated.get<style::LineWidth>().constantOr(1.0) > 0)
@@ -145,7 +144,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             optional<ImagePosition> posA = geometryTile.getPattern(linePatternValue.from);
             optional<ImagePosition> posB = geometryTile.getPattern(linePatternValue.to);
             // if pattern property is constant and patterns aren't available, don't draw
-            if (!linePatternValue.to.empty() && (!posA || !posB)) continue;
+            if (!linePatternValue.to.empty() && (!posA && !posB)) continue;
 
             const auto& binders = bucket.paintPropertyBinders.at(getID());
             binders.setPatternParameters(posA, posB, crossfade);
