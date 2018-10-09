@@ -109,6 +109,7 @@ test/src/mbgl/test/util.cpp
 test/src/mbgl/test/util.hpp
 
 # text
+test/text/bidi.test.cpp
 test/text/cross_tile_symbol_index.test.cpp
 test/text/glyph_manager.test.cpp
 test/text/glyph_pbf.test.cpp

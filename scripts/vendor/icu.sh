@@ -49,6 +49,24 @@ for FILE in "${ALL[@]}"; do
     sed 's/^#include \"\(unicode\/[^\"]\{1,\}\)\"/#include <\1>/' "common/$FILE" > "$DIR/$FILE"
 done
 
+# Apply patch from https://github.com/LibreOffice/core/blob/master/external/icu/icu4c-ubsan.patch.1
+# Shifting signed int to a number greater than can be represented is undefined behavior
+patch -p0 << PATCH
+--- src/ubidiimp.h
++++ src/ubidiimp.h
+@@ -198,8 +198,8 @@
+ /* in a Run, logicalStart will get this bit set if the run level is odd */
+ #define INDEX_ODD_BIT (1UL<<31)
+
+-#define MAKE_INDEX_ODD_PAIR(index, level) ((index)|((int32_t)(level)<<31))
++#define MAKE_INDEX_ODD_PAIR(index, level) ((index)|((uint32_t)(level)<<31))
+-#define ADD_ODD_BIT_FROM_LEVEL(x, level)  ((x)|=((int32_t)(level)<<31))
++#define ADD_ODD_BIT_FROM_LEVEL(x, level)  ((x)|=((uint32_t)(level)<<31))
+ #define REMOVE_ODD_BIT(x)                 ((x)&=~INDEX_ODD_BIT)
+
+ #define GET_INDEX(x)   ((x)&~INDEX_ODD_BIT)
+PATCH
+
 rm -rf common
 
 file_list include src -name "*.h" -o -name "*.cpp"
