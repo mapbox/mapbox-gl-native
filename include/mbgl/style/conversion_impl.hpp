@@ -4,6 +4,7 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/geojson.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <string>
 
@@ -293,7 +294,7 @@ private:
 };
 
 template <class T, class...Args>
-optional<T> convert(const Convertible& value, Error& error, Args&&...args) {
+MBGL_NOINLINE optional<T> convert(const Convertible& value, Error& error, Args&&...args) {
     return Converter<T>()(value, error, std::forward<Args>(args)...);
 }
 
