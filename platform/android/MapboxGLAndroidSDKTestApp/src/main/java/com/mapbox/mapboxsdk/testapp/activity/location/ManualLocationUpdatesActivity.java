@@ -115,7 +115,7 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
   }
 
   @Override
-  public void onMapReady(MapboxMap mapboxMap) {
+  public void onMapReady(@NonNull MapboxMap mapboxMap) {
     locationEngine = new LocationEngineProvider(this).obtainBestLocationEngineAvailable();
     locationEngine.addLocationEngineListener(this);
     locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);

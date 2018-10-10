@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp.activity.infowindow;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
@@ -40,7 +41,7 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
   }
 
   @Override
-  public void onMapReady(MapboxMap map) {
+  public void onMapReady(@NonNull MapboxMap map) {
     mapboxMap = map;
 
     // Add info window adapter
