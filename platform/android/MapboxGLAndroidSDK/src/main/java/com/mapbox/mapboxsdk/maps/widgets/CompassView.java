@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
@@ -32,21 +33,22 @@ public final class CompassView extends ImageView implements Runnable {
 
   private float rotation = 0.0f;
   private boolean fadeCompassViewFacingNorth = true;
+  @Nullable
   private ViewPropertyAnimatorCompat fadeAnimator;
   private MapboxMap.OnCompassAnimationListener compassAnimationListener;
   private boolean isAnimating = false;
 
-  public CompassView(Context context) {
+  public CompassView(@NonNull Context context) {
     super(context);
     initialize(context);
   }
 
-  public CompassView(Context context, AttributeSet attrs) {
+  public CompassView(@NonNull Context context, AttributeSet attrs) {
     super(context, attrs);
     initialize(context);
   }
 
-  public CompassView(Context context, AttributeSet attrs, int defStyleAttr) {
+  public CompassView(@NonNull Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
     initialize(context);
   }

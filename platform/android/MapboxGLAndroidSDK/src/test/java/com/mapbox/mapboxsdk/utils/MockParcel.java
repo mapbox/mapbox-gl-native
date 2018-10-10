@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import android.support.annotation.Nullable;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -28,10 +29,12 @@ import static org.mockito.Mockito.when;
 
 public class MockParcel {
 
+  @Nullable
   public static Parcelable obtain(@NonNull Parcelable object) {
     return obtain(object, 0);
   }
 
+  @Nullable
   public static Parcelable obtain(@NonNull Parcelable object, int describeContentsValue) {
     testDescribeContents(object, describeContentsValue);
     testParcelableArray(object);
@@ -166,48 +169,56 @@ public class MockParcel {
 
     private void setupReads() {
       when(mockedParcel.readInt()).then(new Answer<Integer>() {
+        @NonNull
         @Override
         public Integer answer(InvocationOnMock invocation) throws Throwable {
           return (Integer) objects.get(position++);
         }
       });
       when(mockedParcel.readByte()).thenAnswer(new Answer<Byte>() {
+        @NonNull
         @Override
         public Byte answer(InvocationOnMock invocation) throws Throwable {
           return (Byte) objects.get(position++);
         }
       });
       when(mockedParcel.readLong()).thenAnswer(new Answer<Long>() {
+        @NonNull
         @Override
         public Long answer(InvocationOnMock invocation) throws Throwable {
           return (Long) objects.get(position++);
         }
       });
       when(mockedParcel.readString()).thenAnswer(new Answer<String>() {
+        @NonNull
         @Override
         public String answer(InvocationOnMock invocation) throws Throwable {
           return (String) objects.get(position++);
         }
       });
       when(mockedParcel.readDouble()).thenAnswer(new Answer<Double>() {
+        @NonNull
         @Override
         public Double answer(InvocationOnMock invocation) throws Throwable {
           return (Double) objects.get(position++);
         }
       });
       when(mockedParcel.readFloat()).thenAnswer(new Answer<Float>() {
+        @NonNull
         @Override
         public Float answer(InvocationOnMock invocation) throws Throwable {
           return (Float) objects.get(position++);
         }
       });
       when(mockedParcel.readParcelable(Parcelable.class.getClassLoader())).thenAnswer(new Answer<Parcelable>() {
+        @NonNull
         @Override
         public Parcelable answer(InvocationOnMock invocation) throws Throwable {
           return (Parcelable) objects.get(position++);
         }
       });
       when(mockedParcel.readParcelableArray(Parcelable.class.getClassLoader())).thenAnswer(new Answer<Object[]>() {
+        @NonNull
         @Override
         public Object[] answer(InvocationOnMock invocation) throws Throwable {
           int size = (Integer) objects.get(position++);
@@ -224,6 +235,7 @@ public class MockParcel {
         }
       });
       when(mockedParcel.createIntArray()).then(new Answer<int[]>() {
+        @Nullable
         @Override
         public int[] answer(InvocationOnMock invocation) throws Throwable {
           int size = (Integer) objects.get(position++);
@@ -243,8 +255,9 @@ public class MockParcel {
 
     private void setupOthers() {
       doAnswer(new Answer<Void>() {
+        @Nullable
         @Override
-        public Void answer(InvocationOnMock invocation) throws Throwable {
+        public Void answer(@NonNull InvocationOnMock invocation) throws Throwable {
           position = ((Integer) invocation.getArguments()[0]);
           return null;
         }

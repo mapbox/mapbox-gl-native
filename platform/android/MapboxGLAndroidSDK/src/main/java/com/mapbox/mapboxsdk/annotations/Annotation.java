@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.support.annotation.NonNull;
 
+import android.support.annotation.Nullable;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
@@ -121,11 +122,11 @@ public abstract class Annotation implements Comparable<Annotation> {
    * @return returns true both id's match else returns false.
    */
   @Override
-  public boolean equals(Object object) {
+  public boolean equals(@Nullable Object object) {
     if (this == object) {
       return true;
     }
-    if (object == null || !(object instanceof Annotation)) {
+    if (!(object instanceof Annotation)) {
       return false;
     }
     Annotation that = (Annotation) object;

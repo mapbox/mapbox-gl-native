@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.location;
 
 import android.animation.ValueAnimator;
+import android.support.annotation.NonNull;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ class LayerGpsBearingAnimator extends MapboxFloatAnimator<MapboxAnimator.OnLayer
   }
 
   @Override
-  public void onAnimationUpdate(ValueAnimator animation) {
+  public void onAnimationUpdate(@NonNull ValueAnimator animation) {
     for (OnLayerAnimationsValuesChangeListener listener : updateListeners) {
       listener.onNewGpsBearingValue((Float) animation.getAnimatedValue());
     }

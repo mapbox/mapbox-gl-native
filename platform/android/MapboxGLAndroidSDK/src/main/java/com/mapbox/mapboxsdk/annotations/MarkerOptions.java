@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.mapbox.mapboxsdk.exceptions.InvalidMarkerPositionException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
@@ -40,6 +42,7 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
     }
   }
 
+  @NonNull
   @Override
   public MarkerOptions getThis() {
     return this;
@@ -128,7 +131,7 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
 
   public static final Parcelable.Creator<MarkerOptions> CREATOR =
     new Parcelable.Creator<MarkerOptions>() {
-      public MarkerOptions createFromParcel(Parcel in) {
+      public MarkerOptions createFromParcel(@NonNull Parcel in) {
         return new MarkerOptions(in);
       }
 
@@ -146,7 +149,7 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
    * Else, false.
    */
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) {
       return true;
     }

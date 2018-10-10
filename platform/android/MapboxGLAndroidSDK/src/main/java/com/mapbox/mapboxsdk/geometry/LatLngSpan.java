@@ -91,7 +91,7 @@ public class LatLngSpan implements Parcelable {
   public static final Parcelable.Creator<LatLngSpan> CREATOR =
     new Parcelable.Creator<LatLngSpan>() {
       @Override
-      public LatLngSpan createFromParcel(Parcel in) {
+      public LatLngSpan createFromParcel(@NonNull Parcel in) {
         return new LatLngSpan(in);
       }
 
@@ -118,7 +118,7 @@ public class LatLngSpan implements Parcelable {
    * @param flags Additional flags about how the object should be written
    */
   @Override
-  public void writeToParcel(Parcel out, int flags) {
+  public void writeToParcel(@NonNull Parcel out, int flags) {
     out.writeDouble(mLatitudeSpan);
     out.writeDouble(mLongitudeSpan);
   }

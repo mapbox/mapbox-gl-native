@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.style.sources;
 
+import android.support.annotation.NonNull;
+
 /**
  * Builder class for composing CustomGeometrySource objects.
  */
@@ -11,6 +13,7 @@ public class CustomGeometrySourceOptions extends GeoJsonOptions {
    * @param wrap defaults to false
    * @return the current instance for chaining
    */
+  @NonNull
   public CustomGeometrySourceOptions withWrap(boolean wrap) {
     this.put("wrap", wrap);
     return this;
@@ -23,6 +26,7 @@ public class CustomGeometrySourceOptions extends GeoJsonOptions {
    * @param clip defaults to false
    * @return the current instance for chaining
    */
+  @NonNull
   public CustomGeometrySourceOptions withClip(boolean clip) {
     this.put("clip", clip);
     return this;

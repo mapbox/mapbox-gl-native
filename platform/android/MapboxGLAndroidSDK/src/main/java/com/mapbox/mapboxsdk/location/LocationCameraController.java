@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.location;
 import android.content.Context;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.view.MotionEvent;
 
@@ -34,7 +35,7 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
     Context context,
     MapboxMap mapboxMap,
     OnCameraTrackingChangedListener internalCameraTrackingChangedListener,
-    LocationComponentOptions options,
+    @NonNull LocationComponentOptions options,
     OnCameraMoveInvalidateListener onCameraMoveInvalidateListener) {
     this.mapboxMap = mapboxMap;
 
@@ -92,7 +93,7 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
     onCameraMoveInvalidateListener.onInvalidateCameraMove();
   }
 
-  private void setLatLng(LatLng latLng) {
+  private void setLatLng(@NonNull LatLng latLng) {
     mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
     onCameraMoveInvalidateListener.onInvalidateCameraMove();
   }
@@ -108,7 +109,7 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
   }
 
   @Override
-  public void onNewLatLngValue(LatLng latLng) {
+  public void onNewLatLngValue(@NonNull LatLng latLng) {
     if (cameraMode == CameraMode.TRACKING
       || cameraMode == CameraMode.TRACKING_COMPASS
       || cameraMode == CameraMode.TRACKING_GPS
@@ -187,6 +188,7 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
     }
   }
 
+  @NonNull
   @VisibleForTesting
   MapboxMap.OnMoveListener onMoveListener = new MapboxMap.OnMoveListener() {
     private boolean interrupt;
@@ -226,6 +228,7 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
     }
   };
 
+  @NonNull
   private MapboxMap.OnRotateListener onRotateListener = new MapboxMap.OnRotateListener() {
     @Override
     public void onRotateBegin(@NonNull RotateGestureDetector detector) {
@@ -245,6 +248,7 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
     }
   };
 
+  @NonNull
   private MapboxMap.OnFlingListener onFlingListener = new MapboxMap.OnFlingListener() {
     @Override
     public void onFling() {
@@ -259,7 +263,7 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent motionEvent) {
+    public boolean onTouchEvent(@Nullable MotionEvent motionEvent) {
       if (motionEvent != null) {
         int action = motionEvent.getActionMasked();
         if (action == MotionEvent.ACTION_UP) {
