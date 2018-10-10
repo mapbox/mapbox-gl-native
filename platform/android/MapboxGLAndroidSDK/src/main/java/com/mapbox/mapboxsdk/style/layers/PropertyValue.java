@@ -17,6 +17,7 @@ public class PropertyValue<T> {
 
   private static final String TAG = "Mbgl-PropertyValue";
 
+  @NonNull
   public final String name;
   public final T value;
 

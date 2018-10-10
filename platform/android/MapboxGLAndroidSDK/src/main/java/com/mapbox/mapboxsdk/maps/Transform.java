@@ -31,9 +31,12 @@ final class Transform implements MapView.OnMapChangedListener {
   private final MarkerViewManager markerViewManager;
   private final Handler handler = new Handler();
 
+  @Nullable
   private CameraPosition cameraPosition;
+  @Nullable
   private MapboxMap.CancelableCallback cameraCancelableCallback;
 
+  @Nullable
   private MapboxMap.OnCameraChangeListener onCameraChangeListener;
 
   private CameraChangeDispatcher cameraChangeDispatcher;
@@ -58,6 +61,7 @@ final class Transform implements MapView.OnMapChangedListener {
   // Camera API
   //
 
+  @Nullable
   @UiThread
   public final CameraPosition getCameraPosition() {
     if (cameraPosition == null) {
@@ -92,7 +96,8 @@ final class Transform implements MapView.OnMapChangedListener {
   }
 
   @UiThread
-  final void moveCamera(MapboxMap mapboxMap, CameraUpdate update, final MapboxMap.CancelableCallback callback) {
+  final void moveCamera(@NonNull MapboxMap mapboxMap, @NonNull CameraUpdate update,
+                        @Nullable final MapboxMap.CancelableCallback callback) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
     if (isValidCameraPosition(cameraPosition)) {
       cancelTransitions();
@@ -112,8 +117,9 @@ final class Transform implements MapView.OnMapChangedListener {
   }
 
   @UiThread
-  final void easeCamera(MapboxMap mapboxMap, CameraUpdate update, int durationMs, boolean easingInterpolator,
-                        final MapboxMap.CancelableCallback callback, boolean isDismissable) {
+  final void easeCamera(@NonNull MapboxMap mapboxMap, @NonNull CameraUpdate update, int durationMs,
+                        boolean easingInterpolator, @Nullable final MapboxMap.CancelableCallback callback,
+                        boolean isDismissable) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
     if (isValidCameraPosition(cameraPosition)) {
       cancelTransitions();
@@ -129,8 +135,8 @@ final class Transform implements MapView.OnMapChangedListener {
   }
 
   @UiThread
-  final void animateCamera(MapboxMap mapboxMap, CameraUpdate update, int durationMs,
-                           final MapboxMap.CancelableCallback callback) {
+  final void animateCamera(@NonNull MapboxMap mapboxMap, @NonNull CameraUpdate update, int durationMs,
+                           @Nullable final MapboxMap.CancelableCallback callback) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
     if (isValidCameraPosition(cameraPosition)) {
       cancelTransitions();

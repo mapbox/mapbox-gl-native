@@ -295,18 +295,18 @@ final class LocationAnimatorCoordinator {
     locationAnimatorSet.start();
   }
 
-  void resetAllCameraAnimations(CameraPosition currentCameraPosition, boolean isGpsNorth) {
+  void resetAllCameraAnimations(@NonNull CameraPosition currentCameraPosition, boolean isGpsNorth) {
     resetCameraCompassAnimation(currentCameraPosition);
     boolean snap = resetCameraLocationAnimations(currentCameraPosition, isGpsNorth);
     playCameraLocationAnimators(snap ? 0 : TRANSITION_ANIMATION_DURATION_MS);
   }
 
-  private boolean resetCameraLocationAnimations(CameraPosition currentCameraPosition, boolean isGpsNorth) {
+  private boolean resetCameraLocationAnimations(@NonNull CameraPosition currentCameraPosition, boolean isGpsNorth) {
     resetCameraGpsBearingAnimation(currentCameraPosition, isGpsNorth);
     return resetCameraLatLngAnimation(currentCameraPosition);
   }
 
-  private boolean resetCameraLatLngAnimation(CameraPosition currentCameraPosition) {
+  private boolean resetCameraLatLngAnimation(@NonNull CameraPosition currentCameraPosition) {
     CameraLatLngAnimator animator = (CameraLatLngAnimator) animatorArray.get(ANIMATOR_CAMERA_LATLNG);
     if (animator == null) {
       return false;
@@ -320,7 +320,7 @@ final class LocationAnimatorCoordinator {
     return immediateAnimation(previousCameraTarget, currentTarget, currentCameraPosition.zoom);
   }
 
-  private void resetCameraGpsBearingAnimation(CameraPosition currentCameraPosition, boolean isGpsNorth) {
+  private void resetCameraGpsBearingAnimation(@NonNull CameraPosition currentCameraPosition, boolean isGpsNorth) {
     CameraGpsBearingAnimator animator = (CameraGpsBearingAnimator) animatorArray.get(ANIMATOR_CAMERA_GPS_BEARING);
     if (animator == null) {
       return;
@@ -334,7 +334,7 @@ final class LocationAnimatorCoordinator {
       new CameraGpsBearingAnimator(previousCameraBearing, normalizedCameraBearing, cameraListeners));
   }
 
-  private void resetCameraCompassAnimation(CameraPosition currentCameraPosition) {
+  private void resetCameraCompassAnimation(@NonNull CameraPosition currentCameraPosition) {
     CameraCompassBearingAnimator animator =
       (CameraCompassBearingAnimator) animatorArray.get(ANIMATOR_CAMERA_COMPASS_BEARING);
     if (animator == null) {
@@ -382,7 +382,7 @@ final class LocationAnimatorCoordinator {
     this.durationMultiplier = trackingAnimationDurationMultiplier;
   }
 
-  private boolean immediateAnimation(LatLng current, LatLng target, double zoom) {
+  private boolean immediateAnimation(LatLng current, @NonNull LatLng target, double zoom) {
     // TODO: calculate the value based on the projection
     double distance = current.distanceTo(target);
     if (zoom > 10) {

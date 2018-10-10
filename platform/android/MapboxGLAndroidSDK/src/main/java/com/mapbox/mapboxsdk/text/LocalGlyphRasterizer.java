@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.support.annotation.Keep;
+import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 
 /**
@@ -15,7 +16,9 @@ import android.support.annotation.WorkerThread;
  */
 public class LocalGlyphRasterizer {
   private final Bitmap bitmap;
+  @NonNull
   private final Paint paint;
+  @NonNull
   private final Canvas canvas;
 
   LocalGlyphRasterizer() {

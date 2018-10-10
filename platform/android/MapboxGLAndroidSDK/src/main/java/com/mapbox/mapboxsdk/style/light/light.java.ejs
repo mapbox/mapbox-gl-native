@@ -55,6 +55,7 @@ public class Light {
    *
    * @return <%- property.name %> as Position
    */
+  @NonNull
   public Position get<%- camelize(property.name) %>() {
     checkThread();
     return nativeGet<%- camelize(property.name) %>();
@@ -88,6 +89,7 @@ public class Light {
    *
    * @return <%- property.name %> as <%- propertyType(property) %>
    */
+  @NonNull
   <%- propertyTypeAnnotation(property) %> public <%- propertyJavaType(property) %> get<%- camelize(property.name) %>() {
     checkThread();
     return nativeGet<%- camelize(property.name) %>();
@@ -100,6 +102,7 @@ public class Light {
    *
    * @return transition options for <%- property.name %>
    */
+  @NonNull
   public TransitionOptions get<%- camelize(property.name) %>Transition() {
     checkThread();
     return nativeGet<%- camelize(property.name) %>Transition();
@@ -110,7 +113,7 @@ public class Light {
    *
    * @param options transition options for <%- property.name %>
    */
-  public void set<%- camelize(property.name) %>Transition(TransitionOptions options) {
+  public void set<%- camelize(property.name) %>Transition(@NonNull TransitionOptions options) {
     checkThread();
     nativeSet<%- camelize(property.name) %>Transition(options.getDuration(), options.getDelay());
   }
@@ -126,16 +129,19 @@ public class Light {
   @Keep
   private native void nativeSet<%- camelize(property.name) %>(Position position);
 
+  @NonNull
   @Keep
   private native Position nativeGet<%- camelize(property.name) %>();
 <% } else { -%>
   @Keep
   private native void nativeSet<%- camelize(property.name) %>(<%- propertyJavaType(property) -%> <%- property.name %>);
 
+  @NonNull
   @Keep
   private native <%- propertyJavaType(property) -%> nativeGet<%- camelize(property.name) %>();
 <% } -%>
 <% if (property.transition) { -%>
+  @NonNull
   @Keep
   private native TransitionOptions nativeGet<%- camelize(property.name) %>Transition();
 

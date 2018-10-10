@@ -62,7 +62,7 @@ public class GeoJsonSource extends Source {
    * @param id      the source id
    * @param geoJson raw Json FeatureCollection
    */
-  public GeoJsonSource(String id, String geoJson) {
+  public GeoJsonSource(String id, @Nullable String geoJson) {
     super();
     if (geoJson == null || geoJson.startsWith("http")) {
       throw new IllegalArgumentException("Expected a raw json body");
@@ -78,7 +78,7 @@ public class GeoJsonSource extends Source {
    * @param geoJson raw Json body
    * @param options options
    */
-  public GeoJsonSource(String id, String geoJson, GeoJsonOptions options) {
+  public GeoJsonSource(String id, @Nullable String geoJson, GeoJsonOptions options) {
     super();
     if (geoJson == null || geoJson.startsWith("http")) {
       throw new IllegalArgumentException("Expected a raw json body");
@@ -236,7 +236,7 @@ public class GeoJsonSource extends Source {
    *
    * @param url the GeoJSON FeatureCollection url
    */
-  public void setUrl(URL url) {
+  public void setUrl(@NonNull URL url) {
     checkThread();
     setUrl(url.toExternalForm());
   }
@@ -279,6 +279,7 @@ public class GeoJsonSource extends Source {
   @Keep
   protected native void nativeSetUrl(String url);
 
+  @NonNull
   @Keep
   protected native String nativeGetUrl();
 
@@ -294,6 +295,7 @@ public class GeoJsonSource extends Source {
   @Keep
   private native void nativeSetGeometry(Geometry geometry);
 
+  @NonNull
   @Keep
   private native Feature[] querySourceFeatures(Object[] filter);
 

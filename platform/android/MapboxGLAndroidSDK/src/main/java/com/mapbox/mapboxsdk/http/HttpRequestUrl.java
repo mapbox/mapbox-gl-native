@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.http;
 
+import android.support.annotation.NonNull;
+
 public class HttpRequestUrl {
 
   private HttpRequestUrl() {
@@ -13,7 +15,7 @@ public class HttpRequestUrl {
    * @param querySize   the query size of the resource request
    * @return the adapted resource url
    */
-  public static String buildResourceUrl(String host, String resourceUrl, int querySize) {
+  public static String buildResourceUrl(@NonNull String host, String resourceUrl, int querySize) {
     if (isValidMapboxEndpoint(host)) {
       if (querySize == 0) {
         resourceUrl = resourceUrl + "?";

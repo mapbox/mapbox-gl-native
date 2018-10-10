@@ -45,13 +45,17 @@ class AnnotationManager {
   private final MapView mapView;
   private final IconManager iconManager;
   private final InfoWindowManager infoWindowManager = new InfoWindowManager();
+  @NonNull
   private final MarkerViewManager markerViewManager;
   private final LongSparseArray<Annotation> annotationsArray;
   private final List<Marker> selectedMarkers = new ArrayList<>();
 
   private MapboxMap mapboxMap;
+  @Nullable
   private MapboxMap.OnMarkerClickListener onMarkerClickListener;
+  @Nullable
   private MapboxMap.OnPolygonClickListener onPolygonClickListener;
+  @Nullable
   private MapboxMap.OnPolylineClickListener onPolylineClickListener;
 
   private Annotations annotations;
@@ -60,8 +64,8 @@ class AnnotationManager {
   private Polygons polygons;
   private Polylines polylines;
 
-  AnnotationManager(NativeMapView view, MapView mapView, LongSparseArray<Annotation> annotationsArray,
-                    MarkerViewManager markerViewManager, IconManager iconManager, Annotations annotations,
+  AnnotationManager(@Nullable NativeMapView view, MapView mapView, LongSparseArray<Annotation> annotationsArray,
+                    @NonNull MarkerViewManager markerViewManager, IconManager iconManager, Annotations annotations,
                     Markers markers, Polygons polygons, Polylines polylines, ShapeAnnotations shapeAnnotations) {
     this.mapView = mapView;
     this.annotationsArray = annotationsArray;
@@ -80,6 +84,7 @@ class AnnotationManager {
 
   // TODO refactor MapboxMap out for Projection and Transform
   // Requires removing MapboxMap from Annotations by using Peer model from #6912
+  @NonNull
   AnnotationManager bind(MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
     this.markerViewManager.bind(mapboxMap);
@@ -224,7 +229,7 @@ class AnnotationManager {
     return polygons.addBy(polygonOptionsList, mapboxMap);
   }
 
-  void updatePolygon(Polygon polygon) {
+  void updatePolygon(@NonNull Polygon polygon) {
     if (!isAddedToMap(polygon)) {
       logNonAdded(polygon);
       return;
@@ -248,7 +253,7 @@ class AnnotationManager {
     return polylines.addBy(polylineOptionsList, mapboxMap);
   }
 
-  void updatePolyline(Polyline polyline) {
+  void updatePolyline(@NonNull Polyline polyline) {
     if (!isAddedToMap(polyline)) {
       logNonAdded(polyline);
       return;
@@ -333,19 +338,22 @@ class AnnotationManager {
     selectedMarkers.remove(marker);
   }
 
+  @NonNull
   List<Marker> getSelectedMarkers() {
     return selectedMarkers;
   }
 
+  @NonNull
   InfoWindowManager getInfoWindowManager() {
     return infoWindowManager;
   }
 
+  @NonNull
   MarkerViewManager getMarkerViewManager() {
     return markerViewManager;
   }
 
-  void adjustTopOffsetPixels(MapboxMap mapboxMap) {
+  void adjustTopOffsetPixels(@NonNull MapboxMap mapboxMap) {
     int count = annotationsArray.size();
     for (int i = 0; i < count; i++) {
       Annotation annotation = annotationsArray.get(i);
@@ -364,11 +372,11 @@ class AnnotationManager {
     }
   }
 
-  private boolean isAddedToMap(Annotation annotation) {
+  private boolean isAddedToMap(@Nullable Annotation annotation) {
     return annotation != null && annotation.getId() != -1 && annotationsArray.indexOfKey(annotation.getId()) > -1;
   }
 
-  private void logNonAdded(Annotation annotation) {
+  private void logNonAdded(@NonNull Annotation annotation) {
     Logger.w(TAG, String.format(
       "Attempting to update non-added %s with value %s", annotation.getClass().getCanonicalName(), annotation)
     );
@@ -378,7 +386,7 @@ class AnnotationManager {
   // Click event
   //
 
-  boolean onTap(PointF tapPoint) {
+  boolean onTap(@NonNull PointF tapPoint) {
     MarkerHit markerHit = getMarkerHitFromTouchArea(tapPoint);
     long markerId = new MarkerHitResolver(mapboxMap).execute(markerHit);
     if (markerId != NO_ANNOTATION_ID) {
@@ -440,11 +448,11 @@ class AnnotationManager {
     return true;
   }
 
-  private boolean onClickMarker(Marker marker) {
+  private boolean onClickMarker(@NonNull Marker marker) {
     return onMarkerClickListener != null && onMarkerClickListener.onMarkerClick(marker);
   }
 
-  private void toggleMarkerSelectionState(Marker marker) {
+  private void toggleMarkerSelectionState(@NonNull Marker marker) {
     if (!selectedMarkers.contains(marker)) {
       selectMarker(marker);
     } else {
@@ -460,7 +468,8 @@ class AnnotationManager {
       this.shapeAnnotations = shapeAnnotations;
     }
 
-    public Annotation execute(ShapeAnnotationHit shapeHit) {
+    @Nullable
+    public Annotation execute(@NonNull ShapeAnnotationHit shapeHit) {
       Annotation foundAnnotation = null;
       List<Annotation> annotations = shapeAnnotations.obtainAllIn(shapeHit.tapPoint);
       if (annotations.size() > 0) {
@@ -472,18 +481,24 @@ class AnnotationManager {
 
   private static class MarkerHitResolver {
 
+    @NonNull
     private final MarkerViewManager markerViewManager;
+    @NonNull
     private final Projection projection;
     private final int minimalTouchSize;
 
+    @Nullable
     private View view;
     private Bitmap bitmap;
     private int bitmapWidth;
     private int bitmapHeight;
     private PointF markerLocation;
 
+    @NonNull
     private Rect hitRectView = new Rect();
+    @NonNull
     private RectF hitRectMarker = new RectF();
+    @NonNull
     private RectF highestSurfaceIntersection = new RectF();
 
     private long closestMarkerId = NO_ANNOTATION_ID;
@@ -494,7 +509,7 @@ class AnnotationManager {
       this.minimalTouchSize = (int) (32 * Mapbox.getApplicationContext().getResources().getDisplayMetrics().density);
     }
 
-    public long execute(MarkerHit markerHit) {
+    public long execute(@NonNull MarkerHit markerHit) {
       resolveForMarkers(markerHit);
       return closestMarkerId;
     }
@@ -509,7 +524,7 @@ class AnnotationManager {
       }
     }
 
-    private void resolveForMarkerView(MarkerHit markerHit, MarkerView markerView) {
+    private void resolveForMarkerView(@NonNull MarkerHit markerHit, @NonNull MarkerView markerView) {
       view = markerViewManager.getView(markerView);
       if (view != null) {
         view.getHitRect(hitRectView);
@@ -518,7 +533,7 @@ class AnnotationManager {
       }
     }
 
-    private void resolveForMarker(MarkerHit markerHit, Marker marker) {
+    private void resolveForMarker(@NonNull MarkerHit markerHit, Marker marker) {
       markerLocation = projection.toScreenLocation(marker.getPosition());
       bitmap = marker.getIcon().getBitmap();
 
@@ -540,7 +555,7 @@ class AnnotationManager {
       hitTestMarker(markerHit, marker, hitRectMarker);
     }
 
-    private void hitTestMarker(MarkerHit markerHit, Marker marker, RectF hitRectMarker) {
+    private void hitTestMarker(@NonNull MarkerHit markerHit, @NonNull Marker marker, @NonNull RectF hitRectMarker) {
       if (hitRectMarker.contains(markerHit.getTapPointX(), markerHit.getTapPointY())) {
         hitRectMarker.intersect(markerHit.tapRect);
         if (isRectangleHighestSurfaceIntersection(hitRectMarker)) {

@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.location;
 
 import android.animation.ValueAnimator;
+import android.support.annotation.NonNull;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ class CameraCompassBearingAnimator extends MapboxFloatAnimator<MapboxAnimator.On
   }
 
   @Override
-  public void onAnimationUpdate(ValueAnimator animation) {
+  public void onAnimationUpdate(@NonNull ValueAnimator animation) {
     for (OnCameraAnimationsValuesChangeListener listener : updateListeners) {
       listener.onNewCompassBearingValue((Float) animation.getAnimatedValue());
     }

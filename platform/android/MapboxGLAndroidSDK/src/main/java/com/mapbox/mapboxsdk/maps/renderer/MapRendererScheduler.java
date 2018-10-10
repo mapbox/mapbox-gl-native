@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.maps.renderer;
 
 import android.support.annotation.Keep;
+import android.support.annotation.NonNull;
 
 /**
  * Can be used to schedule work on the map renderer
@@ -12,6 +13,6 @@ public interface MapRendererScheduler {
   void requestRender();
 
   @Keep
-  void queueEvent(Runnable runnable);
+  void queueEvent(@NonNull Runnable runnable);
 
 }

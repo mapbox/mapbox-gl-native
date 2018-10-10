@@ -126,7 +126,7 @@ public class ColorUtils {
    * @throws ConversionException on illegal input
    */
   @ColorInt
-  public static int rgbaToColor(String value) {
+  public static int rgbaToColor(@NonNull String value) {
     Pattern c = Pattern.compile("rgba?\\s*\\(\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*,\\s*(\\d+\\.?\\d*)\\s*,"
       + "?\\s*(\\d+\\.?\\d*)?\\s*\\)");
     Matcher m = c.matcher(value);
@@ -193,7 +193,7 @@ public class ColorUtils {
     };
   }
 
-  private static int getColorCompat(Context context, int id) {
+  private static int getColorCompat(@NonNull Context context, int id) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       return context.getResources().getColor(id, context.getTheme());
     } else {

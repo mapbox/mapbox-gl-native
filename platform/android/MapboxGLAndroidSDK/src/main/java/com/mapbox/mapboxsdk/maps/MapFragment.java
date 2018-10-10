@@ -51,6 +51,7 @@ public final class MapFragment extends Fragment implements OnMapReadyCallback {
    * @param mapboxMapOptions The configuration options to be used.
    * @return MapFragment instantiated.
    */
+  @NonNull
   public static MapFragment newInstance(@Nullable MapboxMapOptions mapboxMapOptions) {
     MapFragment mapFragment = new MapFragment();
     mapFragment.setArguments(MapFragmentUtils.createFragmentArgs(mapboxMapOptions));
@@ -65,7 +66,7 @@ public final class MapFragment extends Fragment implements OnMapReadyCallback {
    * @param savedInstanceState The saved instance state for the map fragment.
    */
   @Override
-  public void onInflate(Context context, AttributeSet attrs, Bundle savedInstanceState) {
+  public void onInflate(@NonNull Context context, AttributeSet attrs, Bundle savedInstanceState) {
     super.onInflate(context, attrs, savedInstanceState);
     setArguments(MapFragmentUtils.createFragmentArgs(MapboxMapOptions.createFromAttributes(context, attrs)));
   }
@@ -92,7 +93,7 @@ public final class MapFragment extends Fragment implements OnMapReadyCallback {
    * @return The view created
    */
   @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+  public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     super.onCreateView(inflater, container, savedInstanceState);
     Context context = inflater.getContext();
     map = new MapView(context, MapFragmentUtils.resolveArgs(context, getArguments()));
@@ -227,6 +228,6 @@ public final class MapFragment extends Fragment implements OnMapReadyCallback {
      *
      * @param mapView The created mapview
      */
-    void onMapViewReady(MapView mapView);
+    void onMapViewReady(@NonNull MapView mapView);
   }
 }

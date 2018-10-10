@@ -129,6 +129,7 @@ public class CustomGeometrySource extends Source {
   @Keep
   protected native void initialize(String sourceId, Object options);
 
+  @NonNull
   @Keep
   private native Feature[] querySourceFeatures(Object[] filter);
 
@@ -179,7 +180,7 @@ public class CustomGeometrySource extends Source {
     }
   }
 
-  private void executeRequest(GeometryTileRequest request) {
+  private void executeRequest(@NonNull GeometryTileRequest request) {
     executorLock.lock();
     try {
       if (executor != null && !executor.isShutdown()) {
@@ -235,6 +236,7 @@ public class CustomGeometrySource extends Source {
           final AtomicInteger threadCount = new AtomicInteger();
           final int poolId = poolCount.getAndIncrement();
 
+          @NonNull
           @Override
           public Thread newThread(@NonNull Runnable runnable) {
             return new Thread(
@@ -277,7 +279,7 @@ public class CustomGeometrySource extends Source {
       return Arrays.hashCode(new int[] {z, x, y});
     }
 
-    public boolean equals(Object object) {
+    public boolean equals(@Nullable Object object) {
       if (object == this) {
         return true;
       }
@@ -299,6 +301,7 @@ public class CustomGeometrySource extends Source {
     private final GeometryTileProvider provider;
     private final Map<TileID, GeometryTileRequest> awaiting;
     private final Map<TileID, AtomicBoolean> inProgress;
+    @NonNull
     private final WeakReference<CustomGeometrySource> sourceRef;
     private final AtomicBoolean cancelled;
 
@@ -362,7 +365,7 @@ public class CustomGeometrySource extends Source {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
       if (this == o) {
         return true;
       }

@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.support.annotation.Keep;
 
+import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 /**
@@ -43,6 +44,7 @@ public class MapSnapshot {
    * @param latLng the geographical coordinates
    * @return the point on the image
    */
+  @NonNull
   @Keep
   public native PointF pixelForLatLng(LatLng latLng);
 
@@ -52,6 +54,7 @@ public class MapSnapshot {
    * @param pointF the point in pixels
    * @return the geographical coordinates
    */
+  @NonNull
   @Keep
   public native LatLng latLngForPixel(PointF pointF);
 

@@ -203,7 +203,7 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
     }
 
     @Override
-    public void handleMessage(Message msg) {
+    public void handleMessage(@NonNull Message msg) {
       CameraChangeDispatcher dispatcher = dispatcherWeakReference.get();
       if (dispatcher != null) {
         switch (msg.what) {
