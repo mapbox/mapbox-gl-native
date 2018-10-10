@@ -89,7 +89,7 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
   }
 
   @Override
-  public void onMapReady(MapboxMap mapboxMap) {
+  public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
 
     // Add a sdf image for the makers

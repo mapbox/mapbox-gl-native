@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp.activity.maplayout;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
@@ -39,7 +40,7 @@ public class LatLngBoundsForCameraActivity extends AppCompatActivity implements 
   }
 
   @Override
-  public void onMapReady(MapboxMap mapboxMap) {
+  public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
     mapboxMap.setLatLngBoundsForCameraTarget(ICELAND_BOUNDS);
     mapboxMap.setMinZoomPreference(2);

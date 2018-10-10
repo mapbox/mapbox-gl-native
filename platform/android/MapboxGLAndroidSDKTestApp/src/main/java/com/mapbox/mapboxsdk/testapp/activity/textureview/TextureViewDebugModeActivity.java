@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp.activity.textureview;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -94,7 +95,7 @@ public class TextureViewDebugModeActivity extends AppCompatActivity implements O
   }
 
   @Override
-  public void onMapReady(MapboxMap map) {
+  public void onMapReady(@NonNull MapboxMap map) {
     mapboxMap = map;
     mapboxMap.getUiSettings().setZoomControlsEnabled(true);
 
