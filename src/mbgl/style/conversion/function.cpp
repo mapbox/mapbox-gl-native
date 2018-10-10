@@ -78,7 +78,7 @@ optional<PropertyExpression<T>> convertFunctionToExpression(const Convertible& v
         return nullopt;
     }
 
-    optional<T> defaultValue;
+    optional<T> defaultValue{};
 
     auto defaultValueValue = objectMember(value, "default");
     if (defaultValueValue) {
