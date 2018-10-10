@@ -202,7 +202,7 @@ void NodeExpression::Evaluate(const Nan::FunctionCallbackInfo<v8::Value>& info) 
 
     try {
         mapbox::geojson::feature feature = geoJSON->get<mapbox::geojson::feature>();
-        auto result = expression->evaluate(zoom, feature, heatmapDensity);
+        auto result = expression->evaluate(zoom, feature, {}, heatmapDensity);
         if (result) {
             info.GetReturnValue().Set(toJS(*result));
         } else {
