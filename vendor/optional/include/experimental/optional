@@ -1,0 +1,20 @@
+#pragma once
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wextra"
+#pragma GCC diagnostic ignored "-Wshadow"
+#include <chromium/base/optional.hpp>
+#pragma GCC diagnostic pop
+
+namespace std {
+namespace experimental {
+
+template <typename T>
+using optional = base::Optional<T>;
+
+using nullopt_t = base::nullopt_t;
+constexpr nullopt_t nullopt = base::nullopt;
+
+} // namespace experimental
+} // namespace std
