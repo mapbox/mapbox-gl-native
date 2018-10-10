@@ -12,6 +12,10 @@ using namespace mbgl::style::expression::dsl;
 
 using namespace std::string_literals;
 
+static StubGeometryTileFeature stubFeature {
+    PropertyMap {}
+};
+
 static StubGeometryTileFeature oneInteger {
     PropertyMap {{ "property", uint64_t(1) }}
 };
@@ -55,6 +59,17 @@ TEST(PropertyExpression, Defaults) {
         .evaluate(oneString, {}, 2.0f));
     EXPECT_EQ(2.0f, PropertyExpression<float>(number(get("property")))
         .evaluate(oneString, {}, 2.0f));
+}
+
+TEST(PropertyExpression, FeatureState) {
+    EXPECT_EQ(1.0f, PropertyExpression<float>(number(featureState("state")), 0.0)
+        .evaluate(stubFeature, PropertyMap {{ "state", uint64_t(1) }}, 2.0f));
+    EXPECT_EQ(1.0f, PropertyExpression<float>(number(featureState("state")), 0.0)
+        .evaluate(stubFeature, PropertyMap {{ "state", 1.0 }}, 2.0f));
+    EXPECT_EQ(0.0f, PropertyExpression<float>(number(featureState("state")), 0.0)
+        .evaluate(stubFeature, PropertyMap {{"state", "1"s }}, 2.0f));
+    EXPECT_EQ("1"s, PropertyExpression<std::string>(featureState("state"))
+        .evaluate(stubFeature, PropertyMap {{"state", "1"s }}, "0"s));
 }
 
 TEST(PropertyExpression, ZoomInterpolation) {

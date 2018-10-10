@@ -33,11 +33,10 @@ TEST(Expression, IsExpression) {
         document.Parse<0>(R"([")" + name + R"("])");
         const JSValue* expression = &document;
 
-        // TODO:   "feature-state": https://github.com/mapbox/mapbox-gl-native/issues/12613
         // TODO: "interpolate-hcl": https://github.com/mapbox/mapbox-gl-native/issues/8720
         // TODO: "interpolate-lab": https://github.com/mapbox/mapbox-gl-native/issues/8720
         // TODO:          "format": https://github.com/mapbox/mapbox-gl-native/issues/12612
-        if (name == "feature-state" || name == "interpolate-hcl" || name == "interpolate-lab" || name == "format") {
+        if (name == "interpolate-hcl" || name == "interpolate-lab" || name == "format") {
             if (expression::isExpression(conversion::Convertible(expression))) {
                 ASSERT_TRUE(false) << "Expression name" << name << "is implemented - please update Expression.IsExpression test.";
             }

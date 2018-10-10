@@ -103,6 +103,13 @@ public:
     ParseResult parseLayerPropertyExpression(const mbgl::style::conversion::Convertible& value);
 
     /*
+        Parse the given style-spec JSON value as an expression intended to be used
+        in a layer filter.  This entails checking additional constraints
+        that exist in that context but not, e.g., for layer properties.
+    */
+    ParseResult parseLayerFilterExpression(const mbgl::style::conversion::Convertible& value);
+
+    /*
         Parse a child expression. For use by individual Expression::parse() methods.
     */
     ParseResult parse(const mbgl::style::conversion::Convertible&,

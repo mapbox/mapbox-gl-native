@@ -85,6 +85,14 @@ std::unique_ptr<Expression> get(std::unique_ptr<Expression> property) {
     return compound("get", std::move(property));
 }
 
+std::unique_ptr<Expression> featureState(const char* value) {
+    return featureState(literal(value));
+}
+
+std::unique_ptr<Expression> featureState(std::unique_ptr<Expression> property) {
+    return compound("feature-state", std::move(property));
+}
+
 std::unique_ptr<Expression> id() {
     return compound("id");
 }

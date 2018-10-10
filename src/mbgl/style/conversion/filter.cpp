@@ -20,7 +20,7 @@ optional<mbgl::Value> serializeLegacyFilter(const Convertible& values);
 optional<Filter> Converter<Filter>::operator()(const Convertible& value, Error& error) const {
     if (isExpression(value)) {
         ParsingContext parsingContext(type::Boolean);
-        ParseResult parseResult = parsingContext.parseExpression(value);
+        ParseResult parseResult = parsingContext.parseLayerFilterExpression(value);
         if (!parseResult) {
             error.message = parsingContext.getCombinedErrors();
             return nullopt;

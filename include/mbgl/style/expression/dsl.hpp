@@ -42,6 +42,9 @@ std::unique_ptr<Expression> toString(std::unique_ptr<Expression>);
 std::unique_ptr<Expression> get(const char* value);
 std::unique_ptr<Expression> get(std::unique_ptr<Expression>);
 
+std::unique_ptr<Expression> featureState(const char* value);
+std::unique_ptr<Expression> featureState(std::unique_ptr<Expression>);
+
 std::unique_ptr<Expression> id();
 std::unique_ptr<Expression> zoom();
 

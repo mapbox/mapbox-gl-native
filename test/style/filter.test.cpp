@@ -243,6 +243,13 @@ TEST(Filter, ExpressionLegacyMix) {
     EXPECT_TRUE(error.message.size() > 0);
 }
 
+TEST(Filter, ExpressionFeatureState) {
+    conversion::Error error;
+    optional<Filter> filter = conversion::convertJSON<Filter>(R"(["==", ["feature-state", "state"], 1])", error);
+    EXPECT_FALSE(bool(filter));
+    EXPECT_TRUE(error.message.size() > 0);
+}
+
 TEST(Filter, ZoomExpressionNested) {
     ASSERT_TRUE(filter(R"(["==", ["get", "two"], ["zoom"]])", {{"two", int64_t(2)}}, {}, FeatureType::Point, {}, 2.0f));
     ASSERT_FALSE(filter(R"(["==", ["get", "two"], ["+", ["zoom"], 1]])", {{"two", int64_t(2)}}, {}, FeatureType::Point, {}, 2.0f));

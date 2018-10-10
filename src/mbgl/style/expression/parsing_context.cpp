@@ -243,6 +243,16 @@ ParseResult ParsingContext::parseLayerPropertyExpression(const Convertible& valu
     return parsed;
 }
 
+ParseResult ParsingContext::parseLayerFilterExpression(const Convertible& value) {
+    assert(*expected == type::Boolean);
+    ParseResult parsed = parse(value);
+    if (parsed && !isFeatureStateConstant(**parsed)) {
+        error(R"("feature-state" expression may not be used in filter expressions.)");
+        return ParseResult();
+    }
+    return parsed;
+}
+
 const std::string ParsingContext::getCombinedErrors() const {
     std::string combinedError;
     for (const ParsingError& parsingError : *errors) {
