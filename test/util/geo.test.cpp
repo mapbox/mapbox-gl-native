@@ -187,6 +187,33 @@ TEST(LatLng, Boundaries) {
     ASSERT_DOUBLE_EQ(0.5, coordinate.longitude());
 }
 
+TEST(LatLngBounds, Antimeridian) {
+    // Bounding box less than 180° that does not cross antimeridian
+                                     //southwest     northeast
+    auto boundsNormalLT = LatLngBounds::hull({-90.0, -20.0},{90.0, 20.0});
+
+    ASSERT_DOUBLE_EQ(-20, boundsNormalLT.west());
+    ASSERT_DOUBLE_EQ(20, boundsNormalLT.east());
+
+    // Bounding box greater than 180° that does not cross antimeridian
+    auto boundsNormalGT = LatLngBounds::hull({-90.0, -100.0},{90.0, 100.0});
+
+    ASSERT_DOUBLE_EQ(-100, boundsNormalGT.west());
+    ASSERT_DOUBLE_EQ(100, boundsNormalGT.east());
+
+    // Bounding box less than 180° that crosses the antimeridian
+    auto boundsAntimeridianLT = LatLngBounds::hull({-90.0, -200.0},{90.0, 160.0});
+
+    ASSERT_DOUBLE_EQ(-200, boundsAntimeridianLT.west());
+    ASSERT_DOUBLE_EQ(160, boundsAntimeridianLT.east());
+
+    // Bounding box greater than 180° that crosses the antimeridian
+    auto boundsAntimeridianGT = LatLngBounds::hull({-90.0, -270.0},{90.0, 0.0});
+
+    ASSERT_DOUBLE_EQ(-270, boundsAntimeridianGT.west());
+    ASSERT_DOUBLE_EQ(0, boundsAntimeridianGT.east());
+}
+
 TEST(LatLngBounds, FromTileID) {
     {
         const LatLngBounds bounds{ CanonicalTileID(0, 0, 0) };
@@ -283,11 +310,11 @@ TEST(LatLngBounds, ContainsBounds_Wrapped) {
     auto unwrapped = LatLngBounds::hull({10.0, 170.0}, { -10.0, -175.0});
     EXPECT_FALSE(bounds.contains(unwrapped));
     EXPECT_FALSE(bounds.contains(unwrapped, LatLng::Wrapped));
-    
+
     unwrapped = LatLngBounds::hull({10.0, 0.0} , {-10.0, -10.0});
     EXPECT_FALSE(bounds.contains(unwrapped));
     EXPECT_FALSE(bounds.contains(unwrapped, LatLng::Wrapped));
-    
+
     unwrapped = LatLngBounds::hull({10.0, -165.0}, {-10.0, -180.0});
     EXPECT_TRUE(bounds.contains(unwrapped));
     EXPECT_TRUE(bounds.contains(unwrapped, LatLng::Wrapped));

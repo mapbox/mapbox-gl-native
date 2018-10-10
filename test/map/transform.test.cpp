@@ -554,6 +554,7 @@ TEST(Transform, DefaultTransform) {
 TEST(Transform, LatLngBounds) {
     const LatLng nullIsland {};
     const LatLng sanFrancisco { 37.7749, -122.4194 };
+    const LatLng wrappedSanFrancisco { 37.7749, 237.5806};
 
     Transform transform;
     transform.resize({ 1000, 1000 });
@@ -579,6 +580,11 @@ TEST(Transform, LatLngBounds) {
     ASSERT_EQ(transform.getLatLng(), sanFrancisco);
 
     transform.setLatLngBounds(LatLngBounds::hull({ -90.0, -180.0 }, { 0.0, 180.0 }));
+    // ensure a wrapped coordinate works
+    transform.setLatLng(wrappedSanFrancisco);
+    ASSERT_EQ(transform.getLatLng().latitude(), 0.0);
+    ASSERT_EQ(transform.getLatLng().longitude(), sanFrancisco.longitude());
+
     transform.setLatLng(sanFrancisco);
     ASSERT_EQ(transform.getLatLng().latitude(), 0.0);
     ASSERT_EQ(transform.getLatLng().longitude(), sanFrancisco.longitude());
