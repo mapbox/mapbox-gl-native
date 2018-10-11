@@ -554,7 +554,6 @@ TEST(Transform, DefaultTransform) {
 TEST(Transform, LatLngBounds) {
     const LatLng nullIsland {};
     const LatLng sanFrancisco { 37.7749, -122.4194 };
-    const LatLng wrappedSanFrancisco { 37.7749, 237.5806};
 
     Transform transform;
     transform.resize({ 1000, 1000 });
@@ -580,10 +579,15 @@ TEST(Transform, LatLngBounds) {
     ASSERT_EQ(transform.getLatLng(), sanFrancisco);
 
     transform.setLatLngBounds(LatLngBounds::hull({ -90.0, -180.0 }, { 0.0, 180.0 }));
-    // ensure a wrapped coordinate works
-    transform.setLatLng(wrappedSanFrancisco);
-    ASSERT_EQ(transform.getLatLng().latitude(), 0.0);
-    ASSERT_EQ(transform.getLatLng().longitude(), sanFrancisco.longitude());
+    // test that we can limit the bounds vertically while allowing unlimited horizontal scrolling
+    transform.setLatLng(LatLng {45, -180});
+    ASSERT_EQ(transform.getLatLng().latitude(), 0);
+    ASSERT_EQ(transform.getLatLng().longitude(), -180);
+
+    transform.setLatLngBounds(LatLngBounds::hull({ -90.0, -180.0 }, { 0.0, 179.0 }));
+    transform.setLatLng(LatLng {45, 179.5});
+    ASSERT_EQ(transform.getLatLng().latitude(), 0);
+    ASSERT_EQ(transform.getLatLng().longitude(), 179);
 
     transform.setLatLng(sanFrancisco);
     ASSERT_EQ(transform.getLatLng().latitude(), 0.0);

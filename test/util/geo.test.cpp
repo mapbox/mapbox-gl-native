@@ -187,31 +187,54 @@ TEST(LatLng, Boundaries) {
     ASSERT_DOUBLE_EQ(0.5, coordinate.longitude());
 }
 
-TEST(LatLngBounds, Antimeridian) {
-    // Bounding box less than 180° that does not cross antimeridian
-                                     //southwest     northeast
+TEST(LatLngBounds, CoordinateWrapping) {
+    // Bounding box less than 180° from west to east that does not cross antimeridian
     auto boundsNormalLT = LatLngBounds::hull({-90.0, -20.0},{90.0, 20.0});
 
     ASSERT_DOUBLE_EQ(-20, boundsNormalLT.west());
+    // test that the bounds contains the wrapped bounding coordinates
+    EXPECT_FALSE(boundsNormalLT.contains(LatLng{-90.0, 340.0}));
+    EXPECT_TRUE(boundsNormalLT.contains(LatLng{-90.0, 340.0}, LatLng::Wrapped));
     ASSERT_DOUBLE_EQ(20, boundsNormalLT.east());
+    EXPECT_FALSE(boundsNormalLT.contains(LatLng{90.0, 380.0}));
+    EXPECT_TRUE(boundsNormalLT.contains(LatLng{90.0, 380.0}, LatLng::Wrapped));
 
     // Bounding box greater than 180° that does not cross antimeridian
     auto boundsNormalGT = LatLngBounds::hull({-90.0, -100.0},{90.0, 100.0});
 
     ASSERT_DOUBLE_EQ(-100, boundsNormalGT.west());
+    EXPECT_FALSE(boundsNormalGT.contains(LatLng{-90.0, 260.0}));
+    EXPECT_TRUE(boundsNormalGT.contains(LatLng{-90.0, 260.0}, LatLng::Wrapped));
     ASSERT_DOUBLE_EQ(100, boundsNormalGT.east());
+    EXPECT_FALSE(boundsNormalGT.contains(LatLng{90.0, 460.0}));
+    EXPECT_TRUE(boundsNormalGT.contains(LatLng{90.0, 460.0}, LatLng::Wrapped));
 
     // Bounding box less than 180° that crosses the antimeridian
-    auto boundsAntimeridianLT = LatLngBounds::hull({-90.0, -200.0},{90.0, 160.0});
+    auto boundsAntimeridianLT = LatLngBounds::hull({-90.0, -200.0},{90.0, -160.0});
+
+    // test that bounding box spans antimeridian
+    EXPECT_FALSE(boundsAntimeridianLT.contains(LatLng{0, 0}));
+    EXPECT_TRUE(boundsAntimeridianLT.contains(LatLng{0, -180}));
 
     ASSERT_DOUBLE_EQ(-200, boundsAntimeridianLT.west());
-    ASSERT_DOUBLE_EQ(160, boundsAntimeridianLT.east());
+    EXPECT_FALSE(boundsAntimeridianLT.contains(LatLng{-90.0, 160.0}));
+    EXPECT_TRUE(boundsAntimeridianLT.contains(LatLng{-90.0, 160.0}, LatLng::Wrapped));
+    ASSERT_DOUBLE_EQ(-160, boundsAntimeridianLT.east());
+    EXPECT_FALSE(boundsAntimeridianLT.contains(LatLng{90.0, 200.0}));
+    EXPECT_TRUE(boundsAntimeridianLT.contains(LatLng{90.0, 200.0}, LatLng::Wrapped));
 
     // Bounding box greater than 180° that crosses the antimeridian
     auto boundsAntimeridianGT = LatLngBounds::hull({-90.0, -270.0},{90.0, 0.0});
 
+    EXPECT_FALSE(boundsAntimeridianLT.contains(LatLng{0, -300}));
+    EXPECT_TRUE(boundsAntimeridianLT.contains(LatLng{0, -180}));
+
     ASSERT_DOUBLE_EQ(-270, boundsAntimeridianGT.west());
+    EXPECT_FALSE(boundsAntimeridianGT.contains(LatLng{-90.0, 90.0}));
+    EXPECT_TRUE(boundsAntimeridianGT.contains(LatLng{-90.0, 90.0}, LatLng::Wrapped));
     ASSERT_DOUBLE_EQ(0, boundsAntimeridianGT.east());
+    EXPECT_FALSE(boundsAntimeridianGT.contains(LatLng{90.0, 360.0}));
+    EXPECT_TRUE(boundsAntimeridianGT.contains(LatLng{90.0, 360.0}, LatLng::Wrapped));
 }
 
 TEST(LatLngBounds, FromTileID) {
