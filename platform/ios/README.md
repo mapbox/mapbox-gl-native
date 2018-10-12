@@ -2,6 +2,8 @@
 
 [![Circle CI build status](https://circleci.com/gh/mapbox/mapbox-gl-native.svg?style=shield)](https://circleci.com/gh/mapbox/workflows/mapbox-gl-native/tree/master)
 
+**Please note:** This is branch restores iOS 8 support to iOS SDK v4.5.0. There will be minimal maintenance for this branch. If iOS 8 support is not needed, please use the [latest release](https://github.com/mapbox/mapbox-gl-native/releases) of the Maps SDK for iOS. There are no plans to restore iOS 8 support to `master`.
+
 A library based on [Mapbox GL Native](../../README.md) for embedding interactive map views with scalable, customizable vector maps into Cocoa Touch applications on iOS using Objective-C, Swift, or Interface Builder.
 
 This repository is for day-to-day development of the SDK. Building the SDK yourself requires [a number of dependencies and steps](../../INSTALL.md) that are unnecessary for developing production applications. For production applications, please consider installing an official, prebuilt release instead; see the [Mapbox iOS SDK website](https://www.mapbox.com/ios-sdk/) for installation instructions.

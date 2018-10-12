@@ -1,6 +1,9 @@
 # Changelog for Mapbox Maps SDK for iOS
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
+## ios8-release-gazpacho
+
+* Restored iOS 8 support for the Mapbox Maps SDK for iOS. ([#13036](https://github.com/mapbox/mapbox-gl-native/pull/13036))
 
 ## 4.5.0
 
@@ -14,7 +17,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Added `-[MGLOfflineStorage addContentsOfFile:withCompletionHandler:]` and `-[MGLOfflineStorage addContentsOfURL:withCompletionHandler:]` methods to add pregenerated offline packs to offline storage. ([#12791](https://github.com/mapbox/mapbox-gl-native/pull/12791))
 
-### Other changes	
+### Other changes
 
 * Fixed an issue where `-[MGLMapSnapshotter startWithQueue:completionHandler:]` failed to call its completion handler in some cases. ([#12355](https://github.com/mapbox/mapbox-gl-native/pull/12355))
 * Fixed bugs in coercion expression operators ("to-array" applied to empty arrays, "to-color" applied to colors, and "to-number" applied to null) [#12864](https://github.com/mapbox/mapbox-gl-native/pull/12864)

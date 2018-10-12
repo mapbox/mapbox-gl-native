@@ -4,7 +4,7 @@ This document explains how to build a development version of Mapbox Maps SDK for
 
 ### Requirements
 
-The Mapbox Maps SDK for iOS is intended to run on iOS 9.0 and above on the following devices:
+The Mapbox Maps SDK for iOS is intended to run on iOS 8.0 and above on the following devices:
 
 * iPhone 4s and above (5, 5c, 5s, 6, 6 Plus, 7, 7 Plus, 8, 8 Plus, X)
 * iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2, Pro)
