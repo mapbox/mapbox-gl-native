@@ -312,7 +312,7 @@ public final class MapboxMap {
   }
 
   /**
-   * Tries to cast the Layer to T, returns null if it's another type.
+   * Tries to cast the Layer to T, throws ClassCastException if it's another type.
    *
    * @param layerId the layer id used to look up a layer
    * @param <T>     the generic attribute of a Layer
@@ -320,15 +320,8 @@ public final class MapboxMap {
    */
   @Nullable
   public <T extends Layer> T getLayerAs(@NonNull String layerId) {
-    try {
-      // noinspection unchecked
-      return (T) nativeMapView.getLayer(layerId);
-    } catch (ClassCastException exception) {
-      String message = String.format("Layer: %s is a different type: ", layerId);
-      Logger.e(TAG, message, exception);
-      MapStrictMode.strictModeViolation(message, exception);
-      return null;
-    }
+    // noinspection unchecked
+    return (T) nativeMapView.getLayer(layerId);
   }
 
   /**
