@@ -612,7 +612,7 @@ run-android-ui-test-$1-%: platform/android/gradle/configuration.gradle
 # Symbolicate native stack trace with the specified abi
 .PHONY: android-ndk-stack-$1
 android-ndk-stack-$1: platform/android/gradle/configuration.gradle
-	adb logcat | ndk-stack -sym platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/$2/
+	adb logcat | ndk-stack -sym platform/android/MapboxGLAndroidSDK/build/intermediates/transforms/mergeJniLibs/release/0/lib/$2/
 
 # Run render tests with pixelmatch
 .PHONY: run-android-render-test-$1
