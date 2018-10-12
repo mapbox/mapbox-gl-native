@@ -13,6 +13,7 @@ import com.mapbox.mapboxsdk.maps.UiSettings;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Arrays;
 
 /**
  * Factory for creating CameraUpdate objects.
@@ -212,6 +213,53 @@ public final class CameraUpdateFactory {
       }
       return new CameraPosition.Builder(this).build();
     }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      CameraPositionUpdate that = (CameraPositionUpdate) o;
+
+      if (Double.compare(that.bearing, bearing) != 0) {
+        return false;
+      }
+      if (Double.compare(that.tilt, tilt) != 0) {
+        return false;
+      }
+      if (Double.compare(that.zoom, zoom) != 0) {
+        return false;
+      }
+      return target != null ? target.equals(that.target) : that.target == null;
+    }
+
+    @Override
+    public int hashCode() {
+      int result;
+      long temp;
+      temp = Double.doubleToLongBits(bearing);
+      result = (int) (temp ^ (temp >>> 32));
+      result = 31 * result + (target != null ? target.hashCode() : 0);
+      temp = Double.doubleToLongBits(tilt);
+      result = 31 * result + (int) (temp ^ (temp >>> 32));
+      temp = Double.doubleToLongBits(zoom);
+      result = 31 * result + (int) (temp ^ (temp >>> 32));
+      return result;
+    }
+
+    @Override
+    public String toString() {
+      return "CameraPositionUpdate{"
+        + "bearing=" + bearing
+        + ", target=" + target
+        + ", tilt=" + tilt
+        + ", zoom=" + zoom
+        + '}';
+    }
   }
 
   static final class CameraBoundsUpdate implements CameraUpdate {
@@ -239,6 +287,38 @@ public final class CameraUpdateFactory {
     @Override
     public CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap) {
       return mapboxMap.getCameraForLatLngBounds(bounds, padding);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      CameraBoundsUpdate that = (CameraBoundsUpdate) o;
+
+      if (!bounds.equals(that.bounds)) {
+        return false;
+      }
+      return Arrays.equals(padding, that.padding);
+    }
+
+    @Override
+    public int hashCode() {
+      int result = bounds.hashCode();
+      result = 31 * result + Arrays.hashCode(padding);
+      return result;
+    }
+
+    @Override
+    public String toString() {
+      return "CameraBoundsUpdate{"
+        + "bounds=" + bounds
+        + ", padding=" + Arrays.toString(padding)
+        + '}';
     }
   }
 
@@ -272,6 +352,38 @@ public final class CameraUpdateFactory {
         .tilt(previousPosition.tilt)
         .bearing(previousPosition.bearing)
         .build();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      CameraMoveUpdate that = (CameraMoveUpdate) o;
+
+      if (Float.compare(that.x, x) != 0) {
+        return false;
+      }
+      return Float.compare(that.y, y) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+      int result = (x != +0.0f ? Float.floatToIntBits(x) : 0);
+      result = 31 * result + (y != +0.0f ? Float.floatToIntBits(y) : 0);
+      return result;
+    }
+
+    @Override
+    public String toString() {
+      return "CameraMoveUpdate{"
+        + "x=" + x
+        + ", y=" + y
+        + '}';
     }
   }
 
@@ -365,6 +477,51 @@ public final class CameraUpdateFactory {
           .target(mapboxMap.getProjection().fromScreenLocation(new PointF(getX(), getY())))
           .build();
       }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      ZoomUpdate that = (ZoomUpdate) o;
+
+      if (type != that.type) {
+        return false;
+      }
+      if (Double.compare(that.zoom, zoom) != 0) {
+        return false;
+      }
+      if (Float.compare(that.x, x) != 0) {
+        return false;
+      }
+      return Float.compare(that.y, y) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+      int result;
+      long temp;
+      result = type;
+      temp = Double.doubleToLongBits(zoom);
+      result = 31 * result + (int) (temp ^ (temp >>> 32));
+      result = 31 * result + (x != +0.0f ? Float.floatToIntBits(x) : 0);
+      result = 31 * result + (y != +0.0f ? Float.floatToIntBits(y) : 0);
+      return result;
+    }
+
+    @Override
+    public String toString() {
+      return "ZoomUpdate{"
+        + "type=" + type
+        + ", zoom=" + zoom
+        + ", x=" + x
+        + ", y=" + y
+        + '}';
     }
   }
 }
