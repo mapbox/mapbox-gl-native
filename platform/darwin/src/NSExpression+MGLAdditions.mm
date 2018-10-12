@@ -843,9 +843,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     NSPredicate *conditional = [arguments.firstObject constantValue];
                     return [NSExpression expressionForConditional:conditional trueExpression:arguments[1] falseExpression:arguments[2]];
                 }
-            } else {
-                    return [NSExpression expressionForFunction:@"MGL_IF" arguments:arguments];
             }
+            
+            return [NSExpression expressionForFunction:@"MGL_IF" arguments:arguments];
         } else if ([op isEqualToString:@"match"]) {
             NSMutableArray *optionsArray = [NSMutableArray array];
             

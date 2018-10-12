@@ -620,11 +620,12 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
-        // TODO JK: caught "NSInternalInconsistencyException", "length: is not a supported method."
-        NSExpression *expression = [NSExpression expressionForFunction:@"length:" arguments:arguments];
-        NSArray *jsonExpression = @[@"length", @"MacDonald"];
-        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
-        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+        if (@available(iOS 9.0, *)) {
+            NSExpression *expression = [NSExpression expressionForFunction:@"length:" arguments:arguments];
+            NSArray *jsonExpression = @[@"length", @"MacDonald"];
+            XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+            XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+        }
     }
 }
 
@@ -1099,7 +1100,6 @@ using namespace std::string_literals;
                     @80000
                 ],
                 @[@"get", @"abbr"],
-                // TODO JK - ((localizedExpression.mgl_jsonExpressionObject) equal to (localizedJSONExpression)) failed: throwing "*** -constantValue only defined for abstract class.  Define -[NSKeyPathExpression constantValue]!"
                 @[@"get", @"name"]
             ],
             @5, @[@"get", @"name"]

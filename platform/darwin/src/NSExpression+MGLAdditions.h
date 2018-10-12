@@ -173,6 +173,8 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionI
  guide for a correspondence of operators and types between the style
  specification and the `NSExpression` representation used by this SDK.
  
+ Note that the `length` argument is not currently supported with iOS 8.
+ 
  You can use `NSJSONSerialization` to serialize the Foundation object as data to
  write to a file.
  */
