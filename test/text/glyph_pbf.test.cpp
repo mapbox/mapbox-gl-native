@@ -13,7 +13,7 @@ TEST(GlyphPBF, Parsing) {
     auto& sdf = sdfs[0];
     EXPECT_EQ(69u, sdf.id);
     AlphaImage expected({7, 7});
-    expected.fill('x');
+    std::fill(expected.data(), expected.data() + expected.bytes(), 'x');
     EXPECT_EQ(expected, sdf.bitmap);
     EXPECT_EQ(1u, sdf.metrics.width);
     EXPECT_EQ(1u, sdf.metrics.height);

@@ -32,8 +32,9 @@ public:
         stub.metrics.left = 0;
         stub.metrics.top = -8;
         stub.metrics.advance = 24;
-
-        stub.bitmap = AlphaImage(Size(30, 30), stubBitmap, stubBitmapLength);
+        std::unique_ptr<uint8_t[]> imageData{std::make_unique<uint8_t[]>(stubBitmapLength)};
+        std::copy(stubBitmap, stubBitmap + stubBitmapLength, imageData.get());
+        stub.bitmap = AlphaImage(Size(30, 30), std::move(imageData));
 
         return stub;
     }
@@ -236,11 +237,11 @@ TEST(GlyphManager, LoadLocalCJKGlyph) {
         EXPECT_EQ(glyph->metrics.left, 0);
         EXPECT_EQ(glyph->metrics.top, -8);
         EXPECT_EQ(glyph->metrics.advance, 24ul);
-        EXPECT_EQ(glyph->bitmap.size, Size(30, 30));
+        EXPECT_EQ(glyph->bitmap.size(), Size(30, 30));
 
-        size_t pixelCount = glyph->bitmap.size.width * glyph->bitmap.size.height;
+        size_t pixelCount = glyph->bitmap.size().area();
         for (size_t i = 0; i < pixelCount; i++) {
-            EXPECT_EQ(glyph->bitmap.data[i], sdfBitmap[i]);
+            EXPECT_EQ(glyph->bitmap.data()[i], sdfBitmap[i]);
         }
 
         test.end();

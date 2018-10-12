@@ -109,23 +109,23 @@ void checkImage(const std::string& base,
     }
 
     PremultipliedImage expected = decodeImage(expected_image);
-    PremultipliedImage diff { expected.size };
+    PremultipliedImage diff { expected.size() };
 
 
 #if !TEST_READ_ONLY
     util::write_file(base + "/actual.png", encodePNG(actual));
 #endif
 
-    ASSERT_EQ(expected.size, actual.size);
+    ASSERT_EQ(expected.size(), actual.size());
 
-    double pixels = mapbox::pixelmatch(actual.data.get(),
-                                       expected.data.get(),
-                                       expected.size.width,
-                                       expected.size.height,
-                                       diff.data.get(),
+    double pixels = mapbox::pixelmatch(actual.data(),
+                                       expected.data(),
+                                       expected.size().width,
+                                       expected.size().height,
+                                       diff.data(),
                                        pixelThreshold);
 
-    EXPECT_LE(pixels / (expected.size.width * expected.size.height), imageThreshold);
+    EXPECT_LE(pixels / expected.size().area(), imageThreshold);
 
 #if !TEST_READ_ONLY
     util::write_file(base + "/diff.png", encodePNG(diff));

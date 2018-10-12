@@ -22,8 +22,8 @@ GlyphAtlas makeGlyphAtlas(const GlyphMap& glyphs) {
                 const Glyph& glyph = **entry.second;
 
                 const mapbox::Bin& bin = *pack.packOne(-1,
-                    glyph.bitmap.size.width + 2 * padding,
-                    glyph.bitmap.size.height + 2 * padding);
+                    glyph.bitmap.size().width + 2 * padding,
+                    glyph.bitmap.size().height + 2 * padding);
 
                 result.image.resize({
                     static_cast<uint32_t>(pack.width()),
@@ -37,7 +37,7 @@ GlyphAtlas makeGlyphAtlas(const GlyphMap& glyphs) {
                                     bin.x + padding,
                                     bin.y + padding
                                  },
-                                 glyph.bitmap.size);
+                                 glyph.bitmap.size());
 
                 positions.emplace(glyph.id,
                                   GlyphPosition {

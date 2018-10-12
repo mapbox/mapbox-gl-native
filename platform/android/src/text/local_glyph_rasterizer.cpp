@@ -120,8 +120,9 @@ Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack& fontStack, GlyphID g
 
     // Copy alpha values from RGBA bitmap into the AlphaImage output
     fixedMetrics.bitmap = AlphaImage(size);
-    for (uint32_t i = 0; i < size.width * size.height; i++) {
-        fixedMetrics.bitmap.data[i] = rgbaBitmap.data[4 * i + 3];
+    uint32_t sizeArea = size.area();
+    for (uint32_t i = 0; i < sizeArea; ++i) {
+        fixedMetrics.bitmap.data()[i] = rgbaBitmap.data()[4 * i + 3];
     }
 
     return fixedMetrics;

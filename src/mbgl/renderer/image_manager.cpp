@@ -44,7 +44,7 @@ void ImageManager::removeImage(const std::string& id) {
         const uint32_t y = it->second.bin->y;
         const uint32_t w = it->second.bin->w;
         const uint32_t h = it->second.bin->h;
-        PremultipliedImage::clear(atlasImage, { x, y }, { w, h });
+        atlasImage.clear({ x, y }, { w, h });
 
         shelfPack.unref(*it->second.bin);
         patterns.erase(it);
@@ -130,8 +130,8 @@ optional<ImagePosition> ImageManager::getPattern(const std::string& id) {
         return {};
     }
 
-    const uint16_t width = image->image.size.width + padding * 2;
-    const uint16_t height = image->image.size.height + padding * 2;
+    const uint16_t width = image->image.size().width + padding * 2;
+    const uint16_t height = image->image.size().height + padding * 2;
 
     mapbox::Bin* bin = shelfPack.packOne(-1, width, height);
     if (!bin) {
@@ -139,13 +139,14 @@ optional<ImagePosition> ImageManager::getPattern(const std::string& id) {
     }
 
     atlasImage.resize(getPixelSize());
+    assert(atlasImage.valid());
 
     const PremultipliedImage& src = image->image;
 
     const uint32_t x = bin->x + padding;
     const uint32_t y = bin->y + padding;
-    const uint32_t w = src.size.width;
-    const uint32_t h = src.size.height;
+    const uint32_t w = src.size().width;
+    const uint32_t h = src.size().height;
 
     PremultipliedImage::copy(src, atlasImage, { 0, 0 }, { x, y }, { w, h });
 

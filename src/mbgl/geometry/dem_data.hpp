@@ -17,11 +17,11 @@ public:
     void backfillBorder(const DEMData& borderTileData, int8_t dx, int8_t dy);
 
     void set(const int32_t x, const int32_t y, const int32_t value) {
-        reinterpret_cast<int32_t*>(image.data.get())[idx(x, y)] = value + 65536;
+        reinterpret_cast<int32_t*>(image.data())[idx(x, y)] = value + 65536;
     }
 
     int32_t get(const int32_t x, const int32_t y) const {
-        return reinterpret_cast<const int32_t*>(image.data.get())[idx(x, y)] - 65536;
+        return reinterpret_cast<const int32_t*>(image.data())[idx(x, y)] - 65536;
     }
 
     const PremultipliedImage* getImage() const {

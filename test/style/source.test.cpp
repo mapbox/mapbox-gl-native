@@ -730,10 +730,10 @@ TEST(Source, ImageSourceImageUpdate) {
     // Load initial, so the source state will be loaded=true
     source.loadDescription(test.fileSource);
     PremultipliedImage rgba({ 1, 1 });
-    rgba.data[0] = 255;
-    rgba.data[1] = 254;
-    rgba.data[2] = 253;
-    rgba.data[3] = 0;
+    rgba.data()[0] = 255;
+    rgba.data()[1] = 254;
+    rgba.data()[2] = 253;
+    rgba.data()[3] = 0;
 
     // Schedule an update
     test.loop.invoke([&] () {

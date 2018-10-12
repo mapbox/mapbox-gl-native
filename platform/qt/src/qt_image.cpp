@@ -7,7 +7,7 @@
 namespace mbgl {
 
 std::string encodePNG(const PremultipliedImage& pre) {
-    QImage image(pre.data.get(), pre.size.width, pre.size.height,
+    QImage image(pre.data(), pre.size().width, pre.size().height,
         QImage::Format_ARGB32_Premultiplied);
 
     QByteArray array;

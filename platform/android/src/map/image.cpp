@@ -29,7 +29,7 @@ mbgl::style::Image Image::getImage(jni::JNIEnv& env, const jni::Object<Image>& i
         throw mbgl::util::SpriteImageException("Sprite image pixel count mismatch");
     }
 
-    jni::GetArrayRegion(env, *pixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
+    jni::GetArrayRegion(env, *pixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data()));
     return mbgl::style::Image {name, std::move(premultipliedImage), pixelRatio, sdf};
 }
 

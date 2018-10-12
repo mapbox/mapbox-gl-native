@@ -121,7 +121,7 @@ public:
     template <typename Image>
     void drawPixels(const Image& image) {
         auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
-        drawPixels(image.size, image.data.get(), format);
+        drawPixels(image.size(), image.data(), format);
     }
 #endif // MBGL_USE_GLES2
 
@@ -131,7 +131,7 @@ public:
                           TextureUnit unit = 0,
                           TextureType type = TextureType::UnsignedByte) {
         auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
-        return { image.size, createTexture(image.size, image.data.get(), format, unit, type) };
+        return { image.size(), createTexture(image.size(), image.data(), format, unit, type) };
     }
 
     template <typename Image>
@@ -140,8 +140,8 @@ public:
                        TextureUnit unit = 0,
                        TextureType type = TextureType::UnsignedByte) {
         auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
-        updateTexture(obj.texture.get(), image.size, image.data.get(), format, unit, type);
-        obj.size = image.size;
+        updateTexture(obj.texture.get(), image.size(), image.data(), format, unit, type);
+        obj.size = image.size();
     }
 
     // Creates an empty texture with the specified dimensions.

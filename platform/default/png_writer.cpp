@@ -44,8 +44,8 @@ std::string encodePNG(const PremultipliedImage& pre) {
 
     // IHDR chunk for our RGBA image.
     const char ihdr[13] = {
-        NETWORK_BYTE_UINT32(src.size.width),  // width
-        NETWORK_BYTE_UINT32(src.size.height), // height
+        NETWORK_BYTE_UINT32(src.size().width),  // width
+        NETWORK_BYTE_UINT32(src.size().height), // height
         8,                                    // bit depth == 8 bits
         6,                                    // color type == RGBA
         0,                                    // compression method == deflate
@@ -56,10 +56,10 @@ std::string encodePNG(const PremultipliedImage& pre) {
     // Prepare the (compressed) data chunk.
     const auto stride = src.stride();
     std::string idat;
-    for (uint32_t y = 0; y < src.size.height; y++) {
+    for (uint32_t y = 0; y < src.size().height; y++) {
         // Every scanline needs to be prefixed with one byte that indicates the filter type.
         idat.append(1, 0); // filter type 0
-        idat.append((const char*)(src.data.get() + y * stride), stride);
+        idat.append((const char*)(src.data() + y * stride), stride);
     }
     idat = util::compress(idat);
 

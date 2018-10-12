@@ -23,11 +23,11 @@ std::unique_ptr<style::Image> createStyleImage(const std::string& id,
     // Disallow invalid parameter configurations.
     if (width <= 0 || height <= 0 || width > 1024 || height > 1024 ||
         ratio <= 0 || ratio > 10 ||
-        srcX >= image.size.width || srcY >= image.size.height ||
-        srcX + width > image.size.width || srcY + height > image.size.height) {
+        srcX >= image.size().width || srcY >= image.size().height ||
+        srcX + width > image.size().width || srcY + height > image.size().height) {
         Log::Error(Event::Sprite, "Can't create sprite with invalid metrics: %ux%u@%u,%u in %ux%u@%sx sprite",
             width, height, srcX, srcY,
-            image.size.width, image.size.height,
+            image.size().width, image.size().height,
             util::toString(ratio).c_str());
         return nullptr;
     }

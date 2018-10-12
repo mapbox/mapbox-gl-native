@@ -6,13 +6,10 @@ namespace mbgl {
 namespace util {
 
 PremultipliedImage premultiply(UnassociatedImage&& src) {
-    PremultipliedImage dst;
+    Size size = src.size();
+    PremultipliedImage dst(size, src.takeData());
 
-    dst.size = src.size;
-    src.size = { 0, 0 };
-    dst.data = std::move(src.data);
-
-    uint8_t* data = dst.data.get();
+    uint8_t* data = dst.data();
     for (size_t i = 0; i < dst.bytes(); i += 4) {
         uint8_t& r = data[i + 0];
         uint8_t& g = data[i + 1];
@@ -27,13 +24,10 @@ PremultipliedImage premultiply(UnassociatedImage&& src) {
 }
 
 UnassociatedImage unpremultiply(PremultipliedImage&& src) {
-    UnassociatedImage dst;
+    Size size = src.size();
+    UnassociatedImage dst(size, src.takeData());
 
-    dst.size = src.size;
-    src.size = { 0, 0 };
-    dst.data = std::move(src.data);
-
-    uint8_t* data = dst.data.get();
+    uint8_t* data = dst.data();
     for (size_t i = 0; i < dst.bytes(); i += 4) {
         uint8_t& r = data[i + 0];
         uint8_t& g = data[i + 1];

@@ -240,7 +240,7 @@ double AnnotationManager::getTopOffsetPixelsForImage(const std::string& id_) {
     std::lock_guard<std::mutex> lock(mutex);
     const std::string id = prefixedImageID(id_);
     auto it = images.find(id);
-    return it != images.end() ? -(it->second.getImage().size.height / it->second.getPixelRatio()) / 2 : 0;
+    return it != images.end() ? -(it->second.getImage().size().height / it->second.getPixelRatio()) / 2 : 0;
 }
 
 } // namespace mbgl

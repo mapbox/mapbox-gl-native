@@ -10,7 +10,7 @@ auto fakeImage = [](Size s) {
     PremultipliedImage img = PremultipliedImage(s);
 
     for (size_t i = 0; i < img.bytes(); i ++) {
-        img.data[i] = (i+1) % 4 == 0 ? 1 : std::rand() % 255;
+        img.data()[i] = (i+1) % 4 == 0 ? 1 : std::rand() % 255;
     }
     return img;
 };

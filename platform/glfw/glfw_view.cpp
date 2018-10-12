@@ -324,7 +324,7 @@ GLFWView::makeImage(const std::string& id, int width, int height, float pixelRat
     const int h = std::ceil(pixelRatio * height);
 
     mbgl::PremultipliedImage image({ static_cast<uint32_t>(w), static_cast<uint32_t>(h) });
-    auto data = reinterpret_cast<uint32_t*>(image.data.get());
+    auto* data = reinterpret_cast<uint32_t*>(image.data());
     const int dist = (w / 2) * (w / 2);
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {

@@ -421,7 +421,7 @@ void NodeMap::Render(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     try {
         auto options = ParseOptions(Nan::To<v8::Object>(info[0]).ToLocalChecked());
         assert(!nodeMap->req);
-        assert(!nodeMap->image.data);
+        assert(!nodeMap->image.valid());
         nodeMap->req = std::make_unique<RenderRequest>(Nan::To<v8::Function>(info[1]).ToLocalChecked());
 
         nodeMap->startRender(std::move(options));
@@ -463,7 +463,7 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
             error = std::move(eptr);
             uv_async_send(async);
         } else {
-            assert(!image.data);
+            assert(!image.valid());
             image = frontend->readStillImage();
             uv_async_send(async);
         }
@@ -498,7 +498,7 @@ void NodeMap::renderFinished() {
 
     // These have to be empty to be prepared for the next render call.
     assert(!req);
-    assert(!image.data);
+    assert(!image.valid());
 
     v8::Local<v8::Function> callback = Nan::New(request->callback);
     v8::Local<v8::Object> target = Nan::New<v8::Object>();
@@ -524,16 +524,16 @@ void NodeMap::renderFinished() {
         assert(!error);
 
         request->runInAsyncScope(target, callback, 1, argv);
-    } else if (img.data) {
+    } else if (img.valid()) {
         v8::Local<v8::Object> pixels = Nan::NewBuffer(
-            reinterpret_cast<char *>(img.data.get()), img.bytes(),
+            reinterpret_cast<char *>(img.data()), img.bytes(),
             // Retain the data until the buffer is deleted.
             [](char *, void * hint) {
                 delete [] reinterpret_cast<uint8_t*>(hint);
             },
-            img.data.get()
+            img.data()
         ).ToLocalChecked();
-        img.data.release();
+        img.takeData().release();
 
         v8::Local<v8::Value> argv[] = {
             Nan::Null(),

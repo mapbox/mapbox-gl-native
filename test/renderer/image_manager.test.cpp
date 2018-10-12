@@ -39,7 +39,7 @@ TEST(ImageManager, Basic) {
     EXPECT_EQ(18, metro.displaySize()[0]);
     EXPECT_EQ(18, metro.displaySize()[1]);
     EXPECT_EQ(1.0f, metro.pixelRatio);
-    EXPECT_EQ(imageManager.getPixelSize(), imageManager.getAtlasImage().size);
+    EXPECT_EQ(imageManager.getPixelSize(), imageManager.getAtlasImage().size());
 
     test::checkImage("test/fixtures/image_manager/basic", imageManager.getAtlasImage());
 }
@@ -48,7 +48,7 @@ TEST(ImageManager, Updates) {
     ImageManager imageManager;
 
     PremultipliedImage imageA({ 16, 12 });
-    imageA.fill(255);
+    std::fill(imageA.data(), imageA.data() + imageA.bytes(), 255);
     imageManager.addImage(makeMutable<style::Image::Impl>("one", std::move(imageA), 1));
 
     auto a = *imageManager.getPattern("one");
@@ -62,7 +62,7 @@ TEST(ImageManager, Updates) {
     test::checkImage("test/fixtures/image_manager/updates_before", imageManager.getAtlasImage());
 
     PremultipliedImage imageB({ 5, 5 });
-    imageA.fill(200);
+    std::fill(imageA.data(), imageA.data() + imageA.bytes(), 200);
     imageManager.updateImage(makeMutable<style::Image::Impl>("one", std::move(imageB), 1));
 
     auto b = *imageManager.getPattern("one");

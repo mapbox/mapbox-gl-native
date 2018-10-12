@@ -601,7 +601,7 @@ void NativeMapView::addAnnotationIcon(JNIEnv& env, const jni::String& symbol, ji
         throw mbgl::util::SpriteImageException("Sprite image pixel count mismatch");
     }
 
-    jni::GetArrayRegion(env, *jpixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
+    jni::GetArrayRegion(env, *jpixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data()));
     map->addAnnotationImage(std::make_unique<mbgl::style::Image>(
         symbolName, std::move(premultipliedImage), float(scale)));
 }

@@ -43,7 +43,7 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
         return LinePatternPos();
     }
 
-    if (nextRow + dashheight > image.size.height) {
+    if (nextRow + dashheight > image.size().height) {
         Log::Warning(Event::OpenGL, "line atlas bitmap overflow");
         return LinePatternPos();
     }
@@ -53,7 +53,7 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
         length += part;
     }
 
-    float stretch = image.size.width / length;
+    float stretch = image.size().width / length;
     float halfWidth = stretch * 0.5;
     // If dasharray has an odd length, both the first and last parts
     // are dashes and should be joined seamlessly.
@@ -61,7 +61,7 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
 
     for (int y = -n; y <= n; y++) {
         int row = nextRow + n + y;
-        int index = image.size.width * row;
+        int index = image.size().width * row;
 
         float left = 0;
         float right = dasharray[0];
@@ -71,7 +71,7 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
             left -= dasharray.back();
         }
 
-        for (uint32_t x = 0; x < image.size.width; x++) {
+        for (uint32_t x = 0; x < image.size().width; x++) {
 
             while (right < x / stretch) {
                 left = right;
@@ -105,14 +105,14 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
             } else {
                 signedDistance = int((inside ? 1 : -1) * dist);
             }
-
-            image.data[index + x] = fmax(0, fmin(255, signedDistance + offset));
+            uint8_t* imageData = const_cast<uint8_t*>(image.data());
+            imageData[index + x] = fmax(0, fmin(255, signedDistance + offset));
         }
     }
 
     LinePatternPos position;
-    position.y = (0.5 + nextRow + n) / image.size.height;
-    position.height = (2.0 * n) / image.size.height;
+    position.y = (0.5 + nextRow + n) / image.size().height;
+    position.height = (2.0 * n) / image.size().height;
     position.width = length;
 
     nextRow += dashheight;
@@ -123,7 +123,7 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
 }
 
 Size LineAtlas::getSize() const {
-    return image.size;
+    return image.size();
 }
 
 void LineAtlas::upload(gl::Context& context, gl::TextureUnit unit) {

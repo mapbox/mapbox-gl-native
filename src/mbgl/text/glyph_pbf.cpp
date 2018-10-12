@@ -80,8 +80,11 @@ std::vector<Glyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::string
                 if (size.area() != glyphData.size()) {
                     continue;
                 }
-
-                glyph.bitmap = AlphaImage(size, reinterpret_cast<const uint8_t*>(glyphData.data()), glyphData.size());
+                std::unique_ptr<uint8_t[]> imageData{std::make_unique<uint8_t[]>(glyphData.size())};
+                const uint8_t* glyphDataAsUint8 = reinterpret_cast<const uint8_t*>(glyphData.data());
+                std::copy(glyphDataAsUint8, glyphDataAsUint8 + glyphData.size(), imageData.get());
+                glyph.bitmap = AlphaImage(size, std::move(imageData));
+                assert(glyphData.size() == glyph.bitmap.bytes());
             }
 
             result.push_back(std::move(glyph));

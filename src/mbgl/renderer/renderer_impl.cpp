@@ -488,7 +488,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         auto image = parameters.context.readFramebuffer<AlphaImage, gl::TextureFormat::Stencil>(viewport.size, false);
 
         // Scale the Stencil buffer to cover the entire color space.
-        auto it = image.data.get();
+        auto it = image.data();
         auto end = it + viewport.size.width * viewport.size.height;
         const auto factor = 255.0f / *std::max_element(it, end);
         for (; it != end; ++it) {

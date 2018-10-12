@@ -4,12 +4,12 @@
 namespace mbgl {
 
 DEMData::DEMData(const PremultipliedImage& _image, Tileset::DEMEncoding encoding):
-    dim(_image.size.height),
-    border(std::max<int32_t>(std::ceil(_image.size.height / 2), 1)),
+    dim(_image.size().height),
+    border(std::max<int32_t>(std::ceil(_image.size().height / 2), 1)),
     stride(dim + 2 * border),
     image({ static_cast<uint32_t>(stride), static_cast<uint32_t>(stride) }) {
 
-    if (_image.size.height != _image.size.width){
+    if (_image.size().height != _image.size().width){
         throw std::runtime_error("raster-dem tiles must be square.");
     }
 
@@ -25,13 +25,14 @@ DEMData::DEMData(const PremultipliedImage& _image, Tileset::DEMEncoding encoding
 
     auto decodeRGB = encoding == Tileset::DEMEncoding::Terrarium ? decodeTerrarium : decodeMapbox;
 
-    std::memset(image.data.get(), 0, image.bytes());
+    std::memset(image.data(), 0, image.bytes());
 
     for (int32_t y = 0; y < dim; y++) {
         for (int32_t x = 0; x < dim; x++) {
             const int32_t i = y * dim + x;
             const int32_t j = i * 4;
-            set(x, y, decodeRGB(_image.data[j], _image.data[j+1], _image.data[j+2]));
+            const uint8_t* imageData = _image.data();
+            set(x, y, decodeRGB(imageData[j], imageData[j+1], imageData[j+2]));
         }
     }
     

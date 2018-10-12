@@ -131,7 +131,7 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
     // alloc row pointers
     const std::unique_ptr<png_bytep[]> rows(new png_bytep[height]);
     for (unsigned row = 0; row < height; ++row)
-        rows[row] = image.data.get() + row * width * 4;
+        rows[row] = image.data() + row * width * 4;
     png_read_image(png_ptr, rows.get());
 
     png_read_end(png_ptr, nullptr);
