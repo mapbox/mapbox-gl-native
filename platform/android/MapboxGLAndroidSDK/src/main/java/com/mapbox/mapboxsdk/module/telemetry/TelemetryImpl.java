@@ -15,7 +15,8 @@ import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
-import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
+import com.mapbox.mapboxsdk.offline.OfflineRegionError;
+import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 
 public class TelemetryImpl implements TelemetryDefinition {
 
@@ -96,13 +97,44 @@ public class TelemetryImpl implements TelemetryDefinition {
   }
 
   @Override
-  public void onCreateOfflineRegion(@NonNull OfflineRegionDefinition offlineDefinition) {
+  public void onOfflineDownloadStart(@NonNull OfflineRegionDefinition offlineDefinition) {
     MapEventFactory mapEventFactory = new MapEventFactory();
     telemetry.push(mapEventFactory.createOfflineDownloadStartEvent(
-      offlineDefinition instanceof OfflineTilePyramidRegionDefinition ? "tileregion" : "shaperegion",
+            offlineDefinition.getType(),
+            offlineDefinition.getMinZoom(),
+            offlineDefinition.getMaxZoom(),
+            offlineDefinition.getStyleURL())
+    );
+  }
+
+  @Override
+  public void onOfflineDownloadEndSuccess(@NonNull OfflineRegionDefinition offlineDefinition,
+                                          @NonNull OfflineRegionStatus status) {
+
+    if (status.isComplete()) {
+      telemetry.push(new MapEventFactory().createOfflineDownloadCompleteEvent(
+              offlineDefinition.getType(),
+              offlineDefinition.getMinZoom(),
+              offlineDefinition.getMaxZoom(),
+              offlineDefinition.getStyleURL(),
+              status.getCompletedResourceSize(),
+              status.getCompletedTileCount(),
+              "success"
+      ));
+    }
+  }
+
+  @Override
+  public void onOfflineDownloadEndFailure(@NonNull OfflineRegionDefinition offlineDefinition,
+                                          @NonNull OfflineRegionError error) {
+
+    telemetry.push(new MapEventFactory().createOfflineDownloadCompleteEvent(
+      offlineDefinition.getType(),
       offlineDefinition.getMinZoom(),
       offlineDefinition.getMaxZoom(),
-      offlineDefinition.getStyleURL())
-    );
+      offlineDefinition.getStyleURL(),
+      0L, 0L,
+      "failure"
+    ));
   }
 }
