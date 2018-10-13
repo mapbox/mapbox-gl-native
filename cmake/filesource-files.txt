@@ -10,6 +10,8 @@ src/mbgl/storage/asset_file_source.hpp
 platform/default/src/mbgl/storage/asset_file_source.cpp
 src/mbgl/storage/local_file_source.hpp
 platform/default/src/mbgl/storage/local_file_source.cpp
+platform/default/include/mbgl/storage/local_file_request.hpp
+platform/default/src/mbgl/storage/local_file_request.cpp
 
 # Offline
 include/mbgl/storage/offline.hpp
