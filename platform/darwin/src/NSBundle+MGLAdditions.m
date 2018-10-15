@@ -28,7 +28,7 @@ const MGLExceptionName MGLBundleNotFoundException = @"MGLBundleNotFoundException
     return self.mgl_frameworkInfoDictionary[@"CFBundleIdentifier"];
 }
 
-+ (nullable NSDictionary<NSString *, id> *)mgl_frameworkInfoDictionary {
++ (nullable NS_DICTIONARY_OF(NSString *, id) *)mgl_frameworkInfoDictionary {
     NSBundle *bundle = self.mgl_frameworkBundle;
     return bundle.infoDictionary;
 }

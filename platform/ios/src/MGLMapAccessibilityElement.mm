@@ -56,9 +56,11 @@
         // may be in the local language, which may be written in another script.
         // Attempt to transform to the script of the preferred language, keeping
         // the original string if no transform exists or if transformation fails.
-        NSString *dominantScript = [NSOrthography mgl_dominantScriptForMapboxStreetsLanguage:languageCode];
-        name = [name mgl_stringByTransliteratingIntoScript:dominantScript];
-
+        if (@available(iOS 9.0, *)) {
+            NSString *dominantScript = [NSOrthography mgl_dominantScriptForMapboxStreetsLanguage:languageCode];
+            name = [name mgl_stringByTransliteratingIntoScript:dominantScript];
+        }
+        
         self.accessibilityLabel = name;
     }
     return self;

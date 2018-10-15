@@ -103,7 +103,7 @@ MGL_EXPORT
  @param identifier A string that uniquely identifies the source.
  @param options An `NSDictionary` of options for this source.
  */
-- (instancetype)initWithIdentifier:(NSString *)identifier options:(nullable NSDictionary<MGLShapeSourceOption, id> *)options NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithIdentifier:(NSString *)identifier options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options NS_DESIGNATED_INITIALIZER;
 
 /**
  Returns a custom shape data source initialized with an identifier, data source, and a
@@ -122,7 +122,7 @@ MGL_EXPORT
  @param identifier A string that uniquely identifies the source.
  @param options An `NSDictionary` of options for this source.
  */
-- (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(id<MGLComputedShapeSourceDataSource>)dataSource options:(nullable NSDictionary<MGLShapeSourceOption, id> *)options;
+- (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(id<MGLComputedShapeSourceDataSource>)dataSource options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options;
 
 /**
  Invalidates all the features and properties intersecting with or contained in

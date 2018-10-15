@@ -6,7 +6,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly, getter=isMapboxStreets) BOOL mapboxStreets;
 
-+ (NSSet<NSString *> *)mapboxStreetsLanguages;
++ (NS_SET_OF(NSString *) *)mapboxStreetsLanguages;
 
 + (nullable NSString *)preferredMapboxStreetsLanguage;
 + (nullable NSString *)preferredMapboxStreetsLanguageForPreferences:(NSArray<NSString *> *)preferencesArray;

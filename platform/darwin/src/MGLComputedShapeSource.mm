@@ -16,7 +16,7 @@ const MGLExceptionName MGLInvalidDatasourceException = @"MGLInvalidDatasourceExc
 const MGLShapeSourceOption MGLShapeSourceOptionWrapsCoordinates = @"MGLShapeSourceOptionWrapsCoordinates";
 const MGLShapeSourceOption MGLShapeSourceOptionClipsCoordinates = @"MGLShapeSourceOptionClipsCoordinates";
 
-mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDictionary(NSDictionary<MGLShapeSourceOption, id> *options) {
+mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDictionary(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *options) {
     mbgl::style::CustomGeometrySource::Options sourceOptions;
 
     if (NSNumber *value = options[MGLShapeSourceOptionMinimumZoomLevel]) {
@@ -159,7 +159,7 @@ mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDi
 
 @implementation MGLComputedShapeSource
 
-- (instancetype)initWithIdentifier:(NSString *)identifier options:(NSDictionary<MGLShapeSourceOption, id> *)options {
+- (instancetype)initWithIdentifier:(NSString *)identifier options:(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options {
     NSOperationQueue *requestQueue = [[NSOperationQueue alloc] init];
     requestQueue.name = [NSString stringWithFormat:@"mgl.MGLComputedShapeSource.%@", identifier];
     requestQueue.qualityOfService = NSQualityOfServiceUtility;

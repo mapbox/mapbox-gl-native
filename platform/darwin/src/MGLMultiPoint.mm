@@ -70,7 +70,7 @@
     return _coordinates.size();
 }
 
-+ (NSSet<NSString *> *)keyPathsForValuesAffectingPointCount
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingPointCount
 {
     return [NSSet setWithObjects:@"coordinates", nil];
 }

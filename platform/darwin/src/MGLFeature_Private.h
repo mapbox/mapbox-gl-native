@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
  vector tile features.
  */
 MGL_EXPORT
-NSArray<MGLShape <MGLFeature> *> *MGLFeaturesFromMBGLFeatures(const std::vector<mbgl::Feature> &features);
+NS_ARRAY_OF(MGLShape <MGLFeature> *) *MGLFeaturesFromMBGLFeatures(const std::vector<mbgl::Feature> &features);
 
 /**
  Returns an `MGLFeature` object converted from the given mbgl::Feature
@@ -36,7 +36,7 @@ mbgl::Feature mbglFeature(mbgl::Feature feature, id identifier, NSDictionary *at
 /**
  Returns an `NSDictionary` representation of an `MGLFeature`.
  */
-NSDictionary<NSString *, id> *NSDictionaryFeatureForGeometry(NSDictionary *geometry, NSDictionary *attributes, id identifier);
+NS_DICTIONARY_OF(NSString *, id) *NSDictionaryFeatureForGeometry(NSDictionary *geometry, NSDictionary *attributes, id identifier);
 
 NS_ASSUME_NONNULL_END
 

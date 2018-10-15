@@ -7,11 +7,11 @@
 
 @implementation MGLShapeCollection
 
-+ (instancetype)shapeCollectionWithShapes:(NSArray<MGLShape *> *)shapes {
++ (instancetype)shapeCollectionWithShapes:(NS_ARRAY_OF(MGLShape *) *)shapes {
     return [[self alloc] initWithShapes:shapes];
 }
 
-- (instancetype)initWithShapes:(NSArray<MGLShape *> *)shapes {
+- (instancetype)initWithShapes:(NS_ARRAY_OF(MGLShape *) *)shapes {
     if (self = [super init]) {
         _shapes = shapes.copy;
     }

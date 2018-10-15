@@ -4,7 +4,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MGLPolyline (Private)
 
-- (NSArray<id> *)mgl_coordinates;
+- (NS_ARRAY_OF(id) *)mgl_coordinates;
 
 @end
 

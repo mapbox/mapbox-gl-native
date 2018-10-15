@@ -88,8 +88,8 @@ const MGLExceptionName MGLRedundantSourceIdentifierException = @"MGLRedundantSou
 @property (nonatomic, readonly, weak) MGLMapView *mapView;
 @property (nonatomic, readonly) mbgl::style::Style *rawStyle;
 @property (readonly, copy, nullable) NSURL *URL;
-@property (nonatomic, readwrite, strong) NSMutableDictionary<NSString *, MGLOpenGLStyleLayer *> *openGLLayers;
-@property (nonatomic) NSMutableDictionary<NSString *, NSDictionary<NSObject *, MGLTextLanguage *> *> *localizedLayersByIdentifier;
+@property (nonatomic, readwrite, strong) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLOpenGLStyleLayer *) *openGLLayers;
+@property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, NS_DICTIONARY_OF(NSObject *, MGLTextLanguage *) *) *localizedLayersByIdentifier;
 
 @end
 
@@ -148,9 +148,9 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 
 #pragma mark Sources
 
-- (NSSet<__kindof MGLSource *> *)sources {
+- (NS_SET_OF(__kindof MGLSource *) *)sources {
     auto rawSources = self.rawStyle->getSources();
-    NSMutableSet<__kindof MGLSource *> *sources = [NSMutableSet setWithCapacity:rawSources.size()];
+    NS_MUTABLE_SET_OF(__kindof MGLSource *) *sources = [NSMutableSet setWithCapacity:rawSources.size()];
     for (auto rawSource = rawSources.begin(); rawSource != rawSources.end(); ++rawSource) {
         MGLSource *source = [self sourceFromMBGLSource:*rawSource];
         [sources addObject:source];
@@ -158,7 +158,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     return sources;
 }
 
-- (void)setSources:(NSSet<__kindof MGLSource *> *)sources {
+- (void)setSources:(NS_SET_OF(__kindof MGLSource *) *)sources {
     for (MGLSource *source in self.sources) {
         [self removeSource:source];
     }
@@ -251,10 +251,10 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 
 #pragma mark Style layers
 
-- (NSArray<__kindof MGLStyleLayer *> *)layers
+- (NS_ARRAY_OF(__kindof MGLStyleLayer *) *)layers
 {
     auto layers = self.rawStyle->getLayers();
-    NSMutableArray<__kindof MGLStyleLayer *> *styleLayers = [NSMutableArray arrayWithCapacity:layers.size()];
+    NS_MUTABLE_ARRAY_OF(__kindof MGLStyleLayer *) *styleLayers = [NSMutableArray arrayWithCapacity:layers.size()];
     for (auto layer : layers) {
         MGLStyleLayer *styleLayer = [self layerFromMBGLLayer:layer];
         [styleLayers addObject:styleLayer];
@@ -262,7 +262,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     return styleLayers;
 }
 
-- (void)setLayers:(NSArray<__kindof MGLStyleLayer *> *)layers {
+- (void)setLayers:(NS_ARRAY_OF(__kindof MGLStyleLayer *) *)layers {
     for (MGLStyleLayer *layer in self.layers) {
         [self removeLayer:layer];
     }
@@ -600,13 +600,13 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     }
 }
 
-- (NSSet<MGLVectorTileSource *> *)mapboxStreetsSources {
+- (NS_SET_OF(MGLVectorTileSource *) *)mapboxStreetsSources {
     return [self.sources objectsPassingTest:^BOOL (__kindof MGLVectorTileSource * _Nonnull source, BOOL * _Nonnull stop) {
         return [source isKindOfClass:[MGLVectorTileSource class]] && source.mapboxStreets;
     }];
 }
 
-- (NSArray<MGLStyleLayer *> *)placeStyleLayers {
+- (NS_ARRAY_OF(MGLStyleLayer *) *)placeStyleLayers {
     NSSet *streetsSourceIdentifiers = [self.mapboxStreetsSources valueForKey:@"identifier"];
     
     NSSet *placeSourceLayerIdentifiers = [NSSet setWithObjects:@"marine_label", @"country_label", @"state_label", @"place_label", @"water_label", @"poi_label", @"rail_station_label", @"mountain_peak_label", nil];
@@ -616,7 +616,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     return [self.layers filteredArrayUsingPredicate:isPlacePredicate];
 }
 
-- (NSArray<MGLStyleLayer *> *)roadStyleLayers {
+- (NS_ARRAY_OF(MGLStyleLayer *) *)roadStyleLayers {
     NSSet *streetsSourceIdentifiers = [self.mapboxStreetsSources valueForKey:@"identifier"];
     
     NSPredicate *isPlacePredicate = [NSPredicate predicateWithBlock:^BOOL (MGLVectorStyleLayer * _Nullable layer, NSDictionary<NSString *, id> * _Nullable bindings) {

@@ -27,7 +27,7 @@
     return self = [super initWithPendingSource:std::move(source)];
 }
 
-- (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NSArray<NSString *> *)tileURLTemplates options:(nullable NSDictionary<MGLTileSourceOption, id> *)options {
+- (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(nullable NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options {
     mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, options);
     auto source = std::make_unique<mbgl::style::VectorSource>(identifier.UTF8String, tileSet);
     return self = [super initWithPendingSource:std::move(source)];
@@ -47,7 +47,7 @@
     return attribution ? @(attribution->c_str()) : nil;
 }
 
-- (NSArray<id <MGLFeature>> *)featuresInSourceLayersWithIdentifiers:(NSSet<NSString *> *)sourceLayerIdentifiers predicate:(nullable NSPredicate *)predicate {
+- (NS_ARRAY_OF(id <MGLFeature>) *)featuresInSourceLayersWithIdentifiers:(NS_SET_OF(NSString *) *)sourceLayerIdentifiers predicate:(nullable NSPredicate *)predicate {
     
     mbgl::optional<std::vector<std::string>> optionalSourceLayerIDs;
     if (sourceLayerIdentifiers) {
@@ -95,9 +95,9 @@ static NSArray * const MGLMapboxStreetsAlternativeLanguages = @[
     @"zh-Hans",
 ];
 
-+ (NSSet<NSString *> *)mapboxStreetsLanguages {
++ (NS_SET_OF(NSString *) *)mapboxStreetsLanguages {
     static dispatch_once_t onceToken;
-    static NSSet<NSString *> *mapboxStreetsLanguages;
+    static NS_SET_OF(NSString *) *mapboxStreetsLanguages;
     dispatch_once(&onceToken, ^{
         mapboxStreetsLanguages = [NSSet setWithArray:MGLMapboxStreetsLanguages];
     });

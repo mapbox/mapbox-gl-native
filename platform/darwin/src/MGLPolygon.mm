@@ -102,7 +102,7 @@
              @"coordinates": self.mgl_coordinates};
 }
 
-- (NSArray<id> *)mgl_coordinates {
+- (NS_ARRAY_OF(id) *)mgl_coordinates {
     NSMutableArray *coordinates = [NSMutableArray array];
 
     NSMutableArray *exteriorRing = [NSMutableArray array];
@@ -128,7 +128,7 @@
 
 @interface MGLMultiPolygon ()
 
-@property (nonatomic, copy, readwrite) NSArray<MGLPolygon *> *polygons;
+@property (nonatomic, copy, readwrite) NS_ARRAY_OF(MGLPolygon *) *polygons;
 
 @end
 
@@ -138,11 +138,11 @@
 
 @synthesize overlayBounds = _overlayBounds;
 
-+ (instancetype)multiPolygonWithPolygons:(NSArray<MGLPolygon *> *)polygons {
++ (instancetype)multiPolygonWithPolygons:(NS_ARRAY_OF(MGLPolygon *) *)polygons {
     return [[self alloc] initWithPolygons:polygons];
 }
 
-- (instancetype)initWithPolygons:(NSArray<MGLPolygon *> *)polygons {
+- (instancetype)initWithPolygons:(NS_ARRAY_OF(MGLPolygon *) *)polygons {
     if (self = [super init]) {
         _polygons = polygons;
 

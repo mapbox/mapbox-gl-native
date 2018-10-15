@@ -175,6 +175,8 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionI
  
  You can use `NSJSONSerialization` to serialize the Foundation object as data to
  write to a file.
+ 
+@note Note that the `length` argument is not currently supported with iOS 8.
  */
 @property (nonatomic, readonly) id mgl_jsonExpressionObject;
 

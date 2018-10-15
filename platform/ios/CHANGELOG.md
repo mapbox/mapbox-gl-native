@@ -1,6 +1,9 @@
 # Changelog for Mapbox Maps SDK for iOS
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
+## ios8-release-gazpacho
+
+* Restored iOS 8 support for the Mapbox Maps SDK for iOS. ([#13036](https://github.com/mapbox/mapbox-gl-native/pull/13036))
 
 ## 4.5.0 - October 10, 2018
 
@@ -23,7 +26,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added `-[MGLOfflineStorage addContentsOfFile:withCompletionHandler:]` and `-[MGLOfflineStorage addContentsOfURL:withCompletionHandler:]` methods to add pregenerated offline packs to offline storage. ([#12791](https://github.com/mapbox/mapbox-gl-native/pull/12791))
 * Fixed an issue where some tiles weren't rendered correctly when no internet connectivity was available ([#12931](https://github.com/mapbox/mapbox-gl-native/pull/12931))
 
-### Other changes	
+### Other changes
 
 * Added `MGLAltitudeForZoomLevel` and `MGLZoomLevelForAltitude` to public API for conversion between zoom levels and altitudes. ([#12986](https://github.com/mapbox/mapbox-gl-native/pull/12986))
 * Deprecated the `+[MGLMapCamera cameraLookingAtCenterCoordinate:fromDistance:pitch:heading:]` method in favor of `+[MGLMapCamera cameraLookingAtCenterCoordinate:altitude:pitch:heading:]` and `+[MGLMapCamera cameraLookingAtCenterCoordinate:acrossDistance:pitch:heading:]`. ([#12966](https://github.com/mapbox/mapbox-gl-native/pull/12966))

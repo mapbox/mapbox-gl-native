@@ -7,6 +7,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 MGL_EXPORT
-mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDictionary(NSDictionary<MGLShapeSourceOption, id> *options);
+mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDictionary(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *options);
 
 NS_ASSUME_NONNULL_END

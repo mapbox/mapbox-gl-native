@@ -16,7 +16,7 @@
 
 @implementation MGLAttributionInfo
 
-+ (NSArray<MGLAttributionInfo *> *)attributionInfosFromHTMLString:(nullable NSString *)htmlString fontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
++ (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosFromHTMLString:(nullable NSString *)htmlString fontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
     if (!htmlString) {
         return @[];
     }
@@ -112,7 +112,7 @@
     return infos;
 }
 
-+ (NSAttributedString *)attributedStringForAttributionInfos:(NSArray<MGLAttributionInfo *> *)attributionInfos {
++ (NSAttributedString *)attributedStringForAttributionInfos:(NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfos {
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:attributionInfos.count];
     for (MGLAttributionInfo *info in attributionInfos) {
         NSMutableAttributedString *title = info.title.mutableCopy;
@@ -259,7 +259,7 @@
     }
 }
 
-- (void)growArrayByAddingAttributionInfosFromArray:(NSArray<MGLAttributionInfo *> *)infos {
+- (void)growArrayByAddingAttributionInfosFromArray:(NS_ARRAY_OF(MGLAttributionInfo *) *)infos {
     for (MGLAttributionInfo *info in infos) {
         [self growArrayByAddingAttributionInfo:info];
     }

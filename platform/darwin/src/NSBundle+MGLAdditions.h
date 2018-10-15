@@ -36,7 +36,7 @@ FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLBundleNotFoundException;
 
 + (nullable NSString *)mgl_frameworkBundleIdentifier;
 
-+ (nullable NSDictionary<NSString *, id> *)mgl_frameworkInfoDictionary;
++ (nullable NS_DICTIONARY_OF(NSString *, id) *)mgl_frameworkInfoDictionary;
 
 + (nullable NSString *)mgl_applicationBundleIdentifier;
 
