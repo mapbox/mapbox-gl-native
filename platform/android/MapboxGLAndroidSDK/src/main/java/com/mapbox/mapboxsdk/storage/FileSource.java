@@ -82,15 +82,18 @@ public class FileSource {
   @Deprecated
   public static String getCachePath(@NonNull Context context) {
     // Default value
-    boolean setStorageExternal = MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL;
+    boolean isExternalStorageConfiguration = MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL;
 
     try {
       // Try getting a custom value from the app Manifest
       ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(),
         PackageManager.GET_META_DATA);
-      setStorageExternal = appInfo.metaData.getBoolean(
-        MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
-        MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL);
+      if (appInfo.metaData != null) {
+        isExternalStorageConfiguration = appInfo.metaData.getBoolean(
+          MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
+          MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL
+        );
+      }
     } catch (PackageManager.NameNotFoundException exception) {
       Logger.e(TAG, "Failed to read the package metadata: ", exception);
       MapStrictMode.strictModeViolation(exception);
@@ -100,7 +103,7 @@ public class FileSource {
     }
 
     String cachePath = null;
-    if (setStorageExternal && isExternalStorageReadable()) {
+    if (isExternalStorageConfiguration && isExternalStorageReadable()) {
       try {
         // Try getting the external storage path
         cachePath = context.getExternalFilesDir(null).getAbsolutePath();
