@@ -302,15 +302,15 @@ void DefaultFileSource::pause() {
 void DefaultFileSource::resume() {
     impl->resume();
 }
+    
+void DefaultFileSource::put(const Resource& resource, const Response& response) {
+    impl->actor().invoke(&Impl::put, resource, response);
+}
 
 // For testing only:
 
 void DefaultFileSource::setOnlineStatus(const bool status) {
     impl->actor().invoke(&Impl::setOnlineStatus, status);
-}
-
-void DefaultFileSource::put(const Resource& resource, const Response& response) {
-    impl->actor().invoke(&Impl::put, resource, response);
 }
 
 } // namespace mbgl
