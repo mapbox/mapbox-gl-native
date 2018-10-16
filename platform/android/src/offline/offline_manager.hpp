@@ -75,6 +75,14 @@ public:
                              const jni::String&,
                              const jni::Object<MergeOfflineRegionsCallback>&);
 
+    void putResourceWithUrl(jni::JNIEnv&,
+                            const jni::String& url,
+                            const jni::Array<jni::jbyte>& data,
+                            jlong modified,
+                            jlong expires,
+                            const jni::String& eTag);
+
+
 private:
     mbgl::DefaultFileSource& fileSource;
 };
