@@ -1970,7 +1970,7 @@ public:
     MGLMapCamera *camera;
     
     mbgl::ScreenCoordinate anchor = mbgl::ScreenCoordinate { anchorPoint.x, anchorPoint.y };
-    currentCameraOptions.angle = degrees * mbgl::util::DEG2RAD;
+    currentCameraOptions.angle = degrees;
     currentCameraOptions.anchor = anchor;
     camera = [self cameraForCameraOptions:currentCameraOptions];
     
@@ -1984,7 +1984,7 @@ public:
     
     MGLMapCamera *camera;
 
-    currentCameraOptions.pitch = pitch * mbgl::util::DEG2RAD;
+    currentCameraOptions.pitch = pitch;
     camera = [self cameraForCameraOptions:currentCameraOptions];
     
     return camera;

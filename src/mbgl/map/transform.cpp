@@ -91,8 +91,8 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     const LatLng unwrappedLatLng = camera.center.value_or(getLatLng());
     const LatLng latLng = unwrappedLatLng.wrapped();
     double zoom = camera.zoom.value_or(getZoom());
-    double angle = camera.angle.value_or(getAngle());
-    double pitch = camera.pitch.value_or(getPitch());
+    double angle = camera.angle ? -*camera.angle * util::DEG2RAD : getAngle();
+    double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
 
     if (std::isnan(zoom)) {
         return;
@@ -164,8 +164,8 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
 void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &animation) {
     const LatLng latLng = camera.center.value_or(getLatLng()).wrapped();
     double zoom = camera.zoom.value_or(getZoom());
-    double angle = camera.angle.value_or(getAngle());
-    double pitch = camera.pitch.value_or(getPitch());
+    double angle = camera.angle ? -*camera.angle * util::DEG2RAD : getAngle();
+    double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
 
     if (std::isnan(zoom) || state.size.isEmpty()) {
         return;
@@ -451,7 +451,7 @@ void Transform::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& 
     }
 
     CameraOptions camera;
-    camera.angle = state.angle + util::angle_between(first - center, second - center);
+    camera.angle = -(state.angle + util::angle_between(first - center, second - center)) * util::RAD2DEG;
     easeTo(camera, animation);
 }
 
@@ -462,7 +462,7 @@ void Transform::setAngle(double angle, const AnimationOptions& animation) {
 void Transform::setAngle(double angle, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     if (std::isnan(angle)) return;
     CameraOptions camera;
-    camera.angle = angle;
+    camera.angle = -angle * util::RAD2DEG;
     camera.anchor = anchor;
     easeTo(camera, animation);
 }
@@ -486,7 +486,7 @@ void Transform::setPitch(double pitch, const AnimationOptions& animation) {
 void Transform::setPitch(double pitch, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     if (std::isnan(pitch)) return;
     CameraOptions camera;
-    camera.pitch = pitch;
+    camera.pitch = pitch * util::RAD2DEG;
     camera.anchor = anchor;
     easeTo(camera, animation);
 }

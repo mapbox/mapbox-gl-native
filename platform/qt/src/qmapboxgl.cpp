@@ -808,10 +808,10 @@ void QMapboxGL::jumpTo(const QMapboxGLCameraOptions& camera)
         mbglCamera.zoom = camera.zoom.value<double>();
     }
     if (camera.angle.isValid()) {
-        mbglCamera.angle = -camera.angle.value<double>() * mbgl::util::DEG2RAD;
+        mbglCamera.angle = camera.angle.value<double>();
     }
     if (camera.pitch.isValid()) {
-        mbglCamera.pitch = camera.pitch.value<double>() * mbgl::util::DEG2RAD;
+        mbglCamera.pitch = camera.pitch.value<double>();
     }
 
     mbglCamera.padding = d_ptr->margins;
