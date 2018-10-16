@@ -1,16 +1,15 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
@@ -23,8 +22,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
  * use {@link com.mapbox.mapboxsdk.maps.UiSettings}.
  * </p>
  */
-@SuppressLint("AppCompatCustomView")
-public final class CompassView extends ImageView implements Runnable {
+public final class CompassView extends AppCompatImageView implements Runnable {
 
   public static final long TIME_WAIT_IDLE = 500;
   public static final long TIME_MAP_NORTH_ANIMATION = 150;
