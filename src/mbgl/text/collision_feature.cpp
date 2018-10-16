@@ -14,7 +14,8 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
                                    const float padding,
                                    const style::SymbolPlacementType placement,
                                    IndexedSubfeature indexedFeature_,
-                                   const float overscaling)
+                                   const float overscaling,
+                                   const float rotate)
         : indexedFeature(std::move(indexedFeature_))
         , alongLine(placement != style::SymbolPlacementType::Point) {
     if (top == 0 && bottom == 0 && left == 0 && right == 0) return;
@@ -35,7 +36,23 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
         GeometryCoordinate anchorPoint = convertPoint<int16_t>(anchor.point);
         bboxifyLabel(line, anchorPoint, anchor.segment, length, height, overscaling);
     } else {
-        boxes.emplace_back(anchor.point, Point<float>{ 0, 0 }, x1, y1, x2, y2);
+        if (rotate) {
+            const float rotateRadians = rotate * M_PI / 180.0;
+
+            const Point<float> tl = util::rotate(Point<float>(x1, y1), rotateRadians);
+            const Point<float> tr = util::rotate(Point<float>(x2, y1), rotateRadians);
+            const Point<float> bl = util::rotate(Point<float>(x1, y2), rotateRadians);
+            const Point<float> br = util::rotate(Point<float>(x2, y2), rotateRadians);
+            
+            const float xMin = std::min({tl.x, tr.x, bl.x, br.x});
+            const float xMax = std::max({tl.x, tr.x, bl.x, br.x});
+            const float yMin = std::min({tl.y, tr.y, bl.y, br.y});
+            const float yMax = std::max({tl.y, tr.y, bl.y, br.y});
+            
+            boxes.emplace_back(anchor.point, Point<float>{ 0, 0 }, xMin, yMin, xMax, yMax);
+        } else {
+            boxes.emplace_back(anchor.point, Point<float>{ 0, 0 }, x1, y1, x2, y2);
+        }
     }
 }
 

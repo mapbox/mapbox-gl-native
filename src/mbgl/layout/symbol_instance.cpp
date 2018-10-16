@@ -23,15 +23,16 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                const std::size_t layoutFeatureIndex_,
                                const std::size_t dataFeatureIndex_,
                                const std::u16string& key_,
-                               const float overscaling) :
+                               const float overscaling,
+                               const float rotate) :
     anchor(anchor_),
     line(line_),
     hasText(false),
     hasIcon(shapedIcon),
 
     // Create the collision features that will be used to check whether this symbol instance can be placed
-    textCollisionFeature(line_, anchor, shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature, overscaling),
-    iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, indexedFeature),
+    textCollisionFeature(line_, anchor, shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature, overscaling, rotate),
+    iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, indexedFeature, rotate),
     layoutFeatureIndex(layoutFeatureIndex_),
     dataFeatureIndex(dataFeatureIndex_),
     textOffset(textOffset_),
