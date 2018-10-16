@@ -550,7 +550,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     if (CLLocationCoordinate2DIsValid(options.camera.centerCoordinate)) {
         cameraOptions.center = MGLLatLngFromLocationCoordinate2D(options.camera.centerCoordinate);
     }
-    cameraOptions.angle = MAX(0, options.camera.heading) * mbgl::util::DEG2RAD;
+    cameraOptions.angle = MAX(0, options.camera.heading);
     cameraOptions.zoom = MAX(0, options.zoomLevel);
     cameraOptions.pitch = MAX(0, options.camera.pitch);
     

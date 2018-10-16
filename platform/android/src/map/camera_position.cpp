@@ -14,7 +14,7 @@ jni::Local<jni::Object<CameraPosition>> CameraPosition::New(jni::JNIEnv &env, mb
 
     // convert bearing, measured in radians counterclockwise from true north.
     // Wrapped to [−π rad, π rad). Android binding from 0 to 360 degrees
-    double bearing_degrees = -options.angle.value_or(0) * util::RAD2DEG;
+    double bearing_degrees = options.angle.value_or(0);
     while (bearing_degrees > 360) {
         bearing_degrees -= 360;
     }
@@ -23,7 +23,7 @@ jni::Local<jni::Object<CameraPosition>> CameraPosition::New(jni::JNIEnv &env, mb
     }
 
     // convert tilt, core ranges from  [0 rad, 1,0472 rad], android ranges from 0 to 60
-    double tilt_degrees = options.pitch.value_or(0) * util::RAD2DEG;
+    double tilt_degrees = options.pitch.value_or(0);
 
     return javaClass.New(env, constructor, LatLng::New(env, center), options.zoom.value_or(0), tilt_degrees, bearing_degrees);
 }
@@ -42,7 +42,7 @@ mbgl::CameraOptions CameraPosition::getCameraOptions(jni::JNIEnv& env, const jni
             {},
             {},
             position.Get(env, zoom),
-            position.Get(env, bearing) * util::DEG2RAD,
+            position.Get(env, bearing),
             position.Get(env, tilt)
     };
 }
