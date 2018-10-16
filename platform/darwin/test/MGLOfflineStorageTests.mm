@@ -1,6 +1,7 @@
 #import <Mapbox/Mapbox.h>
 
 #import "MGLOfflineStorage_Private.h"
+#import "NSDate+MGLAdditions.h"
 
 #import <XCTest/XCTest.h>
 
@@ -392,6 +393,58 @@
         
     }
     
+}
+
+-(void) testPutResourceForURL {
+    NSURL *styleURL = [NSURL URLWithString:@"https://api.mapbox.com/some/thing"];
+    
+    MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+    std::string testData("test data");
+    [os putResourceWithUrl:styleURL data:[NSData dataWithBytes:testData.c_str() length:testData.length()] modified:nil expires:nil etag:nil];
+    
+    auto fs = os.mbglFileSource;
+    const mbgl::Resource resource { mbgl::Resource::Unknown, "https://api.mapbox.com/some/thing" };
+    std::unique_ptr<mbgl::AsyncRequest> req;
+    req = fs->request(resource, [&](mbgl::Response res) {
+        req.reset();
+        XCTAssertFalse(res.error.get(), @"Request should not return an error");
+        XCTAssertTrue(res.data.get(), @"Request should return data");
+        XCTAssertFalse(res.modified, @"Request should not have a modification timestamp");
+        XCTAssertFalse(res.expires, @"Request should not have an expiration timestamp");
+        XCTAssertFalse(res.etag, @"Request should not have an entity tag");
+        XCTAssertEqual("test data", *res.data, @"Request did not return expected data");
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    });
+    
+    CFRunLoopRun();
+}
+
+-(void) testPutResourceForURLWithTimestamps {
+    NSURL *styleURL = [NSURL URLWithString:@"https://api.mapbox.com/some/thing"];
+    
+    MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+    std::string testData("test data");
+    NSDate* now = [NSDate date];
+    [os putResourceWithUrl:styleURL data:[NSData dataWithBytes:testData.c_str() length:testData.length()] modified:now expires:now etag:@"some etag"];
+    
+    auto fs = os.mbglFileSource;
+    const mbgl::Resource resource { mbgl::Resource::Unknown, "https://api.mapbox.com/some/thing" };
+    std::unique_ptr<mbgl::AsyncRequest> req;
+    req = fs->request(resource, [&](mbgl::Response res) {
+        req.reset();
+        XCTAssertFalse(res.error.get(), @"Request should not return an error");
+        XCTAssertTrue(res.data.get(), @"Request should return data");
+        XCTAssertTrue(res.modified, @"Request should have a modification timestamp");
+        XCTAssertEqual(MGLTimeIntervalFromDuration(res.modified->time_since_epoch()), floor(now.timeIntervalSince1970), @"Modification timestamp should roundtrip");
+        XCTAssertTrue(res.expires, @"Request should have an expiration timestamp");
+        XCTAssertEqual(MGLTimeIntervalFromDuration(res.expires->time_since_epoch()), floor(now.timeIntervalSince1970), @"Expiration timestamp should roundtrip");
+        XCTAssertTrue(res.etag, @"Request should have an entity tag");
+        XCTAssertEqual(*res.etag, "some etag", @"Entity tag should roundtrip");
+        XCTAssertEqual("test data", *res.data, @"Request did not return expected data");
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    });
+    
+    CFRunLoopRun();
 }
 
 @end
