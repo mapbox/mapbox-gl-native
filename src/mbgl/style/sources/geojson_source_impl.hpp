@@ -17,8 +17,8 @@ public:
     virtual mapbox::geometry::feature_collection<int16_t> getTile(const CanonicalTileID&) = 0;
 
     // SuperclusterData
-    virtual mapbox::geometry::feature_collection<double> getChildren(const std::uint32_t) = 0;
-    virtual mapbox::geometry::feature_collection<double> getLeaves(const std::uint32_t, const std::uint32_t,
+    virtual mapbox::geometry::feature_collection<double> getClusterChildren(const std::uint32_t) = 0;
+    virtual mapbox::geometry::feature_collection<double> getClusterLeaves(const std::uint32_t, const std::uint32_t,
                                                                    const std::uint32_t) = 0;
     virtual std::uint8_t getClusterExpansionZoom(std::uint32_t) = 0;
 };

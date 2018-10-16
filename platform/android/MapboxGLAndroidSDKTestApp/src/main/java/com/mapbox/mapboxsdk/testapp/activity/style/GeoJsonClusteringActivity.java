@@ -240,7 +240,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
           "Cluster= (id=%s) with %s points, cluster will expand at zoom %s",
           clusterId, pointCount, expansionZoom
         );
-        recursiveLoopClusterFeatures(source.getLeaves(clusterId, 10, 0));
+        recursiveLoopClusterFeatures(source.getClusterLeaves(clusterId, 10, 0));
       } else {
         Timber.e("Point data: %s", feature.toJson());
       }

@@ -21,17 +21,18 @@ public:
         return impl.getTile(tileID.z, tileID.x, tileID.y).features;
     }
 
-    mapbox::geometry::feature_collection<double> getChildren(const std::uint32_t) final {
+    mapbox::geometry::feature_collection<double> getClusterChildren(const std::uint32_t) final {
+        // no-op, SuperclusterData only
         return {};
     }
 
-    mapbox::geometry::feature_collection<double> getLeaves(const std::uint32_t,
-                                                           const std::uint32_t,
-                                                           const std::uint32_t) final {
+    mapbox::geometry::feature_collection<double> getClusterLeaves(const std::uint32_t, const std::uint32_t, const std::uint32_t) final {
+        // no-op, SuperclusterData only
         return {};
     }
 
     std::uint8_t getClusterExpansionZoom(std::uint32_t) final {
+        // no-op, SuperclusterData only
         return 0;
     }
 
@@ -49,13 +50,13 @@ public:
         return impl.getTile(tileID.z, tileID.x, tileID.y);
     }
 
-    mapbox::geometry::feature_collection<double> getChildren(const std::uint32_t cluster_id) final {
+    mapbox::geometry::feature_collection<double> getClusterChildren(const std::uint32_t cluster_id) final {
         return impl.getChildren(cluster_id);
     }
 
-    mapbox::geometry::feature_collection<double> getLeaves(const std::uint32_t cluster_id,
-                                                           const std::uint32_t limit = 10,
-                                                           const std::uint32_t offset = 0) final {
+    mapbox::geometry::feature_collection<double> getClusterLeaves(const std::uint32_t cluster_id,
+                                                           const std::uint32_t limit,
+                                                           const std::uint32_t offset) final {
         return impl.getLeaves(cluster_id, limit, offset);
     }
 

@@ -273,20 +273,51 @@ public class GeoJsonSource extends Source {
     return features != null ? Arrays.asList(features) : new ArrayList<>();
   }
 
+  /**
+   * Returns the children of a cluster (on the next zoom level) given its id (cluster_id value from feature properties).
+   * <p>
+   * Requires configuring this source as a cluster by calling {@link GeoJsonOptions#withCluster(boolean)}.
+   * </p>
+   *
+   * @param clusterId cluster_id value from feature properties
+   * @return a list of features for the underlying children
+   */
   @NonNull
-  public List<Feature> getChildren(long clusterId) {
+  public List<Feature> getClusterChildren(long clusterId) {
     checkThread();
-    Feature[] features = nativeGetChildren(clusterId);
+    Feature[] features = nativeGetClusterChildren(clusterId);
     return features != null ? Arrays.asList(features) : new ArrayList<>();
   }
 
+  /**
+   * Returns all the points of a cluster (given its cluster_id), with pagination support: limit is the number of points
+   * to return (set to Infinity for all points), and offset is the amount of points to skip (for pagination).
+   * <p>
+   * Requires configuring this source as a cluster by calling {@link GeoJsonOptions#withCluster(boolean)}.
+   * </p>
+   *
+   * @param clusterId cluster_id value from feature properties
+   * @param limit  limit is the number of points to return
+   * @param offset  offset is the amount of points to skip (for pagination)
+   * @return a list of features for the underlying leaves
+   */
   @NonNull
-  public List<Feature> getLeaves(long clusterId, long limit, long offset) {
+  public List<Feature> getClusterLeaves(long clusterId, long limit, long offset) {
     checkThread();
-    Feature[] features = nativeGetLeaves(clusterId, limit, offset);
+    Feature[] features = nativeGetClusterLeaves(clusterId, limit, offset);
     return features != null ? Arrays.asList(features) : new ArrayList<>();
   }
 
+  /**
+   * Returns the zoom on which the cluster expands into several children (useful for "click to zoom" feature)
+   * given the cluster's cluster_id (cluster_id value from feature properties).
+   * <p>
+   * Requires configuring this source as a cluster by calling {@link GeoJsonOptions#withCluster(boolean)}.
+   * </p>
+   *
+   * @param clusterId cluster_id value from feature properties
+   * @return the zoom on which the cluster expands into several children
+   */
   public double getClusterExpansionZoom(long clusterId) {
     checkThread();
     return nativeGetClusterExpansionZoom(clusterId);
@@ -319,10 +350,10 @@ public class GeoJsonSource extends Source {
   private native Feature[] querySourceFeatures(Object[] filter);
 
   @Keep
-  private native Feature[] nativeGetChildren(long clusterId);
+  private native Feature[] nativeGetClusterChildren(long clusterId);
 
   @Keep
-  private native Feature[]  nativeGetLeaves(long clusterId, long limit, long offset);
+  private native Feature[] nativeGetClusterLeaves(long clusterId, long limit, long offset);
 
   @Keep
   private native double nativeGetClusterExpansionZoom(long clusterId);

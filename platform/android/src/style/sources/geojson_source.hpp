@@ -51,9 +51,9 @@ private:
 
     jni::Local<jni::String> getURL(jni::JNIEnv&);
 
-    jni::Local<jni::Array<jni::Object<geojson::Feature>>> getChildren(jni::JNIEnv&, jni::jlong);
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> getClusterChildren(jni::JNIEnv &, jni::jlong);
 
-    jni::Local<jni::Array<jni::Object<geojson::Feature>>> getLeaves(jni::JNIEnv&, jni::jlong, jni::jlong, jni::jlong);
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> getClusterLeaves(jni::JNIEnv &, jni::jlong, jni::jlong, jni::jlong);
 
     jni::jdouble getClusterExpansionZoom(jni::JNIEnv&, jni::jlong);
 

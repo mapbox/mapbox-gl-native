@@ -108,19 +108,19 @@ namespace android {
         return Feature::convert(env, features);
     }
 
-    jni::Local<jni::Array<jni::Object<geojson::Feature>>> GeoJSONSource::getChildren(jni::JNIEnv& env, jni::jlong clusterId) {
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> GeoJSONSource::getClusterChildren(jni::JNIEnv& env, jni::jlong clusterId) {
         using namespace mbgl::android::conversion;
         using namespace mbgl::android::geojson;
 
-        std::vector<mbgl::Feature> features = source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::getChildren(clusterId);
+        std::vector<mbgl::Feature> features = source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::getClusterChildren(clusterId);
         return Feature::convert(env, features);
     }
 
-    jni::Local<jni::Array<jni::Object<geojson::Feature>>> GeoJSONSource::getLeaves(jni::JNIEnv& env, jni::jlong clusterId, jni::jlong limit, jni::jlong offset) {
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> GeoJSONSource::getClusterLeaves(jni::JNIEnv& env, jni::jlong clusterId, jni::jlong limit, jni::jlong offset) {
         using namespace mbgl::android::conversion;
         using namespace mbgl::android::geojson;
 
-        std::vector<mbgl::Feature> features = source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::getLeaves(clusterId, limit, offset);
+        std::vector<mbgl::Feature> features = source.as<mbgl::style::GeoJSONSource>()->GeoJSONSource::getClusterLeaves(clusterId, limit, offset);
         return Feature::convert(env, features);
     }
 
@@ -197,8 +197,8 @@ namespace android {
             METHOD(&GeoJSONSource::setURL, "nativeSetUrl"),
             METHOD(&GeoJSONSource::getURL, "nativeGetUrl"),
             METHOD(&GeoJSONSource::querySourceFeatures, "querySourceFeatures"),
-            METHOD(&GeoJSONSource::getLeaves, "nativeGetLeaves"),
-            METHOD(&GeoJSONSource::getChildren, "nativeGetChildren"),
+            METHOD(&GeoJSONSource::getClusterLeaves, "nativeGetClusterLeaves"),
+            METHOD(&GeoJSONSource::getClusterChildren, "nativeGetClusterChildren"),
             METHOD(&GeoJSONSource::getClusterExpansionZoom, "nativeGetClusterExpansionZoom")
         );
     }
