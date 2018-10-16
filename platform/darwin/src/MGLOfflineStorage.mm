@@ -9,10 +9,13 @@
 #import "MGLTilePyramidOfflineRegion.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSValue+MGLAdditions.h"
+#import "NSDate+MGLAdditions.h"
+#import "NSData+MGLAdditions.h"
 
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/storage/resource_transform.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 
@@ -469,5 +472,26 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:cachePath error:NULL];
     return attributes.fileSize;
 }
+
+-(void)putResourceWithUrl:(NSURL *)url data:(NSData *)data modified:(NSDate * _Nullable)modified expires:(NSDate * _Nullable)expires etag:(NSString * _Nullable)etag {
+    mbgl::Resource resource(mbgl::Resource::Kind::Unknown, [[url absoluteString] UTF8String]);
+    mbgl::Response response;
+    response.data = std::make_shared<std::string>(static_cast<const char*>(data.bytes), data.length);
+    
+    if (etag) {
+        response.etag = std::string([etag UTF8String]);
+    }
+    
+    if (modified) {
+        response.modified = mbgl::util::now() + std::chrono::duration_cast<mbgl::Seconds>(MGLDurationFromTimeInterval(modified.timeIntervalSinceNow));
+    }
+    
+    if (expires) {
+        response.expires = mbgl::util::now() + std::chrono::duration_cast<mbgl::Seconds>(MGLDurationFromTimeInterval(expires.timeIntervalSinceNow));
+    }
+    
+    _mbglFileSource->put(resource, response);
+}
+
 
 @end
