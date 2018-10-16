@@ -462,4 +462,25 @@ public class OfflineManager {
 
   @Keep
   private native void mergeOfflineRegions(FileSource fileSource, String path, MergeOfflineRegionsCallback callback);
+
+  /**
+   * Insert the provided resource into the ambient cache
+   * This method mimics the caching that would take place if the equivalent
+   * resource were requested in the process of map rendering.
+   * Use this method to pre-warm the cache with resources you know
+   * will be requested.
+   *
+   * This call is asynchronous: the data may not be immediately available
+   * for in-progress requests, although subsequent requests should have
+   * access to the cached data.
+   *
+   * @param url The URL of the resource to insert
+   * @param data Response data to store for this resource. Data is expected to be uncompressed;
+   *             internally, the cache will compress data as necessary.
+   * @param modified Optional "modified" response header, in seconds since 1970, or 0 if not set
+   * @param expires Optional "expires" response header, in seconds since 1970, or 0 if not set
+   * @param etag Optional "entity tag" response header
+   */
+  @Keep
+  public native void putResourceWithUrl(String url, byte[] data, long modified, long expires, String etag);
 }
