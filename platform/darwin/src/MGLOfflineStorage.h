@@ -339,6 +339,26 @@ MGL_EXPORT
  */
 @property (nonatomic, readonly) unsigned long long countOfBytesCompleted;
 
+/*
+ * Insert the provided resource into the ambient cache
+ * This method mimics the caching that would take place if the equivalent
+ * resource were requested in the process of map rendering.
+ * Use this method to pre-warm the cache with resources you know
+ * will be requested.
+ *
+ * This call is asynchronous: the data may not be immediately available
+ * for in-progress requests, although subsequent requests should have
+ * access to the cached data.
+ *
+ * @param url The URL of the resource to insert
+ * @param data Response data to store for this resource. Data is expected to be uncompressed; internally, the cache will compress data as necessary.
+ * @param modified Optional "modified" response header
+ * @param expires Optional "expires" response header
+ * @param etag Optional "entity tag" response header
+ */
+-(void)putResourceWithUrl:(NSURL *)url data:(NSData *)data modified:(NSDate * _Nullable)modified expires:(NSDate * _Nullable)expires etag:(NSString * _Nullable)etag;
+
+
 @end
 
 /**
