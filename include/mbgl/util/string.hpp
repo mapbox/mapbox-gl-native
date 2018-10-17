@@ -1,6 +1,5 @@
 #pragma once
 
-#include <sstream>
 #include <string>
 #include <cassert>
 #include <cstdlib>
@@ -8,6 +7,9 @@
 
 // Polyfill needed by Qt when building for Android with GCC
 #if defined(__ANDROID__) && defined(__GLIBCXX__)
+
+// TODO: remove use std::to_string to avoid using <sstream>
+#include <sstream>
 
 namespace std {
 
