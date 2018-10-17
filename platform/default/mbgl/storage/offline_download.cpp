@@ -219,7 +219,7 @@ void OfflineDownload::activateDownload() {
     status = OfflineRegionStatus();
     status.downloadState = OfflineRegionDownloadState::Active;
     status.requiredResourceCount++;
-    ensureResource(Resource::style(definition.match([](auto& reg){ return reg.styleURL; })),
+    ensureResource(Resource::style(definition.match([](auto& reg){ return reg.styleURL; }), Resource::Priority::Low),
                    [&](Response styleResponse) {
         status.requiredResourceCountIsPrecise = true;
 
@@ -238,7 +238,7 @@ void OfflineDownload::activateDownload() {
                     status.requiredResourceCount++;
                     requiredSourceURLs.insert(url);
 
-                    ensureResource(Resource::source(url), [=](Response sourceResponse) {
+                    ensureResource(Resource::source(url, Resource::Priority::Low), [=](Response sourceResponse) {
                         style::conversion::Error error;
                         optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse.data, error);
                         if (tileset) {
@@ -353,6 +353,7 @@ void OfflineDownload::deactivateDownload() {
 }
 
 void OfflineDownload::queueResource(Resource resource) {
+    resource.setPriority(Resource::Priority::Low);
     status.requiredResourceCount++;
     resourcesRemaining.push_front(std::move(resource));
 }
@@ -362,12 +363,14 @@ void OfflineDownload::queueTiles(SourceType type, uint16_t tileSize, const Tiles
         status.requiredResourceCount++;
         resourcesRemaining.push_back(Resource::tile(
             tileset.tiles[0], definition.match([](auto& def) { return def.pixelRatio; }), tile.x,
-            tile.y, tile.z, tileset.scheme));
+            tile.y, tile.z, tileset.scheme, Resource::Priority::Low));
     });
 }
 
 void OfflineDownload::ensureResource(const Resource& resource,
                                      std::function<void(Response)> callback) {
+    assert(resource.priority == Resource::Priority::Low);
+
     auto workRequestsIt = requests.insert(requests.begin(), nullptr);
     *workRequestsIt = util::RunLoop::Get()->invokeCancellable([=]() {
         requests.erase(workRequestsIt);
