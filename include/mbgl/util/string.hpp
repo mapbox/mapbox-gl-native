@@ -49,9 +49,9 @@ inline std::string toString(uint8_t num) {
     return std::to_string(unsigned(num));
 }
 
-std::string toString(float);
-std::string toString(double);
-std::string toString(long double);
+std::string toString(float, bool decimal = false);
+std::string toString(double, bool decimal = false);
+std::string toString(long double, bool decimal = false);
 
 inline std::string toString(std::exception_ptr error) {
     assert(error);

@@ -4,16 +4,17 @@
 namespace mbgl {
 namespace util {
 
-std::string toString(float num) {
-    return dtoa(num);
+std::string toString(float num, bool decimal) {
+    return dtoa(num, decimal);
 }
 
-std::string toString(double num) {
-    return dtoa(num);
+std::string toString(double num, bool decimal) {
+    return dtoa(num, decimal);
 }
 
-std::string toString(long double num) {
-    return dtoa(num);
+std::string toString(long double num, bool decimal) {
+    return dtoa(num, decimal);
+}
 }
 
 } // namespace util
