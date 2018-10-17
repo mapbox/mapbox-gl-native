@@ -1,0 +1,5 @@
+{
+    "darwin": "Add 'putResourceWithURL' method to MGLOfflineStorage to support pre-warming the ambient cache.",
+    "android": "Add 'putResourceWithURL' method to OfflineManager to support pre-warming the ambient cache.",
+    "issue": 13022
+}
