@@ -20,6 +20,7 @@ class UnwrappedTileID;
 
 class TransformState {
     friend class Transform;
+    friend class RendererState;
 
 public:
     TransformState(ConstrainMode = ConstrainMode::HeightOnly, ViewportMode = ViewportMode::Default);

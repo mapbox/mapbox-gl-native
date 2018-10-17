@@ -1,5 +1,6 @@
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/renderer/renderer.hpp>
+#include <mbgl/renderer/renderer_state.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/transform_state.hpp>
