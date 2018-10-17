@@ -13,12 +13,12 @@ namespace util {
 
 #if !defined(_WINDOWS)
 
-std::string dtoa(double value) {
+std::string dtoa(double value, bool decimal) {
     std::string data;
     data.resize(25);
     auto end = rapidjson::internal::dtoa(value, const_cast<char*>(data.data()));
     auto length = end - data.data();
-    if (length >= 3 && end[-1] == '0' && end[-2] == '.') {
+    if (!decimal && length >= 3 && end[-1] == '0' && end[-2] == '.') {
         // Remove trailing ".0" for integers
         length -= 2;
     }
