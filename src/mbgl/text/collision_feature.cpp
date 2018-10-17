@@ -37,6 +37,8 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
         bboxifyLabel(line, anchorPoint, anchor.segment, length, height, overscaling);
     } else {
         if (rotate) {
+            // Account for *-rotate in point collision boxes
+            // Doesn't account for icon-text-fit
             const float rotateRadians = rotate * M_PI / 180.0;
 
             const Point<float> tl = util::rotate(Point<float>(x1, y1), rotateRadians);
@@ -44,6 +46,9 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
             const Point<float> bl = util::rotate(Point<float>(x1, y2), rotateRadians);
             const Point<float> br = util::rotate(Point<float>(x2, y2), rotateRadians);
             
+            // Collision features require an "on-axis" geometry,
+            // so take the envelope of the rotated geometry
+            // (may be quite large for wide labels rotated 45 degrees)
             const float xMin = std::min({tl.x, tr.x, bl.x, br.x});
             const float xMax = std::max({tl.x, tr.x, bl.x, br.x});
             const float yMin = std::min({tl.y, tr.y, bl.y, br.y});
