@@ -618,6 +618,10 @@ bool isStringInSupportedScript(const std::string& input) {
     return true;
 }
 
+bool isWhitespace(char16_t chr) {
+    return chr == u' ' || chr == u'\t' || chr == u'\n' || chr == u'\v' || chr == u'\f' || chr == u'\r';
+}
+
 } // namespace i18n
 } // namespace util
 } // namespace mbgl

@@ -1,8 +1,6 @@
 #include <mbgl/text/tagged_string.hpp>
 #include <mbgl/util/i18n.hpp>
 
-#include <boost/algorithm/string.hpp>
-
 namespace mbgl {
     
 void TaggedString::addSection(const std::u16string& sectionText, double scale, FontStackHash fontStack) {
@@ -12,7 +10,6 @@ void TaggedString::addSection(const std::u16string& sectionText, double scale, F
 }
 
 void TaggedString::trim() {
-    auto whiteSpace = boost::algorithm::is_any_of(u" \t\n\v\f\r");
     std::size_t beginningWhitespace = styledText.first.find_first_not_of(u" \t\n\v\f\r");
     if (beginningWhitespace == std::u16string::npos) {
         // Entirely whitespace

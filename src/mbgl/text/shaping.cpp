@@ -4,8 +4,6 @@
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/text/bidi.hpp>
 
-#include <boost/algorithm/string.hpp>
-
 #include <algorithm>
 #include <cmath>
 
@@ -247,7 +245,7 @@ std::set<std::size_t> determineLineBreaks(const TaggedString& logicalInput,
             continue;
         }
         auto it = glyphs->second.find(codePoint);
-        if (it != glyphs->second.end() && it->second && !boost::algorithm::is_any_of(u" \t\n\v\f\r")(codePoint)) {
+        if (it != glyphs->second.end() && it->second && !util::i18n::isWhitespace(codePoint)) {
             currentX += (*it->second)->metrics.advance * section.scale + spacing;
         }
         
