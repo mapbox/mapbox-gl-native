@@ -48,7 +48,7 @@
     [window makeKeyAndVisible];
 
     if (!self.mapView.style) {
-        [self waitForMapViewToFinishLoadingStyleWithTimeout:5];
+        [self waitForMapViewToFinishLoadingStyleWithTimeout:10];
     }
 }
 
