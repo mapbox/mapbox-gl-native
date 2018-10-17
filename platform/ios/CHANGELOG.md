@@ -2,6 +2,11 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## 4.6.0
+
+* Added the ability to style symbol layers labels with multiple fonts and text sizes via the `format` expression operator. ([#12624](https://github.com/mapbox/mapbox-gl-native/pull/12624))
+* Added the `-[MGLOfflineStorage putResourceWithUrl:data:modified:expires:etag:mustRevalidate:]` method to allow pre-warming of the ambient cache. ([#13022](https://github.com/mapbox/mapbox-gl-native/pull/13022))
+
 ## 4.5.0 - October 10, 2018
 
 ### Styles and rendering
