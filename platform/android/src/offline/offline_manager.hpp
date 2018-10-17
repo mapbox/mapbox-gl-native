@@ -80,7 +80,8 @@ public:
                             const jni::Array<jni::jbyte>& data,
                             jlong modified,
                             jlong expires,
-                            const jni::String& eTag);
+                            const jni::String& eTag,
+                            jboolean mustRevalidate);
 
 
 private:

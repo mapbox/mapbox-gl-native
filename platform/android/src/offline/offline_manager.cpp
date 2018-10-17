@@ -207,13 +207,15 @@ void OfflineManager::putResourceWithUrl(jni::JNIEnv& env,
                                         const jni::Array<jni::jbyte>& arr,
                                         jlong modified,
                                         jlong expires,
-                                        const jni::String& eTag_) {
+                                        const jni::String& eTag_,
+                                        jboolean mustRevalidate) {
     auto url =  jni::Make<std::string>(env, url_);
     auto data = std::make_shared<std::string>(arr.Length(env), char());
     jni::GetArrayRegion(env, *arr, 0, data->size(), reinterpret_cast<jbyte*>(&(*data)[0]));
     mbgl::Resource resource(mbgl::Resource::Kind::Unknown, url);
     mbgl::Response response;
     response.data = data;
+    response.mustRevalidate = mustRevalidate;
     if (eTag_) {
         response.etag = jni::Make<std::string>(env, eTag_);
     }

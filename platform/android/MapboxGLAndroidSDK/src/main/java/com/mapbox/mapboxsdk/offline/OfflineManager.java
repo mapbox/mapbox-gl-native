@@ -480,7 +480,9 @@ public class OfflineManager {
    * @param modified Optional "modified" response header, in seconds since 1970, or 0 if not set
    * @param expires Optional "expires" response header, in seconds since 1970, or 0 if not set
    * @param etag Optional "entity tag" response header
+   * @param mustRevalidate Indicates whether response can be used after it's stale
    */
   @Keep
-  public native void putResourceWithUrl(String url, byte[] data, long modified, long expires, String etag);
+  public native void putResourceWithUrl(String url, byte[] data, long modified, long expires,
+                                        String etag, boolean mustRevalidate);
 }
