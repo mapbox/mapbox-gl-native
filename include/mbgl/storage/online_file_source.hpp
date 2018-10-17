@@ -26,6 +26,7 @@ public:
 
     // For testing only.
     void setOnlineStatus(bool);
+    void setMaximumConcurrentRequestsOverride(uint32_t);
 
 private:
     friend class OnlineFileRequest;

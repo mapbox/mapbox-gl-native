@@ -663,7 +663,7 @@ TEST(OfflineDownload, Deactivate) {
 }
 
 
-TEST(OfflineDownload, LowPriorityRequests) {
+TEST(OfflineDownload, AllOfflineRequestsHaveLowPriority) {
     OfflineTest test;
     auto region = test.createRegion();
     ASSERT_TRUE(region);
