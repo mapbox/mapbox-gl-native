@@ -355,8 +355,9 @@ MGL_EXPORT
  * @param modified Optional "modified" response header
  * @param expires Optional "expires" response header
  * @param etag Optional "entity tag" response header
+ * @param mustRevalidate Indicates whether response can be used after it's stale
  */
--(void)putResourceWithUrl:(NSURL *)url data:(NSData *)data modified:(NSDate * _Nullable)modified expires:(NSDate * _Nullable)expires etag:(NSString * _Nullable)etag;
+-(void)putResourceWithUrl:(NSURL *)url data:(NSData *)data modified:(NSDate * _Nullable)modified expires:(NSDate * _Nullable)expires etag:(NSString * _Nullable)etag mustRevalidate:(BOOL)mustRevalidate;
 
 
 @end

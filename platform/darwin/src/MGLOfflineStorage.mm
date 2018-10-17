@@ -473,21 +473,22 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     return attributes.fileSize;
 }
 
--(void)putResourceWithUrl:(NSURL *)url data:(NSData *)data modified:(NSDate * _Nullable)modified expires:(NSDate * _Nullable)expires etag:(NSString * _Nullable)etag {
+-(void)putResourceWithUrl:(NSURL *)url data:(NSData *)data modified:(NSDate * _Nullable)modified expires:(NSDate * _Nullable)expires etag:(NSString * _Nullable)etag mustRevalidate:(BOOL)mustRevalidate {
     mbgl::Resource resource(mbgl::Resource::Kind::Unknown, [[url absoluteString] UTF8String]);
     mbgl::Response response;
     response.data = std::make_shared<std::string>(static_cast<const char*>(data.bytes), data.length);
+    response.mustRevalidate = mustRevalidate;
     
     if (etag) {
         response.etag = std::string([etag UTF8String]);
     }
     
     if (modified) {
-        response.modified = mbgl::util::now() + std::chrono::duration_cast<mbgl::Seconds>(MGLDurationFromTimeInterval(modified.timeIntervalSinceNow));
+        response.modified = mbgl::Timestamp() + std::chrono::duration_cast<mbgl::Seconds>(MGLDurationFromTimeInterval(modified.timeIntervalSince1970));
     }
     
     if (expires) {
-        response.expires = mbgl::util::now() + std::chrono::duration_cast<mbgl::Seconds>(MGLDurationFromTimeInterval(expires.timeIntervalSinceNow));
+        response.expires = mbgl::Timestamp() + std::chrono::duration_cast<mbgl::Seconds>(MGLDurationFromTimeInterval(expires.timeIntervalSince1970));
     }
     
     _mbglFileSource->put(resource, response);

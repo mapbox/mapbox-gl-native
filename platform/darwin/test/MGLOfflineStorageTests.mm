@@ -400,7 +400,7 @@
     
     MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
     std::string testData("test data");
-    [os putResourceWithUrl:styleURL data:[NSData dataWithBytes:testData.c_str() length:testData.length()] modified:nil expires:nil etag:nil];
+    [os putResourceWithUrl:styleURL data:[NSData dataWithBytes:testData.c_str() length:testData.length()] modified:nil expires:nil etag:nil mustRevalidate:NO];
     
     auto fs = os.mbglFileSource;
     const mbgl::Resource resource { mbgl::Resource::Unknown, "https://api.mapbox.com/some/thing" };
@@ -412,6 +412,7 @@
         XCTAssertFalse(res.modified, @"Request should not have a modification timestamp");
         XCTAssertFalse(res.expires, @"Request should not have an expiration timestamp");
         XCTAssertFalse(res.etag, @"Request should not have an entity tag");
+        XCTAssertFalse(res.mustRevalidate, @"Request should not require revalidation");
         XCTAssertEqual("test data", *res.data, @"Request did not return expected data");
         CFRunLoopStop(CFRunLoopGetCurrent());
     });
@@ -425,7 +426,8 @@
     MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
     std::string testData("test data");
     NSDate* now = [NSDate date];
-    [os putResourceWithUrl:styleURL data:[NSData dataWithBytes:testData.c_str() length:testData.length()] modified:now expires:now etag:@"some etag"];
+    NSDate* future = [now dateByAddingTimeInterval:600];
+    [os putResourceWithUrl:styleURL data:[NSData dataWithBytes:testData.c_str() length:testData.length()] modified:now expires:future etag:@"some etag" mustRevalidate:YES];
     
     auto fs = os.mbglFileSource;
     const mbgl::Resource resource { mbgl::Resource::Unknown, "https://api.mapbox.com/some/thing" };
@@ -437,9 +439,10 @@
         XCTAssertTrue(res.modified, @"Request should have a modification timestamp");
         XCTAssertEqual(MGLTimeIntervalFromDuration(res.modified->time_since_epoch()), floor(now.timeIntervalSince1970), @"Modification timestamp should roundtrip");
         XCTAssertTrue(res.expires, @"Request should have an expiration timestamp");
-        XCTAssertEqual(MGLTimeIntervalFromDuration(res.expires->time_since_epoch()), floor(now.timeIntervalSince1970), @"Expiration timestamp should roundtrip");
+        XCTAssertEqual(MGLTimeIntervalFromDuration(res.expires->time_since_epoch()), floor(future.timeIntervalSince1970), @"Expiration timestamp should roundtrip");
         XCTAssertTrue(res.etag, @"Request should have an entity tag");
         XCTAssertEqual(*res.etag, "some etag", @"Entity tag should roundtrip");
+        XCTAssertTrue(res.mustRevalidate, @"Request should require revalidation");
         XCTAssertEqual("test data", *res.data, @"Request did not return expected data");
         CFRunLoopStop(CFRunLoopGetCurrent());
     });
