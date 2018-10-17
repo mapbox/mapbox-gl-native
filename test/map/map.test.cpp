@@ -49,6 +49,34 @@ public:
     }
 };
 
+TEST(Map, RendererState) {
+    MapTest<> test;
+
+    // Map hasn't notified the frontend about an update yet.
+    CameraOptions nullOptions;
+    ASSERT_EQ(test.frontend.getCameraOptions(), nullOptions);
+
+    LatLng coordinate { 1, 1 };
+    double zoom = 12.0;
+    double pitchInDegrees = 45.0;
+    double bearingInDegrees = 30.0;
+
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.setLatLngZoom(coordinate, zoom);
+    test.map.setPitch(pitchInDegrees);
+    test.map.setBearing(bearingInDegrees);
+
+    test.runLoop.runOnce();
+    test.frontend.render(test.map);
+
+    const CameraOptions& options = test.frontend.getCameraOptions();
+    EXPECT_NEAR(options.center->latitude(), coordinate.latitude(), 1e-7);
+    EXPECT_NEAR(options.center->longitude(), coordinate.longitude(), 1e-7);
+    ASSERT_DOUBLE_EQ(*options.zoom, zoom);
+    ASSERT_DOUBLE_EQ(*options.pitch, pitchInDegrees);
+    EXPECT_NEAR(*options.angle, bearingInDegrees, 1e-7);
+}
+
 TEST(Map, LatLngBehavior) {
     MapTest<> test;
 
