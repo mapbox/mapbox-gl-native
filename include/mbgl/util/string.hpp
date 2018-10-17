@@ -53,6 +53,8 @@ std::string toString(float, bool decimal = false);
 std::string toString(double, bool decimal = false);
 std::string toString(long double, bool decimal = false);
 
+std::string toHex(size_t);
+
 inline std::string toString(std::exception_ptr error) {
     assert(error);
 
