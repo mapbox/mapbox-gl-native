@@ -35,7 +35,7 @@ class RecyclerViewActivity : AppCompatActivity() {
         (recyclerView.adapter as ItemAdapter).onSaveInstanceState(outState)
     }
 
-    override fun onLowMemory() {gi
+    override fun onLowMemory() {
         super.onLowMemory()
         // to release memory, we need to call MapView#onLowMemory
         (recyclerView.adapter as ItemAdapter).onLowMemory()
