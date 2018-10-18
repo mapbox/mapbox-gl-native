@@ -120,7 +120,11 @@ class RecyclerViewActivity : AppCompatActivity() {
         }
 
         fun onDestroy() {
-            mapHolder?.mapView?.onDestroy()
+            mapHolder?.mapView?.let {
+                it.onPause()
+                it.onStop()
+                it.onDestroy()
+            }
         }
 
         class MapItem
