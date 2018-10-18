@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.drawable.ColorDrawable;
 import android.opengl.GLSurfaceView;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.IntDef;
@@ -20,7 +19,6 @@ import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
@@ -144,8 +142,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     // add accessibility support
     setContentDescription(context.getString(R.string.mapbox_mapActionDescription));
     setWillNotDraw(false);
-
-    getViewTreeObserver().addOnGlobalLayoutListener(new MapViewLayoutListener(this, options));
+    initialiseDrawingSurface(options);
   }
 
   private void initialiseMap() {
@@ -1364,30 +1361,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
      *               {@link #SOURCE_DID_CHANGE}.
      */
     void onMapChanged(@MapChange int change);
-  }
-
-  private static class MapViewLayoutListener implements ViewTreeObserver.OnGlobalLayoutListener {
-
-    private WeakReference<MapView> mapViewWeakReference;
-    private MapboxMapOptions options;
-
-    MapViewLayoutListener(MapView mapView, MapboxMapOptions options) {
-      this.mapViewWeakReference = new WeakReference<>(mapView);
-      this.options = options;
-    }
-
-    @Override
-    public void onGlobalLayout() {
-      MapView mapView = mapViewWeakReference.get();
-      if (mapView != null) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-          mapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-        } else {
-          mapView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-        }
-        mapView.initialiseDrawingSurface(options);
-      }
-    }
   }
 
   private class FocalPointInvalidator implements FocalPointChangeListener {
