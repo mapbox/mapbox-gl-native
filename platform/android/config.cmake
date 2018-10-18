@@ -85,23 +85,25 @@ target_link_libraries(mapbox-gl
     PRIVATE mbgl-filesource
 )
 
-## Test library ##
-
-set(MBGL_TEST_TARGET_TYPE "library")
+## Test executable ##
 macro(mbgl_platform_test)
     target_sources(mbgl-test
-        PRIVATE platform/default/src/mbgl/test/main.cpp
-
-        # Main test entry point
-        platform/android/src/test/main.jni.cpp
+        PRIVATE platform/android/src/test/test_runner.cpp
+        PRIVATE platform/android/src/test/runtime.cpp
     )
 
     target_include_directories(mbgl-test
         PRIVATE platform/android/include
     )
 
+    set_target_properties(mbgl-test
+        PROPERTIES
+        LINK_FLAGS
+        "-fPIE -pie \
+        -Wl,--export-dynamic \
+        -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/src/test/version-script")
+
     target_link_libraries(mbgl-test
-        PRIVATE mbgl-core
         PRIVATE mbgl-filesource
     )
 endmacro()
