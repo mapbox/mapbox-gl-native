@@ -123,7 +123,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                     u8string = platform::lowercase(u8string);
                 }
 
-                ft.formattedText->addSection(applyArabicShaping(util::utf8_to_utf16::convert(u8string)),
+                ft.formattedText->addSection(applyArabicShaping(util::convertUTF8ToUTF16(u8string)),
                                              section.fontScale ? *section.fontScale : 1.0,
                                              section.fontStack ? FontStackHasher()(*section.fontStack) : baseFontStackHash);
 

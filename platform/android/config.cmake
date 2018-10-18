@@ -69,7 +69,6 @@ macro(mbgl_filesource)
     target_add_mason_package(mbgl-filesource PUBLIC jni.hpp)
 
     target_link_libraries(mbgl-filesource
-        PRIVATE codecvt
         PUBLIC sqlite
         PUBLIC -llog
         PUBLIC -landroid
@@ -84,8 +83,11 @@ add_library(mapbox-gl SHARED
     platform/android/src/main.cpp
 )
 
+target_include_directories(mapbox-gl
+    PRIVATE src
+)
+
 target_link_libraries(mapbox-gl
-    PRIVATE codecvt
     PRIVATE mbgl-core
     PRIVATE mbgl-filesource
 )
@@ -106,7 +108,6 @@ macro(mbgl_platform_test)
     )
 
     target_link_libraries(mbgl-test
-        PRIVATE codecvt
         PRIVATE mbgl-core
         PRIVATE mbgl-filesource
     )

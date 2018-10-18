@@ -5,10 +5,8 @@
 namespace mbgl {
 namespace util {
 
-class utf8_to_utf16 {
-public:
-    static std::u16string convert(std::string const&);
-};
+std::u16string convertUTF8ToUTF16(const std::string&);
+std::string convertUTF16ToUTF8(const std::u16string&);
 
 } // namespace util
 } // namespace mbgl
