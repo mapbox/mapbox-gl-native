@@ -43,6 +43,7 @@
 
 using namespace mbgl;
 using SourceType = mbgl::style::SourceType;
+using namespace std::literals;
 
 class SourceTest {
 public:
@@ -703,6 +704,105 @@ TEST(Source, GeoJSonSourceUrlUpdate) {
     test.loop.invoke([&] () {
         // Update the url
         source.setURL(std::string("http://source-url.ext"));
+    });
+
+    test.run();
+}
+
+TEST(Source, GeoJSONSourceSupercluster) {
+    SourceTest test;
+
+    test.fileSource.sourceResponse = [&] (const Resource& resource) {
+        EXPECT_EQ("http://url", resource.url);
+        Response response;
+        response.data = std::make_unique<std::string>(util::read_file("test/fixtures/supercluster/places.json"));
+        return response;
+    };
+
+    test.styleObserver.sourceLoaded = [&](Source& source) {
+        EXPECT_TRUE(source.is<GeoJSONSource>());
+        const auto geojson_source = source.as<GeoJSONSource>();
+        ASSERT_NE(geojson_source, nullptr);
+
+        auto children = geojson_source->getClusterChildren(1);
+        EXPECT_EQ(children.size(), 4U);
+
+        // Compare results produced by supercluster with default GeoJSONOptions
+        // clustering options.
+        EXPECT_EQ(children[0].properties["cluster_id"].get<uint64_t>(), 2U);
+        EXPECT_EQ(children[1].properties["cluster_id"].get<uint64_t>(), 34U);
+        EXPECT_EQ(children[2].properties["cluster_id"].get<uint64_t>(), 258U);
+        EXPECT_EQ(children[3].properties["cluster_id"].get<uint64_t>(), 2466U);
+
+        EXPECT_EQ(geojson_source->getClusterExpansionZoom(1U), 1U);
+        EXPECT_EQ(geojson_source->getClusterExpansionZoom(2U), 2U);
+        EXPECT_EQ(geojson_source->getClusterExpansionZoom(34U), 2U);
+        EXPECT_EQ(geojson_source->getClusterExpansionZoom(258U), 2U);
+        EXPECT_EQ(geojson_source->getClusterExpansionZoom(2466U), 3U);
+
+        EXPECT_EQ(children[0].properties["point_count"].get<uint64_t>(), 7U);
+        EXPECT_EQ(children[1].properties["point_count"].get<uint64_t>(), 16U);
+        EXPECT_EQ(children[2].properties["point_count"].get<uint64_t>(), 7U);
+        EXPECT_EQ(children[3].properties["point_count"].get<uint64_t>(), 2U);
+
+        // Get leaves for cluster 1, with default limit 10, offset 0.
+        auto leaves = geojson_source->getClusterLeaves(1);
+        EXPECT_EQ(leaves.size(), 10U);
+
+        auto leaves_limit = geojson_source->getClusterLeaves(1, 3);
+        EXPECT_EQ(leaves_limit.size(), 3U);
+
+        EXPECT_EQ(leaves_limit[0].properties["name"].get<std::string>(), "Niagara Falls"s);
+        EXPECT_EQ(leaves_limit[1].properties["name"].get<std::string>(), "Cape May"s);
+        EXPECT_EQ(leaves_limit[2].properties["name"].get<std::string>(), "Cape Fear"s);
+
+        test.end();
+    };
+
+    GeoJSONOptions options{};
+    options.cluster = true;
+
+    GeoJSONSource source("source", options);
+
+    source.setObserver(&test.styleObserver);
+    source.setURL(std::string("http://url"));
+
+    // Schedule an update for the source
+    test.loop.invoke([&] () {
+        source.loadDescription(test.fileSource);
+    });
+
+    test.run();
+}
+
+TEST(Source, GeoJSONSourceVT) {
+    SourceTest test;
+
+    test.fileSource.sourceResponse = [&] (const Resource& resource) {
+        EXPECT_EQ("http://url", resource.url);
+        Response response;
+        response.data = std::make_unique<std::string>(util::read_file("test/fixtures/supercluster/places.json"));
+        return response;
+    };
+
+    test.styleObserver.sourceLoaded = [&](Source& source) {
+        EXPECT_TRUE(source.is<GeoJSONSource>());
+        const auto geojson_source = source.as<GeoJSONSource>();
+        ASSERT_NE(geojson_source, nullptr);
+        EXPECT_TRUE(geojson_source->getClusterChildren(1).empty());
+        EXPECT_TRUE(geojson_source->getClusterLeaves(1).empty());
+        EXPECT_EQ(geojson_source->getClusterExpansionZoom(1), 0);
+        test.end();
+    };
+
+    GeoJSONSource source("source");
+
+    source.setObserver(&test.styleObserver);
+    source.setURL(std::string("http://url"));
+
+    // Schedule an update for the source
+    test.loop.invoke([&] () {
+        source.loadDescription(test.fileSource);
     });
 
     test.run();
