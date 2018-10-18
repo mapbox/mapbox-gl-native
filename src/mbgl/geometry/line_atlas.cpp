@@ -2,8 +2,7 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
-
-#include <boost/functional/hash.hpp>
+#include <mbgl/util/hash.hpp>
 
 #include <sstream>
 #include <cmath>
@@ -22,7 +21,7 @@ LinePatternPos LineAtlas::getDashPosition(const std::vector<float>& dasharray,
     size_t key = patternCap == LinePatternCap::Round ? std::numeric_limits<size_t>::min()
                                                      : std::numeric_limits<size_t>::max();
     for (const float part : dasharray) {
-        boost::hash_combine<float>(key, part);
+        util::hash_combine<float>(key, part);
     }
 
     // Note: We're not handling hash collisions here.

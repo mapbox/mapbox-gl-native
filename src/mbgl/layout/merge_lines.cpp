@@ -1,7 +1,6 @@
 #include <mbgl/layout/merge_lines.hpp>
 #include <mbgl/layout/symbol_feature.hpp>
-
-#include <boost/functional/hash.hpp>
+#include <mbgl/util/hash.hpp>
 
 namespace mbgl {
 namespace util {
@@ -43,10 +42,7 @@ size_t mergeFromLeft(std::vector<SymbolFeature>& features,
 }
 
 size_t getKey(const std::u16string& text, const GeometryCoordinate& coord) {
-    auto hash = std::hash<std::u16string>()(text);
-    boost::hash_combine(hash, coord.x);
-    boost::hash_combine(hash, coord.y);
-    return hash;
+    return util::hash(text, coord.x, coord.y);
 }
 
 void mergeLines(std::vector<SymbolFeature>& features) {
