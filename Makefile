@@ -513,7 +513,7 @@ MBGL_ANDROID_ABIS += x86-64;x86_64
 MBGL_ANDROID_LOCAL_WORK_DIR = /data/local/tmp/core-tests
 MBGL_ANDROID_LIBDIR = lib$(if $(filter arm-v8 x86-64,$1),64)
 MBGL_ANDROID_DALVIKVM = dalvikvm$(if $(filter arm-v8 x86-64,$1),64,32)
-MBGL_ANDROID_APK_SUFFIX = $(if $(filter Release,$(BUILDTYPE)),release-unsigned,debug)
+MBGL_ANDROID_APK_SUFFIX = $(if $(filter Release,$(BUILDTYPE)),release,debug)
 MBGL_ANDROID_CORE_TEST_DIR = platform/android/MapboxGLAndroidSDK/.externalNativeBuild/cmake/$(buildtype)/$2/core-tests
 MBGL_ANDROID_STL ?= c++_static
 MBGL_ANDROID_GRADLE = ./gradlew --parallel --max-workers=$(JOBS) -Pmapbox.buildtype=$(buildtype) -Pmapbox.stl=$(MBGL_ANDROID_STL)
@@ -555,7 +555,7 @@ android-$1: platform/android/gradle/configuration.gradle
 android-core-test-$1: android-test-lib-$1
 	# Compile main sources and extract the classes (using the test app to get all transitive dependencies in one place)
 	mkdir -p $(MBGL_ANDROID_CORE_TEST_DIR)
-	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-$(MBGL_ANDROID_APK_SUFFIX).apk classes.dex -d $(MBGL_ANDROID_CORE_TEST_DIR)
+	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/$(buildtype)/MapboxGLAndroidSDKTestApp-$(MBGL_ANDROID_APK_SUFFIX).apk classes.dex -d $(MBGL_ANDROID_CORE_TEST_DIR)
 
 	# Compile Test runner
 	find platform/android/src/test -name "*.java" > $(MBGL_ANDROID_CORE_TEST_DIR)/java-sources.txt
@@ -571,8 +571,8 @@ run-android-core-test-$1-%: android-core-test-$1
 	# Push all needed files to the device
 	adb push $(MBGL_ANDROID_CORE_TEST_DIR)/test.jar $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
 	adb push test/fixtures $(MBGL_ANDROID_LOCAL_WORK_DIR)/test > /dev/null 2>&1
-	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/bundles/default/jni/$2/libmapbox-gl.so $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
-	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/bundles/default/jni/$2/libmbgl-test.so $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
+	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/intermediate-jars/$(buildtype)/jni/$2/libmapbox-gl.so $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
+	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/intermediate-jars/$(buildtype)/jni/$2/libmbgl-test.so $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
 
 	# Kick off the tests
 	adb shell "export LD_LIBRARY_PATH=/system/$(MBGL_ANDROID_LIBDIR):$(MBGL_ANDROID_LOCAL_WORK_DIR) && cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && $(MBGL_ANDROID_DALVIKVM) -cp $(MBGL_ANDROID_LOCAL_WORK_DIR)/test.jar Main --gtest_filter=$$*"
