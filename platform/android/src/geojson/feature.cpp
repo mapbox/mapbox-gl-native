@@ -33,7 +33,7 @@ class FeatureIdVisitor {
 public:
     template<class T>
     std::string operator()(const T& i) const {
-        return std::to_string(i);
+        return util::toString(i);
     }
 
     std::string operator()(const std::string& i) const {
