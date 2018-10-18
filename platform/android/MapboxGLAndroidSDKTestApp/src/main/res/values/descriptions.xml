@@ -76,4 +76,5 @@
     <string name="description_location_modes">Showcases location render and tracking modes</string>
     <string name="description_location_fragment">Uses LocationComponent in a Fragment</string>
     <string name="description_location_manual">Force location updates and don\'t rely on the engine</string>
+    <string name="description_recyclerview">Show a MapView as a recyclerView item</string>
 </resources>
