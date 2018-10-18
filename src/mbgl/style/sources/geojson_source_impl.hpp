@@ -31,13 +31,13 @@ public:
     ~Impl() final;
 
     Range<uint8_t> getZoomRange() const;
-    GeoJSONData* getData() const;
+    std::weak_ptr<GeoJSONData> getData() const;
 
     optional<std::string> getAttribution() const final;
 
 private:
     GeoJSONOptions options;
-    std::unique_ptr<GeoJSONData> data;
+    std::shared_ptr<GeoJSONData> data;
 };
 
 } // namespace style
