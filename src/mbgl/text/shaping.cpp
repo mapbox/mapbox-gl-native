@@ -5,6 +5,7 @@
 #include <mbgl/text/bidi.hpp>
 
 #include <algorithm>
+#include <list>
 #include <cmath>
 
 namespace mbgl {

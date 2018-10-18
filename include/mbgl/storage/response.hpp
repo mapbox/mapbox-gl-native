@@ -69,6 +69,4 @@ public:
     Error(Reason, std::string = "", optional<Timestamp> = {});
 };
 
-std::ostream& operator<<(std::ostream&, Response::Error::Reason);
-
 } // namespace mbgl

@@ -8,4 +8,6 @@ namespace mbgl {
 using JSDocument = rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator>;
 using JSValue = rapidjson::GenericValue<rapidjson::UTF8<>, rapidjson::CrtAllocator>;
 
+std::string formatJSONParseError(const JSDocument&);
+
 } // namespace mbgl

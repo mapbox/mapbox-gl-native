@@ -19,8 +19,6 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/actor/scheduler.hpp>
 
-#include <iostream>
-
 namespace mbgl {
 
 using namespace style;

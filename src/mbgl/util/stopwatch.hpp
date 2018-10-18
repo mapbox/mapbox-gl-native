@@ -4,7 +4,10 @@
 #include <mbgl/util/chrono.hpp>
 
 #include <string>
+
+#ifdef MBGL_TIMING
 #include <sstream>
+#endif
 
 namespace mbgl {
 namespace util {
