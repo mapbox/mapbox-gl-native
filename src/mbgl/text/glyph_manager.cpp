@@ -31,7 +31,7 @@ void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphD
         Entry& entry = entries[fontStack];
 
         const GlyphIDs& glyphIDs = dependency.second;
-        GlyphRangeSet ranges;
+        std::unordered_set<GlyphRange> ranges;
         for (const auto& glyphID : glyphIDs) {
             if (localGlyphRasterizer->canRasterizeGlyph(fontStack, glyphID)) {
                 if (entry.glyphs.find(glyphID) == entry.glyphs.end()) {
