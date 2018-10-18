@@ -93,7 +93,6 @@
   "render-tests/fill-pattern/update-feature-state": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue",
   "render-tests/geojson/inline-linestring-fill": "current behavior is arbitrary",
   "render-tests/geojson/inline-polygon-symbol": "behavior needs reconciliation with gl-js",
-  "render-tests/icon-rotate/with-offset": "https://github.com/mapbox/mapbox-gl-native/issues/11872",
   "render-tests/mixed-zoom/z10-z11": "https://github.com/mapbox/mapbox-gl-native/issues/10397",
   "render-tests/raster-masking/overlapping-zoom": "https://github.com/mapbox/mapbox-gl-native/issues/10195",
   "render-tests/real-world/bangkok": "https://github.com/mapbox/mapbox-gl-native/issues/10412",

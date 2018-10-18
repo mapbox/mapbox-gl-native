@@ -1,0 +1,4 @@
+{
+    "core": "Fix bug in which using `icon-rotate` and `icon-offset` together prevented `queryRenderedFeatures` from returning the symbol",
+    "issue": 12909
+}

@@ -31,7 +31,8 @@ public:
                    const std::size_t layoutFeatureIndex,
                    const std::size_t dataFeatureIndex,
                    const std::u16string& key,
-                   const float overscaling);
+                   const float overscaling,
+                   const float rotate);
 
     Anchor anchor;
     GeometryCoordinates line;
