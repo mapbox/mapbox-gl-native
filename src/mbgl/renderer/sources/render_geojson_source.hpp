@@ -44,7 +44,7 @@ private:
     const style::GeoJSONSource::Impl& impl() const;
 
     TilePyramid tilePyramid;
-    style::GeoJSONData* data = nullptr;
+    std::weak_ptr<style::GeoJSONData> data;
 };
 
 template <>

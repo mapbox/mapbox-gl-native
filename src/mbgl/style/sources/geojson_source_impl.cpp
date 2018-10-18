@@ -75,7 +75,7 @@ GeoJSONSource::Impl::Impl(std::string id_, GeoJSONOptions options_)
 GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON)
     : Source::Impl(other),
       options(other.options) {
-    double scale = util::EXTENT / util::tileSize;
+    constexpr double scale = util::EXTENT / util::tileSize;
 
     if (options.cluster
         && geoJSON.is<mapbox::feature::feature_collection<double>>()
@@ -84,7 +84,7 @@ GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON)
         clusterOptions.maxZoom = options.clusterMaxZoom;
         clusterOptions.extent = util::EXTENT;
         clusterOptions.radius = ::round(scale * options.clusterRadius);
-        data = std::make_unique<SuperclusterData>(
+        data = std::make_shared<SuperclusterData>(
             geoJSON.get<mapbox::feature::feature_collection<double>>(), clusterOptions);
     } else {
         mapbox::geojsonvt::Options vtOptions;
@@ -93,7 +93,7 @@ GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON)
         vtOptions.buffer = ::round(scale * options.buffer);
         vtOptions.tolerance = scale * options.tolerance;
         vtOptions.lineMetrics = options.lineMetrics;
-        data = std::make_unique<GeoJSONVTData>(geoJSON, vtOptions);
+        data = std::make_shared<GeoJSONVTData>(geoJSON, vtOptions);
     }
 }
 
@@ -103,8 +103,8 @@ Range<uint8_t> GeoJSONSource::Impl::getZoomRange() const {
     return { options.minzoom, options.maxzoom };
 }
 
-GeoJSONData* GeoJSONSource::Impl::getData() const {
-    return data.get();
+std::weak_ptr<GeoJSONData> GeoJSONSource::Impl::getData() const {
+    return data;
 }
 
 optional<std::string> GeoJSONSource::Impl::getAttribution() const {
