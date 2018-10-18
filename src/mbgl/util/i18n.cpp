@@ -609,7 +609,7 @@ bool charInSupportedScript(char16_t chr) {
 }
     
 bool isStringInSupportedScript(const std::string& input) {
-    auto u16string = util::utf8_to_utf16::convert(input);
+    auto u16string = util::convertUTF8ToUTF16(input);
     for (char16_t chr : u16string) {
         if (!charInSupportedScript(chr)) {
             return false;

@@ -19,7 +19,7 @@ mason_use(cheap-ruler VERSION 2.5.3 HEADER_ONLY)
 mason_use(vector-tile VERSION 1.0.2 HEADER_ONLY)
 
 if(MBGL_PLATFORM STREQUAL "android")
-    mason_use(jni.hpp VERSION 4.0.0 HEADER_ONLY)
+    mason_use(jni.hpp VERSION 4.0.1 HEADER_ONLY)
 elseif(MBGL_PLATFORM STREQUAL "ios")
     # noop
 elseif(MBGL_PLATFORM STREQUAL "linux")
