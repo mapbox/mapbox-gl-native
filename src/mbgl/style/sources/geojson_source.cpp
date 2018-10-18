@@ -41,17 +41,29 @@ optional<std::string> GeoJSONSource::getURL() const {
 }
 
 mapbox::geometry::feature_collection<double> GeoJSONSource::getClusterChildren(const std::uint32_t cluster_id) const {
-    return impl().getData()->getClusterChildren(cluster_id);
+    if (auto data = impl().getData().lock()) {
+        return data->getClusterChildren(cluster_id);
+    }
+
+    return {};
 }
 
 mapbox::geometry::feature_collection<double> GeoJSONSource::getClusterLeaves(const std::uint32_t cluster_id,
                                                            const std::uint32_t limit,
                                                            const std::uint32_t offset) const {
-    return impl().getData()->getClusterLeaves(cluster_id, limit, offset);
+    if (auto data = impl().getData().lock()) {
+        return data->getClusterLeaves(cluster_id, limit, offset);
+    }
+
+    return {};
 }
 
 std::uint8_t GeoJSONSource::getClusterExpansionZoom(std::uint32_t cluster_id) const {
-    return impl().getData()->getClusterExpansionZoom(cluster_id);
+    if (auto data = impl().getData().lock()) {
+        return data->getClusterExpansionZoom(cluster_id);
+    }
+
+    return 0;
 }
 
 void GeoJSONSource::loadDescription(FileSource& fileSource) {
