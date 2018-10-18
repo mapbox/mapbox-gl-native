@@ -4,7 +4,6 @@
 #include <mbgl/algorithm/update_tile_masks.hpp>
 #include <mbgl/geometry/dem_data.hpp>
 #include <mbgl/renderer/buckets/hillshade_bucket.hpp>
-#include <iostream>
 
 namespace mbgl {
 

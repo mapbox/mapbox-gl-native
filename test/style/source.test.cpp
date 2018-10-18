@@ -127,7 +127,7 @@ TEST(Source, LoadingCorrupt) {
 
     test.styleObserver.sourceError = [&] (Source& source, std::exception_ptr error) {
         EXPECT_EQ("source", source.getID());
-        EXPECT_EQ("0 - Invalid value.", util::toString(error));
+        EXPECT_EQ("Invalid value. at offset 0", util::toString(error));
         test.end();
     };
 

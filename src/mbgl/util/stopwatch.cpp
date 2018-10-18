@@ -4,7 +4,6 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/logging.hpp>
 
-#include <iostream>
 #include <atomic>
 
 namespace mbgl {

@@ -4,7 +4,6 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/hash.hpp>
 
-#include <sstream>
 #include <cmath>
 
 namespace mbgl {

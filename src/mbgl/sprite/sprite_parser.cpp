@@ -9,7 +9,6 @@
 
 #include <cmath>
 #include <limits>
-#include <sstream>
 
 namespace mbgl {
 
@@ -91,9 +90,7 @@ std::vector<std::unique_ptr<style::Image>> parseSprite(const std::string& encode
     JSDocument doc;
     doc.Parse<0>(json.c_str());
     if (doc.HasParseError()) {
-        std::stringstream message;
-        message << "Failed to parse JSON: " << rapidjson::GetParseError_En(doc.GetParseError()) << " at offset " << doc.GetErrorOffset();
-        throw std::runtime_error(message.str());
+        throw std::runtime_error("Failed to parse JSON: " + formatJSONParseError(doc));
     } else if (!doc.IsObject()) {
         throw std::runtime_error("Sprite JSON root must be an object");
     } else {

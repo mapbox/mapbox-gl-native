@@ -18,7 +18,6 @@
 
 #include <algorithm>
 #include <set>
-#include <sstream>
 
 namespace mbgl {
 namespace style {
@@ -30,11 +29,7 @@ StyleParseResult Parser::parse(const std::string& json) {
     document.Parse<0>(json.c_str());
 
     if (document.HasParseError()) {
-        std::stringstream message;
-        message <<  document.GetErrorOffset() << " - "
-            << rapidjson::GetParseError_En(document.GetParseError());
-
-        return std::make_exception_ptr(std::runtime_error(message.str()));
+        return std::make_exception_ptr(std::runtime_error(formatJSONParseError(document)));
     }
 
     if (!document.IsObject()) {
