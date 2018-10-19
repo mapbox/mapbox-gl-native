@@ -38,5 +38,6 @@
   "RenderTestActivity",
   "SymbolLayerActivity",
   "LocationFragmentActivity",
-  "MergeOfflineRegionsActivity"
+  "MergeOfflineRegionsActivity",
+  "NestedViewPagerActivity"
 ]
