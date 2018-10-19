@@ -11,7 +11,7 @@ ProgramParameters::ProgramParameters(const float pixelRatio,
           result.reserve(32);
           result += "#define DEVICE_PIXEL_RATIO ";
           result += util::toString(pixelRatio, true);
-          result += "\n";
+          result += '\n';
           if (overdraw) {
               result += "#define OVERDRAW_INSPECTOR\n";
           }
@@ -33,7 +33,7 @@ optional<std::string> ProgramParameters::cachePath(const char* name) const {
         result += *cacheDir;
         result += "/com.mapbox.gl.shader.";
         result += name;
-        result += ".";
+        result += '.';
         result += util::toHex(std::hash<std::string>()(defines));
         result += ".pbf";
         return result;
