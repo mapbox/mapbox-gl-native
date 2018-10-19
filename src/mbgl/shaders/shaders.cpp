@@ -18,7 +18,7 @@ std::string vertexSource(const ProgramParameters& parameters, const char* vertex
 
 std::string programIdentifier(const std::string& vertexSource, const std::string& fragmentSource) {
     std::string result;
-    result.reserve(sizeof(size_t) * 2 * 2 + 2 + 1);
+    result.reserve((sizeof(size_t) * 2) * 2 + 2); // 2 size_t hex values + "v2"
     result += util::toHex(std::hash<std::string>()(vertexSource));
     result += util::toHex(std::hash<std::string>()(fragmentSource));
     result += "v2";
