@@ -44,6 +44,8 @@ import com.mapbox.mapboxsdk.offline.OfflineGeometryRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.mapboxsdk.storage.FileSource;
+import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 import java.lang.annotation.Retention;
@@ -131,6 +133,32 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
     // hide surface until map is fully loaded #10990
     setForeground(new ColorDrawable(options.getForegroundLoadColor()));
+
+    // Remove all sources from current style when going to load a new style
+    // This avoids crashing when calling updates on sources current style
+    // after underlying style has been cleared
+    addOnWillStartLoadingMapListener(new OnWillStartLoadingMapListener() {
+      @Override
+      public void onWillStartLoadingMap() {
+        if (mapboxMap == null) {
+          return;
+        }
+
+        for (Layer layer : mapboxMap.getLayers()) {
+          // avoid removing composite and annotations layer
+//        if (layer.isRuntimeLayer()) {
+//          mapboxMap.removeLayer(layer);
+//        }
+        }
+
+        for (Source source : mapboxMap.getSources()) {
+          // avoid removing composite and annotations layer
+//        if (source.isRuntimeSource()) {
+//          mapboxMap.removeSource(source);
+//        }
+        }
+      }
+    });
 
     mapboxMapOptions = options;
 

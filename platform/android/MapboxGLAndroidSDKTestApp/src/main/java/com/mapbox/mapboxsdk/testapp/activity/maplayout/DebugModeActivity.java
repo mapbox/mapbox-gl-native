@@ -97,7 +97,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
   public void onMapReady(MapboxMap map) {
     mapboxMap = map;
     mapboxMap.getUiSettings().setZoomControlsEnabled(true);
-
+    mapboxMap.setTransitionDuration(3000);
     setupNavigationView(mapboxMap.getLayers());
 
     setupNavigationView(mapboxMap.getLayers());
@@ -163,7 +163,9 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
         if (currentStyleIndex == STYLES.length) {
           currentStyleIndex = 0;
         }
-        mapboxMap.setStyleUrl(STYLES[currentStyleIndex], style -> Timber.d("Style loaded %s", style));
+        mapboxMap.setStyleUrl(STYLES[currentStyleIndex], style ->
+          Timber.d("Style loaded %s", style));
+          mapboxMap.setTransitionDuration(4500);
       }
     });
   }

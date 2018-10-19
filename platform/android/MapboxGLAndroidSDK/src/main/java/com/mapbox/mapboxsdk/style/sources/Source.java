@@ -11,6 +11,7 @@ public abstract class Source {
 
   @Keep
   private long nativePtr;
+  private boolean runtimeSource;
 
   /**
    * Internal use
@@ -25,6 +26,7 @@ public abstract class Source {
 
   public Source() {
     checkThread();
+    runtimeSource = true;
   }
 
   /**
@@ -71,4 +73,8 @@ public abstract class Source {
 
   @Keep
   protected native String nativeGetAttribution();
+
+  public boolean isRuntimeSource() {
+    return runtimeSource;
+  }
 }

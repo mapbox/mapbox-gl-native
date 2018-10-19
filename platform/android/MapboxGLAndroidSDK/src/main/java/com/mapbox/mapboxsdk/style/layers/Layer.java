@@ -16,6 +16,7 @@ public abstract class Layer {
   private long nativePtr;
   @Keep
   private boolean invalidated;
+  private boolean isRuntimeLayer;
 
   @Keep
   protected Layer(long nativePtr) {
@@ -25,6 +26,7 @@ public abstract class Layer {
 
   public Layer() {
     checkThread();
+    isRuntimeLayer = true;
   }
 
   /**
@@ -132,5 +134,9 @@ public abstract class Layer {
       return ((Expression) value).toArray();
     }
     return value;
+  }
+
+  public boolean isRuntimeLayer() {
+    return isRuntimeLayer;
   }
 }
