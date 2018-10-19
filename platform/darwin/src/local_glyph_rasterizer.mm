@@ -114,7 +114,7 @@ PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
     const size_t bytesPerRow = bytesPerPixel * size.width;
 
     CGContextHandle context(CGBitmapContextCreate(
-        rgbaBitmap.data.get(),
+        rgbaBitmap.data(),
         size.width,
         size.height,
         bitsPerComponent,
@@ -165,8 +165,8 @@ Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
    
     // Copy alpha values from RGBA bitmap into the AlphaImage output
     fixedMetrics.bitmap = AlphaImage(size);
-    for (uint32_t i = 0; i < size.width * size.height; i++) {
-        fixedMetrics.bitmap.data[i] = rgbaBitmap.data[4 * i + 3];
+    for (uint32_t i = 0; i < size.area(); ++i) {
+        fixedMetrics.bitmap.data()[i] = rgbaBitmap.data()[4 * i + 3];
     }
 
     return fixedMetrics;

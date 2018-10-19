@@ -15,15 +15,16 @@ CGImageRef CGImageCreateWithMGLPremultipliedImage(mbgl::PremultipliedImage&& src
     // We're converting the PremultipliedImage's backing store to a CGDataProvider, and are taking
     // over ownership of the memory.
     CGDataProviderHandle provider(CGDataProviderCreateWithData(
-        NULL, src.data.get(), src.bytes(), [](void*, const void* data, size_t) {
-            delete[] reinterpret_cast<const decltype(src.data)::element_type*>(data);
+        NULL, src.data(), src.bytes(), [](void*, const void* data, size_t) {
+            delete[] reinterpret_cast<const uint8_t*>(data);
         }));
     if (!provider) {
         return nil;
     }
 
     // If we successfully created the provider, it will take over management of the memory segment.
-    src.data.release();
+    mbgl::Size srcSize{src.size()};
+    src.takeData().release();
 
     CGColorSpaceHandle colorSpace(CGColorSpaceCreateDeviceRGB());
     if (!colorSpace) {
@@ -33,9 +34,9 @@ CGImageRef CGImageCreateWithMGLPremultipliedImage(mbgl::PremultipliedImage&& src
     constexpr const size_t bitsPerComponent = 8;
     constexpr const size_t bytesPerPixel = 4;
     constexpr const size_t bitsPerPixel = bitsPerComponent * bytesPerPixel;
-    const size_t bytesPerRow = bytesPerPixel * src.size.width;
+    const size_t bytesPerRow = bytesPerPixel * srcSize.width;
 
-    return CGImageCreate(src.size.width, src.size.height, bitsPerComponent, bitsPerPixel,
+    return CGImageCreate(srcSize.width, srcSize.height, bitsPerComponent, bitsPerPixel,
                          bytesPerRow, *colorSpace,
                          kCGBitmapByteOrderDefault | kCGImageAlphaPremultipliedLast, *provider,
                          NULL, false, kCGRenderingIntentDefault);
@@ -57,7 +58,7 @@ mbgl::PremultipliedImage MGLPremultipliedImageFromCGImage(CGImageRef src) {
     const size_t bytesPerRow = bytesPerPixel * width;
 
     CGContextHandle context(CGBitmapContextCreate(
-        image.data.get(), width, height, bitsPerComponent, bytesPerRow, *colorSpace,
+        image.data(), width, height, bitsPerComponent, bytesPerRow, *colorSpace,
         kCGBitmapByteOrderDefault | kCGImageAlphaPremultipliedLast));
     if (!context) {
         throw std::runtime_error("CGBitmapContextCreate failed");

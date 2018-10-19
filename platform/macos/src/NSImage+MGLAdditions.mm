@@ -23,8 +23,8 @@
 
     NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithCGImage:image];
     CGImageRelease(image);
-    CGFloat w = styleImage->getImage().size.width / styleImage->getPixelRatio();
-    CGFloat h = styleImage->getImage().size.height / styleImage->getPixelRatio();
+    CGFloat w = styleImage->getImage().size().width / styleImage->getPixelRatio();
+    CGFloat h = styleImage->getImage().size().height / styleImage->getPixelRatio();
     if (self = [self initWithSize:NSMakeSize(w, h)]) {
         [self addRepresentation:rep];
         [self setTemplate:styleImage->isSdf()];
@@ -34,7 +34,7 @@
 
 - (std::unique_ptr<mbgl::style::Image>)mgl_styleImageWithIdentifier:(NSString *)identifier {
     mbgl::PremultipliedImage cPremultipliedImage = self.mgl_premultipliedImage;
-    auto imageWidth = cPremultipliedImage.size.width;
+    auto imageWidth = cPremultipliedImage.size().width;
     return std::make_unique<mbgl::style::Image>([identifier UTF8String],
                                                 std::move(cPremultipliedImage),
                                                 (float)(imageWidth / self.size.width),

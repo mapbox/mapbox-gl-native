@@ -49,26 +49,33 @@ template <ImageAlphaMode Mode>
 class Image : public ImageBase {
 public:
     static constexpr size_t channels = Mode == ImageAlphaMode::Exclusive ? 1 : 4;
+
     Image() = default;
     Image(const Size& s) : ImageBase(s, channels) {}
     Image(const Size& s, std::unique_ptr<uint8_t[]> d) : ImageBase(s, std::move(d)) {}
     Image(Image&& o) = default;
-    ~Image() = default;
     Image& operator=(Image&& o) = default;
+
+    ~Image() = default;
+
     size_t stride() const { return ImageBase::stride(channels); }
     size_t bytes() const { return ImageBase::bytes(channels); }
+
     // Resizes this image. If the given size is more than the current one,
     // extra space is filled with '0'.
     void resize(const Size& s) { ImageBase::resize(s, channels); }
+
     // Clears the rect area specified by `pt` and `size` from this image.
     // The image must be valid.
     void clear(const Point<uint32_t>& pt, const Size& s) {
         ImageBase::clear(pt, s, channels);
     }
+
     bool operator==(const Image& o) const {
         return std::equal(data(), data() + bytes(),
                           o.data(), o.data() + o.bytes());
     }
+
     bool operator!=(const Image& o) const {
         return !(operator==(o));
     }
