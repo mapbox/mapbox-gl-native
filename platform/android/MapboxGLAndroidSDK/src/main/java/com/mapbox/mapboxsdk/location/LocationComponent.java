@@ -758,8 +758,6 @@ public final class LocationComponent {
     isInitialized = true;
     this.options = options;
 
-    AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-
     mapboxMap.addOnMapClickListener(onMapClickListener);
     mapboxMap.addOnMapLongClickListener(onMapLongClickListener);
 
