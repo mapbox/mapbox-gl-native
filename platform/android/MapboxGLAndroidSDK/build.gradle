@@ -27,7 +27,6 @@ android {
     buildToolsVersion androidVersions.buildToolsVersion
 
     defaultConfig {
-        vectorDrawables.useSupportLibrary = true
         minSdkVersion androidVersions.minSdkVersion
         targetSdkVersion androidVersions.targetSdkVersion
         buildConfigField "String", "GIT_REVISION_SHORT", String.format("\"%s\"", getGitRevision())
