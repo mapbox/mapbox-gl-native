@@ -5,7 +5,6 @@ import android.animation.AnimatorSet;
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.util.LongSparseArray;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
@@ -79,7 +78,7 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
   }
 
   @Override
-  public void onMapReady(@NonNull final MapboxMap map) {
+  public void onMapReady(final MapboxMap map) {
     mapboxMap = map;
     initFab();
   }

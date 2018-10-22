@@ -1,7 +1,5 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.support.annotation.NonNull;
-
 /**
  * Interface definition for a callback to be invoked when the map is ready to be used.
  * <p>
@@ -18,5 +16,5 @@ public interface OnMapReadyCallback {
    * @param mapboxMap An instance of MapboxMap associated with the {@link MapFragment} or
    *                  {@link MapView} that defines the callback.
    */
-  void onMapReady(@NonNull MapboxMap mapboxMap);
+  void onMapReady(MapboxMap mapboxMap);
 }

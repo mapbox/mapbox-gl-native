@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.camera;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.constants.Style;
@@ -32,7 +31,7 @@ public class MaxMinZoomActivity extends AppCompatActivity implements OnMapReadyC
   }
 
   @Override
-  public void onMapReady(@NonNull final MapboxMap map) {
+  public void onMapReady(final MapboxMap map) {
     mapboxMap = map;
     mapboxMap.setMinZoomPreference(3);
     mapboxMap.setMaxZoomPreference(5);
