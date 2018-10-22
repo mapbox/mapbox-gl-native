@@ -29,6 +29,10 @@ Result<jni::Local<jni::Object<>>> Converter<jni::Local<jni::Object<>>, Color>::o
     return jni::Make<jni::String>(env, sstream.str());
 }
 
+Result<jni::Local<jni::Object<>>> Converter<jni::Local<jni::Object<>>, style::expression::Formatted>::operator()(jni::JNIEnv& env, const style::expression::Formatted& value) const {
+    return jni::Make<jni::String>(env, value.toString());
+}
+
 Result<jni::Local<jni::Object<>>> Converter<jni::Local<jni::Object<>>, std::vector<std::string>>::operator()(jni::JNIEnv& env, const std::vector<std::string>& value) const {
     auto result = jni::Array<jni::String>::New(env, value.size());
 

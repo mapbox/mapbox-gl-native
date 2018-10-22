@@ -25,6 +25,7 @@ interface Markers {
 
   List<Marker> obtainAll();
 
+  @NonNull
   List<Marker> obtainAllIn(@NonNull RectF rectangle);
 
   MarkerView addViewBy(@NonNull BaseMarkerViewOptions markerOptions, @NonNull MapboxMap mapboxMap,

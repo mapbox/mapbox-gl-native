@@ -808,10 +808,10 @@ void QMapboxGL::jumpTo(const QMapboxGLCameraOptions& camera)
         mbglCamera.zoom = camera.zoom.value<double>();
     }
     if (camera.angle.isValid()) {
-        mbglCamera.angle = -camera.angle.value<double>() * mbgl::util::DEG2RAD;
+        mbglCamera.angle = camera.angle.value<double>();
     }
     if (camera.pitch.isValid()) {
-        mbglCamera.pitch = camera.pitch.value<double>() * mbgl::util::DEG2RAD;
+        mbglCamera.pitch = camera.pitch.value<double>();
     }
 
     mbglCamera.padding = d_ptr->margins;
@@ -1817,11 +1817,13 @@ void QMapboxGLPrivate::update(std::shared_ptr<mbgl::UpdateParameters> parameters
 {
     std::lock_guard<std::recursive_mutex> lock(m_mapRendererMutex);
 
+    m_updateParameters = std::move(parameters);
+
     if (!m_mapRenderer) {
         return;
     }
 
-    m_mapRenderer->updateParameters(std::move(parameters));
+    m_mapRenderer->updateParameters(std::move(m_updateParameters));
 
     requestRendering();
 }
@@ -1856,6 +1858,11 @@ void QMapboxGLPrivate::createRenderer()
     connect(m_mapRenderer.get(), SIGNAL(needsRendering()), this, SLOT(requestRendering()));
 
     m_mapRenderer->setObserver(m_rendererObserver);
+
+    if (m_updateParameters) {
+        m_mapRenderer->updateParameters(m_updateParameters);
+        requestRendering();
+    }
 }
 
 void QMapboxGLPrivate::destroyRenderer()

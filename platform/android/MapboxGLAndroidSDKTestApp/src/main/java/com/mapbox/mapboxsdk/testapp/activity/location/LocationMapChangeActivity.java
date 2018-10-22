@@ -75,7 +75,7 @@ public class LocationMapChangeActivity extends AppCompatActivity implements OnMa
   }
 
   @Override
-  public void onMapReady(MapboxMap mapboxMap) {
+  public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
     activateLocationComponent();
   }

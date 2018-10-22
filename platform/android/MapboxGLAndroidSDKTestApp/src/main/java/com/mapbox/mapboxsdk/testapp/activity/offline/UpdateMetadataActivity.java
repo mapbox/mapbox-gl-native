@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
@@ -57,7 +58,9 @@ public class UpdateMetadataActivity extends AppCompatActivity implements Adapter
     final EditText input = new EditText(this);
     input.setText(metadata);
     input.setInputType(InputType.TYPE_CLASS_TEXT);
-    input.setSelection(metadata.length());
+    if (metadata != null) {
+      input.setSelection(metadata.length());
+    }
     builder.setView(input);
 
     builder.setPositiveButton("OK", (dialog, which) ->

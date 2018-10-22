@@ -92,8 +92,7 @@ void Style::Impl::parse(const std::string& json_) {
     layers.clear();
     images.clear();
 
-    transitionOptions = {};
-    transitionOptions.duration = util::DEFAULT_TRANSITION_DURATION;
+    transitionOptions = parser.transition;
 
     for (auto& source : parser.sources) {
         addSource(std::move(source));

@@ -302,8 +302,17 @@ public:
     };
 
     void populateVertexVector(const GeometryTileFeature&, std::size_t length, const ImagePositions& patternPositions, const optional<PatternDependency>& patternDependencies) override {
-        if (!patternDependencies) return;
-        if (!patternPositions.empty()) {
+    
+        if (patternDependencies->mid.empty())  {
+            // Unlike other propperties with expressions that evaluate to null, the default value for `*-pattern` properties is an empty
+            // string and will not have a valid entry in patternPositions. We still need to populate the attribute buffers to avoid crashes
+            // when we try to draw the layer because we don't know at draw time if all features were evaluated to valid pattern dependencies.
+            for (std::size_t i = zoomInVertexVector.vertexSize(); i < length; ++i) {
+                patternToVertexVector.emplace_back(Vertex { std::array<uint16_t, 4>{{0, 0, 0, 0}} });
+                zoomInVertexVector.emplace_back(Vertex2 { std::array<uint16_t, 4>{{0, 0, 0, 0}} } );
+                zoomOutVertexVector.emplace_back(Vertex2 { std::array<uint16_t, 4>{{0, 0, 0, 0}} });
+            }
+        } else if (!patternPositions.empty()) {
             const auto min = patternPositions.find(patternDependencies->min);
             const auto mid = patternPositions.find(patternDependencies->mid);
             const auto max = patternPositions.find(patternDependencies->max);

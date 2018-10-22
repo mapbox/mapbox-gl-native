@@ -40,6 +40,10 @@ static_assert(mbgl::underlying_type(ResultCode::Auth) == SQLITE_AUTH, "error");
 static_assert(mbgl::underlying_type(ResultCode::Range) == SQLITE_RANGE, "error");
 static_assert(mbgl::underlying_type(ResultCode::NotADB) == SQLITE_NOTADB, "error");
 
+void setTempPath(const std::string& path) {
+    sqlite3_temp_directory = sqlite3_mprintf("%s", path.c_str());
+}
+
 class DatabaseImpl {
 public:
     DatabaseImpl(sqlite3* db_)
@@ -97,6 +101,13 @@ public:
 template <typename T>
 using optional = std::experimental::optional<T>;
 
+
+#ifndef NDEBUG
+void logSqlMessage(void *, const int err, const char *msg) {
+    mbgl::Log::Record(mbgl::EventSeverity::Debug, mbgl::Event::Database, err, "%s", msg);
+}
+#endif
+
 __attribute__((constructor))
 static void initalize() {
     if (sqlite3_libversion_number() / 1000000 != SQLITE_VERSION_NUMBER / 1000000) {
@@ -109,9 +120,7 @@ static void initalize() {
 
 #ifndef NDEBUG
     // Enable SQLite logging before initializing the database.
-    sqlite3_config(SQLITE_CONFIG_LOG, [](void *, const int err, const char *msg) {
-        mbgl::Log::Record(mbgl::EventSeverity::Debug, mbgl::Event::Database, err, "%s", msg);
-    }, nullptr);
+    sqlite3_config(SQLITE_CONFIG_LOG, &logSqlMessage, nullptr);
 #endif
 }
 

@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 
 import com.mapbox.mapboxsdk.MapStrictMode;
@@ -29,6 +30,7 @@ public class FileSource {
   private static final String TAG = "Mbgl-FileSource";
   private static final Lock resourcesCachePathLoaderLock = new ReentrantLock();
   private static final Lock internalCachePathLoaderLock = new ReentrantLock();
+  @Nullable
   private static String resourcesCachePath;
   private static String internalCachePath;
 
@@ -61,7 +63,7 @@ public class FileSource {
    * @return the single instance of FileSource
    */
   @UiThread
-  public static synchronized FileSource getInstance(Context context) {
+  public static synchronized FileSource getInstance(@NonNull Context context) {
     if (INSTANCE == null) {
       INSTANCE = new FileSource(getResourcesCachePath(context), context.getResources().getAssets());
     }
@@ -76,18 +78,22 @@ public class FileSource {
    * @return the files directory path
    * @deprecated Use {@link #getResourcesCachePath(Context)} instead.
    */
+  @Nullable
   @Deprecated
-  public static String getCachePath(Context context) {
+  public static String getCachePath(@NonNull Context context) {
     // Default value
-    boolean setStorageExternal = MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL;
+    boolean isExternalStorageConfiguration = MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL;
 
     try {
       // Try getting a custom value from the app Manifest
       ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(),
         PackageManager.GET_META_DATA);
-      setStorageExternal = appInfo.metaData.getBoolean(
-        MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
-        MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL);
+      if (appInfo.metaData != null) {
+        isExternalStorageConfiguration = appInfo.metaData.getBoolean(
+          MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
+          MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL
+        );
+      }
     } catch (PackageManager.NameNotFoundException exception) {
       Logger.e(TAG, "Failed to read the package metadata: ", exception);
       MapStrictMode.strictModeViolation(exception);
@@ -97,7 +103,7 @@ public class FileSource {
     }
 
     String cachePath = null;
-    if (setStorageExternal && isExternalStorageReadable()) {
+    if (isExternalStorageConfiguration && isExternalStorageReadable()) {
       try {
         // Try getting the external storage path
         cachePath = context.getExternalFilesDir(null).getAbsolutePath();
@@ -159,6 +165,7 @@ public class FileSource {
       unlockPathLoaders();
     }
 
+    @NonNull
     @Override
     protected String[] doInBackground(Context... contexts) {
       return new String[] {
@@ -181,7 +188,8 @@ public class FileSource {
    * @param context the context to derive the files directory path from
    * @return the files directory path
    */
-  public static String getResourcesCachePath(Context context) {
+  @Nullable
+  public static String getResourcesCachePath(@NonNull Context context) {
     resourcesCachePathLoaderLock.lock();
     try {
       if (resourcesCachePath == null) {
@@ -199,7 +207,7 @@ public class FileSource {
    * @param context the context to derive the internal cache path from
    * @return the internal cache path
    */
-  public static String getInternalCachePath(Context context) {
+  public static String getInternalCachePath(@NonNull Context context) {
     internalCachePathLoaderLock.lock();
     try {
       if (internalCachePath == null) {
@@ -240,6 +248,7 @@ public class FileSource {
   @Keep
   public native void setAccessToken(@NonNull String accessToken);
 
+  @NonNull
   @Keep
   public native String getAccessToken();
 

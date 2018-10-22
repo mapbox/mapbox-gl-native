@@ -3,6 +3,7 @@
     package="com.mapbox.mapboxsdk.testapp">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".MapboxApplication"
@@ -811,6 +812,17 @@
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_camera" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.mapbox.mapboxsdk.testapp.activity.FeatureOverviewActivity" />
+        </activity>
+        <activity
+            android:name=".activity.offline.MergeOfflineRegionsActivity"
+            android:description="@string/description_offline_merge"
+            android:label="@string/activity_offline_merge">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_offline" />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.mapbox.mapboxsdk.testapp.activity.FeatureOverviewActivity" />

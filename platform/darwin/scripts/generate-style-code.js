@@ -103,6 +103,11 @@ global.objCTestValue = function (property, layerType, arraysAsStructs, indent) {
         case 'number':
             return '@"1"';
         case 'formatted':
+            // Special 'string' case to handle constant expression text-field that automatically
+            // converts Formatted back to string.
+            return layerType === 'string' ?
+                `@"'${_.startCase(propertyName)}'"` :
+                `@"MGL_FUNCTION('format', '${_.startCase(propertyName)}', %@)", @{}`;
         case 'string':
             return `@"'${_.startCase(propertyName)}'"`;
         case 'enum':
@@ -559,6 +564,7 @@ global.valueTransformerArguments = function (property) {
         case 'number':
             return ['float', objCType];
         case 'formatted':
+            return ['mbgl::style::expression::Formatted', objCType];
         case 'string':
             return ['std::string', objCType];
         case 'enum':
@@ -593,6 +599,7 @@ global.mbglType = function(property) {
         case 'number':
             return 'float';
         case 'formatted':
+            return 'mbgl::style::expression::Formatted';
         case 'string':
             return 'std::string';
         case 'enum': {

@@ -43,6 +43,14 @@ TEST(Style, Properties) {
     ASSERT_EQ("", style.getName());
     ASSERT_EQ(60, *style.getDefaultCamera().pitch);
 
+    style.loadJSON(R"STYLE({})STYLE");
+    ASSERT_EQ(Milliseconds(300), *style.getTransitionOptions().duration);
+    ASSERT_EQ(optional<Duration> {}, style.getTransitionOptions().delay);
+
+    style.loadJSON(R"STYLE({"transition": { "duration": 500, "delay": 50 }})STYLE");
+    ASSERT_EQ(Milliseconds(500), *style.getTransitionOptions().duration);
+    ASSERT_EQ(Milliseconds(50), *style.getTransitionOptions().delay);
+
     style.loadJSON(R"STYLE({"name": 23, "center": {}, "bearing": "north", "zoom": null, "pitch": "wide"})STYLE");
     ASSERT_EQ("", style.getName());
     ASSERT_EQ(LatLng {}, *style.getDefaultCamera().center);

@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.maplayout;
 
 import android.os.Bundle;
-import android.support.v4.util.LongSparseArray;
 import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -25,37 +24,25 @@ public class MapChangeActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_map_simple);
 
-    final LongSparseArray<String> mapChangeMap = buildMapChangeStringValueSparseArray();
-    mapView = (MapView) findViewById(R.id.mapView);
-    mapView.addOnMapChangedListener(change -> Timber.e("OnMapChange: %s, %s", change, mapChangeMap.get(change)));
-
+    mapView = findViewById(R.id.mapView);
+    mapView.addOnCameraIsChangingListener(() -> Timber.v("OnCameraIsChanging"));
+    mapView.addOnCameraDidChangeListener(animated -> Timber.v("OnCamaraDidChange: animated: %s", animated));
+    mapView.addOnCameraWillChangeListener(animated -> Timber.v("OnCameraWilChange: animated: %s", animated));
+    mapView.addOnDidFailLoadingMapListener(errorMessage -> Timber.v("OnDidFailLoadingMap: %s", errorMessage));
+    mapView.addOnDidFinishLoadingMapListener(() -> Timber.v("OnDidFinishLoadingMap"));
+    mapView.addOnDidFinishLoadingStyleListener(() -> Timber.v("OnDidFinishLoadingStyle"));
+    mapView.addOnDidFinishRenderingFrameListener(fully -> Timber.v("OnDidFinishRenderingFrame: fully: %s", fully));
+    mapView.addOnDidFinishRenderingMapListener(fully -> Timber.v("OnDidFinishRenderingMap: fully: %s", fully));
+    mapView.addOnSourceChangedListener(sourceId -> Timber.v("OnSourceChangedListener: source with id: %s", sourceId));
+    mapView.addOnWillStartLoadingMapListener(() -> Timber.v("OnWillStartLoadingMap"));
+    mapView.addOnWillStartRenderingFrameListener(() -> Timber.v("OnWillStartRenderingFrame"));
+    mapView.addOnWillStartRenderingMapListener(() -> Timber.v("OnWillStartRenderingMap"));
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
       mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
         new LatLng(55.754020, 37.620948), 12), 9000);
     });
-  }
-
-  private LongSparseArray<String> buildMapChangeStringValueSparseArray() {
-    LongSparseArray<String> mapChangeArray = new LongSparseArray<>();
-    mapChangeArray.put(MapView.REGION_WILL_CHANGE, "Region will change");
-    mapChangeArray.put(MapView.REGION_WILL_CHANGE_ANIMATED, "Region will change animated");
-    mapChangeArray.put(MapView.REGION_IS_CHANGING, "Region is changing");
-    mapChangeArray.put(MapView.REGION_DID_CHANGE, "Region did change");
-    mapChangeArray.put(MapView.REGION_DID_CHANGE_ANIMATED, "Region did change animated");
-    mapChangeArray.put(MapView.WILL_START_LOADING_MAP, "Will start loading map");
-    mapChangeArray.put(MapView.DID_FINISH_LOADING_MAP, "Did finish loading map");
-    mapChangeArray.put(MapView.DID_FAIL_LOADING_MAP, "Did fail loading map");
-    mapChangeArray.put(MapView.WILL_START_RENDERING_FRAME, "Will start rendering frame");
-    mapChangeArray.put(MapView.DID_FINISH_RENDERING_FRAME, "Did finish rendering frame");
-    mapChangeArray.put(MapView.DID_FINISH_RENDERING_FRAME_FULLY_RENDERED, "Did finish rendering frame fully rendered");
-    mapChangeArray.put(MapView.WILL_START_RENDERING_MAP, "Will start rendering map");
-    mapChangeArray.put(MapView.DID_FINISH_RENDERING_MAP, "Did finish rendering map");
-    mapChangeArray.put(MapView.DID_FINISH_RENDERING_MAP_FULLY_RENDERED, "Did finish rendering map fully rendered");
-    mapChangeArray.put(MapView.DID_FINISH_LOADING_STYLE, "Did finish loading style");
-    mapChangeArray.put(MapView.SOURCE_DID_CHANGE, "Source did change");
-    return mapChangeArray;
   }
 
   @Override

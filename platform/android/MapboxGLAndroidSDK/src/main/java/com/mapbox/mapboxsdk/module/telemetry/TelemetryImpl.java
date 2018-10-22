@@ -1,6 +1,8 @@
 package com.mapbox.mapboxsdk.module.telemetry;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.mapbox.android.telemetry.AppUserTurnstile;
 import com.mapbox.android.telemetry.Event;
 import com.mapbox.android.telemetry.MapEventFactory;
@@ -13,6 +15,9 @@ import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
+import com.mapbox.mapboxsdk.offline.OfflineGeometryRegionDefinition;
+import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
+import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 
 import java.lang.reflect.Field;
 
@@ -20,6 +25,7 @@ public class TelemetryImpl implements TelemetryDefinition {
 
   private static final String TAG = "Mbgl-TelemetryImpl";
   private static TelemetryImpl instance;
+  @Nullable
   private MapboxTelemetry telemetry;
 
   /**
@@ -109,6 +115,26 @@ public class TelemetryImpl implements TelemetryDefinition {
     return telemetry.updateSessionIdRotationInterval(new SessionInterval(interval));
   }
 
+  @Override
+  public void onCreateOfflineRegion(OfflineRegionDefinition offlineDefinition) {
+    MapEventFactory mapEventFactory = new MapEventFactory();
+
+    Event mapOfflineEvent;
+    if (offlineDefinition instanceof OfflineTilePyramidRegionDefinition) {
+      OfflineTilePyramidRegionDefinition tileDefinition =
+        (OfflineTilePyramidRegionDefinition)offlineDefinition;
+      mapOfflineEvent = mapEventFactory.buildMapOfflineEvent(
+        tileDefinition.getMinZoom(), tileDefinition.getMaxZoom(), "bounds",
+        new String[]{tileDefinition.getStyleURL()});
+    } else {
+      OfflineGeometryRegionDefinition geometryDefinition =
+        (OfflineGeometryRegionDefinition) offlineDefinition;
+      mapOfflineEvent = mapEventFactory.buildMapOfflineEvent(
+        geometryDefinition.getMinZoom(), geometryDefinition.getMaxZoom(), geometryDefinition.getGeometry().type(),
+        new String[]{geometryDefinition.getStyleURL()});
+    }
+  }
+
   /**
    * Set the debug logging state of telemetry.
    *
@@ -131,7 +157,7 @@ public class TelemetryImpl implements TelemetryDefinition {
    * @deprecated use {@link #setSessionIdRotationInterval(int)} instead
    */
   @Deprecated
-  public static boolean updateSessionIdRotationInterval(SessionInterval interval) {
+  public static boolean updateSessionIdRotationInterval(@NonNull SessionInterval interval) {
     try {
       Field field = interval.getClass().getDeclaredField("interval");
       field.setAccessible(true);

@@ -3,42 +3,39 @@
 # contents of this file will be appended into proguard-android.txt
 -keepattributes Signature, *Annotation*, EnclosingMethod
 
-# config for the SDK
+# Reflection on classes from native code
 -keep class com.google.gson.JsonArray { *; }
 -keep class com.google.gson.JsonElement { *; }
 -keep class com.google.gson.JsonObject { *; }
 -keep class com.google.gson.JsonPrimitive { *; }
+-dontnote com.google.gson.**
 
-# config for okhttp 3.8.0, https://github.com/square/okhttp/pull/3354
--dontwarn okio.**
+# dontnote for keeps the entry point x but not the descriptor class y
+-dontnote com.mapbox.mapboxsdk.maps.MapboxMap$OnFpsChangedListener
+-dontnote com.mapbox.mapboxsdk.style.layers.PropertyValue
+-dontnote com.mapbox.mapboxsdk.maps.MapboxMap
+-dontnote com.mapbox.mapboxsdk.maps.MapboxMapOptions
+-dontnote com.mapbox.mapboxsdk.log.LoggerDefinition
+-dontnote com.mapbox.android.core.location.LocationEnginePriority
+
+# config for okhttp 3.11.0, https://github.com/square/okhttp/pull/3354
 -dontwarn javax.annotation.**
--dontnote okhttp3.**
-
-# config for mapbox-android-telemetry:3.0.0-beta.1
--keep class com.mapbox.android.telemetry.** { *; }
--dontwarn com.mapbox.android.core.location.MockLocationEngine
--dontwarn com.mapbox.android.core.location.MockLocationEngine$LocationUpdateRunnable
--dontwarn java.awt.Color
--dontwarn com.mapzen.android.lost.api**
--dontwarn org.conscrypt.OpenSSLProvider
--dontwarn org.conscrypt.Conscrypt
+-dontnote okhttp3.internal.**
+-dontwarn org.codehaus.**
 
 # config for mapbox-sdk-geojson:3.0.1
 -keep class com.mapbox.geojson.** { *; }
--dontnote com.google.gson.internal.UnsafeAllocator
+-dontwarn com.google.auto.value.**
 
-# config for mapbox-android-gestures:0.0.1-20180228.152340-13
--dontnote com.mapbox.android.gestures.*
-
-# config for additional warnings
--keep class com.google.android.gms.dynamite.descriptors.com.google.android.gms.flags.ModuleDescriptor { java.lang.String MODULE_ID; }
--keep class com.google.android.gms.dynamite.descriptors.com.google.android.gms.flags.ModuleDescriptor { int MODULE_VERSION; }
--keep class com.google.android.gms.dynamite.DynamiteModule$DynamiteLoaderClassLoader { java.lang.ClassLoader sClassLoader; }
--dontnote com.google.devtools.build.android.desugar.runtime.ThrowableExtension
+# config for additional notes
 -dontnote org.robolectric.Robolectric
 -dontnote libcore.io.Memory
--dontnote com.google.protobuf.ExtensionRegistry
--dontnote com.google.protobuf.Extension
+-dontnote com.google.protobuf.**
 -dontnote android.net.**
 -dontnote org.apache.http.**
--dontwarn com.sun.xml.internal.ws.spi.db.**
+
+# config for mapbox-sdk-services
+# while we don't include this dependency directly
+# a large amount of users combine it with our SDK
+# we aren't able to provide a proguard config in that project (jar vs aar)
+-dontwarn com.sun.xml.internal.ws.spi.db.*

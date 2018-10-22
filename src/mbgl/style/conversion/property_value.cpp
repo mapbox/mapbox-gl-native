@@ -78,6 +78,7 @@ template optional<PropertyValue<SymbolZOrderType>> Converter<PropertyValue<Symbo
 template optional<PropertyValue<TextJustifyType>> Converter<PropertyValue<TextJustifyType>>::operator()(conversion::Convertible const&, conversion::Error&, bool, bool) const;
 template optional<PropertyValue<TextTransformType>> Converter<PropertyValue<TextTransformType>>::operator()(conversion::Convertible const&, conversion::Error&, bool, bool) const;
 template optional<PropertyValue<TranslateAnchorType>> Converter<PropertyValue<TranslateAnchorType>>::operator()(conversion::Convertible const&, conversion::Error&, bool, bool) const;
+template optional<PropertyValue<mbgl::style::expression::Formatted>> Converter<PropertyValue<mbgl::style::expression::Formatted>>::operator()(conversion::Convertible const&, conversion::Error&, bool, bool) const;
 
 } // namespace conversion
 } // namespace style

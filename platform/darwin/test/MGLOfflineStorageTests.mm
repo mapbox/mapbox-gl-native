@@ -1,6 +1,7 @@
 #import <Mapbox/Mapbox.h>
 
 #import "MGLOfflineStorage_Private.h"
+#import "NSDate+MGLAdditions.h"
 
 #import <XCTest/XCTest.h>
 
@@ -11,6 +12,24 @@
 @end
 
 @implementation MGLOfflineStorageTests
+
++ (void)tearDown {
+    NSURL *cacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory
+                                                                      inDomain:NSUserDomainMask
+                                                             appropriateForURL:nil
+                                                                        create:NO
+                                                                         error:nil];
+    // Unit tests don't use the main bundle; use com.mapbox.ios.sdk instead.
+    NSString *bundleIdentifier = [NSBundle bundleForClass:[MGLMapView class]].bundleIdentifier;
+    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
+    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@".mapbox"];
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:cacheDirectoryURL.path], @"Cache subdirectory should exist.");
+    
+    NSURL *cacheURL = [cacheDirectoryURL URLByAppendingPathComponent:@"cache.db"];
+    
+    [[NSFileManager defaultManager] removeItemAtURL:cacheURL error:nil];
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:cacheURL.path], @"Cache subdirectory should not exist.");
+}
 
 - (void)setUp {
     [super setUp];
@@ -25,7 +44,7 @@
             [expectation fulfill];
             [self waitForExpectationsWithTimeout:0 handler:nil];
         } else {
-            [self waitForExpectationsWithTimeout:2 handler:nil];
+            [self waitForExpectationsWithTimeout:10 handler:nil];
         }
 
         XCTAssertNotNil([MGLOfflineStorage sharedOfflineStorage].packs, @"Shared offline storage object should have a non-nil collection of packs by this point.");
@@ -68,7 +87,7 @@
         pack = completionHandlerPack;
         [additionCompletionHandlerExpectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:2 handler:nil];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
 
     XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Added pack should have been added to the canonical collection of packs owned by the shared offline storage object. This assertion can fail if this test is run before -testAAALoadPacks.");
 
@@ -106,7 +125,7 @@
         return notificationPack == pack && pack.state == MGLOfflinePackStateInactive;
     }];
     [pack requestProgress];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
 }
 
 - (void)testAddPackForGeometry {
@@ -139,7 +158,7 @@
         pack = completionHandlerPack;
         [additionCompletionHandlerExpectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:2 handler:nil];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
     
     XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Added pack should have been added to the canonical collection of packs owned by the shared offline storage object. This assertion can fail if this test is run before -testAAALoadPacks.");
     
@@ -177,7 +196,7 @@
         return notificationPack == pack && pack.state == MGLOfflinePackStateInactive;
     }];
     [pack requestProgress];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
     pack = nil;
 }
 
@@ -221,7 +240,7 @@
         XCTAssertEqual(pack.state, MGLOfflinePackStateInvalid, @"Removed pack should be invalid in the completion handler.");
         [completionHandlerExpectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
 
     XCTAssertEqual(pack.state, MGLOfflinePackStateInvalid, @"Removed pack should have been invalidated synchronously.");
 
@@ -262,6 +281,173 @@
     CFRunLoopRun();
 
     [os setDelegate:nil];
+}
+
+- (void)testAddFileContent {
+
+    NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentDir = [documentPaths objectAtIndex:0];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    BOOL directoryExists = [fileManager fileExistsAtPath:documentDir];
+    if (!directoryExists) {
+        [fileManager createDirectoryAtPath:documentDir withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    
+    // Valid database
+    {
+        NSURL *resourceURL = [NSURL fileURLWithPath:[[NSBundle bundleForClass:[self class]] pathForResource:@"sideload_sat" ofType:@"db"]];
+        NSString *filePath = [documentDir stringByAppendingPathComponent:@"sideload_sat.db"];
+      
+        BOOL databaseExists = [fileManager fileExistsAtPath:filePath];
+        if (databaseExists) {
+            [fileManager removeItemAtPath:filePath error:nil];
+        }
+        
+        NSError *error;
+        [fileManager moveItemAtURL:resourceURL toURL:[NSURL fileURLWithPath:filePath] error:&error];
+        NSDictionary *atributes = @{ NSFilePosixPermissions: @0777 };
+        error = nil;
+        [fileManager setAttributes:atributes ofItemAtPath:filePath error:&error];
+        XCTAssertNil(error, @"Changing the file's permissions:%@ should not return an error.", filePath);
+        error = nil;
+        NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:filePath error:&error];
+        
+        NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
+        long long fileSize = [fileSizeNumber longLongValue];
+        long long databaseFileSize = 73728;
+        // Merging databases creates an empty file if the file does not exist at the given path.
+        XCTAssertEqual(fileSize, databaseFileSize, @"The database file size must be:%lld actual size:%lld", databaseFileSize, fileSize);
+        
+        NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
+        
+        [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
+            const auto changeKind = static_cast<NSKeyValueChange>([change[NSKeyValueChangeKindKey] unsignedLongValue]);
+            NSIndexSet *indices = change[NSKeyValueChangeIndexesKey];
+            return changeKind == NSKeyValueChangeInsertion && indices.count == 1;
+        }];
+        
+        XCTestExpectation *fileAdditionCompletionHandlerExpectation = [self expectationWithDescription:@"add database content completion handler"];
+        MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+        [os addContentsOfFile:filePath withCompletionHandler:^(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
+            XCTAssertNotNil(fileURL, @"The fileURL should not be nil.");
+            XCTAssertNotNil(packs, @"Adding the contents of the barcelona.db should update one pack.");
+            XCTAssertNil(error, @"Adding contents to a file should not return an error.");
+            for (MGLOfflinePack *pack in [MGLOfflineStorage sharedOfflineStorage].packs) {
+                NSLog(@"PACK:%@", pack);
+            }
+            [fileAdditionCompletionHandlerExpectation fulfill];
+        }];
+        [self waitForExpectationsWithTimeout:10 handler:nil];
+        // Depending on the database it may update or add a pack. For this case specifically the offline database adds one pack.
+        XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Adding contents of barcelona.db should add one pack.");
+
+    }
+    // Invalid database type
+    {
+        NSURL *resourceURL = [NSURL fileURLWithPath:[[NSBundle bundleForClass:[self class]] pathForResource:@"one-liner" ofType:@"json"]];
+        NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentDir = [documentPaths objectAtIndex:0];
+        NSString *filePath = [documentDir stringByAppendingPathComponent:@"on-liner-copy.json"];
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+
+        BOOL exists = [fileManager fileExistsAtPath:filePath];
+        if (exists) {
+            [fileManager removeItemAtPath:filePath error:nil];
+        }
+
+        NSError *error;
+        [fileManager copyItemAtURL:resourceURL toURL:[NSURL fileURLWithPath:filePath] error:&error];
+        
+        XCTestExpectation *invalidFileCompletionHandlerExpectation = [self expectationWithDescription:@"invalid content database completion handler"];
+        MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+        [os addContentsOfFile:filePath withCompletionHandler:^(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
+            XCTAssertNotNil(error, @"Passing an invalid offline database file should return an error.");
+            XCTAssertNil(packs, @"Passing an invalid offline database file should not add packs to the offline database.");
+            [invalidFileCompletionHandlerExpectation fulfill];
+        }];
+        [self waitForExpectationsWithTimeout:10 handler:nil];
+    }
+    // File non existent
+    {
+        NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentDir = [documentPaths objectAtIndex:0];
+        NSString *filePath = [documentDir stringByAppendingPathComponent:@"nonexistent.db"];
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        
+        BOOL exists = [fileManager fileExistsAtPath:filePath];
+        if (exists) {
+            [fileManager removeItemAtPath:filePath error:nil];
+        }
+        
+        MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+        XCTAssertThrowsSpecificNamed([os addContentsOfFile:filePath withCompletionHandler:nil], NSException, NSInvalidArgumentException, "MGLOfflineStorage should rise an exception if an invalid database file is passed.");
+
+    }
+    // URL to a non-file
+    {
+        NSURL *resourceURL = [NSURL URLWithString:@"https://www.mapbox.com"];
+        
+        MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+        XCTAssertThrowsSpecificNamed([os addContentsOfURL:resourceURL withCompletionHandler:nil], NSException, NSInvalidArgumentException, "MGLOfflineStorage should rise an exception if an invalid URL file is passed.");
+        
+    }
+    
+}
+
+-(void) testPutResourceForURL {
+    NSURL *styleURL = [NSURL URLWithString:@"https://api.mapbox.com/some/thing"];
+    
+    MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+    std::string testData("test data");
+    [os putResourceWithUrl:styleURL data:[NSData dataWithBytes:testData.c_str() length:testData.length()] modified:nil expires:nil etag:nil mustRevalidate:NO];
+    
+    auto fs = os.mbglFileSource;
+    const mbgl::Resource resource { mbgl::Resource::Unknown, "https://api.mapbox.com/some/thing" };
+    std::unique_ptr<mbgl::AsyncRequest> req;
+    req = fs->request(resource, [&](mbgl::Response res) {
+        req.reset();
+        XCTAssertFalse(res.error.get(), @"Request should not return an error");
+        XCTAssertTrue(res.data.get(), @"Request should return data");
+        XCTAssertFalse(res.modified, @"Request should not have a modification timestamp");
+        XCTAssertFalse(res.expires, @"Request should not have an expiration timestamp");
+        XCTAssertFalse(res.etag, @"Request should not have an entity tag");
+        XCTAssertFalse(res.mustRevalidate, @"Request should not require revalidation");
+        XCTAssertEqual("test data", *res.data, @"Request did not return expected data");
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    });
+    
+    CFRunLoopRun();
+}
+
+-(void) testPutResourceForURLWithTimestamps {
+    NSURL *styleURL = [NSURL URLWithString:@"https://api.mapbox.com/some/thing"];
+    
+    MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+    std::string testData("test data");
+    NSDate* now = [NSDate date];
+    NSDate* future = [now dateByAddingTimeInterval:600];
+    [os putResourceWithUrl:styleURL data:[NSData dataWithBytes:testData.c_str() length:testData.length()] modified:now expires:future etag:@"some etag" mustRevalidate:YES];
+    
+    auto fs = os.mbglFileSource;
+    const mbgl::Resource resource { mbgl::Resource::Unknown, "https://api.mapbox.com/some/thing" };
+    std::unique_ptr<mbgl::AsyncRequest> req;
+    req = fs->request(resource, [&](mbgl::Response res) {
+        req.reset();
+        XCTAssertFalse(res.error.get(), @"Request should not return an error");
+        XCTAssertTrue(res.data.get(), @"Request should return data");
+        XCTAssertTrue(res.modified, @"Request should have a modification timestamp");
+        XCTAssertEqual(MGLTimeIntervalFromDuration(res.modified->time_since_epoch()), floor(now.timeIntervalSince1970), @"Modification timestamp should roundtrip");
+        XCTAssertTrue(res.expires, @"Request should have an expiration timestamp");
+        XCTAssertEqual(MGLTimeIntervalFromDuration(res.expires->time_since_epoch()), floor(future.timeIntervalSince1970), @"Expiration timestamp should roundtrip");
+        XCTAssertTrue(res.etag, @"Request should have an entity tag");
+        XCTAssertEqual(*res.etag, "some etag", @"Entity tag should roundtrip");
+        XCTAssertTrue(res.mustRevalidate, @"Request should require revalidation");
+        XCTAssertEqual("test data", *res.data, @"Request did not return expected data");
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    });
+    
+    CFRunLoopRun();
 }
 
 @end

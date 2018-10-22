@@ -8,7 +8,7 @@
 #pragma mark - Tests
 
 - (void)waitForMapViewToBeRendered {
-    [self waitForMapViewToBeRenderedWithTimeout:1];
+    [self waitForMapViewToBeRenderedWithTimeout:5];
 }
 
 // This test does not strictly need to be in this test file/target. Including here for convenience.
@@ -186,7 +186,7 @@
         XCTAssertNil(mapView2.style);
 
         self.styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
-        [self waitForExpectationsWithTimeout:1 handler:nil];
+        [self waitForExpectationsWithTimeout:10 handler:nil];
 
         MGLOpenGLStyleLayer *layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
         weakLayer = layer;

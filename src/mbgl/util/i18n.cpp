@@ -556,6 +556,9 @@ bool hasRotatedVerticalOrientation(char16_t chr) {
     return !(hasUprightVerticalOrientation(chr) || hasNeutralVerticalOrientation(chr));
 }
 
+// Replaces "horizontal" with "vertical" punctuation in place
+// Does not re-order or change length of string
+// (TaggedString::verticalizePunctuation depends on this behavior)
 std::u16string verticalizePunctuation(const std::u16string& input) {
     std::u16string output;
 

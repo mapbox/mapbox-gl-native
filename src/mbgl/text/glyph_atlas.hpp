@@ -12,7 +12,7 @@ struct GlyphPosition {
 };
 
 using GlyphPositionMap = std::map<GlyphID, GlyphPosition>;
-using GlyphPositions = std::map<FontStack, GlyphPositionMap>;
+using GlyphPositions = std::map<FontStackHash, GlyphPositionMap>;
 
 class GlyphAtlas {
 public:

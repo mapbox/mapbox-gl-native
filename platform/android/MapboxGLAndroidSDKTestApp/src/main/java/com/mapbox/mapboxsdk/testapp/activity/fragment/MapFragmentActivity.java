@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.activity.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -68,13 +69,13 @@ public class MapFragmentActivity extends AppCompatActivity implements MapFragmen
   }
 
   @Override
-  public void onMapReady(MapboxMap map) {
+  public void onMapReady(@NonNull MapboxMap map) {
     mapboxMap = map;
   }
 
   @Override
   public void onMapChanged(int change) {
-    if (initialCameraAnimation && change == MapView.DID_FINISH_RENDERING_MAP_FULLY_RENDERED) {
+    if (initialCameraAnimation && change == MapView.DID_FINISH_RENDERING_MAP_FULLY_RENDERED && mapboxMap != null) {
       mapboxMap.animateCamera(
         CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().tilt(45.0).build()), 5000);
       initialCameraAnimation = false;

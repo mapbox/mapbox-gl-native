@@ -4,6 +4,9 @@
 @implementation UIDevice (MGLAdditions)
 
 - (NSString *)modelString {
+#if TARGET_OS_SIMULATOR
+    return [[[NSProcessInfo processInfo] environment] objectForKey:@"SIMULATOR_MODEL_IDENTIFIER"];
+#else
     char *typeSpecifier = "hw.machine";
 
     size_t size;
@@ -16,6 +19,7 @@
 
     free(answer);
     return results;
+#endif
 }
 
 - (BOOL)mgl_isLegacyDevice {
@@ -42,8 +46,6 @@
             return YES;
         }
     }
-
-    // TODO: Also handle simulator using something like `ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"]`.
 
     return NO;
 }

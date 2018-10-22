@@ -5,6 +5,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
+#include <mbgl/style/expression/formatted.hpp>
 
 #include <mbgl/util/color.hpp>
 
@@ -121,9 +122,9 @@ public:
     PropertyValue<AlignmentType> getTextRotationAlignment() const;
     void setTextRotationAlignment(PropertyValue<AlignmentType>);
 
-    static PropertyValue<std::string> getDefaultTextField();
-    PropertyValue<std::string> getTextField() const;
-    void setTextField(PropertyValue<std::string>);
+    static PropertyValue<expression::Formatted> getDefaultTextField();
+    PropertyValue<expression::Formatted> getTextField() const;
+    void setTextField(PropertyValue<expression::Formatted>);
 
     static PropertyValue<std::vector<std::string>> getDefaultTextFont();
     PropertyValue<std::vector<std::string>> getTextFont() const;

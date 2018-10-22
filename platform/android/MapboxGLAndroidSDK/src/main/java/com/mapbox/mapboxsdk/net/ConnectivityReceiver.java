@@ -32,7 +32,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
    * @param context the context to extract the application context from
    * @return single instance of ConnectivityReceiver
    */
-  public static synchronized ConnectivityReceiver instance(Context context) {
+  public static synchronized ConnectivityReceiver instance(@NonNull Context context) {
     if (INSTANCE == null) {
       // Register new instance
       INSTANCE = new ConnectivityReceiver(context.getApplicationContext());
@@ -43,6 +43,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     return INSTANCE;
   }
 
+  @NonNull
   private List<ConnectivityListener> listeners = new CopyOnWriteArrayList<>();
   private Context context;
   private int activationCounter;
@@ -83,7 +84,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
    * {@inheritDoc}
    */
   @Override
-  public void onReceive(Context context, Intent intent) {
+  public void onReceive(@NonNull Context context, Intent intent) {
     boolean connected = isConnected(context);
     Logger.v(TAG, String.format("Connected: %s", connected));
 
@@ -117,7 +118,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
    * @param context current Context
    * @return true if connected
    */
-  public boolean isConnected(Context context) {
+  public boolean isConnected(@NonNull Context context) {
     Boolean connected = Mapbox.isConnected();
     if (connected != null) {
       // Connectivity state overridden by app

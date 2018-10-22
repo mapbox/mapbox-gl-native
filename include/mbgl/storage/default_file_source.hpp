@@ -160,10 +160,20 @@ public:
      * expired while the file source was paused.
      */
     void resume();
+    
+    /*
+     * Insert the provided resource into the ambient cache
+     *
+     * Consumers of the resource will expect the uncompressed version; the
+     * OfflineDatabase will determine whether to compress the data on disk.
+     * This call is asynchronous: the data may not be immediately available
+     * for in-progress requests, although subsequent requests should have
+     * access to the cached data.
+     */
+    void put(const Resource&, const Response&);
 
     // For testing only.
     void setOnlineStatus(bool);
-    void put(const Resource&, const Response&);
 
     class Impl;
 

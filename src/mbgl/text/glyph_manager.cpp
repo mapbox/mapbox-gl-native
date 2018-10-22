@@ -130,7 +130,7 @@ void GlyphManager::notify(GlyphRequestor& requestor, const GlyphDependencies& gl
         const FontStack& fontStack = dependency.first;
         const GlyphIDs& glyphIDs = dependency.second;
 
-        Glyphs& glyphs = response[fontStack];
+        Glyphs& glyphs = response[FontStackHasher()(fontStack)];
         Entry& entry = entries[fontStack];
 
         for (const auto& glyphID : glyphIDs) {

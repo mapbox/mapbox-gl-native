@@ -4,18 +4,17 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
-import com.mapbox.mapboxsdk.style.layers.LineLayer;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
 
@@ -24,12 +23,23 @@ import java.net.URL;
 
 import timber.log.Timber;
 
-import static com.mapbox.mapboxsdk.style.expressions.Expression.array;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.gte;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.gt;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.lt;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.has;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.toNumber;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap;
+
 
 /**
  * Test activity showcasing adding a Circle Layer to the Map
@@ -39,6 +49,10 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
  */
 public class CircleLayerActivity extends AppCompatActivity implements View.OnClickListener {
 
+  public static final String SOURCE_ID = "bus_stop";
+  public static final String SOURCE_ID_CLUSTER = "bus_stop_cluster";
+  public static final String URL_BUS_ROUTES = "https://raw.githubusercontent.com/cheeaun/busrouter-sg/master/data/2/bus-stops.geojson";
+  public static final String LAYER_ID = "stops_layer";
   private MapView mapView;
   private MapboxMap mapboxMap;
 
@@ -56,7 +70,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_circle_layer);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
@@ -69,8 +83,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
 
   private void addBusStopSource() {
     try {
-      source = new GeoJsonSource("bus_stop",
-        new URL("https://raw.githubusercontent.com/cheeaun/busrouter-sg/master/data/2/bus-stops.geojson"));
+      source = new GeoJsonSource(SOURCE_ID, new URL(URL_BUS_ROUTES));
     } catch (MalformedURLException exception) {
       Timber.e(exception, "That's not an url... ");
     }
@@ -78,20 +91,20 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
   }
 
   private void addBusStopCircleLayer() {
-    layer = new CircleLayer("stops_layer", "bus_stop");
+    layer = new CircleLayer(LAYER_ID, SOURCE_ID);
     layer.setProperties(
       circleColor(Color.parseColor("#FF9800")),
       circleRadius(2.0f)
     );
-    mapboxMap.addLayer(layer);
+    mapboxMap.addLayerBelow(layer, "waterway-label");
   }
 
   private void initFloatingActionButtons() {
-    routeFab = (FloatingActionButton) findViewById(R.id.fab_route);
+    routeFab = findViewById(R.id.fab_route);
     routeFab.setColorFilter(ContextCompat.getColor(CircleLayerActivity.this, R.color.primary));
     routeFab.setOnClickListener(CircleLayerActivity.this);
 
-    styleFab = (FloatingActionButton) findViewById(R.id.fab_style);
+    styleFab = findViewById(R.id.fab_style);
     styleFab.setOnClickListener(CircleLayerActivity.this);
   }
 
@@ -102,49 +115,88 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
     }
 
     if (view.getId() == R.id.fab_route) {
-      showBusRoute();
+      showBusCluster();
     } else if (view.getId() == R.id.fab_style) {
       changeMapStyle();
     }
   }
 
-  private void showBusRoute() {
+  private void showBusCluster() {
     removeFabs();
-    applyBusRouteFilterToBusStopSource();
-    addBusRouteSource();
-    addBusRouteLayer();
+    removeOldSource();
+    addClusteredSource();
+  }
+
+  private void removeOldSource() {
+    mapboxMap.removeSource(SOURCE_ID);
+    mapboxMap.removeLayer(LAYER_ID);
+  }
+
+  private void addClusteredSource() {
+    try {
+      mapboxMap.addSource(
+        new GeoJsonSource(SOURCE_ID_CLUSTER,
+          new URL(URL_BUS_ROUTES),
+          new GeoJsonOptions()
+            .withCluster(true)
+            .withClusterMaxZoom(14)
+            .withClusterRadius(50)
+        )
+      );
+    } catch (MalformedURLException malformedUrlException) {
+      Timber.e(malformedUrlException, "That's not an url... ");
+    }
+
+    // Add unclustered layer
+    int[][] layers = new int[][] {
+      new int[] {150, ResourcesCompat.getColor(getResources(), R.color.redAccent, getTheme())},
+      new int[] {20, ResourcesCompat.getColor(getResources(), R.color.greenAccent, getTheme())},
+      new int[] {0, ResourcesCompat.getColor(getResources(), R.color.blueAccent, getTheme())}
+    };
+
+    SymbolLayer unclustered = new SymbolLayer("unclustered-points", SOURCE_ID_CLUSTER);
+    unclustered.setProperties(
+      iconImage("bus-15")
+    );
+
+    mapboxMap.addLayer(unclustered);
+
+    for (int i = 0; i < layers.length; i++) {
+      // Add some nice circles
+      CircleLayer circles = new CircleLayer("cluster-" + i, SOURCE_ID_CLUSTER);
+      circles.setProperties(
+        circleColor(layers[i][1]),
+        circleRadius(18f)
+      );
+
+      Expression pointCount = toNumber(get("point_count"));
+      circles.setFilter(
+        i == 0
+          ? all(has("point_count"),
+          gte(pointCount, literal(layers[i][0]))
+        ) : all(has("point_count"),
+          gt(pointCount, literal(layers[i][0])),
+          lt(pointCount, literal(layers[i - 1][0]))
+        )
+      );
+      mapboxMap.addLayer(circles);
+    }
+
+    // Add the count labels
+    SymbolLayer count = new SymbolLayer("count", SOURCE_ID_CLUSTER);
+    count.setProperties(
+      textField(Expression.toString(get("point_count"))),
+      textSize(12f),
+      textColor(Color.WHITE),
+      textIgnorePlacement(true),
+      textAllowOverlap(true)
+    );
+    mapboxMap.addLayer(count);
   }
 
   private void removeFabs() {
     routeFab.setVisibility(View.GONE);
     styleFab.setVisibility(View.GONE);
-  }
-
-  private void applyBusRouteFilterToBusStopSource() {
-    layer.setFilter(has(Expression.toString(get("number")), array(literal(Data.STOPS_FOR_ROUTE))));
-  }
-
-  private void addBusRouteSource() {
-    try {
-      mapboxMap.addSource(new GeoJsonSource("bus_route",
-        new URL("https://gist.githubusercontent.com/tobrun/7fbc0fe7e9ffea509f7608cda2601d5d/raw/"
-          + "a4b8cc289020f91fa2e1553524820054395e36f5/line.geojson")));
-    } catch (MalformedURLException malformedUrlException) {
-      Timber.e(malformedUrlException, "That's not an url... ");
-    }
-  }
-
-  private void addBusRouteLayer() {
-    LineLayer lineLayer = new LineLayer("route_layer", "bus_route");
-    mapboxMap.addLayerBelow(lineLayer, "stops_layer");
-    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(
-      new CameraPosition.Builder()
-        .target(new LatLng(1.3896777, 103.9874997))
-        .bearing(225)
-        .tilt(45)
-        .zoom(13)
-        .build()
-    ), 1750);
   }
 
   private void changeMapStyle() {
@@ -221,13 +273,6 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
   }
 
   private static class Data {
-    private static final String[] STOPS_FOR_ROUTE = new String[] {"99009", "99131", "99049", "99039", "99029", "99019",
-      "98079", "98069", "97099", "97089", "97079", "97069", "97209", "97059", "97049", "97039", "97019", "96069",
-      "96059", "96049", "96099", "96089", "96079", "85079", "85089", "85069", "85059", "85099", "84069", "84059",
-      "84049", "84039", "84029", "84019", "83099", "83079", "83059", "83049", "83029", "82069", "82049", "82029",
-      "82109", "81069", "81049", "81029", "80089", "80069", "80049", "80039", "80029", "01319", "01219", "01129",
-      "01059", "01119", "01019", "04159", "04149", "04229", "04239", "05059", "05049", "05039", "05019", "10589"};
-
     private static final String[] STYLES = new String[] {
       Style.MAPBOX_STREETS,
       Style.OUTDOORS,

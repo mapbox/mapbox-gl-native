@@ -2,9 +2,48 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
-## master
-- Add `symbol-z-order` symbol layout property to style spec [#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783)
-- Fixed bugs in coercion expression operators ("to-array" applied to empty arrays, "to-color" applied to colors, and "to-number" applied to null) [#12864](https://github.com/mapbox/mapbox-gl-native/pull/12864)
+## 6.7.0-alpha.1 - October 17, 2018
+ - Core format expression integration [#12624](https://github.com/mapbox/mapbox-gl-native/pull/12624)
+ - Remove obsolete catch block in getLayerAs [#13091](https://github.com/mapbox/mapbox-gl-native/pull/13091)
+ - Include Mapbox SDK Services proguard configuration [#13103](https://github.com/mapbox/mapbox-gl-native/pull/13103)
+ - Avoid printing exception for valid code path when loading FileSource [#13102](https://github.com/mapbox/mapbox-gl-native/pull/13102)
+ - Add equals, hashcode and toString to camera update types [#13089](https://github.com/mapbox/mapbox-gl-native/pull/13089)
+ - Infer nullity, optimise codebase for consumption by kotlin [#13071](https://github.com/mapbox/mapbox-gl-native/pull/13071)
+ - Replace OnMapchange with specific callbacks [#13050](https://github.com/mapbox/mapbox-gl-native/pull/13050)
+ - Offline region creation telemetry event [#12544](https://github.com/mapbox/mapbox-gl-native/pull/12544)
+
+## 6.6.1 - October 17, 2018
+ - Use appcompat resource configuration for vector drawables [#13114](https://github.com/mapbox/mapbox-gl-native/pull/13114)
+ - Reverse order of prioritising shape vs marker click handling [#13059](https://github.com/mapbox/mapbox-gl-native/pull/13059)
+
+## 6.6.0 - October 11, 2018
+ - Fixed an issue where fill and line layers would occasionally flicker on zoom [#12982](https://github.com/mapbox/mapbox-gl-native/pull/12982)
+
+## 6.6.0-beta.1 - October 3, 2018
+ - Add configuration to change the animation duration multiplier when tracking location [#13011](https://github.com/mapbox/mapbox-gl-native/pull/13011)
+ - Move camera and puck immediately when starting to track and displacement is big [#13013](https://github.com/mapbox/mapbox-gl-native/pull/13013)
+
+## 6.6.0-alpha.2 - September 26, 2018
+ - Expose offline database merge API [#12860](https://github.com/mapbox/mapbox-gl-native/pull/12860)
+ - Remove unnecessary camera callbacks loops [#12973](https://github.com/mapbox/mapbox-gl-native/pull/12973)
+ - Fix an issue where `OnCameraMoveListener#onCameraMove` would not get invoked while using `LocationComponent` [#12932](https://github.com/mapbox/mapbox-gl-native/pull/12932)
+ - Try not to re-draw tiles when coming back from background [#12844](https://github.com/mapbox/mapbox-gl-native/pull/12844)
+ - Proguard config revision [#12929](https://github.com/mapbox/mapbox-gl-native/pull/12929)
+ - Improve compatibility of offline packs between devices [#12933](https://github.com/mapbox/mapbox-gl-native/pull/12933)
+ - Update telemetry dependency to 3.2.1 [#12974](https://github.com/mapbox/mapbox-gl-native/pull/12974)
+ - Fix an issue where some tiles weren't rendered correctly when no internet connectivity was available [#12931](https://github.com/mapbox/mapbox-gl-native/pull/12931)
+ 
+## 6.6.0-alpha.1 - September 19, 2018
+ - Merge LocationLayerPlugin to the Maps SDK [#12786](https://github.com/mapbox/mapbox-gl-native/pull/12786)
+ - Add `symbol-z-order` symbol layout property to style spec [#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783)
+ - Add "crossSourceCollisions" map option [#12842](https://github.com/mapbox/mapbox-gl-native/pull/12842)
+ - "is-supported-script" expression support [#12845](https://github.com/mapbox/mapbox-gl-native/pull/12845)
+ - Update isEmulator check [#12832](https://github.com/mapbox/mapbox-gl-native/pull/12832)
+ - Prevent crash when expression evaluates to default, no pattern [#12896](https://github.com/mapbox/mapbox-gl-native/pull/12896)
+ - Fixed bugs in coercion expression operators ("to-array" applied to empty arrays, "to-color" applied to colors, and "to-number" applied to null) [#12864](https://github.com/mapbox/mapbox-gl-native/pull/12864)
+ - Update proguard config to not warn about AutoValue [#12920](https://github.com/mapbox/mapbox-gl-native/pull/12920)
+ - Remove nunicode from android binding [#12497](https://github.com/mapbox/mapbox-gl-native/pull/12497)
+ - Correct LatLngBounds exception message [#12816](https://github.com/mapbox/mapbox-gl-native/pull/12816)
 
 ## 6.5.0 - September 11, 2018
  - Fixed a cubic-bezier interpolation bug. [#12812](https://github.com/mapbox/mapbox-gl-native/issues/12812)

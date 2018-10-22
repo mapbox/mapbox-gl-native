@@ -29,18 +29,20 @@ TEST(Expression, IsExpression) {
 
     for(auto& entry : allExpressions.GetObject()) {
         const std::string name { entry.name.GetString(), entry.name.GetStringLength() };
-        if (name == "line-progress" ||
-            name == "feature-state" ||
-            name == "interpolate-hcl" ||
-            name == "interpolate-lab" ||
-            name == "format") {
-            // Not yet implemented
-            continue;
-        }
         JSDocument document;
         document.Parse<0>(R"([")" + name + R"("])");
-
         const JSValue* expression = &document;
+
+        // TODO:   "feature-state": https://github.com/mapbox/mapbox-gl-native/issues/12613
+        // TODO: "interpolate-hcl": https://github.com/mapbox/mapbox-gl-native/issues/8720
+        // TODO: "interpolate-lab": https://github.com/mapbox/mapbox-gl-native/issues/8720
+        if (name == "feature-state" || name == "interpolate-hcl" || name == "interpolate-lab") {
+            if (expression::isExpression(conversion::Convertible(expression))) {
+                ASSERT_TRUE(false) << "Expression name" << name << "is implemented - please update Expression.IsExpression test.";
+            }
+            continue;
+        }
+
         EXPECT_TRUE(expression::isExpression(conversion::Convertible(expression))) << name;
     }
 }

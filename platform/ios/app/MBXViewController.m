@@ -14,10 +14,11 @@
 #import <objc/runtime.h>
 
 static const CLLocationCoordinate2D WorldTourDestinations[] = {
-    { .latitude = 38.9131982, .longitude = -77.0325453144239 },
-    { .latitude = 37.7757368, .longitude = -122.4135302 },
-    { .latitude = 12.9810816, .longitude = 77.6368034 },
-    { .latitude = -13.15589555, .longitude = -74.2178961777998 },
+    { .latitude = 38.8999418, .longitude = -77.033996 },
+    { .latitude = 37.7884307, .longitude = -122.3998631 },
+    { .latitude = 52.5003103, .longitude = 13.4197763 },
+    { .latitude = 60.1712627, .longitude = 24.9378866 },
+    { .latitude = 53.8948782, .longitude = 27.5558476 },
 };
 
 static const MGLCoordinateBounds colorado = {
@@ -1561,7 +1562,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
     [annotations removeObjectAtIndex:0];
     MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:nextAnnotation.coordinate
-                                                            fromDistance:10
+                                                          acrossDistance:10
                                                                    pitch:arc4random_uniform(60)
                                                                  heading:arc4random_uniform(360)];
     __weak MBXViewController *weakSelf = self;
@@ -1740,7 +1741,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     [self addAnnotations:50 aroundCoordinate:annotation.coordinate radius:100000.0]; // 100km
 
     MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:annotation.coordinate
-                                                            fromDistance:10000.0
+                                                                altitude:10000.0
                                                                    pitch:drand48()*60.0
                                                                  heading:drand48()*360];
     [self.mapView flyToCamera:camera

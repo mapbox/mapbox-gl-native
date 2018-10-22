@@ -14,12 +14,15 @@ BUILDTYPE=${BUILDTYPE:-Debug}
 BUILD_FOR_DEVICE=${BUILD_DEVICE:-true}
 SYMBOLS=${SYMBOLS:-YES}
 
+FORMAT=${FORMAT:-dynamic}
 BUILD_DYNAMIC=true
-BUILD_STATIC=true
+BUILD_STATIC=false
 if [[ ${FORMAT} == "static" ]]; then
+    BUILD_STATIC=true
     BUILD_DYNAMIC=false
-elif [[ ${FORMAT} == "dynamic" ]]; then
-    BUILD_STATIC=false
+elif [[ ${FORMAT} != "dynamic" ]]; then
+    echo "Error: FORMAT must be dynamic or static."
+    exit 1
 fi
 
 SDK=iphonesimulator
@@ -32,7 +35,7 @@ function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
 trap finish EXIT
 
-step "Configuring ${FORMAT:-dynamic and static} ${BUILDTYPE} framework for ${SDK} ${IOS_SDK_VERSION}; symbols: ${SYMBOLS}"
+step "Configuring ${FORMAT} framework for ${SDK} ${IOS_SDK_VERSION} (symbols: ${SYMBOLS}, buildtype: ${BUILDTYPE})"
 
 xcodebuild -version
 
@@ -59,13 +62,11 @@ SHORT_VERSION=${SEM_VERSION%-*}
 step "Building targets (build ${PROJ_VERSION}, version ${SEM_VERSION})"
 
 SCHEME='dynamic'
-if [[ ${BUILD_DYNAMIC} == true && ${BUILD_STATIC} == true ]]; then
-    SCHEME+='+static'
-elif [[ ${BUILD_STATIC} == true ]]; then
+if [[ ${BUILD_STATIC} == true ]]; then
     SCHEME='static'
 fi
 
-step "Building for iOS Simulator using scheme ${SCHEME}"
+step "Building ${FORMAT} framework for iOS Simulator using ${SCHEME} scheme"
 xcodebuild \
     CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
     CURRENT_SHORT_VERSION=${SHORT_VERSION} \
@@ -80,7 +81,7 @@ xcodebuild \
     -jobs ${JOBS} | tee ${LOG_PATH} | xcpretty
 
 if [[ ${BUILD_FOR_DEVICE} == true ]]; then
-    step "Building for iOS devices using scheme ${SCHEME}"
+    step "Building ${FORMAT} framework for iOS devices using ${SCHEME} scheme"
     xcodebuild \
         CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
         CURRENT_SHORT_VERSION=${SHORT_VERSION} \
@@ -137,8 +138,8 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
             ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.framework/${NAME} \
             -create -output ${OUTPUT}/dynamic/${NAME}.framework/${NAME} | echo
     fi
-
-    cp -rv ${PRODUCTS}/${BUILDTYPE}-iphoneos/Settings.bundle ${OUTPUT}
+    
+    cp -rv platform/ios/app/Settings.bundle ${OUTPUT}
 else
     if [[ ${BUILD_STATIC} == true ]]; then
         step "Assembling static library for iOS Simulator…"
@@ -162,8 +163,8 @@ else
                 ${OUTPUT}/dynamic/
         fi
     fi
-
-    cp -rv ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/Settings.bundle ${OUTPUT}
+    
+    cp -rv platform/ios/app/Settings.bundle ${OUTPUT}
 fi
 
 if [[ ${SYMBOLS} = NO ]]; then

@@ -1,27 +1,22 @@
 package com.mapbox.mapboxsdk.testapp.activity;
 
 import android.app.Activity;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingRegistry;
 import android.support.test.espresso.IdlingResourceTimeoutException;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
-
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
 import com.mapbox.mapboxsdk.testapp.action.WaitAction;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
-
 import junit.framework.Assert;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
-
 import timber.log.Timber;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -46,21 +41,22 @@ public abstract class BaseActivityTest {
       Timber.e(String.format("%s - %s", testNameRule.getMethodName(), "@Before test: register idle resource"));
       idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
       IdlingRegistry.getInstance().register(idlingResource);
-      checkViewIsDisplayed(R.id.mapView);
+      Espresso.onIdle();
       mapboxMap = idlingResource.getMapboxMap();
     } catch (IdlingResourceTimeoutException idlingResourceTimeoutException) {
-      Timber.e("Idling resource timed out. Couldn't not validate if map is ready.");
-      throw new RuntimeException("Could not start test for " + getActivityClass().getSimpleName() + ".\n"
-        + "The ViewHierarchy doesn't contain a view with resource id = R.id.mapView or \n"
-        + "the Activity doesn't contain an instance variable with a name equal to mapboxMap.\n"
-        + "You can resolve this issue by adding the requirements above or\n add "
-        + getActivityClass().getSimpleName() + " to the platform/android/scripts/exclude-activity-gen.json to blacklist"
-        + " the Activity from being generated.\n");
+      throw new RuntimeException(String.format("Could not start %s test for %s.\n  Either the ViewHierarchy doesn't "
+          + "contain a view with resource id = R.id.mapView or \n the hosting Activity wasn't in an idle state.",
+        testNameRule.getMethodName(),
+        getActivityClass().getSimpleName())
+      );
     }
   }
 
   protected void validateTestSetup() {
-    Assert.assertTrue("Device is not connected to the Internet.", isConnected(rule.getActivity()));
+    if (!Mapbox.isConnected()) {
+      Timber.e("Not connected to the internet while running test");
+    }
+
     checkViewIsDisplayed(R.id.mapView);
     Assert.assertNotNull(mapboxMap);
   }
@@ -81,13 +77,6 @@ public abstract class BaseActivityTest {
 
   protected void waitAction(long waitTime) {
     onView(withId(R.id.mapView)).perform(new WaitAction(waitTime));
-  }
-
-  static boolean isConnected(Context context) {
-    ConnectivityManager connectivityManager
-      = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
   }
 
   protected ViewInteraction onMapView() {

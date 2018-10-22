@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.support.annotation.FloatRange;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.Mapbox;
@@ -67,7 +68,7 @@ public class MarkerView extends Marker {
    *
    * @param baseMarkerViewOptions the builder used to construct the MarkerView
    */
-  public MarkerView(BaseMarkerViewOptions baseMarkerViewOptions) {
+  public MarkerView(@NonNull BaseMarkerViewOptions baseMarkerViewOptions) {
     super(baseMarkerViewOptions);
     this.alpha = baseMarkerViewOptions.getAlpha();
     this.anchorU = baseMarkerViewOptions.getAnchorU();
@@ -384,7 +385,7 @@ public class MarkerView extends Marker {
    * @param mapboxMap the MapboxMap instances.
    */
   @Override
-  public void setMapboxMap(MapboxMap mapboxMap) {
+  public void setMapboxMap(@Nullable MapboxMap mapboxMap) {
     super.setMapboxMap(mapboxMap);
     if (mapboxMap != null) {
       if (isFlat()) {
@@ -410,6 +411,7 @@ public class MarkerView extends Marker {
    *
    * @return the String representation.
    */
+  @NonNull
   @Override
   public String toString() {
     return "MarkerView [position[" + getPosition() + "]]";

@@ -252,18 +252,24 @@ void GeometryTileWorker::coalesce() {
 
 void GeometryTileWorker::onGlyphsAvailable(GlyphMap newGlyphMap) {
     for (auto& newFontGlyphs : newGlyphMap) {
-        const FontStack& fontStack = newFontGlyphs.first;
+        FontStackHash fontStack = newFontGlyphs.first;
         Glyphs& newGlyphs = newFontGlyphs.second;
 
         Glyphs& glyphs = glyphMap[fontStack];
-        GlyphIDs& pendingGlyphIDs = pendingGlyphDependencies[fontStack];
+        for (auto& pendingGlyphDependency : pendingGlyphDependencies) {
+            // Linear lookup here to handle reverse of FontStackHash -> FontStack,
+            // since dependencies need the full font stack name to make a request
+            // There should not be many fontstacks to look through
+            if (FontStackHasher()(pendingGlyphDependency.first) == fontStack) {
+                GlyphIDs& pendingGlyphIDs = pendingGlyphDependency.second;
+                for (auto& newGlyph : newGlyphs) {
+                    const GlyphID& glyphID = newGlyph.first;
+                    optional<Immutable<Glyph>>& glyph = newGlyph.second;
 
-        for (auto& newGlyph : newGlyphs) {
-            const GlyphID& glyphID = newGlyph.first;
-            optional<Immutable<Glyph>>& glyph = newGlyph.second;
-
-            if (pendingGlyphIDs.erase(glyphID)) {
-                glyphs.emplace(glyphID, std::move(glyph));
+                    if (pendingGlyphIDs.erase(glyphID)) {
+                        glyphs.emplace(glyphID, std::move(glyph));
+                    }
+                }
             }
         }
     }
@@ -282,7 +288,7 @@ void GeometryTileWorker::onImagesAvailable(ImageMap newIconMap, ImageMap newPatt
 
 void GeometryTileWorker::requestNewGlyphs(const GlyphDependencies& glyphDependencies) {
     for (auto& fontDependencies : glyphDependencies) {
-        auto fontGlyphs = glyphMap.find(fontDependencies.first);
+        auto fontGlyphs = glyphMap.find(FontStackHasher()(fontDependencies.first));
         for (auto glyphID : fontDependencies.second) {
             if (fontGlyphs == glyphMap.end() || fontGlyphs->second.find(glyphID) == fontGlyphs->second.end()) {
                 pendingGlyphDependencies[fontDependencies.first].insert(glyphID);

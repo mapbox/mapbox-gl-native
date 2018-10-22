@@ -75,9 +75,12 @@ import static com.mapbox.mapboxsdk.location.LocationComponentConstants.DEFAULT_T
 public final class LocationComponent {
   private static final String TAG = "Mbgl-LocationComponent";
 
+  @NonNull
   private final MapboxMap mapboxMap;
   private LocationComponentOptions options;
+  @Nullable
   private LocationEngine locationEngine;
+  @Nullable
   private CompassEngine compassEngine;
   private boolean usingInternalLocationEngine;
 
@@ -90,6 +93,7 @@ public final class LocationComponent {
    * Holds last location which is being returned in the {@link #getLastKnownLocation()}
    * when there is no {@link #locationEngine} set or when the last location returned by the engine is null.
    */
+  @Nullable
   private Location lastLocation;
   private CameraPosition lastCameraPosition;
 
@@ -339,12 +343,13 @@ public final class LocationComponent {
    *
    * @param options to update the current style
    */
-  public void applyStyle(LocationComponentOptions options) {
+  public void applyStyle(@NonNull LocationComponentOptions options) {
     this.options = options;
     locationLayerController.applyStyle(options);
     locationCameraController.initializeOptions(options);
     staleStateManager.setEnabled(options.enableStaleState());
     staleStateManager.setDelayTime(options.staleStateTimeout());
+    locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options.trackingAnimationDurationMultiplier());
     updateMapWithOptions(options);
   }
 
@@ -769,9 +774,11 @@ public final class LocationComponent {
       options);
     locationCameraController = new LocationCameraController(
       context, mapboxMap, cameraTrackingChangedListener, options, onCameraMoveInvalidateListener);
+
     locationAnimatorCoordinator = new LocationAnimatorCoordinator();
     locationAnimatorCoordinator.addLayerListener(locationLayerController);
     locationAnimatorCoordinator.addCameraListener(locationCameraController);
+    locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options.trackingAnimationDurationMultiplier());
 
     WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
     SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
@@ -828,7 +835,7 @@ public final class LocationComponent {
    *
    * @param location the latest user location
    */
-  private void updateLocation(final Location location, boolean fromLastLocation) {
+  private void updateLocation(@Nullable final Location location, boolean fromLastLocation) {
     if (location == null) {
       return;
     } else if (!isLayerReady) {
@@ -899,6 +906,7 @@ public final class LocationComponent {
     locationAnimatorCoordinator.feedNewAccuracyRadius(Utils.calculateZoomLevelRadius(mapboxMap, location), noAnimation);
   }
 
+  @NonNull
   private OnCameraMoveListener onCameraMoveListener = new OnCameraMoveListener() {
     @Override
     public void onCameraMove() {
@@ -906,6 +914,7 @@ public final class LocationComponent {
     }
   };
 
+  @NonNull
   private OnCameraIdleListener onCameraIdleListener = new OnCameraIdleListener() {
     @Override
     public void onCameraIdle() {
@@ -913,6 +922,7 @@ public final class LocationComponent {
     }
   };
 
+  @NonNull
   private OnMapClickListener onMapClickListener = new OnMapClickListener() {
     @Override
     public void onMapClick(@NonNull LatLng point) {
@@ -924,6 +934,7 @@ public final class LocationComponent {
     }
   };
 
+  @NonNull
   private MapboxMap.OnMapLongClickListener onMapLongClickListener = new MapboxMap.OnMapLongClickListener() {
     @Override
     public void onMapLongClick(@NonNull LatLng point) {
@@ -935,6 +946,7 @@ public final class LocationComponent {
     }
   };
 
+  @NonNull
   private OnLocationStaleListener onLocationStaleListener = new OnLocationStaleListener() {
     @Override
     public void onStaleStateChange(boolean isStale) {
@@ -946,6 +958,7 @@ public final class LocationComponent {
     }
   };
 
+  @NonNull
   private OnCameraMoveInvalidateListener onCameraMoveInvalidateListener = new OnCameraMoveInvalidateListener() {
     @Override
     public void onInvalidateCameraMove() {
@@ -953,6 +966,7 @@ public final class LocationComponent {
     }
   };
 
+  @NonNull
   private CompassListener compassListener = new CompassListener() {
     @Override
     public void onCompassChanged(float userHeading) {
@@ -965,6 +979,7 @@ public final class LocationComponent {
     }
   };
 
+  @NonNull
   private LocationEngineListener locationEngineListener = new LocationEngineListener() {
     @Override
     @SuppressWarnings( {"MissingPermission"})
@@ -980,6 +995,7 @@ public final class LocationComponent {
     }
   };
 
+  @NonNull
   private OnCameraTrackingChangedListener cameraTrackingChangedListener = new OnCameraTrackingChangedListener() {
     @Override
     public void onCameraTrackingDismissed() {

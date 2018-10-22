@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.module.http;
 
+import android.support.annotation.NonNull;
 import okhttp3.OkHttpClient;
 import okio.Buffer;
 
@@ -44,6 +45,7 @@ public class HttpRequestUtil {
     HttpRequestImpl.setOkHttpClient(client);
   }
 
+  @NonNull
   static String toHumanReadableAscii(String s) {
     for (int i = 0, length = s.length(), c; i < length; i += Character.charCount(c)) {
       c = s.codePointAt(i);

@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.maps.renderer.glsurfaceview;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 
+import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.maps.renderer.egl.EGLConfigChooser;
 
@@ -19,6 +20,7 @@ import static android.opengl.GLSurfaceView.RENDERMODE_WHEN_DIRTY;
  */
 public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceView.Renderer {
 
+  @NonNull
   private final GLSurfaceView glSurfaceView;
 
   public GLSurfaceViewMapRenderer(Context context,
@@ -30,6 +32,7 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
     glSurfaceView.setEGLConfigChooser(new EGLConfigChooser());
     glSurfaceView.setRenderer(this);
     glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
+    glSurfaceView.setPreserveEGLContextOnPause(true);
   }
 
   @Override

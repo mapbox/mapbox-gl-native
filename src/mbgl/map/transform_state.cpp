@@ -130,6 +130,26 @@ ViewportMode TransformState::getViewportMode() const {
     return viewportMode;
 }
 
+#pragma mark - Camera options
+
+CameraOptions TransformState::getCameraOptions(const EdgeInsets& padding) const {
+    CameraOptions camera;
+
+    if (padding.isFlush()) {
+        camera.center = getLatLng();
+    } else {
+        ScreenCoordinate point = padding.getCenter(size.width, size.height);
+        point.y = size.height - point.y;
+        camera.center = screenCoordinateToLatLng(point).wrapped();
+    }
+    camera.padding = padding;
+    camera.zoom = getZoom();
+    camera.angle = -angle * util::RAD2DEG;
+    camera.pitch = pitch * util::RAD2DEG;
+
+    return camera;
+}
+
 #pragma mark - Position
 
 LatLng TransformState::getLatLng(LatLng::WrapMode wrapMode) const {
@@ -352,20 +372,25 @@ bool TransformState::rotatedNorth() const {
 }
 
 void TransformState::constrain(double& scale_, double& x_, double& y_) const {
-    // Constrain minimum scale to avoid zooming out far enough to show off-world areas.
-    scale_ = util::max(scale_,
-                       static_cast<double>(rotatedNorth() ? size.height : size.width) / util::tileSize,
-                       static_cast<double>(rotatedNorth() ? size.width : size.height) / util::tileSize);
-
-    // Constrain min/max pan to avoid showing off-world areas.
-    if (constrainMode == ConstrainMode::WidthAndHeight) {
-        double max_x = (scale_ * util::tileSize - (rotatedNorth() ? size.height : size.width)) / 2;
-        x_ = std::max(-max_x, std::min(x_, max_x));
+    if (constrainMode == ConstrainMode::None) {
+        return;
     }
 
-    if (constrainMode != ConstrainMode::None) {
-        double max_y = (scale_ * util::tileSize - (rotatedNorth() ? size.width : size.height)) / 2;
-        y_ = std::max(-max_y, std::min(y_, max_y));
+    const double ratioX = (rotatedNorth() ? size.height : size.width) / util::tileSize;
+    const double ratioY = (rotatedNorth() ? size.width : size.height) / util::tileSize;
+
+    // Constrain minimum scale to avoid zooming out far enough to show off-world areas on the Y axis.
+    // If Y axis ratio is too small to be constrained, use X axis ratio instead.
+    scale_ = util::max(scale_, ratioY < 1.0 ? ratioX : ratioY);
+
+    // Constrain min/max pan to avoid showing off-world areas on the Y axis.
+    double max_y = (scale_ * util::tileSize - (rotatedNorth() ? size.width : size.height)) / 2;
+    y_ = std::max(-max_y, std::min(y_, max_y));
+
+    if (constrainMode == ConstrainMode::WidthAndHeight) {
+        // Constrain min/max pan to avoid showing off-world areas on the X axis.
+        double max_x = (scale_ * util::tileSize - (rotatedNorth() ? size.height : size.width)) / 2;
+        x_ = std::max(-max_x, std::min(x_, max_x));
     }
 }
 

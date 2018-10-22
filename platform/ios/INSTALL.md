@@ -81,7 +81,7 @@ A nightly build of the dynamic framework, based on the master branch, is availab
 
 You can alternatively install the SDK as a static framework:
 
-1. Build from source using the `make ipackage` command.
+1. Build from source using the `make iframework FORMAT=static BUILDTYPE=Release` command.
 
 1. Drag the Mapbox.bundle and Mapbox.framework from the `build/ios/pkg/static/` directory into the Project navigator. In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish. Open the project editor and select your application target to verify that the following changes occurred automatically:
 
@@ -109,7 +109,7 @@ You can alternatively install the SDK as a static framework:
 To test pre-releases and/or betas, you can reference the pre-release like so in your Podfile:
 
 ```rb
-pod 'Mapbox-iOS-SDK', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/<insert branch or tag>/platform/ios/Mapbox-iOS-SDK.podspec'
+pod 'Mapbox-iOS-SDK-symbols', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/<insert branch or tag>/platform/ios/Mapbox-iOS-SDK-symbols.podspec'
 ```
 
 ##### Testing nightly releases with CocoaPods

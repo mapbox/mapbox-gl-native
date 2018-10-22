@@ -8,6 +8,16 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
+EvaluationResult toBoolean(const Value& v) {
+    return v.match(
+        [&] (double f) { return static_cast<bool>(f); },
+        [&] (const std::string& s) { return s.length() > 0; },
+        [&] (bool b) { return b; },
+        [&] (const NullValue&) { return false; },
+        [&] (const auto&) { return true; }
+    );
+}
+
 EvaluationResult toNumber(const Value& v) {
     optional<double> result = v.match(
         [](NullValue) -> optional<double> { return 0.0; },
@@ -72,33 +82,60 @@ EvaluationResult toColor(const Value& colorValue) {
     );
 }
 
+EvaluationResult toFormatted(const Value& formattedValue) {
+    return Formatted(toString(formattedValue).c_str());
+}
+
 Coercion::Coercion(type::Type type_, std::vector<std::unique_ptr<Expression>> inputs_) :
     Expression(Kind::Coercion, std::move(type_)),
     inputs(std::move(inputs_))
 {
     assert(!inputs.empty());
     type::Type t = getType();
-    if (t.is<type::NumberType>()) {
-        coerceSingleValue = toNumber;
+    if (t.is<type::BooleanType>()) {
+        coerceSingleValue = toBoolean;
     } else if (t.is<type::ColorType>()) {
         coerceSingleValue = toColor;
+    } else if (t.is<type::NumberType>()) {
+        coerceSingleValue = toNumber;
+    } else if (t.is<type::StringType>()) {
+        coerceSingleValue = [] (const Value& v) -> EvaluationResult { return toString(v); };
+    } else if (t.is<type::FormattedType>()) {
+        coerceSingleValue = toFormatted;
     } else {
         assert(false);
     }
 }
 
+mbgl::Value Coercion::serialize() const {
+    if (getType().is<type::FormattedType>()) {
+        // Since there's no explicit "to-formatted" coercion, the only coercions should be created
+        // by string expressions that get implicitly coerced to "formatted".
+        std::vector<mbgl::Value> serialized{{ std::string("format") }};
+        serialized.push_back(inputs[0]->serialize());
+        serialized.push_back(std::unordered_map<std::string, mbgl::Value>());
+        return serialized;
+    } else {
+        return Expression::serialize();
+    }
+};
+    
 std::string Coercion::getOperator() const {
     return getType().match(
-      [](const type::NumberType&) { return "to-number"; },
+      [](const type::BooleanType&) { return "to-boolean"; },
       [](const type::ColorType&) { return "to-color"; },
+      [](const type::NumberType&) { return "to-number"; },
+      [](const type::StringType&) { return "to-string"; },
       [](const auto&) { assert(false); return ""; });
 }
 
 using namespace mbgl::style::conversion;
 ParseResult Coercion::parse(const Convertible& value, ParsingContext& ctx) {
     static std::unordered_map<std::string, type::Type> types {
+        {"to-boolean", type::Boolean},
+        {"to-color", type::Color},
         {"to-number", type::Number},
-        {"to-color", type::Color}
+        {"to-string", type::String}
     };
 
     std::size_t length = arrayLength(value);
@@ -110,7 +147,18 @@ ParseResult Coercion::parse(const Convertible& value, ParsingContext& ctx) {
 
     auto it = types.find(*toString(arrayMember(value, 0)));
     assert(it != types.end());
+
+    if ((it->second == type::Boolean || it->second == type::String || it->second == type::Formatted) && length != 2) {
+        ctx.error("Expected one argument.");
+        return ParseResult();
+    }
     
+    /**
+     * Special form for error-coalescing coercion expressions "to-number",
+     * "to-color".  Since these coercions can fail at runtime, they accept multiple
+     * arguments, only evaluating one at a time until one succeeds.
+     */
+
     std::vector<std::unique_ptr<Expression>> parsed;
     parsed.reserve(length - 1);
     for (std::size_t i = 1; i < length; i++) {
@@ -163,6 +211,3 @@ std::vector<optional<Value>> Coercion::possibleOutputs() const {
 } // namespace expression
 } // namespace style
 } // namespace mbgl
-
-
-

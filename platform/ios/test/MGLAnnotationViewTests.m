@@ -85,7 +85,7 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
     MGLTestAnnotation *annotation = [[MGLTestAnnotation alloc] init];
     [_mapView addAnnotation:annotation];
 
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
 
     XCTAssert(_mapView.annotations.count == 1, @"number of annotations should be 1");
     XCTAssertNotNil(_annotationView.annotation, @"annotation property should not be nil");

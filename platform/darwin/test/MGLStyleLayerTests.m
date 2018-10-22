@@ -37,6 +37,13 @@
     if (isBoolean) {
         if ([components.firstObject isEqualToString:@"is"]) {
             [components removeObjectAtIndex:0];
+
+            // Xcode 10 incorrectly classifies "optional" as a verb, so return early to avoid the verb checks.
+            // https://openradar.appspot.com/44149950
+            if ([components.lastObject isEqualToString:@"optional"] && NSFoundationVersionNumber >= 1548) {
+                return;
+            }
+
             if (![components.lastObject.lexicalClasses containsObject:NSLinguisticTagAdjective]) {
                 XCTAssertTrue([components.lastObject.lexicalClasses containsObject:NSLinguisticTagVerb],
                               @"Boolean getter %@ that starts with “is” should contain an adjective, past participle, or verb.", name);

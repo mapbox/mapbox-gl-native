@@ -214,7 +214,8 @@ TEST(OfflineDownload, Activate) {
     };
 
     test.fileSource.spriteImageResponse = [&] (const Resource& resource) {
-        EXPECT_EQ("http://127.0.0.1:3000/sprite.png", resource.url);
+        EXPECT_TRUE(resource.url == "http://127.0.0.1:3000/sprite.png" ||
+                    resource.url == "http://127.0.0.1:3000/sprite@2x.png");
         return test.response("sprite.png");
     };
 
@@ -224,7 +225,8 @@ TEST(OfflineDownload, Activate) {
     };
 
     test.fileSource.spriteJSONResponse = [&] (const Resource& resource) {
-        EXPECT_EQ("http://127.0.0.1:3000/sprite.json", resource.url);
+        EXPECT_TRUE(resource.url == "http://127.0.0.1:3000/sprite.json" ||
+                    resource.url == "http://127.0.0.1:3000/sprite@2x.json");
         return test.response("sprite.json");
     };
 
@@ -251,7 +253,7 @@ TEST(OfflineDownload, Activate) {
 
     observer->statusChangedFn = [&] (OfflineRegionStatus status) {
         if (status.complete()) {
-            EXPECT_EQ(262u, status.completedResourceCount); // 256 glyphs, 1 tile, 1 style, source, image, sprite image, and sprite json
+            EXPECT_EQ(264u, status.completedResourceCount); // 256 glyphs, 2 sprite images, 2 sprite jsons, 1 tile, 1 style, source, image
             EXPECT_EQ(test.size, status.completedResourceSize);
 
             download.setState(OfflineRegionDownloadState::Inactive);
@@ -334,7 +336,7 @@ TEST(OfflineDownload, GetStatusStyleComplete) {
     EXPECT_EQ(OfflineRegionDownloadState::Inactive, status.downloadState);
     EXPECT_EQ(1u, status.completedResourceCount);
     EXPECT_EQ(test.size, status.completedResourceSize);
-    EXPECT_EQ(261u, status.requiredResourceCount);
+    EXPECT_EQ(263u, status.requiredResourceCount);
     EXPECT_FALSE(status.requiredResourceCountIsPrecise);
     EXPECT_FALSE(status.complete());
 }
@@ -361,7 +363,7 @@ TEST(OfflineDownload, GetStatusStyleAndSourceComplete) {
     EXPECT_EQ(OfflineRegionDownloadState::Inactive, status.downloadState);
     EXPECT_EQ(2u, status.completedResourceCount);
     EXPECT_EQ(test.size, status.completedResourceSize);
-    EXPECT_EQ(262u, status.requiredResourceCount);
+    EXPECT_EQ(264u, status.requiredResourceCount);
     EXPECT_TRUE(status.requiredResourceCountIsPrecise);
     EXPECT_FALSE(status.complete());
 }

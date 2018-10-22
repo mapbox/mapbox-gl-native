@@ -135,6 +135,18 @@ typedef void (^MGLOfflinePackAdditionCompletionHandler)(MGLOfflinePack * _Nullab
 typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error);
 
 /**
+ A block to be called once the contents of a file are copied into the current packs.
+ 
+ @param fileURL The file URL of the offline database containing the offline packs
+ that were copied.
+ @param packs An array of all known offline packs, or `nil` if there was an error
+ creating or adding the pack.
+ @param error A pointer to an error object (if any) indicating why the pack could
+ not be created or added.
+ */
+typedef void (^MGLBatchedOfflinePackAdditionCompletionHandler)(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error);
+
+/**
  The type of resource that is requested.
  */
 typedef NS_ENUM(NSUInteger, MGLResourceKind) {
@@ -173,6 +185,42 @@ MGL_EXPORT
  Returns the shared offline storage object.
  */
 @property (class, nonatomic, readonly) MGLOfflineStorage *sharedOfflineStorage;
+
+#pragma mark - Adding Contents of File
+
+/**
+ Adds the offline packs located at the given file path to offline storage.
+ 
+ The file must be a valid offline region database bundled with the application
+ or downloaded separately.
+ 
+ The resulting packs are added or updated to the shared offline storage object’s `packs`
+ property, then the `completion` block is executed.
+ 
+ @param filePath A string representation of the file path. The file path must be
+ writable as schema updates may be perfomed.
+ @param completion The completion handler to call once the contents of the given
+ file has been added to offline storage. This handler is executed asynchronously
+ on the main queue.
+ */
+- (void)addContentsOfFile:(NSString *)filePath withCompletionHandler:(nullable MGLBatchedOfflinePackAdditionCompletionHandler)completion;
+
+/**
+ Adds the offline packs located at the given URL to offline storage.
+ 
+ The file must be a valid offline region database bundled with the application
+ or downloaded separately.
+ 
+ The resulting packs are added or updated to the shared offline storage object’s `packs`
+ property, then the `completion` block is executed.
+ 
+ @param fileURL A file URL specifying the file to add. URL should be a valid system path.
+ The file URL must be writable as schema updates may be performed.
+ @param completion The completion handler to call once the contents of the given
+ file has been added to offline storage. This handler is executed asynchronously
+ on the main queue.
+ */
+- (void)addContentsOfURL:(NSURL *)fileURL withCompletionHandler:(nullable MGLBatchedOfflinePackAdditionCompletionHandler)completion;
 
 #pragma mark - Accessing the Delegate
 
@@ -290,6 +338,27 @@ MGL_EXPORT
  as part of an offline pack or due to caching during normal use of `MGLMapView`.
  */
 @property (nonatomic, readonly) unsigned long long countOfBytesCompleted;
+
+/*
+ * Insert the provided resource into the ambient cache
+ * This method mimics the caching that would take place if the equivalent
+ * resource were requested in the process of map rendering.
+ * Use this method to pre-warm the cache with resources you know
+ * will be requested.
+ *
+ * This call is asynchronous: the data may not be immediately available
+ * for in-progress requests, although subsequent requests should have
+ * access to the cached data.
+ *
+ * @param url The URL of the resource to insert
+ * @param data Response data to store for this resource. Data is expected to be uncompressed; internally, the cache will compress data as necessary.
+ * @param modified Optional "modified" response header
+ * @param expires Optional "expires" response header
+ * @param etag Optional "entity tag" response header
+ * @param mustRevalidate Indicates whether response can be used after it's stale
+ */
+-(void)putResourceWithUrl:(NSURL *)url data:(NSData *)data modified:(NSDate * _Nullable)modified expires:(NSDate * _Nullable)expires etag:(NSString * _Nullable)etag mustRevalidate:(BOOL)mustRevalidate;
+
 
 @end
 

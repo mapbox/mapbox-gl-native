@@ -37,10 +37,11 @@ type::Type parseType(v8::Local<v8::Object> type) {
     static std::unordered_map<std::string, type::Type> types = {
         {"string", type::String},
         {"number", type::Number},
-        {"noolean", type::Boolean},
+        {"boolean", type::Boolean},
         {"object", type::Object},
         {"color", type::Color},
-        {"value", type::Value}
+        {"value", type::Value},
+        {"formatted", type::Formatted}
     };
 
     v8::Local<v8::Value> v8kind = Nan::Get(type, Nan::New("kind").ToLocalChecked()).ToLocalChecked();
@@ -150,6 +151,33 @@ struct ToValue {
         assert(false);
         Nan::EscapableHandleScope scope;
         return scope.Escape(Nan::Null());
+    }
+    
+    v8::Local<v8::Value> operator()(const Formatted& formatted) {
+        // This mimics the internal structure of the Formatted class in formatted.js
+        // A better approach might be to use the explicit serialized form
+        // both here and on the JS side? e.g. toJS(fromExpressionValue<mbgl::Value>(formatted))
+        std::unordered_map<std::string, mbgl::Value> serialized;
+        std::vector<mbgl::Value> sections;
+        for (const auto& section : formatted.sections) {
+            std::unordered_map<std::string, mbgl::Value> serializedSection;
+            serializedSection.emplace("text", section.text);
+            if (section.fontScale) {
+                serializedSection.emplace("scale", *section.fontScale);
+            } else {
+                serializedSection.emplace("scale", mbgl::NullValue());
+            }
+            if (section.fontStack) {
+                std::string fontStackString;
+                serializedSection.emplace("fontStack", mbgl::fontStackToString(*section.fontStack));
+            } else {
+                serializedSection.emplace("fontStack", mbgl::NullValue());
+            }
+            sections.push_back(serializedSection);
+        }
+        serialized.emplace("sections", sections);
+
+        return toJS(serialized);
     }
 
     v8::Local<v8::Value> operator()(const mbgl::Color& color) {

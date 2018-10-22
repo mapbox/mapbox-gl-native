@@ -450,8 +450,8 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
     }
     
     CameraOptions options = mbgl::cameraForLatLngs(latLngs, transform, padding);
-    options.angle = transform.getAngle();
-    options.pitch = transform.getPitch();
+    options.angle = -transform.getAngle() * util::RAD2DEG;
+    options.pitch = transform.getPitch() * util::RAD2DEG;
     
     return options;
 }

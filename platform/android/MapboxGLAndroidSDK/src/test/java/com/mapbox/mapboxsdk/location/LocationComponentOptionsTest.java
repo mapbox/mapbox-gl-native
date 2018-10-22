@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 
+import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.R;
 
 import org.junit.Before;
@@ -27,6 +28,7 @@ public class LocationComponentOptionsTest {
   @Mock
   private Resources resources;
 
+  @NonNull
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 

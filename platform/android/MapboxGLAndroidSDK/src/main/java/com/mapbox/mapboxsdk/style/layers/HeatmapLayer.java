@@ -62,6 +62,7 @@ public class HeatmapLayer extends Layer {
    * @param sourceLayer the source layer to set
    * @return This
    */
+  @NonNull
   public HeatmapLayer withSourceLayer(String sourceLayer) {
     setSourceLayer(sourceLayer);
     return this;
@@ -72,6 +73,7 @@ public class HeatmapLayer extends Layer {
    *
    * @return id of the source
    */
+  @NonNull
   public String getSourceId() {
     checkThread();
     return nativeGetSourceId();
@@ -82,6 +84,7 @@ public class HeatmapLayer extends Layer {
    *
    * @return sourceLayer the source layer to get
    */
+  @NonNull
   public String getSourceLayer() {
     checkThread();
     return nativeGetSourceLayer();
@@ -92,7 +95,7 @@ public class HeatmapLayer extends Layer {
    *
    * @param filter the expression filter to set
    */
-  public void setFilter(Expression filter) {
+  public void setFilter(@NonNull Expression filter) {
     checkThread();
     nativeSetFilter(filter.toArray());
   }
@@ -103,7 +106,8 @@ public class HeatmapLayer extends Layer {
    * @param filter the expression filter to set
    * @return This
    */
-  public HeatmapLayer withFilter(Expression filter) {
+  @NonNull
+  public HeatmapLayer withFilter(@NonNull Expression filter) {
     setFilter(filter);
     return this;
   }
@@ -130,6 +134,7 @@ public class HeatmapLayer extends Layer {
    * @param properties the var-args properties
    * @return This
    */
+  @NonNull
   public HeatmapLayer withProperties(@NonNull PropertyValue<?>... properties) {
     setProperties(properties);
     return this;
@@ -142,6 +147,7 @@ public class HeatmapLayer extends Layer {
    *
    * @return property wrapper value around Float
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getHeatmapRadius() {
     checkThread();
@@ -153,6 +159,7 @@ public class HeatmapLayer extends Layer {
    *
    * @return transition options for Float
    */
+  @NonNull
   public TransitionOptions getHeatmapRadiusTransition() {
     checkThread();
     return nativeGetHeatmapRadiusTransition();
@@ -163,7 +170,7 @@ public class HeatmapLayer extends Layer {
    *
    * @param options transition options for Float
    */
-  public void setHeatmapRadiusTransition(TransitionOptions options) {
+  public void setHeatmapRadiusTransition(@NonNull TransitionOptions options) {
     checkThread();
     nativeSetHeatmapRadiusTransition(options.getDuration(), options.getDelay());
   }
@@ -173,6 +180,7 @@ public class HeatmapLayer extends Layer {
    *
    * @return property wrapper value around Float
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getHeatmapWeight() {
     checkThread();
@@ -184,6 +192,7 @@ public class HeatmapLayer extends Layer {
    *
    * @return property wrapper value around Float
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getHeatmapIntensity() {
     checkThread();
@@ -195,6 +204,7 @@ public class HeatmapLayer extends Layer {
    *
    * @return transition options for Float
    */
+  @NonNull
   public TransitionOptions getHeatmapIntensityTransition() {
     checkThread();
     return nativeGetHeatmapIntensityTransition();
@@ -205,7 +215,7 @@ public class HeatmapLayer extends Layer {
    *
    * @param options transition options for Float
    */
-  public void setHeatmapIntensityTransition(TransitionOptions options) {
+  public void setHeatmapIntensityTransition(@NonNull TransitionOptions options) {
     checkThread();
     nativeSetHeatmapIntensityTransition(options.getDuration(), options.getDelay());
   }
@@ -215,6 +225,7 @@ public class HeatmapLayer extends Layer {
    *
    * @return property wrapper value around String
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getHeatmapColor() {
     checkThread();
@@ -243,6 +254,7 @@ public class HeatmapLayer extends Layer {
    *
    * @return property wrapper value around Float
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getHeatmapOpacity() {
     checkThread();
@@ -254,6 +266,7 @@ public class HeatmapLayer extends Layer {
    *
    * @return transition options for Float
    */
+  @NonNull
   public TransitionOptions getHeatmapOpacityTransition() {
     checkThread();
     return nativeGetHeatmapOpacityTransition();
@@ -264,38 +277,46 @@ public class HeatmapLayer extends Layer {
    *
    * @param options transition options for Float
    */
-  public void setHeatmapOpacityTransition(TransitionOptions options) {
+  public void setHeatmapOpacityTransition(@NonNull TransitionOptions options) {
     checkThread();
     nativeSetHeatmapOpacityTransition(options.getDuration(), options.getDelay());
   }
 
+  @NonNull
   @Keep
   private native Object nativeGetHeatmapRadius();
 
+  @NonNull
   @Keep
   private native TransitionOptions nativeGetHeatmapRadiusTransition();
 
   @Keep
   private native void nativeSetHeatmapRadiusTransition(long duration, long delay);
 
+  @NonNull
   @Keep
   private native Object nativeGetHeatmapWeight();
 
+  @NonNull
   @Keep
   private native Object nativeGetHeatmapIntensity();
 
+  @NonNull
   @Keep
   private native TransitionOptions nativeGetHeatmapIntensityTransition();
 
   @Keep
   private native void nativeSetHeatmapIntensityTransition(long duration, long delay);
 
+  @NonNull
   @Keep
   private native Object nativeGetHeatmapColor();
 
+  @NonNull
   @Keep
   private native Object nativeGetHeatmapOpacity();
 
+  @NonNull
   @Keep
   private native TransitionOptions nativeGetHeatmapOpacityTransition();
 

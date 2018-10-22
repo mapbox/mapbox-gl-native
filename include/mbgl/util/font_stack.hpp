@@ -11,11 +11,12 @@ namespace mbgl {
 
 // An array of font names
 using FontStack = std::vector<std::string>;
+using FontStackHash = std::size_t;
 
 std::string fontStackToString(const FontStack&);
 
-struct FontStackHash {
-    std::size_t operator()(const FontStack&) const;
+struct FontStackHasher {
+    FontStackHash operator()(const FontStack&) const;
 };
 
 // Statically evaluate layer properties to determine what font stacks are used.

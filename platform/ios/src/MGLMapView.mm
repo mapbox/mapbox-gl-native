@@ -90,7 +90,7 @@ const MGLMapViewDecelerationRate MGLMapViewDecelerationRateImmediate = 0.0;
 
 const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondDefault = -1;
 const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondLowPower = 30;
-const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondMaximum = 60;
+const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondMaximum = 0;
 
 const MGLExceptionName MGLMissingLocationServicesUsageDescriptionException = @"MGLMissingLocationServicesUsageDescriptionException";
 const MGLExceptionName MGLUserLocationAnnotationTypeException = @"MGLUserLocationAnnotationTypeException";
@@ -437,8 +437,9 @@ public:
     _mbglThreadPool = mbgl::sharedThreadPool();
 
     auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, *config.fileSource, *_mbglThreadPool, config.contextMode, config.cacheDir, config.localFontFamilyName);
+    BOOL enableCrossSourceCollisions = !config.perSourceCollisions;
     _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView);
-    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *[config fileSource], *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
+    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *[config fileSource], *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default, enableCrossSourceCollisions);
 
     // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {
@@ -636,6 +637,9 @@ public:
     _glView.layer.opaque = _opaque;
     _glView.delegate = self;
 
+    CAEAGLLayer *eaglLayer = MGL_OBJC_DYNAMIC_CAST(_glView.layer, CAEAGLLayer);
+    eaglLayer.presentsWithTransaction = YES;
+    
     [_glView bindDrawable];
     [self insertSubview:_glView atIndex:0];
     _glView.contentMode = UIViewContentModeCenter;
@@ -985,8 +989,6 @@ public:
     if ( ! self.dormant || ! _rendererFrontend)
     {
         _rendererFrontend->render();
-
-        [self updateUserLocationAnnotationView];
     }
 }
 
@@ -1117,6 +1119,11 @@ public:
     {
         _needsDisplayRefresh = NO;
 
+        // Update UIKit elements, prior to rendering
+        [self updateUserLocationAnnotationView];
+        [self updateAnnotationViews];
+        [self updateCalloutView];
+        
         [self.glView display];
     }
 
@@ -1212,6 +1219,10 @@ public:
         // CADisplayLink.frameInterval does not support more than 60 FPS (and
         // no device that supports >60 FPS ever supported iOS 9).
         NSInteger maximumFrameRate = 60;
+
+        // `0` is an alias for maximum frame rate.
+        newFrameRate = newFrameRate ?: maximumFrameRate;
+
         _displayLink.frameInterval = maximumFrameRate / MIN(newFrameRate, maximumFrameRate);
     }
 }
@@ -1959,7 +1970,7 @@ public:
     MGLMapCamera *camera;
     
     mbgl::ScreenCoordinate anchor = mbgl::ScreenCoordinate { anchorPoint.x, anchorPoint.y };
-    currentCameraOptions.angle = degrees * mbgl::util::DEG2RAD;
+    currentCameraOptions.angle = degrees;
     currentCameraOptions.anchor = anchor;
     camera = [self cameraForCameraOptions:currentCameraOptions];
     
@@ -1973,7 +1984,7 @@ public:
     
     MGLMapCamera *camera;
 
-    currentCameraOptions.pitch = pitch * mbgl::util::DEG2RAD;
+    currentCameraOptions.pitch = pitch;
     camera = [self cameraForCameraOptions:currentCameraOptions];
     
     return camera;
@@ -2388,9 +2399,9 @@ public:
     auto camera = _mbglMap->getStyle().getDefaultCamera();
     CGFloat pitch = *camera.pitch;
     CLLocationDirection heading = mbgl::util::wrap(*camera.angle, 0., 360.);
-    CLLocationDistance distance = MGLAltitudeForZoomLevel(*camera.zoom, pitch, 0, self.frame.size);
+    CLLocationDistance altitude = MGLAltitudeForZoomLevel(*camera.zoom, pitch, 0, self.frame.size);
     self.camera = [MGLMapCamera cameraLookingAtCenterCoordinate:MGLLocationCoordinate2DFromLatLng(*camera.center)
-                                                   fromDistance:distance
+                                                       altitude:altitude
                                                           pitch:pitch
                                                         heading:heading];
 }
@@ -3465,7 +3476,7 @@ public:
     CLLocationDirection direction = cameraOptions.angle ? mbgl::util::wrap(-MGLDegreesFromRadians(*cameraOptions.angle), 0., 360.) : self.direction;
     CGFloat pitch = cameraOptions.pitch ? MGLDegreesFromRadians(*cameraOptions.pitch) : _mbglMap->getPitch();
     CLLocationDistance altitude = MGLAltitudeForZoomLevel(zoomLevel, pitch, centerCoordinate.latitude, self.frame.size);
-    return [MGLMapCamera cameraLookingAtCenterCoordinate:centerCoordinate fromDistance:altitude pitch:pitch heading:direction];
+    return [MGLMapCamera cameraLookingAtCenterCoordinate:centerCoordinate altitude:altitude pitch:pitch heading:direction];
 }
 
 /// Returns a CameraOptions object that specifies parameters for animating to
@@ -5247,10 +5258,15 @@ public:
         self.targetCoordinate,
     };
     UIEdgeInsets inset = self.edgePaddingForFollowingWithCourse;
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     if (self.userLocationVerticalAlignment == MGLAnnotationVerticalAlignmentCenter)
     {
         inset.bottom = CGRectGetMaxY(self.bounds) - CGRectGetMidY(self.contentFrame);
     }
+#pragma clang diagnostic pop
+
     [self _setVisibleCoordinates:foci
                            count:sizeof(foci) / sizeof(foci[0])
                      edgePadding:inset
@@ -5273,9 +5289,9 @@ public:
                                                    correctPoint.x - CGRectGetMidX(bounds),
                                                    correctPoint.y - CGRectGetMidY(bounds));
     return UIEdgeInsetsMake(CGRectGetMinY(boundsAroundCorrectPoint) - CGRectGetMinY(bounds),
-                            self.contentInset.left,
+                            CGRectGetMaxX(boundsAroundCorrectPoint) - CGRectGetMaxX(bounds),
                             CGRectGetMaxY(bounds) - CGRectGetMaxY(boundsAroundCorrectPoint),
-                            self.contentInset.right);
+                            CGRectGetMaxX(bounds) - CGRectGetMaxX(boundsAroundCorrectPoint));
 }
 
 /// Returns the edge padding to apply during bifocal course tracking.
@@ -5310,10 +5326,13 @@ public:
 
         if (direction >= 0)
         {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
             if (self.userLocationVerticalAlignment == MGLAnnotationVerticalAlignmentTop)
             {
                 direction += 180;
             }
+#pragma clang diagnostic pop
         }
     }
     return direction;
@@ -5709,8 +5728,7 @@ public:
         _isChangingAnnotationLayers = NO;
         [self.style didChangeValueForKey:@"layers"];
     }
-    [self updateAnnotationViews];
-    [self updateCalloutView];
+
     if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingFrame:fullyRendered:)])
     {
         [self.delegate mapViewDidFinishRenderingFrame:self fullyRendered:fullyRendered];
@@ -5766,9 +5784,6 @@ public:
     {
         return;
     }
-
-    [CATransaction begin];
-    [CATransaction setDisableActions:YES];
 
     // If the map is pitched consider the viewport to be exactly the same as the bounds.
     // Otherwise, add a small buffer.
@@ -5864,8 +5879,6 @@ public:
             }
         }
     }
-
-    [CATransaction commit];
 }
 
 - (void)updateCalloutView
@@ -5951,12 +5964,8 @@ public:
     {
         // Smoothly move the user location annotation view and callout view to
         // the new location.
-        [UIView animateWithDuration:duration
-                              delay:0
-                            options:(UIViewAnimationOptionCurveLinear |
-                                     UIViewAnimationOptionAllowUserInteraction |
-                                     UIViewAnimationOptionBeginFromCurrentState)
-                         animations:^{
+        
+        dispatch_block_t animation = ^{
             if (self.selectedAnnotation == self.userLocation)
             {
                 UIView <MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
@@ -5965,7 +5974,20 @@ public:
                                                  userPoint.y - annotationView.center.y);
             }
             annotationView.center = userPoint;
-        } completion:NULL];
+        };
+        
+        if (duration > 0) {
+            [UIView animateWithDuration:duration
+                                  delay:0
+                                options:(UIViewAnimationOptionCurveLinear |
+                                         UIViewAnimationOptionAllowUserInteraction |
+                                         UIViewAnimationOptionBeginFromCurrentState)
+                             animations:animation
+                             completion:NULL];
+        }
+        else {
+            animation();
+        }
         _userLocationAnimationCompletionDate = [NSDate dateWithTimeIntervalSinceNow:duration];
 
         annotationView.hidden = NO;
@@ -5988,15 +6010,23 @@ public:
 /// the overall map view (but respecting the content inset).
 - (CGPoint)userLocationAnnotationViewCenter
 {
+    if ([self.delegate respondsToSelector:@selector(mapViewUserLocationAnchorPoint:)])
+    {
+        CGPoint anchorPoint = [self.delegate mapViewUserLocationAnchorPoint:self];
+        return CGPointMake(anchorPoint.x + self.contentInset.left, anchorPoint.y + self.contentInset.top);
+    }
+    
     CGRect contentFrame = UIEdgeInsetsInsetRect(self.contentFrame, self.edgePaddingForFollowingWithCourse);
+    
     if (CGRectIsEmpty(contentFrame))
     {
         contentFrame = self.contentFrame;
     }
+    
     CGPoint center = CGPointMake(CGRectGetMidX(contentFrame), CGRectGetMidY(contentFrame));
 
-    // When tracking course, it’s more important to see the road ahead, so
-    // weight the user dot down towards the bottom.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     switch (self.userLocationVerticalAlignment) {
         case MGLAnnotationVerticalAlignmentCenter:
             break;
@@ -6007,7 +6037,8 @@ public:
             center.y = CGRectGetMaxY(contentFrame);
             break;
     }
-
+#pragma clang dianostic pop
+    
     return center;
 }
 

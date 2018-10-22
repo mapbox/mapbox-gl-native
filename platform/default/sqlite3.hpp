@@ -67,6 +67,8 @@ class StatementImpl;
 class Query;
 class Transaction;
 
+void setTempPath(const std::string&);
+
 class Database {
 private:
     Database(std::unique_ptr<DatabaseImpl>);

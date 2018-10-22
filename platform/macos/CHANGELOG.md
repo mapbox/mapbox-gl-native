@@ -5,12 +5,24 @@
 ### Styles and rendering
 
 * Added an `MGLSymbolStyleLayer.symbolZOrder` property for forcing point features in a symbol layer to be layered in the same order that they are specified in the layer’s associated source. ([#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783))
+* Fixed a crash when a style layer `*-pattern` property evaluates to nil for a particular feature. ([#12896](https://github.com/mapbox/mapbox-gl-native/pull/12896))
+* Fixed an issue where fill and line layers would occasionally flicker on zoom ([#12982](https://github.com/mapbox/mapbox-gl-native/pull/12982))
+
+### Offline maps
+
+* Added `-[MGLOfflineStorage addContentsOfFile:withCompletionHandler:]` and `-[MGLOfflineStorage addContentsOfURL:withCompletionHandler:]` methods to add pregenerated offline packs to offline storage. ([#12791](https://github.com/mapbox/mapbox-gl-native/pull/12791))
+* Fixed an issue where some tiles weren't rendered correctly when no internet connectivity was available ([#12931](https://github.com/mapbox/mapbox-gl-native/pull/12931))
 
 ### Other changes	
 
+* Added `MGLAltitudeForZoomLevel` and `MGLZoomLevelForAltitude` to public API for conversion between zoom levels and altitudes. ([#12986](https://github.com/mapbox/mapbox-gl-native/pull/12986))
+* Deprecated the `+[MGLMapCamera cameraLookingAtCenterCoordinate:fromDistance:pitch:heading:]` method in favor of `+[MGLMapCamera cameraLookingAtCenterCoordinate:altitude:pitch:heading:]` and `+[MGLMapCamera cameraLookingAtCenterCoordinate:acrossDistance:pitch:heading:]`. ([#12966](https://github.com/mapbox/mapbox-gl-native/pull/12966))
+* Fixed an issue where `+[MGLMapCamera cameraLookingAtCenterCoordinate:fromEyeCoordinate:eyeAltitude:]` created a camera looking from the wrong eye coordinate. ([#12966](https://github.com/mapbox/mapbox-gl-native/pull/12966))
+* Added an `MGLMapCamera.viewingDistance` property based on the existing `MGLMapCamera.altitude` property. ([#12966](https://github.com/mapbox/mapbox-gl-native/pull/12966))
 * Fixed an issue where `-[MGLMapSnapshotter startWithQueue:completionHandler:]` failed to call its completion handler in some cases. ([#12355](https://github.com/mapbox/mapbox-gl-native/pull/12355))
 * Fixed an issue where `MGLMapView` produced a designable error in Interface Builder storyboards in Xcode 10. ([#12883](https://github.com/mapbox/mapbox-gl-native/pull/12883))
 * Fixed bugs in coercion expression operators ("to-array" applied to empty arrays, "to-color" applied to colors, and "to-number" applied to null) [#12864](https://github.com/mapbox/mapbox-gl-native/pull/12864)
+* Added the `MGLCollisionBehaviorPre4_0` Info.plist key for applications that require the collision detection behavior in version v0.6 of the SDK. ([#12941](https://github.com/mapbox/mapbox-gl-native/pull/12941))
 
 # 0.11.0 - September 13, 2018
 

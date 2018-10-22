@@ -109,12 +109,14 @@ test/src/mbgl/test/util.cpp
 test/src/mbgl/test/util.hpp
 
 # text
+test/text/bidi.test.cpp
 test/text/cross_tile_symbol_index.test.cpp
 test/text/glyph_manager.test.cpp
 test/text/glyph_pbf.test.cpp
 test/text/language_tag.test.cpp
 test/text/local_glyph_rasterizer.test.cpp
 test/text/quads.test.cpp
+test/text/tagged_string.test.cpp
 
 # tile
 test/tile/custom_geometry_tile.test.cpp

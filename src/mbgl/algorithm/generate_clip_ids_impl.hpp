@@ -64,7 +64,7 @@ void ClipIDGenerator::update(std::vector<std::reference_wrapper<Renderable>> ren
         uint8_t count = 1;
         for (auto& it : renderables) {
             auto& renderable = it.get();
-            if (!renderable.used) {
+            if (!renderable.used || !renderable.needsClipping) {
                 continue;
             }
             renderable.clip.mask |= mask;

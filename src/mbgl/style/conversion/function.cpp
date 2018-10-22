@@ -6,6 +6,7 @@
 #include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/match.hpp>
 #include <mbgl/style/expression/case.hpp>
+#include <mbgl/style/expression/format_expression.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <cassert>
@@ -36,6 +37,13 @@ bool hasTokens(const std::string& source) {
 
     return false;
 }
+    
+std::unique_ptr<Expression> convertTokenStringToFormatExpression(const std::string& source) {
+    auto textExpression = convertTokenStringToExpression(source);
+    std::vector<FormatExpressionSection> sections;
+    sections.emplace_back(std::move(textExpression), nullopt, nullopt);
+    return std::make_unique<FormatExpression>(sections);
+}
 
 std::unique_ptr<Expression> convertTokenStringToExpression(const std::string& source) {
     std::vector<std::unique_ptr<Expression>> inputs;
@@ -52,7 +60,7 @@ std::unique_ptr<Expression> convertTokenStringToExpression(const std::string& so
         if (pos != end) {
             for (brace++; brace != end && tokenReservedChars.find(*brace) == std::string::npos; brace++);
             if (brace != end && *brace == '}') {
-                inputs.push_back(toString(get(literal(std::string(pos + 1, brace)))));
+                inputs.push_back(get(literal(std::string(pos + 1, brace))));
                 pos = brace + 1;
             } else {
                 inputs.push_back(literal(std::string(pos, brace)));
@@ -65,7 +73,7 @@ std::unique_ptr<Expression> convertTokenStringToExpression(const std::string& so
     case 0:
         return literal(source);
     case 1:
-        return std::move(inputs[0]);
+        return toString(std::move(inputs[0]));
     default:
         return concat(std::move(inputs));
     }
@@ -78,7 +86,7 @@ optional<PropertyExpression<T>> convertFunctionToExpression(const Convertible& v
         return nullopt;
     }
 
-    optional<T> defaultValue;
+    optional<T> defaultValue{};
 
     auto defaultValueValue = objectMember(value, "default");
     if (defaultValueValue) {
@@ -138,6 +146,9 @@ template optional<PropertyExpression<TextTransformType>>
     convertFunctionToExpression<TextTransformType>(const Convertible&, Error&, bool);
 template optional<PropertyExpression<TranslateAnchorType>>
     convertFunctionToExpression<TranslateAnchorType>(const Convertible&, Error&, bool);
+    
+template optional<PropertyExpression<Formatted>>
+    convertFunctionToExpression<Formatted>(const Convertible&, Error&, bool);
 
 // Ad-hoc Converters for double and int64_t. We should replace float with double wholesale,
 // and promote the int64_t Converter to general use (and it should check that the input is
@@ -280,6 +291,15 @@ static optional<std::unique_ptr<Expression>> convertLiteral(type::Type type, con
         [&] (const type::CollatorType&) -> optional<std::unique_ptr<Expression>> {
             assert(false); // No properties use this type.
             return nullopt;
+        },
+        [&] (const type::FormattedType&) -> optional<std::unique_ptr<Expression>> {
+            auto result = convert<std::string>(value, error);
+            if (!result) {
+                return nullopt;
+            }
+            return convertTokens ?
+                convertTokenStringToFormatExpression(*result) :
+                literal(Formatted(result->c_str()));
         }
     );
 }
@@ -679,6 +699,9 @@ optional<std::unique_ptr<Expression>> convertFunctionToExpression(type::Type typ
             },
             [&] (const type::Array& array) -> optional<std::unique_ptr<Expression>> {
                 return assertion(array, get(literal(*property)));
+            },
+            [&] (const type::FormattedType&) -> optional<std::unique_ptr<Expression>> {
+                return format(get(literal(*property)));
             },
             [&] (const auto&) -> optional<std::unique_ptr<Expression>>  {
                 assert(false); // No properties use this type.

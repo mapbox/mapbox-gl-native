@@ -5,6 +5,8 @@
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/enum.hpp>
 
+#include <mbgl/style/expression/formatted.hpp>
+
 #include <jni/jni.hpp>
 
 #include <string>
@@ -51,6 +53,11 @@ struct Converter<jni::Local<jni::Object<>>, std::string> {
 template <>
 struct Converter<jni::Local<jni::Object<>>, Color> {
     Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const Color& value) const;
+};
+
+template <>
+struct Converter<jni::Local<jni::Object<>>, style::expression::Formatted> {
+    Result<jni::Local<jni::Object<>>> operator()(jni::JNIEnv& env, const style::expression::Formatted& value) const;
 };
 
 template <std::size_t N>

@@ -37,7 +37,7 @@
     XCTAssertThrowsSpecificNamed((layer.circleColor = interpExpression), NSException, NSInvalidArgumentException);
 
     [self.mapView.style addLayer:layer];
-    [self waitForMapViewToBeRenderedWithTimeout:1.0];
+    [self waitForMapViewToBeRenderedWithTimeout:5];
 }
 
 - (void)testForSteppingExpressionRenderCrashWithEmptyStops {
@@ -55,7 +55,7 @@
     XCTAssertThrowsSpecificNamed((layer.circleColor = steppingExpression), NSException, NSInvalidArgumentException);
 
     [self.mapView.style addLayer:layer];
-    [self waitForMapViewToBeRenderedWithTimeout:1.0];
+    [self waitForMapViewToBeRenderedWithTimeout:5];
 }
 
 @end

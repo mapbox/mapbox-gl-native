@@ -26,12 +26,13 @@ public:
                    const float iconBoxScale,
                    const float iconPadding,
                    const std::array<float, 2> iconOffset,
-                   const GlyphPositionMap&,
+                   const GlyphPositions&,
                    const IndexedSubfeature&,
                    const std::size_t layoutFeatureIndex,
                    const std::size_t dataFeatureIndex,
                    const std::u16string& key,
-                   const float overscaling);
+                   const float overscaling,
+                   const float rotate);
 
     Anchor anchor;
     GeometryCoordinates line;

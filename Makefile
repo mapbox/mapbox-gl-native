@@ -252,24 +252,18 @@ ios-sanitize-address: $(IOS_PROJ_PATH)
 ios-static-analyzer: $(IOS_PROJ_PATH)
 	set -o pipefail && $(IOS_XCODEBUILD_SIM) analyze -scheme 'CI' test $(XCPRETTY)
 
+.PHONY: ios-check-events-symbols
+ios-check-events-symbols:
+	./platform/ios/scripts/check-events-symbols.sh
+
 .PHONY: ipackage
-ipackage: $(IOS_PROJ_PATH)
-	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
-	./platform/ios/scripts/package.sh
-
-.PHONY: ipackage-strip
-ipackage-strip: $(IOS_PROJ_PATH)
-	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO \
-	./platform/ios/scripts/package.sh
-
-.PHONY: ipackage-sim
-ipackage-sim: $(IOS_PROJ_PATH)
-	BUILDTYPE=Debug FORMAT=dynamic BUILD_DEVICE=false SYMBOLS=$(SYMBOLS) \
-	./platform/ios/scripts/package.sh
+ipackage: ipackage*
+ipackage%:
+	@echo make ipackage is deprecated — use make iframework.
 
 .PHONY: iframework
 iframework: $(IOS_PROJ_PATH)
-	FORMAT=dynamic BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
+	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
 	./platform/ios/scripts/package.sh
 
 .PHONY: ideploy
@@ -290,9 +284,10 @@ style-code: darwin-style-code
 darwin-update-examples:
 	node platform/darwin/scripts/update-examples.js
 
-.PHONY: check-public-symbols
-check-public-symbols:
+.PHONY: darwin-check-public-symbols
+darwin-check-public-symbols:
 	node platform/darwin/scripts/check-public-symbols.js macOS iOS
+
 endif
 
 #### Linux targets #####################################################
@@ -328,14 +323,12 @@ test: $(LINUX_BUILD)
 benchmark: $(LINUX_BUILD)
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-benchmark
 
-ifneq (,$(shell command -v gdb 2> /dev/null))
-  GDB ?= $(shell scripts/mason.sh PREFIX gdb VERSION 2017-04-08-aebcde5)/bin/gdb \
-        	-batch -return-child-result \
-        	-ex 'set print thread-events off' \
-        	-ex 'set disable-randomization off' \
-        	-ex 'run' \
-        	-ex 'thread apply all bt' --args
-endif
+GDB ?= gdb \
+	-batch -return-child-result \
+	-ex 'set print thread-events off' \
+	-ex 'set disable-randomization off' \
+	-ex 'run' \
+	-ex 'thread apply all bt' --args
 
 .PHONY: run-test
 run-test: run-test-*

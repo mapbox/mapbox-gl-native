@@ -40,6 +40,7 @@ optional<std::string> checkSubtype(const Type& expected, const Type& t) {
                 String,
                 Object,
                 Color,
+                Formatted,
                 Array(Value)
             };
             

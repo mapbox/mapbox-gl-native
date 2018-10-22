@@ -305,13 +305,8 @@ private:
     std::vector<RenderbufferID> abandonedRenderbuffers;
 
 public:
-    // For testing and Windows because Qt + ANGLE
-    // crashes with VAO enabled.
-#if defined(_WINDOWS)
-    bool disableVAOExtension = true;
-#else
+    // For testing
     bool disableVAOExtension = false;
-#endif
 };
 
 } // namespace gl

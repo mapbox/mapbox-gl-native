@@ -118,7 +118,8 @@ ParseResult convertLiteral(const Convertible& convertible, Error& error) {
 
 optional<std::vector<std::unique_ptr<Expression>>> convertLiteralArray(const Convertible &input, Error& error, std::size_t startIndex = 0) {
     std::vector<std::unique_ptr<Expression>> output;
-    for (std::size_t i = startIndex; i < arrayLength(input); i++) {
+    output.reserve(arrayLength(input));
+    for (std::size_t i = startIndex; i < arrayLength(input); ++i) {
         ParseResult literal = convertLiteral(arrayMember(input, i), error);
         if (!literal) {
             return nullopt;
@@ -178,7 +179,8 @@ ParseResult convertLegacyInFilter(const Convertible& values, Error& error) {
 
 optional<std::vector<std::unique_ptr<Expression>>> convertLegacyFilterArray(const Convertible &input, Error& error, std::size_t startIndex = 0) {
     std::vector<std::unique_ptr<Expression>> output;
-    for (std::size_t i = startIndex; i < arrayLength(input); i++) {
+    output.reserve(arrayLength(input));
+    for (std::size_t i = startIndex; i < arrayLength(input); ++i) {
         optional<std::unique_ptr<Expression>> child = convertLegacyFilter(arrayMember(input, i), error);
         if (!child) {
             return nullopt;
@@ -225,7 +227,8 @@ optional<mbgl::Value> serializeLegacyFilter(const Convertible& values) {
         return nullopt;
     } else if (isArray(values)) {
         std::vector<mbgl::Value> result;
-        for (std::size_t i = 0; i < arrayLength(values); i++) {
+        result.reserve(arrayLength(values));
+        for (std::size_t i = 0; i < arrayLength(values); ++i) {
             auto arrayValue = serializeLegacyFilter(arrayMember(values, i));
             if (arrayValue) {
                 result.push_back(*arrayValue);

@@ -62,6 +62,7 @@ public class HillshadeLayer extends Layer {
    * @param sourceLayer the source layer to set
    * @return This
    */
+  @NonNull
   public HillshadeLayer withSourceLayer(String sourceLayer) {
     setSourceLayer(sourceLayer);
     return this;
@@ -72,6 +73,7 @@ public class HillshadeLayer extends Layer {
    *
    * @return id of the source
    */
+  @NonNull
   public String getSourceId() {
     checkThread();
     return nativeGetSourceId();
@@ -83,6 +85,7 @@ public class HillshadeLayer extends Layer {
    * @param properties the var-args properties
    * @return This
    */
+  @NonNull
   public HillshadeLayer withProperties(@NonNull PropertyValue<?>... properties) {
     setProperties(properties);
     return this;
@@ -95,6 +98,7 @@ public class HillshadeLayer extends Layer {
    *
    * @return property wrapper value around Float
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getHillshadeIlluminationDirection() {
     checkThread();
@@ -106,6 +110,7 @@ public class HillshadeLayer extends Layer {
    *
    * @return property wrapper value around String
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getHillshadeIlluminationAnchor() {
     checkThread();
@@ -117,6 +122,7 @@ public class HillshadeLayer extends Layer {
    *
    * @return property wrapper value around Float
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getHillshadeExaggeration() {
     checkThread();
@@ -128,6 +134,7 @@ public class HillshadeLayer extends Layer {
    *
    * @return transition options for Float
    */
+  @NonNull
   public TransitionOptions getHillshadeExaggerationTransition() {
     checkThread();
     return nativeGetHillshadeExaggerationTransition();
@@ -138,7 +145,7 @@ public class HillshadeLayer extends Layer {
    *
    * @param options transition options for Float
    */
-  public void setHillshadeExaggerationTransition(TransitionOptions options) {
+  public void setHillshadeExaggerationTransition(@NonNull TransitionOptions options) {
     checkThread();
     nativeSetHillshadeExaggerationTransition(options.getDuration(), options.getDelay());
   }
@@ -148,6 +155,7 @@ public class HillshadeLayer extends Layer {
    *
    * @return property wrapper value around String
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getHillshadeShadowColor() {
     checkThread();
@@ -176,6 +184,7 @@ public class HillshadeLayer extends Layer {
    *
    * @return transition options for String
    */
+  @NonNull
   public TransitionOptions getHillshadeShadowColorTransition() {
     checkThread();
     return nativeGetHillshadeShadowColorTransition();
@@ -186,7 +195,7 @@ public class HillshadeLayer extends Layer {
    *
    * @param options transition options for String
    */
-  public void setHillshadeShadowColorTransition(TransitionOptions options) {
+  public void setHillshadeShadowColorTransition(@NonNull TransitionOptions options) {
     checkThread();
     nativeSetHillshadeShadowColorTransition(options.getDuration(), options.getDelay());
   }
@@ -196,6 +205,7 @@ public class HillshadeLayer extends Layer {
    *
    * @return property wrapper value around String
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getHillshadeHighlightColor() {
     checkThread();
@@ -224,6 +234,7 @@ public class HillshadeLayer extends Layer {
    *
    * @return transition options for String
    */
+  @NonNull
   public TransitionOptions getHillshadeHighlightColorTransition() {
     checkThread();
     return nativeGetHillshadeHighlightColorTransition();
@@ -234,7 +245,7 @@ public class HillshadeLayer extends Layer {
    *
    * @param options transition options for String
    */
-  public void setHillshadeHighlightColorTransition(TransitionOptions options) {
+  public void setHillshadeHighlightColorTransition(@NonNull TransitionOptions options) {
     checkThread();
     nativeSetHillshadeHighlightColorTransition(options.getDuration(), options.getDelay());
   }
@@ -244,6 +255,7 @@ public class HillshadeLayer extends Layer {
    *
    * @return property wrapper value around String
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getHillshadeAccentColor() {
     checkThread();
@@ -272,6 +284,7 @@ public class HillshadeLayer extends Layer {
    *
    * @return transition options for String
    */
+  @NonNull
   public TransitionOptions getHillshadeAccentColorTransition() {
     checkThread();
     return nativeGetHillshadeAccentColorTransition();
@@ -282,47 +295,57 @@ public class HillshadeLayer extends Layer {
    *
    * @param options transition options for String
    */
-  public void setHillshadeAccentColorTransition(TransitionOptions options) {
+  public void setHillshadeAccentColorTransition(@NonNull TransitionOptions options) {
     checkThread();
     nativeSetHillshadeAccentColorTransition(options.getDuration(), options.getDelay());
   }
 
+  @NonNull
   @Keep
   private native Object nativeGetHillshadeIlluminationDirection();
 
+  @NonNull
   @Keep
   private native Object nativeGetHillshadeIlluminationAnchor();
 
+  @NonNull
   @Keep
   private native Object nativeGetHillshadeExaggeration();
 
+  @NonNull
   @Keep
   private native TransitionOptions nativeGetHillshadeExaggerationTransition();
 
   @Keep
   private native void nativeSetHillshadeExaggerationTransition(long duration, long delay);
 
+  @NonNull
   @Keep
   private native Object nativeGetHillshadeShadowColor();
 
+  @NonNull
   @Keep
   private native TransitionOptions nativeGetHillshadeShadowColorTransition();
 
   @Keep
   private native void nativeSetHillshadeShadowColorTransition(long duration, long delay);
 
+  @NonNull
   @Keep
   private native Object nativeGetHillshadeHighlightColor();
 
+  @NonNull
   @Keep
   private native TransitionOptions nativeGetHillshadeHighlightColorTransition();
 
   @Keep
   private native void nativeSetHillshadeHighlightColorTransition(long duration, long delay);
 
+  @NonNull
   @Keep
   private native Object nativeGetHillshadeAccentColor();
 
+  @NonNull
   @Keep
   private native TransitionOptions nativeGetHillshadeAccentColorTransition();
 

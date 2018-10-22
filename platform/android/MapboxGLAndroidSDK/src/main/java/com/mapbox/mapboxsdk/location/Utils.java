@@ -65,8 +65,9 @@ public final class Utils {
     return bitmap;
   }
 
+  @Nullable
   static Drawable getDrawable(@NonNull Context context, @DrawableRes int drawableRes,
-                              @ColorInt Integer tintColor) {
+                              @Nullable @ColorInt Integer tintColor) {
     Drawable drawable = ContextCompat.getDrawable(context, drawableRes);
     if (tintColor == null) {
       return drawable;
@@ -84,8 +85,7 @@ public final class Utils {
     if (location == null) {
       return 0;
     }
-    double metersPerPixel = mapboxMap.getProjection().getMetersPerPixelAtLatitude(
-      location.getLatitude());
+    double metersPerPixel = mapboxMap.getProjection().getMetersPerPixelAtLatitude(location.getLatitude());
     return (float) (location.getAccuracy() * (1 / metersPerPixel));
   }
 
