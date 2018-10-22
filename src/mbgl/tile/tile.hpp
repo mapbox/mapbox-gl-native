@@ -3,7 +3,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/feature.hpp>
+#include <mbgl/util/feature_state.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/tile/tile_necessity.hpp>

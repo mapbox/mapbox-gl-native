@@ -5,6 +5,7 @@
 #include <mbgl/style/layer_type.hpp>
 #include <mbgl/style/image_impl.hpp>
 #include <mbgl/renderer/image_atlas.hpp>
+#include <mbgl/util/feature_state.hpp>
 #include <atomic>
 
 namespace mbgl {

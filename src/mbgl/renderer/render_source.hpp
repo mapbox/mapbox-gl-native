@@ -4,7 +4,7 @@
 #include <mbgl/tile/tile_observer.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/util/feature.hpp>
+#include <mbgl/util/feature_state.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/layer_impl.hpp>
 

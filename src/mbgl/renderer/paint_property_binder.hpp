@@ -12,7 +12,7 @@
 #include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/util/indexed_tuple.hpp>
 #include <mbgl/layout/pattern_layout.hpp>
-
+#include <mbgl/util/feature_state.hpp>
 #include <bitset>
 
 namespace mbgl {
