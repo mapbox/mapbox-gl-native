@@ -331,8 +331,8 @@ public class OfflineRegion {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            callback.onStatus(status);
             FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
+            callback.onStatus(status);
           }
         });
       }
@@ -342,8 +342,8 @@ public class OfflineRegion {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            callback.onError(error);
             FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
+            callback.onError(error);
           }
         });
       }
@@ -377,8 +377,8 @@ public class OfflineRegion {
           handler.post(new Runnable() {
             @Override
             public void run() {
-              callback.onDelete();
               FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
+              callback.onDelete();
               OfflineRegion.this.finalize();
             }
           });
