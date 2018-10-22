@@ -23,15 +23,11 @@ class InfoWindowManager {
 
   private final List<InfoWindow> infoWindows = new ArrayList<>();
 
-  @Nullable
   private MapboxMap.InfoWindowAdapter infoWindowAdapter;
   private boolean allowConcurrentMultipleInfoWindows;
 
-  @Nullable
   private MapboxMap.OnInfoWindowClickListener onInfoWindowClickListener;
-  @Nullable
   private MapboxMap.OnInfoWindowLongClickListener onInfoWindowLongClickListener;
-  @Nullable
   private MapboxMap.OnInfoWindowCloseListener onInfoWindowCloseListener;
 
   void update() {
@@ -46,7 +42,6 @@ class InfoWindowManager {
     this.infoWindowAdapter = infoWindowAdapter;
   }
 
-  @Nullable
   MapboxMap.InfoWindowAdapter getInfoWindowAdapter() {
     return infoWindowAdapter;
   }
@@ -59,7 +54,7 @@ class InfoWindowManager {
     return allowConcurrentMultipleInfoWindows;
   }
 
-  boolean isInfoWindowValidForMarker(@Nullable Marker marker) {
+  boolean isInfoWindowValidForMarker(Marker marker) {
     return marker != null && (!TextUtils.isEmpty(marker.getTitle()) || !TextUtils.isEmpty(marker.getSnippet()));
   }
 
@@ -67,7 +62,6 @@ class InfoWindowManager {
     onInfoWindowClickListener = listener;
   }
 
-  @Nullable
   MapboxMap.OnInfoWindowClickListener getOnInfoWindowClickListener() {
     return onInfoWindowClickListener;
   }
@@ -76,7 +70,6 @@ class InfoWindowManager {
     onInfoWindowLongClickListener = listener;
   }
 
-  @Nullable
   MapboxMap.OnInfoWindowLongClickListener getOnInfoWindowLongClickListener() {
     return onInfoWindowLongClickListener;
   }
@@ -85,7 +78,6 @@ class InfoWindowManager {
     onInfoWindowCloseListener = listener;
   }
 
-  @Nullable
   MapboxMap.OnInfoWindowCloseListener getOnInfoWindowCloseListener() {
     return onInfoWindowCloseListener;
   }

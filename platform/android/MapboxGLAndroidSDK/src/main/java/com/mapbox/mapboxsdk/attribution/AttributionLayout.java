@@ -2,14 +2,11 @@ package com.mapbox.mapboxsdk.attribution;
 
 import android.graphics.Bitmap;
 import android.graphics.PointF;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 public class AttributionLayout {
 
-  @Nullable
   private Bitmap logo;
-  @Nullable
   private PointF anchorPoint;
   private boolean shortText;
 
@@ -19,12 +16,10 @@ public class AttributionLayout {
     this.shortText = shortText;
   }
 
-  @Nullable
   public Bitmap getLogo() {
     return logo;
   }
 
-  @Nullable
   public PointF getAnchorPoint() {
     return anchorPoint;
   }
@@ -34,7 +29,7 @@ public class AttributionLayout {
   }
 
   @Override
-  public boolean equals(@Nullable Object o) {
+  public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
@@ -57,7 +52,6 @@ public class AttributionLayout {
     return result;
   }
 
-  @NonNull
   @Override
   public String toString() {
     return "AttributionLayout{"

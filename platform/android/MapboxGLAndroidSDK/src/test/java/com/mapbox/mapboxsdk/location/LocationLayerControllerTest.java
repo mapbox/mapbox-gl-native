@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.location;
 
 import android.graphics.Bitmap;
 
-import android.support.annotation.NonNull;
 import com.google.gson.JsonElement;
 import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -443,13 +442,13 @@ public class LocationLayerControllerTest {
     verify(locationFeature, times(0)).addNumberProperty(PROPERTY_ACCURACY_RADIUS, accuracyRadiusValue);
   }
 
-  private LayerFeatureProvider buildFeatureProvider(@NonNull LocationComponentOptions options) {
+  private LayerFeatureProvider buildFeatureProvider(LocationComponentOptions options) {
     LayerFeatureProvider provider = mock(LayerFeatureProvider.class);
     when(provider.generateLocationFeature(null, options)).thenReturn(mock(Feature.class));
     return provider;
   }
 
-  private LayerFeatureProvider buildFeatureProvider(Feature feature, @NonNull LocationComponentOptions options) {
+  private LayerFeatureProvider buildFeatureProvider(Feature feature, LocationComponentOptions options) {
     LayerFeatureProvider provider = mock(LayerFeatureProvider.class);
     when(provider.generateLocationFeature(null, options)).thenReturn(feature);
     return provider;

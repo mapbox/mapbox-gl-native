@@ -80,9 +80,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   private final CopyOnWriteArrayList<OnMapChangedListener> onMapChangedListeners = new CopyOnWriteArrayList<>();
   private final MapChangeReceiver mapChangeReceiver = new MapChangeReceiver();
 
-  @Nullable
   private NativeMapView nativeMapView;
-  @Nullable
   private MapboxMap mapboxMap;
   private MapboxMapOptions mapboxMapOptions;
   private MapRenderer mapRenderer;
@@ -94,12 +92,9 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   private ImageView attrView;
   private ImageView logoView;
 
-  @Nullable
   private MapGestureDetector mapGestureDetector;
-  @Nullable
   private MapKeyListener mapKeyListener;
   private MapZoomButtonController mapZoomButtonController;
-  @Nullable
   private Bundle savedInstanceState;
 
   @UiThread
@@ -236,7 +231,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     };
   }
 
-  private MapboxMap.OnCompassAnimationListener createCompassAnimationListener(@NonNull final CameraChangeDispatcher
+  private MapboxMap.OnCompassAnimationListener createCompassAnimationListener(final CameraChangeDispatcher
                                                                                 cameraChangeDispatcher) {
     return new MapboxMap.OnCompassAnimationListener() {
       @Override
@@ -252,7 +247,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     };
   }
 
-  private OnClickListener createCompassClickListener(@NonNull final CameraChangeDispatcher cameraChangeDispatcher) {
+  private OnClickListener createCompassClickListener(final CameraChangeDispatcher cameraChangeDispatcher) {
     return new OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -465,7 +460,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   @Override
-  public boolean onTouchEvent(@NonNull MotionEvent event) {
+  public boolean onTouchEvent(MotionEvent event) {
     if (!isMapInitialized() || !isZoomButtonControllerInitialized() || !isGestureDetectorInitialized()) {
       return super.onTouchEvent(event);
     }
@@ -477,7 +472,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   @Override
-  public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
+  public boolean onKeyDown(int keyCode, KeyEvent event) {
     return mapKeyListener.onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event);
   }
 
@@ -487,17 +482,17 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   @Override
-  public boolean onKeyUp(int keyCode, @NonNull KeyEvent event) {
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
     return mapKeyListener.onKeyUp(keyCode, event) || super.onKeyUp(keyCode, event);
   }
 
   @Override
-  public boolean onTrackballEvent(@NonNull MotionEvent event) {
+  public boolean onTrackballEvent(MotionEvent event) {
     return mapKeyListener.onTrackballEvent(event) || super.onTrackballEvent(event);
   }
 
   @Override
-  public boolean onGenericMotionEvent(@NonNull MotionEvent event) {
+  public boolean onGenericMotionEvent(MotionEvent event) {
     if (!isGestureDetectorInitialized()) {
       return super.onGenericMotionEvent(event);
     }
@@ -505,7 +500,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   @Override
-  public boolean onHoverEvent(@NonNull MotionEvent event) {
+  public boolean onHoverEvent(MotionEvent event) {
     if (!isZoomButtonControllerInitialized()) {
       return super.onHoverEvent(event);
     }
@@ -595,9 +590,9 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     }
   }
 
-  private void setOfflineRegionDefinition(@NonNull String styleUrl, LatLng latLng, double minZoom, double maxZoom) {
+  private void setOfflineRegionDefinition(String styleUrl, LatLng cameraTarget, double minZoom, double maxZoom) {
     CameraPosition cameraPosition = new CameraPosition.Builder()
-      .target(latLng)
+      .target(cameraTarget)
       .zoom(minZoom)
       .build();
     setStyleUrl(styleUrl);
@@ -683,7 +678,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   // ViewCallback
   //
 
-  @Nullable
   @Override
   public Bitmap getViewContent() {
     return BitmapUtils.createBitmapFromView(this);
@@ -1123,7 +1117,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     return mapGestureDetector != null;
   }
 
-  @Nullable
   MapboxMap getMapboxMap() {
     return mapboxMap;
   }
@@ -1665,11 +1658,10 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    */
   private static class AttributionClickListener implements OnClickListener {
 
-    @NonNull
     private final AttributionDialogManager defaultDialogManager;
     private UiSettings uiSettings;
 
-    private AttributionClickListener(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
+    private AttributionClickListener(Context context, MapboxMap mapboxMap) {
       this.defaultDialogManager = new AttributionDialogManager(context, mapboxMap);
       this.uiSettings = mapboxMap.getUiSettings();
     }

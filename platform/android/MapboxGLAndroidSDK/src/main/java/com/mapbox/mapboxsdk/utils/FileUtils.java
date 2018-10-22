@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.utils;
 
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -12,7 +11,6 @@ public class FileUtils {
    * Task checking whether app's process can read a file.
    */
   public static class CheckFileReadPermissionTask extends AsyncTask<File, Void, Boolean> {
-    @NonNull
     private final WeakReference<OnCheckFileReadPermissionListener> listenerWeakReference;
 
     public CheckFileReadPermissionTask(OnCheckFileReadPermissionListener listener) {
@@ -69,7 +67,6 @@ public class FileUtils {
    * Task checking whether app's process can write to a file.
    */
   public static class CheckFileWritePermissionTask extends AsyncTask<File, Void, Boolean> {
-    @NonNull
     private final WeakReference<OnCheckFileWritePermissionListener> listenerWeakReference;
 
     public CheckFileWritePermissionTask(OnCheckFileWritePermissionListener listener) {

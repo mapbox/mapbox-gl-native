@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.style.layers;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
-import android.support.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
@@ -51,13 +50,11 @@ public abstract class Layer {
     }
   }
 
-  @NonNull
   public String getId() {
     checkThread();
     return nativeGetId();
   }
 
-  @NonNull
   public PropertyValue<String> getVisibility() {
     checkThread();
     return new PaintPropertyValue<>("visibility", (String) nativeGetVisibility());
@@ -87,11 +84,9 @@ public abstract class Layer {
   @Keep
   protected native void finalize() throws Throwable;
 
-  @NonNull
   @Keep
   protected native String nativeGetId();
 
-  @NonNull
   @Keep
   protected native Object nativeGetVisibility();
 
@@ -104,18 +99,15 @@ public abstract class Layer {
   @Keep
   protected native void nativeSetFilter(Object[] filter);
 
-  @NonNull
   @Keep
   protected native JsonElement nativeGetFilter();
 
   @Keep
   protected native void nativeSetSourceLayer(String sourceLayer);
 
-  @NonNull
   @Keep
   protected native String nativeGetSourceLayer();
 
-  @NonNull
   @Keep
   protected native String nativeGetSourceId();
 
@@ -135,8 +127,7 @@ public abstract class Layer {
     return nativePtr;
   }
 
-  @Nullable
-  private Object convertValue(@Nullable Object value) {
+  private Object convertValue(Object value) {
     if (value != null && value instanceof Expression) {
       return ((Expression) value).toArray();
     }

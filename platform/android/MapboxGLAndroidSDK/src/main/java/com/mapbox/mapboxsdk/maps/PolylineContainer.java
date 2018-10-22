@@ -36,7 +36,6 @@ class PolylineContainer implements Polylines {
     return polyline;
   }
 
-  @NonNull
   @Override
   public List<Polyline> addBy(@NonNull List<PolylineOptions> polylineOptionsList, @NonNull MapboxMap mapboxMap) {
     int count = polylineOptionsList.size();
@@ -62,12 +61,11 @@ class PolylineContainer implements Polylines {
   }
 
   @Override
-  public void update(@NonNull Polyline polyline) {
+  public void update(Polyline polyline) {
     nativeMapView.updatePolyline(polyline);
     annotations.setValueAt(annotations.indexOfKey(polyline.getId()), polyline);
   }
 
-  @NonNull
   @Override
   public List<Polyline> obtainAll() {
     List<Polyline> polylines = new ArrayList<>();

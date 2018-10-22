@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.location;
 
-import android.support.annotation.NonNull;
 import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.Layer;
@@ -51,7 +50,6 @@ class LayerSourceProvider {
 
   private static final String EMPTY_STRING = "";
 
-  @NonNull
   GeoJsonSource generateSource(Feature locationFeature) {
     return new GeoJsonSource(
       LOCATION_SOURCE,
@@ -60,8 +58,7 @@ class LayerSourceProvider {
     );
   }
 
-  @NonNull
-  Layer generateLayer(@NonNull String layerId) {
+  Layer generateLayer(String layerId) {
     SymbolLayer layer = new SymbolLayer(layerId, LOCATION_SOURCE);
     layer.setProperties(
       iconAllowOverlap(true),
@@ -97,7 +94,6 @@ class LayerSourceProvider {
     return layer;
   }
 
-  @NonNull
   Layer generateAccuracyLayer() {
     return new CircleLayer(ACCURACY_LAYER, LOCATION_SOURCE)
       .withProperties(

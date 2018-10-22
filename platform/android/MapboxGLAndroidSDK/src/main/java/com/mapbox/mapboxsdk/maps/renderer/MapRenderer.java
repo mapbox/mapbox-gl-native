@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.CallSuper;
 import android.support.annotation.Keep;
 
-import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.storage.FileSource;
 
@@ -26,7 +25,7 @@ public abstract class MapRenderer implements MapRendererScheduler {
 
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
-  public MapRenderer(@NonNull Context context, String localIdeographFontFamily) {
+  public MapRenderer(Context context, String localIdeographFontFamily) {
     FileSource fileSource = FileSource.getInstance(context);
     float pixelRatio = context.getResources().getDisplayMetrics().density;
     String programCacheDir = FileSource.getInternalCachePath(context);
@@ -65,7 +64,7 @@ public abstract class MapRenderer implements MapRendererScheduler {
   }
 
   @CallSuper
-  protected void onSurfaceChanged(@NonNull GL10 gl, int width, int height) {
+  protected void onSurfaceChanged(GL10 gl, int width, int height) {
     gl.glViewport(0, 0, width, height);
     nativeOnSurfaceChanged(width, height);
   }

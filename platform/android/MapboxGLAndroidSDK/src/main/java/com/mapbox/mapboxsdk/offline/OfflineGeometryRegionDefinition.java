@@ -4,8 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Keep;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -26,7 +24,6 @@ public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition,
 
   @Keep
   private String styleURL;
-  @Nullable
   @Keep
   private Geometry geometry;
   @Keep
@@ -77,7 +74,6 @@ public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition,
     return styleURL;
   }
 
-  @Nullable
   public Geometry getGeometry() {
     return geometry;
   }
@@ -87,7 +83,6 @@ public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition,
    * to retain backwards compatibility
    * @return the {@link LatLngBounds} or null
    */
-  @Nullable
   @Override
   public LatLngBounds getBounds() {
     if (geometry == null) {
@@ -120,7 +115,7 @@ public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition,
   }
 
   @Override
-  public void writeToParcel(@NonNull Parcel dest, int flags) {
+  public void writeToParcel(Parcel dest, int flags) {
     dest.writeString(styleURL);
     dest.writeString(Feature.fromGeometry(geometry).toJson());
     dest.writeDouble(minZoom);
@@ -129,7 +124,7 @@ public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition,
   }
 
   public static final Creator CREATOR = new Creator() {
-    public OfflineGeometryRegionDefinition createFromParcel(@NonNull Parcel in) {
+    public OfflineGeometryRegionDefinition createFromParcel(Parcel in) {
       return new OfflineGeometryRegionDefinition(in);
     }
 

@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.Bitmap;
 
-import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
@@ -38,7 +37,7 @@ class IconManager {
     loadIcon(IconFactory.recreate(IconFactory.ICON_MARKERVIEW_ID, IconFactory.ICON_MARKERVIEW_BITMAP));
   }
 
-  Icon loadIconForMarker(@NonNull Marker marker) {
+  Icon loadIconForMarker(Marker marker) {
     Icon icon = marker.getIcon();
     if (icon == null) {
       // TODO replace with anchor implementation, we are faking an anchor by adding extra pixels and diving height by 2
@@ -51,14 +50,14 @@ class IconManager {
     return icon;
   }
 
-  void loadIconForMarkerView(@NonNull MarkerView marker) {
+  void loadIconForMarkerView(MarkerView marker) {
     Icon icon = marker.getIcon();
     Bitmap bitmap = icon.getBitmap();
     updateHighestIconSize(bitmap);
     addIcon(icon, false);
   }
 
-  int getTopOffsetPixelsForIcon(@NonNull Icon icon) {
+  int getTopOffsetPixelsForIcon(Icon icon) {
     return (int) (nativeMapView.getTopOffsetPixelsForAnnotationSymbol(icon.getId()) * nativeMapView.getPixelRatio());
   }
 
@@ -78,11 +77,11 @@ class IconManager {
     return icon;
   }
 
-  private void addIcon(@NonNull Icon icon) {
+  private void addIcon(Icon icon) {
     addIcon(icon, true);
   }
 
-  private void addIcon(@NonNull Icon icon, boolean addIconToMap) {
+  private void addIcon(Icon icon, boolean addIconToMap) {
     if (!iconMap.keySet().contains(icon)) {
       iconMap.put(icon, 1);
       if (addIconToMap) {
@@ -126,7 +125,7 @@ class IconManager {
     }
   }
 
-  void ensureIconLoaded(@NonNull Marker marker, @NonNull MapboxMap mapboxMap) {
+  void ensureIconLoaded(Marker marker, MapboxMap mapboxMap) {
     Icon icon = marker.getIcon();
     if (icon == null) {
       icon = loadDefaultIconForMarker(marker);
@@ -135,7 +134,7 @@ class IconManager {
     setTopOffsetPixels(marker, mapboxMap, icon);
   }
 
-  private void setTopOffsetPixels(Marker marker, @NonNull MapboxMap mapboxMap, @NonNull Icon icon) {
+  private void setTopOffsetPixels(Marker marker, MapboxMap mapboxMap, Icon icon) {
     // this seems to be a costly operation according to the profiler so I'm trying to save some calls
     Marker previousMarker = marker.getId() != -1 ? (Marker) mapboxMap.getAnnotation(marker.getId()) : null;
     if (previousMarker == null || previousMarker.getIcon() == null || previousMarker.getIcon() != marker.getIcon()) {
@@ -143,7 +142,7 @@ class IconManager {
     }
   }
 
-  void iconCleanup(@NonNull Icon icon) {
+  void iconCleanup(Icon icon) {
     Integer refCounter = iconMap.get(icon);
     if (refCounter != null) {
       refCounter--;

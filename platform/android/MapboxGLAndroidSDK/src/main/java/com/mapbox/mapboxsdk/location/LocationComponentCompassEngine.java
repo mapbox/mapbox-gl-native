@@ -31,7 +31,6 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
   private static final float ALPHA = 0.45f;
 
   private final WindowManager windowManager;
-  @NonNull
   private final SensorManager sensorManager;
   private final List<CompassListener> compassListeners = new ArrayList<>();
 
@@ -43,18 +42,14 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
   @Nullable
   private Sensor magneticFieldSensor;
 
-  @NonNull
   private float[] truncatedRotationVectorValue = new float[4];
-  @NonNull
   private float[] rotationMatrix = new float[9];
   private float[] rotationVectorValue;
   private float lastHeading;
   private int lastAccuracySensorStatus;
 
   private long compassUpdateNextTimestamp;
-  @Nullable
   private float[] gravityValues = new float[3];
-  @Nullable
   private float[] magneticValues = new float[3];
 
   /**
@@ -114,7 +109,7 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
   }
 
   @Override
-  public void onSensorChanged(@NonNull SensorEvent event) {
+  public void onSensorChanged(SensorEvent event) {
     // check when the last time the compass was updated, return if too soon.
     long currentTime = SystemClock.elapsedRealtime();
     if (currentTime < compassUpdateNextTimestamp) {
@@ -238,8 +233,7 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
    * @param smoothedValues array of float, that contains previous state
    * @return float filtered array of float
    */
-  @Nullable
-  private float[] lowPassFilter(@NonNull float[] newValues, @Nullable float[] smoothedValues) {
+  private float[] lowPassFilter(float[] newValues, float[] smoothedValues) {
     if (smoothedValues == null) {
       return newValues;
     }

@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.attribution;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -45,7 +44,6 @@ public class AttributionParser {
    *
    * @return the attributions
    */
-  @NonNull
   public Set<Attribution> getAttributions() {
     return attributions;
   }
@@ -55,7 +53,6 @@ public class AttributionParser {
    *
    * @return the parsed attribution string
    */
-  @NonNull
   public String createAttributionString() {
     return createAttributionString(false);
   }
@@ -66,7 +63,6 @@ public class AttributionParser {
    * @param shortenedOutput if attribution string should contain shortened output
    * @return the parsed attribution string
    */
-  @NonNull
   public String createAttributionString(boolean shortenedOutput) {
     StringBuilder stringBuilder = new StringBuilder(withCopyrightSign ? "" : "© ");
     int counter = 0;
@@ -105,7 +101,7 @@ public class AttributionParser {
    * @param htmlBuilder the html builder
    * @param urlSpan     the url span to be parsed
    */
-  private void parseUrlSpan(@NonNull SpannableStringBuilder htmlBuilder, URLSpan urlSpan) {
+  private void parseUrlSpan(SpannableStringBuilder htmlBuilder, URLSpan urlSpan) {
     String url = urlSpan.getURL();
     if (isUrlValid(url)) {
       String anchor = parseAnchorValue(htmlBuilder, urlSpan);
@@ -122,7 +118,7 @@ public class AttributionParser {
    * @param url the url to be validated
    * @return if the url is valid
    */
-  private boolean isUrlValid(@NonNull String url) {
+  private boolean isUrlValid(String url) {
     return isValidForImproveThisMap(url) && isValidForMapbox(url);
   }
 
@@ -156,7 +152,7 @@ public class AttributionParser {
    * @param url the url to be validated
    * @return if the url is valid for improve this map
    */
-  private boolean isValidForImproveThisMap(@NonNull String url) {
+  private boolean isValidForImproveThisMap(String url) {
     return withImproveMap || !url.equals(Attribution.IMPROVE_MAP_URL);
   }
 
@@ -166,7 +162,7 @@ public class AttributionParser {
    * @param url the url to be validated
    * @return if the url is valid for Mapbox
    */
-  private boolean isValidForMapbox(@NonNull String url) {
+  private boolean isValidForMapbox(String url) {
     return withMapboxAttribution || !url.equals(Attribution.MAPBOX_URL);
   }
 
@@ -177,7 +173,6 @@ public class AttributionParser {
    * @param urlSpan     the current urlSpan
    * @return the parsed anchor value
    */
-  @NonNull
   private String parseAnchorValue(SpannableStringBuilder htmlBuilder, URLSpan urlSpan) {
     int start = htmlBuilder.getSpanStart(urlSpan);
     int end = htmlBuilder.getSpanEnd(urlSpan);
@@ -193,8 +188,7 @@ public class AttributionParser {
    * @param anchor the attribution string to strip
    * @return the stripped attribution string without the copyright sign
    */
-  @NonNull
-  private String stripCopyright(@NonNull String anchor) {
+  private String stripCopyright(String anchor) {
     if (!withCopyrightSign && anchor.startsWith("© ")) {
       anchor = anchor.substring(2, anchor.length());
     }
@@ -248,43 +242,36 @@ public class AttributionParser {
     private boolean withMapboxAttribution = true;
     private String[] attributionDataStringArray;
 
-    @NonNull
     public Options withAttributionData(String... attributionData) {
       this.attributionDataStringArray = attributionData;
       return this;
     }
 
-    @NonNull
     public Options withImproveMap(boolean withImproveMap) {
       this.withImproveMap = withImproveMap;
       return this;
     }
 
-    @NonNull
     public Options withCopyrightSign(boolean withCopyrightSign) {
       this.withCopyrightSign = withCopyrightSign;
       return this;
     }
 
-    @NonNull
     public Options withTelemetryAttribution(boolean withTelemetryAttribution) {
       this.withTelemetryAttribution = withTelemetryAttribution;
       return this;
     }
 
-    @NonNull
     public Options withMapboxAttribution(boolean withMapboxAttribution) {
       this.withMapboxAttribution = withMapboxAttribution;
       return this;
     }
 
-    @NonNull
     public Options withContext(Context context) {
       this.context = new WeakReference<>(context);
       return this;
     }
 
-    @NonNull
     public AttributionParser build() {
       if (attributionDataStringArray == null) {
         throw new IllegalStateException("Using builder without providing attribution data");

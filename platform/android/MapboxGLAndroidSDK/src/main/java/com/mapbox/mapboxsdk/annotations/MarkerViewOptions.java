@@ -4,8 +4,6 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import com.mapbox.mapboxsdk.exceptions.InvalidMarkerPositionException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
@@ -55,7 +53,6 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
    *
    * @return the object for which this method was called.
    */
-  @NonNull
   @Override
   public MarkerViewOptions getThis() {
     return this;
@@ -80,7 +77,7 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
    *              {@link #PARCELABLE_WRITE_RETURN_VALUE}.
    */
   @Override
-  public void writeToParcel(@NonNull Parcel out, int flags) {
+  public void writeToParcel(Parcel out, int flags) {
     out.writeParcelable(getPosition(), flags);
     out.writeString(getSnippet());
     out.writeString(getTitle());
@@ -126,7 +123,7 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
 
   public static final Parcelable.Creator<MarkerViewOptions> CREATOR =
     new Parcelable.Creator<MarkerViewOptions>() {
-      public MarkerViewOptions createFromParcel(@NonNull Parcel in) {
+      public MarkerViewOptions createFromParcel(Parcel in) {
         return new MarkerViewOptions(in);
       }
 
@@ -144,7 +141,7 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
    * {@link PolylineOptions} object. Else, false.
    */
   @Override
-  public boolean equals(@Nullable Object object) {
+  public boolean equals(Object object) {
     if (this == object) {
       return true;
     }

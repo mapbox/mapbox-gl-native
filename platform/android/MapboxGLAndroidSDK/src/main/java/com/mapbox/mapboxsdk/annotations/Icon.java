@@ -1,8 +1,6 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 
 import java.nio.ByteBuffer;
@@ -71,7 +69,6 @@ public class Icon {
    *
    * @return the bytes of the bitmap
    */
-  @NonNull
   public byte[] toBytes() {
     if (mBitmap == null) {
       throw new IllegalStateException("Required to set a Icon before calling toBytes");
@@ -88,7 +85,7 @@ public class Icon {
    * @return True if the icon being passed in matches this icon object. Else, false.
    */
   @Override
-  public boolean equals(@Nullable Object object) {
+  public boolean equals(Object object) {
     if (this == object) {
       return true;
     }

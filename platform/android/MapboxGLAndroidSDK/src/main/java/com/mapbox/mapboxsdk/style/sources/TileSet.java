@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.style.sources;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Size;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -282,11 +281,10 @@ public class TileSet {
     this.center = center;
   }
 
-  public void setCenter(@NonNull LatLng center) {
+  public void setCenter(LatLng center) {
     this.center = new Float[] {(float) center.getLongitude(), (float) center.getLatitude()};
   }
 
-  @NonNull
   Map<String, Object> toValueObject() {
     Map<String, Object> result = new HashMap<>();
     result.put("tilejson", tilejson);

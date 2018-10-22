@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 
 /**
@@ -21,7 +20,7 @@ public interface TelemetryDefinition {
    * @param longitude the longitude value of the gesture focal point
    * @param zoom      current zoom of the map
    */
-  void onGestureInteraction(@NonNull String eventType, double latitude, double longitude, double zoom);
+  void onGestureInteraction(String eventType, double latitude, double longitude, double zoom);
 
   /**
    * Set the end-user selected state to participate or opt-out in telemetry collection.
@@ -46,5 +45,5 @@ public interface TelemetryDefinition {
    *
    * @param offlineDefinition the offline region definition
    */
-  void onCreateOfflineRegion(@NonNull OfflineRegionDefinition offlineDefinition);
+  void onCreateOfflineRegion(OfflineRegionDefinition offlineDefinition);
 }

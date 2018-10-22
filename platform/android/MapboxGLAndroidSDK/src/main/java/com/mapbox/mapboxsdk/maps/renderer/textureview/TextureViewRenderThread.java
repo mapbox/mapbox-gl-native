@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.maps.renderer.textureview;
 
 import android.graphics.SurfaceTexture;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.view.TextureView;
 import com.mapbox.mapboxsdk.log.Logger;
@@ -27,9 +26,7 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
 
   private static final String TAG = "Mbgl-TextureViewRenderThread";
 
-  @NonNull
   private final TextureViewMapRenderer mapRenderer;
-  @NonNull
   private final EGLHolder eglHolder;
 
   // Lock used for synchronization
@@ -37,7 +34,6 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
 
   // Guarded by lock
   private final ArrayList<Runnable> eventQueue = new ArrayList<>();
-  @Nullable
   private SurfaceTexture surface;
   private int width;
   private int height;
@@ -122,7 +118,7 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
   /**
    * May be called from any thread
    */
-  void queueEvent(@NonNull Runnable runnable) {
+  void queueEvent(Runnable runnable) {
     if (runnable == null) {
       throw new IllegalArgumentException("runnable must not be null");
     }
@@ -332,7 +328,6 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
     private boolean translucentSurface;
 
     private EGL10 egl;
-    @Nullable
     private EGLConfig eglConfig;
     private EGLDisplay eglDisplay = EGL10.EGL_NO_DISPLAY;
     private EGLContext eglContext = EGL10.EGL_NO_CONTEXT;
@@ -375,7 +370,6 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
       }
     }
 
-    @NonNull
     GL10 createGL() {
       return (GL10) eglContext.getGL();
     }

@@ -51,7 +51,6 @@ public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
    * @param mapboxMapOptions The configuration options to be used.
    * @return MapFragment created.
    */
-  @NonNull
   public static SupportMapFragment newInstance(@Nullable MapboxMapOptions mapboxMapOptions) {
     SupportMapFragment mapFragment = new SupportMapFragment();
     mapFragment.setArguments(MapFragmentUtils.createFragmentArgs(mapboxMapOptions));
@@ -79,7 +78,7 @@ public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
    * @param savedInstanceState The saved instance state for the map fragment.
    */
   @Override
-  public void onInflate(@NonNull Context context, AttributeSet attrs, Bundle savedInstanceState) {
+  public void onInflate(Context context, AttributeSet attrs, Bundle savedInstanceState) {
     super.onInflate(context, attrs, savedInstanceState);
     setArguments(MapFragmentUtils.createFragmentArgs(MapboxMapOptions.createFromAttributes(context, attrs)));
   }

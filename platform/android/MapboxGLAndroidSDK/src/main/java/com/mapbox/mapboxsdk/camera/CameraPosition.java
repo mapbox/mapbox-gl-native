@@ -6,8 +6,6 @@ import android.os.Parcelable;
 import android.support.annotation.FloatRange;
 import android.support.annotation.Keep;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -127,7 +125,7 @@ public final class CameraPosition implements Parcelable {
    * Else, false.
    */
   @Override
-  public boolean equals(@Nullable Object o) {
+  public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
@@ -170,7 +168,6 @@ public final class CameraPosition implements Parcelable {
   public static final class Builder {
 
     private double bearing = -1;
-    @Nullable
     private LatLng target = null;
     private double tilt = -1;
     private double zoom = -1;
@@ -187,7 +184,7 @@ public final class CameraPosition implements Parcelable {
      *
      * @param previous Existing CameraPosition values to use
      */
-    public Builder(@Nullable CameraPosition previous) {
+    public Builder(CameraPosition previous) {
       super();
       if (previous != null) {
         this.bearing = previous.bearing;
@@ -202,7 +199,7 @@ public final class CameraPosition implements Parcelable {
      *
      * @param typedArray TypedArray containing attribute values
      */
-    public Builder(@Nullable TypedArray typedArray) {
+    public Builder(TypedArray typedArray) {
       super();
       if (typedArray != null) {
         this.bearing = typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_cameraBearing, 0.0f);
@@ -219,7 +216,7 @@ public final class CameraPosition implements Parcelable {
      *
      * @param update Update containing camera options
      */
-    public Builder(@Nullable CameraUpdateFactory.CameraPositionUpdate update) {
+    public Builder(CameraUpdateFactory.CameraPositionUpdate update) {
       super();
       if (update != null) {
         bearing = update.getBearing();
@@ -234,7 +231,7 @@ public final class CameraPosition implements Parcelable {
      *
      * @param update Update containing camera options
      */
-    public Builder(@Nullable CameraUpdateFactory.ZoomUpdate update) {
+    public Builder(CameraUpdateFactory.ZoomUpdate update) {
       super();
       if (update != null) {
         this.zoom = update.getZoom();
@@ -247,7 +244,6 @@ public final class CameraPosition implements Parcelable {
      * @param bearing Bearing
      * @return this
      */
-    @NonNull
     public Builder bearing(double bearing) {
       double direction = bearing;
 
@@ -268,7 +264,6 @@ public final class CameraPosition implements Parcelable {
      * @param location target of the camera
      * @return this
      */
-    @NonNull
     public Builder target(LatLng location) {
       this.target = location;
       return this;
@@ -283,7 +278,6 @@ public final class CameraPosition implements Parcelable {
      * @param tilt Tilt value of the camera
      * @return this
      */
-    @NonNull
     public Builder tilt(@FloatRange(from = MapboxConstants.MINIMUM_TILT,
       to = MapboxConstants.MAXIMUM_TILT) double tilt) {
       this.tilt = MathUtils.clamp(tilt, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT);
@@ -299,7 +293,6 @@ public final class CameraPosition implements Parcelable {
      * @param zoom Zoom value of the camera
      * @return this
      */
-    @NonNull
     public Builder zoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
       to = MapboxConstants.MAXIMUM_ZOOM) double zoom) {
       this.zoom = zoom;

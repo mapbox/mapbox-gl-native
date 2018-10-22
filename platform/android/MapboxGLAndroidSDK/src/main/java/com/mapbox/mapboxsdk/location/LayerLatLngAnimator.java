@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.location;
 
 import android.animation.ValueAnimator;
 
-import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.List;
@@ -18,7 +17,7 @@ class LayerLatLngAnimator extends MapboxLatLngAnimator<MapboxAnimator.OnLayerAni
   }
 
   @Override
-  public void onAnimationUpdate(@NonNull ValueAnimator animation) {
+  public void onAnimationUpdate(ValueAnimator animation) {
     for (OnLayerAnimationsValuesChangeListener listener : updateListeners) {
       listener.onNewLatLngValue((LatLng) animation.getAnimatedValue());
     }
