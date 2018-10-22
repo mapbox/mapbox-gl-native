@@ -49,7 +49,6 @@ public class Light {
    *
    * @return anchor as String
    */
-  @NonNull
   @Property.ANCHOR public String getAnchor() {
     checkThread();
     return nativeGetAnchor();
@@ -70,7 +69,6 @@ public class Light {
    *
    * @return position as Position
    */
-  @NonNull
   public Position getPosition() {
     checkThread();
     return nativeGetPosition();
@@ -81,7 +79,6 @@ public class Light {
    *
    * @return transition options for position
    */
-  @NonNull
   public TransitionOptions getPositionTransition() {
     checkThread();
     return nativeGetPositionTransition();
@@ -92,7 +89,7 @@ public class Light {
    *
    * @param options transition options for position
    */
-  public void setPositionTransition(@NonNull TransitionOptions options) {
+  public void setPositionTransition(TransitionOptions options) {
     checkThread();
     nativeSetPositionTransition(options.getDuration(), options.getDelay());
   }
@@ -122,7 +119,6 @@ public class Light {
    *
    * @return color as String
    */
-  @NonNull
    public String getColor() {
     checkThread();
     return nativeGetColor();
@@ -133,7 +129,6 @@ public class Light {
    *
    * @return transition options for color
    */
-  @NonNull
   public TransitionOptions getColorTransition() {
     checkThread();
     return nativeGetColorTransition();
@@ -144,7 +139,7 @@ public class Light {
    *
    * @param options transition options for color
    */
-  public void setColorTransition(@NonNull TransitionOptions options) {
+  public void setColorTransition(TransitionOptions options) {
     checkThread();
     nativeSetColorTransition(options.getDuration(), options.getDelay());
   }
@@ -164,7 +159,6 @@ public class Light {
    *
    * @return intensity as Float
    */
-  @NonNull
    public float getIntensity() {
     checkThread();
     return nativeGetIntensity();
@@ -175,7 +169,6 @@ public class Light {
    *
    * @return transition options for intensity
    */
-  @NonNull
   public TransitionOptions getIntensityTransition() {
     checkThread();
     return nativeGetIntensityTransition();
@@ -186,7 +179,7 @@ public class Light {
    *
    * @param options transition options for intensity
    */
-  public void setIntensityTransition(@NonNull TransitionOptions options) {
+  public void setIntensityTransition(TransitionOptions options) {
     checkThread();
     nativeSetIntensityTransition(options.getDuration(), options.getDelay());
   }
@@ -198,16 +191,13 @@ public class Light {
   @Keep
   private native void nativeSetAnchor(String anchor);
 
-  @NonNull
   @Keep
   private native String nativeGetAnchor();
   @Keep
   private native void nativeSetPosition(Position position);
 
-  @NonNull
   @Keep
   private native Position nativeGetPosition();
-  @NonNull
   @Keep
   private native TransitionOptions nativeGetPositionTransition();
 
@@ -216,10 +206,8 @@ public class Light {
   @Keep
   private native void nativeSetColor(String color);
 
-  @NonNull
   @Keep
   private native String nativeGetColor();
-  @NonNull
   @Keep
   private native TransitionOptions nativeGetColorTransition();
 
@@ -228,10 +216,8 @@ public class Light {
   @Keep
   private native void nativeSetIntensity(float intensity);
 
-  @NonNull
   @Keep
   private native float nativeGetIntensity();
-  @NonNull
   @Keep
   private native TransitionOptions nativeGetIntensityTransition();
 

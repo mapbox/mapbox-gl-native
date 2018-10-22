@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -41,9 +40,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
   private static final String MAP_FEEDBACK_URL = "https://www.mapbox.com/map-feedback";
   private static final String MAP_FEEDBACK_LOCATION_FORMAT = MAP_FEEDBACK_URL + "/#/%f/%f/%d";
 
-  @NonNull
   private final Context context;
-  @NonNull
   private final MapboxMap mapboxMap;
   private Set<Attribution> attributionSet;
 
@@ -54,7 +51,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
 
   // Called when someone presses the attribution icon on the map
   @Override
-  public void onClick(@NonNull View view) {
+  public void onClick(View view) {
     attributionSet = new AttributionBuilder(mapboxMap, view.getContext()).build();
 
     boolean isActivityFinishing = false;
@@ -69,7 +66,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
     }
   }
 
-  protected void showAttributionDialog(@NonNull String[] attributionTitles) {
+  protected void showAttributionDialog(String[] attributionTitles) {
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
     builder.setTitle(R.string.mapbox_attributionsDialogTitle);
     builder.setAdapter(new ArrayAdapter<>(context, R.layout.mapbox_attribution_list_item, attributionTitles), this);
@@ -104,7 +101,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
     builder.setMessage(R.string.mapbox_attributionTelemetryMessage);
     builder.setPositiveButton(R.string.mapbox_attributionTelemetryPositive, new DialogInterface.OnClickListener() {
       @Override
-      public void onClick(@NonNull DialogInterface dialog, int which) {
+      public void onClick(DialogInterface dialog, int which) {
         TelemetryDefinition telemetry = Mapbox.getTelemetry();
         if (telemetry != null) {
           telemetry.setUserTelemetryRequestState(true);
@@ -114,14 +111,14 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
     });
     builder.setNeutralButton(R.string.mapbox_attributionTelemetryNeutral, new DialogInterface.OnClickListener() {
       @Override
-      public void onClick(@NonNull DialogInterface dialog, int which) {
+      public void onClick(DialogInterface dialog, int which) {
         showWebPage(context.getResources().getString(R.string.mapbox_telemetryLink));
         dialog.cancel();
       }
     });
     builder.setNegativeButton(R.string.mapbox_attributionTelemetryNegative, new DialogInterface.OnClickListener() {
       @Override
-      public void onClick(@NonNull DialogInterface dialog, int which) {
+      public void onClick(DialogInterface dialog, int which) {
         TelemetryDefinition telemetry = Mapbox.getTelemetry();
         if (telemetry != null) {
           telemetry.setUserTelemetryRequestState(false);
@@ -141,8 +138,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
     showWebPage(url);
   }
 
-  @NonNull
-  private String buildMapFeedbackMapUrl(@Nullable CameraPosition cameraPosition) {
+  private String buildMapFeedbackMapUrl(CameraPosition cameraPosition) {
     // appends current location to the map feedback url if available
     return cameraPosition != null ? String.format(Locale.getDefault(),
       MAP_FEEDBACK_LOCATION_FORMAT, cameraPosition.target.getLongitude(), cameraPosition.target.getLatitude(),
@@ -164,7 +160,6 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
   private static class AttributionBuilder {
 
     private final MapboxMap mapboxMap;
-    @NonNull
     private final WeakReference<Context> context;
 
     AttributionBuilder(MapboxMap mapboxMap, Context context) {

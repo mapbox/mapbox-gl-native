@@ -36,7 +36,6 @@ class PolygonContainer implements Polygons {
     return polygon;
   }
 
-  @NonNull
   @Override
   public List<Polygon> addBy(@NonNull List<PolygonOptions> polygonOptionsList, @NonNull MapboxMap mapboxMap) {
     int count = polygonOptionsList.size();
@@ -63,12 +62,11 @@ class PolygonContainer implements Polygons {
   }
 
   @Override
-  public void update(@NonNull Polygon polygon) {
+  public void update(Polygon polygon) {
     nativeMapView.updatePolygon(polygon);
     annotations.setValueAt(annotations.indexOfKey(polygon.getId()), polygon);
   }
 
-  @NonNull
   @Override
   public List<Polygon> obtainAll() {
     List<Polygon> polygons = new ArrayList<>();

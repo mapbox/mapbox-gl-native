@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.geometry;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 
 /**
  * Contains the four points defining the four-sided polygon that is visible in a map's camera.
@@ -99,7 +98,6 @@ public class VisibleRegion implements Parcelable {
    *
    * @return the string representation of this
    */
-  @NonNull
   @Override
   public String toString() {
     return "[farLeft [" + farLeft + "], farRight [" + farRight + "], nearLeft [" + nearLeft + "], nearRight ["
@@ -136,7 +134,7 @@ public class VisibleRegion implements Parcelable {
    * @param flags Additional flags about how the object should be written
    */
   @Override
-  public void writeToParcel(@NonNull Parcel out, int flags) {
+  public void writeToParcel(Parcel out, int flags) {
     out.writeParcelable(farLeft, flags);
     out.writeParcelable(farRight, flags);
     out.writeParcelable(nearLeft, flags);
@@ -149,7 +147,7 @@ public class VisibleRegion implements Parcelable {
    */
   public static final Parcelable.Creator<VisibleRegion> CREATOR =
     new Parcelable.Creator<VisibleRegion>() {
-      public VisibleRegion createFromParcel(@NonNull Parcel in) {
+      public VisibleRegion createFromParcel(Parcel in) {
         return new VisibleRegion(in);
       }
 

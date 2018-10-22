@@ -30,21 +30,15 @@ import com.mapbox.mapboxsdk.utils.ColorUtils;
  */
 public final class UiSettings {
 
-  @NonNull
   private final FocalPointChangeListener focalPointChangeListener;
-  @NonNull
   private final Projection projection;
-  @NonNull
   private final CompassView compassView;
   private final int[] compassMargins = new int[4];
 
-  @NonNull
   private final ImageView attributionsView;
   private final int[] attributionsMargins = new int[4];
-  @Nullable
   private AttributionDialogManager attributionDialogManager;
 
-  @NonNull
   private final View logoView;
   private final int[] logoMargins = new int[4];
 
@@ -71,7 +65,6 @@ public final class UiSettings {
 
   private boolean deselectMarkersOnTap = true;
 
-  @Nullable
   private PointF userProvidedFocalPoint;
 
   UiSettings(@NonNull Projection projection, @NonNull FocalPointChangeListener listener,
@@ -94,7 +87,7 @@ public final class UiSettings {
     initialiseZoomControl(context);
   }
 
-  void onSaveInstanceState(@NonNull Bundle outState) {
+  void onSaveInstanceState(Bundle outState) {
     saveGestures(outState);
     saveCompass(outState);
     saveLogo(outState);
@@ -151,7 +144,7 @@ public final class UiSettings {
       savedInstanceState.getBoolean(MapboxConstants.STATE_INCREASE_SCALE_THRESHOLD));
   }
 
-  private void initialiseCompass(MapboxMapOptions options, @NonNull Resources resources) {
+  private void initialiseCompass(MapboxMapOptions options, Resources resources) {
     setCompassEnabled(options.getCompassEnabled());
     setCompassGravity(options.getCompassGravity());
     int[] compassMargins = options.getCompassMargins();
@@ -192,13 +185,13 @@ public final class UiSettings {
       compassView.getContext(), savedInstanceState.getByteArray(MapboxConstants.STATE_COMPASS_IMAGE_BITMAP)));
   }
 
-  private void initialiseLogo(MapboxMapOptions options, @NonNull Resources resources) {
+  private void initialiseLogo(MapboxMapOptions options, Resources resources) {
     setLogoEnabled(options.getLogoEnabled());
     setLogoGravity(options.getLogoGravity());
     setLogoMargins(resources, options.getLogoMargins());
   }
 
-  private void setLogoMargins(@NonNull Resources resources, @Nullable int[] logoMargins) {
+  private void setLogoMargins(Resources resources, int[] logoMargins) {
     if (logoMargins != null) {
       setLogoMargins(logoMargins[0], logoMargins[1], logoMargins[2], logoMargins[3]);
     } else {
@@ -226,7 +219,7 @@ public final class UiSettings {
       savedInstanceState.getInt(MapboxConstants.STATE_LOGO_MARGIN_BOTTOM));
   }
 
-  private void initialiseAttribution(@NonNull Context context, MapboxMapOptions options) {
+  private void initialiseAttribution(Context context, MapboxMapOptions options) {
     setAttributionEnabled(options.getAttributionEnabled());
     setAttributionGravity(options.getAttributionGravity());
     setAttributionMargins(context, options.getAttributionMargins());
@@ -235,7 +228,7 @@ public final class UiSettings {
       ? attributionTintColor : ColorUtils.getPrimaryColor(context));
   }
 
-  private void setAttributionMargins(@NonNull Context context, @Nullable int[] attributionMargins) {
+  private void setAttributionMargins(Context context, int[] attributionMargins) {
     if (attributionMargins != null) {
       setAttributionMargins(attributionMargins[0], attributionMargins[1],
         attributionMargins[2], attributionMargins[3]);
@@ -551,7 +544,7 @@ public final class UiSettings {
    *
    * @param attributionDialogManager the manager class used for showing attribution
    */
-  public void setAttributionDialogManager(@Nullable AttributionDialogManager attributionDialogManager) {
+  public void setAttributionDialogManager(@NonNull AttributionDialogManager attributionDialogManager) {
     this.attributionDialogManager = attributionDialogManager;
   }
 
@@ -560,7 +553,7 @@ public final class UiSettings {
    *
    * @return the active manager class used for showing attribution
    */
-  @Nullable
+  @NonNull
   public AttributionDialogManager getAttributionDialogManager() {
     return attributionDialogManager;
   }
@@ -982,7 +975,6 @@ public final class UiSettings {
    *
    * @return The focal point
    */
-  @Nullable
   public PointF getFocalPoint() {
     return userProvidedFocalPoint;
   }

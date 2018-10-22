@@ -82,7 +82,6 @@ public class <%- camelize(type) %>Layer extends Layer {
    * @param sourceLayer the source layer to set
    * @return This
    */
-  @NonNull
   public <%- camelize(type) %>Layer withSourceLayer(String sourceLayer) {
     setSourceLayer(sourceLayer);
     return this;
@@ -95,7 +94,6 @@ public class <%- camelize(type) %>Layer extends Layer {
    *
    * @return id of the source
    */
-  @NonNull
   public String getSourceId() {
     checkThread();
     return nativeGetSourceId();
@@ -108,7 +106,6 @@ public class <%- camelize(type) %>Layer extends Layer {
    *
    * @return sourceLayer the source layer to get
    */
-  @NonNull
   public String getSourceLayer() {
     checkThread();
     return nativeGetSourceLayer();
@@ -119,7 +116,7 @@ public class <%- camelize(type) %>Layer extends Layer {
    *
    * @param filter the expression filter to set
    */
-  public void setFilter(@NonNull Expression filter) {
+  public void setFilter(Expression filter) {
     checkThread();
     nativeSetFilter(filter.toArray());
   }
@@ -130,8 +127,7 @@ public class <%- camelize(type) %>Layer extends Layer {
    * @param filter the expression filter to set
    * @return This
    */
-  @NonNull
-  public <%- camelize(type) %>Layer withFilter(@NonNull Expression filter) {
+  public <%- camelize(type) %>Layer withFilter(Expression filter) {
     setFilter(filter);
     return this;
   }
@@ -159,7 +155,6 @@ public class <%- camelize(type) %>Layer extends Layer {
    * @param properties the var-args properties
    * @return This
    */
-  @NonNull
   public <%- camelize(type) %>Layer withProperties(@NonNull PropertyValue<?>... properties) {
     setProperties(properties);
     return this;
@@ -173,7 +168,6 @@ public class <%- camelize(type) %>Layer extends Layer {
    *
    * @return property wrapper value around <%- propertyType(property) %>
    */
-  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<<%- propertyType(property) %>> get<%- camelize(property.name) %>() {
     checkThread();
@@ -205,7 +199,6 @@ public class <%- camelize(type) %>Layer extends Layer {
    *
    * @return transition options for <%- propertyType(property) %>
    */
-  @NonNull
   public TransitionOptions get<%- camelize(property.name) %>Transition() {
     checkThread();
     return nativeGet<%- camelize(property.name) %>Transition();
@@ -216,7 +209,7 @@ public class <%- camelize(type) %>Layer extends Layer {
    *
    * @param options transition options for <%- propertyType(property) %>
    */
-  public void set<%- camelize(property.name) %>Transition(@NonNull TransitionOptions options) {
+  public void set<%- camelize(property.name) %>Transition(TransitionOptions options) {
     checkThread();
     nativeSet<%- camelize(property.name) %>Transition(options.getDuration(), options.getDelay());
   }
@@ -224,12 +217,10 @@ public class <%- camelize(type) %>Layer extends Layer {
 <% } -%>
 
 <% for (const property of properties) { -%>
-  @NonNull
   @Keep
   private native Object nativeGet<%- camelize(property.name) %>();
 
 <% if (property.transition) { -%>
-  @NonNull
   @Keep
   private native TransitionOptions nativeGet<%- camelize(property.name) %>Transition();
 

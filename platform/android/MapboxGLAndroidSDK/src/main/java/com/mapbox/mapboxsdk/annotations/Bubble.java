@@ -8,26 +8,22 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
 
 class Bubble extends Drawable {
 
-  @NonNull
   private RectF rect;
   private float arrowWidth;
   private float arrowHeight;
   private float arrowPosition;
   private float cornersRadius;
-  @NonNull
   private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
   private float strokeWidth;
   private Paint strokePaint;
   private Path strokePath;
-  @NonNull
   private Path path = new Path();
 
-  Bubble(@NonNull RectF rect, @NonNull ArrowDirection arrowDirection, float arrowWidth, float arrowHeight,
-         float arrowPosition, float cornersRadius, int bubbleColor, float strokeWidth, int strokeColor) {
+  Bubble(RectF rect, ArrowDirection arrowDirection, float arrowWidth, float arrowHeight, float arrowPosition,
+         float cornersRadius, int bubbleColor, float strokeWidth, int strokeColor) {
     this.rect = rect;
     this.arrowWidth = arrowWidth;
     this.arrowHeight = arrowHeight;
@@ -53,7 +49,7 @@ class Bubble extends Drawable {
   }
 
   @Override
-  public void draw(@NonNull Canvas canvas) {
+  public void draw(Canvas canvas) {
     if (strokeWidth > 0) {
       canvas.drawPath(strokePath, strokePaint);
     }
@@ -85,7 +81,7 @@ class Bubble extends Drawable {
     return (int) rect.height();
   }
 
-  private void initPath(@NonNull ArrowDirection arrowDirection, @NonNull Path path, float strokeWidth) {
+  private void initPath(ArrowDirection arrowDirection, Path path, float strokeWidth) {
     switch (arrowDirection.getValue()) {
       case ArrowDirection.LEFT:
         if (cornersRadius <= 0) {

@@ -3,8 +3,6 @@ package com.mapbox.mapboxsdk.http;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.log.Logger;
@@ -22,7 +20,6 @@ class LocalRequestTask extends AsyncTask<String, Void, byte[]> {
     this.requestResponse = requestResponse;
   }
 
-  @Nullable
   @Override
   protected byte[] doInBackground(String... strings) {
     return loadFile(Mapbox.getApplicationContext().getAssets(),
@@ -33,15 +30,14 @@ class LocalRequestTask extends AsyncTask<String, Void, byte[]> {
   }
 
   @Override
-  protected void onPostExecute(@Nullable byte[] bytes) {
+  protected void onPostExecute(byte[] bytes) {
     super.onPostExecute(bytes);
     if (bytes != null && requestResponse != null) {
       requestResponse.onResponse(bytes);
     }
   }
 
-  @Nullable
-  private static byte[] loadFile(AssetManager assets, @NonNull String path) {
+  private static byte[] loadFile(AssetManager assets, String path) {
     byte[] buffer = null;
     try (InputStream input = assets.open(path)) {
       int size = input.available();

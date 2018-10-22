@@ -3,8 +3,6 @@ package com.mapbox.mapboxsdk.geometry;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Keep;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 /**
  * ProjectedMeters is a projection of longitude, latitude points in Mercator meters.
@@ -20,7 +18,7 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable {
    * Inner class responsible for recreating Parcels into objects.
    */
   public static final Creator<ProjectedMeters> CREATOR = new Creator<ProjectedMeters>() {
-    public ProjectedMeters createFromParcel(@NonNull Parcel in) {
+    public ProjectedMeters createFromParcel(Parcel in) {
       return new ProjectedMeters(in);
     }
 
@@ -92,7 +90,7 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable {
    * @return true if equal, false if not
    */
   @Override
-  public boolean equals(@Nullable Object other) {
+  public boolean equals(Object other) {
     if (this == other) {
       return true;
     }
@@ -127,7 +125,6 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable {
    *
    * @return the string representation of this
    */
-  @NonNull
   @Override
   public String toString() {
     return "ProjectedMeters [northing=" + northing + ", easting=" + easting + "]";
@@ -150,7 +147,7 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable {
    * @param flags Additional flags about how the object should be written
    */
   @Override
-  public void writeToParcel(@NonNull Parcel out, int flags) {
+  public void writeToParcel(Parcel out, int flags) {
     out.writeDouble(northing);
     out.writeDouble(easting);
   }

@@ -68,7 +68,6 @@ public class LatLngBounds implements Parcelable {
    *
    * @return LatLng center of this LatLngBounds
    */
-  @NonNull
   public LatLng getCenter() {
     double latCenter = (this.latitudeNorth + this.latitudeSouth) / 2.0;
     double longCenter;
@@ -127,7 +126,6 @@ public class LatLngBounds implements Parcelable {
    *
    * @return LatLng of the south west corner
    */
-  @NonNull
   public LatLng getSouthWest() {
     return new LatLng(latitudeSouth, longitudeWest);
   }
@@ -137,7 +135,6 @@ public class LatLngBounds implements Parcelable {
    *
    * @return LatLng of the north east corner
    */
-  @NonNull
   public LatLng getNorthEast() {
     return new LatLng(latitudeNorth, longitudeEast);
   }
@@ -147,7 +144,6 @@ public class LatLngBounds implements Parcelable {
    *
    * @return LatLng of the south east corner
    */
-  @NonNull
   public LatLng getSouthEast() {
     return new LatLng(latitudeSouth, longitudeEast);
   }
@@ -157,7 +153,6 @@ public class LatLngBounds implements Parcelable {
    *
    * @return LatLng of the north west corner
    */
-  @NonNull
   public LatLng getNorthWest() {
     return new LatLng(latitudeNorth, longitudeWest);
   }
@@ -167,7 +162,6 @@ public class LatLngBounds implements Parcelable {
    *
    * @return LatLngSpan area
    */
-  @NonNull
   public LatLngSpan getSpan() {
     return new LatLngSpan(getLatitudeSpan(), getLongitudeSpan());
   }
@@ -222,7 +216,6 @@ public class LatLngBounds implements Parcelable {
    *
    * @return the string representation
    */
-  @NonNull
   @Override
   public String toString() {
     return "N:" + this.latitudeNorth + "; E:" + this.longitudeEast + "; S:" + this.latitudeSouth
@@ -283,7 +276,6 @@ public class LatLngBounds implements Parcelable {
    *
    * @return an array of 2 LatLng objects.
    */
-  @NonNull
   public LatLng[] toLatLngs() {
     return new LatLng[] {getNorthEast(), getSouthWest()};
   }
@@ -373,8 +365,7 @@ public class LatLngBounds implements Parcelable {
    * @param latLng the latitude lognitude pair to include in the bounds.
    * @return the newly constructed bounds
    */
-  @NonNull
-  public LatLngBounds include(@NonNull LatLng latLng) {
+  public LatLngBounds include(LatLng latLng) {
     return new LatLngBounds.Builder()
       .include(getNorthEast())
       .include(getSouthWest())
@@ -427,7 +418,7 @@ public class LatLngBounds implements Parcelable {
    * @param latLng the point which may be contained
    * @return true, if the point is contained within the bounds
    */
-  public boolean contains(@NonNull final ILatLng latLng) {
+  public boolean contains(final ILatLng latLng) {
     return containsLatitude(latLng.getLatitude())
       && containsLongitude(latLng.getLongitude());
   }
@@ -438,7 +429,7 @@ public class LatLngBounds implements Parcelable {
    * @param other the bounds which may be contained
    * @return true, if the bounds is contained within the bounds
    */
-  public boolean contains(@NonNull final LatLngBounds other) {
+  public boolean contains(final LatLngBounds other) {
     return contains(other.getNorthEast())
       && contains(other.getSouthWest());
   }
@@ -638,7 +629,7 @@ public class LatLngBounds implements Parcelable {
   public static final Parcelable.Creator<LatLngBounds> CREATOR =
     new Parcelable.Creator<LatLngBounds>() {
       @Override
-      public LatLngBounds createFromParcel(@NonNull final Parcel in) {
+      public LatLngBounds createFromParcel(final Parcel in) {
         return readFromParcel(in);
       }
 
@@ -678,7 +669,7 @@ public class LatLngBounds implements Parcelable {
    * @param flags Additional flags about how the object should be written
    */
   @Override
-  public void writeToParcel(@NonNull final Parcel out, final int flags) {
+  public void writeToParcel(final Parcel out, final int flags) {
     out.writeDouble(this.latitudeNorth);
     out.writeDouble(this.longitudeEast);
     out.writeDouble(this.latitudeSouth);
@@ -721,8 +712,7 @@ public class LatLngBounds implements Parcelable {
      * @param latLngs the List of LatLng objects to be added
      * @return this
      */
-    @NonNull
-    public Builder includes(@NonNull List<LatLng> latLngs) {
+    public Builder includes(List<LatLng> latLngs) {
       latLngList.addAll(latLngs);
       return this;
     }
@@ -733,7 +723,6 @@ public class LatLngBounds implements Parcelable {
      * @param latLng the LatLng to be added
      * @return this
      */
-    @NonNull
     public Builder include(@NonNull LatLng latLng) {
       latLngList.add(latLng);
       return this;

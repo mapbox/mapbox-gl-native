@@ -10,7 +10,6 @@ import java.util.List;
 
 abstract class MapboxCameraAnimatorAdapter extends
   MapboxFloatAnimator<MapboxAnimator.OnCameraAnimationsValuesChangeListener> {
-  @Nullable
   private final MapboxMap.CancelableCallback cancelableCallback;
 
   MapboxCameraAnimatorAdapter(Float previous, Float target,

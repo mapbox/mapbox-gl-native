@@ -21,7 +21,6 @@ import java.util.List;
  */
 public class Projection {
 
-  @NonNull
   private final NativeMapView nativeMapView;
   private int[] contentPadding;
 

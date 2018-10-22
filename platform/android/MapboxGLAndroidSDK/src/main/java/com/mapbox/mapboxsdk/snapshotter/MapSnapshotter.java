@@ -50,7 +50,7 @@ public class MapSnapshotter {
      *
      * @param snapshot the snapshot
      */
-    void onSnapshotReady(@NonNull MapSnapshot snapshot);
+    void onSnapshotReady(MapSnapshot snapshot);
 
   }
 
@@ -68,7 +68,7 @@ public class MapSnapshotter {
      *
      * @param error the error message
      */
-    void onError(@NonNull String error);
+    void onError(String error);
   }
 
   private static final int LOGO_MARGIN_DP = 4;
@@ -78,9 +78,7 @@ public class MapSnapshotter {
   private long nativePtr = 0;
 
   private final Context context;
-  @Nullable
   private SnapshotReadyCallback callback;
-  @Nullable
   private ErrorHandler errorHandler;
 
   /**
@@ -112,7 +110,6 @@ public class MapSnapshotter {
      * @param url The style URL to use
      * @return the mutated {@link Options}
      */
-    @NonNull
     public Options withStyle(String url) {
       this.styleUrl = url;
       return this;
@@ -122,7 +119,6 @@ public class MapSnapshotter {
      * @param styleJson The style json to use
      * @return the mutated {@link Options}
      */
-    @NonNull
     public Options withStyleJson(String styleJson) {
       this.styleJson = styleJson;
       return this;
@@ -133,7 +129,6 @@ public class MapSnapshotter {
      *               This is applied after the camera position
      * @return the mutated {@link Options}
      */
-    @NonNull
     public Options withRegion(LatLngBounds region) {
       this.region = region;
       return this;
@@ -143,7 +138,6 @@ public class MapSnapshotter {
      * @param pixelRatio the pixel ratio to use (default: 1)
      * @return the mutated {@link Options}
      */
-    @NonNull
     public Options withPixelRatio(float pixelRatio) {
       this.pixelRatio = pixelRatio;
       return this;
@@ -155,7 +149,6 @@ public class MapSnapshotter {
      *                       by region if set in conjunction.
      * @return the mutated {@link Options}
      */
-    @NonNull
     public Options withCameraPosition(CameraPosition cameraPosition) {
       this.cameraPosition = cameraPosition;
       return this;
@@ -165,7 +158,6 @@ public class MapSnapshotter {
      * @param showLogo The flag indicating to show the Mapbox logo.
      * @return the mutated {@link Options}
      */
-    @NonNull
     public Options withLogo(boolean showLogo) {
       this.showLogo = showLogo;
       return this;
@@ -317,24 +309,21 @@ public class MapSnapshotter {
    *
    * @param mapSnapshot the map snapshot to draw the overlay on
    */
-  protected void addOverlay(@NonNull MapSnapshot mapSnapshot) {
+  protected void addOverlay(MapSnapshot mapSnapshot) {
     Bitmap snapshot = mapSnapshot.getBitmap();
     Canvas canvas = new Canvas(snapshot);
     int margin = (int) context.getResources().getDisplayMetrics().density * LOGO_MARGIN_DP;
     drawOverlay(mapSnapshot, snapshot, canvas, margin);
   }
 
-  private void drawOverlay(@NonNull MapSnapshot mapSnapshot, @NonNull Bitmap snapshot,
-                           @NonNull Canvas canvas, int margin) {
+  private void drawOverlay(MapSnapshot mapSnapshot, Bitmap snapshot, Canvas canvas, int margin) {
     AttributionMeasure measure = getAttributionMeasure(mapSnapshot, snapshot, margin);
     AttributionLayout layout = measure.measure();
     drawLogo(mapSnapshot, canvas, margin, layout);
     drawAttribution(mapSnapshot, canvas, measure, layout);
   }
 
-  @NonNull
-  private AttributionMeasure getAttributionMeasure(@NonNull MapSnapshot mapSnapshot, @NonNull Bitmap snapshot,
-                                                   int margin) {
+  private AttributionMeasure getAttributionMeasure(MapSnapshot mapSnapshot, Bitmap snapshot, int margin) {
     Logo logo = createScaledLogo(snapshot);
     TextView longText = createTextView(mapSnapshot, false, logo.getScale());
     TextView shortText = createTextView(mapSnapshot, true, logo.getScale());
@@ -349,22 +338,21 @@ public class MapSnapshotter {
       .build();
   }
 
-  private void drawLogo(MapSnapshot mapSnapshot, @NonNull Canvas canvas, int margin,
-                        @NonNull AttributionLayout layout) {
+  private void drawLogo(MapSnapshot mapSnapshot, Canvas canvas, int margin, AttributionLayout layout) {
     if (mapSnapshot.isShowLogo()) {
       drawLogo(mapSnapshot.getBitmap(), canvas, margin, layout);
     }
   }
 
-  private void drawLogo(@NonNull Bitmap snapshot, @NonNull Canvas canvas, int margin, AttributionLayout placement) {
+  private void drawLogo(Bitmap snapshot, Canvas canvas, int margin, AttributionLayout placement) {
     Bitmap selectedLogo = placement.getLogo();
     if (selectedLogo != null) {
       canvas.drawBitmap(selectedLogo, margin, snapshot.getHeight() - selectedLogo.getHeight() - margin, null);
     }
   }
 
-  private void drawAttribution(@NonNull MapSnapshot mapSnapshot, @NonNull Canvas canvas,
-                               @NonNull AttributionMeasure measure, @NonNull AttributionLayout layout) {
+  private void drawAttribution(MapSnapshot mapSnapshot, Canvas canvas,
+                               AttributionMeasure measure, AttributionLayout layout) {
     // draw attribution
     PointF anchorPoint = layout.getAnchorPoint();
     if (anchorPoint != null) {
@@ -385,8 +373,7 @@ public class MapSnapshotter {
     canvas.restore();
   }
 
-  @NonNull
-  private TextView createTextView(@NonNull MapSnapshot mapSnapshot, boolean shortText, float scale) {
+  private TextView createTextView(MapSnapshot mapSnapshot, boolean shortText, float scale) {
     int textColor = ResourcesCompat.getColor(context.getResources(), R.color.mapbox_gray_dark, context.getTheme());
     int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
     int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
@@ -412,7 +399,6 @@ public class MapSnapshotter {
    * @param shortText   indicates if the short variant of the string should be parsed
    * @return the parsed attribution string
    */
-  @NonNull
   private String createAttributionString(MapSnapshot mapSnapshot, boolean shortText) {
     AttributionParser attributionParser = new AttributionParser.Options()
       .withAttributionData(mapSnapshot.getAttributions())
@@ -471,7 +457,7 @@ public class MapSnapshotter {
    * @param snapshot the generated snapshot
    */
   @Keep
-  protected void onSnapshotReady(@NonNull final MapSnapshot snapshot) {
+  protected void onSnapshotReady(final MapSnapshot snapshot) {
     new Handler().post(new Runnable() {
       @Override
       public void run() {

@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.support.annotation.Nullable;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
@@ -12,7 +11,6 @@ import static org.mockito.Mockito.mock;
 
 public class MapboxMapTest {
 
-  @Nullable
   private MapboxMap mapboxMap;
 
   @Before

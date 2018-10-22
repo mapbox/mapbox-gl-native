@@ -36,7 +36,6 @@ import java.util.Map;
 @Deprecated
 public class MarkerViewManager implements MapView.OnMapChangedListener {
 
-  @NonNull
   private final ViewGroup markerViewContainer;
   private final ViewTreeObserver.OnPreDrawListener markerViewPreDrawObserver =
     new ViewTreeObserver.OnPreDrawListener() {
@@ -57,7 +56,6 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
 
   private boolean enabled;
   private long updateTime;
-  @Nullable
   private MapboxMap.OnMarkerViewClickListener onMarkerViewClickListener;
   private boolean isWaitingForRenderInvoke;
 
@@ -332,7 +330,7 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
    * @param convertView the View presentation of the MarkerView.
    * @param adapter     the adapter used to adapt the marker to the convertView.
    */
-  public void select(@NonNull MarkerView marker, View convertView, @NonNull MapboxMap.MarkerViewAdapter adapter) {
+  public void select(@NonNull MarkerView marker, View convertView, MapboxMap.MarkerViewAdapter adapter) {
     select(marker, convertView, adapter, true);
   }
 
@@ -349,8 +347,8 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
    * @param adapter       the adapter used to adapt the marker to the convertView.
    * @param callbackToMap indicates if select marker must be called on MapboxMap.
    */
-  public void select(@NonNull MarkerView marker, @Nullable View convertView,
-                     @NonNull MapboxMap.MarkerViewAdapter adapter, boolean callbackToMap) {
+  public void select(@NonNull MarkerView marker, View convertView, MapboxMap.MarkerViewAdapter adapter,
+                     boolean callbackToMap) {
     if (convertView != null) {
       if (adapter.onSelect(marker, convertView, false)) {
         if (callbackToMap) {
@@ -381,7 +379,7 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
    * @return the MarkerView adapter.
    */
   @Nullable
-  public MapboxMap.MarkerViewAdapter getViewAdapter(@NonNull MarkerView markerView) {
+  public MapboxMap.MarkerViewAdapter getViewAdapter(MarkerView markerView) {
     MapboxMap.MarkerViewAdapter adapter = null;
     for (MapboxMap.MarkerViewAdapter a : markerViewAdapters) {
       if (a.getMarkerClass().equals(markerView.getClass())) {
@@ -402,7 +400,7 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
    *
    * @param marker the MarkerView to remove.
    */
-  public void removeMarkerView(@Nullable MarkerView marker) {
+  public void removeMarkerView(MarkerView marker) {
     final View viewHolder = markerViewMap.get(marker);
     if (viewHolder != null && marker != null) {
       for (final MapboxMap.MarkerViewAdapter<?> adapter : markerViewAdapters) {
@@ -427,7 +425,7 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
    *
    * @param markerViewAdapter the MarkerViewAdapter to add.
    */
-  public void addMarkerViewAdapter(@NonNull MapboxMap.MarkerViewAdapter markerViewAdapter) {
+  public void addMarkerViewAdapter(MapboxMap.MarkerViewAdapter markerViewAdapter) {
     if (markerViewAdapter.getMarkerClass().equals(MarkerView.class)) {
       throw new RuntimeException("Providing a custom MarkerViewAdapter requires subclassing MarkerView");
     }
@@ -443,7 +441,6 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
    *
    * @return a List of MarkerViewAdapters.
    */
-  @NonNull
   public List<MapboxMap.MarkerViewAdapter> getMarkerViewAdapters() {
     return markerViewAdapters;
   }
@@ -562,7 +559,7 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
    * @param markerView that the click event occurred
    * @return true if the marker view click has been handled, false if not
    */
-  public boolean onClickMarkerView(@NonNull MarkerView markerView) {
+  public boolean onClickMarkerView(MarkerView markerView) {
     boolean clickHandled = false;
 
     MapboxMap.MarkerViewAdapter adapter = getViewAdapter(markerView);
@@ -584,7 +581,7 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
    *
    * @param marker that we are ensuring info window offset
    */
-  public void ensureInfoWindowOffset(@NonNull MarkerView marker) {
+  public void ensureInfoWindowOffset(MarkerView marker) {
     View view = null;
     if (markerViewMap.containsKey(marker)) {
       view = markerViewMap.get(marker);
@@ -623,13 +620,12 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
     }
   }
 
-  @NonNull
   public ViewGroup getMarkerViewContainer() {
     return markerViewContainer;
   }
 
-  public void addOnMarkerViewAddedListener(@NonNull MarkerView markerView, OnMarkerViewAddedListener listener) {
-    markerViewAddedListenerMap.put(markerView.getId(), listener);
+  public void addOnMarkerViewAddedListener(MarkerView markerView, OnMarkerViewAddedListener onMarkerViewAddedListener) {
+    markerViewAddedListenerMap.put(markerView.getId(), onMarkerViewAddedListener);
   }
 
   /**

@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 
 import com.mapbox.mapboxsdk.R;
@@ -27,7 +26,7 @@ class LayerBitmapProvider {
     return getBitmapFromDrawable(drawable);
   }
 
-  Bitmap generateShadowBitmap(@NonNull LocationComponentOptions options) {
+  Bitmap generateShadowBitmap(LocationComponentOptions options) {
     Drawable shadowDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_user_icon_shadow);
     return generateShadow(shadowDrawable, options.elevation());
   }

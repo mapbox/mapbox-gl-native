@@ -1,7 +1,5 @@
 package com.mapbox.mapboxsdk.attribution;
 
-import android.support.annotation.Nullable;
-
 public class Attribution {
 
   private static final String OPENSTREETMAP = "OpenStreetMap";
@@ -36,7 +34,7 @@ public class Attribution {
   }
 
   @Override
-  public boolean equals(@Nullable Object o) {
+  public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
