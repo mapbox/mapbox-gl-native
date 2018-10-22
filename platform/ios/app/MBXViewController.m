@@ -31,19 +31,22 @@ static const MGLCoordinateBounds colorado = {
 static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXViewControllerAnnotationViewReuseIdentifer";
 
 typedef NS_ENUM(NSInteger, MBXSettingsSections) {
-    MBXSettingsCoreRendering = 0,
+    MBXSettingsDebugTools = 0,
     MBXSettingsAnnotations,
     MBXSettingsRuntimeStyling,
     MBXSettingsMiscellaneous,
 };
 
-typedef NS_ENUM(NSInteger, MBXSettingsCoreRenderingRows) {
-    MBXSettingsCoreRenderingResetPosition = 0,
-    MBXSettingsCoreRenderingTileBoundaries,
-    MBXSettingsCoreRenderingTileInfo,
-    MBXSettingsCoreRenderingTimestamps,
-    MBXSettingsCoreRenderingCollisionBoxes,
-    MBXSettingsCoreRenderingOverdrawVisualization,
+typedef NS_ENUM(NSInteger, MBXSettingsDebugToolsRows) {
+    MBXSettingsDebugToolsResetPosition = 0,
+    MBXSettingsDebugToolsTileBoundaries,
+    MBXSettingsDebugToolsTileInfo,
+    MBXSettingsDebugToolsTimestamps,
+    MBXSettingsDebugToolsCollisionBoxes,
+    MBXSettingsDebugToolsOverdrawVisualization,
+    MBXSettingsDebugToolsShowZoomLevel,
+    MBXSettingsDebugToolsShowFrameTimeGraph,
+    MBXSettingsDebugToolsShowReuseQueueStats
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsAnnotationsRows) {
@@ -93,11 +96,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
-    MBXSettingsMiscellaneousShowReuseQueueStats = 0,
     MBXSettingsMiscellaneousWorldTour,
     MBXSettingsMiscellaneousRandomTour,
-    MBXSettingsMiscellaneousShowZoomLevel,
-    MBXSettingsMiscellaneousShowFrameTimeGraph,
     MBXSettingsMiscellaneousScrollView,
     MBXSettingsMiscellaneousToggleTwoMaps,
     MBXSettingsMiscellaneousLocalizeLabels,
@@ -331,7 +331,11 @@ CLLocationCoordinate2D randomWorldCoordinate() {
         self.mapInfoHUDEnabled = YES;
         [self updateHUD];
     }
-    self.frameTimeGraphEnabled = [defaults boolForKey:@"MBXShowsFrameTimeGraph"];
+    if ([defaults boolForKey:@"MBXShowsFrameTimeGraph"])
+    {
+        self.frameTimeGraphEnabled = YES;
+        self.frameTimeGraphView.hidden = NO;
+    }
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations
@@ -377,7 +381,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 - (NSArray <NSString *> *)settingsSectionTitles
 {
     return @[
-        @"Core Rendering",
+        @"Debug Tools",
         @"Annotations",
         @"Runtime Styling",
         @"Miscellaneous"
@@ -392,7 +396,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
     switch (section)
     {
-        case MBXSettingsCoreRendering:
+        case MBXSettingsDebugTools:
             [settingsTitles addObjectsFromArray:@[
                 @"Reset Position",
                 [NSString stringWithFormat:@"%@ Tile Boundaries",
@@ -405,6 +409,9 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                     (debugMask & MGLMapDebugCollisionBoxesMask ? @"Hide" :@"Show")],
                 [NSString stringWithFormat:@"%@ Overdraw Visualization",
                     (debugMask & MGLMapDebugOverdrawVisualizationMask ? @"Hide" :@"Show")],
+                [NSString stringWithFormat:@"%@ Map Info HUD", (_mapInfoHUDEnabled ? @"Hide" :@"Show")],
+                [NSString stringWithFormat:@"%@ Frame Time Graph", (_frameTimeGraphEnabled ? @"Hide" :@"Show")],
+                [NSString stringWithFormat:@"%@ Reuse Queue Stats", (_reuseQueueStatsEnabled ? @"Hide" :@"Show")]
             ]];
             break;
         case MBXSettingsAnnotations:
@@ -457,11 +464,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
             break;
         case MBXSettingsMiscellaneous:
             [settingsTitles addObjectsFromArray:@[
-                [NSString stringWithFormat:@"%@ Reuse Queue Stats", (_reuseQueueStatsEnabled ? @"Hide" :@"Show")],
                 @"Start World Tour",
                 @"Random Tour",
-                [NSString stringWithFormat:@"%@ Map Info HUD", (_mapInfoHUDEnabled ? @"Hide" :@"Show")],
-                [NSString stringWithFormat:@"%@ Frame Time Graph", (_frameTimeGraphEnabled ? @"Hide" :@"Show")],
                 @"Embedded Map View",
                 [NSString stringWithFormat:@"%@ Second Map", ([self.view viewWithTag:2] == nil ? @"Show" : @"Hide")],
                 [NSString stringWithFormat:@"Show Labels in %@", (_localizingLabels ? @"Default Language" : [[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier value:[self bestLanguageForUser]])],
@@ -491,29 +495,51 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 {
     switch (indexPath.section)
     {
-        case MBXSettingsCoreRendering:
+        case MBXSettingsDebugTools:
             switch (indexPath.row)
             {
-                case MBXSettingsCoreRenderingResetPosition:
+                case MBXSettingsDebugToolsResetPosition:
                     [self.mapView resetPosition];
                     break;
-                case MBXSettingsCoreRenderingTileBoundaries:
+                case MBXSettingsDebugToolsTileBoundaries:
                     self.mapView.debugMask ^= MGLMapDebugTileBoundariesMask;
                     break;
-                case MBXSettingsCoreRenderingTileInfo:
+                case MBXSettingsDebugToolsTileInfo:
                     self.mapView.debugMask ^= MGLMapDebugTileInfoMask;
                     break;
-                case MBXSettingsCoreRenderingTimestamps:
+                case MBXSettingsDebugToolsTimestamps:
                     self.mapView.debugMask ^= MGLMapDebugTimestampsMask;
                     break;
-                case MBXSettingsCoreRenderingCollisionBoxes:
+                case MBXSettingsDebugToolsCollisionBoxes:
                     self.mapView.debugMask ^= MGLMapDebugCollisionBoxesMask;
                     break;
-                case MBXSettingsCoreRenderingOverdrawVisualization:
+                case MBXSettingsDebugToolsOverdrawVisualization:
                     self.mapView.debugMask ^= MGLMapDebugOverdrawVisualizationMask;
                     break;
+                case MBXSettingsDebugToolsShowZoomLevel:
+                {
+                    self.mapInfoHUDEnabled = !self.mapInfoHUDEnabled;
+                    self.hudLabel.hidden = !self.mapInfoHUDEnabled;
+                    self.reuseQueueStatsEnabled = NO;
+                    [self updateHUD];
+                    break;
+                }
+                case MBXSettingsDebugToolsShowFrameTimeGraph:
+                {
+                    self.frameTimeGraphEnabled = !self.frameTimeGraphEnabled;
+                    self.frameTimeGraphView.hidden = !self.frameTimeGraphEnabled;
+                    break;
+                }
+                case MBXSettingsDebugToolsShowReuseQueueStats:
+                {
+                    self.reuseQueueStatsEnabled = !self.reuseQueueStatsEnabled;
+                    self.hudLabel.hidden = !self.reuseQueueStatsEnabled;
+                    self.mapInfoHUDEnabled = NO;
+                    [self updateHUD];
+                    break;
+                }
                 default:
-                    NSAssert(NO, @"All core rendering setting rows should be implemented");
+                    NSAssert(NO, @"All debug tools setting rows should be implemented");
                     break;
             }
             break;
@@ -675,28 +701,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 case MBXSettingsMiscellaneousDeleteLogFile:
                     [self deleteTelemetryLogFile];
                     break;
-                case MBXSettingsMiscellaneousShowReuseQueueStats:
-                {
-                    self.reuseQueueStatsEnabled = !self.reuseQueueStatsEnabled;
-                    self.hudLabel.hidden = !self.reuseQueueStatsEnabled;
-                    self.mapInfoHUDEnabled = NO;
-                    [self updateHUD];
-                    break;
-                }
-                case MBXSettingsMiscellaneousShowZoomLevel:
-                {
-                    self.mapInfoHUDEnabled = !self.mapInfoHUDEnabled;
-                    self.hudLabel.hidden = !self.mapInfoHUDEnabled;
-                    self.reuseQueueStatsEnabled = NO;
-                    [self updateHUD];
-                    break;
-                }
-                case MBXSettingsMiscellaneousShowFrameTimeGraph:
-                {
-                    self.frameTimeGraphEnabled = !self.frameTimeGraphEnabled;
-                    self.frameTimeGraphView.hidden = !self.frameTimeGraphEnabled;
-                    break;
-                }
                 case MBXSettingsMiscellaneousScrollView:
                 {
                     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
