@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.style;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -49,7 +48,7 @@ public class GradientLineActivity extends AppCompatActivity implements OnMapRead
   }
 
   @Override
-  public void onMapReady(@NonNull MapboxMap map) {
+  public void onMapReady(MapboxMap map) {
     this.mapboxMap = map;
 
     try {

@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
 import android.graphics.RectF;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
@@ -44,7 +43,7 @@ public class MarkerViewsInRectangleActivity extends AppCompatActivity implements
   }
 
   @Override
-  public void onMapReady(@NonNull MapboxMap mapboxMap) {
+  public void onMapReady(MapboxMap mapboxMap) {
     MarkerViewsInRectangleActivity.this.mapboxMap = mapboxMap;
     selectionBox.setOnClickListener(this);
     mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.0907, 5.1214), 16));

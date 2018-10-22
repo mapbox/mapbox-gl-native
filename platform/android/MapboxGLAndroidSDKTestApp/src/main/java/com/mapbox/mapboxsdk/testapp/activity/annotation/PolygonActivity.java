@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -75,7 +74,7 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
   }
 
   @Override
-  public void onMapReady(@NonNull MapboxMap map) {
+  public void onMapReady(MapboxMap map) {
     mapboxMap = map;
 
     map.setOnPolygonClickListener(polygon -> Toast.makeText(

@@ -119,7 +119,7 @@ public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
   }
 
   @Override
-  public void onMapReady(@NonNull MapboxMap mapboxMap) {
+  public void onMapReady(MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
     for (OnMapReadyCallback onMapReadyCallback : mapReadyCallbackList) {
       onMapReadyCallback.onMapReady(mapboxMap);

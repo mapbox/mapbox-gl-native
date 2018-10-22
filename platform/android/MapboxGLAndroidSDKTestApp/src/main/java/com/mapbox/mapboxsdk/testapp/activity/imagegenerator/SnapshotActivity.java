@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.imagegenerator;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -39,7 +38,7 @@ public class SnapshotActivity extends AppCompatActivity implements OnMapReadyCal
   }
 
   @Override
-  public void onMapReady(@NonNull MapboxMap map) {
+  public void onMapReady(MapboxMap map) {
     mapboxMap = map;
     mapboxMap.setStyleUrl(Style.OUTDOORS);
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
