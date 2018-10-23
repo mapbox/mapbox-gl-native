@@ -75,6 +75,10 @@ void RenderLayer::setRenderTiles(std::vector<std::reference_wrapper<RenderTile>>
     renderTiles = std::move(tiles);
 }
 
+void RenderLayer::markContextDestroyed() {
+    // no-op
+}
+
 void RenderLayer::checkRenderability(const PaintParameters& parameters,
                                      const uint32_t activeBindingCount) {
     // Only warn once for every layer.

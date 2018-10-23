@@ -42,6 +42,10 @@ bool RenderCustomLayer::hasCrossfade() const {
     return false;
 }
 
+void RenderCustomLayer::markContextDestroyed() {
+    contextDestroyed = true;
+}
+
 std::unique_ptr<Bucket> RenderCustomLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
     assert(false);
     return nullptr;
