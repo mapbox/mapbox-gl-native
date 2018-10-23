@@ -199,7 +199,7 @@ public class <%- camelize(type) %>Layer extends Layer {
    * Get the <%- camelize(property.name) %> property as {@link Formatted} object
    *
    * @return property wrapper value around <%- propertyType(property) %>
-   * @see Expression#format(Expression...)
+   * @see Expression#format(Expression.FormatEntry...)
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Formatted> getFormatted<%- camelize(property.name) %>() {

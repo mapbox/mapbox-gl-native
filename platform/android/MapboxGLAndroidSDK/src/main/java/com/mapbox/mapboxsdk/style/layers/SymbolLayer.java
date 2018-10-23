@@ -386,7 +386,7 @@ public class SymbolLayer extends Layer {
    * Get the TextField property as {@link Formatted} object
    *
    * @return property wrapper value around String
-   * @see Expression#format(Expression...)
+   * @see Expression#format(Expression.FormatEntry...)
    */
   @SuppressWarnings("unchecked")
   public PropertyValue<Formatted> getFormattedTextField() {

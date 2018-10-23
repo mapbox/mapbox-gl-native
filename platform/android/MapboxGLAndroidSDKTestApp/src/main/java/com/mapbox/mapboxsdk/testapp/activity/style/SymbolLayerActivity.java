@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mapbox.geojson.Feature;
@@ -29,6 +30,11 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 import java.util.List;
 
+import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.formatFontScale;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.formatTextFont;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.concat;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.format;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.formatEntry;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.switchCase;
@@ -118,7 +124,16 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
           iconSize(switchCase(toBool(get(SELECTED_FEATURE_PROPERTY)), literal(3.0f), literal(1.0f))),
           iconAnchor(Property.ICON_ANCHOR_BOTTOM),
           iconColor(Color.RED),
-          textField(get(TITLE_FEATURE_PROPERTY)),
+          textField(
+            format(
+              formatEntry("this is", formatFontScale(0.75)),
+              formatEntry(
+                concat(literal("\n"), get(TITLE_FEATURE_PROPERTY)),
+                formatFontScale(1.25),
+                formatTextFont(new String[] {"DIN Offc Pro Bold", "Arial Unicode MS Regular"})
+              )
+            )
+          ),
           textFont(new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"}),
           textColor(Color.RED),
           textAllowOverlap(true),

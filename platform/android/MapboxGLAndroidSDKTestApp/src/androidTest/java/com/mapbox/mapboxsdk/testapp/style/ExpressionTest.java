@@ -30,8 +30,8 @@ import java.io.IOException;
 
 import timber.log.Timber;
 
-import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.fontScale;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.textFont;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.formatFontScale;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.formatTextFont;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.collator;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
@@ -315,7 +315,7 @@ public class ExpressionTest extends BaseActivityTest {
       mapboxMap.addLayer(layer);
 
       Expression expression = format(
-        formatEntry("test", fontScale(1.75))
+        formatEntry("test", formatFontScale(1.75))
       );
       layer.setProperties(textField(expression));
       waitForLayer(uiController, mapboxMap, latLng);
@@ -344,13 +344,16 @@ public class ExpressionTest extends BaseActivityTest {
 
       Expression expression = format(
         formatEntry(
-          literal("test"), fontScale(1.0), textFont(new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"})
+          literal("test"),
+          formatFontScale(1.0),
+          formatTextFont(new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"})
         )
       );
       layer.setProperties(textField(expression));
       waitForLayer(uiController, mapboxMap, latLng);
-      assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
-        .isEmpty());
+      assertFalse(
+        mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer").isEmpty()
+      );
 
       assertNull(layer.getTextField().getExpression());
       assertEquals("test", layer.getTextField().getValue());
@@ -375,13 +378,16 @@ public class ExpressionTest extends BaseActivityTest {
 
       Expression expression = format(
         formatEntry(
-          "test", fontScale(0.5), textFont(new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"})
+          "test",
+          formatFontScale(0.5),
+          formatTextFont(new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"})
         )
       );
       layer.setProperties(textField(expression));
       waitForLayer(uiController, mapboxMap, latLng);
-      assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
-        .isEmpty());
+      assertFalse(
+        mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer").isEmpty()
+      );
 
       assertNull(layer.getTextField().getExpression());
       assertEquals("test", layer.getTextField().getValue());
@@ -404,14 +410,17 @@ public class ExpressionTest extends BaseActivityTest {
 
       Expression expression = format(
         formatEntry(
-          "test", fontScale(1.5), textFont(new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"})
+          "test",
+          formatFontScale(1.5),
+          formatTextFont(new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"})
         ),
-        formatEntry("\ntest2", fontScale(2))
+        formatEntry("\ntest2", formatFontScale(2))
       );
       layer.setProperties(textField(expression));
       waitForLayer(uiController, mapboxMap, latLng);
-      assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
-        .isEmpty());
+      assertFalse(
+        mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer").isEmpty()
+      );
 
       assertNull(layer.getTextField().getExpression());
       assertEquals("test\ntest2", layer.getTextField().getValue());
@@ -440,8 +449,8 @@ public class ExpressionTest extends BaseActivityTest {
       Expression expression = format(
         formatEntry(
           get("test_property"),
-          fontScale(number(get("test_property_number"))),
-          textFont(new String[] {"Arial Unicode MS Regular", "DIN Offc Pro Regular"})
+          Expression.FormatOption.formatFontScale(number(get("test_property_number"))),
+          formatTextFont(new String[] {"Arial Unicode MS Regular", "DIN Offc Pro Regular"})
         )
       );
       layer.setProperties(textField(expression));
@@ -472,10 +481,10 @@ public class ExpressionTest extends BaseActivityTest {
       Expression expression = format(
         formatEntry(
           get("test_property"),
-          fontScale(1.25),
-          textFont(new String[] {"Arial Unicode MS Regular", "DIN Offc Pro Regular"})
+          formatFontScale(1.25),
+          formatTextFont(new String[] {"Arial Unicode MS Regular", "DIN Offc Pro Regular"})
         ),
-        formatEntry("\ntest2", fontScale(2))
+        formatEntry("\ntest2", formatFontScale(2))
       );
       layer.setProperties(textField(expression));
       waitForLayer(uiController, mapboxMap, latLng);

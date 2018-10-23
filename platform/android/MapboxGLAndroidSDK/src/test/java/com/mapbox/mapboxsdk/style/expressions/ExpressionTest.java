@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.fontScale;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.textFont;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.formatFontScale;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.formatTextFont;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.abs;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.acos;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
@@ -1420,7 +1420,8 @@ public class ExpressionTest {
       }
     };
     Object[] actual = format(
-      formatEntry(literal("test"), fontScale(literal(1.5)), textFont(literal(new String[] {"awesome"})))
+      formatEntry(
+        literal("test"), formatFontScale(literal(1.5)), formatTextFont(literal(new String[] {"awesome"})))
     ).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
@@ -1455,10 +1456,11 @@ public class ExpressionTest {
       }
     };
     Object[] actual = format(
-      formatEntry(literal("test"), textFont(new String[] {"awesome"})),
-      formatEntry("test2", fontScale(1.5)),
+      formatEntry(literal("test"), formatTextFont(new String[] {"awesome"})),
+      formatEntry("test2", formatFontScale(1.5)),
       formatEntry(literal("test3")),
-      formatEntry(literal("test4"), fontScale(literal(1.5)), textFont(new String[] {"awesome"}))
+      formatEntry(
+        literal("test4"), formatFontScale(literal(1.5)), formatTextFont(new String[] {"awesome"}))
     ).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
