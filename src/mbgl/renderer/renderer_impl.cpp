@@ -299,13 +299,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         RenderLayer* layer = getRenderLayer(layerImpl->id);
         assert(layer);
 
-        if (!parameters.staticData.has3D && (
-                layer->is<RenderFillExtrusionLayer>() ||
-                layer->is<RenderHillshadeLayer>() ||
-                layer->is<RenderHeatmapLayer>())) {
-
-            parameters.staticData.has3D = true;
-        }
+        parameters.staticData.has3D |=
+                (layerImpl->getTypeInfo()->pass3d == LayerTypeInfo::Pass3D::Required);
 
         if (!layer->needsRendering(zoomHistory.lastZoom)) {
             continue;
