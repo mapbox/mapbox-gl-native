@@ -1,9 +1,4 @@
 include(platform/qt/qt.cmake)
-include(cmake/nunicode.cmake)
-
-if(NOT WITH_QT_I18N)
-    include(cmake/icu.cmake)
-endif()
 
 macro(mbgl_platform_core)
     target_sources(mbgl-core
@@ -16,9 +11,9 @@ macro(mbgl_platform_core)
         PRIVATE platform/qt/include
     )
 
-    target_link_libraries(mbgl-core
+    target_link_libraries(mbgl-core PRIVATE
         ${MBGL_QT_CORE_LIBRARIES}
-        PRIVATE nunicode
+        nunicode
     )
 
     if(NOT WITH_QT_DECODERS)
@@ -39,10 +34,6 @@ macro(mbgl_platform_core)
     else()
         target_sources(mbgl-core PRIVATE platform/qt/src/bidi.cpp)
     endif()
-
-    if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-        target_add_mason_package(mbgl-core PRIVATE optional)
-    endif()
 endmacro()
 
 
@@ -54,10 +45,6 @@ macro(mbgl_filesource)
     target_link_libraries(mbgl-filesource
         ${MBGL_QT_FILESOURCE_LIBRARIES}
     )
-
-    if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-        target_add_mason_package(mbgl-filesource PRIVATE optional)
-    endif()
 endmacro()
 
 # FIXME: For now tests are disabled on Windows until we
@@ -86,6 +73,3 @@ if (NOT CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         )
     endmacro()
 endif()
-
-target_add_mason_package(qmapboxgl PRIVATE geojson)
-target_add_mason_package(qmapboxgl PRIVATE rapidjson)

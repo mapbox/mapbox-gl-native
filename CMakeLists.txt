@@ -1,6 +1,24 @@
 cmake_minimum_required(VERSION 3.4)
 project(mbgl LANGUAGES CXX C)
 
+set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebInfo Sanitize)
+
+# Compiler configuration
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
+# Required to avoid warnings when setting visibility
+cmake_policy(SET CMP0063 NEW)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
 option(WITH_CXX11ABI "Use the C++11 ABI" OFF)
 option(WITH_COVERAGE "Enable coverage reports" OFF)
 option(WITH_OSMESA   "Use OSMesa headless backend" OFF)
@@ -8,6 +26,12 @@ option(WITH_EGL      "Use EGL backend" OFF)
 option(WITH_NODEJS   "Download test dependencies like NPM and Node.js" ON)
 option(WITH_ERROR    "Add -Werror flag to build (turns warnings into errors)" ON)
 
+if (WITH_ERROR)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+    set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Werror")
+endif()
+
+include(cmake/vendor.cmake)
 include(cmake/mbgl.cmake)
 include(cmake/mason.cmake)
 include(cmake/xcode.cmake)
@@ -47,30 +71,10 @@ set_source_files_properties(src/mbgl/util/version.cpp PROPERTIES COMPILE_DEFINIT
 
 include(cmake/mason-dependencies.cmake)
 
-add_definitions(-DRAPIDJSON_HAS_STDSTRING=1)
-
 if(WITH_COVERAGE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
 endif(WITH_COVERAGE)
-
-set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebInfo Sanitize)
-
-# Compiler configuration
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS OFF)
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-
-# Required to avoid warnings when setting visibility
-cmake_policy(SET CMP0063 NEW)
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_C_VISIBILITY_PRESET hidden)
-
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
 if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-backtrace-limit=0 -w")
@@ -78,11 +82,6 @@ if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth=1024 -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wno-variadic-macros -Wno-unknown-pragmas")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wshadow -Wno-variadic-macros -Wno-unknown-pragmas")
-endif()
-
-if (WITH_ERROR)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-    set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Werror")
 endif()
 
 if(APPLE AND CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")

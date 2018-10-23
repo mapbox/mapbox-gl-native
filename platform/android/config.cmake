@@ -1,7 +1,6 @@
 set(USE_GLES2 ON)
 
 include(cmake/sqlite.cmake)
-include(cmake/icu.cmake)
 
 # Build thin archives.
 set(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> cruT <TARGET> <LINK_FLAGS> <OBJECTS>")
@@ -43,13 +42,9 @@ macro(mbgl_platform_core)
         PRIVATE platform/android
     )
 
-    target_add_mason_package(mbgl-core PUBLIC geojson)
     target_add_mason_package(mbgl-core PUBLIC jni.hpp)
-    target_add_mason_package(mbgl-core PUBLIC rapidjson)
 
     target_link_libraries(mbgl-core
-        PRIVATE icu
-        PUBLIC expected
         PUBLIC -llog
         PUBLIC -landroid
         PUBLIC -ljnigraphics
