@@ -129,6 +129,11 @@ FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLResourceNotFoundException
  Access tokens associate requests to Mapbox’s vector tile and style APIs with
  your Mapbox account. They also deter other developers from using your styles
  without your permission.
+ 
+ Because `MGLMapView` loads asynchronously, several delegate methods are available 
+ for receiving map-related updates. These methods can be used to ensure that certain operations
+ have completed before taking any additional actions. Information on these methods is located
+ in the `MGLMapViewDelegate` protocol documentation.
 
  Adding your own gesture recognizer to `MGLMapView` will block the corresponding
  gesture recognizer built into `MGLMapView`. To avoid conflicts, define which
