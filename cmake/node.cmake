@@ -57,7 +57,6 @@ target_link_libraries(mbgl-node INTERFACE
     mbgl-loop-node
 )
 
-target_add_mason_package(mbgl-node INTERFACE geojson)
 set_target_properties(mbgl-node.all PROPERTIES FOLDER "Node.js")
 
 add_custom_target(mbgl-node.active DEPENDS mbgl-node.abi-${NodeJS_ABI})

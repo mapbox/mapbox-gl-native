@@ -158,8 +158,6 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     list(APPEND MBGL_QT_CORE_FILES
         PRIVATE platform/qt/src/thread.cpp
     )
-
-    target_add_mason_package(qmapboxgl PRIVATE optional)
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "QNX")
     list(APPEND MBGL_QT_CORE_FILES
         PRIVATE platform/qt/src/thread.cpp
