@@ -8,6 +8,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  A protocol for a `UIView` subclass that displays information about a selected
  annotation near that annotation.
+ 
+ To receive updates from an object that conforms to the `MGLCalloutView` protocol,
+ use the optional methods available in the `MGLCalloutViewDelegate` protocol.
  */
 @protocol MGLCalloutView <NSObject>
 
