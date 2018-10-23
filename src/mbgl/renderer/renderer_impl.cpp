@@ -69,13 +69,13 @@ Renderer::Impl::~Impl() {
     assert(BackendScope::exists());
 
     if (contextLost) {
-        // Signal all RenderCustomLayers that the context was lost
-        // before cleaning up
+        // Signal all RenderLayers that the context was lost
+        // before cleaning up. At the moment, only CustomLayer is
+        // interested whether rendering context is lost. However, it would be
+        // beneficial for dynamically loaded or other custom built-in plugins.
         for (const auto& entry : renderLayers) {
             RenderLayer& layer = *entry.second;
-            if (layer.is<RenderCustomLayer>()) {
-                layer.as<RenderCustomLayer>()->markContextDestroyed();
-            }
+            layer.markContextDestroyed();
         }
     }
 };

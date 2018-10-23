@@ -91,8 +91,8 @@ public:
     Immutable<style::Layer::Impl> baseImpl;
     void setImpl(Immutable<style::Layer::Impl>);
 
+    virtual void markContextDestroyed();
     friend std::string layoutKey(const RenderLayer&);
-
 protected:
     // Checks whether the current hardware can render this layer. If it can't, we'll show a warning
     // in the console to inform the developer.
