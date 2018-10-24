@@ -12,7 +12,7 @@ import android.support.annotation.Keep;
  * except at the equator.
  * </p>
  */
-public class ProjectedMeters implements IProjectedMeters, Parcelable {
+public class ProjectedMeters implements Parcelable {
 
   /**
    * Inner class responsible for recreating Parcels into objects.
@@ -68,7 +68,6 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable {
    *
    * @return Projected meters in north.
    */
-  @Override
   public double getNorthing() {
     return northing;
   }
@@ -78,7 +77,6 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable {
    *
    * @return Projected meters in east.
    */
-  @Override
   public double getEasting() {
     return easting;
   }
