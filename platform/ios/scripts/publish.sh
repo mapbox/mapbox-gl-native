@@ -12,15 +12,6 @@ trap finish EXIT
 # Update the PUBLISH_VERSION manually when releasing a new iOS 8 compatible SDK.
 # In the case of symbolicated builds, we also append the `-symbols`.
 #
-PUBLISH_VERSION="v4.5.0-cn.1"
-
-if [[ ${#} -eq 2 ]]; then
-    PUBLISH_STYLE="-$2"
-else
-    PUBLISH_STYLE=""
-fi
-
-#
 # zip
 #
 cd build/ios/pkg
