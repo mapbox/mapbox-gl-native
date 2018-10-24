@@ -35,6 +35,10 @@ public:
     RendererBackend* getBackend();
     CameraOptions getCameraOptions();
 
+    bool hasImage(const std::string&);
+    bool hasLayer(const std::string&);
+    bool hasSource(const std::string&);
+
     PremultipliedImage readStillImage();
     PremultipliedImage render(Map&);
 
