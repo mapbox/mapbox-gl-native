@@ -10,6 +10,7 @@ import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -110,6 +111,31 @@ public class GeoJsonSource extends Source {
     super();
     initialize(id, options);
     nativeSetUrl(url.toExternalForm());
+  }
+
+  /**
+   * Create a GeoJsonSource from a file
+   *
+   * @param id   the source id
+   * @param file file
+   */
+  public GeoJsonSource(String id, File file) {
+    super();
+    initialize(id, null);
+    nativeSetUrl(file.getPath());
+  }
+
+  /**
+   * Create a GeoJsonSource from a file
+   *
+   * @param id      the source id
+   * @param file    file
+   * @param options options
+   */
+  public GeoJsonSource(String id, File file, GeoJsonOptions options) {
+    super();
+    initialize(id, options);
+    nativeSetUrl(file.getPath());
   }
 
   /**
