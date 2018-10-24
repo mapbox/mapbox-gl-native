@@ -220,7 +220,7 @@ commands:
           steps: [ save-node_modules-cache ]
       - when:
           condition: << parameters.ccache >>
-          steps: [ save-ccache ]
+          steps: [ save-ccache, show-ccache-stats ]
       - when:
           condition: << parameters.mason >>
           steps: [ save-mason_packages-cache ]
