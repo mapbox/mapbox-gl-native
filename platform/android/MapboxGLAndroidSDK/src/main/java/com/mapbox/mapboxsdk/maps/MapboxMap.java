@@ -759,34 +759,11 @@ public final class MapboxMap {
                                final int durationMs,
                                final boolean easingInterpolator,
                                @Nullable final MapboxMap.CancelableCallback callback) {
-    easeCamera(update, durationMs, easingInterpolator, callback, false);
-  }
-
-  /**
-   * Gradually move the camera by a specified duration in milliseconds, zoom will not be affected
-   * unless specified within {@link CameraUpdate}. A callback can be used to be notified when
-   * easing the camera stops. If {@link #getCameraPosition()} is called during the animation, it
-   * will return the current location of the camera in flight.
-   *
-   * @param update             The change that should be applied to the camera.
-   * @param durationMs         The duration of the animation in milliseconds. This must be strictly
-   *                           positive, otherwise an IllegalArgumentException will be thrown.
-   * @param easingInterpolator True for easing interpolator, false for linear.
-   * @param callback           An optional callback to be notified from the main thread when the animation
-   *                           stops. If the animation stops due to its natural completion, the callback
-   *                           will be notified with onFinish(). If the animation stops due to interruption
-   *                           by a later camera movement or a user gesture, onCancel() will be called.
-   *                           Do not update or ease the camera from within onCancel().
-   * @param isDismissable      true will allow animated camera changes dismiss a tracking mode.
-   */
-  public final void easeCamera(@NonNull final CameraUpdate update, final int durationMs,
-                               final boolean easingInterpolator, @Nullable final MapboxMap.CancelableCallback callback,
-                               final boolean isDismissable) {
 
     if (durationMs <= 0) {
       throw new IllegalArgumentException("Null duration passed into easeCamera");
     }
-    transform.easeCamera(MapboxMap.this, update, durationMs, easingInterpolator, callback, isDismissable);
+    transform.easeCamera(MapboxMap.this, update, durationMs, easingInterpolator, callback);
   }
 
   /**
