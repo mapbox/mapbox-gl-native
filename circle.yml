@@ -38,12 +38,7 @@ workflows:
       - linux-gcc49-debug:
           name: linux-gcc4.9-debug
       - linux-gcc5-debug-coverage
-      - ios-debug-template:
-          name: ios-debug
-          xcode: "9.4.1"
-      - ios-debug-template:
-          name: ios-debug-xcode10
-          xcode: "10.0.0"
+      - ios-debug
       - ios-release-template:
           name: ios-release
       - ios-release-tag:
@@ -673,7 +668,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node-macos-release:
     macos:
-      xcode: "9.4.1"
+      xcode: "10.0.0"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -829,12 +824,9 @@ jobs:
             platform/linux/scripts/coveralls.sh
 
 # ------------------------------------------------------------------------------
-  ios-debug-template:
-    parameters:
-      xcode:
-        type: string
+  ios-debug:
     macos:
-      xcode: << parameters.xcode >>
+      xcode: "10.0.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -860,7 +852,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-nightly:
     macos:
-      xcode: "9.4.1"
+      xcode: "10.0.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -879,7 +871,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-address-nightly:
     macos:
-      xcode: "9.4.1"
+      xcode: "10.0.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -898,7 +890,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-static-analyzer-nightly:
     macos:
-      xcode: "9.4.1"
+      xcode: "10.0.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -989,7 +981,7 @@ jobs:
 # ------------------------------------------------------------------------------
   macos-debug:
     macos:
-      xcode: "9.4.1"
+      xcode: "10.0.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
