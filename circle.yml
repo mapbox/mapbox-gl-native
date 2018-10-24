@@ -833,6 +833,7 @@ jobs:
           name: Upload coverage results to codecov.io
           command: |
             bash <(curl -s https://codecov.io/bash) -t $CODECOV_UPLOAD_TOKEN
+            ./codecov -F linux-core
 
 # ------------------------------------------------------------------------------
   ios-debug-template:
