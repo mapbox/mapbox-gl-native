@@ -331,52 +331,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             continue;
         }
 
-        const bool symbolLayer = layer->is<RenderSymbolLayer>();
-
-        auto sortedTiles = source->getRenderTiles();
-        if (symbolLayer) {
-            // Sort symbol tiles in opposite y position, so tiles with overlapping symbols are drawn
-            // on top of each other, with lower symbols being drawn on top of higher symbols.
-            std::sort(sortedTiles.begin(), sortedTiles.end(), [&](const RenderTile& a, const RenderTile& b) {
-                Point<float> pa(a.id.canonical.x, a.id.canonical.y);
-                Point<float> pb(b.id.canonical.x, b.id.canonical.y);
-
-                auto par = util::rotate(pa, parameters.state.getAngle());
-                auto pbr = util::rotate(pb, parameters.state.getAngle());
-
-                return std::tie(b.id.canonical.z, par.y, par.x) < std::tie(a.id.canonical.z, pbr.y, pbr.x);
-            });
-        } else {
-            std::sort(sortedTiles.begin(), sortedTiles.end(),
-                      [](const auto& a, const auto& b) { return a.get().id < b.get().id; });
-            // Don't render non-symbol layers for tiles that we're only holding on to for symbol fading
-            sortedTiles.erase(std::remove_if(sortedTiles.begin(), sortedTiles.end(),
-                                             [](const auto& tile) { return tile.get().tile.holdForFade(); }),
-                              sortedTiles.end());
-        }
-
-        std::vector<std::reference_wrapper<RenderTile>> sortedTilesForInsertion;
-        const bool fillLayer = layer->is<RenderFillLayer>();
-        const bool lineLayer = layer->is<RenderLineLayer>();
-
-        for (auto& sortedTile : sortedTiles) {
-            auto& tile = sortedTile.get();
-            if (!tile.tile.isRenderable()) {
-                continue;
-            }
-
-            auto bucket = tile.tile.getBucket(*layer->baseImpl);
-            if (bucket) {
-                sortedTilesForInsertion.emplace_back(tile);
-                tile.used = true;
-
-                // We only need clipping when we're drawing fill or line layers.
-                if (fillLayer || lineLayer) {
-                    tile.needsClipping = true;
-                }
-            }
-        }
-        layer->setRenderTiles(std::move(sortedTilesForInsertion));
+        layer->setRenderTiles(source->getRenderTiles(), parameters.state);
         order.emplace_back(RenderItem { *layer, source });
     }
 

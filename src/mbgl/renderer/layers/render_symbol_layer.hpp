@@ -88,6 +88,10 @@ public:
     float textSize = 16.0f;
 
     const style::SymbolLayer::Impl& impl() const;
+
+protected:
+    RenderTiles filterRenderTiles(RenderTiles) const final;
+    void sortRenderTiles(const TransformState&) final;
 };
 
 template <>
