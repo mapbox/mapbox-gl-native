@@ -1,6 +1,8 @@
 package com.mapbox.mapboxsdk.module.telemetry;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+
 import com.mapbox.android.telemetry.AppUserTurnstile;
 import com.mapbox.android.telemetry.Event;
 import com.mapbox.android.telemetry.MapEventFactory;
@@ -113,22 +115,25 @@ public class TelemetryImpl implements TelemetryDefinition {
   }
 
   @Override
-  public void onCreateOfflineRegion(OfflineRegionDefinition offlineDefinition) {
+  public void onCreateOfflineRegion(@NonNull OfflineRegionDefinition offlineDefinition) {
     MapEventFactory mapEventFactory = new MapEventFactory();
 
-    Event mapOfflineEvent;
     if (offlineDefinition instanceof OfflineTilePyramidRegionDefinition) {
       OfflineTilePyramidRegionDefinition tileDefinition =
         (OfflineTilePyramidRegionDefinition)offlineDefinition;
-      mapOfflineEvent = mapEventFactory.buildMapOfflineEvent(
-        tileDefinition.getMinZoom(), tileDefinition.getMaxZoom(), "bounds",
-        new String[]{tileDefinition.getStyleURL()});
+      telemetry.push(mapEventFactory.createOfflineDownloadStartEvent(
+              "tileregion",
+              tileDefinition.getMinZoom(),
+              tileDefinition.getMaxZoom(),
+              tileDefinition.getStyleURL()));
     } else {
       OfflineGeometryRegionDefinition geometryDefinition =
         (OfflineGeometryRegionDefinition) offlineDefinition;
-      mapOfflineEvent = mapEventFactory.buildMapOfflineEvent(
-        geometryDefinition.getMinZoom(), geometryDefinition.getMaxZoom(), geometryDefinition.getGeometry().type(),
-        new String[]{geometryDefinition.getStyleURL()});
+      telemetry.push(mapEventFactory.createOfflineDownloadStartEvent(
+              "shaperegion",
+              geometryDefinition.getMinZoom(),
+              geometryDefinition.getMaxZoom(),
+              geometryDefinition.getStyleURL()));
     }
   }
 
