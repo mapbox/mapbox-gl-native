@@ -1,0 +1,4 @@
+{
+    "core": "When using longitude values of +-180° in LatLngBounds, the longitude was being improperly wrapped resulting in an unexpected bounding box.",
+    "issue": 12797
+}
