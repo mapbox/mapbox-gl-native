@@ -98,6 +98,9 @@
     }
   },
   "paint_line": {
+    "line-gradient": {
+      "doc": "The color gradient with which the line will be drawn. This property only has an effect on lines defined by an `MGLShapeSource` whose `MGLShapeSourceOptionLineDistanceMetrics` option is set to `YES`."
+    },
     "line-pattern": {
       "doc": "Name of image in style images to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512)."
     },
