@@ -368,8 +368,9 @@ MGL_EXPORT
 
 #if TARGET_OS_IPHONE
 /**
- Defines a gradient with which to color a line feature. Can only be used with
- GeoJSON sources that specify `"lineMetrics": true`.
+ The color gradient with which the line will be drawn. This property only has an
+ effect on lines defined by an `MGLShapeSource` whose
+ `MGLShapeSourceOptionLineDistanceMetrics` option is set to `YES`.
  
  This property is only applied to the style if `lineDasharray` is set to `nil`,
  and `linePattern` is set to `nil`, and the data source requirements are met.
@@ -389,8 +390,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) NSExpression *lineGradient;
 #else
 /**
- Defines a gradient with which to color a line feature. Can only be used with
- GeoJSON sources that specify `"lineMetrics": true`.
+ The color gradient with which the line will be drawn. This property only has an
+ effect on lines defined by an `MGLShapeSource` whose
+ `MGLShapeSourceOptionLineDistanceMetrics` option is set to `YES`.
  
  This property is only applied to the style if `lineDasharray` is set to `nil`,
  and `linePattern` is set to `nil`, and the data source requirements are met.
