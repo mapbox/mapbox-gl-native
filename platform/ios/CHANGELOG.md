@@ -4,7 +4,13 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 4.6.0
 
+### Styles and rendering
+
 * Added the ability to style symbol layers labels with multiple fonts and text sizes via the `format` expression operator. ([#12624](https://github.com/mapbox/mapbox-gl-native/pull/12624))
+
+### Offline maps
+
+* Added prioritization of user-interactive resource requests, over offline requests. ([#13019](https://github.com/mapbox/mapbox-gl-native/pull/13019))
 * Added the `-[MGLOfflineStorage putResourceWithUrl:data:modified:expires:etag:mustRevalidate:]` method to allow pre-warming of the ambient cache. ([#13022](https://github.com/mapbox/mapbox-gl-native/pull/13022))
 
 ## 4.5.0 - October 10, 2018
@@ -18,6 +24,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue where fill and line layers would occasionally flicker on zoom. ([#12982](https://github.com/mapbox/mapbox-gl-native/pull/12982))
 
 ### User location
+
 * Added `-[MGLMapViewDelegate mapViewUserLocationAnchorPoint:]` to customize the position of the user location annotation. ([#12907](https://github.com/mapbox/mapbox-gl-native/pull/12907))
 * Marked `MGLMapView.userLocationVerticalAlignment` as deprecated. Use `-[MGLMapViewDelegate mapViewUserLocationAnchorPoint:]` instead. ([#12907](https://github.com/mapbox/mapbox-gl-native/pull/12907))
 * Added the `-[MGLMapView updateUserLocationAnnotationView]` and `-[MGLMapView updateUserLocationAnnotationViewAnimatedWithDuration:]` methods to update the position of the user location annotation between location updates. ([#12907](https://github.com/mapbox/mapbox-gl-native/pull/12907))
