@@ -9,9 +9,6 @@ function finish { >&2 echo -en "\033[0m"; }
 trap finish EXIT
 
 #
-# Update the PUBLISH_VERSION manually when releasing a new iOS 8 compatible SDK.
-# In the case of symbolicated builds, we also append the `-symbols`.
-#
 # zip
 #
 cd build/ios/pkg
@@ -37,6 +34,7 @@ if [ -n "${CI:-}" ]; then
 fi
 
 step "Uploading ${ZIP} to s3…"
+
 # Since this build is primarily for .CN customers, it will be hosted on .cn. 
 
 aws s3 cp ../${ZIP} s3://binary.mapbox.cn/mapbox-china-plugin/ios/builds/maps-sdk/ --acl public-read ${PROGRESS}
