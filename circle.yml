@@ -311,7 +311,6 @@ commands:
     steps:
     - run:
         name: Log in to Google Cloud Platform
-        shell: /bin/bash -euo pipefail
         command: |
           if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
             echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
