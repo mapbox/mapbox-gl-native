@@ -12,7 +12,7 @@ trap finish EXIT
 # Update the PUBLISH_VERSION manually when releasing a new iOS 8 compatible SDK.
 # In the case of symbolicated builds, we also append the `-symbols`.
 #
-PUBLISH_VERSION="v4.5.0-cn"
+PUBLISH_VERSION="v4.5.0-cn.1"
 
 if [[ ${#} -eq 2 ]]; then
     PUBLISH_STYLE="-$2"
@@ -46,7 +46,7 @@ if [ -n "${CI:-}" ]; then
 fi
 
 step "Uploading ${ZIP} to s3…"
-# Since this build is for .CN customers, and we want to keep it separate from the main Maps SDK, it will be hosted on .cn. 
+# Since this build is primarily for .CN customers, it will be hosted on .cn. 
 
 aws s3 cp ../${ZIP} s3://binary.mapbox.cn/mapbox-china-plugin/ios/builds/maps-sdk/ --acl public-read ${PROGRESS}
 echo "URL: https://mapbox.s3.amazonaws.cn/mapbox-plugin-ios/ios/builds/${ZIP}"
