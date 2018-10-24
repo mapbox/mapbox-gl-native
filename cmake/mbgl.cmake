@@ -209,7 +209,7 @@ function(initialize_xcode_cxx_build_settings target)
     set_xcode_property(${target} CLANG_WARN_RANGE_LOOP_ANALYSIS YES)
 
     # -flto
-    set_xcode_property(${target} LLVM_LTO $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebugInfo>>:YES>)
+    set_xcode_property(${target} LLVM_LTO $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>>:YES>)
 
     # Make releases debuggable.
     set_xcode_property(${target} GCC_GENERATE_DEBUGGING_SYMBOLS YES)
