@@ -362,4 +362,23 @@ style::SymbolPropertyValues RenderSymbolLayer::textPropertyValues(const style::S
     };
 }
 
+RenderLayer::RenderTiles RenderSymbolLayer::filterRenderTiles(RenderTiles tiles) const {
+    auto filterFn = [](auto& tile){ return !tile.tile.isRenderable(); };
+    return RenderLayer::filterRenderTiles(std::move(tiles), filterFn);
+}
+
+void RenderSymbolLayer::sortRenderTiles(const TransformState& state) {
+    // Sort symbol tiles in opposite y position, so tiles with overlapping symbols are drawn
+    // on top of each other, with lower symbols being drawn on top of higher symbols.
+    std::sort(renderTiles.begin(), renderTiles.end(), [&state](const auto& a, const auto& b) {
+        Point<float> pa(a.get().id.canonical.x, a.get().id.canonical.y);
+        Point<float> pb(b.get().id.canonical.x, b.get().id.canonical.y);
+
+        auto par = util::rotate(pa, state.getAngle());
+        auto pbr = util::rotate(pb, state.getAngle());
+
+        return std::tie(b.get().id.canonical.z, par.y, par.x) < std::tie(a.get().id.canonical.z, pbr.y, pbr.x);
+    });
+}
+
 } // namespace mbgl
