@@ -2,6 +2,20 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.7.0-alpha.2 - October 24, 2018
+ - Format expression support [#12985](https://github.com/mapbox/mapbox-gl-native/pull/12985)
+ - Remove view tree observer [#13133](https://github.com/mapbox/mapbox-gl-native/pull/13133)
+ - Revert infer nullity [#13147](https://github.com/mapbox/mapbox-gl-native/pull/13147)
+ - Add priorities to requests [#13019](https://github.com/mapbox/mapbox-gl-native/pull/13019)
+ - Avoid using <locale> and <iostream> [#13135](https://github.com/mapbox/mapbox-gl-native/pull/13135)
+ - Introduce mgbl::RenderState [#13123](https://github.com/mapbox/mapbox-gl-native/pull/13123)
+ - Ensure queryRenderedFeatures accounts for icon-rotate [#13105](https://github.com/mapbox/mapbox-gl-native/pull/13105)
+ - Add 'putResourceForURL' for pre-warming ambient cache [#13119](https://github.com/mapbox/mapbox-gl-native/pull/13119)
+
+## 6.6.2 - October 24, 2018
+ - Remove requirement on vectorDrawables.useSupportLibrary [#13168](https://github.com/mapbox/mapbox-gl-native/pull/13168)
+ - File source deactivate called before callbacks [#13146](https://github.com/mapbox/mapbox-gl-native/pull/13168)
+
 ## 6.7.0-alpha.1 - October 17, 2018
  - Core format expression integration [#12624](https://github.com/mapbox/mapbox-gl-native/pull/12624)
  - Remove obsolete catch block in getLayerAs [#13091](https://github.com/mapbox/mapbox-gl-native/pull/13091)
