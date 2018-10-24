@@ -830,9 +830,9 @@ jobs:
       - save-dependencies
       - run-unit-tests
       - run:
-          name: Upload coverage results to coveralls
+          name: Upload coverage results to codecov.io
           command: |
-            platform/linux/scripts/coveralls.sh
+            bash <(curl -s https://codecov.io/bash) -t $CODECOV_UPLOAD_TOKEN
 
 # ------------------------------------------------------------------------------
   ios-debug-template:
