@@ -399,3 +399,15 @@ endif()
 target_include_directories(mapbox-gl-native SYSTEM INTERFACE
     ${GIT_ROOT}/include
 )
+
+add_executable(app
+    ${GIT_ROOT}/core/app.cpp
+)
+
+target_link_libraries(app PRIVATE
+    mapbox-gl-native
+)
+
+target_include_directories(app PRIVATE
+    ${GIT_ROOT}/platform/default
+)
