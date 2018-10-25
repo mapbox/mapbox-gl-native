@@ -62,9 +62,9 @@ public class CustomGeometrySource extends Source {
   }
 
   /**
-   * Create a CustomGeometrySource with non-default CustomGeometrySourceOptions.
-   * <p>Supported options are minZoom, maxZoom, buffer, and tolerance.</p>
-   *  @param id       The source id.
+   * Create a CustomGeometrySource with non-default {@link CustomGeometrySourceOptions}.
+   *
+   * @param id       The source id.
    * @param options  CustomGeometrySourceOptions.
    * @param provider The tile provider that returns geometry data for this source.
    */
