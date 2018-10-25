@@ -15,7 +15,6 @@
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
 #include <mbgl/renderer/layers/render_fill_layer.hpp>
-#include <mbgl/renderer/layers/render_heatmap_layer.hpp>
 #include <mbgl/renderer/layers/render_hillshade_layer.hpp>
 #include <mbgl/renderer/style_diff.hpp>
 #include <mbgl/renderer/query.hpp>
@@ -186,14 +185,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         if (layerAdded || layerChanged) {
             layer.transition(transitionParameters);
-
-            if (layer.is<RenderHeatmapLayer>()) {
-                layer.as<RenderHeatmapLayer>()->updateColorRamp();
-            }
-
-            if (layer.is<RenderLineLayer>()) {
-                layer.as<RenderLineLayer>()->updateColorRamp();
-            }
+            layer.update();
         }
 
         if (layerAdded || layerChanged || zoomChanged || layer.hasTransition() || layer.hasCrossfade()) {

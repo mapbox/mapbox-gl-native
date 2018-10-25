@@ -86,6 +86,10 @@ void RenderLayer::sortRenderTiles(const TransformState&) {
     std::sort(renderTiles.begin(), renderTiles.end(), [](const auto& a, const auto& b) { return a.get().id < b.get().id; });
 }
 
+void RenderLayer::update() {
+    // no-op
+}
+
 RenderLayer::RenderTiles RenderLayer::filterRenderTiles(RenderTiles tiles, FilterFunctionPtr filterFn) const {
     assert(filterFn != nullptr);
     RenderTiles filtered;
