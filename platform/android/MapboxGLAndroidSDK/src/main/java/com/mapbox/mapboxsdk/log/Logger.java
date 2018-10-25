@@ -201,6 +201,24 @@ public final class Logger {
    * @param message  The message you would like logged.
    */
   public static void log(int severity, String tag, String message) {
-    LoggerDefinition.log(severity, tag, message);
+    switch (severity) {
+      case Log.VERBOSE:
+        Logger.v(tag, message);
+        break;
+      case Log.DEBUG:
+        Logger.d(tag, message);
+        break;
+      case Log.INFO:
+        Logger.i(tag, message);
+        break;
+      case Log.WARN:
+        Logger.w(tag, message);
+        break;
+      case Log.ERROR:
+        Logger.e(tag, message);
+        break;
+      default:
+        throw new UnsupportedOperationException();
+    }
   }
 }
