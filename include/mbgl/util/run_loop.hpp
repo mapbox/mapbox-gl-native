@@ -14,9 +14,10 @@
 #include <mutex>
 
 namespace mbgl {
-namespace util {
 
-using LOOP_HANDLE = void *;
+class PlatformRunLoop;
+
+namespace util {
 
 class RunLoop : public Scheduler,
                 private util::noncopyable {
@@ -42,7 +43,6 @@ public:
     ~RunLoop() override;
 
     static RunLoop* Get();
-    static LOOP_HANDLE getLoopHandle();
 
     void run();
     void runOnce();
@@ -78,8 +78,6 @@ public:
             Mailbox::maybeReceive(mailbox);
         });
     }
-
-    class Impl;
 
 private:
     MBGL_STORE_THREAD(tid)
@@ -124,7 +122,7 @@ private:
     Queue highPriorityQueue;
     std::mutex mutex;
 
-    std::unique_ptr<Impl> impl;
+    std::unique_ptr<PlatformRunLoop> impl;
 };
 
 } // namespace util
