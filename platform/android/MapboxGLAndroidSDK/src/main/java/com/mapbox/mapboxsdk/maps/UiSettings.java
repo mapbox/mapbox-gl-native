@@ -732,7 +732,10 @@ public final class UiSettings {
    * By default the zoom controls are enabled if the device is only single touch capable;
    *
    * @param zoomControlsEnabled If true, the zoom controls are enabled.
+   * @deprecated {@link android.widget.ZoomButtonsController}, this functionality and UI is better handled with
+   * custom views and layouts rather than a dedicated zoom-control widget.
    */
+  @Deprecated
   public void setZoomControlsEnabled(boolean zoomControlsEnabled) {
     this.zoomControlsEnabled = zoomControlsEnabled;
   }
