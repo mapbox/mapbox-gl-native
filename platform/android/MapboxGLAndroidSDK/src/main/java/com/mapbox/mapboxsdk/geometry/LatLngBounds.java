@@ -229,7 +229,7 @@ public class LatLngBounds implements Parcelable {
    * @param latLngs List of LatLng objects
    * @return LatLngBounds
    */
-  static LatLngBounds fromLatLngs(final List<? extends ILatLng> latLngs) {
+  static LatLngBounds fromLatLngs(final List<? extends LatLng> latLngs) {
     double minLat = GeometryConstants.MAX_LATITUDE;
     double maxLat = GeometryConstants.MIN_LATITUDE;
 
@@ -251,7 +251,7 @@ public class LatLngBounds implements Parcelable {
       }
     }
 
-    for (final ILatLng gp : latLngs) {
+    for (final LatLng gp : latLngs) {
       final double latitude = gp.getLatitude();
       minLat = Math.min(minLat, latitude);
       maxLat = Math.max(maxLat, latitude);
@@ -418,7 +418,7 @@ public class LatLngBounds implements Parcelable {
    * @param latLng the point which may be contained
    * @return true, if the point is contained within the bounds
    */
-  public boolean contains(final ILatLng latLng) {
+  public boolean contains(final LatLng latLng) {
     return containsLatitude(latLng.getLatitude())
       && containsLongitude(latLng.getLongitude());
   }
