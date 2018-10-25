@@ -37,5 +37,5 @@ step "Uploading ${ZIP} to s3…"
 
 # Since this build is primarily for .CN customers, it will be hosted on .cn. 
 
-aws s3 cp ../${ZIP} s3://binary.mapbox.cn/mapbox-china-plugin/ios/builds/maps-sdk/ --acl public-read ${PROGRESS}
-echo "URL: https://mapbox.s3.amazonaws.cn/mapbox-plugin-ios/ios/builds/maps-sdk/${ZIP}"
+aws s3 cp ../${ZIP} s3://binary.mapbox.cn/ios/builds/maps-sdk/ --acl public-read ${PROGRESS}
+echo "URL: https://mapbox.s3.amazonaws.cn/ios/builds/maps-sdk/${ZIP}"
