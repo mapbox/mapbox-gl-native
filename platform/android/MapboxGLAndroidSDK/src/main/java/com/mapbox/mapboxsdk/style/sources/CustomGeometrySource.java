@@ -230,7 +230,7 @@ public class CustomGeometrySource extends Source {
       }
 
       executor = new ThreadPoolExecutor(THREAD_POOL_LIMIT, THREAD_POOL_LIMIT,
-        0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+        0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
         new ThreadFactory() {
           final AtomicInteger threadCount = new AtomicInteger();
           final int poolId = poolCount.getAndIncrement();
