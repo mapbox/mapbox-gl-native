@@ -59,66 +59,6 @@ void <%- camelize(type) %>Layer::Impl::stringifyLayout(rapidjson::Writer<rapidjs
 }
 <% } -%>
 
-<% if (type !== 'background') { -%>
-// Source
-
-const std::string& <%- camelize(type) %>Layer::getSourceID() const {
-    return impl().source;
-}
-
-<% if (type !== 'raster' && type !== 'hillshade') { -%>
-void <%- camelize(type) %>Layer::setSourceLayer(const std::string& sourceLayer) {
-    auto impl_ = mutableImpl();
-    impl_->sourceLayer = sourceLayer;
-    baseImpl = std::move(impl_);
-}
-
-const std::string& <%- camelize(type) %>Layer::getSourceLayer() const {
-    return impl().sourceLayer;
-}
-
-// Filter
-
-void <%- camelize(type) %>Layer::setFilter(const Filter& filter) {
-    auto impl_ = mutableImpl();
-    impl_->filter = filter;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-const Filter& <%- camelize(type) %>Layer::getFilter() const {
-    return impl().filter;
-}
-<% } -%>
-<% } -%>
-
-// Visibility
-
-void <%- camelize(type) %>Layer::setVisibility(VisibilityType value) {
-    if (value == getVisibility())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->visibility = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-// Zoom range
-
-void <%- camelize(type) %>Layer::setMinZoom(float minZoom) {
-    auto impl_ = mutableImpl();
-    impl_->minZoom = minZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-void <%- camelize(type) %>Layer::setMaxZoom(float maxZoom) {
-    auto impl_ = mutableImpl();
-    impl_->maxZoom = maxZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
 // Layout properties
 
 <% for (const property of layoutProperties) { -%>
@@ -314,6 +254,10 @@ optional<Error> <%- camelize(type) %>Layer::setLayoutProperty(const std::string&
     <% } %>
 
     return Error { "layer doesn't support this property" };
+}
+
+Mutable<Layer::Impl> <%- camelize(type) %>Layer::mutableBaseImpl() const {
+    return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
 } // namespace style

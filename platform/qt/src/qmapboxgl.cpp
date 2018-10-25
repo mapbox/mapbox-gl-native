@@ -1533,38 +1533,14 @@ void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
         return;
     }
 
-    Filter filter_;
-
     Error error;
     mbgl::optional<Filter> converted = convert<Filter>(filter, error);
     if (!converted) {
         qWarning() << "Error parsing filter:" << error.message.c_str();
         return;
     }
-    filter_ = std::move(*converted);
 
-    if (layer_->is<FillLayer>()) {
-        layer_->as<FillLayer>()->setFilter(filter_);
-        return;
-    }
-    if (layer_->is<LineLayer>()) {
-        layer_->as<LineLayer>()->setFilter(filter_);
-        return;
-    }
-    if (layer_->is<SymbolLayer>()) {
-        layer_->as<SymbolLayer>()->setFilter(filter_);
-        return;
-    }
-    if (layer_->is<CircleLayer>()) {
-        layer_->as<CircleLayer>()->setFilter(filter_);
-        return;
-    }
-    if (layer_->is<FillExtrusionLayer>()) {
-        layer_->as<FillExtrusionLayer>()->setFilter(filter_);
-        return;
-    }
-
-    qWarning() << "Layer doesn't support filters";
+    layer_->setFilter(std::move(*converted));
 }
 
 QVariant QVariantFromValue(const mbgl::Value &value) {
@@ -1617,24 +1593,7 @@ QVariant QMapboxGL::getFilter(const QString &layer)  const {
         return QVariant();
     }
 
-    Filter filter_;
-
-    if (layer_->is<FillLayer>()) {
-        filter_ = layer_->as<FillLayer>()->getFilter();
-    } else if (layer_->is<LineLayer>()) {
-        filter_ = layer_->as<LineLayer>()->getFilter();
-    } else if (layer_->is<SymbolLayer>()) {
-        filter_ = layer_->as<SymbolLayer>()->getFilter();
-    } else if (layer_->is<CircleLayer>()) {
-        filter_ = layer_->as<CircleLayer>()->getFilter();
-    } else if (layer_->is<FillExtrusionLayer>()) {
-        filter_ = layer_->as<FillExtrusionLayer>()->getFilter();
-    } else {
-        qWarning() << "Layer doesn't support filters";
-        return QVariant();
-    }
-
-    auto serialized = filter_.serialize();
+    auto serialized = layer_->getFilter().serialize();
     return QVariantFromValue(serialized);
 }
 

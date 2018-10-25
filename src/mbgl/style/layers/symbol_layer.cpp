@@ -43,62 +43,6 @@ void SymbolLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffe
     layout.stringify(writer);
 }
 
-// Source
-
-const std::string& SymbolLayer::getSourceID() const {
-    return impl().source;
-}
-
-void SymbolLayer::setSourceLayer(const std::string& sourceLayer) {
-    auto impl_ = mutableImpl();
-    impl_->sourceLayer = sourceLayer;
-    baseImpl = std::move(impl_);
-}
-
-const std::string& SymbolLayer::getSourceLayer() const {
-    return impl().sourceLayer;
-}
-
-// Filter
-
-void SymbolLayer::setFilter(const Filter& filter) {
-    auto impl_ = mutableImpl();
-    impl_->filter = filter;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-const Filter& SymbolLayer::getFilter() const {
-    return impl().filter;
-}
-
-// Visibility
-
-void SymbolLayer::setVisibility(VisibilityType value) {
-    if (value == getVisibility())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->visibility = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-// Zoom range
-
-void SymbolLayer::setMinZoom(float minZoom) {
-    auto impl_ = mutableImpl();
-    impl_->minZoom = minZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-void SymbolLayer::setMaxZoom(float maxZoom) {
-    auto impl_ = mutableImpl();
-    impl_->maxZoom = maxZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
 // Layout properties
 
 PropertyValue<SymbolPlacementType> SymbolLayer::getDefaultSymbolPlacement() {
@@ -2028,6 +1972,10 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
     
 
     return Error { "layer doesn't support this property" };
+}
+
+Mutable<Layer::Impl> SymbolLayer::mutableBaseImpl() const {
+    return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
 } // namespace style

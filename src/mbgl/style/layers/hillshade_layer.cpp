@@ -42,40 +42,6 @@ std::unique_ptr<Layer> HillshadeLayer::cloneRef(const std::string& id_) const {
 void HillshadeLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-// Source
-
-const std::string& HillshadeLayer::getSourceID() const {
-    return impl().source;
-}
-
-
-// Visibility
-
-void HillshadeLayer::setVisibility(VisibilityType value) {
-    if (value == getVisibility())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->visibility = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-// Zoom range
-
-void HillshadeLayer::setMinZoom(float minZoom) {
-    auto impl_ = mutableImpl();
-    impl_->minZoom = minZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-void HillshadeLayer::setMaxZoom(float maxZoom) {
-    auto impl_ = mutableImpl();
-    impl_->maxZoom = maxZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
 // Layout properties
 
 
@@ -449,6 +415,10 @@ optional<Error> HillshadeLayer::setLayoutProperty(const std::string& name, const
         
 
     return Error { "layer doesn't support this property" };
+}
+
+Mutable<Layer::Impl> HillshadeLayer::mutableBaseImpl() const {
+    return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
 } // namespace style
