@@ -237,7 +237,7 @@ public class OfflineManager {
    * @param callback completion/error callback
    */
   public void mergeOfflineRegions(@NonNull String path, @NonNull final MergeOfflineRegionsCallback callback) {
-    File src = new File(path);
+    final File src = new File(path);
     new FileUtils.CheckFileReadPermissionTask(new FileUtils.OnCheckFileReadPermissionListener() {
       @Override
       public void onReadPermissionGranted() {
@@ -329,12 +329,12 @@ public class OfflineManager {
     }
   }
 
-  private void mergeOfflineDatabaseFiles(@NonNull File file, @NonNull final MergeOfflineRegionsCallback callback,
-                                         boolean isTemporaryFile) {
+  private void mergeOfflineDatabaseFiles(@NonNull final File file, @NonNull final MergeOfflineRegionsCallback callback,
+                                         final boolean isTemporaryFile) {
     fileSource.activate();
     mergeOfflineRegions(fileSource, file.getAbsolutePath(), new MergeOfflineRegionsCallback() {
       @Override
-      public void onMerge(OfflineRegion[] offlineRegions) {
+      public void onMerge(final OfflineRegion[] offlineRegions) {
         getHandler().post(new Runnable() {
           @Override
           public void run() {
@@ -348,7 +348,7 @@ public class OfflineManager {
       }
 
       @Override
-      public void onError(String error) {
+      public void onError(final String error) {
         getHandler().post(new Runnable() {
           @Override
           public void run() {

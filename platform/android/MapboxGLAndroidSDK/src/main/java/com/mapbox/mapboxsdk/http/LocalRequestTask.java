@@ -39,16 +39,30 @@ class LocalRequestTask extends AsyncTask<String, Void, byte[]> {
 
   private static byte[] loadFile(AssetManager assets, String path) {
     byte[] buffer = null;
-    try (InputStream input = assets.open(path)) {
+    InputStream input = null;
+    try {
+      input = assets.open(path);
       int size = input.available();
       buffer = new byte[size];
       input.read(buffer);
     } catch (IOException exception) {
-      String message = "Load file failed";
-      Logger.e(TAG, message, exception);
-      MapStrictMode.strictModeViolation(message, exception);
+      logFileError(exception);
+    } finally {
+      if (input != null) {
+        try {
+          input.close();
+        } catch (IOException exception) {
+          logFileError(exception);
+        }
+      }
     }
     return buffer;
+  }
+
+  private static void logFileError(Exception exception) {
+    String message = "Load file failed";
+    Logger.e(TAG, message, exception);
+    MapStrictMode.strictModeViolation(message, exception);
   }
 
   public interface OnLocalRequestResponse {
