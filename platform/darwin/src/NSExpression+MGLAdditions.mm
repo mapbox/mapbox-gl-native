@@ -542,6 +542,10 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
     return [NSExpression expressionForVariable:@"heatmapDensity"];
 }
 
++ (NSExpression *)lineProgressVariableExpression {
+    return [NSExpression expressionForVariable:@"lineProgress"];
+}
+
 + (NSExpression *)geometryTypeVariableExpression {
     return [NSExpression expressionForVariable:@"geometryType"];
 }
@@ -814,6 +818,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return NSExpression.zoomLevelVariableExpression;
         } else if ([op isEqualToString:@"heatmap-density"]) {
             return NSExpression.heatmapDensityVariableExpression;
+        } else if ([op isEqualToString:@"line-progress"]) {
+            return NSExpression.lineProgressVariableExpression;
         } else if ([op isEqualToString:@"geometry-type"]) {
             return NSExpression.geometryTypeVariableExpression;
         } else if ([op isEqualToString:@"id"]) {
@@ -910,6 +916,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         case NSVariableExpressionType: {
             if ([self.variable isEqualToString:@"heatmapDensity"]) {
                 return @[@"heatmap-density"];
+            }
+            if ([self.variable isEqualToString:@"lineProgress"]) {
+                return @[@"line-progress"];
             }
             if ([self.variable isEqualToString:@"zoomLevel"]) {
                 return @[@"zoom"];

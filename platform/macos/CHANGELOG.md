@@ -7,6 +7,7 @@
 * Added an `MGLSymbolStyleLayer.symbolZOrder` property for forcing point features in a symbol layer to be layered in the same order that they are specified in the layer’s associated source. ([#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783))
 * Fixed a crash when a style layer `*-pattern` property evaluates to nil for a particular feature. ([#12896](https://github.com/mapbox/mapbox-gl-native/pull/12896))
 * Fixed a crash when using the `MGL_LET`, `MGL_MATCH`, `MGL_IF`, or `MGL_FUNCTION` functions without a colon inside an `NSExpression` or `NSPredicate` format string. ([#13189](https://github.com/mapbox/mapbox-gl-native/pull/13189))
+* Fixed a crash setting the `MGLLineStyleLayer.lineGradient` property to an expression containing the `$lineProgress` variable. Added an `NSExpression.lineProgressVariableExpression` class property that returns an expression for the `$lineProgress` variable. ([#13192](https://github.com/mapbox/mapbox-gl-native/pull/13192))
 * Fixed an issue where fill and line layers would occasionally flicker on zoom ([#12982](https://github.com/mapbox/mapbox-gl-native/pull/12982))
 
 ### Offline maps

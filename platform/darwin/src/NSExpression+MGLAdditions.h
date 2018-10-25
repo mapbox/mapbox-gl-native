@@ -63,6 +63,13 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionI
 
 /**
  `NSExpression` variable that corresponds to the
+ <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-line-progress"><code>line-progress</code></a>
+ expression operator in the Mapbox Style Specification.
+ */
+@property (class, nonatomic, readonly) NSExpression *lineProgressVariableExpression;
+
+/**
+ `NSExpression` variable that corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#eexpressions-geometry-type"><code>geometry-type</code></a>
  expression operator in the Mapbox Style Specification.
  */
