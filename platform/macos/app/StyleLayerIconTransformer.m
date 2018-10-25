@@ -22,6 +22,9 @@
     if ([layer isKindOfClass:[MGLFillStyleLayer class]]) {
         return [NSImage imageNamed:@"fill"];
     }
+    if ([layer isKindOfClass:[MGLFillExtrusionStyleLayer class]]) {
+        return [NSImage imageNamed:@"fill-extrusion"];
+    }
     if ([layer isKindOfClass:[MGLLineStyleLayer class]]) {
         return [NSImage imageNamed:@"NSListViewTemplate"];
     }
