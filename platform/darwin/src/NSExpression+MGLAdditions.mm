@@ -1065,9 +1065,11 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 [expressionObject addObject:self.operand.mgl_jsonExpressionObject];
                 return expressionObject;
             } else if ([function isEqualToString:@"MGL_IF"] ||
+                       [function isEqualToString:@"MGL_IF:"] ||
                        [function isEqualToString:@"mgl_if:"]) {
                 return self.mgl_jsonIfExpressionObject;
             } else if ([function isEqualToString:@"MGL_MATCH"] ||
+                       [function isEqualToString:@"MGL_MATCH:"] ||
                        [function isEqualToString:@"mgl_match:"]) {
                 return self.mgl_jsonMatchExpressionObject;
             } else if ([function isEqualToString:@"mgl_coalesce:"] ||
@@ -1104,7 +1106,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }
                 [NSException raise:NSInvalidArgumentException
                             format:@"Casting expression to %@ not yet implemented.", type];
-            } else if ([function isEqualToString:@"MGL_FUNCTION"]) {
+            } else if ([function isEqualToString:@"MGL_FUNCTION"] ||
+                       [function isEqualToString:@"MGL_FUNCTION:"]) {
                 NSExpression *op = self.arguments.firstObject;
                 if (op.expressionType == NSConstantValueExpressionType
                     && [op.constantValue isEqualToString:@"collator"]) {
@@ -1257,7 +1260,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
 }
 
 - (id)mgl_jsonMatchExpressionObject {
-    BOOL isAftermarketFunction = [self.function isEqualToString:@"MGL_MATCH"];
+    BOOL isAftermarketFunction = [self.function hasPrefix:@"MGL_MATCH"];
     NSUInteger minimumIndex = isAftermarketFunction ? 1 : 0;
 
     NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"match", (isAftermarketFunction ? self.arguments.firstObject : self.operand).mgl_jsonExpressionObject, nil];
@@ -1283,7 +1286,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
 }
 
 - (id)mgl_jsonIfExpressionObject {
-    BOOL isAftermarketFunction = [self.function isEqualToString:@"MGL_IF"];
+    BOOL isAftermarketFunction = [self.function hasPrefix:@"MGL_IF"];
     NSUInteger minimumIndex = isAftermarketFunction ? 1 : 0;
     NSExpression *firstCondition;
     id condition;
