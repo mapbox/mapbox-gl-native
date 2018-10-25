@@ -14,7 +14,7 @@ exemptLabels:
 pulls:
   daysUntilStale: 60
   daysUntilClose: -1
-  staleComment: false
+  markComment: false
   closeComment: >
     This pull request has been automatically detected as stale because it has not had
     recent activity and will be archived. Thank you for your contributions.
@@ -22,7 +22,7 @@ pulls:
 issues:
   daysUntilStale: 180
   daysUntilClose: -1
-  staleComment: false
+  markComment: false
   closeComment: >
     This issue has been automatically detected as stale because it has not had
     recent activity and will be archived. Thank you for your contributions.
