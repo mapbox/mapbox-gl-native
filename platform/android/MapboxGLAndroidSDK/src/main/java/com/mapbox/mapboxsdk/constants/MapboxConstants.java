@@ -124,7 +124,6 @@ public class MapboxConstants {
   public static final String STATE_SCROLL_ENABLED = "mapbox_scrollEnabled";
   public static final String STATE_ROTATE_ENABLED = "mapbox_rotateEnabled";
   public static final String STATE_TILT_ENABLED = "mapbox_tiltEnabled";
-  public static final String STATE_ZOOM_CONTROLS_ENABLED = "mapbox_zoomControlsEnabled";
   public static final String STATE_DOUBLE_TAP_ENABLED = "mapbox_doubleTapEnabled";
   public static final String STATE_DEBUG_ACTIVE = "mapbox_debugActive";
   public static final String STATE_STYLE_URL = "mapbox_styleUrl";

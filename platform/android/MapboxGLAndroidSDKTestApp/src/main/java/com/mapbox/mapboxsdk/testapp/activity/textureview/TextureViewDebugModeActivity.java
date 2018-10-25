@@ -96,7 +96,6 @@ public class TextureViewDebugModeActivity extends AppCompatActivity implements O
   @Override
   public void onMapReady(MapboxMap map) {
     mapboxMap = map;
-    mapboxMap.getUiSettings().setZoomControlsEnabled(true);
 
     setupNavigationView(mapboxMap.getLayers());
     setupZoomView();
@@ -105,7 +104,7 @@ public class TextureViewDebugModeActivity extends AppCompatActivity implements O
 
   private void setFpsView() {
     final TextView fpsView = (TextView) findViewById(R.id.fpsView);
-    mapboxMap.setOnFpsChangedListener(fps -> fpsView.setText(String.format(Locale.US,"FPS: %4.2f", fps)));
+    mapboxMap.setOnFpsChangedListener(fps -> fpsView.setText(String.format(Locale.US, "FPS: %4.2f", fps)));
   }
 
   private void setupNavigationView(List<Layer> layerList) {

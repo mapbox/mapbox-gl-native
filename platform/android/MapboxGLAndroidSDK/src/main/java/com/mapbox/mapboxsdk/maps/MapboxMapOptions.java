@@ -63,7 +63,6 @@ public class MapboxMapOptions implements Parcelable {
   private boolean scrollGesturesEnabled = true;
   private boolean tiltGesturesEnabled = true;
   private boolean zoomGesturesEnabled = true;
-  private boolean zoomControlsEnabled = false;
   private boolean doubleTapGesturesEnabled = true;
 
   private boolean prefetchesTiles = true;
@@ -120,7 +119,6 @@ public class MapboxMapOptions implements Parcelable {
     rotateGesturesEnabled = in.readByte() != 0;
     scrollGesturesEnabled = in.readByte() != 0;
     tiltGesturesEnabled = in.readByte() != 0;
-    zoomControlsEnabled = in.readByte() != 0;
     zoomGesturesEnabled = in.readByte() != 0;
     doubleTapGesturesEnabled = in.readByte() != 0;
 
@@ -162,8 +160,6 @@ public class MapboxMapOptions implements Parcelable {
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiRotateGestures, true));
       mapboxMapOptions.tiltGesturesEnabled(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiTiltGestures, true));
-      mapboxMapOptions.zoomControlsEnabled(
-        typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiZoomControls, false));
       mapboxMapOptions.doubleTapGesturesEnabled(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiDoubleTapGestures, true));
 
@@ -494,20 +490,6 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
-   * Specifies if the zoom controls are enabled for a map view.
-   *
-   * @param enabled True and gesture will be enabled
-   * @return This
-   * @deprecated {@link android.widget.ZoomButtonsController}, this functionality and UI is better handled with
-   * custom views and layouts rather than a dedicated zoom-control widget.
-   */
-  @Deprecated
-  public MapboxMapOptions zoomControlsEnabled(boolean enabled) {
-    zoomControlsEnabled = enabled;
-    return this;
-  }
-
-  /**
    * Specifies if the zoom gesture is enabled for a map view.
    *
    * @param enabled True and gesture will be enabled
@@ -808,15 +790,6 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
-   * Get the current configured zoom controls state for a map view.
-   *
-   * @return True indicates gesture is enabled
-   */
-  public boolean getZoomControlsEnabled() {
-    return zoomControlsEnabled;
-  }
-
-  /**
    * Get the current configured zoom gesture state for a map view.
    *
    * @return True indicates gesture is enabled
@@ -964,7 +937,6 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeByte((byte) (rotateGesturesEnabled ? 1 : 0));
     dest.writeByte((byte) (scrollGesturesEnabled ? 1 : 0));
     dest.writeByte((byte) (tiltGesturesEnabled ? 1 : 0));
-    dest.writeByte((byte) (zoomControlsEnabled ? 1 : 0));
     dest.writeByte((byte) (zoomGesturesEnabled ? 1 : 0));
     dest.writeByte((byte) (doubleTapGesturesEnabled ? 1 : 0));
 
@@ -1042,9 +1014,6 @@ public class MapboxMapOptions implements Parcelable {
     if (zoomGesturesEnabled != options.zoomGesturesEnabled) {
       return false;
     }
-    if (zoomControlsEnabled != options.zoomControlsEnabled) {
-      return false;
-    }
     if (doubleTapGesturesEnabled != options.doubleTapGesturesEnabled) {
       return false;
     }
@@ -1117,7 +1086,6 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (scrollGesturesEnabled ? 1 : 0);
     result = 31 * result + (tiltGesturesEnabled ? 1 : 0);
     result = 31 * result + (zoomGesturesEnabled ? 1 : 0);
-    result = 31 * result + (zoomControlsEnabled ? 1 : 0);
     result = 31 * result + (doubleTapGesturesEnabled ? 1 : 0);
     result = 31 * result + (apiBaseUrl != null ? apiBaseUrl.hashCode() : 0);
     result = 31 * result + (textureMode ? 1 : 0);
