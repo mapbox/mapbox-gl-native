@@ -27,9 +27,6 @@
         <attr name="mapbox_uiTiltGestures" format="boolean"/>
         <attr name="mapbox_uiDoubleTapGestures" format="boolean"/>
 
-        <!--UI-Controls-->
-        <attr name="mapbox_uiZoomControls" format="boolean"/>
-
         <!--Compass-->
         <attr name="mapbox_uiCompass" format="boolean"/>
         <attr name="mapbox_uiCompassGravity">
