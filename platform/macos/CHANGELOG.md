@@ -10,10 +10,11 @@
 
 ### Offline maps
 
+* Added prioritization of user-interactive resource requests, over offline requests. ([#13019](https://github.com/mapbox/mapbox-gl-native/pull/13019))
 * Added `-[MGLOfflineStorage addContentsOfFile:withCompletionHandler:]` and `-[MGLOfflineStorage addContentsOfURL:withCompletionHandler:]` methods to add pregenerated offline packs to offline storage. ([#12791](https://github.com/mapbox/mapbox-gl-native/pull/12791))
 * Fixed an issue where some tiles weren't rendered correctly when no internet connectivity was available ([#12931](https://github.com/mapbox/mapbox-gl-native/pull/12931))
 
-### Other changes	
+### Other changes
 
 * Added `MGLAltitudeForZoomLevel` and `MGLZoomLevelForAltitude` to public API for conversion between zoom levels and altitudes. ([#12986](https://github.com/mapbox/mapbox-gl-native/pull/12986))
 * Deprecated the `+[MGLMapCamera cameraLookingAtCenterCoordinate:fromDistance:pitch:heading:]` method in favor of `+[MGLMapCamera cameraLookingAtCenterCoordinate:altitude:pitch:heading:]` and `+[MGLMapCamera cameraLookingAtCenterCoordinate:acrossDistance:pitch:heading:]`. ([#12966](https://github.com/mapbox/mapbox-gl-native/pull/12966))
