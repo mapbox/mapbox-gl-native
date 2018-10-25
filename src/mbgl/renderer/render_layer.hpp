@@ -95,7 +95,14 @@ public:
     void setImpl(Immutable<style::Layer::Impl>);
 
     virtual void markContextDestroyed();
+
+    // TODO: Figure out how to remove this or whether layers other than
+    // RenderHeatmapLayer and RenderLineLayer need paint property updates,
+    // similar to color ramp. Temporarily moved to the base.
+    virtual void update();
+
     friend std::string layoutKey(const RenderLayer&);
+
 protected:
     // Checks whether the current hardware can render this layer. If it can't, we'll show a warning
     // in the console to inform the developer.

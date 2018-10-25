@@ -18,6 +18,7 @@ public:
     bool hasTransition() const override;
     bool hasCrossfade() const override;
     void render(PaintParameters&, RenderSource*) override;
+    void update() final;
 
     bool queryIntersectsFeature(
             const GeometryCoordinates&,
@@ -26,8 +27,6 @@ public:
             const TransformState&,
             const float,
             const mat4&) const override;
-
-    void updateColorRamp();
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
 
@@ -40,6 +39,9 @@ public:
     PremultipliedImage colorRamp;
     optional<OffscreenTexture> renderTexture;
     optional<gl::Texture> colorRampTexture;
+
+private:
+    void updateColorRamp();
 };
 
 template <>

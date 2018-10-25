@@ -32,6 +32,7 @@ public:
     bool hasTransition() const override;
     bool hasCrossfade() const override;
     void render(PaintParameters&, RenderSource*) override;
+    void update() final;
 
     RenderLinePaintProperties::PossiblyEvaluated paintProperties() const;
 
@@ -43,7 +44,6 @@ public:
             const float,
             const mat4&) const override;
 
-    void updateColorRamp();
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
     std::unique_ptr<Layout> createLayout(const BucketParameters&,
@@ -59,6 +59,7 @@ public:
 
 private:
     float getLineWidth(const GeometryTileFeature&, const float) const;
+    void updateColorRamp();
     CrossfadeParameters crossfade;
     PremultipliedImage colorRamp;
     optional<gl::Texture> colorRampTexture;

@@ -294,4 +294,8 @@ float RenderLineLayer::getLineWidth(const GeometryTileFeature& feature, const fl
 }
 
 
+void RenderLineLayer::update() {
+    updateColorRamp();
+}
+
 } // namespace mbgl

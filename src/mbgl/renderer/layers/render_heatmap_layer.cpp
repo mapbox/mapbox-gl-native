@@ -185,6 +185,10 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
     }
 }
 
+void RenderHeatmapLayer::update() {
+    updateColorRamp();
+}
+
 void RenderHeatmapLayer::updateColorRamp() {
     auto colorValue = unevaluated.get<HeatmapColor>().getValue();
     if (colorValue.isUndefined()) {
