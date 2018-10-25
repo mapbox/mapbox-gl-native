@@ -24,8 +24,42 @@ std::string Layer::getID() const {
     return baseImpl->id;
 }
 
+std::string Layer::getSourceID() const {
+    return baseImpl->source;
+}
+
+std::string Layer::getSourceLayer() const {
+    return baseImpl->sourceLayer;
+}
+
+void Layer::setSourceLayer(const std::string& sourceLayer) {
+    auto impl_ = mutableBaseImpl();
+    impl_->sourceLayer = sourceLayer;
+    baseImpl = std::move(impl_);
+}
+
+const Filter& Layer::getFilter() const {
+    return baseImpl->filter;
+}
+
+void Layer::setFilter(const Filter& filter) {
+    auto impl_ = mutableBaseImpl();
+    impl_->filter = filter;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
 VisibilityType Layer::getVisibility() const {
     return baseImpl->visibility;
+}
+
+void Layer::setVisibility(VisibilityType value) {
+    if (value == getVisibility())
+        return;
+    auto impl_ = mutableBaseImpl();
+    impl_->visibility = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
 }
 
 float Layer::getMinZoom() const {
@@ -34,6 +68,20 @@ float Layer::getMinZoom() const {
 
 float Layer::getMaxZoom() const {
     return baseImpl->maxZoom;
+}
+
+void Layer::setMinZoom(float minZoom) {
+    auto impl_ = mutableBaseImpl();
+    impl_->minZoom = minZoom;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void Layer::setMaxZoom(float maxZoom) {
+    auto impl_ = mutableBaseImpl();
+    impl_->maxZoom = maxZoom;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
 }
 
 void Layer::setObserver(LayerObserver* observer_) {

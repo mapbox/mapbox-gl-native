@@ -42,62 +42,6 @@ std::unique_ptr<Layer> FillExtrusionLayer::cloneRef(const std::string& id_) cons
 void FillExtrusionLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-// Source
-
-const std::string& FillExtrusionLayer::getSourceID() const {
-    return impl().source;
-}
-
-void FillExtrusionLayer::setSourceLayer(const std::string& sourceLayer) {
-    auto impl_ = mutableImpl();
-    impl_->sourceLayer = sourceLayer;
-    baseImpl = std::move(impl_);
-}
-
-const std::string& FillExtrusionLayer::getSourceLayer() const {
-    return impl().sourceLayer;
-}
-
-// Filter
-
-void FillExtrusionLayer::setFilter(const Filter& filter) {
-    auto impl_ = mutableImpl();
-    impl_->filter = filter;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-const Filter& FillExtrusionLayer::getFilter() const {
-    return impl().filter;
-}
-
-// Visibility
-
-void FillExtrusionLayer::setVisibility(VisibilityType value) {
-    if (value == getVisibility())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->visibility = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-// Zoom range
-
-void FillExtrusionLayer::setMinZoom(float minZoom) {
-    auto impl_ = mutableImpl();
-    impl_->minZoom = minZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-void FillExtrusionLayer::setMaxZoom(float maxZoom) {
-    auto impl_ = mutableImpl();
-    impl_->maxZoom = maxZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
 // Layout properties
 
 
@@ -539,6 +483,10 @@ optional<Error> FillExtrusionLayer::setLayoutProperty(const std::string& name, c
         
 
     return Error { "layer doesn't support this property" };
+}
+
+Mutable<Layer::Impl> FillExtrusionLayer::mutableBaseImpl() const {
+    return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
 } // namespace style

@@ -43,62 +43,6 @@ void LineLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>
     layout.stringify(writer);
 }
 
-// Source
-
-const std::string& LineLayer::getSourceID() const {
-    return impl().source;
-}
-
-void LineLayer::setSourceLayer(const std::string& sourceLayer) {
-    auto impl_ = mutableImpl();
-    impl_->sourceLayer = sourceLayer;
-    baseImpl = std::move(impl_);
-}
-
-const std::string& LineLayer::getSourceLayer() const {
-    return impl().sourceLayer;
-}
-
-// Filter
-
-void LineLayer::setFilter(const Filter& filter) {
-    auto impl_ = mutableImpl();
-    impl_->filter = filter;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-const Filter& LineLayer::getFilter() const {
-    return impl().filter;
-}
-
-// Visibility
-
-void LineLayer::setVisibility(VisibilityType value) {
-    if (value == getVisibility())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->visibility = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-// Zoom range
-
-void LineLayer::setMinZoom(float minZoom) {
-    auto impl_ = mutableImpl();
-    impl_->minZoom = minZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-void LineLayer::setMaxZoom(float maxZoom) {
-    auto impl_ = mutableImpl();
-    impl_->maxZoom = maxZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
 // Layout properties
 
 PropertyValue<LineCapType> LineLayer::getDefaultLineCap() {
@@ -878,6 +822,10 @@ optional<Error> LineLayer::setLayoutProperty(const std::string& name, const Conv
     
 
     return Error { "layer doesn't support this property" };
+}
+
+Mutable<Layer::Impl> LineLayer::mutableBaseImpl() const {
+    return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
 } // namespace style

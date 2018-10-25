@@ -68,13 +68,6 @@ public:
 
     ~CustomLayer() final;
 
-    // Visibility
-    void setVisibility(VisibilityType) final;
-
-    // Zoom range
-    void setMinZoom(float) final;
-    void setMaxZoom(float) final;
-
     // Dynamic properties
     optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
     optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
@@ -88,10 +81,9 @@ public:
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 
     CustomLayer(const CustomLayer&) = delete;
-};
 
-template <>
-bool Layer::is<CustomLayer>() const;
+    Mutable<Layer::Impl> mutableBaseImpl() const final;
+};
 
 } // namespace style
 } // namespace mbgl

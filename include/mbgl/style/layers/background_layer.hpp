@@ -19,13 +19,6 @@ public:
     BackgroundLayer(const std::string& layerID);
     ~BackgroundLayer() final;
 
-    // Visibility
-    void setVisibility(VisibilityType) final;
-
-    // Zoom range
-    void setMinZoom(float) final;
-    void setMaxZoom(float) final;
-
     // Dynamic properties
     optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
     optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
@@ -58,6 +51,9 @@ public:
     Mutable<Impl> mutableImpl() const;
     BackgroundLayer(Immutable<Impl>);
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
+
+protected:
+    Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
 template <>

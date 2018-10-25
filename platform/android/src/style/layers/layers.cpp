@@ -26,66 +26,58 @@
 #include "fill_extrusion_layer.hpp"
 
 namespace mbgl {
+
 namespace android {
 
-// Mapping from style layers to peer classes
-template <class> struct PeerType {};
-template <> struct PeerType<style::BackgroundLayer> { using Type = android::BackgroundLayer; };
-template <> struct PeerType<style::CircleLayer> { using Type = android::CircleLayer; };
-template <> struct PeerType<style::FillExtrusionLayer> { using Type = android::FillExtrusionLayer; };
-template <> struct PeerType<style::FillLayer> { using Type = android::FillLayer; };
-template <> struct PeerType<style::HeatmapLayer> { using Type = android::HeatmapLayer; };
-template <> struct PeerType<style::HillshadeLayer> { using Type = android::HillshadeLayer; };
-template <> struct PeerType<style::LineLayer> { using Type = android::LineLayer; };
-template <> struct PeerType<style::RasterLayer> { using Type = android::RasterLayer; };
-template <> struct PeerType<style::SymbolLayer> { using Type = android::SymbolLayer; };
-template <> struct PeerType<style::CustomLayer> { using Type = android::CustomLayer; };
-
-// Inititalizes a non-owning peer
-struct LayerPeerIntitializer {
-    mbgl::Map& map;
-
-    template <class LayerType>
-    Layer* operator()(LayerType& layer) {
-        return new typename PeerType<LayerType>::Type(map, layer);
-    }
-};
-
-static Layer* initializeLayerPeer(mbgl::Map& map, mbgl::style::Layer& coreLayer) {
-    Layer* layer = coreLayer.accept(LayerPeerIntitializer {map});
-    return layer ? layer : new UnknownLayer(map, coreLayer);
+template <typename T>
+inline std::unique_ptr<T> to(std::unique_ptr<style::Layer> layer) {
+    return std::unique_ptr<T>(layer.release()->as<T>());
 }
 
-// Initializes an owning peer
-// Only usable once since it needs to pass on ownership
-// of the given layer and thus enforced to be an rvalue
-struct UniqueLayerPeerIntitializer {
-    mbgl::Map& map;
-    std::unique_ptr<style::Layer> layer;
+template <typename T>
+inline T& to(style::Layer& layer) {
+    return *layer.as<T>();
+}
 
-    template <class LayerType>
-    Layer* operator()(LayerType&) && {
-        return new typename PeerType<LayerType>::Type(
-                map,
-                std::unique_ptr<LayerType>(layer.release()->as<LayerType>())
-        );
+template <typename T>
+std::unique_ptr<Layer> initializeLayerPeer(Map& map, style::LayerType type, T&& layer) {
+    switch (type) {
+    case style::LayerType::Fill:
+        return std::unique_ptr<Layer>(new FillLayer(map, to<style::FillLayer>(std::forward<T>(layer))));
+    case style::LayerType::Line:
+        return std::unique_ptr<Layer>(new LineLayer(map, to<style::LineLayer>(std::forward<T>(layer))));
+    case style::LayerType::Circle:
+        return std::unique_ptr<Layer>(new CircleLayer(map, to<style::CircleLayer>(std::forward<T>(layer))));
+    case style::LayerType::Symbol:
+        return std::unique_ptr<Layer>(new SymbolLayer(map, to<style::SymbolLayer>(std::forward<T>(layer))));
+    case style::LayerType::Raster:
+        return std::unique_ptr<Layer>(new RasterLayer(map, to<style::RasterLayer>(std::forward<T>(layer))));
+    case style::LayerType::Background:
+        return std::unique_ptr<Layer>(new BackgroundLayer(map, to<style::BackgroundLayer>(std::forward<T>(layer))));
+    case style::LayerType::Hillshade:
+        return std::unique_ptr<Layer>(new HillshadeLayer(map, to<style::HillshadeLayer>(std::forward<T>(layer))));
+    case style::LayerType::Custom:
+        return std::unique_ptr<Layer>(new CustomLayer(map, to<style::CustomLayer>(std::forward<T>(layer))));
+    case style::LayerType::FillExtrusion:
+        return std::unique_ptr<Layer>(new FillExtrusionLayer(map, to<style::FillExtrusionLayer>(std::forward<T>(layer))));
+    case style::LayerType::Heatmap:
+        return std::unique_ptr<Layer>(new HeatmapLayer(map, to<style::HeatmapLayer>(std::forward<T>(layer))));
     }
-};
-
-static Layer* initializeLayerPeer(Map& map, std::unique_ptr<mbgl::style::Layer> coreLayer) {
-    Layer* layer = coreLayer->accept(UniqueLayerPeerIntitializer {map, std::move(coreLayer)});
-    return layer ? layer : new UnknownLayer(map, std::move(coreLayer));
+    // Not reachable, but placate GCC.
+    assert(false);
+    return std::unique_ptr<Layer>(new UnknownLayer(map, std::forward<T>(layer)));
 }
 
 jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, Map& map, style::Layer& coreLayer) {
-    std::unique_ptr<Layer> peerLayer = std::unique_ptr<Layer>(initializeLayerPeer(map, coreLayer));
+    std::unique_ptr<Layer> peerLayer = initializeLayerPeer(map, coreLayer.getType(), coreLayer);
     jni::Local<jni::Object<Layer>> result = peerLayer->createJavaPeer(env);
     peerLayer.release();
     return result;
 }
 
 jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> coreLayer) {
-    std::unique_ptr<Layer> peerLayer = std::unique_ptr<Layer>(initializeLayerPeer(map, std::move(coreLayer)));
+    auto type = coreLayer->getType();
+    std::unique_ptr<Layer> peerLayer = initializeLayerPeer(map, type, std::move(coreLayer));
     jni::Local<jni::Object<Layer>> result = peerLayer->createJavaPeer(env);
     peerLayer.release();
     return result;

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/peer.hpp>
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/util/optional.hpp>
@@ -27,6 +26,7 @@ class CustomLayer;
 class FillExtrusionLayer;
 class HeatmapLayer;
 class LayerObserver;
+class Filter;
 
 /**
  * The runtime representation of a [layer](https://www.mapbox.com/mapbox-gl-style-spec/#layers) from the Mapbox Style
@@ -44,8 +44,11 @@ class LayerObserver;
  *
  *     auto circleLayer = std::make_unique<CircleLayer>("my-circle-layer");
  */
-class Layer : public mbgl::util::noncopyable {
+class Layer {
 public:
+    Layer(const Layer& ) = delete;
+    Layer& operator=(const Layer&) = delete;
+
     virtual ~Layer();
 
     // Check whether this layer is of the given subtype.
@@ -63,60 +66,26 @@ public:
         return is<T>() ? reinterpret_cast<const T*>(this) : nullptr;
     }
 
-    // Convenience method for dynamic dispatch on the concrete layer type. Using
-    // method overloading, this allows consolidation of logic common to vector-based
-    // layers (Fill, FillExtrusion, Line, Circle, or Symbol). For example:
-    //
-    //     struct Visitor {
-    //         void operator()(CustomLayer&) { ... }
-    //         void operator()(RasterLayer&) { ... }
-    //         void operator()(BackgroundLayer&) { ... }
-    //         template <class VectorLayer>
-    //         void operator()(VectorLayer&) { ... }
-    //     };
-    //
-    template <class V>
-    auto accept(V&& visitor) {
-        switch (getType()) {
-        case LayerType::Fill:
-            return std::forward<V>(visitor)(*as<FillLayer>());
-        case LayerType::Line:
-            return std::forward<V>(visitor)(*as<LineLayer>());
-        case LayerType::Circle:
-            return std::forward<V>(visitor)(*as<CircleLayer>());
-        case LayerType::Symbol:
-            return std::forward<V>(visitor)(*as<SymbolLayer>());
-        case LayerType::Raster:
-            return std::forward<V>(visitor)(*as<RasterLayer>());
-        case LayerType::Background:
-            return std::forward<V>(visitor)(*as<BackgroundLayer>());
-        case LayerType::Hillshade:
-            return std::forward<V>(visitor)(*as<HillshadeLayer>());
-        case LayerType::Custom:
-            return std::forward<V>(visitor)(*as<CustomLayer>());
-        case LayerType::FillExtrusion:
-            return std::forward<V>(visitor)(*as<FillExtrusionLayer>());
-        case LayerType::Heatmap:
-            return std::forward<V>(visitor)(*as<HeatmapLayer>());
-        }
-
-        // Not reachable, but placate GCC.
-        assert(false);
-        throw new std::runtime_error("unknown layer type");
-    }
-
     LayerType getType() const;
     std::string getID() const;
+    // Source
+    std::string getSourceID() const;
+    std::string getSourceLayer() const;
+    void setSourceLayer(const std::string& sourceLayer);
+
+    // Filter
+    const Filter& getFilter() const;
+    void setFilter(const Filter&);
 
     // Visibility
     VisibilityType getVisibility() const;
-    virtual void setVisibility(VisibilityType) = 0;
+    void setVisibility(VisibilityType);
 
     // Zoom range
     float getMinZoom() const;
     float getMaxZoom() const;
-    virtual void setMinZoom(float) = 0;
-    virtual void setMaxZoom(float) = 0;
+    void setMinZoom(float);
+    void setMaxZoom(float);
 
     // Dynamic properties
     virtual optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) = 0;
@@ -124,21 +93,25 @@ public:
     optional<conversion::Error> setVisibility(const conversion::Convertible& value);
 
     // Private implementation
+    // TODO : We should not have public mutable data members.
     class Impl;
     Immutable<Impl> baseImpl;
-
-    Layer(Immutable<Impl>);
 
     // Create a layer, copying all properties except id and paint properties from this layer.
     virtual std::unique_ptr<Layer> cloneRef(const std::string& id) const = 0;
 
-    LayerObserver* observer = nullptr;
+    
     void setObserver(LayerObserver*);
 
     // For use in SDK bindings, which store a reference to a platform-native peer
     // object here, so that separately-obtained references to this object share
     // identical platform-native peers.
     util::peer peer;
+protected:
+    Layer(Immutable<Impl>);   
+    virtual Mutable<Impl> mutableBaseImpl() const = 0;
+
+    LayerObserver* observer = nullptr;
 };
 
 } // namespace style
