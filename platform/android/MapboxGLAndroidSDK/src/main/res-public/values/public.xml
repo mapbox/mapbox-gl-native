@@ -34,9 +34,6 @@
     <public name="mapbox_uiTiltGestures" type="attr" />
     <public name="mapbox_uiDoubleTapGestures" type="attr" />
 
-    <!--UI-Controls-->
-    <public name="mapbox_uiZoomControls" type="attr" />
-
     <!--Compass-->
     <public name="mapbox_uiCompass" type="attr" />
     <public name="mapbox_uiCompassGravity" type="attr" />

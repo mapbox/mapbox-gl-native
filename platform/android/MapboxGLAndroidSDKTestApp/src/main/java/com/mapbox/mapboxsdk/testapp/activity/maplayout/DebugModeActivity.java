@@ -96,7 +96,6 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
   @Override
   public void onMapReady(MapboxMap map) {
     mapboxMap = map;
-    mapboxMap.getUiSettings().setZoomControlsEnabled(true);
 
     setupNavigationView(mapboxMap.getLayers());
 

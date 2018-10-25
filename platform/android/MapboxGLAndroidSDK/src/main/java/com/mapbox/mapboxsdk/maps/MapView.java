@@ -21,7 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ZoomButtonsController;
 
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.mapboxsdk.MapStrictMode;
@@ -94,7 +93,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   private MapGestureDetector mapGestureDetector;
   private MapKeyListener mapKeyListener;
-  private MapZoomButtonController mapZoomButtonController;
   private Bundle savedInstanceState;
 
   @UiThread
@@ -183,12 +181,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings,
       annotationManager, cameraChangeDispatcher);
     mapKeyListener = new MapKeyListener(transform, uiSettings, mapGestureDetector);
-
-    // overlain zoom buttons
-    mapZoomButtonController = new MapZoomButtonController(new ZoomButtonsController(this));
-    MapZoomControllerListener zoomListener = new MapZoomControllerListener(
-      mapGestureDetector, cameraChangeDispatcher, getWidth(), getHeight());
-    mapZoomButtonController.bind(uiSettings, zoomListener);
 
     // compass
     compassView.injectCompassAnimationListener(createCompassAnimationListener(cameraChangeDispatcher));
@@ -449,13 +441,10 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    if (!isZoomButtonControllerInitialized() || !isGestureDetectorInitialized()) {
+    if (!isGestureDetectorInitialized()) {
       return super.onTouchEvent(event);
     }
 
-    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-      mapZoomButtonController.setVisible(true);
-    }
     return mapGestureDetector.onTouchEvent(event) || super.onTouchEvent(event);
   }
 
@@ -485,28 +474,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       return super.onGenericMotionEvent(event);
     }
     return mapGestureDetector.onGenericMotionEvent(event) || super.onGenericMotionEvent(event);
-  }
-
-  @Override
-  public boolean onHoverEvent(MotionEvent event) {
-    if (!isZoomButtonControllerInitialized()) {
-      return super.onHoverEvent(event);
-    }
-
-    switch (event.getActionMasked()) {
-      case MotionEvent.ACTION_HOVER_ENTER:
-      case MotionEvent.ACTION_HOVER_MOVE:
-        mapZoomButtonController.setVisible(true);
-        return true;
-
-      case MotionEvent.ACTION_HOVER_EXIT:
-        mapZoomButtonController.setVisible(false);
-        return true;
-
-      default:
-        // We are not interested in this event
-        return false;
-    }
   }
 
   /**
@@ -619,32 +586,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       pixelRatio = getResources().getDisplayMetrics().density;
     }
     return pixelRatio;
-  }
-
-  //
-  // View events
-  //
-
-  // Called when view is no longer connected
-  @Override
-  @CallSuper
-  protected void onDetachedFromWindow() {
-    super.onDetachedFromWindow();
-    if (isZoomButtonControllerInitialized()) {
-      mapZoomButtonController.setVisible(false);
-    }
-  }
-
-  // Called when view is hidden and shown
-  @Override
-  protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
-    if (isInEditMode()) {
-      return;
-    }
-
-    if (isZoomButtonControllerInitialized()) {
-      mapZoomButtonController.setVisible(visibility == View.VISIBLE);
-    }
   }
 
   //
@@ -1078,10 +1019,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     }
   }
 
-  private boolean isZoomButtonControllerInitialized() {
-    return mapZoomButtonController != null;
-  }
-
   private boolean isGestureDetectorInitialized() {
     return mapGestureDetector != null;
   }
@@ -1505,46 +1442,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     @Override
     public void cancelAllVelocityAnimations() {
       mapGestureDetector.cancelAnimators();
-    }
-  }
-
-  private static class MapZoomControllerListener implements ZoomButtonsController.OnZoomListener {
-
-    private final MapGestureDetector mapGestureDetector;
-    private final CameraChangeDispatcher cameraChangeDispatcher;
-    private final float mapWidth;
-    private final float mapHeight;
-
-    MapZoomControllerListener(MapGestureDetector detector, CameraChangeDispatcher dispatcher,
-                              float mapWidth, float mapHeight) {
-      this.mapGestureDetector = detector;
-      this.cameraChangeDispatcher = dispatcher;
-      this.mapWidth = mapWidth;
-      this.mapHeight = mapHeight;
-    }
-
-    // Not used
-    @Override
-    public void onVisibilityChanged(boolean visible) {
-      // Ignore
-    }
-
-    // Called when user pushes a zoom button on the ZoomButtonController
-    @Override
-    public void onZoom(boolean zoomIn) {
-      cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_ANIMATION);
-      onZoom(zoomIn, mapGestureDetector.getFocalPoint());
-    }
-
-    private void onZoom(boolean zoomIn, @Nullable PointF focalPoint) {
-      if (focalPoint == null) {
-        focalPoint = new PointF(mapWidth / 2, mapHeight / 2);
-      }
-      if (zoomIn) {
-        mapGestureDetector.zoomInAnimated(focalPoint, true);
-      } else {
-        mapGestureDetector.zoomOutAnimated(focalPoint, true);
-      }
     }
   }
 

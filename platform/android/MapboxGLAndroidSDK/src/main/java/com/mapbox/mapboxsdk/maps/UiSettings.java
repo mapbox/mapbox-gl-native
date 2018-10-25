@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PointF;
@@ -52,8 +51,6 @@ public final class UiSettings {
 
   private boolean scrollGesturesEnabled = true;
 
-  private boolean zoomControlsEnabled;
-
   private boolean doubleTapGesturesEnabled = true;
 
   private boolean scaleVelocityAnimationEnabled = true;
@@ -84,7 +81,6 @@ public final class UiSettings {
     initialiseCompass(options, resources);
     initialiseLogo(options, resources);
     initialiseAttribution(context, options);
-    initialiseZoomControl(context);
   }
 
   void onSaveInstanceState(Bundle outState) {
@@ -92,7 +88,6 @@ public final class UiSettings {
     saveCompass(outState);
     saveLogo(outState);
     saveAttribution(outState);
-    saveZoomControl(outState);
     saveDeselectMarkersOnTap(outState);
     saveFocalPoint(outState);
   }
@@ -102,7 +97,6 @@ public final class UiSettings {
     restoreCompass(savedInstanceState);
     restoreLogo(savedInstanceState);
     restoreAttribution(savedInstanceState);
-    restoreZoomControl(savedInstanceState);
     restoreDeselectMarkersOnTap(savedInstanceState);
     restoreFocalPoint(savedInstanceState);
   }
@@ -112,7 +106,6 @@ public final class UiSettings {
     setScrollGesturesEnabled(options.getScrollGesturesEnabled());
     setRotateGesturesEnabled(options.getRotateGesturesEnabled());
     setTiltGesturesEnabled(options.getTiltGesturesEnabled());
-    setZoomControlsEnabled(options.getZoomControlsEnabled());
     setDoubleTapGesturesEnabled(options.getDoubleTapGesturesEnabled());
   }
 
@@ -257,20 +250,6 @@ public final class UiSettings {
       savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_TOP),
       savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_RIGHT),
       savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_BOTTOM));
-  }
-
-  private void initialiseZoomControl(Context context) {
-    if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)) {
-      setZoomControlsEnabled(true);
-    }
-  }
-
-  private void saveZoomControl(Bundle outState) {
-    outState.putBoolean(MapboxConstants.STATE_ZOOM_CONTROLS_ENABLED, isZoomControlsEnabled());
-  }
-
-  private void restoreZoomControl(Bundle savedInstanceState) {
-    setZoomControlsEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_ZOOM_CONTROLS_ENABLED));
   }
 
   /**
@@ -718,34 +697,6 @@ public final class UiSettings {
    */
   public boolean isZoomGesturesEnabled() {
     return zoomGesturesEnabled;
-  }
-
-  /**
-   * <p>
-   * Sets whether the zoom controls are enabled.
-   * If enabled, the zoom controls are a pair of buttons
-   * (one for zooming in, one for zooming out) that appear on the screen.
-   * When pressed, they cause the camera to zoom in (or out) by one zoom level.
-   * If disabled, the zoom controls are not shown.
-   * </p>
-   * By default the zoom controls are enabled if the device is only single touch capable;
-   *
-   * @param zoomControlsEnabled If true, the zoom controls are enabled.
-   * @deprecated {@link android.widget.ZoomButtonsController}, this functionality and UI is better handled with
-   * custom views and layouts rather than a dedicated zoom-control widget.
-   */
-  @Deprecated
-  public void setZoomControlsEnabled(boolean zoomControlsEnabled) {
-    this.zoomControlsEnabled = zoomControlsEnabled;
-  }
-
-  /**
-   * Gets whether the zoom controls are enabled.
-   *
-   * @return If true, the zoom controls are enabled.
-   */
-  public boolean isZoomControlsEnabled() {
-    return zoomControlsEnabled;
   }
 
   /**
