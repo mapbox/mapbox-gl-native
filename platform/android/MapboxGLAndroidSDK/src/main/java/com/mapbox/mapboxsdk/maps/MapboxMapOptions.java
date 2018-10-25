@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
+
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -497,7 +498,10 @@ public class MapboxMapOptions implements Parcelable {
    *
    * @param enabled True and gesture will be enabled
    * @return This
+   * @deprecated {@link android.widget.ZoomButtonsController}, this functionality and UI is better handled with
+   * custom views and layouts rather than a dedicated zoom-control widget.
    */
+  @Deprecated
   public MapboxMapOptions zoomControlsEnabled(boolean enabled) {
     zoomControlsEnabled = enabled;
     return this;
