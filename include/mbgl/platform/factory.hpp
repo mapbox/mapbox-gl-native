@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/platform/platform_run_loop.hpp>
+
 #include <memory>
 
 namespace mbgl {
@@ -21,9 +23,9 @@ public:
      *
      * @return the platform run loop.
      */
-    static std::unique_ptr<PlatformRunLoop> runLoop();
+    static std::unique_ptr<PlatformRunLoop> createRunLoop();
 
     PlatformFactory() = delete;
-}
+};
 
 } // namespace mbgl

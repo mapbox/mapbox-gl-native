@@ -1,7 +1,4 @@
-#include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/async_task.hpp>
-#include <mbgl/util/thread_local.hpp>
-#include <mbgl/actor/scheduler.hpp>
+#include <mbgl/platform/platform_run_loop.hpp>
 
 #include <uv.h>
 
@@ -16,22 +13,21 @@ void dummyCallback(uv_async_t*) {}
 } // namespace
 
 namespace mbgl {
-namespace util {
 
 struct Watch {
     static void onEvent(uv_poll_t* poll, int, int event) {
         auto watch = reinterpret_cast<Watch*>(poll->data);
 
-        RunLoop::Event watchEvent = RunLoop::Event::None;
+        PlatformRunLoop::Event watchEvent = PlatformRunLoop::Event::None;
         switch (event) {
         case UV_READABLE:
-            watchEvent = RunLoop::Event::Read;
+            watchEvent = PlatformRunLoop::Event::Read;
             break;
         case UV_WRITABLE:
-            watchEvent = RunLoop::Event::Write;
+            watchEvent = PlatformRunLoop::Event::Write;
             break;
         case UV_READABLE | UV_WRITABLE:
-            watchEvent = RunLoop::Event::ReadWrite;
+            watchEvent = PlatformRunLoop::Event::ReadWrite;
             break;
         }
 
@@ -46,16 +42,16 @@ struct Watch {
     uv_poll_t poll;
     int fd;
 
-    std::function<void(int, RunLoop::Event)> eventCallback;
+    std::function<void(int, PlatformRunLoop::Event)> eventCallback;
     std::function<void()> closeCallback;
 };
 
-RunLoop* RunLoop::Get() {
+RunLoop* PlatformRunLoop::Get() {
     assert(static_cast<RunLoop*>(Scheduler::GetCurrent()));
     return static_cast<RunLoop*>(Scheduler::GetCurrent());
 }
 
-class RunLoop::Impl {
+class DefaultRunLoop : public PlatformRunLoop {
 public:
     void closeHolder() {
         uv_close(holderHandle(), [](uv_handle_t* h) {
@@ -70,45 +66,45 @@ public:
     uv_loop_t *loop = nullptr;
     uv_async_t* holder = new uv_async_t;
 
-    RunLoop::Type type;
+    PlatformRunLoop::Type type;
     std::unique_ptr<AsyncTask> async;
 
     std::unordered_map<int, std::unique_ptr<Watch>> watchPoll;
 };
 
-RunLoop::RunLoop(Type type) : impl(std::make_unique<Impl>()) {
+PlatformRunLoop::RunLoop(Type type) : impl(std::make_unique<Impl>()) {
     switch (type) {
     case Type::New:
-        impl->loop = new uv_loop_t;
-        if (uv_loop_init(impl->loop) != 0) {
+        loop = new uv_loop_t;
+        if (uv_loop_init(loop) != 0) {
             throw std::runtime_error("Failed to initialize loop.");
         }
         break;
     case Type::Default:
-        impl->loop = uv_default_loop();
+        loop = uv_default_loop();
         break;
     }
 
     // Just for holding a ref to the main loop and keep
     // it alive as required by libuv.
-    if (uv_async_init(impl->loop, impl->holder, dummyCallback) != 0) {
+    if (uv_async_init(loop, holder, dummyCallback) != 0) {
         throw std::runtime_error("Failed to initialize async.");
     }
 
-    impl->type = type;
+    type = type;
 
     Scheduler::SetCurrent(this);
-    impl->async = std::make_unique<AsyncTask>(std::bind(&RunLoop::process, this));
+    async = std::make_unique<AsyncTask>(std::bind(&PlatformRunLoop::process, this));
 }
 
-RunLoop::~RunLoop() {
+PlatformRunLoop::~RunLoop() {
     Scheduler::SetCurrent(nullptr);
 
     // Close the dummy handle that we have
     // just to keep the main loop alive.
-    impl->closeHolder();
+    closeHolder();
 
-    if (impl->type == Type::Default) {
+    if (type == Type::Default) {
         return;
     }
 
@@ -116,53 +112,47 @@ RunLoop::~RunLoop() {
     // close callbacks have been called. Not needed
     // for the default main loop because it is only
     // closed when the application exits.
-    impl->async.reset();
+    async.reset();
     runOnce();
 
-    if (uv_loop_close(impl->loop) == UV_EBUSY) {
+    if (uv_loop_close(loop) == UV_EBUSY) {
         assert(false && "Failed to close loop.");
     }
-    delete impl->loop;
+    delete loop;
 }
 
-LOOP_HANDLE RunLoop::getLoopHandle() {
-    return Get()->impl->loop;
+LOOP_HANDLE PlatformRunLoop::getLoopHandle() {
+    return Get()->loop;
 }
 
-void RunLoop::wake() {
-    impl->async->send();
+void PlatformRunLoop::wake() {
+    async->send();
 }
 
-void RunLoop::run() {
-    MBGL_VERIFY_THREAD(tid);
-
-    uv_ref(impl->holderHandle());
-    uv_run(impl->loop, UV_RUN_DEFAULT);
+void PlatformRunLoop::run() {
+    uv_ref(holderHandle());
+    uv_run(loop, UV_RUN_DEFAULT);
 }
 
-void RunLoop::runOnce() {
-    MBGL_VERIFY_THREAD(tid);
-
-    uv_run(impl->loop, UV_RUN_NOWAIT);
+void PlatformRunLoop::runOnce() {
+    uv_run(loop, UV_RUN_NOWAIT);
 }
 
-void RunLoop::stop() {
-    invoke([&] { uv_unref(impl->holderHandle()); });
+void PlatformRunLoop::stop() {
+    invoke([&] { uv_unref(holderHandle()); });
 }
 
-void RunLoop::addWatch(int fd, Event event, std::function<void(int, Event)>&& callback) {
-    MBGL_VERIFY_THREAD(tid);
-
+void PlatformRunLoop::addWatch(int fd, Event event, std::function<void(int, Event)>&& callback) {
     Watch *watch = nullptr;
-    auto watchPollIter = impl->watchPoll.find(fd);
+    auto watchPollIter = watchPoll.find(fd);
 
-    if (watchPollIter == impl->watchPoll.end()) {
+    if (watchPollIter == watchPoll.end()) {
         std::unique_ptr<Watch> watchPtr = std::make_unique<Watch>();
 
         watch = watchPtr.get();
-        impl->watchPoll[fd] = std::move(watchPtr);
+        watchPoll[fd] = std::move(watchPtr);
 
-        if (uv_poll_init(impl->loop, &watch->poll, fd)) {
+        if (uv_poll_init(loop, &watch->poll, fd)) {
             throw std::runtime_error("Failed to init poll on file descriptor.");
         }
     } else {
@@ -193,16 +183,14 @@ void RunLoop::addWatch(int fd, Event event, std::function<void(int, Event)>&& ca
     }
 }
 
-void RunLoop::removeWatch(int fd) {
-    MBGL_VERIFY_THREAD(tid);
-
-    auto watchPollIter = impl->watchPoll.find(fd);
-    if (watchPollIter == impl->watchPoll.end()) {
+void PlatformRunLoop::removeWatch(int fd) {
+    auto watchPollIter = watchPoll.find(fd);
+    if (watchPollIter == watchPoll.end()) {
         return;
     }
 
     Watch* watch = watchPollIter->second.release();
-    impl->watchPoll.erase(watchPollIter);
+    watchPoll.erase(watchPollIter);
 
     watch->closeCallback = [watch] {
         delete watch;
@@ -215,5 +203,4 @@ void RunLoop::removeWatch(int fd) {
     uv_close(reinterpret_cast<uv_handle_t*>(&watch->poll), &Watch::onClose);
 }
 
-} // namespace util
 } // namespace mbgl

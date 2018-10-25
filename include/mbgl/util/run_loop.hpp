@@ -2,6 +2,7 @@
 
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/actor/mailbox.hpp>
+#include <mbgl/platform/factory.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/work_task.hpp>
@@ -14,9 +15,6 @@
 #include <mutex>
 
 namespace mbgl {
-
-class PlatformRunLoop;
-
 namespace util {
 
 class RunLoop : public Scheduler,
@@ -43,6 +41,7 @@ public:
     ~RunLoop() override;
 
     static RunLoop* Get();
+    static void* getLoopHandle();
 
     void run();
     void runOnce();
@@ -122,7 +121,7 @@ private:
     Queue highPriorityQueue;
     std::mutex mutex;
 
-    std::unique_ptr<PlatformRunLoop> impl;
+    std::unique_ptr<mbgl::PlatformRunLoop> impl;
 };
 
 } // namespace util

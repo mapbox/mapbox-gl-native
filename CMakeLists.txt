@@ -24,7 +24,7 @@ option(WITH_COVERAGE "Enable coverage reports" OFF)
 option(WITH_OSMESA   "Use OSMesa headless backend" OFF)
 option(WITH_EGL      "Use EGL backend" OFF)
 option(WITH_NODEJS   "Download test dependencies like NPM and Node.js" ON)
-option(WITH_ERROR    "Add -Werror flag to build (turns warnings into errors)" ON)
+option(WITH_ERROR    "Add -Werror flag to build (turns warnings into errors)" OFF)
 
 if (WITH_ERROR)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
