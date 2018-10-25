@@ -229,18 +229,6 @@ public class UiSettingsTest {
   }
 
   @Test
-  public void testZoomControlsEnabled() {
-    uiSettings.setZoomControlsEnabled(true);
-    assertEquals("Zoom controls should be enabled", true, uiSettings.isZoomControlsEnabled());
-  }
-
-  @Test
-  public void testZoomControlsDisabled() {
-    uiSettings.setZoomControlsEnabled(false);
-    assertEquals("Zoom controls should be disabled", false, uiSettings.isZoomControlsEnabled());
-  }
-
-  @Test
   public void testDoubleTapGesturesEnabled() {
     uiSettings.setDoubleTapGesturesEnabled(true);
     assertEquals("DoubleTap gesture should be enabled", true, uiSettings.isDoubleTapGesturesEnabled());
