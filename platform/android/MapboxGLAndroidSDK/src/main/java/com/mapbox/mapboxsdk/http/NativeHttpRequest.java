@@ -58,13 +58,16 @@ public class NativeHttpRequest implements HttpResponder {
   }
 
   private void executeLocalRequest(String resourceUrl) {
-    new LocalRequestTask(bytes -> {
-      if (bytes != null) {
-        lock.lock();
-        if (nativePtr != 0) {
-          nativeOnResponse(200, null, null, null, null, null, null, bytes);
+    new LocalRequestTask(new LocalRequestTask.OnLocalRequestResponse() {
+      @Override
+      public void onResponse(byte[] bytes) {
+        if (bytes != null) {
+          lock.lock();
+          if (nativePtr != 0) {
+            NativeHttpRequest.this.nativeOnResponse(200, null, null, null, null, null, null, bytes);
+          }
+          lock.unlock();
         }
-        lock.unlock();
       }
     }).execute(resourceUrl);
   }

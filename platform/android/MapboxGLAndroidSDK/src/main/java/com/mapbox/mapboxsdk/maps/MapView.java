@@ -327,11 +327,14 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     );
 
     // deprecated API
-    nativeMapView.addOnMapChangedListener(change -> {
-      // dispatch events to external listeners
-      if (!onMapChangedListeners.isEmpty()) {
-        for (OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
-          onMapChangedListener.onMapChanged(change);
+    nativeMapView.addOnMapChangedListener(new OnMapChangedListener() {
+      @Override
+      public void onMapChanged(int change) {
+        // dispatch events to external listeners
+        if (!onMapChangedListeners.isEmpty()) {
+          for (OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
+            onMapChangedListener.onMapChanged(change);
+          }
         }
       }
     });

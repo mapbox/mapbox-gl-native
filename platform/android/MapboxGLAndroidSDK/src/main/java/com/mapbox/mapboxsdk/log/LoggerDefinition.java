@@ -1,7 +1,5 @@
 package com.mapbox.mapboxsdk.log;
 
-import android.util.Log;
-
 /**
  * Definition of a logger for the Mapbox Maps SDK for Android.
  */
@@ -101,34 +99,4 @@ public interface LoggerDefinition {
    * @param tr  An exception to log
    */
   void e(String tag, String msg, Throwable tr);
-
-  /**
-   * Send a log message based on severity.
-   *
-   * @param severity the log severity
-   * @param tag      Used to identify the source of a log message.  It usually identifies
-   *                 the class or activity where the log call occurs.
-   * @param message  The message you would like logged.
-   */
-  static void log(int severity, String tag, String message) {
-    switch (severity) {
-      case Log.VERBOSE:
-        Logger.v(tag, message);
-        break;
-      case Log.DEBUG:
-        Logger.d(tag, message);
-        break;
-      case Log.INFO:
-        Logger.i(tag, message);
-        break;
-      case Log.WARN:
-        Logger.w(tag, message);
-        break;
-      case Log.ERROR:
-        Logger.e(tag, message);
-        break;
-      default:
-        throw new UnsupportedOperationException();
-    }
-  }
 }
