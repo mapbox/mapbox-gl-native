@@ -290,6 +290,17 @@ The following variables are defined by this SDK for use with style layers:
       <code>NSExpression.zoomLevelVariableExpression</code> property.
    </td>
 </tr>
+<tr>
+   <td><code>$lineProgress</code></td>
+   <td>Number</td>
+   <td>
+      A number that indicates the relative distance along a line at a given
+      point along the line. This variable evaluates to 0 at the beginning of the
+      line and 1 at the end of the line. It can only be used with the
+      `MGLLineStyleLayer.lineGradient` property. It corresponds to the
+      <code>NSExpression.lineProgressVariableExpression</code> property.
+   </td>
+</tr>
 </tbody>
 </table>
 

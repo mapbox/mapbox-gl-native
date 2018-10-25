@@ -388,6 +388,7 @@ In style specification | Method, function, or predicate type | Format string syn
 `tan`                  | `mgl_tan:` | `mgl_tan(0)`
 `zoom`                 | `NSExpression.zoomLevelVariableExpression` | `$zoomLevel`
 `heatmap-density`      | `NSExpression.heatmapDensityVariableExpression` | `$heatmapDensity`
+`line-progress`        | `NSExpression.lineProgressVariableExpression` | `$lineProgress`
 
 For operators that have no corresponding `NSExpression` symbol, use the
 `MGL_FUNCTION()` format string syntax.
