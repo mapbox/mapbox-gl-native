@@ -21,7 +21,7 @@ import com.mapbox.mapboxsdk.constants.GeometryConstants;
  * data automatically, so all data enters in the WGS84 datum.
  * </p>
  */
-public class LatLng implements ILatLng, Parcelable {
+public class LatLng implements Parcelable {
 
   /**
    * Inner class responsible for recreating Parcels into objects.
@@ -139,7 +139,6 @@ public class LatLng implements ILatLng, Parcelable {
    * @see GeometryConstants#MIN_LATITUDE
    * @see GeometryConstants#MAX_LATITUDE
    */
-  @Override
   public double getLatitude() {
     return latitude;
   }
@@ -177,7 +176,6 @@ public class LatLng implements ILatLng, Parcelable {
    * @see GeometryConstants#MIN_LONGITUDE
    * @see GeometryConstants#MAX_LONGITUDE
    */
-  @Override
   public double getLongitude() {
     return longitude;
   }
@@ -196,7 +194,6 @@ public class LatLng implements ILatLng, Parcelable {
    *
    * @return the altitude value in meters
    */
-  @Override
   public double getAltitude() {
     return altitude;
   }
