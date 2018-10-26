@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
@@ -25,7 +26,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
 import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
-import timber.log.Timber;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+
+import timber.log.Timber;
 
 /**
  * Test activity showcasing adding a large amount of Markers or MarkerViews.
@@ -224,12 +226,17 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
 
         viewCountView = (TextView) findViewById(R.id.countView);
 
-        mapView.addOnMapChangedListener(change -> {
-          if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
-            if (!mapboxMap.getMarkerViewManager().getMarkerViewAdapters().isEmpty()) {
-              viewCountView.setText(String.format(Locale.getDefault(), "ViewCache size %d",
-                mapboxMap.getMarkerViewManager().getMarkerViewContainer().getChildCount()));
-            }
+        mapView.addOnCameraIsChangingListener(new MapView.OnCameraIsChangingListener() {
+          @Override
+          public void onCameraIsChanging() {
+            onCameraChange();
+          }
+        });
+
+        mapView.addOnCameraDidChangeListener(new MapView.OnCameraDidChangeListener() {
+          @Override
+          public void onCameraDidChange(boolean animated) {
+            onCameraChange();
           }
         });
 
@@ -241,6 +248,13 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
               Toast.LENGTH_SHORT).show();
             return false;
           });
+      }
+    }
+
+    private void onCameraChange() {
+      if (!mapboxMap.getMarkerViewManager().getMarkerViewAdapters().isEmpty()) {
+        viewCountView.setText(String.format(Locale.getDefault(), "ViewCache size %d",
+          mapboxMap.getMarkerViewManager().getMarkerViewContainer().getChildCount()));
       }
     }
   }

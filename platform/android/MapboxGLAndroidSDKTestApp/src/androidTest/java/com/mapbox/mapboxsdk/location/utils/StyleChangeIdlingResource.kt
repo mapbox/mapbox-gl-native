@@ -33,12 +33,10 @@ class StyleChangeIdlingResource : IdlingResource {
 
   fun waitForStyle(mapView: MapView, mapboxMap: MapboxMap, styleUrl: String) {
     isIdle = false
-    mapView.addOnMapChangedListener(object : MapView.OnMapChangedListener {
-      override fun onMapChanged(change: Int) {
-        if (change == MapView.DID_FINISH_LOADING_STYLE) {
-          mapView.removeOnMapChangedListener(this)
-          setIdle()
-        }
+    mapView.addOnDidFinishLoadingStyleListener(object : MapView.OnDidFinishLoadingStyleListener {
+      override fun onDidFinishLoadingStyle() {
+        mapView.removeOnDidFinishLoadingStyleListener(this)
+        setIdle()
       }
     })
     mapboxMap.setStyleUrl(styleUrl)

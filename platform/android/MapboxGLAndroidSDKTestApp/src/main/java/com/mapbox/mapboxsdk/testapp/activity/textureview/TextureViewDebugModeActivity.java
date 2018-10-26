@@ -80,9 +80,9 @@ public class TextureViewDebugModeActivity extends AppCompatActivity implements O
 
   private void setupMapView(Bundle savedInstanceState) {
     mapView = (MapView) findViewById(R.id.mapView);
-    mapView.addOnMapChangedListener(change -> {
-      if (change == MapView.DID_FINISH_LOADING_STYLE && mapboxMap != null) {
-        Timber.v("New style loaded with JSON: %s", mapboxMap.getStyleJson());
+
+    mapView.addOnDidFinishLoadingStyleListener(() -> {
+      if (mapboxMap != null) {
         setupNavigationView(mapboxMap.getLayers());
       }
     });
@@ -109,6 +109,7 @@ public class TextureViewDebugModeActivity extends AppCompatActivity implements O
   }
 
   private void setupNavigationView(List<Layer> layerList) {
+    Timber.v("New style loaded with JSON: %s", mapboxMap.getStyleJson());
     final LayerListAdapter adapter = new LayerListAdapter(this, layerList);
     ListView listView = (ListView) findViewById(R.id.listView);
     listView.setAdapter(adapter);
