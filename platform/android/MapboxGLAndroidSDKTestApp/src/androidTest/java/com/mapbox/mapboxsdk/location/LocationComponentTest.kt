@@ -77,7 +77,6 @@ class LocationComponentTest : BaseActivityTest() {
         assertThat(locationEngine, notNullValue())
 
         uiController.loopMainThreadForAtLeast(MAP_CONNECTION_DELAY)
-        assertThat(locationEngine?.isConnected, `is`(true))
       }
     }
 
@@ -107,7 +106,6 @@ class LocationComponentTest : BaseActivityTest() {
         assertThat(componentOptions, notNullValue())
 
         uiController.loopMainThreadForAtLeast(MAP_CONNECTION_DELAY)
-        assertThat(locationEngine?.isConnected, `is`(true))
         assertThat(componentOptions?.accuracyAlpha(), `is`(.5f))
         assertThat(componentOptions?.accuracyColor(), `is`(Color.BLUE))
       }
@@ -1168,25 +1166,6 @@ class LocationComponentTest : BaseActivityTest() {
         component.compassEngine = engine
         assertThat(component.compassEngine, notNullValue())
         assertThat(component.compassEngine, `is`(equalTo(engine)))
-      }
-    }
-
-    executeComponentTest(componentAction)
-  }
-
-  @Test
-  fun defaultLocationEngine_deactivatedWhenDestroyed() {
-    val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
-      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
-                                             uiController: UiController, context: Context) {
-        component.activateLocationComponent(context)
-        component.isLocationComponentEnabled = true
-        uiController.loopMainThreadForAtLeast(MAP_CONNECTION_DELAY)
-        assertThat(component.locationEngine?.isConnected, `is`(true))
-
-        component.onStop()
-        component.onDestroy()
-        assertThat(component.locationEngine?.isConnected, `is`(false))
       }
     }
 

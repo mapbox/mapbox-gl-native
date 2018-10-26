@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ListPopupWindow;
@@ -15,9 +16,10 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.mapbox.android.core.location.LocationEngine;
-import com.mapbox.android.core.location.LocationEngineListener;
-import com.mapbox.android.core.location.LocationEnginePriority;
+import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
+import com.mapbox.android.core.location.LocationEngineRequest;
+import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -37,7 +39,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LocationModesActivity extends AppCompatActivity implements OnMapReadyCallback,
-  LocationEngineListener, OnLocationClickListener, OnCameraTrackingChangedListener {
+        OnLocationClickListener, OnCameraTrackingChangedListener {
+
+  private static final long DEFAULT_INTERVAL_MILLIS = 1000;
+  private static final long DEFAULT_FASTEST_INTERVAL_MILLIS = 1000;
 
   private MapView mapView;
   private Button locationModeBtn;
@@ -61,6 +66,8 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
   private int renderMode = RenderMode.NORMAL;
 
   private Location lastLocation;
+
+  private LocationEngineCallback<LocationEngineResult> locationEngineCallback;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -134,11 +141,19 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
 
-    locationEngine = new LocationEngineProvider(this).obtainBestLocationEngineAvailable();
-    locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
-    locationEngine.setFastestInterval(1000);
-    locationEngine.addLocationEngineListener(this);
-    locationEngine.activate();
+    locationEngine = LocationEngineProvider.getBestLocationEngine(getApplicationContext(),
+            false);
+    locationEngineCallback = new LocationEngineCallback<LocationEngineResult>() {
+      @Override
+      public void onSuccess(LocationEngineResult result) {
+        // noop
+      }
+
+      @Override
+      public void onFailure(@NonNull Exception exception) {
+        // noop
+      }
+    };
 
     int[] padding;
     if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -230,16 +245,15 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
   }
 
   @Override
-  @SuppressWarnings( {"MissingPermission"})
   protected void onStart() {
     super.onStart();
     mapView.onStart();
     if (locationEngine != null) {
-      locationEngine.addLocationEngineListener(this);
-      if (locationEngine.isConnected()) {
-        locationEngine.requestLocationUpdates();
-      } else {
-        locationEngine.activate();
+      try {
+        locationEngine.requestLocationUpdates(getLocationRequst(DEFAULT_INTERVAL_MILLIS),
+                locationEngineCallback, Looper.getMainLooper());
+      } catch (SecurityException se) {
+        se.printStackTrace();
       }
     }
   }
@@ -261,8 +275,7 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
     super.onStop();
     mapView.onStop();
     if (locationEngine != null) {
-      locationEngine.removeLocationEngineListener(this);
-      locationEngine.removeLocationUpdates();
+      locationEngine.removeLocationUpdates(locationEngineCallback);
     }
   }
 
@@ -282,9 +295,6 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
   protected void onDestroy() {
     super.onDestroy();
     mapView.onDestroy();
-    if (locationEngine != null) {
-      locationEngine.deactivate();
-    }
   }
 
   @Override
@@ -293,15 +303,11 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
     mapView.onLowMemory();
   }
 
-  @Override
-  @SuppressWarnings( {"MissingPermission"})
-  public void onConnected() {
-    locationEngine.requestLocationUpdates();
-  }
-
-  @Override
-  public void onLocationChanged(Location location) {
-    // no impl
+  private static LocationEngineRequest getLocationRequst(long interval) {
+    return new LocationEngineRequest.Builder(interval)
+            .setFastestInterval(DEFAULT_FASTEST_INTERVAL_MILLIS)
+            .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+            .build();
   }
 
   @Override

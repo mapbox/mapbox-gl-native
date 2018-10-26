@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
@@ -11,9 +12,10 @@ import android.support.annotation.StyleRes;
 import android.view.WindowManager;
 
 import com.mapbox.android.core.location.LocationEngine;
-import com.mapbox.android.core.location.LocationEngineListener;
-import com.mapbox.android.core.location.LocationEnginePriority;
+import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
+import com.mapbox.android.core.location.LocationEngineRequest;
+import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
@@ -27,6 +29,9 @@ import com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveListener;
 import com.mapbox.mapboxsdk.maps.MapboxMap.OnMapClickListener;
 
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -59,10 +64,10 @@ import static com.mapbox.mapboxsdk.location.LocationComponentConstants.DEFAULT_T
  * this plugin work as expected.
  * <p>
  * This component offers a default, built-in {@link LocationEngine} with some of the activation methods.
- * This engine will be obtained by {@link LocationEngineProvider#obtainBestLocationEngineAvailable} which defaults
- * to the {@link com.mapbox.android.core.location.AndroidLocationEngine}. If you'd like to utilize Google Play Services
+ * This engine will be obtained by {@link LocationEngineProvider#getBestLocationEngine(Context, boolean)} which defaults
+ * to the {@link com.mapbox.android.core.location.MapboxFusedLocationEngineImpl}. If you'd like to utilize Google Play Services
  * for more precise location updates, simply add the Google Play Location Services dependency in your build script.
- * This will make the default engine the {@link com.mapbox.android.core.location.GoogleLocationEngine} instead.
+ * This will make the default engine the {@link com.mapbox.android.core.location.GoogleLocationEngineImpl} instead.
  * <p>
  * For location puck animation purposes, like navigation,
  * we recommend limiting the maximum zoom level of the map for the best user experience.
@@ -71,6 +76,8 @@ import static com.mapbox.mapboxsdk.location.LocationComponentConstants.DEFAULT_T
  */
 public final class LocationComponent {
   private static final String TAG = "Mbgl-LocationComponent";
+  private static final long DEFAULT_INTERVAL_MILLIS = 1000;
+  private static final long DEFAULT_FASTEST_INTERVAL_MILLIS = 1000;
 
   @NonNull
   private final MapboxMap mapboxMap;
@@ -489,19 +496,14 @@ public final class LocationComponent {
       // If internal location engines being used, extra steps need to be taken to deconstruct the
       // instance.
       if (usingInternalLocationEngine) {
-        this.locationEngine.removeLocationUpdates();
-        this.locationEngine.deactivate();
         usingInternalLocationEngine = false;
       }
-      this.locationEngine.removeLocationEngineListener(locationEngineListener);
+      this.locationEngine.removeLocationUpdates(locationEngineListener);
       this.locationEngine = null;
     }
 
     if (locationEngine != null) {
       this.locationEngine = locationEngine;
-      if (isEnabled) {
-        this.locationEngine.addLocationEngineListener(locationEngineListener);
-      }
     }
   }
 
@@ -544,11 +546,31 @@ public final class LocationComponent {
   @Nullable
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   public Location getLastKnownLocation() {
-    Location location = locationEngine != null ? locationEngine.getLastLocation() : null;
-    if (location == null) {
-      location = lastLocation;
+    if (locationEngine == null) {
+      return null;
     }
-    return location;
+    // TODO: decide if we want to change signature of this method, for now make it work as is
+    final AtomicReference<LocationEngineResult> resultRef = new AtomicReference<>();
+    CountDownLatch latch = new CountDownLatch(1);
+    locationEngine.getLastLocation(new LocationEngineCallback<LocationEngineResult>() {
+      @Override
+      public void onSuccess(LocationEngineResult result) {
+        resultRef.set(result);
+        latch.countDown();
+      }
+
+      @Override
+      public void onFailure(@NonNull Exception exception) {
+        // TODO: log exception
+      }
+    });
+    try {
+      latch.await(2, TimeUnit.SECONDS);
+    } catch (InterruptedException ie) {
+      ie.printStackTrace();
+    }
+    LocationEngineResult result = resultRef.get();
+    return result != null ? result.getLastLocation() : null;
   }
 
   /**
@@ -690,9 +712,6 @@ public final class LocationComponent {
    * Internal use.
    */
   public void onDestroy() {
-    if (locationEngine != null && usingInternalLocationEngine) {
-      locationEngine.deactivate();
-    }
   }
 
   /**
@@ -731,9 +750,13 @@ public final class LocationComponent {
 
     if (isEnabled) {
       if (locationEngine != null) {
-        locationEngine.addLocationEngineListener(locationEngineListener);
-        if (locationEngine.isConnected() && usingInternalLocationEngine) {
-          locationEngine.requestLocationUpdates();
+        if (usingInternalLocationEngine) {
+          try {
+            locationEngine.requestLocationUpdates(getLocationRequst(DEFAULT_INTERVAL_MILLIS),
+                    locationEngineListener, Looper.getMainLooper());
+          } catch (SecurityException se) {
+            se.printStackTrace();
+          }
         }
       }
       setCameraMode(locationCameraController.getCameraMode());
@@ -754,9 +777,8 @@ public final class LocationComponent {
     locationAnimatorCoordinator.cancelAllAnimations();
     if (locationEngine != null) {
       if (usingInternalLocationEngine) {
-        locationEngine.removeLocationUpdates();
+        locationEngine.removeLocationUpdates(locationEngineListener);
       }
-      locationEngine.removeLocationEngineListener(locationEngineListener);
     }
     mapboxMap.removeOnCameraMoveListener(onCameraMoveListener);
     mapboxMap.removeOnCameraIdleListener(onCameraIdleListener);
@@ -801,19 +823,17 @@ public final class LocationComponent {
 
   private void initializeLocationEngine(@NonNull Context context) {
     if (this.locationEngine != null) {
-      if (usingInternalLocationEngine) {
-        this.locationEngine.removeLocationUpdates();
-        this.locationEngine.deactivate();
-      }
-      this.locationEngine.removeLocationEngineListener(locationEngineListener);
+      this.locationEngine.removeLocationUpdates(locationEngineListener);
     }
-
     usingInternalLocationEngine = true;
-    locationEngine = new LocationEngineProvider(context).obtainBestLocationEngineAvailable();
-    locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
-    locationEngine.setFastestInterval(1000);
-    locationEngine.addLocationEngineListener(locationEngineListener);
-    locationEngine.activate();
+    locationEngine = LocationEngineProvider.getBestLocationEngine(context, false);
+  }
+
+  private static LocationEngineRequest getLocationRequst(long interval) {
+    return new LocationEngineRequest.Builder(interval)
+            .setFastestInterval(DEFAULT_FASTEST_INTERVAL_MILLIS)
+            .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+            .build();
   }
 
   private void enableLocationComponent() {
@@ -986,18 +1006,19 @@ public final class LocationComponent {
   };
 
   @NonNull
-  private LocationEngineListener locationEngineListener = new LocationEngineListener() {
+  private LocationEngineCallback<LocationEngineResult> locationEngineListener =
+          new LocationEngineCallback<LocationEngineResult>() {
     @Override
-    @SuppressWarnings( {"MissingPermission"})
-    public void onConnected() {
-      if (usingInternalLocationEngine && isLayerReady && isEnabled) {
-        locationEngine.requestLocationUpdates();
+    public void onSuccess(LocationEngineResult result) {
+      Location location = result.getLastLocation();
+      if (location != null) {
+        updateLocation(location, false);
       }
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-      updateLocation(location, false);
+    public void onFailure(@NonNull Exception exception) {
+     // TODO: handle error
     }
   };
 
