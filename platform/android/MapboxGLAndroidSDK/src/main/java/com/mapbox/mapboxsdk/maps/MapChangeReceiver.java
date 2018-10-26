@@ -1,22 +1,30 @@
 package com.mapbox.mapboxsdk.maps;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 class MapChangeReceiver implements NativeMapView.StateCallback {
 
-  private final List<MapView.OnCameraWillChangeListener> onCameraWillChangeListenerList = new ArrayList<>();
-  private final List<MapView.OnCameraIsChangingListener> onCameraIsChangingListenerList = new ArrayList<>();
-  private final List<MapView.OnCameraDidChangeListener> onCameraDidChangeListenerList = new ArrayList<>();
-  private final List<MapView.OnWillStartLoadingMapListener> onWillStartLoadingMapListenerList = new ArrayList<>();
-  private final List<MapView.OnDidFinishLoadingMapListener> onDidFinishLoadingMapListenerList = new ArrayList<>();
-  private final List<MapView.OnDidFailLoadingMapListener> onDidFailLoadingMapListenerList = new ArrayList<>();
-  private final List<MapView.OnWillStartRenderingFrameListener> onWillStartRenderingFrameList = new ArrayList<>();
-  private final List<MapView.OnDidFinishRenderingFrameListener> onDidFinishRenderingFrameList = new ArrayList<>();
-  private final List<MapView.OnWillStartRenderingMapListener> onWillStartRenderingMapListenerList = new ArrayList<>();
-  private final List<MapView.OnDidFinishRenderingMapListener> onDidFinishRenderingMapListenerList = new ArrayList<>();
-  private final List<MapView.OnDidFinishLoadingStyleListener> onDidFinishLoadingStyleListenerList = new ArrayList<>();
-  private final List<MapView.OnSourceChangedListener> onSourceChangedListenerList = new ArrayList<>();
+  private final List<MapView.OnCameraWillChangeListener> onCameraWillChangeListenerList = new CopyOnWriteArrayList<>();
+  private final List<MapView.OnCameraIsChangingListener> onCameraIsChangingListenerList = new CopyOnWriteArrayList<>();
+  private final List<MapView.OnCameraDidChangeListener> onCameraDidChangeListenerList = new CopyOnWriteArrayList<>();
+  private final List<MapView.OnWillStartLoadingMapListener> onWillStartLoadingMapListenerList
+    = new CopyOnWriteArrayList<>();
+  private final List<MapView.OnDidFinishLoadingMapListener> onDidFinishLoadingMapListenerList
+    = new CopyOnWriteArrayList<>();
+  private final List<MapView.OnDidFailLoadingMapListener> onDidFailLoadingMapListenerList
+    = new CopyOnWriteArrayList<>();
+  private final List<MapView.OnWillStartRenderingFrameListener> onWillStartRenderingFrameList
+    = new CopyOnWriteArrayList<>();
+  private final List<MapView.OnDidFinishRenderingFrameListener> onDidFinishRenderingFrameList
+    = new CopyOnWriteArrayList<>();
+  private final List<MapView.OnWillStartRenderingMapListener> onWillStartRenderingMapListenerList
+    = new CopyOnWriteArrayList<>();
+  private final List<MapView.OnDidFinishRenderingMapListener> onDidFinishRenderingMapListenerList
+    = new CopyOnWriteArrayList<>();
+  private final List<MapView.OnDidFinishLoadingStyleListener> onDidFinishLoadingStyleListenerList
+    = new CopyOnWriteArrayList<>();
+  private final List<MapView.OnSourceChangedListener> onSourceChangedListenerList = new CopyOnWriteArrayList<>();
 
   @Override
   public void onCameraWillChange(boolean animated) {
