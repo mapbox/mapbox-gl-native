@@ -71,6 +71,8 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
         // Add a marker on the clicked point
         marker = mapboxMap.addMarker(new CustomMarkerOptions().position(point).features(features));
         mapboxMap.selectMarker(marker);
+
+        return false;
       });
     });
 

@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mapbox.geojson.Feature;
@@ -133,7 +134,7 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
   }
 
   @Override
-  public void onMapClick(@NonNull LatLng point) {
+  public boolean onMapClick(@NonNull LatLng point) {
     // Query which features are clicked
     PointF screenLoc = mapboxMap.getProjection().toScreenLocation(point);
     List<Feature> features = mapboxMap.queryRenderedFeatures(screenLoc, MARKER_LAYER);
@@ -147,6 +148,8 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
       }
       geoJsonSource.setGeoJson(markerCollection);
     }
+
+    return false;
   }
 
   private void toggleTextSize() {
