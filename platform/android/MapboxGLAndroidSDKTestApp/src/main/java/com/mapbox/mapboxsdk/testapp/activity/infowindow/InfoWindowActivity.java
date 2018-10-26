@@ -109,7 +109,7 @@ public class InfoWindowActivity extends AppCompatActivity
   }
 
   @Override
-  public void onMapLongClick(@NonNull LatLng point) {
+  public boolean onMapLongClick(@NonNull LatLng point) {
     if (customMarker != null) {
       // Remove previous added marker
       mapboxMap.removeAnnotation(customMarker);
@@ -122,6 +122,8 @@ public class InfoWindowActivity extends AppCompatActivity
       .snippet(new DecimalFormat("#.#####").format(point.getLatitude()) + ", "
         + new DecimalFormat("#.#####").format(point.getLongitude()))
       .position(point));
+
+    return false;
   }
 
   @Override

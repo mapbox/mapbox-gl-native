@@ -35,7 +35,10 @@ public class MaxMinZoomActivity extends AppCompatActivity implements OnMapReadyC
     mapboxMap = map;
     mapboxMap.setMinZoomPreference(3);
     mapboxMap.setMaxZoomPreference(5);
-    mapboxMap.setOnMapClickListener(point -> map.setStyle(Style.OUTDOORS, style -> Timber.d("Style Loaded %s", style)));
+    mapboxMap.setOnMapClickListener(point -> {
+      map.setStyle(Style.OUTDOORS, style -> Timber.d("Style Loaded %s", style));
+      return false;
+    });
   }
 
   @Override

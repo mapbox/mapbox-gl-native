@@ -60,8 +60,9 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
   }
 
   @Override
-  public void onMapLongClick(@NonNull LatLng point) {
+  public boolean onMapLongClick(@NonNull LatLng point) {
     toggleLogCameraChanges();
+    return false;
   }
 
   @Override

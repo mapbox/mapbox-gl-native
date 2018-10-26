@@ -2544,8 +2544,10 @@ public final class MapboxMap {
      * Called when the user clicks on the map view.
      *
      * @param point The projected map coordinate the user clicked on.
+     * @return True if this click should be consumed and not passed further to other listeners registered afterwards,
+     * false otherwise.
      */
-    void onMapClick(@NonNull LatLng point);
+    boolean onMapClick(@NonNull LatLng point);
   }
 
   /**
@@ -2558,8 +2560,10 @@ public final class MapboxMap {
      * Called when the user long clicks on the map view.
      *
      * @param point The projected map coordinate the user long clicked on.
+     * @return True if this click should be consumed and not passed further to other listeners registered afterwards,
+     * false otherwise.
      */
-    void onMapLongClick(@NonNull LatLng point);
+    boolean onMapLongClick(@NonNull LatLng point);
   }
 
   /**
