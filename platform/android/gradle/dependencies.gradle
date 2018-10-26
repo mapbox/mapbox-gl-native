@@ -9,7 +9,7 @@ ext {
 
     versions = [
             mapboxServices  : '4.1.0',
-            mapboxTelemetry : '3.5.4',
+            mapboxTelemetry : '4.0.0',
             mapboxGestures  : '0.3.0',
             supportLib      : '27.1.1',
             constraintLayout: '1.1.2',
@@ -23,7 +23,8 @@ ext {
             okhttp          : '3.11.0',
             kotlin          : '1.2.51',
             licenses        : '0.8.41',
-            lint            : '26.1.3'
+            lint            : '26.1.3',
+            gms             : '16.0.0'
     ]
 
     dependenciesList = [
@@ -53,7 +54,7 @@ ext {
             supportRecyclerView    : "com.android.support:recyclerview-v7:${versions.supportLib}",
             supportConstraintLayout: "com.android.support.constraint:constraint-layout:${versions.constraintLayout}",
 
-            gmsLocation            : 'com.google.android.gms:play-services-location:11.0.4',
+            gmsLocation            : "com.google.android.gms:play-services-location:${versions.gms}",
             timber                 : "com.jakewharton.timber:timber:${versions.timber}",
             okhttp3                : "com.squareup.okhttp3:okhttp:${versions.okhttp}",
             leakCanaryDebug        : "com.squareup.leakcanary:leakcanary-android:${versions.leakCanary}",

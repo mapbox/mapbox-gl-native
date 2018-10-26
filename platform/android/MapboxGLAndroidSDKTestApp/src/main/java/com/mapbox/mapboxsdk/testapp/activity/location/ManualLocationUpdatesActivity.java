@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp.activity.location;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -9,9 +10,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.mapbox.android.core.location.LocationEngine;
-import com.mapbox.android.core.location.LocationEngineListener;
-import com.mapbox.android.core.location.LocationEnginePriority;
+import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
+import com.mapbox.android.core.location.LocationEngineRequest;
+import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -27,7 +29,10 @@ import java.util.List;
 import timber.log.Timber;
 
 public class ManualLocationUpdatesActivity extends AppCompatActivity implements OnMapReadyCallback,
-  LocationEngineListener {
+        LocationEngineCallback<LocationEngineResult> {
+
+  private static final long DEFAULT_INTERVAL_MILLIS = 1000;
+  private static final long DEFAULT_FASTEST_INTERVAL_MILLIS = 1000;
 
   private MapView mapView;
   private LocationComponent locationComponent;
@@ -116,35 +121,32 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
 
   @Override
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
-    locationEngine = new LocationEngineProvider(this).obtainBestLocationEngineAvailable();
-    locationEngine.addLocationEngineListener(this);
-    locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
-    locationEngine.activate();
+    locationEngine = LocationEngineProvider.getBestLocationEngine(getApplicationContext(),
+            false);
     locationComponent = mapboxMap.getLocationComponent();
     locationComponent.activateLocationComponent(this, locationEngine);
     locationComponent.setLocationComponentEnabled(true);
     locationComponent.setRenderMode(RenderMode.COMPASS);
   }
 
-  @Override
-  @SuppressWarnings( {"MissingPermission"})
-  public void onConnected() {
-    locationEngine.requestLocationUpdates();
+  private static LocationEngineRequest getLocationRequst(long interval) {
+    return new LocationEngineRequest.Builder(interval)
+            .setFastestInterval(DEFAULT_FASTEST_INTERVAL_MILLIS)
+            .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+            .build();
   }
 
   @Override
-  public void onLocationChanged(Location location) {
-    Timber.d("Location change occurred: %s", location.toString());
-  }
-
-  @Override
-  @SuppressWarnings( {"MissingPermission"})
   protected void onStart() {
     super.onStart();
     mapView.onStart();
     if (locationEngine != null) {
-      locationEngine.requestLocationUpdates();
-      locationEngine.addLocationEngineListener(this);
+      try {
+        locationEngine.requestLocationUpdates(getLocationRequst(DEFAULT_INTERVAL_MILLIS),
+                this, Looper.getMainLooper());
+      } catch (SecurityException se) {
+        se.printStackTrace();
+      }
     }
   }
 
@@ -165,8 +167,7 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
     super.onStop();
     mapView.onStop();
     if (locationEngine != null) {
-      locationEngine.removeLocationEngineListener(this);
-      locationEngine.removeLocationUpdates();
+      locationEngine.removeLocationUpdates(this);
     }
   }
 
@@ -180,14 +181,24 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
   protected void onDestroy() {
     super.onDestroy();
     mapView.onDestroy();
-    if (locationEngine != null) {
-      locationEngine.deactivate();
-    }
   }
 
   @Override
   public void onLowMemory() {
     super.onLowMemory();
     mapView.onLowMemory();
+  }
+
+  @Override
+  public void onSuccess(LocationEngineResult result) {
+    Location location = result.getLastLocation();
+    if (location != null) {
+      Timber.d("Location change occurred: %s", location.toString());
+    }
+  }
+
+  @Override
+  public void onFailure(@NonNull Exception exception) {
+    Timber.d("Location engine error occurred: %s", exception.getMessage());
   }
 }
