@@ -1221,7 +1221,7 @@ public:
                                            camera.centerCoordinate.latitude,
                                            self.frame.size);
     if (camera.heading >= 0) {
-        options.angle = -camera.heading;
+        options.angle = camera.heading;
     }
     if (camera.pitch >= 0) {
         options.pitch = camera.pitch;
