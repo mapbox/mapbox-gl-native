@@ -95,6 +95,8 @@ class DraggableMarkerActivity : AppCompatActivity() {
             Snackbar.LENGTH_LONG)
             .show()
         }
+
+        false
       }
 
       draggableSymbolsManager = DraggableSymbolsManager(
@@ -185,6 +187,7 @@ class DraggableMarkerActivity : AppCompatActivity() {
             onSymbolDragStarted(id)
           }
         }
+        false
       }
 
       androidGesturesManager.setMoveGestureListener(MyMoveGestureListener())

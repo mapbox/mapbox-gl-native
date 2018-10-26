@@ -583,6 +583,11 @@ public final class LocationComponent {
 
   /**
    * Adds a listener that gets invoked when the user clicks the displayed location.
+   * <p>
+   * If there are registered location click listeners and the location is clicked,
+   * only {@link OnLocationClickListener#onLocationComponentClick()} is going to be delivered,
+   * {@link com.mapbox.mapboxsdk.maps.MapboxMap.OnMapClickListener#onMapClick(LatLng)} is going to be consumed
+   * and not pushed to the listeners registered after the component's activation.
    *
    * @param listener The location click listener that is invoked when the
    *                 location is clicked
@@ -602,6 +607,11 @@ public final class LocationComponent {
 
   /**
    * Adds a listener that gets invoked when the user long clicks the displayed location.
+   * <p>
+   * If there are registered location long click listeners and the location is long clicked,
+   * only {@link OnLocationLongClickListener#onLocationComponentLongClick()} is going to be delivered,
+   * {@link com.mapbox.mapboxsdk.maps.MapboxMap.OnMapLongClickListener#onMapLongClick(LatLng)} is going to be consumed
+   * and not pushed to the listeners registered after the component's activation.
    *
    * @param listener The location click listener that is invoked when the
    *                 location is clicked
@@ -915,23 +925,27 @@ public final class LocationComponent {
 
   private OnMapClickListener onMapClickListener = new OnMapClickListener() {
     @Override
-    public void onMapClick(@NonNull LatLng point) {
+    public boolean onMapClick(@NonNull LatLng point) {
       if (!onLocationClickListeners.isEmpty() && locationLayerController.onMapClick(point)) {
         for (OnLocationClickListener listener : onLocationClickListeners) {
           listener.onLocationComponentClick();
         }
+        return true;
       }
+      return false;
     }
   };
 
   private MapboxMap.OnMapLongClickListener onMapLongClickListener = new MapboxMap.OnMapLongClickListener() {
     @Override
-    public void onMapLongClick(@NonNull LatLng point) {
+    public boolean onMapLongClick(@NonNull LatLng point) {
       if (!onLocationLongClickListeners.isEmpty() && locationLayerController.onMapClick(point)) {
         for (OnLocationLongClickListener listener : onLocationLongClickListeners) {
           listener.onLocationComponentLongClick();
         }
+        return true;
       }
+      return false;
     }
   };
 

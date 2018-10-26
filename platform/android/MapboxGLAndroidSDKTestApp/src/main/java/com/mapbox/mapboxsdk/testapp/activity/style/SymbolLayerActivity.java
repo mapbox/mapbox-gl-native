@@ -148,7 +148,7 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
   }
 
   @Override
-  public void onMapClick(@NonNull LatLng point) {
+  public boolean onMapClick(@NonNull LatLng point) {
     // Query which features are clicked
     PointF screenLoc = mapboxMap.getProjection().toScreenLocation(point);
     List<Feature> features = mapboxMap.queryRenderedFeatures(screenLoc, MARKER_LAYER);
@@ -162,6 +162,8 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
       }
       geoJsonSource.setGeoJson(markerCollection);
     }
+
+    return false;
   }
 
   private void toggleTextSize() {

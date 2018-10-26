@@ -927,7 +927,9 @@ final class MapGestureDetector {
 
     // new API
     for (MapboxMap.OnMapClickListener listener : onMapClickListenerList) {
-      listener.onMapClick(projection.fromScreenLocation(tapPoint));
+      if (listener.onMapClick(projection.fromScreenLocation(tapPoint))) {
+        return;
+      }
     }
   }
 
@@ -939,7 +941,9 @@ final class MapGestureDetector {
 
     // new API
     for (MapboxMap.OnMapLongClickListener listener : onMapLongClickListenerList) {
-      listener.onMapLongClick(projection.fromScreenLocation(longClickPoint));
+      if (listener.onMapLongClick(projection.fromScreenLocation(longClickPoint))) {
+        return;
+      }
     }
   }
 

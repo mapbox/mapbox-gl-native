@@ -64,8 +64,9 @@ public class CameraPositionActivity extends FragmentActivity implements OnMapRea
   }
 
   @Override
-  public void onMapLongClick(@NonNull LatLng point) {
+  public boolean onMapLongClick(@NonNull LatLng point) {
     toggleLogCameraChanges();
+    return false;
   }
 
   @Override

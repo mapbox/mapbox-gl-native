@@ -101,6 +101,8 @@ public class DoubleMapActivity extends AppCompatActivity {
           // test if we can open 2 activities after each other
           Toast.makeText(mapViewMini.getContext(), "Creating a new Activity instance",Toast.LENGTH_SHORT).show();
           startActivity(new Intent(mapViewMini.getContext(), DoubleMapActivity.class));
+
+          return false;
         });
       });
     }

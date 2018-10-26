@@ -71,6 +71,8 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
           infoWindow.update();
         });
       }
+
+      return false;
     });
 
     // Focus on Paris
