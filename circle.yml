@@ -834,7 +834,6 @@ jobs:
       - install-macos-dependencies
       - install-dependencies
       - build-ios-test
-      - build-ios-integration-test
       - check-public-symbols
       - run:
           name: Check symbol namespacing for mapbox-events-ios
