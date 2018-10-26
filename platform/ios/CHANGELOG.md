@@ -13,6 +13,11 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added prioritization of user-interactive resource requests, over offline requests. ([#13019](https://github.com/mapbox/mapbox-gl-native/pull/13019))
 * Added the `-[MGLOfflineStorage putResourceWithUrl:data:modified:expires:etag:mustRevalidate:]` method to allow pre-warming of the ambient cache. ([#13022](https://github.com/mapbox/mapbox-gl-native/pull/13022))
 
+### Other changes
+
+* Fixed an issue where snapshots had the wrong heading and pitch. ([#13123](https://github.com/mapbox/mapbox-gl-native/pull/13123))
+* Fixed an issue where `-[MGLMapViewDelegate mapView:shouldChangeFromCamera:toCamera:]` was called with an incorrectly rotated `newCamera` when the user rotated the map. ([#13123](https://github.com/mapbox/mapbox-gl-native/pull/13123))
+
 ## 4.5.0 - October 10, 2018
 
 ### Styles and rendering
