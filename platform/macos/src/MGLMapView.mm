@@ -1221,10 +1221,10 @@ public:
                                            camera.centerCoordinate.latitude,
                                            self.frame.size);
     if (camera.heading >= 0) {
-        options.angle = MGLRadiansFromDegrees(-camera.heading);
+        options.angle = -camera.heading;
     }
     if (camera.pitch >= 0) {
-        options.pitch = MGLRadiansFromDegrees(camera.pitch);
+        options.pitch = camera.pitch;
     }
     return options;
 }
@@ -1317,8 +1317,8 @@ public:
 - (MGLMapCamera *)cameraForCameraOptions:(const mbgl::CameraOptions &)cameraOptions {
     CLLocationCoordinate2D centerCoordinate = MGLLocationCoordinate2DFromLatLng(cameraOptions.center ? *cameraOptions.center : _mbglMap->getLatLng());
     double zoomLevel = cameraOptions.zoom ? *cameraOptions.zoom : self.zoomLevel;
-    CLLocationDirection direction = cameraOptions.angle ? mbgl::util::wrap(-MGLDegreesFromRadians(*cameraOptions.angle), 0., 360.) : self.direction;
-    CGFloat pitch = cameraOptions.pitch ? MGLDegreesFromRadians(*cameraOptions.pitch) : _mbglMap->getPitch();
+    CLLocationDirection direction = cameraOptions.angle ? mbgl::util::wrap(*cameraOptions.angle, 0., 360.) : self.direction;
+    CGFloat pitch = cameraOptions.pitch ? *cameraOptions.pitch : _mbglMap->getPitch();
     CLLocationDistance altitude = MGLAltitudeForZoomLevel(zoomLevel, pitch,
                                                           centerCoordinate.latitude,
                                                           self.frame.size);
