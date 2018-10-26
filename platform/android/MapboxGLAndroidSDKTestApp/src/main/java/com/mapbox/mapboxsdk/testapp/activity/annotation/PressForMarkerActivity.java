@@ -43,9 +43,15 @@ public class PressForMarkerActivity extends AppCompatActivity {
       mapboxMap = map;
       resetMap();
 
-      mapboxMap.addOnMapLongClickListener(point -> addMarker(point));
+      mapboxMap.addOnMapLongClickListener(point -> {
+        addMarker(point);
+        return false;
+      });
 
-      mapboxMap.addOnMapClickListener(point -> addMarker(point));
+      mapboxMap.addOnMapClickListener(point -> {
+        addMarker(point);
+        return false;
+      });
 
       if (savedInstanceState != null) {
         markerList = savedInstanceState.getParcelableArrayList(STATE_MARKER_LIST);

@@ -63,6 +63,8 @@ public class QuerySourceFeaturesActivity extends AppCompatActivity {
         List<Feature> features = source.querySourceFeatures(eq(get("key1"), literal("value1")));
         Toast.makeText(QuerySourceFeaturesActivity.this, String.format("Found %s features",
           features.size()), Toast.LENGTH_SHORT).show();
+
+        return false;
       });
 
       FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

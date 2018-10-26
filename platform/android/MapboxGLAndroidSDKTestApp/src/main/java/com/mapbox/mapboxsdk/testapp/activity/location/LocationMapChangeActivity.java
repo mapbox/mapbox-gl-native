@@ -5,16 +5,15 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Toast;
 
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.location.LocationComponent;
-import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.List;
@@ -33,12 +32,9 @@ public class LocationMapChangeActivity extends AppCompatActivity implements OnMa
     mapView = findViewById(R.id.mapView);
     FloatingActionButton stylesFab = findViewById(R.id.fabStyles);
 
-    stylesFab.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (mapboxMap != null) {
-          mapboxMap.setStyleUrl(Utils.getNextStyle());
-        }
+    stylesFab.setOnClickListener(v -> {
+      if (mapboxMap != null) {
+        mapboxMap.setStyleUrl(Utils.getNextStyle());
       }
     });
 
@@ -86,6 +82,12 @@ public class LocationMapChangeActivity extends AppCompatActivity implements OnMa
     locationComponent.activateLocationComponent(this);
     locationComponent.setLocationComponentEnabled(true);
     locationComponent.setRenderMode(RenderMode.COMPASS);
+
+    locationComponent.addOnLocationClickListener(
+      () -> Toast.makeText(this, "Location clicked", Toast.LENGTH_SHORT).show());
+
+    locationComponent.addOnLocationLongClickListener(
+      () -> Toast.makeText(this, "Location long clicked", Toast.LENGTH_SHORT).show());
   }
 
   @Override

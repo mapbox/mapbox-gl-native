@@ -125,6 +125,8 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
       } else {
         Timber.e("No features found");
       }
+
+      return false;
     });
   }
 

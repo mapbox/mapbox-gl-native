@@ -105,6 +105,8 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
           "hello from: " + feature.getStringProperty(FEATURE_NAME),
           Toast.LENGTH_LONG).show();
       }
+
+      return false;
     });
   }
 
