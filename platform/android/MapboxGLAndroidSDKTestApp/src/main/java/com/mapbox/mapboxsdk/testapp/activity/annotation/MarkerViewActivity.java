@@ -58,6 +58,7 @@ public class MarkerViewActivity extends AppCompatActivity {
 
   private MapboxMap mapboxMap;
   private MapView mapView;
+  private TextView viewCountView;
 
   // MarkerView location updates
   private MarkerView movingMarkerOne;
@@ -77,7 +78,7 @@ public class MarkerViewActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_marker_view);
 
-    final TextView viewCountView = (TextView) findViewById(R.id.countView);
+    viewCountView = (TextView) findViewById(R.id.countView);
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(mapboxMap -> {
@@ -140,18 +141,12 @@ public class MarkerViewActivity extends AppCompatActivity {
       markerViewManager.addMarkerViewAdapter(new CountryAdapter(MarkerViewActivity.this, mapboxMap));
       markerViewManager.addMarkerViewAdapter(new TextAdapter(MarkerViewActivity.this, mapboxMap));
 
-      final ViewGroup markerViewContainer = markerViewManager.getMarkerViewContainer();
 
       // add a change listener to validate the size of amount of child views
-      mapView.addOnMapChangedListener(change -> {
-        if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
-          if (!markerViewManager.getMarkerViewAdapters().isEmpty() && viewCountView != null) {
-            viewCountView.setText(String.format(
-              Locale.getDefault(),
-              getString(R.string.viewcache_size),
-              markerViewContainer.getChildCount())
-            );
-          }
+      mapView.addOnCameraDidChangeListener(new MapView.OnCameraDidChangeListener() {
+        @Override
+        public void onCameraDidChange(boolean animated) {
+          setViewCount();
         }
       });
 
@@ -192,6 +187,18 @@ public class MarkerViewActivity extends AppCompatActivity {
       mapboxMap.selectMarker(markerRightOffScreen);
       mapboxMap.selectMarker(markerRightBottomOffScreen);
     });
+  }
+
+  private void setViewCount() {
+    final MarkerViewManager markerViewManager = mapboxMap.getMarkerViewManager();
+    final ViewGroup markerViewContainer = markerViewManager.getMarkerViewContainer();
+    if (!markerViewManager.getMarkerViewAdapters().isEmpty() && viewCountView != null) {
+      viewCountView.setText(String.format(
+        Locale.getDefault(),
+        getString(R.string.viewcache_size),
+        markerViewContainer.getChildCount())
+      );
+    }
   }
 
   private void loopMarkerRotate() {
