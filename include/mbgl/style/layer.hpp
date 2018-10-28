@@ -30,9 +30,9 @@ class Filter;
  * * Cloning and copying
  *
  * All other functionality lives in the derived classes. To instantiate a layer, create an instance of the desired
- * type, passing the ID:
+ * type, calling `LayerManager`:
  *
- *     auto circleLayer = std::make_unique<CircleLayer>("my-circle-layer");
+ *     auto circleLayer = LayerManager::get()->createLayer("circle", ...);
  */
 class Layer {
 public:
@@ -87,6 +87,43 @@ protected:
     virtual Mutable<Impl> mutableBaseImpl() const = 0;
 
     LayerObserver* observer = nullptr;
+};
+
+/**
+ * @brief The LayerFactory abstract class
+ * 
+ * This class is responsible for creation of the layer objects that belong to a concrete layer type.
+ */
+class LayerFactory {
+public:
+    virtual ~LayerFactory() = default;
+    /// Returns the type of the layers, created by this factory.
+    virtual const char* type() const = 0;
+    /// Returns a new Layer instance on success call; returns `nulltptr` otherwise. 
+    virtual std::unique_ptr<Layer> createLayer(const std::string& id, const conversion::Convertible& value) = 0;
+protected:
+    optional<std::string> getSource(const conversion::Convertible& value) const;
+    bool initSourceLayerAndFilter(Layer*, const conversion::Convertible& value) const;
+};
+
+/**
+ * @brief A singleton class forwarding calls to the corresponding  \c LayerFactory instance.
+ */
+class LayerManager {
+public:
+    /**
+     * @brief A singleton getter.
+     * 
+     * @return LayerManager* 
+     */
+    static LayerManager* get();
+
+    virtual ~LayerManager() = default;
+    /// Returns a new Layer instance on success call; returns `nulltptr` otherwise.
+    virtual std::unique_ptr<Layer> createLayer(const std::string& type, const std::string& id, const conversion::Convertible& value, conversion::Error& error) = 0;
+
+protected:
+    LayerManager() = default;
 };
 
 } // namespace style

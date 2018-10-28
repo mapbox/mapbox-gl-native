@@ -421,5 +421,21 @@ Mutable<Layer::Impl> HillshadeLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+HillshadeLayerFactory::~HillshadeLayerFactory() = default;
+
+const char* HillshadeLayerFactory::type() const {
+    return "hillshade";
+}
+
+std::unique_ptr<style::Layer> HillshadeLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
+    optional<std::string> source = getSource(value);
+    if (!source) {
+        return nullptr;
+    }
+
+    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new HillshadeLayer(id, *source));
+    return layer;
+}
+
 } // namespace style
 } // namespace mbgl

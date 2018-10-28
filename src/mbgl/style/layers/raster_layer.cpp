@@ -510,5 +510,21 @@ Mutable<Layer::Impl> RasterLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+RasterLayerFactory::~RasterLayerFactory() = default;
+
+const char* RasterLayerFactory::type() const {
+    return "raster";
+}
+
+std::unique_ptr<style::Layer> RasterLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
+    optional<std::string> source = getSource(value);
+    if (!source) {
+        return nullptr;
+    }
+
+    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new RasterLayer(id, *source));
+    return layer;
+}
+
 } // namespace style
 } // namespace mbgl

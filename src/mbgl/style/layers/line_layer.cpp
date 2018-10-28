@@ -828,5 +828,24 @@ Mutable<Layer::Impl> LineLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+LineLayerFactory::~LineLayerFactory() = default;
+
+const char* LineLayerFactory::type() const {
+    return "line";
+}
+
+std::unique_ptr<style::Layer> LineLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
+    optional<std::string> source = getSource(value);
+    if (!source) {
+        return nullptr;
+    }
+
+    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new LineLayer(id, *source));
+    if (!initSourceLayerAndFilter(layer.get(), value)) {
+        return nullptr;
+    }
+    return layer;
+}
+
 } // namespace style
 } // namespace mbgl

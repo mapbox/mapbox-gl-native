@@ -260,5 +260,31 @@ Mutable<Layer::Impl> <%- camelize(type) %>Layer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+<%- camelize(type) %>LayerFactory::~<%- camelize(type) %>LayerFactory() = default;
+
+const char* <%- camelize(type) %>LayerFactory::type() const {
+    return "<%- type %>";
+}
+
+std::unique_ptr<style::Layer> <%- camelize(type) %>LayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
+<% if (type === 'background') { -%>
+    (void)value;
+    return std::unique_ptr<style::Layer>(new <%- camelize(type) %>Layer(id));
+<% } else { -%>
+    optional<std::string> source = getSource(value);
+    if (!source) {
+        return nullptr;
+    }
+
+    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new <%- camelize(type) %>Layer(id, *source));
+<% if (type !== 'raster' && type !== 'hillshade') { -%>
+    if (!initSourceLayerAndFilter(layer.get(), value)) {
+        return nullptr;
+    }
+<% } -%>
+    return layer;
+<% } -%>
+}
+
 } // namespace style
 } // namespace mbgl

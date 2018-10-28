@@ -86,5 +86,13 @@ protected:
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
+class RasterLayerFactory : public LayerFactory {
+protected:
+    // LayerFactory overrides.
+    ~RasterLayerFactory() override;
+    const char* type() const final;
+    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) override;
+};
+
 } // namespace style
 } // namespace mbgl

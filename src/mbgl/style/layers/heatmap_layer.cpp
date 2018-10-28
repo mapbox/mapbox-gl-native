@@ -374,5 +374,24 @@ Mutable<Layer::Impl> HeatmapLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+HeatmapLayerFactory::~HeatmapLayerFactory() = default;
+
+const char* HeatmapLayerFactory::type() const {
+    return "heatmap";
+}
+
+std::unique_ptr<style::Layer> HeatmapLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
+    optional<std::string> source = getSource(value);
+    if (!source) {
+        return nullptr;
+    }
+
+    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new HeatmapLayer(id, *source));
+    if (!initSourceLayerAndFilter(layer.get(), value)) {
+        return nullptr;
+    }
+    return layer;
+}
+
 } // namespace style
 } // namespace mbgl
