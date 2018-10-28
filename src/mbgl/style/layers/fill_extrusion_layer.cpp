@@ -489,5 +489,24 @@ Mutable<Layer::Impl> FillExtrusionLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+FillExtrusionLayerFactory::~FillExtrusionLayerFactory() = default;
+
+const char* FillExtrusionLayerFactory::type() const {
+    return "fill-extrusion";
+}
+
+std::unique_ptr<style::Layer> FillExtrusionLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
+    optional<std::string> source = getSource(value);
+    if (!source) {
+        return nullptr;
+    }
+
+    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new FillExtrusionLayer(id, *source));
+    if (!initSourceLayerAndFilter(layer.get(), value)) {
+        return nullptr;
+    }
+    return layer;
+}
+
 } // namespace style
 } // namespace mbgl

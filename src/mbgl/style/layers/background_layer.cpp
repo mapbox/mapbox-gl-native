@@ -270,5 +270,16 @@ Mutable<Layer::Impl> BackgroundLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+BackgroundLayerFactory::~BackgroundLayerFactory() = default;
+
+const char* BackgroundLayerFactory::type() const {
+    return "background";
+}
+
+std::unique_ptr<style::Layer> BackgroundLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
+    (void)value;
+    return std::unique_ptr<style::Layer>(new BackgroundLayer(id));
+}
+
 } // namespace style
 } // namespace mbgl

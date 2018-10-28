@@ -1978,5 +1978,24 @@ Mutable<Layer::Impl> SymbolLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+SymbolLayerFactory::~SymbolLayerFactory() = default;
+
+const char* SymbolLayerFactory::type() const {
+    return "symbol";
+}
+
+std::unique_ptr<style::Layer> SymbolLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
+    optional<std::string> source = getSource(value);
+    if (!source) {
+        return nullptr;
+    }
+
+    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new SymbolLayer(id, *source));
+    if (!initSourceLayerAndFilter(layer.get(), value)) {
+        return nullptr;
+    }
+    return layer;
+}
+
 } // namespace style
 } // namespace mbgl
