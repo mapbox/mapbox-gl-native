@@ -866,6 +866,29 @@ public final class MapboxMap {
     }
   }
 
+  /**
+   * Scrolls the camera over the map, shifting the center of view by the specified number of pixels in the x and y
+   * directions.
+   *
+   * @param x Amount of pixels to scroll to in x direction
+   * @param y Amount of pixels to scroll to in y direction
+   */
+  public void scrollBy(float x, float y) {
+    nativeMapView.moveBy(x, y);
+  }
+
+  /**
+   * Scrolls the camera over the map, shifting the center of view by the specified number of pixels in the x and y
+   * directions.
+   *
+   * @param x        Amount of pixels to scroll to in x direction
+   * @param y        Amount of pixels to scroll to in y direction
+   * @param duration Amount of time the scrolling should take
+   */
+  public void scrollBy(float x, float y, long duration) {
+    nativeMapView.moveBy(x, y, duration);
+  }
+
   //
   //  Reset North
   //

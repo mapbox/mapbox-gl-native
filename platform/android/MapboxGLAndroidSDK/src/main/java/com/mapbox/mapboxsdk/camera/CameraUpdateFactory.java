@@ -93,7 +93,9 @@ public final class CameraUpdateFactory {
    * @param xPixel Amount of pixels to scroll to in x direction
    * @param yPixel Amount of pixels to scroll to in y direction
    * @return CameraUpdate Final Camera Position
+   * @deprecated use {@link MapboxMap#scrollBy(float, float)} for more precise displacements when using a padded map.
    */
+  @Deprecated
   public static CameraUpdate scrollBy(float xPixel, float yPixel) {
     return new CameraMoveUpdate(xPixel, yPixel);
   }
@@ -336,22 +338,27 @@ public final class CameraUpdateFactory {
     public CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap) {
       UiSettings uiSettings = mapboxMap.getUiSettings();
       Projection projection = mapboxMap.getProjection();
-
       // Calculate the new center point
       float viewPortWidth = uiSettings.getWidth();
       float viewPortHeight = uiSettings.getHeight();
-      PointF targetPoint = new PointF(viewPortWidth / 2 + x, viewPortHeight / 2 + y);
+      int[] padding = mapboxMap.getPadding();
 
-      // Convert point to LatLng
+      // we inverse the map padding, is reapplied when using moveTo/easeTo or animateTo
+      PointF targetPoint = new PointF(
+        (viewPortWidth - padding[0] + padding[1]) / 2 + x,
+        (viewPortHeight + padding[1] - padding[3]) / 2 + y
+      );
+
       LatLng latLng = projection.fromScreenLocation(targetPoint);
-
       CameraPosition previousPosition = mapboxMap.getCameraPosition();
-      return new CameraPosition.Builder()
-        .target(latLng != null ? latLng : previousPosition.target)
-        .zoom(previousPosition.zoom)
-        .tilt(previousPosition.tilt)
-        .bearing(previousPosition.bearing)
-        .build();
+      CameraPosition position =
+        new CameraPosition.Builder()
+          .target(latLng)
+          .zoom(previousPosition.zoom)
+          .tilt(previousPosition.tilt)
+          .bearing(previousPosition.bearing)
+          .build();
+      return position;
     }
 
     @Override
