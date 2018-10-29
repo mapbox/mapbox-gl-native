@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:contentDescription="@string/mapbox_compassContentDescription"/>
 
-    <ImageView
+    <android.support.v7.widget.AppCompatImageView
         android:visibility="gone"
         android:id="@+id/logoView"
         android:layout_width="wrap_content"
@@ -22,7 +22,7 @@
         android:contentDescription="@null"
         app:srcCompat="@drawable/mapbox_logo_icon"/>
 
-    <ImageView
+    <android.support.v7.widget.AppCompatImageView
         android:visibility="gone"
         android:id="@+id/attributionView"
         android:layout_width="wrap_content"
