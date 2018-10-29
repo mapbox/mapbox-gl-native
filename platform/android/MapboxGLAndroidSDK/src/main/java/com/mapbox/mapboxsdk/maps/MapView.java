@@ -323,8 +323,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     nativeMapView = new NativeMapView(
       getContext(), getPixelRatio(), crossSourceCollisions, this, mapChangeReceiver, mapRenderer
     );
-
-    nativeMapView.resizeView(getMeasuredWidth(), getMeasuredHeight());
   }
 
   private void onSurfaceCreated() {
@@ -451,7 +449,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    if (!isMapInitialized() || !isZoomButtonControllerInitialized() || !isGestureDetectorInitialized()) {
+    if (!isZoomButtonControllerInitialized() || !isGestureDetectorInitialized()) {
       return super.onTouchEvent(event);
     }
 
@@ -550,13 +548,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    * @see Style
    */
   public void setStyleUrl(@NonNull String url) {
-    if (destroyed) {
-      return;
-    }
-    if (!isMapInitialized()) {
-      mapboxMapOptions.styleUrl(url);
-      return;
-    }
     nativeMapView.setStyleUrl(url);
   }
 
@@ -567,10 +558,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    * @see OfflineRegionDefinition
    */
   public void setOfflineRegionDefinition(OfflineRegionDefinition definition) {
-    if (destroyed) {
-      return;
-    }
-
     if (definition instanceof OfflineTilePyramidRegionDefinition) {
       setOfflineTilePyramidRegionDefinition((OfflineTilePyramidRegionDefinition) definition);
     } else if (definition instanceof OfflineGeometryRegionDefinition) {
@@ -586,15 +573,15 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       .zoom(minZoom)
       .build();
     setStyleUrl(styleUrl);
-    if (!isMapInitialized()) {
+    if (mapboxMap != null) {
+      mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+      mapboxMap.setMinZoomPreference(minZoom);
+      mapboxMap.setMaxZoomPreference(maxZoom);
+    } else {
       mapboxMapOptions.camera(cameraPosition);
       mapboxMapOptions.minZoomPreference(minZoom);
       mapboxMapOptions.maxZoomPreference(maxZoom);
-      return;
     }
-    mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-    mapboxMap.setMinZoomPreference(minZoom);
-    mapboxMap.setMaxZoomPreference(maxZoom);
   }
 
   private void setOfflineTilePyramidRegionDefinition(OfflineTilePyramidRegionDefinition regionDefinition) {
@@ -619,11 +606,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   @Override
   protected void onSizeChanged(int width, int height, int oldw, int oldh) {
-    if (destroyed) {
-      return;
-    }
-
-    if (!isInEditMode() && isMapInitialized()) {
+    if (!isInEditMode()) {
       nativeMapView.resizeView(width, height);
     }
   }
@@ -1093,10 +1076,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     } else {
       callback.onMapReady(mapboxMap);
     }
-  }
-
-  private boolean isMapInitialized() {
-    return nativeMapView != null;
   }
 
   private boolean isZoomButtonControllerInitialized() {
