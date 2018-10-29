@@ -6,14 +6,14 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -21,13 +21,12 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
-
 import timber.log.Timber;
 
 /**
  * Test activity showcasing how to listen to camera change events.
  */
-public class CameraPositionActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener,
+public class CameraPositionActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener,
   MapboxMap.OnMapLongClickListener {
 
   private MapView mapView;
@@ -39,6 +38,11 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_camera_position);
+
+    Toolbar toolbar = findViewById(R.id.toolbar);
+    toolbar.setTitle(R.string.activity_camera_position);
+    toolbar.setNavigationIcon(R.drawable.ic_ab_back);
+    toolbar.setNavigationOnClickListener(v -> finish());
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);

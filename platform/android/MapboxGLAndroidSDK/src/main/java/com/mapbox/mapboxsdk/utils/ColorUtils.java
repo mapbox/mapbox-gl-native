@@ -4,14 +4,12 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
-import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.widget.ImageViewCompat;
 import android.util.TypedValue;
 import android.widget.ImageView;
-
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.exceptions.ConversionException;
 
@@ -109,12 +107,10 @@ public class ColorUtils {
    * @param tintColor The color to tint.
    */
   public static void setTintList(@NonNull ImageView imageView, @ColorInt int tintColor) {
-    Drawable originalDrawable = imageView.getDrawable();
-    Drawable wrappedDrawable = DrawableCompat.wrap(originalDrawable);
-    DrawableCompat.setTintList(wrappedDrawable, getSelector(tintColor));
+    ImageViewCompat.setImageTintList(imageView, getSelector(tintColor));
   }
 
-  static int normalizeColorComponent(String value) {
+  private static int normalizeColorComponent(String value) {
     return (int) (Float.parseFloat(value) * 255);
   }
 
@@ -151,7 +147,7 @@ public class ColorUtils {
    * @return String rgba color
    */
   public static String colorToRgbaString(@ColorInt int color) {
-    String alpha = new DecimalFormat("#.###").format(((float)((color >> 24) & 0xFF)) / 255.0f);
+    String alpha = new DecimalFormat("#.###").format(((float) ((color >> 24) & 0xFF)) / 255.0f);
     return String.format(Locale.US, "rgba(%d, %d, %d, %s)",
       (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, alpha);
   }

@@ -126,6 +126,7 @@
         </activity>
         <activity
             android:name=".activity.camera.CameraPositionActivity"
+            android:theme="@style/NoActionBar"
             android:description="@string/description_cameraposition"
             android:label="@string/activity_camera_position">
             <meta-data

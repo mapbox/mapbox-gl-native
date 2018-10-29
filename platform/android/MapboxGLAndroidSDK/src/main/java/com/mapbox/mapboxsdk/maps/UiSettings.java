@@ -595,7 +595,6 @@ public final class UiSettings {
    * <p>
    * Sets the tint of the attribution view. Use this to change the color of the attribution.
    * </p>
-   * By default, the logo is tinted with the primary color of your theme.
    *
    * @param tintColor Color to tint the attribution.
    */
