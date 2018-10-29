@@ -147,15 +147,15 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
         for (Layer layer : mapboxMap.getLayers()) {
           // avoid removing composite and annotations layer
 //        if (layer.isRuntimeLayer()) {
-//          mapboxMap.removeLayer(layer);
+         // mapboxMap.removeLayer(layer);
 //        }
         }
 
         for (Source source : mapboxMap.getSources()) {
           // avoid removing composite and annotations layer
-//        if (source.isRuntimeSource()) {
-//          mapboxMap.removeSource(source);
-//        }
+          if (source.isRuntimeSource()) {
+            mapboxMap.removeSource(source);
+          }
         }
       }
     });
