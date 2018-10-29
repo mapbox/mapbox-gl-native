@@ -815,7 +815,7 @@ jobs:
     docker:
       - image: mbgl/7d2403f42e:linux-gcc-5
     resource_class: large
-    # working_directory: /src
+    working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
       JOBS: 4
