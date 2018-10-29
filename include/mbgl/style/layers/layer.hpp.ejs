@@ -72,10 +72,5 @@ protected:
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
-template <>
-inline bool Layer::is<<%- camelize(type) %>Layer>() const {
-    return getType() == LayerType::<%- camelize(type) %>;
-}
-
 } // namespace style
 } // namespace mbgl

@@ -56,10 +56,5 @@ protected:
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
-template <>
-inline bool Layer::is<BackgroundLayer>() const {
-    return getType() == LayerType::Background;
-}
-
 } // namespace style
 } // namespace mbgl

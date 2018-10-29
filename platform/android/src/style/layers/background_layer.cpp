@@ -10,6 +10,10 @@
 namespace mbgl {
 namespace android {
 
+    inline mbgl::style::BackgroundLayer& toBackgroundLayer(mbgl::style::Layer& layer) {
+        return static_cast<mbgl::style::BackgroundLayer&>(layer);
+    }
+
     /**
      * Creates an owning peer object (for layers not attached to the map) from the JVM side
      */
@@ -37,12 +41,12 @@ namespace android {
 
     jni::Local<jni::Object<>> BackgroundLayer::getBackgroundColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::BackgroundLayer>()->BackgroundLayer::getBackgroundColor()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toBackgroundLayer(layer).getBackgroundColor()));
     }
 
     jni::Local<jni::Object<TransitionOptions>> BackgroundLayer::getBackgroundColorTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::BackgroundLayer>()->BackgroundLayer::getBackgroundColorTransition();
+        mbgl::style::TransitionOptions options = toBackgroundLayer(layer).getBackgroundColorTransition();
         return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
@@ -50,17 +54,17 @@ namespace android {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::BackgroundLayer>()->BackgroundLayer::setBackgroundColorTransition(options);
+        toBackgroundLayer(layer).setBackgroundColorTransition(options);
     }
 
     jni::Local<jni::Object<>> BackgroundLayer::getBackgroundPattern(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::BackgroundLayer>()->BackgroundLayer::getBackgroundPattern()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toBackgroundLayer(layer).getBackgroundPattern()));
     }
 
     jni::Local<jni::Object<TransitionOptions>> BackgroundLayer::getBackgroundPatternTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::BackgroundLayer>()->BackgroundLayer::getBackgroundPatternTransition();
+        mbgl::style::TransitionOptions options = toBackgroundLayer(layer).getBackgroundPatternTransition();
         return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
@@ -68,17 +72,17 @@ namespace android {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::BackgroundLayer>()->BackgroundLayer::setBackgroundPatternTransition(options);
+        toBackgroundLayer(layer).setBackgroundPatternTransition(options);
     }
 
     jni::Local<jni::Object<>> BackgroundLayer::getBackgroundOpacity(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::BackgroundLayer>()->BackgroundLayer::getBackgroundOpacity()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toBackgroundLayer(layer).getBackgroundOpacity()));
     }
 
     jni::Local<jni::Object<TransitionOptions>> BackgroundLayer::getBackgroundOpacityTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::BackgroundLayer>()->BackgroundLayer::getBackgroundOpacityTransition();
+        mbgl::style::TransitionOptions options = toBackgroundLayer(layer).getBackgroundOpacityTransition();
         return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
@@ -86,7 +90,7 @@ namespace android {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::BackgroundLayer>()->BackgroundLayer::setBackgroundOpacityTransition(options);
+        toBackgroundLayer(layer).setBackgroundOpacityTransition(options);
     }
 
 

@@ -69,10 +69,5 @@ protected:
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
-template <>
-inline bool Layer::is<HeatmapLayer>() const {
-    return getType() == LayerType::Heatmap;
-}
-
 } // namespace style
 } // namespace mbgl

@@ -10,6 +10,10 @@
 namespace mbgl {
 namespace android {
 
+    inline mbgl::style::HeatmapLayer& toHeatmapLayer(mbgl::style::Layer& layer) {
+        return static_cast<mbgl::style::HeatmapLayer&>(layer);
+    }
+
     /**
      * Creates an owning peer object (for layers not attached to the map) from the JVM side
      */
@@ -37,12 +41,12 @@ namespace android {
 
     jni::Local<jni::Object<>> HeatmapLayer::getHeatmapRadius(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getHeatmapRadius()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toHeatmapLayer(layer).getHeatmapRadius()));
     }
 
     jni::Local<jni::Object<TransitionOptions>> HeatmapLayer::getHeatmapRadiusTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getHeatmapRadiusTransition();
+        mbgl::style::TransitionOptions options = toHeatmapLayer(layer).getHeatmapRadiusTransition();
         return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
@@ -50,22 +54,22 @@ namespace android {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::setHeatmapRadiusTransition(options);
+        toHeatmapLayer(layer).setHeatmapRadiusTransition(options);
     }
 
     jni::Local<jni::Object<>> HeatmapLayer::getHeatmapWeight(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getHeatmapWeight()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toHeatmapLayer(layer).getHeatmapWeight()));
     }
 
     jni::Local<jni::Object<>> HeatmapLayer::getHeatmapIntensity(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getHeatmapIntensity()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toHeatmapLayer(layer).getHeatmapIntensity()));
     }
 
     jni::Local<jni::Object<TransitionOptions>> HeatmapLayer::getHeatmapIntensityTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getHeatmapIntensityTransition();
+        mbgl::style::TransitionOptions options = toHeatmapLayer(layer).getHeatmapIntensityTransition();
         return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
@@ -73,26 +77,26 @@ namespace android {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::setHeatmapIntensityTransition(options);
+        toHeatmapLayer(layer).setHeatmapIntensityTransition(options);
     }
 
     jni::Local<jni::Object<>> HeatmapLayer::getHeatmapColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        auto propertyValue = layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getHeatmapColor();
+        auto propertyValue =  toHeatmapLayer(layer).getHeatmapColor();
         if (propertyValue.isUndefined()) {
-            propertyValue = layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getDefaultHeatmapColor();
+            propertyValue =  toHeatmapLayer(layer).getDefaultHeatmapColor();
         }
         return std::move(*convert<jni::Local<jni::Object<>>>(env, propertyValue));
     }
 
     jni::Local<jni::Object<>> HeatmapLayer::getHeatmapOpacity(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getHeatmapOpacity()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toHeatmapLayer(layer).getHeatmapOpacity()));
     }
 
     jni::Local<jni::Object<TransitionOptions>> HeatmapLayer::getHeatmapOpacityTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getHeatmapOpacityTransition();
+        mbgl::style::TransitionOptions options = toHeatmapLayer(layer).getHeatmapOpacityTransition();
         return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
@@ -100,7 +104,7 @@ namespace android {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::setHeatmapOpacityTransition(options);
+        toHeatmapLayer(layer).setHeatmapOpacityTransition(options);
     }
 
 

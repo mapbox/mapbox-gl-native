@@ -74,10 +74,5 @@ protected:
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
-template <>
-inline bool Layer::is<HillshadeLayer>() const {
-    return getType() == LayerType::Hillshade;
-}
-
 } // namespace style
 } // namespace mbgl

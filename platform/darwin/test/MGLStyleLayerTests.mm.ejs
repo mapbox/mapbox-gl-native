@@ -54,8 +54,8 @@
     MGL<%- camelize(type) %>StyleLayer *layer = [[MGL<%- camelize(type) %>StyleLayer alloc] initWithIdentifier:@"layerID" source:source];
 <% } -%>
     XCTAssertNotEqual(layer.rawLayer, nullptr);
-    XCTAssertTrue(layer.rawLayer->is<mbgl::style::<%- camelize(type) %>Layer>());
-    auto rawLayer = layer.rawLayer->as<mbgl::style::<%- camelize(type) %>Layer>();
+    XCTAssertEqual(layer.rawLayer->getType(), mbgl::style::LayerType::<%- camelize(type) %>);
+    auto rawLayer = static_cast<mbgl::style::<%- camelize(type) %>Layer*>(layer.rawLayer);
 
     MGLTransition transitionTest = MGLTransitionMake(5, 4);
 

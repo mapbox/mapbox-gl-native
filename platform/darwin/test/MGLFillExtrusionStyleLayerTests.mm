@@ -43,8 +43,8 @@
 
     MGLFillExtrusionStyleLayer *layer = [[MGLFillExtrusionStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     XCTAssertNotEqual(layer.rawLayer, nullptr);
-    XCTAssertTrue(layer.rawLayer->is<mbgl::style::FillExtrusionLayer>());
-    auto rawLayer = layer.rawLayer->as<mbgl::style::FillExtrusionLayer>();
+    XCTAssertEqual(layer.rawLayer->getType(), mbgl::style::LayerType::FillExtrusion);
+    auto rawLayer = static_cast<mbgl::style::FillExtrusionLayer*>(layer.rawLayer);
 
     MGLTransition transitionTest = MGLTransitionMake(5, 4);
 

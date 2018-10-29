@@ -274,10 +274,5 @@ protected:
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
-template <>
-inline bool Layer::is<SymbolLayer>() const {
-    return getType() == LayerType::Symbol;
-}
-
 } // namespace style
 } // namespace mbgl

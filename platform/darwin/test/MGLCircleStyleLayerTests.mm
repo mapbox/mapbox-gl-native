@@ -43,8 +43,8 @@
 
     MGLCircleStyleLayer *layer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     XCTAssertNotEqual(layer.rawLayer, nullptr);
-    XCTAssertTrue(layer.rawLayer->is<mbgl::style::CircleLayer>());
-    auto rawLayer = layer.rawLayer->as<mbgl::style::CircleLayer>();
+    XCTAssertEqual(layer.rawLayer->getType(), mbgl::style::LayerType::Circle);
+    auto rawLayer = static_cast<mbgl::style::CircleLayer*>(layer.rawLayer);
 
     MGLTransition transitionTest = MGLTransitionMake(5, 4);
 

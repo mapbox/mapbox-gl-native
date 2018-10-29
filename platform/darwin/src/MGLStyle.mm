@@ -350,30 +350,30 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     if (MGLStyleLayer *layer = rawLayer->peer.has_value() ? rawLayer->peer.get<LayerWrapper>().layer : nil) {
         return layer;
     }
-
-    if (auto fillLayer = rawLayer->as<mbgl::style::FillLayer>()) {
-        return [[MGLFillStyleLayer alloc] initWithRawLayer:fillLayer];
-    } else if (auto fillExtrusionLayer = rawLayer->as<mbgl::style::FillExtrusionLayer>()) {
-        return [[MGLFillExtrusionStyleLayer alloc] initWithRawLayer:fillExtrusionLayer];
-    } else if (auto lineLayer = rawLayer->as<mbgl::style::LineLayer>()) {
-        return [[MGLLineStyleLayer alloc] initWithRawLayer:lineLayer];
-    } else if (auto symbolLayer = rawLayer->as<mbgl::style::SymbolLayer>()) {
-        return [[MGLSymbolStyleLayer alloc] initWithRawLayer:symbolLayer];
-    } else if (auto rasterLayer = rawLayer->as<mbgl::style::RasterLayer>()) {
-        return [[MGLRasterStyleLayer alloc] initWithRawLayer:rasterLayer];
-    } else if (auto heatmapLayer = rawLayer->as<mbgl::style::HeatmapLayer>()) {
-        return [[MGLHeatmapStyleLayer alloc] initWithRawLayer:heatmapLayer];
-    } else if (auto hillshadeLayer = rawLayer->as<mbgl::style::HillshadeLayer>()) {
-        return [[MGLHillshadeStyleLayer alloc] initWithRawLayer:hillshadeLayer];
-    } else if (auto circleLayer = rawLayer->as<mbgl::style::CircleLayer>()) {
-        return [[MGLCircleStyleLayer alloc] initWithRawLayer:circleLayer];
-    } else if (auto backgroundLayer = rawLayer->as<mbgl::style::BackgroundLayer>()) {
-        return [[MGLBackgroundStyleLayer alloc] initWithRawLayer:backgroundLayer];
-    } else if (auto customLayer = rawLayer->as<mbgl::style::CustomLayer>()) {
-        return [[MGLOpenGLStyleLayer alloc] initWithRawLayer:customLayer];
-    } else {
-        NSAssert(NO, @"Unrecognized layer type");
-        return nil;
+    switch (rawLayer->getType()) {
+        case mbgl::style::LayerType::Fill:
+            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::FillLayer*>(rawLayer)];
+        case mbgl::style::LayerType::FillExtrusion:
+            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::FillExtrusionLayer*>(rawLayer)];
+        case mbgl::style::LayerType::Line:
+            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::LineLayer*>(rawLayer)];
+        case mbgl::style::LayerType::Symbol:
+            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::SymbolLayer*>(rawLayer)];
+        case mbgl::style::LayerType::Raster:
+            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::RasterLayer*>(rawLayer)];
+        case mbgl::style::LayerType::Heatmap:
+            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::HeatmapLayer*>(rawLayer)];
+        case mbgl::style::LayerType::Hillshade:
+            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::HillshadeLayer*>(rawLayer)];
+        case mbgl::style::LayerType::Circle:
+            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::CircleLayer*>(rawLayer)];
+        case mbgl::style::LayerType::Background:
+            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::BackgroundLayer*>(rawLayer)];
+        case mbgl::style::LayerType::Custom:
+            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::CustomLayer*>(rawLayer)];
+        default:
+            NSAssert(NO, @"Unrecognized layer type");
+            return nil;;
     }
 }
 

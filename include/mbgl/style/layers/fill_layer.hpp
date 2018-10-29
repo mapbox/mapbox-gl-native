@@ -80,10 +80,5 @@ protected:
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
-template <>
-inline bool Layer::is<FillLayer>() const {
-    return getType() == LayerType::Fill;
-}
-
 } // namespace style
 } // namespace mbgl
