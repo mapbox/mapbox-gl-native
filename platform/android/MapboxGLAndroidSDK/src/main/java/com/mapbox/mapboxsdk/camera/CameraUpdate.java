@@ -20,3 +20,4 @@ public interface CameraUpdate {
   CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap);
 
 }
+
