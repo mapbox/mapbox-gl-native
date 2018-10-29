@@ -90,6 +90,10 @@ void RenderLayer::update() {
     // no-op
 }
 
+optional<Color> RenderLayer::getSolidBackground() const {
+    return nullopt;
+}
+
 RenderLayer::RenderTiles RenderLayer::filterRenderTiles(RenderTiles tiles, FilterFunctionPtr filterFn) const {
     assert(filterFn != nullptr);
     RenderTiles filtered;
