@@ -49,7 +49,7 @@
                                                     OS_LOG_TYPE_ERROR,
                                                     OS_LOG_TYPE_FAULT };
             dispatch_once(&once, ^ {
-                mapbox_log = os_log_create("com.mapbox.maps-ios-sdk", "SDK");
+                mapbox_log = os_log_create("com.mapbox.maps", "SDK");
             });
             NSUInteger logTypesCount = sizeof(log_types) / sizeof(os_log_type_t);
             NSAssert(level <= logTypesCount, @"There is an attempt to log a non suported logging level.");
