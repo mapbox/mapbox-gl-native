@@ -218,9 +218,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         bool needsRelayout = false;
 
         for (const auto& layer : *layerImpls) {
-            if (layer->type == LayerType::Background ||
-                layer->type == LayerType::Custom ||
-                layer->source != source->id) {
+
+            if (layer->getTypeInfo()->source == LayerTypeInfo::Source::NotRequired
+                    || layer->source != source->id) {
                 continue;
             }
 
@@ -298,21 +298,16 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             continue;
         }
 
-        if (const RenderBackgroundLayer* background = layer->as<RenderBackgroundLayer>()) {
-            const BackgroundPaintProperties::PossiblyEvaluated& paint = background->evaluated;
-            if (parameters.contextMode == GLContextMode::Unique
-                    && layerImpl.get() == layerImpls->at(0).get()
-                    && paint.get<BackgroundPattern>().from.empty()) {
-                // This is a solid background. We can use glClear().
-                backgroundColor = paint.get<BackgroundColor>() * paint.get<BackgroundOpacity>();
-            } else {
-                // This is a textured background, or not the bottommost layer. We need to render it with a quad.
-                order.emplace_back(RenderItem { *layer, nullptr });
+        if (parameters.contextMode == GLContextMode::Unique
+            && layerImpl.get() == layerImpls->at(0).get()) {
+            const auto& solidBackground = layer->getSolidBackground();
+            if (solidBackground) {
+                backgroundColor = *solidBackground;
+                continue;
             }
-            continue;
         }
 
-        if (layer->is<RenderCustomLayer>()) {
+        if (layerImpl->getTypeInfo()->source == LayerTypeInfo::Source::NotRequired) {
             order.emplace_back(RenderItem { *layer, nullptr });
             continue;
         }
