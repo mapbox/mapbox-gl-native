@@ -15,16 +15,6 @@
 namespace mbgl {
 namespace style {
 
-class FillLayer;
-class LineLayer;
-class CircleLayer;
-class SymbolLayer;
-class RasterLayer;
-class HillshadeLayer;
-class BackgroundLayer;
-class CustomLayer;
-class FillExtrusionLayer;
-class HeatmapLayer;
 class LayerObserver;
 class Filter;
 
@@ -50,21 +40,6 @@ public:
     Layer& operator=(const Layer&) = delete;
 
     virtual ~Layer();
-
-    // Check whether this layer is of the given subtype.
-    template <class T>
-    bool is() const;
-
-    // Dynamically cast this layer to the given subtype.
-    template <class T>
-    T* as() {
-        return is<T>() ? reinterpret_cast<T*>(this) : nullptr;
-    }
-
-    template <class T>
-    const T* as() const {
-        return is<T>() ? reinterpret_cast<const T*>(this) : nullptr;
-    }
 
     LayerType getType() const;
     std::string getID() const;

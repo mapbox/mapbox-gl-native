@@ -104,10 +104,5 @@ protected:
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
-template <>
-inline bool Layer::is<CircleLayer>() const {
-    return getType() == LayerType::Circle;
-}
-
 } // namespace style
 } // namespace mbgl

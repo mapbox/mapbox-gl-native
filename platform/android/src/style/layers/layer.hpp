@@ -10,6 +10,8 @@
 #include <jni/jni.hpp>
 
 namespace mbgl {
+
+
 namespace android {
 
 class Layer : private mbgl::util::noncopyable {
@@ -91,7 +93,6 @@ protected:
 
     // Map is set when the layer is retrieved or after adding to the map
     mbgl::Map* map;
-
 };
 
 } // namespace android

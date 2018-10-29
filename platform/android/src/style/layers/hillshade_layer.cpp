@@ -10,6 +10,10 @@
 namespace mbgl {
 namespace android {
 
+    inline mbgl::style::HillshadeLayer& toHillshadeLayer(mbgl::style::Layer& layer) {
+        return static_cast<mbgl::style::HillshadeLayer&>(layer);
+    }
+
     /**
      * Creates an owning peer object (for layers not attached to the map) from the JVM side
      */
@@ -37,22 +41,22 @@ namespace android {
 
     jni::Local<jni::Object<>> HillshadeLayer::getHillshadeIlluminationDirection(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeIlluminationDirection()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toHillshadeLayer(layer).getHillshadeIlluminationDirection()));
     }
 
     jni::Local<jni::Object<>> HillshadeLayer::getHillshadeIlluminationAnchor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeIlluminationAnchor()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toHillshadeLayer(layer).getHillshadeIlluminationAnchor()));
     }
 
     jni::Local<jni::Object<>> HillshadeLayer::getHillshadeExaggeration(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeExaggeration()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toHillshadeLayer(layer).getHillshadeExaggeration()));
     }
 
     jni::Local<jni::Object<TransitionOptions>> HillshadeLayer::getHillshadeExaggerationTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeExaggerationTransition();
+        mbgl::style::TransitionOptions options = toHillshadeLayer(layer).getHillshadeExaggerationTransition();
         return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
@@ -60,17 +64,17 @@ namespace android {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::setHillshadeExaggerationTransition(options);
+        toHillshadeLayer(layer).setHillshadeExaggerationTransition(options);
     }
 
     jni::Local<jni::Object<>> HillshadeLayer::getHillshadeShadowColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeShadowColor()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toHillshadeLayer(layer).getHillshadeShadowColor()));
     }
 
     jni::Local<jni::Object<TransitionOptions>> HillshadeLayer::getHillshadeShadowColorTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeShadowColorTransition();
+        mbgl::style::TransitionOptions options = toHillshadeLayer(layer).getHillshadeShadowColorTransition();
         return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
@@ -78,17 +82,17 @@ namespace android {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::setHillshadeShadowColorTransition(options);
+        toHillshadeLayer(layer).setHillshadeShadowColorTransition(options);
     }
 
     jni::Local<jni::Object<>> HillshadeLayer::getHillshadeHighlightColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeHighlightColor()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toHillshadeLayer(layer).getHillshadeHighlightColor()));
     }
 
     jni::Local<jni::Object<TransitionOptions>> HillshadeLayer::getHillshadeHighlightColorTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeHighlightColorTransition();
+        mbgl::style::TransitionOptions options = toHillshadeLayer(layer).getHillshadeHighlightColorTransition();
         return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
@@ -96,17 +100,17 @@ namespace android {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::setHillshadeHighlightColorTransition(options);
+        toHillshadeLayer(layer).setHillshadeHighlightColorTransition(options);
     }
 
     jni::Local<jni::Object<>> HillshadeLayer::getHillshadeAccentColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeAccentColor()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toHillshadeLayer(layer).getHillshadeAccentColor()));
     }
 
     jni::Local<jni::Object<TransitionOptions>> HillshadeLayer::getHillshadeAccentColorTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeAccentColorTransition();
+        mbgl::style::TransitionOptions options = toHillshadeLayer(layer).getHillshadeAccentColorTransition();
         return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
@@ -114,7 +118,7 @@ namespace android {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::setHillshadeAccentColorTransition(options);
+        toHillshadeLayer(layer).setHillshadeAccentColorTransition(options);
     }
 
 

@@ -125,10 +125,5 @@ protected:
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
-template <>
-inline bool Layer::is<LineLayer>() const {
-    return getType() == LayerType::Line;
-}
-
 } // namespace style
 } // namespace mbgl

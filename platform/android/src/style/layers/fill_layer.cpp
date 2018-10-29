@@ -10,6 +10,10 @@
 namespace mbgl {
 namespace android {
 
+    inline mbgl::style::FillLayer& toFillLayer(mbgl::style::Layer& layer) {
+        return static_cast<mbgl::style::FillLayer&>(layer);
+    }
+
     /**
      * Creates an owning peer object (for layers not attached to the map) from the JVM side
      */
@@ -37,17 +41,17 @@ namespace android {
 
     jni::Local<jni::Object<>> FillLayer::getFillAntialias(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillAntialias()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillAntialias()));
     }
 
     jni::Local<jni::Object<>> FillLayer::getFillOpacity(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillOpacity()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillOpacity()));
     }
 
     jni::Local<jni::Object<TransitionOptions>> FillLayer::getFillOpacityTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::FillLayer>()->FillLayer::getFillOpacityTransition();
+        mbgl::style::TransitionOptions options = toFillLayer(layer).getFillOpacityTransition();
         return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
@@ -55,17 +59,17 @@ namespace android {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::FillLayer>()->FillLayer::setFillOpacityTransition(options);
+        toFillLayer(layer).setFillOpacityTransition(options);
     }
 
     jni::Local<jni::Object<>> FillLayer::getFillColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillColor()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillColor()));
     }
 
     jni::Local<jni::Object<TransitionOptions>> FillLayer::getFillColorTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::FillLayer>()->FillLayer::getFillColorTransition();
+        mbgl::style::TransitionOptions options = toFillLayer(layer).getFillColorTransition();
         return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
@@ -73,17 +77,17 @@ namespace android {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::FillLayer>()->FillLayer::setFillColorTransition(options);
+        toFillLayer(layer).setFillColorTransition(options);
     }
 
     jni::Local<jni::Object<>> FillLayer::getFillOutlineColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillOutlineColor()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillOutlineColor()));
     }
 
     jni::Local<jni::Object<TransitionOptions>> FillLayer::getFillOutlineColorTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::FillLayer>()->FillLayer::getFillOutlineColorTransition();
+        mbgl::style::TransitionOptions options = toFillLayer(layer).getFillOutlineColorTransition();
         return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
@@ -91,17 +95,17 @@ namespace android {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::FillLayer>()->FillLayer::setFillOutlineColorTransition(options);
+        toFillLayer(layer).setFillOutlineColorTransition(options);
     }
 
     jni::Local<jni::Object<>> FillLayer::getFillTranslate(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillTranslate()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillTranslate()));
     }
 
     jni::Local<jni::Object<TransitionOptions>> FillLayer::getFillTranslateTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::FillLayer>()->FillLayer::getFillTranslateTransition();
+        mbgl::style::TransitionOptions options = toFillLayer(layer).getFillTranslateTransition();
         return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
@@ -109,22 +113,22 @@ namespace android {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::FillLayer>()->FillLayer::setFillTranslateTransition(options);
+        toFillLayer(layer).setFillTranslateTransition(options);
     }
 
     jni::Local<jni::Object<>> FillLayer::getFillTranslateAnchor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillTranslateAnchor()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillTranslateAnchor()));
     }
 
     jni::Local<jni::Object<>> FillLayer::getFillPattern(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        return std::move(*convert<jni::Local<jni::Object<>>>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillPattern()));
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillPattern()));
     }
 
     jni::Local<jni::Object<TransitionOptions>> FillLayer::getFillPatternTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::FillLayer>()->FillLayer::getFillPatternTransition();
+        mbgl::style::TransitionOptions options = toFillLayer(layer).getFillPatternTransition();
         return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
@@ -132,7 +136,7 @@ namespace android {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::FillLayer>()->FillLayer::setFillPatternTransition(options);
+        toFillLayer(layer).setFillPatternTransition(options);
     }
 
 

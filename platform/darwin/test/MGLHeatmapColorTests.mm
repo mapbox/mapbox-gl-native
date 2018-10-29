@@ -15,7 +15,7 @@
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" shape:feature options:nil];
     MGLHeatmapStyleLayer *layer = [[MGLHeatmapStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
 
-    auto rawLayer = layer.rawLayer->as<mbgl::style::HeatmapLayer>();
+    auto rawLayer = static_cast<mbgl::style::HeatmapLayer*>(layer.rawLayer);
     
     XCTAssertTrue(rawLayer->getHeatmapColor().isUndefined(),
                   @"heatmap-color should be unset initially.");

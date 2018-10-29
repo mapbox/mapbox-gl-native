@@ -86,10 +86,5 @@ protected:
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
-template <>
-inline bool Layer::is<RasterLayer>() const {
-    return getType() == LayerType::Raster;
-}
-
 } // namespace style
 } // namespace mbgl

@@ -43,8 +43,8 @@
 
     MGLHeatmapStyleLayer *layer = [[MGLHeatmapStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     XCTAssertNotEqual(layer.rawLayer, nullptr);
-    XCTAssertTrue(layer.rawLayer->is<mbgl::style::HeatmapLayer>());
-    auto rawLayer = layer.rawLayer->as<mbgl::style::HeatmapLayer>();
+    XCTAssertEqual(layer.rawLayer->getType(), mbgl::style::LayerType::Heatmap);
+    auto rawLayer = static_cast<mbgl::style::HeatmapLayer*>(layer.rawLayer);
 
     MGLTransition transitionTest = MGLTransitionMake(5, 4);
 

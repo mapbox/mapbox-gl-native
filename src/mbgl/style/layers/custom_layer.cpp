@@ -39,10 +39,5 @@ Mutable<Layer::Impl> CustomLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-template <>
-bool Layer::is<CustomLayer>() const {
-    return getType() == LayerType::Custom;
-}
-
 } // namespace style
 } // namespace mbgl

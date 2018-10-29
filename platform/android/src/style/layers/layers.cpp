@@ -31,12 +31,12 @@ namespace android {
 
 template <typename T>
 inline std::unique_ptr<T> to(std::unique_ptr<style::Layer> layer) {
-    return std::unique_ptr<T>(layer.release()->as<T>());
+    return std::unique_ptr<T>(static_cast<T*>(layer.release()));
 }
 
 template <typename T>
 inline T& to(style::Layer& layer) {
-    return *layer.as<T>();
+    return static_cast<T&>(layer);
 }
 
 template <typename T>
