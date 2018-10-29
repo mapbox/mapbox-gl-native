@@ -178,7 +178,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     // MapboxMap
     mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, proj, registerTouchListener,
       annotationManager, cameraChangeDispatcher);
-    mapCallback.initialise();
 
     // user input
     mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings,
@@ -217,6 +216,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     } else {
       mapboxMap.onRestoreInstanceState(savedInstanceState);
     }
+
+    mapCallback.initialised();
   }
 
   private FocalPointChangeListener createFocalPointChangeListener() {
@@ -1584,7 +1585,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       addOnCameraDidChangeListener(this);
     }
 
-    void initialise() {
+    void initialised() {
       if (!initialLoad) {
         // Style has loaded before the drawing surface has been initialized, delivering OnMapReady
         mapboxMap.onPreMapReady();
