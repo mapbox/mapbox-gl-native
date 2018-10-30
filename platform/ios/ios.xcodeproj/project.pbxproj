@@ -394,6 +394,10 @@
 		ACA65F54214066E600537748 /* MMEConfigurator.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F50214066E600537748 /* MMEConfigurator.m */; };
 		ACA65F592140697200537748 /* MMEDispatchManager.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F562140697100537748 /* MMEDispatchManager.m */; };
 		ACA65F5A2140697200537748 /* MMEDispatchManager.m in Sources */ = {isa = PBXBuildFile; fileRef = ACA65F562140697100537748 /* MMEDispatchManager.m */; };
+		ACD0245A2187EABA00D8C8A7 /* MMEMetricsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = ACD024542187EAAF00D8C8A7 /* MMEMetricsManager.m */; };
+		ACD0245B2187EABA00D8C8A7 /* MMEMetricsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = ACD024542187EAAF00D8C8A7 /* MMEMetricsManager.m */; };
+		ACD0245E2187EACB00D8C8A7 /* MMEMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = ACD024572187EAAF00D8C8A7 /* MMEMetrics.m */; };
+		ACD0245F2187EACB00D8C8A7 /* MMEMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = ACD024572187EAAF00D8C8A7 /* MMEMetrics.m */; };
 		CA0C27922076C804001CE5B7 /* MGLShapeSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0C27912076C804001CE5B7 /* MGLShapeSourceTests.m */; };
 		CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */; };
 		CA1B4A512099FB2200EDD491 /* MGLMapSnapshotterTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA1B4A502099FB2200EDD491 /* MGLMapSnapshotterTest.m */; };
@@ -1039,6 +1043,10 @@
 		ACA65F50214066E600537748 /* MMEConfigurator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEConfigurator.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEConfigurator.m"; sourceTree = SOURCE_ROOT; };
 		ACA65F552140696B00537748 /* MMEDispatchManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEDispatchManager.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEDispatchManager.h"; sourceTree = SOURCE_ROOT; };
 		ACA65F562140697100537748 /* MMEDispatchManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEDispatchManager.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEDispatchManager.m"; sourceTree = SOURCE_ROOT; };
+		ACD024542187EAAF00D8C8A7 /* MMEMetricsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEMetricsManager.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEMetricsManager.m"; sourceTree = SOURCE_ROOT; };
+		ACD024552187EAAF00D8C8A7 /* MMEMetrics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEMetrics.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEMetrics.h"; sourceTree = SOURCE_ROOT; };
+		ACD024562187EAAF00D8C8A7 /* MMEMetricsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEMetricsManager.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEMetricsManager.h"; sourceTree = SOURCE_ROOT; };
+		ACD024572187EAAF00D8C8A7 /* MMEMetrics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEMetrics.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEMetrics.m"; sourceTree = SOURCE_ROOT; };
 		CA0C27912076C804001CE5B7 /* MGLShapeSourceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLShapeSourceTests.m; sourceTree = "<group>"; };
 		CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewIntegrationTest.m; sourceTree = "<group>"; wrapsLines = 0; };
 		CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLMapViewIntegrationTest.h; sourceTree = "<group>"; };
@@ -1617,6 +1625,10 @@
 				40834BA41FE05D6B00C1BD0D /* MMEEventsManager.m */,
 				40834BB31FE05D6D00C1BD0D /* MMELocationManager.h */,
 				40834BB81FE05D6D00C1BD0D /* MMELocationManager.m */,
+				ACD024552187EAAF00D8C8A7 /* MMEMetrics.h */,
+				ACD024572187EAAF00D8C8A7 /* MMEMetrics.m */,
+				ACD024562187EAAF00D8C8A7 /* MMEMetricsManager.h */,
+				ACD024542187EAAF00D8C8A7 /* MMEMetricsManager.m */,
 				40834BC51FE05D6F00C1BD0D /* MMENSDateWrapper.h */,
 				40834BBC1FE05D6E00C1BD0D /* MMENSDateWrapper.m */,
 				40834BAA1FE05D6C00C1BD0D /* MMENSURLSessionWrapper.h */,
@@ -2948,6 +2960,7 @@
 				DA88485D1CBAFB9800AB86E3 /* MGLFaux3DUserLocationAnnotationView.m in Sources */,
 				DAD165701CF41981001FF4B9 /* MGLFeature.mm in Sources */,
 				30E578191DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */,
+				ACD0245A2187EABA00D8C8A7 /* MMEMetricsManager.m in Sources */,
 				40EDA1C11CFE0E0500D9EA68 /* MGLAnnotationContainerView.m in Sources */,
 				40834C481FE05F7500C1BD0D /* vendor_identifier.m in Sources */,
 				DA8848541CBAFB9800AB86E3 /* MGLCompactCalloutView.m in Sources */,
@@ -3015,6 +3028,7 @@
 				408AA8581DAEDA1E00022900 /* NSDictionary+MGLAdditions.mm in Sources */,
 				DA35A2A11CC9E95F00E826B2 /* MGLCoordinateFormatter.m in Sources */,
 				92FC0AEE207CEE16007B6B54 /* MGLShapeOfflineRegion.mm in Sources */,
+				ACD0245E2187EACB00D8C8A7 /* MMEMetrics.m in Sources */,
 				35305D481D22AA680007D005 /* NSData+MGLAdditions.mm in Sources */,
 				40834BF61FE05E1800C1BD0D /* MMEUIApplicationWrapper.m in Sources */,
 				DA8848291CBAFA6200AB86E3 /* MGLStyle.mm in Sources */,
@@ -3080,6 +3094,7 @@
 				DAED38661D62D0FC00D7640F /* NSURL+MGLAdditions.m in Sources */,
 				DAD165711CF41981001FF4B9 /* MGLFeature.mm in Sources */,
 				30E5781A1DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */,
+				ACD0245B2187EABA00D8C8A7 /* MMEMetricsManager.m in Sources */,
 				40EDA1C21CFE0E0500D9EA68 /* MGLAnnotationContainerView.m in Sources */,
 				40834C551FE05F7600C1BD0D /* vendor_identifier.m in Sources */,
 				DAA4E4291CBB730400178DFB /* NSBundle+MGLAdditions.m in Sources */,
@@ -3147,6 +3162,7 @@
 				357FE2E01E02D2B20068B753 /* NSCoder+MGLAdditions.mm in Sources */,
 				92FC0AEF207CEE16007B6B54 /* MGLShapeOfflineRegion.mm in Sources */,
 				DAA4E42D1CBB730400178DFB /* MGLAnnotationImage.m in Sources */,
+				ACD0245F2187EACB00D8C8A7 /* MMEMetrics.m in Sources */,
 				40834C0A1FE05E1800C1BD0D /* MMEUIApplicationWrapper.m in Sources */,
 				558DE7A31E5615E400C7916D /* MGLFoundation.mm in Sources */,
 				3510FFF31D6D9D8C00F413B2 /* NSExpression+MGLAdditions.mm in Sources */,
