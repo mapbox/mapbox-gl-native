@@ -8,9 +8,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'appcompat-v7'
     }
     api dependenciesList.mapboxJavaGeoJSON
-    api(dependenciesList.mapboxAndroidGestures) {
-        exclude group: 'com.android.support', module: 'appcompat-v7'
-    }
+    api dependenciesList.mapboxAndroidGestures
     implementation dependenciesList.mapboxJavaTurf
     implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportAnnotations
