@@ -26,7 +26,8 @@ const style::FillLayer::Impl& RenderFillLayer::impl() const {
 }
 
 std::unique_ptr<Bucket> RenderFillLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
-    assert(false); // Should be calling createLayout() instead.
+    // Should be calling createLayout() instead.
+    assert(baseImpl->getTypeInfo()->layout == LayerTypeInfo::Layout::NotRequired);
     return nullptr;
 }
 

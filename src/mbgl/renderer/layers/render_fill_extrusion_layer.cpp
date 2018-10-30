@@ -28,10 +28,10 @@ const style::FillExtrusionLayer::Impl& RenderFillExtrusionLayer::impl() const {
 }
 
 std::unique_ptr<Bucket> RenderFillExtrusionLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
-    assert(false); // Should be calling createLayout() instead.
+    // Should be calling createLayout() instead.
+    assert(baseImpl->getTypeInfo()->layout == LayerTypeInfo::Layout::NotRequired);
     return nullptr;
 }
-
 
 std::unique_ptr<Layout> RenderFillExtrusionLayer::createLayout(const BucketParameters& parameters,
                         const std::vector<const RenderLayer*>& group,
