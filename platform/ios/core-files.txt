@@ -268,6 +268,8 @@ platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventsConfiguration.
 platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventsManager.m
 platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEHashProvider.m
 platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMELocationManager.m
+platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEMetrics.m
+platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMEMetricsManager.m
 platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMENSDateWrapper.m
 platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMENSURLSessionWrapper.m
 platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/MMETimerManager.m
