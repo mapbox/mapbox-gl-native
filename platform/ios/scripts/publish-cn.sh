@@ -24,7 +24,7 @@ echo "finished!"
 # zip
 #
 cd build/ios/pkg
-ZIP="mapbox-ios-sdk-cn.zip"
+ZIP="mapbox-ios-sdk-4.5.0-cn.1.zip"
 step "Compressing ${ZIP}…"
 rm -f ../${ZIP}
 zip -yr ../${ZIP} *
@@ -49,5 +49,5 @@ step "Uploading ${ZIP} to s3…"
 
 # Since this build is primarily for .CN customers, it will be hosted on .cn. 
 
-aws s3 cp ../${ZIP} s3://binary.mapbox.cn/ios/builds/maps-sdk/ --acl public-read ${PROGRESS}
+aws s3 cp ../${ZIP} https://s3.cn-north-1.amazonaws.com.cn/binary.mapbox.cn/${ZIP} --acl public-read ${PROGRESS}
 echo "URL:  https://s3.cn-north-1.amazonaws.com.cn/binary.mapbox.cn/${ZIP}"

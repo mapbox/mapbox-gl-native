@@ -9,7 +9,7 @@ DERIVED_DATA=build/ios
 PRODUCTS=${DERIVED_DATA}
 LOG_PATH=build/xcodebuild-$(date +"%Y-%m-%d_%H%M%S").log
 
-BUILDTYPE=${BUILDTYPE:-Debug}
+BUILDTYPE=${BUILDTYPE:-Release}
 BUILD_FOR_DEVICE=${BUILD_DEVICE:-true}
 SYMBOLS=${SYMBOLS:-YES}
 
@@ -55,7 +55,7 @@ echo ${HASH}
 echo ${HASH} >> ${VERSION}
 
 PROJ_VERSION=$(git rev-list --count HEAD)
-SEM_VERSION=$( git describe --tags --match=ios-v*.*.* --abbrev=0 | sed 's/^ios-v//' )
+SEM_VERSION="4.5.0-cn.1"
 SHORT_VERSION=${SEM_VERSION%-*}
 
 step "Building targets (build ${PROJ_VERSION}, version ${SEM_VERSION})"
