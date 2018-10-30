@@ -67,28 +67,35 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
     this.pixelRatio = parcel.readFloat();
   }
 
-  /*
-   * Getters
-   */
 
+  @Override
   public String getStyleURL() {
     return styleURL;
   }
 
+  @Override
   public LatLngBounds getBounds() {
     return bounds;
   }
 
+  @Override
   public double getMinZoom() {
     return minZoom;
   }
 
+  @Override
   public double getMaxZoom() {
     return maxZoom;
   }
 
+  @Override
   public float getPixelRatio() {
     return pixelRatio;
+  }
+
+  @Override
+  public String getType() {
+    return "tileregion";
   }
 
   /*
