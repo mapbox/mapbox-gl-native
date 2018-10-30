@@ -1,5 +1,9 @@
 #import "MGLLoggingConfiguration.h"
 
+NS_INLINE NSString *NSStringFromBOOL(BOOL value) {
+    return value ? @"YES" : @"NO";
+}
+
 #define MGLLogInfo(message, ...)  MGLLogWithType(MGLLoggingLevelInfo, __PRETTY_FUNCTION__, __LINE__, message, ##__VA_ARGS__)
 #define MGLLogDebug(message, ...) MGLLogWithType(MGLLoggingLevelDebug, __PRETTY_FUNCTION__, __LINE__, message, ##__VA_ARGS__)
 #define MGLLogError(message, ...) MGLLogWithType(MGLLoggingLevelError, __PRETTY_FUNCTION__, __LINE__, message, ##__VA_ARGS__)
