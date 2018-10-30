@@ -18,7 +18,7 @@ CircleBucket::CircleBucket(const BucketParameters& parameters, const std::vector
             std::piecewise_construct,
             std::forward_as_tuple(layer->getID()),
             std::forward_as_tuple(
-                layer->as<RenderCircleLayer>()->evaluated,
+                toRenderCircleLayer(layer)->evaluated,
                 parameters.tileID.overscaledZ));
     }
 }
