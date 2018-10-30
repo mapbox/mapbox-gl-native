@@ -15,7 +15,6 @@ import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
-import com.mapbox.mapboxsdk.offline.OfflineGeometryRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 
@@ -117,24 +116,12 @@ public class TelemetryImpl implements TelemetryDefinition {
   @Override
   public void onCreateOfflineRegion(@NonNull OfflineRegionDefinition offlineDefinition) {
     MapEventFactory mapEventFactory = new MapEventFactory();
-
-    if (offlineDefinition instanceof OfflineTilePyramidRegionDefinition) {
-      OfflineTilePyramidRegionDefinition tileDefinition =
-        (OfflineTilePyramidRegionDefinition)offlineDefinition;
-      telemetry.push(mapEventFactory.createOfflineDownloadStartEvent(
-              "tileregion",
-              tileDefinition.getMinZoom(),
-              tileDefinition.getMaxZoom(),
-              tileDefinition.getStyleURL()));
-    } else {
-      OfflineGeometryRegionDefinition geometryDefinition =
-        (OfflineGeometryRegionDefinition) offlineDefinition;
-      telemetry.push(mapEventFactory.createOfflineDownloadStartEvent(
-              "shaperegion",
-              geometryDefinition.getMinZoom(),
-              geometryDefinition.getMaxZoom(),
-              geometryDefinition.getStyleURL()));
-    }
+    telemetry.push(mapEventFactory.createOfflineDownloadStartEvent(
+      offlineDefinition instanceof OfflineTilePyramidRegionDefinition ? "tileregion" : "shaperegion",
+      offlineDefinition.getMinZoom(),
+      offlineDefinition.getMaxZoom(),
+      offlineDefinition.getStyleURL())
+    );
   }
 
   /**

@@ -32,7 +32,6 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.maps.renderer.glsurfaceview.GLSurfaceViewMapRenderer;
@@ -525,46 +524,24 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    * @see OfflineRegionDefinition
    */
   public void setOfflineRegionDefinition(OfflineRegionDefinition definition) {
-    if (definition instanceof OfflineTilePyramidRegionDefinition) {
-      setOfflineTilePyramidRegionDefinition((OfflineTilePyramidRegionDefinition) definition);
-    } else if (definition instanceof OfflineGeometryRegionDefinition) {
-      setOfflineGeometryRegionDefinition((OfflineGeometryRegionDefinition) definition);
-    } else {
-      throw new UnsupportedOperationException("OfflineRegionDefintion instance not supported");
-    }
-  }
+    double minZoom = definition.getMinZoom();
+    double maxZoom = definition.getMaxZoom();
 
-  private void setOfflineRegionDefinition(String styleUrl, LatLng cameraTarget, double minZoom, double maxZoom) {
     CameraPosition cameraPosition = new CameraPosition.Builder()
-      .target(cameraTarget)
+      .target(definition.getBounds().getCenter())
       .zoom(minZoom)
       .build();
-    setStyleUrl(styleUrl);
-    if (mapboxMap != null) {
-      mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-      mapboxMap.setMinZoomPreference(minZoom);
-      mapboxMap.setMaxZoomPreference(maxZoom);
-    } else {
+    setStyleUrl(definition.getStyleURL());
+
+    if (mapboxMap == null) {
       mapboxMapOptions.camera(cameraPosition);
       mapboxMapOptions.minZoomPreference(minZoom);
       mapboxMapOptions.maxZoomPreference(maxZoom);
+      return;
     }
-  }
-
-  private void setOfflineTilePyramidRegionDefinition(OfflineTilePyramidRegionDefinition regionDefinition) {
-    setOfflineRegionDefinition(regionDefinition.getStyleURL(),
-      regionDefinition.getBounds().getCenter(),
-      regionDefinition.getMinZoom(),
-      regionDefinition.getMaxZoom()
-    );
-  }
-
-  private void setOfflineGeometryRegionDefinition(OfflineGeometryRegionDefinition regionDefinition) {
-    setOfflineRegionDefinition(regionDefinition.getStyleURL(),
-      regionDefinition.getBounds().getCenter(),
-      regionDefinition.getMinZoom(),
-      regionDefinition.getMaxZoom()
-    );
+    mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    mapboxMap.setMinZoomPreference(minZoom);
+    mapboxMap.setMaxZoomPreference(maxZoom);
   }
 
   //
