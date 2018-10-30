@@ -4,7 +4,7 @@ This branch is intended to exist as a branch off of of the main Maps SDK. There 
 
 Before running this script, please check that you are authorized to upload to S3 in China. 
 
-1. Update the `IOS_SDK_VERSION` and `SEM_VERSION` values in the `platform/ios/scripts/package.sh` file. Versioning will follow: `vX.X.X-cn.X` in order to keep this distinct from the main Maps SDK.
+1. Update the `SEM_VERSION` value in the `platform/ios/scripts/package.sh` file. Versioning will follow: `vX.X.X-cn.X` in order to keep this distinct from the main Maps SDK.
 
 2. Update the SDK version in the podspec files.
 

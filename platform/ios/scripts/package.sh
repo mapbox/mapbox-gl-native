@@ -28,7 +28,7 @@ SDK=iphonesimulator
 if [[ ${BUILD_FOR_DEVICE} == true ]]; then
     SDK=iphoneos
 fi
-IOS_SDK_VERSION='v4.5.0-cn.1'
+IOS_SDK_VERSION=`xcrun --sdk ${SDK} --show-sdk-version`
 
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
