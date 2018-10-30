@@ -32,6 +32,11 @@ NS_ASSUME_NONNULL_BEGIN
  new heatmap style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
 
+ #### Related examples
+ See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/heatmap-example/">Create a
+ heatmap layer</a> example to learn how to add this style layer to your map.
+
  ### Example
 
  ```swift

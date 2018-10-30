@@ -26,6 +26,11 @@ NS_ASSUME_NONNULL_BEGIN
  If you only need to observe changes in a particular pack’s progress, you can
  alternatively observe KVO change notifications to the pack’s `progress` key
  path.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/offline-pack/">
+ Download an offline map</a> example to learn how to calculate the progress
+ of an offline download.
  */
 FOUNDATION_EXTERN MGL_EXPORT const NSNotificationName MGLOfflinePackProgressChangedNotification;
 
@@ -177,6 +182,11 @@ typedef NS_ENUM(NSUInteger, MGLResourceKind) {
  packs. All of this class’s instance methods are asynchronous, reflecting the
  fact that offline resources are stored in a database. The shared object
  maintains a canonical collection of offline packs in its `packs` property.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/offline-pack/">
+ Download an offline map</a> example to learn how to create and register an
+ offline pack for a defined region.
  */
 MGL_EXPORT
 @interface MGLOfflineStorage : NSObject

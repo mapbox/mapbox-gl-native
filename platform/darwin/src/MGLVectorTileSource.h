@@ -53,6 +53,11 @@ NS_ASSUME_NONNULL_BEGIN
  ])
  mapView.style?.addSource(source)
  ```
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/dds-circle-layer/">
+ Data-driven circles</a> example to learn how to add data to your map using
+ an `MGLVectorTileSource` object.
  */
 MGL_EXPORT
 @interface MGLVectorTileSource : MGLTileSource

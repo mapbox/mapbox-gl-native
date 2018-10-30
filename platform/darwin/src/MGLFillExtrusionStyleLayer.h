@@ -40,6 +40,11 @@ typedef NS_ENUM(NSUInteger, MGLFillExtrusionTranslationAnchor) {
  new fill-extrusion style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
 
+ #### Related examples
+ See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/extrusions/">Display 3D
+ buildings</a> example to learn how to add and style 3D layers on a map.
+
  ### Example
 
  ```swift

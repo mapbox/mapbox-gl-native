@@ -25,6 +25,11 @@ MGL_EXPORT
 
  The value of this property is nil during initialization and while user tracking
  is inactive.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/user-location-annotation/">
+ Customize the user location annotation</a> example to learn how to customize
+ the default user location annotation object.
  */
 @property (nonatomic, readonly, weak, nullable) MGLUserLocation *userLocation;
 

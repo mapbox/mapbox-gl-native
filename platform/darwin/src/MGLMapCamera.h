@@ -9,6 +9,14 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  An `MGLMapCamera` object represents a viewpoint from which the user observes
  some point on an `MGLMapView`.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/camera-animation/">
+ Camera animation</a> example to learn how to create a camera that rotates
+ around a central point. See the <a href="https://www.mapbox.com/ios-sdk/maps/
+ examples/constraining-gestures/">Restrict map panning to an area</a> example
+ to learn how to restrict map panning using `MGLMapViewDelegate`'s
+ `-mapView:shouldChangeFromCamera:toCamera:` method.
  */
 MGL_EXPORT
 @interface MGLMapCamera : NSObject <NSSecureCoding, NSCopying>

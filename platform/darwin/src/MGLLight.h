@@ -40,11 +40,11 @@ typedef struct __attribute__((objc_boxable)) MGLSphericalPosition {
 
 /**
  Creates a new `MGLSphericalPosition` from the given radial, azimuthal, polar.
- 
+
  @param radial The radial coordinate.
  @param azimuthal The azimuthal angle.
  @param polar The polar angle.
- 
+
  @return Returns a `MGLSphericalPosition` struct containing the position attributes.
  */
 NS_INLINE MGLSphericalPosition MGLSphericalPositionMake(CGFloat radial, CLLocationDirection azimuthal, CLLocationDirection polar) {
@@ -52,12 +52,19 @@ NS_INLINE MGLSphericalPosition MGLSphericalPositionMake(CGFloat radial, CLLocati
     position.radial = radial;
     position.azimuthal = azimuthal;
     position.polar = polar;
-    
+
     return position;
 }
 
 /**
- An `MGLLight` object represents the light source for extruded geometries in `MGLStyle`.
+  An `MGLLight` object represents the light source for extruded geometries in
+ `MGLStyle`.
+ 
+ #### Related examples
+ See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/light-example/">Adjust light
+ of 3D buildings</a> to learn how to create and modify the light source for 3D
+ geometries.
  */
 MGL_EXPORT
 @interface MGLLight : NSObject
@@ -118,6 +125,12 @@ MGL_EXPORT
  This property corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-position"><code>position</code></a>
  light property in the Mapbox Style Specification.
+
+ #### Related examples
+ See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/light-example/">Adjust light
+ of 3D buildings</a> example to learn how to create and modify the position of
+ value of an `MGLLight` object for 3D geometries.
  */
 @property (nonatomic) NSExpression *position;
 

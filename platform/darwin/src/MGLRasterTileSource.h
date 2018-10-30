@@ -52,6 +52,11 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionTileSi
  ])
  mapView.style?.addSource(source)
  ```
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/source-custom-raster/">
+ Add raster imagery</a> example to learn how to add a `MGLRasterStyleLayer`
+ to your map using an `MGLRasterTileSource`.
  */
 MGL_EXPORT
 @interface MGLRasterTileSource : MGLTileSource

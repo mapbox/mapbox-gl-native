@@ -52,6 +52,13 @@ typedef NS_ENUM(NSUInteger, MGLRasterResamplingMode) {
  new raster style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
 
+ #### Related examples
+ See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/image-source/">Add an
+ image</a> and <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/source-custom-raster/">Add
+ raster imagery</a> examples to learn how to add imagery with this style layer.
+
  ### Example
 
  ```swift
