@@ -34,6 +34,13 @@ NS_ASSUME_NONNULL_BEGIN
  A point shape is known as a
  <a href="https://tools.ietf.org/html/rfc7946#section-3.1.2">Point</a> geometry
  in GeoJSON.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/marker/">
+ Mark a place on the map with an annotation</a>, <a href="https://www.mapbox.com/ios-sdk/maps/examples/marker-image/">
+ Mark a place on the map with an image</a>, and <a href="https://www.mapbox.com/ios-sdk/maps/examples/default-callout/">
+ Default callout usage</a> examples to learn how to add `MGLPointAnnotation`
+ objects to your map.
  */
 MGL_EXPORT
 @interface MGLPointAnnotation : MGLShape

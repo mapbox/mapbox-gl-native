@@ -360,6 +360,10 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
     return doc;
 };
 
+global.propertyExample = function (property) {
+    return property.examples;
+};
+
 global.isDataDriven = function (property) {
   return property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
 };
@@ -696,6 +700,7 @@ const layers = _(spec.layer.type.values).map((value, layerType) => {
 
     return {
         doc: spec.layer.type.values[layerType].doc,
+        examples: spec.layer.type.values[layerType].examples,
         type: layerType,
         layoutProperties: _.sortBy(layoutProperties, ['name']),
         paintProperties: _.sortBy(paintProperties, ['name']),

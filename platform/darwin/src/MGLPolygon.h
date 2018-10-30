@@ -44,6 +44,11 @@ NS_ASSUME_NONNULL_BEGIN
 
  To make the polygon straddle the antimeridian, specify some longitudes less
  than −180 degrees or greater than 180 degrees.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/polygon/">
+ Add a polygon annotation</a> example to learn how to initialize an
+ `MGLPolygon` object from an array of coordinates.
  */
 MGL_EXPORT
 @interface MGLPolygon : MGLMultiPoint <MGLOverlay>

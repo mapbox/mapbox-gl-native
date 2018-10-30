@@ -78,6 +78,16 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslationAnchor) {
  new circle style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
 
+ #### Related examples
+ See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/dds-circle-layer/">Data-driven
+ circles</a>, <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/shape-collection/">Add
+ multiple shapes from a single shape source</a>, and <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/clustering/">Cluster point
+ data</a> examples to learn how to add circles to your map using this style
+ layer.
+
  ### Example
 
  ```swift

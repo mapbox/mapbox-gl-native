@@ -174,6 +174,11 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  An `MGLPointFeature` object associates a point shape with an optional
  identifier and attributes.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/runtime-multiple-annotations/">
+ Dynamically style interactive points</a> example to learn how to initialize
+ `MGLPointFeature` objects and add it them your map.
  */
 MGL_EXPORT
 @interface MGLPointFeature : MGLPointAnnotation <MGLFeature>
@@ -186,6 +191,11 @@ MGL_EXPORT
  A polyline feature is known as a
  <a href="https://tools.ietf.org/html/rfc7946#section-3.1.4">LineString</a>
  feature in GeoJSON.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/line-geojson/">
+ Add a line annotation from GeoJSON</a> example to learn how to initialize an
+ `MGLPolylineFeature` and add it to an `MGLMapView` object.
  */
 MGL_EXPORT
 @interface MGLPolylineFeature : MGLPolyline <MGLFeature>
@@ -248,6 +258,11 @@ MGL_EXPORT
  A shape collection feature is known as a
  <a href="https://tools.ietf.org/html/rfc7946#section-3.3">feature collection</a>
  in GeoJSON.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/shape-collection/">
+ Add multiple shapes from a single shape source</a> example to learn how to
+ add shape data to your map using an `MGLShapeCollectionFeature` object.
  */
 MGL_EXPORT
 @interface MGLShapeCollectionFeature : MGLShapeCollection <MGLFeature>

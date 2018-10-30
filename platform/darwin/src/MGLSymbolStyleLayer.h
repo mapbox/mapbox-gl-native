@@ -356,6 +356,14 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  new symbol style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
 
+ #### Related examples
+ See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/runtime-multiple-annotations/">Dynamically
+ style interactive points</a> and <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/clustering-with-images/">Use
+ images to cluster point data</a> examples learn how to style data on your map
+ using this layer.
+
  ### Example
 
  ```swift
@@ -509,6 +517,12 @@ MGL_EXPORT
  * Variable assignments and references to assigned variables
  * Interpolation and step functions applied to the `$zoomLevel` variable and/or
  feature attributes
+
+ #### Related examples
+ See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/clustering-with-images/">Use
+ images to cluster point data</a> example to learn how to dynamically set your
+ icons with an expression.
  */
 @property (nonatomic, null_resettable) NSExpression *iconImageName;
 
@@ -1073,6 +1087,14 @@ MGL_EXPORT
  * Variable assignments and references to assigned variables
  * Interpolation and step functions applied to the `$zoomLevel` variable and/or
  feature attributes
+
+ #### Related examples
+ See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/clustering/">Cluster point
+ data</a> and <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/clustering-with-images/">Use
+ images to cluster point data</a> to learn how to use an expression to set this
+ attribute to the number of markers within a cluster.
  */
 @property (nonatomic, null_resettable) NSExpression *text;
 

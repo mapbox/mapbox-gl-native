@@ -89,6 +89,15 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslationAnchor) {
  new line style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
 
+ #### Related examples
+ See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/shape-collection/">Add
+ multiple shapes from a single shape source</a> example to learn how to add a
+ line to your map using this style layer. See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/runtime-add-line/">Add a
+ line style layer from GeoJSON</a> example to learn how to add and style line
+ data to an `MGLMapView` object at runtime.
+
  ### Example
 
  ```swift
