@@ -18,7 +18,7 @@ HeatmapBucket::HeatmapBucket(const BucketParameters& parameters, const std::vect
             std::piecewise_construct,
             std::forward_as_tuple(layer->getID()),
             std::forward_as_tuple(
-                layer->as<RenderHeatmapLayer>()->evaluated,
+                toRenderHeatmapLayer(layer)->evaluated,
                 parameters.tileID.overscaledZ));
     }
 }

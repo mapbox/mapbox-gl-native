@@ -50,11 +50,11 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
       pixelRatio(parameters.pixelRatio),
       tileSize(util::tileSize * overscaling),
       tilePixelRatio(float(util::EXTENT) / tileSize),
-      textSize(layers.at(0)->as<RenderSymbolLayer>()->impl().layout.get<TextSize>()),
-      iconSize(layers.at(0)->as<RenderSymbolLayer>()->impl().layout.get<IconSize>())
+      textSize(toRenderSymbolLayer(layers.at(0))->impl().layout.get<TextSize>()),
+      iconSize(toRenderSymbolLayer(layers.at(0))->impl().layout.get<IconSize>())
     {
 
-    const SymbolLayer::Impl& leader = layers.at(0)->as<RenderSymbolLayer>()->impl();
+    const SymbolLayer::Impl& leader = toRenderSymbolLayer(layers.at(0))->impl();
 
     layout = leader.layout.evaluate(PropertyEvaluationParameters(zoom));
 
@@ -91,8 +91,8 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
     for (const auto& layer : layers) {
         layerPaintProperties.emplace(layer->getID(), std::make_pair(
-            layer->as<RenderSymbolLayer>()->iconPaintProperties(),
-            layer->as<RenderSymbolLayer>()->textPaintProperties()
+            toRenderSymbolLayer(layer)->iconPaintProperties(),
+            toRenderSymbolLayer(layer)->textPaintProperties()
         ));
     }
 

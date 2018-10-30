@@ -99,4 +99,8 @@ inline bool RenderLayer::is<RenderSymbolLayer>() const {
     return type == style::LayerType::Symbol;
 }
 
+inline const RenderSymbolLayer* toRenderSymbolLayer(const RenderLayer* layer) {
+    return static_cast<const RenderSymbolLayer*>(layer);
+}
+
 } // namespace mbgl

@@ -39,4 +39,8 @@ inline bool RenderLayer::is<RenderCircleLayer>() const {
     return type == style::LayerType::Circle;
 }
 
+inline const RenderCircleLayer* toRenderCircleLayer(const RenderLayer* layer) {
+    return static_cast<const RenderCircleLayer*>(layer);
+}
+
 } // namespace mbgl
