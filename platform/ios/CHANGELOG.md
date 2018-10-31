@@ -9,6 +9,9 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added the ability to style symbol layers labels with multiple fonts and text sizes via the `format` expression operator. ([#12624](https://github.com/mapbox/mapbox-gl-native/pull/12624))
 * Fixed a crash when using the `MGL_LET`, `MGL_MATCH`, `MGL_IF`, or `MGL_FUNCTION` functions without a colon inside an `NSExpression` or `NSPredicate` format string. ([#13189](https://github.com/mapbox/mapbox-gl-native/pull/13189))
 * Fixed a crash setting the `MGLLineStyleLayer.lineGradient` property to an expression containing the `$lineProgress` variable. Added an `NSExpression.lineProgressVariableExpression` class property that returns an expression for the `$lineProgress` variable. ([#13192](https://github.com/mapbox/mapbox-gl-native/pull/13192))
+* Fixed an issue where feature querying would fail for symbols that set both `MGLSymbolStyleLayer.iconRotation` and `MGLSymbolStyleLayer.iconOffset`. ([#13105](https://github.com/mapbox/mapbox-gl-native/pull/13105))
+* Fixed an issue where polygons crossing tile boundaries could be improperly clipped. ([#13231](https://github.com/mapbox/mapbox-gl-native/pull/13231))
+* Fixed improper wrapping of ±180° longitude values in `MGLCoordinateBounds`. ([#13006](https://github.com/mapbox/mapbox-gl-native/pull/13006))
 
 ### Offline maps
 
