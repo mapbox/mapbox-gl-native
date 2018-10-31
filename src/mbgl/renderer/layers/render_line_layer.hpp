@@ -71,4 +71,8 @@ inline bool RenderLayer::is<RenderLineLayer>() const {
     return type == style::LayerType::Line;
 }
 
+inline const RenderLineLayer* toRenderLineLayer(const RenderLayer* layer) {
+    return static_cast<const RenderLineLayer*>(layer);
+}
+
 } // namespace mbgl

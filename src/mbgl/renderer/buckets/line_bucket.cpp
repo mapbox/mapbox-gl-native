@@ -545,16 +545,10 @@ float LineBucket::getLineWidth(const RenderLineLayer& layer) const {
 }
 
 float LineBucket::getQueryRadius(const RenderLayer& layer) const {
-    if (!layer.is<RenderLineLayer>()) {
-        return 0;
-    }
-
-    auto lineLayer = layer.as<RenderLineLayer>();
-
+    const RenderLineLayer* lineLayer = toRenderLineLayer(&layer);
     const std::array<float, 2>& translate = lineLayer->evaluated.get<LineTranslate>();
     float offset = get<LineOffset>(*lineLayer, paintPropertyBinders);
     return getLineWidth(*lineLayer) / 2.0 + std::abs(offset) + util::length(translate[0], translate[1]);
 }
-
 
 } // namespace mbgl
