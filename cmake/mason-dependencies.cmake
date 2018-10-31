@@ -1,6 +1,5 @@
 # All dependencies in a single separate file so its checksum can be used in a CI cache key name
 
-mason_use(boost VERSION 1.65.1 HEADER_ONLY)
 mason_use(cheap-ruler VERSION 2.5.3 HEADER_ONLY)
 mason_use(pixelmatch VERSION 0.10.0 HEADER_ONLY)
 

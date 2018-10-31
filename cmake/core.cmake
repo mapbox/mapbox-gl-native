@@ -21,6 +21,7 @@ target_link_libraries(mbgl-core PRIVATE
 # FIXME: We should not leak these many
 # libraries in our public interface.
 target_link_libraries(mbgl-core PUBLIC
+    boost
     geojson.hpp
     geometry.hpp
     icu
@@ -31,8 +32,6 @@ target_link_libraries(mbgl-core PUBLIC
     variant
     vector-tile
 )
-
-target_add_mason_package(mbgl-core PRIVATE boost)
 
 mbgl_platform_core()
 

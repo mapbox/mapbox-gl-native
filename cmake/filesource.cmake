@@ -2,8 +2,6 @@
 load_sources_list(MBGL_FILESOURCE_FILES cmake/filesource-files.txt)
 add_library(mbgl-filesource STATIC ${MBGL_FILESOURCE_FILES})
 
-target_add_mason_package(mbgl-filesource PRIVATE boost)
-
 target_include_directories(mbgl-filesource
     PRIVATE include
     PRIVATE src
