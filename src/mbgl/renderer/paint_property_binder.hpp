@@ -190,7 +190,6 @@ public:
 
     void updateVertexVector(size_t start, size_t end, const GeometryTileFeature& feature, const PropertyMap& featureState) override {
         if (!isUpdateable) { return; }
-        assert(start < end && end < vertexVector.vertexSize());
         auto evaluated = expression.evaluate(feature, featureState, defaultValue);
         this->statistics.add(evaluated);
         auto value = attributeValue(evaluated);
@@ -201,8 +200,15 @@ public:
     };
 
     void upload(gl::Context& context) override {
-        vertexBuffer = context.createVertexBuffer(std::move(vertexVector),
-            isUpdateable ? gl::BufferUsage::StaticDraw : gl::BufferUsage::DynamicDraw);
+        if (isUpdateable) {
+            if (!vertexBuffer) {
+                vertexBuffer = context.createVertexBuffer(vertexVector, gl::BufferUsage::DynamicDraw);
+            } else {
+            context.updateVertexBuffer(*vertexBuffer, vertexVector);
+            }
+        } else {
+            vertexBuffer = context.createVertexBuffer(std::move(vertexVector), gl::BufferUsage::StaticDraw);
+        }
     }
 
     std::tuple<optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
@@ -264,7 +270,7 @@ public:
 
     void updateVertexVector(size_t start, size_t end, const GeometryTileFeature& feature, const PropertyMap& featureState) override {
         if (!isUpdateable) { return; }
-        assert(start < end && end < vertexVector.vertexSize());
+        assert(start < end && end <= vertexVector.vertexSize());
         Range<T> range = expression.evaluate(zoomRange, feature, featureState, defaultValue);
         this->statistics.add(range.min);
         this->statistics.add(range.max);
@@ -277,8 +283,15 @@ public:
     };
 
     void upload(gl::Context& context) override {
-        vertexBuffer = context.createVertexBuffer(std::move(vertexVector),
-            isUpdateable ? gl::BufferUsage::StaticDraw : gl::BufferUsage::DynamicDraw);
+        if (isUpdateable) {
+            if(!vertexBuffer) {
+                vertexBuffer = context.createVertexBuffer(vertexVector, gl::BufferUsage::DynamicDraw);
+            } else {
+                context.updateVertexBuffer(*vertexBuffer, vertexVector);
+            }
+        } else {
+            vertexBuffer = context.createVertexBuffer(std::move(vertexVector), gl::BufferUsage::StaticDraw);
+        }
     }
 
     std::tuple<optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
@@ -517,8 +530,7 @@ public:
         });
         auto featureId = feature.getID();
         if (featureId) {
-            auto posArray = idMap[*featureId];
-            posArray.emplace_back(index, binderBufferOffset, length);
+            idMap[*featureId].emplace_back(index, binderBufferOffset, length);
         }
         binderBufferOffset = length;
     }
@@ -532,8 +544,10 @@ public:
     bool updateVertexVectors(const FeatureStates& featureStates, const GeometryTileLayer& layer) {
         bool dirty = false;
         for (const auto& pair : featureStates) {
-            const auto& posArray = idMap[pair.first];
-            for (const auto& info : posArray) {
+            const auto posArray = idMap.find(pair.first);
+            if (posArray == idMap.end()) continue;
+
+            for (const auto& info : posArray->second) {
                 std::unique_ptr<GeometryTileFeature> feature = layer.getFeature(std::get<0>(info));
                 const size_t startVertex = std::get<1>(info);
                 const size_t endVertex = std::get<2>(info);

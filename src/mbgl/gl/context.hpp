@@ -71,7 +71,21 @@ public:
     }
 
     template <class Vertex, class DrawMode>
+    VertexBuffer<Vertex, DrawMode> createVertexBuffer(const VertexVector<Vertex, DrawMode>& v, const BufferUsage usage = BufferUsage::StaticDraw) {
+        return VertexBuffer<Vertex, DrawMode> {
+            v.vertexSize(),
+            createVertexBuffer(v.data(), v.byteSize(), usage)
+        };
+    }
+
+    template <class Vertex, class DrawMode>
     void updateVertexBuffer(VertexBuffer<Vertex, DrawMode>& buffer, VertexVector<Vertex, DrawMode>&& v) {
+        assert(v.vertexSize() == buffer.vertexCount);
+        updateVertexBuffer(buffer.buffer, v.data(), v.byteSize());
+    }
+
+    template <class Vertex, class DrawMode>
+    void updateVertexBuffer(VertexBuffer<Vertex, DrawMode>& buffer, const VertexVector<Vertex, DrawMode>& v) {
         assert(v.vertexSize() == buffer.vertexCount);
         updateVertexBuffer(buffer.buffer, v.data(), v.byteSize());
     }

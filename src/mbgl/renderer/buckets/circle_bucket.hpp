@@ -27,6 +27,10 @@ public:
 
     void upload(gl::Context&) override;
 
+    void setFeatureState(const GeometryTileData*,
+                const std::string&,
+                const FeatureStates&) override;
+
     float getQueryRadius(const RenderLayer&) const override;
 
     gl::VertexVector<CircleLayoutVertex> vertices;
@@ -37,6 +41,7 @@ public:
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
 
     std::map<std::string, CircleProgram::PaintPropertyBinders> paintPropertyBinders;
+    std::set<std::string> stateDependentLayers;
 
     const MapMode mode;
 };

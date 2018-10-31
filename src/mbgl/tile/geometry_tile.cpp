@@ -127,12 +127,13 @@ void GeometryTile::setFeatureState(std::shared_ptr<FeatureStatesMap> featureStat
     if (featureStatesMap_->empty() || pending == true) {
         return;
     }
-
+    featureStates  = featureStatesMap_;
     const auto tileData = latestFeatureIndex->getData();
     for (auto& entry : buckets) {
         auto& bucket = *entry.second;
         if (!bucket.hasData()) { continue; }
         const auto& sourceLayer = sourceLayers.at(entry.first);
+
         const auto& perLayerFeatureStates = featureStates->find(sourceLayer);
         if (perLayerFeatureStates != featureStates->end() &&
             !perLayerFeatureStates->second.empty()) {

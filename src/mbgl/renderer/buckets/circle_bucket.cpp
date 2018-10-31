@@ -20,13 +20,17 @@ CircleBucket::CircleBucket(const BucketParameters& parameters, const std::vector
             std::forward_as_tuple(
                 layer->as<RenderCircleLayer>()->evaluated,
                 parameters.tileID.overscaledZ));
+        if (layer->as<RenderCircleLayer>()->evaluated.isFeatureStateDependent()) {
+            stateDependentLayers.emplace(layer->getID());
+        }
     }
 }
 
 void CircleBucket::upload(gl::Context& context) {
-    vertexBuffer = context.createVertexBuffer(std::move(vertices));
-    indexBuffer = context.createIndexBuffer(std::move(triangles));
-
+    if (!vertexBuffer) {
+        vertexBuffer = context.createVertexBuffer(std::move(vertices));
+        indexBuffer = context.createIndexBuffer(std::move(triangles));
+    }
     for (auto& pair : paintPropertyBinders) {
         pair.second.upload(context);
     }
@@ -94,6 +98,23 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
     }
 }
 
+void CircleBucket::setFeatureState(const GeometryTileData* tileData,
+                        const std::string& sourceLayer,
+                        const FeatureStates& featureStates) {
+    if (featureStates.empty() /*|| stateDependentLayers.empty()*/) { return; }
+
+    auto sourceLayerData = tileData->getLayer(sourceLayer);
+    if (sourceLayerData) {
+        for (auto& pair : paintPropertyBinders) {
+            if (stateDependentLayers.count(pair.first) > 0) {
+                if(pair.second.updateVertexVectors(featureStates,  *sourceLayerData)) {
+                    //Only toggle uploaded if needed.
+                    uploaded = false;
+                }
+            }
+        }
+    }
+}
 template <class Property>
 static float get(const RenderCircleLayer& layer, const std::map<std::string, CircleProgram::PaintPropertyBinders>& paintPropertyBinders) {
     auto it = paintPropertyBinders.find(layer.getID());
