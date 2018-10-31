@@ -137,6 +137,14 @@ if(CCACHE_PROGRAM)
         # Clang also thinks that ccache isn't interactive, so we explicitly need to enable color.
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qunused-arguments -fcolor-diagnostics")
     endif()
+elseif(WIN32)
+    find_program(CLCACHE_PROGRAM clcache)
+    if(CLCACHE_PROGRAM)
+        # clcache doesn't work with external pdb files
+        # https://github.com/frerich/clcache/issues/30
+        string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+        string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+    endif()
 else()
     message(STATUS "Can't find ccache — consider installing ccache to improve recompilation performance")
 endif()

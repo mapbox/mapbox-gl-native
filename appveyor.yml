@@ -5,6 +5,8 @@ image:
 - Visual Studio 2017
 
 environment:
+  PYTHON:  C:\python37
+
   matrix:
   - configuration: Release
 
@@ -54,6 +56,7 @@ cache:
   - '%APPVEYOR_BUILD_FOLDER%\mason_packages'
   - '%APPVEYOR_BUILD_FOLDER%\LLVM-%LLVM_VERSION%-win64.exe'
   - '%APPVEYOR_BUILD_FOLDER%\cmake-3.10.1-win64-x64.zip'
+  - C:\clcache
 
 install:
   - git config --system core.longpaths true
@@ -71,12 +74,16 @@ install:
       }
       scripts\check-sha256.ps1 LLVM-$env:LLVM_VERSION-win64.exe "$env:LLVM_HASH"
       Start-Process -FilePath "LLVM-$env:LLVM_VERSION-win64.exe" -ArgumentList '/S',"/D=C:\LLVM-$env:LLVM_VERSION" -Wait
+  - set PATH=%PYTHON%\Scripts;%PYTHON%;%PATH%
+  - pip install clcache
 
 before_build:
   - set PATH=C:\LLVM-%LLVM_VERSION%\bin;%PATH%
   - set PATH=C:\cmake-3.10.1-win64-x64\bin;%PATH%
-  - set CC=clang-cl
-  - set CXX=clang-cl
+  - set CLCACHE_DIR=c:\clcache
+  - set CLCACHE_CL=clang-cl
+  - set CC=clcache
+  - set CXX=clcache
   - mkdir %APPVEYOR_BUILD_FOLDER%\build
   - cd %APPVEYOR_BUILD_FOLDER%\build
 
@@ -91,4 +98,6 @@ build_script:
        -DCMAKE_PREFIX_PATH=%QT_PREFIX%
        -DCMAKE_MAKE_PROGRAM="%APPVEYOR_BUILD_FOLDER%\platform\qt\ninja.exe"
        ..
+  - clcache -z
   - cmake --build . -- -j %NUMBER_OF_PROCESSORS%
+  - clcache -s
