@@ -2,6 +2,20 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.7.0-beta.1 - October 31, 2018
+ - Remove map initialised check [#13224](https://github.com/mapbox/mapbox-gl-native/pull/13224)
+ - Upgrade GeoJSONVT to v6.6.2 [#13231](https://github.com/mapbox/mapbox-gl-native/pull/13231)
+ - Deliver OnMapReady at end of initialisation block [#13220](https://github.com/mapbox/mapbox-gl-native/pull/13220)
+ - Rework MapCallback to execute in correct order [#13203](https://github.com/mapbox/mapbox-gl-native/pull/13203)
+ - Deprecate map zoom button controller [#13197](https://github.com/mapbox/mapbox-gl-native/pull/13197)
+ - RenderState API [#13170](https://github.com/mapbox/mapbox-gl-native/pull/13170)
+ - Avoid wrapping longitude values at dateline [#13006](https://github.com/mapbox/mapbox-gl-native/pull/13006)
+
+## 6.6.3 - October 31, 2018
+ - Fix crash with non AppCompatActivities [#13222](https://github.com/mapbox/mapbox-gl-native/pull/13222)
+ - Telemetry bump 3.5.1 [#13204](https://github.com/mapbox/mapbox-gl-native/pull/13204)
+ - Gestures library 0.3.0 [#13234](https://github.com/mapbox/mapbox-gl-native/pull/13234)
+
 ## 6.7.0-alpha.2 - October 24, 2018
  - Format expression support [#12985](https://github.com/mapbox/mapbox-gl-native/pull/12985)
  - Remove view tree observer [#13133](https://github.com/mapbox/mapbox-gl-native/pull/13133)
