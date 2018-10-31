@@ -1,7 +1,7 @@
 ignore:
   - "test/"
 flags:
-  core-gl:
+  coregl:
     paths:
       - "/src"
   ios:
