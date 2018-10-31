@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp.activity.infowindow;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
@@ -28,13 +29,39 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
 
   private MapboxMap mapboxMap;
   private MapView mapView;
+  private MarkerView marker;
+
+  private MapboxMap.OnMapClickListener mapClickListener = new MapboxMap.OnMapClickListener() {
+    @Override
+    public boolean onMapClick(@NonNull LatLng point) {
+      if (marker == null) {
+        return false;
+      }
+
+      // Distance from click to marker
+      double distanceKm = marker.getPosition().distanceTo(point) / 1000;
+
+      // Get the info window
+      final InfoWindow infoWindow = marker.getInfoWindow();
+
+      // Get the view from the info window
+      if (infoWindow != null && infoWindow.getView() != null) {
+        // Set the new text on the text view in the info window
+        TextView textView = (TextView) infoWindow.getView();
+        textView.setText(String.format(Locale.getDefault(), "%.2fkm", distanceKm));
+        // Update the info window position (as the text length changes)
+        textView.post(infoWindow::update);
+      }
+      return true;
+    }
+  };
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_infowindow_adapter);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
   }
@@ -50,30 +77,11 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
     mapboxMap.getUiSettings().setDeselectMarkersOnTap(false);
 
     // Add a marker
-    final MarkerView marker = addMarker(mapboxMap);
+    marker = addMarker(mapboxMap);
     mapboxMap.selectMarker(marker);
 
     // On map click, change the info window contents
-    mapboxMap.setOnMapClickListener(point -> {
-      // Distance from click to marker
-      double distanceKm = marker.getPosition().distanceTo(point) / 1000;
-
-      // Get the info window
-      final InfoWindow infoWindow = marker.getInfoWindow();
-
-      // Get the view from the info window
-      if (infoWindow != null && infoWindow.getView() != null) {
-        // Set the new text on the text view in the info window
-        TextView textView  = (TextView) infoWindow.getView();
-        textView.setText(String.format(Locale.getDefault(), "%.2fkm", distanceKm));
-        textView.post(() -> {
-          // Update the info window position (as the text length changes)
-          infoWindow.update();
-        });
-      }
-
-      return false;
-    });
+    mapboxMap.addOnMapClickListener(mapClickListener);
 
     // Focus on Paris
     mapboxMap.animateCamera(CameraUpdateFactory.newLatLng(PARIS));
@@ -133,6 +141,9 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
   @Override
   protected void onDestroy() {
     super.onDestroy();
+    if (mapboxMap != null) {
+      mapboxMap.removeOnMapClickListener(mapClickListener);
+    }
     mapView.onDestroy();
   }
 

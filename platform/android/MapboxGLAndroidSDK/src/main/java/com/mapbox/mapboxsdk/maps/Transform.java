@@ -18,8 +18,7 @@ import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener;
 /**
  * Resembles the current Map transformation.
  * <p>
- * Responsible for synchronising {@link CameraPosition} state and notifying
- * {@link com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraChangeListener}.
+ * Responsible for synchronising {@link CameraPosition} state and notifying camera change listeners.
  * </p>
  */
 final class Transform implements MapView.OnCameraDidChangeListener {
@@ -33,8 +32,6 @@ final class Transform implements MapView.OnCameraDidChangeListener {
 
   private CameraPosition cameraPosition;
   private MapboxMap.CancelableCallback cameraCancelableCallback;
-
-  private MapboxMap.OnCameraChangeListener onCameraChangeListener;
 
   private CameraChangeDispatcher cameraChangeDispatcher;
 
@@ -174,9 +171,6 @@ final class Transform implements MapView.OnCameraDidChangeListener {
       }
 
       this.cameraPosition = cameraPosition;
-      if (onCameraChangeListener != null) {
-        onCameraChangeListener.onCameraChange(this.cameraPosition);
-      }
     }
     return cameraPosition;
   }
@@ -213,14 +207,6 @@ final class Transform implements MapView.OnCameraDidChangeListener {
   void resetNorth() {
     cancelTransitions();
     nativeMapView.resetNorth();
-  }
-
-  //
-  // Camera change listener API
-  //
-
-  void setOnCameraChangeListener(@Nullable MapboxMap.OnCameraChangeListener listener) {
-    this.onCameraChangeListener = listener;
   }
 
   //

@@ -8,7 +8,6 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -17,6 +16,7 @@ import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.utils.IdleZoomListener;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
 
 import java.io.IOException;
@@ -48,6 +48,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
   public static final String AMSTERDAM_PARKS_LAYER = "amsterdam-parks-layer";
   private MapView mapView;
   private MapboxMap mapboxMap;
+  private IdleZoomListener idleListener;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +56,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
     setContentView(R.layout.activity_data_driven_style);
 
     // Initialize map as normal
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
 
     mapView.getMapAsync(map -> {
@@ -75,14 +76,8 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
 
   private void setupDebugZoomView() {
     final TextView textView = (TextView) findViewById(R.id.textZoom);
-    mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
-      @Override
-      public void onCameraChange(CameraPosition position) {
-        textView.setText(String.format(getString(R.string.debug_zoom), position.zoom));
-      }
-    });
+    mapboxMap.addOnCameraIdleListener(idleListener = new IdleZoomListener(mapboxMap, textView));
   }
-
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -123,6 +118,9 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
   @Override
   protected void onDestroy() {
     super.onDestroy();
+    if (mapboxMap != null && idleListener != null) {
+      mapboxMap.removeOnCameraIdleListener(idleListener);
+    }
     mapView.onDestroy();
   }
 

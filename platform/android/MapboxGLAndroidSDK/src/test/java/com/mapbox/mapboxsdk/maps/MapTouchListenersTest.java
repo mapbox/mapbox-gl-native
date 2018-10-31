@@ -70,18 +70,6 @@ public class MapTouchListenersTest {
   }
 
   @Test
-  public void onScrollListenerTest() throws Exception {
-    MapboxMap.OnScrollListener listener = mock(MapboxMap.OnScrollListener.class);
-    mapGestureDetector.addOnScrollListener(listener);
-    mapGestureDetector.notifyOnScrollListeners();
-    verify(listener, times(1)).onScroll();
-
-    mapGestureDetector.removeOnScrollListener(listener);
-    mapGestureDetector.notifyOnScrollListeners();
-    verify(listener, times(1)).onScroll();
-  }
-
-  @Test
   public void onMoveListenerTest() throws Exception {
     MapboxMap.OnMoveListener listener = mock(MapboxMap.OnMoveListener.class);
     MoveGestureDetector detector = mock(MoveGestureDetector.class);

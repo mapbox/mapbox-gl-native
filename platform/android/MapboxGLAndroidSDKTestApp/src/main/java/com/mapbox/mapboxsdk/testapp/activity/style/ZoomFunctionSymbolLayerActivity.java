@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp.activity.style;
 
 import android.graphics.PointF;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -9,6 +10,7 @@ import com.google.gson.JsonObject;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.Property;
@@ -51,6 +53,23 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
   private boolean isSelected = false;
   private boolean isShowingSymbolLayer = true;
 
+  private MapboxMap.OnMapClickListener mapClickListener = new MapboxMap.OnMapClickListener() {
+    @Override
+    public boolean onMapClick(@NonNull LatLng point) {
+      PointF screenPoint = mapboxMap.getProjection().toScreenLocation(point);
+      List<Feature> featureList = mapboxMap.queryRenderedFeatures(screenPoint, LAYER_ID);
+      if (!featureList.isEmpty()) {
+        Feature feature = featureList.get(0);
+        boolean selectedNow = feature.getBooleanProperty(KEY_PROPERTY_SELECTED);
+        isSelected = !selectedNow;
+        updateSource();
+      } else {
+        Timber.e("No features found");
+      }
+      return true;
+    }
+  };
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -62,7 +81,7 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
       mapboxMap = map;
       updateSource();
       addLayer();
-      addMapClickListener();
+      map.addOnMapClickListener(mapClickListener);
     });
   }
 
@@ -111,23 +130,6 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
       iconAllowOverlap(true)
     );
     mapboxMap.addLayer(layer);
-  }
-
-  private void addMapClickListener() {
-    mapboxMap.setOnMapClickListener(point -> {
-      PointF screenPoint = mapboxMap.getProjection().toScreenLocation(point);
-      List<Feature> featureList = mapboxMap.queryRenderedFeatures(screenPoint, LAYER_ID);
-      if (!featureList.isEmpty()) {
-        Feature feature = featureList.get(0);
-        boolean selectedNow = feature.getBooleanProperty(KEY_PROPERTY_SELECTED);
-        isSelected = !selectedNow;
-        updateSource();
-      } else {
-        Timber.e("No features found");
-      }
-
-      return false;
-    });
   }
 
   @Override
