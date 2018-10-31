@@ -1,4 +1,4 @@
-#include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/offline_download.hpp>
 #include <mbgl/storage/resource.hpp>
@@ -84,7 +84,7 @@ uint64_t tileCount(const OfflineRegionDefinition& definition, style::SourceType 
 OfflineDownload::OfflineDownload(int64_t id_,
                                  OfflineRegionDefinition&& definition_,
                                  OfflineDatabase& offlineDatabase_,
-                                 FileSource& onlineFileSource_)
+                                 OnlineFileSource& onlineFileSource_)
     : id(id_),
       definition(definition_),
       offlineDatabase(offlineDatabase_),
@@ -340,7 +340,7 @@ void OfflineDownload::continueDownload() {
         return;
     }
 
-    while (!resourcesRemaining.empty() && requests.size() < HTTPFileSource::maximumConcurrentRequests()) {
+    while (!resourcesRemaining.empty() && requests.size() < onlineFileSource.getMaximumConcurrentRequests()) {
         ensureResource(resourcesRemaining.front());
         resourcesRemaining.pop_front();
     }

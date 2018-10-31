@@ -433,7 +433,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(LowHighPriorityRequests)) {
     std::size_t response_counter = 0;
     const std::size_t NUM_REQUESTS = 3;
 
-    fs.setMaximumConcurrentRequestsOverride(1);
+    fs.setMaximumConcurrentRequests(1);
 
     NetworkStatus::Set(NetworkStatus::Status::Offline);
 
@@ -473,7 +473,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(LowHighPriorityRequestsMany)) {
     int correct_regular = 0;
 
 
-    fs.setMaximumConcurrentRequestsOverride(1);
+    fs.setMaximumConcurrentRequests(1);
 
     NetworkStatus::Set(NetworkStatus::Status::Offline);
 

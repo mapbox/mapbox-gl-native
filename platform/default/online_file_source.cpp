@@ -25,6 +25,8 @@
 
 namespace mbgl {
 
+static uint32_t DEFAULT_MAXIMUM_CONCURRENT_REQUESTS = 20;
+
 class OnlineFileRequest : public AsyncRequest {
 public:
     using Callback = std::function<void (Response)>;
@@ -64,6 +66,7 @@ class OnlineFileSource::Impl {
 public:
     Impl() {
         NetworkStatus::Subscribe(&reachability);
+        setMaximumConcurrentRequests(DEFAULT_MAXIMUM_CONCURRENT_REQUESTS);
     }
 
     ~Impl() {
@@ -156,20 +159,15 @@ public:
         networkIsReachableAgain();
     }
 
-    void setMaximumConcurrentRequestsOverride(const uint32_t maximumConcurrentRequestsOverride_) {
-        maximumConcurrentRequestsOverride = maximumConcurrentRequestsOverride_;
+    uint32_t getMaximumConcurrentRequests() const {
+        return maximumConcurrentRequests;
+    }
+
+    void setMaximumConcurrentRequests(uint32_t maximumConcurrentRequests_) {
+        maximumConcurrentRequests = maximumConcurrentRequests_;
     }
 
 private:
-
-    uint32_t getMaximumConcurrentRequests() const {
-        if (maximumConcurrentRequestsOverride > 0) {
-            return maximumConcurrentRequestsOverride;
-        }
-        else {
-            return HTTPFileSource::maximumConcurrentRequests();
-        }
-    }
 
     void networkIsReachableAgain() {
         for (auto& request : allRequests) {
@@ -260,7 +258,7 @@ private:
     std::unordered_set<OnlineFileRequest*> activeRequests;
 
     bool online = true;
-    uint32_t maximumConcurrentRequestsOverride = 0;
+    uint32_t maximumConcurrentRequests;
     HTTPFileSource httpFileSource;
     util::AsyncTask reachability { std::bind(&Impl::networkIsReachableAgain, this) };
 };
@@ -472,14 +470,19 @@ ActorRef<OnlineFileRequest> OnlineFileRequest::actor() {
     return ActorRef<OnlineFileRequest>(*this, mailbox);
 }
 
+void OnlineFileSource::setMaximumConcurrentRequests(uint32_t maximumConcurrentRequests_) {
+    impl->setMaximumConcurrentRequests(maximumConcurrentRequests_);
+}
+
+uint32_t OnlineFileSource::getMaximumConcurrentRequests() const {
+    return impl->getMaximumConcurrentRequests();
+}
+
+
 // For testing only:
 
 void OnlineFileSource::setOnlineStatus(const bool status) {
     impl->setOnlineStatus(status);
-}
-
-void OnlineFileSource::setMaximumConcurrentRequestsOverride(const uint32_t maximumConcurrentRequestsOverride) {
-    impl->setMaximumConcurrentRequestsOverride(maximumConcurrentRequestsOverride);
 }
 
 } // namespace mbgl
