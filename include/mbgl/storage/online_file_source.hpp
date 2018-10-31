@@ -24,9 +24,11 @@ public:
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
 
+    void setMaximumConcurrentRequests(uint32_t);
+    uint32_t getMaximumConcurrentRequests() const;
+
     // For testing only.
     void setOnlineStatus(bool);
-    void setMaximumConcurrentRequestsOverride(uint32_t);
 
 private:
     friend class OnlineFileRequest;
