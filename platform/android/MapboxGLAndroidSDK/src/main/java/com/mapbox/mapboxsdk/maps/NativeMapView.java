@@ -42,7 +42,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 // Class that wraps the native methods for convenience
 final class NativeMapView {
@@ -76,8 +75,6 @@ final class NativeMapView {
 
   // Listener invoked to return a bitmap of the map
   private MapboxMap.SnapshotReadyCallback snapshotReadyCallback;
-
-  private final CopyOnWriteArrayList<MapView.OnMapChangedListener> onMapChangedListeners = new CopyOnWriteArrayList<>();
 
   static {
     LibraryLoader.load();
@@ -133,7 +130,6 @@ final class NativeMapView {
 
   public void destroy() {
     destroyed = true;
-    onMapChangedListeners.clear();
     viewCallback = null;
     nativeDestroy();
   }
@@ -911,99 +907,63 @@ final class NativeMapView {
   //
 
   @Keep
-  protected void onMapChanged(int rawChange) {
-    for (MapView.OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
-      try {
-        onMapChangedListener.onMapChanged(rawChange);
-      } catch (RuntimeException err) {
-        Logger.e(TAG, "Exception in MapView.OnMapChangedListener", err);
-        MapStrictMode.strictModeViolation(err);
-      }
-    }
-  }
-
-  @Keep
   private void onCameraWillChange(boolean animated) {
     stateCallback.onCameraWillChange(animated);
-    // deprecated API
-    onMapChanged(animated ? MapView.REGION_WILL_CHANGE_ANIMATED : MapView.REGION_WILL_CHANGE);
   }
 
   @Keep
   private void onCameraIsChanging() {
     stateCallback.onCameraIsChanging();
-    // deprecated API
-    onMapChanged(MapView.REGION_IS_CHANGING);
   }
 
   @Keep
   private void onCameraDidChange(boolean animated) {
     stateCallback.onCameraDidChange(animated);
-    // deprecated API
-    onMapChanged(animated ? MapView.REGION_DID_CHANGE_ANIMATED : MapView.REGION_DID_CHANGE);
   }
 
   @Keep
   private void onWillStartLoadingMap() {
     stateCallback.onWillStartLoadingMap();
-    // deprecated API
-    onMapChanged(MapView.WILL_START_LOADING_MAP);
   }
 
   @Keep
   private void onDidFinishLoadingMap() {
     stateCallback.onDidFinishLoadingMap();
-    // deprecated API
-    onMapChanged(MapView.DID_FINISH_LOADING_MAP);
   }
 
   @Keep
   private void onDidFailLoadingMap(String error) {
     stateCallback.onDidFailLoadingMap(error);
-    // deprecated API
-    onMapChanged(MapView.DID_FAIL_LOADING_MAP);
   }
 
   @Keep
   private void onWillStartRenderingFrame() {
     stateCallback.onWillStartRenderingFrame();
-    // deprecated API
-    onMapChanged(MapView.WILL_START_RENDERING_FRAME);
   }
 
   @Keep
   private void onDidFinishRenderingFrame(boolean fully) {
     stateCallback.onDidFinishRenderingFrame(fully);
-    // deprecated API
-    onMapChanged(fully ? MapView.DID_FINISH_RENDERING_FRAME_FULLY_RENDERED : MapView.DID_FINISH_RENDERING_FRAME);
   }
 
   @Keep
   private void onWillStartRenderingMap() {
     stateCallback.onWillStartRenderingMap();
-    // deprecated API
-    onMapChanged(MapView.WILL_START_RENDERING_MAP);
   }
 
   @Keep
   private void onDidFinishRenderingMap(boolean fully) {
     stateCallback.onDidFinishRenderingMap(fully);
-    // deprecated API
-    onMapChanged(fully ? MapView.DID_FINISH_RENDERING_MAP_FULLY_RENDERED : MapView.DID_FINISH_RENDERING_MAP);
   }
 
   @Keep
   private void onDidFinishLoadingStyle() {
     stateCallback.onDidFinishLoadingStyle();
-    // deprecated API
-    onMapChanged(MapView.DID_FINISH_LOADING_STYLE);
   }
 
   @Keep
   private void onSourceChanged(String sourceId) {
     stateCallback.onSourceChanged(sourceId);
-    // deprecated API
-    onMapChanged(MapView.SOURCE_DID_CHANGE);
   }
 
   @Keep
@@ -1304,27 +1264,6 @@ final class NativeMapView {
       return 0;
     }
     return viewCallback.getHeight();
-  }
-
-  //
-  // MapChangeEvents
-  //
-
-  /**
-   * @deprecated use {@link StateCallback} instead
-   */
-  @Deprecated
-  void addOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
-    onMapChangedListeners.add(listener);
-  }
-
-  /**
-   * @deprecated use {@link StateCallback} instead
-   */
-  void removeOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
-    if (onMapChangedListeners.contains(listener)) {
-      onMapChangedListeners.remove(listener);
-    }
   }
 
   //

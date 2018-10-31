@@ -34,7 +34,7 @@ public class AnnotationManagerTest {
     Polygons polygons = new PolygonContainer(aNativeMapView, annotationsArray);
     Polylines polylines = new PolylineContainer(aNativeMapView, annotationsArray);
     ShapeAnnotations shapeAnnotations = new ShapeAnnotationContainer(aNativeMapView, annotationsArray);
-    AnnotationManager annotationManager = new AnnotationManager(aNativeMapView, aMapView, annotationsArray,
+    AnnotationManager annotationManager = new AnnotationManager(aMapView, annotationsArray,
       aMarkerViewManager, aIconManager, annotations, markers, polygons, polylines, shapeAnnotations);
     Marker aMarker = mock(Marker.class);
     long aId = 5L;
@@ -61,7 +61,7 @@ public class AnnotationManagerTest {
     Polygons polygons = new PolygonContainer(aNativeMapView, annotationsArray);
     Polylines polylines = new PolylineContainer(aNativeMapView, annotationsArray);
     ShapeAnnotations shapeAnnotations = new ShapeAnnotationContainer(aNativeMapView, annotationsArray);
-    AnnotationManager annotationManager = new AnnotationManager(aNativeMapView, aMapView, annotationsArray,
+    AnnotationManager annotationManager = new AnnotationManager(aMapView, annotationsArray,
       aMarkerViewManager, aIconManager, annotations, markers, polygons, polylines, shapeAnnotations);
     long firstId = 1L;
     long secondId = 2L;
