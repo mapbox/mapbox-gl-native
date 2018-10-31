@@ -517,6 +517,15 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(LowHighPriorityRequestsMany)) {
     loop.run();
 }
 
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(MaximumConcurrentRequests)) {
+    util::RunLoop loop;
+    OnlineFileSource fs;
+
+    ASSERT_EQ(fs.getMaximumConcurrentRequests(), 20u);
+
+    fs.setMaximumConcurrentRequests(10);
+    ASSERT_EQ(fs.getMaximumConcurrentRequests(), 10u);
+}
 TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RequestSameUrlMultipleTimes)) {
     util::RunLoop loop;
     OnlineFileSource fs;
