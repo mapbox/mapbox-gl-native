@@ -18,9 +18,6 @@ public class ModuleProviderImpl implements ModuleProvider {
   @Override
   @Nullable
   public TelemetryDefinition obtainTelemetry() {
-    // TODO remove singleton with next major release,
-    // this is needed to make static methods on TelemetryImpl
-    // backwards compatible without breaking semver
-    return TelemetryImpl.getInstance();
+    return new TelemetryImpl();
   }
 }

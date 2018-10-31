@@ -1792,29 +1792,6 @@ public final class MapboxMap {
   //
 
   /**
-   * Sets a callback that's invoked on every change in camera position.
-   *
-   * @param listener The callback that's invoked on every camera change position.
-   *                 To unset the callback, use null.
-   */
-  @Deprecated
-  public void setOnCameraChangeListener(@Nullable OnCameraChangeListener listener) {
-    transform.setOnCameraChangeListener(listener);
-  }
-
-  /**
-   * Sets a callback that is invoked when camera movement has ended.
-   *
-   * @param listener the listener to notify
-   * @deprecated use {@link #addOnCameraIdleListener(OnCameraIdleListener)}
-   * and {@link #removeOnCameraIdleListener(OnCameraIdleListener)} instead
-   */
-  @Deprecated
-  public void setOnCameraIdleListener(@Nullable OnCameraIdleListener listener) {
-    cameraChangeDispatcher.setOnCameraIdleListener(listener);
-  }
-
-  /**
    * Adds a callback that is invoked when camera movement has ended.
    *
    * @param listener the listener to notify
@@ -1830,18 +1807,6 @@ public final class MapboxMap {
    */
   public void removeOnCameraIdleListener(@NonNull OnCameraIdleListener listener) {
     cameraChangeDispatcher.removeOnCameraIdleListener(listener);
-  }
-
-  /**
-   * Sets a callback that is invoked when camera movement was cancelled.
-   *
-   * @param listener the listener to notify
-   * @deprecated use {@link #addOnCameraMoveCancelListener(OnCameraMoveCanceledListener)} and
-   * {@link #removeOnCameraMoveCancelListener(OnCameraMoveCanceledListener)} instead
-   */
-  @Deprecated
-  public void setOnCameraMoveCancelListener(@Nullable OnCameraMoveCanceledListener listener) {
-    cameraChangeDispatcher.setOnCameraMoveCanceledListener(listener);
   }
 
   /**
@@ -1863,18 +1828,6 @@ public final class MapboxMap {
   }
 
   /**
-   * Sets a callback that is invoked when camera movement has started.
-   *
-   * @param listener the listener to notify
-   * @deprecated use {@link #addOnCameraMoveStartedListener(OnCameraMoveStartedListener)} and
-   * {@link #removeOnCameraMoveStartedListener(OnCameraMoveStartedListener)} instead
-   */
-  @Deprecated
-  public void setOnCameraMoveStartedListener(@Nullable OnCameraMoveStartedListener listener) {
-    cameraChangeDispatcher.setOnCameraMoveStartedListener(listener);
-  }
-
-  /**
    * Adds a callback that is invoked when camera movement has started.
    *
    * @param listener the listener to notify
@@ -1890,18 +1843,6 @@ public final class MapboxMap {
    */
   public void removeOnCameraMoveStartedListener(@NonNull OnCameraMoveStartedListener listener) {
     cameraChangeDispatcher.removeOnCameraMoveStartedListener(listener);
-  }
-
-  /**
-   * Sets a callback that is invoked when camera position changes.
-   *
-   * @param listener the listener to notify
-   * @deprecated use {@link #addOnCameraMoveListener(OnCameraMoveListener)} and
-   * {@link #removeOnCameraMoveListener(OnCameraMoveListener)}instead
-   */
-  @Deprecated
-  public void setOnCameraMoveListener(@Nullable OnCameraMoveListener listener) {
-    cameraChangeDispatcher.setOnCameraMoveListener(listener);
   }
 
   /**
@@ -1937,48 +1878,6 @@ public final class MapboxMap {
   @Nullable
   OnFpsChangedListener getOnFpsChangedListener() {
     return onFpsChangedListener;
-  }
-
-  /**
-   * Sets a callback that's invoked when the map is scrolled.
-   *
-   * @param listener The callback that's invoked when the map is scrolled.
-   *                 To unset the callback, use null.
-   * @deprecated Use {@link #addOnScrollListener(OnScrollListener)} instead.
-   */
-  @Deprecated
-  public void setOnScrollListener(@Nullable OnScrollListener listener) {
-    onGesturesManagerInteractionListener.onSetScrollListener(listener);
-  }
-
-  /**
-   * Adds a callback that's invoked when the map is scrolled.
-   *
-   * @param listener The callback that's invoked when the map is scrolled.
-   */
-  public void addOnScrollListener(@NonNull OnScrollListener listener) {
-    onGesturesManagerInteractionListener.onAddScrollListener(listener);
-  }
-
-  /**
-   * Removes a callback that's invoked when the map is scrolled.
-   *
-   * @param listener The callback that's invoked when the map is scrolled.
-   */
-  public void removeOnScrollListener(@NonNull OnScrollListener listener) {
-    onGesturesManagerInteractionListener.onRemoveScrollListener(listener);
-  }
-
-  /**
-   * Sets a callback that's invoked when the map is flinged.
-   *
-   * @param listener The callback that's invoked when the map is flinged.
-   *                 To unset the callback, use null.
-   * @deprecated Use {@link #addOnFlingListener(OnFlingListener)} instead.
-   */
-  @Deprecated
-  public void setOnFlingListener(@Nullable OnFlingListener listener) {
-    onGesturesManagerInteractionListener.onSetFlingListener(listener);
   }
 
   /**
@@ -2107,18 +2006,6 @@ public final class MapboxMap {
   }
 
   /**
-   * Sets a callback that's invoked when the user clicks on the map view.
-   *
-   * @param listener The callback that's invoked when the user clicks on the map view.
-   *                 To unset the callback, use null.
-   * @deprecated Use {@link #addOnMapClickListener(OnMapClickListener)} instead.
-   */
-  @Deprecated
-  public void setOnMapClickListener(@Nullable OnMapClickListener listener) {
-    onGesturesManagerInteractionListener.onSetMapClickListener(listener);
-  }
-
-  /**
    * Adds a callback that's invoked when the user clicks on the map view.
    *
    * @param listener The callback that's invoked when the user clicks on the map view.
@@ -2134,18 +2021,6 @@ public final class MapboxMap {
    */
   public void removeOnMapClickListener(@NonNull OnMapClickListener listener) {
     onGesturesManagerInteractionListener.onRemoveMapClickListener(listener);
-  }
-
-  /**
-   * Sets a callback that's invoked when the user long clicks on the map view.
-   *
-   * @param listener The callback that's invoked when the user long clicks on the map view.
-   *                 To unset the callback, use null.
-   * @deprecated Use {@link #addOnMapLongClickListener(OnMapLongClickListener)} instead.
-   */
-  @Deprecated
-  public void setOnMapLongClickListener(@Nullable OnMapLongClickListener listener) {
-    onGesturesManagerInteractionListener.onSetMapLongClickListener(listener);
   }
 
   /**
@@ -2325,27 +2200,13 @@ public final class MapboxMap {
   /**
    * Interface definition for a callback to be invoked when the map is flinged.
    *
-   * @see MapboxMap#setOnFlingListener(OnFlingListener)
+   * @see MapboxMap#addOnFlingListener(OnFlingListener)
    */
   public interface OnFlingListener {
     /**
      * Called when the map is flinged.
      */
     void onFling();
-  }
-
-  /**
-   * Interface definition for a callback to be invoked when the map is scrolled.
-   *
-   * @see MapboxMap#setOnScrollListener(OnScrollListener)
-   * @deprecated Use {@link OnMoveListener} instead.
-   */
-  @Deprecated
-  public interface OnScrollListener {
-    /**
-     * Called when the map is scrolled.
-     */
-    void onScroll();
   }
 
   /**
@@ -2398,25 +2259,6 @@ public final class MapboxMap {
     void onShove(@NonNull ShoveGestureDetector detector);
 
     void onShoveEnd(@NonNull ShoveGestureDetector detector);
-  }
-
-  /**
-   * Interface definition for a callback to be invoked when the camera changes position.
-   *
-   * @deprecated Replaced by {@link MapboxMap.OnCameraMoveStartedListener}, {@link MapboxMap.OnCameraMoveListener} and
-   * {@link MapboxMap.OnCameraIdleListener}. The order in which the deprecated onCameraChange method will be called in
-   * relation to the methods in the new camera change listeners is undefined.
-   */
-  @Deprecated
-  public interface OnCameraChangeListener {
-    /**
-     * Called after the camera position has changed. During an animation,
-     * this listener may not be notified of intermediate camera positions.
-     * It is always called for the final position in the animation.
-     *
-     * @param position The CameraPosition at the end of the last camera change.
-     */
-    void onCameraChange(CameraPosition position);
   }
 
   /**
@@ -2503,25 +2345,14 @@ public final class MapboxMap {
    * related to touch and click events.
    */
   interface OnGesturesManagerInteractionListener {
-    void onSetMapClickListener(OnMapClickListener listener);
 
     void onAddMapClickListener(OnMapClickListener listener);
 
     void onRemoveMapClickListener(OnMapClickListener listener);
 
-    void onSetMapLongClickListener(OnMapLongClickListener listener);
-
     void onAddMapLongClickListener(OnMapLongClickListener listener);
 
     void onRemoveMapLongClickListener(OnMapLongClickListener listener);
-
-    void onSetScrollListener(OnScrollListener listener);
-
-    void onAddScrollListener(OnScrollListener listener);
-
-    void onRemoveScrollListener(OnScrollListener listener);
-
-    void onSetFlingListener(OnFlingListener listener);
 
     void onAddFlingListener(OnFlingListener listener);
 
@@ -2554,7 +2385,7 @@ public final class MapboxMap {
   /**
    * Interface definition for a callback to be invoked when the user clicks on the map view.
    *
-   * @see MapboxMap#setOnMapClickListener(OnMapClickListener)
+   * @see MapboxMap#addOnMapClickListener(OnMapClickListener)
    */
   public interface OnMapClickListener {
     /**
@@ -2570,7 +2401,7 @@ public final class MapboxMap {
   /**
    * Interface definition for a callback to be invoked when the user long clicks on the map view.
    *
-   * @see MapboxMap#setOnMapLongClickListener(OnMapLongClickListener)
+   * @see MapboxMap#addOnMapLongClickListener(OnMapLongClickListener)
    */
   public interface OnMapLongClickListener {
     /**

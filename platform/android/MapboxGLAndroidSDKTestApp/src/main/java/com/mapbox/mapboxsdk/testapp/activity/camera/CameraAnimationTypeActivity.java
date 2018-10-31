@@ -50,6 +50,15 @@ public class CameraAnimationTypeActivity extends AppCompatActivity implements On
   private MapView mapView;
   private boolean cameraState;
 
+  private MapboxMap.OnCameraIdleListener cameraIdleListener = new MapboxMap.OnCameraIdleListener() {
+    @Override
+    public void onCameraIdle() {
+      if (mapboxMap != null) {
+        Timber.w(mapboxMap.getCameraPosition().toString());
+      }
+    }
+  };
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -66,7 +75,7 @@ public class CameraAnimationTypeActivity extends AppCompatActivity implements On
     mapboxMap = map;
     mapboxMap.getUiSettings().setAttributionEnabled(false);
     mapboxMap.getUiSettings().setLogoEnabled(false);
-    mapboxMap.setOnCameraChangeListener(position -> Timber.w(position.toString()));
+    mapboxMap.addOnCameraIdleListener(cameraIdleListener);
 
     // handle move button clicks
     View moveButton = findViewById(R.id.cameraMoveButton);
@@ -149,6 +158,9 @@ public class CameraAnimationTypeActivity extends AppCompatActivity implements On
   @Override
   protected void onDestroy() {
     super.onDestroy();
+    if (mapboxMap != null) {
+      mapboxMap.removeOnCameraIdleListener(cameraIdleListener);
+    }
     mapView.onDestroy();
   }
 
