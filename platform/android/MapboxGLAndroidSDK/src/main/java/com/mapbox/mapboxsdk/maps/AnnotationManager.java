@@ -60,7 +60,7 @@ class AnnotationManager {
   private Polygons polygons;
   private Polylines polylines;
 
-  AnnotationManager(NativeMapView view, MapView mapView, LongSparseArray<Annotation> annotationsArray,
+  AnnotationManager(MapView mapView, LongSparseArray<Annotation> annotationsArray,
                     MarkerViewManager markerViewManager, IconManager iconManager, Annotations annotations,
                     Markers markers, Polygons polygons, Polylines polylines, ShapeAnnotations shapeAnnotations) {
     this.mapView = mapView;
@@ -72,9 +72,9 @@ class AnnotationManager {
     this.polygons = polygons;
     this.polylines = polylines;
     this.shapeAnnotations = shapeAnnotations;
-    if (view != null) {
+    if (mapView != null) {
       // null checking needed for unit tests
-      view.addOnMapChangedListener(markerViewManager);
+      mapView.addOnDidFinishRenderingFrameListener(markerViewManager);
     }
   }
 

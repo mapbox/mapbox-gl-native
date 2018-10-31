@@ -73,6 +73,7 @@ public final class MapboxMap {
   private final Transform transform;
   private final AnnotationManager annotationManager;
   private final CameraChangeDispatcher cameraChangeDispatcher;
+  private final MapChangeReceiver mapChangeReceiver;
 
   private final OnGesturesManagerInteractionListener onGesturesManagerInteractionListener;
 
@@ -81,7 +82,7 @@ public final class MapboxMap {
 
   MapboxMap(NativeMapView map, Transform transform, UiSettings ui, Projection projection,
             OnGesturesManagerInteractionListener listener, AnnotationManager annotations,
-            CameraChangeDispatcher cameraChangeDispatcher) {
+            CameraChangeDispatcher cameraChangeDispatcher, MapChangeReceiver mapChangeReceiver) {
     this.nativeMapView = map;
     this.uiSettings = ui;
     this.projection = projection;
@@ -89,6 +90,7 @@ public final class MapboxMap {
     this.transform = transform;
     this.onGesturesManagerInteractionListener = listener;
     this.cameraChangeDispatcher = cameraChangeDispatcher;
+    this.mapChangeReceiver = mapChangeReceiver;
   }
 
   void initialise(@NonNull Context context, @NonNull MapboxMapOptions options) {
@@ -961,12 +963,12 @@ public final class MapboxMap {
    * </ul>
    * <p>
    * This method is asynchronous and will return before the style finishes loading.
-   * If you wish to wait for the map to finish loading, listen for the {@link MapView#DID_FINISH_LOADING_MAP} event
-   * or use the {@link #setStyleUrl(String, OnStyleLoadedListener)} method instead.
+   * If you wish to wait for the map to finish loading, listen to the {@link MapView.OnDidFinishLoadingStyleListener}
+   * callback or use the {@link #setStyleUrl(String, OnStyleLoadedListener)} method instead.
    * </p>
    * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
-   * emitted.
+   * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
+   * will be triggered.
    *
    * @param url The URL of the map style
    * @see Style
@@ -995,8 +997,8 @@ public final class MapboxMap {
    * </ul>
    * <p>
    * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
-   * emitted.
+   * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
+   * will be triggered.
    * <p>
    *
    * @param url      The URL of the map style
@@ -1005,13 +1007,11 @@ public final class MapboxMap {
    */
   public void setStyleUrl(@NonNull final String url, @Nullable final OnStyleLoadedListener callback) {
     if (callback != null) {
-      nativeMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
+      mapChangeReceiver.addOnDidFinishLoadingStyleListener(new MapView.OnDidFinishLoadingStyleListener() {
         @Override
-        public void onMapChanged(@MapView.MapChange int change) {
-          if (change == MapView.DID_FINISH_LOADING_STYLE) {
-            callback.onStyleLoaded(url);
-            nativeMapView.removeOnMapChangedListener(this);
-          }
+        public void onDidFinishLoadingStyle() {
+          callback.onStyleLoaded(url);
+          mapChangeReceiver.removeOnDidFinishLoadingStyleListener(this);
         }
       });
     }
@@ -1024,12 +1024,12 @@ public final class MapboxMap {
    * </p>
    * <p>
    * This method is asynchronous and will return before the style finishes loading.
-   * If you wish to wait for the map to finish loading, listen for the {@link MapView#DID_FINISH_LOADING_MAP} event
-   * or use the {@link #setStyle(String, OnStyleLoadedListener)} method instead.
+   * If you wish to wait for the map to finish loading, listen to the {@link MapView.OnDidFinishLoadingStyleListener}
+   * callback or use the {@link #setStyle(String, OnStyleLoadedListener)} method instead.
    * </p>
    * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
-   * sent.
+   * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
+   * will be triggered.
    *
    * @param style The bundled style.
    * @see Style
@@ -1043,8 +1043,8 @@ public final class MapboxMap {
    * Loads a new map style from the specified bundled style.
    * </p>
    * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
-   * sent.
+   * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
+   * will be triggered.
    *
    * @param style    The bundled style.
    * @param callback The callback to be invoked when the style has finished loading
@@ -1080,8 +1080,8 @@ public final class MapboxMap {
    * Loads a new map style from a json string.
    * <p>
    * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
-   * sent.
+   * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
+   * will be triggered.
    * </p>
    */
   public void setStyleJson(@NonNull String styleJson) {

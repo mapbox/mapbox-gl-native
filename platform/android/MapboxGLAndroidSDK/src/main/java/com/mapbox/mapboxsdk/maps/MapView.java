@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.annotation.Nullable;
-import android.support.annotation.IntDef;
 import android.support.annotation.CallSuper;
 import android.support.v4.util.LongSparseArray;
 import android.util.AttributeSet;
@@ -43,12 +42,9 @@ import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
@@ -69,7 +65,6 @@ import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
  */
 public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
-  private final CopyOnWriteArrayList<OnMapChangedListener> onMapChangedListeners = new CopyOnWriteArrayList<>();
   private final MapChangeReceiver mapChangeReceiver = new MapChangeReceiver();
   private final MapCallback mapCallback = new MapCallback();
   private final InitialRenderCallback initialRenderCallback = new InitialRenderCallback();
@@ -129,9 +124,9 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
     // inflate view
     View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
-    compassView = (CompassView) view.findViewById(R.id.compassView);
-    attrView = (ImageView) view.findViewById(R.id.attributionView);
-    logoView = (ImageView) view.findViewById(R.id.logoView);
+    compassView = view.findViewById(R.id.compassView);
+    attrView = view.findViewById(R.id.attributionView);
+    logoView = view.findViewById(R.id.logoView);
 
     // add accessibility support
     setContentDescription(context.getString(R.string.mapbox_mapActionDescription));
@@ -163,14 +158,14 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     Polygons polygons = new PolygonContainer(nativeMapView, annotationsArray);
     Polylines polylines = new PolylineContainer(nativeMapView, annotationsArray);
     ShapeAnnotations shapeAnnotations = new ShapeAnnotationContainer(nativeMapView, annotationsArray);
-    AnnotationManager annotationManager = new AnnotationManager(nativeMapView, this, annotationsArray,
+    AnnotationManager annotationManager = new AnnotationManager(this, annotationsArray,
       markerViewManager, iconManager, annotations, markers, polygons, polylines, shapeAnnotations);
-    Transform transform = new Transform(nativeMapView, annotationManager.getMarkerViewManager(),
+    Transform transform = new Transform(this, nativeMapView, annotationManager.getMarkerViewManager(),
       cameraChangeDispatcher);
 
     // MapboxMap
     mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, proj, registerTouchListener,
-      annotationManager, cameraChangeDispatcher);
+      annotationManager, cameraChangeDispatcher, mapChangeReceiver);
 
     // user input
     mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings,
@@ -402,7 +397,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   public void onDestroy() {
     destroyed = true;
     mapChangeReceiver.clear();
-    onMapChangedListeners.clear();
     mapCallback.onDestroy();
     initialRenderCallback.onDestroy();
 
@@ -501,10 +495,11 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    * </ul>
    * <p>
    * This method is asynchronous and will return immediately before the style finishes loading.
-   * If you wish to wait for the map to finish loading listen for the {@link MapView#DID_FINISH_LOADING_MAP} event.
+   * If you wish to wait for the map to finish loading listen to {@link OnDidFinishLoadingStyleListener} callback.
    * </p>
    * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be sent.
+   * An error message will be logged in the Android logcat and provided to the {@link OnDidFailLoadingMapListener}
+   * callback.
    *
    * @param url The URL of the map style
    * @see Style
@@ -950,35 +945,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   /**
-   * <p>
-   * Add a callback that's invoked when the displayed map view changes.
-   * </p>
-   * To remove the callback, use {@link MapView#removeOnMapChangedListener(OnMapChangedListener)}.
-   *
-   * @param listener The callback that's invoked on every frame rendered to the map view.
-   * @see MapView#removeOnMapChangedListener(OnMapChangedListener)
-   * @deprecated use specific map change callbacks instead
-   */
-  @Deprecated
-  public void addOnMapChangedListener(@NonNull OnMapChangedListener listener) {
-    onMapChangedListeners.add(listener);
-  }
-
-  /**
-   * Remove a callback added with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}
-   *
-   * @param listener The previously added callback to remove.
-   * @see MapView#addOnMapChangedListener(OnMapChangedListener)
-   * @deprecated use specific map change callbacks instead
-   */
-  @Deprecated
-  public void removeOnMapChangedListener(@NonNull OnMapChangedListener listener) {
-    if (onMapChangedListeners.contains(listener)) {
-      onMapChangedListeners.remove(listener);
-    }
-  }
-
-  /**
    * Sets a callback object which will be triggered when the {@link MapboxMap} instance is ready to be used.
    *
    * @param callback The callback object that will be triggered when the map is ready to be used.
@@ -1002,247 +968,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   void setMapboxMap(MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
-  }
-
-  /**
-   * Definition of a map change event.
-   *
-   * @see MapView.OnMapChangedListener#onMapChanged(int)
-   */
-  @IntDef( {REGION_WILL_CHANGE,
-    REGION_WILL_CHANGE_ANIMATED,
-    REGION_IS_CHANGING,
-    REGION_DID_CHANGE,
-    REGION_DID_CHANGE_ANIMATED,
-    WILL_START_LOADING_MAP,
-    DID_FINISH_LOADING_MAP,
-    DID_FAIL_LOADING_MAP,
-    WILL_START_RENDERING_FRAME,
-    DID_FINISH_RENDERING_FRAME,
-    DID_FINISH_RENDERING_FRAME_FULLY_RENDERED,
-    WILL_START_RENDERING_MAP,
-    DID_FINISH_RENDERING_MAP,
-    DID_FINISH_RENDERING_MAP_FULLY_RENDERED,
-    DID_FINISH_LOADING_STYLE,
-    SOURCE_DID_CHANGE
-  })
-  @Retention(RetentionPolicy.SOURCE)
-  public @interface MapChange {
-  }
-
-  /**
-   * This event is triggered whenever the currently displayed map region is about to changing
-   * without an animation.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int REGION_WILL_CHANGE = 0;
-
-  /**
-   * This event is triggered whenever the currently displayed map region is about to changing
-   * with an animation.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int REGION_WILL_CHANGE_ANIMATED = 1;
-
-  /**
-   * This event is triggered whenever the currently displayed map region is changing.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int REGION_IS_CHANGING = 2;
-
-  /**
-   * This event is triggered whenever the currently displayed map region finished changing
-   * without an animation.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int REGION_DID_CHANGE = 3;
-
-  /**
-   * This event is triggered whenever the currently displayed map region finished changing
-   * with an animation.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int REGION_DID_CHANGE_ANIMATED = 4;
-
-  /**
-   * This event is triggered when the map is about to start loading a new map style.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int WILL_START_LOADING_MAP = 5;
-
-  /**
-   * This  is triggered when the map has successfully loaded a new map style.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int DID_FINISH_LOADING_MAP = 6;
-
-  /**
-   * This event is triggered when the map has failed to load a new map style.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int DID_FAIL_LOADING_MAP = 7;
-
-  /**
-   * This event is triggered when the map will start rendering a frame.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int WILL_START_RENDERING_FRAME = 8;
-
-  /**
-   * This event is triggered when the map finished rendering a frame.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int DID_FINISH_RENDERING_FRAME = 9;
-
-  /**
-   * This event is triggered when the map finished rendering the frame fully.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int DID_FINISH_RENDERING_FRAME_FULLY_RENDERED = 10;
-
-  /**
-   * This event is triggered when the map will start rendering the map.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int WILL_START_RENDERING_MAP = 11;
-
-  /**
-   * This event is triggered when the map finished rendering the map.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int DID_FINISH_RENDERING_MAP = 12;
-
-  /**
-   * This event is triggered when the map is fully rendered.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int DID_FINISH_RENDERING_MAP_FULLY_RENDERED = 13;
-
-  /**
-   * This {@link MapChange} is triggered when a style has finished loading.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int DID_FINISH_LOADING_STYLE = 14;
-
-  /**
-   * This {@link MapChange} is triggered when a source changes.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapChange
-   * @see MapView.OnMapChangedListener
-   */
-  public static final int SOURCE_DID_CHANGE = 15;
-
-  /**
-   * Interface definition for a callback to be invoked when the displayed map view changes.
-   * <p>
-   * Register to {@link MapChange} events with {@link MapView#addOnMapChangedListener(OnMapChangedListener)}.
-   * </p>
-   *
-   * @see MapView#addOnMapChangedListener(OnMapChangedListener)
-   * @see MapView.MapChange
-   * @deprecated use specific map change callbacks instead
-   */
-  @Deprecated
-  public interface OnMapChangedListener {
-    /**
-     * Called when the displayed map view changes.
-     *
-     * @param change Type of map change event, one of {@link #REGION_WILL_CHANGE},
-     *               {@link #REGION_WILL_CHANGE_ANIMATED},
-     *               {@link #REGION_IS_CHANGING},
-     *               {@link #REGION_DID_CHANGE},
-     *               {@link #REGION_DID_CHANGE_ANIMATED},
-     *               {@link #WILL_START_LOADING_MAP},
-     *               {@link #DID_FAIL_LOADING_MAP},
-     *               {@link #DID_FINISH_LOADING_MAP},
-     *               {@link #WILL_START_RENDERING_FRAME},
-     *               {@link #DID_FINISH_RENDERING_FRAME},
-     *               {@link #DID_FINISH_RENDERING_FRAME_FULLY_RENDERED},
-     *               {@link #WILL_START_RENDERING_MAP},
-     *               {@link #DID_FINISH_RENDERING_MAP},
-     *               {@link #DID_FINISH_RENDERING_MAP_FULLY_RENDERED}.
-     *               {@link #DID_FINISH_LOADING_STYLE},
-     *               {@link #SOURCE_DID_CHANGE}.
-     */
-    void onMapChanged(@MapChange int change);
   }
 
   private class FocalPointInvalidator implements FocalPointChangeListener {
@@ -1507,7 +1232,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
         mapboxMap.onUpdateRegionChange();
       }
     }
-
 
     @Override
     public void onCameraIsChanging() {
