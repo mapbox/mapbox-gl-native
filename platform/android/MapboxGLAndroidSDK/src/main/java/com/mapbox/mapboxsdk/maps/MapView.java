@@ -6,22 +6,21 @@ import android.graphics.PointF;
 import android.graphics.drawable.ColorDrawable;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.support.annotation.CallSuper;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+import android.support.annotation.Nullable;
+import android.support.annotation.IntDef;
+import android.support.annotation.CallSuper;
 import android.support.v4.util.LongSparseArray;
 import android.util.AttributeSet;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -38,21 +37,18 @@ import com.mapbox.mapboxsdk.maps.renderer.glsurfaceview.GLSurfaceViewMapRenderer
 import com.mapbox.mapboxsdk.maps.renderer.textureview.TextureViewMapRenderer;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
-import com.mapbox.mapboxsdk.offline.OfflineGeometryRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
-import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
@@ -537,11 +533,11 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       mapboxMapOptions.camera(cameraPosition);
       mapboxMapOptions.minZoomPreference(minZoom);
       mapboxMapOptions.maxZoomPreference(maxZoom);
-      return;
+    } else {
+      mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+      mapboxMap.setMinZoomPreference(minZoom);
+      mapboxMap.setMaxZoomPreference(maxZoom);
     }
-    mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-    mapboxMap.setMinZoomPreference(minZoom);
-    mapboxMap.setMaxZoomPreference(maxZoom);
   }
 
   //

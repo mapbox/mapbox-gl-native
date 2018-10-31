@@ -717,7 +717,6 @@ public class LocationComponentOptions implements Parcelable {
    * Get the tracking animation duration multiplier.
    *
    * @return tracking animation duration multiplier
-   * @since 0.9.0
    */
   public float trackingAnimationDurationMultiplier() {
     return trackingAnimationDurationMultiplier;
@@ -1548,7 +1547,6 @@ public class LocationComponentOptions implements Parcelable {
      * Sets the tracking animation duration multiplier.
      *
      * @param trackingAnimationDurationMultiplier the tracking animation duration multiplier
-     * @since 0.9.0
      */
     public LocationComponentOptions.Builder trackingAnimationDurationMultiplier(
       float trackingAnimationDurationMultiplier) {
