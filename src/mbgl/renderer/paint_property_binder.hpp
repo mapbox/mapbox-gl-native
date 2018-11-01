@@ -641,7 +641,7 @@ public:
 private:
     Binders binders;
     IdMap idMap;
-    uint32_t binderBufferOffset;
+    size_t binderBufferOffset;
 };
 
 } // namespace mbgl

@@ -25,7 +25,7 @@ struct FeatureStateChange {
     type(type_),
     id(std::move(id_)),
     key(std::move(key_)),
-    value(value_) {}
+    value(std::move(value_)) {}
 };
 
-}
+} // namespace mbgl

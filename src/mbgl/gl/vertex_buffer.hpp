@@ -23,7 +23,7 @@ public:
     }
 
     template<class... Args>
-    void emplace(size_t startAt, Args&&... args) {
+    void emplace(std::size_t startAt, Args&&... args) {
         static_assert(sizeof...(args) == groupSize, "wrong buffer element count");
         assert(startAt < v.size());
         auto emplaceIter = v.begin() + (startAt * groupSize);
