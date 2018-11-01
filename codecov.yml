@@ -1,10 +1,2 @@
 ignore:
   - "test/"
-flags:
-  coregl:
-    paths:
-      - "/src"
-  ios:
-    paths:
-      - "platform/ios"
-      - "platform/darwin"

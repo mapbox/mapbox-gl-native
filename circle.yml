@@ -832,8 +832,10 @@ jobs:
       - run:
           name: Upload coverage results to codecov.io
           command: |
-            bash <(curl -s https://codecov.io/bash) -t $CODECOV_UPLOAD_TOKEN -F core-gl
-            ./codecov -F linux-core
+            curl -sSfL -o codecov https://codecov.io/bash
+            chmod +x codecov
+            ./codecov -c
+          # ./codecov -t $CODECOV_UPLOAD_TOKEN -F linux-core
 
 # ------------------------------------------------------------------------------
   ios-debug-template:
