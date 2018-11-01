@@ -26,9 +26,4 @@ private:
     std::shared_ptr<style::CustomLayerHost> host;
 };
 
-template <>
-inline bool RenderLayer::is<RenderCustomLayer>() const {
-    return type == style::LayerType::Custom;
-}
-
 } // namespace mbgl

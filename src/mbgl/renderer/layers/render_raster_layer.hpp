@@ -27,9 +27,4 @@ public:
     const style::RasterLayer::Impl& impl() const;
 };
 
-template <>
-inline bool RenderLayer::is<RenderRasterLayer>() const {
-    return type == style::LayerType::Raster;
-}
-
 } // namespace mbgl

@@ -44,11 +44,6 @@ private:
     void updateColorRamp();
 };
 
-template <>
-inline bool RenderLayer::is<RenderHeatmapLayer>() const {
-    return type == style::LayerType::Heatmap;
-}
-
 inline const RenderHeatmapLayer* toRenderHeatmapLayer(const RenderLayer* layer) {
     return static_cast<const RenderHeatmapLayer*>(layer);
 }

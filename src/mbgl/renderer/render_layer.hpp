@@ -47,21 +47,6 @@ public:
     // Returns instance of RenderLayerSymbolInterface if RenderLayer supports it.
     virtual const RenderLayerSymbolInterface* getSymbolInterface() const;
 
-    // Check whether this layer is of the given subtype.
-    template <class T>
-    bool is() const;
-
-    // Dynamically cast this layer to the given subtype.
-    template <class T>
-    T* as() {
-        return is<T>() ? reinterpret_cast<T*>(this) : nullptr;
-    }
-
-    template <class T>
-    const T* as() const {
-        return is<T>() ? reinterpret_cast<const T*>(this) : nullptr;
-    }
-
     const std::string& getID() const;
 
     // Checks whether this layer needs to be rendered in the given render pass.
