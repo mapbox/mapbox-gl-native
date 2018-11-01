@@ -42,21 +42,66 @@
         
         if (@available(iOS 10.0, macOS 10.12.0, *)) {
             static dispatch_once_t once;
-            static os_log_t mapbox_log;
+            static os_log_t info_log;
+            static os_log_t debug_log;
+            static os_log_t error_log;
+            static os_log_t fault_log;
             static os_log_type_t log_types[] = { OS_LOG_TYPE_DEFAULT,
                                                     OS_LOG_TYPE_INFO,
                                                     OS_LOG_TYPE_DEBUG,
                                                     OS_LOG_TYPE_ERROR,
                                                     OS_LOG_TYPE_FAULT };
             dispatch_once(&once, ^ {
-                mapbox_log = os_log_create("com.mapbox.maps", "SDK");
+                info_log = os_log_create("com.mapbox.maps", "INFO");
+                debug_log = os_log_create("com.mapbox.maps", "DEBUG");
+                error_log = os_log_create("com.mapbox.maps", "ERROR");
+                fault_log = os_log_create("com.mapbox.maps", "FAULT");
             });
+            
+            os_log_t mapbox_log;
+            switch (level) {
+                case MGLLoggingLevelInfo:
+                    mapbox_log = info_log;
+                    break;
+                case MGLLoggingLevelDebug:
+                    mapbox_log = debug_log;
+                    break;
+                case MGLLoggingLevelError:
+                    mapbox_log = error_log;
+                    break;
+                case MGLLoggingLevelFault:
+                    mapbox_log = fault_log;
+                    break;
+                case MGLLoggingLevelNone:
+                default:
+                    break;
+            }
+
             NSUInteger logTypesCount = sizeof(log_types) / sizeof(os_log_type_t);
             NSAssert(level <= logTypesCount, @"There is an attempt to log a non suported logging level.");
             os_log_type_t logType = log_types[level];
             os_log_with_type(mapbox_log, logType, "%@ - %d: %@", fileName, line, message);
         } else {
-            NSLog(@"[SDK] %@ - %lu: %@", fileName, line, message);
+            NSString *category;
+            switch (level) {
+                case MGLLoggingLevelInfo:
+                    category = @"INFO";
+                    break;
+                case MGLLoggingLevelDebug:
+                    category = @"DEBUG";
+                    break;
+                case MGLLoggingLevelError:
+                    category = @"ERROR";
+                    break;
+                case MGLLoggingLevelFault:
+                    category = @"FAULT";
+                    break;
+                case MGLLoggingLevelNone:
+                default:
+                    break;
+            }
+            
+            NSLog(@"[%@] %@ - %lu: %@", category, fileName, line, message);
         }
     };
     
