@@ -3,6 +3,7 @@
 #import "MGLShape_Private.h"
 #import "NSCoder+MGLAdditions.h"
 #import "MGLTypes.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 @implementation MGLMultiPoint
 {
@@ -61,7 +62,7 @@
 
 - (CLLocationCoordinate2D)coordinate
 {
-    NSAssert([self pointCount] > 0, @"A multipoint must have coordinates");
+    MGLAssert([self pointCount] > 0, @"A multipoint must have coordinates");
     return _coordinates.at(0);
 }
 
@@ -181,7 +182,7 @@
 
 - (mbgl::Annotation)annotationObjectWithDelegate:(__unused id <MGLMultiPointDelegate>)delegate
 {
-    NSAssert(NO, @"Cannot add an annotation from an instance of %@", NSStringFromClass([self class]));
+    MGLAssert(NO, @"Cannot add an annotation from an instance of %@", NSStringFromClass([self class]));
     return mbgl::SymbolAnnotation(mbgl::Point<double>());
 }
 

@@ -2,6 +2,7 @@
 
 #import "NSBundle+MGLAdditions.h"
 #import "NSValue+MGLAdditions.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 @implementation MGLCoordinateFormatter
 
@@ -119,7 +120,7 @@
 }
 
 - (BOOL)getObjectValue:(out id __nullable * __nullable)obj forString:(NSString *)string errorDescription:(out NSString * __nullable * __nullable)error {
-    NSAssert(NO, @"-getObjectValue:forString:errorDescription: has not been implemented");
+    MGLAssert(NO, @"-getObjectValue:forString:errorDescription: has not been implemented");
     return NO;
 }
 

@@ -373,7 +373,7 @@ public:
 - (nonnull NSURL *)styleURL
 {
     NSString *styleURLString = @(_mbglMap->getStyle().getURL().c_str()).mgl_stringOrNilIfEmpty;
-    NSAssert(styleURLString || _isTargetingInterfaceBuilder, @"Invalid style URL string %@", styleURLString);
+    MGLAssert(styleURLString || _isTargetingInterfaceBuilder, @"Invalid style URL string %@", styleURLString);
     return styleURLString ? [NSURL URLWithString:styleURLString] : nil;
 }
 
@@ -633,7 +633,7 @@ public:
     // create context
     //
     _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-    NSAssert(_context, @"Failed to create OpenGL ES context.");
+    MGLAssert(_context, @"Failed to create OpenGL ES context.");
 
     // create GL view
     //
@@ -1398,7 +1398,7 @@ public:
 
 - (void)notifyGestureDidEndWithDrift:(BOOL)drift {
     _changeDelimiterSuppressionDepth--;
-    NSAssert(_changeDelimiterSuppressionDepth >= 0,
+    MGLAssert(_changeDelimiterSuppressionDepth >= 0,
              @"Unbalanced change delimiter suppression/unsuppression");
     if (_changeDelimiterSuppressionDepth == 0) {
         _mbglMap->setGestureInProgress(false);
@@ -1779,7 +1779,7 @@ public:
         if (hitAnnotationTag != _selectedAnnotationTag)
         {
             id <MGLAnnotation> annotation = [self annotationWithTag:hitAnnotationTag];
-            NSAssert(annotation, @"Cannot select nonexistent annotation with tag %llu", hitAnnotationTag);
+            MGLAssert(annotation, @"Cannot select nonexistent annotation with tag %llu", hitAnnotationTag);
             return annotation;
         }
     }
@@ -2021,9 +2021,9 @@ public:
 {
     if ([self.delegate respondsToSelector:@selector(mapView:annotation:calloutAccessoryControlTapped:)])
     {
-        NSAssert([tap.view isKindOfClass:[UIControl class]], @"Tapped view %@ is not a UIControl", tap.view);
+        MGLAssert([tap.view isKindOfClass:[UIControl class]], @"Tapped view %@ is not a UIControl", tap.view);
         id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
-        NSAssert(selectedAnnotation, @"Selected annotation should not be nil.");
+        MGLAssert(selectedAnnotation, @"Selected annotation should not be nil.");
         [self.delegate mapView:self annotation:selectedAnnotation
             calloutAccessoryControlTapped:(UIControl *)tap.view];
     }
@@ -2039,7 +2039,7 @@ public:
     if ([self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)])
     {
         id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
-        NSAssert(selectedAnnotation, @"Selected annotation should not be nil.");
+        MGLAssert(selectedAnnotation, @"Selected annotation should not be nil.");
         [self.delegate mapView:self tapOnCalloutForAnnotation:selectedAnnotation];
     }
 }
@@ -2049,7 +2049,7 @@ public:
     if ([self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)])
     {
         id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
-        NSAssert(selectedAnnotation, @"Selected annotation should not be nil.");
+        MGLAssert(selectedAnnotation, @"Selected annotation should not be nil.");
         [self.delegate mapView:self tapOnCalloutForAnnotation:selectedAnnotation];
     }
 }
@@ -2621,7 +2621,7 @@ public:
         
         NSUInteger annotationIndex = index - visibleAnnotationRange.location;
         MGLAnnotationTag annotationTag = visibleAnnotations[annotationIndex];
-        NSAssert(annotationTag != MGLAnnotationTagNotFound, @"Can’t get accessibility element for nonexistent or invisible annotation at index %li.", (long)index);
+        MGLAssert(annotationTag != MGLAnnotationTagNotFound, @"Can’t get accessibility element for nonexistent or invisible annotation at index %li.", (long)index);
         return [self accessibilityElementForAnnotationWithTag:annotationTag];
     }
     
@@ -2666,7 +2666,7 @@ public:
         return self.attributionButton;
     }
     
-    NSAssert(NO, @"Index %ld not in recognized accessibility element ranges. "
+    MGLAssert(NO, @"Index %ld not in recognized accessibility element ranges. "
              @"User location annotation range: %@; visible annotation range: %@; "
              @"visible place feature range: %@; visible road feature range: %@.",
              (long)index, NSStringFromRange(userLocationAnnotationRange),
@@ -2682,7 +2682,7 @@ public:
  */
 - (id)accessibilityElementForAnnotationWithTag:(MGLAnnotationTag)annotationTag
 {
-    NSAssert(_annotationContextsByAnnotationTag.count(annotationTag), @"Missing annotation for tag %llu.", annotationTag);
+    MGLAssert(_annotationContextsByAnnotationTag.count(annotationTag), @"Missing annotation for tag %llu.", annotationTag);
     MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
     id <MGLAnnotation> annotation = annotationContext.annotation;
     
@@ -3748,7 +3748,7 @@ public:
             }
 
             MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
-            NSAssert(annotationContext.annotation, @"Missing annotation for tag %llu.", annotationTag);
+            MGLAssert(annotationContext.annotation, @"Missing annotation for tag %llu.", annotationTag);
             if (annotationContext.annotation)
             {
                 [annotations addObject:annotationContext.annotation];
@@ -3812,7 +3812,7 @@ public:
 
     for (id <MGLAnnotation> annotation in annotations)
     {
-        NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
+        MGLAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
 
         // adding the same annotation object twice is a no-op
         if (_annotationTagsByAnnotation.count(annotation) != 0)
@@ -3916,7 +3916,7 @@ public:
             _annotationContextsByAnnotationTag[annotationTag] = context;
 
             if ([annotation isKindOfClass:[NSObject class]]) {
-                NSAssert(![annotation isKindOfClass:[MGLMultiPoint class]], @"Point annotation should not be MGLMultiPoint.");
+                MGLAssert(![annotation isKindOfClass:[MGLMultiPoint class]], @"Point annotation should not be MGLMultiPoint.");
                 [(NSObject *)annotation addObserver:self forKeyPath:@"coordinate" options:0 context:(void *)(NSUInteger)annotationTag];
             }
         }
@@ -4108,7 +4108,7 @@ public:
 
     for (id <MGLAnnotation> annotation in annotations)
     {
-        NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
+        MGLAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
 
         MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
         if (annotationTag == MGLAnnotationTagNotFound)
@@ -4189,7 +4189,7 @@ public:
 #if DEBUG
     for (id <MGLOverlay> overlay in overlays)
     {
-        NSAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"overlay should conform to MGLOverlay");
+        MGLAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"overlay should conform to MGLOverlay");
     }
 #endif
 
@@ -4208,7 +4208,7 @@ public:
 #if DEBUG
     for (id <MGLOverlay> overlay in overlays)
     {
-        NSAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"overlay should conform to MGLOverlay");
+        MGLAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"overlay should conform to MGLOverlay");
     }
 #endif
 
@@ -4270,7 +4270,7 @@ public:
         // hit testing fails.
         auto end = std::remove_if(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag annotationTag) {
             id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
-            NSAssert(annotation, @"Unknown annotation found nearby tap");
+            MGLAssert(annotation, @"Unknown annotation found nearby tap");
             if ( ! annotation)
             {
                 return true;
@@ -4459,7 +4459,7 @@ public:
 
     id <MGLAnnotation> firstAnnotation = selectedAnnotations[0];
 
-    NSAssert([firstAnnotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
+    MGLAssert([firstAnnotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
 
     if ([firstAnnotation isKindOfClass:[MGLMultiPoint class]]) return;
 
@@ -4541,7 +4541,7 @@ public:
                 if (![providedCalloutView isKindOfClass:[UIView class]]) {
                     [NSException raise:NSInvalidArgumentException format:@"Callout view must be a kind of UIView"];
                 }
-                NSAssert([providedCalloutView conformsToProtocol:@protocol(MGLCalloutView)], @"callout view must conform to MGLCalloutView");
+                MGLAssert([providedCalloutView conformsToProtocol:@protocol(MGLCalloutView)], @"callout view must conform to MGLCalloutView");
                 calloutView = providedCalloutView;
             }
         }
@@ -5918,7 +5918,7 @@ public:
 
         // Get the annotation tag then use it to get the context.
         MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
-        NSAssert(annotationTag != MGLAnnotationTagNotFound, @"-visibleAnnotationsInRect: returned unrecognized annotation");
+        MGLAssert(annotationTag != MGLAnnotationTagNotFound, @"-visibleAnnotationsInRect: returned unrecognized annotation");
         MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
 
         MGLAnnotationView *annotationView = annotationContext.annotationView;
@@ -5958,7 +5958,7 @@ public:
         }
 
         MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
-        NSAssert(annotationTag != MGLAnnotationTagNotFound, @"-visibleAnnotationsInRect: returned unrecognized annotation");
+        MGLAssert(annotationTag != MGLAnnotationTagNotFound, @"-visibleAnnotationsInRect: returned unrecognized annotation");
         MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
         UIView *annotationView = annotationContext.annotationView;
 
@@ -6015,7 +6015,7 @@ public:
 
         CGRect positioningRect = annotationView ? annotationView.frame : [self positioningRectForCalloutForAnnotationWithTag:tag];
 
-        NSAssert( ! CGRectIsNull(positioningRect), @"Positioning rect should not be CGRectNull by this point");
+        MGLAssert( ! CGRectIsNull(positioningRect), @"Positioning rect should not be CGRectNull by this point");
 
         CGPoint centerPoint = CGPointMake(CGRectGetMidX(positioningRect), CGRectGetMinY(positioningRect));
 

@@ -380,7 +380,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
         case mbgl::style::LayerType::Custom:
             return [[MGLOpenGLStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::CustomLayer*>(rawLayer)];
         default:
-            NSAssert(NO, @"Unrecognized layer type");
+            MGLAssert(NO, @"Unrecognized layer type");
             return nil;;
     }
 }

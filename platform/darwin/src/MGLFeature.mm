@@ -13,6 +13,7 @@
 #import "NSDictionary+MGLAdditions.h"
 #import "NSArray+MGLAdditions.h"
 #import "NSExpression+MGLPrivateAdditions.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #import <mbgl/util/geometry.hpp>
 #import <mbgl/style/conversion/geojson.hpp>
@@ -288,7 +289,7 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
     featureCollection.reserve(self.shapes.count);
     for (MGLShape <MGLFeature> *feature in self.shapes) {
         auto geoJSONObject = feature.geoJSONObject;
-        NSAssert(geoJSONObject.is<mbgl::Feature>(), @"Feature collection must only contain features.");
+        MGLAssert(geoJSONObject.is<mbgl::Feature>(), @"Feature collection must only contain features.");
         featureCollection.push_back(geoJSONObject.get<mbgl::Feature>());
     }
     return featureCollection;

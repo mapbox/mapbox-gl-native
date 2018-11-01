@@ -2,6 +2,7 @@
 
 #import "MGLValueEvaluator.h"
 #import "MGLStyleValue_Private.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #include <mbgl/style/conversion/filter.hpp>
 
@@ -63,7 +64,7 @@ static NSDictionary * const MGLPredicateOperatorTypesByJSONOperator = @{
         return [NSPredicate predicateWithValue:NO];
     }
     
-    NSAssert([object isKindOfClass:[NSArray class]], @"Condition for case expression should be an expression.");
+    MGLAssert([object isKindOfClass:[NSArray class]], @"Condition for case expression should be an expression.");
     NSArray *objects = (NSArray *)object;
     NSString *op = objects.firstObject;
     

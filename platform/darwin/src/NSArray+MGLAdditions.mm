@@ -2,6 +2,7 @@
 
 #import "NSDictionary+MGLAdditions.h"
 #import "NSExpression+MGLPrivateAdditions.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 @implementation NSArray (MGLAdditions)
 
@@ -28,7 +29,7 @@
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] init];
     BOOL isSubsequentItem = NO;
     for (NSAttributedString *component in self) {
-        NSAssert([component isKindOfClass:[NSAttributedString class]], @"Items in array must be attributed strings.");
+        MGLAssert([component isKindOfClass:[NSAttributedString class]], @"Items in array must be attributed strings.");
         if (isSubsequentItem) {
             [attributedString appendAttributedString:attributedSeparator];
         }

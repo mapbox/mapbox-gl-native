@@ -15,6 +15,7 @@
 #import "NSBundle+MGLAdditions.h"
 #import "MGLStyle.h"
 #import "MGLAttributionInfo_Private.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #if TARGET_OS_IPHONE
 #import "UIImage+MGLAdditions.h"
@@ -123,7 +124,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (void)dealloc {
     if (_completion) {
-        NSAssert(_snapshotCallback, @"Snapshot in progress - there should be a valid callback");
+        MGLAssert(_snapshotCallback, @"Snapshot in progress - there should be a valid callback");
 
         [MGLMapSnapshotter completeWithErrorCode:MGLErrorCodeSnapshotFailed
                                      description:@"MGLMapSnapshotter deallocated prior to snapshot completion."
