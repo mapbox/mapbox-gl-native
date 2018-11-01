@@ -7,6 +7,7 @@
 #include <mbgl/util/version.hpp>
 
 #import <Foundation/Foundation.h>
+#import "MGLLoggingConfiguration_Private.h"
 
 #include <mutex>
 #include <chrono>
@@ -202,6 +203,7 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
 
     @autoreleasepool {
         NSURL* url = [NSURL URLWithString:@(resource.url.c_str())];
+        MGLLogDebug(@"Requesting URI: %@", url.relativePath);
         if (impl->accountType == 0 &&
             ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
             NSString* absoluteString = [url.absoluteString
@@ -231,6 +233,8 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
                 using Error = Response::Error;
 
                 if (error) {
+                    MGLLogError(@"Requesting: %@ failed with error: %@", res.URL.relativePath, error);
+                    
                     if (data) {
                         response.data =
                             std::make_shared<std::string>((const char*)[data bytes], [data length]);
@@ -262,6 +266,7 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
                     }
                 } else if ([res isKindOfClass:[NSHTTPURLResponse class]]) {
                     const long responseCode = [(NSHTTPURLResponse *)res statusCode];
+                    MGLLogDebug(@"Requesting %@ returned responseCode: %lu", res.URL.relativePath, responseCode);
 
                     NSDictionary *headers = [(NSHTTPURLResponse *)res allHeaderFields];
                     NSString *cache_control = [headers objectForKey:@"Cache-Control"];
