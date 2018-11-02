@@ -32,7 +32,7 @@
              MMEEventKeyShapeForOfflineRegion: @"shaperegion",
              MMEEventKeyMinZoomLevel: @(self.minimumZoomLevel),
              MMEEventKeyMaxZoomLevel: @(self.maximumZoomLevel),
-             MMEEventKeyStyleURL: self.styleURL
+             MMEEventKeyStyleURL: self.styleURL.absoluteString ?: [NSNull null]
              #endif
              };
 }
