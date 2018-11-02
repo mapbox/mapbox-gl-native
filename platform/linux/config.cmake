@@ -86,7 +86,6 @@ macro(mbgl_platform_core)
     target_link_libraries(mbgl-core
         PRIVATE nunicode
         PRIVATE icu
-        PUBLIC -lz
     )
 
     if(WITH_CXX11ABI)

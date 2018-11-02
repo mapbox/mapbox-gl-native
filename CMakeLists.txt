@@ -57,18 +57,6 @@ endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-if(EXISTS ${CMAKE_SOURCE_DIR}/.git/HEAD)
-    exec_program(
-        "git"
-        ${CMAKE_SOURCE_DIR}
-        ARGS "rev-parse --short=8 HEAD"
-        OUTPUT_VARIABLE MBGL_VERSION_REV )
-else()
-    set(MBGL_VERSION_REV 00000000)
-endif()
-
-set_source_files_properties(src/mbgl/util/version.cpp PROPERTIES COMPILE_DEFINITIONS MBGL_VERSION_REV="${MBGL_VERSION_REV}")
-
 include(cmake/mason-dependencies.cmake)
 
 if(WITH_COVERAGE)
@@ -167,7 +155,7 @@ if (COMMAND mbgl_filesource)
     include(cmake/filesource.cmake)
 endif()
 
-include(cmake/core.cmake)
+add_subdirectory(src)
 
 if(COMMAND mbgl_platform_test)
     include(cmake/test.cmake)

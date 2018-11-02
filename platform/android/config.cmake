@@ -52,7 +52,6 @@ macro(mbgl_platform_core)
         PUBLIC -lGLESv2
         PUBLIC -lstdc++
         PUBLIC -latomic
-        PUBLIC -lz
     )
 endmacro()
 
