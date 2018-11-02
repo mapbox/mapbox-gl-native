@@ -11,21 +11,20 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
+import junit.framework.Assert;
+
 public class OnMapReadyIdlingResource implements IdlingResource, OnMapReadyCallback {
 
   private MapboxMap mapboxMap;
   private IdlingResource.ResourceCallback resourceCallback;
-  private final Handler handler = new Handler(Looper.getMainLooper());
 
   @WorkerThread
   public OnMapReadyIdlingResource(final Activity activity) {
-    handler.post(new Runnable() {
-      @Override
-      public void run() {
-        MapView mapView = (MapView) activity.findViewById(R.id.mapView);
-        if (mapView != null) {
-          mapView.getMapAsync(OnMapReadyIdlingResource.this);
-        }
+    Handler handler = new Handler(Looper.getMainLooper());
+    handler.post(() -> {
+      MapView mapView = activity.findViewById(R.id.mapView);
+      if (mapView != null) {
+        mapView.getMapAsync(OnMapReadyIdlingResource.this);
       }
     });
   }
@@ -51,6 +50,7 @@ public class OnMapReadyIdlingResource implements IdlingResource, OnMapReadyCallb
 
   @Override
   public void onMapReady(MapboxMap mapboxMap) {
+    Assert.assertNotNull("MapboxMap should not be null", mapboxMap);
     this.mapboxMap = mapboxMap;
     if (resourceCallback != null) {
       resourceCallback.onTransitionToIdle();
