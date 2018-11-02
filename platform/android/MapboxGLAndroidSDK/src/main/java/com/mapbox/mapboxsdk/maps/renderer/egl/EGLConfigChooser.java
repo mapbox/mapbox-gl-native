@@ -67,7 +67,7 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
   }
 
   @Override
-  public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display) {
+  public EGLConfig chooseConfig(@NonNull EGL10 egl, EGLDisplay display) {
     int[] configAttribs = getConfigAttributes();
 
     // Determine number of possible configurations
@@ -90,6 +90,7 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
     return config;
   }
 
+  @NonNull
   private int[] getNumberOfConfigurations(EGL10 egl, EGLDisplay display, int[] configAttributes) {
     int[] numConfigs = new int[1];
     if (!egl.eglChooseConfig(display, configAttributes, null, 0, numConfigs)) {
@@ -101,6 +102,7 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
     return numConfigs;
   }
 
+  @NonNull
   private EGLConfig[] getPossibleConfigurations(EGL10 egl, EGLDisplay display,
                                                 int[] configAttributes, int[] numConfigs) {
     EGLConfig[] configs = new EGLConfig[numConfigs[0]];
@@ -139,7 +141,7 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
     }
   }
 
-  private EGLConfig chooseBestMatchConfig(EGL10 egl, EGLDisplay display, EGLConfig[] configs) {
+  private EGLConfig chooseBestMatchConfig(@NonNull EGL10 egl, EGLDisplay display, EGLConfig[] configs) {
     class Config implements Comparable<Config> {
       private final BufferFormat bufferFormat;
       private final DepthStencilFormat depthStencilFormat;

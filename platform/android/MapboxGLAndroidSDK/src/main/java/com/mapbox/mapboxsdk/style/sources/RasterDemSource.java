@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.style.sources;
 
 import android.support.annotation.Keep;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 
@@ -97,6 +98,7 @@ public class RasterDemSource extends Source {
   @Keep
   protected native void finalize() throws Throwable;
 
+  @NonNull
   @Keep
   protected native String nativeGetUrl();
 

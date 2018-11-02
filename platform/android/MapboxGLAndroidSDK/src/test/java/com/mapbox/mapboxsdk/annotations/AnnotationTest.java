@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.annotations;
 
+import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 import org.junit.Before;
@@ -20,6 +21,7 @@ public class AnnotationTest {
   @InjectMocks
   private MapboxMap mapboxMap = mock(MapboxMap.class);
   private Annotation annotation;
+  @NonNull
   private Annotation compare = new Annotation() {
     @Override
     public long getId() {

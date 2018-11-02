@@ -48,6 +48,7 @@ class MarkerContainer implements Markers {
     return marker;
   }
 
+  @NonNull
   @Override
   public List<Marker> addBy(@NonNull List<? extends BaseMarkerOptions> markerOptionsList, @NonNull MapboxMap
     mapboxMap) {
@@ -82,6 +83,7 @@ class MarkerContainer implements Markers {
     annotations.setValueAt(annotations.indexOfKey(updatedMarker.getId()), updatedMarker);
   }
 
+  @NonNull
   @Override
   public List<Marker> obtainAll() {
     List<Marker> markers = new ArrayList<>();
@@ -137,6 +139,7 @@ class MarkerContainer implements Markers {
     return marker;
   }
 
+  @NonNull
   @Override
   public List<MarkerView> addViewsBy(@NonNull List<? extends BaseMarkerViewOptions> markerViewOptions, @NonNull
     MapboxMap mapboxMap) {
@@ -160,6 +163,7 @@ class MarkerContainer implements Markers {
     return markers;
   }
 
+  @NonNull
   @Override
   public List<MarkerView> obtainViewsIn(@NonNull RectF rectangle) {
     float pixelRatio = nativeMapView.getPixelRatio();
@@ -210,12 +214,13 @@ class MarkerContainer implements Markers {
     return marker;
   }
 
-  private void ensureIconLoaded(Marker marker, MapboxMap mapboxMap) {
+  private void ensureIconLoaded(Marker marker, @NonNull MapboxMap mapboxMap) {
     if (!(marker instanceof MarkerView)) {
       iconManager.ensureIconLoaded(marker, mapboxMap);
     }
   }
 
+  @NonNull
   private List<Annotation> obtainAnnotations() {
     List<Annotation> annotations = new ArrayList<>();
     for (int i = 0; i < this.annotations.size(); i++) {

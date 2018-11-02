@@ -4,6 +4,8 @@ package com.mapbox.mapboxsdk.annotations;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ public final class PolygonOptions implements Parcelable {
 
   public static final Parcelable.Creator<PolygonOptions> CREATOR =
     new Parcelable.Creator<PolygonOptions>() {
-      public PolygonOptions createFromParcel(Parcel in) {
+      public PolygonOptions createFromParcel(@NonNull Parcel in) {
         return new PolygonOptions(in);
       }
 
@@ -80,6 +82,7 @@ public final class PolygonOptions implements Parcelable {
    * @param point {@link LatLng} point to be added to polygon geometry.
    * @return This {@link PolygonOptions} object with the given point added to the outline.
    */
+  @NonNull
   public PolygonOptions add(LatLng point) {
     polygon.addPoint(point);
     return this;
@@ -91,6 +94,7 @@ public final class PolygonOptions implements Parcelable {
    * @param points {@link LatLng} points to be added to polygon geometry.
    * @return This {@link PolygonOptions} object with the given points added to the outline.
    */
+  @NonNull
   public PolygonOptions add(LatLng... points) {
     for (LatLng point : points) {
       add(point);
@@ -105,6 +109,7 @@ public final class PolygonOptions implements Parcelable {
    *               geometry
    * @return This {@link PolygonOptions} object with the given points added to the outline.
    */
+  @NonNull
   public PolygonOptions addAll(Iterable<LatLng> points) {
     for (LatLng point : points) {
       add(point);
@@ -118,6 +123,7 @@ public final class PolygonOptions implements Parcelable {
    * @param hole {@link List} list made up of {@link LatLng} points defining the hole
    * @return This {@link PolygonOptions} object with the given hole added to the outline.
    */
+  @NonNull
   public PolygonOptions addHole(List<LatLng> hole) {
     polygon.addHole(hole);
     return this;
@@ -129,6 +135,7 @@ public final class PolygonOptions implements Parcelable {
    * @param holes {@link List} list made up of {@link LatLng} holes to be added to polygon geometry
    * @return This {@link PolygonOptions} object with the given holes added to the outline.
    */
+  @NonNull
   public PolygonOptions addHole(List<LatLng>... holes) {
     for (List<LatLng> hole : holes) {
       addHole(hole);
@@ -142,6 +149,7 @@ public final class PolygonOptions implements Parcelable {
    * @param holes {@link Iterable} list made up of {@link List} list of {@link LatLng} holes defining the hole geometry
    * @return This {@link PolygonOptions} object with the given holes added to the outline.
    */
+  @NonNull
   public PolygonOptions addAllHoles(Iterable<List<LatLng>> holes) {
     for (List<LatLng> hole : holes) {
       addHole(hole);
@@ -155,6 +163,7 @@ public final class PolygonOptions implements Parcelable {
    * @param alpha float value between 0 (not visible) and 1.
    * @return This {@link PolygonOptions} object with the given polygon alpha value.
    */
+  @NonNull
   public PolygonOptions alpha(float alpha) {
     polygon.setAlpha(alpha);
     return this;
@@ -175,6 +184,7 @@ public final class PolygonOptions implements Parcelable {
    * @param color 32-bit ARGB color.
    * @return This {@link PolylineOptions} object with a new color set.
    */
+  @NonNull
   public PolygonOptions fillColor(int color) {
     polygon.setFillColor(color);
     return this;
@@ -204,6 +214,7 @@ public final class PolygonOptions implements Parcelable {
    * @param color 32-bit ARGB color.
    * @return This {@link PolygonOptions} object with a new stroke color set.
    */
+  @NonNull
   public PolygonOptions strokeColor(int color) {
     polygon.setStrokeColor(color);
     return this;
@@ -247,7 +258,7 @@ public final class PolygonOptions implements Parcelable {
    * {@link PolygonOptions} object. Else, false.
    */
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) {
       return true;
     }

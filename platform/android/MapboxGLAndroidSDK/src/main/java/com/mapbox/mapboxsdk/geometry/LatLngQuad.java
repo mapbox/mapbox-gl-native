@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.geometry;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Keep;
+import android.support.annotation.NonNull;
 
 /**
  * A geographical area representing a non-aligned quadrilateral
@@ -51,7 +52,7 @@ public class LatLngQuad implements Parcelable {
 
   public static final Parcelable.Creator<LatLngQuad> CREATOR = new Parcelable.Creator<LatLngQuad>() {
     @Override
-    public LatLngQuad createFromParcel(final Parcel in) {
+    public LatLngQuad createFromParcel(@NonNull final Parcel in) {
       return readFromParcel(in);
     }
 
@@ -76,14 +77,14 @@ public class LatLngQuad implements Parcelable {
   }
 
   @Override
-  public void writeToParcel(final Parcel out, final int arg1) {
+  public void writeToParcel(@NonNull final Parcel out, final int arg1) {
     topLeft.writeToParcel(out, arg1);
     topRight.writeToParcel(out, arg1);
     bottomRight.writeToParcel(out, arg1);
     bottomLeft.writeToParcel(out, arg1);
   }
 
-  private static LatLngQuad readFromParcel(final Parcel in) {
+  private static LatLngQuad readFromParcel(@NonNull final Parcel in) {
     final LatLng topLeft = new LatLng(in);
     final LatLng topRight = new LatLng(in);
     final LatLng bottomRight = new LatLng(in);

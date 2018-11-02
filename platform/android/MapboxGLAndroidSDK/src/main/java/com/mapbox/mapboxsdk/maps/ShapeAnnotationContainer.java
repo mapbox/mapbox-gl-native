@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.RectF;
+import android.support.annotation.NonNull;
 import android.support.v4.util.LongSparseArray;
 
 import com.mapbox.mapboxsdk.annotations.Annotation;
@@ -18,13 +19,15 @@ class ShapeAnnotationContainer implements ShapeAnnotations {
     this.annotations = annotations;
   }
 
+  @NonNull
   @Override
-  public List<Annotation> obtainAllIn(RectF rectangle) {
+  public List<Annotation> obtainAllIn(@NonNull RectF rectangle) {
     RectF rect = nativeMapView.getDensityDependantRectangle(rectangle);
     long[] annotationIds = nativeMapView.queryShapeAnnotations(rect);
     return getAnnotationsFromIds(annotationIds);
   }
 
+  @NonNull
   private List<Annotation> getAnnotationsFromIds(long[] annotationIds) {
     List<Annotation> shapeAnnotations = new ArrayList<>();
     for (long annotationId : annotationIds) {

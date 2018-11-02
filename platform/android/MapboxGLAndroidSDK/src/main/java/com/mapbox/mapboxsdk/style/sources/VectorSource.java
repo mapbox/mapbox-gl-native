@@ -97,9 +97,11 @@ public class VectorSource extends Source {
   @Keep
   protected native void finalize() throws Throwable;
 
+  @NonNull
   @Keep
   protected native String nativeGetUrl();
 
+  @NonNull
   @Keep
   private native Feature[] querySourceFeatures(String[] sourceLayerId,
                                                Object[] filter);

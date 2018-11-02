@@ -62,6 +62,7 @@ public class FillLayer extends Layer {
    * @param sourceLayer the source layer to set
    * @return This
    */
+  @NonNull
   public FillLayer withSourceLayer(String sourceLayer) {
     setSourceLayer(sourceLayer);
     return this;
@@ -72,6 +73,7 @@ public class FillLayer extends Layer {
    *
    * @return id of the source
    */
+  @NonNull
   public String getSourceId() {
     checkThread();
     return nativeGetSourceId();
@@ -82,6 +84,7 @@ public class FillLayer extends Layer {
    *
    * @return sourceLayer the source layer to get
    */
+  @NonNull
   public String getSourceLayer() {
     checkThread();
     return nativeGetSourceLayer();
@@ -92,7 +95,7 @@ public class FillLayer extends Layer {
    *
    * @param filter the expression filter to set
    */
-  public void setFilter(Expression filter) {
+  public void setFilter(@NonNull Expression filter) {
     checkThread();
     nativeSetFilter(filter.toArray());
   }
@@ -103,7 +106,8 @@ public class FillLayer extends Layer {
    * @param filter the expression filter to set
    * @return This
    */
-  public FillLayer withFilter(Expression filter) {
+  @NonNull
+  public FillLayer withFilter(@NonNull Expression filter) {
     setFilter(filter);
     return this;
   }
@@ -130,6 +134,7 @@ public class FillLayer extends Layer {
    * @param properties the var-args properties
    * @return This
    */
+  @NonNull
   public FillLayer withProperties(@NonNull PropertyValue<?>... properties) {
     setProperties(properties);
     return this;
@@ -142,6 +147,7 @@ public class FillLayer extends Layer {
    *
    * @return property wrapper value around Boolean
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<Boolean> getFillAntialias() {
     checkThread();
@@ -153,6 +159,7 @@ public class FillLayer extends Layer {
    *
    * @return property wrapper value around Float
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getFillOpacity() {
     checkThread();
@@ -164,6 +171,7 @@ public class FillLayer extends Layer {
    *
    * @return transition options for Float
    */
+  @NonNull
   public TransitionOptions getFillOpacityTransition() {
     checkThread();
     return nativeGetFillOpacityTransition();
@@ -174,7 +182,7 @@ public class FillLayer extends Layer {
    *
    * @param options transition options for Float
    */
-  public void setFillOpacityTransition(TransitionOptions options) {
+  public void setFillOpacityTransition(@NonNull TransitionOptions options) {
     checkThread();
     nativeSetFillOpacityTransition(options.getDuration(), options.getDelay());
   }
@@ -184,6 +192,7 @@ public class FillLayer extends Layer {
    *
    * @return property wrapper value around String
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getFillColor() {
     checkThread();
@@ -212,6 +221,7 @@ public class FillLayer extends Layer {
    *
    * @return transition options for String
    */
+  @NonNull
   public TransitionOptions getFillColorTransition() {
     checkThread();
     return nativeGetFillColorTransition();
@@ -222,7 +232,7 @@ public class FillLayer extends Layer {
    *
    * @param options transition options for String
    */
-  public void setFillColorTransition(TransitionOptions options) {
+  public void setFillColorTransition(@NonNull TransitionOptions options) {
     checkThread();
     nativeSetFillColorTransition(options.getDuration(), options.getDelay());
   }
@@ -232,6 +242,7 @@ public class FillLayer extends Layer {
    *
    * @return property wrapper value around String
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getFillOutlineColor() {
     checkThread();
@@ -260,6 +271,7 @@ public class FillLayer extends Layer {
    *
    * @return transition options for String
    */
+  @NonNull
   public TransitionOptions getFillOutlineColorTransition() {
     checkThread();
     return nativeGetFillOutlineColorTransition();
@@ -270,7 +282,7 @@ public class FillLayer extends Layer {
    *
    * @param options transition options for String
    */
-  public void setFillOutlineColorTransition(TransitionOptions options) {
+  public void setFillOutlineColorTransition(@NonNull TransitionOptions options) {
     checkThread();
     nativeSetFillOutlineColorTransition(options.getDuration(), options.getDelay());
   }
@@ -280,6 +292,7 @@ public class FillLayer extends Layer {
    *
    * @return property wrapper value around Float[]
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getFillTranslate() {
     checkThread();
@@ -291,6 +304,7 @@ public class FillLayer extends Layer {
    *
    * @return transition options for Float[]
    */
+  @NonNull
   public TransitionOptions getFillTranslateTransition() {
     checkThread();
     return nativeGetFillTranslateTransition();
@@ -301,7 +315,7 @@ public class FillLayer extends Layer {
    *
    * @param options transition options for Float[]
    */
-  public void setFillTranslateTransition(TransitionOptions options) {
+  public void setFillTranslateTransition(@NonNull TransitionOptions options) {
     checkThread();
     nativeSetFillTranslateTransition(options.getDuration(), options.getDelay());
   }
@@ -311,6 +325,7 @@ public class FillLayer extends Layer {
    *
    * @return property wrapper value around String
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getFillTranslateAnchor() {
     checkThread();
@@ -322,6 +337,7 @@ public class FillLayer extends Layer {
    *
    * @return property wrapper value around String
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getFillPattern() {
     checkThread();
@@ -333,6 +349,7 @@ public class FillLayer extends Layer {
    *
    * @return transition options for String
    */
+  @NonNull
   public TransitionOptions getFillPatternTransition() {
     checkThread();
     return nativeGetFillPatternTransition();
@@ -343,56 +360,68 @@ public class FillLayer extends Layer {
    *
    * @param options transition options for String
    */
-  public void setFillPatternTransition(TransitionOptions options) {
+  public void setFillPatternTransition(@NonNull TransitionOptions options) {
     checkThread();
     nativeSetFillPatternTransition(options.getDuration(), options.getDelay());
   }
 
+  @NonNull
   @Keep
   private native Object nativeGetFillAntialias();
 
+  @NonNull
   @Keep
   private native Object nativeGetFillOpacity();
 
+  @NonNull
   @Keep
   private native TransitionOptions nativeGetFillOpacityTransition();
 
   @Keep
   private native void nativeSetFillOpacityTransition(long duration, long delay);
 
+  @NonNull
   @Keep
   private native Object nativeGetFillColor();
 
+  @NonNull
   @Keep
   private native TransitionOptions nativeGetFillColorTransition();
 
   @Keep
   private native void nativeSetFillColorTransition(long duration, long delay);
 
+  @NonNull
   @Keep
   private native Object nativeGetFillOutlineColor();
 
+  @NonNull
   @Keep
   private native TransitionOptions nativeGetFillOutlineColorTransition();
 
   @Keep
   private native void nativeSetFillOutlineColorTransition(long duration, long delay);
 
+  @NonNull
   @Keep
   private native Object nativeGetFillTranslate();
 
+  @NonNull
   @Keep
   private native TransitionOptions nativeGetFillTranslateTransition();
 
   @Keep
   private native void nativeSetFillTranslateTransition(long duration, long delay);
 
+  @NonNull
   @Keep
   private native Object nativeGetFillTranslateAnchor();
 
+  @NonNull
   @Keep
   private native Object nativeGetFillPattern();
 
+  @NonNull
   @Keep
   private native TransitionOptions nativeGetFillPatternTransition();
 

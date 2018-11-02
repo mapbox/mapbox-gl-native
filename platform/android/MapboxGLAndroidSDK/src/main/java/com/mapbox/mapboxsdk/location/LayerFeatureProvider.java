@@ -13,7 +13,7 @@ import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_
 class LayerFeatureProvider {
 
   @NonNull
-  Feature generateLocationFeature(@Nullable Feature locationFeature, LocationComponentOptions options) {
+  Feature generateLocationFeature(@Nullable Feature locationFeature, @NonNull LocationComponentOptions options) {
     if (locationFeature != null) {
       return locationFeature;
     }

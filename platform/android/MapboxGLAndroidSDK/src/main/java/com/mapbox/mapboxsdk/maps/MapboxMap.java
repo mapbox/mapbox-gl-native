@@ -78,6 +78,7 @@ public final class MapboxMap {
   private final OnGesturesManagerInteractionListener onGesturesManagerInteractionListener;
 
   private LocationComponent locationComponent;
+  @Nullable
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
   MapboxMap(NativeMapView map, Transform transform, UiSettings ui, Projection projection,
@@ -681,7 +682,7 @@ public final class MapboxMap {
    * @param update The change that should be applied to the camera.
    * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
    */
-  public final void easeCamera(CameraUpdate update) {
+  public final void easeCamera(@NonNull CameraUpdate update) {
     easeCamera(update, MapboxConstants.ANIMATION_DURATION);
   }
 
@@ -698,7 +699,7 @@ public final class MapboxMap {
    *                 Do not update or ease the camera from within onCancel().
    * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
    */
-  public final void easeCamera(CameraUpdate update, @Nullable final MapboxMap.CancelableCallback callback) {
+  public final void easeCamera(@NonNull CameraUpdate update, @Nullable final MapboxMap.CancelableCallback callback) {
     easeCamera(update, MapboxConstants.ANIMATION_DURATION, callback);
   }
 
@@ -1074,7 +1075,7 @@ public final class MapboxMap {
    * @param style The bundled style.
    * @see Style
    */
-  public void setStyle(@Style.StyleUrl String style) {
+  public void setStyle(@NonNull @Style.StyleUrl String style) {
     setStyleUrl(style);
   }
 
@@ -1090,7 +1091,7 @@ public final class MapboxMap {
    * @param callback The callback to be invoked when the style has finished loading
    * @see Style
    */
-  public void setStyle(@Style.StyleUrl String style, @Nullable OnStyleLoadedListener callback) {
+  public void setStyle(@NonNull @Style.StyleUrl String style, @Nullable OnStyleLoadedListener callback) {
     setStyleUrl(style, callback);
   }
 
@@ -1769,7 +1770,7 @@ public final class MapboxMap {
    */
   @NonNull
   @Deprecated
-  public CameraPosition getCameraForGeometry(Geometry geometry, double bearing, int[] padding) {
+  public CameraPosition getCameraForGeometry(@NonNull Geometry geometry, double bearing, @NonNull int[] padding) {
     return getCameraForGeometry(geometry, padding, bearing, transform.getTilt());
   }
 
@@ -2556,6 +2557,7 @@ public final class MapboxMap {
 
     private Context context;
     private final Class<U> persistentClass;
+    @NonNull
     private final Pools.SimplePool<View> viewReusePool;
 
     /**
@@ -2639,6 +2641,7 @@ public final class MapboxMap {
      *
      * @return the pool associated to this adapter
      */
+    @NonNull
     public final Pools.SimplePool<View> getViewReusePool() {
       return viewReusePool;
     }

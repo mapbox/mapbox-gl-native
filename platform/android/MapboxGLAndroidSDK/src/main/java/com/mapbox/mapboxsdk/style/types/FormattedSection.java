@@ -14,6 +14,7 @@ import java.util.Arrays;
 public class FormattedSection {
   private String text;
   private double fontScale;
+  @Nullable
   private String[] fontStack;
 
   /**

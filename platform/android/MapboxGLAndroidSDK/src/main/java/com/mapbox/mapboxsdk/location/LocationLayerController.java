@@ -73,7 +73,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
 
   LocationLayerController(MapboxMap mapboxMap, LayerSourceProvider layerSourceProvider,
                           LayerFeatureProvider featureProvider, LayerBitmapProvider bitmapProvider,
-                          LocationComponentOptions options) {
+                          @NonNull LocationComponentOptions options) {
     this.mapboxMap = mapboxMap;
     this.layerSourceProvider = layerSourceProvider;
     this.bitmapProvider = bitmapProvider;
@@ -192,7 +192,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
     return isHidden;
   }
 
-  private void setLayerVisibility(String layerId, boolean visible) {
+  private void setLayerVisibility(@NonNull String layerId, boolean visible) {
     Layer layer = mapboxMap.getLayer(layerId);
     if (layer != null) {
       String targetVisibility = visible ? VISIBLE : NONE;
@@ -202,7 +202,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
     }
   }
 
-  private void addLayers(String idBelowLayer) {
+  private void addLayers(@NonNull String idBelowLayer) {
     addSymbolLayer(BEARING_LAYER, idBelowLayer);
     addSymbolLayer(FOREGROUND_LAYER, BEARING_LAYER);
     addSymbolLayer(BACKGROUND_LAYER, FOREGROUND_LAYER);
@@ -210,7 +210,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
     addAccuracyLayer();
   }
 
-  private void addSymbolLayer(String layerId, String beforeLayerId) {
+  private void addSymbolLayer(@NonNull String layerId, @NonNull String beforeLayerId) {
     Layer layer = layerSourceProvider.generateLayer(layerId);
     addLayerToMap(layer, beforeLayerId);
   }
@@ -220,12 +220,12 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
     addLayerToMap(accuracyLayer, BACKGROUND_LAYER);
   }
 
-  private void addLayerToMap(Layer layer, @NonNull String idBelowLayer) {
+  private void addLayerToMap(@NonNull Layer layer, @NonNull String idBelowLayer) {
     mapboxMap.addLayerBelow(layer, idBelowLayer);
     layerMap.add(layer.getId());
   }
 
-  private void setBearingProperty(String propertyId, float bearing) {
+  private void setBearingProperty(@NonNull String propertyId, float bearing) {
     locationFeature.addNumberProperty(propertyId, bearing);
     refreshSource();
   }
@@ -276,7 +276,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
     mapboxMap.addImage(BACKGROUND_STALE_ICON, backgroundStaleBitmap);
   }
 
-  private void styleShadow(LocationComponentOptions options) {
+  private void styleShadow(@NonNull LocationComponentOptions options) {
     mapboxMap.addImage(SHADOW_ICON, bitmapProvider.generateShadowBitmap(options));
   }
 
@@ -310,7 +310,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
     mapboxMap.addImage(FOREGROUND_STALE_ICON, foregroundBitmapStale);
   }
 
-  private void styleScaling(LocationComponentOptions options) {
+  private void styleScaling(@NonNull LocationComponentOptions options) {
     for (String layerId : layerMap) {
       Layer layer = mapboxMap.getLayer(layerId);
       if (layer != null && layer instanceof SymbolLayer) {
@@ -342,6 +342,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
     refreshSource();
   }
 
+  @Nullable
   private String buildIconString(@Nullable String bitmapName, @NonNull String drawableName) {
     if (bitmapName != null) {
       return bitmapName;
@@ -361,7 +362,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
   // Map click event
   //
 
-  boolean onMapClick(LatLng point) {
+  boolean onMapClick(@NonNull LatLng point) {
     PointF screenLoc = mapboxMap.getProjection().toScreenLocation(point);
     List<Feature> features = mapboxMap.queryRenderedFeatures(screenLoc,
       BACKGROUND_LAYER,

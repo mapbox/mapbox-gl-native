@@ -28,13 +28,14 @@ import com.mapbox.mapboxsdk.utils.ThreadUtils;
 public final class Mapbox {
 
   private static final String TAG = "Mbgl-Mapbox";
-
   private static ModuleProvider moduleProvider;
   private static Mapbox INSTANCE;
 
   private Context context;
+  @Nullable
   private String accessToken;
   private Boolean connected;
+  @Nullable
   private TelemetryDefinition telemetry;
 
   /**
@@ -48,6 +49,7 @@ public final class Mapbox {
    * @return the single instance of Mapbox
    */
   @UiThread
+  @NonNull
   public static synchronized Mapbox getInstance(@NonNull Context context, @Nullable String accessToken) {
     ThreadUtils.checkThread("Mapbox");
     if (INSTANCE == null) {
@@ -171,7 +173,7 @@ public final class Mapbox {
    * @param accessToken the access token to validate
    * @return true is valid, false otherwise
    */
-  static boolean isAccessTokenValid(String accessToken) {
+  static boolean isAccessTokenValid(@Nullable String accessToken) {
     if (accessToken == null) {
       return false;
     }

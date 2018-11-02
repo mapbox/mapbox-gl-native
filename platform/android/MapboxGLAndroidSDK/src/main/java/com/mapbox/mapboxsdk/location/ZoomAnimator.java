@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.location;
 
 import android.animation.ValueAnimator;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -20,7 +21,7 @@ class ZoomAnimator extends MapboxCameraAnimatorAdapter {
   }
 
   @Override
-  public void onAnimationUpdate(ValueAnimator animation) {
+  public void onAnimationUpdate(@NonNull ValueAnimator animation) {
     for (OnCameraAnimationsValuesChangeListener listener : updateListeners) {
       listener.onNewZoomValue((Float) animation.getAnimatedValue());
     }

@@ -6,6 +6,8 @@ import android.os.Parcelable;
 import android.support.annotation.FloatRange;
 import android.support.annotation.Keep;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.mapbox.mapboxsdk.constants.GeometryConstants;
 
 
@@ -27,7 +29,7 @@ public class LatLng implements Parcelable {
    * Inner class responsible for recreating Parcels into objects.
    */
   public static final Parcelable.Creator<LatLng> CREATOR = new Parcelable.Creator<LatLng>() {
-    public LatLng createFromParcel(Parcel in) {
+    public LatLng createFromParcel(@NonNull Parcel in) {
       return new LatLng(in);
     }
 
@@ -204,6 +206,7 @@ public class LatLng implements Parcelable {
    *
    * @return new LatLng object with wrapped Longitude
    */
+  @NonNull
   public LatLng wrap() {
     return new LatLng(latitude, wrap(longitude, GeometryConstants.MIN_LONGITUDE, GeometryConstants.MAX_LONGITUDE));
   }
@@ -241,7 +244,7 @@ public class LatLng implements Parcelable {
    * @return True if equal, false if not
    */
   @Override
-  public boolean equals(Object object) {
+  public boolean equals(@Nullable Object object) {
     if (this == object) {
       return true;
     }
@@ -278,6 +281,7 @@ public class LatLng implements Parcelable {
    *
    * @return the string representation
    */
+  @NonNull
   @Override
   public String toString() {
     return "LatLng [latitude=" + latitude + ", longitude=" + longitude + ", altitude=" + altitude + "]";
@@ -300,7 +304,7 @@ public class LatLng implements Parcelable {
    * @param flags Additional flags about how the object should be written
    */
   @Override
-  public void writeToParcel(Parcel out, int flags) {
+  public void writeToParcel(@NonNull Parcel out, int flags) {
     out.writeDouble(latitude);
     out.writeDouble(longitude);
     out.writeDouble(altitude);
@@ -312,7 +316,7 @@ public class LatLng implements Parcelable {
    * @param other Other LatLng to compare to
    * @return distance in meters
    */
-  public double distanceTo(LatLng other) {
+  public double distanceTo(@NonNull LatLng other) {
     if (latitude == other.latitude && longitude == other.longitude) {
       // return 0.0 to avoid a NaN
       return 0.0;
