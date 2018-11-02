@@ -34,8 +34,7 @@
              };
 }
 
-+ (BOOL)supportsSecureCoding {
-    
++ (BOOL)supportsSecureCoding {    
     return YES;
 }
 
