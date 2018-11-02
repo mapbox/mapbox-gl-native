@@ -951,7 +951,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    */
   @UiThread
   public void getMapAsync(final @NonNull OnMapReadyCallback callback) {
-    if (mapCallback.isInitialLoad()) {
+    if (mapCallback.isInitialLoad() || mapboxMap == null) {
+      // Add callback to the list only if the style hasn't loaded, or the drawing surface isn't ready
       mapCallback.addOnMapReadyCallback(callback);
     } else {
       callback.onMapReady(mapboxMap);
