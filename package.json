@@ -18,7 +18,7 @@
     "npm-run-all": "^4.0.2"
   },
   "devDependencies": {
-    "@octokit/rest": "^15.9.2",
+    "@octokit/rest": "^15.15.1",
     "aws-sdk": "^2.285.1",
     "csscolorparser": "^1.0.2",
     "ejs": "^2.4.1",
