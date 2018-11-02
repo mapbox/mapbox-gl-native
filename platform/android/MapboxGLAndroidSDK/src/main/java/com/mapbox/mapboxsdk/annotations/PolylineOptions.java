@@ -3,6 +3,8 @@ package com.mapbox.mapboxsdk.annotations;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ public final class PolylineOptions implements Parcelable {
 
   public static final Parcelable.Creator<PolylineOptions> CREATOR =
     new Parcelable.Creator<PolylineOptions>() {
-      public PolylineOptions createFromParcel(Parcel in) {
+      public PolylineOptions createFromParcel(@NonNull Parcel in) {
         return new PolylineOptions(in);
       }
 
@@ -76,6 +78,7 @@ public final class PolylineOptions implements Parcelable {
    * @param point {@link LatLng} point to be added to polyline geometry.
    * @return This {@link PolylineOptions} object with the given point on the end.
    */
+  @NonNull
   public PolylineOptions add(LatLng point) {
     polyline.addPoint(point);
     return this;
@@ -87,6 +90,7 @@ public final class PolylineOptions implements Parcelable {
    * @param points {@link LatLng} points defining the polyline geometry.
    * @return This {@link PolylineOptions} object with the given point on the end.
    */
+  @NonNull
   public PolylineOptions add(LatLng... points) {
     for (LatLng point : points) {
       add(point);
@@ -101,6 +105,7 @@ public final class PolylineOptions implements Parcelable {
    *               geometry
    * @return This {@link PolylineOptions} object with the given points on the end.
    */
+  @NonNull
   public PolylineOptions addAll(Iterable<LatLng> points) {
     for (LatLng point : points) {
       add(point);
@@ -114,6 +119,7 @@ public final class PolylineOptions implements Parcelable {
    * @param alpha float value between 0 (not visible) and 1.
    * @return This {@link PolylineOptions} object with the given polyline alpha value.
    */
+  @NonNull
   public PolylineOptions alpha(float alpha) {
     polyline.setAlpha(alpha);
     return this;
@@ -134,6 +140,7 @@ public final class PolylineOptions implements Parcelable {
    * @param color 32-bit ARGB color.
    * @return This {@link PolylineOptions} object with a new color set.
    */
+  @NonNull
   public PolylineOptions color(int color) {
     polyline.setColor(color);
     return this;
@@ -172,6 +179,7 @@ public final class PolylineOptions implements Parcelable {
    * @param width float value defining width of polyline using unit pixels.
    * @return This {@link PolylineOptions} object with a new width set.
    */
+  @NonNull
   public PolylineOptions width(float width) {
     polyline.setWidth(width);
     return this;
@@ -196,7 +204,7 @@ public final class PolylineOptions implements Parcelable {
    * Else, false.
    */
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) {
       return true;
     }

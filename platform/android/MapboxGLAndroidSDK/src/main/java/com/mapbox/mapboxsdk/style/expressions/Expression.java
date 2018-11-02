@@ -90,7 +90,9 @@ import java.util.Map;
  */
 public class Expression {
 
+  @Nullable
   private final String operator;
+  @Nullable
   private final Expression[] arguments;
 
   /**
@@ -435,7 +437,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-==">Style specification</a>
    */
-  public static Expression eq(Expression compareOne, boolean compareTwo) {
+  public static Expression eq(@NonNull Expression compareOne, boolean compareTwo) {
     return eq(compareOne, literal(compareTwo));
   }
 
@@ -2234,7 +2236,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-ln">Style specification</a>
    */
-  public static Expression ln(Number number) {
+  public static Expression ln(@NonNull Number number) {
     return ln(literal(number));
   }
 
@@ -2686,7 +2688,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-round">Style specification</a>
    */
-  public static Expression round(Number number) {
+  public static Expression round(@NonNull Number number) {
     return round(literal(number));
   }
 
@@ -2730,7 +2732,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-abs">Style specification</a>
    */
-  public static Expression abs(Number number) {
+  public static Expression abs(@NonNull Number number) {
     return abs(literal(number));
   }
 
@@ -2774,7 +2776,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-abs">Style specification</a>
    */
-  public static Expression ceil(Number number) {
+  public static Expression ceil(@NonNull Number number) {
     return ceil(literal(number));
   }
 
@@ -2818,7 +2820,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-abs">Style specification</a>
    */
-  public static Expression floor(Number number) {
+  public static Expression floor(@NonNull Number number) {
     return floor(literal(number));
   }
 
@@ -2906,7 +2908,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-is-supported-script">Style
    * specification</a>
    */
-  public static Expression isSupportedScript(String string) {
+  public static Expression isSupportedScript(@NonNull String string) {
     return new Expression("is-supported-script", literal(string));
   }
 
@@ -3617,7 +3619,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
    */
-  public static Expression step(@NonNull Expression input, @NonNull Expression defaultOutput, Expression... stops) {
+  public static Expression step(@NonNull Expression input, @NonNull Expression defaultOutput, @NonNull Expression... stops) {
     return new Expression("step", join(new Expression[] {input, defaultOutput}, stops));
   }
 
@@ -3844,7 +3846,7 @@ public class Expression {
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate">Style specification</a>
    */
   public static Expression interpolate(@NonNull Interpolator interpolation,
-                                       @NonNull Expression number, Expression... stops) {
+                                       @NonNull Expression number, @NonNull Expression... stops) {
     return new Expression("interpolate", join(new Expression[] {interpolation, number}, stops));
   }
 
@@ -4051,6 +4053,7 @@ public class Expression {
    * @param right the right part of an expression
    * @return the joined expression
    */
+  @NonNull
   private static Expression[] join(Expression[] left, Expression[] right) {
     Expression[] output = new Expression[left.length + right.length];
     System.arraycopy(left, 0, output, 0, left.length);
@@ -4132,7 +4135,7 @@ public class Expression {
    * @return true if equal, false if not
    */
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     super.equals(o);
     if (this == o) {
       return true;
@@ -4232,7 +4235,7 @@ public class Expression {
      * @return true if equal, false if not
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
       if (this == o) {
         return true;
       }
@@ -4260,6 +4263,7 @@ public class Expression {
       return result;
     }
 
+    @NonNull
     private static String unwrapStringLiteral(String value) {
       if (value.length() > 1 &&
         value.charAt(0) == '\"' && value.charAt(value.length() - 1) == '\"') {
@@ -4312,6 +4316,7 @@ public class Expression {
      * @param stops the stops to convert
      * @return the converted stops as an expression array
      */
+    @NonNull
     static Expression[] toExpressionArray(Stop... stops) {
       Expression[] expressions = new Expression[stops.length * 2];
       Stop stop;
@@ -4555,6 +4560,7 @@ public class Expression {
      *
      * @return the string representation of the expression array
      */
+    @NonNull
     @Override
     public String toString() {
       Object[] array = (Object[]) literal;
@@ -4576,7 +4582,7 @@ public class Expression {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
       if (this == o) {
         return true;
       }
@@ -4600,6 +4606,7 @@ public class Expression {
       this.map = map;
     }
 
+    @NonNull
     @Override
     public Object toValue() {
       Map<String, Object> unwrappedMap = new HashMap<>();
@@ -4615,6 +4622,7 @@ public class Expression {
       return unwrappedMap;
     }
 
+    @NonNull
     @Override
     public String toString() {
       StringBuilder builder = new StringBuilder();
@@ -4634,7 +4642,7 @@ public class Expression {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
       if (this == o) {
         return true;
       }
@@ -4669,6 +4677,7 @@ public class Expression {
    * @param object the object to convert to an object array
    * @return the converted object array
    */
+  @NonNull
   private static Object[] toObjectArray(Object object) {
     // object is a primitive array
     int len = java.lang.reflect.Array.getLength(object);

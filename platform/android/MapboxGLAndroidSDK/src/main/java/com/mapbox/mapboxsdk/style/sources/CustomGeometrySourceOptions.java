@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.style.sources;
 
+import android.support.annotation.NonNull;
+
 import java.util.HashMap;
 
 /**
@@ -13,6 +15,7 @@ public class CustomGeometrySourceOptions extends HashMap<String, Object> {
    * @param wrap defaults to false
    * @return the current instance for chaining
    */
+  @NonNull
   public CustomGeometrySourceOptions withWrap(boolean wrap) {
     this.put("wrap", wrap);
     return this;
@@ -25,6 +28,7 @@ public class CustomGeometrySourceOptions extends HashMap<String, Object> {
    * @param clip defaults to false
    * @return the current instance for chaining
    */
+  @NonNull
   public CustomGeometrySourceOptions withClip(boolean clip) {
     this.put("clip", clip);
     return this;
@@ -36,6 +40,7 @@ public class CustomGeometrySourceOptions extends HashMap<String, Object> {
    * @param minZoom the minimum zoom - Defaults to 0.
    * @return the current instance for chaining
    */
+  @NonNull
   public CustomGeometrySourceOptions withMinZoom(int minZoom) {
     this.put("minzoom", minZoom);
     return this;
@@ -47,6 +52,7 @@ public class CustomGeometrySourceOptions extends HashMap<String, Object> {
    * @param maxZoom the maximum zoom - Defaults to 25.5
    * @return the current instance for chaining
    */
+  @NonNull
   public CustomGeometrySourceOptions withMaxZoom(int maxZoom) {
     this.put("maxzoom", maxZoom);
     return this;
@@ -59,6 +65,7 @@ public class CustomGeometrySourceOptions extends HashMap<String, Object> {
    * @param buffer the buffer size - Defaults to 128.
    * @return the current instance for chaining
    */
+  @NonNull
   public CustomGeometrySourceOptions withBuffer(int buffer) {
     this.put("buffer", buffer);
     return this;
@@ -70,6 +77,7 @@ public class CustomGeometrySourceOptions extends HashMap<String, Object> {
    * @param tolerance the tolerance - Defaults to 0.375
    * @return the current instance for chaining
    */
+  @NonNull
   public CustomGeometrySourceOptions withTolerance(float tolerance) {
     this.put("tolerance", tolerance);
     return this;

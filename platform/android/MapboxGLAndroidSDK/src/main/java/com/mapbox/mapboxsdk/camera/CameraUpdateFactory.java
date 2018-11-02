@@ -5,6 +5,7 @@ import android.graphics.PointF;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
+import android.support.annotation.Nullable;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -217,7 +218,7 @@ public final class CameraUpdateFactory {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
       if (this == o) {
         return true;
       }
@@ -292,7 +293,7 @@ public final class CameraUpdateFactory {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
       if (this == o) {
         return true;
       }
@@ -362,7 +363,7 @@ public final class CameraUpdateFactory {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
       if (this == o) {
         return true;
       }
@@ -487,7 +488,7 @@ public final class CameraUpdateFactory {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
       if (this == o) {
         return true;
       }

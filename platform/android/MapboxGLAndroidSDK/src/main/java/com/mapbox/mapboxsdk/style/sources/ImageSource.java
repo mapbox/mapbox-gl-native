@@ -46,7 +46,7 @@ public class ImageSource extends Source {
    * @param coordinates The Latitude and Longitude of the four corners of the image
    * @param url         remote json file
    */
-  public ImageSource(String id, LatLngQuad coordinates, URL url) {
+  public ImageSource(String id, LatLngQuad coordinates, @NonNull URL url) {
     super();
     initialize(id, coordinates);
     setUrl(url);
@@ -83,7 +83,7 @@ public class ImageSource extends Source {
    *
    * @param url An Image url
    */
-  public void setUrl(URL url) {
+  public void setUrl(@NonNull URL url) {
     setUrl(url.toExternalForm());
   }
 
@@ -149,6 +149,7 @@ public class ImageSource extends Source {
   @Keep
   protected native void nativeSetUrl(String url);
 
+  @NonNull
   @Keep
   protected native String nativeGetUrl();
 

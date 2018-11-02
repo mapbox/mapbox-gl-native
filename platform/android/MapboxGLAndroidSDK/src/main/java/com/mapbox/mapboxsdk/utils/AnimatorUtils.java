@@ -35,7 +35,7 @@ public class AnimatorUtils {
    * @param duration    the duration of the animator
    * @param listener    the animator end listener
    */
-  public static void animate(final View view, @AnimatorRes int animatorRes, int duration,
+  public static void animate(@Nullable final View view, @AnimatorRes int animatorRes, int duration,
                              @Nullable final OnAnimationEndListener listener) {
     if (view == null) {
       return;

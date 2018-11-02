@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 
 import com.mapbox.mapboxsdk.MapStrictMode;
@@ -29,6 +30,7 @@ public class FileSource {
   private static final String TAG = "Mbgl-FileSource";
   private static final Lock resourcesCachePathLoaderLock = new ReentrantLock();
   private static final Lock internalCachePathLoaderLock = new ReentrantLock();
+  @Nullable
   private static String resourcesCachePath;
   private static String internalCachePath;
 
@@ -61,7 +63,7 @@ public class FileSource {
    * @return the single instance of FileSource
    */
   @UiThread
-  public static synchronized FileSource getInstance(Context context) {
+  public static synchronized FileSource getInstance(@NonNull Context context) {
     if (INSTANCE == null) {
       INSTANCE = new FileSource(getResourcesCachePath(context), context.getResources().getAssets());
     }
@@ -76,8 +78,9 @@ public class FileSource {
    * @return the files directory path
    * @deprecated Use {@link #getResourcesCachePath(Context)} instead.
    */
+  @Nullable
   @Deprecated
-  public static String getCachePath(Context context) {
+  public static String getCachePath(@NonNull Context context) {
     // Default value
     boolean isExternalStorageConfiguration = MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL;
 
@@ -162,6 +165,7 @@ public class FileSource {
       unlockPathLoaders();
     }
 
+    @NonNull
     @Override
     protected String[] doInBackground(Context... contexts) {
       return new String[] {
@@ -184,7 +188,8 @@ public class FileSource {
    * @param context the context to derive the files directory path from
    * @return the files directory path
    */
-  public static String getResourcesCachePath(Context context) {
+  @Nullable
+  public static String getResourcesCachePath(@NonNull Context context) {
     resourcesCachePathLoaderLock.lock();
     try {
       if (resourcesCachePath == null) {
@@ -202,7 +207,7 @@ public class FileSource {
    * @param context the context to derive the internal cache path from
    * @return the internal cache path
    */
-  public static String getInternalCachePath(Context context) {
+  public static String getInternalCachePath(@NonNull Context context) {
     internalCachePathLoaderLock.lock();
     try {
       if (internalCachePath == null) {
@@ -243,6 +248,7 @@ public class FileSource {
   @Keep
   public native void setAccessToken(@NonNull String accessToken);
 
+  @NonNull
   @Keep
   public native String getAccessToken();
 

@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.PointF;
 
+import android.support.annotation.Nullable;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.android.gestures.RotateGestureDetector;
 import com.mapbox.android.gestures.ShoveGestureDetector;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 public class MapTouchListenersTest {
 
+  @Nullable
   private MapGestureDetector mapGestureDetector;
   private LatLng latLng;
   private PointF pointF;

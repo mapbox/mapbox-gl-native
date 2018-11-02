@@ -161,7 +161,7 @@ public class OfflineManager {
    * @param context the context used to host the offline manager
    * @return the single instance of offline manager
    */
-  public static synchronized OfflineManager getInstance(Context context) {
+  public static synchronized OfflineManager getInstance(@NonNull Context context) {
     if (instance == null) {
       instance = new OfflineManager(context);
     }
@@ -267,7 +267,9 @@ public class OfflineManager {
   }
 
   private static final class CopyTempDatabaseFileTask extends AsyncTask<Object, Void, Object> {
+    @NonNull
     private final WeakReference<OfflineManager> offlineManagerWeakReference;
+    @NonNull
     private final WeakReference<MergeOfflineRegionsCallback> callbackWeakReference;
 
     CopyTempDatabaseFileTask(OfflineManager offlineManager, MergeOfflineRegionsCallback callback) {
@@ -305,7 +307,7 @@ public class OfflineManager {
     }
   }
 
-  private static void copyTempDatabaseFile(File sourceFile, File destFile) throws IOException {
+  private static void copyTempDatabaseFile(@NonNull File sourceFile, File destFile) throws IOException {
     if (!destFile.exists() && !destFile.createNewFile()) {
       throw new IOException("Unable to copy database file for merge.");
     }
@@ -380,7 +382,7 @@ public class OfflineManager {
    * @param callback   the callback to be invoked
    */
   public void createOfflineRegion(@NonNull OfflineRegionDefinition definition, @NonNull byte[] metadata,
-                                  final CreateOfflineRegionCallback callback) {
+                                  @NonNull final CreateOfflineRegionCallback callback) {
     if (!isValidOfflineRegionDefinition(definition)) {
       callback.onError(
         String.format(context.getString(R.string.mapbox_offline_error_region_definition_invalid),

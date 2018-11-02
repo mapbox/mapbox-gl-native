@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Keep;
 
+import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 
@@ -93,6 +94,7 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
     return pixelRatio;
   }
 
+  @NonNull
   @Override
   public String getType() {
     return "tileregion";
@@ -108,7 +110,7 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
   }
 
   @Override
-  public void writeToParcel(Parcel dest, int flags) {
+  public void writeToParcel(@NonNull Parcel dest, int flags) {
     dest.writeString(styleURL);
     dest.writeDouble(bounds.getLatNorth());
     dest.writeDouble(bounds.getLonEast());
@@ -120,7 +122,7 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
   }
 
   public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-    public OfflineTilePyramidRegionDefinition createFromParcel(Parcel in) {
+    public OfflineTilePyramidRegionDefinition createFromParcel(@NonNull Parcel in) {
       return new OfflineTilePyramidRegionDefinition(in);
     }
 

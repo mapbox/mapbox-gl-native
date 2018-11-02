@@ -1,6 +1,8 @@
 package com.mapbox.mapboxsdk.style.light;
 
 import android.support.annotation.Keep;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Position of the light source relative to lit (extruded) geometries.
@@ -49,7 +51,7 @@ public class Position {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) {
       return true;
     }
@@ -76,6 +78,7 @@ public class Position {
     return result;
   }
 
+  @NonNull
   @Override
   public String toString() {
     return "Position{"

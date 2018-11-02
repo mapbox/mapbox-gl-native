@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.location;
 
 import android.os.Handler;
+import android.support.annotation.NonNull;
 
 /**
  * Class controls the location stale state when the {@link android.location.Location} hasn't
@@ -12,6 +13,7 @@ class StaleStateManager {
 
   private boolean isEnabled;
   private final OnLocationStaleListener innerOnLocationStaleListeners;
+  @NonNull
   private final Handler handler;
   private boolean isStale = true;
   private long delayTime;
@@ -23,6 +25,7 @@ class StaleStateManager {
     delayTime = options.staleStateTimeout();
   }
 
+  @NonNull
   private Runnable staleStateRunnable = new Runnable() {
     @Override
     public void run() {

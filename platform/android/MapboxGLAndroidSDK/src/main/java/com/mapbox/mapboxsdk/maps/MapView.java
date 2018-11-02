@@ -69,7 +69,9 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   private final MapCallback mapCallback = new MapCallback();
   private final InitialRenderCallback initialRenderCallback = new InitialRenderCallback();
 
+  @Nullable
   private NativeMapView nativeMapView;
+  @Nullable
   private MapboxMap mapboxMap;
   private MapboxMapOptions mapboxMapOptions;
   private MapRenderer mapRenderer;
@@ -81,8 +83,11 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   private ImageView attrView;
   private ImageView logoView;
 
+  @Nullable
   private MapGestureDetector mapGestureDetector;
+  @Nullable
   private MapKeyListener mapKeyListener;
+  @Nullable
   private Bundle savedInstanceState;
 
   @UiThread
@@ -211,7 +216,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     };
   }
 
-  private MapboxMap.OnCompassAnimationListener createCompassAnimationListener(final CameraChangeDispatcher
+  private MapboxMap.OnCompassAnimationListener createCompassAnimationListener(@NonNull final CameraChangeDispatcher
                                                                                 cameraChangeDispatcher) {
     return new MapboxMap.OnCompassAnimationListener() {
       @Override
@@ -227,7 +232,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     };
   }
 
-  private OnClickListener createCompassClickListener(final CameraChangeDispatcher cameraChangeDispatcher) {
+  private OnClickListener createCompassClickListener(@NonNull final CameraChangeDispatcher cameraChangeDispatcher) {
     return new OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -438,7 +443,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   @Override
-  public boolean onKeyDown(int keyCode, KeyEvent event) {
+  public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
     return mapKeyListener.onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event);
   }
 
@@ -448,17 +453,17 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   @Override
-  public boolean onKeyUp(int keyCode, KeyEvent event) {
+  public boolean onKeyUp(int keyCode, @NonNull KeyEvent event) {
     return mapKeyListener.onKeyUp(keyCode, event) || super.onKeyUp(keyCode, event);
   }
 
   @Override
-  public boolean onTrackballEvent(MotionEvent event) {
+  public boolean onTrackballEvent(@NonNull MotionEvent event) {
     return mapKeyListener.onTrackballEvent(event) || super.onTrackballEvent(event);
   }
 
   @Override
-  public boolean onGenericMotionEvent(MotionEvent event) {
+  public boolean onGenericMotionEvent(@NonNull MotionEvent event) {
     if (!isGestureDetectorInitialized()) {
       return super.onGenericMotionEvent(event);
     }
@@ -517,7 +522,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    * @param definition the offline region definition
    * @see OfflineRegionDefinition
    */
-  public void setOfflineRegionDefinition(OfflineRegionDefinition definition) {
+  public void setOfflineRegionDefinition(@NonNull OfflineRegionDefinition definition) {
     double minZoom = definition.getMinZoom();
     double maxZoom = definition.getMaxZoom();
 
@@ -564,6 +569,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   // ViewCallback
   //
 
+  @Nullable
   @Override
   public Bitmap getViewContent() {
     return BitmapUtils.createBitmapFromView(this);
@@ -973,6 +979,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     return mapGestureDetector != null;
   }
 
+  @Nullable
   MapboxMap getMapboxMap() {
     return mapboxMap;
   }
@@ -1240,10 +1247,11 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    */
   private static class AttributionClickListener implements OnClickListener {
 
+    @NonNull
     private final AttributionDialogManager defaultDialogManager;
     private UiSettings uiSettings;
 
-    private AttributionClickListener(Context context, MapboxMap mapboxMap) {
+    private AttributionClickListener(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
       this.defaultDialogManager = new AttributionDialogManager(context, mapboxMap);
       this.uiSettings = mapboxMap.getUiSettings();
     }
