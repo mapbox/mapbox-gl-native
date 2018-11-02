@@ -6,17 +6,21 @@ import android.support.test.espresso.IdlingRegistry;
 import android.support.test.espresso.IdlingResourceTimeoutException;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
+
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
 import com.mapbox.mapboxsdk.testapp.action.WaitAction;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
+
 import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
+
 import timber.log.Timber;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -38,7 +42,12 @@ public abstract class BaseActivityTest {
   @Before
   public void beforeTest() {
     try {
-      Timber.e(String.format("%s - %s", testNameRule.getMethodName(), "@Before test: register idle resource"));
+      Timber.e(String.format(
+        "%s - %s - %s",
+        getClass().getSimpleName(),
+        testNameRule.getMethodName(),
+        "@Before test: register idle resource"
+      ));
       idlingResource = new OnMapReadyIdlingResource(rule.getActivity());
       IdlingRegistry.getInstance().register(idlingResource);
       Espresso.onIdle();
