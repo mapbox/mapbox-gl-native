@@ -394,8 +394,8 @@ public:
 
     void updateVertexVector(size_t, size_t, const GeometryTileFeature&, const PropertyMap&) override {
         if (!isUpdateable) return;
-        //TODO: AHM: How to evaluate expression with feature-state to determine
-        // patterns and pattern positions synchronously
+        //TODO: AHM: How to evaluate expressions with feature-state to determine
+        // patterns and pattern positions synchronously?
     };
 
     std::tuple<optional<gl::AttributeBinding>, optional<gl::AttributeBinding>> attributeBinding(const PossiblyEvaluatedPropertyValue<Faded<T>>& currentValue) const override {

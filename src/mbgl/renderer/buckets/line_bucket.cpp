@@ -61,7 +61,10 @@ void LineBucket::setFeatureState(const GeometryTileData* tileData,
     if (sourceLayerData) {
         for (auto& pair : paintPropertyBinders) {
             if (stateDependentLayers.count(pair.first) > 0) {
-                pair.second.updateVertexVectors(featureStates,  *sourceLayerData);
+                if(pair.second.updateVertexVectors(featureStates,  *sourceLayerData)) {
+                    //Only toggle uploaded if needed.
+                    uploaded = false;
+                }
             }
         }
     }

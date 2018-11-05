@@ -71,9 +71,10 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
                          const Range<uint8_t> zoomRange,
                          optional<LatLngBounds> bounds,
                          std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile) {
-    update(layers, {}, needsRendering, needsRelayout, parameters, type, tileSize, zoomRange, bounds, createTile);
-}
+    FeatureStatesMap fsm;
+    update(layers,fsm, needsRendering, needsRelayout, parameters, type, tileSize, zoomRange, bounds, createTile);
 
+}
 void extend(PropertyMap& a, const PropertyMap& b) {
     for (const auto& pair: b) {
         auto it = a.find(pair.first);

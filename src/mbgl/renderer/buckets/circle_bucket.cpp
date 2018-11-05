@@ -101,7 +101,7 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
 void CircleBucket::setFeatureState(const GeometryTileData* tileData,
                         const std::string& sourceLayer,
                         const FeatureStates& featureStates) {
-    if (featureStates.empty() /*|| stateDependentLayers.empty()*/) { return; }
+    if (featureStates.empty() || stateDependentLayers.empty()) { return; }
 
     auto sourceLayerData = tileData->getLayer(sourceLayer);
     if (sourceLayerData) {
@@ -115,6 +115,7 @@ void CircleBucket::setFeatureState(const GeometryTileData* tileData,
         }
     }
 }
+
 template <class Property>
 static float get(const RenderCircleLayer& layer, const std::map<std::string, CircleProgram::PaintPropertyBinders>& paintPropertyBinders) {
     auto it = paintPropertyBinders.find(layer.getID());
