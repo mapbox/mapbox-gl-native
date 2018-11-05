@@ -505,7 +505,10 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    * @see Style
    */
   public void setStyleUrl(@NonNull String url) {
-    nativeMapView.setStyleUrl(url);
+    if (nativeMapView != null) {
+      // null-checking the nativeMapView as it can be mistakenly called after it's been destroyed
+      nativeMapView.setStyleUrl(url);
+    }
   }
 
   /**
@@ -541,7 +544,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   @Override
   protected void onSizeChanged(int width, int height, int oldw, int oldh) {
-    if (!isInEditMode()) {
+    if (!isInEditMode() && nativeMapView != null) {
+      // null-checking the nativeMapView, see #13277
       nativeMapView.resizeView(width, height);
     }
   }
