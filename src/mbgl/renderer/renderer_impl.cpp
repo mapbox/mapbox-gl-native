@@ -11,11 +11,6 @@
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/renderer/layers/render_background_layer.hpp>
-#include <mbgl/renderer/layers/render_custom_layer.hpp>
-#include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
-#include <mbgl/renderer/layers/render_fill_layer.hpp>
-#include <mbgl/renderer/layers/render_hillshade_layer.hpp>
 #include <mbgl/renderer/style_diff.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
@@ -279,8 +274,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     Color backgroundColor;
 
-    class RenderItem {
-    public:
+    struct RenderItem {
+        RenderItem(RenderLayer& layer_, RenderSource* source_)
+            : layer(layer_), source(source_) {}
         RenderLayer& layer;
         RenderSource* source;
     };
@@ -308,7 +304,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
 
         if (layerImpl->getTypeInfo()->source == LayerTypeInfo::Source::NotRequired) {
-            order.emplace_back(RenderItem { *layer, nullptr });
+            order.emplace_back(*layer, nullptr);
             continue;
         }
 
@@ -319,7 +315,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
 
         layer->setRenderTiles(source->getRenderTiles(), parameters.state);
-        order.emplace_back(RenderItem { *layer, source });
+        order.emplace_back(*layer, source);
     }
 
     {
