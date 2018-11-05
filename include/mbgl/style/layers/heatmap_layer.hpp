@@ -70,11 +70,17 @@ protected:
 };
 
 class HeatmapLayerFactory : public LayerFactory {
-protected:
+public:
+    HeatmapLayerFactory();
     // LayerFactory overrides.
     ~HeatmapLayerFactory() override;
-    const char* type() const final;
-    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) override;
+    bool supportsType(const std::string& type) const final;
+    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
+
+    static HeatmapLayerFactory* get();
+
+private:
+    static HeatmapLayerFactory* instance;
 };
 
 } // namespace style

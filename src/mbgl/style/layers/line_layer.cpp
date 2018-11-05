@@ -43,6 +43,10 @@ void LineLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>
     layout.stringify(writer);
 }
 
+LayerFactory* LineLayer::Impl::getLayerFactory() const {
+    return LineLayerFactory::get();
+}
+
 // Layout properties
 
 PropertyValue<LineCapType> LineLayer::getDefaultLineCap() {
@@ -828,10 +832,23 @@ Mutable<Layer::Impl> LineLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+LineLayerFactory* LineLayerFactory::instance = nullptr;
+
+LineLayerFactory::LineLayerFactory() {
+    assert(!instance);
+    instance = this;
+}
+
 LineLayerFactory::~LineLayerFactory() = default;
 
-const char* LineLayerFactory::type() const {
-    return "line";
+// static
+LineLayerFactory* LineLayerFactory::get() {
+    assert(instance);
+    return instance;
+}
+
+bool LineLayerFactory::supportsType(const std::string& type) const {
+    return type == "line";
 }
 
 std::unique_ptr<style::Layer> LineLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

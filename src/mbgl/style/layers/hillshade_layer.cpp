@@ -42,6 +42,10 @@ std::unique_ptr<Layer> HillshadeLayer::cloneRef(const std::string& id_) const {
 void HillshadeLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
+LayerFactory* HillshadeLayer::Impl::getLayerFactory() const {
+    return HillshadeLayerFactory::get();
+}
+
 // Layout properties
 
 
@@ -421,10 +425,23 @@ Mutable<Layer::Impl> HillshadeLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+HillshadeLayerFactory* HillshadeLayerFactory::instance = nullptr;
+
+HillshadeLayerFactory::HillshadeLayerFactory() {
+    assert(!instance);
+    instance = this;
+}
+
 HillshadeLayerFactory::~HillshadeLayerFactory() = default;
 
-const char* HillshadeLayerFactory::type() const {
-    return "hillshade";
+// static
+HillshadeLayerFactory* HillshadeLayerFactory::get() {
+    assert(instance);
+    return instance;
+}
+
+bool HillshadeLayerFactory::supportsType(const std::string& type) const {
+    return type == "hillshade";
 }
 
 std::unique_ptr<style::Layer> HillshadeLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

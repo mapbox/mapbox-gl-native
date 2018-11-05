@@ -42,6 +42,10 @@ std::unique_ptr<Layer> CircleLayer::cloneRef(const std::string& id_) const {
 void CircleLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
+LayerFactory* CircleLayer::Impl::getLayerFactory() const {
+    return CircleLayerFactory::get();
+}
+
 // Layout properties
 
 
@@ -687,10 +691,23 @@ Mutable<Layer::Impl> CircleLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+CircleLayerFactory* CircleLayerFactory::instance = nullptr;
+
+CircleLayerFactory::CircleLayerFactory() {
+    assert(!instance);
+    instance = this;
+}
+
 CircleLayerFactory::~CircleLayerFactory() = default;
 
-const char* CircleLayerFactory::type() const {
-    return "circle";
+// static
+CircleLayerFactory* CircleLayerFactory::get() {
+    assert(instance);
+    return instance;
+}
+
+bool CircleLayerFactory::supportsType(const std::string& type) const {
+    return type == "circle";
 }
 
 std::unique_ptr<style::Layer> CircleLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

@@ -42,6 +42,10 @@ std::unique_ptr<Layer> FillExtrusionLayer::cloneRef(const std::string& id_) cons
 void FillExtrusionLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
+LayerFactory* FillExtrusionLayer::Impl::getLayerFactory() const {
+    return FillExtrusionLayerFactory::get();
+}
+
 // Layout properties
 
 
@@ -489,10 +493,23 @@ Mutable<Layer::Impl> FillExtrusionLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+FillExtrusionLayerFactory* FillExtrusionLayerFactory::instance = nullptr;
+
+FillExtrusionLayerFactory::FillExtrusionLayerFactory() {
+    assert(!instance);
+    instance = this;
+}
+
 FillExtrusionLayerFactory::~FillExtrusionLayerFactory() = default;
 
-const char* FillExtrusionLayerFactory::type() const {
-    return "fill-extrusion";
+// static
+FillExtrusionLayerFactory* FillExtrusionLayerFactory::get() {
+    assert(instance);
+    return instance;
+}
+
+bool FillExtrusionLayerFactory::supportsType(const std::string& type) const {
+    return type == "fill-extrusion";
 }
 
 std::unique_ptr<style::Layer> FillExtrusionLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

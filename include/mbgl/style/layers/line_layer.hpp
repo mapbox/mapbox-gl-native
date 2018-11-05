@@ -126,11 +126,17 @@ protected:
 };
 
 class LineLayerFactory : public LayerFactory {
-protected:
+public:
+    LineLayerFactory();
     // LayerFactory overrides.
     ~LineLayerFactory() override;
-    const char* type() const final;
-    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) override;
+    bool supportsType(const std::string& type) const final;
+    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
+
+    static LineLayerFactory* get();
+
+private:
+    static LineLayerFactory* instance;
 };
 
 } // namespace style

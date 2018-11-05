@@ -5,17 +5,6 @@
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion_impl.hpp>
 
-#include <mbgl/style/layers/symbol_layer.hpp>
-#include <mbgl/style/layers/background_layer.hpp>
-#include <mbgl/style/layers/circle_layer.hpp>
-#include <mbgl/style/layers/fill_extrusion_layer.hpp>
-#include <mbgl/style/layers/fill_layer.hpp>
-#include <mbgl/style/layers/heatmap_layer.hpp>
-#include <mbgl/style/layers/hillshade_layer.hpp>
-#include <mbgl/style/layers/line_layer.hpp>
-#include <mbgl/style/layers/raster_layer.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
-
 namespace mbgl {
 namespace style {
 
@@ -154,53 +143,6 @@ bool LayerFactory::initSourceLayerAndFilter(Layer* layer, const conversion::Conv
 
     return true;
 }
-
-// TODO: Move the LayerManager implementation to the dedicated .cpp file per platform.
-class LayerManagerImpl : public LayerManager {
-public:
-    void addLayerFactory(LayerFactory* factory) {
-        factories.emplace(std::make_pair(factory->type(), std::unique_ptr<LayerFactory>(factory)));
-    }
-private:
-    // LayerManager overrides.
-    std::unique_ptr<Layer> createLayer(const std::string& type, const std::string& id, const conversion::Convertible& value, conversion::Error& error) final;
-
-    std::unordered_map<std::string, std::unique_ptr<LayerFactory>> factories;
-};
-
-std::unique_ptr<Layer> LayerManagerImpl::createLayer(const std::string& type, const std::string& id, const conversion::Convertible& value, conversion::Error& error) {
-    auto search = factories.find(type);
-    if (search != factories.end()) {
-        if (auto layer = search->second->createLayer(id, value)) {
-            return layer;
-        }
-        error.message = "Error parsing a layer of type: " + type;
-    } else {
-        error.message = "Unsupported layer type: " + type;
-    }
-    return nullptr;
-}
-
-// static 
-LayerManager* LayerManager::get() {
-    static LayerManager* instance = nullptr;
-    if (instance == nullptr) {
-       static LayerManagerImpl impl;
-       impl.addLayerFactory(new FillLayerFactory);
-       impl.addLayerFactory(new LineLayerFactory);
-       impl.addLayerFactory(new CircleLayerFactory);
-       impl.addLayerFactory(new SymbolLayerFactory);
-       impl.addLayerFactory(new RasterLayerFactory);
-       impl.addLayerFactory(new BackgroundLayerFactory);
-       impl.addLayerFactory(new HillshadeLayerFactory);
-       impl.addLayerFactory(new FillExtrusionLayerFactory);
-       impl.addLayerFactory(new HeatmapLayerFactory);
-
-       instance = &impl;
-    }
-    return instance;
-}
-
 
 } // namespace style
 } // namespace mbgl

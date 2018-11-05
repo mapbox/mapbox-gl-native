@@ -85,5 +85,19 @@ public:
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
+class CustomLayerFactory : public LayerFactory {
+public:
+    CustomLayerFactory();
+    // LayerFactory overrides.
+    ~CustomLayerFactory() override;
+    bool supportsType(const std::string& type) const final;
+    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
+
+    static CustomLayerFactory* get();
+
+private:
+    static CustomLayerFactory* instance;
+};
+
 } // namespace style
 } // namespace mbgl
