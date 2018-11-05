@@ -57,11 +57,17 @@ protected:
 };
 
 class BackgroundLayerFactory : public LayerFactory {
-protected:
+public:
+    BackgroundLayerFactory();
     // LayerFactory overrides.
     ~BackgroundLayerFactory() override;
-    const char* type() const final;
-    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) override;
+    bool supportsType(const std::string& type) const final;
+    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
+
+    static BackgroundLayerFactory* get();
+
+private:
+    static BackgroundLayerFactory* instance;
 };
 
 } // namespace style

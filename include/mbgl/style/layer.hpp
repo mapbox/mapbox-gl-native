@@ -40,7 +40,7 @@ public:
     Layer& operator=(const Layer&) = delete;
 
     virtual ~Layer();
-
+    // Note: LayerType is deprecated, do not use it.
     LayerType getType() const;
     std::string getID() const;
     // Source
@@ -82,11 +82,11 @@ public:
     // object here, so that separately-obtained references to this object share
     // identical platform-native peers.
     util::peer peer;
+    Layer(Immutable<Impl>);
 protected:
-    Layer(Immutable<Impl>);   
     virtual Mutable<Impl> mutableBaseImpl() const = 0;
 
-    LayerObserver* observer = nullptr;
+    LayerObserver* observer;
 };
 
 /**
@@ -97,10 +97,11 @@ protected:
 class LayerFactory {
 public:
     virtual ~LayerFactory() = default;
-    /// Returns the type of the layers, created by this factory.
-    virtual const char* type() const = 0;
+    /// Returns \c true if this factory can produce layers of the given type of the layers; returns \c false otherwise.
+    virtual bool supportsType(const std::string& type) const = 0;
     /// Returns a new Layer instance on success call; returns `nulltptr` otherwise. 
     virtual std::unique_ptr<Layer> createLayer(const std::string& id, const conversion::Convertible& value) = 0;
+
 protected:
     optional<std::string> getSource(const conversion::Convertible& value) const;
     bool initSourceLayerAndFilter(Layer*, const conversion::Convertible& value) const;

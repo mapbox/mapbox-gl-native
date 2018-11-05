@@ -59,6 +59,10 @@ void <%- camelize(type) %>Layer::Impl::stringifyLayout(rapidjson::Writer<rapidjs
 }
 <% } -%>
 
+LayerFactory* <%- camelize(type) %>Layer::Impl::getLayerFactory() const {
+    return <%- camelize(type) %>LayerFactory::get();
+}
+
 // Layout properties
 
 <% for (const property of layoutProperties) { -%>
@@ -260,10 +264,23 @@ Mutable<Layer::Impl> <%- camelize(type) %>Layer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+<%- camelize(type) %>LayerFactory* <%- camelize(type) %>LayerFactory::instance = nullptr;
+
+<%- camelize(type) %>LayerFactory::<%- camelize(type) %>LayerFactory() {
+    assert(!instance);
+    instance = this;
+}
+
 <%- camelize(type) %>LayerFactory::~<%- camelize(type) %>LayerFactory() = default;
 
-const char* <%- camelize(type) %>LayerFactory::type() const {
-    return "<%- type %>";
+// static
+<%- camelize(type) %>LayerFactory* <%- camelize(type) %>LayerFactory::get() {
+    assert(instance);
+    return instance;
+}
+
+bool <%- camelize(type) %>LayerFactory::supportsType(const std::string& type) const {
+    return type == "<%- type %>";
 }
 
 std::unique_ptr<style::Layer> <%- camelize(type) %>LayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

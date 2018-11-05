@@ -42,6 +42,10 @@ std::unique_ptr<Layer> FillLayer::cloneRef(const std::string& id_) const {
 void FillLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
+LayerFactory* FillLayer::Impl::getLayerFactory() const {
+    return FillLayerFactory::get();
+}
+
 // Layout properties
 
 
@@ -489,10 +493,23 @@ Mutable<Layer::Impl> FillLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+FillLayerFactory* FillLayerFactory::instance = nullptr;
+
+FillLayerFactory::FillLayerFactory() {
+    assert(!instance);
+    instance = this;
+}
+
 FillLayerFactory::~FillLayerFactory() = default;
 
-const char* FillLayerFactory::type() const {
-    return "fill";
+// static
+FillLayerFactory* FillLayerFactory::get() {
+    assert(instance);
+    return instance;
+}
+
+bool FillLayerFactory::supportsType(const std::string& type) const {
+    return type == "fill";
 }
 
 std::unique_ptr<style::Layer> FillLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

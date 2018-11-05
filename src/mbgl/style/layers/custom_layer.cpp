@@ -39,5 +39,29 @@ Mutable<Layer::Impl> CustomLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+CustomLayerFactory* CustomLayerFactory::instance = nullptr;
+
+CustomLayerFactory::CustomLayerFactory() {
+    assert(!instance);
+    instance = this;
+}
+
+CustomLayerFactory::~CustomLayerFactory() = default;
+
+// static
+CustomLayerFactory* CustomLayerFactory::get() {
+    assert(instance);
+    return instance;
+}
+
+bool CustomLayerFactory::supportsType(const std::string&) const {
+    return false;
+}
+
+std::unique_ptr<style::Layer> CustomLayerFactory::createLayer(const std::string&, const conversion::Convertible&) {
+    assert(false);
+    return nullptr;
+}
+
 } // namespace style
 } // namespace mbgl

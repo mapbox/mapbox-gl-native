@@ -43,6 +43,10 @@ void SymbolLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffe
     layout.stringify(writer);
 }
 
+LayerFactory* SymbolLayer::Impl::getLayerFactory() const {
+    return SymbolLayerFactory::get();
+}
+
 // Layout properties
 
 PropertyValue<SymbolPlacementType> SymbolLayer::getDefaultSymbolPlacement() {
@@ -1978,10 +1982,23 @@ Mutable<Layer::Impl> SymbolLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+SymbolLayerFactory* SymbolLayerFactory::instance = nullptr;
+
+SymbolLayerFactory::SymbolLayerFactory() {
+    assert(!instance);
+    instance = this;
+}
+
 SymbolLayerFactory::~SymbolLayerFactory() = default;
 
-const char* SymbolLayerFactory::type() const {
-    return "symbol";
+// static
+SymbolLayerFactory* SymbolLayerFactory::get() {
+    assert(instance);
+    return instance;
+}
+
+bool SymbolLayerFactory::supportsType(const std::string& type) const {
+    return type == "symbol";
 }
 
 std::unique_ptr<style::Layer> SymbolLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

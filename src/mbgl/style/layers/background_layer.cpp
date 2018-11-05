@@ -42,6 +42,10 @@ std::unique_ptr<Layer> BackgroundLayer::cloneRef(const std::string& id_) const {
 void BackgroundLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
+LayerFactory* BackgroundLayer::Impl::getLayerFactory() const {
+    return BackgroundLayerFactory::get();
+}
+
 // Layout properties
 
 
@@ -270,10 +274,23 @@ Mutable<Layer::Impl> BackgroundLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+BackgroundLayerFactory* BackgroundLayerFactory::instance = nullptr;
+
+BackgroundLayerFactory::BackgroundLayerFactory() {
+    assert(!instance);
+    instance = this;
+}
+
 BackgroundLayerFactory::~BackgroundLayerFactory() = default;
 
-const char* BackgroundLayerFactory::type() const {
-    return "background";
+// static
+BackgroundLayerFactory* BackgroundLayerFactory::get() {
+    assert(instance);
+    return instance;
+}
+
+bool BackgroundLayerFactory::supportsType(const std::string& type) const {
+    return type == "background";
 }
 
 std::unique_ptr<style::Layer> BackgroundLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

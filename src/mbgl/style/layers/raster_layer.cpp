@@ -42,6 +42,10 @@ std::unique_ptr<Layer> RasterLayer::cloneRef(const std::string& id_) const {
 void RasterLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
+LayerFactory* RasterLayer::Impl::getLayerFactory() const {
+    return RasterLayerFactory::get();
+}
+
 // Layout properties
 
 
@@ -510,10 +514,23 @@ Mutable<Layer::Impl> RasterLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
+RasterLayerFactory* RasterLayerFactory::instance = nullptr;
+
+RasterLayerFactory::RasterLayerFactory() {
+    assert(!instance);
+    instance = this;
+}
+
 RasterLayerFactory::~RasterLayerFactory() = default;
 
-const char* RasterLayerFactory::type() const {
-    return "raster";
+// static
+RasterLayerFactory* RasterLayerFactory::get() {
+    assert(instance);
+    return instance;
+}
+
+bool RasterLayerFactory::supportsType(const std::string& type) const {
+    return type == "raster";
 }
 
 std::unique_ptr<style::Layer> RasterLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

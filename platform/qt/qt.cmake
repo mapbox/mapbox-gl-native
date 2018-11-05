@@ -43,6 +43,9 @@ set(MBGL_QT_CORE_FILES
     PRIVATE platform/default/collator.cpp
     PRIVATE platform/default/unaccent.cpp
     PRIVATE platform/default/unaccent.hpp
+
+    #Layer manager
+    PRIVATE platform/default/layer_manager.cpp
 )
 
 set(MBGL_QT_FILESOURCE_FILES

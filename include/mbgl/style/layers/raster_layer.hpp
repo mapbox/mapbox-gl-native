@@ -87,11 +87,17 @@ protected:
 };
 
 class RasterLayerFactory : public LayerFactory {
-protected:
+public:
+    RasterLayerFactory();
     // LayerFactory overrides.
     ~RasterLayerFactory() override;
-    const char* type() const final;
-    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) override;
+    bool supportsType(const std::string& type) const final;
+    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
+
+    static RasterLayerFactory* get();
+
+private:
+    static RasterLayerFactory* instance;
 };
 
 } // namespace style
