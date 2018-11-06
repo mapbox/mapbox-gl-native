@@ -7,7 +7,7 @@
 using namespace mbgl::util;
 
 TEST(URL, percentEncode) {
-    EXPECT_EQ("%22%C3%A9nc%C3%B8%C3%B0ing%22", percentEncode("\"éncøðing\""));
+    EXPECT_EQ("%22%c3%a9nc%c3%b8%c3%b0ing%22", percentEncode("\"éncøðing\""));
 }
 
 TEST(URL, percentDecode) {

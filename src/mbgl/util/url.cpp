@@ -24,7 +24,7 @@ inline bool isSchemeCharacter(char c) {
 
 inline char toLowerHex(char c) {
     c &= 0x0F;
-    return '0' + c + (c > 9 ? 7 : 0);
+    return '0' + c + (c > 9 ? 39 : 0);
 }
 
 } // namespace
