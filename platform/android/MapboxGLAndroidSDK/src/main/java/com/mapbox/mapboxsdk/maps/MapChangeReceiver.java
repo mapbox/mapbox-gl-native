@@ -1,9 +1,14 @@
 package com.mapbox.mapboxsdk.maps;
 
+import com.mapbox.mapboxsdk.MapStrictMode;
+import com.mapbox.mapboxsdk.log.Logger;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 class MapChangeReceiver implements NativeMapView.StateCallback {
+
+  private static final String TAG = "Mbgl-MapChangeReceiver";
 
   private final List<MapView.OnCameraWillChangeListener> onCameraWillChangeListenerList = new CopyOnWriteArrayList<>();
   private final List<MapView.OnCameraIsChangingListener> onCameraIsChangingListenerList = new CopyOnWriteArrayList<>();
@@ -28,109 +33,169 @@ class MapChangeReceiver implements NativeMapView.StateCallback {
 
   @Override
   public void onCameraWillChange(boolean animated) {
-    if (!onCameraWillChangeListenerList.isEmpty()) {
-      for (MapView.OnCameraWillChangeListener onCameraWillChangeListener : onCameraWillChangeListenerList) {
-        onCameraWillChangeListener.onCameraWillChange(animated);
+    try {
+      if (!onCameraWillChangeListenerList.isEmpty()) {
+        for (MapView.OnCameraWillChangeListener onCameraWillChangeListener : onCameraWillChangeListenerList) {
+          onCameraWillChangeListener.onCameraWillChange(animated);
+        }
       }
+    } catch (RuntimeException err) {
+      Logger.e(TAG, "Exception in onCameraWillChange", err);
+      MapStrictMode.strictModeViolation(err);
     }
   }
 
   @Override
   public void onCameraIsChanging() {
-    if (!onCameraIsChangingListenerList.isEmpty()) {
-      for (MapView.OnCameraIsChangingListener onCameraIsChangingListener : onCameraIsChangingListenerList) {
-        onCameraIsChangingListener.onCameraIsChanging();
+    try {
+      if (!onCameraIsChangingListenerList.isEmpty()) {
+        for (MapView.OnCameraIsChangingListener onCameraIsChangingListener : onCameraIsChangingListenerList) {
+          onCameraIsChangingListener.onCameraIsChanging();
+        }
       }
+    } catch (RuntimeException err) {
+      Logger.e(TAG, "Exception in onCameraIsChanging", err);
+      MapStrictMode.strictModeViolation(err);
     }
   }
 
   @Override
   public void onCameraDidChange(boolean animated) {
-    if (!onCameraDidChangeListenerList.isEmpty()) {
-      for (MapView.OnCameraDidChangeListener onCameraDidChangeListener : onCameraDidChangeListenerList) {
-        onCameraDidChangeListener.onCameraDidChange(animated);
+    try {
+      if (!onCameraDidChangeListenerList.isEmpty()) {
+        for (MapView.OnCameraDidChangeListener onCameraDidChangeListener : onCameraDidChangeListenerList) {
+          onCameraDidChangeListener.onCameraDidChange(animated);
+        }
       }
+    } catch (RuntimeException err) {
+      Logger.e(TAG, "Exception in onCameraDidChange", err);
+      MapStrictMode.strictModeViolation(err);
     }
   }
 
   @Override
   public void onWillStartLoadingMap() {
-    if (!onWillStartLoadingMapListenerList.isEmpty()) {
-      for (MapView.OnWillStartLoadingMapListener onWillStartLoadingMapListener : onWillStartLoadingMapListenerList) {
-        onWillStartLoadingMapListener.onWillStartLoadingMap();
+    try {
+      if (!onWillStartLoadingMapListenerList.isEmpty()) {
+        for (MapView.OnWillStartLoadingMapListener onWillStartLoadingMapListener : onWillStartLoadingMapListenerList) {
+          onWillStartLoadingMapListener.onWillStartLoadingMap();
+        }
       }
+    } catch (RuntimeException err) {
+      Logger.e(TAG, "Exception in onWillStartLoadingMap", err);
+      MapStrictMode.strictModeViolation(err);
     }
   }
 
   @Override
   public void onDidFinishLoadingMap() {
-    if (!onDidFinishLoadingMapListenerList.isEmpty()) {
-      for (MapView.OnDidFinishLoadingMapListener onDidFinishLoadingMapListener : onDidFinishLoadingMapListenerList) {
-        onDidFinishLoadingMapListener.onDidFinishLoadingMap();
+    try {
+      if (!onDidFinishLoadingMapListenerList.isEmpty()) {
+        for (MapView.OnDidFinishLoadingMapListener onDidFinishLoadingMapListener : onDidFinishLoadingMapListenerList) {
+          onDidFinishLoadingMapListener.onDidFinishLoadingMap();
+        }
       }
+    } catch (RuntimeException err) {
+      Logger.e(TAG, "Exception in onDidFinishLoadingMap", err);
+      MapStrictMode.strictModeViolation(err);
     }
   }
 
   @Override
   public void onDidFailLoadingMap(String error) {
-    if (!onDidFailLoadingMapListenerList.isEmpty()) {
-      for (MapView.OnDidFailLoadingMapListener onDidFailLoadingMapListener : onDidFailLoadingMapListenerList) {
-        onDidFailLoadingMapListener.onDidFailLoadingMap(error);
+    try {
+      if (!onDidFailLoadingMapListenerList.isEmpty()) {
+        for (MapView.OnDidFailLoadingMapListener onDidFailLoadingMapListener : onDidFailLoadingMapListenerList) {
+          onDidFailLoadingMapListener.onDidFailLoadingMap(error);
+        }
       }
+    } catch (RuntimeException err) {
+      Logger.e(TAG, "Exception in onDidFailLoadingMap", err);
+      MapStrictMode.strictModeViolation(err);
     }
   }
 
   @Override
   public void onWillStartRenderingFrame() {
-    if (!onWillStartRenderingFrameList.isEmpty()) {
-      for (MapView.OnWillStartRenderingFrameListener listener : onWillStartRenderingFrameList) {
-        listener.onWillStartRenderingFrame();
+    try {
+      if (!onWillStartRenderingFrameList.isEmpty()) {
+        for (MapView.OnWillStartRenderingFrameListener listener : onWillStartRenderingFrameList) {
+          listener.onWillStartRenderingFrame();
+        }
       }
+    } catch (RuntimeException err) {
+      Logger.e(TAG, "Exception in onWillStartRenderingFrame", err);
+      MapStrictMode.strictModeViolation(err);
     }
   }
 
   @Override
   public void onDidFinishRenderingFrame(boolean fully) {
-    if (!onDidFinishRenderingFrameList.isEmpty()) {
-      for (MapView.OnDidFinishRenderingFrameListener listener : onDidFinishRenderingFrameList) {
-        listener.onDidFinishRenderingFrame(fully);
+    try {
+      if (!onDidFinishRenderingFrameList.isEmpty()) {
+        for (MapView.OnDidFinishRenderingFrameListener listener : onDidFinishRenderingFrameList) {
+          listener.onDidFinishRenderingFrame(fully);
+        }
       }
+    } catch (RuntimeException err) {
+      Logger.e(TAG, "Exception in onDidFinishRenderingFrame", err);
+      MapStrictMode.strictModeViolation(err);
     }
   }
 
   @Override
   public void onWillStartRenderingMap() {
-    if (!onWillStartRenderingMapListenerList.isEmpty()) {
-      for (MapView.OnWillStartRenderingMapListener listener : onWillStartRenderingMapListenerList) {
-        listener.onWillStartRenderingMap();
+    try {
+      if (!onWillStartRenderingMapListenerList.isEmpty()) {
+        for (MapView.OnWillStartRenderingMapListener listener : onWillStartRenderingMapListenerList) {
+          listener.onWillStartRenderingMap();
+        }
       }
+    } catch (RuntimeException err) {
+      Logger.e(TAG, "Exception in onWillStartRenderingMap", err);
+      MapStrictMode.strictModeViolation(err);
     }
   }
 
   @Override
   public void onDidFinishRenderingMap(boolean fully) {
-    if (!onDidFinishRenderingMapListenerList.isEmpty()) {
-      for (MapView.OnDidFinishRenderingMapListener listener : onDidFinishRenderingMapListenerList) {
-        listener.onDidFinishRenderingMap(fully);
+    try {
+      if (!onDidFinishRenderingMapListenerList.isEmpty()) {
+        for (MapView.OnDidFinishRenderingMapListener listener : onDidFinishRenderingMapListenerList) {
+          listener.onDidFinishRenderingMap(fully);
+        }
       }
+    } catch (RuntimeException err) {
+      Logger.e(TAG, "Exception in onDidFinishRenderingMap", err);
+      MapStrictMode.strictModeViolation(err);
     }
   }
 
   @Override
   public void onDidFinishLoadingStyle() {
-    if (!onDidFinishLoadingStyleListenerList.isEmpty()) {
-      for (MapView.OnDidFinishLoadingStyleListener listener : onDidFinishLoadingStyleListenerList) {
-        listener.onDidFinishLoadingStyle();
+    try {
+      if (!onDidFinishLoadingStyleListenerList.isEmpty()) {
+        for (MapView.OnDidFinishLoadingStyleListener listener : onDidFinishLoadingStyleListenerList) {
+          listener.onDidFinishLoadingStyle();
+        }
       }
+    } catch (RuntimeException err) {
+      Logger.e(TAG, "Exception in onDidFinishLoadingStyle", err);
+      MapStrictMode.strictModeViolation(err);
     }
   }
 
   @Override
   public void onSourceChanged(String sourceId) {
-    if (!onSourceChangedListenerList.isEmpty()) {
-      for (MapView.OnSourceChangedListener onSourceChangedListener : onSourceChangedListenerList) {
-        onSourceChangedListener.onSourceChangedListener(sourceId);
+    try {
+      if (!onSourceChangedListenerList.isEmpty()) {
+        for (MapView.OnSourceChangedListener onSourceChangedListener : onSourceChangedListenerList) {
+          onSourceChangedListener.onSourceChangedListener(sourceId);
+        }
       }
+    } catch (RuntimeException err) {
+      Logger.e(TAG, "Exception in onSourceChanged", err);
+      MapStrictMode.strictModeViolation(err);
     }
   }
 
