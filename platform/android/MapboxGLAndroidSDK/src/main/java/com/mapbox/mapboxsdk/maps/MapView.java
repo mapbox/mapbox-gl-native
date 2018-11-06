@@ -789,6 +789,12 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     mapChangeReceiver.removeOnSourceChangedListener(listener);
   }
 
+  /**
+   * Interface definition for a callback to be invoked when the camera will change.
+   * <p>
+   * {@link MapView#addOnCameraWillChangeListener(OnCameraWillChangeListener)}
+   * </p>
+   */
   public interface OnCameraWillChangeListener {
 
     /**
