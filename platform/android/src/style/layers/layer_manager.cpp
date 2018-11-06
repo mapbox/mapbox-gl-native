@@ -1,4 +1,4 @@
-#include "layers.hpp"
+#include "layer_manager.hpp"
 
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/layer_impl.hpp>

@@ -95,8 +95,8 @@ platform/android/src/style/layers/hillshade_layer.cpp
 platform/android/src/style/layers/hillshade_layer.hpp
 platform/android/src/style/layers/layer.cpp
 platform/android/src/style/layers/layer.hpp
-platform/android/src/style/layers/layers.cpp
-platform/android/src/style/layers/layers.hpp
+platform/android/src/style/layers/layer_manager.cpp
+platform/android/src/style/layers/layer_manager.hpp
 platform/android/src/style/layers/line_layer.cpp
 platform/android/src/style/layers/line_layer.hpp
 platform/android/src/style/layers/raster_layer.cpp
