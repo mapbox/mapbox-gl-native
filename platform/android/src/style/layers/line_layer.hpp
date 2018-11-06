@@ -15,8 +15,6 @@ public:
     using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/LineLayer"; };
 
-    static void registerNative(jni::JNIEnv&);
-
     LineLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
     LineLayer(mbgl::Map&, mbgl::style::LineLayer&);
@@ -74,9 +72,22 @@ public:
     jni::Local<jni::Object<TransitionOptions>> getLinePatternTransition(jni::JNIEnv&);
 
     jni::Local<jni::Object<jni::ObjectTag>> getLineGradient(jni::JNIEnv&);
-    jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&);
 
 }; // class LineLayer
+
+class LineJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::LineLayerFactory {
+public:
+    ~LineJavaLayerPeerFactory() override;
+
+    // JavaLayerPeerFactory overrides.
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+
+    void registerNative(jni::JNIEnv&) final;
+
+    style::LayerFactory* getLayerFactory() final { return this; }
+
+};  // class LineJavaLayerPeerFactory
 
 } // namespace android
 } // namespace mbgl

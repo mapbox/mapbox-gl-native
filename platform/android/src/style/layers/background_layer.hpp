@@ -15,8 +15,6 @@ public:
     using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/BackgroundLayer"; };
 
-    static void registerNative(jni::JNIEnv&);
-
     BackgroundLayer(jni::JNIEnv&, jni::String&);
 
     BackgroundLayer(mbgl::Map&, mbgl::style::BackgroundLayer&);
@@ -38,9 +36,22 @@ public:
     jni::Local<jni::Object<jni::ObjectTag>> getBackgroundOpacity(jni::JNIEnv&);
     void setBackgroundOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Local<jni::Object<TransitionOptions>> getBackgroundOpacityTransition(jni::JNIEnv&);
-    jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&);
 
 }; // class BackgroundLayer
+
+class BackgroundJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::BackgroundLayerFactory {
+public:
+    ~BackgroundJavaLayerPeerFactory() override;
+
+    // JavaLayerPeerFactory overrides.
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+
+    void registerNative(jni::JNIEnv&) final;
+
+    style::LayerFactory* getLayerFactory() final { return this; }
+
+};  // class BackgroundJavaLayerPeerFactory
 
 } // namespace android
 } // namespace mbgl

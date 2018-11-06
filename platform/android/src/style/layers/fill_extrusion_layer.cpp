@@ -7,6 +7,8 @@
 #include "../conversion/property_value.hpp"
 #include "../conversion/transition_options.hpp"
 
+#include <mbgl/style/layer_impl.hpp>
+
 namespace mbgl {
 namespace android {
 
@@ -18,7 +20,7 @@ namespace android {
      * Creates an owning peer object (for layers not attached to the map) from the JVM side
      */
     FillExtrusionLayer::FillExtrusionLayer(jni::JNIEnv& env, jni::String& layerId, jni::String& sourceId)
-        : Layer(env, std::make_unique<mbgl::style::FillExtrusionLayer>(jni::Make<std::string>(env, layerId), jni::Make<std::string>(env, sourceId))) {
+        : Layer(std::make_unique<mbgl::style::FillExtrusionLayer>(jni::Make<std::string>(env, layerId), jni::Make<std::string>(env, sourceId))) {
     }
 
     /**
@@ -153,13 +155,29 @@ namespace android {
     }
 
 
-    jni::Local<jni::Object<Layer>> FillExtrusionLayer::createJavaPeer(jni::JNIEnv& env) {
-        static auto& javaClass = jni::Class<FillExtrusionLayer>::Singleton(env);
-        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
-        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+    // FillExtrusionJavaLayerPeerFactory
+
+    FillExtrusionJavaLayerPeerFactory::~FillExtrusionJavaLayerPeerFactory() = default;
+
+    namespace {
+        jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv& env, Layer* layer) {
+            static auto& javaClass = jni::Class<FillExtrusionLayer>::Singleton(env);
+            static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+            return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(layer));
+        }
+    }  // namespace
+
+    jni::Local<jni::Object<Layer>> FillExtrusionJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
+        assert(layer.baseImpl->getLayerFactory() == this);
+        return createJavaPeer(env, new FillExtrusionLayer(map, toFillExtrusionLayer(layer)));
     }
 
-    void FillExtrusionLayer::registerNative(jni::JNIEnv& env) {
+    jni::Local<jni::Object<Layer>> FillExtrusionJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
+        assert(layer->baseImpl->getLayerFactory() == this);
+        return createJavaPeer(env, new FillExtrusionLayer(map, std::unique_ptr<mbgl::style::FillExtrusionLayer>(static_cast<mbgl::style::FillExtrusionLayer*>(layer.release()))));
+    }
+
+    void FillExtrusionJavaLayerPeerFactory::registerNative(jni::JNIEnv& env) {
         // Lookup the class
         static auto& javaClass = jni::Class<FillExtrusionLayer>::Singleton(env);
 

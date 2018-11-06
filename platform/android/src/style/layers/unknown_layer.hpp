@@ -20,7 +20,7 @@ public:
 
     ~UnknownLayer() = default;
 
-    jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&);
+    static jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&, Layer*);
 
 }; // class UnknownLayer
 

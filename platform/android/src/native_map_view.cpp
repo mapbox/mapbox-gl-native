@@ -733,7 +733,7 @@ jni::Local<jni::Array<jni::Object<Layer>>> NativeMapView::getLayers(JNIEnv& env)
     auto jLayers = jni::Array<jni::Object<Layer>>::New(env, layers.size());
     int index = 0;
     for (auto layer : layers) {
-        jLayers.Set(env, index, createJavaLayerPeer(env, *map, *layer));
+        jLayers.Set(env, index, LayerManagerAndroid::get()->createJavaLayerPeer(env, *map, *layer));
         index++;
     }
 
@@ -750,7 +750,7 @@ jni::Local<jni::Object<Layer>> NativeMapView::getLayer(JNIEnv& env, const jni::S
     }
 
     // Create and return the layer's native peer
-    return createJavaLayerPeer(env, *map, *coreLayer);
+    return LayerManagerAndroid::get()->createJavaLayerPeer(env, *map, *coreLayer);
 }
 
 void NativeMapView::addLayer(JNIEnv& env, jlong nativeLayerPtr, const jni::String& before) {
@@ -830,7 +830,7 @@ void NativeMapView::addLayerAt(JNIEnv& env, jlong nativeLayerPtr, jni::jint inde
 jni::Local<jni::Object<Layer>> NativeMapView::removeLayerById(JNIEnv& env, const jni::String& id) {
     std::unique_ptr<mbgl::style::Layer> coreLayer = map->getStyle().removeLayer(jni::Make<std::string>(env, id));
     if (coreLayer) {
-        return createJavaLayerPeer(env, *map, std::move(coreLayer));
+        return LayerManagerAndroid::get()->createJavaLayerPeer(env, *map, std::move(coreLayer));
     } else {
         return jni::Local<jni::Object<Layer>>();
     }
@@ -851,7 +851,7 @@ jni::Local<jni::Object<Layer>> NativeMapView::removeLayerAt(JNIEnv& env, jni::ji
 
     std::unique_ptr<mbgl::style::Layer> coreLayer = map->getStyle().removeLayer(layers.at(index)->getID());
     if (coreLayer) {
-        return createJavaLayerPeer(env, *map, std::move(coreLayer));
+        return LayerManagerAndroid::get()->createJavaLayerPeer(env, *map, std::move(coreLayer));
     } else {
         return jni::Local<jni::Object<Layer>>();
     }
