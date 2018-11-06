@@ -1,3 +1,12 @@
 ignore:
   - "test/"
   - "vendor/"
+coverage:
+  notify:
+    slack:
+      default:
+        url: "secret:5kE2PFwXm3Yv7fR8w4GDX+IMEFcEQSstwD7xY5wv89+DiciZKRvLHnKY3UOc8Pzfsd9oEkvWk7trLrNUPDggbXhEHSP3PJM6RwktosoER1lNmmJztboTycrcL7UF/gNf30HYzlPL9Jt/7p8808ftkFhUqzr2NDN6ABwQexlfMB4="
+        only_pulls: false
+        branches: null
+        flags: null
+        paths: null
