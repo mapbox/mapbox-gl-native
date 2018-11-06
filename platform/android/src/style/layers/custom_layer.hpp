@@ -25,5 +25,19 @@ public:
 
 }; // class CustomLayer
 
+class CustomJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::CustomLayerFactory {
+public:
+    ~CustomJavaLayerPeerFactory() override;
+
+    // JavaLayerPeerFactory overrides.
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+
+    void registerNative(jni::JNIEnv&) final;
+
+    style::LayerFactory* getLayerFactory() final { return this; }
+
+};  // class CustomJavaLayerPeerFactory
+
 } // namespace android
 } // namespace mbgl

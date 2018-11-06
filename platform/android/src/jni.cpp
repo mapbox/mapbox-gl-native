@@ -160,7 +160,7 @@ void registerNatives(JavaVM *vm) {
 
     // Style
     TransitionOptions::registerNative(env);
-    registerNativeLayers(env);
+    LayerManagerAndroid::get()->registerNative(env);
     Source::registerNative(env);
     Light::registerNative(env);
     Position::registerNative(env);

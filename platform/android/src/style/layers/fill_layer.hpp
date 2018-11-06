@@ -15,8 +15,6 @@ public:
     using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/FillLayer"; };
 
-    static void registerNative(jni::JNIEnv&);
-
     FillLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
     FillLayer(mbgl::Map&, mbgl::style::FillLayer&);
@@ -50,9 +48,22 @@ public:
     jni::Local<jni::Object<jni::ObjectTag>> getFillPattern(jni::JNIEnv&);
     void setFillPatternTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Local<jni::Object<TransitionOptions>> getFillPatternTransition(jni::JNIEnv&);
-    jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&);
 
 }; // class FillLayer
+
+class FillJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::FillLayerFactory {
+public:
+    ~FillJavaLayerPeerFactory() override;
+
+    // JavaLayerPeerFactory overrides.
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+
+    void registerNative(jni::JNIEnv&) final;
+
+    style::LayerFactory* getLayerFactory() final { return this; }
+
+};  // class FillJavaLayerPeerFactory
 
 } // namespace android
 } // namespace mbgl

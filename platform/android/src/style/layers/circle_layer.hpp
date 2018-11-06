@@ -15,8 +15,6 @@ public:
     using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/CircleLayer"; };
 
-    static void registerNative(jni::JNIEnv&);
-
     CircleLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
     CircleLayer(mbgl::Map&, mbgl::style::CircleLayer&);
@@ -64,9 +62,22 @@ public:
     jni::Local<jni::Object<jni::ObjectTag>> getCircleStrokeOpacity(jni::JNIEnv&);
     void setCircleStrokeOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Local<jni::Object<TransitionOptions>> getCircleStrokeOpacityTransition(jni::JNIEnv&);
-    jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&);
 
 }; // class CircleLayer
+
+class CircleJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::CircleLayerFactory {
+public:
+    ~CircleJavaLayerPeerFactory() override;
+
+    // JavaLayerPeerFactory overrides.
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+
+    void registerNative(jni::JNIEnv&) final;
+
+    style::LayerFactory* getLayerFactory() final { return this; }
+
+};  // class CircleJavaLayerPeerFactory
 
 } // namespace android
 } // namespace mbgl

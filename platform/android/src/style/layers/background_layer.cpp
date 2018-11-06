@@ -7,6 +7,8 @@
 #include "../conversion/property_value.hpp"
 #include "../conversion/transition_options.hpp"
 
+#include <mbgl/style/layer_impl.hpp>
+
 namespace mbgl {
 namespace android {
 
@@ -18,7 +20,7 @@ namespace android {
      * Creates an owning peer object (for layers not attached to the map) from the JVM side
      */
     BackgroundLayer::BackgroundLayer(jni::JNIEnv& env, jni::String& layerId)
-        : Layer(env, std::make_unique<mbgl::style::BackgroundLayer>(jni::Make<std::string>(env, layerId))) {
+        : Layer(std::make_unique<mbgl::style::BackgroundLayer>(jni::Make<std::string>(env, layerId))) {
     }
 
     /**
@@ -94,13 +96,29 @@ namespace android {
     }
 
 
-    jni::Local<jni::Object<Layer>> BackgroundLayer::createJavaPeer(jni::JNIEnv& env) {
-        static auto& javaClass = jni::Class<BackgroundLayer>::Singleton(env);
-        static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
-        return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+    // BackgroundJavaLayerPeerFactory
+
+    BackgroundJavaLayerPeerFactory::~BackgroundJavaLayerPeerFactory() = default;
+
+    namespace {
+        jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv& env, Layer* layer) {
+            static auto& javaClass = jni::Class<BackgroundLayer>::Singleton(env);
+            static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+            return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(layer));
+        }
+    }  // namespace
+
+    jni::Local<jni::Object<Layer>> BackgroundJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
+        assert(layer.baseImpl->getLayerFactory() == this);
+        return createJavaPeer(env, new BackgroundLayer(map, toBackgroundLayer(layer)));
     }
 
-    void BackgroundLayer::registerNative(jni::JNIEnv& env) {
+    jni::Local<jni::Object<Layer>> BackgroundJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
+        assert(layer->baseImpl->getLayerFactory() == this);
+        return createJavaPeer(env, new BackgroundLayer(map, std::unique_ptr<mbgl::style::BackgroundLayer>(static_cast<mbgl::style::BackgroundLayer*>(layer.release()))));
+    }
+
+    void BackgroundJavaLayerPeerFactory::registerNative(jni::JNIEnv& env) {
         // Lookup the class
         static auto& javaClass = jni::Class<BackgroundLayer>::Singleton(env);
 

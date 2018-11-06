@@ -1,6 +1,7 @@
 #include "layers.hpp"
 
 #include <mbgl/style/layer.hpp>
+#include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
@@ -12,6 +13,10 @@
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
 
+#include <mbgl/style/conversion/constant.hpp>
+#include <mbgl/style/conversion/filter.hpp>
+#include <mbgl/style/conversion_impl.hpp>
+
 #include "background_layer.hpp"
 #include "circle_layer.hpp"
 #include "custom_layer.hpp"
@@ -22,81 +27,88 @@
 #include "line_layer.hpp"
 #include "raster_layer.hpp"
 #include "symbol_layer.hpp"
-#include "unknown_layer.hpp"
 #include "fill_extrusion_layer.hpp"
 
 namespace mbgl {
 
 namespace android {
 
-template <typename T>
-inline std::unique_ptr<T> to(std::unique_ptr<style::Layer> layer) {
-    return std::unique_ptr<T>(static_cast<T*>(layer.release()));
+LayerManagerAndroid::LayerManagerAndroid() {
+    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new FillJavaLayerPeerFactory));
+    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new LineJavaLayerPeerFactory));
+    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new CircleJavaLayerPeerFactory));
+    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new SymbolJavaLayerPeerFactory));
+    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new RasterJavaLayerPeerFactory));
+    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new BackgroundJavaLayerPeerFactory));
+    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new HillshadeJavaLayerPeerFactory));
+    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new FillExtrusionJavaLayerPeerFactory));
+    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new HeatmapJavaLayerPeerFactory));
+    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new CustomJavaLayerPeerFactory));
 }
 
-template <typename T>
-inline T& to(style::Layer& layer) {
-    return static_cast<T&>(layer);
-}
+LayerManagerAndroid::~LayerManagerAndroid() = default;
 
-template <typename T>
-std::unique_ptr<Layer> initializeLayerPeer(Map& map, style::LayerType type, T&& layer) {
-    switch (type) {
-    case style::LayerType::Fill:
-        return std::unique_ptr<Layer>(new FillLayer(map, to<style::FillLayer>(std::forward<T>(layer))));
-    case style::LayerType::Line:
-        return std::unique_ptr<Layer>(new LineLayer(map, to<style::LineLayer>(std::forward<T>(layer))));
-    case style::LayerType::Circle:
-        return std::unique_ptr<Layer>(new CircleLayer(map, to<style::CircleLayer>(std::forward<T>(layer))));
-    case style::LayerType::Symbol:
-        return std::unique_ptr<Layer>(new SymbolLayer(map, to<style::SymbolLayer>(std::forward<T>(layer))));
-    case style::LayerType::Raster:
-        return std::unique_ptr<Layer>(new RasterLayer(map, to<style::RasterLayer>(std::forward<T>(layer))));
-    case style::LayerType::Background:
-        return std::unique_ptr<Layer>(new BackgroundLayer(map, to<style::BackgroundLayer>(std::forward<T>(layer))));
-    case style::LayerType::Hillshade:
-        return std::unique_ptr<Layer>(new HillshadeLayer(map, to<style::HillshadeLayer>(std::forward<T>(layer))));
-    case style::LayerType::Custom:
-        return std::unique_ptr<Layer>(new CustomLayer(map, to<style::CustomLayer>(std::forward<T>(layer))));
-    case style::LayerType::FillExtrusion:
-        return std::unique_ptr<Layer>(new FillExtrusionLayer(map, to<style::FillExtrusionLayer>(std::forward<T>(layer))));
-    case style::LayerType::Heatmap:
-        return std::unique_ptr<Layer>(new HeatmapLayer(map, to<style::HeatmapLayer>(std::forward<T>(layer))));
+jni::Local<jni::Object<Layer>> LayerManagerAndroid::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
+    if (JavaLayerPeerFactory* factory = getPeerFactory(&layer)) {
+        return factory->createJavaLayerPeer(env, map, layer);
     }
-    // Not reachable, but placate GCC.
-    assert(false);
-    return std::unique_ptr<Layer>(new UnknownLayer(map, std::forward<T>(layer)));
+    return jni::Local<jni::Object<Layer>>();
 }
 
-jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, Map& map, style::Layer& coreLayer) {
-    std::unique_ptr<Layer> peerLayer = initializeLayerPeer(map, coreLayer.getType(), coreLayer);
-    jni::Local<jni::Object<Layer>> result = peerLayer->createJavaPeer(env);
-    peerLayer.release();
-    return result;
+jni::Local<jni::Object<Layer>> LayerManagerAndroid::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
+    if (JavaLayerPeerFactory* factory = getPeerFactory(layer.get())) {
+        return factory->createJavaLayerPeer(env, map, std::move(layer));
+    }
+    return jni::Local<jni::Object<Layer>>();
 }
 
-jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> coreLayer) {
-    auto type = coreLayer->getType();
-    std::unique_ptr<Layer> peerLayer = initializeLayerPeer(map, type, std::move(coreLayer));
-    jni::Local<jni::Object<Layer>> result = peerLayer->createJavaPeer(env);
-    peerLayer.release();
-    return result;
-}
-
-void registerNativeLayers(jni::JNIEnv& env) {
+void LayerManagerAndroid::registerNative(jni::JNIEnv& env) {
     Layer::registerNative(env);
-    BackgroundLayer::registerNative(env);
-    CircleLayer::registerNative(env);
-    CustomLayer::registerNative(env);
-    FillExtrusionLayer::registerNative(env);
-    FillLayer::registerNative(env);
-    HeatmapLayer::registerNative(env);
-    HillshadeLayer::registerNative(env);
-    LineLayer::registerNative(env);
-    RasterLayer::registerNative(env);
-    SymbolLayer::registerNative(env);
-    UnknownLayer::registerNative(env);
+    for (const auto& factory: factories) {
+        factory->registerNative(env);
+    }
+}
+
+JavaLayerPeerFactory* LayerManagerAndroid::getPeerFactory(mbgl::style::Layer* layer) {
+    auto* layerFactory = layer->baseImpl->getLayerFactory();
+    assert(layerFactory);
+    for (const auto& factory: factories) {
+        if (factory->getLayerFactory() == layerFactory) {
+            return factory.get();
+        }
+    }
+    assert(false);
+    return nullptr;
+}
+
+std::unique_ptr<style::Layer> LayerManagerAndroid::createLayer(const std::string& type, const std::string& id, const style::conversion::Convertible& value, style::conversion::Error& error) {
+    for (const auto& factory: factories) {
+        auto* layerFactory = factory->getLayerFactory();
+        if (layerFactory->supportsType(type)) {
+            if (auto layer = layerFactory->createLayer(id, value)) {
+                return layer;
+            }
+            error.message = "Error parsing a layer of type: " + type;
+            return nullptr;
+        }
+    }
+    error.message = "Unsupported layer type: " + type;
+    return nullptr;
+}
+
+// static 
+LayerManagerAndroid* LayerManagerAndroid::get() {
+    static LayerManagerAndroid impl;
+    return &impl;
 }
 
 } // namespace android
+
+namespace style {
+// static 
+LayerManager* LayerManager::get() {
+    return android::LayerManagerAndroid::get();
+}
+
+} // style
 } // namespace mbgl

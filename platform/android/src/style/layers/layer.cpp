@@ -37,7 +37,7 @@ namespace android {
     /**
      * Invoked when the construction is initiated from the jvm through a subclass
      */
-    Layer::Layer(jni::JNIEnv&, std::unique_ptr<mbgl::style::Layer> coreLayer)
+    Layer::Layer(std::unique_ptr<mbgl::style::Layer> coreLayer)
         : ownedLayer(std::move(coreLayer))
         , layer(*ownedLayer) {
     }
