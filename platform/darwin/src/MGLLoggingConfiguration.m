@@ -80,7 +80,7 @@
             NSUInteger logTypesCount = sizeof(log_types) / sizeof(os_log_type_t);
             NSAssert(level <= logTypesCount, @"There is an attempt to log a non suported logging level.");
             os_log_type_t logType = log_types[level];
-            os_log_with_type(mapbox_log, logType, "%@ - %d: %@", fileName, line, message);
+            os_log_with_type(mapbox_log, logType, "%@ - %lu: %@", fileName, (unsigned long)line, message);
         } else {
             NSString *category;
             switch (level) {
@@ -101,7 +101,7 @@
                     break;
             }
             
-            NSLog(@"[%@] %@ - %lu: %@", category, fileName, line, message);
+            NSLog(@"[%@] %@ - %lu: %@", category, fileName, (unsigned long)line, message);
         }
     };
     
