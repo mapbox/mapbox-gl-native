@@ -86,6 +86,7 @@ public class HillshadeLayerTest extends BaseActivityTest {
     Timber.i("hillshade-illumination-direction");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getHillshadeIlluminationDirection().getValue());
 
       // Set and Get
       layer.setProperties(hillshadeIlluminationDirection(0.3f));
@@ -100,6 +101,7 @@ public class HillshadeLayerTest extends BaseActivityTest {
     Timber.i("hillshade-illumination-anchor");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getHillshadeIlluminationAnchor().getValue());
 
       // Set and Get
       layer.setProperties(hillshadeIlluminationAnchor(HILLSHADE_ILLUMINATION_ANCHOR_MAP));
@@ -129,6 +131,7 @@ public class HillshadeLayerTest extends BaseActivityTest {
     Timber.i("hillshade-exaggeration");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getHillshadeExaggeration().getValue());
 
       // Set and Get
       layer.setProperties(hillshadeExaggeration(0.3f));
@@ -158,6 +161,7 @@ public class HillshadeLayerTest extends BaseActivityTest {
     Timber.i("hillshade-shadow-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getHillshadeShadowColor().getValue());
 
       // Set and Get
       layer.setProperties(hillshadeShadowColor("rgba(0, 0, 0, 1)"));
@@ -201,6 +205,7 @@ public class HillshadeLayerTest extends BaseActivityTest {
     Timber.i("hillshade-highlight-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getHillshadeHighlightColor().getValue());
 
       // Set and Get
       layer.setProperties(hillshadeHighlightColor("rgba(0, 0, 0, 1)"));
@@ -244,6 +249,7 @@ public class HillshadeLayerTest extends BaseActivityTest {
     Timber.i("hillshade-accent-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getHillshadeAccentColor().getValue());
 
       // Set and Get
       layer.setProperties(hillshadeAccentColor("rgba(0, 0, 0, 1)"));

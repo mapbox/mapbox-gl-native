@@ -126,6 +126,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("symbol-placement");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getSymbolPlacement().getValue());
 
       // Set and Get
       layer.setProperties(symbolPlacement(SYMBOL_PLACEMENT_POINT));
@@ -140,6 +141,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("symbol-spacing");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getSymbolSpacing().getValue());
 
       // Set and Get
       layer.setProperties(symbolSpacing(0.3f));
@@ -154,6 +156,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("symbol-avoid-edges");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Boolean) layer.getSymbolAvoidEdges().getValue());
 
       // Set and Get
       layer.setProperties(symbolAvoidEdges(true));
@@ -168,6 +171,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("symbol-z-order");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getSymbolZOrder().getValue());
 
       // Set and Get
       layer.setProperties(symbolZOrder(SYMBOL_Z_ORDER_VIEWPORT_Y));
@@ -182,6 +186,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-allow-overlap");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Boolean) layer.getIconAllowOverlap().getValue());
 
       // Set and Get
       layer.setProperties(iconAllowOverlap(true));
@@ -196,6 +201,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-ignore-placement");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Boolean) layer.getIconIgnorePlacement().getValue());
 
       // Set and Get
       layer.setProperties(iconIgnorePlacement(true));
@@ -210,6 +216,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-optional");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Boolean) layer.getIconOptional().getValue());
 
       // Set and Get
       layer.setProperties(iconOptional(true));
@@ -224,6 +231,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-rotation-alignment");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getIconRotationAlignment().getValue());
 
       // Set and Get
       layer.setProperties(iconRotationAlignment(ICON_ROTATION_ALIGNMENT_MAP));
@@ -238,6 +246,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-size");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getIconSize().getValue());
 
       // Set and Get
       layer.setProperties(iconSize(0.3f));
@@ -252,6 +261,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-size-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getIconSize().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
@@ -267,6 +277,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-text-fit");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getIconTextFit().getValue());
 
       // Set and Get
       layer.setProperties(iconTextFit(ICON_TEXT_FIT_NONE));
@@ -281,6 +292,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-text-fit-padding");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float[]) layer.getIconTextFitPadding().getValue());
 
       // Set and Get
       layer.setProperties(iconTextFitPadding(new Float[] {0f, 0f, 0f, 0f}));
@@ -295,6 +307,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-image");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getIconImage().getValue());
 
       // Set and Get
       layer.setProperties(iconImage("undefined"));
@@ -312,6 +325,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-image-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getIconImage().getExpression());
 
       // Set and Get
       Expression expression = string(Expression.get("undefined"));
@@ -327,6 +341,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-rotate");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getIconRotate().getValue());
 
       // Set and Get
       layer.setProperties(iconRotate(0.3f));
@@ -341,6 +356,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-rotate-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getIconRotate().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
@@ -356,6 +372,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-padding");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getIconPadding().getValue());
 
       // Set and Get
       layer.setProperties(iconPadding(0.3f));
@@ -370,6 +387,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-keep-upright");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Boolean) layer.getIconKeepUpright().getValue());
 
       // Set and Get
       layer.setProperties(iconKeepUpright(true));
@@ -384,6 +402,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-offset");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float[]) layer.getIconOffset().getValue());
 
       // Set and Get
       layer.setProperties(iconOffset(new Float[] {0f, 0f}));
@@ -398,6 +417,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-anchor");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getIconAnchor().getValue());
 
       // Set and Get
       layer.setProperties(iconAnchor(ICON_ANCHOR_CENTER));
@@ -412,6 +432,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-anchor-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getIconAnchor().getExpression());
 
       // Set and Get
       Expression expression = string(Expression.get("undefined"));
@@ -427,6 +448,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-pitch-alignment");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getIconPitchAlignment().getValue());
 
       // Set and Get
       layer.setProperties(iconPitchAlignment(ICON_PITCH_ALIGNMENT_MAP));
@@ -441,6 +463,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-pitch-alignment");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getTextPitchAlignment().getValue());
 
       // Set and Get
       layer.setProperties(textPitchAlignment(TEXT_PITCH_ALIGNMENT_MAP));
@@ -455,6 +478,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-rotation-alignment");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getTextRotationAlignment().getValue());
 
       // Set and Get
       layer.setProperties(textRotationAlignment(TEXT_ROTATION_ALIGNMENT_MAP));
@@ -469,6 +493,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-field");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getTextField().getValue());
 
       // Set and Get
       layer.setProperties(textField(""));
@@ -486,6 +511,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-field-formatted");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getTextField().getValue());
 
       Formatted expected = new Formatted(new FormattedSection[] {
         new FormattedSection("", 1.0)
@@ -507,6 +533,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-field-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getTextField().getExpression());
 
       // Set and Get
       Expression expression = string(Expression.get("undefined"));
@@ -522,6 +549,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-field-formatted-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getTextField().getExpression());
 
       // Set and Get
       Expression expression = string(Expression.get("undefined"));
@@ -537,6 +565,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-font");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String[]) layer.getTextFont().getValue());
 
       // Set and Get
       layer.setProperties(textFont(new String[]{"Open Sans Regular", "Arial Unicode MS Regular"}));
@@ -551,6 +580,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-size");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getTextSize().getValue());
 
       // Set and Get
       layer.setProperties(textSize(0.3f));
@@ -565,6 +595,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-size-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getTextSize().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
@@ -580,6 +611,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-max-width");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getTextMaxWidth().getValue());
 
       // Set and Get
       layer.setProperties(textMaxWidth(0.3f));
@@ -594,6 +626,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-max-width-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getTextMaxWidth().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
@@ -609,6 +642,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-line-height");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getTextLineHeight().getValue());
 
       // Set and Get
       layer.setProperties(textLineHeight(0.3f));
@@ -623,6 +657,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-letter-spacing");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getTextLetterSpacing().getValue());
 
       // Set and Get
       layer.setProperties(textLetterSpacing(0.3f));
@@ -637,6 +672,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-letter-spacing-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getTextLetterSpacing().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
@@ -652,6 +688,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-justify");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getTextJustify().getValue());
 
       // Set and Get
       layer.setProperties(textJustify(TEXT_JUSTIFY_LEFT));
@@ -666,6 +703,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-justify-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getTextJustify().getExpression());
 
       // Set and Get
       Expression expression = string(Expression.get("undefined"));
@@ -681,6 +719,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-anchor");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getTextAnchor().getValue());
 
       // Set and Get
       layer.setProperties(textAnchor(TEXT_ANCHOR_CENTER));
@@ -695,6 +734,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-anchor-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getTextAnchor().getExpression());
 
       // Set and Get
       Expression expression = string(Expression.get("undefined"));
@@ -710,6 +750,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-max-angle");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getTextMaxAngle().getValue());
 
       // Set and Get
       layer.setProperties(textMaxAngle(0.3f));
@@ -724,6 +765,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-rotate");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getTextRotate().getValue());
 
       // Set and Get
       layer.setProperties(textRotate(0.3f));
@@ -738,6 +780,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-rotate-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getTextRotate().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
@@ -753,6 +796,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-padding");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getTextPadding().getValue());
 
       // Set and Get
       layer.setProperties(textPadding(0.3f));
@@ -767,6 +811,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-keep-upright");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Boolean) layer.getTextKeepUpright().getValue());
 
       // Set and Get
       layer.setProperties(textKeepUpright(true));
@@ -781,6 +826,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-transform");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getTextTransform().getValue());
 
       // Set and Get
       layer.setProperties(textTransform(TEXT_TRANSFORM_NONE));
@@ -795,6 +841,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-transform-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getTextTransform().getExpression());
 
       // Set and Get
       Expression expression = string(Expression.get("undefined"));
@@ -810,6 +857,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-offset");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float[]) layer.getTextOffset().getValue());
 
       // Set and Get
       layer.setProperties(textOffset(new Float[] {0f, 0f}));
@@ -824,6 +872,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-allow-overlap");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Boolean) layer.getTextAllowOverlap().getValue());
 
       // Set and Get
       layer.setProperties(textAllowOverlap(true));
@@ -838,6 +887,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-ignore-placement");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Boolean) layer.getTextIgnorePlacement().getValue());
 
       // Set and Get
       layer.setProperties(textIgnorePlacement(true));
@@ -852,6 +902,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-optional");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Boolean) layer.getTextOptional().getValue());
 
       // Set and Get
       layer.setProperties(textOptional(true));
@@ -881,6 +932,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-opacity");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getIconOpacity().getValue());
 
       // Set and Get
       layer.setProperties(iconOpacity(0.3f));
@@ -895,6 +947,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-opacity-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getIconOpacity().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
@@ -925,6 +978,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getIconColor().getValue());
 
       // Set and Get
       layer.setProperties(iconColor("rgba(0, 0, 0, 1)"));
@@ -939,6 +993,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-color-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getIconColor().getExpression());
 
       // Set and Get
       Expression expression = toColor(Expression.get("undefined"));
@@ -983,6 +1038,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-halo-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getIconHaloColor().getValue());
 
       // Set and Get
       layer.setProperties(iconHaloColor("rgba(0, 0, 0, 1)"));
@@ -997,6 +1053,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-halo-color-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getIconHaloColor().getExpression());
 
       // Set and Get
       Expression expression = toColor(Expression.get("undefined"));
@@ -1041,6 +1098,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-halo-width");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getIconHaloWidth().getValue());
 
       // Set and Get
       layer.setProperties(iconHaloWidth(0.3f));
@@ -1055,6 +1113,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-halo-width-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getIconHaloWidth().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
@@ -1085,6 +1144,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-halo-blur");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getIconHaloBlur().getValue());
 
       // Set and Get
       layer.setProperties(iconHaloBlur(0.3f));
@@ -1099,6 +1159,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-halo-blur-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getIconHaloBlur().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
@@ -1129,6 +1190,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-translate");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float[]) layer.getIconTranslate().getValue());
 
       // Set and Get
       layer.setProperties(iconTranslate(new Float[] {0f, 0f}));
@@ -1143,6 +1205,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("icon-translate-anchor");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getIconTranslateAnchor().getValue());
 
       // Set and Get
       layer.setProperties(iconTranslateAnchor(ICON_TRANSLATE_ANCHOR_MAP));
@@ -1172,6 +1235,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-opacity");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getTextOpacity().getValue());
 
       // Set and Get
       layer.setProperties(textOpacity(0.3f));
@@ -1186,6 +1250,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-opacity-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getTextOpacity().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
@@ -1216,6 +1281,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getTextColor().getValue());
 
       // Set and Get
       layer.setProperties(textColor("rgba(0, 0, 0, 1)"));
@@ -1230,6 +1296,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-color-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getTextColor().getExpression());
 
       // Set and Get
       Expression expression = toColor(Expression.get("undefined"));
@@ -1274,6 +1341,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-halo-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getTextHaloColor().getValue());
 
       // Set and Get
       layer.setProperties(textHaloColor("rgba(0, 0, 0, 1)"));
@@ -1288,6 +1356,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-halo-color-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getTextHaloColor().getExpression());
 
       // Set and Get
       Expression expression = toColor(Expression.get("undefined"));
@@ -1332,6 +1401,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-halo-width");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getTextHaloWidth().getValue());
 
       // Set and Get
       layer.setProperties(textHaloWidth(0.3f));
@@ -1346,6 +1416,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-halo-width-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getTextHaloWidth().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
@@ -1376,6 +1447,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-halo-blur");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getTextHaloBlur().getValue());
 
       // Set and Get
       layer.setProperties(textHaloBlur(0.3f));
@@ -1390,6 +1462,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-halo-blur-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getTextHaloBlur().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
@@ -1420,6 +1493,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-translate");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float[]) layer.getTextTranslate().getValue());
 
       // Set and Get
       layer.setProperties(textTranslate(new Float[] {0f, 0f}));
@@ -1434,6 +1508,7 @@ public class SymbolLayerTest extends BaseActivityTest {
     Timber.i("text-translate-anchor");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getTextTranslateAnchor().getValue());
 
       // Set and Get
       layer.setProperties(textTranslateAnchor(TEXT_TRANSLATE_ANCHOR_MAP));
