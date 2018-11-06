@@ -139,6 +139,7 @@ public class HeatmapLayerTest extends BaseActivityTest {
     Timber.i("heatmap-radius");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getHeatmapRadius().getValue());
 
       // Set and Get
       layer.setProperties(heatmapRadius(0.3f));
@@ -153,6 +154,7 @@ public class HeatmapLayerTest extends BaseActivityTest {
     Timber.i("heatmap-radius-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getHeatmapRadius().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
@@ -168,6 +170,7 @@ public class HeatmapLayerTest extends BaseActivityTest {
     Timber.i("heatmap-weight");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getHeatmapWeight().getValue());
 
       // Set and Get
       layer.setProperties(heatmapWeight(0.3f));
@@ -182,6 +185,7 @@ public class HeatmapLayerTest extends BaseActivityTest {
     Timber.i("heatmap-weight-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getHeatmapWeight().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
@@ -212,6 +216,7 @@ public class HeatmapLayerTest extends BaseActivityTest {
     Timber.i("heatmap-intensity");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getHeatmapIntensity().getValue());
 
       // Set and Get
       layer.setProperties(heatmapIntensity(0.3f));
@@ -241,6 +246,7 @@ public class HeatmapLayerTest extends BaseActivityTest {
     Timber.i("heatmap-opacity");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getHeatmapOpacity().getValue());
 
       // Set and Get
       layer.setProperties(heatmapOpacity(0.3f));
