@@ -17,7 +17,7 @@ public:
                   const mapbox::geojsonvt::Options& options)
         : impl(geoJSON, options) {}
 
-    mapbox::geometry::feature_collection<int16_t> getTile(const CanonicalTileID& tileID) final {
+    mapbox::feature::feature_collection<int16_t> getTile(const CanonicalTileID& tileID) final {
         return impl.getTile(tileID.z, tileID.x, tileID.y).features;
     }
 
@@ -27,11 +27,11 @@ private:
 
 class SuperclusterData : public GeoJSONData {
 public:
-    SuperclusterData(const mapbox::geometry::feature_collection<double>& features,
+    SuperclusterData(const mapbox::feature::feature_collection<double>& features,
                      const mapbox::supercluster::Options& options)
         : impl(features, options) {}
 
-    mapbox::geometry::feature_collection<int16_t> getTile(const CanonicalTileID& tileID) final {
+    mapbox::feature::feature_collection<int16_t> getTile(const CanonicalTileID& tileID) final {
         return impl.getTile(tileID.z, tileID.x, tileID.y);
     }
 
@@ -50,14 +50,14 @@ GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON)
     double scale = util::EXTENT / util::tileSize;
 
     if (options.cluster
-        && geoJSON.is<mapbox::geometry::feature_collection<double>>()
-        && !geoJSON.get<mapbox::geometry::feature_collection<double>>().empty()) {
+        && geoJSON.is<mapbox::feature::feature_collection<double>>()
+        && !geoJSON.get<mapbox::feature::feature_collection<double>>().empty()) {
         mapbox::supercluster::Options clusterOptions;
         clusterOptions.maxZoom = options.clusterMaxZoom;
         clusterOptions.extent = util::EXTENT;
         clusterOptions.radius = ::round(scale * options.clusterRadius);
         data = std::make_unique<SuperclusterData>(
-            geoJSON.get<mapbox::geometry::feature_collection<double>>(), clusterOptions);
+            geoJSON.get<mapbox::feature::feature_collection<double>>(), clusterOptions);
     } else {
         mapbox::geojsonvt::Options vtOptions;
         vtOptions.maxZoom = options.maxzoom;

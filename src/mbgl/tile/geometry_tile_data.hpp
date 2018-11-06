@@ -43,7 +43,7 @@ public:
     virtual FeatureType getType() const = 0;
     virtual optional<Value> getValue(const std::string& key) const = 0;
     virtual PropertyMap getProperties() const { return PropertyMap(); }
-    virtual optional<FeatureIdentifier> getID() const { return {}; }
+    virtual FeatureIdentifier getID() const { return NullValue {}; }
     virtual GeometryCollection getGeometries() const = 0;
 };
 
@@ -83,6 +83,9 @@ Feature convertFeature(const GeometryTileFeature&, const CanonicalTileID&);
 GeometryCollection fixupPolygons(const GeometryCollection&);
 
 struct ToGeometryCollection {
+    GeometryCollection operator()(const mapbox::geometry::empty&) const {
+        return GeometryCollection();
+    }
     GeometryCollection operator()(const mapbox::geometry::point<int16_t>& geom) const {
         return { { geom } };
     }

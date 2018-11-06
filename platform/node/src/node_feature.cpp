@@ -14,6 +14,10 @@ using Properties = mbgl::PropertyMap;
 template <class T>
 struct ToType {
 public:
+    v8::Local<v8::String> operator()(const empty&) {
+        return type("Empty");
+    }
+
     v8::Local<v8::String> operator()(const point<T>&) {
         return type("Point");
     }
@@ -159,8 +163,8 @@ v8::Local<v8::Object> toJS(const Feature& feature) {
     Nan::Set(result, Nan::New("geometry").ToLocalChecked(), toJS(feature.geometry));
     Nan::Set(result, Nan::New("properties").ToLocalChecked(), toJS(feature.properties));
 
-    if (feature.id) {
-        Nan::Set(result, Nan::New("id").ToLocalChecked(), FeatureIdentifier::visit(*feature.id, ToValue()));
+    if (!feature.id.is<mbgl::NullValue>()) {
+        Nan::Set(result, Nan::New("id").ToLocalChecked(), FeatureIdentifier::visit(feature.id, ToValue()));
     }
 
     return scope.Escape(result);

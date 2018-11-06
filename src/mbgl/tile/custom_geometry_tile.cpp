@@ -30,7 +30,7 @@ CustomGeometryTile::~CustomGeometryTile() {
 
 void CustomGeometryTile::setTileData(const GeoJSON& geoJSON) {
 
-    auto featureData = mapbox::geometry::feature_collection<int16_t>();
+    auto featureData = mapbox::feature::feature_collection<int16_t>();
     if (geoJSON.is<FeatureCollection>() && !geoJSON.get<FeatureCollection>().empty()) {
         const double scale = util::EXTENT / options.tileSize;
 
@@ -76,7 +76,7 @@ void CustomGeometryTile::querySourceFeatures(
         auto featureCount = layer->featureCount();
         for (std::size_t i = 0; i < featureCount; i++) {
             auto feature = layer->getFeature(i);
-            
+
             // Apply filter, if any
             if (queryOptions.filter && !(*queryOptions.filter)(style::expression::EvaluationContext { static_cast<float>(id.overscaledZ), feature.get() })) {
                 continue;

@@ -102,10 +102,10 @@ const CGFloat MGLAnnotationImagePaddingForCallout = 4;
 const NSEdgeInsets MGLMapViewOffscreenAnnotationPadding = NSEdgeInsetsMake(-30.0f, -30.0f, -30.0f, -30.0f);
 
 /// Unique identifier representing a single annotation in mbgl.
-typedef uint32_t MGLAnnotationTag;
+typedef uint64_t MGLAnnotationTag;
 
 /// An indication that the requested annotation was not found or is nonexistent.
-enum { MGLAnnotationTagNotFound = UINT32_MAX };
+enum { MGLAnnotationTagNotFound = UINT64_MAX };
 
 /// Mapping from an annotation tag to metadata about that annotation, including
 /// the annotation itself.
@@ -1520,7 +1520,7 @@ public:
     if (hitAnnotationTag != MGLAnnotationTagNotFound) {
         if (hitAnnotationTag != _selectedAnnotationTag) {
             id <MGLAnnotation> annotation = [self annotationWithTag:hitAnnotationTag];
-            NSAssert(annotation, @"Cannot select nonexistent annotation with tag %u", hitAnnotationTag);
+            NSAssert(annotation, @"Cannot select nonexistent annotation with tag %llu", hitAnnotationTag);
             [self selectAnnotation:annotation atPoint:gesturePoint];
         }
     } else {
@@ -1843,7 +1843,7 @@ public:
             }
 
             MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
-            NSAssert(annotationContext.annotation, @"Missing annotation for tag %u.", annotationTag);
+            NSAssert(annotationContext.annotation, @"Missing annotation for tag %llu.", annotationTag);
             if (annotationContext.annotation)
             {
                 [annotations addObject:annotationContext.annotation];

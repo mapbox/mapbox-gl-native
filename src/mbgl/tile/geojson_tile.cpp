@@ -8,19 +8,19 @@ namespace mbgl {
 GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
                          std::string sourceID_,
                          const TileParameters& parameters,
-                         mapbox::geometry::feature_collection<int16_t> features)
+                         mapbox::feature::feature_collection<int16_t> features)
     : GeometryTile(overscaledTileID, sourceID_, parameters) {
     updateData(std::move(features));
 }
 
-void GeoJSONTile::updateData(mapbox::geometry::feature_collection<int16_t> features) {
+void GeoJSONTile::updateData(mapbox::feature::feature_collection<int16_t> features) {
     setData(std::make_unique<GeoJSONTileData>(std::move(features)));
 }
-    
+
 void GeoJSONTile::querySourceFeatures(
     std::vector<Feature>& result,
     const SourceQueryOptions& options) {
-    
+
     // Ignore the sourceLayer, there is only one
     if (auto tileData = getData()) {
         if (auto layer = tileData->getLayer({})) {

@@ -50,10 +50,8 @@ TEST(GeoJSONTile, Issue7648) {
 
     CircleLayer layer("circle", "source");
 
-    mapbox::geometry::feature_collection<int16_t> features;
-    features.push_back(mapbox::geometry::feature<int16_t> {
-        mapbox::geometry::point<int16_t>(0, 0)
-    });
+    mapbox::feature::feature_collection<int16_t> features;
+    features.push_back(mapbox::feature::feature<int16_t> { mapbox::geometry::point<int16_t>(0, 0) });
 
     GeoJSONTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, features);
 
@@ -84,10 +82,8 @@ TEST(GeoJSONTile, Issue9927) {
 
     CircleLayer layer("circle", "source");
 
-    mapbox::geometry::feature_collection<int16_t> features;
-    features.push_back(mapbox::geometry::feature<int16_t> {
-        mapbox::geometry::point<int16_t>(0, 0)
-    });
+    mapbox::feature::feature_collection<int16_t> features;
+    features.push_back(mapbox::feature::feature<int16_t> { mapbox::geometry::point<int16_t>(0, 0) });
 
     GeoJSONTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, features);
 

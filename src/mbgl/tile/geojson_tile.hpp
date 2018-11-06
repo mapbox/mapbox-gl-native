@@ -12,10 +12,10 @@ public:
     GeoJSONTile(const OverscaledTileID&,
                 std::string sourceID,
                 const TileParameters&,
-                mapbox::geometry::feature_collection<int16_t>);
+                mapbox::feature::feature_collection<int16_t>);
 
-    void updateData(mapbox::geometry::feature_collection<int16_t>);
-    
+    void updateData(mapbox::feature::feature_collection<int16_t>);
+
     void querySourceFeatures(
         std::vector<Feature>& result,
         const SourceQueryOptions&) override;

@@ -16,7 +16,7 @@ public:
     FeatureType getType() const override;
     optional<Value> getValue(const std::string& key) const override;
     std::unordered_map<std::string, Value> getProperties() const override;
-    optional<FeatureIdentifier> getID() const override;
+    FeatureIdentifier getID() const override;
     GeometryCollection getGeometries() const override;
 
 private:
