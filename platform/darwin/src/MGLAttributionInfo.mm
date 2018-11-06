@@ -65,10 +65,15 @@
     NSData *htmlData = [styledHTML dataUsingEncoding:NSUTF8StringEncoding];
 
 #if TARGET_OS_IPHONE
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithData:htmlData
-                                                                                          options:options
-                                                                               documentAttributes:nil
-                                                                                            error:NULL];
+    __block NSMutableAttributedString *attributedString;
+    
+    dispatch_sync(dispatch_get_main_queue() , ^{
+        // This initializer should be called from a global or main queue. https://developer.apple.com/documentation/foundation/nsattributedstring/1524613-initwithdata
+        attributedString = [[NSMutableAttributedString alloc] initWithData:htmlData
+                                                                   options:options
+                                                        documentAttributes:nil
+                                                                     error:NULL];
+    });
 #else
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithHTML:htmlData
                                                                                           options:options
