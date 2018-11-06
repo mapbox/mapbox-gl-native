@@ -372,13 +372,18 @@ public class SymbolLayer extends Layer {
     if (propertyValue.isExpression()) {
       return (PropertyValue<String>) propertyValue;
     } else {
+      String text = null;
+
       Formatted formatted = (Formatted) nativeGetTextField();
-      StringBuilder builder = new StringBuilder();
-      for (FormattedSection section : formatted.getFormattedSections()) {
-        builder.append(section.getText());
+      if (formatted != null) {
+        StringBuilder builder = new StringBuilder();
+        for (FormattedSection section : formatted.getFormattedSections()) {
+          builder.append(section.getText());
+        }
+        text = builder.toString();
       }
 
-      return (PropertyValue<String>) new PropertyValue("text-field", builder.toString());
+      return (PropertyValue<String>) new PropertyValue("text-field", text);
     }
   }
 

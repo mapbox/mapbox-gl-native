@@ -82,6 +82,7 @@ public class BackgroundLayerTest extends BaseActivityTest {
     Timber.i("background-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getBackgroundColor().getValue());
 
       // Set and Get
       layer.setProperties(backgroundColor("rgba(0, 0, 0, 1)"));
@@ -125,6 +126,7 @@ public class BackgroundLayerTest extends BaseActivityTest {
     Timber.i("background-pattern");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getBackgroundPattern().getValue());
 
       // Set and Get
       layer.setProperties(backgroundPattern("pedestrian-polygon"));
@@ -154,6 +156,7 @@ public class BackgroundLayerTest extends BaseActivityTest {
     Timber.i("background-opacity");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getBackgroundOpacity().getValue());
 
       // Set and Get
       layer.setProperties(backgroundOpacity(0.3f));
