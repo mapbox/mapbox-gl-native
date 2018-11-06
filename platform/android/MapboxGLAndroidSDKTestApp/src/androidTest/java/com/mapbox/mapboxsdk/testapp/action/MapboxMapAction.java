@@ -7,6 +7,7 @@ import android.view.View;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
+import com.mapbox.mapboxsdk.testapp.R;
 import org.hamcrest.Matcher;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -39,7 +40,7 @@ public class MapboxMapAction implements ViewAction {
   }
 
   public static void invoke(MapboxMap mapboxMap, OnInvokeActionListener invokeViewAction) {
-    onView(withId(android.R.id.content)).perform(new MapboxMapAction(invokeViewAction, mapboxMap));
+    onView(withId(R.id.mapView)).perform(new MapboxMapAction(invokeViewAction, mapboxMap));
   }
 
   public interface OnInvokeActionListener {
