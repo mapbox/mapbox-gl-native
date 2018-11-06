@@ -1143,13 +1143,18 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       }
     }
 
+    /**
+     * Notify listeners, clear when done
+     */
     private void onMapReady() {
       if (onMapReadyCallbackList.size() > 0) {
-        // Notify listeners, clear when done
         Iterator<OnMapReadyCallback> iterator = onMapReadyCallbackList.iterator();
         while (iterator.hasNext()) {
           OnMapReadyCallback callback = iterator.next();
-          callback.onMapReady(mapboxMap);
+          if (callback != null) {
+            // null checking required for #13279
+            callback.onMapReady(mapboxMap);
+          }
           iterator.remove();
         }
       }
@@ -1184,6 +1189,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     public void onDidFinishLoadingStyle() {
       if (mapboxMap != null) {
         if (initialLoad) {
+          initialLoad = false;
           mapboxMap.onPreMapReady();
           onMapReady();
           mapboxMap.onPostMapReady();
