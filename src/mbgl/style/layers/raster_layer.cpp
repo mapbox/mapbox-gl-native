@@ -42,7 +42,7 @@ std::unique_ptr<Layer> RasterLayer::cloneRef(const std::string& id_) const {
 void RasterLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-LayerFactory* RasterLayer::Impl::getLayerFactory() const {
+LayerFactory* RasterLayer::Impl::getLayerFactory() const noexcept {
     return RasterLayerFactory::get();
 }
 
@@ -524,12 +524,12 @@ RasterLayerFactory::RasterLayerFactory() {
 RasterLayerFactory::~RasterLayerFactory() = default;
 
 // static
-RasterLayerFactory* RasterLayerFactory::get() {
+RasterLayerFactory* RasterLayerFactory::get() noexcept {
     assert(instance);
     return instance;
 }
 
-bool RasterLayerFactory::supportsType(const std::string& type) const {
+bool RasterLayerFactory::supportsType(const std::string& type) const noexcept {
     return type == "raster";
 }
 

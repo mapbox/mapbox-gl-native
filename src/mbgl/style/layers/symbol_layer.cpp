@@ -43,7 +43,7 @@ void SymbolLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffe
     layout.stringify(writer);
 }
 
-LayerFactory* SymbolLayer::Impl::getLayerFactory() const {
+LayerFactory* SymbolLayer::Impl::getLayerFactory() const noexcept {
     return SymbolLayerFactory::get();
 }
 
@@ -1992,12 +1992,12 @@ SymbolLayerFactory::SymbolLayerFactory() {
 SymbolLayerFactory::~SymbolLayerFactory() = default;
 
 // static
-SymbolLayerFactory* SymbolLayerFactory::get() {
+SymbolLayerFactory* SymbolLayerFactory::get() noexcept {
     assert(instance);
     return instance;
 }
 
-bool SymbolLayerFactory::supportsType(const std::string& type) const {
+bool SymbolLayerFactory::supportsType(const std::string& type) const noexcept {
     return type == "symbol";
 }
 

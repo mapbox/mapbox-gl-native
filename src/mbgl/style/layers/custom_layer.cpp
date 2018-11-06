@@ -49,12 +49,12 @@ CustomLayerFactory::CustomLayerFactory() {
 CustomLayerFactory::~CustomLayerFactory() = default;
 
 // static
-CustomLayerFactory* CustomLayerFactory::get() {
+CustomLayerFactory* CustomLayerFactory::get() noexcept {
     assert(instance);
     return instance;
 }
 
-bool CustomLayerFactory::supportsType(const std::string&) const {
+bool CustomLayerFactory::supportsType(const std::string&) const noexcept {
     return false;
 }
 

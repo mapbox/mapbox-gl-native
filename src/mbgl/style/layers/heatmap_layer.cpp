@@ -42,7 +42,7 @@ std::unique_ptr<Layer> HeatmapLayer::cloneRef(const std::string& id_) const {
 void HeatmapLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-LayerFactory* HeatmapLayer::Impl::getLayerFactory() const {
+LayerFactory* HeatmapLayer::Impl::getLayerFactory() const noexcept {
     return HeatmapLayerFactory::get();
 }
 
@@ -388,12 +388,12 @@ HeatmapLayerFactory::HeatmapLayerFactory() {
 HeatmapLayerFactory::~HeatmapLayerFactory() = default;
 
 // static
-HeatmapLayerFactory* HeatmapLayerFactory::get() {
+HeatmapLayerFactory* HeatmapLayerFactory::get() noexcept {
     assert(instance);
     return instance;
 }
 
-bool HeatmapLayerFactory::supportsType(const std::string& type) const {
+bool HeatmapLayerFactory::supportsType(const std::string& type) const noexcept {
     return type == "heatmap";
 }
 

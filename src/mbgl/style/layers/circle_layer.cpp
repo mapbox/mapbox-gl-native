@@ -42,7 +42,7 @@ std::unique_ptr<Layer> CircleLayer::cloneRef(const std::string& id_) const {
 void CircleLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-LayerFactory* CircleLayer::Impl::getLayerFactory() const {
+LayerFactory* CircleLayer::Impl::getLayerFactory() const noexcept {
     return CircleLayerFactory::get();
 }
 
@@ -701,12 +701,12 @@ CircleLayerFactory::CircleLayerFactory() {
 CircleLayerFactory::~CircleLayerFactory() = default;
 
 // static
-CircleLayerFactory* CircleLayerFactory::get() {
+CircleLayerFactory* CircleLayerFactory::get() noexcept {
     assert(instance);
     return instance;
 }
 
-bool CircleLayerFactory::supportsType(const std::string& type) const {
+bool CircleLayerFactory::supportsType(const std::string& type) const noexcept {
     return type == "circle";
 }
 
