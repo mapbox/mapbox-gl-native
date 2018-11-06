@@ -61,6 +61,7 @@ private:
 }
 
 - (instancetype)init {
+    MGLLogInfo(@"Calling this initializer is not allowed.");
     if (self = [super init]) {
         _state = MGLOfflinePackStateInvalid;
         NSLog(@"%s called; did you mean to call +[MGLOfflineStorage addPackForRegion:withContext:completionHandler:] instead?", __PRETTY_FUNCTION__);
@@ -109,6 +110,7 @@ private:
 }
 
 - (void)resume {
+    MGLLogInfo(@"Resuming pack download.");
     MGLAssertOfflinePackIsValid();
 
     self.state = MGLOfflinePackStateActive;
@@ -118,6 +120,7 @@ private:
 }
 
 - (void)suspend {
+    MGLLogInfo(@"Suspending pack download.");
     MGLAssertOfflinePackIsValid();
 
     if (self.state == MGLOfflinePackStateActive) {
@@ -130,6 +133,7 @@ private:
 }
 
 - (void)invalidate {
+    MGLLogInfo(@"Invalidating pack.");
     MGLAssert(_state != MGLOfflinePackStateInvalid, @"Cannot invalidate an already invalid offline pack.");
 
     self.state = MGLOfflinePackStateInvalid;
@@ -139,6 +143,7 @@ private:
 }
 
 - (void)setState:(MGLOfflinePackState)state {
+    MGLLogDebug(@"Setting state: %ld", (long)state);
     if (!self.mbglOfflineRegion) {
         // A progress update has arrived after the call to
         // -[MGLOfflineStorage removePack:withCompletionHandler:] but before the
@@ -156,6 +161,7 @@ private:
 }
 
 - (void)requestProgress {
+    MGLLogInfo(@"Requesting pack progress.");
     MGLAssertOfflinePackIsValid();
 
     mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
@@ -208,6 +214,8 @@ private:
 }
 
 - (void)didReceiveError:(NSError *)error {
+    MGLLogInfo(@"Notifying pack error.");
+    MGLLogError(@"Error: %@", error.localizedDescription);
     NSDictionary *userInfo = @{ MGLOfflinePackUserInfoKeyError: error };
     NSNotificationCenter *noteCenter = [NSNotificationCenter defaultCenter];
     [noteCenter postNotificationName:MGLOfflinePackErrorNotification
@@ -216,6 +224,7 @@ private:
 }
 
 - (void)didReceiveMaximumAllowedMapboxTiles:(uint64_t)limit {
+    MGLLogInfo(@"Notifying reached maximum allowed Mapbox tiles: %lu", (unsigned long)limit);
     NSDictionary *userInfo = @{ MGLOfflinePackUserInfoKeyMaximumCount: @(limit) };
     NSNotificationCenter *noteCenter = [NSNotificationCenter defaultCenter];
     [noteCenter postNotificationName:MGLOfflinePackMaximumMapboxTilesReachedNotification
