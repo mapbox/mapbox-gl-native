@@ -323,6 +323,19 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     nativeMapView = new NativeMapView(
       getContext(), getPixelRatio(), crossSourceCollisions, this, mapChangeReceiver, mapRenderer
     );
+
+    // deprecated API
+    nativeMapView.addOnMapChangedListener(new OnMapChangedListener() {
+      @Override
+      public void onMapChanged(int change) {
+        // dispatch events to external listeners
+        if (!onMapChangedListeners.isEmpty()) {
+          for (OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
+            onMapChangedListener.onMapChanged(change);
+          }
+        }
+      }
+    });
   }
 
   private void onSurfaceCreated() {
@@ -1063,9 +1076,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    */
   @Deprecated
   public void removeOnMapChangedListener(@NonNull OnMapChangedListener listener) {
-    if (onMapChangedListeners.contains(listener)) {
-      onMapChangedListeners.remove(listener);
-    }
+    onMapChangedListeners.remove(listener);
   }
 
   /**
