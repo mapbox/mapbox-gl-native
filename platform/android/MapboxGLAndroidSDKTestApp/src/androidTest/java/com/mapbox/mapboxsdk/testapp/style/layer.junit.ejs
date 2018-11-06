@@ -162,6 +162,7 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
     Timber.i("<%- property.name %>");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((<%- propertyType(property) %>) layer.get<%- camelize(property.name) %>().getValue());
 
       // Set and Get
       layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>));
@@ -186,6 +187,7 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
     Timber.i("<%- property.name %>-formatted");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((<%- propertyType(property) %>) layer.get<%- camelize(property.name) %>().getValue());
 
       Formatted expected = new Formatted(new FormattedSection[] {
         new FormattedSection("", 1.0)
@@ -212,6 +214,7 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
     Timber.i("<%- property.name %>-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.get<%- camelize(property.name) %>().getExpression());
 
       // Set and Get
       Expression expression = <%- defaultExpressionJava(property) %>(Expression.get("undefined"));
@@ -232,6 +235,7 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
     Timber.i("<%- property.name %>-formatted-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.get<%- camelize(property.name) %>().getExpression());
 
       // Set and Get
       Expression expression = <%- defaultExpressionJava(property) %>(Expression.get("undefined"));

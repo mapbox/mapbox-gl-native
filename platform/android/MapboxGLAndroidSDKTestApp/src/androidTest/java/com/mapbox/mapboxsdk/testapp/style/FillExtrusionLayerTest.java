@@ -139,6 +139,7 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
     Timber.i("fill-extrusion-opacity");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getFillExtrusionOpacity().getValue());
 
       // Set and Get
       layer.setProperties(fillExtrusionOpacity(0.3f));
@@ -168,6 +169,7 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
     Timber.i("fill-extrusion-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getFillExtrusionColor().getValue());
 
       // Set and Get
       layer.setProperties(fillExtrusionColor("rgba(0, 0, 0, 1)"));
@@ -182,6 +184,7 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
     Timber.i("fill-extrusion-color-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getFillExtrusionColor().getExpression());
 
       // Set and Get
       Expression expression = toColor(Expression.get("undefined"));
@@ -226,6 +229,7 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
     Timber.i("fill-extrusion-translate");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float[]) layer.getFillExtrusionTranslate().getValue());
 
       // Set and Get
       layer.setProperties(fillExtrusionTranslate(new Float[] {0f, 0f}));
@@ -240,6 +244,7 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
     Timber.i("fill-extrusion-translate-anchor");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getFillExtrusionTranslateAnchor().getValue());
 
       // Set and Get
       layer.setProperties(fillExtrusionTranslateAnchor(FILL_EXTRUSION_TRANSLATE_ANCHOR_MAP));
@@ -269,6 +274,7 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
     Timber.i("fill-extrusion-pattern");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((String) layer.getFillExtrusionPattern().getValue());
 
       // Set and Get
       layer.setProperties(fillExtrusionPattern("pedestrian-polygon"));
@@ -283,6 +289,7 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
     Timber.i("fill-extrusion-pattern-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getFillExtrusionPattern().getExpression());
 
       // Set and Get
       Expression expression = string(Expression.get("undefined"));
@@ -313,6 +320,7 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
     Timber.i("fill-extrusion-height");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getFillExtrusionHeight().getValue());
 
       // Set and Get
       layer.setProperties(fillExtrusionHeight(0.3f));
@@ -327,6 +335,7 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
     Timber.i("fill-extrusion-height-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getFillExtrusionHeight().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
@@ -357,6 +366,7 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
     Timber.i("fill-extrusion-base");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull((Float) layer.getFillExtrusionBase().getValue());
 
       // Set and Get
       layer.setProperties(fillExtrusionBase(0.3f));
@@ -371,6 +381,7 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
     Timber.i("fill-extrusion-base-expression");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
+      assertNull(layer.getFillExtrusionBase().getExpression());
 
       // Set and Get
       Expression expression = number(Expression.get("undefined"));
