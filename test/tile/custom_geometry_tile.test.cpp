@@ -50,8 +50,8 @@ TEST(CustomGeometryTile, InvokeFetchTile) {
 
     CircleLayer layer("circle", "source");
 
-    mapbox::geometry::feature_collection<double> features;
-    features.push_back(mapbox::geometry::feature<double> {
+    mapbox::feature::feature_collection<double> features;
+    features.push_back(mapbox::feature::feature<double> {
         mapbox::geometry::point<double>(0, 0)
     });
     CustomTileLoader loader([&](const CanonicalTileID& tileId) {
@@ -62,7 +62,7 @@ TEST(CustomGeometryTile, InvokeFetchTile) {
     });
     auto mb =std::make_shared<Mailbox>(*Scheduler::GetCurrent());
     ActorRef<CustomTileLoader> loaderActor(loader, mb);
-    
+
     CustomGeometryTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, CustomGeometrySource::TileOptions(),
     loaderActor);
 
@@ -76,8 +76,8 @@ TEST(CustomGeometryTile, InvokeCancelTile) {
 
     CircleLayer layer("circle", "source");
 
-    mapbox::geometry::feature_collection<double> features;
-    features.push_back(mapbox::geometry::feature<double> {
+    mapbox::feature::feature_collection<double> features;
+    features.push_back(mapbox::feature::feature<double> {
         mapbox::geometry::point<double>(0, 0)
     });
 
@@ -87,7 +87,7 @@ TEST(CustomGeometryTile, InvokeCancelTile) {
     });
     auto mb =std::make_shared<Mailbox>(*Scheduler::GetCurrent());
     ActorRef<CustomTileLoader> loaderActor(loader, mb);
-    
+
     CustomGeometryTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, CustomGeometrySource::TileOptions(),
     loaderActor);
 
@@ -101,15 +101,15 @@ TEST(CustomGeometryTile, InvokeTileChanged) {
 
     CircleLayer layer("circle", "source");
 
-    mapbox::geometry::feature_collection<double> features;
-    features.push_back(mapbox::geometry::feature<double> {
+    mapbox::feature::feature_collection<double> features;
+    features.push_back(mapbox::feature::feature<double> {
         mapbox::geometry::point<double>(0, 0)
     });
 
     CustomTileLoader loader(nullptr, nullptr);
     auto mb =std::make_shared<Mailbox>(*Scheduler::GetCurrent());
     ActorRef<CustomTileLoader> loaderActor(loader, mb);
-    
+
     CustomGeometryTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, CustomGeometrySource::TileOptions(),
     loaderActor);
 

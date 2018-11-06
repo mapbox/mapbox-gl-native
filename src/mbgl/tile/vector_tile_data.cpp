@@ -29,7 +29,7 @@ std::unordered_map<std::string, Value> VectorTileFeature::getProperties() const 
     return feature.getProperties();
 }
 
-optional<FeatureIdentifier> VectorTileFeature::getID() const {
+FeatureIdentifier VectorTileFeature::getID() const {
     return feature.getID();
 }
 

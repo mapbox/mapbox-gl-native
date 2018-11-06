@@ -12,7 +12,7 @@
 
 namespace mbgl {
 
-using AnnotationID = uint32_t;
+using AnnotationID = uint64_t;
 using AnnotationIDs = std::vector<AnnotationID>;
 
 class SymbolAnnotation {

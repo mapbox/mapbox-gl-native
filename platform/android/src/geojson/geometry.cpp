@@ -22,6 +22,11 @@ public:
 
     jni::JNIEnv& env;
 
+    jni::Local<jni::Object<Geometry>> operator()(const mbgl::EmptyGeometry &) const {
+        // FIXME: mapbox-java needs to have its own Empty type.
+        return GeometryCollection::New(env, {});
+    }
+
     jni::Local<jni::Object<Geometry>> operator()(const mbgl::Point<double> &geometry) const {
         return Point::New(env, geometry);
     }

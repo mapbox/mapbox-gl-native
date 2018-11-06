@@ -19,7 +19,7 @@ LineString<int16_t> emptyLine;
 
 class SymbolFeatureStub : public SymbolFeature {
 public:
-    SymbolFeatureStub(optional<FeatureIdentifier> id_, FeatureType type_, GeometryCollection geometry_,
+    SymbolFeatureStub(FeatureIdentifier id_, FeatureType type_, GeometryCollection geometry_,
                       PropertyMap properties_, optional<std::u16string> text_,
                       optional<std::string> icon_, std::size_t index_) :
         SymbolFeature(std::make_unique<StubGeometryTileFeature>(std::move(id_), type_, std::move(geometry_), std::move(properties_)))

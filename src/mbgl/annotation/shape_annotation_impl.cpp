@@ -22,7 +22,7 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
     static const double baseTolerance = 4;
 
     if (!shapeTiler) {
-        mapbox::geometry::feature_collection<double> features;
+        mapbox::feature::feature_collection<double> features;
         features.emplace_back(ShapeAnnotationGeometry::visit(geometry(), [] (auto&& geom) {
             return Feature { std::move(geom) };
         }));

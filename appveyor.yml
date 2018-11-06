@@ -39,7 +39,7 @@ for:
       LLVM_VERSION: 5.0.1
       LLVM_HASH: 981543611D719624ACB29A2CFFD6A479CFF36E8AB5EE8A57D8ECA4F9C4C6956F
       VCVARSALL: 'C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
-      QT_PREFIX: 'C:\Qt\5.6.3\msvc2015_64\lib\cmake'
+      QT_PREFIX: 'C:\Qt\latest\msvc2015_64\lib\cmake'
 
 -
   matrix:
@@ -50,7 +50,7 @@ for:
     LLVM_VERSION: 6.0.0
     LLVM_HASH: 2501887b2f638d3f65b0336f354b96f8108b563522d81e841d5c88c34af283dd
     VCVARSALL: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat'
-    QT_PREFIX: 'C:\Qt\5.11.1\msvc2017_64\lib\cmake'
+    QT_PREFIX: 'C:\Qt\latest\msvc2017_64\lib\cmake'
 
 cache:
   - '%APPVEYOR_BUILD_FOLDER%\mason_packages'

@@ -226,8 +226,8 @@ using Definition = CompoundExpressionRegistry::Definition;
 Value featureIdAsExpressionValue(EvaluationContext params) {
     assert(params.feature);
     auto id = params.feature->getID();
-    if (!id) return Null;
-    return id->match([](const auto& idid) {
+    if (id.is<NullValue>()) return Null;
+    return id.match([](const auto& idid) {
         return toExpressionValue(mbgl::Value(idid));
     });
 };
@@ -278,8 +278,7 @@ optional<std::string> featurePropertyAsString(EvaluationContext params, const st
 optional<double> featureIdAsDouble(EvaluationContext params) {
     assert(params.feature);
     auto id = params.feature->getID();
-    if (!id) return optional<double>();
-    return id->match(
+    return id.match(
         [](double value) { return value; },
         [](uint64_t value) { return optional<double>(static_cast<double>(value)); },
         [](int64_t value) { return optional<double>(static_cast<double>(value)); },
@@ -290,8 +289,7 @@ optional<double> featureIdAsDouble(EvaluationContext params) {
 optional<std::string> featureIdAsString(EvaluationContext params) {
     assert(params.feature);
     auto id = params.feature->getID();
-    if (!id) return optional<std::string>();
-    return id->match(
+    return id.match(
         [](std::string value) { return value; },
         [](auto) { return optional<std::string>(); }
     );
@@ -417,10 +415,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         }
 
         auto id = params.feature->getID();
-        if (!id) {
-            return Null;
-        }
-        return id->match(
+        return id.match(
             [](const auto& idValue) {
                 return toExpressionValue(mbgl::Value(idValue));
             }
@@ -606,7 +601,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
 
     define("filter-has-id", [](const EvaluationContext& params) -> Result<bool> {
         assert(params.feature);
-        return bool(params.feature->getID());
+        return !params.feature->getID().is<NullValue>();
     });
 
     define("filter-type-in", [](const EvaluationContext& params, const Varargs<std::string>& types) -> Result<bool> {

@@ -27,7 +27,7 @@ public:
 
     FeatureType getType() const override;
     optional<Value> getValue(const std::string&) const override;
-    optional<FeatureIdentifier> getID() const override;
+    FeatureIdentifier getID() const override;
     GeometryCollection getGeometries() const override;
 
 private:

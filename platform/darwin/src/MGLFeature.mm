@@ -16,7 +16,41 @@
 
 #import <mbgl/util/geometry.hpp>
 #import <mbgl/style/conversion/geojson.hpp>
-#import <mapbox/geometry/feature.hpp>
+#import <mapbox/feature.hpp>
+
+@interface MGLEmptyFeature ()
+@end
+
+@implementation MGLEmptyFeature
+
+@synthesize identifier;
+@synthesize attributes;
+
+MGL_DEFINE_FEATURE_INIT_WITH_CODER();
+MGL_DEFINE_FEATURE_ENCODE();
+MGL_DEFINE_FEATURE_IS_EQUAL();
+
+- (id)attributeForKey:(NSString *)key {
+    return self.attributes[key];
+}
+
+- (NSDictionary *)geoJSONDictionary {
+    return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
+}
+
+- (mbgl::GeoJSON)geoJSONObject {
+    return mbglFeature({[self geometryObject]}, identifier, self.attributes);
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; identifier = %@, attributes = %@>",
+            NSStringFromClass([self class]), (void *)self,
+            self.identifier ? [NSString stringWithFormat:@"\"%@\"", self.identifier] : self.identifier,
+            self.attributes.count ? self.attributes : @"none"];
+}
+
+@end
 
 @interface MGLPointFeature ()
 @end
@@ -269,6 +303,11 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 template <typename T>
 class GeometryEvaluator {
 public:
+    MGLShape <MGLFeature> * operator()(const mbgl::EmptyGeometry &) const {
+        MGLEmptyFeature *feature = [[MGLEmptyFeature alloc] init];
+        return feature;
+    }
+
     MGLShape <MGLFeature> * operator()(const mbgl::Point<T> &geometry) const {
         MGLPointFeature *feature = [[MGLPointFeature alloc] init];
         feature.coordinate = toLocationCoordinate2D(geometry);
@@ -390,8 +429,8 @@ id <MGLFeature> MGLFeatureFromMBGLFeature(const mbgl::Feature &feature) {
     }
     GeometryEvaluator<double> evaluator;
     MGLShape <MGLFeature> *shape = mapbox::geometry::geometry<double>::visit(feature.geometry, evaluator);
-    if (feature.id) {
-        shape.identifier = mbgl::FeatureIdentifier::visit(*feature.id, ValueEvaluator());
+    if (!feature.id.is<mapbox::feature::null_value_t>()) {
+        shape.identifier = mbgl::FeatureIdentifier::visit(feature.id, ValueEvaluator());
     }
     shape.attributes = attributes;
 

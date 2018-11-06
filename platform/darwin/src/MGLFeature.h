@@ -172,6 +172,14 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ An `MGLEmptyFeature` object associates an empty shape with an optional
+ identifier and attributes.
+ */
+MGL_EXPORT
+@interface MGLEmptyFeature : MGLShape <MGLFeature>
+@end
+
+/**
  An `MGLPointFeature` object associates a point shape with an optional
  identifier and attributes.
  */

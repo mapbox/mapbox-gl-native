@@ -21,7 +21,7 @@ using namespace mbgl::style;
 
 bool filter(const char * json,
             const PropertyMap& featureProperties = {{}},
-            optional<FeatureIdentifier> featureId = {},
+            FeatureIdentifier featureId = {},
             FeatureType featureType = FeatureType::Point,
             GeometryCollection featureGeometry = {},
             float zoom = 0.0f) {
@@ -81,7 +81,7 @@ std::string stringifyFilter(const char * json) {
 
 TEST(Filter, EqualsNull) {
     auto f = R"(["==", "foo", null])";
-    ASSERT_TRUE(filter(f, {{ "foo", mapbox::geometry::null_value }}));
+    ASSERT_TRUE(filter(f, {{ "foo", mapbox::feature::null_value }}));
 
     ASSERT_FALSE(filter(f, {{ "foo", int64_t(0) }}));
     ASSERT_FALSE(filter(f, {{ "foo", int64_t(1) }}));
@@ -107,7 +107,7 @@ TEST(Filter, EqualsNumber) {
     ASSERT_FALSE(filter(f, {{ "foo", std::string("0") }}));
     ASSERT_FALSE(filter(f, {{ "foo", false }}));
     ASSERT_FALSE(filter(f, {{ "foo", true }}));
-    ASSERT_FALSE(filter(f, {{ "foo", mapbox::geometry::null_value }}));
+    ASSERT_FALSE(filter(f, {{ "foo", mapbox::feature::null_value }}));
     ASSERT_FALSE(filter(f, {{}}));
 }
 

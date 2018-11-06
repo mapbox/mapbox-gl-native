@@ -7,9 +7,9 @@ namespace mbgl {
 
 class GeoJSONTileFeature : public GeometryTileFeature {
 public:
-    const mapbox::geometry::feature<int16_t>& feature;
+    const mapbox::feature::feature<int16_t>& feature;
 
-    GeoJSONTileFeature(const mapbox::geometry::feature<int16_t>& feature_)
+    GeoJSONTileFeature(const mapbox::feature::feature<int16_t>& feature_)
         : feature(feature_) {
     }
 
@@ -21,7 +21,7 @@ public:
         return feature.properties;
     }
 
-    optional<FeatureIdentifier> getID() const override {
+    FeatureIdentifier getID() const override {
         return feature.id;
     }
 
@@ -47,7 +47,7 @@ public:
 
 class GeoJSONTileLayer : public GeometryTileLayer {
 public:
-    GeoJSONTileLayer(std::shared_ptr<const mapbox::geometry::feature_collection<int16_t>> features_)
+    GeoJSONTileLayer(std::shared_ptr<const mapbox::feature::feature_collection<int16_t>> features_)
         : features(std::move(features_)) {
     }
 
@@ -64,17 +64,17 @@ public:
     }
 
 private:
-    std::shared_ptr<const mapbox::geometry::feature_collection<int16_t>> features;
+    std::shared_ptr<const mapbox::feature::feature_collection<int16_t>> features;
 };
 
 class GeoJSONTileData : public GeometryTileData {
 public:
-    GeoJSONTileData(mapbox::geometry::feature_collection<int16_t> features_)
-        : features(std::make_shared<mapbox::geometry::feature_collection<int16_t>>(
+    GeoJSONTileData(mapbox::feature::feature_collection<int16_t> features_)
+        : features(std::make_shared<mapbox::feature::feature_collection<int16_t>>(
               std::move(features_))) {
     }
 
-    GeoJSONTileData(std::shared_ptr<const mapbox::geometry::feature_collection<int16_t>> features_)
+    GeoJSONTileData(std::shared_ptr<const mapbox::feature::feature_collection<int16_t>> features_)
         : features(std::move(features_)) {
     }
 
@@ -88,7 +88,7 @@ public:
 
 
 private:
-    std::shared_ptr<const mapbox::geometry::feature_collection<int16_t>> features;
+    std::shared_ptr<const mapbox::feature::feature_collection<int16_t>> features;
 };
 
 } // namespace mbgl
