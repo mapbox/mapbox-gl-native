@@ -42,7 +42,7 @@ std::unique_ptr<Layer> BackgroundLayer::cloneRef(const std::string& id_) const {
 void BackgroundLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-LayerFactory* BackgroundLayer::Impl::getLayerFactory() const {
+LayerFactory* BackgroundLayer::Impl::getLayerFactory() const noexcept {
     return BackgroundLayerFactory::get();
 }
 
@@ -284,12 +284,12 @@ BackgroundLayerFactory::BackgroundLayerFactory() {
 BackgroundLayerFactory::~BackgroundLayerFactory() = default;
 
 // static
-BackgroundLayerFactory* BackgroundLayerFactory::get() {
+BackgroundLayerFactory* BackgroundLayerFactory::get() noexcept {
     assert(instance);
     return instance;
 }
 
-bool BackgroundLayerFactory::supportsType(const std::string& type) const {
+bool BackgroundLayerFactory::supportsType(const std::string& type) const noexcept {
     return type == "background";
 }
 

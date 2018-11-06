@@ -42,7 +42,7 @@ std::unique_ptr<Layer> FillLayer::cloneRef(const std::string& id_) const {
 void FillLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-LayerFactory* FillLayer::Impl::getLayerFactory() const {
+LayerFactory* FillLayer::Impl::getLayerFactory() const noexcept {
     return FillLayerFactory::get();
 }
 
@@ -503,12 +503,12 @@ FillLayerFactory::FillLayerFactory() {
 FillLayerFactory::~FillLayerFactory() = default;
 
 // static
-FillLayerFactory* FillLayerFactory::get() {
+FillLayerFactory* FillLayerFactory::get() noexcept {
     assert(instance);
     return instance;
 }
 
-bool FillLayerFactory::supportsType(const std::string& type) const {
+bool FillLayerFactory::supportsType(const std::string& type) const noexcept {
     return type == "fill";
 }
 

@@ -21,7 +21,7 @@ public:
     LayerManagerBase();
 private:
     // LayerManager overrides.
-    std::unique_ptr<Layer> createLayer(const std::string& type, const std::string& id, const conversion::Convertible& value, conversion::Error& error) final;
+    std::unique_ptr<Layer> createLayer(const std::string& type, const std::string& id, const conversion::Convertible& value, conversion::Error& error) noexcept final;
     std::vector<std::unique_ptr<LayerFactory>> factories;
 };
 
@@ -37,7 +37,10 @@ LayerManagerBase::LayerManagerBase() {
     factories.emplace_back(std::unique_ptr<LayerFactory>(new HeatmapLayerFactory));
 }
 
-std::unique_ptr<Layer> LayerManagerBase::createLayer(const std::string& type, const std::string& id, const conversion::Convertible& value, conversion::Error& error) {
+std::unique_ptr<Layer> LayerManagerBase::createLayer(const std::string& type,
+                                                     const std::string& id,
+                                                     const conversion::Convertible& value,
+                                                     conversion::Error& error) noexcept {
     for (const auto& factory: factories) {
         if (factory->supportsType(type)) {
             auto layer = factory->createLayer(id, value);
@@ -52,7 +55,7 @@ std::unique_ptr<Layer> LayerManagerBase::createLayer(const std::string& type, co
 }
 
 // static 
-LayerManager* LayerManager::get() {
+LayerManager* LayerManager::get() noexcept {
     static LayerManagerBase impl;
     return &impl;
 }

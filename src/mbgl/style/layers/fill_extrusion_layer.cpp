@@ -42,7 +42,7 @@ std::unique_ptr<Layer> FillExtrusionLayer::cloneRef(const std::string& id_) cons
 void FillExtrusionLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-LayerFactory* FillExtrusionLayer::Impl::getLayerFactory() const {
+LayerFactory* FillExtrusionLayer::Impl::getLayerFactory() const noexcept {
     return FillExtrusionLayerFactory::get();
 }
 
@@ -503,12 +503,12 @@ FillExtrusionLayerFactory::FillExtrusionLayerFactory() {
 FillExtrusionLayerFactory::~FillExtrusionLayerFactory() = default;
 
 // static
-FillExtrusionLayerFactory* FillExtrusionLayerFactory::get() {
+FillExtrusionLayerFactory* FillExtrusionLayerFactory::get() noexcept {
     assert(instance);
     return instance;
 }
 
-bool FillExtrusionLayerFactory::supportsType(const std::string& type) const {
+bool FillExtrusionLayerFactory::supportsType(const std::string& type) const noexcept {
     return type == "fill-extrusion";
 }
 

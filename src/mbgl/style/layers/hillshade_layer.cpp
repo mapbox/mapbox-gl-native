@@ -42,7 +42,7 @@ std::unique_ptr<Layer> HillshadeLayer::cloneRef(const std::string& id_) const {
 void HillshadeLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-LayerFactory* HillshadeLayer::Impl::getLayerFactory() const {
+LayerFactory* HillshadeLayer::Impl::getLayerFactory() const noexcept {
     return HillshadeLayerFactory::get();
 }
 
@@ -435,12 +435,12 @@ HillshadeLayerFactory::HillshadeLayerFactory() {
 HillshadeLayerFactory::~HillshadeLayerFactory() = default;
 
 // static
-HillshadeLayerFactory* HillshadeLayerFactory::get() {
+HillshadeLayerFactory* HillshadeLayerFactory::get() noexcept {
     assert(instance);
     return instance;
 }
 
-bool HillshadeLayerFactory::supportsType(const std::string& type) const {
+bool HillshadeLayerFactory::supportsType(const std::string& type) const noexcept {
     return type == "hillshade";
 }
 

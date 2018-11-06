@@ -85,10 +85,10 @@ public:
     FillLayerFactory();
     // LayerFactory overrides.
     ~FillLayerFactory() override;
-    bool supportsType(const std::string& type) const final;
+    bool supportsType(const std::string& type) const noexcept final;
     std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
 
-    static FillLayerFactory* get();
+    static FillLayerFactory* get() noexcept;
 
 private:
     static FillLayerFactory* instance;

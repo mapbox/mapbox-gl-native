@@ -107,7 +107,7 @@ optional<conversion::Error> Layer::setVisibility(const conversion::Convertible& 
     return nullopt;
 }
 
-optional<std::string> LayerFactory::getSource(const conversion::Convertible& value) const {
+optional<std::string> LayerFactory::getSource(const conversion::Convertible& value) const noexcept {
     auto sourceValue = objectMember(value, "source");
     if (!sourceValue) {
         return nullopt;
@@ -121,7 +121,7 @@ optional<std::string> LayerFactory::getSource(const conversion::Convertible& val
     return source;
 }
 
-bool LayerFactory::initSourceLayerAndFilter(Layer* layer, const conversion::Convertible& value) const {
+bool LayerFactory::initSourceLayerAndFilter(Layer* layer, const conversion::Convertible& value) const noexcept {
     auto sourceLayerValue = objectMember(value, "source-layer");
     if (sourceLayerValue) {
         optional<std::string> sourceLayer = toString(*sourceLayerValue);

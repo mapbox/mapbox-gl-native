@@ -59,7 +59,7 @@ void <%- camelize(type) %>Layer::Impl::stringifyLayout(rapidjson::Writer<rapidjs
 }
 <% } -%>
 
-LayerFactory* <%- camelize(type) %>Layer::Impl::getLayerFactory() const {
+LayerFactory* <%- camelize(type) %>Layer::Impl::getLayerFactory() const noexcept {
     return <%- camelize(type) %>LayerFactory::get();
 }
 
@@ -274,12 +274,12 @@ Mutable<Layer::Impl> <%- camelize(type) %>Layer::mutableBaseImpl() const {
 <%- camelize(type) %>LayerFactory::~<%- camelize(type) %>LayerFactory() = default;
 
 // static
-<%- camelize(type) %>LayerFactory* <%- camelize(type) %>LayerFactory::get() {
+<%- camelize(type) %>LayerFactory* <%- camelize(type) %>LayerFactory::get() noexcept {
     assert(instance);
     return instance;
 }
 
-bool <%- camelize(type) %>LayerFactory::supportsType(const std::string& type) const {
+bool <%- camelize(type) %>LayerFactory::supportsType(const std::string& type) const noexcept {
     return type == "<%- type %>";
 }
 

@@ -41,7 +41,7 @@ public:
     // Utility function for automatic layer grouping.
     virtual void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const = 0;
 
-    virtual LayerFactory* getLayerFactory() const = 0;
+    virtual LayerFactory* getLayerFactory() const noexcept = 0;
 
     const LayerType type;
     std::string id;

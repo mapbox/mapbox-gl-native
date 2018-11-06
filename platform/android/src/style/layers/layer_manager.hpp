@@ -19,7 +19,7 @@ namespace android {
 class LayerManagerAndroid : public mbgl::style::LayerManager {
 public:
     ~LayerManagerAndroid() override;
-    static LayerManagerAndroid* get();
+    static LayerManagerAndroid* get() noexcept;
     
     jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&);
     jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>);
@@ -30,7 +30,7 @@ private:
     LayerManagerAndroid();
     JavaLayerPeerFactory* getPeerFactory(mbgl::style::Layer*);
     // mbgl:style::LayerManager overrides.
-    std::unique_ptr<style::Layer> createLayer(const std::string& type, const std::string& id, const style::conversion::Convertible& value, style::conversion::Error& error) final;
+    std::unique_ptr<style::Layer> createLayer(const std::string& type, const std::string& id, const style::conversion::Convertible& value, style::conversion::Error& error) noexcept final;
 
     std::vector<std::unique_ptr<JavaLayerPeerFactory>> factories;
 };

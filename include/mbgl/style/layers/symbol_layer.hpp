@@ -279,10 +279,10 @@ public:
     SymbolLayerFactory();
     // LayerFactory overrides.
     ~SymbolLayerFactory() override;
-    bool supportsType(const std::string& type) const final;
+    bool supportsType(const std::string& type) const noexcept final;
     std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
 
-    static SymbolLayerFactory* get();
+    static SymbolLayerFactory* get() noexcept;
 
 private:
     static SymbolLayerFactory* instance;

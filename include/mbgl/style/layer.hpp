@@ -98,13 +98,13 @@ class LayerFactory {
 public:
     virtual ~LayerFactory() = default;
     /// Returns \c true if this factory can produce layers of the given type of the layers; returns \c false otherwise.
-    virtual bool supportsType(const std::string& type) const = 0;
+    virtual bool supportsType(const std::string& type) const noexcept = 0;
     /// Returns a new Layer instance on success call; returns `nulltptr` otherwise. 
     virtual std::unique_ptr<Layer> createLayer(const std::string& id, const conversion::Convertible& value) = 0;
 
 protected:
-    optional<std::string> getSource(const conversion::Convertible& value) const;
-    bool initSourceLayerAndFilter(Layer*, const conversion::Convertible& value) const;
+    optional<std::string> getSource(const conversion::Convertible& value) const noexcept;
+    bool initSourceLayerAndFilter(Layer*, const conversion::Convertible& value) const noexcept;
 };
 
 /**
@@ -117,11 +117,11 @@ public:
      * 
      * @return LayerManager* 
      */
-    static LayerManager* get();
+    static LayerManager* get() noexcept;
 
     virtual ~LayerManager() = default;
     /// Returns a new Layer instance on success call; returns `nulltptr` otherwise.
-    virtual std::unique_ptr<Layer> createLayer(const std::string& type, const std::string& id, const conversion::Convertible& value, conversion::Error& error) = 0;
+    virtual std::unique_ptr<Layer> createLayer(const std::string& type, const std::string& id, const conversion::Convertible& value, conversion::Error& error) noexcept = 0;
 
 protected:
     LayerManager() = default;

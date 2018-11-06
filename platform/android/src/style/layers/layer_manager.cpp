@@ -81,7 +81,7 @@ JavaLayerPeerFactory* LayerManagerAndroid::getPeerFactory(mbgl::style::Layer* la
     return nullptr;
 }
 
-std::unique_ptr<style::Layer> LayerManagerAndroid::createLayer(const std::string& type, const std::string& id, const style::conversion::Convertible& value, style::conversion::Error& error) {
+std::unique_ptr<style::Layer> LayerManagerAndroid::createLayer(const std::string& type, const std::string& id, const style::conversion::Convertible& value, style::conversion::Error& error) noexcept{
     for (const auto& factory: factories) {
         auto* layerFactory = factory->getLayerFactory();
         if (layerFactory->supportsType(type)) {
@@ -97,7 +97,7 @@ std::unique_ptr<style::Layer> LayerManagerAndroid::createLayer(const std::string
 }
 
 // static 
-LayerManagerAndroid* LayerManagerAndroid::get() {
+LayerManagerAndroid* LayerManagerAndroid::get() noexcept {
     static LayerManagerAndroid impl;
     return &impl;
 }
@@ -106,7 +106,7 @@ LayerManagerAndroid* LayerManagerAndroid::get() {
 
 namespace style {
 // static 
-LayerManager* LayerManager::get() {
+LayerManager* LayerManager::get() noexcept {
     return android::LayerManagerAndroid::get();
 }
 

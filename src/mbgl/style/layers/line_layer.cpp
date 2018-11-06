@@ -43,7 +43,7 @@ void LineLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>
     layout.stringify(writer);
 }
 
-LayerFactory* LineLayer::Impl::getLayerFactory() const {
+LayerFactory* LineLayer::Impl::getLayerFactory() const noexcept {
     return LineLayerFactory::get();
 }
 
@@ -842,12 +842,12 @@ LineLayerFactory::LineLayerFactory() {
 LineLayerFactory::~LineLayerFactory() = default;
 
 // static
-LineLayerFactory* LineLayerFactory::get() {
+LineLayerFactory* LineLayerFactory::get() noexcept {
     assert(instance);
     return instance;
 }
 
-bool LineLayerFactory::supportsType(const std::string& type) const {
+bool LineLayerFactory::supportsType(const std::string& type) const noexcept {
     return type == "line";
 }
 
