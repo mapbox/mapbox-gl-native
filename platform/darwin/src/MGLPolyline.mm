@@ -139,6 +139,7 @@
 }
 
 - (instancetype)initWithPolylines:(NSArray<MGLPolyline *> *)polylines {
+    MGLLogDebug(@"Initializing with %lu polylines.", (unsigned long)polylines.count);
     if (self = [super init]) {
         _polylines = polylines;
 
@@ -153,6 +154,7 @@
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder {
+    MGLLogInfo(@"Initializing with coder.");
     if (self = [super initWithCoder:decoder]) {
         _polylines = [decoder decodeObjectOfClass:[NSArray class] forKey:@"polylines"];
     }

@@ -13,6 +13,7 @@
 
 - (instancetype)initWithCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count
 {
+    MGLLogDebug(@"Initializing with %lu coordinates.", (unsigned long) count);
     self = [super init];
 
     if (self)
@@ -29,6 +30,7 @@
 
 - (instancetype)initWithCoder:(NSCoder *)decoder
 {
+    MGLLogInfo(@"Initializing with coder.");
     if (self = [super initWithCoder:decoder]) {
         _coordinates = [decoder mgl_decodeLocationCoordinates2DForKey:@"coordinates"];
     }
@@ -94,6 +96,7 @@
 }
 
 - (void)setCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count {
+    MGLLogDebug(@"Setting: %lu coordinates.", (unsigned long)count);
     if (!count) {
         [NSException raise:NSInvalidArgumentException
                     format:@"A multipoint must have at least one vertex."];
@@ -106,6 +109,7 @@
 }
 
 - (void)insertCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count atIndex:(NSUInteger)index {
+    MGLLogDebug(@"Inserting %lu coordinates at index %lu.", (unsigned long)count, (unsigned long)index);
     if (!count) {
         return;
     }
@@ -124,15 +128,18 @@
 
 - (void)appendCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count
 {
+    MGLLogDebug(@"Appending %lu coordinates.", (unsigned long)count);
     [self insertCoordinates:coords count:count atIndex:_coordinates.size()];
 }
 
 - (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(const CLLocationCoordinate2D *)coords
 {
+    MGLLogDebug(@"Replacing coordinates in range: %@", NSStringFromRange(range));
     [self replaceCoordinatesInRange:range withCoordinates:coords count:range.length];
 }
 
 - (void)replaceCoordinatesInRange:(NSRange)range withCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count {
+    MGLLogDebug(@"Replacing %lu coordinates in range %@.", (unsigned long)count, NSStringFromRange(range));
     if (!count && !range.length) {
         return;
     }
@@ -155,6 +162,7 @@
 }
 
 - (void)removeCoordinatesInRange:(NSRange)range {
+    MGLLogDebug(@"Removing coordinatesInRange: %@", NSStringFromRange(range));
     CLLocationCoordinate2D coords;
     [self replaceCoordinatesInRange:range withCoordinates:&coords count:0];
 }

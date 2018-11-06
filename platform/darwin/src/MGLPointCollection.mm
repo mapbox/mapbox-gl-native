@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count
 {
+    MGLLogDebug(@"Initializing with %lu coordinates.", (unsigned long)count);
     self = [super init];
     if (self)
     {
@@ -30,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)decoder {
+    MGLLogInfo(@"Initializing with coder.O");
     if (self = [super initWithCoder:decoder]) {
         NSArray *coordinates = [decoder decodeObjectOfClass:[NSArray class] forKey:@"coordinates"];
         _coordinates = [coordinates mgl_coordinates];
