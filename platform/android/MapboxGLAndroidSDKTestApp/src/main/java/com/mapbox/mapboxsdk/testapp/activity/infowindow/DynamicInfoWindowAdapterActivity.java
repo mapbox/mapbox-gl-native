@@ -67,7 +67,7 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
   }
 
   @Override
-  public void onMapReady(MapboxMap map) {
+  public void onMapReady(@NonNull MapboxMap map) {
     mapboxMap = map;
 
     // Add info window adapter

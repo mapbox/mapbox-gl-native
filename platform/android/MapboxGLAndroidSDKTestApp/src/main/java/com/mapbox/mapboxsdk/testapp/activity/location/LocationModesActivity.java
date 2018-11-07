@@ -131,7 +131,7 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
 
   @SuppressLint("MissingPermission")
   @Override
-  public void onMapReady(MapboxMap mapboxMap) {
+  public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
 
     locationEngine = new LocationEngineProvider(this).obtainBestLocationEngineAvailable();
