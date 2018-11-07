@@ -354,23 +354,23 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
         case mbgl::style::LayerType::Fill:
             return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::FillLayer*>(rawLayer)];
         case mbgl::style::LayerType::FillExtrusion:
-            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::FillExtrusionLayer*>(rawLayer)];
+            return [[MGLFillExtrusionStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::FillExtrusionLayer*>(rawLayer)];
         case mbgl::style::LayerType::Line:
-            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::LineLayer*>(rawLayer)];
+            return [[MGLLineStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::LineLayer*>(rawLayer)];
         case mbgl::style::LayerType::Symbol:
-            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::SymbolLayer*>(rawLayer)];
+            return [[MGLSymbolStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::SymbolLayer*>(rawLayer)];
         case mbgl::style::LayerType::Raster:
-            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::RasterLayer*>(rawLayer)];
+            return [[MGLRasterStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::RasterLayer*>(rawLayer)];
         case mbgl::style::LayerType::Heatmap:
-            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::HeatmapLayer*>(rawLayer)];
+            return [[MGLHeatmapStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::HeatmapLayer*>(rawLayer)];
         case mbgl::style::LayerType::Hillshade:
-            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::HillshadeLayer*>(rawLayer)];
+            return [[MGLHillshadeStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::HillshadeLayer*>(rawLayer)];
         case mbgl::style::LayerType::Circle:
-            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::CircleLayer*>(rawLayer)];
+            return [[MGLCircleStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::CircleLayer*>(rawLayer)];
         case mbgl::style::LayerType::Background:
-            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::BackgroundLayer*>(rawLayer)];
+            return [[MGLBackgroundStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::BackgroundLayer*>(rawLayer)];
         case mbgl::style::LayerType::Custom:
-            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::CustomLayer*>(rawLayer)];
+            return [[MGLOpenGLStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::CustomLayer*>(rawLayer)];
         default:
             NSAssert(NO, @"Unrecognized layer type");
             return nil;;
