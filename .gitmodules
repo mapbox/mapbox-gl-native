@@ -61,3 +61,6 @@
 [submodule "vendor/boost"]
 	path = vendor/boost
 	url = https://github.com/mapbox/mapbox-gl-native-boost.git
+[submodule "vendor/benchmark"]
+	path = vendor/benchmark
+	url = https://github.com/google/benchmark.git
