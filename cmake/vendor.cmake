@@ -3,6 +3,7 @@ execute_process(
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/vendor
 )
 
+include(${CMAKE_SOURCE_DIR}/vendor/benchmark.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/boost.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/earcut.hpp.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/expected.cmake)
