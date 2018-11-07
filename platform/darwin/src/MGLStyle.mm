@@ -129,8 +129,8 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 #pragma mark -
 
 - (instancetype)initWithRawStyle:(mbgl::style::Style *)rawStyle mapView:(MGLMapView *)mapView {
+    MGLLogInfo(@"Initializing %@ with mapView: %@", NSStringFromClass([self class]), mapView);
     if (self = [super init]) {
-        MGLLogInfo(@"Initializing %@", NSStringFromClass([self class]));
         _mapView = mapView;
         _rawStyle = rawStyle;
         _openGLLayers = [NSMutableDictionary dictionary];

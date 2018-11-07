@@ -32,6 +32,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (instancetype _Nonnull)initWithStyleURL:(nullable NSURL *)styleURL camera:(MGLMapCamera *)camera size:(CGSize) size
 {
+    MGLLogDebug(@"Initializing withStyleURL: %@ camera: %@ size: %@", styleURL, camera, NSStringFromCGSize(size));
     self = [super init];
     if (self) {
         if ( !styleURL)
@@ -135,6 +136,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (instancetype)initWithOptions:(MGLMapSnapshotOptions *)options
 {
+    MGLLogDebug(@"Initializing withOptions: %@", options);
     self = [super init];
     if (self) {
         [self setOptions:options];
@@ -144,6 +146,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (void)startWithCompletionHandler:(MGLMapSnapshotCompletionHandler)completion
 {
+    MGLLogDebug(@"Starting withCompletionHandler: %@", completion);
     [self startWithQueue:dispatch_get_main_queue() completionHandler:completion];
 }
 
@@ -501,6 +504,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (void)cancel
 {
+    MGLLogInfo(@"Cancelling snapshotter.");
     self.cancelled = YES;
     
     if (_snapshotCallback) {
@@ -530,6 +534,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (void)setOptions:(MGLMapSnapshotOptions *)options
 {
+    MGLLogDebug(@"Setting options: %@", options);
     _options = options;
     mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
     _mbglThreadPool = mbgl::sharedThreadPool();
