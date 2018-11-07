@@ -101,11 +101,12 @@ public class RasterLayerTest extends BaseActivityTest {
     Timber.i("raster-opacity");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getRasterOpacity().getValue());
+      assertNull(layer.getRasterOpacity().getValue());
 
       // Set and Get
-      layer.setProperties(rasterOpacity(0.3f));
-      assertEquals((Float) layer.getRasterOpacity().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(rasterOpacity(propertyValue));
+      assertEquals(layer.getRasterOpacity().getValue(), propertyValue);
     });
   }
 
@@ -131,11 +132,12 @@ public class RasterLayerTest extends BaseActivityTest {
     Timber.i("raster-hue-rotate");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getRasterHueRotate().getValue());
+      assertNull(layer.getRasterHueRotate().getValue());
 
       // Set and Get
-      layer.setProperties(rasterHueRotate(0.3f));
-      assertEquals((Float) layer.getRasterHueRotate().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(rasterHueRotate(propertyValue));
+      assertEquals(layer.getRasterHueRotate().getValue(), propertyValue);
     });
   }
 
@@ -161,11 +163,12 @@ public class RasterLayerTest extends BaseActivityTest {
     Timber.i("raster-brightness-min");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getRasterBrightnessMin().getValue());
+      assertNull(layer.getRasterBrightnessMin().getValue());
 
       // Set and Get
-      layer.setProperties(rasterBrightnessMin(0.3f));
-      assertEquals((Float) layer.getRasterBrightnessMin().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(rasterBrightnessMin(propertyValue));
+      assertEquals(layer.getRasterBrightnessMin().getValue(), propertyValue);
     });
   }
 
@@ -191,11 +194,12 @@ public class RasterLayerTest extends BaseActivityTest {
     Timber.i("raster-brightness-max");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getRasterBrightnessMax().getValue());
+      assertNull(layer.getRasterBrightnessMax().getValue());
 
       // Set and Get
-      layer.setProperties(rasterBrightnessMax(0.3f));
-      assertEquals((Float) layer.getRasterBrightnessMax().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(rasterBrightnessMax(propertyValue));
+      assertEquals(layer.getRasterBrightnessMax().getValue(), propertyValue);
     });
   }
 
@@ -221,11 +225,12 @@ public class RasterLayerTest extends BaseActivityTest {
     Timber.i("raster-saturation");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getRasterSaturation().getValue());
+      assertNull(layer.getRasterSaturation().getValue());
 
       // Set and Get
-      layer.setProperties(rasterSaturation(0.3f));
-      assertEquals((Float) layer.getRasterSaturation().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(rasterSaturation(propertyValue));
+      assertEquals(layer.getRasterSaturation().getValue(), propertyValue);
     });
   }
 
@@ -251,11 +256,12 @@ public class RasterLayerTest extends BaseActivityTest {
     Timber.i("raster-contrast");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getRasterContrast().getValue());
+      assertNull(layer.getRasterContrast().getValue());
 
       // Set and Get
-      layer.setProperties(rasterContrast(0.3f));
-      assertEquals((Float) layer.getRasterContrast().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(rasterContrast(propertyValue));
+      assertEquals(layer.getRasterContrast().getValue(), propertyValue);
     });
   }
 
@@ -266,11 +272,12 @@ public class RasterLayerTest extends BaseActivityTest {
     Timber.i("raster-resampling");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getRasterResampling().getValue());
+      assertNull(layer.getRasterResampling().getValue());
 
       // Set and Get
-      layer.setProperties(rasterResampling(RASTER_RESAMPLING_LINEAR));
-      assertEquals((String) layer.getRasterResampling().getValue(), (String) RASTER_RESAMPLING_LINEAR);
+      String propertyValue = RASTER_RESAMPLING_LINEAR;
+      layer.setProperties(rasterResampling(propertyValue));
+      assertEquals(layer.getRasterResampling().getValue(), propertyValue);
     });
   }
 
@@ -281,11 +288,12 @@ public class RasterLayerTest extends BaseActivityTest {
     Timber.i("raster-fade-duration");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getRasterFadeDuration().getValue());
+      assertNull(layer.getRasterFadeDuration().getValue());
 
       // Set and Get
-      layer.setProperties(rasterFadeDuration(0.3f));
-      assertEquals((Float) layer.getRasterFadeDuration().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(rasterFadeDuration(propertyValue));
+      assertEquals(layer.getRasterFadeDuration().getValue(), propertyValue);
     });
   }
 }

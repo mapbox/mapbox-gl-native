@@ -139,11 +139,12 @@ public class HeatmapLayerTest extends BaseActivityTest {
     Timber.i("heatmap-radius");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getHeatmapRadius().getValue());
+      assertNull(layer.getHeatmapRadius().getValue());
 
       // Set and Get
-      layer.setProperties(heatmapRadius(0.3f));
-      assertEquals((Float) layer.getHeatmapRadius().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(heatmapRadius(propertyValue));
+      assertEquals(layer.getHeatmapRadius().getValue(), propertyValue);
     });
   }
 
@@ -170,11 +171,12 @@ public class HeatmapLayerTest extends BaseActivityTest {
     Timber.i("heatmap-weight");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getHeatmapWeight().getValue());
+      assertNull(layer.getHeatmapWeight().getValue());
 
       // Set and Get
-      layer.setProperties(heatmapWeight(0.3f));
-      assertEquals((Float) layer.getHeatmapWeight().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(heatmapWeight(propertyValue));
+      assertEquals(layer.getHeatmapWeight().getValue(), propertyValue);
     });
   }
 
@@ -216,11 +218,12 @@ public class HeatmapLayerTest extends BaseActivityTest {
     Timber.i("heatmap-intensity");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getHeatmapIntensity().getValue());
+      assertNull(layer.getHeatmapIntensity().getValue());
 
       // Set and Get
-      layer.setProperties(heatmapIntensity(0.3f));
-      assertEquals((Float) layer.getHeatmapIntensity().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(heatmapIntensity(propertyValue));
+      assertEquals(layer.getHeatmapIntensity().getValue(), propertyValue);
     });
   }
 
@@ -246,11 +249,12 @@ public class HeatmapLayerTest extends BaseActivityTest {
     Timber.i("heatmap-opacity");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getHeatmapOpacity().getValue());
+      assertNull(layer.getHeatmapOpacity().getValue());
 
       // Set and Get
-      layer.setProperties(heatmapOpacity(0.3f));
-      assertEquals((Float) layer.getHeatmapOpacity().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(heatmapOpacity(propertyValue));
+      assertEquals(layer.getHeatmapOpacity().getValue(), propertyValue);
     });
   }
 }

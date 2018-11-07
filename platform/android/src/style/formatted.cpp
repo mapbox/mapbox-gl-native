@@ -18,21 +18,28 @@ jni::Local<jni::Object<Formatted>> Formatted::New(jni::JNIEnv& env, const style:
         auto section = value.sections.at(i);
         auto text = jni::Make<jni::String>(env, section.text);
 
-        double fontScale = 1.0;
-        if (section.fontScale) {
-            fontScale = section.fontScale.value();
-        }
-
-        if (section.fontStack) {
+        if (section.fontStack && section.fontScale) {
+            double fontScale = section.fontScale.value();
             auto fontStack = jni::Array<jni::String>::New(env, section.fontStack.value().size());
             for (std::size_t j = 0; j < section.fontStack.value().size(); j++) {
                 fontStack.Set(env, j, jni::Make<jni::String>(env, section.fontStack.value().at(j)));
             }
-            static auto formattedSectionConstructor = formattedSection.GetConstructor<jni::String, double, jni::Array<jni::String>>(env);
-            sections.Set(env, i, formattedSection.New(env, formattedSectionConstructor, text, fontScale, fontStack));
+            static auto formattedSectionConstructor = formattedSection.GetConstructor<jni::String, jni::Number, jni::Array<jni::String>>(env);
+            sections.Set(env, i, formattedSection.New(env, formattedSectionConstructor, text, jni::Box(env, fontScale), fontStack));
+        } else if (section.fontScale) {
+            double fontScale = section.fontScale.value();
+            static auto formattedSectionConstructor = formattedSection.GetConstructor<jni::String, jni::Number>(env);
+            sections.Set(env, i, formattedSection.New(env, formattedSectionConstructor, text, jni::Box(env, fontScale)));
+        } else if (section.fontStack) {
+            auto fontStack = jni::Array<jni::String>::New(env, section.fontStack.value().size());
+            for (std::size_t j = 0; j < section.fontStack.value().size(); j++) {
+                fontStack.Set(env, j, jni::Make<jni::String>(env, section.fontStack.value().at(j)));
+            }
+            static auto formattedSectionConstructor = formattedSection.GetConstructor<jni::String, jni::Array<jni::String>>(env);
+            sections.Set(env, i, formattedSection.New(env, formattedSectionConstructor, text, fontStack));
         } else {
-            static auto formattedSectionConstructor = formattedSection.GetConstructor<jni::String, double>(env);
-            sections.Set(env, i, formattedSection.New(env, formattedSectionConstructor, text, fontScale));
+            static auto formattedSectionConstructor = formattedSection.GetConstructor<jni::String>(env);
+            sections.Set(env, i, formattedSection.New(env, formattedSectionConstructor, text));
         }
     }
 

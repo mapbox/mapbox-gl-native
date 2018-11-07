@@ -86,11 +86,12 @@ public class HillshadeLayerTest extends BaseActivityTest {
     Timber.i("hillshade-illumination-direction");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getHillshadeIlluminationDirection().getValue());
+      assertNull(layer.getHillshadeIlluminationDirection().getValue());
 
       // Set and Get
-      layer.setProperties(hillshadeIlluminationDirection(0.3f));
-      assertEquals((Float) layer.getHillshadeIlluminationDirection().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(hillshadeIlluminationDirection(propertyValue));
+      assertEquals(layer.getHillshadeIlluminationDirection().getValue(), propertyValue);
     });
   }
 
@@ -101,11 +102,12 @@ public class HillshadeLayerTest extends BaseActivityTest {
     Timber.i("hillshade-illumination-anchor");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getHillshadeIlluminationAnchor().getValue());
+      assertNull(layer.getHillshadeIlluminationAnchor().getValue());
 
       // Set and Get
-      layer.setProperties(hillshadeIlluminationAnchor(HILLSHADE_ILLUMINATION_ANCHOR_MAP));
-      assertEquals((String) layer.getHillshadeIlluminationAnchor().getValue(), (String) HILLSHADE_ILLUMINATION_ANCHOR_MAP);
+      String propertyValue = HILLSHADE_ILLUMINATION_ANCHOR_MAP;
+      layer.setProperties(hillshadeIlluminationAnchor(propertyValue));
+      assertEquals(layer.getHillshadeIlluminationAnchor().getValue(), propertyValue);
     });
   }
 
@@ -131,11 +133,12 @@ public class HillshadeLayerTest extends BaseActivityTest {
     Timber.i("hillshade-exaggeration");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getHillshadeExaggeration().getValue());
+      assertNull(layer.getHillshadeExaggeration().getValue());
 
       // Set and Get
-      layer.setProperties(hillshadeExaggeration(0.3f));
-      assertEquals((Float) layer.getHillshadeExaggeration().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(hillshadeExaggeration(propertyValue));
+      assertEquals(layer.getHillshadeExaggeration().getValue(), propertyValue);
     });
   }
 
@@ -161,11 +164,12 @@ public class HillshadeLayerTest extends BaseActivityTest {
     Timber.i("hillshade-shadow-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getHillshadeShadowColor().getValue());
+      assertNull(layer.getHillshadeShadowColor().getValue());
 
       // Set and Get
-      layer.setProperties(hillshadeShadowColor("rgba(0, 0, 0, 1)"));
-      assertEquals((String) layer.getHillshadeShadowColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+      String propertyValue = "rgba(0, 0, 0, 1)";
+      layer.setProperties(hillshadeShadowColor(propertyValue));
+      assertEquals(layer.getHillshadeShadowColor().getValue(), propertyValue);
     });
   }
 
@@ -205,11 +209,12 @@ public class HillshadeLayerTest extends BaseActivityTest {
     Timber.i("hillshade-highlight-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getHillshadeHighlightColor().getValue());
+      assertNull(layer.getHillshadeHighlightColor().getValue());
 
       // Set and Get
-      layer.setProperties(hillshadeHighlightColor("rgba(0, 0, 0, 1)"));
-      assertEquals((String) layer.getHillshadeHighlightColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+      String propertyValue = "rgba(0, 0, 0, 1)";
+      layer.setProperties(hillshadeHighlightColor(propertyValue));
+      assertEquals(layer.getHillshadeHighlightColor().getValue(), propertyValue);
     });
   }
 
@@ -249,11 +254,12 @@ public class HillshadeLayerTest extends BaseActivityTest {
     Timber.i("hillshade-accent-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getHillshadeAccentColor().getValue());
+      assertNull(layer.getHillshadeAccentColor().getValue());
 
       // Set and Get
-      layer.setProperties(hillshadeAccentColor("rgba(0, 0, 0, 1)"));
-      assertEquals((String) layer.getHillshadeAccentColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+      String propertyValue = "rgba(0, 0, 0, 1)";
+      layer.setProperties(hillshadeAccentColor(propertyValue));
+      assertEquals(layer.getHillshadeAccentColor().getValue(), propertyValue);
     });
   }
 

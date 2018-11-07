@@ -2117,8 +2117,8 @@ public class PropertyFactory {
   /**
    * Value to use for a text label. If a plain `string` is provided, it will be treated as a `formatted` with default/inherited formatting options.
    *
-   * @param value a String value
-   * @return property wrapper around String
+   * @param value a Formatted value
+   * @return property wrapper around Formatted
    */
   public static PropertyValue<Expression> textField(Expression value) {
     return new LayoutPropertyValue<>("text-field", value);
