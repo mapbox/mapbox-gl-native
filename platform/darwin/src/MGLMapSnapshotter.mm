@@ -32,7 +32,12 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (instancetype _Nonnull)initWithStyleURL:(nullable NSURL *)styleURL camera:(MGLMapCamera *)camera size:(CGSize) size
 {
-    MGLLogDebug(@"Initializing withStyleURL: %@ camera: %@ size: %@", styleURL, camera, NSStringFromCGSize(size));
+#if TARGET_OS_IPHONE
+    NSString *sizeString = NSStringFromCGSize(size);
+#else
+    NSString *sizeString = NSStringFromSize(size);
+#endif
+    MGLLogDebug(@"Initializing withStyleURL: %@ camera: %@ size: %@", styleURL, camera, sizeString);
     self = [super init];
     if (self) {
         if ( !styleURL)
