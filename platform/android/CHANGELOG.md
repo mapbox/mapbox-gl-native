@@ -2,6 +2,21 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.7.0 - November 7, 2018
+ - Handle null getMapAsync invocations, deliver onMapReady only once [#13301](https://github.com/mapbox/mapbox-gl-native/pull/13301)
+ - Verify if `text-field` is not null before performing compatibility operations [#13294](https://github.com/mapbox/mapbox-gl-native/pull/13294)
+ - Log Java exception and fail silently instead of throwing a native exception in the map state callbacks[#13294](https://github.com/mapbox/mapbox-gl-native/pull/13294)
+ - Reintroduce OnMapChange invocation [#13289](https://github.com/mapbox/mapbox-gl-native/pull/13289)
+ - Null-check nativeMapView in case it's destroyed [#13281](https://github.com/mapbox/mapbox-gl-native/pull/13281)
+
+## 6.6.5 - November 2, 2018
+ - Telemetry v3.5.2 [#13258](https://github.com/mapbox/mapbox-gl-native/pull/13258)
+
+## 6.6.4 - November 1, 2018
+ - Fix crash with non AppCompatActivities [#13222](https://github.com/mapbox/mapbox-gl-native/pull/13222)
+ - Telemetry bump 3.5.1 [#13204](https://github.com/mapbox/mapbox-gl-native/pull/13204)
+ - Gestures library 0.3.0 [#13234](https://github.com/mapbox/mapbox-gl-native/pull/13234)
+
 ## 6.7.0-beta.1 - October 31, 2018
  - Remove map initialised check [#13224](https://github.com/mapbox/mapbox-gl-native/pull/13224)
  - Upgrade GeoJSONVT to v6.6.2 [#13231](https://github.com/mapbox/mapbox-gl-native/pull/13231)
@@ -10,11 +25,6 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Deprecate map zoom button controller [#13197](https://github.com/mapbox/mapbox-gl-native/pull/13197)
  - RenderState API [#13170](https://github.com/mapbox/mapbox-gl-native/pull/13170)
  - Avoid wrapping longitude values at dateline [#13006](https://github.com/mapbox/mapbox-gl-native/pull/13006)
-
-## 6.6.3 - October 31, 2018
- - Fix crash with non AppCompatActivities [#13222](https://github.com/mapbox/mapbox-gl-native/pull/13222)
- - Telemetry bump 3.5.1 [#13204](https://github.com/mapbox/mapbox-gl-native/pull/13204)
- - Gestures library 0.3.0 [#13234](https://github.com/mapbox/mapbox-gl-native/pull/13234)
 
 ## 6.7.0-alpha.2 - October 24, 2018
  - Format expression support [#12985](https://github.com/mapbox/mapbox-gl-native/pull/12985)
@@ -26,7 +36,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Ensure queryRenderedFeatures accounts for icon-rotate [#13105](https://github.com/mapbox/mapbox-gl-native/pull/13105)
  - Add 'putResourceForURL' for pre-warming ambient cache [#13119](https://github.com/mapbox/mapbox-gl-native/pull/13119)
 
-## 6.6.2 - October 24, 2018
+## 6.6.2/6.6.3 - October 24, 2018
  - Remove requirement on vectorDrawables.useSupportLibrary [#13168](https://github.com/mapbox/mapbox-gl-native/pull/13168)
  - File source deactivate called before callbacks [#13146](https://github.com/mapbox/mapbox-gl-native/pull/13168)
 
@@ -60,7 +70,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Improve compatibility of offline packs between devices [#12933](https://github.com/mapbox/mapbox-gl-native/pull/12933)
  - Update telemetry dependency to 3.2.1 [#12974](https://github.com/mapbox/mapbox-gl-native/pull/12974)
  - Fix an issue where some tiles weren't rendered correctly when no internet connectivity was available [#12931](https://github.com/mapbox/mapbox-gl-native/pull/12931)
- 
+
 ## 6.6.0-alpha.1 - September 19, 2018
  - Merge LocationLayerPlugin to the Maps SDK [#12786](https://github.com/mapbox/mapbox-gl-native/pull/12786)
  - Add `symbol-z-order` symbol layout property to style spec [#12783](https://github.com/mapbox/mapbox-gl-native/pull/12783)
