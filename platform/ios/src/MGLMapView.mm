@@ -2422,7 +2422,7 @@ public:
 
 - (void)setZoomEnabled:(BOOL)zoomEnabled
 {
-    MGLLogDebug(@"Setting zoomEnabled: %@", NSStringFromBOOL(zoomEnabled));
+    MGLLogDebug(@"Setting zoomEnabled: %@", MGLStringFromBOOL(zoomEnabled));
     _zoomEnabled = zoomEnabled;
     self.pinch.enabled = zoomEnabled;
     self.doubleTap.enabled = zoomEnabled;
@@ -2432,28 +2432,28 @@ public:
 
 - (void)setScrollEnabled:(BOOL)scrollEnabled
 {
-    MGLLogDebug(@"Setting scrollEnabled: %@", NSStringFromBOOL(scrollEnabled));
+    MGLLogDebug(@"Setting scrollEnabled: %@", MGLStringFromBOOL(scrollEnabled));
     _scrollEnabled = scrollEnabled;
     self.pan.enabled = scrollEnabled;
 }
 
 - (void)setRotateEnabled:(BOOL)rotateEnabled
 {
-    MGLLogDebug(@"Setting rotateEnabled: %@", NSStringFromBOOL(rotateEnabled));
+    MGLLogDebug(@"Setting rotateEnabled: %@", MGLStringFromBOOL(rotateEnabled));
     _rotateEnabled = rotateEnabled;
     self.rotate.enabled = rotateEnabled;
 }
 
 - (void)setPitchEnabled:(BOOL)pitchEnabled
 {
-    MGLLogDebug(@"Setting pitchEnabled: %@", NSStringFromBOOL(pitchEnabled));
+    MGLLogDebug(@"Setting pitchEnabled: %@", MGLStringFromBOOL(pitchEnabled));
     _pitchEnabled = pitchEnabled;
     self.twoFingerDrag.enabled = pitchEnabled;
 }
 
 - (void)setShowsScale:(BOOL)showsScale
 {
-    MGLLogDebug(@"Setting showsScale: %@", NSStringFromBOOL(showsScale));
+    MGLLogDebug(@"Setting showsScale: %@", MGLStringFromBOOL(showsScale));
     _showsScale = showsScale;
     self.scaleBar.hidden = !showsScale;
 
@@ -2999,7 +2999,7 @@ public:
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated
 {
-    MGLLogDebug(@"Setting centerCoordinate: %@ animated: %@", NSStringFromCLLocationCoordinate2D(coordinate), NSStringFromBOOL(animated));
+    MGLLogDebug(@"Setting centerCoordinate: %@ animated: %@", NSStringFromCLLocationCoordinate2D(coordinate), MGLStringFromBOOL(animated));
     [self setCenterCoordinate:coordinate zoomLevel:self.zoomLevel animated:animated];
 }
 
@@ -3020,7 +3020,7 @@ public:
     MGLLogDebug(@"Setting centerCoordinate: %@ zoomLevel: %f animated: %@",
                 NSStringFromCLLocationCoordinate2D(centerCoordinate),
                 zoomLevel,
-                NSStringFromBOOL(animated));
+                MGLStringFromBOOL(animated));
     [self setCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:self.direction animated:animated];
 }
 
@@ -3030,7 +3030,7 @@ public:
                 NSStringFromCLLocationCoordinate2D(centerCoordinate),
                 zoomLevel,
                 direction,
-                NSStringFromBOOL(animated));
+                MGLStringFromBOOL(animated));
     [self setCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:direction animated:animated completionHandler:NULL];
 }
 
@@ -3040,7 +3040,7 @@ public:
                 NSStringFromCLLocationCoordinate2D(centerCoordinate),
                 zoomLevel,
                 direction,
-                NSStringFromBOOL(animated),
+                MGLStringFromBOOL(animated),
                 completion);
     self.userTrackingMode = MGLUserTrackingModeNone;
 
@@ -3119,7 +3119,7 @@ public:
 
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated
 {
-    MGLLogDebug(@"Setting zoomLevel: %f animated: %@", zoomLevel, NSStringFromBOOL(animated));
+    MGLLogDebug(@"Setting zoomLevel: %f animated: %@", zoomLevel, MGLStringFromBOOL(animated));
     if (zoomLevel == self.zoomLevel) return;
     [self cancelTransitions];
 
@@ -3167,7 +3167,7 @@ public:
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds animated:(BOOL)animated
 {
-    MGLLogDebug(@"Setting visibleCoordinateBounds: %@ animated: %@", MGLStringFromCoordinateBounds(bounds), NSStringFromBOOL(animated));
+    MGLLogDebug(@"Setting visibleCoordinateBounds: %@ animated: %@", MGLStringFromCoordinateBounds(bounds), MGLStringFromBOOL(animated));
     [self setVisibleCoordinateBounds:bounds edgePadding:UIEdgeInsetsZero animated:animated];
 }
 
@@ -3176,7 +3176,7 @@ public:
     MGLLogDebug(@"Setting visibleCoordinateBounds: %@ edgePadding: %@ animated: %@",
                 MGLStringFromCoordinateBounds(bounds),
                 NSStringFromUIEdgeInsets(insets),
-                NSStringFromBOOL(animated));
+                MGLStringFromBOOL(animated));
     CLLocationCoordinate2D coordinates[] = {
         {bounds.ne.latitude, bounds.sw.longitude},
         bounds.sw,
@@ -3195,7 +3195,7 @@ public:
                 MGLStringFromCoordinateBounds(bounds),
                 NSStringFromUIEdgeInsets(insets),
                 direction,
-                NSStringFromBOOL(animated));
+                MGLStringFromBOOL(animated));
     CLLocationCoordinate2D coordinates[] = {
         {bounds.ne.latitude, bounds.sw.longitude},
         bounds.sw,
@@ -3214,7 +3214,7 @@ public:
     MGLLogDebug(@"Setting: %lu coordinates edgePadding: %@ animated: %@",
                 count,
                 NSStringFromUIEdgeInsets(insets),
-                NSStringFromBOOL(animated));
+                MGLStringFromBOOL(animated));
     [self setVisibleCoordinates:coordinates count:count edgePadding:insets direction:self.direction animated:animated];
 }
 
@@ -3224,7 +3224,7 @@ public:
                 count,
                 NSStringFromUIEdgeInsets(insets),
                 direction,
-                NSStringFromBOOL(animated));
+                MGLStringFromBOOL(animated));
     [self setVisibleCoordinates:coordinates count:count edgePadding:insets direction:direction duration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil];
 }
 
@@ -3319,7 +3319,7 @@ public:
 
 - (void)setDirection:(CLLocationDirection)direction animated:(BOOL)animated
 {
-    MGLLogDebug(@"Setting direction: %f animated: %@", direction, NSStringFromBOOL(animated));
+    MGLLogDebug(@"Setting direction: %f animated: %@", direction, MGLStringFromBOOL(animated));
     if ( ! animated && ! self.rotationAllowed) return;
 
     if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading)
@@ -3383,7 +3383,7 @@ public:
 
 - (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated
 {
-    MGLLogDebug(@"Setting camera: %@ animated: %@", camera, NSStringFromBOOL(animated));
+    MGLLogDebug(@"Setting camera: %@ animated: %@", camera, MGLStringFromBOOL(animated));
     [self setCamera:camera withDuration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil];
 }
 
@@ -4468,7 +4468,7 @@ public:
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
-    MGLLogDebug(@"Selecting annotation: %@ animated: %@", annotation, NSStringFromBOOL(animated));
+    MGLLogDebug(@"Selecting annotation: %@ animated: %@", annotation, MGLStringFromBOOL(animated));
     CGRect positioningRect = [self positioningRectForAnnotation:annotation defaultCalloutPoint:CGPointZero];
     [self selectAnnotation:annotation moveOnscreen:animated animateSelection:YES calloutPositioningRect:positioningRect];
 }
@@ -4749,11 +4749,11 @@ public:
 
 - (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
-    MGLLogDebug(@"Deselecting annotation: %@ animated: %@", annotation, NSStringFromBOOL(animated));
     if ( ! annotation) return;
 
     if (self.selectedAnnotation == annotation)
     {
+        MGLLogDebug(@"Deselecting annotation: %@ animated: %@", annotation, MGLStringFromBOOL(animated));
         // dismiss popup
         [self.calloutViewForSelectedAnnotation dismissCalloutAnimated:animated];
 
@@ -4824,7 +4824,7 @@ public:
 
 - (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations animated:(BOOL)animated
 {
-    MGLLogDebug(@"Showing: %lu annotations animated: %@", annotations.count, NSStringFromBOOL(animated));
+    MGLLogDebug(@"Showing: %lu annotations animated: %@", annotations.count, MGLStringFromBOOL(animated));
     CGFloat maximumPadding = 100;
     CGFloat yPadding = (self.frame.size.height / 5 <= maximumPadding) ? (self.frame.size.height / 5) : maximumPadding;
     CGFloat xPadding = (self.frame.size.width / 5 <= maximumPadding) ? (self.frame.size.width / 5) : maximumPadding;
@@ -4836,7 +4836,7 @@ public:
 
 - (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated
 {
-    MGLLogDebug(@"Showing: %lu annotations edgePadding: %@ animated: %@", annotations.count, NSStringFromUIEdgeInsets(insets), NSStringFromBOOL(animated));
+    MGLLogDebug(@"Showing: %lu annotations edgePadding: %@ animated: %@", annotations.count, NSStringFromUIEdgeInsets(insets), MGLStringFromBOOL(animated));
     if ( ! annotations || ! annotations.count) return;
 
     mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
@@ -4974,7 +4974,7 @@ public:
 
 - (void)setShowsUserLocation:(BOOL)showsUserLocation
 {
-    MGLLogDebug(@"Setting showsUserLocation: %@", NSStringFromBOOL(showsUserLocation));
+    MGLLogDebug(@"Setting showsUserLocation: %@", MGLStringFromBOOL(showsUserLocation));
     if (showsUserLocation == _showsUserLocation || _isTargetingInterfaceBuilder) return;
 
     _showsUserLocation = showsUserLocation;
@@ -5064,7 +5064,7 @@ public:
 
 - (void)setUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated
 {
-    MGLLogDebug(@"Setting userTrackingMode: %lu animated: %@", mode, NSStringFromBOOL(animated));
+    MGLLogDebug(@"Setting userTrackingMode: %lu animated: %@", mode, MGLStringFromBOOL(animated));
     if (mode == _userTrackingMode) return;
 
     if ((mode == MGLUserTrackingModeFollowWithHeading || mode == MGLUserTrackingModeFollowWithCourse) &&
@@ -5177,7 +5177,7 @@ public:
 
 - (void)setShowsUserHeadingIndicator:(BOOL)showsUserHeadingIndicator
 {
-    MGLLogDebug(@"Setting showsUserHeadingIndicator: %@", NSStringFromBOOL(showsUserHeadingIndicator));
+    MGLLogDebug(@"Setting showsUserHeadingIndicator: %@", MGLStringFromBOOL(showsUserHeadingIndicator));
     _showsUserHeadingIndicator = showsUserHeadingIndicator;
 
     if (_showsUserHeadingIndicator)
@@ -6563,7 +6563,7 @@ private:
 
 - (void)setAllowsZooming:(BOOL)allowsZooming
 {
-    MGLLogDebug(@"Setting allowsZooming: %@", NSStringFromBOOL(allowsZooming));
+    MGLLogDebug(@"Setting allowsZooming: %@", MGLStringFromBOOL(allowsZooming));
     self.zoomEnabled = allowsZooming;
 }
 
@@ -6579,7 +6579,7 @@ private:
 
 - (void)setAllowsScrolling:(BOOL)allowsScrolling
 {
-    MGLLogDebug(@"Setting allowsScrolling: %@", NSStringFromBOOL(allowsScrolling));
+    MGLLogDebug(@"Setting allowsScrolling: %@", MGLStringFromBOOL(allowsScrolling));
     self.scrollEnabled = allowsScrolling;
 }
 
@@ -6595,7 +6595,7 @@ private:
 
 - (void)setAllowsRotating:(BOOL)allowsRotating
 {
-    MGLLogDebug(@"Setting allowsRotating: %@", NSStringFromBOOL(allowsRotating));
+    MGLLogDebug(@"Setting allowsRotating: %@", MGLStringFromBOOL(allowsRotating));
     self.rotateEnabled = allowsRotating;
 }
 
@@ -6611,7 +6611,7 @@ private:
 
 - (void)setAllowsTilting:(BOOL)allowsTilting
 {
-    MGLLogDebug(@"Setting allowsTilting: %@", NSStringFromBOOL(allowsTilting));
+    MGLLogDebug(@"Setting allowsTilting: %@", MGLStringFromBOOL(allowsTilting));
     self.pitchEnabled = allowsTilting;
 }
 
@@ -6627,7 +6627,7 @@ private:
 
 - (void)setShowsHeading:(BOOL)showsHeading
 {
-    MGLLogDebug(@"Setting showsHeading: %@", NSStringFromBOOL(showsHeading));
+    MGLLogDebug(@"Setting showsHeading: %@", MGLStringFromBOOL(showsHeading));
     self.showsUserHeadingIndicator = showsHeading;
 }
 

@@ -182,7 +182,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
         __typeof__(self) strongSelf = weakSelf;
         // If self had died, _snapshotCallback would have been destroyed and this block would not be executed
-        NSCAssert(strongSelf, @"Snapshot callback executed after being destroyed.");
+        MGLCAssert(strongSelf, @"Snapshot callback executed after being destroyed.");
 
         if (!strongSelf.completion)
             return;

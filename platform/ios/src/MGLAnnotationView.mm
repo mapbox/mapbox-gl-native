@@ -94,13 +94,13 @@
 
 - (void)setSelected:(BOOL)selected
 {
-    MGLLogDebug(@"Setting selected: %@", NSStringFromBOOL(selected));
+    MGLLogDebug(@"Setting selected: %@", MGLStringFromBOOL(selected));
     [self setSelected:selected animated:NO];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
-    MGLLogDebug(@"Setting selected: %@ animated: %@", NSStringFromBOOL(selected), NSStringFromBOOL(animated));
+    MGLLogDebug(@"Setting selected: %@ animated: %@", MGLStringFromBOOL(selected), MGLStringFromBOOL(animated));
     [self willChangeValueForKey:@"selected"];
     _selected = selected;
     [self didChangeValueForKey:@"selected"];
@@ -127,7 +127,7 @@
 
 - (void)setScalesWithViewingDistance:(BOOL)scalesWithViewingDistance
 {
-    MGLLogDebug(@"Setting scaleWithViewingDistance: %@", NSStringFromBOOL(scalesWithViewingDistance));
+    MGLLogDebug(@"Setting scaleWithViewingDistance: %@", MGLStringFromBOOL(scalesWithViewingDistance));
     if (_scalesWithViewingDistance != scalesWithViewingDistance)
     {
         _scalesWithViewingDistance = scalesWithViewingDistance;
@@ -180,7 +180,7 @@
 
 - (void)setRotatesToMatchCamera:(BOOL)rotatesToMatchCamera
 {
-    MGLLogDebug(@"Setting rotatesToMatchCamera: %@", NSStringFromBOOL(rotatesToMatchCamera));
+    MGLLogDebug(@"Setting rotatesToMatchCamera: %@", MGLStringFromBOOL(rotatesToMatchCamera));
     if (_rotatesToMatchCamera != rotatesToMatchCamera)
     {
         _rotatesToMatchCamera = rotatesToMatchCamera;
@@ -212,7 +212,7 @@
 
 - (void)setDraggable:(BOOL)draggable
 {
-    MGLLogDebug(@"Setting draggable: %@", NSStringFromBOOL(draggable));
+    MGLLogDebug(@"Setting draggable: %@", MGLStringFromBOOL(draggable));
     [self willChangeValueForKey:@"draggable"];
     _draggable = draggable;
     [self didChangeValueForKey:@"draggable"];
@@ -292,7 +292,7 @@
 
 - (void)setDragState:(MGLAnnotationViewDragState)dragState animated:(BOOL)animated
 {
-    MGLLogDebug(@"Setting dragState: %lu animated: %@", (unsigned long)dragState, NSStringFromBOOL(animated));
+    MGLLogDebug(@"Setting dragState: %lu animated: %@", (unsigned long)dragState, MGLStringFromBOOL(animated));
     [self willChangeValueForKey:@"dragState"];
     _dragState = dragState;
     [self didChangeValueForKey:@"dragState"];

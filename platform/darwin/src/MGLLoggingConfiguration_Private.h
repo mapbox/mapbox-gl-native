@@ -1,6 +1,6 @@
 #import "MGLLoggingConfiguration.h"
 
-NS_INLINE NSString *NSStringFromBOOL(BOOL value) {
+NS_INLINE NSString *MGLStringFromBOOL(BOOL value) {
     return value ? @"YES" : @"NO";
 }
 
@@ -21,6 +21,13 @@ NS_INLINE NSString *NSStringFromBOOL(BOOL value) {
             MGLLogFault(message, ##__VA_ARGS__); \
         } \
         NSAssert(expression, message, ##__VA_ARGS__); \
+    })
+#define MGLCAssert(expression, message, ...) \
+    __extension__({ \
+        if (__builtin_expect(!(expression), 0)) { \
+            MGLLogFault(message, ##__VA_ARGS__); \
+        } \
+        NSCAssert(expression, message, ##__VA_ARGS__); \
     })
 
 @interface MGLLoggingConfiguration (Private)

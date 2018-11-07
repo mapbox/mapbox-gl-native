@@ -480,6 +480,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 }
 
 - (void)setMaximumAllowedMapboxTiles:(uint64_t)maximumCount {
+    MGLLogDebug(@"Setting mazimumAllowedMapboxTiles: %lu", (unsigned long)maximumCount);
     _mbglFileSource->setOfflineMapboxTileCountLimit(maximumCount);
 }
 
