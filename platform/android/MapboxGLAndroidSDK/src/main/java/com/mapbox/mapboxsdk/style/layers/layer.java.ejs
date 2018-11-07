@@ -182,44 +182,8 @@ public class <%- camelize(type) %>Layer extends Layer {
   @SuppressWarnings("unchecked")
   public PropertyValue<<%- propertyType(property) %>> get<%- camelize(property.name) %>() {
     checkThread();
-<% if (property.name === 'text-field' && property.type === 'formatted') { -%>
-
-    PropertyValue propertyValue = new PropertyValue<>("text-field", nativeGetTextField());
-    if (propertyValue.isExpression()) {
-      return (PropertyValue<String>) propertyValue;
-    } else {
-      String text = null;
-
-      Formatted formatted = (Formatted) nativeGetTextField();
-      if (formatted != null) {
-        StringBuilder builder = new StringBuilder();
-        for (FormattedSection section : formatted.getFormattedSections()) {
-          builder.append(section.getText());
-        }
-        text = builder.toString();
-      }
-
-      return (PropertyValue<String>) new PropertyValue("text-field", text);
-    }
-<% } else { -%>
     return (PropertyValue<<%- propertyType(property) %>>) new PropertyValue("<%- property.name %>", nativeGet<%- camelize(property.name) %>());
-<% } -%>
   }
-<% if (property.name === 'text-field' && property.type === 'formatted') { -%>
-
-  /**
-   * Get the <%- camelize(property.name) %> property as {@link Formatted} object
-   *
-   * @return property wrapper value around <%- propertyType(property) %>
-   * @see Expression#format(Expression.FormatEntry...)
-   */
-  @NonNull
-  @SuppressWarnings("unchecked")
-  public PropertyValue<Formatted> getFormatted<%- camelize(property.name) %>() {
-    checkThread();
-    return (PropertyValue<Formatted>) new PropertyValue("<%- property.name %>", nativeGet<%- camelize(property.name) %>());
-  }
-<% } -%>
 <% if (property.type == 'color') { -%>
 
   /**

@@ -129,11 +129,12 @@ public class LineLayerTest extends BaseActivityTest {
     Timber.i("line-cap");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getLineCap().getValue());
+      assertNull(layer.getLineCap().getValue());
 
       // Set and Get
-      layer.setProperties(lineCap(LINE_CAP_BUTT));
-      assertEquals((String) layer.getLineCap().getValue(), (String) LINE_CAP_BUTT);
+      String propertyValue = LINE_CAP_BUTT;
+      layer.setProperties(lineCap(propertyValue));
+      assertEquals(layer.getLineCap().getValue(), propertyValue);
     });
   }
 
@@ -144,11 +145,12 @@ public class LineLayerTest extends BaseActivityTest {
     Timber.i("line-join");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getLineJoin().getValue());
+      assertNull(layer.getLineJoin().getValue());
 
       // Set and Get
-      layer.setProperties(lineJoin(LINE_JOIN_BEVEL));
-      assertEquals((String) layer.getLineJoin().getValue(), (String) LINE_JOIN_BEVEL);
+      String propertyValue = LINE_JOIN_BEVEL;
+      layer.setProperties(lineJoin(propertyValue));
+      assertEquals(layer.getLineJoin().getValue(), propertyValue);
     });
   }
 
@@ -175,11 +177,12 @@ public class LineLayerTest extends BaseActivityTest {
     Timber.i("line-miter-limit");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getLineMiterLimit().getValue());
+      assertNull(layer.getLineMiterLimit().getValue());
 
       // Set and Get
-      layer.setProperties(lineMiterLimit(0.3f));
-      assertEquals((Float) layer.getLineMiterLimit().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(lineMiterLimit(propertyValue));
+      assertEquals(layer.getLineMiterLimit().getValue(), propertyValue);
     });
   }
 
@@ -190,11 +193,12 @@ public class LineLayerTest extends BaseActivityTest {
     Timber.i("line-round-limit");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getLineRoundLimit().getValue());
+      assertNull(layer.getLineRoundLimit().getValue());
 
       // Set and Get
-      layer.setProperties(lineRoundLimit(0.3f));
-      assertEquals((Float) layer.getLineRoundLimit().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(lineRoundLimit(propertyValue));
+      assertEquals(layer.getLineRoundLimit().getValue(), propertyValue);
     });
   }
 
@@ -220,11 +224,12 @@ public class LineLayerTest extends BaseActivityTest {
     Timber.i("line-opacity");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getLineOpacity().getValue());
+      assertNull(layer.getLineOpacity().getValue());
 
       // Set and Get
-      layer.setProperties(lineOpacity(0.3f));
-      assertEquals((Float) layer.getLineOpacity().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(lineOpacity(propertyValue));
+      assertEquals(layer.getLineOpacity().getValue(), propertyValue);
     });
   }
 
@@ -266,11 +271,12 @@ public class LineLayerTest extends BaseActivityTest {
     Timber.i("line-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getLineColor().getValue());
+      assertNull(layer.getLineColor().getValue());
 
       // Set and Get
-      layer.setProperties(lineColor("rgba(0, 0, 0, 1)"));
-      assertEquals((String) layer.getLineColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+      String propertyValue = "rgba(0, 0, 0, 1)";
+      layer.setProperties(lineColor(propertyValue));
+      assertEquals(layer.getLineColor().getValue(), propertyValue);
     });
   }
 
@@ -326,11 +332,12 @@ public class LineLayerTest extends BaseActivityTest {
     Timber.i("line-translate");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float[]) layer.getLineTranslate().getValue());
+      assertNull(layer.getLineTranslate().getValue());
 
       // Set and Get
-      layer.setProperties(lineTranslate(new Float[] {0f, 0f}));
-      assertEquals((Float[]) layer.getLineTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
+      Float[] propertyValue = new Float[] {0f, 0f};
+      layer.setProperties(lineTranslate(propertyValue));
+      assertEquals(layer.getLineTranslate().getValue(), propertyValue);
     });
   }
 
@@ -341,11 +348,12 @@ public class LineLayerTest extends BaseActivityTest {
     Timber.i("line-translate-anchor");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getLineTranslateAnchor().getValue());
+      assertNull(layer.getLineTranslateAnchor().getValue());
 
       // Set and Get
-      layer.setProperties(lineTranslateAnchor(LINE_TRANSLATE_ANCHOR_MAP));
-      assertEquals((String) layer.getLineTranslateAnchor().getValue(), (String) LINE_TRANSLATE_ANCHOR_MAP);
+      String propertyValue = LINE_TRANSLATE_ANCHOR_MAP;
+      layer.setProperties(lineTranslateAnchor(propertyValue));
+      assertEquals(layer.getLineTranslateAnchor().getValue(), propertyValue);
     });
   }
 
@@ -371,11 +379,12 @@ public class LineLayerTest extends BaseActivityTest {
     Timber.i("line-width");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getLineWidth().getValue());
+      assertNull(layer.getLineWidth().getValue());
 
       // Set and Get
-      layer.setProperties(lineWidth(0.3f));
-      assertEquals((Float) layer.getLineWidth().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(lineWidth(propertyValue));
+      assertEquals(layer.getLineWidth().getValue(), propertyValue);
     });
   }
 
@@ -417,11 +426,12 @@ public class LineLayerTest extends BaseActivityTest {
     Timber.i("line-gap-width");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getLineGapWidth().getValue());
+      assertNull(layer.getLineGapWidth().getValue());
 
       // Set and Get
-      layer.setProperties(lineGapWidth(0.3f));
-      assertEquals((Float) layer.getLineGapWidth().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(lineGapWidth(propertyValue));
+      assertEquals(layer.getLineGapWidth().getValue(), propertyValue);
     });
   }
 
@@ -463,11 +473,12 @@ public class LineLayerTest extends BaseActivityTest {
     Timber.i("line-offset");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getLineOffset().getValue());
+      assertNull(layer.getLineOffset().getValue());
 
       // Set and Get
-      layer.setProperties(lineOffset(0.3f));
-      assertEquals((Float) layer.getLineOffset().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(lineOffset(propertyValue));
+      assertEquals(layer.getLineOffset().getValue(), propertyValue);
     });
   }
 
@@ -493,11 +504,12 @@ public class LineLayerTest extends BaseActivityTest {
     Timber.i("line-blur");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getLineBlur().getValue());
+      assertNull(layer.getLineBlur().getValue());
 
       // Set and Get
-      layer.setProperties(lineBlur(0.3f));
-      assertEquals((Float) layer.getLineBlur().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(lineBlur(propertyValue));
+      assertEquals(layer.getLineBlur().getValue(), propertyValue);
     });
   }
 
@@ -539,11 +551,12 @@ public class LineLayerTest extends BaseActivityTest {
     Timber.i("line-dasharray");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float[]) layer.getLineDasharray().getValue());
+      assertNull(layer.getLineDasharray().getValue());
 
       // Set and Get
-      layer.setProperties(lineDasharray(new Float[] {}));
-      assertEquals((Float[]) layer.getLineDasharray().getValue(), (Float[]) new Float[] {});
+      Float[] propertyValue = new Float[] {};
+      layer.setProperties(lineDasharray(propertyValue));
+      assertEquals(layer.getLineDasharray().getValue(), propertyValue);
     });
   }
 
@@ -569,11 +582,12 @@ public class LineLayerTest extends BaseActivityTest {
     Timber.i("line-pattern");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getLinePattern().getValue());
+      assertNull(layer.getLinePattern().getValue());
 
       // Set and Get
-      layer.setProperties(linePattern("pedestrian-polygon"));
-      assertEquals((String) layer.getLinePattern().getValue(), (String) "pedestrian-polygon");
+      String propertyValue = "pedestrian-polygon";
+      layer.setProperties(linePattern(propertyValue));
+      assertEquals(layer.getLinePattern().getValue(), propertyValue);
     });
   }
 

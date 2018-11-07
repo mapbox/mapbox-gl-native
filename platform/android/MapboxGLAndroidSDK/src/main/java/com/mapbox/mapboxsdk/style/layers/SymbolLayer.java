@@ -388,41 +388,11 @@ public class SymbolLayer extends Layer {
   /**
    * Get the TextField property
    *
-   * @return property wrapper value around String
+   * @return property wrapper value around Formatted
    */
   @NonNull
   @SuppressWarnings("unchecked")
-  public PropertyValue<String> getTextField() {
-    checkThread();
-
-    PropertyValue propertyValue = new PropertyValue<>("text-field", nativeGetTextField());
-    if (propertyValue.isExpression()) {
-      return (PropertyValue<String>) propertyValue;
-    } else {
-      String text = null;
-
-      Formatted formatted = (Formatted) nativeGetTextField();
-      if (formatted != null) {
-        StringBuilder builder = new StringBuilder();
-        for (FormattedSection section : formatted.getFormattedSections()) {
-          builder.append(section.getText());
-        }
-        text = builder.toString();
-      }
-
-      return (PropertyValue<String>) new PropertyValue("text-field", text);
-    }
-  }
-
-  /**
-   * Get the TextField property as {@link Formatted} object
-   *
-   * @return property wrapper value around String
-   * @see Expression#format(Expression.FormatEntry...)
-   */
-  @NonNull
-  @SuppressWarnings("unchecked")
-  public PropertyValue<Formatted> getFormattedTextField() {
+  public PropertyValue<Formatted> getTextField() {
     checkThread();
     return (PropertyValue<Formatted>) new PropertyValue("text-field", nativeGetTextField());
   }

@@ -278,7 +278,7 @@ public class ExpressionTest extends BaseActivityTest {
   }
 
   @Test
-  public void testConstFormatExpressionNoParams() {
+  public void testConstFormatExpression() {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       LatLng latLng = new LatLng(51, 17);
@@ -295,13 +295,7 @@ public class ExpressionTest extends BaseActivityTest {
         .isEmpty());
 
       assertNull(layer.getTextField().getExpression());
-      assertEquals("test", layer.getTextField().getValue());
-
-      Formatted expected = new Formatted(new FormattedSection[] {
-        new FormattedSection("test", 1.0f)
-      });
-      assertNull(layer.getFormattedTextField().getExpression());
-      assertEquals(expected, layer.getFormattedTextField().getValue());
+      assertEquals(new Formatted(new FormattedSection("test")), layer.getTextField().getValue());
     });
   }
 
@@ -323,13 +317,7 @@ public class ExpressionTest extends BaseActivityTest {
         .isEmpty());
 
       assertNull(layer.getTextField().getExpression());
-      assertEquals("test", layer.getTextField().getValue());
-
-      Formatted expected = new Formatted(new FormattedSection[] {
-        new FormattedSection("test", 1.75f)
-      });
-      assertNull(layer.getFormattedTextField().getExpression());
-      assertEquals(expected, layer.getFormattedTextField().getValue());
+      assertEquals(new Formatted(new FormattedSection("test", 1.75)), layer.getTextField().getValue());
     });
   }
 
@@ -345,7 +333,6 @@ public class ExpressionTest extends BaseActivityTest {
       Expression expression = format(
         formatEntry(
           literal("test"),
-          formatFontScale(1.0),
           formatTextFont(new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"})
         )
       );
@@ -356,14 +343,10 @@ public class ExpressionTest extends BaseActivityTest {
       );
 
       assertNull(layer.getTextField().getExpression());
-      assertEquals("test", layer.getTextField().getValue());
-
-      Formatted expected = new Formatted(new FormattedSection[] {
-        new FormattedSection("test", 1.0f,
+      assertEquals(new Formatted(
+        new FormattedSection("test",
           new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"})
-      });
-      assertNull(layer.getFormattedTextField().getExpression());
-      assertEquals(expected, layer.getFormattedTextField().getValue());
+      ), layer.getTextField().getValue());
     });
   }
 
@@ -390,12 +373,11 @@ public class ExpressionTest extends BaseActivityTest {
       );
 
       assertNull(layer.getTextField().getExpression());
-      assertEquals("test", layer.getTextField().getValue());
-
-      Formatted expected = new Formatted(new FormattedSection[] {
-        new FormattedSection("test", 0.5f, new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"})});
-      assertNull(layer.getFormattedTextField().getExpression());
-      assertEquals(expected, layer.getFormattedTextField().getValue());
+      assertEquals(new Formatted(
+        new FormattedSection("test",
+          0.5,
+          new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"})
+      ), layer.getTextField().getValue());
     });
   }
 
@@ -423,14 +405,12 @@ public class ExpressionTest extends BaseActivityTest {
       );
 
       assertNull(layer.getTextField().getExpression());
-      assertEquals("test\ntest2", layer.getTextField().getValue());
-
-      Formatted expected = new Formatted(new FormattedSection[] {
-        new FormattedSection("test", 1.5f, new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"}),
-        new FormattedSection("\ntest2", 2f),
-      });
-      assertNull(layer.getFormattedTextField().getExpression());
-      assertEquals(expected, layer.getFormattedTextField().getValue());
+      assertEquals(new Formatted(
+        new FormattedSection[] {
+          new FormattedSection("test", 1.5, new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"}),
+          new FormattedSection("\ntest2", 2.0),
+        }
+      ), layer.getTextField().getValue());
     });
   }
 
@@ -460,9 +440,6 @@ public class ExpressionTest extends BaseActivityTest {
 
       assertEquals(expression, layer.getTextField().getExpression());
       assertNull(layer.getTextField().getValue());
-
-      assertEquals(expression, layer.getFormattedTextField().getExpression());
-      assertNull(layer.getFormattedTextField().getValue());
     });
   }
 
@@ -493,9 +470,6 @@ public class ExpressionTest extends BaseActivityTest {
 
       assertEquals(expression, layer.getTextField().getExpression());
       assertNull(layer.getTextField().getValue());
-
-      assertEquals(expression, layer.getFormattedTextField().getExpression());
-      assertNull(layer.getFormattedTextField().getValue());
     });
   }
 
@@ -514,11 +488,8 @@ public class ExpressionTest extends BaseActivityTest {
         .isEmpty());
 
       assertNull(layer.getTextField().getExpression());
-      assertEquals("test", layer.getTextField().getValue());
-
-      assertNull(layer.getFormattedTextField().getExpression());
-      Formatted expected = new Formatted(new FormattedSection[] {new FormattedSection("test", 1.0f)});
-      assertEquals(expected, layer.getFormattedTextField().getValue());
+      assertEquals(new Formatted(
+        new FormattedSection("test")), layer.getTextField().getValue());
     });
   }
 

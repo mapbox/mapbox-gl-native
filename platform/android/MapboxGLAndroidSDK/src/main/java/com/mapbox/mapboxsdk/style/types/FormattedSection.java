@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.style.types;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 
 import java.util.Arrays;
 
@@ -12,20 +11,19 @@ import java.util.Arrays;
  */
 @Keep
 public class FormattedSection {
-  private String text;
-  private double fontScale;
-  @Nullable
-  private String[] fontStack;
+  private final String text;
+  private final Number fontScale;
+  private final String[] fontStack;
 
   /**
    * Creates a formatted section.
    *
    * @param text      displayed string
-   * @param fontScale scale of the font, 1.0 is default
-   * @param fontStack main and fallback fonts that are a part of the style
+   * @param fontScale scale of the font, setting to null will fall back to style's default settings
+   * @param fontStack main and fallback fonts that are a part of the style,
+   *                  setting null will fall back to style's default settings
    */
-  @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-  public FormattedSection(@NonNull String text, double fontScale, @Nullable String[] fontStack) {
+  public FormattedSection(@NonNull String text, @Nullable Number fontScale, @Nullable String[] fontStack) {
     this.text = text;
     this.fontScale = fontScale;
     this.fontStack = fontStack;
@@ -35,12 +33,30 @@ public class FormattedSection {
    * Creates a formatted section.
    *
    * @param text      displayed string
-   * @param fontScale scale of the font, 1.0 is default
+   * @param fontScale scale of the font, setting to null will fall back to style's default settings
    */
-  @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-  public FormattedSection(@NonNull String text, double fontScale) {
-    this.text = text;
-    this.fontScale = fontScale;
+  public FormattedSection(@NonNull String text, @Nullable Number fontScale) {
+    this(text, fontScale, null);
+  }
+
+  /**
+   * Creates a formatted section.
+   *
+   * @param text displayed string
+   */
+  public FormattedSection(@NonNull String text) {
+    this(text, null, null);
+  }
+
+  /**
+   * Creates a formatted section.
+   *
+   * @param text      displayed string
+   * @param fontStack main and fallback fonts that are a part of the style,
+   *                  setting null will fall back to style's default settings
+   */
+  public FormattedSection(@NonNull String text, @Nullable String[] fontStack) {
+    this(text, null, fontStack);
   }
 
   /**
@@ -56,9 +72,10 @@ public class FormattedSection {
   /**
    * Returns displayed text's font scale.
    *
-   * @return font scale, defaults to 1.0
+   * @return font scale
    */
-  public double getFontScale() {
+  @Nullable
+  public Number getFontScale() {
     return fontScale;
   }
 
@@ -73,7 +90,7 @@ public class FormattedSection {
   }
 
   @Override
-  public boolean equals(@Nullable Object o) {
+  public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
@@ -81,20 +98,22 @@ public class FormattedSection {
       return false;
     }
 
-    FormattedSection section = (FormattedSection) o;
+    FormattedSection that = (FormattedSection) o;
 
-    return Double.compare(section.fontScale, fontScale) == 0
-      && (text != null ? text.equals(section.text) : section.text == null)
-      && Arrays.equals(fontStack, section.fontStack);
+    if (text != null ? !text.equals(that.text) : that.text != null) {
+      return false;
+    }
+    if (fontScale != null ? !fontScale.equals(that.fontScale) : that.fontScale != null) {
+      return false;
+    }
+    // Probably incorrect - comparing Object[] arrays with Arrays.equals
+    return Arrays.equals(fontStack, that.fontStack);
   }
 
   @Override
   public int hashCode() {
-    int result;
-    long temp;
-    result = text != null ? text.hashCode() : 0;
-    temp = Double.doubleToLongBits(fontScale);
-    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    int result = text != null ? text.hashCode() : 0;
+    result = 31 * result + (fontScale != null ? fontScale.hashCode() : 0);
     result = 31 * result + Arrays.hashCode(fontStack);
     return result;
   }

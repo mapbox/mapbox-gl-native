@@ -129,11 +129,12 @@ public class FillLayerTest extends BaseActivityTest {
     Timber.i("fill-antialias");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Boolean) layer.getFillAntialias().getValue());
+      assertNull(layer.getFillAntialias().getValue());
 
       // Set and Get
-      layer.setProperties(fillAntialias(true));
-      assertEquals((Boolean) layer.getFillAntialias().getValue(), (Boolean) true);
+      Boolean propertyValue = true;
+      layer.setProperties(fillAntialias(propertyValue));
+      assertEquals(layer.getFillAntialias().getValue(), propertyValue);
     });
   }
 
@@ -159,11 +160,12 @@ public class FillLayerTest extends BaseActivityTest {
     Timber.i("fill-opacity");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getFillOpacity().getValue());
+      assertNull(layer.getFillOpacity().getValue());
 
       // Set and Get
-      layer.setProperties(fillOpacity(0.3f));
-      assertEquals((Float) layer.getFillOpacity().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(fillOpacity(propertyValue));
+      assertEquals(layer.getFillOpacity().getValue(), propertyValue);
     });
   }
 
@@ -205,11 +207,12 @@ public class FillLayerTest extends BaseActivityTest {
     Timber.i("fill-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getFillColor().getValue());
+      assertNull(layer.getFillColor().getValue());
 
       // Set and Get
-      layer.setProperties(fillColor("rgba(0, 0, 0, 1)"));
-      assertEquals((String) layer.getFillColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+      String propertyValue = "rgba(0, 0, 0, 1)";
+      layer.setProperties(fillColor(propertyValue));
+      assertEquals(layer.getFillColor().getValue(), propertyValue);
     });
   }
 
@@ -265,11 +268,12 @@ public class FillLayerTest extends BaseActivityTest {
     Timber.i("fill-outline-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getFillOutlineColor().getValue());
+      assertNull(layer.getFillOutlineColor().getValue());
 
       // Set and Get
-      layer.setProperties(fillOutlineColor("rgba(0, 0, 0, 1)"));
-      assertEquals((String) layer.getFillOutlineColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+      String propertyValue = "rgba(0, 0, 0, 1)";
+      layer.setProperties(fillOutlineColor(propertyValue));
+      assertEquals(layer.getFillOutlineColor().getValue(), propertyValue);
     });
   }
 
@@ -325,11 +329,12 @@ public class FillLayerTest extends BaseActivityTest {
     Timber.i("fill-translate");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float[]) layer.getFillTranslate().getValue());
+      assertNull(layer.getFillTranslate().getValue());
 
       // Set and Get
-      layer.setProperties(fillTranslate(new Float[] {0f, 0f}));
-      assertEquals((Float[]) layer.getFillTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
+      Float[] propertyValue = new Float[] {0f, 0f};
+      layer.setProperties(fillTranslate(propertyValue));
+      assertEquals(layer.getFillTranslate().getValue(), propertyValue);
     });
   }
 
@@ -340,11 +345,12 @@ public class FillLayerTest extends BaseActivityTest {
     Timber.i("fill-translate-anchor");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getFillTranslateAnchor().getValue());
+      assertNull(layer.getFillTranslateAnchor().getValue());
 
       // Set and Get
-      layer.setProperties(fillTranslateAnchor(FILL_TRANSLATE_ANCHOR_MAP));
-      assertEquals((String) layer.getFillTranslateAnchor().getValue(), (String) FILL_TRANSLATE_ANCHOR_MAP);
+      String propertyValue = FILL_TRANSLATE_ANCHOR_MAP;
+      layer.setProperties(fillTranslateAnchor(propertyValue));
+      assertEquals(layer.getFillTranslateAnchor().getValue(), propertyValue);
     });
   }
 
@@ -370,11 +376,12 @@ public class FillLayerTest extends BaseActivityTest {
     Timber.i("fill-pattern");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getFillPattern().getValue());
+      assertNull(layer.getFillPattern().getValue());
 
       // Set and Get
-      layer.setProperties(fillPattern("pedestrian-polygon"));
-      assertEquals((String) layer.getFillPattern().getValue(), (String) "pedestrian-polygon");
+      String propertyValue = "pedestrian-polygon";
+      layer.setProperties(fillPattern(propertyValue));
+      assertEquals(layer.getFillPattern().getValue(), propertyValue);
     });
   }
 

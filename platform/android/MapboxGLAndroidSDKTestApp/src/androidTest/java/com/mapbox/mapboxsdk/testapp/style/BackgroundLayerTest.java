@@ -82,11 +82,12 @@ public class BackgroundLayerTest extends BaseActivityTest {
     Timber.i("background-color");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getBackgroundColor().getValue());
+      assertNull(layer.getBackgroundColor().getValue());
 
       // Set and Get
-      layer.setProperties(backgroundColor("rgba(0, 0, 0, 1)"));
-      assertEquals((String) layer.getBackgroundColor().getValue(), (String) "rgba(0, 0, 0, 1)");
+      String propertyValue = "rgba(0, 0, 0, 1)";
+      layer.setProperties(backgroundColor(propertyValue));
+      assertEquals(layer.getBackgroundColor().getValue(), propertyValue);
     });
   }
 
@@ -126,11 +127,12 @@ public class BackgroundLayerTest extends BaseActivityTest {
     Timber.i("background-pattern");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((String) layer.getBackgroundPattern().getValue());
+      assertNull(layer.getBackgroundPattern().getValue());
 
       // Set and Get
-      layer.setProperties(backgroundPattern("pedestrian-polygon"));
-      assertEquals((String) layer.getBackgroundPattern().getValue(), (String) "pedestrian-polygon");
+      String propertyValue = "pedestrian-polygon";
+      layer.setProperties(backgroundPattern(propertyValue));
+      assertEquals(layer.getBackgroundPattern().getValue(), propertyValue);
     });
   }
 
@@ -156,11 +158,12 @@ public class BackgroundLayerTest extends BaseActivityTest {
     Timber.i("background-opacity");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       assertNotNull(layer);
-      assertNull((Float) layer.getBackgroundOpacity().getValue());
+      assertNull(layer.getBackgroundOpacity().getValue());
 
       // Set and Get
-      layer.setProperties(backgroundOpacity(0.3f));
-      assertEquals((Float) layer.getBackgroundOpacity().getValue(), (Float) 0.3f);
+      Float propertyValue = 0.3f;
+      layer.setProperties(backgroundOpacity(propertyValue));
+      assertEquals(layer.getBackgroundOpacity().getValue(), propertyValue);
     });
   }
 }
