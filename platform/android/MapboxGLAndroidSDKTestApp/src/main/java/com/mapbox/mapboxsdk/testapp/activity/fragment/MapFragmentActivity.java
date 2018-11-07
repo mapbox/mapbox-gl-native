@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.activity.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -69,7 +70,7 @@ public class MapFragmentActivity extends AppCompatActivity implements MapFragmen
   }
 
   @Override
-  public void onMapReady(MapboxMap map) {
+  public void onMapReady(@NonNull MapboxMap map) {
     mapboxMap = map;
   }
 
