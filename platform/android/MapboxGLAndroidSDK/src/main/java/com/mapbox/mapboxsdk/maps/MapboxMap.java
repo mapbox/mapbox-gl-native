@@ -76,10 +76,13 @@ public final class MapboxMap {
   @Nullable
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
+  private com.mapbox.mapboxsdk.maps.Style style;
+
   MapboxMap(NativeMapView map, Transform transform, UiSettings ui, Projection projection,
             OnGesturesManagerInteractionListener listener, AnnotationManager annotations,
             CameraChangeDispatcher cameraChangeDispatcher, MapChangeReceiver mapChangeReceiver) {
     this.nativeMapView = map;
+    this.style = new com.mapbox.mapboxsdk.maps.Style(nativeMapView);
     this.uiSettings = ui;
     this.projection = projection;
     this.annotationManager = annotations.bind(this);
@@ -99,6 +102,10 @@ public final class MapboxMap {
     setStyleUrl(options);
     setStyleJson(options);
     setPrefetchesTiles(options);
+  }
+
+  public com.mapbox.mapboxsdk.maps.Style getStyle(){
+    return style;
   }
 
   /**
