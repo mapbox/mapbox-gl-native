@@ -27,8 +27,8 @@ fi
 OUTPUT=${OUTPUT:-documentation}
 
 BRANCH=$( git describe --tags --match=ios-v*.*.* --abbrev=0 )
-SHORT_VERSION=$( echo ${BRANCH} | sed 's/^ios-v//' )
-RELEASE_VERSION=$( echo ${SHORT_VERSION} | sed -e 's/^ios-v//' -e 's/-.*//' )
+SHORT_VERSION="4.5.0-cn.1"
+RELEASE_VERSION="4.5.0-cn.1"
 
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
