@@ -2,8 +2,8 @@ package com.mapbox.mapboxsdk.testapp.activity.maplayout;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-
 import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -17,8 +17,11 @@ public class SimpleMapActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_map_simple);
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
+    mapView.getMapAsync(mapboxMap -> mapboxMap.setStyle(
+      new Style.Builder().fromUrl(Style.MAPBOX_STREETS)
+    ));
   }
 
   @Override

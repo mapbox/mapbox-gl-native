@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.testapp.activity.render.RenderTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.SnapshotterIdlingResource;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,6 +59,7 @@ public class RenderTest {
   }
 
   @Test
+  @Ignore
   public void testRender() {
     onView(withId(android.R.id.content)).check(matches(isDisplayed()));
   }

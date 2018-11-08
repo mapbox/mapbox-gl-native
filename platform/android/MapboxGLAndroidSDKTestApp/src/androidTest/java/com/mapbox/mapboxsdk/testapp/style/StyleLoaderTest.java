@@ -5,6 +5,7 @@ import android.support.test.espresso.UiController;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
@@ -37,8 +38,8 @@ public class StyleLoaderTest extends BaseActivityTest {
       public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
         try {
           String expected = ResourceUtils.readRawResource(rule.getActivity(), R.raw.local_style);
-          mapboxMap.setStyleJson(expected);
-          String actual = mapboxMap.getStyleJson();
+          mapboxMap.setStyle(new Style.Builder().fromJson(expected));
+          String actual = mapboxMap.getStyle().getJson();
           assertEquals("Style json should match", expected, actual);
         } catch (IOException exception) {
           exception.printStackTrace();
@@ -55,7 +56,7 @@ public class StyleLoaderTest extends BaseActivityTest {
       public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
         try {
           String expected = ResourceUtils.readRawResource(rule.getActivity(), R.raw.local_style);
-          mapboxMap.setStyleJson(expected);
+          mapboxMap.setStyle(new Style.Builder().fromJson(expected));
 
           // fake activity stop/start
           MapView mapView = (MapView) rule.getActivity().findViewById(R.id.mapView);
@@ -65,8 +66,8 @@ public class StyleLoaderTest extends BaseActivityTest {
           mapView.onStart();
           mapView.onResume();
 
-          String actual = mapboxMap.getStyleJson();
-          assertEquals("Style URL should be empty", "", mapboxMap.getStyleUrl());
+          String actual = mapboxMap.getStyle().getJson();
+          assertEquals("Style URL should be empty", "", mapboxMap.getStyle().getUrl());
           assertEquals("Style json should match", expected, actual);
         } catch (IOException exception) {
           exception.printStackTrace();

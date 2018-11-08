@@ -27,14 +27,13 @@ class MergeOfflineRegionsActivity : AppCompatActivity() {
     // forcing offline state
     Mapbox.setConnected(false)
 
-    mapView.setStyleUrl(TEST_STYLE)
-
     mapView.onCreate(savedInstanceState)
     load_region_btn.setOnClickListener {
       copyAsset()
     }
     mapView.getMapAsync {
       it.isDebugActive = true
+      it.setStyle(Style.Builder().fromUrl(TEST_STYLE))
     }
   }
 
@@ -59,7 +58,9 @@ class MergeOfflineRegionsActivity : AppCompatActivity() {
       FileSource.getResourcesCachePath(this) + "/" + TEST_DB_FILE_NAME,
       object : OfflineManager.MergeOfflineRegionsCallback {
         override fun onMerge(offlineRegions: Array<OfflineRegion>) {
-          mapView.setStyleUrl(TEST_STYLE)
+          mapView.getMapAsync{
+              it.setStyle(Style.Builder().fromUrl(TEST_STYLE))
+          }
           Toast.makeText(
             this@MergeOfflineRegionsActivity,
             String.format("Merged %d regions.", offlineRegions.size),

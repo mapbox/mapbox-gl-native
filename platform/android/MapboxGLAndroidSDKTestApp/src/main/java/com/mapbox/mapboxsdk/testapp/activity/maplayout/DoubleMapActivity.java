@@ -82,7 +82,6 @@ public class DoubleMapActivity extends AppCompatActivity {
       // MapView mini
       mapViewMini = view.findViewById(R.id.mini_map);
       mapViewMini.onCreate(savedInstanceState);
-      mapViewMini.setStyleUrl(Style.LIGHT);
       mapViewMini.getMapAsync(mapboxMap -> {
         mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
           new CameraPosition.Builder().target(MACHU_PICCHU)
@@ -90,6 +89,7 @@ public class DoubleMapActivity extends AppCompatActivity {
             .build()
           )
         );
+        mapboxMap.setStyle(new Style.Builder().fromUrl(Style.LIGHT));
 
         UiSettings uiSettings = mapboxMap.getUiSettings();
         uiSettings.setAllGesturesEnabled(false);

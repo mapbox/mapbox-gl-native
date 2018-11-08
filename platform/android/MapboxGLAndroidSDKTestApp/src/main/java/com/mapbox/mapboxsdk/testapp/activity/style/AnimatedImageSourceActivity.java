@@ -16,6 +16,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngQuad;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.RasterLayer;
 import com.mapbox.mapboxsdk.style.sources.ImageSource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -52,22 +53,24 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
   public void onMapReady(@NonNull final MapboxMap map) {
     mapboxMap = map;
 
-    // add source
-    LatLngQuad quad = new LatLngQuad(
+    map.setStyle(Style.MAPBOX_STREETS, style -> {
+      // add source
+      LatLngQuad quad = new LatLngQuad(
         new LatLng(46.437, -80.425),
         new LatLng(46.437, -71.516),
         new LatLng(37.936, -71.516),
         new LatLng(37.936, -80.425));
-    mapboxMap.getStyle().addSource(new ImageSource(ID_IMAGE_SOURCE, quad, R.drawable.southeast_radar_0));
+      mapboxMap.getStyle().addSource(new ImageSource(ID_IMAGE_SOURCE, quad, R.drawable.southeast_radar_0));
 
-    // add layer
-    RasterLayer layer = new RasterLayer(ID_IMAGE_LAYER, ID_IMAGE_SOURCE);
-    mapboxMap.getStyle().addLayer(layer);
+      // add layer
+      RasterLayer layer = new RasterLayer(ID_IMAGE_LAYER, ID_IMAGE_SOURCE);
+      mapboxMap.getStyle().addLayer(layer);
 
-    // loop refresh geojson
-    handler = new Handler();
-    runnable = new RefreshImageRunnable(mapboxMap, handler);
-    handler.postDelayed(runnable, 100);
+      // loop refresh geojson
+      handler = new Handler();
+      runnable = new RefreshImageRunnable(mapboxMap, handler);
+      handler.postDelayed(runnable, 100);
+    });
   }
 
   @Override

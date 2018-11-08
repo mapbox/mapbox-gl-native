@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.HillshadeLayer;
 import com.mapbox.mapboxsdk.style.sources.RasterDemSource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -33,10 +34,12 @@ public class HillshadeLayerActivity extends AppCompatActivity {
       mapboxMap = map;
 
       RasterDemSource rasterDemSource = new RasterDemSource(SOURCE_ID, SOURCE_URL);
-      mapboxMap.getStyle().addSource(rasterDemSource);
-
       HillshadeLayer hillshadeLayer = new HillshadeLayer(LAYER_ID, SOURCE_ID);
-      mapboxMap.getStyle().addLayerBelow(hillshadeLayer, LAYER_BELOW_ID);
+      mapboxMap.setStyle(new Style.Builder()
+        .fromUrl(Style.MAPBOX_STREETS)
+        .withLayer(hillshadeLayer)
+        .withSource(rasterDemSource)
+      );
     });
   }
 

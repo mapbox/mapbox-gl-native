@@ -66,7 +66,6 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_query_features_point);
 
-
     // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);

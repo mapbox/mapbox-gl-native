@@ -16,6 +16,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
@@ -67,12 +68,13 @@ class DraggableMarkerActivity : AppCompatActivity() {
     mapView.getMapAsync { mapboxMap ->
       this.mapboxMap = mapboxMap
 
-      val style = mapboxMap.style
-
-      // Setting up markers icon, source and layer
-      mapboxMap.getStyle().addImage(markerImageId, IconFactory.getInstance(this).defaultMarker().bitmap)
-      style.addSource(source)
-      style.addLayer(layer)
+      mapboxMap.setStyle(
+        Style.Builder()
+          .fromUrl(Style.MAPBOX_STREETS)
+          .withImage(markerImageId, IconFactory.getInstance(this).defaultMarker().bitmap)
+          .withSource(source)
+          .withLayer(layer)
+      )
 
       // Add initial markers
       addMarker(LatLng(52.407210, 16.924324))

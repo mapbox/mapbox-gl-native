@@ -6,6 +6,7 @@ import android.graphics.*
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.testapp.R
 import kotlinx.android.synthetic.main.activity_overlay.*
 
@@ -19,6 +20,9 @@ class OverlayMapActivity : AppCompatActivity() {
         setContentView(R.layout.activity_overlay)
         mapView.onCreate(savedInstanceState)
         parentView.addView(OverlayView(this))
+        mapView.getMapAsync {
+            it.setStyle(Style.MAPBOX_STREETS)
+        }
     }
 
     override fun onStart() {
