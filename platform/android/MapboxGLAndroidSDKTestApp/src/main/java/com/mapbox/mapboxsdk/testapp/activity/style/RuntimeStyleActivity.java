@@ -93,8 +93,8 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       // Center and Zoom (Amsterdam, zoomed to streets)
       mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.379189, 4.899431), 14));
 
-      mapboxMap.setTransitionDuration(250);
-      mapboxMap.setTransitionDelay(50);
+      // set custom transition
+      mapboxMap.getStyle().setTransition(new TransitionOptions(250, 50));
     });
   }
 

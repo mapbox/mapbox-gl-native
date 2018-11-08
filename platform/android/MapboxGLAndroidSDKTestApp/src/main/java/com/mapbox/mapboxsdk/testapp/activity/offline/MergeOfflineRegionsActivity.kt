@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.constants.Style
+import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.log.Logger
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion
