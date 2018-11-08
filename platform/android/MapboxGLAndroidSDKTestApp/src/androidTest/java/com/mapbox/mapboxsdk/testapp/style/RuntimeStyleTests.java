@@ -93,7 +93,9 @@ public class RuntimeStyleTests extends BaseActivityTest {
 
         // Test inserting with invalid above-id
         try {
-          mapboxMap.getStyle().addLayerAbove(new CircleLayer("invalid-id-layer-test", source.getId()), "no-such-layer-here-man");
+          mapboxMap.getStyle().addLayerAbove(
+            new CircleLayer("invalid-id-layer-test", source.getId()), "no-such-layer-here-man"
+          );
           fail("Should have thrown exception");
         } catch (CannotAddLayerException ex) {
           // Yeah

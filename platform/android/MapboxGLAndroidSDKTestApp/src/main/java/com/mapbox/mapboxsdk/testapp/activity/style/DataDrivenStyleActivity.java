@@ -12,6 +12,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
@@ -63,11 +64,13 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
       // Store for later
       mapboxMap = map;
 
-      // Add a parks layer
-      addParksLayer();
+      mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
+        // Add a parks layer
+        addParksLayer();
 
-      // Add debug overlay
-      setupDebugZoomView();
+        // Add debug overlay
+        setupDebugZoomView();
+      });
 
       // Center and Zoom (Amsterdam, zoomed to streets)
       mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.379189, 4.899431), 14));

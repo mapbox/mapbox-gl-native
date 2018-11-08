@@ -31,11 +31,10 @@ public class ManualZoomActivity extends AppCompatActivity {
     setContentView(R.layout.activity_manual_zoom);
 
     mapView = (MapView) findViewById(R.id.mapView);
-    mapView.setStyleUrl(Style.SATELLITE);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(mapboxMap -> {
       ManualZoomActivity.this.mapboxMap = mapboxMap;
-
+      mapboxMap.setStyle(new Style.Builder().fromUrl(Style.SATELLITE));
       UiSettings uiSettings = ManualZoomActivity.this.mapboxMap.getUiSettings();
       uiSettings.setAllGesturesEnabled(false);
     });

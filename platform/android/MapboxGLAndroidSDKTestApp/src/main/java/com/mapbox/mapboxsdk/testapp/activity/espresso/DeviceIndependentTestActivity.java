@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 public class DeviceIndependentTestActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -27,6 +28,7 @@ public class DeviceIndependentTestActivity extends AppCompatActivity implements 
   @Override
   public void onMapReady(@NonNull MapboxMap map) {
     mapboxMap = map;
+    mapboxMap.setStyle(Style.MAPBOX_STREETS);
   }
 
   public MapboxMap getMapboxMap() {

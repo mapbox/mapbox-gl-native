@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.feature;
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -10,6 +11,8 @@ import android.widget.Toast;
 import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.style.layers.BackgroundLayer;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -20,6 +23,8 @@ import java.util.List;
 
 import timber.log.Timber;
 
+import static com.mapbox.mapboxsdk.style.expressions.Expression.rgb;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.backgroundColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 
 /**
@@ -45,20 +50,31 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
     mapView.getMapAsync(mapboxMap -> {
       QueryRenderedFeaturesBoxSymbolCountActivity.this.mapboxMap = mapboxMap;
 
-      // Add a symbol layer (also works with annotations)
       try {
-        mapboxMap.getStyle().addSource(new GeoJsonSource("symbols-source", ResourceUtils.readRawResource(
-          QueryRenderedFeaturesBoxSymbolCountActivity.this, R.raw.test_points_utrecht)));
-      } catch (IOException ioException) {
-        Timber.e(ioException, "Could not load geojson");
-        return;
+        String testPoints = ResourceUtils.readRawResource(mapView.getContext(), R.raw.test_points_utrecht);
+        Bitmap markerImage = BitmapFactory.decodeResource(getResources(), R.drawable.mapbox_marker_icon_default);
+
+        mapboxMap.setStyle(new Style.Builder()
+          .withLayer(
+            new BackgroundLayer("bg")
+              .withProperties(
+                backgroundColor(rgb(120, 161, 226))
+              )
+          )
+          .withLayer(
+            new SymbolLayer("symbols-layer", "symbols-source")
+              .withProperties(
+                iconImage("test-icon")
+              )
+          )
+          .withSource(
+            new GeoJsonSource("symbols-source", testPoints)
+          )
+          .withImage("test-icon", markerImage)
+        );
+      } catch (IOException exception) {
+        exception.printStackTrace();
       }
-      mapboxMap.getStyle().addImage(
-        "test-icon",
-        BitmapFactory.decodeResource(getResources(),
-          R.drawable.mapbox_marker_icon_default)
-      );
-      mapboxMap.getStyle().addLayer(new SymbolLayer("symbols-layer", "symbols-source").withProperties(iconImage("test-icon")));
 
       selectionBox.setOnClickListener(view -> {
         // Query

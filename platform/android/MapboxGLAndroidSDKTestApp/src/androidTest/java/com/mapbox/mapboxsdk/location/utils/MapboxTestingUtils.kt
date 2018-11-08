@@ -15,7 +15,7 @@ import com.mapbox.mapboxsdk.style.layers.Property
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 
 fun MapboxMap.querySourceFeatures(sourceId: String): List<Feature> {
-  return this.style.getSourceAs<GeoJsonSource>(sourceId)?.querySourceFeatures(null) ?: emptyList()
+  return this.style!!.getSourceAs<GeoJsonSource>(sourceId)?.querySourceFeatures(null) ?: emptyList()
 }
 
 fun MapboxMap.queryRenderedFeatures(location: Location, layerId: String): List<Feature> {
@@ -25,7 +25,7 @@ fun MapboxMap.queryRenderedFeatures(location: Location, layerId: String): List<F
 }
 
 fun MapboxMap.isLayerVisible(layerId: String): Boolean {
-  return this.style.getLayer(layerId)?.visibility?.value?.equals(Property.VISIBLE)!!
+  return this.style!!.getLayer(layerId)?.visibility?.value?.equals(Property.VISIBLE)!!
 }
 
 fun MapboxMap.waitForSource(uiController: UiController, sourceId: String) {
@@ -99,7 +99,7 @@ class MapboxTestingUtils {
 
 fun MapboxMap.addImageFromDrawable(string: String, drawable: Drawable) {
   val bitmapFromDrawable = getBitmapFromDrawable(drawable)
-  this.style.addImage(string, bitmapFromDrawable)
+  this.style!!.addImage(string, bitmapFromDrawable)
 }
 
 private fun getBitmapFromDrawable(drawable: Drawable): Bitmap {

@@ -10,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.List;
@@ -37,6 +38,9 @@ public class QueryRenderedFeaturesBoxCountActivity extends AppCompatActivity {
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(mapboxMap -> {
       QueryRenderedFeaturesBoxCountActivity.this.mapboxMap = mapboxMap;
+
+      mapboxMap.setStyle(new Style.Builder().fromUrl(Style.MAPBOX_STREETS));
+
       selectionBox.setOnClickListener(view -> {
         // Query
         int top = selectionBox.getTop() - mapView.getTop();

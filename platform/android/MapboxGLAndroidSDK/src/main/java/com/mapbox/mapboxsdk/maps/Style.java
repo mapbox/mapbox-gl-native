@@ -5,6 +5,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.style.light.Light;
@@ -15,6 +16,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Style {
 
@@ -22,35 +24,23 @@ public class Style {
   private final HashMap<String, Source> sources = new HashMap<>();
   private final HashMap<String, Layer> layers = new HashMap<>();
 
-  public Style(NativeMapView nativeMapView) {
+  private final OnStyleLoaded onStyleLoaded;
+  private final Builder builder;
+  private boolean styleLoaded;
+
+  public Style(Builder builder, NativeMapView nativeMapView, OnStyleLoaded styleLoaded) {
+    this.builder = builder;
     this.nativeMapView = nativeMapView;
+    this.onStyleLoaded = styleLoaded;
   }
 
-  public void loadStyle(@StyleUrl String styleUrl) {
-    for (Source source : sources.values()) {
-      if (source != null) {
-        source.setDetached();
-        nativeMapView.removeSource(source);
-      }
-    }
-
-    for (Layer layer : layers.values()) {
-      if (layer != null) {
-        layer.setDetached();
-        nativeMapView.removeLayer(layer);
-      }
-    }
-
-    nativeMapView.setStyleUrl(styleUrl);
-  }
-
-  @Nullable
-  public String getUrl(){
+  @NonNull
+  public String getUrl() {
     return nativeMapView.getStyleUrl();
   }
 
-  @Nullable
-  public String getJson(){
+  @NonNull
+  public String getJson() {
     return nativeMapView.getStyleJson();
   }
 
@@ -339,6 +329,59 @@ public class Style {
     return nativeMapView.getLight();
   }
 
+
+  /**
+   * Called when the underlying map will start loading a new style. This method will clean up this style
+   * by setting the java sources and layers in a detached state and removing them from core.
+   */
+  public void onWillStartLoadingStyle() {
+    for (Source source : sources.values()) {
+      if (source != null) {
+        source.setDetached();
+        nativeMapView.removeSource(source);
+      }
+    }
+
+    for (Layer layer : layers.values()) {
+      if (layer != null) {
+        layer.setDetached();
+        nativeMapView.removeLayer(layer);
+      }
+    }
+
+    sources.clear();
+    layers.clear();
+  }
+
+  /**
+   * Called when the underlying map has finished loading this style.
+   * This method will add all components added to the builder that were defined with the 'with' prefix.
+   */
+  public void onDidFinishLoadingStyle() {
+    if (!styleLoaded) {
+      styleLoaded = true;
+      for (Source source : builder.sources) {
+        addSource(source);
+      }
+
+      for (Layer layer : builder.layers) {
+        addLayerBelow(layer, MapboxConstants.LAYER_ID_ANNOTATIONS);
+      }
+
+      for (Map.Entry<String, Bitmap> stringBitmapEntry : builder.images.entrySet()) {
+        addImage(stringBitmapEntry.getKey(), stringBitmapEntry.getValue());
+      }
+
+      if (builder.transitionOptions != null) {
+        setTransition(builder.transitionOptions);
+      }
+
+      if (onStyleLoaded != null) {
+        onStyleLoaded.onStyleLoaded(this);
+      }
+    }
+  }
+
   //
   // Builder
   //
@@ -350,8 +393,8 @@ public class Style {
     private List<Source> sources = new ArrayList<>();
     // TODO allow adding below and at index
     private List<Layer> layers = new ArrayList<>();
+    private HashMap<String, Bitmap> images = new HashMap<>();
     private TransitionOptions transitionOptions;
-
 
     /**
      * <p>
@@ -383,8 +426,8 @@ public class Style {
      * @param url The URL of the map style
      * @see Style
      */
-    public Builder withStyleUrl(@StyleUrl String url) {
-      this.styleUrl = styleUrl;
+    public Builder fromUrl(String url) {
+      this.styleUrl = url;
       return this;
     }
 
@@ -396,7 +439,7 @@ public class Style {
      * will be triggered.
      * </p>
      */
-    public Builder withStyleJson(String styleJson) {
+    public Builder fromJson(String styleJson) {
       this.styleJson = styleJson;
       return this;
     }
@@ -406,6 +449,7 @@ public class Style {
       return this;
     }
 
+    // TODO add layer at support!
     public Builder withLayer(Layer layer) {
       layers.add(layer);
       return this;
@@ -416,22 +460,38 @@ public class Style {
       return this;
     }
 
-    Style build(NativeMapView nativeMapView) {
-      Style style = new Style(nativeMapView);
-      for (Source source : sources) {
-        style.addSource(source);
+    // TODO add SDF support!
+    public Builder withImage(String name, Bitmap image) {
+      images.put(name, image);
+      return this;
+    }
+
+    Style build(NativeMapView nativeMapView, OnStyleLoaded styleLoaded) {
+      Style style = new Style(this, nativeMapView, styleLoaded);
+      nativeMapView.setStyle(style);
+
+      if (styleUrl != null) {
+        nativeMapView.setStyleUrl(styleUrl);
+      } else if (styleJson != null) {
+        nativeMapView.setStyleJson(styleJson);
+      } else {
+        // user didn't provide a `from` component,
+        // flag the style as loaded,
+        // add components defined added using the `with` prefix.
+        style.onDidFinishLoadingStyle();
       }
 
-      for (Layer layer : layers) {
-        style.addLayer(layer);
-      }
-
-      if (transitionOptions != null) {
-        style.setTransition(transitionOptions);
-      }
       return style;
     }
 
+  }
+
+  //
+  //
+  //
+
+  public interface OnStyleLoaded {
+    void onStyleLoaded(Style style);
   }
 
   //

@@ -47,51 +47,54 @@ public class CustomSpriteActivity extends AppCompatActivity {
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      final FloatingActionButton fab = findViewById(R.id.fab);
-      fab.setColorFilter(ContextCompat.getColor(CustomSpriteActivity.this, R.color.primary));
-      fab.setOnClickListener(new View.OnClickListener() {
 
-        private Point point;
+      map.getStyle(style -> {
+        final FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setColorFilter(ContextCompat.getColor(CustomSpriteActivity.this, R.color.primary));
+        fab.setOnClickListener(new View.OnClickListener() {
 
-        @Override
-        public void onClick(View view) {
-          if (point == null) {
-            Timber.i("First click -> Car");
-            // Add an icon to reference later
-            mapboxMap.getStyle().addImage(CUSTOM_ICON, BitmapFactory.decodeResource(getResources(), R.drawable.ic_car_top));
+          private Point point;
 
-            // Add a source with a geojson point
-            point = Point.fromLngLat(13.400972d, 52.519003d);
-            source = new GeoJsonSource(
-              "point",
-              FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(point)})
-            );
-            mapboxMap.getStyle().addSource(source);
+          @Override
+          public void onClick(View view) {
+            if (point == null) {
+              Timber.i("First click -> Car");
+              // Add an icon to reference later
+              style.addImage(CUSTOM_ICON, BitmapFactory.decodeResource(getResources(), R.drawable.ic_car_top));
 
-            // Add a symbol layer that references that point source
-            layer = new SymbolLayer("layer", "point");
-            layer.setProperties(
-              // Set the id of the sprite to use
-              iconImage(CUSTOM_ICON),
-              iconAllowOverlap(true),
-              iconIgnorePlacement(true)
-            );
+              // Add a source with a geojson point
+              point = Point.fromLngLat(13.400972d, 52.519003d);
+              source = new GeoJsonSource(
+                "point",
+                FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(point)})
+              );
+              mapboxMap.getStyle().addSource(source);
 
-            // lets add a circle below labels!
-            mapboxMap.getStyle().addLayerBelow(layer, "waterway-label");
+              // Add a symbol layer that references that point source
+              layer = new SymbolLayer("layer", "point");
+              layer.setProperties(
+                // Set the id of the sprite to use
+                iconImage(CUSTOM_ICON),
+                iconAllowOverlap(true),
+                iconIgnorePlacement(true)
+              );
 
-            fab.setImageResource(R.drawable.ic_directions_car_black);
-          } else {
-            // Update point
-            point = Point.fromLngLat(point.longitude() + 0.001,
+              // lets add a circle below labels!
+              mapboxMap.getStyle().addLayerBelow(layer, "waterway-label");
+
+              fab.setImageResource(R.drawable.ic_directions_car_black);
+            } else {
+              // Update point
+              point = Point.fromLngLat(point.longitude() + 0.001,
                 point.latitude() + 0.001);
-            source.setGeoJson(FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(point)}));
+              source.setGeoJson(FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(point)}));
 
-            // Move the camera as well
-            mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(
-              point.latitude(), point.longitude())));
+              // Move the camera as well
+              mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(
+                point.latitude(), point.longitude())));
+            }
           }
-        }
+        });
       });
     });
   }

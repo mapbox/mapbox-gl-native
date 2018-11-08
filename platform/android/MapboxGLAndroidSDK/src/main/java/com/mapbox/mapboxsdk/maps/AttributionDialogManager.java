@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
-
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
@@ -25,8 +24,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Responsible for managing attribution interactions on the map.
@@ -180,10 +179,14 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
 
       List<String> attributions = new ArrayList<>();
       String attribution;
-      for (Source source : mapboxMap.getStyle().getSources()) {
-        attribution = source.getAttribution();
-        if (!attribution.isEmpty()) {
-          attributions.add(source.getAttribution());
+
+      Style style = mapboxMap.getStyle();
+      if (style != null) {
+        for (Source source : mapboxMap.getStyle().getSources()) {
+          attribution = source.getAttribution();
+          if (!attribution.isEmpty()) {
+            attributions.add(source.getAttribution());
+          }
         }
       }
 

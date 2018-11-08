@@ -9,6 +9,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
@@ -66,13 +67,19 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
     mapView.getMapAsync(map -> {
       mapboxMap = map;
       mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.7749, 122.4194), 0));
-      mapboxMap.getStyle().addImage(
-        "icon-id",
-        BitmapUtils.getBitmapFromDrawable(getResources().getDrawable(R.drawable.ic_hearing_black_24dp)),
-        true
-      );
-      // Add a clustered source with some layers
-      addClusteredGeoJsonSource();
+
+      mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
+        @Override
+        public void onStyleLoaded(Style style) {
+          style.addImage(
+            "icon-id",
+            BitmapUtils.getBitmapFromDrawable(getResources().getDrawable(R.drawable.ic_hearing_black_24dp)),
+            true
+          );
+          // Add a clustered source with some layers
+          addClusteredGeoJsonSource(style);
+        }
+      });
     });
   }
 
@@ -129,10 +136,10 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
     }
   }
 
-  private void addClusteredGeoJsonSource() {
+  private void addClusteredGeoJsonSource(Style style) {
     // Add a clustered source
     try {
-      mapboxMap.getStyle().addSource(
+      style.addSource(
         new GeoJsonSource("earthquakes",
           new URL("https://www.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson"),
           new GeoJsonOptions()
@@ -169,7 +176,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
       )
     );
 
-    mapboxMap.getStyle().addLayer(unclustered);
+    style.addLayer(unclustered);
 
     for (int i = 0; i < layers.length; i++) {
       // Add some nice circles
@@ -189,7 +196,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
           lt(pointCount, literal(layers[i - 1][0]))
         )
       );
-      mapboxMap.getStyle().addLayer(circles);
+      style.addLayer(circles);
     }
 
     // Add the count labels
@@ -201,7 +208,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
       textIgnorePlacement(true),
       textAllowOverlap(true)
     );
-    mapboxMap.getStyle().addLayer(count);
+    style.addLayer(count);
 
 
     // Zoom out to start

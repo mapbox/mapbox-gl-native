@@ -35,7 +35,7 @@ public class MapSnapshotterActivity extends AppCompatActivity {
 
     // Find the grid view and start snapshotting as soon
     // as the view is measured
-    grid = (GridLayout) findViewById(R.id.snapshot_grid);
+    grid = findViewById(R.id.snapshot_grid);
     grid.getViewTreeObserver()
       .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
         @Override
