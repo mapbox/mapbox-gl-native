@@ -18,7 +18,7 @@ import java.util.List;
 
 public class Style {
 
-  private NativeMapView nativeMapView;
+  private final NativeMapView nativeMapView;
   private final HashMap<String, Source> sources = new HashMap<>();
   private final HashMap<String, Layer> layers = new HashMap<>();
 
@@ -42,6 +42,16 @@ public class Style {
     }
 
     nativeMapView.setStyleUrl(styleUrl);
+  }
+
+  @Nullable
+  public String getUrl(){
+    return nativeMapView.getStyleUrl();
+  }
+
+  @Nullable
+  public String getJson(){
+    return nativeMapView.getStyleJson();
   }
 
   //
@@ -342,11 +352,50 @@ public class Style {
     private List<Layer> layers = new ArrayList<>();
     private TransitionOptions transitionOptions;
 
-    public Builder withStyleUrl(@StyleUrl String styleUrl) {
+
+    /**
+     * <p>
+     * Loads a new map style asynchronous from the specified URL.
+     * </p>
+     * {@code url} can take the following forms:
+     * <ul>
+     * <li>{@code Style.*}: load one of the bundled styles in {@link Style}.</li>
+     * <li>{@code mapbox://styles/<user>/<style>}:
+     * loads the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
+     * {@code user} is your username. {@code style} is the ID of your custom
+     * style created in <a href="https://www.mapbox.com/studio">Mapbox Studio</a>.</li>
+     * <li>{@code http://...} or {@code https://...}:
+     * loads the style over the Internet from any web server.</li>
+     * <li>{@code asset://...}:
+     * loads the style from the APK {@code assets/} directory.
+     * This is used to load a style bundled with your app.</li>
+     * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
+     * </ul>
+     * <p>
+     * This method is asynchronous and will return before the style finishes loading.
+     * If you wish to wait for the map to finish loading, listen to the {@link MapView.OnDidFinishLoadingStyleListener}
+     * callback.
+     * </p>
+     * If the style fails to load or an invalid style URL is set, the map view will become blank.
+     * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
+     * will be triggered.
+     *
+     * @param url The URL of the map style
+     * @see Style
+     */
+    public Builder withStyleUrl(@StyleUrl String url) {
       this.styleUrl = styleUrl;
       return this;
     }
 
+    /**
+     * Loads a new map style from a json string.
+     * <p>
+     * If the style fails to load or an invalid style URL is set, the map view will become blank.
+     * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
+     * will be triggered.
+     * </p>
+     */
     public Builder withStyleJson(String styleJson) {
       this.styleJson = styleJson;
       return this;
@@ -366,7 +415,7 @@ public class Style {
       this.transitionOptions = transition;
       return this;
     }
-    
+
     Style build(NativeMapView nativeMapView) {
       Style style = new Style(nativeMapView);
       for (Source source : sources) {
