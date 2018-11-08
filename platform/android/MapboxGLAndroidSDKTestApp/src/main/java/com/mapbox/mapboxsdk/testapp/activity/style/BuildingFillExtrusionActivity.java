@@ -8,6 +8,7 @@ import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.FillExtrusionLayer;
 import com.mapbox.mapboxsdk.style.layers.Property;
@@ -46,12 +47,13 @@ public class BuildingFillExtrusionActivity extends AppCompatActivity {
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      setupBuildings();
+      Style style = map.getStyle();
+      setupBuildings(style);
       setupLight();
     });
   }
 
-  private void setupBuildings() {
+  private void setupBuildings(Style style) {
     FillExtrusionLayer fillExtrusionLayer = new FillExtrusionLayer("3d-buildings", "composite");
     fillExtrusionLayer.setSourceLayer("building");
     fillExtrusionLayer.setFilter(eq(get("extrude"), literal("true")));
@@ -62,11 +64,11 @@ public class BuildingFillExtrusionActivity extends AppCompatActivity {
       fillExtrusionBase(Expression.get("min_height")),
       fillExtrusionOpacity(0.9f)
     );
-    mapboxMap.addLayer(fillExtrusionLayer);
+    style.addLayer(fillExtrusionLayer);
   }
 
   private void setupLight() {
-    light = mapboxMap.getLight();
+    light = mapboxMap.getStyle().getLight();
 
     findViewById(R.id.fabLightPosition).setOnClickListener(v -> {
       isInitPosition = !isInitPosition;

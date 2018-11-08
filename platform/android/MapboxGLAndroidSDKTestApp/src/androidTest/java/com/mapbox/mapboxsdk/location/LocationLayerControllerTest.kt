@@ -79,7 +79,7 @@ class LocationLayerControllerTest : BaseActivityTest() {
         component.isLocationComponentEnabled = true
         component.renderMode = RenderMode.NORMAL
         uiController.loopMainThreadForAtLeast(MAP_RENDER_DELAY)
-        assertThat(mapboxMap.getSource(LOCATION_SOURCE), notNullValue())
+        assertThat(mapboxMap.getStyle().getSource(LOCATION_SOURCE), notNullValue())
       }
     }
     executeComponentTest(componentAction)
@@ -220,7 +220,7 @@ class LocationLayerControllerTest : BaseActivityTest() {
         assertThat(component.renderMode, `is`(equalTo(RenderMode.NORMAL)))
 
         // Check that the Source has been re-added to the new map style
-        val source: GeoJsonSource? = mapboxMap.getSourceAs(LOCATION_SOURCE)
+        val source: GeoJsonSource? = mapboxMap.getStyle().getSourceAs(LOCATION_SOURCE)
         assertThat(source, notNullValue())
 
         // Check that all layers visibilities are set to visible

@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.CustomLayer;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.model.customlayer.ExampleCustomLayer;
@@ -52,14 +53,15 @@ public class CustomLayerActivity extends AppCompatActivity {
   }
 
   private void swapCustomLayer() {
+    Style style = mapboxMap.getStyle();
     if (customLayer != null) {
-      mapboxMap.removeLayer(customLayer);
+      style.removeLayer(customLayer);
       customLayer = null;
       fab.setImageResource(R.drawable.ic_layers);
     } else {
       customLayer = new CustomLayer("custom",
         ExampleCustomLayer.createContext());
-      mapboxMap.addLayerBelow(customLayer, "building");
+      style.addLayerBelow(customLayer, "building");
       fab.setImageResource(R.drawable.ic_layers_clear);
     }
   }

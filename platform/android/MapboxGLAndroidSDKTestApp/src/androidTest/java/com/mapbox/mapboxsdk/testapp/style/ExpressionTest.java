@@ -242,7 +242,7 @@ public class ExpressionTest extends BaseActivityTest {
       Expression expression3 = eq(literal("Łukasz"), literal("lukasz"), collator(literal(false), eq(literal(2),
         literal(1))));
 
-      mapboxMap.addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      mapboxMap.getStyle().addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
       Layer layer = new CircleLayer("layer", "source")
         .withProperties(circleColor(
           switchCase(
@@ -250,7 +250,7 @@ public class ExpressionTest extends BaseActivityTest {
             literal(ColorUtils.colorToRgbaString(Color.RED))
           )
         ));
-      mapboxMap.addLayer(layer);
+      mapboxMap.getStyle().addLayer(layer);
       uiController.loopMainThreadForAtLeast(1000);
       assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
         .isEmpty());
@@ -282,9 +282,9 @@ public class ExpressionTest extends BaseActivityTest {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       LatLng latLng = new LatLng(51, 17);
-      mapboxMap.addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      mapboxMap.getStyle().addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
       SymbolLayer layer = new SymbolLayer("layer", "source");
-      mapboxMap.addLayer(layer);
+      mapboxMap.getStyle().addLayer(layer);
 
       Expression expression = format(
         formatEntry("test")
@@ -304,9 +304,9 @@ public class ExpressionTest extends BaseActivityTest {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       LatLng latLng = new LatLng(51, 17);
-      mapboxMap.addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      mapboxMap.getStyle().addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
       SymbolLayer layer = new SymbolLayer("layer", "source");
-      mapboxMap.addLayer(layer);
+      mapboxMap.getStyle().addLayer(layer);
 
       Expression expression = format(
         formatEntry("test", formatFontScale(1.75))
@@ -326,9 +326,9 @@ public class ExpressionTest extends BaseActivityTest {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       LatLng latLng = new LatLng(51, 17);
-      mapboxMap.addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      mapboxMap.getStyle().addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
       SymbolLayer layer = new SymbolLayer("layer", "source");
-      mapboxMap.addLayer(layer);
+      mapboxMap.getStyle().addLayer(layer);
 
       Expression expression = format(
         formatEntry(
@@ -355,9 +355,9 @@ public class ExpressionTest extends BaseActivityTest {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       LatLng latLng = new LatLng(51, 17);
-      mapboxMap.addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      mapboxMap.getStyle().addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
       SymbolLayer layer = new SymbolLayer("layer", "source");
-      mapboxMap.addLayer(layer);
+      mapboxMap.getStyle().addLayer(layer);
 
       Expression expression = format(
         formatEntry(
@@ -386,9 +386,9 @@ public class ExpressionTest extends BaseActivityTest {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       LatLng latLng = new LatLng(51, 17);
-      mapboxMap.addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      mapboxMap.getStyle().addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
       SymbolLayer layer = new SymbolLayer("layer", "source");
-      mapboxMap.addLayer(layer);
+      mapboxMap.getStyle().addLayer(layer);
 
       Expression expression = format(
         formatEntry(
@@ -421,9 +421,9 @@ public class ExpressionTest extends BaseActivityTest {
       Feature feature = Feature.fromGeometry(Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude()));
       feature.addStringProperty("test_property", "test");
       feature.addNumberProperty("test_property_number", 1.5);
-      mapboxMap.addSource(new GeoJsonSource("source", feature));
+      mapboxMap.getStyle().addSource(new GeoJsonSource("source", feature));
       SymbolLayer layer = new SymbolLayer("layer", "source");
-      mapboxMap.addLayer(layer);
+      mapboxMap.getStyle().addLayer(layer);
 
       Expression expression = format(
         formatEntry(
@@ -450,9 +450,9 @@ public class ExpressionTest extends BaseActivityTest {
       Feature feature = Feature.fromGeometry(Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude()));
       feature.addStringProperty("test_property", "test");
       feature.addNumberProperty("test_property_number", 1.5);
-      mapboxMap.addSource(new GeoJsonSource("source", feature));
+      mapboxMap.getStyle().addSource(new GeoJsonSource("source", feature));
       SymbolLayer layer = new SymbolLayer("layer", "source");
-      mapboxMap.addLayer(layer);
+      mapboxMap.getStyle().addLayer(layer);
 
       Expression expression = format(
         formatEntry(
@@ -477,9 +477,9 @@ public class ExpressionTest extends BaseActivityTest {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       LatLng latLng = new LatLng(51, 17);
-      mapboxMap.addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      mapboxMap.getStyle().addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
       SymbolLayer layer = new SymbolLayer("layer", "source");
-      mapboxMap.addLayer(layer);
+      mapboxMap.getStyle().addLayer(layer);
 
       layer.setProperties(textField("test"));
       waitForLayer(uiController, mapboxMap, latLng);
@@ -534,13 +534,13 @@ public class ExpressionTest extends BaseActivityTest {
       try {
         source = new GeoJsonSource("amsterdam-parks-source",
           ResourceUtils.readRawResource(rule.getActivity(), R.raw.amsterdam));
-        mapboxMap.addSource(source);
+        mapboxMap.getStyle().addSource(source);
       } catch (IOException ioException) {
         return;
       }
 
       // Add a fill layer
-      mapboxMap.addLayer(layer = new FillLayer("amsterdam-parks-layer", source.getId())
+      mapboxMap.getStyle().addLayer(layer = new FillLayer("amsterdam-parks-layer", source.getId())
         .withProperties(
           fillColor(rgba(0.0f, 0.0f, 0.0f, 0.5f)),
           fillOutlineColor(rgb(0, 0, 255)),
