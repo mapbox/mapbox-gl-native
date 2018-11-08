@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -121,32 +123,34 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
 
-    int[] padding;
-    if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-      padding = new int[] {0, 750, 0, 0};
-    } else {
-      padding = new int[] {0, 250, 0, 0};
-    }
+    mapboxMap.getStyle(style -> {
+      int[] padding;
+      if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+        padding = new int[] {0, 750, 0, 0};
+      } else {
+        padding = new int[] {0, 250, 0, 0};
+      }
 
-    LocationComponentOptions options = LocationComponentOptions.builder(this)
-      .padding(padding)
-      .layerBelow("waterway-label")
-      .build();
+      LocationComponentOptions options = LocationComponentOptions.builder(this)
+        .padding(padding)
+        .layerBelow("waterway-label")
+        .build();
 
-    locationComponent = mapboxMap.getLocationComponent();
-    locationComponent.activateLocationComponent(this, true,
-      new LocationEngineRequest.Builder(750)
-        .setFastestInterval(750)
-        .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-        .build()
-    );
-    locationComponent.applyStyle(options);
-    locationComponent.setLocationComponentEnabled(true);
-    locationComponent.addOnLocationClickListener(this);
-    locationComponent.addOnCameraTrackingChangedListener(this);
-    locationComponent.setCameraMode(cameraMode);
-    setRendererMode(renderMode);
-    locationComponent.forceLocationUpdate(lastLocation);
+      locationComponent = mapboxMap.getLocationComponent();
+      locationComponent.activateLocationComponent(this, true,
+        new LocationEngineRequest.Builder(750)
+          .setFastestInterval(750)
+          .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+          .build()
+      );
+      locationComponent.applyStyle(options);
+      locationComponent.setLocationComponentEnabled(true);
+      locationComponent.addOnLocationClickListener(this);
+      locationComponent.addOnCameraTrackingChangedListener(this);
+      locationComponent.setCameraMode(cameraMode);
+      setRendererMode(renderMode);
+      locationComponent.forceLocationUpdate(lastLocation);
+    });
   }
 
   @Override
@@ -187,6 +191,10 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
   }
 
   private void toggleStyle() {
+    if (locationComponent == null) {
+      return;
+    }
+
     customStyle = !customStyle;
     locationComponent.applyStyle(
       this,
@@ -194,11 +202,19 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
   }
 
   private void toggleMapStyle() {
-    String styleUrl = mapboxMap.getStyleUrl().contentEquals(Style.DARK) ? Style.LIGHT : Style.DARK;
-    mapboxMap.setStyle(styleUrl);
+    if (locationComponent == null) {
+      return;
+    }
+
+    String styleUrl = Style.DARK.equals(mapboxMap.getStyle().getUrl()) ? Style.LIGHT : Style.DARK;
+    mapboxMap.setStyle(new Style.Builder().fromUrl(styleUrl));
   }
 
   private void disableGesturesManagement() {
+    if (locationComponent == null) {
+      return;
+    }
+
     LocationComponentOptions options = locationComponent
       .getLocationComponentOptions()
       .toBuilder()
@@ -208,6 +224,10 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
   }
 
   private void enableGesturesManagement() {
+    if (locationComponent == null) {
+      return;
+    }
+
     LocationComponentOptions options = locationComponent
       .getLocationComponentOptions()
       .toBuilder()

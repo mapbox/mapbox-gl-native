@@ -11,7 +11,6 @@ import android.support.annotation.RequiresPermission;
 import android.support.annotation.StyleRes;
 import android.support.annotation.VisibleForTesting;
 import android.view.WindowManager;
-
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
@@ -123,7 +122,12 @@ public final class LocationComponent {
   /**
    * Indicates whether the component has been initialized.
    */
-  private boolean isInitialized;
+  private boolean isComponentInitialized;
+
+  /**
+   * Indicates whether the style has been initialized.
+   */
+  private boolean isStyleInitialized;
 
   /**
    * Indicates that the component is enabled and should be displaying location if Mapbox components are available and
@@ -182,7 +186,6 @@ public final class LocationComponent {
     this.staleStateManager = staleStateManager;
     this.compassEngine = compassEngine;
     this.internalLocationEngineProvider = internalLocationEngineProvider;
-    isInitialized = true;
   }
 
   /**
@@ -835,16 +838,17 @@ public final class LocationComponent {
    * Internal use.
    */
   public void onFinishLoadingStyle() {
-    if (isInitialized) {
+    isStyleInitialized = true;
+    if (isComponentInitialized) {
       locationLayerController.initializeComponents(options);
       locationCameraController.initializeOptions(options);
+      onLocationLayerStart();
     }
-    onLocationLayerStart();
   }
 
   @SuppressLint("MissingPermission")
   private void onLocationLayerStart() {
-    if (!isInitialized || !isComponentStarted) {
+    if (!isComponentInitialized || !isComponentStarted) {
       return;
     }
 
@@ -874,7 +878,7 @@ public final class LocationComponent {
   }
 
   private void onLocationLayerStop() {
-    if (!isInitialized || !isLayerReady || !isComponentStarted) {
+    if (!isComponentInitialized || !isLayerReady || !isComponentStarted) {
       return;
     }
 
@@ -891,10 +895,10 @@ public final class LocationComponent {
   }
 
   private void initialize(@NonNull Context context, @NonNull LocationComponentOptions options) {
-    if (isInitialized) {
+    if (isComponentInitialized) {
       return;
     }
-    isInitialized = true;
+    isComponentInitialized = true;
     this.options = options;
 
     mapboxMap.addOnMapClickListener(onMapClickListener);
@@ -923,6 +927,10 @@ public final class LocationComponent {
 
     setRenderMode(RenderMode.NORMAL);
     setCameraMode(CameraMode.NONE);
+
+    if (isStyleInitialized) {
+      onFinishLoadingStyle();
+    }
 
     onLocationLayerStart();
   }

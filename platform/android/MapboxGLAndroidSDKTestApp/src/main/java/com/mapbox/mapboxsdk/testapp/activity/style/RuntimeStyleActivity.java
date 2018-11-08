@@ -7,13 +7,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.Layer;
@@ -30,13 +30,12 @@ import com.mapbox.mapboxsdk.style.sources.TileSet;
 import com.mapbox.mapboxsdk.style.sources.VectorSource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
+import timber.log.Timber;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.color;
@@ -75,6 +74,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
   private MapView mapView;
   private MapboxMap mapboxMap;
+  private boolean styleLoaded;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -82,9 +82,8 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     setContentView(R.layout.activity_runtime_style);
 
     // Initialize map as normal
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-
 
     mapView.getMapAsync(map -> {
       // Store for later
@@ -93,8 +92,12 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       // Center and Zoom (Amsterdam, zoomed to streets)
       mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.379189, 4.899431), 14));
 
-      // set custom transition
-      mapboxMap.getStyle().setTransition(new TransitionOptions(250, 50));
+      mapboxMap.setStyle(
+        new Style.Builder()
+          .fromUrl(Style.MAPBOX_STREETS)
+          // set custom transition
+          .withTransition(new TransitionOptions(250, 50)), style -> styleLoaded = true
+      );
     });
   }
 
@@ -148,6 +151,10 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
+    if (!styleLoaded) {
+      return false;
+    }
+
     switch (item.getItemId()) {
       case R.id.action_list_layers:
         listLayers();
@@ -490,7 +497,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   }
 
   private void styleFillFilterLayer() {
-    mapboxMap.setStyleUrl("asset://fill_filter_style.json");
+    mapboxMap.setStyle(new Style.Builder().fromUrl("asset://fill_filter_style.json"));
     mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(31, -100), 3));
 
     Handler handler = new Handler(getMainLooper());
@@ -518,7 +525,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   }
 
   private void styleLineFilterLayer() {
-    mapboxMap.setStyleUrl("asset://line_filter_style.json");
+    mapboxMap.setStyle(new Style.Builder().fromUrl("asset://line_filter_style.json"));
     mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(40, -97), 5));
 
     Handler handler = new Handler(getMainLooper());
@@ -546,7 +553,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   }
 
   private void styleNumericFillLayer() {
-    mapboxMap.setStyleUrl("asset://numeric_filter_style.json");
+    mapboxMap.setStyle(new Style.Builder().fromUrl("asset://numeric_filter_style.json"));
     mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(40, -97), 5));
 
     Handler handler = new Handler(getMainLooper());

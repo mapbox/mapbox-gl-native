@@ -16,10 +16,11 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -81,8 +82,9 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
   }
 
   private void setupMapView(Bundle savedInstanceState) {
-    mapView = findViewById(R.id.mapView);
-
+    MapboxMapOptions mapboxMapOptions = setupMapboxMapOptions();
+    mapView = new MapView(this, mapboxMapOptions);
+    ((ViewGroup) findViewById(R.id.coordinator_layout)).addView(mapView);
     mapView.addOnDidFinishLoadingStyleListener(() -> {
       if (mapboxMap != null) {
         setupNavigationView(mapboxMap.getStyle().getLayers());
@@ -90,17 +92,23 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
     });
 
     mapView.setTag(true);
-    mapView.setStyleUrl(STYLES[currentStyleIndex]);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
     mapView.addOnDidFinishLoadingStyleListener(() -> Timber.d("Style loaded"));
   }
 
+  protected MapboxMapOptions setupMapboxMapOptions() {
+    MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
+    mapboxMapOptions.styleUrl(Style.MAPBOX_STREETS);
+    return mapboxMapOptions;
+  }
+
   @Override
   public void onMapReady(@NonNull MapboxMap map) {
     mapboxMap = map;
-
-    setupNavigationView(mapboxMap.getStyle().getLayers());
+    mapboxMap.setStyle(
+      new Style.Builder().fromUrl(STYLES[currentStyleIndex]), style -> setupNavigationView(style.getLayers())
+    );
     setupZoomView();
     setFpsView();
   }
@@ -113,7 +121,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
   }
 
   private void setupNavigationView(List<Layer> layerList) {
-    Timber.v("New style loaded with JSON: %s", mapboxMap.getStyleJson());
+    Timber.v("New style loaded with JSON: %s", mapboxMap.getStyle().getJson());
     final LayerListAdapter adapter = new LayerListAdapter(this, layerList);
     ListView listView = findViewById(R.id.listView);
     listView.setAdapter(adapter);
@@ -161,7 +169,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
         if (currentStyleIndex == STYLES.length) {
           currentStyleIndex = 0;
         }
-        mapboxMap.setStyleUrl(STYLES[currentStyleIndex]);
+        mapboxMap.setStyle(new Style.Builder().fromUrl(STYLES[currentStyleIndex]));
       }
     });
   }

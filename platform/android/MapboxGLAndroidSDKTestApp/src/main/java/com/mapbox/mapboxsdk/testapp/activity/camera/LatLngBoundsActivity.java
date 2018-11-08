@@ -12,6 +12,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.view.LockableBottomSheetBehavior;
 
@@ -52,20 +53,26 @@ public class LatLngBoundsActivity extends AppCompatActivity implements View.OnCl
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_latlngbounds);
+    initBottomSheet();
+    initMapView(savedInstanceState);
+  }
+
+  private void initMapView(Bundle savedInstanceState) {
     mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      initMap();
+      disableGestures();
+      moveToBounds(bottomSheet.getMeasuredHeight(), BOUNDS_PADDING_DIVIDER_SMALL, ANIMATION_DURATION_SHORT);
+      loadStyle();
     });
   }
 
-  private void initMap() {
-    disableGestures();
-    addMarkers();
-    initFab();
-    initBottomSheet();
-    moveToBounds(bottomSheet.getMeasuredHeight(), BOUNDS_PADDING_DIVIDER_SMALL, ANIMATION_DURATION_SHORT);
+  private void loadStyle() {
+    mapboxMap.setStyle(new Style.Builder().fromUrl(Style.MAPBOX_STREETS), style -> {
+      addMarkers();
+      initFab();
+    });
   }
 
   private void disableGestures() {
@@ -96,7 +103,7 @@ public class LatLngBoundsActivity extends AppCompatActivity implements View.OnCl
     bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
       @Override
       public void onStateChanged(@NonNull View bottomSheet, int newState) {
-        if (newState == BottomSheetBehavior.STATE_SETTLING) {
+        if (newState == BottomSheetBehavior.STATE_SETTLING && mapboxMap != null) {
           moveToBounds(0, BOUNDS_PADDING_DIVIDER_LARGE, ANIMATION_DURATION_LONG);
         }
       }

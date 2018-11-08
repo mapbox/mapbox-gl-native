@@ -14,6 +14,7 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.List;
@@ -34,11 +35,10 @@ public class LocationMapChangeActivity extends AppCompatActivity implements OnMa
 
     stylesFab.setOnClickListener(v -> {
       if (mapboxMap != null) {
-        mapboxMap.setStyleUrl(Utils.getNextStyle());
+        mapboxMap.setStyle(new Style.Builder().fromUrl(Utils.getNextStyle()));
       }
     });
 
-    mapView.setStyleUrl(Utils.getNextStyle());
     mapView.onCreate(savedInstanceState);
 
     if (PermissionsManager.areLocationPermissionsGranted(this)) {
@@ -73,12 +73,14 @@ public class LocationMapChangeActivity extends AppCompatActivity implements OnMa
   @Override
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
-    activateLocationComponent();
+    mapboxMap.setStyle(new Style.Builder().fromUrl(Utils.getNextStyle()),
+      style -> activateLocationComponent());
   }
 
   @SuppressLint("MissingPermission")
   private void activateLocationComponent() {
     LocationComponent locationComponent = mapboxMap.getLocationComponent();
+    locationComponent.onStart();
     locationComponent.activateLocationComponent(this);
     locationComponent.setLocationComponentEnabled(true);
     locationComponent.setRenderMode(RenderMode.COMPASS);

@@ -13,6 +13,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.CustomGeometrySource;
 import com.mapbox.mapboxsdk.style.sources.GeometryTileProvider;
@@ -34,7 +35,6 @@ public class GridSourceActivity extends AppCompatActivity implements OnMapReadyC
   public static final String ID_GRID_LAYER = "grid_layer";
 
   private MapView mapView;
-  private MapboxMap mapboxMap;
 
   // public for testing purposes
   public CustomGeometrySource source;
@@ -102,19 +102,17 @@ public class GridSourceActivity extends AppCompatActivity implements OnMapReadyC
 
   @Override
   public void onMapReady(@NonNull final MapboxMap map) {
-    mapboxMap = map;
-
-    // add source
     source = new CustomGeometrySource(ID_GRID_SOURCE, new GridProvider());
-    mapboxMap.getStyle().addSource(source);
-
-    // add layer
     layer = new LineLayer(ID_GRID_LAYER, ID_GRID_SOURCE);
     layer.setProperties(
       lineColor(Color.parseColor("#000000"))
     );
 
-    mapboxMap.getStyle().addLayer(layer);
+    map.setStyle(new Style.Builder()
+      .fromUrl(Style.MAPBOX_STREETS)
+      .withLayer(layer)
+      .withSource(source)
+    );
   }
 
   @Override

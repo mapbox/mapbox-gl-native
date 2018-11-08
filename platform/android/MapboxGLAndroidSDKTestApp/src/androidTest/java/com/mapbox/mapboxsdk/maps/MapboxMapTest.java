@@ -16,6 +16,7 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidMarkerPositionException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
@@ -67,9 +68,12 @@ public class MapboxMapTest extends BaseActivityTest {
     validateTestSetup();
     onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
       long transitionDuration = 600;
-      mapboxMap.setTransitionDuration(transitionDuration);
+      mapboxMap.getStyle().setTransition(new TransitionOptions(transitionDuration, 0));
       assertEquals(
-        "TransitionDuration should match", transitionDuration, mapboxMap.getTransitionDuration(), 0
+        "TransitionDuration should match",
+        transitionDuration,
+        mapboxMap.getStyle().getTransition().getDuration(),
+        0
       );
     }));
   }
@@ -79,9 +83,12 @@ public class MapboxMapTest extends BaseActivityTest {
     validateTestSetup();
     onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
       long transitionDelay = 50;
-      mapboxMap.setTransitionDelay(transitionDelay);
+      mapboxMap.getStyle().setTransition(new TransitionOptions(600, transitionDelay));
       assertEquals(
-        "TransitionDelay should match", transitionDelay, mapboxMap.getTransitionDelay(), 0
+        "TransitionDelay should match",
+        transitionDelay,
+        mapboxMap.getStyle().getTransition().getDelay(),
+        0
       );
     }));
   }

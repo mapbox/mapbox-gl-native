@@ -242,7 +242,8 @@ public class ExpressionTest extends BaseActivityTest {
       Expression expression3 = eq(literal("Łukasz"), literal("lukasz"), collator(literal(false), eq(literal(2),
         literal(1))));
 
-      mapboxMap.getStyle().addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      mapboxMap.getStyle()
+        .addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
       Layer layer = new CircleLayer("layer", "source")
         .withProperties(circleColor(
           switchCase(
@@ -282,7 +283,8 @@ public class ExpressionTest extends BaseActivityTest {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       LatLng latLng = new LatLng(51, 17);
-      mapboxMap.getStyle().addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      mapboxMap.getStyle()
+        .addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
       SymbolLayer layer = new SymbolLayer("layer", "source");
       mapboxMap.getStyle().addLayer(layer);
 
@@ -304,7 +306,8 @@ public class ExpressionTest extends BaseActivityTest {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       LatLng latLng = new LatLng(51, 17);
-      mapboxMap.getStyle().addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      mapboxMap.getStyle()
+        .addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
       SymbolLayer layer = new SymbolLayer("layer", "source");
       mapboxMap.getStyle().addLayer(layer);
 
@@ -326,7 +329,8 @@ public class ExpressionTest extends BaseActivityTest {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       LatLng latLng = new LatLng(51, 17);
-      mapboxMap.getStyle().addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      mapboxMap.getStyle()
+        .addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
       SymbolLayer layer = new SymbolLayer("layer", "source");
       mapboxMap.getStyle().addLayer(layer);
 
@@ -355,7 +359,8 @@ public class ExpressionTest extends BaseActivityTest {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       LatLng latLng = new LatLng(51, 17);
-      mapboxMap.getStyle().addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      mapboxMap.getStyle()
+        .addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
       SymbolLayer layer = new SymbolLayer("layer", "source");
       mapboxMap.getStyle().addLayer(layer);
 
@@ -386,7 +391,8 @@ public class ExpressionTest extends BaseActivityTest {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       LatLng latLng = new LatLng(51, 17);
-      mapboxMap.getStyle().addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      mapboxMap.getStyle()
+        .addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
       SymbolLayer layer = new SymbolLayer("layer", "source");
       mapboxMap.getStyle().addLayer(layer);
 
@@ -477,7 +483,8 @@ public class ExpressionTest extends BaseActivityTest {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       LatLng latLng = new LatLng(51, 17);
-      mapboxMap.getStyle().addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      mapboxMap.getStyle()
+        .addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
       SymbolLayer layer = new SymbolLayer("layer", "source");
       mapboxMap.getStyle().addLayer(layer);
 

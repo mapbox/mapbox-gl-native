@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
 
@@ -78,7 +79,7 @@ public class StyleFileActivity extends AppCompatActivity {
       Timber.d("Read json, %s", json);
       MapboxMap mapboxMap = this.mapboxMap.get();
       if (mapboxMap != null) {
-        mapboxMap.setStyleJson(json);
+        mapboxMap.setStyle(new Style.Builder().fromJson(json));
       }
     }
   }
@@ -116,7 +117,7 @@ public class StyleFileActivity extends AppCompatActivity {
       // Actual file:// usage
       MapboxMap mapboxMap = this.mapboxMap.get();
       if (mapboxMap != null) {
-        mapboxMap.setStyleUrl("file://" + cacheStyleFile.getAbsolutePath());
+        mapboxMap.setStyle(new Style.Builder().fromUrl("file://" + cacheStyleFile.getAbsolutePath()));
       }
     }
 

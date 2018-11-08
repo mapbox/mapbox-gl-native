@@ -12,7 +12,6 @@ import android.support.annotation.Size;
 import android.support.annotation.UiThread;
 import android.text.TextUtils;
 import android.view.View;
-
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.android.gestures.RotateGestureDetector;
@@ -36,8 +35,10 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.log.Logger;
+import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -68,13 +69,15 @@ public final class MapboxMap {
   @Nullable
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
+  private List<Style.OnStyleLoaded> styleLoadedCallbacks = new ArrayList<>();
+
+  @Nullable
   private Style style;
 
   MapboxMap(NativeMapView map, Transform transform, UiSettings ui, Projection projection,
             OnGesturesManagerInteractionListener listener, AnnotationManager annotations,
             CameraChangeDispatcher cameraChangeDispatcher) {
     this.nativeMapView = map;
-    this.style = new Style(nativeMapView);
     this.uiSettings = ui;
     this.projection = projection;
     this.annotationManager = annotations.bind(this);
@@ -95,6 +98,26 @@ public final class MapboxMap {
     setPrefetchesTiles(options);
   }
 
+  /**
+   * Get the Style of the map asynchronously.
+   */
+  public void getStyle(@NonNull Style.OnStyleLoaded onStyleLoaded) {
+    if (style == null) {
+      styleLoadedCallbacks.add(onStyleLoaded);
+    } else {
+      onStyleLoaded.onStyleLoaded(style);
+    }
+  }
+
+  /**
+   * Get the Style of the map.
+   * <p>
+   * Returns null when style is being loaded.
+   * </p>
+   *
+   * @return the style of the map
+   */
+  @Nullable
   public Style getStyle() {
     return style;
   }
@@ -122,7 +145,6 @@ public final class MapboxMap {
   void onSaveInstanceState(@NonNull Bundle outState) {
     outState.putParcelable(MapboxConstants.STATE_CAMERA_POSITION, transform.getCameraPosition());
     outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, nativeMapView.getDebug());
-    outState.putString(MapboxConstants.STATE_STYLE_URL, nativeMapView.getStyleUrl());
     uiSettings.onSaveInstanceState(outState);
   }
 
@@ -143,11 +165,6 @@ public final class MapboxMap {
     }
 
     nativeMapView.setDebug(savedInstanceState.getBoolean(MapboxConstants.STATE_DEBUG_ACTIVE));
-
-    final String styleUrl = savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL);
-    if (!TextUtils.isEmpty(styleUrl)) {
-      nativeMapView.setStyleUrl(savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL));
-    }
   }
 
   /**
@@ -167,6 +184,17 @@ public final class MapboxMap {
   }
 
   /**
+   * Called when the OnMapReadyCallback has finished executing.
+   * <p>
+   * Invalidation of the camera position is required to update the added components in
+   * OnMapReadyCallback with the correct transformation.
+   * </p>
+   */
+  void onPostMapReady() {
+    transform.invalidateCameraPosition();
+  }
+
+  /**
    * Called when the map will start loading style.
    */
   void onStartLoadingMap() {
@@ -178,6 +206,7 @@ public final class MapboxMap {
    */
   void onFinishLoadingStyle() {
     locationComponent.onFinishLoadingStyle();
+    locationComponent.onStart();
   }
 
   /**
@@ -623,6 +652,40 @@ public final class MapboxMap {
   }
 
   //
+  // Offline
+  //
+
+  /**
+   * Loads a new style from the specified offline region definition and moves the map camera to that region.
+   *
+   * @param definition the offline region definition
+   * @see OfflineRegionDefinition
+   */
+  public void setOfflineRegionDefinition(@NonNull OfflineRegionDefinition definition) {
+    setOfflineRegionDefinition(definition, null);
+  }
+
+  /**
+   * Loads a new style from the specified offline region definition and moves the map camera to that region.
+   *
+   * @param definition the offline region definition
+   * @see OfflineRegionDefinition
+   */
+  public void setOfflineRegionDefinition(@NonNull OfflineRegionDefinition definition,
+                                         @Nullable Style.OnStyleLoaded callback) {
+    double minZoom = definition.getMinZoom();
+    double maxZoom = definition.getMaxZoom();
+    CameraPosition cameraPosition = new CameraPosition.Builder()
+      .target(definition.getBounds().getCenter())
+      .zoom(minZoom)
+      .build();
+    moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    setMinZoomPreference(minZoom);
+    setMaxZoomPreference(maxZoom);
+    setStyle(new Style.Builder().fromUrl(definition.getStyleURL()), callback);
+  }
+
+  //
   // Debug
   //
 
@@ -675,8 +738,31 @@ public final class MapboxMap {
   // Styling
   //
 
-  public Style setStyle(Style.Builder builder) {
-    return style = builder.build(nativeMapView);
+  public void setStyle(@Style.StyleUrl String style) {
+    this.setStyle(style, null);
+  }
+
+  public void setStyle(@Style.StyleUrl String style, final Style.OnStyleLoaded callback) {
+    this.setStyle(new Style.Builder().fromUrl(style), callback);
+  }
+
+  public void setStyle(Style.Builder builder) {
+    this.setStyle(builder, null);
+  }
+
+  public void setStyle(Style.Builder builder, final Style.OnStyleLoaded callback) {
+    builder.build(nativeMapView, new Style.OnStyleLoaded() {
+      @Override
+      public void onStyleLoaded(Style style) {
+        MapboxMap.this.style = style;
+        if (callback != null) {
+          callback.onStyleLoaded(style);
+        }
+        for (Style.OnStyleLoaded styleLoadedCallback : styleLoadedCallbacks) {
+          styleLoadedCallback.onStyleLoaded(style);
+        }
+      }
+    });
   }
 
   /**
@@ -687,14 +773,14 @@ public final class MapboxMap {
   private void setStyleUrl(@NonNull MapboxMapOptions options) {
     String style = options.getStyleUrl();
     if (!TextUtils.isEmpty(style)) {
-      setStyle(new Style.Builder().withStyleUrl(style));
+      setStyle(new Style.Builder().fromUrl(style));
     }
   }
 
   private void setStyleJson(@NonNull MapboxMapOptions options) {
     String styleJson = options.getStyleJson();
     if (!TextUtils.isEmpty(styleJson)) {
-      setStyle(new Style.Builder().withStyleJson(styleJson));
+      setStyle(new Style.Builder().fromJson(styleJson));
     }
   }
 

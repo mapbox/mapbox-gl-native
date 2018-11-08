@@ -9,6 +9,7 @@ import android.view.View;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -17,7 +18,6 @@ import com.mapbox.mapboxsdk.testapp.R;
 public class TextureViewResizeActivity extends AppCompatActivity {
 
   private MapView mapView;
-  private MapboxMap mapboxMap;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +37,17 @@ public class TextureViewResizeActivity extends AppCompatActivity {
   }
 
   private void setupMapView(Bundle savedInstanceState) {
-    mapView = (MapView) findViewById(R.id.mapView);
-    mapView.getMapAsync(mapboxMap -> TextureViewResizeActivity.this.mapboxMap = mapboxMap);
+    mapView = findViewById(R.id.mapView);
+    mapView.onCreate(savedInstanceState);
+    mapView.getMapAsync(this::setupMap);
+  }
+
+  private void setupMap(MapboxMap mapboxMap) {
+    mapboxMap.setStyle(Style.MAPBOX_STREETS);
   }
 
   private void setupFab() {
-    FloatingActionButton fabDebug = (FloatingActionButton) findViewById(R.id.fabResize);
+    FloatingActionButton fabDebug = findViewById(R.id.fabResize);
     fabDebug.setOnClickListener(view -> {
       if (mapView != null) {
         View parent = findViewById(R.id.coordinator_layout);

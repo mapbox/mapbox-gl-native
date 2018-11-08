@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.sources.VectorSource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -33,8 +34,6 @@ public class RuntimeStyleTimingTestActivity extends AppCompatActivity {
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(mapboxMap -> {
       RuntimeStyleTimingTestActivity.this.mapboxMap = mapboxMap;
-      VectorSource museums = new VectorSource("museums_source", "mapbox://mapbox.2opop9hr");
-      mapboxMap.getStyle().addSource(museums);
 
       CircleLayer museumsLayer = new CircleLayer("museums", "museums_source");
       museumsLayer.setSourceLayer("museum-cusco");
@@ -44,7 +43,11 @@ public class RuntimeStyleTimingTestActivity extends AppCompatActivity {
         circleColor(Color.argb(1, 55, 148, 179))
       );
 
-      mapboxMap.getStyle().addLayer(museumsLayer);
+      VectorSource museums = new VectorSource("museums_source", "mapbox://mapbox.2opop9hr");
+      mapboxMap.setStyle(new Style.Builder()
+        .fromUrl(Style.MAPBOX_STREETS)
+        .withSource(museums)
+        .withLayer(museumsLayer));
     });
   }
 

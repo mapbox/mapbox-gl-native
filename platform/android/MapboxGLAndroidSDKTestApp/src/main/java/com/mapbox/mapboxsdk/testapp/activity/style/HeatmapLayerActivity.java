@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.HeatmapLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -53,13 +54,16 @@ public class HeatmapLayerActivity extends AppCompatActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_heatmaplayer);
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      addEarthquakeSource();
-      addHeatmapLayer();
-      addCircleLayer();
+
+      mapboxMap.setStyle(Style.DARK, style -> {
+        addEarthquakeSource();
+        addHeatmapLayer();
+        addCircleLayer();
+      });
     });
   }
 
