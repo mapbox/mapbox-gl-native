@@ -43,13 +43,14 @@ public class BuildingFillExtrusionActivity extends AppCompatActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_building_layer);
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      Style style = map.getStyle();
-      setupBuildings(style);
-      setupLight();
+      mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
+        setupBuildings(style);
+        setupLight();
+      });
     });
   }
 

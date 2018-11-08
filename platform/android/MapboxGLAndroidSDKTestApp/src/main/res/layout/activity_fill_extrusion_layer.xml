@@ -13,7 +13,6 @@
         app:mapbox_cameraTargetLng="7.497989"
         app:mapbox_cameraZoom="9"
         app:mapbox_cameraBearing="140"
-        app:mapbox_cameraTilt="60"
-        app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"/>
+        app:mapbox_cameraTilt="60"/>
 
 </RelativeLayout>

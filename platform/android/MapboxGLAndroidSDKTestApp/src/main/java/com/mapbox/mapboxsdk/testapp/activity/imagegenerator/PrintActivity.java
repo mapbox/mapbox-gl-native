@@ -23,14 +23,14 @@ public class PrintActivity extends AppCompatActivity implements MapboxMap.Snapsh
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_print);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(mapboxMap -> PrintActivity.this.mapboxMap = mapboxMap);
 
     final View fab = findViewById(R.id.fab);
     if (fab != null) {
       fab.setOnClickListener(view -> {
-        if (mapboxMap != null) {
+        if (mapboxMap.getStyle() != null) {
           mapboxMap.snapshot(PrintActivity.this);
         }
       });

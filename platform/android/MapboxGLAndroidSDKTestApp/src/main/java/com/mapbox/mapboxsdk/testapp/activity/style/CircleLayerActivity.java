@@ -74,18 +74,18 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      addBusStopSource();
-      addBusStopCircleLayer();
-      initFloatingActionButtons();
-      isLoadingStyle = false;
+
+      mapboxMap.setStyle(Style.SATELLITE_STREETS, style -> {
+        addBusStopSource();
+        addBusStopCircleLayer();
+        initFloatingActionButtons();
+        isLoadingStyle = false;
+      });
     });
 
-    mapView.addOnDidFinishLoadingStyleListener(new MapView.OnDidFinishLoadingStyleListener() {
-      @Override
-      public void onDidFinishLoadingStyle() {
-        addBusStop();
-        isLoadingStyle = false;
-      }
+    mapView.addOnDidFinishLoadingStyleListener(() -> {
+      addBusStop();
+      isLoadingStyle = false;
     });
   }
 
@@ -219,7 +219,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
   }
 
   private void loadNewStyle() {
-    mapboxMap.setStyleUrl(getNextStyle());
+    mapboxMap.setStyle(new Style.Builder().fromUrl(getNextStyle()));
   }
 
   private void addBusStop() {

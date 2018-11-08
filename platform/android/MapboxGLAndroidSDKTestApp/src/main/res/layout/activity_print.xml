@@ -18,6 +18,7 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_print"
+        app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"
         app:backgroundTint="@color/accent"/>
 
 </android.support.design.widget.CoordinatorLayout>

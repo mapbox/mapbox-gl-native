@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import timber.log.Timber;
@@ -17,7 +17,6 @@ import timber.log.Timber;
 public class MapChangeActivity extends AppCompatActivity {
 
   private MapView mapView;
-  private MapboxMap mapboxMap;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +37,8 @@ public class MapChangeActivity extends AppCompatActivity {
     mapView.addOnWillStartRenderingFrameListener(() -> Timber.v("OnWillStartRenderingFrame"));
     mapView.addOnWillStartRenderingMapListener(() -> Timber.v("OnWillStartRenderingMap"));
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(map -> {
-      mapboxMap = map;
+    mapView.getMapAsync(mapboxMap -> {
+      mapboxMap.setStyle(Style.MAPBOX_STREETS);
       mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
         new LatLng(55.754020, 37.620948), 12), 9000);
     });

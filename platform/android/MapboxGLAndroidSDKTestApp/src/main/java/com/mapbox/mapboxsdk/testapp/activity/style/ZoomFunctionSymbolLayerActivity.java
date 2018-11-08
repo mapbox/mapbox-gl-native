@@ -76,14 +76,16 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_zoom_symbol_layer);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      Style style = map.getStyle();
-      updateSource(style);
-      addLayer(style);
-      map.addOnMapClickListener(mapClickListener);
+
+      map.setStyle(Style.MAPBOX_STREETS, style -> {
+        updateSource(style);
+        addLayer(style);
+        map.addOnMapClickListener(mapClickListener);
+      });
     });
   }
 

@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
-
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.location.LocationEngineRequest;
@@ -18,6 +17,7 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.List;
@@ -107,16 +107,18 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
   @SuppressLint("MissingPermission")
   @Override
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
-    locationComponent = mapboxMap.getLocationComponent();
-    locationComponent.activateLocationComponent(
-      this,
-      locationEngine,
-      new LocationEngineRequest.Builder(500)
-        .setFastestInterval(500)
-        .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-        .build());
-    locationComponent.setLocationComponentEnabled(true);
-    locationComponent.setRenderMode(RenderMode.COMPASS);
+    mapboxMap.setStyle(new Style.Builder().fromUrl(Style.MAPBOX_STREETS), style -> {
+      locationComponent = mapboxMap.getLocationComponent();
+      locationComponent.activateLocationComponent(
+        this,
+        locationEngine,
+        new LocationEngineRequest.Builder(500)
+          .setFastestInterval(500)
+          .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+          .build());
+      locationComponent.setLocationComponentEnabled(true);
+      locationComponent.setRenderMode(RenderMode.COMPASS);
+    });
   }
 
   @Override
