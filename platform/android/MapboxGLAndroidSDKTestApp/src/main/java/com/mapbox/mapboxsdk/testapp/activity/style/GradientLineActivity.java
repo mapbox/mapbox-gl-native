@@ -54,8 +54,8 @@ public class GradientLineActivity extends AppCompatActivity implements OnMapRead
 
     try {
       String geoJson = ResourceUtils.readRawResource(GradientLineActivity.this, R.raw.test_line_gradient_feature);
-      mapboxMap.addSource(new GeoJsonSource(LINE_SOURCE, geoJson, new GeoJsonOptions().withLineMetrics(true)));
-      mapboxMap.addLayer(new LineLayer("gradient", LINE_SOURCE)
+      mapboxMap.getStyle().addSource(new GeoJsonSource(LINE_SOURCE, geoJson, new GeoJsonOptions().withLineMetrics(true)));
+      mapboxMap.getStyle().addLayer(new LineLayer("gradient", LINE_SOURCE)
         .withProperties(
           lineGradient(interpolate(
             linear(), lineProgress(),

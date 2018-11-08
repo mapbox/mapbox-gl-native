@@ -11,6 +11,7 @@ import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -47,10 +48,12 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
     mapView.getMapAsync(mapboxMap -> {
       QueryRenderedFeaturesBoxHighlightActivity.this.mapboxMap = mapboxMap;
 
+      Style style = mapboxMap.getStyle();
+
       // Add layer / source
       final GeoJsonSource source = new GeoJsonSource("highlighted-shapes-source");
-      mapboxMap.addSource(source);
-      mapboxMap.addLayer(
+      style.addSource(source);
+      style.addLayer(
         new FillLayer("highlighted-shapes-layer", "highlighted-shapes-source")
           .withProperties(fillColor(Color.RED))
       );

@@ -1,13 +1,19 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.graphics.Bitmap;
+import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.Source;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
+import java.util.List;
 
 public class Style {
 
@@ -41,11 +47,31 @@ public class Style {
   // Source
   //
 
+  /**
+   * Retrieve all the sources in the style
+   *
+   * @return all the sources in the current style
+   */
+  public List<Source> getSources() {
+    return nativeMapView.getSources();
+  }
+
+  /**
+   * Adds the source to the map. The source must be newly created and not added to the map before
+   *
+   * @param source the source to add
+   */
   public void addSource(Source source) {
     sources.put(source.getId(), source);
     nativeMapView.addSource(source);
   }
 
+  /**
+   * Retrieve a source by id
+   *
+   * @param id the source's id
+   * @return the source if present in the current style
+   */
   public Source getSource(String id) {
     Source source = sources.get(id);
     if (source == null) {
@@ -54,15 +80,99 @@ public class Style {
     return source;
   }
 
+  /**
+   * Tries to cast the Source to T, throws ClassCastException if it's another type.
+   *
+   * @param sourceId the id used to look up a layer
+   * @param <T>      the generic type of a Source
+   * @return the casted Source, null if another type
+   */
+  public <T extends Source> T getSourceAs(@NonNull String sourceId) {
+    // noinspection unchecked
+    if (sources.containsKey(sourceId)) {
+      return (T) sources.get(sourceId);
+    }
+    return (T) nativeMapView.getSource(sourceId);
+  }
+
+  /**
+   * Removes the source. Any references to the source become invalid and should not be used anymore
+   *
+   * @param sourceId the source to remove
+   * @return the source handle or null if the source was not present
+   */
+  @Nullable
+  public Source removeSource(@NonNull String sourceId) {
+    sources.remove(sourceId);
+    return nativeMapView.removeSource(sourceId);
+  }
+
+  /**
+   * Removes the source, preserving the reference for re-use
+   *
+   * @param source the source to remove
+   * @return the source
+   */
+  @Nullable
+  public Source removeSource(@NonNull Source source) {
+    sources.remove(source.getId());
+    return nativeMapView.removeSource(source);
+  }
+
   //
   // Layer
   //
 
+  /**
+   * Adds the layer to the map. The layer must be newly created and not added to the map before
+   *
+   * @param layer the layer to add
+   */
   public void addLayer(Layer layer) {
     layers.put(layer.getId(), layer);
     nativeMapView.addLayer(layer);
   }
 
+  /**
+   * Adds the layer to the map. The layer must be newly created and not added to the map before
+   *
+   * @param layer the layer to add
+   * @param below the layer id to add this layer before
+   */
+  public void addLayerBelow(@NonNull Layer layer, @NonNull String below) {
+    layers.put(layer.getId(), layer);
+    nativeMapView.addLayerBelow(layer, below);
+  }
+
+  /**
+   * Adds the layer to the map. The layer must be newly created and not added to the map before
+   *
+   * @param layer the layer to add
+   * @param above the layer id to add this layer above
+   */
+  public void addLayerAbove(@NonNull Layer layer, @NonNull String above) {
+    layers.put(layer.getId(), layer);
+    nativeMapView.addLayerAbove(layer, above);
+  }
+
+  /**
+   * Adds the layer to the map at the specified index. The layer must be newly
+   * created and not added to the map before
+   *
+   * @param layer the layer to add
+   * @param index the index to insert the layer at
+   */
+  public void addLayerAt(@NonNull Layer layer, @IntRange(from = 0) int index) {
+    layers.put(layer.getId(), layer);
+    nativeMapView.addLayerAt(layer, index);
+  }
+
+  /**
+   * Get the layer by id
+   *
+   * @param id the layer's id
+   * @return the layer, if present in the style
+   */
   public Layer getLayer(String id) {
     Layer layer = layers.get(id);
     if (layer == null) {
@@ -71,10 +181,113 @@ public class Style {
     return layer;
   }
 
+  /**
+   * Tries to cast the Layer to T, throws ClassCastException if it's another type.
+   *
+   * @param layerId the layer id used to look up a layer
+   * @param <T>     the generic attribute of a Layer
+   * @return the casted Layer, null if another type
+   */
+  public <T extends Layer> T getLayerAs(@NonNull String layerId) {
+    // noinspection unchecked
+    return (T) nativeMapView.getLayer(layerId);
+  }
+
+  /**
+   * Retrieve all the layers in the style
+   *
+   * @return all the layers in the current style
+   */
+  @NonNull
+  public List<Layer> getLayers() {
+    return nativeMapView.getLayers();
+  }
+
+  /**
+   * Removes the layer. Any references to the layer become invalid and should not be used anymore
+   *
+   * @param layerId the layer to remove
+   * @return the removed layer or null if not found
+   */
+  @Nullable
+  public Layer removeLayer(@NonNull String layerId) {
+    layers.remove(layerId);
+    return nativeMapView.removeLayer(layerId);
+  }
+
+  /**
+   * Removes the layer. The reference is re-usable after this and can be re-added
+   *
+   * @param layer the layer to remove
+   * @return the layer
+   */
+  @Nullable
+  public Layer removeLayer(@NonNull Layer layer) {
+    layers.remove(layer.getId());
+    return nativeMapView.removeLayer(layer);
+  }
+
+  /**
+   * Removes the layer. Any other references to the layer become invalid and should not be used anymore
+   *
+   * @param index the layer index
+   * @return the removed layer or null if not found
+   */
+  @Nullable
+  public Layer removeLayerAt(@IntRange(from = 0) int index) {
+    // TODO what about runtime added sources?
+    return nativeMapView.removeLayerAt(index);
+  }
+
+  //
+  // Image
+  //
+
+  /**
+   * Adds an image to be used in the map's style
+   *
+   * @param name  the name of the image
+   * @param image the pre-multiplied Bitmap
+   */
+  public void addImage(@NonNull String name, @NonNull Bitmap image) {
+    addImage(name, image, false);
+  }
+
+  /**
+   * Adds an image to be used in the map's style
+   *
+   * @param name  the name of the image
+   * @param image the pre-multiplied Bitmap
+   * @param sdf   the flag indicating image is an SDF or template image
+   */
+  public void addImage(@NonNull String name, @NonNull Bitmap image, boolean sdf) {
+    nativeMapView.addImage(name, image, sdf);
+  }
+
+  /**
+   * Adds an images to be used in the map's style
+   */
+  public void addImages(@NonNull HashMap<String, Bitmap> images) {
+    nativeMapView.addImages(images);
+  }
+
+  /**
+   * Removes an image from the map's style
+   *
+   * @param name the name of the image to remove
+   */
+  public void removeImage(@NonNull String name) {
+    nativeMapView.removeImage(name);
+  }
+
+  @Nullable
+  public Bitmap getImage(@NonNull String name) {
+    return nativeMapView.getImage(name);
+  }
+
   //
   // Transition
   //
-
 
   /**
    * <p>
@@ -102,7 +315,21 @@ public class Style {
   }
 
   //
-  // Style constants
+  // Light
+  //
+
+  /**
+   * Get the light source used to change lighting conditions on extruded fill layers.
+   *
+   * @return the global light source
+   */
+  @NonNull
+  public Light getLight() {
+    return nativeMapView.getLight();
+  }
+
+  //
+  // Style URL constants
   //
 
   /**

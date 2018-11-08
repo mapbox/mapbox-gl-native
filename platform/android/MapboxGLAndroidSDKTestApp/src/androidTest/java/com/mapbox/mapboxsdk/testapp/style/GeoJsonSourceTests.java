@@ -51,8 +51,8 @@ public class GeoJsonSourceTests extends BaseActivityTest {
       } catch (IOException exception) {
         Timber.e(exception);
       }
-      mapboxMap.addSource(source);
-      mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
+      mapboxMap.getStyle().addSource(source);
+      mapboxMap.getStyle().addLayer(new CircleLayer("layer", source.getId()));
     });
   }
 
@@ -61,8 +61,8 @@ public class GeoJsonSourceTests extends BaseActivityTest {
     validateTestSetup();
     MapboxMapAction.invoke(mapboxMap, (uiController, mapboxMap) -> {
       GeoJsonSource source = new GeoJsonSource("source", Point.fromLngLat(0d, 0d));
-      mapboxMap.addSource(source);
-      mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
+      mapboxMap.getStyle().addSource(source);
+      mapboxMap.getStyle().addLayer(new CircleLayer("layer", source.getId()));
     });
   }
 
@@ -77,8 +77,8 @@ public class GeoJsonSourceTests extends BaseActivityTest {
       } catch (IOException exception) {
         Timber.e(exception);
       }
-      mapboxMap.addSource(source);
-      mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
+      mapboxMap.getStyle().addSource(source);
+      mapboxMap.getStyle().addLayer(new CircleLayer("layer", source.getId()));
     });
   }
 
@@ -87,8 +87,8 @@ public class GeoJsonSourceTests extends BaseActivityTest {
     validateTestSetup();
     MapboxMapAction.invoke(mapboxMap, (uiController, mapboxMap) -> {
       GeoJsonSource source = new GeoJsonSource("source");
-      mapboxMap.addSource(source);
-      mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
+      mapboxMap.getStyle().addSource(source);
+      mapboxMap.getStyle().addLayer(new CircleLayer("layer", source.getId()));
 
       source.setGeoJson(Point.fromLngLat(0, 0));
       source.setGeoJson(Point.fromLngLat(-25, -25));
@@ -146,9 +146,9 @@ public class GeoJsonSourceTests extends BaseActivityTest {
     validateTestSetup();
     MapboxMapAction.invoke(mapboxMap, (uiController, mapboxMap) -> {
       GeoJsonSource source = new GeoJsonSource("source");
-      mapboxMap.addSource(source);
+      mapboxMap.getStyle().addSource(source);
       Layer layer = new CircleLayer("layer", source.getId());
-      mapboxMap.addLayer(layer);
+      mapboxMap.getStyle().addLayer(layer);
 
       try {
         source.setGeoJson(Feature.fromJson(ResourceUtils.readRawResource(rule.getActivity(), resource)));
@@ -156,8 +156,8 @@ public class GeoJsonSourceTests extends BaseActivityTest {
         Timber.e(exception);
       }
 
-      mapboxMap.removeLayer(layer);
-      mapboxMap.removeSource(source);
+      mapboxMap.getStyle().removeLayer(layer);
+      mapboxMap.getStyle().removeSource(source);
     });
   }
 

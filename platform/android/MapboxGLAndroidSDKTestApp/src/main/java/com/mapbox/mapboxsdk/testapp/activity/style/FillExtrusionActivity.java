@@ -52,9 +52,9 @@ public class FillExtrusionActivity extends AppCompatActivity {
       Polygon domTower = Polygon.fromLngLats(lngLats);
 
       GeoJsonSource source = new GeoJsonSource("extrusion-source", domTower);
-      map.addSource(source);
+      map.getStyle().addSource(source);
 
-      mapboxMap.addLayer(
+      mapboxMap.getStyle().addLayer(
         new FillExtrusionLayer("extrusion-layer", source.getId())
           .withProperties(
             fillExtrusionHeight(40f),
