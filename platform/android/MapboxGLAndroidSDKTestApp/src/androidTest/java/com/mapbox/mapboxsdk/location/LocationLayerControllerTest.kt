@@ -14,7 +14,7 @@ import android.support.test.rule.GrantPermissionRule
 import android.support.test.rule.GrantPermissionRule.grant
 import android.support.test.runner.AndroidJUnit4
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.constants.Style
+import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentConstants.*
 import com.mapbox.mapboxsdk.location.modes.RenderMode
