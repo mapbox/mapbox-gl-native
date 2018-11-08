@@ -507,8 +507,8 @@ jobs:
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
       BUILDTYPE: Debug
       IS_LOCAL_DEVELOPMENT: false
       MBGL_ANDROID_STL: << parameters.stl >>
@@ -569,8 +569,8 @@ jobs:
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
       BUILDTYPE: Release
       IS_LOCAL_DEVELOPMENT: false
     steps:
@@ -653,8 +653,8 @@ jobs:
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
       BUILDTYPE: Debug
       WITH_EGL: 1
     steps:
@@ -785,8 +785,8 @@ jobs:
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
       BUILDTYPE: Debug
       WITH_EGL: 1
       WITH_CXX11ABI: 0
@@ -806,8 +806,8 @@ jobs:
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
       BUILDTYPE: Debug
       WITH_EGL: 1
       WITH_COVERAGE: 1
@@ -1011,8 +1011,8 @@ jobs:
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
       BUILDTYPE: Release
       GTEST_OUTPUT: xml
       LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
@@ -1035,8 +1035,8 @@ jobs:
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
       BUILDTYPE: Release
       WITH_QT_I18N: 1
     steps:
