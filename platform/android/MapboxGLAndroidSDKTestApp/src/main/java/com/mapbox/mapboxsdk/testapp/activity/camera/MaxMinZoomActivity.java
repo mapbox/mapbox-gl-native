@@ -25,7 +25,7 @@ public class MaxMinZoomActivity extends AppCompatActivity implements OnMapReadyC
     @Override
     public boolean onMapClick(@NonNull LatLng point) {
       if (mapboxMap != null) {
-        mapboxMap.setStyle(Style.OUTDOORS, style -> Timber.d("Style Loaded %s", style));
+        mapboxMap.setStyle(Style.OUTDOORS);
       }
       return true;
     }
@@ -39,6 +39,10 @@ public class MaxMinZoomActivity extends AppCompatActivity implements OnMapReadyC
     mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
+
+    mapView.addOnDidFinishLoadingStyleListener(() -> {
+      Timber.d("Style Loaded");
+    });
   }
 
   @Override
