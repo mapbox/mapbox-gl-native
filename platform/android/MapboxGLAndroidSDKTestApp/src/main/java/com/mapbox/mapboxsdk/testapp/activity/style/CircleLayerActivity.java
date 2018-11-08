@@ -79,6 +79,14 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
       initFloatingActionButtons();
       isLoadingStyle = false;
     });
+
+    mapView.addOnDidFinishLoadingStyleListener(new MapView.OnDidFinishLoadingStyleListener() {
+      @Override
+      public void onDidFinishLoadingStyle() {
+        addBusStop();
+        isLoadingStyle = false;
+      }
+    });
   }
 
   private void addBusStopSource() {
@@ -211,10 +219,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
   }
 
   private void loadNewStyle() {
-    mapboxMap.setStyleUrl(getNextStyle(), style -> {
-      addBusStop();
-      isLoadingStyle = false;
-    });
+    mapboxMap.setStyleUrl(getNextStyle());
   }
 
   private void addBusStop() {
