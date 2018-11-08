@@ -1,4 +1,0 @@
-{
-    "core": "Add ability to style symbol layers labels with multiple fonts and text sizes via `format` expression.",
-    "issue": 12624
-}
