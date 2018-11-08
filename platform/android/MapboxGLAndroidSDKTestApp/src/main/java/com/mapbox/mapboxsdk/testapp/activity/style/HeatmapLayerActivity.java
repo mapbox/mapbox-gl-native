@@ -65,7 +65,7 @@ public class HeatmapLayerActivity extends AppCompatActivity {
 
   private void addEarthquakeSource() {
     try {
-      mapboxMap.addSource(new GeoJsonSource(EARTHQUAKE_SOURCE_ID, new URL(EARTHQUAKE_SOURCE_URL)));
+      mapboxMap.getStyle().addSource(new GeoJsonSource(EARTHQUAKE_SOURCE_ID, new URL(EARTHQUAKE_SOURCE_URL)));
     } catch (MalformedURLException malformedUrlException) {
       Timber.e(malformedUrlException, "That's not an url... ");
     }
@@ -130,7 +130,7 @@ public class HeatmapLayerActivity extends AppCompatActivity {
       )
     );
 
-    mapboxMap.addLayerAbove(layer, "waterway-label");
+    mapboxMap.getStyle().addLayerAbove(layer, "waterway-label");
   }
 
   private void addCircleLayer() {
@@ -179,7 +179,7 @@ public class HeatmapLayerActivity extends AppCompatActivity {
       circleStrokeWidth(1.0f)
     );
 
-    mapboxMap.addLayerBelow(circleLayer, HEATMAP_LAYER_ID);
+    mapboxMap.getStyle().addLayerBelow(circleLayer, HEATMAP_LAYER_ID);
   }
 
   @Override

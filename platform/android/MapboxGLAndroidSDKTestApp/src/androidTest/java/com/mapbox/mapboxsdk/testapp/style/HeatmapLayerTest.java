@@ -39,13 +39,13 @@ public class HeatmapLayerTest extends BaseActivityTest {
   private void setupLayer() {
     Timber.i("Retrieving layer");
     invoke(mapboxMap, (uiController, mapboxMap) -> {
-      if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+      if ((layer = mapboxMap.getStyle().getLayerAs("my-layer")) == null) {
         Timber.i("Adding layer");
         layer = new HeatmapLayer("my-layer", "composite");
         layer.setSourceLayer("composite");
-        mapboxMap.addLayer(layer);
+        mapboxMap.getStyle().addLayer(layer);
         // Layer reference is now stale, get new reference
-        layer = mapboxMap.getLayerAs("my-layer");
+        layer = mapboxMap.getStyle().getLayerAs("my-layer");
       }
     });
   }
