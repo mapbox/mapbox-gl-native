@@ -12,6 +12,7 @@ import com.mapbox.mapboxsdk.style.sources.Source;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -326,6 +327,62 @@ public class Style {
   @NonNull
   public Light getLight() {
     return nativeMapView.getLight();
+  }
+
+  //
+  // Builder
+  //
+
+  public static class Builder {
+
+    private String styleUrl;
+    private String styleJson;
+    private List<Source> sources = new ArrayList<>();
+    // TODO allow adding below and at index
+    private List<Layer> layers = new ArrayList<>();
+    private TransitionOptions transitionOptions;
+
+    public Builder withStyleUrl(@StyleUrl String styleUrl) {
+      this.styleUrl = styleUrl;
+      return this;
+    }
+
+    public Builder withStyleJson(String styleJson) {
+      this.styleJson = styleJson;
+      return this;
+    }
+
+    public Builder withSource(Source source) {
+      sources.add(source);
+      return this;
+    }
+
+    public Builder withLayer(Layer layer) {
+      layers.add(layer);
+      return this;
+    }
+
+    public Builder withTransition(TransitionOptions transition) {
+      this.transitionOptions = transition;
+      return this;
+    }
+    
+    Style build(NativeMapView nativeMapView) {
+      Style style = new Style(nativeMapView);
+      for (Source source : sources) {
+        style.addSource(source);
+      }
+
+      for (Layer layer : layers) {
+        style.addLayer(layer);
+      }
+
+      if (transitionOptions != null) {
+        style.setTransition(transitionOptions);
+      }
+      return style;
+    }
+
   }
 
   //
