@@ -7,7 +7,7 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.snapshotter.MapSnapshotter;

@@ -28,7 +28,7 @@ import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.maps.renderer.glsurfaceview.GLSurfaceViewMapRenderer;

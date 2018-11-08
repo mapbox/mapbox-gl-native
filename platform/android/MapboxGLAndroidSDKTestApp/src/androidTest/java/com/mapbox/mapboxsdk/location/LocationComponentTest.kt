@@ -16,7 +16,7 @@ import android.support.test.runner.AndroidJUnit4
 import android.support.v4.content.ContextCompat
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.constants.Style
+import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentConstants.*
 import com.mapbox.mapboxsdk.location.modes.CameraMode

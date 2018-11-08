@@ -24,7 +24,7 @@ import com.mapbox.mapboxsdk.attribution.AttributionLayout;
 import com.mapbox.mapboxsdk.attribution.AttributionMeasure;
 import com.mapbox.mapboxsdk.attribution.AttributionParser;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;

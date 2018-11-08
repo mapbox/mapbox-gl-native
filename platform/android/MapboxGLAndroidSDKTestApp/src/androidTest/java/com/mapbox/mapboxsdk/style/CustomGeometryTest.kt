@@ -4,7 +4,7 @@ import android.support.test.espresso.UiController
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
-import com.mapbox.mapboxsdk.constants.Style
+import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
