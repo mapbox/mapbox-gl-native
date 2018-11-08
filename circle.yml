@@ -668,7 +668,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node-macos-release:
     macos:
-      xcode: "10.0.0"
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -826,7 +826,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-debug:
     macos:
-      xcode: "10.0.0"
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -851,7 +851,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-nightly:
     macos:
-      xcode: "10.0.0"
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -870,7 +870,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-address-nightly:
     macos:
-      xcode: "10.0.0"
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -889,7 +889,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-static-analyzer-nightly:
     macos:
-      xcode: "10.0.0"
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -908,7 +908,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-release-template:
     macos:
-      xcode: "10.0.0"
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -938,7 +938,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-release-tag:
     macos:
-      xcode: "10.0.0"
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -980,7 +980,7 @@ jobs:
 # ------------------------------------------------------------------------------
   macos-debug:
     macos:
-      xcode: "10.0.0"
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
