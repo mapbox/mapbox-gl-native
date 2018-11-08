@@ -58,11 +58,11 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
         new LatLng(46.437, -71.516),
         new LatLng(37.936, -71.516),
         new LatLng(37.936, -80.425));
-    mapboxMap.addSource(new ImageSource(ID_IMAGE_SOURCE, quad, R.drawable.southeast_radar_0));
+    mapboxMap.getStyle().addSource(new ImageSource(ID_IMAGE_SOURCE, quad, R.drawable.southeast_radar_0));
 
     // add layer
     RasterLayer layer = new RasterLayer(ID_IMAGE_LAYER, ID_IMAGE_SOURCE);
-    mapboxMap.addLayer(layer);
+    mapboxMap.getStyle().addLayer(layer);
 
     // loop refresh geojson
     handler = new Handler();
@@ -137,7 +137,7 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
 
     @Override
     public void run() {
-      ((ImageSource) mapboxMap.getSource(ID_IMAGE_SOURCE)).setImage(drawables[drawableIndex++]);
+      ((ImageSource) mapboxMap.getStyle().getSource(ID_IMAGE_SOURCE)).setImage(drawables[drawableIndex++]);
       if (drawableIndex > 3) {
         drawableIndex = 0;
       }

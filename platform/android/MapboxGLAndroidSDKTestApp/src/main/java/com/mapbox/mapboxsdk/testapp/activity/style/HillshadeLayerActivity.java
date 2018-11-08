@@ -33,10 +33,10 @@ public class HillshadeLayerActivity extends AppCompatActivity {
       mapboxMap = map;
 
       RasterDemSource rasterDemSource = new RasterDemSource(SOURCE_ID, SOURCE_URL);
-      mapboxMap.addSource(rasterDemSource);
+      mapboxMap.getStyle().addSource(rasterDemSource);
 
       HillshadeLayer hillshadeLayer = new HillshadeLayer(LAYER_ID, SOURCE_ID);
-      mapboxMap.addLayerBelow(hillshadeLayer, LAYER_BELOW_ID);
+      mapboxMap.getStyle().addLayerBelow(hillshadeLayer, LAYER_BELOW_ID);
     });
   }
 

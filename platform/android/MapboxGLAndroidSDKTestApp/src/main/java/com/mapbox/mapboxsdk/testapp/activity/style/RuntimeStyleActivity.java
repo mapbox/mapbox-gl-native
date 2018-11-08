@@ -206,7 +206,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   }
 
   private void listLayers() {
-    List<Layer> layers = mapboxMap.getLayers();
+    List<Layer> layers = mapboxMap.getStyle().getLayers();
     StringBuilder builder = new StringBuilder("Layers:");
     for (Layer layer : layers) {
       builder.append("\n");
@@ -216,7 +216,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   }
 
   private void listSources() {
-    List<Source> sources = mapboxMap.getSources();
+    List<Source> sources = mapboxMap.getStyle().getSources();
     StringBuilder builder = new StringBuilder("Sources:");
     for (Source source : sources) {
       builder.append("\n");
@@ -228,7 +228,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   private void setLayerInvisible() {
     String[] roadLayers = new String[] {"water"};
     for (String roadLayer : roadLayers) {
-      Layer layer = mapboxMap.getLayer(roadLayer);
+      Layer layer = mapboxMap.getStyle().getLayer(roadLayer);
       if (layer != null) {
         layer.setProperties(visibility(NONE));
       }
@@ -242,7 +242,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       public void onFinish() {
         String[] roadLayers = new String[] {"road-label-small", "road-label-medium", "road-label-large"};
         for (String roadLayer : roadLayers) {
-          Layer layer = mapboxMap.getLayer(roadLayer);
+          Layer layer = mapboxMap.getStyle().getLayer(roadLayer);
           if (layer != null) {
             layer.setProperties(symbolPlacement(SYMBOL_PLACEMENT_POINT));
           }
@@ -252,14 +252,14 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   }
 
   private void setBackgroundOpacity() {
-    Layer background = mapboxMap.getLayer("background");
+    Layer background = mapboxMap.getStyle().getLayer("background");
     if (background != null) {
       background.setProperties(backgroundOpacity(0.2f));
     }
   }
 
   private void setWaterColor() {
-    FillLayer water = mapboxMap.getLayerAs("water");
+    FillLayer water = mapboxMap.getStyle().getLayerAs("water");
     if (water != null) {
       water.setFillColorTransition(new TransitionOptions(7500, 1000));
       water.setProperties(
@@ -273,7 +273,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
   private void removeBuildings() {
     // Zoom to see buildings first
-    mapboxMap.removeLayer("building");
+    mapboxMap.getStyle().removeLayer("building");
   }
 
   private void addParksLayer() {
@@ -289,7 +289,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       return;
     }
 
-    mapboxMap.addSource(source);
+    mapboxMap.getStyle().addSource(source);
 
     FillLayer layer = new FillLayer("parksLayer", "amsterdam-spots");
     layer.setProperties(
@@ -302,14 +302,14 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     // Only show me parks (except westerpark with stroke-width == 3)
     layer.setFilter(all(eq(get("type"), literal("park")), eq(get("stroke-width"), literal(3))));
 
-    mapboxMap.addLayerBelow(layer, "building");
+    mapboxMap.getStyle().addLayerBelow(layer, "building");
     // layer.setPaintProperty(fillColor(Color.RED)); // XXX But not after the object is attached
 
     // Or get the object later and set it. It's all good.
-    mapboxMap.getLayer("parksLayer").setProperties(fillColor(Color.RED));
+    mapboxMap.getStyle().getLayer("parksLayer").setProperties(fillColor(Color.RED));
 
     // You can get a typed layer, if you're sure it's of that type. Use with care
-    layer = mapboxMap.getLayerAs("parksLayer");
+    layer = mapboxMap.getStyle().getLayerAs("parksLayer");
     // And get some properties
     PropertyValue<Boolean> fillAntialias = layer.getFillAntialias();
     Timber.d("Fill anti alias: %s", fillAntialias.getValue());
@@ -339,7 +339,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     }
 
     // Add an empty source
-    mapboxMap.addSource(new GeoJsonSource("dynamic-park-source"));
+    mapboxMap.getStyle().addSource(new GeoJsonSource("dynamic-park-source"));
 
     FillLayer layer = new FillLayer("dynamic-parks-layer", "dynamic-park-source");
     layer.setProperties(
@@ -352,7 +352,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     // Only show me parks
     layer.setFilter(all(eq(get("type"), literal("park"))));
 
-    mapboxMap.addLayer(layer);
+    mapboxMap.getStyle().addLayer(layer);
 
     // Get a good look at it all
     mapboxMap.animateCamera(CameraUpdateFactory.zoomTo(12));
@@ -372,7 +372,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       // change the source
       int park = counter < parks.features().size() - 1 ? counter : 0;
 
-      GeoJsonSource source = mapboxMap.getSourceAs("dynamic-park-source");
+      GeoJsonSource source = mapboxMap.getStyle().getSourceAs("dynamic-park-source");
 
       if (source == null) {
         Timber.e("Source not found");
@@ -392,7 +392,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   private void addTerrainLayer() {
     // Add a source
     Source source = new VectorSource("my-terrain-source", "mapbox://mapbox.mapbox-terrain-v2");
-    mapboxMap.addSource(source);
+    mapboxMap.getStyle().addSource(source);
 
     LineLayer layer = new LineLayer("terrainLayer", "my-terrain-source");
     layer.setSourceLayer("contour");
@@ -404,7 +404,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     );
 
     // adding layers below "road" layers
-    List<Layer> layers = mapboxMap.getLayers();
+    List<Layer> layers = mapboxMap.getStyle().getLayers();
     Layer latestLayer = null;
     Collections.reverse(layers);
     for (Layer currentLayer : layers) {
@@ -420,17 +420,17 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     }
 
     if (latestLayer != null) {
-      mapboxMap.addLayerBelow(layer, latestLayer.getId());
+      mapboxMap.getStyle().addLayerBelow(layer, latestLayer.getId());
     }
 
     // Need to get a fresh handle
-    layer = mapboxMap.getLayerAs("terrainLayer");
+    layer = mapboxMap.getStyle().getLayerAs("terrainLayer");
 
     // Make sure it's also applied after the fact
     layer.setMinZoom(10);
     layer.setMaxZoom(15);
 
-    layer = (LineLayer) mapboxMap.getLayer("terrainLayer");
+    layer = (LineLayer) mapboxMap.getStyle().getLayer("terrainLayer");
     Toast.makeText(this, String.format(
       "Set min/max zoom to %s - %s", layer.getMinZoom(), layer.getMaxZoom()), Toast.LENGTH_SHORT).show();
   }
@@ -438,14 +438,14 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   private void addSatelliteLayer() {
     // Add a source
     Source source = new RasterSource("my-raster-source", "mapbox://mapbox.satellite", 512);
-    mapboxMap.addSource(source);
+    mapboxMap.getStyle().addSource(source);
 
     // Add a layer
-    mapboxMap.addLayer(new RasterLayer("satellite-layer", "my-raster-source"));
+    mapboxMap.getStyle().addLayer(new RasterLayer("satellite-layer", "my-raster-source"));
   }
 
   private void updateWaterColorOnZoom() {
-    FillLayer layer = mapboxMap.getLayerAs("water");
+    FillLayer layer = mapboxMap.getStyle().getLayerAs("water");
     if (layer == null) {
       return;
     }
@@ -474,7 +474,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     tileSet.setMinZoom(0);
     tileSet.setMaxZoom(14);
     Source source = new VectorSource("custom-tile-source", tileSet);
-    mapboxMap.addSource(source);
+    mapboxMap.getStyle().addSource(source);
 
     // Add a layer
     LineLayer lineLayer = new LineLayer("custom-tile-layers", "custom-tile-source");
@@ -486,7 +486,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       lineWidth(2.0f),
       lineColor(Color.GREEN)
     );
-    mapboxMap.addLayer(lineLayer);
+    mapboxMap.getStyle().addLayer(lineLayer);
   }
 
   private void styleFillFilterLayer() {
@@ -501,7 +501,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
       Timber.d("Styling filtered fill layer");
 
-      FillLayer states = (FillLayer) mapboxMap.getLayer("states");
+      FillLayer states = (FillLayer) mapboxMap.getStyle().getLayer("states");
 
       if (states != null) {
         states.setFilter(eq(get("name"), literal("Texas")));
@@ -529,7 +529,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
       Timber.d("Styling filtered line layer");
 
-      LineLayer counties = (LineLayer) mapboxMap.getLayer("counties");
+      LineLayer counties = (LineLayer) mapboxMap.getStyle().getLayer("counties");
 
       if (counties != null) {
         counties.setFilter(eq(get("NAME10"), "Washington"));
@@ -557,7 +557,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
       Timber.d("Styling numeric fill layer");
 
-      FillLayer regions = (FillLayer) mapboxMap.getLayer("regions");
+      FillLayer regions = (FillLayer) mapboxMap.getStyle().getLayer("regions");
 
       if (regions != null) {
         regions.setFilter(all(
@@ -576,10 +576,10 @@ public class RuntimeStyleActivity extends AppCompatActivity {
   }
 
   private void bringWaterToFront() {
-    Layer water = mapboxMap.getLayer("water");
+    Layer water = mapboxMap.getStyle().getLayer("water");
     if (water != null) {
-      mapboxMap.removeLayer(water);
-      mapboxMap.addLayerAt(water, mapboxMap.getLayers().size() - 1);
+      mapboxMap.getStyle().removeLayer(water);
+      mapboxMap.getStyle().addLayerAt(water, mapboxMap.getStyle().getLayers().size() - 1);
     } else {
       Toast.makeText(this, "No water layer in this style", Toast.LENGTH_SHORT).show();
     }

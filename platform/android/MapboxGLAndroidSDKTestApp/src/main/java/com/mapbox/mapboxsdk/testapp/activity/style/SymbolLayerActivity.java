@@ -101,7 +101,7 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
     // Add a sdf image for the makers
     Drawable icLayersDrawable = getResources().getDrawable(R.drawable.ic_layers);
     Bitmap icLayersBitmap = BitmapUtils.getBitmapFromDrawable(icLayersDrawable);
-    mapboxMap.addImage(
+    mapboxMap.getStyle().addImage(
       MARKER_ICON,
       icLayersBitmap,
       true
@@ -112,10 +112,10 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
       Feature.fromGeometry(Point.fromLngLat(4.91638, 52.35673), featureProperties("Marker 1")),
       Feature.fromGeometry(Point.fromLngLat(4.91638, 52.34673), featureProperties("Marker 2"))
     });
-    mapboxMap.addSource(geoJsonSource = new GeoJsonSource(MARKER_SOURCE, markerCollection));
+    mapboxMap.getStyle().addSource(geoJsonSource = new GeoJsonSource(MARKER_SOURCE, markerCollection));
 
     // Add the symbol-layer
-    mapboxMap.addLayer(
+    mapboxMap.getStyle().addLayer(
       new SymbolLayer(MARKER_LAYER, MARKER_SOURCE)
         .withProperties(
           iconImage(MARKER_ICON),
@@ -167,17 +167,17 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
   }
 
   private void toggleTextSize() {
-    SymbolLayer layer = mapboxMap.getLayerAs(MARKER_LAYER);
+    SymbolLayer layer = mapboxMap.getStyle().getLayerAs(MARKER_LAYER);
     layer.setProperties(layer.getTextSize().getValue() > 10 ? textSize(10f) : textSize(20f));
   }
 
   private void toggleTextField() {
-    SymbolLayer layer = mapboxMap.getLayerAs(MARKER_LAYER);
+    SymbolLayer layer = mapboxMap.getStyle().getLayerAs(MARKER_LAYER);
     layer.setProperties("{title}".equals(layer.getTextField().getValue()) ? textField("āA") : textField("{title}"));
   }
 
   private void toggleTextFont() {
-    SymbolLayer layer = mapboxMap.getLayerAs(MARKER_LAYER);
+    SymbolLayer layer = mapboxMap.getStyle().getLayerAs(MARKER_LAYER);
     if (initialFont) {
       layer.setProperties(textFont(new String[] {"DIN Offc Pro Bold", "Arial Unicode MS Bold"}));
     } else {

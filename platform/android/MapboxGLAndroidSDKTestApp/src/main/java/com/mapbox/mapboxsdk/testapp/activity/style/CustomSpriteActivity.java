@@ -58,7 +58,7 @@ public class CustomSpriteActivity extends AppCompatActivity {
           if (point == null) {
             Timber.i("First click -> Car");
             // Add an icon to reference later
-            mapboxMap.addImage(CUSTOM_ICON, BitmapFactory.decodeResource(getResources(), R.drawable.ic_car_top));
+            mapboxMap.getStyle().addImage(CUSTOM_ICON, BitmapFactory.decodeResource(getResources(), R.drawable.ic_car_top));
 
             // Add a source with a geojson point
             point = Point.fromLngLat(13.400972d, 52.519003d);
@@ -66,7 +66,7 @@ public class CustomSpriteActivity extends AppCompatActivity {
               "point",
               FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(point)})
             );
-            mapboxMap.addSource(source);
+            mapboxMap.getStyle().addSource(source);
 
             // Add a symbol layer that references that point source
             layer = new SymbolLayer("layer", "point");
@@ -78,7 +78,7 @@ public class CustomSpriteActivity extends AppCompatActivity {
             );
 
             // lets add a circle below labels!
-            mapboxMap.addLayerBelow(layer, "waterway-label");
+            mapboxMap.getStyle().addLayerBelow(layer, "waterway-label");
 
             fab.setImageResource(R.drawable.ic_directions_car_black);
           } else {

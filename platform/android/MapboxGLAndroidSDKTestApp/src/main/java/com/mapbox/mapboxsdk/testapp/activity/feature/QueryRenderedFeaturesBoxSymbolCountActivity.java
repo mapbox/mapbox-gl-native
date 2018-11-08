@@ -47,18 +47,18 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
 
       // Add a symbol layer (also works with annotations)
       try {
-        mapboxMap.addSource(new GeoJsonSource("symbols-source", ResourceUtils.readRawResource(
+        mapboxMap.getStyle().addSource(new GeoJsonSource("symbols-source", ResourceUtils.readRawResource(
           QueryRenderedFeaturesBoxSymbolCountActivity.this, R.raw.test_points_utrecht)));
       } catch (IOException ioException) {
         Timber.e(ioException, "Could not load geojson");
         return;
       }
-      mapboxMap.addImage(
+      mapboxMap.getStyle().addImage(
         "test-icon",
         BitmapFactory.decodeResource(getResources(),
           R.drawable.mapbox_marker_icon_default)
       );
-      mapboxMap.addLayer(new SymbolLayer("symbols-layer", "symbols-source").withProperties(iconImage("test-icon")));
+      mapboxMap.getStyle().addLayer(new SymbolLayer("symbols-layer", "symbols-source").withProperties(iconImage("test-icon")));
 
       selectionBox.setOnClickListener(view -> {
         // Query
