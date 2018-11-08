@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.http;
 
-import android.support.annotation.Keep;
-import android.support.annotation.Nullable;
+import androidx.annotation.Keep;
+import androidx.annotation.Nullable;
 import com.mapbox.mapboxsdk.Mapbox;
 
 import java.util.concurrent.locks.ReentrantLock;

@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.mapbox.mapboxsdk.http.HttpRequest;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
 import com.mapbox.mapboxsdk.module.http.HttpRequestImpl;

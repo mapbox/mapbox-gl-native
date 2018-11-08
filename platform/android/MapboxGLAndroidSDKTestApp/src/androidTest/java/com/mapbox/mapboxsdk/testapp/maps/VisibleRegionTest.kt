@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.maps
 
 import android.graphics.PointF
-import android.support.test.espresso.UiController
+import androidx.test.espresso.UiController
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory

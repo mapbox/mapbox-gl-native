@@ -1,8 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
 import android.graphics.Color;
-import android.support.test.espresso.UiController;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.espresso.UiController;
+import androidx.test.runner.AndroidJUnit4;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Point;

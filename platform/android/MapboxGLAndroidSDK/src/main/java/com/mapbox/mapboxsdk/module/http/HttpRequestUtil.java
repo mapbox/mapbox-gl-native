@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.module.http;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import okhttp3.OkHttpClient;
 import okio.Buffer;
 

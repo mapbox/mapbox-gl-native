@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
 
-import android.support.test.espresso.UiController;
+import androidx.test.espresso.UiController;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;

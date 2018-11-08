@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.style.sources;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Size;
+import androidx.annotation.NonNull;
+import androidx.annotation.Size;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 

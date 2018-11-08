@@ -1,9 +1,9 @@
 package com.mapbox.mapboxsdk.style.expressions;
 
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.Size;
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;

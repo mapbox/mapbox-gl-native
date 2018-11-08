@@ -2,7 +2,7 @@ package com.mapbox.mapboxsdk.geometry;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Contains the four points defining the four-sided polygon that is visible in a map's camera.

@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.utils;
 
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.lang.ref.WeakReference;

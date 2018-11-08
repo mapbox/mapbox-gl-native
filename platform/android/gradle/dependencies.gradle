@@ -11,7 +11,6 @@ ext {
             mapboxServices  : '4.0.0',
             mapboxTelemetry : '3.5.2',
             mapboxGestures  : '0.3.0',
-            supportLib      : '27.1.1',
             constraintLayout: '1.1.2',
             espresso        : '3.0.2',
             testRunner      : '1.0.2',
@@ -31,27 +30,24 @@ ext {
             mapboxJavaGeoJSON      : "com.mapbox.mapboxsdk:mapbox-sdk-geojson:${versions.mapboxServices}",
             mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxTelemetry}",
             mapboxAndroidGestures  : "com.mapbox.mapboxsdk:mapbox-android-gestures:${versions.mapboxGestures}",
-
-            // for testApp
             mapboxJavaTurf         : "com.mapbox.mapboxsdk:mapbox-sdk-turf:${versions.mapboxServices}",
+
+            appCompat              : "androidx.appcompat:appcompat:1.0.2",
+            fragment               : "androidx.fragment:fragment:1.0.0",
+            recyclerView           : "androidx.recyclerview:recyclerview:1.0.0",
+            material               : "com.google.android.material:material:1.1.0-alpha01",
+            constraintLayout       : "androidx.constraintlayout:constraintlayout:2.0.0-alpha2",
+            annotation             : "androidx.annotation:annotation:1.0.0",
+
+            testRunner             : "androidx.test:runner:1.1.0",
+            testRules              : "androidx.test:rules:1.1.0",
+            espressoCore           : "androidx.test.espresso:espresso-core:3.1.0",
+            espressoIntents        : "androidx.test.espresso:espresso-intents:3.1.0",
+            espressoContrib        : "androidx.test.espresso:espresso-contrib:3.1.0",
 
             junit                  : "junit:junit:${versions.junit}",
             mockito                : "org.mockito:mockito-core:${versions.mockito}",
             robolectric            : "org.robolectric:robolectric:${versions.robolectric}",
-
-            testRunner             : "com.android.support.test:runner:${versions.testRunner}",
-            testRules              : "com.android.support.test:rules:${versions.testRunner}",
-            testEspressoCore       : "com.android.support.test.espresso:espresso-core:${versions.espresso}",
-            testEspressoIntents    : "com.android.support.test.espresso:espresso-intents:${versions.espresso}",
-            testEspressoContrib    : "com.android.support.test.espresso:espresso-contrib:${versions.espresso}",
-
-            supportAnnotations     : "com.android.support:support-annotations:${versions.supportLib}",
-            supportAppcompatV7     : "com.android.support:appcompat-v7:${versions.supportLib}",
-            supportFragmentV4      : "com.android.support:support-fragment:${versions.supportLib}",
-            supportUtilV4          : "com.android.support:support-core-utils:${versions.supportLib}",
-            supportDesign          : "com.android.support:design:${versions.supportLib}",
-            supportRecyclerView    : "com.android.support:recyclerview-v7:${versions.supportLib}",
-            supportConstraintLayout: "com.android.support.constraint:constraint-layout:${versions.constraintLayout}",
 
             gmsLocation            : 'com.google.android.gms:play-services-location:11.0.4',
             timber                 : "com.jakewharton.timber:timber:${versions.timber}",

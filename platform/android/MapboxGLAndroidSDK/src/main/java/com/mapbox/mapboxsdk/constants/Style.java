@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.constants;
 
-import android.support.annotation.StringDef;
+import androidx.annotation.StringDef;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 

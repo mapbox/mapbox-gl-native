@@ -3,8 +3,8 @@ package com.mapbox.mapboxsdk.testapp.utils;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.WorkerThread;
-import android.support.test.espresso.IdlingResource;
+import androidx.annotation.WorkerThread;
+import androidx.test.espresso.IdlingResource;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;

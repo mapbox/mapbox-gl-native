@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.offline;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 

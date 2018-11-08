@@ -3,11 +3,11 @@ package com.mapbox.mapboxsdk.geometry;
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.FloatRange;
-import android.support.annotation.Keep;
+import androidx.annotation.FloatRange;
+import androidx.annotation.Keep;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.mapbox.mapboxsdk.constants.GeometryConstants;
 
 

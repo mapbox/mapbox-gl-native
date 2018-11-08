@@ -1,9 +1,9 @@
 package com.mapbox.mapboxsdk.style.layers;
 
-import android.support.annotation.Keep;
-import android.support.annotation.NonNull;
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;

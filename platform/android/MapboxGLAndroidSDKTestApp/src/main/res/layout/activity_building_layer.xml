@@ -12,7 +12,7 @@
         app:mapbox_cameraZoom="15"
         app:mapbox_styleUrl="@string/mapbox_style_dark"/>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabLightPosition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
         app:backgroundTint="@color/accent"
         app:layout_anchorGravity="top"/>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabLightColor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

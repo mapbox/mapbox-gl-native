@@ -1,10 +1,10 @@
 package com.mapbox.mapboxsdk.style.sources;
 
-import android.support.annotation.Keep;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.Size;
-import android.support.annotation.UiThread;
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.Size;
+import androidx.annotation.UiThread;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.style.expressions.Expression;

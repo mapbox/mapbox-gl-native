@@ -1,8 +1,8 @@
 package com.mapbox.mapboxsdk.maps;
 
 
-import android.support.annotation.NonNull;
-import android.support.v4.util.LongSparseArray;
+import androidx.annotation.NonNull;
+import androidx.collection.LongSparseArray;
 
 import com.mapbox.mapboxsdk.annotations.Annotation;
 

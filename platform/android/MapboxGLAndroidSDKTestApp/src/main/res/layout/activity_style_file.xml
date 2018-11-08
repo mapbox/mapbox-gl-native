@@ -14,7 +14,7 @@
         app:mapbox_cameraZoom="16"
         app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"/>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_style_json"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
         android:src="@drawable/ic_add"
         app:backgroundTint="@android:color/white"/>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@id/fab_file"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

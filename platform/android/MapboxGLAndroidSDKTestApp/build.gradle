@@ -10,7 +10,7 @@ android {
         targetSdkVersion androidVersions.targetSdkVersion
         versionCode 13
         versionName "6.0.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -60,10 +60,10 @@ dependencies {
     implementation(project(':MapboxGLAndroidSDK'))
     implementation(dependenciesList.mapboxJavaTurf)
 
-    implementation dependenciesList.supportAppcompatV7
-    implementation dependenciesList.supportRecyclerView
-    implementation dependenciesList.supportDesign
-    implementation dependenciesList.supportConstraintLayout
+    implementation dependenciesList.appCompat
+    implementation dependenciesList.recyclerView
+    implementation dependenciesList.material
+    implementation dependenciesList.constraintLayout
 
     // implementation dependenciesList.lost
     implementation dependenciesList.gmsLocation
@@ -71,12 +71,12 @@ dependencies {
     debugImplementation dependenciesList.leakCanaryDebug
     releaseImplementation dependenciesList.leakCanaryRelease
 
-    androidTestImplementation dependenciesList.supportAnnotations
+    androidTestImplementation dependenciesList.annotation
     androidTestImplementation dependenciesList.testRunner
     androidTestImplementation dependenciesList.testRules
-    androidTestImplementation dependenciesList.testEspressoCore
-    androidTestImplementation dependenciesList.testEspressoIntents
-    androidTestImplementation dependenciesList.testEspressoContrib
+    androidTestImplementation dependenciesList.espressoCore
+    androidTestImplementation dependenciesList.espressoIntents
+    androidTestImplementation dependenciesList.espressoContrib
 }
 
 apply from: "${rootDir}/gradle/gradle-make.gradle"

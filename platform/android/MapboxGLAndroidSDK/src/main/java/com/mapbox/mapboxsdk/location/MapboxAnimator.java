@@ -2,7 +2,7 @@ package com.mapbox.mapboxsdk.location;
 
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 

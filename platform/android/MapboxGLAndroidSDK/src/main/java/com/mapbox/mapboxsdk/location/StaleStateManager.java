@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.location;
 
 import android.os.Handler;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Class controls the location stale state when the {@link android.location.Location} hasn't

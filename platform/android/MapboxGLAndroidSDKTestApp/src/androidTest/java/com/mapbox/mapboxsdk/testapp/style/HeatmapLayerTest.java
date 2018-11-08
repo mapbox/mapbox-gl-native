@@ -2,8 +2,7 @@
 
 package com.mapbox.mapboxsdk.testapp.style;
 
-import android.graphics.Color;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.runner.AndroidJUnit4;
 
 import timber.log.Timber;
 

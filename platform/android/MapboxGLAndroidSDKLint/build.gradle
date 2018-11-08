@@ -8,7 +8,7 @@ dependencies {
     compileOnly dependenciesList.lint
     compileOnly dependenciesList.lintApi
     compileOnly dependenciesList.lintChecks
-    compileOnly dependenciesList.supportAnnotations
+    compileOnly 'androidx.annotation:annotation:1.0.0'
 
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.robolectric

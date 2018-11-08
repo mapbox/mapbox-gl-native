@@ -1,11 +1,11 @@
 package com.mapbox.mapboxsdk.testapp.offline
 
 import android.content.Context
-import android.support.test.espresso.Espresso
-import android.support.test.espresso.IdlingRegistry
-import android.support.test.espresso.UiController
-import android.support.test.espresso.idling.CountingIdlingResource
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.UiController
+import androidx.test.espresso.idling.CountingIdlingResource
+import androidx.test.runner.AndroidJUnit4
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion

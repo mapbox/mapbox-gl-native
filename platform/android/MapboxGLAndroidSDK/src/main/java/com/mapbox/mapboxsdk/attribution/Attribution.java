@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.attribution;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 public class Attribution {
 

@@ -10,9 +10,9 @@ dependencies {
     api dependenciesList.mapboxJavaGeoJSON
     api dependenciesList.mapboxAndroidGestures
     implementation dependenciesList.mapboxJavaTurf
-    implementation dependenciesList.supportAppcompatV7
-    implementation dependenciesList.supportAnnotations
-    implementation dependenciesList.supportFragmentV4
+    implementation dependenciesList.appCompat
+    implementation dependenciesList.annotation
+    implementation dependenciesList.fragment
     implementation dependenciesList.okhttp3
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito

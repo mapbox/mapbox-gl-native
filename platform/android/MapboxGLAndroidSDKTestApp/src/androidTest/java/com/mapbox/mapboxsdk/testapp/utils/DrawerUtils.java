@@ -1,17 +1,17 @@
 package com.mapbox.mapboxsdk.testapp.utils;
 
-import android.support.annotation.StringRes;
-import android.support.test.espresso.Espresso;
-import android.support.test.espresso.action.ViewActions;
-import android.support.test.espresso.matcher.ViewMatchers;
+import androidx.annotation.StringRes;
+import androidx.test.espresso.Espresso;
+import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.matcher.ViewMatchers;
 
 import com.mapbox.mapboxsdk.testapp.R;
 
 import org.hamcrest.Matchers;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 
 public class DrawerUtils {
 
