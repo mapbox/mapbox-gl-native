@@ -2,6 +2,10 @@
 
 ## 0.12.0 - November 8, 2018
 
+* Renamed `-[MGLOfflineStorage putResourceWithUrl:data:modified:expires:etag:mustRevalidate:]` to `-[MGLOfflineStorage preloadData:forURL:modificationDate:expirationDate:eTag:mustRevalidate:]`. ([#13318](https://github.com/mapbox/mapbox-gl-native/pull/13318))
+
+## master
+
 ### Styles and rendering
 
 * `MGLSymbolStyleLayer.text` can now be set to rich text with varying fonts and text sizes. ([#12624](https://github.com/mapbox/mapbox-gl-native/pull/12624))

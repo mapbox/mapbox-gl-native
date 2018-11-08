@@ -395,12 +395,13 @@
     
 }
 
--(void) testPutResourceForURL {
+- (void)testPutResourceForURL {
     NSURL *styleURL = [NSURL URLWithString:@"https://api.mapbox.com/some/thing"];
     
     MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
     std::string testData("test data");
-    [os putResourceWithUrl:styleURL data:[NSData dataWithBytes:testData.c_str() length:testData.length()] modified:nil expires:nil etag:nil mustRevalidate:NO];
+    NSData *data = [NSData dataWithBytes:testData.c_str() length:testData.length()];
+    [os preloadData:data forURL:styleURL modificationDate:nil expirationDate:nil eTag:nil mustRevalidate:NO];
     
     auto fs = os.mbglFileSource;
     const mbgl::Resource resource { mbgl::Resource::Unknown, "https://api.mapbox.com/some/thing" };
@@ -420,14 +421,15 @@
     CFRunLoopRun();
 }
 
--(void) testPutResourceForURLWithTimestamps {
+- (void)testPutResourceForURLWithTimestamps {
     NSURL *styleURL = [NSURL URLWithString:@"https://api.mapbox.com/some/thing"];
     
     MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
     std::string testData("test data");
-    NSDate* now = [NSDate date];
-    NSDate* future = [now dateByAddingTimeInterval:600];
-    [os putResourceWithUrl:styleURL data:[NSData dataWithBytes:testData.c_str() length:testData.length()] modified:now expires:future etag:@"some etag" mustRevalidate:YES];
+    NSDate *now = [NSDate date];
+    NSDate *future = [now dateByAddingTimeInterval:600];
+    NSData *data = [NSData dataWithBytes:testData.c_str() length:testData.length()];
+    [os preloadData:data forURL:styleURL modificationDate:now expirationDate:future eTag:@"some etag" mustRevalidate:YES];
     
     auto fs = os.mbglFileSource;
     const mbgl::Resource resource { mbgl::Resource::Unknown, "https://api.mapbox.com/some/thing" };

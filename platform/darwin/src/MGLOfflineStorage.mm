@@ -490,14 +490,14 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     return attributes.fileSize;
 }
 
--(void)putResourceWithUrl:(NSURL *)url data:(NSData *)data modified:(NSDate * _Nullable)modified expires:(NSDate * _Nullable)expires etag:(NSString * _Nullable)etag mustRevalidate:(BOOL)mustRevalidate {
-    mbgl::Resource resource(mbgl::Resource::Kind::Unknown, [[url absoluteString] UTF8String]);
+- (void)preloadData:(NSData *)data forURL:(NSURL *)url modificationDate:(nullable NSDate *)modified expirationDate:(nullable NSDate *)expires eTag:(nullable NSString *)eTag mustRevalidate:(BOOL)mustRevalidate {
+    mbgl::Resource resource(mbgl::Resource::Kind::Unknown, url.absoluteString.UTF8String);
     mbgl::Response response;
     response.data = std::make_shared<std::string>(static_cast<const char*>(data.bytes), data.length);
     response.mustRevalidate = mustRevalidate;
     
-    if (etag) {
-        response.etag = std::string([etag UTF8String]);
+    if (eTag) {
+        response.etag = std::string(eTag.UTF8String);
     }
     
     if (modified) {
@@ -511,5 +511,8 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     _mbglFileSource->put(resource, response);
 }
 
+- (void)putResourceWithUrl:(NSURL *)url data:(NSData *)data modified:(nullable NSDate *)modified expires:(nullable NSDate *)expires etag:(nullable NSString *)etag mustRevalidate:(BOOL)mustRevalidate {
+    [self preloadData:data forURL:url modificationDate:modified expirationDate:expires eTag:etag mustRevalidate:mustRevalidate];
+}
 
 @end
