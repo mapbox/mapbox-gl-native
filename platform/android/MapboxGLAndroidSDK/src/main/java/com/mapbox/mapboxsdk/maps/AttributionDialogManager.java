@@ -180,7 +180,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
 
       List<String> attributions = new ArrayList<>();
       String attribution;
-      for (Source source : mapboxMap.getSources()) {
+      for (Source source : mapboxMap.getStyle().getSources()) {
         attribution = source.getAttribution();
         if (!attribution.isEmpty()) {
           attributions.add(source.getAttribution());

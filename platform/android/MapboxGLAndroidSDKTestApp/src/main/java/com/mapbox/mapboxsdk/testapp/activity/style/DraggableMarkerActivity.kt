@@ -67,10 +67,12 @@ class DraggableMarkerActivity : AppCompatActivity() {
     mapView.getMapAsync { mapboxMap ->
       this.mapboxMap = mapboxMap
 
+      val style = mapboxMap.style
+
       // Setting up markers icon, source and layer
-      mapboxMap.addImage(markerImageId, IconFactory.getInstance(this).defaultMarker().bitmap)
-      mapboxMap.addSource(source)
-      mapboxMap.addLayer(layer)
+      mapboxMap.getStyle().addImage(markerImageId, IconFactory.getInstance(this).defaultMarker().bitmap)
+      style.addSource(source)
+      style.addLayer(layer)
 
       // Add initial markers
       addMarker(LatLng(52.407210, 16.924324))

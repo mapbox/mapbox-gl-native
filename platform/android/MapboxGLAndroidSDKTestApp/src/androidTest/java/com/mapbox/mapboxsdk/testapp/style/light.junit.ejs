@@ -120,7 +120,7 @@ public class LightTest extends BaseActivityTest {
           fillExtrusionBase(Expression.get("min_height")),
           fillExtrusionOpacity(0.6f)
         );
-        mapboxMap.addLayer(fillExtrusionLayer);
+        mapboxMap.getStyle().addLayer(fillExtrusionLayer);
       }
     });
   }

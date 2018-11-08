@@ -13,6 +13,7 @@ import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -62,7 +63,7 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
         Feature feature = featureList.get(0);
         boolean selectedNow = feature.getBooleanProperty(KEY_PROPERTY_SELECTED);
         isSelected = !selectedNow;
-        updateSource();
+        updateSource(mapboxMap.getStyle());
       } else {
         Timber.e("No features found");
       }
@@ -79,19 +80,20 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      updateSource();
-      addLayer();
+      Style style = map.getStyle();
+      updateSource(style);
+      addLayer(style);
       map.addOnMapClickListener(mapClickListener);
     });
   }
 
-  private void updateSource() {
+  private void updateSource(Style style) {
     FeatureCollection featureCollection = createFeatureCollection();
     if (source != null) {
       source.setGeoJson(featureCollection);
     } else {
       source = new GeoJsonSource(SOURCE_ID, featureCollection);
-      mapboxMap.addSource(source);
+      style.addSource(source);
     }
   }
 
@@ -113,7 +115,7 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
     return FeatureCollection.fromFeatures(new Feature[] {feature});
   }
 
-  private void addLayer() {
+  private void addLayer(Style style) {
     layer = new SymbolLayer(LAYER_ID, SOURCE_ID);
     layer.setProperties(
       iconImage(
@@ -129,7 +131,7 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
       ),
       iconAllowOverlap(true)
     );
-    mapboxMap.addLayer(layer);
+    style.addLayer(layer);
   }
 
   @Override
@@ -143,7 +145,7 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
     if (mapboxMap != null) {
       if (item.getItemId() == R.id.menu_action_change_location) {
         isInitialPosition = !isInitialPosition;
-        updateSource();
+        updateSource(mapboxMap.getStyle());
       } else if (item.getItemId() == R.id.menu_action_toggle_source) {
         toggleSymbolLayerVisibility();
       }

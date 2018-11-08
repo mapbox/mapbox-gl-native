@@ -48,14 +48,14 @@ public class QuerySourceFeaturesActivity extends AppCompatActivity {
           Feature.fromGeometry(Point.fromLngLat(17.3, 51), properties),
           Feature.fromGeometry(Point.fromLngLat(17.4, 51), properties),
         }));
-      mapboxMap.addSource(source);
+      mapboxMap.getStyle().addSource(source);
 
       Expression visible = eq(get("key1"), literal("value1"));
       Expression invisible = neq(get("key1"), literal("value1"));
 
       CircleLayer layer = new CircleLayer("test-layer", source.getId())
         .withFilter(visible);
-      mapboxMap.addLayer(layer);
+      mapboxMap.getStyle().addLayer(layer);
 
       // Add a click listener
       mapboxMap.addOnMapClickListener(point -> {

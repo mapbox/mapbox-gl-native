@@ -119,11 +119,11 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     if (item.getItemId() == R.id.menu_action_icon_overlap) {
-      SymbolLayer layer = mapboxMap.getLayerAs(LAYER_ID);
+      SymbolLayer layer = mapboxMap.getStyle().getLayerAs(LAYER_ID);
       layer.setProperties(iconAllowOverlap(!layer.getIconAllowOverlap().getValue()));
       return true;
     } else if (item.getItemId() == R.id.menu_action_filter) {
-      SymbolLayer layer = mapboxMap.getLayerAs(LAYER_ID);
+      SymbolLayer layer = mapboxMap.getStyle().getLayerAs(LAYER_ID);
       layer.setFilter(eq(get(FEATURE_RANK), literal(1)));
       Timber.e("Filter that was set: %s", layer.getFilter());
       return true;
@@ -286,10 +286,10 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
 
     // add a geojson source to the map
     Source source = new GeoJsonSource(SOURCE_ID, featureCollection);
-    mapboxMap.addSource(source);
+    mapboxMap.getStyle().addSource(source);
 
     // add symbol layer
-    mapboxMap.addLayer(symbolLayer);
+    mapboxMap.getStyle().addLayer(symbolLayer);
 
     // get expressions
     Expression iconImageExpressionResult = symbolLayer.getIconImage().getExpression();
@@ -350,7 +350,7 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
     @Override
     protected void onPostExecute(HashMap<String, Bitmap> bitmapHashMap) {
       super.onPostExecute(bitmapHashMap);
-      mapboxMap.addImages(bitmapHashMap);
+      mapboxMap.getStyle().addImages(bitmapHashMap);
     }
   }
 }

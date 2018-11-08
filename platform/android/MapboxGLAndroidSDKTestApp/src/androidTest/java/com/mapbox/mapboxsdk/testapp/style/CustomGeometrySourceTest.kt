@@ -39,9 +39,9 @@ class CustomGeometrySourceTest : BaseActivityTest() {
   fun threadsShutdownWhenSourceRemovedTest() {
     validateTestSetup()
     invoke(mapboxMap) { uiController, mapboxMap ->
-      mapboxMap.removeLayer(ID_GRID_LAYER)
+      mapboxMap.getStyle().removeLayer(ID_GRID_LAYER)
       uiController.loopMainThreadForAtLeast(3000)
-      mapboxMap.removeSource(ID_GRID_SOURCE)
+      mapboxMap.getStyle().removeSource(ID_GRID_SOURCE)
       uiController.loopMainThreadForAtLeast(1000)
       Assert.assertTrue("There should be no threads running when the source is removed.",
         Thread.getAllStackTraces().keys.filter {
@@ -55,12 +55,12 @@ class CustomGeometrySourceTest : BaseActivityTest() {
   fun threadsRestartedWhenSourceReAddedTest() {
     validateTestSetup()
     invoke(mapboxMap) { uiController, mapboxMap ->
-      mapboxMap.removeLayer((rule.activity as GridSourceActivity).layer)
+      mapboxMap.getStyle().removeLayer((rule.activity as GridSourceActivity).layer)
       uiController.loopMainThreadForAtLeast(3000)
-      mapboxMap.removeSource(ID_GRID_SOURCE)
+      mapboxMap.getStyle().removeSource(ID_GRID_SOURCE)
       uiController.loopMainThreadForAtLeast(1000)
-      mapboxMap.addSource((rule.activity as GridSourceActivity).source)
-      mapboxMap.addLayer((rule.activity as GridSourceActivity).layer)
+      mapboxMap.getStyle().addSource((rule.activity as GridSourceActivity).source)
+      mapboxMap.getStyle().addLayer((rule.activity as GridSourceActivity).layer)
       uiController.loopMainThreadForAtLeast(1000)
       Assert.assertTrue("Threads should be restarted when the source is re-added to the map.",
         Thread.getAllStackTraces().keys.filter {

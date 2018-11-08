@@ -99,7 +99,7 @@ class MapboxTestingUtils {
 
 fun MapboxMap.addImageFromDrawable(string: String, drawable: Drawable) {
   val bitmapFromDrawable = getBitmapFromDrawable(drawable)
-  this.addImage(string, bitmapFromDrawable)
+  this.style.addImage(string, bitmapFromDrawable)
 }
 
 private fun getBitmapFromDrawable(drawable: Drawable): Bitmap {
