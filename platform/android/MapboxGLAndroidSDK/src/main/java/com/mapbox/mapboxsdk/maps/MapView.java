@@ -169,7 +169,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
     // MapboxMap
     mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, proj, registerTouchListener,
-      annotationManager, cameraChangeDispatcher, mapChangeReceiver);
+      annotationManager, cameraChangeDispatcher);
 
     // user input
     mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings,

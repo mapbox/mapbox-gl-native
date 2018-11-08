@@ -6,7 +6,6 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.annotation.FloatRange;
-import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Size;
@@ -21,7 +20,6 @@ import com.mapbox.android.gestures.ShoveGestureDetector;
 import com.mapbox.android.gestures.StandardScaleGestureDetector;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
-import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
@@ -34,17 +32,12 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
-import com.mapbox.mapboxsdk.style.layers.Layer;
-import com.mapbox.mapboxsdk.style.light.Light;
-import com.mapbox.mapboxsdk.style.sources.Source;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -68,7 +61,6 @@ public final class MapboxMap {
   private final Transform transform;
   private final AnnotationManager annotationManager;
   private final CameraChangeDispatcher cameraChangeDispatcher;
-  private final MapChangeReceiver mapChangeReceiver;
 
   private final OnGesturesManagerInteractionListener onGesturesManagerInteractionListener;
 
@@ -80,7 +72,7 @@ public final class MapboxMap {
 
   MapboxMap(NativeMapView map, Transform transform, UiSettings ui, Projection projection,
             OnGesturesManagerInteractionListener listener, AnnotationManager annotations,
-            CameraChangeDispatcher cameraChangeDispatcher, MapChangeReceiver mapChangeReceiver) {
+            CameraChangeDispatcher cameraChangeDispatcher) {
     this.nativeMapView = map;
     this.style = new Style(nativeMapView);
     this.uiSettings = ui;
@@ -89,7 +81,6 @@ public final class MapboxMap {
     this.transform = transform;
     this.onGesturesManagerInteractionListener = listener;
     this.cameraChangeDispatcher = cameraChangeDispatcher;
-    this.mapChangeReceiver = mapChangeReceiver;
   }
 
   void initialise(@NonNull Context context, @NonNull MapboxMapOptions options) {
@@ -709,7 +700,7 @@ public final class MapboxMap {
    * <p>
    * This method is asynchronous and will return before the style finishes loading.
    * If you wish to wait for the map to finish loading, listen to the {@link MapView.OnDidFinishLoadingStyleListener}
-   * callback or use the {@link #setStyleUrl(String, OnStyleLoadedListener)} method instead.
+   * callback.
    * </p>
    * If the style fails to load or an invalid style URL is set, the map view will become blank.
    * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
@@ -719,47 +710,6 @@ public final class MapboxMap {
    * @see Style
    */
   public void setStyleUrl(@NonNull String url) {
-    setStyleUrl(url, null);
-  }
-
-  /**
-   * <p>
-   * Loads a new map style asynchronous from the specified URL.
-   * </p>
-   * {@code url} can take the following forms:
-   * <ul>
-   * <li>{@code Style.*}: load one of the bundled styles in {@link Style}.</li>
-   * <li>{@code mapbox://styles/<user>/<style>}:
-   * loads the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
-   * {@code user} is your username. {@code style} is the ID of your custom
-   * style created in <a href="https://www.mapbox.com/studio">Mapbox Studio</a>.</li>
-   * <li>{@code http://...} or {@code https://...}:
-   * loads the style over the Internet from any web server.</li>
-   * <li>{@code asset://...}:
-   * loads the style from the APK {@code assets/} directory.
-   * This is used to load a style bundled with your app.</li>
-   * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
-   * </ul>
-   * <p>
-   * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
-   * will be triggered.
-   * <p>
-   *
-   * @param url      The URL of the map style
-   * @param callback The callback that is invoked when the style has loaded.
-   * @see Style
-   */
-  public void setStyleUrl(@NonNull final String url, @Nullable final OnStyleLoadedListener callback) {
-    if (callback != null) {
-      mapChangeReceiver.addOnDidFinishLoadingStyleListener(new MapView.OnDidFinishLoadingStyleListener() {
-        @Override
-        public void onDidFinishLoadingStyle() {
-          callback.onStyleLoaded(url);
-          mapChangeReceiver.removeOnDidFinishLoadingStyleListener(this);
-        }
-      });
-    }
     nativeMapView.setStyleUrl(url);
   }
 
@@ -770,7 +720,7 @@ public final class MapboxMap {
    * <p>
    * This method is asynchronous and will return before the style finishes loading.
    * If you wish to wait for the map to finish loading, listen to the {@link MapView.OnDidFinishLoadingStyleListener}
-   * callback or use the {@link #setStyle(String, OnStyleLoadedListener)} method instead.
+   * callback.
    * </p>
    * If the style fails to load or an invalid style URL is set, the map view will become blank.
    * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
@@ -784,22 +734,6 @@ public final class MapboxMap {
   }
 
   /**
-   * <p>
-   * Loads a new map style from the specified bundled style.
-   * </p>
-   * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
-   * will be triggered.
-   *
-   * @param style    The bundled style.
-   * @param callback The callback to be invoked when the style has finished loading
-   * @see Style
-   */
-  public void setStyle(@NonNull @Style.StyleUrl String style, @Nullable OnStyleLoadedListener callback) {
-    setStyleUrl(style, callback);
-  }
-
-  /**
    * Loads a new map style from MapboxMapOptions if available.
    *
    * @param options the object containing the style url
@@ -807,7 +741,7 @@ public final class MapboxMap {
   private void setStyleUrl(@NonNull MapboxMapOptions options) {
     String style = options.getStyleUrl();
     if (!TextUtils.isEmpty(style)) {
-      setStyleUrl(style, null);
+      setStyleUrl(style);
     }
   }
 
@@ -2183,18 +2117,6 @@ public final class MapboxMap {
      * @param snapshot the snapshot bitmap
      */
     void onSnapshotReady(@NonNull Bitmap snapshot);
-  }
-
-  /**
-   * Interface definition for a callback to be invoked when the style has finished loading.
-   */
-  public interface OnStyleLoadedListener {
-    /**
-     * Invoked when the style has finished loading
-     *
-     * @param style the style that has been loaded
-     */
-    void onStyleLoaded(@NonNull String style);
   }
 
   //

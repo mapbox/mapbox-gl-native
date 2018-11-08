@@ -152,6 +152,8 @@ public class TextureViewDebugModeActivity extends AppCompatActivity implements O
   }
 
   private void setupStyleChangeView() {
+    mapView.addOnDidFinishLoadingStyleListener(() -> Timber.d("Style loaded"));
+
     FloatingActionButton fabStyles = findViewById(R.id.fabStyles);
     fabStyles.setOnClickListener(view -> {
       if (mapboxMap != null) {
@@ -159,7 +161,7 @@ public class TextureViewDebugModeActivity extends AppCompatActivity implements O
         if (currentStyleIndex == STYLES.length) {
           currentStyleIndex = 0;
         }
-        mapboxMap.setStyleUrl(STYLES[currentStyleIndex], style -> Timber.d("Style loaded %s", style));
+        mapboxMap.setStyleUrl(STYLES[currentStyleIndex]);
       }
     });
   }
