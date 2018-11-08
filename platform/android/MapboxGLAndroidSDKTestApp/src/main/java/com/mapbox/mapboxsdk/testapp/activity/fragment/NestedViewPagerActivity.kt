@@ -14,9 +14,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.mapbox.mapboxsdk.camera.CameraPosition
-import com.mapbox.mapboxsdk.constants.Style
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions
+import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.maps.SupportMapFragment
 import com.mapbox.mapboxsdk.testapp.R
 import kotlinx.android.synthetic.main.activity_recyclerview.*

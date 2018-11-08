@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -51,22 +52,27 @@ public class RealTimeGeoJsonActivity extends AppCompatActivity implements OnMapR
   public void onMapReady(@NonNull final MapboxMap map) {
     mapboxMap = map;
 
-    // add source
-    try {
-      mapboxMap.getStyle().addSource(new GeoJsonSource(ID_GEOJSON_SOURCE, new URL(URL_GEOJSON_SOURCE)));
-    } catch (MalformedURLException malformedUrlException) {
-      Timber.e(malformedUrlException, "Invalid URL");
-    }
+    mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
+      @Override
+      public void onStyleLoaded(Style style) {
+        // add source
+        try {
+          style.addSource(new GeoJsonSource(ID_GEOJSON_SOURCE, new URL(URL_GEOJSON_SOURCE)));
+        } catch (MalformedURLException malformedUrlException) {
+          Timber.e(malformedUrlException, "Invalid URL");
+        }
 
-    // add layer
-    SymbolLayer layer = new SymbolLayer(ID_GEOJSON_LAYER, ID_GEOJSON_SOURCE);
-    layer.setProperties(iconImage("rocket-15"));
-    mapboxMap.getStyle().addLayer(layer);
+        // add layer
+        SymbolLayer layer = new SymbolLayer(ID_GEOJSON_LAYER, ID_GEOJSON_SOURCE);
+        layer.setProperties(iconImage("rocket-15"));
+        style.addLayer(layer);
 
-    // loop refresh geojson
-    handler = new Handler();
-    runnable = new RefreshGeoJsonRunnable(mapboxMap, handler);
-    handler.postDelayed(runnable, 2000);
+        // loop refresh geojson
+        handler = new Handler();
+        runnable = new RefreshGeoJsonRunnable(mapboxMap, handler);
+        handler.postDelayed(runnable, 2000);
+      }
+    });
   }
 
   @Override

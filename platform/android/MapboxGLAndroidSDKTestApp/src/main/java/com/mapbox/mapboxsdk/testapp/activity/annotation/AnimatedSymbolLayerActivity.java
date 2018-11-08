@@ -72,14 +72,15 @@ public class AnimatedSymbolLayerActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_animated_marker);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       this.mapboxMap = map;
-      this.style = mapboxMap.getStyle();
-      setupCars();
-      animateRandomRoutes();
-      animateTaxi();
+      map.setStyle(Style.MAPBOX_STREETS, style -> {
+        setupCars();
+        animateRandomRoutes();
+        animateTaxi();
+      });
     });
   }
 

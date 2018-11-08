@@ -41,7 +41,7 @@ public class SnapshotActivity extends AppCompatActivity implements OnMapReadyCal
   @Override
   public void onMapReady(@NonNull MapboxMap map) {
     mapboxMap = map;
-    mapboxMap.setStyleUrl(Style.OUTDOORS);
+    mapboxMap.setStyle(new Style.Builder().fromUrl(Style.OUTDOORS));
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
     if (fab != null) {
       fab.setColorFilter(ContextCompat.getColor(SnapshotActivity.this, R.color.primary));

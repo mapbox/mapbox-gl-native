@@ -12,6 +12,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import timber.log.Timber;
@@ -65,15 +66,14 @@ public class CameraAnimationTypeActivity extends AppCompatActivity implements On
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_camera_animation_types);
     mapView = findViewById(R.id.mapView);
-    if (mapView != null) {
-      mapView.onCreate(savedInstanceState);
-      mapView.getMapAsync(this);
-    }
+    mapView.onCreate(savedInstanceState);
+    mapView.getMapAsync(this);
   }
 
   @Override
   public void onMapReady(@NonNull MapboxMap map) {
     mapboxMap = map;
+    mapboxMap.setStyle(new Style.Builder().fromUrl(Style.MAPBOX_STREETS));
     mapboxMap.getUiSettings().setAttributionEnabled(false);
     mapboxMap.getUiSettings().setLogoEnabled(false);
     mapboxMap.addOnCameraIdleListener(cameraIdleListener);
