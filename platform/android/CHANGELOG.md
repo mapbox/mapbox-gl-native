@@ -2,7 +2,7 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
-## 6.6.6 - November 8, 2018
+## 6.6.7 - November 9, 2018
  - Telemetry v3.5.4 [#13330](https://github.com/mapbox/mapbox-gl-native/pull/13330)
 
 ## 6.7.0 - November 7, 2018
