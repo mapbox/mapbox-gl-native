@@ -2,6 +2,16 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.6.6 - November 8, 2018
+ - Telemetry v3.5.4 [#13330](https://github.com/mapbox/mapbox-gl-native/pull/13330)
+
+## 6.7.0 - November 7, 2018
+ - Handle null getMapAsync invocations, deliver onMapReady only once [#13301](https://github.com/mapbox/mapbox-gl-native/pull/13301)
+ - Verify if `text-field` is not null before performing compatibility operations [#13294](https://github.com/mapbox/mapbox-gl-native/pull/13294)
+ - Log Java exception and fail silently instead of throwing a native exception in the map state callbacks[#13294](https://github.com/mapbox/mapbox-gl-native/pull/13294)
+ - Reintroduce OnMapChange invocation [#13289](https://github.com/mapbox/mapbox-gl-native/pull/13289)
+ - Null-check nativeMapView in case it's destroyed [#13281](https://github.com/mapbox/mapbox-gl-native/pull/13281)
+
 ## 6.6.5 - November 2, 2018
  - Telemetry v3.5.2 [#13258](https://github.com/mapbox/mapbox-gl-native/pull/13258)
 
