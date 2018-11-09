@@ -5,7 +5,7 @@ package com.mapbox.mapboxsdk.style.layers;
 import android.support.annotation.ColorInt;
 
 import com.mapbox.mapboxsdk.style.expressions.Expression;
-import com.mapbox.mapboxsdk.utils.ColorUtils;
+import static com.mapbox.mapboxsdk.utils.ColorUtils.colorToRgbaString;
 
 /**
  * Constructs paint/layout properties for Layers
@@ -2444,33 +2444,4 @@ public class PropertyFactory {
     return new LayoutPropertyValue<>("text-optional", value);
   }
 
-  /**
-   * Converts Android color int to "rbga(r, g, b, a)" String equivalent.
-   * <p>
-   * Alpha value will be converted from 0-255 range to 0-1.
-   * </p>
-   *
-   * @param color Android color int
-   * @return String rgba color
-   * @deprecated use {@link com.mapbox.mapboxsdk.utils.ColorUtils#colorToRgbaString(int)} instead
-   */
-  @Deprecated
-  public static String colorToRgbaString(@ColorInt int color) {
-    return ColorUtils.colorToRgbaString(color);
-  }
-
-  /**
-   * Converts Android color int to rgba float array.
-   * <p>
-   * Alpha value will be converted from 0-255 range to 0-1.
-   * </p>
-   *
-   * @param color Android color int
-   * @return int rgba array
-   * @deprecated use {@link com.mapbox.mapboxsdk.utils.ColorUtils#colorToRgbaArray(int)} instead
-   */
-  @Deprecated
-  public static float[] colorToRgbaArray(@ColorInt int color) {
-    return ColorUtils.colorToRgbaArray(color);
-  }
 }

@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.mapbox.mapboxsdk.utils.ColorUtils.colorToRgbaArray;
+
 /**
  * The value for any layout property, paint property, or filter may be specified as an expression.
  * An expression defines a formula for computing the value of the property using the operators described below.
@@ -220,7 +222,7 @@ public class Expression {
    * @return the color expression
    */
   public static Expression color(@ColorInt int color) {
-    float[] rgba = PropertyFactory.colorToRgbaArray(color);
+    float[] rgba = colorToRgbaArray(color);
     return rgba(rgba[0], rgba[1], rgba[2], rgba[3]);
   }
 

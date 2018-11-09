@@ -2,8 +2,8 @@ package com.mapbox.mapboxsdk.style.expressions;
 
 import android.graphics.Color;
 
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.PropertyValue;
+import com.mapbox.mapboxsdk.utils.ColorUtils;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -147,7 +147,7 @@ public class ExpressionTest {
   @Test
   public void testToRgba() throws Exception {
     Object[] expected = new Object[] {"to-rgba", new Object[] {"to-color", "rgba(255, 0, 0, 1)"}};
-    Object[] actual = toRgba(toColor(literal(PropertyFactory.colorToRgbaString(Color.RED)))).toArray();
+    Object[] actual = toRgba(toColor(literal(ColorUtils.colorToRgbaString(Color.RED)))).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -1282,7 +1282,7 @@ public class ExpressionTest {
       literal(5f), literal("rgba(0, 0, 0, 1)"),
       literal(10.5f), literal("rgb(255, 0, 0)"),
       literal(15), color(Color.GREEN),
-      literal(20), literal(PropertyFactory.colorToRgbaString(Color.BLUE)));
+      literal(20), literal(ColorUtils.colorToRgbaString(Color.BLUE)));
     assertEquals("expressions should match", expected, raw(expected.toString()));
   }
 
@@ -1312,7 +1312,7 @@ public class ExpressionTest {
 
   @Test
   public void testAlphaValueInStringConversion() {
-    String color = PropertyFactory.colorToRgbaString(Color.parseColor("#41FF0000")).split(" ")[3];
+    String color = ColorUtils.colorToRgbaString(Color.parseColor("#41FF0000")).split(" ")[3];
     String alpha = color.substring(0, color.length() - 1);
     assertEquals("alpha value should match", 0.254f, Float.valueOf(alpha), 0.001f);
   }
