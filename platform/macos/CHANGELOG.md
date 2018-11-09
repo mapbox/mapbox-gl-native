@@ -38,7 +38,7 @@
 * Fixed an issue where snapshots had the wrong heading and pitch. ([#13123](https://github.com/mapbox/mapbox-gl-native/pull/13123))
 * Fixed an issue where `MGLMapView` produced a designable error in Interface Builder storyboards in Xcode 10. ([#12883](https://github.com/mapbox/mapbox-gl-native/pull/12883))
 
-# 0.11.0 - September 13, 2018
+## 0.11.0 - September 13, 2018
 
 ### Styles and rendering
 
@@ -64,7 +64,7 @@
 * Fixed inconsistencies in exception naming. ([#12583](https://github.com/mapbox/mapbox-gl-native/issues/12583))
 * Fixed an issue where `-[MGLMapView convertCoordinateBounds:toRectToView:]` would return an empty CGRect if the bounds crossed the antimeridian. ([#12758](https://github.com/mapbox/mapbox-gl-native/pull/12758))
 
-# 0.10.0 - August 15, 2018
+## 0.10.0 - August 15, 2018
 
 ## Styles and rendering
 
@@ -78,7 +78,7 @@
 * Fixed an issue causing country and ocean labels to disappear after calling `-[MGLStyle localizeLabelsIntoLocale:]` when the system language is set to Simplified Chinese. ([#12164](https://github.com/mapbox/mapbox-gl-native/issues/12164))
 * Closed a security vulnerability introduced in 0.8.0 that would potentially allow the owner of a style to compromise apps loading that style. ([#12571](https://github.com/mapbox/mapbox-gl-native/pull/12571))
 
-# 0.9.0 - July 18, 2018
+## 0.9.0 - July 18, 2018
 
 ## Styles and rendering
 
