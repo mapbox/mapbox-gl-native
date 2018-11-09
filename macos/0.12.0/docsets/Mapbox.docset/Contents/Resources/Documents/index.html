@@ -822,35 +822,6 @@
 <li>Fixed an issue where snapshots had the wrong heading and pitch. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/13123">#13123</a>)</li>
 <li>Fixed an issue where <code><a href="Classes/MGLMapView.html">MGLMapView</a></code> produced a designable error in Interface Builder storyboards in Xcode 10. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/12883">#12883</a>)</li>
 </ul>
-<h1 id='0-11-0-september-13-2018' class='heading'>0.11.0 - September 13, 2018</h1>
-<h3 id='styles-and-rendering' class='heading'>Styles and rendering</h3>
-
-<ul>
-<li>When a symbol in an <code><a href="Classes/MGLSymbolStyleLayer.html">MGLSymbolStyleLayer</a></code> has both an icon and text, both are shown or hidden together based on available space. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/12521">#12521</a>)</li>
-<li>Invalid values of <code><a href="Classes/MGLSymbolStyleLayer.html#/c:objc(cs)MGLSymbolStyleLayer(py)textFontNames">MGLSymbolStyleLayer.textFontNames</a></code> are treated as warnings instead of errors. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/12414">#12414</a>)</li>
-<li>Added an <code><a href="Classes/MGLLineStyleLayer.html#/c:objc(cs)MGLLineStyleLayer(py)lineGradient">MGLLineStyleLayer.lineGradient</a></code> property that can be used to define a gradient with which to color a line feature. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/12575">#12575</a>)</li>
-<li>The <code><a href="Classes/MGLLineStyleLayer.html#/c:objc(cs)MGLLineStyleLayer(py)linePattern">MGLLineStyleLayer.linePattern</a></code>, <code><a href="Classes/MGLFillStyleLayer.html#/c:objc(cs)MGLFillStyleLayer(py)fillPattern">MGLFillStyleLayer.fillPattern</a></code>, and <code>MGLFillStyleLayer.fillExtrusionPattern</code> properties can now be set to expressions that refer to feature attributes. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/12284">#12284</a>)</li>
-<li>Reduced the amount of memory consumed by font data after changing the style. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/12414">#12414</a>)</li>
-<li><code><a href="Classes/MGLShapeSource.html#/c:objc(cs)MGLShapeSource(im)initWithIdentifier:shape:options:">-[MGLShapeSource initWithIdentifier:shape:options:]</a></code> and <code><a href="Classes/MGLComputedShapeSource.html#/c:objc(cs)MGLComputedShapeSource(im)setFeatures:inTileAtX:y:zoomLevel:">-[MGLComputedShapeSource setFeatures:inTileAtX:y:zoomLevel:]</a></code> warn about possible attribute loss when passing in an <code><a href="Classes/MGLShapeCollection.html">MGLShapeCollection</a></code> object. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/12625">#12625</a>)</li>
-<li>Added an <code><a href="Other Constants.html#/c:@MGLShapeSourceOptionLineDistanceMetrics">MGLShapeSourceOptionLineDistanceMetrics</a></code> option that enables or disables calculating line distance metrics. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/12604">#12604</a>)</li>
-<li>Fixed an issue where the <code>cubic-bezier</code> curve type for <code>mgl_interpolate:withCurveType:parameters:stops:</code> expressions was misinterpreted for some style layer properties. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/12826">#12826</a>)</li>
-<li>Fixed an issue that could cause symbols to fade in during pan operations instead of always showing when using <code><a href="Classes/MGLSymbolStyleLayer.html#/c:objc(cs)MGLSymbolStyleLayer(py)iconAllowsOverlap">MGLSymbolStyleLayer.iconAllowsOverlap</a></code> or <code><a href="Classes/MGLSymbolStyleLayer.html#/c:objc(cs)MGLSymbolStyleLayer(py)textAllowsOverlap">MGLSymbolStyleLayer.textAllowsOverlap</a></code> properties. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/12698">#12698</a>)</li>
-</ul>
-<h3 id='offline-maps' class='heading'>Offline maps</h3>
-
-<ul>
-<li>Added the <code><a href="Classes/MGLShapeOfflineRegion.html">MGLShapeOfflineRegion</a></code> class for creating an offline pack that covers an arbitrary shape. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/11447">#11447</a>)</li>
-<li>Fixed crashes when offline storage encountered certain SQLite errors. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/12224">#12224</a>)</li>
-</ul>
-<h3 id='other-changes' class='heading'>Other changes</h3>
-
-<ul>
-<li>The <code><a href="Classes/MGLMapView.html#/c:objc(cs)MGLMapView(im)annotationAtPoint:">-[MGLMapView annotationAtPoint:]</a></code> method can now return annotations near tile boundaries at high zoom levels. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/12570">#12570</a>)</li>
-<li>Added an <code><a href="Protocols/MGLMapViewDelegate.html#/c:objc(pl)MGLMapViewDelegate(im)mapView:shapeAnnotationIsEnabled:">-[MGLMapViewDelegate mapView:shapeAnnotationIsEnabled:]</a></code> method to specify whether an annotation is selectable. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/12352">#12352</a>)</li>
-<li>Fixed inconsistencies in exception naming. (<a href="https://github.com/mapbox/mapbox-gl-native/issues/12583">#12583</a>)</li>
-<li>Fixed an issue where <code><a href="Classes/MGLMapView.html#/c:objc(cs)MGLMapView(im)convertCoordinateBounds:toRectToView:">-[MGLMapView convertCoordinateBounds:toRectToView:]</a></code> would return an empty CGRect if the bounds crossed the antimeridian. (<a href="https://github.com/mapbox/mapbox-gl-native/pull/12758">#12758</a>)</li>
-</ul>
-<h1 id='0-10-0-august-15-2018' class='heading'>0.10.0 - August 15, 2018</h1>
 
           </div>
         </section>
