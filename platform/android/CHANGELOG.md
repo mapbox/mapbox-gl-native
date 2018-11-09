@@ -9,6 +9,9 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Reintroduce OnMapChange invocation [#13289](https://github.com/mapbox/mapbox-gl-native/pull/13289)
  - Null-check nativeMapView in case it's destroyed [#13281](https://github.com/mapbox/mapbox-gl-native/pull/13281)
 
+## 6.6.6 - November 8, 2018
+ - Telemetry v3.5.4 [#13330](https://github.com/mapbox/mapbox-gl-native/pull/13330)
+
 ## 6.6.5 - November 2, 2018
  - Telemetry v3.5.2 [#13258](https://github.com/mapbox/mapbox-gl-native/pull/13258)
 
