@@ -3,27 +3,16 @@
 
 #include <QMapboxGL>
 
-#include <QtGlobal>
-
-// XXX http://stackoverflow.com/questions/24899558/how-to-check-qt-version-to-include-different-header#comment59591604_29887388
-#if QT_VERSION >= 0x050400
 #include <QOpenGLWidget>
-#else
-#include <QGLWidget>
-#endif // QT_VERSION
-
 #include <QPropertyAnimation>
 #include <QScopedPointer>
+#include <QtGlobal>
 
 class QKeyEvent;
 class QMouseEvent;
 class QWheelEvent;
 
-#if QT_VERSION >= 0x050400
 class MapWindow : public QOpenGLWidget
-#else
-class MapWindow : public QGLWidget
-#endif // QT_VERSION
 {
     Q_OBJECT
 

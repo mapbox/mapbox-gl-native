@@ -29,9 +29,7 @@ void HTTPFileSource::Impl::request(HTTPRequest* req)
     }
 
     QNetworkRequest networkRequest = req->networkRequest();
-#if QT_VERSION >= 0x050600
     networkRequest.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
-#endif
 
     data.first = m_manager->get(networkRequest);
     connect(data.first, SIGNAL(finished()), this, SLOT(onReplyFinished()));
@@ -60,15 +58,7 @@ void HTTPFileSource::Impl::cancel(HTTPRequest* req)
 
     if (requestsVector.empty()) {
         m_pending.erase(it);
-#if QT_VERSION >= 0x050000
         reply->abort();
-#else
-        // XXX: We should be aborting the reply here
-        // but a bug on Qt4 causes the connection of
-        // other ongoing requests to drop if we call
-        // abort() too often (and we do).
-        Q_UNUSED(reply);
-#endif
     }
 }
 
@@ -105,11 +95,7 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
 }
 
 uint32_t HTTPFileSource::maximumConcurrentRequests() {
-#if QT_VERSION >= 0x050000
     return 20;
-#else
-    return 10;
-#endif
 }
 
 } // namespace mbgl
