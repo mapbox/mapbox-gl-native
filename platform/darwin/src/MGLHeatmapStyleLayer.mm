@@ -8,9 +8,10 @@
 #import "MGLStyleValue_Private.h"
 #import "MGLHeatmapStyleLayer.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MGLHeatmapStyleLayer_Private.h"
 
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/layers/heatmap_layer.hpp>
+
 
 @interface MGLHeatmapStyleLayer ()
 
@@ -220,3 +221,11 @@
 }
 
 @end
+
+namespace mbgl {
+
+MGLStyleLayer* HeatmapStyleLayerPeerFactory::createPeer(style::Layer* rawLayer) {
+    return [[MGLHeatmapStyleLayer alloc] initWithRawLayer:rawLayer];
+}
+
+}  // namespace mbgl

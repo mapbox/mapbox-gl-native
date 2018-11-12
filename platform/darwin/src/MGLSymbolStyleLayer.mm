@@ -8,9 +8,10 @@
 #import "MGLStyleValue_Private.h"
 #import "MGLSymbolStyleLayer.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MGLSymbolStyleLayer_Private.h"
 
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
+
 
 namespace mbgl {
 
@@ -1610,3 +1611,11 @@ namespace mbgl {
 }
 
 @end
+
+namespace mbgl {
+
+MGLStyleLayer* SymbolStyleLayerPeerFactory::createPeer(style::Layer* rawLayer) {
+    return [[MGLSymbolStyleLayer alloc] initWithRawLayer:rawLayer];
+}
+
+}  // namespace mbgl

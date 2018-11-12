@@ -8,9 +8,10 @@
 #import "MGLStyleValue_Private.h"
 #import "MGLBackgroundStyleLayer.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MGLBackgroundStyleLayer_Private.h"
 
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/layers/background_layer.hpp>
+
 
 @interface MGLBackgroundStyleLayer ()
 
@@ -146,3 +147,11 @@
 }
 
 @end
+
+namespace mbgl {
+
+MGLStyleLayer* BackgroundStyleLayerPeerFactory::createPeer(style::Layer* rawLayer) {
+    return [[MGLBackgroundStyleLayer alloc] initWithRawLayer:rawLayer];
+}
+
+}  // namespace mbgl

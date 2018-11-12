@@ -82,4 +82,21 @@ struct LayerWrapper {
 
 @end
 
+namespace mbgl {
+
+class LayerPeerFactory {
+public:
+    virtual ~LayerPeerFactory() = default;
+    /**
+     Get the corresponding core layer factory.
+     */
+    virtual style::LayerFactory* getCoreLayerFactory() = 0;
+    /**
+     Creates an MGLStyleLayer instance with a raw pointer to the backing store.
+     */
+    virtual MGLStyleLayer* createPeer(style::Layer*) = 0;
+};
+
+}  // namespace mbgl
+
 NS_ASSUME_NONNULL_END

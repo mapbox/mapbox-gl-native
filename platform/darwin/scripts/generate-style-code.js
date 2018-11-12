@@ -669,6 +669,7 @@ const lightDoc = spec['light-cocoa-doc'];
 const lightType = 'light';
 
 const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.ejs', 'utf8'), { strict: true });
+const layerPrivateH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer_Private.h.ejs', 'utf8'), { strict: true });
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
 const testLayers = ejs.compile(fs.readFileSync('platform/darwin/test/MGLStyleLayerTests.mm.ejs', 'utf8'), { strict: true});
 const forStyleAuthorsMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/For Style Authors.md.ejs', 'utf8'), { strict: true });
@@ -755,6 +756,7 @@ for (var layer of layers) {
     }
 
     writeIfModified(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, duplicatePlatformDecls(layerH(layer)));
+    writeIfModified(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}_Private.h`, duplicatePlatformDecls(layerPrivateH(layer)));
     writeIfModified(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.mm`, layerM(layer));
     writeIfModified(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.mm`, testLayers(layer));
 }

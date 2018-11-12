@@ -14,9 +14,10 @@
 #import "MGLStyleValue_Private.h"
 #import "MGL<%- camelize(type) %>StyleLayer.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MGL<%- camelize(type) %>StyleLayer_Private.h"
 
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
+
 <% if (enumProperties) { -%>
 
 namespace mbgl {
@@ -254,3 +255,11 @@ namespace mbgl {
 <% } -%>
 @end
 <% } -%>
+
+namespace mbgl {
+
+MGLStyleLayer* <%- camelize(type) %>StyleLayerPeerFactory::createPeer(style::Layer* rawLayer) {
+    return [[MGL<%- camelize(type) %>StyleLayer alloc] initWithRawLayer:rawLayer];
+}
+
+}  // namespace mbgl

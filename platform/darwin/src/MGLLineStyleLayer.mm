@@ -8,9 +8,10 @@
 #import "MGLStyleValue_Private.h"
 #import "MGLLineStyleLayer.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MGLLineStyleLayer_Private.h"
 
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/layers/line_layer.hpp>
+
 
 namespace mbgl {
 
@@ -592,3 +593,11 @@ namespace mbgl {
 }
 
 @end
+
+namespace mbgl {
+
+MGLStyleLayer* LineStyleLayerPeerFactory::createPeer(style::Layer* rawLayer) {
+    return [[MGLLineStyleLayer alloc] initWithRawLayer:rawLayer];
+}
+
+}  // namespace mbgl

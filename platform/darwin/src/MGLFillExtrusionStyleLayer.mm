@@ -8,9 +8,10 @@
 #import "MGLStyleValue_Private.h"
 #import "MGLFillExtrusionStyleLayer.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MGLFillExtrusionStyleLayer_Private.h"
 
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/layers/fill_extrusion_layer.hpp>
+
 
 namespace mbgl {
 
@@ -350,3 +351,11 @@ namespace mbgl {
 }
 
 @end
+
+namespace mbgl {
+
+MGLStyleLayer* FillExtrusionStyleLayerPeerFactory::createPeer(style::Layer* rawLayer) {
+    return [[MGLFillExtrusionStyleLayer alloc] initWithRawLayer:rawLayer];
+}
+
+}  // namespace mbgl

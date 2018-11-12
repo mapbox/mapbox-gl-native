@@ -34,7 +34,6 @@ macro(mbgl_platform_core)
         PRIVATE platform/darwin/src/nsthread.mm
         PRIVATE platform/darwin/src/string_nsstring.mm
         PRIVATE platform/default/bidi.cpp
-        PRIVATE platform/default/layer_manager.cpp
         PRIVATE platform/default/thread_local.cpp
         PRIVATE platform/default/utf.cpp
 

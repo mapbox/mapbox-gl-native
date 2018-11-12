@@ -8,9 +8,10 @@
 #import "MGLStyleValue_Private.h"
 #import "MGLRasterStyleLayer.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MGLRasterStyleLayer_Private.h"
 
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/layers/raster_layer.hpp>
+
 
 namespace mbgl {
 
@@ -351,3 +352,11 @@ namespace mbgl {
 }
 
 @end
+
+namespace mbgl {
+
+MGLStyleLayer* RasterStyleLayerPeerFactory::createPeer(style::Layer* rawLayer) {
+    return [[MGLRasterStyleLayer alloc] initWithRawLayer:rawLayer];
+}
+
+}  // namespace mbgl

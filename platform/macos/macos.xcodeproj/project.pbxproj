@@ -93,6 +93,18 @@
 		55D120A31F7906E6004B6D81 /* libmbgl-filesource.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A41F7906E6004B6D81 /* libmbgl-filesource.a */; };
 		55D120A51F790A0C004B6D81 /* libmbgl-filesource.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A41F7906E6004B6D81 /* libmbgl-filesource.a */; };
 		55E2AD111E5B0A6900E8C587 /* MGLOfflineStorageTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55E2AD101E5B0A6900E8C587 /* MGLOfflineStorageTests.mm */; };
+		747ABE59219B2BDB00523B67 /* MGLFillExtrusionStyleLayer_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 747ABE54219B2BDA00523B67 /* MGLFillExtrusionStyleLayer_Private.h */; };
+		747ABE5A219B2BDB00523B67 /* MGLCircleStyleLayer_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 747ABE55219B2BDA00523B67 /* MGLCircleStyleLayer_Private.h */; };
+		747ABE5B219B2BDB00523B67 /* MGLBackgroundStyleLayer_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 747ABE56219B2BDB00523B67 /* MGLBackgroundStyleLayer_Private.h */; };
+		747ABE5C219B2BDB00523B67 /* MGLFillStyleLayer_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 747ABE57219B2BDB00523B67 /* MGLFillStyleLayer_Private.h */; };
+		747ABE5D219B2BDB00523B67 /* MGLHeatmapStyleLayer_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 747ABE58219B2BDB00523B67 /* MGLHeatmapStyleLayer_Private.h */; };
+		747ABE5F219B2BED00523B67 /* MGLHillshadeStyleLayer_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 747ABE5E219B2BED00523B67 /* MGLHillshadeStyleLayer_Private.h */; };
+		747ABE61219B2C0000523B67 /* MGLLineStyleLayer_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 747ABE60219B2C0000523B67 /* MGLLineStyleLayer_Private.h */; };
+		747ABE64219B2C1800523B67 /* MGLOpenGLStyleLayer_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 747ABE62219B2C1700523B67 /* MGLOpenGLStyleLayer_Private.h */; };
+		747ABE65219B2C1800523B67 /* MGLRasterStyleLayer_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 747ABE63219B2C1700523B67 /* MGLRasterStyleLayer_Private.h */; };
+		747ABE67219B2C3200523B67 /* MGLSymbolStyleLayer_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 747ABE66219B2C3200523B67 /* MGLSymbolStyleLayer_Private.h */; };
+		749EC8912199CCB9005608D7 /* MGLStyleLayerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 749EC88F2199CCB8005608D7 /* MGLStyleLayerManager.h */; };
+		749EC8932199CCB9005608D7 /* MGLStyleLayerManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 749EC8902199CCB9005608D7 /* MGLStyleLayerManager.mm */; };
 		89462399200D199100DA8EF2 /* heatmap.json in Resources */ = {isa = PBXBuildFile; fileRef = 89462398200D199100DA8EF2 /* heatmap.json */; };
 		8946239D200E744800DA8EF2 /* MGLHeatmapStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8946239A200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		894623A0200E748000DA8EF2 /* MGLHeatmapStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8946239B200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.mm */; };
@@ -393,6 +405,18 @@
 		55D9B4B01D005D3900C1CCE2 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		55E2AD101E5B0A6900E8C587 /* MGLOfflineStorageTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLOfflineStorageTests.mm; path = ../../darwin/test/MGLOfflineStorageTests.mm; sourceTree = "<group>"; };
 		55FE0E8D1D100A0900FD240B /* config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = config.xcconfig; path = ../../build/macos/config.xcconfig; sourceTree = "<group>"; };
+		747ABE54219B2BDA00523B67 /* MGLFillExtrusionStyleLayer_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFillExtrusionStyleLayer_Private.h; sourceTree = "<group>"; };
+		747ABE55219B2BDA00523B67 /* MGLCircleStyleLayer_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCircleStyleLayer_Private.h; sourceTree = "<group>"; };
+		747ABE56219B2BDB00523B67 /* MGLBackgroundStyleLayer_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLBackgroundStyleLayer_Private.h; sourceTree = "<group>"; };
+		747ABE57219B2BDB00523B67 /* MGLFillStyleLayer_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFillStyleLayer_Private.h; sourceTree = "<group>"; };
+		747ABE58219B2BDB00523B67 /* MGLHeatmapStyleLayer_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLHeatmapStyleLayer_Private.h; sourceTree = "<group>"; };
+		747ABE5E219B2BED00523B67 /* MGLHillshadeStyleLayer_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLHillshadeStyleLayer_Private.h; sourceTree = "<group>"; };
+		747ABE60219B2C0000523B67 /* MGLLineStyleLayer_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLineStyleLayer_Private.h; sourceTree = "<group>"; };
+		747ABE62219B2C1700523B67 /* MGLOpenGLStyleLayer_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLOpenGLStyleLayer_Private.h; sourceTree = "<group>"; };
+		747ABE63219B2C1700523B67 /* MGLRasterStyleLayer_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLRasterStyleLayer_Private.h; sourceTree = "<group>"; };
+		747ABE66219B2C3200523B67 /* MGLSymbolStyleLayer_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLSymbolStyleLayer_Private.h; sourceTree = "<group>"; };
+		749EC88F2199CCB8005608D7 /* MGLStyleLayerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLStyleLayerManager.h; sourceTree = "<group>"; };
+		749EC8902199CCB9005608D7 /* MGLStyleLayerManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLStyleLayerManager.mm; sourceTree = "<group>"; };
 		89462398200D199100DA8EF2 /* heatmap.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = heatmap.json; sourceTree = "<group>"; };
 		8946239A200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLHeatmapStyleLayer.h; sourceTree = "<group>"; };
 		8946239B200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLHeatmapStyleLayer.mm; sourceTree = "<group>"; };
@@ -705,6 +729,18 @@
 		35136D471D42295400C20EFD /* Layers */ = {
 			isa = PBXGroup;
 			children = (
+				747ABE66219B2C3200523B67 /* MGLSymbolStyleLayer_Private.h */,
+				747ABE62219B2C1700523B67 /* MGLOpenGLStyleLayer_Private.h */,
+				747ABE63219B2C1700523B67 /* MGLRasterStyleLayer_Private.h */,
+				747ABE60219B2C0000523B67 /* MGLLineStyleLayer_Private.h */,
+				747ABE5E219B2BED00523B67 /* MGLHillshadeStyleLayer_Private.h */,
+				747ABE56219B2BDB00523B67 /* MGLBackgroundStyleLayer_Private.h */,
+				747ABE55219B2BDA00523B67 /* MGLCircleStyleLayer_Private.h */,
+				747ABE54219B2BDA00523B67 /* MGLFillExtrusionStyleLayer_Private.h */,
+				747ABE57219B2BDB00523B67 /* MGLFillStyleLayer_Private.h */,
+				747ABE58219B2BDB00523B67 /* MGLHeatmapStyleLayer_Private.h */,
+				749EC88F2199CCB8005608D7 /* MGLStyleLayerManager.h */,
+				749EC8902199CCB9005608D7 /* MGLStyleLayerManager.mm */,
 				DA8F25851D51C9E10010E6B5 /* MGLBackgroundStyleLayer.h */,
 				DA8F25861D51C9E10010E6B5 /* MGLBackgroundStyleLayer.mm */,
 				3527428B1D4C24AB00A1ECE6 /* MGLCircleStyleLayer.h */,
@@ -1227,10 +1263,14 @@
 				3508EC641D749D39009B0EE4 /* NSExpression+MGLAdditions.h in Headers */,
 				DAE6C38D1CC31E2A00DB3429 /* MGLOfflineRegion_Private.h in Headers */,
 				DA7DC9831DED647F0027472F /* MGLRasterTileSource_Private.h in Headers */,
+				747ABE5B219B2BDB00523B67 /* MGLBackgroundStyleLayer_Private.h in Headers */,
 				1753ED401E53CE6100A9FD90 /* MGLConversion.h in Headers */,
+				747ABE59219B2BDB00523B67 /* MGLFillExtrusionStyleLayer_Private.h in Headers */,
 				DA8F259C1D51CB000010E6B5 /* MGLStyleValue_Private.h in Headers */,
 				DAE6C35B1CC31E0400DB3429 /* MGLAnnotation.h in Headers */,
 				DAE6C3B61CC31EF300DB3429 /* MGLMapView_Private.h in Headers */,
+				747ABE65219B2C1800523B67 /* MGLRasterStyleLayer_Private.h in Headers */,
+				747ABE5D219B2BDB00523B67 /* MGLHeatmapStyleLayer_Private.h in Headers */,
 				DAF25716201901C200367EF5 /* MGLHillshadeStyleLayer.h in Headers */,
 				92092EF01F5EB10E00AF5130 /* MGLMapSnapshotter.h in Headers */,
 				3527428D1D4C24AB00A1ECE6 /* MGLCircleStyleLayer.h in Headers */,
@@ -1242,6 +1282,7 @@
 				DAE6C3A31CC31E9400DB3429 /* MGLAnnotationImage.h in Headers */,
 				DAE6C3A41CC31E9400DB3429 /* MGLMapView.h in Headers */,
 				DAE6C3611CC31E0400DB3429 /* MGLOfflineStorage.h in Headers */,
+				749EC8912199CCB9005608D7 /* MGLStyleLayerManager.h in Headers */,
 				352742781D4C220900A1ECE6 /* MGLStyleValue.h in Headers */,
 				DAE6C35E1CC31E0400DB3429 /* MGLMultiPoint.h in Headers */,
 				35602BFF1D3EA9B40050646F /* MGLStyleLayer_Private.h in Headers */,
@@ -1258,6 +1299,7 @@
 				DAE6C39C1CC31E2A00DB3429 /* NSString+MGLAdditions.h in Headers */,
 				1F8A5A06216D4696004DFE75 /* MGLLoggingConfiguration.h in Headers */,
 				3529039B1D6C63B80002C7DF /* NSPredicate+MGLAdditions.h in Headers */,
+				747ABE5A219B2BDB00523B67 /* MGLCircleStyleLayer_Private.h in Headers */,
 				DA8F25971D51CAC70010E6B5 /* MGLVectorTileSource.h in Headers */,
 				DA7DC9811DED5F5C0027472F /* MGLVectorTileSource_Private.h in Headers */,
 				DAE6C3861CC31E2A00DB3429 /* MGLGeometry_Private.h in Headers */,
@@ -1280,6 +1322,7 @@
 				DA35A2A41CC9EB1A00E826B2 /* MGLCoordinateFormatter.h in Headers */,
 				35C5D8491D6DD66D00E95907 /* NSCompoundPredicate+MGLAdditions.h in Headers */,
 				9250B8C32073C69100EF338C /* MGLShapeOfflineRegion.h in Headers */,
+				747ABE67219B2C3200523B67 /* MGLSymbolStyleLayer_Private.h in Headers */,
 				DD0902B31DB1AC6400C5BDCE /* MGLNetworkConfiguration.h in Headers */,
 				DAE6C3621CC31E0400DB3429 /* MGLOverlay.h in Headers */,
 				DAE6C3651CC31E0400DB3429 /* MGLPolyline.h in Headers */,
@@ -1292,6 +1335,8 @@
 				1F7454A31ECFB00300021D39 /* MGLLight_Private.h in Headers */,
 				359819591E02F611008FC139 /* NSCoder+MGLAdditions.h in Headers */,
 				DAE6C38E1CC31E2A00DB3429 /* MGLOfflineStorage_Private.h in Headers */,
+				747ABE61219B2C0000523B67 /* MGLLineStyleLayer_Private.h in Headers */,
+				747ABE5F219B2BED00523B67 /* MGLHillshadeStyleLayer_Private.h in Headers */,
 				DA87A9A01DC9DC6200810D09 /* MGLValueEvaluator.h in Headers */,
 				8946239D200E744800DA8EF2 /* MGLHeatmapStyleLayer.h in Headers */,
 				DAE6C3601CC31E0400DB3429 /* MGLOfflineRegion.h in Headers */,
@@ -1318,6 +1363,7 @@
 				35D65C5A1D65AD5500722C23 /* NSDate+MGLAdditions.h in Headers */,
 				355BA4ED1D41633E00CCC6D5 /* NSColor+MGLAdditions.h in Headers */,
 				DAE6C3891CC31E2A00DB3429 /* MGLMultiPoint_Private.h in Headers */,
+				747ABE64219B2C1800523B67 /* MGLOpenGLStyleLayer_Private.h in Headers */,
 				DAE6C3A51CC31E9400DB3429 /* MGLMapView+IBAdditions.h in Headers */,
 				DA35A2AD1CCA091800E826B2 /* MGLCompassDirectionFormatter.h in Headers */,
 				352742851D4C244700A1ECE6 /* MGLRasterTileSource.h in Headers */,
@@ -1329,6 +1375,7 @@
 				DA6408D71DA4E5DA00908C90 /* MGLVectorStyleLayer.h in Headers */,
 				352742891D4C245800A1ECE6 /* MGLShapeSource.h in Headers */,
 				1F7454A41ECFB00300021D39 /* MGLLight.h in Headers */,
+				747ABE5C219B2BDB00523B67 /* MGLFillStyleLayer_Private.h in Headers */,
 				408AA8671DAEEE3900022900 /* NSDictionary+MGLAdditions.h in Headers */,
 				DAE6C3671CC31E0400DB3429 /* MGLStyle.h in Headers */,
 				3EA9317388DC9A0BF46B7674 /* MGLRendererConfiguration.h in Headers */,
@@ -1569,6 +1616,7 @@
 				558DE7A71E56161C00C7916D /* MGLFoundation.mm in Sources */,
 				DAE6C39D1CC31E2A00DB3429 /* NSString+MGLAdditions.m in Sources */,
 				3598195A1E02F611008FC139 /* NSCoder+MGLAdditions.mm in Sources */,
+				749EC8932199CCB9005608D7 /* MGLStyleLayerManager.mm in Sources */,
 				DAE6C3941CC31E2A00DB3429 /* MGLStyle.mm in Sources */,
 				DAE6C3871CC31E2A00DB3429 /* MGLGeometry.mm in Sources */,
 				894623A0200E748000DA8EF2 /* MGLHeatmapStyleLayer.mm in Sources */,
