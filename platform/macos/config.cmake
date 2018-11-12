@@ -14,7 +14,6 @@ macro(mbgl_platform_core)
         PRIVATE platform/darwin/src/nsthread.mm
         PRIVATE platform/darwin/src/string_nsstring.mm
         PRIVATE platform/default/bidi.cpp
-        PRIVATE platform/default/layer_manager.cpp
         PRIVATE platform/default/thread_local.cpp
         PRIVATE platform/default/utf.cpp
 
@@ -116,6 +115,7 @@ endmacro()
 
 macro(mbgl_platform_test)
     target_sources(mbgl-test
+        PRIVATE platform/default/layer_manager.cpp
         PRIVATE platform/default/mbgl/test/main.cpp
     )
 
@@ -137,6 +137,7 @@ endmacro()
 
 macro(mbgl_platform_benchmark)
     target_sources(mbgl-benchmark
+        PRIVATE platform/default/layer_manager.cpp
         PRIVATE benchmark/src/main.cpp
     )
 
@@ -153,6 +154,9 @@ macro(mbgl_platform_benchmark)
 endmacro()
 
 macro(mbgl_platform_node)
+    target_sources(mbgl-core
+        PRIVATE platform/default/layer_manager.cpp
+    )
     target_link_libraries(mbgl-node INTERFACE
         -exported_symbols_list ${CMAKE_SOURCE_DIR}/platform/node/symbol-list
         -dead_strip

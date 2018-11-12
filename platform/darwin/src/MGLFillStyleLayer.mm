@@ -8,9 +8,10 @@
 #import "MGLStyleValue_Private.h"
 #import "MGLFillStyleLayer.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MGLFillStyleLayer_Private.h"
 
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/layers/fill_layer.hpp>
+
 
 namespace mbgl {
 
@@ -338,3 +339,11 @@ namespace mbgl {
 }
 
 @end
+
+namespace mbgl {
+
+MGLStyleLayer* FillStyleLayerPeerFactory::createPeer(style::Layer* rawLayer) {
+    return [[MGLFillStyleLayer alloc] initWithRawLayer:rawLayer];
+}
+
+}  // namespace mbgl

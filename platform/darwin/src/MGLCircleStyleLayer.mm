@@ -8,9 +8,10 @@
 #import "MGLStyleValue_Private.h"
 #import "MGLCircleStyleLayer.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MGLCircleStyleLayer_Private.h"
 
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/layers/circle_layer.hpp>
+
 
 namespace mbgl {
 
@@ -497,3 +498,11 @@ namespace mbgl {
 }
 
 @end
+
+namespace mbgl {
+
+MGLStyleLayer* CircleStyleLayerPeerFactory::createPeer(style::Layer* rawLayer) {
+    return [[MGLCircleStyleLayer alloc] initWithRawLayer:rawLayer];
+}
+
+}  // namespace mbgl

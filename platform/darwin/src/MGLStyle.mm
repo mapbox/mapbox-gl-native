@@ -13,6 +13,7 @@
 #import "MGLRasterStyleLayer.h"
 #import "MGLBackgroundStyleLayer.h"
 #import "MGLOpenGLStyleLayer.h"
+#import "MGLStyleLayerManager.h"
 
 #import "MGLSource.h"
 #import "MGLSource_Private.h"
@@ -32,16 +33,6 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/light.hpp>
-#include <mbgl/style/layers/fill_layer.hpp>
-#include <mbgl/style/layers/fill_extrusion_layer.hpp>
-#include <mbgl/style/layers/line_layer.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
-#include <mbgl/style/layers/raster_layer.hpp>
-#include <mbgl/style/layers/heatmap_layer.hpp>
-#include <mbgl/style/layers/hillshade_layer.hpp>
-#include <mbgl/style/layers/circle_layer.hpp>
-#include <mbgl/style/layers/background_layer.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/sources/raster_source.hpp>
@@ -358,31 +349,8 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     if (MGLStyleLayer *layer = rawLayer->peer.has_value() ? rawLayer->peer.get<LayerWrapper>().layer : nil) {
         return layer;
     }
-    switch (rawLayer->getType()) {
-        case mbgl::style::LayerType::Fill:
-            return [[MGLFillStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::FillLayer*>(rawLayer)];
-        case mbgl::style::LayerType::FillExtrusion:
-            return [[MGLFillExtrusionStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::FillExtrusionLayer*>(rawLayer)];
-        case mbgl::style::LayerType::Line:
-            return [[MGLLineStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::LineLayer*>(rawLayer)];
-        case mbgl::style::LayerType::Symbol:
-            return [[MGLSymbolStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::SymbolLayer*>(rawLayer)];
-        case mbgl::style::LayerType::Raster:
-            return [[MGLRasterStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::RasterLayer*>(rawLayer)];
-        case mbgl::style::LayerType::Heatmap:
-            return [[MGLHeatmapStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::HeatmapLayer*>(rawLayer)];
-        case mbgl::style::LayerType::Hillshade:
-            return [[MGLHillshadeStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::HillshadeLayer*>(rawLayer)];
-        case mbgl::style::LayerType::Circle:
-            return [[MGLCircleStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::CircleLayer*>(rawLayer)];
-        case mbgl::style::LayerType::Background:
-            return [[MGLBackgroundStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::BackgroundLayer*>(rawLayer)];
-        case mbgl::style::LayerType::Custom:
-            return [[MGLOpenGLStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::CustomLayer*>(rawLayer)];
-        default:
-            MGLAssert(NO, @"Unrecognized layer type");
-            return nil;;
-    }
+
+    return mbgl::LayerManagerDarwin::get()->createPeer(rawLayer);
 }
 
 - (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier

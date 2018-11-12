@@ -8,9 +8,10 @@
 #import "MGLStyleValue_Private.h"
 #import "MGLHillshadeStyleLayer.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MGLHillshadeStyleLayer_Private.h"
 
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/layers/hillshade_layer.hpp>
+
 
 namespace mbgl {
 
@@ -249,3 +250,11 @@ namespace mbgl {
 }
 
 @end
+
+namespace mbgl {
+
+MGLStyleLayer* HillshadeStyleLayerPeerFactory::createPeer(style::Layer* rawLayer) {
+    return [[MGLHillshadeStyleLayer alloc] initWithRawLayer:rawLayer];
+}
+
+}  // namespace mbgl
