@@ -187,7 +187,7 @@ public class LocationComponentOptions implements Parcelable {
    * @return a new {@link LocationComponentOptions} object with the settings you defined in your style
    * resource
    */
-  @Nullable
+  @NonNull
   public static LocationComponentOptions createFromAttributes(@NonNull Context context,
                                                               @StyleRes int styleRes) {
 
