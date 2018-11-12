@@ -65,7 +65,6 @@ dependencies {
     implementation dependenciesList.supportDesign
     implementation dependenciesList.supportConstraintLayout
 
-    // implementation dependenciesList.lost
     implementation dependenciesList.gmsLocation
     implementation dependenciesList.timber
     debugImplementation dependenciesList.leakCanaryDebug

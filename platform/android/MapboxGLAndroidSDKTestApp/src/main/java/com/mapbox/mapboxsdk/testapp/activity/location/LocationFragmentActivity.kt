@@ -105,8 +105,7 @@ class LocationFragmentActivity : AppCompatActivity() {
       mapView.getMapAsync {
         mapboxMap = it
         component = mapboxMap.locationComponent
-        component?.activateLocationComponent(activity,
-                LocationEngineProvider.getBestLocationEngine(activity, false))
+        component?.activateLocationComponent(activity)
         component?.isLocationComponentEnabled = true
         component?.locationEngine?.getLastLocation(this)
       }

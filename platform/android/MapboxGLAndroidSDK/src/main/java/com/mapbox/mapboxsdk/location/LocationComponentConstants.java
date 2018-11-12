@@ -26,6 +26,12 @@ final class LocationComponentConstants {
   // Threshold value to perform immediate camera/layer position update.
   static final double INSTANT_LOCATION_TRANSITION_THRESHOLD = 500_000;
 
+  // Default interval between location updates
+  static final long DEFAULT_INTERVAL_MILLIS = 1000;
+
+  // Default fastest acceptable interval between location updates
+  static final long DEFAULT_FASTEST_INTERVAL_MILLIS = 1000;
+
   // Sources
   static final String LOCATION_SOURCE = "mapbox-location-source";
   static final String PROPERTY_GPS_BEARING = "mapbox-property-gps-bearing";
