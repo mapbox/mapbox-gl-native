@@ -5,11 +5,7 @@
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/traits.hpp>
 
-#if QT_VERSION >= 0x050000
 #include <QOpenGLContext>
-#else
-#include <QGLContext>
-#endif
 
 // mbgl::NetworkStatus::Status
 static_assert(mbgl::underlying_type(QMapbox::Online) == mbgl::underlying_type(mbgl::NetworkStatus::Status::Online), "error");

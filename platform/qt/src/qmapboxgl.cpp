@@ -45,11 +45,7 @@
 #include <mbgl/util/traits.hpp>
 #include <mbgl/actor/scheduler.hpp>
 
-#if QT_VERSION >= 0x050000
 #include <QGuiApplication>
-#else
-#include <QCoreApplication>
-#endif
 
 #include <QDebug>
 #include <QImage>
@@ -140,13 +136,8 @@ std::unique_ptr<mbgl::style::Image> toStyleImage(const QString &id, const QImage
         .rgbSwapped()
         .convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
-#if QT_VERSION >= 0x051000
-    auto img = std::make_unique<uint8_t[]>(swapped.sizeInBytes());
-    memcpy(img.get(), swapped.constBits(), swapped.sizeInBytes());
-#else
     auto img = std::make_unique<uint8_t[]>(swapped.byteCount());
     memcpy(img.get(), swapped.constBits(), swapped.byteCount());
-#endif
 
     return std::make_unique<mbgl::style::Image>(
         id.toStdString(),
@@ -1838,14 +1829,6 @@ void QMapboxGLPrivate::render()
     if (!m_mapRenderer) {
         createRenderer();
     }
-
-#if defined(__APPLE__) && QT_VERSION < 0x050000
-    // FIXME Qt 4.x provides an incomplete FBO at start.
-    // See https://bugreports.qt.io/browse/QTBUG-36802 for details.
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        return;
-    }
-#endif
 
     m_renderQueued.clear();
     m_mapRenderer->render();

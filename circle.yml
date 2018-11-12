@@ -48,7 +48,6 @@ workflows:
             branches:
               ignore: /.*/
       - macos-debug
-      - qt4-linux-gcc5-release
       - qt5-linux-gcc5-release
       - qt5-macos-debug
   nightly:
@@ -1003,30 +1002,6 @@ jobs:
           destination: test/fixtures
       - collect-xcode-build-logs
       - upload-xcode-build-logs
-
-# ------------------------------------------------------------------------------
-  qt4-linux-gcc5-release:
-    docker:
-      - image: mbgl/7d2403f42e:linux-gcc-5-qt-4
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
-      BUILDTYPE: Release
-      GTEST_OUTPUT: xml
-      LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
-    steps:
-      - install-dependencies
-      - build-qt-app
-      - build-qt-test
-      - save-dependencies
-      - run:
-          name: Run memory-load tests
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              make run-qt-test-Memory.*:*.Load
-            scripts/log_memory_benchmarks.sh test_detail.xml "Platform=Linux,Compiler=${_CC},Arch=$(uname -m)"
 
 # ------------------------------------------------------------------------------
   qt5-linux-gcc5-release:
