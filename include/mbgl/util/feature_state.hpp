@@ -15,17 +15,32 @@ struct FeatureStateChange {
   };
     
   ChangeType type;
+  std::string sourceLayer;
   FeatureIdentifier id;
   std::string key;
   optional<Value> value;
   FeatureStateChange(ChangeType type_,
-		     FeatureIdentifier&& id_,
-		     std::string&& key_,
+             const std::string& sourceLayer_,
+             const FeatureIdentifier& id_,
+		     const std::string& key_,
 		     optional<Value> value_) :
+    type(type_),
+    sourceLayer(sourceLayer_),
+    id(std::move(id_)),
+    key(std::move(key_)),
+    value(std::move(value_)) {}
+    
+  FeatureStateChange(ChangeType type_,
+             const FeatureIdentifier& id_,
+             const std::string& key_,
+             optional<Value> value_) :
     type(type_),
     id(std::move(id_)),
     key(std::move(key_)),
     value(std::move(value_)) {}
+
 };
+
+using FeatureStateChangeSet = std::vector<FeatureStateChange>;
 
 } // namespace mbgl

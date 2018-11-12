@@ -8,8 +8,10 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/immutable.hpp>
+#include <mbgl/util/feature_state.hpp>
 
 #include <vector>
+#include <map>
 
 namespace mbgl {
 
@@ -31,6 +33,7 @@ public:
     const Immutable<std::vector<Immutable<style::Image::Impl>>> images;
     const Immutable<std::vector<Immutable<style::Source::Impl>>> sources;
     const Immutable<std::vector<Immutable<style::Layer::Impl>>> layers;
+    const Immutable<std::unordered_map<std::string, Immutable<std::vector<FeatureStateChange>>>> stateChanges;
 
     AnnotationManager& annotationManager;
 

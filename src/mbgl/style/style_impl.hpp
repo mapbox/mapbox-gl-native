@@ -17,6 +17,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/feature_state.hpp>
 
 #include <memory>
 #include <string>
@@ -88,6 +89,9 @@ public:
     Immutable<std::vector<Immutable<Image::Impl>>> getImageImpls() const;
     Immutable<std::vector<Immutable<Source::Impl>>> getSourceImpls() const;
     Immutable<std::vector<Immutable<Layer::Impl>>> getLayerImpls() const;
+    Immutable<std::unordered_map<std::string,
+                                 Immutable<std::vector<FeatureStateChange>>>>
+        getFeatureStateChangeSets();
 
     void dumpDebugLogs() const;
 

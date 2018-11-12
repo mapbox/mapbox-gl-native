@@ -10,7 +10,8 @@ namespace mbgl {
 namespace style {
 
 GeoJSONSource::GeoJSONSource(const std::string& id, const GeoJSONOptions& options)
-    : Source(makeMutable<Impl>(std::move(id), options)) {
+    : Source(makeMutable<Impl>(std::move(id), options)),
+     stateChanges(makeMutable<std::vector<FeatureStateChange>>()) {
 }
 
 GeoJSONSource::~GeoJSONSource() = default;
@@ -34,6 +35,20 @@ void GeoJSONSource::setGeoJSON(const mapbox::geojson::geojson& geoJSON) {
     req.reset();
     baseImpl = makeMutable<Impl>(impl(), geoJSON);
     observer->onSourceChanged(*this);
+}
+
+void GeoJSONSource::setFeatureState(const FeatureIdentifier& featureId, const std::string& key, const mbgl::Value& value) {
+    if ( featureId.valid() && !key.empty()) {
+        stateChanges->emplace_back(FeatureStateChange::ChangeType::Insert, featureId, key, value);
+//        observer->onSourceChanged(*this);
+    }
+}
+
+Immutable<std::vector<FeatureStateChange>> GeoJSONSource::collectFeatureStates() {
+    Immutable<std::vector<FeatureStateChange>> immutable(std::move(stateChanges));
+    stateChanges = makeMutable<std::vector<FeatureStateChange>>();
+    printf("!)!)! Collecting feature state!@$!@$\n");
+    return immutable;
 }
 
 optional<std::string> GeoJSONSource::getURL() const {

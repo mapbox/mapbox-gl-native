@@ -44,7 +44,7 @@ public:
                 std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);
 
     void update(const std::vector<Immutable<style::Layer::Impl>>&,
-                const FeatureStatesMap& newStates,
+                const FeatureStateChangeSet&,
                 bool needsRendering,
                 bool needsRelayout,
                 const TileParameters&,

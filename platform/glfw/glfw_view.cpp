@@ -15,6 +15,7 @@
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/map/camera.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
 
 #include <mapbox/cheap_ruler.hpp>
 #include <mapbox/geometry.hpp>
@@ -518,6 +519,35 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
     }
     view->lastX = x;
     view->lastY = y;
+
+    if (view->tracking || view->rotating || view->pitching) return;
+
+    mbgl::ScreenCoordinate screenCoordinate = { x, y };
+
+    std::vector<mbgl::Feature> features = view->rendererFrontend->getRenderer()->queryRenderedFeatures(screenCoordinate,{ });
+
+    if (features.empty() && !view->hoveredId) return;
+    auto pointsSource = view->map->getStyle().getSource("points");
+    if (pointsSource && pointsSource->is<mbgl::style::GeoJSONSource>()) {
+        auto gj = pointsSource->as<mbgl::style::GeoJSONSource>();
+
+        if (features.size() >= 1 && features[0].id) {
+            const auto& fId = features[0].id;
+            
+            if (view->hoveredId != fId) {
+                if (view->hoveredId) {
+                    gj->setFeatureState(*(view->hoveredId), "hover", false);
+                }
+                gj->setFeatureState(*(features[0].id), "hover", true);
+                view->hoveredId = features[0].id;
+                view->invalidate();
+            }
+        } else if (view->hoveredId) {
+            gj->setFeatureState(*(view->hoveredId), "hover", false);
+            view->hoveredId = mbgl::nullopt;
+            view->invalidate();
+        }
+    }
 }
 
 void GLFWView::run() {
@@ -539,7 +569,6 @@ void GLFWView::run() {
             updateAnimatedAnnotations();
 
             activate();
-
             rendererFrontend->render();
 
             glfwSwapBuffers(window);

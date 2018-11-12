@@ -125,6 +125,7 @@ private:
 
     mbgl::util::RunLoop runLoop;
     mbgl::util::Timer frameTick;
+    mbgl::optional<mbgl::FeatureIdentifier> hoveredId;
 
     GLFWwindow *window = nullptr;
     bool dirty = false;

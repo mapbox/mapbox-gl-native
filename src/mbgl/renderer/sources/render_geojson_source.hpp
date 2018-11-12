@@ -18,6 +18,13 @@ public:
 
     void update(Immutable<style::Source::Impl>,
                 const std::vector<Immutable<style::Layer::Impl>>&,
+                Immutable<FeatureStateChangeSet>,
+                bool needsRendering,
+                bool needsRelayout,
+                const TileParameters&) final;
+
+    void update(Immutable<style::Source::Impl>,
+                const std::vector<Immutable<style::Layer::Impl>>&,
                 bool needsRendering,
                 bool needsRelayout,
                 const TileParameters&) final;

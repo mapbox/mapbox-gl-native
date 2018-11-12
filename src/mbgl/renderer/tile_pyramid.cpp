@@ -71,7 +71,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
                          const Range<uint8_t> zoomRange,
                          optional<LatLngBounds> bounds,
                          std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile) {
-    FeatureStatesMap fsm;
+    FeatureStateChangeSet fsm;
     update(layers,fsm, needsRendering, needsRelayout, parameters, type, tileSize, zoomRange, bounds, createTile);
 
 }
@@ -87,7 +87,7 @@ void extend(PropertyMap& a, const PropertyMap& b) {
 }
 
 void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layers,
-                         const FeatureStatesMap& newStates,
+                         const FeatureStateChangeSet& statesChangeSet,
                          const bool needsRendering,
                          const bool needsRelayout,
                          const TileParameters& parameters,
@@ -151,19 +151,17 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
         idealTiles = util::tileCover(parameters.transformState, idealZoom);
     }
 
+    FeatureStatesMap newStates = {};
     //Coalesce changes to the feature state before applying to tiles.
     std::shared_ptr<FeatureStatesMap> changedStates = std::make_shared<FeatureStatesMap>();
-    for( const auto& sourceLayer: newStates) {
-        auto& existing = (*featureStates)[sourceLayer.first];
-        auto& changed = sourceLayer.second;
-        FeatureStates newChanges;
-        //for each feature id in this sourceLayer, get and merge the PropertyMap from newStates
-        for (const auto& id: changed) {
-            auto& e = existing[id.first];
-            extend(e, id.second);
-            newChanges[id.first] = e;
+//    printf("TPU: %lu statechanges\n", statesChangeSet.size());
+    for( const auto& stateChange: statesChangeSet) {
+        auto& existing = (*featureStates)[stateChange.sourceLayer];
+        if (stateChange.type == FeatureStateChange::ChangeType::Insert) {
+            
+            (existing[stateChange.id])[stateChange.key] = *(stateChange.value);
         }
-        changedStates->emplace(sourceLayer.first, newChanges);
+        (*changedStates)[stateChange.sourceLayer][stateChange.id] = existing[stateChange.id];
     }
 
     // Stores a list of all the tiles that we're definitely going to retain. There are two

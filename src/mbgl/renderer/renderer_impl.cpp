@@ -243,12 +243,22 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             filteredLayers.push_back(layer);
         }
 
-        //TODO: AHM: Send feature states
-        renderSources.at(source->id)->update(source,
-                                             filteredLayers,
-                                             needsRendering,
-                                             needsRelayout,
-                                             tileParameters);
+        const auto changeSet = updateParameters.stateChanges->find(source->id);
+        if (changeSet != updateParameters.stateChanges->end()) {
+            renderSources.at(source->id)->update(source,
+                                                 filteredLayers,
+                                                 changeSet->second,
+                                                 needsRendering,
+                                                 needsRelayout,
+                                                 tileParameters);
+        }
+        else {
+            renderSources.at(source->id)->update(source,
+                                                 filteredLayers,
+                                                 needsRendering,
+                                                 needsRelayout,
+                                                 tileParameters);
+        }
     }
 
     transformState = updateParameters.transformState;

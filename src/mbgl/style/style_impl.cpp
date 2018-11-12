@@ -21,6 +21,8 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/feature_state.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
 
 namespace mbgl {
 namespace style {
@@ -355,6 +357,20 @@ Immutable<std::vector<Immutable<Source::Impl>>> Style::Impl::getSourceImpls() co
 
 Immutable<std::vector<Immutable<Layer::Impl>>> Style::Impl::getLayerImpls() const {
     return layers.getImpls();
+}
+
+Immutable<std::unordered_map<std::string, Immutable<std::vector<FeatureStateChange>>>> Style::Impl::getFeatureStateChangeSets() {
+    auto sources_ = getSources();
+    Mutable<std::unordered_map<std::string, Immutable<std::vector<FeatureStateChange>>>>
+        collectedStates(makeMutable<std::unordered_map<std::string, Immutable<std::vector<FeatureStateChange>>>>());
+
+    for (auto src: sources_) {
+        if (src->is<GeoJSONSource>()) {
+            GeoJSONSource * gjSrc = src->as<GeoJSONSource>();
+            collectedStates->insert({gjSrc->getID(), gjSrc->collectFeatureStates()});
+        }
+    }
+    return std::move(collectedStates);
 }
 
 } // namespace style

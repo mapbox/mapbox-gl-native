@@ -787,6 +787,7 @@ void Map::Impl::onUpdate() {
         style->impl->getImageImpls(),
         style->impl->getSourceImpls(),
         style->impl->getLayerImpls(),
+        style->impl->getFeatureStateChangeSets(),
         annotationManager,
         prefetchZoomDelta,
         bool(stillImageRequest),

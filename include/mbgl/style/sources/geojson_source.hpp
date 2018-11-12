@@ -2,8 +2,10 @@
 
 #include <mbgl/style/source.hpp>
 #include <mbgl/util/geojson.hpp>
+#include <mbgl/util/feature_state.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/immutable.hpp>
 
 namespace mbgl {
 
@@ -33,6 +35,7 @@ public:
 
     void setURL(const std::string& url);
     void setGeoJSON(const GeoJSON&);
+    void setFeatureState(const FeatureIdentifier&, const std::string&, const mbgl::Value&);
 
     optional<std::string> getURL() const;
 
@@ -41,9 +44,11 @@ public:
 
     void loadDescription(FileSource&) final;
 
+    Immutable<std::vector<FeatureStateChange>> collectFeatureStates();
 private:
     optional<std::string> url;
     std::unique_ptr<AsyncRequest> req;
+    Mutable<std::vector<FeatureStateChange>> stateChanges;
 };
 
 template <>

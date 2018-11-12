@@ -26,6 +26,7 @@ bool RenderGeoJSONSource::isLoaded() const {
 
 void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
                                  const std::vector<Immutable<Layer::Impl>>& layers,
+                                 Immutable<FeatureStateChangeSet> statesChangeSet,
                                  const bool needsRendering,
                                  const bool needsRelayout,
                                  const TileParameters& parameters) {
@@ -56,6 +57,7 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
     }
 
     tilePyramid.update(layers,
+                       *statesChangeSet,
                        needsRendering,
                        needsRelayout,
                        parameters,
@@ -68,6 +70,50 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
+void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
+                                 const std::vector<Immutable<Layer::Impl>>& layers,
+                                 const bool needsRendering,
+                                 const bool needsRelayout,
+                                 const TileParameters& parameters) {
+    std::swap(baseImpl, baseImpl_);
+
+    enabled = needsRendering;
+
+    GeoJSONData* data_ = impl().getData();
+
+    if (data_ != data) {
+        data = data_;
+        tilePyramid.cache.clear();
+
+        if (data) {
+            const uint8_t maxZ = impl().getZoomRange().max;
+            for (const auto& pair : tilePyramid.tiles) {
+                if (pair.first.canonical.z <= maxZ) {
+                    static_cast<GeoJSONTile*>(pair.second.get())->updateData(data->getTile(pair.first.canonical));
+                }
+            }
+        }
+    }
+
+    if (!data) {
+        tilePyramid.tiles.clear();
+        tilePyramid.renderTiles.clear();
+        return;
+    }
+
+    tilePyramid.update(layers,
+                       {},
+                       needsRendering,
+                       needsRelayout,
+                       parameters,
+                       SourceType::GeoJSON,
+                       util::tileSize,
+                       impl().getZoomRange(),
+                       optional<LatLngBounds>{},
+                       [&] (const OverscaledTileID& tileID) {
+                           return std::make_unique<GeoJSONTile>(tileID, impl().id, parameters, data->getTile(tileID.canonical));
+                       });
+}
 void RenderGeoJSONSource::startRender(PaintParameters& parameters) {
     parameters.clipIDGenerator.update(tilePyramid.getRenderTiles());
     tilePyramid.startRender(parameters);

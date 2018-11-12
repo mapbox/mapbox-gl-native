@@ -50,7 +50,7 @@ public:
 
     virtual void update(Immutable<style::Source::Impl>,
                 const std::vector<Immutable<style::Layer::Impl>>&,
-                const FeatureStatesMap&,
+                Immutable<FeatureStateChangeSet>,
                 bool,
                 bool,
                 const TileParameters&) {}

@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
         fileSource.setAccessToken(std::string(token));
     }
 
-    mbgl::ThreadPool threadPool(4);
+    mbgl::ThreadPool threadPool(1);
     GLFWRendererFrontend rendererFrontend { std::make_unique<mbgl::Renderer>(backend, view->getPixelRatio(), fileSource, threadPool), backend };
     mbgl::Map map(rendererFrontend, backend, view->getSize(), view->getPixelRatio(), fileSource, threadPool);
 
