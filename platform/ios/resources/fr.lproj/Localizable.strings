@@ -95,7 +95,7 @@
 "TELEMETRY_DISABLED_ON" = "Participer";
 
 /* Telemetry prompt message */
-"TELEMETRY_ENABLED_MSG" = "Vous aidez à rendre OpenStreetMap et Mapbox encore meilleurs en contribuant des données anonymes d’utilisation.";
+"TELEMETRY_ENABLED_MSG" = "Vous aidez à améliorer OpenStreetMap et Mapbox en contribuant des données anonymes d’utilisation.";
 
 /* Telemetry prompt button */
 "TELEMETRY_ENABLED_OFF" = "Arrêter de participer";
@@ -110,7 +110,7 @@
 "TELEMETRY_NAME" = "Télémétrie Mapbox";
 
 /* Telemetry prompt title */
-"TELEMETRY_TITLE" = "Rend meilleure les cartes Mapbox";
+"TELEMETRY_TITLE" = "Améliorez les cartes Mapbox";
 
 /* Default user location annotation title */
 "USER_DOT_TITLE" = "Vous êtes ici";
