@@ -9,7 +9,7 @@
 
 namespace mbgl {
 
-class RenderSymbolLayer;
+class RenderLayerSymbolInterface;
 class SymbolBucket;
 
 class OpacityState {
@@ -80,9 +80,9 @@ private:
 class Placement {
 public:
     Placement(const TransformState&, MapMode mapMode, const bool crossSourceCollisions);
-    void placeLayer(RenderSymbolLayer&, const mat4&, bool showCollisionBoxes);
+    void placeLayer(const RenderLayerSymbolInterface&, const mat4&, bool showCollisionBoxes);
     void commit(const Placement& prevPlacement, TimePoint);
-    void updateLayerOpacities(RenderSymbolLayer&);
+    void updateLayerOpacities(const RenderLayerSymbolInterface&);
     float symbolFadeChange(TimePoint now) const;
     bool hasTransitions(TimePoint now) const;
 

@@ -17,6 +17,7 @@ class TransitionParameters;
 class PropertyEvaluationParameters;
 class PaintParameters;
 class RenderSource;
+class RenderLayerSymbolInterface;
 class RenderTile;
 class TransformState;
 
@@ -42,6 +43,9 @@ public:
 
     // Returns true if the layer has a pattern property and is actively crossfading.
     virtual bool hasCrossfade() const = 0;
+
+    // Returns instance of RenderLayerSymbolInterface if RenderLayer supports it.
+    virtual const RenderLayerSymbolInterface* getSymbolInterface() const;
 
     // Check whether this layer is of the given subtype.
     template <class T>
@@ -118,10 +122,6 @@ protected:
     RenderTiles filterRenderTiles(RenderTiles, FilterFunctionPtr) const;
 
 protected:
-    // renderTiles are exposed directly to CrossTileSymbolIndex and Placement so they
-    // can update opacities in the symbol buckets immediately before rendering
-    friend class CrossTileSymbolIndex;
-    friend class Placement;
     // Stores current set of tiles to be rendered for this layer.
     std::vector<std::reference_wrapper<RenderTile>> renderTiles;
 

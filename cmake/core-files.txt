@@ -262,6 +262,7 @@ src/mbgl/renderer/layers/render_heatmap_layer.cpp
 src/mbgl/renderer/layers/render_heatmap_layer.hpp
 src/mbgl/renderer/layers/render_hillshade_layer.cpp
 src/mbgl/renderer/layers/render_hillshade_layer.hpp
+src/mbgl/renderer/layers/render_layer_symbol_interface.hpp
 src/mbgl/renderer/layers/render_line_layer.cpp
 src/mbgl/renderer/layers/render_line_layer.hpp
 src/mbgl/renderer/layers/render_raster_layer.cpp
