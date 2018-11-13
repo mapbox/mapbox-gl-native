@@ -516,3 +516,21 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(LowHighPriorityRequestsMany)) {
 
     loop.run();
 }
+
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RequestSameUrlMultipleTimes)) {
+    util::RunLoop loop;
+    OnlineFileSource fs;
+
+    int count = 0;
+    std::vector<std::unique_ptr<AsyncRequest>> requests;
+
+    for (int i = 0; i < 100; ++i) {
+        requests.emplace_back(fs.request({ Resource::Unknown, "http://127.0.0.1:3000/load" }, [&](Response) {
+            if (++count == 100) {
+                loop.stop();
+            }
+        }));
+    }
+
+    loop.run();
+}
