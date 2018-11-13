@@ -87,6 +87,21 @@ bool HeadlessFrontend::hasSource(const std::string& id) {
 
     return false;
 }
+ScreenCoordinate HeadlessFrontend::pixelForLatLng(const LatLng& coordinate) {
+    if (updateParameters) {
+        return RendererState::pixelForLatLng(*updateParameters, coordinate);
+    }
+
+    return ScreenCoordinate {};
+}
+
+LatLng HeadlessFrontend::latLngForPixel(const ScreenCoordinate& point) {
+    if (updateParameters) {
+        return RendererState::latLngForPixel(*updateParameters, point);
+    }
+
+    return LatLng {};
+}
 
 void HeadlessFrontend::setSize(Size size_) {
     if (size != size_) {
