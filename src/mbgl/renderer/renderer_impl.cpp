@@ -322,46 +322,48 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         order.emplace_back(RenderItem { *layer, source });
     }
 
-    bool symbolBucketsChanged = false;
-    if (parameters.mapMode != MapMode::Continuous) {
-        // TODO: Think about right way for symbol index to handle still rendering
-        crossTileSymbolIndex.reset();
-    }
-    for (auto it = order.rbegin(); it != order.rend(); ++it) {
-        if (it->layer.is<RenderSymbolLayer>()) {
-            const float lng = parameters.state.getLatLng().longitude();
-            if (crossTileSymbolIndex.addLayer(*it->layer.as<RenderSymbolLayer>(), lng)) symbolBucketsChanged = true;
+    {
+        if (parameters.mapMode != MapMode::Continuous) {
+            // TODO: Think about right way for symbol index to handle still rendering
+            crossTileSymbolIndex.reset();
         }
-    }
 
-    bool placementChanged = false;
-    if (!placement->stillRecent(parameters.timePoint)) {
-        placementChanged = true;
+        std::vector<RenderItem> renderItemsWithSymbols;
+        std::copy_if(order.rbegin(), order.rend(), std::back_inserter(renderItemsWithSymbols),
+                [](const auto& item) { return item.layer.getSymbolInterface() != nullptr; });
 
-        auto newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode, updateParameters.crossSourceCollisions);
+        bool symbolBucketsChanged = false;
+        const bool placementChanged = !placement->stillRecent(parameters.timePoint);
+        std::unique_ptr<Placement> newPlacement;
         std::set<std::string> usedSymbolLayers;
-        for (auto it = order.rbegin(); it != order.rend(); ++it) {
-            if (it->layer.is<RenderSymbolLayer>()) {
-                usedSymbolLayers.insert(it->layer.getID());
-                newPlacement->placeLayer(*it->layer.as<RenderSymbolLayer>(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
+
+        if (placementChanged) {
+            newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode, updateParameters.crossSourceCollisions);
+        }
+
+        for (const auto& item : renderItemsWithSymbols) {
+            if (crossTileSymbolIndex.addLayer(*item.layer.getSymbolInterface(), parameters.state.getLatLng().longitude())) symbolBucketsChanged = true;
+
+            if (newPlacement) {
+                usedSymbolLayers.insert(item.layer.getID());
+                newPlacement->placeLayer(*item.layer.getSymbolInterface(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
             }
         }
 
-        newPlacement->commit(*placement, parameters.timePoint);
-        crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
-        placement = std::move(newPlacement);
-        
-        updateFadingTiles();
-    } else {
-        placement->setStale();
-    }
+        if (newPlacement) {
+            newPlacement->commit(*placement, parameters.timePoint);
+            crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
+            placement = std::move(newPlacement);
+            updateFadingTiles();
+        } else {
+            placement->setStale();
+        }
 
-    parameters.symbolFadeChange = placement->symbolFadeChange(parameters.timePoint);
+        parameters.symbolFadeChange = placement->symbolFadeChange(parameters.timePoint);
 
-    if (placementChanged || symbolBucketsChanged) {
-        for (auto it = order.rbegin(); it != order.rend(); ++it) {
-            if (it->layer.is<RenderSymbolLayer>()) {
-                placement->updateLayerOpacities(*it->layer.as<RenderSymbolLayer>());
+        if (placementChanged || symbolBucketsChanged) {
+            for (const auto& item : renderItemsWithSymbols) {
+                placement->updateLayerOpacities(*item.layer.getSymbolInterface());
             }
         }
     }

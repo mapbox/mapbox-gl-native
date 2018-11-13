@@ -1,6 +1,7 @@
 #include <mbgl/text/cross_tile_symbol_index.hpp>
 #include <mbgl/layout/symbol_instance.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
+#include <mbgl/renderer/layers/render_layer_symbol_interface.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/tile/tile.hpp>
 
@@ -164,27 +165,27 @@ bool CrossTileSymbolLayerIndex::removeStaleBuckets(const std::unordered_set<uint
 
 CrossTileSymbolIndex::CrossTileSymbolIndex() {}
 
-bool CrossTileSymbolIndex::addLayer(RenderSymbolLayer& symbolLayer, float lng) {
+bool CrossTileSymbolIndex::addLayer(const RenderLayerSymbolInterface& symbolInterface, float lng) {
 
-    auto& layerIndex = layerIndexes[symbolLayer.getID()];
+    auto& layerIndex = layerIndexes[symbolInterface.layerID()];
 
     bool symbolBucketsChanged = false;
     std::unordered_set<uint32_t> currentBucketIDs;
 
     layerIndex.handleWrapJump(lng);
 
-    for (RenderTile& renderTile : symbolLayer.renderTiles) {
+    for (const RenderTile& renderTile : symbolInterface.getRenderTiles()) {
         if (!renderTile.tile.isRenderable()) {
             continue;
         }
 
-        auto bucket = renderTile.tile.getBucket<SymbolBucket>(*symbolLayer.baseImpl);
+        auto bucket = symbolInterface.getSymbolBucket(renderTile);
         if (!bucket) {
             continue;
         }
         SymbolBucket& symbolBucket = *bucket;
 
-        if (symbolBucket.bucketLeaderID != symbolLayer.getID()) {
+        if (symbolBucket.bucketLeaderID != symbolInterface.layerID()) {
             // Only add this layer if it's the "group leader" for the bucket
             continue;
         }

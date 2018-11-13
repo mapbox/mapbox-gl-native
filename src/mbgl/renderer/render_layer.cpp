@@ -86,6 +86,10 @@ void RenderLayer::sortRenderTiles(const TransformState&) {
     std::sort(renderTiles.begin(), renderTiles.end(), [](const auto& a, const auto& b) { return a.get().id < b.get().id; });
 }
 
+const RenderLayerSymbolInterface* RenderLayer::getSymbolInterface() const {
+    return nullptr;
+}
+
 void RenderLayer::update() {
     // no-op
 }

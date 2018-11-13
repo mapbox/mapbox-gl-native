@@ -1,6 +1,6 @@
 #include <mbgl/text/placement.hpp>
 #include <mbgl/renderer/render_layer.hpp>
-#include <mbgl/renderer/layers/render_symbol_layer.hpp>
+#include <mbgl/renderer/layers/render_layer_symbol_interface.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
@@ -62,24 +62,24 @@ Placement::Placement(const TransformState& state_, MapMode mapMode_, const bool 
     , collisionGroups(crossSourceCollisions)
 {}
 
-void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatrix, bool showCollisionBoxes) {
+void Placement::placeLayer(const RenderLayerSymbolInterface& symbolInterface, const mat4& projMatrix, bool showCollisionBoxes) {
 
     std::unordered_set<uint32_t> seenCrossTileIDs;
 
-    for (RenderTile& renderTile : symbolLayer.renderTiles) {
+    for (const RenderTile& renderTile : symbolInterface.getRenderTiles()) {
         if (!renderTile.tile.isRenderable()) {
             continue;
         }
         assert(renderTile.tile.kind == Tile::Kind::Geometry);
         GeometryTile& geometryTile = static_cast<GeometryTile&>(renderTile.tile);
 
-        auto bucket = renderTile.tile.getBucket<SymbolBucket>(*symbolLayer.baseImpl);
+        auto bucket = symbolInterface.getSymbolBucket(renderTile);
         if (!bucket) {
             continue;
         }
         SymbolBucket& symbolBucket = *bucket;
 
-        if (symbolBucket.bucketLeaderID != symbolLayer.getID()) {
+        if (symbolBucket.bucketLeaderID != symbolInterface.layerID()) {
             // Only place this layer if it's the "group leader" for the bucket
             continue;
         }
@@ -276,20 +276,20 @@ void Placement::commit(const Placement& prevPlacement, TimePoint now) {
     fadeStartTime = placementChanged ? commitTime : prevPlacement.fadeStartTime;
 }
 
-void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer) {
+void Placement::updateLayerOpacities(const RenderLayerSymbolInterface& symbolInterface) {
     std::set<uint32_t> seenCrossTileIDs;
-    for (RenderTile& renderTile : symbolLayer.renderTiles) {
+    for (const RenderTile& renderTile : symbolInterface.getRenderTiles()) {
         if (!renderTile.tile.isRenderable()) {
             continue;
         }
 
-        auto bucket = renderTile.tile.getBucket<SymbolBucket>(*symbolLayer.baseImpl);
+        auto bucket = symbolInterface.getSymbolBucket(renderTile);
         if (!bucket) {
             continue;
         }
         SymbolBucket& symbolBucket = *bucket;
 
-        if (symbolBucket.bucketLeaderID != symbolLayer.getID()) {
+        if (symbolBucket.bucketLeaderID != symbolInterface.layerID()) {
             // Only update opacities this layer if it's the "group leader" for the bucket
             continue;
         }
