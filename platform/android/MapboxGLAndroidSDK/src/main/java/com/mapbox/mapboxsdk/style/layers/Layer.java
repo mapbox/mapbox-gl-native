@@ -2,10 +2,11 @@ package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
-
 import android.support.annotation.Nullable;
+
 import com.google.gson.JsonElement;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
+import com.mapbox.mapboxsdk.style.types.Formatted;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
 
 /**
@@ -137,9 +138,12 @@ public abstract class Layer {
 
   @Nullable
   private Object convertValue(@Nullable Object value) {
-    if (value != null && value instanceof Expression) {
+    if (value instanceof Expression) {
       return ((Expression) value).toArray();
+    } else if (value instanceof Formatted) {
+      return ((Formatted) value).toArray();
+    } else {
+      return value;
     }
-    return value;
   }
 }
