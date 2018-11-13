@@ -126,7 +126,7 @@ namespace mbgl {
 
 - (void)setFillColorTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting fillColorTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting fillColorTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillColorTransition(options);
@@ -163,7 +163,7 @@ namespace mbgl {
 
 - (void)setFillOpacityTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting fillOpacityTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting fillOpacityTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillOpacityTransition(options);
@@ -200,7 +200,7 @@ namespace mbgl {
 
 - (void)setFillOutlineColorTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting fillOutlineColorTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting fillOutlineColorTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillOutlineColorTransition(options);
@@ -237,7 +237,7 @@ namespace mbgl {
 
 - (void)setFillPatternTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting fillPatternTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting fillPatternTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillPatternTransition(options);
@@ -274,7 +274,7 @@ namespace mbgl {
 
 - (void)setFillTranslationTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting fillTranslationTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting fillTranslationTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillTranslateTransition(options);

@@ -70,7 +70,7 @@ namespace mbgl {
 
 - (void)setMaximumRasterBrightnessTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting maximumRasterBrightnessTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting maximumRasterBrightnessTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setRasterBrightnessMaxTransition(options);
@@ -114,7 +114,7 @@ namespace mbgl {
 
 - (void)setMinimumRasterBrightnessTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting minimumRasterBrightnessTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting minimumRasterBrightnessTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setRasterBrightnessMinTransition(options);
@@ -158,7 +158,7 @@ namespace mbgl {
 
 - (void)setRasterContrastTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting rasterContrastTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting rasterContrastTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setRasterContrastTransition(options);
@@ -213,7 +213,7 @@ namespace mbgl {
 
 - (void)setRasterHueRotationTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting rasterHueRotationTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting rasterHueRotationTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setRasterHueRotateTransition(options);
@@ -257,7 +257,7 @@ namespace mbgl {
 
 - (void)setRasterOpacityTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting rasterOpacityTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting rasterOpacityTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setRasterOpacityTransition(options);
@@ -319,7 +319,7 @@ namespace mbgl {
 
 - (void)setRasterSaturationTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting rasterSaturationTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting rasterSaturationTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setRasterSaturationTransition(options);

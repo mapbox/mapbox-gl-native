@@ -125,7 +125,7 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 <% if (property["transition"]) { -%>
 
 - (void)set<%- camelize(property.name) %>Transition:(MGLTransition)transition {
-    MGLLogDebug(@"Setting <%- objCName(property) %>Transition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting <%- objCName(property) %>Transition: %@", MGLStringFromMGLTransition(transition));
     _<%- objCName(property) %>Transition = transition;
 }
 <% } -%>

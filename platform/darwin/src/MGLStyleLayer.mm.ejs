@@ -206,7 +206,7 @@ namespace mbgl {
 
 - (void)set<%- camelize(property.name) %>Transition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting <%- objCName(property) %>Transition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting <%- objCName(property) %>Transition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->set<%- camelize(originalPropertyName(property)) %>Transition(options);

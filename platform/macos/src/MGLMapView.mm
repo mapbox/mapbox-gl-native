@@ -991,7 +991,7 @@ public:
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate animated:(BOOL)animated {
-    MGLLogDebug(@"Setting centerCoordinate: %@ animated: %@", NSStringFromCLLocationCoordinate2D(centerCoordinate), NSStringFromBOOL(animated));
+    MGLLogDebug(@"Setting centerCoordinate: %@ animated: %@", NSStringFromCLLocationCoordinate2D(centerCoordinate), MGLStringFromBOOL(animated));
     [self willChangeValueForKey:@"centerCoordinate"];
     _mbglMap->setLatLng(MGLLatLngFromLocationCoordinate2D(centerCoordinate),
                         MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
@@ -1042,7 +1042,7 @@ public:
 }
 
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated {
-    MGLLogDebug(@"Setting zoomLevel: %f animated: %@", zoomLevel, NSStringFromBOOL(animated));
+    MGLLogDebug(@"Setting zoomLevel: %f animated: %@", zoomLevel, MGLStringFromBOOL(animated));
     [self willChangeValueForKey:@"zoomLevel"];
     _mbglMap->setZoom(zoomLevel,
                       MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
@@ -1114,7 +1114,7 @@ public:
 }
 
 - (void)setDirection:(CLLocationDirection)direction animated:(BOOL)animated {
-    MGLLogDebug(@"Setting direction: %f animated: %@", direction, NSStringFromBOOL(animated));
+    MGLLogDebug(@"Setting direction: %f animated: %@", direction, MGLStringFromBOOL(animated));
     [self willChangeValueForKey:@"direction"];
     _mbglMap->setBearing(direction,
                          MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
@@ -1141,7 +1141,7 @@ public:
 }
 
 - (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated {
-    MGLLogDebug(@"Setting camera: %@ animated: %@", camera, NSStringFromBOOL(animated));
+    MGLLogDebug(@"Setting camera: %@ animated: %@", camera, MGLStringFromBOOL(animated));
     [self setCamera:camera withDuration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:NULL];
 }
 
@@ -1264,7 +1264,7 @@ public:
 }
 
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds animated:(BOOL)animated {
-    MGLLogDebug(@"Setting visibleCoordinateBounds: %@ animated: %@", MGLStringFromCoordinateBounds(bounds), NSStringFromBOOL(animated));
+    MGLLogDebug(@"Setting visibleCoordinateBounds: %@ animated: %@", MGLStringFromCoordinateBounds(bounds), MGLStringFromBOOL(animated));
     [self setVisibleCoordinateBounds:bounds edgePadding:NSEdgeInsetsZero animated:animated];
 }
 
@@ -2289,7 +2289,7 @@ public:
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint moveOnscreen:(BOOL)moveOnscreen animateSelection:(BOOL)animateSelection
 {
-    MGLLogDebug(@"Selecting annotation: %@ atPoint: %@ moveOnscreen: %@ animateSelection: %@", annotation, NSStringFromPoint(gesturePoint), NSStringFromBOOL(moveOnscreen), NSStringFromBOOL(animateSelection));
+    MGLLogDebug(@"Selecting annotation: %@ atPoint: %@ moveOnscreen: %@ animateSelection: %@", annotation, NSStringFromPoint(gesturePoint), MGLStringFromBOOL(moveOnscreen), MGLStringFromBOOL(animateSelection));
     id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
     if (annotation == selectedAnnotation) {
         return;
@@ -2401,7 +2401,7 @@ public:
 }
 
 - (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations animated:(BOOL)animated {
-    MGLLogDebug(@"Showing: %lu annotations animated: %@", annotations.count, NSStringFromBOOL(animated));
+    MGLLogDebug(@"Showing: %lu annotations animated: %@", annotations.count, MGLStringFromBOOL(animated));
     CGFloat maximumPadding = 100;
     CGFloat yPadding = (NSHeight(self.bounds) / 5 <= maximumPadding) ? (NSHeight(self.bounds) / 5) : maximumPadding;
     CGFloat xPadding = (NSWidth(self.bounds) / 5 <= maximumPadding) ? (NSWidth(self.bounds) / 5) : maximumPadding;

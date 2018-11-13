@@ -93,7 +93,7 @@ typedef struct __attribute__((objc_boxable)) MGLTransition {
     NSTimeInterval delay;
 } MGLTransition;
 
-NS_INLINE NSString *NSStringFromMGLTransition(MGLTransition transition) {
+NS_INLINE NSString *MGLStringFromMGLTransition(MGLTransition transition) {
     return [NSString stringWithFormat:@"transition { duration: %f, delay: %f }", transition.duration, transition.delay];
 }
 

@@ -122,7 +122,7 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 }
 
 - (void)setPositionTransition:(MGLTransition)transition {
-    MGLLogDebug(@"Setting positionTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting positionTransition: %@", MGLStringFromMGLTransition(transition));
     _positionTransition = transition;
 }
 
@@ -133,7 +133,7 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 }
 
 - (void)setColorTransition:(MGLTransition)transition {
-    MGLLogDebug(@"Setting colorTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting colorTransition: %@", MGLStringFromMGLTransition(transition));
     _colorTransition = transition;
 }
 
@@ -144,7 +144,7 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 }
 
 - (void)setIntensityTransition:(MGLTransition)transition {
-    MGLLogDebug(@"Setting intensityTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting intensityTransition: %@", MGLStringFromMGLTransition(transition));
     _intensityTransition = transition;
 }
 

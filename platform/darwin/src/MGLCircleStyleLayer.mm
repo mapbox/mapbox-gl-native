@@ -111,7 +111,7 @@ namespace mbgl {
 
 - (void)setCircleBlurTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting circleBlurTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting circleBlurTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleBlurTransition(options);
@@ -148,7 +148,7 @@ namespace mbgl {
 
 - (void)setCircleColorTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting circleColorTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting circleColorTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleColorTransition(options);
@@ -185,7 +185,7 @@ namespace mbgl {
 
 - (void)setCircleOpacityTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting circleOpacityTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting circleOpacityTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleOpacityTransition(options);
@@ -240,7 +240,7 @@ namespace mbgl {
 
 - (void)setCircleRadiusTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting circleRadiusTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting circleRadiusTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleRadiusTransition(options);
@@ -302,7 +302,7 @@ namespace mbgl {
 
 - (void)setCircleStrokeColorTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting circleStrokeColorTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting circleStrokeColorTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleStrokeColorTransition(options);
@@ -339,7 +339,7 @@ namespace mbgl {
 
 - (void)setCircleStrokeOpacityTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting circleStrokeOpacityTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting circleStrokeOpacityTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleStrokeOpacityTransition(options);
@@ -376,7 +376,7 @@ namespace mbgl {
 
 - (void)setCircleStrokeWidthTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting circleStrokeWidthTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting circleStrokeWidthTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleStrokeWidthTransition(options);
@@ -413,7 +413,7 @@ namespace mbgl {
 
 - (void)setCircleTranslationTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
-    MGLLogDebug(@"Setting circleTranslationTransition: %@", NSStringFromMGLTransition(transition));
+    MGLLogDebug(@"Setting circleTranslationTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setCircleTranslateTransition(options);
