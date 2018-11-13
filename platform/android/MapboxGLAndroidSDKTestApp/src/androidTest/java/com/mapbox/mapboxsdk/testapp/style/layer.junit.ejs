@@ -175,10 +175,10 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
 
       layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>("default"));
       assertEquals(layer.get<%- camelize(property.name) %>().getValue(), propertyValue);
-<% } else {-%>
+
+<% } -%>
       layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>(propertyValue));
       assertEquals(layer.get<%- camelize(property.name) %>().getValue(), propertyValue);
-<% } -%>
 <% if (property.tokens) { -%>
 
       layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>("{token}"));

@@ -9,6 +9,7 @@ package com.mapbox.mapboxsdk.style.layers;
 import android.support.annotation.ColorInt;
 
 import com.mapbox.mapboxsdk.style.expressions.Expression;
+import com.mapbox.mapboxsdk.style.types.Formatted;
 import static com.mapbox.mapboxsdk.utils.ColorUtils.colorToRgbaString;
 
 /**
@@ -73,7 +74,8 @@ public class PropertyFactory {
   public static PropertyValue<String> <%- camelizeWithLeadingLowercase(property.name) %>(String value) {
     return new LayoutPropertyValue<>("<%-  property.name %>", value);
   }
-<% } else {-%>
+
+<% } -%>
   /**
    * <%- propertyFactoryMethodDoc(property) %>
    *
@@ -83,7 +85,6 @@ public class PropertyFactory {
   public static PropertyValue<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %>(<%- propertyTypeAnnotation(property) %><%- iff(() => propertyTypeAnnotation(property), " ") %><%- propertyType(property) %> value) {
     return new LayoutPropertyValue<>("<%-  property.name %>", value);
   }
-<% } -%>
 
   /**
    * <%- propertyFactoryMethodDoc(property) %>

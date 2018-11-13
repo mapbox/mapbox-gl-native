@@ -187,7 +187,7 @@ global.defaultValueJava = function(property) {
       case 'number':
         return '0.3f';
       case 'formatted':
-        return 'new Formatted(new FormattedSection[]{new FormattedSection("default")})'
+        return 'new Formatted(new FormattedSection("default"))'
       case 'string':
         return '"' + property['default'] + '"';
       case 'enum':
