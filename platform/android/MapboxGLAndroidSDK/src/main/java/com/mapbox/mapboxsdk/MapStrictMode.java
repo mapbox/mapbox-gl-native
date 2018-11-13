@@ -29,36 +29,18 @@ public class MapStrictMode {
   /**
    * Internal use. Called whenever the strict mode violation occurs.
    */
-  public static void strictModeViolation(String message, Exception exception) {
+  public static void strictModeViolation(String message, Throwable throwable) {
     if (strictModeEnabled) {
-      throw new MapStrictModeException(String.format("%s - %s", message, exception));
+      throw new MapStrictModeException(String.format("%s - %s", message, throwable));
     }
   }
 
   /**
    * Internal use. Called whenever the strict mode violation occurs.
    */
-  public static void strictModeViolation(String message, Error error) {
+  public static void strictModeViolation(Throwable throwable) {
     if (strictModeEnabled) {
-      throw new MapStrictModeException(String.format("%s - %s", message, error));
-    }
-  }
-
-  /**
-   * Internal use. Called whenever the strict mode violation occurs.
-   */
-  public static void strictModeViolation(Error error) {
-    if (strictModeEnabled) {
-      throw new MapStrictModeException(String.format("%s", error));
-    }
-  }
-
-  /**
-   * Internal use. Called whenever the strict mode violation occurs.
-   */
-  public static void strictModeViolation(Exception exception) {
-    if (strictModeEnabled) {
-      throw new MapStrictModeException(String.format("%s", exception));
+      throw new MapStrictModeException(String.format("%s", throwable));
     }
   }
 }
