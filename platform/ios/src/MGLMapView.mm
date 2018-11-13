@@ -1380,11 +1380,17 @@ public:
 
 - (void)touchesBegan:(__unused NSSet<UITouch *> *)touches withEvent:(__unused UIEvent *)event
 {
+    if (!self.zoomEnabled && !self.pitchEnabled && !self.rotateEnabled && !self.scrollEnabled)
+    {
+        return;
+    };
+    
     _mbglMap->setGestureInProgress(false);
     if (self.userTrackingState == MGLUserTrackingStateBegan)
     {
         [self setUserTrackingMode:MGLUserTrackingModeNone animated:NO];
     }
+    
     [self cancelTransitions];
 }
 
