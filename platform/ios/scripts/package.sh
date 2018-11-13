@@ -13,6 +13,7 @@ LOG_PATH=build/xcodebuild-$(date +"%Y-%m-%d_%H%M%S").log
 BUILDTYPE=${BUILDTYPE:-Debug}
 BUILD_FOR_DEVICE=${BUILD_DEVICE:-true}
 SYMBOLS=${SYMBOLS:-YES}
+VARIANT=normal
 
 FORMAT=${FORMAT:-dynamic}
 BUILD_DYNAMIC=true
@@ -98,6 +99,17 @@ fi
 
 LIBS=(Mapbox.a)
 
+function copy_map_files {
+    MAP_FILE_ARCHS='armv7 arm64'
+    for ARCH in ${MAP_FILE_ARCHS}; do
+        MAP_FILE="${PRODUCTS}/${BUILDTYPE}-iphoneos/${NAME}-LinkMap-${VARIANT}-${ARCH}.txt"
+        if [[ -e ${MAP_FILE} ]]; then
+            step "Copying map file for ${ARCH}"
+            cp ${MAP_FILE} ${OUTPUT}/dynamic/
+        fi
+    done
+}
+
 # https://medium.com/@syshen/create-an-ios-universal-framework-148eb130a46c
 if [[ ${BUILD_FOR_DEVICE} == true ]]; then
     if [[ ${BUILD_STATIC} == true ]]; then
@@ -110,6 +122,8 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
             `cmake -LA -N ${DERIVED_DATA} | grep MASON_PACKAGE_icu_LIBRARIES | cut -d= -f2`
 
         cp -rv ${PRODUCTS}/${BUILDTYPE}-iphoneos/${NAME}.bundle ${OUTPUT}/static
+
+        copy_map_files
     fi
 
     if [[ ${BUILD_DYNAMIC} == true ]]; then
@@ -131,6 +145,8 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
                 lipo -info ${OUTPUT}/dynamic/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}
             fi
         fi
+
+        copy_map_files
 
         step "Merging simulator dynamic library into device dynamic library…"
         lipo \
@@ -164,6 +180,8 @@ else
         fi
     fi
     
+    copy_map_files
+
     cp -rv platform/ios/app/Settings.bundle ${OUTPUT}
 fi
 
