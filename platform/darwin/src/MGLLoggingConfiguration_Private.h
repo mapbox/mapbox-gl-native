@@ -4,10 +4,19 @@ NS_INLINE NSString *MGLStringFromBOOL(BOOL value) {
     return value ? @"YES" : @"NO";
 }
 
-#define MGLLogInfo(message, ...)  MGLLogWithType(MGLLoggingLevelInfo, __PRETTY_FUNCTION__, __LINE__, @"")
-#define MGLLogDebug(message, ...) MGLLogWithType(MGLLoggingLevelDebug, __PRETTY_FUNCTION__, __LINE__, @"")
-#define MGLLogError(message, ...) MGLLogWithType(MGLLoggingLevelError, __PRETTY_FUNCTION__, __LINE__, @"")
-#define MGLLogFault(message, ...) MGLLogWithType(MGLLoggingLevelFault, __PRETTY_FUNCTION__, __LINE__, @"")
+#ifdef MGL_DISABLE_LOGGING
+#define MGLLogInfo(...)
+#define MGLLogDebug(...)
+#define MGLLogError(...)
+#define MGLLogFault(...)
+
+#else
+#define MGLLogInfo(message, ...)  MGLLogWithType(MGLLoggingLevelInfo, __PRETTY_FUNCTION__, __LINE__, message, ##__VA_ARGS__)
+#define MGLLogDebug(message, ...) MGLLogWithType(MGLLoggingLevelDebug, __PRETTY_FUNCTION__, __LINE__, message, ##__VA_ARGS__)
+#define MGLLogError(message, ...) MGLLogWithType(MGLLoggingLevelError, __PRETTY_FUNCTION__, __LINE__, message, ##__VA_ARGS__)
+#define MGLLogFault(message, ...) MGLLogWithType(MGLLoggingLevelFault, __PRETTY_FUNCTION__, __LINE__, message, ##__VA_ARGS__)
+#endif
+
 #define MGLLogWithType(type, function, line, message, ...) \
 { \
     if ([MGLLoggingConfiguration sharedConfiguration].loggingLevel != MGLLoggingLevelNone && type <= [MGLLoggingConfiguration sharedConfiguration].loggingLevel) \
