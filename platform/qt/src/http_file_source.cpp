@@ -90,8 +90,12 @@ void HTTPFileSource::Impl::onReplyFinished()
 
     QByteArray data = reply->readAll();
     QVector<HTTPRequest*>& requestsVector = it.value().second;
-    for (auto req : requestsVector) {
-        req->handleNetworkReply(reply, data);
+
+    // Cannot use the iterator to walk the requestsVector
+    // because calling handleNetworkReply() might get
+    // requests added to the requestsVector.
+    while (!requestsVector.isEmpty()) {
+        requestsVector.takeFirst()->handleNetworkReply(reply, data);
     }
 
     m_pending.erase(it);
