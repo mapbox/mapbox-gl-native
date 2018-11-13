@@ -39,6 +39,9 @@ public:
     bool hasLayer(const std::string&);
     bool hasSource(const std::string&);
 
+    ScreenCoordinate pixelForLatLng(const LatLng&);
+    LatLng latLngForPixel(const ScreenCoordinate&);
+
     PremultipliedImage readStillImage();
     PremultipliedImage render(Map&);
 

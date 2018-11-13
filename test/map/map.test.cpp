@@ -79,6 +79,16 @@ TEST(Map, RendererState) {
     ASSERT_DOUBLE_EQ(*options.pitch, pitchInDegrees);
     EXPECT_NEAR(*options.angle, bearingInDegrees, 1e-7);
 
+    {
+        const LatLng& latLng = test.frontend.latLngForPixel(ScreenCoordinate { 0, 0 });
+        const ScreenCoordinate& point = test.frontend.pixelForLatLng(coordinate);
+        EXPECT_NEAR(coordinate.latitude(), latLng.latitude(), 1e-1);
+        EXPECT_NEAR(coordinate.longitude(), latLng.longitude(), 1e-1);
+        const Size size = test.map.getSize();
+        EXPECT_NEAR(point.x, size.width / 2.0, 1e-7);
+        EXPECT_NEAR(point.y, size.height / 2.0, 1e-7);
+    }
+
     // RendererState::hasImage
     test.map.getStyle().addImage(std::make_unique<style::Image>("default_marker", decodeImage(util::read_file("test/fixtures/sprites/default_marker.png")), 1.0));
 
