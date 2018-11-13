@@ -914,6 +914,12 @@ jobs:
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
+      - run:
+          name: Upload coverage results to codecov.io
+          command: |
+            curl -sSfL -o codecov https://codecov.io/bash
+            chmod +x codecov
+            ./codecov -c
 
 # ------------------------------------------------------------------------------
   ios-sanitize-nightly:
