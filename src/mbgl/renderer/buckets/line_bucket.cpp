@@ -3,6 +3,7 @@
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
+#include <iostream>
 
 #include <cassert>
 
@@ -181,6 +182,8 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, const Geome
 
         // if two consecutive vertices exist, skip the current one
         if (nextCoordinate && coordinates[i] == *nextCoordinate) {
+            std::clog << nextCoordinate->x << "," << nextCoordinate->y;
+            abort();
             continue;
         }
 
