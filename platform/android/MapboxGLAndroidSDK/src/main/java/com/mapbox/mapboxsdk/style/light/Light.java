@@ -8,8 +8,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 
 import com.mapbox.mapboxsdk.style.layers.Property;
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+import com.mapbox.mapboxsdk.utils.ColorUtils;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
 
 /**
@@ -104,7 +104,7 @@ public class Light {
    */
   public void setColor(@ColorInt int color) {
     checkThread();
-    nativeSetColor(PropertyFactory.colorToRgbaString(color));
+    nativeSetColor(ColorUtils.colorToRgbaString(color));
   }
 
   /**
