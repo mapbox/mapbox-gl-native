@@ -722,6 +722,17 @@ std::vector<Feature> Renderer::Impl::querySourceFeatures(const std::string& sour
     return source->querySourceFeatures(options);
 }
 
+FeatureExtensionValue Renderer::Impl::queryFeatureExtensions(const std::string& sourceID,
+                                                             const Feature& feature,
+                                                             const std::string& extension,
+                                                             const std::string& extensionField,
+                                                             const optional<std::map<std::string, Value>>& args) const {
+    if (RenderSource* renderSource = getRenderSource(sourceID)) {
+        return renderSource->queryFeatureExtensions(feature, extension, extensionField, args);
+    }
+    return {};
+}
+
 void Renderer::Impl::reduceMemoryUse() {
     assert(BackendScope::exists());
     for (const auto& entry : renderSources) {

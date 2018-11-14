@@ -53,6 +53,12 @@ public:
     std::vector<Feature> querySourceFeatures(const std::string& sourceID, const SourceQueryOptions&) const;
     std::vector<Feature> queryShapeAnnotations(const ScreenLineString&) const;
 
+    FeatureExtensionValue queryFeatureExtensions(const std::string& sourceID,
+                                                 const Feature& feature,
+                                                 const std::string& extension,
+                                                 const std::string& extensionField,
+                                                 const optional<std::map<std::string, Value>>& args) const;
+
     void reduceMemoryUse();
     void dumDebugLogs();
 

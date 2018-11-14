@@ -100,6 +100,14 @@ std::vector<Feature> Renderer::querySourceFeatures(const std::string& sourceID, 
     return impl->querySourceFeatures(sourceID, options);
 }
 
+FeatureExtensionValue Renderer::queryFeatureExtensions(const std::string& sourceID,
+                                                       const Feature& feature,
+                                                       const std::string& extension,
+                                                       const std::string& extensionField,
+                                                       const optional<std::map<std::string, Value>>& args) const {
+    return impl->queryFeatureExtensions(sourceID, feature, extension, extensionField, args);
+}
+
 void Renderer::dumpDebugLogs() {
     impl->dumDebugLogs();
 }
