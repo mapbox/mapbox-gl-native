@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-set -e
+set -eu
 set -o pipefail
-set -u
 
 NAME=Mapbox
 OUTPUT=build/ios/pkg
@@ -10,7 +9,7 @@ DERIVED_DATA=build/ios
 PRODUCTS=${DERIVED_DATA}
 LOG_PATH=build/xcodebuild-$(date +"%Y-%m-%d_%H%M%S").log
 
-BUILDTYPE=${BUILDTYPE:-Debug}
+BUILDTYPE=${BUILDTYPE:-Release}
 BUILD_FOR_DEVICE=${BUILD_DEVICE:-true}
 SYMBOLS=${SYMBOLS:-YES}
 
@@ -56,7 +55,7 @@ echo ${HASH}
 echo ${HASH} >> ${VERSION}
 
 PROJ_VERSION=$(git rev-list --count HEAD)
-SEM_VERSION=$( git describe --tags --match=ios-v*.*.* --abbrev=0 | sed 's/^ios-v//' )
+SEM_VERSION="4.5.0-cn.1"
 SHORT_VERSION=${SEM_VERSION%-*}
 
 step "Building targets (build ${PROJ_VERSION}, version ${SEM_VERSION})"
@@ -77,8 +76,7 @@ xcodebuild \
     -workspace ./platform/ios/ios.xcworkspace \
     -scheme ${SCHEME} \
     -configuration ${BUILDTYPE} \
-    -sdk iphonesimulator \
-    -jobs ${JOBS} | tee ${LOG_PATH} | xcpretty
+    -sdk iphonesimulator | tee ${LOG_PATH} | xcpretty
 
 if [[ ${BUILD_FOR_DEVICE} == true ]]; then
     step "Building ${FORMAT} framework for iOS devices using ${SCHEME} scheme"
@@ -92,8 +90,7 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
         -workspace ./platform/ios/ios.xcworkspace \
         -scheme ${SCHEME} \
         -configuration ${BUILDTYPE} \
-        -sdk iphoneos \
-        -jobs ${JOBS} | tee ${LOG_PATH} | xcpretty
+        -sdk iphoneos |  tee ${LOG_PATH}  | xcpretty
 fi
 
 LIBS=(Mapbox.a)
