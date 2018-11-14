@@ -1005,7 +1005,7 @@ public:
     // degradation. The only time the scale bar's intrinsic content size _must_ invalidated
     // is here as a reaction to this object's view dimension changes.
     [self.scaleBar invalidateIntrinsicContentSize];
-    
+
     [super layoutSubviews];
 
     [self adjustContentInset];
@@ -1025,6 +1025,7 @@ public:
     }
 
     [self updateUserLocationAnnotationView];
+    [self updateAnnotationViews];
 }
 
 /// Updates `contentInset` to reflect the current window geometry.
