@@ -92,7 +92,7 @@ BOOL MGLEqualFloatWithAccuracy(CGFloat left, CGFloat right, CGFloat accuracy)
                                    pitch:(CGFloat)pitch
                                  heading:(CLLocationDirection)heading
 {
-    MGLLogDebug(@"Initializing withCenterCoordinate: %@ altitude: %.0fm pitch: %f° heading: %f°", NSStringFromCLLocationCoordinate2D(centerCoordinate), altitude, pitch, heading);
+    MGLLogDebug(@"Initializing withCenterCoordinate: %@ altitude: %.0fm pitch: %f° heading: %f°", MGLStringFromCLLocationCoordinate2D(centerCoordinate), altitude, pitch, heading);
     if (self = [super init])
     {
         _centerCoordinate = centerCoordinate;

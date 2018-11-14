@@ -2999,13 +2999,13 @@ public:
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated
 {
-    MGLLogDebug(@"Setting centerCoordinate: %@ animated: %@", NSStringFromCLLocationCoordinate2D(coordinate), MGLStringFromBOOL(animated));
+    MGLLogDebug(@"Setting centerCoordinate: %@ animated: %@", MGLStringFromCLLocationCoordinate2D(coordinate), MGLStringFromBOOL(animated));
     [self setCenterCoordinate:coordinate zoomLevel:self.zoomLevel animated:animated];
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate
 {
-    MGLLogDebug(@"Setting centerCoordinate: %@", NSStringFromCLLocationCoordinate2D(centerCoordinate));
+    MGLLogDebug(@"Setting centerCoordinate: %@", MGLStringFromCLLocationCoordinate2D(centerCoordinate));
     [self setCenterCoordinate:centerCoordinate animated:NO];
 }
 
@@ -3018,7 +3018,7 @@ public:
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated
 {
     MGLLogDebug(@"Setting centerCoordinate: %@ zoomLevel: %f animated: %@",
-                NSStringFromCLLocationCoordinate2D(centerCoordinate),
+                MGLStringFromCLLocationCoordinate2D(centerCoordinate),
                 zoomLevel,
                 MGLStringFromBOOL(animated));
     [self setCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:self.direction animated:animated];
@@ -3027,7 +3027,7 @@ public:
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated
 {
     MGLLogDebug(@"Setting centerCoordinate: %@ zoomLevel: %f direction: %f animated: %@",
-                NSStringFromCLLocationCoordinate2D(centerCoordinate),
+                MGLStringFromCLLocationCoordinate2D(centerCoordinate),
                 zoomLevel,
                 direction,
                 MGLStringFromBOOL(animated));
@@ -3037,7 +3037,7 @@ public:
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion
 {
     MGLLogDebug(@"Setting centerCoordinate: %@ zoomLevel: %f direction: %f animated: %@ completionHandler: %@",
-                NSStringFromCLLocationCoordinate2D(centerCoordinate),
+                MGLStringFromCLLocationCoordinate2D(centerCoordinate),
                 zoomLevel,
                 direction,
                 MGLStringFromBOOL(animated),
