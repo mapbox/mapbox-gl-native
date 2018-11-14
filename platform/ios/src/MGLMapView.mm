@@ -376,7 +376,8 @@ public:
 
 - (nonnull NSURL *)styleURL
 {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return [self valueAtTerminationForKey:@"styleURL" ofClass:[NSURL class]];
     }
 
@@ -408,7 +409,8 @@ public:
 
 - (mbgl::Map &)mbglMap
 {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         [NSException raise:MGLUnderlyingMapUnavailableException
                     format:@"The underlying map is not available - this happens during app termination"];
     }
@@ -2389,7 +2391,8 @@ public:
 
 - (MGLMapDebugMaskOptions)debugMask
 {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         NSNumber *value = [self valueAtTerminationForKey:@"debugMask" ofClass:[NSNumber class]];
         return value.unsignedIntegerValue;
     }
@@ -2422,7 +2425,9 @@ public:
 - (void)setDebugMask:(MGLMapDebugMaskOptions)debugMask
 {
     if (!_mbglMap)
+    {
         return;
+    }
 
     mbgl::MapDebugOptions options = mbgl::MapDebugOptions::NoDebug;
     if (debugMask & MGLMapDebugTileBoundariesMask)
@@ -3114,10 +3119,13 @@ public:
 
 - (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate edgePadding:(UIEdgeInsets)insets zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
-    if (!_mbglMap) {
-        if (completion) {
+    if (!_mbglMap)
+    {
+        if (completion)
+        {
             completion();
         }
+        return;
     }
     
     mbgl::CameraOptions cameraOptions;
@@ -3193,8 +3201,8 @@ public:
     CGFloat duration = animated ? MGLAnimationDuration : 0;
 
     self.mbglMap.setZoom(zoomLevel,
-                      MGLEdgeInsetsFromNSEdgeInsets(self.contentInset),
-                      MGLDurationFromTimeInterval(duration));
+                         MGLEdgeInsetsFromNSEdgeInsets(self.contentInset),
+                         MGLDurationFromTimeInterval(duration));
 }
 
 - (void)setMinimumZoomLevel:(double)minimumZoomLevel
@@ -3315,8 +3323,10 @@ public:
 
 - (void)_setVisibleCoordinates:(const CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
-    if (!_mbglMap) {
-        if (completion) {
+    if (!_mbglMap)
+    {
+        if (completion)
+        {
             completion();
         }
         return;
@@ -3398,7 +3408,8 @@ public:
 
 - (void)_setDirection:(CLLocationDirection)direction animated:(BOOL)animated
 {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return;
     }
     
@@ -3441,7 +3452,8 @@ public:
 
 - (MGLMapCamera *)camera
 {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return [self valueAtTerminationForKey:@"camera" ofClass:[MGLMapCamera class]];
     }
     
@@ -3474,8 +3486,10 @@ public:
 }
 
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function edgePadding:(UIEdgeInsets)edgePadding completionHandler:(nullable void (^)(void))completion {
-    if (!_mbglMap) {
-        if (completion) {
+    if (!_mbglMap)
+    {
+        if (completion)
+        {
             completion();
         }
         return;
@@ -3539,8 +3553,10 @@ public:
 
 - (void)_flyToCamera:(MGLMapCamera *)camera edgePadding:(UIEdgeInsets)insets withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion
 {
-    if (!_mbglMap) {
-        if (completion) {
+    if (!_mbglMap)
+    {
+        if (completion)
+        {
             completion();
         }
         return;
@@ -3589,7 +3605,8 @@ public:
 }
 
 - (void)cancelTransitions {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return;
     }
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonTransitionCancelled;
@@ -3604,7 +3621,8 @@ public:
 
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets
 {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return nil;
     }
     
@@ -3616,7 +3634,8 @@ public:
 
 - (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets
 {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return nil;
     }
 
@@ -3632,7 +3651,8 @@ public:
 }
 
 - (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingShape:(MGLShape *)shape edgePadding:(UIEdgeInsets)insets {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return nil;
     }
 
@@ -3649,7 +3669,8 @@ public:
 }
 
 - (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(UIEdgeInsets)insets {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return nil;
     }
 
@@ -3663,7 +3684,8 @@ public:
 
 - (MGLMapCamera *)cameraForCameraOptions:(const mbgl::CameraOptions &)cameraOptions
 {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return nil;
     }
 
@@ -5795,7 +5817,8 @@ public:
 }
 
 - (void)cameraWillChangeAnimated:(BOOL)animated {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return;
     }
 
@@ -5829,7 +5852,8 @@ public:
 }
 
 - (void)cameraIsChanging {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return;
     }
 
@@ -5847,7 +5871,8 @@ public:
 }
 
 - (void)cameraDidChangeAnimated:(BOOL)animated {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return;
     }
 
@@ -5893,7 +5918,8 @@ public:
 }
 
 - (void)mapViewWillStartLoadingMap {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return;
     }
 
@@ -5904,7 +5930,8 @@ public:
 }
 
 - (void)mapViewDidFinishLoadingMap {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return;
     }
 
@@ -5919,7 +5946,8 @@ public:
 }
 
 - (void)mapViewDidFailLoadingMapWithError:(NSError *)error {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return;
     }
 
@@ -5930,7 +5958,8 @@ public:
 }
 
 - (void)mapViewWillStartRenderingFrame {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return;
     }
 
@@ -5941,7 +5970,8 @@ public:
 }
 
 - (void)mapViewDidFinishRenderingFrameFullyRendered:(BOOL)fullyRendered {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return;
     }
 
@@ -5958,7 +5988,8 @@ public:
 }
 
 - (void)mapViewWillStartRenderingMap {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return;
     }
 
@@ -5969,7 +6000,8 @@ public:
 }
 
 - (void)mapViewDidFinishRenderingMapFullyRendered:(BOOL)fullyRendered {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return;
     }
     
@@ -5982,7 +6014,8 @@ public:
 }
 
 - (void)didFinishLoadingStyle {
-    if (!_mbglMap) {
+    if (!_mbglMap)
+    {
         return;
     }
 
