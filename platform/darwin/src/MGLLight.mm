@@ -111,13 +111,11 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 
 - (void)setAnchor:(NSExpression *)anchor {
     MGLLogDebug(@"Setting anchor: %@", anchor);
-
     _anchor = anchor;
 }
 
 - (void)setPosition:(NSExpression *)position {
     MGLLogDebug(@"Setting position: %@", position);
-
     _position = position;
 }
 
@@ -128,7 +126,6 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 
 - (void)setColor:(NSExpression *)color {
     MGLLogDebug(@"Setting color: %@", color);
-
     _color = color;
 }
 
@@ -139,7 +136,6 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 
 - (void)setIntensity:(NSExpression *)intensity {
     MGLLogDebug(@"Setting intensity: %@", intensity);
-
     _intensity = intensity;
 }
 
