@@ -986,12 +986,12 @@ public:
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate {
-    MGLLogDebug(@"Setting centerCoordinate: %@", NSStringFromCLLocationCoordinate2D(centerCoordinate));
+    MGLLogDebug(@"Setting centerCoordinate: %@", MGLStringFromCLLocationCoordinate2D(centerCoordinate));
     [self setCenterCoordinate:centerCoordinate animated:NO];
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate animated:(BOOL)animated {
-    MGLLogDebug(@"Setting centerCoordinate: %@ animated: %@", NSStringFromCLLocationCoordinate2D(centerCoordinate), MGLStringFromBOOL(animated));
+    MGLLogDebug(@"Setting centerCoordinate: %@ animated: %@", MGLStringFromCLLocationCoordinate2D(centerCoordinate), MGLStringFromBOOL(animated));
     [self willChangeValueForKey:@"centerCoordinate"];
     _mbglMap->setLatLng(MGLLatLngFromLocationCoordinate2D(centerCoordinate),
                         MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),

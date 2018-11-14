@@ -3240,13 +3240,7 @@ public:
 
 - (void)setVisibleCoordinates:(const CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
-    MGLLogDebug(@"Setting: %lu coordinates edgePadding: %@ direction: %f duration: %f animationTimingFunction: %@ completionHandler: %@",
-                count,
-                NSStringFromUIEdgeInsets(insets),
-                direction,
-                duration,
-                function,
-                completion);
+    MGLLogDebug(@"Setting: %lu coordinates edgePadding: %@ direction: %f duration: %f animationTimingFunction: %@ completionHandler: %@", count, NSStringFromUIEdgeInsets(insets), direction, duration, function, completion);
     self.userTrackingMode = MGLUserTrackingModeNone;
 
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonProgrammatic;

@@ -44,17 +44,23 @@
         if (@available(iOS 10.0, macOS 10.12.0, *)) {
             static dispatch_once_t once;
             static os_log_t info_log;
+#if MGL_ENABLE_DEBUG_LOGGING
             static os_log_t debug_log;
+#endif
             static os_log_t error_log;
             static os_log_t fault_log;
             static os_log_type_t log_types[] = { OS_LOG_TYPE_DEFAULT,
                                                     OS_LOG_TYPE_INFO,
+#if MGL_ENABLE_DEBUG_LOGGING
                                                     OS_LOG_TYPE_DEBUG,
+#endif
                                                     OS_LOG_TYPE_ERROR,
                                                     OS_LOG_TYPE_FAULT };
             dispatch_once(&once, ^ {
                 info_log = os_log_create("com.mapbox.maps", "INFO");
+#if MGL_ENABLE_DEBUG_LOGGING
                 debug_log = os_log_create("com.mapbox.maps", "DEBUG");
+#endif
                 error_log = os_log_create("com.mapbox.maps", "ERROR");
                 fault_log = os_log_create("com.mapbox.maps", "FAULT");
             });
@@ -80,8 +86,6 @@
                     break;
             }
 
-            NSUInteger logTypesCount = sizeof(log_types) / sizeof(os_log_type_t);
-            NSAssert(level <= logTypesCount, @"There is an attempt to log a non suported logging level.");
             os_log_type_t logType = log_types[level];
             os_log_with_type(mapbox_log, logType, "%@ - %lu: %@", fileName, (unsigned long)line, message);
         } else {
