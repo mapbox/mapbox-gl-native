@@ -103,6 +103,7 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewPreferredFramesPerSecond MGLMapView
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLMissingLocationServicesUsageDescriptionException;
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUserLocationAnnotationTypeException;
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLResourceNotFoundException;
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUnderlyingMapUnavailableException;
 
 /**
  An interactive, customizable map view with an interface similar to the one
@@ -636,11 +637,14 @@ MGL_EXPORT IB_DESIGNABLE
 
  Changing the center coordinate centers the map on the new coordinate without
  changing the current zoom level.
-
+ 
  @param coordinate The new center coordinate for the map.
  @param animated Specify `YES` if you want the map view to scroll to the new
     location or `NO` if you want the map to display the new location
     immediately.
+ 
+ @note The behaviour of this method is undefined if called when observing
+ `UIApplicationWillTerminateNotification`.
  */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated;
 
@@ -653,6 +657,9 @@ MGL_EXPORT IB_DESIGNABLE
  @param animated Specify `YES` if you want the map view to animate scrolling and
     zooming to the new location or `NO` if you want the map to display the new
     location immediately.
+ 
+ @note The behaviour of this method is undefined if called when observing
+ `UIApplicationWillTerminateNotification`.
  */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
@@ -667,6 +674,9 @@ MGL_EXPORT IB_DESIGNABLE
  @param animated Specify `YES` if you want the map view to animate scrolling,
     zooming, and rotating to the new location or `NO` if you want the map to
     display the new location immediately.
+ 
+ @note The behaviour of this method is undefined if called when observing
+ `UIApplicationWillTerminateNotification`.
  */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated;
 
@@ -682,6 +692,9 @@ MGL_EXPORT IB_DESIGNABLE
     zooming, and rotating to the new location or `NO` if you want the map to
     display the new location immediately.
  @param completion The block executed after the animation finishes.
+ 
+ @note The behaviour of this method is undefined if called when observing
+ `UIApplicationWillTerminateNotification`.
  */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion;
 
@@ -1020,6 +1033,10 @@ MGL_EXPORT IB_DESIGNABLE
     bounds with zoom level as high (close to the ground) as possible while still
     including the entire coordinate bounds. The camera object uses the current
     direction and pitch.
+
+ @note The behaviour of this method is undefined if called when observing
+ `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
+ depending on the order of notification delivery.
  */
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds;
 
@@ -1034,6 +1051,10 @@ MGL_EXPORT IB_DESIGNABLE
     with zoom level as high (close to the ground) as possible while still
     including the entire coordinate bounds. The camera object uses the current
     direction and pitch.
+ 
+ @note The behaviour of this method is undefined if called when observing
+ `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
+ depending on the order of notification delivery.
  */
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets;
 
@@ -1050,6 +1071,10 @@ MGL_EXPORT IB_DESIGNABLE
     with zoom level as high (close to the ground) as possible while still
     including the entire coordinate bounds. The initial camera's pitch and
     direction will be honored.
+
+ @note The behaviour of this method is undefined if called when observing
+ `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
+ depending on the order of notification delivery.
  */
 - (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets;
 
@@ -1065,6 +1090,10 @@ MGL_EXPORT IB_DESIGNABLE
  @return A camera object centered on the shape's center with zoom level as high
     (close to the ground) as possible while still including the entire shape. The
     initial camera's pitch and direction will be honored.
+ 
+ @note The behaviour of this method is undefined if called when observing
+ `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
+ depending on the order of notification delivery.
  */
 - (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingShape:(MGLShape *)shape edgePadding:(UIEdgeInsets)insets;
 
@@ -1079,6 +1108,10 @@ MGL_EXPORT IB_DESIGNABLE
  @return A camera object centered on the shape's center with zoom level as high 
     (close to the ground) as possible while still including the entire shape. The
     camera object uses the current pitch.
+ 
+ @note The behaviour of this method is undefined if called when observing
+ `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
+ depending on the order of notification delivery.
  */
 - (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(UIEdgeInsets)insets;
 
