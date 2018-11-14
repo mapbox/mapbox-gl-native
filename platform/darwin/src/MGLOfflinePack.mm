@@ -215,7 +215,7 @@ private:
 
 - (void)didReceiveError:(NSError *)error {
     MGLLogError(@"Error: %@", error.localizedDescription);
-    MGLLogInfo(@"About notifying pack error.");
+    MGLLogInfo(@"Notifying about pack error.");
     
     NSDictionary *userInfo = @{ MGLOfflinePackUserInfoKeyError: error };
     NSNotificationCenter *noteCenter = [NSNotificationCenter defaultCenter];

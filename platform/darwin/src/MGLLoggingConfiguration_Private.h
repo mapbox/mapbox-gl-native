@@ -4,16 +4,16 @@ NS_INLINE NSString *MGLStringFromBOOL(BOOL value) {
     return value ? @"YES" : @"NO";
 }
 
-#ifdef MGL_DISABLE_LOGGING
+#ifdef MGL_LOGGING_DISABLED
 
 #define MGLLogInfo(...)
 #define MGLLogDebug(...)
-#define MGLLogError(message, ...)
-#define MGLLogFault(message, ...)
+#define MGLLogError(...)
+#define MGLLogFault(...)
 
 #else
 
-#if MGL_ENABLE_DEBUG_LOGGING
+#if MGL_LOGGING_ENABLE_DEBUG
     #define MGLLogDebug(message, ...) MGLLogWithType(MGLLoggingLevelDebug, __PRETTY_FUNCTION__, __LINE__, message, ##__VA_ARGS__)
 #else
     #define MGLLogDebug(...)
@@ -41,7 +41,7 @@ NS_INLINE NSString *MGLStringFromBOOL(BOOL value) {
     })
 
 
-#ifndef MGL_DISABLE_LOGGING
+#ifndef MGL_LOGGING_DISABLED
 
 #define MGLLogWithType(type, function, line, message, ...) \
 { \

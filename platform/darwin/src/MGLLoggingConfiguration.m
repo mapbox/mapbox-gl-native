@@ -1,6 +1,6 @@
 #import "MGLLoggingConfiguration_Private.h"
 
-#ifndef MGL_DISABLE_LOGGING
+#ifndef MGL_LOGGING_DISABLED
 #if __has_builtin(__builtin_os_log_format)
 #import <os/log.h>
 #endif
@@ -44,21 +44,21 @@
         if (@available(iOS 10.0, macOS 10.12.0, *)) {
             static dispatch_once_t once;
             static os_log_t info_log;
-#if MGL_ENABLE_DEBUG_LOGGING
+#if MGL_LOGGING_ENABLE_DEBUG
             static os_log_t debug_log;
 #endif
             static os_log_t error_log;
             static os_log_t fault_log;
             static os_log_type_t log_types[] = { OS_LOG_TYPE_DEFAULT,
                                                     OS_LOG_TYPE_INFO,
-#if MGL_ENABLE_DEBUG_LOGGING
+#if MGL_LOGGING_ENABLE_DEBUG
                                                     OS_LOG_TYPE_DEBUG,
 #endif
                                                     OS_LOG_TYPE_ERROR,
                                                     OS_LOG_TYPE_FAULT };
             dispatch_once(&once, ^ {
                 info_log = os_log_create("com.mapbox.maps", "INFO");
-#if MGL_ENABLE_DEBUG_LOGGING
+#if MGL_LOGGING_ENABLE_DEBUG
                 debug_log = os_log_create("com.mapbox.maps", "DEBUG");
 #endif
                 error_log = os_log_create("com.mapbox.maps", "ERROR");
@@ -70,7 +70,7 @@
                 case MGLLoggingLevelInfo:
                     mapbox_log = info_log;
                     break;
-#if MGL_ENABLE_DEBUG_LOGGING
+#if MGL_LOGGING_ENABLE_DEBUG
                 case MGLLoggingLevelDebug:
                     mapbox_log = debug_log;
                     break;
@@ -94,7 +94,7 @@
                 case MGLLoggingLevelInfo:
                     category = @"INFO";
                     break;
-#if MGL_ENABLE_DEBUG_LOGGING
+#if MGL_LOGGING_ENABLE_DEBUG
                 case MGLLoggingLevelDebug:
                     category = @"DEBUG";
                     break;

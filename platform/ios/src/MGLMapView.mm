@@ -688,6 +688,7 @@ public:
 
 - (void)dealloc
 {
+    MGLLogInfo(@"Deallocating MGLMapView.");
     [_reachability stopNotifier];
 
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
@@ -735,7 +736,6 @@ public:
     [_locationManager stopUpdatingLocation];
     [_locationManager stopUpdatingHeading];
     _locationManager.delegate = nil;
-    MGLLogInfo(@"Deallocating MGLMapView.");
 }
 
 - (void)setDelegate:(nullable id<MGLMapViewDelegate>)delegate

@@ -2,10 +2,10 @@
 
 #import "MGLFoundation.h"
 
-#ifndef MGL_DISABLE_LOGGING
-    #ifndef MGL_ENABLE_DEBUG_LOGGING
+#ifndef MGL_LOGGING_DISABLED
+    #ifndef MGL_LOGGING_ENABLE_DEBUG
         #ifdef DEBUG
-            #define MGL_ENABLE_DEBUG_LOGGING 1
+            #define MGL_LOGGING_ENABLE_DEBUG 1
         #endif
     #endif
 
@@ -24,7 +24,7 @@ typedef NS_ENUM(NSInteger, MGLLoggingLevel) {
      but is not essential.
      */
     MGLLoggingLevelInfo,
-#if MGL_ENABLE_DEBUG_LOGGING
+#if MGL_LOGGING_ENABLE_DEBUG
     /**
      Debug-level messages contain information that may be helpful for troubleshooting
      specific problems.
