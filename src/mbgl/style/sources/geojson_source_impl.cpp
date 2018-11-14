@@ -21,6 +21,20 @@ public:
         return impl.getTile(tileID.z, tileID.x, tileID.y).features;
     }
 
+    mapbox::feature::feature_collection<double> getChildren(const std::uint32_t) final {
+        return {};
+    }
+
+    mapbox::feature::feature_collection<double> getLeaves(const std::uint32_t,
+                                                           const std::uint32_t,
+                                                           const std::uint32_t) final {
+        return {};
+    }
+
+    std::uint8_t getClusterExpansionZoom(std::uint32_t) final {
+        return 0;
+    }
+
 private:
     mapbox::geojsonvt::GeoJSONVT impl;
 };
@@ -33,6 +47,20 @@ public:
 
     mapbox::feature::feature_collection<int16_t> getTile(const CanonicalTileID& tileID) final {
         return impl.getTile(tileID.z, tileID.x, tileID.y);
+    }
+
+    mapbox::feature::feature_collection<double> getChildren(const std::uint32_t cluster_id) final {
+        return impl.getChildren(cluster_id);
+    }
+
+    mapbox::feature::feature_collection<double> getLeaves(const std::uint32_t cluster_id,
+                                                           const std::uint32_t limit,
+                                                           const std::uint32_t offset) final {
+        return impl.getLeaves(cluster_id, limit, offset);
+    }
+
+    std::uint8_t getClusterExpansionZoom(std::uint32_t cluster_id) final {
+        return impl.getClusterExpansionZoom(cluster_id);
     }
 
 private:
