@@ -1,5 +1,6 @@
 #import "MGLLoggingConfiguration_Private.h"
 
+#ifndef MGL_DISABLE_LOGGING
 #if __has_builtin(__builtin_os_log_format)
 #import <os/log.h>
 #endif
@@ -63,9 +64,11 @@
                 case MGLLoggingLevelInfo:
                     mapbox_log = info_log;
                     break;
+#if MGL_ENABLE_DEBUG_LOGGING
                 case MGLLoggingLevelDebug:
                     mapbox_log = debug_log;
                     break;
+#endif
                 case MGLLoggingLevelError:
                     mapbox_log = error_log;
                     break;
@@ -87,9 +90,11 @@
                 case MGLLoggingLevelInfo:
                     category = @"INFO";
                     break;
+#if MGL_ENABLE_DEBUG_LOGGING
                 case MGLLoggingLevelDebug:
                     category = @"DEBUG";
                     break;
+#endif
                 case MGLLoggingLevelError:
                     category = @"ERROR";
                     break;
@@ -109,3 +114,4 @@
 }
 
 @end
+#endif
