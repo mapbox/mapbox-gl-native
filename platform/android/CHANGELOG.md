@@ -2,6 +2,26 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 7.0.0-alpha.1 - November 14, 2018
+ - Added Nullable and NonNull annotations [#13274](https://github.com/mapbox/mapbox-gl-native/pull/13274)
+ - Catch and re-throw throwables thrown inside map state callbacks [#13351](https://github.com/mapbox/mapbox-gl-native/pull/13351)
+ - Removed deprecated code and notices [#13244](https://github.com/mapbox/mapbox-gl-native/pull/13244)
+ - Update to mapbox java services  4.1.0 [#13357](https://github.com/mapbox/mapbox-gl-native/pull/13357)
+ - Removed deprecated color conversion from PropertyFactory [#13337](https://github.com/mapbox/mapbox-gl-native/pull/13337)
+ - Removed deprecated OnMapChange interface and implementation [#13240](https://github.com/mapbox/mapbox-gl-native/pull/13240)
+ - Cleanup isDismissible flag [#13197](https://github.com/mapbox/mapbox-gl-native/pull/13179)
+ - Removed java 8 language features [#13193](https://github.com/mapbox/mapbox-gl-native/pull/13193)
+ - Removed ZoomButtonsController support [#13198](https://github.com/mapbox/mapbox-gl-native/pull/13198)
+ - Changed CustomGeometrySource() signature to be Kotlin friendly [#13178](https://github.com/mapbox/mapbox-gl-native/pull/13178)
+ - Removed ILatLng and IProjectedMeteres [#13176](https://github.com/mapbox/mapbox-gl-native/pull/13176)
+ - Option to consume map clicks, consuming location clicks [#13205](https://github.com/mapbox/mapbox-gl-native/pull/13205)
+ - Consolidated OfflineRegionDefinitions [#13180](https://github.com/mapbox/mapbox-gl-native/pull/13180)
+ - Added scrollBy() to MapboxMap, depricated  CameraUpdate.scrollBy() [#13223](https://github.com/mapbox/mapbox-gl-native/pull/13223)
+ - Improved CustomGeometrySource constructor typing [#13200](https://github.com/mapbox/mapbox-gl-native/pull/13200)
+ - Removed deprecated MarkerView[#13194](https://github.com/mapbox/mapbox-gl-native/pull/13194)
+ - Annotate onMapReady with @NonNull [#13307](https://github.com/mapbox/mapbox-gl-native/pull/13307)
+
+
 ## 6.6.7 - November 8, 2018
  - Telemetry v3.5.4 [#13330](https://github.com/mapbox/mapbox-gl-native/pull/13330)
 
