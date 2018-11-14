@@ -2,6 +2,7 @@
 
 #import "MGLValueEvaluator.h"
 #import "MGLStyleValue_Private.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #include <mbgl/style/conversion/filter.hpp>
 
@@ -63,7 +64,7 @@ static NSDictionary * const MGLPredicateOperatorTypesByJSONOperator = @{
         return [NSPredicate predicateWithValue:NO];
     }
     
-    NSAssert([object isKindOfClass:[NSArray class]], @"Condition for case expression should be an expression.");
+    MGLAssert([object isKindOfClass:[NSArray class]], @"Condition for case expression should be an expression.");
     NSArray *objects = (NSArray *)object;
     NSString *op = objects.firstObject;
     
@@ -74,10 +75,10 @@ static NSDictionary * const MGLPredicateOperatorTypesByJSONOperator = @{
         NSComparisonPredicateOptions options = 0;
         if (objects.count > 3) {
             NSArray *collatorExpression = objects[3];
-            NSCAssert([collatorExpression isKindOfClass:[NSArray class]], @"Collators must be dictionaries.");
-            NSCAssert(collatorExpression.count == 2, @"Malformed collator expression");
+            MGLCAssert([collatorExpression isKindOfClass:[NSArray class]], @"Collators must be dictionaries.");
+            MGLCAssert(collatorExpression.count == 2, @"Malformed collator expression");
             NSDictionary *collator = collatorExpression[1];
-            NSCAssert([collator isKindOfClass:[NSDictionary class]], @"Malformed collator in collator expression");
+            MGLCAssert([collator isKindOfClass:[NSDictionary class]], @"Malformed collator in collator expression");
             
             // Predicate options can’t express specific locales as collators can.
             if (!collator[@"locale"]) {

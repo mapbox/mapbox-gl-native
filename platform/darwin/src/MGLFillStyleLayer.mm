@@ -7,6 +7,7 @@
 #import "MGLStyleLayer_Private.h"
 #import "MGLStyleValue_Private.h"
 #import "MGLFillStyleLayer.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
@@ -30,6 +31,7 @@ namespace mbgl {
 
 - (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source
 {
+    MGLLogDebug(@"Initializing %@ with identifier: %@ source: %@", NSStringFromClass([self class]), identifier, source);
     auto layer = std::make_unique<mbgl::style::FillLayer>(identifier.UTF8String, source.identifier.UTF8String);
     return self = [super initWithPendingLayer:std::move(layer)];
 }
@@ -57,6 +59,7 @@ namespace mbgl {
 - (void)setSourceLayerIdentifier:(NSString *)sourceLayerIdentifier
 {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting sourceLayerIdentifier: %@", sourceLayerIdentifier);
 
     self.rawLayer->setSourceLayer(sourceLayerIdentifier.UTF8String ?: "");
 }
@@ -64,6 +67,7 @@ namespace mbgl {
 - (void)setPredicate:(NSPredicate *)predicate
 {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting predicate: %@", predicate);
 
     self.rawLayer->setFilter(predicate ? predicate.mgl_filter : mbgl::style::Filter());
 }
@@ -79,6 +83,7 @@ namespace mbgl {
 
 - (void)setFillAntialiased:(NSExpression *)fillAntialiased {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting fillAntialiased: %@", fillAntialiased);
 
     auto mbglValue = MGLStyleValueTransformer<bool, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<bool>>(fillAntialiased, false);
     self.rawLayer->setFillAntialias(mbglValue);
@@ -103,6 +108,7 @@ namespace mbgl {
 
 - (void)setFillColor:(NSExpression *)fillColor {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting fillColor: %@", fillColor);
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(fillColor, true);
     self.rawLayer->setFillColor(mbglValue);
@@ -120,6 +126,7 @@ namespace mbgl {
 
 - (void)setFillColorTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting fillColorTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillColorTransition(options);
@@ -138,6 +145,7 @@ namespace mbgl {
 
 - (void)setFillOpacity:(NSExpression *)fillOpacity {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting fillOpacity: %@", fillOpacity);
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(fillOpacity, true);
     self.rawLayer->setFillOpacity(mbglValue);
@@ -155,6 +163,7 @@ namespace mbgl {
 
 - (void)setFillOpacityTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting fillOpacityTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillOpacityTransition(options);
@@ -173,6 +182,7 @@ namespace mbgl {
 
 - (void)setFillOutlineColor:(NSExpression *)fillOutlineColor {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting fillOutlineColor: %@", fillOutlineColor);
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(fillOutlineColor, true);
     self.rawLayer->setFillOutlineColor(mbglValue);
@@ -190,6 +200,7 @@ namespace mbgl {
 
 - (void)setFillOutlineColorTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting fillOutlineColorTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillOutlineColorTransition(options);
@@ -208,6 +219,7 @@ namespace mbgl {
 
 - (void)setFillPattern:(NSExpression *)fillPattern {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting fillPattern: %@", fillPattern);
 
     auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(fillPattern, true);
     self.rawLayer->setFillPattern(mbglValue);
@@ -225,6 +237,7 @@ namespace mbgl {
 
 - (void)setFillPatternTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting fillPatternTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillPatternTransition(options);
@@ -243,6 +256,7 @@ namespace mbgl {
 
 - (void)setFillTranslation:(NSExpression *)fillTranslation {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting fillTranslation: %@", fillTranslation);
 
     auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toPropertyValue<mbgl::style::PropertyValue<std::array<float, 2>>>(fillTranslation, false);
     self.rawLayer->setFillTranslate(mbglValue);
@@ -260,6 +274,7 @@ namespace mbgl {
 
 - (void)setFillTranslationTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting fillTranslationTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setFillTranslateTransition(options);
@@ -285,6 +300,7 @@ namespace mbgl {
 
 - (void)setFillTranslationAnchor:(NSExpression *)fillTranslationAnchor {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting fillTranslationAnchor: %@", fillTranslationAnchor);
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslationAnchor>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::TranslateAnchorType>>(fillTranslationAnchor, false);
     self.rawLayer->setFillTranslateAnchor(mbglValue);

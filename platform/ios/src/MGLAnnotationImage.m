@@ -1,4 +1,5 @@
 #import "MGLAnnotationImage_Private.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 @interface MGLAnnotationImage ()
 
@@ -18,6 +19,7 @@
 
 - (instancetype)initWithImage:(UIImage *)image reuseIdentifier:(NSString *)reuseIdentifier
 {
+    MGLLogDebug(@"Initializing with image size: %@ reuseIdentifier: %@", NSStringFromCGSize(image.size), reuseIdentifier);
     self = [super init];
 
     if (self)
@@ -35,6 +37,7 @@
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder {
+    MGLLogInfo(@"Initializing with coder.");
     if (self = [super init]) {
         _image = [decoder decodeObjectOfClass:[UIImage class] forKey:@"image"];
         _reuseIdentifier = [decoder decodeObjectOfClass:[NSString class] forKey:@"reuseIdentifier"];
@@ -66,6 +69,7 @@
 }
 
 - (void)setImage:(UIImage *)image {
+    MGLLogDebug(@"Setting image: %@", image);
     _image = image;
     [self.delegate annotationImageNeedsRedisplay:self];
 }

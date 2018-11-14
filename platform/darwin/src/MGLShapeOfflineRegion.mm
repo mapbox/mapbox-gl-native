@@ -11,6 +11,7 @@
 #import "MGLFeature_Private.h"
 #import "MGLShape_Private.h"
 #import "MGLStyle.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 #import "MMEConstants.h"
@@ -42,6 +43,7 @@
 }
 
 - (instancetype)init {
+    MGLLogInfo(@"Calling this initializer is not allowed.");
     [NSException raise:@"Method unavailable"
                 format:
      @"-[MGLShapeOfflineRegion init] is unavailable. "
@@ -50,6 +52,7 @@
 }
 
 - (instancetype)initWithStyleURL:(NSURL *)styleURL shape:(MGLShape *)shape fromZoomLevel:(double)minimumZoomLevel toZoomLevel:(double)maximumZoomLevel {
+    MGLLogDebug(@"Initializing styleURL: %@ shape: %@ fromZoomLevel: %f toZoomLevel: %f", styleURL, shape, minimumZoomLevel, maximumZoomLevel);
     if (self = [super init]) {
         if (!styleURL) {
             styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
@@ -91,6 +94,7 @@
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)coder {
+    MGLLogInfo(@"Initializing with coder.");
     NSURL *styleURL = [coder decodeObjectForKey:@"styleURL"];
     MGLShape * shape = [coder decodeObjectForKey:@"shape"];
     double minimumZoomLevel = [coder decodeDoubleForKey:@"minimumZoomLevel"];

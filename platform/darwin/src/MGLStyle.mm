@@ -25,6 +25,7 @@
 #import "MGLImageSource.h"
 
 #import "MGLAttributionInfo_Private.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/default_styles.hpp>
@@ -128,11 +129,13 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 #pragma mark -
 
 - (instancetype)initWithRawStyle:(mbgl::style::Style *)rawStyle mapView:(MGLMapView *)mapView {
+    MGLLogInfo(@"Initializing %@ with mapView: %@", NSStringFromClass([self class]), mapView);
     if (self = [super init]) {
         _mapView = mapView;
         _rawStyle = rawStyle;
         _openGLLayers = [NSMutableDictionary dictionary];
         _localizedLayersByIdentifier = [NSMutableDictionary dictionary];
+        MGLLogDebug(@"Initializing with style name: %@ mapView: %@", self.name, mapView);
     }
     return self;
 }
@@ -159,6 +162,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 }
 
 - (void)setSources:(NSSet<__kindof MGLSource *> *)sources {
+    MGLLogDebug(@"Setting: %lu sources", sources.count);
     for (MGLSource *source in self.sources) {
         [self removeSource:source];
     }
@@ -177,6 +181,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 
 - (MGLSource *)sourceWithIdentifier:(NSString *)identifier
 {
+    MGLLogDebug(@"Querying source with identifier: %@", identifier);
     auto rawSource = self.rawStyle->getSource(identifier.UTF8String);
     
     return rawSource ? [self sourceFromMBGLSource:rawSource] : nil;
@@ -206,6 +211,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 
 - (void)addSource:(MGLSource *)source
 {
+    MGLLogDebug(@"Adding source: %@", source);
     if (!source.rawSource) {
         [NSException raise:NSInvalidArgumentException format:
          @"The source %@ cannot be added to the style. "
@@ -222,6 +228,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 
 - (void)removeSource:(MGLSource *)source
 {
+    MGLLogDebug(@"Removing source: %@", source);
     if (!source.rawSource) {
         [NSException raise:NSInvalidArgumentException format:
          @"The source %@ cannot be removed from the style. "
@@ -263,6 +270,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 }
 
 - (void)setLayers:(NSArray<__kindof MGLStyleLayer *> *)layers {
+    MGLLogDebug(@"Setting: %lu layers", layers.count);
     for (MGLStyleLayer *layer in self.layers) {
         [self removeLayer:layer];
     }
@@ -372,19 +380,21 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
         case mbgl::style::LayerType::Custom:
             return [[MGLOpenGLStyleLayer alloc] initWithRawLayer:static_cast<mbgl::style::CustomLayer*>(rawLayer)];
         default:
-            NSAssert(NO, @"Unrecognized layer type");
+            MGLAssert(NO, @"Unrecognized layer type");
             return nil;;
     }
 }
 
 - (MGLStyleLayer *)layerWithIdentifier:(NSString *)identifier
 {
+    MGLLogDebug(@"Querying layerWithIdentifier: %@", identifier);
     auto mbglLayer = self.rawStyle->getLayer(identifier.UTF8String);
     return mbglLayer ? [self layerFromMBGLLayer:mbglLayer] : nil;
 }
 
 - (void)removeLayer:(MGLStyleLayer *)layer
 {
+    MGLLogDebug(@"Removing layer: %@", layer);
     if (!layer.rawLayer) {
         [NSException raise:NSInvalidArgumentException format:
          @"The style layer %@ cannot be removed from the style. "
@@ -398,6 +408,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 
 - (void)addLayer:(MGLStyleLayer *)layer
 {
+    MGLLogDebug(@"Adding layer: %@", layer);
     if (!layer.rawLayer) {
         [NSException raise:NSInvalidArgumentException format:
          @"The style layer %@ cannot be added to the style. "
@@ -419,6 +430,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 
 - (void)insertLayer:(MGLStyleLayer *)layer belowLayer:(MGLStyleLayer *)sibling
 {
+    MGLLogDebug(@"Inseting layer: %@ belowLayer: %@", layer, sibling);
     if (!layer.rawLayer) {
         [NSException raise:NSInvalidArgumentException
                     format:
@@ -443,6 +455,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 }
 
 - (void)insertLayer:(MGLStyleLayer *)layer aboveLayer:(MGLStyleLayer *)sibling {
+    MGLLogDebug(@"Inseting layer: %@ aboveLayer: %@", layer, sibling);
     if (!layer.rawLayer) {
         [NSException raise:NSInvalidArgumentException
                     format:
@@ -496,6 +509,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 
 - (void)setImage:(MGLImage *)image forName:(NSString *)name
 {
+    MGLLogDebug(@"Setting image: %@ forName: %@", image, name);
     if (!image) {
         [NSException raise:NSInvalidArgumentException
                     format:@"Cannot assign nil image to “%@”.", name];
@@ -510,6 +524,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 
 - (void)removeImageForName:(NSString *)name
 {
+    MGLLogDebug(@"Removing imageForName: %@", name);
     if (!name) {
         [NSException raise:NSInvalidArgumentException
                     format:@"Cannot remove image with nil name."];
@@ -520,6 +535,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 
 - (MGLImage *)imageForName:(NSString *)name
 {
+    MGLLogDebug(@"Querying imageForName: %@", name);
     if (!name) {
         [NSException raise:NSInvalidArgumentException
                     format:@"Cannot get image with nil name."];

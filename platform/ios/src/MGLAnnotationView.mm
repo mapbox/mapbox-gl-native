@@ -2,6 +2,7 @@
 #import "MGLAnnotationView_Private.h"
 #import "MGLMapView_Private.h"
 #import "MGLAnnotation.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #import "NSBundle+MGLAdditions.h"
 
@@ -27,6 +28,7 @@
 }
 
 - (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier {
+    MGLLogDebug(@"Initializing with identifier: %@", reuseIdentifier);
     self = [super initWithFrame:CGRectZero];
     if (self) {
         [self commonInitWithAnnotation:nil reuseIdentifier:reuseIdentifier];
@@ -35,6 +37,7 @@
 }
 
 - (instancetype)initWithAnnotation:(nullable id<MGLAnnotation>)annotation reuseIdentifier:(nullable NSString *)reuseIdentifier {
+    MGLLogDebug(@"Initializing with annotation: %@ reuseIdentifier: %@", annotation, reuseIdentifier);
     self = [super initWithFrame:CGRectZero];
     if (self) {
         [self commonInitWithAnnotation:annotation reuseIdentifier:reuseIdentifier];
@@ -51,6 +54,7 @@
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder {
+    MGLLogInfo(@"Initializing with coder.");
     if (self = [super initWithCoder:decoder]) {
         _reuseIdentifier = [decoder decodeObjectOfClass:[NSString class] forKey:@"reuseIdentifier"];
         _annotation = [decoder decodeObjectOfClass:[NSObject class] forKey:@"annotation"];
@@ -83,17 +87,20 @@
 
 - (void)setCenterOffset:(CGVector)centerOffset
 {
+    MGLLogDebug(@"Setting centerOffset: %@", NSStringFromCGVector(centerOffset));
     _centerOffset = centerOffset;
     self.center = self.center;
 }
 
 - (void)setSelected:(BOOL)selected
 {
+    MGLLogDebug(@"Setting selected: %@", MGLStringFromBOOL(selected));
     [self setSelected:selected animated:NO];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
+    MGLLogDebug(@"Setting selected: %@ animated: %@", MGLStringFromBOOL(selected), MGLStringFromBOOL(animated));
     [self willChangeValueForKey:@"selected"];
     _selected = selected;
     [self didChangeValueForKey:@"selected"];
@@ -109,6 +116,7 @@
 
 - (void)setCenter:(CGPoint)center
 {
+    MGLLogDebug(@"Setting center: %@", NSStringFromCGPoint(center));
     center.x += _centerOffset.dx;
     center.y += _centerOffset.dy;
 
@@ -119,6 +127,7 @@
 
 - (void)setScalesWithViewingDistance:(BOOL)scalesWithViewingDistance
 {
+    MGLLogDebug(@"Setting scaleWithViewingDistance: %@", MGLStringFromBOOL(scalesWithViewingDistance));
     if (_scalesWithViewingDistance != scalesWithViewingDistance)
     {
         _scalesWithViewingDistance = scalesWithViewingDistance;
@@ -171,6 +180,7 @@
 
 - (void)setRotatesToMatchCamera:(BOOL)rotatesToMatchCamera
 {
+    MGLLogDebug(@"Setting rotatesToMatchCamera: %@", MGLStringFromBOOL(rotatesToMatchCamera));
     if (_rotatesToMatchCamera != rotatesToMatchCamera)
     {
         _rotatesToMatchCamera = rotatesToMatchCamera;
@@ -202,6 +212,7 @@
 
 - (void)setDraggable:(BOOL)draggable
 {
+    MGLLogDebug(@"Setting draggable: %@", MGLStringFromBOOL(draggable));
     [self willChangeValueForKey:@"draggable"];
     _draggable = draggable;
     [self didChangeValueForKey:@"draggable"];
@@ -275,11 +286,13 @@
 
 - (void)setDragState:(MGLAnnotationViewDragState)dragState
 {
+    MGLLogDebug(@"Setting dragState: %lu", (unsigned long)dragState);
     [self setDragState:dragState animated:YES];
 }
 
 - (void)setDragState:(MGLAnnotationViewDragState)dragState animated:(BOOL)animated
 {
+    MGLLogDebug(@"Setting dragState: %lu animated: %@", (unsigned long)dragState, MGLStringFromBOOL(animated));
     [self willChangeValueForKey:@"dragState"];
     _dragState = dragState;
     [self didChangeValueForKey:@"dragState"];

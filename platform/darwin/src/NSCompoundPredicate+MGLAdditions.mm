@@ -4,6 +4,7 @@
 
 #import "NSPredicate+MGLPrivateAdditions.h"
 #import "NSExpression+MGLPrivateAdditions.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #include <mbgl/style/conversion/property_value.hpp>
 
@@ -25,7 +26,7 @@
 - (id)mgl_jsonExpressionObject {
     switch (self.compoundPredicateType) {
         case NSNotPredicateType: {
-            NSAssert(self.subpredicates.count <= 1, @"NOT predicate cannot have multiple subpredicates.");
+            MGLAssert(self.subpredicates.count <= 1, @"NOT predicate cannot have multiple subpredicates.");
             NSPredicate *subpredicate = self.subpredicates.firstObject;
             return @[@"!", subpredicate.mgl_jsonExpressionObject];
         }

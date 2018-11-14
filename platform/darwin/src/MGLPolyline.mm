@@ -4,6 +4,7 @@
 #import "MGLGeometry_Private.h"
 
 #import "MGLFeature.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #import <mbgl/util/geojson.hpp>
 #import <mapbox/polylabel.hpp>
@@ -64,7 +65,7 @@
 
 - (CLLocationCoordinate2D)coordinate {
     NSUInteger count = self.pointCount;
-    NSAssert(count > 0, @"Polyline must have coordinates");
+    MGLAssert(count > 0, @"Polyline must have coordinates");
 
     CLLocationCoordinate2D *coordinates = self.coordinates;
     CLLocationDistance middle = [self length] / 2.0;
@@ -138,6 +139,7 @@
 }
 
 - (instancetype)initWithPolylines:(NSArray<MGLPolyline *> *)polylines {
+    MGLLogDebug(@"Initializing with %lu polylines.", (unsigned long)polylines.count);
     if (self = [super init]) {
         _polylines = polylines;
 
@@ -152,6 +154,7 @@
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder {
+    MGLLogInfo(@"Initializing with coder.");
     if (self = [super initWithCoder:decoder]) {
         _polylines = [decoder decodeObjectOfClass:[NSArray class] forKey:@"polylines"];
     }
@@ -184,7 +187,7 @@
 - (CLLocationCoordinate2D)coordinate {
     MGLPolyline *polyline = self.polylines.firstObject;
     CLLocationCoordinate2D *coordinates = polyline.coordinates;
-    NSAssert([polyline pointCount] > 0, @"Polyline must have coordinates");
+    MGLAssert([polyline pointCount] > 0, @"Polyline must have coordinates");
     CLLocationCoordinate2D firstCoordinate = coordinates[0];
 
     return firstCoordinate;

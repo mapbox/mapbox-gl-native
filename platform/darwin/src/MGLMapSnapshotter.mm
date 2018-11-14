@@ -15,6 +15,7 @@
 #import "NSBundle+MGLAdditions.h"
 #import "MGLStyle.h"
 #import "MGLAttributionInfo_Private.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #if TARGET_OS_IPHONE
 #import "UIImage+MGLAdditions.h"
@@ -31,6 +32,12 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (instancetype _Nonnull)initWithStyleURL:(nullable NSURL *)styleURL camera:(MGLMapCamera *)camera size:(CGSize) size
 {
+#if TARGET_OS_IPHONE
+    NSString *sizeString = NSStringFromCGSize(size);
+#else
+    NSString *sizeString = NSStringFromSize(size);
+#endif
+    MGLLogDebug(@"Initializing withStyleURL: %@ camera: %@ size: %@", styleURL, camera, sizeString);
     self = [super init];
     if (self) {
         if ( !styleURL)
@@ -123,7 +130,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (void)dealloc {
     if (_completion) {
-        NSAssert(_snapshotCallback, @"Snapshot in progress - there should be a valid callback");
+        MGLAssert(_snapshotCallback, @"Snapshot in progress - there should be a valid callback");
 
         [MGLMapSnapshotter completeWithErrorCode:MGLErrorCodeSnapshotFailed
                                      description:@"MGLMapSnapshotter deallocated prior to snapshot completion."
@@ -134,6 +141,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (instancetype)initWithOptions:(MGLMapSnapshotOptions *)options
 {
+    MGLLogDebug(@"Initializing withOptions: %@", options);
     self = [super init];
     if (self) {
         [self setOptions:options];
@@ -143,6 +151,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (void)startWithCompletionHandler:(MGLMapSnapshotCompletionHandler)completion
 {
+    MGLLogDebug(@"Starting withCompletionHandler: %@", completion);
     [self startWithQueue:dispatch_get_main_queue() completionHandler:completion];
 }
 
@@ -173,7 +182,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
         __typeof__(self) strongSelf = weakSelf;
         // If self had died, _snapshotCallback would have been destroyed and this block would not be executed
-        NSCAssert(strongSelf, @"Snapshot callback executed after being destroyed.");
+        MGLCAssert(strongSelf, @"Snapshot callback executed after being destroyed.");
 
         if (!strongSelf.completion)
             return;
@@ -500,6 +509,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (void)cancel
 {
+    MGLLogInfo(@"Cancelling snapshotter.");
     self.cancelled = YES;
     
     if (_snapshotCallback) {
@@ -529,6 +539,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (void)setOptions:(MGLMapSnapshotOptions *)options
 {
+    MGLLogDebug(@"Setting options: %@", options);
     _options = options;
     mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
     _mbglThreadPool = mbgl::sharedThreadPool();

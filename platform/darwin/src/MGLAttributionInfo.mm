@@ -11,6 +11,7 @@
 #import "NSArray+MGLAdditions.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #include <string>
 
@@ -91,7 +92,7 @@
                                  options:0
                               usingBlock:
     ^(id _Nullable value, NSRange range, BOOL * _Nonnull stop) {
-        NSCAssert(!value || [value isKindOfClass:[NSURL class]], @"If present, URL attribute must be an NSURL.");
+        MGLCAssert(!value || [value isKindOfClass:[NSURL class]], @"If present, URL attribute must be an NSURL.");
 
         // Detect feedback links by the bogus style rule applied above.
         NSNumber *strokeWidth = [attributedString attribute:NSStrokeWidthAttributeName

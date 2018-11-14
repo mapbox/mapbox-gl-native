@@ -1,5 +1,6 @@
 #import "NSValue+MGLStyleAttributeAdditions.h"
 #import "MGLLight.h"
+#import "MGLLoggingConfiguration_Private.h"
 #if TARGET_OS_IPHONE
     #import <UIKit/UIKit.h>
     #define MGLEdgeInsets UIEdgeInsets
@@ -35,7 +36,7 @@
 
 - (std::array<float, 2>)mgl_offsetArrayValue
 {
-    NSAssert(strcmp(self.objCType, @encode(CGVector)) == 0, @"Value does not represent a CGVector");
+    MGLAssert(strcmp(self.objCType, @encode(CGVector)) == 0, @"Value does not represent a CGVector");
     CGVector vector;
     [self getValue:&vector];
 #if !TARGET_OS_IPHONE
@@ -49,7 +50,7 @@
 
 - (std::array<float, 4>)mgl_paddingArrayValue
 {
-    NSAssert(strcmp(self.objCType, @encode(MGLEdgeInsets)) == 0, @"Value does not represent an NSEdgeInsets/UIEdgeInsets");
+    MGLAssert(strcmp(self.objCType, @encode(MGLEdgeInsets)) == 0, @"Value does not represent an NSEdgeInsets/UIEdgeInsets");
     MGLEdgeInsets insets;
     [self getValue:&insets];
     // Style specification defines padding in clockwise order: top, right, bottom, left.
@@ -63,7 +64,7 @@
 
 - (std::array<float, 3>)mgl_lightPositionArrayValue
 {
-    NSAssert(strcmp(self.objCType, @encode(MGLSphericalPosition)) == 0, @"Value does not represent an MGLSphericalPosition");
+    MGLAssert(strcmp(self.objCType, @encode(MGLSphericalPosition)) == 0, @"Value does not represent an MGLSphericalPosition");
     MGLSphericalPosition lightPosition;
     [self getValue:&lightPosition];
     // Style specification defines padding in clockwise order: top, right, bottom, left.

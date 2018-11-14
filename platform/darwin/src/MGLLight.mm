@@ -8,6 +8,7 @@
 #import "NSDate+MGLAdditions.h"
 #import "MGLStyleValue_Private.h"
 #import "NSValue+MGLAdditions.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #import <mbgl/style/light.hpp>
 #import <mbgl/style/types.hpp>
@@ -43,6 +44,7 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 - (instancetype)initWithMBGLLight:(const mbgl::style::Light *)mbglLight
 {
     if (self = [super init]) {
+        MGLLogInfo(@"Initializing %@.", NSStringFromClass([self class]));
         auto anchor = mbglLight->getAnchor();
         NSExpression *anchorExpression;
         if (anchor.isUndefined()) {
@@ -103,6 +105,43 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 
 
     return mbglLight;
+}
+
+
+
+- (void)setAnchor:(NSExpression *)anchor {
+    MGLLogDebug(@"Setting anchor: %@", anchor);
+    _anchor = anchor;
+}
+
+- (void)setPosition:(NSExpression *)position {
+    MGLLogDebug(@"Setting position: %@", position);
+    _position = position;
+}
+
+- (void)setPositionTransition:(MGLTransition)transition {
+    MGLLogDebug(@"Setting positionTransition: %@", MGLStringFromMGLTransition(transition));
+    _positionTransition = transition;
+}
+
+- (void)setColor:(NSExpression *)color {
+    MGLLogDebug(@"Setting color: %@", color);
+    _color = color;
+}
+
+- (void)setColorTransition:(MGLTransition)transition {
+    MGLLogDebug(@"Setting colorTransition: %@", MGLStringFromMGLTransition(transition));
+    _colorTransition = transition;
+}
+
+- (void)setIntensity:(NSExpression *)intensity {
+    MGLLogDebug(@"Setting intensity: %@", intensity);
+    _intensity = intensity;
+}
+
+- (void)setIntensityTransition:(MGLTransition)transition {
+    MGLLogDebug(@"Setting intensityTransition: %@", MGLStringFromMGLTransition(transition));
+    _intensityTransition = transition;
 }
 
 @end

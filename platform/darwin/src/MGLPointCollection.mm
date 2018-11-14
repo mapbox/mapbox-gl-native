@@ -1,6 +1,7 @@
 #import "MGLPointCollection_Private.h"
 #import "MGLGeometry_Private.h"
 #import "NSArray+MGLAdditions.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #import <mbgl/util/geojson.hpp>
 #import <mbgl/util/geometry.hpp>
@@ -20,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count
 {
+    MGLLogDebug(@"Initializing with %lu coordinates.", (unsigned long)count);
     self = [super init];
     if (self)
     {
@@ -29,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)decoder {
+    MGLLogInfo(@"Initializing with coder.O");
     if (self = [super initWithCoder:decoder]) {
         NSArray *coordinates = [decoder decodeObjectOfClass:[NSArray class] forKey:@"coordinates"];
         _coordinates = [coordinates mgl_coordinates];
@@ -77,7 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (CLLocationCoordinate2D)coordinate
 {
-    NSAssert([self pointCount] > 0, @"A multipoint must have coordinates");
+    MGLAssert([self pointCount] > 0, @"A multipoint must have coordinates");
     return _coordinates.at(0);
 }
 

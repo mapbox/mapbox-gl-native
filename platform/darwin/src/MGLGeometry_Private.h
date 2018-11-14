@@ -19,6 +19,10 @@ typedef struct MGLRadianCoordinate2D {
     MGLLocationRadians longitude;
 } MGLRadianCoordinate2D;
 
+NS_INLINE NSString *MGLStringFromCLLocationCoordinate2D(CLLocationCoordinate2D coordinate) {
+    return [NSString stringWithFormat:@"(lat: %f, lon: %f)", coordinate.latitude, coordinate.longitude];
+}
+
 /**
  Creates a new `MGLRadianCoordinate2D` from the given latitudinal and longitudinal.
  */

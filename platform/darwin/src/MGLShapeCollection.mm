@@ -2,6 +2,7 @@
 
 #import "MGLShape_Private.h"
 #import "MGLFeature.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #import <mbgl/style/conversion/geojson.hpp>
 
@@ -12,6 +13,7 @@
 }
 
 - (instancetype)initWithShapes:(NSArray<MGLShape *> *)shapes {
+    MGLLogDebug(@"Initializing with %lu shapes.", (unsigned long)shapes.count);
     if (self = [super init]) {
         _shapes = shapes.copy;
     }
@@ -19,6 +21,7 @@
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder {
+    MGLLogInfo(@"Initializing with coder.");
     if (self = [super initWithCoder:decoder]) {
         _shapes = [decoder decodeObjectOfClass:[NSArray class] forKey:@"shapes"];
     }

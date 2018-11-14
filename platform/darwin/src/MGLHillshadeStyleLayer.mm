@@ -7,6 +7,7 @@
 #import "MGLStyleLayer_Private.h"
 #import "MGLStyleValue_Private.h"
 #import "MGLHillshadeStyleLayer.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/hillshade_layer.hpp>
@@ -30,6 +31,7 @@ namespace mbgl {
 
 - (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source
 {
+    MGLLogDebug(@"Initializing %@ with identifier: %@ source: %@", NSStringFromClass([self class]), identifier, source);
     auto layer = std::make_unique<mbgl::style::HillshadeLayer>(identifier.UTF8String, source.identifier.UTF8String);
     return self = [super initWithPendingLayer:std::move(layer)];
 }
@@ -50,6 +52,7 @@ namespace mbgl {
 
 - (void)setHillshadeAccentColor:(NSExpression *)hillshadeAccentColor {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting hillshadeAccentColor: %@", hillshadeAccentColor);
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(hillshadeAccentColor, false);
     self.rawLayer->setHillshadeAccentColor(mbglValue);
@@ -67,6 +70,7 @@ namespace mbgl {
 
 - (void)setHillshadeAccentColorTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting hillshadeAccentColorTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setHillshadeAccentColorTransition(options);
@@ -85,6 +89,7 @@ namespace mbgl {
 
 - (void)setHillshadeExaggeration:(NSExpression *)hillshadeExaggeration {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting hillshadeExaggeration: %@", hillshadeExaggeration);
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(hillshadeExaggeration, false);
     self.rawLayer->setHillshadeExaggeration(mbglValue);
@@ -102,6 +107,7 @@ namespace mbgl {
 
 - (void)setHillshadeExaggerationTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting hillshadeExaggerationTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setHillshadeExaggerationTransition(options);
@@ -120,6 +126,7 @@ namespace mbgl {
 
 - (void)setHillshadeHighlightColor:(NSExpression *)hillshadeHighlightColor {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting hillshadeHighlightColor: %@", hillshadeHighlightColor);
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(hillshadeHighlightColor, false);
     self.rawLayer->setHillshadeHighlightColor(mbglValue);
@@ -137,6 +144,7 @@ namespace mbgl {
 
 - (void)setHillshadeHighlightColorTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting hillshadeHighlightColorTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setHillshadeHighlightColorTransition(options);
@@ -155,6 +163,7 @@ namespace mbgl {
 
 - (void)setHillshadeIlluminationAnchor:(NSExpression *)hillshadeIlluminationAnchor {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting hillshadeIlluminationAnchor: %@", hillshadeIlluminationAnchor);
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::style::HillshadeIlluminationAnchorType, NSValue *, mbgl::style::HillshadeIlluminationAnchorType, MGLHillshadeIlluminationAnchor>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::HillshadeIlluminationAnchorType>>(hillshadeIlluminationAnchor, false);
     self.rawLayer->setHillshadeIlluminationAnchor(mbglValue);
@@ -172,6 +181,7 @@ namespace mbgl {
 
 - (void)setHillshadeIlluminationDirection:(NSExpression *)hillshadeIlluminationDirection {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting hillshadeIlluminationDirection: %@", hillshadeIlluminationDirection);
 
     auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(hillshadeIlluminationDirection, false);
     self.rawLayer->setHillshadeIlluminationDirection(mbglValue);
@@ -189,6 +199,7 @@ namespace mbgl {
 
 - (void)setHillshadeShadowColor:(NSExpression *)hillshadeShadowColor {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting hillshadeShadowColor: %@", hillshadeShadowColor);
 
     auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(hillshadeShadowColor, false);
     self.rawLayer->setHillshadeShadowColor(mbglValue);
@@ -206,6 +217,7 @@ namespace mbgl {
 
 - (void)setHillshadeShadowColorTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting hillshadeShadowColorTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setHillshadeShadowColorTransition(options);

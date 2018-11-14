@@ -8,6 +8,7 @@
 #import "MGLTilePyramidOfflineRegion_Private.h"
 #import "MGLGeometry_Private.h"
 #import "MGLStyle.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 #import "MMEConstants.h"
@@ -39,6 +40,7 @@
 }
 
 - (instancetype)init {
+    MGLLogInfo(@"Calling this initializer is not allowed.");
     [NSException raise:NSGenericException format:
      @"-[MGLTilePyramidOfflineRegion init] is unavailable. "
      @"Use -initWithStyleURL:bounds:fromZoomLevel:toZoomLevel: instead."];
@@ -46,6 +48,7 @@
 }
 
 - (instancetype)initWithStyleURL:(NSURL *)styleURL bounds:(MGLCoordinateBounds)bounds fromZoomLevel:(double)minimumZoomLevel toZoomLevel:(double)maximumZoomLevel {
+    MGLLogDebug(@"Initializing styleURL: %@ bounds: %@ fromZoomLevel: %f toZoomLevel: %f", styleURL, MGLStringFromCoordinateBounds(bounds), minimumZoomLevel, maximumZoomLevel);
     if (self = [super init]) {
         if (!styleURL) {
             styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
@@ -87,6 +90,7 @@
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)coder {
+    MGLLogInfo(@"Initializing with coder.");
     NSURL *styleURL = [coder decodeObjectForKey:@"styleURL"];
     CLLocationCoordinate2D sw = CLLocationCoordinate2DMake([coder decodeDoubleForKey:@"southWestLatitude"],
                                                            [coder decodeDoubleForKey:@"southWestLongitude"]);

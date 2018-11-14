@@ -2,6 +2,7 @@
 
 #import "MGLShape_Private.h"
 #import "NSCoder+MGLAdditions.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #import <mbgl/util/geometry.hpp>
 
@@ -17,6 +18,7 @@
 
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
+    MGLLogInfo(@"Initializing with coder.");
     if (self = [super initWithCoder:coder]) {
         self.coordinate = [coder decodeMGLCoordinateForKey:@"coordinate"];
     }
