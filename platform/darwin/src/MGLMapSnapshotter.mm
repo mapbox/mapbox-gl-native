@@ -155,10 +155,11 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     self = [super init];
     if (self) {
         [self setOptions:options];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(applicationWillTerminate:)
-                                                     name:UIApplicationWillTerminateNotification
-                                                   object:nil];
+#if TARGET_OS_IPHONE
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:UIApplicationWillTerminateNotification object:nil];
+#else
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+#endif
     }
     return self;
 }
