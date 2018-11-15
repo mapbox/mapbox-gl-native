@@ -1,7 +1,8 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/style/properties.hpp>
 #include <mbgl/style/expression/dsl.hpp>
+#include <mbgl/style/expression/format_expression.hpp>
+#include <mbgl/style/properties.hpp>
 #include <mbgl/renderer/property_evaluator.hpp>
 #include <mbgl/renderer/data_driven_property_evaluator.hpp>
 
@@ -135,4 +136,10 @@ TEST(TransitioningDataDrivenPropertyValue, Evaluate) {
     ASSERT_TRUE(evaluateDataExpression(t0, 0ms).isConstant());
     ASSERT_FALSE(evaluateDataExpression(t1, 0ms).isConstant()) <<
         "A paint property transition to a data-driven evaluates immediately to the final value (see https://github.com/mapbox/mapbox-gl-native/issues/8237).";
+}
+
+TEST(PropertyValue, EvaluateFormatted) {
+    using namespace mbgl::style::expression;
+    using namespace mbgl::style::expression::dsl;
+    ASSERT_EQ(PropertyExpression<Formatted> { format("hello") }.evaluate(12.0).toString(), std::string("hello"));
 }

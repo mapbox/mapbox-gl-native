@@ -25,8 +25,7 @@ public:
     bool isFeatureConstant() const { return expression::isFeatureConstant(*expression); }
 
     T evaluate(float zoom) const {
-        assert(!expression::isZoomConstant(*expression));
-        assert(expression::isFeatureConstant(*expression));
+        assert(isFeatureConstant());
         const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext(zoom, nullptr));
         if (result) {
             const optional<T> typed = expression::fromExpressionValue<T>(*result);
@@ -37,8 +36,8 @@ public:
 
     template <class Feature>
     T evaluate(const Feature& feature, T finalDefaultValue) const {
-        assert(expression::isZoomConstant(*expression));
-        assert(!expression::isFeatureConstant(*expression));
+        assert(isZoomConstant());
+        assert(!isFeatureConstant());
         const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext(&feature));
         if (result) {
             const optional<T> typed = expression::fromExpressionValue<T>(*result);
@@ -49,7 +48,7 @@ public:
 
     template <class Feature>
     T evaluate(float zoom, const Feature& feature, T finalDefaultValue) const {
-        assert(!expression::isFeatureConstant(*expression));
+        assert(!isFeatureConstant());
         const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext({zoom}, &feature));
         if (result) {
             const optional<T> typed = expression::fromExpressionValue<T>(*result);
