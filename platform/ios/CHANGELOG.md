@@ -2,9 +2,11 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## master
+## 4.7.0
 
 * Renamed `-[MGLOfflineStorage putResourceWithUrl:data:modified:expires:etag:mustRevalidate:]` to `-[MGLOfflineStorage preloadData:forURL:modificationDate:expirationDate:eTag:mustRevalidate:]`. ([#13318](https://github.com/mapbox/mapbox-gl-native/pull/13318))
+* Fixed sporadic crash when using `MGLMapSnapshotter`. ([#13300](https://github.com/mapbox/mapbox-gl-native/pull/13300))
+* Added `MGLLoggingConfiguration` and `MGLLoggingBlockHandler` that handle error and fault events produced by the SDK. ([#13235)(https://github.com/mapbox/mapbox-gl-native/pull/13235))
 
 ## 4.6.0 - November 7, 2018
 
