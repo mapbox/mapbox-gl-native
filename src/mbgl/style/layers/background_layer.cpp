@@ -14,6 +14,10 @@
 namespace mbgl {
 namespace style {
 
+namespace {
+    const LayerTypeInfo typeInfoBackground{ "background", LayerTypeInfo::SourceNotRequired };
+}  // namespace
+
 BackgroundLayer::BackgroundLayer(const std::string& layerID)
     : Layer(makeMutable<Impl>(LayerType::Background, layerID, std::string())) {
 }
@@ -42,8 +46,8 @@ std::unique_ptr<Layer> BackgroundLayer::cloneRef(const std::string& id_) const {
 void BackgroundLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-LayerFactory* BackgroundLayer::Impl::getLayerFactory() const noexcept {
-    return BackgroundLayerFactory::get();
+const LayerTypeInfo* BackgroundLayer::Impl::getTypeInfo() const noexcept {
+    return &typeInfoBackground;
 }
 
 // Layout properties
@@ -274,23 +278,12 @@ Mutable<Layer::Impl> BackgroundLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-BackgroundLayerFactory* BackgroundLayerFactory::instance = nullptr;
-
-BackgroundLayerFactory::BackgroundLayerFactory() {
-    assert(!instance);
-    instance = this;
-}
+BackgroundLayerFactory::BackgroundLayerFactory() = default;
 
 BackgroundLayerFactory::~BackgroundLayerFactory() = default;
 
-// static
-BackgroundLayerFactory* BackgroundLayerFactory::get() noexcept {
-    assert(instance);
-    return instance;
-}
-
-bool BackgroundLayerFactory::supportsType(const std::string& type) const noexcept {
-    return type == "background";
+const LayerTypeInfo* BackgroundLayerFactory::getTypeInfo() const noexcept {
+    return &typeInfoBackground;
 }
 
 std::unique_ptr<style::Layer> BackgroundLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

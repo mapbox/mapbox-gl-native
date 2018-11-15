@@ -14,6 +14,10 @@
 namespace mbgl {
 namespace style {
 
+namespace {
+    const LayerTypeInfo typeInfoLine{ "line", LayerTypeInfo::SourceRequired };
+}  // namespace
+
 LineLayer::LineLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(makeMutable<Impl>(LayerType::Line, layerID, sourceID)) {
 }
@@ -43,8 +47,8 @@ void LineLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>
     layout.stringify(writer);
 }
 
-LayerFactory* LineLayer::Impl::getLayerFactory() const noexcept {
-    return LineLayerFactory::get();
+const LayerTypeInfo* LineLayer::Impl::getTypeInfo() const noexcept {
+    return &typeInfoLine;
 }
 
 // Layout properties
@@ -832,23 +836,12 @@ Mutable<Layer::Impl> LineLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-LineLayerFactory* LineLayerFactory::instance = nullptr;
-
-LineLayerFactory::LineLayerFactory() {
-    assert(!instance);
-    instance = this;
-}
+LineLayerFactory::LineLayerFactory() = default;
 
 LineLayerFactory::~LineLayerFactory() = default;
 
-// static
-LineLayerFactory* LineLayerFactory::get() noexcept {
-    assert(instance);
-    return instance;
-}
-
-bool LineLayerFactory::supportsType(const std::string& type) const noexcept {
-    return type == "line";
+const LayerTypeInfo* LineLayerFactory::getTypeInfo() const noexcept {
+    return &typeInfoLine;
 }
 
 std::unique_ptr<style::Layer> LineLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

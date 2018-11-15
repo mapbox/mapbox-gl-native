@@ -128,15 +128,11 @@ protected:
 class LineLayerFactory : public LayerFactory {
 public:
     LineLayerFactory();
-    // LayerFactory overrides.
     ~LineLayerFactory() override;
-    bool supportsType(const std::string& type) const noexcept final;
+
+    // LayerFactory overrides.
+    const LayerTypeInfo* getTypeInfo() const noexcept final;
     std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
-
-    static LineLayerFactory* get() noexcept;
-
-private:
-    static LineLayerFactory* instance;
 };
 
 } // namespace style

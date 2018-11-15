@@ -14,6 +14,10 @@
 namespace mbgl {
 namespace style {
 
+namespace {
+    const LayerTypeInfo typeInfoFill{ "fill", LayerTypeInfo::SourceRequired };
+}  // namespace
+
 FillLayer::FillLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(makeMutable<Impl>(LayerType::Fill, layerID, sourceID)) {
 }
@@ -42,8 +46,8 @@ std::unique_ptr<Layer> FillLayer::cloneRef(const std::string& id_) const {
 void FillLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-LayerFactory* FillLayer::Impl::getLayerFactory() const noexcept {
-    return FillLayerFactory::get();
+const LayerTypeInfo* FillLayer::Impl::getTypeInfo() const noexcept {
+    return &typeInfoFill;
 }
 
 // Layout properties
@@ -493,23 +497,12 @@ Mutable<Layer::Impl> FillLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-FillLayerFactory* FillLayerFactory::instance = nullptr;
-
-FillLayerFactory::FillLayerFactory() {
-    assert(!instance);
-    instance = this;
-}
+FillLayerFactory::FillLayerFactory() = default;
 
 FillLayerFactory::~FillLayerFactory() = default;
 
-// static
-FillLayerFactory* FillLayerFactory::get() noexcept {
-    assert(instance);
-    return instance;
-}
-
-bool FillLayerFactory::supportsType(const std::string& type) const noexcept {
-    return type == "fill";
+const LayerTypeInfo* FillLayerFactory::getTypeInfo() const noexcept {
+    return &typeInfoFill;
 }
 
 std::unique_ptr<style::Layer> FillLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

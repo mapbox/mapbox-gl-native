@@ -101,12 +101,12 @@ namespace android {
     }  // namespace
 
     jni::Local<jni::Object<Layer>> <%- camelize(type) %>JavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
-        assert(layer.baseImpl->getLayerFactory() == this);
+        assert(layer.baseImpl->getTypeInfo() == getTypeInfo());
         return createJavaPeer(env, new <%- camelize(type) %>Layer(map, to<%- camelize(type) %>Layer(layer)));
     }
 
     jni::Local<jni::Object<Layer>> <%- camelize(type) %>JavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
-        assert(layer->baseImpl->getLayerFactory() == this);
+        assert(layer->baseImpl->getTypeInfo() == getTypeInfo());
         return createJavaPeer(env, new <%- camelize(type) %>Layer(map, std::unique_ptr<mbgl::style::<%- camelize(type) %>Layer>(static_cast<mbgl::style::<%- camelize(type) %>Layer*>(layer.release()))));
     }
 

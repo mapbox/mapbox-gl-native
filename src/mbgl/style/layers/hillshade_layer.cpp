@@ -14,6 +14,10 @@
 namespace mbgl {
 namespace style {
 
+namespace {
+    const LayerTypeInfo typeInfoHillshade{ "hillshade", LayerTypeInfo::SourceRequired };
+}  // namespace
+
 HillshadeLayer::HillshadeLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(makeMutable<Impl>(LayerType::Hillshade, layerID, sourceID)) {
 }
@@ -42,8 +46,8 @@ std::unique_ptr<Layer> HillshadeLayer::cloneRef(const std::string& id_) const {
 void HillshadeLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-LayerFactory* HillshadeLayer::Impl::getLayerFactory() const noexcept {
-    return HillshadeLayerFactory::get();
+const LayerTypeInfo* HillshadeLayer::Impl::getTypeInfo() const noexcept {
+    return &typeInfoHillshade;
 }
 
 // Layout properties
@@ -425,23 +429,12 @@ Mutable<Layer::Impl> HillshadeLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-HillshadeLayerFactory* HillshadeLayerFactory::instance = nullptr;
-
-HillshadeLayerFactory::HillshadeLayerFactory() {
-    assert(!instance);
-    instance = this;
-}
+HillshadeLayerFactory::HillshadeLayerFactory() = default;
 
 HillshadeLayerFactory::~HillshadeLayerFactory() = default;
 
-// static
-HillshadeLayerFactory* HillshadeLayerFactory::get() noexcept {
-    assert(instance);
-    return instance;
-}
-
-bool HillshadeLayerFactory::supportsType(const std::string& type) const noexcept {
-    return type == "hillshade";
+const LayerTypeInfo* HillshadeLayerFactory::getTypeInfo() const noexcept {
+    return &typeInfoHillshade;
 }
 
 std::unique_ptr<style::Layer> HillshadeLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

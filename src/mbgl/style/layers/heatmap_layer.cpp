@@ -14,6 +14,10 @@
 namespace mbgl {
 namespace style {
 
+namespace {
+    const LayerTypeInfo typeInfoHeatmap{ "heatmap", LayerTypeInfo::SourceRequired };
+}  // namespace
+
 HeatmapLayer::HeatmapLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(makeMutable<Impl>(LayerType::Heatmap, layerID, sourceID)) {
 }
@@ -42,8 +46,8 @@ std::unique_ptr<Layer> HeatmapLayer::cloneRef(const std::string& id_) const {
 void HeatmapLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-LayerFactory* HeatmapLayer::Impl::getLayerFactory() const noexcept {
-    return HeatmapLayerFactory::get();
+const LayerTypeInfo* HeatmapLayer::Impl::getTypeInfo() const noexcept {
+    return &typeInfoHeatmap;
 }
 
 // Layout properties
@@ -378,23 +382,12 @@ Mutable<Layer::Impl> HeatmapLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-HeatmapLayerFactory* HeatmapLayerFactory::instance = nullptr;
-
-HeatmapLayerFactory::HeatmapLayerFactory() {
-    assert(!instance);
-    instance = this;
-}
+HeatmapLayerFactory::HeatmapLayerFactory() = default;
 
 HeatmapLayerFactory::~HeatmapLayerFactory() = default;
 
-// static
-HeatmapLayerFactory* HeatmapLayerFactory::get() noexcept {
-    assert(instance);
-    return instance;
-}
-
-bool HeatmapLayerFactory::supportsType(const std::string& type) const noexcept {
-    return type == "heatmap";
+const LayerTypeInfo* HeatmapLayerFactory::getTypeInfo() const noexcept {
+    return &typeInfoHeatmap;
 }
 
 std::unique_ptr<style::Layer> HeatmapLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

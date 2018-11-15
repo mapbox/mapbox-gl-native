@@ -16,9 +16,5 @@ bool CustomLayer::Impl::hasLayoutDifference(const Layer::Impl&) const {
 void CustomLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-LayerFactory*  CustomLayer::Impl::getLayerFactory() const noexcept {
-    return CustomLayerFactory::get();
-}
-
 } // namespace style
 } // namespace mbgl

@@ -5,6 +5,10 @@
 namespace mbgl {
 namespace style {
 
+namespace {
+    const LayerTypeInfo typeInfoCustom{ "", LayerTypeInfo::SourceNotRequired };
+}  // namespace
+
 CustomLayer::CustomLayer(const std::string& layerID,
                          std::unique_ptr<CustomLayerHost> host)
     : Layer(makeMutable<Impl>(layerID, std::move(host))) {
@@ -39,23 +43,16 @@ Mutable<Layer::Impl> CustomLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-CustomLayerFactory* CustomLayerFactory::instance = nullptr;
-
-CustomLayerFactory::CustomLayerFactory() {
-    assert(!instance);
-    instance = this;
+const LayerTypeInfo* CustomLayer::Impl::getTypeInfo() const noexcept {
+    return &typeInfoCustom;
 }
+
+CustomLayerFactory::CustomLayerFactory() = default;
 
 CustomLayerFactory::~CustomLayerFactory() = default;
 
-// static
-CustomLayerFactory* CustomLayerFactory::get() noexcept {
-    assert(instance);
-    return instance;
-}
-
-bool CustomLayerFactory::supportsType(const std::string&) const noexcept {
-    return false;
+const LayerTypeInfo* CustomLayerFactory::getTypeInfo() const noexcept {
+    return &typeInfoCustom;
 }
 
 std::unique_ptr<style::Layer> CustomLayerFactory::createLayer(const std::string&, const conversion::Convertible&) {

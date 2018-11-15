@@ -14,6 +14,10 @@
 namespace mbgl {
 namespace style {
 
+namespace {
+    const LayerTypeInfo typeInfoRaster{ "raster", LayerTypeInfo::SourceRequired };
+}  // namespace
+
 RasterLayer::RasterLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(makeMutable<Impl>(LayerType::Raster, layerID, sourceID)) {
 }
@@ -42,8 +46,8 @@ std::unique_ptr<Layer> RasterLayer::cloneRef(const std::string& id_) const {
 void RasterLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-LayerFactory* RasterLayer::Impl::getLayerFactory() const noexcept {
-    return RasterLayerFactory::get();
+const LayerTypeInfo* RasterLayer::Impl::getTypeInfo() const noexcept {
+    return &typeInfoRaster;
 }
 
 // Layout properties
@@ -514,23 +518,12 @@ Mutable<Layer::Impl> RasterLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-RasterLayerFactory* RasterLayerFactory::instance = nullptr;
-
-RasterLayerFactory::RasterLayerFactory() {
-    assert(!instance);
-    instance = this;
-}
+RasterLayerFactory::RasterLayerFactory() = default;
 
 RasterLayerFactory::~RasterLayerFactory() = default;
 
-// static
-RasterLayerFactory* RasterLayerFactory::get() noexcept {
-    assert(instance);
-    return instance;
-}
-
-bool RasterLayerFactory::supportsType(const std::string& type) const noexcept {
-    return type == "raster";
+const LayerTypeInfo* RasterLayerFactory::getTypeInfo() const noexcept {
+    return &typeInfoRaster;
 }
 
 std::unique_ptr<style::Layer> RasterLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

@@ -18,7 +18,7 @@ public:
 
     bool hasLayoutDifference(const Layer::Impl&) const override;
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
-    LayerFactory* getLayerFactory() const noexcept final;
+    const LayerTypeInfo* getTypeInfo() const noexcept final;
 
     std::shared_ptr<CustomLayerHost> host;
 };

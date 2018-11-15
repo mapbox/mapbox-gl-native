@@ -14,6 +14,10 @@
 namespace mbgl {
 namespace style {
 
+namespace {
+    const LayerTypeInfo typeInfoSymbol{ "symbol", LayerTypeInfo::SourceRequired };
+}  // namespace
+
 SymbolLayer::SymbolLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(makeMutable<Impl>(LayerType::Symbol, layerID, sourceID)) {
 }
@@ -43,8 +47,8 @@ void SymbolLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffe
     layout.stringify(writer);
 }
 
-LayerFactory* SymbolLayer::Impl::getLayerFactory() const noexcept {
-    return SymbolLayerFactory::get();
+const LayerTypeInfo* SymbolLayer::Impl::getTypeInfo() const noexcept {
+    return &typeInfoSymbol;
 }
 
 // Layout properties
@@ -1982,23 +1986,12 @@ Mutable<Layer::Impl> SymbolLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-SymbolLayerFactory* SymbolLayerFactory::instance = nullptr;
-
-SymbolLayerFactory::SymbolLayerFactory() {
-    assert(!instance);
-    instance = this;
-}
+SymbolLayerFactory::SymbolLayerFactory() = default;
 
 SymbolLayerFactory::~SymbolLayerFactory() = default;
 
-// static
-SymbolLayerFactory* SymbolLayerFactory::get() noexcept {
-    assert(instance);
-    return instance;
-}
-
-bool SymbolLayerFactory::supportsType(const std::string& type) const noexcept {
-    return type == "symbol";
+const LayerTypeInfo* SymbolLayerFactory::getTypeInfo() const noexcept {
+    return &typeInfoSymbol;
 }
 
 std::unique_ptr<style::Layer> SymbolLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

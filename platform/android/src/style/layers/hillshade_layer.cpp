@@ -137,12 +137,12 @@ namespace android {
     }  // namespace
 
     jni::Local<jni::Object<Layer>> HillshadeJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
-        assert(layer.baseImpl->getLayerFactory() == this);
+        assert(layer.baseImpl->getTypeInfo() == getTypeInfo());
         return createJavaPeer(env, new HillshadeLayer(map, toHillshadeLayer(layer)));
     }
 
     jni::Local<jni::Object<Layer>> HillshadeJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
-        assert(layer->baseImpl->getLayerFactory() == this);
+        assert(layer->baseImpl->getTypeInfo() == getTypeInfo());
         return createJavaPeer(env, new HillshadeLayer(map, std::unique_ptr<mbgl::style::HillshadeLayer>(static_cast<mbgl::style::HillshadeLayer*>(layer.release()))));
     }
 
