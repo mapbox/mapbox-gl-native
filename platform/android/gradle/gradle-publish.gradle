@@ -121,6 +121,12 @@ afterEvaluate { project ->
         from android.sourceSets.main.java.sourceFiles
     }
 
+    tasks.withType(Javadoc) {
+        options.addStringOption('encoding', 'UTF-8')
+        options.addStringOption('docencoding', 'UTF-8')
+        options.addStringOption('charset', 'UTF-8')
+    }
+
     artifacts {
         archives androidSourcesJar
         archives androidJavadocsJar
