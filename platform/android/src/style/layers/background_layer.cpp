@@ -109,12 +109,12 @@ namespace android {
     }  // namespace
 
     jni::Local<jni::Object<Layer>> BackgroundJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
-        assert(layer.baseImpl->getLayerFactory() == this);
+        assert(layer.baseImpl->getTypeInfo() == getTypeInfo());
         return createJavaPeer(env, new BackgroundLayer(map, toBackgroundLayer(layer)));
     }
 
     jni::Local<jni::Object<Layer>> BackgroundJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
-        assert(layer->baseImpl->getLayerFactory() == this);
+        assert(layer->baseImpl->getTypeInfo() == getTypeInfo());
         return createJavaPeer(env, new BackgroundLayer(map, std::unique_ptr<mbgl::style::BackgroundLayer>(static_cast<mbgl::style::BackgroundLayer*>(layer.release()))));
     }
 

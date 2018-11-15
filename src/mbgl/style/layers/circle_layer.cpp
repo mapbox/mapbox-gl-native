@@ -14,6 +14,10 @@
 namespace mbgl {
 namespace style {
 
+namespace {
+    const LayerTypeInfo typeInfoCircle{ "circle", LayerTypeInfo::SourceRequired };
+}  // namespace
+
 CircleLayer::CircleLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(makeMutable<Impl>(LayerType::Circle, layerID, sourceID)) {
 }
@@ -42,8 +46,8 @@ std::unique_ptr<Layer> CircleLayer::cloneRef(const std::string& id_) const {
 void CircleLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-LayerFactory* CircleLayer::Impl::getLayerFactory() const noexcept {
-    return CircleLayerFactory::get();
+const LayerTypeInfo* CircleLayer::Impl::getTypeInfo() const noexcept {
+    return &typeInfoCircle;
 }
 
 // Layout properties
@@ -691,23 +695,12 @@ Mutable<Layer::Impl> CircleLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-CircleLayerFactory* CircleLayerFactory::instance = nullptr;
-
-CircleLayerFactory::CircleLayerFactory() {
-    assert(!instance);
-    instance = this;
-}
+CircleLayerFactory::CircleLayerFactory() = default;
 
 CircleLayerFactory::~CircleLayerFactory() = default;
 
-// static
-CircleLayerFactory* CircleLayerFactory::get() noexcept {
-    assert(instance);
-    return instance;
-}
-
-bool CircleLayerFactory::supportsType(const std::string& type) const noexcept {
-    return type == "circle";
+const LayerTypeInfo* CircleLayerFactory::getTypeInfo() const noexcept {
+    return &typeInfoCircle;
 }
 
 std::unique_ptr<style::Layer> CircleLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

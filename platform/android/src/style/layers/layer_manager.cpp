@@ -34,16 +34,16 @@ namespace mbgl {
 namespace android {
 
 LayerManagerAndroid::LayerManagerAndroid() {
-    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new FillJavaLayerPeerFactory));
-    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new LineJavaLayerPeerFactory));
-    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new CircleJavaLayerPeerFactory));
-    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new SymbolJavaLayerPeerFactory));
-    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new RasterJavaLayerPeerFactory));
-    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new BackgroundJavaLayerPeerFactory));
-    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new HillshadeJavaLayerPeerFactory));
-    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new FillExtrusionJavaLayerPeerFactory));
-    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new HeatmapJavaLayerPeerFactory));
-    factories.emplace_back(std::unique_ptr<JavaLayerPeerFactory>(new CustomJavaLayerPeerFactory));
+    addLayerType(std::make_unique<FillJavaLayerPeerFactory>());
+    addLayerType(std::make_unique<LineJavaLayerPeerFactory>());
+    addLayerType(std::make_unique<CircleJavaLayerPeerFactory>());
+    addLayerType(std::make_unique<SymbolJavaLayerPeerFactory>());
+    addLayerType(std::make_unique<RasterJavaLayerPeerFactory>());
+    addLayerType(std::make_unique<BackgroundJavaLayerPeerFactory>());
+    addLayerType(std::make_unique<HillshadeJavaLayerPeerFactory>());
+    addLayerType(std::make_unique<FillExtrusionJavaLayerPeerFactory>());
+    addLayerType(std::make_unique<HeatmapJavaLayerPeerFactory>());
+    addLayerType(std::make_unique<CustomJavaLayerPeerFactory>());
 }
 
 LayerManagerAndroid::~LayerManagerAndroid() = default;
@@ -69,11 +69,20 @@ void LayerManagerAndroid::registerNative(jni::JNIEnv& env) {
     }
 }
 
+void LayerManagerAndroid::addLayerType(std::unique_ptr<JavaLayerPeerFactory> factory) {
+    auto* coreFactory = factory->getLayerFactory();
+    std::string type{coreFactory->getTypeInfo()->type};
+    if (!type.empty()) {
+        typeToFactory.emplace(std::make_pair(std::move(type), coreFactory));
+    }
+    factories.emplace_back(std::move(factory));
+}
+
 JavaLayerPeerFactory* LayerManagerAndroid::getPeerFactory(mbgl::style::Layer* layer) {
-    auto* layerFactory = layer->baseImpl->getLayerFactory();
-    assert(layerFactory);
+    auto* typeInfo = layer->baseImpl->getTypeInfo();
+    assert(typeInfo);
     for (const auto& factory: factories) {
-        if (factory->getLayerFactory() == layerFactory) {
+        if (factory->getLayerFactory()->getTypeInfo() == typeInfo) {
             return factory.get();
         }
     }
@@ -81,16 +90,17 @@ JavaLayerPeerFactory* LayerManagerAndroid::getPeerFactory(mbgl::style::Layer* la
     return nullptr;
 }
 
-std::unique_ptr<style::Layer> LayerManagerAndroid::createLayer(const std::string& type, const std::string& id, const style::conversion::Convertible& value, style::conversion::Error& error) noexcept{
-    for (const auto& factory: factories) {
-        auto* layerFactory = factory->getLayerFactory();
-        if (layerFactory->supportsType(type)) {
-            if (auto layer = layerFactory->createLayer(id, value)) {
-                return layer;
-            }
+std::unique_ptr<style::Layer> LayerManagerAndroid::createLayer(const std::string& type,
+                                                               const std::string& id,
+                                                               const style::conversion::Convertible& value,
+                                                               style::conversion::Error& error) noexcept {
+    auto search = typeToFactory.find(type);
+    if (search != typeToFactory.end()) {
+        auto layer = search->second->createLayer(id, value);
+        if (!layer) {
             error.message = "Error parsing a layer of type: " + type;
-            return nullptr;
         }
+        return layer;
     }
     error.message = "Unsupported layer type: " + type;
     return nullptr;

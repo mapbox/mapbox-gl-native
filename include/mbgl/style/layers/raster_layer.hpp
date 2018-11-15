@@ -89,15 +89,11 @@ protected:
 class RasterLayerFactory : public LayerFactory {
 public:
     RasterLayerFactory();
-    // LayerFactory overrides.
     ~RasterLayerFactory() override;
-    bool supportsType(const std::string& type) const noexcept final;
+
+    // LayerFactory overrides.
+    const LayerTypeInfo* getTypeInfo() const noexcept final;
     std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
-
-    static RasterLayerFactory* get() noexcept;
-
-private:
-    static RasterLayerFactory* instance;
 };
 
 } // namespace style

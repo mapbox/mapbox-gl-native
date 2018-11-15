@@ -107,6 +107,10 @@ optional<conversion::Error> Layer::setVisibility(const conversion::Convertible& 
     return nullopt;
 }
 
+const LayerTypeInfo* Layer::getTypeInfo() const noexcept {
+    return baseImpl->getTypeInfo();
+}
+
 optional<std::string> LayerFactory::getSource(const conversion::Convertible& value) const noexcept {
     auto sourceValue = objectMember(value, "source");
     if (!sourceValue) {

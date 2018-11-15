@@ -28,11 +28,13 @@ public:
 
 private:
     LayerManagerAndroid();
+    void addLayerType(std::unique_ptr<JavaLayerPeerFactory>);
     JavaLayerPeerFactory* getPeerFactory(mbgl::style::Layer*);
     // mbgl:style::LayerManager overrides.
     std::unique_ptr<style::Layer> createLayer(const std::string& type, const std::string& id, const style::conversion::Convertible& value, style::conversion::Error& error) noexcept final;
 
     std::vector<std::unique_ptr<JavaLayerPeerFactory>> factories;
+    std::map<std::string, style::LayerFactory*> typeToFactory;
 };
 
 }

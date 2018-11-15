@@ -168,12 +168,12 @@ namespace android {
     }  // namespace
 
     jni::Local<jni::Object<Layer>> FillExtrusionJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
-        assert(layer.baseImpl->getLayerFactory() == this);
+        assert(layer.baseImpl->getTypeInfo() == getTypeInfo());
         return createJavaPeer(env, new FillExtrusionLayer(map, toFillExtrusionLayer(layer)));
     }
 
     jni::Local<jni::Object<Layer>> FillExtrusionJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
-        assert(layer->baseImpl->getLayerFactory() == this);
+        assert(layer->baseImpl->getTypeInfo() == getTypeInfo());
         return createJavaPeer(env, new FillExtrusionLayer(map, std::unique_ptr<mbgl::style::FillExtrusionLayer>(static_cast<mbgl::style::FillExtrusionLayer*>(layer.release()))));
     }
 

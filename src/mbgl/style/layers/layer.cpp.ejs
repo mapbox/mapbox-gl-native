@@ -19,6 +19,14 @@
 namespace mbgl {
 namespace style {
 
+namespace {
+<% if (type === 'background') { -%>
+    const LayerTypeInfo typeInfo<%- camelize(type) %>{ "<%- type %>", LayerTypeInfo::SourceNotRequired };
+<% } else { -%>
+    const LayerTypeInfo typeInfo<%- camelize(type) %>{ "<%- type %>", LayerTypeInfo::SourceRequired };
+<% } -%>
+}  // namespace
+
 <% if (type === 'background') { -%>
 <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID)
     : Layer(makeMutable<Impl>(LayerType::<%- camelize(type) %>, layerID, std::string())) {
@@ -59,8 +67,8 @@ void <%- camelize(type) %>Layer::Impl::stringifyLayout(rapidjson::Writer<rapidjs
 }
 <% } -%>
 
-LayerFactory* <%- camelize(type) %>Layer::Impl::getLayerFactory() const noexcept {
-    return <%- camelize(type) %>LayerFactory::get();
+const LayerTypeInfo* <%- camelize(type) %>Layer::Impl::getTypeInfo() const noexcept {
+    return &typeInfo<%- camelize(type) %>;
 }
 
 // Layout properties
@@ -264,23 +272,12 @@ Mutable<Layer::Impl> <%- camelize(type) %>Layer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-<%- camelize(type) %>LayerFactory* <%- camelize(type) %>LayerFactory::instance = nullptr;
-
-<%- camelize(type) %>LayerFactory::<%- camelize(type) %>LayerFactory() {
-    assert(!instance);
-    instance = this;
-}
+<%- camelize(type) %>LayerFactory::<%- camelize(type) %>LayerFactory() = default;
 
 <%- camelize(type) %>LayerFactory::~<%- camelize(type) %>LayerFactory() = default;
 
-// static
-<%- camelize(type) %>LayerFactory* <%- camelize(type) %>LayerFactory::get() noexcept {
-    assert(instance);
-    return instance;
-}
-
-bool <%- camelize(type) %>LayerFactory::supportsType(const std::string& type) const noexcept {
-    return type == "<%- type %>";
+const LayerTypeInfo* <%- camelize(type) %>LayerFactory::getTypeInfo() const noexcept {
+    return &typeInfo<%- camelize(type) %>;
 }
 
 std::unique_ptr<style::Layer> <%- camelize(type) %>LayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

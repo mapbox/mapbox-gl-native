@@ -14,6 +14,10 @@
 namespace mbgl {
 namespace style {
 
+namespace {
+    const LayerTypeInfo typeInfoFillExtrusion{ "fill-extrusion", LayerTypeInfo::SourceRequired };
+}  // namespace
+
 FillExtrusionLayer::FillExtrusionLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(makeMutable<Impl>(LayerType::FillExtrusion, layerID, sourceID)) {
 }
@@ -42,8 +46,8 @@ std::unique_ptr<Layer> FillExtrusionLayer::cloneRef(const std::string& id_) cons
 void FillExtrusionLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
-LayerFactory* FillExtrusionLayer::Impl::getLayerFactory() const noexcept {
-    return FillExtrusionLayerFactory::get();
+const LayerTypeInfo* FillExtrusionLayer::Impl::getTypeInfo() const noexcept {
+    return &typeInfoFillExtrusion;
 }
 
 // Layout properties
@@ -493,23 +497,12 @@ Mutable<Layer::Impl> FillExtrusionLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-FillExtrusionLayerFactory* FillExtrusionLayerFactory::instance = nullptr;
-
-FillExtrusionLayerFactory::FillExtrusionLayerFactory() {
-    assert(!instance);
-    instance = this;
-}
+FillExtrusionLayerFactory::FillExtrusionLayerFactory() = default;
 
 FillExtrusionLayerFactory::~FillExtrusionLayerFactory() = default;
 
-// static
-FillExtrusionLayerFactory* FillExtrusionLayerFactory::get() noexcept {
-    assert(instance);
-    return instance;
-}
-
-bool FillExtrusionLayerFactory::supportsType(const std::string& type) const noexcept {
-    return type == "fill-extrusion";
+const LayerTypeInfo* FillExtrusionLayerFactory::getTypeInfo() const noexcept {
+    return &typeInfoFillExtrusion;
 }
 
 std::unique_ptr<style::Layer> FillExtrusionLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {

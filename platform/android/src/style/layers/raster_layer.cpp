@@ -173,12 +173,12 @@ namespace android {
     }  // namespace
 
     jni::Local<jni::Object<Layer>> RasterJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
-        assert(layer.baseImpl->getLayerFactory() == this);
+        assert(layer.baseImpl->getTypeInfo() == getTypeInfo());
         return createJavaPeer(env, new RasterLayer(map, toRasterLayer(layer)));
     }
 
     jni::Local<jni::Object<Layer>> RasterJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
-        assert(layer->baseImpl->getLayerFactory() == this);
+        assert(layer->baseImpl->getTypeInfo() == getTypeInfo());
         return createJavaPeer(env, new RasterLayer(map, std::unique_ptr<mbgl::style::RasterLayer>(static_cast<mbgl::style::RasterLayer*>(layer.release()))));
     }
 

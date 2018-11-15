@@ -19,6 +19,21 @@ class LayerObserver;
 class Filter;
 
 /**
+ * @brief Holds static data for a certain layer type.
+ */
+struct LayerTypeInfo {
+    /**
+     * @brief contains the layer type as defined in the style specification;
+     */
+    const char* type;
+    /**
+     * @brief contains \c SourceRequired if the corresponding layer type requires source;
+     * contains \c SourceNotRequired otherwise.
+     */
+    const enum { SourceRequired, SourceNotRequired } source;
+};
+
+/**
  * The runtime representation of a [layer](https://www.mapbox.com/mapbox-gl-style-spec/#layers) from the Mapbox Style
  * Specification.
  *
@@ -83,11 +98,15 @@ public:
     // identical platform-native peers.
     util::peer peer;
     Layer(Immutable<Impl>);
+
+    const LayerTypeInfo* getTypeInfo() const noexcept;
+
 protected:
     virtual Mutable<Impl> mutableBaseImpl() const = 0;
 
     LayerObserver* observer;
 };
+
 
 /**
  * @brief The LayerFactory abstract class
@@ -97,8 +116,8 @@ protected:
 class LayerFactory {
 public:
     virtual ~LayerFactory() = default;
-    /// Returns \c true if this factory can produce layers of the given type of the layers; returns \c false otherwise.
-    virtual bool supportsType(const std::string& type) const noexcept = 0;
+    /// Returns the layer type data.
+    virtual const LayerTypeInfo* getTypeInfo() const noexcept = 0;
     /// Returns a new Layer instance on success call; returns `nulltptr` otherwise. 
     virtual std::unique_ptr<Layer> createLayer(const std::string& id, const conversion::Convertible& value) = 0;
 

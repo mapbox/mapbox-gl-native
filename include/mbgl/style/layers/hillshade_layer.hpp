@@ -77,15 +77,11 @@ protected:
 class HillshadeLayerFactory : public LayerFactory {
 public:
     HillshadeLayerFactory();
-    // LayerFactory overrides.
     ~HillshadeLayerFactory() override;
-    bool supportsType(const std::string& type) const noexcept final;
+
+    // LayerFactory overrides.
+    const LayerTypeInfo* getTypeInfo() const noexcept final;
     std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
-
-    static HillshadeLayerFactory* get() noexcept;
-
-private:
-    static HillshadeLayerFactory* instance;
 };
 
 } // namespace style
