@@ -381,8 +381,9 @@ public:
 
 - (nonnull NSURL *)styleURL
 {
-    if (self.terminated)
+    if (!_mbglMap)
     {
+        NSAssert(self.terminated, @"_mbglMap should only be unavailable during app termination");
         return self.residualStyleURL;
     }
 
@@ -2377,8 +2378,9 @@ public:
 
 - (MGLMapDebugMaskOptions)debugMask
 {
-    if (self.terminated)
+    if (!_mbglMap)
     {
+        NSAssert(self.terminated, @"_mbglMap should only be unavailable during app termination");
         return self.residualDebugMask;
     }
     
@@ -3437,8 +3439,9 @@ public:
 
 - (MGLMapCamera *)camera
 {
-    if (self.terminated)
+    if (!_mbglMap)
     {
+        NSAssert(self.terminated, @"_mbglMap should only be unavailable during app termination");
         return self.residualCamera;
     }
     
