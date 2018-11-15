@@ -173,6 +173,8 @@ typedef void (^MGLMapSnapshotCompletionHandler)(MGLMapSnapshot* _Nullable snapsh
 MGL_EXPORT
 @interface MGLMapSnapshotter : NSObject
 
+- (instancetype)init NS_UNAVAILABLE;
+
 /**
  Initializes and returns a map snapshotter object that produces snapshots
  according to the given options.
@@ -180,7 +182,7 @@ MGL_EXPORT
  @param options The options to use when generating a map snapshot.
  @return An initialized map snapshotter.
  */
-- (instancetype)initWithOptions:(MGLMapSnapshotOptions *)options;
+- (instancetype)initWithOptions:(MGLMapSnapshotOptions *)options NS_DESIGNATED_INITIALIZER;
 
 /**
  Starts the snapshot creation and executes the specified block with the result.

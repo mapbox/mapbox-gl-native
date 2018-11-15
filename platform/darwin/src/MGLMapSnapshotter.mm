@@ -117,6 +117,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 @interface MGLMapSnapshotter()
 @property (nonatomic) BOOL cancelled;
+@property (nonatomic) BOOL terminated;
 @property (nonatomic) dispatch_queue_t resultQueue;
 @property (nonatomic, copy) MGLMapSnapshotCompletionHandler completion;
 + (void)completeWithErrorCode:(MGLErrorCode)errorCode description:(nonnull NSString*)description onQueue:(dispatch_queue_t)queue completion:(MGLMapSnapshotCompletionHandler)completion;
@@ -129,6 +130,8 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 }
 
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     if (_completion) {
         MGLAssert(_snapshotCallback, @"Snapshot in progress - there should be a valid callback");
 
@@ -139,14 +142,38 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     }
 }
 
+
+- (instancetype)init {
+    NSAssert(NO, @"Please use -[MGLMapSnapshotter initWithOptions:]");
+    [super doesNotRecognizeSelector:_cmd];
+    return nil;
+}
+
 - (instancetype)initWithOptions:(MGLMapSnapshotOptions *)options
 {
     MGLLogDebug(@"Initializing withOptions: %@", options);
     self = [super init];
     if (self) {
         [self setOptions:options];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationWillTerminate:)
+                                                     name:UIApplicationWillTerminateNotification
+                                                   object:nil];
     }
     return self;
+}
+
+- (void)applicationWillTerminate:(NSNotification *)notification
+{
+    if (self.completion) {
+        [self cancel];
+    }
+
+    _mbglMapSnapshotter.reset();
+    _snapshotCallback.reset();
+    _mbglThreadPool.reset();
+    
+    self.terminated = YES;
 }
 
 - (void)startWithCompletionHandler:(MGLMapSnapshotCompletionHandler)completion
@@ -167,7 +194,12 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
         [NSException raise:NSInternalInconsistencyException
                     format:@"Already started this snapshotter."];
     }
-    
+
+    if (self.terminated) {
+        [NSException raise:NSInternalInconsistencyException
+                    format:@"Starting a snapshotter after application termination is not supported."];
+    }
+
     self.completion = completion;
     self.resultQueue = queue;
     self.cancelled = NO;
@@ -539,7 +571,18 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (void)setOptions:(MGLMapSnapshotOptions *)options
 {
+    if (_terminated) {
+        [NSException raise:NSInternalInconsistencyException
+                    format:@"Calling MGLMapSnapshotter.options after application termination is not supported."];
+    }
+
     MGLLogDebug(@"Setting options: %@", options);
+
+    if (_completion) {
+        [self cancel];
+    }
+    
+    _cancelled = NO;
     _options = options;
     mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
     _mbglThreadPool = mbgl::sharedThreadPool();
