@@ -103,7 +103,6 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewPreferredFramesPerSecond MGLMapView
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLMissingLocationServicesUsageDescriptionException;
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUserLocationAnnotationTypeException;
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLResourceNotFoundException;
-FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUnderlyingMapUnavailableException;
 
 /**
  An interactive, customizable map view with an interface similar to the one
@@ -643,7 +642,7 @@ MGL_EXPORT IB_DESIGNABLE
     location or `NO` if you want the map to display the new location
     immediately.
  
- @note The behaviour of this method is undefined if called when observing
+ @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`.
  */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated;
@@ -658,7 +657,7 @@ MGL_EXPORT IB_DESIGNABLE
     zooming to the new location or `NO` if you want the map to display the new
     location immediately.
  
- @note The behaviour of this method is undefined if called when observing
+ @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`.
  */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated;
@@ -675,7 +674,7 @@ MGL_EXPORT IB_DESIGNABLE
     zooming, and rotating to the new location or `NO` if you want the map to
     display the new location immediately.
  
- @note The behaviour of this method is undefined if called when observing
+ @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`.
  */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated;
@@ -693,7 +692,7 @@ MGL_EXPORT IB_DESIGNABLE
     display the new location immediately.
  @param completion The block executed after the animation finishes.
  
- @note The behaviour of this method is undefined if called when observing
+ @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`.
  */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion;
@@ -1034,7 +1033,7 @@ MGL_EXPORT IB_DESIGNABLE
     including the entire coordinate bounds. The camera object uses the current
     direction and pitch.
 
- @note The behaviour of this method is undefined if called when observing
+ @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
  depending on the order of notification delivery.
  */
@@ -1052,7 +1051,7 @@ MGL_EXPORT IB_DESIGNABLE
     including the entire coordinate bounds. The camera object uses the current
     direction and pitch.
  
- @note The behaviour of this method is undefined if called when observing
+ @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
  depending on the order of notification delivery.
  */
@@ -1072,7 +1071,7 @@ MGL_EXPORT IB_DESIGNABLE
     including the entire coordinate bounds. The initial camera's pitch and
     direction will be honored.
 
- @note The behaviour of this method is undefined if called when observing
+ @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
  depending on the order of notification delivery.
  */
@@ -1091,7 +1090,7 @@ MGL_EXPORT IB_DESIGNABLE
     (close to the ground) as possible while still including the entire shape. The
     initial camera's pitch and direction will be honored.
  
- @note The behaviour of this method is undefined if called when observing
+ @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
  depending on the order of notification delivery.
  */
@@ -1109,7 +1108,7 @@ MGL_EXPORT IB_DESIGNABLE
     (close to the ground) as possible while still including the entire shape. The
     camera object uses the current pitch.
  
- @note The behaviour of this method is undefined if called when observing
+ @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
  depending on the order of notification delivery.
  */

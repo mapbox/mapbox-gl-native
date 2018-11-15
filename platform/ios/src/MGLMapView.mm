@@ -2377,7 +2377,7 @@ public:
 
 - (MGLMapDebugMaskOptions)debugMask
 {
-    if (!self.terminated)
+    if (self.terminated)
     {
         return self.residualDebugMask;
     }
@@ -3437,9 +3437,9 @@ public:
 
 - (MGLMapCamera *)camera
 {
-    if (!_mbglMap)
+    if (self.terminated)
     {
-        return [self valueAtTerminationForKey:@"camera" ofClass:[MGLMapCamera class]];
+        return self.residualCamera;
     }
     
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);

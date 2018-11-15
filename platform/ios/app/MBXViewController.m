@@ -1986,7 +1986,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
         annotationView.backgroundColor = [UIColor whiteColor];
 
         // Note that having two long press gesture recognizers on overlapping
-        // views (`self.view` & `annotationView`) will cause weird behaviour.
+        // views (`self.view` & `annotationView`) will cause weird behavior.
         // Comment out the pin dropping functionality in the handleLongPress:
         // method in this class to make draggable annotation views play nice.
         annotationView.draggable = YES;
