@@ -250,7 +250,12 @@ public:
 @property (nonatomic) CFTimeInterval frameTime;
 @property (nonatomic) CFTimeInterval averageFrameTime;
 
-@property (nonatomic) NSMutableDictionary *propertyValuesAtTermination;
+/// Residual properties (saved on app termination)
+@property (nonatomic) BOOL terminated;
+@property (nonatomic, copy) MGLMapCamera *residualCamera;
+@property (nonatomic) MGLMapDebugMaskOptions residualDebugMask;
+@property (nonatomic, copy) NSURL *residualStyleURL;
+
 - (mbgl::Map &)mbglMap;
 
 @end
@@ -376,9 +381,9 @@ public:
 
 - (nonnull NSURL *)styleURL
 {
-    if (!_mbglMap)
+    if (self.terminated)
     {
-        return [self valueAtTerminationForKey:@"styleURL" ofClass:[NSURL class]];
+        return self.residualStyleURL;
     }
 
     NSString *styleURLString = @(self.mbglMap.getStyle().getURL().c_str()).mgl_stringOrNilIfEmpty;
@@ -702,29 +707,13 @@ public:
     _isWaitingForRedundantReachableNotification = NO;
 }
 
-// This is similar to macOS' `restorableStateKeyPaths` used for state restoration
-// Support for `UIStateRestoring` is still TBD: see https://github.com/mapbox/mapbox-gl-native/issues/3660
-+ (NSArray *)mglRestorableStateKeyPaths {
-    return @[@"camera", @"debugMask", @"styleURL"];
-}
-
-- (id)valueAtTerminationForKey:(NSString*)key ofClass:(Class)classType {
-    id value = self.propertyValuesAtTermination[key];
-    
-    if (![value isKindOfClass:classType]) {
-        return nil;
-    }
-    
-    return value;
-}
 
 - (void)destroyCoreObjects {
-    // Record the current state
-    self.propertyValuesAtTermination = [NSMutableDictionary dictionary];
-    
-    for (NSString *property in [self.class mglRestorableStateKeyPaths]) {
-        self.propertyValuesAtTermination[property] = [self valueForKey:property];
-    }
+    // Record the current state. Currently only saving a limited set of properties.
+    self.terminated = YES;
+    self.residualCamera = self.camera;
+    self.residualDebugMask = self.debugMask;
+    self.residualStyleURL = self.styleURL;
     
     // Tear down C++ objects, insuring worker threads correctly terminate.
     // Because of how _mbglMap is constructed, we need to destroy it first.
@@ -736,9 +725,6 @@ public:
 
     _rendererFrontend.reset();
     _mbglThreadPool.reset();
-
-    _annotationContextsByAnnotationTag.clear();
-    _annotationTagsByAnnotation.clear();
 }
 
 - (void)dealloc
@@ -2391,10 +2377,9 @@ public:
 
 - (MGLMapDebugMaskOptions)debugMask
 {
-    if (!_mbglMap)
+    if (!self.terminated)
     {
-        NSNumber *value = [self valueAtTerminationForKey:@"debugMask" ofClass:[NSNumber class]];
-        return value.unsignedIntegerValue;
+        return self.residualDebugMask;
     }
     
     mbgl::MapDebugOptions options = self.mbglMap.getDebug();
