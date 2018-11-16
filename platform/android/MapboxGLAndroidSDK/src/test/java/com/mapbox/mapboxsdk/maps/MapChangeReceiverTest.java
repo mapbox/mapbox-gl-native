@@ -1,8 +1,10 @@
 package com.mapbox.mapboxsdk.maps;
 
+import com.google.common.util.concurrent.ExecutionError;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.log.LoggerDefinition;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
