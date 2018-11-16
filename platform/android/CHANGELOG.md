@@ -2,6 +2,9 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.7.1 - November 16, 2018
+ - Telemetry v3.5.4 [#13330](https://github.com/mapbox/mapbox-gl-native/pull/13330)
+
 ## 7.0.0-alpha.1 - November 14, 2018
  - Added Nullable and NonNull annotations [#13274](https://github.com/mapbox/mapbox-gl-native/pull/13274)
  - Catch and re-throw throwables thrown inside map state callbacks [#13351](https://github.com/mapbox/mapbox-gl-native/pull/13351)
