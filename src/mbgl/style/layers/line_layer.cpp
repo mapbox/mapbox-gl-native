@@ -15,7 +15,13 @@ namespace mbgl {
 namespace style {
 
 namespace {
-    const LayerTypeInfo typeInfoLine{ "line", LayerTypeInfo::SourceRequired };
+    const LayerTypeInfo typeInfoLine
+        {"line",
+          LayerTypeInfo::Source::Required,
+          LayerTypeInfo::Pass3D::NotRequired,
+          LayerTypeInfo::Layout::Required,
+          LayerTypeInfo::Clipping::Required
+        };
 }  // namespace
 
 LineLayer::LineLayer(const std::string& layerID, const std::string& sourceID)

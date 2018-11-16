@@ -15,7 +15,13 @@ namespace mbgl {
 namespace style {
 
 namespace {
-    const LayerTypeInfo typeInfoFill{ "fill", LayerTypeInfo::SourceRequired };
+    const LayerTypeInfo typeInfoFill
+        {"fill",
+          LayerTypeInfo::Source::Required,
+          LayerTypeInfo::Pass3D::NotRequired,
+          LayerTypeInfo::Layout::Required,
+          LayerTypeInfo::Clipping::Required
+        };
 }  // namespace
 
 FillLayer::FillLayer(const std::string& layerID, const std::string& sourceID)

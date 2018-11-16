@@ -15,7 +15,13 @@ namespace mbgl {
 namespace style {
 
 namespace {
-    const LayerTypeInfo typeInfoHillshade{ "hillshade", LayerTypeInfo::SourceRequired };
+    const LayerTypeInfo typeInfoHillshade
+        {"hillshade",
+          LayerTypeInfo::Source::Required,
+          LayerTypeInfo::Pass3D::Required,
+          LayerTypeInfo::Layout::NotRequired,
+          LayerTypeInfo::Clipping::NotRequired
+        };
 }  // namespace
 
 HillshadeLayer::HillshadeLayer(const std::string& layerID, const std::string& sourceID)

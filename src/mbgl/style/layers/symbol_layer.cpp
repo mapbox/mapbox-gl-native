@@ -15,7 +15,13 @@ namespace mbgl {
 namespace style {
 
 namespace {
-    const LayerTypeInfo typeInfoSymbol{ "symbol", LayerTypeInfo::SourceRequired };
+    const LayerTypeInfo typeInfoSymbol
+        {"symbol",
+          LayerTypeInfo::Source::Required,
+          LayerTypeInfo::Pass3D::NotRequired,
+          LayerTypeInfo::Layout::Required,
+          LayerTypeInfo::Clipping::NotRequired
+        };
 }  // namespace
 
 SymbolLayer::SymbolLayer(const std::string& layerID, const std::string& sourceID)
