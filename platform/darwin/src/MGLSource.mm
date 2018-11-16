@@ -62,11 +62,13 @@
     BOOL removed = NO;
     
     if (self.rawSource == mapView.style.rawStyle->getSource(self.identifier.UTF8String)) {
-        _pendingSource = mapView.style.rawStyle->removeSource(self.identifier.UTF8String);
-        _mapView = nil;
         
-        if (_pendingSource) {
+        auto removedSource = mapView.style.rawStyle->removeSource(self.identifier.UTF8String);
+        
+        if (removedSource) {
             removed = YES;
+            _pendingSource = std::move(removedSource);
+            _mapView = nil;
         } else if (outError) {
             NSString *format = NSLocalizedStringWithDefaultValue(@"REMOVE_SRC_FAIL_IN_USE_FMT", nil, nil, @"Source '%@' is in use, cannot remove.", @"User-friendly error description");
             NSString *localizedDescription = [NSString stringWithFormat:format, self.identifier];
