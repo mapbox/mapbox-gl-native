@@ -15,7 +15,13 @@ namespace mbgl {
 namespace style {
 
 namespace {
-    const LayerTypeInfo typeInfoRaster{ "raster", LayerTypeInfo::SourceRequired };
+    const LayerTypeInfo typeInfoRaster
+        {"raster",
+          LayerTypeInfo::Source::Required,
+          LayerTypeInfo::Pass3D::NotRequired,
+          LayerTypeInfo::Layout::NotRequired,
+          LayerTypeInfo::Clipping::NotRequired
+        };
 }  // namespace
 
 RasterLayer::RasterLayer(const std::string& layerID, const std::string& sourceID)

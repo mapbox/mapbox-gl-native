@@ -15,7 +15,13 @@ namespace mbgl {
 namespace style {
 
 namespace {
-    const LayerTypeInfo typeInfoHeatmap{ "heatmap", LayerTypeInfo::SourceRequired };
+    const LayerTypeInfo typeInfoHeatmap
+        {"heatmap",
+          LayerTypeInfo::Source::Required,
+          LayerTypeInfo::Pass3D::Required,
+          LayerTypeInfo::Layout::NotRequired,
+          LayerTypeInfo::Clipping::NotRequired
+        };
 }  // namespace
 
 HeatmapLayer::HeatmapLayer(const std::string& layerID, const std::string& sourceID)

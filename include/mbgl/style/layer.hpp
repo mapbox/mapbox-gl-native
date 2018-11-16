@@ -26,11 +26,30 @@ struct LayerTypeInfo {
      * @brief contains the layer type as defined in the style specification;
      */
     const char* type;
+
     /**
-     * @brief contains \c SourceRequired if the corresponding layer type requires source;
-     * contains \c SourceNotRequired otherwise.
+     * @brief contains \c Source::Required if the corresponding layer type
+     * requires source. Contains \c Source::NotRequired otherwise.
      */
-    const enum { SourceRequired, SourceNotRequired } source;
+    const enum class Source { Required, NotRequired } source;
+
+    /**
+     * @brief contains \c Pass3D::Required if the corresponding layer type
+     * requires 3D rendering pass. Contains \c Pass3D::NotRequired otherwise.
+     */
+    const enum class Pass3D { Required, NotRequired } pass3d;
+
+    /**
+     * @brief contains \c Layout::Required if the corresponding layer type
+     * requires layouting. * contains \c Layout::NotRequired otherwise.
+     */
+    const enum class Layout { Required, NotRequired } layout;
+
+    /**
+     * @brief contains \c Clipping::Required if the corresponding layer type
+     * requires clipping. Contains \c Clipping::NotRequired otherwise.
+     */
+    const enum class Clipping { Required, NotRequired } clipping;
 };
 
 /**

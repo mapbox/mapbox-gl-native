@@ -15,7 +15,13 @@ namespace mbgl {
 namespace style {
 
 namespace {
-    const LayerTypeInfo typeInfoCircle{ "circle", LayerTypeInfo::SourceRequired };
+    const LayerTypeInfo typeInfoCircle
+        {"circle",
+          LayerTypeInfo::Source::Required,
+          LayerTypeInfo::Pass3D::NotRequired,
+          LayerTypeInfo::Layout::NotRequired,
+          LayerTypeInfo::Clipping::NotRequired
+        };
 }  // namespace
 
 CircleLayer::CircleLayer(const std::string& layerID, const std::string& sourceID)

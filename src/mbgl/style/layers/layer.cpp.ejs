@@ -19,12 +19,51 @@
 namespace mbgl {
 namespace style {
 
-namespace {
-<% if (type === 'background') { -%>
-    const LayerTypeInfo typeInfo<%- camelize(type) %>{ "<%- type %>", LayerTypeInfo::SourceNotRequired };
-<% } else { -%>
-    const LayerTypeInfo typeInfo<%- camelize(type) %>{ "<%- type %>", LayerTypeInfo::SourceRequired };
-<% } -%>
+namespace {<%
+let layerCapabilities = {};
+let defaults = { caps: { 'Source':   'NotRequired',
+                         'Pass3D':   'NotRequired',
+                         'Layout':   'NotRequired',
+                         'Clipping': 'NotRequired'
+                 },
+                 require: function(cap) {
+                             let copy = Object.assign({}, this);
+                             copy.caps = Object.assign({}, this.caps);
+                             copy.caps[cap] = 'Required';
+                             return copy;
+                 },
+                 finalize: function() {
+                    return Object.keys(this.caps).reduce((acc, key) => {
+                        acc.push(`${key}::${this.caps[key]}`);
+                        return acc;
+                    }, []);
+                 }
+               };
+
+layerCapabilities['background']     = defaults.finalize();
+layerCapabilities['fill']           = defaults.require('Source')
+                                              .require('Layout')
+                                              .require('Clipping')
+                                              .finalize();
+layerCapabilities['fill-extrusion'] = defaults.require('Source')
+                                              .require('Pass3D')
+                                              .require('Layout')
+                                              .finalize();
+layerCapabilities['hillshade']      = defaults.require('Source')
+                                              .require('Pass3D')
+                                              .finalize();
+layerCapabilities['symbol']         = defaults.require('Source')
+                                              .require('Layout')
+                                              .finalize();
+layerCapabilities['circle']         = defaults.require('Source').finalize();
+layerCapabilities['line']           = layerCapabilities['fill'];
+layerCapabilities['heatmap']        = layerCapabilities['hillshade'];
+layerCapabilities['raster']         = layerCapabilities['circle'];
+%>
+    const LayerTypeInfo typeInfo<%- `${camelize(type)}`%>
+        {"<%- type %>",
+          <%-`${layerCapabilities[type].map(cap => `LayerTypeInfo::${cap}`).join(',\n          ')}` %>
+        };
 }  // namespace
 
 <% if (type === 'background') { -%>

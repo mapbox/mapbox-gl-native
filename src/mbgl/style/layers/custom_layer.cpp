@@ -6,7 +6,12 @@ namespace mbgl {
 namespace style {
 
 namespace {
-    const LayerTypeInfo typeInfoCustom{ "", LayerTypeInfo::SourceNotRequired };
+    const LayerTypeInfo typeInfoCustom
+    { "",
+      LayerTypeInfo::Source::NotRequired,
+      LayerTypeInfo::Pass3D::NotRequired,
+      LayerTypeInfo::Layout::NotRequired,
+      LayerTypeInfo::Clipping::NotRequired };
 }  // namespace
 
 CustomLayer::CustomLayer(const std::string& layerID,
