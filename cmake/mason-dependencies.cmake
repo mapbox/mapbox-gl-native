@@ -1,10 +1,7 @@
 # All dependencies in a single separate file so its checksum can be used in a CI cache key name
 
-mason_use(cheap-ruler VERSION 2.5.3 HEADER_ONLY)
-mason_use(pixelmatch VERSION 0.10.0 HEADER_ONLY)
-
 if(MBGL_PLATFORM STREQUAL "android")
-    mason_use(jni.hpp VERSION 4.0.1 HEADER_ONLY)
+    # noop
 elseif(MBGL_PLATFORM STREQUAL "ios")
     # noop
 elseif(MBGL_PLATFORM STREQUAL "linux")

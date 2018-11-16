@@ -42,9 +42,8 @@ macro(mbgl_platform_core)
         PRIVATE platform/android
     )
 
-    target_add_mason_package(mbgl-core PUBLIC jni.hpp)
-
     target_link_libraries(mbgl-core
+        PUBLIC jni.hpp
         PUBLIC -llog
         PUBLIC -landroid
         PUBLIC -ljnigraphics
@@ -61,10 +60,9 @@ macro(mbgl_filesource)
     # Modify platform/android/filesource-files.txt to change the source files for this target.
     target_sources_from_file(mbgl-filesource PRIVATE platform/android/filesource-files.txt)
 
-    target_add_mason_package(mbgl-filesource PUBLIC jni.hpp)
-
     target_link_libraries(mbgl-filesource
         PUBLIC sqlite
+        PUBLIC jni.hpp
         PUBLIC -llog
         PUBLIC -landroid
         PUBLIC -lstdc++

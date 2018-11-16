@@ -18,9 +18,9 @@ target_include_directories(mbgl-glfw
 
 target_link_libraries(mbgl-glfw
     PRIVATE mbgl-core
+    PRIVATE cheap-ruler-cpp
 )
 
-target_add_mason_package(mbgl-glfw PRIVATE cheap-ruler)
 target_add_mason_package(mbgl-glfw PRIVATE glfw)
 target_add_mason_package(mbgl-glfw PRIVATE args)
 
