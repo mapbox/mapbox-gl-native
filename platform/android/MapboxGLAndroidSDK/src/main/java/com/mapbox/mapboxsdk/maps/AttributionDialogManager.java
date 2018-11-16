@@ -38,7 +38,7 @@ import java.util.Locale;
  */
 public class AttributionDialogManager implements View.OnClickListener, DialogInterface.OnClickListener {
 
-  private static final String MAP_FEEDBACK_URL = "https://www.mapbox.com/map-feedback";
+  private static final String MAP_FEEDBACK_URL = "https://www.mapbox.com/feedback";
   private static final String MAP_FEEDBACK_LOCATION_FORMAT = MAP_FEEDBACK_URL + "/#/%f/%f/%d";
 
   @NonNull
