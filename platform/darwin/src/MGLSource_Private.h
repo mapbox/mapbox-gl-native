@@ -67,7 +67,7 @@ struct SourceWrapper {
  to the `MGLSource` instance and the unique_ptr reference is valid again. It is
  safe to add the source back to the style after it is removed.
  */
-- (void)removeFromMapView:(MGLMapView *)mapView;
+- (BOOL)removeFromMapView:(MGLMapView *)mapView error:(NSError * __nullable * __nullable)outError;
 
 @end
 
