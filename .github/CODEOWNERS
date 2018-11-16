@@ -5,5 +5,5 @@
 /platform/macos/ @1ec5 @mapbox/maps-ios-reviewers
 
 # Darwin
-/platform/darwin/ @mapbox/maps-ios-reviewers
+/platform/darwin/ @1ec5 @mapbox/maps-ios-reviewers
 
