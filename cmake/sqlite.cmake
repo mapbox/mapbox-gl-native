@@ -34,4 +34,5 @@ target_compile_definitions(sqlite
 target_compile_options(sqlite
     PRIVATE "-Wno-int-conversion"
     PRIVATE "-Wno-implicit-fallthrough"
+    PRIVATE "-Wno-cast-function-type"
 )

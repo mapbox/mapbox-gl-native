@@ -155,7 +155,7 @@ function(add_vendor_target NAME TYPE)
     foreach(FILE IN LISTS FILES)
         target_sources(${NAME} ${SOURCE_TYPE} "${CMAKE_CURRENT_SOURCE_DIR}/vendor/${NAME}/${FILE}")
     endforeach()
-    target_include_directories(${NAME} ${INCLUDE_TYPE} "${CMAKE_CURRENT_SOURCE_DIR}/vendor/${NAME}/include")
+    target_include_directories(${NAME} SYSTEM ${INCLUDE_TYPE} "${CMAKE_CURRENT_SOURCE_DIR}/vendor/${NAME}/include")
     create_source_groups(${NAME})
 endfunction()
 
