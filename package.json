@@ -13,7 +13,7 @@
   },
   "license": "BSD-2-Clause",
   "dependencies": {
-    "@mapbox/cmake-node-module": "^1.1.0",
+    "@mapbox/cmake-node-module": "^1.2.0",
     "node-pre-gyp": "^0.10.2",
     "npm-run-all": "^4.0.2"
   },

@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
                 std::string json = readFile(geometryValue.Get());
                 auto geometry = parseGeometry(json);
                 return OfflineRegionDefinition{ OfflineGeometryRegionDefinition(style, geometry, minZoom, maxZoom, pixelRatio) };
-            } catch(std::runtime_error e) {
+            } catch(const std::runtime_error& e) {
                 std::cerr << "Could not parse geojson file " << geometryValue.Get() << ": " << e.what() << std::endl;
                 exit(1);
             }

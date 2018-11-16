@@ -22,7 +22,7 @@ workflows:
           filters:
             tags:
               only: /node-.*/
-      - node-gcc6-debug:
+      - node-gcc8-debug:
           filters:
             tags:
               only: /node-.*/
@@ -32,9 +32,8 @@ workflows:
               only: /node-.*/
       - linux-clang-38-libcxx-debug:
           name: linux-clang-3.8-libcxx-debug
-      - linux-clang4-sanitize-address
-      - linux-clang4-sanitize-undefined
-      - linux-clang4-sanitize-thread
+      - linux-clang-7-sanitize-address-undefined
+      - linux-clang-7-sanitize-thread
       - linux-gcc49-debug:
           name: linux-gcc4.9-debug
       - linux-gcc5-debug-coverage
@@ -400,6 +399,14 @@ commands:
           xvfb-run --server-args="-screen 0 1024x768x24" \
             make run-test
 
+  run-unit-tests-sanitized:
+    steps:
+    - run:
+        name: Run tests
+        command: |
+          xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
+          # Unfortunately, Google Test eats the status code, so we'll have to check the output.
+          [ -z "$(sed -n '/^SUMMARY: .*Sanitizer:/p' sanitizer)" ]
 
   publish-node-package:
     steps:
@@ -450,7 +457,7 @@ commands:
 jobs:
   nitpick:
     docker:
-      - image: mbgl/linux-clang-4:d121f629f7
+      - image: mbgl/linux-clang-7:a5a3c52107
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -485,7 +492,7 @@ jobs:
 # ------------------------------------------------------------------------------
   clang-tidy:
     docker:
-      - image: mbgl/linux-clang-3.9:2077f965ed
+      - image: mbgl/linux-clang-7:a5a3c52107
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -656,9 +663,9 @@ jobs:
       - upload-render-tests
 
 # ------------------------------------------------------------------------------
-  node-gcc6-debug:
+  node-gcc8-debug:
     docker:
-      - image: mbgl/linux-gcc-6:d461f83b52
+      - image: mbgl/linux-gcc-8:d2b1553d2f
     resource_class: large
     working_directory: /src
     environment:
@@ -710,9 +717,9 @@ jobs:
       - save-dependencies
 
 # ------------------------------------------------------------------------------
-  linux-clang4-sanitize-address:
+  linux-clang-7-sanitize-address-undefined:
     docker:
-      - image: mbgl/linux-clang-4:d121f629f7
+      - image: mbgl/linux-clang-7:a5a3c52107
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -720,51 +727,21 @@ jobs:
       BUILDTYPE: Sanitize
       WITH_EGL: 1
       GDB: '' # Do not run with GDB
-      CXXFLAGS: -fsanitize=address
-      LDFLAGS: -fsanitize=address
+      CXXFLAGS: -fsanitize=address -fsanitize=undefined
+      LDFLAGS: -fsanitize=address -fsanitize=undefined
       ASAN_OPTIONS: detect_leaks=0:color=always:print_summary=1
-    steps:
-      - install-dependencies
-      - setup-llvm-symbolizer
-      - build-test
-      - save-dependencies
-      - run:
-          name: Run tests
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
-            # Unfortunately, Google Test eats the status code, so we'll have to check the output.
-            [ -z "$(sed -n '/^SUMMARY: AddressSanitizer:/p' sanitizer)" ]
-
-# ------------------------------------------------------------------------------
-  linux-clang4-sanitize-undefined:
-    docker:
-      - image: mbgl/linux-clang-4:d121f629f7
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Sanitize
-      WITH_EGL: 1
-      GDB: '' # Do not run with GDB
-      CXXFLAGS: -fsanitize=undefined
-      LDFLAGS: -fsanitize=undefined
       UBSAN_OPTIONS: print_stacktrace=1:color=always:print_summary=1
     steps:
       - install-dependencies
       - setup-llvm-symbolizer
       - build-test
       - save-dependencies
-      - run:
-          name: Run tests
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
-            # Unfortunately, Google Test eats the status code, so we'll have to check the output.
-            [ -z "$(sed -n '/^SUMMARY: UndefinedBehaviorSanitizer:/p' sanitizer)" ]
+      - run-unit-tests-sanitized
 
 # ------------------------------------------------------------------------------
-  linux-clang4-sanitize-thread:
+  linux-clang-7-sanitize-thread:
     docker:
-      - image: mbgl/linux-clang-4:d121f629f7
+      - image: mbgl/linux-clang-7:a5a3c52107
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -780,12 +757,7 @@ jobs:
       - setup-llvm-symbolizer
       - build-test
       - save-dependencies
-      - run:
-          name: Run tests
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
-            # Unfortunately, Google Test eats the status code, so we'll have to check the output.
-            [ -z "$(sed -n '/^SUMMARY: ThreadSanitizer:/p' sanitizer)" ]
+      - run-unit-tests-sanitized
 
 # ------------------------------------------------------------------------------
   linux-gcc49-debug:
