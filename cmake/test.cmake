@@ -27,9 +27,8 @@ target_link_libraries(mbgl-test PRIVATE
     mbgl-core
     shelf-pack-cpp
     unique_resource
+    pixelmatch-cpp
 )
-
-target_add_mason_package(mbgl-test PRIVATE pixelmatch)
 
 mbgl_platform_test()
 

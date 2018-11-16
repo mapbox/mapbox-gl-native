@@ -64,3 +64,12 @@
 [submodule "vendor/benchmark"]
 	path = vendor/benchmark
 	url = https://github.com/google/benchmark.git
+[submodule "vendor/cheap-ruler-cpp"]
+	path = vendor/cheap-ruler-cpp
+	url = https://github.com/mapbox/cheap-ruler-cpp.git
+[submodule "vendor/pixelmatch-cpp"]
+	path = vendor/pixelmatch-cpp
+	url = https://github.com/mapbox/pixelmatch-cpp.git
+[submodule "vendor/jni.hpp"]
+	path = vendor/jni.hpp
+	url = https://github.com/mapbox/jni.hpp.git
