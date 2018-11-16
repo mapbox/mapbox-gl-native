@@ -9,7 +9,7 @@
 @implementation MGLNSStringAdditionsTests
 
 - (void)testTitleCasedString {
-    NSLocale *locale = [NSLocale currentLocale];
+    NSLocale *locale = [NSLocale localeWithLocaleIdentifier:@"en-US"];
 
     XCTAssertEqualObjects([@"© OpenStreetMap" mgl_titleCasedStringWithLocale:locale], @"© OpenStreetMap");
     XCTAssertEqualObjects([@"© OSM" mgl_titleCasedStringWithLocale:locale], @"© OSM");
