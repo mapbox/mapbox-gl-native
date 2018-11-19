@@ -267,14 +267,13 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
     }
 }
 
-std::vector<FontStack> Parser::fontStacks() const {
+std::set<FontStack> Parser::fontStacks() const {
     std::vector<Immutable<Layer::Impl>> impls;
     impls.reserve(layers.size());
     for (const auto& layer : layers) {
         impls.emplace_back(layer->baseImpl);
     }
-    std::set<FontStack> result = mbgl::fontStacks(impls);
-    return std::vector<FontStack>(result.begin(), result.end());
+    return mbgl::fontStacks(impls);
 }
 
 } // namespace style
