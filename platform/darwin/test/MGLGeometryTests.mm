@@ -106,7 +106,7 @@
     XCTAssertNil(error, @"Valid GeoJSON data should produce no error on deserialization.");
     XCTAssertNotNil(feature, @"Valid GeoJSON data should produce an object on deserialization.");
     XCTAssertTrue([feature isKindOfClass:[MGLPointFeature class]], @"Valid GeoJSON point feature data should produce an MGLPointFeature.");
-    XCTAssertEqual(feature.attributes.count, 0);
+    XCTAssertEqual(feature.attributes.count, 0UL);
     XCTAssertEqual(feature.coordinate.latitude, 0);
     XCTAssertEqual(feature.coordinate.longitude, 0);
 

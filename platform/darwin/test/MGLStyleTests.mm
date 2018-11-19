@@ -141,9 +141,9 @@
 - (void)testSources {
     NSSet<MGLSource *> *initialSources = self.style.sources;
     if ([initialSources.anyObject.identifier isEqualToString:@"com.mapbox.annotations"]) {
-        XCTAssertEqual(self.style.sources.count, 1);
+        XCTAssertEqual(self.style.sources.count, 1UL);
     } else {
-        XCTAssertEqual(self.style.sources.count, 0);
+        XCTAssertEqual(self.style.sources.count, 0UL);
     }
     MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
     [self.style addSource:shapeSource];
@@ -251,9 +251,9 @@
 - (void)testLayers {
     NSArray<MGLStyleLayer *> *initialLayers = self.style.layers;
     if ([initialLayers.firstObject.identifier isEqualToString:@"com.mapbox.annotations.points"]) {
-        XCTAssertEqual(self.style.layers.count, 1);
+        XCTAssertEqual(self.style.layers.count, 1UL);
     } else {
-        XCTAssertEqual(self.style.layers.count, 0);
+        XCTAssertEqual(self.style.layers.count, 0UL);
     }
     MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
     [self.style addSource:shapeSource];

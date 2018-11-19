@@ -248,7 +248,7 @@
 }
 
 - (void)testCountOfBytesCompleted {
-    XCTAssertGreaterThan([MGLOfflineStorage sharedOfflineStorage].countOfBytesCompleted, 0);
+    XCTAssertGreaterThan([MGLOfflineStorage sharedOfflineStorage].countOfBytesCompleted, 0UL);
 }
 
 - (NSURL *)offlineStorage:(MGLOfflineStorage *)storage

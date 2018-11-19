@@ -358,7 +358,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 
 - (void)updateLabels {
     NSEnumerator<UIView*> *viewEnumerator = [self.labelViews objectEnumerator];
-    NSInteger i = 0;
+    NSUInteger i = 0;
     CLLocationDistance multiplier = (self.row.distance / self.row.numberOfBars);
 
     if (![self usesMetricSystem]) {

@@ -105,7 +105,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     mbgl::MultiPoint<double> multiPoint;
     multiPoint.reserve(self.pointCount);
-    for (NSInteger i = 0; i< self.pointCount; i++)
+    for (NSUInteger i = 0; i < self.pointCount; i++)
     {
         multiPoint.push_back(mbgl::Point<double>(self.coordinates[i].longitude, self.coordinates[i].latitude));
     }

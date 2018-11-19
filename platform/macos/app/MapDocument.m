@@ -1324,7 +1324,7 @@ NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *sha
     }
     if (action == @selector(showStyle:)) {
         NSPopUpButton *popUpButton = (NSPopUpButton *)toolbarItem.view;
-        NSUInteger index = self.indexOfStyleInToolbarItem;
+        NSInteger index = self.indexOfStyleInToolbarItem;
         if (index == NSNotFound) {
             index = -1;
         }

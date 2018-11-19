@@ -117,7 +117,7 @@
 
     for (MGLPolygon *interiorPolygon in self.interiorPolygons) {
         NSMutableArray *interiorRing = [NSMutableArray array];
-        for (int index = 0; index < interiorPolygon.pointCount; index++) {
+        for (NSUInteger index = 0; index < interiorPolygon.pointCount; index++) {
             CLLocationCoordinate2D coordinate = interiorPolygon.coordinates[index];
             [interiorRing addObject:@[@(coordinate.longitude), @(coordinate.latitude)]];
         }

@@ -2590,7 +2590,7 @@ public:
     }
     
     // Compass
-    NSUInteger compassIndex = 0;
+    NSInteger compassIndex = 0;
     if (index == compassIndex)
     {
         return self.compassView;
@@ -2666,7 +2666,7 @@ public:
     }
     
     // Attribution button
-    NSUInteger attributionButtonIndex = NSMaxRange(visibleRoadFeatureRange);
+    NSInteger attributionButtonIndex = NSMaxRange(visibleRoadFeatureRange);
     if (index == attributionButtonIndex)
     {
         return self.attributionButton;

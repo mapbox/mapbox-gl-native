@@ -18,7 +18,7 @@
     mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, nil);
 
     // has the correct URL templates
-    XCTAssertEqual(tileSet.tiles.size(), 3);
+    XCTAssertEqual(tileSet.tiles.size(), 3UL);
     XCTAssertEqual(tileSet.tiles[0], "tile.1");
     XCTAssertEqual(tileSet.tiles[1], "tile.2");
     XCTAssertEqual(tileSet.tiles[2], "tile.3");
