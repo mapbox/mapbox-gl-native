@@ -104,7 +104,7 @@ public abstract class Layer {
   @Keep
   protected native void nativeSetFilter(Object[] filter);
 
-  @NonNull
+  @Nullable
   @Keep
   protected native JsonElement nativeGetFilter();
 
