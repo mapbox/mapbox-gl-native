@@ -46,7 +46,7 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
     
     // Effectively categorize the class with some extra class methods.
     Class NSPredicateUtilities = objc_getMetaClass(className.UTF8String);
-#pragma clang push
+#pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundeclared-selector"
     #define INSTALL_METHOD(sel) \
         { \
@@ -85,7 +85,7 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
     INSTALL_CONTROL_STRUCTURE(MGL_FUNCTION);
     
     #undef INSTALL_AFTERMARKET_FN
-#pragma clang pop
+#pragma clang diagnostic pop
 }
 
 /**

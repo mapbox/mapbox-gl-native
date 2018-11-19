@@ -6147,7 +6147,7 @@ public:
             center.y = CGRectGetMaxY(contentFrame);
             break;
     }
-#pragma clang dianostic pop
+#pragma clang diagnostic pop
     
     return center;
 }
