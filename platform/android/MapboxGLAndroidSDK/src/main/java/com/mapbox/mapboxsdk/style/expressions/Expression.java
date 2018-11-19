@@ -4485,7 +4485,7 @@ public class Expression {
      * @param jsonElement the json element to convert
      * @return the expression
      */
-    private static Expression convert(@NonNull JsonElement jsonElement) {
+    public static Expression convert(@NonNull JsonElement jsonElement) {
       if (jsonElement instanceof JsonArray) {
         return convert((JsonArray) jsonElement);
       } else if (jsonElement instanceof JsonPrimitive) {
