@@ -63,7 +63,7 @@ public class PropertyValue<T> {
         ? Expression.Converter.convert((JsonArray) value)
         : (Expression) value;
     } else {
-      Logger.w(TAG, "not an expression, try PropertyValue#getValue()");
+      Logger.w(TAG, String.format("%s not an expression, try PropertyValue#getValue()", name));
       return null;
     }
   }
@@ -88,7 +88,7 @@ public class PropertyValue<T> {
       // noinspection unchecked
       return value;
     } else {
-      Logger.w(TAG, "not a value, try PropertyValue#getExpression()");
+      Logger.w(TAG, String.format("%s not a value, try PropertyValue#getExpression()", name));
       return null;
     }
   }
