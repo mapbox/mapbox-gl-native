@@ -70,7 +70,7 @@
             _pendingSource = std::move(removedSource);
             _mapView = nil;
         } else if (outError) {
-            NSString *format = NSLocalizedStringWithDefaultValue(@"REMOVE_SRC_FAIL_IN_USE_FMT", nil, nil, @"Source '%@' is in use, cannot remove.", @"User-friendly error description");
+            NSString *format = NSLocalizedStringWithDefaultValue(@"REMOVE_SRC_FAIL_IN_USE_FMT", @"Foundation", nil, @"Source '%@' is in use, cannot remove.", @"User-friendly error description");
             NSString *localizedDescription = [NSString stringWithFormat:format, self.identifier];
 
             *outError = [NSError errorWithDomain:MGLErrorDomain
@@ -80,7 +80,7 @@
     }
     else if (outError) {
         // Consider raising an exception here
-        NSString *format = NSLocalizedStringWithDefaultValue(@"REMOVE_SRC_FAIL_MISMATCH_FMT", nil, nil, @"Identifier '%@' does not match source identifier '%s'", @"User-friendly error description");
+        NSString *format = NSLocalizedStringWithDefaultValue(@"REMOVE_SRC_FAIL_MISMATCH_FMT", @"Foundation", nil, @"Identifier '%@' does not match source identifier '%s'", @"User-friendly error description");
         NSString *localizedDescription = [NSString stringWithFormat:format,
                                           self.identifier,
                                           self.rawSource ? self.rawSource->getID().c_str() : "(null)"];
