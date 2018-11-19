@@ -43,7 +43,7 @@ public:
     double pitch = 0;
 
     // Statically evaluate layer properties to determine what font stacks are used.
-    std::vector<FontStack> fontStacks() const;
+    std::set<FontStack> fontStacks() const;
 
 private:
     void parseTransition(const JSValue&);

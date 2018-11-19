@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <set>
 
 #include <dirent.h>
 
@@ -96,11 +97,12 @@ INSTANTIATE_TEST_CASE_P(StyleParser, StyleParserTest, ::testing::ValuesIn([] {
 TEST(StyleParser, FontStacks) {
     style::Parser parser;
     parser.parse(util::read_file("test/fixtures/style_parser/font_stacks.json"));
-    auto result = parser.fontStacks();
-    ASSERT_EQ(3u, result.size());
-    ASSERT_EQ(FontStack({"a"}), result[0]);
-    ASSERT_EQ(FontStack({"a", "b"}), result[1]);
-    ASSERT_EQ(FontStack({"a", "b", "c"}), result[2]);
+    std::set<mbgl::FontStack> expected;
+    expected.insert(FontStack({"a"}));
+    expected.insert(FontStack({"a", "b"}));
+    expected.insert(FontStack({"a", "b", "c"}));
+    std::set<mbgl::FontStack> result = parser.fontStacks();
+    ASSERT_EQ(expected, result);
 }
 
 TEST(StyleParser, FontStacksNoTextField) {
@@ -134,10 +136,11 @@ TEST(StyleParser, FontStacksCaseExpression) {
             }
         }]
     })");
-    auto result = parser.fontStacks();
-    ASSERT_EQ(2u, result.size());
-    ASSERT_EQ(FontStack({"Arial"}), result[0]);
-    ASSERT_EQ(FontStack({"Helvetica"}), result[1]);
+    std::set<mbgl::FontStack> expected;
+    expected.insert(FontStack({"Arial"}));
+    expected.insert(FontStack({"Helvetica"}));
+    std::set<mbgl::FontStack> result = parser.fontStacks();
+    ASSERT_EQ(expected, result);
 }
 
 TEST(StyleParser, FontStacksMatchExpression) {
@@ -154,10 +157,11 @@ TEST(StyleParser, FontStacksMatchExpression) {
             }
         }]
     })");
-    auto result = parser.fontStacks();
-    ASSERT_EQ(2u, result.size());
-    ASSERT_EQ(FontStack({"Arial"}), result[0]);
-    ASSERT_EQ(FontStack({"Helvetica"}), result[1]);
+    std::set<mbgl::FontStack> expected;
+    expected.insert(FontStack({"Arial"}));
+    expected.insert(FontStack({"Helvetica"}));
+    std::set<mbgl::FontStack> result = parser.fontStacks();
+    ASSERT_EQ(expected, result);
 }
 
 TEST(StyleParser, FontStacksStepExpression) {
@@ -174,10 +178,11 @@ TEST(StyleParser, FontStacksStepExpression) {
             }
         }]
     })");
-    auto result = parser.fontStacks();
-    ASSERT_EQ(2u, result.size());
-    ASSERT_EQ(FontStack({"Arial"}), result[0]);
-    ASSERT_EQ(FontStack({"Helvetica"}), result[1]);
+    std::set<mbgl::FontStack> expected;
+    expected.insert(FontStack({"Arial"}));
+    expected.insert(FontStack({"Helvetica"}));
+    std::set<mbgl::FontStack> result = parser.fontStacks();
+    ASSERT_EQ(expected, result);
 }
 
 TEST(StyleParser, FontStacksGetExpression) {
