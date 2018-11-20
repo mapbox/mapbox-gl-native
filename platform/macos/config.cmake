@@ -1,5 +1,3 @@
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11)
-
 include(cmake/loop-darwin.cmake)
 
 macro(mbgl_platform_core)

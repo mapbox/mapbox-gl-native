@@ -19,6 +19,8 @@ set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11)
+
 option(WITH_CXX11ABI "Use the C++11 ABI" OFF)
 option(WITH_COVERAGE "Enable coverage reports" OFF)
 option(WITH_OSMESA   "Use OSMesa headless backend" OFF)
@@ -31,8 +33,8 @@ if (WITH_ERROR)
     set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Werror")
 endif()
 
-include(cmake/vendor.cmake)
 include(cmake/mbgl.cmake)
+include(cmake/vendor.cmake)
 include(cmake/mason.cmake)
 include(cmake/xcode.cmake)
 

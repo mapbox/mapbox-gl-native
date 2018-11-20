@@ -26,3 +26,7 @@ include(${CMAKE_SOURCE_DIR}/vendor/unique_resource.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/variant.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/vector-tile.cmake)
 include(${CMAKE_SOURCE_DIR}/vendor/wagyu.cmake)
+
+if(MBGL_PLATFORM STREQUAL "linux" OR MBGL_PLATFORM STREQUAL "macos")
+    include(${CMAKE_SOURCE_DIR}/vendor/glfw.cmake)
+endif()
