@@ -2148,24 +2148,23 @@ public:
         }
     }
 
-    NSString *title = NSLocalizedStringWithDefaultValue(@"SDK_NAME", nil, nil, @"Mapbox Maps SDK for iOS", @"Action sheet title");
-    UIAlertController *attributionController = [UIAlertController alertControllerWithTitle:title
+    NSString *actionSheetTitle = NSLocalizedStringWithDefaultValue(@"SDK_NAME", nil, nil, @"Mapbox Maps SDK for iOS", @"Action sheet title");
+    UIAlertController *attributionController = [UIAlertController alertControllerWithTitle:actionSheetTitle
                                                                                    message:nil
                                                                             preferredStyle:UIAlertControllerStyleActionSheet];
 
     if (shouldShowVersion)
     {
-        attributionController.title = [title stringByAppendingFormat:@" %@", [NSBundle mgl_frameworkInfoDictionary][@"MGLSemanticVersionString"]];
+        attributionController.title = [actionSheetTitle stringByAppendingFormat:@" %@", [NSBundle mgl_frameworkInfoDictionary][@"MGLSemanticVersionString"]];
     }
 
     NSArray *attributionInfos = [self.style attributionInfosWithFontSize:[UIFont buttonFontSize]
                                                                linkColor:nil];
     for (MGLAttributionInfo *info in attributionInfos)
     {
-        NSString *title = [info.title.string mgl_titleCasedStringWithLocale:[NSLocale currentLocale]];
-        UIAlertAction *action = [UIAlertAction actionWithTitle:title
+        UIAlertAction *action = [UIAlertAction actionWithTitle:[info.title.string mgl_titleCasedStringWithLocale:[NSLocale currentLocale]]
                                                          style:UIAlertActionStyleDefault
-                                                       handler:^(UIAlertAction * _Nonnull action) {
+                                                       handler:^(UIAlertAction * _Nonnull actionBlock) {
             NSURL *url = info.URL;
             if (url)
             {
@@ -2202,9 +2201,7 @@ public:
     attributionController.popoverPresentationController.sourceRect = self.attributionButton.frame;
     
     UIViewController *viewController = [self.window.rootViewController mgl_topMostViewController];
-    [viewController presentViewController:attributionController
-                                 animated:YES
-                               completion:NULL];
+    [viewController presentViewController:attributionController animated:YES completion:NULL];
 }
 
 - (void)presentTelemetryAlertController
@@ -2234,8 +2231,7 @@ public:
     UIAlertAction *moreAction = [UIAlertAction actionWithTitle:moreTitle
                                                          style:UIAlertActionStyleDefault
                                                        handler:^(UIAlertAction * _Nonnull action) {
-        [[UIApplication sharedApplication] openURL:
-         [NSURL URLWithString:@"https://www.mapbox.com/telemetry/"]];
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://www.mapbox.com/telemetry/"]];
     }];
     [alertController addAction:moreAction];
     
@@ -2254,9 +2250,7 @@ public:
     [alertController addAction:participateAction];
     
     UIViewController *viewController = [self.window.rootViewController mgl_topMostViewController];
-    [viewController presentViewController:alertController
-                                 animated:YES
-                               completion:NULL];
+    [viewController presentViewController:alertController animated:YES completion:NULL];
 }
 
 #pragma mark - Properties -
@@ -2740,8 +2734,8 @@ public:
         _featureAccessibilityElements = [NSMutableSet set];
     }
     
-    MGLFeatureAccessibilityElement *element = [_featureAccessibilityElements objectsPassingTest:^BOOL(MGLFeatureAccessibilityElement * _Nonnull element, BOOL * _Nonnull stop) {
-        return element.feature.identifier && ![element.feature.identifier isEqual:@0] && [element.feature.identifier isEqual:feature.identifier];
+    MGLFeatureAccessibilityElement *element = [_featureAccessibilityElements objectsPassingTest:^BOOL(MGLFeatureAccessibilityElement * _Nonnull testElement, BOOL * _Nonnull stop) {
+        return testElement.feature.identifier && ![testElement.feature.identifier isEqual:@0] && [testElement.feature.identifier isEqual:feature.identifier];
     }].anyObject;
     if (!element)
     {
@@ -2769,8 +2763,8 @@ public:
         _featureAccessibilityElements = [NSMutableSet set];
     }
     
-    MGLFeatureAccessibilityElement *element = [_featureAccessibilityElements objectsPassingTest:^BOOL(MGLFeatureAccessibilityElement * _Nonnull element, BOOL * _Nonnull stop) {
-        return element.feature.identifier && ![element.feature.identifier isEqual:@0] && [element.feature.identifier isEqual:feature.identifier];
+    MGLFeatureAccessibilityElement *element = [_featureAccessibilityElements objectsPassingTest:^BOOL(MGLFeatureAccessibilityElement * _Nonnull testElement, BOOL * _Nonnull stop) {
+        return testElement.feature.identifier && ![testElement.feature.identifier isEqual:@0] && [testElement.feature.identifier isEqual:feature.identifier];
     }].anyObject;
     if (!element)
     {

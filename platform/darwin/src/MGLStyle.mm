@@ -449,8 +449,8 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     auto layers = self.rawStyle->getLayers();
     std::string siblingIdentifier = sibling.identifier.UTF8String;
     NSUInteger index = 0;
-    for (auto layer : layers) {
-        if (layer->getID() == siblingIdentifier) {
+    for (auto siblingLayer : layers) {
+        if (siblingLayer->getID() == siblingIdentifier) {
             break;
         }
         index++;
@@ -470,9 +470,9 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
             [NSException raise:MGLRedundantLayerIdentifierException format:@"%s", err.what()];
         }
     } else {
-        MGLStyleLayer *sibling = [self layerFromMBGLLayer:layers.at(index + 1)];
+        MGLStyleLayer *nextSibling = [self layerFromMBGLLayer:layers.at(index + 1)];
         try {
-            [layer addToStyle:self belowLayer:sibling];
+            [layer addToStyle:self belowLayer:nextSibling];
         } catch (std::runtime_error & err) {
             [NSException raise:MGLRedundantLayerIdentifierException format:@"%s", err.what()];
         }

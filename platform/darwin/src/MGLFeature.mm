@@ -387,8 +387,8 @@ private:
             innerPolygons = [NSMutableArray arrayWithCapacity:geometry.size() - 1];
             for (auto iter = geometry.begin() + 1; iter != geometry.end(); iter++) {
                 auto &innerRing = *iter;
-                std::vector<CLLocationCoordinate2D> coordinates = toLocationCoordinates2D(innerRing);
-                MGLPolygon *innerPolygon = [MGLPolygon polygonWithCoordinates:&coordinates[0] count:coordinates.size()];
+                std::vector<CLLocationCoordinate2D> innerCoordinates = toLocationCoordinates2D(innerRing);
+                MGLPolygon *innerPolygon = [MGLPolygon polygonWithCoordinates:&innerCoordinates[0] count:innerCoordinates.size()];
                 [innerPolygons addObject:innerPolygon];
             }
         }

@@ -7,6 +7,8 @@
 
 #include <mbgl/util/run_loop.hpp>
 
+#pragma clang diagnostic ignored "-Wshadow"
+
 @interface MGLOfflineStorageTests : XCTestCase <MGLOfflineStorageDelegate>
 
 @end

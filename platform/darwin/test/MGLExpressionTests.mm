@@ -375,8 +375,8 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
-        NSArray *arguments = @[MGLConstantExpression(@1), MGLConstantExpression(@1), MGLConstantExpression(@1)];
-        NSExpression *expression = [NSExpression expressionForFunction:@"add:to:" arguments:arguments];
+        NSArray *threeArguments = @[MGLConstantExpression(@1), MGLConstantExpression(@1), MGLConstantExpression(@1)];
+        NSExpression *expression = [NSExpression expressionForFunction:@"add:to:" arguments:threeArguments];
         NSArray *jsonExpression = @[@"+", @1, @1, @1];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         jsonExpression = @[@"+", @[@"+", @1, @1], @1];
