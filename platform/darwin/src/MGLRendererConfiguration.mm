@@ -8,6 +8,7 @@
 #import <AppKit/AppKit.h>
 #endif
 
+static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPre4_0";
 
 @implementation MGLRendererConfiguration
 
@@ -16,11 +17,25 @@
 }
 
 - (instancetype)init {
-    self = [super init];
+    return [self initWithPropertyDictionary:[[NSBundle mainBundle] infoDictionary]];
+}
+
+- (instancetype)initWithPropertyDictionary:(NSDictionary *)properties {
     
     if (self) {
-        NSNumber *boolWrapper = [[[NSBundle mainBundle] infoDictionary] valueForKey:@"MGLCollisionBehaviorPre4_0"];
-        [[NSUserDefaults standardUserDefaults] setObject:boolWrapper forKey:@"MGLCollisionBehaviorPre4_0"];
+        
+        // Set the collision behaviour
+
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+        // Only use the behavior from the application's info.plist, if we don't already
+        // have the behavior specified in `NSUserDefaults.standardUserDefaults`
+        if (![defaults objectForKey:MGLCollisionBehaviorPre4_0Key]) {            
+            NSNumber *bundleNumber = MGL_OBJC_DYNAMIC_CAST(properties[MGLCollisionBehaviorPre4_0Key], NSNumber);
+
+            // Set or clear
+            [defaults setObject:bundleNumber forKey:MGLCollisionBehaviorPre4_0Key];
+        }
     }
     
     return self;
@@ -53,8 +68,7 @@
 }
 
 - (BOOL)perSourceCollisions {
-    NSNumber *boolWrapper = MGL_OBJC_DYNAMIC_CAST([[NSUserDefaults standardUserDefaults] objectForKey:@"MGLCollisionBehaviorPre4_0"], NSNumber);
-    return boolWrapper.boolValue;
+    return [[NSUserDefaults standardUserDefaults] boolForKey:MGLCollisionBehaviorPre4_0Key];
 }
 
 @end
