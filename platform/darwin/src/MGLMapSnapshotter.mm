@@ -15,6 +15,7 @@
 #import "NSBundle+MGLAdditions.h"
 #import "MGLStyle.h"
 #import "MGLAttributionInfo_Private.h"
+#import "MGLRendererConfiguration.h"
 
 #if TARGET_OS_IPHONE
 #import "UIImage+MGLAdditions.h"
@@ -158,7 +159,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
         [NSException raise:NSInternalInconsistencyException
                     format:@"Already started this snapshotter."];
     }
-    
+
     self.completion = completion;
     self.resultQueue = queue;
     self.cancelled = NO;
@@ -560,8 +561,11 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
         coordinateBounds = MGLLatLngBoundsFromCoordinateBounds(options.coordinateBounds);
     }
     
+    // App-global configuration
+    MGLRendererConfiguration* config = [MGLRendererConfiguration currentConfiguration];
+
     // Create the snapshotter
-    _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(mbglFileSource, _mbglThreadPool, style, size, pixelRatio, cameraOptions, coordinateBounds);
+    _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(mbglFileSource, _mbglThreadPool, style, size, pixelRatio, cameraOptions, coordinateBounds, config.cacheDir, config.localFontFamilyName);
 }
 
 @end
