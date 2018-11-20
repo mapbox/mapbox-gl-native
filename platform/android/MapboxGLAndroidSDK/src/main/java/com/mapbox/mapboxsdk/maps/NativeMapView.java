@@ -264,8 +264,7 @@ final class NativeMapView {
     if (checkState("")) {
       return new LatLng();
     }
-    // wrap longitude values coming from core
-    return nativeGetLatLng().wrap();
+    return nativeGetLatLng();
   }
 
   public CameraPosition getCameraForLatLngBounds(LatLngBounds bounds, int[] padding, double bearing, double tilt) {
@@ -638,7 +637,7 @@ final class NativeMapView {
       return new LatLng();
     }
     return nativeLatLngForProjectedMeters(projectedMeters.getNorthing(),
-      projectedMeters.getEasting()).wrap();
+      projectedMeters.getEasting());
   }
 
   @NonNull
@@ -655,7 +654,7 @@ final class NativeMapView {
     if (checkState("latLngForPixel")) {
       return new LatLng();
     }
-    return nativeLatLngForPixel(pixel.x / pixelRatio, pixel.y / pixelRatio).wrap();
+    return nativeLatLngForPixel(pixel.x / pixelRatio, pixel.y / pixelRatio);
   }
 
   public double getTopOffsetPixelsForAnnotationSymbol(String symbolName) {

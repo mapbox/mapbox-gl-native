@@ -12,14 +12,24 @@ public class GeometryConstants {
   public static final int RADIUS_EARTH_METERS = 6378137;
 
   /**
+   * This constant represents the lowest longitude value available to represent a wrapped geolocation.
+   */
+  public static final double MIN_WRAP_LONGITUDE = -180;
+
+  /**
+   * This constant represents the highest longitude value available to represent a wrapped geolocation.
+   */
+  public static final double MAX_WRAP_LONGITUDE = 180;
+
+  /**
    * This constant represents the lowest longitude value available to represent a geolocation.
    */
-  public static final double MIN_LONGITUDE = -180;
+  public static final double MIN_LONGITUDE = Double.NEGATIVE_INFINITY;
 
   /**
    * This constant represents the highest longitude value available to represent a geolocation.
    */
-  public static final double MAX_LONGITUDE = 180;
+  public static final double MAX_LONGITUDE = Double.POSITIVE_INFINITY;
 
   /**
    * This constant represents the lowest latitude value available to represent a geolocation.
