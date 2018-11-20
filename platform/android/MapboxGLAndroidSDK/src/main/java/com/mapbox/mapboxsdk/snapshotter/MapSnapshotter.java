@@ -95,6 +95,7 @@ public class MapSnapshotter {
     private LatLngBounds region;
     private CameraPosition cameraPosition;
     private boolean showLogo = true;
+    private String localIdeographFontFamily;
 
     /**
      * @param width  the width of the image
@@ -172,6 +173,22 @@ public class MapSnapshotter {
     }
 
     /**
+     * Set the font family for generating glyphs locally for ideographs in the &#x27;CJK Unified Ideographs&#x27;
+     * and &#x27;Hangul Syllables&#x27; ranges.
+     * <p>
+     * The font family argument is passed to {@link android.graphics.Typeface#create(String, int)}.
+     * Default system fonts are defined in &#x27;/system/etc/fonts.xml&#x27;
+     *
+     * @param fontFamily font family for local ideograph generation.
+     * @return the mutated {@link Options}
+     */
+    @NonNull
+    public Options withLocalIdeographFontFamily(String fontFamily) {
+      this.localIdeographFontFamily = fontFamily;
+      return this;
+    }
+
+    /**
      * @return the width of the image
      */
     public int getWidth() {
@@ -214,6 +231,14 @@ public class MapSnapshotter {
     public CameraPosition getCameraPosition() {
       return cameraPosition;
     }
+
+    /**
+     * @return the font family used for locally generating ideographs
+     */
+    public String getLocalIdeographFontFamily() {
+      return localIdeographFontFamily;
+    }
+
   }
 
   /**
@@ -231,7 +256,7 @@ public class MapSnapshotter {
 
     nativeInitialize(this, fileSource, options.pixelRatio, options.width,
       options.height, options.styleUrl, options.styleJson, options.region, options.cameraPosition,
-      options.showLogo, programCacheDir);
+      options.showLogo, programCacheDir, options.localIdeographFontFamily);
   }
 
   /**
@@ -513,7 +538,8 @@ public class MapSnapshotter {
                                          FileSource fileSource, float pixelRatio,
                                          int width, int height, String styleUrl, String styleJson,
                                          LatLngBounds region, CameraPosition position,
-                                         boolean showLogo, String programCacheDir);
+                                         boolean showLogo, String programCacheDir,
+                                         String localIdeographFontFamily);
 
   @Keep
   protected native void nativeStart();

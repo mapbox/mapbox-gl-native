@@ -35,7 +35,8 @@ public:
                    const jni::Object<LatLngBounds>& region,
                    const jni::Object<CameraPosition>& position,
                    jni::jboolean showLogo,
-                   const jni::String& programCacheDir);
+                   const jni::String& programCacheDir,
+                   const jni::String& localIdeographFontFamily);
 
     ~MapSnapshotter();
 
