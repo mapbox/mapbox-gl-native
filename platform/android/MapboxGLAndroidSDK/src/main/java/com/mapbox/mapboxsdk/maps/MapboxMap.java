@@ -22,6 +22,7 @@ import com.mapbox.android.gestures.StandardScaleGestureDetector;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.MapStrictMode;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
@@ -950,7 +951,18 @@ public final class MapboxMap {
   private void setApiBaseUrl(@NonNull MapboxMapOptions options) {
     String apiBaseUrl = options.getApiBaseUrl();
     if (!TextUtils.isEmpty(apiBaseUrl)) {
+      validateTelemetryConfigurationForCnEndpoint(apiBaseUrl);
       nativeMapView.setApiBaseUrl(apiBaseUrl);
+    }
+  }
+
+  private void validateTelemetryConfigurationForCnEndpoint(String apiBaseUrl) {
+    if (apiBaseUrl.contains(MapboxConstants.URL_API_CN)) {
+      // enable cn endpoint for telemetry
+      TelemetryDefinition definition = Mapbox.getTelemetry();
+      if (definition != null) {
+        definition.setApiBaseUrl(MapboxConstants.URL_EVENTS_CN);
+      }
     }
   }
 

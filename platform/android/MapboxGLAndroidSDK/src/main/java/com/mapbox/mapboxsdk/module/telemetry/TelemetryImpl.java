@@ -60,6 +60,17 @@ public class TelemetryImpl implements TelemetryDefinition {
     telemetry.push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, state));
   }
 
+  @Override
+  public void onCreateOfflineRegion(@NonNull OfflineRegionDefinition offlineDefinition) {
+    MapEventFactory mapEventFactory = new MapEventFactory();
+    telemetry.push(mapEventFactory.createOfflineDownloadStartEvent(
+      offlineDefinition instanceof OfflineTilePyramidRegionDefinition ? "tileregion" : "shaperegion",
+      offlineDefinition.getMinZoom(),
+      offlineDefinition.getMaxZoom(),
+      offlineDefinition.getStyleURL())
+    );
+  }
+
   /**
    * Set the end-user selected state to participate or opt-out in telemetry collection.
    */
@@ -95,14 +106,13 @@ public class TelemetryImpl implements TelemetryDefinition {
     return telemetry.updateSessionIdRotationInterval(new SessionInterval(interval));
   }
 
+  /**
+   * Set the telemetry api end point base url
+   *
+   * @param baseUrl the end point url for telemetry collection
+   */
   @Override
-  public void onCreateOfflineRegion(@NonNull OfflineRegionDefinition offlineDefinition) {
-    MapEventFactory mapEventFactory = new MapEventFactory();
-    telemetry.push(mapEventFactory.createOfflineDownloadStartEvent(
-      offlineDefinition instanceof OfflineTilePyramidRegionDefinition ? "tileregion" : "shaperegion",
-      offlineDefinition.getMinZoom(),
-      offlineDefinition.getMaxZoom(),
-      offlineDefinition.getStyleURL())
-    );
+  public void setApiBaseUrl(@NonNull String baseUrl) {
+    //telemetry.updateApiBaseUrl(baseUrl);
   }
 }

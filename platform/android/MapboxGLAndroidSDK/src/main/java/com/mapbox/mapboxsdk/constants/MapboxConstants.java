@@ -117,6 +117,16 @@ public class MapboxConstants {
    */
   public static final String FRAG_ARG_MAPBOXMAPOPTIONS = "MapboxMapOptions";
 
+  /**
+   * CN base url API endpoint
+   */
+  public static final String URL_API_CN = "api.mapbox.cn";
+
+  /**
+   * CN base url events endpoint
+   */
+  public static final String URL_EVENTS_CN = "https://events.mapbox.cn";
+
   // Save instance state keys
   public static final String STATE_HAS_SAVED_STATE = "mapbox_savedState";
   public static final String STATE_CAMERA_POSITION = "mapbox_cameraPosition";
