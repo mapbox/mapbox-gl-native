@@ -318,6 +318,27 @@ MGL_EXPORT
  */
 - (void)removeSource:(MGLSource *)source;
 
+/**
+ Removes a source from the current style.
+ 
+ @note Source identifiers are not guaranteed to exist across styles or different
+ versions of the same style. Applications that use this API must first set the
+ style URL to an explicitly versioned style using a convenience method like
+ `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
+ inspectable in Interface Builder, or a manually constructed `NSURL`. This
+ approach also avoids source identifer name changes that will occur in the default
+ style’s sources over time.
+ 
+ @param source The source to remove from the current style.
+ @param outError Upon return, if an error has occurred, a pointer to an `NSError`
+ object describing the error. Pass in `NULL` to ignore any error.
+ 
+ @return `YES` if `source` was removed successfully. If `NO`, `outError` contains
+ an `NSError` object describing the problem.
+ */
+- (BOOL)removeSource:(MGLSource *)source error:(NSError * __nullable * __nullable)outError;
+
+
 #pragma mark Managing Style Layers
 
 /**

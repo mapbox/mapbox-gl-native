@@ -219,15 +219,22 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 
 - (void)removeSource:(MGLSource *)source
 {
+    [self removeSource:source error:nil];
+}
+
+- (BOOL)removeSource:(MGLSource *)source error:(NSError * __nullable * __nullable)outError {
     MGLLogDebug(@"Removing source: %@", source);
+    
     if (!source.rawSource) {
         [NSException raise:NSInvalidArgumentException format:
          @"The source %@ cannot be removed from the style. "
          @"Make sure the source was created as a member of a concrete subclass of MGLSource.",
          source];
     }
-    [source removeFromMapView:self.mapView];
+
+    return [source removeFromMapView:self.mapView error:outError];
 }
+
 
 - (nullable NSArray<MGLAttributionInfo *> *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
     // It’d be incredibly convenient to use -sources here, but this operation
