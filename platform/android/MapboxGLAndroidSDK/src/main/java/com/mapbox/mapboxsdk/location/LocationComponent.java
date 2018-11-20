@@ -64,10 +64,8 @@ import static com.mapbox.mapboxsdk.location.LocationComponentConstants.DEFAULT_T
  * for more precise location updates, simply add the Google Play Location Services dependency in your build script.
  * This will make the default engine the {@link com.mapbox.android.core.location.GoogleLocationEngine} instead.
  * <p>
- * When activating the component for the first time, the map's max/min zoom levels will be set to
- * {@link LocationComponentOptions#MAX_ZOOM_DEFAULT} and {@link LocationComponentOptions#MIN_ZOOM_DEFAULT} respectively.
- * You can adjust the zoom range with {@link LocationComponentOptions#maxZoom()} and
- * {@link LocationComponentOptions#minZoom()}.
+ * For location puck animation purposes, like navigation,
+ * we recommend limiting the maximum zoom level of the map for the best user experience.
  * <p>
  * Location Component doesn't support state saving out-of-the-box.
  */
@@ -832,9 +830,6 @@ public final class LocationComponent {
     mapboxMap.setPadding(
       options.padding()[0], options.padding()[1], options.padding()[2], options.padding()[3]
     );
-
-    mapboxMap.setMaxZoomPreference(options.maxZoom());
-    mapboxMap.setMinZoomPreference(options.minZoom());
   }
 
   /**

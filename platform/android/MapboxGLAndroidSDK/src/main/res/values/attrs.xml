@@ -159,10 +159,6 @@
         <!-- Map layer configuration -->
         <attr name="mapbox_layer_below" format="string"/>
 
-        <!-- Map zoom levels -->
-        <attr name="mapbox_maxZoom" format="float"/>
-        <attr name="mapbox_minZoom" format="float"/>
-
         <!-- Icon scale based on map zoom levels -->
         <attr name="mapbox_maxZoomIconScale" format="float"/>
         <attr name="mapbox_minZoomIconScale" format="float"/>

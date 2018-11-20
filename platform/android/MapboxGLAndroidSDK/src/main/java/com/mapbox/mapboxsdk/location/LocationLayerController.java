@@ -313,12 +313,12 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
   private void styleScaling(@NonNull LocationComponentOptions options) {
     for (String layerId : layerMap) {
       Layer layer = mapboxMap.getLayer(layerId);
-      if (layer != null && layer instanceof SymbolLayer) {
+      if (layer instanceof SymbolLayer) {
         layer.setProperties(
           iconSize(
             interpolate(linear(), zoom(),
-              stop(options.minZoom(), options.minZoomIconScale()),
-              stop(options.maxZoom(), options.maxZoomIconScale())
+              stop(mapboxMap.getMinZoomLevel(), options.minZoomIconScale()),
+              stop(mapboxMap.getMaxZoomLevel(), options.maxZoomIconScale())
             )
           )
         );
@@ -342,7 +342,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
     refreshSource();
   }
 
-  @Nullable
+  @NonNull
   private String buildIconString(@Nullable String bitmapName, @NonNull String drawableName) {
     if (bitmapName != null) {
       return bitmapName;
