@@ -2389,13 +2389,6 @@ public:
     _mbglMap->setDebug(options);
 }
 
-- (void)setDebugActive:(BOOL)debugActive
-{
-    self.debugMask = debugActive ? (MGLMapDebugTileBoundariesMask |
-                                    MGLMapDebugTileInfoMask |
-                                    MGLMapDebugCollisionBoxesMask) : 0;
-}
-
 - (void)resetNorth
 {
     MGLLogInfo(@"Resetting the map rotation to a northern heading — a direction of 0 degrees.");
