@@ -68,7 +68,7 @@
 
 #pragma mark Working with Transition Values
 
-+ (NSValue *)valueWithMGLTransition:(MGLTransition)transition; {
++ (NSValue *)valueWithMGLTransition:(MGLTransition)transition {
     return [NSValue value:&transition withObjCType:@encode(MGLTransition)];
 }
 
