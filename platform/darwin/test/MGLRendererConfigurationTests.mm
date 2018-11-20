@@ -40,34 +40,42 @@ static NSString * const MGLRendererConfigurationTests_collisionBehaviorKey = @"M
     XCTAssert([config perSourceCollisions]);
 }
 
-- (void)testSettingMGLCollisionBehaviorPre4_0InNSUserDefaults {
-    
-    __unsafe_unretained MGLRendererConfiguration *unsafeConfig1 = nil;
-    
+- (void)testSettingMGLCollisionBehaviorPre40InNSUserDefaults {
     {
         XCTAssertNil([[NSUserDefaults standardUserDefaults] objectForKey:MGLRendererConfigurationTests_collisionBehaviorKey]);
         MGLRendererConfiguration *config = [MGLRendererConfiguration currentConfiguration];
         XCTAssertFalse([config perSourceCollisions]);
-        unsafeConfig1 = config;
     }
     
-    __unsafe_unretained MGLRendererConfiguration *unsafeConfig2 = nil;
     [[NSUserDefaults standardUserDefaults] setObject:@(NO) forKey:MGLRendererConfigurationTests_collisionBehaviorKey];
     {
         XCTAssertNotNil([[NSUserDefaults standardUserDefaults] objectForKey:MGLRendererConfigurationTests_collisionBehaviorKey]);
         MGLRendererConfiguration *config = [MGLRendererConfiguration currentConfiguration];
-        XCTAssert(config != unsafeConfig1);
         XCTAssertFalse([config perSourceCollisions]);
-        unsafeConfig2 = config;
     }
     
     [[NSUserDefaults standardUserDefaults] setObject:@(YES) forKey:MGLRendererConfigurationTests_collisionBehaviorKey];
     {
         XCTAssertNotNil([[NSUserDefaults standardUserDefaults] objectForKey:MGLRendererConfigurationTests_collisionBehaviorKey]);
         MGLRendererConfiguration *config = [MGLRendererConfiguration currentConfiguration];
-        XCTAssert(config != unsafeConfig1);
-        XCTAssert(config != unsafeConfig2);
         XCTAssert([config perSourceCollisions]);
+    }
+}
+
+- (void)testOverridingMGLCollisionBehaviorPre40 {
+
+    // Dictionary = NO, NSUserDefaults = YES
+    {
+        [[NSUserDefaults standardUserDefaults] setObject:@(YES) forKey:MGLRendererConfigurationTests_collisionBehaviorKey];
+        MGLRendererConfiguration *config = [[MGLRendererConfiguration alloc] initWithPropertyDictionary:@{MGLRendererConfigurationTests_collisionBehaviorKey:@(NO)}];
+        XCTAssert([config perSourceCollisions]);
+    }
+
+    // Dictionary = YES, NSUserDefaults = NO
+    {
+        [[NSUserDefaults standardUserDefaults] setObject:@(NO) forKey:MGLRendererConfigurationTests_collisionBehaviorKey];
+        MGLRendererConfiguration *config = [[MGLRendererConfiguration alloc] initWithPropertyDictionary:@{MGLRendererConfigurationTests_collisionBehaviorKey:@(YES)}];
+        XCTAssertFalse([config perSourceCollisions]);
     }
 }
 
