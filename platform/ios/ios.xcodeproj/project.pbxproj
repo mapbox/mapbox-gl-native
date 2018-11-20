@@ -1949,13 +1949,13 @@
 				DA2E885E1CC0382C00F24E7B /* MGLOfflineRegionTests.m */,
 				55E2AD121E5B125400E8C587 /* MGLOfflineStorageTests.mm */,
 				35B8E08B1D6C8B5100E768D2 /* MGLPredicateTests.mm */,
+				CA8FBC0821A47BB100D1203C /* MGLRendererConfigurationTests.mm */,
 				DA2E88601CC0382C00F24E7B /* MGLStyleTests.mm */,
 				556660D71E1D085500E2C41B /* MGLVersionNumber.m */,
 				DA2E88551CC036F400F24E7B /* Info.plist */,
 				DA2784FB1DF02FF4001D5B8D /* Media.xcassets */,
 				DA35D0871E1A6309007DED41 /* one-liner.json */,
 				1F8A59F62165326C004DFE75 /* sideload_sat.db */,
-				CA8FBC0821A47BB100D1203C /* MGLRendererConfigurationTests.mm */,
 			);
 			name = "SDK Tests";
 			path = test;
