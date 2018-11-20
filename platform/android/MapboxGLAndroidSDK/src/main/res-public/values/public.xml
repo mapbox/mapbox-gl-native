@@ -135,10 +135,6 @@
     <public name="mapbox_iconPaddingRight" format="integer" type="attr"/>
     <public name="mapbox_iconPaddingBottom" format="integer" type="attr"/>
 
-    <!-- Map zoom levels -->
-    <public name="mapbox_maxZoom" format="float" type="attr"/>
-    <public name="mapbox_minZoom" format="float" type="attr"/>
-
     <!-- Icon scale based on map zoom levels -->
     <public name="mapbox_maxZoomIconScale" format="float" type="attr"/>
     <public name="mapbox_minZoomIconScale" format="float" type="attr"/>

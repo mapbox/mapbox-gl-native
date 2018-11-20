@@ -24,10 +24,6 @@
     <item name="mapbox_iconPaddingRight">0</item>
     <item name="mapbox_iconPaddingBottom">0</item>
 
-    <!-- Map zoom levels -->
-    <item name="mapbox_maxZoom">18</item>
-    <item name="mapbox_minZoom">2</item>
-
     <!-- Location icon scale based on map zoom levels -->
     <item name="mapbox_maxZoomIconScale">1</item>
     <item name="mapbox_minZoomIconScale">0.6</item>
