@@ -1,5 +1,6 @@
 #import "MGLRendererConfiguration.h"
 #import "MGLOfflineStorage_Private.h"
+#import "MGLFoundation_Private.h"
 
 #if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
@@ -12,6 +13,17 @@
 
 + (instancetype)currentConfiguration {
     return [[self alloc] init];
+}
+
+- (instancetype)init {
+    self = [super init];
+    
+    if (self) {
+        NSNumber *boolWrapper = [[[NSBundle mainBundle] infoDictionary] valueForKey:@"MGLCollisionBehaviorPre4_0"];
+        [[NSUserDefaults standardUserDefaults] setObject:boolWrapper forKey:@"MGLCollisionBehaviorPre4_0"];
+    }
+    
+    return self;
 }
 
 - (mbgl::DefaultFileSource *)fileSource {
@@ -41,8 +53,7 @@
 }
 
 - (BOOL)perSourceCollisions {
-    NSNumber *boolWrapper = [[[NSBundle mainBundle] infoDictionary] valueForKey:@"MGLCollisionBehaviorPre4_0"];
-    
+    NSNumber *boolWrapper = MGL_OBJC_DYNAMIC_CAST([[NSUserDefaults standardUserDefaults] objectForKey:@"MGLCollisionBehaviorPre4_0"], NSNumber);
     return boolWrapper.boolValue;
 }
 
