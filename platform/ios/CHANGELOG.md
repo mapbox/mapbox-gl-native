@@ -10,6 +10,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * This SDK’s dynamic framework now has a bundle identifier of `com.mapbox.Mapbox`. ([#12857](https://github.com/mapbox/mapbox-gl-native/pull/12857))
 * Modified the behavior of the map view so that programmatic camera transitions can no longer be interrupted by user interaction when `MGLMapView.zoomEnabled`, `MGLMapView.rotateEnabled`, `MGLMapView.scrollEnabled`, and `MGLMapView.pitchEnabled` are set to false. ([#13362](https://github.com/mapbox/mapbox-gl-native/pull/13362))
 * Fixed random crashes during app termination. ([#13367](https://github.com/mapbox/mapbox-gl-native/pull/13367))
+* Added `-[MGLStyle removeSource:error:]` that returns a `BOOL` indicating success (and an optional `NSError` in case of failure). ([#13399](https://github.com/mapbox/mapbox-gl-native/pull/13399))
 
 ## 4.6.0 - November 7, 2018
 

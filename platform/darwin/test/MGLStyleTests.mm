@@ -237,7 +237,12 @@
     [self.style addLayer:fillLayer];
 
     // Attempt to remove the raster tile source
-    [self.style removeSource:rasterTileSource];
+    NSError *error;
+    BOOL result = [self.style removeSource:rasterTileSource error:&error];
+    
+    XCTAssertFalse(result);
+    XCTAssertEqualObjects(error.domain, MGLErrorDomain);
+    XCTAssertEqual(error.code, MGLErrorCodeSourceIsInUseCannotRemove);
     
     // Ensure it is still there
     XCTAssertTrue([[self.style sourceWithIdentifier:rasterTileSource.identifier] isMemberOfClass:[MGLRasterTileSource class]]);
