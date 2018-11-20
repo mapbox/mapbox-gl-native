@@ -32,7 +32,8 @@ public:
                    const float pixelRatio,
                    const optional<CameraOptions> cameraOptions,
                    const optional<LatLngBounds> region,
-                   const optional<std::string> cacheDir = {});
+                   const optional<std::string> cacheDir = {},
+                   const optional<std::string> localFontFamily = {});
 
     ~MapSnapshotter();
 
