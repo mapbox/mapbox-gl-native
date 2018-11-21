@@ -461,8 +461,8 @@ jobs:
       - image: mbgl/linux-clang-7:a5a3c52107
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
       BUILDTYPE: Debug
     steps:
       - install-dependencies: { mason: false, ccache: false }
@@ -496,8 +496,8 @@ jobs:
       - image: mbgl/linux-clang-7:a5a3c52107
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
       BUILDTYPE: Debug
     steps:
       - install-dependencies: { ccache: false }
@@ -524,11 +524,11 @@ jobs:
         default: android-ndk-r19:8e91a7ebab
     docker:
       - image: mbgl/<< parameters.image >>
-    resource_class: large
+    resource_class: xlarge
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
+      LIBSYSCONFCPUS: 8
+      JOBS: 8
       BUILDTYPE: Debug
       IS_LOCAL_DEVELOPMENT: false
       MBGL_ANDROID_STL: << parameters.stl >>
@@ -592,11 +592,11 @@ jobs:
   android-release:
     docker:
       - image: mbgl/android-ndk-r19:8e91a7ebab
-    resource_class: large
+    resource_class: xlarge
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
+      LIBSYSCONFCPUS: 8
+      JOBS: 8
       BUILDTYPE: Release
       IS_LOCAL_DEVELOPMENT: false
     steps:
@@ -699,6 +699,7 @@ jobs:
   node-clang39-release:
     docker:
       - image: mbgl/linux-clang-3.9:2077f965ed
+    resource_class: large
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -721,8 +722,8 @@ jobs:
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
     steps:
@@ -756,6 +757,7 @@ jobs:
   linux-clang-38-libcxx-debug:
     docker:
       - image: mbgl/linux-clang-3.8-libcxx:d6800bdbb4
+    resource_class: large
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -772,6 +774,7 @@ jobs:
   linux-clang-7-sanitize-address-undefined:
     docker:
       - image: mbgl/linux-clang-7:a5a3c52107
+    resource_class: large
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -794,6 +797,7 @@ jobs:
   linux-clang-7-sanitize-thread:
     docker:
       - image: mbgl/linux-clang-7:a5a3c52107
+    resource_class: large
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -818,8 +822,8 @@ jobs:
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
       WITH_CXX11ABI: 0
@@ -839,8 +843,8 @@ jobs:
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
       WITH_COVERAGE: 1
@@ -1045,8 +1049,8 @@ jobs:
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 2
-      JOBS: 2
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Release
       WITH_QT_I18N: 1
     steps:
