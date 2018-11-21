@@ -6,7 +6,10 @@ namespace mbgl {
 }
 
 /// Minimum size of an annotation’s accessibility element.
-extern const CGSize MGLAnnotationAccessibilityElementMinimumSize;
+FOUNDATION_EXTERN const CGSize MGLAnnotationAccessibilityElementMinimumSize;
+
+/// Indicates that a method (that uses `mbgl::Map`) was called after app termination.
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUnderlyingMapUnavailableException;
 
 @interface MGLMapView (Private)
 
@@ -15,8 +18,6 @@ extern const CGSize MGLAnnotationAccessibilityElementMinimumSize;
 
 /** Triggers another render pass even when it is not necessary. */
 - (void)setNeedsGLDisplay;
-
-- (mbgl::Map *)mbglMap;
 
 - (mbgl::Renderer *)renderer;
 

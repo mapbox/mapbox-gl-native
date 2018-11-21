@@ -2,7 +2,9 @@ package com.mapbox.mapboxsdk.offline;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Keep;
 
+import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 
@@ -10,19 +12,24 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
  * An offline region defined by a style URL, geographic bounding box, zoom range, and
  * device pixel ratio.
  * <p>
- * Both minZoom and maxZoom must be ≥ 0, and maxZoom must be ≥ minZoom.
+ * Both minZoom and maxZoom must be &#x2265; 0, and maxZoom must be &#x2265; minZoom.
  * <p>
- * maxZoom may be ∞, in which case for each tile source, the region will include
+ * maxZoom may be &#x221E;, in which case for each tile source, the region will include
  * tiles from minZoom up to the maximum zoom level provided by that source.
  * <p>
- * pixelRatio must be ≥ 0 and should typically be 1.0 or 2.0.
+ * pixelRatio must be &#x2265; 0 and should typically be 1.0 or 2.0.
  */
 public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefinition, Parcelable {
 
+  @Keep
   private String styleURL;
+  @Keep
   private LatLngBounds bounds;
+  @Keep
   private double minZoom;
+  @Keep
   private double maxZoom;
+  @Keep
   private float pixelRatio;
 
   /**
@@ -34,6 +41,7 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
    * @param maxZoom    max zoom
    * @param pixelRatio pixel ratio of the device
    */
+  @Keep
   public OfflineTilePyramidRegionDefinition(
     String styleURL, LatLngBounds bounds, double minZoom, double maxZoom, float pixelRatio) {
     // Note: Also used in JNI
@@ -60,28 +68,36 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
     this.pixelRatio = parcel.readFloat();
   }
 
-  /*
-   * Getters
-   */
 
+  @Override
   public String getStyleURL() {
     return styleURL;
   }
 
+  @Override
   public LatLngBounds getBounds() {
     return bounds;
   }
 
+  @Override
   public double getMinZoom() {
     return minZoom;
   }
 
+  @Override
   public double getMaxZoom() {
     return maxZoom;
   }
 
+  @Override
   public float getPixelRatio() {
     return pixelRatio;
+  }
+
+  @NonNull
+  @Override
+  public String getType() {
+    return "tileregion";
   }
 
   /*
@@ -94,7 +110,7 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
   }
 
   @Override
-  public void writeToParcel(Parcel dest, int flags) {
+  public void writeToParcel(@NonNull Parcel dest, int flags) {
     dest.writeString(styleURL);
     dest.writeDouble(bounds.getLatNorth());
     dest.writeDouble(bounds.getLonEast());
@@ -106,7 +122,7 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
   }
 
   public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-    public OfflineTilePyramidRegionDefinition createFromParcel(Parcel in) {
+    public OfflineTilePyramidRegionDefinition createFromParcel(@NonNull Parcel in) {
       return new OfflineTilePyramidRegionDefinition(in);
     }
 

@@ -1,4 +1,4 @@
 /**
- * Contains the Mapbox Maps Android Location API classes.
+ * Contains the Mapbox Location layer plugin.
  */
 package com.mapbox.mapboxsdk.location;

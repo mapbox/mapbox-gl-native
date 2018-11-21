@@ -1,4 +1,5 @@
-#include "i18n.hpp"
+#include <mbgl/util/i18n.hpp>
+#include <mbgl/util/utf.hpp>
 
 #include <algorithm>
 #include <map>
@@ -65,7 +66,7 @@ DEFINE_IS_IN_UNICODE_BLOCK(UnifiedCanadianAboriginalSyllabics, 0x1400, 0x167F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Hanunoo, 0x1720, 0x173F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Buhid, 0x1740, 0x175F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Tagbanwa, 0x1760, 0x177F)
-// DEFINE_IS_IN_UNICODE_BLOCK(Khmer, 0x1780, 0x17FF)
+DEFINE_IS_IN_UNICODE_BLOCK(Khmer, 0x1780, 0x17FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Mongolian, 0x1800, 0x18AF)
 DEFINE_IS_IN_UNICODE_BLOCK(UnifiedCanadianAboriginalSyllabicsExtended, 0x18B0, 0x18FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Limbu, 0x1900, 0x194F)
@@ -555,6 +556,9 @@ bool hasRotatedVerticalOrientation(char16_t chr) {
     return !(hasUprightVerticalOrientation(chr) || hasNeutralVerticalOrientation(chr));
 }
 
+// Replaces "horizontal" with "vertical" punctuation in place
+// Does not re-order or change length of string
+// (TaggedString::verticalizePunctuation depends on this behavior)
 std::u16string verticalizePunctuation(const std::u16string& input) {
     std::u16string output;
 
@@ -580,6 +584,42 @@ std::u16string verticalizePunctuation(const std::u16string& input) {
 
 char16_t verticalizePunctuation(char16_t chr) {
     return verticalPunctuation.count(chr) ? verticalPunctuation.at(chr) : 0;
+}
+    
+bool charInSupportedScript(char16_t chr) {
+    // This is a rough heuristic: whether we "can render" a script
+    // actually depends on the properties of the font being used
+    // and whether differences from the ideal rendering are considered
+    // semantically significant.
+    
+    // Even in Latin script, we "can't render" combinations such as the fi
+    // ligature, but we don't consider that semantically significant.n false;
+    if ((chr >= 0x0900 && chr <= 0x0DFF) ||
+        // Main blocks for Indic scripts and Sinhala
+        (chr >= 0x0F00 && chr <= 0x109F) ||
+        // Main blocks for Tibetan and Myanmar
+        isInKhmer(chr)) {
+        // These blocks cover common scripts that require
+        // complex text shaping, based on unicode script metadata:
+        // http://www.unicode.org/repos/cldr/trunk/common/properties/scriptMetadata.txt
+        // where "Web Rank <= 32" "Shaping Required = YES"
+        return false;
+    }
+    return true;
+}
+    
+bool isStringInSupportedScript(const std::string& input) {
+    auto u16string = util::convertUTF8ToUTF16(input);
+    for (char16_t chr : u16string) {
+        if (!charInSupportedScript(chr)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isWhitespace(char16_t chr) {
+    return chr == u' ' || chr == u'\t' || chr == u'\n' || chr == u'\v' || chr == u'\f' || chr == u'\r';
 }
 
 } // namespace i18n

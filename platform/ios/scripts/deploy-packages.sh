@@ -95,6 +95,7 @@ git checkout ${VERSION_TAG}
 step "Deploying version ${PUBLISH_VERSION}…"
 
 make clean && make distclean
+npm install --ignore-scripts
 mkdir -p ${BINARY_DIRECTORY}
 
 if [[ "${GITHUB_RELEASE}" == true ]]; then
@@ -102,14 +103,14 @@ if [[ "${GITHUB_RELEASE}" == true ]]; then
     if [[ $( echo ${PUBLISH_VERSION} | awk '/[0-9]-/' ) ]]; then
         PUBLISH_PRE_FLAG='--pre-release'
     fi
+    RELEASE_NOTES=$( ./platform/ios/scripts/release-notes.js github )
     github-release release \
         --tag "ios-v${PUBLISH_VERSION}" \
         --name "ios-v${PUBLISH_VERSION}" \
-        --draft ${PUBLISH_PRE_FLAG}
+        --draft ${PUBLISH_PRE_FLAG} \
+        --description "${RELEASE_NOTES}"
 fi
 
-buildPackageStyle "ipackage" "symbols"
-buildPackageStyle "ipackage-strip"
 buildPackageStyle "iframework" "symbols-dynamic"
 buildPackageStyle "iframework SYMBOLS=NO" "dynamic"
 

@@ -17,7 +17,8 @@ Run:
 npm install @mapbox/mapbox-gl-native
 ```
 
-Other platforms will fall back to a source compile with `make node`; see INSTALL.md in the repository root directory for prequisites.
+Other platforms will fall back to a source compile with `make node`; see [DEVELOPING.md](DEVELOPING.md) for details on
+building from source.
 
 ## Testing
 

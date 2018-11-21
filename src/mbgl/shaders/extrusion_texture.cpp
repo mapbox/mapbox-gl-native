@@ -1,12 +1,17 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/shaders/extrusion_texture.hpp>
+#include <mbgl/shaders/source.hpp>
 
 namespace mbgl {
 namespace shaders {
 
 const char* extrusion_texture::name = "extrusion_texture";
-const char* extrusion_texture::vertexSource = R"MBGL_SHADER(
+const char* extrusion_texture::vertexSource = source() + 35603;
+const char* extrusion_texture::fragmentSource = source() + 35819;
+
+// Uncompressed source of extrusion_texture.vertex.glsl:
+/*
 uniform mat4 u_matrix;
 uniform vec2 u_world;
 attribute vec2 a_pos;
@@ -19,8 +24,10 @@ void main() {
     v_pos.y = 1.0 - a_pos.y;
 }
 
-)MBGL_SHADER";
-const char* extrusion_texture::fragmentSource = R"MBGL_SHADER(
+*/
+
+// Uncompressed source of extrusion_texture.fragment.glsl:
+/*
 uniform sampler2D u_image;
 uniform float u_opacity;
 varying vec2 v_pos;
@@ -33,7 +40,7 @@ void main() {
 #endif
 }
 
-)MBGL_SHADER";
+*/
 
 } // namespace shaders
 } // namespace mbgl

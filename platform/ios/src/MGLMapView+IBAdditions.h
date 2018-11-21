@@ -44,6 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) IBInspectable BOOL allowsTilting;
 @property (nonatomic) IBInspectable BOOL showsUserLocation;
 @property (nonatomic) IBInspectable BOOL showsHeading;
+@property (nonatomic) IBInspectable BOOL showsScale;
 
 @end
 

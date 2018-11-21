@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <QVariant>
@@ -35,11 +35,7 @@ public:
     static bool isObject(const QVariant& value) {
         return value.canConvert(QVariant::Map)
             || value.type() == QVariant::ByteArray
-    #if QT_VERSION >= 0x050000
             || QString(value.typeName()) == QStringLiteral("QMapbox::Feature");
-    #else
-            || QString(value.typeName()) == QString("QMapbox::Feature");
-    #endif
     }
 
     static optional<QVariant> objectMember(const QVariant& value, const char* key) {
@@ -121,11 +117,7 @@ public:
     }
 
     static optional<GeoJSON> toGeoJSON(const QVariant& value, Error& error) {
-    #if QT_VERSION >= 0x050000
         if (value.typeName() == QStringLiteral("QMapbox::Feature")) {
-    #else
-        if (value.typeName() == QString("QMapbox::Feature")) {
-    #endif
             return GeoJSON { asMapboxGLFeature(value.value<QMapbox::Feature>()) };
         } else if (value.type() != QVariant::ByteArray) {
             error = { "JSON data must be in QByteArray" };

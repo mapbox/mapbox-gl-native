@@ -4,10 +4,15 @@ import android.graphics.PointF;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 
+import com.mapbox.geojson.Point;
+import com.mapbox.mapboxsdk.constants.GeometryConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.geometry.VisibleRegion;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A projection is used to translate between on screen location and geographic coordinates on
@@ -16,6 +21,7 @@ import com.mapbox.mapboxsdk.geometry.VisibleRegion;
  */
 public class Projection {
 
+  @NonNull
   private final NativeMapView nativeMapView;
   private int[] contentPadding;
 
@@ -24,38 +30,32 @@ public class Projection {
     this.contentPadding = new int[] {0, 0, 0, 0};
   }
 
-  void setContentPadding(int[] contentPadding, int[] userLocationViewPadding) {
+  void setContentPadding(int[] contentPadding) {
     this.contentPadding = contentPadding;
-
-    int[] padding = new int[] {
-      contentPadding[0] + userLocationViewPadding[0],
-      contentPadding[1] + userLocationViewPadding[1],
-      contentPadding[2] + userLocationViewPadding[2],
-      contentPadding[3] + userLocationViewPadding[3]
-    };
-
-    nativeMapView.setContentPadding(padding);
+    nativeMapView.setContentPadding(contentPadding);
   }
 
   int[] getContentPadding() {
     return contentPadding;
   }
 
-  public void invalidateContentPadding(int[] userLocationViewPadding) {
-    setContentPadding(contentPadding, userLocationViewPadding);
+  public void invalidateContentPadding() {
+    setContentPadding(contentPadding);
   }
 
   /**
    * Returns the spherical Mercator projected meters for a LatLng.
    */
-  public ProjectedMeters getProjectedMetersForLatLng(LatLng latLng) {
+  @NonNull
+  public ProjectedMeters getProjectedMetersForLatLng(@NonNull LatLng latLng) {
     return nativeMapView.projectedMetersForLatLng(latLng);
   }
 
   /**
    * Returns the LatLng for a spherical Mercator projected meters.
    */
-  public LatLng getLatLngForProjectedMeters(ProjectedMeters projectedMeters) {
+  @NonNull
+  public LatLng getLatLngForProjectedMeters(@NonNull ProjectedMeters projectedMeters) {
     return nativeMapView.latLngForProjectedMeters(projectedMeters);
   }
 
@@ -82,34 +82,159 @@ public class Projection {
    * @return The LatLng corresponding to the point on the screen, or null if the ray through
    * the given screen point does not intersect the ground plane.
    */
-  public LatLng fromScreenLocation(PointF point) {
+  @NonNull
+  public LatLng fromScreenLocation(@NonNull PointF point) {
     return nativeMapView.latLngForPixel(point);
   }
 
   /**
    * Gets a projection of the viewing frustum for converting between screen coordinates and
    * geo-latitude/longitude coordinates.
+   * <p>
+   * This method ignores the content padding.
    *
    * @return The projection of the viewing frustum in its current state.
    */
+  @NonNull
   public VisibleRegion getVisibleRegion() {
-    float left = 0;
-    float right = nativeMapView.getWidth();
-    float top = 0;
-    float bottom = nativeMapView.getHeight();
+    return getVisibleRegion(true);
+  }
+
+  /**
+   * Gets a projection of the viewing frustum for converting between screen coordinates and
+   * geo-latitude/longitude coordinates.
+   *
+   * @param ignorePadding True if the padding should be ignored,
+   *                      false if the returned region should be reduced by the padding.
+   * @return The projection of the viewing frustum in its current state.
+   */
+  @NonNull
+  public VisibleRegion getVisibleRegion(boolean ignorePadding) {
+    float left;
+    float right;
+    float top;
+    float bottom;
+
+    if (ignorePadding) {
+      left = 0;
+      right = nativeMapView.getWidth();
+      top = 0;
+      bottom = nativeMapView.getHeight();
+    } else {
+      left = contentPadding[0];
+      right = nativeMapView.getWidth() - contentPadding[2];
+      top = contentPadding[1];
+      bottom = nativeMapView.getHeight() - contentPadding[3];
+    }
+
+    LatLng center = fromScreenLocation(new PointF(left + (right - left) / 2, top + (bottom - top) / 2));
 
     LatLng topLeft = fromScreenLocation(new PointF(left, top));
     LatLng topRight = fromScreenLocation(new PointF(right, top));
     LatLng bottomRight = fromScreenLocation(new PointF(right, bottom));
     LatLng bottomLeft = fromScreenLocation(new PointF(left, bottom));
 
+    List<LatLng> latLngs = new ArrayList<>();
+    latLngs.add(topRight);
+    latLngs.add(bottomRight);
+    latLngs.add(bottomLeft);
+    latLngs.add(topLeft);
+
+    double maxEastLonSpan = 0;
+    double maxWestLonSpan = 0;
+
+    double east = 0;
+    double west = 0;
+    double north = GeometryConstants.MIN_LATITUDE;
+    double south = GeometryConstants.MAX_LATITUDE;
+
+    for (LatLng latLng : latLngs) {
+      double bearing = bearing(center, latLng);
+
+      if (bearing >= 0) {
+        double span = getLongitudeSpan(latLng.getLongitude(), center.getLongitude());
+        if (span > maxEastLonSpan) {
+          maxEastLonSpan = span;
+          east = latLng.getLongitude();
+        }
+      } else {
+        double span = getLongitudeSpan(center.getLongitude(), latLng.getLongitude());
+        if (span > maxWestLonSpan) {
+          maxWestLonSpan = span;
+          west = latLng.getLongitude();
+        }
+      }
+
+      if (north < latLng.getLatitude()) {
+        north = latLng.getLatitude();
+      }
+      if (south > latLng.getLatitude()) {
+        south = latLng.getLatitude();
+      }
+    }
+
     return new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight,
-      LatLngBounds.from(
-        topRight.getLatitude(),
-        topRight.getLongitude(),
-        bottomLeft.getLatitude(),
-        bottomLeft.getLongitude())
-    );
+      LatLngBounds.from(north, east, south, west));
+  }
+
+  /**
+   * Takes two {@link Point}s and finds the geographic bearing between them.
+   *
+   * @param latLng1 the first point used for calculating the bearing
+   * @param latLng2 the second point used for calculating the bearing
+   * @return bearing in decimal degrees
+   * @see <a href="http://turfjs.org/docs/#bearing">Turf Bearing documentation</a>
+   */
+  static double bearing(@NonNull LatLng latLng1, @NonNull LatLng latLng2) {
+
+    double lon1 = degreesToRadians(latLng1.getLongitude());
+    double lon2 = degreesToRadians(latLng2.getLongitude());
+    double lat1 = degreesToRadians(latLng1.getLatitude());
+    double lat2 = degreesToRadians(latLng2.getLatitude());
+
+    double value1 = Math.sin(lon2 - lon1) * Math.cos(lat2);
+    double value2 = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1)
+      * Math.cos(lat2) * Math.cos(lon2 - lon1);
+
+    return radiansToDegrees(Math.atan2(value1, value2));
+  }
+
+  /**
+   * Converts an angle in degrees to radians.
+   *
+   * @param degrees angle between 0 and 360 degrees
+   * @return angle in radians
+   */
+  static double degreesToRadians(double degrees) {
+    double radians = degrees % 360;
+    return radians * Math.PI / 180;
+  }
+
+  /**
+   * Converts an angle in radians to degrees.
+   *
+   * @param radians angle in radians
+   * @return degrees between 0 and 360 degrees
+   */
+  static double radiansToDegrees(double radians) {
+    double degrees = radians % (2 * Math.PI);
+    return degrees * 180 / Math.PI;
+  }
+
+  /**
+   * Get the absolute distance, in degrees, between the west and
+   * east boundaries of this LatLngBounds
+   *
+   * @return Span distance
+   */
+  static double getLongitudeSpan(double east, double west) {
+    double longSpan = Math.abs(east - west);
+    if (east > west) {
+      return longSpan;
+    }
+
+    // shortest span contains antimeridian
+    return GeometryConstants.LONGITUDE_SPAN - longSpan;
   }
 
   /**
@@ -120,7 +245,8 @@ public class Projection {
    * @param location A LatLng on the map to convert to a screen location.
    * @return A Point representing the screen location in screen pixels.
    */
-  public PointF toScreenLocation(LatLng location) {
+  @NonNull
+  public PointF toScreenLocation(@NonNull LatLng location) {
     return nativeMapView.pixelForLatLng(location);
   }
 

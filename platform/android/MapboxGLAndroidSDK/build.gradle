@@ -1,20 +1,23 @@
 apply plugin: 'com.android.library'
+apply plugin: "com.jaredsburrows.license"
+apply plugin: 'kotlin-android'
 
 dependencies {
-    api dependenciesList.mapboxAndroidTelemetry
+    lintChecks project(":MapboxGLAndroidSDKLint")
+    api(dependenciesList.mapboxAndroidTelemetry) {
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+    }
     api dependenciesList.mapboxJavaGeoJSON
+    api dependenciesList.mapboxAndroidGestures
+    implementation dependenciesList.mapboxJavaTurf
+    implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportAnnotations
     implementation dependenciesList.supportFragmentV4
-    implementation dependenciesList.timber
     implementation dependenciesList.okhttp3
-    compileOnly(dependenciesList.lost) {
-        exclude group: 'com.google.guava'
-        exclude group: 'com.android.support'
-    }
-    testImplementation dependenciesList.lost
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
     testImplementation dependenciesList.robolectric
+    testImplementation dependenciesList.kotlinLib
 }
 
 android {
@@ -25,8 +28,10 @@ android {
         minSdkVersion androidVersions.minSdkVersion
         targetSdkVersion androidVersions.targetSdkVersion
         buildConfigField "String", "GIT_REVISION_SHORT", String.format("\"%s\"", getGitRevision())
+        buildConfigField "String", "MAPBOX_SDK_IDENTIFIER", String.format("\"%s\"", "mapbox-maps-android")
+        buildConfigField "String", "MAPBOX_SDK_VERSION", String.format("\"%s\"", project.VERSION_NAME)
         buildConfigField "String", "MAPBOX_VERSION_STRING", String.format("\"Mapbox/%s\"", project.VERSION_NAME)
-        buildConfigField "String", "MAPBOX_EVENTS_USER_AGENT", String.format("\"MapboxEventsAndroid/%s\"", project.VERSION_NAME)
+        buildConfigField "String", "MAPBOX_EVENTS_USER_AGENT", String.format("\"mapbox-maps-android/%s\"", project.VERSION_NAME)
     }
 
     defaultPublishConfig project.hasProperty("mapbox.buildtype") ? project.getProperty("mapbox.buildtype") : "debug"
@@ -55,12 +60,18 @@ android {
         }
     }
 
+    // Allow determining the C++ STL we're using when building Mapbox GL.
+    def stl = 'c++_static'
+    if (project.hasProperty("mapbox.stl")) {
+        stl = project.getProperty("mapbox.stl")
+    }
+
     defaultConfig {
         if (abi != 'none') {
             externalNativeBuild {
                 cmake {
                     arguments "-DANDROID_TOOLCHAIN=clang"
-                    arguments "-DANDROID_STL=c++_static"
+                    arguments "-DANDROID_STL=" + stl
                     arguments "-DANDROID_CPP_FEATURES=rtti;exceptions"
                     arguments "-DMBGL_PLATFORM=android"
                     arguments "-DMASON_PLATFORM=android"
@@ -89,7 +100,7 @@ android {
                     if (abi != 'all') {
                         abiFilters abi.split(' ')
                     } else {
-                        abiFilters "armeabi", "armeabi-v7a", "mips", "x86", "arm64-v8a", "x86_64"
+                        abiFilters "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
                     }
                 }
             }
@@ -107,13 +118,8 @@ android {
         main.res.srcDirs += 'src/main/res-public'
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
     lintOptions {
-        disable 'MissingTranslation', 'TypographyQuotes', 'ObsoleteLintCustomCheck', 'MissingPermission'
+        disable 'MissingTranslation', 'TypographyQuotes', 'ObsoleteLintCustomCheck', 'MissingPermission', 'WrongThreadInterprocedural'
         checkAllWarnings true
         warningsAsErrors false
     }
@@ -121,6 +127,7 @@ android {
     testOptions {
         unitTests {
             returnDefaultValues true
+            includeAndroidResources = true
         }
     }
 
@@ -129,6 +136,13 @@ android {
             jniDebuggable true
         }
     }
+}
+
+licenseReport {
+    generateHtmlReport = false
+    generateJsonReport = true
+    copyHtmlReportToAssets = false
+    copyJsonReportToAssets = false
 }
 
 def static getGitRevision() {
@@ -147,3 +161,4 @@ apply from: "${rootDir}/gradle/gradle-javadoc.gradle"
 apply from: "${rootDir}/gradle/gradle-publish.gradle"
 apply from: "${rootDir}/gradle/gradle-checkstyle.gradle"
 apply from: "${rootDir}/gradle/gradle-tests-staticblockremover.gradle"
+apply from: "${rootDir}/gradle/gradle-dependencies-graph.gradle"

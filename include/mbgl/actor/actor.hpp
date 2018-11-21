@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/actor/aspiring_actor.hpp>
+#include <mbgl/actor/established_actor.hpp>
 #include <mbgl/actor/mailbox.hpp>
 #include <mbgl/actor/message.hpp>
 #include <mbgl/actor/actor_ref.hpp>
@@ -8,6 +10,7 @@
 #include <memory>
 #include <future>
 #include <type_traits>
+#include <cassert>
 
 namespace mbgl {
 
@@ -34,65 +37,33 @@ namespace mbgl {
     the lifetime of the owning Actor, and sending a message to a `Ref` whose `Actor` has died is
     a no-op. (In the future, a dead-letters queue or log may be implemented.)
 
-    Construction and destruction of an actor is currently synchronous: the corresponding `O`
+    Construction and destruction of an Actor is synchronous: the corresponding `O`
     object is constructed synchronously by the `Actor` constructor, and destructed synchronously
     by the `~Actor` destructor, after ensuring that the `O` is not currently receiving an
-    asynchronous message. (Construction and destruction may change to be asynchronous in the
-    future.) The constructor of `O` is passed an `ActorRef<O>` referring to itself (which it
-    can use to self-send messages), followed by the forwarded arguments passed to `Actor<O>`.
+    asynchronous message. The constructor of `O` is passed an `ActorRef<O>` referring to itself
+    (which it can use to self-send messages), followed by the forwarded arguments passed to
+    `Actor<O>`.  Asynchronous object construction can be accomplished by directly using the
+    lower-level types, `AspiringActor<O>` and `EstablishedActor<O>`.
 
     Please don't send messages that contain shared pointers or references. That subverts the
     purpose of the actor model: prohibiting direct concurrent access to shared state.
 */
-
 template <class Object>
-class Actor : public util::noncopyable {
+class Actor {
 public:
+    template <class... Args>
+    Actor(Scheduler& scheduler, Args&&... args)
+        : target(scheduler, parent, std::forward<Args>(args)...) {}
 
-    // Enabled for Objects with a constructor taking ActorRef<Object> as the first parameter
-    template <typename U = Object, class... Args, typename std::enable_if<std::is_constructible<U, ActorRef<U>, Args...>::value>::type * = nullptr>
-    Actor(Scheduler& scheduler, Args&&... args_)
-            : mailbox(std::make_shared<Mailbox>(scheduler)),
-              object(self(), std::forward<Args>(args_)...) {
-    }
-
-    // Enabled for plain Objects
-    template<typename U = Object, class... Args, typename std::enable_if<!std::is_constructible<U, ActorRef<U>, Args...>::value>::type * = nullptr>
-    Actor(Scheduler& scheduler, Args&& ... args_)
-            : mailbox(std::make_shared<Mailbox>(scheduler)), object(std::forward<Args>(args_)...) {
-    }
-
-    ~Actor() {
-        mailbox->close();
-    }
-
-    template <typename Fn, class... Args>
-    void invoke(Fn fn, Args&&... args) {
-        mailbox->push(actor::makeMessage(object, fn, std::forward<Args>(args)...));
-    }
-
-    template <typename Fn, class... Args>
-    auto ask(Fn fn, Args&&... args) {
-        // Result type is deduced from the function's return type
-        using ResultType = typename std::result_of<decltype(fn)(Object, Args...)>::type;
-
-        std::promise<ResultType> promise;
-        auto future = promise.get_future();
-        mailbox->push(actor::makeMessage(std::move(promise), object, fn, std::forward<Args>(args)...));
-        return future;
-    }
+    Actor(const Actor&) = delete;
 
     ActorRef<std::decay_t<Object>> self() {
-        return ActorRef<std::decay_t<Object>>(object, mailbox);
-    }
-
-    operator ActorRef<std::decay_t<Object>>() {
-        return self();
+        return parent.self();
     }
 
 private:
-    std::shared_ptr<Mailbox> mailbox;
-    Object object;
+    AspiringActor<Object> parent;
+    EstablishedActor<Object> target;
 };
 
 } // namespace mbgl

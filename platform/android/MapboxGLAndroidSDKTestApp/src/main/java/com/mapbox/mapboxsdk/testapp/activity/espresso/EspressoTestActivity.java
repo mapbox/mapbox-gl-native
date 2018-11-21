@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.activity.espresso;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -19,7 +20,7 @@ public class EspressoTestActivity extends AppCompatActivity implements OnMapRead
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_camera_test);
+    setContentView(R.layout.activity_espresso_test);
 
     // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
@@ -28,7 +29,7 @@ public class EspressoTestActivity extends AppCompatActivity implements OnMapRead
   }
 
   @Override
-  public void onMapReady(MapboxMap map) {
+  public void onMapReady(@NonNull MapboxMap map) {
     mapboxMap = map;
   }
 

@@ -1,6 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.activity.imagegenerator;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +17,8 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.Locale;
+
+import timber.log.Timber;
 
 /**
  * Test activity showcasing the Snapshot API to create and display a bitmap of the current shown Map.
@@ -35,7 +39,7 @@ public class SnapshotActivity extends AppCompatActivity implements OnMapReadyCal
   }
 
   @Override
-  public void onMapReady(MapboxMap map) {
+  public void onMapReady(@NonNull MapboxMap map) {
     mapboxMap = map;
     mapboxMap.setStyleUrl(Style.OUTDOORS);
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -75,6 +79,12 @@ public class SnapshotActivity extends AppCompatActivity implements OnMapReadyCal
   @Override
   protected void onPause() {
     super.onPause();
+    mapboxMap.snapshot(new MapboxMap.SnapshotReadyCallback() {
+      @Override
+      public void onSnapshotReady(Bitmap snapshot) {
+        Timber.e("Regression test for https://github.com/mapbox/mapbox-gl-native/pull/11358");
+      }
+    });
     mapView.onPause();
   }
 

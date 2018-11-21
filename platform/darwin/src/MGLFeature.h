@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  The `MGLFeature` protocol is used to provide details about geographic features
- contained in an `MGLShapeSource` or `MGLVectorSource` object. Each concrete
+ contained in an `MGLShapeSource` or `MGLVectorTileSource` object. Each concrete
  subclass of `MGLShape` in turn has a subclass that conforms to this protocol. A
  feature object associates a shape with an optional identifier and attributes.
 
@@ -23,8 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
  In addition to adding data to the map, you can also extract data from the map:
  `-[MGLMapView visibleFeaturesAtPoint:]` and related methods return feature
  objects that correspond to features in the source. This enables you to inspect
- the properties of features in vector tiles loaded by `MGLVectorSource` objects.
- You also reuse these feature objects as overlay annotations.
+ the properties of features in vector tiles loaded by `MGLVectorTileSource`
+ objects. You also reuse these feature objects as overlay annotations.
 
  While it is possible to add `MGLFeature`-conforming objects to the map as
  annotations using `-[MGLMapView addAnnotations:]` and related methods, doing so
@@ -43,12 +43,12 @@ NS_ASSUME_NONNULL_BEGIN
  source.
 
  You can configure an `MGLVectorStyleLayer` object to include or exclude a
- specific feature in an `MGLShapeSource` or `MGLVectorSource`. In the
+ specific feature in an `MGLShapeSource` or `MGLVectorTileSource`. In the
  `MGLVectorStyleLayer.predicate` property, compare the special `$id` attribute
  to the feature’s identifier.
 
- In vector tiles loaded by `MGLVectorSource` objects, the identifier corresponds
- to the
+ In vector tiles loaded by `MGLVectorTileSource` objects, the identifier
+ corresponds to the
  <a href="https://github.com/mapbox/vector-tile-spec/tree/master/2.1#42-features">feature identifier</a>
  (`id`). If the source does not specify the feature’s identifier, the value of
  this property is `nil`. If specified, the identifier may be an integer,
@@ -83,7 +83,7 @@ NS_ASSUME_NONNULL_BEGIN
  A dictionary of attributes for this feature.
 
  You can configure an `MGLVectorStyleLayer` object to include or exclude a
- specific feature in an `MGLShapeSource` or `MGLVectorSource`. In the
+ specific feature in an `MGLShapeSource` or `MGLVectorTileSource`. In the
  `MGLVectorStyleLayer.predicate` property, compare a key of the attribute
  dictionary to the value you want to include. For example, if you want an
  `MGLLineStyleLayer` object to display only important features, you might assign
@@ -107,7 +107,7 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLSymbolStyleLayer.textField` to an `MGLStyleValue` object containing the
  raw string value `{name}`.
 
- In vector tiles loaded by `MGLVectorSource` objects, the keys and values of
+ In vector tiles loaded by `MGLVectorTileSource` objects, the keys and values of
  each feature’s attribute dictionary are determined by the source. Each
  attribute name is a string, while each attribute value may be a null value,
  Boolean value, integer, floating-point number, or string. These data types are
@@ -148,7 +148,7 @@ NS_ASSUME_NONNULL_BEGIN
  when the feature instance is used to initialize an `MGLShapeSource` and that
  source is added to the map and styled.
  */
-@property (nonatomic, copy) NS_DICTIONARY_OF(NSString *, id) *attributes;
+@property (nonatomic, copy) NSDictionary<NSString *, id> *attributes;
 
 /**
  Returns the feature attribute for the given attribute name.
@@ -167,13 +167,26 @@ NS_ASSUME_NONNULL_BEGIN
  `attributes` property, and an `id` key corresponding to the receiver’s
  `identifier` property.
  */
-- (NS_DICTIONARY_OF(NSString *, id) *)geoJSONDictionary;
+- (NSDictionary<NSString *, id> *)geoJSONDictionary;
 
+@end
+
+/**
+ An `MGLEmptyFeature` object associates an empty shape with an optional
+ identifier and attributes.
+ */
+MGL_EXPORT
+@interface MGLEmptyFeature : MGLShape <MGLFeature>
 @end
 
 /**
  An `MGLPointFeature` object associates a point shape with an optional
  identifier and attributes.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/runtime-multiple-annotations/">
+ Dynamically style interactive points</a> example to learn how to initialize
+ `MGLPointFeature` objects and add it them your map.
  */
 MGL_EXPORT
 @interface MGLPointFeature : MGLPointAnnotation <MGLFeature>
@@ -186,6 +199,11 @@ MGL_EXPORT
  A polyline feature is known as a
  <a href="https://tools.ietf.org/html/rfc7946#section-3.1.4">LineString</a>
  feature in GeoJSON.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/line-geojson/">
+ Add a line annotation from GeoJSON</a> example to learn how to initialize an
+ `MGLPolylineFeature` and add it to an `MGLMapView` object.
  */
 MGL_EXPORT
 @interface MGLPolylineFeature : MGLPolyline <MGLFeature>
@@ -238,22 +256,28 @@ MGL_EXPORT
  An `MGLShapeCollectionFeature` object associates a shape collection with an
  optional identifier and attributes.
  
- `MGLShapeCollectionFeature` is most commonly used to add multiple shapes to a single
- `MGLShapeSource`. Configure the appearance of an `MGLSource`’s shape collection
- collectively using an `MGLSymbolStyleLayer` object, or use multiple instances of
- `MGLCircleStyleLayer`, `MGLFillStyleLayer`, and `MGLLineStyleLayer` to
- configure the appearance of each kind of shape inside the collection.
+ `MGLShapeCollectionFeature` is most commonly used to add multiple shapes to a
+ single `MGLShapeSource`. Configure the appearance of an `MGLSource`’s shape
+ collection collectively using an `MGLSymbolStyleLayer` object, or use multiple
+ instances of `MGLCircleStyleLayer`, `MGLFillStyleLayer`, and
+ `MGLLineStyleLayer` to configure the appearance of each kind of shape inside
+ the collection.
 
  A shape collection feature is known as a
  <a href="https://tools.ietf.org/html/rfc7946#section-3.3">feature collection</a>
  in GeoJSON.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/shape-collection/">
+ Add multiple shapes from a single shape source</a> example to learn how to
+ add shape data to your map using an `MGLShapeCollectionFeature` object.
  */
 MGL_EXPORT
 @interface MGLShapeCollectionFeature : MGLShapeCollection <MGLFeature>
 
-@property (nonatomic, copy, readonly) NS_ARRAY_OF(MGLShape<MGLFeature> *) *shapes;
+@property (nonatomic, copy, readonly) NSArray<MGLShape<MGLFeature> *> *shapes;
 
-+ (instancetype)shapeCollectionWithShapes:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)shapes;
++ (instancetype)shapeCollectionWithShapes:(NSArray<MGLShape<MGLFeature> *> *)shapes;
 
 @end
 

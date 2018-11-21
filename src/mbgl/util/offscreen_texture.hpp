@@ -12,10 +12,12 @@ class Texture;
 class OffscreenTexture {
 public:
     OffscreenTexture(gl::Context&,
-                     Size size = { 256, 256 });
+                     Size size = { 256, 256 },
+                     gl::TextureType type = gl::TextureType::UnsignedByte);
     OffscreenTexture(gl::Context&,
                      Size size,
-                     gl::Renderbuffer<gl::RenderbufferType::DepthComponent>&);
+                     gl::Renderbuffer<gl::RenderbufferType::DepthComponent>&,
+                     gl::TextureType type = gl::TextureType::UnsignedByte);
     ~OffscreenTexture();
     OffscreenTexture(OffscreenTexture&&);
     OffscreenTexture& operator=(OffscreenTexture&&);

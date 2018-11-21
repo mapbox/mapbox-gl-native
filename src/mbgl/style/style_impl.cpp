@@ -6,6 +6,7 @@
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
@@ -54,11 +55,6 @@ void Style::Impl::loadURL(const std::string& url_) {
     url = url_;
 
     styleRequest = fileSource.request(Resource::style(url), [this](Response res) {
-        // Once we get a fresh style, or the style is mutated, stop revalidating.
-        if (res.isFresh() || mutated) {
-            styleRequest.reset();
-        }
-
         // Don't allow a loaded, mutated style to be overwritten with a new version.
         if (mutated && loaded) {
             return;
@@ -96,8 +92,7 @@ void Style::Impl::parse(const std::string& json_) {
     layers.clear();
     images.clear();
 
-    transitionOptions = {};
-    transitionOptions.duration = util::DEFAULT_TRANSITION_DURATION;
+    transitionOptions = parser.transition;
 
     for (auto& source : parser.sources) {
         addSource(std::move(source));
@@ -151,28 +146,13 @@ void Style::Impl::addSource(std::unique_ptr<Source> source) {
     sources.add(std::move(source));
 }
 
-struct SourceIdUsageEvaluator {
-    const std::string& sourceId;
-
-    bool operator()(BackgroundLayer&) { return false; }
-    bool operator()(CustomLayer&) { return false; }
-
-    template <class LayerType>
-    bool operator()(LayerType& layer) {
-        return layer.getSourceID() == sourceId;
-    }
-};
-
 std::unique_ptr<Source> Style::Impl::removeSource(const std::string& id) {
     // Check if source is in use
-    SourceIdUsageEvaluator sourceIdEvaluator {id};
-    auto layerIt = std::find_if(layers.begin(), layers.end(), [&](const auto& layer) {
-        return layer->accept(sourceIdEvaluator);
-    });
-
-    if (layerIt != layers.end()) {
-        Log::Warning(Event::General, "Source '%s' is in use, cannot remove", id.c_str());
-        return nullptr;
+    for (const auto& layer: layers) {
+        if (layer->getSourceID() == id) {
+            Log::Warning(Event::General, "Source '%s' is in use, cannot remove", id.c_str());
+            return nullptr;
+        }
     }
 
     std::unique_ptr<Source> source = sources.remove(id);

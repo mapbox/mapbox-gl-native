@@ -19,18 +19,16 @@ namespace android {
         NetworkStatus::Set(connected ? NetworkStatus::Status::Online : NetworkStatus::Status::Offline);
     }
 
-    jni::Class<ConnectivityListener> ConnectivityListener::javaClass;
-
     void ConnectivityListener::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        ConnectivityListener::javaClass = *jni::Class<ConnectivityListener>::Find(env).NewGlobalRef(env).release();
+        static auto& javaClass = jni::Class<ConnectivityListener>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<ConnectivityListener>(
             env,
-            ConnectivityListener::javaClass,
+            javaClass,
             "nativePtr",
             std::make_unique<ConnectivityListener, JNIEnv&>,
             "initialize",

@@ -4,13 +4,9 @@ This document explains how to build the Mapbox Maps SDK for iOS from source. It 
 
 ## Requirements
 
-The Mapbox Maps SDK for iOS and iosapp demo application require iOS 8.0 or above.
-
-The Mapbox Maps SDK for iOS requires Xcode 9.1 or above to compile from source.
+See the "Requirements" section in [INSTALL.md](INSTALL.md).
 
 ## Building the SDK
-
-Make sure that you have the [core dependencies](../../INSTALL.md) installed.
 
 Create and open an Xcode workspace that includes both the SDK source and some Objective-C test applications by running:
 
@@ -40,14 +36,7 @@ Install [jazzy](https://github.com/realm/jazzy) for generating API documentation
 [sudo] gem install jazzy
 ```
 
-Build and package the SDK by using one of the following commands:
-
-* `make ipackage` builds both dynamic and static frameworks in the Debug configuration for devices and the iOS Simulator.
-* `make iframework` builds a dynamic framework in the Debug configuration for devices and the iOS Simulator. The CocoaPods pod downloads the output of this target.
-* `make ipackage-sim` builds a dynamic framework in the Debug configuration for the iOS simulator. This is the fastest target.
-* `make ipackage-strip` builds both dynamic and static frameworks in the Debug configuration, stripped of debug symbols, for devices and the iOS Simulator.
-
-You can customize the build output by passing the following arguments into the `make` invocation:
+Build and package the SDK by using the `make iframework` command. You can customize the build output by passing the following arguments into the `make` invocation:
 
 * `BUILDTYPE=Release` will optimize for distribution. Defaults to `Debug`.
 * `BUILD_DEVICE=false` builds only for the iOS Simulator.
@@ -76,7 +65,7 @@ To add any Objective-C type, constant, or member to the iOS SDK’s public inter
 
 To add an Objective-C class, protocol, category, typedef, enumeration, or global constant to the iOS maps SDK’s public interface:
 
-1. _(Optional.)_ Add the macro `MGL_EXPORT` prior to the declaration for classes and global constants when adding them in shared headers located in `platform/darwin`. To use this macro, include `MGLFoundation.h`. You can check whether all public symbols are exported correctly by running `make check-public-symbols`.
+1. _(Optional.)_ Add the macro `MGL_EXPORT` prior to the declaration for classes and global constants when adding them in shared headers located in `platform/darwin`. To use this macro, include `MGLFoundation.h`. You can check whether all public symbols are exported correctly by running `make darwin-check-public-symbols`.
 1. _(Optional.)_ Add the type or constant’s name to the relevant category in the `custom_categories` section of [the jazzy configuration file](./jazzy.yml). This is required for classes and protocols and also recommended for any other type that is strongly associated with a particular class or protocol. If you leave out this step, the symbol will appear in an “Other” section in the generated HTML documentation’s table of contents.
 1. _(Optional.)_ If the symbol would also be publicly exposed in the macOS maps SDK, consult [the companion macOS document](../macos/DEVELOPING.md#making-a-type-or-constant-public) for further instructions.
 
@@ -88,6 +77,7 @@ To add an Objective-C header or implementation file to the iOS maps SDK:
 1. Audit new headers for nullability. Typically, you will wrap a header with `NS_ASSUME_NONNULL_BEGIN` and `NS_ASSUME_NONNULL_END`.
 1. _(Optional.)_ If it’s a public header, change its visibility from Project to Public and import it in [the iOS SDK’s umbrella header](./src/Mapbox.h).
 1. _(Optional.)_ If the file would also be used by the macOS maps SDK, make sure it’s in [platform/darwin/src/](../darwin/src/), then consult [the companion macOS document](../macos/DEVELOPING.md#adding-a-source-code-file) for further instructions.
+1. Run `scripts/generate-cmake-files.js` to update the generated source file list for third party build systems.
 
 ### Adding a resource
 
@@ -139,6 +129,8 @@ To add an example code listing to the documentation for a class or class member:
    to [MGLDocumentationExampleTests](test/MGLDocumentationExampleTests.swift).
    Wrap the code you’d like to appear in the documentation within
    `//#-example-code` and `//#-end-example-code` comments.
+1. If the header doesn’t already have an example code listing, add the path to
+   the header to platform/darwin/scripts/update-examples.list.
 1. Insert the code listings into the headers:
 
 ```bash

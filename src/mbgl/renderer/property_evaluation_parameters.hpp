@@ -5,6 +5,13 @@
 
 namespace mbgl {
 
+class CrossfadeParameters {
+public:
+    float fromScale;
+    float toScale;
+    float t;
+};
+
 class PropertyEvaluationParameters {
 public:
     explicit PropertyEvaluationParameters(float z_)
@@ -23,6 +30,18 @@ public:
           zoomHistory(std::move(zoomHistory_)),
           defaultFadeDuration(std::move(defaultFadeDuration_)),
           useIntegerZoom(useIntegerZoom_) {}
+
+    CrossfadeParameters getCrossfadeParameters() const {
+        const float fraction = z - std::floor(z);
+        const std::chrono::duration<float> d = defaultFadeDuration;
+        const float t = d != std::chrono::duration<float>::zero()
+                ? std::min((now - zoomHistory.lastIntegerZoomTime) / d, 1.0f)
+                : 1.0f;
+
+        return z > zoomHistory.lastIntegerZoom
+            ? CrossfadeParameters { 2.0f, 1.0f, fraction + (1.0f - fraction) * t }
+            : CrossfadeParameters { 0.5f, 1.0f, 1 - (1 - t) * fraction };
+    }
 
     float z;
     TimePoint now;

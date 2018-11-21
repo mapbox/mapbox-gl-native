@@ -7,8 +7,8 @@
 
 @implementation MGLSourceQueryTests
 
-- (void) testQueryVectorSource {
-    MGLVectorSource *source = [[MGLVectorSource alloc] initWithIdentifier:@"vector" tileURLTemplates:@[@"fake"] options:nil];
+- (void) testQueryVectorTileSource {
+    MGLVectorTileSource *source = [[MGLVectorTileSource alloc] initWithIdentifier:@"vector" tileURLTemplates:@[@"fake"] options:nil];
     NSSet *sourceLayers = [NSSet setWithObjects:@"buildings", @"water", nil];
     NSArray* features = [source featuresInSourceLayersWithIdentifiers:sourceLayers predicate:nil];
     // Source not added yet, so features is 0

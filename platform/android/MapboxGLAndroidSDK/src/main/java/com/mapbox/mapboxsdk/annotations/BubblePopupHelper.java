@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.R;
 
 class BubblePopupHelper {
 
+  @NonNull
   static PopupWindow create(@NonNull Context context, @NonNull BubbleLayout bubbleLayout) {
     PopupWindow popupWindow = new PopupWindow(context);
 

@@ -1,6 +1,7 @@
 #include <mbgl/renderer/layers/render_hillshade_layer.hpp>
 #include <mbgl/renderer/buckets/hillshade_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/sources/render_raster_dem_source.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
@@ -55,36 +56,60 @@ bool RenderHillshadeLayer::hasTransition() const {
     return unevaluated.hasTransition();
 }
 
-void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
+bool RenderHillshadeLayer::hasCrossfade() const {
+    return false;
+}
+
+void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src) {
     if (parameters.pass != RenderPass::Translucent && parameters.pass != RenderPass::Pass3D)
         return;
-    
+
+    RenderRasterDEMSource* demsrc = static_cast<RenderRasterDEMSource*>(src);
+    const uint8_t TERRAIN_RGB_MAXZOOM = 15;
+    const uint8_t maxzoom = demsrc != nullptr ? demsrc->getMaxZoom() : TERRAIN_RGB_MAXZOOM;
+
     auto draw = [&] (const mat4& matrix,
                      const auto& vertexBuffer,
                      const auto& indexBuffer,
                      const auto& segments,
                      const UnwrappedTileID& id) {
-        parameters.programs.hillshade.draw(
+        auto& programInstance = parameters.programs.hillshade;
+
+        const HillshadeProgram::PaintPropertyBinders paintAttributeData{ evaluated, 0 };
+
+        const auto allUniformValues = programInstance.computeAllUniformValues(
+            HillshadeProgram::UniformValues {
+                uniforms::u_matrix::Value( matrix ),
+                uniforms::u_image::Value( 0 ),
+                uniforms::u_highlight::Value( evaluated.get<HillshadeHighlightColor>() ),
+                uniforms::u_shadow::Value( evaluated.get<HillshadeShadowColor>() ),
+                uniforms::u_accent::Value( evaluated.get<HillshadeAccentColor>() ),
+                uniforms::u_light::Value( getLight(parameters) ),
+                uniforms::u_latrange::Value( getLatRange(id) ),
+            },
+            paintAttributeData,
+            evaluated,
+            parameters.state.getZoom()
+        );
+        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
+            vertexBuffer,
+            paintAttributeData,
+            evaluated
+        );
+
+        checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
+        programInstance.draw(
             parameters.context,
             gl::Triangles(),
             parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
             gl::StencilMode::disabled(),
             parameters.colorModeForRenderPass(),
-            HillshadeProgram::UniformValues {
-                uniforms::u_matrix::Value{ matrix },
-                uniforms::u_image::Value{ 0 },
-                uniforms::u_highlight::Value{ evaluated.get<HillshadeHighlightColor>() },
-                uniforms::u_shadow::Value{ evaluated.get<HillshadeShadowColor>() },
-                uniforms::u_accent::Value{ evaluated.get<HillshadeAccentColor>() },
-                uniforms::u_light::Value{ getLight(parameters) },
-                uniforms::u_latrange::Value{ getLatRange(id) },
-            },
-            vertexBuffer,
+            gl::CullFaceMode::disabled(),
             indexBuffer,
             segments,
-            HillshadeProgram::PaintPropertyBinders { evaluated, 0 },
-            evaluated,
-            parameters.state.getZoom(),
+            allUniformValues,
+            allAttributeBindings,
             getID()
         );
     };
@@ -94,8 +119,12 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
     matrix::translate(mat, mat, 0, -util::EXTENT, 0);
 
     for (const RenderTile& tile : renderTiles) {
-        assert(dynamic_cast<HillshadeBucket*>(tile.tile.getBucket(*baseImpl)));
-        HillshadeBucket& bucket = *reinterpret_cast<HillshadeBucket*>(tile.tile.getBucket(*baseImpl));
+        auto bucket_ = tile.tile.getBucket<HillshadeBucket>(*baseImpl);
+        if (!bucket_) {
+            continue;
+        }
+        HillshadeBucket& bucket = *bucket_;
+
         if (!bucket.hasData()){
             continue;
         }
@@ -107,25 +136,41 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
             
             parameters.context.bindTexture(*bucket.dem, 0, gl::TextureFilter::Nearest, gl::TextureMipMap::No, gl::TextureWrap::Clamp, gl::TextureWrap::Clamp);
             const Properties<>::PossiblyEvaluated properties;
+            const HillshadePrepareProgram::PaintPropertyBinders paintAttributeData{ properties, 0 };
             
-            parameters.programs.hillshadePrepare.draw(
+            auto& programInstance = parameters.programs.hillshadePrepare;
+
+            const auto allUniformValues = programInstance.computeAllUniformValues(
+                HillshadePrepareProgram::UniformValues {
+                    uniforms::u_matrix::Value( mat ),
+                    uniforms::u_dimension::Value( {{uint16_t(tilesize * 2), uint16_t(tilesize * 2)}} ),
+                    uniforms::u_zoom::Value( float(tile.id.canonical.z) ),
+                    uniforms::u_maxzoom::Value( float(maxzoom) ),
+                    uniforms::u_image::Value( 0 )
+                },
+                paintAttributeData,
+                properties,
+                parameters.state.getZoom()
+            );
+            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
+                parameters.staticData.rasterVertexBuffer,
+                paintAttributeData,
+                properties
+            );
+
+            checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
+            programInstance.draw(
                 parameters.context,
                 gl::Triangles(),
                 parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
-                HillshadePrepareProgram::UniformValues {
-                    uniforms::u_matrix::Value { mat },
-                    uniforms::u_dimension::Value { {{uint16_t(tilesize * 2), uint16_t(tilesize * 2) }} },
-                    uniforms::u_zoom::Value{ float(tile.id.canonical.z) },
-                    uniforms::u_image::Value{ 0 }
-                },
-                parameters.staticData.rasterVertexBuffer,
+                gl::CullFaceMode::disabled(),
                 parameters.staticData.quadTriangleIndexBuffer,
                 parameters.staticData.rasterSegments,
-                HillshadePrepareProgram::PaintPropertyBinders { properties, 0 },
-                properties,
-                parameters.state.getZoom(),
+                allUniformValues,
+                allAttributeBindings,
                 getID()
             );
             bucket.texture = std::move(view.getTexture());

@@ -1,5 +1,9 @@
 #import "NSString+MGLAdditions.h"
 
+#if TARGET_OS_OSX
+    #import <Availability.h>
+#endif
+
 @implementation NSString (MGLAdditions)
 
 - (NSRange)mgl_wholeRange {
@@ -13,14 +17,9 @@
 - (NSString *)mgl_titleCasedStringWithLocale:(NSLocale *)locale {
     NSMutableString *string = self.mutableCopy;
     NSOrthography *orthography;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunguarded-availability-new"
-    if ([NSOrthography respondsToSelector:@selector(defaultOrthographyForLanguage:)]) {
+    if (@available(iOS 11.0, macOS 10.13.0, *)) {
         orthography = [NSOrthography defaultOrthographyForLanguage:locale.localeIdentifier];
     }
-#pragma clang diagnostic pop
-#endif
     [string enumerateLinguisticTagsInRange:string.mgl_wholeRange scheme:NSLinguisticTagSchemeLexicalClass options:0 orthography:orthography usingBlock:^(NSString * _Nonnull tag, NSRange tokenRange, NSRange sentenceRange, BOOL * _Nonnull stop) {
         NSString *word = [string substringWithRange:tokenRange];
         if (word.length > 3
@@ -42,22 +41,18 @@
 }
 
 - (NSString *)mgl_stringByTransliteratingIntoScript:(NSString *)script {
-    if (@available(iOS 9.0, *)) {
-        NSMutableString *string = self.mutableCopy;
-        NSStringTransform transform;
-        if ([script isEqualToString:@"Latn"]) {
-            transform = NSStringTransformToLatin;
-        } else if ([script isEqualToString:@"Hans"]) {
-            // No transform available.
-        } else if ([script isEqualToString:@"Cyrl"]) {
-            transform = @"Any-Latin; Latin-Cyrillic";
-        } else if ([script isEqualToString:@"Arab"]) {
-            transform = @"Any-Latin; Latin-Arabic";
-        }
-        return transform ? [string stringByApplyingTransform:transform reverse:NO] : string;
-    } else {
-        return self;
+    NSMutableString *string = self.mutableCopy;
+    NSStringTransform transform;
+    if ([script isEqualToString:@"Latn"]) {
+        transform = NSStringTransformToLatin;
+    } else if ([script isEqualToString:@"Hans"]) {
+        // No transform available.
+    } else if ([script isEqualToString:@"Cyrl"]) {
+        transform = @"Any-Latin; Latin-Cyrillic";
+    } else if ([script isEqualToString:@"Arab"]) {
+        transform = @"Any-Latin; Latin-Arabic";
     }
+    return transform ? [string stringByApplyingTransform:transform reverse:NO] : string;
 }
 
 @end

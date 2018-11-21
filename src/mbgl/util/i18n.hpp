@@ -72,6 +72,10 @@ std::u16string verticalizePunctuation(const std::u16string& input);
 
     @return The character’s specialized vertical form; 0 if not applicable. */
 char16_t verticalizePunctuation(char16_t chr);
+    
+bool isStringInSupportedScript(const std::string& input);
+
+bool isWhitespace(char16_t chr);
 
 } // namespace i18n
 } // namespace util

@@ -5,7 +5,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/data_driven_property_value.hpp>
+#include <mbgl/style/expression/formatted.hpp>
 
 #include <mbgl/util/color.hpp>
 
@@ -19,15 +19,9 @@ public:
     RasterLayer(const std::string& layerID, const std::string& sourceID);
     ~RasterLayer() final;
 
-    // Source
-    const std::string& getSourceID() const;
-
-    // Visibility
-    void setVisibility(VisibilityType) final;
-
-    // Zoom range
-    void setMinZoom(float) final;
-    void setMaxZoom(float) final;
+    // Dynamic properties
+    optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
+    optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
 
     // Paint properties
 
@@ -67,6 +61,12 @@ public:
     void setRasterContrastTransition(const TransitionOptions&);
     TransitionOptions getRasterContrastTransition() const;
 
+    static PropertyValue<RasterResamplingType> getDefaultRasterResampling();
+    PropertyValue<RasterResamplingType> getRasterResampling() const;
+    void setRasterResampling(PropertyValue<RasterResamplingType>);
+    void setRasterResamplingTransition(const TransitionOptions&);
+    TransitionOptions getRasterResamplingTransition() const;
+
     static PropertyValue<float> getDefaultRasterFadeDuration();
     PropertyValue<float> getRasterFadeDuration() const;
     void setRasterFadeDuration(PropertyValue<float>);
@@ -81,12 +81,20 @@ public:
     Mutable<Impl> mutableImpl() const;
     RasterLayer(Immutable<Impl>);
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
+
+protected:
+    Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
-template <>
-inline bool Layer::is<RasterLayer>() const {
-    return getType() == LayerType::Raster;
-}
+class RasterLayerFactory : public LayerFactory {
+public:
+    RasterLayerFactory();
+    ~RasterLayerFactory() override;
+
+    // LayerFactory overrides.
+    const LayerTypeInfo* getTypeInfo() const noexcept final;
+    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
+};
 
 } // namespace style
 } // namespace mbgl

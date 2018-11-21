@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.offline;
 
+import android.support.annotation.Keep;
+
 /**
  * A region's status includes its active/inactive state as well as counts
  * of the number of resources that have completed downloading, their total
@@ -61,6 +63,7 @@ public class OfflineRegionStatus {
    *
    * For JNI use only
    */
+  @Keep
   private OfflineRegionStatus(int downloadState, long completedResourceCount,
                               long completedResourceSize, long completedTileCount,
                               long completedTileSize, long requiredResourceCount,

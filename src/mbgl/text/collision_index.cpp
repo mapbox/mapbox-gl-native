@@ -62,6 +62,21 @@ bool CollisionIndex::isOffscreen(const CollisionBox& box) const {
 bool CollisionIndex::isInsideGrid(const CollisionBox& box) const {
     return box.px2 >= 0 && box.px1 < gridRightBoundary && box.py2 >= 0 && box.py1 < gridBottomBoundary;
 }
+    
+CollisionTileBoundaries CollisionIndex::projectTileBoundaries(const mat4& posMatrix) const {
+    Point<float> topLeft = projectPoint(posMatrix, { 0, 0 });
+    Point<float> bottomRight = projectPoint(posMatrix, { util::EXTENT, util::EXTENT });
+
+    return {{ topLeft.x, topLeft.y, bottomRight.x, bottomRight.y }};
+    
+}
+
+bool CollisionIndex::isInsideTile(const CollisionBox& box, const CollisionTileBoundaries& tileBoundaries) const {
+    // This check is only well defined when the tile boundaries are axis-aligned
+    // We are relying on it only being used in MapMode::Tile, where that is always the case
+
+    return box.px1 >= tileBoundaries[0] && box.py1 >= tileBoundaries[1] && box.px2 < tileBoundaries[2] && box.py2 < tileBoundaries[3];
+}
 
 
 std::pair<bool,bool> CollisionIndex::placeFeature(CollisionFeature& feature,
@@ -73,7 +88,9 @@ std::pair<bool,bool> CollisionIndex::placeFeature(CollisionFeature& feature,
                                       const float fontSize,
                                       const bool allowOverlap,
                                       const bool pitchWithMap,
-                                      const bool collisionDebug) {
+                                      const bool collisionDebug,
+                                      const optional<CollisionTileBoundaries>& avoidEdges,
+                                      const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate) {
     if (!feature.alongLine) {
         CollisionBox& box = feature.boxes.front();
         const auto projectedPoint = projectAndGetPerspectiveRatio(posMatrix, box.anchor);
@@ -82,15 +99,17 @@ std::pair<bool,bool> CollisionIndex::placeFeature(CollisionFeature& feature,
         box.py1 = box.y1 * tileToViewport + projectedPoint.first.y;
         box.px2 = box.x2 * tileToViewport + projectedPoint.first.x;
         box.py2 = box.y2 * tileToViewport + projectedPoint.first.y;
+    
 
-        if (!isInsideGrid(box) ||
-            (!allowOverlap && collisionGrid.hitTest({{ box.px1, box.py1 }, { box.px2, box.py2 }}))) {
+        if ((avoidEdges && !isInsideTile(box, *avoidEdges)) ||
+            !isInsideGrid(box) ||
+            (!allowOverlap && collisionGrid.hitTest({{ box.px1, box.py1 }, { box.px2, box.py2 }}, collisionGroupPredicate))) {
             return { false, false };
         }
 
         return {true, isOffscreen(box)};
     } else {
-        return placeLineFeature(feature, posMatrix, labelPlaneMatrix, textPixelRatio, symbol, scale, fontSize, allowOverlap, pitchWithMap, collisionDebug);
+        return placeLineFeature(feature, posMatrix, labelPlaneMatrix, textPixelRatio, symbol, scale, fontSize, allowOverlap, pitchWithMap, collisionDebug, avoidEdges, collisionGroupPredicate);
     }
 }
 
@@ -103,7 +122,9 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
                                       const float fontSize,
                                       const bool allowOverlap,
                                       const bool pitchWithMap,
-                                      const bool collisionDebug) {
+                                      const bool collisionDebug,
+                                      const optional<CollisionTileBoundaries>& avoidEdges,
+                                      const optional<std::function<bool(const IndexedSubfeature&)>> collisionGroupPredicate) {
 
     const auto tileUnitAnchorPoint = symbol.anchorPoint;
     const auto projectedAnchor = projectAnchor(posMatrix, tileUnitAnchorPoint);
@@ -202,15 +223,14 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
         entirelyOffscreen &= isOffscreen(circle);
         inGrid |= isInsideGrid(circle);
 
-        if (!allowOverlap) {
-            if (collisionGrid.hitTest({{circle.px, circle.py}, circle.radius})) {
-                if (!collisionDebug) {
-                    return {false, false};
-                } else {
-                    // Don't early exit if we're showing the debug circles because we still want to calculate
-                    // which circles are in use
-                    collisionDetected = true;
-                }
+        if ((avoidEdges && !isInsideTile(circle, *avoidEdges)) ||
+            (!allowOverlap && collisionGrid.hitTest({{circle.px, circle.py}, circle.radius}, collisionGroupPredicate))) {
+            if (!collisionDebug) {
+                return {false, false};
+            } else {
+                // Don't early exit if we're showing the debug circles because we still want to calculate
+                // which circles are in use
+                collisionDetected = true;
             }
         }
     }
@@ -219,7 +239,7 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
 }
 
 
-void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlacement) {
+void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlacement, uint32_t bucketInstanceId, uint16_t collisionGroupId) {
     if (feature.alongLine) {
         for (auto& circle : feature.boxes) {
             if (!circle.used) {
@@ -227,18 +247,30 @@ void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlaceme
             }
 
             if (ignorePlacement) {
-                ignoredGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ circle.px, circle.py }, circle.radius});
+                ignoredGrid.insert(
+                    IndexedSubfeature(feature.indexedFeature, bucketInstanceId, collisionGroupId),
+                    {{ circle.px, circle.py }, circle.radius}
+                );
             } else {
-                collisionGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ circle.px, circle.py }, circle.radius});
+                collisionGrid.insert(
+                    IndexedSubfeature(feature.indexedFeature, bucketInstanceId, collisionGroupId),
+                    {{ circle.px, circle.py }, circle.radius}
+                );
             }
         }
     } else {
         assert(feature.boxes.size() == 1);
         auto& box = feature.boxes[0];
         if (ignorePlacement) {
-            ignoredGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ box.px1, box.py1 }, { box.px2, box.py2 }});
+            ignoredGrid.insert(
+                IndexedSubfeature(feature.indexedFeature, bucketInstanceId, collisionGroupId),
+                {{ box.px1, box.py1 }, { box.px2, box.py2 }}
+            );
         } else {
-            collisionGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ box.px1, box.py1 }, { box.px2, box.py2 }});
+            collisionGrid.insert(
+                IndexedSubfeature(feature.indexedFeature, bucketInstanceId, collisionGroupId),
+                {{ box.px1, box.py1 }, { box.px2, box.py2 }}
+            );
         }
     }
 }
@@ -262,66 +294,41 @@ bool polygonIntersectsBox(const LineString<float>& polygon, const GridIndex<Inde
     return util::polygonIntersectsPolygon(integerPolygon, bboxPoints);
 }
 
-std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, const UnwrappedTileID& tileID, const std::string& sourceID) const {
-    std::vector<IndexedSubfeature> result;
+std::unordered_map<uint32_t, std::vector<IndexedSubfeature>> CollisionIndex::queryRenderedSymbols(const ScreenLineString& queryGeometry) const {
+    std::unordered_map<uint32_t, std::vector<IndexedSubfeature>> result;
     if (queryGeometry.empty() || (collisionGrid.empty() && ignoredGrid.empty())) {
         return result;
     }
-    
-    mat4 posMatrix;
-    mat4 projMatrix;
-    transformState.getProjMatrix(projMatrix);
-    transformState.matrixFor(posMatrix, tileID);
-    matrix::multiply(posMatrix, projMatrix, posMatrix);
 
-    // queryGeometry is specified in integer tile units, but in projecting we switch to float pixels
-    LineString<float> projectedQuery;
+    LineString<float> gridQuery;
     for (const auto& point : queryGeometry) {
-        auto projected = projectPoint(posMatrix, convertPoint<float>(point));
-        projectedQuery.push_back(projected);
+        gridQuery.emplace_back(point.x + viewportPadding, point.y + viewportPadding);
     }
     
-    auto envelope = mapbox::geometry::envelope(projectedQuery);
+    auto envelope = mapbox::geometry::envelope(gridQuery);
     
     using QueryResult = std::pair<IndexedSubfeature, GridIndex<IndexedSubfeature>::BBox>;
     
-    std::vector<QueryResult> thisTileFeatures;
     std::vector<QueryResult> features = collisionGrid.queryWithBoxes(envelope);
-
-    for (auto& queryResult : features) {
-        auto& feature = queryResult.first;
-        if (feature.sourceID == sourceID && feature.tileID == tileID.canonical) {
-            // We only have to filter on the canonical ID because even if the feature is showing multiple times
-            // we treat it as one feature.
-            thisTileFeatures.push_back(queryResult);
-        }
-    }
-    
     std::vector<QueryResult> ignoredFeatures = ignoredGrid.queryWithBoxes(envelope);
-    for (auto& queryResult : ignoredFeatures) {
-        auto& feature = queryResult.first;
-        if (feature.sourceID == sourceID && feature.tileID == tileID.canonical) {
-            thisTileFeatures.push_back(queryResult);
-        }
-    }
+    features.insert(features.end(), ignoredFeatures.begin(), ignoredFeatures.end());
 
-    std::unordered_map<std::string, std::unordered_map<std::string, std::unordered_set<std::size_t>>> sourceLayerFeatures;
-    for (auto& queryResult : thisTileFeatures) {
+    std::unordered_map<uint32_t, std::unordered_set<size_t>> seenBuckets;
+   for (auto& queryResult : features) {
         auto& feature = queryResult.first;
         auto& bbox = queryResult.second;
 
         // Skip already seen features.
-        auto& seenFeatures = sourceLayerFeatures[feature.sourceLayerName][feature.bucketName];
+        auto& seenFeatures = seenBuckets[feature.bucketInstanceId];
         if (seenFeatures.find(feature.index) != seenFeatures.end())
             continue;
-
-        seenFeatures.insert(feature.index);
         
-        if (!polygonIntersectsBox(projectedQuery, bbox)) {
+        if (!polygonIntersectsBox(gridQuery, bbox)) {
             continue;
         }
 
-        result.push_back(feature);
+        seenFeatures.insert(feature.index);
+        result[feature.bucketInstanceId].push_back(feature);
     }
 
     return result;

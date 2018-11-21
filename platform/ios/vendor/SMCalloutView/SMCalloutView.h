@@ -114,6 +114,18 @@ extern NSTimeInterval const kMGLSMCalloutViewRepositionDelayForUIScrollView;
 - (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToView:(UIView *)constrainedView animated:(BOOL)animated;
 
 /**
+ @brief Presents a callout view by adding it to "inView" and pointing at the given rect of inView's bounds.
+
+ @discussion Constrains the callout to the rect (in the space of the given view).
+
+ @param rect @c CGRect to present the view from
+ @param view view to 'constrain' the @c constrainedView to
+ @param constrainedRect Rect to constrain the callout to
+ @param animated @c BOOL if presentation should be animated
+ */
+- (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToRect:(CGRect)constrainedRect animated:(BOOL)animated;
+
+/**
  @brief Present a callout layer in the `layer` and pointing at the given rect of the `layer` bounds
  
  @discussion Same as the view-based presentation, but inserts the callout into a CALayer hierarchy instead.

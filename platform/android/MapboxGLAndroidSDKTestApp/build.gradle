@@ -8,7 +8,7 @@ android {
         applicationId "com.mapbox.mapboxsdk.testapp"
         minSdkVersion androidVersions.minSdkVersion
         targetSdkVersion androidVersions.targetSdkVersion
-        versionCode 12
+        versionCode 13
         versionName "6.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -34,13 +34,16 @@ android {
 
     buildTypes {
         debug {
-            testCoverageEnabled = true
+            testCoverageEnabled true
             minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
     }
 
@@ -52,18 +55,18 @@ android {
 }
 
 dependencies {
-    implementation(project(':MapboxGLAndroidSDK'))
-    implementation(dependenciesList.mapboxJavaServices) {
-        transitive = true
-    }
+    implementation dependenciesList.kotlinLib
 
-    api dependenciesList.mapboxJavaTurf
+    implementation(project(':MapboxGLAndroidSDK'))
+    implementation(dependenciesList.mapboxJavaTurf)
 
     implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportRecyclerView
     implementation dependenciesList.supportDesign
+    implementation dependenciesList.supportConstraintLayout
 
-    implementation dependenciesList.lost
+    // implementation dependenciesList.lost
+    implementation dependenciesList.gmsLocation
     implementation dependenciesList.timber
     debugImplementation dependenciesList.leakCanaryDebug
     releaseImplementation dependenciesList.leakCanaryRelease
@@ -73,6 +76,7 @@ dependencies {
     androidTestImplementation dependenciesList.testRules
     androidTestImplementation dependenciesList.testEspressoCore
     androidTestImplementation dependenciesList.testEspressoIntents
+    androidTestImplementation dependenciesList.testEspressoContrib
 }
 
 apply from: "${rootDir}/gradle/gradle-make.gradle"
@@ -81,3 +85,6 @@ apply from: "${rootDir}/gradle/gradle-checkstyle.gradle"
 apply from: "${rootDir}/gradle/gradle-lint.gradle"
 
 
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'

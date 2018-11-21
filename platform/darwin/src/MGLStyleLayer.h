@@ -5,6 +5,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLInvalidStyleLayerException;
+
 /**
  `MGLStyleLayer` is an abstract base class for style layers. A style layer
  manages the layout and appearance of content at a specific z-index in a style.
@@ -41,6 +43,11 @@ MGL_EXPORT
 
 /**
  Whether this layer is displayed. A value of `NO` hides the layer.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/runtime-toggle-layer/">
+ Show and hide a layer</a> example to learn how to toggle an `MGLStyleLayer`
+ object's visibility.
  */
 @property (nonatomic, assign, getter=isVisible) BOOL visible;
 

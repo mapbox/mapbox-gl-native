@@ -37,6 +37,7 @@ which it is added.
 
 #pragma mark - Accessing the Paint Attributes
 
+#if TARGET_OS_IPHONE
 /**
  The color with which the background will be drawn.
  
@@ -59,6 +60,30 @@ which it is added.
  feature attributes.
  */
 @property (nonatomic, null_resettable) NSExpression *backgroundColor;
+#else
+/**
+ The color with which the background will be drawn.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ This property is only applied to the style if `backgroundPattern` is set to
+ `nil`. Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *backgroundColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `backgroundColor` property.
@@ -75,7 +100,7 @@ which it is added.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values between 0 and 1 inclusive
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables

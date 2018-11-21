@@ -13,10 +13,46 @@
 #import "NSDictionary+MGLAdditions.h"
 #import "NSArray+MGLAdditions.h"
 #import "NSExpression+MGLPrivateAdditions.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #import <mbgl/util/geometry.hpp>
 #import <mbgl/style/conversion/geojson.hpp>
-#import <mapbox/geometry/feature.hpp>
+#import <mapbox/feature.hpp>
+
+@interface MGLEmptyFeature ()
+@end
+
+@implementation MGLEmptyFeature
+
+@synthesize identifier;
+@synthesize attributes;
+
+MGL_DEFINE_FEATURE_INIT_WITH_CODER();
+MGL_DEFINE_FEATURE_ENCODE();
+MGL_DEFINE_FEATURE_IS_EQUAL();
+
+- (id)attributeForKey:(NSString *)key {
+    MGLLogDebug(@"Retrieving attributeForKey: %@", key);
+    return self.attributes[key];
+}
+
+- (NSDictionary *)geoJSONDictionary {
+    return NSDictionaryFeatureForGeometry([super geoJSONDictionary], self.attributes, self.identifier);
+}
+
+- (mbgl::GeoJSON)geoJSONObject {
+    return mbglFeature({[self geometryObject]}, identifier, self.attributes);
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; identifier = %@, attributes = %@>",
+            NSStringFromClass([self class]), (void *)self,
+            self.identifier ? [NSString stringWithFormat:@"\"%@\"", self.identifier] : self.identifier,
+            self.attributes.count ? self.attributes : @"none"];
+}
+
+@end
 
 @interface MGLPointFeature ()
 @end
@@ -31,6 +67,7 @@ MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
 
 - (id)attributeForKey:(NSString *)key {
+    MGLLogDebug(@"Retrieving attributeForKey: %@", key);
     return self.attributes[key];
 }
 
@@ -66,6 +103,7 @@ MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
 
 - (id)attributeForKey:(NSString *)key {
+    MGLLogDebug(@"Retrieving attributeForKey: %@", key);
     return self.attributes[key];
 }
 
@@ -102,6 +140,7 @@ MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
 
 - (id)attributeForKey:(NSString *)key {
+    MGLLogDebug(@"Retrieving attributeForKey: %@", key);
     return self.attributes[key];
 }
 
@@ -138,6 +177,7 @@ MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
 
 - (id)attributeForKey:(NSString *)key {
+    MGLLogDebug(@"Retrieving attributeForKey: %@", key);
     return self.attributes[key];
 }
 
@@ -164,6 +204,7 @@ MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
 
 - (id)attributeForKey:(NSString *)key {
+    MGLLogDebug(@"Retrieving attributeForKey: %@", key);
     return self.attributes[key];
 }
 
@@ -200,6 +241,7 @@ MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
 
 - (id)attributeForKey:(NSString *)key {
+    MGLLogDebug(@"Retrieving attributeForKey: %@", key);
     return self.attributes[key];
 }
 
@@ -233,7 +275,7 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 
 @dynamic shapes;
 
-+ (instancetype)shapeCollectionWithShapes:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)shapes {
++ (instancetype)shapeCollectionWithShapes:(NSArray<MGLShape<MGLFeature> *> *)shapes {
     return [super shapeCollectionWithShapes:shapes];
 }
 
@@ -254,7 +296,7 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
     featureCollection.reserve(self.shapes.count);
     for (MGLShape <MGLFeature> *feature in self.shapes) {
         auto geoJSONObject = feature.geoJSONObject;
-        NSAssert(geoJSONObject.is<mbgl::Feature>(), @"Feature collection must only contain features.");
+        MGLAssert(geoJSONObject.is<mbgl::Feature>(), @"Feature collection must only contain features.");
         featureCollection.push_back(geoJSONObject.get<mbgl::Feature>());
     }
     return featureCollection;
@@ -269,6 +311,11 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 template <typename T>
 class GeometryEvaluator {
 public:
+    MGLShape <MGLFeature> * operator()(const mbgl::EmptyGeometry &) const {
+        MGLEmptyFeature *feature = [[MGLEmptyFeature alloc] init];
+        return feature;
+    }
+
     MGLShape <MGLFeature> * operator()(const mbgl::Point<T> &geometry) const {
         MGLPointFeature *feature = [[MGLPointFeature alloc] init];
         feature.coordinate = toLocationCoordinate2D(geometry);
@@ -340,8 +387,8 @@ private:
             innerPolygons = [NSMutableArray arrayWithCapacity:geometry.size() - 1];
             for (auto iter = geometry.begin() + 1; iter != geometry.end(); iter++) {
                 auto &innerRing = *iter;
-                std::vector<CLLocationCoordinate2D> coordinates = toLocationCoordinates2D(innerRing);
-                MGLPolygon *innerPolygon = [MGLPolygon polygonWithCoordinates:&coordinates[0] count:coordinates.size()];
+                std::vector<CLLocationCoordinate2D> innerCoordinates = toLocationCoordinates2D(innerRing);
+                MGLPolygon *innerPolygon = [MGLPolygon polygonWithCoordinates:&innerCoordinates[0] count:innerCoordinates.size()];
                 [innerPolygons addObject:innerPolygon];
             }
         }
@@ -373,7 +420,7 @@ public:
     }
 };
 
-NS_ARRAY_OF(MGLShape <MGLFeature> *) *MGLFeaturesFromMBGLFeatures(const std::vector<mbgl::Feature> &features) {
+NSArray<MGLShape <MGLFeature> *> *MGLFeaturesFromMBGLFeatures(const std::vector<mbgl::Feature> &features) {
     NSMutableArray *shapes = [NSMutableArray arrayWithCapacity:features.size()];
     for (const auto &feature : features) {
         [shapes addObject:MGLFeatureFromMBGLFeature(feature)];
@@ -390,8 +437,8 @@ id <MGLFeature> MGLFeatureFromMBGLFeature(const mbgl::Feature &feature) {
     }
     GeometryEvaluator<double> evaluator;
     MGLShape <MGLFeature> *shape = mapbox::geometry::geometry<double>::visit(feature.geometry, evaluator);
-    if (feature.id) {
-        shape.identifier = mbgl::FeatureIdentifier::visit(*feature.id, ValueEvaluator());
+    if (!feature.id.is<mapbox::feature::null_value_t>()) {
+        shape.identifier = mbgl::FeatureIdentifier::visit(feature.id, ValueEvaluator());
     }
     shape.attributes = attributes;
 
@@ -414,7 +461,7 @@ mbgl::Feature mbglFeature(mbgl::Feature feature, id identifier, NSDictionary *at
     return feature;
 }
 
-NS_DICTIONARY_OF(NSString *, id) *NSDictionaryFeatureForGeometry(NSDictionary *geometry, NSDictionary *attributes, id identifier) {
+NSDictionary<NSString *, id> *NSDictionaryFeatureForGeometry(NSDictionary *geometry, NSDictionary *attributes, id identifier) {
     NSMutableDictionary *feature = [@{@"type": @"Feature",
                                       @"properties": (attributes) ?: [NSNull null],
                                       @"geometry": geometry} mutableCopy];

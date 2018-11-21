@@ -1,6 +1,6 @@
 #include <mbgl/text/placement.hpp>
 #include <mbgl/renderer/render_layer.hpp>
-#include <mbgl/renderer/layers/render_symbol_layer.hpp>
+#include <mbgl/renderer/layers/render_layer_symbol_interface.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
@@ -33,33 +33,64 @@ JointOpacityState::JointOpacityState(const JointOpacityState& prevOpacityState, 
 bool JointOpacityState::isHidden() const {
     return icon.isHidden() && text.isHidden();
 }
+    
+const CollisionGroups::CollisionGroup& CollisionGroups::get(const std::string& sourceID) {
+    // The predicate/groupID mechanism allows for arbitrary grouping,
+    // but the current interface defines one source == one group when
+    // crossSourceCollisions == true.
+    if (!crossSourceCollisions) {
+        if (collisionGroups.find(sourceID) == collisionGroups.end()) {
+            uint16_t nextGroupID = ++maxGroupID;
+            collisionGroups.emplace(sourceID, CollisionGroup(
+                nextGroupID,
+                optional<Predicate>([nextGroupID](const IndexedSubfeature& feature) -> bool {
+                    return feature.collisionGroupId == nextGroupID;
+                })
+            ));
+        }
+        return collisionGroups[sourceID];
+    } else {
+        static CollisionGroup nullGroup{0, nullopt};
+        return nullGroup;
+    }
+}
 
-Placement::Placement(const TransformState& state_, MapMode mapMode_)
+Placement::Placement(const TransformState& state_, MapMode mapMode_, style::TransitionOptions transitionOptions_, const bool crossSourceCollisions)
     : collisionIndex(state_)
     , state(state_)
     , mapMode(mapMode_)
-    , recentUntil(TimePoint::min())
+    , transitionOptions(transitionOptions_)
+    , collisionGroups(crossSourceCollisions)
 {}
 
-void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatrix, bool showCollisionBoxes) {
+void Placement::placeLayer(const RenderLayerSymbolInterface& symbolInterface, const mat4& projMatrix, bool showCollisionBoxes) {
 
     std::unordered_set<uint32_t> seenCrossTileIDs;
 
-    for (RenderTile& renderTile : symbolLayer.renderTiles) {
+    for (const RenderTile& renderTile : symbolInterface.getRenderTiles()) {
         if (!renderTile.tile.isRenderable()) {
             continue;
         }
+        assert(renderTile.tile.kind == Tile::Kind::Geometry);
+        GeometryTile& geometryTile = static_cast<GeometryTile&>(renderTile.tile);
 
-        auto bucket = renderTile.tile.getBucket(*symbolLayer.baseImpl);
-        assert(dynamic_cast<SymbolBucket*>(bucket));
-        SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
+        auto bucket = symbolInterface.getSymbolBucket(renderTile);
+        if (!bucket) {
+            continue;
+        }
+        SymbolBucket& symbolBucket = *bucket;
+
+        if (symbolBucket.bucketLeaderID != symbolInterface.layerID()) {
+            // Only place this layer if it's the "group leader" for the bucket
+            continue;
+        }
 
         auto& layout = symbolBucket.layout;
 
         const float pixelsToTileUnits = renderTile.id.pixelsToTileUnits(1, state.getZoom());
 
-        const float scale = std::pow(2, state.getZoom() - renderTile.tile.id.overscaledZ);
-        const float textPixelRatio = (util::tileSize * renderTile.tile.id.overscaleFactor()) / util::EXTENT;
+        const float scale = std::pow(2, state.getZoom() - geometryTile.id.overscaledZ);
+        const float textPixelRatio = (util::tileSize * geometryTile.id.overscaleFactor()) / util::EXTENT;
 
         mat4 posMatrix;
         state.matrixFor(posMatrix, renderTile.id);
@@ -76,8 +107,17 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
                 layout.get<style::IconRotationAlignment>() == style::AlignmentType::Map,
                 state,
                 pixelsToTileUnits);
-
-        placeLayerBucket(symbolBucket, posMatrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, textPixelRatio, showCollisionBoxes, seenCrossTileIDs, renderTile.tile.holdForFade());
+        
+        
+        // As long as this placement lives, we have to hold onto this bucket's
+        // matching FeatureIndex/data for querying purposes
+        retainedQueryData.emplace(std::piecewise_construct,
+                                  std::forward_as_tuple(symbolBucket.bucketInstanceId),
+                                  std::forward_as_tuple(symbolBucket.bucketInstanceId, geometryTile.getFeatureIndex(), geometryTile.id));
+        
+        const auto collisionGroup = collisionGroups.get(geometryTile.sourceID);
+        
+        placeLayerBucket(symbolBucket, posMatrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, textPixelRatio, showCollisionBoxes, seenCrossTileIDs, renderTile.tile.holdForFade(), collisionGroup);
     }
 }
 
@@ -90,14 +130,38 @@ void Placement::placeLayerBucket(
         const float textPixelRatio,
         const bool showCollisionBoxes,
         std::unordered_set<uint32_t>& seenCrossTileIDs,
-        const bool holdingForFade) {
+        const bool holdingForFade,
+        const CollisionGroups::CollisionGroup& collisionGroup) {
 
     auto partiallyEvaluatedTextSize = bucket.textSizeBinder->evaluateForZoom(state.getZoom());
     auto partiallyEvaluatedIconSize = bucket.iconSizeBinder->evaluateForZoom(state.getZoom());
 
-    const bool iconWithoutText = !bucket.hasTextData() || bucket.layout.get<style::TextOptional>();
-    const bool textWithoutIcon = !bucket.hasIconData() || bucket.layout.get<style::IconOptional>();
-
+    optional<CollisionTileBoundaries> avoidEdges;
+    if (mapMode == MapMode::Tile &&
+        (bucket.layout.get<style::SymbolAvoidEdges>() ||
+         bucket.layout.get<style::SymbolPlacement>() == style::SymbolPlacementType::Line)) {
+        avoidEdges = collisionIndex.projectTileBoundaries(posMatrix);
+    }
+    
+    const bool textAllowOverlap = bucket.layout.get<style::TextAllowOverlap>();
+    const bool iconAllowOverlap = bucket.layout.get<style::IconAllowOverlap>();
+    // This logic is similar to the "defaultOpacityState" logic below in updateBucketOpacities
+    // If we know a symbol is always supposed to show, force it to be marked visible even if
+    // it wasn't placed into the collision index (because some or all of it was outside the range
+    // of the collision grid).
+    // There is a subtle edge case here we're accepting:
+    //  Symbol A has text-allow-overlap: true, icon-allow-overlap: true, icon-optional: false
+    //  A's icon is outside the grid, so doesn't get placed
+    //  A's text would be inside grid, but doesn't get placed because of icon-optional: false
+    //  We still show A because of the allow-overlap settings.
+    //  Symbol B has allow-overlap: false, and gets placed where A's text would be
+    //  On panning in, there is a short period when Symbol B and Symbol A will overlap
+    //  This is the reverse of our normal policy of "fade in on pan", but should look like any other
+    //  collision and hopefully not be too noticeable.
+    // See https://github.com/mapbox/mapbox-gl-native/issues/12683
+    const bool alwaysShowText = textAllowOverlap && (iconAllowOverlap || !bucket.hasIconData() || bucket.layout.get<style::IconOptional>());
+    const bool alwaysShowIcon = iconAllowOverlap && (textAllowOverlap || !bucket.hasTextData() || bucket.layout.get<style::TextOptional>());
+    
     for (auto& symbolInstance : bucket.symbolInstances) {
 
         if (seenCrossTileIDs.count(symbolInstance.crossTileID) == 0) {
@@ -121,7 +185,7 @@ void Placement::placeLayerBucket(
                         placedSymbol, scale, fontSize,
                         bucket.layout.get<style::TextAllowOverlap>(),
                         bucket.layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map,
-                        showCollisionBoxes);
+                        showCollisionBoxes, avoidEdges, collisionGroup.second);
                 placeText = placed.first;
                 offscreen &= placed.second;
             }
@@ -135,10 +199,13 @@ void Placement::placeLayerBucket(
                         placedSymbol, scale, fontSize,
                         bucket.layout.get<style::IconAllowOverlap>(),
                         bucket.layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map,
-                        showCollisionBoxes);
+                        showCollisionBoxes, avoidEdges, collisionGroup.second);
                 placeIcon = placed.first;
                 offscreen &= placed.second;
             }
+
+            const bool iconWithoutText = !symbolInstance.hasText || bucket.layout.get<style::TextOptional>();
+            const bool textWithoutIcon = !symbolInstance.hasIcon || bucket.layout.get<style::IconOptional>();
 
             // combine placements for icon and text
             if (!iconWithoutText && !textWithoutIcon) {
@@ -150,11 +217,11 @@ void Placement::placeLayerBucket(
             }
 
             if (placeText) {
-                collisionIndex.insertFeature(symbolInstance.textCollisionFeature, bucket.layout.get<style::TextIgnorePlacement>());
+                collisionIndex.insertFeature(symbolInstance.textCollisionFeature, bucket.layout.get<style::TextIgnorePlacement>(), bucket.bucketInstanceId, collisionGroup.first);
             }
 
             if (placeIcon) {
-                collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<style::IconIgnorePlacement>());
+                collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<style::IconIgnorePlacement>(), bucket.bucketInstanceId, collisionGroup.first);
             }
 
             assert(symbolInstance.crossTileID != 0);
@@ -165,7 +232,7 @@ void Placement::placeLayerBucket(
                 placements.erase(symbolInstance.crossTileID);
             }
             
-            placements.emplace(symbolInstance.crossTileID, JointPlacement(placeText, placeIcon, offscreen || bucket.justReloaded));
+            placements.emplace(symbolInstance.crossTileID, JointPlacement(placeText || alwaysShowText, placeIcon || alwaysShowIcon, offscreen || bucket.justReloaded));
             seenCrossTileIDs.insert(symbolInstance.crossTileID);
         }
     } 
@@ -173,13 +240,13 @@ void Placement::placeLayerBucket(
     bucket.justReloaded = false;
 }
 
-bool Placement::commit(const Placement& prevPlacement, TimePoint now) {
+void Placement::commit(const Placement& prevPlacement, TimePoint now) {
     commitTime = now;
 
     bool placementChanged = false;
 
-    float increment = mapMode == MapMode::Continuous ?
-        std::chrono::duration<float>(commitTime - prevPlacement.commitTime) / Duration(std::chrono::milliseconds(300)) :
+    float increment = mapMode == MapMode::Continuous && transitionOptions.enablePlacementTransitions ?
+        std::chrono::duration<float>(commitTime - prevPlacement.commitTime) / transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION) :
         1.0;
 
     // add the opacities from the current placement, and copy their current values from the previous placement
@@ -207,19 +274,26 @@ bool Placement::commit(const Placement& prevPlacement, TimePoint now) {
         }
     }
 
-    return placementChanged;
+    fadeStartTime = placementChanged ? commitTime : prevPlacement.fadeStartTime;
 }
 
-void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer) {
+void Placement::updateLayerOpacities(const RenderLayerSymbolInterface& symbolInterface) {
     std::set<uint32_t> seenCrossTileIDs;
-    for (RenderTile& renderTile : symbolLayer.renderTiles) {
+    for (const RenderTile& renderTile : symbolInterface.getRenderTiles()) {
         if (!renderTile.tile.isRenderable()) {
             continue;
         }
 
-        auto bucket = renderTile.tile.getBucket(*symbolLayer.baseImpl);
-        assert(dynamic_cast<SymbolBucket*>(bucket));
-        SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
+        auto bucket = symbolInterface.getSymbolBucket(renderTile);
+        if (!bucket) {
+            continue;
+        }
+        SymbolBucket& symbolBucket = *bucket;
+
+        if (symbolBucket.bucketLeaderID != symbolInterface.layerID()) {
+            // Only update opacities this layer if it's the "group leader" for the bucket
+            continue;
+        }
         updateBucketOpacities(symbolBucket, seenCrossTileIDs);
     }
 }
@@ -230,18 +304,30 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
     if (bucket.hasCollisionBoxData()) bucket.collisionBox.dynamicVertices.clear();
     if (bucket.hasCollisionCircleData()) bucket.collisionCircle.dynamicVertices.clear();
 
+    JointOpacityState duplicateOpacityState(false, false, true);
+
+    const bool textAllowOverlap = bucket.layout.get<style::TextAllowOverlap>();
+    const bool iconAllowOverlap = bucket.layout.get<style::IconAllowOverlap>();
+    
+    // If allow-overlap is true, we can show symbols before placement runs on them
+    // But we have to wait for placement if we potentially depend on a paired icon/text
+    // with allow-overlap: false.
+    // See https://github.com/mapbox/mapbox-gl-native/issues/12483
     JointOpacityState defaultOpacityState(
-            bucket.layout.get<style::TextAllowOverlap>(),
-            bucket.layout.get<style::IconAllowOverlap>(),
+            textAllowOverlap && (iconAllowOverlap || !bucket.hasIconData() || bucket.layout.get<style::IconOptional>()),
+            iconAllowOverlap && (textAllowOverlap || !bucket.hasTextData() || bucket.layout.get<style::TextOptional>()),
             true);
 
     for (SymbolInstance& symbolInstance : bucket.symbolInstances) {
         bool isDuplicate = seenCrossTileIDs.count(symbolInstance.crossTileID) > 0;
 
         auto it = opacities.find(symbolInstance.crossTileID);
-        auto opacityState = it != opacities.end() && !isDuplicate ?
-            it->second :
-            defaultOpacityState;
+        auto opacityState = defaultOpacityState;
+        if (isDuplicate) {
+            opacityState = duplicateOpacityState;
+        } else if (it != opacities.end()) {
+            opacityState = it->second;
+        }
 
         if (it == opacities.end()) {
             opacities.emplace(symbolInstance.crossTileID, defaultOpacityState);
@@ -278,51 +364,68 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
         }
         
         auto updateCollisionBox = [&](const auto& feature, const bool placed) {
-            for (const CollisionBox& box : feature.boxes) {
-                if (feature.alongLine) {
-                   auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, !box.used);
-                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
-                } else {
-                    auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, false);
-                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
-                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
-                }
+            if (feature.alongLine) {
+                return;
+            }
+            auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, false);
+            for (size_t i = 0; i < feature.boxes.size() * 4; i++) {
+                bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
             }
         };
-        updateCollisionBox(symbolInstance.textCollisionFeature, opacityState.text.placed);
-        updateCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
+        
+        auto updateCollisionCircles = [&](const auto& feature, const bool placed) {
+            if (!feature.alongLine) {
+                return;
+            }
+            for (const CollisionBox& box : feature.boxes) {
+                auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, !box.used);
+                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+                bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+            }
+        };
+        
+        if (bucket.hasCollisionBoxData()) {
+            updateCollisionBox(symbolInstance.textCollisionFeature, opacityState.text.placed);
+            updateCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
+        }
+        if (bucket.hasCollisionCircleData()) {
+            updateCollisionCircles(symbolInstance.textCollisionFeature, opacityState.text.placed);
+            updateCollisionCircles(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
+        }
     }
 
     bucket.updateOpacity();
     bucket.sortFeatures(state.getAngle());
+    auto retainedData = retainedQueryData.find(bucket.bucketInstanceId);
+    if (retainedData != retainedQueryData.end()) {
+        retainedData->second.featureSortOrder = bucket.featureSortOrder;
+    }
 }
 
 float Placement::symbolFadeChange(TimePoint now) const {
-    if (mapMode == MapMode::Continuous) {
-        return std::chrono::duration<float>(now - commitTime) / Duration(std::chrono::milliseconds(300));
+    if (mapMode == MapMode::Continuous && transitionOptions.enablePlacementTransitions) {
+        return std::chrono::duration<float>(now - commitTime) / transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION);
     } else {
         return 1.0;
     }
 }
 
 bool Placement::hasTransitions(TimePoint now) const {
-    return symbolFadeChange(now) < 1.0 || stale;
+    if (mapMode == MapMode::Continuous && transitionOptions.enablePlacementTransitions) {
+        return stale || std::chrono::duration<float>(now - fadeStartTime) < transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION);
+    } else {
+        return false;
+    }
 }
 
 bool Placement::stillRecent(TimePoint now) const {
-    return mapMode == MapMode::Continuous && recentUntil > now;
-}
-void Placement::setRecent(TimePoint now) {
-    stale = false;
-    if (mapMode == MapMode::Continuous) {
-        // Only set in continuous mode because "now" isn't defined in still mode
-        recentUntil = now + Duration(std::chrono::milliseconds(300));
-    }
+    // Even if transitionOptions.duration is set to a value < 300ms, we still wait for this default transition duration
+    // before attempting another placement operation.
+    return mapMode == MapMode::Continuous &&
+        transitionOptions.enablePlacementTransitions &&
+        commitTime + std::max(util::DEFAULT_TRANSITION_DURATION, transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION)) > now;
 }
 
 void Placement::setStale() {
@@ -331,6 +434,14 @@ void Placement::setStale() {
 
 const CollisionIndex& Placement::getCollisionIndex() const {
     return collisionIndex;
+}
+    
+const RetainedQueryData& Placement::getQueryData(uint32_t bucketInstanceId) const {
+    auto it = retainedQueryData.find(bucketInstanceId);
+    if (it == retainedQueryData.end()) {
+        throw std::runtime_error("Placement::getQueryData with unrecognized bucketInstanceId");
+    }
+    return it->second;
 }
 
 } // namespace mbgl

@@ -19,7 +19,6 @@ public:
                    optional<PositionedIcon> shapedIcon,
                    const style::SymbolLayoutProperties::Evaluated&,
                    const float layoutTextSize,
-                   const uint32_t index,
                    const float textBoxScale,
                    const float textPadding,
                    style::SymbolPlacementType textPlacement,
@@ -27,15 +26,16 @@ public:
                    const float iconBoxScale,
                    const float iconPadding,
                    const std::array<float, 2> iconOffset,
-                   const GlyphPositionMap&,
+                   const GlyphPositions&,
                    const IndexedSubfeature&,
-                   const std::size_t featureIndex,
+                   const std::size_t layoutFeatureIndex,
+                   const std::size_t dataFeatureIndex,
                    const std::u16string& key,
-                   const float overscaling);
+                   const float overscaling,
+                   const float rotate);
 
     Anchor anchor;
     GeometryCoordinates line;
-    uint32_t index;
     bool hasText;
     bool hasIcon;
     SymbolQuads horizontalGlyphQuads;
@@ -44,7 +44,8 @@ public:
     CollisionFeature textCollisionFeature;
     CollisionFeature iconCollisionFeature;
     WritingModeType writingModes;
-    std::size_t featureIndex;
+    std::size_t layoutFeatureIndex; // Index into the set of features included at layout time
+    std::size_t dataFeatureIndex;   // Index into the underlying tile data feature set
     std::array<float, 2> textOffset;
     std::array<float, 2> iconOffset;
     std::u16string key;

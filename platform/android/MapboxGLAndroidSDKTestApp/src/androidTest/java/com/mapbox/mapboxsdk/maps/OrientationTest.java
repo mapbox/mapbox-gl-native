@@ -16,17 +16,17 @@ public class OrientationTest extends BaseActivityTest {
   @Test
   public void testChangeDeviceOrientation() {
     onView(isRoot()).perform(orientationLandscape());
-    waitLoop(2200);
+    waitAction(2200);
     onView(isRoot()).perform(orientationPortrait());
-    waitLoop(2500);
+    waitAction(2500);
     onView(isRoot()).perform(orientationLandscapeReverse());
-    waitLoop(500);
+    waitAction(500);
     onView(isRoot()).perform(orientationPortraitReverse());
-    waitLoop(1250);
+    waitAction(1250);
     onView(isRoot()).perform(orientationLandscape());
-    waitLoop(750);
+    waitAction(750);
     onView(isRoot()).perform(orientationPortrait());
-    waitLoop(950);
+    waitAction(950);
     onView(isRoot()).perform(orientationLandscapeReverse());
     onView(isRoot()).perform(orientationPortraitReverse());
     onView(isRoot()).perform(orientationLandscape());

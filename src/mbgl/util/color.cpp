@@ -23,11 +23,25 @@ optional<Color> Color::parse(const std::string& s) {
 }
 
 std::string Color::stringify() const {
+    std::array<double, 4> array = toArray();
     return "rgba(" +
-        util::toString(r * 255 / a) + "," +
-        util::toString(g * 255 / a) + "," +
-        util::toString(b * 255 / a) + "," +
-        util::toString(a) + ")";
+        util::toString(array[0]) + "," +
+        util::toString(array[1]) + "," +
+        util::toString(array[2]) + "," +
+        util::toString(array[3]) + ")";
+}
+
+std::array<double, 4> Color::toArray() const {
+    if (a == 0) {
+        return {{ 0, 0, 0, 0 }};
+    } else {
+        return {{
+            r * 255 / a,
+            g * 255 / a,
+            b * 255 / a,
+            a,
+        }};
+    }
 }
 
 } // namespace mbgl

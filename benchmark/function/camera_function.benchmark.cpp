@@ -1,9 +1,9 @@
 #include <benchmark/benchmark.h>
 
-#include <mbgl/style/function/source_function.hpp>
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/function.hpp>
+#include <mbgl/style/conversion/property_value.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -27,7 +27,7 @@ static void Parse_CameraFunction(benchmark::State& state) {
         state.PauseTiming();
         auto doc = createFunctionJSON(stopCount);
         state.ResumeTiming();
-        optional<CameraFunction<float>> result = conversion::convertJSON<CameraFunction<float>>(doc, error);
+        optional<PropertyValue<float>> result = conversion::convertJSON<PropertyValue<float>>(doc, error, false, false);
         if (!result) {
             state.SkipWithError(error.message.c_str());
         }
@@ -39,14 +39,14 @@ static void Evaluate_CameraFunction(benchmark::State& state) {
     size_t stopCount = state.range(0);
     auto doc = createFunctionJSON(stopCount);
     conversion::Error error;
-    optional<CameraFunction<float>> function = conversion::convertJSON<CameraFunction<float>>(doc, error);
+    optional<PropertyValue<float>> function = conversion::convertJSON<PropertyValue<float>>(doc, error, false, false);
     if (!function) {
         state.SkipWithError(error.message.c_str());
     }
     
     while(state.KeepRunning()) {
         float z = 24.0f * static_cast<float>(rand() % 100) / 100;
-        function->evaluate(z);
+        function->asExpression().evaluate(z);
     }
     
     state.SetLabel(std::to_string(stopCount).c_str());

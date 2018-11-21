@@ -13,6 +13,7 @@ const lightProperties = Object.keys(spec[`light`]).reduce((memo, name) => {
   var property = spec[`light`][name];
   property.name = name;
   property['light-property'] = true;
+  property.doc = property.doc.replace(/°/g,'&#xB0;');
   memo.push(property);
   return memo;
 }, []);
@@ -54,6 +55,8 @@ global.propertyType = function propertyType(property) {
         return 'Boolean';
       case 'number':
         return 'Float';
+      case 'formatted':
+        return 'Formatted';
       case 'string':
         return 'String';
       case 'enum':
@@ -73,6 +76,8 @@ global.propertyJavaType = function propertyType(property) {
          return 'boolean';
        case 'number':
          return 'float';
+       case 'formatted':
+         return 'Formatted';
        case 'string':
          return 'String';
        case 'enum':
@@ -120,6 +125,7 @@ global.propertyNativeType = function (property) {
     return 'bool';
   case 'number':
     return 'float';
+  case 'formatted':
   case 'string':
     return 'std::string';
   case 'enum':
@@ -148,6 +154,26 @@ global.propertyTypeAnnotation = function propertyTypeAnnotation(property) {
   }
 };
 
+global.defaultExpressionJava = function(property) {
+    switch (property.type) {
+      case 'boolean':
+        return 'boolean';
+      case 'number':
+        return 'number';
+      case 'formatted':
+        return 'format';
+      case 'string':
+        return "string";
+      case 'enum':
+        return "string";
+      case 'color':
+        return 'toColor';
+      case 'array':
+        return "array";
+      default: return "string";
+      }
+}
+
 global.defaultValueJava = function(property) {
     if(property.name.endsWith("-pattern")) {
         return '"pedestrian-polygon"';
@@ -160,6 +186,8 @@ global.defaultValueJava = function(property) {
         return 'true';
       case 'number':
         return '0.3f';
+      case 'formatted':
+        return 'new Formatted(new FormattedSection[]{new FormattedSection("default")})'
       case 'string':
         return '"' + property['default'] + '"';
       case 'enum':
@@ -216,10 +244,15 @@ global.propertyValueDoc = function (property, value) {
 
     // Match references to other property names & values.
     // Requires the format 'When `foo` is set to `bar`,'.
-    let doc = property.values[value].doc.replace(/When `(.+?)` is set to `(.+?)`,/g, function (m, peerPropertyName, propertyValue, offset, str) {
+    let doc = property.values[value].doc.replace(/When `(.+?)` is set to `(.+?)`(?: or `([^`]+?)`)?,/g, function (m, peerPropertyName, propertyValue, secondPropertyValue, offset, str) {
         let otherProperty = snakeCaseUpper(peerPropertyName);
         let otherValue = snakeCaseUpper(peerPropertyName) + '_' + snakeCaseUpper(propertyValue);
-        return 'When {@link ' + `${otherProperty}` + '} is set to {@link Property#' + `${otherValue}` + '},';
+        const firstPropertyValue = 'When {@link ' + `${otherProperty}` + '} is set to {@link Property#' + `${otherValue}` + '}';
+        if (secondPropertyValue) {
+            return firstPropertyValue + ` or {@link Property#${snakeCaseUpper(peerPropertyName) + '_' + snakeCaseUpper(secondPropertyValue)}},`;
+        } else {
+            return firstPropertyValue + ',';
+        }
     });
 
     // Match references to our own property values.
@@ -248,19 +281,14 @@ global.propertyValueDoc = function (property, value) {
     return doc;
 };
 
-global.isDataDriven = function (property) {
-  return property['property-function'] === true;
-};
-
 global.isLightProperty = function (property) {
   return property['light-property'] === true;
 };
 
 global.propertyValueType = function (property) {
-  if (isDataDriven(property)) {
-    return `DataDrivenPropertyValue<${evaluatedType(property)}>`;
-  } else {
-    return `PropertyValue<${evaluatedType(property)}>`;
+  switch (property['property-type']) {
+    default:
+      return `PropertyValue<${evaluatedType(property)}>`;
   }
 };
 
@@ -282,6 +310,7 @@ global.evaluatedType = function (property) {
     return 'bool';
   case 'number':
     return 'float';
+  case 'formatted':
   case 'string':
     return 'std::string';
   case 'enum':
@@ -299,22 +328,18 @@ global.evaluatedType = function (property) {
 };
 
 global.supportsZoomFunction = function (property) {
-  return property['zoom-function'] === true;
+  return property.expression && property.expression.parameters.indexOf('zoom') > -1;
 };
 
 global.supportsPropertyFunction = function (property) {
-  return property['property-function'] === true;
+  return property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
 };
 
 // Template processing //
 
 // Java + JNI Light (Peer model)
-const lightHpp = ejs.compile(fs.readFileSync('platform/android/src/style/light.hpp.ejs', 'utf8'), {strict: true});;
-const lightCpp = ejs.compile(fs.readFileSync('platform/android/src/style/light.cpp.ejs', 'utf8'), {strict: true});;
 const lightJava = ejs.compile(fs.readFileSync('platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/light/light.java.ejs', 'utf8'), {strict: true});
 const lightJavaUnitTests = ejs.compile(fs.readFileSync('platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/style/light.junit.ejs', 'utf8'), {strict: true});
-writeIfModified(`platform/android/src/style/light.hpp`, lightHpp({properties: lightProperties}));
-writeIfModified(`platform/android/src/style/light.cpp`, lightCpp({properties: lightProperties}));
 writeIfModified(`platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/light/Light.java`, lightJava({properties: lightProperties}));
 writeIfModified(`platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/style/LightTest.java`, lightJavaUnitTests({properties: lightProperties}));
 
@@ -343,21 +368,4 @@ const enumPropertyJavaTemplate = ejs.compile(fs.readFileSync('platform/android/M
 writeIfModified(
     `platform/android/MapboxGLAndroidSDK/src/main/java/com/mapbox/mapboxsdk/style/layers/Property.java`,
     enumPropertyJavaTemplate({properties: enumProperties})
-);
-
-// De-duplicate enum properties before processing jni property templates
-const enumPropertiesDeDup = _(enumProperties).uniqBy(global.propertyNativeType).value();
-
-// JNI Enum property conversion templates
-const enumPropertyHppTypeStringValueTemplate = ejs.compile(fs.readFileSync('platform/android/src/style/conversion/types_string_values.hpp.ejs', 'utf8'), {strict: true});
-writeIfModified(
-    `platform/android/src/style/conversion/types_string_values.hpp`,
-    enumPropertyHppTypeStringValueTemplate({properties: enumPropertiesDeDup})
-);
-
-// JNI property value types conversion templates
-const enumPropertyHppTypeTemplate = ejs.compile(fs.readFileSync('platform/android/src/style/conversion/types.hpp.ejs', 'utf8'), {strict: true});
-writeIfModified(
-    `platform/android/src/style/conversion/types.hpp`,
-    enumPropertyHppTypeTemplate({properties: enumPropertiesDeDup})
 );

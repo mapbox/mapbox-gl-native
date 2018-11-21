@@ -2,9 +2,8 @@
 
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/constant.hpp>
-#include <mbgl/style/conversion/function.hpp>
-#include <mbgl/style/conversion/data_driven_property_value.hpp>
-#include <mbgl/util/rapidjson.hpp>
+#include <mbgl/style/conversion/property_value.hpp>
+#include <mbgl/style/expression/dsl.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -14,7 +13,7 @@ TEST(StyleConversion, Function) {
     Error error;
 
     auto parseFunction = [&](const std::string& json) {
-        return convertJSON<CameraFunction<float>>(json, error);
+        return convertJSON<PropertyValue<float>>(json, error, false, false);
     };
 
     auto fn1 = parseFunction(R"({"stops":[]})");
@@ -46,7 +45,7 @@ TEST(StyleConversion, Function) {
 
     auto fn8 = parseFunction("[]");
     ASSERT_FALSE(fn8);
-    ASSERT_EQ("function must be an object", error.message);
+    ASSERT_EQ("value must be a number", error.message);
 
     auto fn9 = parseFunction(R"({"stops":[[0,0]],"base":false})");
     ASSERT_FALSE(fn9);
@@ -56,25 +55,58 @@ TEST(StyleConversion, Function) {
 TEST(StyleConversion, CompositeFunctionExpression) {
     Error error;
 
-    auto parseFunction = [&](const std::string& src) {
-        JSDocument doc;
-        doc.Parse<0>(src);
-        return convert<DataDrivenPropertyValue<float>>(doc, error);
+    auto parseFunction = [&](const std::string& json) {
+        return convertJSON<PropertyValue<float>>(json, error, true, false);
     };
 
     auto fn1 = parseFunction(R"(["interpolate", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10])");
     ASSERT_TRUE(fn1);
-    
+
     auto fn2 = parseFunction(R"(["coalesce", ["interpolate", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10], 0])");
     ASSERT_TRUE(fn2);
 
     auto fn3 = parseFunction(R"(["let", "a", 0, ["interpolate", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10] ])");
     ASSERT_TRUE(fn3);
 
-    auto fn4 = parseFunction(R"(["coalesce", ["let", "a", 0, ["interpolate", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10], 0 ])");
+    auto fn4 = parseFunction(R"(["coalesce", ["let", "a", 0, ["interpolate", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10]], 0])");
     ASSERT_TRUE(fn4);
 
     auto fn5 = parseFunction(R"(["coalesce", ["interpolate", ["linear"], ["number", ["get", "x"]], 0, ["zoom"], 10, 10], 0])");
     ASSERT_FALSE(fn5);
     ASSERT_EQ(R"("zoom" expression may only be used as input to a top-level "step" or "interpolate" expression.)", error.message);
+}
+
+TEST(StyleConversion, TokenStrings) {
+    ASSERT_FALSE(hasTokens(""));
+    ASSERT_FALSE(hasTokens("{"));
+    ASSERT_FALSE(hasTokens("{token"));
+    ASSERT_TRUE(hasTokens("{token}"));
+    ASSERT_TRUE(hasTokens("token {token}"));
+    ASSERT_TRUE(hasTokens("{token} {token}"));
+
+    using namespace mbgl::style::expression::dsl;
+    ASSERT_EQ(*convertTokenStringToExpression("{token}"), *toString(get(literal("token"))));
+    ASSERT_EQ(*convertTokenStringToExpression("token {token}"), *concat(vec(literal("token "), get(literal("token")))));
+    ASSERT_EQ(*convertTokenStringToExpression("{token} token"), *concat(vec(get(literal("token")), literal(" token"))));
+    ASSERT_EQ(*convertTokenStringToExpression("{token} {token}"), *concat(vec(get(literal("token")), literal(" "), get(literal("token")))));
+    ASSERT_EQ(*convertTokenStringToExpression("{token} {token"), *concat(vec(get(literal("token")), literal(" "), literal("{token"))));
+    ASSERT_EQ(*convertTokenStringToExpression("{token {token}"), *concat(vec(literal("{token "), get(literal("token")))));
+}
+
+
+TEST(StyleConversion, FormattedIdentityFunction) {
+    // See https://github.com/mapbox/mapbox-gl-js/issues/7311
+    // We never introduced this bug on gl-native, but we _almost_ did
+    Error error;
+
+    auto parseFunction = [&](const std::string& json) {
+        return convertJSON<PropertyValue<mbgl::style::expression::Formatted>>(json, error, true, false);
+    };
+    
+    using namespace mbgl::style::expression::dsl;
+
+    auto fn1 = parseFunction(R"({ "property": "name", "type": "identity" })");
+    ASSERT_TRUE(bool(fn1));
+    ASSERT_TRUE(fn1->isExpression());
+    ASSERT_EQ(fn1->asExpression().getExpression(), *format(get(literal("name"))));
 }

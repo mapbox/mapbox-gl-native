@@ -27,6 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 #define NSLocalizedStringWithDefaultValue(key, tbl, bundle, val, comment) \
     [[NSBundle mgl_frameworkBundle] localizedStringForKey:(key) value:(val) table:(tbl)]
 
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLBundleNotFoundException;
+
 @interface NSBundle (MGLAdditions)
 
 /// Returns the bundle containing the SDK’s classes and Info.plist file.
@@ -34,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable NSString *)mgl_frameworkBundleIdentifier;
 
-+ (nullable NS_DICTIONARY_OF(NSString *, id) *)mgl_frameworkInfoDictionary;
++ (nullable NSDictionary<NSString *, id> *)mgl_frameworkInfoDictionary;
 
 + (nullable NSString *)mgl_applicationBundleIdentifier;
 

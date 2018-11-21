@@ -15,12 +15,12 @@ umbrella_header: src/Mapbox.h
 framework_root: ../darwin/src
 
 custom_categories:
-  - name: Guides
+  - name: Appendices
     children:
       - Working with GeoJSON Data
       - Predicates and Expressions
       - For Style Authors
-      - Using Style Functions at Runtime
+      - Migrating to Expressions
       - Tile URL Templates
       - Info.plist Keys
   - name: Maps
@@ -63,13 +63,13 @@ custom_categories:
   - name: Content Sources
     children:
       - MGLSource
-      - MGLTileSource
-      - MGLAbstractShapeSource
       - MGLShapeSource
       - MGLComputedShapeSource
-      - MGLRasterSource
+      - MGLTileSource
+      - MGLRasterTileSource
       - MGLRasterDEMSource
-      - MGLVectorSource
+      - MGLVectorTileSource
+      - MGLImageSource
   - name: Style Layers
     children:
       - MGLStyleLayer
@@ -80,6 +80,7 @@ custom_categories:
       - MGLCircleStyleLayer
       - MGLFillStyleLayer
       - MGLFillExtrusionStyleLayer
+      - MGLHeatmapStyleLayer
       - MGLHillshadeStyleLayer
       - MGLLineStyleLayer
       - MGLSymbolStyleLayer
@@ -91,6 +92,7 @@ custom_categories:
       - MGLOfflinePackProgress
       - MGLOfflinePackState
       - MGLTilePyramidOfflineRegion
+      - MGLShapeOfflineRegion
   - name: Geometry
     children:
       - MGLCoordinateBounds

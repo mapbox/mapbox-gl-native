@@ -14,8 +14,9 @@
 
  You can add point collections to the map by adding them to an `MGLShapeSource`
  object. Configure the appearance of an `MGLShapeSource`’s or
- `MGLVectorSource`’s point collections collectively using an
- `MGLCircleStyleLayer` or `MGLSymbolStyleLayer` object.
+ `MGLVectorTileSource`’s point collections collectively using an
+ `MGLCircleStyleLayer` or `MGLSymbolStyleLayer` object. To access a point
+ collection’s attributes, use an `MGLPointCollectionFeature` object.
 
  You cannot add an `MGLPointCollection` object directly to a map view as an
  annotation. However, you can create individual `MGLPointAnnotation` objects

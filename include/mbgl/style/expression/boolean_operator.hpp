@@ -12,7 +12,7 @@ namespace expression {
 class Any : public Expression  {
 public:
     Any(std::vector<std::unique_ptr<Expression>> inputs_) :
-        Expression(type::Boolean),
+        Expression(Kind::Any, type::Boolean),
         inputs(std::move(inputs_))
     {}
 
@@ -23,6 +23,7 @@ public:
     bool operator==(const Expression& e) const override;
     std::vector<optional<Value>> possibleOutputs() const override;
 
+    std::string getOperator() const override { return "any"; }
 private:
     std::vector<std::unique_ptr<Expression>> inputs;
 };
@@ -30,7 +31,7 @@ private:
 class All : public Expression  {
 public:
     All(std::vector<std::unique_ptr<Expression>> inputs_) :
-        Expression(type::Boolean),
+        Expression(Kind::All, type::Boolean),
         inputs(std::move(inputs_))
     {}
 
@@ -41,6 +42,7 @@ public:
     bool operator==(const Expression& e) const override;
     std::vector<optional<Value>> possibleOutputs() const override;
 
+    std::string getOperator() const override { return "all"; }
 private:
     std::vector<std::unique_ptr<Expression>> inputs;
 };

@@ -8,8 +8,8 @@
 
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/feature.hpp>
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 namespace mbgl {
 namespace style {

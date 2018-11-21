@@ -28,15 +28,25 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslationAnchor) {
  optionally stroked) polygons on the map.
  
  Use a fill style layer to configure the visual appearance of polygon or
- multipolygon features in vector tiles loaded by an `MGLVectorSource` object or
- `MGLPolygon`, `MGLPolygonFeature`, `MGLMultiPolygon`, or
- `MGLMultiPolygonFeature` instances in an `MGLShapeSource` object.
+ multipolygon features. These features can come from vector tiles loaded by an
+ `MGLVectorTileSource` object, or they can be `MGLPolygon`, `MGLPolygonFeature`,
+ `MGLMultiPolygon`, or `MGLMultiPolygonFeature` instances in an `MGLShapeSource`
+ or `MGLComputedShapeSource` object.
 
  You can access an existing fill style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
  otherwise, find it using the `MGLStyle.layers` property. You can also create a
  new fill style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
+
+ #### Related examples
+ See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/select-layer/">Select a
+ feature within a layer</a> example to learn how to use a `TERNARY` expression
+ to modify the `fillOpacity` of an `MGLFillStyleLayer` object. See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/fill-pattern/">Add a pattern
+ to a polygon</a> example to learn how to use an image to add pattern to the
+ features styled by a `MGLFillStyleLayer`.
 
  ### Example
 
@@ -94,6 +104,7 @@ MGL_EXPORT
 
 @property (nonatomic, null_resettable) NSExpression *fillAntialias __attribute__((unavailable("Use fillAntialiased instead.")));
 
+#if TARGET_OS_IPHONE
 /**
  The color of the filled part of this layer.
  
@@ -114,6 +125,28 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *fillColor;
+#else
+/**
+ The color of the filled part of this layer.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ This property is only applied to the style if `fillPattern` is set to `nil`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *fillColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `fillColor` property.
@@ -131,7 +164,7 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values between 0 and 1 inclusive
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -147,6 +180,7 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition fillOpacityTransition;
 
+#if TARGET_OS_IPHONE
 /**
  The outline color of the fill. Matches the value of `fillColor` if unspecified.
  
@@ -164,6 +198,25 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *fillOutlineColor;
+#else
+/**
+ The outline color of the fill. Matches the value of `fillColor` if unspecified.
+ 
+ This property is only applied to the style if `fillPattern` is set to `nil`,
+ and `fillAntialiased` is set to an expression that evaluates to `YES`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *fillOutlineColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `fillOutlineColor` property.
@@ -174,7 +227,8 @@ MGL_EXPORT
 
 /**
  Name of image in sprite to use for drawing image fills. For seamless patterns,
- image width and height must be a factor of two (2, 4, 8, ..., 512).
+ image width and height must be a factor of two (2, 4, 8, ..., 512). Note that
+ zoom-dependent expressions will be evaluated only at integer zoom levels.
  
  You can set this property to an expression containing any of the following:
  
@@ -182,11 +236,8 @@ MGL_EXPORT
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
- * Step functions applied to the `$zoomLevel` variable
- 
- This property does not support applying interpolation functions to the
- `$zoomLevel` variable or applying interpolation or step functions to feature
- attributes.
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *fillPattern;
 

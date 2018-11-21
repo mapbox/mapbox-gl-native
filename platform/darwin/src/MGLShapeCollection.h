@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  `MGLShapeCollection` is most commonly used to add multiple shapes to a single
  `MGLShapeSource`. Configure the appearance of an `MGLShapeSource`’s or
- `MGLVectorSource`’s shape collection collectively using an
+ `MGLVectorTileSource`’s shape collection collectively using an
  `MGLSymbolStyleLayer` object, or use multiple instances of
  `MGLCircleStyleLayer`, `MGLFillStyleLayer`, and `MGLLineStyleLayer` to
  configure the appearance of each kind of shape inside the collection.
@@ -27,7 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 
  To represent a collection of point, polyline, or polygon shapes, it may be more
  convenient to use an `MGLPointCollection`, `MGLMultiPolyline`, or
- `MGLMultiPolygon` object, respectively.
+ `MGLMultiPolygon` object, respectively. To access a shape collection’s
+ attributes, use the corresponding `MGLFeature` object.
 
  A shape collection is known as a
  <a href="https://tools.ietf.org/html/rfc7946#section-3.1.8">GeometryCollection</a>
@@ -39,7 +40,7 @@ MGL_EXPORT
 /**
  An array of shapes forming the shape collection.
  */
-@property (nonatomic, copy, readonly) NS_ARRAY_OF(MGLShape *) *shapes;
+@property (nonatomic, copy, readonly) NSArray<MGLShape *> *shapes;
 
 /**
  Creates and returns a shape collection consisting of the given shapes.
@@ -48,7 +49,7 @@ MGL_EXPORT
     this array is copied to the new object.
  @return A new shape collection object.
  */
-+ (instancetype)shapeCollectionWithShapes:(NS_ARRAY_OF(MGLShape *) *)shapes;
++ (instancetype)shapeCollectionWithShapes:(NSArray<MGLShape *> *)shapes;
 
 @end
 

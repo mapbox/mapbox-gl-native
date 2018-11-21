@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/map/camera.hpp>
 #include <mbgl/renderer/mode.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/gl/headless_backend.hpp>
@@ -32,6 +33,14 @@ public:
 
     Renderer* getRenderer();
     RendererBackend* getBackend();
+    CameraOptions getCameraOptions();
+
+    bool hasImage(const std::string&);
+    bool hasLayer(const std::string&);
+    bool hasSource(const std::string&);
+
+    ScreenCoordinate pixelForLatLng(const LatLng&);
+    LatLng latLngForPixel(const ScreenCoordinate&);
 
     PremultipliedImage readStillImage();
     PremultipliedImage render(Map&);

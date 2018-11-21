@@ -5,7 +5,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/data_driven_property_value.hpp>
+#include <mbgl/style/expression/formatted.hpp>
 
 #include <mbgl/util/color.hpp>
 
@@ -19,20 +19,9 @@ public:
     FillExtrusionLayer(const std::string& layerID, const std::string& sourceID);
     ~FillExtrusionLayer() final;
 
-    // Source
-    const std::string& getSourceID() const;
-    const std::string& getSourceLayer() const;
-    void setSourceLayer(const std::string& sourceLayer);
-
-    void setFilter(const Filter&);
-    const Filter& getFilter() const;
-
-    // Visibility
-    void setVisibility(VisibilityType) final;
-
-    // Zoom range
-    void setMinZoom(float) final;
-    void setMaxZoom(float) final;
+    // Dynamic properties
+    optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
+    optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
 
     // Paint properties
 
@@ -42,9 +31,9 @@ public:
     void setFillExtrusionOpacityTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionOpacityTransition() const;
 
-    static DataDrivenPropertyValue<Color> getDefaultFillExtrusionColor();
-    DataDrivenPropertyValue<Color> getFillExtrusionColor() const;
-    void setFillExtrusionColor(DataDrivenPropertyValue<Color>);
+    static PropertyValue<Color> getDefaultFillExtrusionColor();
+    PropertyValue<Color> getFillExtrusionColor() const;
+    void setFillExtrusionColor(PropertyValue<Color>);
     void setFillExtrusionColorTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionColorTransition() const;
 
@@ -66,15 +55,15 @@ public:
     void setFillExtrusionPatternTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionPatternTransition() const;
 
-    static DataDrivenPropertyValue<float> getDefaultFillExtrusionHeight();
-    DataDrivenPropertyValue<float> getFillExtrusionHeight() const;
-    void setFillExtrusionHeight(DataDrivenPropertyValue<float>);
+    static PropertyValue<float> getDefaultFillExtrusionHeight();
+    PropertyValue<float> getFillExtrusionHeight() const;
+    void setFillExtrusionHeight(PropertyValue<float>);
     void setFillExtrusionHeightTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionHeightTransition() const;
 
-    static DataDrivenPropertyValue<float> getDefaultFillExtrusionBase();
-    DataDrivenPropertyValue<float> getFillExtrusionBase() const;
-    void setFillExtrusionBase(DataDrivenPropertyValue<float>);
+    static PropertyValue<float> getDefaultFillExtrusionBase();
+    PropertyValue<float> getFillExtrusionBase() const;
+    void setFillExtrusionBase(PropertyValue<float>);
     void setFillExtrusionBaseTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionBaseTransition() const;
 
@@ -86,12 +75,20 @@ public:
     Mutable<Impl> mutableImpl() const;
     FillExtrusionLayer(Immutable<Impl>);
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
+
+protected:
+    Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
-template <>
-inline bool Layer::is<FillExtrusionLayer>() const {
-    return getType() == LayerType::FillExtrusion;
-}
+class FillExtrusionLayerFactory : public LayerFactory {
+public:
+    FillExtrusionLayerFactory();
+    ~FillExtrusionLayerFactory() override;
+
+    // LayerFactory overrides.
+    const LayerTypeInfo* getTypeInfo() const noexcept final;
+    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
+};
 
 } // namespace style
 } // namespace mbgl

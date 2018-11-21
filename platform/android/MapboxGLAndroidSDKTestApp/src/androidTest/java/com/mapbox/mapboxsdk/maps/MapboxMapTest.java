@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -22,15 +21,13 @@ import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.TestConstants;
 import com.mapbox.mapboxsdk.testapp.utils.ViewUtils;
-
 import org.hamcrest.Matcher;
 import org.junit.Ignore;
 import org.junit.Test;
+import timber.log.Timber;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import timber.log.Timber;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -126,6 +123,7 @@ public class MapboxMapTest extends BaseActivityTest {
     }));
   }
 
+
   //
   // MinZoomLevel
   //
@@ -162,16 +160,6 @@ public class MapboxMapTest extends BaseActivityTest {
   }
 
   //
-  // TrackingSettings
-  //
-
-  @Test
-  public void testTrackingSettings() {
-    validateTestSetup();
-    assertNotNull("TrackingSettings should not be null", mapboxMap.getTrackingSettings());
-  }
-
-  //
   // InfoWindow
   //
 
@@ -200,30 +188,6 @@ public class MapboxMapTest extends BaseActivityTest {
       MapboxMap.InfoWindowAdapter infoWindowAdapter = marker -> null;
       mapboxMap.setInfoWindowAdapter(infoWindowAdapter);
       assertEquals("InfoWindowAdpter should be the same", infoWindowAdapter, mapboxMap.getInfoWindowAdapter());
-    }));
-  }
-
-  //
-  // Location
-  //
-
-  @Test
-  @Ignore /* disabled due to enabling permissions during test #7177 */
-  public void testMyLocationEnabled() {
-    validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      mapboxMap.setMyLocationEnabled(true);
-      assertTrue("MyLocationEnabled should be true", mapboxMap.isMyLocationEnabled());
-    }));
-  }
-
-  @Test
-  @Ignore /* can't create handler inside thread that not called Looper.prepare() */
-  public void testMyLocationDisabled() {
-    validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      mapboxMap.setMyLocationEnabled(false);
-      assertFalse("MyLocationEnabled should be false", mapboxMap.isMyLocationEnabled());
     }));
   }
 
@@ -668,7 +632,9 @@ public class MapboxMapTest extends BaseActivityTest {
     }));
   }
 
-  private class MapboxMapAction implements ViewAction {
+  //
+
+  public class MapboxMapAction implements ViewAction {
 
     private InvokeViewAction invokeViewAction;
 

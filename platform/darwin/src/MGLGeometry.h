@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
-#import <CoreGraphics/CGBase.h>
+#import <CoreGraphics/CoreGraphics.h>
 
 #import "MGLFoundation.h"
 
@@ -14,6 +14,24 @@ typedef struct __attribute__((objc_boxable)) MGLCoordinateSpan {
     CLLocationDegrees longitudeDelta;
 } MGLCoordinateSpan;
 
+/* Defines a point on the map in Mercator projection for a specific zoom level. */
+typedef struct __attribute__((objc_boxable)) MGLMapPoint {
+    /** X coordinate representing a longitude in Mercator projection. */
+    CGFloat x;
+    /** Y coordinate representing  a latitide in Mercator projection. */
+    CGFloat y;
+    /** Zoom level at which the X and Y coordinates are valid. */
+    CGFloat zoomLevel;
+} MGLMapPoint;
+
+/* Defines a 4x4 matrix. */
+typedef struct MGLMatrix4 {
+    double m00, m01, m02, m03;
+    double m10, m11, m12, m13;
+    double m20, m21, m22, m23;
+    double m30, m31, m32, m33;
+} MGLMatrix4;
+
 /**
  Creates a new `MGLCoordinateSpan` from the given latitudinal and longitudinal
  deltas.
@@ -26,6 +44,17 @@ NS_INLINE MGLCoordinateSpan MGLCoordinateSpanMake(CLLocationDegrees latitudeDelt
 }
 
 /**
+ Creates a new `MGLMapPoint` from the given X and Y coordinates, and zoom level.
+ */
+NS_INLINE MGLMapPoint MGLMapPointMake(CGFloat x, CGFloat y, CGFloat zoomLevel) {
+    MGLMapPoint point;
+    point.x = x;
+    point.y = y;
+    point.zoomLevel = zoomLevel;
+    return point;
+}
+
+/**
  Returns `YES` if the two coordinate spans represent the same latitudinal change
  and the same longitudinal change.
  */
@@ -35,7 +64,7 @@ NS_INLINE BOOL MGLCoordinateSpanEqualToCoordinateSpan(MGLCoordinateSpan span1, M
 }
 
 /** An area of zero width and zero height. */
-extern MGL_EXPORT const MGLCoordinateSpan MGLCoordinateSpanZero;
+FOUNDATION_EXTERN MGL_EXPORT const MGLCoordinateSpan MGLCoordinateSpanZero;
 
 /** A rectangular area as measured on a two-dimensional map projection. */
 typedef struct __attribute__((objc_boxable)) MGLCoordinateBounds {
@@ -117,7 +146,15 @@ NS_INLINE BOOL MGLCoordinateBoundsIntersectsCoordinateBounds(MGLCoordinateBounds
             bounds1.sw.longitude < bounds2.ne.longitude);
 }
 
-/** Returns `YES` if the coordinate is within the coordinate bounds. */
+/**
+ Returns `YES` if the coordinate is within the coordinate bounds.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/constraining-gestures/">
+ Restrict map panning to an area</a> example to learn how to use
+ `MGLCoordinateInCoordinateBounds` to determine if a point is within, or
+ intersects, a given bounding box.
+ */
 NS_INLINE BOOL MGLCoordinateInCoordinateBounds(CLLocationCoordinate2D coordinate, MGLCoordinateBounds bounds) {
     return (coordinate.latitude  >= bounds.sw.latitude  &&
             coordinate.latitude  <= bounds.ne.latitude  &&
@@ -180,5 +217,27 @@ NS_INLINE CGFloat MGLRadiansFromDegrees(CLLocationDegrees degrees) {
 NS_INLINE CLLocationDegrees MGLDegreesFromRadians(CGFloat radians) {
     return radians * 180 / M_PI;
 }
+
+/** Returns Mercator projection of a WGS84 coordinate at the specified zoom level. */
+FOUNDATION_EXTERN MGL_EXPORT MGLMapPoint MGLMapPointForCoordinate(CLLocationCoordinate2D coordinate, double zoomLevel);
+
+
+/** Converts a map zoom level to a camera altitude.
+ 
+ @param zoomLevel The zoom level to convert.
+ @param pitch The camera pitch, measured in degrees.
+ @param latitude The latitude of the point at the center of the viewport.
+ @param size The size of the viewport.
+ @return An altitude measured in meters. */
+FOUNDATION_EXTERN MGL_EXPORT CLLocationDistance MGLAltitudeForZoomLevel(double zoomLevel, CGFloat pitch, CLLocationDegrees latitude, CGSize size);
+
+/** Converts a camera altitude to a map zoom level.
+ 
+ @param altitude The altitude to convert, measured in meters.
+ @param pitch The camera pitch, measured in degrees.
+ @param latitude The latitude of the point at the center of the viewport.
+ @param size The size of the viewport.
+ @return A zero-based zoom level. */
+FOUNDATION_EXTERN MGL_EXPORT double MGLZoomLevelForAltitude(CLLocationDistance altitude, CGFloat pitch, CLLocationDegrees latitude, CGSize size);
 
 NS_ASSUME_NONNULL_END

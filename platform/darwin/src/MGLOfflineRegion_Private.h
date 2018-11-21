@@ -9,19 +9,15 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLOfflineRegion_Private <MGLOfflineRegion>
 
 /**
- Initializes and returns an offline region backed by the given C++ region
- definition object.
-
- @param definition A reference to an offline region definition backing the
-    offline region.
- */
-- (instancetype)initWithOfflineRegionDefinition:(const mbgl::OfflineRegionDefinition &)definition;
-
-/**
  Creates and returns a C++ offline region definition corresponding to the
  receiver.
  */
 - (const mbgl::OfflineRegionDefinition)offlineRegionDefinition;
+
+/**
+ Attributes to be passed into the offline download start event
+ */
+@property (nonatomic, readonly) NSDictionary *offlineStartEventAttributes;
 
 @end
 

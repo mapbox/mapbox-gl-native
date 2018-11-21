@@ -3,27 +3,28 @@
 #include <mbgl/util/geojson.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
-#include <jni/jni.hpp>
-
 #include "../java/util.hpp"
+#include "geometry.hpp"
+
+#include <jni/jni.hpp>
 
 namespace mbgl {
 namespace android {
 namespace geojson {
 
-class MultiLineString : private mbgl::util::noncopyable {
+class MultiLineString {
 public:
+    using SuperTag = Geometry;
     static constexpr auto Name() { return "com/mapbox/geojson/MultiLineString"; };
-
     static constexpr auto Type() { return "MultiLineString"; };
 
-    static mapbox::geojson::multi_line_string convert(jni::JNIEnv&, jni::Object<MultiLineString>);
+    static jni::Local<jni::Object<MultiLineString>> New(jni::JNIEnv&, const mbgl::MultiLineString<double>&);
 
-    static mapbox::geojson::multi_line_string convert(jni::JNIEnv&, jni::Object<java::util::List/*<java::util::List<Point>>*/>);
+    static mapbox::geojson::multi_line_string convert(jni::JNIEnv&, const jni::Object<MultiLineString>&);
 
-    static jni::Object<java::util::List> coordinates(jni::JNIEnv&, jni::Object<MultiLineString>);
+    static mapbox::geojson::multi_line_string convert(jni::JNIEnv&, const jni::Object<java::util::List/*<java::util::List<Point>>*/>&);
 
-    static jni::Class<MultiLineString> javaClass;
+    static jni::Local<jni::Object<java::util::List>> coordinates(jni::JNIEnv&, const jni::Object<MultiLineString>&);
 
     static void registerNative(jni::JNIEnv&);
 };

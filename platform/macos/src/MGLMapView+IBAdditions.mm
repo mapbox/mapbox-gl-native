@@ -1,10 +1,12 @@
 #import "MGLMapView+IBAdditions.h"
 
+#import "MGLStyle.h"
+
 #import "MGLMapView_Private.h"
 
 @implementation MGLMapView (IBAdditions)
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingStyleURL__ {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingStyleURL__ {
     return [NSSet setWithObject:@"styleURL"];
 }
 
@@ -17,13 +19,13 @@
                  [NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSURL *url = URLString.length ? [NSURL URLWithString:URLString] : nil;
     if (URLString.length && !url) {
-        [NSException raise:@"Invalid style URL"
+        [NSException raise:MGLInvalidStyleURLException
                     format:@"“%@” is not a valid style URL.", URLString];
     }
     self.styleURL = url;
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingLatitude {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingLatitude {
     return [NSSet setWithObjects:@"centerCoordinate", @"camera", nil];
 }
 
@@ -45,7 +47,7 @@
     }
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingLongitude {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingLongitude {
     return [NSSet setWithObjects:@"centerCoordinate", @"camera", nil];
 }
 
@@ -67,7 +69,7 @@
     }
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingAllowsZooming {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingAllowsZooming {
     return [NSSet setWithObject:@"zoomEnabled"];
 }
 
@@ -79,7 +81,7 @@
     self.zoomEnabled = allowsZooming;
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingAllowsScrolling {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingAllowsScrolling {
     return [NSSet setWithObject:@"scrollEnabled"];
 }
 
@@ -91,7 +93,7 @@
     self.scrollEnabled = allowsScrolling;
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingAllowsRotating {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingAllowsRotating {
     return [NSSet setWithObject:@"rotateEnabled"];
 }
 
@@ -103,7 +105,7 @@
     self.rotateEnabled = allowsRotating;
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingAllowsTilting {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingAllowsTilting {
     return [NSSet setWithObject:@"pitchEnabled"];
 }
 

@@ -1,12 +1,17 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/shaders/circle.hpp>
+#include <mbgl/shaders/source.hpp>
 
 namespace mbgl {
 namespace shaders {
 
 const char* circle::name = "circle";
-const char* circle::vertexSource = R"MBGL_SHADER(
+const char* circle::vertexSource = source() + 4416;
+const char* circle::fragmentSource = source() + 8666;
+
+// Uncompressed source of circle.vertex.glsl:
+/*
 uniform mat4 u_matrix;
 uniform bool u_scale_with_map;
 uniform bool u_pitch_with_map;
@@ -84,7 +89,7 @@ varying vec3 v_data;
 void main(void) {
     
 #ifndef HAS_UNIFORM_u_color
-    color = unpack_mix_vec4(a_color, a_color_t);
+    color = unpack_mix_color(a_color, a_color_t);
 #else
     highp vec4 color = u_color;
 #endif
@@ -112,7 +117,7 @@ void main(void) {
 
     
 #ifndef HAS_UNIFORM_u_stroke_color
-    stroke_color = unpack_mix_vec4(a_stroke_color, a_stroke_color_t);
+    stroke_color = unpack_mix_color(a_stroke_color, a_stroke_color_t);
 #else
     highp vec4 stroke_color = u_stroke_color;
 #endif
@@ -169,8 +174,10 @@ void main(void) {
     v_data = vec3(extrude.x, extrude.y, antialiasblur);
 }
 
-)MBGL_SHADER";
-const char* circle::fragmentSource = R"MBGL_SHADER(
+*/
+
+// Uncompressed source of circle.fragment.glsl:
+/*
 
 #ifndef HAS_UNIFORM_u_color
 varying highp vec4 color;
@@ -281,7 +288,7 @@ void main() {
 #endif
 }
 
-)MBGL_SHADER";
+*/
 
 } // namespace shaders
 } // namespace mbgl

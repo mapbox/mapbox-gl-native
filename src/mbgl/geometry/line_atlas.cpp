@@ -2,10 +2,8 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
+#include <mbgl/util/hash.hpp>
 
-#include <boost/functional/hash.hpp>
-
-#include <sstream>
 #include <cmath>
 
 namespace mbgl {
@@ -22,7 +20,7 @@ LinePatternPos LineAtlas::getDashPosition(const std::vector<float>& dasharray,
     size_t key = patternCap == LinePatternCap::Round ? std::numeric_limits<size_t>::min()
                                                      : std::numeric_limits<size_t>::max();
     for (const float part : dasharray) {
-        boost::hash_combine<float>(key, part);
+        util::hash_combine<float>(key, part);
     }
 
     // Note: We're not handling hash collisions here.
@@ -40,6 +38,10 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
     const uint8_t n = patternCap == LinePatternCap::Round ? 7 : 0;
     const uint8_t dashheight = 2 * n + 1;
     const uint8_t offset = 128;
+
+    if (dasharray.size() < 2) {
+        return LinePatternPos();
+    }
 
     if (nextRow + dashheight > image.size.height) {
         Log::Warning(Event::OpenGL, "line atlas bitmap overflow");
@@ -73,6 +75,9 @@ LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, LinePatte
 
             while (right < x / stretch) {
                 left = right;
+                if (partIndex >= dasharray.size()) {
+                    return LinePatternPos();
+                }
                 right = right + dasharray[partIndex];
 
                 if (oddLength && partIndex == dasharray.size() - 1) {

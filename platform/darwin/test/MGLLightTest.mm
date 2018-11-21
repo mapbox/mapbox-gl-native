@@ -104,7 +104,7 @@
         XCTAssert(intensityTransition.delay && MGLTimeIntervalFromDuration(*intensityTransition.delay) == defaultTransition.delay);
         XCTAssert(intensityTransition.duration && MGLTimeIntervalFromDuration(*intensityTransition.duration) == defaultTransition.duration);
 
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         light.setIntensity(propertyValue);
         light.setIntensityTransition(transitionOptions);
 

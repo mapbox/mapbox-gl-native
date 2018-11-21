@@ -1,5 +1,6 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/test/stub_map_observer.hpp>
 #include <mbgl/test/fake_file_source.hpp>
 #include <mbgl/test/fixture_log_observer.hpp>
 
@@ -17,50 +18,13 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/util/color.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
 using namespace std::literals::string_literals;
-
-class StubMapObserver : public MapObserver {
-public:
-    void onWillStartLoadingMap() final {
-        if (onWillStartLoadingMapCallback) {
-            onWillStartLoadingMapCallback();
-        }
-    }
-    
-    void onDidFinishLoadingMap() final {
-        if (onDidFinishLoadingMapCallback) {
-            onDidFinishLoadingMapCallback();
-        }
-    }
-    
-    void onDidFailLoadingMap(std::exception_ptr) final {
-        if (didFailLoadingMapCallback) {
-            didFailLoadingMapCallback();
-        }
-    }
-    
-    void onDidFinishLoadingStyle() final {
-        if (didFinishLoadingStyleCallback) {
-            didFinishLoadingStyleCallback();
-        }
-    }
-
-    void onDidFinishRenderingFrame(RenderMode mode) final {
-        if (didFinishRenderingFrame) {
-            didFinishRenderingFrame(mode);
-        }
-    }
-
-    std::function<void()> onWillStartLoadingMapCallback;
-    std::function<void()> onDidFinishLoadingMapCallback;
-    std::function<void()> didFailLoadingMapCallback;
-    std::function<void()> didFinishLoadingStyleCallback;
-    std::function<void(RenderMode)> didFinishRenderingFrame;
-};
 
 template <class FileSource = StubFileSource>
 class MapTest {
@@ -86,6 +50,80 @@ public:
             , map(frontend, observer, frontend.getSize(), pixelRatio, fileSource, threadPool, mode) {
     }
 };
+
+TEST(Map, RendererState) {
+    MapTest<> test;
+
+    // Map hasn't notified the frontend about an update yet.
+    CameraOptions nullOptions;
+    ASSERT_EQ(test.frontend.getCameraOptions(), nullOptions);
+
+    LatLng coordinate { 1, 1 };
+    double zoom = 12.0;
+    double pitchInDegrees = 45.0;
+    double bearingInDegrees = 30.0;
+
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.setLatLngZoom(coordinate, zoom);
+    test.map.setPitch(pitchInDegrees);
+    test.map.setBearing(bearingInDegrees);
+
+    test.runLoop.runOnce();
+    test.frontend.render(test.map);
+
+    // RendererState::getCameraOptions
+    const CameraOptions& options = test.frontend.getCameraOptions();
+    EXPECT_NEAR(options.center->latitude(), coordinate.latitude(), 1e-7);
+    EXPECT_NEAR(options.center->longitude(), coordinate.longitude(), 1e-7);
+    ASSERT_DOUBLE_EQ(*options.zoom, zoom);
+    ASSERT_DOUBLE_EQ(*options.pitch, pitchInDegrees);
+    EXPECT_NEAR(*options.angle, bearingInDegrees, 1e-7);
+
+    {
+        const LatLng& latLng = test.frontend.latLngForPixel(ScreenCoordinate { 0, 0 });
+        const ScreenCoordinate& point = test.frontend.pixelForLatLng(coordinate);
+        EXPECT_NEAR(coordinate.latitude(), latLng.latitude(), 1e-1);
+        EXPECT_NEAR(coordinate.longitude(), latLng.longitude(), 1e-1);
+        const Size size = test.map.getSize();
+        EXPECT_NEAR(point.x, size.width / 2.0, 1e-7);
+        EXPECT_NEAR(point.y, size.height / 2.0, 1e-7);
+    }
+
+    // RendererState::hasImage
+    test.map.getStyle().addImage(std::make_unique<style::Image>("default_marker", decodeImage(util::read_file("test/fixtures/sprites/default_marker.png")), 1.0));
+
+    // The frontend has not yet been notified about the newly-added image.
+    EXPECT_FALSE(test.frontend.hasImage("default_marker"));
+
+    test.runLoop.runOnce();
+    test.frontend.render(test.map);
+
+    EXPECT_TRUE(test.frontend.hasImage("default_marker"));
+
+    // RendererState::hasSource
+    auto source = std::make_unique<GeoJSONSource>("GeoJSONSource");
+    source->setGeoJSON( Geometry<double>{ Point<double>{ 0, 0 } } );
+    test.map.getStyle().addSource(std::move(source));
+
+    // The frontend has not yet been notified about the newly-added source.
+    EXPECT_FALSE(test.frontend.hasSource("GeoJSONSource"));
+
+    test.runLoop.runOnce();
+    test.frontend.render(test.map);
+
+    EXPECT_TRUE(test.frontend.hasSource("GeoJSONSource"));
+
+    // RendererState::hasLayer
+    test.map.getStyle().addLayer(std::make_unique<SymbolLayer>("SymbolLayer", "GeoJSONSource"));
+
+    // The frontend has not yet been notified about the newly-added source.
+    EXPECT_FALSE(test.frontend.hasLayer("SymbolLayer"));
+
+    test.runLoop.runOnce();
+    test.frontend.render(test.map);
+
+    EXPECT_TRUE(test.frontend.hasLayer("SymbolLayer"));
+}
 
 TEST(Map, LatLngBehavior) {
     MapTest<> test;
@@ -119,10 +157,24 @@ TEST(Map, LatLngBoundsToCameraWithAngle) {
 
     LatLngBounds bounds = LatLngBounds::hull({15.68169,73.499857}, {53.560711, 134.77281});
 
-    CameraOptions virtualCamera = test.map.cameraForLatLngBounds(bounds, {}, 35);
+    CameraOptions virtualCamera = test.map.cameraForLatLngBounds(bounds, {}, 35.0);
     ASSERT_TRUE(bounds.contains(*virtualCamera.center));
     EXPECT_NEAR(*virtualCamera.zoom, 1.21385, 1e-5);
-    EXPECT_DOUBLE_EQ(virtualCamera.angle.value_or(0), -35 * util::DEG2RAD);
+    EXPECT_NEAR(virtualCamera.angle.value_or(0), 35.0, 1e-5);
+}
+
+TEST(Map, LatLngBoundsToCameraWithAngleAndPitch) {
+    MapTest<> test;
+    
+    test.map.setLatLngZoom({ 40.712730, -74.005953 }, 16.0);
+    
+    LatLngBounds bounds = LatLngBounds::hull({15.68169,73.499857}, {53.560711, 134.77281});
+    
+    CameraOptions virtualCamera = test.map.cameraForLatLngBounds(bounds, {}, 35, 20);
+    ASSERT_TRUE(bounds.contains(*virtualCamera.center));
+    EXPECT_NEAR(*virtualCamera.zoom, 13.66272, 1e-5);
+    ASSERT_DOUBLE_EQ(*virtualCamera.pitch, 20.0);
+    EXPECT_NEAR(virtualCamera.angle.value_or(0), 35.0, 1e-5);
 }
 
 TEST(Map, LatLngsToCamera) {
@@ -130,12 +182,26 @@ TEST(Map, LatLngsToCamera) {
 
     std::vector<LatLng> latLngs{{ 40.712730, 74.005953 }, {15.68169,73.499857}, {30.82678, 83.4082}};
 
-    CameraOptions virtualCamera = test.map.cameraForLatLngs(latLngs, {}, 23);
-    EXPECT_DOUBLE_EQ(virtualCamera.angle.value_or(0), -23 * util::DEG2RAD);
+    CameraOptions virtualCamera = test.map.cameraForLatLngs(latLngs, {}, 23.0);
+    EXPECT_NEAR(virtualCamera.angle.value_or(0), 23.0, 1e-5);
     EXPECT_NEAR(virtualCamera.zoom.value_or(0), 2.75434, 1e-5);
     EXPECT_NEAR(virtualCamera.center->latitude(), 28.49288, 1e-5);
     EXPECT_NEAR(virtualCamera.center->longitude(), 74.97437, 1e-5);
 }
+
+TEST(Map, LatLngsToCameraWithAngleAndPitch) {
+    MapTest<> test;
+    
+    std::vector<LatLng> latLngs{{ 40.712730, 74.005953 }, {15.68169,73.499857}, {30.82678, 83.4082}};
+    
+    CameraOptions virtualCamera = test.map.cameraForLatLngs(latLngs, {}, 23, 20);
+    EXPECT_NEAR(virtualCamera.angle.value_or(0), 23.0, 1e-5);
+    EXPECT_NEAR(virtualCamera.zoom.value_or(0), 3.04378, 1e-5);
+    EXPECT_NEAR(virtualCamera.center->latitude(), 28.53718, 1e-5);
+    EXPECT_NEAR(virtualCamera.center->longitude(), 74.31746, 1e-5);
+    ASSERT_DOUBLE_EQ(*virtualCamera.pitch, 20.0);
+}
+
 
 TEST(Map, CameraToLatLngBounds) {
     MapTest<> test;
@@ -217,9 +283,9 @@ TEST(Map, SetStyleInvalidJSON) {
     EXPECT_TRUE(fail);
 
     auto observer = Log::removeObserver();
-    auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
+    auto flo = static_cast<FixtureLogObserver*>(observer.get());
     EXPECT_EQ(1u, flo->count({ EventSeverity::Error, Event::ParseStyle, -1,
-        "Failed to parse style: 0 - Invalid value." }));
+        "Failed to parse style: Invalid value. at offset 0" }));
     auto unchecked = flo->unchecked();
     EXPECT_TRUE(unchecked.empty()) << unchecked;
 }
@@ -252,7 +318,7 @@ TEST(Map, DoubleStyleLoad) {
 }
 
 TEST(Map, StyleFresh) {
-    // The map should not revalidate fresh styles.
+    // The map should continue to revalidate fresh styles.
 
     MapTest<FakeFileSource> test;
 
@@ -264,11 +330,11 @@ TEST(Map, StyleFresh) {
     response.expires = Timestamp::max();
 
     test.fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(0u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource.requests.size());
 }
 
 TEST(Map, StyleExpired) {
-    // The map should allow expired styles to be revalidated, so long as no mutations are made.
+    // The map should allow expired styles to be revalidated until we get a fresh style.
 
     using namespace std::chrono_literals;
 
@@ -284,11 +350,22 @@ TEST(Map, StyleExpired) {
     test.fileSource.respond(Resource::Style, response);
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
+    // Mutate layer. From now on, sending a response to the style won't overwrite it anymore, but
+    // we should continue to wait for a fresh response.
     test.map.getStyle().addLayer(std::make_unique<style::BackgroundLayer>("bg"));
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
+    // Send another expired response, and confirm that we didn't overwrite the style, but continue
+    // to wait for a fresh response.
     test.fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(0u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource.requests.size());
+    EXPECT_NE(nullptr, test.map.getStyle().getLayer("bg"));
+
+    // Send a fresh response, and confirm that we didn't overwrite the style, but continue to wait
+    // for a fresh response.
+    response.expires = util::now() + 1h;
+    test.fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource.requests.size());
     EXPECT_NE(nullptr, test.map.getStyle().getLayer("bg"));
 }
 
@@ -352,7 +429,7 @@ TEST(Map, StyleEarlyMutation) {
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/water.json"));
     test.fileSource.respond(Resource::Style, response);
 
-    EXPECT_EQ(0u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource.requests.size());
     EXPECT_NE(nullptr, test.map.getStyle().getLayer("water"));
 }
 
@@ -360,7 +437,7 @@ TEST(Map, MapLoadingSignal) {
     MapTest<> test;
 
     bool emitted = false;
-    test.observer.onWillStartLoadingMapCallback = [&]() {
+    test.observer.willStartLoadingMapCallback = [&]() {
         emitted = true;
     };
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
@@ -370,7 +447,7 @@ TEST(Map, MapLoadingSignal) {
 TEST(Map, MapLoadedSignal) {
     MapTest<> test { 1, MapMode::Continuous };
 
-    test.observer.onDidFinishLoadingMapCallback = [&]() {
+    test.observer.didFinishLoadingMapCallback = [&]() {
         test.runLoop.stop();
     };
 
@@ -596,7 +673,7 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     HeadlessFrontend frontend(pixelRatio, fileSource, threadPool);
 
     StubMapObserver observer;
-    observer.didFinishRenderingFrame = [&] (MapObserver::RenderMode) {
+    observer.didFinishRenderingFrameCallback = [&] (MapObserver::RenderMode) {
         // Start a timer that ends the test one second from now. If we are continuing to render
         // indefinitely, the timer will be constantly restarted and never trigger. Instead, the
         // emergency shutoff above will trigger, failing the test.
@@ -651,4 +728,53 @@ TEST(Map, NoContentTiles) {
                      test.frontend.render(test.map),
                      0.0015,
                      0.1);
+}
+
+// https://github.com/mapbox/mapbox-gl-native/issues/12432
+TEST(Map, Issue12432) {
+    MapTest<> test { 1, MapMode::Continuous };
+
+    test.fileSource.tileResponse = [&](const Resource&) {
+        Response result;
+        result.data = std::make_shared<std::string>(util::read_file("test/fixtures/map/issue12432/0-0-0.mvt"));
+        return result;
+    };
+
+    test.map.getStyle().loadJSON(R"STYLE({
+      "version": 8,
+      "sources": {
+        "mapbox": {
+          "type": "vector",
+          "tiles": ["http://example.com/{z}-{x}-{y}.vector.pbf"]
+        }
+      },
+      "layers": [{
+        "id": "water",
+        "type": "fill",
+        "source": "mapbox",
+        "source-layer": "water"
+      }]
+    })STYLE");
+
+    test.observer.didFinishLoadingMapCallback = [&]() {
+        test.map.getStyle().loadJSON(R"STYLE({
+          "version": 8,
+          "sources": {
+            "mapbox": {
+              "type": "vector",
+              "tiles": ["http://example.com/{z}-{x}-{y}.vector.pbf"]
+            }
+          },
+          "layers": [{
+            "id": "water",
+            "type": "line",
+            "source": "mapbox",
+            "source-layer": "water"
+          }]
+        })STYLE");
+
+        test.runLoop.stop();
+    };
+
+    test.runLoop.run();
 }

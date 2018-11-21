@@ -1,12 +1,17 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/shaders/raster.hpp>
+#include <mbgl/shaders/source.hpp>
 
 namespace mbgl {
 namespace shaders {
 
 const char* raster::name = "raster";
-const char* raster::vertexSource = R"MBGL_SHADER(
+const char* raster::vertexSource = source() + 68497;
+const char* raster::fragmentSource = source() + 69310;
+
+// Uncompressed source of raster.vertex.glsl:
+/*
 uniform mat4 u_matrix;
 uniform vec2 u_tl_parent;
 uniform float u_scale_parent;
@@ -29,8 +34,10 @@ void main() {
     v_pos1 = (v_pos0 * u_scale_parent) + u_tl_parent;
 }
 
-)MBGL_SHADER";
-const char* raster::fragmentSource = R"MBGL_SHADER(
+*/
+
+// Uncompressed source of raster.fragment.glsl:
+/*
 uniform float u_fade_t;
 uniform float u_opacity;
 uniform sampler2D u_image0;
@@ -84,7 +91,7 @@ void main() {
 #endif
 }
 
-)MBGL_SHADER";
+*/
 
 } // namespace shaders
 } // namespace mbgl

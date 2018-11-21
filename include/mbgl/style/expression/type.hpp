@@ -60,6 +60,19 @@ struct ValueType {
     std::string getName() const { return "value"; }
     bool operator==(const ValueType&) const { return true; }
 };
+    
+struct CollatorType {
+    constexpr CollatorType() {}; // NOLINT
+    std::string getName() const { return "collator"; }
+    bool operator==(const CollatorType&) const { return true; }
+};
+    
+struct FormattedType {
+    constexpr FormattedType() {}; // NOLINT
+    std::string getName() const { return "formatted"; }
+    bool operator==(const FormattedType&) const { return true; }
+};
+
 
 constexpr NullType Null;
 constexpr NumberType Number;
@@ -68,6 +81,8 @@ constexpr BooleanType Boolean;
 constexpr ColorType Color;
 constexpr ValueType Value;
 constexpr ObjectType Object;
+constexpr CollatorType Collator;
+constexpr FormattedType Formatted;
 constexpr ErrorType Error;
 
 struct Array;
@@ -81,6 +96,8 @@ using Type = variant<
     ObjectType,
     ValueType,
     mapbox::util::recursive_wrapper<Array>,
+    CollatorType,
+    FormattedType,
     ErrorType>;
 
 struct Array {

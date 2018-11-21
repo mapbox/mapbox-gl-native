@@ -119,13 +119,6 @@ public class MapboxMapOptionsTest {
   }
 
   @Test
-  public void testLocationEnabled() {
-    assertFalse(new MapboxMapOptions().getLocationEnabled());
-    assertTrue(new MapboxMapOptions().locationEnabled(true).getLocationEnabled());
-    assertFalse(new MapboxMapOptions().locationEnabled(false).getLocationEnabled());
-  }
-
-  @Test
   public void testTiltGesturesEnabled() {
     assertTrue(new MapboxMapOptions().getTiltGesturesEnabled());
     assertTrue(new MapboxMapOptions().tiltGesturesEnabled(true).getTiltGesturesEnabled());
@@ -154,17 +147,10 @@ public class MapboxMapOptionsTest {
   }
 
   @Test
-  public void testZoomControlsEnabled() {
-    assertFalse(new MapboxMapOptions().getZoomControlsEnabled());
-    assertTrue(new MapboxMapOptions().zoomControlsEnabled(true).getZoomControlsEnabled());
-    assertFalse(new MapboxMapOptions().zoomControlsEnabled(false).getZoomControlsEnabled());
-  }
-
-  @Test
   public void testStyleUrl() {
-    assertEquals(Style.DARK, new MapboxMapOptions().styleUrl(Style.DARK).getStyle());
-    assertNotEquals(Style.LIGHT, new MapboxMapOptions().styleUrl(Style.DARK).getStyle());
-    assertNull(new MapboxMapOptions().getStyle());
+    assertEquals(Style.DARK, new MapboxMapOptions().styleUrl(Style.DARK).getStyleUrl());
+    assertNotEquals(Style.LIGHT, new MapboxMapOptions().styleUrl(Style.DARK).getStyleUrl());
+    assertNull(new MapboxMapOptions().getStyleUrl());
   }
 
   @Test
@@ -176,18 +162,6 @@ public class MapboxMapOptionsTest {
   }
 
   @Test
-  public void testMyLocationForegroundTint() {
-    assertEquals(Color.BLUE, new MapboxMapOptions()
-      .myLocationForegroundTintColor(Color.BLUE).getMyLocationForegroundTintColor());
-  }
-
-  @Test
-  public void testMyLocationBackgroundTint() {
-    assertEquals(Color.BLUE, new MapboxMapOptions()
-      .myLocationBackgroundTintColor(Color.BLUE).getMyLocationBackgroundTintColor());
-  }
-
-  @Test
   public void testPrefetchesTiles() {
     // Default value
     assertTrue(new MapboxMapOptions().getPrefetchesTiles());
@@ -195,6 +169,16 @@ public class MapboxMapOptionsTest {
     // Check mutations
     assertTrue(new MapboxMapOptions().setPrefetchesTiles(true).getPrefetchesTiles());
     assertFalse(new MapboxMapOptions().setPrefetchesTiles(false).getPrefetchesTiles());
+  }
+
+  @Test
+  public void testCrossSourceCollisions() {
+    // Default value
+    assertTrue(new MapboxMapOptions().getCrossSourceCollisions());
+
+    // check mutations
+    assertTrue(new MapboxMapOptions().crossSourceCollisions(true).getCrossSourceCollisions());
+    assertFalse(new MapboxMapOptions().crossSourceCollisions(false).getCrossSourceCollisions());
   }
 }
 

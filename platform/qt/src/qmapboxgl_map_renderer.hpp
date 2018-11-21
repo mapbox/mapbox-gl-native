@@ -14,7 +14,6 @@
 
 #include <memory>
 #include <mutex>
-#include <queue>
 
 namespace mbgl {
 class Renderer;
@@ -23,7 +22,7 @@ class UpdateParameters;
 
 class QMapboxGLRendererBackend;
 
-class QMapboxGLMapRenderer : public QObject, public mbgl::Scheduler
+class QMapboxGLMapRenderer : public QObject
 {
     Q_OBJECT
 
@@ -31,9 +30,6 @@ public:
     QMapboxGLMapRenderer(qreal pixelRatio, mbgl::DefaultFileSource &,
             mbgl::ThreadPool &, QMapboxGLSettings::GLContextMode);
     virtual ~QMapboxGLMapRenderer();
-
-    // mbgl::Scheduler implementation.
-    void schedule(std::weak_ptr<mbgl::Mailbox> scheduled) final;
 
     void render();
     void updateFramebuffer(quint32 fbo, const mbgl::Size &size);
@@ -56,8 +52,5 @@ private:
     QMapboxGLRendererBackend m_backend;
     std::unique_ptr<mbgl::Renderer> m_renderer;
 
-    std::mutex m_taskQueueMutex;
-    std::queue<std::weak_ptr<mbgl::Mailbox>> m_taskQueue;
-
-    bool m_threadWithScheduler;
+    bool m_forceScheduler;
 };

@@ -30,20 +30,33 @@ rm -f ../${ZIP}
 zip -yr ../${ZIP} *
 
 #
+# report file sizes
+#
+step "Echoing file sizes…"
+du -sh ../${ZIP}
+du -sch *
+du -sch dynamic/*
+
+#
 # upload
 #
+PROGRESS=
+if [ -n "${CI:-}" ]; then
+    PROGRESS="--no-progress"
+fi
+
 step "Uploading ${ZIP} to s3…"
 REPO_NAME=$(basename $TRAVIS_REPO_SLUG)
-aws s3 cp ../${ZIP} s3://mapbox/$REPO_NAME/ios/builds/ --acl public-read
+aws s3 cp ../${ZIP} s3://mapbox/$REPO_NAME/ios/builds/ --acl public-read ${PROGRESS}
 echo "URL: https://mapbox.s3.amazonaws.com/$REPO_NAME/ios/builds/${ZIP}"
 
 #
-# update nightly
+# upload & update nightly
 #
 if [[ ${PUBLISH_VERSION} =~ "nightly" ]]; then
     step "Updating ${PUBLISH_VERSION} to ${PUBLISH_STYLE}…"
     GENERIC_NIGHTLY_FILENAME="mapbox-ios-sdk-${PUBLISH_VERSION}.zip"
     aws s3 cp \
         s3://mapbox/$REPO_NAME/ios/builds/${ZIP} \
-        s3://mapbox/$REPO_NAME/ios/builds/${GENERIC_NIGHTLY_FILENAME} --acl public-read
+        s3://mapbox/$REPO_NAME/ios/builds/${GENERIC_NIGHTLY_FILENAME} --acl public-read ${PROGRESS}
 fi

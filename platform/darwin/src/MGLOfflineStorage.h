@@ -26,8 +26,13 @@ NS_ASSUME_NONNULL_BEGIN
  If you only need to observe changes in a particular pack’s progress, you can
  alternatively observe KVO change notifications to the pack’s `progress` key
  path.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/offline-pack/">
+ Download an offline map</a> example to learn how to calculate the progress
+ of an offline download.
  */
-extern MGL_EXPORT const NSNotificationName MGLOfflinePackProgressChangedNotification;
+FOUNDATION_EXTERN MGL_EXPORT const NSNotificationName MGLOfflinePackProgressChangedNotification;
 
 /**
  Posted by the shared `MGLOfflineStorage` object whenever an `MGLOfflinePack`
@@ -40,7 +45,7 @@ extern MGL_EXPORT const NSNotificationName MGLOfflinePackProgressChangedNotifica
  `userInfo` dictionary contains the error object in the
  `MGLOfflinePackErrorUserInfoKey` key.
  */
-extern MGL_EXPORT const NSNotificationName MGLOfflinePackErrorNotification;
+FOUNDATION_EXTERN MGL_EXPORT const NSNotificationName MGLOfflinePackErrorNotification;
 
 /**
  Posted by the shared `MGLOfflineStorage` object when the maximum number of
@@ -55,7 +60,7 @@ extern MGL_EXPORT const NSNotificationName MGLOfflinePackErrorNotification;
  calling the `-[MGLOfflineStorage removePack:withCompletionHandler:]` method.
  Contact your Mapbox sales representative to have the limit raised.
  */
-extern MGL_EXPORT const NSNotificationName MGLOfflinePackMaximumMapboxTilesReachedNotification;
+FOUNDATION_EXTERN MGL_EXPORT const NSNotificationName MGLOfflinePackMaximumMapboxTilesReachedNotification;
 
 /**
  A key in the `userInfo` property of a notification posted by `MGLOfflinePack`.
@@ -68,9 +73,9 @@ typedef NSString *MGLOfflinePackUserInfoKey NS_EXTENSIBLE_STRING_ENUM;
  `MGLOfflinePackProgressChangedNotification` notification. Call `-integerValue`
  on the object to receive the `MGLOfflinePackState`-typed state.
  */
-extern MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyState;
+FOUNDATION_EXTERN MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyState;
 
-extern MGL_EXPORT NSString * const MGLOfflinePackStateUserInfoKey __attribute__((deprecated("Use MGLOfflinePackUserInfoKeyState")));
+FOUNDATION_EXTERN MGL_EXPORT NSString * const MGLOfflinePackStateUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyState")));
 
 /**
  The key for an `NSValue` object that indicates an offline pack’s current
@@ -79,9 +84,9 @@ extern MGL_EXPORT NSString * const MGLOfflinePackStateUserInfoKey __attribute__(
  `-MGLOfflinePackProgressValue` on the object to receive the
  `MGLOfflinePackProgress`-typed progress.
  */
-extern MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyProgress;
+FOUNDATION_EXTERN MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyProgress;
 
-extern MGL_EXPORT NSString * const MGLOfflinePackProgressUserInfoKey __attribute__((deprecated("Use MGLOfflinePackUserInfoKeyProgress")));
+FOUNDATION_EXTERN MGL_EXPORT NSString * const MGLOfflinePackProgressUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyProgress")));
 
 /**
  The key for an `NSError` object that is encountered in the course of
@@ -89,9 +94,9 @@ extern MGL_EXPORT NSString * const MGLOfflinePackProgressUserInfoKey __attribute
  an `MGLOfflinePackErrorNotification` notification. The error’s domain is
  `MGLErrorDomain`. See `MGLErrorCode` for possible error codes.
  */
-extern MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyError;
+FOUNDATION_EXTERN MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyError;
 
-extern MGL_EXPORT NSString * const MGLOfflinePackErrorUserInfoKey __attribute__((deprecated("Use MGLOfflinePackUserInfoKeyError")));
+FOUNDATION_EXTERN MGL_EXPORT NSString * const MGLOfflinePackErrorUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyError")));
 
 /**
  The key for an `NSNumber` object that indicates the maximum number of
@@ -101,9 +106,11 @@ extern MGL_EXPORT NSString * const MGLOfflinePackErrorUserInfoKey __attribute__(
  `-unsignedLongLongValue` on the object to receive the `uint64_t`-typed tile
  limit.
  */
-extern MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount;
+FOUNDATION_EXTERN MGL_EXPORT const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount;
 
-extern MGL_EXPORT NSString * const MGLOfflinePackMaximumCountUserInfoKey __attribute__((deprecated("Use MGLOfflinePackUserInfoKeyMaximumCount")));
+FOUNDATION_EXTERN MGL_EXPORT NSString * const MGLOfflinePackMaximumCountUserInfoKey __attribute__((unavailable("Use MGLOfflinePackUserInfoKeyMaximumCount")));
+
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUnsupportedRegionTypeException;
 
 /**
  A block to be called once an offline pack has been completely created and
@@ -131,6 +138,18 @@ typedef void (^MGLOfflinePackAdditionCompletionHandler)(MGLOfflinePack * _Nullab
     pack could not be invalidated or removed.
  */
 typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error);
+
+/**
+ A block to be called once the contents of a file are copied into the current packs.
+ 
+ @param fileURL The file URL of the offline database containing the offline packs
+ that were copied.
+ @param packs An array of all known offline packs, or `nil` if there was an error
+ creating or adding the pack.
+ @param error A pointer to an error object (if any) indicating why the pack could
+ not be created or added.
+ */
+typedef void (^MGLBatchedOfflinePackAdditionCompletionHandler)(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error);
 
 /**
  The type of resource that is requested.
@@ -163,6 +182,11 @@ typedef NS_ENUM(NSUInteger, MGLResourceKind) {
  packs. All of this class’s instance methods are asynchronous, reflecting the
  fact that offline resources are stored in a database. The shared object
  maintains a canonical collection of offline packs in its `packs` property.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/offline-pack/">
+ Download an offline map</a> example to learn how to create and register an
+ offline pack for a defined region.
  */
 MGL_EXPORT
 @interface MGLOfflineStorage : NSObject
@@ -170,7 +194,43 @@ MGL_EXPORT
 /**
  Returns the shared offline storage object.
  */
-+ (instancetype)sharedOfflineStorage;
+@property (class, nonatomic, readonly) MGLOfflineStorage *sharedOfflineStorage;
+
+#pragma mark - Adding Contents of File
+
+/**
+ Adds the offline packs located at the given file path to offline storage.
+ 
+ The file must be a valid offline region database bundled with the application
+ or downloaded separately.
+ 
+ The resulting packs are added or updated to the shared offline storage object’s `packs`
+ property, then the `completion` block is executed.
+ 
+ @param filePath A string representation of the file path. The file path must be
+ writable as schema updates may be perfomed.
+ @param completion The completion handler to call once the contents of the given
+ file has been added to offline storage. This handler is executed asynchronously
+ on the main queue.
+ */
+- (void)addContentsOfFile:(NSString *)filePath withCompletionHandler:(nullable MGLBatchedOfflinePackAdditionCompletionHandler)completion;
+
+/**
+ Adds the offline packs located at the given URL to offline storage.
+ 
+ The file must be a valid offline region database bundled with the application
+ or downloaded separately.
+ 
+ The resulting packs are added or updated to the shared offline storage object’s `packs`
+ property, then the `completion` block is executed.
+ 
+ @param fileURL A file URL specifying the file to add. URL should be a valid system path.
+ The file URL must be writable as schema updates may be performed.
+ @param completion The completion handler to call once the contents of the given
+ file has been added to offline storage. This handler is executed asynchronously
+ on the main queue.
+ */
+- (void)addContentsOfURL:(NSURL *)fileURL withCompletionHandler:(nullable MGLBatchedOfflinePackAdditionCompletionHandler)completion;
 
 #pragma mark - Accessing the Delegate
 
@@ -199,7 +259,7 @@ MGL_EXPORT
  `packs` property, observe KVO change notifications on the `packs` key path.
  The initial load results in an `NSKeyValueChangeSetting` change.
  */
-@property (nonatomic, strong, readonly, nullable) NS_ARRAY_OF(MGLOfflinePack *) *packs;
+@property (nonatomic, strong, readonly, nullable) NSArray<MGLOfflinePack *> *packs;
 
 /**
  Creates and registers an offline pack that downloads the resources needed to
@@ -288,6 +348,30 @@ MGL_EXPORT
  as part of an offline pack or due to caching during normal use of `MGLMapView`.
  */
 @property (nonatomic, readonly) unsigned long long countOfBytesCompleted;
+
+/*
+ Inserts the provided resource into the ambient cache.
+ 
+ This method mimics the caching that would take place if the equivalent resource
+ were requested in the process of map rendering. Use this method to pre-warm the
+ cache with resources you know will be requested.
+ 
+ This method is asynchronous; the data may not be immediately available for
+ in-progress requests, though subsequent requests should have access to the
+ cached data.
+ 
+ @param data Response data to store for this resource. The data is expected to
+    be uncompressed; internally, the cache will compress data as necessary.
+ @param url The URL at which the data can normally be found.
+ @param modified The date the resource was last modified.
+ @param expires The date after which the resource is no longer valid.
+ @param eTag An HTTP entity tag.
+ @param mustRevalidate A Boolean value indicating whether the data is still
+    usable past the expiration date.
+ */
+- (void)preloadData:(NSData *)data forURL:(NSURL *)url modificationDate:(nullable NSDate *)modified expirationDate:(nullable NSDate *)expires eTag:(nullable NSString *)eTag mustRevalidate:(BOOL)mustRevalidate NS_SWIFT_NAME(preload(_:for:modifiedOn:expiresOn:eTag:mustRevalidate:));
+
+- (void)putResourceWithUrl:(NSURL *)url data:(NSData *)data modified:(nullable NSDate *)modified expires:(nullable NSDate *)expires etag:(nullable NSString *)etag mustRevalidate:(BOOL)mustRevalidate __attribute__((deprecated("Use -preloadData:forURL:modificationDate:expirationDate:eTag:mustRevalidate:.")));
 
 @end
 

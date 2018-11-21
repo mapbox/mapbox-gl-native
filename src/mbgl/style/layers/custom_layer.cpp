@@ -5,21 +5,18 @@
 namespace mbgl {
 namespace style {
 
-CustomLayer::CustomLayer(const std::string& layerID,
-                         CustomLayerInitializeFunction init,
-                         CustomLayerRenderFunction render,
-                         CustomLayerContextLostFunction contextLost,
-                         CustomLayerDeinitializeFunction deinit,
-                         void* context)
-        : Layer(makeMutable<Impl>(layerID, init, render, contextLost, deinit, context)) {
-}
+namespace {
+    const LayerTypeInfo typeInfoCustom
+    { "",
+      LayerTypeInfo::Source::NotRequired,
+      LayerTypeInfo::Pass3D::NotRequired,
+      LayerTypeInfo::Layout::NotRequired,
+      LayerTypeInfo::Clipping::NotRequired };
+}  // namespace
 
 CustomLayer::CustomLayer(const std::string& layerID,
-                         CustomLayerInitializeFunction init,
-                         CustomLayerRenderFunction render,
-                         CustomLayerDeinitializeFunction deinit,
-                         void* context)
-    : Layer(makeMutable<Impl>(layerID, init, render, nullptr, deinit, context)) {
+                         std::unique_ptr<CustomLayerHost> host)
+    : Layer(makeMutable<Impl>(layerID, std::move(host))) {
 }
 
 CustomLayer::~CustomLayer() = default;
@@ -37,34 +34,35 @@ std::unique_ptr<Layer> CustomLayer::cloneRef(const std::string&) const {
     return nullptr;
 }
 
-// Visibility
+using namespace conversion;
 
-void CustomLayer::setVisibility(VisibilityType value) {
-    if (value == getVisibility())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->visibility = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
+optional<Error> CustomLayer::setPaintProperty(const std::string&, const Convertible&) {
+    return Error { "layer doesn't support this property" };
 }
 
-// Zoom range
-
-void CustomLayer::setMinZoom(float minZoom) {
-    auto impl_ = mutableImpl();
-    impl_->minZoom = minZoom;
-    baseImpl = std::move(impl_);
+optional<Error> CustomLayer::setLayoutProperty(const std::string&, const Convertible&) {
+    return Error { "layer doesn't support this property" };
 }
 
-void CustomLayer::setMaxZoom(float maxZoom) {
-    auto impl_ = mutableImpl();
-    impl_->maxZoom = maxZoom;
-    baseImpl = std::move(impl_);
+Mutable<Layer::Impl> CustomLayer::mutableBaseImpl() const {
+    return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-template <>
-bool Layer::is<CustomLayer>() const {
-    return getType() == LayerType::Custom;
+const LayerTypeInfo* CustomLayer::Impl::getTypeInfo() const noexcept {
+    return &typeInfoCustom;
+}
+
+CustomLayerFactory::CustomLayerFactory() = default;
+
+CustomLayerFactory::~CustomLayerFactory() = default;
+
+const LayerTypeInfo* CustomLayerFactory::getTypeInfo() const noexcept {
+    return &typeInfoCustom;
+}
+
+std::unique_ptr<style::Layer> CustomLayerFactory::createLayer(const std::string&, const conversion::Convertible&) {
+    assert(false);
+    return nullptr;
 }
 
 } // namespace style

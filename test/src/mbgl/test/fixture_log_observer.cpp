@@ -11,8 +11,9 @@ FixtureLog::Message::Message(EventSeverity severity_,
     : severity(severity_), event(event_), code(code_), msg(std::move(msg_)) {
 }
 
-bool FixtureLog::Message::operator==(const Message& rhs) const {
-    return severity == rhs.severity && event == rhs.event && code == rhs.code && msg == rhs.msg;
+bool FixtureLog::Message::matches(const Message& rhs, bool substring) const {
+    return severity == rhs.severity && event == rhs.event && code == rhs.code &&
+           (substring ? msg.find(rhs.msg) != std::string::npos : msg == rhs.msg);
 }
 
 FixtureLog::Observer::Observer(FixtureLog* log_) : log(log_) {
@@ -31,7 +32,9 @@ bool FixtureLog::Observer::onRecord(EventSeverity severity,
                                     const std::string& msg) {
     std::lock_guard<std::mutex> lock(messagesMutex);
 
-    messages.emplace_back(severity, event, code, msg);
+    if (severity != EventSeverity::Debug) {
+        messages.emplace_back(severity, event, code, msg);
+    }
 
     return true;
 }
@@ -42,12 +45,12 @@ bool FixtureLog::Observer::empty() const {
     return messages.empty();
 }
 
-size_t FixtureLog::Observer::count(const Message& message) const {
+size_t FixtureLog::Observer::count(const Message& message, bool substring) const {
     std::lock_guard<std::mutex> lock(messagesMutex);
 
     size_t message_count = 0;
     for (const auto& msg : messages) {
-        if (msg == message) {
+        if (!msg.checked && msg.matches(message, substring)) {
             message_count++;
             msg.checked = true;
         }
@@ -63,8 +66,12 @@ bool FixtureLog::empty() const {
     return observer ? observer->empty() : true;
 }
 
-size_t FixtureLog::count(const FixtureLog::Message& message) const {
-    return observer ? observer->count(message) : 0;
+size_t FixtureLog::count(const FixtureLog::Message& message, bool substring) const {
+    return observer ? observer->count(message, substring) : 0;
+}
+
+size_t FixtureLog::uncheckedCount() const {
+    return observer ? observer->uncheckedCount() : 0;
 }
 
 FixtureLog::~FixtureLog() {
@@ -84,6 +91,18 @@ std::vector<FixtureLog::Message> FixtureLogObserver::unchecked() const {
         }
     }
     return unchecked_messages;
+}
+
+size_t FixtureLogObserver::uncheckedCount() const {
+    std::lock_guard<std::mutex> lock(messagesMutex);
+
+    size_t result = 0;
+    for (const auto& msg : messages) {
+        if (!msg.checked) {
+            result++;
+        }
+    }
+    return result;
 }
 
 ::std::ostream& operator<<(::std::ostream& os, const std::vector<FixtureLog::Message>& messages) {

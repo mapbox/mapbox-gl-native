@@ -2,6 +2,7 @@
 
 #include <mbgl/math/clamp.hpp>
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/tileset.hpp>
 
 #include <memory>
 #include <array>
@@ -12,7 +13,7 @@ namespace mbgl {
 
 class DEMData {
 public:
-    DEMData(const PremultipliedImage& image);
+    DEMData(const PremultipliedImage& image, Tileset::DEMEncoding encoding);
     void backfillBorder(const DEMData& borderTileData, int8_t dx, int8_t dy);
 
     void set(const int32_t x, const int32_t y, const int32_t value) {

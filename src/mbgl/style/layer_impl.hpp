@@ -41,6 +41,13 @@ public:
     // Utility function for automatic layer grouping.
     virtual void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const = 0;
 
+    // Returns pointer to the statically allocated layer type info structure.
+    virtual const LayerTypeInfo* getTypeInfo() const noexcept = 0;
+
+    // Populates the given \a fontStack with fonts being used by the layer.
+    virtual void populateFontStack(std::set<FontStack>& fontStack) const;
+
+    // Note: LayerType is deprecated, do not use it.
     const LayerType type;
     std::string id;
     std::string source;

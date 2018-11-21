@@ -45,7 +45,6 @@ mbgl::LatLng MGLLatLngFromLocationCoordinate2D(CLLocationCoordinate2D coordinate
     }
 }
 
-MGL_EXPORT
 CLLocationDistance MGLAltitudeForZoomLevel(double zoomLevel, CGFloat pitch, CLLocationDegrees latitude, CGSize size) {
     CLLocationDistance metersPerPixel = mbgl::Projection::getMetersPerPixelAtLatitude(latitude, zoomLevel);
     CLLocationDistance metersTall = metersPerPixel * size.height;
@@ -53,7 +52,6 @@ CLLocationDistance MGLAltitudeForZoomLevel(double zoomLevel, CGFloat pitch, CLLo
     return altitude * std::sin(M_PI_2 - MGLRadiansFromDegrees(pitch)) / std::sin(M_PI_2);
 }
 
-MGL_EXPORT
 double MGLZoomLevelForAltitude(CLLocationDistance altitude, CGFloat pitch, CLLocationDegrees latitude, CGSize size) {
     CLLocationDistance eyeAltitude = altitude / std::sin(M_PI_2 - MGLRadiansFromDegrees(pitch)) * std::sin(M_PI_2);
     CLLocationDistance metersTall = eyeAltitude * 2 * std::tan(MGLRadiansFromDegrees(MGLAngularFieldOfView) / 2.);
@@ -100,9 +98,25 @@ CLLocationDirection MGLDirectionBetweenCoordinates(CLLocationCoordinate2D firstC
 
 CGPoint MGLPointRounded(CGPoint point) {
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    CGFloat scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [UIScreen mainScreen].nativeScale : [UIScreen mainScreen].scale;
+    CGFloat scaleFactor = [UIScreen mainScreen].nativeScale;
 #elif TARGET_OS_MAC
     CGFloat scaleFactor = [NSScreen mainScreen].backingScaleFactor;
 #endif
     return CGPointMake(round(point.x * scaleFactor) / scaleFactor, round(point.y * scaleFactor) / scaleFactor);
 }
+
+MGLMapPoint MGLMapPointForCoordinate(CLLocationCoordinate2D coordinate, double zoomLevel) {
+    mbgl::Point<double> projectedCoordinate = mbgl::Projection::project(MGLLatLngFromLocationCoordinate2D(coordinate), std::pow(2.0, zoomLevel));
+    return MGLMapPointMake(projectedCoordinate.x, projectedCoordinate.y, zoomLevel);
+}
+
+MGLMatrix4 MGLMatrix4Make(std::array<double, 16>  array) {
+    MGLMatrix4 mat4 = {
+        .m00 = array[0], .m01 = array[1], .m02 = array[2], .m03 = array[3],
+        .m10 = array[4], .m11 = array[5], .m12 = array[6], .m13 = array[7],
+        .m20 = array[8], .m21 = array[9], .m22 = array[10], .m23 = array[11],
+        .m30 = array[12], .m31 = array[13], .m32 = array[14], .m33 = array[15]
+    };
+    return mat4;
+}
+

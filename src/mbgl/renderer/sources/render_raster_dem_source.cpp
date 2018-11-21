@@ -4,7 +4,6 @@
 #include <mbgl/algorithm/update_tile_masks.hpp>
 #include <mbgl/geometry/dem_data.hpp>
 #include <mbgl/renderer/buckets/hillshade_bucket.hpp>
-#include <iostream>
 
 namespace mbgl {
 
@@ -36,7 +35,7 @@ void RenderRasterDEMSource::update(Immutable<style::Source::Impl> baseImpl_,
 
     if (tileset != _tileset) {
         tileset = _tileset;
-
+        maxzoom = tileset->zoomRange.max;
         // TODO: this removes existing buckets, and will cause flickering.
         // Should instead refresh tile data in place.
         tilePyramid.tiles.clear();
@@ -147,7 +146,7 @@ RenderRasterDEMSource::queryRenderedFeatures(const ScreenLineString&,
                                           const TransformState&,
                                           const std::vector<const RenderLayer*>&,
                                           const RenderedQueryOptions&,
-                                          const CollisionIndex& ) const {
+                                          const mat4&) const {
     return std::unordered_map<std::string, std::vector<Feature>> {};
 }
 
@@ -155,8 +154,8 @@ std::vector<Feature> RenderRasterDEMSource::querySourceFeatures(const SourceQuer
     return {};
 }
 
-void RenderRasterDEMSource::onLowMemory() {
-    tilePyramid.onLowMemory();
+void RenderRasterDEMSource::reduceMemoryUse() {
+    tilePyramid.reduceMemoryUse();
 }
 
 void RenderRasterDEMSource::dumpDebugLogs() const {

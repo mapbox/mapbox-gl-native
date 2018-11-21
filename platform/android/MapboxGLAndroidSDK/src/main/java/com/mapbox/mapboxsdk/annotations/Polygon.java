@@ -1,7 +1,9 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Color;
+import android.support.annotation.Keep;
 
+import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
@@ -13,8 +15,11 @@ import java.util.List;
  */
 public final class Polygon extends BasePointCollection {
 
+  @Keep
   private int fillColor = Color.BLACK; // default fillColor is black
+  @Keep
   private int strokeColor = Color.BLACK; // default strokeColor is black
+  @Keep
   private List<List<LatLng>> holes;
 
   Polygon() {
@@ -75,7 +80,7 @@ public final class Polygon extends BasePointCollection {
    *
    * @param holes A {@link List} of {@link List} of {@link LatLng} points making up the holes.
    */
-  public void setHoles(List<? extends List<LatLng>> holes) {
+  public void setHoles(@NonNull List<? extends List<LatLng>> holes) {
     this.holes = new ArrayList<>(holes);
     update();
   }

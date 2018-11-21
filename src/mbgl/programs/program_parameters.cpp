@@ -1,7 +1,5 @@
 #include <mbgl/programs/program_parameters.hpp>
-
-#include <iomanip>
-#include <sstream>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 
@@ -9,14 +7,15 @@ ProgramParameters::ProgramParameters(const float pixelRatio,
                                      const bool overdraw,
                                      optional<std::string> cacheDir_)
     : defines([&] {
-          std::ostringstream ss;
-          ss.imbue(std::locale("C"));
-          ss.setf(std::ios_base::showpoint);
-          ss << "#define DEVICE_PIXEL_RATIO " << pixelRatio << std::endl;
+          std::string result;
+          result.reserve(32);
+          result += "#define DEVICE_PIXEL_RATIO ";
+          result += util::toString(pixelRatio, true);
+          result += '\n';
           if (overdraw) {
-              ss << "#define OVERDRAW_INSPECTOR" << std::endl;
+              result += "#define OVERDRAW_INSPECTOR\n";
           }
-          return ss.str();
+          return result;
       }()),
       cacheDir(std::move(cacheDir_)) {
 }
@@ -29,10 +28,15 @@ optional<std::string> ProgramParameters::cachePath(const char* name) const {
     if (!cacheDir) {
         return {};
     } else {
-        std::ostringstream ss;
-        ss << *cacheDir << "/com.mapbox.gl.shader." << name << "." << std::setfill('0')
-           << std::setw(sizeof(size_t) * 2) << std::hex << std::hash<std::string>()(defines) << ".pbf";
-        return ss.str();
+        std::string result;
+        result.reserve(cacheDir->length() + 64);
+        result += *cacheDir;
+        result += "/com.mapbox.gl.shader.";
+        result += name;
+        result += '.';
+        result += util::toHex(std::hash<std::string>()(defines));
+        result += ".pbf";
+        return result;
     }
 }
 

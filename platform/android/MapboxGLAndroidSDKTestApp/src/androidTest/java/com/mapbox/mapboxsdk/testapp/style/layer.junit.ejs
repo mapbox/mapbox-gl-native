@@ -7,31 +7,22 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
 import android.graphics.Color;
-import android.support.test.espresso.UiController;
 import android.support.test.runner.AndroidJUnit4;
 
 import timber.log.Timber;
 
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.style.functions.CompositeFunction;
-import com.mapbox.mapboxsdk.style.functions.CameraFunction;
-import com.mapbox.mapboxsdk.style.functions.SourceFunction;
-import com.mapbox.mapboxsdk.style.functions.stops.CategoricalStops;
-import com.mapbox.mapboxsdk.style.functions.stops.ExponentialStops;
-import com.mapbox.mapboxsdk.style.functions.stops.IdentityStops;
-import com.mapbox.mapboxsdk.style.functions.stops.IntervalStops;
-import com.mapbox.mapboxsdk.style.functions.stops.Stop;
-import com.mapbox.mapboxsdk.style.functions.stops.Stops;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.<%- camelize(type) %>Layer;
-import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
+<% if (type === 'symbol') { -%>
+import com.mapbox.mapboxsdk.style.types.Formatted;
+import com.mapbox.mapboxsdk.style.types.FormattedSection;
+<% } -%>
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static com.mapbox.mapboxsdk.style.functions.Function.*;
-import static com.mapbox.mapboxsdk.style.functions.stops.Stop.stop;
-import static com.mapbox.mapboxsdk.style.functions.stops.Stops.*;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.*;
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
 import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
@@ -56,47 +47,52 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
   private void setupLayer() {
 <% if (type === 'background') { -%>
     Timber.i("Retrieving layer");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        layer = mapboxMap.getLayerAs("background");
-      }
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      layer = mapboxMap.getLayerAs("background");
     });
 <% } else { -%>
     Timber.i("Retrieving layer");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-          Timber.i("Adding layer");
-          layer = new <%- camelize(type) %>Layer("my-layer", "composite");
-          layer.setSourceLayer("composite");
-          mapboxMap.addLayer(layer);
-          // Layer reference is now stale, get new reference
-          layer = mapboxMap.getLayerAs("my-layer");
-        }
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+        Timber.i("Adding layer");
+        layer = new <%- camelize(type) %>Layer("my-layer", "composite");
+        layer.setSourceLayer("composite");
+        mapboxMap.addLayer(layer);
+        // Layer reference is now stale, get new reference
+        layer = mapboxMap.getLayerAs("my-layer");
       }
     });
 <% } -%>
   }
+<% if (type !== 'background') { -%>
+
+  @Test
+  public void testSourceId() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("SourceId");
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+      // Get source id
+      assertEquals(layer.getSourceId(), "composite");
+    });
+  }
+<% } -%>
 
   @Test
   public void testSetVisibility() {
     validateTestSetup();
     setupLayer();
     Timber.i("Visibility");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
 
-        // Get initial
-        assertEquals(layer.getVisibility().getValue(), VISIBLE);
+      // Get initial
+      assertEquals(layer.getVisibility().getValue(), VISIBLE);
 
-        // Set
-        layer.setProperties(visibility(NONE));
-        assertEquals(layer.getVisibility().getValue(), NONE);
-      }
+      // Set
+      layer.setProperties(visibility(NONE));
+      assertEquals(layer.getVisibility().getValue(), NONE);
     });
   }
 <% if (!(type === 'background' || type === 'raster' || type === 'hillshade')) { -%>
@@ -106,23 +102,46 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("SourceLayer");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
 
-        // Get initial
-        assertEquals(layer.getSourceLayer(), "composite");
+      // Get initial
+      assertEquals(layer.getSourceLayer(), "composite");
 
-        // Set
-        final String sourceLayer = "test";
-        layer.setSourceLayer(sourceLayer);
-        assertEquals(layer.getSourceLayer(), sourceLayer);
-      }
+      // Set
+      final String sourceLayer = "test";
+      layer.setSourceLayer(sourceLayer);
+      assertEquals(layer.getSourceLayer(), sourceLayer);
     });
   }
+
+  @Test
+  public void testFilter() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("Filter");
+    invoke(mapboxMap, (uiController, mapboxMap1) -> {
+      assertNotNull(layer);
+
+      // Get initial
+      assertEquals(layer.getFilter(), null);
+
+      // Set
+      Expression filter = eq(get("undefined"), literal(1.0));
+      layer.setFilter(filter);
+      assertEquals(layer.getFilter().toString(), filter.toString());
+
+      // Set constant
+      filter = literal(true);
+      layer.setFilter(filter);
+      assertEquals(layer.getFilter().toString(), filter.toString());
+    });
+  }
+
+
 <% } -%>
 <% for (const property of properties) { -%>
+<% if (property['property-type'] !== 'color-ramp') { -%>
 <% if (property.transition) { -%>
 
   @Test
@@ -130,16 +149,13 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("<%- property.name %>TransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
 
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.set<%- camelize(property.name) %>Transition(options);
-        assertEquals(layer.get<%- camelize(property.name) %>Transition(), options);
-      }
+      // Set and Get
+      TransitionOptions options = new TransitionOptions(300, 100);
+      layer.set<%- camelize(property.name) %>Transition(options);
+      assertEquals(layer.get<%- camelize(property.name) %>Transition(), options);
     });
   }
 <% } -%>
@@ -149,291 +165,53 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("<%- property.name %>");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+      assertNull(layer.get<%- camelize(property.name) %>().getValue());
 
-        // Set and Get
-        layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>));
-        assertEquals((<%- propertyType(property) %>) layer.get<%- camelize(property.name) %>().getValue(), (<%- propertyType(property) %>) <%- defaultValueJava(property) %>);
-      }
-    });
-  }
-<% if (supportsZoomFunction(property)) { -%>
+      // Set and Get
+      <%- propertyType(property) %> propertyValue = <%- defaultValueJava(property) %>;
+<% if (property.type === 'formatted') { -%>
 
-  @Test
-  public void test<%- camelize(property.name) %>AsCameraFunction() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("<%- property.name %>");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set
-        layer.setProperties(
-          <%- camelizeWithLeadingLowercase(property.name) %>(
-            zoom(
-<% if (property.function == 'piecewise-constant') { -%>
-              interval(
-                stop(2, <%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>))
-              )
-<% } else { -%>
-              exponential(
-                stop(2, <%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>))
-              ).withBase(0.5f)
-<% } -%>
-            )
-          )
-        );
-
-        // Verify
-        assertNotNull(layer.get<%- camelize(property.name) %>());
-        assertNotNull(layer.get<%- camelize(property.name) %>().getFunction());
-        assertEquals(CameraFunction.class, layer.get<%- camelize(property.name) %>().getFunction().getClass());
-<% if (property.function == 'piecewise-constant') { -%>
-        assertEquals(IntervalStops.class, layer.get<%- camelize(property.name) %>().getFunction().getStops().getClass());
-        assertEquals(1, ((IntervalStops) layer.get<%- camelize(property.name) %>().getFunction().getStops()).size());
-<% } else { -%>
-        assertEquals(ExponentialStops.class, layer.get<%- camelize(property.name) %>().getFunction().getStops().getClass());
-        assertEquals(0.5f, ((ExponentialStops) layer.get<%- camelize(property.name) %>().getFunction().getStops()).getBase(), 0.001);
-        assertEquals(1, ((ExponentialStops) layer.get<%- camelize(property.name) %>().getFunction().getStops()).size());
-<% } -%>
-      }
-    });
-  }
-<% } -%>
-<% if (supportsPropertyFunction(property)) { -%>
-
-  @Test
-  public void test<%- camelize(property.name) %>AsIdentitySourceFunction() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("<%- property.name %>");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set
-        layer.setProperties(
-          <%- camelizeWithLeadingLowercase(property.name) %>(property("FeaturePropertyA", Stops.<<%- propertyType(property) %>>identity()))
-        );
-
-        // Verify
-        assertNotNull(layer.get<%- camelize(property.name) %>());
-        assertNotNull(layer.get<%- camelize(property.name) %>().getFunction());
-        assertEquals(SourceFunction.class, layer.get<%- camelize(property.name) %>().getFunction().getClass());
-        assertEquals("FeaturePropertyA", ((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getProperty());
-        assertEquals(IdentityStops.class, layer.get<%- camelize(property.name) %>().getFunction().getStops().getClass());
-      }
-    });
-  }
-<% if (property.function == 'piecewise-constant') { -%>
-
-  @Test
-  public void test<%- camelize(property.name) %>AsIntervalSourceFunction() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("<%- property.name %>");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set
-        layer.setProperties(
-          <%- camelizeWithLeadingLowercase(property.name) %>(
-            property(
-              "FeaturePropertyA",
-              interval(
-<% if (property.type == 'color') { -%>
-                stop(Color.RED, <%- camelizeWithLeadingLowercase(property.name) %>(Color.RED))
+      layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>("default"));
+      assertEquals(layer.get<%- camelize(property.name) %>().getValue(), propertyValue);
 <% } else {-%>
-                stop(1, <%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>))
-              )
+      layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>(propertyValue));
+      assertEquals(layer.get<%- camelize(property.name) %>().getValue(), propertyValue);
 <% } -%>
-            )
-          )
-        );
+<% if (property.tokens) { -%>
 
-        // Verify
-        assertNotNull(layer.get<%- camelize(property.name) %>());
-        assertNotNull(layer.get<%- camelize(property.name) %>().getFunction());
-        assertEquals(SourceFunction.class, layer.get<%- camelize(property.name) %>().getFunction().getClass());
-        assertEquals("FeaturePropertyA", ((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getProperty());
-        assertEquals(IntervalStops.class, layer.get<%- camelize(property.name) %>().getFunction().getStops().getClass());
-      }
-    });
-  }
-<% } else if (property.type === 'array') { -%>
-
-  @Test
-  public void test<%- camelize(property.name) %>AsIntervalSourceFunction() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("<%- property.name %>");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set
-        layer.setProperties(
-          <%- camelizeWithLeadingLowercase(property.name) %>(
-            property(
-              "FeaturePropertyA",
-              interval(
-<% if (property.type == 'color') { -%>
-                stop(Color.RED, <%- camelizeWithLeadingLowercase(property.name) %>(Color.RED))
+      layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>("{token}"));
+<% if (property.type === 'formatted') { -%>
+      assertEquals(layer.get<%- camelize(property.name) %>().getExpression(), <%- defaultExpressionJava(property) %>(Expression.formatEntry(Expression.toString(Expression.get("token")))));
 <% } else {-%>
-                stop(1, <%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>))
+      assertEquals(layer.get<%- camelize(property.name) %>().getExpression(), Expression.toString(Expression.get("token")));
 <% } -%>
-              )
-            )
-          )
-        );
-
-        // Verify
-        assertNotNull(layer.get<%- camelize(property.name) %>());
-        assertNotNull(layer.get<%- camelize(property.name) %>().getFunction());
-        assertEquals(SourceFunction.class, layer.get<%- camelize(property.name) %>().getFunction().getClass());
-        assertEquals("FeaturePropertyA", ((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getProperty());
-        assertEquals(IntervalStops.class, layer.get<%- camelize(property.name) %>().getFunction().getStops().getClass());
-      }
+<% } -%>
     });
   }
-<% } else { -%>
+<% if (property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven') { -%>
+<% if (!(property.name.endsWith("-font")||property.name.endsWith("-offset"))) { -%>
 
   @Test
-  public void test<%- camelize(property.name) %>AsExponentialSourceFunction() {
+  public void test<%- camelize(property.name) %>AsExpression() {
     validateTestSetup();
     setupLayer();
-    Timber.i("<%- property.name %>");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    Timber.i("<%- property.name %>-expression");
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+      assertNull(layer.get<%- camelize(property.name) %>().getExpression());
 
-        // Set
-        layer.setProperties(
-          <%- camelizeWithLeadingLowercase(property.name) %>(
-            property(
-              "FeaturePropertyA",
-              exponential(
-<% if (property.type == 'color') { -%>
-                stop(Color.RED, <%- camelizeWithLeadingLowercase(property.name) %>(Color.RED))
-<% } else {-%>
-                stop(<%- defaultValueJava(property) %>, <%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>))
-<% } -%>
-              ).withBase(0.5f)
-            )
-          )
-        );
-
-        // Verify
-        assertNotNull(layer.get<%- camelize(property.name) %>());
-        assertNotNull(layer.get<%- camelize(property.name) %>().getFunction());
-        assertEquals(SourceFunction.class, layer.get<%- camelize(property.name) %>().getFunction().getClass());
-        assertEquals("FeaturePropertyA", ((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getProperty());
-        assertEquals(ExponentialStops.class, layer.get<%- camelize(property.name) %>().getFunction().getStops().getClass());
-      }
-    });
-  }
-
-  @Test
-  public void test<%- camelize(property.name) %>AsCategoricalSourceFunction() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("<%- property.name %>");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set
-        layer.setProperties(
-          <%- camelizeWithLeadingLowercase(property.name) %>(
-            property(
-              "FeaturePropertyA",
-              categorical(
-<% if (property.type == 'color') { -%>
-                stop("valueA", <%- camelizeWithLeadingLowercase(property.name) %>(Color.RED))
-              )
-            ).withDefaultValue(<%- camelizeWithLeadingLowercase(property.name) %>(Color.GREEN))
-<% } else {-%>
-                stop(1.0f, <%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>))
-              )
-            ).withDefaultValue(<%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>))
-<% } -%>
-          )
-        );
-
-        // Verify
-        assertNotNull(layer.get<%- camelize(property.name) %>());
-        assertNotNull(layer.get<%- camelize(property.name) %>().getFunction());
-        assertEquals(SourceFunction.class, layer.get<%- camelize(property.name) %>().getFunction().getClass());
-        assertEquals("FeaturePropertyA", ((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getProperty());
-        assertEquals(CategoricalStops.class, layer.get<%- camelize(property.name) %>().getFunction().getStops().getClass());
-        assertNotNull(((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getDefaultValue());
-        assertNotNull(((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getDefaultValue().getValue());
-<% if (property.type === 'color') { -%>
-        assertEquals(Color.GREEN, (int) ((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getDefaultValue().getColorInt());
+      // Set and Get
+<% if (property.type === 'formatted') { -%>
+      Expression expression = <%- defaultExpressionJava(property) %>(Expression.formatEntry(Expression.get("undefined"), FormatOption.formatFontScale(2.0), FormatOption.formatTextFont(new String[]{"Open Sans Regular", "Arial Unicode MS Regular"})));
 <% } else { -%>
-        assertEquals(<%- defaultValueJava(property) %>, ((SourceFunction) layer.get<%- camelize(property.name) %>().getFunction()).getDefaultValue().getValue());
+      Expression expression = <%- defaultExpressionJava(property) %>(Expression.get("undefined"));
 <% } -%>
-      }
-    });
-
-  }
-<% if (property.type !== 'color') { -%>
-
-  @Test
-  public void test<%- camelize(property.name) %>AsCompositeFunction() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("<%- property.name %>");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set
-        layer.setProperties(
-          <%- camelizeWithLeadingLowercase(property.name) %>(
-            composite(
-              "FeaturePropertyA",
-              exponential(
-                stop(0, 0.3f, <%- camelizeWithLeadingLowercase(property.name) %>(0.9f))
-              ).withBase(0.5f)
-<% if (property.type == 'number') { -%>
-            ).withDefaultValue(<%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>))
-<% } else { -%>
-            )
-<% } -%>
-          )
-        );
-
-        // Verify
-        assertNotNull(layer.get<%- camelize(property.name) %>());
-        assertNotNull(layer.get<%- camelize(property.name) %>().getFunction());
-        assertEquals(CompositeFunction.class, layer.get<%- camelize(property.name) %>().getFunction().getClass());
-        assertEquals("FeaturePropertyA", ((CompositeFunction) layer.get<%- camelize(property.name) %>().getFunction()).getProperty());
-        assertEquals(ExponentialStops.class, layer.get<%- camelize(property.name) %>().getFunction().getStops().getClass());
-        assertEquals(1, ((ExponentialStops) layer.get<%- camelize(property.name) %>().getFunction().getStops()).size());
-
-        ExponentialStops<Stop.CompositeValue<Float, <%- propertyType(property) %>>, <%- propertyType(property) %>> stops =
-          (ExponentialStops<Stop.CompositeValue<Float, <%- propertyType(property) %>>, <%- propertyType(property) %>>) layer.get<%- camelize(property.name) %>().getFunction().getStops();
-        Stop<Stop.CompositeValue<Float, <%- propertyType(property) %>>, <%- propertyType(property) %>> stop = stops.iterator().next();
-        assertEquals(0f, stop.in.zoom, 0.001);
-        assertEquals(0.3f, stop.in.value, 0.001f);
-        assertEquals(0.9f, stop.out, 0.001f);
-      }
+      layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>(expression));
+      assertEquals(layer.get<%- camelize(property.name) %>().getExpression(), expression);
     });
   }
-<% } -%>
 <% } -%>
 <% } -%>
 <% if (property.type == 'color') { -%>
@@ -443,18 +221,15 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("<%- property.name %>");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
 
-        // Set and Get
-        layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>(Color.RED));
-        assertEquals(layer.get<%- camelize(property.name) %>AsInt(), Color.RED);
-      }
+      // Set and Get
+      layer.setProperties(<%- camelizeWithLeadingLowercase(property.name) %>(Color.RED));
+      assertEquals(layer.get<%- camelize(property.name) %>AsInt(), Color.RED);
     });
   }
 <% } -%>
 <% } -%>
-
+<% } -%>
 }

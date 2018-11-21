@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mbgl/style/expression/expression.hpp>
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
+#include <mbgl/style/conversion.hpp>
 
 #include <memory>
 #include <map>
@@ -15,7 +15,7 @@ class Coalesce : public Expression {
 public:
     using Args = std::vector<std::unique_ptr<Expression>>;
     Coalesce(const type::Type& type_, Args args_) :
-        Expression(type_),
+        Expression(Kind::Coalesce, type_),
         args(std::move(args_))
     {}
 
@@ -38,6 +38,7 @@ public:
         return args.at(i).get();
     }
     
+    std::string getOperator() const override { return "coalesce"; }
 private:
     Args args;
 };

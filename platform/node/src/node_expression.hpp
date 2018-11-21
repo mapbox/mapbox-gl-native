@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/style/expression/expression.hpp>
 #include <exception>
 #include <memory>
@@ -32,6 +32,9 @@ private:
     static void GetType(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void IsFeatureConstant(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void IsZoomConstant(const Nan::FunctionCallbackInfo<v8::Value>&);
+
+    static void Serialize(const Nan::FunctionCallbackInfo<v8::Value>&);
+
     static Nan::Persistent<v8::Function> constructor;
 
     std::unique_ptr<Expression> expression;

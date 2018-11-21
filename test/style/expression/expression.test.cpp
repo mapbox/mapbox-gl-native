@@ -1,6 +1,6 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/util/io.hpp>
-#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/expression/is_expression.hpp>
@@ -24,15 +24,25 @@ TEST(Expression, IsExpression) {
                 spec["expression_name"].IsObject() &&
                 spec["expression_name"].HasMember("values") &&
                 spec["expression_name"]["values"].IsObject());
-    
+
     const auto& allExpressions = spec["expression_name"]["values"];
-    
+
     for(auto& entry : allExpressions.GetObject()) {
         const std::string name { entry.name.GetString(), entry.name.GetStringLength() };
         JSDocument document;
         document.Parse<0>(R"([")" + name + R"("])");
-
         const JSValue* expression = &document;
+
+        // TODO:   "feature-state": https://github.com/mapbox/mapbox-gl-native/issues/12613
+        // TODO: "interpolate-hcl": https://github.com/mapbox/mapbox-gl-native/issues/8720
+        // TODO: "interpolate-lab": https://github.com/mapbox/mapbox-gl-native/issues/8720
+        if (name == "feature-state" || name == "interpolate-hcl" || name == "interpolate-lab") {
+            if (expression::isExpression(conversion::Convertible(expression))) {
+                ASSERT_TRUE(false) << "Expression name" << name << "is implemented - please update Expression.IsExpression test.";
+            }
+            continue;
+        }
+
         EXPECT_TRUE(expression::isExpression(conversion::Convertible(expression))) << name;
     }
 }
@@ -49,7 +59,7 @@ TEST_P(ExpressionEqualityTest, ExpressionEquality) {
         assert(!document.HasParseError());
         const JSValue* expression = &document;
         expression::ParsingContext ctx;
-        expression::ParseResult parsed = ctx.parse(conversion::Convertible(expression));
+        expression::ParseResult parsed = ctx.parseExpression(conversion::Convertible(expression));
         if (!parsed) {
             error_ = ctx.getErrors().size() > 0 ? ctx.getErrors()[0].message : "failed to parse";
         };

@@ -53,7 +53,7 @@ public:
     std::vector<Feature> querySourceFeatures(const std::string& sourceID, const SourceQueryOptions&) const;
     std::vector<Feature> queryShapeAnnotations(const ScreenLineString&) const;
 
-    void onLowMemory();
+    void reduceMemoryUse();
     void dumDebugLogs();
 
 private:
@@ -64,7 +64,12 @@ private:
 
           RenderLayer* getRenderLayer(const std::string& id);
     const RenderLayer* getRenderLayer(const std::string& id) const;
-                           
+              
+    void queryRenderedSymbols(std::unordered_map<std::string, std::vector<Feature>>& resultsByLayer,
+                              const ScreenLineString& geometry,
+                              const std::vector<const RenderLayer*>& layers,
+                              const RenderedQueryOptions& options) const;
+    
     std::vector<Feature> queryRenderedFeatures(const ScreenLineString&, const RenderedQueryOptions&, const std::vector<const RenderLayer*>&) const;
 
     // GlyphManagerObserver implementation.
@@ -74,7 +79,6 @@ private:
     void onTileChanged(RenderSource&, const OverscaledTileID&) override;
     void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) override;
 
-    void commitFeatureIndexes();
     void updateFadingTiles();
 
     friend class Renderer;

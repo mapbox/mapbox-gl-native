@@ -5,10 +5,16 @@
 #endif
 
 #import "MGLOfflineRegion_Private.h"
+#import "MGLTilePyramidOfflineRegion_Private.h"
 #import "MGLGeometry_Private.h"
 #import "MGLStyle.h"
+#import "MGLLoggingConfiguration_Private.h"
 
-@interface MGLTilePyramidOfflineRegion () <MGLOfflineRegion_Private>
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#import "MMEConstants.h"
+#endif
+
+@interface MGLTilePyramidOfflineRegion () <MGLOfflineRegion_Private, MGLTilePyramidOfflineRegion_Private>
 
 @end
 
@@ -18,26 +24,38 @@
 
 @synthesize styleURL = _styleURL;
 
+-(NSDictionary *)offlineStartEventAttributes {
+    return @{
+             #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+             MMEEventKeyShapeForOfflineRegion: @"tileregion",
+             MMEEventKeyMinZoomLevel: @(self.minimumZoomLevel),
+             MMEEventKeyMaxZoomLevel: @(self.maximumZoomLevel),
+             MMEEventKeyStyleURL: self.styleURL.absoluteString ?: [NSNull null]
+             #endif
+             };
+}
+
 + (BOOL)supportsSecureCoding {
     return YES;
 }
 
 - (instancetype)init {
-    [NSException raise:@"Method unavailable"
-                format:
+    MGLLogInfo(@"Calling this initializer is not allowed.");
+    [NSException raise:NSGenericException format:
      @"-[MGLTilePyramidOfflineRegion init] is unavailable. "
      @"Use -initWithStyleURL:bounds:fromZoomLevel:toZoomLevel: instead."];
     return nil;
 }
 
 - (instancetype)initWithStyleURL:(NSURL *)styleURL bounds:(MGLCoordinateBounds)bounds fromZoomLevel:(double)minimumZoomLevel toZoomLevel:(double)maximumZoomLevel {
+    MGLLogDebug(@"Initializing styleURL: %@ bounds: %@ fromZoomLevel: %f toZoomLevel: %f", styleURL, MGLStringFromCoordinateBounds(bounds), minimumZoomLevel, maximumZoomLevel);
     if (self = [super init]) {
         if (!styleURL) {
             styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
         }
 
         if (!styleURL.scheme) {
-            [NSException raise:@"Invalid style URL" format:
+            [NSException raise:MGLInvalidStyleURLException format:
              @"%@ does not support setting a relative file URL as the style URL. "
              @"To download the online resources required by this style, "
              @"specify a URL to an online copy of this style. "
@@ -53,7 +71,7 @@
     return self;
 }
 
-- (instancetype)initWithOfflineRegionDefinition:(const mbgl::OfflineRegionDefinition &)definition {
+- (instancetype)initWithOfflineRegionDefinition:(const mbgl::OfflineTilePyramidRegionDefinition &)definition {
     NSURL *styleURL = [NSURL URLWithString:@(definition.styleURL.c_str())];
     MGLCoordinateBounds bounds = MGLCoordinateBoundsFromLatLngBounds(definition.bounds);
     return [self initWithStyleURL:styleURL bounds:bounds fromZoomLevel:definition.minZoom toZoomLevel:definition.maxZoom];
@@ -72,6 +90,7 @@
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)coder {
+    MGLLogInfo(@"Initializing with coder.");
     NSURL *styleURL = [coder decodeObjectForKey:@"styleURL"];
     CLLocationCoordinate2D sw = CLLocationCoordinate2DMake([coder decodeDoubleForKey:@"southWestLatitude"],
                                                            [coder decodeDoubleForKey:@"southWestLongitude"]);

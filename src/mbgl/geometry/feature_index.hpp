@@ -5,6 +5,7 @@
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/grid_index.hpp>
 #include <mbgl/util/feature.hpp>
+#include <mbgl/util/mat4.hpp>
 
 #include <vector>
 #include <string>
@@ -14,6 +15,7 @@ namespace mbgl {
 
 class RenderedQueryOptions;
 class RenderLayer;
+class TransformState;
 
 class CollisionIndex;
 
@@ -23,50 +25,50 @@ public:
     IndexedSubfeature(std::size_t index_, std::string sourceLayerName_, std::string bucketName_, size_t sortIndex_)
         : index(index_)
         , sourceLayerName(std::move(sourceLayerName_))
-        , bucketName(std::move(bucketName_))
+        , bucketLeaderID(std::move(bucketName_))
         , sortIndex(sortIndex_)
-        , tileID(0, 0, 0)
+        , bucketInstanceId(0)
+        , collisionGroupId(0)
     {}
     
-    IndexedSubfeature(std::size_t index_, std::string sourceLayerName_, std::string bucketName_, size_t sortIndex_,
-                      std::string sourceID_, CanonicalTileID tileID_)
-        : index(index_)
-        , sourceLayerName(std::move(sourceLayerName_))
-        , bucketName(std::move(bucketName_))
-        , sortIndex(std::move(sortIndex_))
-        , sourceID(std::move(sourceID_))
-        , tileID(std::move(tileID_))
-    {}
     
+    IndexedSubfeature(const IndexedSubfeature& other, uint32_t bucketInstanceId_, uint16_t collisionGroupId_)
+        : index(other.index)
+        , sourceLayerName(other.sourceLayerName)
+        , bucketLeaderID(other.bucketLeaderID)
+        , sortIndex(other.sortIndex)
+        , bucketInstanceId(bucketInstanceId_)
+        , collisionGroupId(collisionGroupId_)
+    {}
     size_t index;
     std::string sourceLayerName;
-    std::string bucketName;
+    std::string bucketLeaderID;
     size_t sortIndex;
 
     // Only used for symbol features
-    std::string sourceID;
-    CanonicalTileID tileID;
+    uint32_t bucketInstanceId;
+    uint16_t collisionGroupId;
 };
 
 class FeatureIndex {
 public:
-    FeatureIndex();
+    FeatureIndex(std::unique_ptr<const GeometryTileData> tileData_);
 
-    void insert(const GeometryCollection&, std::size_t index, const std::string& sourceLayerName, const std::string& bucketName);
+    const GeometryTileData* getData() { return tileData.get(); }
+    
+    void insert(const GeometryCollection&, std::size_t index, const std::string& sourceLayerName, const std::string& bucketLeaderID);
 
     void query(
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const GeometryCoordinates& queryGeometry,
-            const float bearing,
+            const TransformState&,
+            const mat4& posMatrix,
             const double tileSize,
             const double scale,
             const RenderedQueryOptions& options,
-            const GeometryTileData&,
             const UnwrappedTileID&,
-            const std::string&,
             const std::vector<const RenderLayer*>&,
-            const CollisionIndex&,
-            const float additionalQueryRadius) const;
+            const float additionalQueryPadding) const;
 
     static optional<GeometryCoordinates> translateQueryGeometry(
             const GeometryCoordinates& queryGeometry,
@@ -75,23 +77,31 @@ public:
             const float bearing,
             const float pixelsToTileUnits);
 
-    void setBucketLayerIDs(const std::string& bucketName, const std::vector<std::string>& layerIDs);
+    void setBucketLayerIDs(const std::string& bucketLeaderID, const std::vector<std::string>& layerIDs);
+    
+    std::unordered_map<std::string, std::vector<Feature>> lookupSymbolFeatures(
+           const std::vector<IndexedSubfeature>& symbolFeatures,
+           const RenderedQueryOptions& options,
+           const std::vector<const RenderLayer*>& layers,
+           const OverscaledTileID& tileID,
+           const std::shared_ptr<std::vector<size_t>>& featureSortOrder) const;
 
 private:
     void addFeature(
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const IndexedSubfeature&,
-            const GeometryCoordinates& queryGeometry,
             const RenderedQueryOptions& options,
-            const GeometryTileData&,
             const CanonicalTileID&,
             const std::vector<const RenderLayer*>&,
-            const float bearing,
-            const float pixelsToTileUnits) const;
+            const GeometryCoordinates& queryGeometry,
+            const TransformState& transformState,
+            const float pixelsToTileUnits,
+            const mat4& posMatrix) const;
 
     GridIndex<IndexedSubfeature> grid;
     unsigned int sortIndex = 0;
 
     std::unordered_map<std::string, std::vector<std::string>> bucketLayerIDs;
+    std::unique_ptr<const GeometryTileData> tileData;
 };
 } // namespace mbgl

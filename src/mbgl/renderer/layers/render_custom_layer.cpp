@@ -5,23 +5,25 @@
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/gl/gl.hpp>
+#include <mbgl/util/mat4.hpp>
 
 namespace mbgl {
 
 using namespace style;
 
 RenderCustomLayer::RenderCustomLayer(Immutable<style::CustomLayer::Impl> _impl)
-    : RenderLayer(LayerType::Custom, _impl) {
+    : RenderLayer(LayerType::Custom, _impl), host(_impl->host) {
+    assert(BackendScope::exists());
+    host->initialize();
 }
 
 RenderCustomLayer::~RenderCustomLayer() {
     assert(BackendScope::exists());
-    if (initialized) {
-        if (contextDestroyed && impl().contextLostFn ) {
-            impl().contextLostFn(impl().context);
-        } else if (!contextDestroyed && impl().deinitializeFn) {
-            impl().deinitializeFn(impl().context);
-        }
+    if (contextDestroyed) {
+        host->contextLost();
+    } else {
+        host->deinitialize();
     }
 }
 
@@ -36,6 +38,13 @@ void RenderCustomLayer::evaluate(const PropertyEvaluationParameters&) {
 bool RenderCustomLayer::hasTransition() const {
     return false;
 }
+bool RenderCustomLayer::hasCrossfade() const {
+    return false;
+}
+
+void RenderCustomLayer::markContextDestroyed() {
+    contextDestroyed = true;
+}
 
 std::unique_ptr<Bucket> RenderCustomLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
     assert(false);
@@ -43,15 +52,13 @@ std::unique_ptr<Bucket> RenderCustomLayer::createBucket(const BucketParameters&,
 }
 
 void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) {
-    if (context != impl().context || !initialized) {
+    if (host != impl().host) {
         //If the context changed, deinitialize the previous one before initializing the new one.
-        if (context && !contextDestroyed && impl().deinitializeFn) {
-            impl().deinitializeFn(context);
+        if (host && !contextDestroyed) {
+            MBGL_CHECK_ERROR(host->deinitialize());
         }
-        context = impl().context;
-        assert(impl().initializeFn);
-        impl().initializeFn(impl().context);
-        initialized = true;
+        host = impl().host;
+        MBGL_CHECK_ERROR(host->initialize());
     }
 
     gl::Context& glContext = paintParameters.context;
@@ -62,6 +69,7 @@ void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) 
     glContext.setDepthMode(paintParameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly));
     glContext.setStencilMode(gl::StencilMode::disabled());
     glContext.setColorMode(paintParameters.colorModeForRenderPass());
+    glContext.setCullFaceMode(gl::CullFaceMode::disabled());
 
     CustomLayerRenderParameters parameters;
 
@@ -73,9 +81,11 @@ void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) 
     parameters.bearing = -state.getAngle() * util::RAD2DEG;
     parameters.pitch = state.getPitch();
     parameters.fieldOfView = state.getFieldOfView();
+    mat4 projMatrix;
+    state.getProjMatrix(projMatrix);
+    parameters.projectionMatrix = projMatrix;
 
-    assert(impl().renderFn);
-    impl().renderFn(context, parameters);
+    MBGL_CHECK_ERROR(host->render(parameters));
 
     // Reset the view back to our original one, just in case the CustomLayer changed
     // the viewport or Framebuffer.

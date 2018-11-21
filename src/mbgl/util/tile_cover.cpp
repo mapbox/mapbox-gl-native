@@ -2,12 +2,18 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/util/tile_cover_impl.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
+#include <mbgl/math/log2.hpp>
 
 #include <functional>
+#include <list>
 
 namespace mbgl {
 
 namespace {
+
+using ScanLine = const std::function<void(int32_t x0, int32_t x1, int32_t y)>;
 
 // Taken from polymaps src/Layer.js
 // https://github.com/simplegeo/polymaps/blob/master/src/Layer.js#L333-L383
@@ -26,8 +32,6 @@ struct edge {
         dy = b.y - a.y;
     }
 };
-
-using ScanLine = const std::function<void(int32_t x0, int32_t x1, int32_t y)>;
 
 // scan-line conversion
 static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine scanLine) {
@@ -127,7 +131,7 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
 } // namespace
 
 int32_t coveringZoomLevel(double zoom, style::SourceType type, uint16_t size) {
-    zoom += std::log(util::tileSize / size) / std::log(2);
+    zoom += util::log2(util::tileSize / size);
     if (type == style::SourceType::Raster || type == style::SourceType::Video) {
         return ::round(zoom);
     } else {
@@ -147,11 +151,11 @@ std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, int32_t z) {
         { std::min(bounds_.north(),  util::LATITUDE_MAX), bounds_.east() });
 
     return tileCover(
-        TileCoordinate::fromLatLng(z, bounds.northwest()).p,
-        TileCoordinate::fromLatLng(z, bounds.northeast()).p,
-        TileCoordinate::fromLatLng(z, bounds.southeast()).p,
-        TileCoordinate::fromLatLng(z, bounds.southwest()).p,
-        TileCoordinate::fromLatLng(z, bounds.center()).p,
+        Projection::project(bounds.northwest(), z),
+        Projection::project(bounds.northeast(), z),
+        Projection::project(bounds.southeast(), z),
+        Projection::project(bounds.southwest(), z),
+        Projection::project(bounds.center(), z),
         z);
 }
 
@@ -169,25 +173,80 @@ std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
         z);
 }
 
+std::vector<UnwrappedTileID> tileCover(const Geometry<double>& geometry, int32_t z) {
+    std::vector<UnwrappedTileID> result;
+    TileCover tc(geometry, z, true);
+    while (tc.hasNext()) {
+        result.push_back(*tc.next());
+    };
+
+    return result;
+}
+
 // Taken from https://github.com/mapbox/sphericalmercator#xyzbbox-zoom-tms_style-srs
 // Computes the projected tiles for the lower left and upper right points of the bounds
 // and uses that to compute the tile cover count
-uint64_t tileCount(const LatLngBounds& bounds, uint8_t zoom, uint16_t tileSize_){
+uint64_t tileCount(const LatLngBounds& bounds, uint8_t zoom){
+    if (zoom == 0) {
+        return 1;
+    }
+    auto sw = Projection::project(bounds.southwest(), zoom);
+    auto ne = Projection::project(bounds.northeast(), zoom);
+    auto maxTile = std::pow(2.0, zoom);
+    auto x1 = floor(sw.x);
+    auto x2 = ceil(ne.x) - 1;
+    auto y1 = util::clamp(floor(sw.y), 0.0, maxTile - 1);
+    auto y2 = util::clamp(floor(ne.y), 0.0, maxTile - 1);
 
-    auto sw = Projection::project(bounds.southwest().wrapped(), zoom, tileSize_);
-    auto ne = Projection::project(bounds.northeast().wrapped(), zoom, tileSize_);
+    auto dx = x1 > x2 ? (maxTile - x1) + x2 : x2 - x1;
+    auto dy = y1 - y2;
+    return (dx + 1) * (dy + 1);
+}
 
-    auto x1 = floor(sw.x/ tileSize_);
-    auto x2 = floor((ne.x - 1) / tileSize_);
-    auto y1 = floor(sw.y/ tileSize_);
-    auto y2 = floor((ne.y - 1) / tileSize_);
+uint64_t tileCount(const Geometry<double>& geometry, uint8_t z) {
+    uint64_t tileCount = 0;
 
-    auto minX = ::fmax(std::min(x1, x2), 0);
-    auto maxX = std::max(x1, x2);
-    auto minY = (std::pow(2, zoom) - 1) - std::max(y1, y2);
-    auto maxY = (std::pow(2, zoom) - 1) - ::fmax(std::min(y1, y2), 0);
-    
-    return (maxX - minX + 1) * (maxY - minY + 1);
+    TileCover tc(geometry, z, true);
+    while (tc.next()) {
+        tileCount++;
+    };
+    return tileCount;
+}
+
+TileCover::TileCover(const LatLngBounds&bounds_, int32_t z) {
+    LatLngBounds bounds = LatLngBounds::hull(
+        { std::max(bounds_.south(), -util::LATITUDE_MAX), bounds_.west() },
+        { std::min(bounds_.north(),  util::LATITUDE_MAX), bounds_.east() });
+
+    if (bounds.isEmpty() ||
+        bounds.south() >  util::LATITUDE_MAX ||
+        bounds.north() < -util::LATITUDE_MAX) {
+        bounds = LatLngBounds::world();
+    }
+
+    auto sw = Projection::project(bounds.southwest(), z);
+    auto ne = Projection::project(bounds.northeast(), z);
+    auto se = Projection::project(bounds.southeast(), z);
+    auto nw = Projection::project(bounds.northwest(), z);
+
+    Polygon<double> p({ {sw, nw, ne, se, sw} });
+    impl = std::make_unique<TileCover::Impl>(z, p, false);
+}
+
+TileCover::TileCover(const Geometry<double>& geom, int32_t z, bool project/* = true*/)
+ : impl( std::make_unique<TileCover::Impl>(z, geom, project)) {
+}
+
+TileCover::~TileCover() {
+
+}
+
+optional<UnwrappedTileID> TileCover::next() {
+    return impl->next();
+}
+
+bool TileCover::hasNext() {
+    return impl->hasNext();
 }
 
 } // namespace util

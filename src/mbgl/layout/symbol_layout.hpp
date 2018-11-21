@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/layout/layout.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/layout/symbol_feature.hpp>
@@ -25,26 +26,28 @@ namespace style {
 class Filter;
 } // namespace style
 
-class SymbolLayout {
+class SymbolLayout : public Layout {
 public:
     SymbolLayout(const BucketParameters&,
                  const std::vector<const RenderLayer*>&,
                  std::unique_ptr<GeometryTileLayer>,
                  ImageDependencies&,
                  GlyphDependencies&);
+    
+    ~SymbolLayout() final = default;
 
-    void prepare(const GlyphMap&, const GlyphPositions&,
-                 const ImageMap&, const ImagePositions&,
-                 const OverscaledTileID&, const std::string&);
+    void prepareSymbols(const GlyphMap&, const GlyphPositions&,
+                 const ImageMap&, const ImagePositions&) override;
 
-    std::unique_ptr<SymbolBucket> place(const bool showCollisionBoxes);
+    void createBucket(const ImagePositions&, std::unique_ptr<FeatureIndex>&, std::unordered_map<std::string, std::shared_ptr<Bucket>>&, const bool firstLoad, const bool showCollisionBoxes) override;
 
-    bool hasSymbolInstances() const;
+    bool hasSymbolInstances() const override;
+    bool hasDependencies() const override;
 
     std::map<std::string,
         std::pair<style::IconPaintProperties::PossiblyEvaluated, style::TextPaintProperties::PossiblyEvaluated>> layerPaintProperties;
 
-    const std::string bucketName;
+    const std::string bucketLeaderID;
     std::vector<SymbolInstance> symbolInstances;
 
 private:
@@ -52,9 +55,7 @@ private:
                     const SymbolFeature&,
                     const std::pair<Shaping, Shaping>& shapedTextOrientations,
                     optional<PositionedIcon> shapedIcon,
-                    const GlyphPositionMap&,
-                    const OverscaledTileID&,
-                    const std::string&);
+                    const GlyphPositions&);
 
     bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor&);
     std::map<std::u16string, std::vector<Anchor>> compareText;
@@ -84,7 +85,7 @@ private:
 
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
-    
+
     style::TextSize::UnevaluatedType textSize;
     style::IconSize::UnevaluatedType iconSize;
 

@@ -18,7 +18,7 @@ struct Main {
     /**
      * JNI Bound to Main#runAllTests()
      */
-    static void runAllTests(jni::JNIEnv& env, jni::Object<Main>, jni::Array<jni::String> args) {
+    static void runAllTests(jni::JNIEnv& env, const jni::Object<Main>&, const jni::Array<jni::String>& args) {
         mbgl::Log::Warning(mbgl::Event::JNI, "Starting tests");
 
         // We need to create a copy of the argv data since Java-internals are stored in UTF-16.
@@ -69,7 +69,7 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *) {
     // Load the test library jni bindings
     mbgl::Log::Info(mbgl::Event::JNI, "Registering test JNI Methods");
 
-    jni::RegisterNatives(env, jni::Class<Main>::Find(env),
+    jni::RegisterNatives(env, *jni::Class<Main>::Find(env),
                          jni::MakeNativeMethod<decltype(Main::runAllTests), &Main::runAllTests>("runAllTests"));
 
     return JNI_VERSION_1_6;

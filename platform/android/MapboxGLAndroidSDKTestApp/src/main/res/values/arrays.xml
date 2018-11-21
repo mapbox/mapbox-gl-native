@@ -7,16 +7,4 @@
         <item>1000</item>
         <item>10000</item>
     </string-array>
-
-    <string-array name="user_tracking_mode">
-        <item>Disabled</item>
-        <item>Follow tracking</item>
-    </string-array>
-
-    <string-array name="user_bearing_mode">
-        <item>Disabled</item>
-        <item>GPS bearing</item>
-        <item>Compass bearing</item>
-        <!--<item>Combined mode</item>-->
-    </string-array>
 </resources>

@@ -251,7 +251,7 @@ TEST(DefaultFileSource, OptionalNonExpired) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::LoadingMethod::CacheOnly };
+    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", Resource::Priority::Regular, {}, Resource::LoadingMethod::CacheOnly };
 
     using namespace std::chrono_literals;
 
@@ -281,7 +281,7 @@ TEST(DefaultFileSource, OptionalExpired) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::LoadingMethod::CacheOnly };
+    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", Resource::Priority::Regular, {}, Resource::LoadingMethod::CacheOnly };
 
     using namespace std::chrono_literals;
 
@@ -327,7 +327,7 @@ TEST(DefaultFileSource, OptionalNotFound) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::LoadingMethod::CacheOnly };
+    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", Resource::Priority::Regular, {}, Resource::LoadingMethod::CacheOnly };
 
     using namespace std::chrono_literals;
 

@@ -3,7 +3,7 @@
 #import "MGLFaux3DUserLocationAnnotationView.h"
 #import "MGLGeometry.h"
 
-const CGFloat MGLUserLocationHeadingArrowSize = 6;
+const CGFloat MGLUserLocationHeadingArrowSize = 8;
 
 @implementation MGLUserLocationHeadingArrowLayer
 

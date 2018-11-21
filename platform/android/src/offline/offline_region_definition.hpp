@@ -10,24 +10,33 @@ class OfflineRegionDefinition {
 public:
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineRegionDefinition"; };
 
-    static jni::Class<OfflineRegionDefinition> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
+    static mbgl::OfflineRegionDefinition getDefinition(JNIEnv& env, const jni::Object<OfflineRegionDefinition>& jDefinition);
 };
 
-class OfflineTilePyramidRegionDefinition: public OfflineRegionDefinition {
+class OfflineTilePyramidRegionDefinition {
 public:
+    using SuperTag = OfflineRegionDefinition;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineTilePyramidRegionDefinition"; };
 
-    static jni::Object<OfflineTilePyramidRegionDefinition> New(jni::JNIEnv&, mbgl::OfflineTilePyramidRegionDefinition);
+    static jni::Local<jni::Object<OfflineRegionDefinition>> New(jni::JNIEnv&, const mbgl::OfflineTilePyramidRegionDefinition&);
 
-    static mbgl::OfflineTilePyramidRegionDefinition getDefinition(jni::JNIEnv&, jni::Object<OfflineTilePyramidRegionDefinition>);
-
-    static jni::Class<OfflineTilePyramidRegionDefinition> javaClass;
+    static mbgl::OfflineTilePyramidRegionDefinition getDefinition(jni::JNIEnv&, const jni::Object<OfflineTilePyramidRegionDefinition>&);
 
     static void registerNative(jni::JNIEnv&);
+};
 
+class OfflineGeometryRegionDefinition {
+public:
+    using SuperTag = OfflineRegionDefinition;
+    static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineGeometryRegionDefinition"; };
+
+    static jni::Local<jni::Object<OfflineRegionDefinition>> New(jni::JNIEnv&, const mbgl::OfflineGeometryRegionDefinition&);
+
+    static mbgl::OfflineGeometryRegionDefinition getDefinition(jni::JNIEnv&, const jni::Object<OfflineGeometryRegionDefinition>&);
+
+    static void registerNative(jni::JNIEnv&);
 };
 
 } // namespace android

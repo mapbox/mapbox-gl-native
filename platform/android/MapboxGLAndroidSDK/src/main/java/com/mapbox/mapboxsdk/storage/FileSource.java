@@ -4,11 +4,22 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
+
+import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import timber.log.Timber;
+import com.mapbox.mapboxsdk.utils.ThreadUtils;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import com.mapbox.mapboxsdk.log.Logger;
 
 /**
  * Holds a central reference to the core's DefaultFileSource for as long as
@@ -16,11 +27,19 @@ import timber.log.Timber;
  */
 public class FileSource {
 
+  private static final String TAG = "Mbgl-FileSource";
+  private static final Lock resourcesCachePathLoaderLock = new ReentrantLock();
+  private static final Lock internalCachePathLoaderLock = new ReentrantLock();
+  @Nullable
+  private static String resourcesCachePath;
+  private static String internalCachePath;
+
   /**
    * This callback allows implementors to transform URLs before they are requested
    * from the internet. This can be used add or remove custom parameters, or reroute
    * certain requests to other servers or endpoints.
    */
+  @Keep
   public interface ResourceTransformCallback {
 
     /**
@@ -43,45 +62,54 @@ public class FileSource {
    * @param context the context to derive the cache path from
    * @return the single instance of FileSource
    */
-  public static synchronized FileSource getInstance(Context context) {
+  @UiThread
+  public static synchronized FileSource getInstance(@NonNull Context context) {
     if (INSTANCE == null) {
-      String cachePath = getCachePath(context);
-      INSTANCE = new FileSource(cachePath, context.getResources().getAssets());
+      INSTANCE = new FileSource(getResourcesCachePath(context), context.getResources().getAssets());
     }
 
     return INSTANCE;
   }
 
   /**
-   * Get the cache path for a context.
+   * Get files directory path for a context.
    *
-   * @param context the context to derive the cache path from
-   * @return the cache path
+   * @param context the context to derive the files directory path from
+   * @return the files directory path
+   * @deprecated Use {@link #getResourcesCachePath(Context)} instead.
    */
-  public static String getCachePath(Context context) {
+  @Nullable
+  @Deprecated
+  public static String getCachePath(@NonNull Context context) {
     // Default value
-    boolean setStorageExternal = MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL;
+    boolean isExternalStorageConfiguration = MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL;
 
     try {
       // Try getting a custom value from the app Manifest
       ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(),
         PackageManager.GET_META_DATA);
-      setStorageExternal = appInfo.metaData.getBoolean(
-        MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
-        MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL);
+      if (appInfo.metaData != null) {
+        isExternalStorageConfiguration = appInfo.metaData.getBoolean(
+          MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
+          MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL
+        );
+      }
     } catch (PackageManager.NameNotFoundException exception) {
-      Timber.e(exception, "Failed to read the package metadata: ");
+      Logger.e(TAG, "Failed to read the package metadata: ", exception);
+      MapStrictMode.strictModeViolation(exception);
     } catch (Exception exception) {
-      Timber.e(exception, "Failed to read the storage key: ");
+      Logger.e(TAG, "Failed to read the storage key: ", exception);
+      MapStrictMode.strictModeViolation(exception);
     }
 
     String cachePath = null;
-    if (setStorageExternal && isExternalStorageReadable()) {
+    if (isExternalStorageConfiguration && isExternalStorageReadable()) {
       try {
         // Try getting the external storage path
         cachePath = context.getExternalFilesDir(null).getAbsolutePath();
       } catch (NullPointerException exception) {
-        Timber.e(exception, "Failed to obtain the external storage path: ");
+        Logger.e(TAG, "Failed to obtain the external storage path: ", exception);
+        MapStrictMode.strictModeViolation(exception);
       }
     }
 
@@ -109,27 +137,122 @@ public class FileSource {
       return true;
     }
 
-    Timber.w("External storage was requested but it isn't readable. For API level < 18"
+    Logger.w(TAG, "External storage was requested but it isn't readable. For API level < 18"
       + " make sure you've requested READ_EXTERNAL_STORAGE or WRITE_EXTERNAL_STORAGE"
       + " permissions in your app Manifest (defaulting to internal storage).");
 
     return false;
   }
 
+  /**
+   * Initializes file directories paths.
+   *
+   * @param context the context to derive paths from
+   */
+  @UiThread
+  public static void initializeFileDirsPaths(Context context) {
+    ThreadUtils.checkThread("FileSource");
+    lockPathLoaders();
+    if (resourcesCachePath == null || internalCachePath == null) {
+      new FileDirsPathsTask().execute(context);
+    }
+  }
+
+  private static class FileDirsPathsTask extends AsyncTask<Context, Void, String[]> {
+
+    @Override
+    protected void onCancelled() {
+      unlockPathLoaders();
+    }
+
+    @NonNull
+    @Override
+    protected String[] doInBackground(Context... contexts) {
+      return new String[] {
+        getCachePath(contexts[0]),
+        contexts[0].getCacheDir().getAbsolutePath()
+      };
+    }
+
+    @Override
+    protected void onPostExecute(String[] paths) {
+      resourcesCachePath = paths[0];
+      internalCachePath = paths[1];
+      unlockPathLoaders();
+    }
+  }
+
+  /**
+   * Get files directory path for a context.
+   *
+   * @param context the context to derive the files directory path from
+   * @return the files directory path
+   */
+  @Nullable
+  public static String getResourcesCachePath(@NonNull Context context) {
+    resourcesCachePathLoaderLock.lock();
+    try {
+      if (resourcesCachePath == null) {
+        resourcesCachePath = getCachePath(context);
+      }
+      return resourcesCachePath;
+    } finally {
+      resourcesCachePathLoaderLock.unlock();
+    }
+  }
+
+  /**
+   * Get internal cache path for a context.
+   *
+   * @param context the context to derive the internal cache path from
+   * @return the internal cache path
+   */
+  public static String getInternalCachePath(@NonNull Context context) {
+    internalCachePathLoaderLock.lock();
+    try {
+      if (internalCachePath == null) {
+        internalCachePath = context.getCacheDir().getAbsolutePath();
+      }
+      return internalCachePath;
+    } finally {
+      internalCachePathLoaderLock.unlock();
+    }
+  }
+
+  private static void lockPathLoaders() {
+    internalCachePathLoaderLock.lock();
+    resourcesCachePathLoaderLock.lock();
+  }
+
+  private static void unlockPathLoaders() {
+    resourcesCachePathLoaderLock.unlock();
+    internalCachePathLoaderLock.unlock();
+  }
+
+  @Keep
   private long nativePtr;
 
   private FileSource(String cachePath, AssetManager assetManager) {
     initialize(Mapbox.getAccessToken(), cachePath, assetManager);
   }
 
+  @Keep
+  public native boolean isActivated();
+
+  @Keep
   public native void activate();
 
+  @Keep
   public native void deactivate();
 
+  @Keep
   public native void setAccessToken(@NonNull String accessToken);
 
+  @NonNull
+  @Keep
   public native String getAccessToken();
 
+  @Keep
   public native void setApiBaseUrl(String baseUrl);
 
   /**
@@ -140,11 +263,14 @@ public class FileSource {
    *
    * @param callback the callback to be invoked or null to reset
    */
+  @Keep
   public native void setResourceTransform(final ResourceTransformCallback callback);
 
+  @Keep
   private native void initialize(String accessToken, String cachePath, AssetManager assetManager);
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
 }

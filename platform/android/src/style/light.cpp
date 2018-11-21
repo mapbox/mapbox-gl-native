@@ -1,5 +1,3 @@
-// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make android-style-code`.
-
 #include <mbgl/map/map.hpp>
 #include "light.hpp"
 #include "conversion/transition_options.hpp"
@@ -16,21 +14,20 @@ static Light* initializeLightPeer(mbgl::Map& map, mbgl::style::Light& coreLight)
     return new Light(map, coreLight);
 }
 
-jni::jobject* Light::createJavaLightPeer(jni::JNIEnv& env, Map& map, mbgl::style::Light& coreLight) {
+jni::Local<jni::Object<Light>> Light::createJavaLightPeer(jni::JNIEnv& env, Map& map, mbgl::style::Light& coreLight) {
     std::unique_ptr<Light> peerLight = std::unique_ptr<Light>(initializeLightPeer(map, coreLight));
-    jni::jobject* result = peerLight->createJavaPeer(env);
+    auto result = peerLight->createJavaPeer(env);
     peerLight.release();
     return result;
 }
 
-jni::Class<Light> Light::javaClass;
-
-jni::jobject* Light::createJavaPeer(jni::JNIEnv& env) {
-    static auto constructor = Light::javaClass.template GetConstructor<jni::jlong>(env);
-    return Light::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+jni::Local<jni::Object<Light>> Light::createJavaPeer(jni::JNIEnv& env) {
+    static auto& javaClass = jni::Class<Light>::Singleton(env);
+    static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+    return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
 }
 
-void Light::setAnchor(jni::JNIEnv& env, jni::String property) {
+void Light::setAnchor(jni::JNIEnv& env, const jni::String& property) {
     std::string anchorStr = jni::Make<std::string>(env, property);
     if (anchorStr.compare("map") == 0) {
         light.setAnchor(LightAnchorType::Map);
@@ -39,7 +36,7 @@ void Light::setAnchor(jni::JNIEnv& env, jni::String property) {
     }
 }
 
-jni::String Light::getAnchor(jni::JNIEnv& env) {
+jni::Local<jni::String> Light::getAnchor(jni::JNIEnv& env) {
     auto anchorType = light.getAnchor();
     if (anchorType == LightAnchorType::Map) {
         return jni::Make<jni::String>(env, "map");
@@ -48,22 +45,22 @@ jni::String Light::getAnchor(jni::JNIEnv& env) {
     }
 }
 
-void Light::setPosition(jni::JNIEnv& env, jni::Object<Position> jposition) {
+void Light::setPosition(jni::JNIEnv& env, const jni::Object<Position>& jposition) {
     using namespace mbgl::android::conversion;
     auto position = *convert<mbgl::style::Position>(env, jposition);
     light.setPosition(position);
 }
 
-jni::Object<Position> Light::getPosition(jni::JNIEnv& env) {
+jni::Local<jni::Object<Position>> Light::getPosition(jni::JNIEnv& env) {
     using namespace mbgl::android::conversion;
     mbgl::style::Position position = light.getPosition().asConstant();
-    return *convert<jni::Object<Position>>(env, position);
+    return std::move(*convert<jni::Local<jni::Object<Position>>>(env, position));
 }
 
-jni::Object<TransitionOptions> Light::getPositionTransition(jni::JNIEnv& env) {
+jni::Local<jni::Object<TransitionOptions>> Light::getPositionTransition(jni::JNIEnv& env) {
    using namespace mbgl::android::conversion;
    mbgl::style::TransitionOptions options = light.getPositionTransition();
-   return *convert<jni::Object<TransitionOptions>>(env, options);
+   return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
 }
 
 void Light::setPositionTransition(jni::JNIEnv&, jlong duration, jlong delay) {
@@ -73,22 +70,22 @@ void Light::setPositionTransition(jni::JNIEnv&, jlong duration, jlong delay) {
    light.setPositionTransition(options);
 }
 
-void Light::setColor(jni::JNIEnv& env, jni::String property) {
+void Light::setColor(jni::JNIEnv& env, const jni::String& property) {
     auto color = Color::parse(jni::Make<std::string>(env, property));
     if (color) {
         light.setColor(color.value());
     }
 }
 
-jni::String Light::getColor(jni::JNIEnv &env) {
+jni::Local<jni::String> Light::getColor(jni::JNIEnv &env) {
     auto color = light.getColor().asConstant();
     return jni::Make<jni::String>(env, color.stringify());
 }
 
-jni::Object<TransitionOptions> Light::getColorTransition(jni::JNIEnv& env) {
+jni::Local<jni::Object<TransitionOptions>> Light::getColorTransition(jni::JNIEnv& env) {
    using namespace mbgl::android::conversion;
    mbgl::style::TransitionOptions options = light.getColorTransition();
-   return *convert<jni::Object<TransitionOptions>>(env, options);
+   return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
 }
 
 void Light::setColorTransition(jni::JNIEnv&, jlong duration, jlong delay) {
@@ -106,10 +103,10 @@ jni::jfloat Light::getIntensity(jni::JNIEnv&) {
     return light.getIntensity().asConstant();
 }
 
-jni::Object<TransitionOptions> Light::getIntensityTransition(jni::JNIEnv& env) {
+jni::Local<jni::Object<TransitionOptions>> Light::getIntensityTransition(jni::JNIEnv& env) {
    using namespace mbgl::android::conversion;
    mbgl::style::TransitionOptions options = light.getIntensityTransition();
-   return *convert<jni::Object<TransitionOptions>>(env, options);
+   return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
 }
 
 void Light::setIntensityTransition(jni::JNIEnv&, jlong duration, jlong delay) {
@@ -121,11 +118,11 @@ void Light::setIntensityTransition(jni::JNIEnv&, jlong duration, jlong delay) {
 
 void Light::registerNative(jni::JNIEnv& env) {
     // Lookup the class
-    Light::javaClass = *jni::Class<Light>::Find(env).NewGlobalRef(env).release();
+    static auto& javaClass = jni::Class<Light>::Singleton(env);
 
 #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
     // Register the peer
-    jni::RegisterNativePeer<Light>(env, Light::javaClass, "nativePtr",
+    jni::RegisterNativePeer<Light>(env, javaClass, "nativePtr",
     METHOD(&Light::getAnchor, "nativeGetAnchor"),
     METHOD(&Light::setAnchor, "nativeSetAnchor"),
     METHOD(&Light::getPositionTransition, "nativeGetPositionTransition"),

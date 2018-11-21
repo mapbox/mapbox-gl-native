@@ -5,6 +5,7 @@ import android.graphics.PointF;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
+import android.support.annotation.Nullable;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -13,6 +14,7 @@ import com.mapbox.mapboxsdk.maps.UiSettings;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Arrays;
 
 /**
  * Factory for creating CameraUpdate objects.
@@ -92,7 +94,9 @@ public final class CameraUpdateFactory {
    * @param xPixel Amount of pixels to scroll to in x direction
    * @param yPixel Amount of pixels to scroll to in y direction
    * @return CameraUpdate Final Camera Position
+   * @deprecated use {@link MapboxMap#scrollBy(float, float)} for more precise displacements when using a padded map.
    */
+  @Deprecated
   public static CameraUpdate scrollBy(float xPixel, float yPixel) {
     return new CameraMoveUpdate(xPixel, yPixel);
   }
@@ -148,6 +152,26 @@ public final class CameraUpdateFactory {
     return new ZoomUpdate(ZoomUpdate.ZOOM_TO, zoom);
   }
 
+  /**
+   * Returns a CameraUpdate that moves the camera viewpoint to a particular bearing.
+   *
+   * @param bearing Bearing to change to
+   * @return CameraUpdate Final Camera Position
+   */
+  public static CameraUpdate bearingTo(double bearing) {
+    return new CameraPositionUpdate(bearing, null, -1, -1);
+  }
+
+  /**
+   * Returns a CameraUpdate that moves the camera viewpoint to a particular tilt.
+   *
+   * @param tilt Tilt to change to
+   * @return CameraUpdate Final Camera Position
+   */
+  public static CameraUpdate tiltTo(double tilt) {
+    return new CameraPositionUpdate(-1, null, tilt, -1);
+  }
+
   //
   // CameraUpdate types
   //
@@ -192,6 +216,53 @@ public final class CameraUpdateFactory {
       }
       return new CameraPosition.Builder(this).build();
     }
+
+    @Override
+    public boolean equals(@Nullable Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      CameraPositionUpdate that = (CameraPositionUpdate) o;
+
+      if (Double.compare(that.bearing, bearing) != 0) {
+        return false;
+      }
+      if (Double.compare(that.tilt, tilt) != 0) {
+        return false;
+      }
+      if (Double.compare(that.zoom, zoom) != 0) {
+        return false;
+      }
+      return target != null ? target.equals(that.target) : that.target == null;
+    }
+
+    @Override
+    public int hashCode() {
+      int result;
+      long temp;
+      temp = Double.doubleToLongBits(bearing);
+      result = (int) (temp ^ (temp >>> 32));
+      result = 31 * result + (target != null ? target.hashCode() : 0);
+      temp = Double.doubleToLongBits(tilt);
+      result = 31 * result + (int) (temp ^ (temp >>> 32));
+      temp = Double.doubleToLongBits(zoom);
+      result = 31 * result + (int) (temp ^ (temp >>> 32));
+      return result;
+    }
+
+    @Override
+    public String toString() {
+      return "CameraPositionUpdate{"
+        + "bearing=" + bearing
+        + ", target=" + target
+        + ", tilt=" + tilt
+        + ", zoom=" + zoom
+        + '}';
+    }
   }
 
   static final class CameraBoundsUpdate implements CameraUpdate {
@@ -220,6 +291,38 @@ public final class CameraUpdateFactory {
     public CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap) {
       return mapboxMap.getCameraForLatLngBounds(bounds, padding);
     }
+
+    @Override
+    public boolean equals(@Nullable Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      CameraBoundsUpdate that = (CameraBoundsUpdate) o;
+
+      if (!bounds.equals(that.bounds)) {
+        return false;
+      }
+      return Arrays.equals(padding, that.padding);
+    }
+
+    @Override
+    public int hashCode() {
+      int result = bounds.hashCode();
+      result = 31 * result + Arrays.hashCode(padding);
+      return result;
+    }
+
+    @Override
+    public String toString() {
+      return "CameraBoundsUpdate{"
+        + "bounds=" + bounds
+        + ", padding=" + Arrays.toString(padding)
+        + '}';
+    }
   }
 
   static final class CameraMoveUpdate implements CameraUpdate {
@@ -236,22 +339,59 @@ public final class CameraUpdateFactory {
     public CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap) {
       UiSettings uiSettings = mapboxMap.getUiSettings();
       Projection projection = mapboxMap.getProjection();
-
       // Calculate the new center point
       float viewPortWidth = uiSettings.getWidth();
       float viewPortHeight = uiSettings.getHeight();
-      PointF targetPoint = new PointF(viewPortWidth / 2 + x, viewPortHeight / 2 + y);
+      int[] padding = mapboxMap.getPadding();
 
-      // Convert point to LatLng
+      // we inverse the map padding, is reapplied when using moveTo/easeTo or animateTo
+      PointF targetPoint = new PointF(
+        (viewPortWidth - padding[0] + padding[1]) / 2 + x,
+        (viewPortHeight + padding[1] - padding[3]) / 2 + y
+      );
+
       LatLng latLng = projection.fromScreenLocation(targetPoint);
-
       CameraPosition previousPosition = mapboxMap.getCameraPosition();
-      return new CameraPosition.Builder()
-        .target(latLng != null ? latLng : previousPosition.target)
-        .zoom(previousPosition.zoom)
-        .tilt(previousPosition.tilt)
-        .bearing(previousPosition.bearing)
-        .build();
+      CameraPosition position =
+        new CameraPosition.Builder()
+          .target(latLng)
+          .zoom(previousPosition.zoom)
+          .tilt(previousPosition.tilt)
+          .bearing(previousPosition.bearing)
+          .build();
+      return position;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      CameraMoveUpdate that = (CameraMoveUpdate) o;
+
+      if (Float.compare(that.x, x) != 0) {
+        return false;
+      }
+      return Float.compare(that.y, y) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+      int result = (x != +0.0f ? Float.floatToIntBits(x) : 0);
+      result = 31 * result + (y != +0.0f ? Float.floatToIntBits(y) : 0);
+      return result;
+    }
+
+    @Override
+    public String toString() {
+      return "CameraMoveUpdate{"
+        + "x=" + x
+        + ", y=" + y
+        + '}';
     }
   }
 
@@ -345,6 +485,51 @@ public final class CameraUpdateFactory {
           .target(mapboxMap.getProjection().fromScreenLocation(new PointF(getX(), getY())))
           .build();
       }
+    }
+
+    @Override
+    public boolean equals(@Nullable Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      ZoomUpdate that = (ZoomUpdate) o;
+
+      if (type != that.type) {
+        return false;
+      }
+      if (Double.compare(that.zoom, zoom) != 0) {
+        return false;
+      }
+      if (Float.compare(that.x, x) != 0) {
+        return false;
+      }
+      return Float.compare(that.y, y) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+      int result;
+      long temp;
+      result = type;
+      temp = Double.doubleToLongBits(zoom);
+      result = 31 * result + (int) (temp ^ (temp >>> 32));
+      result = 31 * result + (x != +0.0f ? Float.floatToIntBits(x) : 0);
+      result = 31 * result + (y != +0.0f ? Float.floatToIntBits(y) : 0);
+      return result;
+    }
+
+    @Override
+    public String toString() {
+      return "ZoomUpdate{"
+        + "type=" + type
+        + ", zoom=" + zoom
+        + ", x=" + x
+        + ", y=" + y
+        + '}';
     }
   }
 }

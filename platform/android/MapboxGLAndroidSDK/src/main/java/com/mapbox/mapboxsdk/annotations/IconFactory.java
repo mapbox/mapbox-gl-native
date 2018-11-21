@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.exceptions.TooManyIconsException;
 
@@ -24,7 +25,7 @@ import java.io.InputStream;
 /**
  * Factory for creating Icons from bitmap images.
  * <p>
- * icon is used to display bitmaps on top of the map using {@link Marker} and {@link MarkerView}.
+ * icon is used to display bitmaps on top of the map using {@link Marker}.
  * </p>
  *
  * @see Icon
@@ -32,14 +33,11 @@ import java.io.InputStream;
 public final class IconFactory {
 
   private static final String ICON_ID_PREFIX = "com.mapbox.icons.icon_";
-  public static final Bitmap ICON_MARKERVIEW_BITMAP = Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8);
-  public static final String ICON_MARKERVIEW_ID = ICON_ID_PREFIX + "marker_view";
 
   private Context context;
   @SuppressLint("StaticFieldLeak")
   private static IconFactory instance;
   private Icon defaultMarker;
-  private Icon defaultMarkerView;
   private BitmapFactory.Options options;
 
   private int nextId = 0;
@@ -120,18 +118,6 @@ public final class IconFactory {
     return defaultMarker;
   }
 
-  /**
-   * Provides an icon using the default marker icon used for {@link MarkerView}.
-   *
-   * @return An icon with the default {@link MarkerView} icon.
-   */
-  public Icon defaultMarkerView() {
-    if (defaultMarkerView == null) {
-      defaultMarkerView = fromResource(R.drawable.mapbox_markerview_icon_default);
-    }
-    return defaultMarkerView;
-  }
-
   private Icon fromInputStream(@NonNull InputStream is) {
     Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
     return fromBitmap(bitmap);
@@ -148,6 +134,7 @@ public final class IconFactory {
     try {
       is = context.getAssets().open(assetName);
     } catch (IOException ioException) {
+      MapStrictMode.strictModeViolation(ioException);
       return null;
     }
     return fromInputStream(is);
@@ -178,6 +165,7 @@ public final class IconFactory {
     try {
       is = context.openFileInput(fileName);
     } catch (FileNotFoundException fileNotFoundException) {
+      MapStrictMode.strictModeViolation(fileNotFoundException);
       return null;
     }
     return fromInputStream(is);

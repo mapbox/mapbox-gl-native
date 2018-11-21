@@ -5,7 +5,6 @@
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/util/feature.hpp>
-#include <mbgl/util/throttler.hpp>
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 
@@ -38,7 +37,7 @@ public:
     void setShowCollisionBoxes(const bool showCollisionBoxes) override;
 
     void onGlyphsAvailable(GlyphMap) override;
-    void onImagesAvailable(ImageMap, uint64_t imageCorrelationID) override;
+    void onImagesAvailable(ImageMap, ImageMap, uint64_t imageCorrelationID) override;
     
     void getGlyphs(GlyphDependencies);
     void getImages(ImageRequestPair);
@@ -55,62 +54,52 @@ public:
             const TransformState&,
             const std::vector<const RenderLayer*>& layers,
             const RenderedQueryOptions& options,
-            const CollisionIndex& collisionIndex) override;
+            const mat4& projMatrix) override;
 
     void querySourceFeatures(
         std::vector<Feature>& result,
         const SourceQueryOptions&) override;
 
+    float getQueryPadding(const std::vector<const RenderLayer*>&) override;
+
     void cancel() override;
 
     class LayoutResult {
     public:
-        std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
+        std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
         std::unique_ptr<FeatureIndex> featureIndex;
-        std::unique_ptr<GeometryTileData> tileData;
+        optional<AlphaImage> glyphAtlasImage;
+        ImageAtlas iconAtlas;
 
-        LayoutResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets_,
+        LayoutResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets_,
                      std::unique_ptr<FeatureIndex> featureIndex_,
-                     std::unique_ptr<GeometryTileData> tileData_)
-            : nonSymbolBuckets(std::move(nonSymbolBuckets_)),
+                     optional<AlphaImage> glyphAtlasImage_,
+                     ImageAtlas iconAtlas_)
+            : buckets(std::move(buckets_)),
               featureIndex(std::move(featureIndex_)),
-              tileData(std::move(tileData_)) {}
+              glyphAtlasImage(std::move(glyphAtlasImage_)),
+              iconAtlas(std::move(iconAtlas_)) {}
     };
     void onLayout(LayoutResult, uint64_t correlationID);
 
-    class PlacementResult {
-    public:
-        std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
-        optional<AlphaImage> glyphAtlasImage;
-        optional<PremultipliedImage> iconAtlasImage;
-
-        PlacementResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets_,
-                        optional<AlphaImage> glyphAtlasImage_,
-                        optional<PremultipliedImage> iconAtlasImage_)
-            : symbolBuckets(std::move(symbolBuckets_)),
-              glyphAtlasImage(std::move(glyphAtlasImage_)),
-              iconAtlasImage(std::move(iconAtlasImage_)) {}
-    };
-    void onPlacement(PlacementResult, uint64_t correlationID);
-
     void onError(std::exception_ptr, uint64_t correlationID);
-    
+
     bool holdForFade() const override;
     void markRenderedIdeal() override;
     void markRenderedPreviously() override;
     void performedFadePlacement() override;
+    const optional<ImagePosition> getPattern(const std::string& pattern);
+    const std::shared_ptr<FeatureIndex> getFeatureIndex() const { return latestFeatureIndex; }
     
-    void commitFeatureIndex() override;
+    const std::string sourceID;
     
 protected:
     const GeometryTileData* getData() {
-        return data.get();
+        return latestFeatureIndex ? latestFeatureIndex->getData() : nullptr;
     }
 
 private:
     void markObsolete();
-
-    const std::string sourceID;
 
     // Used to signal the worker that it should abandon parsing this tile as soon as possible.
     std::atomic<bool> obsolete { false };
@@ -123,16 +112,12 @@ private:
 
     uint64_t correlationID = 0;
 
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
-    std::unique_ptr<FeatureIndex> featureIndex;
-    std::unique_ptr<FeatureIndex> pendingFeatureIndex;
-    std::unique_ptr<const GeometryTileData> data;
-    std::unique_ptr<const GeometryTileData> pendingData;
+    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
+    
+    std::shared_ptr<FeatureIndex> latestFeatureIndex;
 
     optional<AlphaImage> glyphAtlasImage;
-    optional<PremultipliedImage> iconAtlasImage;
-
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
+    ImageAtlas iconAtlas;
 
     const MapMode mode;
     

@@ -15,8 +15,7 @@ PremultipliedImage decodeImage(const std::string& string) {
     jni::SetArrayRegion(*env, *array, 0, string.size(),
                         reinterpret_cast<const signed char*>(string.data()));
 
-    auto bitmap = android::BitmapFactory::DecodeByteArray(*env, array, 0, string.size());
-    return android::Bitmap::GetImage(*env, bitmap);
+    return android::Bitmap::GetImage(*env, android::BitmapFactory::DecodeByteArray(*env, array, 0, string.size()));
 }
 
 } // namespace mbgl

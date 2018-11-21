@@ -18,7 +18,7 @@
     mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, nil);
 
     // has the correct URL templates
-    XCTAssertEqual(tileSet.tiles.size(), 3);
+    XCTAssertEqual(tileSet.tiles.size(), 3UL);
     XCTAssertEqual(tileSet.tiles[0], "tile.1");
     XCTAssertEqual(tileSet.tiles[1], "tile.2");
     XCTAssertEqual(tileSet.tiles[2], "tile.3");
@@ -66,8 +66,16 @@
     // when the tile set has attribution infos
     MGLAttributionInfo *mapboxInfo = [[MGLAttributionInfo alloc] initWithTitle:[[NSAttributedString alloc] initWithString:@"Mapbox"]
                                                                            URL:[NSURL URLWithString:@"https://www.mapbox.com/"]];
+#if TARGET_OS_IPHONE
+    UIColor *redColor = [UIColor redColor];
+#else
+    // CSS uses the sRGB color space. In macOS 10.12 Sierra and below,
+    // -[NSColor redColor] is in the calibrated RGB space and has a slightly
+    // different sRGB value than on iOS and macOS 10.13 High Sierra.
+    NSColor *redColor = [NSColor colorWithSRGBRed:1 green:0 blue:0 alpha:1];
+#endif
     NSAttributedString *gl = [[NSAttributedString alloc] initWithString:@"GL" attributes:@{
-        NSBackgroundColorAttributeName: [MGLColor redColor],
+        NSBackgroundColorAttributeName: redColor,
     }];
     MGLAttributionInfo *glInfo = [[MGLAttributionInfo alloc] initWithTitle:gl URL:nil];
     tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, @{
@@ -82,7 +90,7 @@
 #else
     NSString *html = (@"<font face=\"Helvetica\" size=\"3\" style=\"font: 12.0px Helvetica\">"
                       @"<a href=\"https://www.mapbox.com/\">Mapbox</a> </font>"
-                      @"<font face=\"Helvetica\" size=\"3\" style=\"font: 12.0px Helvetica; background-color: #ff2600\">GL</font>\n");
+                      @"<font face=\"Helvetica\" size=\"3\" style=\"font: 12.0px Helvetica; background-color: #ff0000\">GL</font>\n");
 #endif
     XCTAssertEqualObjects(@(tileSet.attribution.c_str()), html);
 
@@ -102,6 +110,23 @@
 
     // the scheme is reflected by the mbgl tileset
     XCTAssertEqual(tileSet.scheme, mbgl::Tileset::Scheme::TMS);
+
+    // when the dem enciding is changed using an NSNumber
+    tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, @{
+        MGLTileSourceOptionDEMEncoding: @(MGLDEMEncodingTerrarium),
+    });
+
+    // the encoding is reflected by the mbgl tileset
+    XCTAssertEqual(tileSet.encoding, mbgl::Tileset::DEMEncoding::Terrarium);
+
+    // when the dem enciding is changed using an NSValue
+    MGLDEMEncoding terrarium = MGLDEMEncodingTerrarium;
+    tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, @{
+        MGLTileSourceOptionDEMEncoding: [NSValue value:&terrarium withObjCType:@encode(MGLDEMEncoding)],
+    });
+
+    // the encoding is reflected by the mbgl tileset
+    XCTAssertEqual(tileSet.encoding, mbgl::Tileset::DEMEncoding::Terrarium);
 }
 
 - (void)testInvalidTileSet {

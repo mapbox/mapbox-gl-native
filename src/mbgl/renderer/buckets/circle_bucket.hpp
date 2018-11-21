@@ -18,7 +18,10 @@ public:
     CircleBucket(const BucketParameters&, const std::vector<const RenderLayer*>&);
 
     void addFeature(const GeometryTileFeature&,
-                    const GeometryCollection&) override;
+                    const GeometryCollection&,
+                    const ImagePositions&,
+                    const PatternLayerMap&) override;
+
     bool hasData() const override;
 
     void upload(gl::Context&) override;
@@ -36,5 +39,10 @@ public:
 
     const MapMode mode;
 };
+
+template <>
+inline bool Bucket::is<CircleBucket>() const {
+    return layerType == style::LayerType::Circle;
+}
 
 } // namespace mbgl

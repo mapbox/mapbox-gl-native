@@ -101,7 +101,13 @@ global.objCTestValue = function (property, layerType, arraysAsStructs, indent) {
         case 'boolean':
             return property.default ? '@"false"' : '@"true"';
         case 'number':
-            return '@"0xff"';
+            return '@"1"';
+        case 'formatted':
+            // Special 'string' case to handle constant expression text-field that automatically
+            // converts Formatted back to string.
+            return layerType === 'string' ?
+                `@"'${_.startCase(propertyName)}'"` :
+                `@"MGL_FUNCTION('format', '${_.startCase(propertyName)}', %@)", @{}`;
         case 'string':
             return `@"'${_.startCase(propertyName)}'"`;
         case 'enum':
@@ -145,7 +151,8 @@ global.mbglTestValue = function (property, layerType) {
         case 'boolean':
             return property.default ? 'false' : 'true';
         case 'number':
-            return '0xff';
+            return '1.0';
+        case 'formatted':
         case 'string':
             return `"${_.startCase(propertyName)}"`;
         case 'enum': {
@@ -186,6 +193,18 @@ global.mbglTestValue = function (property, layerType) {
     }
 };
 
+global.mbglExpressionTestValue = function (property, layerType) {
+    let propertyName = originalPropertyName(property);
+    switch (property.type) {
+        case 'enum':
+            return `"${_.last(_.keys(property.values))}"`;
+        case 'color':
+            return 'mbgl::Color(1, 0, 0, 1)';
+        default:
+            return global.mbglTestValue(property, layerType);
+    }
+};
+
 global.testGetterImplementation = function (property, layerType, isFunction) {
     let helperMsg = testHelperMessage(property, layerType, isFunction);
     let value = `[MGLRuntimeStylingHelper ${helperMsg}]`;
@@ -206,6 +225,7 @@ global.testHelperMessage = function (property, layerType, isFunction) {
             return 'testBool' + fnSuffix;
         case 'number':
             return 'testNumber' + fnSuffix;
+        case 'formatted':
         case 'string':
             return 'testString' + fnSuffix;
         case 'enum':
@@ -236,13 +256,20 @@ global.testHelperMessage = function (property, layerType, isFunction) {
 global.propertyDoc = function (propertyName, property, layerType, kind) {
     // Match references to other property names & values.
     // Requires the format 'When `foo` is set to `bar`,'.
-    let doc = property.doc.replace(/`([^`]+?)` is set to `([^`]+?)`/g, function (m, peerPropertyName, propertyValue, offset, str) {
+    let doc = property.doc.replace(/`([^`]+?)` is set to `([^`]+?)`(?: or `([^`]+?)`)?/g, function (m, peerPropertyName, propertyValue, secondPropertyValue, offset, str) {
         let otherProperty = camelizeWithLeadingLowercase(peerPropertyName);
         let otherValue = objCType(layerType, peerPropertyName) + camelize(propertyValue);
         if (property.type == 'array' && kind == 'light') {
             otherValue = propertyValue;
         }
-        return '`' + `${otherProperty}` + '` is set to `' + `${otherValue}` + '`';
+        const firstPropertyValue = '`' + `${otherProperty}` + '` is set to `' + `${otherValue}` + '`';
+        if (secondPropertyValue) {
+            return firstPropertyValue + ' or `' +
+                objCType(layerType, peerPropertyName) + camelize(secondPropertyValue) +
+                '`';
+        } else {
+            return firstPropertyValue;
+        }
     });
     // Match references to our own property values.
     // Requires the format 'is equivalent to `bar`'.
@@ -300,7 +327,17 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
             doc += `\n\nThis attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#${anchor}"><code>${property.original}</code></a> layout property in the Mapbox Style Specification.`;
         }
         doc += '\n\nYou can set this property to an expression containing any of the following:\n\n';
-        doc += `* Constant ${describeType(property)} values\n`;
+        doc += `* Constant ${describeType(property)} values`;
+        if ('minimum' in property) {
+            if ('maximum' in property) {
+                doc += ` between ${formatNumber(property.minimum)} and ${formatNumber(property.maximum)} inclusive`;
+            } else {
+                doc += ` no less than ${formatNumber(property.minimum)}`;
+            }
+        } else if ('maximum' in property) {
+            doc += ` no greater than ${formatNumber(property.maximum)}`;
+        }
+        doc += '\n';
         if (property.type === 'enum') {
             doc += '* Any of the following constant string values:\n';
             doc += Object.keys(property.values).map(value => '  * `' + value + '`: ' + property.values[value].doc).join('\n') + '\n';
@@ -308,17 +345,27 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
         doc += '* Predefined functions, including mathematical and string operators\n' +
             '* Conditional expressions\n' +
             '* Variable assignments and references to assigned variables\n';
-        if (property["property-function"]) {
-            doc += '* Interpolation and step functions applied to the `$zoomLevel` variable and/or feature attributes\n';
-        } else if (property.function === "interpolated") {
-            doc += '* Interpolation and step functions applied to the `$zoomLevel` variable\n\n' +
+        const inputVariable = property.expression && property['property-type'] === 'color-ramp' ?
+            '$' + camelizeWithLeadingLowercase(property.expression.parameters[0]) : '$zoomLevel';
+        if (isDataDriven(property)) {
+            doc += `* Interpolation and step functions applied to the \`${inputVariable}\` variable and/or feature attributes\n`;
+        } else if (property.expression && property.expression.interpolated) {
+            doc += `* Interpolation and step functions applied to the \`${inputVariable}\` variable\n\n` +
                 'This property does not support applying interpolation or step functions to feature attributes.';
         } else {
-            doc += '* Step functions applied to the `$zoomLevel` variable\n\n' +
-                'This property does not support applying interpolation functions to the `$zoomLevel` variable or applying interpolation or step functions to feature attributes.';
+            doc += `* Step functions applied to the \`${inputVariable}\` variable\n\n` +
+                `This property does not support applying interpolation functions to the \`${inputVariable}\` variable or applying interpolation or step functions to feature attributes.`;
         }
     }
     return doc;
+};
+
+global.propertyExample = function (property) {
+    return property.examples;
+};
+
+global.isDataDriven = function (property) {
+  return property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
 };
 
 global.propertyReqs = function (property, propertiesByName, type) {
@@ -329,6 +376,8 @@ global.propertyReqs = function (property, propertiesByName, type) {
             return '`' + camelizeWithLeadingLowercase(req['!']) + '` is set to `nil`';
         } else {
             let name = Object.keys(req)[0];
+            if (name === 'source')
+                return 'the data source requirements are met';
             return '`' + camelizeWithLeadingLowercase(name) + '` is set to an expression that evaluates to ' + describeValue(req[name], propertiesByName[name], type);
         }
     }).join(', and ') + '. Otherwise, it is ignored.';
@@ -350,6 +399,7 @@ global.describeType = function (property) {
             return 'Boolean';
         case 'number':
             return 'numeric';
+        case 'formatted':
         case 'string':
             return 'string';
         case 'enum':
@@ -387,12 +437,13 @@ global.describeValue = function (value, property, layerType) {
                 throw new Error(`No description available for ${value[0]} expression in ${property.name} of ${layerType}.`);
         }
     }
-    
+
     switch (property.type) {
         case 'boolean':
             return value ? '`YES`' : '`NO`';
         case 'number':
-            return 'the float `' + value + '`';
+            return 'the float ' + '`' + formatNumber(value) + '`';
+        case 'formatted':
         case 'string':
             if (value === '') {
                 return 'the empty string';
@@ -427,7 +478,7 @@ global.describeValue = function (value, property, layerType) {
             if (color.r === 1 && color.g === 1 && color.b === 1 && color.a === 1) {
                 return '`UIColor.whiteColor`';
             }
-            return 'a `UIColor`' + ` object whose RGB value is ${color.r}, ${color.g}, ${color.b} and whose alpha value is ${color.a}`;
+            return 'a `UIColor`' + ` object whose RGB value is ${formatNumber(color.r)}, ${formatNumber(color.g)}, ${formatNumber(color.b)} and whose alpha value is ${formatNumber(color.a)}`;
         case 'array':
             let units = property.units || '';
             if (units) {
@@ -438,12 +489,12 @@ global.describeValue = function (value, property, layerType) {
                     if (value[0] === 0 && value[1] === 0 && value[2] === 0 && value[3] === 0) {
                         return 'an `NSValue` object containing `UIEdgeInsetsZero`';
                     }
-                    return 'an `NSValue` object containing a `UIEdgeInsets` struct set to' + ` ${value[0]}${units} on the top, ${value[3]}${units} on the left, ${value[2]}${units} on the bottom, and ${value[1]}${units} on the right`;
+                    return 'an `NSValue` object containing a `UIEdgeInsets` struct set to' + ` ${formatNumber(value[0])}${units} on the top, ${formatNumber(value[3])}${units} on the left, ${formatNumber(value[2])}${units} on the bottom, and ${formatNumber(value[1])}${units} on the right`;
                 case 'offset':
                 case 'translate':
-                    return 'an `NSValue` object containing a `CGVector` struct set to' + ` ${value[0]}${units} rightward and ${value[1]}${units} downward`;
+                    return 'an `NSValue` object containing a `CGVector` struct set to' + ` ${formatNumber(value[0])}${units} rightward and ${formatNumber(value[1])}${units} downward`;
                 case 'position':
-                    return 'an `MGLSphericalPosition` struct set to' + ` ${value[0]} radial, ${value[1]} azimuthal and ${value[2]} polar`;
+                    return 'an `MGLSphericalPosition` struct set to' + ` ${formatNumber(value[0])} radial, ${formatNumber(value[1])} azimuthal and ${formatNumber(value[2])} polar`;
                 default:
                     return 'the array `' + value.join('`, `') + '`';
             }
@@ -451,6 +502,10 @@ global.describeValue = function (value, property, layerType) {
             throw new Error(`unknown type for ${property.name}`);
     }
 };
+
+global.formatNumber = function (num) {
+    return num.toLocaleString().replace('-', '\u2212');
+}
 
 global.propertyDefault = function (property, layerType) {
     if (property.name === 'heatmap-color') {
@@ -470,6 +525,7 @@ global.propertyType = function (property) {
             return 'NSNumber *';
         case 'number':
             return 'NSNumber *';
+        case 'formatted':
         case 'string':
             return 'NSString *';
         case 'enum':
@@ -500,7 +556,8 @@ global.isInterpolatable = function (property) {
     const type = property.type === 'array' ? property.value : property.type;
     return type !== 'boolean' &&
         type !== 'enum' &&
-        type !== 'string';
+        type !== 'string' &&
+        type !== 'formatted';
 };
 
 global.valueTransformerArguments = function (property) {
@@ -510,6 +567,8 @@ global.valueTransformerArguments = function (property) {
             return ['bool', objCType];
         case 'number':
             return ['float', objCType];
+        case 'formatted':
+            return ['mbgl::style::expression::Formatted', objCType];
         case 'string':
             return ['std::string', objCType];
         case 'enum':
@@ -543,6 +602,8 @@ global.mbglType = function(property) {
             return 'bool';
         case 'number':
             return 'float';
+        case 'formatted':
+            return 'mbgl::style::expression::Formatted';
         case 'string':
             return 'std::string';
         case 'enum': {
@@ -608,10 +669,11 @@ const lightDoc = spec['light-cocoa-doc'];
 const lightType = 'light';
 
 const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.ejs', 'utf8'), { strict: true });
+const layerPrivateH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer_Private.h.ejs', 'utf8'), { strict: true });
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
 const testLayers = ejs.compile(fs.readFileSync('platform/darwin/test/MGLStyleLayerTests.mm.ejs', 'utf8'), { strict: true});
 const forStyleAuthorsMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/For Style Authors.md.ejs', 'utf8'), { strict: true });
-const ddsGuideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Using Style Functions at Runtime.md.ejs', 'utf8'), { strict: true });
+const ddsGuideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Migrating to Expressions.md.ejs', 'utf8'), { strict: true });
 const templatesMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Tile URL Templates.md.ejs', 'utf8'), { strict: true });
 
 const lightH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.h.ejs', 'utf8'), {strict: true});
@@ -639,6 +701,7 @@ const layers = _(spec.layer.type.values).map((value, layerType) => {
 
     return {
         doc: spec.layer.type.values[layerType].doc,
+        examples: spec.layer.type.values[layerType].examples,
         type: layerType,
         layoutProperties: _.sortBy(layoutProperties, ['name']),
         paintProperties: _.sortBy(paintProperties, ['name']),
@@ -649,13 +712,13 @@ function duplicatePlatformDecls(src) {
     // Look for a documentation comment that contains “MGLColor” or “UIColor”
     // and the subsequent function, method, or property declaration. Try not to
     // match greedily.
-    return src.replace(/(\/\*\*(?:\*[^\/]|[^*])*?\*\/)(\s*[^;]+?\b(?:MGL|NS|UI)(?:Color|EdgeInsets(?:Zero)?)\b[^;]+?;)/g,
+    return src.replace(/(\/\*\*(?:\*[^\/]|[^*])*?\b(?:MGL|NS|UI)Color\b[\s\S]*?\*\/)(\s*.+?;)/g,
                        (match, comment, decl) => {
-        let macosComment = comment.replace(/\b(?:MGL|UI)(Color|EdgeInsets(?:Zero)?)\b/g, 'NS$1')
+        let macosComment = comment.replace(/\b(?:MGL|UI)Color\b/g, 'NSColor')
             // Use the correct indefinite article.
-            .replace(/\ba(\s+`?NS(?:Color|EdgeInsets))\b/gi, 'an$1');
-        let iosDecl = decl.replace(/\bMGL(Color|EdgeInsets)\b/g, 'UI$1');
-        let macosDecl = decl.replace(/\b(?:MGL|UI)(Color|EdgeInsets)\b/g, 'NS$1');
+            .replace(/\ba(\s+`?NSColor)\b/gi, 'an$1');
+        let iosDecl = decl.replace(/\bMGLColor\b/g, 'UIColor');
+        let macosDecl = decl.replace(/\b(?:MGL|UI)Color\b/g, 'NSColor');
         return `\
 #if TARGET_OS_IPHONE
 ${comment}${iosDecl}
@@ -693,6 +756,7 @@ for (var layer of layers) {
     }
 
     writeIfModified(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, duplicatePlatformDecls(layerH(layer)));
+    writeIfModified(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}_Private.h`, duplicatePlatformDecls(layerPrivateH(layer)));
     writeIfModified(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.mm`, layerM(layer));
     writeIfModified(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.mm`, testLayers(layer));
 }
@@ -742,10 +806,10 @@ writeIfModified(`platform/macos/docs/guides/For Style Authors.md`, forStyleAutho
     renamedProperties: renamedPropertiesByLayerType,
     layers: layers,
 }));
-writeIfModified(`platform/ios/docs/guides/Using Style Functions at Runtime.md`, ddsGuideMD({
+writeIfModified(`platform/ios/docs/guides/Migrating to Expressions.md`, ddsGuideMD({
     os: 'iOS',
 }));
-writeIfModified(`platform/macos/docs/guides/Using Style Functions at Runtime.md`, ddsGuideMD({
+writeIfModified(`platform/macos/docs/guides/Migrating to Expressions.md`, ddsGuideMD({
     os: 'macOS',
 }));
 writeIfModified(`platform/ios/docs/guides/Tile URL Templates.md`, templatesMD({

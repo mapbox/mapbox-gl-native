@@ -8,11 +8,13 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/source.hpp>
+#include <mbgl/style/expression/dsl.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
+using namespace mbgl::style::expression;
 
 namespace {
 
@@ -66,19 +68,20 @@ TEST(Query, QueryRenderedFeaturesFilterLayer) {
 }
 
 TEST(Query, QueryRenderedFeaturesFilter) {
-    QueryTest test;
+    using namespace mbgl::style::expression::dsl;
 
+    QueryTest test;
     auto zz = test.map.pixelForLatLng({ 0, 0 });
 
-    const EqualsFilter eqFilter = { "key1", std::string("value1") };
+    const Filter eqFilter(eq(get("key1"), literal("value1")));
     auto features1 = test.frontend.getRenderer()->queryRenderedFeatures(zz, {{}, { eqFilter }});
     EXPECT_EQ(features1.size(), 1u);
 
-    const IdentifierNotEqualsFilter idNotEqFilter = { std::string("feature1") };
+    const Filter idNotEqFilter(ne(id(), literal("feature1")));
     auto features2 = test.frontend.getRenderer()->queryRenderedFeatures(zz, {{{ "layer4" }}, { idNotEqFilter }});
     EXPECT_EQ(features2.size(), 0u);
 
-    const GreaterThanFilter gtFilter = { "key2", 1.0 };
+    const Filter gtFilter(gt(number(get("key2")), literal(1.0)));
     auto features3 = test.frontend.getRenderer()->queryRenderedFeatures(zz, {{ }, { gtFilter }});
     EXPECT_EQ(features3.size(), 1u);
 }
@@ -107,17 +110,19 @@ TEST(Query, QuerySourceFeaturesOptionValidation) {
 }
 
 TEST(Query, QuerySourceFeaturesFilter) {
+    using namespace mbgl::style::expression::dsl;
+
     QueryTest test;
 
-    const EqualsFilter eqFilter = { "key1", std::string("value1") };
+    const Filter eqFilter(eq(get("key1"), literal("value1")));
     auto features1 = test.frontend.getRenderer()->querySourceFeatures("source4", {{}, { eqFilter }});
     EXPECT_EQ(features1.size(), 1u);
 
-    const IdentifierNotEqualsFilter idNotEqFilter = { std::string("feature1") };
+    const Filter idNotEqFilter(ne(id(), literal("feature1")));
     auto features2 = test.frontend.getRenderer()->querySourceFeatures("source4", {{}, { idNotEqFilter }});
     EXPECT_EQ(features2.size(), 0u);
 
-    const GreaterThanFilter gtFilter = { "key2", 1.0 };
+    const Filter gtFilter(gt(number(get("key2")), literal(1.0)));
     auto features3 = test.frontend.getRenderer()->querySourceFeatures("source4", {{}, { gtFilter }});
     EXPECT_EQ(features3.size(), 1u);
 }

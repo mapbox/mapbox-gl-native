@@ -75,7 +75,7 @@ static const MGLRow MGLImperialTable[] ={
 @class MGLScaleBarLabel;
 
 @interface MGLScaleBar()
-@property (nonatomic) NSArray<MGLScaleBarLabel *> *labels;
+@property (nonatomic) NSArray<UIView *> *labelViews;
 @property (nonatomic) NSArray<UIView *> *bars;
 @property (nonatomic) UIView *containerView;
 @property (nonatomic) MGLDistanceFormatter *formatter;
@@ -84,6 +84,10 @@ static const MGLRow MGLImperialTable[] ={
 @property (nonatomic) UIColor *secondaryColor;
 @property (nonatomic) CALayer *borderLayer;
 @property (nonatomic, assign) CGFloat borderWidth;
+@property (nonatomic) NSCache* labelImageCache;
+@property (nonatomic) MGLScaleBarLabel* prototypeLabel;
+
+
 @end
 
 static const CGFloat MGLBarHeight = 4;
@@ -152,6 +156,29 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     [_containerView.layer addSublayer:_borderLayer];
     
     _formatter = [[MGLDistanceFormatter alloc] init];
+
+    // Image labels are now images
+    _labelImageCache              = [[NSCache alloc] init];
+    _prototypeLabel               = [[MGLScaleBarLabel alloc] init];
+    _prototypeLabel.font          = [UIFont systemFontOfSize:8 weight:UIFontWeightMedium];
+    _prototypeLabel.clipsToBounds = NO;
+
+    NSUInteger numberOfLabels = 4;
+    NSMutableArray *labelViews = [NSMutableArray arrayWithCapacity:numberOfLabels];
+
+    for (NSUInteger i = 0; i < numberOfLabels; i++) {
+        UIView *view = [[UIView alloc] init];
+        view.bounds        = CGRectZero;
+        view.clipsToBounds = NO;
+        view.contentMode   = UIViewContentModeCenter;
+        view.hidden        = YES;
+        [labelViews addObject:view];
+        [self addSubview:view];
+    }
+    _labelViews = [labelViews copy];
+
+    // Zero is a special case (no formatting)
+    [self addZeroLabel];
 }
 
 #pragma mark - Dimensions
@@ -178,12 +205,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 #pragma mark - Convenience methods
 
 - (BOOL)usesRightToLeftLayout {
-    // semanticContentAttribute is iOS 9+
-    if ([self.superview respondsToSelector:@selector(semanticContentAttribute)]) {
-        return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.superview.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
-    } else {
-        return UIApplication.sharedApplication.userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
-    }
+    return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.superview.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
 }
 
 - (BOOL)usesMetricSystem {
@@ -195,21 +217,31 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     CLLocationDistance maximumDistance = [self maximumWidth] * [self unitsPerPoint];
     
     BOOL useMetric = [self usesMetricSystem];
-    MGLRow row = useMetric ? MGLMetricTable[0] : MGLImperialTable[0];
-    NSUInteger count = useMetric
-    ? sizeof(MGLMetricTable) / sizeof(MGLMetricTable[0])
-    : sizeof(MGLImperialTable) / sizeof(MGLImperialTable[0]);
-    
-    for (NSUInteger i = 0; i < count; i++) {
-        CLLocationDistance distance = useMetric ? MGLMetricTable[i].distance : MGLImperialTable[i].distance;
-        if (distance <= maximumDistance) {
-            row = useMetric ? MGLMetricTable[i] : MGLImperialTable[i];
-        } else {
-            break;
-        }
+
+    const MGLRow *row;
+    const MGLRow *table;
+    NSUInteger count;
+
+    if (useMetric) {
+        row = table = MGLMetricTable;
+        count = sizeof(MGLMetricTable) / sizeof(MGLMetricTable[0]);
     }
-    
-    return row;
+    else {
+        row = table = MGLImperialTable;
+        count = sizeof(MGLImperialTable) / sizeof(MGLImperialTable[0]);
+    }
+
+    while (row < table + count) {
+        if (row->distance > maximumDistance) {
+            // use the previous row
+            NSAssert(row != table, @"");
+            return *(row - 1);
+        }
+        ++row;
+    }
+
+    // Didn't find it, just return the first.
+    return *table;
 }
 
 #pragma mark - Setters
@@ -260,9 +292,9 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     
     _row = row;
     [_bars makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    [_labels makeObjectsPerformSelector:@selector(removeFromSuperview)];
     _bars = nil;
-    _labels = nil;
+
+    [self updateLabels];
 }
 
 #pragma mark - Views
@@ -280,59 +312,89 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     return _bars;
 }
 
-- (NSArray<UILabel *> *)labels {
-    if (!_labels) {
-        NSDecimalNumber *zeroNumber = [NSDecimalNumber decimalNumberWithString:@"0"];
-        NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-        NSMutableArray *labels = [NSMutableArray array];
-        
-        for (NSUInteger i = 0; i <= self.row.numberOfBars; i++) {
-            UILabel *label = [[MGLScaleBarLabel alloc] init];
-            label.font = [UIFont systemFontOfSize:8 weight:UIFontWeightMedium];
-            label.text = [formatter stringFromNumber:zeroNumber];
-            label.clipsToBounds = NO;
-            [label setNeedsDisplay];
-            [label sizeToFit];
-            [labels addObject:label];
-            [self addSubview:label];
-        }
-        _labels = labels;
+#pragma mark - Labels
+
+- (void)addZeroLabel {
+    NSDecimalNumber *zeroNumber = [NSDecimalNumber decimalNumberWithString:@"0"];
+    NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+    NSString *text = [formatter stringFromNumber:zeroNumber];
+
+    UIImage* image = [self imageForLabelText:text];
+    [self.labelImageCache setObject:image forKey:@(0)];
+}
+
+- (UIImage*)imageForLabelText:(NSString*)text {
+    self.prototypeLabel.text = text;
+    [self.prototypeLabel setNeedsDisplay];
+    [self.prototypeLabel sizeToFit];
+
+    // Now render
+    UIGraphicsBeginImageContextWithOptions(self.prototypeLabel.bounds.size, NO, 0.0);
+    [self.prototypeLabel.layer renderInContext: UIGraphicsGetCurrentContext()];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+
+- (UIImage*)cachedLabelImageForDistance:(CLLocationDistance)barDistance {
+    // Make a slightly nicer key, rather than something that's a double.
+    NSUInteger floorDist = (NSUInteger)(barDistance*100);
+
+    NSNumber *key = @(floorDist);
+    UIImage *cachedImage = [self.labelImageCache objectForKey:key];
+
+    if (cachedImage) {
+        return cachedImage;
     }
-    return _labels;
+
+    // Calc it
+    NSString *text = [self.formatter stringFromDistance:barDistance];
+    UIImage *image = [self imageForLabelText:text];
+
+    [self.labelImageCache setObject:image forKey:key];
+
+    return image;
+}
+
+- (void)updateLabels {
+    NSEnumerator<UIView*> *viewEnumerator = [self.labelViews objectEnumerator];
+    NSUInteger i = 0;
+    CLLocationDistance multiplier = (self.row.distance / self.row.numberOfBars);
+
+    if (![self usesMetricSystem]) {
+        multiplier /= MGLFeetPerMeter;
+    }
+
+    for (; i <= self.row.numberOfBars; i++) {
+        UIView *labelView = [viewEnumerator nextObject];
+        labelView.hidden = NO;
+
+        CLLocationDistance barDistance = multiplier * i;
+        UIImage *image = [self cachedLabelImageForDistance:barDistance];
+
+        labelView.layer.contents      = (id)image.CGImage;
+        labelView.layer.contentsScale = image.scale;
+    }
+
+    // Hide the rest.
+    for (; i < self.labelViews.count; i++) {
+        UIView *labelView = [viewEnumerator nextObject];
+        labelView.hidden = YES;
+    }
 }
 
 #pragma mark - Layout
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
+
     if (!self.row.numberOfBars) {
         // Current distance is not within allowed range
         return;
     }
-    
-    [self updateLabels];
+
     [self layoutBars];
     [self layoutLabels];
-}
-
-- (void)updateLabels {
-    NSArray *labels = [self.labels subarrayWithRange:NSMakeRange(1, self.labels.count-1)];
-    BOOL useMetric = [self usesMetricSystem];
-    NSUInteger i = 0;
-    
-    for (MGLScaleBarLabel *label in labels) {
-        CLLocationDistance barDistance = (self.row.distance / self.row.numberOfBars) * (i + 1);
-        
-        if (!useMetric) {
-            barDistance /= MGLFeetPerMeter;
-        }
-        
-        label.text = [self.formatter stringFromDistance:barDistance];
-        [label setNeedsDisplay];
-        [label sizeToFit];
-        i++;
-    }
 }
 
 - (void)layoutBars {
@@ -362,11 +424,15 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     CGFloat barWidth = round(self.bounds.size.width / self.bars.count);
     BOOL RTL = [self usesRightToLeftLayout];
     NSUInteger i = RTL ? self.bars.count : 0;
-    for (MGLScaleBarLabel *label in self.labels) {
+    for (UIView *label in self.labelViews) {
         CGFloat xPosition = round(barWidth * i - CGRectGetMidX(label.bounds) + self.borderWidth);
-        label.frame = CGRectMake(xPosition, 0,
-                                 CGRectGetWidth(label.bounds),
-                                 CGRectGetHeight(label.bounds));
+        CGFloat yPosition = round(0.5 * (CGRectGetMaxY(self.bounds) - MGLBarHeight));
+
+        CGRect frame = label.frame;
+        frame.origin.x = xPosition;
+        frame.origin.y = yPosition;
+        label.frame = frame;
+
         i = RTL ? i-1 : i+1;
     }
 }

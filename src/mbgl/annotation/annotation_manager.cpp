@@ -8,6 +8,7 @@
 #include <mbgl/style/style_impl.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/style/expression/dsl.hpp>
 #include <mbgl/storage/file_source.hpp>
 
 #include <boost/function_output_iterator.hpp>
@@ -139,7 +140,13 @@ std::unique_ptr<AnnotationTileData> AnnotationManager::getTileData(const Canonic
     auto pointLayer = tileData->addLayer(PointLayerID);
 
     LatLngBounds tileBounds(tileID);
-
+    // Hack for https://github.com/mapbox/mapbox-gl-native/issues/12472
+    // To handle precision issues, query a slightly larger area than the tile bounds
+    // Symbols at a border can be included in vector data for both tiles
+    // The rendering/querying logic will make sure the symbols show up in only one of the tiles
+    tileBounds.extend(LatLng(tileBounds.south() - 0.000000001, tileBounds.west() - 0.000000001));
+    tileBounds.extend(LatLng(tileBounds.north() + 0.000000001, tileBounds.east() + 0.000000001));
+    
     symbolTree.query(boost::geometry::index::intersects(tileBounds),
         boost::make_function_output_iterator([&](const auto& val){
             val->updateLayer(tileID, *pointLayer);
@@ -160,8 +167,9 @@ void AnnotationManager::updateStyle() {
 
         std::unique_ptr<SymbolLayer> layer = std::make_unique<SymbolLayer>(PointLayerID, SourceID);
 
+        using namespace expression::dsl;
         layer->setSourceLayer(PointLayerID);
-        layer->setIconImage({SourceID + ".{sprite}"});
+        layer->setIconImage(PropertyExpression<std::string>(concat(vec(literal(SourceID + "."), toString(get("sprite"))))));
         layer->setIconAllowOverlap(true);
         layer->setIconIgnorePlacement(true);
 

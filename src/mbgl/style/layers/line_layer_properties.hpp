@@ -68,8 +68,11 @@ struct LineDasharray : CrossFadedPaintProperty<std::vector<float>> {
     static std::vector<float> defaultValue() { return {  }; }
 };
 
-struct LinePattern : CrossFadedPaintProperty<std::string> {
+struct LinePattern : CrossFadedDataDrivenPaintProperty<std::string, attributes::a_pattern_to, uniforms::u_pattern_to, attributes::a_pattern_from, uniforms::u_pattern_from> {
     static std::string defaultValue() { return ""; }
+};
+
+struct LineGradient : ColorRampProperty {
 };
 
 class LineLayoutProperties : public Properties<
@@ -89,7 +92,8 @@ class LinePaintProperties : public Properties<
     LineOffset,
     LineBlur,
     LineDasharray,
-    LinePattern
+    LinePattern,
+    LineGradient
 > {};
 
 } // namespace style

@@ -9,17 +9,19 @@
 #include <QMouseEvent>
 #include <QString>
 
-#if QT_VERSION >= 0x050000
-#include <QWindow>
-#endif
-
 int kAnimationDuration = 10000;
-
 
 MapWindow::MapWindow(const QMapboxGLSettings &settings)
     : m_settings(settings)
 {
     setWindowIcon(QIcon(":icon.png"));
+}
+
+MapWindow::~MapWindow()
+{
+    // Make sure we have a valid context so we
+    // can delete the QMapboxGL.
+    makeCurrent();
 }
 
 void MapWindow::selfTest()
@@ -38,13 +40,7 @@ void MapWindow::selfTest()
 }
 
 qreal MapWindow::pixelRatio() {
-#if QT_VERSION >= 0x050600
     return devicePixelRatioF();
-#elif QT_VERSION >= 0x050000
-    return devicePixelRatio();
-#else
-    return 1;
-#endif
 }
 
 
@@ -222,7 +218,21 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
 
             m_map->setFilter("3d-buildings", buildingsFilterExpression);
 
-            m_map->setPaintProperty("3d-buildings", "fill-extrusion-color", "#aaa");
+            QString fillExtrusionColorJSON = R"JSON(
+              [
+                "interpolate",
+                ["linear"],
+                ["get", "height"],
+                  0.0, "blue",
+                 20.0, "royalblue",
+                 40.0, "cyan",
+                 60.0, "lime",
+                 80.0, "yellow",
+                100.0, "red"
+              ]
+            )JSON";
+
+            m_map->setPaintProperty("3d-buildings", "fill-extrusion-color", fillExtrusionColorJSON);
             m_map->setPaintProperty("3d-buildings", "fill-extrusion-opacity", .6);
 
             QVariantMap extrusionHeight;
@@ -348,11 +358,7 @@ void MapWindow::keyPressEvent(QKeyEvent *ev)
 
 void MapWindow::mousePressEvent(QMouseEvent *ev)
 {
-#if QT_VERSION < 0x050000
-    m_lastPos = ev->posF();
-#else
     m_lastPos = ev->localPos();
-#endif
 
     if (ev->type() == QEvent::MouseButtonPress) {
         if (ev->buttons() == (Qt::LeftButton | Qt::RightButton)) {
@@ -373,11 +379,7 @@ void MapWindow::mousePressEvent(QMouseEvent *ev)
 
 void MapWindow::mouseMoveEvent(QMouseEvent *ev)
 {
-#if QT_VERSION < 0x050000
-    QPointF delta = ev->posF() - m_lastPos;
-#else
     QPointF delta = ev->localPos() - m_lastPos;
-#endif
 
     if (!delta.isNull()) {
         if (ev->buttons() == Qt::LeftButton && ev->modifiers() & Qt::ShiftModifier) {
@@ -385,19 +387,11 @@ void MapWindow::mouseMoveEvent(QMouseEvent *ev)
         } else if (ev->buttons() == Qt::LeftButton) {
             m_map->moveBy(delta);
         } else if (ev->buttons() == Qt::RightButton) {
-#if QT_VERSION < 0x050000
-            m_map->rotateBy(m_lastPos, ev->posF());
-#else
             m_map->rotateBy(m_lastPos, ev->localPos());
-#endif
         }
     }
 
-#if QT_VERSION < 0x050000
-    m_lastPos = ev->posF();
-#else
     m_lastPos = ev->localPos();
-#endif
     ev->accept();
 }
 
@@ -443,8 +437,6 @@ void MapWindow::paintGL()
 {
     m_frameDraws++;
     m_map->resize(size());
-#if QT_VERSION >= 0x050400
     m_map->setFramebufferObject(defaultFramebufferObject(), size() * pixelRatio());
-#endif
     m_map->render();
 }

@@ -74,6 +74,8 @@ void RenderTile::finishRender(PaintParameters& parameters) {
     static const style::Properties<>::PossiblyEvaluated properties {};
     static const DebugProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
+    auto& program = parameters.programs.debug;
+
     if (parameters.debugOptions & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
         if (!tile.debugBucket || tile.debugBucket->renderable != tile.isRenderable() ||
             tile.debugBucket->complete != tile.isComplete() ||
@@ -85,41 +87,53 @@ void RenderTile::finishRender(PaintParameters& parameters) {
                 tile.expires, parameters.debugOptions, parameters.context);
         }
 
-        parameters.programs.debug.draw(
+        const auto allAttributeBindings = program.computeAllAttributeBindings(
+            *tile.debugBucket->vertexBuffer,
+            paintAttributeData,
+            properties
+        );
+
+        program.draw(
             parameters.context,
             gl::Lines { 4.0f * parameters.pixelRatio },
             gl::DepthMode::disabled(),
             parameters.stencilModeForClipping(clip),
             gl::ColorMode::unblended(),
-            DebugProgram::UniformValues {
-                uniforms::u_matrix::Value{ matrix },
-                uniforms::u_color::Value{ Color::white() }
-            },
-            *tile.debugBucket->vertexBuffer,
+            gl::CullFaceMode::disabled(),
             *tile.debugBucket->indexBuffer,
             tile.debugBucket->segments,
-            paintAttributeData,
-            properties,
-            parameters.state.getZoom(),
+            program.computeAllUniformValues(
+                DebugProgram::UniformValues {
+                    uniforms::u_matrix::Value( matrix ),
+                    uniforms::u_color::Value( Color::white() )
+                },
+                paintAttributeData,
+                properties,
+                parameters.state.getZoom()
+            ),
+            allAttributeBindings,
             "debug"
         );
 
-        parameters.programs.debug.draw(
+        program.draw(
             parameters.context,
             gl::Lines { 2.0f * parameters.pixelRatio },
             gl::DepthMode::disabled(),
             parameters.stencilModeForClipping(clip),
             gl::ColorMode::unblended(),
-            DebugProgram::UniformValues {
-                uniforms::u_matrix::Value{ matrix },
-                uniforms::u_color::Value{ Color::black() }
-            },
-            *tile.debugBucket->vertexBuffer,
+            gl::CullFaceMode::disabled(),
             *tile.debugBucket->indexBuffer,
             tile.debugBucket->segments,
-            paintAttributeData,
-            properties,
-            parameters.state.getZoom(),
+            program.computeAllUniformValues(
+                DebugProgram::UniformValues {
+                    uniforms::u_matrix::Value( matrix ),
+                    uniforms::u_color::Value( Color::black() )
+                },
+                paintAttributeData,
+                properties,
+                parameters.state.getZoom()
+            ),
+            allAttributeBindings,
             "debug"
         );
     }
@@ -131,16 +145,23 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             gl::DepthMode::disabled(),
             parameters.stencilModeForClipping(clip),
             gl::ColorMode::unblended(),
-            DebugProgram::UniformValues {
-                uniforms::u_matrix::Value{ matrix },
-                uniforms::u_color::Value{ Color::red() }
-            },
-            parameters.staticData.tileVertexBuffer,
+            gl::CullFaceMode::disabled(),
             parameters.staticData.tileBorderIndexBuffer,
             parameters.staticData.tileBorderSegments,
-            paintAttributeData,
-            properties,
-            parameters.state.getZoom(),
+            program.computeAllUniformValues(
+                DebugProgram::UniformValues {
+                    uniforms::u_matrix::Value( matrix ),
+                    uniforms::u_color::Value( Color::red() )
+                },
+                paintAttributeData,
+                properties,
+                parameters.state.getZoom()
+            ),
+            program.computeAllAttributeBindings(
+                parameters.staticData.tileVertexBuffer,
+                paintAttributeData,
+                properties
+            ),
             "debug"
         );
     }

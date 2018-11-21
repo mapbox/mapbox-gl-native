@@ -2,7 +2,6 @@
 
 #import <Mapbox/Mapbox.h>
 #import "MGLFeature_Private.h"
-#import "MGLAbstractShapeSource_Private.h"
 #import "MGLShapeSource_Private.h"
 #import "MGLSource_Private.h"
 
@@ -19,7 +18,8 @@
                               MGLShapeSourceOptionMaximumZoomLevelForClustering: @98,
                               MGLShapeSourceOptionMaximumZoomLevel: @99,
                               MGLShapeSourceOptionBuffer: @1976,
-                              MGLShapeSourceOptionSimplificationTolerance: @0.42};
+                              MGLShapeSourceOptionSimplificationTolerance: @0.42,
+                              MGLShapeSourceOptionLineDistanceMetrics: @YES};
 
     auto mbglOptions = MGLGeoJSONOptionsFromDictionary(options);
     XCTAssertTrue(mbglOptions.cluster);
@@ -28,6 +28,7 @@
     XCTAssertEqual(mbglOptions.maxzoom, 99);
     XCTAssertEqual(mbglOptions.buffer, 1976);
     XCTAssertEqual(mbglOptions.tolerance, 0.42);
+    XCTAssertTrue(mbglOptions.lineMetrics);
 
     options = @{MGLShapeSourceOptionClustered: @"number 1"};
     XCTAssertThrows(MGLGeoJSONOptionsFromDictionary(options));
@@ -64,7 +65,7 @@
 
     MGLShapeCollection *collection = (MGLShapeCollection *)source.shape;
     XCTAssertNotNil(collection);
-    XCTAssertEqual(collection.shapes.count, 1);
+    XCTAssertEqual(collection.shapes.count, 1UL);
     XCTAssertTrue([collection.shapes.firstObject isMemberOfClass:[MGLPolylineFeature class]]);
 }
 
@@ -293,7 +294,7 @@
     MGLShapeCollectionFeature *shape = (MGLShapeCollectionFeature *)source.shape;
 
     XCTAssertTrue([shape isKindOfClass:[MGLShapeCollectionFeature class]]);
-    XCTAssertEqual(shape.shapes.count, 1, @"Shape collection should contain 1 shape");
+    XCTAssertEqual(shape.shapes.count, 1UL, @"Shape collection should contain 1 shape");
 
     // when a shape is included in the features array
     MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:coordinates count:sizeof(coordinates)/sizeof(coordinates[0]) interiorPolygons:nil];
@@ -318,7 +319,7 @@
     MGLShapeCollectionFeature *shape = (MGLShapeCollectionFeature *)source.shape;
 
     XCTAssertTrue([shape isKindOfClass:[MGLShapeCollection class]]);
-    XCTAssertEqual(shape.shapes.count, 1, @"Shape collection should contain 1 shape");
+    XCTAssertEqual(shape.shapes.count, 1UL, @"Shape collection should contain 1 shape");
 }
 
 @end

@@ -1,6 +1,7 @@
 #import "MGLClockDirectionFormatter.h"
 
 #import "NSBundle+MGLAdditions.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #define wrap(value, min, max) \
     (fmod((fmod((value - min), (max - min)) + (max - min)), (max - min)) + min)
@@ -52,7 +53,7 @@
 }
 
 - (BOOL)getObjectValue:(out id __nullable * __nullable)obj forString:(NSString *)string errorDescription:(out NSString * __nullable * __nullable)error {
-    NSAssert(NO, @"-getObjectValue:forString:errorDescription: has not been implemented");
+    MGLAssert(NO, @"-getObjectValue:forString:errorDescription: has not been implemented");
     return NO;
 }
 

@@ -32,12 +32,12 @@ public:
                           const TransformState& transformState,
                           const std::vector<const RenderLayer*>& layers,
                           const RenderedQueryOptions& options,
-                          const CollisionIndex&) const final;
+                          const mat4& projMatrix) const final;
 
     std::vector<Feature>
     querySourceFeatures(const SourceQueryOptions&) const final;
 
-    void onLowMemory() final;
+    void reduceMemoryUse() final;
     void dumpDebugLogs() const final;
 
 private:

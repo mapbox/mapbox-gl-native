@@ -5,7 +5,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/data_driven_property_value.hpp>
+#include <mbgl/style/expression/formatted.hpp>
 
 #include <mbgl/util/color.hpp>
 
@@ -19,44 +19,33 @@ public:
     CircleLayer(const std::string& layerID, const std::string& sourceID);
     ~CircleLayer() final;
 
-    // Source
-    const std::string& getSourceID() const;
-    const std::string& getSourceLayer() const;
-    void setSourceLayer(const std::string& sourceLayer);
-
-    void setFilter(const Filter&);
-    const Filter& getFilter() const;
-
-    // Visibility
-    void setVisibility(VisibilityType) final;
-
-    // Zoom range
-    void setMinZoom(float) final;
-    void setMaxZoom(float) final;
+    // Dynamic properties
+    optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
+    optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
 
     // Paint properties
 
-    static DataDrivenPropertyValue<float> getDefaultCircleRadius();
-    DataDrivenPropertyValue<float> getCircleRadius() const;
-    void setCircleRadius(DataDrivenPropertyValue<float>);
+    static PropertyValue<float> getDefaultCircleRadius();
+    PropertyValue<float> getCircleRadius() const;
+    void setCircleRadius(PropertyValue<float>);
     void setCircleRadiusTransition(const TransitionOptions&);
     TransitionOptions getCircleRadiusTransition() const;
 
-    static DataDrivenPropertyValue<Color> getDefaultCircleColor();
-    DataDrivenPropertyValue<Color> getCircleColor() const;
-    void setCircleColor(DataDrivenPropertyValue<Color>);
+    static PropertyValue<Color> getDefaultCircleColor();
+    PropertyValue<Color> getCircleColor() const;
+    void setCircleColor(PropertyValue<Color>);
     void setCircleColorTransition(const TransitionOptions&);
     TransitionOptions getCircleColorTransition() const;
 
-    static DataDrivenPropertyValue<float> getDefaultCircleBlur();
-    DataDrivenPropertyValue<float> getCircleBlur() const;
-    void setCircleBlur(DataDrivenPropertyValue<float>);
+    static PropertyValue<float> getDefaultCircleBlur();
+    PropertyValue<float> getCircleBlur() const;
+    void setCircleBlur(PropertyValue<float>);
     void setCircleBlurTransition(const TransitionOptions&);
     TransitionOptions getCircleBlurTransition() const;
 
-    static DataDrivenPropertyValue<float> getDefaultCircleOpacity();
-    DataDrivenPropertyValue<float> getCircleOpacity() const;
-    void setCircleOpacity(DataDrivenPropertyValue<float>);
+    static PropertyValue<float> getDefaultCircleOpacity();
+    PropertyValue<float> getCircleOpacity() const;
+    void setCircleOpacity(PropertyValue<float>);
     void setCircleOpacityTransition(const TransitionOptions&);
     TransitionOptions getCircleOpacityTransition() const;
 
@@ -84,21 +73,21 @@ public:
     void setCirclePitchAlignmentTransition(const TransitionOptions&);
     TransitionOptions getCirclePitchAlignmentTransition() const;
 
-    static DataDrivenPropertyValue<float> getDefaultCircleStrokeWidth();
-    DataDrivenPropertyValue<float> getCircleStrokeWidth() const;
-    void setCircleStrokeWidth(DataDrivenPropertyValue<float>);
+    static PropertyValue<float> getDefaultCircleStrokeWidth();
+    PropertyValue<float> getCircleStrokeWidth() const;
+    void setCircleStrokeWidth(PropertyValue<float>);
     void setCircleStrokeWidthTransition(const TransitionOptions&);
     TransitionOptions getCircleStrokeWidthTransition() const;
 
-    static DataDrivenPropertyValue<Color> getDefaultCircleStrokeColor();
-    DataDrivenPropertyValue<Color> getCircleStrokeColor() const;
-    void setCircleStrokeColor(DataDrivenPropertyValue<Color>);
+    static PropertyValue<Color> getDefaultCircleStrokeColor();
+    PropertyValue<Color> getCircleStrokeColor() const;
+    void setCircleStrokeColor(PropertyValue<Color>);
     void setCircleStrokeColorTransition(const TransitionOptions&);
     TransitionOptions getCircleStrokeColorTransition() const;
 
-    static DataDrivenPropertyValue<float> getDefaultCircleStrokeOpacity();
-    DataDrivenPropertyValue<float> getCircleStrokeOpacity() const;
-    void setCircleStrokeOpacity(DataDrivenPropertyValue<float>);
+    static PropertyValue<float> getDefaultCircleStrokeOpacity();
+    PropertyValue<float> getCircleStrokeOpacity() const;
+    void setCircleStrokeOpacity(PropertyValue<float>);
     void setCircleStrokeOpacityTransition(const TransitionOptions&);
     TransitionOptions getCircleStrokeOpacityTransition() const;
 
@@ -110,12 +99,20 @@ public:
     Mutable<Impl> mutableImpl() const;
     CircleLayer(Immutable<Impl>);
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
+
+protected:
+    Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
-template <>
-inline bool Layer::is<CircleLayer>() const {
-    return getType() == LayerType::Circle;
-}
+class CircleLayerFactory : public LayerFactory {
+public:
+    CircleLayerFactory();
+    ~CircleLayerFactory() override;
+
+    // LayerFactory overrides.
+    const LayerTypeInfo* getTypeInfo() const noexcept final;
+    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
+};
 
 } // namespace style
 } // namespace mbgl

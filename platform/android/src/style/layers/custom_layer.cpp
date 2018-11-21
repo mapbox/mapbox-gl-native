@@ -7,14 +7,10 @@
 namespace mbgl {
 namespace android {
 
-    CustomLayer::CustomLayer(jni::JNIEnv& env, jni::String layerId, jni::jlong initializeFunction, jni::jlong renderFunction, jni::jlong contextLostFunction, jni::jlong deinitializeFunction, jni::jlong context)
-        : Layer(env, std::make_unique<mbgl::style::CustomLayer>(
+    CustomLayer::CustomLayer(jni::JNIEnv& env, const jni::String& layerId, jni::jlong host)
+        : Layer(std::make_unique<mbgl::style::CustomLayer>(
                 jni::Make<std::string>(env, layerId),
-                reinterpret_cast<mbgl::style::CustomLayerInitializeFunction>(initializeFunction),
-                reinterpret_cast<mbgl::style::CustomLayerRenderFunction>(renderFunction),
-                reinterpret_cast<mbgl::style::CustomLayerContextLostFunction>(contextLostFunction),
-                reinterpret_cast<mbgl::style::CustomLayerDeinitializeFunction>(deinitializeFunction),
-                reinterpret_cast<void*>(context))
+                std::unique_ptr<mbgl::style::CustomLayerHost>(reinterpret_cast<mbgl::style::CustomLayerHost*>(host)))
                 ) {
     }
 
@@ -23,7 +19,7 @@ namespace android {
     }
 
     CustomLayer::CustomLayer(mbgl::Map& map, std::unique_ptr<mbgl::style::CustomLayer> coreLayer)
-            : Layer(map, std::move(coreLayer)) {
+        : Layer(map, std::move(coreLayer)) {
     }
 
     CustomLayer::~CustomLayer() = default;
@@ -37,23 +33,34 @@ namespace android {
         }
     }
 
-    jni::Class<CustomLayer> CustomLayer::javaClass;
-
-    jni::jobject* CustomLayer::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = CustomLayer::javaClass.template GetConstructor<jni::jlong>(env);
-        return CustomLayer::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+    namespace {
+        jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv& env, Layer* layer) {
+            static auto& javaClass = jni::Class<CustomLayer>::Singleton(env);
+            static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+            return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(layer));
+        }
     }
 
-    void CustomLayer::registerNative(jni::JNIEnv& env) {
+    CustomJavaLayerPeerFactory::~CustomJavaLayerPeerFactory() = default;
+
+    jni::Local<jni::Object<Layer>> CustomJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
+        return createJavaPeer(env, new CustomLayer(map, static_cast<mbgl::style::CustomLayer&>(layer)));
+    }
+
+    jni::Local<jni::Object<Layer>> CustomJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
+        return createJavaPeer(env, new CustomLayer(map, std::unique_ptr<mbgl::style::CustomLayer>(static_cast<mbgl::style::CustomLayer*>(layer.release()))));
+    }
+
+    void CustomJavaLayerPeerFactory::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        CustomLayer::javaClass = *jni::Class<CustomLayer>::Find(env).NewGlobalRef(env).release();
+        static auto& javaClass = jni::Class<CustomLayer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<CustomLayer>(
-            env, CustomLayer::javaClass, "nativePtr",
-            std::make_unique<CustomLayer, JNIEnv&, jni::String, jni::jlong, jni::jlong, jni::jlong, jni::jlong, jni::jlong>,
+            env, javaClass, "nativePtr",
+            jni::MakePeer<CustomLayer, const jni::String&, jni::jlong>,
             "initialize",
             "finalize",
             METHOD(&CustomLayer::update, "nativeUpdate"));

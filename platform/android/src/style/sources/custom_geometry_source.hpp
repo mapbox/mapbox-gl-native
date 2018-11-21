@@ -15,31 +15,34 @@ namespace android {
 
 class CustomGeometrySource : public Source {
 public:
-
+    using SuperTag = Source;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/sources/CustomGeometrySource"; };
-
-    static jni::Class<CustomGeometrySource> javaClass;
 
     static void registerNative(jni::JNIEnv&);
 
-    CustomGeometrySource(jni::JNIEnv&, jni::String, jni::Object<>);
-
+    CustomGeometrySource(jni::JNIEnv&, const jni::String&, const jni::Object<>&);
     CustomGeometrySource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
-
     ~CustomGeometrySource();
+
+    bool removeFromMap(JNIEnv&, const jni::Object<Source>&, mbgl::Map&) override;
+    void addToMap(JNIEnv&, const jni::Object<Source>&, mbgl::Map&, AndroidRendererFrontend&) override;
 
     void fetchTile(const mbgl::CanonicalTileID& tileID);
     void cancelTile(const mbgl::CanonicalTileID& tileID);
-    void setTileData(jni::JNIEnv& env, jni::jint z, jni::jint x, jni::jint y, jni::Object<geojson::FeatureCollection> jf);
-
-    void invalidateTile(jni::JNIEnv& env, jni::jint z, jni::jint x, jni::jint y);
-    void invalidateBounds(jni::JNIEnv& env, jni::Object<LatLngBounds> bounds);
-
-    jni::Array<jni::Object<geojson::Feature>> querySourceFeatures(jni::JNIEnv&,
-                                                                  jni::Array<jni::Object<>> );
+    bool isCancelled(jni::jint z, jni::jint x, jni::jint y);
+    void startThreads();
+    void releaseThreads();
 
 private:
-    jni::Object<Source> createJavaPeer(jni::JNIEnv&);
+    void setTileData(jni::JNIEnv& env, jni::jint z, jni::jint x, jni::jint y, const jni::Object<geojson::FeatureCollection>& jf);
+
+    void invalidateTile(jni::JNIEnv& env, jni::jint z, jni::jint x, jni::jint y);
+    void invalidateBounds(jni::JNIEnv& env, const jni::Object<LatLngBounds>& bounds);
+
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> querySourceFeatures(jni::JNIEnv&,
+                                                                  const jni::Array<jni::Object<>>& );
+
+    jni::Local<jni::Object<Source>> createJavaPeer(jni::JNIEnv&);
 
 }; // class CustomGeometrySource
 

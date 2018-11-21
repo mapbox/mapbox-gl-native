@@ -2,6 +2,7 @@
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/renderer/render_layer.hpp>
+#include <mbgl/renderer/layers/render_layer_symbol_interface.hpp>
 #include <mbgl/style/image_impl.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
@@ -48,8 +49,6 @@ public:
 
     bool hasHalo;
     bool hasFill;
-    
-    float maxCameraDistance; // 1.5 for road labels, or 10 (essentially infinite) for everything else
 };
 
 } // namespace style
@@ -58,7 +57,7 @@ class BucketParameters;
 class SymbolLayout;
 class GeometryTileLayer;
 
-class RenderSymbolLayer: public RenderLayer {
+class RenderSymbolLayer: public RenderLayer, public RenderLayerSymbolInterface {
 public:
     RenderSymbolLayer(Immutable<style::SymbolLayer::Impl>);
     ~RenderSymbolLayer() final = default;
@@ -66,6 +65,7 @@ public:
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
+    bool hasCrossfade() const override;
     void render(PaintParameters&, RenderSource*) override;
 
     style::IconPaintProperties::PossiblyEvaluated iconPaintProperties() const;
@@ -75,11 +75,17 @@ public:
     style::SymbolPropertyValues textPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated&) const;
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
-    std::unique_ptr<SymbolLayout> createLayout(const BucketParameters&,
+    std::unique_ptr<Layout> createLayout(const BucketParameters&,
                                                const std::vector<const RenderLayer*>&,
                                                std::unique_ptr<GeometryTileLayer>,
                                                GlyphDependencies&,
-                                               ImageDependencies&) const;
+                                               ImageDependencies&) const override;
+
+    // RenderLayerSymbolInterface overrides
+    const RenderLayerSymbolInterface* getSymbolInterface() const final;
+    const std::string& layerID() const final;
+    const std::vector<std::reference_wrapper<RenderTile>>& getRenderTiles() const final;
+    SymbolBucket* getSymbolBucket(const RenderTile&) const final;
 
     // Paint properties
     style::SymbolPaintProperties::Unevaluated unevaluated;
@@ -89,11 +95,14 @@ public:
     float textSize = 16.0f;
 
     const style::SymbolLayer::Impl& impl() const;
+
+protected:
+    RenderTiles filterRenderTiles(RenderTiles) const final;
+    void sortRenderTiles(const TransformState&) final;
 };
 
-template <>
-inline bool RenderLayer::is<RenderSymbolLayer>() const {
-    return type == style::LayerType::Symbol;
+inline const RenderSymbolLayer* toRenderSymbolLayer(const RenderLayer* layer) {
+    return static_cast<const RenderSymbolLayer*>(layer);
 }
 
 } // namespace mbgl

@@ -10,9 +10,7 @@ class OfflineRegionError {
 public:
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineRegionError"; };
 
-    static jni::Object<OfflineRegionError> New(jni::JNIEnv&, mbgl::Response::Error);
-
-    static jni::Class<OfflineRegionError> javaClass;
+    static jni::Local<jni::Object<OfflineRegionError>> New(jni::JNIEnv&, mbgl::Response::Error);
 
     static void registerNative(jni::JNIEnv&);
 };

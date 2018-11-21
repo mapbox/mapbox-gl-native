@@ -3,31 +3,18 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
 import android.graphics.Color;
-import android.support.test.espresso.UiController;
 import android.support.test.runner.AndroidJUnit4;
 
 import timber.log.Timber;
 
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.style.functions.CompositeFunction;
-import com.mapbox.mapboxsdk.style.functions.CameraFunction;
-import com.mapbox.mapboxsdk.style.functions.SourceFunction;
-import com.mapbox.mapboxsdk.style.functions.stops.CategoricalStops;
-import com.mapbox.mapboxsdk.style.functions.stops.ExponentialStops;
-import com.mapbox.mapboxsdk.style.functions.stops.IdentityStops;
-import com.mapbox.mapboxsdk.style.functions.stops.IntervalStops;
-import com.mapbox.mapboxsdk.style.functions.stops.Stop;
-import com.mapbox.mapboxsdk.style.functions.stops.Stops;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.HillshadeLayer;
-import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static com.mapbox.mapboxsdk.style.functions.Function.*;
-import static com.mapbox.mapboxsdk.style.functions.stops.Stop.stop;
-import static com.mapbox.mapboxsdk.style.functions.stops.Stops.*;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.*;
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
 import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
@@ -51,18 +38,27 @@ public class HillshadeLayerTest extends BaseActivityTest {
 
   private void setupLayer() {
     Timber.i("Retrieving layer");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-          Timber.i("Adding layer");
-          layer = new HillshadeLayer("my-layer", "composite");
-          layer.setSourceLayer("composite");
-          mapboxMap.addLayer(layer);
-          // Layer reference is now stale, get new reference
-          layer = mapboxMap.getLayerAs("my-layer");
-        }
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+        Timber.i("Adding layer");
+        layer = new HillshadeLayer("my-layer", "composite");
+        layer.setSourceLayer("composite");
+        mapboxMap.addLayer(layer);
+        // Layer reference is now stale, get new reference
+        layer = mapboxMap.getLayerAs("my-layer");
       }
+    });
+  }
+
+  @Test
+  public void testSourceId() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("SourceId");
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+      // Get source id
+      assertEquals(layer.getSourceId(), "composite");
     });
   }
 
@@ -71,18 +67,15 @@ public class HillshadeLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("Visibility");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
 
-        // Get initial
-        assertEquals(layer.getVisibility().getValue(), VISIBLE);
+      // Get initial
+      assertEquals(layer.getVisibility().getValue(), VISIBLE);
 
-        // Set
-        layer.setProperties(visibility(NONE));
-        assertEquals(layer.getVisibility().getValue(), NONE);
-      }
+      // Set
+      layer.setProperties(visibility(NONE));
+      assertEquals(layer.getVisibility().getValue(), NONE);
     });
   }
 
@@ -91,47 +84,14 @@ public class HillshadeLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("hillshade-illumination-direction");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+      assertNull(layer.getHillshadeIlluminationDirection().getValue());
 
-        // Set and Get
-        layer.setProperties(hillshadeIlluminationDirection(0.3f));
-        assertEquals((Float) layer.getHillshadeIlluminationDirection().getValue(), (Float) 0.3f);
-      }
-    });
-  }
-
-  @Test
-  public void testHillshadeIlluminationDirectionAsCameraFunction() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("hillshade-illumination-direction");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set
-        layer.setProperties(
-          hillshadeIlluminationDirection(
-            zoom(
-              exponential(
-                stop(2, hillshadeIlluminationDirection(0.3f))
-              ).withBase(0.5f)
-            )
-          )
-        );
-
-        // Verify
-        assertNotNull(layer.getHillshadeIlluminationDirection());
-        assertNotNull(layer.getHillshadeIlluminationDirection().getFunction());
-        assertEquals(CameraFunction.class, layer.getHillshadeIlluminationDirection().getFunction().getClass());
-        assertEquals(ExponentialStops.class, layer.getHillshadeIlluminationDirection().getFunction().getStops().getClass());
-        assertEquals(0.5f, ((ExponentialStops) layer.getHillshadeIlluminationDirection().getFunction().getStops()).getBase(), 0.001);
-        assertEquals(1, ((ExponentialStops) layer.getHillshadeIlluminationDirection().getFunction().getStops()).size());
-      }
+      // Set and Get
+      Float propertyValue = 0.3f;
+      layer.setProperties(hillshadeIlluminationDirection(propertyValue));
+      assertEquals(layer.getHillshadeIlluminationDirection().getValue(), propertyValue);
     });
   }
 
@@ -140,46 +100,14 @@ public class HillshadeLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("hillshade-illumination-anchor");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+      assertNull(layer.getHillshadeIlluminationAnchor().getValue());
 
-        // Set and Get
-        layer.setProperties(hillshadeIlluminationAnchor(HILLSHADE_ILLUMINATION_ANCHOR_MAP));
-        assertEquals((String) layer.getHillshadeIlluminationAnchor().getValue(), (String) HILLSHADE_ILLUMINATION_ANCHOR_MAP);
-      }
-    });
-  }
-
-  @Test
-  public void testHillshadeIlluminationAnchorAsCameraFunction() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("hillshade-illumination-anchor");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set
-        layer.setProperties(
-          hillshadeIlluminationAnchor(
-            zoom(
-              interval(
-                stop(2, hillshadeIlluminationAnchor(HILLSHADE_ILLUMINATION_ANCHOR_MAP))
-              )
-            )
-          )
-        );
-
-        // Verify
-        assertNotNull(layer.getHillshadeIlluminationAnchor());
-        assertNotNull(layer.getHillshadeIlluminationAnchor().getFunction());
-        assertEquals(CameraFunction.class, layer.getHillshadeIlluminationAnchor().getFunction().getClass());
-        assertEquals(IntervalStops.class, layer.getHillshadeIlluminationAnchor().getFunction().getStops().getClass());
-        assertEquals(1, ((IntervalStops) layer.getHillshadeIlluminationAnchor().getFunction().getStops()).size());
-      }
+      // Set and Get
+      String propertyValue = HILLSHADE_ILLUMINATION_ANCHOR_MAP;
+      layer.setProperties(hillshadeIlluminationAnchor(propertyValue));
+      assertEquals(layer.getHillshadeIlluminationAnchor().getValue(), propertyValue);
     });
   }
 
@@ -188,16 +116,13 @@ public class HillshadeLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("hillshade-exaggerationTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
 
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setHillshadeExaggerationTransition(options);
-        assertEquals(layer.getHillshadeExaggerationTransition(), options);
-      }
+      // Set and Get
+      TransitionOptions options = new TransitionOptions(300, 100);
+      layer.setHillshadeExaggerationTransition(options);
+      assertEquals(layer.getHillshadeExaggerationTransition(), options);
     });
   }
 
@@ -206,47 +131,14 @@ public class HillshadeLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("hillshade-exaggeration");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+      assertNull(layer.getHillshadeExaggeration().getValue());
 
-        // Set and Get
-        layer.setProperties(hillshadeExaggeration(0.3f));
-        assertEquals((Float) layer.getHillshadeExaggeration().getValue(), (Float) 0.3f);
-      }
-    });
-  }
-
-  @Test
-  public void testHillshadeExaggerationAsCameraFunction() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("hillshade-exaggeration");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set
-        layer.setProperties(
-          hillshadeExaggeration(
-            zoom(
-              exponential(
-                stop(2, hillshadeExaggeration(0.3f))
-              ).withBase(0.5f)
-            )
-          )
-        );
-
-        // Verify
-        assertNotNull(layer.getHillshadeExaggeration());
-        assertNotNull(layer.getHillshadeExaggeration().getFunction());
-        assertEquals(CameraFunction.class, layer.getHillshadeExaggeration().getFunction().getClass());
-        assertEquals(ExponentialStops.class, layer.getHillshadeExaggeration().getFunction().getStops().getClass());
-        assertEquals(0.5f, ((ExponentialStops) layer.getHillshadeExaggeration().getFunction().getStops()).getBase(), 0.001);
-        assertEquals(1, ((ExponentialStops) layer.getHillshadeExaggeration().getFunction().getStops()).size());
-      }
+      // Set and Get
+      Float propertyValue = 0.3f;
+      layer.setProperties(hillshadeExaggeration(propertyValue));
+      assertEquals(layer.getHillshadeExaggeration().getValue(), propertyValue);
     });
   }
 
@@ -255,16 +147,13 @@ public class HillshadeLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("hillshade-shadow-colorTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
 
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setHillshadeShadowColorTransition(options);
-        assertEquals(layer.getHillshadeShadowColorTransition(), options);
-      }
+      // Set and Get
+      TransitionOptions options = new TransitionOptions(300, 100);
+      layer.setHillshadeShadowColorTransition(options);
+      assertEquals(layer.getHillshadeShadowColorTransition(), options);
     });
   }
 
@@ -273,47 +162,14 @@ public class HillshadeLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("hillshade-shadow-color");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+      assertNull(layer.getHillshadeShadowColor().getValue());
 
-        // Set and Get
-        layer.setProperties(hillshadeShadowColor("rgba(0, 0, 0, 1)"));
-        assertEquals((String) layer.getHillshadeShadowColor().getValue(), (String) "rgba(0, 0, 0, 1)");
-      }
-    });
-  }
-
-  @Test
-  public void testHillshadeShadowColorAsCameraFunction() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("hillshade-shadow-color");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set
-        layer.setProperties(
-          hillshadeShadowColor(
-            zoom(
-              exponential(
-                stop(2, hillshadeShadowColor("rgba(0, 0, 0, 1)"))
-              ).withBase(0.5f)
-            )
-          )
-        );
-
-        // Verify
-        assertNotNull(layer.getHillshadeShadowColor());
-        assertNotNull(layer.getHillshadeShadowColor().getFunction());
-        assertEquals(CameraFunction.class, layer.getHillshadeShadowColor().getFunction().getClass());
-        assertEquals(ExponentialStops.class, layer.getHillshadeShadowColor().getFunction().getStops().getClass());
-        assertEquals(0.5f, ((ExponentialStops) layer.getHillshadeShadowColor().getFunction().getStops()).getBase(), 0.001);
-        assertEquals(1, ((ExponentialStops) layer.getHillshadeShadowColor().getFunction().getStops()).size());
-      }
+      // Set and Get
+      String propertyValue = "rgba(0, 0, 0, 1)";
+      layer.setProperties(hillshadeShadowColor(propertyValue));
+      assertEquals(layer.getHillshadeShadowColor().getValue(), propertyValue);
     });
   }
 
@@ -322,15 +178,12 @@ public class HillshadeLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("hillshade-shadow-color");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
 
-        // Set and Get
-        layer.setProperties(hillshadeShadowColor(Color.RED));
-        assertEquals(layer.getHillshadeShadowColorAsInt(), Color.RED);
-      }
+      // Set and Get
+      layer.setProperties(hillshadeShadowColor(Color.RED));
+      assertEquals(layer.getHillshadeShadowColorAsInt(), Color.RED);
     });
   }
 
@@ -339,16 +192,13 @@ public class HillshadeLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("hillshade-highlight-colorTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
 
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setHillshadeHighlightColorTransition(options);
-        assertEquals(layer.getHillshadeHighlightColorTransition(), options);
-      }
+      // Set and Get
+      TransitionOptions options = new TransitionOptions(300, 100);
+      layer.setHillshadeHighlightColorTransition(options);
+      assertEquals(layer.getHillshadeHighlightColorTransition(), options);
     });
   }
 
@@ -357,47 +207,14 @@ public class HillshadeLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("hillshade-highlight-color");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+      assertNull(layer.getHillshadeHighlightColor().getValue());
 
-        // Set and Get
-        layer.setProperties(hillshadeHighlightColor("rgba(0, 0, 0, 1)"));
-        assertEquals((String) layer.getHillshadeHighlightColor().getValue(), (String) "rgba(0, 0, 0, 1)");
-      }
-    });
-  }
-
-  @Test
-  public void testHillshadeHighlightColorAsCameraFunction() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("hillshade-highlight-color");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set
-        layer.setProperties(
-          hillshadeHighlightColor(
-            zoom(
-              exponential(
-                stop(2, hillshadeHighlightColor("rgba(0, 0, 0, 1)"))
-              ).withBase(0.5f)
-            )
-          )
-        );
-
-        // Verify
-        assertNotNull(layer.getHillshadeHighlightColor());
-        assertNotNull(layer.getHillshadeHighlightColor().getFunction());
-        assertEquals(CameraFunction.class, layer.getHillshadeHighlightColor().getFunction().getClass());
-        assertEquals(ExponentialStops.class, layer.getHillshadeHighlightColor().getFunction().getStops().getClass());
-        assertEquals(0.5f, ((ExponentialStops) layer.getHillshadeHighlightColor().getFunction().getStops()).getBase(), 0.001);
-        assertEquals(1, ((ExponentialStops) layer.getHillshadeHighlightColor().getFunction().getStops()).size());
-      }
+      // Set and Get
+      String propertyValue = "rgba(0, 0, 0, 1)";
+      layer.setProperties(hillshadeHighlightColor(propertyValue));
+      assertEquals(layer.getHillshadeHighlightColor().getValue(), propertyValue);
     });
   }
 
@@ -406,15 +223,12 @@ public class HillshadeLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("hillshade-highlight-color");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
 
-        // Set and Get
-        layer.setProperties(hillshadeHighlightColor(Color.RED));
-        assertEquals(layer.getHillshadeHighlightColorAsInt(), Color.RED);
-      }
+      // Set and Get
+      layer.setProperties(hillshadeHighlightColor(Color.RED));
+      assertEquals(layer.getHillshadeHighlightColorAsInt(), Color.RED);
     });
   }
 
@@ -423,16 +237,13 @@ public class HillshadeLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("hillshade-accent-colorTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
 
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setHillshadeAccentColorTransition(options);
-        assertEquals(layer.getHillshadeAccentColorTransition(), options);
-      }
+      // Set and Get
+      TransitionOptions options = new TransitionOptions(300, 100);
+      layer.setHillshadeAccentColorTransition(options);
+      assertEquals(layer.getHillshadeAccentColorTransition(), options);
     });
   }
 
@@ -441,47 +252,14 @@ public class HillshadeLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("hillshade-accent-color");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+      assertNull(layer.getHillshadeAccentColor().getValue());
 
-        // Set and Get
-        layer.setProperties(hillshadeAccentColor("rgba(0, 0, 0, 1)"));
-        assertEquals((String) layer.getHillshadeAccentColor().getValue(), (String) "rgba(0, 0, 0, 1)");
-      }
-    });
-  }
-
-  @Test
-  public void testHillshadeAccentColorAsCameraFunction() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("hillshade-accent-color");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set
-        layer.setProperties(
-          hillshadeAccentColor(
-            zoom(
-              exponential(
-                stop(2, hillshadeAccentColor("rgba(0, 0, 0, 1)"))
-              ).withBase(0.5f)
-            )
-          )
-        );
-
-        // Verify
-        assertNotNull(layer.getHillshadeAccentColor());
-        assertNotNull(layer.getHillshadeAccentColor().getFunction());
-        assertEquals(CameraFunction.class, layer.getHillshadeAccentColor().getFunction().getClass());
-        assertEquals(ExponentialStops.class, layer.getHillshadeAccentColor().getFunction().getStops().getClass());
-        assertEquals(0.5f, ((ExponentialStops) layer.getHillshadeAccentColor().getFunction().getStops()).getBase(), 0.001);
-        assertEquals(1, ((ExponentialStops) layer.getHillshadeAccentColor().getFunction().getStops()).size());
-      }
+      // Set and Get
+      String propertyValue = "rgba(0, 0, 0, 1)";
+      layer.setProperties(hillshadeAccentColor(propertyValue));
+      assertEquals(layer.getHillshadeAccentColor().getValue(), propertyValue);
     });
   }
 
@@ -490,16 +268,12 @@ public class HillshadeLayerTest extends BaseActivityTest {
     validateTestSetup();
     setupLayer();
     Timber.i("hillshade-accent-color");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
 
-        // Set and Get
-        layer.setProperties(hillshadeAccentColor(Color.RED));
-        assertEquals(layer.getHillshadeAccentColorAsInt(), Color.RED);
-      }
+      // Set and Get
+      layer.setProperties(hillshadeAccentColor(Color.RED));
+      assertEquals(layer.getHillshadeAccentColorAsInt(), Color.RED);
     });
   }
-
 }

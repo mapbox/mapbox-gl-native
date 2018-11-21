@@ -1,17 +1,31 @@
 #include "json_array.hpp"
-
 #include "json_element.hpp"
 
 namespace mbgl {
 namespace android {
 namespace gson {
 
-std::vector<mapbox::geometry::value> JsonArray::convert(jni::JNIEnv &env, jni::Object<JsonArray> jsonArray) {
-    std::vector<mapbox::geometry::value> values;
+jni::Local<jni::Object<JsonArray>> JsonArray::New(jni::JNIEnv& env, const std::vector<mbgl::Value>& values){
+    static auto& javaClass = jni::Class<JsonArray>::Singleton(env);
+    static auto constructor = javaClass.GetConstructor(env);
+    static auto addMethod = javaClass.GetMethod<void (jni::Object<JsonElement>)>(env, "add");
+
+    auto jsonArray = javaClass.New(env, constructor);
+
+    for (const auto &v : values) {
+        jsonArray.Call(env, addMethod, JsonElement::New(env, v));
+    }
+
+    return jsonArray;
+}
+
+std::vector<mbgl::Value> JsonArray::convert(jni::JNIEnv& env, const jni::Object<JsonArray>& jsonArray) {
+    std::vector<mbgl::Value> values;
 
     if (jsonArray) {
-        static auto getMethod = JsonArray::javaClass.GetMethod<jni::Object<JsonElement> (jni::jint)>(env, "get");
-        static auto sizeMethod = JsonArray::javaClass.GetMethod<jni::jint ()>(env, "size");
+        static auto& javaClass = jni::Class<JsonArray>::Singleton(env);
+        static auto getMethod = javaClass.GetMethod<jni::Object<JsonElement> (jni::jint)>(env, "get");
+        static auto sizeMethod = javaClass.GetMethod<jni::jint ()>(env, "size");
 
         int size = jsonArray.Call(env, sizeMethod);
         values.reserve(uint(size));
@@ -21,19 +35,15 @@ std::vector<mapbox::geometry::value> JsonArray::convert(jni::JNIEnv &env, jni::O
             if (entry) {
                 values.push_back(JsonElement::convert(env, entry));
             }
-            jni::DeleteLocalRef(env, entry);
         }
     }
 
     return values;
 }
 
-void JsonArray::registerNative(jni::JNIEnv &env) {
-    // Lookup the class
-    javaClass = *jni::Class<JsonArray>::Find(env).NewGlobalRef(env).release();
+void JsonArray::registerNative(jni::JNIEnv& env) {
+    jni::Class<JsonArray>::Singleton(env);
 }
-
-jni::Class<JsonArray> JsonArray::javaClass;
 
 } // namespace gson
 } // namespace android

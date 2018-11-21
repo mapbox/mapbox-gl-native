@@ -56,9 +56,9 @@ public:
         return renderer.get();
     }
     
-    void onLowMemory() {
+    void reduceMemoryUse() {
         if (!renderer)  return;
-        renderer->onLowMemory();
+        renderer->reduceMemoryUse();
     }
     
 private:

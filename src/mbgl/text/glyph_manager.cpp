@@ -5,6 +5,7 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/tiny_sdf.hpp>
+#include <mbgl/util/std.hpp>
 
 namespace mbgl {
 
@@ -30,7 +31,7 @@ void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphD
         Entry& entry = entries[fontStack];
 
         const GlyphIDs& glyphIDs = dependency.second;
-        GlyphRangeSet ranges;
+        std::unordered_set<GlyphRange> ranges;
         for (const auto& glyphID : glyphIDs) {
             if (localGlyphRasterizer->canRasterizeGlyph(fontStack, glyphID)) {
                 if (entry.glyphs.find(glyphID) == entry.glyphs.end()) {
@@ -129,7 +130,7 @@ void GlyphManager::notify(GlyphRequestor& requestor, const GlyphDependencies& gl
         const FontStack& fontStack = dependency.first;
         const GlyphIDs& glyphIDs = dependency.second;
 
-        Glyphs& glyphs = response[fontStack];
+        Glyphs& glyphs = response[FontStackHasher()(fontStack)];
         Entry& entry = entries[fontStack];
 
         for (const auto& glyphID : glyphIDs) {
@@ -151,6 +152,12 @@ void GlyphManager::removeRequestor(GlyphRequestor& requestor) {
             range.second.requestors.erase(&requestor);
         }
     }
+}
+
+void GlyphManager::evict(const std::set<FontStack>& keep) {
+    util::erase_if(entries, [&] (const auto& entry) {
+        return keep.count(entry.first) == 0;
+    });
 }
 
 } // namespace mbgl

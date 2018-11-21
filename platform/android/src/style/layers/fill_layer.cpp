@@ -7,14 +7,20 @@
 #include "../conversion/property_value.hpp"
 #include "../conversion/transition_options.hpp"
 
+#include <mbgl/style/layer_impl.hpp>
+
 namespace mbgl {
 namespace android {
+
+    inline mbgl::style::FillLayer& toFillLayer(mbgl::style::Layer& layer) {
+        return static_cast<mbgl::style::FillLayer&>(layer);
+    }
 
     /**
      * Creates an owning peer object (for layers not attached to the map) from the JVM side
      */
-    FillLayer::FillLayer(jni::JNIEnv& env, jni::String layerId, jni::String sourceId)
-        : Layer(env, std::make_unique<mbgl::style::FillLayer>(jni::Make<std::string>(env, layerId), jni::Make<std::string>(env, sourceId))) {
+    FillLayer::FillLayer(jni::JNIEnv& env, jni::String& layerId, jni::String& sourceId)
+        : Layer(std::make_unique<mbgl::style::FillLayer>(jni::Make<std::string>(env, layerId), jni::Make<std::string>(env, sourceId))) {
     }
 
     /**
@@ -35,131 +41,139 @@ namespace android {
 
     // Property getters
 
-    jni::Object<jni::ObjectTag> FillLayer::getFillAntialias(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> FillLayer::getFillAntialias(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillAntialias());
-        return jni::Object<jni::ObjectTag>(*converted);
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillAntialias()));
     }
 
-    jni::Object<jni::ObjectTag> FillLayer::getFillOpacity(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> FillLayer::getFillOpacity(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillOpacity());
-        return jni::Object<jni::ObjectTag>(*converted);
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillOpacity()));
     }
 
-    jni::Object<TransitionOptions> FillLayer::getFillOpacityTransition(jni::JNIEnv& env) {
+    jni::Local<jni::Object<TransitionOptions>> FillLayer::getFillOpacityTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::FillLayer>()->FillLayer::getFillOpacityTransition();
-        return *convert<jni::Object<TransitionOptions>>(env, options);
+        mbgl::style::TransitionOptions options = toFillLayer(layer).getFillOpacityTransition();
+        return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
     void FillLayer::setFillOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay) {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::FillLayer>()->FillLayer::setFillOpacityTransition(options);
+        toFillLayer(layer).setFillOpacityTransition(options);
     }
 
-    jni::Object<jni::ObjectTag> FillLayer::getFillColor(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> FillLayer::getFillColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillColor());
-        return jni::Object<jni::ObjectTag>(*converted);
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillColor()));
     }
 
-    jni::Object<TransitionOptions> FillLayer::getFillColorTransition(jni::JNIEnv& env) {
+    jni::Local<jni::Object<TransitionOptions>> FillLayer::getFillColorTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::FillLayer>()->FillLayer::getFillColorTransition();
-        return *convert<jni::Object<TransitionOptions>>(env, options);
+        mbgl::style::TransitionOptions options = toFillLayer(layer).getFillColorTransition();
+        return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
     void FillLayer::setFillColorTransition(jni::JNIEnv&, jlong duration, jlong delay) {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::FillLayer>()->FillLayer::setFillColorTransition(options);
+        toFillLayer(layer).setFillColorTransition(options);
     }
 
-    jni::Object<jni::ObjectTag> FillLayer::getFillOutlineColor(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> FillLayer::getFillOutlineColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillOutlineColor());
-        return jni::Object<jni::ObjectTag>(*converted);
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillOutlineColor()));
     }
 
-    jni::Object<TransitionOptions> FillLayer::getFillOutlineColorTransition(jni::JNIEnv& env) {
+    jni::Local<jni::Object<TransitionOptions>> FillLayer::getFillOutlineColorTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::FillLayer>()->FillLayer::getFillOutlineColorTransition();
-        return *convert<jni::Object<TransitionOptions>>(env, options);
+        mbgl::style::TransitionOptions options = toFillLayer(layer).getFillOutlineColorTransition();
+        return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
     void FillLayer::setFillOutlineColorTransition(jni::JNIEnv&, jlong duration, jlong delay) {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::FillLayer>()->FillLayer::setFillOutlineColorTransition(options);
+        toFillLayer(layer).setFillOutlineColorTransition(options);
     }
 
-    jni::Object<jni::ObjectTag> FillLayer::getFillTranslate(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> FillLayer::getFillTranslate(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillTranslate());
-        return jni::Object<jni::ObjectTag>(*converted);
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillTranslate()));
     }
 
-    jni::Object<TransitionOptions> FillLayer::getFillTranslateTransition(jni::JNIEnv& env) {
+    jni::Local<jni::Object<TransitionOptions>> FillLayer::getFillTranslateTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::FillLayer>()->FillLayer::getFillTranslateTransition();
-        return *convert<jni::Object<TransitionOptions>>(env, options);
+        mbgl::style::TransitionOptions options = toFillLayer(layer).getFillTranslateTransition();
+        return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
     void FillLayer::setFillTranslateTransition(jni::JNIEnv&, jlong duration, jlong delay) {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::FillLayer>()->FillLayer::setFillTranslateTransition(options);
+        toFillLayer(layer).setFillTranslateTransition(options);
     }
 
-    jni::Object<jni::ObjectTag> FillLayer::getFillTranslateAnchor(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> FillLayer::getFillTranslateAnchor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillTranslateAnchor());
-        return jni::Object<jni::ObjectTag>(*converted);
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillTranslateAnchor()));
     }
 
-    jni::Object<jni::ObjectTag> FillLayer::getFillPattern(jni::JNIEnv& env) {
+    jni::Local<jni::Object<>> FillLayer::getFillPattern(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::FillLayer>()->FillLayer::getFillPattern());
-        return jni::Object<jni::ObjectTag>(*converted);
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillLayer(layer).getFillPattern()));
     }
 
-    jni::Object<TransitionOptions> FillLayer::getFillPatternTransition(jni::JNIEnv& env) {
+    jni::Local<jni::Object<TransitionOptions>> FillLayer::getFillPatternTransition(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::FillLayer>()->FillLayer::getFillPatternTransition();
-        return *convert<jni::Object<TransitionOptions>>(env, options);
+        mbgl::style::TransitionOptions options = toFillLayer(layer).getFillPatternTransition();
+        return std::move(*convert<jni::Local<jni::Object<TransitionOptions>>>(env, options));
     }
 
     void FillLayer::setFillPatternTransition(jni::JNIEnv&, jlong duration, jlong delay) {
         mbgl::style::TransitionOptions options;
         options.duration.emplace(mbgl::Milliseconds(duration));
         options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::FillLayer>()->FillLayer::setFillPatternTransition(options);
+        toFillLayer(layer).setFillPatternTransition(options);
     }
 
 
-    jni::Class<FillLayer> FillLayer::javaClass;
+    // FillJavaLayerPeerFactory
 
-    jni::jobject* FillLayer::createJavaPeer(jni::JNIEnv& env) {
-        static auto constructor = FillLayer::javaClass.template GetConstructor<jni::jlong>(env);
-        return FillLayer::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+    FillJavaLayerPeerFactory::~FillJavaLayerPeerFactory() = default;
+
+    namespace {
+        jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv& env, Layer* layer) {
+            static auto& javaClass = jni::Class<FillLayer>::Singleton(env);
+            static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
+            return javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(layer));
+        }
+    }  // namespace
+
+    jni::Local<jni::Object<Layer>> FillJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
+        assert(layer.baseImpl->getTypeInfo() == getTypeInfo());
+        return createJavaPeer(env, new FillLayer(map, toFillLayer(layer)));
     }
 
-    void FillLayer::registerNative(jni::JNIEnv& env) {
+    jni::Local<jni::Object<Layer>> FillJavaLayerPeerFactory::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
+        assert(layer->baseImpl->getTypeInfo() == getTypeInfo());
+        return createJavaPeer(env, new FillLayer(map, std::unique_ptr<mbgl::style::FillLayer>(static_cast<mbgl::style::FillLayer*>(layer.release()))));
+    }
+
+    void FillJavaLayerPeerFactory::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        FillLayer::javaClass = *jni::Class<FillLayer>::Find(env).NewGlobalRef(env).release();
+        static auto& javaClass = jni::Class<FillLayer>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
         jni::RegisterNativePeer<FillLayer>(
-            env, FillLayer::javaClass, "nativePtr",
-            std::make_unique<FillLayer, JNIEnv&, jni::String, jni::String>,
+            env, javaClass, "nativePtr",
+            jni::MakePeer<FillLayer, jni::String&, jni::String&>,
             "initialize",
             "finalize",
             METHOD(&FillLayer::getFillAntialias, "nativeGetFillAntialias"),

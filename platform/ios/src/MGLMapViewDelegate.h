@@ -1,6 +1,7 @@
 #import <UIKit/UIKit.h>
 
 #import "MGLTypes.h"
+#import "MGLCameraChangeReason.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -22,15 +23,83 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark Responding to Map Position Changes
 
 /**
+ Asks the delegate whether the map view should be allowed to change from the
+ existing camera to the new camera in response to a user gesture.
+
+ This method is called as soon as the user gesture is recognized. It is not
+ called in response to a programmatic camera change, such as by setting the
+ `centerCoordinate` property or calling `-flyToCamera:completionHandler:`.
+
+ This method is called many times during gesturing, so you should avoid performing
+ complex or performance-intensive tasks in your implementation.
+
+ @param mapView The map view that the user is manipulating.
+ @param oldCamera The camera representing the viewpoint at the moment the
+ gesture is recognized. If this method returns `NO`, the map view’s camera
+ continues to be this camera.
+ @param newCamera The expected camera after the gesture completes. If this
+ method returns `YES`, this camera becomes the map view’s camera.
+ @return A Boolean value indicating whether the map view should stay at
+ `oldCamera` or change to `newCamera`.
+
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/constraining-gestures/">
+ Restrict map panning to an area</a> example to learn how to use this method
+ and `MGLMapCamera` objects to restrict a users ability to pan your map.
+ */
+- (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera;
+
+/**
+ :nodoc:
+ Asks the delegate whether the map view should be allowed to change from the
+ existing camera to the new camera in response to a user gesture.
+
+ This method is called as soon as the user gesture is recognized. It is not
+ called in response to a programmatic camera change, such as by setting the
+ `centerCoordinate` property or calling `-flyToCamera:completionHandler:`.
+
+ This method is called many times during gesturing, so you should avoid performing
+ complex or performance-intensive tasks in your implementation.
+
+ @param mapView The map view that the user is manipulating.
+ @param oldCamera The camera representing the viewpoint at the moment the
+ gesture is recognized. If this method returns `NO`, the map view’s camera
+ continues to be this camera.
+ @param newCamera The expected camera after the gesture completes. If this
+ method returns `YES`, this camera becomes the map view’s camera.
+ @param reason The reason for the camera change.
+ @return A Boolean value indicating whether the map view should stay at
+ `oldCamera` or change to `newCamera`.
+
+ @note If this method is implemented `-mapView:shouldChangeFromCamera:toCamera:` will not be called.
+ */
+- (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera reason:(MGLCameraChangeReason)reason;
+
+/**
  Tells the delegate that the viewpoint depicted by the map view is about to change.
- 
+
  This method is called whenever the currently displayed map camera will start
  changing for any reason.
- 
+
  @param mapView The map view whose viewpoint will change.
  @param animated Whether the change will cause an animated effect on the map.
  */
 - (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated;
+
+/**
+ :nodoc:
+ Tells the delegate that the viewpoint depicted by the map view is about to change.
+
+ This method is called whenever the currently displayed map camera will start
+ changing for any reason.
+
+ @param mapView The map view whose viewpoint will change.
+ @param animated Whether the change will cause an animated effect on the map.
+ @param reason The reason for the camera change.
+
+ @note If this method is implemented `-mapView:regionWillChangeAnimated:` will not be called.
+ */
+- (void)mapView:(MGLMapView *)mapView regionWillChangeWithReason:(MGLCameraChangeReason)reason animated:(BOOL)animated;
 
 /**
  Tells the delegate that the viewpoint depicted by the map view is changing.
@@ -39,21 +108,46 @@ NS_ASSUME_NONNULL_BEGIN
  an animation, whether due to a user gesture or due to a call to a method such
  as `-[MGLMapView setCamera:animated:]`. This method can be called before
  `-mapViewDidFinishLoadingMap:` is called.
- 
- During the animation, this method may be called many times to report updates to 
- the viewpoint. Therefore, your implementation of this method should be as lightweight 
+
+ During the animation, this method may be called many times to report updates to
+ the viewpoint. Therefore, your implementation of this method should be as lightweight
  as possible to avoid affecting performance.
 
  @param mapView The map view whose viewpoint is changing.
+
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/clustering/">
+ Cluster point data</a> example to learn how to trigger an action whenever
+ the map region changes.
  */
 - (void)mapViewRegionIsChanging:(MGLMapView *)mapView;
+
+/**
+ :nodoc:
+ Tells the delegate that the viewpoint depicted by the map view is changing.
+
+ This method is called as the currently displayed map camera changes as part of
+ an animation, whether due to a user gesture or due to a call to a method such
+ as `-[MGLMapView setCamera:animated:]`. This method can be called before
+ `-mapViewDidFinishLoadingMap:` is called.
+
+ During the animation, this method may be called many times to report updates to
+ the viewpoint. Therefore, your implementation of this method should be as lightweight
+ as possible to avoid affecting performance.
+
+ @param mapView The map view whose viewpoint is changing.
+ @param reason The reason for the camera change.
+
+ @note If this method is implemented `-mapViewRegionIsChanging:` will not be called.
+ */
+- (void)mapView:(MGLMapView *)mapView regionIsChangingWithReason:(MGLCameraChangeReason)reason;
 
 /**
  Tells the delegate that the viewpoint depicted by the map view has finished
  changing.
 
  This method is called whenever the currently displayed map camera has finished
- changing, after any calls to `-mapViewRegionIsChanging:` due to animation. Therefore, 
+ changing, after any calls to `-mapViewRegionIsChanging:` due to animation. Therefore,
  this method can be called before `-mapViewDidFinishLoadingMap:` is called.
 
  @param mapView The map view whose viewpoint has changed.
@@ -62,26 +156,21 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
 
 /**
- Asks the delegate whether the map view should be allowed to change from the
- existing camera to the new camera in response to a user gesture.
- 
- This method is called as soon as the user gesture is recognized. It is not
- called in response to a programmatic camera change, such as by setting the
- `centerCoordinate` property or calling `-flyToCamera:completionHandler:`.
- 
- This method is called many times during gesturing, so you should avoid performing 
- complex or performance-intensive tasks in your implementation.
- 
- @param mapView The map view that the user is manipulating.
- @param oldCamera The camera representing the viewpoint at the moment the
-    gesture is recognized. If this method returns `NO`, the map view’s camera
-    continues to be this camera.
- @param newCamera The expected camera after the gesture completes. If this
-    method returns `YES`, this camera becomes the map view’s camera.
- @return A Boolean value indicating whether the map view should stay at
-    `oldCamera` or change to `newCamera`.
+ :nodoc:
+ Tells the delegate that the viewpoint depicted by the map view has finished
+ changing.
+
+ This method is called whenever the currently displayed map camera has finished
+ changing, after any calls to `-mapViewRegionIsChanging:` due to animation. Therefore,
+ this method can be called before `-mapViewDidFinishLoadingMap:` is called.
+
+ @param mapView The map view whose viewpoint has changed.
+ @param animated Whether the change caused an animated effect on the map.
+ @param reason The reason for the camera change.
+
+ @note If this method is implemented `-mapView:regionDidChangeAnimated:` will not be called.
  */
-- (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera;
+- (void)mapView:(MGLMapView *)mapView regionDidChangeWithReason:(MGLCameraChangeReason)reason animated:(BOOL)animated;
 
 #pragma mark Loading the Map
 
@@ -164,6 +253,12 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param mapView The map view that has just loaded a style.
  @param style The style that was loaded.
+
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/runtime-multiple-annotations/">
+ Dynamically style interactive points</a> and <a href="https://www.mapbox.com/ios-sdk/maps/examples/shape-collection/">
+ Add multiple shapes from a single shape source</a> examples to learn how to
+ ensure a map's style has loaded before modifying it at runtime.
  */
 - (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style;
 
@@ -229,6 +324,21 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)mapView:(MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated;
 
+/**
+ Returns a screen coordinate at which to position the user location annotation.
+ This coordinate is relative to the map view’s origin after applying the map view’s
+ content insets.
+
+ When unimplemented, the user location annotation is aligned within the center of
+ the map view with respect to the content insets.
+
+ This method will override any values set by `MGLMapView.userLocationVerticalAlignment`
+ or `-[MGLMapView setUserLocationVerticalAlignment:]`.
+
+ @param mapView The map view that is tracking the user's location.
+ */
+- (CGPoint)mapViewUserLocationAnchorPoint:(MGLMapView *)mapView;
+
 #pragma mark Managing the Appearance of Annotations
 
 /**
@@ -249,6 +359,14 @@ NS_ASSUME_NONNULL_BEGIN
     displayed.
  @return The annotation image object to display for the given annotation or
     `nil` if you want to display the default marker image or an annotation view.
+
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-models/">
+ Annotation models</a>, <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-view-image/">
+ Add annotation views and images</a>, and <a href="https://www.mapbox.com/ios-sdk/maps/examples/marker-image/">
+ Mark a place on the map with an image</a> examples to learn to specify which
+ image should be used for `MGLAnnotation` objects that have been added to
+ your map.
  */
 - (nullable MGLAnnotationImage *)mapView:(MGLMapView *)mapView imageForAnnotation:(id <MGLAnnotation>)annotation;
 
@@ -281,6 +399,11 @@ NS_ASSUME_NONNULL_BEGIN
  @param mapView The map view rendering the shape annotation.
  @param annotation The annotation being rendered.
  @return A color to use for the shape outline.
+
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-models/">
+ Annotation models</a> example to learn how to modify the outline color of an
+ `MGLShape` object that has been added to your map as an annotation.
  */
 - (UIColor *)mapView:(MGLMapView *)mapView strokeColorForShapeAnnotation:(MGLShape *)annotation;
 
@@ -296,6 +419,11 @@ NS_ASSUME_NONNULL_BEGIN
  @param mapView The map view rendering the polygon annotation.
  @param annotation The annotation being rendered.
  @return The polygon’s interior fill color.
+
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/polygon/">Add
+ a polygon annotation</a> example to learn how to modify the color of a an
+ `MGLPolygon` at runtime.
  */
 - (UIColor *)mapView:(MGLMapView *)mapView fillColorForPolygonAnnotation:(MGLPolygon *)annotation;
 
@@ -308,6 +436,11 @@ NS_ASSUME_NONNULL_BEGIN
  @param mapView The map view rendering the polygon annotation.
  @param annotation The annotation being rendered.
  @return A line width for the polyline, measured in points.
+
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/line-geojson/">
+ Add a line annotation from GeoJSON</a> example to learn how to modify the
+ line width of an `MGLPolylineFeature` on your map.
  */
 - (CGFloat)mapView:(MGLMapView *)mapView lineWidthForPolylineAnnotation:(MGLPolyline *)annotation;
 
@@ -335,6 +468,12 @@ NS_ASSUME_NONNULL_BEGIN
     displayed.
  @return The view object to display for the given annotation or `nil` if you
     want to display an annotation image instead.
+
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-view-image/">
+ Add annotation views and images</a> example to learn how to specify what
+ `MGLViewAnnotation` to use for a given `MGLPointAnnotation` object on your
+ map.
  */
 - (nullable MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id <MGLAnnotation>)annotation;
 
@@ -349,9 +488,21 @@ NS_ASSUME_NONNULL_BEGIN
  @param annotationViews An array of `MGLAnnotationView` objects representing the
     views that were added.
  */
-- (void)mapView:(MGLMapView *)mapView didAddAnnotationViews:(NS_ARRAY_OF(MGLAnnotationView *) *)annotationViews;
+- (void)mapView:(MGLMapView *)mapView didAddAnnotationViews:(NSArray<MGLAnnotationView *> *)annotationViews;
 
 #pragma mark Selecting Annotations
+
+/**
+ Returns a Boolean value indicating whether the shape annotation can be selected.
+
+ If the return value is `YES`, the user can select the annotation by tapping
+ on it. If the delegate does not implement this method, the default value is `YES`.
+
+ @param mapView The map view that has selected the annotation.
+ @param annotation The object representing the shape annotation.
+ @return A Boolean value indicating whether the annotation can be selected.
+ */
+- (BOOL)mapView:(MGLMapView *)mapView shapeAnnotationIsEnabled:(MGLShape *)annotation;
 
 /**
  Tells the delegate that one of its annotations was selected.
@@ -364,6 +515,11 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param mapView The map view containing the annotation.
  @param annotation The annotation that was selected.
+
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/runtime-multiple-annotations/">
+ Dynamically style interactive points</a> example to learn how to remove an
+ annotation view if it has already been selected.
  */
 - (void)mapView:(MGLMapView *)mapView didSelectAnnotation:(id <MGLAnnotation>)annotation;
 
@@ -438,6 +594,13 @@ NS_ASSUME_NONNULL_BEGIN
  @param annotation The object representing the annotation.
  @return A Boolean value indicating whether the annotation should show a
     callout.
+
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-view-image/">
+ Add annotation views and images</a>, <a href="https://www.mapbox.com/ios-sdk/maps/examples/custom-callout/">
+ Display custom views as callouts</a>, and <a href="https://www.mapbox.com/ios-sdk/maps/examples/default-callout/">
+ Default callout usage</a> examples to learn how to show callouts for
+ `MGLAnnotation` objects.
  */
 - (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation;
 
@@ -455,6 +618,11 @@ NS_ASSUME_NONNULL_BEGIN
  @param annotation The object representing the annotation.
  @return A view conforming to the `MGLCalloutView` protocol, or `nil` to use the
     default callout view.
+
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/custom-callout/">
+ Display custom views as callouts</a> example to learn how to customize an
+ `MGLAnnotation` object's `MGLCalloutView`.
  */
 - (nullable id <MGLCalloutView>)mapView:(MGLMapView *)mapView calloutViewForAnnotation:(id <MGLAnnotation>)annotation;
 
@@ -481,6 +649,11 @@ NS_ASSUME_NONNULL_BEGIN
  @param mapView The map view presenting the annotation callout.
  @param annotation The object representing the annotation with the callout.
  @return The accessory view to display.
+
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/default-callout/">
+ Default callout usage</a> example to learn how to modify the view that is
+ displayed on the left side of the standard callout bubble.
  */
 - (nullable UIView *)mapView:(MGLMapView *)mapView leftCalloutAccessoryViewForAnnotation:(id <MGLAnnotation>)annotation;
 
@@ -507,6 +680,11 @@ NS_ASSUME_NONNULL_BEGIN
  @param mapView The map view presenting the annotation callout.
  @param annotation The object representing the annotation with the callout.
  @return The accessory view to display.
+
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/default-callout/">
+ Default callout usage</a> example to learn how to modify the view that is
+ displayed on the right side of the standard callout bubble.
  */
 - (nullable UIView *)mapView:(MGLMapView *)mapView rightCalloutAccessoryViewForAnnotation:(id <MGLAnnotation>)annotation;
 
@@ -532,6 +710,11 @@ NS_ASSUME_NONNULL_BEGIN
  @param mapView The map view containing the specified annotation.
  @param annotation The annotation whose accessory view was tapped.
  @param control The control that was tapped.
+
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/default-callout/">
+ Default callout usage</a> example to learn how to trigger an action when the
+ standard callout bubble's accessory control is tapped.
  */
 - (void)mapView:(MGLMapView *)mapView annotation:(id <MGLAnnotation>)annotation calloutAccessoryControlTapped:(UIControl *)control;
 
@@ -550,6 +733,11 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param mapView The map view containing the specified annotation.
  @param annotation The annotation whose callout was tapped.
+
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/custom-callout/">
+ Display custom views as callouts</a> example to learn how to trigger an
+ action when an `MGLAnnotation`s `MGLCalloutView` is tapped.
  */
 - (void)mapView:(MGLMapView *)mapView tapOnCalloutForAnnotation:(id <MGLAnnotation>)annotation;
 

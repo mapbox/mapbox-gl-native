@@ -1,12 +1,17 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/shaders/symbol_sdf.hpp>
+#include <mbgl/shaders/source.hpp>
 
 namespace mbgl {
 namespace shaders {
 
 const char* symbol_sdf::name = "symbol_sdf";
-const char* symbol_sdf::vertexSource = R"MBGL_SHADER(
+const char* symbol_sdf::vertexSource = source() + 74570;
+const char* symbol_sdf::fragmentSource = source() + 80495;
+
+// Uncompressed source of symbol_sdf.vertex.glsl:
+/*
 const float PI = 3.141592653589793;
 
 attribute vec4 a_pos_offset;
@@ -92,14 +97,14 @@ varying vec3 v_data1;
 void main() {
     
 #ifndef HAS_UNIFORM_u_fill_color
-    fill_color = unpack_mix_vec4(a_fill_color, a_fill_color_t);
+    fill_color = unpack_mix_color(a_fill_color, a_fill_color_t);
 #else
     highp vec4 fill_color = u_fill_color;
 #endif
 
     
 #ifndef HAS_UNIFORM_u_halo_color
-    halo_color = unpack_mix_vec4(a_halo_color, a_halo_color_t);
+    halo_color = unpack_mix_color(a_halo_color, a_halo_color_t);
 #else
     highp vec4 halo_color = u_halo_color;
 #endif
@@ -136,9 +141,9 @@ void main() {
     float size;
 
     if (!u_is_size_zoom_constant && !u_is_size_feature_constant) {
-        size = mix(a_size[0], a_size[1], u_size_t) / 10.0;
+        size = mix(a_size[0], a_size[1], u_size_t) / 256.0;
     } else if (u_is_size_zoom_constant && !u_is_size_feature_constant) {
-        size = a_size[0] / 10.0;
+        size = a_size[0] / 256.0;
     } else if (!u_is_size_zoom_constant && u_is_size_feature_constant) {
         size = u_size;
     } else {
@@ -156,7 +161,10 @@ void main() {
     highp float distance_ratio = u_pitch_with_map ?
         camera_to_anchor_distance / u_camera_to_center_distance :
         u_camera_to_center_distance / camera_to_anchor_distance;
-    highp float perspective_ratio = 0.5 + 0.5 * distance_ratio;
+    highp float perspective_ratio = clamp(
+        0.5 + 0.5 * distance_ratio,
+        0.0, // Prevents oversized near-field symbols in pitched/overzoomed tiles
+        4.0);
 
     size *= perspective_ratio;
 
@@ -180,7 +188,7 @@ void main() {
     mat2 rotation_matrix = mat2(angle_cos, -1.0 * angle_sin, angle_sin, angle_cos);
 
     vec4 projected_pos = u_label_plane_matrix * vec4(a_projected_pos.xy, 0.0, 1.0);
-    gl_Position = u_gl_coord_matrix * vec4(projected_pos.xy / projected_pos.w + rotation_matrix * (a_offset / 64.0 * fontScale), 0.0, 1.0);
+    gl_Position = u_gl_coord_matrix * vec4(projected_pos.xy / projected_pos.w + rotation_matrix * (a_offset / 32.0 * fontScale), 0.0, 1.0);
     float gamma_scale = gl_Position.w;
 
     vec2 tex = a_tex / u_texsize;
@@ -192,8 +200,10 @@ void main() {
     v_data1 = vec3(gamma_scale, size, interpolated_fade_opacity);
 }
 
-)MBGL_SHADER";
-const char* symbol_sdf::fragmentSource = R"MBGL_SHADER(
+*/
+
+// Uncompressed source of symbol_sdf.fragment.glsl:
+/*
 #define SDF_PX 8.0
 #define EDGE_GAMMA 0.105/DEVICE_PIXEL_RATIO
 
@@ -295,7 +305,7 @@ void main() {
 #endif
 }
 
-)MBGL_SHADER";
+*/
 
 } // namespace shaders
 } // namespace mbgl

@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)annotationContainerViewWithAnnotationContainerView:(MGLAnnotationContainerView *)annotationContainerView;
 
-- (void)addSubviews:(NS_ARRAY_OF(MGLAnnotationView *) *)subviews;
+- (void)addSubviews:(NSArray<MGLAnnotationView *> *)subviews;
 
 @end
 

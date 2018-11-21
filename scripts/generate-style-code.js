@@ -15,10 +15,6 @@ function parseCSSColor(str) {
   ];
 }
 
-global.isDataDriven = function (property) {
-  return property['property-function'] === true;
-};
-
 global.isLightProperty = function (property) {
   return property['light-property'] === true;
 };
@@ -41,6 +37,8 @@ global.evaluatedType = function (property) {
     return 'bool';
   case 'number':
     return 'float';
+  case 'formatted':
+    return 'expression::Formatted';
   case 'string':
     return 'std::string';
   case 'enum':
@@ -59,46 +57,58 @@ global.evaluatedType = function (property) {
 
 function attributeUniformType(property, type) {
     const attributeNameExceptions = {
-      'text-opacity': 'opacity',
-      'icon-opacity': 'opacity',
-      'text-color': 'fill_color',
-      'icon-color': 'fill_color',
-      'text-halo-color': 'halo_color',
-      'icon-halo-color': 'halo_color',
-      'text-halo-blur': 'halo_blur',
-      'icon-halo-blur': 'halo_blur',
-      'text-halo-width': 'halo_width',
-      'icon-halo-width': 'halo_width',
-      'line-gap-width': 'gapwidth'
+      'text-opacity': ['opacity'],
+      'icon-opacity': ['opacity'],
+      'text-color': ['fill_color'],
+      'icon-color': ['fill_color'],
+      'text-halo-color': ['halo_color'],
+      'icon-halo-color': ['halo_color'],
+      'text-halo-blur': ['halo_blur'],
+      'icon-halo-blur': ['halo_blur'],
+      'text-halo-width': ['halo_width'],
+      'icon-halo-width': ['halo_width'],
+      'line-gap-width': ['gapwidth'],
+      'line-pattern': ['pattern_to', 'pattern_from'],
+      'fill-pattern': ['pattern_to', 'pattern_from'],
+      'fill-extrusion-pattern': ['pattern_to', 'pattern_from']
     }
-    const name = attributeNameExceptions[property.name] ||
-        property.name.replace(type + '-', '').replace(/-/g, '_');
-    return `attributes::a_${name}${name === 'offset' ? '<1>' : ''}, uniforms::u_${name}`;
+    const names = attributeNameExceptions[property.name] ||
+       [ property.name.replace(type + '-', '').replace(/-/g, '_') ];
+
+    return names.map(name => {
+      return `attributes::a_${name}${name === 'offset' ? '<1>' : ''}, uniforms::u_${name}`
+    }).join(', ');
 }
 
 global.layoutPropertyType = function (property) {
-  if (isDataDriven(property)) {
-    return `DataDrivenLayoutProperty<${evaluatedType(property)}>`;
-  } else {
-    return `LayoutProperty<${evaluatedType(property)}>`;
+  switch (property['property-type']) {
+    case 'data-driven':
+    case 'cross-faded-data-driven':
+      return `DataDrivenLayoutProperty<${evaluatedType(property)}>`;
+    default:
+      return `LayoutProperty<${evaluatedType(property)}>`;
   }
 };
 
 global.paintPropertyType = function (property, type) {
-  if (isDataDriven(property)) {
-    return `DataDrivenPaintProperty<${evaluatedType(property)}, ${attributeUniformType(property, type)}>`;
-  } else if (/-pattern$/.test(property.name) || property.name === 'line-dasharray') {
-    return `CrossFadedPaintProperty<${evaluatedType(property)}>`;
-  } else {
-    return `PaintProperty<${evaluatedType(property)}>`;
+  switch (property['property-type']) {
+    case 'data-driven':
+      return `DataDrivenPaintProperty<${evaluatedType(property)}, ${attributeUniformType(property, type)}>`;
+    case 'cross-faded-data-driven':
+      return `CrossFadedDataDrivenPaintProperty<${evaluatedType(property)}, ${attributeUniformType(property, type)}>`;
+    case 'cross-faded':
+      return `CrossFadedPaintProperty<${evaluatedType(property)}>`;
+    default:
+      return `PaintProperty<${evaluatedType(property)}>`;
   }
 };
 
 global.propertyValueType = function (property) {
-  if (isDataDriven(property)) {
-    return `DataDrivenPropertyValue<${evaluatedType(property)}>`;
-  } else {
-    return `PropertyValue<${evaluatedType(property)}>`;
+  switch (property['property-type']) {
+    case 'color-ramp':
+      return `ColorRampPropertyValue`;
+    default:
+      return `PropertyValue<${evaluatedType(property)}>`;
   }
 };
 
@@ -112,13 +122,14 @@ global.defaultValue = function (property) {
     return '{}';
   }
 
-  if (property.name === 'heatmap-color') {
+  if (property['property-type'] === 'color-ramp') {
       return '{}';
   }
 
   switch (property.type) {
   case 'number':
     return property.default;
+  case 'formatted':
   case 'string':
     return JSON.stringify(property.default || "");
   case 'enum':
@@ -190,9 +201,6 @@ for (const layer of layers) {
   writeIfModified(`src/mbgl/style/layers/${layerFileName}_layer_properties.hpp`, propertiesHpp(layer));
   writeIfModified(`src/mbgl/style/layers/${layerFileName}_layer_properties.cpp`, propertiesCpp(layer));
 }
-
-const propertySettersHpp = ejs.compile(fs.readFileSync('src/mbgl/style/conversion/make_property_setters.hpp.ejs', 'utf8'), {strict: true});
-writeIfModified('src/mbgl/style/conversion/make_property_setters.hpp', propertySettersHpp({layers: layers}));
 
 // Light
 const lightProperties = Object.keys(spec[`light`]).reduce((memo, name) => {

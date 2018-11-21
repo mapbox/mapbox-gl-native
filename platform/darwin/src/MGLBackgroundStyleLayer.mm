@@ -2,14 +2,16 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLSource.h"
-#import "NSPredicate+MGLAdditions.h"
+#import "NSPredicate+MGLPrivateAdditions.h"
 #import "NSDate+MGLAdditions.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLStyleValue_Private.h"
 #import "MGLBackgroundStyleLayer.h"
+#import "MGLLoggingConfiguration_Private.h"
+#import "MGLBackgroundStyleLayer_Private.h"
 
 #include <mbgl/style/transition_options.hpp>
-#include <mbgl/style/layers/background_layer.hpp>
+
 
 @interface MGLBackgroundStyleLayer ()
 
@@ -21,6 +23,7 @@
 
 - (instancetype)initWithIdentifier:(NSString *)identifier
 {
+    MGLLogDebug(@"Initializing %@ with identifier: %@", NSStringFromClass([self class]), identifier);
     auto layer = std::make_unique<mbgl::style::BackgroundLayer>(identifier.UTF8String);
     return self = [super initWithPendingLayer:std::move(layer)];
 }
@@ -34,8 +37,9 @@
 
 - (void)setBackgroundColor:(NSExpression *)backgroundColor {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting backgroundColor: %@", backgroundColor);
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(backgroundColor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(backgroundColor, false);
     self.rawLayer->setBackgroundColor(mbglValue);
 }
 
@@ -51,6 +55,7 @@
 
 - (void)setBackgroundColorTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting backgroundColorTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setBackgroundColorTransition(options);
@@ -69,8 +74,9 @@
 
 - (void)setBackgroundOpacity:(NSExpression *)backgroundOpacity {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting backgroundOpacity: %@", backgroundOpacity);
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(backgroundOpacity);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(backgroundOpacity, false);
     self.rawLayer->setBackgroundOpacity(mbglValue);
 }
 
@@ -86,6 +92,7 @@
 
 - (void)setBackgroundOpacityTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting backgroundOpacityTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setBackgroundOpacityTransition(options);
@@ -104,8 +111,9 @@
 
 - (void)setBackgroundPattern:(NSExpression *)backgroundPattern {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting backgroundPattern: %@", backgroundPattern);
 
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(backgroundPattern);
+    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(backgroundPattern, false);
     self.rawLayer->setBackgroundPattern(mbglValue);
 }
 
@@ -121,6 +129,7 @@
 
 - (void)setBackgroundPatternTransition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting backgroundPatternTransition: %@", MGLStringFromMGLTransition(transition));
 
     mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
     self.rawLayer->setBackgroundPatternTransition(options);
@@ -138,3 +147,11 @@
 }
 
 @end
+
+namespace mbgl {
+
+MGLStyleLayer* BackgroundStyleLayerPeerFactory::createPeer(style::Layer* rawLayer) {
+    return [[MGLBackgroundStyleLayer alloc] initWithRawLayer:rawLayer];
+}
+
+}  // namespace mbgl

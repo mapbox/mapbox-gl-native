@@ -7,6 +7,7 @@
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/expression/dsl.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
@@ -53,13 +54,19 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
         height = videoMode->height;
     }
 
+#if __APPLE__
     glfwWindowHint(GLFW_COCOA_GRAPHICS_SWITCHING, GL_TRUE);
+#endif
+
+#if MBGL_WITH_EGL
+    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
+#endif
 
 #ifdef DEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
 
-#ifdef GL_ES_VERSION_2_0
+#if MBGL_USE_GLES2
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -440,7 +447,7 @@ void GLFWView::onScroll(GLFWwindow *window, double /*xOffset*/, double yOffset) 
         scale = 1.0 / scale;
     }
 
-    view->map->setZoom(view->map->getZoom() + std::log2(scale), mbgl::ScreenCoordinate { view->lastX, view->lastY });
+    view->map->setZoom(view->map->getZoom() + ::log2(scale), mbgl::ScreenCoordinate { view->lastX, view->lastY });
 }
 
 void GLFWView::onWindowResize(GLFWwindow *window, int width, int height) {
@@ -496,12 +503,10 @@ void GLFWView::onMouseClick(GLFWwindow *window, int button, int action, int modi
 void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
     auto *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     if (view->tracking) {
-        double dx = x - view->lastX;
-        double dy = y - view->lastY;
+        const double dx = x - view->lastX;
+        const double dy = y - view->lastY;
         if (dx || dy) {
-            view->map->setLatLng(
-                    view->map->latLngForPixel(mbgl::ScreenCoordinate(x - dx, y - dy)),
-                    mbgl::ScreenCoordinate(x, y));
+            view->map->moveBy(mbgl::ScreenCoordinate { dx, dy });
         }
     } else if (view->rotating) {
         view->map->rotateBy({ view->lastX, view->lastY }, { x, y });
@@ -619,6 +624,9 @@ void GLFWView::onDidFinishLoadingStyle() {
 }
 
 void GLFWView::toggle3DExtrusions(bool visible) {
+    using namespace mbgl::style;
+    using namespace mbgl::style::expression::dsl;
+
     show3DExtrusions = visible;
 
     // Satellite-only style does not contain building extrusions data.
@@ -627,32 +635,22 @@ void GLFWView::toggle3DExtrusions(bool visible) {
     }
 
     if (auto layer = map->getStyle().getLayer("3d-buildings")) {
-        layer->setVisibility(mbgl::style::VisibilityType(!show3DExtrusions));
+        layer->setVisibility(VisibilityType(!show3DExtrusions));
         return;
     }
 
-    auto extrusionLayer = std::make_unique<mbgl::style::FillExtrusionLayer>("3d-buildings", "composite");
+    auto extrusionLayer = std::make_unique<FillExtrusionLayer>("3d-buildings", "composite");
     extrusionLayer->setSourceLayer("building");
     extrusionLayer->setMinZoom(15.0f);
-    extrusionLayer->setFilter(mbgl::style::EqualsFilter { "extrude", { std::string("true") } });
-
-    auto colorFn = mbgl::style::SourceFunction<mbgl::Color> { "height",
-        mbgl::style::ExponentialStops<mbgl::Color> {
-            std::map<float, mbgl::Color> {
-                {   0.f, *mbgl::Color::parse("#160e23") },
-                {  50.f, *mbgl::Color::parse("#00615f") },
-                { 100.f, *mbgl::Color::parse("#55e9ff") }
-            }
-        }
-    };
-    extrusionLayer->setFillExtrusionColor({ colorFn });
-    extrusionLayer->setFillExtrusionOpacity({ 0.6f });
-
-    auto heightSourceFn = mbgl::style::SourceFunction<float> { "height", mbgl::style::IdentityStops<float>() };
-    extrusionLayer->setFillExtrusionHeight({ heightSourceFn });
-
-    auto baseSourceFn = mbgl::style::SourceFunction<float> { "min_height", mbgl::style::IdentityStops<float>() };
-    extrusionLayer->setFillExtrusionBase({ baseSourceFn });
+    extrusionLayer->setFilter(Filter(eq(get("extrude"), literal("true"))));
+    extrusionLayer->setFillExtrusionColor(PropertyExpression<mbgl::Color>(
+        interpolate(linear(), number(get("height")),
+                    0.f, toColor(literal("#160e23")),
+                    50.f, toColor(literal("#00615f")),
+                    100.f, toColor(literal("#55e9ff")))));
+    extrusionLayer->setFillExtrusionOpacity(0.6f);
+    extrusionLayer->setFillExtrusionHeight(PropertyExpression<float>(get("height")));
+    extrusionLayer->setFillExtrusionBase(PropertyExpression<float>(get("min_height")));
 
     map->getStyle().addLayer(std::move(extrusionLayer));
 }
@@ -660,7 +658,7 @@ void GLFWView::toggle3DExtrusions(bool visible) {
 namespace mbgl {
 namespace platform {
 
-#ifndef GL_ES_VERSION_2_0
+#ifndef MBGL_USE_GLES2
 void showDebugImage(std::string name, const char *data, size_t width, size_t height) {
     glfwInit();
 

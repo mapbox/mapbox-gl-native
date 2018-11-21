@@ -1,5 +1,6 @@
 #include <mbgl/style/conversion/geojson.hpp>
 #include <mbgl/style/conversion/json.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 namespace mbgl {
 namespace style {

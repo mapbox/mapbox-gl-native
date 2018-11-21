@@ -37,10 +37,9 @@ static CGFloat const tipWidth = 10.0;
     return self;
 }
 
-
 #pragma mark - API
 
-- (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToView:(UIView *)constrainedView animated:(BOOL)animated
+- (void)presentCalloutFromRect:(CGRect)rect inView:(nonnull UIView *)view constrainedToRect:(__unused CGRect)constrainedRect animated:(BOOL)animated
 {
     if ([self.delegate respondsToSelector:@selector(calloutViewWillAppear:)])
     {
@@ -107,6 +106,5 @@ static CGFloat const tipWidth = 10.0;
     CGContextFillPath(ctxt);
     CGPathRelease(tipPath);
 }
-
 
 @end

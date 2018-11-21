@@ -45,7 +45,7 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NS_DICTIONARY_OF(NSString *, id) *)change context:(void *)context {
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *, id> *)change context:(void *)context {
     if ([keyPath isEqualToString:@"packs"]) {
         NSKeyValueChange changeKind = [change[NSKeyValueChangeKindKey] unsignedIntegerValue];
         NSIndexSet *indices = change[NSKeyValueChangeIndexesKey];
@@ -110,18 +110,16 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
         [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack *pack, NSError *error) {
             if (error) {
                 NSString *message = [NSString stringWithFormat:@"Mapbox GL was unable to add the offline pack “%@”.", name];
-                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Can’t Add Offline Pack" message:message preferredStyle:UIAlertControllerStyleAlert];
-                [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
-                [self presentViewController:alertController animated:YES completion:nil];
+                UIAlertController *errorAlertController = [UIAlertController alertControllerWithTitle:@"Can’t Add Offline Pack" message:message preferredStyle:UIAlertControllerStyleAlert];
+                [errorAlertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+                [self presentViewController:errorAlertController animated:YES completion:nil];
             } else {
                 [pack resume];
             }
         }];
     }];
     [alertController addAction:downloadAction];
-    if ([alertController respondsToSelector:@selector(setPreferredAction:)]) {
-        alertController.preferredAction = downloadAction;
-    }
+    alertController.preferredAction = downloadAction;
 
     [self presentViewController:alertController animated:YES completion:nil];
 }

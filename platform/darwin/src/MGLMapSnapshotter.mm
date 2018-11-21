@@ -15,6 +15,7 @@
 #import "NSBundle+MGLAdditions.h"
 #import "MGLStyle.h"
 #import "MGLAttributionInfo_Private.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #if TARGET_OS_IPHONE
 #import "UIImage+MGLAdditions.h"
@@ -31,6 +32,12 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (instancetype _Nonnull)initWithStyleURL:(nullable NSURL *)styleURL camera:(MGLMapCamera *)camera size:(CGSize) size
 {
+#if TARGET_OS_IPHONE
+    NSString *sizeString = NSStringFromCGSize(size);
+#else
+    NSString *sizeString = NSStringFromSize(size);
+#endif
+    MGLLogDebug(@"Initializing withStyleURL: %@ camera: %@ size: %@", styleURL, camera, sizeString);
     self = [super init];
     if (self) {
         if ( !styleURL)
@@ -53,249 +60,381 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 @end
 
 @interface MGLMapSnapshot()
-- (instancetype)initWithImage:(nullable MGLImage *)image scale:(CGFloat)scale pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn;
+- (instancetype)initWithImage:(nullable MGLImage *)image scale:(CGFloat)scale pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn latLngForFn:(mbgl::MapSnapshotter::LatLngForFn)latLngForFn;
 
 @property (nonatomic) CGFloat scale;
 @end
 
 @implementation MGLMapSnapshot {
     mbgl::MapSnapshotter::PointForFn _pointForFn;
+    mbgl::MapSnapshotter::LatLngForFn _latLngForFn;
 }
 
-- (instancetype)initWithImage:(nullable MGLImage *)image scale:(CGFloat)scale pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn
+- (instancetype)initWithImage:(nullable MGLImage *)image scale:(CGFloat)scale pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn latLngForFn:(mbgl::MapSnapshotter::LatLngForFn)latLngForFn
 {
     self = [super init];
     if (self) {
         _pointForFn = std::move(pointForFn);
+        _latLngForFn = std::move(latLngForFn);
         _scale = scale;
         _image = image;
     }
     return self;
 }
 
+#if TARGET_OS_IPHONE
+
 - (CGPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate
 {
     mbgl::ScreenCoordinate sc = _pointForFn(MGLLatLngFromLocationCoordinate2D(coordinate));
     return CGPointMake(sc.x, sc.y);
 }
+
+- (CLLocationCoordinate2D)coordinateForPoint:(CGPoint)point
+{
+    mbgl::LatLng latLng = _latLngForFn(mbgl::ScreenCoordinate(point.x, point.y));
+    return MGLLocationCoordinate2DFromLatLng(latLng);
+}
+
+#else
+
+- (NSPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate
+{
+    mbgl::ScreenCoordinate sc = _pointForFn(MGLLatLngFromLocationCoordinate2D(coordinate));
+    return NSMakePoint(sc.x, self.image.size.height - sc.y);
+}
+
+- (CLLocationCoordinate2D)coordinateForPoint:(NSPoint)point
+{
+    auto screenCoord = mbgl::ScreenCoordinate(point.x, self.image.size.height - point.y);
+    mbgl::LatLng latLng = _latLngForFn(screenCoord);
+    return MGLLocationCoordinate2DFromLatLng(latLng);
+}
+
+#endif
+
 @end
 
 @interface MGLMapSnapshotter()
-
+@property (nonatomic) BOOL cancelled;
+@property (nonatomic) BOOL terminated;
+@property (nonatomic) dispatch_queue_t resultQueue;
+@property (nonatomic, copy) MGLMapSnapshotCompletionHandler completion;
++ (void)completeWithErrorCode:(MGLErrorCode)errorCode description:(nonnull NSString*)description onQueue:(dispatch_queue_t)queue completion:(MGLMapSnapshotCompletionHandler)completion;
 @end
 
 @implementation MGLMapSnapshotter {
-    
     std::shared_ptr<mbgl::ThreadPool> _mbglThreadPool;
     std::unique_ptr<mbgl::MapSnapshotter> _mbglMapSnapshotter;
     std::unique_ptr<mbgl::Actor<mbgl::MapSnapshotter::Callback>> _snapshotCallback;
-    NS_ARRAY_OF(MGLAttributionInfo *) *_attributionInfo;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
+    if (_completion) {
+        MGLAssert(_snapshotCallback, @"Snapshot in progress - there should be a valid callback");
+
+        [MGLMapSnapshotter completeWithErrorCode:MGLErrorCodeSnapshotFailed
+                                     description:@"MGLMapSnapshotter deallocated prior to snapshot completion."
+                                         onQueue:_resultQueue
+                                      completion:_completion];
+    }
+}
+
+
+- (instancetype)init {
+    NSAssert(NO, @"Please use -[MGLMapSnapshotter initWithOptions:]");
+    [super doesNotRecognizeSelector:_cmd];
+    return nil;
 }
 
 - (instancetype)initWithOptions:(MGLMapSnapshotOptions *)options
 {
+    MGLLogDebug(@"Initializing withOptions: %@", options);
     self = [super init];
     if (self) {
         [self setOptions:options];
-        _loading = false;
-
+#if TARGET_OS_IPHONE
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:UIApplicationWillTerminateNotification object:nil];
+#else
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+#endif
     }
     return self;
 }
 
+- (void)applicationWillTerminate:(NSNotification *)notification
+{
+    if (self.completion) {
+        [self cancel];
+    }
+
+    _mbglMapSnapshotter.reset();
+    _snapshotCallback.reset();
+    _mbglThreadPool.reset();
+    
+    self.terminated = YES;
+}
+
 - (void)startWithCompletionHandler:(MGLMapSnapshotCompletionHandler)completion
 {
+    MGLLogDebug(@"Starting withCompletionHandler: %@", completion);
     [self startWithQueue:dispatch_get_main_queue() completionHandler:completion];
 }
 
 - (void)startWithQueue:(dispatch_queue_t)queue completionHandler:(MGLMapSnapshotCompletionHandler)completion
 {
-    if ([self isLoading]) {
+    if (!mbgl::Scheduler::GetCurrent()) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"startWithQueue:completionHandler: must be called from a thread with an active run loop."];
+    }
+
+    if (self.completion) {
+        // Consider replacing this exception with an error passed to the completion block.
         [NSException raise:NSInternalInconsistencyException
                     format:@"Already started this snapshotter."];
     }
+
+    if (self.terminated) {
+        [NSException raise:NSInternalInconsistencyException
+                    format:@"Starting a snapshotter after application termination is not supported."];
+    }
+
+    self.completion = completion;
+    self.resultQueue = queue;
+    self.cancelled = NO;
+
+    __weak __typeof__(self) weakSelf = self;
+    // mbgl::Scheduler::GetCurrent() scheduler means "run callback on current (ie UI/main) thread"
+    // capture weakSelf to avoid retain cycle if callback is never called (ie snapshot cancelled)
+
+    _snapshotCallback = std::make_unique<mbgl::Actor<mbgl::MapSnapshotter::Callback>>(
+							*mbgl::Scheduler::GetCurrent(),
+							[=](std::exception_ptr mbglError, mbgl::PremultipliedImage image, mbgl::MapSnapshotter::Attributions attributions, mbgl::MapSnapshotter::PointForFn pointForFn, mbgl::MapSnapshotter::LatLngForFn latLngForFn) {
+
+        __typeof__(self) strongSelf = weakSelf;
+        // If self had died, _snapshotCallback would have been destroyed and this block would not be executed
+        MGLCAssert(strongSelf, @"Snapshot callback executed after being destroyed.");
+
+        if (!strongSelf.completion)
+            return;
+
+        if (mbglError) {
+            NSString *description = @(mbgl::util::toString(mbglError).c_str());
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey: description};
+            NSError *error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeSnapshotFailed userInfo:userInfo];
+            
+            // Dispatch to result queue
+            dispatch_async(queue, ^{
+                strongSelf.completion(nil, error);
+                strongSelf.completion = nil;
+            });
+        } else {
+#if TARGET_OS_IPHONE
+            MGLImage *mglImage = [[MGLImage alloc] initWithMGLPremultipliedImage:std::move(image) scale:strongSelf.options.scale];
+#else
+            MGLImage *mglImage = [[MGLImage alloc] initWithMGLPremultipliedImage:std::move(image)];
+            mglImage.size = NSMakeSize(mglImage.size.width / strongSelf.options.scale,
+                                       mglImage.size.height / strongSelf.options.scale);
+#endif
+            [strongSelf drawAttributedSnapshot:attributions snapshotImage:mglImage pointForFn:pointForFn latLngForFn:latLngForFn];
+        }
+        strongSelf->_snapshotCallback = NULL;
+
+    });
+
+    // Launches snapshot on background Thread owned by mbglMapSnapshotter
+    // _snapshotCallback->self() is an ActorRef: if the callback is destroyed, further messages
+    // to the callback are just no-ops
+    _mbglMapSnapshotter->snapshot(_snapshotCallback->self());
+}
+
++ (MGLImage*)drawAttributedSnapshotWorker:(mbgl::MapSnapshotter::Attributions)attributions snapshotImage:(MGLImage *)mglImage pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn latLngForFn:(mbgl::MapSnapshotter::LatLngForFn)latLngForFn scale:(CGFloat)scale size:(CGSize)size {
+
+    NSArray<MGLAttributionInfo *>* attributionInfo = [MGLMapSnapshotter generateAttributionInfos:attributions];
+
+#if TARGET_OS_IPHONE
+    MGLAttributionInfoStyle attributionInfoStyle = MGLAttributionInfoStyleLong;
+    for (NSUInteger styleValue = MGLAttributionInfoStyleLong; styleValue >= MGLAttributionInfoStyleShort; styleValue--) {
+        attributionInfoStyle = (MGLAttributionInfoStyle)styleValue;
+        CGSize attributionSize = [MGLMapSnapshotter attributionSizeWithLogoStyle:attributionInfoStyle sourceAttributionStyle:attributionInfoStyle attributionInfo:attributionInfo];
+        if (attributionSize.width <= mglImage.size.width) {
+            break;
+        }
+    }
     
-    _loading = true;
+    UIImage *logoImage = [MGLMapSnapshotter logoImageWithStyle:attributionInfoStyle];
+    CGSize attributionBackgroundSize = [MGLMapSnapshotter attributionTextSizeWithStyle:attributionInfoStyle attributionInfo:attributionInfo];
     
-    dispatch_async(queue, ^{
-        _snapshotCallback = std::make_unique<mbgl::Actor<mbgl::MapSnapshotter::Callback>>(*mbgl::Scheduler::GetCurrent(), [=](std::exception_ptr mbglError, mbgl::PremultipliedImage image, mbgl::MapSnapshotter::Attributions attributions, mbgl::MapSnapshotter::PointForFn pointForFn) {
-            _loading = false;
-            
-            NSMutableArray *infos = [NSMutableArray array];
+    CGRect logoImageRect = CGRectMake(MGLLogoImagePosition.x, mglImage.size.height - (MGLLogoImagePosition.y + logoImage.size.height), logoImage.size.width, logoImage.size.height);
+    CGPoint attributionOrigin = CGPointMake(mglImage.size.width - 10 - attributionBackgroundSize.width,
+                                            logoImageRect.origin.y + (logoImageRect.size.height / 2) - (attributionBackgroundSize.height / 2) + 1);
+    if (!logoImage) {
+        CGSize defaultLogoSize = [MGLMapSnapshotter mapboxLongStyleLogo].size;
+        logoImageRect = CGRectMake(0, mglImage.size.height - (MGLLogoImagePosition.y + defaultLogoSize.height), 0, defaultLogoSize.height);
+        attributionOrigin = CGPointMake(10, logoImageRect.origin.y + (logoImageRect.size.height / 2) - (attributionBackgroundSize.height / 2) + 1);
+    }
+    
+    CGRect attributionBackgroundFrame = CGRectMake(attributionOrigin.x,
+                                                   attributionOrigin.y,
+                                                   attributionBackgroundSize.width,
+                                                   attributionBackgroundSize.height);
+    CGPoint attributionTextPosition = CGPointMake(attributionBackgroundFrame.origin.x + 10,
+                                                  attributionBackgroundFrame.origin.y - 1);
+    
+    CGRect cropRect = CGRectMake(attributionBackgroundFrame.origin.x * mglImage.scale,
+                                 attributionBackgroundFrame.origin.y * mglImage.scale,
+                                 attributionBackgroundSize.width * mglImage.scale,
+                                 attributionBackgroundSize.height * mglImage.scale);
+    
+    
+    UIGraphicsBeginImageContextWithOptions(mglImage.size, NO, scale);
+    
+    [mglImage drawInRect:CGRectMake(0, 0, mglImage.size.width, mglImage.size.height)];
+    
+    [logoImage drawInRect:logoImageRect];
+    
+    UIImage *currentImage = UIGraphicsGetImageFromCurrentImageContext();
+    CGImageRef attributionImageRef = CGImageCreateWithImageInRect([currentImage CGImage], cropRect);
+    UIImage *attributionImage = [UIImage imageWithCGImage:attributionImageRef];
+    CGImageRelease(attributionImageRef);
+    
+    CIImage *ciAttributionImage = [[CIImage alloc] initWithCGImage:attributionImage.CGImage];
+    
+    UIImage *blurredAttributionBackground = [MGLMapSnapshotter blurredAttributionBackground:ciAttributionImage];
+    
+    [blurredAttributionBackground drawInRect:attributionBackgroundFrame];
+    
+    [MGLMapSnapshotter drawAttributionTextWithStyle:attributionInfoStyle origin:attributionTextPosition attributionInfo:attributionInfo];
+    
+    UIImage *compositedImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
 
-#if TARGET_OS_IPHONE
-            CGFloat fontSize = [UIFont smallSystemFontSize];
-            UIColor *attributeFontColor = [UIColor blackColor];
-#else
-            CGFloat fontSize = [NSFont systemFontSizeForControlSize:NSMiniControlSize];
-            NSColor *attributeFontColor = [NSColor blackColor];
-#endif
-            for (auto attribution = attributions.begin(); attribution != attributions.end(); ++attribution) {
-                NSString *attributionHTMLString = @(attribution->c_str());
-                NSArray *tileSetInfos = [MGLAttributionInfo attributionInfosFromHTMLString:attributionHTMLString
-                                                                                  fontSize:fontSize
-                                                                                 linkColor:attributeFontColor];
-                [infos growArrayByAddingAttributionInfosFromArray:tileSetInfos];
-            }
-            
-            _attributionInfo = infos;
-            
-            if (mbglError) {
-                NSString *description = @(mbgl::util::toString(mbglError).c_str());
-                NSDictionary *userInfo = @{NSLocalizedDescriptionKey: description};
-                NSError *error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeSnapshotFailed userInfo:userInfo];
-                
-                // Dispatch result to origin queue
-                dispatch_async(queue, ^{
-                    completion(nil, error);
-                });
-            } else {
-#if TARGET_OS_IPHONE
-                MGLImage *mglImage = [[MGLImage alloc] initWithMGLPremultipliedImage:std::move(image) scale:self.options.scale];
-#else
-                MGLImage *mglImage = [[MGLImage alloc] initWithMGLPremultipliedImage:std::move(image)];
-                mglImage.size = NSMakeSize(mglImage.size.width / self.options.scale,
-                                           mglImage.size.height / self.options.scale);
-#endif
-                
-                // Process image watermark in a work queue
-                dispatch_queue_t workQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-                dispatch_async(workQueue, ^{
-#if TARGET_OS_IPHONE
-                    MGLAttributionInfoStyle attributionInfoStyle = MGLAttributionInfoStyleLong;
-                    for (NSUInteger styleValue = MGLAttributionInfoStyleLong; styleValue >= MGLAttributionInfoStyleShort; styleValue--) {
-                        attributionInfoStyle = (MGLAttributionInfoStyle)styleValue;
-                        CGSize attributionSize = [self attributionSizeWithLogoStyle:attributionInfoStyle sourceAttributionStyle:attributionInfoStyle];
-                        if (attributionSize.width <= mglImage.size.width) {
-                            break;
-                        }
-                    }
-                    
-                    UIImage *logoImage = [self logoImageWithStyle:attributionInfoStyle];
-                    CGSize attributionBackgroundSize = [self attributionTextSizeWithStyle:attributionInfoStyle];
-                    
-                    CGRect logoImageRect = CGRectMake(MGLLogoImagePosition.x, mglImage.size.height - (MGLLogoImagePosition.y + logoImage.size.height), logoImage.size.width, logoImage.size.height);
-                    CGPoint attributionOrigin = CGPointMake(mglImage.size.width - 10 - attributionBackgroundSize.width,
-                                                            logoImageRect.origin.y + (logoImageRect.size.height / 2) - (attributionBackgroundSize.height / 2) + 1);
-                    if (!logoImage) {
-                        CGSize defaultLogoSize = [self mapboxLongStyleLogo].size;
-                        logoImageRect = CGRectMake(0, mglImage.size.height - (MGLLogoImagePosition.y + defaultLogoSize.height), 0, defaultLogoSize.height);
-                        attributionOrigin = CGPointMake(10, logoImageRect.origin.y + (logoImageRect.size.height / 2) - (attributionBackgroundSize.height / 2) + 1);
-                    }
-                    
-                    CGRect attributionBackgroundFrame = CGRectMake(attributionOrigin.x,
-                                                                   attributionOrigin.y,
-                                                                   attributionBackgroundSize.width,
-                                                                   attributionBackgroundSize.height);
-                    CGPoint attributionTextPosition = CGPointMake(attributionBackgroundFrame.origin.x + 10,
-                                                                  attributionBackgroundFrame.origin.y - 1);
-                    
-                    CGRect cropRect = CGRectMake(attributionBackgroundFrame.origin.x * mglImage.scale,
-                                                 attributionBackgroundFrame.origin.y * mglImage.scale,
-                                                 attributionBackgroundSize.width * mglImage.scale,
-                                                 attributionBackgroundSize.height * mglImage.scale);
-                    
-                    
-                    UIGraphicsBeginImageContextWithOptions(mglImage.size, NO, self.options.scale);
-                    
-                    [mglImage drawInRect:CGRectMake(0, 0, mglImage.size.width, mglImage.size.height)];
-                    
-                    [logoImage drawInRect:logoImageRect];
-                    
-                    UIImage *currentImage = UIGraphicsGetImageFromCurrentImageContext();
-                    CGImageRef attributionImageRef = CGImageCreateWithImageInRect([currentImage CGImage], cropRect);
-                    UIImage *attributionImage = [UIImage imageWithCGImage:attributionImageRef];
-                    CGImageRelease(attributionImageRef);
-                    
-                    CIImage *ciAttributionImage = [[CIImage alloc] initWithCGImage:attributionImage.CGImage];
-                    
-                    UIImage *blurredAttributionBackground = [self blurredAttributionBackground:ciAttributionImage];
-                    
-                    [blurredAttributionBackground drawInRect:attributionBackgroundFrame];
-                    
-                    [self drawAttributionTextWithStyle:attributionInfoStyle origin:attributionTextPosition];
-                    
-                    UIImage *compositedImage = UIGraphicsGetImageFromCurrentImageContext();
-                    
-                    UIGraphicsEndImageContext();
-#else
-                    NSSize targetSize = NSMakeSize(self.options.size.width, self.options.size.height);
-                    NSRect targetFrame = NSMakeRect(0, 0, targetSize.width, targetSize.height);
-                    
-                    MGLAttributionInfoStyle attributionInfoStyle = MGLAttributionInfoStyleLong;
-                    for (NSUInteger styleValue = MGLAttributionInfoStyleLong; styleValue >= MGLAttributionInfoStyleShort; styleValue--) {
-                        attributionInfoStyle = (MGLAttributionInfoStyle)styleValue;
-                        CGSize attributionSize = [self attributionSizeWithLogoStyle:attributionInfoStyle sourceAttributionStyle:attributionInfoStyle];
-                        if (attributionSize.width <= mglImage.size.width) {
-                            break;
-                        }
-                    }
-                    
-                    NSImage *logoImage = [self logoImageWithStyle:attributionInfoStyle];
-                    CGSize attributionBackgroundSize = [self attributionTextSizeWithStyle:attributionInfoStyle];
-                    NSImage *sourceImage = mglImage;
-                    
-                    CGRect logoImageRect = CGRectMake(MGLLogoImagePosition.x, MGLLogoImagePosition.y, logoImage.size.width, logoImage.size.height);
-                    CGPoint attributionOrigin = CGPointMake(targetFrame.size.width - 10 - attributionBackgroundSize.width,
-                                                            MGLLogoImagePosition.y + 1);
-                    if (!logoImage) {
-                        CGSize defaultLogoSize = [self mapboxLongStyleLogo].size;
-                        logoImageRect = CGRectMake(0, MGLLogoImagePosition.y, 0, defaultLogoSize.height);
-                        attributionOrigin = CGPointMake(10, attributionOrigin.y);
-                    }
-                    
-                    CGRect attributionBackgroundFrame = CGRectMake(attributionOrigin.x,
-                                                                   attributionOrigin.y,
-                                                                   attributionBackgroundSize.width,
-                                                                   attributionBackgroundSize.height);
-                    CGPoint attributionTextPosition = CGPointMake(attributionBackgroundFrame.origin.x + 10,
-                                                                  logoImageRect.origin.y + (logoImageRect.size.height / 2) - (attributionBackgroundSize.height / 2));
-                    
-                    
-                    NSImage *compositedImage = nil;
-                    NSImageRep *sourceImageRep = [sourceImage bestRepresentationForRect:targetFrame
-                                                                                context:nil
-                                                                                  hints:nil];
-                    compositedImage = [[NSImage alloc] initWithSize:targetSize];
-                    
-                    [compositedImage lockFocus];
+    return compositedImage;
 
-                    [sourceImageRep drawInRect: targetFrame];
-                    
-                    if (logoImage) {
-                        [logoImage drawInRect:logoImageRect];
-                    }
-                    
-                    NSBitmapImageRep *attributionBackground = [[NSBitmapImageRep alloc] initWithFocusedViewRect:attributionBackgroundFrame];
-                    
-                    CIImage *attributionBackgroundImage = [[CIImage alloc] initWithCGImage:[attributionBackground CGImage]];
-                    
-                    NSImage *blurredAttributionBackground = [self blurredAttributionBackground:attributionBackgroundImage];
+#else
 
-                    [blurredAttributionBackground drawInRect:attributionBackgroundFrame];
-                    
-                    [self drawAttributionTextWithStyle:attributionInfoStyle origin:attributionTextPosition];
-                    
-                    [compositedImage unlockFocus];
-                    
-                    
+    NSSize targetSize = NSMakeSize(size.width, size.height);
+    NSRect targetFrame = NSMakeRect(0, 0, targetSize.width, targetSize.height);
+    
+    MGLAttributionInfoStyle attributionInfoStyle = MGLAttributionInfoStyleLong;
+    for (NSUInteger styleValue = MGLAttributionInfoStyleLong; styleValue >= MGLAttributionInfoStyleShort; styleValue--) {
+        attributionInfoStyle = (MGLAttributionInfoStyle)styleValue;
+        CGSize attributionSize = [MGLMapSnapshotter attributionSizeWithLogoStyle:attributionInfoStyle sourceAttributionStyle:attributionInfoStyle attributionInfo:attributionInfo];
+        if (attributionSize.width <= mglImage.size.width) {
+            break;
+        }
+    }
+    
+    NSImage *logoImage = [MGLMapSnapshotter logoImageWithStyle:attributionInfoStyle];
+    CGSize attributionBackgroundSize = [MGLMapSnapshotter attributionTextSizeWithStyle:attributionInfoStyle attributionInfo:attributionInfo];
+    NSImage *sourceImage = mglImage;
+    
+    CGRect logoImageRect = CGRectMake(MGLLogoImagePosition.x, MGLLogoImagePosition.y, logoImage.size.width, logoImage.size.height);
+    CGPoint attributionOrigin = CGPointMake(targetFrame.size.width - 10 - attributionBackgroundSize.width,
+                                            MGLLogoImagePosition.y + 1);
+    if (!logoImage) {
+        CGSize defaultLogoSize = [MGLMapSnapshotter mapboxLongStyleLogo].size;
+        logoImageRect = CGRectMake(0, MGLLogoImagePosition.y, 0, defaultLogoSize.height);
+        attributionOrigin = CGPointMake(10, attributionOrigin.y);
+    }
+    
+    CGRect attributionBackgroundFrame = CGRectMake(attributionOrigin.x,
+                                                   attributionOrigin.y,
+                                                   attributionBackgroundSize.width,
+                                                   attributionBackgroundSize.height);
+    CGPoint attributionTextPosition = CGPointMake(attributionBackgroundFrame.origin.x + 10,
+                                                  logoImageRect.origin.y + (logoImageRect.size.height / 2) - (attributionBackgroundSize.height / 2));
+    
+    
+    NSImage *compositedImage = nil;
+    NSImageRep *sourceImageRep = [sourceImage bestRepresentationForRect:targetFrame
+                                                                context:nil
+                                                                  hints:nil];
+    compositedImage = [[NSImage alloc] initWithSize:targetSize];
+    
+    [compositedImage lockFocus];
+    
+    [sourceImageRep drawInRect: targetFrame];
+    
+    if (logoImage) {
+        [logoImage drawInRect:logoImageRect];
+    }
+    
+    NSBitmapImageRep *attributionBackground = [[NSBitmapImageRep alloc] initWithFocusedViewRect:attributionBackgroundFrame];
+    
+    CIImage *attributionBackgroundImage = [[CIImage alloc] initWithCGImage:[attributionBackground CGImage]];
+    
+    NSImage *blurredAttributionBackground = [MGLMapSnapshotter blurredAttributionBackground:attributionBackgroundImage];
+    
+    [blurredAttributionBackground drawInRect:attributionBackgroundFrame];
+    
+    [MGLMapSnapshotter drawAttributionTextWithStyle:attributionInfoStyle origin:attributionTextPosition attributionInfo:attributionInfo];
+    
+    [compositedImage unlockFocus];
+
+    return compositedImage;
 #endif
-                    
-                    // Dispatch result to origin queue
-                    dispatch_async(queue, ^{
-                        MGLMapSnapshot* snapshot = [[MGLMapSnapshot alloc] initWithImage:compositedImage scale:self.options.scale pointForFn:pointForFn];
-                        completion(snapshot, nil);
-                    });
-                });
+}
+
+- (void)drawAttributedSnapshot:(mbgl::MapSnapshotter::Attributions)attributions snapshotImage:(MGLImage *)mglImage pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn latLngForFn:(mbgl::MapSnapshotter::LatLngForFn)latLngForFn {
+    
+    // Process image watermark in a work queue
+    dispatch_queue_t workQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_queue_t resultQueue = self.resultQueue;
+
+    // Capture scale and size by value to avoid accessing self from another thread
+    CGFloat scale = self.options.scale;
+    CGSize size = self.options.size;
+
+    // pointForFn is a copyable std::function that captures state by value: see MapSnapshotter::Impl::snapshot
+    __weak __typeof__(self) weakself = self;
+
+    dispatch_async(workQueue, ^{
+        // Call a class method to ensure we're not accidentally capturing self
+        MGLImage *compositedImage = [MGLMapSnapshotter drawAttributedSnapshotWorker:attributions snapshotImage:mglImage pointForFn:pointForFn latLngForFn:latLngForFn scale:scale size:size];
+
+        // Dispatch result to origin queue
+        dispatch_async(resultQueue, ^{
+            __typeof__(self) strongself = weakself;
+
+            if (strongself.completion) {
+                MGLMapSnapshot* snapshot = [[MGLMapSnapshot alloc] initWithImage:compositedImage
+                                                                           scale:scale
+                                                                      pointForFn:pointForFn
+                                                                     latLngForFn:latLngForFn];
+                strongself.completion(snapshot, nil);
+                strongself.completion = nil;
             }
         });
-        _mbglMapSnapshotter->snapshot(_snapshotCallback->self());
     });
 }
 
-- (void)drawAttributionTextWithStyle:(MGLAttributionInfoStyle)attributionInfoStyle origin:(CGPoint)origin
++ (NSArray<MGLAttributionInfo *>*) generateAttributionInfos:(mbgl::MapSnapshotter::Attributions)attributions {
+    NSMutableArray *infos = [NSMutableArray array];
+    
+#if TARGET_OS_IPHONE
+    CGFloat fontSize = [UIFont smallSystemFontSize];
+    UIColor *attributeFontColor = [UIColor blackColor];
+#else
+    CGFloat fontSize = [NSFont systemFontSizeForControlSize:NSMiniControlSize];
+    NSColor *attributeFontColor = [NSColor blackColor];
+#endif
+    for (auto attribution = attributions.begin(); attribution != attributions.end(); ++attribution) {
+        NSString *attributionHTMLString = @(attribution->c_str());
+        NSArray *tileSetInfos = [MGLAttributionInfo attributionInfosFromHTMLString:attributionHTMLString
+                                                                          fontSize:fontSize
+                                                                         linkColor:attributeFontColor];
+        [infos growArrayByAddingAttributionInfosFromArray:tileSetInfos];
+    }
+    return infos;
+}
+
++ (void)drawAttributionTextWithStyle:(MGLAttributionInfoStyle)attributionInfoStyle origin:(CGPoint)origin attributionInfo:(NSArray<MGLAttributionInfo *>*)attributionInfo
 {
-    for (MGLAttributionInfo *info in _attributionInfo) {
+    for (MGLAttributionInfo *info in attributionInfo) {
         if (info.isFeedbackLink) {
             continue;
         }
@@ -306,7 +445,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     }
 }
 
-- (MGLImage *)blurredAttributionBackground:(CIImage *)backgroundImage
++ (MGLImage *)blurredAttributionBackground:(CIImage *)backgroundImage
 {
     CGAffineTransform transform = CGAffineTransformIdentity;
     CIFilter *clamp = [CIFilter filterWithName:@"CIAffineClamp"];
@@ -337,12 +476,12 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     return image;
 }
 
-- (MGLImage *)logoImageWithStyle:(MGLAttributionInfoStyle)style
++ (MGLImage *)logoImageWithStyle:(MGLAttributionInfoStyle)style
 {
     MGLImage *logoImage;
     switch (style) {
         case MGLAttributionInfoStyleLong:
-            logoImage = [self mapboxLongStyleLogo];
+            logoImage = [MGLMapSnapshotter mapboxLongStyleLogo];
             break;
         case MGLAttributionInfoStyleMedium:
 #if TARGET_OS_IPHONE
@@ -358,7 +497,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     return logoImage;
 }
 
-- (MGLImage *)mapboxLongStyleLogo
++ (MGLImage *)mapboxLongStyleLogo
 {
     MGLImage *logoImage;
 #if TARGET_OS_IPHONE
@@ -369,11 +508,11 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     return logoImage;
 }
 
-- (CGSize)attributionSizeWithLogoStyle:(MGLAttributionInfoStyle)logoStyle sourceAttributionStyle:(MGLAttributionInfoStyle)attributionStyle
++ (CGSize)attributionSizeWithLogoStyle:(MGLAttributionInfoStyle)logoStyle sourceAttributionStyle:(MGLAttributionInfoStyle)attributionStyle attributionInfo:(NSArray<MGLAttributionInfo *>*)attributionInfo
 {
     MGLImage *logoImage = [self logoImageWithStyle:logoStyle];
     
-    CGSize attributionBackgroundSize = [self attributionTextSizeWithStyle:attributionStyle];
+    CGSize attributionBackgroundSize = [MGLMapSnapshotter attributionTextSizeWithStyle:attributionStyle attributionInfo:attributionInfo];
     
     CGSize attributionSize = CGSizeZero;
     
@@ -386,10 +525,10 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     return attributionSize;
 }
 
-- (CGSize)attributionTextSizeWithStyle:(MGLAttributionInfoStyle)attributionStyle
++ (CGSize)attributionTextSizeWithStyle:(MGLAttributionInfoStyle)attributionStyle attributionInfo:(NSArray<MGLAttributionInfo *>*)attributionInfo
 {
     CGSize attributionBackgroundSize = CGSizeMake(10, 0);
-    for (MGLAttributionInfo *info in _attributionInfo) {
+    for (MGLAttributionInfo *info in attributionInfo) {
         if (info.isFeedbackLink) {
             continue;
         }
@@ -403,17 +542,54 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (void)cancel
 {
+    MGLLogInfo(@"Cancelling snapshotter.");
+    self.cancelled = YES;
+    
+    if (_snapshotCallback) {
+        [MGLMapSnapshotter completeWithErrorCode:MGLErrorCodeSnapshotFailed
+                                     description:[NSString stringWithFormat:@"MGLMapSnapshotter cancelled from %s", __PRETTY_FUNCTION__]
+                                         onQueue:self.resultQueue
+                                      completion:self.completion];
+        self.completion = nil;
+    }
+
     _snapshotCallback.reset();
     _mbglMapSnapshotter.reset();
 }
 
++ (void)completeWithErrorCode:(MGLErrorCode)errorCode description:(nonnull NSString*)description onQueue:(dispatch_queue_t)queue completion:(MGLMapSnapshotCompletionHandler)completion {
+    // The snapshot hasn't completed, so we should alert the caller
+    if (completion && queue) {
+        dispatch_async(queue, ^{
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey: description};
+            NSError *error = [NSError errorWithDomain:MGLErrorDomain
+                                                 code:errorCode
+                                             userInfo:userInfo];
+            completion(NULL, error);
+        });
+    }
+}
+
 - (void)setOptions:(MGLMapSnapshotOptions *)options
 {
+    if (_terminated) {
+        [NSException raise:NSInternalInconsistencyException
+                    format:@"Calling MGLMapSnapshotter.options after application termination is not supported."];
+    }
+
+    MGLLogDebug(@"Setting options: %@", options);
+
+    if (_completion) {
+        [self cancel];
+    }
+    
+    _cancelled = NO;
     _options = options;
     mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
     _mbglThreadPool = mbgl::sharedThreadPool();
     
     std::string styleURL = std::string([options.styleURL.absoluteString UTF8String]);
+    std::pair<bool, std::string> style = std::make_pair(false, styleURL);
     
     // Size; taking into account the minimum texture size for OpenGL ES
     // For non retina screens the ratio is 1:1 MGLSnapshotterMinimumPixelSize
@@ -429,7 +605,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     if (CLLocationCoordinate2DIsValid(options.camera.centerCoordinate)) {
         cameraOptions.center = MGLLatLngFromLocationCoordinate2D(options.camera.centerCoordinate);
     }
-    cameraOptions.angle = MAX(0, options.camera.heading) * mbgl::util::DEG2RAD;
+    cameraOptions.angle = MAX(0, options.camera.heading);
     cameraOptions.zoom = MAX(0, options.zoomLevel);
     cameraOptions.pitch = MAX(0, options.camera.pitch);
     
@@ -440,7 +616,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     }
     
     // Create the snapshotter
-    _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(*mbglFileSource, *_mbglThreadPool, styleURL, size, pixelRatio, cameraOptions, coordinateBounds);
+    _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(mbglFileSource, _mbglThreadPool, style, size, pixelRatio, cameraOptions, coordinateBounds);
 }
 
 @end

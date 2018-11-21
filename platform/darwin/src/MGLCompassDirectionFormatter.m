@@ -1,6 +1,7 @@
 #import "MGLCompassDirectionFormatter.h"
 
 #import "NSBundle+MGLAdditions.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #define wrap(value, min, max) \
     (fmod((fmod((value - min), (max - min)) + (max - min)), (max - min)) + min)
@@ -15,8 +16,8 @@
 }
 
 - (NSString *)stringFromDirection:(CLLocationDirection)direction {
-    static NS_ARRAY_OF(NSString *) *shortStrings;
-    static NS_ARRAY_OF(NSString *) *longStrings;
+    static NSArray<NSString *> *shortStrings;
+    static NSArray<NSString *> *longStrings;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         shortStrings = @[
@@ -95,7 +96,7 @@
             NSLocalizedStringWithDefaultValue(@"COMPASS_NbW_LONG", @"Foundation", nil, @"north by west", @"North by west, long"),
         ];
 
-        NSAssert(shortStrings.count == longStrings.count, @"Long and short compass direction string arrays must have the same size.");
+        MGLAssert(shortStrings.count == longStrings.count, @"Long and short compass direction string arrays must have the same size.");
     });
 
     NSInteger cardinalPoint = wrap(round(wrap(direction, 0, 360) / 360 * shortStrings.count), 0, shortStrings.count);
@@ -117,7 +118,7 @@
 }
 
 - (BOOL)getObjectValue:(out id __nullable * __nullable)obj forString:(NSString *)string errorDescription:(out NSString * __nullable * __nullable)error {
-    NSAssert(NO, @"-getObjectValue:forString:errorDescription: has not been implemented");
+    MGLAssert(NO, @"-getObjectValue:forString:errorDescription: has not been implemented");
     return NO;
 }
 

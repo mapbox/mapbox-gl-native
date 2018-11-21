@@ -34,7 +34,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         mapView = MGLMapView(frame: CGRect(x: 0, y: 0, width: 256, height: 256), styleURL: MGLDocumentationExampleTests.styleURL)
         mapView.delegate = self
         styleLoadingExpectation = expectation(description: "Map view should finish loading style")
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
     }
 
     override func tearDown() {
@@ -73,14 +73,14 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         XCTAssertNotNil(mapView.style?.source(withIdentifier: "lines"))
     }
 
-    func testMGLRasterSource() {
+    func testMGLRasterTileSource() {
         //#-example-code
-        let source = MGLRasterSource(identifier: "clouds", tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"], options: [
+        let source = MGLRasterTileSource(identifier: "clouds", tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"], options: [
             .minimumZoomLevel: 9,
             .maximumZoomLevel: 16,
             .tileSize: 512,
             .attributionInfos: [
-                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "https://mapbox.com"))
             ]
         ])
         mapView.style?.addSource(source)
@@ -109,13 +109,13 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         XCTAssertNotNil(mapView.style?.source(withIdentifier: "hills"))
     }
 
-    func testMGLVectorSource() {
+    func testMGLVectorTileSource() {
         //#-example-code
-        let source = MGLVectorSource(identifier: "pois", tileURLTemplates: ["https://example.com/vector-tiles/{z}/{x}/{y}.mvt"], options: [
+        let source = MGLVectorTileSource(identifier: "pois", tileURLTemplates: ["https://example.com/vector-tiles/{z}/{x}/{y}.mvt"], options: [
             .minimumZoomLevel: 9,
             .maximumZoomLevel: 16,
             .attributionInfos: [
-                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "https://mapbox.com"))
             ]
         ])
         mapView.style?.addSource(source)
@@ -151,7 +151,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
 
     func testMGLCircleStyleLayer() {
-        let population = MGLVectorSource(identifier: "population", configurationURL: URL(string: "https://example.com/style.json")!)
+        let population = MGLVectorTileSource(identifier: "population", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style?.addSource(population)
         
         //#-example-code
@@ -162,7 +162,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         #else
             layer.circleColor = NSExpression(forConstantValue: UIColor.green)
         #endif
-        layer.circleRadius = NSExpression(format: "FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'exponential', 1.75, %@)",
+        layer.circleRadius = NSExpression(format: "mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'exponential', 1.75, %@)",
                                           [12: 2,
                                            22: 180])
         layer.circleOpacity = NSExpression(forConstantValue: 0.7)
@@ -174,13 +174,13 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
 
     func testMGLLineStyleLayer() {
-        let trails = MGLVectorSource(identifier: "trails", configurationURL: URL(string: "https://example.com/style.json")!)
+        let trails = MGLVectorTileSource(identifier: "trails", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style?.addSource(trails)
 
         //#-example-code
         let layer = MGLLineStyleLayer(identifier: "trails-path", source: trails)
         layer.sourceLayerIdentifier = "trails"
-        layer.lineWidth = NSExpression(format: "FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'exponential', 1.5, %@)",
+        layer.lineWidth = NSExpression(format: "mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'exponential', 1.5, %@)",
                                        [14: 2,
                                         18: 20])
         #if os(macOS)
@@ -197,7 +197,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
 
     func testMGLFillStyleLayer() {
-        let parks = MGLVectorSource(identifier: "parks", configurationURL: URL(string: "https://example.com/style.json")!)
+        let parks = MGLVectorTileSource(identifier: "parks", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style?.addSource(parks)
 
         //#-example-code
@@ -216,7 +216,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
     
     func testMGLFillExtrusionStyleLayer() {
-        let buildings = MGLVectorSource(identifier: "buildings", configurationURL: URL(string: "https://example.com/style.json")!)
+        let buildings = MGLVectorTileSource(identifier: "buildings", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style?.addSource(buildings)
         
         //#-example-code
@@ -230,9 +230,27 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         
         XCTAssertNotNil(mapView.style?.layer(withIdentifier: "buildings"))
     }
+    
+    func testMGLHeatmapStyleLayer() {
+        let earthquakes = MGLShapeSource(identifier: "earthquakes", url: URL(string: "https://example.com/earthquakes.json")!, options: [:])
+        mapView.style?.addSource(earthquakes)
+        
+        //#-example-code
+        let layer = MGLHeatmapStyleLayer(identifier: "earthquake-heat", source: earthquakes)
+        layer.heatmapWeight = NSExpression(format: "mgl_interpolate:withCurveType:parameters:stops:(magnitude, 'linear', nil, %@)",
+                                           [0: 0,
+                                            6: 1])
+        layer.heatmapIntensity = NSExpression(format: "mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)",
+                                              [0: 1,
+                                               9: 3])
+        mapView.style?.addLayer(layer)
+        //#-end-example-code
+        
+        XCTAssertNotNil(mapView.style?.layer(withIdentifier: "earthquake-heat"))
+    }
 
     func testMGLSymbolStyleLayer() {
-        let pois = MGLVectorSource(identifier: "pois", configurationURL: URL(string: "https://example.com/style.json")!)
+        let pois = MGLVectorTileSource(identifier: "pois", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style?.addSource(pois)
 
         //#-example-code
@@ -257,12 +275,12 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
 
     func testMGLRasterStyleLayer() {
-        let source = MGLRasterSource(identifier: "clouds", tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"], options: [
+        let source = MGLRasterTileSource(identifier: "clouds", tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"], options: [
             .minimumZoomLevel: 9,
             .maximumZoomLevel: 16,
             .tileSize: 512,
             .attributionInfos: [
-                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "https://mapbox.com"))
             ]
         ])
         mapView.style?.addSource(source)
@@ -282,12 +300,12 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
             .maximumZoomLevel: 16,
             .tileSize: 256,
             .attributionInfos: [
-                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "https://mapbox.com"))
             ]
         ])
         mapView.style?.addSource(source)
         
-        let canals = MGLVectorSource(identifier: "canals", configurationURL: URL(string: "https://example.com/style.json")!)
+        let canals = MGLVectorTileSource(identifier: "canals", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style?.addSource(canals)
         let canalShadowLayer = MGLLineStyleLayer(identifier: "waterway-river-canal-shadow", source: canals)
         mapView.style?.addLayer(canalShadowLayer)
@@ -304,13 +322,13 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
 
     func testMGLVectorStyleLayer$predicate() {
-        let terrain = MGLVectorSource(identifier: "terrain", configurationURL: URL(string: "https://example.com/style.json")!)
+        let terrain = MGLVectorTileSource(identifier: "terrain", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style?.addSource(terrain)
 
         //#-example-code
         let layer = MGLLineStyleLayer(identifier: "contour", source: terrain)
         layer.sourceLayerIdentifier = "contours"
-        layer.predicate = NSPredicate(format: "(index == 5 || index == 10) && ele >= 1500.0")
+        layer.predicate = NSPredicate(format: "(index == 5 || index == 10) && CAST(ele, 'NSNumber') >= 1500.0")
         mapView.style?.addLayer(layer)
         //#-end-example-code
 
@@ -352,15 +370,15 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         #endif
         
         class MGLStyle {
-            static func satelliteStreetsStyleURL() -> URL {
+            static var satelliteStreetsStyleURL: URL {
                 return MGLDocumentationExampleTests.styleURL
             }
         }
         
         //#-example-code
-        let camera = MGLMapCamera(lookingAtCenter: CLLocationCoordinate2D(latitude: 37.7184, longitude: -122.4365), fromDistance: 100, pitch: 20, heading: 0)
+        let camera = MGLMapCamera(lookingAtCenter: CLLocationCoordinate2D(latitude: 37.7184, longitude: -122.4365), altitude: 100, pitch: 20, heading: 0)
 
-        let options = MGLMapSnapshotOptions(styleURL: MGLStyle.satelliteStreetsStyleURL(), camera: camera, size: CGSize(width: 320, height: 480))
+        let options = MGLMapSnapshotOptions(styleURL: MGLStyle.satelliteStreetsStyleURL, camera: camera, size: CGSize(width: 320, height: 480))
         options.zoomLevel = 10
 
         let snapshotter = MGLMapSnapshotter(options: options)
@@ -373,7 +391,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         }
         //#-end-example-code
         
-        wait(for: [expectation], timeout: 1)
+        wait(for: [expectation], timeout: 5)
     }
     
     // For testMGLMapView().

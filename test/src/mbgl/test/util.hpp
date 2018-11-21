@@ -5,20 +5,24 @@
 #endif
 
 #if ANDROID
-#define TEST_READ_ONLY 0
-#define TEST_HAS_SERVER 0
+    #define TEST_READ_ONLY 0
+    #undef TEST_HAS_SERVER
+    #define TEST_HAS_SERVER 0
 #elif TARGET_OS_IOS
-#define TEST_READ_ONLY 1
-#define TEST_HAS_SERVER 0
+    #define TEST_READ_ONLY 1
+    #undef TEST_HAS_SERVER
+    #define TEST_HAS_SERVER 0
 #else
-#define TEST_READ_ONLY 0
-#define TEST_HAS_SERVER 1
+    #define TEST_READ_ONLY 0
+    #ifndef TEST_HAS_SERVER
+        #define TEST_HAS_SERVER 1
+    #endif
 #endif
 
 #if TARGET_OS_SIMULATOR
-#define TEST_IS_SIMULATOR 1
+    #define TEST_IS_SIMULATOR 1
 #else
-#define TEST_IS_SIMULATOR 0
+    #define TEST_IS_SIMULATOR 0
 #endif
 
 #if !TEST_IS_SIMULATOR && !CI_BUILD

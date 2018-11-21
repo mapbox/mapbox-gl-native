@@ -107,7 +107,7 @@ TEST(GlyphManager, LoadingSuccess) {
     };
 
     test.requestor.glyphsAvailable = [&] (GlyphMap glyphs) {
-        const auto& testPositions = glyphs.at({{"Test Stack"}});
+        const auto& testPositions = glyphs.at(FontStackHasher()({{"Test Stack"}}));
 
         ASSERT_EQ(testPositions.size(), 3u);
         ASSERT_EQ(testPositions.count(u'a'), 1u);
@@ -224,7 +224,7 @@ TEST(GlyphManager, LoadLocalCJKGlyph) {
     test.requestor.glyphsAvailable = [&] (GlyphMap glyphs) {
         EXPECT_EQ(glyphResponses, 0); // Local generation should prevent requesting any glyphs
         
-        const auto& testPositions = glyphs.at({{"Test Stack"}});
+        const auto& testPositions = glyphs.at(FontStackHasher()({{"Test Stack"}}));
 
         ASSERT_EQ(testPositions.size(), 1u);
         ASSERT_EQ(testPositions.count(u'中'), 1u);
@@ -275,7 +275,7 @@ TEST(GlyphManager, LoadingInvalid) {
     };
 
     test.requestor.glyphsAvailable = [&] (GlyphMap glyphs) {
-        const auto& testPositions = glyphs.at({{"Test Stack"}});
+        const auto& testPositions = glyphs.at(FontStackHasher()({{"Test Stack"}}));
 
         ASSERT_EQ(testPositions.size(), 2u);
         ASSERT_FALSE(bool(testPositions.at(u'A')));

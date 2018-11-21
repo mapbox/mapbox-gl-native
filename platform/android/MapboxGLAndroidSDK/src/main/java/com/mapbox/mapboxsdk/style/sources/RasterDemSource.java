@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.style.sources;
 
+import android.support.annotation.Keep;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 
@@ -19,7 +21,8 @@ public class RasterDemSource extends Source {
    *
    * @param nativePtr - pointer to native peer
    */
-  private RasterDemSource(long nativePtr) {
+  @Keep
+  RasterDemSource(long nativePtr) {
     super(nativePtr);
   }
 
@@ -40,6 +43,7 @@ public class RasterDemSource extends Source {
    * @param url the source url
    */
   public RasterDemSource(String id, String url) {
+    super();
     initialize(id, url, DEFAULT_TILE_SIZE);
   }
 
@@ -51,6 +55,7 @@ public class RasterDemSource extends Source {
    * @param tileSize the tile size
    */
   public RasterDemSource(String id, String url, int tileSize) {
+    super();
     initialize(id, url, tileSize);
   }
 
@@ -61,6 +66,7 @@ public class RasterDemSource extends Source {
    * @param tileSet the {@link TileSet}
    */
   public RasterDemSource(String id, TileSet tileSet) {
+    super();
     initialize(id, tileSet.toValueObject(), DEFAULT_TILE_SIZE);
   }
 
@@ -72,6 +78,7 @@ public class RasterDemSource extends Source {
    * @param tileSize tje tile size
    */
   public RasterDemSource(String id, TileSet tileSet, int tileSize) {
+    super();
     initialize(id, tileSet.toValueObject(), tileSize);
   }
 
@@ -80,14 +87,19 @@ public class RasterDemSource extends Source {
    */
   @Nullable
   public String getUrl() {
+    checkThread();
     return nativeGetUrl();
   }
 
+  @Keep
   protected native void initialize(String layerId, Object payload, int tileSize);
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
+  @NonNull
+  @Keep
   protected native String nativeGetUrl();
 
 }

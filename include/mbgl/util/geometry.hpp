@@ -13,6 +13,8 @@ enum class FeatureType : uint8_t {
     Polygon = 3
 };
 
+using EmptyGeometry = mapbox::geometry::empty;
+
 template <class T>
 using Point = mapbox::geometry::point<T>;
 
@@ -43,6 +45,7 @@ Point<S> convertPoint(const Point<T>& p) {
 }
 
 struct ToFeatureType {
+    FeatureType operator()(const EmptyGeometry&) const { return FeatureType::Unknown; }
     template <class T>
     FeatureType operator()(const Point<T> &) const { return FeatureType::Point; }
     template <class T>

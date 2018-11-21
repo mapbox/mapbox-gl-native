@@ -45,7 +45,7 @@ ifeq ($(V), 1)
   export XCPRETTY
   NINJA_ARGS ?= -v
 else
-  export XCPRETTY ?= | xcpretty
+  export XCPRETTY ?= | tee '$(shell pwd)/build/xcodebuild-$(shell date +"%Y-%m-%d_%H%M%S").log' | xcpretty
   NINJA_ARGS ?=
 endif
 
@@ -74,7 +74,8 @@ MACOS_XCODEBUILD = xcodebuild \
 
 $(MACOS_PROJ_PATH): $(BUILD_DEPS) $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings
 	mkdir -p $(MACOS_OUTPUT_PATH)
-	(cd $(MACOS_OUTPUT_PATH) && cmake -G Xcode ../..)
+	(cd $(MACOS_OUTPUT_PATH) && cmake -G Xcode ../.. \
+		-DWITH_EGL=${WITH_EGL})
 
 $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings: platform/macos/WorkspaceSettings.xcsettings
 	mkdir -p "$(MACOS_USER_DATA_PATH)"
@@ -111,8 +112,7 @@ run-benchmark-%: benchmark
 	$(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-benchmark --benchmark_filter=$* ${BENCHMARK_ARGS}
 
 .PHONY: node-benchmark
-node-benchmark: $(MACOS_PROJ_PATH)
-	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'node-benchmark' build $(XCPRETTY)
+node-benchmark: node
 
 .PHONY: run-node-benchmark
 run-node-benchmark: node-benchmark
@@ -136,7 +136,11 @@ offline: $(MACOS_PROJ_PATH)
 
 .PHONY: node
 node: $(MACOS_PROJ_PATH)
-	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-node' build $(XCPRETTY)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-node (Active ABI)' build $(XCPRETTY)
+
+.PHONY: node-all
+node-all: $(MACOS_PROJ_PATH)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-node (All ABIs)' build $(XCPRETTY)
 
 .PHONY: macos-test
 macos-test: $(MACOS_PROJ_PATH)
@@ -171,6 +175,7 @@ $(MACOS_COMPDB_PATH)/Makefile:
 	mkdir -p $(MACOS_COMPDB_PATH)
 	(cd $(MACOS_COMPDB_PATH) && cmake ../../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
+		-DWITH_EGL=${WITH_EGL} \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
 
 .PHONY:
@@ -235,32 +240,30 @@ ios-test: $(IOS_PROJ_PATH)
 ios-integration-test: $(IOS_PROJ_PATH)
 	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'Integration Test Harness' test $(XCPRETTY)
 
+.PHONY: ios-sanitize
+ios-sanitize: $(IOS_PROJ_PATH)
+	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' -enableThreadSanitizer YES -enableUndefinedBehaviorSanitizer YES test $(XCPRETTY)
+
 .PHONY: ios-sanitize-address
 ios-sanitize-address: $(IOS_PROJ_PATH)
 	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' -enableAddressSanitizer YES test $(XCPRETTY)
 
-.PHONY: ios-sanitize-thread
-ios-sanitize-thread: $(IOS_PROJ_PATH)
-	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' -enableThreadSanitizer YES test $(XCPRETTY)
+.PHONY: ios-static-analyzer
+ios-static-analyzer: $(IOS_PROJ_PATH)
+	set -o pipefail && $(IOS_XCODEBUILD_SIM) analyze -scheme 'CI' test $(XCPRETTY)
+
+.PHONY: ios-check-events-symbols
+ios-check-events-symbols:
+	./platform/ios/scripts/check-events-symbols.sh
 
 .PHONY: ipackage
-ipackage: $(IOS_PROJ_PATH)
-	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
-	./platform/ios/scripts/package.sh
-
-.PHONY: ipackage-strip
-ipackage-strip: $(IOS_PROJ_PATH)
-	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO \
-	./platform/ios/scripts/package.sh
-
-.PHONY: ipackage-sim
-ipackage-sim: $(IOS_PROJ_PATH)
-	BUILDTYPE=Debug FORMAT=dynamic BUILD_DEVICE=false SYMBOLS=$(SYMBOLS) \
-	./platform/ios/scripts/package.sh
+ipackage: ipackage*
+ipackage%:
+	@echo make ipackage is deprecated — use make iframework.
 
 .PHONY: iframework
 iframework: $(IOS_PROJ_PATH)
-	FORMAT=dynamic BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
+	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
 	./platform/ios/scripts/package.sh
 
 .PHONY: ideploy
@@ -281,9 +284,10 @@ style-code: darwin-style-code
 darwin-update-examples:
 	node platform/darwin/scripts/update-examples.js
 
-.PHONY: check-public-symbols
-check-public-symbols:
+.PHONY: darwin-check-public-symbols
+darwin-check-public-symbols:
 	node platform/darwin/scripts/check-public-symbols.js macOS iOS
+
 endif
 
 #### Linux targets #####################################################
@@ -319,14 +323,12 @@ test: $(LINUX_BUILD)
 benchmark: $(LINUX_BUILD)
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-benchmark
 
-ifneq (,$(shell command -v gdb 2> /dev/null))
-  GDB ?= $(shell scripts/mason.sh PREFIX gdb VERSION 2017-04-08-aebcde5)/bin/gdb \
-        	-batch -return-child-result \
-        	-ex 'set print thread-events off' \
-        	-ex 'set disable-randomization off' \
-        	-ex 'run' \
-        	-ex 'thread apply all bt' --args
-endif
+GDB ?= gdb \
+	-batch -return-child-result \
+	-ex 'set print thread-events off' \
+	-ex 'set disable-randomization off' \
+	-ex 'run' \
+	-ex 'thread apply all bt' --args
 
 .PHONY: run-test
 run-test: run-test-*
@@ -358,7 +360,11 @@ run-glfw-app: glfw-app
 
 .PHONY: node
 node: $(LINUX_BUILD)
-	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node.active
+
+.PHONY: node-all
+node-all: $(LINUX_BUILD)
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node.all
 
 .PHONY: compdb
 compdb: $(LINUX_BUILD)
@@ -379,13 +385,7 @@ endif
 QT_QMAKE_FOUND := $(shell command -v qmake 2> /dev/null)
 ifdef QT_QMAKE_FOUND
   export QT_INSTALL_DOCS = $(shell qmake -query QT_INSTALL_DOCS)
-  ifeq ($(shell qmake -query QT_VERSION | head -c1), 4)
-    QT_ROOT_PATH = build/qt4-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
-    WITH_QT_4=1
-  else
-    QT_ROOT_PATH = build/qt-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
-    WITH_QT_4=0
-  endif
+  QT_ROOT_PATH = build/qt-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
 endif
 
 export QT_OUTPUT_PATH = $(QT_ROOT_PATH)/$(BUILDTYPE)
@@ -402,7 +402,6 @@ $(QT_BUILD): $(BUILD_DEPS)
 		-DMASON_PLATFORM_VERSION=$(MASON_PLATFORM_VERSION) \
 		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
 		-DWITH_QT_I18N=${WITH_QT_I18N} \
-		-DWITH_QT_4=${WITH_QT_4} \
 		-DWITH_CXX11ABI=${WITH_CXX11ABI} \
 		-DWITH_COVERAGE=${WITH_COVERAGE})
 
@@ -418,13 +417,40 @@ $(MACOS_QT_PROJ_PATH): $(BUILD_DEPS)
 		-DMASON_PLATFORM_VERSION=$(MASON_PLATFORM_VERSION) \
 		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
 		-DWITH_QT_I18N=${WITH_QT_I18N} \
-		-DWITH_QT_4=${WITH_QT_4} \
 		-DWITH_CXX11ABI=${WITH_CXX11ABI} \
 		-DWITH_COVERAGE=${WITH_COVERAGE})
 
 .PHONY: qtproj
 qtproj: $(MACOS_QT_PROJ_PATH)
 	open $(MACOS_QT_PROJ_PATH)
+
+endif
+
+ifdef QNX_HOST
+export WITH_QT_DECODERS ?= ON
+export QCC_COMPILER_TARGET ?= gcc_ntox86_64
+export QCC_NTOARCH ?= x86_64
+
+export QNX_OUTPUT_PATH = build/qt-qnx-$(QCC_NTOARCH)/$(BUILDTYPE)
+QNX_QT_BUILD = $(QNX_OUTPUT_PATH)/build.ninja
+$(QNX_QT_BUILD): $(BUILD_DEPS)
+	@scripts/check-qt.sh
+	mkdir -p $(QNX_OUTPUT_PATH)
+	(cd $(QNX_OUTPUT_PATH) && cmake -G Ninja ../../.. \
+		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		-DQCC_COMPILER_TARGET=${QCC_COMPILER_TARGET} \
+		-DQCC_NTOARCH=${QCC_NTOARCH} \
+		-DCMAKE_TOOLCHAIN_FILE=platform/qt/qnx.cmake \
+		-DMBGL_PLATFORM=qt \
+		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
+		-DWITH_QT_I18N=${WITH_QT_I18N} \
+		-DWITH_CXX11ABI=${WITH_CXX11ABI} \
+		-DWITH_COVERAGE=${WITH_COVERAGE})
+
+.PHONY: qnx-qt-lib
+qnx-qt-lib: $(QNX_QT_BUILD)
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(QNX_OUTPUT_PATH) qmapboxgl
 
 endif
 
@@ -466,22 +492,22 @@ test-node-recycle-map: node
 	npm test
 	npm run test-render -- --recycle-map --shuffle
 	npm run test-query
+	npm run test-expressions
 
 #### Android targets ###########################################################
 
-MBGL_ANDROID_ABIS  = arm-v5;armeabi
-MBGL_ANDROID_ABIS += arm-v7;armeabi-v7a
+MBGL_ANDROID_ABIS  = arm-v7;armeabi-v7a
 MBGL_ANDROID_ABIS += arm-v8;arm64-v8a
 MBGL_ANDROID_ABIS += x86;x86
 MBGL_ANDROID_ABIS += x86-64;x86_64
-MBGL_ANDROID_ABIS += mips;mips
 
 MBGL_ANDROID_LOCAL_WORK_DIR = /data/local/tmp/core-tests
 MBGL_ANDROID_LIBDIR = lib$(if $(filter arm-v8 x86-64,$1),64)
 MBGL_ANDROID_DALVIKVM = dalvikvm$(if $(filter arm-v8 x86-64,$1),64,32)
 MBGL_ANDROID_APK_SUFFIX = $(if $(filter Release,$(BUILDTYPE)),release-unsigned,debug)
 MBGL_ANDROID_CORE_TEST_DIR = platform/android/MapboxGLAndroidSDK/.externalNativeBuild/cmake/$(buildtype)/$2/core-tests
-MBGL_ANDROID_GRADLE = ./gradlew --parallel --max-workers=$(JOBS) -Pmapbox.buildtype=$(buildtype)
+MBGL_ANDROID_STL ?= c++_static
+MBGL_ANDROID_GRADLE = ./gradlew --parallel --max-workers=$(JOBS) -Pmapbox.buildtype=$(buildtype) -Pmapbox.stl=$(MBGL_ANDROID_STL)
 
 # Lists all devices, and extracts the identifiers, then obtains the ABI for every one.
 # Some devices return \r\n, so we'll have to remove the carriage return before concatenating.
@@ -579,6 +605,23 @@ run-android-ui-test-$1-%: platform/android/gradle/configuration.gradle
 android-ndk-stack-$1: platform/android/gradle/configuration.gradle
 	adb logcat | ndk-stack -sym platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/$2/
 
+# Run render tests with pixelmatch
+.PHONY: run-android-render-test-$1
+run-android-render-test-$1: $(BUILD_DEPS) platform/android/gradle/configuration.gradle
+	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
+	# delete old test results
+	rm -rf platform/android/build/render-test/mapbox/
+  # copy test definitions & ignore file to test app assets folder, clear old ones first
+	rm -rf platform/android/MapboxGLAndroidSDKTestApp/src/main/assets/integration
+	cp -r mapbox-gl-js/test/integration platform/android/MapboxGLAndroidSDKTestApp/src/main/assets
+	cp platform/node/test/ignores.json platform/android/MapboxGLAndroidSDKTestApp/src/main/assets/integration/ignores.json
+	# run RenderTest.java to generate static map images
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class="com.mapbox.mapboxsdk.testapp.render.RenderTest"
+	# pull generated images from the device
+	adb pull "`adb shell 'printenv EXTERNAL_STORAGE' | tr -d '\r'`/mapbox/render" platform/android/build/render-test
+	# copy expected result and run pixelmatch
+	python platform/android/scripts/run-render-test.py
+
 endef
 
 # Explodes the arguments into individual variables
@@ -608,14 +651,14 @@ run-android-ui-test-%: run-android-ui-test-arm-v7-%
 # Run Java Unit tests on the JVM of the development machine executing this
 .PHONY: run-android-unit-test
 run-android-unit-test: platform/android/gradle/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest --info
 run-android-unit-test-%: platform/android/gradle/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest --tests "$*"
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest  --info --tests "$*"
 
 # Builds a release package of the Android SDK
 .PHONY: apackage
 apackage: platform/android/gradle/configuration.gradle
-	make android-lib-arm-v5 && make android-lib-arm-v7 && make android-lib-arm-v8 && make android-lib-x86 && make android-lib-x86-64 && make android-lib-mips
+	make android-lib-arm-v7 && make android-lib-arm-v8 && make android-lib-x86 && make android-lib-x86-64
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all assemble$(BUILDTYPE)
 
 # Build test app instrumentation tests apk and test app apk for all abi's
@@ -667,6 +710,12 @@ android-lint-test-app: platform/android/gradle/configuration.gradle
 android-javadoc: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:javadocrelease
 
+# Generates platform/android/LICENSE.md file based on all Android project dependencies
+.PHONY: android-license
+android-license: platform/android/gradle/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:licenseReleaseReport
+	python platform/android/scripts/generate-license.py
+
 # Symbolicate ndk stack traces for the arm-v7 abi
 .PHONY: android-ndk-stack
 android-ndk-stack: android-ndk-stack-arm-v7
@@ -683,6 +732,11 @@ endif
 android-configuration: platform/android/gradle/configuration.gradle
 	cat platform/android/gradle/configuration.gradle
 
+# Creates a dependency graph using Graphviz
+.PHONY: android-graph
+android-graph:
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:generateDependencyGraphMapboxLibraries
+
 #### Miscellaneous targets #####################################################
 
 .PHONY: style-code
@@ -697,6 +751,7 @@ codestyle:
 .PHONY: clean
 clean:
 	-rm -rf ./build \
+	        ./lib/*.node \
 	        ./platform/android/gradle/configuration.gradle \
 	        ./platform/android/MapboxGLAndroidSDK/build \
 	        ./platform/android/MapboxGLAndroidSDK/.externalNativeBuild \

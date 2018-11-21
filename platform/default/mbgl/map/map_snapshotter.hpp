@@ -25,12 +25,12 @@ class Style;
 
 class MapSnapshotter {
 public:
-    MapSnapshotter(FileSource& fileSource,
-                   Scheduler& scheduler,
-                   const std::string& styleURL,
+    MapSnapshotter(FileSource* fileSource,
+                   std::shared_ptr<Scheduler> scheduler,
+                   const std::pair<bool, std::string> style,
                    const Size&,
                    const float pixelRatio,
-                   const CameraOptions&,
+                   const optional<CameraOptions> cameraOptions,
                    const optional<LatLngBounds> region,
                    const optional<std::string> cacheDir = {});
 
@@ -38,6 +38,9 @@ public:
 
     void setStyleURL(const std::string& styleURL);
     std::string getStyleURL() const;
+
+    void setStyleJSON(const std::string& styleJSON);
+    std::string getStyleJSON() const;
 
     void setSize(const Size&);
     Size getSize() const;
@@ -49,8 +52,9 @@ public:
     LatLngBounds getRegion() const;
 
     using PointForFn = std::function<ScreenCoordinate (const LatLng&)>;
+    using LatLngForFn = std::function<LatLng (const ScreenCoordinate&)>;
     using Attributions = std::vector<std::string>;
-    using Callback = std::function<void (std::exception_ptr, PremultipliedImage, Attributions, PointForFn)>;
+    using Callback = std::function<void (std::exception_ptr, PremultipliedImage, Attributions, PointForFn, LatLngForFn)>;
     void snapshot(ActorRef<Callback>);
 
 private:

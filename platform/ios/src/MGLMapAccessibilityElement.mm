@@ -4,7 +4,7 @@
 #import "MGLFeature.h"
 
 #import "MGLGeometry_Private.h"
-#import "MGLVectorSource_Private.h"
+#import "MGLVectorTileSource_Private.h"
 
 #import "NSBundle+MGLAdditions.h"
 #import "NSOrthography+MGLAdditions.h"
@@ -48,7 +48,7 @@
     if (self = [super initWithAccessibilityContainer:container]) {
         _feature = feature;
         
-        NSString *languageCode = [MGLVectorSource preferredMapboxStreetsLanguage];
+        NSString *languageCode = [MGLVectorTileSource preferredMapboxStreetsLanguage];
         NSString *nameAttribute = [NSString stringWithFormat:@"name_%@", languageCode];
         NSString *name = [feature attributeForKey:nameAttribute];
 
@@ -56,10 +56,8 @@
         // may be in the local language, which may be written in another script.
         // Attempt to transform to the script of the preferred language, keeping
         // the original string if no transform exists or if transformation fails.
-        if (@available(iOS 9.0, *)) {
-            NSString *dominantScript = [NSOrthography mgl_dominantScriptForMapboxStreetsLanguage:languageCode];
-            name = [name mgl_stringByTransliteratingIntoScript:dominantScript];
-        }
+        NSString *dominantScript = [NSOrthography mgl_dominantScriptForMapboxStreetsLanguage:languageCode];
+        name = [name mgl_stringByTransliteratingIntoScript:dominantScript];
 
         self.accessibilityLabel = name;
     }

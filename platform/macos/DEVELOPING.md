@@ -4,23 +4,9 @@ This document explains how to build the Mapbox Maps SDK for macOS from source. I
 
 ## Requirements
 
-The Mapbox Maps SDK for macOS and the macosapp demo application run on macOS 10.10.0 or above.
-
-The Mapbox Maps SDK for macOS requires Xcode 8.0 or above.
+See the "Requirements" section in [INSTALL.md](INSTALL.md).
 
 ## Building the SDK
-
-1. [Install core dependencies](../../INSTALL.md).
-1. Run `make xproj`.
-1. Switch to the “dynamic” or “macosapp” scheme. The former builds just the Cocoa framework, while the latter also builds a Cocoa demo application based on it.
-
-### Packaging builds
-
-Install [jazzy](https://github.com/realm/jazzy) for generating API documentation:
-
-```bash
-[sudo] gem install jazzy
-```
 
 Build and package the SDK by using one of the following commands:
 
@@ -54,7 +40,7 @@ To add any Objective-C type, constant, or member to the macOS maps SDK’s publi
 
 To add an Objective-C class, protocol, category, typedef, enumeration, or global constant to the macOS maps SDK’s public interface:
 
-1. _(Optional.)_ Add the macro `MGL_EXPORT` prior to the declaration for classes and global constants. To use this macro, include `MGLFoundation.h`. You can check whether all public symbols are exported correctly by running `make check-public-symbols`.
+1. _(Optional.)_ Add the macro `MGL_EXPORT` prior to the declaration for classes and global constants. To use this macro, include `MGLFoundation.h`. You can check whether all public symbols are exported correctly by running `make darwin-check-public-symbols`.
 1. _(Optional.)_ Add the type or constant’s name to the relevant category in the `custom_categories` section of [the jazzy configuration file](./jazzy.yml). This is required for classes and protocols and also recommended for any other type that is strongly associated with a particular class or protocol. If you leave out this step, the symbol will appear in an “Other” section in the generated HTML documentation’s table of contents.
 1. _(Optional.)_ If the symbol would also be publicly exposed in the iOS maps SDK, consult [the companion iOS document](../ios/DEVELOPING.md#making-a-type-or-constant-public) for further instructions.
 
@@ -66,6 +52,7 @@ To add an Objective-C header or implementation file to the macOS maps SDK:
 1. Audit new headers for nullability. Typically, you will wrap a header with `NS_ASSUME_NONNULL_BEGIN` and `NS_ASSUME_NONNULL_END`.
 1. _(Optional.)_ If it’s a public header, change its visibility from Project to Public and import it in [the macOS SDK’s umbrella header](./src/Mapbox.h).
 1. _(Optional.)_ If the file would also be used by the iOS maps SDK, make sure it’s in [platform/darwin/src/](../darwin/src/), then consult [the companion iOS document](../ios/DEVELOPING.md#adding-a-source-code-file) for further instructions.
+1. Run `scripts/generate-cmake-files.js` to update the generated source file list for third party build systems.
 
 ### Adding a resource
 
@@ -117,6 +104,8 @@ To add an example code listing to the documentation for a class or class member:
    to [MGLDocumentationExampleTests](test/MGLDocumentationExampleTests.swift).
    Wrap the code you’d like to appear in the documentation within
    `//#-example-code` and `//#-end-example-code` comments.
+1. If the header doesn’t already have an example code listing, add the path to
+   the header to platform/darwin/scripts/update-examples.list.
 1. Insert the code listings into the headers:
 
 ```bash

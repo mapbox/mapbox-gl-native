@@ -1,4 +1,5 @@
 #include <mbgl/style/expression/case.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/string.hpp>
 
 namespace mbgl {
@@ -28,7 +29,8 @@ void Case::eachChild(const std::function<void(const Expression&)>& visit) const 
 }
 
 bool Case::operator==(const Expression& e) const {
-    if (auto rhs = dynamic_cast<const Case*>(&e)) {
+    if (e.getKind() == Kind::Case) {
+        auto rhs = static_cast<const Case*>(&e);
         return *otherwise == *(rhs->otherwise) && Expression::childrenEqual(branches, rhs->branches);
     }
     return false;

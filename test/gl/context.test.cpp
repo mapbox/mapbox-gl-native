@@ -94,7 +94,9 @@ TEST(GLContextMode, Shared) {
     map.setLatLngZoom({ 37.8, -122.5 }, 10);
 
     // Set transparent background layer.
-    map.getStyle().getLayer("background")->as<BackgroundLayer>()->setBackgroundColor( { { 1.0f, 0.0f, 0.0f, 0.5f } } );
+    auto layer = map.getStyle().getLayer("background");
+    ASSERT_EQ(LayerType::Background, layer->getType());
+    static_cast<BackgroundLayer*>(layer)->setBackgroundColor( { { 1.0f, 0.0f, 0.0f, 0.5f } } );
 
     {
         // Custom rendering outside of GL Native render loop.

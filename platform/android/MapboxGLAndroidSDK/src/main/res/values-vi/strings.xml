@@ -12,5 +12,6 @@
     <string name="mapbox_attributionTelemetryNeutral">Thông tin thêm</string>
     <string name="mapbox_attributionErrorNoBrowser">Không thể mở trang Web vì thiết bị thiếu trình duyệt.</string>
     <string name="mapbox_offline_error_region_definition_invalid">OfflineRegionDefinition được cung cấp không vừa thế giới: %s</string>
+    <string name="mapbox_telemetryImproveMap">Cải thiện Bản đồ này</string>
     <string name="mapbox_telemetrySettings">Thiết lập Trình viễn trắc</string>
     </resources>

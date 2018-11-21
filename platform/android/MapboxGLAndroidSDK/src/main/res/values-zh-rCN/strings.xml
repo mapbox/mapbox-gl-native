@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mapbox_compassContentDescription">指南针，点击使地图旋转重置到正北方向。</string>
+    <string name="mapbox_attributionsIconContentDescription">Attribution图标，点击以显示attribution对话框。</string>
+    <string name="mapbox_myLocationViewContentDescription">定位视图，在地图上显示当前位置。</string>
+    <string name="mapbox_mapActionDescription">显示由Mapbox创建的地图，通过拖动两个手指来滚动，捏两个手指来放大。</string>
+    <string name="mapbox_attributionsDialogTitle">Mapbox Maps SDK for Android</string>
+    <string name="mapbox_attributionTelemetryTitle">让Mapbox地图变得更好</string>
+    <string name="mapbox_attributionTelemetryMessage">您的匿名数据帮助OpenStreetMap和Mapbox的地图变得更好。</string>
+    <string name="mapbox_attributionTelemetryPositive">继续参与</string>
+    <string name="mapbox_attributionTelemetryNegative">不再参与</string>
+    <string name="mapbox_attributionTelemetryNeutral">更多信息</string>
+    <string name="mapbox_attributionErrorNoBrowser">设备中未安装任何浏览器，不能打开该网页</string>
+    <string name="mapbox_offline_error_region_definition_invalid">提供的OfflineRegionDefinition不符合标准地理范围：%s</string>
+    <string name="mapbox_telemetryImproveMap">完善地图</string>
+    <string name="mapbox_telemetrySettings">Telemetry设置</string>
+</resources>

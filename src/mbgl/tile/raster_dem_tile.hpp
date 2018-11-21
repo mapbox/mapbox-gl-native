@@ -94,6 +94,7 @@ private:
     Actor<RasterDEMTileWorker> worker;
     
     uint64_t correlationID = 0;
+    Tileset::DEMEncoding encoding;
 
     // Contains the Bucket object for the tile. Buckets are render
     // objects and they get added by tile parsing operations.

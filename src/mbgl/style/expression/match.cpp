@@ -1,6 +1,7 @@
 #include <mbgl/style/expression/match.hpp>
 #include <mbgl/style/expression/check_subtype.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/string.hpp>
 
 namespace mbgl {
@@ -18,7 +19,8 @@ void Match<T>::eachChild(const std::function<void(const Expression&)>& visit) co
 
 template <typename T>
 bool Match<T>::operator==(const Expression& e) const {
-    if (auto rhs = dynamic_cast<const Match*>(&e)) {
+    if (e.getKind() == Kind::Match) {
+        auto rhs = static_cast<const Match*>(&e);
         return (*input == *(rhs->input) &&
                 *otherwise == *(rhs->otherwise) &&
                 Expression::childrenEqual(branches, rhs->branches));
@@ -40,11 +42,51 @@ std::vector<optional<Value>> Match<T>::possibleOutputs() const {
     return result;
 }
 
+template <typename T>
+mbgl::Value Match<T>::serialize() const {
+    std::vector<mbgl::Value> serialized;
+    serialized.emplace_back(getOperator());
+    serialized.emplace_back(input->serialize());
+    
+    // Sort so serialization has an arbitrary defined order, even though branch order doesn't affect evaluation
+    std::map<T, std::shared_ptr<Expression>> sortedBranches(branches.begin(), branches.end());
+
+    // Group branches by unique match expression to support condensed serializations
+    // of the form [case1, case2, ...] -> matchExpression
+    std::map<Expression*, size_t> outputLookup;
+    std::vector<std::pair<Expression*, std::vector<mbgl::Value>>> groupedByOutput;
+    for (auto& entry : sortedBranches) {
+        auto outputIndex = outputLookup.find(entry.second.get());
+        if (outputIndex == outputLookup.end()) {
+            // First time seeing this output, add it to the end of the grouped list
+            outputLookup[entry.second.get()] = groupedByOutput.size();
+            groupedByOutput.emplace_back(entry.second.get(), std::vector<mbgl::Value>{{entry.first}});
+        } else {
+            // We've seen this expression before, add the label to that output's group
+            groupedByOutput[outputIndex->second].second.emplace_back(entry.first);
+        }
+    };
+    
+    for (auto& entry : groupedByOutput) {
+        entry.second.size() == 1
+            ? serialized.emplace_back(entry.second[0])       // Only a single label matches this output expression
+            : serialized.emplace_back(entry.second);         // Array of literal labels pointing to this output expression
+        serialized.emplace_back(entry.first->serialize());   // The output expression itself
+    }
+    
+    serialized.emplace_back(otherwise->serialize());
+    return serialized;
+}
+    
 
 template<> EvaluationResult Match<std::string>::evaluate(const EvaluationContext& params) const {
     const EvaluationResult inputValue = input->evaluate(params);
     if (!inputValue) {
         return inputValue.error();
+    }
+
+    if (!inputValue->is<std::string>()) {
+        return otherwise->evaluate(params);
     }
 
     auto it = branches.find(inputValue->get<std::string>());
@@ -60,7 +102,11 @@ template<> EvaluationResult Match<int64_t>::evaluate(const EvaluationContext& pa
     if (!inputValue) {
         return inputValue.error();
     }
-    
+
+    if (!inputValue->is<double>()) {
+        return otherwise->evaluate(params);
+    }
+
     const auto numeric = inputValue->get<double>();
     int64_t rounded = std::floor(numeric);
     if (numeric == rounded) {
@@ -93,7 +139,7 @@ optional<InputType> parseInputValue(const Convertible& input, ParsingContext& pa
                     parentContext.error("Branch labels must be integers no larger than " + util::toString(Value::maxSafeInteger()) + ".", index);
                 } else {
                     type = {type::Number};
-                    result = {static_cast<int64_t>(n)};
+                    result = optional<InputType>{static_cast<int64_t>(n)};
                 }
             },
             [&] (int64_t n) {
@@ -101,7 +147,7 @@ optional<InputType> parseInputValue(const Convertible& input, ParsingContext& pa
                     parentContext.error("Branch labels must be integers no larger than " + util::toString(Value::maxSafeInteger()) + ".", index);
                 } else {
                     type = {type::Number};
-                    result = {n};
+                    result = optional<InputType>{n};
                 }
             },
             [&] (double n) {
@@ -111,7 +157,7 @@ optional<InputType> parseInputValue(const Convertible& input, ParsingContext& pa
                     parentContext.error("Numeric branch labels must be integer values.", index);
                 } else {
                     type = {type::Number};
-                    result = {static_cast<int64_t>(n)};
+                    result = optional<InputType>{static_cast<int64_t>(n)};
                 }
             },
             [&] (const std::string& s) {
@@ -244,7 +290,7 @@ ParseResult parseMatch(const Convertible& value, ParsingContext& ctx) {
         branches.push_back(std::make_pair(std::move(labels), std::move(*output)));
     }
 
-    auto input = ctx.parse(arrayMember(value, 1), 1, inputType);
+    auto input = ctx.parse(arrayMember(value, 1), 1, {type::Value});
     if (!input) {
         return ParseResult();
     }
@@ -255,6 +301,12 @@ ParseResult parseMatch(const Convertible& value, ParsingContext& ctx) {
     }
 
     assert(inputType && outputType);
+
+    optional<std::string> err;
+    if ((*input)->getType() != type::Value && (err = type::checkSubtype(*inputType, (*input)->getType()))) {
+        ctx.error(*err, 1);
+        return ParseResult();
+    }
 
     return inputType->match(
         [&](const type::NumberType&) {

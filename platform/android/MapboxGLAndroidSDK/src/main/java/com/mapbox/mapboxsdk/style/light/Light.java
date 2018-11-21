@@ -3,12 +3,14 @@
 package com.mapbox.mapboxsdk.style.light;
 
 import android.support.annotation.ColorInt;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 
 import com.mapbox.mapboxsdk.style.layers.Property;
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+import com.mapbox.mapboxsdk.utils.ColorUtils;
+import com.mapbox.mapboxsdk.utils.ThreadUtils;
 
 /**
  * The global light source.
@@ -18,6 +20,7 @@ import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 @UiThread
 public class Light {
 
+  @Keep
   private long nativePtr;
 
   /**
@@ -25,7 +28,9 @@ public class Light {
    *
    * @param nativePtr pointer used by core
    */
-  public Light(long nativePtr) {
+  @Keep
+  Light(long nativePtr) {
+    checkThread();
     this.nativePtr = nativePtr;
   }
 
@@ -35,6 +40,7 @@ public class Light {
    * @param anchor as String
    */
   public void setAnchor(@Property.ANCHOR String anchor) {
+    checkThread();
     nativeSetAnchor(anchor);
   }
 
@@ -43,25 +49,30 @@ public class Light {
    *
    * @return anchor as String
    */
+   @NonNull
   @Property.ANCHOR public String getAnchor() {
+    checkThread();
     return nativeGetAnchor();
   }
 
   /**
-   * Set the Position property. Position of the light source relative to lit (extruded) geometries, in [r radial coordinate, a azimuthal angle, p polar angle] where r indicates the distance from the center of the base of an object to its light, a indicates the position of the light relative to 0° (0° when `light.anchor` is set to `viewport` corresponds to the top of the viewport, or 0° when `light.anchor` is set to `map` corresponds to due north, and degrees proceed clockwise), and p indicates the height of the light (from 0°, directly above, to 180°, directly below).
+   * Set the Position property. Position of the light source relative to lit (extruded) geometries, in [r radial coordinate, a azimuthal angle, p polar angle] where r indicates the distance from the center of the base of an object to its light, a indicates the position of the light relative to 0&#xB0; (0&#xB0; when `light.anchor` is set to `viewport` corresponds to the top of the viewport, or 0&#xB0; when `light.anchor` is set to `map` corresponds to due north, and degrees proceed clockwise), and p indicates the height of the light (from 0&#xB0;, directly above, to 180&#xB0;, directly below).
    *
    * @param position of the light
    */
   public void setPosition(@NonNull Position position) {
+    checkThread();
     nativeSetPosition(position);
   }
 
   /**
-   * Get the Position property. Position of the light source relative to lit (extruded) geometries, in [r radial coordinate, a azimuthal angle, p polar angle] where r indicates the distance from the center of the base of an object to its light, a indicates the position of the light relative to 0° (0° when `light.anchor` is set to `viewport` corresponds to the top of the viewport, or 0° when `light.anchor` is set to `map` corresponds to due north, and degrees proceed clockwise), and p indicates the height of the light (from 0°, directly above, to 180°, directly below).
+   * Get the Position property. Position of the light source relative to lit (extruded) geometries, in [r radial coordinate, a azimuthal angle, p polar angle] where r indicates the distance from the center of the base of an object to its light, a indicates the position of the light relative to 0&#xB0; (0&#xB0; when `light.anchor` is set to `viewport` corresponds to the top of the viewport, or 0&#xB0; when `light.anchor` is set to `map` corresponds to due north, and degrees proceed clockwise), and p indicates the height of the light (from 0&#xB0;, directly above, to 180&#xB0;, directly below).
    *
    * @return position as Position
    */
+  @NonNull
   public Position getPosition() {
+    checkThread();
     return nativeGetPosition();
   }
 
@@ -70,7 +81,9 @@ public class Light {
    *
    * @return transition options for position
    */
+  @NonNull
   public TransitionOptions getPositionTransition() {
+    checkThread();
     return nativeGetPositionTransition();
   }
 
@@ -79,7 +92,8 @@ public class Light {
    *
    * @param options transition options for position
    */
-  public void setPositionTransition(TransitionOptions options) {
+  public void setPositionTransition(@NonNull TransitionOptions options) {
+    checkThread();
     nativeSetPositionTransition(options.getDuration(), options.getDelay());
   }
 
@@ -89,7 +103,8 @@ public class Light {
    * @param color as int
    */
   public void setColor(@ColorInt int color) {
-    nativeSetColor(PropertyFactory.colorToRgbaString(color));
+    checkThread();
+    nativeSetColor(ColorUtils.colorToRgbaString(color));
   }
 
   /**
@@ -98,6 +113,7 @@ public class Light {
    * @param color as String
    */
   public void setColor(String color) {
+    checkThread();
     nativeSetColor(color);
   }
 
@@ -106,7 +122,9 @@ public class Light {
    *
    * @return color as String
    */
+   @NonNull
    public String getColor() {
+    checkThread();
     return nativeGetColor();
   }
 
@@ -115,7 +133,9 @@ public class Light {
    *
    * @return transition options for color
    */
+  @NonNull
   public TransitionOptions getColorTransition() {
+    checkThread();
     return nativeGetColorTransition();
   }
 
@@ -124,7 +144,8 @@ public class Light {
    *
    * @param options transition options for color
    */
-  public void setColorTransition(TransitionOptions options) {
+  public void setColorTransition(@NonNull TransitionOptions options) {
+    checkThread();
     nativeSetColorTransition(options.getDuration(), options.getDelay());
   }
 
@@ -134,6 +155,7 @@ public class Light {
    * @param intensity as Float
    */
   public void setIntensity(float intensity) {
+    checkThread();
     nativeSetIntensity(intensity);
   }
 
@@ -142,7 +164,9 @@ public class Light {
    *
    * @return intensity as Float
    */
+   @NonNull
    public float getIntensity() {
+    checkThread();
     return nativeGetIntensity();
   }
 
@@ -151,7 +175,9 @@ public class Light {
    *
    * @return transition options for intensity
    */
+  @NonNull
   public TransitionOptions getIntensityTransition() {
+    checkThread();
     return nativeGetIntensityTransition();
   }
 
@@ -160,22 +186,55 @@ public class Light {
    *
    * @param options transition options for intensity
    */
-  public void setIntensityTransition(TransitionOptions options) {
+  public void setIntensityTransition(@NonNull TransitionOptions options) {
+    checkThread();
     nativeSetIntensityTransition(options.getDuration(), options.getDelay());
   }
 
+  private void checkThread(){
+    ThreadUtils.checkThread("Light");
+  }
+
+  @Keep
   private native void nativeSetAnchor(String anchor);
+
+  @NonNull
+  @Keep
   private native String nativeGetAnchor();
+  @Keep
   private native void nativeSetPosition(Position position);
+
+  @NonNull
+  @Keep
   private native Position nativeGetPosition();
+  @NonNull
+  @Keep
   private native TransitionOptions nativeGetPositionTransition();
+
+  @Keep
   private native void nativeSetPositionTransition(long duration, long delay);
+  @Keep
   private native void nativeSetColor(String color);
+
+  @NonNull
+  @Keep
   private native String nativeGetColor();
+  @NonNull
+  @Keep
   private native TransitionOptions nativeGetColorTransition();
+
+  @Keep
   private native void nativeSetColorTransition(long duration, long delay);
+  @Keep
   private native void nativeSetIntensity(float intensity);
+
+  @NonNull
+  @Keep
   private native float nativeGetIntensity();
+  @NonNull
+  @Keep
   private native TransitionOptions nativeGetIntensityTransition();
+
+  @Keep
   private native void nativeSetIntensityTransition(long duration, long delay);
 }

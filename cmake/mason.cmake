@@ -23,20 +23,14 @@ function(mason_detect_platform)
     if(NOT MASON_PLATFORM_VERSION)
         # Android Studio only passes ANDROID_ABI, but we need to adjust that to the Mason
         if(MASON_PLATFORM STREQUAL "android" AND NOT MASON_PLATFORM_VERSION)
-            if (ANDROID_ABI STREQUAL "armeabi")
-                set(MASON_PLATFORM_VERSION "arm-v5-9" PARENT_SCOPE)
-            elseif (ANDROID_ABI STREQUAL "armeabi-v7a")
-                set(MASON_PLATFORM_VERSION "arm-v7-9" PARENT_SCOPE)
+            if (ANDROID_ABI STREQUAL "armeabi-v7a")
+                set(MASON_PLATFORM_VERSION "arm-v7-14" PARENT_SCOPE)
             elseif (ANDROID_ABI STREQUAL "arm64-v8a")
                 set(MASON_PLATFORM_VERSION "arm-v8-21" PARENT_SCOPE)
             elseif (ANDROID_ABI STREQUAL "x86")
-                set(MASON_PLATFORM_VERSION "x86-9" PARENT_SCOPE)
+                set(MASON_PLATFORM_VERSION "x86-14" PARENT_SCOPE)
             elseif (ANDROID_ABI STREQUAL "x86_64")
                 set(MASON_PLATFORM_VERSION "x86-64-21" PARENT_SCOPE)
-            elseif (ANDROID_ABI STREQUAL "mips")
-                set(MASON_PLATFORM_VERSION "mips-9" PARENT_SCOPE)
-            elseif (ANDROID_ABI STREQUAL "mips64")
-                set(MASON_PLATFORM_VERSION "mips-64-9" PARENT_SCOPE)
             else()
                 message(FATAL_ERROR "Unknown ANDROID_ABI '${ANDROID_ABI}'.")
             endif()
@@ -90,17 +84,15 @@ function(mason_use _PACKAGE)
                 set(_URL "${MASON_REPOSITORY}/${_SLUG}.tar.gz")
                 message("[Mason] Downloading package ${_URL}...")
 
-                set(_FAILED)
-                set(_ERROR)
-                # Note: some CMake versions are compiled without SSL support
+                set(_STATUS)
                 get_filename_component(_CACHE_DIR "${_CACHE_PATH}" DIRECTORY)
                 file(MAKE_DIRECTORY "${_CACHE_DIR}")
-                execute_process(
-                    COMMAND curl --retry 3 -s -f -S -L "${_URL}" -o "${_CACHE_PATH}.tmp"
-                    RESULT_VARIABLE _FAILED
-                    ERROR_VARIABLE _ERROR)
-                if(_FAILED)
-                    message(FATAL_ERROR "[Mason] Failed to download ${_URL}: ${_ERROR}")
+                file(DOWNLOAD "${_URL}" "${_CACHE_PATH}.tmp" STATUS _STATUS TLS_VERIFY ON)
+                
+                list(GET _STATUS 0 _STATUS_CODE)
+                list(GET _STATUS 1 _STATUS_STRING)
+                if(NOT _STATUS_CODE EQUAL 0)
+                    message(FATAL_ERROR "[Mason] Failed to download ${_URL}: ${_STATUS_STRING}")
                 else()
                     # We downloaded to a temporary file to prevent half-finished downloads
                     file(RENAME "${_CACHE_PATH}.tmp" "${_CACHE_PATH}")
@@ -216,8 +208,8 @@ endif()
 
 mason_detect_platform()
 
-# Execute commands if CMake is run in command mode
-if (CMAKE_ARGC)
+# Execute commands if CMake is run in command mode\
+if (CMAKE_ARGC AND "${CMAKE_SCRIPT_MODE_FILE}" STREQUAL "${CMAKE_CURRENT_LIST_DIR}/mason.cmake")
     # Collect remaining arguments for passing to mason_use
     set(_MASON_ARGS)
     foreach(I RANGE 4 ${CMAKE_ARGC})

@@ -7,6 +7,7 @@
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/background_program.hpp>
 #include <mbgl/util/tile_cover.hpp>
+#include <mbgl/map/transform_state.hpp>
 
 namespace mbgl {
 
@@ -33,6 +34,7 @@ void RenderBackgroundLayer::transition(const TransitionParameters &parameters) {
 
 void RenderBackgroundLayer::evaluate(const PropertyEvaluationParameters &parameters) {
     evaluated = unevaluated.evaluate(parameters);
+    crossfade = parameters.getCrossfadeParameters();
 
     passes = evaluated.get<style::BackgroundOpacity>() > 0 ? RenderPass::Translucent
                                                            : RenderPass::None;
@@ -42,12 +44,46 @@ bool RenderBackgroundLayer::hasTransition() const {
     return unevaluated.hasTransition();
 }
 
+bool RenderBackgroundLayer::hasCrossfade() const {
+    return crossfade.t != 1;
+}
+
 void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
     // Note that for bottommost layers without a pattern, the background color is drawn with
     // glClear rather than this method.
 
     const Properties<>::PossiblyEvaluated properties;
     const BackgroundProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+
+    auto draw = [&](auto& program, auto&& uniformValues) {
+        const auto allUniformValues = program.computeAllUniformValues(
+            std::move(uniformValues),
+            paintAttributeData,
+            properties,
+            parameters.state.getZoom()
+        );
+        const auto allAttributeBindings = program.computeAllAttributeBindings(
+            parameters.staticData.tileVertexBuffer,
+            paintAttributeData,
+            properties
+        );
+
+        checkRenderability(parameters, program.activeBindingCount(allAttributeBindings));
+
+        program.draw(
+            parameters.context,
+            gl::Triangles(),
+            parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+            gl::StencilMode::disabled(),
+            parameters.colorModeForRenderPass(),
+            gl::CullFaceMode::disabled(),
+            parameters.staticData.quadTriangleIndexBuffer,
+            parameters.staticData.tileTriangleSegments,
+            allUniformValues,
+            allAttributeBindings,
+            getID()
+        );
+    };
 
     if (!evaluated.get<BackgroundPattern>().to.empty()) {
         optional<ImagePosition> imagePosA = parameters.imageManager.getPattern(evaluated.get<BackgroundPattern>().from);
@@ -59,54 +95,40 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
         parameters.imageManager.bind(parameters.context, 0);
 
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
-            parameters.programs.backgroundPattern.draw(
-                parameters.context,
-                gl::Triangles(),
-                parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
-                gl::StencilMode::disabled(),
-                parameters.colorModeForRenderPass(),
+            draw(
+                parameters.programs.backgroundPattern,
                 BackgroundPatternUniforms::values(
                     parameters.matrixForTile(tileID),
                     evaluated.get<BackgroundOpacity>(),
                     parameters.imageManager.getPixelSize(),
                     *imagePosA,
                     *imagePosB,
-                    evaluated.get<BackgroundPattern>(),
+                    crossfade,
                     tileID,
                     parameters.state
-                ),
-                parameters.staticData.tileVertexBuffer,
-                parameters.staticData.quadTriangleIndexBuffer,
-                parameters.staticData.tileTriangleSegments,
-                paintAttributeData,
-                properties,
-                parameters.state.getZoom(),
-                getID()
+                )
             );
         }
     } else {
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
-            parameters.programs.background.draw(
-                parameters.context,
-                gl::Triangles(),
-                parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
-                gl::StencilMode::disabled(),
-                parameters.colorModeForRenderPass(),
+            draw(
+                parameters.programs.background,
                 BackgroundProgram::UniformValues {
-                    uniforms::u_matrix::Value{ parameters.matrixForTile(tileID) },
-                    uniforms::u_color::Value{ evaluated.get<BackgroundColor>() },
-                    uniforms::u_opacity::Value{ evaluated.get<BackgroundOpacity>() },
-                },
-                parameters.staticData.tileVertexBuffer,
-                parameters.staticData.quadTriangleIndexBuffer,
-                parameters.staticData.tileTriangleSegments,
-                paintAttributeData,
-                properties,
-                parameters.state.getZoom(),
-                getID()
+                    uniforms::u_matrix::Value( parameters.matrixForTile(tileID) ),
+                    uniforms::u_color::Value( evaluated.get<BackgroundColor>() ),
+                    uniforms::u_opacity::Value( evaluated.get<BackgroundOpacity>() ),
+                }
             );
         }
     }
+}
+
+optional<Color> RenderBackgroundLayer::getSolidBackground() const {
+    if (!evaluated.get<BackgroundPattern>().from.empty()) {
+        return nullopt;
+    }
+
+    return { evaluated.get<BackgroundColor>() * evaluated.get<BackgroundOpacity>() };
 }
 
 } // namespace mbgl

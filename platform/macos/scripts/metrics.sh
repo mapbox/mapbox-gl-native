@@ -4,4 +4,4 @@ set -e
 set -o pipefail
 
 # Track individual architectures
-scripts/log_binary_size.sh "build/macos/pkg/Mapbox.framework/Versions/Current/Mapbox"  "Platform=macOS,Arch=x86_64"
+scripts/check_binary_size.js "build/macos/pkg/Mapbox.framework/Versions/Current/Mapbox"  "macOS x86_64"

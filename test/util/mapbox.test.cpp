@@ -116,8 +116,8 @@ TEST(Mapbox, TileURL) {
         "https://api.example.com/v4/a.b/0/0/0.png?access_token=key",
         mbgl::util::mapbox::normalizeTileURL("https://api.example.com", "mapbox://tiles/a.b/0/0/0.png", "key"));
     EXPECT_EQ(
-        "https://api.mapbox.com/v4/a.b/0/0/0@2x.webp?access_token=key",
-        mbgl::util::mapbox::normalizeTileURL(util::API_BASE_URL, "mapbox://tiles/a.b/0/0/0@2x.webp", "key"));
+        "https://api.mapbox.com/v4/a.b/0/0/0@2x.png?access_token=key",
+        mbgl::util::mapbox::normalizeTileURL(util::API_BASE_URL, "mapbox://tiles/a.b/0/0/0@2x.png", "key"));
     EXPECT_EQ(
         "https://api.mapbox.com/v4/a.b,c.d/0/0/0.pbf?access_token=key",
         mbgl::util::mapbox::normalizeTileURL(util::API_BASE_URL, "mapbox://tiles/a.b,c.d/0/0/0.pbf", "key"));
@@ -166,8 +166,6 @@ TEST(Mapbox, CanonicalURL) {
     EXPECT_EQ(
         "mapbox://tiles/a.b/{z}/{x}/{y}@2x.jpg70",
         mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.jpg70?access_token=key", SourceType::Raster, 512));
-
-#if defined(__ANDROID__) || defined(__APPLE__)
     EXPECT_EQ(
         "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.png",
         mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png", SourceType::Raster, 256));
@@ -180,20 +178,6 @@ TEST(Mapbox, CanonicalURL) {
     EXPECT_EQ(
         "mapbox://tiles/a.b/{z}/{x}/{y}@2x.png",
         mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png?access_token=key", SourceType::Raster, 512));
-#else
-    EXPECT_EQ(
-        "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.webp",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png", SourceType::Raster, 256));
-    EXPECT_EQ(
-        "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.webp",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png?access_token=key", SourceType::Raster, 256));
-    EXPECT_EQ(
-        "mapbox://tiles/a.b/{z}/{x}/{y}@2x.webp",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png", SourceType::Raster, 512));
-    EXPECT_EQ(
-        "mapbox://tiles/a.b/{z}/{x}/{y}@2x.webp",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png?access_token=key", SourceType::Raster, 512));
-#endif // defined(__ANDROID__) || defined(__APPLE__)
 
     // We don't ever expect to see these inputs, but be safe anyway.
     EXPECT_EQ(
@@ -221,11 +205,7 @@ TEST(Mapbox, CanonicalizeRasterTileset) {
 
     mbgl::util::mapbox::canonicalizeTileset(tileset, "mapbox://mapbox.satellite", SourceType::Raster, 256);
 
-#if !defined(__ANDROID__) && !defined(__APPLE__)
-    EXPECT_EQ("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.webp", tileset.tiles[0]);
-#else
     EXPECT_EQ("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.png", tileset.tiles[0]);
-#endif
 }
 
 TEST(Mapbox, CanonicalizeVectorTileset) {

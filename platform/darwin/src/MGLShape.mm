@@ -40,7 +40,7 @@ bool operator==(const CLLocationCoordinate2D lhs, const CLLocationCoordinate2D r
 }
 
 - (mbgl::Geometry<double>)geometryObject {
-    [NSException raise:@"MGLAbstractClassException"
+    [NSException raise:MGLAbstractClassException
                 format:@"MGLShape is an abstract class"];
     return mbgl::Point<double>();
 }
@@ -103,9 +103,8 @@ bool operator==(const CLLocationCoordinate2D lhs, const CLLocationCoordinate2D r
 
 - (CLLocationCoordinate2D)coordinate
 {
-    [[NSException exceptionWithName:@"MGLAbstractClassException"
-                             reason:@"MGLShape is an abstract class"
-                           userInfo:nil] raise];
+    [NSException raise:MGLAbstractClassException
+                format:@"MGLShape is an abstract class"];
     return kCLLocationCoordinate2DInvalid;
 }
 

@@ -1,12 +1,17 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/shaders/line.hpp>
+#include <mbgl/shaders/source.hpp>
 
 namespace mbgl {
 namespace shaders {
 
 const char* line::name = "line";
-const char* line::vertexSource = R"MBGL_SHADER(
+const char* line::vertexSource = source() + 41600;
+const char* line::fragmentSource = source() + 46063;
+
+// Uncompressed source of line.vertex.glsl:
+/*
 
 
 // the distance over which the line edge fades out.
@@ -31,6 +36,7 @@ uniform vec2 u_gl_units_to_pixels;
 varying vec2 v_normal;
 varying vec2 v_width2;
 varying float v_gamma_scale;
+varying highp float v_linesofar;
 
 
 #ifndef HAS_UNIFORM_u_color
@@ -87,7 +93,7 @@ uniform mediump float u_width;
 void main() {
     
 #ifndef HAS_UNIFORM_u_color
-    color = unpack_mix_vec4(a_color, a_color_t);
+    color = unpack_mix_color(a_color, a_color_t);
 #else
     highp vec4 color = u_color;
 #endif
@@ -131,6 +137,8 @@ void main() {
     vec2 a_extrude = a_data.xy - 128.0;
     float a_direction = mod(a_data.z, 4.0) - 1.0;
 
+    v_linesofar = (floor(a_data.z / 4.0) + a_data.w * 64.0) * 2.0;
+
     vec2 pos = a_pos_normal.xy;
 
     // x is 1 if it's a round cap, 0 otherwise
@@ -145,7 +153,7 @@ void main() {
     offset = -1.0 * offset;
 
     float inset = gapwidth + (gapwidth > 0.0 ? ANTIALIASING : 0.0);
-    float outset = gapwidth + halfwidth * (gapwidth > 0.0 ? 2.0 : 1.0) + ANTIALIASING;
+    float outset = gapwidth + halfwidth * (gapwidth > 0.0 ? 2.0 : 1.0) + (halfwidth == 0.0 ? 0.0 : ANTIALIASING);
 
     // Scale the extrusion vector down to a normal and then up by the line width
     // of this vertex.
@@ -170,8 +178,10 @@ void main() {
     v_width2 = vec2(outset, inset);
 }
 
-)MBGL_SHADER";
-const char* line::fragmentSource = R"MBGL_SHADER(
+*/
+
+// Uncompressed source of line.fragment.glsl:
+/*
 
 #ifndef HAS_UNIFORM_u_color
 varying highp vec4 color;
@@ -231,7 +241,7 @@ void main() {
 #endif
 }
 
-)MBGL_SHADER";
+*/
 
 } // namespace shaders
 } // namespace mbgl

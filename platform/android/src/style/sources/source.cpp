@@ -1,5 +1,6 @@
 #include "source.hpp"
 #include "../android_conversion.hpp"
+#include "../../attach_env.hpp"
 
 #include <jni/jni.hpp>
 
@@ -7,8 +8,8 @@
 #include <mbgl/util/logging.hpp>
 
 // Java -> C++ conversion
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/source.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 // C++ -> Java conversion
 #include "../conversion/property_value.hpp"
@@ -47,16 +48,16 @@ namespace android {
         }
     }
 
-    jni::Object<Source> Source::peerForCoreSource(jni::JNIEnv& env, mbgl::style::Source& coreSource, AndroidRendererFrontend& frontend) {
+    const jni::Object<Source>& Source::peerForCoreSource(jni::JNIEnv& env, mbgl::style::Source& coreSource, AndroidRendererFrontend& frontend) {
         if (!coreSource.peer.has_value()) {
             coreSource.peer = createSourcePeer(env, coreSource, frontend);
         }
-        return *mbgl::util::any_cast<std::unique_ptr<Source>>(&coreSource.peer)->get()->javaPeer;
+        return coreSource.peer.get<std::unique_ptr<Source>>()->javaPeer;
     }
 
-    Source::Source(jni::JNIEnv& env, mbgl::style::Source& coreSource, jni::Object<Source> obj, AndroidRendererFrontend& frontend)
+    Source::Source(jni::JNIEnv& env, mbgl::style::Source& coreSource, const jni::Object<Source>& obj, AndroidRendererFrontend& frontend)
         : source(coreSource)
-        , javaPeer(obj.NewGlobalRef(env))
+        , javaPeer(jni::NewGlobal(env, obj))
         , rendererFrontend(&frontend) {
     }
 
@@ -76,22 +77,23 @@ namespace android {
         if (ownedSource.get() == nullptr && javaPeer.get() != nullptr) {
             // Manually clear the java peer
             android::UniqueEnv env = android::AttachEnv();
+            static auto& javaClass = jni::Class<Source>::Singleton(*env);
             static auto nativePtrField = javaClass.GetField<jlong>(*env, "nativePtr");
-            javaPeer->Set(*env, nativePtrField, (jlong) 0);
+            javaPeer.Set(*env, nativePtrField, (jlong) 0);
             javaPeer.reset();
         }
     }
 
-    jni::String Source::getId(jni::JNIEnv& env) {
+    jni::Local<jni::String> Source::getId(jni::JNIEnv& env) {
         return jni::Make<jni::String>(env, source.getID());
     }
 
-    jni::String Source::getAttribution(jni::JNIEnv& env) {
+    jni::Local<jni::String> Source::getAttribution(jni::JNIEnv& env) {
         auto attribution = source.getAttribution();
         return attribution ? jni::Make<jni::String>(env, attribution.value()) : jni::Make<jni::String>(env,"");
     }
 
-    void Source::addToMap(JNIEnv& env, jni::Object<Source> obj, mbgl::Map& map, AndroidRendererFrontend& frontend) {
+    void Source::addToMap(JNIEnv& env, const jni::Object<Source>& obj, mbgl::Map& map, AndroidRendererFrontend& frontend) {
         // Check to see if we own the source first
         if (!ownedSource) {
             throw std::runtime_error("Cannot add source twice");
@@ -104,12 +106,12 @@ namespace android {
         source.peer = std::unique_ptr<Source>(this);
 
         // Add strong reference to java source
-        javaPeer = obj.NewGlobalRef(env);
+        javaPeer = jni::NewGlobal(env, obj);
 
         rendererFrontend = &frontend;
     }
 
-    void Source::removeFromMap(JNIEnv&, jni::Object<Source>, mbgl::Map& map) {
+    bool Source::removeFromMap(JNIEnv&, const jni::Object<Source>&, mbgl::Map& map) {
         // Cannot remove if not attached yet
         if (ownedSource) {
             throw std::runtime_error("Cannot remove detached source");
@@ -119,13 +121,18 @@ namespace android {
         ownedSource = map.getStyle().removeSource(source.getID());
 
         // The source may not be removed if any layers still reference it
+        return ownedSource != nullptr;
+    }
+
+    void Source::releaseJavaPeer() {
+        // We can't release the peer if the source was not removed from the map
         if (!ownedSource) {
             return;
         }
 
         // Release the peer relationships. These will be re-established when the source is added to a map
         assert(ownedSource->peer.has_value());
-        util::any_cast<std::unique_ptr<Source>>(&(ownedSource->peer))->release();
+        ownedSource->peer.get<std::unique_ptr<Source>>().release();
         ownedSource->peer.reset();
 
         // Release the strong reference to the java peer
@@ -135,16 +142,14 @@ namespace android {
         rendererFrontend = nullptr;
     }
 
-    jni::Class<Source> Source::javaClass;
-
     void Source::registerNative(jni::JNIEnv& env) {
         // Lookup the class
-        Source::javaClass = *jni::Class<Source>::Find(env).NewGlobalRef(env).release();
+        static auto& javaClass = jni::Class<Source>::Singleton(env);
 
         #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
         // Register the peer
-        jni::RegisterNativePeer<Source>(env, Source::javaClass, "nativePtr",
+        jni::RegisterNativePeer<Source>(env, javaClass, "nativePtr",
             METHOD(&Source::getId, "nativeGetId"),
             METHOD(&Source::getAttribution, "nativeGetAttribution")
         );

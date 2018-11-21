@@ -1,6 +1,6 @@
 #import "MGLRasterDEMSource.h"
 
-#import "MGLRasterSource_Private.h"
+#import "MGLRasterTileSource_Private.h"
 #import "NSURL+MGLAdditions.h"
 
 #import <mbgl/style/sources/raster_dem_source.hpp>

@@ -1,4 +1,4 @@
 #!/bin/sh
 
 export CCACHE_CPP2=true
-exec "@C_LAUNCHER@" "${DEVELOPER_DIR}/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" "$@"
+exec "@C_LAUNCHER@" "${PATH%%/Contents/Developer/*}/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" "$@"

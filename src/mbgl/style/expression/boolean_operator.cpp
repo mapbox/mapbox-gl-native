@@ -1,4 +1,5 @@
 #include <mbgl/style/expression/boolean_operator.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 namespace mbgl {
 namespace style {
@@ -20,7 +21,8 @@ void Any::eachChild(const std::function<void(const Expression&)>& visit) const {
 }
 
 bool Any::operator==(const Expression& e) const {
-    if (auto rhs = dynamic_cast<const Any*>(&e)) {
+    if (e.getKind() == Kind::Any) {
+        auto rhs = static_cast<const Any*>(&e);
         return Expression::childrenEqual(inputs, rhs->inputs);
     }
     return false;
@@ -47,7 +49,8 @@ void All::eachChild(const std::function<void(const Expression&)>& visit) const {
 }
 
 bool All::operator==(const Expression& e) const {
-    if (auto rhs = dynamic_cast<const All*>(&e)) {
+    if (e.getKind() == Kind::All) {
+        auto rhs = static_cast<const All*>(&e);
         return Expression::childrenEqual(inputs, rhs->inputs);
     }
     return false;

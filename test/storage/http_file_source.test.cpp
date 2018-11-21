@@ -2,6 +2,7 @@
 #include <mbgl/storage/http_file_source.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/string.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 using namespace mbgl;
@@ -177,12 +178,12 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(Load)) {
     std::function<void(int)> req = [&](int i) {
         const auto current = number++;
         reqs[i] = fs.request({ Resource::Unknown,
-                     std::string("http://127.0.0.1:3000/load/") + std::to_string(current) },
+                     std::string("http://127.0.0.1:3000/load/") + util::toString(current) },
                    [&, i, current](Response res) {
             reqs[i].reset();
             EXPECT_EQ(nullptr, res.error);
             ASSERT_TRUE(res.data.get());
-            EXPECT_EQ(std::string("Request ") +  std::to_string(current), *res.data);
+            EXPECT_EQ(std::string("Request ") +  util::toString(current), *res.data);
             EXPECT_FALSE(bool(res.expires));
             EXPECT_FALSE(res.mustRevalidate);
             EXPECT_FALSE(bool(res.modified));

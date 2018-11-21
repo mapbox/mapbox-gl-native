@@ -15,7 +15,7 @@
 namespace mbgl {
 
 class SymbolInstance;
-class RenderSymbolLayer;
+class RenderLayerSymbolInterface;
 class SymbolBucket;
 
 class IndexedSymbolInstance {
@@ -45,18 +45,20 @@ public:
     CrossTileSymbolLayerIndex();
     bool addBucket(const OverscaledTileID&, SymbolBucket&, uint32_t& maxCrossTileID);
     bool removeStaleBuckets(const std::unordered_set<uint32_t>& currentIDs);
+    void handleWrapJump(float newLng);
 private:
     void removeBucketCrossTileIDs(uint8_t zoom, const TileLayerIndex& removedBucket);
 
     std::map<uint8_t, std::map<OverscaledTileID,TileLayerIndex>> indexes;
     std::map<uint8_t, std::set<uint32_t>> usedCrossTileIDs;
+    float lng = 0;
 };
 
 class CrossTileSymbolIndex {
 public:
     CrossTileSymbolIndex();
 
-    bool addLayer(RenderSymbolLayer&);
+    bool addLayer(const RenderLayerSymbolInterface&, float lng);
     void pruneUnusedLayers(const std::set<std::string>&);
 
     void reset();

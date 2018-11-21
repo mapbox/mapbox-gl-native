@@ -2,53 +2,70 @@ ext {
 
     androidVersions = [
             minSdkVersion    : 14,
-            targetSdkVersion : 25,
-            compileSdkVersion: 25,
-            buildToolsVersion: '26.0.3'
+            targetSdkVersion : 27,
+            compileSdkVersion: 27,
+            buildToolsVersion: '27.0.3'
     ]
 
     versions = [
-            mapboxServices: '3.0.0-beta.2',
-            mapboxTelemetry: '2.2.9',
-            supportLib    : '25.4.0',
-            espresso      : '3.0.1',
-            testRunner    : '1.0.1',
-            leakCanary    : '1.5.1',
-            lost          : '3.0.4',
-            junit         : '4.12',
-            mockito       : '2.10.0',
-            robolectric   : '3.5.1',
-            timber        : '4.5.1',
-            okhttp        : '3.9.1'
+            mapboxServices  : '4.1.0',
+            mapboxTelemetry : '3.5.4',
+            mapboxGestures  : '0.3.0',
+            supportLib      : '27.1.1',
+            constraintLayout: '1.1.2',
+            espresso        : '3.0.2',
+            testRunner      : '1.0.2',
+            leakCanary      : '1.6.1',
+            junit           : '4.12',
+            mockito         : '2.18.3',
+            robolectric     : '3.8',
+            timber          : '4.7.1',
+            okhttp          : '3.11.0',
+            kotlin          : '1.2.51',
+            licenses        : '0.8.41',
+            lint            : '26.1.3'
     ]
 
     dependenciesList = [
-            mapboxJavaServices    : "com.mapbox.mapboxsdk:mapbox-sdk-services:${versions.mapboxServices}",
-            mapboxJavaGeoJSON     : "com.mapbox.mapboxsdk:mapbox-sdk-geojson:${versions.mapboxServices}",
-            mapboxAndroidTelemetry: "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxTelemetry}",
+            mapboxJavaServices     : "com.mapbox.mapboxsdk:mapbox-sdk-services:${versions.mapboxServices}",
+            mapboxJavaGeoJSON      : "com.mapbox.mapboxsdk:mapbox-sdk-geojson:${versions.mapboxServices}",
+            mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxTelemetry}",
+            mapboxAndroidGestures  : "com.mapbox.mapboxsdk:mapbox-android-gestures:${versions.mapboxGestures}",
 
             // for testApp
-            mapboxJavaTurf        : "com.mapbox.mapboxsdk:mapbox-sdk-turf:${versions.mapboxServices}",
+            mapboxJavaTurf         : "com.mapbox.mapboxsdk:mapbox-sdk-turf:${versions.mapboxServices}",
 
-            junit                 : "junit:junit:${versions.junit}",
-            mockito               : "org.mockito:mockito-core:${versions.mockito}",
-            robolectric           : "org.robolectric:robolectric:${versions.robolectric}",
+            junit                  : "junit:junit:${versions.junit}",
+            mockito                : "org.mockito:mockito-core:${versions.mockito}",
+            robolectric            : "org.robolectric:robolectric:${versions.robolectric}",
 
-            testRunner            : "com.android.support.test:runner:${versions.testRunner}",
-            testRules             : "com.android.support.test:rules:${versions.testRunner}",
-            testEspressoCore      : "com.android.support.test.espresso:espresso-core:${versions.espresso}",
-            testEspressoIntents   : "com.android.support.test.espresso:espresso-intents:${versions.espresso}",
+            testRunner             : "com.android.support.test:runner:${versions.testRunner}",
+            testRules              : "com.android.support.test:rules:${versions.testRunner}",
+            testEspressoCore       : "com.android.support.test.espresso:espresso-core:${versions.espresso}",
+            testEspressoIntents    : "com.android.support.test.espresso:espresso-intents:${versions.espresso}",
+            testEspressoContrib    : "com.android.support.test.espresso:espresso-contrib:${versions.espresso}",
 
-            supportAnnotations    : "com.android.support:support-annotations:${versions.supportLib}",
-            supportAppcompatV7    : "com.android.support:appcompat-v7:${versions.supportLib}",
-            supportFragmentV4     : "com.android.support:support-fragment:${versions.supportLib}",
-            supportDesign         : "com.android.support:design:${versions.supportLib}",
-            supportRecyclerView   : "com.android.support:recyclerview-v7:${versions.supportLib}",
+            supportAnnotations     : "com.android.support:support-annotations:${versions.supportLib}",
+            supportAppcompatV7     : "com.android.support:appcompat-v7:${versions.supportLib}",
+            supportFragmentV4      : "com.android.support:support-fragment:${versions.supportLib}",
+            supportUtilV4          : "com.android.support:support-core-utils:${versions.supportLib}",
+            supportDesign          : "com.android.support:design:${versions.supportLib}",
+            supportRecyclerView    : "com.android.support:recyclerview-v7:${versions.supportLib}",
+            supportConstraintLayout: "com.android.support.constraint:constraint-layout:${versions.constraintLayout}",
 
-            lost                  : "com.mapzen.android:lost:${versions.lost}",
-            timber                : "com.jakewharton.timber:timber:${versions.timber}",
-            okhttp3               : "com.squareup.okhttp3:okhttp:${versions.okhttp}",
-            leakCanaryDebug       : "com.squareup.leakcanary:leakcanary-android:${versions.leakCanary}",
-            leakCanaryRelease     : "com.squareup.leakcanary:leakcanary-android-no-op:${versions.leakCanary}"
+            gmsLocation            : 'com.google.android.gms:play-services-location:11.0.4',
+            timber                 : "com.jakewharton.timber:timber:${versions.timber}",
+            okhttp3                : "com.squareup.okhttp3:okhttp:${versions.okhttp}",
+            leakCanaryDebug        : "com.squareup.leakcanary:leakcanary-android:${versions.leakCanary}",
+            leakCanaryRelease      : "com.squareup.leakcanary:leakcanary-android-no-op:${versions.leakCanary}",
+
+            kotlinLib              : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}",
+            kotlinPlugin           : "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
+            licensesPlugin         : "com.jaredsburrows:gradle-license-plugin:${versions.licenses}",
+
+            lint                   : "com.android.tools.lint:lint:${versions.lint}",
+            lintApi                : "com.android.tools.lint:lint-api:${versions.lint}",
+            lintChecks             : "com.android.tools.lint:lint-checks:${versions.lint}",
+            lintTests              : "com.android.tools.lint:lint-tests:${versions.lint}"
     ]
 }

@@ -12,18 +12,15 @@ public:
 
     static constexpr auto Name() { return "android/graphics/RectF"; };
 
-    static float getLeft(jni::JNIEnv&, jni::Object<RectF>);
+    static float getLeft(jni::JNIEnv&, const jni::Object<RectF>&);
 
-    static float getTop(jni::JNIEnv&, jni::Object<RectF>);
+    static float getTop(jni::JNIEnv&, const jni::Object<RectF>&);
 
-    static float getRight(jni::JNIEnv&, jni::Object<RectF>);
+    static float getRight(jni::JNIEnv&, const jni::Object<RectF>&);
 
-    static float getBottom(jni::JNIEnv&, jni::Object<RectF>);
-
-    static jni::Class<RectF> javaClass;
+    static float getBottom(jni::JNIEnv&, const jni::Object<RectF>&);
 
     static void registerNative(jni::JNIEnv&);
-
 };
 
 

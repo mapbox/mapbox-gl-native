@@ -6,7 +6,7 @@
 namespace node_mbgl {
 
 NodeThreadPool::NodeThreadPool()
-    : queue(new util::AsyncQueue<std::weak_ptr<mbgl::Mailbox>>(uv_default_loop(), [this](std::weak_ptr<mbgl::Mailbox> mailbox) {
+    : queue(new util::AsyncQueue<std::weak_ptr<mbgl::Mailbox>>(uv_default_loop(), [](std::weak_ptr<mbgl::Mailbox> mailbox) {
         Worker* worker = new Worker(mailbox);
         Nan::AsyncQueueWorker(worker);
     })) {

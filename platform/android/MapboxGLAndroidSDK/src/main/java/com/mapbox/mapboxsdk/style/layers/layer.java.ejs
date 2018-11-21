@@ -8,12 +8,21 @@
 package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.ColorInt;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 
 import static com.mapbox.mapboxsdk.utils.ColorUtils.rgbaToColor;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+<% if (type === 'symbol') { -%>
+import com.mapbox.mapboxsdk.style.types.Formatted;
+import com.mapbox.mapboxsdk.style.types.FormattedSection;
+<% } -%>
 
 /**
  * <%- doc %>
@@ -28,7 +37,8 @@ public class <%- camelize(type) %>Layer extends Layer {
    *
    * @param nativePtr pointer used by core
    */
-  public <%- camelize(type) %>Layer(long nativePtr) {
+  @Keep
+  <%- camelize(type) %>Layer(long nativePtr) {
     super(nativePtr);
   }
 
@@ -39,9 +49,11 @@ public class <%- camelize(type) %>Layer extends Layer {
    * @param layerId the id of the layer
    */
   public <%- camelize(type) %>Layer(String layerId) {
+    super();
     initialize(layerId);
   }
 
+  @Keep
   protected native void initialize(String layerId);
 
 <% } else { -%>
@@ -52,9 +64,11 @@ public class <%- camelize(type) %>Layer extends Layer {
    * @param sourceId the id of the source
    */
   public <%- camelize(type) %>Layer(String layerId, String sourceId) {
+    super();
     initialize(layerId, sourceId);
   }
 
+  @Keep
   protected native void initialize(String layerId, String sourceId);
 
   /**
@@ -63,6 +77,7 @@ public class <%- camelize(type) %>Layer extends Layer {
    * @param sourceLayer the source layer to set
    */
   public void setSourceLayer(String sourceLayer) {
+    checkThread();
     nativeSetSourceLayer(sourceLayer);
   }
 
@@ -72,9 +87,23 @@ public class <%- camelize(type) %>Layer extends Layer {
    * @param sourceLayer the source layer to set
    * @return This
    */
+  @NonNull
   public <%- camelize(type) %>Layer withSourceLayer(String sourceLayer) {
     setSourceLayer(sourceLayer);
     return this;
+  }
+
+<% } -%>
+<% if (type !== 'background' && type !== 'custom') { -%>
+  /**
+   * Get the source id.
+   *
+   * @return id of the source
+   */
+  @NonNull
+  public String getSourceId() {
+    checkThread();
+    return nativeGetSourceId();
   }
 
 <% } -%>
@@ -84,28 +113,48 @@ public class <%- camelize(type) %>Layer extends Layer {
    *
    * @return sourceLayer the source layer to get
    */
+  @NonNull
   public String getSourceLayer() {
+    checkThread();
     return nativeGetSourceLayer();
   }
 
   /**
-   * Set a single filter.
+   * Set a single expression filter.
    *
-   * @param filter the filter to set
+   * @param filter the expression filter to set
    */
-  public void setFilter(Filter.Statement filter) {
+  public void setFilter(@NonNull Expression filter) {
+    checkThread();
     nativeSetFilter(filter.toArray());
   }
 
   /**
-   * Set a single filter.
+   * Set a single expression filter.
    *
-   * @param filter the filter to set
+   * @param filter the expression filter to set
    * @return This
    */
-  public <%- camelize(type) %>Layer withFilter(Filter.Statement filter) {
+  @NonNull
+  public <%- camelize(type) %>Layer withFilter(@NonNull Expression filter) {
     setFilter(filter);
     return this;
+  }
+
+  /**
+   * Get a single expression filter.
+   *
+   * @return the expression filter to get
+   */
+  @Nullable
+  public Expression getFilter() {
+    checkThread();
+    JsonElement jsonElement = nativeGetFilter();
+    if (jsonElement != null) {
+      return Expression.Converter.convert(jsonElement);
+    } else {
+      return null;
+    }
   }
 
 <% } -%>
@@ -115,6 +164,7 @@ public class <%- camelize(type) %>Layer extends Layer {
    * @param properties the var-args properties
    * @return This
    */
+  @NonNull
   public <%- camelize(type) %>Layer withProperties(@NonNull PropertyValue<?>... properties) {
     setProperties(properties);
     return this;
@@ -128,8 +178,10 @@ public class <%- camelize(type) %>Layer extends Layer {
    *
    * @return property wrapper value around <%- propertyType(property) %>
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<<%- propertyType(property) %>> get<%- camelize(property.name) %>() {
+    checkThread();
     return (PropertyValue<<%- propertyType(property) %>>) new PropertyValue("<%- property.name %>", nativeGet<%- camelize(property.name) %>());
   }
 <% if (property.type == 'color') { -%>
@@ -142,6 +194,7 @@ public class <%- camelize(type) %>Layer extends Layer {
    */
   @ColorInt
   public int get<%- camelize(property.name) %>AsInt() {
+    checkThread();
     PropertyValue<<%- propertyType(property) %>> value = get<%- camelize(property.name) %>();
     if (value.isValue()) {
       return rgbaToColor(value.getValue());
@@ -157,7 +210,9 @@ public class <%- camelize(type) %>Layer extends Layer {
    *
    * @return transition options for <%- propertyType(property) %>
    */
+  @NonNull
   public TransitionOptions get<%- camelize(property.name) %>Transition() {
+    checkThread();
     return nativeGet<%- camelize(property.name) %>Transition();
   }
 
@@ -166,23 +221,30 @@ public class <%- camelize(type) %>Layer extends Layer {
    *
    * @param options transition options for <%- propertyType(property) %>
    */
-  public void set<%- camelize(property.name) %>Transition(TransitionOptions options) {
+  public void set<%- camelize(property.name) %>Transition(@NonNull TransitionOptions options) {
+    checkThread();
     nativeSet<%- camelize(property.name) %>Transition(options.getDuration(), options.getDelay());
   }
 <% } -%>
 <% } -%>
 
 <% for (const property of properties) { -%>
+  @NonNull
+  @Keep
   private native Object nativeGet<%- camelize(property.name) %>();
 
 <% if (property.transition) { -%>
+  @NonNull
+  @Keep
   private native TransitionOptions nativeGet<%- camelize(property.name) %>Transition();
 
+  @Keep
   private native void nativeSet<%- camelize(property.name) %>Transition(long duration, long delay);
 
 <% } -%>
 <% } -%>
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
 }

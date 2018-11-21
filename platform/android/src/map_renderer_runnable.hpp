@@ -22,8 +22,6 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/maps/renderer/MapRendererRunnable"; };
 
-    static jni::Class<MapRendererRunnable> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
     MapRendererRunnable(jni::JNIEnv&, std::weak_ptr<Mailbox>);
@@ -38,10 +36,10 @@ public:
     void run(jni::JNIEnv&);
 
     // Transfers ownership of the Peer object to the caller
-    jni::UniqueObject<MapRendererRunnable> peer();
+    jni::Global<jni::Object<MapRendererRunnable>> peer();
 
 private:
-    jni::UniqueObject<MapRendererRunnable> javaPeer;
+    jni::Global<jni::Object<MapRendererRunnable>> javaPeer;
     std::weak_ptr<Mailbox> mailbox;
 };
 

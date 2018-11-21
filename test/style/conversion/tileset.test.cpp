@@ -62,6 +62,26 @@ TEST(Tileset, ValidWorldBounds) {
     EXPECT_EQ(converted->bounds, LatLngBounds::hull({90, -180}, {-90, 180}));
 }
 
+TEST(Tileset, PointBounds) {
+    Error error;
+    mbgl::optional<Tileset> converted = convertJSON<Tileset>(R"JSON({
+        "tiles": ["http://mytiles"],
+        "bounds": [0, 0, 0, 0]
+    })JSON", error);
+    EXPECT_TRUE((bool) converted);
+    EXPECT_EQ(converted->bounds, LatLngBounds::hull({0, 0}, {0, 0}));
+}
+
+TEST(Tileset, BoundsAreClamped) {
+    Error error;
+    mbgl::optional<Tileset> converted = convertJSON<Tileset>(R"JSON({
+        "tiles": ["http://mytiles"],
+        "bounds": [-181.0000005,-90.000000006,180.00000000000006,91]
+    })JSON", error);
+    EXPECT_TRUE((bool) converted);
+    EXPECT_EQ(converted->bounds, LatLngBounds::hull({90, -180}, {-90, 180}));
+}
+
 TEST(Tileset, FullConversion) {
     Error error;
     Tileset converted = *convertJSON<Tileset>(R"JSON({

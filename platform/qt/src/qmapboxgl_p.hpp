@@ -37,6 +37,9 @@ public:
     void render();
     void setFramebufferObject(quint32 fbo, const QSize& size);
 
+    using PropertySetter = mbgl::optional<mbgl::style::conversion::Error> (mbgl::style::Layer::*)(const std::string&, const mbgl::style::conversion::Convertible&);
+    bool setProperty(const PropertySetter& setter, const QString& layer, const QString& name, const QVariant& value);
+
     mbgl::EdgeInsets margins;
     std::unique_ptr<mbgl::Map> mapObj;
 
@@ -51,6 +54,7 @@ private:
 
     std::recursive_mutex m_mapRendererMutex;
     std::shared_ptr<mbgl::RendererObserver> m_rendererObserver;
+    std::shared_ptr<mbgl::UpdateParameters> m_updateParameters;
 
     std::unique_ptr<QMapboxGLMapObserver> m_mapObserver;
     std::shared_ptr<mbgl::DefaultFileSource> m_fileSourceObj;

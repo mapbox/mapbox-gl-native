@@ -11,7 +11,6 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                optional<PositionedIcon> shapedIcon,
                                const SymbolLayoutProperties::Evaluated& layout,
                                const float layoutTextSize,
-                               const uint32_t index_,
                                const float textBoxScale,
                                const float textPadding,
                                const SymbolPlacementType textPlacement,
@@ -19,21 +18,23 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                const float iconBoxScale,
                                const float iconPadding,
                                const std::array<float, 2> iconOffset_,
-                               const GlyphPositionMap& positions,
+                               const GlyphPositions& positions,
                                const IndexedSubfeature& indexedFeature,
-                               const std::size_t featureIndex_,
+                               const std::size_t layoutFeatureIndex_,
+                               const std::size_t dataFeatureIndex_,
                                const std::u16string& key_,
-                               const float overscaling) :
+                               const float overscaling,
+                               const float rotate) :
     anchor(anchor_),
     line(line_),
-    index(index_),
-    hasText(shapedTextOrientations.first || shapedTextOrientations.second),
+    hasText(false),
     hasIcon(shapedIcon),
 
     // Create the collision features that will be used to check whether this symbol instance can be placed
-    textCollisionFeature(line_, anchor, shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature, overscaling),
-    iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, indexedFeature),
-    featureIndex(featureIndex_),
+    textCollisionFeature(line_, anchor, shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature, overscaling, rotate),
+    iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, indexedFeature, rotate),
+    layoutFeatureIndex(layoutFeatureIndex_),
+    dataFeatureIndex(dataFeatureIndex_),
     textOffset(textOffset_),
     iconOffset(iconOffset_),
     key(key_) {
@@ -48,6 +49,8 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     if (shapedTextOrientations.second) {
         verticalGlyphQuads = getGlyphQuads(shapedTextOrientations.second, layout, textPlacement, positions);
     }
+    // 'hasText' depends on finding at least one glyph in the shaping that's also in the GlyphPositionMap
+    hasText = horizontalGlyphQuads.size() > 0 || verticalGlyphQuads.size() > 0;
 
     if (shapedTextOrientations.first && shapedTextOrientations.second) {
         writingModes = WritingModeType::Horizontal | WritingModeType::Vertical;

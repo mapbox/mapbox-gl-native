@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ import java.util.List;
 public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
 
   private final List<OnMapReadyCallback> mapReadyCallbackList = new ArrayList<>();
+  private MapFragment.OnMapViewReadyCallback mapViewReadyCallback;
   private MapboxMap mapboxMap;
   private MapView map;
 
@@ -49,10 +51,37 @@ public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
    * @param mapboxMapOptions The configuration options to be used.
    * @return MapFragment created.
    */
+  @NonNull
   public static SupportMapFragment newInstance(@Nullable MapboxMapOptions mapboxMapOptions) {
     SupportMapFragment mapFragment = new SupportMapFragment();
     mapFragment.setArguments(MapFragmentUtils.createFragmentArgs(mapboxMapOptions));
     return mapFragment;
+  }
+
+  /**
+   * Called when the context attaches to this fragment.
+   *
+   * @param context the context attaching
+   */
+  @Override
+  public void onAttach(Context context) {
+    super.onAttach(context);
+    if (context instanceof MapFragment.OnMapViewReadyCallback) {
+      mapViewReadyCallback = (MapFragment.OnMapViewReadyCallback) context;
+    }
+  }
+
+  /**
+   * Called when this fragment is inflated, parses XML tag attributes.
+   *
+   * @param context            The context inflating this fragment.
+   * @param attrs              The XML tag attributes.
+   * @param savedInstanceState The saved instance state for the map fragment.
+   */
+  @Override
+  public void onInflate(@NonNull Context context, AttributeSet attrs, Bundle savedInstanceState) {
+    super.onInflate(context, attrs, savedInstanceState);
+    setArguments(MapFragmentUtils.createFragmentArgs(MapboxMapOptions.createFromAttributes(context, attrs)));
   }
 
   /**
@@ -82,10 +111,15 @@ public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
     super.onViewCreated(view, savedInstanceState);
     map.onCreate(savedInstanceState);
     map.getMapAsync(this);
+
+    // notify listeners about MapView creation
+    if (mapViewReadyCallback != null) {
+      mapViewReadyCallback.onMapViewReady(map);
+    }
   }
 
   @Override
-  public void onMapReady(MapboxMap mapboxMap) {
+  public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
     for (OnMapReadyCallback onMapReadyCallback : mapReadyCallbackList) {
       onMapReadyCallback.onMapReady(mapboxMap);
@@ -127,7 +161,9 @@ public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
   @Override
   public void onSaveInstanceState(@NonNull Bundle outState) {
     super.onSaveInstanceState(outState);
-    map.onSaveInstanceState(outState);
+    if (map != null && !map.isDestroyed()) {
+      map.onSaveInstanceState(outState);
+    }
   }
 
   /**
@@ -145,7 +181,9 @@ public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
   @Override
   public void onLowMemory() {
     super.onLowMemory();
-    map.onLowMemory();
+    if (map != null && !map.isDestroyed()) {
+      map.onLowMemory();
+    }
   }
 
   /**

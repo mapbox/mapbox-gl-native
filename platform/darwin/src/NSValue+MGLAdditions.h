@@ -29,6 +29,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) CLLocationCoordinate2D MGLCoordinateValue;
 
 /**
+ Creates a new value object containing the specified Mapbox map point structure.
+
+ @param point The value for the new object.
+ @return A new value object that contains the coordinate and zoom level information.
+ */
++ (instancetype)valueWithMGLMapPoint:(MGLMapPoint)point;
+
+/**
+ The Mapbox map point structure representation of the value.
+ */
+@property (readonly) MGLMapPoint MGLMapPointValue;
+
+/**
  Creates a new value object containing the specified Mapbox coordinate span
  structure.
 

@@ -7,12 +7,22 @@
 #import "MGLOfflinePack_Private.h"
 #import "MGLOfflineRegion_Private.h"
 #import "MGLTilePyramidOfflineRegion.h"
+#import "MGLShapeOfflineRegion.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSValue+MGLAdditions.h"
+#import "NSDate+MGLAdditions.h"
+#import "NSData+MGLAdditions.h"
+#import "MGLLoggingConfiguration_Private.h"
+
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#import "MMEConstants.h"
+#import "MGLMapboxEvents.h"
+#endif
 
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/storage/resource_transform.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 
@@ -26,17 +36,15 @@ const NSNotificationName MGLOfflinePackErrorNotification = @"MGLOfflinePackError
 const NSNotificationName MGLOfflinePackMaximumMapboxTilesReachedNotification = @"MGLOfflinePackMaximumMapboxTilesReached";
 
 const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyState = @"State";
-NSString * const MGLOfflinePackStateUserInfoKey = MGLOfflinePackUserInfoKeyState;
 const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyProgress = @"Progress";
-NSString * const MGLOfflinePackProgressUserInfoKey = MGLOfflinePackUserInfoKeyProgress;
 const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyError = @"Error";
-NSString * const MGLOfflinePackErrorUserInfoKey = MGLOfflinePackUserInfoKeyError;
 const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount = @"MaximumCount";
-NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoKeyMaximumCount;
+
+const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegionTypeException";
 
 @interface MGLOfflineStorage ()
 
-@property (nonatomic, strong, readwrite) NS_MUTABLE_ARRAY_OF(MGLOfflinePack *) *packs;
+@property (nonatomic, strong, readwrite) NSMutableArray<MGLOfflinePack *> *packs;
 @property (nonatomic) mbgl::DefaultFileSource *mbglFileSource;
 @property (nonatomic, getter=isPaused) BOOL paused;
 
@@ -80,6 +88,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
 #endif
 
 - (void)setDelegate:(id<MGLOfflineStorageDelegate>)newValue {
+    MGLLogDebug(@"Setting delegate: %@", newValue);
     _delegate = newValue;
     if ([self.delegate respondsToSelector:@selector(offlineStorage:URLForResourceOfKind:withURL:)]) {
         _mbglResourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(*mbgl::Scheduler::GetCurrent(), [offlineStorage = self](auto kind_, const std::string&& url_) -> std::string {
@@ -247,7 +256,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
     _mbglFileSource = nullptr;
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NS_DICTIONARY_OF(NSString *, id) *)change context:(void *)context {
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *, id> *)change context:(void *)context {
     // Synchronize the file source’s access token with the global one in MGLAccountManager.
     if ([keyPath isEqualToString:@"accessToken"] && object == [MGLAccountManager sharedManager]) {
         NSString *accessToken = change[NSKeyValueChangeNewKey];
@@ -266,9 +275,94 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
     }
 }
 
+#pragma mark Offline merge methods
+
+- (void)addContentsOfFile:(NSString *)filePath withCompletionHandler:(MGLBatchedOfflinePackAdditionCompletionHandler)completion {
+    MGLLogDebug(@"Adding contentsOfFile: %@ completionHandler: %@", filePath, completion);
+    NSURL *fileURL = [NSURL fileURLWithPath:filePath];
+    
+    [self addContentsOfURL:fileURL withCompletionHandler:completion];
+
+}
+
+- (void)addContentsOfURL:(NSURL *)fileURL withCompletionHandler:(MGLBatchedOfflinePackAdditionCompletionHandler)completion {
+    MGLLogDebug(@"Adding contentsOfURL: %@ completionHandler: %@", fileURL, completion);
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    if (!fileURL.isFileURL) {
+        [NSException raise:NSInvalidArgumentException format:@"%@ must be a valid file path", fileURL.absoluteString];
+    }
+    if (![fileManager isWritableFileAtPath:fileURL.path]) {
+        [NSException raise:NSInvalidArgumentException format:@"The file path: %@ must be writable", fileURL.absoluteString];
+    }
+    
+    __weak MGLOfflineStorage *weakSelf = self;
+    [self _addContentsOfFile:fileURL.path withCompletionHandler:^(NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
+        if (packs) {
+            NSMutableDictionary *packsByIdentifier = [NSMutableDictionary dictionary];
+            
+            MGLOfflineStorage *strongSelf = weakSelf;
+            for (MGLOfflinePack *pack in packs) {
+                [packsByIdentifier setObject:pack forKey:@(pack.mbglOfflineRegion->getID())];
+            }
+            
+            id mutablePacks = [strongSelf mutableArrayValueForKey:@"packs"];
+            NSMutableIndexSet *replaceIndexSet = [NSMutableIndexSet indexSet];
+            NSMutableArray *replacePacksArray = [NSMutableArray array];
+            [strongSelf.packs enumerateObjectsUsingBlock:^(MGLOfflinePack * _Nonnull pack, NSUInteger idx, BOOL * _Nonnull stop) {
+                MGLOfflinePack *newPack = packsByIdentifier[@(pack.mbglOfflineRegion->getID())];
+                if (newPack) {
+                    MGLOfflinePack *previousPack = [mutablePacks objectAtIndex:idx];
+                    [previousPack invalidate];
+                    [replaceIndexSet addIndex:idx];
+                    [replacePacksArray addObject:[packsByIdentifier objectForKey:@(newPack.mbglOfflineRegion->getID())]];
+                    [packsByIdentifier removeObjectForKey:@(newPack.mbglOfflineRegion->getID())];
+                }
+
+            }];
+            
+            if (replaceIndexSet.count > 0) {
+                [mutablePacks replaceObjectsAtIndexes:replaceIndexSet withObjects:replacePacksArray];
+            }
+            
+            [mutablePacks addObjectsFromArray:packsByIdentifier.allValues];
+        }
+        if (completion) {
+            completion(fileURL, packs, error);
+        }
+    }];
+}
+
+- (void)_addContentsOfFile:(NSString *)filePath withCompletionHandler:(void (^)(NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error))completion {
+    self.mbglFileSource->mergeOfflineRegions(std::string(static_cast<const char *>([filePath UTF8String])), [&, completion, filePath](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> result) {
+        NSError *error;
+        NSMutableArray *packs;
+        if (!result) {
+            NSString *description = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"ADD_FILE_CONTENTS_FAILED_DESC", @"Foundation", nil, @"Unable to add offline packs from the file at %@.", @"User-friendly error description"), filePath];
+            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
+                                                                               NSLocalizedDescriptionKey: description,
+                                                                               NSLocalizedFailureReasonErrorKey: @(mbgl::util::toString(result.error()).c_str())
+                                                                               }];
+        } else {
+            auto& regions = result.value();
+            packs = [NSMutableArray arrayWithCapacity:regions.size()];
+            for (auto &region : regions) {
+                MGLOfflinePack *pack = [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(region))];
+                [packs addObject:pack];
+            }
+        }
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), [&, completion, error, packs](void) {
+                completion(packs, error);
+            });
+        }
+    });
+}
+
 #pragma mark Pack management methods
 
 - (void)addPackForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflinePackAdditionCompletionHandler)completion {
+    MGLLogDebug(@"Adding packForRegion: %@ contextLength: %lu completionHandler: %@", region, (unsigned long)context.length, completion);
     __weak MGLOfflineStorage *weakSelf = self;
     [self _addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack * _Nullable pack, NSError * _Nullable error) {
         pack.state = MGLOfflinePackStateInactive;
@@ -277,29 +371,40 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
         if (completion) {
             completion(pack, error);
         }
+            
+        #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+            NSMutableDictionary *offlineDownloadStartEventAttributes = [NSMutableDictionary dictionaryWithObject:MMEventTypeOfflineDownloadStart forKey:MMEEventKeyEvent];
+        
+            if ([region conformsToProtocol:@protocol(MGLOfflineRegion_Private)]) {
+                NSDictionary *regionAttributes = ((id<MGLOfflineRegion_Private>)region).offlineStartEventAttributes;
+                [offlineDownloadStartEventAttributes addEntriesFromDictionary:regionAttributes];
+            }
+        
+            [MGLMapboxEvents pushEvent:MMEventTypeOfflineDownloadStart withAttributes:offlineDownloadStartEventAttributes];
+        #endif
     }];
 }
 
 - (void)_addPackForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflinePackAdditionCompletionHandler)completion {
     if (![region conformsToProtocol:@protocol(MGLOfflineRegion_Private)]) {
-        [NSException raise:@"Unsupported region type" format:
-         @"Regions of type %@ are unsupported.", NSStringFromClass([region class])];
+        [NSException raise:MGLUnsupportedRegionTypeException
+                    format:@"Regions of type %@ are unsupported.", NSStringFromClass([region class])];
         return;
     }
 
-    const mbgl::OfflineTilePyramidRegionDefinition regionDefinition = [(id <MGLOfflineRegion_Private>)region offlineRegionDefinition];
+    const mbgl::OfflineRegionDefinition regionDefinition = [(id <MGLOfflineRegion_Private>)region offlineRegionDefinition];
     mbgl::OfflineRegionMetadata metadata(context.length);
     [context getBytes:&metadata[0] length:metadata.size()];
-    self.mbglFileSource->createOfflineRegion(regionDefinition, metadata, [&, completion](std::exception_ptr exception, mbgl::optional<mbgl::OfflineRegion> mbglOfflineRegion) {
+    self.mbglFileSource->createOfflineRegion(regionDefinition, metadata, [&, completion](mbgl::expected<mbgl::OfflineRegion, std::exception_ptr> mbglOfflineRegion) {
         NSError *error;
-        if (exception) {
-            NSString *errorDescription = @(mbgl::util::toString(exception).c_str());
+        if (!mbglOfflineRegion) {
+            NSString *errorDescription = @(mbgl::util::toString(mbglOfflineRegion.error()).c_str());
             error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:errorDescription ? @{
                 NSLocalizedDescriptionKey: errorDescription,
             } : nil];
         }
         if (completion) {
-            MGLOfflinePack *pack = mbglOfflineRegion ? [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(*mbglOfflineRegion))] : nil;
+            MGLOfflinePack *pack = mbglOfflineRegion ? [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(mbglOfflineRegion.value()))] : nil;
             dispatch_async(dispatch_get_main_queue(), [&, completion, error, pack](void) {
                 completion(pack, error);
             });
@@ -308,6 +413,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
 }
 
 - (void)removePack:(MGLOfflinePack *)pack withCompletionHandler:(MGLOfflinePackRemovalCompletionHandler)completion {
+    MGLLogDebug(@"Removing pack: %@ completionHandler: %@", pack, completion);
     [[self mutableArrayValueForKey:@"packs"] removeObject:pack];
     [self _removePack:pack withCompletionHandler:^(NSError * _Nullable error) {
         if (completion) {
@@ -340,7 +446,8 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
 }
 
 - (void)reloadPacks {
-    [self getPacksWithCompletionHandler:^(NS_ARRAY_OF(MGLOfflinePack *) *packs, __unused NSError * _Nullable error) {
+    MGLLogInfo(@"Reloading packs.");
+    [self getPacksWithCompletionHandler:^(NSArray<MGLOfflinePack *> *packs, __unused NSError * _Nullable error) {
         for (MGLOfflinePack *pack in self.packs) {
             [pack invalidate];
         }
@@ -348,18 +455,18 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
     }];
 }
 
-- (void)getPacksWithCompletionHandler:(void (^)(NS_ARRAY_OF(MGLOfflinePack *) *packs, NSError * _Nullable error))completion {
-    self.mbglFileSource->listOfflineRegions([&, completion](std::exception_ptr exception, mbgl::optional<std::vector<mbgl::OfflineRegion>> regions) {
+- (void)getPacksWithCompletionHandler:(void (^)(NSArray<MGLOfflinePack *> *packs, NSError * _Nullable error))completion {
+    self.mbglFileSource->listOfflineRegions([&, completion](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> result) {
         NSError *error;
-        if (exception) {
-            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
-                NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
-            }];
-        }
         NSMutableArray *packs;
-        if (regions) {
-            packs = [NSMutableArray arrayWithCapacity:regions->size()];
-            for (mbgl::OfflineRegion &region : *regions) {
+        if (!result) {
+            error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
+                NSLocalizedDescriptionKey: @(mbgl::util::toString(result.error()).c_str()),
+            }];
+        } else {
+            auto& regions = result.value();
+            packs = [NSMutableArray arrayWithCapacity:regions.size()];
+            for (auto &region : regions) {
                 MGLOfflinePack *pack = [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(region))];
                 [packs addObject:pack];
             }
@@ -373,6 +480,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
 }
 
 - (void)setMaximumAllowedMapboxTiles:(uint64_t)maximumCount {
+    MGLLogDebug(@"Setting maximumAllowedMapboxTiles: %lu", (unsigned long)maximumCount);
     _mbglFileSource->setOfflineMapboxTileCountLimit(maximumCount);
 }
 
@@ -387,6 +495,31 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
 
     NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:cachePath error:NULL];
     return attributes.fileSize;
+}
+
+- (void)preloadData:(NSData *)data forURL:(NSURL *)url modificationDate:(nullable NSDate *)modified expirationDate:(nullable NSDate *)expires eTag:(nullable NSString *)eTag mustRevalidate:(BOOL)mustRevalidate {
+    mbgl::Resource resource(mbgl::Resource::Kind::Unknown, url.absoluteString.UTF8String);
+    mbgl::Response response;
+    response.data = std::make_shared<std::string>(static_cast<const char*>(data.bytes), data.length);
+    response.mustRevalidate = mustRevalidate;
+    
+    if (eTag) {
+        response.etag = std::string(eTag.UTF8String);
+    }
+    
+    if (modified) {
+        response.modified = mbgl::Timestamp() + std::chrono::duration_cast<mbgl::Seconds>(MGLDurationFromTimeInterval(modified.timeIntervalSince1970));
+    }
+    
+    if (expires) {
+        response.expires = mbgl::Timestamp() + std::chrono::duration_cast<mbgl::Seconds>(MGLDurationFromTimeInterval(expires.timeIntervalSince1970));
+    }
+    
+    _mbglFileSource->put(resource, response);
+}
+
+- (void)putResourceWithUrl:(NSURL *)url data:(NSData *)data modified:(nullable NSDate *)modified expires:(nullable NSDate *)expires etag:(nullable NSString *)etag mustRevalidate:(BOOL)mustRevalidate {
+    [self preloadData:data forURL:url modificationDate:modified expirationDate:expires eTag:etag mustRevalidate:mustRevalidate];
 }
 
 @end

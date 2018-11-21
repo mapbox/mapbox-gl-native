@@ -17,16 +17,14 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/sources/Source"; };
 
-    static jni::Class<Source> javaClass;
-
     static void registerNative(jni::JNIEnv&);
 
-    static jni::Object<Source> peerForCoreSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
+    static const jni::Object<Source>& peerForCoreSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
 
     /*
      * Called when a Java object is created for a core source that belongs to a map.
      */
-    Source(jni::JNIEnv&, mbgl::style::Source&, jni::Object<Source>, AndroidRendererFrontend&);
+    Source(jni::JNIEnv&, mbgl::style::Source&, const jni::Object<Source>&, AndroidRendererFrontend&);
 
     /*
      * Called when a Java object is created for a new core source that does not belong to a map.
@@ -35,13 +33,15 @@ public:
 
     virtual ~Source();
 
-    void addToMap(JNIEnv&, jni::Object<Source>, mbgl::Map&, AndroidRendererFrontend&);
+    virtual void addToMap(JNIEnv&, const jni::Object<Source>&, mbgl::Map&, AndroidRendererFrontend&);
 
-    void removeFromMap(JNIEnv&, jni::Object<Source>, mbgl::Map&);
+    virtual bool removeFromMap(JNIEnv&, const jni::Object<Source>&, mbgl::Map&);
 
-    jni::String getId(jni::JNIEnv&);
+    void releaseJavaPeer();
 
-    jni::String getAttribution(jni::JNIEnv&);
+    jni::Local<jni::String> getId(jni::JNIEnv&);
+
+    jni::Local<jni::String> getAttribution(jni::JNIEnv&);
 
 protected:
     // Set on newly created sources until added to the map.
@@ -51,7 +51,7 @@ protected:
     mbgl::style::Source& source;
 
     // Set when the source is added to a map.
-    jni::UniqueObject<Source> javaPeer;
+    jni::Global<jni::Object<Source>> javaPeer;
 
     // RendererFrontend pointer is valid only when added to the map.
     AndroidRendererFrontend* rendererFrontend { nullptr };

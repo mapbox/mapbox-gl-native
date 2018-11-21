@@ -23,15 +23,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#ifndef NS_STRING_ENUM
-    #define NS_STRING_ENUM
-    #define NS_EXTENSIBLE_STRING_ENUM
-    typedef NSString *NSErrorDomain;
-    typedef NSString *NSNotificationName;
-#endif
+typedef NSString *MGLExceptionName NS_TYPED_EXTENSIBLE_ENUM;
+
+/**
+ :nodoc: Generic exceptions used across multiple disparate classes. Exceptions
+ that are unique to a class or class-cluster should be defined in those headers.
+ */
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLAbstractClassException;
 
 /** Indicates an error occurred in the Mapbox SDK. */
-extern MGL_EXPORT NSErrorDomain const MGLErrorDomain;
+FOUNDATION_EXTERN MGL_EXPORT NSErrorDomain const MGLErrorDomain;
 
 /** Error constants for the Mapbox SDK. */
 typedef NS_ENUM(NSInteger, MGLErrorCode) {
@@ -49,6 +50,10 @@ typedef NS_ENUM(NSInteger, MGLErrorCode) {
     MGLErrorCodeLoadStyleFailed = 5,
     /** An error occurred while snapshotting the map. */
     MGLErrorCodeSnapshotFailed = 6,
+    /** Source is in use and cannot be removed */
+    MGLErrorCodeSourceIsInUseCannotRemove = 7,
+    /** Source is in use and cannot be removed */
+    MGLErrorCodeSourceIdentifierMismatch = 8
 };
 
 /** Options for enabling debugging features in an `MGLMapView` instance. */
@@ -92,6 +97,10 @@ typedef struct __attribute__((objc_boxable)) MGLTransition {
     NSTimeInterval delay;
 } MGLTransition;
 
+NS_INLINE NSString *MGLStringFromMGLTransition(MGLTransition transition) {
+    return [NSString stringWithFormat:@"transition { duration: %f, delay: %f }", transition.duration, transition.delay];
+}
+
 /**
  Creates a new `MGLTransition` from the given duration and delay.
  
@@ -111,23 +120,3 @@ NS_INLINE MGLTransition MGLTransitionMake(NSTimeInterval duration, NSTimeInterva
 }
 
 NS_ASSUME_NONNULL_END
-
-#ifndef NS_ARRAY_OF
-    // Foundation collection classes adopted lightweight generics in iOS 9.0 and OS X 10.11 SDKs.
-    #if __has_feature(objc_generics) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= 90000 || __MAC_OS_X_VERSION_MAX_ALLOWED >= 101100)
-        /** Inserts a type specifier for a pointer to a lightweight generic with the given collection and object classes. Use a `*` for any non-`id` object classes but no `*` for the collection class. */
-        #define NS_ARRAY_OF(ObjectClass...)                 NSArray <ObjectClass>
-        #define NS_MUTABLE_ARRAY_OF(ObjectClass...)         NSMutableArray <ObjectClass>
-        #define NS_SET_OF(ObjectClass...)                   NSSet <ObjectClass>
-        #define NS_MUTABLE_SET_OF(ObjectClass...)           NSMutableSet <ObjectClass>
-        #define NS_DICTIONARY_OF(ObjectClass...)            NSDictionary <ObjectClass>
-        #define NS_MUTABLE_DICTIONARY_OF(ObjectClass...)    NSMutableDictionary <ObjectClass>
-    #else
-        #define NS_ARRAY_OF(ObjectClass...)                 NSArray
-        #define NS_MUTABLE_ARRAY_OF(ObjectClass...)         NSMutableArray
-        #define NS_SET_OF(ObjectClass...)                   NSSet
-        #define NS_MUTABLE_SET_OF(ObjectClass...)           NSMutableSet
-        #define NS_DICTIONARY_OF(ObjectClass...)            NSDictionary
-        #define NS_MUTABLE_DICTIONARY_OF(ObjectClass...)    NSMutableDictionary
-    #endif
-#endif

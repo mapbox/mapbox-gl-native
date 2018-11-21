@@ -2,6 +2,7 @@
 #include <mbgl/style/conversion/position.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/transition_options.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 namespace mbgl {
 namespace style {
@@ -9,8 +10,8 @@ namespace conversion {
 
 optional<Light> Converter<Light>::operator()(const Convertible& value, Error& error) const {
     if (!isObject(value)) {
-        error = { "light must be an object" };
-        return {};
+        error.message = "light must be an object";
+        return nullopt;
     }
 
     Light light;
@@ -18,12 +19,12 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
     const auto anchor = objectMember(value, "anchor");
     if (anchor) {
         optional<PropertyValue<LightAnchorType>> convertedAnchor =
-            convert<PropertyValue<LightAnchorType>>(*anchor, error);
+            convert<PropertyValue<LightAnchorType>>(*anchor, error, false, false);
 
         if (convertedAnchor) {
             light.setAnchor(*convertedAnchor);
         } else {
-            return {};
+            return nullopt;
         }
     }
 
@@ -34,19 +35,19 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
         if (transition) {
             light.setAnchorTransition(*transition);
         } else {
-            return {};
+            return nullopt;
         }
     }
 
     const auto color = objectMember(value, "color");
     if (color) {
         optional<PropertyValue<Color>> convertedColor =
-            convert<PropertyValue<Color>>(*color, error);
+            convert<PropertyValue<Color>>(*color, error, false, false);
 
         if (convertedColor) {
             light.setColor(*convertedColor);
         } else {
-            return {};
+            return nullopt;
         }
     }
 
@@ -57,19 +58,19 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
         if (transition) {
             light.setColorTransition(*transition);
         } else {
-            return {};
+            return nullopt;
         }
     }
 
     const auto position = objectMember(value, "position");
     if (position) {
         optional<PropertyValue<Position>> convertedPosition =
-            convert<PropertyValue<Position>>(*position, error);
+            convert<PropertyValue<Position>>(*position, error, false, false);
 
         if (convertedPosition) {
             light.setPosition(*convertedPosition);
         } else {
-            return {};
+            return nullopt;
         }
     }
 
@@ -80,19 +81,19 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
         if (transition) {
             light.setPositionTransition(*transition);
         } else {
-            return {};
+            return nullopt;
         }
     }
 
     const auto intensity = objectMember(value, "intensity");
     if (intensity) {
         optional<PropertyValue<float>> convertedIntensity =
-            convert<PropertyValue<float>>(*intensity, error);
+            convert<PropertyValue<float>>(*intensity, error, false, false);
 
         if (convertedIntensity) {
             light.setIntensity(*convertedIntensity);
         } else {
-            return {};
+            return nullopt;
         }
     }
 
@@ -103,7 +104,7 @@ optional<Light> Converter<Light>::operator()(const Convertible& value, Error& er
         if (transition) {
             light.setIntensityTransition(*transition);
         } else {
-            return {};
+            return nullopt;
         }
     }
 

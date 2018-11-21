@@ -4,6 +4,7 @@
 #import "MGLGeometry_Private.h"
 
 #import "MGLFeature.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #import <mbgl/util/geojson.hpp>
 #import <mapbox/polylabel.hpp>
@@ -49,7 +50,7 @@
              @"coordinates": self.mgl_coordinates};
 }
 
-- (NS_ARRAY_OF(id) *)mgl_coordinates {
+- (NSArray<id> *)mgl_coordinates {
     NSMutableArray *coordinates = [[NSMutableArray alloc] initWithCapacity:self.pointCount];
     for (NSUInteger index = 0; index < self.pointCount; index++) {
         CLLocationCoordinate2D coordinate = self.coordinates[index];
@@ -64,7 +65,7 @@
 
 - (CLLocationCoordinate2D)coordinate {
     NSUInteger count = self.pointCount;
-    NSAssert(count > 0, @"Polyline must have coordinates");
+    MGLAssert(count > 0, @"Polyline must have coordinates");
 
     CLLocationCoordinate2D *coordinates = self.coordinates;
     CLLocationDistance middle = [self length] / 2.0;
@@ -72,9 +73,12 @@
     
     if (count > 1 || middle > traveled) {
         for (NSUInteger i = 0; i < count; i++) {
-            
+
+            // Avoid a heap buffer overflow when there are only two coordinates.
+            NSUInteger nextIndex = (i + 1 == count) ? 0 : 1;
+
             MGLRadianCoordinate2D from = MGLRadianCoordinateFromLocationCoordinate(coordinates[i]);
-            MGLRadianCoordinate2D to = MGLRadianCoordinateFromLocationCoordinate(coordinates[i + 1]);
+            MGLRadianCoordinate2D to = MGLRadianCoordinateFromLocationCoordinate(coordinates[i + nextIndex]);
             
             if (traveled >= middle) {
                 double overshoot = middle - traveled;
@@ -91,7 +95,6 @@
             }
             
             traveled += (MGLDistanceBetweenRadianCoordinates(from, to) * mbgl::util::EARTH_RADIUS_M);
-            
         }
     }
 
@@ -121,7 +124,7 @@
 
 @interface MGLMultiPolyline ()
 
-@property (nonatomic, copy, readwrite) NS_ARRAY_OF(MGLPolyline *) *polylines;
+@property (nonatomic, copy, readwrite) NSArray<MGLPolyline *> *polylines;
 
 @end
 
@@ -131,11 +134,12 @@
 
 @synthesize overlayBounds = _overlayBounds;
 
-+ (instancetype)multiPolylineWithPolylines:(NS_ARRAY_OF(MGLPolyline *) *)polylines {
++ (instancetype)multiPolylineWithPolylines:(NSArray<MGLPolyline *> *)polylines {
     return [[self alloc] initWithPolylines:polylines];
 }
 
-- (instancetype)initWithPolylines:(NS_ARRAY_OF(MGLPolyline *) *)polylines {
+- (instancetype)initWithPolylines:(NSArray<MGLPolyline *> *)polylines {
+    MGLLogDebug(@"Initializing with %lu polylines.", (unsigned long)polylines.count);
     if (self = [super init]) {
         _polylines = polylines;
 
@@ -150,6 +154,7 @@
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder {
+    MGLLogInfo(@"Initializing with coder.");
     if (self = [super initWithCoder:decoder]) {
         _polylines = [decoder decodeObjectOfClass:[NSArray class] forKey:@"polylines"];
     }
@@ -182,7 +187,7 @@
 - (CLLocationCoordinate2D)coordinate {
     MGLPolyline *polyline = self.polylines.firstObject;
     CLLocationCoordinate2D *coordinates = polyline.coordinates;
-    NSAssert([polyline pointCount] > 0, @"Polyline must have coordinates");
+    MGLAssert([polyline pointCount] > 0, @"Polyline must have coordinates");
     CLLocationCoordinate2D firstCoordinate = coordinates[0];
 
     return firstCoordinate;

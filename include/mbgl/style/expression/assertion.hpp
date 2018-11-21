@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mbgl/style/expression/expression.hpp>
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
+#include <mbgl/style/conversion.hpp>
 
 #include <memory>
 #include <vector>
@@ -13,10 +13,7 @@ namespace expression {
 
 class Assertion : public Expression  {
 public:
-    Assertion(type::Type type_, std::vector<std::unique_ptr<Expression>> inputs_) :
-        Expression(type_),
-        inputs(std::move(inputs_))
-    {}
+    Assertion(type::Type type_, std::vector<std::unique_ptr<Expression>> inputs_);
 
     static ParseResult parse(const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
 
@@ -26,6 +23,9 @@ public:
     bool operator==(const Expression& e) const override;
 
     std::vector<optional<Value>> possibleOutputs() const override;
+    
+    mbgl::Value serialize() const override;
+    std::string getOperator() const override;
 
 private:
     std::vector<std::unique_ptr<Expression>> inputs;

@@ -4,21 +4,43 @@ This document explains how to build a development version of the Mapbox Maps SDK
 
 ### Requirements
 
-The Mapbox Maps SDK for macOS requires the macOS 10.10.0 SDK (or above) and Xcode 8.0 (or above). To use this SDK with Xcode 7.3.1, download and use a symbols build from the [releases](https://github.com/mapbox/mapbox-gl-native/releases) page.
+The Mapbox Maps SDK for macOS requires the macOS 10.11.0 SDK (or above) and Xcode 9.0 (or above). To use this SDK with Xcode 7.3.1, download and use a symbols build from the [releases](https://github.com/mapbox/mapbox-gl-native/releases) page.
+
+Before building, follow these steps to install prerequisites:
+
+1. Install [Xcode](https://developer.apple.com/xcode/)
+1. Launch Xcode and install any updates
+1. Install [Homebrew](http://brew.sh)
+1. Install [Node.js](https://nodejs.org/), [CMake](https://cmake.org/), and [ccache](https://ccache.samba.org):
+   ```
+   brew install node cmake ccache
+   ```
+1. Install [xcpretty](https://github.com/supermarin/xcpretty) (optional, used for prettifying command line builds):
+   ```
+   [sudo] gem install xcpretty
+   ```
+1. Install [jazzy](https://github.com/realm/jazzy) for generating API documentation:
+   ```
+   [sudo] gem install jazzy
+   ```
 
 ### Building the SDK from source
 
 To build the SDK from source:
 
-1. [Install core dependencies](../../INSTALL.md).
-
-1. Install [jazzy](https://github.com/realm/jazzy) for generating API documentation:
-
+1. Clone the git repository:
    ```
-   [sudo] gem install jazzy
+   git clone https://github.com/mapbox/mapbox-gl-native.git
+   cd mapbox-gl-native
    ```
-
-1. Run `make xpackage`, which produces a `Mapbox.framework` in the `build/macos/pkg/` folder.
+   Note that this repository uses Git submodules. They'll be automatically checked out when you first run a `make` command,
+   but are not updated automatically. We recommended that you run `git submodule update` after pulling down new commits to
+   this repository.
+1. Run:
+   ```
+   make xpackage
+   ```
+   This produces a `Mapbox.framework` in the `build/macos/pkg/` folder.
 
 ### Installation
 

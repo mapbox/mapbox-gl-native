@@ -1,12 +1,17 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/shaders/collision_circle.hpp>
+#include <mbgl/shaders/source.hpp>
 
 namespace mbgl {
 namespace shaders {
 
 const char* collision_circle::name = "collision_circle";
-const char* collision_circle::vertexSource = R"MBGL_SHADER(
+const char* collision_circle::vertexSource = source() + 15671;
+const char* collision_circle::fragmentSource = source() + 16977;
+
+// Uncompressed source of collision_circle.vertex.glsl:
+/*
 attribute vec2 a_pos;
 attribute vec2 a_anchor_pos;
 attribute vec2 a_extrude;
@@ -44,8 +49,10 @@ void main() {
     v_extrude_scale = u_extrude_scale * u_camera_to_center_distance * collision_perspective_ratio;
 }
 
-)MBGL_SHADER";
-const char* collision_circle::fragmentSource = R"MBGL_SHADER(
+*/
+
+// Uncompressed source of collision_circle.fragment.glsl:
+/*
 uniform float u_overscale_factor;
 
 varying float v_placed;
@@ -81,7 +88,7 @@ void main() {
     gl_FragColor = opacity_t * color;
 }
 
-)MBGL_SHADER";
+*/
 
 } // namespace shaders
 } // namespace mbgl

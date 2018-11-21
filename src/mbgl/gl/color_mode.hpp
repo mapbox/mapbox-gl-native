@@ -85,6 +85,10 @@ public:
     static ColorMode alphaBlended() {
         return ColorMode { Add { One, OneMinusSrcAlpha }, {}, { true, true, true, true } };
     }
+
+    static ColorMode additive() {
+        return ColorMode { Add { One, One }, {}, { true, true, true, true } };
+    }
 };
 
 constexpr bool operator!=(const ColorMode::Mask& a, const ColorMode::Mask& b) {

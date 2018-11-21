@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  You can add point shapes to the map by adding them to an `MGLShapeSource`
  object. Configure the appearance of an `MGLShapeSource`’s or
- `MGLVectorSource`’s point shapes collectively using an `MGLCircleStyleLayer` or
+ `MGLVectorTileSource`’s point shapes collectively using an `MGLCircleStyleLayer` or
  `MGLSymbolStyleLayer` object.
 
  For more interactivity, add a selectable point annotation to a map view using
@@ -28,11 +28,19 @@ NS_ASSUME_NONNULL_BEGIN
  default content of the annotation’s callout (on iOS) or popover (on macOS).
 
  To group multiple related points together in one shape, use an
- `MGLPointCollection` or `MGLShapeCollection` object.
+ `MGLPointCollection` or `MGLShapeCollection` object. To access
+ a point’s attributes, use an `MGLPointFeature` object.
 
  A point shape is known as a
  <a href="https://tools.ietf.org/html/rfc7946#section-3.1.2">Point</a> geometry
  in GeoJSON.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/marker/">
+ Mark a place on the map with an annotation</a>, <a href="https://www.mapbox.com/ios-sdk/maps/examples/marker-image/">
+ Mark a place on the map with an image</a>, and <a href="https://www.mapbox.com/ios-sdk/maps/examples/default-callout/">
+ Default callout usage</a> examples to learn how to add `MGLPointAnnotation`
+ objects to your map.
  */
 MGL_EXPORT
 @interface MGLPointAnnotation : MGLShape

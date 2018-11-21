@@ -1,7 +1,6 @@
 #include <mbgl/layout/merge_lines.hpp>
 #include <mbgl/layout/symbol_feature.hpp>
-
-#include <boost/functional/hash.hpp>
+#include <mbgl/util/hash.hpp>
 
 namespace mbgl {
 namespace util {
@@ -43,10 +42,7 @@ size_t mergeFromLeft(std::vector<SymbolFeature>& features,
 }
 
 size_t getKey(const std::u16string& text, const GeometryCoordinate& coord) {
-    auto hash = std::hash<std::u16string>()(text);
-    boost::hash_combine(hash, coord.x);
-    boost::hash_combine(hash, coord.y);
-    return hash;
+    return util::hash(text, coord.x, coord.y);
 }
 
 void mergeLines(std::vector<SymbolFeature>& features) {
@@ -57,12 +53,14 @@ void mergeLines(std::vector<SymbolFeature>& features) {
         SymbolFeature& feature = features[k];
         GeometryCollection& geometry = feature.geometry;
 
-        if (!feature.text || geometry.empty() || geometry[0].empty()) {
+        if (!feature.formattedText || geometry.empty() || geometry[0].empty()) {
             continue;
         }
+        
+        // TODO: Key should include formatting options (see https://github.com/mapbox/mapbox-gl-js/issues/3645)
 
-        const size_t leftKey = getKey(*feature.text, geometry[0].front());
-        const size_t rightKey = getKey(*feature.text, geometry[0].back());
+        const size_t leftKey = getKey(feature.formattedText->rawText(), geometry[0].front());
+        const size_t rightKey = getKey(feature.formattedText->rawText(), geometry[0].back());
 
         const auto left = rightIndex.find(leftKey);
         const auto right = leftIndex.find(rightKey);
@@ -75,7 +73,7 @@ void mergeLines(std::vector<SymbolFeature>& features) {
 
             leftIndex.erase(leftKey);
             rightIndex.erase(rightKey);
-            rightIndex[getKey(*feature.text, features[i].geometry[0].back())] = i;
+            rightIndex[getKey(feature.formattedText->rawText(), features[i].geometry[0].back())] = i;
 
         } else if (left != rightIndex.end()) {
             // found mergeable line adjacent to the start of the current line, merge

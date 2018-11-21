@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/map/mode.hpp>
+#include <mbgl/map/camera.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/constants.hpp>
@@ -19,6 +20,7 @@ class UnwrappedTileID;
 
 class TransformState {
     friend class Transform;
+    friend class RendererState;
 
 public:
     TransformState(ConstrainMode = ConstrainMode::HeightOnly, ViewportMode = ViewportMode::Default);
@@ -39,6 +41,8 @@ public:
 
     // Viewport mode
     ViewportMode getViewportMode() const;
+
+    CameraOptions getCameraOptions(const EdgeInsets&) const;
 
     // Position
     LatLng getLatLng(LatLng::WrapMode = LatLng::Unwrapped) const;
@@ -87,6 +91,7 @@ public:
     }
 
     float getCameraToTileDistance(const UnwrappedTileID&) const;
+    float maxPitchScaleFactor() const;
 
 private:
     bool rotatedNorth() const;

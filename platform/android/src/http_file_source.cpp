@@ -20,20 +20,19 @@ public:
 
 class HTTPRequest : public AsyncRequest {
 public:
-    static constexpr auto Name() { return "com/mapbox/mapboxsdk/http/HTTPRequest"; };
+    static constexpr auto Name() { return "com/mapbox/mapboxsdk/http/NativeHttpRequest"; };
 
     HTTPRequest(jni::JNIEnv&, const Resource&, FileSource::Callback);
     ~HTTPRequest();
 
-    void onFailure(jni::JNIEnv&, int type, jni::String message);
+    void onFailure(jni::JNIEnv&, int type, const jni::String& message);
     void onResponse(jni::JNIEnv&, int code,
-                    jni::String etag, jni::String modified,
-                    jni::String cacheControl, jni::String expires,
-                    jni::String retryAfter, jni::String xRateLimitReset,
-                    jni::Array<jni::jbyte> body);
+                    const jni::String& etag, const jni::String& modified,
+                    const jni::String& cacheControl, const jni::String& expires,
+                    const jni::String& retryAfter, const jni::String& xRateLimitReset,
+                    const jni::Array<jni::jbyte>& body);
 
-    static jni::Class<HTTPRequest> javaClass;
-    jni::UniqueObject<HTTPRequest> javaRequest;
+    jni::Global<jni::Object<HTTPRequest>> javaRequest;
 
 private:
     Resource resource;
@@ -52,16 +51,14 @@ private:
     static const int permanentError = 2;
 };
 
-jni::Class<HTTPRequest> HTTPRequest::javaClass;
-
 namespace android {
 
 void RegisterNativeHTTPRequest(jni::JNIEnv& env) {
-    HTTPRequest::javaClass = *jni::Class<HTTPRequest>::Find(env).NewGlobalRef(env).release();
+    static auto& javaClass = jni::Class<HTTPRequest>::Singleton(env);
 
     #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-    jni::RegisterNativePeer<HTTPRequest>(env, HTTPRequest::javaClass, "mNativePtr",
+    jni::RegisterNativePeer<HTTPRequest>(env, javaClass, "nativePtr",
         METHOD(&HTTPRequest::onFailure, "nativeOnFailure"),
         METHOD(&HTTPRequest::onResponse, "nativeOnResponse"));
 }
@@ -82,29 +79,32 @@ HTTPRequest::HTTPRequest(jni::JNIEnv& env, const Resource& resource_, FileSource
 
     jni::UniqueLocalFrame frame = jni::PushLocalFrame(env, 10);
 
+    static auto& javaClass = jni::Class<HTTPRequest>::Singleton(env);
     static auto constructor =
         javaClass.GetConstructor<jni::jlong, jni::String, jni::String, jni::String>(env);
 
-    javaRequest = javaClass.New(env, constructor,
-        reinterpret_cast<jlong>(this),
-        jni::Make<jni::String>(env, resource.url),
-        jni::Make<jni::String>(env, etagStr),
-        jni::Make<jni::String>(env, modifiedStr)).NewGlobalRef(env);
+    javaRequest = jni::NewGlobal(env,
+        javaClass.New(env, constructor,
+            reinterpret_cast<jlong>(this),
+            jni::Make<jni::String>(env, resource.url),
+            jni::Make<jni::String>(env, etagStr),
+            jni::Make<jni::String>(env, modifiedStr)));
 }
 
 HTTPRequest::~HTTPRequest() {
     android::UniqueEnv env = android::AttachEnv();
 
+    static auto& javaClass = jni::Class<HTTPRequest>::Singleton(*env);
     static auto cancel = javaClass.GetMethod<void ()>(*env, "cancel");
 
-    javaRequest->Call(*env, cancel);
+    javaRequest.Call(*env, cancel);
 }
 
 void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
-                             jni::String etag, jni::String modified,
-                             jni::String cacheControl, jni::String expires,
-                             jni::String jRetryAfter, jni::String jXRateLimitReset,
-                             jni::Array<jni::jbyte> body) {
+                             const jni::String& etag, const jni::String& modified,
+                             const jni::String& cacheControl, const jni::String& expires,
+                             const jni::String& jRetryAfter, const jni::String& jXRateLimitReset,
+                             const jni::Array<jni::jbyte>& body) {
 
     using Error = Response::Error;
 
@@ -151,15 +151,15 @@ void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
         }
         response.error = std::make_unique<Error>(Error::Reason::RateLimit, "HTTP status code 429", http::parseRetryHeaders(retryAfter, xRateLimitReset));
     } else if (code >= 500 && code < 600) {
-        response.error = std::make_unique<Error>(Error::Reason::Server, std::string{ "HTTP status code " } + std::to_string(code));
+        response.error = std::make_unique<Error>(Error::Reason::Server, std::string{ "HTTP status code " } + util::toString(code));
     } else {
-        response.error = std::make_unique<Error>(Error::Reason::Other, std::string{ "HTTP status code " } + std::to_string(code));
+        response.error = std::make_unique<Error>(Error::Reason::Other, std::string{ "HTTP status code " } + util::toString(code));
     }
 
     async.send();
 }
 
-void HTTPRequest::onFailure(jni::JNIEnv& env, int type, jni::String message) {
+void HTTPRequest::onFailure(jni::JNIEnv& env, int type, const jni::String& message) {
     std::string messageStr = jni::Make<std::string>(env, message);
 
     using Error = Response::Error;
@@ -186,10 +186,6 @@ HTTPFileSource::~HTTPFileSource() = default;
 
 std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, Callback callback) {
     return std::make_unique<HTTPRequest>(*impl->env, resource, callback);
-}
-
-uint32_t HTTPFileSource::maximumConcurrentRequests() {
-    return 20;
 }
 
 } // namespace mbgl

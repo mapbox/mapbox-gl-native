@@ -1,6 +1,6 @@
 Pod::Spec.new do |m|
 
-  version = '3.7.3'
+  version = '4.7.0-alpha.1'
 
   m.name    = 'Mapbox-iOS-SDK-nightly-dynamic'
   m.version = "#{version}-nightly"
@@ -20,11 +20,13 @@ Pod::Spec.new do |m|
   }
 
   m.platform              = :ios
-  m.ios.deployment_target = '8.0'
+  m.ios.deployment_target = '9.0'
 
   m.requires_arc = true
 
   m.vendored_frameworks = 'dynamic/Mapbox.framework'
   m.module_name = 'Mapbox'
+
+  m.preserve_path = '**/*.bcsymbolmap'
 
 end

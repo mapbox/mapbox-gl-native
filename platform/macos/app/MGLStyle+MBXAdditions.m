@@ -2,15 +2,15 @@
 
 @implementation MGLStyle (MBXAdditions)
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingReversedLayers {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingReversedLayers {
     return [NSSet setWithObject:@"layers"];
 }
 
-- (NS_ARRAY_OF(__kindof MGLStyleLayer *) *)reversedLayers {
+- (NSArray<__kindof MGLStyleLayer *> *)reversedLayers {
     return self.layers.reverseObjectEnumerator.allObjects;
 }
 
-- (void)setReversedLayers:(NS_ARRAY_OF(__kindof MGLStyleLayer *) *)reversedLayers {
+- (void)setReversedLayers:(NSArray<__kindof MGLStyleLayer *> *)reversedLayers {
     self.layers = reversedLayers.reverseObjectEnumerator.allObjects;
 }
 

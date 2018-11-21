@@ -65,9 +65,9 @@ public class MapSnapshotterReuseActivity extends AppCompatActivity implements Ma
 
   private LatLngBounds getRandomBounds() {
     return LatLngBounds.from(
-      randomInRange(-5, 5),
-      randomInRange(-5, 5),
       randomInRange(5, 10),
+      randomInRange(-5, 5),
+      randomInRange(-5, 5),
       randomInRange(5, 10)
     );
   }

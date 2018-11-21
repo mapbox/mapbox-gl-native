@@ -1,6 +1,7 @@
 #import "MGLPointCollection_Private.h"
 #import "MGLGeometry_Private.h"
 #import "NSArray+MGLAdditions.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #import <mbgl/util/geojson.hpp>
 #import <mbgl/util/geometry.hpp>
@@ -20,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count
 {
+    MGLLogDebug(@"Initializing with %lu coordinates.", (unsigned long)count);
     self = [super init];
     if (self)
     {
@@ -29,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)decoder {
+    MGLLogInfo(@"Initializing with coder.O");
     if (self = [super initWithCoder:decoder]) {
         NSArray *coordinates = [decoder decodeObjectOfClass:[NSArray class] forKey:@"coordinates"];
         _coordinates = [coordinates mgl_coordinates];
@@ -54,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
     if (!_bounds) {
         mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
         for (auto coordinate : _coordinates) {
-            if (!CLLocationCoordinate2DIsValid(coordinate)) {
+            if (!MGLLocationCoordinate2DIsValid(coordinate)) {
                 bounds = mbgl::LatLngBounds::empty();
                 break;
             }
@@ -77,7 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (CLLocationCoordinate2D)coordinate
 {
-    NSAssert([self pointCount] > 0, @"A multipoint must have coordinates");
+    MGLAssert([self pointCount] > 0, @"A multipoint must have coordinates");
     return _coordinates.at(0);
 }
 
@@ -102,7 +105,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     mbgl::MultiPoint<double> multiPoint;
     multiPoint.reserve(self.pointCount);
-    for (NSInteger i = 0; i< self.pointCount; i++)
+    for (NSUInteger i = 0; i < self.pointCount; i++)
     {
         multiPoint.push_back(mbgl::Point<double>(self.coordinates[i].longitude, self.coordinates[i].latitude));
     }

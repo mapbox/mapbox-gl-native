@@ -2,10 +2,7 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/premultiply.hpp>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wshadow"
 #include <boost/crc.hpp>
-#pragma GCC diagnostic pop
 
 #include <cassert>
 #include <cstring>

@@ -62,9 +62,10 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslationAnchor) {
  circles on the map.
  
  Use a circle style layer to configure the visual appearance of point or point
- collection features in vector tiles loaded by an `MGLVectorSource` object or
- `MGLPointAnnotation`, `MGLPointFeature`, `MGLPointCollection`, or
- `MGLPointCollectionFeature` instances in an `MGLShapeSource` object.
+ collection features. These features can come from vector tiles loaded by an
+ `MGLVectorTileSource` object, or they can be `MGLPointAnnotation`,
+ `MGLPointFeature`, `MGLPointCollection`, or `MGLPointCollectionFeature`
+ instances in an `MGLShapeSource` or `MGLComputedShapeSource` object.
  
  A circle style layer renders circles whose radii are measured in screen units.
  To display circles on the map whose radii correspond to real-world distances,
@@ -77,13 +78,23 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslationAnchor) {
  new circle style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
 
+ #### Related examples
+ See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/dds-circle-layer/">Data-driven
+ circles</a>, <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/shape-collection/">Add
+ multiple shapes from a single shape source</a>, and <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/clustering/">Cluster point
+ data</a> examples to learn how to add circles to your map using this style
+ layer.
+
  ### Example
 
  ```swift
  let layer = MGLCircleStyleLayer(identifier: "circles", source: population)
  layer.sourceLayerIdentifier = "population"
  layer.circleColor = NSExpression(forConstantValue: UIColor.green)
- layer.circleRadius = NSExpression(format: "FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'exponential', 1.75, %@)",
+ layer.circleRadius = NSExpression(format: "mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'exponential', 1.75, %@)",
                                    [12: 2,
                                     22: 180])
  layer.circleOpacity = NSExpression(forConstantValue: 0.7)
@@ -136,6 +147,7 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition circleBlurTransition;
 
+#if TARGET_OS_IPHONE
 /**
  The fill color of the circle.
  
@@ -153,6 +165,25 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *circleColor;
+#else
+/**
+ The fill color of the circle.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *circleColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `circleColor` property.
@@ -169,7 +200,7 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values between 0 and 1 inclusive
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -218,7 +249,7 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -264,6 +295,7 @@ MGL_EXPORT
 
 @property (nonatomic, null_resettable) NSExpression *circlePitchScale __attribute__((unavailable("Use circleScaleAlignment instead.")));
 
+#if TARGET_OS_IPHONE
 /**
  The stroke color of the circle.
  
@@ -281,6 +313,25 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *circleStrokeColor;
+#else
+/**
+ The stroke color of the circle.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *circleStrokeColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `circleStrokeColor` property.
@@ -297,7 +348,7 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values between 0 and 1 inclusive
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -324,7 +375,7 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables

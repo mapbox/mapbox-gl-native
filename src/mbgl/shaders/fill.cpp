@@ -1,12 +1,17 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/shaders/fill.hpp>
+#include <mbgl/shaders/source.hpp>
 
 namespace mbgl {
 namespace shaders {
 
 const char* fill::name = "fill";
-const char* fill::vertexSource = R"MBGL_SHADER(
+const char* fill::vertexSource = source() + 18105;
+const char* fill::fragmentSource = source() + 18811;
+
+// Uncompressed source of fill.vertex.glsl:
+/*
 attribute vec2 a_pos;
 
 uniform mat4 u_matrix;
@@ -33,7 +38,7 @@ uniform lowp float u_opacity;
 void main() {
     
 #ifndef HAS_UNIFORM_u_color
-    color = unpack_mix_vec4(a_color, a_color_t);
+    color = unpack_mix_color(a_color, a_color_t);
 #else
     highp vec4 color = u_color;
 #endif
@@ -49,8 +54,10 @@ void main() {
     gl_Position = u_matrix * vec4(a_pos, 0, 1);
 }
 
-)MBGL_SHADER";
-const char* fill::fragmentSource = R"MBGL_SHADER(
+*/
+
+// Uncompressed source of fill.fragment.glsl:
+/*
 
 #ifndef HAS_UNIFORM_u_color
 varying highp vec4 color;
@@ -85,7 +92,7 @@ void main() {
 #endif
 }
 
-)MBGL_SHADER";
+*/
 
 } // namespace shaders
 } // namespace mbgl

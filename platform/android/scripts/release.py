@@ -59,8 +59,6 @@ ALLOWED_PRE_RELEASE = ['beta']
 MAPBOX_GL_ANDROID_SDK_PATH = '../MapboxGLAndroidSDK'
 GRADLE_PROPERTIES_PATH = '%s/gradle.properties' % MAPBOX_GL_ANDROID_SDK_PATH
 GRADLE_TOKEN = 'VERSION_NAME='
-FABRIC_PROPERTIES_PATH = '%s/src/main/resources/fabric/com.mapbox.mapboxsdk.mapbox-android-sdk.properties' % MAPBOX_GL_ANDROID_SDK_PATH
-FABRIC_TOKEN = 'fabric-version='
 
 # Triggers a new build, returns a summary of the build
 URL_CIRCLECI = 'https://circleci.com/api/v1.1/project/github/mapbox/mapbox-gl-native/tree/'  # + :branch
@@ -144,10 +142,7 @@ def publish_final(branch, version):
 	dirty_gradle = update_current_version(file_path=GRADLE_PROPERTIES_PATH, file_var=GRADLE_TOKEN, version=version)
 	if dirty_gradle:
 		git_add(path=GRADLE_PROPERTIES_PATH)
-	dirty_fabric = update_current_version(file_path=FABRIC_PROPERTIES_PATH, file_var=FABRIC_TOKEN, version=version)
-	if dirty_fabric:
-		git_add(path=FABRIC_PROPERTIES_PATH)
-	if dirty_gradle or dirty_fabric:
+	if dirty_gradle:
 		git_commit_and_push(branch=branch, version=version)
 	do_circleci_request(branch=branch)
 

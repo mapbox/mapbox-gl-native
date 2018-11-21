@@ -64,13 +64,7 @@ void Transform::resize(const Size size) {
 #pragma mark - Camera
 
 CameraOptions Transform::getCameraOptions(const EdgeInsets& padding) const {
-    CameraOptions camera;
-    camera.center = getLatLng(padding);
-    camera.padding = padding;
-    camera.zoom = getZoom();
-    camera.angle = getAngle();
-    camera.pitch = getPitch();
-    return camera;
+    return state.getCameraOptions(padding);
 }
 
 /**
@@ -91,8 +85,8 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     const LatLng unwrappedLatLng = camera.center.value_or(getLatLng());
     const LatLng latLng = unwrappedLatLng.wrapped();
     double zoom = camera.zoom.value_or(getZoom());
-    double angle = camera.angle.value_or(getAngle());
-    double pitch = camera.pitch.value_or(getPitch());
+    double angle = camera.angle ? -*camera.angle * util::DEG2RAD : getAngle();
+    double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
 
     if (std::isnan(zoom)) {
         return;
@@ -164,8 +158,8 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
 void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &animation) {
     const LatLng latLng = camera.center.value_or(getLatLng()).wrapped();
     double zoom = camera.zoom.value_or(getZoom());
-    double angle = camera.angle.value_or(getAngle());
-    double pitch = camera.pitch.value_or(getPitch());
+    double angle = camera.angle ? -*camera.angle * util::DEG2RAD : getAngle();
+    double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
 
     if (std::isnan(zoom) || state.size.isEmpty()) {
         return;
@@ -451,7 +445,7 @@ void Transform::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& 
     }
 
     CameraOptions camera;
-    camera.angle = state.angle + util::angle_between(first - center, second - center);
+    camera.angle = -(state.angle + util::angle_between(first - center, second - center)) * util::RAD2DEG;
     easeTo(camera, animation);
 }
 
@@ -462,7 +456,7 @@ void Transform::setAngle(double angle, const AnimationOptions& animation) {
 void Transform::setAngle(double angle, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     if (std::isnan(angle)) return;
     CameraOptions camera;
-    camera.angle = angle;
+    camera.angle = -angle * util::RAD2DEG;
     camera.anchor = anchor;
     easeTo(camera, animation);
 }
@@ -486,7 +480,7 @@ void Transform::setPitch(double pitch, const AnimationOptions& animation) {
 void Transform::setPitch(double pitch, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     if (std::isnan(pitch)) return;
     CameraOptions camera;
-    camera.pitch = pitch;
+    camera.pitch = pitch * util::RAD2DEG;
     camera.anchor = anchor;
     easeTo(camera, animation);
 }
@@ -594,13 +588,10 @@ void Transform::startTransition(const CameraOptions& camera,
                 animation.transitionFrameFn(t);
             }
             observer.onCameraIsChanging();
+            return false;
         } else {
-            transitionFinishFn();
-            transitionFinishFn = nullptr;
-
-            // This callback gets destroyed here,
-            // we can only return after this point.
-            transitionFrameFn = nullptr;
+            // Indicate that we need to terminate this transition
+            return true;
         }
     };
 
@@ -615,7 +606,14 @@ void Transform::startTransition(const CameraOptions& camera,
     };
 
     if (!isAnimated) {
-        transitionFrameFn(Clock::now());
+        auto update = std::move(transitionFrameFn);
+        auto finish = std::move(transitionFinishFn);
+
+        transitionFrameFn = nullptr;
+        transitionFinishFn = nullptr;
+
+        update(Clock::now());
+        finish();
     }
 }
 
@@ -624,8 +622,43 @@ bool Transform::inTransition() const {
 }
 
 void Transform::updateTransitions(const TimePoint& now) {
-    if (transitionFrameFn) {
-        transitionFrameFn(now);
+
+    // Use a temporary function to ensure that the transitionFrameFn lambda is
+    // called only once per update.
+
+    // This addresses the symptoms of https://github.com/mapbox/mapbox-gl-native/issues/11180
+    // where setting a shape source to nil (or similar) in the `onCameraIsChanging`
+    // observer function causes `Map::Impl::onUpdate()` to be called which
+    // in turn calls this function (before the current iteration has completed),
+    // leading to an infinite loop. See https://github.com/mapbox/mapbox-gl-native/issues/5833
+    // for a similar, related, issue.
+    //
+    // By temporarily nulling the `transitionFrameFn` (and then restoring it
+    // after the temporary has been called) we stop this recursion.
+    //
+    // It's important to note that the scope of this change is stop the above
+    // crashes. It doesn't address any potential deeper issue (for example
+    // user error, how often and when transition callbacks are called).
+
+    auto transition = std::move(transitionFrameFn);
+    transitionFrameFn = nullptr;
+
+    if (transition && transition(now)) {
+        // If the transition indicates that it is complete, then we should call
+        // the finish lambda (going via a temporary as above)
+        auto finish = std::move(transitionFinishFn);
+
+        transitionFinishFn = nullptr;
+        transitionFrameFn = nullptr;
+
+        if (finish) {
+            finish();
+        }
+    } else if (!transitionFrameFn) {
+        // We have to check `transitionFrameFn` is nil here, since a new transition
+        // may have been triggered in a user callback (from the transition call
+        // above)
+        transitionFrameFn = std::move(transition);
     }
 }
 

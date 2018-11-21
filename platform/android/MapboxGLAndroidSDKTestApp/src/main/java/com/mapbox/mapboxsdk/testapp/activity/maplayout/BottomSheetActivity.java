@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.maplayout;
 
 import android.content.Context;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -34,7 +33,7 @@ public class BottomSheetActivity extends AppCompatActivity {
 
   private static final String TAG_MAIN_FRAGMENT = "com.mapbox.mapboxsdk.fragment.tag.main";
   private static final String TAG_BOTTOM_FRAGMENT = "com.mapbox.mapboxsdk.fragment.tag.bottom";
-
+  private static final String AMOUNT_OF_MAIN_MAP_FRAGMENTS = "Amount of main map fragments: %s";
   private boolean bottomSheetFragmentAdded;
 
   @Override
@@ -89,7 +88,10 @@ public class BottomSheetActivity extends AppCompatActivity {
     }
     fragmentTransaction.addToBackStack(String.valueOf(mainMapFragment.hashCode()));
     fragmentTransaction.commit();
-    Toast.makeText(this, "Amount of main map fragments: " + (fragmentCount + 1), Toast.LENGTH_SHORT).show();
+    Toast.makeText(getApplicationContext(),
+      String.format(AMOUNT_OF_MAIN_MAP_FRAGMENTS, (fragmentCount + 1)),
+      Toast.LENGTH_SHORT
+    ).show();
   }
 
   private void toggleBottomSheetMapFragment() {
@@ -150,11 +152,8 @@ public class BottomSheetActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onMapReady(MapboxMap mapboxMap) {
-      Location location = mapboxMap.getMyLocation();
-      if (location != null) {
-        mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 15));
-      }
+    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+      mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.760545, -122.436055), 15));
     }
 
     @Override
@@ -207,7 +206,6 @@ public class BottomSheetActivity extends AppCompatActivity {
     public static BottomSheetFragment newInstance() {
       BottomSheetFragment mapFragment = new BottomSheetFragment();
       MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
-      mapboxMapOptions.locationEnabled(true);
       mapboxMapOptions.renderSurfaceOnTop(true);
       mapboxMapOptions.styleUrl(Style.LIGHT);
       mapFragment.setArguments(MapFragmentUtils.createFragmentArgs(mapboxMapOptions));
@@ -229,11 +227,8 @@ public class BottomSheetActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onMapReady(MapboxMap mapboxMap) {
-      Location location = mapboxMap.getMyLocation();
-      if (location != null) {
-        mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 15));
-      }
+    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+      mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.760545, -122.436055), 15));
     }
 
     @Override

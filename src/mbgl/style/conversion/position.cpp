@@ -1,5 +1,6 @@
 #include <mbgl/style/conversion/position.hpp>
 #include <mbgl/style/conversion/constant.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 #include <array>
 
@@ -11,7 +12,7 @@ optional<Position> Converter<Position>::operator()(const Convertible& value, Err
     optional<std::array<float, 3>> spherical = convert<std::array<float, 3>>(value, error);
 
     if (!spherical) {
-        return {};
+        return nullopt;
     }
 
     return Position(*spherical);

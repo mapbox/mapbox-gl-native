@@ -1,9 +1,11 @@
 package com.mapbox.mapboxsdk.testapp.activity.camera;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -19,23 +21,32 @@ public class MaxMinZoomActivity extends AppCompatActivity implements OnMapReadyC
   private MapView mapView;
   private MapboxMap mapboxMap;
 
-  @Override
+  private MapboxMap.OnMapClickListener clickListener = new MapboxMap.OnMapClickListener() {
+    @Override
+    public boolean onMapClick(@NonNull LatLng point) {
+      if (mapboxMap != null) {
+        mapboxMap.setStyle(Style.OUTDOORS, style -> Timber.d("Style Loaded %s", style));
+      }
+      return true;
+    }
+  };
 
+  @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_maxmin_zoom);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
   }
 
   @Override
-  public void onMapReady(final MapboxMap map) {
+  public void onMapReady(@NonNull final MapboxMap map) {
     mapboxMap = map;
     mapboxMap.setMinZoomPreference(3);
     mapboxMap.setMaxZoomPreference(5);
-    mapboxMap.setOnMapClickListener(point -> map.setStyle(Style.OUTDOORS, style -> Timber.d("Style Loaded %s", style)));
+    mapboxMap.addOnMapClickListener(clickListener);
   }
 
   @Override
@@ -71,6 +82,9 @@ public class MaxMinZoomActivity extends AppCompatActivity implements OnMapReadyC
   @Override
   protected void onDestroy() {
     super.onDestroy();
+    if (mapboxMap != null) {
+      mapboxMap.removeOnMapClickListener(clickListener);
+    }
     mapView.onDestroy();
   }
 

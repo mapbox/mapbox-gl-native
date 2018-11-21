@@ -1,12 +1,17 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/shaders/fill_outline.hpp>
+#include <mbgl/shaders/source.hpp>
 
 namespace mbgl {
 namespace shaders {
 
 const char* fill_outline::name = "fill_outline";
-const char* fill_outline::vertexSource = R"MBGL_SHADER(
+const char* fill_outline::vertexSource = source() + 19280;
+const char* fill_outline::fragmentSource = source() + 20185;
+
+// Uncompressed source of fill_outline.vertex.glsl:
+/*
 attribute vec2 a_pos;
 
 uniform mat4 u_matrix;
@@ -36,7 +41,7 @@ uniform lowp float u_opacity;
 void main() {
     
 #ifndef HAS_UNIFORM_u_outline_color
-    outline_color = unpack_mix_vec4(a_outline_color, a_outline_color_t);
+    outline_color = unpack_mix_color(a_outline_color, a_outline_color_t);
 #else
     highp vec4 outline_color = u_outline_color;
 #endif
@@ -53,8 +58,10 @@ void main() {
     v_pos = (gl_Position.xy / gl_Position.w + 1.0) / 2.0 * u_world;
 }
 
-)MBGL_SHADER";
-const char* fill_outline::fragmentSource = R"MBGL_SHADER(
+*/
+
+// Uncompressed source of fill_outline.fragment.glsl:
+/*
 
 #ifndef HAS_UNIFORM_u_outline_color
 varying highp vec4 outline_color;
@@ -93,7 +100,7 @@ void main() {
 #endif
 }
 
-)MBGL_SHADER";
+*/
 
 } // namespace shaders
 } // namespace mbgl

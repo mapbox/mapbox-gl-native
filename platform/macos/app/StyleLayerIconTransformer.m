@@ -22,6 +22,9 @@
     if ([layer isKindOfClass:[MGLFillStyleLayer class]]) {
         return [NSImage imageNamed:@"fill"];
     }
+    if ([layer isKindOfClass:[MGLFillExtrusionStyleLayer class]]) {
+        return [NSImage imageNamed:@"fill-extrusion"];
+    }
     if ([layer isKindOfClass:[MGLLineStyleLayer class]]) {
         return [NSImage imageNamed:@"NSListViewTemplate"];
     }
@@ -30,6 +33,9 @@
     }
     if ([layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
         return [NSImage imageNamed:@"symbol"];
+    }
+    if ([layer isKindOfClass:[MGLHeatmapStyleLayer class]]) {
+        return [NSImage imageNamed:@"heatmap"];
     }
     if ([layer isKindOfClass:[MGLHillshadeStyleLayer class]]) {
         return [NSImage imageNamed:@"hillshade"];

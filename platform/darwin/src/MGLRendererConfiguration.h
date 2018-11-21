@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MGLRendererConfiguration : NSObject
 
 /** Returns an instance of the current renderer configuration. */
-+ (instancetype)currentConfiguration;
+@property (class, nonatomic, readonly) MGLRendererConfiguration *currentConfiguration;
 
 /** The file source to use. Defaults to `mbgl::DefaultFileSource` */
 @property (nonatomic, readonly) mbgl::DefaultFileSource *fileSource;
@@ -34,6 +34,17 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLIdeographicFontFamilyName` in your containing app's Info.plist to a value
  which will be available at run time, e.g. "PingFang". */
 @property (nonatomic, readonly) mbgl::optional<std::string> localFontFamilyName;
+
+/**
+ A Boolean value indicating whether symbol layers may enable per-source symbol
+ collision detection.
+ 
+ Set `MGLCollisionBehaviorPre4_0` in your containing app's Info.plist.
+ 
+ Setting this property to `YES` in the plist results in symbol layers only running
+ collision detection against other symbol layers that are part of the same source.
+ */
+@property (nonatomic, readonly) BOOL perSourceCollisions;
 
 @end
 

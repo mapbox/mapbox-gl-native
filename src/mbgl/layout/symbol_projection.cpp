@@ -240,7 +240,11 @@ namespace mbgl {
                                                             const PlacedSymbol& symbol,
                                                             const mat4& labelPlaneMatrix,
                                                             const bool returnTileDistance) {
-
+        if (symbol.glyphOffsets.empty()) {
+            assert(false);
+            return optional<std::pair<PlacedGlyph, PlacedGlyph>>();
+        }
+        
         const float firstGlyphOffset = symbol.glyphOffsets.front();
         const float lastGlyphOffset = symbol.glyphOffsets.back();;
 

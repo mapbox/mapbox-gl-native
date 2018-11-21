@@ -5,17 +5,25 @@
 #import "MBXOfflinePacksTableViewController.h"
 #import "MBXAnnotationView.h"
 #import "MBXUserLocationAnnotationView.h"
+#import "LimeGreenStyleLayer.h"
 #import "MBXEmbeddedMapViewController.h"
 
 #import <Mapbox/Mapbox.h>
+#import "../src/MGLMapView_Experimental.h"
 
 #import <objc/runtime.h>
 
 static const CLLocationCoordinate2D WorldTourDestinations[] = {
-    { .latitude = 38.9131982, .longitude = -77.0325453144239 },
-    { .latitude = 37.7757368, .longitude = -122.4135302 },
-    { .latitude = 12.9810816, .longitude = 77.6368034 },
-    { .latitude = -13.15589555, .longitude = -74.2178961777998 },
+    { .latitude = 38.8999418, .longitude = -77.033996 },
+    { .latitude = 37.7884307, .longitude = -122.3998631 },
+    { .latitude = 52.5003103, .longitude = 13.4197763 },
+    { .latitude = 60.1712627, .longitude = 24.9378866 },
+    { .latitude = 53.8948782, .longitude = 27.5558476 },
+};
+
+static const MGLCoordinateBounds colorado = {
+    .sw = { .latitude = 36.986207, .longitude = -109.049896},
+    .ne = { .latitude = 40.989329, .longitude = -102.062592},
 };
 
 static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXViewControllerAnnotationViewReuseIdentifer";
@@ -49,6 +57,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsAnnotationsRows) {
     MBXSettingsAnnotationsQueryAnnotations,
     MBXSettingsAnnotationsCustomUserDot,
     MBXSettingsAnnotationsRemoveAnnotations,
+    MBXSettingsAnnotationSelectRandomOffscreenPointAnnotation,
+    MBXSettingsAnnotationCenterSelectedAnnotation,
+    MBXSettingsAnnotationAddVisibleAreaPolyline
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
@@ -70,10 +81,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingUpdateShapeSourceData,
     MBXSettingsRuntimeStylingUpdateShapeSourceURL,
     MBXSettingsRuntimeStylingUpdateShapeSourceFeatures,
-    MBXSettingsRuntimeStylingVectorSource,
-    MBXSettingsRuntimeStylingRasterSource,
+    MBXSettingsRuntimeStylingVectorTileSource,
+    MBXSettingsRuntimeStylingRasterTileSource,
     MBXSettingsRuntimeStylingImageSource,
     MBXSettingsRuntimeStylingRouteLine,
+    MBXSettingsRuntimeStylingAddLimeGreenTriangleLayer,
     MBXSettingsRuntimeStylingDDSPolygon,
     MBXSettingsRuntimeStylingCustomLatLonGrid,
 };
@@ -81,14 +93,76 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MBXSettingsMiscellaneousShowReuseQueueStats = 0,
     MBXSettingsMiscellaneousWorldTour,
+    MBXSettingsMiscellaneousRandomTour,
     MBXSettingsMiscellaneousShowZoomLevel,
     MBXSettingsMiscellaneousScrollView,
     MBXSettingsMiscellaneousToggleTwoMaps,
-    MBXSettingsMiscellaneousCountryLabels,
+    MBXSettingsMiscellaneousLocalizeLabels,
     MBXSettingsMiscellaneousShowSnapshots,
+    MBXSettingsMiscellaneousShouldLimitCameraChanges,
+    MBXSettingsMiscellaneousShowCustomLocationManager,
     MBXSettingsMiscellaneousPrintLogFile,
     MBXSettingsMiscellaneousDeleteLogFile,
 };
+
+// Utility methods
+CLLocationCoordinate2D coordinateCentered(CLLocationCoordinate2D origin, CLLocationDegrees bearing, CLLocationDistance distance) {
+
+    // Convert to radians
+    double multiplier      = M_PI / 180.0;
+    double sourceLatitude  = multiplier * origin.latitude;
+    double sourceLongitude = multiplier * origin.longitude;
+    bearing *= multiplier;
+    distance /= 6378137.0;
+
+    // Pulled from MGLRadianCoordinateAtDistanceFacingDirection:
+    double latitude = asin((sin(sourceLatitude) * cos(distance)) +
+                           (cos(sourceLatitude) * sin(distance) * cos(bearing)));
+
+    double longitude = sourceLongitude + atan2((sin(bearing) * sin(distance) * cos(sourceLatitude)),
+                                               cos(distance) - (sin(sourceLatitude) * sin(latitude)));
+
+    CLLocationCoordinate2D result;
+    result.latitude  = fmin(85.0, fmax(-85.0, (latitude / multiplier)));
+    result.longitude = longitude / multiplier;
+    return result;
+}
+
+CLLocationCoordinate2D randomWorldCoordinate() {
+
+    static const struct {
+        CLLocationCoordinate2D coordinate;
+        CLLocationDistance radius;
+    } landmasses[] = {
+        // Rough land masses
+        {{ 38.328531,   94.778736 },    4100000 },  // Asia
+        {{ 1.477244,    18.138111 },    4100000 },  // Africa
+        {{ 52.310059,   22.295425 },    2000000 },  // Europe
+        {{ 42.344216,   -96.532700 },   3000000 },  // N America
+        {{ -11.537273,  -57.035181 },   2220000 },  // S America
+        {{ -20.997030,  134.660541 },   2220000 },  // Australia
+
+        // A few cities
+        {{ 51.504787,   -0.106977 },    33000 },    // London
+        {{ 37.740186,   -122.437086 },  8500 },     // SF
+        {{ 52.509978,   13.406510 },    12000 },    // Berlin
+        {{ 12.966246,   77.586505 },    19000 }     // Bengaluru
+    };
+
+    NSInteger index                   = drand48() * (sizeof(landmasses)/sizeof(landmasses[0]));
+    CLLocationCoordinate2D coordinate = landmasses[index].coordinate;
+    CLLocationDistance radius         = landmasses[index].radius;
+
+    // Now create a world coord
+    CLLocationDegrees heading          = drand48()*360.0;
+    CLLocationDistance distance        = drand48()*radius;
+    CLLocationCoordinate2D newLocation = coordinateCentered(coordinate, heading, distance);
+    return newLocation;
+}
+
+
+
+
 
 @interface MBXDroppedPinAnnotation : MGLPointAnnotation
 @end
@@ -121,17 +195,15 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 @property (nonatomic) NSInteger styleIndex;
 @property (nonatomic) BOOL debugLoggingEnabled;
 @property (nonatomic) BOOL customUserLocationAnnnotationEnabled;
-@property (nonatomic) BOOL usingLocaleBasedCountryLabels;
+@property (nonatomic, getter=isLocalizingLabels) BOOL localizingLabels;
 @property (nonatomic) BOOL reuseQueueStatsEnabled;
-@property (nonatomic) BOOL showZoomLevelEnabled;
-
+@property (nonatomic) BOOL mapInfoHUDEnabled;
+@property (nonatomic) BOOL shouldLimitCameraChanges;
+@property (nonatomic) BOOL randomWalk;
 @end
 
 @interface MGLMapView (MBXViewController)
-
-@property (nonatomic) BOOL usingLocaleBasedCountryLabels;
 @property (nonatomic) NSDictionary *annotationViewReuseQueueByIdentifier;
-
 @end
 
 @implementation MBXViewController
@@ -164,12 +236,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self restoreState:nil];
 
     self.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
-    self.mapView.scaleBar.hidden = NO;
+    self.mapView.showsScale = YES;
     self.mapView.showsUserHeadingIndicator = YES;
-    self.hudLabel.hidden = YES;
-    if ([UIFont respondsToSelector:@selector(monospacedDigitSystemFontOfSize:weight:)]) {
-        self.hudLabel.titleLabel.font = [UIFont monospacedDigitSystemFontOfSize:10 weight:UIFontWeightRegular];
-    }
+    self.hudLabel.titleLabel.font = [UIFont monospacedDigitSystemFontOfSize:10 weight:UIFontWeightRegular];
 
     if ([MGLAccountManager accessToken].length)
     {
@@ -199,13 +268,20 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             [self.mapView reloadStyle:self];
         }];
         [alertController addAction:OKAction];
+        alertController.preferredAction = OKAction;
 
-        if ([alertController respondsToSelector:@selector(setPreferredAction:)])
-        {
-            alertController.preferredAction = OKAction;
-        }
         [self presentViewController:alertController animated:YES completion:nil];
     }
+
+    // Add fall-through single tap gesture recognizer. This will be called when
+    // the map view's tap recognizers fail.
+    UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
+    for (UIGestureRecognizer *gesture in self.mapView.gestureRecognizers) {
+        if ([gesture isKindOfClass:[UITapGestureRecognizer class]]) {
+            [singleTap requireGestureRecognizerToFail:gesture];
+        }
+    }
+    [self.mapView addGestureRecognizer:singleTap];
 }
 
 - (void)saveState:(__unused NSNotification *)notification
@@ -216,6 +292,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [defaults setInteger:self.mapView.userTrackingMode forKey:@"MBXUserTrackingMode"];
     [defaults setBool:self.mapView.showsUserLocation forKey:@"MBXShowsUserLocation"];
     [defaults setInteger:self.mapView.debugMask forKey:@"MBXDebugMask"];
+    [defaults setBool:self.mapInfoHUDEnabled forKey:@"MBXShowsZoomLevelHUD"];
     [defaults synchronize];
 }
 
@@ -240,6 +317,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     if (uncheckedDebugMask >= 0)
     {
         self.mapView.debugMask = (MGLMapDebugMaskOptions)uncheckedDebugMask;
+    }
+    if ([defaults boolForKey:@"MBXShowsZoomLevelHUD"])
+    {
+        self.mapInfoHUDEnabled = YES;
+        [self updateHUD];
     }
 }
 
@@ -266,6 +348,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 - (IBAction)showSettings:(__unused id)sender
 {
+    self.randomWalk = NO;
+
     UITableViewController *settingsViewController = [[UITableViewController alloc] initWithStyle:UITableViewStyleGrouped];
     settingsViewController.tableView.delegate = self;
     settingsViewController.tableView.dataSource = self;
@@ -328,6 +412,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Query Annotations",
                 [NSString stringWithFormat:@"%@ Custom User Dot", (_customUserLocationAnnnotationEnabled ? @"Disable" : @"Enable")],
                 @"Remove Annotations",
+                @"Select an offscreen point annotation",
+                @"Center selected annotation",
+                @"Add visible area polyline"
             ]];
             break;
         case MBXSettingsRuntimeStyling:
@@ -350,10 +437,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Update Shape Source: Data",
                 @"Update Shape Source: URL",
                 @"Update Shape Source: Features",
-                @"Style Vector Source",
-                @"Style Raster Source",
+                @"Style Vector Tile Source",
+                @"Style Raster Tile Source",
                 @"Style Image Source",
                 @"Add Route Line",
+                @"Add Lime Green Triangle Layer",
                 @"Dynamically Style Polygon",
                 @"Add Custom Lat/Lon Grid",
             ]];
@@ -362,11 +450,14 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             [settingsTitles addObjectsFromArray:@[
                 [NSString stringWithFormat:@"%@ Reuse Queue Stats", (_reuseQueueStatsEnabled ? @"Hide" :@"Show")],
                 @"Start World Tour",
-                [NSString stringWithFormat:@"%@ Zoom/Pitch/Direction Label", (_showZoomLevelEnabled ? @"Hide" :@"Show")],
+                @"Random Tour",
+                [NSString stringWithFormat:@"%@ Map Info HUD", (_mapInfoHUDEnabled ? @"Hide" :@"Show")],
                 @"Embedded Map View",
                 [NSString stringWithFormat:@"%@ Second Map", ([self.view viewWithTag:2] == nil ? @"Show" : @"Hide")],
-                [NSString stringWithFormat:@"Show Labels in %@", (_usingLocaleBasedCountryLabels ? @"Default Language" : [[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier value:[self bestLanguageForUser]])],
-                @"Show Snapshots"
+                [NSString stringWithFormat:@"Show Labels in %@", (_localizingLabels ? @"Default Language" : [[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier value:[self bestLanguageForUser]])],
+                @"Show Snapshots",
+                [NSString stringWithFormat:@"%@ Camera Changes", (_shouldLimitCameraChanges ? @"Unlimit" : @"Limit")],
+                @"View Route Simulation",
             ]];
 
             if (self.debugLoggingEnabled)
@@ -455,6 +546,18 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 case MBXSettingsAnnotationsRemoveAnnotations:
                     [self.mapView removeAnnotations:self.mapView.annotations];
                     break;
+                case MBXSettingsAnnotationSelectRandomOffscreenPointAnnotation:
+                    [self selectAnOffscreenPointAnnotation];
+                    break;
+
+                case MBXSettingsAnnotationCenterSelectedAnnotation:
+                    [self centerSelectedAnnotation];
+                    break;
+
+                case MBXSettingsAnnotationAddVisibleAreaPolyline:
+                    [self addVisibleAreaPolyline];
+                    break;
+
                 default:
                     NSAssert(NO, @"All annotations setting rows should be implemented");
                     break;
@@ -517,17 +620,20 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 case MBXSettingsRuntimeStylingUpdateShapeSourceFeatures:
                     [self updateShapeSourceFeatures];
                     break;
-                case MBXSettingsRuntimeStylingVectorSource:
-                    [self styleVectorSource];
+                case MBXSettingsRuntimeStylingVectorTileSource:
+                    [self styleVectorTileSource];
                     break;
-                case MBXSettingsRuntimeStylingRasterSource:
-                    [self styleRasterSource];
+                case MBXSettingsRuntimeStylingRasterTileSource:
+                    [self styleRasterTileSource];
                     break;
                 case MBXSettingsRuntimeStylingImageSource:
                     [self styleImageSource];
                     break;
                 case MBXSettingsRuntimeStylingRouteLine:
                     [self styleRouteLine];
+                    break;
+                case MBXSettingsRuntimeStylingAddLimeGreenTriangleLayer:
+                    [self styleAddLimeGreenTriangleLayer];
                     break;
                 case MBXSettingsRuntimeStylingDDSPolygon:
                     [self stylePolygonWithDDS];
@@ -543,12 +649,16 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         case MBXSettingsMiscellaneous:
             switch (indexPath.row)
             {
-                case MBXSettingsMiscellaneousCountryLabels:
+                case MBXSettingsMiscellaneousLocalizeLabels:
                     [self styleCountryLabelsLanguage];
                     break;
                 case MBXSettingsMiscellaneousWorldTour:
                     [self startWorldTour];
                     break;
+                case MBXSettingsMiscellaneousRandomTour:
+                    [self randomWorldTour];
+                    break;
+
                 case MBXSettingsMiscellaneousPrintLogFile:
                     [self printTelemetryLogFile];
                     break;
@@ -559,14 +669,14 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 {
                     self.reuseQueueStatsEnabled = !self.reuseQueueStatsEnabled;
                     self.hudLabel.hidden = !self.reuseQueueStatsEnabled;
-                    self.showZoomLevelEnabled = NO;
+                    self.mapInfoHUDEnabled = NO;
                     [self updateHUD];
                     break;
                 }
                 case MBXSettingsMiscellaneousShowZoomLevel:
                 {
-                    self.showZoomLevelEnabled = !self.showZoomLevelEnabled;
-                    self.hudLabel.hidden = !self.showZoomLevelEnabled;
+                    self.mapInfoHUDEnabled = !self.mapInfoHUDEnabled;
+                    self.hudLabel.hidden = !self.mapInfoHUDEnabled;
                     self.reuseQueueStatsEnabled = NO;
                     [self updateHUD];
                     break;
@@ -579,83 +689,24 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 }
                 case MBXSettingsMiscellaneousToggleTwoMaps:
-                    if ([self.view viewWithTag:2] == nil) {
-                        MGLMapView *secondMapView = [[MGLMapView alloc] initWithFrame:
-                                                        CGRectMake(0, self.view.bounds.size.height / 2,
-                                                                   self.view.bounds.size.width, self.view.bounds.size.height / 2)];
-                        secondMapView.translatesAutoresizingMaskIntoConstraints = false;
-                        secondMapView.tag = 2;
-                        for (NSLayoutConstraint *constraint in self.view.constraints)
-                        {
-                            if ((constraint.firstItem  == self.mapView && constraint.firstAttribute  == NSLayoutAttributeBottom) ||
-                                (constraint.secondItem == self.mapView && constraint.secondAttribute == NSLayoutAttributeBottom))
-                            {
-                                [self.view removeConstraint:constraint];
-                                break;
-                            }
-                        }
-                        [self.view addSubview:secondMapView];
-                        [self.view addConstraints:@[
-                            [NSLayoutConstraint constraintWithItem:self.mapView
-                                                         attribute:NSLayoutAttributeBottom
-                                                         relatedBy:NSLayoutRelationEqual
-                                                            toItem:self.view
-                                                         attribute:NSLayoutAttributeCenterY
-                                                        multiplier:1
-                                                          constant:0],
-                            [NSLayoutConstraint constraintWithItem:secondMapView
-                                                         attribute:NSLayoutAttributeCenterX
-                                                         relatedBy:NSLayoutRelationEqual
-                                                            toItem:self.view
-                                                         attribute:NSLayoutAttributeCenterX
-                                                        multiplier:1
-                                                          constant:0],
-                            [NSLayoutConstraint constraintWithItem:secondMapView
-                                                         attribute:NSLayoutAttributeWidth
-                                                         relatedBy:NSLayoutRelationEqual
-                                                            toItem:self.view
-                                                         attribute:NSLayoutAttributeWidth
-                                                        multiplier:1
-                                                          constant:0],
-                            [NSLayoutConstraint constraintWithItem:secondMapView
-                                                         attribute:NSLayoutAttributeTop
-                                                         relatedBy:NSLayoutRelationEqual
-                                                            toItem:self.view
-                                                         attribute:NSLayoutAttributeCenterY
-                                                        multiplier:1
-                                                          constant:0],
-                            [NSLayoutConstraint constraintWithItem:secondMapView
-                                                         attribute:NSLayoutAttributeBottom
-                                                         relatedBy:NSLayoutRelationEqual
-                                                            toItem:self.bottomLayoutGuide
-                                                         attribute:NSLayoutAttributeTop
-                                                        multiplier:1
-                                                          constant:0],
-                        ]];
-                    } else {
-                        NSMutableArray *constraintsToRemove = [NSMutableArray array];
-                        MGLMapView *secondMapView = (MGLMapView *)[self.view viewWithTag:2];
-                        for (NSLayoutConstraint *constraint in self.view.constraints)
-                        {
-                            if (constraint.firstItem == secondMapView || constraint.secondItem == secondMapView)
-                            {
-                                [constraintsToRemove addObject:constraint];
-                            }
-                        }
-                        [self.view removeConstraints:constraintsToRemove];
-                        [secondMapView removeFromSuperview];
-                        [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.mapView
-                                                                              attribute:NSLayoutAttributeBottom
-                                                                              relatedBy:NSLayoutRelationEqual
-                                                                                 toItem:self.bottomLayoutGuide
-                                                                              attribute:NSLayoutAttributeTop
-                                                                             multiplier:1
-                                                                               constant:0]];
-                    }
+                    [self toggleSecondMapView];
                     break;
                 case MBXSettingsMiscellaneousShowSnapshots:
                 {
                     [self performSegueWithIdentifier:@"ShowSnapshots" sender:nil];
+                    break;
+                }
+                case MBXSettingsMiscellaneousShowCustomLocationManager:
+                {
+                    [self performSegueWithIdentifier:@"ShowCustomLocationManger" sender:nil];
+                    break;
+                }
+                case MBXSettingsMiscellaneousShouldLimitCameraChanges:
+                {
+                    self.shouldLimitCameraChanges = !self.shouldLimitCameraChanges;
+                    if (self.shouldLimitCameraChanges) {
+                        [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(39.748947, -104.995882) zoomLevel:10 direction:0 animated:NO];
+                    }
                     break;
                 }
                 default:
@@ -896,7 +947,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
         MGLFillExtrusionStyleLayer* layer = [[MGLFillExtrusionStyleLayer alloc] initWithIdentifier:@"extrudedBuildings" source:source];
         layer.sourceLayerIdentifier = @"building";
-        layer.predicate = [NSPredicate predicateWithFormat:@"extrude == 'true' AND height > 0"];
+        layer.predicate = [NSPredicate predicateWithFormat:@"extrude == 'true' AND CAST(height, 'NSNumber') > 0"];
         layer.fillExtrusionBase = [NSExpression expressionForKeyPath:@"min_height"];
         layer.fillExtrusionHeight = [NSExpression expressionForKeyPath:@"height"];
 
@@ -929,18 +980,20 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                       @10.0f: [UIColor redColor],
                                       @12.0f: [UIColor greenColor],
                                       @14.0f: [UIColor blueColor]};
-    waterLayer.fillColor = [NSExpression expressionWithFormat:
-                            @"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
-                            waterColorStops];
+    NSExpression *fillColorExpression = [NSExpression mgl_expressionForInterpolatingExpression:NSExpression.zoomLevelVariableExpression
+                                                                                 withCurveType:MGLExpressionInterpolationModeLinear
+                                                                                    parameters:nil
+                                                                                         stops:[NSExpression expressionForConstantValue:waterColorStops]];
+    waterLayer.fillColor = fillColorExpression;
 
     NSDictionary *fillAntialiasedStops = @{@11: @YES,
                                            @12: @NO,
                                            @13: @YES,
                                            @14: @NO,
                                            @15: @YES};
-    waterLayer.fillAntialiased = [NSExpression expressionWithFormat:
-                                  @"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', false, %@)",
-                                  fillAntialiasedStops];
+    waterLayer.fillAntialiased = [NSExpression mgl_expressionForSteppingExpression:NSExpression.zoomLevelVariableExpression
+                                                                    fromExpression:[NSExpression expressionForConstantValue:@NO]
+                                                                             stops:[NSExpression expressionForConstantValue:fillAntialiasedStops]];
 }
 
 - (void)styleRoadLayer
@@ -952,7 +1005,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                      @10: @15,
                                      @15: @30};
     NSExpression *lineWidthExpression = [NSExpression expressionWithFormat:
-                                         @"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+                                         @"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)",
                                          lineWidthStops];
     roadLayer.lineWidth = lineWidthExpression;
     roadLayer.lineGapWidth = lineWidthExpression;
@@ -961,7 +1014,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                          @13: [UIColor yellowColor],
                                          @16: [UIColor cyanColor]};
     roadLayer.lineColor = [NSExpression expressionWithFormat:
-                           @"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+                           @"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)",
                            roadLineColorStops];
 
     roadLayer.visible = YES;
@@ -972,14 +1025,14 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 - (void)styleRasterLayer
 {
     NSURL *rasterURL = [NSURL URLWithString:@"mapbox://mapbox.satellite"];
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"my-raster-source" configurationURL:rasterURL tileSize:512];
-    [self.mapView.style addSource:rasterSource];
+    MGLRasterTileSource *rasterTileSource = [[MGLRasterTileSource alloc] initWithIdentifier:@"my-raster-tile-source" configurationURL:rasterURL tileSize:512];
+    [self.mapView.style addSource:rasterTileSource];
 
-    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"my-raster-layer" source:rasterSource];
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"my-raster-layer" source:rasterTileSource];
     NSDictionary *opacityStops = @{@20.0f: @1.0f,
                                    @5.0f: @0.0f};
     rasterLayer.rasterOpacity = [NSExpression expressionWithFormat:
-                                 @"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+                                 @"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)",
                                  opacityStops];
     [self.mapView.style addLayer:rasterLayer];
 }
@@ -1076,7 +1129,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         MGLFillStyleLayer *regionsLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"regions"];
 
         // filter (testing both inline and format strings)
-        regionsLayer.predicate = [NSPredicate predicateWithFormat:@"HRRNUM >= %@ AND HRRNUM < 300", @(200)];
+        regionsLayer.predicate = [NSPredicate predicateWithFormat:@"CAST(HRRNUM, 'NSNumber') >= %@ AND CAST(HRRNUM, 'NSNumber') < 300", @(200)];
 
         // paint properties
         regionsLayer.fillColor = [NSExpression expressionForConstantValue:[UIColor blueColor]];
@@ -1106,10 +1159,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:querySourceID features:visibleFeatures options:nil];
-        [self.mapView.style addSource:source];
+        MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:querySourceID features:visibleFeatures options:nil];
+        [self.mapView.style addSource:shapeSource];
 
-        MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:queryLayerID source:source];
+        MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:queryLayerID source:shapeSource];
         fillLayer.fillColor = [NSExpression expressionForConstantValue:[UIColor blueColor]];
         fillLayer.fillOpacity = [NSExpression expressionForConstantValue:@0.5];
         [self.mapView.style addLayer:fillLayer];
@@ -1211,10 +1264,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self.mapView.style addLayer:layer];
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSString *geoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-109.34814453125,37.64903402157866]]}}]}";
-        NSData *data = [geoJSON dataUsingEncoding:NSUTF8StringEncoding];
-        MGLShape *shape = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:NULL];
-        source.shape = shape;
+        NSString *updatedGeoJSON = @"{\"type\": \"FeatureCollection\",\"features\": [{\"type\": \"Feature\",\"properties\": {},\"geometry\": {\"type\": \"LineString\",\"coordinates\": [[-107.75390625,40.329795743702064],[-109.34814453125,37.64903402157866]]}}]}";
+        NSData *updatedData = [updatedGeoJSON dataUsingEncoding:NSUTF8StringEncoding];
+        MGLShape *updatedShape = [MGLShape shapeWithData:updatedData encoding:NSUTF8StringEncoding error:NULL];
+        source.shape = updatedShape;
     });
 }
 
@@ -1233,10 +1286,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(41.563986787078704, -75.04843935793578) zoomLevel:8 animated:NO];
 
-        NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"threestates" ofType:@"geojson"];
-        NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
+        NSString *threeStatesFilePath = [[NSBundle bundleForClass:self.class] pathForResource:@"threestates" ofType:@"geojson"];
+        NSURL *updatedGeoJSONURL = [NSURL fileURLWithPath:threeStatesFilePath];
 
-        source.URL = geoJSONURL;
+        source.URL = updatedGeoJSONURL;
     });
 }
 
@@ -1280,6 +1333,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 - (void)styleDynamicPointCollection
 {
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(36.9979, -109.0441) zoomLevel:14 animated:NO];
+
     CLLocationCoordinate2D coordinates[] = {
         {37.00145594210082, -109.04960632324219},
         {37.00173012609867, -109.0404224395752},
@@ -1294,17 +1348,17 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self.mapView.style addLayer:layer];
 }
 
-- (void)styleVectorSource
+- (void)styleVectorTileSource
 {
     NSURL *url = [[NSURL alloc] initWithString:@"mapbox://mapbox.mapbox-terrain-v2"];
-    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"style-vector-source-id" configurationURL:url];
-    [self.mapView.style addSource:vectorSource];
+    MGLVectorTileSource *vectorTileSource = [[MGLVectorTileSource alloc] initWithIdentifier:@"style-vector-tile-source-id" configurationURL:url];
+    [self.mapView.style addSource:vectorTileSource];
 
     MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"style-vector-background-layer-id"];
     backgroundLayer.backgroundColor = [NSExpression expressionForConstantValue:[UIColor blackColor]];
     [self.mapView.style addLayer:backgroundLayer];
 
-    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"style-vector-line-layer-id" source:vectorSource];
+    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"style-vector-line-layer-id" source:vectorTileSource];
     lineLayer.sourceLayerIdentifier = @"contour";
     lineLayer.lineJoin = [NSExpression expressionForConstantValue:@"round"];
     lineLayer.lineCap = [NSExpression expressionForConstantValue:@"round"];
@@ -1313,15 +1367,15 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self.mapView.style addLayer:lineLayer];
 }
 
-- (void)styleRasterSource
+- (void)styleRasterTileSource
 {
     NSString *tileURL = [NSString stringWithFormat:@"https://stamen-tiles.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}%@.jpg", UIScreen.mainScreen.nativeScale > 1 ? @"@2x" : @""];
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"style-raster-source-id" tileURLTemplates:@[tileURL] options:@{
+    MGLRasterTileSource *rasterTileSource = [[MGLRasterTileSource alloc] initWithIdentifier:@"style-raster-tile-source-id" tileURLTemplates:@[tileURL] options:@{
         MGLTileSourceOptionTileSize: @256,
     }];
-    [self.mapView.style addSource:rasterSource];
+    [self.mapView.style addSource:rasterTileSource];
 
-    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"style-raster-layer-id" source:rasterSource];
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"style-raster-layer-id" source:rasterTileSource];
     [self.mapView.style addLayer:rasterLayer];
 }
 
@@ -1360,8 +1414,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 -(void)styleCountryLabelsLanguage
 {
-    _usingLocaleBasedCountryLabels = !_usingLocaleBasedCountryLabels;
-    self.mapView.style.localizesLabels = _usingLocaleBasedCountryLabels;
+    _localizingLabels = !_localizingLabels;
+    [self.mapView.style localizeLabelsIntoLocale:_localizingLabels ? [NSLocale localeWithLocaleIdentifier:@"mul"] : nil];
 }
 
 - (void)styleRouteLine
@@ -1402,6 +1456,12 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self.mapView.style addLayer:routeLayer];
 }
 
+- (void)styleAddLimeGreenTriangleLayer
+{
+    LimeGreenStyleLayer *layer = [[LimeGreenStyleLayer alloc] initWithIdentifier:@"mbx-custom"];
+    [self.mapView.style addLayer:layer];
+}
+
 - (void)stylePolygonWithDDS {
     CLLocationCoordinate2D leftCoords[] = {
         {37.73081027834234, -122.49412536621094},
@@ -1428,10 +1488,16 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
     // source, categorical function that sets any feature with a "fill" attribute value of true to red color and anything without to green
     MGLFillStyleLayer *fillStyleLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fill-layer" source:shapeSource];
-    fillStyleLayer.fillColor = [NSExpression expressionWithFormat:@"TERNARY(fill, %@, %@)", [UIColor greenColor], [UIColor redColor]];
+    fillStyleLayer.fillColor = [NSExpression mgl_expressionForConditional:[NSPredicate predicateWithFormat:@"fill == YES"]
+                                                           trueExpression:[NSExpression expressionForConstantValue:[UIColor greenColor]]
+                                                         falseExpresssion:[NSExpression expressionForConstantValue:[UIColor redColor]]];
+                                                               
+    
 
     // source, identity function that sets any feature with an "opacity" attribute to use that value and anything without to 1.0
-    fillStyleLayer.fillOpacity = [NSExpression expressionWithFormat:@"TERNARY(opacity != nil, opacity, 1.0)"];
+    fillStyleLayer.fillOpacity = [NSExpression mgl_expressionForConditional:[NSPredicate predicateWithFormat:@"opacity != nil"]
+                                                             trueExpression:[NSExpression expressionForKeyPath:@"opacity"] 
+                                                           falseExpresssion:[NSExpression expressionForConstantValue:@1.0]];
     [self.mapView.style addLayer:fillStyleLayer];
 }
 
@@ -1485,7 +1551,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self continueWorldTourWithRemainingAnnotations:annotations];
 }
 
-- (void)continueWorldTourWithRemainingAnnotations:(NS_MUTABLE_ARRAY_OF(MGLPointAnnotation *) *)annotations
+- (void)continueWorldTourWithRemainingAnnotations:(NSMutableArray<MGLPointAnnotation *> *)annotations
 {
     MGLPointAnnotation *nextAnnotation = annotations.firstObject;
     if (!nextAnnotation || !_isTouringWorld)
@@ -1496,7 +1562,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
     [annotations removeObjectAtIndex:0];
     MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:nextAnnotation.coordinate
-                                                            fromDistance:10
+                                                          acrossDistance:10
                                                                    pitch:arc4random_uniform(60)
                                                                  heading:arc4random_uniform(360)];
     __weak MBXViewController *weakSelf = self;
@@ -1527,6 +1593,73 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Visible Annotations" message:message preferredStyle:UIAlertControllerStyleAlert];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (id<MGLAnnotation>)randomOffscreenPointAnnotation {
+
+    NSPredicate *pointAnnotationPredicate = [NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [evaluatedObject isKindOfClass:[MGLPointAnnotation class]];
+    }];
+
+    NSArray *annotations = [self.mapView.annotations filteredArrayUsingPredicate:pointAnnotationPredicate];
+
+    if (annotations.count == 0) {
+        return nil;
+    }
+
+    NSArray *visibleAnnotations = [self.mapView.visibleAnnotations filteredArrayUsingPredicate:pointAnnotationPredicate];
+
+    if (visibleAnnotations.count == annotations.count) {
+        return nil;
+    }
+
+    NSMutableArray *invisibleAnnotations = [annotations mutableCopy];
+
+    if (visibleAnnotations.count > 0) {
+        [invisibleAnnotations removeObjectsInArray:visibleAnnotations];
+    }
+
+    // Now pick a random offscreen annotation.
+    uint32_t index = arc4random_uniform((uint32_t)invisibleAnnotations.count);
+    return invisibleAnnotations[index];
+}
+
+- (void)selectAnOffscreenPointAnnotation {
+    id<MGLAnnotation> annotation = [self randomOffscreenPointAnnotation];
+    if (annotation) {
+        [self.mapView selectAnnotation:annotation animated:YES];
+
+        NSAssert(self.mapView.selectedAnnotations.firstObject, @"The annotation was not selected");
+    }
+}
+
+- (void)centerSelectedAnnotation {
+    id<MGLAnnotation> annotation = self.mapView.selectedAnnotations.firstObject;
+
+    if (!annotation)
+        return;
+
+    CGPoint point = [self.mapView convertCoordinate:annotation.coordinate toPointToView:self.mapView];
+
+    // Animate, so that point becomes the the center
+    CLLocationCoordinate2D center = [self.mapView convertPoint:point toCoordinateFromView:self.mapView];
+    [self.mapView setCenterCoordinate:center animated:YES];
+}
+
+- (void)addVisibleAreaPolyline {
+    CGRect constrainedRect = UIEdgeInsetsInsetRect(self.mapView.bounds, self.mapView.contentInset);
+
+    CLLocationCoordinate2D lineCoords[5];
+
+    lineCoords[0] = [self.mapView convertPoint: CGPointMake(CGRectGetMinX(constrainedRect), CGRectGetMinY(constrainedRect)) toCoordinateFromView:self.mapView];
+    lineCoords[1] = [self.mapView convertPoint: CGPointMake(CGRectGetMaxX(constrainedRect), CGRectGetMinY(constrainedRect)) toCoordinateFromView:self.mapView];
+    lineCoords[2] = [self.mapView convertPoint: CGPointMake(CGRectGetMaxX(constrainedRect), CGRectGetMaxY(constrainedRect)) toCoordinateFromView:self.mapView];
+    lineCoords[3] = [self.mapView convertPoint: CGPointMake(CGRectGetMinX(constrainedRect), CGRectGetMaxY(constrainedRect)) toCoordinateFromView:self.mapView];
+    lineCoords[4] = lineCoords[0];
+
+    MGLPolyline *line = [MGLPolyline polylineWithCoordinates:lineCoords
+                                                       count:sizeof(lineCoords)/sizeof(lineCoords[0])];
+    [self.mapView addAnnotation:line];
 }
 
 - (void)printTelemetryLogFile
@@ -1560,7 +1693,161 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     return filePath;
 }
 
+#pragma mark - Random World Tour
+
+- (void)addAnnotations:(NSInteger)numAnnotations aroundCoordinate:(CLLocationCoordinate2D)coordinate radius:(CLLocationDistance)radius {
+    NSMutableArray *annotations = [[NSMutableArray alloc] initWithCapacity:numAnnotations];
+    for (NSInteger i = 0; i<numAnnotations; i++) {
+
+        CLLocationDegrees heading          = drand48()*360.0;
+        CLLocationDistance distance        = drand48()*radius;
+        CLLocationCoordinate2D newLocation = coordinateCentered(coordinate, heading, distance);
+
+        MBXDroppedPinAnnotation *annotation = [[MBXDroppedPinAnnotation alloc] init];
+        annotation.coordinate = newLocation;
+        [annotations addObject:annotation];
+    }
+    [self.mapView addAnnotations:annotations];
+}
+
+- (void)randomWorldTour {
+    // Consistent initial conditions (consider setting these by test params)
+    srand48(0);
+    [self.mapView removeAnnotations:self.mapView.annotations];
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(31, -100) zoomLevel:3 animated:NO];
+
+    [self randomWorldTourInternal];
+}
+
+- (void)randomWorldTourInternal {
+
+    self.randomWalk = YES;
+
+    // Remove all annotations
+    NSTimeInterval duration = 16.0;
+    __weak MBXViewController *weakSelf = self;
+
+    // Remove old annotations, half-way through the flight.
+    NSArray *annotationsToRemove = [self.mapView.annotations copy];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * 0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [weakSelf.mapView removeAnnotations:annotationsToRemove];
+    });
+
+    MBXDroppedPinAnnotation *annotation = [[MBXDroppedPinAnnotation alloc] init];
+    annotation.coordinate = randomWorldCoordinate();
+    [self.mapView addAnnotation:annotation];
+
+    // Add annotations around that coord
+    [self addAnnotations:50 aroundCoordinate:annotation.coordinate radius:100000.0]; // 100km
+
+    MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:annotation.coordinate
+                                                                altitude:10000.0
+                                                                   pitch:drand48()*60.0
+                                                                 heading:drand48()*360];
+    [self.mapView flyToCamera:camera
+                 withDuration:duration
+                 peakAltitude:2000000.0
+            completionHandler:^{
+                // This completion handler is currently called BEFORE the
+                // region did change delegate method, and we don't have a "reason"
+                // so we can't tell if the motion was cancelled. We use the delegate
+                // for that, and set self.randomWalk. But since we want a delay
+                // anyway, we can just check later. Not ideal though..
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    MBXViewController *strongSelf = weakSelf;
+                    if (strongSelf.randomWalk) {
+                        [strongSelf randomWorldTourInternal];
+                    }
+                });
+            }];
+}
+
+- (void)toggleSecondMapView {
+    if ([self.view viewWithTag:2] == nil) {
+        MGLMapView *secondMapView = [[MGLMapView alloc] initWithFrame:
+                                     CGRectMake(0, self.view.bounds.size.height / 2,
+                                                self.view.bounds.size.width, self.view.bounds.size.height / 2)];
+        secondMapView.showsScale = YES;
+        secondMapView.translatesAutoresizingMaskIntoConstraints = NO;
+        secondMapView.tag = 2;
+        for (NSLayoutConstraint *constraint in self.view.constraints)
+        {
+            if ((constraint.firstItem  == self.mapView && constraint.firstAttribute  == NSLayoutAttributeBottom) ||
+                (constraint.secondItem == self.mapView && constraint.secondAttribute == NSLayoutAttributeBottom))
+            {
+                [self.view removeConstraint:constraint];
+                break;
+            }
+        }
+        [self.view addSubview:secondMapView];
+        [self.view addConstraints:@[
+            [NSLayoutConstraint constraintWithItem:self.mapView
+                                         attribute:NSLayoutAttributeBottom
+                                         relatedBy:NSLayoutRelationEqual
+                                            toItem:self.view
+                                         attribute:NSLayoutAttributeCenterY
+                                        multiplier:1
+                                          constant:0],
+            [NSLayoutConstraint constraintWithItem:secondMapView
+                                         attribute:NSLayoutAttributeCenterX
+                                         relatedBy:NSLayoutRelationEqual
+                                            toItem:self.view
+                                         attribute:NSLayoutAttributeCenterX
+                                        multiplier:1
+                                          constant:0],
+            [NSLayoutConstraint constraintWithItem:secondMapView
+                                         attribute:NSLayoutAttributeWidth
+                                         relatedBy:NSLayoutRelationEqual
+                                            toItem:self.view
+                                         attribute:NSLayoutAttributeWidth
+                                        multiplier:1
+                                          constant:0],
+            [NSLayoutConstraint constraintWithItem:secondMapView
+                                         attribute:NSLayoutAttributeTop
+                                         relatedBy:NSLayoutRelationEqual
+                                            toItem:self.view
+                                         attribute:NSLayoutAttributeCenterY
+                                        multiplier:1
+                                          constant:0],
+            [NSLayoutConstraint constraintWithItem:secondMapView
+                                         attribute:NSLayoutAttributeBottom
+                                         relatedBy:NSLayoutRelationEqual
+                                            toItem:self.bottomLayoutGuide
+                                         attribute:NSLayoutAttributeBottom
+                                        multiplier:1
+                                          constant:0],
+        ]];
+    } else {
+        NSMutableArray *constraintsToRemove = [NSMutableArray array];
+        MGLMapView *secondMapView = (MGLMapView *)[self.view viewWithTag:2];
+        for (NSLayoutConstraint *constraint in self.view.constraints)
+        {
+            if (constraint.firstItem == secondMapView || constraint.secondItem == secondMapView)
+            {
+                [constraintsToRemove addObject:constraint];
+            }
+        }
+        [self.view removeConstraints:constraintsToRemove];
+        [secondMapView removeFromSuperview];
+        [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.mapView
+                                                              attribute:NSLayoutAttributeBottom
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:self.bottomLayoutGuide
+                                                              attribute:NSLayoutAttributeTop
+                                                             multiplier:1
+                                                               constant:0]];
+    }
+}
+
 #pragma mark - User Actions
+
+- (void)handleSingleTap:(UITapGestureRecognizer *)singleTap {
+    [self.navigationController setNavigationBarHidden:!self.navigationController.navigationBarHidden animated:YES];
+
+    // This is how you'd get the coordinate for the point where the user tapped:
+    //    CGPoint tapPoint = [singleTap locationInView:self.mapView];
+    //    CLLocationCoordinate2D tapCoordinate = [self.mapView convertPoint:tapPoint toCoordinateFromView:nil];
+}
 
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer *)longPress
 {
@@ -1580,7 +1867,13 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                  toCoordinateFromView:self.mapView];
         pin.title = title ?: @"Dropped Pin";
         pin.subtitle = [[[MGLCoordinateFormatter alloc] init] stringFromCoordinate:pin.coordinate];
-        // Calling `addAnnotation:` on mapView is not required since `selectAnnotation:animated` has the side effect of adding the annotation if required
+
+
+        // Calling `addAnnotation:` on mapView is required here (since `selectAnnotation:animated` has
+        // the side effect of adding the annotation if required, but returning an incorrect callout
+        // positioning rect)
+
+        [self.mapView addAnnotation:pin];
         [self.mapView selectAnnotation:pin animated:YES];
     }
 }
@@ -1599,8 +1892,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             @"Dark",
             @"Satellite",
             @"Satellite Streets",
-            @"Traffic Day",
-            @"Traffic Night",
         ];
         styleURLs = @[
             [MGLStyle streetsStyleURL],
@@ -1608,9 +1899,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             [MGLStyle lightStyleURL],
             [MGLStyle darkStyleURL],
             [MGLStyle satelliteStyleURL],
-            [MGLStyle satelliteStreetsStyleURL],
-            [NSURL URLWithString:@"mapbox://styles/mapbox/traffic-day-v2"],
-            [NSURL URLWithString:@"mapbox://styles/mapbox/traffic-night-v2"],
+            [MGLStyle satelliteStreetsStyleURL]
             
         ];
         NSAssert(styleNames.count == styleURLs.count, @"Style names and URLs don’t match.");
@@ -1697,16 +1986,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         annotationView.backgroundColor = [UIColor whiteColor];
 
         // Note that having two long press gesture recognizers on overlapping
-        // views (`self.view` & `annotationView`) will cause weird behaviour.
+        // views (`self.view` & `annotationView`) will cause weird behavior.
         // Comment out the pin dropping functionality in the handleLongPress:
         // method in this class to make draggable annotation views play nice.
         annotationView.draggable = YES;
-
-        // Uncomment to force annotation view to maintain a constant size when
-        // the map is tilted. By default, annotation views will shrink and grow
-        // as they move towards and away from the horizon. Relatedly, annotations
-        // backed by GL sprites currently ONLY scale with viewing distance.
-        // annotationView.scalesWithViewingDistance = NO;
     } else {
         // orange indicates that the annotation view was reused
         annotationView.backgroundColor = [UIColor orangeColor];
@@ -1881,7 +2164,32 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     // Default Mapbox styles use {name_en} as their label language, which means
     // that a device with an English-language locale is already effectively
     // using locale-based country labels.
-    _usingLocaleBasedCountryLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
+    _localizingLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
+}
+
+- (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera {
+    if (_shouldLimitCameraChanges) {
+        // Get the current camera to restore it after.
+        MGLMapCamera *currentCamera = mapView.camera;
+
+        // From the new camera obtain the center to test if it’s inside the boundaries.
+        CLLocationCoordinate2D newCameraCenter = newCamera.centerCoordinate;
+
+        // Set the map’s visible bounds to newCamera.
+        mapView.camera = newCamera;
+        MGLCoordinateBounds newVisibleCoordinates = mapView.visibleCoordinateBounds;
+
+        // Revert the camera.
+        mapView.camera = currentCamera;
+
+        // Test if the newCameraCenter and newVisibleCoordinates are inside Colorado.
+        BOOL inside = MGLCoordinateInCoordinateBounds(newCameraCenter, colorado);
+        BOOL intersects = MGLCoordinateInCoordinateBounds(newVisibleCoordinates.ne, colorado) && MGLCoordinateInCoordinateBounds(newVisibleCoordinates.sw, colorado);
+
+        return inside && intersects;
+    } else {
+        return YES;
+    }
 }
 
 - (void)mapViewRegionIsChanging:(MGLMapView *)mapView
@@ -1889,7 +2197,12 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self updateHUD];
 }
 
-- (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
+- (void)mapView:(MGLMapView *)mapView regionDidChangeWithReason:(MGLCameraChangeReason)reason animated:(BOOL)animated
+{
+    if (reason != MGLCameraChangeReasonProgrammatic) {
+        self.randomWalk = NO;
+    }
+
     [self updateHUD];
 }
 
@@ -1898,7 +2211,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 }
 
 - (void)updateHUD {
-    if (!self.reuseQueueStatsEnabled && !self.showZoomLevelEnabled) return;
+    if (!self.reuseQueueStatsEnabled && !self.mapInfoHUDEnabled) return;
+
+    if (self.hudLabel.hidden) self.hudLabel.hidden = NO;
 
     NSString *hudString;
 
@@ -1908,8 +2223,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             queuedAnnotations += queue.count;
         }
         hudString = [NSString stringWithFormat:@"Visible: %ld  Queued: %ld", (unsigned long)self.mapView.visibleAnnotations.count, (unsigned long)queuedAnnotations];
-    } else if (self.showZoomLevelEnabled) {
-        hudString = [NSString stringWithFormat:@"%.2f ∕ ↕\U0000FE0E%.f° ∕ %.f°", self.mapView.zoomLevel, self.mapView.camera.pitch, self.mapView.direction];
+    } else if (self.mapInfoHUDEnabled) {
+        if (!self.mapView.experimental_enableFrameRateMeasurement) self.mapView.experimental_enableFrameRateMeasurement = YES;
+        hudString = [NSString stringWithFormat:@"%.f FPS (%.1fms) ∕ %.2f ∕ ↕\U0000FE0E%.f° ∕ %.f°",
+                     roundf(self.mapView.averageFrameRate), self.mapView.averageFrameTime,
+                     self.mapView.zoomLevel, self.mapView.camera.pitch, self.mapView.direction];
     }
 
     [self.hudLabel setTitle:hudString forState:UIControlStateNormal];

@@ -1,15 +1,74 @@
-#import "MGLComputedShapeSource.h"
+#import "MGLComputedShapeSource_Private.h"
 
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
 #import "MGLShape_Private.h"
-#import "MGLAbstractShapeSource_Private.h"
 #import "MGLGeometry_Private.h"
+#import "MGLShapeCollection.h"
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/sources/custom_geometry_source.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/geojson.hpp>
+
+const MGLExceptionName MGLInvalidDatasourceException = @"MGLInvalidDatasourceException";
+
+const MGLShapeSourceOption MGLShapeSourceOptionWrapsCoordinates = @"MGLShapeSourceOptionWrapsCoordinates";
+const MGLShapeSourceOption MGLShapeSourceOptionClipsCoordinates = @"MGLShapeSourceOptionClipsCoordinates";
+
+mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDictionary(NSDictionary<MGLShapeSourceOption, id> *options) {
+    mbgl::style::CustomGeometrySource::Options sourceOptions;
+
+    if (NSNumber *value = options[MGLShapeSourceOptionMinimumZoomLevel]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionMaximumZoomLevelForClustering must be an NSNumber."];
+        }
+        sourceOptions.zoomRange.min = value.integerValue;
+    }
+
+    if (NSNumber *value = options[MGLShapeSourceOptionMaximumZoomLevel]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionMaximumZoomLevel must be an NSNumber."];
+        }
+        sourceOptions.zoomRange.max = value.integerValue;
+    }
+
+    if (NSNumber *value = options[MGLShapeSourceOptionBuffer]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionBuffer must be an NSNumber."];
+        }
+        sourceOptions.tileOptions.buffer = value.integerValue;
+    }
+
+    if (NSNumber *value = options[MGLShapeSourceOptionSimplificationTolerance]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionSimplificationTolerance must be an NSNumber."];
+        }
+        sourceOptions.tileOptions.tolerance = value.doubleValue;
+    }
+
+    if (NSNumber *value = options[MGLShapeSourceOptionWrapsCoordinates]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionWrapsCoordinates must be an NSNumber."];
+        }
+        sourceOptions.tileOptions.wrap = value.boolValue;
+    }
+
+    if (NSNumber *value = options[MGLShapeSourceOptionClipsCoordinates]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionClipsCoordinates must be an NSNumber."];
+        }
+        sourceOptions.tileOptions.clip = value.boolValue;
+    }
+
+    return sourceOptions;
+}
 
 @interface MGLComputedShapeSource () {
     std::unique_ptr<mbgl::style::CustomGeometrySource> _pendingSource;
@@ -73,6 +132,14 @@
         mbgl::FeatureCollection featureCollection;
         featureCollection.reserve(data.count);
         for (MGLShape <MGLFeature> * feature in data) {
+            if ([feature isMemberOfClass:[MGLShapeCollection class]]) {
+                static dispatch_once_t onceToken;
+                dispatch_once(&onceToken, ^{
+                    NSLog(@"MGLShapeCollection initialized with MGLFeatures will not retain attributes."
+                          @"Use MGLShapeCollectionFeature to retain attributes instead."
+                          @"This will be logged only once.");
+                });
+            }
             mbgl::Feature geoJsonObject = [feature geoJSONObject].get<mbgl::Feature>();
             featureCollection.push_back(geoJsonObject);
         }
@@ -92,7 +159,7 @@
 
 @implementation MGLComputedShapeSource
 
-- (instancetype)initWithIdentifier:(NSString *)identifier options:(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options {
+- (instancetype)initWithIdentifier:(NSString *)identifier options:(NSDictionary<MGLShapeSourceOption, id> *)options {
     NSOperationQueue *requestQueue = [[NSOperationQueue alloc] init];
     requestQueue.name = [NSString stringWithFormat:@"mgl.MGLComputedShapeSource.%@", identifier];
     requestQueue.qualityOfService = NSQualityOfServiceUtility;
@@ -120,7 +187,7 @@
     return self;
 }
 
-- (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(id<MGLComputedShapeSourceDataSource>)dataSource options:(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options {
+- (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(id<MGLComputedShapeSourceDataSource>)dataSource options:(NSDictionary<MGLShapeSourceOption, id> *)options {
     if (self = [self initWithIdentifier:identifier options:options]) {
         [self setDataSource:dataSource];
     }
@@ -138,6 +205,14 @@
     for (MGLShape <MGLFeature> * feature in features) {
         mbgl::Feature geoJsonObject = [feature geoJSONObject].get<mbgl::Feature>();
         featureCollection.push_back(geoJsonObject);
+        if ([feature isMemberOfClass:[MGLShapeCollection class]]) {
+            static dispatch_once_t onceToken;
+            dispatch_once(&onceToken, ^{
+                NSLog(@"MGLShapeCollection initialized with MGLFeatures will not retain attributes."
+                      @"Use MGLShapeCollectionFeature to retain attributes instead."
+                      @"This will be logged only once.");
+            });
+        }
     }
     const auto geojson = mbgl::GeoJSON{featureCollection};
     static_cast<mbgl::style::CustomGeometrySource *>(self.rawSource)->setTileData(tileID, geojson);
@@ -149,10 +224,12 @@
     self.dataSourceImplementsFeaturesForTile = [dataSource respondsToSelector:@selector(featuresInTileAtX:y:zoomLevel:)];
     self.dataSourceImplementsFeaturesForBounds = [dataSource respondsToSelector:@selector(featuresInCoordinateBounds:zoomLevel:)];
 
-    if(!self.dataSourceImplementsFeaturesForBounds && !self.dataSourceImplementsFeaturesForTile) {
-        [NSException raise:@"Invalid Datasource" format:@"Datasource does not implement any MGLComputedShapeSourceDataSource methods"];
-    } else if(self.dataSourceImplementsFeaturesForBounds && self.dataSourceImplementsFeaturesForTile) {
-        [NSException raise:@"Invalid Datasource" format:@"Datasource implements multiple MGLComputedShapeSourceDataSource methods"];
+    if (!self.dataSourceImplementsFeaturesForBounds && !self.dataSourceImplementsFeaturesForTile) {
+        [NSException raise:MGLInvalidDatasourceException
+                    format:@"Datasource does not implement any MGLComputedShapeSourceDataSource methods"];
+    } else if (self.dataSourceImplementsFeaturesForBounds && self.dataSourceImplementsFeaturesForTile) {
+        [NSException raise:MGLInvalidDatasourceException
+                    format:@"Datasource implements multiple MGLComputedShapeSourceDataSource methods"];
     }
 
     _dataSource = dataSource;

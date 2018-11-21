@@ -6,8 +6,30 @@
 
 namespace mbgl {
 
+Mailbox::Mailbox() {
+}
+
 Mailbox::Mailbox(Scheduler& scheduler_)
-    : scheduler(scheduler_) {
+    : scheduler(&scheduler_) {
+}
+
+void Mailbox::open(Scheduler& scheduler_) {
+    assert(!scheduler);
+
+    // As with close(), block until neither receive() nor push() are in progress, and acquire the two
+    // mutexes in the same order.
+    std::lock_guard<std::recursive_mutex> receivingLock(receivingMutex);
+    std::lock_guard<std::mutex> pushingLock(pushingMutex);
+    
+    scheduler = &scheduler_;
+
+    if (closed) {
+        return;
+    }
+    
+    if (!queue.empty()) {
+        (*scheduler)->schedule(shared_from_this());
+    }
 }
 
 void Mailbox::close() {
@@ -22,6 +44,9 @@ void Mailbox::close() {
     closed = true;
 }
 
+bool Mailbox::isOpen() const { return bool(scheduler); }
+
+
 void Mailbox::push(std::unique_ptr<Message> message) {
     std::lock_guard<std::mutex> pushingLock(pushingMutex);
 
@@ -32,13 +57,15 @@ void Mailbox::push(std::unique_ptr<Message> message) {
     std::lock_guard<std::mutex> queueLock(queueMutex);
     bool wasEmpty = queue.empty();
     queue.push(std::move(message));
-    if (wasEmpty) {
-        scheduler.schedule(shared_from_this());
+    if (wasEmpty && scheduler) {
+        (*scheduler)->schedule(shared_from_this());
     }
 }
 
 void Mailbox::receive() {
     std::lock_guard<std::recursive_mutex> receivingLock(receivingMutex);
+    
+    assert(scheduler);
 
     if (closed) {
         return;
@@ -58,7 +85,7 @@ void Mailbox::receive() {
     (*message)();
 
     if (!wasEmpty) {
-        scheduler.schedule(shared_from_this());
+        (*scheduler)->schedule(shared_from_this());
     }
 }
 

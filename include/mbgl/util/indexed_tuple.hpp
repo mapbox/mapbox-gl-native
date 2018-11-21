@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mbgl/util/type_list.hpp>
-#include <mbgl/util/tuple.hpp>
 
+#include <tuple>
 #include <type_traits>
 
 namespace mbgl {
@@ -24,21 +24,22 @@ template <class...> class IndexedTuple;
 // for motivation.
 //
 template <class... Is, class... Ts>
-class IndexedTuple<TypeList<Is...>, TypeList<Ts...>> : public tuple_polyfill<Ts...> {
+class IndexedTuple<TypeList<Is...>, TypeList<Ts...>> : public std::tuple<Ts...> {
 public:
     static_assert(sizeof...(Is) == sizeof...(Ts), "IndexedTuple size mismatch");
 
-    using tuple_polyfill<Ts...>::tuple;
-
     template <class I>
     auto& get() {
-        return get_polyfill<TypeIndex<I, Is...>::value>(*this);
+        return std::get<TypeIndex<I, Is...>::value, Ts...>(*this);
     }
 
     template <class I>
     const auto& get() const {
-        return get_polyfill<TypeIndex<I, Is...>::value>(*this);
+        return std::get<TypeIndex<I, Is...>::value, Ts...>(*this);
     }
+
+    template <class... Us>
+    IndexedTuple(Us&&... other) : std::tuple<Ts...>(std::forward<Us>(other)...) {};
 
     template <class... Js, class... Us>
     IndexedTuple<TypeList<Is..., Js...>, TypeList<Ts..., Us...>>
@@ -48,6 +49,18 @@ public:
             other.template get<Js>()...
         };
     }
+
+    // Help out MSVC++
+    bool operator==(const IndexedTuple<TypeList<Is...>, TypeList<Ts...>>& other) const {
+        return static_cast<const std::tuple<Ts...>&>(*this) == static_cast<const std::tuple<Ts...>&>(other);
+    }
+
+    bool operator!=(const IndexedTuple<TypeList<Is...>, TypeList<Ts...>>& other) const {
+        return !(*this == other);
+    }
 };
+
+template <class, class T>
+using ExpandToType = T;
 
 } // namespace mbgl

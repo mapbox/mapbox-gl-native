@@ -35,9 +35,14 @@ public:
               context.createProgram(context.createShader(ShaderType::Vertex, vertexSource),
                                     context.createShader(ShaderType::Fragment, fragmentSource))),
           uniformsState((context.linkProgram(program), Uniforms::bindLocations(program))),
-          attributeLocations(Attributes::bindLocations(program)) {
+          attributeLocations(Attributes::bindLocations(context, program)) {
+
         // Re-link program after manually binding only active attributes in Attributes::bindLocations
         context.linkProgram(program);
+
+        // We have to re-initialize the uniforms state from the bindings as the uniform locations
+        // get shifted on some implementations
+        uniformsState = Uniforms::bindLocations(program);
     }
 
     template <class BinaryProgram>
@@ -113,6 +118,7 @@ public:
               DepthMode depthMode,
               StencilMode stencilMode,
               ColorMode colorMode,
+              CullFaceMode cullFaceMode,
               const UniformValues& uniformValues,
               VertexArray& vertexArray,
               const AttributeBindings& attributeBindings,
@@ -125,6 +131,7 @@ public:
         context.setDepthMode(depthMode);
         context.setStencilMode(stencilMode);
         context.setColorMode(colorMode);
+        context.setCullFaceMode(cullFaceMode);
 
         context.program = program;
 

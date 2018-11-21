@@ -7,6 +7,7 @@
 
 #include <iterator>
 #include <map>
+#include <unordered_map>
 #include <string>
 #include <vector>
 #include <memory>
@@ -51,11 +52,30 @@ public:
 
 } // namespace detail
 
+/*
+    Controls the annotation behavior of the parser when encountering an expression
+    whose type is not a subtype of the expected type. The default behavior, used
+    when optional<TypeAnnotationOption> is a nullopt, is as follows:
+
+    When we expect a number, string, boolean, or array but have a value, wrap it in an assertion.
+    When we expect a color or formatted string, but have a string or value, wrap it in a coercion.
+    Otherwise, we do static type-checking.
+
+    These behaviors are overridable for:
+      * The "coalesce" operator, which needs to omit type annotations.
+      * String-valued properties (e.g. `text-field`), where coercion is more convenient than assertion.
+*/
+enum class TypeAnnotationOption {
+    coerce,
+    assert,
+    omit
+};
+
 class ParsingContext {
 public:
     ParsingContext() : errors(std::make_shared<std::vector<ParsingError>>()) {}
     ParsingContext(std::string key_) : key(std::move(key_)), errors(std::make_shared<std::vector<ParsingError>>()) {}
-    explicit ParsingContext(optional<type::Type> expected_)
+    explicit ParsingContext(type::Type expected_)
         : expected(std::move(expected_)),
           errors(std::make_shared<std::vector<ParsingError>>())
     {}
@@ -67,31 +87,31 @@ public:
     std::string getKey() const { return key; }
     optional<type::Type> getExpected() const { return expected; }
     const std::vector<ParsingError>& getErrors() const { return *errors; }
-
-    enum TypeAnnotationOption {
-        includeTypeAnnotations,
-        omitTypeAnnotations
-    };
+    const std::string getCombinedErrors() const;
 
     /*
-        Parse the given style-spec JSON value into an Expression object.
-        Specifically, this function is responsible for determining the expression
-        type (either Literal, or the one named in value[0]) and dispatching to the
-        appropriate ParseXxxx::parse(const V&, ParsingContext) method.
+        Parse the given style-spec JSON value as an expression.
     */
-    ParseResult parse(const mbgl::style::conversion::Convertible& value,
-                      TypeAnnotationOption typeAnnotationOption = includeTypeAnnotations);
+    ParseResult parseExpression(const mbgl::style::conversion::Convertible& value,
+                                optional<TypeAnnotationOption> = {});
 
     /*
-        Parse a child expression.
+        Parse the given style-spec JSON value as an expression intended to be used
+        in a layout or paint property.  This entails checking additional constraints
+        that exist in that context but not, e.g., for filters.
+    */
+    ParseResult parseLayerPropertyExpression(const mbgl::style::conversion::Convertible& value);
+
+    /*
+        Parse a child expression. For use by individual Expression::parse() methods.
     */
     ParseResult parse(const mbgl::style::conversion::Convertible&,
                       std::size_t,
                       optional<type::Type> = {},
-                      TypeAnnotationOption typeAnnotationOption = includeTypeAnnotations);
+                      optional<TypeAnnotationOption> = {});
     
     /*
-        Parse a child expression.
+        Parse a child expression.  For use by individual Expression::parse() methods.
     */
     ParseResult parse(const mbgl::style::conversion::Convertible&,
                       std::size_t index,
@@ -140,6 +160,16 @@ private:
           scope(std::move(scope_)),
         errors(std::move(errors_))
     {}
+    
+    
+    /*
+        Parse the given style-spec JSON value into an Expression object.
+        Specifically, this function is responsible for determining the expression
+        type (either Literal, or the one named in value[0]) and dispatching to the
+        appropriate ParseXxxx::parse(const V&, ParsingContext) method.
+    */
+    ParseResult parse(const mbgl::style::conversion::Convertible& value,
+                      optional<TypeAnnotationOption> = {});
     
     std::string key;
     optional<type::Type> expected;

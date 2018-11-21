@@ -31,7 +31,6 @@ import com.mapbox.mapboxsdk.style.sources.VectorSource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,15 +38,18 @@ import java.util.List;
 
 import timber.log.Timber;
 
+import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.color;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.gte;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.lt;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.toNumber;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
-import static com.mapbox.mapboxsdk.style.layers.Filter.all;
-import static com.mapbox.mapboxsdk.style.layers.Filter.eq;
-import static com.mapbox.mapboxsdk.style.layers.Filter.gte;
-import static com.mapbox.mapboxsdk.style.layers.Filter.lt;
 import static com.mapbox.mapboxsdk.style.layers.Property.FILL_TRANSLATE_ANCHOR_MAP;
 import static com.mapbox.mapboxsdk.style.layers.Property.NONE;
 import static com.mapbox.mapboxsdk.style.layers.Property.SYMBOL_PLACEMENT_POINT;
@@ -195,6 +197,9 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       case R.id.action_numeric_filter:
         styleNumericFillLayer();
         return true;
+      case R.id.action_bring_water_to_front:
+        bringWaterToFront();
+        return true;
       default:
         return super.onOptionsItemSelected(item);
     }
@@ -295,7 +300,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     );
 
     // Only show me parks (except westerpark with stroke-width == 3)
-    layer.setFilter(all(eq("type", "park"), eq("stroke-width", 2)));
+    layer.setFilter(all(eq(get("type"), literal("park")), eq(get("stroke-width"), literal(3))));
 
     mapboxMap.addLayerBelow(layer, "building");
     // layer.setPaintProperty(fillColor(Color.RED)); // XXX But not after the object is attached
@@ -345,7 +350,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     );
 
     // Only show me parks
-    layer.setFilter(all(eq("type", "park")));
+    layer.setFilter(all(eq(get("type"), literal("park"))));
 
     mapboxMap.addLayer(layer);
 
@@ -499,7 +504,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       FillLayer states = (FillLayer) mapboxMap.getLayer("states");
 
       if (states != null) {
-        states.setFilter(eq("name", "Texas"));
+        states.setFilter(eq(get("name"), literal("Texas")));
         states.setFillOpacityTransition(new TransitionOptions(2500, 0));
         states.setFillColorTransition(new TransitionOptions(2500, 0));
         states.setProperties(
@@ -527,7 +532,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       LineLayer counties = (LineLayer) mapboxMap.getLayer("counties");
 
       if (counties != null) {
-        counties.setFilter(eq("NAME10", "Washington"));
+        counties.setFilter(eq(get("NAME10"), "Washington"));
 
         counties.setProperties(
           lineColor(Color.RED),
@@ -555,7 +560,10 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       FillLayer regions = (FillLayer) mapboxMap.getLayer("regions");
 
       if (regions != null) {
-        regions.setFilter(all(gte("HRRNUM", 200), lt("HRRNUM", 300)));
+        regions.setFilter(all(
+          gte(toNumber(get("HRRNUM")), literal(200)),
+          lt(toNumber(get("HRRNUM")), literal(300)))
+        );
 
         regions.setProperties(
           fillColor(Color.BLUE),
@@ -565,6 +573,16 @@ public class RuntimeStyleActivity extends AppCompatActivity {
         Toast.makeText(RuntimeStyleActivity.this, "No regions layer in this style", Toast.LENGTH_SHORT).show();
       }
     }, 2000);
+  }
+
+  private void bringWaterToFront() {
+    Layer water = mapboxMap.getLayer("water");
+    if (water != null) {
+      mapboxMap.removeLayer(water);
+      mapboxMap.addLayerAt(water, mapboxMap.getLayers().size() - 1);
+    } else {
+      Toast.makeText(this, "No water layer in this style", Toast.LENGTH_SHORT).show();
+    }
   }
 
   private static class DefaultCallback implements MapboxMap.CancelableCallback {

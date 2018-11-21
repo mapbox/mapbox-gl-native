@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Color;
+import android.support.annotation.Keep;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
@@ -9,7 +10,9 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
  */
 public final class Polyline extends BasePointCollection {
 
+  @Keep
   private int color = Color.BLACK; // default color is black
+  @Keep
   private float width = 10; // As specified by Google API Docs (in pixels)
 
   Polyline() {

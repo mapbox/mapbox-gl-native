@@ -114,6 +114,7 @@ test('Map', function(t) {
             'removeLayer',
             'addImage',
             'removeImage',
+            'setLayerZoomRange',
             'setLayoutProperty',
             'setPaintProperty',
             'setFilter',
@@ -316,11 +317,15 @@ test('Map', function(t) {
 
             t.throws(function() {
                 map.load('foo bar');
-            }, /Failed to parse style: 1 - Invalid value./);
+            }, /Failed to parse style: Invalid value. at offset 1/);
 
             t.throws(function() {
                 map.load('""');
             }, /Failed to parse style: style must be an object/);
+
+            t.throws(function() {
+                map.load('""');
+            }, mbgl.ParseError);
 
             map.release();
             t.end();
@@ -340,7 +345,11 @@ test('Map', function(t) {
 
             t.throws(function() {
                 map.load('invalid');
-            }, /Failed to parse style: 0 - Invalid value./);
+            }, mbgl.ParseError);
+
+            t.throws(function() {
+                map.load('invalid');
+            }, /Failed to parse style: Invalid value. at offset 0/);
         });
 
         t.test('accepts an empty stylesheet string', function(t) {
@@ -531,7 +540,7 @@ test('Map', function(t) {
             t.throws(function() {
                 map.render({}, function() {});
                 map.render({}, function() {});
-            }, /Map is currently rendering an image/);
+            }, /Map is currently processing a RenderRequest/);
 
             map.release();
             t.end();

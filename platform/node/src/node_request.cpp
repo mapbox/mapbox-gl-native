@@ -124,7 +124,8 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
 void NodeRequest::Execute() {
     v8::Local<v8::Value> argv[] = { handle() };
 
-    Nan::MakeCallback(Nan::To<v8::Object>(target->handle()->GetInternalField(1)).ToLocalChecked(), "request", 1, argv);
+    Nan::AsyncResource res("mbgl:execute");
+    res.runInAsyncScope(Nan::To<v8::Object>(target->handle()->GetInternalField(1)).ToLocalChecked(), "request", 1, argv);
 }
 
 NodeRequest::NodeAsyncRequest::NodeAsyncRequest(NodeRequest* request_) : request(request_) {

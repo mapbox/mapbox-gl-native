@@ -43,6 +43,7 @@ int main(int argc, char *argv[]) {
     args::Flag offlineFlag(argumentParser, "offline", "Toggle offline", {'o', "offline"});
 
     args::ValueFlag<std::string> styleValue(argumentParser, "URL", "Map stylesheet", {'s', "style"});
+    args::ValueFlag<std::string> cacheDBValue(argumentParser, "file", "Cache database file name", {'c', "cache"});
     args::ValueFlag<double> lonValue(argumentParser, "degrees", "Longitude", {'x', "lon"});
     args::ValueFlag<double> latValue(argumentParser, "degrees", "Latitude", {'y', "lat"});
     args::ValueFlag<double> zoomValue(argumentParser, "number", "Zoom level", {'z', "zoom"});
@@ -51,14 +52,14 @@ int main(int argc, char *argv[]) {
 
     try {
         argumentParser.ParseCLI(argc, argv);
-    } catch (args::Help) {
+    } catch (const args::Help&) {
         std::cout << argumentParser;
         exit(0);
-    } catch (args::ParseError e) {
+    } catch (const args::ParseError& e) {
         std::cerr << e.what() << std::endl;
         std::cerr << argumentParser;
         exit(1);
-    } catch (args::ValidationError e) {
+    } catch (const args::ValidationError& e) {
         std::cerr << e.what() << std::endl;
         std::cerr << argumentParser;
         exit(2);
@@ -76,6 +77,7 @@ int main(int argc, char *argv[]) {
     const bool fullscreen = fullscreenFlag ? args::get(fullscreenFlag) : false;
     const bool benchmark = benchmarkFlag ? args::get(benchmarkFlag) : false;
     std::string style = styleValue ? args::get(styleValue) : "";
+    const std::string cacheDB = cacheDBValue ? args::get(cacheDBValue) : "/tmp/mbgl-cache.db";
 
     // sigint handling
     struct sigaction sigIntHandler;
@@ -91,7 +93,7 @@ int main(int argc, char *argv[]) {
     GLFWView backend(fullscreen, benchmark);
     view = &backend;
 
-    mbgl::DefaultFileSource fileSource("/tmp/mbgl-cache.db", ".");
+    mbgl::DefaultFileSource fileSource(cacheDB, ".");
     if (!settings.online) {
         fileSource.setOnlineStatus(false);
         mbgl::Log::Warning(mbgl::Event::Setup, "Application is offline. Press `O` to toggle online status.");

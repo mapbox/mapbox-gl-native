@@ -1,9 +1,16 @@
 package com.mapbox.mapboxsdk.style.sources;
 
+import android.support.annotation.Keep;
+
+import android.support.annotation.NonNull;
+import com.mapbox.mapboxsdk.utils.ThreadUtils;
+
 /**
  * Base Peer class for sources. see source.hpp for the other half of the peer.
  */
 public abstract class Source {
+
+  @Keep
   private long nativePtr;
 
   /**
@@ -11,11 +18,21 @@ public abstract class Source {
    *
    * @param nativePtr - pointer to native peer
    */
-  public Source(long nativePtr) {
+  @Keep
+  protected Source(long nativePtr) {
+    checkThread();
     this.nativePtr = nativePtr;
   }
 
   public Source() {
+    checkThread();
+  }
+
+  /**
+   * Validates if source interaction is happening on the UI thread
+   */
+  protected void checkThread() {
+    ThreadUtils.checkThread("Source");
   }
 
   /**
@@ -23,7 +40,9 @@ public abstract class Source {
    *
    * @return the source id
    */
+  @NonNull
   public String getId() {
+    checkThread();
     return nativeGetId();
   }
 
@@ -35,7 +54,9 @@ public abstract class Source {
    *
    * @return the string representation of the attribution in html format
    */
+  @NonNull
   public String getAttribution() {
+    checkThread();
     return nativeGetAttribution();
   }
 
@@ -48,8 +69,11 @@ public abstract class Source {
     return nativePtr;
   }
 
+  @NonNull
+  @Keep
   protected native String nativeGetId();
 
+  @NonNull
+  @Keep
   protected native String nativeGetAttribution();
-
 }

@@ -27,11 +27,10 @@ struct CameraOptions {
         levels. */
     optional<double> zoom;
 
-    /** Bearing, measured in radians counterclockwise from true north. Wrapped
-        to [−π rad, π rad). */
+    /** Bearing, measured in degrees from true north. Wrapped to [0, 360). */
     optional<double> angle;
 
-    /** Pitch toward the horizon measured in radians, with 0 rad resulting in a
+    /** Pitch toward the horizon measured in degrees , with 0 deg resulting in a
         two-dimensional map. */
     optional<double> pitch;
 };

@@ -30,13 +30,13 @@ public:
     EvaluationContext(float zoom_, GeometryTileFeature const * feature_) :
         zoom(zoom_), feature(feature_)
     {}
-    EvaluationContext(optional<float> zoom_, GeometryTileFeature const * feature_, optional<double> heatmapDensity_) :
-        zoom(std::move(zoom_)), feature(feature_), heatmapDensity(std::move(heatmapDensity_))
+    EvaluationContext(optional<float> zoom_, GeometryTileFeature const * feature_, optional<double> colorRampParameter_) :
+        zoom(std::move(zoom_)), feature(feature_), colorRampParameter(std::move(colorRampParameter_))
     {}
     
     optional<float> zoom;
     GeometryTileFeature const * feature;
-    optional<double> heatmapDensity;
+    optional<double> colorRampParameter;
 };
 
 template <typename T>
@@ -113,9 +113,32 @@ public:
     ParseResult ExpressionClass::parse(const V&, ParsingContext),
     which handles parsing a style-spec JSON representation of the expression.
 */
+
+enum class Kind : int32_t {
+    Coalesce,
+    CompoundExpression,
+    Literal,
+    At,
+    Interpolate,
+    Assertion,
+    Length,
+    Step,
+    Let,
+    Var,
+    CollatorExpression,
+    Coercion,
+    Match,
+    Error,
+    Case,
+    Any,
+    All,
+    Comparison,
+    FormatExpression,
+};
+
 class Expression {
 public:
-    Expression(type::Type type_) : type(std::move(type_)) {}
+    Expression(Kind kind_, type::Type type_) : kind(kind_), type(std::move(type_)) {}
     virtual ~Expression() = default;
     
     virtual EvaluationResult evaluate(const EvaluationContext& params) const = 0;
@@ -125,9 +148,10 @@ public:
         return !operator==(rhs);
     }
 
+    Kind getKind() const { return kind; };
     type::Type getType() const { return type; };
     
-    EvaluationResult evaluate(optional<float> zoom, const Feature& feature, optional<double> heatmapDensity) const;
+    EvaluationResult evaluate(optional<float> zoom, const Feature& feature, optional<double> colorRampParameter) const;
 
     /**
      * Statically analyze the expression, attempting to enumerate possible outputs. Returns
@@ -135,6 +159,17 @@ public:
      * complete set of outputs is statically undecidable.
      */
     virtual std::vector<optional<Value>> possibleOutputs() const = 0;
+    
+    virtual mbgl::Value serialize() const {
+        std::vector<mbgl::Value> serialized;
+        serialized.emplace_back(getOperator());
+        eachChild([&](const Expression &child) {
+            serialized.emplace_back(child.serialize());
+        });
+        return serialized;
+    };
+    
+    virtual std::string getOperator() const = 0;
 
 protected:
     template <typename T>
@@ -171,6 +206,7 @@ protected:
     }
 
 private:
+    Kind kind;
     type::Type type;
 };
 

@@ -8,6 +8,7 @@
 
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
+#include <mbgl/style/expression/dsl.hpp>
 
 @interface MGLRasterLayerTests : MGLStyleLayerTests
 @end
@@ -24,8 +25,8 @@
 
     MGLRasterStyleLayer *layer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     XCTAssertNotEqual(layer.rawLayer, nullptr);
-    XCTAssertTrue(layer.rawLayer->is<mbgl::style::RasterLayer>());
-    auto rawLayer = layer.rawLayer->as<mbgl::style::RasterLayer>();
+    XCTAssertEqual(layer.rawLayer->getType(), mbgl::style::LayerType::Raster);
+    auto rawLayer = static_cast<mbgl::style::RasterLayer*>(layer.rawLayer);
 
     MGLTransition transitionTest = MGLTransitionMake(5, 4);
 
@@ -36,30 +37,30 @@
                       @"raster-brightness-max should be unset initially.");
         NSExpression *defaultExpression = layer.maximumRasterBrightness;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.maximumRasterBrightness = constantExpression;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getRasterBrightnessMax(), propertyValue,
                        @"Setting maximumRasterBrightness to a constant value expression should update raster-brightness-max.");
         XCTAssertEqualObjects(layer.maximumRasterBrightness, constantExpression,
                               @"maximumRasterBrightness should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.maximumRasterBrightness = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = {{
-            { -INFINITY, 0xff },
-            { 18, 0xff },
-        }};
-        propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
+
         XCTAssertEqual(rawLayer->getRasterBrightnessMax(), propertyValue,
                        @"Setting maximumRasterBrightness to a camera expression should update raster-brightness-max.");
         XCTAssertEqualObjects(layer.maximumRasterBrightness, functionExpression,
                               @"maximumRasterBrightness should round-trip camera expressions.");
 
-                              
 
         layer.maximumRasterBrightness = nil;
         XCTAssertTrue(rawLayer->getRasterBrightnessMax().isUndefined(),
@@ -69,8 +70,8 @@
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.maximumRasterBrightness = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.maximumRasterBrightness = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
@@ -80,30 +81,30 @@
                       @"raster-brightness-min should be unset initially.");
         NSExpression *defaultExpression = layer.minimumRasterBrightness;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.minimumRasterBrightness = constantExpression;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getRasterBrightnessMin(), propertyValue,
                        @"Setting minimumRasterBrightness to a constant value expression should update raster-brightness-min.");
         XCTAssertEqualObjects(layer.minimumRasterBrightness, constantExpression,
                               @"minimumRasterBrightness should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.minimumRasterBrightness = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = {{
-            { -INFINITY, 0xff },
-            { 18, 0xff },
-        }};
-        propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
+
         XCTAssertEqual(rawLayer->getRasterBrightnessMin(), propertyValue,
                        @"Setting minimumRasterBrightness to a camera expression should update raster-brightness-min.");
         XCTAssertEqualObjects(layer.minimumRasterBrightness, functionExpression,
                               @"minimumRasterBrightness should round-trip camera expressions.");
 
-                              
 
         layer.minimumRasterBrightness = nil;
         XCTAssertTrue(rawLayer->getRasterBrightnessMin().isUndefined(),
@@ -113,8 +114,8 @@
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.minimumRasterBrightness = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.minimumRasterBrightness = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
@@ -124,30 +125,30 @@
                       @"raster-contrast should be unset initially.");
         NSExpression *defaultExpression = layer.rasterContrast;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.rasterContrast = constantExpression;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getRasterContrast(), propertyValue,
                        @"Setting rasterContrast to a constant value expression should update raster-contrast.");
         XCTAssertEqualObjects(layer.rasterContrast, constantExpression,
                               @"rasterContrast should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.rasterContrast = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = {{
-            { -INFINITY, 0xff },
-            { 18, 0xff },
-        }};
-        propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
+
         XCTAssertEqual(rawLayer->getRasterContrast(), propertyValue,
                        @"Setting rasterContrast to a camera expression should update raster-contrast.");
         XCTAssertEqualObjects(layer.rasterContrast, functionExpression,
                               @"rasterContrast should round-trip camera expressions.");
 
-                              
 
         layer.rasterContrast = nil;
         XCTAssertTrue(rawLayer->getRasterContrast().isUndefined(),
@@ -157,8 +158,8 @@
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.rasterContrast = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.rasterContrast = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
         // Transition property test
         layer.rasterContrastTransition = transitionTest;
@@ -177,30 +178,30 @@
                       @"raster-fade-duration should be unset initially.");
         NSExpression *defaultExpression = layer.rasterFadeDuration;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.rasterFadeDuration = constantExpression;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getRasterFadeDuration(), propertyValue,
                        @"Setting rasterFadeDuration to a constant value expression should update raster-fade-duration.");
         XCTAssertEqualObjects(layer.rasterFadeDuration, constantExpression,
                               @"rasterFadeDuration should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.rasterFadeDuration = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = {{
-            { -INFINITY, 0xff },
-            { 18, 0xff },
-        }};
-        propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
+
         XCTAssertEqual(rawLayer->getRasterFadeDuration(), propertyValue,
                        @"Setting rasterFadeDuration to a camera expression should update raster-fade-duration.");
         XCTAssertEqualObjects(layer.rasterFadeDuration, functionExpression,
                               @"rasterFadeDuration should round-trip camera expressions.");
 
-                              
 
         layer.rasterFadeDuration = nil;
         XCTAssertTrue(rawLayer->getRasterFadeDuration().isUndefined(),
@@ -210,8 +211,8 @@
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.rasterFadeDuration = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.rasterFadeDuration = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
@@ -221,30 +222,30 @@
                       @"raster-hue-rotate should be unset initially.");
         NSExpression *defaultExpression = layer.rasterHueRotation;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.rasterHueRotation = constantExpression;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getRasterHueRotate(), propertyValue,
                        @"Setting rasterHueRotation to a constant value expression should update raster-hue-rotate.");
         XCTAssertEqualObjects(layer.rasterHueRotation, constantExpression,
                               @"rasterHueRotation should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.rasterHueRotation = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = {{
-            { -INFINITY, 0xff },
-            { 18, 0xff },
-        }};
-        propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
+
         XCTAssertEqual(rawLayer->getRasterHueRotate(), propertyValue,
                        @"Setting rasterHueRotation to a camera expression should update raster-hue-rotate.");
         XCTAssertEqualObjects(layer.rasterHueRotation, functionExpression,
                               @"rasterHueRotation should round-trip camera expressions.");
 
-                              
 
         layer.rasterHueRotation = nil;
         XCTAssertTrue(rawLayer->getRasterHueRotate().isUndefined(),
@@ -254,8 +255,8 @@
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.rasterHueRotation = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.rasterHueRotation = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
@@ -265,30 +266,30 @@
                       @"raster-opacity should be unset initially.");
         NSExpression *defaultExpression = layer.rasterOpacity;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.rasterOpacity = constantExpression;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getRasterOpacity(), propertyValue,
                        @"Setting rasterOpacity to a constant value expression should update raster-opacity.");
         XCTAssertEqualObjects(layer.rasterOpacity, constantExpression,
                               @"rasterOpacity should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.rasterOpacity = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = {{
-            { -INFINITY, 0xff },
-            { 18, 0xff },
-        }};
-        propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
+
         XCTAssertEqual(rawLayer->getRasterOpacity(), propertyValue,
                        @"Setting rasterOpacity to a camera expression should update raster-opacity.");
         XCTAssertEqualObjects(layer.rasterOpacity, functionExpression,
                               @"rasterOpacity should round-trip camera expressions.");
 
-                              
 
         layer.rasterOpacity = nil;
         XCTAssertTrue(rawLayer->getRasterOpacity().isUndefined(),
@@ -298,8 +299,8 @@
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.rasterOpacity = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.rasterOpacity = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
         // Transition property test
         layer.rasterOpacityTransition = transitionTest;
@@ -312,36 +313,80 @@
         XCTAssertEqual(rasterOpacityTransition.duration, transitionTest.duration);
     }
 
+    // raster-resampling
+    {
+        XCTAssertTrue(rawLayer->getRasterResampling().isUndefined(),
+                      @"raster-resampling should be unset initially.");
+        NSExpression *defaultExpression = layer.rasterResamplingMode;
+
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'nearest'"];
+        layer.rasterResamplingMode = constantExpression;
+        mbgl::style::PropertyValue<mbgl::style::RasterResamplingType> propertyValue = { mbgl::style::RasterResamplingType::Nearest };
+        XCTAssertEqual(rawLayer->getRasterResampling(), propertyValue,
+                       @"Setting rasterResamplingMode to a constant value expression should update raster-resampling.");
+        XCTAssertEqualObjects(layer.rasterResamplingMode, constantExpression,
+                              @"rasterResamplingMode should round-trip constant value expressions.");
+
+        constantExpression = [NSExpression expressionWithFormat:@"'nearest'"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.rasterResamplingMode = functionExpression;
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<mbgl::style::RasterResamplingType>(
+                step(zoom(), literal("nearest"), 18.0, literal("nearest"))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getRasterResampling(), propertyValue,
+                       @"Setting rasterResamplingMode to a camera expression should update raster-resampling.");
+        XCTAssertEqualObjects(layer.rasterResamplingMode, functionExpression,
+                              @"rasterResamplingMode should round-trip camera expressions.");
+
+
+        layer.rasterResamplingMode = nil;
+        XCTAssertTrue(rawLayer->getRasterResampling().isUndefined(),
+                      @"Unsetting rasterResamplingMode should return raster-resampling to the default value.");
+        XCTAssertEqualObjects(layer.rasterResamplingMode, defaultExpression,
+                              @"rasterResamplingMode should return the default value after being unset.");
+
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.rasterResamplingMode = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.rasterResamplingMode = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+    }
+
     // raster-saturation
     {
         XCTAssertTrue(rawLayer->getRasterSaturation().isUndefined(),
                       @"raster-saturation should be unset initially.");
         NSExpression *defaultExpression = layer.rasterSaturation;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"1"];
         layer.rasterSaturation = constantExpression;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::PropertyValue<float> propertyValue = { 1.0 };
         XCTAssertEqual(rawLayer->getRasterSaturation(), propertyValue,
                        @"Setting rasterSaturation to a constant value expression should update raster-saturation.");
         XCTAssertEqualObjects(layer.rasterSaturation, constantExpression,
                               @"rasterSaturation should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        constantExpression = [NSExpression expressionWithFormat:@"1"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.rasterSaturation = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = {{
-            { -INFINITY, 0xff },
-            { 18, 0xff },
-        }};
-        propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<float>(
+                step(zoom(), literal(1.0), 18.0, literal(1.0))
+            );
+        }
+
         XCTAssertEqual(rawLayer->getRasterSaturation(), propertyValue,
                        @"Setting rasterSaturation to a camera expression should update raster-saturation.");
         XCTAssertEqualObjects(layer.rasterSaturation, functionExpression,
                               @"rasterSaturation should round-trip camera expressions.");
 
-                              
 
         layer.rasterSaturation = nil;
         XCTAssertTrue(rawLayer->getRasterSaturation().isUndefined(),
@@ -351,8 +396,8 @@
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.rasterSaturation = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.rasterSaturation = functionExpression, NSException, NSInvalidArgumentException, @"MGLRasterLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
         // Transition property test
         layer.rasterSaturationTransition = transitionTest;
@@ -373,7 +418,13 @@
     [self testPropertyName:@"raster-fade-duration" isBoolean:NO];
     [self testPropertyName:@"raster-hue-rotation" isBoolean:NO];
     [self testPropertyName:@"raster-opacity" isBoolean:NO];
+    [self testPropertyName:@"raster-resampling-mode" isBoolean:NO];
     [self testPropertyName:@"raster-saturation" isBoolean:NO];
+}
+
+- (void)testValueAdditions {
+    XCTAssertEqual([NSValue valueWithMGLRasterResamplingMode:MGLRasterResamplingModeLinear].MGLRasterResamplingModeValue, MGLRasterResamplingModeLinear);
+    XCTAssertEqual([NSValue valueWithMGLRasterResamplingMode:MGLRasterResamplingModeNearest].MGLRasterResamplingModeValue, MGLRasterResamplingModeNearest);
 }
 
 @end

@@ -2,6 +2,7 @@
 
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/storage/resource.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 
 #include <list>
 #include <unordered_set>
@@ -27,7 +28,7 @@ class Parser;
  */
 class OfflineDownload {
 public:
-    OfflineDownload(int64_t id, OfflineRegionDefinition&&, OfflineDatabase& offline, FileSource& online);
+    OfflineDownload(int64_t id, OfflineRegionDefinition&&, OfflineDatabase& offline, OnlineFileSource& online);
     ~OfflineDownload();
 
     void setObserver(std::unique_ptr<OfflineRegionObserver>);
@@ -46,18 +47,20 @@ private:
      * is deactivated, all in progress requests are cancelled.
      */
     void ensureResource(const Resource&, std::function<void (Response)> = {});
-    bool checkTileCountLimit(const Resource& resource);
+
+    void onMapboxTileCountLimitExceeded();
 
     int64_t id;
     OfflineRegionDefinition definition;
     OfflineDatabase& offlineDatabase;
-    FileSource& onlineFileSource;
+    OnlineFileSource& onlineFileSource;
     OfflineRegionStatus status;
     std::unique_ptr<OfflineRegionObserver> observer;
 
     std::list<std::unique_ptr<AsyncRequest>> requests;
     std::unordered_set<std::string> requiredSourceURLs;
     std::deque<Resource> resourcesRemaining;
+    std::list<std::tuple<Resource, Response>> buffer;
 
     void queueResource(Resource);
     void queueTiles(style::SourceType, uint16_t tileSize, const Tileset&);

@@ -1,0 +1,9 @@
+# iOS
+/platform/ios/ @mapbox/maps-ios-reviewers
+
+# macOS
+/platform/macos/ @1ec5 @mapbox/maps-ios-reviewers
+
+# Darwin
+/platform/darwin/ @1ec5 @mapbox/maps-ios-reviewers
+

@@ -3,11 +3,16 @@
 package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.ColorInt;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 
 import static com.mapbox.mapboxsdk.utils.ColorUtils.rgbaToColor;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 
 /**
@@ -23,7 +28,8 @@ public class CircleLayer extends Layer {
    *
    * @param nativePtr pointer used by core
    */
-  public CircleLayer(long nativePtr) {
+  @Keep
+  CircleLayer(long nativePtr) {
     super(nativePtr);
   }
 
@@ -34,9 +40,11 @@ public class CircleLayer extends Layer {
    * @param sourceId the id of the source
    */
   public CircleLayer(String layerId, String sourceId) {
+    super();
     initialize(layerId, sourceId);
   }
 
+  @Keep
   protected native void initialize(String layerId, String sourceId);
 
   /**
@@ -45,6 +53,7 @@ public class CircleLayer extends Layer {
    * @param sourceLayer the source layer to set
    */
   public void setSourceLayer(String sourceLayer) {
+    checkThread();
     nativeSetSourceLayer(sourceLayer);
   }
 
@@ -54,9 +63,21 @@ public class CircleLayer extends Layer {
    * @param sourceLayer the source layer to set
    * @return This
    */
+  @NonNull
   public CircleLayer withSourceLayer(String sourceLayer) {
     setSourceLayer(sourceLayer);
     return this;
+  }
+
+  /**
+   * Get the source id.
+   *
+   * @return id of the source
+   */
+  @NonNull
+  public String getSourceId() {
+    checkThread();
+    return nativeGetSourceId();
   }
 
   /**
@@ -64,28 +85,48 @@ public class CircleLayer extends Layer {
    *
    * @return sourceLayer the source layer to get
    */
+  @NonNull
   public String getSourceLayer() {
+    checkThread();
     return nativeGetSourceLayer();
   }
 
   /**
-   * Set a single filter.
+   * Set a single expression filter.
    *
-   * @param filter the filter to set
+   * @param filter the expression filter to set
    */
-  public void setFilter(Filter.Statement filter) {
+  public void setFilter(@NonNull Expression filter) {
+    checkThread();
     nativeSetFilter(filter.toArray());
   }
 
   /**
-   * Set a single filter.
+   * Set a single expression filter.
    *
-   * @param filter the filter to set
+   * @param filter the expression filter to set
    * @return This
    */
-  public CircleLayer withFilter(Filter.Statement filter) {
+  @NonNull
+  public CircleLayer withFilter(@NonNull Expression filter) {
     setFilter(filter);
     return this;
+  }
+
+  /**
+   * Get a single expression filter.
+   *
+   * @return the expression filter to get
+   */
+  @Nullable
+  public Expression getFilter() {
+    checkThread();
+    JsonElement jsonElement = nativeGetFilter();
+    if (jsonElement != null) {
+      return Expression.Converter.convert(jsonElement);
+    } else {
+      return null;
+    }
   }
 
   /**
@@ -94,6 +135,7 @@ public class CircleLayer extends Layer {
    * @param properties the var-args properties
    * @return This
    */
+  @NonNull
   public CircleLayer withProperties(@NonNull PropertyValue<?>... properties) {
     setProperties(properties);
     return this;
@@ -106,8 +148,10 @@ public class CircleLayer extends Layer {
    *
    * @return property wrapper value around Float
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getCircleRadius() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("circle-radius", nativeGetCircleRadius());
   }
 
@@ -116,7 +160,9 @@ public class CircleLayer extends Layer {
    *
    * @return transition options for Float
    */
+  @NonNull
   public TransitionOptions getCircleRadiusTransition() {
+    checkThread();
     return nativeGetCircleRadiusTransition();
   }
 
@@ -125,7 +171,8 @@ public class CircleLayer extends Layer {
    *
    * @param options transition options for Float
    */
-  public void setCircleRadiusTransition(TransitionOptions options) {
+  public void setCircleRadiusTransition(@NonNull TransitionOptions options) {
+    checkThread();
     nativeSetCircleRadiusTransition(options.getDuration(), options.getDelay());
   }
 
@@ -134,8 +181,10 @@ public class CircleLayer extends Layer {
    *
    * @return property wrapper value around String
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getCircleColor() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("circle-color", nativeGetCircleColor());
   }
 
@@ -147,6 +196,7 @@ public class CircleLayer extends Layer {
    */
   @ColorInt
   public int getCircleColorAsInt() {
+    checkThread();
     PropertyValue<String> value = getCircleColor();
     if (value.isValue()) {
       return rgbaToColor(value.getValue());
@@ -160,7 +210,9 @@ public class CircleLayer extends Layer {
    *
    * @return transition options for String
    */
+  @NonNull
   public TransitionOptions getCircleColorTransition() {
+    checkThread();
     return nativeGetCircleColorTransition();
   }
 
@@ -169,7 +221,8 @@ public class CircleLayer extends Layer {
    *
    * @param options transition options for String
    */
-  public void setCircleColorTransition(TransitionOptions options) {
+  public void setCircleColorTransition(@NonNull TransitionOptions options) {
+    checkThread();
     nativeSetCircleColorTransition(options.getDuration(), options.getDelay());
   }
 
@@ -178,8 +231,10 @@ public class CircleLayer extends Layer {
    *
    * @return property wrapper value around Float
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getCircleBlur() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("circle-blur", nativeGetCircleBlur());
   }
 
@@ -188,7 +243,9 @@ public class CircleLayer extends Layer {
    *
    * @return transition options for Float
    */
+  @NonNull
   public TransitionOptions getCircleBlurTransition() {
+    checkThread();
     return nativeGetCircleBlurTransition();
   }
 
@@ -197,7 +254,8 @@ public class CircleLayer extends Layer {
    *
    * @param options transition options for Float
    */
-  public void setCircleBlurTransition(TransitionOptions options) {
+  public void setCircleBlurTransition(@NonNull TransitionOptions options) {
+    checkThread();
     nativeSetCircleBlurTransition(options.getDuration(), options.getDelay());
   }
 
@@ -206,8 +264,10 @@ public class CircleLayer extends Layer {
    *
    * @return property wrapper value around Float
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getCircleOpacity() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("circle-opacity", nativeGetCircleOpacity());
   }
 
@@ -216,7 +276,9 @@ public class CircleLayer extends Layer {
    *
    * @return transition options for Float
    */
+  @NonNull
   public TransitionOptions getCircleOpacityTransition() {
+    checkThread();
     return nativeGetCircleOpacityTransition();
   }
 
@@ -225,7 +287,8 @@ public class CircleLayer extends Layer {
    *
    * @param options transition options for Float
    */
-  public void setCircleOpacityTransition(TransitionOptions options) {
+  public void setCircleOpacityTransition(@NonNull TransitionOptions options) {
+    checkThread();
     nativeSetCircleOpacityTransition(options.getDuration(), options.getDelay());
   }
 
@@ -234,8 +297,10 @@ public class CircleLayer extends Layer {
    *
    * @return property wrapper value around Float[]
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getCircleTranslate() {
+    checkThread();
     return (PropertyValue<Float[]>) new PropertyValue("circle-translate", nativeGetCircleTranslate());
   }
 
@@ -244,7 +309,9 @@ public class CircleLayer extends Layer {
    *
    * @return transition options for Float[]
    */
+  @NonNull
   public TransitionOptions getCircleTranslateTransition() {
+    checkThread();
     return nativeGetCircleTranslateTransition();
   }
 
@@ -253,7 +320,8 @@ public class CircleLayer extends Layer {
    *
    * @param options transition options for Float[]
    */
-  public void setCircleTranslateTransition(TransitionOptions options) {
+  public void setCircleTranslateTransition(@NonNull TransitionOptions options) {
+    checkThread();
     nativeSetCircleTranslateTransition(options.getDuration(), options.getDelay());
   }
 
@@ -262,8 +330,10 @@ public class CircleLayer extends Layer {
    *
    * @return property wrapper value around String
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getCircleTranslateAnchor() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("circle-translate-anchor", nativeGetCircleTranslateAnchor());
   }
 
@@ -272,8 +342,10 @@ public class CircleLayer extends Layer {
    *
    * @return property wrapper value around String
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getCirclePitchScale() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("circle-pitch-scale", nativeGetCirclePitchScale());
   }
 
@@ -282,8 +354,10 @@ public class CircleLayer extends Layer {
    *
    * @return property wrapper value around String
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getCirclePitchAlignment() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("circle-pitch-alignment", nativeGetCirclePitchAlignment());
   }
 
@@ -292,8 +366,10 @@ public class CircleLayer extends Layer {
    *
    * @return property wrapper value around Float
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getCircleStrokeWidth() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("circle-stroke-width", nativeGetCircleStrokeWidth());
   }
 
@@ -302,7 +378,9 @@ public class CircleLayer extends Layer {
    *
    * @return transition options for Float
    */
+  @NonNull
   public TransitionOptions getCircleStrokeWidthTransition() {
+    checkThread();
     return nativeGetCircleStrokeWidthTransition();
   }
 
@@ -311,7 +389,8 @@ public class CircleLayer extends Layer {
    *
    * @param options transition options for Float
    */
-  public void setCircleStrokeWidthTransition(TransitionOptions options) {
+  public void setCircleStrokeWidthTransition(@NonNull TransitionOptions options) {
+    checkThread();
     nativeSetCircleStrokeWidthTransition(options.getDuration(), options.getDelay());
   }
 
@@ -320,8 +399,10 @@ public class CircleLayer extends Layer {
    *
    * @return property wrapper value around String
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<String> getCircleStrokeColor() {
+    checkThread();
     return (PropertyValue<String>) new PropertyValue("circle-stroke-color", nativeGetCircleStrokeColor());
   }
 
@@ -333,6 +414,7 @@ public class CircleLayer extends Layer {
    */
   @ColorInt
   public int getCircleStrokeColorAsInt() {
+    checkThread();
     PropertyValue<String> value = getCircleStrokeColor();
     if (value.isValue()) {
       return rgbaToColor(value.getValue());
@@ -346,7 +428,9 @@ public class CircleLayer extends Layer {
    *
    * @return transition options for String
    */
+  @NonNull
   public TransitionOptions getCircleStrokeColorTransition() {
+    checkThread();
     return nativeGetCircleStrokeColorTransition();
   }
 
@@ -355,7 +439,8 @@ public class CircleLayer extends Layer {
    *
    * @param options transition options for String
    */
-  public void setCircleStrokeColorTransition(TransitionOptions options) {
+  public void setCircleStrokeColorTransition(@NonNull TransitionOptions options) {
+    checkThread();
     nativeSetCircleStrokeColorTransition(options.getDuration(), options.getDelay());
   }
 
@@ -364,8 +449,10 @@ public class CircleLayer extends Layer {
    *
    * @return property wrapper value around Float
    */
+  @NonNull
   @SuppressWarnings("unchecked")
   public PropertyValue<Float> getCircleStrokeOpacity() {
+    checkThread();
     return (PropertyValue<Float>) new PropertyValue("circle-stroke-opacity", nativeGetCircleStrokeOpacity());
   }
 
@@ -374,7 +461,9 @@ public class CircleLayer extends Layer {
    *
    * @return transition options for Float
    */
+  @NonNull
   public TransitionOptions getCircleStrokeOpacityTransition() {
+    checkThread();
     return nativeGetCircleStrokeOpacityTransition();
   }
 
@@ -383,65 +472,113 @@ public class CircleLayer extends Layer {
    *
    * @param options transition options for Float
    */
-  public void setCircleStrokeOpacityTransition(TransitionOptions options) {
+  public void setCircleStrokeOpacityTransition(@NonNull TransitionOptions options) {
+    checkThread();
     nativeSetCircleStrokeOpacityTransition(options.getDuration(), options.getDelay());
   }
 
+  @NonNull
+  @Keep
   private native Object nativeGetCircleRadius();
 
+  @NonNull
+  @Keep
   private native TransitionOptions nativeGetCircleRadiusTransition();
 
+  @Keep
   private native void nativeSetCircleRadiusTransition(long duration, long delay);
 
+  @NonNull
+  @Keep
   private native Object nativeGetCircleColor();
 
+  @NonNull
+  @Keep
   private native TransitionOptions nativeGetCircleColorTransition();
 
+  @Keep
   private native void nativeSetCircleColorTransition(long duration, long delay);
 
+  @NonNull
+  @Keep
   private native Object nativeGetCircleBlur();
 
+  @NonNull
+  @Keep
   private native TransitionOptions nativeGetCircleBlurTransition();
 
+  @Keep
   private native void nativeSetCircleBlurTransition(long duration, long delay);
 
+  @NonNull
+  @Keep
   private native Object nativeGetCircleOpacity();
 
+  @NonNull
+  @Keep
   private native TransitionOptions nativeGetCircleOpacityTransition();
 
+  @Keep
   private native void nativeSetCircleOpacityTransition(long duration, long delay);
 
+  @NonNull
+  @Keep
   private native Object nativeGetCircleTranslate();
 
+  @NonNull
+  @Keep
   private native TransitionOptions nativeGetCircleTranslateTransition();
 
+  @Keep
   private native void nativeSetCircleTranslateTransition(long duration, long delay);
 
+  @NonNull
+  @Keep
   private native Object nativeGetCircleTranslateAnchor();
 
+  @NonNull
+  @Keep
   private native Object nativeGetCirclePitchScale();
 
+  @NonNull
+  @Keep
   private native Object nativeGetCirclePitchAlignment();
 
+  @NonNull
+  @Keep
   private native Object nativeGetCircleStrokeWidth();
 
+  @NonNull
+  @Keep
   private native TransitionOptions nativeGetCircleStrokeWidthTransition();
 
+  @Keep
   private native void nativeSetCircleStrokeWidthTransition(long duration, long delay);
 
+  @NonNull
+  @Keep
   private native Object nativeGetCircleStrokeColor();
 
+  @NonNull
+  @Keep
   private native TransitionOptions nativeGetCircleStrokeColorTransition();
 
+  @Keep
   private native void nativeSetCircleStrokeColorTransition(long duration, long delay);
 
+  @NonNull
+  @Keep
   private native Object nativeGetCircleStrokeOpacity();
 
+  @NonNull
+  @Keep
   private native TransitionOptions nativeGetCircleStrokeOpacityTransition();
 
+  @Keep
   private native void nativeSetCircleStrokeOpacityTransition(long duration, long delay);
 
   @Override
+  @Keep
   protected native void finalize() throws Throwable;
 
 }

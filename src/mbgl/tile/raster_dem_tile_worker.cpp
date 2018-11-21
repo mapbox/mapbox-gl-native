@@ -10,14 +10,14 @@ RasterDEMTileWorker::RasterDEMTileWorker(ActorRef<RasterDEMTileWorker>, ActorRef
     : parent(std::move(parent_)) {
 }
 
-void RasterDEMTileWorker::parse(std::shared_ptr<const std::string> data, uint64_t correlationID) {
+void RasterDEMTileWorker::parse(std::shared_ptr<const std::string> data, uint64_t correlationID, Tileset::DEMEncoding encoding) {
     if (!data) {
         parent.invoke(&RasterDEMTile::onParsed, nullptr, correlationID); // No data; empty tile.
         return;
     }
 
     try {
-        auto bucket = std::make_unique<HillshadeBucket>(decodeImage(*data));
+        auto bucket = std::make_unique<HillshadeBucket>(decodeImage(*data), encoding);
         parent.invoke(&RasterDEMTile::onParsed, std::move(bucket), correlationID);
     } catch (...) {
         parent.invoke(&RasterDEMTile::onError, std::current_exception(), correlationID);

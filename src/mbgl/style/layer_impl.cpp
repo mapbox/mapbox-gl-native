@@ -9,5 +9,7 @@ Layer::Impl::Impl(LayerType type_, std::string layerID, std::string sourceID)
       source(std::move(sourceID)) {
 }
 
+void Layer::Impl::populateFontStack(std::set<FontStack>&) const {}
+
 } // namespace style
 } // namespace mbgl

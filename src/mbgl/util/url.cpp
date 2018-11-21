@@ -1,8 +1,6 @@
 #include <mbgl/util/url.hpp>
 #include <mbgl/util/token.hpp>
 
-#include <iomanip>
-#include <sstream>
 #include <string>
 #include <cstdlib>
 #include <algorithm>
@@ -24,26 +22,30 @@ inline bool isSchemeCharacter(char c) {
     return isAlphaNumericCharacter(c) || c == '-' || c == '+' || c == '.';
 }
 
+inline char toLowerHex(char c) {
+    c &= 0x0F;
+    return '0' + c + (c > 9 ? 39 : 0);
+}
+
 } // namespace
 
 namespace mbgl {
 namespace util {
 
 std::string percentEncode(const std::string& input) {
-    std::ostringstream encoded;
-
-    encoded.fill('0');
-    encoded << std::hex;
+    std::string encoded;
 
     for (auto c : input) {
         if (isAlphaNumericCharacter(c) || c == '-' || c == '_' || c == '.' || c == '~') {
-            encoded << c;
+            encoded += c;
         } else {
-            encoded << '%' << std::setw(2) << int(c);
+            encoded += '%';
+            encoded += toLowerHex(c >> 4);
+            encoded += toLowerHex(c);
         }
     }
 
-    return encoded.str();
+    return encoded;
 }
 
 std::string percentDecode(const std::string& input) {
@@ -130,7 +132,7 @@ Path::Path(const std::string& str, const size_t pos, const size_t count)
 }
 
 std::string transformURL(const std::string& tpl, const std::string& str, const URL& url) {
-    auto result = util::replaceTokens(tpl, [&](const std::string& token) -> std::string {
+    auto result = util::replaceTokens(tpl, [&](const std::string& token) -> optional<std::string> {
         if (token == "path") {
             return str.substr(url.path.first, url.path.second);
         } else if (token == "domain") {
@@ -146,8 +148,9 @@ std::string transformURL(const std::string& tpl, const std::string& str, const U
         } else if (token == "extension") {
             const Path path(str, url.path.first, url.path.second);
             return str.substr(path.extension.first, path.extension.second);
+        } else {
+            return {};
         }
-        return "";
     });
 
     // Append the query string if it exists.

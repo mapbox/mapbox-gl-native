@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MGLNetworkConfiguration : NSObject
 
 /// Returns the shared instance of the `MGLNetworkConfiguration` class.
-+ (instancetype)sharedManager;
+@property (class, nonatomic, readonly) MGLNetworkConfiguration *sharedManager;
 
 /// The current API base URL. If `nil`, the Mapbox default base API URL is in use.
 @property (atomic, nullable) NSURL *apiBaseURL;

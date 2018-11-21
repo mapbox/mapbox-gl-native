@@ -86,6 +86,11 @@ MGL_EXPORT
 - (CGPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate;
 
 /**
+ Converts the specified image point to a map coordinate.
+ */
+- (CLLocationCoordinate2D)coordinateForPoint:(CGPoint)point;
+
+/**
  The image of the map’s content.
  */
 @property (nonatomic, readonly) UIImage *image;
@@ -95,6 +100,12 @@ MGL_EXPORT
  image.
  */
 - (NSPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate;
+
+/**
+ Converts the specified image point to a map coordinate.
+ */
+- (CLLocationCoordinate2D)coordinateForPoint:(NSPoint)point;
+
 
 /**
  The image of the map’s content.
@@ -138,9 +149,9 @@ typedef void (^MGLMapSnapshotCompletionHandler)(MGLMapSnapshot* _Nullable snapsh
  ### Example
  
  ```swift
- let camera = MGLMapCamera(lookingAtCenter: CLLocationCoordinate2D(latitude: 37.7184, longitude: -122.4365), fromDistance: 100, pitch: 20, heading: 0)
+ let camera = MGLMapCamera(lookingAtCenter: CLLocationCoordinate2D(latitude: 37.7184, longitude: -122.4365), altitude: 100, pitch: 20, heading: 0)
  
- let options = MGLMapSnapshotOptions(styleURL: MGLStyle.satelliteStreetsStyleURL(), camera: camera, size: CGSize(width: 320, height: 480))
+ let options = MGLMapSnapshotOptions(styleURL: MGLStyle.satelliteStreetsStyleURL, camera: camera, size: CGSize(width: 320, height: 480))
  options.zoomLevel = 10
  
  let snapshotter = MGLMapSnapshotter(options: options)
@@ -152,9 +163,17 @@ typedef void (^MGLMapSnapshotCompletionHandler)(MGLMapSnapshot* _Nullable snapsh
      image = snapshot?.image
  }
  ```
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/map-snapshotter/">
+ Create a static map snapshot</a> example to learn how to use the
+ `MGLMapSnapshotter` to generate a static image based on an `MGLMapView`
+ object's style, camera, and view bounds.
  */
 MGL_EXPORT
 @interface MGLMapSnapshotter : NSObject
+
+- (instancetype)init NS_UNAVAILABLE;
 
 /**
  Initializes and returns a map snapshotter object that produces snapshots
@@ -163,7 +182,7 @@ MGL_EXPORT
  @param options The options to use when generating a map snapshot.
  @return An initialized map snapshotter.
  */
-- (instancetype)initWithOptions:(MGLMapSnapshotOptions *)options;
+- (instancetype)initWithOptions:(MGLMapSnapshotOptions *)options NS_DESIGNATED_INITIALIZER;
 
 /**
  Starts the snapshot creation and executes the specified block with the result.

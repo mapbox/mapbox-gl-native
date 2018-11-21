@@ -35,7 +35,13 @@ class Context;
 
 class Tile : private util::noncopyable {
 public:
-    Tile(OverscaledTileID);
+    enum class Kind : uint8_t {
+        Geometry,
+        Raster,
+        RasterDEM
+    };
+
+    Tile(Kind, OverscaledTileID);
     virtual ~Tile();
 
     void setObserver(TileObserver* observer);
@@ -48,6 +54,12 @@ public:
     virtual void upload(gl::Context&) = 0;
     virtual Bucket* getBucket(const style::Layer::Impl&) const = 0;
 
+    template <class T>
+    T* getBucket(const style::Layer::Impl& layer) const {
+        Bucket* bucket = getBucket(layer);
+        return bucket ? bucket->as<T>() : nullptr;
+    }
+
     virtual void setShowCollisionBoxes(const bool) {}
     virtual void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) {}
     virtual void setMask(TileMask&&) {}
@@ -58,11 +70,13 @@ public:
             const TransformState&,
             const std::vector<const RenderLayer*>&,
             const RenderedQueryOptions& options,
-            const CollisionIndex&);
+            const mat4& projMatrix);
 
     virtual void querySourceFeatures(
             std::vector<Feature>& result,
             const SourceQueryOptions&);
+
+    virtual float getQueryPadding(const std::vector<const RenderLayer*>&);
 
     void setTriedCache();
 
@@ -109,14 +123,10 @@ public:
     // and will have time to finish by the second placement.
     virtual void performedFadePlacement() {}
     
-    // FeatureIndexes are loaded asynchronously, but must be used with a CollisionIndex
-    // generated from the same data. Calling commitFeatureIndex signals the current
-    // CollisionIndex is up-to-date and allows us to start using the last loaded FeatureIndex
-    virtual void commitFeatureIndex() {}
-    
     void dumpDebugLogs() const;
 
-    const OverscaledTileID id;
+    const Kind kind;
+    OverscaledTileID id;
     optional<Timestamp> modified;
     optional<Timestamp> expires;
 

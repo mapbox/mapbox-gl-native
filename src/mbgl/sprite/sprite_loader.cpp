@@ -86,7 +86,7 @@ void SpriteLoader::emitSpriteLoadedIfComplete() {
         return;
     }
 
-    loader->worker.invoke(&SpriteLoaderWorker::parse, loader->image, loader->json);
+    loader->worker.self().invoke(&SpriteLoaderWorker::parse, loader->image, loader->json);
 }
 
 void SpriteLoader::onParsed(std::vector<std::unique_ptr<style::Image>>&& result) {

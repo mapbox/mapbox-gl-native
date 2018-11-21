@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:mapbox="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    mapbox:ignore="NestedWeights">
+    tools:ignore="NestedWeights">
 
     <LinearLayout
-        android:baselineAligned="false"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="0.5"
+        android:baselineAligned="false"
         android:orientation="horizontal">
 
         <!-- DC -->
@@ -21,10 +21,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.5"
-            mapbox:center_latitude="38.913187"
-            mapbox:center_longitude="-77.032546"
-            mapbox:style_url="mapbox://styles/mapbox/streets-v10"
-            mapbox:zoom="12"/>
+            mapbox:mapbox_cameraTargetLat="38.913187"
+            mapbox:mapbox_cameraTargetLng="-77.032546"
+            mapbox:mapbox_cameraZoom="12"
+            mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10" />
 
         <!-- SF -->
         <fragment
@@ -33,17 +33,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.5"
-            mapbox:center_latitude="37.775732"
-            mapbox:center_longitude="-122.413985"
-            mapbox:style_url="mapbox://styles/mapbox/outdoors-v10"
-            mapbox:zoom="13"/>
+            mapbox:mapbox_cameraTargetLat="37.775732"
+            mapbox:mapbox_cameraTargetLng="-122.413985"
+            mapbox:mapbox_cameraZoom="13"
+            mapbox:mapbox_styleUrl="mapbox://styles/mapbox/outdoors-v10" />
     </LinearLayout>
 
     <LinearLayout
-        android:baselineAligned="false"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="0.5"
+        android:baselineAligned="false"
         android:orientation="horizontal">
 
         <!-- Bangalore -->
@@ -53,10 +53,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.5"
-            mapbox:center_latitude="12.97913"
-            mapbox:center_longitude="77.59188"
-            mapbox:style_url="mapbox://styles/mapbox/light-v9"
-            mapbox:zoom="14"/>
+            mapbox:mapbox_cameraTargetLat="12.97913"
+            mapbox:mapbox_cameraTargetLng="77.59188"
+            mapbox:mapbox_cameraZoom="14"
+            mapbox:mapbox_styleUrl="mapbox://styles/mapbox/light-v9" />
 
         <!-- Ayacucho -->
         <fragment
@@ -65,9 +65,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.5"
-            mapbox:center_latitude="-13.155980"
-            mapbox:center_longitude="-74.217134"
-            mapbox:style_url="mapbox://styles/mapbox/dark-v9"
-            mapbox:zoom="15"/>
+            mapbox:mapbox_cameraTargetLat="-13.155980"
+            mapbox:mapbox_cameraTargetLng="-74.217134"
+            mapbox:mapbox_cameraZoom="15"
+            mapbox:mapbox_styleUrl="mapbox://styles/mapbox/dark-v9" />
     </LinearLayout>
 </LinearLayout>

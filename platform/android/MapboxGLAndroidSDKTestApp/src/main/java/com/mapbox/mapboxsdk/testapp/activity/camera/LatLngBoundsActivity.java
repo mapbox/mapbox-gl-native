@@ -10,7 +10,6 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.http.HttpRequestUtil;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -52,9 +51,8 @@ public class LatLngBoundsActivity extends AppCompatActivity implements View.OnCl
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    HttpRequestUtil.setLogEnabled(false);
     setContentView(R.layout.activity_latlngbounds);
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
@@ -63,10 +61,16 @@ public class LatLngBoundsActivity extends AppCompatActivity implements View.OnCl
   }
 
   private void initMap() {
+    disableGestures();
     addMarkers();
     initFab();
     initBottomSheet();
-    moveToBounds(bottomSheet.getMeasuredHeight(), BOUNDS_PADDING_DIVIDER_SMALL, 0);
+    moveToBounds(bottomSheet.getMeasuredHeight(), BOUNDS_PADDING_DIVIDER_SMALL, ANIMATION_DURATION_SHORT);
+  }
+
+  private void disableGestures() {
+    mapboxMap.getUiSettings().setTiltGesturesEnabled(false);
+    mapboxMap.getUiSettings().setRotateGesturesEnabled(false);
   }
 
   private void addMarkers() {
@@ -151,7 +155,6 @@ public class LatLngBoundsActivity extends AppCompatActivity implements View.OnCl
   protected void onDestroy() {
     super.onDestroy();
     mapView.onDestroy();
-    HttpRequestUtil.setLogEnabled(true);
   }
 
   @Override

@@ -1,12 +1,17 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/shaders/line_sdf.hpp>
+#include <mbgl/shaders/source.hpp>
 
 namespace mbgl {
 namespace shaders {
 
 const char* line_sdf::name = "line_sdf";
-const char* line_sdf::vertexSource = R"MBGL_SHADER(
+const char* line_sdf::vertexSource = source() + 61204;
+const char* line_sdf::fragmentSource = source() + 66571;
+
+// Uncompressed source of line_sdf.vertex.glsl:
+/*
 // floor(127 / 2) == 63.0
 // the maximum allowed miter limit is 2.0 at the moment. the extrude normal is
 // stored in a byte (-128..127). we scale regular normals up to length 63, but
@@ -105,7 +110,7 @@ uniform lowp float u_floorwidth;
 void main() {
     
 #ifndef HAS_UNIFORM_u_color
-    color = unpack_mix_vec4(a_color, a_color_t);
+    color = unpack_mix_color(a_color, a_color_t);
 #else
     highp vec4 color = u_color;
 #endif
@@ -171,7 +176,7 @@ void main() {
     offset = -1.0 * offset;
 
     float inset = gapwidth + (gapwidth > 0.0 ? ANTIALIASING : 0.0);
-    float outset = gapwidth + halfwidth * (gapwidth > 0.0 ? 2.0 : 1.0) + ANTIALIASING;
+    float outset = gapwidth + halfwidth * (gapwidth > 0.0 ? 2.0 : 1.0) + (halfwidth == 0.0 ? 0.0 : ANTIALIASING);
 
     // Scale the extrusion vector down to a normal and then up by the line width
     // of this vertex.
@@ -199,8 +204,10 @@ void main() {
     v_width2 = vec2(outset, inset);
 }
 
-)MBGL_SHADER";
-const char* line_sdf::fragmentSource = R"MBGL_SHADER(
+*/
+
+// Uncompressed source of line_sdf.fragment.glsl:
+/*
 
 uniform sampler2D u_image;
 uniform float u_sdfgamma;
@@ -296,7 +303,7 @@ void main() {
 #endif
 }
 
-)MBGL_SHADER";
+*/
 
 } // namespace shaders
 } // namespace mbgl

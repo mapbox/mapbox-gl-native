@@ -58,11 +58,7 @@ public class CustomLayerActivity extends AppCompatActivity {
       fab.setImageResource(R.drawable.ic_layers);
     } else {
       customLayer = new CustomLayer("custom",
-        ExampleCustomLayer.createContext(),
-        ExampleCustomLayer.InitializeFunction,
-        ExampleCustomLayer.RenderFunction,
-        ExampleCustomLayer.ContextLostFunction, // Optional
-        ExampleCustomLayer.DeinitializeFunction);
+        ExampleCustomLayer.createContext());
       mapboxMap.addLayerBelow(customLayer, "building");
       fab.setImageResource(R.drawable.ic_layers_clear);
     }

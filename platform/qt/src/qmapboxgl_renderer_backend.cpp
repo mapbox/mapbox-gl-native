@@ -1,12 +1,7 @@
 #include "qmapboxgl_renderer_backend.hpp"
 
-#include <QtGlobal>
-
-#if QT_VERSION >= 0x050000
 #include <QOpenGLContext>
-#else
-#include <QGLContext>
-#endif
+#include <QtGlobal>
 
 void QMapboxGLRendererBackend::updateAssumedState()
 {
@@ -39,11 +34,6 @@ void QMapboxGLRendererBackend::updateFramebuffer(quint32 fbo, const mbgl::Size &
 */
 mbgl::gl::ProcAddress QMapboxGLRendererBackend::getExtensionFunctionPointer(const char* name)
 {
-#if QT_VERSION >= 0x050000
     QOpenGLContext* thisContext = QOpenGLContext::currentContext();
     return thisContext->getProcAddress(name);
-#else
-    const QGLContext* thisContext = QGLContext::currentContext();
-    return reinterpret_cast<mbgl::gl::ProcAddress>(thisContext->getProcAddress(name));
-#endif
 }

@@ -36,7 +36,7 @@ typedef NS_ENUM(NSUInteger, MGLHillshadeIlluminationAnchor) {
  
  To display posterized hillshading based on vector shapes, as with the <a
  href="https://www.mapbox.com/vector-tiles/mapbox-terrain/">Mapbox Terrain</a>
- source, use an `MGLVectorSource` object in conjunction with several
+ source, use an `MGLVectorTileSource` object in conjunction with several
  `MGLFillStyleLayer` objects.
 
  You can access an existing hillshade style layer using the
@@ -75,6 +75,7 @@ MGL_EXPORT
 
 #pragma mark - Accessing the Paint Attributes
 
+#if TARGET_OS_IPHONE
 /**
  The shading color used to accentuate rugged terrain like sharp cliffs and
  gorges.
@@ -95,6 +96,28 @@ MGL_EXPORT
  feature attributes.
  */
 @property (nonatomic, null_resettable) NSExpression *hillshadeAccentColor;
+#else
+/**
+ The shading color used to accentuate rugged terrain like sharp cliffs and
+ gorges.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *hillshadeAccentColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `hillshadeAccentColor` property.
@@ -111,7 +134,7 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values between 0 and 1 inclusive
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -129,6 +152,7 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition hillshadeExaggerationTransition;
 
+#if TARGET_OS_IPHONE
 /**
  The shading color of areas that faces towards the light source.
  
@@ -148,6 +172,27 @@ MGL_EXPORT
  feature attributes.
  */
 @property (nonatomic, null_resettable) NSExpression *hillshadeHighlightColor;
+#else
+/**
+ The shading color of areas that faces towards the light source.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.whiteColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *hillshadeHighlightColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `hillshadeHighlightColor` property.
@@ -191,7 +236,7 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values between 0 and 359 inclusive
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -202,6 +247,7 @@ MGL_EXPORT
  */
 @property (nonatomic, null_resettable) NSExpression *hillshadeIlluminationDirection;
 
+#if TARGET_OS_IPHONE
 /**
  The shading color of areas that face away from the light source.
  
@@ -221,6 +267,27 @@ MGL_EXPORT
  feature attributes.
  */
 @property (nonatomic, null_resettable) NSExpression *hillshadeShadowColor;
+#else
+/**
+ The shading color of areas that face away from the light source.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *hillshadeShadowColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `hillshadeShadowColor` property.

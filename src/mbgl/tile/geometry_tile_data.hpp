@@ -22,19 +22,19 @@ class GeometryCoordinates : public std::vector<GeometryCoordinate> {
 public:
     using coordinate_type = int16_t;
 
-    GeometryCoordinates() = default;
-    GeometryCoordinates(const std::vector<GeometryCoordinate>& v)
-        : std::vector<GeometryCoordinate>(v) {}
-    GeometryCoordinates(std::vector<GeometryCoordinate>&& v)
-        : std::vector<GeometryCoordinate>(std::move(v)) {}
-
-    using std::vector<GeometryCoordinate>::vector;
+    template <class... Args>
+    GeometryCoordinates(Args&&... args) : std::vector<GeometryCoordinate>(std::forward<Args>(args)...) {}
+    GeometryCoordinates(std::initializer_list<GeometryCoordinate> args)
+      : std::vector<GeometryCoordinate>(std::move(args)) {}
 };
 
 class GeometryCollection : public std::vector<GeometryCoordinates> {
 public:
     using coordinate_type = int16_t;
-    using std::vector<GeometryCoordinates>::vector;
+    template <class... Args>
+    GeometryCollection(Args&&... args) : std::vector<GeometryCoordinates>(std::forward<Args>(args)...) {}
+    GeometryCollection(std::initializer_list<GeometryCoordinates> args)
+      : std::vector<GeometryCoordinates>(std::move(args)) {}
 };
 
 class GeometryTileFeature {
@@ -43,7 +43,7 @@ public:
     virtual FeatureType getType() const = 0;
     virtual optional<Value> getValue(const std::string& key) const = 0;
     virtual PropertyMap getProperties() const { return PropertyMap(); }
-    virtual optional<FeatureIdentifier> getID() const { return {}; }
+    virtual FeatureIdentifier getID() const { return NullValue {}; }
     virtual GeometryCollection getGeometries() const = 0;
 };
 
@@ -83,6 +83,9 @@ Feature convertFeature(const GeometryTileFeature&, const CanonicalTileID&);
 GeometryCollection fixupPolygons(const GeometryCollection&);
 
 struct ToGeometryCollection {
+    GeometryCollection operator()(const mapbox::geometry::empty&) const {
+        return GeometryCollection();
+    }
     GeometryCollection operator()(const mapbox::geometry::point<int16_t>& geom) const {
         return { { geom } };
     }

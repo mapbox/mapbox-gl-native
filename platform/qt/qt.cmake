@@ -3,7 +3,6 @@
 
 option(WITH_QT_DECODERS "Use builtin Qt image decoders" OFF)
 option(WITH_QT_I18N     "Use builtin Qt i18n support"   OFF)
-option(WITH_QT_4        "Use Qt4 instead of Qt5"        OFF)
 
 add_definitions("-D__QT__")
 
@@ -38,6 +37,14 @@ set(MBGL_QT_CORE_FILES
     PRIVATE platform/qt/src/timer.cpp
     PRIVATE platform/qt/src/timer_impl.hpp
     PRIVATE platform/qt/src/utf.cpp
+
+    PRIVATE platform/default/local_glyph_rasterizer.cpp
+    PRIVATE platform/default/collator.cpp
+    PRIVATE platform/default/unaccent.cpp
+    PRIVATE platform/default/unaccent.hpp
+
+    #Layer manager
+    PRIVATE platform/default/layer_manager.cpp
 )
 
 set(MBGL_QT_FILESOURCE_FILES
@@ -65,13 +72,16 @@ add_library(qmapboxgl SHARED
     platform/qt/src/qmapboxgl_map_observer.hpp
     platform/qt/src/qmapboxgl_map_renderer.cpp
     platform/qt/src/qmapboxgl_map_renderer.hpp
-    platform/qt/src/qmapboxgl_renderer_backend.hpp
     platform/qt/src/qmapboxgl_renderer_backend.cpp
+    platform/qt/src/qmapboxgl_renderer_backend.hpp
+    platform/qt/src/qmapboxgl_scheduler.cpp
+    platform/qt/src/qmapboxgl_scheduler.hpp
     platform/default/mbgl/util/default_styles.hpp
 )
 
 target_include_directories(qmapboxgl
     PUBLIC platform/qt/include
+    PRIVATE src
 )
 
 target_compile_definitions(qmapboxgl
@@ -101,11 +111,32 @@ target_link_libraries(mbgl-qt
     PRIVATE qmapboxgl
 )
 
-if(WITH_QT_4)
-    include(platform/qt/qt4.cmake)
-else()
-    include(platform/qt/qt5.cmake)
-endif()
+find_package(Qt5Core     REQUIRED)
+find_package(Qt5Gui      REQUIRED)
+find_package(Qt5Network  REQUIRED)
+find_package(Qt5OpenGL   REQUIRED)
+find_package(Qt5Widgets  REQUIRED)
+find_package(Qt5Sql      REQUIRED)
+
+# Qt5 always build OpenGL ES2 which is the compatibility
+# mode. Qt5 will take care of translating the desktop
+# version of OpenGL to ES2.
+add_definitions("-DMBGL_USE_GLES2")
+
+set(MBGL_QT_CORE_LIBRARIES
+    PUBLIC Qt5::Core
+    PUBLIC Qt5::Gui
+    PUBLIC Qt5::OpenGL
+)
+
+set(MBGL_QT_FILESOURCE_LIBRARIES
+    PUBLIC Qt5::Network
+    PUBLIC Qt5::Sql
+)
+
+target_link_libraries(mbgl-qt
+    PRIVATE Qt5::Widgets
+)
 
 xcode_create_scheme(TARGET mbgl-qt)
 
@@ -117,20 +148,10 @@ if (MASON_PLATFORM STREQUAL "osx" OR MASON_PLATFORM STREQUAL "ios")
     list(APPEND MBGL_QT_CORE_LIBRARIES
         PRIVATE "-framework Foundation"
     )
-    if(WITH_QT_4)
-        list(APPEND MBGL_QT_CORE_LIBRARIES
-            PRIVATE "-framework OpenGL"
-        )
-    endif()
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     list(APPEND MBGL_QT_CORE_FILES
         PRIVATE platform/default/thread.cpp
     )
-    if(WITH_QT_4)
-        list(APPEND MBGL_QT_CORE_LIBRARIES
-            PRIVATE "-lGL"
-        )
-    endif()
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     add_definitions("-DQT_COMPILING_QIMAGE_COMPAT_CPP")
     add_definitions("-DRAPIDJSON_HAS_CXX11_RVALUE_REFS")
@@ -145,13 +166,16 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     add_definitions("-Wno-unused-command-line-argument")
     add_definitions("-Wno-unused-local-typedef")
     add_definitions("-Wno-unused-private-field")
+    add_definitions("-Wno-inconsistent-missing-override")
 
     list(APPEND MBGL_QT_CORE_FILES
         PRIVATE platform/qt/src/thread.cpp
     )
-
-    target_add_mason_package(qmapboxgl PRIVATE optional)
-    target_add_mason_package(qmapboxgl PRIVATE tao_tuple)
+elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "QNX")
+    list(APPEND MBGL_QT_CORE_FILES
+        PRIVATE platform/qt/src/thread.cpp
+    )
+    add_definitions("-Wno-narrowing")
 endif()
 
 add_custom_command(

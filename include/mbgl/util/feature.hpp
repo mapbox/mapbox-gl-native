@@ -2,15 +2,15 @@
 
 #include <mbgl/util/optional.hpp>
 
-#include <mapbox/geometry/feature.hpp>
+#include <mapbox/feature.hpp>
 
 namespace mbgl {
 
-using Value = mapbox::geometry::value;
-using NullValue = mapbox::geometry::null_value_t;
-using PropertyMap = mapbox::geometry::property_map;
-using FeatureIdentifier = mapbox::geometry::identifier;
-using Feature = mapbox::geometry::feature<double>;
+using Value = mapbox::feature::value;
+using NullValue = mapbox::feature::null_value_t;
+using PropertyMap = mapbox::feature::property_map;
+using FeatureIdentifier = mapbox::feature::identifier;
+using Feature = mapbox::feature::feature<double>;
 
 template <class T>
 optional<T> numericValue(const Value& value) {

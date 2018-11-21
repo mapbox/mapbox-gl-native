@@ -33,30 +33,32 @@
 namespace mbgl {
 namespace android {
 
+LocalGlyphRasterizer::LocalGlyphRasterizer() {
+    UniqueEnv env { AttachEnv() };
+
+    static auto& javaClass = jni::Class<LocalGlyphRasterizer>::Singleton(*env);
+    static auto constructor = javaClass.GetConstructor(*env);
+
+    javaObject = jni::NewGlobal(*env, javaClass.New(*env, constructor));
+}
+
 PremultipliedImage LocalGlyphRasterizer::drawGlyphBitmap(const std::string& fontFamily, const bool bold, const GlyphID glyphID) {
     UniqueEnv env { AttachEnv() };
 
-    using Signature = jni::Object<Bitmap>(jni::String, jni::jboolean, jni::jchar);
-    auto method = javaClass.GetStaticMethod<Signature>(*env, "drawGlyphBitmap");
+    static auto& javaClass = jni::Class<LocalGlyphRasterizer>::Singleton(*env);
+    static auto drawGlyphBitmap = javaClass.GetMethod<jni::Object<Bitmap> (jni::String, jni::jboolean, jni::jchar)>(*env, "drawGlyphBitmap");
 
-    jni::String jniFontFamily = jni::Make<jni::String>(*env, fontFamily);
-
-    auto javaBitmap = javaClass.Call(*env,
-                                     method,
-                                     jniFontFamily,
-                                     static_cast<jni::jboolean>(bold),
-                                     static_cast<jni::jchar>(glyphID));
-
-    PremultipliedImage result = Bitmap::GetImage(*env, javaBitmap);
-    jni::DeleteLocalRef(*env, javaBitmap);
-    return result;
+    return Bitmap::GetImage(*env,
+        javaObject.Call(*env,
+            drawGlyphBitmap,
+            jni::Make<jni::String>(*env, fontFamily),
+            static_cast<jni::jboolean>(bold),
+            static_cast<jni::jchar>(glyphID)));
 }
 
 void LocalGlyphRasterizer::registerNative(jni::JNIEnv& env) {
-    javaClass = *jni::Class<LocalGlyphRasterizer>::Find(env).NewGlobalRef(env).release();
+    jni::Class<LocalGlyphRasterizer>::Singleton(env);
 }
-
-jni::Class<LocalGlyphRasterizer> LocalGlyphRasterizer::javaClass;
 
 } // namespace android
 
@@ -76,13 +78,15 @@ public:
             std::string lowercaseFont = platform::lowercase(font);
             if (lowercaseFont.find("bold") != std::string::npos) {
                 bold = true;
+                break;
             }
         }
-        return android::LocalGlyphRasterizer::drawGlyphBitmap(*fontFamily, bold, glyphID);
+        return androidLocalGlyphRasterizer.drawGlyphBitmap(*fontFamily, bold, glyphID);
     }
 
 private:
     optional<std::string> fontFamily;
+    android::LocalGlyphRasterizer androidLocalGlyphRasterizer;
 };
 
 LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string> fontFamily)

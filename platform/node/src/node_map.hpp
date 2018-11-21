@@ -25,6 +25,8 @@ class NodeMapObserver : public mbgl::MapObserver {
     void onDidFailLoadingMap(std::exception_ptr) override;
 };
 
+class RenderRequest;
+
 class NodeMap : public Nan::ObjectWrap,
                 public mbgl::FileSource {
 public:
@@ -35,6 +37,7 @@ public:
     ~NodeMap();
 
     static Nan::Persistent<v8::Function> constructor;
+    static Nan::Persistent<v8::Object> parseError;
 
     static void Init(v8::Local<v8::Object>);
 
@@ -50,6 +53,7 @@ public:
     static void RemoveLayer(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void AddImage(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void RemoveImage(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void SetLayerZoomRange(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetLayoutProperty(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetPaintProperty(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetFilter(const Nan::FunctionCallbackInfo<v8::Value>&);
@@ -64,6 +68,8 @@ public:
     static void DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>&);
 
+    static v8::Local<v8::Value> ParseError(const char* msg);
+
     void startRender(RenderOptions options);
     void renderFinished();
 
@@ -76,6 +82,7 @@ public:
 
     const float pixelRatio;
     mbgl::MapMode mode;
+    bool crossSourceCollisions;
     NodeThreadPool threadpool;
     NodeMapObserver mapObserver;
     std::unique_ptr<mbgl::HeadlessFrontend> frontend;
@@ -83,7 +90,7 @@ public:
 
     std::exception_ptr error;
     mbgl::PremultipliedImage image;
-    std::unique_ptr<Nan::Callback> callback;
+    std::unique_ptr<RenderRequest> req;
 
     // Async for delivering the notifications of render completion.
     uv_async_t *async;

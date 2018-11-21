@@ -280,6 +280,20 @@ public class RuntimeStyleTests extends BaseActivityTest {
     });
   }
 
+  @Test
+  public void testRemoveNonExistingSource() {
+    invoke(mapboxMap, (uiController, mapboxMap) -> mapboxMap.removeSource("source"));
+  }
+
+  @Test
+  public void testRemoveNonExistingLayer() {
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      mapboxMap.removeLayer("layer");
+      mapboxMap.removeLayerAt(mapboxMap.getLayers().size() + 1);
+      mapboxMap.removeLayerAt(-1);
+    });
+  }
+
   /**
    * https://github.com/mapbox/mapbox-gl-native/issues/7973
    */

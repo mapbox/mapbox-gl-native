@@ -1,6 +1,8 @@
 #include "jni.hpp"
 
 #include <mbgl/util/logging.hpp>
+#include <src/style/formatted.hpp>
+#include <src/style/formatted_section.hpp>
 
 #include "annotation/marker.hpp"
 #include "annotation/polygon.hpp"
@@ -14,6 +16,7 @@
 #include "geojson/feature.hpp"
 #include "geojson/feature_collection.hpp"
 #include "geojson/geometry.hpp"
+#include "geojson/geometry_collection.hpp"
 #include "geojson/line_string.hpp"
 #include "geojson/multi_line_string.hpp"
 #include "geojson/multi_point.hpp"
@@ -40,17 +43,14 @@
 #include "offline/offline_region_error.hpp"
 #include "offline/offline_region_status.hpp"
 #include "style/transition_options.hpp"
-#include "style/functions/categorical_stops.hpp"
-#include "style/functions/exponential_stops.hpp"
-#include "style/functions/identity_stops.hpp"
-#include "style/functions/interval_stops.hpp"
-#include "style/functions/stop.hpp"
-#include "style/layers/layers.hpp"
+#include "style/layers/layer_manager.hpp"
 #include "style/sources/source.hpp"
 #include "style/light.hpp"
 #include "snapshotter/map_snapshotter.hpp"
 #include "snapshotter/map_snapshot.hpp"
+#include "text/collator_jni.hpp"
 #include "text/local_glyph_rasterizer_jni.hpp"
+#include "logger.hpp"
 
 namespace mbgl {
 namespace android {
@@ -121,6 +121,7 @@ void registerNatives(JavaVM *vm) {
     geojson::Feature::registerNative(env);
     geojson::FeatureCollection::registerNative(env);
     geojson::Geometry::registerNative(env);
+    geojson::GeometryCollection::registerNative(env);
     geojson::LineString::registerNative(env);
     geojson::MultiLineString::registerNative(env);
     geojson::MultiPoint::registerNative(env);
@@ -159,15 +160,12 @@ void registerNatives(JavaVM *vm) {
 
     // Style
     TransitionOptions::registerNative(env);
-    registerNativeLayers(env);
+    LayerManagerAndroid::get()->registerNative(env);
     Source::registerNative(env);
     Light::registerNative(env);
     Position::registerNative(env);
-    Stop::registerNative(env);
-    CategoricalStops::registerNative(env);
-    ExponentialStops::registerNative(env);
-    IdentityStops::registerNative(env);
-    IntervalStops::registerNative(env);
+    Formatted::registerNative(env);
+    FormattedSection::registerNative(env);
 
     // Map
     CameraPosition::registerNative(env);
@@ -181,6 +179,7 @@ void registerNatives(JavaVM *vm) {
     OfflineRegion::registerNative(env);
     OfflineRegionDefinition::registerNative(env);
     OfflineTilePyramidRegionDefinition::registerNative(env);
+    OfflineGeometryRegionDefinition::registerNative(env);
     OfflineRegionError::registerNative(env);
     OfflineRegionStatus::registerNative(env);
 
@@ -190,6 +189,12 @@ void registerNatives(JavaVM *vm) {
 
     // text
     LocalGlyphRasterizer::registerNative(env);
+    Locale::registerNative(env);
+    Collator::registerNative(env);
+    StringUtils::registerNative(env);
+
+    // Logger
+    Logger::registerNative(env);
 }
 
 } // namespace android

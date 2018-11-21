@@ -4,8 +4,10 @@
 
         <!--Configuration-->
         <attr name="mapbox_styleUrl" format="string"/>
+        <attr name="mapbox_styleJson" format="string"/>
         <attr name="mapbox_apiBaseUrl" format="string"/>
         <attr name="mapbox_localIdeographFontFamily" format="string"/>
+        <attr name="mapbox_cross_source_collisions" format="boolean"/>
 
         <!--Camera-->
         <attr name="mapbox_cameraTargetLat" format="float"/>
@@ -24,24 +26,6 @@
         <attr name="mapbox_uiRotateGestures" format="boolean"/>
         <attr name="mapbox_uiTiltGestures" format="boolean"/>
         <attr name="mapbox_uiDoubleTapGestures" format="boolean"/>
-
-        <!--UI-Controls-->
-        <attr name="mapbox_uiZoomControls" format="boolean"/>
-
-        <!--MyLocation-->
-        <attr name="mapbox_myLocation" format="boolean"/>
-        <attr name="mapbox_myLocationTintColor" format="color"/>
-        <attr name="mapbox_myLocationDrawable" format="reference"/>
-        <attr name="mapbox_myLocationBearingDrawable" format="reference"/>
-        <attr name="mapbox_myLocationBackgroundDrawable" format="reference"/>
-        <attr name="mapbox_myLocationBackgroundTintColor" format="color"/>
-        <attr name="mapbox_myLocationBackgroundMarginLeft" format="dimension"/>
-        <attr name="mapbox_myLocationBackgroundMarginTop" format="dimension"/>
-        <attr name="mapbox_myLocationBackgroundMarginRight" format="dimension"/>
-        <attr name="mapbox_myLocationBackgroundMarginBottom" format="dimension"/>
-        <attr name="mapbox_myLocationAccuracyTintColor" format="color"/>
-        <attr name="mapbox_myLocationAccuracyAlpha" format="integer"/>
-        <attr name="mapbox_myLocationAccuracyThreshold" format="float"/>
 
         <!--Compass-->
         <attr name="mapbox_uiCompass" format="boolean"/>
@@ -117,9 +101,12 @@
 
         <!-- Use TextureView-->
         <attr name="mapbox_renderTextureMode" format="boolean"/>
+        <attr name="mapbox_renderTextureTranslucentSurface" format="boolean"/>
+        <attr name="mapbox_foregroundLoadColor" format="color"/>
 
         <attr name="mapbox_enableTilePrefetch" format="boolean"/>
         <attr name="mapbox_enableZMediaOverlay" format="boolean"/>
+        <attr name="mapbox_pixelRatio" format="float"/>
 
     </declare-styleable>
 
@@ -138,5 +125,55 @@
             <enum name="top" value="2"/>
             <enum name="bottom" value="3"/>
         </attr>
+    </declare-styleable>
+
+    <declare-styleable name="mapbox_LocationComponent">
+        <attr name="mapbox_foregroundDrawable" format="reference"/>
+        <attr name="mapbox_foregroundTintColor" format="color"/>
+        <attr name="mapbox_backgroundDrawable" format="reference"/>
+        <attr name="mapbox_backgroundTintColor" format="color"/>
+        <attr name="mapbox_bearingDrawable" format="reference"/>
+        <attr name="mapbox_bearingTintColor" format="color"/>
+        <attr name="mapbox_gpsDrawable" format="reference"/>
+
+        <attr name="mapbox_foregroundDrawableStale" format="reference"/>
+        <attr name="mapbox_foregroundStaleTintColor" format="color"/>
+        <attr name="mapbox_backgroundDrawableStale" format="reference"/>
+        <attr name="mapbox_backgroundStaleTintColor" format="color"/>
+
+        <attr name="mapbox_accuracyAlpha" format="float"/>
+        <attr name="mapbox_accuracyColor" format="color"/>
+
+        <attr name="mapbox_elevation" format="dimension"/>
+
+        <!-- Stale state -->
+        <attr name="mapbox_enableStaleState" format="boolean"/>
+        <attr name="mapbox_staleStateTimeout" format="integer" min="0"/>
+
+        <!-- Location icon padding -->
+        <attr name="mapbox_iconPaddingLeft" format="integer"/>
+        <attr name="mapbox_iconPaddingTop" format="integer"/>
+        <attr name="mapbox_iconPaddingRight" format="integer"/>
+        <attr name="mapbox_iconPaddingBottom" format="integer"/>
+
+        <!-- Map layer configuration -->
+        <attr name="mapbox_layer_below" format="string"/>
+
+        <!-- Map zoom levels -->
+        <attr name="mapbox_maxZoom" format="float"/>
+        <attr name="mapbox_minZoom" format="float"/>
+
+        <!-- Icon scale based on map zoom levels -->
+        <attr name="mapbox_maxZoomIconScale" format="float"/>
+        <attr name="mapbox_minZoomIconScale" format="float"/>
+
+        <!-- Camera tracking settings -->
+        <attr name="mapbox_trackingGesturesManagement" format="boolean"/>
+        <attr name="mapbox_trackingInitialMoveThreshold" format="dimension"/>
+        <attr name="mapbox_trackingMultiFingerMoveThreshold" format="dimension"/>
+
+        <!-- Animation duration multiplier -->
+        <attr name="mapbox_trackingAnimationDurationMultiplier" format="float" />
+
     </declare-styleable>
 </resources>

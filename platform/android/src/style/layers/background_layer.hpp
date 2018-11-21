@@ -12,14 +12,10 @@ namespace android {
 
 class BackgroundLayer : public Layer {
 public:
-
+    using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/BackgroundLayer"; };
 
-    static jni::Class<BackgroundLayer> javaClass;
-
-    static void registerNative(jni::JNIEnv&);
-
-    BackgroundLayer(jni::JNIEnv&, jni::String);
+    BackgroundLayer(jni::JNIEnv&, jni::String&);
 
     BackgroundLayer(mbgl::Map&, mbgl::style::BackgroundLayer&);
 
@@ -29,20 +25,33 @@ public:
 
     // Properties
 
-    jni::Object<jni::ObjectTag> getBackgroundColor(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getBackgroundColor(jni::JNIEnv&);
     void setBackgroundColorTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getBackgroundColorTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getBackgroundColorTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getBackgroundPattern(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getBackgroundPattern(jni::JNIEnv&);
     void setBackgroundPatternTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getBackgroundPatternTransition(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getBackgroundPatternTransition(jni::JNIEnv&);
 
-    jni::Object<jni::ObjectTag> getBackgroundOpacity(jni::JNIEnv&);
+    jni::Local<jni::Object<jni::ObjectTag>> getBackgroundOpacity(jni::JNIEnv&);
     void setBackgroundOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getBackgroundOpacityTransition(jni::JNIEnv&);
-    jni::jobject* createJavaPeer(jni::JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getBackgroundOpacityTransition(jni::JNIEnv&);
 
 }; // class BackgroundLayer
+
+class BackgroundJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::BackgroundLayerFactory {
+public:
+    ~BackgroundJavaLayerPeerFactory() override;
+
+    // JavaLayerPeerFactory overrides.
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+
+    void registerNative(jni::JNIEnv&) final;
+
+    style::LayerFactory* getLayerFactory() final { return this; }
+
+};  // class BackgroundJavaLayerPeerFactory
 
 } // namespace android
 } // namespace mbgl

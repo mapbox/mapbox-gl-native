@@ -1,5 +1,8 @@
 package com.mapbox.mapboxsdk.annotations;
 
+import android.support.annotation.Keep;
+
+import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.ArrayList;
@@ -10,7 +13,9 @@ import java.util.List;
  */
 public abstract class BasePointCollection extends Annotation {
 
+  @Keep
   private List<LatLng> points;
+  @Keep
   private float alpha = 1.0f;
 
   protected BasePointCollection() {
@@ -23,6 +28,7 @@ public abstract class BasePointCollection extends Annotation {
    *
    * @return A {@link List} of points.
    */
+  @NonNull
   public List<LatLng> getPoints() {
     return new ArrayList<>(points);
   }
@@ -33,7 +39,7 @@ public abstract class BasePointCollection extends Annotation {
    *
    * @param points A {@link List} of {@link LatLng} points making up the polyline.
    */
-  public void setPoints(List<LatLng> points) {
+  public void setPoints(@NonNull List<LatLng> points) {
     this.points = new ArrayList<>(points);
     update();
   }

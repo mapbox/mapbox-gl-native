@@ -3,7 +3,7 @@
 
 @interface MGLAnnotationContainerView ()
 
-@property (nonatomic) NS_MUTABLE_ARRAY_OF(MGLAnnotationView *) *annotationViews;
+@property (nonatomic) NSMutableArray<MGLAnnotationView *> *annotationViews;
 
 @end
 
@@ -26,7 +26,7 @@
     return newAnnotationContainerView;
 }
 
-- (void)addSubviews:(NS_ARRAY_OF(MGLAnnotationView *) *)subviews
+- (void)addSubviews:(NSArray<MGLAnnotationView *> *)subviews
 {
     for (MGLAnnotationView *view in subviews)
     {

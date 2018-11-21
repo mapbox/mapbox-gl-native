@@ -15,6 +15,7 @@ import com.google.gson.JsonElement;
 import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -34,12 +35,37 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
   private MapboxMap mapboxMap;
   private Marker marker;
 
+  private MapboxMap.OnMapClickListener mapClickListener = new MapboxMap.OnMapClickListener() {
+    @Override
+    public boolean onMapClick(@NonNull LatLng point) {
+      final float density = getResources().getDisplayMetrics().density;
+      final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
+      Timber.i(
+        "Requesting features for %sx%s (%sx%s adjusted for density)",
+        pixel.x, pixel.y, pixel.x / density, pixel.y / density
+      );
+      List<Feature> features = mapboxMap.queryRenderedFeatures(pixel);
+
+      // Debug output
+      debugOutput(features);
+
+      // Remove any previous markers
+      if (marker != null) {
+        mapboxMap.removeMarker(marker);
+      }
+
+      // Add a marker on the clicked point
+      marker = mapboxMap.addMarker(new CustomMarkerOptions().position(point).features(features));
+      mapboxMap.selectMarker(marker);
+      return true;
+    }
+  };
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_query_features_point);
 
-    final float density = getResources().getDisplayMetrics().density;
 
     // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
@@ -51,29 +77,8 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
       addCustomInfoWindowAdapter(mapboxMap);
 
       // Add a click listener
-      mapboxMap.setOnMapClickListener(point -> {
-        // Query
-        final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
-        Timber.i(
-          "Requesting features for %sx%s (%sx%s adjusted for density)",
-          pixel.x, pixel.y, pixel.x / density, pixel.y / density
-        );
-        List<Feature> features = mapboxMap.queryRenderedFeatures(pixel);
-
-        // Debug output
-        debugOutput(features);
-
-        // Remove any previous markers
-        if (marker != null) {
-          mapboxMap.removeMarker(marker);
-        }
-
-        // Add a marker on the clicked point
-        marker = mapboxMap.addMarker(new CustomMarkerOptions().position(point).features(features));
-        mapboxMap.selectMarker(marker);
-      });
+      mapboxMap.addOnMapClickListener(mapClickListener);
     });
-
   }
 
   private void debugOutput(List<Feature> features) {
@@ -164,6 +169,9 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
   @Override
   protected void onDestroy() {
     super.onDestroy();
+    if (mapboxMap != null) {
+      mapboxMap.removeOnMapClickListener(mapClickListener);
+    }
     mapView.onDestroy();
   }
 

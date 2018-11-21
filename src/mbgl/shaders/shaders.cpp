@@ -1,10 +1,9 @@
 #include <mbgl/shaders/shaders.hpp>
 #include <mbgl/shaders/preludes.hpp>
 #include <mbgl/programs/program_parameters.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <cassert>
-#include <sstream>
-#include <iomanip>
 
 namespace mbgl {
 namespace shaders {
@@ -18,12 +17,12 @@ std::string vertexSource(const ProgramParameters& parameters, const char* vertex
 }
 
 std::string programIdentifier(const std::string& vertexSource, const std::string& fragmentSource) {
-    std::ostringstream ss;
-    ss << std::setfill('0') << std::setw(sizeof(size_t) * 2) << std::hex;
-    ss << std::hash<std::string>()(vertexSource);
-    ss << std::hash<std::string>()(fragmentSource);
-    ss << "v2";
-    return ss.str();
+    std::string result;
+    result.reserve((sizeof(size_t) * 2) * 2 + 2); // 2 size_t hex values + "v2"
+    result += util::toHex(std::hash<std::string>()(vertexSource));
+    result += util::toHex(std::hash<std::string>()(fragmentSource));
+    result += "v2";
+    return result;
 }
 
 } // namespace shaders

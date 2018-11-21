@@ -52,8 +52,9 @@ public:
                      const float padding,
                      const style::SymbolPlacementType placement,
                      const IndexedSubfeature& indexedFeature_,
-                     const float overscaling)
-        : CollisionFeature(line, anchor, shapedText.top, shapedText.bottom, shapedText.left, shapedText.right, boxScale, padding, placement, indexedFeature_, overscaling) {}
+                     const float overscaling,
+                     const float rotate)
+        : CollisionFeature(line, anchor, shapedText.top, shapedText.bottom, shapedText.left, shapedText.right, boxScale, padding, placement, indexedFeature_, overscaling, rotate) {}
 
     // for icons
     // Icons collision features are always SymbolPlacementType::Point, which means the collision feature
@@ -66,7 +67,8 @@ public:
                      optional<PositionedIcon> shapedIcon,
                      const float boxScale,
                      const float padding,
-                     const IndexedSubfeature& indexedFeature_)
+                     const IndexedSubfeature& indexedFeature_,
+                     const float rotate)
         : CollisionFeature(line, anchor,
                            (shapedIcon ? shapedIcon->top() : 0),
                            (shapedIcon ? shapedIcon->bottom() : 0),
@@ -75,7 +77,7 @@ public:
                            boxScale,
                            padding,
                            style::SymbolPlacementType::Point,
-                           indexedFeature_, 1) {}
+                           indexedFeature_, 1, rotate) {}
 
     CollisionFeature(const GeometryCoordinates& line,
                      const Anchor&,
@@ -87,7 +89,8 @@ public:
                      const float padding,
                      const style::SymbolPlacementType,
                      IndexedSubfeature,
-                     const float overscaling);
+                     const float overscaling,
+                     const float rotate);
 
     std::vector<CollisionBox> boxes;
     IndexedSubfeature indexedFeature;

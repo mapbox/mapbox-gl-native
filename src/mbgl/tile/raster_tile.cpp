@@ -15,7 +15,7 @@ namespace mbgl {
 RasterTile::RasterTile(const OverscaledTileID& id_,
                        const TileParameters& parameters,
                        const Tileset& tileset)
-    : Tile(id_),
+    : Tile(Kind::Raster, id_),
       loader(*this, id_, parameters, tileset),
       mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
       worker(parameters.workerScheduler,
@@ -37,7 +37,7 @@ void RasterTile::setMetadata(optional<Timestamp> modified_, optional<Timestamp> 
 void RasterTile::setData(std::shared_ptr<const std::string> data) {
     pending = true;
     ++correlationID;
-    worker.invoke(&RasterTileWorker::parse, data, correlationID);
+    worker.self().invoke(&RasterTileWorker::parse, data, correlationID);
 }
 
 void RasterTile::onParsed(std::unique_ptr<RasterBucket> result, const uint64_t resultCorrelationID) {

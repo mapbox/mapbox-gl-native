@@ -1,4 +1,5 @@
 #include <mbgl/style/expression/literal.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/string.hpp>
 
 namespace mbgl {
@@ -102,7 +103,14 @@ ParseResult Literal::parse(const Convertible& value, ParsingContext& ctx) {
     }
 }
 
+mbgl::Value Literal::serialize() const {
+    if (getType().is<type::Array>() || getType().is<type::ObjectType>()) {
+        return std::vector<mbgl::Value>{{ getOperator(), *fromExpressionValue<mbgl::Value>(value) }};
+    } else {
+        return *fromExpressionValue<mbgl::Value>(value);
+    }
+}
+
 } // namespace expression
 } // namespace style
 } // namespace mbgl
-

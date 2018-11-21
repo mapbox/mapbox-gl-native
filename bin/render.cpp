@@ -39,14 +39,14 @@ int main(int argc, char *argv[]) {
 
     try {
         argumentParser.ParseCLI(argc, argv);
-    } catch (args::Help) {
+    } catch (const args::Help&) {
         std::cout << argumentParser;
         exit(0);
-    } catch (args::ParseError e) {
+    } catch (const args::ParseError& e) {
         std::cerr << e.what() << std::endl;
         std::cerr << argumentParser;
         exit(1);
-    } catch (args::ValidationError e) {
+    } catch (const args::ValidationError& e) {
         std::cerr << e.what() << std::endl;
         std::cerr << argumentParser;
         exit(2);

@@ -1,5 +1,6 @@
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/math/log2.hpp>
 
 namespace mbgl {
 
@@ -13,9 +14,10 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
                                    const float padding,
                                    const style::SymbolPlacementType placement,
                                    IndexedSubfeature indexedFeature_,
-                                   const float overscaling)
+                                   const float overscaling,
+                                   const float rotate)
         : indexedFeature(std::move(indexedFeature_))
-        , alongLine(placement == style::SymbolPlacementType::Line) {
+        , alongLine(placement != style::SymbolPlacementType::Point) {
     if (top == 0 && bottom == 0 && left == 0 && right == 0) return;
 
     const float y1 = top * boxScale - padding;
@@ -34,14 +36,36 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
         GeometryCoordinate anchorPoint = convertPoint<int16_t>(anchor.point);
         bboxifyLabel(line, anchorPoint, anchor.segment, length, height, overscaling);
     } else {
-        boxes.emplace_back(anchor.point, Point<float>{ 0, 0 }, x1, y1, x2, y2);
+        if (rotate) {
+            // Account for *-rotate in point collision boxes
+            // Doesn't account for icon-text-fit
+            const float rotateRadians = rotate * M_PI / 180.0;
+
+            const Point<float> tl = util::rotate(Point<float>(x1, y1), rotateRadians);
+            const Point<float> tr = util::rotate(Point<float>(x2, y1), rotateRadians);
+            const Point<float> bl = util::rotate(Point<float>(x1, y2), rotateRadians);
+            const Point<float> br = util::rotate(Point<float>(x2, y2), rotateRadians);
+            
+            // Collision features require an "on-axis" geometry,
+            // so take the envelope of the rotated geometry
+            // (may be quite large for wide labels rotated 45 degrees)
+            const float xMin = std::min({tl.x, tr.x, bl.x, br.x});
+            const float xMax = std::max({tl.x, tr.x, bl.x, br.x});
+            const float yMin = std::min({tl.y, tr.y, bl.y, br.y});
+            const float yMax = std::max({tl.y, tr.y, bl.y, br.y});
+            
+            boxes.emplace_back(anchor.point, Point<float>{ 0, 0 }, xMin, yMin, xMax, yMax);
+        } else {
+            boxes.emplace_back(anchor.point, Point<float>{ 0, 0 }, x1, y1, x2, y2);
+        }
     }
 }
 
 void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoordinate& anchorPoint,
                                     const int segment, const float labelLength, const float boxSize, const float overscaling) {
     const float step = boxSize / 2;
-    const int nBoxes = std::floor(labelLength / step);
+    const int nBoxes = std::max(static_cast<int>(std::floor(labelLength / step)), 1);
+
     // We calculate line collision circles out to 300% of what would normally be our
     // max size, to allow collision detection to work on labels that expand as
     // they move into the distance
@@ -50,7 +74,7 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
     // symbol spacing will put labels very close together in a pitched map.
     // To reduce the cost of adding extra collision circles, we slowly increase
     // them for overscaled tiles.
-    const float overscalingPaddingFactor = 1 + .4 * std::log(overscaling) / std::log(2);
+    const float overscalingPaddingFactor = 1 + .4 * util::log2(static_cast<double>(overscaling));
     const int nPitchPaddingBoxes = std::floor(nBoxes * overscalingPaddingFactor / 2);
 
     // offset the center of the first box by half a box so that the edge of the

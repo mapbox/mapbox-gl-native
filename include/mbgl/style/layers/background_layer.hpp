@@ -5,7 +5,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/data_driven_property_value.hpp>
+#include <mbgl/style/expression/formatted.hpp>
 
 #include <mbgl/util/color.hpp>
 
@@ -19,12 +19,9 @@ public:
     BackgroundLayer(const std::string& layerID);
     ~BackgroundLayer() final;
 
-    // Visibility
-    void setVisibility(VisibilityType) final;
-
-    // Zoom range
-    void setMinZoom(float) final;
-    void setMaxZoom(float) final;
+    // Dynamic properties
+    optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
+    optional<conversion::Error> setPaintProperty(const std::string& name, const conversion::Convertible& value) final;
 
     // Paint properties
 
@@ -54,12 +51,20 @@ public:
     Mutable<Impl> mutableImpl() const;
     BackgroundLayer(Immutable<Impl>);
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
+
+protected:
+    Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
-template <>
-inline bool Layer::is<BackgroundLayer>() const {
-    return getType() == LayerType::Background;
-}
+class BackgroundLayerFactory : public LayerFactory {
+public:
+    BackgroundLayerFactory();
+    ~BackgroundLayerFactory() override;
+
+    // LayerFactory overrides.
+    const LayerTypeInfo* getTypeInfo() const noexcept final;
+    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
+};
 
 } // namespace style
 } // namespace mbgl

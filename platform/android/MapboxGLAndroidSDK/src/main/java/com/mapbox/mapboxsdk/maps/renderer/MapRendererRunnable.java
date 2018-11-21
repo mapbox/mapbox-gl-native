@@ -1,9 +1,12 @@
 package com.mapbox.mapboxsdk.maps.renderer;
 
+import android.support.annotation.Keep;
+
 /**
  * Peer class for {@link Runnable}s to be scheduled on the {@link MapRenderer} thread.
  * The actual work is performed in the native peer.
  */
+@Keep
 class MapRendererRunnable implements Runnable {
 
   // Holds the pointer to the native peer after initialisation

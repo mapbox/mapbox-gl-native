@@ -28,6 +28,7 @@ MBGL_DEFINE_ENUM(Event, {
     { Event::Android, "Android" },
     { Event::Crash, "Crash" },
     { Event::Glyph, "Glyph" },
+    { Event::Timing, "Timing" },
     { Event(-1), "Unknown" },
 });
 

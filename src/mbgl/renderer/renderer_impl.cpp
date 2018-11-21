@@ -11,10 +11,6 @@
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/renderer/layers/render_background_layer.hpp>
-#include <mbgl/renderer/layers/render_custom_layer.hpp>
-#include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
-#include <mbgl/renderer/layers/render_hillshade_layer.hpp>
 #include <mbgl/renderer/style_diff.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
@@ -59,7 +55,7 @@ Renderer::Impl::Impl(RendererBackend& backend_,
     , sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>())
     , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
     , renderLight(makeMutable<Light::Impl>())
-    , placement(std::make_unique<Placement>(TransformState{}, MapMode::Static)) {
+    , placement(std::make_unique<Placement>(TransformState{}, MapMode::Static, TransitionOptions{}, true)) {
     glyphManager->setObserver(this);
 }
 
@@ -67,13 +63,13 @@ Renderer::Impl::~Impl() {
     assert(BackendScope::exists());
 
     if (contextLost) {
-        // Signal all RenderCustomLayers that the context was lost
-        // before cleaning up
+        // Signal all RenderLayers that the context was lost
+        // before cleaning up. At the moment, only CustomLayer is
+        // interested whether rendering context is lost. However, it would be
+        // beneficial for dynamically loaded or other custom built-in plugins.
         for (const auto& entry : renderLayers) {
             RenderLayer& layer = *entry.second;
-            if (layer.is<RenderCustomLayer>()) {
-                layer.as<RenderCustomLayer>()->markContextDestroyed();
-            }
+            layer.markContextDestroyed();
         }
     }
 };
@@ -84,11 +80,6 @@ void Renderer::Impl::setObserver(RendererObserver* observer_) {
 
 void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     if (updateParameters.mode != MapMode::Continuous) {
-        // Don't load/render anyting in still mode until explicitly requested.
-        if (!updateParameters.stillImageRequest) {
-            return;
-        }
-
         // Reset zoom history state.
         zoomHistory.first = true;
     }
@@ -99,15 +90,19 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     const bool zoomChanged = zoomHistory.update(updateParameters.transformState.getZoom(), updateParameters.timePoint);
 
+    const bool isMapModeContinuous = updateParameters.mode == MapMode::Continuous;
+
+    const TransitionOptions transitionOptions = isMapModeContinuous ? updateParameters.transitionOptions : TransitionOptions();
+
     const TransitionParameters transitionParameters {
         updateParameters.timePoint,
-        updateParameters.mode == MapMode::Continuous ? updateParameters.transitionOptions : TransitionOptions()
+        transitionOptions
     };
 
     const PropertyEvaluationParameters evaluationParameters {
         zoomHistory,
         updateParameters.timePoint,
-        updateParameters.mode == MapMode::Continuous ? util::DEFAULT_TRANSITION_DURATION : Duration::zero()
+        transitionOptions.duration.value_or(isMapModeContinuous ? util::DEFAULT_TRANSITION_DURATION : Duration::zero())
     };
 
     const TileParameters tileParameters {
@@ -177,6 +172,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         renderLayers.at(entry.first)->setImpl(entry.second.after);
     }
 
+    if (!layerDiff.removed.empty() || !layerDiff.added.empty() || !layerDiff.changed.empty()) {
+        glyphManager->evict(fontStacks(*updateParameters.layers));
+    }
+
     // Update layers for class and zoom changes.
     for (const auto& entry : renderLayers) {
         RenderLayer& layer = *entry.second;
@@ -185,9 +184,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         if (layerAdded || layerChanged) {
             layer.transition(transitionParameters);
+            layer.update();
         }
 
-        if (layerAdded || layerChanged || zoomChanged || layer.hasTransition()) {
+        if (layerAdded || layerChanged || zoomChanged || layer.hasTransition() || layer.hasCrossfade()) {
             layer.evaluate(evaluationParameters);
         }
     }
@@ -217,9 +217,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         bool needsRelayout = false;
 
         for (const auto& layer : *layerImpls) {
-            if (layer->type == LayerType::Background ||
-                layer->type == LayerType::Custom ||
-                layer->source != source->id) {
+
+            if (layer->getTypeInfo()->source == LayerTypeInfo::Source::NotRequired
+                    || layer->source != source->id) {
                 continue;
             }
 
@@ -278,8 +278,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     Color backgroundColor;
 
-    class RenderItem {
-    public:
+    struct RenderItem {
+        RenderItem(RenderLayer& layer_, RenderSource* source_)
+            : layer(layer_), source(source_) {}
         RenderLayer& layer;
         RenderSource* source;
     };
@@ -290,30 +291,24 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         RenderLayer* layer = getRenderLayer(layerImpl->id);
         assert(layer);
 
-        if (!parameters.staticData.has3D && (layer->is<RenderFillExtrusionLayer>() || layer->is<RenderHillshadeLayer>())) {
-            parameters.staticData.has3D = true;
-        }
+        parameters.staticData.has3D |=
+                (layerImpl->getTypeInfo()->pass3d == LayerTypeInfo::Pass3D::Required);
 
         if (!layer->needsRendering(zoomHistory.lastZoom)) {
             continue;
         }
 
-        if (const RenderBackgroundLayer* background = layer->as<RenderBackgroundLayer>()) {
-            const BackgroundPaintProperties::PossiblyEvaluated& paint = background->evaluated;
-            if (parameters.contextMode == GLContextMode::Unique
-                    && layerImpl.get() == layerImpls->at(0).get()
-                    && paint.get<BackgroundPattern>().from.empty()) {
-                // This is a solid background. We can use glClear().
-                backgroundColor = paint.get<BackgroundColor>() * paint.get<BackgroundOpacity>();
-            } else {
-                // This is a textured background, or not the bottommost layer. We need to render it with a quad.
-                order.emplace_back(RenderItem { *layer, nullptr });
+        if (parameters.contextMode == GLContextMode::Unique
+            && layerImpl.get() == layerImpls->at(0).get()) {
+            const auto& solidBackground = layer->getSolidBackground();
+            if (solidBackground) {
+                backgroundColor = *solidBackground;
+                continue;
             }
-            continue;
         }
 
-        if (layer->is<RenderCustomLayer>()) {
-            order.emplace_back(RenderItem { *layer, nullptr });
+        if (layerImpl->getTypeInfo()->source == LayerTypeInfo::Source::NotRequired) {
+            order.emplace_back(*layer, nullptr);
             continue;
         }
 
@@ -323,97 +318,52 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             continue;
         }
 
-        const bool symbolLayer = layer->is<RenderSymbolLayer>();
-
-        auto sortedTiles = source->getRenderTiles();
-        if (symbolLayer) {
-            // Sort symbol tiles in opposite y position, so tiles with overlapping symbols are drawn
-            // on top of each other, with lower symbols being drawn on top of higher symbols.
-            std::sort(sortedTiles.begin(), sortedTiles.end(), [&](const RenderTile& a, const RenderTile& b) {
-                Point<float> pa(a.id.canonical.x, a.id.canonical.y);
-                Point<float> pb(b.id.canonical.x, b.id.canonical.y);
-
-                auto par = util::rotate(pa, parameters.state.getAngle());
-                auto pbr = util::rotate(pb, parameters.state.getAngle());
-
-                return std::tie(b.id.canonical.z, par.y, par.x) < std::tie(a.id.canonical.z, pbr.y, pbr.x);
-            });
-        } else {
-            std::sort(sortedTiles.begin(), sortedTiles.end(),
-                      [](const auto& a, const auto& b) { return a.get().id < b.get().id; });
-            // Don't render non-symbol layers for tiles that we're only holding on to for symbol fading
-            sortedTiles.erase(std::remove_if(sortedTiles.begin(), sortedTiles.end(),
-                                             [](const auto& tile) { return tile.get().tile.holdForFade(); }),
-                              sortedTiles.end());
-        }
-
-        std::vector<std::reference_wrapper<RenderTile>> sortedTilesForInsertion;
-        for (auto& sortedTile : sortedTiles) {
-            auto& tile = sortedTile.get();
-            if (!tile.tile.isRenderable()) {
-                continue;
-            }
-
-            auto bucket = tile.tile.getBucket(*layer->baseImpl);
-            if (bucket) {
-                sortedTilesForInsertion.emplace_back(tile);
-                tile.used = true;
-
-                // We only need clipping when we're _not_ drawing a symbol layer.
-                if (!symbolLayer) {
-                    tile.needsClipping = true;
-                }
-            }
-        }
-        layer->setRenderTiles(std::move(sortedTilesForInsertion));
-        order.emplace_back(RenderItem { *layer, source });
+        layer->setRenderTiles(source->getRenderTiles(), parameters.state);
+        order.emplace_back(*layer, source);
     }
 
-    bool symbolBucketsChanged = false;
-    if (parameters.mapMode != MapMode::Continuous) {
-        // TODO: Think about right way for symbol index to handle still rendering
-        crossTileSymbolIndex.reset();
-    }
-    for (auto it = order.rbegin(); it != order.rend(); ++it) {
-        if (it->layer.is<RenderSymbolLayer>()) {
-            if (crossTileSymbolIndex.addLayer(*it->layer.as<RenderSymbolLayer>())) symbolBucketsChanged = true;
+    {
+        if (parameters.mapMode != MapMode::Continuous) {
+            // TODO: Think about right way for symbol index to handle still rendering
+            crossTileSymbolIndex.reset();
         }
-    }
 
-    bool placementChanged = false;
-    if (!placement->stillRecent(parameters.timePoint)) {
-        auto newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode);
+        std::vector<RenderItem> renderItemsWithSymbols;
+        std::copy_if(order.rbegin(), order.rend(), std::back_inserter(renderItemsWithSymbols),
+                [](const auto& item) { return item.layer.getSymbolInterface() != nullptr; });
+
+        bool symbolBucketsChanged = false;
+        const bool placementChanged = !placement->stillRecent(parameters.timePoint);
+        std::unique_ptr<Placement> newPlacement;
         std::set<std::string> usedSymbolLayers;
-        for (auto it = order.rbegin(); it != order.rend(); ++it) {
-            if (it->layer.is<RenderSymbolLayer>()) {
-                usedSymbolLayers.insert(it->layer.getID());
-                newPlacement->placeLayer(*it->layer.as<RenderSymbolLayer>(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
+
+        if (placementChanged) {
+            newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode, updateParameters.transitionOptions, updateParameters.crossSourceCollisions);
+        }
+
+        for (const auto& item : renderItemsWithSymbols) {
+            if (crossTileSymbolIndex.addLayer(*item.layer.getSymbolInterface(), parameters.state.getLatLng().longitude())) symbolBucketsChanged = true;
+
+            if (newPlacement) {
+                usedSymbolLayers.insert(item.layer.getID());
+                newPlacement->placeLayer(*item.layer.getSymbolInterface(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
             }
         }
 
-        placementChanged = newPlacement->commit(*placement, parameters.timePoint);
-        // commitFeatureIndexes depends on the assumption that no new FeatureIndex has been loaded since placement
-        // started. If we violate this assumption, then we need to either make CollisionIndex completely independendent of
-        // FeatureIndex, or find a way for its entries to point to multiple FeatureIndexes.
-        commitFeatureIndexes();
-        crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
-        if (placementChanged || symbolBucketsChanged) {
+        if (newPlacement) {
+            newPlacement->commit(*placement, parameters.timePoint);
+            crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
             placement = std::move(newPlacement);
+            updateFadingTiles();
+        } else {
+            placement->setStale();
         }
 
-        placement->setRecent(parameters.timePoint);
-        
-        updateFadingTiles();
-    } else {
-        placement->setStale();
-    }
+        parameters.symbolFadeChange = placement->symbolFadeChange(parameters.timePoint);
 
-    parameters.symbolFadeChange = placement->symbolFadeChange(parameters.timePoint);
-
-    if (placementChanged || symbolBucketsChanged) {
-        for (auto it = order.rbegin(); it != order.rend(); ++it) {
-            if (it->layer.is<RenderSymbolLayer>()) {
-                placement->updateLayerOpacities(*it->layer.as<RenderSymbolLayer>());
+        if (placementChanged || symbolBucketsChanged) {
+            for (const auto& item : renderItemsWithSymbols) {
+                placement->updateLayerOpacities(*item.layer.getSymbolInterface());
             }
         }
     }
@@ -486,7 +436,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         static const ClippingMaskProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
         for (const auto& clipID : parameters.clipIDGenerator.getClipIDs()) {
-            parameters.staticData.programs.clippingMask.draw(
+            auto& program = parameters.staticData.programs.clippingMask;
+
+            program.draw(
                 parameters.context,
                 gl::Triangles(),
                 gl::DepthMode::disabled(),
@@ -499,15 +451,22 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                     gl::StencilMode::Replace
                 },
                 gl::ColorMode::disabled(),
-                ClippingMaskProgram::UniformValues {
-                    uniforms::u_matrix::Value{ parameters.matrixForTile(clipID.first) },
-                },
-                parameters.staticData.tileVertexBuffer,
+                gl::CullFaceMode::disabled(),
                 parameters.staticData.quadTriangleIndexBuffer,
                 parameters.staticData.tileTriangleSegments,
-                paintAttributeData,
-                properties,
-                parameters.state.getZoom(),
+                program.computeAllUniformValues(
+                    ClippingMaskProgram::UniformValues {
+                        uniforms::u_matrix::Value( parameters.matrixForTile(clipID.first) ),
+                    },
+                    paintAttributeData,
+                    properties,
+                    parameters.state.getZoom()
+                ),
+                program.computeAllAttributeBindings(
+                    parameters.staticData.tileVertexBuffer,
+                    paintAttributeData,
+                    properties
+                ),
                 "clipping"
             );
         }
@@ -664,6 +623,39 @@ std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineStrin
 
     return queryRenderedFeatures(geometry, options, layers);
 }
+    
+void Renderer::Impl::queryRenderedSymbols(std::unordered_map<std::string, std::vector<Feature>>& resultsByLayer,
+                                          const ScreenLineString& geometry,
+                                          const std::vector<const RenderLayer*>& layers,
+                                          const RenderedQueryOptions& options) const {
+    
+    auto renderedSymbols = placement->getCollisionIndex().queryRenderedSymbols(geometry);
+    std::vector<std::reference_wrapper<const RetainedQueryData>> bucketQueryData;
+    for (auto entry : renderedSymbols) {
+        bucketQueryData.push_back(placement->getQueryData(entry.first));
+    }
+    // Although symbol query is global, symbol results are only sortable within a bucket
+    // For a predictable global sort order, we sort the buckets based on their corresponding tile position
+    std::sort(bucketQueryData.begin(), bucketQueryData.end(), [](const RetainedQueryData& a, const RetainedQueryData& b) {
+        return
+            std::tie(a.tileID.canonical.z, a.tileID.canonical.y, a.tileID.wrap, a.tileID.canonical.x) <
+            std::tie(b.tileID.canonical.z, b.tileID.canonical.y, b.tileID.wrap, b.tileID.canonical.x);
+    });
+    
+    for (auto wrappedQueryData : bucketQueryData) {
+        auto& queryData = wrappedQueryData.get();
+        auto bucketSymbols = queryData.featureIndex->lookupSymbolFeatures(renderedSymbols[queryData.bucketInstanceId],
+                                                                          options,
+                                                                          layers,
+                                                                          queryData.tileID,
+                                                                          queryData.featureSortOrder);
+        
+        for (auto layer : bucketSymbols) {
+            auto& resultFeatures = resultsByLayer[layer.first];
+            std::move(layer.second.begin(), layer.second.end(), std::inserter(resultFeatures, resultFeatures.end()));
+        }
+    }
+}
 
 std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options, const std::vector<const RenderLayer*>& layers) const {
     std::unordered_set<std::string> sourceIDs;
@@ -671,13 +663,18 @@ std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineStrin
         sourceIDs.emplace(layer->baseImpl->source);
     }
 
+    mat4 projMatrix;
+    transformState.getProjMatrix(projMatrix);
+
     std::unordered_map<std::string, std::vector<Feature>> resultsByLayer;
     for (const auto& sourceID : sourceIDs) {
         if (RenderSource* renderSource = getRenderSource(sourceID)) {
-            auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, layers, options, placement->getCollisionIndex());
+            auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, layers, options, projMatrix);
             std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
         }
     }
+    
+    queryRenderedSymbols(resultsByLayer, geometry, layers, options);
 
     std::vector<Feature> result;
 
@@ -722,12 +719,12 @@ std::vector<Feature> Renderer::Impl::querySourceFeatures(const std::string& sour
     return source->querySourceFeatures(options);
 }
 
-void Renderer::Impl::onLowMemory() {
+void Renderer::Impl::reduceMemoryUse() {
     assert(BackendScope::exists());
-    backend.getContext().performCleanup();
     for (const auto& entry : renderSources) {
-        entry.second->onLowMemory();
+        entry.second->reduceMemoryUse();
     }
+    backend.getContext().performCleanup();
     observer->onInvalidate();
 }
 
@@ -774,15 +771,6 @@ bool Renderer::Impl::hasTransitions(TimePoint timePoint) const {
     }
 
     return false;
-}
-
-void Renderer::Impl::commitFeatureIndexes() {
-    for (auto& source : renderSources) {
-        for (auto& renderTile : source.second->getRenderTiles()) {
-            Tile& tile = renderTile.get().tile;
-            tile.commitFeatureIndex();
-        }
-    }
 }
 
 void Renderer::Impl::updateFadingTiles() {

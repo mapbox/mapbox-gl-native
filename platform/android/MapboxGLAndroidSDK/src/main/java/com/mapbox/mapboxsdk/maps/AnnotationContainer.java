@@ -27,6 +27,7 @@ class AnnotationContainer implements Annotations {
     return annotations.get(id);
   }
 
+  @NonNull
   @Override
   public List<Annotation> obtainAll() {
     List<Annotation> annotations = new ArrayList<>();

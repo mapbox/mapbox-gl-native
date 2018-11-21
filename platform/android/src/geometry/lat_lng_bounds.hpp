@@ -14,14 +14,11 @@ public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/geometry/LatLngBounds"; };
 
-    static jni::Object<LatLngBounds> New(jni::JNIEnv&, mbgl::LatLngBounds);
+    static jni::Local<jni::Object<LatLngBounds>> New(jni::JNIEnv&, mbgl::LatLngBounds);
 
-    static mbgl::LatLngBounds getLatLngBounds(jni::JNIEnv&, jni::Object<LatLngBounds>);
-
-    static jni::Class<LatLngBounds> javaClass;
+    static mbgl::LatLngBounds getLatLngBounds(jni::JNIEnv&, const jni::Object<LatLngBounds>&);
 
     static void registerNative(jni::JNIEnv&);
-
 };
 
 

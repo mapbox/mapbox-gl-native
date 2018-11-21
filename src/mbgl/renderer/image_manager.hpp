@@ -21,7 +21,7 @@ class Context;
 class ImageRequestor {
 public:
     virtual ~ImageRequestor() = default;
-    virtual void onImagesAvailable(ImageMap, uint64_t imageCorrelationID) = 0;
+    virtual void onImagesAvailable(ImageMap icons, ImageMap patterns, uint64_t imageCorrelationID) = 0;
 };
 
 /*

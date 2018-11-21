@@ -11,12 +11,13 @@
 #import "NSArray+MGLAdditions.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #include <string>
 
 @implementation MGLAttributionInfo
 
-+ (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosFromHTMLString:(nullable NSString *)htmlString fontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
++ (NSArray<MGLAttributionInfo *> *)attributionInfosFromHTMLString:(nullable NSString *)htmlString fontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor {
     if (!htmlString) {
         return @[];
     }
@@ -49,7 +50,12 @@
         CGFloat blue;
         CGFloat alpha;
 #if !TARGET_OS_IPHONE
-        linkColor = [linkColor colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
+        // CSS uses the sRGB color space.
+        if ([NSColor redColor].colorSpaceName == NSCalibratedRGBColorSpace) {
+            linkColor = [linkColor colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
+        } else {
+            linkColor = [linkColor colorUsingColorSpace:[NSColorSpace sRGBColorSpace]];
+        }
 #endif
         [linkColor getRed:&red green:&green blue:&blue alpha:&alpha];
         [css appendFormat:
@@ -60,10 +66,20 @@
     NSData *htmlData = [styledHTML dataUsingEncoding:NSUTF8StringEncoding];
 
 #if TARGET_OS_IPHONE
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithData:htmlData
-                                                                                          options:options
-                                                                               documentAttributes:nil
-                                                                                            error:NULL];
+    __block NSMutableAttributedString *attributedString;
+    dispatch_block_t initialization = ^{
+            // This initializer should be called from a global or main queue. https://developer.apple.com/documentation/foundation/nsattributedstring/1524613-initwithdata
+            attributedString = [[NSMutableAttributedString alloc] initWithData:htmlData
+                                                                       options:options
+                                                            documentAttributes:nil
+                                                                         error:NULL];
+    };
+    
+    if (![[NSThread currentThread] isMainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), initialization);
+    } else {
+        initialization();
+    }
 #else
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithHTML:htmlData
                                                                                           options:options
@@ -76,7 +92,7 @@
                                  options:0
                               usingBlock:
     ^(id _Nullable value, NSRange range, BOOL * _Nonnull stop) {
-        NSCAssert(!value || [value isKindOfClass:[NSURL class]], @"If present, URL attribute must be an NSURL.");
+        MGLCAssert(!value || [value isKindOfClass:[NSURL class]], @"If present, URL attribute must be an NSURL.");
 
         // Detect feedback links by the bogus style rule applied above.
         NSNumber *strokeWidth = [attributedString attribute:NSStrokeWidthAttributeName
@@ -107,7 +123,7 @@
     return infos;
 }
 
-+ (NSAttributedString *)attributedStringForAttributionInfos:(NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfos {
++ (NSAttributedString *)attributedStringForAttributionInfos:(NSArray<MGLAttributionInfo *> *)attributionInfos {
     NSMutableArray *titles = [NSMutableArray arrayWithCapacity:attributionInfos.count];
     for (MGLAttributionInfo *info in attributionInfos) {
         NSMutableAttributedString *title = info.title.mutableCopy;
@@ -254,7 +270,7 @@
     }
 }
 
-- (void)growArrayByAddingAttributionInfosFromArray:(NS_ARRAY_OF(MGLAttributionInfo *) *)infos {
+- (void)growArrayByAddingAttributionInfosFromArray:(NSArray<MGLAttributionInfo *> *)infos {
     for (MGLAttributionInfo *info in infos) {
         [self growArrayByAddingAttributionInfo:info];
     }

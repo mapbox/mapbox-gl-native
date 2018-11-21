@@ -1,4 +1,4 @@
-#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion_impl.hpp>
 
 NS_ASSUME_NONNULL_BEGIN
 

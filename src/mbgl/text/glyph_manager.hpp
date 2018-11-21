@@ -42,6 +42,9 @@ public:
 
     void setObserver(GlyphManagerObserver*);
 
+    // Remove glyphs for all but the supplied font stacks.
+    void evict(const std::set<FontStack>&);
+
 private:
     Glyph generateLocalSDF(const FontStack& fontStack, GlyphID glyphID);
 
@@ -59,7 +62,7 @@ private:
         std::map<GlyphID, Immutable<Glyph>> glyphs;
     };
 
-    std::unordered_map<FontStack, Entry, FontStackHash> entries;
+    std::unordered_map<FontStack, Entry, FontStackHasher> entries;
 
     void requestRange(GlyphRequest&, const FontStack&, const GlyphRange&);
     void processResponse(const Response&, const FontStack&, const GlyphRange&);

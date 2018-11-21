@@ -1,6 +1,7 @@
 #import "MGLSource_Private.h"
 #import "MGLStyle_Private.h"
 #import "MGLMapView_Private.h"
+#import "NSBundle+MGLAdditions.h"
 
 #include <mbgl/style/style.hpp>
 #include <mbgl/map/map.hpp>
@@ -48,7 +49,7 @@
 
 - (void)addToMapView:(MGLMapView *)mapView {
     if (_pendingSource == nullptr) {
-        [NSException raise:@"MGLRedundantSourceException"
+        [NSException raise:MGLRedundantSourceException
                     format:@"This instance %@ was already added to %@. Adding the same source instance " \
          "to the style more than once is invalid.", self, mapView.style];
     }
@@ -57,11 +58,39 @@
     _mapView.style.rawStyle->addSource(std::move(_pendingSource));
 }
 
-- (void)removeFromMapView:(MGLMapView *)mapView {
+- (BOOL)removeFromMapView:(MGLMapView *)mapView error:(NSError * __nullable * __nullable)outError {
+    BOOL removed = NO;
+    
     if (self.rawSource == mapView.style.rawStyle->getSource(self.identifier.UTF8String)) {
-        _pendingSource = mapView.style.rawStyle->removeSource(self.identifier.UTF8String);
-        _mapView = nil;
+        
+        auto removedSource = mapView.style.rawStyle->removeSource(self.identifier.UTF8String);
+        
+        if (removedSource) {
+            removed = YES;
+            _pendingSource = std::move(removedSource);
+            _mapView = nil;
+        } else if (outError) {
+            NSString *format = NSLocalizedStringWithDefaultValue(@"REMOVE_SRC_FAIL_IN_USE_FMT", @"Foundation", nil, @"Source '%@' is in use, cannot remove.", @"User-friendly error description");
+            NSString *localizedDescription = [NSString stringWithFormat:format, self.identifier];
+
+            *outError = [NSError errorWithDomain:MGLErrorDomain
+                                            code:MGLErrorCodeSourceIsInUseCannotRemove
+                                        userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
+        }
     }
+    else if (outError) {
+        // Consider raising an exception here
+        NSString *format = NSLocalizedStringWithDefaultValue(@"REMOVE_SRC_FAIL_MISMATCH_FMT", @"Foundation", nil, @"Identifier '%@' does not match source identifier '%s'", @"User-friendly error description");
+        NSString *localizedDescription = [NSString stringWithFormat:format,
+                                          self.identifier,
+                                          self.rawSource ? self.rawSource->getID().c_str() : "(null)"];
+        
+        *outError = [NSError errorWithDomain:MGLErrorDomain
+                                        code:MGLErrorCodeSourceIdentifierMismatch
+                                    userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
+    }
+    
+    return removed;
 }
 
 - (NSString *)description {

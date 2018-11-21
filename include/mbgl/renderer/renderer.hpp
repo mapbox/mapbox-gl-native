@@ -48,7 +48,7 @@ public:
     void dumpDebugLogs();
 
     // Memory
-    void onLowMemory();
+    void reduceMemoryUse();
 
 private:
     class Impl;

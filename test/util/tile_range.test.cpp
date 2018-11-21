@@ -1,4 +1,3 @@
-
 #include <mbgl/util/tile_range.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/map/transform.hpp>
@@ -25,6 +24,18 @@ TEST(TileRange, ContainsBoundsFromTile) {
         EXPECT_TRUE(range.contains(CanonicalTileID(10, 162, 395)));
     }
 }
+
+TEST(TileRange, ContainsMultiZoom) {
+    auto wrappedBounds = LatLngBounds::hull({ 37.6609, -122.5744 }, { 37.8271, -122.3204 });
+    auto range = util::TileRange::fromLatLngBounds(wrappedBounds, 5, 13);
+    EXPECT_FALSE(range.contains(CanonicalTileID(0, 0, 0)));
+    EXPECT_FALSE(range.contains(CanonicalTileID(5, 3, 11)));
+    EXPECT_FALSE(range.contains(CanonicalTileID(6, 9, 22)));
+    EXPECT_TRUE(range.contains(CanonicalTileID(5, 5, 12)));
+    EXPECT_TRUE(range.contains(CanonicalTileID(6, 10, 24)));
+    EXPECT_TRUE(range.contains(CanonicalTileID(13, 1310, 3166)));
+}
+
 TEST(TileRange, ContainsIntersectingTiles) {
     auto bounds = LatLngBounds::hull({ 37.6609, -122.5744 }, { 37.8271, -122.3204 });
     auto range = util::TileRange::fromLatLngBounds(bounds, 13);
@@ -41,14 +52,14 @@ TEST(TileRange, ContainsWrappedBounds) {
 
 TEST(TileRange, ContainsBoundsCrossingAntimeridian) {
     {
-        auto cossingBounds = LatLngBounds::hull({-20.9615, -214.309}, {19.477, -155.830});
-        auto range = util::TileRange::fromLatLngBounds(cossingBounds, 1);
+        auto crossingBounds = LatLngBounds::hull({-20.9615, -214.309}, {19.477, -155.830});
+        auto range = util::TileRange::fromLatLngBounds(crossingBounds, 1);
         EXPECT_TRUE(range.contains(CanonicalTileID(1, 1, 1)));
         EXPECT_TRUE(range.contains(CanonicalTileID(1, 0, 0)));
     }
     {
-        auto cossingBounds = LatLngBounds::hull({-20.9615, -214.309}, {19.477, -155.830});
-        auto range = util::TileRange::fromLatLngBounds(cossingBounds, 6);
+        auto crossingBounds = LatLngBounds::hull({-20.9615, -214.309}, {19.477, -155.830});
+        auto range = util::TileRange::fromLatLngBounds(crossingBounds, 6);
         EXPECT_FALSE(range.contains(CanonicalTileID(6, 55, 34)));
         EXPECT_FALSE(range.contains(CanonicalTileID(6, 5, 28)));
         EXPECT_TRUE(range.contains(CanonicalTileID(6, 63, 28)));

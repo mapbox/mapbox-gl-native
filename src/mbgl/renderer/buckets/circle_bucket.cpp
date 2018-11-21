@@ -11,13 +11,14 @@ namespace mbgl {
 using namespace style;
 
 CircleBucket::CircleBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers)
-    : mode(parameters.mode) {
+    : Bucket(LayerType::Circle),
+      mode(parameters.mode) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(layer->getID()),
             std::forward_as_tuple(
-                layer->as<RenderCircleLayer>()->evaluated,
+                toRenderCircleLayer(layer)->evaluated,
                 parameters.tileID.overscaledZ));
     }
 }
@@ -38,7 +39,9 @@ bool CircleBucket::hasData() const {
 }
 
 void CircleBucket::addFeature(const GeometryTileFeature& feature,
-                              const GeometryCollection& geometry) {
+                                 const GeometryCollection& geometry,
+                                 const ImagePositions&,
+                                 const PatternLayerMap&) {
     constexpr const uint16_t vertexLength = 4;
 
     for (auto& circle : geometry) {
@@ -86,7 +89,7 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
     }
 
     for (auto& pair : paintPropertyBinders) {
-        pair.second.populateVertexVectors(feature, vertices.vertexSize());
+        pair.second.populateVertexVectors(feature, vertices.vertexSize(), {}, {});
     }
 }
 
@@ -101,12 +104,7 @@ static float get(const RenderCircleLayer& layer, const std::map<std::string, Cir
 }
 
 float CircleBucket::getQueryRadius(const RenderLayer& layer) const {
-    if (!layer.is<RenderCircleLayer>()) {
-        return 0;
-    }
-
-    auto circleLayer = layer.as<RenderCircleLayer>();
-
+    const RenderCircleLayer* circleLayer = toRenderCircleLayer(&layer);
     float radius = get<CircleRadius>(*circleLayer, paintPropertyBinders);
     float stroke = get<CircleStrokeWidth>(*circleLayer, paintPropertyBinders);
     auto translate = circleLayer->evaluated.get<CircleTranslate>();

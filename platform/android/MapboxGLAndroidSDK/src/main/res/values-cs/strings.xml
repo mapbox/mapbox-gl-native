@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mapbox_compassContentDescription">Kompas. Nastavit natočení mapy k severu.</string>
+    <string name="mapbox_attributionsIconContentDescription">Atributy. Zobrazit nastavení atributů.</string>
+    <string name="mapbox_myLocationViewContentDescription">Zobrazení polohy. Zobrazit umístění na mapě.</string>
+    <string name="mapbox_mapActionDescription">Zobrazení mapy vytvořené s Mapbox. Posunout tažením dvěma prsty. Změnit velikost roztažením dvou prstů.</string>
+    <string name="mapbox_attributionsDialogTitle">Mapbox Maps SDK pro Android</string>
+    <string name="mapbox_attributionTelemetryTitle">Udělat mapy Mapbox lepšími</string>
+    <string name="mapbox_attributionTelemetryMessage">Pomáhat udělat OpenStreetMap a Mapbox mapy lepšími poskytnutím anonymních dat o využití.</string>
+    <string name="mapbox_attributionTelemetryPositive">Souhlasit</string>
+    <string name="mapbox_attributionTelemetryNegative">Odmítnout</string>
+    <string name="mapbox_attributionTelemetryNeutral">Více informací</string>
+    <string name="mapbox_attributionErrorNoBrowser">Na zařízení není nainstalován prohlížeč obsahu internetu, webovou stránku nelze zobrazit.</string>
+    <string name="mapbox_offline_error_region_definition_invalid">Pokud OfflineRegionDefinition neodpovídá hranicím: %s</string>
+    <string name="mapbox_telemetrySettings">Nastavení telemetrie</string>
+    </resources>

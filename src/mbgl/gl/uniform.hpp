@@ -16,13 +16,6 @@ namespace gl {
 template <class T>
 void bindUniform(UniformLocation, const T&);
 
-template <class Tag, class T>
-class UniformValue {
-public:
-    explicit UniformValue(T t_) : t(std::move(t_)) {}
-    T t;
-};
-
 class ActiveUniform {
 public:
     std::size_t size;
@@ -42,18 +35,16 @@ ActiveUniforms activeUniforms(ProgramID);
 template <class Tag, class T>
 class Uniform {
 public:
-    using Value = UniformValue<Tag, T>;
-
-    using Type = T;
+    using Value = T;
 
     class State {
     public:
         State(UniformLocation location_) : location(std::move(location_)) {}
 
         void operator=(const Value& value) {
-            if (location >= 0 && (!current || *current != value.t)) {
-                current = value.t;
-                bindUniform(location, value.t);
+            if (location >= 0 && (!current || *current != value)) {
+                current = value;
+                bindUniform(location, value);
             }
         }
 
@@ -99,11 +90,11 @@ public:
             { // Some shader programs have uniforms declared, but not used, so they're not active.
               // Therefore, we'll only verify them when they are indeed active.
               (active.find(Us::name()) != active.end()
-                   ? verifyUniform<typename Us::Type>(active.at(Us::name()))
+                   ? verifyUniform<typename Us::Value>(active.at(Us::name()))
                    : false)... });
 #endif
 
-        return State { { uniformLocation(id, Us::name()) }... };
+        return State(uniformLocation(id, Us::name())...);
     }
 
     template <class Program>
@@ -120,23 +111,8 @@ public:
     }
 };
 
-
-namespace detail {
-
-template <class...>
-struct ConcatenateUniforms;
-
-template <class... As, class... Bs>
-struct ConcatenateUniforms<TypeList<As...>, TypeList<Bs...>> {
-    using Type = Uniforms<As..., Bs...>;
-};
-
-} // namespace detail
-
-template <class A, class B>
-using ConcatenateUniforms = typename detail::ConcatenateUniforms<
-    typename A::Types,
-    typename B::Types>::Type;
+template <class... Us>
+using ConcatenateUniforms = typename TypeListConcat<typename Us::Types...>::template ExpandInto<Uniforms>;
 
 } // namespace gl
 } // namespace mbgl

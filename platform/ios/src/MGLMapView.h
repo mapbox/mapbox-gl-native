@@ -2,7 +2,6 @@
 #import "MGLMapCamera.h"
 
 #import <UIKit/UIKit.h>
-#import <CoreLocation/CoreLocation.h>
 
 #import "MGLFoundation.h"
 #import "MGLTypes.h"
@@ -22,15 +21,19 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLOverlay;
 @protocol MGLCalloutView;
 @protocol MGLFeature;
+@protocol MGLLocationManager;
+
+/** Options for `MGLMapView.decelerationRate`. */
+typedef CGFloat MGLMapViewDecelerationRate NS_TYPED_EXTENSIBLE_ENUM;
 
 /** The default deceleration rate for a map view. */
-extern MGL_EXPORT const CGFloat MGLMapViewDecelerationRateNormal;
+FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewDecelerationRate MGLMapViewDecelerationRateNormal;
 
 /** A fast deceleration rate for a map view. */
-extern MGL_EXPORT const CGFloat MGLMapViewDecelerationRateFast;
+FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewDecelerationRate MGLMapViewDecelerationRateFast;
 
 /** Disables deceleration in a map view. */
-extern MGL_EXPORT const CGFloat MGLMapViewDecelerationRateImmediate;
+FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewDecelerationRate MGLMapViewDecelerationRateImmediate;
 
 /**
  The vertical alignment of an annotation within a map view. Used with
@@ -48,6 +51,9 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
 /**
  The mode used to track the user location on the map. Used with
  `MGLMapView.userTrackingMode`.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/user-tracking-mode/">Switch between user tracking modes</a> example to learn how to toggle modes and how each mode behaves.
  */
 typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
     /** The map does not follow the user location. */
@@ -79,6 +85,25 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
     MGLUserTrackingModeFollowWithCourse,
 };
 
+/** Options for `MGLMapView.preferredFramesPerSecond`. */
+typedef NSInteger MGLMapViewPreferredFramesPerSecond NS_TYPED_EXTENSIBLE_ENUM;
+
+/**
+ The default frame rate. This can be either 30 FPS or 60 FPS, depending on
+ device capabilities.
+ */
+FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondDefault;
+
+/** A conservative frame rate; typically 30 FPS. */
+FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondLowPower;
+
+/** The maximum supported frame rate; typically 60 FPS. */
+FOUNDATION_EXTERN MGL_EXPORT const MGLMapViewPreferredFramesPerSecond MGLMapViewPreferredFramesPerSecondMaximum;
+
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLMissingLocationServicesUsageDescriptionException;
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUserLocationAnnotationTypeException;
+FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLResourceNotFoundException;
+
 /**
  An interactive, customizable map view with an interface similar to the one
  provided by Apple’s MapKit.
@@ -107,6 +132,11 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
  Access tokens associate requests to Mapbox’s vector tile and style APIs with
  your Mapbox account. They also deter other developers from using your styles
  without your permission.
+ 
+ Because `MGLMapView` loads asynchronously, several delegate methods are available 
+ for receiving map-related updates. These methods can be used to ensure that certain operations
+ have completed before taking any additional actions. Information on these methods is located
+ in the `MGLMapViewDelegate` protocol documentation.
 
  Adding your own gesture recognizer to `MGLMapView` will block the corresponding
  gesture recognizer built into `MGLMapView`. To avoid conflicts, define which
@@ -124,7 +154,10 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
 
  @note You are responsible for getting permission to use the map data and for
  ensuring that your use adheres to the relevant terms of use.
-
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/simple-map-view/">
+ Simple map view</a> example to learn how to initialize a basic `MGLMapView`.
  */
 MGL_EXPORT IB_DESIGNABLE
 @interface MGLMapView : UIView
@@ -150,6 +183,16 @@ MGL_EXPORT IB_DESIGNABLE
     (`mapbox://styles/{user}/{style}`), or a path to a local file relative
     to the application’s resource path. Specify `nil` for the default style.
  @return An initialized map view.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/custom-style/">
+ Apply a style designed in Mapbox Studio</a> example to learn how to
+ initialize an `MGLMapView` with a custom style. See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/raster-styles/">
+ Appy a style designed in Mapbox Studio Classic</a> example to learn how to
+ intialize an `MGLMapView` with a Studio Classic style _or_ a custom style
+ JSON. See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/source-custom-vector/">
+ Use third-party vector tiles</a> example to learn how to initialize an
+ `MGLMapView` with a third-party tile source.
  */
 - (instancetype)initWithFrame:(CGRect)frame styleURL:(nullable NSURL *)styleURL;
 
@@ -189,13 +232,7 @@ MGL_EXPORT IB_DESIGNABLE
  */
 @property (nonatomic, readonly, nullable) MGLStyle *style;
 
-/**
- URLs of the styles bundled with the library.
-
- @deprecated Call the relevant class method of `MGLStyle` for the URL of a
-    particular default style.
- */
-@property (nonatomic, readonly) NS_ARRAY_OF(NSURL *) *bundledStyleURLs __attribute__((deprecated("Call the relevant class method of MGLStyle for the URL of a particular default style.")));
+@property (nonatomic, readonly) NSArray<NSURL *> *bundledStyleURLs __attribute__((unavailable("Call the relevant class method of MGLStyle for the URL of a particular default style.")));
 
 /**
  URL of the style currently displayed in the receiver.
@@ -209,6 +246,11 @@ MGL_EXPORT IB_DESIGNABLE
 
  If you want to modify the current style without replacing it outright, or if
  you want to introspect individual style attributes, use the `style` property.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/switch-styles/">
+ Switch between map styles</a> example to learn how to change the style of
+ a map at runtime.
  */
 @property (nonatomic, null_resettable) NSURL *styleURL;
 
@@ -224,11 +266,20 @@ MGL_EXPORT IB_DESIGNABLE
  the server, calling this method does not necessarily ensure that the map view
  reflects those changes.
  */
-- (IBAction)reloadStyle:(id)sender;
+- (IBAction)reloadStyle:(nullable id)sender;
+
+/**
+ A Boolean value indicating whether the map may display scale information.
+
+ The scale bar may not be shown at all zoom levels. The view controlled by this
+ property is available at `scaleBar`. The default value of this property is
+ `NO`.
+ */
+@property (nonatomic, assign) BOOL showsScale;
 
 /**
  A control indicating the scale of the map. The scale bar is positioned in the
- upper-left corner. The scale bar is hidden by default.
+ upper-left corner. Enable the scale bar via `showsScale`.
  */
 @property (nonatomic, readonly) UIView *scaleBar;
 
@@ -283,19 +334,47 @@ MGL_EXPORT IB_DESIGNABLE
  */
 - (IBAction)showAttribution:(id)sender;
 
-/// :nodoc: Support for style classes has been removed. This property always returns an empty array.
-@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("This property is non-functional.")));
+/**
+ The preferred frame rate at which the map view is rendered.
 
-/// :nodoc: Support for style classes has been removed. This property always returns NO.
-- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+ The default value for this property is
+ `MGLMapViewPreferredFramesPerSecondDefault`, which will adaptively set the
+ preferred frame rate based on the capability of the user’s device to maintain
+ a smooth experience.
 
-/// :nodoc: Support for style classes has been removed. This property is a no-op.
-- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+ In addition to the provided `MGLMapViewPreferredFramesPerSecond` options, this
+ property can be set to arbitrary integer values.
 
-/// :nodoc: Support for style classes has been removed. This property is a no-op.
-- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+ @see `CADisplayLink.preferredFramesPerSecond`
+ */
+@property (nonatomic, assign) MGLMapViewPreferredFramesPerSecond preferredFramesPerSecond;
+
+@property (nonatomic) NSArray<NSString *> *styleClasses __attribute__((unavailable("Support for style classes has been removed.")));
+
+- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
+
+- (void)addStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
+
+- (void)removeStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 
 #pragma mark Displaying the User’s Location
+
+/**
+ The object that this map view uses to start and stop the delivery of location-related
+ updates.
+ 
+ To receive the current user location, implement the `-[MGLMapViewDelegate mapView:didUpdateUserLocation:]`
+ and `-[MGLMapViewDelegate mapView:didFailToLocateUserWithError:]` methods.
+ 
+ If setting this property to `nil` or if no custom manager is provided this property
+ is set to the default location manager.
+ 
+ `MGLMapView` uses a default location manager. If you want to substitute your own
+ location manager, you should do so by setting this property before setting
+ `showsUserLocation` to `YES`. To restore the default location manager,
+ set this property to `nil`.
+ */
+@property (nonatomic, null_resettable) id<MGLLocationManager> locationManager;
 
 /**
  A Boolean value indicating whether the map may display the user location.
@@ -313,6 +392,9 @@ MGL_EXPORT IB_DESIGNABLE
  `NSLocationAlwaysUsageDescription` in its `Info.plist` to satisfy the
  requirements of the underlying Core Location framework when enabling this
  property.
+ 
+ If you implement a custom location manager, set the `locationManager` before
+ calling `showsUserLocation`.
  */
 @property (nonatomic, assign) BOOL showsUserLocation;
 
@@ -337,6 +419,11 @@ MGL_EXPORT IB_DESIGNABLE
  Changing the value of this property updates the map view with an animated
  transition. If you don’t want to animate the change, use the
  `-setUserTrackingMode:animated:` method instead.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/user-location-annotation/">
+ Customize the user location annotation</a> to learn how to customize the
+ default user location annotation shown by `MGLUserTrackingMode`.
  */
 @property (nonatomic, assign) MGLUserTrackingMode userTrackingMode;
 
@@ -360,7 +447,7 @@ MGL_EXPORT IB_DESIGNABLE
  transition. If you don’t want to animate the change, use the
  `-setUserLocationVerticalAlignment:animated:` method instead.
  */
-@property (nonatomic, assign) MGLAnnotationVerticalAlignment userLocationVerticalAlignment;
+@property (nonatomic, assign) MGLAnnotationVerticalAlignment userLocationVerticalAlignment __attribute__((deprecated("Use -[MGLMapViewDelegate mapViewUserLocationAnchorPoint:] instead.")));
 
 /**
  Sets the vertical alignment of the user location annotation within the
@@ -371,7 +458,20 @@ MGL_EXPORT IB_DESIGNABLE
     position within the map view. If `NO`, the user location annotation
     instantaneously moves to its new position.
  */
-- (void)setUserLocationVerticalAlignment:(MGLAnnotationVerticalAlignment)alignment animated:(BOOL)animated;
+- (void)setUserLocationVerticalAlignment:(MGLAnnotationVerticalAlignment)alignment animated:(BOOL)animated __attribute__((deprecated("Use -[MGLMapViewDelegate mapViewUserLocationAnchorPoint:] instead.")));
+
+/**
+ Updates the position of the user location annotation view by retreiving the user's last
+ known location.
+ */
+- (void)updateUserLocationAnnotationView;
+
+/**
+ Updates the position of the user location annotation view by retreiving the user's last
+ known location with a specified duration.
+ @param duration The duration to animate the change in seconds.
+*/
+- (void)updateUserLocationAnnotationViewAnimatedWithDuration:(NSTimeInterval)duration;
 
 /**
  A Boolean value indicating whether the user location annotation may display a
@@ -494,6 +594,19 @@ MGL_EXPORT IB_DESIGNABLE
 @property(nonatomic, getter=isPitchEnabled) BOOL pitchEnabled;
 
 /**
+ A Boolean value that determines whether the user will receive haptic feedback
+ for certain interactions with the map.
+
+ When this property is set to `YES`, the default, a `UIImpactFeedbackStyleLight`
+ haptic feedback event be played when the user rotates the map to due north
+ (0°).
+
+ This feature requires a device that supports haptic feedback, running iOS 10 or
+ newer.
+ */
+@property(nonatomic, getter=isHapticFeedbackEnabled) BOOL hapticFeedbackEnabled;
+
+/**
  A floating-point value that determines the rate of deceleration after the user
  lifts their finger.
 
@@ -523,11 +636,14 @@ MGL_EXPORT IB_DESIGNABLE
 
  Changing the center coordinate centers the map on the new coordinate without
  changing the current zoom level.
-
+ 
  @param coordinate The new center coordinate for the map.
  @param animated Specify `YES` if you want the map view to scroll to the new
     location or `NO` if you want the map to display the new location
     immediately.
+ 
+ @note The behavior of this method is undefined if called in response to
+ `UIApplicationWillTerminateNotification`.
  */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)coordinate animated:(BOOL)animated;
 
@@ -540,6 +656,9 @@ MGL_EXPORT IB_DESIGNABLE
  @param animated Specify `YES` if you want the map view to animate scrolling and
     zooming to the new location or `NO` if you want the map to display the new
     location immediately.
+ 
+ @note The behavior of this method is undefined if called in response to
+ `UIApplicationWillTerminateNotification`.
  */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
@@ -554,6 +673,9 @@ MGL_EXPORT IB_DESIGNABLE
  @param animated Specify `YES` if you want the map view to animate scrolling,
     zooming, and rotating to the new location or `NO` if you want the map to
     display the new location immediately.
+ 
+ @note The behavior of this method is undefined if called in response to
+ `UIApplicationWillTerminateNotification`.
  */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated;
 
@@ -569,6 +691,9 @@ MGL_EXPORT IB_DESIGNABLE
     zooming, and rotating to the new location or `NO` if you want the map to
     display the new location immediately.
  @param completion The block executed after the animation finishes.
+ 
+ @note The behavior of this method is undefined if called in response to
+ `UIApplicationWillTerminateNotification`.
  */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion;
 
@@ -669,11 +794,10 @@ MGL_EXPORT IB_DESIGNABLE
  want to animate the change, call `-setVisibleCoordinateBounds:animated:`
  instead.
  
- If a longitude is less than −180 degrees or greater than 180 degrees, the visible
- bounds straddles the antimeridian or international date line.
- 
- For example, a visible bounds that stretches from Tokyo to San Francisco would have
- coordinates of (35.68476, -220.24257) and (37.78428, -122.41310).
+ If a longitude is less than −180 degrees or greater than 180 degrees, the
+ visible bounds straddles the antimeridian or international date line. For
+ example, if both Tokyo and San Francisco are visible, the visible bounds might
+ extend from (35.68476, −220.24257) to (37.78428, −122.41310).
  */
 @property (nonatomic) MGLCoordinateBounds visibleCoordinateBounds;
 
@@ -681,11 +805,10 @@ MGL_EXPORT IB_DESIGNABLE
  Changes the receiver’s viewport to fit the given coordinate bounds,
  optionally animating the change.
  
- To make the visible bounds go across the antimeridian or international date line,
- specify some longitudes less than −180 degrees or greater than 180 degrees.
- 
- For example, a visible bounds that stretches from Tokyo to San Francisco would have
- coordinates of (35.68476, -220.24257) and (37.78428, -122.41310).
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible bounds to extend from (35.68476, −220.24257) to (37.78428, −122.41310).
 
  @param bounds The bounds that the viewport will show in its entirety.
  @param animated Specify `YES` to animate the change by smoothly scrolling
@@ -696,6 +819,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit the given coordinate bounds and
  optionally some additional padding on each side.
+ 
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible bounds to extend from (35.68476, −220.24257) to (37.78428, −122.41310).
 
  @param bounds The bounds that the viewport will show in its entirety.
  @param insets The minimum padding (in screen points) that will be visible
@@ -708,6 +836,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit all of the given coordinates and
  optionally some additional padding on each side.
+ 
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible coordinates to (35.68476, −220.24257) and (37.78428, −122.41310).
 
  @param coordinates The coordinates that the viewport will show.
  @param count The number of coordinates. This number must not be greater than
@@ -722,6 +855,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit all of the given coordinates and
  optionally some additional padding on each side.
+ 
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible coordinates to (35.68476, −220.24257) and (37.78428, −122.41310).
 
  @param coordinates The coordinates that the viewport will show.
  @param count The number of coordinates. This number must not be greater than
@@ -748,7 +886,7 @@ MGL_EXPORT IB_DESIGNABLE
  @param animated `YES` if you want the map region change to be animated, or `NO`
     if you want the map to display the new region immediately without animations.
  */
-- (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations animated:(BOOL)animated;
+- (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations animated:(BOOL)animated;
 
 /**
  Sets the visible region so that the map displays the specified annotations with
@@ -763,7 +901,7 @@ MGL_EXPORT IB_DESIGNABLE
  @param animated `YES` if you want the map region change to be animated, or `NO`
     if you want the map to display the new region immediately without animations.
  */
-- (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
+- (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
 
 /**
  A camera representing the current viewpoint of the map.
@@ -778,6 +916,11 @@ MGL_EXPORT IB_DESIGNABLE
  @param animated Specify `YES` if you want the map view to animate the change to
     the new viewpoint or `NO` if you want the map to display the new viewpoint
     immediately.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/camera-animation/">
+ Camera animation</a> example to learn how to trigger an animation that
+ rotates around a central point.
  */
 - (void)setCamera:(MGLMapCamera *)camera animated:(BOOL)animated;
 
@@ -792,6 +935,11 @@ MGL_EXPORT IB_DESIGNABLE
  @param function A timing function used for the animation. Set this parameter to
     `nil` for a transition that matches most system animations. If the duration
     is `0`, this parameter is ignored.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/camera-animation/">
+ Camera animation</a> example to learn how to create a timed animation that
+ rotates around a central point for a specific duration.
  */
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function;
 
@@ -884,6 +1032,10 @@ MGL_EXPORT IB_DESIGNABLE
     bounds with zoom level as high (close to the ground) as possible while still
     including the entire coordinate bounds. The camera object uses the current
     direction and pitch.
+
+ @note The behavior of this method is undefined if called in response to
+ `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
+ depending on the order of notification delivery.
  */
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds;
 
@@ -898,8 +1050,51 @@ MGL_EXPORT IB_DESIGNABLE
     with zoom level as high (close to the ground) as possible while still
     including the entire coordinate bounds. The camera object uses the current
     direction and pitch.
+ 
+ @note The behavior of this method is undefined if called in response to
+ `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
+ depending on the order of notification delivery.
  */
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets;
+
+/**
+ Returns the camera that best fits the given coordinate bounds, with the specified camera,
+ optionally with some additional padding on each side.
+ 
+ @param camera The camera that the return camera should adhere to. All values
+    on this camera will be manipulated except for pitch and direction.
+ @param bounds The coordinate bounds to fit to the receiver’s viewport.
+ @param insets The minimum padding (in screen points) that would be visible
+    around the returned camera object if it were set as the receiver’s camera.
+ @return A camera object centered on the same location as the coordinate bounds
+    with zoom level as high (close to the ground) as possible while still
+    including the entire coordinate bounds. The initial camera's pitch and
+    direction will be honored.
+
+ @note The behavior of this method is undefined if called in response to
+ `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
+ depending on the order of notification delivery.
+ */
+- (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets;
+
+/**
+ Returns the camera that best fits the given shape, with the specified camera,
+ optionally with some additional padding on each side.
+ 
+ @param camera The camera that the return camera should adhere to. All values
+    on this camera will be manipulated except for pitch and direction.
+ @param shape The shape to fit to the receiver’s viewport.
+ @param insets The minimum padding (in screen points) that would be visible
+    around the returned camera object if it were set as the receiver’s camera.
+ @return A camera object centered on the shape's center with zoom level as high
+    (close to the ground) as possible while still including the entire shape. The
+    initial camera's pitch and direction will be honored.
+ 
+ @note The behavior of this method is undefined if called in response to
+ `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
+ depending on the order of notification delivery.
+ */
+- (MGLMapCamera *)camera:(MGLMapCamera *)camera fittingShape:(MGLShape *)shape edgePadding:(UIEdgeInsets)insets;
 
 /**
  Returns the camera that best fits the given shape, with the specified direction,
@@ -912,6 +1107,10 @@ MGL_EXPORT IB_DESIGNABLE
  @return A camera object centered on the shape's center with zoom level as high 
     (close to the ground) as possible while still including the entire shape. The
     camera object uses the current pitch.
+ 
+ @note The behavior of this method is undefined if called in response to
+ `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
+ depending on the order of notification delivery.
  */
 - (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(UIEdgeInsets)insets;
 
@@ -984,6 +1183,11 @@ MGL_EXPORT IB_DESIGNABLE
  @param point The point to convert.
  @param view The view in whose coordinate system the point is expressed.
  @return The geographic coordinate at the given point.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/point-conversion/">
+ Point conversion</a> example to learn how to convert a `CGPoint` to a map
+ coordinate.
  */
 - (CLLocationCoordinate2D)convertPoint:(CGPoint)point toCoordinateFromView:(nullable UIView *)view;
 
@@ -998,12 +1202,21 @@ MGL_EXPORT IB_DESIGNABLE
     belong to the same window as the map view.
  @return The point (in the appropriate view or window coordinate system)
     corresponding to the given geographic coordinate.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/point-conversion/">
+ Point conversion</a> example to learn how to convert a map coordinate to a
+ `CGPoint` object.
  */
 - (CGPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(nullable UIView *)view;
 
 /**
  Converts a rectangle in the given view’s coordinate system to a geographic
  bounding box.
+ 
+ If the returned coordinate bounds contains a longitude is less than −180 degrees
+ or greater than 180 degrees, the bounding box straddles the antimeridian or
+ international date line.
 
  @param rect The rectangle to convert.
  @param view The view in whose coordinate system the rectangle is expressed.
@@ -1014,6 +1227,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Converts a geographic bounding box to a rectangle in the given view’s
  coordinate system.
+ 
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible bounds to extend from (35.68476, −220.24257) to (37.78428, −122.41310).
 
  @param bounds The geographic bounding box to convert.
  @param view The view in whose coordinate system the returned rectangle should
@@ -1037,7 +1255,7 @@ MGL_EXPORT IB_DESIGNABLE
  */
 - (CLLocationDistance)metersPerPointAtLatitude:(CLLocationDegrees)latitude;
 
-- (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude __attribute__((deprecated("Use -metersPerPointAtLatitude:.")));
+- (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude __attribute__((unavailable("Use -metersPerPointAtLatitude:.")));
 
 #pragma mark Annotating the Map
 
@@ -1048,7 +1266,7 @@ MGL_EXPORT IB_DESIGNABLE
  annotations are associated with the map view, the value of this property is
  `nil`.
  */
-@property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLAnnotation>) *annotations;
+@property (nonatomic, readonly, nullable) NSArray<id <MGLAnnotation>> *annotations;
 
 /**
  Adds an annotation to the map view.
@@ -1060,7 +1278,14 @@ MGL_EXPORT IB_DESIGNABLE
 
  @param annotation The annotation object to add to the receiver. This object
     must conform to the `MGLAnnotation` protocol. The map view retains the
-    annotation object. */
+    annotation object.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-models/">
+ Annotation models</a> and <a href="https://www.mapbox.com/ios-sdk/maps/examples/line-geojson/">
+ Add a line annotation from GeoJSON</a> examples to learn how to add an
+ annotation to an `MGLMapView` object.
+ */
 - (void)addAnnotation:(id <MGLAnnotation>)annotation;
 
 /**
@@ -1076,7 +1301,7 @@ MGL_EXPORT IB_DESIGNABLE
     must conform to the `MGLAnnotation` protocol. The map view retains each
     individual annotation object.
  */
-- (void)addAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations;
+- (void)addAnnotations:(NSArray<id <MGLAnnotation>> *)annotations;
 
 /**
  Removes an annotation from the map view, deselecting it if it is selected.
@@ -1101,7 +1326,7 @@ MGL_EXPORT IB_DESIGNABLE
  @param annotations The array of annotation objects to remove. Objects in the
     array must conform to the `MGLAnnotation` protocol.
  */
-- (void)removeAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations;
+- (void)removeAnnotations:(NSArray<id <MGLAnnotation>> *)annotations;
 
 /**
  Returns an `MGLAnnotationView` if the given annotation is currently associated
@@ -1125,6 +1350,11 @@ MGL_EXPORT IB_DESIGNABLE
     annotation image object using the `-mapView:imageForAnnotation:` method.
  @return An annotation image object with the given identifier, or `nil` if no
     such object exists in the reuse queue.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-view-image/">
+ Add annotation views and images</a> example learn how to most efficiently
+ reuse an `MGLAnnotationImage`.
  */
 - (nullable __kindof MGLAnnotationImage *)dequeueReusableAnnotationImageWithIdentifier:(NSString *)identifier;
 
@@ -1152,7 +1382,7 @@ MGL_EXPORT IB_DESIGNABLE
  annotations are associated with the map view or if no annotations associated
  with the map view are currently visible, the value of this property is `nil`.
  */
-@property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLAnnotation>) *visibleAnnotations;
+@property (nonatomic, readonly, nullable) NSArray<id <MGLAnnotation>> *visibleAnnotations;
 
 /**
  Returns the list of annotations associated with the receiver that intersect with
@@ -1163,7 +1393,7 @@ MGL_EXPORT IB_DESIGNABLE
     no annotations associated with the map view are currently visible in the
     rectangle.
  */
-- (nullable NS_ARRAY_OF(id <MGLAnnotation>) *)visibleAnnotationsInRect:(CGRect)rect;
+- (nullable NSArray<id <MGLAnnotation>> *)visibleAnnotationsInRect:(CGRect)rect;
 
 #pragma mark Managing Annotation Selections
 
@@ -1172,17 +1402,32 @@ MGL_EXPORT IB_DESIGNABLE
 
  Assigning a new array to this property selects only the first annotation in
  the array.
+
+ If the annotation is of type `MGLPointAnnotation` and is offscreen, the camera
+ will animate to bring the annotation and its callout just on screen. If you
+ need finer control, consider using `-selectAnnotation:animated:`.
+
+ @note In versions prior to `4.0.0` if the annotation was offscreen it was not
+ selected.
  */
-@property (nonatomic, copy) NS_ARRAY_OF(id <MGLAnnotation>) *selectedAnnotations;
+@property (nonatomic, copy) NSArray<id <MGLAnnotation>> *selectedAnnotations;
 
 /**
- Selects an annotation and displays a callout view for it.
+ Selects an annotation and displays its callout view.
 
- If the given annotation is not visible within the current viewport, this
- method has no effect.
+ The `animated` parameter determines whether the map is panned to bring the
+ annotation on-screen, specifically:
+
+ | `animated` parameter | Effect |
+ |------------------|--------|
+ | `NO`             | The annotation is selected, and the callout is presented. However the map is not panned to bring the annotation or callout onscreen. The presentation of the callout is animated. |
+ | `YES`            | The annotation is selected, and the callout is presented. If the annotation is offscreen *and* is of type `MGLPointAnnotation`, the map is panned so that the annotation and its callout are brought just onscreen. The annotation is *not* centered within the viewport. |
 
  @param annotation The annotation object to select.
- @param animated If `YES`, the callout view is animated into position.
+ @param animated If `YES`, the annotation and callout view are animated on-screen.
+
+ @note In versions prior to `4.0.0` selecting an offscreen annotation did not
+ change the camera.
  */
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
 
@@ -1203,7 +1448,7 @@ MGL_EXPORT IB_DESIGNABLE
  overlays are associated with the map view, the value of this property is
  empty array.
  */
-@property (nonatomic, readonly, nonnull) NS_ARRAY_OF(id <MGLOverlay>) *overlays;
+@property (nonatomic, readonly, nonnull) NSArray<id <MGLOverlay>> *overlays;
 
 /**
  Adds a single overlay object to the map.
@@ -1222,7 +1467,7 @@ MGL_EXPORT IB_DESIGNABLE
  @param overlays An array of objects, each of which must conform to the
     `MGLOverlay` protocol.
  */
-- (void)addOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays;
+- (void)addOverlays:(NSArray<id <MGLOverlay>> *)overlays;
 
 /**
  Removes a single overlay object from the map.
@@ -1242,7 +1487,7 @@ MGL_EXPORT IB_DESIGNABLE
  @param overlays An array of objects, each of which conforms to the `MGLOverlay`
     protocol.
  */
-- (void)removeOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays;
+- (void)removeOverlays:(NSArray<id <MGLOverlay>> *)overlays;
 
 #pragma mark Accessing the Underlying Map Data
 
@@ -1257,8 +1502,13 @@ MGL_EXPORT IB_DESIGNABLE
  @param point A point expressed in the map view’s coordinate system.
  @return An array of objects conforming to the `MGLFeature` protocol that
     represent features in the sources used by the current style.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/select-layer/">
+ Select a feature within a layer</a> example to learn how to query an
+ `MGLMapView` object for visible `MGLFeature` objects.
  */
-- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesAtPoint:(CGPoint)point NS_SWIFT_NAME(visibleFeatures(at:));
+- (NSArray<id <MGLFeature>> *)visibleFeaturesAtPoint:(CGPoint)point NS_SWIFT_NAME(visibleFeatures(at:));
 
 /**
  Returns an array of rendered map features that intersect with a given point,
@@ -1277,7 +1527,7 @@ MGL_EXPORT IB_DESIGNABLE
  @return An array of objects conforming to the `MGLFeature` protocol that 
     represent features in the sources used by the current style.
  */
-- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesAtPoint:(CGPoint)point inStyleLayersWithIdentifiers:(nullable NS_SET_OF(NSString *) *)styleLayerIdentifiers NS_SWIFT_NAME(visibleFeatures(at:styleLayerIdentifiers:));
+- (NSArray<id <MGLFeature>> *)visibleFeaturesAtPoint:(CGPoint)point inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)styleLayerIdentifiers NS_SWIFT_NAME(visibleFeatures(at:styleLayerIdentifiers:));
 
 /**
  Returns an array of rendered map features that intersect with a given point,
@@ -1286,9 +1536,9 @@ MGL_EXPORT IB_DESIGNABLE
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant map
  content sources. The returned array includes features loaded by
- `MGLShapeSource` and `MGLVectorSource` objects but does not include anything
- from `MGLRasterSource` objects, or from image, video, or canvas sources, which
- are unsupported by this SDK.
+ `MGLShapeSource` and `MGLVectorTileSource` objects but does not include
+ anything from `MGLRasterTileSource` objects, or from video or canvas sources,
+ which are unsupported by this SDK.
 
  The returned features are drawn by a style layer in the current style. For
  example, suppose the current style uses the
@@ -1320,7 +1570,7 @@ MGL_EXPORT IB_DESIGNABLE
 
  Only visible features are returned. To obtain features regardless of
  visibility, use the
- `-[MGLVectorSource featuresInSourceLayersWithIdentifiers:predicate:]` and
+ `-[MGLVectorTileSource featuresInSourceLayersWithIdentifiers:predicate:]` and
  `-[MGLShapeSource featuresMatchingPredicate:]` methods on the relevant sources.
 
  The returned features may also include features corresponding to annotations.
@@ -1344,7 +1594,7 @@ MGL_EXPORT IB_DESIGNABLE
  @return An array of objects conforming to the `MGLFeature` protocol that
     represent features in the sources used by the current style.
  */
-- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesAtPoint:(CGPoint)point inStyleLayersWithIdentifiers:(nullable NS_SET_OF(NSString *) *)styleLayerIdentifiers predicate:(nullable NSPredicate *)predicate NS_SWIFT_NAME(visibleFeatures(at:styleLayerIdentifiers:predicate:));
+- (NSArray<id <MGLFeature>> *)visibleFeaturesAtPoint:(CGPoint)point inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)styleLayerIdentifiers predicate:(nullable NSPredicate *)predicate NS_SWIFT_NAME(visibleFeatures(at:styleLayerIdentifiers:predicate:));
 
 /**
  Returns an array of rendered map features that intersect with the given
@@ -1359,7 +1609,7 @@ MGL_EXPORT IB_DESIGNABLE
  @return An array of objects conforming to the `MGLFeature` protocol that
     represent features in the sources used by the current style.
  */
-- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesInRect:(CGRect)rect NS_SWIFT_NAME(visibleFeatures(in:));
+- (NSArray<id <MGLFeature>> *)visibleFeaturesInRect:(CGRect)rect NS_SWIFT_NAME(visibleFeatures(in:));
 
 /**
  Returns an array of rendered map features that intersect with the given
@@ -1378,7 +1628,7 @@ MGL_EXPORT IB_DESIGNABLE
  @return An array of objects conforming to the `MGLFeature` protocol that
     represent features in the sources used by the current style.
  */
-- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesInRect:(CGRect)rect inStyleLayersWithIdentifiers:(nullable NS_SET_OF(NSString *) *)styleLayerIdentifiers NS_SWIFT_NAME(visibleFeatures(in:styleLayerIdentifiers:));
+- (NSArray<id <MGLFeature>> *)visibleFeaturesInRect:(CGRect)rect inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)styleLayerIdentifiers NS_SWIFT_NAME(visibleFeatures(in:styleLayerIdentifiers:));
 
 /**
  Returns an array of rendered map features that intersect with the given
@@ -1388,9 +1638,9 @@ MGL_EXPORT IB_DESIGNABLE
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant map
  content sources. The returned array includes features loaded by
- `MGLShapeSource` and `MGLVectorSource` objects but does not include anything
- from `MGLRasterSource` objects, or from image, video, or canvas sources, which
- are unsupported by this SDK.
+ `MGLShapeSource` and `MGLVectorTileSource` objects but does not include
+ anything from `MGLRasterTileSource` objects, or from video or canvas sources,
+ which are unsupported by this SDK.
 
  The returned features are drawn by a style layer in the current style. For
  example, suppose the current style uses the
@@ -1423,7 +1673,7 @@ MGL_EXPORT IB_DESIGNABLE
 
  Only visible features are returned. To obtain features regardless of
  visibility, use the
- `-[MGLVectorSource featuresInSourceLayersWithIdentifiers:predicate:]` and
+ `-[MGLVectorTileSource featuresInSourceLayersWithIdentifiers:predicate:]` and
  `-[MGLShapeSource featuresMatchingPredicate:]` methods on the relevant sources.
 
  @note Layer identifiers are not guaranteed to exist across styles or different
@@ -1431,8 +1681,8 @@ MGL_EXPORT IB_DESIGNABLE
  style URL to an explicitly versioned style using a convenience method like
  `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
  inspectable in Interface Builder, or a manually constructed `NSURL`. This
- approach also avoids layer identifer name changes that will occur in the default
- style’s layers over time.
+ approach also avoids layer identifer name changes that will occur in the
+ default style’s layers over time.
  
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set
@@ -1450,7 +1700,7 @@ MGL_EXPORT IB_DESIGNABLE
  @return An array of objects conforming to the `MGLFeature` protocol that
     represent features in the sources used by the current style.
  */
-- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesInRect:(CGRect)rect inStyleLayersWithIdentifiers:(nullable NS_SET_OF(NSString *) *)styleLayerIdentifiers predicate:(nullable NSPredicate *)predicate NS_SWIFT_NAME(visibleFeatures(in:styleLayerIdentifiers:predicate:));
+- (NSArray<id <MGLFeature>> *)visibleFeaturesInRect:(CGRect)rect inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)styleLayerIdentifiers predicate:(nullable NSPredicate *)predicate NS_SWIFT_NAME(visibleFeatures(in:styleLayerIdentifiers:predicate:));
 
 #pragma mark Debugging the Map
 
@@ -1462,11 +1712,11 @@ MGL_EXPORT IB_DESIGNABLE
  */
 @property (nonatomic) MGLMapDebugMaskOptions debugMask;
 
-@property (nonatomic, getter=isDebugActive) BOOL debugActive __attribute__((deprecated("Use -debugMask and -setDebugMask:.")));
+@property (nonatomic, getter=isDebugActive) BOOL debugActive __attribute__((unavailable("Use -debugMask and -setDebugMask:.")));
 
-- (void)toggleDebug __attribute__((deprecated("Use -setDebugMask:.")));
+- (void)toggleDebug __attribute__((unavailable("Use -setDebugMask:.")));
 
-- (void)emptyMemoryCache __attribute__((deprecated));
+- (void)emptyMemoryCache __attribute__((unavailable));
 
 @end
 

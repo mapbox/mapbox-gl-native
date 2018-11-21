@@ -14,6 +14,7 @@ public:
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
+    bool hasCrossfade() const override;
 
     void render(PaintParameters&, RenderSource*) override;
 
@@ -25,10 +26,5 @@ public:
 
     const style::RasterLayer::Impl& impl() const;
 };
-
-template <>
-inline bool RenderLayer::is<RenderRasterLayer>() const {
-    return type == style::LayerType::Raster;
-}
 
 } // namespace mbgl

@@ -106,7 +106,7 @@
     XCTAssertNil(error, @"Valid GeoJSON data should produce no error on deserialization.");
     XCTAssertNotNil(feature, @"Valid GeoJSON data should produce an object on deserialization.");
     XCTAssertTrue([feature isKindOfClass:[MGLPointFeature class]], @"Valid GeoJSON point feature data should produce an MGLPointFeature.");
-    XCTAssertEqual(feature.attributes.count, 0);
+    XCTAssertEqual(feature.attributes.count, 0UL);
     XCTAssertEqual(feature.coordinate.latitude, 0);
     XCTAssertEqual(feature.coordinate.longitude, 0);
 
@@ -163,4 +163,49 @@
                           [NSValue valueWithMGLCoordinate:quad.bottomRight],
                           @"Quad bottom right should be computed correctly.");
 }
+
+- (void)testMGLMapPoint {
+    MGLMapPoint point = MGLMapPointForCoordinate(CLLocationCoordinate2DMake(37.936, -80.425), 0.0);
+    
+    MGLMapPoint roundTrippedPoint = [NSValue valueWithMGLMapPoint:point].MGLMapPointValue;
+    XCTAssertEqual(point.x, roundTrippedPoint.x);
+    XCTAssertEqual(point.y, roundTrippedPoint.y);
+    XCTAssertEqual(point.zoomLevel, roundTrippedPoint.zoomLevel);
+}
+
+- (void)testMGLLocationCoordinate2DIsValid {
+    {
+        CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(37.936, -71.516);
+        XCTAssertTrue(MGLLocationCoordinate2DIsValid(coordinate));
+    }
+    {
+        CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(46.816368, 5.844469);
+        XCTAssertTrue(MGLLocationCoordinate2DIsValid(coordinate));
+    }
+    {
+        CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(-21.512680, 23.334703);
+        XCTAssertTrue(MGLLocationCoordinate2DIsValid(coordinate));
+    }
+    {
+        CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(-44.947936, -73.081313);
+        XCTAssertTrue(MGLLocationCoordinate2DIsValid(coordinate));
+    }
+    {
+        CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(19.333630, 203.555405);
+        XCTAssertTrue(MGLLocationCoordinate2DIsValid(coordinate));
+    }
+    {
+        CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(23.254696, -240.795323);
+        XCTAssertTrue(MGLLocationCoordinate2DIsValid(coordinate));
+    }
+    {
+        CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(91, 361);
+        XCTAssertFalse(MGLLocationCoordinate2DIsValid(coordinate));
+    }
+    {
+        CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(-91, -361);
+        XCTAssertFalse(MGLLocationCoordinate2DIsValid(coordinate));
+    }
+}
+
 @end

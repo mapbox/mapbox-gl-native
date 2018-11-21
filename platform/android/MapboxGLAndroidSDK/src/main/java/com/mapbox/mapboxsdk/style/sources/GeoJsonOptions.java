@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.style.sources;
 
+import android.support.annotation.NonNull;
+
 import java.util.HashMap;
 
 /**
@@ -11,11 +13,12 @@ import java.util.HashMap;
 public class GeoJsonOptions extends HashMap<String, Object> {
 
   /**
-   * Maximum zoom level at which to create vector tiles (higher means greater detail at high zoom levels).
+   * Minimum zoom level at which to create vector tiles (lower means more field of view detail at low zoom levels).
    *
-   * @param maxZoom the maximum zoom - Defaults to 18.
+   * @param minZoom the minimum zoom - Defaults to 0.
    * @return the current instance for chaining
    */
+  @NonNull
   public GeoJsonOptions withMinZoom(int minZoom) {
     this.put("minzoom", minZoom);
     return this;
@@ -24,9 +27,10 @@ public class GeoJsonOptions extends HashMap<String, Object> {
   /**
    * Maximum zoom level at which to create vector tiles (higher means greater detail at high zoom levels).
    *
-   * @param maxZoom the maximum zoom - Defaults to 18.
+   * @param maxZoom the maximum zoom - Defaults to 25.5
    * @return the current instance for chaining
    */
+  @NonNull
   public GeoJsonOptions withMaxZoom(int maxZoom) {
     this.put("maxzoom", maxZoom);
     return this;
@@ -39,8 +43,21 @@ public class GeoJsonOptions extends HashMap<String, Object> {
    * @param buffer the buffer size - Defaults to 128.
    * @return the current instance for chaining
    */
+  @NonNull
   public GeoJsonOptions withBuffer(int buffer) {
     this.put("buffer", buffer);
+    return this;
+  }
+
+  /**
+   * Initialises whether to calculate line distance metrics.
+   *
+   * @param lineMetrics true to calculate line distance metrics.
+   * @return the current instance for chaining
+   */
+  @NonNull
+  public GeoJsonOptions withLineMetrics(boolean lineMetrics) {
+    this.put("lineMetrics", lineMetrics);
     return this;
   }
 
@@ -50,6 +67,7 @@ public class GeoJsonOptions extends HashMap<String, Object> {
    * @param tolerance the tolerance - Defaults to 0.375
    * @return the current instance for chaining
    */
+  @NonNull
   public GeoJsonOptions withTolerance(float tolerance) {
     this.put("tolerance", tolerance);
     return this;
@@ -61,6 +79,7 @@ public class GeoJsonOptions extends HashMap<String, Object> {
    * @param cluster cluster? - Defaults to false
    * @return the current instance for chaining
    */
+  @NonNull
   public GeoJsonOptions withCluster(boolean cluster) {
     this.put("cluster", cluster);
     return this;
@@ -73,6 +92,7 @@ public class GeoJsonOptions extends HashMap<String, Object> {
    *                       zoom features are not clustered)
    * @return the current instance for chaining
    */
+  @NonNull
   public GeoJsonOptions withClusterMaxZoom(int clusterMaxZoom) {
     this.put("clusterMaxZoom", clusterMaxZoom);
     return this;
@@ -84,9 +104,9 @@ public class GeoJsonOptions extends HashMap<String, Object> {
    * @param clusterRadius cluster radius - Defaults to 50
    * @return the current instance for chaining
    */
+  @NonNull
   public GeoJsonOptions withClusterRadius(int clusterRadius) {
     this.put("clusterRadius", clusterRadius);
     return this;
   }
-
 }

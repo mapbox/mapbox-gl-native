@@ -61,7 +61,7 @@ public:
     // world, unwrap the start longitude to ensure the shortest path is taken.
     void unwrapForShortestPath(const LatLng& end) {
         const double delta = std::abs(end.lon - lon);
-        if (delta < util::LONGITUDE_MAX || delta > util::DEGREES_MAX) return;
+        if (delta <= util::LONGITUDE_MAX || delta >= util::DEGREES_MAX) return;
         if (lon > 0 && end.lon < 0) lon -= util::DEGREES_MAX;
         else if (lon < 0 && end.lon > 0) lon += util::DEGREES_MAX;
     }

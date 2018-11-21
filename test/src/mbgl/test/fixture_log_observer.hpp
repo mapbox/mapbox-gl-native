@@ -15,7 +15,7 @@ public:
         Message() = default;
         Message(EventSeverity severity_, Event event_, int64_t code_, std::string msg_);
 
-        bool operator==(const Message& rhs) const;
+        bool matches(const Message& rhs, bool substring = false) const;
 
         const EventSeverity severity {};
         const Event event {};
@@ -39,7 +39,8 @@ public:
                               const std::string& msg) override;
 
         bool empty() const;
-        size_t count(const Message& message) const;
+        size_t uncheckedCount() const;
+        size_t count(const Message& message, bool substring = false) const;
         std::vector<Message> unchecked() const;
 
     private:
@@ -51,7 +52,8 @@ public:
     FixtureLog();
 
     bool empty() const;
-    size_t count(const Message& message) const;
+    size_t uncheckedCount() const;
+    size_t count(const Message& message, bool substring = false) const;
 
     ~FixtureLog();
 

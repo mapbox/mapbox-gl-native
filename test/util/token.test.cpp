@@ -47,4 +47,7 @@ TEST(Token, replaceTokens) {
         if (token == "HØYDE") return "150";
         return "";
     }));
+    EXPECT_EQ("{unknown}", mbgl::util::replaceTokens("{unknown}", [](const std::string&) -> optional<std::string> {
+        return {};
+    }));
 }

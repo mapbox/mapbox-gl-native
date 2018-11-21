@@ -1,12 +1,17 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/shaders/background_pattern.hpp>
+#include <mbgl/shaders/source.hpp>
 
 namespace mbgl {
 namespace shaders {
 
 const char* background_pattern::name = "background_pattern";
-const char* background_pattern::vertexSource = R"MBGL_SHADER(
+const char* background_pattern::vertexSource = source() + 3020;
+const char* background_pattern::fragmentSource = source() + 3664;
+
+// Uncompressed source of background_pattern.vertex.glsl:
+/*
 uniform mat4 u_matrix;
 uniform vec2 u_pattern_size_a;
 uniform vec2 u_pattern_size_b;
@@ -28,8 +33,10 @@ void main() {
     v_pos_b = get_pattern_pos(u_pixel_coord_upper, u_pixel_coord_lower, u_scale_b * u_pattern_size_b, u_tile_units_to_pixels, a_pos);
 }
 
-)MBGL_SHADER";
-const char* background_pattern::fragmentSource = R"MBGL_SHADER(
+*/
+
+// Uncompressed source of background_pattern.fragment.glsl:
+/*
 uniform vec2 u_pattern_tl_a;
 uniform vec2 u_pattern_br_a;
 uniform vec2 u_pattern_tl_b;
@@ -59,7 +66,7 @@ void main() {
 #endif
 }
 
-)MBGL_SHADER";
+*/
 
 } // namespace shaders
 } // namespace mbgl

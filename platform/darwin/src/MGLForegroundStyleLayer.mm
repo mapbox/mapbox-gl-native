@@ -3,7 +3,7 @@
 @implementation MGLForegroundStyleLayer
 
 - (NSString *)sourceIdentifier {
-    [NSException raise:@"MGLAbstractClassException"
+    [NSException raise:MGLAbstractClassException
                 format:@"MGLForegroundStyleLayer is an abstract class"];
     return nil;
 }

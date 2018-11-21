@@ -4,9 +4,8 @@
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/text/bidi.hpp>
 
-#include <boost/algorithm/string.hpp>
-
 #include <algorithm>
+#include <list>
 #include <cmath>
 
 namespace mbgl {
@@ -91,7 +90,7 @@ void align(Shaping& shaping,
 
 // justify left = 0, right = 1, center = .5
 void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
-                 const Glyphs& glyphs,
+                 const GlyphMap& glyphMap,
                  std::size_t start,
                  std::size_t end,
                  float justify) {
@@ -100,9 +99,13 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
     }
     
     PositionedGlyph& glyph = positionedGlyphs[end];
-    auto it = glyphs.find(glyph.glyph);
-    if (it != glyphs.end() && it->second) {
-        const uint32_t lastAdvance = (*it->second)->metrics.advance;
+    auto glyphs = glyphMap.find(glyph.font);
+    if (glyphs == glyphMap.end()) {
+        return;
+    }
+    auto it = glyphs->second.find(glyph.glyph);
+    if (it != glyphs->second.end() && it->second) {
+        const float lastAdvance = (*it->second)->metrics.advance * glyph.scale;
         const float lineIndent = float(glyph.x + lastAdvance) * justify;
         
         for (std::size_t j = start; j <= end; j++) {
@@ -111,17 +114,25 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
     }
 }
 
-float determineAverageLineWidth(const std::u16string& logicalInput,
+float determineAverageLineWidth(const TaggedString& logicalInput,
                                 const float spacing,
                                 float maxWidth,
-                                const Glyphs& glyphs) {
+                                const GlyphMap& glyphMap) {
     float totalWidth = 0;
     
-    for (char16_t chr : logicalInput) {
-        auto it = glyphs.find(chr);
-        if (it != glyphs.end() && it->second) {
-            totalWidth += (*it->second)->metrics.advance + spacing;
+    for (std::size_t i = 0; i < logicalInput.length(); i++) {
+        const SectionOptions& section = logicalInput.getSection(i);
+        char16_t codePoint = logicalInput.getCharCodeAt(i);
+        auto glyphs = glyphMap.find(section.fontStackHash);
+        if (glyphs == glyphMap.end()) {
+            continue;
         }
+        auto it = glyphs->second.find(codePoint);
+        if (it == glyphs->second.end() || !it->second) {
+            continue;
+        }
+        
+        totalWidth += (*it->second)->metrics.advance * section.scale + spacing;
     }
     
     int32_t targetLineCount = ::fmax(1, std::ceil(totalWidth / maxWidth));
@@ -209,11 +220,11 @@ std::set<std::size_t> leastBadBreaks(const PotentialBreak& lastLineBreak) {
 
 // We determine line breaks based on shaped text in logical order. Working in visual order would be
 //  more intuitive, but we can't do that because the visual order may be changed by line breaks!
-std::set<std::size_t> determineLineBreaks(const std::u16string& logicalInput,
+std::set<std::size_t> determineLineBreaks(const TaggedString& logicalInput,
                                           const float spacing,
                                           float maxWidth,
                                           const WritingModeType writingMode,
-                                          const Glyphs& glyphs) {
+                                          const GlyphMap& glyphMap) {
     if (!maxWidth || writingMode != WritingModeType::Horizontal) {
         return {};
     }
@@ -222,40 +233,45 @@ std::set<std::size_t> determineLineBreaks(const std::u16string& logicalInput,
         return {};
     }
     
-    const float targetWidth = determineAverageLineWidth(logicalInput, spacing, maxWidth, glyphs);
+    const float targetWidth = determineAverageLineWidth(logicalInput, spacing, maxWidth, glyphMap);
     
     std::list<PotentialBreak> potentialBreaks;
     float currentX = 0;
     
-    for (std::size_t i = 0; i < logicalInput.size(); i++) {
-        const char16_t codePoint = logicalInput[i];
-        auto it = glyphs.find(codePoint);
-        if (it != glyphs.end() && it->second && !boost::algorithm::is_any_of(u" \t\n\v\f\r")(codePoint)) {
-            currentX += (*it->second)->metrics.advance + spacing;
+    for (std::size_t i = 0; i < logicalInput.length(); i++) {
+        const SectionOptions& section = logicalInput.getSection(i);
+        char16_t codePoint = logicalInput.getCharCodeAt(i);
+        auto glyphs = glyphMap.find(section.fontStackHash);
+        if (glyphs == glyphMap.end()) {
+            continue;
+        }
+        auto it = glyphs->second.find(codePoint);
+        if (it != glyphs->second.end() && it->second && !util::i18n::isWhitespace(codePoint)) {
+            currentX += (*it->second)->metrics.advance * section.scale + spacing;
         }
         
         // Ideographic characters, spaces, and word-breaking punctuation that often appear without
         // surrounding spaces.
-        if ((i < logicalInput.size() - 1) &&
+        if ((i < logicalInput.length() - 1) &&
             (util::i18n::allowsWordBreaking(codePoint) || util::i18n::allowsIdeographicBreaking(codePoint))) {
             potentialBreaks.push_back(evaluateBreak(i+1, currentX, targetWidth, potentialBreaks,
-                                                    calculatePenalty(codePoint, logicalInput[i+1]),
+                                                    calculatePenalty(codePoint, logicalInput.getCharCodeAt(i+1)),
                                                     false));
         }
     }
     
-    return leastBadBreaks(evaluateBreak(logicalInput.size(), currentX, targetWidth, potentialBreaks, 0, true));
+    return leastBadBreaks(evaluateBreak(logicalInput.length(), currentX, targetWidth, potentialBreaks, 0, true));
 }
 
 void shapeLines(Shaping& shaping,
-                          const std::vector<std::u16string>& lines,
-                          const float spacing,
-                          const float lineHeight,
-                          const style::SymbolAnchorType textAnchor,
-                          const style::TextJustifyType textJustify,
-                          const float verticalHeight,
-                          const WritingModeType writingMode,
-                          const Glyphs& glyphs) {
+                std::vector<TaggedString>& lines,
+                const float spacing,
+                const float lineHeight,
+                const style::SymbolAnchorType textAnchor,
+                const style::TextJustifyType textJustify,
+                const float verticalHeight,
+                const WritingModeType writingMode,
+                const GlyphMap& glyphMap) {
     
     // the y offset *should* be part of the font metadata
     const int32_t yOffset = -17;
@@ -265,13 +281,16 @@ void shapeLines(Shaping& shaping,
     
     float maxLineLength = 0;
 
+
     const float justify = textJustify == style::TextJustifyType::Right ? 1 :
         textJustify == style::TextJustifyType::Left ? 0 :
         0.5;
     
-    for (std::u16string line : lines) {
+    for (TaggedString& line : lines) {
         // Collapse whitespace so it doesn't throw off justification
-        boost::algorithm::trim_if(line, boost::algorithm::is_any_of(u" \t\n\v\f\r"));
+        line.trim();
+        
+        const double lineMaxScale = line.getMaxScale();
         
         if (line.empty()) {
             y += lineHeight; // Still need a line feed after empty line
@@ -279,20 +298,31 @@ void shapeLines(Shaping& shaping,
         }
         
         std::size_t lineStartIndex = shaping.positionedGlyphs.size();
-        for (char16_t chr : line) {
-            auto it = glyphs.find(chr);
-            if (it == glyphs.end() || !it->second) {
+        for (std::size_t i = 0; i < line.length(); i++) {
+            const SectionOptions& section = line.getSection(i);
+            char16_t codePoint = line.getCharCodeAt(i);
+            auto glyphs = glyphMap.find(section.fontStackHash);
+            if (glyphs == glyphMap.end()) {
+                continue;
+            }
+            auto it = glyphs->second.find(codePoint);
+            if (it == glyphs->second.end() || !it->second) {
                 continue;
             }
             
+            // We don't know the baseline, but since we're laying out
+            // at 24 points, we can calculate how much it will move when
+            // we scale up or down.
+            const double baselineOffset = (lineMaxScale - section.scale) * 24;
+            
             const Glyph& glyph = **it->second;
             
-            if (writingMode == WritingModeType::Horizontal || !util::i18n::hasUprightVerticalOrientation(chr)) {
-                shaping.positionedGlyphs.emplace_back(chr, x, y, false);
-                x += glyph.metrics.advance + spacing;
+            if (writingMode == WritingModeType::Horizontal || !util::i18n::hasUprightVerticalOrientation(codePoint)) {
+                shaping.positionedGlyphs.emplace_back(codePoint, x, y + baselineOffset, false, section.fontStackHash, section.scale);
+                x += glyph.metrics.advance * section.scale + spacing;
             } else {
-                shaping.positionedGlyphs.emplace_back(chr, x, 0, true);
-                x += verticalHeight + spacing;
+                shaping.positionedGlyphs.emplace_back(codePoint, x, baselineOffset, true, section.fontStackHash, section.scale);
+                x += verticalHeight * section.scale + spacing;
             }
         }
         
@@ -301,19 +331,19 @@ void shapeLines(Shaping& shaping,
             float lineLength = x - spacing; // Don't count trailing spacing
             maxLineLength = util::max(lineLength, maxLineLength);
             
-            justifyLine(shaping.positionedGlyphs, glyphs, lineStartIndex,
+            justifyLine(shaping.positionedGlyphs, glyphMap, lineStartIndex,
                         shaping.positionedGlyphs.size() - 1, justify);
         }
         
         x = 0;
-        y += lineHeight;
+        y += lineHeight * lineMaxScale;
     }
 
     auto anchorAlign = getAnchorAlignment(textAnchor);
 
     align(shaping, justify, anchorAlign.horizontalAlign, anchorAlign.verticalAlign, maxLineLength,
           lineHeight, lines.size());
-    const float height = lines.size() * lineHeight;
+    const float height = y - yOffset;
 
     // Calculate the bounding box
     shaping.top += -anchorAlign.verticalAlign * height;
@@ -322,7 +352,7 @@ void shapeLines(Shaping& shaping,
     shaping.right = shaping.left + maxLineLength;
 }
 
-const Shaping getShaping(const std::u16string& logicalInput,
+const Shaping getShaping(const TaggedString& formattedString,
                          const float maxWidth,
                          const float lineHeight,
                          const style::SymbolAnchorType textAnchor,
@@ -332,12 +362,23 @@ const Shaping getShaping(const std::u16string& logicalInput,
                          const float verticalHeight,
                          const WritingModeType writingMode,
                          BiDi& bidi,
-                         const Glyphs& glyphs) {
+                         const GlyphMap& glyphs) {
     Shaping shaping(translate.x, translate.y, writingMode);
     
-    std::vector<std::u16string> reorderedLines =
-    bidi.processText(logicalInput,
-                     determineLineBreaks(logicalInput, spacing, maxWidth, writingMode, glyphs));
+    std::vector<TaggedString> reorderedLines;
+    if (formattedString.sectionCount() == 1) {
+        auto untaggedLines = bidi.processText(formattedString.rawText(),
+                                              determineLineBreaks(formattedString, spacing, maxWidth, writingMode, glyphs));
+        for (const auto& line : untaggedLines) {
+            reorderedLines.emplace_back(line, formattedString.sectionAt(0));
+        }
+    } else {
+        auto processedLines = bidi.processStyledText(formattedString.getStyledText(),
+                                                     determineLineBreaks(formattedString, spacing, maxWidth, writingMode, glyphs));
+        for (const auto& line : processedLines) {
+            reorderedLines.emplace_back(line, formattedString.getSections());
+        }
+    }
     
     shapeLines(shaping, reorderedLines, spacing, lineHeight, textAnchor,
                textJustify, verticalHeight, writingMode, glyphs);

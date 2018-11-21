@@ -36,8 +36,14 @@ for(const subPackage of subPackages) {
     }
 
     for (const activity of activities) {
-      // strip .java from input file
-      const activityName = activity.slice(0, -5);
+      var activityName;
+      if (activity.slice(-5) === '.java') {
+        // .java file
+        activityName = activity.slice(0, -5);
+      } else {
+        // .kt file
+        activityName = activity.slice(0, -3);
+      }
 
       // create path for test file
       const filePath = testBasePath+"/"+subPackage+"/"+activityName+'Test.java';

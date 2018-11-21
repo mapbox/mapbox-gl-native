@@ -7,13 +7,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  `MGLVectorStyleLayer` is an abstract superclass for style layers whose content
- is defined by an `MGLShapeSource` or `MGLVectorSource` object.
+ is defined by an `MGLShapeSource` or `MGLVectorTileSource` object.
 
  Create instances of `MGLCircleStyleLayer`, `MGLFillStyleLayer`,
- `MGLFillExtrusionStyleLayer`, `MGLLineStyleLayer`, and `MGLSymbolStyleLayer` in
- order to use `MGLVectorStyleLayer`'s properties and methods. Do not create
- instances of `MGLVectorStyleLayer` directly, and do not create your own
- subclasses of this class.
+ `MGLFillExtrusionStyleLayer`, `MGLHeatmapStyleLayer`, `MGLLineStyleLayer`, and
+ `MGLSymbolStyleLayer` in order to use `MGLVectorStyleLayer`'s properties and
+ methods. Do not create instances of `MGLVectorStyleLayer` directly, and do not
+ create your own subclasses of this class.
  */
 MGL_EXPORT
 @interface MGLVectorStyleLayer : MGLForegroundStyleLayer
@@ -47,7 +47,7 @@ MGL_EXPORT
  ```swift
  let layer = MGLLineStyleLayer(identifier: "contour", source: terrain)
  layer.sourceLayerIdentifier = "contours"
- layer.predicate = NSPredicate(format: "(index == 5 || index == 10) && ele >= 1500.0")
+ layer.predicate = NSPredicate(format: "(index == 5 || index == 10) && CAST(ele, 'NSNumber') >= 1500.0")
  mapView.style?.addLayer(layer)
  ```
  */

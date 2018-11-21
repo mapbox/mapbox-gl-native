@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coordinator_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="0dp"
+        app:mapbox_uiAttribution="false" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabToggleManualLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="82dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:tint="@android:color/white"
+        app:backgroundTint="@color/accent"
+        app:layout_anchorGravity="top"
+        app:srcCompat="@drawable/ic_layers" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabManualLocationChange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:alpha="0.5"
+        android:tint="@android:color/white"
+        app:backgroundTint="@color/accent"
+        app:layout_anchorGravity="top"
+        app:srcCompat="@drawable/ic_my_location" />
+
+</android.support.design.widget.CoordinatorLayout>

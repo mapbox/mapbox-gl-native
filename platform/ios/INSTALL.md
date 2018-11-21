@@ -4,29 +4,48 @@ This document explains how to build a development version of Mapbox Maps SDK for
 
 ### Requirements
 
-The Mapbox Maps SDK for iOS is intended to run on iOS 8.0 and above on the following devices:
+The Mapbox Maps SDK for iOS is intended to run on iOS 9.0 and above on the following devices:
 
 * iPhone 4s and above (5, 5c, 5s, 6, 6 Plus, 7, 7 Plus, 8, 8 Plus, X)
 * iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2, Pro)
 * iPod touch 5th generation and above
 
-Note that 32-bit simulators (such as the iPhone 5 or iPad 2) are not supported.
+
+Note that debugging in 32-bit simulators (such as the iPhone 5 or iPad 2) is only partially supported.
 
 The Mapbox Maps SDK for iOS requires:
 
 * Xcode 9.1 or higher to compile from source
 * Xcode 8.0 or higher to integrate the compiled framework into an application
 
-### Building the SDK
+Before building, follow these steps to install prerequisites:
 
-1. [Install core dependencies](../../INSTALL.md).
-
+1. Install [Xcode](https://developer.apple.com/xcode/)
+1. Launch Xcode and install any updates
+1. Install [Homebrew](http://brew.sh)
+1. Install [Node.js](https://nodejs.org/), [CMake](https://cmake.org/), and [ccache](https://ccache.samba.org):
+   ```
+   brew install node cmake ccache
+   ```
+1. Install [xcpretty](https://github.com/supermarin/xcpretty) (optional, used for prettifying command line builds):
+   ```
+   [sudo] gem install xcpretty
+   ```
 1. Install [jazzy](https://github.com/realm/jazzy) for generating API documentation:
-
    ```
    [sudo] gem install jazzy
    ```
 
+### Building the SDK
+
+1. Clone the git repository:
+   ```
+   git clone https://github.com/mapbox/mapbox-gl-native.git
+   cd mapbox-gl-native
+   ```
+   Note that this repository uses Git submodules. They'll be automatically checked out when you first run a `make` command,
+   but are not updated automatically. We recommended that you run `git submodule update` after pulling down new commits to
+   this repository.
 1. Run `make iframework BUILDTYPE=Release`. The packaging script will produce a `build/ios/pkg/` folder containing:
   - a `dynamic` folder containing a dynamically-linked fat framework with debug symbols for devices and the iOS Simulator
   - a `documentation` folder with HTML API documentation
@@ -62,7 +81,7 @@ A nightly build of the dynamic framework, based on the master branch, is availab
 
 You can alternatively install the SDK as a static framework:
 
-1. Build from source using the `make ipackage` command.
+1. Build from source using the `make iframework FORMAT=static BUILDTYPE=Release` command.
 
 1. Drag the Mapbox.bundle and Mapbox.framework from the `build/ios/pkg/static/` directory into the Project navigator. In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish. Open the project editor and select your application target to verify that the following changes occurred automatically:
 
@@ -85,12 +104,14 @@ You can alternatively install the SDK as a static framework:
 
 #### CocoaPods
 
+For instructions on installing stable release versions of the Mapbox Maps SDK for iOS with CocoaPods, see [our website](https://www.mapbox.com/install/ios/cocoapods/).
+
 ##### Testing pre-releases with CocoaPods
 
-To test pre-releases and/or betas, you can reference the pre-release like so in your Podfile:
+To test pre-releases of the dynamic framework, directly specify the version in your Podfile:
 
 ```rb
-pod 'Mapbox-iOS-SDK', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/<insert branch or tag>/platform/ios/Mapbox-iOS-SDK.podspec'
+pod 'Mapbox-iOS-SDK', '~> x.x.x-alpha.1'
 ```
 
 ##### Testing nightly releases with CocoaPods
@@ -121,7 +142,11 @@ For instructions on installing stable release versions of the Mapbox Maps SDK fo
 
 ##### Testing pre-releases with Carthage
 
-Carthage currently does not support pre-release versions of binaries.
+To test pre-releases of the dynamic framework, directly specify the version in your Cartfile:
+
+```json
+binary "https://www.mapbox.com/ios-sdk/Mapbox-iOS-SDK.json" ~> x.x.x-alpha.1
+```
 
 ##### Using your own build with Carthage
 

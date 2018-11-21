@@ -16,7 +16,7 @@ public:
     using Bindings = std::map<std::string, std::shared_ptr<Expression>>;
     
     Let(Bindings bindings_, std::unique_ptr<Expression> result_) :
-        Expression(result_->getType()),
+        Expression(Kind::Let, result_->getType()),
         bindings(std::move(bindings_)),
         result(std::move(result_))
     {}
@@ -27,7 +27,8 @@ public:
     void eachChild(const std::function<void(const Expression&)>&) const override;
 
     bool operator==(const Expression& e) const override {
-        if (auto rhs = dynamic_cast<const Let*>(&e)) {
+        if (e.getKind() == Kind::Let) {
+            auto rhs = static_cast<const Let*>(&e);
             return *result == *(rhs->result);
         }
         return false;
@@ -39,6 +40,8 @@ public:
         return result.get();
     }
 
+    mbgl::Value serialize() const override;
+    std::string getOperator() const override { return "let"; }
 private:
     Bindings bindings;
     std::unique_ptr<Expression> result;
@@ -47,7 +50,7 @@ private:
 class Var : public Expression {
 public:
     Var(std::string name_, std::shared_ptr<Expression> value_) :
-        Expression(value_->getType()),
+        Expression(Kind::Var, value_->getType()),
         name(std::move(name_)),
         value(value_)
     {}
@@ -58,7 +61,8 @@ public:
     void eachChild(const std::function<void(const Expression&)>&) const override;
 
     bool operator==(const Expression& e) const override {
-        if (auto rhs = dynamic_cast<const Var*>(&e)) {
+        if (e.getKind() == Kind::Var) {
+            auto rhs = static_cast<const Var*>(&e);
             return *value == *(rhs->value);
         }
         return false;
@@ -66,6 +70,11 @@ public:
 
     std::vector<optional<Value>> possibleOutputs() const override;
 
+    mbgl::Value serialize() const override;
+    std::string getOperator() const override { return "var"; }
+    
+    const std::shared_ptr<Expression>& getBoundExpression() const { return value; }
+    
 private:
     std::string name;
     std::shared_ptr<Expression> value;

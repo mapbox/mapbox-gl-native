@@ -86,16 +86,16 @@ RenderGeoJSONSource::queryRenderedFeatures(const ScreenLineString& geometry,
                                            const TransformState& transformState,
                                            const std::vector<const RenderLayer*>& layers,
                                            const RenderedQueryOptions& options,
-                                           const CollisionIndex& collisionIndex) const {
-    return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options, collisionIndex);
+                                           const mat4& projMatrix) const {
+    return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options, projMatrix);
 }
 
 std::vector<Feature> RenderGeoJSONSource::querySourceFeatures(const SourceQueryOptions& options) const {
     return tilePyramid.querySourceFeatures(options);
 }
 
-void RenderGeoJSONSource::onLowMemory() {
-    tilePyramid.onLowMemory();
+void RenderGeoJSONSource::reduceMemoryUse() {
+    tilePyramid.reduceMemoryUse();
 }
 
 void RenderGeoJSONSource::dumpDebugLogs() const {

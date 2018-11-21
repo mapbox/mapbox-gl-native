@@ -8,9 +8,63 @@
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer_impl.hpp>
 #include <mbgl/style/layer_observer.hpp>
+#include <mbgl/style/conversion/color_ramp_property_value.hpp>
+#include <mbgl/style/conversion/constant.hpp>
+#include <mbgl/style/conversion/property_value.hpp>
+#include <mbgl/style/conversion/transition_options.hpp>
+#include <mbgl/style/conversion/json.hpp>
+#include <mbgl/style/conversion_impl.hpp>
+#include <mbgl/util/fnv_hash.hpp>
 
 namespace mbgl {
 namespace style {
+
+namespace {<%
+let layerCapabilities = {};
+let defaults = { caps: { 'Source':   'NotRequired',
+                         'Pass3D':   'NotRequired',
+                         'Layout':   'NotRequired',
+                         'Clipping': 'NotRequired'
+                 },
+                 require: function(cap) {
+                             let copy = Object.assign({}, this);
+                             copy.caps = Object.assign({}, this.caps);
+                             copy.caps[cap] = 'Required';
+                             return copy;
+                 },
+                 finalize: function() {
+                    return Object.keys(this.caps).reduce((acc, key) => {
+                        acc.push(`${key}::${this.caps[key]}`);
+                        return acc;
+                    }, []);
+                 }
+               };
+
+layerCapabilities['background']     = defaults.finalize();
+layerCapabilities['fill']           = defaults.require('Source')
+                                              .require('Layout')
+                                              .require('Clipping')
+                                              .finalize();
+layerCapabilities['fill-extrusion'] = defaults.require('Source')
+                                              .require('Pass3D')
+                                              .require('Layout')
+                                              .finalize();
+layerCapabilities['hillshade']      = defaults.require('Source')
+                                              .require('Pass3D')
+                                              .finalize();
+layerCapabilities['symbol']         = defaults.require('Source')
+                                              .require('Layout')
+                                              .finalize();
+layerCapabilities['circle']         = defaults.require('Source').finalize();
+layerCapabilities['line']           = layerCapabilities['fill'];
+layerCapabilities['heatmap']        = layerCapabilities['hillshade'];
+layerCapabilities['raster']         = layerCapabilities['circle'];
+%>
+    const LayerTypeInfo typeInfo<%- `${camelize(type)}`%>
+        {"<%- type %>",
+          <%-`${layerCapabilities[type].map(cap => `LayerTypeInfo::${cap}`).join(',\n          ')}` %>
+        };
+}  // namespace
 
 <% if (type === 'background') { -%>
 <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID)
@@ -52,62 +106,8 @@ void <%- camelize(type) %>Layer::Impl::stringifyLayout(rapidjson::Writer<rapidjs
 }
 <% } -%>
 
-<% if (type !== 'background') { -%>
-// Source
-
-const std::string& <%- camelize(type) %>Layer::getSourceID() const {
-    return impl().source;
-}
-
-<% if (type !== 'raster' && type !== 'hillshade') { -%>
-void <%- camelize(type) %>Layer::setSourceLayer(const std::string& sourceLayer) {
-    auto impl_ = mutableImpl();
-    impl_->sourceLayer = sourceLayer;
-    baseImpl = std::move(impl_);
-}
-
-const std::string& <%- camelize(type) %>Layer::getSourceLayer() const {
-    return impl().sourceLayer;
-}
-
-// Filter
-
-void <%- camelize(type) %>Layer::setFilter(const Filter& filter) {
-    auto impl_ = mutableImpl();
-    impl_->filter = filter;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-const Filter& <%- camelize(type) %>Layer::getFilter() const {
-    return impl().filter;
-}
-<% } -%>
-<% } -%>
-
-// Visibility
-
-void <%- camelize(type) %>Layer::setVisibility(VisibilityType value) {
-    if (value == getVisibility())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->visibility = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-// Zoom range
-
-void <%- camelize(type) %>Layer::setMinZoom(float minZoom) {
-    auto impl_ = mutableImpl();
-    impl_->minZoom = minZoom;
-    baseImpl = std::move(impl_);
-}
-
-void <%- camelize(type) %>Layer::setMaxZoom(float maxZoom) {
-    auto impl_ = mutableImpl();
-    impl_->maxZoom = maxZoom;
-    baseImpl = std::move(impl_);
+const LayerTypeInfo* <%- camelize(type) %>Layer::Impl::getTypeInfo() const noexcept {
+    return &typeInfo<%- camelize(type) %>;
 }
 
 // Layout properties
@@ -134,7 +134,13 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyV
 // Paint properties
 <% for (const property of paintProperties) { %>
 <%- propertyValueType(property) %> <%- camelize(type) %>Layer::getDefault<%- camelize(property.name) %>() {
+<% if (property.name === 'heatmap-color') { -%>
+    conversion::Error error;
+    std::string rawValue = R"JSON(<%- JSON.stringify(property.default) %>)JSON";
+    return *conversion::convertJSON<<%- propertyValueType(property)%>>(rawValue, error);
+<% } else { -%>
     return { <%- defaultValue(property) %> };
+<% } -%>
 }
 
 <%- propertyValueType(property) %> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
@@ -160,6 +166,178 @@ TransitionOptions <%- camelize(type) %>Layer::get<%- camelize(property.name) %>T
     return impl().paint.template get<<%- camelize(property.name) %>>().options;
 }
 <% } -%>
+
+using namespace conversion;
+
+optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& name, const Convertible& value) {
+    enum class Property {
+        Unknown,
+<% for (const property of paintProperties) { -%>
+        <%- camelize(property.name) %>,
+<% } -%>
+<% for (const property of paintProperties) { -%>
+        <%- camelize(property.name) %>Transition,
+<% } -%>
+    };
+
+    Property property = Property::Unknown;
+    switch (util::hashFNV1a(name.c_str())) {
+    <% for (const property of paintProperties) { -%>
+case util::hashFNV1a("<%- property.name %>"):
+        if (name == "<%- property.name %>") {
+            property = Property::<%- camelize(property.name) %>;
+        }
+        break;
+    case util::hashFNV1a("<%- property.name %>-transition"):
+        if (name == "<%- property.name %>-transition") {
+            property = Property::<%- camelize(property.name) %>Transition;
+        }
+        break;
+    <% } %>
+    }
+
+    if (property == Property::Unknown) {
+        return Error { "layer doesn't support this property" };
+    }
+
+    <%
+        const paintConversions = {};
+        for (const property of paintProperties) {
+            const dataDriven = property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
+            const convertTokens = property.name === 'icon-image' || property.name === 'text-field';
+            const conversion = `optional<${propertyValueType(property)}> typedValue = convert<${propertyValueType(property)}>(value, error, ${dataDriven}, ${convertTokens})`;
+            paintConversions[conversion] = paintConversions[conversion] || [];
+            paintConversions[conversion].push(property);
+        }
+    -%>
+    <% for (const key in paintConversions) {
+        const properties = paintConversions[key];
+    %>
+    if (<%- properties.map(p => `property == Property::${camelize(p.name)}`).join(' || ') %>) {
+        Error error;
+        <%- key %>;
+        if (!typedValue) {
+            return error;
+        }
+        <% if (properties.length == 1) { %>
+        set<%- camelize(properties[0].name) %>(*typedValue);
+        return nullopt;
+        <% } else for (const property of properties) { %>
+        if (property == Property::<%- camelize(property.name) %>) {
+            set<%- camelize(property.name) %>(*typedValue);
+            return nullopt;
+        }
+        <% } %>
+    }
+    <% } %>
+
+    Error error;
+    optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+    if (!transition) {
+        return error;
+    }
+    <% for (const property of paintProperties) { %>
+    if (property == Property::<%- camelize(property.name) %>Transition) {
+        set<%- camelize(property.name) %>Transition(*transition);
+        return nullopt;
+    }
+    <% } %>
+
+    return Error { "layer doesn't support this property" };
+}
+
+optional<Error> <%- camelize(type) %>Layer::setLayoutProperty(const std::string& name, const Convertible& value) {
+    if (name == "visibility") {
+        return Layer::setVisibility(value);
+    }
+
+    enum class Property {
+        Unknown,
+<% for (const property of layoutProperties) { -%>
+        <%- camelize(property.name) %>,
+<% } -%>
+    };
+
+    Property property = Property::Unknown;
+    switch (util::hashFNV1a(name.c_str())) {
+    <% for (const property of layoutProperties) { %>
+    case util::hashFNV1a("<%- property.name %>"):
+        if (name == "<%- property.name %>") {
+            property = Property::<%- camelize(property.name) %>;
+        }
+        break;
+    <% } %>
+    }
+
+    if (property == Property::Unknown) {
+        return Error { "layer doesn't support this property" };
+    }
+
+    <%
+        const layoutConversions = {};
+        for (const property of layoutProperties) {
+            const dataDriven = property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
+            const convertTokens = property.name === 'icon-image' || property.name === 'text-field';
+            const conversion = `optional<${propertyValueType(property)}> typedValue = convert<${propertyValueType(property)}>(value, error, ${dataDriven}, ${convertTokens})`;
+            layoutConversions[conversion] = layoutConversions[conversion] || [];
+            layoutConversions[conversion].push(property);
+        }
+    -%>
+    <% for (const key in layoutConversions) {
+        const properties = layoutConversions[key];
+    %>
+    if (<%- properties.map(p => `property == Property::${camelize(p.name)}`).join(' || ') %>) {
+        Error error;
+        <%- key %>;
+        if (!typedValue) {
+            return error;
+        }
+        <% if (properties.length == 1) { %>
+        set<%- camelize(properties[0].name) %>(*typedValue);
+        return nullopt;
+        <% } else for (const property of properties) { %>
+        if (property == Property::<%- camelize(property.name) %>) {
+            set<%- camelize(property.name) %>(*typedValue);
+            return nullopt;
+        }
+        <% } %>
+    }
+    <% } %>
+
+    return Error { "layer doesn't support this property" };
+}
+
+Mutable<Layer::Impl> <%- camelize(type) %>Layer::mutableBaseImpl() const {
+    return staticMutableCast<Layer::Impl>(mutableImpl());
+}
+
+<%- camelize(type) %>LayerFactory::<%- camelize(type) %>LayerFactory() = default;
+
+<%- camelize(type) %>LayerFactory::~<%- camelize(type) %>LayerFactory() = default;
+
+const LayerTypeInfo* <%- camelize(type) %>LayerFactory::getTypeInfo() const noexcept {
+    return &typeInfo<%- camelize(type) %>;
+}
+
+std::unique_ptr<style::Layer> <%- camelize(type) %>LayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
+<% if (type === 'background') { -%>
+    (void)value;
+    return std::unique_ptr<style::Layer>(new <%- camelize(type) %>Layer(id));
+<% } else { -%>
+    optional<std::string> source = getSource(value);
+    if (!source) {
+        return nullptr;
+    }
+
+    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new <%- camelize(type) %>Layer(id, *source));
+<% if (type !== 'raster' && type !== 'hillshade') { -%>
+    if (!initSourceLayerAndFilter(layer.get(), value)) {
+        return nullptr;
+    }
+<% } -%>
+    return layer;
+<% } -%>
+}
 
 } // namespace style
 } // namespace mbgl

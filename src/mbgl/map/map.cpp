@@ -44,7 +44,8 @@ public:
          Scheduler&,
          MapMode,
          ConstrainMode,
-         ViewportMode);
+         ViewportMode,
+         bool);
 
     ~Impl();
 
@@ -73,6 +74,7 @@ public:
 
     const MapMode mode;
     const float pixelRatio;
+    const bool crossSourceCollisions;
 
     MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
 
@@ -96,7 +98,8 @@ Map::Map(RendererFrontend& rendererFrontend,
          Scheduler& scheduler,
          MapMode mapMode,
          ConstrainMode constrainMode,
-         ViewportMode viewportMode)
+         ViewportMode viewportMode,
+         bool crossSourceCollisions)
     : impl(std::make_unique<Impl>(*this,
                                   rendererFrontend,
                                   mapObserver,
@@ -105,7 +108,8 @@ Map::Map(RendererFrontend& rendererFrontend,
                                   scheduler,
                                   mapMode,
                                   constrainMode,
-                                  viewportMode)) {
+                                  viewportMode,
+                                  crossSourceCollisions)) {
     impl->transform.resize(size);
 }
 
@@ -117,7 +121,8 @@ Map::Impl::Impl(Map& map_,
                 Scheduler& scheduler_,
                 MapMode mode_,
                 ConstrainMode constrainMode_,
-                ViewportMode viewportMode_)
+                ViewportMode viewportMode_,
+                bool crossSourceCollisions_)
     : map(map_),
       observer(mapObserver),
       rendererFrontend(frontend),
@@ -128,6 +133,7 @@ Map::Impl::Impl(Map& map_,
                 viewportMode_),
       mode(mode_),
       pixelRatio(pixelRatio_),
+      crossSourceCollisions(crossSourceCollisions_),
       style(std::make_unique<Style>(scheduler, fileSource, pixelRatio)),
       annotationManager(*style) {
 
@@ -364,13 +370,13 @@ void Map::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& pad
     impl->onUpdate();
 }
 
-CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeInsets& padding, optional<double> bearing) const {
+CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeInsets& padding, optional<double> bearing, optional<double> pitch) const {
     return cameraForLatLngs({
         bounds.northwest(),
         bounds.southwest(),
         bounds.southeast(),
         bounds.northeast(),
-    }, padding, bearing);
+    }, padding, bearing, pitch);
 }
 
 CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transform& transform, const EdgeInsets& padding) {
@@ -426,27 +432,37 @@ CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transfo
     return options;
 }
 
-CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const EdgeInsets& padding, optional<double> bearing) const {
-    if(bearing) {
-        double angle = -*bearing * util::DEG2RAD;  // Convert to radians
-        Transform transform(impl->transform.getState());
-        transform.setAngle(angle);
-        CameraOptions options = mbgl::cameraForLatLngs(latLngs, transform, padding);
-        options.angle = angle;
-        return options;
-    } else {
+CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const EdgeInsets& padding, optional<double> bearing, optional<double> pitch) const {
+    
+    if (!bearing && !pitch) {
         return mbgl::cameraForLatLngs(latLngs, impl->transform, padding);
     }
+    
+    Transform transform(impl->transform.getState());
+    
+    if (bearing) {
+        double angle = -*bearing * util::DEG2RAD; // Convert to radians
+        transform.setAngle(angle);
+    }
+    if (pitch) {
+        double pitchAsRadian = *pitch * util::DEG2RAD; // Convert to radians
+        transform.setPitch(pitchAsRadian);
+    }
+    
+    CameraOptions options = mbgl::cameraForLatLngs(latLngs, transform, padding);
+    options.angle = -transform.getAngle() * util::RAD2DEG;
+    options.pitch = transform.getPitch() * util::RAD2DEG;
+    
+    return options;
 }
 
-CameraOptions Map::cameraForGeometry(const Geometry<double>& geometry, const EdgeInsets& padding, optional<double> bearing) const {
+CameraOptions Map::cameraForGeometry(const Geometry<double>& geometry, const EdgeInsets& padding, optional<double> bearing, optional<double> pitch) const {
 
     std::vector<LatLng> latLngs;
     forEachPoint(geometry, [&](const Point<double>& pt) {
         latLngs.push_back({ pt.y, pt.x });
     });
-    return cameraForLatLngs(latLngs, padding, bearing);
-
+    return cameraForLatLngs(latLngs, padding, bearing, pitch);
 }
 
 LatLngBounds Map::latLngBoundsForCamera(const CameraOptions& camera) const {
@@ -748,6 +764,11 @@ void Map::Impl::onInvalidate() {
 }
 
 void Map::Impl::onUpdate() {
+    // Don't load/render anything in still mode until explicitly requested.
+    if (mode != MapMode::Continuous && !stillImageRequest) {
+        return;
+    }
+    
     TimePoint timePoint = mode == MapMode::Continuous ? Clock::now() : Clock::time_point::max();
 
     transform.updateTransitions(timePoint);
@@ -768,7 +789,8 @@ void Map::Impl::onUpdate() {
         style->impl->getLayerImpls(),
         annotationManager,
         prefetchZoomDelta,
-        bool(stillImageRequest)
+        bool(stillImageRequest),
+        crossSourceCollisions
     };
 
     rendererFrontend.update(std::make_shared<UpdateParameters>(std::move(params)));
