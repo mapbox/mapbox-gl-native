@@ -79,6 +79,10 @@ public:
     std::map<std::string, std::pair<
         SymbolIconProgram::PaintPropertyBinders,
         SymbolSDFTextProgram::PaintPropertyBinders>> paintPropertyBinders;
+    
+    std::map<std::string, std::pair<
+        SymbolIconProgram::PaintPropertyBinders::Bitset,
+        SymbolSDFTextProgram::PaintPropertyBinders::Bitset>> paintPropertyBitsets;
 
     std::unique_ptr<SymbolSizeBinder> textSizeBinder;
 

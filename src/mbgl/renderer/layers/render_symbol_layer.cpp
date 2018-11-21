@@ -110,9 +110,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          const auto& symbolSizeBinder,
                          const SymbolPropertyValues& values_,
                          const auto& binders,
-                         const auto& paintProperties)
+                         const auto& paintProperties,
+                         const auto& paintPropertyBitset)
         {
-            auto& programInstance = program.get(paintProperties);
+            auto& programInstance = program.get(paintProperties, paintPropertyBitset);
 
             const auto allUniformValues = programInstance.computeAllUniformValues(
                 std::move(uniformValues),
@@ -187,7 +188,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          bucket.iconSizeBinder,
                          values,
                          bucket.paintPropertyBinders.at(getID()).first,
-                         paintPropertyValues);
+                         paintPropertyValues,
+                         bucket.paintPropertyBitsets.at(getID()).first);
                 }
 
                 if (values.hasFill) {
@@ -197,7 +199,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          bucket.iconSizeBinder,
                          values,
                          bucket.paintPropertyBinders.at(getID()).first,
-                         paintPropertyValues);
+                         paintPropertyValues,
+                         bucket.paintPropertyBitsets.at(getID()).first);
                 }
             } else {
                 draw(parameters.programs.symbolIcon,
@@ -206,7 +209,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                      bucket.iconSizeBinder,
                      values,
                      bucket.paintPropertyBinders.at(getID()).first,
-                     paintPropertyValues);
+                     paintPropertyValues,
+                     bucket.paintPropertyBitsets.at(getID()).first);
             }
         }
 
@@ -240,7 +244,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                      bucket.textSizeBinder,
                      values,
                      bucket.paintPropertyBinders.at(getID()).second,
-                     paintPropertyValues);
+                     paintPropertyValues,
+                     bucket.paintPropertyBitsets.at(getID()).second);
             }
 
             if (values.hasFill) {
@@ -250,7 +255,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                      bucket.textSizeBinder,
                      values,
                      bucket.paintPropertyBinders.at(getID()).second,
-                     paintPropertyValues);
+                     paintPropertyValues,
+                     bucket.paintPropertyBitsets.at(getID()).second);
             }
         }
 

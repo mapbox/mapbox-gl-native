@@ -38,6 +38,14 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
                 std::piecewise_construct,
                 std::forward_as_tuple(pair.second.first, zoom),
                 std::forward_as_tuple(pair.second.second, zoom)));
+        
+        paintPropertyBitsets.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(pair.first),
+            std::forward_as_tuple(
+                std::piecewise_construct,
+                std::forward_as_tuple(SymbolIconProgram::PaintPropertyBinders::constants(pair.second.first)),
+                std::forward_as_tuple(SymbolSDFTextProgram::PaintPropertyBinders::constants(pair.second.second))));
     }
 }
 

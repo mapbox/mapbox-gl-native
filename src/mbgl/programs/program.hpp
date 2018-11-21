@@ -115,8 +115,10 @@ public:
           parameters(std::move(parameters_)) {
     }
 
-    Program& get(const typename PaintProperties::PossiblyEvaluated& currentProperties) {
-        Bitset bits = PaintPropertyBinders::constants(currentProperties);
+    Program& get(const typename PaintProperties::PossiblyEvaluated& currentProperties, const optional<Bitset>& bucketConstants = {}) {
+        // PaintProperties may have changed since the bucket was generated.
+        // If so, and we have the old program loaded, use it until the bucket updates.
+        Bitset bits = bucketConstants ? *bucketConstants : PaintPropertyBinders::constants(currentProperties);
         auto it = programs.find(bits);
         if (it != programs.end()) {
             return it->second;
