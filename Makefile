@@ -70,7 +70,8 @@ MACOS_COMPDB_PATH = $(MACOS_OUTPUT_PATH)/compdb/$(BUILDTYPE)
 MACOS_XCODEBUILD = xcodebuild \
 	-derivedDataPath $(MACOS_OUTPUT_PATH) \
 	-configuration $(BUILDTYPE) \
-	-workspace $(MACOS_WORK_PATH)
+	-workspace $(MACOS_WORK_PATH) \
+	-jobs $(JOBS)
 
 ifneq ($(CI),)
 	MACOS_XCODEBUILD += -xcconfig platform/darwin/ci.xcconfig
@@ -209,7 +210,8 @@ IOS_XCODEBUILD_SIM = xcodebuild \
 	-derivedDataPath $(IOS_OUTPUT_PATH) \
 	-configuration $(BUILDTYPE) -sdk iphonesimulator \
 	-destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
-	-workspace $(IOS_WORK_PATH)
+	-workspace $(IOS_WORK_PATH) \
+	-jobs $(JOBS)
 
 ifneq ($(CI),)
 	IOS_XCODEBUILD_SIM += -xcconfig platform/darwin/ci.xcconfig
