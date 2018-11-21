@@ -123,10 +123,10 @@ Resource Resource::tile(const std::string& urlTemplate,
             } else if (token == "bbox-epsg-3857") {
                 return getTileBBox(x, y, z);
             } else if (token == "prefix") {
-                std::string prefix{ 2 };
-                prefix[0] = "0123456789abcdef"[x % 16];
-                prefix[1] = "0123456789abcdef"[y % 16];
-                return prefix;
+                return {{
+                    "0123456789abcdef"[x % 16],
+                    "0123456789abcdef"[y % 16],
+                }};
             } else if (token == "ratio") {
                 return std::string(pixelRatio > 1.0 ? "@2x" : "");
             } else {
