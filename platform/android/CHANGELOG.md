@@ -2,7 +2,13 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
-## 7.0.0-alpha.2
+## 7.0.0-alpha.2 - November 21, 2018
+ - Add overlay example with custom drawing using paint and canvas [#13431](https://github.com/mapbox/mapbox-gl-native/pull/13431)
+ - Use --info argument to show details during test run [#13415](https://github.com/mapbox/mapbox-gl-native/pull/13415)
+ - Add specific name logging in failure scenarios of PropertyValue [#13409](https://github.com/mapbox/mapbox-gl-native/pull/13409)
+ - Fixed constant layer filter [#13406](https://github.com/mapbox/mapbox-gl-native/pull/13406)
+ - Update map feedback URL [#13396](https://github.com/mapbox/mapbox-gl-native/pull/13396)
+ - Use locale sensitive DecimalFormat for color alpha conversion [#13393](https://github.com/mapbox/mapbox-gl-native/pull/13393)
  - Fixed `{prefix}` in tile resource URLs [#13429](https://github.com/mapbox/mapbox-gl-native/pull/13429)
 
 ## 6.7.1 - November 16, 2018
