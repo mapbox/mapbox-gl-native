@@ -79,7 +79,7 @@ platform/darwin/src/MGLDistanceFormatter.m
 # SDK/Foundation/Geometry
 platform/darwin/src/MGLAnnotation.h
 platform/darwin/src/MGLCluster.h
-platform/darwin/src/MGLCluster.m
+platform/darwin/src/MGLCluster.mm
 platform/darwin/src/MGLCluster_Private.h
 platform/darwin/src/MGLFeature.h
 platform/darwin/src/MGLFeature.mm
