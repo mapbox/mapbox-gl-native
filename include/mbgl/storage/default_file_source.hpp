@@ -85,6 +85,11 @@ public:
     void setOfflineRegionObserver(OfflineRegion&, std::unique_ptr<OfflineRegionObserver>);
 
     /*
+     * Provides additional hints when dowloading offline regions.
+     */
+    void setOfflineRegionDownloadOptions(OfflineRegion&, OfflineRegionDownloadOptions);
+
+    /*
      * Pause or resume downloading of regional resources.
      */
     void setOfflineRegionDownloadState(OfflineRegion&, OfflineRegionDownloadState);

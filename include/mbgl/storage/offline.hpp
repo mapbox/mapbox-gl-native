@@ -91,9 +91,17 @@ using OfflineRegionMetadata = std::vector<uint8_t>;
  * is currently available for offline use. To check if that is the case, use
  * `OfflineRegionStatus::complete()`.
  */
-enum class OfflineRegionDownloadState {
+enum class OfflineRegionDownloadState : bool {
     Inactive,
     Active
+};
+
+/*
+ * Provides additional hints when downloading offline regions.
+ */
+enum class OfflineRegionDownloadOptions : uint8_t {
+    DefaultOptions = 0,
+    StyleOptimizedTiles = 1 << 0
 };
 
 /*

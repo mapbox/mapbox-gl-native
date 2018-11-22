@@ -101,6 +101,7 @@ int main(int argc, char *argv[]) {
     args::ValueFlag<double> minZoomValue(argumentParser, "number", "Min zoom level", {"minZoom"});
     args::ValueFlag<double> maxZoomValue(argumentParser, "number", "Max zoom level", {"maxZoom"});
     args::ValueFlag<double> pixelRatioValue(argumentParser, "number", "Pixel ratio", {"pixelRatio"});
+    args::ValueFlag<bool> styleOptimizedTilesValue(argumentParser, "boolean", "Style optimized tiles", { "style-optimized-tiles" });
 
     try {
         argumentParser.ParseCLI(argc, argv);
@@ -128,6 +129,7 @@ int main(int argc, char *argv[]) {
     const double maxZoom = maxZoomValue ? args::get(maxZoomValue) : 15.0;
     const double pixelRatio = pixelRatioValue ? args::get(pixelRatioValue) : 1.0;
     const std::string output = outputValue ? args::get(outputValue) : "offline.db";
+    const bool styleOptimizedTiles = styleOptimizedTilesValue ? args::get(styleOptimizedTilesValue) : false;
     
     using namespace mbgl;
     
@@ -250,6 +252,9 @@ int main(int argc, char *argv[]) {
 
     std::signal(SIGINT, [] (int) { stop(); });
 
+    const auto options = styleOptimizedTiles ? OfflineRegionDownloadOptions::StyleOptimizedTiles
+                                             : OfflineRegionDownloadOptions::DefaultOptions;
+
     fileSource.createOfflineRegion(definition, metadata, [&] (mbgl::expected<OfflineRegion, std::exception_ptr> region_) {
         if (!region_) {
             std::cerr << "Error creating region: " << util::toString(region_.error()) << std::endl;
@@ -259,6 +264,7 @@ int main(int argc, char *argv[]) {
             assert(region_);
             region = std::make_unique<OfflineRegion>(std::move(*region_));
             fileSource.setOfflineRegionObserver(*region, std::make_unique<Observer>(*region, fileSource, loop, mergePath));
+            fileSource.setOfflineRegionDownloadOptions(*region, options);
             fileSource.setOfflineRegionDownloadState(*region, OfflineRegionDownloadState::Active);
         }
     });

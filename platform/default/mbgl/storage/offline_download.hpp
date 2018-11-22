@@ -32,6 +32,7 @@ public:
     ~OfflineDownload();
 
     void setObserver(std::unique_ptr<OfflineRegionObserver>);
+    void setOptions(OfflineRegionDownloadOptions);
     void setState(OfflineRegionDownloadState);
 
     OfflineRegionStatus getStatus() const;
@@ -55,6 +56,7 @@ private:
     OfflineDatabase& offlineDatabase;
     OnlineFileSource& onlineFileSource;
     OfflineRegionStatus status;
+    OfflineRegionDownloadOptions options = OfflineRegionDownloadOptions::DefaultOptions;
     std::unique_ptr<OfflineRegionObserver> observer;
 
     std::list<std::unique_ptr<AsyncRequest>> requests;
@@ -63,7 +65,7 @@ private:
     std::list<std::tuple<Resource, Response>> buffer;
 
     void queueResource(Resource);
-    void queueTiles(style::SourceType, uint16_t tileSize, const Tileset&);
+    void queueTiles(style::SourceType, uint16_t tileSize, const Tileset&, const std::string& queryExtras);
 };
 
 } // namespace mbgl

@@ -85,6 +85,12 @@ public:
         }
     }
 
+    void setRegionDownloadOptions(int64_t regionID, OfflineRegionDownloadOptions options) {
+        if (auto download = getDownload(regionID)) {
+            download.value()->setOptions(options);
+        }
+    }
+
     void setRegionDownloadState(int64_t regionID, OfflineRegionDownloadState state) {
         if (auto download = getDownload(regionID)) {
             download.value()->setState(state);
@@ -281,6 +287,10 @@ void DefaultFileSource::deleteOfflineRegion(OfflineRegion&& region, std::functio
 
 void DefaultFileSource::setOfflineRegionObserver(OfflineRegion& region, std::unique_ptr<OfflineRegionObserver> observer) {
     impl->actor().invoke(&Impl::setRegionObserver, region.getID(), std::move(observer));
+}
+
+void DefaultFileSource::setOfflineRegionDownloadOptions(OfflineRegion& region, OfflineRegionDownloadOptions options) {
+    impl->actor().invoke(&Impl::setRegionDownloadOptions, region.getID(), options);
 }
 
 void DefaultFileSource::setOfflineRegionDownloadState(OfflineRegion& region, OfflineRegionDownloadState state) {

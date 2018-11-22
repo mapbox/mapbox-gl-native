@@ -98,6 +98,10 @@ void OfflineDownload::setObserver(std::unique_ptr<OfflineRegionObserver> observe
     observer = observer_ ? std::move(observer_) : std::make_unique<OfflineRegionObserver>();
 }
 
+void OfflineDownload::setOptions(OfflineRegionDownloadOptions options_) {
+    options = options_;
+}
+
 void OfflineDownload::setState(OfflineRegionDownloadState state) {
     if (status.downloadState == state) {
         return;
@@ -219,19 +223,26 @@ void OfflineDownload::activateDownload() {
     status = OfflineRegionStatus();
     status.downloadState = OfflineRegionDownloadState::Active;
     status.requiredResourceCount++;
-    ensureResource(Resource::style(definition.match([](auto& reg){ return reg.styleURL; }), Resource::Priority::Low),
-                   [&](Response styleResponse) {
+
+    const std::string styleURL = definition.match([&](auto& reg){ return reg.styleURL; });
+    ensureResource(Resource::style(styleURL, Resource::Priority::Low),
+                   [&, styleURL](Response styleResponse) {
         status.requiredResourceCountIsPrecise = true;
 
         style::Parser parser;
         parser.parse(*styleResponse.data);
+
+        std::string queryExtras;
+        if (static_cast<uint8_t>(options) & static_cast<uint8_t>(OfflineRegionDownloadOptions::StyleOptimizedTiles)) {
+            queryExtras = "?style=" + styleURL + "@" + parser.modified;
+        }
 
         for (const auto& source : parser.sources) {
             SourceType type = source->getType();
 
             auto handleTiledSource = [&] (const variant<std::string, Tileset>& urlOrTileset, const uint16_t tileSize) {
                 if (urlOrTileset.is<Tileset>()) {
-                    queueTiles(type, tileSize, urlOrTileset.get<Tileset>());
+                    queueTiles(type, tileSize, urlOrTileset.get<Tileset>(), queryExtras);
                 } else {
                     const auto& url = urlOrTileset.get<std::string>();
                     status.requiredResourceCountIsPrecise = false;
@@ -243,7 +254,7 @@ void OfflineDownload::activateDownload() {
                         optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse.data, error);
                         if (tileset) {
                             util::mapbox::canonicalizeTileset(*tileset, url, type, tileSize);
-                            queueTiles(type, tileSize, *tileset);
+                            queueTiles(type, tileSize, *tileset, queryExtras);
 
                             requiredSourceURLs.erase(url);
                             if (requiredSourceURLs.empty()) {
@@ -358,11 +369,17 @@ void OfflineDownload::queueResource(Resource resource) {
     resourcesRemaining.push_front(std::move(resource));
 }
 
-void OfflineDownload::queueTiles(SourceType type, uint16_t tileSize, const Tileset& tileset) {
+void OfflineDownload::queueTiles(SourceType type, uint16_t tileSize, const Tileset& tileset, const std::string& queryExtras) {
+    static size_t count = 0;
+    std::string tileURL = tileset.tiles[++count % tileset.tiles.size()];
+    if (!queryExtras.empty()) {
+        tileURL.append(queryExtras);
+    }
+
     tileCover(definition, type, tileSize, tileset.zoomRange, [&](const auto& tile) {
         status.requiredResourceCount++;
         resourcesRemaining.push_back(Resource::tile(
-            tileset.tiles[0], definition.match([](auto& def) { return def.pixelRatio; }), tile.x,
+            tileURL, definition.match([](auto& def) { return def.pixelRatio; }), tile.x,
             tile.y, tile.z, tileset.scheme, Resource::Priority::Low));
     });
 }
