@@ -8,9 +8,9 @@
 
 namespace mbgl {
 
-class RasterStyleLayerPeerFactory : public LayerPeerFactory, public mbgl::style::RasterLayerFactory {
+class RasterStyleLayerPeerFactory : public LayerPeerFactory, public mbgl::RasterLayerFactory {
     // LayerPeerFactory overrides.
-    style::LayerFactory* getCoreLayerFactory() final { return this; }
+    LayerFactory* getCoreLayerFactory() final { return this; }
     virtual MGLStyleLayer* createPeer(style::Layer*) final;
 };
 

@@ -19,7 +19,7 @@ namespace mbgl {
 using namespace style;
 
 RenderFillExtrusionLayer::RenderFillExtrusionLayer(Immutable<style::FillExtrusionLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::FillExtrusion, _impl),
+    : RenderLayer(std::move(_impl)),
       unevaluated(impl().paint.untransitioned()) {
 }
 

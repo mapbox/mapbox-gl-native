@@ -13,7 +13,7 @@ namespace mbgl {
 using namespace style;
 
 RenderCustomLayer::RenderCustomLayer(Immutable<style::CustomLayer::Impl> _impl)
-    : RenderLayer(LayerType::Custom, _impl), host(_impl->host) {
+    : RenderLayer(std::move(_impl)), host(impl().host) {
     assert(BackendScope::exists());
     host->initialize();
 }

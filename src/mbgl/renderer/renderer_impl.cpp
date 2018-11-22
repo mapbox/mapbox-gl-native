@@ -164,7 +164,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     // Create render layers for newly added layers.
     for (const auto& entry : layerDiff.added) {
-        renderLayers.emplace(entry.first, RenderLayer::create(entry.second));
+        renderLayers.emplace(entry.first, LayerManager::get()->createRenderLayer(entry.second));
     }
 
     // Update render layers for changed layers.

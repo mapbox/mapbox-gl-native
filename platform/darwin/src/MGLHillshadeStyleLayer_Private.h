@@ -8,9 +8,9 @@
 
 namespace mbgl {
 
-class HillshadeStyleLayerPeerFactory : public LayerPeerFactory, public mbgl::style::HillshadeLayerFactory {
+class HillshadeStyleLayerPeerFactory : public LayerPeerFactory, public mbgl::HillshadeLayerFactory {
     // LayerPeerFactory overrides.
-    style::LayerFactory* getCoreLayerFactory() final { return this; }
+    LayerFactory* getCoreLayerFactory() final { return this; }
     virtual MGLStyleLayer* createPeer(style::Layer*) final;
 };
 

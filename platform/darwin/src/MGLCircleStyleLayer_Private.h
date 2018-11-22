@@ -8,9 +8,9 @@
 
 namespace mbgl {
 
-class CircleStyleLayerPeerFactory : public LayerPeerFactory, public mbgl::style::CircleLayerFactory {
+class CircleStyleLayerPeerFactory : public LayerPeerFactory, public mbgl::CircleLayerFactory {
     // LayerPeerFactory overrides.
-    style::LayerFactory* getCoreLayerFactory() final { return this; }
+    LayerFactory* getCoreLayerFactory() final { return this; }
     virtual MGLStyleLayer* createPeer(style::Layer*) final;
 };
 

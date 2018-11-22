@@ -14,7 +14,7 @@ namespace mbgl {
 using namespace style;
 
 RenderBackgroundLayer::RenderBackgroundLayer(Immutable<style::BackgroundLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Background, _impl),
+    : RenderLayer(std::move(_impl)),
       unevaluated(impl().paint.untransitioned()) {
 }
 

@@ -17,7 +17,7 @@ namespace mbgl {
 using namespace style;
 
 RenderFillLayer::RenderFillLayer(Immutable<style::FillLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Fill, _impl),
+    : RenderLayer(std::move(_impl)),
       unevaluated(impl().paint.untransitioned()) {
 }
 

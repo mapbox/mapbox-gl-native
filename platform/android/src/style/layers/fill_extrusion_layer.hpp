@@ -53,7 +53,7 @@ public:
 
 }; // class FillExtrusionLayer
 
-class FillExtrusionJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::FillExtrusionLayerFactory {
+class FillExtrusionJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::FillExtrusionLayerFactory {
 public:
     ~FillExtrusionJavaLayerPeerFactory() override;
 
@@ -63,7 +63,7 @@ public:
 
     void registerNative(jni::JNIEnv&) final;
 
-    style::LayerFactory* getLayerFactory() final { return this; }
+    LayerFactory* getLayerFactory() final { return this; }
 
 };  // class FillExtrusionJavaLayerPeerFactory
 

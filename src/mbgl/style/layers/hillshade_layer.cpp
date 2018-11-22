@@ -11,21 +11,27 @@
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/fnv_hash.hpp>
 
+#include <mbgl/renderer/layers/render_hillshade_layer.hpp>
+
 namespace mbgl {
 namespace style {
 
-namespace {
-    const LayerTypeInfo typeInfoHillshade
+
+// static
+const LayerTypeInfo* HillshadeLayer::Impl::staticTypeInfo() noexcept {
+    const static LayerTypeInfo typeInfo
         {"hillshade",
           LayerTypeInfo::Source::Required,
           LayerTypeInfo::Pass3D::Required,
           LayerTypeInfo::Layout::NotRequired,
           LayerTypeInfo::Clipping::NotRequired
         };
-}  // namespace
+    return &typeInfo;
+}
+
 
 HillshadeLayer::HillshadeLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(makeMutable<Impl>(LayerType::Hillshade, layerID, sourceID)) {
+    : Layer(makeMutable<Impl>(layerID, sourceID)) {
 }
 
 HillshadeLayer::HillshadeLayer(Immutable<Impl> impl_)
@@ -50,10 +56,6 @@ std::unique_ptr<Layer> HillshadeLayer::cloneRef(const std::string& id_) const {
 }
 
 void HillshadeLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
-}
-
-const LayerTypeInfo* HillshadeLayer::Impl::getTypeInfo() const noexcept {
-    return &typeInfoHillshade;
 }
 
 // Layout properties
@@ -435,23 +437,25 @@ Mutable<Layer::Impl> HillshadeLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-HillshadeLayerFactory::HillshadeLayerFactory() = default;
+} // namespace style
 
-HillshadeLayerFactory::~HillshadeLayerFactory() = default;
-
-const LayerTypeInfo* HillshadeLayerFactory::getTypeInfo() const noexcept {
-    return &typeInfoHillshade;
+const style::LayerTypeInfo* HillshadeLayerFactory::getTypeInfo() const noexcept {
+    return style::HillshadeLayer::Impl::staticTypeInfo();
 }
 
-std::unique_ptr<style::Layer> HillshadeLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
+std::unique_ptr<style::Layer> HillshadeLayerFactory::createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept {
     optional<std::string> source = getSource(value);
     if (!source) {
         return nullptr;
     }
 
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new HillshadeLayer(id, *source));
+    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::HillshadeLayer(id, *source));
     return layer;
 }
 
-} // namespace style
+std::unique_ptr<RenderLayer> HillshadeLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
+    assert(impl->getTypeInfo() == getTypeInfo());
+    return std::make_unique<RenderHillshadeLayer>(staticImmutableCast<style::HillshadeLayer::Impl>(std::move(impl)));
+}
+
 } // namespace mbgl

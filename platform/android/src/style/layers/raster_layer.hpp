@@ -55,7 +55,7 @@ public:
 
 }; // class RasterLayer
 
-class RasterJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::RasterLayerFactory {
+class RasterJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::RasterLayerFactory {
 public:
     ~RasterJavaLayerPeerFactory() override;
 
@@ -65,7 +65,7 @@ public:
 
     void registerNative(jni::JNIEnv&) final;
 
-    style::LayerFactory* getLayerFactory() final { return this; }
+    LayerFactory* getLayerFactory() final { return this; }
 
 };  // class RasterJavaLayerPeerFactory
 

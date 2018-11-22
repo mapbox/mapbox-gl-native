@@ -75,7 +75,7 @@ public:
 
 }; // class LineLayer
 
-class LineJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::LineLayerFactory {
+class LineJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::LineLayerFactory {
 public:
     ~LineJavaLayerPeerFactory() override;
 
@@ -85,7 +85,7 @@ public:
 
     void registerNative(jni::JNIEnv&) final;
 
-    style::LayerFactory* getLayerFactory() final { return this; }
+    LayerFactory* getLayerFactory() final { return this; }
 
 };  // class LineJavaLayerPeerFactory
 

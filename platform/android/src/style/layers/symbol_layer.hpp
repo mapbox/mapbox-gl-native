@@ -153,7 +153,7 @@ public:
 
 }; // class SymbolLayer
 
-class SymbolJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::SymbolLayerFactory {
+class SymbolJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::SymbolLayerFactory {
 public:
     ~SymbolJavaLayerPeerFactory() override;
 
@@ -163,7 +163,7 @@ public:
 
     void registerNative(jni::JNIEnv&) final;
 
-    style::LayerFactory* getLayerFactory() final { return this; }
+    LayerFactory* getLayerFactory() final { return this; }
 
 };  // class SymbolJavaLayerPeerFactory
 

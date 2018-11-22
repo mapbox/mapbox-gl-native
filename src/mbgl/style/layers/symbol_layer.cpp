@@ -11,21 +11,27 @@
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/fnv_hash.hpp>
 
+#include <mbgl/renderer/layers/render_symbol_layer.hpp>
+
 namespace mbgl {
 namespace style {
 
-namespace {
-    const LayerTypeInfo typeInfoSymbol
+
+// static
+const LayerTypeInfo* SymbolLayer::Impl::staticTypeInfo() noexcept {
+    const static LayerTypeInfo typeInfo
         {"symbol",
           LayerTypeInfo::Source::Required,
           LayerTypeInfo::Pass3D::NotRequired,
           LayerTypeInfo::Layout::Required,
           LayerTypeInfo::Clipping::NotRequired
         };
-}  // namespace
+    return &typeInfo;
+}
+
 
 SymbolLayer::SymbolLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(makeMutable<Impl>(LayerType::Symbol, layerID, sourceID)) {
+    : Layer(makeMutable<Impl>(layerID, sourceID)) {
 }
 
 SymbolLayer::SymbolLayer(Immutable<Impl> impl_)
@@ -51,10 +57,6 @@ std::unique_ptr<Layer> SymbolLayer::cloneRef(const std::string& id_) const {
 
 void SymbolLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>& writer) const {
     layout.stringify(writer);
-}
-
-const LayerTypeInfo* SymbolLayer::Impl::getTypeInfo() const noexcept {
-    return &typeInfoSymbol;
 }
 
 // Layout properties
@@ -1992,26 +1994,28 @@ Mutable<Layer::Impl> SymbolLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-SymbolLayerFactory::SymbolLayerFactory() = default;
+} // namespace style
 
-SymbolLayerFactory::~SymbolLayerFactory() = default;
-
-const LayerTypeInfo* SymbolLayerFactory::getTypeInfo() const noexcept {
-    return &typeInfoSymbol;
+const style::LayerTypeInfo* SymbolLayerFactory::getTypeInfo() const noexcept {
+    return style::SymbolLayer::Impl::staticTypeInfo();
 }
 
-std::unique_ptr<style::Layer> SymbolLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
+std::unique_ptr<style::Layer> SymbolLayerFactory::createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept {
     optional<std::string> source = getSource(value);
     if (!source) {
         return nullptr;
     }
 
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new SymbolLayer(id, *source));
+    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::SymbolLayer(id, *source));
     if (!initSourceLayerAndFilter(layer.get(), value)) {
         return nullptr;
     }
     return layer;
 }
 
-} // namespace style
+std::unique_ptr<RenderLayer> SymbolLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
+    assert(impl->getTypeInfo() == getTypeInfo());
+    return std::make_unique<RenderSymbolLayer>(staticImmutableCast<style::SymbolLayer::Impl>(std::move(impl)));
+}
+
 } // namespace mbgl

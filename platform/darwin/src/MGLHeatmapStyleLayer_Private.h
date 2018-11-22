@@ -8,9 +8,9 @@
 
 namespace mbgl {
 
-class HeatmapStyleLayerPeerFactory : public LayerPeerFactory, public mbgl::style::HeatmapLayerFactory {
+class HeatmapStyleLayerPeerFactory : public LayerPeerFactory, public mbgl::HeatmapLayerFactory {
     // LayerPeerFactory overrides.
-    style::LayerFactory* getCoreLayerFactory() final { return this; }
+    LayerFactory* getCoreLayerFactory() final { return this; }
     virtual MGLStyleLayer* createPeer(style::Layer*) final;
 };
 

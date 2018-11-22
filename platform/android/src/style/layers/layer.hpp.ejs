@@ -43,7 +43,7 @@ public:
 
 }; // class <%- camelize(type) %>Layer
 
-class <%- camelize(type) %>JavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::<%- camelize(type) %>LayerFactory {
+class <%- camelize(type) %>JavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::<%- camelize(type) %>LayerFactory {
 public:
     ~<%- camelize(type) %>JavaLayerPeerFactory() override;
 
@@ -53,7 +53,7 @@ public:
 
     void registerNative(jni::JNIEnv&) final;
 
-    style::LayerFactory* getLayerFactory() final { return this; }
+    LayerFactory* getLayerFactory() final { return this; }
 
 };  // class <%- camelize(type) %>JavaLayerPeerFactory
 

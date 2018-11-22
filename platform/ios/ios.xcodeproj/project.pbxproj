@@ -3770,6 +3770,10 @@
 					"$(geometry_cflags)",
 					"$(geojson_cflags)",
 				);
+                                OTHER_LDFLAGS = (
+                                        "$(mbgl_core_LINK_LIBRARIES)",
+                                        "$(mbgl_filesource_LINK_LIBRARIES)",
+                                );
 				OTHER_SWIFT_FLAGS = "-warnings-as-errors";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3797,6 +3801,10 @@
 					"$(geometry_cflags)",
 					"$(geojson_cflags)",
 				);
+                                OTHER_LDFLAGS = (
+                                        "$(mbgl_core_LINK_LIBRARIES)",
+                                        "$(mbgl_filesource_LINK_LIBRARIES)",
+                                );
 				OTHER_SWIFT_FLAGS = "-warnings-as-errors";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";

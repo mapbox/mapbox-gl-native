@@ -6,7 +6,7 @@ namespace mbgl {
 namespace style {
 
 bool SymbolLayer::Impl::hasLayoutDifference(const Layer::Impl& other) const {
-    assert(other.type == LayerType::Symbol);
+    assert(other.getTypeInfo() == getTypeInfo());
     const auto& impl = static_cast<const style::SymbolLayer::Impl&>(other);
     return filter     != impl.filter ||
            visibility != impl.visibility ||

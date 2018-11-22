@@ -5,6 +5,8 @@
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion_impl.hpp>
 
+#include <mbgl/renderer/render_layer.hpp>
+
 namespace mbgl {
 namespace style {
 
@@ -16,10 +18,6 @@ Layer::Layer(Immutable<Impl> impl)
 }
 
 Layer::~Layer() = default;
-
-LayerType Layer::getType() const {
-    return baseImpl->type;
-}
 
 std::string Layer::getID() const {
     return baseImpl->id;
@@ -111,7 +109,9 @@ const LayerTypeInfo* Layer::getTypeInfo() const noexcept {
     return baseImpl->getTypeInfo();
 }
 
-optional<std::string> LayerFactory::getSource(const conversion::Convertible& value) const noexcept {
+} // namespace style
+
+optional<std::string> LayerFactory::getSource(const style::conversion::Convertible& value) const noexcept {
     auto sourceValue = objectMember(value, "source");
     if (!sourceValue) {
         return nullopt;
@@ -125,7 +125,7 @@ optional<std::string> LayerFactory::getSource(const conversion::Convertible& val
     return source;
 }
 
-bool LayerFactory::initSourceLayerAndFilter(Layer* layer, const conversion::Convertible& value) const noexcept {
+bool LayerFactory::initSourceLayerAndFilter(style::Layer* layer, const style::conversion::Convertible& value) const noexcept {
     auto sourceLayerValue = objectMember(value, "source-layer");
     if (sourceLayerValue) {
         optional<std::string> sourceLayer = toString(*sourceLayerValue);
@@ -137,8 +137,8 @@ bool LayerFactory::initSourceLayerAndFilter(Layer* layer, const conversion::Conv
 
     auto filterValue = objectMember(value, "filter");
     if (filterValue) {
-        conversion::Error error;
-        optional<Filter> filter = conversion::convert<Filter>(*filterValue, error);
+        style::conversion::Error error;
+        optional<style::Filter> filter = style::conversion::convert<style::Filter>(*filterValue, error);
         if (!filter) {
             return false;
         }
@@ -148,5 +148,25 @@ bool LayerFactory::initSourceLayerAndFilter(Layer* layer, const conversion::Conv
     return true;
 }
 
-} // namespace style
+std::unique_ptr<style::Layer> LayerManager::createLayer(
+    const std::string& type, const std::string& id,
+    const style::conversion::Convertible& value, style::conversion::Error& error) noexcept {
+    if (LayerFactory* factory = getFactory(type)) {
+        auto layer = factory->createLayer(id, value);
+        if (!layer) {
+            error.message = "Error parsing a layer of type: " + type;
+        }
+        return layer;
+    }
+    error.message = "Unsupported layer type: " + type;
+    return nullptr;
+}
+
+std::unique_ptr<RenderLayer> LayerManager::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
+    LayerFactory* factory = getFactory(impl->getTypeInfo());
+    assert(factory);
+    return factory->createRenderLayer(std::move(impl));
+}
+
+
 } // namespace mbgl

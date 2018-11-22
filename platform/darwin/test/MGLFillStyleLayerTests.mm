@@ -43,7 +43,7 @@
 
     MGLFillStyleLayer *layer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     XCTAssertNotEqual(layer.rawLayer, nullptr);
-    XCTAssertEqual(layer.rawLayer->getType(), mbgl::style::LayerType::Fill);
+    XCTAssertEqualObjects(@(layer.rawLayer->getTypeInfo()->type), @"fill");
     auto rawLayer = static_cast<mbgl::style::FillLayer*>(layer.rawLayer);
 
     MGLTransition transitionTest = MGLTransitionMake(5, 4);

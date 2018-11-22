@@ -43,7 +43,7 @@
 
     MGLLineStyleLayer *layer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     XCTAssertNotEqual(layer.rawLayer, nullptr);
-    XCTAssertEqual(layer.rawLayer->getType(), mbgl::style::LayerType::Line);
+    XCTAssertEqualObjects(@(layer.rawLayer->getTypeInfo()->type), @"line");
     auto rawLayer = static_cast<mbgl::style::LineLayer*>(layer.rawLayer);
 
     MGLTransition transitionTest = MGLTransitionMake(5, 4);

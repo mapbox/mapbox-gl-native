@@ -15,7 +15,7 @@ static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vecto
     std::vector<std::unique_ptr<RenderLayer>> result;
     result.reserve(layers.size());
     for (auto& layer : layers) {
-        result.push_back(RenderLayer::create(layer->baseImpl));
+        result.push_back(LayerManager::get()->createRenderLayer(layer->baseImpl));
     }
     return result;
 }

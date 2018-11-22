@@ -74,8 +74,7 @@ public:
     Layer& operator=(const Layer&) = delete;
 
     virtual ~Layer();
-    // Note: LayerType is deprecated, do not use it.
-    LayerType getType() const;
+
     std::string getID() const;
     // Source
     std::string getSourceID() const;
@@ -126,6 +125,10 @@ protected:
     LayerObserver* observer;
 };
 
+} // namespace style
+
+class RenderLayer;
+// TODO: The following classes shall not be here. Move layer factories and manager to a dedicated folder.
 
 /**
  * @brief The LayerFactory abstract class
@@ -136,17 +139,19 @@ class LayerFactory {
 public:
     virtual ~LayerFactory() = default;
     /// Returns the layer type data.
-    virtual const LayerTypeInfo* getTypeInfo() const noexcept = 0;
+    virtual const style::LayerTypeInfo* getTypeInfo() const noexcept = 0;
     /// Returns a new Layer instance on success call; returns `nulltptr` otherwise. 
-    virtual std::unique_ptr<Layer> createLayer(const std::string& id, const conversion::Convertible& value) = 0;
+    virtual std::unique_ptr<style::Layer> createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept = 0;
+    /// Returns a new RenderLayer instance on success call; returns `nulltptr` otherwise.
+    virtual std::unique_ptr<RenderLayer> createRenderLayer(Immutable<style::Layer::Impl>) noexcept = 0;
 
 protected:
-    optional<std::string> getSource(const conversion::Convertible& value) const noexcept;
-    bool initSourceLayerAndFilter(Layer*, const conversion::Convertible& value) const noexcept;
+    optional<std::string> getSource(const style::conversion::Convertible& value) const noexcept;
+    bool initSourceLayerAndFilter(style::Layer*, const style::conversion::Convertible& value) const noexcept;
 };
 
 /**
- * @brief A singleton class forwarding calls to the corresponding  \c LayerFactory instance.
+ * @brief A singleton class responsible for creating layer instances.
  */
 class LayerManager {
 public:
@@ -157,13 +162,16 @@ public:
      */
     static LayerManager* get() noexcept;
 
-    virtual ~LayerManager() = default;
     /// Returns a new Layer instance on success call; returns `nulltptr` otherwise.
-    virtual std::unique_ptr<Layer> createLayer(const std::string& type, const std::string& id, const conversion::Convertible& value, conversion::Error& error) noexcept = 0;
+    std::unique_ptr<style::Layer> createLayer(const std::string& type, const std::string& id,
+                                              const style::conversion::Convertible& value, style::conversion::Error& error) noexcept;
+    /// Returns a new RenderLayer instance on success call; returns `nulltptr` otherwise.
+    std::unique_ptr<RenderLayer> createRenderLayer(Immutable<style::Layer::Impl>) noexcept;
 
 protected:
-    LayerManager() = default;
+    virtual ~LayerManager() = default;
+    virtual LayerFactory* getFactory(const std::string& type) noexcept = 0;
+    virtual LayerFactory* getFactory(const style::LayerTypeInfo*) noexcept = 0;
 };
 
-} // namespace style
 } // namespace mbgl

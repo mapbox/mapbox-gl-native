@@ -51,7 +51,7 @@ public:
 
 }; // class FillLayer
 
-class FillJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::FillLayerFactory {
+class FillJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::FillLayerFactory {
 public:
     ~FillJavaLayerPeerFactory() override;
 
@@ -61,7 +61,7 @@ public:
 
     void registerNative(jni::JNIEnv&) final;
 
-    style::LayerFactory* getLayerFactory() final { return this; }
+    LayerFactory* getLayerFactory() final { return this; }
 
 };  // class FillJavaLayerPeerFactory
 

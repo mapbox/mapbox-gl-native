@@ -312,7 +312,7 @@ static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vecto
     std::vector<std::unique_ptr<RenderLayer>> renderLayers;
     renderLayers.reserve(layers.size());
     for (auto& layer : layers) {
-        renderLayers.push_back(RenderLayer::create(layer));
+        renderLayers.push_back(LayerManager::get()->createRenderLayer(layer));
 
         renderLayers.back()->transition(TransitionParameters {
             Clock::time_point::max(),

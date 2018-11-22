@@ -90,7 +90,7 @@ public:
     /**
      Get the corresponding core layer factory.
      */
-    virtual style::LayerFactory* getCoreLayerFactory() = 0;
+    virtual LayerFactory* getCoreLayerFactory() = 0;
     /**
      Creates an MGLStyleLayer instance with a raw pointer to the backing store.
      */

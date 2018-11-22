@@ -1,37 +1,36 @@
-#include <mbgl/style/layer.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
-#include <mbgl/style/layers/background_layer.hpp>
-#include <mbgl/style/layers/circle_layer.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
-#include <mbgl/style/layers/fill_extrusion_layer.hpp>
-#include <mbgl/style/layers/fill_layer.hpp>
-#include <mbgl/style/layers/heatmap_layer.hpp>
-#include <mbgl/style/layers/hillshade_layer.hpp>
-#include <mbgl/style/layers/line_layer.hpp>
-#include <mbgl/style/layers/raster_layer.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/renderer/render_layer.hpp>
+#include <mbgl/renderer/layers/render_background_layer.hpp>
+#include <mbgl/renderer/layers/render_circle_layer.hpp>
+#include <mbgl/renderer/layers/render_custom_layer.hpp>
+#include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
+#include <mbgl/renderer/layers/render_fill_layer.hpp>
+#include <mbgl/renderer/layers/render_hillshade_layer.hpp>
+#include <mbgl/renderer/layers/render_line_layer.hpp>
+#include <mbgl/renderer/layers/render_raster_layer.hpp>
+#include <mbgl/renderer/layers/render_symbol_layer.hpp>
+#include <mbgl/renderer/layers/render_heatmap_layer.hpp>
 
 #include <map>
 #include <memory>
 #include <vector>
 
 namespace mbgl {
-namespace style {
  
-class LayerManagerBase : public LayerManager {
+class LayerManagerDefault final : public LayerManager {
 public:
-    LayerManagerBase();
+    LayerManagerDefault();
 
 private:
     void addLayerType(std::unique_ptr<LayerFactory>);
     // LayerManager overrides.
-    std::unique_ptr<Layer> createLayer(const std::string& type, const std::string& id, const conversion::Convertible& value, conversion::Error& error) noexcept final;
+    LayerFactory* getFactory(const std::string& type) noexcept final;
+    LayerFactory* getFactory(const style::LayerTypeInfo*) noexcept final;
 
     std::vector<std::unique_ptr<LayerFactory>> factories;
     std::map<std::string, LayerFactory*> typeToFactory;
 };
 
-LayerManagerBase::LayerManagerBase() {
+LayerManagerDefault::LayerManagerDefault() {
     addLayerType(std::make_unique<FillLayerFactory>());
     addLayerType(std::make_unique<LineLayerFactory>());
     addLayerType(std::make_unique<CircleLayerFactory>());
@@ -44,7 +43,7 @@ LayerManagerBase::LayerManagerBase() {
     addLayerType(std::make_unique<CustomLayerFactory>());
 }
 
-void LayerManagerBase::addLayerType(std::unique_ptr<LayerFactory> factory) {
+void LayerManagerDefault::addLayerType(std::unique_ptr<LayerFactory> factory) {
     std::string type{factory->getTypeInfo()->type};
     if (!type.empty()) {
         typeToFactory.emplace(std::make_pair(std::move(type), factory.get()));
@@ -52,27 +51,26 @@ void LayerManagerBase::addLayerType(std::unique_ptr<LayerFactory> factory) {
     factories.emplace_back(std::move(factory));
 }
 
-std::unique_ptr<Layer> LayerManagerBase::createLayer(const std::string& type,
-                                                     const std::string& id,
-                                                     const conversion::Convertible& value,
-                                                     conversion::Error& error) noexcept {
-    auto search = typeToFactory.find(type);
-    if (search != typeToFactory.end()) {
-        auto layer = search->second->createLayer(id, value);
-        if (!layer) {
-            error.message = "Error parsing a layer of type: " + type;
+LayerFactory* LayerManagerDefault::getFactory(const mbgl::style::LayerTypeInfo* typeInfo) noexcept {
+    assert(typeInfo);
+    for (const auto& factory: factories) {
+        if (factory->getTypeInfo() == typeInfo) {
+            return factory.get();
         }
-        return layer;
     }
-    error.message = "Unsupported layer type: " + type;
+    assert(false);
     return nullptr;
+}
+
+LayerFactory* LayerManagerDefault::getFactory(const std::string& type) noexcept {
+    auto search = typeToFactory.find(type);
+    return (search != typeToFactory.end()) ? search->second : nullptr;
 }
 
 // static 
 LayerManager* LayerManager::get() noexcept {
-    static LayerManagerBase impl;
-    return &impl;
+    static LayerManagerDefault instance;
+    return &instance;
 }
 
-} // namespace style
 } // namespace mbgl
