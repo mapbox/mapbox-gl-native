@@ -1,3 +1,4 @@
+#import "MGLFoundation_Private.h"
 #import "MGLShapeSource_Private.h"
 
 #import "MGLStyle_Private.h"
@@ -233,7 +234,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
                                                                 range:NSMakeRange(0, description.length)];
     
     printf("%*s%s\n", (int)indent, "", log.UTF8String);
-
+    
     id<MGLCluster> cluster = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(feature, MGLCluster);
     
     if (cluster) {

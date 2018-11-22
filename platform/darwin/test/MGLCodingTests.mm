@@ -1,6 +1,7 @@
 #import <Mapbox/Mapbox.h>
 #import <XCTest/XCTest.h>
 
+#import "MGLFoundation_Private.h"
 #import "MGLCluster_Private.h"
 
 #if TARGET_OS_IPHONE

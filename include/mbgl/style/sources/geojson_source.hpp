@@ -35,8 +35,8 @@ public:
     void setGeoJSON(const GeoJSON&);
     optional<std::string> getURL() const;
 
-    mapbox::geometry::feature_collection<double> getChildren(const std::uint32_t) const;
-    mapbox::geometry::feature_collection<double> getLeaves(const std::uint32_t, const std::uint32_t, const std::uint32_t) const;
+    mapbox::feature::feature_collection<double> getChildren(const std::uint32_t) const;
+    mapbox::feature::feature_collection<double> getLeaves(const std::uint32_t, const std::uint32_t, const std::uint32_t) const;
     std::uint8_t getClusterExpansionZoom(std::uint32_t) const;
 
     class Impl;

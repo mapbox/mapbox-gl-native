@@ -1,3 +1,4 @@
+#import "MGLFoundation_Private.h"
 #import "MGLCluster_Private.h"
 #import "MGLFeature.h"
 #import <objc/runtime.h>

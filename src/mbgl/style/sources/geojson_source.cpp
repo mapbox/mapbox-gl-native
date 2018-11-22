@@ -40,11 +40,11 @@ optional<std::string> GeoJSONSource::getURL() const {
     return url;
 }
 
-mapbox::geometry::feature_collection<double> GeoJSONSource::getChildren(const std::uint32_t cluster_id) const {
+mapbox::feature::feature_collection<double> GeoJSONSource::getChildren(const std::uint32_t cluster_id) const {
     return impl().getData()->getChildren(cluster_id);
 }
 
-mapbox::geometry::feature_collection<double> GeoJSONSource::getLeaves(const std::uint32_t cluster_id,
+mapbox::feature::feature_collection<double> GeoJSONSource::getLeaves(const std::uint32_t cluster_id,
                                                            const std::uint32_t limit = 10,
                                                            const std::uint32_t offset = 0) const{
     return impl().getData()->getLeaves(cluster_id, limit, offset);

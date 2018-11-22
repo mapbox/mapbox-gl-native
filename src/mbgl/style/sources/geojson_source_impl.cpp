@@ -21,11 +21,11 @@ public:
         return impl.getTile(tileID.z, tileID.x, tileID.y).features;
     }
 
-    mapbox::geometry::feature_collection<double> getChildren(const std::uint32_t) final {
+    mapbox::feature::feature_collection<double> getChildren(const std::uint32_t) final {
         return {};
     }
 
-    mapbox::geometry::feature_collection<double> getLeaves(const std::uint32_t,
+    mapbox::feature::feature_collection<double> getLeaves(const std::uint32_t,
                                                            const std::uint32_t,
                                                            const std::uint32_t) final {
         return {};
@@ -49,11 +49,11 @@ public:
         return impl.getTile(tileID.z, tileID.x, tileID.y);
     }
 
-    mapbox::geometry::feature_collection<double> getChildren(const std::uint32_t cluster_id) final {
+    mapbox::feature::feature_collection<double> getChildren(const std::uint32_t cluster_id) final {
         return impl.getChildren(cluster_id);
     }
 
-    mapbox::geometry::feature_collection<double> getLeaves(const std::uint32_t cluster_id,
+    mapbox::feature::feature_collection<double> getLeaves(const std::uint32_t cluster_id,
                                                            const std::uint32_t limit = 10,
                                                            const std::uint32_t offset = 0) final {
         return impl.getLeaves(cluster_id, limit, offset);

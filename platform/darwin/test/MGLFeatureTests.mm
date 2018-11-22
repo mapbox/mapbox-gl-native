@@ -2,6 +2,7 @@
 #import <XCTest/XCTest.h>
 
 #import <mbgl/util/geometry.hpp>
+#import "MGLFoundation_Private.h"
 #import "../../darwin/src/MGLFeature_Private.h"
 
 @interface MGLFeatureTests : XCTestCase
