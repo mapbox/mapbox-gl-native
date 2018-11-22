@@ -75,6 +75,7 @@ public:
 
     TransitionOptions getTransitionOptions() const;
     void setTransitionOptions(const TransitionOptions&);
+    void setPersistentTransitionOptions(optional<TransitionOptions>);
 
     void setLight(std::unique_ptr<Light>);
     Light* getLight() const;
@@ -112,6 +113,7 @@ private:
     Collection<Source> sources;
     Collection<Layer> layers;
     TransitionOptions transitionOptions;
+    optional<TransitionOptions> persistentTransitionOptions;
     std::unique_ptr<Light> light;
 
     // Defaults

@@ -47,6 +47,11 @@ void Style::setTransitionOptions(const TransitionOptions& options) {
     impl->setTransitionOptions(options);
 }
 
+void Style::setPersistentTransitionOptions(optional<TransitionOptions> options) {
+    impl->mutated = true;
+    impl->setPersistentTransitionOptions(options);
+}
+
 void Style::setLight(std::unique_ptr<Light> light) {
     impl->setLight(std::move(light));
 }

@@ -43,6 +43,13 @@ TEST(Style, Properties) {
     ASSERT_EQ("", style.getName());
     ASSERT_EQ(60, *style.getDefaultCamera().pitch);
 
+    const TransitionOptions immediateOptions { { Milliseconds(0) }, { Milliseconds(0) } };
+    style.setPersistentTransitionOptions(immediateOptions);
+    style.loadJSON(R"STYLE({"transition": { "duration": 500, "delay": 50 }})STYLE");
+    ASSERT_EQ(Milliseconds(0), *style.getTransitionOptions().duration);
+    ASSERT_EQ(Milliseconds(0), *style.getTransitionOptions().delay);
+
+    style.setPersistentTransitionOptions({});
     style.loadJSON(R"STYLE({})STYLE");
     ASSERT_EQ(Milliseconds(300), *style.getTransitionOptions().duration);
     ASSERT_EQ(optional<Duration> {}, style.getTransitionOptions().delay);

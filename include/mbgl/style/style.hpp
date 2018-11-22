@@ -3,6 +3,7 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <string>
 #include <vector>
@@ -38,6 +39,9 @@ public:
     // TransitionOptions
     TransitionOptions getTransitionOptions() const;
     void setTransitionOptions(const TransitionOptions&);
+
+    // Overrides style or runtime-defined transition options. This is meant to persist between style changes.
+    void setPersistentTransitionOptions(optional<TransitionOptions>);
 
     // Light
           Light* getLight();

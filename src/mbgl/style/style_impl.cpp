@@ -130,8 +130,12 @@ void Style::Impl::setTransitionOptions(const TransitionOptions& options) {
     transitionOptions = options;
 }
 
+void Style::Impl::setPersistentTransitionOptions(optional<TransitionOptions> options) {
+    persistentTransitionOptions = options;
+}
+
 TransitionOptions Style::Impl::getTransitionOptions() const {
-    return transitionOptions;
+    return persistentTransitionOptions.value_or(transitionOptions);
 }
 
 void Style::Impl::addSource(std::unique_ptr<Source> source) {
