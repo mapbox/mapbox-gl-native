@@ -22,7 +22,7 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11)
 
-option(WITH_CXX11ABI "Use the C++11 ABI" OFF)
+option(WITH_CXX11ABI "Use the C++11 ABI" ON)
 option(WITH_COVERAGE "Enable coverage reports" OFF)
 option(WITH_OSMESA   "Use OSMesa headless backend" OFF)
 option(WITH_EGL      "Use EGL backend" OFF)
