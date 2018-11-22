@@ -23,7 +23,7 @@ namespace mbgl {
 using namespace style;
 
 RenderSymbolLayer::RenderSymbolLayer(Immutable<style::SymbolLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Symbol, _impl),
+    : RenderLayer(std::move(_impl)),
       unevaluated(impl().paint.untransitioned()) {
 }
 

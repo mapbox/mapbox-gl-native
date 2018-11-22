@@ -11,21 +11,27 @@
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/fnv_hash.hpp>
 
+#include <mbgl/renderer/layers/render_heatmap_layer.hpp>
+
 namespace mbgl {
 namespace style {
 
-namespace {
-    const LayerTypeInfo typeInfoHeatmap
+
+// static
+const LayerTypeInfo* HeatmapLayer::Impl::staticTypeInfo() noexcept {
+    const static LayerTypeInfo typeInfo
         {"heatmap",
           LayerTypeInfo::Source::Required,
           LayerTypeInfo::Pass3D::Required,
           LayerTypeInfo::Layout::NotRequired,
           LayerTypeInfo::Clipping::NotRequired
         };
-}  // namespace
+    return &typeInfo;
+}
+
 
 HeatmapLayer::HeatmapLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(makeMutable<Impl>(LayerType::Heatmap, layerID, sourceID)) {
+    : Layer(makeMutable<Impl>(layerID, sourceID)) {
 }
 
 HeatmapLayer::HeatmapLayer(Immutable<Impl> impl_)
@@ -50,10 +56,6 @@ std::unique_ptr<Layer> HeatmapLayer::cloneRef(const std::string& id_) const {
 }
 
 void HeatmapLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
-}
-
-const LayerTypeInfo* HeatmapLayer::Impl::getTypeInfo() const noexcept {
-    return &typeInfoHeatmap;
 }
 
 // Layout properties
@@ -388,26 +390,28 @@ Mutable<Layer::Impl> HeatmapLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-HeatmapLayerFactory::HeatmapLayerFactory() = default;
+} // namespace style
 
-HeatmapLayerFactory::~HeatmapLayerFactory() = default;
-
-const LayerTypeInfo* HeatmapLayerFactory::getTypeInfo() const noexcept {
-    return &typeInfoHeatmap;
+const style::LayerTypeInfo* HeatmapLayerFactory::getTypeInfo() const noexcept {
+    return style::HeatmapLayer::Impl::staticTypeInfo();
 }
 
-std::unique_ptr<style::Layer> HeatmapLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
+std::unique_ptr<style::Layer> HeatmapLayerFactory::createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept {
     optional<std::string> source = getSource(value);
     if (!source) {
         return nullptr;
     }
 
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new HeatmapLayer(id, *source));
+    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::HeatmapLayer(id, *source));
     if (!initSourceLayerAndFilter(layer.get(), value)) {
         return nullptr;
     }
     return layer;
 }
 
-} // namespace style
+std::unique_ptr<RenderLayer> HeatmapLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
+    assert(impl->getTypeInfo() == getTypeInfo());
+    return std::make_unique<RenderHeatmapLayer>(staticImmutableCast<style::HeatmapLayer::Impl>(std::move(impl)));
+}
+
 } // namespace mbgl

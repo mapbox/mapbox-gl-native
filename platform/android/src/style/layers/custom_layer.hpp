@@ -25,7 +25,7 @@ public:
 
 }; // class CustomLayer
 
-class CustomJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::CustomLayerFactory {
+class CustomJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::CustomLayerFactory {
 public:
     ~CustomJavaLayerPeerFactory() override;
 
@@ -35,7 +35,7 @@ public:
 
     void registerNative(jni::JNIEnv&) final;
 
-    style::LayerFactory* getLayerFactory() final { return this; }
+    LayerFactory* getLayerFactory() final { return this; }
 
 };  // class CustomJavaLayerPeerFactory
 

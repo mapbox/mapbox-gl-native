@@ -39,7 +39,7 @@ public:
 
 }; // class BackgroundLayer
 
-class BackgroundJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::BackgroundLayerFactory {
+class BackgroundJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::BackgroundLayerFactory {
 public:
     ~BackgroundJavaLayerPeerFactory() override;
 
@@ -49,7 +49,7 @@ public:
 
     void registerNative(jni::JNIEnv&) final;
 
-    style::LayerFactory* getLayerFactory() final { return this; }
+    LayerFactory* getLayerFactory() final { return this; }
 
 };  // class BackgroundJavaLayerPeerFactory
 

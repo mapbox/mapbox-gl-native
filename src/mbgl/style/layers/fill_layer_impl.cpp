@@ -4,7 +4,7 @@ namespace mbgl {
 namespace style {
 
 bool FillLayer::Impl::hasLayoutDifference(const Layer::Impl& other) const {
-    assert(other.type == LayerType::Fill);
+    assert(other.getTypeInfo() == getTypeInfo());
     const auto& impl = static_cast<const style::FillLayer::Impl&>(other);
     return filter     != impl.filter ||
            visibility != impl.visibility ||

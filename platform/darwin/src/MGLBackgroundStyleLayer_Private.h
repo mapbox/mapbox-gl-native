@@ -8,9 +8,9 @@
 
 namespace mbgl {
 
-class BackgroundStyleLayerPeerFactory : public LayerPeerFactory, public mbgl::style::BackgroundLayerFactory {
+class BackgroundStyleLayerPeerFactory : public LayerPeerFactory, public mbgl::BackgroundLayerFactory {
     // LayerPeerFactory overrides.
-    style::LayerFactory* getCoreLayerFactory() final { return this; }
+    LayerFactory* getCoreLayerFactory() final { return this; }
     virtual MGLStyleLayer* createPeer(style::Layer*) final;
 };
 

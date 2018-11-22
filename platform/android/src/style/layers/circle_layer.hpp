@@ -65,7 +65,7 @@ public:
 
 }; // class CircleLayer
 
-class CircleJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::CircleLayerFactory {
+class CircleJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::CircleLayerFactory {
 public:
     ~CircleJavaLayerPeerFactory() override;
 
@@ -75,7 +75,7 @@ public:
 
     void registerNative(jni::JNIEnv&) final;
 
-    style::LayerFactory* getLayerFactory() final { return this; }
+    LayerFactory* getLayerFactory() final { return this; }
 
 };  // class CircleJavaLayerPeerFactory
 

@@ -31,14 +31,9 @@ LayerManagerDarwin::LayerManagerDarwin() {
 LayerManagerDarwin::~LayerManagerDarwin() = default;
 
 MGLStyleLayer* LayerManagerDarwin::createPeer(style::Layer* layer) {
-    auto* typeInfo = layer->getTypeInfo();
-    assert(typeInfo);
-    for (const auto& factory: factories) {
-        if (factory->getCoreLayerFactory()->getTypeInfo() == typeInfo) {
-            return factory->createPeer(layer);
-        }
+    if (auto* factory = getPeerFactory(layer->getTypeInfo())) {
+        return factory->createPeer(layer);
     }
-    assert(false);
     return nullptr;
 }
 
@@ -51,20 +46,25 @@ void LayerManagerDarwin::addLayerType(std::unique_ptr<LayerPeerFactory> factory)
     factories.emplace_back(std::move(factory));
 }
 
-std::unique_ptr<style::Layer> LayerManagerDarwin::createLayer(const std::string& type,
-                                                              const std::string& id,
-                                                              const style::conversion::Convertible& value,
-                                                              style::conversion::Error& error) noexcept {
-    auto search = typeToFactory.find(type);
-    if (search != typeToFactory.end()) {
-        auto layer = search->second->createLayer(id, value);
-        if (!layer) {
-            error.message = "Error parsing a layer of type: " + type;
+LayerPeerFactory* LayerManagerDarwin::getPeerFactory(const mbgl::style::LayerTypeInfo* typeInfo) {
+    assert(typeInfo);
+    for (const auto& factory: factories) {
+        if (factory->getCoreLayerFactory()->getTypeInfo() == typeInfo) {
+            return factory.get();
         }
-        return layer;
     }
-    error.message = "Unsupported layer type: " + type;
+    assert(false);
     return nullptr;
+}
+
+LayerFactory* LayerManagerDarwin::getFactory(const std::string& type) noexcept {
+    auto search = typeToFactory.find(type);
+    return (search != typeToFactory.end()) ? search->second : nullptr;
+}
+
+LayerFactory* LayerManagerDarwin::getFactory(const mbgl::style::LayerTypeInfo* info) noexcept {
+    LayerPeerFactory* peerFactory = getPeerFactory(info);
+    return (peerFactory != nullptr) ? peerFactory->getCoreLayerFactory() : nullptr;
 }
 
 // static
@@ -73,12 +73,9 @@ LayerManagerDarwin* LayerManagerDarwin::get() noexcept {
     return &impl;
 }
 
-namespace style {
-
 // static
 LayerManager* LayerManager::get() noexcept {
     return LayerManagerDarwin::get();
 }
 
-} // namespace style
 } // namespace mbgl

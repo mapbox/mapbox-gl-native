@@ -3,6 +3,8 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/layer.hpp>
 
+#include <mbgl/renderer/render_layer.hpp>
+
 #include "layer.hpp"
 
 #include <jni/jni.hpp>
@@ -16,9 +18,9 @@ namespace android {
 /**
  * @brief A singleton class forwarding calls to the corresponding  \c JavaLayerPeerFactory instance.
  */
-class LayerManagerAndroid : public mbgl::style::LayerManager {
+class LayerManagerAndroid final : public mbgl::LayerManager {
 public:
-    ~LayerManagerAndroid() override;
+    ~LayerManagerAndroid() final;
     static LayerManagerAndroid* get() noexcept;
     
     jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&);
@@ -29,13 +31,14 @@ public:
 private:
     LayerManagerAndroid();
     void addLayerType(std::unique_ptr<JavaLayerPeerFactory>);
-    JavaLayerPeerFactory* getPeerFactory(mbgl::style::Layer*);
-    // mbgl:style::LayerManager overrides.
-    std::unique_ptr<style::Layer> createLayer(const std::string& type, const std::string& id, const style::conversion::Convertible& value, style::conversion::Error& error) noexcept final;
+    JavaLayerPeerFactory* getPeerFactory(const mbgl::style::LayerTypeInfo*);
+    // mbgl::LayerManager overrides.
+    LayerFactory* getFactory(const std::string& type) noexcept final;
+    LayerFactory* getFactory(const mbgl::style::LayerTypeInfo* info) noexcept final;
 
     std::vector<std::unique_ptr<JavaLayerPeerFactory>> factories;
-    std::map<std::string, style::LayerFactory*> typeToFactory;
+    std::map<std::string, mbgl::LayerFactory*> typeToFactory;
 };
 
-}
-}
+}  // namespace android
+}  // namespace mbgl

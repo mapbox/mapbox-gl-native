@@ -43,7 +43,7 @@ public:
 
 }; // class HeatmapLayer
 
-class HeatmapJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::HeatmapLayerFactory {
+class HeatmapJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::HeatmapLayerFactory {
 public:
     ~HeatmapJavaLayerPeerFactory() override;
 
@@ -53,7 +53,7 @@ public:
 
     void registerNative(jni::JNIEnv&) final;
 
-    style::LayerFactory* getLayerFactory() final { return this; }
+    LayerFactory* getLayerFactory() final { return this; }
 
 };  // class HeatmapJavaLayerPeerFactory
 

@@ -25,7 +25,7 @@
 
     MGLHillshadeStyleLayer *layer = [[MGLHillshadeStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     XCTAssertNotEqual(layer.rawLayer, nullptr);
-    XCTAssertEqual(layer.rawLayer->getType(), mbgl::style::LayerType::Hillshade);
+    XCTAssertEqualObjects(@(layer.rawLayer->getTypeInfo()->type), @"hillshade");
     auto rawLayer = static_cast<mbgl::style::HillshadeLayer*>(layer.rawLayer);
 
     MGLTransition transitionTest = MGLTransitionMake(5, 4);

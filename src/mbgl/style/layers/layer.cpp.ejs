@@ -16,10 +16,12 @@
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/fnv_hash.hpp>
 
+#include <mbgl/renderer/layers/render_<%- type.replace('-', '_') %>_layer.hpp>
+
 namespace mbgl {
 namespace style {
 
-namespace {<%
+<%
 let layerCapabilities = {};
 let defaults = { caps: { 'Source':   'NotRequired',
                          'Pass3D':   'NotRequired',
@@ -60,19 +62,23 @@ layerCapabilities['line']           = layerCapabilities['fill'];
 layerCapabilities['heatmap']        = layerCapabilities['hillshade'];
 layerCapabilities['raster']         = layerCapabilities['circle'];
 %>
-    const LayerTypeInfo typeInfo<%- `${camelize(type)}`%>
+// static
+const LayerTypeInfo* <%- camelize(type) %>Layer::Impl::staticTypeInfo() noexcept {
+    const static LayerTypeInfo typeInfo
         {"<%- type %>",
           <%-`${layerCapabilities[type].map(cap => `LayerTypeInfo::${cap}`).join(',\n          ')}` %>
         };
-}  // namespace
+    return &typeInfo;
+}
+
 
 <% if (type === 'background') { -%>
 <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID)
-    : Layer(makeMutable<Impl>(LayerType::<%- camelize(type) %>, layerID, std::string())) {
+    : Layer(makeMutable<Impl>(layerID, std::string())) {
 }
 <% } else { -%>
 <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID, const std::string& sourceID)
-    : Layer(makeMutable<Impl>(LayerType::<%- camelize(type) %>, layerID, sourceID)) {
+    : Layer(makeMutable<Impl>(layerID, sourceID)) {
 }
 <% } -%>
 
@@ -105,10 +111,6 @@ void <%- camelize(type) %>Layer::Impl::stringifyLayout(rapidjson::Writer<rapidjs
 void <%- camelize(type) %>Layer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 <% } -%>
-
-const LayerTypeInfo* <%- camelize(type) %>Layer::Impl::getTypeInfo() const noexcept {
-    return &typeInfo<%- camelize(type) %>;
-}
 
 // Layout properties
 
@@ -311,25 +313,23 @@ Mutable<Layer::Impl> <%- camelize(type) %>Layer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-<%- camelize(type) %>LayerFactory::<%- camelize(type) %>LayerFactory() = default;
+} // namespace style
 
-<%- camelize(type) %>LayerFactory::~<%- camelize(type) %>LayerFactory() = default;
-
-const LayerTypeInfo* <%- camelize(type) %>LayerFactory::getTypeInfo() const noexcept {
-    return &typeInfo<%- camelize(type) %>;
+const style::LayerTypeInfo* <%- camelize(type) %>LayerFactory::getTypeInfo() const noexcept {
+    return style::<%- camelize(type) %>Layer::Impl::staticTypeInfo();
 }
 
-std::unique_ptr<style::Layer> <%- camelize(type) %>LayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
+std::unique_ptr<style::Layer> <%- camelize(type) %>LayerFactory::createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept {
 <% if (type === 'background') { -%>
     (void)value;
-    return std::unique_ptr<style::Layer>(new <%- camelize(type) %>Layer(id));
+    return std::unique_ptr<style::Layer>(new style::<%- camelize(type) %>Layer(id));
 <% } else { -%>
     optional<std::string> source = getSource(value);
     if (!source) {
         return nullptr;
     }
 
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new <%- camelize(type) %>Layer(id, *source));
+    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::<%- camelize(type) %>Layer(id, *source));
 <% if (type !== 'raster' && type !== 'hillshade') { -%>
     if (!initSourceLayerAndFilter(layer.get(), value)) {
         return nullptr;
@@ -339,5 +339,9 @@ std::unique_ptr<style::Layer> <%- camelize(type) %>LayerFactory::createLayer(con
 <% } -%>
 }
 
-} // namespace style
+std::unique_ptr<RenderLayer> <%- camelize(type) %>LayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
+    assert(impl->getTypeInfo() == getTypeInfo());
+    return std::make_unique<Render<%- camelize(type) %>Layer>(staticImmutableCast<style::<%- camelize(type) %>Layer::Impl>(std::move(impl)));
+}
+
 } // namespace mbgl

@@ -95,7 +95,7 @@ TEST(GLContextMode, Shared) {
 
     // Set transparent background layer.
     auto layer = map.getStyle().getLayer("background");
-    ASSERT_EQ(LayerType::Background, layer->getType());
+    ASSERT_STREQ("background", layer->getTypeInfo()->type);
     static_cast<BackgroundLayer*>(layer)->setBackgroundColor( { { 1.0f, 0.0f, 0.0f, 0.5f } } );
 
     {

@@ -1,17 +1,6 @@
 #include "layer_manager.hpp"
 
-#include <mbgl/style/layer.hpp>
 #include <mbgl/style/layer_impl.hpp>
-#include <mbgl/style/layers/background_layer.hpp>
-#include <mbgl/style/layers/circle_layer.hpp>
-#include <mbgl/style/layers/fill_extrusion_layer.hpp>
-#include <mbgl/style/layers/fill_layer.hpp>
-#include <mbgl/style/layers/heatmap_layer.hpp>
-#include <mbgl/style/layers/hillshade_layer.hpp>
-#include <mbgl/style/layers/line_layer.hpp>
-#include <mbgl/style/layers/raster_layer.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
 
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/filter.hpp>
@@ -49,14 +38,14 @@ LayerManagerAndroid::LayerManagerAndroid() {
 LayerManagerAndroid::~LayerManagerAndroid() = default;
 
 jni::Local<jni::Object<Layer>> LayerManagerAndroid::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, mbgl::style::Layer& layer) {
-    if (JavaLayerPeerFactory* factory = getPeerFactory(&layer)) {
+    if (JavaLayerPeerFactory* factory = getPeerFactory(layer.getTypeInfo())) {
         return factory->createJavaLayerPeer(env, map, layer);
     }
     return jni::Local<jni::Object<Layer>>();
 }
 
 jni::Local<jni::Object<Layer>> LayerManagerAndroid::createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer> layer) {
-    if (JavaLayerPeerFactory* factory = getPeerFactory(layer.get())) {
+    if (JavaLayerPeerFactory* factory = getPeerFactory(layer->getTypeInfo())) {
         return factory->createJavaLayerPeer(env, map, std::move(layer));
     }
     return jni::Local<jni::Object<Layer>>();
@@ -78,8 +67,7 @@ void LayerManagerAndroid::addLayerType(std::unique_ptr<JavaLayerPeerFactory> fac
     factories.emplace_back(std::move(factory));
 }
 
-JavaLayerPeerFactory* LayerManagerAndroid::getPeerFactory(mbgl::style::Layer* layer) {
-    auto* typeInfo = layer->baseImpl->getTypeInfo();
+JavaLayerPeerFactory* LayerManagerAndroid::getPeerFactory(const mbgl::style::LayerTypeInfo* typeInfo) {
     assert(typeInfo);
     for (const auto& factory: factories) {
         if (factory->getLayerFactory()->getTypeInfo() == typeInfo) {
@@ -90,20 +78,14 @@ JavaLayerPeerFactory* LayerManagerAndroid::getPeerFactory(mbgl::style::Layer* la
     return nullptr;
 }
 
-std::unique_ptr<style::Layer> LayerManagerAndroid::createLayer(const std::string& type,
-                                                               const std::string& id,
-                                                               const style::conversion::Convertible& value,
-                                                               style::conversion::Error& error) noexcept {
+LayerFactory* LayerManagerAndroid::getFactory(const std::string& type) noexcept {
     auto search = typeToFactory.find(type);
-    if (search != typeToFactory.end()) {
-        auto layer = search->second->createLayer(id, value);
-        if (!layer) {
-            error.message = "Error parsing a layer of type: " + type;
-        }
-        return layer;
-    }
-    error.message = "Unsupported layer type: " + type;
-    return nullptr;
+    return (search != typeToFactory.end()) ? search->second : nullptr;
+}
+
+LayerFactory* LayerManagerAndroid::getFactory(const mbgl::style::LayerTypeInfo* info) noexcept {
+    JavaLayerPeerFactory* peerFactory = getPeerFactory(info);
+    return (peerFactory != nullptr) ? peerFactory->getLayerFactory() : nullptr;
 }
 
 // static 
@@ -114,11 +96,8 @@ LayerManagerAndroid* LayerManagerAndroid::get() noexcept {
 
 } // namespace android
 
-namespace style {
-// static 
 LayerManager* LayerManager::get() noexcept {
     return android::LayerManagerAndroid::get();
 }
 
-} // style
 } // namespace mbgl

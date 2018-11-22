@@ -6,9 +6,9 @@
 
 namespace mbgl {
     
-class OpenGLStyleLayerPeerFactory : public LayerPeerFactory, public mbgl::style::CustomLayerFactory {
+class OpenGLStyleLayerPeerFactory : public LayerPeerFactory, public mbgl::CustomLayerFactory {
     // LayerPeerFactory overrides.
-    style::LayerFactory* getCoreLayerFactory() final { return this; }
+    LayerFactory* getCoreLayerFactory() final { return this; }
     virtual MGLStyleLayer* createPeer(style::Layer*) final;
 };
     

@@ -18,7 +18,7 @@ std::string layoutKey(const RenderLayer& layer) {
     rapidjson::Writer<rapidjson::StringBuffer> writer(s);
 
     writer.StartArray();
-    writer.Uint(static_cast<uint32_t>(layer.type));
+    writer.Uint64(reinterpret_cast<uint64_t>(layer.baseImpl->getTypeInfo()));
     writer.String(layer.baseImpl->source);
     writer.String(layer.baseImpl->sourceLayer);
     writer.Double(layer.baseImpl->minZoom);

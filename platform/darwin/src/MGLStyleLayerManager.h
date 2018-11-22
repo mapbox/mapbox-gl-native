@@ -10,7 +10,7 @@
 
 namespace mbgl {
 
-class LayerManagerDarwin : public style::LayerManager {
+class LayerManagerDarwin : public LayerManager {
 public:
     static LayerManagerDarwin* get() noexcept;
     ~LayerManagerDarwin();
@@ -20,11 +20,13 @@ public:
 private:
     LayerManagerDarwin();
     void addLayerType(std::unique_ptr<LayerPeerFactory>);
-    // LayerManager overrides.
-    std::unique_ptr<style::Layer> createLayer(const std::string& type, const std::string& id, const style::conversion::Convertible& value, style::conversion::Error& error) noexcept final;
-    
+    LayerPeerFactory* getPeerFactory(const style::LayerTypeInfo* typeInfo);
+    // mbgl::LayerManager overrides.
+    LayerFactory* getFactory(const std::string& type) noexcept final;
+    LayerFactory* getFactory(const mbgl::style::LayerTypeInfo* info) noexcept final;
+
     std::vector<std::unique_ptr<LayerPeerFactory>> factories;
-    std::map<std::string, style::LayerFactory*> typeToFactory;
+    std::map<std::string, LayerFactory*> typeToFactory;
 };
     
 }  // namespace mbgl

@@ -11,21 +11,27 @@
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/fnv_hash.hpp>
 
+#include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
+
 namespace mbgl {
 namespace style {
 
-namespace {
-    const LayerTypeInfo typeInfoFillExtrusion
+
+// static
+const LayerTypeInfo* FillExtrusionLayer::Impl::staticTypeInfo() noexcept {
+    const static LayerTypeInfo typeInfo
         {"fill-extrusion",
           LayerTypeInfo::Source::Required,
           LayerTypeInfo::Pass3D::Required,
           LayerTypeInfo::Layout::Required,
           LayerTypeInfo::Clipping::NotRequired
         };
-}  // namespace
+    return &typeInfo;
+}
+
 
 FillExtrusionLayer::FillExtrusionLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(makeMutable<Impl>(LayerType::FillExtrusion, layerID, sourceID)) {
+    : Layer(makeMutable<Impl>(layerID, sourceID)) {
 }
 
 FillExtrusionLayer::FillExtrusionLayer(Immutable<Impl> impl_)
@@ -50,10 +56,6 @@ std::unique_ptr<Layer> FillExtrusionLayer::cloneRef(const std::string& id_) cons
 }
 
 void FillExtrusionLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
-}
-
-const LayerTypeInfo* FillExtrusionLayer::Impl::getTypeInfo() const noexcept {
-    return &typeInfoFillExtrusion;
 }
 
 // Layout properties
@@ -503,26 +505,28 @@ Mutable<Layer::Impl> FillExtrusionLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-FillExtrusionLayerFactory::FillExtrusionLayerFactory() = default;
+} // namespace style
 
-FillExtrusionLayerFactory::~FillExtrusionLayerFactory() = default;
-
-const LayerTypeInfo* FillExtrusionLayerFactory::getTypeInfo() const noexcept {
-    return &typeInfoFillExtrusion;
+const style::LayerTypeInfo* FillExtrusionLayerFactory::getTypeInfo() const noexcept {
+    return style::FillExtrusionLayer::Impl::staticTypeInfo();
 }
 
-std::unique_ptr<style::Layer> FillExtrusionLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
+std::unique_ptr<style::Layer> FillExtrusionLayerFactory::createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept {
     optional<std::string> source = getSource(value);
     if (!source) {
         return nullptr;
     }
 
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new FillExtrusionLayer(id, *source));
+    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::FillExtrusionLayer(id, *source));
     if (!initSourceLayerAndFilter(layer.get(), value)) {
         return nullptr;
     }
     return layer;
 }
 
-} // namespace style
+std::unique_ptr<RenderLayer> FillExtrusionLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
+    assert(impl->getTypeInfo() == getTypeInfo());
+    return std::make_unique<RenderFillExtrusionLayer>(staticImmutableCast<style::FillExtrusionLayer::Impl>(std::move(impl)));
+}
+
 } // namespace mbgl

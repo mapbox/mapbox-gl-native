@@ -74,15 +74,13 @@ protected:
     Mutable<Layer::Impl> mutableBaseImpl() const final;
 };
 
-class HillshadeLayerFactory : public LayerFactory {
-public:
-    HillshadeLayerFactory();
-    ~HillshadeLayerFactory() override;
+} // namespace style
 
-    // LayerFactory overrides.
-    const LayerTypeInfo* getTypeInfo() const noexcept final;
-    std::unique_ptr<style::Layer> createLayer(const std::string& id, const conversion::Convertible& value) final;
+class HillshadeLayerFactory : public LayerFactory {
+protected:
+    const style::LayerTypeInfo* getTypeInfo() const noexcept final;
+    std::unique_ptr<style::Layer> createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept final;
+    std::unique_ptr<RenderLayer> createRenderLayer(Immutable<style::Layer::Impl>) noexcept final;
 };
 
-} // namespace style
 } // namespace mbgl

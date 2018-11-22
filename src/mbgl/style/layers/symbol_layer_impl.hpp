@@ -13,11 +13,12 @@ public:
 
     bool hasLayoutDifference(const Layer::Impl&) const override;
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
-    const LayerTypeInfo* getTypeInfo() const noexcept final;
     void populateFontStack(std::set<FontStack>& fontStack) const final;
 
     SymbolLayoutProperties::Unevaluated layout;
     SymbolPaintProperties::Transitionable paint;
+
+    DECLARE_LAYER_TYPE_INFO;
 };
 
 } // namespace style

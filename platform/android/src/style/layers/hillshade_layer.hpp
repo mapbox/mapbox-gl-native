@@ -47,7 +47,7 @@ public:
 
 }; // class HillshadeLayer
 
-class HillshadeJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::style::HillshadeLayerFactory {
+class HillshadeJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::HillshadeLayerFactory {
 public:
     ~HillshadeJavaLayerPeerFactory() override;
 
@@ -57,7 +57,7 @@ public:
 
     void registerNative(jni::JNIEnv&) final;
 
-    style::LayerFactory* getLayerFactory() final { return this; }
+    LayerFactory* getLayerFactory() final { return this; }
 
 };  // class HillshadeJavaLayerPeerFactory
 

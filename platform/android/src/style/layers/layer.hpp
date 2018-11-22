@@ -117,7 +117,7 @@ public:
      * 
      * @return style::LayerFactory* must not be \c nullptr.
      */
-    virtual style::LayerFactory* getLayerFactory() = 0;
+    virtual LayerFactory* getLayerFactory() = 0;
 };
 
 

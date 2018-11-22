@@ -18,7 +18,7 @@ namespace mbgl {
 using namespace style;
 
 RenderLineLayer::RenderLineLayer(Immutable<style::LineLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Line, _impl),
+    : RenderLayer(std::move(_impl)),
       unevaluated(impl().paint.untransitioned()),
       colorRamp({256, 1}) {
 }

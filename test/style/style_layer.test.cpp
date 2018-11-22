@@ -54,7 +54,7 @@ const auto duration = 1.0f;
 
 TEST(Layer, BackgroundProperties) {
     auto layer = std::make_unique<BackgroundLayer>("background");
-    ASSERT_EQ(LayerType::Background, layer->getType());
+    ASSERT_STREQ("background", layer->getTypeInfo()->type);
 
     // Paint properties
 
@@ -70,7 +70,7 @@ TEST(Layer, BackgroundProperties) {
 
 TEST(Layer, CircleProperties) {
     auto layer = std::make_unique<CircleLayer>("circle", "source");
-    ASSERT_EQ(LayerType::Circle, layer->getType());
+    ASSERT_STREQ("circle", layer->getTypeInfo()->type);
 
     // Paint properties
 
@@ -95,7 +95,7 @@ TEST(Layer, CircleProperties) {
 
 TEST(Layer, FillProperties) {
     auto layer = std::make_unique<FillLayer>("fill", "source");
-    ASSERT_EQ(LayerType::Fill, layer->getType());
+    ASSERT_STREQ("fill", layer->getTypeInfo()->type);
 
     // Paint properties
 
@@ -123,7 +123,7 @@ TEST(Layer, FillProperties) {
 
 TEST(Layer, LineProperties) {
     auto layer = std::make_unique<LineLayer>("line", "source");
-    ASSERT_EQ(LayerType::Line, layer->getType());
+    ASSERT_STREQ("line", layer->getTypeInfo()->type);
 
     // Layout properties
 
@@ -174,7 +174,7 @@ TEST(Layer, LineProperties) {
 
 TEST(Layer, RasterProperties) {
     auto layer = std::make_unique<RasterLayer>("raster", "source");
-    ASSERT_EQ(LayerType::Raster, layer->getType());
+    ASSERT_STREQ("raster", layer->getTypeInfo()->type);
 
     // Paint properties
 

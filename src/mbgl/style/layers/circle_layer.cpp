@@ -11,21 +11,27 @@
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/fnv_hash.hpp>
 
+#include <mbgl/renderer/layers/render_circle_layer.hpp>
+
 namespace mbgl {
 namespace style {
 
-namespace {
-    const LayerTypeInfo typeInfoCircle
+
+// static
+const LayerTypeInfo* CircleLayer::Impl::staticTypeInfo() noexcept {
+    const static LayerTypeInfo typeInfo
         {"circle",
           LayerTypeInfo::Source::Required,
           LayerTypeInfo::Pass3D::NotRequired,
           LayerTypeInfo::Layout::NotRequired,
           LayerTypeInfo::Clipping::NotRequired
         };
-}  // namespace
+    return &typeInfo;
+}
+
 
 CircleLayer::CircleLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(makeMutable<Impl>(LayerType::Circle, layerID, sourceID)) {
+    : Layer(makeMutable<Impl>(layerID, sourceID)) {
 }
 
 CircleLayer::CircleLayer(Immutable<Impl> impl_)
@@ -50,10 +56,6 @@ std::unique_ptr<Layer> CircleLayer::cloneRef(const std::string& id_) const {
 }
 
 void CircleLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
-}
-
-const LayerTypeInfo* CircleLayer::Impl::getTypeInfo() const noexcept {
-    return &typeInfoCircle;
 }
 
 // Layout properties
@@ -701,26 +703,28 @@ Mutable<Layer::Impl> CircleLayer::mutableBaseImpl() const {
     return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
-CircleLayerFactory::CircleLayerFactory() = default;
+} // namespace style
 
-CircleLayerFactory::~CircleLayerFactory() = default;
-
-const LayerTypeInfo* CircleLayerFactory::getTypeInfo() const noexcept {
-    return &typeInfoCircle;
+const style::LayerTypeInfo* CircleLayerFactory::getTypeInfo() const noexcept {
+    return style::CircleLayer::Impl::staticTypeInfo();
 }
 
-std::unique_ptr<style::Layer> CircleLayerFactory::createLayer(const std::string& id, const conversion::Convertible& value) {
+std::unique_ptr<style::Layer> CircleLayerFactory::createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept {
     optional<std::string> source = getSource(value);
     if (!source) {
         return nullptr;
     }
 
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new CircleLayer(id, *source));
+    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::CircleLayer(id, *source));
     if (!initSourceLayerAndFilter(layer.get(), value)) {
         return nullptr;
     }
     return layer;
 }
 
-} // namespace style
+std::unique_ptr<RenderLayer> CircleLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
+    assert(impl->getTypeInfo() == getTypeInfo());
+    return std::make_unique<RenderCircleLayer>(staticImmutableCast<style::CircleLayer::Impl>(std::move(impl)));
+}
+
 } // namespace mbgl
