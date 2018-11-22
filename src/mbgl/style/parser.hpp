@@ -42,6 +42,9 @@ public:
     double bearing = 0;
     double pitch = 0;
 
+    std::string created;
+    std::string modified;
+
     // Statically evaluate layer properties to determine what font stacks are used.
     std::set<FontStack> fontStacks() const;
 

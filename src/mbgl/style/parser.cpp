@@ -113,6 +113,24 @@ StyleParseResult Parser::parse(const std::string& json) {
         }
     }
 
+    if (document.HasMember("created")) {
+        const JSValue& value = document["created"];
+        if (value.IsString()) {
+            created = { value.GetString(), value.GetStringLength() };
+        } else if (value.IsNumber()) {
+            created = std::to_string(value.GetInt());
+        }
+    }
+
+    if (document.HasMember("modified")) {
+        const JSValue& value = document["modified"];
+        if (value.IsString()) {
+            modified = { value.GetString(), value.GetStringLength() };
+        } else if (value.IsNumber()) {
+            modified = std::to_string(value.GetInt());
+        }
+    }
+
     // Call for side effect of logging warnings for invalid values.
     fontStacks();
 
