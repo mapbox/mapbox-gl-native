@@ -323,22 +323,15 @@ void Transform::moveBy(const ScreenCoordinate& offset, const AnimationOptions& a
 }
 
 void Transform::setLatLng(const LatLng& latLng, const AnimationOptions& animation) {
-    setLatLng(latLng, optional<ScreenCoordinate> {}, animation);
+    CameraOptions camera;
+    camera.center = latLng;
+    easeTo(camera, animation);
 }
 
 void Transform::setLatLng(const LatLng& latLng, const EdgeInsets& padding, const AnimationOptions& animation) {
     CameraOptions camera;
     camera.center = latLng;
     camera.padding = padding;
-    easeTo(camera, animation);
-}
-
-void Transform::setLatLng(const LatLng& latLng, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    CameraOptions camera;
-    camera.center = latLng;
-    if (anchor) {
-        camera.padding = EdgeInsets(anchor->y, anchor->x, state.size.height - anchor->y, state.size.width - anchor->x);
-    }
     easeTo(camera, animation);
 }
 
