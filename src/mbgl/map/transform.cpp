@@ -561,7 +561,9 @@ void Transform::startTransition(const CameraOptions& camera,
     observer.onCameraWillChange(isAnimated ? MapObserver::CameraChangeMode::Animated : MapObserver::CameraChangeMode::Immediate);
 
     // Associate the anchor, if given, with a coordinate.
-    optional<ScreenCoordinate> anchor = camera.anchor;
+    // Anchor and center points are mutually exclusive, with preference for the
+    // center point when both are set.
+    optional<ScreenCoordinate> anchor = camera.center ? nullopt : camera.anchor;
     LatLng anchorLatLng;
     if (anchor) {
         anchor->y = state.size.height - anchor->y;

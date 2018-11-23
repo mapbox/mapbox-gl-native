@@ -10,7 +10,10 @@
 namespace mbgl {
 
 /** Various options for describing the viewpoint of a map. All fields are
-    optional. */
+    optional.
+    Anchor and center points are mutually exclusive, with preference for the
+    center point when both are set.
+    */
 struct CameraOptions {
     /** Coordinate at the center of the map. */
     optional<LatLng> center;
