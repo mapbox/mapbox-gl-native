@@ -64,6 +64,7 @@ final class NativeMapView {
   private ViewCallback viewCallback;
 
   // Used for map change callbacks
+  @Nullable
   private StateCallback stateCallback;
 
   // Device density
@@ -309,6 +310,10 @@ final class NativeMapView {
       return 0;
     }
     return nativeGetPitch();
+  }
+
+  public void setPitch(double pitch) {
+    setPitch(pitch, 0);
   }
 
   public void setPitch(double pitch, long duration) {
@@ -922,62 +927,86 @@ final class NativeMapView {
 
   @Keep
   private void onCameraWillChange(boolean animated) {
-    stateCallback.onCameraWillChange(animated);
+    if (stateCallback != null) {
+      stateCallback.onCameraWillChange(animated);
+    }
   }
 
   @Keep
   private void onCameraIsChanging() {
-    stateCallback.onCameraIsChanging();
+    if (stateCallback != null) {
+      stateCallback.onCameraIsChanging();
+    }
   }
 
   @Keep
   private void onCameraDidChange(boolean animated) {
-    stateCallback.onCameraDidChange(animated);
+    if (stateCallback != null) {
+      stateCallback.onCameraDidChange(animated);
+    }
   }
 
   @Keep
   private void onWillStartLoadingMap() {
-    stateCallback.onWillStartLoadingMap();
+    if (stateCallback != null) {
+      stateCallback.onWillStartLoadingMap();
+    }
   }
 
   @Keep
   private void onDidFinishLoadingMap() {
-    stateCallback.onDidFinishLoadingMap();
+    if (stateCallback != null) {
+      stateCallback.onDidFinishLoadingMap();
+    }
   }
 
   @Keep
   private void onDidFailLoadingMap(String error) {
-    stateCallback.onDidFailLoadingMap(error);
+    if (stateCallback != null) {
+      stateCallback.onDidFailLoadingMap(error);
+    }
   }
 
   @Keep
   private void onWillStartRenderingFrame() {
-    stateCallback.onWillStartRenderingFrame();
+    if (stateCallback != null) {
+      stateCallback.onWillStartRenderingFrame();
+    }
   }
 
   @Keep
   private void onDidFinishRenderingFrame(boolean fully) {
-    stateCallback.onDidFinishRenderingFrame(fully);
+    if (stateCallback != null) {
+      stateCallback.onDidFinishRenderingFrame(fully);
+    }
   }
 
   @Keep
   private void onWillStartRenderingMap() {
-    stateCallback.onWillStartRenderingMap();
+    if (stateCallback != null) {
+      stateCallback.onWillStartRenderingMap();
+    }
   }
 
   @Keep
   private void onDidFinishRenderingMap(boolean fully) {
-    stateCallback.onDidFinishRenderingMap(fully);
+    if (stateCallback != null) {
+      stateCallback.onDidFinishRenderingMap(fully);
+    }
   }
 
   @Keep
   private void onDidFinishLoadingStyle() {
-    stateCallback.onDidFinishLoadingStyle();
+    if (stateCallback != null) {
+      stateCallback.onDidFinishLoadingStyle();
+    }
   }
 
   @Keep
   private void onSourceChanged(String sourceId) {
-    stateCallback.onSourceChanged(sourceId);
+    if (stateCallback != null) {
+      stateCallback.onSourceChanged(sourceId);
+    }
   }
 
   @Keep
