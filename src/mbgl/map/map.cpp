@@ -303,14 +303,11 @@ void Map::moveBy(const ScreenCoordinate& point, const AnimationOptions& animatio
 }
 
 void Map::setLatLng(const LatLng& latLng, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    setLatLng(latLng, animation);
+    easeTo(CameraOptions().withCenter(latLng), animation);
 }
 
 void Map::setLatLng(const LatLng& latLng, const EdgeInsets& padding, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    impl->transform.setLatLng(latLng, padding, animation);
-    impl->onUpdate();
+    easeTo(CameraOptions().withCenter(latLng).withPadding(padding), animation);
 }
 
 LatLng Map::getLatLng(const EdgeInsets& padding) const {
@@ -319,34 +316,22 @@ LatLng Map::getLatLng(const EdgeInsets& padding) const {
 
 void Map::resetPosition(const EdgeInsets& padding) {
     impl->cameraMutated = true;
-    CameraOptions camera;
-    camera.angle = 0;
-    camera.pitch = 0;
-    camera.center = LatLng(0, 0);
-    camera.padding = padding;
-    camera.zoom = 0;
-    impl->transform.jumpTo(camera);
+    impl->transform.jumpTo(CameraOptions().withCenter(LatLng()).withPadding(padding).withZoom(0.0).withAngle(0.0).withPitch(0.0));
     impl->onUpdate();
 }
-
 
 #pragma mark - Zoom
 
 void Map::setZoom(double zoom, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    setZoom(zoom, EdgeInsets(), animation);
+    easeTo(CameraOptions().withZoom(zoom), animation);
 }
 
 void Map::setZoom(double zoom, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    impl->transform.setZoom(zoom, anchor, animation);
-    impl->onUpdate();
+    easeTo(CameraOptions().withZoom(zoom).withAnchor(anchor), animation);
 }
 
 void Map::setZoom(double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    impl->transform.setZoom(zoom, padding, animation);
-    impl->onUpdate();
+    easeTo(CameraOptions().withZoom(zoom).withPadding(padding), animation);
 }
 
 double Map::getZoom() const {
@@ -354,14 +339,11 @@ double Map::getZoom() const {
 }
 
 void Map::setLatLngZoom(const LatLng& latLng, double zoom, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    setLatLngZoom(latLng, zoom, {}, animation);
+    easeTo(CameraOptions().withCenter(latLng).withZoom(zoom), animation);
 }
 
 void Map::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    impl->transform.setLatLngZoom(latLng, zoom, padding, animation);
-    impl->onUpdate();
+    easeTo(CameraOptions().withCenter(latLng).withZoom(zoom).withPadding(padding), animation);
 }
 
 CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeInsets& padding, optional<double> bearing, optional<double> pitch) const {
@@ -374,9 +356,8 @@ CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeI
 }
 
 CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transform& transform, const EdgeInsets& padding) {
-    CameraOptions options;
     if (latLngs.empty()) {
-        return options;
+        return CameraOptions();
     }
     Size size = transform.getState().getSize();
     // Calculate the bounds of the possibly rotated shape with respect to the viewport.
@@ -421,33 +402,24 @@ CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transfo
     // CameraOptions origin is at the top-left corner.
     centerPixel.y = viewportHeight - centerPixel.y;
 
-    options.center = transform.screenCoordinateToLatLng(centerPixel);
-    options.zoom = zoom;
-    return options;
+    return CameraOptions().withCenter(transform.screenCoordinateToLatLng(centerPixel)).withZoom(zoom);
 }
 
 CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const EdgeInsets& padding, optional<double> bearing, optional<double> pitch) const {
-    
+
     if (!bearing && !pitch) {
         return mbgl::cameraForLatLngs(latLngs, impl->transform, padding);
     }
-    
+
     Transform transform(impl->transform.getState());
-    
-    if (bearing) {
-        double angle = -*bearing * util::DEG2RAD; // Convert to radians
-        transform.setAngle(angle);
+
+    if (bearing || pitch) {
+        transform.jumpTo(CameraOptions().withAngle(bearing).withPitch(pitch));
     }
-    if (pitch) {
-        double pitchAsRadian = *pitch * util::DEG2RAD; // Convert to radians
-        transform.setPitch(pitchAsRadian);
-    }
-    
-    CameraOptions options = mbgl::cameraForLatLngs(latLngs, transform, padding);
-    options.angle = -transform.getAngle() * util::RAD2DEG;
-    options.pitch = transform.getPitch() * util::RAD2DEG;
-    
-    return options;
+
+    return mbgl::cameraForLatLngs(latLngs, transform, padding)
+        .withAngle(-transform.getAngle() * util::RAD2DEG)
+        .withPitch(transform.getPitch() * util::RAD2DEG);
 }
 
 CameraOptions Map::cameraForGeometry(const Geometry<double>& geometry, const EdgeInsets& padding, optional<double> bearing, optional<double> pitch) const {
@@ -551,20 +523,15 @@ void Map::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second
 }
 
 void Map::setBearing(double degrees, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    setBearing(degrees, EdgeInsets(), animation);
+    easeTo(CameraOptions().withAngle(degrees), animation);
 }
 
 void Map::setBearing(double degrees, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    impl->transform.setAngle(-degrees * util::DEG2RAD, anchor, animation);
-    impl->onUpdate();
+    return easeTo(CameraOptions().withAngle(degrees).withAnchor(anchor), animation);
 }
 
 void Map::setBearing(double degrees, const EdgeInsets& padding, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    impl->transform.setAngle(-degrees * util::DEG2RAD, padding, animation);
-    impl->onUpdate();
+    easeTo(CameraOptions().withAngle(degrees).withPadding(padding), animation);
 }
 
 double Map::getBearing() const {
@@ -572,22 +539,17 @@ double Map::getBearing() const {
 }
 
 void Map::resetNorth(const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    impl->transform.setAngle(0, animation);
-    impl->onUpdate();
+    easeTo(CameraOptions().withAngle(0.0), animation);
 }
 
 #pragma mark - Pitch
 
 void Map::setPitch(double pitch, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    setPitch(pitch, {}, animation);
+    easeTo(CameraOptions().withPitch(pitch), animation);
 }
 
 void Map::setPitch(double pitch, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    impl->transform.setPitch(pitch * util::DEG2RAD, anchor, animation);
-    impl->onUpdate();
+    easeTo(CameraOptions().withPitch(pitch).withAnchor(anchor), animation);
 }
 
 double Map::getPitch() const {
@@ -762,7 +724,7 @@ void Map::Impl::onUpdate() {
     if (mode != MapMode::Continuous && !stillImageRequest) {
         return;
     }
-    
+
     TimePoint timePoint = mode == MapMode::Continuous ? Clock::now() : Clock::time_point::max();
 
     transform.updateTransitions(timePoint);
