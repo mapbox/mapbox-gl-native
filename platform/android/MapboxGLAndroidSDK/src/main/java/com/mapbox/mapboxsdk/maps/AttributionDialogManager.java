@@ -187,10 +187,9 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
         }
       }
 
-      return new AttributionParser.Options()
+      return new AttributionParser.Options(context)
         .withCopyrightSign(true)
         .withImproveMap(true)
-        .withContext(context)
         .withTelemetryAttribution(true)
         .withAttributionData(attributions.toArray(new String[attributions.size()]))
         .build().getAttributions();

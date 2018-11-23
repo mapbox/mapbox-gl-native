@@ -447,7 +447,7 @@ public class MapSnapshotter {
    */
   @NonNull
   private String createAttributionString(MapSnapshot mapSnapshot, boolean shortText) {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(context)
       .withAttributionData(mapSnapshot.getAttributions())
       .withCopyrightSign(false)
       .withImproveMap(false)
