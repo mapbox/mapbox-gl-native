@@ -20,9 +20,8 @@ public class AttributionParseTest {
 
   @Test
   public void testParseAttributionStringSatellite() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(SATELLITE_ATTRIBUTION)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     Set<Attribution> attributionList = attributionParser.getAttributions();
@@ -54,9 +53,8 @@ public class AttributionParseTest {
 
   @Test
   public void testParseAttributionStringStreets() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     Set<Attribution> attributionList = attributionParser.getAttributions();
@@ -84,10 +82,9 @@ public class AttributionParseTest {
 
   @Test
   public void testParseAttributionWithoutMapbox() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION)
       .withMapboxAttribution(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     Set<Attribution> attributionList = attributionParser.getAttributions();
@@ -111,9 +108,8 @@ public class AttributionParseTest {
 
   @Test
   public void testParseAttributionArrayString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(new String[] {STREETS_ATTRIBUTION, "", SATELLITE_ATTRIBUTION})
-      .withContext(RuntimeEnvironment.application)
       .build();
     Set<Attribution> attributionList = attributionParser.getAttributions();
     assertEquals("Size of list should match", 4, attributionList.size());
@@ -144,10 +140,9 @@ public class AttributionParseTest {
 
   @Test
   public void testHideImproveThisMapAttributionArrayString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(SATELLITE_ATTRIBUTION)
       .withImproveMap(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
     Set<Attribution> attributionList = attributionParser.getAttributions();
     assertEquals("Size of list should match", 3, attributionList.size());
@@ -174,10 +169,9 @@ public class AttributionParseTest {
 
   @Test
   public void testParseHideCopyrightAttributionArrayString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION, "", SATELLITE_ATTRIBUTION)
       .withCopyrightSign(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
     Set<Attribution> attributionList = attributionParser.getAttributions();
     assertEquals("Size of list should match", 4, attributionList.size());
@@ -208,11 +202,10 @@ public class AttributionParseTest {
 
   @Test
   public void testOutputWithoutCopyRightString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION)
       .withCopyrightSign(false)
       .withImproveMap(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     assertEquals(
@@ -225,10 +218,9 @@ public class AttributionParseTest {
 
   @Test
   public void testOutputWithCopyRightString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION)
       .withImproveMap(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     assertEquals(
@@ -240,12 +232,11 @@ public class AttributionParseTest {
 
   @Test
   public void testOutputWithoutCopyRightWithoutMapboxString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION)
       .withCopyrightSign(false)
       .withImproveMap(false)
       .withMapboxAttribution(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     assertEquals(
@@ -257,11 +248,10 @@ public class AttributionParseTest {
 
   @Test
   public void testOutputWithCopyRightWithoutMapboxString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION)
       .withImproveMap(false)
       .withMapboxAttribution(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     assertEquals(
@@ -273,12 +263,11 @@ public class AttributionParseTest {
 
   @Test
   public void testOutputSatelliteString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION, SATELLITE_ATTRIBUTION, "blabla", "")
       .withImproveMap(false)
       .withCopyrightSign(false)
       .withMapboxAttribution(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     assertEquals(
@@ -290,12 +279,11 @@ public class AttributionParseTest {
 
   @Test
   public void testShortOpenStreetMapString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION, SATELLITE_ATTRIBUTION, "blabla", "")
       .withImproveMap(false)
       .withCopyrightSign(false)
       .withMapboxAttribution(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     assertEquals(
@@ -307,11 +295,10 @@ public class AttributionParseTest {
 
   @Test
   public void testShortOpenStreetMapWithoutCopyrightString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION, SATELLITE_ATTRIBUTION, "blabla", "")
       .withImproveMap(false)
       .withCopyrightSign(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     assertEquals(

@@ -241,12 +241,16 @@ public class AttributionParser {
    * </p>
    */
   public static class Options {
-    private WeakReference<Context> context;
+    private final WeakReference<Context> context;
     private boolean withImproveMap = true;
     private boolean withCopyrightSign = true;
     private boolean withTelemetryAttribution = false;
     private boolean withMapboxAttribution = true;
     private String[] attributionDataStringArray;
+
+    public Options(@NonNull Context context) {
+      this.context = new WeakReference<>(context);
+    }
 
     @NonNull
     public Options withAttributionData(String... attributionData) {
@@ -275,12 +279,6 @@ public class AttributionParser {
     @NonNull
     public Options withMapboxAttribution(boolean withMapboxAttribution) {
       this.withMapboxAttribution = withMapboxAttribution;
-      return this;
-    }
-
-    @NonNull
-    public Options withContext(Context context) {
-      this.context = new WeakReference<>(context);
       return this;
     }
 
