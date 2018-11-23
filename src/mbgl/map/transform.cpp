@@ -88,7 +88,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     double angle = camera.angle ? -*camera.angle * util::DEG2RAD : getAngle();
     double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
 
-    if (std::isnan(zoom)) {
+    if (std::isnan(zoom) || std::isnan(angle) || std::isnan(pitch)) {
         return;
     }
 
@@ -161,7 +161,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     double angle = camera.angle ? -*camera.angle * util::DEG2RAD : getAngle();
     double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
 
-    if (std::isnan(zoom) || state.size.isEmpty()) {
+    if (std::isnan(zoom) || std::isnan(angle) || std::isnan(pitch) || state.size.isEmpty()) {
         return;
     }
 
@@ -311,42 +311,9 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
 #pragma mark - Position
 
 void Transform::moveBy(const ScreenCoordinate& offset, const AnimationOptions& animation) {
-    ScreenCoordinate centerOffset = {
-        offset.x,
-        -offset.y,
-    };
+    ScreenCoordinate centerOffset = { offset.x, -offset.y, };
     ScreenCoordinate centerPoint = getScreenCoordinate() - centerOffset;
-
-    CameraOptions camera;
-    camera.center = state.screenCoordinateToLatLng(centerPoint);
-    easeTo(camera, animation);
-}
-
-void Transform::setLatLng(const LatLng& latLng, const AnimationOptions& animation) {
-    CameraOptions camera;
-    camera.center = latLng;
-    easeTo(camera, animation);
-}
-
-void Transform::setLatLng(const LatLng& latLng, const EdgeInsets& padding, const AnimationOptions& animation) {
-    CameraOptions camera;
-    camera.center = latLng;
-    camera.padding = padding;
-    easeTo(camera, animation);
-}
-
-void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const AnimationOptions& animation) {
-    setLatLngZoom(latLng, zoom, EdgeInsets(), animation);
-}
-
-void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
-    if (std::isnan(zoom)) return;
-
-    CameraOptions camera;
-    camera.center = latLng;
-    camera.padding = padding;
-    camera.zoom = zoom;
-    easeTo(camera, animation);
+    easeTo(CameraOptions().withCenter(state.screenCoordinateToLatLng(centerPoint)), animation);
 }
 
 LatLng Transform::getLatLng(const EdgeInsets& padding) const {
@@ -367,26 +334,6 @@ ScreenCoordinate Transform::getScreenCoordinate(const EdgeInsets& padding) const
 
 
 #pragma mark - Zoom
-
-void Transform::setZoom(double zoom, const AnimationOptions& animation) {
-    CameraOptions camera;
-    camera.zoom = zoom;
-    easeTo(camera, animation);
-}
-
-void Transform::setZoom(double zoom, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    CameraOptions camera;
-    camera.zoom = zoom;
-    camera.anchor = anchor;
-    easeTo(camera, animation);
-}
-
-void Transform::setZoom(double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
-    CameraOptions camera;
-    camera.zoom = zoom;
-    if (!padding.isFlush()) camera.anchor = getScreenCoordinate(padding);
-    easeTo(camera, animation);
-}
 
 double Transform::getZoom() const {
     return state.getZoom();
@@ -437,27 +384,8 @@ void Transform::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& 
         center.y = first.y + std::sin(rotateAngle) * heightOffset;
     }
 
-    CameraOptions camera;
-    camera.angle = -(state.angle + util::angle_between(first - center, second - center)) * util::RAD2DEG;
-    easeTo(camera, animation);
-}
-
-void Transform::setAngle(double angle, const AnimationOptions& animation) {
-    setAngle(angle, optional<ScreenCoordinate> {}, animation);
-}
-
-void Transform::setAngle(double angle, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    if (std::isnan(angle)) return;
-    CameraOptions camera;
-    camera.angle = -angle * util::RAD2DEG;
-    camera.anchor = anchor;
-    easeTo(camera, animation);
-}
-
-void Transform::setAngle(double angle, const EdgeInsets& padding, const AnimationOptions& animation) {
-    optional<ScreenCoordinate> anchor;
-    if (!padding.isFlush()) anchor = getScreenCoordinate(padding);
-    setAngle(angle, anchor, animation);
+    const double angle = -(state.angle + util::angle_between(first - center, second - center)) * util::RAD2DEG;
+    easeTo(CameraOptions().withAngle(angle), animation);
 }
 
 double Transform::getAngle() const {
@@ -465,18 +393,6 @@ double Transform::getAngle() const {
 }
 
 #pragma mark - Pitch
-
-void Transform::setPitch(double pitch, const AnimationOptions& animation) {
-    setPitch(pitch, optional<ScreenCoordinate> {}, animation);
-}
-
-void Transform::setPitch(double pitch, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    if (std::isnan(pitch)) return;
-    CameraOptions camera;
-    camera.pitch = pitch * util::RAD2DEG;
-    camera.anchor = anchor;
-    easeTo(camera, animation);
-}
 
 double Transform::getPitch() const {
     return state.pitch;
