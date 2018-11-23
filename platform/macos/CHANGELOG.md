@@ -1,6 +1,16 @@
 # Changelog for Mapbox Maps SDK for macOS
 
+## master
+
+* `MGLMapSnapshotter` now follows "MGLIdeographicFontFamilyName" app setting to reduce font data usage while snapshotting CJK maps [#13427](https://github.com/mapbox/mapbox-gl-native/pull/13427)
+* Fixed an issue where the `{prefix}` token in tile URL templates was evaluated incorrectly when requesting a source’s tiles. ([#13429](https://github.com/mapbox/mapbox-gl-native/pull/13429))
+* Added `-[MGLStyle removeSource:error:]` that returns a `BOOL` indicating success (and an optional `NSError` in case of failure). ([#13399](https://github.com/mapbox/mapbox-gl-native/pull/13399))
+* Added support for setting `MGLCollisionBehaviorPre4_0` in `NSUserDefaults`. ([#13426](https://github.com/mapbox/mapbox-gl-native/pull/13426))
+
 ## 0.12.0 - November 8, 2018
+
+* Renamed `-[MGLOfflineStorage putResourceWithUrl:data:modified:expires:etag:mustRevalidate:]` to `-[MGLOfflineStorage preloadData:forURL:modificationDate:expirationDate:eTag:mustRevalidate:]`. ([#13318](https://github.com/mapbox/mapbox-gl-native/pull/13318))
+* This SDK’s dynamic framework now has a bundle identifier of `com.mapbox.Mapbox`. ([#12857](https://github.com/mapbox/mapbox-gl-native/pull/12857))
 
 ### Styles and rendering
 
