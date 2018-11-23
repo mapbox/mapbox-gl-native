@@ -48,7 +48,6 @@ public:
     void moveBy(const ScreenCoordinate& offset, const AnimationOptions& = {});
     void setLatLng(const LatLng&, const AnimationOptions& = {});
     void setLatLng(const LatLng&, const EdgeInsets&, const AnimationOptions& = {});
-    void setLatLng(const LatLng&, optional<ScreenCoordinate>, const AnimationOptions& = {});
     void setLatLngZoom(const LatLng&, double zoom, const AnimationOptions& = {});
     void setLatLngZoom(const LatLng&, double zoom, const EdgeInsets&, const AnimationOptions& = {});
     LatLng getLatLng(const EdgeInsets& = {}) const;

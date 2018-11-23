@@ -304,18 +304,12 @@ void Map::moveBy(const ScreenCoordinate& point, const AnimationOptions& animatio
 
 void Map::setLatLng(const LatLng& latLng, const AnimationOptions& animation) {
     impl->cameraMutated = true;
-    setLatLng(latLng, optional<ScreenCoordinate> {}, animation);
+    setLatLng(latLng, animation);
 }
 
 void Map::setLatLng(const LatLng& latLng, const EdgeInsets& padding, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setLatLng(latLng, padding, animation);
-    impl->onUpdate();
-}
-
-void Map::setLatLng(const LatLng& latLng, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    impl->cameraMutated = true;
-    impl->transform.setLatLng(latLng, anchor, animation);
     impl->onUpdate();
 }
 

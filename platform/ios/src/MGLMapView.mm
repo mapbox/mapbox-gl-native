@@ -1579,7 +1579,7 @@ public:
             {
                 CLLocationCoordinate2D centerCoordinate = _previousPinchCenterCoordinate;
                 self.mbglMap.setLatLng(MGLLatLngFromLocationCoordinate2D(centerCoordinate),
-                                    mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
+                                    mbgl::EdgeInsets { centerPoint.y, centerPoint.x, self.size.height - centerPoint.y, self.size.width - centerPoint.x });
             }
         }
         [self cameraIsChanging];
