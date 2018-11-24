@@ -1,6 +1,7 @@
 #import "MGLFoundation_Private.h"
 #import "MGLShapeSource_Private.h"
 
+#import "MGLLoggingConfiguration_Private.h"
 #import "MGLStyle_Private.h"
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
@@ -194,12 +195,15 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 // limit(number)The maximum number of features to return.
 // offset(number)The number of features to skip (e.g. for pagination).
 
-- (NSArray<id <MGLFeature>> *)leavesOfCluster:(id<MGLCluster>)cluster offset:(UInt32)offset limit:(UInt32)limit {
+- (NSArray<id <MGLFeature>> *)leavesOfCluster:(id<MGLCluster>)cluster offset:(NSUInteger)offset limit:(NSUInteger)limit {
     if(!self.rawSource) {
         return nil;
     }
     
-    std::vector<mbgl::Feature> leaves = self.rawSource->getLeaves((uint32_t)cluster.clusterIdentifier, limit, offset);
+    MGLAssert(offset < UINT32_MAX, @"`offset` should be < `UINT32_MAX`");
+    MGLAssert(limit < UINT32_MAX, @"`limit` should be < `UINT32_MAX`");
+    
+    std::vector<mbgl::Feature> leaves = self.rawSource->getLeaves((uint32_t)cluster.clusterIdentifier, (uint32_t)limit, (uint32_t)offset);
     return MGLFeaturesFromMBGLFeatures(leaves);
 }
 
