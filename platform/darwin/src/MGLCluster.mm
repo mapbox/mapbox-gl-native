@@ -15,12 +15,18 @@ BOOL MGLFeatureHasClusterAttribute(id<MGLFeature> feature) {
     return [isCluster boolValue];
 }
 
+#pragma mark - Custom subclassing
+
 NSString *MGLClusterSubclassNameForFeature(id<MGLFeature> feature) {
     NSString *className = NSStringFromClass([feature class]);
     NSString *subclassName = [className stringByAppendingString:@"_Cluster"];
     return subclassName;
 }
 
+/**
+ Static free function used as implementation for custom subclasses (that conform
+ to both `MGLFeature` and `MGLCluster`).
+ */
 static NSUInteger MGLClusterIdentifierIMP(id self, SEL _cmd) {
     
     id<MGLFeature> feature = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(self, MGLFeature);
@@ -38,6 +44,10 @@ static NSUInteger MGLClusterIdentifierIMP(id self, SEL _cmd) {
     return identifier;
 }
 
+/**
+ Static free function used as implementation for custom subclasses (that conform
+ to both `MGLFeature` and `MGLCluster`).
+ */
 static NSUInteger MGLClusterPointCountIMP(id self, SEL _cmd) {
     id<MGLFeature> feature = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(self, MGLFeature);
 
@@ -47,6 +57,10 @@ static NSUInteger MGLClusterPointCountIMP(id self, SEL _cmd) {
     return [count unsignedIntegerValue];
 }
 
+/**
+ Static free function used as implementation for custom subclasses (that conform
+ to both `MGLFeature` and `MGLCluster`).
+ */
 static NSString *MGLClusterPointCountAbbreviationIMP(id self, SEL _cmd) {
     id<MGLFeature> feature = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(self, MGLFeature);
 
@@ -74,6 +88,11 @@ static IMP MGLFeatureClusterIMPFromSelector(SEL selector) {
     return NULL;
 }
 
+/**
+ Converts a feature to a custom subclass that supports both `MGLFeature` and
+ `MGLCluster`, or returns `nil` if the feature doesn't have the requisite cluster
+ attributes.
+ */
 id<MGLFeature, MGLCluster> MGLConvertFeatureToClusterSubclass(id<MGLFeature> feature) {
     
     Protocol *clusterProtocol = @protocol(MGLCluster);
@@ -100,6 +119,9 @@ id<MGLFeature, MGLCluster> MGLConvertFeatureToClusterSubclass(id<MGLFeature> fea
         class_addProtocol(clusterSubclass, clusterProtocol);
         
         // Install protocol methods
+        // Run through using `protocol_copyMethodDescriptionList` and the above
+        // `MGLFeatureClusterIMPFromSelector` method. We do this so that we avoid
+        // having to hand-craft the type encodings passed to `class_addMethod`.
         unsigned int count = 0;
         struct objc_method_description *methodDescriptionList = protocol_copyMethodDescriptionList(clusterProtocol, YES, YES, &count);
 

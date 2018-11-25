@@ -189,15 +189,9 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 
 #pragma mark - MGLCluster management
 
-// TODO: doc
-// For clustered sources, fetches the original points that belong to the cluster (as an array of GeoJSON features).
-// clusterId(number)The value of the cluster's  cluster_id property.
-// limit(number)The maximum number of features to return.
-// offset(number)The number of features to skip (e.g. for pagination).
-
 - (NSArray<id <MGLFeature>> *)leavesOfCluster:(id<MGLCluster>)cluster offset:(NSUInteger)offset limit:(NSUInteger)limit {
     if(!self.rawSource) {
-        return nil;
+        return @[];
     }
     
     MGLAssert(offset < UINT32_MAX, @"`offset` should be < `UINT32_MAX`");
@@ -207,18 +201,15 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
     return MGLFeaturesFromMBGLFeatures(leaves);
 }
 
-// TODO: doc
-// For clustered sources, fetches the children of the given cluster on the next zoom level (as an array of GeoJSON features).
 - (NSArray<id <MGLFeature>> *)childrenOfCluster:(id<MGLCluster>)cluster {
     if(!self.rawSource) {
-        return nil;
+        return @[];
     }
 
     std::vector<mbgl::Feature> children = self.rawSource->getChildren((uint32_t)cluster.clusterIdentifier);
     return MGLFeaturesFromMBGLFeatures(children);
 }
 
-// For clustered sources, fetches the zoom at which the given cluster expands.
 - (double)zoomLevelForExpandingCluster:(id<MGLCluster>)cluster {
     if(!self.rawSource) {
         return -1.0;

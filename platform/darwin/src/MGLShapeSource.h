@@ -323,10 +323,49 @@ MGL_EXPORT
  */
 - (NSArray<id <MGLFeature>> *)featuresMatchingPredicate:(nullable NSPredicate *)predicate;
 
-// TODO: doc
+/**
+ Returns an array of map features that are the leaves of the specified cluster.
+ ("Leaves" are the original points that belong to the cluster.)
+ 
+ This method supports pagination; you supply an offset (number of features to skip)
+ and a maximum number of features to return.
+ 
+ @param cluster An object that conforms to the `MGLCluster` protocol. Currently
+    the only types that can conform are private subclasses of `MGLPointFeature`.
+ @param offset Number of features to skip.
+ @param limit Maximum number of features to return
+ 
+ @return An array of objects that conform to the `MGLFeature` protocol.
+ */
 - (NSArray<id <MGLFeature>> *)leavesOfCluster:(id<MGLCluster>)cluster offset:(NSUInteger)offset limit:(NSUInteger)limit;
+
+/**
+ Returns an array of map features that are the immediate children of the specified
+ cluster *on the next zoom level*. The may include features that also conform to
+ the `MGLCluster` protocol.
+ 
+ @param cluster An object that conforms to the `MGLCluster` protocol. Currently
+    the only types that can conform are private subclasses of `MGLPointFeature`.
+ 
+ @return An array of objects that conform to the `MGLFeature` protocol.
+ 
+ @note The returned array may contain the `cluster` that was passed in, if the next
+    zoom level doesn't the zoom level for expanding that cluster. See
+    `-[MGLShapeSource zoomLevelForExpandingCluster:`.
+ */
 - (NSArray<id <MGLFeature>> *)childrenOfCluster:(id<MGLCluster>)cluster;
+
+/**
+ Returns the zoom level at which the given cluster expands.
+ 
+ @param cluster An object that conforms to the `MGLCluster` protocol. Currently
+    the only types that can conform are private subclasses of `MGLPointFeature`.
+ 
+ @return Zoom level. This should be >= 0; any negative return value should be
+    considered an error.
+ */
 - (double)zoomLevelForExpandingCluster:(id<MGLCluster>)cluster;
+
 @end
 
 NS_ASSUME_NONNULL_END
