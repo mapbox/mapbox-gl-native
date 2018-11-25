@@ -1,5 +1,6 @@
 #import "MGLFoundation_Private.h"
 #import "MGLCluster_Private.h"
+#import "MGLLoggingConfiguration_Private.h"
 #import "MGLFeature.h"
 #import <objc/runtime.h>
 
@@ -32,14 +33,14 @@ static NSUInteger MGLClusterIdentifierIMP(id self, SEL _cmd) {
     id<MGLFeature> feature = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(self, MGLFeature);
     
     NSNumber *clusterNumber = MGL_OBJC_DYNAMIC_CAST([feature attributeForKey:MGLClusterIdentifierKey], NSNumber);
-    NSAssert(clusterNumber, @"Clusters should have a cluster_id");
+    MGLAssert(clusterNumber, @"Clusters should have a cluster_id");
     
     if (!clusterNumber) {
         return MGLClusterIdentifierInvalid;
     }
     
     NSUInteger identifier = [clusterNumber unsignedIntegerValue];
-    NSAssert(identifier <= UINT32_MAX, @"Cluster identifiers are 32bit");
+    MGLAssert(identifier <= UINT32_MAX, @"Cluster identifiers are 32bit");
     
     return identifier;
 }
@@ -52,7 +53,7 @@ static NSUInteger MGLClusterPointCountIMP(id self, SEL _cmd) {
     id<MGLFeature> feature = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(self, MGLFeature);
 
     NSNumber *count = MGL_OBJC_DYNAMIC_CAST([feature attributeForKey:MGLClusterCountKey], NSNumber);
-    NSAssert(count, @"Clusters should have a point_count");
+    MGLAssert(count, @"Clusters should have a point_count");
     
     return [count unsignedIntegerValue];
 }
@@ -65,7 +66,7 @@ static NSString *MGLClusterPointCountAbbreviationIMP(id self, SEL _cmd) {
     id<MGLFeature> feature = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(self, MGLFeature);
 
     NSString *abbreviation = MGL_OBJC_DYNAMIC_CAST([feature attributeForKey:MGLClusterCountAbbreviationKey], NSString);
-    NSAssert(abbreviation, @"Clusters should have a point_count_abbreviated");
+    MGLAssert(abbreviation, @"Clusters should have a point_count_abbreviated");
     
     if (!abbreviation) {
         return @"0";
@@ -84,7 +85,7 @@ static IMP MGLFeatureClusterIMPFromSelector(SEL selector) {
     else if (selector == @selector(clusterPointCountAbbreviation)) {
         return (IMP)MGLClusterPointCountAbbreviationIMP;
     }
-    assert(0);
+    MGLCAssert(0, @"Unrecognized selector: %@", NSStringFromSelector(selector));
     return NULL;
 }
 
@@ -142,13 +143,13 @@ id<MGLFeature, MGLCluster> MGLConvertFeatureToClusterSubclass(id<MGLFeature> fea
     
     // Now change the class of the feature
     object_setClass(feature, clusterSubclass);
-    assert([feature conformsToProtocol:clusterProtocol]);
+    MGLCAssert([feature conformsToProtocol:clusterProtocol], @"Feature subclass %@ should conform to MGLCluster", subclassName);
 
     id<MGLFeature, MGLCluster> cluster = (id<MGLFeature, MGLCluster>)feature;
     
-    assert([cluster respondsToSelector:@selector(clusterIdentifier)]);
-    assert([cluster respondsToSelector:@selector(clusterPointCount)]);
-    assert([cluster respondsToSelector:@selector(clusterPointCountAbbreviation)]);
+    MGLCAssert([cluster respondsToSelector:@selector(clusterIdentifier)], @"Feature subclass %@ - missing selector `clusterIdentifier`", subclassName);
+    MGLCAssert([cluster respondsToSelector:@selector(clusterPointCount)], @"Feature subclass %@ - missing selector `clusterPointCount`", subclassName);
+    MGLCAssert([cluster respondsToSelector:@selector(clusterPointCountAbbreviation)], @"Feature subclass %@ - missing selector `clusterPointCountAbbreviation`", subclassName);
     
     return cluster;
 }
