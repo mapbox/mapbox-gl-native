@@ -351,7 +351,7 @@ MGL_EXPORT
  
  @note The returned array may contain the `cluster` that was passed in, if the next
     zoom level doesn't the zoom level for expanding that cluster. See
-    `-[MGLShapeSource zoomLevelForExpandingCluster:`.
+    `-[MGLShapeSource zoomLevelForExpandingCluster:]`.
  */
 - (NSArray<id <MGLFeature>> *)childrenOfCluster:(id<MGLCluster>)cluster;
 

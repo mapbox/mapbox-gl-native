@@ -374,7 +374,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
                 return MGLDocumentationExampleTests.styleURL
             }
         }
-               
+
         //#-example-code
         let camera = MGLMapCamera(lookingAtCenter: CLLocationCoordinate2D(latitude: 37.7184, longitude: -122.4365), altitude: 100, pitch: 20, heading: 0)
 
