@@ -374,7 +374,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
                 return MGLDocumentationExampleTests.styleURL
             }
         }
-        
+               
         //#-example-code
         let camera = MGLMapCamera(lookingAtCenter: CLLocationCoordinate2D(latitude: 37.7184, longitude: -122.4365), altitude: 100, pitch: 20, heading: 0)
 
@@ -392,6 +392,58 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         //#-end-example-code
         
         wait(for: [expectation], timeout: 5)
+    }
+    
+    func testMGLCluster() {
+
+        enum ExampleError: Error {
+            case unexpectedFeatureType
+            case featureIsNotACluster
+        }
+        
+        let geoJSON: [String: Any] = [
+            "type" : "Feature",
+            "geometry" : [
+                "coordinates" : [
+                    -77.00896639534831,
+                    38.87031006108791,
+                    0.0
+                ],
+                "type" : "Point"
+            ],
+            "properties" : [
+                "cluster" : true,
+                "cluster_id" : 123,
+                "point_count" : 4567,
+                "point_count_abbreviated" : "4.5k"
+            ]
+        ]
+        
+        let clusterShapeData = try! JSONSerialization.data(withJSONObject: geoJSON, options: [])
+        
+        do {
+            //#-example-code
+            let shape = try! MGLShape(data: clusterShapeData, encoding: String.Encoding.utf8.rawValue)
+            
+            guard let pointFeature = shape as? MGLPointFeature else {
+                throw ExampleError.unexpectedFeatureType
+            }
+            
+            // Check for cluster conformance
+            guard let cluster = pointFeature as? MGLCluster else {
+                throw ExampleError.featureIsNotACluster
+            }
+            
+            print("Approximate number of points in cluster: \(cluster.clusterPointCountAbbreviation)")
+            
+            //#-end-example-code
+            
+            XCTAssert(cluster.clusterIdentifier == 123)
+            XCTAssert(cluster.clusterPointCount == 4567)
+        }
+        catch let error {
+            XCTFail("Example failed with thrown error: \(error)")
+        }            
     }
     
     // For testMGLMapView().

@@ -21,9 +21,18 @@ FOUNDATION_EXTERN MGL_EXPORT const NSUInteger MGLClusterIdentifierInvalid;
  example:
  
  ```swift
- if let cluster = feature as? MGLCluster {
-    ...
+ let shape = try! MGLShape(data: clusterShapeData, encoding: String.Encoding.utf8.rawValue)
+ 
+ guard let pointFeature = shape as? MGLPointFeature else {
+ throw ExampleError.unexpectedFeatureType
  }
+ 
+ // Check for cluster conformance
+ guard let cluster = pointFeature as? MGLCluster else {
+ throw ExampleError.featureIsNotACluster
+ }
+ 
+ print("Approximate number of points in cluster: \(cluster.clusterPointCountAbbreviation)")
  ```
  */
 MGL_EXPORT
