@@ -19,10 +19,6 @@ typedef struct MGLRadianCoordinate2D {
     MGLLocationRadians longitude;
 } MGLRadianCoordinate2D;
 
-NS_INLINE NSString *MGLStringFromCLLocationCoordinate2D(CLLocationCoordinate2D coordinate) {
-    return [NSString stringWithFormat:@"(lat: %f, lon: %f)", coordinate.latitude, coordinate.longitude];
-}
-
 /**
  Creates a new `MGLRadianCoordinate2D` from the given latitudinal and longitudinal.
  */
@@ -36,6 +32,20 @@ NS_INLINE MGLRadianCoordinate2D MGLRadianCoordinate2DMake(MGLLocationRadians lat
 /// Returns the smallest rectangle that contains both the given rectangle and
 /// the given point.
 CGRect MGLExtendRect(CGRect rect, CGPoint point);
+
+#if TARGET_OS_IPHONE
+NS_INLINE NSString *MGLStringFromSize(CGSize size) {
+    return NSStringFromCGSize(size);
+}
+#else
+NS_INLINE NSString *MGLStringFromSize(NSSize size) {
+    return NSStringFromSize(size);
+}
+#endif
+
+NS_INLINE NSString *MGLStringFromCLLocationCoordinate2D(CLLocationCoordinate2D coordinate) {
+    return [NSString stringWithFormat:@"(lat: %f, lon: %f)", coordinate.latitude, coordinate.longitude];
+}
 
 mbgl::LatLng MGLLatLngFromLocationCoordinate2D(CLLocationCoordinate2D coordinate);
 

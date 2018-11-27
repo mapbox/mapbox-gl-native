@@ -31,16 +31,12 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 @implementation MGLMapSnapshotOptions
 
-- (instancetype _Nonnull)initWithStyleURL:(nullable NSURL *)styleURL camera:(MGLMapCamera *)camera size:(CGSize) size
+- (instancetype _Nonnull)initWithStyleURL:(nullable NSURL *)styleURL camera:(MGLMapCamera *)camera size:(CGSize)size
 {
-#if TARGET_OS_IPHONE
-    NSString *sizeString = NSStringFromCGSize(size);
-#else
-    NSString *sizeString = NSStringFromSize(size);
-#endif
-    MGLLogDebug(@"Initializing withStyleURL: %@ camera: %@ size: %@", styleURL, camera, sizeString);
+    MGLLogDebug(@"Initializing withStyleURL: %@ camera: %@ size: %@", styleURL, camera, MGLStringFromSize(size));
     self = [super init];
-    if (self) {
+    if (self)
+    {
         if ( !styleURL)
         {
             styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
@@ -53,7 +49,6 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 #else
         _scale = [NSScreen mainScreen].backingScaleFactor;
 #endif
-        
     }
     return self;
 }
