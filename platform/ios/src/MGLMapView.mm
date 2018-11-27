@@ -1772,7 +1772,13 @@ public:
     }
     else if (self.selectedAnnotation)
     {
-        [self deselectAnnotation:self.selectedAnnotation animated:YES];
+        BOOL deselect = YES;
+        if ([self.selectedAnnotation respondsToSelector:@selector(dismissesAutomatically)]) {
+            deselect = [self.selectedAnnotation performSelector:@selector(dismissesAutomatically)];
+        }
+        if (deselect) {
+            [self deselectAnnotation:self.selectedAnnotation animated:YES];
+        }
     }
 }
 
