@@ -1,5 +1,5 @@
 #include <mbgl/test/util.hpp>
-#include <mbgl/test/stub_geometry_tile_feature.hpp>
+#include <mbgl/tile/default_tile_feature.hpp>
 
 #include <mbgl/style/property_expression.hpp>
 #include <mbgl/renderer/property_evaluator.hpp>
@@ -12,15 +12,15 @@ using namespace mbgl::style::expression::dsl;
 
 using namespace std::string_literals;
 
-static StubGeometryTileFeature oneInteger {
+static DefaultTileFeature oneInteger {
     PropertyMap {{ "property", uint64_t(1) }}
 };
 
-static StubGeometryTileFeature oneDouble {
+static DefaultTileFeature oneDouble {
     PropertyMap {{ "property", 1.0 }}
 };
 
-static StubGeometryTileFeature oneString {
+static DefaultTileFeature oneString {
     PropertyMap {{ "property", "1"s }}
 };
 
@@ -65,14 +65,14 @@ TEST(PropertyExpression, ZoomInterpolation) {
             3.0, interpolate(linear(), number(get("property")), 1.0, literal(48.0))
         ), 0.0f)
     .evaluate(2.0f, oneInteger, -1.0f)) << "Should interpolate between stops";
-    
+
     EXPECT_EQ(33.0, PropertyExpression<float>(
         interpolate(linear(), zoom(),
             5.0, interpolate(linear(), number(get("property")), 1.0, literal(33.0)),
             10.0, interpolate(linear(), number(get("property")), 1.0, literal(66.0))
         ), 0.0f)
     .evaluate(0.0f, oneInteger, -1.0f)) << "Use first stop output for input values from -inf to first stop";
-    
+
     EXPECT_EQ(66.0, PropertyExpression<float>(
         interpolate(linear(), zoom(),
             0.0, interpolate(linear(), number(get("property")), 1.0, literal(33.0)),
@@ -86,7 +86,7 @@ TEST(PropertyExpression, ZoomInterpolation) {
             10.0, interpolate(linear(), number(get("property")), 1.0, literal(66.0))
         ), 0.0f)
     .evaluate(10.0f, oneInteger, -1.0f)) << "Should interpolate TO the last stop.";
-    
+
     EXPECT_EQ(33.0f, PropertyExpression<float>(
         interpolate(linear(), zoom(),
             0.0, interpolate(linear(), number(get("property")), 1.0, literal(33.0)),

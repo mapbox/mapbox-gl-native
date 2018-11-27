@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
 
-#include <mbgl/benchmark/stub_geometry_tile_feature.hpp>
+#include <mbgl/tile/default_tile_feature.hpp>
 
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
@@ -46,7 +46,7 @@ static void Evaluate_SourceFunction(benchmark::State& state) {
     }
 
     while(state.KeepRunning()) {
-        function->asExpression().evaluate(StubGeometryTileFeature(PropertyMap { { "x", static_cast<int64_t>(rand() % 100) } }), -1.0f);
+        function->asExpression().evaluate(DefaultTileFeature(PropertyMap { { "x", static_cast<int64_t>(rand() % 100) } }), -1.0f);
     }
 
     state.SetLabel(std::to_string(stopCount).c_str());

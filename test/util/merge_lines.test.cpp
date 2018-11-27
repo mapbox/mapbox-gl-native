@@ -1,5 +1,5 @@
 #include <mbgl/test/util.hpp>
-#include <mbgl/test/stub_geometry_tile_feature.hpp>
+#include <mbgl/tile/default_tile_feature.hpp>
 
 #include <mbgl/layout/merge_lines.hpp>
 #include <mbgl/layout/symbol_feature.hpp>
@@ -22,7 +22,7 @@ public:
     SymbolFeatureStub(FeatureIdentifier id_, FeatureType type_, GeometryCollection geometry_,
                       PropertyMap properties_, optional<std::u16string> text_,
                       optional<std::string> icon_, std::size_t index_) :
-        SymbolFeature(std::make_unique<StubGeometryTileFeature>(std::move(id_), type_, std::move(geometry_), std::move(properties_)))
+        SymbolFeature(std::make_unique<DefaultTileFeature>(std::move(id_), type_, std::move(geometry_), std::move(properties_)))
     {
         if (text_) {
             formattedText = TaggedString(*text_, SectionOptions(1.0, 0));
@@ -42,7 +42,7 @@ TEST(MergeLines, SameText) {
     input1.push_back(SymbolFeatureStub({}, FeatureType::LineString, {{{6, 0}, {7, 0}, {8, 0}}}, properties, aaa, {}, 0));
     input1.push_back(SymbolFeatureStub({}, FeatureType::LineString, {{{5, 0}, {6, 0}}}, properties, aaa, {}, 0));
 
-    const std::vector<StubGeometryTileFeature> expected1 = {
+    const std::vector<DefaultTileFeature> expected1 = {
         { {}, FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}}}, properties },
         { {}, FeatureType::LineString, {{{4, 0}, {5, 0}, {6, 0}}}, properties },
         { {}, FeatureType::LineString, {{{5, 0}, {6, 0}, {7, 0}, {8, 0}, {9, 0}}}, properties },
@@ -50,7 +50,7 @@ TEST(MergeLines, SameText) {
         { {}, FeatureType::LineString, { emptyLine }, properties },
         { {}, FeatureType::LineString, { emptyLine }, properties }
     };
-    
+
     mbgl::util::mergeLines(input1);
 
     for (int i = 0; i < 6; i++) {
@@ -65,7 +65,7 @@ TEST(MergeLines, BothEnds) {
     input2.push_back(SymbolFeatureStub { {}, FeatureType::LineString, {{{4, 0}, {5, 0}, {6, 0}}}, properties, aaa, {}, 0 });
     input2.push_back(SymbolFeatureStub { {}, FeatureType::LineString, {{{2, 0}, {3, 0}, {4, 0}}}, properties, aaa, {}, 0 });
 
-    const std::vector<StubGeometryTileFeature> expected2 = {
+    const std::vector<DefaultTileFeature> expected2 = {
         { {}, FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}}}, properties },
         { {}, FeatureType::LineString, { emptyLine }, properties },
         { {}, FeatureType::LineString, { emptyLine }, properties }
@@ -85,7 +85,7 @@ TEST(MergeLines, CircularLines) {
     input3.push_back(SymbolFeatureStub { {}, FeatureType::LineString, {{{2, 0}, {3, 0}, {4, 0}}}, properties, aaa, {}, 0 });
     input3.push_back(SymbolFeatureStub { {}, FeatureType::LineString, {{{4, 0}, {0, 0}}}, properties, aaa, {}, 0 });
 
-    const std::vector<StubGeometryTileFeature> expected3 = {
+    const std::vector<DefaultTileFeature> expected3 = {
         { {}, FeatureType::LineString, {{{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {0, 0}}}, properties },
         { {}, FeatureType::LineString, { emptyLine }, properties },
         { {}, FeatureType::LineString, { emptyLine }, properties }
@@ -102,7 +102,7 @@ TEST(MergeLines, EmptyOuterGeometry) {
     std::vector<mbgl::SymbolFeature> input;
     input.push_back(SymbolFeatureStub { {}, FeatureType::LineString, {}, properties, aaa, {}, 0 });
 
-    const std::vector<StubGeometryTileFeature> expected = { { {}, FeatureType::LineString, {}, properties } };
+    const std::vector<DefaultTileFeature> expected = { { {}, FeatureType::LineString, {}, properties } };
 
     mbgl::util::mergeLines(input);
 
@@ -113,7 +113,7 @@ TEST(MergeLines, EmptyInnerGeometry) {
     std::vector<mbgl::SymbolFeature> input;
     input.push_back(SymbolFeatureStub { {}, FeatureType::LineString, {}, properties, aaa, {}, 0 });
 
-    const std::vector<StubGeometryTileFeature> expected = { { {}, FeatureType::LineString, {}, properties } };
+    const std::vector<DefaultTileFeature> expected = { { {}, FeatureType::LineString, {}, properties } };
 
     mbgl::util::mergeLines(input);
 

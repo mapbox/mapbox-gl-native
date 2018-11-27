@@ -1,17 +1,15 @@
-#pragma once
-
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/feature.hpp>
 
-using namespace mbgl;
+namespace mbgl {
 
-class StubGeometryTileFeature : public GeometryTileFeature {
+class DefaultTileFeature : public GeometryTileFeature {
 public:
-    StubGeometryTileFeature(PropertyMap properties_)
+    DefaultTileFeature(PropertyMap properties_)
         : properties(std::move(properties_)) {
     }
 
-    StubGeometryTileFeature(FeatureIdentifier id_, FeatureType type_, GeometryCollection geometry_, PropertyMap properties_)
+    DefaultTileFeature(FeatureIdentifier id_, FeatureType type_, GeometryCollection geometry_, PropertyMap properties_)
         : properties(std::move(properties_)),
           id(std::move(id_)),
           type(type_),
@@ -39,3 +37,5 @@ public:
         return geometry;
     }
 };
+
+} // namespace mbgl

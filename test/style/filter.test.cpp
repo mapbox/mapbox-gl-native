@@ -1,7 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/geometry.hpp>
-#include <mbgl/test/stub_geometry_tile_feature.hpp>
+#include <mbgl/tile/default_tile_feature.hpp>
 
 #include <mbgl/util/rapidjson.hpp>
 #include <rapidjson/writer.h>
@@ -29,10 +29,10 @@ bool filter(const char * json,
     optional<Filter> filter = conversion::convertJSON<Filter>(json, error);
     EXPECT_TRUE(bool(filter));
     EXPECT_EQ(error.message, "");
-    
-    StubGeometryTileFeature feature { featureId, featureType, featureGeometry, featureProperties };
+
+    DefaultTileFeature feature { featureId, featureType, featureGeometry, featureProperties };
     expression::EvaluationContext context = { zoom, &feature };
-    
+
     return (*filter)(context);
 }
 
@@ -224,7 +224,7 @@ TEST(Filter, LegacyProperty) {
 TEST(Filter, Serialize) {
     std::string json = R"(["any",["==","foo",0],["==","foo",1]])";
     EXPECT_EQ(stringifyFilter(json.c_str()), std::string(json));
-    
+
     json = R"(["<=","two",2])";
     EXPECT_EQ(stringifyFilter(json.c_str()), std::string(json));
 

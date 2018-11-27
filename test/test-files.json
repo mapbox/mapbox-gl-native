@@ -116,7 +116,6 @@
         "mbgl/test/mock.hpp": "test/src/mbgl/test/mock.hpp",
         "mbgl/test/sqlite3_test_fs.hpp": "test/src/mbgl/test/sqlite3_test_fs.hpp",
         "mbgl/test/stub_file_source.hpp": "test/src/mbgl/test/stub_file_source.hpp",
-        "mbgl/test/stub_geometry_tile_feature.hpp": "test/src/mbgl/test/stub_geometry_tile_feature.hpp",
         "mbgl/test/stub_layer_observer.hpp": "test/src/mbgl/test/stub_layer_observer.hpp",
         "mbgl/test/stub_map_observer.hpp": "test/src/mbgl/test/stub_map_observer.hpp",
         "mbgl/test/stub_render_source_observer.hpp": "test/src/mbgl/test/stub_render_source_observer.hpp",

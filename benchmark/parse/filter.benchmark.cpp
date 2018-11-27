@@ -5,7 +5,7 @@
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/benchmark/stub_geometry_tile_feature.hpp>
+#include <mbgl/tile/default_tile_feature.hpp>
 
 using namespace mbgl;
 
@@ -22,7 +22,7 @@ static void Parse_Filter(benchmark::State& state) {
 
 static void Parse_EvaluateFilter(benchmark::State& state) {
     const style::Filter filter = parse(R"FILTER(["==", "foo", "bar"])FILTER");
-    const StubGeometryTileFeature feature = { {}, FeatureType::Unknown , {},  {{ "foo", std::string("bar") }} };
+    const DefaultTileFeature feature = { {}, FeatureType::Unknown , {},  {{ "foo", std::string("bar") }} };
     const style::expression::EvaluationContext context = { &feature };
 
     while (state.KeepRunning()) {

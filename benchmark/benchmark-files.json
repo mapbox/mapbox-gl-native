@@ -16,7 +16,5 @@
     "public_headers": {
         "mbgl/benchmark.hpp": "benchmark/include/mbgl/benchmark.hpp"
     },
-    "private_headers": {
-        "mbgl/benchmark/stub_geometry_tile_feature.hpp": "benchmark/src/mbgl/benchmark/stub_geometry_tile_feature.hpp"
-    }
+    "private_headers": {}
 }

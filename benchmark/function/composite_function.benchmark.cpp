@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
 
-#include <mbgl/benchmark/stub_geometry_tile_feature.hpp>
+#include <mbgl/tile/default_tile_feature.hpp>
 
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/function.hpp>
@@ -52,7 +52,7 @@ static void Evaluate_CompositeFunction(benchmark::State& state) {
 
     while(state.KeepRunning()) {
         float z = 24.0f * static_cast<float>(rand() % 100) / 100;
-        function->asExpression().evaluate(z, StubGeometryTileFeature(PropertyMap { { "x", static_cast<int64_t>(rand() % 100) } }), -1.0f);
+        function->asExpression().evaluate(z, DefaultTileFeature(PropertyMap { { "x", static_cast<int64_t>(rand() % 100) } }), -1.0f);
     }
 
     state.SetLabel(std::to_string(stopCount).c_str());
