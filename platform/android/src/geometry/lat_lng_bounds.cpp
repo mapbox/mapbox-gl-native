@@ -19,7 +19,9 @@ mbgl::LatLngBounds LatLngBounds::getLatLngBounds(jni::JNIEnv& env, const jni::Ob
     mbgl::LatLng sw = { bounds.Get(env, swLatField), bounds.Get(env, swLonField) };
     mbgl::LatLng ne = { bounds.Get(env, neLatField), bounds.Get(env, neLonField) };
 
-    sw.unwrapForShortestPath(ne);
+    if (ne.longitude() < sw.longitude()) {
+        sw = {sw.latitude(), sw.longitude() - util::DEGREES_MAX};
+    }
 
     return mbgl::LatLngBounds::hull(sw, ne);
 }
