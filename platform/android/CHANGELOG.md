@@ -4,6 +4,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 - Add "localIdeographFontFamily" setting to MapSnapshotter to reduce font data usage while snapshotting CJK maps [#13427](https://github.com/mapbox/mapbox-gl-native/pull/13427)
+- Add `fill-extrusion-vertical-gradient` fill paint property [#13463](https://github.com/mapbox/mapbox-gl-native/pull/13463)
 
 ## 7.0.0-alpha.2 - November 21, 2018
  - Add overlay example with custom drawing using paint and canvas [#13431](https://github.com/mapbox/mapbox-gl-native/pull/13431)
