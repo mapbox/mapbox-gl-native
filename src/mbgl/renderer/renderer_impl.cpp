@@ -85,8 +85,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
     
     assert(BackendScope::exists());
-    
-    updateParameters.annotationManager.updateData();
+    if (LayerManager::annotationsEnabled) {
+        updateParameters.annotationManager.updateData();
+    }
 
     const bool zoomChanged = zoomHistory.update(updateParameters.transformState.getZoom(), updateParameters.timePoint);
 
@@ -698,6 +699,7 @@ std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineStrin
 }
 
 std::vector<Feature> Renderer::Impl::queryShapeAnnotations(const ScreenLineString& geometry) const {
+    assert(LayerManager::annotationsEnabled);
     std::vector<const RenderLayer*> shapeAnnotationLayers;
     RenderedQueryOptions options;
     for (const auto& layerImpl : *layerImpls) {

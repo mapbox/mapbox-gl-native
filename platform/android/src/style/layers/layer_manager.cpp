@@ -100,4 +100,6 @@ LayerManager* LayerManager::get() noexcept {
     return android::LayerManagerAndroid::get();
 }
 
+const bool LayerManager::annotationsEnabled = true;
+
 } // namespace mbgl

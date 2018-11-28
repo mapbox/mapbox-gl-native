@@ -239,7 +239,9 @@ void Map::setStyle(std::unique_ptr<Style> style) {
     assert(style);
     impl->onStyleLoading();
     impl->style = std::move(style);
-    impl->annotationManager.setStyle(*impl->style);
+    if (LayerManager::annotationsEnabled) {
+        impl->annotationManager.setStyle(*impl->style);
+    }
 }
 
 #pragma mark - Transitions
@@ -636,32 +638,46 @@ LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {
 #pragma mark - Annotations
 
 void Map::addAnnotationImage(std::unique_ptr<style::Image> image) {
-    impl->annotationManager.addImage(std::move(image));
+    if (LayerManager::annotationsEnabled) {
+        impl->annotationManager.addImage(std::move(image));
+    }
 }
 
 void Map::removeAnnotationImage(const std::string& id) {
-    impl->annotationManager.removeImage(id);
+    if (LayerManager::annotationsEnabled) {
+        impl->annotationManager.removeImage(id);
+    }
 }
 
 double Map::getTopOffsetPixelsForAnnotationImage(const std::string& id) {
-    return impl->annotationManager.getTopOffsetPixelsForImage(id);
+    if (LayerManager::annotationsEnabled) {
+        return impl->annotationManager.getTopOffsetPixelsForImage(id);
+    }
+    return 0.0;
 }
 
 AnnotationID Map::addAnnotation(const Annotation& annotation) {
-    auto result = impl->annotationManager.addAnnotation(annotation);
-    impl->onUpdate();
-    return result;
+    if (LayerManager::annotationsEnabled) {
+        auto result = impl->annotationManager.addAnnotation(annotation);
+        impl->onUpdate();
+        return result;
+    }
+    return 0;
 }
 
 void Map::updateAnnotation(AnnotationID id, const Annotation& annotation) {
-    if (impl->annotationManager.updateAnnotation(id, annotation)) {
-        impl->onUpdate();
+    if (LayerManager::annotationsEnabled) {
+        if (impl->annotationManager.updateAnnotation(id, annotation)) {
+            impl->onUpdate();
+        }
     }
 }
 
 void Map::removeAnnotation(AnnotationID annotation) {
-    impl->annotationManager.removeAnnotation(annotation);
-    impl->onUpdate();
+    if (LayerManager::annotationsEnabled) {
+        impl->annotationManager.removeAnnotation(annotation);
+        impl->onUpdate();
+    }
 }
 
 #pragma mark - Toggles
@@ -762,8 +778,9 @@ void Map::Impl::onStyleLoaded() {
     if (!cameraMutated) {
         map.jumpTo(style->getDefaultCamera());
     }
-
-    annotationManager.onStyleLoaded();
+    if (LayerManager::annotationsEnabled) {
+        annotationManager.onStyleLoaded();
+    }
     observer.onDidFinishLoadingStyle();
 }
 

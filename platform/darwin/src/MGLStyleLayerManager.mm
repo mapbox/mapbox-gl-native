@@ -78,4 +78,6 @@ LayerManager* LayerManager::get() noexcept {
     return LayerManagerDarwin::get();
 }
 
+const bool LayerManager::annotationsEnabled = true;
+
 } // namespace mbgl
