@@ -31,7 +31,11 @@ import java.lang.ref.WeakReference;
  * While either the title and
  * snippet are optional, at least one is required to open the info window.
  * </p>
+ * @deprecated As of 7.0.0,
+ * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+ *   Mapbox Annotation Plugin</a> instead
  */
+@Deprecated
 public class InfoWindow {
 
   private WeakReference<Marker> boundMarker;

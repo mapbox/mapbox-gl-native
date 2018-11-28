@@ -10,6 +10,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 
+@Deprecated
 class Bubble extends Drawable {
 
   private RectF rect;

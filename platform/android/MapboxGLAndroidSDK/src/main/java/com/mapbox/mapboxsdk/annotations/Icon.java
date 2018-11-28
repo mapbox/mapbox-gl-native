@@ -10,9 +10,11 @@ import java.nio.ByteBuffer;
 /**
  * Icon is the visual representation of a Marker on a MapView.
  *
- * @see Marker
- * @see IconFactory
+ * @deprecated As of 7.0.0,
+ * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+ *   Mapbox Annotation Plugin</a> instead
  */
+@Deprecated
 public class Icon {
 
   private Bitmap mBitmap;
