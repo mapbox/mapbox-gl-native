@@ -12,7 +12,11 @@ import java.util.List;
 
 /**
  * Builder for composing {@link Polyline} objects.
+ * @deprecated As of 7.0.0,
+ * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+ *   Mapbox Annotation Plugin</a> instead
  */
+@Deprecated
 public final class PolylineOptions implements Parcelable {
 
 

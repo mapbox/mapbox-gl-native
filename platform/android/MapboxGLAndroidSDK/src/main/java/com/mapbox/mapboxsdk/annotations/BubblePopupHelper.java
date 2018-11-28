@@ -9,6 +9,7 @@ import android.widget.PopupWindow;
 
 import com.mapbox.mapboxsdk.R;
 
+@Deprecated
 class BubblePopupHelper {
 
   @NonNull

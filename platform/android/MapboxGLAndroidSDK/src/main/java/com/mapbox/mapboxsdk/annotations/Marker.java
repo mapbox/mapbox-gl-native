@@ -21,7 +21,11 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
  * with event listeners to bring up info windows. An {@link InfoWindow} is displayed by default when
  * either a title or snippet is provided.
  * </p>
+ * @deprecated As of 7.0.0,
+ * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+ *   Mapbox Annotation Plugin</a> instead
  */
+@Deprecated
 public class Marker extends Annotation {
 
   @Keep
