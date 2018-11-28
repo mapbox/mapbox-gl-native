@@ -401,4 +401,20 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
       assertEquals(layer.getFillExtrusionBase().getExpression(), expression);
     });
   }
+
+  @Test
+  public void testFillExtrusionVerticalGradientAsConstant() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("fill-extrusion-vertical-gradient");
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+      assertNull(layer.getFillExtrusionVerticalGradient().getValue());
+
+      // Set and Get
+      Boolean propertyValue = true;
+      layer.setProperties(fillExtrusionVerticalGradient(propertyValue));
+      assertEquals(layer.getFillExtrusionVerticalGradient().getValue(), propertyValue);
+    });
+  }
 }

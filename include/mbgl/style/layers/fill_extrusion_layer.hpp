@@ -67,6 +67,12 @@ public:
     void setFillExtrusionBaseTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionBaseTransition() const;
 
+    static PropertyValue<bool> getDefaultFillExtrusionVerticalGradient();
+    PropertyValue<bool> getFillExtrusionVerticalGradient() const;
+    void setFillExtrusionVerticalGradient(PropertyValue<bool>);
+    void setFillExtrusionVerticalGradientTransition(const TransitionOptions&);
+    TransitionOptions getFillExtrusionVerticalGradientTransition() const;
+
     // Private implementation
 
     class Impl;
