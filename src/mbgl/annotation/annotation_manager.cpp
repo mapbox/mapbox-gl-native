@@ -13,6 +13,15 @@
 
 #include <boost/function_output_iterator.hpp>
 
+// Note: LayerManager::annotationsEnabled is defined
+// at compile time, so that linker (with LTO on) is able
+// to optimize out the unreachable code.
+#define CHECK_ANNOTATIONS_ENABLED_AND_RETURN(result) \
+if (!LayerManager::annotationsEnabled) {             \
+    assert(false);                                   \
+    return result;                                   \
+}
+
 namespace mbgl {
 
 using namespace style;
@@ -28,14 +37,17 @@ AnnotationManager::AnnotationManager(Style& style_)
 AnnotationManager::~AnnotationManager() = default;
 
 void AnnotationManager::setStyle(Style& style_) {
+    CHECK_ANNOTATIONS_ENABLED_AND_RETURN();
     style = style_;
 }
 
 void AnnotationManager::onStyleLoaded() {
+    CHECK_ANNOTATIONS_ENABLED_AND_RETURN();
     updateStyle();
 }
 
 AnnotationID AnnotationManager::addAnnotation(const Annotation& annotation) {
+    CHECK_ANNOTATIONS_ENABLED_AND_RETURN(nextID++);
     std::lock_guard<std::mutex> lock(mutex);
     AnnotationID id = nextID++;
     Annotation::visit(annotation, [&] (const auto& annotation_) {
@@ -46,6 +58,7 @@ AnnotationID AnnotationManager::addAnnotation(const Annotation& annotation) {
 }
 
 bool AnnotationManager::updateAnnotation(const AnnotationID& id, const Annotation& annotation) {
+    CHECK_ANNOTATIONS_ENABLED_AND_RETURN(true);
     std::lock_guard<std::mutex> lock(mutex);
     Annotation::visit(annotation, [&] (const auto& annotation_) {
         this->update(id, annotation_);
@@ -54,6 +67,7 @@ bool AnnotationManager::updateAnnotation(const AnnotationID& id, const Annotatio
 }
 
 void AnnotationManager::removeAnnotation(const AnnotationID& id) {
+    CHECK_ANNOTATIONS_ENABLED_AND_RETURN();
     std::lock_guard<std::mutex> lock(mutex);
     remove(id);
     dirty = true;
@@ -119,6 +133,7 @@ void AnnotationManager::update(const AnnotationID& id, const FillAnnotation& ann
 }
 
 void AnnotationManager::remove(const AnnotationID& id) {
+    CHECK_ANNOTATIONS_ENABLED_AND_RETURN();
     if (symbolAnnotations.find(id) != symbolAnnotations.end()) {
         symbolTree.remove(symbolAnnotations.at(id));
         symbolAnnotations.erase(id);
@@ -194,6 +209,7 @@ void AnnotationManager::updateStyle() {
 }
 
 void AnnotationManager::updateData() {
+    CHECK_ANNOTATIONS_ENABLED_AND_RETURN();
     std::lock_guard<std::mutex> lock(mutex);
     if (dirty) {
         for (auto& tile : tiles) {
@@ -204,12 +220,14 @@ void AnnotationManager::updateData() {
 }
 
 void AnnotationManager::addTile(AnnotationTile& tile) {
+    CHECK_ANNOTATIONS_ENABLED_AND_RETURN();
     std::lock_guard<std::mutex> lock(mutex);
     tiles.insert(&tile);
     tile.setData(getTileData(tile.id.canonical));
 }
 
 void AnnotationManager::removeTile(AnnotationTile& tile) {
+    CHECK_ANNOTATIONS_ENABLED_AND_RETURN();
     std::lock_guard<std::mutex> lock(mutex);
     tiles.erase(&tile);
 }
@@ -221,6 +239,7 @@ static std::string prefixedImageID(const std::string& id) {
 }
 
 void AnnotationManager::addImage(std::unique_ptr<style::Image> image) {
+    CHECK_ANNOTATIONS_ENABLED_AND_RETURN();
     std::lock_guard<std::mutex> lock(mutex);
     const std::string id = prefixedImageID(image->getID());
     images.erase(id);
@@ -230,6 +249,7 @@ void AnnotationManager::addImage(std::unique_ptr<style::Image> image) {
 }
 
 void AnnotationManager::removeImage(const std::string& id_) {
+    CHECK_ANNOTATIONS_ENABLED_AND_RETURN();
     std::lock_guard<std::mutex> lock(mutex);
     const std::string id = prefixedImageID(id_);
     images.erase(id);
@@ -237,10 +257,11 @@ void AnnotationManager::removeImage(const std::string& id_) {
 }
 
 double AnnotationManager::getTopOffsetPixelsForImage(const std::string& id_) {
+    CHECK_ANNOTATIONS_ENABLED_AND_RETURN(0.0);
     std::lock_guard<std::mutex> lock(mutex);
     const std::string id = prefixedImageID(id_);
     auto it = images.find(id);
-    return it != images.end() ? -(it->second.getImage().size.height / it->second.getPixelRatio()) / 2 : 0;
+    return it != images.end() ? -(it->second.getImage().size.height / it->second.getPixelRatio()) / 2 : 0.0;
 }
 
 } // namespace mbgl

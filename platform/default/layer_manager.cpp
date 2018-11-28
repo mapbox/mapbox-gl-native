@@ -73,4 +73,6 @@ LayerManager* LayerManager::get() noexcept {
     return &instance;
 }
 
+const bool LayerManager::annotationsEnabled = true;
+
 } // namespace mbgl

@@ -84,8 +84,6 @@ private:
     ImageMap images;
 
     std::unordered_set<AnnotationTile*> tiles;
-
-    friend class AnnotationTile;
 };
 
 } // namespace mbgl
