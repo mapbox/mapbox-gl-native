@@ -229,7 +229,6 @@ final class MapGestureDetector {
 
       case MotionEvent.ACTION_CANCEL:
         scheduledAnimators.clear();
-        transform.cancelTransitions();
         transform.setGestureInProgress(false);
         break;
     }
