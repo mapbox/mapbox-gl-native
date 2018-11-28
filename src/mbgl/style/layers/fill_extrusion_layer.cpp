@@ -252,6 +252,33 @@ TransitionOptions FillExtrusionLayer::getFillExtrusionBaseTransition() const {
     return impl().paint.template get<FillExtrusionBase>().options;
 }
 
+PropertyValue<bool> FillExtrusionLayer::getDefaultFillExtrusionVerticalGradient() {
+    return { true };
+}
+
+PropertyValue<bool> FillExtrusionLayer::getFillExtrusionVerticalGradient() const {
+    return impl().paint.template get<FillExtrusionVerticalGradient>().value;
+}
+
+void FillExtrusionLayer::setFillExtrusionVerticalGradient(PropertyValue<bool> value) {
+    if (value == getFillExtrusionVerticalGradient())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<FillExtrusionVerticalGradient>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void FillExtrusionLayer::setFillExtrusionVerticalGradientTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<FillExtrusionVerticalGradient>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions FillExtrusionLayer::getFillExtrusionVerticalGradientTransition() const {
+    return impl().paint.template get<FillExtrusionVerticalGradient>().options;
+}
+
 using namespace conversion;
 
 optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, const Convertible& value) {
@@ -264,6 +291,7 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
         FillExtrusionPattern,
         FillExtrusionHeight,
         FillExtrusionBase,
+        FillExtrusionVerticalGradient,
         FillExtrusionOpacityTransition,
         FillExtrusionColorTransition,
         FillExtrusionTranslateTransition,
@@ -271,6 +299,7 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
         FillExtrusionPatternTransition,
         FillExtrusionHeightTransition,
         FillExtrusionBaseTransition,
+        FillExtrusionVerticalGradientTransition,
     };
 
     Property property = Property::Unknown;
@@ -343,6 +372,16 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
     case util::hashFNV1a("fill-extrusion-base-transition"):
         if (name == "fill-extrusion-base-transition") {
             property = Property::FillExtrusionBaseTransition;
+        }
+        break;
+    case util::hashFNV1a("fill-extrusion-vertical-gradient"):
+        if (name == "fill-extrusion-vertical-gradient") {
+            property = Property::FillExtrusionVerticalGradient;
+        }
+        break;
+    case util::hashFNV1a("fill-extrusion-vertical-gradient-transition"):
+        if (name == "fill-extrusion-vertical-gradient-transition") {
+            property = Property::FillExtrusionVerticalGradientTransition;
         }
         break;
     
@@ -432,6 +471,18 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
         
     }
     
+    if (property == Property::FillExtrusionVerticalGradient) {
+        Error error;
+        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+        
+        setFillExtrusionVerticalGradient(*typedValue);
+        return nullopt;
+        
+    }
+    
 
     Error error;
     optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
@@ -471,6 +522,11 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
     
     if (property == Property::FillExtrusionBaseTransition) {
         setFillExtrusionBaseTransition(*transition);
+        return nullopt;
+    }
+    
+    if (property == Property::FillExtrusionVerticalGradientTransition) {
+        setFillExtrusionVerticalGradientTransition(*transition);
         return nullopt;
     }
     

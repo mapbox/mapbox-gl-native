@@ -154,6 +154,11 @@ namespace android {
         toFillExtrusionLayer(layer).setFillExtrusionBaseTransition(options);
     }
 
+    jni::Local<jni::Object<>> FillExtrusionLayer::getFillExtrusionVerticalGradient(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        return std::move(*convert<jni::Local<jni::Object<>>>(env, toFillExtrusionLayer(layer).getFillExtrusionVerticalGradient()));
+    }
+
 
     // FillExtrusionJavaLayerPeerFactory
 
@@ -207,7 +212,8 @@ namespace android {
             METHOD(&FillExtrusionLayer::getFillExtrusionHeight, "nativeGetFillExtrusionHeight"),
             METHOD(&FillExtrusionLayer::getFillExtrusionBaseTransition, "nativeGetFillExtrusionBaseTransition"),
             METHOD(&FillExtrusionLayer::setFillExtrusionBaseTransition, "nativeSetFillExtrusionBaseTransition"),
-            METHOD(&FillExtrusionLayer::getFillExtrusionBase, "nativeGetFillExtrusionBase"));
+            METHOD(&FillExtrusionLayer::getFillExtrusionBase, "nativeGetFillExtrusionBase"),
+            METHOD(&FillExtrusionLayer::getFillExtrusionVerticalGradient, "nativeGetFillExtrusionVerticalGradient"));
     }
 
 } // namespace android

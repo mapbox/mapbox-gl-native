@@ -1245,6 +1245,26 @@ public class PropertyFactory {
   }
 
   /**
+   * Whether to apply a vertical gradient to the sides of a fill-extrusion layer. If true, sides will be shaded slightly darker farther down.
+   *
+   * @param value a Boolean value
+   * @return property wrapper around Boolean
+   */
+  public static PropertyValue<Boolean> fillExtrusionVerticalGradient(Boolean value) {
+    return new PaintPropertyValue<>("fill-extrusion-vertical-gradient", value);
+  }
+
+  /**
+   * Whether to apply a vertical gradient to the sides of a fill-extrusion layer. If true, sides will be shaded slightly darker farther down.
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> fillExtrusionVerticalGradient(Expression expression) {
+    return new PaintPropertyValue<>("fill-extrusion-vertical-gradient", expression);
+  }
+
+  /**
    * The opacity at which the image will be drawn.
    *
    * @param value a Float value

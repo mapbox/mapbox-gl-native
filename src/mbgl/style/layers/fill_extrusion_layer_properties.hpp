@@ -40,6 +40,10 @@ struct FillExtrusionBase : DataDrivenPaintProperty<float, attributes::a_base, un
     static float defaultValue() { return 0; }
 };
 
+struct FillExtrusionVerticalGradient : PaintProperty<bool> {
+    static bool defaultValue() { return true; }
+};
+
 class FillExtrusionPaintProperties : public Properties<
     FillExtrusionOpacity,
     FillExtrusionColor,
@@ -47,7 +51,8 @@ class FillExtrusionPaintProperties : public Properties<
     FillExtrusionTranslateAnchor,
     FillExtrusionPattern,
     FillExtrusionHeight,
-    FillExtrusionBase
+    FillExtrusionBase,
+    FillExtrusionVerticalGradient
 > {};
 
 } // namespace style

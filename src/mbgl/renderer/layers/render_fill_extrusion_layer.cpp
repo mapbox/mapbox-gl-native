@@ -226,7 +226,8 @@ style::FillExtrusionPaintProperties::PossiblyEvaluated RenderFillExtrusionLayer:
         evaluated.get<style::FillExtrusionTranslateAnchor>(),
         evaluated.get<style::FillExtrusionPattern>(),
         evaluated.get<style::FillExtrusionHeight>(),
-        evaluated.get<style::FillExtrusionBase>()
+        evaluated.get<style::FillExtrusionBase>(),
+        evaluated.get<style::FillExtrusionVerticalGradient>()
     };
 }
 

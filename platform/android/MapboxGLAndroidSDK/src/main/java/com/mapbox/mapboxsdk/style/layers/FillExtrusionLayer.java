@@ -370,6 +370,18 @@ public class FillExtrusionLayer extends Layer {
     nativeSetFillExtrusionBaseTransition(options.getDuration(), options.getDelay());
   }
 
+  /**
+   * Get the FillExtrusionVerticalGradient property
+   *
+   * @return property wrapper value around Boolean
+   */
+  @NonNull
+  @SuppressWarnings("unchecked")
+  public PropertyValue<Boolean> getFillExtrusionVerticalGradient() {
+    checkThread();
+    return (PropertyValue<Boolean>) new PropertyValue("fill-extrusion-vertical-gradient", nativeGetFillExtrusionVerticalGradient());
+  }
+
   @NonNull
   @Keep
   private native Object nativeGetFillExtrusionOpacity();
@@ -439,6 +451,10 @@ public class FillExtrusionLayer extends Layer {
 
   @Keep
   private native void nativeSetFillExtrusionBaseTransition(long duration, long delay);
+
+  @NonNull
+  @Keep
+  private native Object nativeGetFillExtrusionVerticalGradient();
 
   @Override
   @Keep

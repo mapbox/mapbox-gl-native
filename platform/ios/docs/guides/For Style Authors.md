@@ -226,6 +226,7 @@ In style JSON | In Objective-C | In Swift
 
 In style JSON | In Objective-C | In Swift
 --------------|----------------|---------
+`fill-extrusion-vertical-gradient` | `MGLFillExtrusionStyleLayer.fillExtrusionHasVerticalGradient` | `MGLFillExtrusionStyleLayer.fillExtrusionHasVerticalGradient`
 `fill-extrusion-translate` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslation` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslation`
 `fill-extrusion-translate-anchor` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslationAnchor` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslationAnchor`
 

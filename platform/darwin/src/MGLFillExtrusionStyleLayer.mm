@@ -156,6 +156,31 @@ namespace mbgl {
     return transition;
 }
 
+- (void)setFillExtrusionHasVerticalGradient:(NSExpression *)fillExtrusionHasVerticalGradient {
+    MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting fillExtrusionHasVerticalGradient: %@", fillExtrusionHasVerticalGradient);
+
+    auto mbglValue = MGLStyleValueTransformer<bool, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<bool>>(fillExtrusionHasVerticalGradient, false);
+    self.rawLayer->setFillExtrusionVerticalGradient(mbglValue);
+}
+
+- (NSExpression *)fillExtrusionHasVerticalGradient {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getFillExtrusionVerticalGradient();
+    if (propertyValue.isUndefined()) {
+        propertyValue = self.rawLayer->getDefaultFillExtrusionVerticalGradient();
+    }
+    return MGLStyleValueTransformer<bool, NSNumber *>().toExpression(propertyValue);
+}
+
+- (void)setFillExtrusionVerticalGradient:(NSExpression *)fillExtrusionVerticalGradient {
+}
+
+- (NSExpression *)fillExtrusionVerticalGradient {
+    return self.fillExtrusionHasVerticalGradient;
+}
+
 - (void)setFillExtrusionHeight:(NSExpression *)fillExtrusionHeight {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting fillExtrusionHeight: %@", fillExtrusionHeight);
