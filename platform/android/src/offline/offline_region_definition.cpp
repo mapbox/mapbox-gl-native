@@ -50,7 +50,7 @@ mbgl::OfflineTilePyramidRegionDefinition OfflineTilePyramidRegionDefinition::get
 
     return mbgl::OfflineTilePyramidRegionDefinition(
         jni::Make<std::string>(env, jDefinition.Get(env, styleURLF)),
-        LatLngBounds::getLatLngBounds(env, jDefinition.Get(env, boundsF)),
+        LatLngBounds::getLatLngUnwrappedBounds(env, jDefinition.Get(env, boundsF)),
         jDefinition.Get(env, minZoomF),
         jDefinition.Get(env, maxZoomF),
         jDefinition.Get(env, pixelRatioF)

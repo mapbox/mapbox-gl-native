@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.geometry.LatLngUnwrappedBounds;
 import com.mapbox.mapboxsdk.snapshotter.MapSnapshot;
 import com.mapbox.mapboxsdk.snapshotter.MapSnapshotter;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -63,8 +63,8 @@ public class MapSnapshotterReuseActivity extends AppCompatActivity implements Ma
     imageView.setImageBitmap(snapshot.getBitmap());
   }
 
-  private LatLngBounds getRandomBounds() {
-    return LatLngBounds.from(
+  private LatLngUnwrappedBounds getRandomBounds() {
+    return LatLngUnwrappedBounds.from(
       randomInRange(5, 10),
       randomInRange(-5, 5),
       randomInRange(-5, 5),

@@ -142,7 +142,7 @@ namespace android {
     }
 
     void CustomGeometrySource::invalidateBounds(jni::JNIEnv& env, const jni::Object<LatLngBounds>& jBounds) {
-        auto bounds = LatLngBounds::getLatLngBounds(env, jBounds);
+        auto bounds = LatLngBounds::getLatLngUnwrappedBounds(env, jBounds);
         source.as<mbgl::style::CustomGeometrySource>()->CustomGeometrySource::invalidateRegion(bounds);
     }
 

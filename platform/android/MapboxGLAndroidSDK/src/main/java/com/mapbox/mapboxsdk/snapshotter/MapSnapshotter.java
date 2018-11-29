@@ -27,6 +27,7 @@ import com.mapbox.mapboxsdk.attribution.AttributionParser;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.geometry.LatLngUnwrappedBounds;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
 import com.mapbox.mapboxsdk.storage.FileSource;
@@ -288,7 +289,8 @@ public class MapSnapshotter {
     String programCacheDir = FileSource.getInternalCachePath(context);
 
     nativeInitialize(this, fileSource, options.pixelRatio, options.width,
-      options.height, options.styleUrl, options.styleJson, options.region, options.cameraPosition,
+      options.height, options.styleUrl, options.styleJson,
+      LatLngUnwrappedBounds.from(options.region), options.cameraPosition,
       options.showLogo, programCacheDir, options.localIdeographFontFamily);
   }
 
@@ -339,10 +341,10 @@ public class MapSnapshotter {
   /**
    * Updates the snapshotter with a new {@link LatLngBounds}
    *
-   * @param region the region
+   * @param unwrappedRegion the region
    */
   @Keep
-  public native void setRegion(LatLngBounds region);
+  public native void setRegion(LatLngUnwrappedBounds unwrappedRegion);
 
   /**
    * Updates the snapshotter with a new style url
@@ -570,7 +572,8 @@ public class MapSnapshotter {
   protected native void nativeInitialize(MapSnapshotter mapSnapshotter,
                                          FileSource fileSource, float pixelRatio,
                                          int width, int height, String styleUrl, String styleJson,
-                                         LatLngBounds region, CameraPosition position,
+                                         LatLngUnwrappedBounds unwrappedRegion,
+                                         CameraPosition position,
                                          boolean showLogo, String programCacheDir,
                                          String localIdeographFontFamily);
 

@@ -25,6 +25,7 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.exceptions.CalledFromWorkerThreadException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.geometry.LatLngUnwrappedBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
@@ -214,7 +215,7 @@ final class NativeMapView {
     if (checkState("setLatLngBounds")) {
       return;
     }
-    nativeSetLatLngBounds(latLngBounds);
+    nativeSetLatLngBounds(LatLngUnwrappedBounds.from(latLngBounds));
   }
 
   public void cancelTransitions() {
@@ -267,7 +268,8 @@ final class NativeMapView {
     return nativeGetLatLng().wrap();
   }
 
-  public CameraPosition getCameraForLatLngBounds(LatLngBounds bounds, int[] padding, double bearing, double tilt) {
+  public CameraPosition getCameraForLatLngBounds(LatLngUnwrappedBounds bounds,
+                                                 int[] padding, double bearing, double tilt) {
     if (checkState("getCameraForLatLngBounds")) {
       return null;
     }
@@ -1024,7 +1026,7 @@ final class NativeMapView {
   private native String nativeGetStyleJson();
 
   @Keep
-  private native void nativeSetLatLngBounds(LatLngBounds latLngBounds);
+  private native void nativeSetLatLngBounds(LatLngUnwrappedBounds latLngUnwrappedBounds);
 
   @Keep
   private native void nativeCancelTransitions();
@@ -1045,7 +1047,8 @@ final class NativeMapView {
   @NonNull
   @Keep
   private native CameraPosition nativeGetCameraForLatLngBounds(
-    LatLngBounds latLngBounds, double top, double left, double bottom, double right, double bearing, double tilt);
+    LatLngUnwrappedBounds latLngUnwrappedBounds,
+    double top, double left, double bottom, double right, double bearing, double tilt);
 
   @NonNull
   @Keep

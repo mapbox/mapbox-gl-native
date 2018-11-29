@@ -231,7 +231,7 @@ void NativeMapView::setStyleJson(jni::JNIEnv& env, const jni::String& json) {
 
 void NativeMapView::setLatLngBounds(jni::JNIEnv& env, const jni::Object<mbgl::android::LatLngBounds>& jBounds) {
     if (jBounds) {
-        map->setLatLngBounds(mbgl::android::LatLngBounds::getLatLngBounds(env, jBounds));
+        map->setLatLngBounds(mbgl::android::LatLngBounds::getLatLngUnwrappedBounds(env, jBounds));
     } else {
         map->setLatLngBounds(mbgl::LatLngBounds::world());
     }
@@ -324,7 +324,8 @@ void NativeMapView::setLatLng(jni::JNIEnv&, jni::jdouble latitude, jni::jdouble 
 
 jni::Local<jni::Object<CameraPosition>> NativeMapView::getCameraForLatLngBounds(jni::JNIEnv& env, const jni::Object<LatLngBounds>& jBounds, double top, double left, double bottom, double right, double bearing, double tilt) {
     mbgl::EdgeInsets padding = {top, left, bottom, right};
-    return CameraPosition::New(env, map->cameraForLatLngBounds(mbgl::android::LatLngBounds::getLatLngBounds(env, jBounds), padding, bearing, tilt));
+    return CameraPosition::New(env, map->cameraForLatLngBounds(
+            mbgl::android::LatLngBounds::getLatLngUnwrappedBounds(env, jBounds), padding, bearing, tilt));
 }
 
 jni::Local<jni::Object<CameraPosition>> NativeMapView::getCameraForGeometry(jni::JNIEnv& env, const jni::Object<geojson::Geometry>& jGeometry, double top, double left, double bottom, double right, double bearing, double tilt) {

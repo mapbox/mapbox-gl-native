@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.geometry.LatLngUnwrappedBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.UiSettings;
@@ -289,7 +290,7 @@ public final class CameraUpdateFactory {
 
     @Override
     public CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap) {
-      return mapboxMap.getCameraForLatLngBounds(bounds, padding);
+      return mapboxMap.getCameraForLatLngBounds(LatLngUnwrappedBounds.from(bounds), padding);
     }
 
     @Override

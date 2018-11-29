@@ -12,11 +12,12 @@ namespace android {
 class LatLngBounds : private mbgl::util::noncopyable {
 public:
 
-    static constexpr auto Name() { return "com/mapbox/mapboxsdk/geometry/LatLngBounds"; };
+    static constexpr auto Name() { return "com/mapbox/mapboxsdk/geometry/LatLngUnwrappedBounds"; };
 
     static jni::Local<jni::Object<LatLngBounds>> New(jni::JNIEnv&, mbgl::LatLngBounds);
 
-    static mbgl::LatLngBounds getLatLngBounds(jni::JNIEnv&, const jni::Object<LatLngBounds>&);
+    static mbgl::LatLngBounds getLatLngUnwrappedBounds(jni::JNIEnv &,
+                                                       const jni::Object<LatLngBounds> &);
 
     static void registerNative(jni::JNIEnv&);
 };

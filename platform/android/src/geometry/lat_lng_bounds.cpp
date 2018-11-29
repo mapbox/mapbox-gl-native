@@ -9,7 +9,8 @@ jni::Local<jni::Object<LatLngBounds>> LatLngBounds::New(jni::JNIEnv& env, mbgl::
     return javaClass.New(env, constructor, bounds.north(), bounds.east(), bounds.south(), bounds.west());
 }
 
-mbgl::LatLngBounds LatLngBounds::getLatLngBounds(jni::JNIEnv& env, const jni::Object<LatLngBounds>& bounds) {
+mbgl::LatLngBounds LatLngBounds::getLatLngUnwrappedBounds(jni::JNIEnv &env,
+                                                          const jni::Object<LatLngBounds> &bounds) {
     static auto& javaClass = jni::Class<LatLngBounds>::Singleton(env);
     static auto swLatField = javaClass.GetField<jni::jdouble>(env, "latitudeSouth");
     static auto swLonField = javaClass.GetField<jni::jdouble>(env, "longitudeWest");
@@ -18,8 +19,6 @@ mbgl::LatLngBounds LatLngBounds::getLatLngBounds(jni::JNIEnv& env, const jni::Ob
 
     mbgl::LatLng sw = { bounds.Get(env, swLatField), bounds.Get(env, swLonField) };
     mbgl::LatLng ne = { bounds.Get(env, neLatField), bounds.Get(env, neLonField) };
-
-    sw.unwrapForShortestPath(ne);
 
     return mbgl::LatLngBounds::hull(sw, ne);
 }

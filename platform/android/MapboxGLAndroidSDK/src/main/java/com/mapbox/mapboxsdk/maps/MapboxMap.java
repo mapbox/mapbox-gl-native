@@ -36,6 +36,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.geometry.LatLngUnwrappedBounds;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
@@ -1244,66 +1245,67 @@ public final class MapboxMap {
   /**
    * Get a camera position that fits a provided bounds and the current camera tilt and bearing.
    *
-   * @param latLngBounds the bounds to set the map with
+   * @param latLngUnwrappedBounds the bounds to set the map with
    * @return the camera position that fits the bounds
    */
   @NonNull
-  public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds) {
+  public CameraPosition getCameraForLatLngBounds(@NonNull LatLngUnwrappedBounds latLngUnwrappedBounds) {
     // we use current camera tilt value to provide expected transformations as #11993
-    return getCameraForLatLngBounds(latLngBounds, new int[] {0, 0, 0, 0});
+    return getCameraForLatLngBounds(latLngUnwrappedBounds, new int[] {0, 0, 0, 0});
   }
 
 
   /**
    * Get a camera position that fits a provided bounds and padding and the current camera tilt and bearing.
    *
-   * @param latLngBounds the bounds to set the map with
+   * @param latLngUnwrappedBounds the bounds to set the map with
    * @param padding      the padding to apply to the bounds
    * @return the camera position that fits the bounds and padding
    */
   @NonNull
-  public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
+  public CameraPosition getCameraForLatLngBounds(@NonNull LatLngUnwrappedBounds latLngUnwrappedBounds,
                                                  @NonNull @Size(value = 4) int[] padding) {
     // we use current camera tilt/bearing value to provide expected transformations as #11993
-    return getCameraForLatLngBounds(latLngBounds, padding, transform.getRawBearing(), transform.getTilt());
+    return getCameraForLatLngBounds(latLngUnwrappedBounds,
+            padding, transform.getRawBearing(), transform.getTilt());
   }
 
 
   /**
    * Get a camera position that fits a provided bounds, bearing and tilt.
    *
-   * @param latLngBounds the bounds to set the map with
+   * @param latLngUnwrappedBounds the bounds to set the map with
    * @param bearing      the bearing to transform the camera position with
    * @param tilt         to transform the camera position with
    * @return the camera position that fits the bounds and given bearing and tilt
    */
   @NonNull
-  public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
+  public CameraPosition getCameraForLatLngBounds(@NonNull LatLngUnwrappedBounds latLngUnwrappedBounds,
                                                  @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION,
                                                    to = MapboxConstants.MAXIMUM_DIRECTION) double bearing,
                                                  @FloatRange(from = MapboxConstants.MINIMUM_TILT,
                                                    to = MapboxConstants.MAXIMUM_TILT) double tilt) {
-    return getCameraForLatLngBounds(latLngBounds, new int[] {0, 0, 0, 0}, bearing, tilt);
+    return getCameraForLatLngBounds(latLngUnwrappedBounds, new int[] {0, 0, 0, 0}, bearing, tilt);
   }
 
 
   /**
    * Get a camera position that fits a provided bounds, padding, bearing and tilt.
    *
-   * @param latLngBounds the bounds to set the map with
+   * @param latLngUnwrappedBounds the bounds to set the map with
    * @param padding      the padding to apply to the bounds
    * @param bearing      the bearing to transform the camera position with
    * @param tilt         to transform the camera position with
    * @return the camera position that fits the bounds, bearing and tilt
    */
   @NonNull
-  public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
+  public CameraPosition getCameraForLatLngBounds(@NonNull LatLngUnwrappedBounds latLngUnwrappedBounds,
                                                  @NonNull @Size(value = 4) int[] padding,
                                                  @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION,
                                                    to = MapboxConstants.MAXIMUM_DIRECTION) double bearing,
                                                  @FloatRange(from = MapboxConstants.MINIMUM_TILT,
                                                    to = MapboxConstants.MAXIMUM_TILT) double tilt) {
-    return nativeMapView.getCameraForLatLngBounds(latLngBounds, padding, bearing, tilt);
+    return nativeMapView.getCameraForLatLngBounds(latLngUnwrappedBounds, padding, bearing, tilt);
   }
 
   /**

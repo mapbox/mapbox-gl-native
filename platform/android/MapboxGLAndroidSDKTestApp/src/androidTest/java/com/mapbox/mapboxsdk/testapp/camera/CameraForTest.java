@@ -5,7 +5,7 @@ import com.mapbox.geojson.Point;
 import com.mapbox.geojson.Polygon;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.geometry.LatLngUnwrappedBounds;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.DeviceIndependentTestActivity;
 import org.junit.Test;
@@ -22,7 +22,7 @@ public class CameraForTest extends BaseActivityTest {
     validateTestSetup();
     onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
       CameraPosition actualPosition = mapboxMap.getCameraForLatLngBounds(
-        LatLngBounds.from(10, 10, -10, -10));
+        LatLngUnwrappedBounds.from(10, 10, -10, -10));
       CameraPosition expectedPosition = new CameraPosition.Builder()
         .target(new LatLng()).zoom(4.16).tilt(0).bearing(0).build();
       assertEquals("Latitude should match",
@@ -40,7 +40,7 @@ public class CameraForTest extends BaseActivityTest {
     validateTestSetup();
     onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
       CameraPosition actualPosition = mapboxMap.getCameraForLatLngBounds(
-        LatLngBounds.from(10, 10, -10, -10), new int[] {5, 5, 5, 5});
+        LatLngUnwrappedBounds.from(10, 10, -10, -10), new int[] {5, 5, 5, 5});
       CameraPosition expectedPosition = new CameraPosition.Builder()
         .target(new LatLng()).zoom(4.13).tilt(0).bearing(0).build();
       assertEquals("Latitude should match",
@@ -61,7 +61,7 @@ public class CameraForTest extends BaseActivityTest {
     validateTestSetup();
     onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
       CameraPosition actualPosition = mapboxMap.getCameraForLatLngBounds(
-        LatLngBounds.from(10, 10, -10, -10), 45, 0);
+        LatLngUnwrappedBounds.from(10, 10, -10, -10), 45, 0);
       CameraPosition expectedPosition = new CameraPosition.Builder()
         .target(new LatLng()).zoom(3.66).tilt(0).bearing(45).build();
       assertEquals("Latitude should match",
@@ -82,7 +82,7 @@ public class CameraForTest extends BaseActivityTest {
     validateTestSetup();
     onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
       CameraPosition actualPosition = mapboxMap.getCameraForLatLngBounds(
-        LatLngBounds.from(10, 10, -10, -10), 0, 45);
+        LatLngUnwrappedBounds.from(10, 10, -10, -10), 0, 45);
       CameraPosition expectedPosition = new CameraPosition.Builder()
         .target(new LatLng(-0.264576975267, 0)).zoom(4.13).tilt(45).bearing(0).build();
       assertEquals("Latitude should match",
@@ -103,7 +103,7 @@ public class CameraForTest extends BaseActivityTest {
     validateTestSetup();
     onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
       CameraPosition actualPosition = mapboxMap.getCameraForLatLngBounds(
-        LatLngBounds.from(10, 10, -10, -10), new int[] {5, 5, 5, 5}, 45, 45);
+        LatLngUnwrappedBounds.from(10, 10, -10, -10), new int[] {5, 5, 5, 5}, 45, 45);
       CameraPosition expectedPosition = new CameraPosition.Builder()
         .target(new LatLng(-0.3732134634, -0.3713191053)).zoom(3.63).tilt(45).bearing(45).build();
       assertEquals("Latitude should match",

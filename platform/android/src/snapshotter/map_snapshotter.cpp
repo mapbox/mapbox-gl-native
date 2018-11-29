@@ -47,7 +47,7 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
 
     optional<mbgl::LatLngBounds> bounds;
     if (region) {
-        bounds = LatLngBounds::getLatLngBounds(_env, region);
+        bounds = LatLngBounds::getLatLngUnwrappedBounds(_env, region);
     }
 
     std::pair<bool, std::string> style;
@@ -130,7 +130,7 @@ void MapSnapshotter::setCameraPosition(JNIEnv& env, const jni::Object<CameraPosi
 }
 
 void MapSnapshotter::setRegion(JNIEnv& env, const jni::Object<LatLngBounds>& region) {
-    snapshotter->setRegion(LatLngBounds::getLatLngBounds(env, region));
+    snapshotter->setRegion(LatLngBounds::getLatLngUnwrappedBounds(env, region));
 }
 
 

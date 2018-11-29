@@ -9,6 +9,7 @@ import android.support.annotation.WorkerThread;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.geometry.LatLngUnwrappedBounds;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 
 import java.lang.ref.WeakReference;
@@ -84,7 +85,7 @@ public class CustomGeometrySource extends Source {
    * @param bounds The region in which features should be invalidated at all zoom levels
    */
   public void invalidateRegion(LatLngBounds bounds) {
-    nativeInvalidateBounds(bounds);
+    nativeInvalidateBounds(LatLngUnwrappedBounds.from(bounds));
   }
 
   /**
@@ -140,7 +141,7 @@ public class CustomGeometrySource extends Source {
   private native void nativeInvalidateTile(int z, int x, int y);
 
   @Keep
-  private native void nativeInvalidateBounds(LatLngBounds bounds);
+  private native void nativeInvalidateBounds(LatLngUnwrappedBounds bounds);
 
   @Override
   @Keep

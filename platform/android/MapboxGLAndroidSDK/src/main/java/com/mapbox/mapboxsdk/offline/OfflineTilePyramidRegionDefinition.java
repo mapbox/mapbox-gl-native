@@ -7,6 +7,7 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.geometry.LatLngUnwrappedBounds;
 
 /**
  * An offline region defined by a style URL, geographic bounding box, zoom range, and
@@ -44,12 +45,33 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
   @Keep
   public OfflineTilePyramidRegionDefinition(
     String styleURL, LatLngBounds bounds, double minZoom, double maxZoom, float pixelRatio) {
-    // Note: Also used in JNI
+
     this.styleURL = styleURL;
     this.bounds = bounds;
     this.minZoom = minZoom;
     this.maxZoom = maxZoom;
     this.pixelRatio = pixelRatio;
+  }
+
+  /**
+   * Constructor to create an OfflineTilePyramidDefinition from parameters.
+   *
+   * @param styleURL   the style
+   * @param unwrappedBounds     the unwrapped bounds
+   * @param minZoom    min zoom
+   * @param maxZoom    max zoom
+   * @param pixelRatio pixel ratio of the device
+   */
+  @Keep
+  public OfflineTilePyramidRegionDefinition(
+    String styleURL, LatLngUnwrappedBounds unwrappedBounds,
+    double minZoom, double maxZoom, float pixelRatio) {
+
+    // Note: Also used in JNI
+    this(styleURL,
+         LatLngBounds.from(unwrappedBounds.getLatNorth(), unwrappedBounds.getLonEast(),
+                           unwrappedBounds.getLatSouth(), unwrappedBounds.getLonWest()),
+         minZoom, maxZoom, pixelRatio);
   }
 
   /**
