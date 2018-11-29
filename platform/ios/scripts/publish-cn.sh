@@ -24,7 +24,7 @@ echo "finished!"
 # zip
 #
 cd build/ios/pkg
-ZIP="mapbox-ios-sdk-4.5.0-cn.1.zip"
+ZIP="mapbox-ios-sdk-${PUBLISH_VERSION}.zip"
 step "Compressing ${ZIP}…"
 rm -f ../${ZIP}
 zip -yr ../${ZIP} *
