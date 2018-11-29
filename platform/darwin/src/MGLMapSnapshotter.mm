@@ -17,6 +17,7 @@
 #import "MGLAttributionInfo_Private.h"
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLRendererConfiguration.h"
+#import "MGLMapboxEvents.h"
 
 #if TARGET_OS_IPHONE
 #import "UIImage+MGLAdditions.h"
@@ -74,6 +75,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
         _latLngForFn = std::move(latLngForFn);
         _scale = scale;
         _image = image;
+        [MGLMapboxEvents pushTurnstileEvent];
     }
     return self;
 }
