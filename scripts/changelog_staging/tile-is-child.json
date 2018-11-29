@@ -1,0 +1,4 @@
+{
+  "core": "Fix OverscaledTileID::isChildOf to exclude tiles with different wrap. Incorrect child detection could cause flickering for symbols displaying in two wrapped world copies at the same time.",
+  "issue": 13478
+}
