@@ -39,3 +39,6 @@
 # a large amount of users combine it with our SDK
 # we aren't able to provide a proguard config in that project (jar vs aar)
 -dontwarn com.sun.xml.internal.ws.spi.db.*
+
+# Temporary jacoco workaround - https://github.com/mapbox/mapbox-events-android/issues/302
+-dontwarn org.jacoco.**
