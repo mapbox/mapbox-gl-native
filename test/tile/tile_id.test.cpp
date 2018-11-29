@@ -186,6 +186,7 @@ TEST(TileID, Overscaled) {
     EXPECT_TRUE(OverscaledTileID(4, 2, 3).isChildOf(OverscaledTileID(3, 1, 1)));
     EXPECT_TRUE(OverscaledTileID(5, 0, { 4, 2, 3 }).isChildOf(OverscaledTileID(3, 1, 1)));
     EXPECT_TRUE(OverscaledTileID(6, 0, { 4, 2, 3 }).isChildOf(OverscaledTileID(3, 1, 1)));
+    EXPECT_FALSE(OverscaledTileID(6, -1, { 4, 2, 3 }).isChildOf(OverscaledTileID(3, 1, 1)));
     EXPECT_TRUE(OverscaledTileID(7, 0, { 4, 2, 3 }).isChildOf(OverscaledTileID(3, 1, 1)));
 
     EXPECT_FALSE(OverscaledTileID(2, 0, 0).isChildOf(OverscaledTileID(5, 0, { 4, 2, 3 })));
@@ -194,6 +195,7 @@ TEST(TileID, Overscaled) {
     EXPECT_FALSE(OverscaledTileID(5, 0, { 4, 2, 3 }).isChildOf(OverscaledTileID(5, 0, { 4, 2, 3 })));
     EXPECT_TRUE(OverscaledTileID(6, 0, { 4, 2, 3 }).isChildOf(OverscaledTileID(5, 0, { 4, 2, 3 })));
     EXPECT_TRUE(OverscaledTileID(7, 0, { 4, 2, 3 }).isChildOf(OverscaledTileID(5, 0, { 4, 2, 3 })));
+    EXPECT_FALSE(OverscaledTileID(7, 1, { 4, 2, 3 }).isChildOf(OverscaledTileID(5, 0, { 4, 2, 3 })));
 
     EXPECT_FALSE(OverscaledTileID(2, 0, 0).isChildOf(OverscaledTileID(6, 0, { 4, 2, 3 })));
     EXPECT_FALSE(OverscaledTileID(3, 1, 1).isChildOf(OverscaledTileID(6, 0, { 4, 2, 3 })));
@@ -201,7 +203,8 @@ TEST(TileID, Overscaled) {
     EXPECT_FALSE(OverscaledTileID(5, 0, { 4, 2, 3 }).isChildOf(OverscaledTileID(6, 0, { 4, 2, 3 })));
     EXPECT_FALSE(OverscaledTileID(6, 0, { 4, 2, 3 }).isChildOf(OverscaledTileID(6, 0, { 4, 2, 3 })));
     EXPECT_TRUE(OverscaledTileID(7, 0, { 4, 2, 3 }).isChildOf(OverscaledTileID(6, 0, { 4, 2, 3 })));
-
+    EXPECT_FALSE(OverscaledTileID(7, 0, { 4, 2, 3 }).isChildOf(OverscaledTileID(6, -1, { 4, 2, 3 })));
+    
     EXPECT_FALSE(OverscaledTileID(2, 0, 0).isChildOf(OverscaledTileID(5, 0, { 4, 0, 0 })));
     EXPECT_FALSE(OverscaledTileID(3, 1, 1).isChildOf(OverscaledTileID(5, 0, { 4, 0, 0 })));
     EXPECT_FALSE(OverscaledTileID(4, 2, 3).isChildOf(OverscaledTileID(5, 0, { 4, 0, 0 })));
