@@ -10,6 +10,18 @@ function finish { >&2 echo -en "\033[0m"; }
 trap finish EXIT
 
 #
+# iOS 8-compatible release tag format is `vX.Y.Z-cn.1`; `X.Y.Z-cn.1` gets passed in
+# In the case of symbolicated builds, we also append the `-symbols`.
+#
+PUBLISH_VERSION="$1"
+
+if [[ ${#} -eq 2 ]]; then
+    PUBLISH_STYLE="-$2"
+else
+    PUBLISH_STYLE=""
+fi
+
+#
 # make the framework
 #
   
