@@ -17,6 +17,8 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.attribution.AttributionLayout;
 import com.mapbox.mapboxsdk.attribution.AttributionMeasure;
@@ -25,6 +27,7 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.log.Logger;
+import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
 
@@ -251,6 +254,10 @@ public class MapSnapshotter {
   public MapSnapshotter(@NonNull Context context, @NonNull Options options) {
     checkThread();
     this.context = context.getApplicationContext();
+    TelemetryDefinition telemetry = Mapbox.getTelemetry();
+    if (telemetry != null) {
+      telemetry.onAppUserTurnstileEvent();
+    }
     FileSource fileSource = FileSource.getInstance(context);
     String programCacheDir = FileSource.getInternalCachePath(context);
 
