@@ -36,79 +36,14 @@ buildPackageStyle() {
         ./platform/ios/scripts/publish-cn.sh "${PUBLISH_VERSION}" ${style}
         file_name=mapbox-ios-sdk-${PUBLISH_VERSION}-${style}.zip
     fi
-#     step "Downloading ${file_name} from s3 to ${BINARY_DIRECTORY}"
-#     if [[ "${GITHUB_RELEASE}" == true ]]; then
-#         step "Uploading ${file_name} to GitHub"
-#         github-release upload \
-#             --tag "ios-v${PUBLISH_VERSION}" \
-#             --name ${file_name} \
-#             --file "${BINARY_DIRECTORY}/${file_name}" > /dev/null
-#     fi
-# }
+PUBLISH_VERSION=$( echo ${VERSION_TAG} | sed 's/^ios-v//' )
+git checkout ${VERSION_TAG}
+
+step "Deploying version ${PUBLISH_VERSION}…"
 # 
-# export TRAVIS_REPO_SLUG=mapbox-gl-native
-# export GITHUB_USER=mapbox
-# export GITHUB_REPO=mapbox-gl-native
-# export BUILDTYPE=Release
-# 
-# VERSION_TAG=${VERSION_TAG:-''}
-# PUBLISH_VERSION=
-# BINARY_DIRECTORY=${BINARY_DIRECTORY:-build/ios/deploy}
-# GITHUB_RELEASE=${GITHUB_RELEASE:-false}
-# PUBLISH_PRE_FLAG=''
-# 
-# if [[ -z `which github-release` ]]; then
-#     step "Installing github-release…"
-#     brew install github-release
-#     if [ -z `which github-release` ]; then
-#         echo "Unable to install github-release. See: https://github.com/aktau/github-release"
-#         exit 1
-#     fi
-# fi
-# 
-# if [[ ${GITHUB_RELEASE} = "true" ]]; then
-#     GITHUB_RELEASE=true # Assign bool, not just a string
-# fi
-# 
-# if [[ -z ${VERSION_TAG} ]]; then
-#     step "Determining version number from most recent relevant git tag…"
-#     VERSION_TAG=$( git describe --tags --match=ios-v*.*.* --abbrev=0 )
-#     echo "Found tag: ${VERSION_TAG}"
-# fi
-# 
-# if [[ $( echo ${VERSION_TAG} | grep --invert-match ios-v ) ]]; then
-#     echo "Error: ${VERSION_TAG} is not a valid iOS version tag"
-#     echo "VERSION_TAG should be in format: ios-vX.X.X-pre.X"
-#     exit 1
-# fi
-# 
-# if github-release info --tag ${VERSION_TAG} | grep --quiet "draft: ✗"; then
-#     echo "Error: ${VERSION_TAG} has already been published on GitHub"
-#     echo "See: https://github.com/${GITHUB_USER}/${GITHUB_REPO}/releases/tag/${VERSION_TAG}"
-#     exit 1
-# fi
-# 
-# PUBLISH_VERSION=$( echo ${VERSION_TAG} | sed 's/^ios-v//' )
-# git checkout ${VERSION_TAG}
-# 
-# step "Deploying version ${PUBLISH_VERSION}…"
-# 
-# make clean && make distclean
-# npm install --ignore-scripts
-# mkdir -p ${BINARY_DIRECTORY}
-# 
-# if [[ "${GITHUB_RELEASE}" == true ]]; then
-#     step "Create GitHub release…"
-#     if [[ $( echo ${PUBLISH_VERSION} | awk '/[0-9]-/' ) ]]; then
-#         PUBLISH_PRE_FLAG='--pre-release'
-#     fi
-#     RELEASE_NOTES=$( ./platform/ios/scripts/release-notes.js github )
-#     github-release release \
-#         --tag "ios-v${PUBLISH_VERSION}" \
-#         --name "ios-v${PUBLISH_VERSION}" \
-#         --draft ${PUBLISH_PRE_FLAG} \
-#         --description "${RELEASE_NOTES}"
-# fi
+make clean && make distclean
+npm install --ignore-scripts
+mkdir -p ${BINARY_DIRECTORY}
 
 buildPackageStyle "iframework" "symbols-dynamic"
 buildPackageStyle "iframework SYMBOLS=NO" "dynamic"
