@@ -4,6 +4,7 @@
 #include <mbgl/annotation/symbol_annotation_impl.hpp>
 #include <mbgl/annotation/line_annotation_impl.hpp>
 #include <mbgl/annotation/fill_annotation_impl.hpp>
+#include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_impl.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>

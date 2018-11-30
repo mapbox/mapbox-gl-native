@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/layermanager/layer_factory.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/layer.hpp>
 #include "../../gson/json_array.hpp"

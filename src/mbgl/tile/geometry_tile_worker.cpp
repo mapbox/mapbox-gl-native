@@ -1,6 +1,7 @@
 #include <mbgl/tile/geometry_tile_worker.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/layout/pattern_layout.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>

@@ -2,6 +2,7 @@
 
 #import "MGLStyleLayer_Private.h"
 
+#include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/style/layer.hpp>
 
 #include <map>

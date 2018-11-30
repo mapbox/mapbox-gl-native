@@ -3,6 +3,8 @@
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/style/conversion_impl.hpp>
 
+#include <mbgl/layermanager/layer_manager.hpp>
+
 namespace mbgl {
 namespace style {
 namespace conversion {

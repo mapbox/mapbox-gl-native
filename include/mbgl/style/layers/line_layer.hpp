@@ -2,12 +2,12 @@
 
 #pragma once
 
+#include <mbgl/layermanager/layer_factory.hpp>
 #include <mbgl/style/color_ramp_property_value.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
 #include <mbgl/style/expression/formatted.hpp>
-
 #include <mbgl/util/color.hpp>
 
 #include <vector>

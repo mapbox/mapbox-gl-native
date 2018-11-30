@@ -1,4 +1,6 @@
 #include <mbgl/renderer/renderer.hpp>
+
+#include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/renderer/renderer_impl.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>

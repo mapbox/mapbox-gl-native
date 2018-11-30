@@ -94,6 +94,12 @@ src/mbgl/gl/vertex_array.hpp
 src/mbgl/gl/vertex_array_extension.hpp
 src/mbgl/gl/vertex_buffer.hpp
 
+# layermanager
+include/mbgl/layermanager/layer_factory.hpp
+include/mbgl/layermanager/layer_manager.hpp
+src/mbgl/layermanager/layer_factory.cpp
+src/mbgl/layermanager/layer_manager.cpp
+
 # layout
 src/mbgl/layout/clip_lines.cpp
 src/mbgl/layout/clip_lines.hpp
