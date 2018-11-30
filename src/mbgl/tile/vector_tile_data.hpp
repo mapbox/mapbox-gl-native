@@ -14,7 +14,7 @@ public:
     VectorTileFeature(const mapbox::vector_tile::layer&, const protozero::data_view&);
 
     FeatureType getType() const override;
-    optional<Value> getValue(const std::string& key) const override;
+    Value getValue(const std::string& key) const override;
     const PropertyMap& getProperties() const override;
     FeatureIdentifier getID() const override;
     GeometryCollection getGeometries() const override;

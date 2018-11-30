@@ -17,7 +17,7 @@ public:
     {}
 
     FeatureType getType() const override { return feature->getType(); }
-    optional<Value> getValue(const std::string& key) const override { return feature->getValue(key); };
+    Value getValue(const std::string& key) const override { return feature->getValue(key); };
     const PropertyMap& getProperties() const override { return feature->getProperties(); };
     FeatureIdentifier getID() const override { return feature->getID(); };
     GeometryCollection getGeometries() const override { return geometry; };

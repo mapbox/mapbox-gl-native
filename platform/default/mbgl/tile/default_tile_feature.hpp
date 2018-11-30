@@ -29,12 +29,16 @@ public:
         return id;
     }
 
-    optional<Value> getValue(const std::string& key) const override {
-        return properties.count(key) ? properties.at(key) : optional<Value>();
+    Value getValue(const std::string& key) const override {
+        return properties.count(key) ? properties.at(key) : NullValue();
     }
 
     GeometryCollection getGeometries() const override {
         return geometry;
+    }
+
+    const PropertyMap& getProperties() const override {
+        return properties;
     }
 };
 

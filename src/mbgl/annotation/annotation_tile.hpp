@@ -26,7 +26,7 @@ public:
     ~AnnotationTileFeature() override;
 
     FeatureType getType() const override;
-    optional<Value> getValue(const std::string&) const override;
+    Value getValue(const std::string&) const override;
     FeatureIdentifier getID() const override;
     const PropertyMap& getProperties() const override;
     GeometryCollection getGeometries() const override;

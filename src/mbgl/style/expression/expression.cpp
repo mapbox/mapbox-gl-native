@@ -2,6 +2,8 @@
 #include <mbgl/style/expression/compound_expression.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
+#include <mbgl/util/feature.hpp>
+
 namespace mbgl {
 namespace style {
 namespace expression {
@@ -18,12 +20,8 @@ public:
     const PropertyMap& getProperties() const override { return feature.properties; }
     FeatureIdentifier getID() const override { return feature.id; }
     GeometryCollection getGeometries() const override { return {}; }
-    optional<mbgl::Value> getValue(const std::string& key) const override {
-        auto it = feature.properties.find(key);
-        if (it != feature.properties.end()) {
-            return optional<mbgl::Value>(it->second);
-        }
-        return optional<mbgl::Value>();
+    mbgl::Value getValue(const std::string& key) const override {
+        return feature.properties.count(key) ? feature.properties.at(key) : NullValue();
     }
 };
 

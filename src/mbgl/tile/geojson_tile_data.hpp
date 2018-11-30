@@ -36,12 +36,8 @@ public:
         return geometry;
     }
 
-    optional<Value> getValue(const std::string& key) const override {
-        auto it = feature.properties.find(key);
-        if (it != feature.properties.end()) {
-            return optional<Value>(it->second);
-        }
-        return optional<Value>();
+    Value getValue(const std::string& key) const override {
+        return feature.properties.count(key) ? feature.properties.at(key) : NullValue();
     }
 };
 
