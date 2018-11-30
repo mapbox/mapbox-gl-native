@@ -2,11 +2,10 @@ package com.mapbox.mapboxsdk;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.mapboxsdk.log.Logger;
@@ -34,7 +33,6 @@ public final class Mapbox {
   private Context context;
   @Nullable
   private String accessToken;
-  private Boolean connected;
   @Nullable
   private TelemetryDefinition telemetry;
 
@@ -100,8 +98,7 @@ public final class Mapbox {
    */
   public static synchronized void setConnected(Boolean connected) {
     validateMapbox();
-    // Connectivity state overridden by app
-    INSTANCE.connected = connected;
+    ConnectivityReceiver.instance(INSTANCE.context).setConnected(connected);
   }
 
   /**
@@ -112,14 +109,7 @@ public final class Mapbox {
    */
   public static synchronized Boolean isConnected() {
     validateMapbox();
-    if (INSTANCE.connected != null) {
-      // Connectivity state overridden by app
-      return INSTANCE.connected;
-    }
-
-    ConnectivityManager cm = (ConnectivityManager) INSTANCE.context.getSystemService(Context.CONNECTIVITY_SERVICE);
-    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-    return (activeNetwork != null && activeNetwork.isConnected());
+    return ConnectivityReceiver.instance(INSTANCE.context).isConnected();
   }
 
   /**
