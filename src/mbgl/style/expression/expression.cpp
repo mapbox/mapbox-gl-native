@@ -15,7 +15,7 @@ public:
     FeatureType getType() const override  {
         return apply_visitor(ToFeatureType(), feature.geometry);
     }
-    PropertyMap getProperties() const override { return feature.properties; }
+    const PropertyMap& getProperties() const override { return feature.properties; }
     FeatureIdentifier getID() const override { return feature.id; }
     GeometryCollection getGeometries() const override { return {}; }
     optional<mbgl::Value> getValue(const std::string& key) const override {
