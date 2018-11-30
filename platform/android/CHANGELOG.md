@@ -3,8 +3,12 @@
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
 ## master
-- Add "localIdeographFontFamily" setting to MapSnapshotter to reduce font data usage while snapshotting CJK maps [#13427](https://github.com/mapbox/mapbox-gl-native/pull/13427)
 - Add `fill-extrusion-vertical-gradient` fill paint property [#13463](https://github.com/mapbox/mapbox-gl-native/pull/13463)
+
+## 6.7.2 - November 30, 2018
+ - Telemetry v3.5.6 [#13486](https://github.com/mapbox/mapbox-gl-native/pull/13486)
+ - Add "localIdeographFontFamily" setting to MapSnapshotter to reduce font data usage while snapshotting CJK maps [#13427](https://github.com/mapbox/mapbox-gl-native/pull/13427)
+ - Send turnstile event while creating MapSnapshotter instance [#13475](https://github.com/mapbox/mapbox-gl-native/pull/13475)
 
 ## 7.0.0-alpha.2 - November 21, 2018
  - Add overlay example with custom drawing using paint and canvas [#13431](https://github.com/mapbox/mapbox-gl-native/pull/13431)
@@ -36,7 +40,6 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Improved CustomGeometrySource constructor typing [#13200](https://github.com/mapbox/mapbox-gl-native/pull/13200)
  - Removed deprecated MarkerView[#13194](https://github.com/mapbox/mapbox-gl-native/pull/13194)
  - Annotate onMapReady with @NonNull [#13307](https://github.com/mapbox/mapbox-gl-native/pull/13307)
-
 
 ## 6.6.7 - November 8, 2018
  - Telemetry v3.5.4 [#13330](https://github.com/mapbox/mapbox-gl-native/pull/13330)
