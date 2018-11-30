@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/layermanager/layer_factory.hpp>
 #include <mbgl/style/layer.hpp>
 
 #include <array>

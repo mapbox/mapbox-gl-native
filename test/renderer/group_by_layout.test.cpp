@@ -1,5 +1,6 @@
 #include <mbgl/test/util.hpp>
 
+#include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/renderer/group_by_layout.hpp>
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>

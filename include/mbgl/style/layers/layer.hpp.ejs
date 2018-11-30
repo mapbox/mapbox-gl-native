@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <mbgl/layermanager/layer_factory.hpp>
 <% if (type === 'heatmap' || type === 'line') { -%>
 #include <mbgl/style/color_ramp_property_value.hpp>
 <% } -%>
@@ -14,7 +15,6 @@
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
 #include <mbgl/style/expression/formatted.hpp>
-
 #include <mbgl/util/color.hpp>
 
 <% if (type === 'line' || type === 'symbol') { -%>

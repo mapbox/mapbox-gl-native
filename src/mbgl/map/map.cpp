@@ -3,6 +3,7 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
+#include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/style/style_impl.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/renderer/update_parameters.hpp>

@@ -1,9 +1,8 @@
 #pragma once
 
+#include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/layer.hpp>
-
-#include <mbgl/renderer/render_layer.hpp>
 
 #include "layer.hpp"
 
