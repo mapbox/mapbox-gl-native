@@ -12,7 +12,7 @@ SymbolAnnotationImpl::SymbolAnnotationImpl(AnnotationID id_, SymbolAnnotation an
 }
 
 void SymbolAnnotationImpl::updateLayer(const CanonicalTileID& tileID, AnnotationTileLayer& layer) const {
-    std::unordered_map<std::string, std::string> featureProperties;
+    PropertyMap featureProperties;
     featureProperties.emplace("sprite", annotation.icon.empty() ? std::string("default_marker") : annotation.icon);
 
     LatLng latLng { annotation.geometry.y, annotation.geometry.x };

@@ -28,6 +28,7 @@ public:
     FeatureType getType() const override;
     optional<Value> getValue(const std::string&) const override;
     FeatureIdentifier getID() const override;
+    const PropertyMap& getProperties() const override;
     GeometryCollection getGeometries() const override;
 
 private:
@@ -47,7 +48,7 @@ public:
     void addFeature(const AnnotationID,
                     FeatureType,
                     GeometryCollection,
-                    std::unordered_map<std::string, std::string> properties = { {} });
+                    PropertyMap properties = { {} });
 
 private:
     std::shared_ptr<AnnotationTileLayerData> layer;

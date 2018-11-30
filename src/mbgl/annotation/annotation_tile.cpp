@@ -24,7 +24,7 @@ public:
     AnnotationTileFeatureData(const AnnotationID id_,
                               FeatureType type_,
                               GeometryCollection&& geometries_,
-                              std::unordered_map<std::string, std::string>&& properties_)
+                              PropertyMap&& properties_)
         : id(id_),
           type(type_),
           geometries(std::move(geometries_)),
@@ -34,7 +34,7 @@ public:
     AnnotationID id;
     FeatureType type;
     GeometryCollection geometries;
-    std::unordered_map<std::string, std::string> properties;
+    PropertyMap properties;
 };
 
 AnnotationTileFeature::AnnotationTileFeature(std::shared_ptr<const AnnotationTileFeatureData> data_)
@@ -57,6 +57,10 @@ optional<Value> AnnotationTileFeature::getValue(const std::string& key) const {
 
 FeatureIdentifier AnnotationTileFeature::getID() const {
     return data->id;
+}
+
+const PropertyMap& AnnotationTileFeature::getProperties() const {
+    return data->properties;
 }
 
 GeometryCollection AnnotationTileFeature::getGeometries() const {
@@ -90,7 +94,7 @@ std::string AnnotationTileLayer::getName() const {
 void AnnotationTileLayer::addFeature(const AnnotationID id,
                                      FeatureType type,
                                      GeometryCollection geometries,
-                                     std::unordered_map<std::string, std::string> properties) {
+                                     PropertyMap properties) {
 
     layer->features.emplace_back(std::make_shared<AnnotationTileFeatureData>(
         id, type, std::move(geometries), std::move(properties)));
