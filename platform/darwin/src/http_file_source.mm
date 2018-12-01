@@ -89,7 +89,17 @@ public:
             sessionConfig.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
             sessionConfig.URLCache = nil;
 
-            session = [NSURLSession sessionWithConfiguration:sessionConfig];
+            // app might provide a NSURLSessionDelegate for authentication and such
+            id<NSURLSessionDelegate> sessionDelegate = nil;
+            NSDictionary *info = [[NSBundle mainBundle] infoDictionary];
+            NSString *delegateClassName = [info valueForKey:@"MGLNSURLSessionDelegateClassName"];
+            if (delegateClassName) {
+                sessionDelegate = [[NSClassFromString(delegateClassName) alloc] init];
+            }
+            
+            session = [NSURLSession sessionWithConfiguration:sessionConfig
+                                                    delegate:sessionDelegate
+                                               delegateQueue:nil];
 
             userAgent = getUserAgent();
 
