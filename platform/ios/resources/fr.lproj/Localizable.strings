@@ -2,12 +2,6 @@
 "ANNOTATION_A11Y_HINT" = "Afficher plus d’informations";
 
 /* No comment provided by engineer. */
-"API_CLIENT_400_DESC" = "La tâche de session de données a échoué. La requête originale était : %@";
-
-/* No comment provided by engineer. */
-"API_CLIENT_400_REASON" = "Le code de statut était %ld";
-
-/* No comment provided by engineer. */
 "CANCEL" = "Annuler";
 
 /* Accessibility hint for closing the selected annotation’s callout view and returning to the map */
