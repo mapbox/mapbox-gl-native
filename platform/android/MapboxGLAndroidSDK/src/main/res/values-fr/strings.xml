@@ -12,5 +12,6 @@
     <string name="mapbox_attributionTelemetryNeutral">Plus d’informations</string>
     <string name="mapbox_attributionErrorNoBrowser">Aucun navigateur web installé sur l’appareil, impossible d’ouvrir une page web.</string>
     <string name="mapbox_offline_error_region_definition_invalid">Le cadre OfflineRegionDefinition pour définir la région de navigation ne tient pas dans les limites du monde : %s</string>
+    <string name="mapbox_telemetryImproveMap">Améliorer cette carte</string>
     <string name="mapbox_telemetrySettings">Paramètres de télémétrie</string>
     </resources>

@@ -2,12 +2,6 @@
 "ANNOTATION_A11Y_HINT" = "Afficher plus d’informations";
 
 /* No comment provided by engineer. */
-"API_CLIENT_400_DESC" = "La tâche de session de données a échoué. La requête originale était : %@";
-
-/* No comment provided by engineer. */
-"API_CLIENT_400_REASON" = "Le code de statut était %ld";
-
-/* No comment provided by engineer. */
 "CANCEL" = "Annuler";
 
 /* Accessibility hint for closing the selected annotation’s callout view and returning to the map */
@@ -95,7 +89,7 @@
 "TELEMETRY_DISABLED_ON" = "Participer";
 
 /* Telemetry prompt message */
-"TELEMETRY_ENABLED_MSG" = "Vous aidez à rendre OpenStreetMap et Mapbox encore meilleurs en contribuant des données anonymes d’utilisation.";
+"TELEMETRY_ENABLED_MSG" = "Vous aidez à améliorer OpenStreetMap et Mapbox en contribuant des données anonymes d’utilisation.";
 
 /* Telemetry prompt button */
 "TELEMETRY_ENABLED_OFF" = "Arrêter de participer";
@@ -110,7 +104,7 @@
 "TELEMETRY_NAME" = "Télémétrie Mapbox";
 
 /* Telemetry prompt title */
-"TELEMETRY_TITLE" = "Rend meilleure les cartes Mapbox";
+"TELEMETRY_TITLE" = "Améliorez les cartes Mapbox";
 
 /* Default user location annotation title */
 "USER_DOT_TITLE" = "Vous êtes ici";
