@@ -1,5 +1,5 @@
 /* User-friendly error description */
-"ADD_FILE_CONTENTS_FAILED_DESC" = "Impossible d'ajouter le contenu hors ligne à partir du fichier %@.";
+"ADD_FILE_CONTENTS_FAILED_DESC" = "Impossible d’ajouter le contenu hors ligne à partir du fichier %@.";
 
 /* Clock position format, long: {hours} o’clock */
 "CLOCK_FMT_LONG" = "%@ h";
@@ -299,8 +299,5 @@
 "OSM_SHORT_NAME" = "OSM";
 
 /* User-friendly error description */
-"REMOVE_SRC_FAIL_IN_USE_FMT" = "La source '%@' est en cours d'utilisation, impossible de la supprimer.";
-
-/* User-friendly error description */
-"REMOVE_SRC_FAIL_MISMATCH_FMT" = "L'identifiant '%1$@' ne correspond pas à l'identifiant de la source '%2$s'";
+"REMOVE_SRC_FAIL_IN_USE_FMT" = "La source « %@ » est en cours d’utilisation, impossible de la supprimer.";
 
