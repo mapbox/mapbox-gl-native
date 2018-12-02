@@ -298,9 +298,9 @@
 /* OpenStreetMap short name attribution */
 "OSM_SHORT_NAME" = "OSM";
 
-/* User-friendly error description */
-"REMOVE_SRC_FAIL_IN_USE_FMT" = "Source '%@' is in use, cannot remove.";
+/* User-friendly error description; first placeholder is the source’s identifier */
+"REMOVE_SRC_FAIL_IN_USE_FMT" = "The source “%@” can’t be removed while it is in use.";
 
 /* User-friendly error description */
-"REMOVE_SRC_FAIL_MISMATCH_FMT" = "Identifier '%1$@' does not match source identifier '%2$s'";
+"REMOVE_SRC_FAIL_MISMATCH_FMT" = "The source can’t be removed because its identifier, “%@”, belongs to a different source in this style.";
 

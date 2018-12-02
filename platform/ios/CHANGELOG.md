@@ -10,7 +10,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Styles and rendering
 
 * Fixed an issue where the `{prefix}` token in tile URL templates was evaluated incorrectly when requesting a source’s tiles. ([#13429](https://github.com/mapbox/mapbox-gl-native/pull/13429))
-* Added `-[MGLStyle removeSource:error:]` that returns a `BOOL` indicating success (and an optional `NSError` in case of failure). ([#13399](https://github.com/mapbox/mapbox-gl-native/pull/13399))
+* Added an `-[MGLStyle removeSource:error:]` method that returns a descriptive error if the style fails to remove the source, whereas `-[MGLStyle removeSource:]` fails silently. ([#13399](https://github.com/mapbox/mapbox-gl-native/pull/13399))
 * Added support for setting `MGLCollisionBehaviorPre4_0` in `NSUserDefaults`. ([#13426](https://github.com/mapbox/mapbox-gl-native/pull/13426))
 * Modified the behavior of the map view so that programmatic camera transitions can no longer be interrupted by user interaction when `MGLMapView.zoomEnabled`, `MGLMapView.rotateEnabled`, `MGLMapView.scrollEnabled`, and `MGLMapView.pitchEnabled` are set to false. ([#13362](https://github.com/mapbox/mapbox-gl-native/pull/13362))
 
