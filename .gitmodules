@@ -76,3 +76,6 @@
 [submodule "vendor/glfw"]
 	path = vendor/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "vendor/eternal"]
+	path = vendor/eternal
+	url = https://github.com/mapbox/eternal.git
