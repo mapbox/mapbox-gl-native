@@ -152,7 +152,7 @@ public class Style {
    *
    * @param layer the layer to add
    */
-  public void addLayer(Layer layer) {
+  public void addLayer(@NonNull Layer layer) {
     layers.put(layer.getId(), layer);
     nativeMapView.addLayer(layer);
   }
