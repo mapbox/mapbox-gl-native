@@ -18,7 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * TODO
+ * The proxy object for current map style.
+ * <p>
+ * To create new instances of this object, create a new instance using a {@link Builder} and load the style with
+ * {@link MapboxMap#setStyle(Builder)}. This object is returned from {@link MapboxMap#getStyle()} once the style
+ * has been loaded by underlying map.
+ * </p>
  */
 public class Style {
 
