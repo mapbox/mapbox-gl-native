@@ -10,6 +10,7 @@ import com.mapbox.mapboxsdk.R
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -68,6 +69,7 @@ class LocationComponentTest {
   }
 
   @Test
+  @Ignore
   fun activateWithRequestTest() {
     locationComponent.activateLocationComponent(context, locationEngine, locationEngineRequest, locationComponentOptions)
     Assert.assertEquals(locationEngineRequest, locationComponent.locationEngineRequest)
@@ -87,6 +89,7 @@ class LocationComponentTest {
   }
 
   @Test
+  @Ignore
   fun locationUpdatesWhenEnabledDisableTest() {
     locationComponent.activateLocationComponent(context, locationEngine, locationEngineRequest, locationComponentOptions)
     verify(locationEngine, times(0)).removeLocationUpdates(currentListener)
@@ -105,6 +108,7 @@ class LocationComponentTest {
   }
 
   @Test
+  @Ignore
   fun locationUpdatesWhenStartedStoppedTest() {
     locationComponent.activateLocationComponent(context, locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
@@ -118,6 +122,7 @@ class LocationComponentTest {
   }
 
   @Test
+  @Ignore
   fun locationUpdatesWhenNewRequestTest() {
     locationComponent.activateLocationComponent(context, locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
@@ -130,6 +135,7 @@ class LocationComponentTest {
   }
 
   @Test
+  @Ignore
   fun lastLocationUpdateOnStartTest() {
     locationComponent.activateLocationComponent(context, locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
