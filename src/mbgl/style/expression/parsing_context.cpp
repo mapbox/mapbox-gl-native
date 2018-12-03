@@ -29,6 +29,8 @@
 
 #include <mbgl/util/string.hpp>
 
+#include <mapbox/eternal.hpp>
+
 namespace mbgl {
 namespace style {
 namespace expression {
@@ -95,39 +97,45 @@ ParseResult ParsingContext::parse(const Convertible& value, std::size_t index_, 
     return child.parse(value);
 }
 
-const ExpressionRegistry& getExpressionRegistry() {
-    static ExpressionRegistry registry {{
-        {"==", parseComparison},
-        {"!=", parseComparison},
-        {">", parseComparison},
-        {"<", parseComparison},
-        {">=", parseComparison},
-        {"<=", parseComparison},
-        {"all", All::parse},
-        {"any", Any::parse},
-        {"array", Assertion::parse},
-        {"at", At::parse},
-        {"boolean", Assertion::parse},
-        {"case", Case::parse},
-        {"coalesce", Coalesce::parse},
-        {"collator", CollatorExpression::parse},
-        {"format", FormatExpression::parse},
-        {"interpolate", parseInterpolate},
-        {"length", Length::parse},
-        {"let", Let::parse},
-        {"literal", Literal::parse},
-        {"match", parseMatch},
-        {"number", Assertion::parse},
-        {"object", Assertion::parse},
-        {"step", Step::parse},
-        {"string", Assertion::parse},
-        {"to-boolean", Coercion::parse},
-        {"to-color", Coercion::parse},
-        {"to-number", Coercion::parse},
-        {"to-string", Coercion::parse},
-        {"var", Var::parse}
-    }};
-    return registry;
+MAPBOX_ETERNAL_CONSTEXPR const auto expressionRegistry = mapbox::eternal::hash_map<mapbox::eternal::string, ParseFunction>({
+    {"==", parseComparison},
+    {"!=", parseComparison},
+    {">", parseComparison},
+    {"<", parseComparison},
+    {">=", parseComparison},
+    {"<=", parseComparison},
+    {"all", All::parse},
+    {"any", Any::parse},
+    {"array", Assertion::parse},
+    {"at", At::parse},
+    {"boolean", Assertion::parse},
+    {"case", Case::parse},
+    {"coalesce", Coalesce::parse},
+    {"collator", CollatorExpression::parse},
+    {"format", FormatExpression::parse},
+    {"interpolate", parseInterpolate},
+    {"length", Length::parse},
+    {"let", Let::parse},
+    {"literal", Literal::parse},
+    {"match", parseMatch},
+    {"number", Assertion::parse},
+    {"object", Assertion::parse},
+    {"step", Step::parse},
+    {"string", Assertion::parse},
+    {"to-boolean", Coercion::parse},
+    {"to-color", Coercion::parse},
+    {"to-number", Coercion::parse},
+    {"to-string", Coercion::parse},
+    {"var", Var::parse}
+});
+
+ParseFunction getExpression(const std::string& name) {
+    auto parseFunction = expressionRegistry.find(name.c_str());
+    if (parseFunction != expressionRegistry.end()) {
+        return parseFunction->second;
+    } else {
+        return nullptr;
+    }
 }
 
 ParseResult ParsingContext::parse(const Convertible& value, optional<TypeAnnotationOption> typeAnnotationOption) {
@@ -150,9 +158,8 @@ ParseResult ParsingContext::parse(const Convertible& value, optional<TypeAnnotat
             return ParseResult();
         }
         
-        const ExpressionRegistry& registry = getExpressionRegistry();
-        auto parseFunction = registry.find(*op);
-        if (parseFunction != registry.end()) {
+        auto parseFunction = expressionRegistry.find(op->c_str());
+        if (parseFunction != expressionRegistry.end()) {
             parsed = parseFunction->second(value, *this);
         } else {
             parsed = parseCompoundExpression(*op, value, *this);

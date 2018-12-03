@@ -9,6 +9,7 @@ target_include_directories(mbgl-core
 
 target_link_libraries(mbgl-core PRIVATE
     earcut.hpp
+    eternal
     expected
     geojson-vt-cpp
     kdbush.hpp

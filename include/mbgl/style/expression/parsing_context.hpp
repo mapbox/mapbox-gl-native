@@ -178,8 +178,7 @@ private:
 };
 
 using ParseFunction = ParseResult (*)(const conversion::Convertible&, ParsingContext&);
-using ExpressionRegistry = std::unordered_map<std::string, ParseFunction>;
-const ExpressionRegistry& getExpressionRegistry();
+ParseFunction getExpression(const std::string&);
 
 } // namespace expression
 } // namespace style
