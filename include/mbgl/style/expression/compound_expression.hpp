@@ -39,18 +39,11 @@ public:
 
     optional<std::size_t> getParameterCount() const;
 
+    static bool exists(const std::string& name);
+
 protected:
     const detail::SignatureBase& signature;
     std::vector<std::unique_ptr<Expression>> args;
-};
-
-/*
-    Holds the map of expression name => implementation (which is just one or
-    more evaluation functions, each wrapped in a Signature struct).
-*/
-struct CompoundExpressionRegistry {
-    using Definition = std::vector<std::unique_ptr<detail::SignatureBase>>;
-    static std::unordered_map<std::string, Definition> definitions;
 };
 
 ParseResult parseCompoundExpression(const std::string name,

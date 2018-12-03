@@ -97,6 +97,7 @@ ParseResult ParsingContext::parse(const Convertible& value, std::size_t index_, 
     return child.parse(value);
 }
 
+using ParseFunction = ParseResult (*)(const conversion::Convertible&, ParsingContext&);
 MAPBOX_ETERNAL_CONSTEXPR const auto expressionRegistry = mapbox::eternal::hash_map<mapbox::eternal::string, ParseFunction>({
     {"==", parseComparison},
     {"!=", parseComparison},
@@ -126,16 +127,11 @@ MAPBOX_ETERNAL_CONSTEXPR const auto expressionRegistry = mapbox::eternal::hash_m
     {"to-color", Coercion::parse},
     {"to-number", Coercion::parse},
     {"to-string", Coercion::parse},
-    {"var", Var::parse}
+    {"var", Var::parse},
 });
 
-ParseFunction getExpression(const std::string& name) {
-    auto parseFunction = expressionRegistry.find(name.c_str());
-    if (parseFunction != expressionRegistry.end()) {
-        return parseFunction->second;
-    } else {
-        return nullptr;
-    }
+bool isExpression(const std::string& name) {
+    return expressionRegistry.contains(name.c_str());
 }
 
 ParseResult ParsingContext::parse(const Convertible& value, optional<TypeAnnotationOption> typeAnnotationOption) {
