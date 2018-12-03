@@ -16,29 +16,47 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * TODO
+ */
 public class Style {
 
   private final NativeMapView nativeMapView;
   private final HashMap<String, Source> sources = new HashMap<>();
   private final HashMap<String, Layer> layers = new HashMap<>();
-
   private final OnStyleLoaded onStyleLoaded;
   private final Builder builder;
   private boolean styleLoaded;
 
-  public Style(Builder builder, NativeMapView nativeMapView, OnStyleLoaded styleLoaded) {
+  /**
+   * Private constructor to build a style object.
+   *
+   * @param builder the builder used for creating this style
+   * @param nativeMapView the map object used to load this style
+   * @param styleLoaded the callback used to notify about finish style loading
+   */
+  private Style(Builder builder, NativeMapView nativeMapView, OnStyleLoaded styleLoaded) {
     this.builder = builder;
     this.nativeMapView = nativeMapView;
     this.onStyleLoaded = styleLoaded;
   }
 
+  /**
+   * Returns the current style url.
+   *
+   * @return the style url
+   */
   @NonNull
   public String getUrl() {
     return nativeMapView.getStyleUrl();
   }
 
+  /**
+   * Returns the current style json.
+   *
+   * @return the style json
+   */
   @NonNull
   public String getJson() {
     return nativeMapView.getStyleJson();
@@ -266,14 +284,14 @@ public class Style {
   }
 
   /**
-   * Adds an images to be used in the map's style
+   * Adds an images to be used in the map's style.
    */
   public void addImages(@NonNull HashMap<String, Bitmap> images) {
     nativeMapView.addImages(images);
   }
 
   /**
-   * Removes an image from the map's style
+   * Removes an image from the map's style.
    *
    * @param name the name of the image to remove
    */
@@ -281,9 +299,15 @@ public class Style {
     nativeMapView.removeImage(name);
   }
 
+  /**
+   * Get an image from the map's style using an id.
+   *
+   * @param id the id of the image
+   * @return the image bitmap
+   */
   @Nullable
-  public Bitmap getImage(@NonNull String name) {
-    return nativeMapView.getImage(name);
+  public Bitmap getImage(@NonNull String id) {
+    return nativeMapView.getImage(id);
   }
 
   //
@@ -329,7 +353,6 @@ public class Style {
     return nativeMapView.getLight();
   }
 
-
   /**
    * Called when the underlying map will start loading a new style. This method will clean up this style
    * by setting the java sources and layers in a detached state and removing them from core.
@@ -364,12 +387,21 @@ public class Style {
         addSource(source);
       }
 
-      for (Layer layer : builder.layers) {
-        addLayerBelow(layer, MapboxConstants.LAYER_ID_ANNOTATIONS);
+      for (Builder.LayerWrapper layerWrapper : builder.layers) {
+        if (layerWrapper instanceof Builder.LayerAtWrapper) {
+          addLayerAt(layerWrapper.layer, ((Builder.LayerAtWrapper) layerWrapper).index);
+        } else if (layerWrapper instanceof Builder.LayerAboveWrapper) {
+          addLayerAbove(layerWrapper.layer, ((Builder.LayerAboveWrapper) layerWrapper).aboveLayer);
+        } else if (layerWrapper instanceof Builder.LayerBelowWrapper) {
+          addLayerBelow(layerWrapper.layer, ((Builder.LayerBelowWrapper) layerWrapper).belowLayer);
+        } else {
+          // just add layer to map, but below annotations
+          addLayerBelow(layerWrapper.layer, MapboxConstants.LAYER_ID_ANNOTATIONS);
+        }
       }
 
-      for (Map.Entry<String, Bitmap> stringBitmapEntry : builder.images.entrySet()) {
-        addImage(stringBitmapEntry.getKey(), stringBitmapEntry.getValue());
+      for (Builder.ImageWrapper image : builder.images) {
+        addImage(image.id, image.bitmap, image.sdf);
       }
 
       if (builder.transitionOptions != null) {
@@ -386,19 +418,22 @@ public class Style {
   // Builder
   //
 
+  /**
+   * TODO
+   */
   public static class Builder {
 
+    private final List<Source> sources = new ArrayList<>();
+    private final List<LayerWrapper> layers = new ArrayList<>();
+    private final List<ImageWrapper> images = new ArrayList<>();
+
+    private TransitionOptions transitionOptions;
     private String styleUrl;
     private String styleJson;
-    private List<Source> sources = new ArrayList<>();
-    // TODO allow adding below and at index
-    private List<Layer> layers = new ArrayList<>();
-    private HashMap<String, Bitmap> images = new HashMap<>();
-    private TransitionOptions transitionOptions;
 
     /**
      * <p>
-     * Loads a new map style asynchronous from the specified URL.
+     * Will loads a new map style asynchronous from the specified URL.
      * </p>
      * {@code url} can take the following forms:
      * <ul>
@@ -424,6 +459,7 @@ public class Style {
      * will be triggered.
      *
      * @param url The URL of the map style
+     * @return this
      * @see Style
      */
     public Builder fromUrl(String url) {
@@ -432,41 +468,116 @@ public class Style {
     }
 
     /**
-     * Loads a new map style from a json string.
+     * Will load a new map style from a json string.
      * <p>
      * If the style fails to load or an invalid style URL is set, the map view will become blank.
      * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
      * will be triggered.
      * </p>
+     *
+     * @return this
      */
     public Builder fromJson(String styleJson) {
       this.styleJson = styleJson;
       return this;
     }
 
+    /**
+     * Will add the source when map style has loaded.
+     *
+     * @param source the source to add
+     * @return this
+     */
     public Builder withSource(Source source) {
       sources.add(source);
       return this;
     }
 
-    // TODO add layer at support!
+    /**
+     * Will add the layer when the style has loaded.
+     *
+     * @param layer the layer to be added
+     * @return this
+     */
     public Builder withLayer(Layer layer) {
-      layers.add(layer);
+      layers.add(new LayerWrapper(layer));
       return this;
     }
 
+    /**
+     * Will add the layer when the style has loaded at a specified index.
+     *
+     * @param layer the layer to be added
+     * @return this
+     */
+    public Builder withLayerAt(Layer layer, int index) {
+      layers.add(new LayerAtWrapper(layer, index));
+      return this;
+    }
+
+    /**
+     * Will add the layer when the style has loaded above a specified layer id.
+     *
+     * @param layer the layer to be added
+     * @return this
+     */
+    public Builder withLayerAbove(Layer layer, String aboveLayerId) {
+      layers.add(new LayerAboveWrapper(layer, aboveLayerId));
+      return this;
+    }
+
+    /**
+     * Will add the layer when the style has loaded below a specified layer id.
+     *
+     * @param layer the layer to be added
+     * @return this
+     */
+    public Builder withLayerBelow(Layer layer, String belowLayerId) {
+      layers.add(new LayerBelowWrapper(layer, belowLayerId));
+      return this;
+    }
+
+    /**
+     * Will add the transition when the map style has loaded.
+     *
+     * @param transition the transition to be added
+     * @return this
+     */
     public Builder withTransition(TransitionOptions transition) {
       this.transitionOptions = transition;
       return this;
     }
 
-    // TODO add SDF support!
-    public Builder withImage(String name, Bitmap image) {
-      images.put(name, image);
+    /**
+     * Will add the image when the map style has loaded.
+     *
+     * @param id    the id for the image
+     * @param image the image to be added
+     * @return this
+     */
+    public Builder withImage(String id, Bitmap image) {
+      return this.withImage(id, image, false);
+    }
+
+    /**
+     * Will add the image when the map style has loaded.
+     *
+     * @param id    the id for the image
+     * @param image the image to be added
+     * @return this
+     */
+    public Builder withImage(String id, Bitmap image, boolean sdf) {
+      images.add(new ImageWrapper(id, image, sdf));
       return this;
     }
 
-    Style build(NativeMapView nativeMapView, OnStyleLoaded styleLoaded) {
+    /**
+     * Build the composed style.
+     *
+     * @param nativeMapView the native map used for style loading
+     * @param styleLoaded   the callback to be invoked when the style has loaded
+     */
+    void build(NativeMapView nativeMapView, OnStyleLoaded styleLoaded) {
       Style style = new Style(this, nativeMapView, styleLoaded);
       nativeMapView.setStyle(style);
 
@@ -480,17 +591,80 @@ public class Style {
         // add components defined added using the `with` prefix.
         style.onDidFinishLoadingStyle();
       }
-
-      return style;
     }
 
+    private class ImageWrapper {
+      private Bitmap bitmap;
+      private String id;
+      private boolean sdf;
+
+      ImageWrapper(String id, Bitmap bitmap, boolean sdf) {
+        this.id = id;
+        this.bitmap = bitmap;
+        this.sdf = sdf;
+      }
+
+      public Bitmap getBitmap() {
+        return bitmap;
+      }
+
+      public String getId() {
+        return id;
+      }
+
+      public boolean isSdf() {
+        return sdf;
+      }
+    }
+
+    private class LayerWrapper {
+      private Layer layer;
+
+      LayerWrapper(Layer layer) {
+        this.layer = layer;
+      }
+    }
+
+    private class LayerAboveWrapper extends LayerWrapper {
+
+      private String aboveLayer;
+
+      LayerAboveWrapper(Layer layer, String aboveLayer) {
+        super(layer);
+        this.aboveLayer = aboveLayer;
+      }
+    }
+
+    private class LayerBelowWrapper extends LayerWrapper {
+
+      private String belowLayer;
+
+      LayerBelowWrapper(Layer layer, String belowLayer) {
+        super(layer);
+        this.belowLayer = belowLayer;
+      }
+    }
+
+    private class LayerAtWrapper extends LayerWrapper {
+
+      private int index;
+
+      LayerAtWrapper(Layer layer, int index) {
+        super(layer);
+        this.index = index;
+      }
+    }
   }
 
-  //
-  //
-  //
-
+  /**
+   * Callback to be invoked when a style has finished loading.
+   */
   public interface OnStyleLoaded {
+    /**
+     * Invoked when a style has finished loading.
+     *
+     * @param style the style that has finished loading
+     */
     void onStyleLoaded(Style style);
   }
 
