@@ -177,8 +177,7 @@ private:
     std::shared_ptr<std::vector<ParsingError>> errors;
 };
 
-using ParseFunction = ParseResult (*)(const conversion::Convertible&, ParsingContext&);
-ParseFunction getExpression(const std::string&);
+bool isExpression(const std::string&);
 
 } // namespace expression
 } // namespace style
