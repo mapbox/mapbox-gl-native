@@ -76,8 +76,8 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
       mapboxMap = map;
 
       mapboxMap.setStyle(Style.SATELLITE_STREETS, style -> {
-        addBusStopSource();
-        addBusStopCircleLayer();
+        addBusStopSource(style);
+        addBusStopCircleLayer(style);
         initFloatingActionButtons();
         isLoadingStyle = false;
       });
@@ -89,22 +89,22 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
     });
   }
 
-  private void addBusStopSource() {
+  private void addBusStopSource(Style style) {
     try {
       source = new GeoJsonSource(SOURCE_ID, new URL(URL_BUS_ROUTES));
     } catch (MalformedURLException exception) {
       Timber.e(exception, "That's not an url... ");
     }
-    mapboxMap.getStyle().addSource(source);
+    style.addSource(source);
   }
 
-  private void addBusStopCircleLayer() {
+  private void addBusStopCircleLayer(Style style) {
     layer = new CircleLayer(LAYER_ID, SOURCE_ID);
     layer.setProperties(
       circleColor(Color.parseColor("#FF9800")),
       circleRadius(2.0f)
     );
-    mapboxMap.getStyle().addLayerBelow(layer, "waterway-label");
+    style.addLayerBelow(layer, "waterway-label");
   }
 
   private void initFloatingActionButtons() {

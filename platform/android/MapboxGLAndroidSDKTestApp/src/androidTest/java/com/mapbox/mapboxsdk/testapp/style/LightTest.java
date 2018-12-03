@@ -149,7 +149,7 @@ public class LightTest extends BaseActivityTest {
 
       @Override
       public void perform(UiController uiController, View view) {
-        light = mapboxMap.getLight();
+        light = mapboxMap.getStyle().getLight();
         FillExtrusionLayer fillExtrusionLayer = new FillExtrusionLayer("3d-buildings", "composite");
         fillExtrusionLayer.setSourceLayer("building");
         fillExtrusionLayer.setFilter(eq(Expression.get("extrude"), "true"));
