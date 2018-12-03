@@ -25,7 +25,7 @@ import com.mapbox.mapboxsdk.testapp.R;
  * Test activity showing how to use a series of images to create an animation
  * with an ImageSource
  * <p>
- *   GL-native equivalent of https://www.mapbox.com/mapbox-gl-js/example/animate-images/
+ * GL-native equivalent of https://www.mapbox.com/mapbox-gl-js/example/animate-images/
  * </p>
  */
 public class AnimatedImageSourceActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -95,7 +95,9 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
   protected void onStop() {
     super.onStop();
     mapView.onStop();
-    handler.removeCallbacks(runnable);
+    if (handler != null) {
+      handler.removeCallbacks(runnable);
+    }
   }
 
   @Override
