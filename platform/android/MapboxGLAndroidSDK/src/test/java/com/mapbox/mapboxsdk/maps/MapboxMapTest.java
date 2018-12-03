@@ -24,8 +24,8 @@ public class MapboxMapTest {
       mock(Projection.class),
       mock(MapboxMap.OnGesturesManagerInteractionListener.class),
       mock(AnnotationManager.class),
-      mock(CameraChangeDispatcher.class),
-      mock(MapChangeReceiver.class));
+      mock(CameraChangeDispatcher.class)
+    );
   }
 
   @Test(expected = IllegalArgumentException.class)
