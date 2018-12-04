@@ -211,8 +211,8 @@ function(initialize_xcode_cxx_build_settings target)
     # -flto
     set_xcode_property(${target} LLVM_LTO $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>>:YES>)
 
-    # Make releases debuggable.
-    set_xcode_property(${target} GCC_GENERATE_DEBUGGING_SYMBOLS YES)
+    # Make all build configurations debuggable — except Release.
+    set_xcode_property(${target} GCC_GENERATE_DEBUGGING_SYMBOLS $<$<NOT:$<CONFIG:Release>>:YES>)
 endfunction()
 
 # CMake 3.1 does not have this yet.
