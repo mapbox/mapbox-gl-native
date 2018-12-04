@@ -171,16 +171,6 @@ else
     cp -rv platform/ios/app/Settings.bundle ${OUTPUT}
 fi
 
-if [[ ${SYMBOLS} = NO ]]; then
-    step "Stripping symbols from binaries"
-    if [[ ${BUILD_STATIC} == true ]]; then
-        strip -Sx "${OUTPUT}/static/${NAME}.framework/${NAME}"
-    fi
-    if [[ ${BUILD_DYNAMIC} == true ]]; then
-        strip -Sx "${OUTPUT}/dynamic/${NAME}.framework/${NAME}"
-    fi
-fi
-
 function get_comparable_uuid {
     echo $(dwarfdump --uuid ${1} | sed -n 's/.*UUID:\([^\"]*\) .*/\1/p' | sort)
 }
