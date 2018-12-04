@@ -5,6 +5,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.Keep;
 
 import android.support.annotation.NonNull;
+
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.storage.FileSource;
@@ -26,7 +27,7 @@ public abstract class MapRenderer implements MapRendererScheduler {
 
   // Holds the pointer to the native peer after initialisation
   private long nativePtr = 0;
-
+  private int preferredFramesPerSecond = Integer.MAX_VALUE;
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
   public MapRenderer(@NonNull Context context, String localIdeographFontFamily) {
@@ -121,12 +122,38 @@ public abstract class MapRenderer implements MapRendererScheduler {
   private void updateFps() {
     frames++;
     long currentTime = System.nanoTime();
-    double fps = 0;
-    if (currentTime - timeElapsed >= 1) {
-      fps = frames / ((currentTime - timeElapsed) / 1E9);
+    long timeCost = currentTime - timeElapsed;
+
+    if (timeCost >= 1) {
+      double fps = frames / ((timeCost) / 1E9);
+      if (fps > preferredFramesPerSecond) {
+        try {
+          long millis = (long) (timeCost / 1E6 * (fps - preferredFramesPerSecond) / fps);
+          Thread.sleep(millis);
+        } catch (InterruptedException ex) {
+          ex.printStackTrace();
+        }
+        long newCurrentTime = System.nanoTime();
+        timeCost = newCurrentTime - timeElapsed;
+        fps = frames / ((timeCost) / 1E9);
+      }
       onFpsChangedListener.onFpsChanged(fps);
       timeElapsed = currentTime;
       frames = 0;
     }
+  }
+
+  /**
+   * The preferred frame rate at which this render is rendered,
+   * but it can't excess the ability of device hardware.
+   *
+   * @param preferredFramesPerSecond Can be set to arbitrary integer values.
+   */
+  public void setPreferredFramesPerSecond(int preferredFramesPerSecond) {
+    if (preferredFramesPerSecond <= 0) {
+      // Not valid, just return
+      return;
+    }
+    this.preferredFramesPerSecond = preferredFramesPerSecond;
   }
 }

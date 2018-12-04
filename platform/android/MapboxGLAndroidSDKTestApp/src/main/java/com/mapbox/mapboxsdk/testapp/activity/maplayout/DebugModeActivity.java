@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.mapbox.mapboxsdk.testapp.utils.IdleZoomListener;
+
 import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
@@ -62,6 +63,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
     setupMapView(savedInstanceState);
     setupDebugChangeView();
     setupStyleChangeView();
+    setupFpsChangeView();
   }
 
   private void setupToolbar() {
@@ -164,6 +166,15 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
         }
         mapboxMap.setStyleUrl(STYLES[currentStyleIndex], style -> Timber.d("Style loaded %s", style));
       }
+    });
+  }
+
+  private void setupFpsChangeView() {
+    findViewById(R.id.fps_30).setOnClickListener(view -> {
+      mapView.setPreferredFramesPerSecond(30);
+    });
+    findViewById(R.id.fps_60).setOnClickListener(view -> {
+      mapView.setPreferredFramesPerSecond(60);
     });
   }
 

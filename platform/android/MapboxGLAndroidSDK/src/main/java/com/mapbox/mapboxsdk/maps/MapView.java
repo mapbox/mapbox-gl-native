@@ -426,6 +426,18 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   /**
+   *  The preferred frame rate at which the map view is rendered,
+   *  but it can't excess the ability of device hardware.
+   *
+   * @param preferredFramesPerSecond  Can be set to arbitrary integer values.
+   */
+  public void setPreferredFramesPerSecond(int preferredFramesPerSecond) {
+    if (mapRenderer != null) {
+      mapRenderer.setPreferredFramesPerSecond(preferredFramesPerSecond);
+    }
+  }
+
+  /**
    * Returns if the map has been destroyed.
    * <p>
    * This method can be used to determine if the result of an asynchronous operation should be set.
