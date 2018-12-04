@@ -7,8 +7,8 @@ namespace mbgl {
 namespace shaders {
 
 const char* line_gradient::name = "line_gradient";
-const char* line_gradient::vertexSource = source() + 34151;
-const char* line_gradient::fragmentSource = source() + 36869;
+const char* line_gradient::vertexSource = source() + 34191;
+const char* line_gradient::fragmentSource = source() + 36910;
 
 // Uncompressed source of line_gradient.vertex.glsl:
 /*

@@ -7,8 +7,8 @@ namespace mbgl {
 namespace shaders {
 
 const char* fill_extrusion_pattern::name = "fill_extrusion_pattern";
-const char* fill_extrusion_pattern::vertexSource = source() + 23174;
-const char* fill_extrusion_pattern::fragmentSource = source() + 26093;
+const char* fill_extrusion_pattern::vertexSource = source() + 23204;
+const char* fill_extrusion_pattern::fragmentSource = source() + 26124;
 
 // Uncompressed source of fill_extrusion_pattern.vertex.glsl:
 /*

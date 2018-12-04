@@ -25,11 +25,11 @@ function basicMinify(src) {
 for (const key in shaders) {
     const vertex = concatenated.length;
     concatenated += basicMinify(shaders[key].vertexSource);
-    concatenated += '\0';
+    concatenated += '\n\0';
 
     const fragment = concatenated.length;
     concatenated += basicMinify(shaders[key].fragmentSource);
-    concatenated += '\0';
+    concatenated += '\n\0';
 
     offsets[key] = {vertex, fragment};
 }

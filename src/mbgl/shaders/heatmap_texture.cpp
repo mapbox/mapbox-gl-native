@@ -7,8 +7,8 @@ namespace mbgl {
 namespace shaders {
 
 const char* heatmap_texture::name = "heatmap_texture";
-const char* heatmap_texture::vertexSource = source() + 9479;
-const char* heatmap_texture::fragmentSource = source() + 9658;
+const char* heatmap_texture::vertexSource = source() + 9491;
+const char* heatmap_texture::fragmentSource = source() + 9671;
 
 // Uncompressed source of heatmap_texture.vertex.glsl:
 /*
