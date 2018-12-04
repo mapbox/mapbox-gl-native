@@ -74,18 +74,14 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-
-      mapboxMap.setStyle(Style.SATELLITE_STREETS, style -> {
+      mapboxMap.setStyle(Style.SATELLITE_STREETS);
+      mapView.addOnDidFinishLoadingStyleListener(() -> {
+        Style style = mapboxMap.getStyle();
         addBusStopSource(style);
         addBusStopCircleLayer(style);
         initFloatingActionButtons();
         isLoadingStyle = false;
       });
-    });
-
-    mapView.addOnDidFinishLoadingStyleListener(() -> {
-      addBusStop();
-      isLoadingStyle = false;
     });
   }
 
