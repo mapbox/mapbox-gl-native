@@ -7,8 +7,8 @@ namespace mbgl {
 namespace shaders {
 
 const char* circle::name = "circle";
-const char* circle::vertexSource = source() + 4416;
-const char* circle::fragmentSource = source() + 8666;
+const char* circle::vertexSource = source() + 2921;
+const char* circle::fragmentSource = source() + 6086;
 
 // Uncompressed source of circle.vertex.glsl:
 /*

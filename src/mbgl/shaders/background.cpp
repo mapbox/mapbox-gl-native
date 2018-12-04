@@ -7,8 +7,8 @@ namespace mbgl {
 namespace shaders {
 
 const char* background::name = "background";
-const char* background::vertexSource = source() + 2739;
-const char* background::fragmentSource = source() + 2851;
+const char* background::vertexSource = source() + 1427;
+const char* background::fragmentSource = source() + 1522;
 
 // Uncompressed source of background.vertex.glsl:
 /*
