@@ -40,7 +40,7 @@ du -sch dynamic/*
 #
 # upload
 #
-PROGRESS=
+PROGRESS=""
 if [ -n "${CI:-}" ]; then
     PROGRESS="--no-progress"
 fi
