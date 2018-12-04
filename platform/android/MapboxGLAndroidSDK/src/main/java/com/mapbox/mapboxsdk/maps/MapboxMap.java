@@ -206,7 +206,6 @@ public final class MapboxMap {
    */
   void onFinishLoadingStyle() {
     locationComponent.onFinishLoadingStyle();
-    locationComponent.onStart();
   }
 
   /**
@@ -761,6 +760,7 @@ public final class MapboxMap {
         for (Style.OnStyleLoaded styleLoadedCallback : styleLoadedCallbacks) {
           styleLoadedCallback.onStyleLoaded(style);
         }
+        styleLoadedCallbacks.clear();
       }
     });
   }
