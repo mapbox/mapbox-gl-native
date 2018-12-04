@@ -710,9 +710,10 @@ final class NativeMapView {
     nativeSetTransitionDelay(delay);
   }
 
+  @NonNull
   public List<Layer> getLayers() {
     if (checkState("getLayers")) {
-      return null;
+      return new ArrayList<>();
     }
     return Arrays.asList(nativeGetLayers());
   }
@@ -777,9 +778,10 @@ final class NativeMapView {
     return nativeRemoveLayerAt(index);
   }
 
+  @NonNull
   public List<Source> getSources() {
     if (checkState("getSources")) {
-      return null;
+      return new ArrayList<>();
     }
     return Arrays.asList(nativeGetSources());
   }
