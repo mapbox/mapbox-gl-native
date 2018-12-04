@@ -1,7 +1,8 @@
 ignore:
   - "test/"
   - "vendor/"
-
+  - "platform/ios/test"
+  - "platform/darwin/test"
 coverage:
   status:
     project:
