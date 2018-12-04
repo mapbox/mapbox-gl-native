@@ -20,6 +20,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Packaging
 
+* Added the `Mapbox-iOS-SDK-stripped` build flavor, featuring fewer debug symbols. Regular framework binaries are no longer stripped of debug symbols and the `Mapbox-iOS-SDK-symbols` build has been retired. ([#13504](https://github.com/mapbox/mapbox-gl-native/pull/13504))
 * This SDK’s dynamic framework now has a bundle identifier of `com.mapbox.Mapbox`. ([#12857](https://github.com/mapbox/mapbox-gl-native/pull/12857))
 
 ### Other changes
