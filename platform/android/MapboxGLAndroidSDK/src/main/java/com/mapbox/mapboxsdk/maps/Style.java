@@ -37,11 +37,11 @@ public class Style {
   /**
    * Private constructor to build a style object.
    *
-   * @param builder the builder used for creating this style
+   * @param builder       the builder used for creating this style
    * @param nativeMapView the map object used to load this style
-   * @param styleLoaded the callback used to notify about finish style loading
+   * @param styleLoaded   the callback used to notify about finish style loading
    */
-  private Style(Builder builder, NativeMapView nativeMapView, OnStyleLoaded styleLoaded) {
+  private Style(@NonNull Builder builder, @NonNull NativeMapView nativeMapView, @Nullable OnStyleLoaded styleLoaded) {
     this.builder = builder;
     this.nativeMapView = nativeMapView;
     this.onStyleLoaded = styleLoaded;
@@ -76,6 +76,7 @@ public class Style {
    *
    * @return all the sources in the current style
    */
+  @NonNull
   public List<Source> getSources() {
     return nativeMapView.getSources();
   }
@@ -85,7 +86,7 @@ public class Style {
    *
    * @param source the source to add
    */
-  public void addSource(Source source) {
+  public void addSource(@NonNull Source source) {
     sources.put(source.getId(), source);
     nativeMapView.addSource(source);
   }
@@ -96,6 +97,7 @@ public class Style {
    * @param id the source's id
    * @return the source if present in the current style
    */
+  @Nullable
   public Source getSource(String id) {
     Source source = sources.get(id);
     if (source == null) {
@@ -111,6 +113,7 @@ public class Style {
    * @param <T>      the generic type of a Source
    * @return the casted Source, null if another type
    */
+  @Nullable
   public <T extends Source> T getSourceAs(@NonNull String sourceId) {
     // noinspection unchecked
     if (sources.containsKey(sourceId)) {
@@ -197,7 +200,8 @@ public class Style {
    * @param id the layer's id
    * @return the layer, if present in the style
    */
-  public Layer getLayer(String id) {
+  @Nullable
+  public Layer getLayer(@NonNull String id) {
     Layer layer = layers.get(id);
     if (layer == null) {
       layer = nativeMapView.getLayer(id);
@@ -212,6 +216,7 @@ public class Style {
    * @param <T>     the generic attribute of a Layer
    * @return the casted Layer, null if another type
    */
+  @Nullable
   public <T extends Layer> T getLayerAs(@NonNull String layerId) {
     // noinspection unchecked
     return (T) nativeMapView.getLayer(layerId);
@@ -324,7 +329,7 @@ public class Style {
    *
    * @param transitionOptions the transition options
    */
-  public void setTransition(TransitionOptions transitionOptions) {
+  public void setTransition(@NonNull TransitionOptions transitionOptions) {
     nativeMapView.setTransitionDuration(transitionOptions.getDuration());
     nativeMapView.setTransitionDelay(transitionOptions.getDelay());
   }
@@ -337,6 +342,7 @@ public class Style {
    *
    * @return TransitionOptions the transition options
    */
+  @NonNull
   public TransitionOptions getTransition() {
     return new TransitionOptions(nativeMapView.getTransitionDuration(), nativeMapView.getTransitionDelay());
   }
@@ -350,7 +356,7 @@ public class Style {
    *
    * @return the global light source
    */
-  @NonNull
+  @Nullable
   public Light getLight() {
     return nativeMapView.getLight();
   }
@@ -464,7 +470,8 @@ public class Style {
      * @return this
      * @see Style
      */
-    public Builder fromUrl(String url) {
+    @NonNull
+    public Builder fromUrl(@NonNull String url) {
       this.styleUrl = url;
       return this;
     }
@@ -479,7 +486,8 @@ public class Style {
      *
      * @return this
      */
-    public Builder fromJson(String styleJson) {
+    @NonNull
+    public Builder fromJson(@NonNull String styleJson) {
       this.styleJson = styleJson;
       return this;
     }
@@ -490,7 +498,8 @@ public class Style {
      * @param source the source to add
      * @return this
      */
-    public Builder withSource(Source source) {
+    @NonNull
+    public Builder withSource(@NonNull Source source) {
       sources.add(source);
       return this;
     }
@@ -501,7 +510,8 @@ public class Style {
      * @param layer the layer to be added
      * @return this
      */
-    public Builder withLayer(Layer layer) {
+    @NonNull
+    public Builder withLayer(@NonNull Layer layer) {
       layers.add(new LayerWrapper(layer));
       return this;
     }
@@ -512,7 +522,8 @@ public class Style {
      * @param layer the layer to be added
      * @return this
      */
-    public Builder withLayerAt(Layer layer, int index) {
+    @NonNull
+    public Builder withLayerAt(@NonNull Layer layer, int index) {
       layers.add(new LayerAtWrapper(layer, index));
       return this;
     }
@@ -523,7 +534,8 @@ public class Style {
      * @param layer the layer to be added
      * @return this
      */
-    public Builder withLayerAbove(Layer layer, String aboveLayerId) {
+    @NonNull
+    public Builder withLayerAbove(@NonNull Layer layer, @NonNull String aboveLayerId) {
       layers.add(new LayerAboveWrapper(layer, aboveLayerId));
       return this;
     }
@@ -534,7 +546,8 @@ public class Style {
      * @param layer the layer to be added
      * @return this
      */
-    public Builder withLayerBelow(Layer layer, String belowLayerId) {
+    @NonNull
+    public Builder withLayerBelow(@NonNull Layer layer, @NonNull String belowLayerId) {
       layers.add(new LayerBelowWrapper(layer, belowLayerId));
       return this;
     }
@@ -545,7 +558,8 @@ public class Style {
      * @param transition the transition to be added
      * @return this
      */
-    public Builder withTransition(TransitionOptions transition) {
+    @NonNull
+    public Builder withTransition(@NonNull TransitionOptions transition) {
       this.transitionOptions = transition;
       return this;
     }
@@ -557,7 +571,8 @@ public class Style {
      * @param image the image to be added
      * @return this
      */
-    public Builder withImage(String id, Bitmap image) {
+    @NonNull
+    public Builder withImage(@NonNull String id, @NonNull Bitmap image) {
       return this.withImage(id, image, false);
     }
 
@@ -568,7 +583,8 @@ public class Style {
      * @param image the image to be added
      * @return this
      */
-    public Builder withImage(String id, Bitmap image, boolean sdf) {
+    @NonNull
+    public Builder withImage(@NonNull String id, @NonNull Bitmap image, boolean sdf) {
       images.add(new ImageWrapper(id, image, sdf));
       return this;
     }
@@ -579,7 +595,7 @@ public class Style {
      * @param nativeMapView the native map used for style loading
      * @param styleLoaded   the callback to be invoked when the style has loaded
      */
-    void build(NativeMapView nativeMapView, OnStyleLoaded styleLoaded) {
+    void build(@NonNull NativeMapView nativeMapView, @Nullable OnStyleLoaded styleLoaded) {
       Style style = new Style(this, nativeMapView, styleLoaded);
       nativeMapView.setStyle(style);
 
@@ -667,7 +683,7 @@ public class Style {
      *
      * @param style the style that has finished loading
      */
-    void onStyleLoaded(Style style);
+    void onStyleLoaded(@NonNull Style style);
   }
 
   //
