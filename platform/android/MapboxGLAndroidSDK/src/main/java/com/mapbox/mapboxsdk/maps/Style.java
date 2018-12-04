@@ -368,7 +368,7 @@ public class Style {
    * Called when the underlying map will start loading a new style. This method will clean up this style
    * by setting the java sources and layers in a detached state and removing them from core.
    */
-  public void onWillStartLoadingStyle() {
+  void onWillStartLoadingStyle() {
     for (Source source : sources.values()) {
       if (source != null) {
         source.setDetached();
@@ -391,7 +391,7 @@ public class Style {
    * Called when the underlying map has finished loading this style.
    * This method will add all components added to the builder that were defined with the 'with' prefix.
    */
-  public void onDidFinishLoadingStyle() {
+  void onDidFinishLoadingStyle() {
     if (!styleLoaded) {
       styleLoaded = true;
       for (Source source : builder.sources) {
