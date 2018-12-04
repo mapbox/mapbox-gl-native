@@ -861,7 +861,7 @@ jobs:
       - run:
           name: Upload coverage results to codecov.io
           command: |
-            curl -sSfL -o codecov https://codecov.io/bash - F ios
+            curl -sSfL -o codecov https://codecov.io/bash -F ios
             chmod +x codecov
             ./codecov -c
 
