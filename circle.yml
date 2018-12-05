@@ -861,7 +861,7 @@ jobs:
       - run:
           name: Upload coverage results to codecov.io
           command: |
-            curl -sSfL -o codecov https://codecov.io/bash -F ios -J 'CI'
+            curl -sSfL -o codecov https://codecov.io/bash
             chmod +x codecov
             ./codecov -c
 
@@ -901,6 +901,12 @@ jobs:
       - install-macos-dependencies
       - install-dependencies
       - build-ios-test
+      - run:
+          name: Upload coverage results to codecov.io
+          command: |
+            curl -sSfL -o codecov https://codecov.io/bash -F ios -J 'CI'
+            chmod +x codecov
+            ./codecov -c
       - check-public-symbols
       - run:
           name: Check symbol namespacing for mapbox-events-ios
@@ -914,12 +920,6 @@ jobs:
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
-      - run:
-          name: Upload coverage results to codecov.io
-          command: |
-            curl -sSfL -o codecov https://codecov.io/bash
-            chmod +x codecov
-            ./codecov -c
 
 # ------------------------------------------------------------------------------
   ios-sanitize-nightly:
