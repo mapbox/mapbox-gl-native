@@ -16,6 +16,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The proxy object for current map style.
@@ -30,6 +31,7 @@ public class Style implements NativeMapView.StyleCallback {
   private final NativeMapView nativeMapView;
   private final HashMap<String, Source> sources = new HashMap<>();
   private final HashMap<String, Layer> layers = new HashMap<>();
+  private final HashMap<String, Bitmap> images = new HashMap<>();
   private final OnStyleLoaded onStyleLoaded;
   private final Builder builder;
   private boolean styleLoaded;
@@ -381,8 +383,14 @@ public class Style implements NativeMapView.StyleCallback {
       }
     }
 
+    for (Map.Entry<String, Bitmap> bitmapEntry : images.entrySet()) {
+      nativeMapView.removeImage(bitmapEntry.getKey());
+      bitmapEntry.getValue().recycle();
+    }
+
     sources.clear();
     layers.clear();
+    images.clear();
   }
 
   /**
