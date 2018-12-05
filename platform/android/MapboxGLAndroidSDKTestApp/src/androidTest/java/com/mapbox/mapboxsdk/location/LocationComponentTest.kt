@@ -168,7 +168,6 @@ class LocationComponentTest : BaseActivityTest() {
         assertThat(mapboxMap.isLayerVisible(FOREGROUND_LAYER), `is`(true))
         assertThat(mapboxMap.isLayerVisible(BACKGROUND_LAYER), `is`(true))
         assertThat(mapboxMap.isLayerVisible(SHADOW_LAYER), `is`(true))
-        assertThat(mapboxMap.isLayerVisible(ACCURACY_LAYER), `is`(true))
         assertThat(mapboxMap.isLayerVisible(BEARING_LAYER), `is`(false))
       }
     }

@@ -12,6 +12,7 @@ import android.support.annotation.Size;
 import android.support.annotation.UiThread;
 import android.text.TextUtils;
 import android.view.View;
+
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.android.gestures.RotateGestureDetector;
@@ -19,6 +20,7 @@ import com.mapbox.android.gestures.ShoveGestureDetector;
 import com.mapbox.android.gestures.StandardScaleGestureDetector;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
+import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
@@ -69,7 +71,7 @@ public final class MapboxMap {
   @Nullable
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
-  private List<Style.OnStyleLoaded> styleLoadedCallbacks = new ArrayList<>();
+  private final List<Style.OnStyleLoaded> styleLoadedCallbacks = new ArrayList<>();
 
   @Nullable
   private Style style;
@@ -102,10 +104,10 @@ public final class MapboxMap {
    * Get the Style of the map asynchronously.
    */
   public void getStyle(@NonNull Style.OnStyleLoaded onStyleLoaded) {
-    if (style == null) {
-      styleLoadedCallbacks.add(onStyleLoaded);
-    } else {
+    if (style != null && style.isStyleLoaded()) {
       onStyleLoaded.onStyleLoaded(style);
+    } else {
+      styleLoadedCallbacks.add(onStyleLoaded);
     }
   }
 
@@ -119,7 +121,11 @@ public final class MapboxMap {
    */
   @Nullable
   public Style getStyle() {
-    return style;
+    if (style == null || !style.isStyleLoaded()) {
+      return null;
+    } else {
+      return style;
+    }
   }
 
   /**
@@ -195,17 +201,10 @@ public final class MapboxMap {
   }
 
   /**
-   * Called when the map will start loading style.
-   */
-  void onStartLoadingMap() {
-    locationComponent.onStartLoadingMap();
-  }
-
-  /**
    * Called the map finished loading style.
    */
   void onFinishLoadingStyle() {
-    locationComponent.onFinishLoadingStyle();
+    notifyStyleLoaded();
   }
 
   /**
@@ -750,19 +749,39 @@ public final class MapboxMap {
   }
 
   public void setStyle(Style.Builder builder, final Style.OnStyleLoaded callback) {
-    builder.build(nativeMapView, new Style.OnStyleLoaded() {
-      @Override
-      public void onStyleLoaded(Style style) {
-        MapboxMap.this.style = style;
-        if (callback != null) {
-          callback.onStyleLoaded(style);
-        }
-        for (Style.OnStyleLoaded styleLoadedCallback : styleLoadedCallbacks) {
-          styleLoadedCallback.onStyleLoaded(style);
-        }
-        styleLoadedCallbacks.clear();
+    locationComponent.onStartLoadingMap();
+    if (style != null) {
+      style.onWillStartLoadingMap();
+    }
+
+    if (callback != null) {
+      styleLoadedCallbacks.add(callback);
+    }
+
+    style = builder.build(nativeMapView);
+    if (!TextUtils.isEmpty(style.getUrl())) {
+      nativeMapView.setStyleUrl(style.getUrl());
+    } else if (!TextUtils.isEmpty(style.getJson())) {
+      nativeMapView.setStyleJson(style.getJson());
+    } else {
+      // user didn't provide a `from` component,
+      // flag the style as loaded,
+      // add components defined added using the `with` prefix.
+      notifyStyleLoaded();
+    }
+  }
+
+  private void notifyStyleLoaded() {
+    if (style != null) {
+      style.onDidFinishLoadingStyle();
+      locationComponent.onFinishLoadingStyle();
+      for (Style.OnStyleLoaded styleLoadedCallback : styleLoadedCallbacks) {
+        styleLoadedCallback.onStyleLoaded(style);
       }
-    });
+    } else {
+      MapStrictMode.strictModeViolation("No style to provide.");
+    }
+    styleLoadedCallbacks.clear();
   }
 
   /**
