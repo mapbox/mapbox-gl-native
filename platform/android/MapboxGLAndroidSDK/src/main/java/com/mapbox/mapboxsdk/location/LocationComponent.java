@@ -183,6 +183,7 @@ public final class LocationComponent {
     this.staleStateManager = staleStateManager;
     this.compassEngine = compassEngine;
     this.internalLocationEngineProvider = internalLocationEngineProvider;
+    isComponentInitialized = true;
   }
 
   /**
@@ -893,47 +894,56 @@ public final class LocationComponent {
   }
 
   private void initialize(@NonNull final Context context, @NonNull final LocationComponentOptions options) {
-    mapboxMap.getStyle(new Style.OnStyleLoaded() {
-      @Override
-      public void onStyleLoaded(@NonNull Style style) {
-        if (isComponentInitialized) {
-          return;
-        }
-        isComponentInitialized = true;
-        LocationComponent.this.options = options;
+    LocationComponent.this.options = options;
+    mapboxMap.getStyle(new InitializationCallback(context));
+  }
 
-        mapboxMap.addOnMapClickListener(onMapClickListener);
-        mapboxMap.addOnMapLongClickListener(onMapLongClickListener);
+  class InitializationCallback implements Style.OnStyleLoaded {
 
-        LayerSourceProvider sourceProvider = new LayerSourceProvider();
-        LayerFeatureProvider featureProvider = new LayerFeatureProvider();
-        LayerBitmapProvider bitmapProvider = new LayerBitmapProvider(context);
-        locationLayerController = new LocationLayerController(mapboxMap, sourceProvider, featureProvider,
-          bitmapProvider,
-          options);
-        locationCameraController = new LocationCameraController(
-          context, mapboxMap, cameraTrackingChangedListener, options, onCameraMoveInvalidateListener);
+    private final Context context;
 
-        locationAnimatorCoordinator = new LocationAnimatorCoordinator();
-        locationAnimatorCoordinator.addLayerListener(locationLayerController);
-        locationAnimatorCoordinator.addCameraListener(locationCameraController);
-        locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options
-          .trackingAnimationDurationMultiplier());
+    private InitializationCallback(Context context) {
+      this.context = context;
+    }
 
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        compassEngine = new LocationComponentCompassEngine(windowManager, sensorManager);
-        compassEngine.addCompassListener(compassListener);
-        staleStateManager = new StaleStateManager(onLocationStaleListener, options);
-
-        updateMapWithOptions(options);
-
-        setRenderMode(RenderMode.NORMAL);
-        setCameraMode(CameraMode.NONE);
-
-        onLocationLayerStart();
+    @Override
+    public void onStyleLoaded(@NonNull Style style) {
+      if (isComponentInitialized) {
+        return;
       }
-    });
+      isComponentInitialized = true;
+
+      mapboxMap.addOnMapClickListener(onMapClickListener);
+      mapboxMap.addOnMapLongClickListener(onMapLongClickListener);
+
+      LayerSourceProvider sourceProvider = new LayerSourceProvider();
+      LayerFeatureProvider featureProvider = new LayerFeatureProvider();
+      LayerBitmapProvider bitmapProvider = new LayerBitmapProvider(context);
+      locationLayerController = new LocationLayerController(mapboxMap, sourceProvider, featureProvider,
+        bitmapProvider,
+        options);
+      locationCameraController = new LocationCameraController(
+        context, mapboxMap, cameraTrackingChangedListener, options, onCameraMoveInvalidateListener);
+
+      locationAnimatorCoordinator = new LocationAnimatorCoordinator();
+      locationAnimatorCoordinator.addLayerListener(locationLayerController);
+      locationAnimatorCoordinator.addCameraListener(locationCameraController);
+      locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options
+        .trackingAnimationDurationMultiplier());
+
+      WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+      SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+      compassEngine = new LocationComponentCompassEngine(windowManager, sensorManager);
+      compassEngine.addCompassListener(compassListener);
+      staleStateManager = new StaleStateManager(onLocationStaleListener, options);
+
+      updateMapWithOptions(options);
+
+      setRenderMode(RenderMode.NORMAL);
+      setCameraMode(CameraMode.NONE);
+
+      onLocationLayerStart();
+    }
   }
 
   private void initializeLocationEngine(@NonNull Context context) {

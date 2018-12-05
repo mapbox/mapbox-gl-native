@@ -8,11 +8,12 @@ import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.mapboxsdk.R
 import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.mapbox.mapboxsdk.maps.Style
 import org.junit.Assert
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
@@ -61,16 +62,22 @@ class LocationComponentTest {
   @Mock
   private lateinit var locationEngineProvider: LocationComponent.InternalLocationEngineProvider
 
+  @Mock
+  private lateinit var style: Style
+
   @Before
   fun before() {
     MockitoAnnotations.initMocks(this)
     locationComponent = LocationComponent(mapboxMap, currentListener, lastListener, locationLayerController, locationCameraController, locationAnimatorCoordinator, staleStateManager, compassEngine, locationEngineProvider)
     doReturn(locationEngine).`when`(locationEngineProvider).getBestLocationEngine(context, false)
+    doReturn(style).`when`(mapboxMap).style
   }
 
   @Test
   fun activateWithRequestTest() {
     locationComponent.activateLocationComponent(context, locationEngine, locationEngineRequest, locationComponentOptions)
+    verify(mapboxMap).getStyle(ArgumentMatchers.any(Style.OnStyleLoaded::class.java))
+
     Assert.assertEquals(locationEngineRequest, locationComponent.locationEngineRequest)
 
     doReturn(mock(TypedArray::class.java)).`when`(context)
