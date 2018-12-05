@@ -48,7 +48,7 @@ final class NativeMapView {
 
   private static final String TAG = "Mbgl-NativeMapView";
 
-  //Hold a reference to prevent it from being GC'd as long as it's used on the native side
+  // Hold a reference to prevent it from being GC'd as long as it's used on the native side
   private final FileSource fileSource;
 
   // Used to schedule work on the MapRenderer Thread
@@ -71,7 +71,8 @@ final class NativeMapView {
   // Flag to indicating destroy was called
   private boolean destroyed = false;
 
-  private Style style;
+  // Used for style load callbacks
+  private StyleCallback styleCallback;
 
   // Holds the pointer to JNI NativeMapView
   @Keep
@@ -939,8 +940,8 @@ final class NativeMapView {
   @Keep
   private void onWillStartLoadingMap() {
     stateCallback.onWillStartLoadingMap();
-    if (style != null) {
-      style.onWillStartLoadingStyle();
+    if (styleCallback != null) {
+      styleCallback.onWillStartLoadingMap();
     }
   }
 
@@ -976,7 +977,7 @@ final class NativeMapView {
 
   @Keep
   private void onDidFinishLoadingStyle() {
-    style.onDidFinishLoadingStyle();
+    styleCallback.onDidFinishLoadingStyle();
     stateCallback.onDidFinishLoadingStyle();
   }
 
@@ -1341,9 +1342,8 @@ final class NativeMapView {
     });
   }
 
-  // TODO remove dependency of Style on NativeMapView
-  public void setStyle(Style style) {
-    this.style = style;
+  void setStyleCallback(@NonNull StyleCallback callback) {
+    this.styleCallback = callback;
   }
 
   //
@@ -1407,14 +1407,18 @@ final class NativeMapView {
     Bitmap getViewContent();
   }
 
-  public interface StateCallback {
+  interface StyleCallback {
+    void onWillStartLoadingMap();
+
+    void onDidFinishLoadingStyle();
+  }
+
+  interface StateCallback extends StyleCallback {
     void onCameraWillChange(boolean animated);
 
     void onCameraIsChanging();
 
     void onCameraDidChange(boolean animated);
-
-    void onWillStartLoadingMap();
 
     void onDidFinishLoadingMap();
 
@@ -1427,8 +1431,6 @@ final class NativeMapView {
     void onWillStartRenderingMap();
 
     void onDidFinishRenderingMap(boolean fully);
-
-    void onDidFinishLoadingStyle();
 
     void onSourceChanged(String sourceId);
   }
