@@ -78,6 +78,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
     this.layerSourceProvider = layerSourceProvider;
     this.bitmapProvider = bitmapProvider;
     this.locationFeature = featureProvider.generateLocationFeature(locationFeature, options);
+    initializeComponents(options);
     setRenderMode(RenderMode.NORMAL);
   }
 
