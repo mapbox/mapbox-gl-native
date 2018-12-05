@@ -30,6 +30,32 @@
 #include <cassert>
 #include <cstdlib>
 
+
+#include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
+
+#include <cstdio>
+#include <cerrno>
+#include <cstring>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+
+namespace {
+    std::string read_file(const std::string &filename) {
+    std::ifstream file(filename, std::ios::binary);
+    if (file.good()) {
+        std::stringstream data;
+        data << file.rdbuf();
+        return data.str();
+    } else {
+        throw std::runtime_error(std::string("Cannot read file ") + filename);
+    }
+}
+
+} // namespace
+
+
 void glfwError(int error, const char *description) {
     mbgl::Log::Error(mbgl::Event::OpenGL, "GLFW error (%i): %s", error, description);
     assert(false);
@@ -621,6 +647,15 @@ void GLFWView::onDidFinishLoadingStyle() {
     if (show3DExtrusions) {
         toggle3DExtrusions(show3DExtrusions);
     }
+
+    mbgl::style::GeoJSONOptions options;
+    options.lineMetrics = true;
+    auto source = std::make_unique<mbgl::style::GeoJSONSource>("mysource", options);
+    source->setGeoJSON(mapbox::geojson::parse(read_file("crashline.geojson")));
+    map->getStyle().addSource(std::move(source));
+
+    auto layer = std::make_unique<mbgl::style::LineLayer>("mylayer", "mysource");
+    map->getStyle().addLayer(std::move(layer));
 }
 
 void GLFWView::toggle3DExtrusions(bool visible) {

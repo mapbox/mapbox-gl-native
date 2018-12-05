@@ -30,8 +30,8 @@ option(WITH_NODEJS   "Download test dependencies like NPM and Node.js" ON)
 option(WITH_ERROR    "Add -Werror flag to build (turns warnings into errors)" ON)
 
 if (WITH_ERROR)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-    set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Werror")
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+#    set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Werror")
 endif()
 
 include(cmake/mbgl.cmake)
@@ -95,7 +95,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Os -DNDEBUG")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Os -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O3 -DNDEBUG")
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -O3 -DNDEBUG")
-set(CMAKE_CXX_FLAGS_SANITIZE "${CMAKE_CXX_FLAGS_SANITIZE} -O1 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls")
+set(CMAKE_CXX_FLAGS_SANITIZE "${CMAKE_CXX_FLAGS_SANITIZE} -fsanitize=address -fsanitize=undefined -O1 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls")
 set(CMAKE_C_FLAGS_SANITIZE "${CMAKE_C_FLAGS_SANITIZE} -O1 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls")
 
 if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
@@ -106,8 +106,8 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fext-numeric-literals")
 endif()
 
-set(CMAKE_SHARED_LINKER_FLAGS_SANITIZE "${CMAKE_SHARED_LINKER_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS_SANITIZE "${CMAKE_EXE_LINKER_FLAGS}")
+set(CMAKE_SHARED_LINKER_FLAGS_SANITIZE "${CMAKE_SHARED_LINKER_FLAGS} -fsanitize=address -fsanitize=undefined")
+set(CMAKE_EXE_LINKER_FLAGS_SANITIZE "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fsanitize=undefined")
 
 # Technique from https://crascit.com/2016/04/09/using-ccache-with-cmake/
 find_program(CCACHE_PROGRAM ccache)
