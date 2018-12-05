@@ -759,10 +759,10 @@ public final class MapboxMap {
     }
 
     style = builder.build(nativeMapView);
-    if (!TextUtils.isEmpty(style.getUrl())) {
-      nativeMapView.setStyleUrl(style.getUrl());
-    } else if (!TextUtils.isEmpty(style.getJson())) {
-      nativeMapView.setStyleJson(style.getJson());
+    if (!TextUtils.isEmpty(builder.getUrl())) {
+      nativeMapView.setStyleUrl(builder.getUrl());
+    } else if (!TextUtils.isEmpty(builder.getJson())) {
+      nativeMapView.setStyleJson(builder.getJson());
     } else {
       // user didn't provide a `from` component,
       // flag the style as loaded,
