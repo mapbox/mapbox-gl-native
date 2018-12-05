@@ -27,7 +27,6 @@ public class MapSnapshotterActivity extends AppCompatActivity {
   private GridLayout grid;
   private List<MapSnapshotter> snapshotters = new ArrayList<>();
 
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -69,7 +68,7 @@ public class MapSnapshotterActivity extends AppCompatActivity {
 
       // Optionally the style
       .withStyle((column + row) % 2 == 0 ? Style.MAPBOX_STREETS : Style.DARK)
-        .withLocalIdeographFontFamily("sans-serif");
+      .withLocalIdeographFontFamily("sans-serif");
 
     // Optionally the visible region
     if (row % 2 == 0) {
