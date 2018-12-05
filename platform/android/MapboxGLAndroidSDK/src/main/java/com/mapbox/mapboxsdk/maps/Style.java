@@ -34,8 +34,6 @@ public class Style {
   private final HashMap<String, Layer> layers = new HashMap<>();
   private final HashMap<String, Bitmap> images = new HashMap<>();
   private final Builder builder;
-  private String styleUrl;
-  private String styleJson;
   private boolean styleLoaded;
 
   /**
@@ -46,8 +44,6 @@ public class Style {
    */
   private Style(@NonNull Builder builder, @NonNull NativeMapView nativeMapView) {
     this.builder = builder;
-    styleUrl = builder.styleUrl;
-    styleJson = builder.styleJson;
     this.nativeMapView = nativeMapView;
   }
 
@@ -56,9 +52,9 @@ public class Style {
    *
    * @return the style url
    */
-  @Nullable
+  @NonNull
   public String getUrl() {
-    return styleUrl;
+    return nativeMapView.getStyleUrl();
   }
 
   /**
@@ -66,9 +62,9 @@ public class Style {
    *
    * @return the style json
    */
-  @Nullable
+  @NonNull
   public String getJson() {
-    return styleJson;
+    return nativeMapView.getStyleJson();
   }
 
   //
@@ -597,6 +593,14 @@ public class Style {
     public Builder withImage(@NonNull String id, @NonNull Bitmap image, boolean sdf) {
       images.add(new ImageWrapper(id, image, sdf));
       return this;
+    }
+
+    String getUrl() {
+      return styleUrl;
+    }
+
+    String getJson() {
+      return styleJson;
     }
 
     /**
