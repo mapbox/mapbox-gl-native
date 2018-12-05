@@ -25,7 +25,7 @@ import java.util.List;
  * has been loaded by underlying map.
  * </p>
  */
-public class Style {
+public class Style implements NativeMapView.StyleCallback {
 
   private final NativeMapView nativeMapView;
   private final HashMap<String, Source> sources = new HashMap<>();
@@ -368,7 +368,8 @@ public class Style {
    * Called when the underlying map will start loading a new style. This method will clean up this style
    * by setting the java sources and layers in a detached state and removing them from core.
    */
-  void onWillStartLoadingStyle() {
+  @Override
+  public void onWillStartLoadingMap() {
     for (Source source : sources.values()) {
       if (source != null) {
         source.setDetached();
@@ -391,7 +392,8 @@ public class Style {
    * Called when the underlying map has finished loading this style.
    * This method will add all components added to the builder that were defined with the 'with' prefix.
    */
-  void onDidFinishLoadingStyle() {
+  @Override
+  public void onDidFinishLoadingStyle() {
     if (!styleLoaded) {
       styleLoaded = true;
       for (Source source : builder.sources) {
@@ -600,7 +602,7 @@ public class Style {
      */
     void build(@NonNull NativeMapView nativeMapView, @Nullable OnStyleLoaded styleLoaded) {
       Style style = new Style(this, nativeMapView, styleLoaded);
-      nativeMapView.setStyle(style);
+      nativeMapView.setStyleCallback(style);
 
       if (styleUrl != null) {
         nativeMapView.setStyleUrl(styleUrl);
