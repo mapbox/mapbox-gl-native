@@ -41,7 +41,7 @@ fun MapboxMap.waitForLayer(uiController: UiController, location: Location, layer
   var counter = 0
   val delay = MapboxTestingUtils.MAP_RENDER_DELAY
   while (
-    if (shouldDisappear) this.queryRenderedFeatures(location, layerId).isNotEmpty() else this.queryRenderedFeatures(location, layerId).isEmpty()
+    if (shouldDisappear) this.queryRenderedFeatures(location, layerId).isNotEmpty() else (this.style == null || this.queryRenderedFeatures(location, layerId).isEmpty())
       && delay * counter < MapboxTestingUtils.RENDER_TIMEOUT) {
     uiController.loopMainThreadForAtLeast(delay)
     counter++
