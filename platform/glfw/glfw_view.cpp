@@ -41,6 +41,7 @@
 #include <sstream>
 #include <fstream>
 
+
 namespace {
     std::string read_file(const std::string &filename) {
     std::ifstream file(filename, std::ios::binary);
@@ -642,6 +643,14 @@ void GLFWView::setShouldClose() {
 void GLFWView::setWindowTitle(const std::string& title) {
     glfwSetWindowTitle(window, (std::string { "Mapbox GL: " } + title).c_str());
 }
+namespace {
+mapbox::geojson::geometry makeTestLineString() {
+    mapbox::geojson::line_string result;
+    result.push_back({7, 52});
+    result.push_back({8, 52});
+    return result;
+}
+} // namespace
 
 void GLFWView::onDidFinishLoadingStyle() {
     if (show3DExtrusions) {
@@ -651,7 +660,8 @@ void GLFWView::onDidFinishLoadingStyle() {
     mbgl::style::GeoJSONOptions options;
     options.lineMetrics = true;
     auto source = std::make_unique<mbgl::style::GeoJSONSource>("mysource", options);
-    source->setGeoJSON(mapbox::geojson::parse(read_file("crashline.geojson")));
+    //source->setGeoJSON(mapbox::geojson::parse(read_file("/home/mikhail/git/mapbox-gl-native/crashline.geojson")));
+    source->setGeoJSON(makeTestLineString());
     map->getStyle().addSource(std::move(source));
 
     auto layer = std::make_unique<mbgl::style::LineLayer>("mylayer", "mysource");
