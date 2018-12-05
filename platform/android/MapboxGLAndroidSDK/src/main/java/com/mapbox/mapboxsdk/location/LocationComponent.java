@@ -11,6 +11,7 @@ import android.support.annotation.RequiresPermission;
 import android.support.annotation.StyleRes;
 import android.support.annotation.VisibleForTesting;
 import android.view.WindowManager;
+
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
@@ -27,6 +28,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraIdleListener;
 import com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveListener;
 import com.mapbox.mapboxsdk.maps.MapboxMap.OnMapClickListener;
+import com.mapbox.mapboxsdk.maps.Style;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -123,11 +125,6 @@ public final class LocationComponent {
    * Indicates whether the component has been initialized.
    */
   private boolean isComponentInitialized;
-
-  /**
-   * Indicates whether the style has been initialized.
-   */
-  private boolean isStyleInitialized;
 
   /**
    * Indicates that the component is enabled and should be displaying location if Mapbox components are available and
@@ -461,14 +458,16 @@ public final class LocationComponent {
    *
    * @param options to update the current style
    */
-  public void applyStyle(@NonNull LocationComponentOptions options) {
-    this.options = options;
-    locationLayerController.applyStyle(options);
-    locationCameraController.initializeOptions(options);
-    staleStateManager.setEnabled(options.enableStaleState());
-    staleStateManager.setDelayTime(options.staleStateTimeout());
-    locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options.trackingAnimationDurationMultiplier());
-    updateMapWithOptions(options);
+  public void applyStyle(@NonNull final LocationComponentOptions options) {
+    LocationComponent.this.options = options;
+    if (mapboxMap.getStyle() != null) {
+      locationLayerController.applyStyle(options);
+      locationCameraController.initializeOptions(options);
+      staleStateManager.setEnabled(options.enableStaleState());
+      staleStateManager.setDelayTime(options.staleStateTimeout());
+      locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options.trackingAnimationDurationMultiplier());
+      updateMapWithOptions(options);
+    }
   }
 
   /**
@@ -838,7 +837,6 @@ public final class LocationComponent {
    * Internal use.
    */
   public void onFinishLoadingStyle() {
-    isStyleInitialized = true;
     if (isComponentInitialized) {
       locationLayerController.initializeComponents(options);
       locationCameraController.initializeOptions(options);
@@ -848,7 +846,7 @@ public final class LocationComponent {
 
   @SuppressLint("MissingPermission")
   private void onLocationLayerStart() {
-    if (!isComponentInitialized || !isComponentStarted) {
+    if (!isComponentInitialized || !isComponentStarted || mapboxMap.getStyle() == null) {
       return;
     }
 
@@ -894,45 +892,48 @@ public final class LocationComponent {
     mapboxMap.removeOnCameraIdleListener(onCameraIdleListener);
   }
 
-  private void initialize(@NonNull Context context, @NonNull LocationComponentOptions options) {
-    if (isComponentInitialized) {
-      return;
-    }
-    isComponentInitialized = true;
-    this.options = options;
+  private void initialize(@NonNull final Context context, @NonNull final LocationComponentOptions options) {
+    mapboxMap.getStyle(new Style.OnStyleLoaded() {
+      @Override
+      public void onStyleLoaded(@NonNull Style style) {
+        if (isComponentInitialized) {
+          return;
+        }
+        isComponentInitialized = true;
+        LocationComponent.this.options = options;
 
-    mapboxMap.addOnMapClickListener(onMapClickListener);
-    mapboxMap.addOnMapLongClickListener(onMapLongClickListener);
+        mapboxMap.addOnMapClickListener(onMapClickListener);
+        mapboxMap.addOnMapLongClickListener(onMapLongClickListener);
 
-    LayerSourceProvider sourceProvider = new LayerSourceProvider();
-    LayerFeatureProvider featureProvider = new LayerFeatureProvider();
-    LayerBitmapProvider bitmapProvider = new LayerBitmapProvider(context);
-    locationLayerController = new LocationLayerController(mapboxMap, sourceProvider, featureProvider, bitmapProvider,
-      options);
-    locationCameraController = new LocationCameraController(
-      context, mapboxMap, cameraTrackingChangedListener, options, onCameraMoveInvalidateListener);
+        LayerSourceProvider sourceProvider = new LayerSourceProvider();
+        LayerFeatureProvider featureProvider = new LayerFeatureProvider();
+        LayerBitmapProvider bitmapProvider = new LayerBitmapProvider(context);
+        locationLayerController = new LocationLayerController(mapboxMap, sourceProvider, featureProvider,
+          bitmapProvider,
+          options);
+        locationCameraController = new LocationCameraController(
+          context, mapboxMap, cameraTrackingChangedListener, options, onCameraMoveInvalidateListener);
 
-    locationAnimatorCoordinator = new LocationAnimatorCoordinator();
-    locationAnimatorCoordinator.addLayerListener(locationLayerController);
-    locationAnimatorCoordinator.addCameraListener(locationCameraController);
-    locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options.trackingAnimationDurationMultiplier());
+        locationAnimatorCoordinator = new LocationAnimatorCoordinator();
+        locationAnimatorCoordinator.addLayerListener(locationLayerController);
+        locationAnimatorCoordinator.addCameraListener(locationCameraController);
+        locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options
+          .trackingAnimationDurationMultiplier());
 
-    WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-    compassEngine = new LocationComponentCompassEngine(windowManager, sensorManager);
-    compassEngine.addCompassListener(compassListener);
-    staleStateManager = new StaleStateManager(onLocationStaleListener, options);
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        compassEngine = new LocationComponentCompassEngine(windowManager, sensorManager);
+        compassEngine.addCompassListener(compassListener);
+        staleStateManager = new StaleStateManager(onLocationStaleListener, options);
 
-    updateMapWithOptions(options);
+        updateMapWithOptions(options);
 
-    setRenderMode(RenderMode.NORMAL);
-    setCameraMode(CameraMode.NONE);
+        setRenderMode(RenderMode.NORMAL);
+        setCameraMode(CameraMode.NONE);
 
-    if (isStyleInitialized) {
-      onFinishLoadingStyle();
-    }
-
-    onLocationLayerStart();
+        onLocationLayerStart();
+      }
+    });
   }
 
   private void initializeLocationEngine(@NonNull Context context) {

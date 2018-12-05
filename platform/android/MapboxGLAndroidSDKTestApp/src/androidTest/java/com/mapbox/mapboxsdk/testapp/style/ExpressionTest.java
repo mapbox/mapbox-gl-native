@@ -504,9 +504,9 @@ public class ExpressionTest extends BaseActivityTest {
     validateTestSetup();
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       LatLng latLng = new LatLng(51, 17);
-      mapboxMap.addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      mapboxMap.getStyle().addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
       SymbolLayer layer = new SymbolLayer("layer", "source");
-      mapboxMap.addLayer(layer);
+      mapboxMap.getStyle().addLayer(layer);
 
       Formatted formatted = new Formatted(
         new FormattedSection("test", 1.5),

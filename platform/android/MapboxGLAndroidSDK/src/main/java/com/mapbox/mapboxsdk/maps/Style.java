@@ -5,6 +5,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
+
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
@@ -26,14 +27,15 @@ import java.util.Map;
  * has been loaded by underlying map.
  * </p>
  */
-public class Style implements NativeMapView.StyleCallback {
+public class Style {
 
   private final NativeMapView nativeMapView;
   private final HashMap<String, Source> sources = new HashMap<>();
   private final HashMap<String, Layer> layers = new HashMap<>();
   private final HashMap<String, Bitmap> images = new HashMap<>();
-  private final OnStyleLoaded onStyleLoaded;
   private final Builder builder;
+  private String styleUrl;
+  private String styleJson;
   private boolean styleLoaded;
 
   /**
@@ -41,12 +43,12 @@ public class Style implements NativeMapView.StyleCallback {
    *
    * @param builder       the builder used for creating this style
    * @param nativeMapView the map object used to load this style
-   * @param styleLoaded   the callback used to notify about finish style loading
    */
-  private Style(@NonNull Builder builder, @NonNull NativeMapView nativeMapView, @Nullable OnStyleLoaded styleLoaded) {
+  private Style(@NonNull Builder builder, @NonNull NativeMapView nativeMapView) {
     this.builder = builder;
+    styleUrl = builder.styleUrl;
+    styleJson = builder.styleJson;
     this.nativeMapView = nativeMapView;
-    this.onStyleLoaded = styleLoaded;
   }
 
   /**
@@ -54,9 +56,9 @@ public class Style implements NativeMapView.StyleCallback {
    *
    * @return the style url
    */
-  @NonNull
+  @Nullable
   public String getUrl() {
-    return nativeMapView.getStyleUrl();
+    return styleUrl;
   }
 
   /**
@@ -64,9 +66,9 @@ public class Style implements NativeMapView.StyleCallback {
    *
    * @return the style json
    */
-  @NonNull
+  @Nullable
   public String getJson() {
-    return nativeMapView.getStyleJson();
+    return styleJson;
   }
 
   //
@@ -367,8 +369,7 @@ public class Style implements NativeMapView.StyleCallback {
    * Called when the underlying map will start loading a new style. This method will clean up this style
    * by setting the java sources and layers in a detached state and removing them from core.
    */
-  @Override
-  public void onWillStartLoadingMap() {
+  void onWillStartLoadingMap() {
     for (Source source : sources.values()) {
       if (source != null) {
         source.setDetached();
@@ -397,8 +398,7 @@ public class Style implements NativeMapView.StyleCallback {
    * Called when the underlying map has finished loading this style.
    * This method will add all components added to the builder that were defined with the 'with' prefix.
    */
-  @Override
-  public void onDidFinishLoadingStyle() {
+  void onDidFinishLoadingStyle() {
     if (!styleLoaded) {
       styleLoaded = true;
       for (Source source : builder.sources) {
@@ -425,11 +425,11 @@ public class Style implements NativeMapView.StyleCallback {
       if (builder.transitionOptions != null) {
         setTransition(builder.transitionOptions);
       }
-
-      if (onStyleLoaded != null) {
-        onStyleLoaded.onStyleLoaded(this);
-      }
     }
+  }
+
+  boolean isStyleLoaded() {
+    return styleLoaded;
   }
 
   //
@@ -601,24 +601,9 @@ public class Style implements NativeMapView.StyleCallback {
 
     /**
      * Build the composed style.
-     *
-     * @param nativeMapView the native map used for style loading
-     * @param styleLoaded   the callback to be invoked when the style has loaded
      */
-    void build(@NonNull NativeMapView nativeMapView, @Nullable OnStyleLoaded styleLoaded) {
-      Style style = new Style(this, nativeMapView, styleLoaded);
-      nativeMapView.setStyleCallback(style);
-
-      if (styleUrl != null) {
-        nativeMapView.setStyleUrl(styleUrl);
-      } else if (styleJson != null) {
-        nativeMapView.setStyleJson(styleJson);
-      } else {
-        // user didn't provide a `from` component,
-        // flag the style as loaded,
-        // add components defined added using the `with` prefix.
-        style.onDidFinishLoadingStyle();
-      }
+    Style build(@NonNull NativeMapView nativeMapView) {
+      return new Style(this, nativeMapView);
     }
 
     private class ImageWrapper {
