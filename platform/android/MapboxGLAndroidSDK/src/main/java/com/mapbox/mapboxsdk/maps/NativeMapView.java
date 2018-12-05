@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.LibraryLoader;
@@ -70,9 +71,6 @@ final class NativeMapView {
 
   // Flag to indicating destroy was called
   private boolean destroyed = false;
-
-  // Used for style load callbacks
-  private StyleCallback styleCallback;
 
   // Holds the pointer to JNI NativeMapView
   @Keep
@@ -941,9 +939,6 @@ final class NativeMapView {
   @Keep
   private void onWillStartLoadingMap() {
     stateCallback.onWillStartLoadingMap();
-    if (styleCallback != null) {
-      styleCallback.onWillStartLoadingMap();
-    }
   }
 
   @Keep
@@ -978,7 +973,6 @@ final class NativeMapView {
 
   @Keep
   private void onDidFinishLoadingStyle() {
-    styleCallback.onDidFinishLoadingStyle();
     stateCallback.onDidFinishLoadingStyle();
   }
 
@@ -1346,10 +1340,6 @@ final class NativeMapView {
       }
 
     });
-  }
-
-  void setStyleCallback(@NonNull StyleCallback callback) {
-    this.styleCallback = callback;
   }
 
   //
