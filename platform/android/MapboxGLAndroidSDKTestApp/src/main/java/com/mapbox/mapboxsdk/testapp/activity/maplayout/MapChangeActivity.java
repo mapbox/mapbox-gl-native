@@ -33,6 +33,7 @@ public class MapChangeActivity extends AppCompatActivity {
     mapView.addOnDidFinishLoadingStyleListener(() -> Timber.v("OnDidFinishLoadingStyle"));
     mapView.addOnDidFinishRenderingFrameListener(fully -> Timber.v("OnDidFinishRenderingFrame: fully: %s", fully));
     mapView.addOnDidFinishRenderingMapListener(fully -> Timber.v("OnDidFinishRenderingMap: fully: %s", fully));
+    mapView.addOnDidEnterIdleListener(() -> Timber.v("OnDidEnterIdle"));
     mapView.addOnSourceChangedListener(sourceId -> Timber.v("OnSourceChangedListener: source with id: %s", sourceId));
     mapView.addOnWillStartLoadingMapListener(() -> Timber.v("OnWillStartLoadingMap"));
     mapView.addOnWillStartRenderingFrameListener(() -> Timber.v("OnWillStartRenderingFrame"));
