@@ -39,5 +39,7 @@
   "SymbolLayerActivity",
   "LocationFragmentActivity",
   "MergeOfflineRegionsActivity",
-  "NestedViewPagerActivity"
+  "NestedViewPagerActivity",
+  "DebugModeActivity",
+  "TextureViewDebugModeActivity"
 ]
