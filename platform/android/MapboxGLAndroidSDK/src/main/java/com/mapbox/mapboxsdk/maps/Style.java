@@ -433,7 +433,7 @@ public class Style {
   //
 
   /**
-   * TODO
+   * Builder for composing a style object.
    */
   public static class Builder {
 
