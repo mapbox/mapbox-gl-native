@@ -19,7 +19,6 @@ import java.util.List;
 
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.ACCURACY_RADIUS_ANIMATION_DURATION;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.COMPASS_UPDATE_RATE_MS;
-import static com.mapbox.mapboxsdk.location.LocationComponentConstants.INSTANT_LOCATION_TRANSITION_THRESHOLD;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.MAX_ANIMATION_DURATION_MS;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.TRANSITION_ANIMATION_DURATION_MS;
 import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_CAMERA_COMPASS_BEARING;
@@ -31,6 +30,7 @@ import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_LAYER_GPS_BE
 import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_LAYER_LATLNG;
 import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_TILT;
 import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_ZOOM;
+import static com.mapbox.mapboxsdk.location.Utils.immediateAnimation;
 
 final class LocationAnimatorCoordinator {
 
@@ -380,14 +380,5 @@ final class LocationAnimatorCoordinator {
 
   void setTrackingAnimationDurationMultiplier(float trackingAnimationDurationMultiplier) {
     this.durationMultiplier = trackingAnimationDurationMultiplier;
-  }
-
-  private boolean immediateAnimation(LatLng current, @NonNull LatLng target, double zoom) {
-    // TODO: calculate the value based on the projection
-    double distance = current.distanceTo(target);
-    if (zoom > 10) {
-      distance *= zoom;
-    }
-    return distance > INSTANT_LOCATION_TRANSITION_THRESHOLD;
   }
 }
