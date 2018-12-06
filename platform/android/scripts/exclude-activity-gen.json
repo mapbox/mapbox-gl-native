@@ -41,5 +41,8 @@
   "MergeOfflineRegionsActivity",
   "NestedViewPagerActivity",
   "DebugModeActivity",
-  "TextureViewDebugModeActivity"
+  "TextureViewDebugModeActivity",
+  "RuntimeStyleActivity",
+  "GridSourceActivity",
+  "AnimatedImageSourceActivity"
 ]
