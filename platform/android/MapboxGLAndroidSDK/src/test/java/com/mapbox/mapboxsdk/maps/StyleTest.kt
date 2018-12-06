@@ -34,6 +34,7 @@ class StyleTest {
         every { nativeMapView.addImage(any(), any(), any()) } answers {}
         every { nativeMapView.transitionDuration = any() } answers {}
         every { nativeMapView.transitionDelay = any() } answers {}
+        every { nativeMapView.isDestroyed } returns false
         mapboxMap.injectLocationComponent(spyk())
     }
 
