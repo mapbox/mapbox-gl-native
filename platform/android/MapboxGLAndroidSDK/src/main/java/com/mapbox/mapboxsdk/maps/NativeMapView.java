@@ -971,6 +971,11 @@ final class NativeMapView {
   }
 
   @Keep
+  private void onDidEnterIdle() {
+    stateCallback.onDidEnterIdle();
+  }
+
+  @Keep
   private void onDidFinishLoadingStyle() {
     stateCallback.onDidFinishLoadingStyle();
   }
@@ -1425,6 +1430,8 @@ final class NativeMapView {
     void onWillStartRenderingMap();
 
     void onDidFinishRenderingMap(boolean fully);
+
+    void onDidEnterIdle();
 
     void onSourceChanged(String sourceId);
   }

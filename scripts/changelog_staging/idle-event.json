@@ -1,0 +1,6 @@
+{
+  "core": "Add onDidEnterIdle to MapObserver, which fires whenever render completes and no repaint is scheduled.",
+  "darwin": "Add mapViewDidEnterIdle to MGLMapViewDelegate, which fires whenever render completes and no repaint is scheduled.",
+  "android": "Add onDidEnterIdle listener to MapView, which fires whenever render completes and no repaint is scheduled.",
+  "issue": 13469
+}
