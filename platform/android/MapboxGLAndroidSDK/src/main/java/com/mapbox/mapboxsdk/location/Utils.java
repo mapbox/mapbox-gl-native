@@ -14,7 +14,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+
+import static com.mapbox.mapboxsdk.location.LocationComponentConstants.INSTANT_LOCATION_TRANSITION_THRESHOLD;
 
 public final class Utils {
 
@@ -87,6 +90,15 @@ public final class Utils {
     }
     double metersPerPixel = mapboxMap.getProjection().getMetersPerPixelAtLatitude(location.getLatitude());
     return (float) (location.getAccuracy() * (1 / metersPerPixel));
+  }
+
+  static boolean immediateAnimation(LatLng current, @NonNull LatLng target, double zoom) {
+    // TODO: calculate the value based on the projection
+    double distance = current.distanceTo(target);
+    if (zoom > 10) {
+      distance *= zoom;
+    }
+    return distance > INSTANT_LOCATION_TRANSITION_THRESHOLD;
   }
 
   /**
