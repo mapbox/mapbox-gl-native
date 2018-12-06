@@ -736,18 +736,67 @@ public final class MapboxMap {
   // Styling
   //
 
+  /**
+   * Loads a new map style from the specified bundled style.
+   * <p>
+   * This method is asynchronous and will return before the style finishes loading.
+   * If you wish to wait for the map to finish loading, listen to the {@link MapView.OnDidFinishLoadingStyleListener}
+   * callback or use the {@link #setStyle(String, Style.OnStyleLoaded)} method instead.
+   * </p>
+   * If the style fails to load or an invalid style URL is set, the map view will become blank.
+   * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
+   * will be triggered.
+   *
+   * @param style The bundled style
+   * @see Style
+   */
   public void setStyle(@Style.StyleUrl String style) {
     this.setStyle(style, null);
   }
 
+  /**
+   * Loads a new map style from the specified bundled style.
+   * <p>
+   * If the style fails to load or an invalid style URL is set, the map view will become blank.
+   * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
+   * will be triggered.
+   * </p>
+   *
+   * @param style The bundled style
+   * @param callback The callback to be invoked when the style has loaded
+   * @see Style
+   */
   public void setStyle(@Style.StyleUrl String style, final Style.OnStyleLoaded callback) {
     this.setStyle(new Style.Builder().fromUrl(style), callback);
   }
 
+  /**
+   * Loads a new map style from the specified builder.
+   * <p>
+   * If the builder fails to load, the map view will become blank. An error message will be logged in the Android logcat
+   * and {@link MapView.OnDidFailLoadingMapListener} callback will be triggered. If you wish to wait for the map to
+   * finish loading, listen to the {@link MapView.OnDidFinishLoadingStyleListener} callback or use the
+   * {@link #setStyle(String, Style.OnStyleLoaded)} instead.
+   * </p>
+   *
+   * @param builder The style builder
+   * @see Style
+   */
   public void setStyle(Style.Builder builder) {
     this.setStyle(builder, null);
   }
 
+  /**
+   * Loads a new map style from the specified builder.
+   * <p>
+   * If the builder fails to load, the map view will become blank. An error message will be logged in the Android logcat
+   * and {@link MapView.OnDidFailLoadingMapListener} callback will be triggered.
+   * </p>
+   *
+   * @param builder The style builder
+   * @param callback The callback to be invoked when the style has loaded
+   * @see Style
+   */
   public void setStyle(Style.Builder builder, final Style.OnStyleLoaded callback) {
     locationComponent.onStartLoadingMap();
     if (style != null) {
