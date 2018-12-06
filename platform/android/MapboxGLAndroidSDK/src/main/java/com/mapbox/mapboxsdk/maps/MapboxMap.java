@@ -58,31 +58,27 @@ public final class MapboxMap {
   private static final String TAG = "Mbgl-MapboxMap";
 
   private final NativeMapView nativeMapView;
-
   private final UiSettings uiSettings;
   private final Projection projection;
   private final Transform transform;
-  private final AnnotationManager annotationManager;
   private final CameraChangeDispatcher cameraChangeDispatcher;
-
   private final OnGesturesManagerInteractionListener onGesturesManagerInteractionListener;
+  private final List<Style.OnStyleLoaded> styleLoadedCallbacks = new ArrayList<>();
 
   private LocationComponent locationComponent;
+  private AnnotationManager annotationManager;
+
   @Nullable
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
-
-  private final List<Style.OnStyleLoaded> styleLoadedCallbacks = new ArrayList<>();
 
   @Nullable
   private Style style;
 
   MapboxMap(NativeMapView map, Transform transform, UiSettings ui, Projection projection,
-            OnGesturesManagerInteractionListener listener, AnnotationManager annotations,
-            CameraChangeDispatcher cameraChangeDispatcher) {
+            OnGesturesManagerInteractionListener listener, CameraChangeDispatcher cameraChangeDispatcher) {
     this.nativeMapView = map;
     this.uiSettings = ui;
     this.projection = projection;
-    this.annotationManager = annotations.bind(this);
     this.transform = transform;
     this.onGesturesManagerInteractionListener = listener;
     this.cameraChangeDispatcher = cameraChangeDispatcher;
@@ -762,7 +758,7 @@ public final class MapboxMap {
    * will be triggered.
    * </p>
    *
-   * @param style The bundled style
+   * @param style    The bundled style
    * @param callback The callback to be invoked when the style has loaded
    * @see Style
    */
@@ -793,7 +789,7 @@ public final class MapboxMap {
    * and {@link MapView.OnDidFailLoadingMapListener} callback will be triggered.
    * </p>
    *
-   * @param builder The style builder
+   * @param builder  The style builder
    * @param callback The callback to be invoked when the style has loaded
    * @see Style
    */
@@ -820,7 +816,7 @@ public final class MapboxMap {
     }
   }
 
-  private void notifyStyleLoaded() {
+  void notifyStyleLoaded() {
     if (style != null) {
       style.onDidFinishLoadingStyle();
       locationComponent.onFinishLoadingStyle();
@@ -1812,6 +1808,10 @@ public final class MapboxMap {
 
   void injectLocationComponent(LocationComponent locationComponent) {
     this.locationComponent = locationComponent;
+  }
+
+  void injectAnnotationManager(AnnotationManager annotationManager) {
+    this.annotationManager = annotationManager.bind(this);
   }
 
   /**

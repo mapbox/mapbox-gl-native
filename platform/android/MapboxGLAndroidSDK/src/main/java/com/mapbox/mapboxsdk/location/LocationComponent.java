@@ -164,6 +164,12 @@ public final class LocationComponent {
     this.mapboxMap = mapboxMap;
   }
 
+  // used for creating a spy
+  LocationComponent() {
+    //noinspection ConstantConditions
+    mapboxMap = null;
+  }
+
   @VisibleForTesting
   LocationComponent(@NonNull MapboxMap mapboxMap,
                     @NonNull LocationEngineCallback<LocationEngineResult> currentlistener,

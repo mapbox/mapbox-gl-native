@@ -14,6 +14,7 @@ dependencies {
     implementation dependenciesList.okhttp3
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
+    testImplementation dependenciesList.mockk
     testImplementation dependenciesList.robolectric
     testImplementation dependenciesList.kotlinLib
 }
