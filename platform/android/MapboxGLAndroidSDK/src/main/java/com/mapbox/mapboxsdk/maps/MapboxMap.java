@@ -817,6 +817,10 @@ public final class MapboxMap {
   }
 
   void notifyStyleLoaded() {
+    if (nativeMapView.isDestroyed()) {
+      return;
+    }
+
     if (style != null) {
       style.onDidFinishLoadingStyle();
       locationComponent.onFinishLoadingStyle();

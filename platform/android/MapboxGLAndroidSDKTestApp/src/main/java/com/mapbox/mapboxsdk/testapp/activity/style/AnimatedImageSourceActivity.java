@@ -34,43 +34,36 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
   private static final String ID_IMAGE_LAYER = "animated_image_layer";
 
   private MapView mapView;
-  private MapboxMap mapboxMap;
-
-  private Handler handler;
+  private final Handler handler = new Handler();
   private Runnable runnable;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_animated_image_source);
-
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
   }
 
   @Override
   public void onMapReady(@NonNull final MapboxMap map) {
-    mapboxMap = map;
+    LatLngQuad quad = new LatLngQuad(
+      new LatLng(46.437, -80.425),
+      new LatLng(46.437, -71.516),
+      new LatLng(37.936, -71.516),
+      new LatLng(37.936, -80.425));
 
-    map.setStyle(Style.MAPBOX_STREETS, style -> {
-      // add source
-      LatLngQuad quad = new LatLngQuad(
-        new LatLng(46.437, -80.425),
-        new LatLng(46.437, -71.516),
-        new LatLng(37.936, -71.516),
-        new LatLng(37.936, -80.425));
-      mapboxMap.getStyle().addSource(new ImageSource(ID_IMAGE_SOURCE, quad, R.drawable.southeast_radar_0));
-
-      // add layer
-      RasterLayer layer = new RasterLayer(ID_IMAGE_LAYER, ID_IMAGE_SOURCE);
-      mapboxMap.getStyle().addLayer(layer);
-
-      // loop refresh geojson
-      handler = new Handler();
-      runnable = new RefreshImageRunnable(mapboxMap, handler);
-      handler.postDelayed(runnable, 100);
-    });
+    final ImageSource imageSource = new ImageSource(ID_IMAGE_SOURCE, quad, R.drawable.southeast_radar_0);
+    final RasterLayer layer = new RasterLayer(ID_IMAGE_LAYER, ID_IMAGE_SOURCE);
+    map.setStyle(new Style.Builder()
+        .fromUrl(Style.MAPBOX_STREETS)
+        .withSource(imageSource)
+        .withLayer(layer), style -> {
+        runnable = new RefreshImageRunnable(imageSource, handler);
+        handler.postDelayed(runnable, 100);
+      }
+    );
   }
 
   @Override
@@ -95,9 +88,7 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
   protected void onStop() {
     super.onStop();
     mapView.onStop();
-    if (handler != null) {
-      handler.removeCallbacks(runnable);
-    }
+    handler.removeCallbacks(runnable);
   }
 
   @Override
@@ -114,7 +105,7 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
 
   private static class RefreshImageRunnable implements Runnable {
 
-    private MapboxMap mapboxMap;
+    private ImageSource imageSource;
     private Handler handler;
     private Bitmap[] drawables;
     private int drawableIndex;
@@ -129,8 +120,8 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
       return null;
     }
 
-    RefreshImageRunnable(MapboxMap mapboxMap, Handler handler) {
-      this.mapboxMap = mapboxMap;
+    RefreshImageRunnable(ImageSource imageSource, Handler handler) {
+      this.imageSource = imageSource;
       this.handler = handler;
       drawables = new Bitmap[4];
       drawables[0] = getBitmap(R.drawable.southeast_radar_0);
@@ -142,7 +133,7 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
 
     @Override
     public void run() {
-      ((ImageSource) mapboxMap.getStyle().getSource(ID_IMAGE_SOURCE)).setImage(drawables[drawableIndex++]);
+      imageSource.setImage(drawables[drawableIndex++]);
       if (drawableIndex > 3) {
         drawableIndex = 0;
       }
