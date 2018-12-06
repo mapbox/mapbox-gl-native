@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.location;
 
 import android.content.Context;
 import android.graphics.PointF;
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -9,6 +10,8 @@ import android.view.MotionEvent;
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.android.gestures.RotateGestureDetector;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
@@ -29,6 +32,8 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
 
   private final AndroidGesturesManager initialGesturesManager;
   private final AndroidGesturesManager internalGesturesManager;
+
+  private boolean isTransitioning;
 
   LocationCameraController(
     Context context,
@@ -76,11 +81,68 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
   }
 
   void setCameraMode(@CameraMode.Mode int cameraMode) {
+    setCameraMode(cameraMode, null, null);
+  }
+
+  void setCameraMode(@CameraMode.Mode final int cameraMode, @Nullable Location lastLocation,
+                     @Nullable OnLocationCameraTransitionListener internalTransitionListener) {
     final boolean wasTracking = isLocationTracking();
     this.cameraMode = cameraMode;
     mapboxMap.cancelTransitions();
     adjustGesturesThresholds();
     notifyCameraTrackingChangeListener(wasTracking);
+    transitionToCurrentLocation(wasTracking, lastLocation, internalTransitionListener);
+  }
+
+  /**
+   * Initiates a camera animation to the current location if location tracking was engaged.
+   * Notifies an internal listener when the transition's finished to invalidate animators and notify external listeners.
+   */
+  private void transitionToCurrentLocation(boolean wasTracking, Location lastLocation,
+                                           final OnLocationCameraTransitionListener internalTransitionListener) {
+    if (!wasTracking && isLocationTracking() && lastLocation != null) {
+      isTransitioning = true;
+      LatLng target = new LatLng(lastLocation);
+      CameraPosition.Builder builder = new CameraPosition.Builder().target(target);
+      if (isLocationBearingTracking()) {
+        builder.bearing(cameraMode == CameraMode.TRACKING_GPS_NORTH ? 0 : lastLocation.getBearing());
+      }
+
+      CameraUpdate update = CameraUpdateFactory.newCameraPosition(builder.build());
+      MapboxMap.CancelableCallback callback = new MapboxMap.CancelableCallback() {
+        @Override
+        public void onCancel() {
+          isTransitioning = false;
+          if (internalTransitionListener != null) {
+            internalTransitionListener.onLocationCameraTransitionCanceled(cameraMode);
+          }
+        }
+
+        @Override
+        public void onFinish() {
+          isTransitioning = false;
+          if (internalTransitionListener != null) {
+            internalTransitionListener.onLocationCameraTransitionFinished(cameraMode);
+          }
+        }
+      };
+
+      CameraPosition currentPosition = mapboxMap.getCameraPosition();
+      if (Utils.immediateAnimation(currentPosition.target, target, currentPosition.zoom)) {
+        mapboxMap.moveCamera(
+          update,
+          callback);
+      } else {
+        mapboxMap.animateCamera(
+          update,
+          (int) LocationComponentConstants.TRANSITION_ANIMATION_DURATION_MS,
+          callback);
+      }
+    } else {
+      if (internalTransitionListener != null) {
+        internalTransitionListener.onLocationCameraTransitionFinished(cameraMode);
+      }
+    }
   }
 
   int getCameraMode() {
@@ -88,21 +150,43 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
   }
 
   private void setBearing(float bearing) {
+    if (isTransitioning) {
+      return;
+    }
+
     mapboxMap.moveCamera(CameraUpdateFactory.bearingTo(bearing));
     onCameraMoveInvalidateListener.onInvalidateCameraMove();
   }
 
   private void setLatLng(@NonNull LatLng latLng) {
+    if (isTransitioning) {
+      return;
+    }
+
     mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
     onCameraMoveInvalidateListener.onInvalidateCameraMove();
+
+    if (adjustFocalPoint) {
+      PointF focalPoint = mapboxMap.getProjection().toScreenLocation(latLng);
+      mapboxMap.getUiSettings().setFocalPoint(focalPoint);
+      adjustFocalPoint = false;
+    }
   }
 
   private void setZoom(float zoom) {
+    if (isTransitioning) {
+      return;
+    }
+
     mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(zoom));
     onCameraMoveInvalidateListener.onInvalidateCameraMove();
   }
 
   private void setTilt(float tilt) {
+    if (isTransitioning) {
+      return;
+    }
+
     mapboxMap.moveCamera(CameraUpdateFactory.tiltTo(tilt));
     onCameraMoveInvalidateListener.onInvalidateCameraMove();
   }
@@ -114,12 +198,6 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
       || cameraMode == CameraMode.TRACKING_GPS
       || cameraMode == CameraMode.TRACKING_GPS_NORTH) {
       setLatLng(latLng);
-
-      if (adjustFocalPoint) {
-        PointF focalPoint = mapboxMap.getProjection().toScreenLocation(latLng);
-        mapboxMap.getUiSettings().setFocalPoint(focalPoint);
-        adjustFocalPoint = false;
-      }
     }
   }
 
@@ -153,6 +231,10 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
     setTilt(tilt);
   }
 
+  boolean isTransitioning() {
+    return isTransitioning;
+  }
+
   private void adjustGesturesThresholds() {
     if (options.trackingGesturesManagement()) {
       if (isLocationTracking()) {
@@ -176,6 +258,11 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
       || cameraMode == CameraMode.TRACKING_COMPASS
       || cameraMode == CameraMode.NONE_GPS
       || cameraMode == CameraMode.TRACKING_GPS
+      || cameraMode == CameraMode.TRACKING_GPS_NORTH;
+  }
+
+  private boolean isLocationBearingTracking() {
+    return cameraMode == CameraMode.TRACKING_GPS
       || cameraMode == CameraMode.TRACKING_GPS_NORTH;
   }
 
