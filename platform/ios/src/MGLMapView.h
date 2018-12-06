@@ -48,6 +48,13 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
     MGLAnnotationVerticalAlignmentBottom,
 };
 
+typedef NS_ENUM(NSUInteger, MGLUIElementsPosition) {
+    MGLUIElementsPositionTopLeft = 0,
+    MGLUIElementsPositionTopRight,
+    MGLUIElementsPositionBottomLeft,
+    MGLUIElementsPositionBottomRight,
+};
+
 /**
  The mode used to track the user location on the map. Used with
  `MGLMapView.userTrackingMode`.
@@ -287,10 +294,30 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIView *scaleBar;
 
 /**
+ 
+ */
+@property (nonatomic, readonly) MGLUIElementsPosition scaleBarPosition;
+
+/**
+ 
+ */
+@property (nonatomic, readonly) CGPoint scaleBarOffset;
+
+/**
  A control indicating the map’s direction and allowing the user to manipulate
  the direction, positioned in the upper-right corner.
  */
 @property (nonatomic, readonly) UIImageView *compassView;
+
+/**
+ 
+ */
+@property (nonatomic, assign) MGLUIElementsPosition compassViewPosition;
+
+/**
+ 
+ */
+@property (nonatomic, assign) CGPoint compassViewOffset;
 
 /**
  The Mapbox logo, positioned in the lower-left corner.
@@ -302,6 +329,17 @@ MGL_EXPORT IB_DESIGNABLE
     hide this view or change its contents.
  */
 @property (nonatomic, readonly) UIImageView *logoView;
+
+/**
+ 
+ */
+@property (nonatomic, assign) MGLUIElementsPosition logoViewPosition;
+
+/**
+ 
+ */
+@property (nonatomic, assign) CGPoint logoViewOffset;
+
 
 /**
  A view showing legally required copyright notices and telemetry settings,
@@ -327,6 +365,16 @@ MGL_EXPORT IB_DESIGNABLE
     implementation help.
  */
 @property (nonatomic, readonly) UIButton *attributionButton;
+
+/**
+ 
+ */
+@property (nonatomic, assign) MGLUIElementsPosition attributionButtonPosition;
+
+/**
+ 
+ */
+@property (nonatomic, assign) CGPoint attributionButtonOffset;
 
 /**
  Show the attribution and telemetry action sheet.
