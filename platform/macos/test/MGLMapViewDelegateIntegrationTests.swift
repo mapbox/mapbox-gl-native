@@ -24,6 +24,8 @@ extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
     func mapViewDidFinishRenderingFrame(_ mapView: MGLMapView, fullyRendered: Bool) {}
 
     func mapViewDidFinishRenderingMap(_ mapView: MGLMapView, fullyRendered: Bool) {}
+    
+    func mapViewDidEnterIdle(_ mapView: MGLMapView) {}
 
     func mapViewDidFailLoadingMap(_ mapView: MGLMapView, withError error: Error) {}
     
