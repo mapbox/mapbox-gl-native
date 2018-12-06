@@ -18,6 +18,7 @@ ext {
             leakCanary      : '1.6.1',
             junit           : '4.12',
             mockito         : '2.18.3',
+            mockk           : '1.8.13.kotlin13',
             robolectric     : '3.8',
             timber          : '4.7.1',
             okhttp          : '3.11.0',
@@ -38,6 +39,7 @@ ext {
 
             junit                  : "junit:junit:${versions.junit}",
             mockito                : "org.mockito:mockito-core:${versions.mockito}",
+            mockk                  : "io.mockk:mockk:${versions.mockk}",
             robolectric            : "org.robolectric:robolectric:${versions.robolectric}",
 
             testRunner             : "com.android.support.test:runner:${versions.testRunner}",

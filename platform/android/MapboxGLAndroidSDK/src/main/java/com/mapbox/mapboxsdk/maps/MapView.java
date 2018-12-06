@@ -147,7 +147,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     GesturesManagerInteractionListener registerTouchListener = new GesturesManagerInteractionListener();
 
     // callback for camera change events
-    final CameraChangeDispatcher cameraChangeDispatcher = new CameraChangeDispatcher();
+    final CameraChangeDispatcher cameraDispatcher = new CameraChangeDispatcher();
 
     // setup components for MapboxMap creation
     Projection proj = new Projection(nativeMapView);
@@ -161,20 +161,20 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     ShapeAnnotations shapeAnnotations = new ShapeAnnotationContainer(nativeMapView, annotationsArray);
     AnnotationManager annotationManager = new AnnotationManager(this, annotationsArray, iconManager,
       annotations, markers, polygons, polylines, shapeAnnotations);
-    Transform transform = new Transform(this, nativeMapView, cameraChangeDispatcher);
+    Transform transform = new Transform(this, nativeMapView, cameraDispatcher);
 
     // MapboxMap
-    mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, proj, registerTouchListener,
-      annotationManager, cameraChangeDispatcher);
+    mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, proj, registerTouchListener, cameraDispatcher);
+    mapboxMap.injectAnnotationManager(annotationManager);
 
     // user input
     mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings,
-      annotationManager, cameraChangeDispatcher);
+      annotationManager, cameraDispatcher);
     mapKeyListener = new MapKeyListener(transform, uiSettings, mapGestureDetector);
 
     // compass
-    compassView.injectCompassAnimationListener(createCompassAnimationListener(cameraChangeDispatcher));
-    compassView.setOnClickListener(createCompassClickListener(cameraChangeDispatcher));
+    compassView.injectCompassAnimationListener(createCompassAnimationListener(cameraDispatcher));
+    compassView.setOnClickListener(createCompassClickListener(cameraDispatcher));
 
     // LocationComponent
     mapboxMap.injectLocationComponent(new LocationComponent(mapboxMap));
