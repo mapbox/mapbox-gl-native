@@ -934,6 +934,16 @@ public:
     }
 }
 
+- (void)mapViewDidEnterIdle {
+    if (!_mbglMap) {
+        return;
+    }
+    
+    if ([self.delegate respondsToSelector:@selector(mapViewDidEnterIdle)]) {
+        [self.delegate mapViewDidEnterIdle:self];
+    }
+}
+
 - (void)mapViewDidFinishLoadingStyle {
     if (!_mbglMap) {
         return;
@@ -3049,6 +3059,10 @@ public:
     void onDidFinishRenderingMap(mbgl::MapObserver::RenderMode mode) override {
         bool fullyRendered = mode == mbgl::MapObserver::RenderMode::Full;
         [nativeView mapViewDidFinishRenderingMapFullyRendered:fullyRendered];
+    }
+    
+    void onDidEnterIdle() override {
+        [nativeView mapViewDidEnterIdle];
     }
 
     void onDidFinishLoadingStyle() override {
