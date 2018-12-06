@@ -59,23 +59,24 @@ public class HeatmapLayerActivity extends AppCompatActivity {
     mapView.getMapAsync(map -> {
       mapboxMap = map;
 
-      mapboxMap.setStyle(Style.DARK, style -> {
-        addEarthquakeSource();
-        addHeatmapLayer();
-        addCircleLayer();
-      });
+      try {
+        mapboxMap.setStyle(new Style.Builder()
+          .fromUrl(Style.DARK)
+          .withSource(createEarthquakeSource())
+          .withLayerAbove(createHeatmapLayer(), "waterway-label")
+          .withLayerBelow(createCircleLayer(), HEATMAP_LAYER_ID)
+        );
+      } catch (MalformedURLException exception) {
+        Timber.e(exception);
+      }
     });
   }
 
-  private void addEarthquakeSource() {
-    try {
-      mapboxMap.getStyle().addSource(new GeoJsonSource(EARTHQUAKE_SOURCE_ID, new URL(EARTHQUAKE_SOURCE_URL)));
-    } catch (MalformedURLException malformedUrlException) {
-      Timber.e(malformedUrlException, "That's not an url... ");
-    }
+  private GeoJsonSource createEarthquakeSource() throws MalformedURLException {
+    return new GeoJsonSource(EARTHQUAKE_SOURCE_ID, new URL(EARTHQUAKE_SOURCE_URL));
   }
 
-  private void addHeatmapLayer() {
+  private HeatmapLayer createHeatmapLayer() {
     HeatmapLayer layer = new HeatmapLayer(HEATMAP_LAYER_ID, EARTHQUAKE_SOURCE_ID);
     layer.setMaxZoom(9);
     layer.setSourceLayer(HEATMAP_LAYER_SOURCE);
@@ -133,11 +134,10 @@ public class HeatmapLayerActivity extends AppCompatActivity {
         )
       )
     );
-
-    mapboxMap.getStyle().addLayerAbove(layer, "waterway-label");
+    return layer;
   }
 
-  private void addCircleLayer() {
+  private CircleLayer createCircleLayer() {
     CircleLayer circleLayer = new CircleLayer(CIRCLE_LAYER_ID, EARTHQUAKE_SOURCE_ID);
     circleLayer.setProperties(
 
@@ -183,7 +183,7 @@ public class HeatmapLayerActivity extends AppCompatActivity {
       circleStrokeWidth(1.0f)
     );
 
-    mapboxMap.getStyle().addLayerBelow(circleLayer, HEATMAP_LAYER_ID);
+    return circleLayer;
   }
 
   @Override
