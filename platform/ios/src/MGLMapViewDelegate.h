@@ -240,6 +240,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mapViewDidFinishRenderingFrame:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered;
 
 /**
+ Tells the delegate that the map view is entering an idle state, and no more
+ drawing will be necessary until new data is loaded or there is some interaction
+ with the map.
+ 
+ - No camera transitions are in progress
+ - All currently requested tiles have loaded
+ - All fade/transition animations have completed
+ 
+ @param mapView The map view that has just entered the idle state.
+ */
+- (void)mapViewDidEnterIdle:(MGLMapView *)mapView;
+
+/**
  Tells the delegate that the map has just finished loading a style.
 
  This method is called during the initialization of the map view and after any
