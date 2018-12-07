@@ -36,6 +36,7 @@ buildPackageStyle() {
         ./platform/ios/scripts/publish-cn.sh "${PUBLISH_VERSION}" ${style}
         file_name=mapbox-ios-sdk-${PUBLISH_VERSION}-${style}.zip
     fi
+}
 PUBLISH_VERSION=$( echo ${VERSION_TAG} | sed 's/^ios-v//' )
 git checkout ${VERSION_TAG}
 
