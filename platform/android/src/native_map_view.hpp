@@ -216,11 +216,9 @@ public:
 
     void addLayerAt(JNIEnv&, jni::jlong, jni::jint);
 
-    jni::Local<jni::Object<Layer>> removeLayerById(JNIEnv&, const jni::String&);
+    jni::jboolean removeLayerAt(JNIEnv&, jni::jint);
 
-    jni::Local<jni::Object<Layer>> removeLayerAt(JNIEnv&, jni::jint);
-
-    void removeLayer(JNIEnv&, jlong);
+    jni::jboolean removeLayer(JNIEnv&, jlong);
 
     jni::Local<jni::Array<jni::Object<Source>>> getSources(JNIEnv&);
 
@@ -228,9 +226,7 @@ public:
 
     void addSource(JNIEnv&, const jni::Object<Source>&, jlong nativePtr);
 
-    jni::Local<jni::Object<Source>> removeSourceById(JNIEnv&, const jni::String&);
-
-    void removeSource(JNIEnv&, const jni::Object<Source>&, jlong nativePtr);
+    jni::jboolean removeSource(JNIEnv&, const jni::Object<Source>&, jlong nativePtr);
 
     void addImage(JNIEnv&, const jni::String&, const jni::Object<Bitmap>& bitmap, jni::jfloat, jni::jboolean);
 

@@ -824,50 +824,42 @@ void NativeMapView::addLayerAt(JNIEnv& env, jlong nativeLayerPtr, jni::jint inde
     }
 }
 
-/**
- * Remove by layer id.
- */
-jni::Local<jni::Object<Layer>> NativeMapView::removeLayerById(JNIEnv& env, const jni::String& id) {
-    std::unique_ptr<mbgl::style::Layer> coreLayer = map->getStyle().removeLayer(jni::Make<std::string>(env, id));
-    if (coreLayer) {
-        return LayerManagerAndroid::get()->createJavaLayerPeer(env, *map, std::move(coreLayer));
-    } else {
-        return jni::Local<jni::Object<Layer>>();
-    }
-}
 
 /**
  * Remove layer at index.
  */
-jni::Local<jni::Object<Layer>> NativeMapView::removeLayerAt(JNIEnv& env, jni::jint index) {
+jni::jboolean NativeMapView::removeLayerAt(JNIEnv& env, jni::jint index) {
     auto layers = map->getStyle().getLayers();
 
     // Check index
     int numLayers = layers.size() - 1;
     if (index > numLayers || index < 0) {
         Log::Warning(Event::JNI, "Index out of range: %i", index);
-        return jni::Local<jni::Object<Layer>>();
+        return jni::jni_false;
     }
 
     std::unique_ptr<mbgl::style::Layer> coreLayer = map->getStyle().removeLayer(layers.at(index)->getID());
     if (coreLayer) {
-        return LayerManagerAndroid::get()->createJavaLayerPeer(env, *map, std::move(coreLayer));
-    } else {
-        return jni::Local<jni::Object<Layer>>();
+        jni::Local<jni::Object<Layer>> layerObj =
+                LayerManagerAndroid::get()->createJavaLayerPeer(env, *map, std::move(coreLayer));
+        return jni::jni_true;
     }
+    return jni::jni_false;
 }
 
 /**
  * Remove with wrapper object id. Ownership is transferred back to the wrapper
  */
-void NativeMapView::removeLayer(JNIEnv&, jlong layerPtr) {
+jni::jboolean NativeMapView::removeLayer(JNIEnv&, jlong layerPtr) {
     assert(layerPtr != 0);
 
     mbgl::android::Layer *layer = reinterpret_cast<mbgl::android::Layer *>(layerPtr);
     std::unique_ptr<mbgl::style::Layer> coreLayer = map->getStyle().removeLayer(layer->get().getID());
     if (coreLayer) {
         layer->setLayer(std::move(coreLayer));
+        return jni::jni_true;
     }
+    return jni::jni_false;
 }
 
 jni::Local<jni::Array<jni::Object<Source>>> NativeMapView::getSources(JNIEnv& env) {
@@ -908,13 +900,16 @@ void NativeMapView::addSource(JNIEnv& env, const jni::Object<Source>& obj, jlong
     }
 }
 
-void NativeMapView::removeSource(JNIEnv& env, const jni::Object<Source>& obj, jlong sourcePtr) {
+jni::jboolean NativeMapView::removeSource(JNIEnv& env, const jni::Object<Source>& obj, jlong sourcePtr) {
     assert(sourcePtr != 0);
 
     mbgl::android::Source *source = reinterpret_cast<mbgl::android::Source *>(sourcePtr);
     if (source->removeFromMap(env, obj, *map)) {
         source->releaseJavaPeer();
+        return jni::jni_true;
     }
+
+    return jni::jni_false;
 }
 
 void NativeMapView::addImage(JNIEnv& env, const jni::String& name, const jni::Object<Bitmap>& bitmap, jni::jfloat scale, jni::jboolean sdf) {
@@ -1046,7 +1041,6 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::addLayer, "nativeAddLayer"),
             METHOD(&NativeMapView::addLayerAbove, "nativeAddLayerAbove"),
             METHOD(&NativeMapView::addLayerAt, "nativeAddLayerAt"),
-            METHOD(&NativeMapView::removeLayerById, "nativeRemoveLayerById"),
             METHOD(&NativeMapView::removeLayerAt, "nativeRemoveLayerAt"),
             METHOD(&NativeMapView::removeLayer, "nativeRemoveLayer"),
             METHOD(&NativeMapView::getSources, "nativeGetSources"),

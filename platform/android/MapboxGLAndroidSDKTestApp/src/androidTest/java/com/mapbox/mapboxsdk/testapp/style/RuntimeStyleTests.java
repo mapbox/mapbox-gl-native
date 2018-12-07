@@ -42,6 +42,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -124,14 +125,13 @@ public class RuntimeStyleTests extends BaseActivityTest {
       public void perform(UiController uiController, View view) {
         // Remove by index
         Layer firstLayer = mapboxMap.getLayers().get(0);
-        Layer removed = mapboxMap.removeLayerAt(0);
-        assertNotNull(removed);
-        assertNotNull(removed.getId());
-        assertEquals(firstLayer.getId(), removed.getId());
+        boolean removed = mapboxMap.removeLayerAt(0);
+        assertTrue(removed);
+        assertNotNull(firstLayer);
 
         // Test remove by index bounds checks
         Timber.i("Remove layer at index > size");
-        assertNull(mapboxMap.removeLayerAt(Integer.MAX_VALUE));
+        assertFalse(mapboxMap.removeLayerAt(Integer.MAX_VALUE));
       }
     });
   }
@@ -198,8 +198,8 @@ public class RuntimeStyleTests extends BaseActivityTest {
       mapboxMap.addSource(new VectorSource("my-source", "mapbox://mapbox.mapbox-terrain-v2"));
 
       // Remove
-      Source mySource = mapboxMap.removeSource("my-source");
-      assertNotNull(mySource);
+      boolean removeOk = mapboxMap.removeSource("my-source");
+      assertTrue(removeOk);
       assertNull(mapboxMap.getLayer("my-source"));
 
       // Add
@@ -288,9 +288,22 @@ public class RuntimeStyleTests extends BaseActivityTest {
   @Test
   public void testRemoveNonExistingLayer() {
     invoke(mapboxMap, (uiController, mapboxMap) -> {
-      mapboxMap.removeLayer("layer");
-      mapboxMap.removeLayerAt(mapboxMap.getLayers().size() + 1);
-      mapboxMap.removeLayerAt(-1);
+      assertFalse(mapboxMap.removeLayer("layer"));
+      assertFalse(mapboxMap.removeLayerAt(mapboxMap.getLayers().size() + 1));
+      assertFalse(mapboxMap.removeLayerAt(-1));
+    });
+  }
+
+  @Test
+  public void testRemoveExistingLayer() {
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      Layer firstLayer = mapboxMap.getLayers().get(0);
+      assertTrue(mapboxMap.removeLayer(firstLayer));
+
+      firstLayer = mapboxMap.getLayers().get(0);
+      assertTrue(mapboxMap.removeLayer(firstLayer.getId()));
+
+      assertTrue(mapboxMap.removeLayerAt(0));
     });
   }
 
@@ -322,8 +335,8 @@ public class RuntimeStyleTests extends BaseActivityTest {
       assertNotNull(mapboxMap.getLayer("building"));
 
       // Remove
-      Layer building = mapboxMap.removeLayer("building");
-      assertNotNull(building);
+      boolean removed = mapboxMap.removeLayer("building");
+      assertTrue(removed);
       assertNull(mapboxMap.getLayer("building"));
 
       // Add
