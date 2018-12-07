@@ -13,6 +13,7 @@ import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -61,6 +62,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
   private int renderMode;
 
   private final MapboxMap mapboxMap;
+  private final Style style;
   private final LayerSourceProvider layerSourceProvider;
   private final LayerBitmapProvider bitmapProvider;
   private LocationComponentOptions options;
@@ -71,10 +73,11 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
 
   private boolean isHidden = true;
 
-  LocationLayerController(MapboxMap mapboxMap, LayerSourceProvider layerSourceProvider,
+  LocationLayerController(MapboxMap mapboxMap, Style style, LayerSourceProvider layerSourceProvider,
                           LayerFeatureProvider featureProvider, LayerBitmapProvider bitmapProvider,
                           @NonNull LocationComponentOptions options) {
     this.mapboxMap = mapboxMap;
+    this.style = style;
     this.layerSourceProvider = layerSourceProvider;
     this.bitmapProvider = bitmapProvider;
     this.locationFeature = featureProvider.generateLocationFeature(locationFeature, options);
@@ -193,7 +196,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
   }
 
   private void setLayerVisibility(@NonNull String layerId, boolean visible) {
-    Layer layer = mapboxMap.getStyle().getLayer(layerId);
+    Layer layer = style.getLayer(layerId);
     if (layer != null) {
       String targetVisibility = visible ? VISIBLE : NONE;
       if (!layer.getVisibility().value.equals(targetVisibility)) {
@@ -221,7 +224,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
   }
 
   private void addLayerToMap(Layer layer, @NonNull String idBelowLayer) {
-    mapboxMap.getStyle().addLayerBelow(layer, idBelowLayer);
+    style.addLayerBelow(layer, idBelowLayer);
     layerMap.add(layer.getId());
   }
 
@@ -243,11 +246,11 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
 
   private void addLocationSource() {
     locationSource = layerSourceProvider.generateSource(locationFeature);
-    mapboxMap.getStyle().addSource(locationSource);
+    style.addSource(locationSource);
   }
 
   private void refreshSource() {
-    GeoJsonSource source = mapboxMap.getStyle().getSourceAs(LOCATION_SOURCE);
+    GeoJsonSource source = style.getSourceAs(LOCATION_SOURCE);
     if (source != null) {
       locationSource.setGeoJson(locationFeature);
     }
@@ -272,17 +275,17 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
     Bitmap backgroundStaleBitmap = bitmapProvider.generateBitmap(
       options.backgroundDrawableStale(), options.backgroundStaleTintColor()
     );
-    mapboxMap.getStyle().addImage(BACKGROUND_ICON, backgroundBitmap);
-    mapboxMap.getStyle().addImage(BACKGROUND_STALE_ICON, backgroundStaleBitmap);
+    style.addImage(BACKGROUND_ICON, backgroundBitmap);
+    style.addImage(BACKGROUND_STALE_ICON, backgroundStaleBitmap);
   }
 
   private void styleShadow(@NonNull LocationComponentOptions options) {
-    mapboxMap.getStyle().addImage(SHADOW_ICON, bitmapProvider.generateShadowBitmap(options));
+    style.addImage(SHADOW_ICON, bitmapProvider.generateShadowBitmap(options));
   }
 
   private void styleBearing(LocationComponentOptions options) {
     Bitmap bearingBitmap = bitmapProvider.generateBitmap(options.bearingDrawable(), options.bearingTintColor());
-    mapboxMap.getStyle().addImage(BEARING_ICON, bearingBitmap);
+    style.addImage(BEARING_ICON, bearingBitmap);
   }
 
   private void styleAccuracy(float accuracyAlpha, @ColorInt int accuracyColor) {
@@ -306,13 +309,13 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
         options.gpsDrawable(), options.foregroundStaleTintColor()
       );
     }
-    mapboxMap.getStyle().addImage(FOREGROUND_ICON, foregroundBitmap);
-    mapboxMap.getStyle().addImage(FOREGROUND_STALE_ICON, foregroundBitmapStale);
+    style.addImage(FOREGROUND_ICON, foregroundBitmap);
+    style.addImage(FOREGROUND_STALE_ICON, foregroundBitmapStale);
   }
 
   private void styleScaling(@NonNull LocationComponentOptions options) {
     for (String layerId : layerMap) {
-      Layer layer = mapboxMap.getStyle().getLayer(layerId);
+      Layer layer = style.getLayer(layerId);
       if (layer instanceof SymbolLayer) {
         layer.setProperties(
           iconSize(

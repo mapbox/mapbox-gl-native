@@ -1061,7 +1061,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   private class MapCallback implements OnDidFinishLoadingStyleListener,
     OnDidFinishRenderingFrameListener, OnDidFinishLoadingMapListener,
-    OnCameraIsChangingListener, OnCameraDidChangeListener {
+    OnCameraIsChangingListener, OnCameraDidChangeListener, OnDidFailLoadingMapListener {
 
     private final List<OnMapReadyCallback> onMapReadyCallbackList = new ArrayList<>();
 
@@ -1071,6 +1071,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       addOnDidFinishLoadingMapListener(this);
       addOnCameraIsChangingListener(this);
       addOnCameraDidChangeListener(this);
+      addOnDidFailLoadingMapListener(this);
     }
 
     void initialised() {
@@ -1107,12 +1108,20 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       removeOnDidFinishLoadingMapListener(this);
       removeOnCameraIsChangingListener(this);
       removeOnCameraDidChangeListener(this);
+      removeOnDidFailLoadingMapListener(this);
     }
 
     @Override
     public void onDidFinishLoadingStyle() {
       if (mapboxMap != null) {
         mapboxMap.onFinishLoadingStyle();
+      }
+    }
+
+    @Override
+    public void onDidFailLoadingMap(String errorMessage) {
+      if (mapboxMap != null) {
+        mapboxMap.onFailLoadingStyle();
       }
     }
 

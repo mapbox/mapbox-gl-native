@@ -111,6 +111,7 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
       locationComponent = mapboxMap.getLocationComponent();
       locationComponent.activateLocationComponent(
         this,
+        style,
         locationEngine,
         new LocationEngineRequest.Builder(500)
           .setFastestInterval(500)

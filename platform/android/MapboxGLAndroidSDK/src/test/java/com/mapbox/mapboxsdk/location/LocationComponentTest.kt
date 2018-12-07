@@ -9,6 +9,7 @@ import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.mapboxsdk.R
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
+import io.mockk.mockk
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -75,8 +76,7 @@ class LocationComponentTest {
 
   @Test
   fun activateWithRequestTest() {
-    locationComponent.activateLocationComponent(context, locationEngine, locationEngineRequest, locationComponentOptions)
-    verify(mapboxMap).getStyle(ArgumentMatchers.any(Style.OnStyleLoaded::class.java))
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
 
     Assert.assertEquals(locationEngineRequest, locationComponent.locationEngineRequest)
 
@@ -90,13 +90,13 @@ class LocationComponentTest {
       .getDimension(R.dimen.mapbox_locationComponentTrackingMultiFingerMoveThreshold)
     doReturn(0f).`when`(resources)
       .getDimension(R.dimen.mapbox_locationComponentTrackingMultiFingerMoveThreshold)
-    locationComponent.activateLocationComponent(context, true, locationEngineRequest)
+    locationComponent.activateLocationComponent(context, mockk(),true, locationEngineRequest)
     Assert.assertEquals(locationEngineRequest, locationComponent.locationEngineRequest)
   }
 
   @Test
   fun locationUpdatesWhenEnabledDisableTest() {
-    locationComponent.activateLocationComponent(context, locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
     verify(locationEngine, times(0)).removeLocationUpdates(currentListener)
     verify(locationEngine, times(0)).requestLocationUpdates(eq(locationEngineRequest), eq(currentListener), any(Looper::class.java))
 
@@ -114,7 +114,7 @@ class LocationComponentTest {
 
   @Test
   fun locationUpdatesWhenStartedStoppedTest() {
-    locationComponent.activateLocationComponent(context, locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
 
@@ -127,7 +127,7 @@ class LocationComponentTest {
 
   @Test
   fun locationUpdatesWhenNewRequestTest() {
-    locationComponent.activateLocationComponent(context, locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
 
@@ -139,7 +139,7 @@ class LocationComponentTest {
 
   @Test
   fun lastLocationUpdateOnStartTest() {
-    locationComponent.activateLocationComponent(context, locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
     locationComponent.onStart()
     locationComponent.isLocationComponentEnabled = true
 

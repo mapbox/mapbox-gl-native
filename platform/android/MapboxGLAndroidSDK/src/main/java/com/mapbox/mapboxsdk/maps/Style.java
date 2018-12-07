@@ -123,7 +123,7 @@ public class Style {
   }
 
   /**
-   * Removes the source. Any references to the source become invalid and should not be used anymore
+   * Removes the source from the style.
    *
    * @param sourceId the source to remove
    * @return the source handle or null if the source was not present
@@ -261,7 +261,6 @@ public class Style {
    * @return the removed layer or null if not found
    */
   public boolean removeLayerAt(@IntRange(from = 0) int index) {
-    // TODO what about runtime added sources?
     return nativeMapView.removeLayerAt(index);
   }
 
@@ -366,6 +365,7 @@ public class Style {
    * by setting the java sources and layers in a detached state and removing them from core.
    */
   void onWillStartLoadingMap() {
+    styleLoaded = false;
     for (Source source : sources.values()) {
       if (source != null) {
         source.setDetached();
@@ -451,7 +451,7 @@ public class Style {
      * </p>
      * {@code url} can take the following forms:
      * <ul>
-     * <li>{@code Style.*}: load one of the bundled styles in {@link Style}.</li>
+     * <li>{@code Style#StyleUrl}: load one of the bundled styles in {@link Style}.</li>
      * <li>{@code mapbox://styles/<user>/<style>}:
      * loads the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
      * {@code user} is your username. {@code style} is the ID of your custom
@@ -461,12 +461,16 @@ public class Style {
      * <li>{@code asset://...}:
      * loads the style from the APK {@code assets/} directory.
      * This is used to load a style bundled with your app.</li>
+     * <li>{@code file://...}:
+     * loads the style from a file path. This is used to load a style from disk.
+     * </li>
+     * </li>
      * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
      * </ul>
      * <p>
      * This method is asynchronous and will return before the style finishes loading.
      * If you wish to wait for the map to finish loading, listen to the {@link MapView.OnDidFinishLoadingStyleListener}
-     * callback.
+     * callback or use {@link MapboxMap#setStyle(String, OnStyleLoaded)} instead.
      * </p>
      * If the style fails to load or an invalid style URL is set, the map view will become blank.
      * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
