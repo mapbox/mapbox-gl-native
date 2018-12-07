@@ -49,9 +49,9 @@ workflows:
       - ios-release-tag:
           filters:
             tags:
-              only: /v*-cn.*/
+              only: /^v.*-cn.\.*/
             branches:
-              ignore: /.*/
+              only: /ios8-release-.*/
       - macos-debug
       - qt4-linux-gcc5-release
       - qt5-linux-gcc5-release
@@ -960,11 +960,6 @@ jobs:
       SLACK_CHANNEL: C0ACM9Q2C
     steps:
       - checkout
-      - run:
-          name: Send a Slack notification on start
-          command: |
-            export SLACK_MESSAGE="<$CIRCLE_BUILD_URL|Release build for \`$CIRCLE_TAG\` started.>"
-            scripts/notify-slack.sh
       - install-macos-dependencies
       - install-ios-packaging-dependencies
       - install-dependencies
@@ -977,20 +972,6 @@ jobs:
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
-      - run:
-          name: Send a Slack notification on failure
-          when: on_fail
-          command: |
-            export SLACK_MESSAGE="<$CIRCLE_BUILD_URL|Release build for \`$CIRCLE_TAG\` failed.>"
-            export SLACK_COLOR="danger"
-            scripts/notify-slack.sh
-      - run:
-          name: Send a Slack notification on success
-          when: on_success
-          command: |
-            export SLACK_MESSAGE="<$CIRCLE_BUILD_URL|Release build for \`$CIRCLE_TAG\` succeeded.>"
-            export SLACK_COLOR="good"
-            scripts/notify-slack.sh
 
 # ------------------------------------------------------------------------------
   macos-debug:
