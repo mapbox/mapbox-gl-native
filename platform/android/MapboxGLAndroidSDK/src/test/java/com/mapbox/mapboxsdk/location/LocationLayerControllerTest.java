@@ -56,7 +56,8 @@ public class LocationLayerControllerTest {
     LayerBitmapProvider bitmapProvider = mock(LayerBitmapProvider.class);
     LocationComponentOptions options = mock(LocationComponentOptions.class);
 
-    new LocationLayerController(mapboxMap, sourceProvider, buildFeatureProvider(options), bitmapProvider, options);
+    new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options);
 
     verify(style).addSource(locationSource);
   }
@@ -71,7 +72,8 @@ public class LocationLayerControllerTest {
     LayerBitmapProvider bitmapProvider = mock(LayerBitmapProvider.class);
     LocationComponentOptions options = mock(LocationComponentOptions.class);
 
-    new LocationLayerController(mapboxMap, sourceProvider, buildFeatureProvider(options), bitmapProvider, options);
+    new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options);
 
     verify(style).addLayerBelow(shadowLayer, BACKGROUND_LAYER);
   }
@@ -86,7 +88,8 @@ public class LocationLayerControllerTest {
     LayerBitmapProvider bitmapProvider = mock(LayerBitmapProvider.class);
     LocationComponentOptions options = mock(LocationComponentOptions.class);
 
-    new LocationLayerController(mapboxMap, sourceProvider, buildFeatureProvider(options), bitmapProvider, options);
+    new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options);
 
     verify(style).addLayerBelow(backgroundLayer, FOREGROUND_LAYER);
   }
@@ -101,7 +104,8 @@ public class LocationLayerControllerTest {
     LayerBitmapProvider bitmapProvider = mock(LayerBitmapProvider.class);
     LocationComponentOptions options = mock(LocationComponentOptions.class);
 
-    new LocationLayerController(mapboxMap, sourceProvider, buildFeatureProvider(options), bitmapProvider, options);
+    new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options);
 
     verify(style).addLayerBelow(foregroundLayer, BEARING_LAYER);
   }
@@ -118,7 +122,8 @@ public class LocationLayerControllerTest {
     String layerBelow = "layer-below";
     when(options.layerBelow()).thenReturn(layerBelow);
 
-    new LocationLayerController(mapboxMap, sourceProvider, buildFeatureProvider(options), bitmapProvider, options);
+    new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options);
 
     verify(style).addLayerBelow(bearingLayer, layerBelow);
   }
@@ -133,7 +138,8 @@ public class LocationLayerControllerTest {
     LayerBitmapProvider bitmapProvider = mock(LayerBitmapProvider.class);
     LocationComponentOptions options = mock(LocationComponentOptions.class);
 
-    new LocationLayerController(mapboxMap, sourceProvider, buildFeatureProvider(options), bitmapProvider, options);
+    new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options);
 
     verify(style).addLayerBelow(accuracyLayer, BACKGROUND_LAYER);
   }
@@ -149,7 +155,8 @@ public class LocationLayerControllerTest {
     when(options.elevation()).thenReturn(2f);
 
     // Style is applied on initialization
-    new LocationLayerController(mapboxMap, sourceProvider, buildFeatureProvider(options), bitmapProvider, options);
+    new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options);
 
     verify(style).addImage(SHADOW_ICON, bitmap);
   }
@@ -164,7 +171,8 @@ public class LocationLayerControllerTest {
     LocationComponentOptions options = mock(LocationComponentOptions.class);
     when(options.elevation()).thenReturn(0f);
 
-    new LocationLayerController(mapboxMap, sourceProvider, buildFeatureProvider(options), bitmapProvider, options);
+    new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options);
 
     verify(style, times(0)).addImage(SHADOW_ICON, bitmap);
   }
@@ -182,7 +190,8 @@ public class LocationLayerControllerTest {
     Bitmap bitmap = mock(Bitmap.class);
     when(bitmapProvider.generateBitmap(drawableResId, tintColor)).thenReturn(bitmap);
 
-    new LocationLayerController(mapboxMap, sourceProvider, buildFeatureProvider(options), bitmapProvider, options);
+    new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options);
 
     verify(style).addImage(FOREGROUND_ICON, bitmap);
   }
@@ -200,7 +209,8 @@ public class LocationLayerControllerTest {
     Bitmap bitmap = mock(Bitmap.class);
     when(bitmapProvider.generateBitmap(drawableResId, tintColor)).thenReturn(bitmap);
 
-    new LocationLayerController(mapboxMap, sourceProvider, buildFeatureProvider(options), bitmapProvider, options);
+    new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options);
 
     verify(style).addImage(FOREGROUND_STALE_ICON, bitmap);
   }
@@ -218,7 +228,8 @@ public class LocationLayerControllerTest {
     Bitmap bitmap = mock(Bitmap.class);
     when(bitmapProvider.generateBitmap(drawableResId, tintColor)).thenReturn(bitmap);
 
-    new LocationLayerController(mapboxMap, sourceProvider, buildFeatureProvider(options), bitmapProvider, options);
+    new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options);
 
     verify(style).addImage(BACKGROUND_ICON, bitmap);
   }
@@ -236,7 +247,8 @@ public class LocationLayerControllerTest {
     Bitmap bitmap = mock(Bitmap.class);
     when(bitmapProvider.generateBitmap(drawableResId, tintColor)).thenReturn(bitmap);
 
-    new LocationLayerController(mapboxMap, sourceProvider, buildFeatureProvider(options), bitmapProvider, options);
+    new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options);
 
     verify(style).addImage(BACKGROUND_STALE_ICON, bitmap);
   }
@@ -254,7 +266,8 @@ public class LocationLayerControllerTest {
     Bitmap bitmap = mock(Bitmap.class);
     when(bitmapProvider.generateBitmap(drawableResId, tintColor)).thenReturn(bitmap);
 
-    new LocationLayerController(mapboxMap, sourceProvider, buildFeatureProvider(options), bitmapProvider, options);
+    new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+      bitmapProvider, options);
 
     verify(style).addImage(BEARING_ICON, bitmap);
   }
@@ -268,7 +281,8 @@ public class LocationLayerControllerTest {
     LocationComponentOptions options = mock(LocationComponentOptions.class);
     Feature locationFeature = mock(Feature.class);
     LocationLayerController layer = new LocationLayerController(
-      mapboxMap, sourceProvider, buildFeatureProvider(locationFeature, options), bitmapProvider, options
+      mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(locationFeature, options),
+      bitmapProvider, options
     );
 
     layer.updateForegroundOffset(2d);
@@ -285,7 +299,8 @@ public class LocationLayerControllerTest {
     LocationComponentOptions options = mock(LocationComponentOptions.class);
     Feature locationFeature = mock(Feature.class);
     LocationLayerController layer = new LocationLayerController(
-      mapboxMap, sourceProvider, buildFeatureProvider(locationFeature, options), bitmapProvider, options
+      mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(locationFeature, options),
+      bitmapProvider, options
     );
     layer.updateForegroundOffset(2d);
 
@@ -302,7 +317,8 @@ public class LocationLayerControllerTest {
     LocationComponentOptions options = mock(LocationComponentOptions.class);
     Feature locationFeature = mock(Feature.class);
     LocationLayerController layer = new LocationLayerController(
-      mapboxMap, sourceProvider, buildFeatureProvider(locationFeature, options), bitmapProvider, options
+      mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(locationFeature, options),
+      bitmapProvider, options
     );
     layer.onNewLatLngValue(new LatLng());
 
@@ -320,7 +336,8 @@ public class LocationLayerControllerTest {
     LocationComponentOptions options = mock(LocationComponentOptions.class);
     Feature locationFeature = mock(Feature.class);
     LocationLayerController layer = new LocationLayerController(
-      mapboxMap, sourceProvider, buildFeatureProvider(locationFeature, options), bitmapProvider, options
+      mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(locationFeature, options),
+      bitmapProvider, options
     );
     layer.setRenderMode(RenderMode.GPS);
     float gpsBearing = 2f;
@@ -340,7 +357,8 @@ public class LocationLayerControllerTest {
     LocationComponentOptions options = mock(LocationComponentOptions.class);
     Feature locationFeature = mock(Feature.class);
     LocationLayerController layer = new LocationLayerController(
-      mapboxMap, sourceProvider, buildFeatureProvider(locationFeature, options), bitmapProvider, options
+      mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(locationFeature, options),
+      bitmapProvider, options
     );
     layer.setRenderMode(RenderMode.COMPASS);
     float gpsBearing = 2f;
@@ -360,7 +378,8 @@ public class LocationLayerControllerTest {
     LocationComponentOptions options = mock(LocationComponentOptions.class);
     Feature locationFeature = mock(Feature.class);
     LocationLayerController layer = new LocationLayerController(
-      mapboxMap, sourceProvider, buildFeatureProvider(locationFeature, options), bitmapProvider, options
+      mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(locationFeature, options),
+      bitmapProvider, options
     );
     layer.setRenderMode(RenderMode.COMPASS);
     float compassBearing = 2f;
@@ -380,7 +399,8 @@ public class LocationLayerControllerTest {
     LocationComponentOptions options = mock(LocationComponentOptions.class);
     Feature locationFeature = mock(Feature.class);
     LocationLayerController layer = new LocationLayerController(
-      mapboxMap, sourceProvider, buildFeatureProvider(locationFeature, options), bitmapProvider, options
+      mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(locationFeature, options),
+      bitmapProvider, options
     );
     layer.setRenderMode(RenderMode.GPS);
     float compassBearing = 2f;
@@ -400,7 +420,8 @@ public class LocationLayerControllerTest {
     LocationComponentOptions options = mock(LocationComponentOptions.class);
     Feature locationFeature = mock(Feature.class);
     LocationLayerController layer = new LocationLayerController(
-      mapboxMap, sourceProvider, buildFeatureProvider(locationFeature, options), bitmapProvider, options
+      mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(locationFeature, options),
+      bitmapProvider, options
     );
     float accuracyRadiusValue = 2f;
 
@@ -419,7 +440,8 @@ public class LocationLayerControllerTest {
     LocationComponentOptions options = mock(LocationComponentOptions.class);
     Feature locationFeature = mock(Feature.class);
     LocationLayerController layer = new LocationLayerController(
-      mapboxMap, sourceProvider, buildFeatureProvider(locationFeature, options), bitmapProvider, options
+      mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(locationFeature, options),
+      bitmapProvider, options
     );
     layer.setRenderMode(RenderMode.GPS);
     float accuracyRadiusValue = 2f;

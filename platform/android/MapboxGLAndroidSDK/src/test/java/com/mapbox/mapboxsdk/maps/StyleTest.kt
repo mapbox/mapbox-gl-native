@@ -9,6 +9,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -271,6 +272,36 @@ class StyleTest {
         verify(exactly = 1) { nativeMapView.styleUrl = Style.MAPBOX_STREETS }
         mapboxMap.notifyStyleLoaded()
         verify(exactly = 1) { nativeMapView.addSource(source) }
+        verify(exactly = 1) { callback.onStyleLoaded(any()) }
+    }
+
+    @Test
+    fun testGetNullStyle() {
+        Assert.assertNull(mapboxMap.style)
+    }
+
+    @Test
+    fun testGetNullWhileLoading() {
+        val transitionOptions = TransitionOptions(100, 200)
+        val builder = Style.Builder().fromUrl(Style.MAPBOX_STREETS).withTransition(transitionOptions)
+        mapboxMap.setStyle(builder)
+        Assert.assertNull(mapboxMap.style)
+        mapboxMap.notifyStyleLoaded()
+        Assert.assertNotNull(mapboxMap.style)
+    }
+
+    @Test
+    fun testNotReinvokeSameListener() {
+        val callback = mockk<Style.OnStyleLoaded>()
+        every { callback.onStyleLoaded(any()) } answers {}
+        mapboxMap.getStyle(callback)
+        val source = mockk<GeoJsonSource>()
+        every { source.id } returns "1"
+        val builder = Style.Builder().fromJson("{}")
+        mapboxMap.setStyle(builder)
+        verify(exactly = 1) { nativeMapView.styleJson = "{}" }
+        mapboxMap.notifyStyleLoaded()
+        mapboxMap.setStyle(Style.MAPBOX_STREETS)
         verify(exactly = 1) { callback.onStyleLoaded(any()) }
     }
 }

@@ -74,14 +74,14 @@ public class LocationMapChangeActivity extends AppCompatActivity implements OnMa
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
     mapboxMap.setStyle(new Style.Builder().fromUrl(Utils.getNextStyle()),
-      style -> activateLocationComponent());
+      style -> activateLocationComponent(style));
   }
 
   @SuppressLint("MissingPermission")
-  private void activateLocationComponent() {
+  private void activateLocationComponent(@NonNull Style style) {
     LocationComponent locationComponent = mapboxMap.getLocationComponent();
     locationComponent.onStart();
-    locationComponent.activateLocationComponent(this);
+    locationComponent.activateLocationComponent(this, style);
     locationComponent.setLocationComponentEnabled(true);
     locationComponent.setRenderMode(RenderMode.COMPASS);
 

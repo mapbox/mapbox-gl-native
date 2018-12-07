@@ -3,19 +3,14 @@ package com.mapbox.mapboxsdk.testapp.utils;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 import android.support.test.espresso.IdlingResource;
-
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
-import junit.framework.Assert;
-
-public class OnMapReadyIdlingResource implements IdlingResource, OnMapReadyCallback {
+public class OnMapReadyIdlingResource implements IdlingResource {
 
   private boolean styleLoaded;
   private MapboxMap mapboxMap;
@@ -60,11 +55,5 @@ public class OnMapReadyIdlingResource implements IdlingResource, OnMapReadyCallb
 
   public MapboxMap getMapboxMap() {
     return mapboxMap;
-  }
-
-  @Override
-  public void onMapReady(@NonNull MapboxMap mapboxMap) {
-    Assert.assertNotNull("MapboxMap should not be null", mapboxMap);
-    this.mapboxMap = mapboxMap;
   }
 }
