@@ -153,7 +153,7 @@ class LocationComponentTest : BaseActivityTest() {
     executeComponentTest(componentAction)
   }
 
-  @Test
+  @Test(expected = IllegalStateException::class)
   fun settingMapStyleImmediatelyBeforeLoadingComponent_doesStillLoadLayersProperly() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
