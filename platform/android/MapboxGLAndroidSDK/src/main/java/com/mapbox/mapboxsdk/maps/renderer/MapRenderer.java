@@ -27,7 +27,7 @@ public abstract class MapRenderer implements MapRendererScheduler {
 
   // Holds the pointer to the native peer after initialisation
   private long nativePtr = 0;
-  private int preferredFramesPerSecond = Integer.MAX_VALUE;
+  private double expectedRenderTime = 0;
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
   public MapRenderer(@NonNull Context context, String localIdeographFontFamily) {
@@ -76,10 +76,19 @@ public abstract class MapRenderer implements MapRendererScheduler {
 
   @CallSuper
   protected void onDrawFrame(GL10 gl) {
+    long startTime = System.nanoTime();
     try {
       nativeRender();
     } catch (java.lang.Error error) {
       Logger.e(TAG, error.getMessage());
+    }
+    long renderTime = System.nanoTime() - startTime;
+    if (renderTime < expectedRenderTime) {
+      try {
+        Thread.sleep((long) ((expectedRenderTime - renderTime) / 1E6));
+      } catch (InterruptedException ex) {
+        ex.printStackTrace();
+      }
     }
     if (onFpsChangedListener != null) {
       updateFps();
@@ -122,25 +131,10 @@ public abstract class MapRenderer implements MapRendererScheduler {
   private void updateFps() {
     frames++;
     long currentTime = System.nanoTime();
-    long timeCost = currentTime - timeElapsed;
-
-    if (timeCost >= 1) {
-      double fps = frames / ((timeCost) / 1E9);
-      if (fps > preferredFramesPerSecond) {
-        try {
-          long millis = (long) (timeCost / 1E6 * (fps - preferredFramesPerSecond) / fps);
-          Thread.sleep(millis);
-        } catch (InterruptedException ex) {
-          ex.printStackTrace();
-        }
-        long newCurrentTime = System.nanoTime();
-        timeCost = newCurrentTime - timeElapsed;
-        fps = frames / ((timeCost) / 1E9);
-      }
-      onFpsChangedListener.onFpsChanged(fps);
-      timeElapsed = currentTime;
-      frames = 0;
-    }
+    double fps = frames / ((currentTime - timeElapsed) / 1E9);
+    onFpsChangedListener.onFpsChanged(fps);
+    timeElapsed = currentTime;
+    frames = 0;
   }
 
   /**
@@ -154,6 +148,6 @@ public abstract class MapRenderer implements MapRendererScheduler {
       // Not valid, just return
       return;
     }
-    this.preferredFramesPerSecond = preferredFramesPerSecond;
+    expectedRenderTime = 1E9 / preferredFramesPerSecond;
   }
 }
