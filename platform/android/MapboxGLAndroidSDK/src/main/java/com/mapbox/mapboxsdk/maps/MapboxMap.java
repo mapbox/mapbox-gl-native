@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -197,10 +198,17 @@ public final class MapboxMap {
   }
 
   /**
-   * Called the map finished loading style.
+   * Called when the map finished loading a style.
    */
   void onFinishLoadingStyle() {
     notifyStyleLoaded();
+  }
+
+  /**
+   * Called when the map failed loading a style.
+   */
+  void onFailLoadingStyle() {
+    styleLoadedCallbacks.clear();
   }
 
   /**
@@ -663,6 +671,7 @@ public final class MapboxMap {
    * Loads a new style from the specified offline region definition and moves the map camera to that region.
    *
    * @param definition the offline region definition
+   * @param callback   the callback to be invoked when the style has loaded
    * @see OfflineRegionDefinition
    */
   public void setOfflineRegionDefinition(@NonNull OfflineRegionDefinition definition,
@@ -812,7 +821,7 @@ public final class MapboxMap {
       // user didn't provide a `from` component,
       // flag the style as loaded,
       // add components defined added using the `with` prefix.
-      notifyStyleLoaded();
+      notifyStyleLoadedDelayed();
     }
   }
 
@@ -831,6 +840,15 @@ public final class MapboxMap {
       MapStrictMode.strictModeViolation("No style to provide.");
     }
     styleLoadedCallbacks.clear();
+  }
+
+  private void notifyStyleLoadedDelayed() {
+    new Handler().post(new Runnable() {
+      @Override
+      public void run() {
+        notifyStyleLoaded();
+      }
+    });
   }
 
   /**

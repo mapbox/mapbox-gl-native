@@ -137,7 +137,7 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
         .build();
 
       locationComponent = mapboxMap.getLocationComponent();
-      locationComponent.activateLocationComponent(this, true,
+      locationComponent.activateLocationComponent(this, style, true,
         new LocationEngineRequest.Builder(750)
           .setFastestInterval(750)
           .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)

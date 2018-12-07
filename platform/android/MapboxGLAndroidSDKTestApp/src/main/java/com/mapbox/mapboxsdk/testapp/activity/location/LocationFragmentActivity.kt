@@ -93,7 +93,6 @@ class LocationFragmentActivity : AppCompatActivity() {
 
     private lateinit var mapView: MapView
     private lateinit var mapboxMap: MapboxMap
-    private var component: LocationComponent? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
       mapView = MapView(inflater.context)
@@ -105,11 +104,11 @@ class LocationFragmentActivity : AppCompatActivity() {
       mapView.onCreate(savedInstanceState)
       mapView.getMapAsync {
         mapboxMap = it
-        it.setStyle(Style.MAPBOX_STREETS) { _ ->
-            component = mapboxMap.locationComponent
-            component?.activateLocationComponent(activity)
-            component?.isLocationComponentEnabled = true
-            component?.locationEngine?.getLastLocation(this)
+        it.setStyle(Style.MAPBOX_STREETS) { style ->
+            val component = mapboxMap.locationComponent
+            component.activateLocationComponent(activity, style)
+            component.isLocationComponentEnabled = true
+            component.locationEngine?.getLastLocation(this)
         }
       }
     }
