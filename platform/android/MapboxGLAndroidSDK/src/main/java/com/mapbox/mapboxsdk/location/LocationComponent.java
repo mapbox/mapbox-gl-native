@@ -56,7 +56,7 @@ import static com.mapbox.mapboxsdk.location.LocationComponentConstants.DEFAULT_T
  * <p>
  * <strong>
  * To get the component object use {@link MapboxMap#getLocationComponent()} and activate it with
- * {@link #activateLocationComponent(Context)} or one of the overloads.
+ * {@link #activateLocationComponent(Context, Style)} or one of the overloads.
  * Then, manage its visibility with {@link #setLocationComponentEnabled(boolean)}.
  * </strong>
  * <p>
@@ -77,7 +77,7 @@ import static com.mapbox.mapboxsdk.location.LocationComponentConstants.DEFAULT_T
  * When using any engine, requesting/removing the location updates is going to be managed internally.
  * <p>
  * You can also push location updates to the component without any internal engine management.
- * To achieve that, use {@link #activateLocationComponent(Context, boolean)} with false.
+ * To achieve that, use {@link #activateLocationComponent(Context, Style, boolean)} with false.
  * No engine is going to be initialized and you can push location updates with {@link #forceLocationUpdate(Location)}.
  * <p>
  * For location puck animation purposes, like navigation,
@@ -90,6 +90,7 @@ public final class LocationComponent {
 
   @NonNull
   private final MapboxMap mapboxMap;
+  private Style style;
   private LocationComponentOptions options;
   @NonNull
   private InternalLocationEngineProvider internalLocationEngineProvider = new InternalLocationEngineProvider();
@@ -201,8 +202,8 @@ public final class LocationComponent {
    * @param context the context
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
-  public void activateLocationComponent(@NonNull Context context) {
-    activateLocationComponent(context,
+  public void activateLocationComponent(@NonNull Context context, @NonNull Style style) {
+    activateLocationComponent(context, style,
       LocationComponentOptions.createFromAttributes(context, R.style.mapbox_LocationComponent));
   }
 
@@ -215,11 +216,12 @@ public final class LocationComponent {
    *                                 there should be no location engine initialized
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
-  public void activateLocationComponent(@NonNull Context context, boolean useDefaultLocationEngine) {
+  public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
+                                        boolean useDefaultLocationEngine) {
     if (useDefaultLocationEngine) {
-      activateLocationComponent(context, R.style.mapbox_LocationComponent);
+      activateLocationComponent(context, style, R.style.mapbox_LocationComponent);
     } else {
-      activateLocationComponent(context, null, R.style.mapbox_LocationComponent);
+      activateLocationComponent(context, style, null, R.style.mapbox_LocationComponent);
     }
   }
 
@@ -233,13 +235,14 @@ public final class LocationComponent {
    * @param locationEngineRequest    the location request
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
-  public void activateLocationComponent(@NonNull Context context, boolean useDefaultLocationEngine,
+  public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
+                                        boolean useDefaultLocationEngine,
                                         @NonNull LocationEngineRequest locationEngineRequest) {
     setLocationEngineRequest(locationEngineRequest);
     if (useDefaultLocationEngine) {
-      activateLocationComponent(context, R.style.mapbox_LocationComponent);
+      activateLocationComponent(context, style, R.style.mapbox_LocationComponent);
     } else {
-      activateLocationComponent(context, null, R.style.mapbox_LocationComponent);
+      activateLocationComponent(context, style, null, R.style.mapbox_LocationComponent);
     }
   }
 
@@ -253,8 +256,8 @@ public final class LocationComponent {
    * @param styleRes the LocationComponent style res
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
-  public void activateLocationComponent(@NonNull Context context, @StyleRes int styleRes) {
-    activateLocationComponent(context, LocationComponentOptions.createFromAttributes(context, styleRes));
+  public void activateLocationComponent(@NonNull Context context, @NonNull Style style, @StyleRes int styleRes) {
+    activateLocationComponent(context, style, LocationComponentOptions.createFromAttributes(context, styleRes));
   }
 
   /**
@@ -268,8 +271,9 @@ public final class LocationComponent {
    * @param options the options
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
-  public void activateLocationComponent(@NonNull Context context, @NonNull LocationComponentOptions options) {
-    initialize(context, options);
+  public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
+                                        @NonNull LocationComponentOptions options) {
+    initialize(context, style, options);
     initializeLocationEngine(context);
     applyStyle(options);
   }
@@ -283,9 +287,9 @@ public final class LocationComponent {
    * @param styleRes       the LocationComponent style res
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
-  public void activateLocationComponent(@NonNull Context context, @Nullable LocationEngine locationEngine,
-                                        @StyleRes int styleRes) {
-    activateLocationComponent(context, locationEngine,
+  public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
+                                        @Nullable LocationEngine locationEngine, @StyleRes int styleRes) {
+    activateLocationComponent(context, style, locationEngine,
       LocationComponentOptions.createFromAttributes(context, styleRes));
   }
 
@@ -299,9 +303,10 @@ public final class LocationComponent {
    * @param styleRes              the LocationComponent style res
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
-  public void activateLocationComponent(@NonNull Context context, @Nullable LocationEngine locationEngine,
+  public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
+                                        @Nullable LocationEngine locationEngine,
                                         @NonNull LocationEngineRequest locationEngineRequest, @StyleRes int styleRes) {
-    activateLocationComponent(context, locationEngine, locationEngineRequest,
+    activateLocationComponent(context, style, locationEngine, locationEngineRequest,
       LocationComponentOptions.createFromAttributes(context, styleRes));
   }
 
@@ -312,8 +317,9 @@ public final class LocationComponent {
    * @param locationEngine the engine
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
-  public void activateLocationComponent(@NonNull Context context, @NonNull LocationEngine locationEngine) {
-    activateLocationComponent(context, locationEngine, R.style.mapbox_LocationComponent);
+  public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
+                                        @NonNull LocationEngine locationEngine) {
+    activateLocationComponent(context, style, locationEngine, R.style.mapbox_LocationComponent);
   }
 
   /**
@@ -324,9 +330,10 @@ public final class LocationComponent {
    * @param locationEngineRequest the location request
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
-  public void activateLocationComponent(@NonNull Context context, @NonNull LocationEngine locationEngine,
+  public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
+                                        @NonNull LocationEngine locationEngine,
                                         @NonNull LocationEngineRequest locationEngineRequest) {
-    activateLocationComponent(context, locationEngine, locationEngineRequest, R.style.mapbox_LocationComponent);
+    activateLocationComponent(context, style, locationEngine, locationEngineRequest, R.style.mapbox_LocationComponent);
   }
 
   /**
@@ -337,9 +344,10 @@ public final class LocationComponent {
    * @param options        the options
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
-  public void activateLocationComponent(@NonNull Context context, @Nullable LocationEngine locationEngine,
+  public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
+                                        @Nullable LocationEngine locationEngine,
                                         @NonNull LocationComponentOptions options) {
-    initialize(context, options);
+    initialize(context, style, options);
     setLocationEngine(locationEngine);
     applyStyle(options);
   }
@@ -353,10 +361,11 @@ public final class LocationComponent {
    * @param locationEngineRequest the location request
    * @param options               the options
    */
-  public void activateLocationComponent(@NonNull Context context, @Nullable LocationEngine locationEngine,
+  public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
+                                        @Nullable LocationEngine locationEngine,
                                         @NonNull LocationEngineRequest locationEngineRequest,
                                         @NonNull LocationComponentOptions options) {
-    initialize(context, options);
+    initialize(context, style, options);
     setLocationEngineRequest(locationEngineRequest);
     setLocationEngine(locationEngine);
     applyStyle(options);
@@ -899,57 +908,45 @@ public final class LocationComponent {
     mapboxMap.removeOnCameraIdleListener(onCameraIdleListener);
   }
 
-  private void initialize(@NonNull final Context context, @NonNull final LocationComponentOptions options) {
-    LocationComponent.this.options = options;
-    mapboxMap.getStyle(new InitializationCallback(context));
-  }
-
-  class InitializationCallback implements Style.OnStyleLoaded {
-
-    private final Context context;
-
-    private InitializationCallback(Context context) {
-      this.context = context;
+  private void initialize(@NonNull final Context context, @NonNull Style style,
+                          @NonNull final LocationComponentOptions options) {
+    if (isComponentInitialized) {
+      return;
     }
+    isComponentInitialized = true;
 
-    @Override
-    public void onStyleLoaded(@NonNull Style style) {
-      if (isComponentInitialized) {
-        return;
-      }
-      isComponentInitialized = true;
+    this.style = style;
+    this.options = options;
 
-      mapboxMap.addOnMapClickListener(onMapClickListener);
-      mapboxMap.addOnMapLongClickListener(onMapLongClickListener);
+    mapboxMap.addOnMapClickListener(onMapClickListener);
+    mapboxMap.addOnMapLongClickListener(onMapLongClickListener);
 
-      LayerSourceProvider sourceProvider = new LayerSourceProvider();
-      LayerFeatureProvider featureProvider = new LayerFeatureProvider();
-      LayerBitmapProvider bitmapProvider = new LayerBitmapProvider(context);
-      locationLayerController = new LocationLayerController(mapboxMap, sourceProvider, featureProvider,
-        bitmapProvider,
-        options);
-      locationCameraController = new LocationCameraController(
-        context, mapboxMap, cameraTrackingChangedListener, options, onCameraMoveInvalidateListener);
+    LayerSourceProvider sourceProvider = new LayerSourceProvider();
+    LayerFeatureProvider featureProvider = new LayerFeatureProvider();
+    LayerBitmapProvider bitmapProvider = new LayerBitmapProvider(context);
+    locationLayerController = new LocationLayerController(mapboxMap, style, sourceProvider, featureProvider,
+      bitmapProvider, options);
+    locationCameraController = new LocationCameraController(
+      context, mapboxMap, cameraTrackingChangedListener, options, onCameraMoveInvalidateListener);
 
-      locationAnimatorCoordinator = new LocationAnimatorCoordinator();
-      locationAnimatorCoordinator.addLayerListener(locationLayerController);
-      locationAnimatorCoordinator.addCameraListener(locationCameraController);
-      locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options
-        .trackingAnimationDurationMultiplier());
+    locationAnimatorCoordinator = new LocationAnimatorCoordinator();
+    locationAnimatorCoordinator.addLayerListener(locationLayerController);
+    locationAnimatorCoordinator.addCameraListener(locationCameraController);
+    locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options
+      .trackingAnimationDurationMultiplier());
 
-      WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-      SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-      compassEngine = new LocationComponentCompassEngine(windowManager, sensorManager);
-      compassEngine.addCompassListener(compassListener);
-      staleStateManager = new StaleStateManager(onLocationStaleListener, options);
+    WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+    SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+    compassEngine = new LocationComponentCompassEngine(windowManager, sensorManager);
+    compassEngine.addCompassListener(compassListener);
+    staleStateManager = new StaleStateManager(onLocationStaleListener, options);
 
-      updateMapWithOptions(options);
+    updateMapWithOptions(options);
 
-      setRenderMode(RenderMode.NORMAL);
-      setCameraMode(CameraMode.NONE);
+    setRenderMode(RenderMode.NORMAL);
+    setCameraMode(CameraMode.NONE);
 
-      onLocationLayerStart();
-    }
+    onLocationLayerStart();
   }
 
   private void initializeLocationEngine(@NonNull Context context) {

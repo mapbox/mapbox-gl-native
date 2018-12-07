@@ -1,9 +1,9 @@
 package com.mapbox.mapboxsdk.location.utils
 
 import android.support.test.espresso.IdlingResource
-import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
+import java.util.logging.Handler
 
 /**
  * Resource, that's idling until the provided style is loaded.
@@ -32,14 +32,10 @@ class StyleChangeIdlingResource : IdlingResource {
     callback?.onTransitionToIdle()
   }
 
-  fun waitForStyle(mapView: MapView, mapboxMap: MapboxMap, styleUrl: String) {
+  fun waitForStyle(mapboxMap: MapboxMap, styleUrl: String) {
     isIdle = false
-    mapView.addOnDidFinishLoadingStyleListener(object : MapView.OnDidFinishLoadingStyleListener {
-      override fun onDidFinishLoadingStyle() {
-        mapView.removeOnDidFinishLoadingStyleListener(this)
-        setIdle()
-      }
-    })
-    mapboxMap.setStyle(Style.Builder().fromUrl(styleUrl))
+    mapboxMap.setStyle(Style.Builder().fromUrl(styleUrl)) {
+      setIdle()
+    }
   }
 }
