@@ -168,7 +168,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
         )
       )
     );
-
+    unclustered.setFilter(has("mag"));
     mapboxMap.addLayer(unclustered);
 
     for (int i = 0; i < layers.length; i++) {
