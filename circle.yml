@@ -972,6 +972,7 @@ jobs:
           name: Build, package, and upload iOS release
           command: |
             export VERSION_TAG=${CIRCLE_TAG}
+            chmod +x platform/ios/scripts/deploy-packages-cn.sh
             platform/ios/scripts/deploy-packages-cn.sh
       - save-dependencies
       - collect-xcode-build-logs
