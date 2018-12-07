@@ -101,7 +101,7 @@ public final class MapboxMap {
    * Get the Style of the map asynchronously.
    */
   public void getStyle(@NonNull Style.OnStyleLoaded onStyleLoaded) {
-    if (style != null && style.isStyleLoaded()) {
+    if (style != null && style.isFullyLoaded()) {
       onStyleLoaded.onStyleLoaded(style);
     } else {
       styleLoadedCallbacks.add(onStyleLoaded);
@@ -118,7 +118,7 @@ public final class MapboxMap {
    */
   @Nullable
   public Style getStyle() {
-    if (style == null || !style.isStyleLoaded()) {
+    if (style == null || !style.isFullyLoaded()) {
       return null;
     } else {
       return style;
