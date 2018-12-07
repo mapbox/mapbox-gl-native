@@ -49,7 +49,7 @@ workflows:
       - ios-release-tag:
           filters:
             tags:
-              only: /.*-cn.*/
+              only: /v*-cn.*/
             branches:
               ignore: /.*/
       - macos-debug
