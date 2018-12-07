@@ -854,7 +854,8 @@ public final class LocationComponent {
    */
   public void onFinishLoadingStyle() {
     if (isComponentInitialized) {
-      locationLayerController.initializeComponents(options);
+      style = mapboxMap.getStyle();
+      locationLayerController.initializeComponents(style, options);
       locationCameraController.initializeOptions(options);
       onLocationLayerStart();
     }
@@ -913,7 +914,10 @@ public final class LocationComponent {
     if (isComponentInitialized) {
       return;
     }
-    isComponentInitialized = true;
+
+    if (!style.isFullyLoaded()) {
+      throw new IllegalStateException("Style hasn't fully loaded yet, can't initialize LocationComponent.");
+    }
 
     this.style = style;
     this.options = options;
@@ -945,6 +949,8 @@ public final class LocationComponent {
 
     setRenderMode(RenderMode.NORMAL);
     setCameraMode(CameraMode.NONE);
+
+    isComponentInitialized = true;
 
     onLocationLayerStart();
   }

@@ -62,7 +62,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
   private int renderMode;
 
   private final MapboxMap mapboxMap;
-  private final Style style;
+  private Style style;
   private final LayerSourceProvider layerSourceProvider;
   private final LayerBitmapProvider bitmapProvider;
   private LocationComponentOptions options;
@@ -81,11 +81,12 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
     this.layerSourceProvider = layerSourceProvider;
     this.bitmapProvider = bitmapProvider;
     this.locationFeature = featureProvider.generateLocationFeature(locationFeature, options);
-    initializeComponents(options);
+    initializeComponents(style, options);
     setRenderMode(RenderMode.NORMAL);
   }
 
-  void initializeComponents(LocationComponentOptions options) {
+  void initializeComponents(Style style, LocationComponentOptions options) {
+    this.style = style;
     addLocationSource();
     addLayers(options.layerBelow());
     applyStyle(options);
