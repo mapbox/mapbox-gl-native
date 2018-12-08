@@ -18,10 +18,16 @@
         return @"Latn";
     } else if ([hansLanguages containsObject:language]) {
         return @"Hans";
+    } else if ([language isEqualToString:@"zh-Hant"]) {
+        return @"Hant";
     } else if ([language isEqualToString:@"ru"]) {
         return @"Cyrl";
     } else if ([language isEqualToString:@"ar"]) {
         return @"Arab";
+    } else if ([language isEqualToString:@"ja"]) {
+        return @"Jpan";
+    } else if ([language isEqualToString:@"ko"]) {
+        return @"Kore";
     } else {
         // Code for undetermined script
         return @"Zyyy";
