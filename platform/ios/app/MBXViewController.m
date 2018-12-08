@@ -686,7 +686,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
             switch (indexPath.row)
             {
                 case MBXSettingsMiscellaneousLocalizeLabels:
-                    [self styleCountryLabelsLanguage];
+                    [self toggleStyleLabelsLanguage];
                     break;
                 case MBXSettingsMiscellaneousWorldTour:
                     [self startWorldTour];
@@ -1432,7 +1432,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     }
 }
 
--(void)styleCountryLabelsLanguage
+-(void)toggleStyleLabelsLanguage
 {
     _localizingLabels = !_localizingLabels;
     [self.mapView.style localizeLabelsIntoLocale:_localizingLabels ? [NSLocale localeWithLocaleIdentifier:@"mul"] : nil];
@@ -1538,8 +1538,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
 - (NSString *)bestLanguageForUser
 {
-    // https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview
-    NSArray *supportedLanguages = @[ @"ar", @"en", @"es", @"fr", @"de", @"pt", @"ru", @"zh", @"zh-Hans" ];
+    // https://www.mapbox.com/vector-tiles/mapbox-streets-v8/#name-text--name_lang-code-text
+    NSArray *supportedLanguages = @[ @"ar", @"de", @"en", @"es", @"fr", @"ja", @"ko", @"pt", @"ru", @"zh", @"zh-Hans", @"zh-Hant" ];
     NSArray<NSString *> *preferredLanguages = [NSBundle preferredLocalizationsFromArray:supportedLanguages forPreferences:[NSLocale preferredLanguages]];
     NSString *mostSpecificLanguage;
 
@@ -1920,7 +1920,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
             [MGLStyle darkStyleURL],
             [MGLStyle satelliteStyleURL],
             [MGLStyle satelliteStreetsStyleURL]
-            
         ];
         NSAssert(styleNames.count == styleURLs.count, @"Style names and URLs don’t match.");
 
