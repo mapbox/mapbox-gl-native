@@ -1072,9 +1072,18 @@ using namespace std::string_literals;
     }
     {
         NSExpression *original = [NSExpression expressionForKeyPath:@"name_en"];
-        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K, %K, %K})",
-                                  @"name_zh-Hans", @"name_zh-CN", @"name_zh", @"name"];
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K, %K, %K})", @"name_zh-Hans", @"name_zh-CN", @"name_zh", @"name"];
         XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:[NSLocale localeWithLocaleIdentifier:@"zh-Hans"]], expected);
+    }
+    {
+        NSExpression *original = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K})", @"name_en", @"name"];
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_coalesce:({mgl_coalesce:({name_en, name}), mgl_coalesce:({name_en, name})})"];
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:nil], expected);
+    }
+    {
+        NSExpression *original = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K})", @"name_en", @"name"];
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_coalesce:({mgl_coalesce:({name_ja, name}), mgl_coalesce:({name_ja, name})})"];
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:[NSLocale localeWithLocaleIdentifier:@"ja-JP"]], expected);
     }
     {
         NSExpression *original = [NSExpression expressionForKeyPath:@"name_en"];
