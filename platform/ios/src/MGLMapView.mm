@@ -191,6 +191,7 @@ public:
 #pragma mark - Private -
 
 @interface MGLMapView () <UIGestureRecognizerDelegate,
+                          UIPopoverPresentationControllerDelegate,
                           GLKViewDelegate,
                           MGLLocationManagerDelegate,
                           MGLSMCalloutViewDelegate,
@@ -210,6 +211,7 @@ public:
 @property (nonatomic) NSMutableArray<NSLayoutConstraint *> *logoViewConstraints;
 @property (nonatomic, readwrite) UIButton *attributionButton;
 @property (nonatomic) NSMutableArray<NSLayoutConstraint *> *attributionButtonConstraints;
+@property (nonatomic, nullable, weak) UIAlertController *attributionController;
 
 @property (nonatomic, readwrite) MGLStyle *style;
 
@@ -2183,13 +2185,13 @@ public:
     }
 
     NSString *actionSheetTitle = NSLocalizedStringWithDefaultValue(@"SDK_NAME", nil, nil, @"Mapbox Maps SDK for iOS", @"Action sheet title");
-    UIAlertController *attributionController = [UIAlertController alertControllerWithTitle:actionSheetTitle
+    self.attributionController = [UIAlertController alertControllerWithTitle:actionSheetTitle
                                                                                    message:nil
                                                                             preferredStyle:UIAlertControllerStyleActionSheet];
 
     if (shouldShowVersion)
     {
-        attributionController.title = [actionSheetTitle stringByAppendingFormat:@" %@", [NSBundle mgl_frameworkInfoDictionary][@"MGLSemanticVersionString"]];
+        self.attributionController.title = [actionSheetTitle stringByAppendingFormat:@" %@", [NSBundle mgl_frameworkInfoDictionary][@"MGLSemanticVersionString"]];
     }
 
     NSArray *attributionInfos = [self.style attributionInfosWithFontSize:[UIFont buttonFontSize]
@@ -2214,7 +2216,7 @@ public:
                 [[UIApplication sharedApplication] openURL:url];
             }
         }];
-        [attributionController addAction:action];
+        [self.attributionController addAction:action];
     }
     
     NSString *telemetryTitle = NSLocalizedStringWithDefaultValue(@"TELEMETRY_NAME", nil, nil, @"Mapbox Telemetry", @"Action in attribution sheet");
@@ -2223,19 +2225,28 @@ public:
                                                             handler:^(UIAlertAction * _Nonnull action) {
         [self presentTelemetryAlertController];
     }];
-    [attributionController addAction:telemetryAction];
+    [self.attributionController addAction:telemetryAction];
     
     NSString *cancelTitle = NSLocalizedStringWithDefaultValue(@"CANCEL", nil, nil, @"Cancel", @"");
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelTitle
                                                            style:UIAlertActionStyleCancel
                                                          handler:NULL];
-    [attributionController addAction:cancelAction];
+    [self.attributionController addAction:cancelAction];
     
-    attributionController.popoverPresentationController.sourceView = self;
-    attributionController.popoverPresentationController.sourceRect = self.attributionButton.frame;
+    self.attributionController.popoverPresentationController.sourceView = self;
+    self.attributionController.popoverPresentationController.sourceRect = self.attributionButton.frame;
+    self.attributionController.popoverPresentationController.delegate = self;
     
     UIViewController *viewController = [self.window.rootViewController mgl_topMostViewController];
-    [viewController presentViewController:attributionController animated:YES completion:NULL];
+    [viewController presentViewController:self.attributionController animated:YES completion:NULL];
+}
+
+- (void)popoverPresentationController:(UIPopoverPresentationController *)popoverPresentationController willRepositionPopoverToRect:(inout CGRect *)rect inView:(inout UIView * _Nonnull *)view
+{
+    // Update the origin of attribution popover when the view's bounds is changed
+    if (self.attributionController.popoverPresentationController == popoverPresentationController) {
+        *rect = self.attributionButton.frame;
+    }
 }
 
 - (void)presentTelemetryAlertController
