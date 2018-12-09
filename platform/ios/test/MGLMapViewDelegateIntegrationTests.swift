@@ -52,6 +52,8 @@ extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
     func mapView(_ mapView: MGLMapView, didUpdate userLocation: MGLUserLocation?) {}
 
     func mapViewDidFinishRenderingMap(_ mapView: MGLMapView, fullyRendered: Bool) {}
+    
+     func mapViewDidBecomeIdle(_ mapView: MGLMapView) {}
 
     func mapView(_ mapView: MGLMapView, didFailToLocateUserWithError error: Error) {}
 
