@@ -26,7 +26,7 @@ class MapChangeReceiver implements NativeMapView.StateCallback {
     = new CopyOnWriteArrayList<>();
   private final List<MapView.OnDidFinishRenderingMapListener> onDidFinishRenderingMapListenerList
     = new CopyOnWriteArrayList<>();
-  private final List<MapView.OnDidEnterIdleListener> onDidEnterIdleListenerList
+  private final List<MapView.OnDidBecomeIdleListener> onDidBecomeIdleListenerList
       = new CopyOnWriteArrayList<>();
   private final List<MapView.OnDidFinishLoadingStyleListener> onDidFinishLoadingStyleListenerList
     = new CopyOnWriteArrayList<>();
@@ -173,15 +173,15 @@ class MapChangeReceiver implements NativeMapView.StateCallback {
   }
 
   @Override
-  public void onDidEnterIdle() {
+  public void onDidBecomeIdle() {
     try {
-      if (!onDidEnterIdleListenerList.isEmpty()) {
-        for (MapView.OnDidEnterIdleListener listener : onDidEnterIdleListenerList) {
-          listener.onDidEnterIdle();
+      if (!onDidBecomeIdleListenerList.isEmpty()) {
+        for (MapView.OnDidBecomeIdleListener listener : onDidBecomeIdleListenerList) {
+          listener.onDidBecomeIdle();
         }
       }
     } catch (Throwable err) {
-      Logger.e(TAG, "Exception in onDidEnterIdle", err);
+      Logger.e(TAG, "Exception in onDidBecomeIdle", err);
       throw err;
     }
   }
@@ -294,12 +294,12 @@ class MapChangeReceiver implements NativeMapView.StateCallback {
     onDidFinishRenderingMapListenerList.remove(listener);
   }
 
-  void addOnDidEnterIdleListener(MapView.OnDidEnterIdleListener listener) {
-    onDidEnterIdleListenerList.add(listener);
+  void addOnDidBecomeIdleListener(MapView.OnDidBecomeIdleListener listener) {
+    onDidBecomeIdleListenerList.add(listener);
   }
 
-  void removeOnDidEnterIdleListener(MapView.OnDidEnterIdleListener listener) {
-    onDidEnterIdleListenerList.remove(listener);
+  void removeOnDidBecomeIdleListener(MapView.OnDidBecomeIdleListener listener) {
+    onDidBecomeIdleListenerList.remove(listener);
   }
 
   void addOnDidFinishLoadingStyleListener(MapView.OnDidFinishLoadingStyleListener listener) {
@@ -329,7 +329,7 @@ class MapChangeReceiver implements NativeMapView.StateCallback {
     onDidFinishRenderingFrameList.clear();
     onWillStartRenderingMapListenerList.clear();
     onDidFinishRenderingMapListenerList.clear();
-    onDidEnterIdleListenerList.clear();
+    onDidBecomeIdleListenerList.clear();
     onDidFinishLoadingStyleListenerList.clear();
     onSourceChangedListenerList.clear();
   }

@@ -702,8 +702,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the map has entered the idle state.
    */
-  public void addOnDidEnterIdleListener(OnDidEnterIdleListener listener) {
-    mapChangeReceiver.addOnDidEnterIdleListener(listener);
+  public void addOnDidBecomeIdleListener(OnDidBecomeIdleListener listener) {
+    mapChangeReceiver.addOnDidBecomeIdleListener(listener);
   }
 
   /**
@@ -711,8 +711,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    *
    * @param listener The callback that's invoked when the map has entered the idle state.
    */
-  public void removeOnDidEnterIdleListener(OnDidEnterIdleListener listener) {
-    mapChangeReceiver.removeOnDidEnterIdleListener(listener);
+  public void removeOnDidBecomeIdleListener(OnDidBecomeIdleListener listener) {
+    mapChangeReceiver.removeOnDidBecomeIdleListener(listener);
   }
 
   /**
@@ -893,14 +893,14 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   /**
    * Interface definition for a callback to be invoked when the map has entered the idle state.
    * <p>
-   * {@link MapView#addOnDidEnterIdleListener(OnDidEnterIdleListener)}
+   * {@link MapView#addOnDidBecomeIdleListener(OnDidBecomeIdleListener)}
    * </p>
    */
-  public interface OnDidEnterIdleListener {
+  public interface OnDidBecomeIdleListener {
     /**
      * Called when the map has entered the idle state.
      */
-    void onDidEnterIdle();
+    void onDidBecomeIdle();
   }
 
   /**
