@@ -934,13 +934,13 @@ public:
     }
 }
 
-- (void)mapViewDidEnterIdle {
+- (void)mapViewDidBecomeIdle {
     if (!_mbglMap) {
         return;
     }
     
-    if ([self.delegate respondsToSelector:@selector(mapViewDidEnterIdle)]) {
-        [self.delegate mapViewDidEnterIdle:self];
+    if ([self.delegate respondsToSelector:@selector(mapViewDidBecomeIdle)]) {
+        [self.delegate mapViewDidBecomeIdle:self];
     }
 }
 
@@ -3061,8 +3061,8 @@ public:
         [nativeView mapViewDidFinishRenderingMapFullyRendered:fullyRendered];
     }
     
-    void onDidEnterIdle() override {
-        [nativeView mapViewDidEnterIdle];
+    void onDidBecomeIdle() override {
+        [nativeView mapViewDidBecomeIdle];
     }
 
     void onDidFinishLoadingStyle() override {

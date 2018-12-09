@@ -56,7 +56,7 @@ public class MapChangeReceiverTest {
   private MapView.OnDidFinishRenderingMapListener onDidFinishRenderingMapListener;
 
   @Mock
-  private MapView.OnDidEnterIdleListener onDidEnterIdleListener;
+  private MapView.OnDidBecomeIdleListener onDidBecomeIdleListener;
 
   @Mock
   private MapView.OnDidFinishLoadingStyleListener onDidFinishLoadingStyleListener;
@@ -495,29 +495,29 @@ public class MapChangeReceiverTest {
   }
 
   @Test
-  public void testOnDidEnterIdleListener() {
-    mapChangeEventManager.addOnDidEnterIdleListener(onDidEnterIdleListener);
-    mapChangeEventManager.onDidEnterIdle();
-    verify(onDidEnterIdleListener).onDidEnterIdle();
-    mapChangeEventManager.removeOnDidEnterIdleListener(onDidEnterIdleListener);
-    mapChangeEventManager.onDidEnterIdle();
-    verify(onDidEnterIdleListener).onDidEnterIdle();
+  public void testOnDidBecomeIdleListener() {
+    mapChangeEventManager.addOnDidBecomeIdleListener(onDidBecomeIdleListener);
+    mapChangeEventManager.onDidBecomeIdle();
+    verify(onDidBecomeIdleListener).onDidBecomeIdle();
+    mapChangeEventManager.removeOnDidBecomeIdleListener(onDidBecomeIdleListener);
+    mapChangeEventManager.onDidBecomeIdle();
+    verify(onDidBecomeIdleListener).onDidBecomeIdle();
 
-    mapChangeEventManager.addOnDidEnterIdleListener(onDidEnterIdleListener);
+    mapChangeEventManager.addOnDidBecomeIdleListener(onDidBecomeIdleListener);
     Logger.setLoggerDefinition(loggerDefinition);
     Exception exc = new RuntimeException();
-    doThrow(exc).when(onDidEnterIdleListener).onDidEnterIdle();
+    doThrow(exc).when(onDidBecomeIdleListener).onDidBecomeIdle();
     try {
-      mapChangeEventManager.onDidEnterIdle();
+      mapChangeEventManager.onDidBecomeIdle();
       Assert.fail("The exception should've been re-thrown.");
     } catch (RuntimeException throwable) {
       verify(loggerDefinition).e(anyString(), anyString(), eq(exc));
     }
 
     Error err = new ExecutionError("", new Error());
-    doThrow(err).when(onDidEnterIdleListener).onDidEnterIdle();
+    doThrow(err).when(onDidBecomeIdleListener).onDidBecomeIdle();
     try {
-      mapChangeEventManager.onDidEnterIdle();
+      mapChangeEventManager.onDidBecomeIdle();
       Assert.fail("The exception should've been re-thrown.");
     } catch (ExecutionError throwable) {
       verify(loggerDefinition).e(anyString(), anyString(), eq(err));

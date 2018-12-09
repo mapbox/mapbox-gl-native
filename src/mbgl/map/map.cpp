@@ -210,7 +210,7 @@ void Map::Impl::onDidFinishRenderingFrame(RenderMode renderMode, bool needsRepai
         if (needsRepaint || transform.inTransition()) {
             onUpdate();
         } else if (rendererFullyLoaded) {
-            observer.onDidEnterIdle();
+            observer.onDidBecomeIdle();
         }
     } else if (stillImageRequest && rendererFullyLoaded) {
         auto request = std::move(stillImageRequest);
