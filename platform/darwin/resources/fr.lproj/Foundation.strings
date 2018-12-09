@@ -1,11 +1,14 @@
+/* User-friendly error description */
+"ADD_FILE_CONTENTS_FAILED_DESC" = "Impossible d’ajouter le contenu hors ligne à partir du fichier %@.";
+
 /* Clock position format, long: {hours} o’clock */
-"CLOCK_FMT_LONG" = "%@ heures";
+"CLOCK_FMT_LONG" = "%@ h";
 
 /* Clock position format, medium: {hours} o’clock */
-"CLOCK_FMT_MEDIUM" = "%@ heures";
+"CLOCK_FMT_MEDIUM" = "%@ h";
 
 /* Clock position format, short: {hours}:00 */
-"CLOCK_FMT_SHORT" = "%@h 00";
+"CLOCK_FMT_SHORT" = "%@ h 00";
 
 /* East, long */
 "COMPASS_E_LONG" = "est";
@@ -14,13 +17,13 @@
 "COMPASS_E_SHORT" = "E";
 
 /* East by north, long */
-"COMPASS_EbN_LONG" = "est par nord";
+"COMPASS_EbN_LONG" = "est par le nord";
 
 /* East by north, short */
 "COMPASS_EbN_SHORT" = "EpN";
 
 /* East by south, long */
-"COMPASS_EbS_LONG" = "est par sud";
+"COMPASS_EbS_LONG" = "est par le sud";
 
 /* East by south, short */
 "COMPASS_EbS_SHORT" = "EpS";
@@ -44,13 +47,13 @@
 "COMPASS_N_SHORT" = "N";
 
 /* North by east, long */
-"COMPASS_NbE_LONG" = "nord par est";
+"COMPASS_NbE_LONG" = "nord par l’est";
 
 /* North by east, short */
 "COMPASS_NbE_SHORT" = "NpE";
 
 /* North by west, long */
-"COMPASS_NbW_LONG" = "nord par ouest";
+"COMPASS_NbW_LONG" = "nord par l’ouest";
 
 /* North by west, short */
 "COMPASS_NbW_SHORT" = "NpO";
@@ -62,13 +65,13 @@
 "COMPASS_NE_SHORT" = "NE";
 
 /* Northeast by east, long */
-"COMPASS_NEbE_LONG" = "nord-est par est";
+"COMPASS_NEbE_LONG" = "nord-est par l’est";
 
 /* Northeast by east, short */
 "COMPASS_NEbE_SHORT" = "NEpE";
 
 /* Northeast by north, long */
-"COMPASS_NEbN_LONG" = "nord-est par nord";
+"COMPASS_NEbN_LONG" = "nord-est par le nord";
 
 /* Northeast by north, short */
 "COMPASS_NEbN_SHORT" = "NEpN";
@@ -92,13 +95,13 @@
 "COMPASS_NW_SHORT" = "NO";
 
 /* Northwest by north, long */
-"COMPASS_NWbN_LONG" = "nord-ouest par nord";
+"COMPASS_NWbN_LONG" = "nord-ouest par le nord";
 
 /* Northwest by north, short */
 "COMPASS_NWbN_SHORT" = "NOpN";
 
 /* Northwest by west, long */
-"COMPASS_NWbW_LONG" = "nord-ouest par ouest";
+"COMPASS_NWbW_LONG" = "nord-ouest par l’ouest";
 
 /* Northwest by west, short */
 "COMPASS_NWbW_SHORT" = "NOpO";
@@ -110,13 +113,13 @@
 "COMPASS_S_SHORT" = "S";
 
 /* South by east, long */
-"COMPASS_SbE_LONG" = "sud par est";
+"COMPASS_SbE_LONG" = "sud par l’est";
 
 /* South by east, short */
 "COMPASS_SbE_SHORT" = "SpE";
 
 /* South by west, long */
-"COMPASS_SbW_LONG" = "sud par ouest";
+"COMPASS_SbW_LONG" = "sud par l’ouest";
 
 /* South by west, short */
 "COMPASS_SbW_SHORT" = "SpO";
@@ -128,13 +131,13 @@
 "COMPASS_SE_SHORT" = "SE";
 
 /* Southeast by east, long */
-"COMPASS_SEbE_LONG" = "sud-est par est";
+"COMPASS_SEbE_LONG" = "sud-est par l’est";
 
 /* Southeast by east, short */
 "COMPASS_SEbE_SHORT" = "SEpE";
 
 /* Southeast by south, long */
-"COMPASS_SEbS_LONG" = "sud-est par sud";
+"COMPASS_SEbS_LONG" = "sud-est par le sud";
 
 /* Southeast by south, short */
 "COMPASS_SEbS_SHORT" = "SEpS";
@@ -158,13 +161,13 @@
 "COMPASS_SW_SHORT" = "SO";
 
 /* Southwest by south, long */
-"COMPASS_SWbS_LONG" = "sud-ouest par sud";
+"COMPASS_SWbS_LONG" = "sud-ouest par le sud";
 
 /* Southwest by south, short */
 "COMPASS_SWbS_SHORT" = "SOpS";
 
 /* Southwest by west, long */
-"COMPASS_SWbW_LONG" = "sud-ouest par ouest";
+"COMPASS_SWbW_LONG" = "sud-ouest par l’ouest";
 
 /* Southwest by west, short */
 "COMPASS_SWbW_SHORT" = "SOpO";
@@ -176,13 +179,13 @@
 "COMPASS_W_SHORT" = "O";
 
 /* West by north, long */
-"COMPASS_WbN_LONG" = "ouest par nord";
+"COMPASS_WbN_LONG" = "ouest par le nord";
 
 /* West by north, short */
 "COMPASS_WbN_SHORT" = "OpN";
 
 /* West by south, long */
-"COMPASS_WbS_LONG" = "ouest par sud";
+"COMPASS_WbS_LONG" = "ouest par le sud";
 
 /* West by south, short */
 "COMPASS_WbS_SHORT" = "OpS";
@@ -221,7 +224,7 @@
 "COORD_DMS_LONG" = "%1$@, %2$@ et %3$@";
 
 /* Coordinate format, medium: {degrees}{minutes}{seconds} */
-"COORD_DMS_MEDIUM" = "%1$@%2$@%3$@";
+"COORD_DMS_MEDIUM" = "%1$@ %2$@ %3$@";
 
 /* Coordinate format, short: {degrees}{minutes}{seconds} */
 "COORD_DMS_SHORT" = "%1$@%2$@%3$@";
@@ -294,4 +297,7 @@
 
 /* OpenStreetMap short name attribution */
 "OSM_SHORT_NAME" = "OSM";
+
+/* User-friendly error description */
+"REMOVE_SRC_FAIL_IN_USE_FMT" = "La source « %@ » est en cours d’utilisation, impossible de la supprimer.";
 

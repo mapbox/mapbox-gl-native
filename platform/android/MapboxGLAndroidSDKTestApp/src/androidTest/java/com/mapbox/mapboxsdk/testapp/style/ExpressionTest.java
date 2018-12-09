@@ -406,10 +406,9 @@ public class ExpressionTest extends BaseActivityTest {
 
       assertNull(layer.getTextField().getExpression());
       assertEquals(new Formatted(
-        new FormattedSection[] {
-          new FormattedSection("test", 1.5, new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"}),
-          new FormattedSection("\ntest2", 2.0),
-        }
+        new FormattedSection("test", 1.5,
+          new String[] {"DIN Offc Pro Regular", "Arial Unicode MS Regular"}),
+        new FormattedSection("\ntest2", 2.0)
       ), layer.getTextField().getValue());
     });
   }
@@ -490,6 +489,29 @@ public class ExpressionTest extends BaseActivityTest {
       assertNull(layer.getTextField().getExpression());
       assertEquals(new Formatted(
         new FormattedSection("test")), layer.getTextField().getValue());
+    });
+  }
+
+  @Test
+  public void testTextFieldFormattedArgument() {
+    validateTestSetup();
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      LatLng latLng = new LatLng(51, 17);
+      mapboxMap.addSource(new GeoJsonSource("source", Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude())));
+      SymbolLayer layer = new SymbolLayer("layer", "source");
+      mapboxMap.addLayer(layer);
+
+      Formatted formatted = new Formatted(
+        new FormattedSection("test", 1.5),
+        new FormattedSection("\ntest", 0.5, new String[] {"Arial Unicode MS Regular", "DIN Offc Pro Regular"})
+      );
+      layer.setProperties(textField(formatted));
+      waitForLayer(uiController, mapboxMap, latLng);
+      assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
+        .isEmpty());
+
+      assertNull(layer.getTextField().getExpression());
+      assertEquals(formatted, layer.getTextField().getValue());
     });
   }
 

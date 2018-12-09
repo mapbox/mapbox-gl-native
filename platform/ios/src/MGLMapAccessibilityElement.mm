@@ -78,7 +78,11 @@
         NSMutableArray *facts = [NSMutableArray array];
         
         // Announce the kind of place or POI.
-        if (attributes[@"type"]) {
+        NSString *languageCode = [MGLVectorTileSource preferredMapboxStreetsLanguage];
+        NSString *categoryAttribute = [NSString stringWithFormat:@"category_%@", languageCode];
+        if (attributes[categoryAttribute]) {
+            [facts addObject:attributes[categoryAttribute]];
+        } else if (attributes[@"type"]) {
             // FIXME: Unfortunately, these types aren’t a closed set that can be
             // localized, since they’re based on OpenStreetMap tags.
             NSString *type = [attributes[@"type"] stringByReplacingOccurrencesOfString:@"_"
@@ -88,7 +92,6 @@
         // Announce the kind of airport, rail station, or mountain based on its
         // Maki image name.
         else if (attributes[@"maki"]) {
-            // TODO: Localize Maki image names.
             [facts addObject:attributes[@"maki"]];
         }
         

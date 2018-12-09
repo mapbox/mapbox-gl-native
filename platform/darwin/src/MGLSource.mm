@@ -70,20 +70,19 @@
             _pendingSource = std::move(removedSource);
             _mapView = nil;
         } else if (outError) {
-            NSString *format = NSLocalizedStringWithDefaultValue(@"REMOVE_SRC_FAIL_IN_USE_FMT", @"Foundation", nil, @"Source '%@' is in use, cannot remove.", @"User-friendly error description");
-            NSString *localizedDescription = [NSString stringWithFormat:format, self.identifier];
+            NSString *localizedDescription = [NSString stringWithFormat:
+                                              NSLocalizedStringWithDefaultValue(@"REMOVE_SRC_FAIL_IN_USE_FMT", @"Foundation", nil, @"The source “%@” can’t be removed while it is in use.", @"User-friendly error description; first placeholder is the source’s identifier"),
+                                              self.identifier];
 
             *outError = [NSError errorWithDomain:MGLErrorDomain
                                             code:MGLErrorCodeSourceIsInUseCannotRemove
                                         userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
         }
-    }
-    else if (outError) {
-        // Consider raising an exception here
-        NSString *format = NSLocalizedStringWithDefaultValue(@"REMOVE_SRC_FAIL_MISMATCH_FMT", @"Foundation", nil, @"Identifier '%@' does not match source identifier '%s'", @"User-friendly error description");
-        NSString *localizedDescription = [NSString stringWithFormat:format,
-                                          self.identifier,
-                                          self.rawSource ? self.rawSource->getID().c_str() : "(null)"];
+    } else if (outError) {
+        // TODO: Consider raising an exception here
+        NSString *localizedDescription = [NSString stringWithFormat:
+                                          NSLocalizedStringWithDefaultValue(@"REMOVE_SRC_FAIL_MISMATCH_FMT", @"Foundation", nil, @"The source can’t be removed because its identifier, “%@”, belongs to a different source in this style.", @"User-friendly error description"),
+                                          self.identifier];
         
         *outError = [NSError errorWithDomain:MGLErrorDomain
                                         code:MGLErrorCodeSourceIdentifierMismatch

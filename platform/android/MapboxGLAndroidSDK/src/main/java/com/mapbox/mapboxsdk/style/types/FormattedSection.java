@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A component of the {@link Formatted}.
@@ -116,5 +118,12 @@ public class FormattedSection {
     result = 31 * result + (fontScale != null ? fontScale.hashCode() : 0);
     result = 31 * result + Arrays.hashCode(fontStack);
     return result;
+  }
+
+  Object[] toArray() {
+    Map<String, Object> params = new HashMap<>();
+    params.put("font-scale", fontScale);
+    params.put("text-font", fontStack);
+    return new Object[] {text, params};
   }
 }

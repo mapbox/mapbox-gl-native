@@ -17,18 +17,9 @@ public class Formatted {
   /**
    * Create a new formatted text.
    *
-   * @param formattedSection section with formatting options
-   */
-  public Formatted(FormattedSection formattedSection) {
-    this(new FormattedSection[] {formattedSection});
-  }
-
-  /**
-   * Create a new formatted text.
-   *
    * @param formattedSections sections with formatting options
    */
-  public Formatted(FormattedSection[] formattedSections) {
+  public Formatted(FormattedSection... formattedSections) {
     this.formattedSections = formattedSections;
   }
 
@@ -39,6 +30,14 @@ public class Formatted {
    */
   public FormattedSection[] getFormattedSections() {
     return formattedSections;
+  }
+
+  public Object[] toArray() {
+    Object[] sections = new Object[formattedSections.length];
+    for (int i = 0; i < formattedSections.length; i++) {
+      sections[i] = formattedSections[i].toArray();
+    }
+    return sections;
   }
 
   @Override

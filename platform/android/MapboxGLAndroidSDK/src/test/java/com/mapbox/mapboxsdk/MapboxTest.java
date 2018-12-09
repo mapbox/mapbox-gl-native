@@ -68,17 +68,6 @@ public class MapboxTest {
     assertFalse(Mapbox.isAccessTokenValid("blabla"));
   }
 
-  @Test
-  public void testConnected() {
-    injectMapboxSingleton("pk.0000000001");
-
-    // test manual connectivity
-    Mapbox.setConnected(true);
-    assertTrue(Mapbox.isConnected());
-    Mapbox.setConnected(false);
-    assertFalse(Mapbox.isConnected());
-  }
-
   private void injectMapboxSingleton(String accessToken) {
     Mapbox mapbox = new Mapbox(context, accessToken);
     try {

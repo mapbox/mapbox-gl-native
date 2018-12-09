@@ -748,27 +748,29 @@ final class NativeMapView {
     nativeAddLayerAt(layer.getNativePtr(), index);
   }
 
-  @Nullable
-  public Layer removeLayer(@NonNull String layerId) {
+  public boolean removeLayer(@NonNull String layerId) {
     if (checkState("removeLayer")) {
-      return null;
+      return false;
     }
-    return nativeRemoveLayerById(layerId);
+
+    Layer layer = getLayer(layerId);
+    if (layer != null) {
+      return removeLayer(layer);
+    }
+    return false;
   }
 
-  @Nullable
-  public Layer removeLayer(@NonNull Layer layer) {
+
+  public boolean removeLayer(@NonNull Layer layer) {
     if (checkState("removeLayer")) {
-      return null;
+      return false;
     }
-    nativeRemoveLayer(layer.getNativePtr());
-    return layer;
+    return nativeRemoveLayer(layer.getNativePtr());
   }
 
-  @Nullable
-  public Layer removeLayerAt(@IntRange(from = 0) int index) {
+  public boolean removeLayerAt(@IntRange(from = 0) int index) {
     if (checkState("removeLayerAt")) {
-      return null;
+      return false;
     }
     return nativeRemoveLayerAt(index);
   }
@@ -794,25 +796,22 @@ final class NativeMapView {
     nativeAddSource(source, source.getNativePtr());
   }
 
-  @Nullable
-  public Source removeSource(@NonNull String sourceId) {
+  public boolean removeSource(@NonNull String sourceId) {
     if (checkState("removeSource")) {
-      return null;
+      return false;
     }
     Source source = getSource(sourceId);
     if (source != null) {
       return removeSource(source);
     }
-    return null;
+    return false;
   }
 
-  @Nullable
-  public Source removeSource(@NonNull Source source) {
+  public boolean removeSource(@NonNull Source source) {
     if (checkState("removeSource")) {
-      return null;
+      return false;
     }
-    nativeRemoveSource(source, source.getNativePtr());
-    return source;
+    return nativeRemoveSource(source, source.getNativePtr());
   }
 
   public void addImage(@NonNull String name, @NonNull Bitmap image, boolean sdf) {
@@ -1217,16 +1216,11 @@ final class NativeMapView {
   @Keep
   private native void nativeAddLayerAt(long layerPtr, int index) throws CannotAddLayerException;
 
-  @NonNull
   @Keep
-  private native Layer nativeRemoveLayerById(String layerId);
+  private native boolean nativeRemoveLayer(long layerId);
 
   @Keep
-  private native void nativeRemoveLayer(long layerId);
-
-  @NonNull
-  @Keep
-  private native Layer nativeRemoveLayerAt(int index);
+  private native boolean nativeRemoveLayerAt(int index);
 
   @NonNull
   @Keep
@@ -1240,7 +1234,7 @@ final class NativeMapView {
   private native void nativeAddSource(Source source, long sourcePtr) throws CannotAddSourceException;
 
   @Keep
-  private native void nativeRemoveSource(Source source, long sourcePtr);
+  private native boolean nativeRemoveSource(Source source, long sourcePtr);
 
   @Keep
   private native void nativeAddImage(String name, Bitmap bitmap, float pixelRatio, boolean sdf);

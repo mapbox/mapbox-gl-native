@@ -7,7 +7,7 @@ namespace mbgl {
 namespace shaders {
 
 const char* vertexPrelude = source() + 0;
-const char* fragmentPrelude = source() + 2558;
+const char* fragmentPrelude = source() + 1252;
 
 } // namespace shaders
 } // namespace mbgl

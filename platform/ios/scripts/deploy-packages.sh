@@ -111,7 +111,7 @@ if [[ "${GITHUB_RELEASE}" == true ]]; then
         --description "${RELEASE_NOTES}"
 fi
 
-buildPackageStyle "iframework" "symbols-dynamic"
-buildPackageStyle "iframework SYMBOLS=NO" "dynamic"
+buildPackageStyle "iframework" "dynamic"
+buildPackageStyle "iframework SYMBOLS=NO" "stripped-dynamic"
 
 step "Finished deploying ${PUBLISH_VERSION} in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds"

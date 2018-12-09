@@ -521,9 +521,12 @@ public class SymbolLayerTest extends BaseActivityTest {
       assertNull(layer.getTextField().getValue());
 
       // Set and Get
-      Formatted propertyValue = new Formatted(new FormattedSection[]{new FormattedSection("default")});
+      Formatted propertyValue = new Formatted(new FormattedSection("default"));
 
       layer.setProperties(textField("default"));
+      assertEquals(layer.getTextField().getValue(), propertyValue);
+
+      layer.setProperties(textField(propertyValue));
       assertEquals(layer.getTextField().getValue(), propertyValue);
 
       layer.setProperties(textField("{token}"));

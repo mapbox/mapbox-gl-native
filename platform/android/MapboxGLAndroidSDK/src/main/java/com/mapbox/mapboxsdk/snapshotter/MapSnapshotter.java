@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,6 +100,7 @@ public class MapSnapshotter {
     private CameraPosition cameraPosition;
     private boolean showLogo = true;
     private String localIdeographFontFamily;
+    private String apiBaseUrl;
 
     /**
      * @param width  the width of the image
@@ -192,6 +194,18 @@ public class MapSnapshotter {
     }
 
     /**
+     * Specifies the URL used for API endpoint.
+     *
+     * @param apiBaseUrl The base of our API endpoint
+     * @return the mutated {@link Options}
+     */
+    @NonNull
+    public Options withApiBaseUrl(String apiBaseUrl) {
+      this.apiBaseUrl = apiBaseUrl;
+      return this;
+    }
+
+    /**
      * @return the width of the image
      */
     public int getWidth() {
@@ -242,6 +256,13 @@ public class MapSnapshotter {
       return localIdeographFontFamily;
     }
 
+    /**
+     * @return The base of our API endpoint
+     */
+    @Nullable
+    public String getApiBaseUrl() {
+      return apiBaseUrl;
+    }
   }
 
   /**
@@ -259,6 +280,11 @@ public class MapSnapshotter {
       telemetry.onAppUserTurnstileEvent();
     }
     FileSource fileSource = FileSource.getInstance(context);
+    String apiBaseUrl = options.getApiBaseUrl();
+    if (!TextUtils.isEmpty(apiBaseUrl)) {
+      fileSource.setApiBaseUrl(apiBaseUrl);
+    }
+
     String programCacheDir = FileSource.getInternalCachePath(context);
 
     nativeInitialize(this, fileSource, options.pixelRatio, options.width,

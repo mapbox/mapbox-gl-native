@@ -20,13 +20,13 @@ Before building, use the scheme picker button in the toolbar to change the schem
 
 **iosapp** is only one of several shared schemes. Others include:
 
-* **CI** builds exactly what gets built for continuous integration on Bitrise.
-* **bench** is a simple benchmarking application. For more consistent results between runs, run `platform/ios/benchmark/assets/{glyphs,tiles}/download.sh` to download any necessary resources.
 * **dynamic** builds the SDK as a dynamic framework.
 * **static** builds the SDK as a static library and separate resource bundle.
 * **dynamic+static** is a combination of the **dynamic** and **static** schemes.
+* **CI** builds exactly what gets built by our continuous integration service.
+* **bench** is a simple benchmarking application. For more consistent results between runs, run `platform/ios/benchmark/assets/{glyphs,tiles}/download.sh` to download any necessary resources.
 
-If you don’t have an Apple Developer account, change the destination to a simulator such as “iPhone 6s” before you build and run the app.
+If you don’t have an Apple Developer account, change the destination to a simulator before you build and run the app.
 
 ### Packaging builds
 
@@ -41,7 +41,7 @@ Build and package the SDK by using the `make iframework` command. You can custom
 * `BUILDTYPE=Release` will optimize for distribution. Defaults to `Debug`.
 * `BUILD_DEVICE=false` builds only for the iOS Simulator.
 * `FORMAT=dynamic` builds only a dynamic framework. `FORMAT=static` builds only a static framework, for legacy compatibility.
-* `SYMBOLS=NO` strips the build output of any debug symbols, yielding smaller binaries. Defaults to `YES`.
+* `SYMBOLS=NO` strips the build output of debug symbols. Defaults to `YES`.
 
 An example command that creates a dynamic framework suitable for eventual App Store distribution:
 
