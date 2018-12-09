@@ -186,13 +186,13 @@ void NativeMapView::onDidFinishRenderingMap(MapObserver::RenderMode mode) {
     javaPeer.get(*_env).Call(*_env, onDidFinishRenderingMap, (jboolean) (mode != MapObserver::RenderMode::Partial));
 }
 
-void NativeMapView::onDidEnterIdle() {
+void NativeMapView::onDidBecomeIdle() {
     assert(vm != nullptr);
 
     android::UniqueEnv _env = android::AttachEnv();
     static auto& javaClass = jni::Class<NativeMapView>::Singleton(*_env);
-    static auto onDidEnterIdle = javaClass.GetMethod<void ()>(*_env, "onDidEnterIdle");
-    javaPeer.get(*_env).Call(*_env, onDidEnterIdle);
+    static auto onDidBecomeIdle = javaClass.GetMethod<void ()>(*_env, "onDidBecomeIdle");
+    javaPeer.get(*_env).Call(*_env, onDidBecomeIdle);
 }
 
 void NativeMapView::onDidFinishLoadingStyle() {
