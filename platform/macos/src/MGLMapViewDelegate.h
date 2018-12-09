@@ -162,7 +162,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @param mapView The map view that has just entered the idle state.
  */
-- (void)mapViewDidEnterIdle:(MGLMapView *)mapView;
+- (void)mapViewDidBecomeIdle:(MGLMapView *)mapView;
 
 /**
  Tells the delegate that the map has just finished loading a style.
