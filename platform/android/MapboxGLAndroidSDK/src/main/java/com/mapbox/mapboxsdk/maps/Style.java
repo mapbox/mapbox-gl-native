@@ -103,8 +103,9 @@ public class Style {
    */
   public void addSource(@NonNull Source source) {
     if (!fullyLoaded) {
-      // we are loading a new style
-      return;
+      throw new IllegalStateException(
+        "Calling addSource on old Style instance, use the more recently loaded Style instead."
+      );
     }
 
     sources.put(source.getId(), source);
@@ -195,8 +196,9 @@ public class Style {
    */
   public void addLayer(@NonNull Layer layer) {
     if (!fullyLoaded) {
-      // we are loading a new style
-      return;
+      throw new IllegalStateException(
+        "Calling addLayer on old Style instance, use the more recently loaded Style instead."
+      );
     }
 
     layers.put(layer.getId(), layer);
@@ -211,8 +213,9 @@ public class Style {
    */
   public void addLayerBelow(@NonNull Layer layer, @NonNull String below) {
     if (!fullyLoaded) {
-      // we are loading a new style
-      return;
+      throw new IllegalStateException(
+        "Calling addLayerBelow on old Style instance, use the more recently loaded Style instead."
+      );
     }
 
     layers.put(layer.getId(), layer);
@@ -227,8 +230,9 @@ public class Style {
    */
   public void addLayerAbove(@NonNull Layer layer, @NonNull String above) {
     if (!fullyLoaded) {
-      // we are loading a new style
-      return;
+      throw new IllegalStateException(
+        "Calling addLayerAbove on old Style instance, use the more recently loaded Style instead."
+      );
     }
 
     layers.put(layer.getId(), layer);
@@ -244,8 +248,9 @@ public class Style {
    */
   public void addLayerAt(@NonNull Layer layer, @IntRange(from = 0) int index) {
     if (!fullyLoaded) {
-      // we are loading a new style
-      return;
+      throw new IllegalStateException(
+        "Calling addLayerAt on old Style instance, use the more recently loaded Style instead."
+      );
     }
 
     layers.put(layer.getId(), layer);
@@ -368,8 +373,9 @@ public class Style {
    */
   public void addImage(@NonNull String name, @NonNull Bitmap image, boolean sdf) {
     if (!fullyLoaded) {
-      // we are loading a new style
-      return;
+      throw new IllegalStateException(
+        "Calling addImage on old Style instance, use the more recently loaded Style instead."
+      );
     }
 
     nativeMapView.addImage(name, image, sdf);
@@ -380,8 +386,9 @@ public class Style {
    */
   public void addImages(@NonNull HashMap<String, Bitmap> images) {
     if (!fullyLoaded) {
-      // we are loading a new style
-      return;
+      throw new IllegalStateException(
+        "Calling addImages on old Style instance, use the more recently loaded Style instead."
+      );
     }
 
     nativeMapView.addImages(images);
@@ -431,8 +438,9 @@ public class Style {
    */
   public void setTransition(@NonNull TransitionOptions transitionOptions) {
     if (!fullyLoaded) {
-      // we are loading a new style
-      return;
+      throw new IllegalStateException(
+        "Calling setTransition on old Style instance, use the more recently loaded Style instead."
+      );
     }
 
     nativeMapView.setTransitionDuration(transitionOptions.getDuration());
@@ -541,6 +549,12 @@ public class Style {
     }
   }
 
+  /**
+   * Returns true if the style is fully loaded. Returns false if style hasn't been fully loaded or a new style is
+   * underway of being loaded.
+   *
+   * @return True if fully loaded, false otherwise
+   */
   public boolean isFullyLoaded() {
     return fullyLoaded;
   }
