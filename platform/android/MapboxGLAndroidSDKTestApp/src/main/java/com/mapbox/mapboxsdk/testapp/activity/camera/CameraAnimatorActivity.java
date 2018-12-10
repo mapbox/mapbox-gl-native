@@ -24,6 +24,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -81,6 +82,7 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
   @Override
   public void onMapReady(@NonNull final MapboxMap map) {
     mapboxMap = map;
+    map.setStyle(Style.MAPBOX_STREETS);
     initFab();
   }
 

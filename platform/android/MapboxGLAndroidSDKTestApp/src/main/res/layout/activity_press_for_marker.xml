@@ -13,7 +13,6 @@
         app:mapbox_cameraTargetLat="45.1855569"
         app:mapbox_cameraTargetLng="5.7215506"
         app:mapbox_cameraZoom="11"
-        app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"
         app:mapbox_uiAttributionGravity="top|end"
         app:mapbox_uiLogoGravity="top|end"
         app:mapbox_uiLogoMarginRight="28dp"/>

@@ -146,13 +146,6 @@ public class MapboxMapOptionsTest {
   }
 
   @Test
-  public void testStyleUrl() {
-    assertEquals(Style.DARK, new MapboxMapOptions().styleUrl(Style.DARK).getStyleUrl());
-    assertNotEquals(Style.LIGHT, new MapboxMapOptions().styleUrl(Style.DARK).getStyleUrl());
-    assertNull(new MapboxMapOptions().getStyleUrl());
-  }
-
-  @Test
   public void testCamera() {
     CameraPosition position = new CameraPosition.Builder().build();
     assertEquals(new CameraPosition.Builder(position).build(), new MapboxMapOptions().camera(position).getCamera());

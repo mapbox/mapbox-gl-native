@@ -58,7 +58,6 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
     MapboxMapOptions options = new MapboxMapOptions()
       .attributionTintColor(RED_COLOR)
       .compassFadesWhenFacingNorth(false)
-      .styleUrl(Style.MAPBOX_STREETS)
       .camera(new CameraPosition.Builder()
         .target(new LatLng(45.520486, -122.673541))
         .zoom(12)
@@ -77,6 +76,7 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
   @Override
   public void onMapReady(@NonNull MapboxMap map) {
     mapboxMap = map;
+    map.setStyle(Style.MAPBOX_STREETS);
 
     map.setOnPolygonClickListener(polygon -> Toast.makeText(
       PolygonActivity.this,

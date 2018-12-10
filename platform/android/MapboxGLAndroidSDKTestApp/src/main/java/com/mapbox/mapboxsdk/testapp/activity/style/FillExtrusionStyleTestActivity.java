@@ -2,9 +2,9 @@ package com.mapbox.mapboxsdk.testapp.activity.style;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -23,7 +23,11 @@ public class FillExtrusionStyleTestActivity extends AppCompatActivity {
     // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(mapboxMap -> FillExtrusionStyleTestActivity.this.mapboxMap = mapboxMap);
+    mapView.getMapAsync(mapboxMap ->
+      mapboxMap.setStyle(new Style.Builder().fromUrl(Style.MAPBOX_STREETS),
+        style -> FillExtrusionStyleTestActivity.this.mapboxMap = mapboxMap
+      )
+    );
   }
 
   public MapboxMap getMapboxMap() {

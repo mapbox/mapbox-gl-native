@@ -19,6 +19,7 @@ import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -89,8 +90,10 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
   @Override
   public void onMapReady(@NonNull final MapboxMap map) {
     mapboxMap = map;
-    addSymbolClickListener();
-    new LoadDataTask(this).execute();
+    map.setStyle(Style.OUTDOORS, style -> {
+      addSymbolClickListener();
+      new LoadDataTask(SymbolGeneratorActivity.this).execute();
+    });
   }
 
   private void addSymbolClickListener() {

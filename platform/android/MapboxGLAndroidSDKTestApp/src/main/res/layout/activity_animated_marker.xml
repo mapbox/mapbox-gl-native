@@ -12,7 +12,6 @@
         android:layout_height="wrap_content"
         app:mapbox_cameraTargetLat="38.90962"
         app:mapbox_cameraTargetLng="-77.04341"
-        app:mapbox_cameraZoom="15"
-        app:mapbox_styleUrl="@string/mapbox_style_light"/>
+        app:mapbox_cameraZoom="15"/>
 
 </LinearLayout>

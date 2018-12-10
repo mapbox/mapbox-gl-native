@@ -45,7 +45,6 @@ public class SupportMapFragmentActivity extends AppCompatActivity implements Map
 
   private MapboxMapOptions createFragmentOptions() {
     MapboxMapOptions options = new MapboxMapOptions();
-    options.styleUrl(Style.MAPBOX_STREETS);
 
     options.scrollGesturesEnabled(false);
     options.zoomGesturesEnabled(false);
@@ -73,6 +72,7 @@ public class SupportMapFragmentActivity extends AppCompatActivity implements Map
   @Override
   public void onMapReady(@NonNull MapboxMap map) {
     mapboxMap = map;
+    mapboxMap.setStyle(Style.SATELLITE);
   }
 
   @Override

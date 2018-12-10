@@ -11,13 +11,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
+import timber.log.Timber;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -25,8 +26,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import timber.log.Timber;
 
 /**
  * Test activity showcasing adding a large amount of Markers.
@@ -43,9 +42,14 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_marker_bulk);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(mapboxMap -> BulkMarkerActivity.this.mapboxMap = mapboxMap);
+    mapView.getMapAsync(this::initMap);
+  }
+
+  private void initMap(MapboxMap mapboxMap) {
+    this.mapboxMap =  mapboxMap;
+    mapboxMap.setStyle(Style.MAPBOX_STREETS);
   }
 
   @Override

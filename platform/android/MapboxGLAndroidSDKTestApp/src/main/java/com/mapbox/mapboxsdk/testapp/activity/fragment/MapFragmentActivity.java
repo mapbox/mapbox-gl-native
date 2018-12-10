@@ -44,7 +44,6 @@ public class MapFragmentActivity extends AppCompatActivity implements MapFragmen
 
   private MapboxMapOptions createFragmentOptions() {
     MapboxMapOptions options = new MapboxMapOptions();
-    options.styleUrl(Style.OUTDOORS);
 
     options.scrollGesturesEnabled(false);
     options.zoomGesturesEnabled(false);
@@ -72,6 +71,7 @@ public class MapFragmentActivity extends AppCompatActivity implements MapFragmen
   @Override
   public void onMapReady(@NonNull MapboxMap map) {
     mapboxMap = map;
+    mapboxMap.setStyle(Style.OUTDOORS);
   }
 
   @Override

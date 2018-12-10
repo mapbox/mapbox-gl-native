@@ -28,7 +28,7 @@ public class HillshadeLayerActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_fill_extrusion_layer);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
@@ -37,7 +37,7 @@ public class HillshadeLayerActivity extends AppCompatActivity {
       HillshadeLayer hillshadeLayer = new HillshadeLayer(LAYER_ID, SOURCE_ID);
       mapboxMap.setStyle(new Style.Builder()
         .fromUrl(Style.MAPBOX_STREETS)
-        .withLayer(hillshadeLayer)
+        .withLayerBelow(hillshadeLayer, LAYER_BELOW_ID)
         .withSource(rasterDemSource)
       );
     });

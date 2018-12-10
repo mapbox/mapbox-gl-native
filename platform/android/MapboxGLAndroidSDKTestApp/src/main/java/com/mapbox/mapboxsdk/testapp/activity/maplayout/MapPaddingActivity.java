@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
@@ -33,6 +34,7 @@ public class MapPaddingActivity extends AppCompatActivity {
 
     mapView.getMapAsync(mapboxMap -> {
       MapPaddingActivity.this.mapboxMap = mapboxMap;
+      mapboxMap.setStyle(Style.MAPBOX_STREETS);
 
       int paddingLeft = (int) getResources().getDimension(R.dimen.map_padding_left);
       int paddingBottom = (int) getResources().getDimension(R.dimen.map_padding_bottom);
