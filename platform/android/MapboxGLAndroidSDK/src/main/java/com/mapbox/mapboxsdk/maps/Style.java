@@ -5,7 +5,6 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
-
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
@@ -54,11 +53,7 @@ public class Style {
    */
   @NonNull
   public String getUrl() {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return "";
-    }
-
+    validateState("getUrl");
     return nativeMapView.getStyleUrl();
   }
 
@@ -69,11 +64,7 @@ public class Style {
    */
   @NonNull
   public String getJson() {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return "";
-    }
-
+    validateState("getJson");
     return nativeMapView.getStyleJson();
   }
 
@@ -88,11 +79,7 @@ public class Style {
    */
   @NonNull
   public List<Source> getSources() {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return new ArrayList<>();
-    }
-
+    validateState("getSources");
     return nativeMapView.getSources();
   }
 
@@ -102,12 +89,7 @@ public class Style {
    * @param source the source to add
    */
   public void addSource(@NonNull Source source) {
-    if (!fullyLoaded) {
-      throw new IllegalStateException(
-        "Calling addSource on old Style instance, use the more recently loaded Style instead."
-      );
-    }
-
+    validateState("addSource");
     sources.put(source.getId(), source);
     nativeMapView.addSource(source);
   }
@@ -120,11 +102,7 @@ public class Style {
    */
   @Nullable
   public Source getSource(String id) {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return null;
-    }
-
+    validateState("getSource");
     Source source = sources.get(id);
     if (source == null) {
       source = nativeMapView.getSource(id);
@@ -141,11 +119,7 @@ public class Style {
    */
   @Nullable
   public <T extends Source> T getSourceAs(@NonNull String sourceId) {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return null;
-    }
-
+    validateState("getSourceAs");
     // noinspection unchecked
     if (sources.containsKey(sourceId)) {
       return (T) sources.get(sourceId);
@@ -160,11 +134,7 @@ public class Style {
    * @return the source handle or null if the source was not present
    */
   public boolean removeSource(@NonNull String sourceId) {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return false;
-    }
-
+    validateState("removeSource");
     sources.remove(sourceId);
     return nativeMapView.removeSource(sourceId);
   }
@@ -176,11 +146,7 @@ public class Style {
    * @return the source
    */
   public boolean removeSource(@NonNull Source source) {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return false;
-    }
-
+    validateState("removeSource");
     sources.remove(source.getId());
     return nativeMapView.removeSource(source);
   }
@@ -195,12 +161,7 @@ public class Style {
    * @param layer the layer to add
    */
   public void addLayer(@NonNull Layer layer) {
-    if (!fullyLoaded) {
-      throw new IllegalStateException(
-        "Calling addLayer on old Style instance, use the more recently loaded Style instead."
-      );
-    }
-
+    validateState("addLayer");
     layers.put(layer.getId(), layer);
     nativeMapView.addLayer(layer);
   }
@@ -212,12 +173,7 @@ public class Style {
    * @param below the layer id to add this layer before
    */
   public void addLayerBelow(@NonNull Layer layer, @NonNull String below) {
-    if (!fullyLoaded) {
-      throw new IllegalStateException(
-        "Calling addLayerBelow on old Style instance, use the more recently loaded Style instead."
-      );
-    }
-
+    validateState("addLayerBelow");
     layers.put(layer.getId(), layer);
     nativeMapView.addLayerBelow(layer, below);
   }
@@ -229,12 +185,7 @@ public class Style {
    * @param above the layer id to add this layer above
    */
   public void addLayerAbove(@NonNull Layer layer, @NonNull String above) {
-    if (!fullyLoaded) {
-      throw new IllegalStateException(
-        "Calling addLayerAbove on old Style instance, use the more recently loaded Style instead."
-      );
-    }
-
+    validateState("addLayerAbove");
     layers.put(layer.getId(), layer);
     nativeMapView.addLayerAbove(layer, above);
   }
@@ -247,12 +198,7 @@ public class Style {
    * @param index the index to insert the layer at
    */
   public void addLayerAt(@NonNull Layer layer, @IntRange(from = 0) int index) {
-    if (!fullyLoaded) {
-      throw new IllegalStateException(
-        "Calling addLayerAt on old Style instance, use the more recently loaded Style instead."
-      );
-    }
-
+    validateState("addLayerAbove");
     layers.put(layer.getId(), layer);
     nativeMapView.addLayerAt(layer, index);
   }
@@ -265,11 +211,7 @@ public class Style {
    */
   @Nullable
   public Layer getLayer(@NonNull String id) {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return null;
-    }
-
+    validateState("getLayer");
     Layer layer = layers.get(id);
     if (layer == null) {
       layer = nativeMapView.getLayer(id);
@@ -286,11 +228,7 @@ public class Style {
    */
   @Nullable
   public <T extends Layer> T getLayerAs(@NonNull String layerId) {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return null;
-    }
-
+    validateState("getLayerAs");
     // noinspection unchecked
     return (T) nativeMapView.getLayer(layerId);
   }
@@ -302,11 +240,7 @@ public class Style {
    */
   @NonNull
   public List<Layer> getLayers() {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return new ArrayList<>();
-    }
-
+    validateState("getLayers");
     return nativeMapView.getLayers();
   }
 
@@ -317,10 +251,7 @@ public class Style {
    * @return the removed layer or null if not found
    */
   public boolean removeLayer(@NonNull String layerId) {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return false;
-    }
+    validateState("removeLayer");
     layers.remove(layerId);
     return nativeMapView.removeLayer(layerId);
   }
@@ -332,10 +263,7 @@ public class Style {
    * @return the layer
    */
   public boolean removeLayer(@NonNull Layer layer) {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return false;
-    }
+    validateState("removeLayer");
     layers.remove(layer.getId());
     return nativeMapView.removeLayer(layer);
   }
@@ -347,6 +275,7 @@ public class Style {
    * @return the removed layer or null if not found
    */
   public boolean removeLayerAt(@IntRange(from = 0) int index) {
+    validateState("removeLayerAt");
     return nativeMapView.removeLayerAt(index);
   }
 
@@ -372,12 +301,7 @@ public class Style {
    * @param sdf   the flag indicating image is an SDF or template image
    */
   public void addImage(@NonNull String name, @NonNull Bitmap image, boolean sdf) {
-    if (!fullyLoaded) {
-      throw new IllegalStateException(
-        "Calling addImage on old Style instance, use the more recently loaded Style instead."
-      );
-    }
-
+    validateState("addImage");
     nativeMapView.addImage(name, image, sdf);
   }
 
@@ -385,12 +309,7 @@ public class Style {
    * Adds an images to be used in the map's style.
    */
   public void addImages(@NonNull HashMap<String, Bitmap> images) {
-    if (!fullyLoaded) {
-      throw new IllegalStateException(
-        "Calling addImages on old Style instance, use the more recently loaded Style instead."
-      );
-    }
-
+    validateState("addImages");
     nativeMapView.addImages(images);
   }
 
@@ -400,11 +319,7 @@ public class Style {
    * @param name the name of the image to remove
    */
   public void removeImage(@NonNull String name) {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return;
-    }
-
+    validateState("removeImage");
     nativeMapView.removeImage(name);
   }
 
@@ -416,11 +331,7 @@ public class Style {
    */
   @Nullable
   public Bitmap getImage(@NonNull String id) {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return null;
-    }
-
+    validateState("getImage");
     return nativeMapView.getImage(id);
   }
 
@@ -437,12 +348,7 @@ public class Style {
    * @param transitionOptions the transition options
    */
   public void setTransition(@NonNull TransitionOptions transitionOptions) {
-    if (!fullyLoaded) {
-      throw new IllegalStateException(
-        "Calling setTransition on old Style instance, use the more recently loaded Style instead."
-      );
-    }
-
+    validateState("setTransition");
     nativeMapView.setTransitionDuration(transitionOptions.getDuration());
     nativeMapView.setTransitionDelay(transitionOptions.getDelay());
   }
@@ -457,11 +363,7 @@ public class Style {
    */
   @NonNull
   public TransitionOptions getTransition() {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return new TransitionOptions(0, 0);
-    }
-
+    validateState("getTransition");
     return new TransitionOptions(nativeMapView.getTransitionDuration(), nativeMapView.getTransitionDelay());
   }
 
@@ -476,19 +378,20 @@ public class Style {
    */
   @Nullable
   public Light getLight() {
-    if (!fullyLoaded) {
-      // we are loading a new style
-      return null;
-    }
-
+    validateState("getLight");
     return nativeMapView.getLight();
   }
+
+  //
+  // State
+  //
 
   /**
    * Called when the underlying map will start loading a new style. This method will clean up this style
    * by setting the java sources and layers in a detached state and removing them from core.
    */
   void onWillStartLoadingMap() {
+    fullyLoaded = false;
     for (Source source : sources.values()) {
       if (source != null) {
         source.setDetached();
@@ -511,8 +414,6 @@ public class Style {
     sources.clear();
     layers.clear();
     images.clear();
-
-    fullyLoaded = false;
   }
 
   /**
@@ -557,6 +458,19 @@ public class Style {
    */
   public boolean isFullyLoaded() {
     return fullyLoaded;
+  }
+
+  /**
+   * Validates the style state, throw an IllegalArgumentException on invalid state.
+   *
+   * @param methodCall the calling method name
+   */
+  private void validateState(String methodCall) {
+    if (!fullyLoaded) {
+      throw new IllegalStateException(
+        String.format("Calling %s when a newer style is loading/has loaded.", methodCall)
+      );
+    }
   }
 
   //
