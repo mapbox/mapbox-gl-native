@@ -4,7 +4,7 @@
 
 #include "MGLStyleLayer_Private.h"
 
-#include <mbgl/style/layers/hillshade_layer.hpp>
+#include <mbgl/layermanager/hillshade_layer_factory.hpp>
 
 namespace mbgl {
 

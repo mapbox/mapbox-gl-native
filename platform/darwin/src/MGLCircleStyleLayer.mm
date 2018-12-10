@@ -10,6 +10,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLCircleStyleLayer_Private.h"
 
+#include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 
 

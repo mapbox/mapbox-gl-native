@@ -10,6 +10,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLHillshadeStyleLayer_Private.h"
 
+#include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 
 

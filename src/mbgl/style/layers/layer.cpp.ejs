@@ -16,8 +16,6 @@
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/fnv_hash.hpp>
 
-#include <mbgl/renderer/layers/render_<%- type.replace('-', '_') %>_layer.hpp>
-
 namespace mbgl {
 namespace style {
 
@@ -314,34 +312,4 @@ Mutable<Layer::Impl> <%- camelize(type) %>Layer::mutableBaseImpl() const {
 }
 
 } // namespace style
-
-const style::LayerTypeInfo* <%- camelize(type) %>LayerFactory::getTypeInfo() const noexcept {
-    return style::<%- camelize(type) %>Layer::Impl::staticTypeInfo();
-}
-
-std::unique_ptr<style::Layer> <%- camelize(type) %>LayerFactory::createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept {
-<% if (type === 'background') { -%>
-    (void)value;
-    return std::unique_ptr<style::Layer>(new style::<%- camelize(type) %>Layer(id));
-<% } else { -%>
-    optional<std::string> source = getSource(value);
-    if (!source) {
-        return nullptr;
-    }
-
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::<%- camelize(type) %>Layer(id, *source));
-<% if (type !== 'raster' && type !== 'hillshade') { -%>
-    if (!initSourceLayerAndFilter(layer.get(), value)) {
-        return nullptr;
-    }
-<% } -%>
-    return layer;
-<% } -%>
-}
-
-std::unique_ptr<RenderLayer> <%- camelize(type) %>LayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
-    assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<Render<%- camelize(type) %>Layer>(staticImmutableCast<style::<%- camelize(type) %>Layer::Impl>(std::move(impl)));
-}
-
 } // namespace mbgl

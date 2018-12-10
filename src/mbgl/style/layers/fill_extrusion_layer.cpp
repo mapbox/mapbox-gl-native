@@ -11,8 +11,6 @@
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/fnv_hash.hpp>
 
-#include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
-
 namespace mbgl {
 namespace style {
 
@@ -562,27 +560,4 @@ Mutable<Layer::Impl> FillExtrusionLayer::mutableBaseImpl() const {
 }
 
 } // namespace style
-
-const style::LayerTypeInfo* FillExtrusionLayerFactory::getTypeInfo() const noexcept {
-    return style::FillExtrusionLayer::Impl::staticTypeInfo();
-}
-
-std::unique_ptr<style::Layer> FillExtrusionLayerFactory::createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept {
-    optional<std::string> source = getSource(value);
-    if (!source) {
-        return nullptr;
-    }
-
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::FillExtrusionLayer(id, *source));
-    if (!initSourceLayerAndFilter(layer.get(), value)) {
-        return nullptr;
-    }
-    return layer;
-}
-
-std::unique_ptr<RenderLayer> FillExtrusionLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
-    assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderFillExtrusionLayer>(staticImmutableCast<style::FillExtrusionLayer::Impl>(std::move(impl)));
-}
-
 } // namespace mbgl

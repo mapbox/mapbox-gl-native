@@ -4,7 +4,7 @@
 
 #include "MGLStyleLayer_Private.h"
 
-#include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/layermanager/background_layer_factory.hpp>
 
 namespace mbgl {
 

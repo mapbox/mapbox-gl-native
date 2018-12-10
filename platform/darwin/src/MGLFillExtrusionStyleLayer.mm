@@ -10,6 +10,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLFillExtrusionStyleLayer_Private.h"
 
+#include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 
 

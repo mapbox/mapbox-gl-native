@@ -4,7 +4,7 @@
 
 #include "MGLStyleLayer_Private.h"
 
-#include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/layermanager/circle_layer_factory.hpp>
 
 namespace mbgl {
 
