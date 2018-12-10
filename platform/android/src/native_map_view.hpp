@@ -138,7 +138,9 @@ public:
 
     void setVisibleCoordinateBounds(JNIEnv&, const jni::Array<jni::Object<LatLng>>&, const jni::Object<RectF>&, jni::jdouble, jni::jlong);
 
-    void setContentPadding(JNIEnv&, double, double, double, double);
+    void setContentPadding(JNIEnv&, float, float, float, float);
+
+    jni::Local<jni::Array<jni::jfloat>> getContentPadding(JNIEnv&);
 
     void scheduleSnapshot(jni::JNIEnv&);
 

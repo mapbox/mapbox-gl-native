@@ -387,15 +387,29 @@ final class NativeMapView {
     nativeRotateBy(sx / pixelRatio, sy / pixelRatio, ex, ey, duration);
   }
 
-  public void setContentPadding(int[] padding) {
+  public void setContentPadding(float[] padding) {
     if (checkState("setContentPadding")) {
       return;
     }
+    // TopLeftBottomRight
     nativeSetContentPadding(
       padding[1] / pixelRatio,
       padding[0] / pixelRatio,
       padding[3] / pixelRatio,
       padding[2] / pixelRatio);
+  }
+
+  public float[] getContentPadding() {
+    if (checkState("getContentPadding")) {
+      return new float[] {0, 0, 0, 0};
+    }
+    float[] topLeftBottomRight = nativeGetContentPadding();
+    return new float[]{
+      topLeftBottomRight[1] * pixelRatio,
+      topLeftBottomRight[0] * pixelRatio,
+      topLeftBottomRight[3] * pixelRatio,
+      topLeftBottomRight[2] * pixelRatio
+    };
   }
 
   public void setBearing(double degrees) {
@@ -1115,7 +1129,10 @@ final class NativeMapView {
   private native void nativeRotateBy(double sx, double sy, double ex, double ey, long duration);
 
   @Keep
-  private native void nativeSetContentPadding(double top, double left, double bottom, double right);
+  private native void nativeSetContentPadding(float top, float left, float bottom, float right);
+
+  @Keep
+  private native float[] nativeGetContentPadding();
 
   @Keep
   private native void nativeSetBearing(double degrees, long duration);

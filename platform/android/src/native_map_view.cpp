@@ -429,8 +429,19 @@ void NativeMapView::setVisibleCoordinateBounds(JNIEnv& env, const jni::Array<jni
     map->easeTo(cameraOptions, animationOptions);
 }
 
-void NativeMapView::setContentPadding(JNIEnv&, double top, double left, double bottom, double right) {
+void NativeMapView::setContentPadding(JNIEnv&, float top, float left, float bottom, float right) {
     insets = {top, left, bottom, right};
+}
+
+jni::Local<jni::Array<jni::jfloat>> NativeMapView::getContentPadding(JNIEnv& env) {
+    auto result = jni::Array<jni::jfloat>::New(env, 4);
+    std::vector<jfloat> vect;
+    vect.push_back(insets.top());
+    vect.push_back(insets.left());
+    vect.push_back(insets.bottom());
+    vect.push_back(insets.right());
+    result.SetRegion<std::vector<jni::jfloat>>(env, 0, vect);
+    return result;
 }
 
 void NativeMapView::scheduleSnapshot(jni::JNIEnv&) {
@@ -1005,6 +1016,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::resetNorth, "nativeResetNorth"),
             METHOD(&NativeMapView::setVisibleCoordinateBounds, "nativeSetVisibleCoordinateBounds"),
             METHOD(&NativeMapView::setContentPadding, "nativeSetContentPadding"),
+            METHOD(&NativeMapView::getContentPadding, "nativeGetContentPadding"),
             METHOD(&NativeMapView::scheduleSnapshot, "nativeTakeSnapshot"),
             METHOD(&NativeMapView::getCameraPosition, "nativeGetCameraPosition"),
             METHOD(&NativeMapView::updateMarker, "nativeUpdateMarker"),

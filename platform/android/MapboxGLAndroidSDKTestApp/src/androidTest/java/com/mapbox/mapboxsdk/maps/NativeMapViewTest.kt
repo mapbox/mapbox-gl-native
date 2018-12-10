@@ -7,7 +7,10 @@ import android.support.test.annotation.UiThreadTest
 import android.support.test.runner.AndroidJUnit4
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.geometry.LatLngBounds
+import com.mapbox.mapboxsdk.geometry.ProjectedMeters
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer
+import com.mapbox.mapboxsdk.testapp.utils.TestConstants
 import junit.framework.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -33,7 +36,7 @@ class NativeMapViewTest {
     @UiThreadTest
     fun before() {
         val context = InstrumentationRegistry.getContext()
-        nativeMapView = NativeMapView(context, false, null, null, DummyRenderer(context))
+        nativeMapView = NativeMapView(context, 2.0f, false, null, null, DummyRenderer(context))
         nativeMapView.resizeView(WIDTH, HEIGHT)
     }
 
@@ -150,7 +153,7 @@ class NativeMapViewTest {
 
     @Test
     @UiThreadTest
-    fun testPrefetchTilesTrue(){
+    fun testPrefetchTilesTrue() {
         val expected = true
         nativeMapView.prefetchesTiles = true
         val actual = nativeMapView.prefetchesTiles
@@ -159,7 +162,7 @@ class NativeMapViewTest {
 
     @Test
     @UiThreadTest
-    fun testPrefetchTilesFalse(){
+    fun testPrefetchTilesFalse() {
         val expected = false
         nativeMapView.prefetchesTiles = false
         val actual = nativeMapView.prefetchesTiles
@@ -168,10 +171,169 @@ class NativeMapViewTest {
 
     @Test
     @UiThreadTest
-    fun testPrefetchTilesDefault(){
+    fun testPrefetchTilesDefault() {
         val expected = true
         val actual = nativeMapView.prefetchesTiles
         assertEquals("Flag should match", expected, actual)
+    }
+
+    @Test
+    @UiThreadTest
+    fun testSetStyleUrl() {
+        val expected = Style.DARK
+        nativeMapView.styleUrl = expected
+        val actual = nativeMapView.styleUrl
+        assertEquals("Style URL should match", expected, actual)
+    }
+
+    @Test
+    @UiThreadTest
+    fun testSetStyleJson() {
+        val expected = "{}"
+        nativeMapView.styleJson = expected
+        val actual = nativeMapView.styleJson
+        assertEquals("Style JSON should match", expected, actual)
+    }
+
+    @Test
+    @UiThreadTest
+    fun testSetContentPadding() {
+        val expected = floatArrayOf(1.0f, 2.0f, 3.0f, 4.0f)
+        nativeMapView.contentPadding = expected
+        val actual = nativeMapView.contentPadding
+        assertEquals("Left should match", expected[0], actual[0])
+        assertEquals("Top should match", expected[1], actual[1])
+        assertEquals("Right should match", expected[2], actual[2])
+        assertEquals("Bottom should match", expected[3], actual[3])
+    }
+
+    @Test
+    @UiThreadTest
+    fun testSetMinZoom() {
+        val expected = 12.0
+        nativeMapView.minZoom = expected
+        val actual = nativeMapView.minZoom
+        assertEquals("Min zoom should match", expected, actual)
+    }
+
+    @Test
+    @UiThreadTest
+    fun testSetMaxZoom() {
+        val expected = 12.0
+        nativeMapView.maxZoom = expected
+        val actual = nativeMapView.maxZoom
+        assertEquals("Max zoom should match", expected, actual)
+    }
+
+    @Test
+    @UiThreadTest
+    fun testGetProjectedMetersAtLatitude() {
+        val expected = 38986.83510557766
+        val actual = nativeMapView.getMetersPerPixelAtLatitude(5.0)
+        assertEquals("Get projected meters should match", expected, actual)
+    }
+
+    @Test
+    @UiThreadTest
+    fun testLatLngForProjectedMeters() {
+        val expected = LatLng(0.01796630538796444, 0.02694945852363162)
+        val actual = nativeMapView.latLngForProjectedMeters(ProjectedMeters(2000.0, 3000.0))
+        assertEquals("Get LatLng for projected meters", expected, actual)
+    }
+
+    @Test
+    @UiThreadTest
+    fun testFlyTo() {
+        val expected = CameraPosition.Builder()
+                .zoom(12.0)
+                .tilt(30.0)
+                .target(LatLng(12.0, 14.0))
+                .bearing(20.0)
+                .build()
+        nativeMapView.flyTo(expected.bearing, expected.target, 0, expected.tilt, expected.zoom)
+        val actual = nativeMapView.cameraPosition
+        assertEquals("Bearing should match", expected.bearing, actual.bearing, TestConstants.BEARING_DELTA)
+        assertEquals("Latitude should match", expected.target.latitude, actual.target.latitude, TestConstants.LAT_LNG_DELTA)
+        assertEquals("Longitude should match", expected.target.longitude, actual.target.longitude, TestConstants.LAT_LNG_DELTA)
+        assertEquals("Tilt should match", expected.tilt, actual.tilt, TestConstants.TILT_DELTA)
+        assertEquals("Zoom should match", expected.zoom, actual.zoom, TestConstants.ZOOM_DELTA)
+    }
+
+    @Test
+    @UiThreadTest
+    fun testEaseTo() {
+        val expected = CameraPosition.Builder()
+                .zoom(12.0)
+                .tilt(30.0)
+                .target(LatLng(12.0, 14.0))
+                .bearing(20.0)
+                .build()
+        nativeMapView.easeTo(expected.bearing, expected.target, 0, expected.tilt, expected.zoom, false)
+        val actual = nativeMapView.cameraPosition
+        assertEquals("Bearing should match", expected.bearing, actual.bearing, TestConstants.BEARING_DELTA)
+        assertEquals("Latitude should match", expected.target.latitude, actual.target.latitude, TestConstants.LAT_LNG_DELTA)
+        assertEquals("Longitude should match", expected.target.longitude, actual.target.longitude, TestConstants.LAT_LNG_DELTA)
+        assertEquals("Tilt should match", expected.tilt, actual.tilt, TestConstants.TILT_DELTA)
+        assertEquals("Zoom should match", expected.zoom, actual.zoom, TestConstants.ZOOM_DELTA)
+    }
+
+    @Test
+    @UiThreadTest
+    fun testResetPosition() {
+        val expected = CameraPosition.Builder()
+                .zoom(0.0)
+                .tilt(0.0)
+                .target(LatLng(0.0, 0.0))
+                .bearing(0.0)
+                .build()
+        nativeMapView.jumpTo(1.0, LatLng(1.0, 2.0), 23.0, 12.0)
+        nativeMapView.resetPosition()
+        val actual = nativeMapView.cameraPosition
+        assertEquals("Bearing should match", expected.bearing, actual.bearing, TestConstants.BEARING_DELTA)
+        assertEquals("Latitude should match", expected.target.latitude, actual.target.latitude, TestConstants.LAT_LNG_DELTA)
+        assertEquals("Longitude should match", expected.target.longitude, actual.target.longitude, TestConstants.LAT_LNG_DELTA)
+        assertEquals("Tilt should match", expected.tilt, actual.tilt, TestConstants.TILT_DELTA)
+        assertEquals("Zoom should match", expected.zoom, actual.zoom, TestConstants.ZOOM_DELTA)
+    }
+
+    @Test
+    @UiThreadTest
+    fun testGetCameraForLatLngBounds() {
+        val expected = CameraPosition.Builder()
+                .zoom(3.5258764777024005)
+                .tilt(0.0)
+                .target(LatLng(23.182767623652808, 13.999999999994088))
+                .bearing(0.0)
+                .build()
+        val actual = nativeMapView.getCameraForLatLngBounds(
+                LatLngBounds.from(30.0, 12.0, 16.0, 16.0),
+                intArrayOf(0, 0, 0, 0),
+                0.0,
+                0.0
+        )
+        assertEquals("Bearing should match", expected.bearing, actual.bearing, TestConstants.BEARING_DELTA)
+        assertEquals("Latitude should match", expected.target.latitude, actual.target.latitude, TestConstants.LAT_LNG_DELTA)
+        assertEquals("Longitude should match", expected.target.longitude, actual.target.longitude, TestConstants.LAT_LNG_DELTA)
+        assertEquals("Tilt should match", expected.tilt, actual.tilt, TestConstants.TILT_DELTA)
+        assertEquals("Zoom should match", expected.zoom, actual.zoom, TestConstants.ZOOM_DELTA)
+    }
+
+    @Test
+    @UiThreadTest
+    fun testMoveBy() {
+        val expected = CameraPosition.Builder()
+                .zoom(0.0)
+                .tilt(0.0)
+                .target(LatLng(4.21494310024160, -4.218749958739409))
+                .bearing(0.0)
+                .build()
+        nativeMapView.moveBy(12.0, 12.0)
+        val actual = nativeMapView.cameraPosition
+        assertEquals("Bearing should match", expected.bearing, actual.bearing, TestConstants.BEARING_DELTA)
+        assertEquals("Latitude should match", expected.target.latitude, actual.target.latitude, TestConstants.LAT_LNG_DELTA)
+        assertEquals("Longitude should match", expected.target.longitude, actual.target.longitude, TestConstants.LAT_LNG_DELTA)
+        assertEquals("Tilt should match", expected.tilt, actual.tilt, TestConstants.TILT_DELTA)
+        assertEquals("Zoom should match", expected.zoom, actual.zoom, TestConstants.ZOOM_DELTA)
     }
 
     class DummyRenderer(context: Context) : MapRenderer(context, null) {
