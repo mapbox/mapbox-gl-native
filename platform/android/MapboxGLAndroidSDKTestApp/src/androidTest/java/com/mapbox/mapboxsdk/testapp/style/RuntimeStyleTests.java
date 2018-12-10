@@ -133,7 +133,7 @@ public class RuntimeStyleTests extends BaseActivityTest {
 
         // Test remove by index bounds checks
         Timber.i("Remove layer at index > size");
-        assertNull(mapboxMap.getStyle().removeLayerAt(Integer.MAX_VALUE));
+        assertFalse(mapboxMap.getStyle().removeLayerAt(Integer.MAX_VALUE));
       }
     });
   }

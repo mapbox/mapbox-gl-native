@@ -916,7 +916,7 @@ public final class LocationComponent {
     }
 
     if (!style.isFullyLoaded()) {
-      throw new IllegalStateException("Style hasn't fully loaded yet, can't initialize LocationComponent.");
+      throw new IllegalStateException("Style is invalid, provide the most recently loaded one.");
     }
 
     this.style = style;
