@@ -245,7 +245,9 @@ void Placement::commit(const Placement& prevPlacement, TimePoint now) {
 
     bool placementChanged = false;
 
-    float increment = mapMode == MapMode::Continuous && transitionOptions.enablePlacementTransitions ?
+    float increment = mapMode == MapMode::Continuous &&
+                      transitionOptions.enablePlacementTransitions &&
+                      transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION) > Milliseconds(0) ?
         std::chrono::duration<float>(commitTime - prevPlacement.commitTime) / transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION) :
         1.0;
 
@@ -405,7 +407,8 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
 }
 
 float Placement::symbolFadeChange(TimePoint now) const {
-    if (mapMode == MapMode::Continuous && transitionOptions.enablePlacementTransitions) {
+    if (mapMode == MapMode::Continuous && transitionOptions.enablePlacementTransitions &&
+        transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION) > Milliseconds(0)) {
         return std::chrono::duration<float>(now - commitTime) / transitionOptions.duration.value_or(util::DEFAULT_TRANSITION_DURATION);
     } else {
         return 1.0;
