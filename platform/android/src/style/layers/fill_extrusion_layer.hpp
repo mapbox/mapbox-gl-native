@@ -4,6 +4,7 @@
 
 #include "layer.hpp"
 #include "../transition_options.hpp"
+#include <mbgl/layermanager/fill_extrusion_layer_factory.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <jni/jni.hpp>
 

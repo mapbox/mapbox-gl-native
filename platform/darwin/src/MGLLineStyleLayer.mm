@@ -10,6 +10,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLLineStyleLayer_Private.h"
 
+#include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 
 

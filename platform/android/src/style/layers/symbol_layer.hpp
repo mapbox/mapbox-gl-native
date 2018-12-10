@@ -4,6 +4,7 @@
 
 #include "layer.hpp"
 #include "../transition_options.hpp"
+#include <mbgl/layermanager/symbol_layer_factory.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <jni/jni.hpp>
 

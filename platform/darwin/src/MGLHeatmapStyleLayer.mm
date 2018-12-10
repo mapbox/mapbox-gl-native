@@ -10,6 +10,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLHeatmapStyleLayer_Private.h"
 
+#include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 
 

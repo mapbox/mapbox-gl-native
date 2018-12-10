@@ -1,14 +1,15 @@
 #include <mbgl/layermanager/layer_manager.hpp>
-#include <mbgl/style/layers/background_layer.hpp>
-#include <mbgl/style/layers/circle_layer.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
-#include <mbgl/style/layers/fill_extrusion_layer.hpp>
-#include <mbgl/style/layers/fill_layer.hpp>
-#include <mbgl/style/layers/heatmap_layer.hpp>
-#include <mbgl/style/layers/hillshade_layer.hpp>
-#include <mbgl/style/layers/line_layer.hpp>
-#include <mbgl/style/layers/raster_layer.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
+
+#include <mbgl/layermanager/background_layer_factory.hpp>
+#include <mbgl/layermanager/circle_layer_factory.hpp>
+#include <mbgl/layermanager/custom_layer_factory.hpp>
+#include <mbgl/layermanager/fill_extrusion_layer_factory.hpp>
+#include <mbgl/layermanager/fill_layer_factory.hpp>
+#include <mbgl/layermanager/heatmap_layer_factory.hpp>
+#include <mbgl/layermanager/hillshade_layer_factory.hpp>
+#include <mbgl/layermanager/line_layer_factory.hpp>
+#include <mbgl/layermanager/raster_layer_factory.hpp>
+#include <mbgl/layermanager/symbol_layer_factory.hpp>
 
 #include <map>
 #include <memory>

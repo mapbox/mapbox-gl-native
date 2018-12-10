@@ -4,7 +4,7 @@
 
 #include "MGLStyleLayer_Private.h"
 
-#include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/layermanager/line_layer_factory.hpp>
 
 namespace mbgl {
 

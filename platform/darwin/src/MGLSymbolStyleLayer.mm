@@ -10,6 +10,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLSymbolStyleLayer_Private.h"
 
+#include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 
 

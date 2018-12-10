@@ -4,7 +4,7 @@
 
 #include "MGLStyleLayer_Private.h"
 
-#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/layermanager/symbol_layer_factory.hpp>
 
 namespace mbgl {
 

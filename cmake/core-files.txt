@@ -95,10 +95,30 @@ src/mbgl/gl/vertex_array_extension.hpp
 src/mbgl/gl/vertex_buffer.hpp
 
 # layermanager
+include/mbgl/layermanager/background_layer_factory.hpp
+include/mbgl/layermanager/circle_layer_factory.hpp
+include/mbgl/layermanager/custom_layer_factory.hpp
+include/mbgl/layermanager/fill_extrusion_layer_factory.hpp
+include/mbgl/layermanager/fill_layer_factory.hpp
+include/mbgl/layermanager/heatmap_layer_factory.hpp
+include/mbgl/layermanager/hillshade_layer_factory.hpp
 include/mbgl/layermanager/layer_factory.hpp
 include/mbgl/layermanager/layer_manager.hpp
+include/mbgl/layermanager/line_layer_factory.hpp
+include/mbgl/layermanager/raster_layer_factory.hpp
+include/mbgl/layermanager/symbol_layer_factory.hpp
+src/mbgl/layermanager/background_layer_factory.cpp
+src/mbgl/layermanager/circle_layer_factory.cpp
+src/mbgl/layermanager/custom_layer_factory.cpp
+src/mbgl/layermanager/fill_extrusion_layer_factory.cpp
+src/mbgl/layermanager/fill_layer_factory.cpp
+src/mbgl/layermanager/heatmap_layer_factory.cpp
+src/mbgl/layermanager/hillshade_layer_factory.cpp
 src/mbgl/layermanager/layer_factory.cpp
 src/mbgl/layermanager/layer_manager.cpp
+src/mbgl/layermanager/line_layer_factory.cpp
+src/mbgl/layermanager/raster_layer_factory.cpp
+src/mbgl/layermanager/symbol_layer_factory.cpp
 
 # layout
 src/mbgl/layout/clip_lines.cpp

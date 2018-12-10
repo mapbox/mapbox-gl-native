@@ -4,7 +4,7 @@
 
 #include "MGLStyleLayer_Private.h"
 
-#include <mbgl/style/layers/raster_layer.hpp>
+#include <mbgl/layermanager/raster_layer_factory.hpp>
 
 namespace mbgl {
 

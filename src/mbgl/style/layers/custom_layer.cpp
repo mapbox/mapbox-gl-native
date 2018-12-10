@@ -56,18 +56,4 @@ const LayerTypeInfo* CustomLayer::Impl::staticTypeInfo() noexcept {
 }
 
 } // namespace style
-
-const style::LayerTypeInfo* CustomLayerFactory::getTypeInfo() const noexcept {
-    return &style::typeInfoCustom;
-}
-
-std::unique_ptr<style::Layer> CustomLayerFactory::createLayer(const std::string&, const style::conversion::Convertible&) noexcept {
-    assert(false);
-    return nullptr;
-}
-
-std::unique_ptr<RenderLayer> CustomLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
-    return std::make_unique<RenderCustomLayer>(staticImmutableCast<style::CustomLayer::Impl>(std::move(impl)));
-}
-
 } // namespace mbgl

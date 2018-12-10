@@ -10,6 +10,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLBackgroundStyleLayer_Private.h"
 
+#include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 
 

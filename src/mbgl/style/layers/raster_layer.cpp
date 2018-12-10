@@ -11,8 +11,6 @@
 #include <mbgl/style/conversion_impl.hpp>
 #include <mbgl/util/fnv_hash.hpp>
 
-#include <mbgl/renderer/layers/render_raster_layer.hpp>
-
 namespace mbgl {
 namespace style {
 
@@ -527,24 +525,4 @@ Mutable<Layer::Impl> RasterLayer::mutableBaseImpl() const {
 }
 
 } // namespace style
-
-const style::LayerTypeInfo* RasterLayerFactory::getTypeInfo() const noexcept {
-    return style::RasterLayer::Impl::staticTypeInfo();
-}
-
-std::unique_ptr<style::Layer> RasterLayerFactory::createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept {
-    optional<std::string> source = getSource(value);
-    if (!source) {
-        return nullptr;
-    }
-
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::RasterLayer(id, *source));
-    return layer;
-}
-
-std::unique_ptr<RenderLayer> RasterLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
-    assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderRasterLayer>(staticImmutableCast<style::RasterLayer::Impl>(std::move(impl)));
-}
-
 } // namespace mbgl
