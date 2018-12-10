@@ -139,20 +139,21 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
                 }
             }
         }
+        //only triangulate and draw the area of the feature if it is a polygon since other features (e.g. LineString) do not have a base area
+        if(feature.getType() == FeatureType::Polygon) {
+            std::vector<uint32_t> indices = mapbox::earcut(polygon);
 
-        std::vector<uint32_t> indices = mapbox::earcut(polygon);
+            std::size_t nIndices = indices.size();
+            assert(nIndices % 3 == 0);
 
-        std::size_t nIndices = indices.size();
-        assert(nIndices % 3 == 0);
-
-        for (uint32_t i = 0; i < nIndices; i += 3) {
-            // Counter-Clockwise winding order.
-            triangles.emplace_back(flatIndices[indices[i]], flatIndices[indices[i + 2]],
-                                   flatIndices[indices[i + 1]]);
+            for (uint32_t i = 0; i < nIndices; i += 3) {
+                // Counter-Clockwise winding order.
+                triangles.emplace_back(flatIndices[indices[i]], flatIndices[indices[i + 2]],
+                                       flatIndices[indices[i + 1]]);
+            }
+            triangleSegment.indexLength += nIndices;
         }
-
         triangleSegment.vertexLength += totalVertices;
-        triangleSegment.indexLength += nIndices;
     }
 
     for (auto& pair : paintPropertyBinders) {
