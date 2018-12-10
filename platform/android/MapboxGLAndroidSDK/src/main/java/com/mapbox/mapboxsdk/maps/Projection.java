@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.maps;
 import android.graphics.PointF;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
-
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.constants.GeometryConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -32,7 +31,11 @@ public class Projection {
 
   void setContentPadding(int[] contentPadding) {
     this.contentPadding = contentPadding;
-    nativeMapView.setContentPadding(contentPadding);
+    float[] output = new float[contentPadding.length];
+    for (int i = 0; i < contentPadding.length; i++) {
+      output[i] = contentPadding[i];
+    }
+    nativeMapView.setContentPadding(output);
   }
 
   int[] getContentPadding() {
@@ -121,10 +124,10 @@ public class Projection {
       top = 0;
       bottom = nativeMapView.getHeight();
     } else {
-      left = contentPadding[0];
-      right = nativeMapView.getWidth() - contentPadding[2];
-      top = contentPadding[1];
-      bottom = nativeMapView.getHeight() - contentPadding[3];
+      left = (float) contentPadding[0];
+      right = (float) (nativeMapView.getWidth() - contentPadding[2]);
+      top = (float) contentPadding[1];
+      bottom = (float) (nativeMapView.getHeight() - contentPadding[3]);
     }
 
     LatLng center = fromScreenLocation(new PointF(left + (right - left) / 2, top + (bottom - top) / 2));
