@@ -23,8 +23,7 @@
             android:layout_weight="0.5"
             mapbox:mapbox_cameraTargetLat="38.913187"
             mapbox:mapbox_cameraTargetLng="-77.032546"
-            mapbox:mapbox_cameraZoom="12"
-            mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10" />
+            mapbox:mapbox_cameraZoom="12" />
 
         <!-- SF -->
         <fragment
@@ -35,8 +34,7 @@
             android:layout_weight="0.5"
             mapbox:mapbox_cameraTargetLat="37.775732"
             mapbox:mapbox_cameraTargetLng="-122.413985"
-            mapbox:mapbox_cameraZoom="13"
-            mapbox:mapbox_styleUrl="mapbox://styles/mapbox/outdoors-v10" />
+            mapbox:mapbox_cameraZoom="13"/>
     </LinearLayout>
 
     <LinearLayout
@@ -55,8 +53,7 @@
             android:layout_weight="0.5"
             mapbox:mapbox_cameraTargetLat="12.97913"
             mapbox:mapbox_cameraTargetLng="77.59188"
-            mapbox:mapbox_cameraZoom="14"
-            mapbox:mapbox_styleUrl="mapbox://styles/mapbox/light-v9" />
+            mapbox:mapbox_cameraZoom="14" />
 
         <!-- Ayacucho -->
         <fragment
@@ -67,7 +64,6 @@
             android:layout_weight="0.5"
             mapbox:mapbox_cameraTargetLat="-13.155980"
             mapbox:mapbox_cameraTargetLng="-74.217134"
-            mapbox:mapbox_cameraZoom="15"
-            mapbox:mapbox_styleUrl="mapbox://styles/mapbox/dark-v9" />
+            mapbox:mapbox_cameraZoom="15" />
     </LinearLayout>
 </LinearLayout>

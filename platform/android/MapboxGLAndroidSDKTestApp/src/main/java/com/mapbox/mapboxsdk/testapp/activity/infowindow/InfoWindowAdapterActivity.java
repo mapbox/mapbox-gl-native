@@ -12,6 +12,7 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CityStateMarker;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CityStateMarkerOptions;
@@ -30,12 +31,14 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_infowindow_adapter);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      addMarkers();
-      addCustomInfoWindowAdapter();
+      map.setStyle(Style.MAPBOX_STREETS, style -> {
+        addMarkers();
+        addCustomInfoWindowAdapter();
+      });
     });
   }
 

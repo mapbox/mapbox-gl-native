@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Toast;
-
 import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
@@ -123,7 +122,7 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
 
-    mapboxMap.getStyle(style -> {
+    mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
       int[] padding;
       if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
         padding = new int[] {0, 750, 0, 0};

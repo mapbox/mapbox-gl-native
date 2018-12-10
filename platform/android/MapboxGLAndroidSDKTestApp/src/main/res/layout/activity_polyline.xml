@@ -12,7 +12,6 @@
         app:mapbox_uiAttributionTintColor="@android:color/holo_green_dark"
         app:mapbox_cameraTargetLat="47.798202"
         app:mapbox_cameraTargetLng="7.573781"
-        app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"
         app:mapbox_cameraZoom="4" />
 
     <android.support.design.widget.FloatingActionButton

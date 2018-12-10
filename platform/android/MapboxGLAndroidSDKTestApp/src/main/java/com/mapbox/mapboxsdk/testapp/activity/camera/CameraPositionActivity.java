@@ -20,6 +20,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 import timber.log.Timber;
 
@@ -44,7 +45,7 @@ public class CameraPositionActivity extends FragmentActivity implements OnMapRea
     toolbar.setNavigationIcon(R.drawable.ic_ab_back);
     toolbar.setNavigationOnClickListener(v -> finish());
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
   }
@@ -52,12 +53,14 @@ public class CameraPositionActivity extends FragmentActivity implements OnMapRea
   @Override
   public void onMapReady(@NonNull final MapboxMap map) {
     mapboxMap = map;
-    toggleLogCameraChanges();
+    map.setStyle(Style.SATELLITE_STREETS, style -> {
+      // add a listener to FAB
+      fab = findViewById(R.id.fab);
+      fab.setColorFilter(ContextCompat.getColor(CameraPositionActivity.this, R.color.primary));
+      fab.setOnClickListener(this);
+    });
 
-    // add a listener to FAB
-    fab = (FloatingActionButton) findViewById(R.id.fab);
-    fab.setColorFilter(ContextCompat.getColor(CameraPositionActivity.this, R.color.primary));
-    fab.setOnClickListener(this);
+    toggleLogCameraChanges();
 
     // listen to long click events to toggle logging camera changes
     mapboxMap.addOnMapLongClickListener(this);

@@ -4,18 +4,17 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
+import timber.log.Timber;
 
 import java.io.IOException;
-
-import timber.log.Timber;
 
 /**
  * Example showcasing how to create a TextureView with a transparent background.
@@ -40,21 +39,26 @@ public class TextureViewTransparentBackgroundActivity extends AppCompatActivity 
   }
 
   private void setupMapView(Bundle savedInstanceState) {
-    try {
-      MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
-      mapboxMapOptions.styleJson(ResourceUtils.readRawResource(this, R.raw.no_bg_style));
-      mapboxMapOptions.translucentTextureSurface(true);
-      mapboxMapOptions.textureMode(true);
-      mapboxMapOptions.camera(new CameraPosition.Builder()
-        .zoom(2)
-        .target(new LatLng(48.507879, 8.363795))
-        .build()
-      );
+    MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
+    mapboxMapOptions.translucentTextureSurface(true);
+    mapboxMapOptions.textureMode(true);
+    mapboxMapOptions.camera(new CameraPosition.Builder()
+      .zoom(2)
+      .target(new LatLng(48.507879, 8.363795))
+      .build()
+    );
 
-      mapView = new MapView(this, mapboxMapOptions);
-      mapView.onCreate(savedInstanceState);
-      mapView.getMapAsync(map -> mapboxMap = map);
-      ((ViewGroup) findViewById(R.id.coordinator_layout)).addView(mapView);
+    mapView = new MapView(this, mapboxMapOptions);
+    mapView.onCreate(savedInstanceState);
+    mapView.getMapAsync(this::initMap);
+    ((ViewGroup) findViewById(R.id.coordinator_layout)).addView(mapView);
+  }
+
+  private void initMap(MapboxMap mapboxMap) {
+    try {
+      mapboxMap.setStyle(
+        new Style.Builder().fromJson(ResourceUtils.readRawResource(this, R.raw.no_bg_style))
+      );
     } catch (IOException exception) {
       Timber.e(exception);
     }

@@ -18,8 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="?android:attr/actionBarSize"
-            app:mapbox_uiAttributionTintColor="@color/redAccent"
-            app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"/>
+            app:mapbox_uiAttributionTintColor="@color/redAccent"/>
 
     <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
