@@ -14,6 +14,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -42,6 +43,7 @@ public class LatLngBoundsForCameraActivity extends AppCompatActivity implements 
   @Override
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
+    mapboxMap.setStyle(Style.SATELLITE_STREETS);
     mapboxMap.setLatLngBoundsForCameraTarget(ICELAND_BOUNDS);
     mapboxMap.setMinZoomPreference(2);
     showBoundsArea();

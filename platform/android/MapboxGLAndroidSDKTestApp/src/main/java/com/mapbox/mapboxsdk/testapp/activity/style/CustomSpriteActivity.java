@@ -14,6 +14,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -48,7 +49,7 @@ public class CustomSpriteActivity extends AppCompatActivity {
     mapView.getMapAsync(map -> {
       mapboxMap = map;
 
-      map.getStyle(style -> {
+      map.setStyle(Style.MAPBOX_STREETS, style -> {
         final FloatingActionButton fab = findViewById(R.id.fab);
         fab.setColorFilter(ContextCompat.getColor(CustomSpriteActivity.this, R.color.primary));
         fab.setOnClickListener(new View.OnClickListener() {

@@ -95,7 +95,7 @@ public class GridSourceActivity extends AppCompatActivity implements OnMapReadyC
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_grid_source);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
   }

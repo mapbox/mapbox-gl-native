@@ -80,7 +80,6 @@ public class LocationMapChangeActivity extends AppCompatActivity implements OnMa
   @SuppressLint("MissingPermission")
   private void activateLocationComponent(@NonNull Style style) {
     LocationComponent locationComponent = mapboxMap.getLocationComponent();
-    locationComponent.onStart();
     locationComponent.activateLocationComponent(this, style);
     locationComponent.setLocationComponentEnabled(true);
     locationComponent.setRenderMode(RenderMode.COMPASS);

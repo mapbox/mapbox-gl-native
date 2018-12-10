@@ -12,7 +12,6 @@
         android:layout_height="match_parent"
         app:mapbox_cameraTargetLat="64.840048"
         app:mapbox_cameraTargetLng="-18.910457"
-        app:mapbox_cameraZoom="4"
-        app:mapbox_styleUrl="@string/mapbox_style_satellite_streets"/>
+        app:mapbox_cameraZoom="4"/>
 
 </android.support.design.widget.CoordinatorLayout>

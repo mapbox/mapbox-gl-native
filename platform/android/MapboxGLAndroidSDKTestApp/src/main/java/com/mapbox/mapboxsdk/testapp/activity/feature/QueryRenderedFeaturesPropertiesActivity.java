@@ -18,6 +18,7 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 
@@ -70,13 +71,15 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(mapboxMap -> {
-      QueryRenderedFeaturesPropertiesActivity.this.mapboxMap = mapboxMap;
+      mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
+        QueryRenderedFeaturesPropertiesActivity.this.mapboxMap = mapboxMap;
 
-      // Add custom window adapter
-      addCustomInfoWindowAdapter(mapboxMap);
+        // Add custom window adapter
+        addCustomInfoWindowAdapter(mapboxMap);
 
-      // Add a click listener
-      mapboxMap.addOnMapClickListener(mapClickListener);
+        // Add a click listener
+        mapboxMap.addOnMapClickListener(mapClickListener);
+      });
     });
   }
 

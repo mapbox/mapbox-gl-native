@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -23,14 +24,16 @@ public class EspressoTestActivity extends AppCompatActivity implements OnMapRead
     setContentView(R.layout.activity_espresso_test);
 
     // Initialize map as normal
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
   }
 
   @Override
-  public void onMapReady(@NonNull MapboxMap map) {
-    mapboxMap = map;
+  public void onMapReady(@NonNull final MapboxMap map) {
+    map.setStyle(new Style.Builder().fromUrl("asset://streets.json"),
+      style -> mapboxMap = map
+    );
   }
 
   public MapboxMap getMapboxMap() {
