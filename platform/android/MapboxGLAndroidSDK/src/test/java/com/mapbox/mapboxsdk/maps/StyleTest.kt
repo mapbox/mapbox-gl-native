@@ -14,6 +14,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import java.lang.IllegalStateException
 
 @RunWith(RobolectricTestRunner::class)
 class StyleTest {
@@ -304,4 +305,15 @@ class StyleTest {
         mapboxMap.setStyle(Style.MAPBOX_STREETS)
         verify(exactly = 1) { callback.onStyleLoaded(any()) }
     }
+
+    @Test(expected = IllegalStateException::class)
+    fun testIllegalStateExceptionWithStyleReload() {
+        val builder = Style.Builder().fromUrl(Style.MAPBOX_STREETS)
+        mapboxMap.setStyle(builder)
+        mapboxMap.notifyStyleLoaded()
+        val style = mapboxMap.style
+        mapboxMap.setStyle(Style.Builder().fromUrl(Style.DARK))
+        style!!.addLayer(mockk<SymbolLayer>())
+    }
+
 }
