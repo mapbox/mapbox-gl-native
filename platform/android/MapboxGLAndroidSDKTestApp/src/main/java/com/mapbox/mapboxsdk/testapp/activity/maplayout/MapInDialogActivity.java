@@ -11,8 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
 import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -28,7 +28,7 @@ public class MapInDialogActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_map_in_dialog);
 
-    Button button = (Button) findViewById(R.id.button_open_dialog);
+    Button button = findViewById(R.id.button_open_dialog);
     button.setOnClickListener(view -> {
       FragmentManager fm = getSupportFragmentManager();
       MapDialogFragment editNameDialogFragment = MapDialogFragment.newInstance("Map Dialog");
@@ -60,8 +60,9 @@ public class MapInDialogActivity extends AppCompatActivity {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
       super.onViewCreated(view, savedInstanceState);
 
-      mapView = (MapView) view.findViewById(R.id.mapView);
+      mapView = view.findViewById(R.id.mapView);
       mapView.onCreate(savedInstanceState);
+      mapView.getMapAsync(mapboxMap -> mapboxMap.setStyle(Style.OUTDOORS));
     }
 
     @NonNull
@@ -69,6 +70,7 @@ public class MapInDialogActivity extends AppCompatActivity {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
       return new Dialog(getActivity(), getTheme()) {
         boolean destroyed = false;
+
         @Override
         public void dismiss() {
           if (mapView != null && !destroyed) {

@@ -92,8 +92,6 @@ public final class MapboxMap {
     // Map configuration
     setDebugActive(options.getDebugActive());
     setApiBaseUrl(options);
-    setStyleUrl(options);
-    setStyleJson(options);
     setPrefetchesTiles(options);
   }
 
@@ -849,25 +847,6 @@ public final class MapboxMap {
         notifyStyleLoaded();
       }
     });
-  }
-
-  /**
-   * Loads a new map style from MapboxMapOptions if available.
-   *
-   * @param options the object containing the style url
-   */
-  private void setStyleUrl(@NonNull MapboxMapOptions options) {
-    String style = options.getStyleUrl();
-    if (!TextUtils.isEmpty(style)) {
-      setStyle(new Style.Builder().fromUrl(style));
-    }
-  }
-
-  private void setStyleJson(@NonNull MapboxMapOptions options) {
-    String styleJson = options.getStyleJson();
-    if (!TextUtils.isEmpty(styleJson)) {
-      setStyle(new Style.Builder().fromJson(styleJson));
-    }
   }
 
   //
@@ -1839,7 +1818,7 @@ public final class MapboxMap {
   /**
    * Returns the {@link LocationComponent} that can be used to display user's location on the map.
    * <p>
-   * Use {@link LocationComponent#activateLocationComponent(Context)} or any overload to activate the component,
+   * Use {@link LocationComponent#activateLocationComponent(Context, Style)} or any overload to activate the component,
    * then, enable it with {@link LocationComponent#setLocationComponentEnabled(boolean)}.
    * <p>
    * You can customize the location icon and more with {@link com.mapbox.mapboxsdk.location.LocationComponentOptions}.

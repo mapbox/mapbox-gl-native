@@ -77,6 +77,7 @@ public class AnimatedSymbolLayerActivity extends AppCompatActivity {
     mapView.getMapAsync(map -> {
       this.mapboxMap = map;
       map.setStyle(Style.MAPBOX_STREETS, style -> {
+        this.style = style;
         setupCars();
         animateRandomRoutes();
         animateTaxi();
@@ -184,7 +185,7 @@ public class AnimatedSymbolLayerActivity extends AppCompatActivity {
   }
 
   private void updatePassengerSource() {
-    GeoJsonSource source = mapboxMap.getStyle().getSourceAs(PASSENGER_SOURCE);
+    GeoJsonSource source = style.getSourceAs(PASSENGER_SOURCE);
     FeatureCollection featureCollection = FeatureCollection.fromFeatures(new Feature[] {
       Feature.fromGeometry(
         Point.fromLngLat(
@@ -261,7 +262,7 @@ public class AnimatedSymbolLayerActivity extends AppCompatActivity {
 
     randomCarSource = new GeoJsonSource(RANDOM_CAR_SOURCE, featuresFromRoutes());
     style.addSource(randomCarSource);
-    mapboxMap.getStyle().addImage(RANDOM_CAR_IMAGE_ID,
+    style.addImage(RANDOM_CAR_IMAGE_ID,
       ((BitmapDrawable) getResources().getDrawable(R.drawable.ic_car_top)).getBitmap());
 
     SymbolLayer symbolLayer = new SymbolLayer(RANDOM_CAR_LAYER, RANDOM_CAR_SOURCE);
@@ -286,7 +287,7 @@ public class AnimatedSymbolLayerActivity extends AppCompatActivity {
       )
     });
 
-    mapboxMap.getStyle().addImage(PASSENGER,
+    style.addImage(PASSENGER,
       ((BitmapDrawable) getResources().getDrawable(R.drawable.icon_burned)).getBitmap());
 
     GeoJsonSource geoJsonSource = new GeoJsonSource(PASSENGER_SOURCE, featureCollection);
@@ -312,7 +313,7 @@ public class AnimatedSymbolLayerActivity extends AppCompatActivity {
     FeatureCollection featureCollection = FeatureCollection.fromFeatures(new Feature[] {feature});
 
     taxi = new Car(feature, passenger, getDuration());
-    mapboxMap.getStyle().addImage(TAXI,
+    style.addImage(TAXI,
       ((BitmapDrawable) getResources().getDrawable(R.drawable.ic_taxi_top)).getBitmap());
     taxiSource = new GeoJsonSource(TAXI_SOURCE, featureCollection);
     style.addSource(taxiSource);

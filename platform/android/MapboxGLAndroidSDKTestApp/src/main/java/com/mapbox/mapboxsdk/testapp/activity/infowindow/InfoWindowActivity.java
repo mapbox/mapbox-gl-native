@@ -13,6 +13,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.text.DecimalFormat;
@@ -63,8 +64,10 @@ public class InfoWindowActivity extends AppCompatActivity
   @Override
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
-    addMarkers();
-    addInfoWindowListeners();
+    mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
+      addMarkers();
+      addInfoWindowListeners();
+    });
   }
 
   private void addMarkers() {

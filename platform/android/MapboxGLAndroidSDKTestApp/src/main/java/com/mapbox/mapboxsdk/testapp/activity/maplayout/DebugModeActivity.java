@@ -98,9 +98,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
   }
 
   protected MapboxMapOptions setupMapboxMapOptions() {
-    MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
-    mapboxMapOptions.styleUrl(Style.MAPBOX_STREETS);
-    return mapboxMapOptions;
+    return new MapboxMapOptions();
   }
 
   @Override
