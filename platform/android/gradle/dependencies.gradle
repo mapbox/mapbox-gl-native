@@ -14,16 +14,16 @@ ext {
             constraintLayout: '1.1.2',
             espresso        : '3.0.2',
             testRunner      : '1.0.2',
-            leakCanary      : '1.6.1',
+            leakCanary      : '1.6.2',
             junit           : '4.12',
             mockito         : '2.23.4',
             mockk           : '1.9',
-            robolectric     : '3.8',
+            robolectric     : '4.0.2',
             timber          : '4.7.1',
-            okhttp          : '3.11.0',
+            okhttp          : '3.12.0',
             kotlin          : '1.3.11',
-            licenses        : '0.8.41',
-            lint            : '26.1.3',
+            licenses        : '0.8.42',
+            lint            : '26.1.4',
             gms             : '16.0.0',
             reLinker        : '1.3.1'
     ]
@@ -33,8 +33,6 @@ ext {
             mapboxJavaGeoJSON      : "com.mapbox.mapboxsdk:mapbox-sdk-geojson:${versions.mapboxServices}",
             mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxTelemetry}",
             mapboxAndroidGestures  : "com.mapbox.mapboxsdk:mapbox-android-gestures:${versions.mapboxGestures}",
-
-            // for testApp
             mapboxJavaTurf         : "com.mapbox.mapboxsdk:mapbox-sdk-turf:${versions.mapboxServices}",
 
             junit                  : "junit:junit:${versions.junit}",
