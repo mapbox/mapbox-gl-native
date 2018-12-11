@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Locale;
 
 import com.mapbox.mapboxsdk.testapp.utils.IdleZoomListener;
-
 import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
@@ -171,10 +170,10 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
 
   private void setupFpsChangeView() {
     findViewById(R.id.fps_30).setOnClickListener(view -> {
-      mapView.setPreferredFramesPerSecond(30);
+      mapView.setMaximumFps(30);
     });
     findViewById(R.id.fps_60).setOnClickListener(view -> {
-      mapView.setPreferredFramesPerSecond(60);
+      mapView.setMaximumFps(60);
     });
   }
 
