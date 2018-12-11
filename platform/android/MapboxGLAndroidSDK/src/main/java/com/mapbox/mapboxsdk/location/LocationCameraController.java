@@ -129,7 +129,7 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
       };
 
       CameraPosition currentPosition = mapboxMap.getCameraPosition();
-      if (Utils.immediateAnimation(currentPosition.target, target, currentPosition.zoom)) {
+      if (Utils.immediateAnimation(mapboxMap.getProjection(), currentPosition.target, target)) {
         mapboxMap.moveCamera(
           update,
           callback);
