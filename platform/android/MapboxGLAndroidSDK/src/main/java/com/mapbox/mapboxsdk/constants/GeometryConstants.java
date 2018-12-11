@@ -24,7 +24,7 @@ public class GeometryConstants {
   /**
    * This constant represents the lowest longitude value available to represent a geolocation.
    */
-  public static final double MIN_LONGITUDE = Double.MAX_VALUE;
+  public static final double MIN_LONGITUDE = Double.MIN_VALUE;
 
   /**
    * This constant represents the highest longitude value available to represent a geolocation.
