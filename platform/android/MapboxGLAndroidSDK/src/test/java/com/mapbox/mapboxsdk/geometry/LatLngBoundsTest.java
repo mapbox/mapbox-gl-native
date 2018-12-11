@@ -388,34 +388,18 @@ public class LatLngBoundsTest {
   public void intersectSouthLessThanNorthCheck() {
     exception.expect(IllegalArgumentException.class);
     exception.expectMessage("latNorth cannot be less than latSouth");
-
     LatLngBounds intersectLatLngBounds =
       LatLngBounds.from(10, 10, 0, 0)
         .intersect(0, 200, 20, 0);
   }
 
-
   @Test
-  public void intersectEastWrapCheck() {
-
-    LatLngBounds latLngBounds1 = LatLngBounds.from(10, -150, 0, 0);
-    LatLngBounds latLngBounds2 = LatLngBounds.from(90, 200, 0, 0);
-
-    LatLngBounds intersectLatLngBounds = LatLngBounds.from(10, -160, 0, 0);
-
-    assertEquals(latLngBounds1.intersect(latLngBounds2), intersectLatLngBounds);
-    assertEquals(latLngBounds2.intersect(latLngBounds1), intersectLatLngBounds);
-  }
-
-  @Test
-  public void intersectWestWrapCheck() {
-    LatLngBounds latLngBounds1 = LatLngBounds.from(0, 0, -10, 150);
-    LatLngBounds latLngBounds2 = LatLngBounds.from(0, 0, -90, -200);
-
-    LatLngBounds intersectLatLngBounds = LatLngBounds.from(0, 0, -10, 160);
-
-    assertEquals(latLngBounds1.intersect(latLngBounds2), intersectLatLngBounds);
-    assertEquals(latLngBounds2.intersect(latLngBounds1), intersectLatLngBounds);
+  public void intersectEastLessThanWestCheck() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("lonEast cannot be less than lonWest");
+    LatLngBounds intersectLatLngBounds =
+      LatLngBounds.from(10, -10, 0, 0)
+        .intersect(0, 200, 20, 0);
   }
 
   @Test
@@ -592,39 +576,6 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void unionSouthLessThanNorthCheck() {
-    exception.expect(IllegalArgumentException.class);
-    exception.expectMessage("latNorth cannot be less than latSouth");
-
-    LatLngBounds unionLatLngBounds =
-      LatLngBounds.from(10, 10, 0, 0)
-        .union(0, 200, 20, 0);
-  }
-
-
-  @Test
-  public void unionEastWrapCheck() {
-
-    LatLngBounds latLngBounds1 = LatLngBounds.from(10, 10, 0, 0);
-    LatLngBounds latLngBounds2 = LatLngBounds.from(90, 200, 0, 0);
-    LatLngBounds unionLatLngBounds = LatLngBounds.from(90, -160, 0, 0);
-
-    assertEquals(latLngBounds1.union(latLngBounds2), unionLatLngBounds);
-    assertEquals(latLngBounds2.union(latLngBounds1), unionLatLngBounds);
-  }
-
-  @Test
-  public void unionWestWrapCheck() {
-    LatLngBounds latLngBounds1 = LatLngBounds.from(0, 0, -10, -10);
-    LatLngBounds latLngBounds2 = LatLngBounds.from(0, 0, -90, -200);
-
-    LatLngBounds unionLatLngBounds = LatLngBounds.from(0, 0, -90, 160);
-
-    assertEquals(latLngBounds1.union(latLngBounds2), unionLatLngBounds);
-    assertEquals(latLngBounds2.union(latLngBounds1), unionLatLngBounds);
-  }
-
-  @Test
   public void northWest() {
     double minLat = 5;
     double minLon = 6;
@@ -788,5 +739,12 @@ public class LatLngBoundsTest {
     exception.expect(IllegalArgumentException.class);
     exception.expectMessage("latNorth cannot be less than latSouth");
     LatLngBounds.from(0, 20, 20, 0);
+  }
+
+  @Test
+  public void testConstructorCheckLonEastGreaterLonWest() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("lonEast cannot be less than lonWest");
+    LatLngBounds.from(30, 20, 20, 30);
   }
 }

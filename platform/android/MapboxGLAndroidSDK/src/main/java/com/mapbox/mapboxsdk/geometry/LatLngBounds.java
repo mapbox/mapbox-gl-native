@@ -297,7 +297,6 @@ public class LatLngBounds implements Parcelable {
    * latNorth should be greater or equal latSouth, otherwise  IllegalArgumentException will be thrown.
    * <p>
    * This method doesn't recalculate most east or most west boundaries.
-   * Note that lonEast and lonWest will be wrapped to be in the range of [-180, 180],
    * see {@link GeometryConstants#MIN_LONGITUDE} and {@link GeometryConstants#MAX_LONGITUDE}
    * </p>
    */
@@ -308,10 +307,6 @@ public class LatLngBounds implements Parcelable {
     double lonWest) {
 
     checkParams(latNorth, lonEast, latSouth, lonWest);
-
-    lonEast = LatLng.wrap(lonEast, GeometryConstants.MIN_LONGITUDE, GeometryConstants.MAX_LONGITUDE);
-    lonWest = LatLng.wrap(lonWest, GeometryConstants.MIN_LONGITUDE, GeometryConstants.MAX_LONGITUDE);
-
     return new LatLngBounds(latNorth, lonEast, latSouth, lonWest);
   }
 
@@ -340,6 +335,10 @@ public class LatLngBounds implements Parcelable {
 
     if (latNorth < latSouth) {
       throw new IllegalArgumentException("latNorth cannot be less than latSouth");
+    }
+
+    if (lonEast < lonWest) {
+      throw new IllegalArgumentException("lonEast cannot be less than lonWest");
     }
   }
 
