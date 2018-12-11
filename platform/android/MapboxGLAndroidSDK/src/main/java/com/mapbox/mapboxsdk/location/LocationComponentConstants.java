@@ -24,7 +24,7 @@ final class LocationComponentConstants {
   static final long DEFAULT_TRACKING_TILT_ANIM_DURATION = 1250;
 
   // Threshold value to perform immediate camera/layer position update.
-  static final double INSTANT_LOCATION_TRANSITION_THRESHOLD = 500_000;
+  static final double INSTANT_LOCATION_TRANSITION_THRESHOLD = 50_000;
 
   // Default interval between location updates
   static final long DEFAULT_INTERVAL_MILLIS = 1000;

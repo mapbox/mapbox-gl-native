@@ -6,12 +6,14 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentConstants.DEFAULT_TRACKING_TILT_ANIM_DURATION
 import com.mapbox.mapboxsdk.location.LocationComponentConstants.DEFAULT_TRACKING_ZOOM_ANIM_DURATION
 import com.mapbox.mapboxsdk.location.MapboxAnimator.*
+import com.mapbox.mapboxsdk.maps.Projection
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
@@ -22,7 +24,7 @@ class LocationAnimatorCoordinatorTest {
 
   @Before
   fun setUp() {
-    locationAnimatorCoordinator = LocationAnimatorCoordinator()
+    locationAnimatorCoordinator = LocationAnimatorCoordinator(mock(Projection::class.java))
   }
 
   @Test

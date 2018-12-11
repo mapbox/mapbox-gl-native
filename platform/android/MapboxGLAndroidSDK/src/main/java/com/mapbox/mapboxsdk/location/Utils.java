@@ -16,6 +16,7 @@ import android.support.v4.content.ContextCompat;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Projection;
 
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.INSTANT_LOCATION_TRANSITION_THRESHOLD;
 
@@ -92,13 +93,10 @@ public final class Utils {
     return (float) (location.getAccuracy() * (1 / metersPerPixel));
   }
 
-  static boolean immediateAnimation(LatLng current, @NonNull LatLng target, double zoom) {
-    // TODO: calculate the value based on the projection
+  static boolean immediateAnimation(@NonNull Projection projection, @NonNull LatLng current, @NonNull LatLng target) {
+    double metersPerPixel = projection.getMetersPerPixelAtLatitude((current.getLatitude() + target.getLatitude()) / 2);
     double distance = current.distanceTo(target);
-    if (zoom > 10) {
-      distance *= zoom;
-    }
-    return distance > INSTANT_LOCATION_TRANSITION_THRESHOLD;
+    return distance / metersPerPixel > INSTANT_LOCATION_TRANSITION_THRESHOLD;
   }
 
   /**
