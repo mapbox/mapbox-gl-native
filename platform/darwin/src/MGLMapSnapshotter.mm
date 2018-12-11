@@ -77,9 +77,6 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
         _latLngForFn = std::move(latLngForFn);
         _scale = scale;
         _image = image;
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-        [MGLMapboxEvents pushTurnstileEvent];
-#endif
     }
     return self;
 }
@@ -161,6 +158,9 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:UIApplicationWillTerminateNotification object:nil];
 #else
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+#endif
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+        [MGLMapboxEvents pushTurnstileEvent];
 #endif
     }
     return self;
