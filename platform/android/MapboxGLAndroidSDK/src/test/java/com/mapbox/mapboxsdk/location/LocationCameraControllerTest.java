@@ -416,6 +416,9 @@ public class LocationCameraControllerTest {
   private LocationCameraController buildCamera(OnCameraTrackingChangedListener onCameraTrackingChangedListener) {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getUiSettings()).thenReturn(mock(UiSettings.class));
+    Projection projection = mock(Projection.class);
+    when(mapboxMap.getProjection()).thenReturn(projection);
+    when(projection.getMetersPerPixelAtLatitude(any(Double.class))).thenReturn(Double.valueOf(1000));
     MoveGestureDetector moveGestureDetector = mock(MoveGestureDetector.class);
     OnCameraMoveInvalidateListener onCameraMoveInvalidateListener = mock(OnCameraMoveInvalidateListener.class);
     AndroidGesturesManager initialGesturesManager = mock(AndroidGesturesManager.class);
@@ -427,6 +430,9 @@ public class LocationCameraControllerTest {
   private LocationCameraController buildCamera(MoveGestureDetector moveGestureDetector) {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getUiSettings()).thenReturn(mock(UiSettings.class));
+    Projection projection = mock(Projection.class);
+    when(mapboxMap.getProjection()).thenReturn(projection);
+    when(projection.getMetersPerPixelAtLatitude(any(Double.class))).thenReturn(Double.valueOf(1000));
     OnCameraTrackingChangedListener onCameraTrackingChangedListener = mock(OnCameraTrackingChangedListener.class);
     OnCameraMoveInvalidateListener onCameraMoveInvalidateListener = mock(OnCameraMoveInvalidateListener.class);
     AndroidGesturesManager initialGesturesManager = mock(AndroidGesturesManager.class);
