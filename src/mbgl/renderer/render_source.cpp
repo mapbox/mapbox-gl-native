@@ -10,6 +10,8 @@
 #include <mbgl/renderer/sources/render_custom_geometry_source.hpp>
 #include <mbgl/tile/tile.hpp>
 
+#include <mbgl/layermanager/layer_manager.hpp>
+
 namespace mbgl {
 
 using namespace style;
@@ -28,7 +30,12 @@ std::unique_ptr<RenderSource> RenderSource::create(Immutable<Source::Impl> impl)
         assert(false);
         return nullptr;
     case SourceType::Annotations:
-        return std::make_unique<RenderAnnotationSource>(staticImmutableCast<AnnotationSource::Impl>(impl));
+        if (LayerManager::annotationsEnabled) {
+            return std::make_unique<RenderAnnotationSource>(staticImmutableCast<AnnotationSource::Impl>(impl));
+        } else {
+            assert(false);
+            return nullptr;
+        }
     case SourceType::Image:
         return std::make_unique<RenderImageSource>(staticImmutableCast<ImageSource::Impl>(impl));
     case SourceType::CustomVector:

@@ -6,12 +6,15 @@
 #include <mbgl/algorithm/generate_clip_ids.hpp>
 #include <mbgl/algorithm/generate_clip_ids_impl.hpp>
 
+#include <mbgl/layermanager/layer_manager.hpp>
+
 namespace mbgl {
 
 using namespace style;
 
 RenderAnnotationSource::RenderAnnotationSource(Immutable<AnnotationSource::Impl> impl_)
     : RenderSource(impl_) {
+    assert(LayerManager::annotationsEnabled);
     tilePyramid.setObserver(this);
 }
 
