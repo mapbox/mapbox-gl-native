@@ -122,5 +122,42 @@
     [self waitForExpectations:@[expectation] timeout:1.0];
 }
 
+- (void)testShapeSourceWithLineDistanceMetrics {
+    CLLocationCoordinate2D coordinates[] = {
+        CLLocationCoordinate2DMake(9.6315313, 52.4133574),
+        CLLocationCoordinate2DMake(24.9410248, 60.1733244)};
+
+    MGLPolylineFeature *polylineFeature = [MGLPolylineFeature polylineWithCoordinates:coordinates count:sizeof(coordinates)/sizeof(coordinates[0])];
+    NSDictionary *options = @{MGLShapeSourceOptionLineDistanceMetrics: @YES};
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"route" shape:polylineFeature options:options];
+    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"lineLayer" source:source];
+
+    [self.style addSource:source];
+    [self.style addLayer:lineLayer];
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(9.6315313, 52.4133574) animated:YES];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"regionDidChange expectation"];
+    expectation.expectedFulfillmentCount = 1;
+    expectation.assertForOverFulfill = YES;
+
+    __weak id weakself = self;
+    self.regionDidChange = ^(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated) {
+
+        id strongSelf = weakself;
+        if (!strongSelf)
+            return;
+
+        NSArray *features = [source featuresMatchingPredicate:nil];
+        MGLTestAssert(strongSelf, features.count == 1UL, @"Should contain one Feature");
+
+        MGLPolylineFeature *feature = [features objectAtIndex:0];
+        MGLTestAssertNotNil(strongSelf, [feature.attributes objectForKey:@"mapbox_clip_start"], @"Attributes should contain mapbox_clip_start property");
+        MGLTestAssertNotNil(strongSelf, [feature.attributes objectForKey:@"mapbox_clip_end"], @"Attributes should contain mapbox_clip_end property");
+
+        [expectation fulfill];
+    };
+
+    [self waitForExpectations:@[expectation] timeout:1.0];
+}
 
 @end
