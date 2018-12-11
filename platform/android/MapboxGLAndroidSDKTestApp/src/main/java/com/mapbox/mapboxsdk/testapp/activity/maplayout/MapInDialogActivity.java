@@ -69,13 +69,12 @@ public class MapInDialogActivity extends AppCompatActivity {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
       return new Dialog(getActivity(), getTheme()) {
-        boolean destroyed = false;
-
         @Override
         public void dismiss() {
-          if (mapView != null && !destroyed) {
+          if (mapView != null && !mapView.isDestroyed()) {
+            mapView.onPause();
+            mapView.onStop();
             mapView.onDestroy();
-            destroyed = true;
           }
           super.dismiss();
         }
@@ -104,6 +103,12 @@ public class MapInDialogActivity extends AppCompatActivity {
     public void onStop() {
       super.onStop();
       mapView.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+      super.onDestroyView();
+      mapView.onDestroy();
     }
 
     @Override
