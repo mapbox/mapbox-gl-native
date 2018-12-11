@@ -176,7 +176,7 @@
     // it has no "id" key (or value)
     XCTAssertNil(geoJSONFeature[@"id"]);
     // it has a null representation of the properties object
-    XCTAssertEqualObjects(geoJSONFeature[@"properties"], [NSNull null]);
+    XCTAssertEqualObjects(geoJSONFeature[@"properties"], @{});
 
     // when there is a string identifier
     pointFeature.identifier = @"string-id";
@@ -317,13 +317,13 @@
                                        @"geometries": @[
                                            @{ @"geometry": @{@"type": @"Point",
                                                              @"coordinates": @[@(pointCoordinate.longitude), @(pointCoordinate.latitude)]},
-                                              @"properties": [NSNull null],
+                                              @"properties": @{},
                                               @"type": @"Feature",
                                              },
                                             @{ @"geometry": @{@"type": @"LineString",
                                                               @"coordinates": @[@[@(coord1.longitude), @(coord1.latitude)],
                                                                                 @[@(coord2.longitude), @(coord2.latitude)]]},
-                                               @"properties": [NSNull null],
+                                               @"properties": @{},
                                                @"type": @"Feature",
                                             }
                                         ]
