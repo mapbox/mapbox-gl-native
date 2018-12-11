@@ -454,6 +454,9 @@ public class LocationCameraControllerTest {
   public void transition_trackingChanged() {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getCameraPosition()).thenReturn(CameraPosition.DEFAULT);
+    Projection projection = mock(Projection.class);
+    when(mapboxMap.getProjection()).thenReturn(projection);
+    when(projection.getMetersPerPixelAtLatitude(any(Double.class))).thenReturn(Double.valueOf(1000));
     LocationCameraController camera = buildCamera(mapboxMap);
     camera.initializeOptions(mock(LocationComponentOptions.class));
     final OnLocationCameraTransitionListener listener = mock(OnLocationCameraTransitionListener.class);
@@ -478,6 +481,9 @@ public class LocationCameraControllerTest {
   public void transition_trackingNotChanged() {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getCameraPosition()).thenReturn(CameraPosition.DEFAULT);
+    Projection projection = mock(Projection.class);
+    when(mapboxMap.getProjection()).thenReturn(projection);
+    when(projection.getMetersPerPixelAtLatitude(any(Double.class))).thenReturn(Double.valueOf(1000));
     LocationCameraController camera = buildCamera(mapboxMap);
     camera.initializeOptions(mock(LocationComponentOptions.class));
     final OnLocationCameraTransitionListener listener = mock(OnLocationCameraTransitionListener.class);
@@ -504,6 +510,9 @@ public class LocationCameraControllerTest {
   public void transition_canceled() {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getCameraPosition()).thenReturn(CameraPosition.DEFAULT);
+    Projection projection = mock(Projection.class);
+    when(mapboxMap.getProjection()).thenReturn(projection);
+    when(projection.getMetersPerPixelAtLatitude(any(Double.class))).thenReturn(Double.valueOf(1000));
     LocationCameraController camera = buildCamera(mapboxMap);
     camera.initializeOptions(mock(LocationComponentOptions.class));
     final OnLocationCameraTransitionListener listener = mock(OnLocationCameraTransitionListener.class);
@@ -528,6 +537,9 @@ public class LocationCameraControllerTest {
   public void transition_mapboxCallbackFinished() {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getCameraPosition()).thenReturn(CameraPosition.DEFAULT);
+    Projection projection = mock(Projection.class);
+    when(mapboxMap.getProjection()).thenReturn(projection);
+    when(projection.getMetersPerPixelAtLatitude(any(Double.class))).thenReturn(Double.valueOf(1000));
     LocationCameraController camera = buildCamera(mapboxMap);
     camera.initializeOptions(mock(LocationComponentOptions.class));
     final OnLocationCameraTransitionListener listener = mock(OnLocationCameraTransitionListener.class);
@@ -558,9 +570,47 @@ public class LocationCameraControllerTest {
   }
 
   @Test
+  public void transition_mapboxCallbackFinishedImmediately() {
+    MapboxMap mapboxMap = mock(MapboxMap.class);
+    when(mapboxMap.getCameraPosition()).thenReturn(CameraPosition.DEFAULT);
+    Projection projection = mock(Projection.class);
+    when(mapboxMap.getProjection()).thenReturn(projection);
+    when(projection.getMetersPerPixelAtLatitude(any(Double.class))).thenReturn(Double.valueOf(1));
+    LocationCameraController camera = buildCamera(mapboxMap);
+    camera.initializeOptions(mock(LocationComponentOptions.class));
+    final OnLocationCameraTransitionListener listener = mock(OnLocationCameraTransitionListener.class);
+    Location location = mock(Location.class);
+    when(location.getLatitude()).thenReturn(1.0);
+    when(location.getLongitude()).thenReturn(1.0);
+    when(location.getBearing()).thenReturn(30f);
+    when(location.getAltitude()).thenReturn(0.0);
+
+    ArgumentCaptor<MapboxMap.CancelableCallback> callbackCaptor
+      = ArgumentCaptor.forClass(MapboxMap.CancelableCallback.class);
+
+    camera.setCameraMode(CameraMode.TRACKING, location, listener);
+
+    CameraPosition.Builder builder = new CameraPosition.Builder().target(new LatLng(location));
+    verify(mapboxMap).moveCamera(
+      eq(CameraUpdateFactory.newCameraPosition(builder.build())),
+      callbackCaptor.capture());
+
+    Assert.assertTrue(camera.isTransitioning());
+
+    callbackCaptor.getValue().onFinish();
+
+    Assert.assertFalse(camera.isTransitioning());
+
+    verify(listener).onLocationCameraTransitionFinished(CameraMode.TRACKING);
+  }
+
+  @Test
   public void transition_mapboxCallbackCanceled() {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getCameraPosition()).thenReturn(CameraPosition.DEFAULT);
+    Projection projection = mock(Projection.class);
+    when(mapboxMap.getProjection()).thenReturn(projection);
+    when(projection.getMetersPerPixelAtLatitude(any(Double.class))).thenReturn(Double.valueOf(1000));
     LocationCameraController camera = buildCamera(mapboxMap);
     camera.initializeOptions(mock(LocationComponentOptions.class));
     final OnLocationCameraTransitionListener listener = mock(OnLocationCameraTransitionListener.class);
@@ -594,6 +644,9 @@ public class LocationCameraControllerTest {
   public void transition_mapboxAnimateBearing() {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getCameraPosition()).thenReturn(CameraPosition.DEFAULT);
+    Projection projection = mock(Projection.class);
+    when(mapboxMap.getProjection()).thenReturn(projection);
+    when(projection.getMetersPerPixelAtLatitude(any(Double.class))).thenReturn(Double.valueOf(1000));
     LocationCameraController camera = buildCamera(mapboxMap);
     camera.initializeOptions(mock(LocationComponentOptions.class));
     final OnLocationCameraTransitionListener listener = mock(OnLocationCameraTransitionListener.class);
@@ -616,6 +669,9 @@ public class LocationCameraControllerTest {
   public void transition_mapboxAnimateNorth() {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getCameraPosition()).thenReturn(CameraPosition.DEFAULT);
+    Projection projection = mock(Projection.class);
+    when(mapboxMap.getProjection()).thenReturn(projection);
+    when(projection.getMetersPerPixelAtLatitude(any(Double.class))).thenReturn(Double.valueOf(1000));
     LocationCameraController camera = buildCamera(mapboxMap);
     camera.initializeOptions(mock(LocationComponentOptions.class));
     final OnLocationCameraTransitionListener listener = mock(OnLocationCameraTransitionListener.class);
@@ -638,6 +694,9 @@ public class LocationCameraControllerTest {
   public void transition_animatorValuesDuringTransition() {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getCameraPosition()).thenReturn(CameraPosition.DEFAULT);
+    Projection projection = mock(Projection.class);
+    when(mapboxMap.getProjection()).thenReturn(projection);
+    when(projection.getMetersPerPixelAtLatitude(any(Double.class))).thenReturn(Double.valueOf(1000));
     LocationCameraController camera = buildCamera(mapboxMap);
     camera.initializeOptions(mock(LocationComponentOptions.class));
     final OnLocationCameraTransitionListener listener = mock(OnLocationCameraTransitionListener.class);
@@ -674,6 +733,9 @@ public class LocationCameraControllerTest {
   private LocationCameraController buildCamera(OnCameraTrackingChangedListener onCameraTrackingChangedListener) {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getUiSettings()).thenReturn(mock(UiSettings.class));
+    Projection projection = mock(Projection.class);
+    when(mapboxMap.getProjection()).thenReturn(projection);
+    when(projection.getMetersPerPixelAtLatitude(any(Double.class))).thenReturn(Double.valueOf(1000));
     MoveGestureDetector moveGestureDetector = mock(MoveGestureDetector.class);
     OnCameraMoveInvalidateListener onCameraMoveInvalidateListener = mock(OnCameraMoveInvalidateListener.class);
     AndroidGesturesManager initialGesturesManager = mock(AndroidGesturesManager.class);
@@ -685,6 +747,9 @@ public class LocationCameraControllerTest {
   private LocationCameraController buildCamera(MoveGestureDetector moveGestureDetector) {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getUiSettings()).thenReturn(mock(UiSettings.class));
+    Projection projection = mock(Projection.class);
+    when(mapboxMap.getProjection()).thenReturn(projection);
+    when(projection.getMetersPerPixelAtLatitude(any(Double.class))).thenReturn(Double.valueOf(1000));
     OnCameraTrackingChangedListener onCameraTrackingChangedListener = mock(OnCameraTrackingChangedListener.class);
     OnCameraMoveInvalidateListener onCameraMoveInvalidateListener = mock(OnCameraMoveInvalidateListener.class);
     AndroidGesturesManager initialGesturesManager = mock(AndroidGesturesManager.class);
