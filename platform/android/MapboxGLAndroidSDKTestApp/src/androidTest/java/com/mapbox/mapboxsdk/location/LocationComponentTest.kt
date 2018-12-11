@@ -1165,12 +1165,15 @@ class LocationComponentTest : BaseActivityTest() {
                                              uiController: UiController, context: Context) {
         component.activateLocationComponent(context, mapboxMap.style!!, false)
         component.isLocationComponentEnabled = true
-        val target = LatLng(51.0, 17.0)
-        assertTrue(target.distanceTo(LatLng(location)) > LocationComponentConstants.INSTANT_LOCATION_TRANSITION_THRESHOLD)
         component.cameraMode = CameraMode.NONE
         component.forceLocationUpdate(location)
+
+        val target = LatLng(51.0, 17.0)
         mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(target))
+        mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(15.0))
         mapboxMap.moveCamera(CameraUpdateFactory.bearingTo(90.0))
+        assertTrue(Utils.immediateAnimation(mapboxMap.projection, mapboxMap.cameraPosition.target, LatLng(location)))
+
         component.cameraMode = CameraMode.TRACKING_GPS
         assertEquals(location.bearing.toDouble(), mapboxMap.cameraPosition.bearing, 0.1)
         assertEquals(location.latitude, mapboxMap.cameraPosition.target.latitude, 0.1)

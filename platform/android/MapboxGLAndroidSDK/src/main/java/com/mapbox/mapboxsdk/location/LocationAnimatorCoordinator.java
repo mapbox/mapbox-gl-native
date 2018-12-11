@@ -13,6 +13,7 @@ import android.view.animation.LinearInterpolator;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Projection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +40,16 @@ final class LocationAnimatorCoordinator {
   final List<MapboxAnimator.OnLayerAnimationsValuesChangeListener> layerListeners = new ArrayList<>();
   final List<MapboxAnimator.OnCameraAnimationsValuesChangeListener> cameraListeners = new ArrayList<>();
 
+  private final Projection projection;
   private Location previousLocation;
   private float previousAccuracyRadius = -1;
   private float previousCompassBearing = -1;
   private long locationUpdateTimestamp = -1;
   private float durationMultiplier;
+
+  LocationAnimatorCoordinator(Projection projection) {
+    this.projection = projection;
+  }
 
   void addLayerListener(MapboxAnimator.OnLayerAnimationsValuesChangeListener listener) {
     layerListeners.add(listener);
@@ -81,8 +87,8 @@ final class LocationAnimatorCoordinator {
     updateLayerAnimators(previousLayerLatLng, targetLatLng, previousLayerBearing, targetLayerBearing);
     updateCameraAnimators(previousCameraLatLng, previousCameraBearing, targetLatLng, targetCameraBearing);
 
-    boolean snap = immediateAnimation(previousCameraLatLng, targetLatLng, currentCameraPosition.zoom)
-      || immediateAnimation(previousLayerLatLng, targetLatLng, currentCameraPosition.zoom);
+    boolean snap = immediateAnimation(projection, previousCameraLatLng, targetLatLng)
+      || immediateAnimation(projection, previousLayerLatLng, targetLatLng);
     playLocationAnimators(snap ? 0 : getAnimationDuration());
 
     previousLocation = newLocation;
@@ -317,7 +323,7 @@ final class LocationAnimatorCoordinator {
     createNewAnimator(ANIMATOR_CAMERA_LATLNG,
       new CameraLatLngAnimator(previousCameraTarget, currentTarget, cameraListeners));
 
-    return immediateAnimation(previousCameraTarget, currentTarget, currentCameraPosition.zoom);
+    return immediateAnimation(projection, previousCameraTarget, currentTarget);
   }
 
   private void resetCameraGpsBearingAnimation(@NonNull CameraPosition currentCameraPosition, boolean isGpsNorth) {

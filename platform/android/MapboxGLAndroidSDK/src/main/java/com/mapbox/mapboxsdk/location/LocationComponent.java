@@ -1015,7 +1015,7 @@ public final class LocationComponent {
     locationCameraController = new LocationCameraController(
       context, mapboxMap, cameraTrackingChangedListener, options, onCameraMoveInvalidateListener);
 
-    locationAnimatorCoordinator = new LocationAnimatorCoordinator();
+    locationAnimatorCoordinator = new LocationAnimatorCoordinator(mapboxMap.getProjection());
     locationAnimatorCoordinator.addLayerListener(locationLayerController);
     locationAnimatorCoordinator.addCameraListener(locationCameraController);
     locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options
