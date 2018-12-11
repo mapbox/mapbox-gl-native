@@ -25,11 +25,12 @@
 @implementation MGLEmptyFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     MGLLogDebug(@"Retrieving attributeForKey: %@", key);
@@ -60,11 +61,12 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 @implementation MGLPointFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     MGLLogDebug(@"Retrieving attributeForKey: %@", key);
@@ -96,11 +98,12 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 @implementation MGLPolylineFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     MGLLogDebug(@"Retrieving attributeForKey: %@", key);
@@ -133,11 +136,12 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 @implementation MGLPolygonFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     MGLLogDebug(@"Retrieving attributeForKey: %@", key);
@@ -170,11 +174,12 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 @implementation MGLPointCollectionFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     MGLLogDebug(@"Retrieving attributeForKey: %@", key);
@@ -197,11 +202,12 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 @implementation MGLMultiPolylineFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     MGLLogDebug(@"Retrieving attributeForKey: %@", key);
@@ -234,11 +240,12 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 @implementation MGLMultiPolygonFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     MGLLogDebug(@"Retrieving attributeForKey: %@", key);
@@ -271,7 +278,7 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 @implementation MGLShapeCollectionFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 @dynamic shapes;
 
@@ -282,6 +289,7 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     return self.attributes[key];
@@ -463,7 +471,7 @@ mbgl::Feature mbglFeature(mbgl::Feature feature, id identifier, NSDictionary *at
 
 NSDictionary<NSString *, id> *NSDictionaryFeatureForGeometry(NSDictionary *geometry, NSDictionary *attributes, id identifier) {
     NSMutableDictionary *feature = [@{@"type": @"Feature",
-                                      @"properties": (attributes) ?: [NSNull null],
+                                      @"properties": attributes,
                                       @"geometry": geometry} mutableCopy];
     feature[@"id"] = identifier;
     return [feature copy];
