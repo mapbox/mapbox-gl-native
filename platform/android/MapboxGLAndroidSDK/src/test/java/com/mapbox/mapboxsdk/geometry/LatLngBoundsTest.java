@@ -257,8 +257,9 @@ public class LatLngBoundsTest {
             .include(new LatLng(0, -190))
             .build();
 
+    LatLngSpan latLngSpan = latLngBounds.getSpan();
     assertEquals("LatLngSpan should be the same",
-            new LatLngSpan(20, 20), latLngBounds.getSpan());
+            new LatLngSpan(20, 20), latLngSpan);
   }
 
   @Test
@@ -395,14 +396,20 @@ public class LatLngBoundsTest {
   public void intersectSouthLessThanNorthCheck() {
     exception.expect(IllegalArgumentException.class);
     exception.expectMessage("latNorth cannot be less than latSouth");
-
     LatLngBounds intersectLatLngBounds =
             LatLngBounds.from(10, 10, 0, 0)
                     .intersect(0, 200, 20, 0);
   }
 
-
   @Test
+  public void intersectEastLessThanWestCheck() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("lonEast cannot be less than lonWest");
+    LatLngBounds intersectLatLngBounds =
+      LatLngBounds.from(10, -10, 0, 0)
+        .intersect(0, 200, 20, 0);
+  }
+
   public void intersectEastDoesNotWrapCheck() {
 
     LatLngBounds latLngBounds1 = LatLngBounds.from(10, 210, 0, 0);
@@ -749,10 +756,10 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void testConstructorEastLongitudeInfinityAllowed() {
-    LatLngBounds latLngBounds =
-            LatLngBounds.from(0, Double.POSITIVE_INFINITY, -20, -20);
-    assertEquals(Double.POSITIVE_INFINITY, latLngBounds.getLonEast(), DELTA);
+  public void testConstructorChecksEastLongitudeInfinity() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("longitude must not be infinite");
+    LatLngBounds.from(0, Double.POSITIVE_INFINITY, -20, -20);
   }
 
   @Test
@@ -784,10 +791,10 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void testConstructorWestLongitudeInfinityAllowed() {
-    LatLngBounds latLngBounds =
-            LatLngBounds.from(20, 20, 0, Double.NEGATIVE_INFINITY);
-    assertEquals(Double.NEGATIVE_INFINITY, latLngBounds.getLonWest(), DELTA);
+  public void testConstructorChecksWestLongitudeInfinity() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("longitude must not be infinite");
+    LatLngBounds.from(20, 20, 0, Double.POSITIVE_INFINITY);
   }
 
   @Test
