@@ -52,29 +52,43 @@ jni::Local<jni::Object<Layer>> LayerManagerAndroid::createJavaLayerPeer(jni::JNI
 }
 
 void LayerManagerAndroid::registerNative(jni::JNIEnv& env) {
+    if (peerFactories.empty()) {
+        return;
+    }
+
     Layer::registerNative(env);
-    for (const auto& factory: factories) {
+    for (const auto& factory: peerFactories) {
         factory->registerNative(env);
     }
 }
 
 void LayerManagerAndroid::addLayerType(std::unique_ptr<JavaLayerPeerFactory> factory) {
-    auto* coreFactory = factory->getLayerFactory();
-    std::string type{coreFactory->getTypeInfo()->type};
+    assert(getFactory(factory->getLayerFactory()->getTypeInfo()) == nullptr);
+    registerCoreFactory(factory->getLayerFactory());
+    peerFactories.emplace_back(std::move(factory));
+}
+
+void LayerManagerAndroid::addLayerTypeCoreOnly(std::unique_ptr<LayerFactory> factory) {
+    assert(getFactory(factory->getTypeInfo()) == nullptr);
+    registerCoreFactory(factory.get());
+    coreFactories.emplace_back(std::move(factory));
+}
+
+void LayerManagerAndroid::registerCoreFactory(mbgl::LayerFactory* factory) {
+    std::string type{factory->getTypeInfo()->type};
     if (!type.empty()) {
-        typeToFactory.emplace(std::make_pair(std::move(type), coreFactory));
+        assert(typeToFactory.find(type) == typeToFactory.end());
+        typeToFactory.emplace(std::make_pair(std::move(type), factory));
     }
-    factories.emplace_back(std::move(factory));
 }
 
 JavaLayerPeerFactory* LayerManagerAndroid::getPeerFactory(const mbgl::style::LayerTypeInfo* typeInfo) {
     assert(typeInfo);
-    for (const auto& factory: factories) {
+    for (const auto& factory: peerFactories) {
         if (factory->getLayerFactory()->getTypeInfo() == typeInfo) {
             return factory.get();
         }
     }
-    assert(false);
     return nullptr;
 }
 
@@ -84,8 +98,17 @@ LayerFactory* LayerManagerAndroid::getFactory(const std::string& type) noexcept 
 }
 
 LayerFactory* LayerManagerAndroid::getFactory(const mbgl::style::LayerTypeInfo* info) noexcept {
-    JavaLayerPeerFactory* peerFactory = getPeerFactory(info);
-    return (peerFactory != nullptr) ? peerFactory->getLayerFactory() : nullptr;
+    if (JavaLayerPeerFactory* peerFactory = getPeerFactory(info)) {
+        return peerFactory->getLayerFactory();
+    }
+
+    for (const auto& factory: coreFactories) {
+        if (factory->getTypeInfo() == info) {
+            return factory.get();
+        }
+    }
+
+    return nullptr;
 }
 
 // static 

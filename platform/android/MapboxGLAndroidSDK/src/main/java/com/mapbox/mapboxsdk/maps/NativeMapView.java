@@ -64,6 +64,7 @@ final class NativeMapView {
   private ViewCallback viewCallback;
 
   // Used for map change callbacks
+  @Nullable
   private StateCallback stateCallback;
 
   // Device density
@@ -310,6 +311,10 @@ final class NativeMapView {
     return nativeGetPitch();
   }
 
+  public void setPitch(double pitch) {
+    setPitch(pitch, 0);
+  }
+
   public void setPitch(double pitch, long duration) {
     if (checkState("setPitch")) {
       return;
@@ -381,15 +386,29 @@ final class NativeMapView {
     nativeRotateBy(sx / pixelRatio, sy / pixelRatio, ex, ey, duration);
   }
 
-  public void setContentPadding(int[] padding) {
+  public void setContentPadding(float[] padding) {
     if (checkState("setContentPadding")) {
       return;
     }
+    // TopLeftBottomRight
     nativeSetContentPadding(
       padding[1] / pixelRatio,
       padding[0] / pixelRatio,
       padding[3] / pixelRatio,
       padding[2] / pixelRatio);
+  }
+
+  public float[] getContentPadding() {
+    if (checkState("getContentPadding")) {
+      return new float[] {0, 0, 0, 0};
+    }
+    float[] topLeftBottomRight = nativeGetContentPadding();
+    return new float[]{
+      topLeftBottomRight[1] * pixelRatio,
+      topLeftBottomRight[0] * pixelRatio,
+      topLeftBottomRight[3] * pixelRatio,
+      topLeftBottomRight[2] * pixelRatio
+    };
   }
 
   public void setBearing(double degrees) {
@@ -921,62 +940,86 @@ final class NativeMapView {
 
   @Keep
   private void onCameraWillChange(boolean animated) {
-    stateCallback.onCameraWillChange(animated);
+    if (stateCallback != null) {
+      stateCallback.onCameraWillChange(animated);
+    }
   }
 
   @Keep
   private void onCameraIsChanging() {
-    stateCallback.onCameraIsChanging();
+    if (stateCallback != null) {
+      stateCallback.onCameraIsChanging();
+    }
   }
 
   @Keep
   private void onCameraDidChange(boolean animated) {
-    stateCallback.onCameraDidChange(animated);
+    if (stateCallback != null) {
+      stateCallback.onCameraDidChange(animated);
+    }
   }
 
   @Keep
   private void onWillStartLoadingMap() {
-    stateCallback.onWillStartLoadingMap();
+    if (stateCallback != null) {
+      stateCallback.onWillStartLoadingMap();
+    }
   }
 
   @Keep
   private void onDidFinishLoadingMap() {
-    stateCallback.onDidFinishLoadingMap();
+    if (stateCallback != null) {
+      stateCallback.onDidFinishLoadingMap();
+    }
   }
 
   @Keep
   private void onDidFailLoadingMap(String error) {
-    stateCallback.onDidFailLoadingMap(error);
+    if (stateCallback != null) {
+      stateCallback.onDidFailLoadingMap(error);
+    }
   }
 
   @Keep
   private void onWillStartRenderingFrame() {
-    stateCallback.onWillStartRenderingFrame();
+    if (stateCallback != null) {
+      stateCallback.onWillStartRenderingFrame();
+    }
   }
 
   @Keep
   private void onDidFinishRenderingFrame(boolean fully) {
-    stateCallback.onDidFinishRenderingFrame(fully);
+    if (stateCallback != null) {
+      stateCallback.onDidFinishRenderingFrame(fully);
+    }
   }
 
   @Keep
   private void onWillStartRenderingMap() {
-    stateCallback.onWillStartRenderingMap();
+    if (stateCallback != null) {
+      stateCallback.onWillStartRenderingMap();
+    }
   }
 
   @Keep
   private void onDidFinishRenderingMap(boolean fully) {
-    stateCallback.onDidFinishRenderingMap(fully);
+    if (stateCallback != null) {
+      stateCallback.onDidFinishRenderingMap(fully);
+    }
   }
 
   @Keep
   private void onDidFinishLoadingStyle() {
-    stateCallback.onDidFinishLoadingStyle();
+    if (stateCallback != null) {
+      stateCallback.onDidFinishLoadingStyle();
+    }
   }
 
   @Keep
   private void onSourceChanged(String sourceId) {
-    stateCallback.onSourceChanged(sourceId);
+    if (stateCallback != null) {
+      stateCallback.onSourceChanged(sourceId);
+    }
   }
 
   @Keep
@@ -1085,7 +1128,10 @@ final class NativeMapView {
   private native void nativeRotateBy(double sx, double sy, double ex, double ey, long duration);
 
   @Keep
-  private native void nativeSetContentPadding(double top, double left, double bottom, double right);
+  private native void nativeSetContentPadding(float top, float left, float bottom, float right);
+
+  @Keep
+  private native float[] nativeGetContentPadding();
 
   @Keep
   private native void nativeSetBearing(double degrees, long duration);
