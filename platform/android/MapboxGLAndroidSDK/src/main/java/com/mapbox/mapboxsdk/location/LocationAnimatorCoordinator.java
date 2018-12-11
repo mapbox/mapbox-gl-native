@@ -13,6 +13,7 @@ import android.view.animation.LinearInterpolator;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Projection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_LAYER_GPS_BE
 import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_LAYER_LATLNG;
 import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_TILT;
 import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_ZOOM;
+import static com.mapbox.mapboxsdk.location.Utils.immediateAnimation;
 
 final class LocationAnimatorCoordinator {
 
@@ -39,11 +41,16 @@ final class LocationAnimatorCoordinator {
   final List<MapboxAnimator.OnLayerAnimationsValuesChangeListener> layerListeners = new ArrayList<>();
   final List<MapboxAnimator.OnCameraAnimationsValuesChangeListener> cameraListeners = new ArrayList<>();
 
+  private final Projection projection;
   private Location previousLocation;
   private float previousAccuracyRadius = -1;
   private float previousCompassBearing = -1;
   private long locationUpdateTimestamp = -1;
   private float durationMultiplier;
+
+  LocationAnimatorCoordinator(Projection projection) {
+    this.projection = projection;
+  }
 
   void addLayerListener(MapboxAnimator.OnLayerAnimationsValuesChangeListener listener) {
     layerListeners.add(listener);
@@ -81,8 +88,8 @@ final class LocationAnimatorCoordinator {
     updateLayerAnimators(previousLayerLatLng, targetLatLng, previousLayerBearing, targetLayerBearing);
     updateCameraAnimators(previousCameraLatLng, previousCameraBearing, targetLatLng, targetCameraBearing);
 
-    boolean snap = immediateAnimation(previousCameraLatLng, targetLatLng, currentCameraPosition.zoom)
-      || immediateAnimation(previousLayerLatLng, targetLatLng, currentCameraPosition.zoom);
+    boolean snap = immediateAnimation(projection, previousCameraLatLng, targetLatLng)
+      || immediateAnimation(projection, previousLayerLatLng, targetLatLng);
     playLocationAnimators(snap ? 0 : getAnimationDuration());
 
     previousLocation = newLocation;
@@ -317,7 +324,7 @@ final class LocationAnimatorCoordinator {
     createNewAnimator(ANIMATOR_CAMERA_LATLNG,
       new CameraLatLngAnimator(previousCameraTarget, currentTarget, cameraListeners));
 
-    return immediateAnimation(previousCameraTarget, currentTarget, currentCameraPosition.zoom);
+    return immediateAnimation(projection, previousCameraTarget, currentTarget);
   }
 
   private void resetCameraGpsBearingAnimation(CameraPosition currentCameraPosition, boolean isGpsNorth) {
@@ -380,14 +387,5 @@ final class LocationAnimatorCoordinator {
 
   void setTrackingAnimationDurationMultiplier(float trackingAnimationDurationMultiplier) {
     this.durationMultiplier = trackingAnimationDurationMultiplier;
-  }
-
-  private boolean immediateAnimation(LatLng current, LatLng target, double zoom) {
-    // TODO: calculate the value based on the projection
-    double distance = current.distanceTo(target);
-    if (zoom > 10) {
-      distance *= zoom;
-    }
-    return distance > INSTANT_LOCATION_TRANSITION_THRESHOLD;
   }
 }
