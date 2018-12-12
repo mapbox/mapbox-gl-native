@@ -176,6 +176,10 @@ public class Projection {
       }
     }
 
+    if (east < west) {
+      return new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight,
+        LatLngBounds.from(north, east + GeometryConstants.LONGITUDE_SPAN, south, west));
+    }
     return new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight,
       LatLngBounds.from(north, east, south, west));
   }

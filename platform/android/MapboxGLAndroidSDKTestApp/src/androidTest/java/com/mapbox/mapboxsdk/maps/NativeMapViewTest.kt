@@ -238,7 +238,8 @@ class NativeMapViewTest {
     fun testLatLngForProjectedMeters() {
         val expected = LatLng(0.01796630538796444, 0.02694945852363162)
         val actual = nativeMapView.latLngForProjectedMeters(ProjectedMeters(2000.0, 3000.0))
-        assertEquals("Get LatLng for projected meters", expected, actual)
+        assertEquals("Lat for projected meters", expected.latitude, actual.latitude, DELTA)
+        assertEquals("Lng for projected meters", expected.longitude, actual.longitude, DELTA)
     }
 
     @Test
@@ -306,7 +307,7 @@ class NativeMapViewTest {
                 .bearing(0.0)
                 .build()
         val actual = nativeMapView.getCameraForLatLngBounds(
-                LatLngBounds.from(30.0, 12.0, 16.0, 16.0),
+                LatLngBounds.from(30.0, 16.0, 16.0, 12.0),
                 intArrayOf(0, 0, 0, 0),
                 0.0,
                 0.0
