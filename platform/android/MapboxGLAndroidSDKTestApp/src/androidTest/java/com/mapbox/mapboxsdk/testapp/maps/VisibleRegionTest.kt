@@ -191,9 +191,12 @@ class VisibleRegionTest : BaseActivityTest() {
       val latLngs = listOf(
         mapboxMap.getLatLngFromScreenCoords(0f, 0f),
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat()),
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat())
+          .also { it.longitude += 360 },
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height / 2f),
@@ -242,9 +245,12 @@ class VisibleRegionTest : BaseActivityTest() {
       val latLngs = listOf(
         mapboxMap.getLatLngFromScreenCoords(0f, 0f),
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat()),
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat())
+          .also { it.longitude += 360 },
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height / 2f),
@@ -265,12 +271,16 @@ class VisibleRegionTest : BaseActivityTest() {
     validateTestSetup()
     invoke(mapboxMap) { _: UiController, mapboxMap: MapboxMap ->
       mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(0.0, 180.0), 8.0))
+
       val latLngs = listOf(
         mapboxMap.getLatLngFromScreenCoords(0f, 0f),
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat()),
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat())
+          .also { it.longitude += 360 },
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height / 2f),
@@ -294,9 +304,12 @@ class VisibleRegionTest : BaseActivityTest() {
       val latLngs = listOf(
         mapboxMap.getLatLngFromScreenCoords(0f, 0f),
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat()),
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f)
+           .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat())
+          .also { it.longitude += 360 },
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height / 2f),
@@ -320,9 +333,12 @@ class VisibleRegionTest : BaseActivityTest() {
       val latLngs = listOf(
         mapboxMap.getLatLngFromScreenCoords(0f, 0f),
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat()),
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat())
+          .also { it.longitude += 360 },
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height / 2f),
@@ -370,7 +386,8 @@ class VisibleRegionTest : BaseActivityTest() {
             val latLngs = listOf(
                     mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f),
                     mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f - d / 2f, mapView.height / 2f),
-                    mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f + d / 2f, mapView.height / 2f),
+                    mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f + d / 2f, mapView.height / 2f)
+                      .also { it.longitude += 360 },
                     mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f - d / 2f),
                     mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f + d / 2f)
             )
