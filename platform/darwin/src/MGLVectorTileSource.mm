@@ -79,7 +79,7 @@
  An array of locale codes with dedicated name fields in the Mapbox Streets
  source.
  
- https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview
+ https://www.mapbox.com/vector-tiles/mapbox-streets-v8/
  */
 static NSArray * const MGLMapboxStreetsLanguages = @[
     @"ar", @"de", @"en", @"es", @"fr", @"ja", @"ko", @"pt", @"ru", @"zh",
@@ -141,7 +141,7 @@ static NSArray * const MGLMapboxStreetsAlternativeLanguages = @[
         return NO;
     }
     NSArray *identifiers = [url.host componentsSeparatedByString:@","];
-    return [identifiers containsObject:@"mapbox.mapbox-streets-v7"] || [identifiers containsObject:@"mapbox.mapbox-streets-v6"];
+    return [identifiers containsObject:@"mapbox.mapbox-streets-v8"] || [identifiers containsObject:@"mapbox.mapbox-streets-v7"];
 }
 
 @end
