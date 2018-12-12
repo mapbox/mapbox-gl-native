@@ -4,14 +4,25 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
-## 7.0.0-alpha.3 - November 30, 2018
-- Add `fill-extrusion-vertical-gradient` fill paint property [#13463](https://github.com/mapbox/mapbox-gl-native/pull/13463)
-- Don't cancel core transitions on MotionEvent#ACTION_CANCEL [#13465](https://github.com/mapbox/mapbox-gl-native/pull/13465)
-- Require context in AttributionParser.Options [#13444](https://github.com/mapbox/mapbox-gl-native/pull/13444)
-- Deprecated annotations package [#13468](https://github.com/mapbox/mapbox-gl-native/pull/13468)
-- Send turnstile event while create MapSnapshotter instance [#13475](https://github.com/mapbox/mapbox-gl-native/pull/13475)
-- Remove default zoom level restrictions when activating the location component [#13425](https://github.com/mapbox/mapbox-gl-native/pull/13425)
+## 7.0.0-beta.1 - December 12, 2018
+ - Style builder and Style.java [#13484](https://github.com/mapbox/mapbox-gl-native/pull/13484)
+ - LatLng bounds cannot be wrapped [#13419](https://github.com/mapbox/mapbox-gl-native/pull/13419)
+ - Expose endpoint change option for snapshotter [#13508](https://github.com/mapbox/mapbox-gl-native/pull/13508)
+ - Formatted "text-field" property setter [#13358](https://github.com/mapbox/mapbox-gl-native/pull/13358)
+ - Expose setAccesToken on Mapbox.java [#13397](https://github.com/mapbox/mapbox-gl-native/pull/13397)
+ - Immediately notify core about forced connectivity state [#13485](https://github.com/mapbox/mapbox-gl-native/pull/13485)
+ - Handle transition duration of 0ms for symbols [#13535](https://github.com/mapbox/mapbox-gl-native/pull/13535)
+ - Returning boolean when removing sources and layers [#13428](https://github.com/mapbox/mapbox-gl-native/pull/13428)
+ - Telemetry v4.1.1 bump [#13499](https://github.com/mapbox/mapbox-gl-native/pull/13499)
+ - mapbox-java 4.2.0 bump [#13507](https://github.com/mapbox/mapbox-gl-native/pull/13507)
 
+## 7.0.0-alpha.3 - November 30, 2018
+ - Add `fill-extrusion-vertical-gradient` fill paint property [#13463](https://github.com/mapbox/mapbox-gl-native/pull/13463)
+ - Don't cancel core transitions on MotionEvent#ACTION_CANCEL [#13465](https://github.com/mapbox/mapbox-gl-native/pull/13465)
+ - Require context in AttributionParser.Options [#13444](https://github.com/mapbox/mapbox-gl-native/pull/13444)
+ - Deprecated annotations package [#13468](https://github.com/mapbox/mapbox-gl-native/pull/13468)
+ - Send turnstile event while create MapSnapshotter instance [#13475](https://github.com/mapbox/mapbox-gl-native/pull/13475)
+ - Remove default zoom level restrictions when activating the location component [#13425](https://github.com/mapbox/mapbox-gl-native/pull/13425)
 
 ## 6.7.2 - November 30, 2018
  - Telemetry v3.5.6 [#13486](https://github.com/mapbox/mapbox-gl-native/pull/13486)
