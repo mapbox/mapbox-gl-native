@@ -225,7 +225,10 @@ void NativeMapView::onDidBecomeIdle() {
     android::UniqueEnv _env = android::AttachEnv();
     static auto& javaClass = jni::Class<NativeMapView>::Singleton(*_env);
     static auto onDidBecomeIdle = javaClass.GetMethod<void ()>(*_env, "onDidBecomeIdle");
-    javaPeer.get(*_env).Call(*_env, onDidBecomeIdle);
+    auto weakReference = javaPeer.get(*_env);
+    if (weakReference) {
+        weakReference.Call(*_env, onDidBecomeIdle);
+    }
 }
 
 void NativeMapView::onDidFinishLoadingStyle() {
@@ -501,7 +504,10 @@ void NativeMapView::scheduleSnapshot(jni::JNIEnv&) {
         // invoke Mapview#OnSnapshotReady
         static auto& javaClass = jni::Class<NativeMapView>::Singleton(*_env);
         static auto onSnapshotReady = javaClass.GetMethod<void (jni::Object<Bitmap>)>(*_env, "onSnapshotReady");
-        javaPeer.get(*_env).Call(*_env, onSnapshotReady, bitmap);
+        auto weakReference = javaPeer.get(*_env);
+        if (weakReference) {
+            weakReference.Call(*_env, onSnapshotReady, bitmap);
+        }
     });
 }
 

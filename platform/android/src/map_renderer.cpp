@@ -58,7 +58,10 @@ void MapRenderer::schedule(std::weak_ptr<Mailbox> scheduled) {
     static auto& javaClass = jni::Class<MapRenderer>::Singleton(*_env);
     static auto queueEvent = javaClass.GetMethod<void(
             jni::Object<MapRendererRunnable>)>(*_env, "queueEvent");
-    javaPeer.get(*_env).Call(*_env, queueEvent, peer);
+    auto weakReference = javaPeer.get(*_env);
+    if (weakReference) {
+        weakReference.Call(*_env, queueEvent, peer);
+    }
 
     // Release the c++ peer as it will be destroyed on GC of the Java Peer
     runnable.release();
@@ -68,7 +71,10 @@ void MapRenderer::requestRender() {
     android::UniqueEnv _env = android::AttachEnv();
     static auto& javaClass = jni::Class<MapRenderer>::Singleton(*_env);
     static auto onInvalidate = javaClass.GetMethod<void()>(*_env, "requestRender");
-    javaPeer.get(*_env).Call(*_env, onInvalidate);
+    auto weakReference = javaPeer.get(*_env);
+    if (weakReference) {
+        weakReference.Call(*_env, onInvalidate);
+    }
 }
 
 void MapRenderer::update(std::shared_ptr<UpdateParameters> params) {
