@@ -63,6 +63,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
     setupMapView(savedInstanceState);
     setupDebugChangeView();
     setupStyleChangeView();
+    setupFpsChangeView();
   }
 
   private void setupToolbar() {
@@ -169,6 +170,15 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
         }
         mapboxMap.setStyle(new Style.Builder().fromUrl(STYLES[currentStyleIndex]));
       }
+    });
+  }
+
+  private void setupFpsChangeView() {
+    findViewById(R.id.fps_30).setOnClickListener(view -> {
+      mapView.setMaximumFps(30);
+    });
+    findViewById(R.id.fps_60).setOnClickListener(view -> {
+      mapView.setMaximumFps(60);
     });
   }
 
