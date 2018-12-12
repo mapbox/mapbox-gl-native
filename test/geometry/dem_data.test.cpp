@@ -20,9 +20,8 @@ TEST(DEMData, ConstructorMapbox) {
     DEMData demdata(image, Tileset::DEMEncoding::Mapbox);
 
     EXPECT_EQ(demdata.dim, 16);
-    EXPECT_EQ(demdata.border, 8);
-    EXPECT_EQ(demdata.stride, 32);
-    EXPECT_EQ(demdata.getImage()->bytes(), size_t(32*32*4));
+    EXPECT_EQ(demdata.stride, 18);
+    EXPECT_EQ(demdata.getImage()->bytes(), size_t(18*18*4));
 };
 
 TEST(DEMData, ConstructorTerrarium) {
@@ -30,9 +29,8 @@ TEST(DEMData, ConstructorTerrarium) {
     DEMData demdata(image, Tileset::DEMEncoding::Terrarium);
 
     EXPECT_EQ(demdata.dim, 16);
-    EXPECT_EQ(demdata.border, 8);
-    EXPECT_EQ(demdata.stride, 32);
-    EXPECT_EQ(demdata.getImage()->bytes(), size_t(32*32*4));
+    EXPECT_EQ(demdata.stride, 18);
+    EXPECT_EQ(demdata.getImage()->bytes(), size_t(18*18*4));
 };
 
 TEST(DEMData, RoundTrip) {

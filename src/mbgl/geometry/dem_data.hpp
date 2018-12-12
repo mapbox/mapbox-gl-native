@@ -29,7 +29,6 @@ public:
     }
 
     const int32_t dim;
-    const int32_t border;
     const int32_t stride;
 
 
@@ -37,11 +36,11 @@ public:
         PremultipliedImage image;
 
         size_t idx(const int32_t x, const int32_t y) const {
-            assert(x >= -border);
-            assert(x < dim + border);
-            assert(y >= -border);
-            assert(y < dim + border);
-            return (y + border) * stride + (x + border);
+            assert(x >= -1);
+            assert(x < dim + 1);
+            assert(y >= -1);
+            assert(y < dim + 1);
+            return (y + 1) * stride + (x + 1);
         }
 
 };
