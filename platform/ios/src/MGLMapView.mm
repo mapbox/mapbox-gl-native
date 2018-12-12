@@ -551,7 +551,7 @@ public:
     _scaleBar.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_scaleBar];
     _scaleBarConstraints = [NSMutableArray array];
-    _scaleBarPosition = MGLUIElementsPositionTopLeft;
+    _scaleBarPosition = MGLUIElementsPositionBottomRight;
     _scaleBarOffset = CGPointMake(8, 8);
 
     // setup interaction
@@ -826,9 +826,10 @@ public:
 }
 
 - (void)updateConstraintsWithView:(UIView *)view
-                           constraints:(NSMutableArray *)constraints
-                              position:(MGLUIElementsPosition)position
-                                offset:(CGPoint)offset {
+                      constraints:(NSMutableArray *)constraints
+                         position:(MGLUIElementsPosition)position
+                             size:(CGSize)size
+                           offset:(CGPoint)offset {
     UIView *containerView = nil;
     NSMutableArray *updatedConstrants = [NSMutableArray array];
     
@@ -857,6 +858,8 @@ public:
             default:
                 break;
         }
+        [updatedConstrants addObject:[view.widthAnchor constraintEqualToConstant:size.width]];
+        [updatedConstrants addObject:[view.heightAnchor constraintEqualToConstant:size.height]];
     } else {
         // If we have a view controller reference and its automaticallyAdjustsScrollViewInsets
         // is set to YES, use its view as the parent for constraints. -[MGLMapView adjustContentInset]
@@ -972,7 +975,6 @@ public:
                                               attribute:NSLayoutAttributeBaseline
                                              multiplier:1
                                                constant:offset.y + self.contentInset.bottom]];
-                
                 [updatedConstrants addObject:
                  [NSLayoutConstraint constraintWithItem:self
                                               attribute:NSLayoutAttributeTrailing
@@ -986,6 +988,22 @@ public:
             default:
                 break;
         }
+        [updatedConstrants addObject:
+         [NSLayoutConstraint constraintWithItem:view
+                                      attribute:NSLayoutAttributeWidth
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:nil
+                                      attribute:NSLayoutAttributeNotAnAttribute
+                                     multiplier:1.0
+                                       constant:size.width]];
+        [updatedConstrants addObject:
+         [NSLayoutConstraint constraintWithItem:view
+                                      attribute:NSLayoutAttributeHeight
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:nil
+                                      attribute:NSLayoutAttributeNotAnAttribute
+                                     multiplier:1.0
+                                       constant:size.height]];
     }
     
     [containerView removeConstraints:constraints];
@@ -1001,24 +1019,28 @@ public:
     [self updateConstraintsWithView:self.compassView
                         constraints:self.compassViewConstraints
                            position:self.compassViewPosition
+                               size:self.compassView.bounds.size
                              offset:self.compassViewOffset];
     
     // scale bar view
     [self updateConstraintsWithView:self.scaleBar
                         constraints:self.scaleBarConstraints
                            position:self.scaleBarPosition
+                               size:self.scaleBar.intrinsicContentSize
                              offset:self.scaleBarOffset];
 
     // logo view
     [self updateConstraintsWithView:self.logoView
                         constraints:self.logoViewConstraints
                            position:self.logoViewPosition
+                               size:self.logoView.bounds.size
                              offset:self.logoViewOffset];
     
     // attribution button
     [self updateConstraintsWithView:self.attributionButton
                         constraints:self.attributionButtonConstraints
                            position:self.attributionButtonPosition
+                               size:self.attributionButton.bounds.size
                              offset:self.attributionButtonOffset];
     
     [super updateConstraints];
@@ -6395,6 +6417,7 @@ public:
     if ( ! self.scaleBar.hidden)
     {
         [(MGLScaleBar *)self.scaleBar setMetersPerPoint:[self metersPerPointAtLatitude:self.centerCoordinate.latitude]];
+        [self setNeedsUpdateConstraints];
     }
 }
 

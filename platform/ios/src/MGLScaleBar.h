@@ -6,4 +6,9 @@
 // Sets the scale and redraws the scale bar
 @property (nonatomic, assign) CLLocationDistance metersPerPoint;
 
+/**
+ TODO: Add comments
+ */
+- (CGSize)intrinsicContentSize;
+
 @end
