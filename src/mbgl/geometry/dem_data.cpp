@@ -5,8 +5,8 @@ namespace mbgl {
 
 DEMData::DEMData(const PremultipliedImage& _image, Tileset::DEMEncoding encoding):
     dim(_image.size.height),
-    border(std::max<int32_t>(std::ceil(_image.size.height / 2), 1)),
-    stride(dim + 2 * border),
+    // extra two pixels per row for border backfilling on either edge
+    stride(dim + 2),
     image({ static_cast<uint32_t>(stride), static_cast<uint32_t>(stride) }) {
 
     if (_image.size.height != _image.size.width){
@@ -76,22 +76,16 @@ void DEMData::backfillBorder(const DEMData& borderTileData, int8_t dx, int8_t dy
     // represents. For example, dx = -1, dy = -1 represents the upper left corner of the
     // base tile, so we only need to backfill one pixel at coordinates (-1, -1) of the tile
     // image.
-    int32_t _xMin = dx * dim;
-    int32_t _xMax = dx * dim + dim;
-    int32_t _yMin = dy * dim;
-    int32_t _yMax = dy * dim + dim;
+    int32_t xMin = dx * dim;
+    int32_t xMax = dx * dim + dim;
+    int32_t yMin = dy * dim;
+    int32_t yMax = dy * dim + dim;
     
-    if (dx == -1) _xMin = _xMax - 1;
-    else if (dx == 1) _xMax = _xMin + 1;
+    if (dx == -1) xMin = xMax - 1;
+    else if (dx == 1) xMax = xMin + 1;
     
-    if (dy == -1) _yMin = _yMax - 1;
-    else if (dy == 1) _yMax = _yMin + 1;
-    
-    int32_t xMin = util::clamp(_xMin, -border, dim + border);
-    int32_t xMax = util::clamp(_xMax, -border, dim + border);
-    
-    int32_t yMin = util::clamp(_yMin, -border, dim + border);
-    int32_t yMax = util::clamp(_yMax, -border, dim + border);
+    if (dy == -1) yMin = yMax - 1;
+    else if (dy == 1) yMax = yMin + 1;
     
     int32_t ox = -dx * dim;
     int32_t oy = -dy * dim;
