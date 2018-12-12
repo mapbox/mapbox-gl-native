@@ -1,8 +1,9 @@
 package com.mapbox.mapboxsdk.testapp.string;
 
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
+import android.support.test.runner.AndroidJUnit4;
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -12,12 +13,8 @@ import static junit.framework.Assert.assertEquals;
  * See core test in https://github.com/mapbox/mapbox-gl-native/blob/master/test/util/text_conversions.test.cpp
  * </p>
  */
-public class UppperLowerCaseTest extends BaseActivityTest {
-
-  @Override
-  protected Class getActivityClass() {
-    return EspressoTestActivity.class;
-  }
+@RunWith(AndroidJUnit4.class)
+public class UppperLowerCaseTest extends EspressoTest {
 
   @Test
   public void testToUpperCase() {

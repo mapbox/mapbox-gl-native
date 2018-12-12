@@ -15,8 +15,7 @@ import android.view.View;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 
 import org.hamcrest.Matcher;
 import org.junit.After;
@@ -39,14 +38,9 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.anything;
 import static org.hamcrest.core.IsNot.not;
 
-public class AttributionTest extends BaseActivityTest {
+public class AttributionTest extends EspressoTest {
 
   private URLSpan[] urlSpans;
-
-  @Override
-  protected Class getActivityClass() {
-    return EspressoTestActivity.class;
-  }
 
   @Before
   public void beforeTest() {

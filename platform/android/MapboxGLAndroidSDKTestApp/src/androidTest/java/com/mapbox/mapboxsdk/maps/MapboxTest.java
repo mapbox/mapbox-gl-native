@@ -1,27 +1,22 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.support.test.runner.AndroidJUnit4;
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertSame;
 import static junit.framework.Assert.assertTrue;
 
-public class MapboxTest extends BaseActivityTest {
+@RunWith(AndroidJUnit4.class)
+public class MapboxTest {
 
   private static final String ACCESS_TOKEN = "pk.0000000001";
   private static final String ACCESS_TOKEN_2 = "pk.0000000002";
 
-  @Override
-  protected Class getActivityClass() {
-    return EspressoTestActivity.class;
-  }
-
   @Test
   public void testConnected() {
-    validateTestSetup();
     assertTrue(Mapbox.isConnected());
 
     // test manual connectivity
@@ -37,7 +32,6 @@ public class MapboxTest extends BaseActivityTest {
 
   @Test
   public void setAccessToken() {
-    validateTestSetup();
     String realToken =  Mapbox.getAccessToken();
     Mapbox.setAccessToken(ACCESS_TOKEN);
     assertSame(ACCESS_TOKEN, Mapbox.getAccessToken());

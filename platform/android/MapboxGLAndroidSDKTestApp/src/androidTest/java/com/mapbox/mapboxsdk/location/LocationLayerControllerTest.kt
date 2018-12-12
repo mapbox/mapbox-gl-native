@@ -25,8 +25,7 @@ import com.mapbox.mapboxsdk.location.utils.MapboxTestingUtils.Companion.MAP_REND
 import com.mapbox.mapboxsdk.location.utils.MapboxTestingUtils.Companion.pushSourceUpdates
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest
-import com.mapbox.mapboxsdk.testapp.activity.SingleActivity
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.Matchers.equalTo
@@ -39,15 +38,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class LocationLayerControllerTest : BaseActivityTest() {
+class LocationLayerControllerTest : EspressoTest() {
 
   @Rule
   @JvmField
   val permissionRule: GrantPermissionRule = grant(Manifest.permission.ACCESS_FINE_LOCATION)
-
-  override fun getActivityClass(): Class<*> {
-    return SingleActivity::class.java
-  }
 
   private lateinit var styleChangeIdlingResource: StyleChangeIdlingResource
   private val location: Location by lazy {

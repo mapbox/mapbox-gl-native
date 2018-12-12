@@ -8,20 +8,16 @@ import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class StyleLoadTest : BaseActivityTest() {
+class StyleLoadTest : EspressoTest() {
 
     private lateinit var mapView: MapView
-
-    override fun getActivityClass(): Class<*> {
-        return EspressoTestActivity::class.java
-    }
 
     @Before
     override fun beforeTest() {

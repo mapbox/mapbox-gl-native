@@ -1,10 +1,9 @@
 package com.mapbox.mapboxsdk.testapp.offline;
 
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
+import android.support.test.runner.AndroidJUnit4;
 import com.mapbox.mapboxsdk.testapp.utils.OfflineUtils;
-
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -13,15 +12,11 @@ import static com.mapbox.mapboxsdk.testapp.activity.offline.OfflineActivity.JSON
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
-public class OfflineUtilsTest extends BaseActivityTest {
+@RunWith(AndroidJUnit4.class)
+public class OfflineUtilsTest {
 
   private static final String REGION_NAME = "hello world";
   private static final String CONVERTED_REGION_NAME = "{\"FIELD_REGION_NAME\":\"hello world\"}";
-
-  @Override
-  protected Class getActivityClass() {
-    return EspressoTestActivity.class;
-  }
 
   @Test
   public void testOfflineUtilsConvertToBytes() throws UnsupportedEncodingException {

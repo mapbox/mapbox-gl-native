@@ -27,8 +27,8 @@ import com.mapbox.mapboxsdk.location.utils.MapboxTestingUtils.Companion.MAP_CONN
 import com.mapbox.mapboxsdk.location.utils.MapboxTestingUtils.Companion.MAP_RENDER_DELAY
 import com.mapbox.mapboxsdk.location.utils.MapboxTestingUtils.Companion.pushSourceUpdates
 import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest
-import com.mapbox.mapboxsdk.testapp.activity.SingleActivity
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest
+import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity
 import com.mapbox.mapboxsdk.utils.ColorUtils
 import org.hamcrest.CoreMatchers.*
 import org.junit.*
@@ -37,15 +37,11 @@ import org.junit.Assert.assertTrue
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class LocationComponentTest : BaseActivityTest() {
+class LocationComponentTest : EspressoTest() {
 
   @Rule
   @JvmField
   val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION)
-
-  override fun getActivityClass(): Class<*> {
-    return SingleActivity::class.java
-  }
 
   private lateinit var styleChangeIdlingResource: StyleChangeIdlingResource
   private val location: Location by lazy {
@@ -188,7 +184,7 @@ class LocationComponentTest : BaseActivityTest() {
         component.isLocationComponentEnabled = true
 
         // Source should be present but empty
-        val mapView = (rule.activity as SingleActivity).mapView
+        val mapView = (rule.activity as EspressoTestActivity).mapView
         assertThat(mapboxMap.queryRenderedFeatures(
           RectF(0f, 0f, mapView.width.toFloat(), mapView.height.toFloat()), FOREGROUND_LAYER)
           .isEmpty(), `is`(true))

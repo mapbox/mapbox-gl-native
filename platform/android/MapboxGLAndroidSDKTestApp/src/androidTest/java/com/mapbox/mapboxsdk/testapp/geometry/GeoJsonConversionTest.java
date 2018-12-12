@@ -7,8 +7,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.CustomGeometrySource;
 import com.mapbox.mapboxsdk.style.sources.GeometryTileProvider;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 import org.junit.Test;
 
 import static com.mapbox.geojson.Feature.fromGeometry;
@@ -23,7 +22,7 @@ import static java.util.Collections.singletonList;
 /**
  * Instrumentation test to validate java geojson conversion to c++
  */
-public class GeoJsonConversionTest extends BaseActivityTest {
+public class GeoJsonConversionTest extends EspressoTest {
 
   // Regression test for #12343
   @Test
@@ -116,11 +115,6 @@ public class GeoJsonConversionTest extends BaseActivityTest {
       );
       mapboxMap.getStyle().addLayer(new SymbolLayer("test-id", "test-id"));
     }));
-  }
-
-  @Override
-  protected Class getActivityClass() {
-    return EspressoTestActivity.class;
   }
 
   class CustomProvider implements GeometryTileProvider {

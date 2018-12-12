@@ -7,19 +7,15 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class VisibleRegionTest : BaseActivityTest() {
+class VisibleRegionTest : EspressoTest() {
 
   private lateinit var mapView: MapView
-
-  override fun getActivityClass(): Class<*> {
-    return EspressoTestActivity::class.java
-  }
 
   override fun beforeTest() {
     super.beforeTest()
