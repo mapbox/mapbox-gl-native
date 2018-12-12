@@ -89,14 +89,20 @@ void MapSnapshotter::start(JNIEnv& env) {
         if (err) {
             // error handler callback
             static auto onSnapshotFailed = javaClass.GetMethod<void (jni::String)>(*_env, "onSnapshotFailed");
-            javaPeer.get(*_env).Call(*_env, onSnapshotFailed, jni::Make<jni::String>(*_env, util::toString(err)));
+            auto weakReference = javaPeer.get(*_env);
+            if (weakReference) {
+                weakReference.Call(*_env, onSnapshotFailed, jni::Make<jni::String>(*_env, util::toString(err)));
+            }
         } else {
             // Create the wrapper
             auto mapSnapshot = android::MapSnapshot::New(*_env, std::move(image), pixelRatio, attributions, showLogo, pointForFn, latLngForFn);
 
             // invoke callback
             static auto onSnapshotReady = javaClass.GetMethod<void (jni::Object<MapSnapshot>)>(*_env, "onSnapshotReady");
-            javaPeer.get(*_env).Call(*_env, onSnapshotReady, mapSnapshot);
+            auto weakReference = javaPeer.get(*_env);
+            if (weakReference) {
+                weakReference.Call(*_env, onSnapshotReady, mapSnapshot);
+            }
         }
 
         deactivateFilesource(*_env);
