@@ -422,6 +422,18 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   /**
+   *  The maximum frame rate at which the map view is rendered,
+   *  but it can't excess the ability of device hardware.
+   *
+   * @param maximumFps  Can be set to arbitrary integer values.
+   */
+  public void setMaximumFps(int maximumFps) {
+    if (mapRenderer != null) {
+      mapRenderer.setMaximumFps(maximumFps);
+    }
+  }
+
+  /**
    * Returns if the map has been destroyed.
    * <p>
    * This method can be used to determine if the result of an asynchronous operation should be set.
