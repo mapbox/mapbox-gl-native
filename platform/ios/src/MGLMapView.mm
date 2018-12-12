@@ -551,7 +551,7 @@ public:
     _scaleBar.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_scaleBar];
     _scaleBarConstraints = [NSMutableArray array];
-    _scaleBarPosition = MGLUIElementsPositionBottomRight;
+    _scaleBarPosition = MGLUIElementsPositionTopLeft;
     _scaleBarOffset = CGPointMake(8, 8);
 
     // setup interaction
