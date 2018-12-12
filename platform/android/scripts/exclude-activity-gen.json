@@ -44,5 +44,6 @@
   "TextureViewDebugModeActivity",
   "RuntimeStyleActivity",
   "GridSourceActivity",
-  "AnimatedImageSourceActivity"
+  "AnimatedImageSourceActivity",
+  "EspressoTestActivity"
 ]

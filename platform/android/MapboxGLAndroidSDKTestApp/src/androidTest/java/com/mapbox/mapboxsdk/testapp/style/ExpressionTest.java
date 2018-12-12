@@ -18,8 +18,7 @@ import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.style.types.Formatted;
 import com.mapbox.mapboxsdk.style.types.FormattedSection;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
 
@@ -61,7 +60,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
 @RunWith(AndroidJUnit4.class)
-public class ExpressionTest extends BaseActivityTest {
+public class ExpressionTest extends EspressoTest {
 
   private FillLayer layer;
 
@@ -556,10 +555,5 @@ public class ExpressionTest extends BaseActivityTest {
         )
       );
     });
-  }
-
-  @Override
-  protected Class getActivityClass() {
-    return EspressoTestActivity.class;
   }
 }

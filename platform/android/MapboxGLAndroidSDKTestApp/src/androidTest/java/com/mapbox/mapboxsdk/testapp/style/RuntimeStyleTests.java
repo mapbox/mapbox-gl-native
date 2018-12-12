@@ -21,8 +21,7 @@ import com.mapbox.mapboxsdk.style.sources.RasterSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.style.sources.VectorSource;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 
 import junit.framework.Assert;
 
@@ -52,12 +51,7 @@ import static org.junit.Assert.fail;
  * Basic smoke tests for Layer and Source
  */
 @RunWith(AndroidJUnit4.class)
-public class RuntimeStyleTests extends BaseActivityTest {
-
-  @Override
-  protected Class getActivityClass() {
-    return RuntimeStyleTestActivity.class;
-  }
+public class RuntimeStyleTests extends EspressoTest {
 
   @Test
   public void testListLayers() {

@@ -4,8 +4,7 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 import com.mapbox.mapboxsdk.testapp.utils.TestConstants;
 
 import org.junit.Ignore;
@@ -18,14 +17,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
 import static org.junit.Assert.assertEquals;
 
-public class MarkerTest extends BaseActivityTest {
+public class MarkerTest extends EspressoTest {
 
   private Marker marker;
-
-  @Override
-  protected Class getActivityClass() {
-    return EspressoTestActivity.class;
-  }
 
   @Test
   @Ignore

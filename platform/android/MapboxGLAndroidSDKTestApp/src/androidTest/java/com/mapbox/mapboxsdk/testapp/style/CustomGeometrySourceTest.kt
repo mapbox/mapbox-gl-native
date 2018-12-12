@@ -8,7 +8,7 @@ import com.mapbox.mapboxsdk.style.sources.CustomGeometrySource.THREAD_PREFIX
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke
 import com.mapbox.mapboxsdk.testapp.action.OrientationChangeAction.orientationLandscape
 import com.mapbox.mapboxsdk.testapp.action.OrientationChangeAction.orientationPortrait
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest
+import com.mapbox.mapboxsdk.testapp.activity.BaseTest
 import com.mapbox.mapboxsdk.testapp.activity.style.GridSourceActivity
 import com.mapbox.mapboxsdk.testapp.activity.style.GridSourceActivity.ID_GRID_LAYER
 import com.mapbox.mapboxsdk.testapp.activity.style.GridSourceActivity.ID_GRID_SOURCE
@@ -16,7 +16,7 @@ import org.junit.Assert
 import org.junit.Ignore
 import org.junit.Test
 
-class CustomGeometrySourceTest : BaseActivityTest() {
+class CustomGeometrySourceTest : BaseTest() {
 
   override fun getActivityClass(): Class<*> = GridSourceActivity::class.java
 
