@@ -208,7 +208,8 @@ public class LatLng implements Parcelable {
    */
   @NonNull
   public LatLng wrap() {
-    return new LatLng(latitude, wrap(longitude, GeometryConstants.MIN_LONGITUDE, GeometryConstants.MAX_LONGITUDE));
+    return new LatLng(latitude, wrap(longitude,
+            GeometryConstants.MIN_WRAP_LONGITUDE, GeometryConstants.MAX_WRAP_LONGITUDE));
   }
 
 

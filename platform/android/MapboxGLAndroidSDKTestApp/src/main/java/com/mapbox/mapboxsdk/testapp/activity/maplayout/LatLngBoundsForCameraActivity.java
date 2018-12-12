@@ -5,9 +5,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
-
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -18,13 +19,23 @@ import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
- * Test activity showcasing restricting user gestures to a bounds around Iceland.
+ * Test activity showcasing restricting user gestures to a bounds around Iceland, almost worldview and IDL.
  */
 public class LatLngBoundsForCameraActivity extends AppCompatActivity implements OnMapReadyCallback {
 
   private static final LatLngBounds ICELAND_BOUNDS = new LatLngBounds.Builder()
     .include(new LatLng(66.852863, -25.985652))
     .include(new LatLng(62.985661, -12.626277))
+    .build();
+
+  private static final LatLngBounds ALMOST_WORLD_BOUNDS = new LatLngBounds.Builder()
+    .include(new LatLng(20.0, 170.0))
+    .include(new LatLng(-20, -170.0))
+    .build();
+
+  private static final LatLngBounds CROSS_IDL_BOUNDS = new LatLngBounds.Builder()
+    .include(new LatLng(20.0, 170.0))
+    .include(new LatLng(-20, 190.0))
     .build();
 
   private MapView mapView;
@@ -35,7 +46,7 @@ public class LatLngBoundsForCameraActivity extends AppCompatActivity implements 
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_restricted_bounds);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
   }
@@ -44,18 +55,43 @@ public class LatLngBoundsForCameraActivity extends AppCompatActivity implements 
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
     mapboxMap.setStyle(Style.SATELLITE_STREETS);
-    mapboxMap.setLatLngBoundsForCameraTarget(ICELAND_BOUNDS);
     mapboxMap.setMinZoomPreference(2);
-    showBoundsArea();
+    mapboxMap.getUiSettings().setFlingVelocityAnimationEnabled(false);
     showCrosshair();
+    setupBounds(ICELAND_BOUNDS);
   }
 
-  private void showBoundsArea() {
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.menu_bounds, menu);
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.menu_action_allmost_world_bounds:
+        setupBounds(ALMOST_WORLD_BOUNDS);
+        return true;
+      case R.id.menu_action_cross_idl:
+        setupBounds(CROSS_IDL_BOUNDS);
+        return true;
+    }
+    return super.onOptionsItemSelected(item);
+  }
+
+  private void setupBounds(LatLngBounds bounds) {
+    mapboxMap.setLatLngBoundsForCameraTarget(bounds);
+    showBoundsArea(bounds);
+  }
+
+  private void showBoundsArea(LatLngBounds bounds) {
+    mapboxMap.clear();
     PolygonOptions boundsArea = new PolygonOptions()
-      .add(ICELAND_BOUNDS.getNorthWest())
-      .add(ICELAND_BOUNDS.getNorthEast())
-      .add(ICELAND_BOUNDS.getSouthEast())
-      .add(ICELAND_BOUNDS.getSouthWest());
+      .add(bounds.getNorthWest())
+      .add(bounds.getNorthEast())
+      .add(bounds.getSouthEast())
+      .add(bounds.getSouthWest());
     boundsArea.alpha(0.25f);
     boundsArea.fillColor(Color.RED);
     mapboxMap.addPolygon(boundsArea);
