@@ -126,7 +126,8 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
 
         if (!bucket.isPrepared() && parameters.pass == RenderPass::Pass3D) {
             const uint16_t stride = bucket.getDEMData().stride;
-            OffscreenTexture view(parameters.context, { stride, stride });
+            const uint16_t tilesize = bucket.getDEMData().dim;
+            OffscreenTexture view(parameters.context, { tilesize, tilesize });
             view.bind();
             
             parameters.context.bindTexture(*bucket.dem, 0, gl::TextureFilter::Nearest, gl::TextureMipMap::No, gl::TextureWrap::Clamp, gl::TextureWrap::Clamp);
