@@ -294,12 +294,12 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIView *scaleBar;
 
 /**
- 
+ TODO: Add comments
  */
 @property (nonatomic, readonly) MGLUIElementsPosition scaleBarPosition;
 
 /**
- 
+ TODO: Add comments
  */
 @property (nonatomic, readonly) CGPoint scaleBarOffset;
 
@@ -310,12 +310,12 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIImageView *compassView;
 
 /**
- 
+ TODO: Add comments
  */
 @property (nonatomic, assign) MGLUIElementsPosition compassViewPosition;
 
 /**
- 
+ TODO: Add comments
  */
 @property (nonatomic, assign) CGPoint compassViewOffset;
 
@@ -331,12 +331,12 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIImageView *logoView;
 
 /**
- 
+ TODO: Add comments
  */
 @property (nonatomic, assign) MGLUIElementsPosition logoViewPosition;
 
 /**
- 
+ TODO: Add comments
  */
 @property (nonatomic, assign) CGPoint logoViewOffset;
 

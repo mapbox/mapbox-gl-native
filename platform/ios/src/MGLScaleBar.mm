@@ -194,8 +194,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 
 - (CGFloat)maximumWidth {
     CGFloat fullWidth = CGRectGetWidth(self.superview.bounds);
-    CGFloat padding = [self usesRightToLeftLayout] ? fullWidth - CGRectGetMaxX(self.frame) : CGRectGetMinX(self.frame);
-    return floorf(fullWidth / 2 - padding);
+    return floorf(fullWidth / 2);
 }
 
 - (CGFloat)unitsPerPoint {
