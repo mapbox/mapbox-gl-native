@@ -25,7 +25,7 @@ typedef NSString *MGLShapeSourceOption NS_STRING_ENUM;
  
  This option only affects point features within an `MGLShapeSource` object; it
  is ignored when creating an `MGLComputedShapeSource` object.
- 
+
  #### Related examples
  See the <a href="https://docs.mapbox.com/ios/maps/examples/clustering/">Cluster point data</a> and <a href="https://docs.mapbox.com/ios/maps/examples/clustering-with-images/">Use images to cluster point data</a> examples to learn how to cluster point data with this `MGLShapeSourceOption`.
  */
