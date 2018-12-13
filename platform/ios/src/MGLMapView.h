@@ -296,12 +296,12 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  TODO: Add comments
  */
-@property (nonatomic, readonly) MGLUIElementsPosition scaleBarPosition;
+@property (nonatomic, assign) MGLUIElementsPosition scaleBarPosition;
 
 /**
  TODO: Add comments
  */
-@property (nonatomic, readonly) CGPoint scaleBarOffset;
+@property (nonatomic, assign) CGPoint scaleBarOffset;
 
 /**
  A control indicating the map’s direction and allowing the user to manipulate

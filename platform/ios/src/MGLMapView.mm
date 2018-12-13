@@ -819,6 +819,46 @@ public:
     return YES;
 }
 
+- (void)setScaleBarPosition:(MGLUIElementsPosition)scaleBarPosition {
+    _scaleBarPosition = scaleBarPosition;
+    [self setNeedsUpdateConstraints];
+}
+
+- (void)setScaleBarOffset:(CGPoint)scaleBarOffset {
+    _scaleBarOffset = scaleBarOffset;
+    [self setNeedsUpdateConstraints];
+}
+
+- (void)setCompassViewPosition:(MGLUIElementsPosition)compassViewPosition {
+    _compassViewPosition = compassViewPosition;
+    [self setNeedsUpdateConstraints];
+}
+
+- (void)setCompassViewOffset:(CGPoint)compassViewOffset {
+    _compassViewOffset = compassViewOffset;
+    [self setNeedsUpdateConstraints];
+}
+
+- (void)setLogoViewPosition:(MGLUIElementsPosition)logoViewPosition {
+    _logoViewPosition = logoViewPosition;
+    [self setNeedsUpdateConstraints];
+}
+
+- (void)setLogoViewOffset:(CGPoint)logoViewOffset {
+    _logoViewOffset = logoViewOffset;
+    [self setNeedsUpdateConstraints];
+}
+
+- (void)setAttributionButtonPosition:(MGLUIElementsPosition)attributionButtonPosition {
+    _attributionButtonPosition = attributionButtonPosition;
+    [self setNeedsUpdateConstraints];
+}
+
+- (void)setAttributionButtonOffset:(CGPoint)attributionButtonOffset {
+    _attributionButtonOffset = attributionButtonOffset;
+    [self setNeedsUpdateConstraints];
+}
+
 - (UIViewController *)viewControllerForLayoutGuides
 {
     // Per -[UIResponder nextResponder] documentation, a UIView’s next responder
