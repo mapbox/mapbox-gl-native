@@ -534,6 +534,19 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     return MGLTransitionFromOptions(transitionOptions);
 }
 
+- (void)setEnablePlacementTransitions:(BOOL)enablePlacementTransitions
+{
+    mbgl::style::TransitionOptions transitionOptions = self.rawStyle->getTransitionOptions();
+    transitionOptions.enablePlacementTransitions = static_cast<bool>(enablePlacementTransitions);
+    self.rawStyle->setTransitionOptions(transitionOptions);
+}
+
+- (BOOL)enablePlacementTransitions
+{
+    mbgl::style::TransitionOptions transitionOptions = self.rawStyle->getTransitionOptions();
+    return transitionOptions.enablePlacementTransitions;
+}
+
 #pragma mark Style light
 
 - (void)setLight:(MGLLight *)light

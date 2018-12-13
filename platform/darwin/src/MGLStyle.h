@@ -271,6 +271,13 @@ MGL_EXPORT
 @property (nonatomic) MGLTransition transition;
 
 /**
+ A boolean value indicating whether label placement transitions are enabled.
+ 
+ The default value of this property is `YES`.
+ */
+@property (nonatomic, assign) BOOL enablePlacementTransitions;
+
+/**
  Returns a source with the given identifier in the current style.
 
  @note Source identifiers are not guaranteed to exist across styles or different
