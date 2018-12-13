@@ -7,7 +7,7 @@
 @property (nonatomic, assign) CLLocationDistance metersPerPoint;
 
 /**
- TODO: Add comments
+ A `CGSize` indicating intrinsic content size of the scale bar.
  */
 - (CGSize)intrinsicContentSize;
 

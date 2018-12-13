@@ -294,12 +294,12 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIView *scaleBar;
 
 /**
- TODO: Add comments
+ A `MGLUIElementsPosition` indicating the position of the scale bar.
  */
 @property (nonatomic, assign) MGLUIElementsPosition scaleBarPosition;
 
 /**
- TODO: Add comments
+ A `CGPoint` indicating the position offset of the scale bar
  */
 @property (nonatomic, assign) CGPoint scaleBarOffset;
 
@@ -310,12 +310,12 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIImageView *compassView;
 
 /**
- TODO: Add comments
+ A `MGLUIElementsPosition` indicating the position of the compass.
  */
 @property (nonatomic, assign) MGLUIElementsPosition compassViewPosition;
 
 /**
- TODO: Add comments
+ A `CGPoint` indicating the position offset of the compass.
  */
 @property (nonatomic, assign) CGPoint compassViewOffset;
 
@@ -331,12 +331,12 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIImageView *logoView;
 
 /**
- TODO: Add comments
+ A `MGLUIElementsPosition` indicating the position of the logo.
  */
 @property (nonatomic, assign) MGLUIElementsPosition logoViewPosition;
 
 /**
- TODO: Add comments
+ A `CGPoint` indicating the position offset of the logo.
  */
 @property (nonatomic, assign) CGPoint logoViewOffset;
 
@@ -367,12 +367,12 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIButton *attributionButton;
 
 /**
- 
+  A `MGLUIElementsPosition` indicating the position of the attribution.
  */
 @property (nonatomic, assign) MGLUIElementsPosition attributionButtonPosition;
 
 /**
- 
+  A `CGPoint` indicating the position offset of the attribution.
  */
 @property (nonatomic, assign) CGPoint attributionButtonOffset;
 
