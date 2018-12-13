@@ -133,4 +133,9 @@ private:
     std::unordered_map<Bitset, Program> programs;
 };
 
+class LayerTypePrograms {
+public:
+    virtual ~LayerTypePrograms() = default;
+};
+
 } // namespace mbgl

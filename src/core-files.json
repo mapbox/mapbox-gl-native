@@ -63,6 +63,7 @@
         "src/mbgl/programs/hillshade_program.cpp",
         "src/mbgl/programs/line_program.cpp",
         "src/mbgl/programs/program_parameters.cpp",
+        "src/mbgl/programs/programs.cpp",
         "src/mbgl/programs/raster_program.cpp",
         "src/mbgl/programs/symbol_program.cpp",
         "src/mbgl/renderer/backend_scope.cpp",

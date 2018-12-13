@@ -83,7 +83,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                      const auto& vertexBuffer,
                      const auto& indexBuffer,
                      const auto& segments) {
-        auto& programInstance = parameters.programs.raster;
+        auto& programInstance = parameters.programs.getRasterLayerPrograms().raster;
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
             RasterProgram::UniformValues {

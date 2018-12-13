@@ -178,4 +178,17 @@ public:
 using LineLayoutVertex = LineProgram::LayoutVertex;
 using LineAttributes = LineProgram::Attributes;
 
+class LineLayerPrograms final : public LayerTypePrograms {
+public:
+    LineLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+        : line(context, programParameters),
+          lineGradient(context, programParameters),
+          lineSDF(context, programParameters),
+          linePattern(context, programParameters) {}
+    ProgramMap<LineProgram> line;
+    ProgramMap<LineGradientProgram> lineGradient;
+    ProgramMap<LineSDFProgram> lineSDF;
+    ProgramMap<LinePatternProgram> linePattern;
+};
+
 } // namespace mbgl

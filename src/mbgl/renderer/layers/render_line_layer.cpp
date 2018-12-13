@@ -126,7 +126,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
 
             parameters.lineAtlas.bind(parameters.context, 0);
 
-            draw(parameters.programs.lineSDF,
+            draw(parameters.programs.getLineLayerPrograms().lineSDF,
                  LineSDFProgram::uniformValues(
                      evaluated,
                      parameters.pixelRatio,
@@ -148,7 +148,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             optional<ImagePosition> posA = geometryTile.getPattern(linePatternValue.from);
             optional<ImagePosition> posB = geometryTile.getPattern(linePatternValue.to);
 
-            draw(parameters.programs.linePattern,
+            draw(parameters.programs.getLineLayerPrograms().linePattern,
                  LinePatternProgram::uniformValues(
                      evaluated,
                      tile,
@@ -165,14 +165,14 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             }
             parameters.context.bindTexture(*colorRampTexture, 0, gl::TextureFilter::Linear);
 
-            draw(parameters.programs.lineGradient,
+            draw(parameters.programs.getLineLayerPrograms().lineGradient,
                  LineGradientProgram::uniformValues(
                     evaluated,
                     tile,
                     parameters.state,
                     parameters.pixelsToGLUnits), {}, {});
         } else {
-            draw(parameters.programs.line,
+            draw(parameters.programs.getLineLayerPrograms().line,
                  LineProgram::uniformValues(
                      evaluated,
                      tile,
