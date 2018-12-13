@@ -26,6 +26,8 @@ import com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraIdleListener;
 import com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveListener;
 import com.mapbox.mapboxsdk.maps.MapboxMap.OnMapClickListener;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -116,6 +118,11 @@ public final class LocationComponent {
    */
   private boolean isLayerReady;
 
+  /**
+   * Indicates whether we are listening for compass updates.
+   */
+  private boolean isListeningToCompass;
+
   private StaleStateManager staleStateManager;
   private final CopyOnWriteArrayList<OnLocationStaleListener> onLocationStaleListeners
     = new CopyOnWriteArrayList<>();
@@ -133,6 +140,21 @@ public final class LocationComponent {
    */
   public LocationComponent(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
+  }
+
+  public LocationComponent(@NotNull MapboxMap mapboxMap, @NotNull LocationEngine locationEngine,
+                           @NotNull LocationLayerController locationLayerController,
+                           @NotNull LocationCameraController locationCameraController,
+                           @NotNull LocationAnimatorCoordinator locationAnimatorCoordinator,
+                           @NotNull StaleStateManager staleStateManager, @NotNull CompassEngine compassEngine) {
+    this.mapboxMap = mapboxMap;
+    this.locationEngine = locationEngine;
+    this.locationLayerController = locationLayerController;
+    this.locationCameraController = locationCameraController;
+    this.locationAnimatorCoordinator = locationAnimatorCoordinator;
+    this.staleStateManager = staleStateManager;
+    this.compassEngine = compassEngine;
+    isInitialized = true;
   }
 
   /**
@@ -276,6 +298,7 @@ public final class LocationComponent {
     locationCameraController.setCameraMode(cameraMode);
     boolean isGpsNorth = cameraMode == CameraMode.TRACKING_GPS_NORTH;
     locationAnimatorCoordinator.resetAllCameraAnimations(mapboxMap.getCameraPosition(), isGpsNorth);
+    updateCompassListenerState(true);
   }
 
   /**
@@ -302,6 +325,7 @@ public final class LocationComponent {
   public void setRenderMode(@RenderMode.Mode int renderMode) {
     locationLayerController.setRenderMode(renderMode);
     updateLayerOffsets(true);
+    updateCompassListenerState(true);
   }
 
   /**
@@ -518,10 +542,12 @@ public final class LocationComponent {
    *
    * @param compassEngine to be used
    */
-  public void setCompassEngine(@NonNull CompassEngine compassEngine) {
-    this.compassEngine.removeCompassListener(compassListener);
+  public void setCompassEngine(@Nullable CompassEngine compassEngine) {
+    if (this.compassEngine != null) {
+      updateCompassListenerState(false);
+    }
     this.compassEngine = compassEngine;
-    compassEngine.addCompassListener(compassListener);
+    updateCompassListenerState(true);
   }
 
   /**
@@ -529,7 +555,7 @@ public final class LocationComponent {
    *
    * @return compass engine currently being used
    */
-  @NonNull
+  @Nullable
   public CompassEngine getCompassEngine() {
     return compassEngine;
   }
@@ -555,9 +581,11 @@ public final class LocationComponent {
    * The last known accuracy of the compass sensor, one of SensorManager.SENSOR_STATUS_*
    *
    * @return the last know compass accuracy bearing
+   * @deprecated Use {@link #getCompassEngine()}
    */
+  @Deprecated
   public float getLastKnownCompassAccuracyStatus() {
-    return compassEngine.getLastAccuracySensorStatus();
+    return compassEngine != null ? compassEngine.getLastAccuracySensorStatus() : 0;
   }
 
   /**
@@ -566,9 +594,13 @@ public final class LocationComponent {
    *
    * @param compassListener a {@link CompassListener} for listening into compass heading and
    *                        accuracy changes
+   * @deprecated Use {@link #getCompassEngine()}
    */
+  @Deprecated
   public void addCompassListener(@NonNull CompassListener compassListener) {
-    compassEngine.addCompassListener(compassListener);
+    if (compassEngine != null) {
+      compassEngine.addCompassListener(compassListener);
+    }
   }
 
   /**
@@ -576,9 +608,13 @@ public final class LocationComponent {
    *
    * @param compassListener the {@link CompassListener} which you'd like to remove from the listener
    *                        list.
+   * @deprecated Use {@link #getCompassEngine()}
    */
+  @Deprecated
   public void removeCompassListener(@NonNull CompassListener compassListener) {
-    compassEngine.removeCompassListener(compassListener);
+    if (compassEngine != null) {
+      compassEngine.removeCompassListener(compassListener);
+    }
   }
 
   /**
@@ -714,7 +750,6 @@ public final class LocationComponent {
       if (options.enableStaleState()) {
         staleStateManager.onStart();
       }
-      compassEngine.onStart();
     }
 
     if (isEnabled) {
@@ -726,6 +761,7 @@ public final class LocationComponent {
       }
       setCameraMode(locationCameraController.getCameraMode());
       setLastLocation();
+      updateCompassListenerState(true);
       setLastCompassHeading();
     }
   }
@@ -738,7 +774,9 @@ public final class LocationComponent {
     isLayerReady = false;
     locationLayerController.hide();
     staleStateManager.onStop();
-    compassEngine.onStop();
+    if (compassEngine != null) {
+      updateCompassListenerState(false);
+    }
     locationAnimatorCoordinator.cancelAllAnimations();
     if (locationEngine != null) {
       if (usingInternalLocationEngine) {
@@ -775,8 +813,9 @@ public final class LocationComponent {
 
     WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
     SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-    compassEngine = new LocationComponentCompassEngine(windowManager, sensorManager);
-    compassEngine.addCompassListener(compassListener);
+    if (windowManager != null && sensorManager != null) {
+      compassEngine = new LocationComponentCompassEngine(windowManager, sensorManager);
+    }
     staleStateManager = new StaleStateManager(onLocationStaleListener, options);
 
     updateMapWithOptions(options);
@@ -804,6 +843,38 @@ public final class LocationComponent {
     locationEngine.activate();
   }
 
+  private void updateCompassListenerState(boolean canListen) {
+    if (compassEngine != null) {
+      if (!canListen) {
+        // We shouldn't listen, simply unregistering
+        removeCompassListener(compassEngine);
+        return;
+      }
+
+      if (!isInitialized || !isComponentStarted || !isEnabled) {
+        return;
+      }
+
+      if (locationCameraController.isConsumingCompass() || locationLayerController.isConsumingCompass()) {
+        // If we have a consumer, and not yet listening, then start listening
+        if (!isListeningToCompass) {
+          isListeningToCompass = true;
+          compassEngine.addCompassListener(compassListener);
+        }
+      } else {
+        // If we have no consumers, stop listening
+        removeCompassListener(compassEngine);
+      }
+    }
+  }
+
+  private void removeCompassListener(@NonNull CompassEngine engine) {
+    if (isListeningToCompass) {
+      isListeningToCompass = false;
+      engine.removeCompassListener(compassListener);
+    }
+  }
+
   private void enableLocationComponent() {
     isEnabled = true;
     onLocationLayerStart();
@@ -815,9 +886,12 @@ public final class LocationComponent {
   }
 
   private void updateMapWithOptions(final LocationComponentOptions options) {
-    mapboxMap.setPadding(
-      options.padding()[0], options.padding()[1], options.padding()[2], options.padding()[3]
-    );
+    int[] padding = options.padding();
+    if (padding != null) {
+      mapboxMap.setPadding(
+        padding[0], padding[1], padding[2], padding[3]
+      );
+    }
 
     mapboxMap.setMaxZoomPreference(options.maxZoom());
     mapboxMap.setMinZoomPreference(options.minZoom());
@@ -869,7 +943,7 @@ public final class LocationComponent {
   }
 
   private void setLastCompassHeading() {
-    updateCompassHeading(compassEngine.getLastHeading());
+    updateCompassHeading(compassEngine != null ? compassEngine.getLastHeading() : 0);
   }
 
   @SuppressLint("MissingPermission")

@@ -11,8 +11,8 @@ import com.google.gson.JsonObject;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -190,6 +190,10 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
 
   boolean isHidden() {
     return isHidden;
+  }
+
+  boolean isConsumingCompass() {
+    return renderMode == RenderMode.COMPASS;
   }
 
   private void setLayerVisibility(String layerId, boolean visible) {

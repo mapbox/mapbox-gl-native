@@ -164,6 +164,11 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
     }
   }
 
+  boolean isConsumingCompass() {
+    return cameraMode == CameraMode.TRACKING_COMPASS
+      || cameraMode == CameraMode.NONE_COMPASS;
+  }
+
   private boolean isLocationTracking() {
     return cameraMode == CameraMode.TRACKING
       || cameraMode == CameraMode.TRACKING_COMPASS
