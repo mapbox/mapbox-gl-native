@@ -617,6 +617,8 @@ run-android-render-test-$1: $(BUILD_DEPS) platform/android/gradle/configuration.
 	adb pull "`adb shell 'printenv EXTERNAL_STORAGE' | tr -d '\r'`/mapbox/render" platform/android/build/render-test
 	# copy expected result and run pixelmatch
 	python platform/android/scripts/run-render-test.py
+	# remove test definitions from assets
+	rm -rf platform/android/MapboxGLAndroidSDKTestApp/src/main/assets/integration
 
 endef
 
@@ -753,7 +755,8 @@ clean:
 	        ./platform/android/MapboxGLAndroidSDK/.externalNativeBuild \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/build \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/activity/gen \
-	        ./platform/android/MapboxGLAndroidSDK/src/main/assets
+	        ./platform/android/MapboxGLAndroidSDK/src/main/assets \
+		./platform/android/MapboxGLAndroidSDKTestApp/src/main/assets/integration
 
 .PHONY: distclean
 distclean: clean
