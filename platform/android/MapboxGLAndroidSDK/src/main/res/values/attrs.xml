@@ -169,5 +169,11 @@
         <!-- Animation duration multiplier -->
         <attr name="mapbox_trackingAnimationDurationMultiplier" format="float" />
 
+        <!-- Compass animation -->
+        <attr name="mapbox_compassAnimationEnabled" format="boolean" />
+
+        <!-- Accuracy animation-->
+        <attr name="mapbox_accuracyAnimationEnabled" format="boolean" />
+
     </declare-styleable>
 </resources>

@@ -110,6 +110,8 @@ public class LocationComponentOptions implements Parcelable {
   private float trackingMultiFingerMoveThreshold;
   private String layerBelow;
   private float trackingAnimationDurationMultiplier;
+  private boolean compassAnimationEnabled;
+  private boolean accuracyAnimationEnabled;
 
   public LocationComponentOptions(
     float accuracyAlpha,
@@ -141,7 +143,9 @@ public class LocationComponentOptions implements Parcelable {
     float trackingInitialMoveThreshold,
     float trackingMultiFingerMoveThreshold,
     String layerBelow,
-    float trackingAnimationDurationMultiplier) {
+    float trackingAnimationDurationMultiplier,
+    boolean compassAnimationEnabled,
+    boolean accuracyAnimationEnabled) {
     this.accuracyAlpha = accuracyAlpha;
     this.accuracyColor = accuracyColor;
     this.backgroundDrawableStale = backgroundDrawableStale;
@@ -175,6 +179,8 @@ public class LocationComponentOptions implements Parcelable {
     this.trackingMultiFingerMoveThreshold = trackingMultiFingerMoveThreshold;
     this.layerBelow = layerBelow;
     this.trackingAnimationDurationMultiplier = trackingAnimationDurationMultiplier;
+    this.compassAnimationEnabled = compassAnimationEnabled;
+    this.accuracyAnimationEnabled = accuracyAnimationEnabled;
   }
 
   /**
@@ -281,6 +287,14 @@ public class LocationComponentOptions implements Parcelable {
     );
     builder.trackingAnimationDurationMultiplier(trackingAnimationDurationMultiplier);
 
+    builder.compassAnimationEnabled = typedArray.getBoolean(
+      R.styleable.mapbox_LocationComponent_mapbox_compassAnimationEnabled, true
+    );
+
+    builder.accuracyAnimationEnabled = typedArray.getBoolean(
+      R.styleable.mapbox_LocationComponent_mapbox_accuracyAnimationEnabled, true
+    );
+
     typedArray.recycle();
 
     return builder.build();
@@ -347,7 +361,7 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * String image name, identical to one used in
-   * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
+   * the first parameter of {@link com.mapbox.mapboxsdk.maps.Style.Builder#addImage(String, Bitmap)}, the
    * component, will use this image in place of the provided or default mapbox_foregroundDrawableStale.
    * <p>
    * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
@@ -374,7 +388,7 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * String image name, identical to one used in
-   * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
+   * the first parameter of {@link com.mapbox.mapboxsdk.maps.Style.Builder#addImage(String, Bitmap)}, the
    * component, will used this image in place of the provided or default mapbox_foregroundDrawableStale.
    * <p>
    * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
@@ -401,7 +415,7 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * String image name, identical to one used in
-   * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
+   * the first parameter of {@link com.mapbox.mapboxsdk.maps.Style.Builder#addImage(String, Bitmap)}, the
    * component, will used this image in place of the provided or default mapbox_gpsDrawable.
    * <p>
    * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
@@ -428,7 +442,7 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * String image name, identical to one used in
-   * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
+   * the first parameter of {@link com.mapbox.mapboxsdk.maps.Style.Builder#addImage(String, Bitmap)}, the
    * component, will used this image in place of the provided or default mapbox_foregroundDrawable.
    * <p>
    * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
@@ -455,7 +469,7 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * String image name, identical to one used in
-   * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
+   * the first parameter of {@link com.mapbox.mapboxsdk.maps.Style.Builder#addImage(String, Bitmap)}, the
    * component, will used this image in place of the provided or default mapbox_backgroundDrawable.
    * <p>
    * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
@@ -482,7 +496,7 @@ public class LocationComponentOptions implements Parcelable {
 
   /**
    * String image name, identical to one used in
-   * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
+   * the first parameter of {@link com.mapbox.mapboxsdk.maps.Style.Builder#addImage(String, Bitmap)}, the
    * component, will used this image in place of the provided or default mapbox_bearingDrawable.
    * <p>
    * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
@@ -684,6 +698,25 @@ public class LocationComponentOptions implements Parcelable {
     return trackingAnimationDurationMultiplier;
   }
 
+  /**
+   * Enable or disable smooth animation of compass values for {@link com.mapbox.mapboxsdk.location.modes.CameraMode}
+   * and {@link com.mapbox.mapboxsdk.location.modes.RenderMode}.
+   *
+   * @return whether smooth compass animation is enabled
+   */
+  public boolean compassAnimationEnabled() {
+    return compassAnimationEnabled;
+  }
+
+  /**
+   * Enable or disable smooth animation of the accuracy circle around the user's position.
+   *
+   * @return whether smooth animation of the accuracy circle is enabled
+   */
+  public boolean accuracyAnimationEnabled() {
+    return accuracyAnimationEnabled;
+  }
+
   @NonNull
   @Override
   public String toString() {
@@ -836,6 +869,10 @@ public class LocationComponentOptions implements Parcelable {
     h$ ^= Float.floatToIntBits(trackingMultiFingerMoveThreshold);
     h$ *= 1000003;
     h$ ^= Float.floatToIntBits(trackingAnimationDurationMultiplier);
+    h$ *= 1000003;
+    h$ ^= compassAnimationEnabled ? 1231 : 1237;
+    h$ *= 1000003;
+    h$ ^= accuracyAnimationEnabled ? 1231 : 1237;
     return h$;
   }
 
@@ -873,7 +910,9 @@ public class LocationComponentOptions implements Parcelable {
           in.readFloat(),
           in.readFloat(),
           in.readString(),
-          in.readFloat()
+          in.readFloat(),
+          in.readInt() == 1,
+          in.readInt() == 1
         );
       }
 
@@ -970,6 +1009,8 @@ public class LocationComponentOptions implements Parcelable {
     dest.writeFloat(trackingMultiFingerMoveThreshold());
     dest.writeString(layerBelow());
     dest.writeFloat(trackingAnimationDurationMultiplier);
+    dest.writeInt(compassAnimationEnabled() ? 1 : 0);
+    dest.writeInt(accuracyAnimationEnabled() ? 1 : 0);
   }
 
   @Override
@@ -1045,6 +1086,8 @@ public class LocationComponentOptions implements Parcelable {
     private Float trackingMultiFingerMoveThreshold;
     private String layerBelow;
     private Float trackingAnimationDurationMultiplier;
+    private Boolean compassAnimationEnabled;
+    private Boolean accuracyAnimationEnabled;
 
     Builder() {
     }
@@ -1080,6 +1123,8 @@ public class LocationComponentOptions implements Parcelable {
       this.trackingMultiFingerMoveThreshold = source.trackingMultiFingerMoveThreshold();
       this.layerBelow = source.layerBelow();
       this.trackingAnimationDurationMultiplier = source.trackingAnimationDurationMultiplier();
+      this.compassAnimationEnabled = source.compassAnimationEnabled();
+      this.accuracyAnimationEnabled = source.accuracyAnimationEnabled();
     }
 
     /**
@@ -1124,7 +1169,7 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Given a String image name, identical to one used in
-     * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
+     * the first parameter of {@link com.mapbox.mapboxsdk.maps.Style.Builder#addImage(String, Bitmap)}, the
      * component, will used this image in place of the provided or default mapbox_backgroundDrawableStale.
      * <p>
      * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
@@ -1155,7 +1200,7 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Given a String image name, identical to one used in
-     * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
+     * the first parameter of {@link com.mapbox.mapboxsdk.maps.Style.Builder#addImage(String, Bitmap)}, the
      * component, will used this image in place of the provided or default mapbox_foregroundDrawableStale.
      * <p>
      * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
@@ -1186,7 +1231,7 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Given a String image name, identical to one used in
-     * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
+     * the first parameter of {@link com.mapbox.mapboxsdk.maps.Style.Builder#addImage(String, Bitmap)}, the
      * component, will used this image in place of the provided or default mapbox_gpsDrawable.
      * <p>
      * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
@@ -1217,7 +1262,7 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Given a String image name, identical to one used in
-     * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
+     * the first parameter of {@link com.mapbox.mapboxsdk.maps.Style.Builder#addImage(String, Bitmap)}, the
      * component, will used this image in place of the provided or default mapbox_foregroundDrawable.
      * <p>
      * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
@@ -1248,7 +1293,7 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Given a String image name, identical to one used in
-     * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
+     * the first parameter of {@link com.mapbox.mapboxsdk.maps.Style.Builder#addImage(String, Bitmap)}, the
      * component, will used this image in place of the provided or default mapbox_backgroundDrawable.
      * <p>
      * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
@@ -1279,7 +1324,7 @@ public class LocationComponentOptions implements Parcelable {
 
     /**
      * Given a String image name, identical to one used in
-     * the first parameter of {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}, the
+     * the first parameter of {@link com.mapbox.mapboxsdk.maps.Style.Builder#addImage(String, Bitmap)}, the
      * component, will used this image in place of the provided or default mapbox_bearingDrawable.
      * <p>
      * A maki-icon name (example: "circle-15") may also be provided.  These are images that can be loaded
@@ -1524,6 +1569,27 @@ public class LocationComponentOptions implements Parcelable {
       return this;
     }
 
+    /**
+     * Enable or disable smooth animation of compass values for {@link com.mapbox.mapboxsdk.location.modes.CameraMode}
+     * and {@link com.mapbox.mapboxsdk.location.modes.RenderMode}.
+     *
+     * @return whether smooth compass animation is enabled
+     */
+    public LocationComponentOptions.Builder compassAnimationEnabled(Boolean compassAnimationEnabled) {
+      this.compassAnimationEnabled = compassAnimationEnabled;
+      return this;
+    }
+
+    /**
+     * Enable or disable smooth animation of the accuracy circle around the user's position.
+     *
+     * @return whether smooth animation of the accuracy circle is enabled
+     */
+    public Builder accuracyAnimationEnabled(Boolean accuracyAnimationEnabled) {
+      this.accuracyAnimationEnabled = accuracyAnimationEnabled;
+      return this;
+    }
+
     @Nullable
     LocationComponentOptions autoBuild() {
       String missing = "";
@@ -1614,7 +1680,9 @@ public class LocationComponentOptions implements Parcelable {
         this.trackingInitialMoveThreshold,
         this.trackingMultiFingerMoveThreshold,
         this.layerBelow,
-        this.trackingAnimationDurationMultiplier);
+        this.trackingAnimationDurationMultiplier,
+        this.compassAnimationEnabled,
+        this.accuracyAnimationEnabled);
     }
   }
 }
