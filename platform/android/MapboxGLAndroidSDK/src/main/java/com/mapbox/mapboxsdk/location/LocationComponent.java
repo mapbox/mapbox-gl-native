@@ -550,6 +550,8 @@ public final class LocationComponent {
       staleStateManager.setEnabled(options.enableStaleState());
       staleStateManager.setDelayTime(options.staleStateTimeout());
       locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options.trackingAnimationDurationMultiplier());
+      locationAnimatorCoordinator.setCompassAnimationEnabled(options.compassAnimationEnabled());
+      locationAnimatorCoordinator.setAccuracyAnimationEnabled(options.accuracyAnimationEnabled());
       updateMapWithOptions(options);
     }
   }
@@ -1015,7 +1017,10 @@ public final class LocationComponent {
     locationCameraController = new LocationCameraController(
       context, mapboxMap, cameraTrackingChangedListener, options, onCameraMoveInvalidateListener);
 
-    locationAnimatorCoordinator = new LocationAnimatorCoordinator(mapboxMap.getProjection());
+    locationAnimatorCoordinator = new LocationAnimatorCoordinator(
+      mapboxMap.getProjection(),
+      MapboxAnimatorSetProvider.getInstance()
+    );
     locationAnimatorCoordinator.addLayerListener(locationLayerController);
     locationAnimatorCoordinator.addCameraListener(locationCameraController);
     locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options

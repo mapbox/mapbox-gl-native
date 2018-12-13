@@ -48,6 +48,8 @@
         <item name="mapbox_accuracyColor">#FF82C6</item>
 
         <item name="mapbox_elevation">0dp</item>
+        <item name="mapbox_compassAnimationEnabled">false</item>
+        <item name="mapbox_accuracyAnimationEnabled">false</item>
     </style>
 
 </resources>
