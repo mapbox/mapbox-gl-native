@@ -143,4 +143,10 @@
 
     <!-- Animation duration multiplier -->
     <public name="mapbox_trackingAnimationDurationMultiplier" format="float" type="attr" />
+
+    <!-- Compass animation -->
+    <public name="mapbox_compassAnimationEnabled" format="boolean" type="attr" />
+
+    <!-- Accuracy animation-->
+    <public name="mapbox_accuracyAnimationEnabled" format="boolean" type="attr" />
 </resources>
