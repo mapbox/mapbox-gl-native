@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.view.MotionEvent;
+
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.android.gestures.RotateGestureDetector;
@@ -244,6 +245,11 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
         moveGestureDetector.setMoveThreshold(0f);
       }
     }
+  }
+
+  boolean isConsumingCompass() {
+    return cameraMode == CameraMode.TRACKING_COMPASS
+      || cameraMode == CameraMode.NONE_COMPASS;
   }
 
   private boolean isLocationTracking() {

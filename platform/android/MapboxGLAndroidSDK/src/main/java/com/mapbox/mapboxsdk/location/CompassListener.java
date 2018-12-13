@@ -7,7 +7,7 @@ public interface CompassListener {
 
   /**
    * Callback's invoked when a new compass update occurs. You can listen into the compass updates
-   * using {@link LocationComponent#addCompassListener(CompassListener)} and implementing these
+   * using {@link CompassEngine#addCompassListener(CompassListener)} and implementing these
    * callbacks. Note that this interface is also used internally to to update the UI chevron/arrow.
    *
    * @param userHeading the new compass heading
