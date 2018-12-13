@@ -466,8 +466,8 @@ jobs:
     steps:
       - install-dependencies: { mason: false, ccache: false }
       - run:
-          name: Initialize submodule
-          command: git submodule update --init mapbox-gl-js
+          name: Initialize submodules
+          command: git submodule update --init
       - run:
           name: Verify submodule pin
           command: scripts/nitpick/submodule-pin.js

@@ -3,4 +3,4 @@ platform/darwin/src/http_file_source.mm
 platform/darwin/src/MGLLoggingConfiguration.m
 
 # Database
-platform/default/sqlite3.cpp
+platform/default/src/mbgl/storage/sqlite3.cpp

@@ -1,4 +1,4 @@
-#include "sqlite3.hpp"
+#include <mbgl/storage/sqlite3.hpp>
 
 #include <QSqlDatabase>
 #include <QSqlError>

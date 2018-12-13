@@ -21,7 +21,7 @@ target_include_directories(mbgl-test
     PRIVATE src
     PRIVATE test/include
     PRIVATE test/src
-    PRIVATE platform/default
+    PRIVATE platform/default/include
 )
 
 target_link_libraries(mbgl-test PRIVATE

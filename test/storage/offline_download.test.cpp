@@ -12,7 +12,7 @@
 #include <mbgl/util/compression.hpp>
 #include <mbgl/util/string.hpp>
 
-#include <sqlite3.hpp>
+#include <mbgl/storage/sqlite3.hpp>
 #include <gtest/gtest.h>
 #include <iostream>
 

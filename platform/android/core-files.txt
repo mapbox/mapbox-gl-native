@@ -1,3 +1,6 @@
+# JNI overrides
+platform/default/include/jni/string_conversion.hpp
+
 # Loop
 platform/android/src/async_task.cpp
 platform/android/src/run_loop.cpp
@@ -12,14 +15,14 @@ platform/android/src/text/local_glyph_rasterizer_jni.hpp
 platform/android/src/logging_android.cpp
 platform/android/src/thread.cpp
 platform/android/src/string_util.cpp
-platform/default/bidi.cpp
-platform/default/thread_local.cpp
+platform/default/src/mbgl/text/bidi.cpp
+platform/default/src/mbgl/util/thread_local.cpp
 platform/android/src/unaccent.cpp
-platform/default/unaccent.hpp
-platform/default/utf.cpp
+platform/default/include/mbgl/text/unaccent.hpp
+platform/default/src/mbgl/util/utf.cpp
 
 # Image handling
-platform/default/png_writer.cpp
+platform/default/src/mbgl/util/png_writer.cpp
 platform/android/src/bitmap.cpp
 platform/android/src/bitmap.hpp
 platform/android/src/bitmap_factory.cpp
@@ -27,10 +30,10 @@ platform/android/src/bitmap_factory.hpp
 platform/android/src/image.cpp
 
 # Thread pool
-platform/default/mbgl/util/shared_thread_pool.cpp
-platform/default/mbgl/util/shared_thread_pool.hpp
-platform/default/mbgl/util/default_thread_pool.cpp
-platform/default/mbgl/util/default_thread_pool.hpp
+platform/default/src/mbgl/util/shared_thread_pool.cpp
+platform/default/include/mbgl/util/shared_thread_pool.hpp
+platform/default/src/mbgl/util/default_thread_pool.cpp
+platform/default/include/mbgl/util/default_thread_pool.hpp
 
 # Rendering
 platform/android/src/android_renderer_backend.cpp
@@ -39,12 +42,12 @@ platform/android/src/android_renderer_frontend.cpp
 platform/android/src/android_renderer_frontend.hpp
 
 # Snapshots (core)
-platform/default/mbgl/gl/headless_backend.cpp
-platform/default/mbgl/gl/headless_backend.hpp
-platform/default/mbgl/gl/headless_frontend.cpp
-platform/default/mbgl/gl/headless_frontend.hpp
-platform/default/mbgl/map/map_snapshotter.cpp
-platform/default/mbgl/map/map_snapshotter.hpp
+platform/default/src/mbgl/gl/headless_backend.cpp
+platform/default/include/mbgl/gl/headless_backend.hpp
+platform/default/src/mbgl/gl/headless_frontend.cpp
+platform/default/include/mbgl/gl/headless_frontend.hpp
+platform/default/src/mbgl/map/map_snapshotter.cpp
+platform/default/include/mbgl/map/map_snapshotter.hpp
 platform/linux/src/headless_backend_egl.cpp
 
 # Conversion C++ -> Java
@@ -74,7 +77,6 @@ platform/android/src/map/image.hpp
 platform/android/src/style/android_conversion.hpp
 platform/android/src/style/value.cpp
 platform/android/src/style/value.hpp
-platform/android/src/style/conversion/url_or_tileset.hpp
 
 # Style
 platform/android/src/style/transition_options.cpp
@@ -160,13 +162,13 @@ platform/android/src/geojson/line_string.hpp
 platform/android/src/geojson/multi_line_string.cpp
 platform/android/src/geojson/multi_line_string.hpp
 platform/android/src/geojson/multi_point.cpp
-platform/android/src/geojson/multi_point.hpp
 platform/android/src/geojson/multi_polygon.cpp
 platform/android/src/geojson/multi_polygon.hpp
 platform/android/src/geojson/point.cpp
 platform/android/src/geojson/point.hpp
 platform/android/src/geojson/polygon.cpp
 platform/android/src/geojson/polygon.hpp
+platform/android/src/geojson/util.hpp
 
 # Geometry
 platform/android/src/geometry/lat_lng.cpp
@@ -191,6 +193,7 @@ platform/android/src/gson/json_primitive.hpp
 # Annotation
 platform/android/src/annotation/marker.cpp
 platform/android/src/annotation/marker.hpp
+platform/android/src/annotation/multi_point.hpp
 platform/android/src/annotation/polygon.cpp
 platform/android/src/annotation/polygon.hpp
 platform/android/src/annotation/polyline.cpp

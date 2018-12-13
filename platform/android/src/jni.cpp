@@ -1,8 +1,6 @@
 #include "jni.hpp"
 
 #include <mbgl/util/logging.hpp>
-#include <src/style/formatted.hpp>
-#include <src/style/formatted_section.hpp>
 
 #include "annotation/marker.hpp"
 #include "annotation/polygon.hpp"
@@ -46,6 +44,8 @@
 #include "style/layers/layer_manager.hpp"
 #include "style/sources/source.hpp"
 #include "style/light.hpp"
+#include "style/formatted.hpp"
+#include "style/formatted_section.hpp"
 #include "snapshotter/map_snapshotter.hpp"
 #include "snapshotter/map_snapshot.hpp"
 #include "text/collator_jni.hpp"

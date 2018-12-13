@@ -11,17 +11,17 @@ set(CMAKE_AUTORCC ON)
 
 set(MBGL_QT_CORE_FILES
     # Headless view
-    PRIVATE platform/default/mbgl/gl/headless_frontend.cpp
-    PRIVATE platform/default/mbgl/gl/headless_frontend.hpp
-    PRIVATE platform/default/mbgl/gl/headless_backend.cpp
-    PRIVATE platform/default/mbgl/gl/headless_backend.hpp
+    PRIVATE platform/default/src/mbgl/gl/headless_frontend.cpp
+    PRIVATE platform/default/include/mbgl/gl/headless_frontend.hpp
+    PRIVATE platform/default/src/mbgl/gl/headless_backend.cpp
+    PRIVATE platform/default/include/mbgl/gl/headless_backend.hpp
     PRIVATE platform/qt/src/headless_backend_qt.cpp
 
     # Thread pool
-    PRIVATE platform/default/mbgl/util/shared_thread_pool.cpp
-    PRIVATE platform/default/mbgl/util/shared_thread_pool.hpp
-    PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
-    PRIVATE platform/default/mbgl/util/default_thread_pool.hpp
+    PRIVATE platform/default/src/mbgl/util/shared_thread_pool.cpp
+    PRIVATE platform/default/include/mbgl/util/shared_thread_pool.hpp
+    PRIVATE platform/default/src/mbgl/util/default_thread_pool.cpp
+    PRIVATE platform/default/include/mbgl/util/default_thread_pool.hpp
 
     # Thread
     PRIVATE platform/qt/src/thread_local.cpp
@@ -38,13 +38,13 @@ set(MBGL_QT_CORE_FILES
     PRIVATE platform/qt/src/timer_impl.hpp
     PRIVATE platform/qt/src/utf.cpp
 
-    PRIVATE platform/default/local_glyph_rasterizer.cpp
-    PRIVATE platform/default/collator.cpp
-    PRIVATE platform/default/unaccent.cpp
-    PRIVATE platform/default/unaccent.hpp
+    PRIVATE platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
+    PRIVATE platform/default/src/mbgl/text/collator.cpp
+    PRIVATE platform/default/src/mbgl/text/unaccent.cpp
+    PRIVATE platform/default/include/mbgl/text/unaccent.hpp
 
     #Layer manager
-    PRIVATE platform/default/layer_manager.cpp
+    PRIVATE platform/default/src/mbgl/layermanager/layer_manager.cpp
 )
 
 set(MBGL_QT_FILESOURCE_FILES
@@ -76,7 +76,7 @@ add_library(qmapboxgl SHARED
     platform/qt/src/qmapboxgl_renderer_backend.hpp
     platform/qt/src/qmapboxgl_scheduler.cpp
     platform/qt/src/qmapboxgl_scheduler.hpp
-    platform/default/mbgl/util/default_styles.hpp
+    platform/default/include/mbgl/util/default_styles.hpp
 )
 
 target_include_directories(qmapboxgl
@@ -150,7 +150,7 @@ if (MASON_PLATFORM STREQUAL "osx" OR MASON_PLATFORM STREQUAL "ios")
     )
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     list(APPEND MBGL_QT_CORE_FILES
-        PRIVATE platform/default/thread.cpp
+        PRIVATE platform/default/src/mbgl/util/thread.cpp
     )
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     add_definitions("-DQT_COMPILING_QIMAGE_COMPAT_CPP")
