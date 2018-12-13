@@ -9,6 +9,7 @@ import com.mapbox.android.core.location.LocationEngineRequest
 import com.mapbox.mapboxsdk.R
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.location.modes.CameraMode
+import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import io.mockk.mockk
@@ -182,5 +183,165 @@ class LocationComponentTest {
 
     verify(listener).onLocationCameraTransitionCanceled(CameraMode.TRACKING)
     verify(locationAnimatorCoordinator).resetAllCameraAnimations(CameraPosition.DEFAULT, false)
+  }
+
+  @Test
+  fun compass_listenWhenConsumedByNoneCamera() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.onStart()
+    locationComponent.isLocationComponentEnabled = true
+    `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
+
+    `when`(locationCameraController.isConsumingCompass).thenReturn(true)
+    locationComponent.cameraMode = CameraMode.NONE_COMPASS
+    verify(compassEngine).addCompassListener(any(CompassListener::class.java))
+  }
+
+  @Test
+  fun compass_listenWhenConsumedByTrackingCamera() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.onStart()
+    locationComponent.isLocationComponentEnabled = true
+    `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
+
+    `when`(locationCameraController.isConsumingCompass).thenReturn(true)
+    locationComponent.cameraMode = CameraMode.TRACKING_COMPASS
+    verify(compassEngine).addCompassListener(any(CompassListener::class.java))
+  }
+
+  @Test
+  fun compass_listenWhenConsumedByLayer() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.onStart()
+    locationComponent.isLocationComponentEnabled = true
+    `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
+
+    `when`(locationLayerController.isConsumingCompass).thenReturn(true)
+    locationComponent.renderMode = RenderMode.COMPASS
+    verify(compassEngine).addCompassListener(any(CompassListener::class.java))
+  }
+
+  @Test
+  fun compass_notListenWhenNotConsumed() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.onStart()
+    locationComponent.isLocationComponentEnabled = true
+    `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
+
+    `when`(locationLayerController.isConsumingCompass).thenReturn(false)
+    `when`(locationCameraController.isConsumingCompass).thenReturn(false)
+    locationComponent.renderMode = RenderMode.GPS
+    locationComponent.renderMode = RenderMode.NORMAL
+    locationComponent.cameraMode = CameraMode.TRACKING
+    locationComponent.cameraMode = CameraMode.NONE
+    locationComponent.cameraMode = CameraMode.NONE_GPS
+    locationComponent.cameraMode = CameraMode.TRACKING_GPS
+    locationComponent.cameraMode = CameraMode.TRACKING_GPS_NORTH
+    verify(compassEngine, never()).addCompassListener(any(CompassListener::class.java))
+  }
+
+  @Test
+  fun compass_removeListenerOnChange() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.onStart()
+    locationComponent.isLocationComponentEnabled = true
+    `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
+
+    `when`(locationLayerController.isConsumingCompass).thenReturn(true)
+    locationComponent.renderMode = RenderMode.COMPASS
+    `when`(locationLayerController.isConsumingCompass).thenReturn(false)
+    locationComponent.renderMode = RenderMode.NORMAL
+    verify(compassEngine).removeCompassListener(any(CompassListener::class.java))
+  }
+
+  @Test
+  fun compass_removeListenerOnStop() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.onStart()
+    locationComponent.isLocationComponentEnabled = true
+    `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
+
+    `when`(locationLayerController.isConsumingCompass).thenReturn(true)
+    locationComponent.renderMode = RenderMode.COMPASS
+    locationComponent.onStop()
+    verify(compassEngine).removeCompassListener(any(CompassListener::class.java))
+  }
+
+  @Test
+  fun compass_reAddListenerOnStart() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.onStart()
+    locationComponent.isLocationComponentEnabled = true
+    `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
+
+    `when`(locationLayerController.isConsumingCompass).thenReturn(true)
+    locationComponent.renderMode = RenderMode.COMPASS
+    locationComponent.onStop()
+    locationComponent.onStart()
+    verify(compassEngine, times(2)).addCompassListener(any(CompassListener::class.java))
+  }
+
+  @Test
+  fun compass_removeListenerOnStyleStartLoad() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.onStart()
+    locationComponent.isLocationComponentEnabled = true
+    `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
+
+    `when`(locationLayerController.isConsumingCompass).thenReturn(true)
+    locationComponent.renderMode = RenderMode.COMPASS
+    locationComponent.onStartLoadingMap()
+    verify(compassEngine).removeCompassListener(any(CompassListener::class.java))
+  }
+
+  @Test
+  fun compass_reAddListenerOnStyleLoadFinished() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.onStart()
+    locationComponent.isLocationComponentEnabled = true
+    `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
+
+    `when`(locationLayerController.isConsumingCompass).thenReturn(true)
+    locationComponent.renderMode = RenderMode.COMPASS
+    locationComponent.onStartLoadingMap()
+    locationComponent.onFinishLoadingStyle()
+    verify(compassEngine, times(2)).addCompassListener(any(CompassListener::class.java))
+  }
+
+  @Test
+  fun compass_reAddListenerOnlyWhenEnabled() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.onStart()
+    locationComponent.isLocationComponentEnabled = true
+    `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
+
+    `when`(locationLayerController.isConsumingCompass).thenReturn(true)
+    locationComponent.renderMode = RenderMode.COMPASS
+    locationComponent.isLocationComponentEnabled = false
+    locationComponent.onStartLoadingMap()
+    locationComponent.onFinishLoadingStyle()
+    verify(compassEngine).addCompassListener(any(CompassListener::class.java))
+  }
+
+  @Test
+  fun compass_notAdListenerWhenDisabled() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.onStart()
+    `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
+
+    `when`(locationLayerController.isConsumingCompass).thenReturn(true)
+    locationComponent.renderMode = RenderMode.COMPASS
+    verify(compassEngine, never()).addCompassListener(any(CompassListener::class.java))
+  }
+
+  @Test
+  fun compass_notAdListenerWhenStopped() {
+    locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
+    locationComponent.isLocationComponentEnabled = true
+    `when`(mapboxMap.cameraPosition).thenReturn(CameraPosition.DEFAULT)
+
+    `when`(locationLayerController.isConsumingCompass).thenReturn(true)
+    locationComponent.renderMode = RenderMode.COMPASS
+    verify(compassEngine, never()).addCompassListener(any(CompassListener::class.java))
   }
 }
