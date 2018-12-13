@@ -127,9 +127,6 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
     if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
       rotationVectorValue = getRotationVectorFromSensorEvent(event);
       updateOrientation();
-
-      // Update the compassUpdateNextTimestamp
-      compassUpdateNextTimestamp = currentTime + LocationComponentConstants.COMPASS_UPDATE_RATE_MS;
     } else if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
       notifyCompassChangeListeners((event.values[0] + 360) % 360);
     } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -139,6 +136,9 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
       magneticValues = lowPassFilter(getRotationVectorFromSensorEvent(event), magneticValues);
       updateOrientation();
     }
+
+    // Update the compassUpdateNextTimestamp
+    compassUpdateNextTimestamp = currentTime + LocationComponentConstants.COMPASS_UPDATE_RATE_MS;
   }
 
   @Override
