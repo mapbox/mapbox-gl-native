@@ -10,6 +10,8 @@ import android.support.annotation.Nullable;
 import android.view.Surface;
 import android.view.WindowManager;
 
+import com.mapbox.mapboxsdk.log.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,15 +23,18 @@ import timber.log.Timber;
  */
 class LocationComponentCompassEngine implements CompassEngine, SensorEventListener {
 
+  private static final String TAG = "Mbgl-LocationComponentCompassEngine";
+
   // The rate sensor events will be delivered at. As the Android documentation states, this is only
   // a hint to the system and the events might actually be received faster or slower then this
   // specified rate. Since the minimum Android API levels about 9, we are able to set this value
   // ourselves rather than using one of the provided constants which deliver updates too quickly for
   // our use case. The default is set to 100ms
-  private static final int SENSOR_DELAY_MICROS = 100 * 1000;
+  static final int SENSOR_DELAY_MICROS = 100 * 1000;
   // Filtering coefficient 0 < ALPHA < 1
   private static final float ALPHA = 0.45f;
 
+  @NonNull
   private final WindowManager windowManager;
   private final SensorManager sensorManager;
   private final List<CompassListener> compassListeners = new ArrayList<>();
@@ -56,7 +61,7 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
    * Construct a new instance of the this class. A internal compass listeners needed to separate it
    * from the cleared list of public listeners.
    */
-  LocationComponentCompassEngine(WindowManager windowManager, SensorManager sensorManager) {
+  LocationComponentCompassEngine(@NonNull WindowManager windowManager, @NonNull SensorManager sensorManager) {
     this.windowManager = windowManager;
     this.sensorManager = sensorManager;
     compassSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
@@ -75,7 +80,7 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
   @Override
   public void addCompassListener(@NonNull CompassListener compassListener) {
     if (compassListeners.isEmpty()) {
-      onStart();
+      registerSensorListeners();
     }
     compassListeners.add(compassListener);
   }
@@ -84,7 +89,7 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
   public void removeCompassListener(@NonNull CompassListener compassListener) {
     compassListeners.remove(compassListener);
     if (compassListeners.isEmpty()) {
-      onStop();
+      unregisterSensorListeners();
     }
   }
 
@@ -100,12 +105,16 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
 
   @Override
   public void onStart() {
-    registerSensorListeners();
+    if (!compassListeners.isEmpty()) {
+      registerSensorListeners();
+    }
   }
 
   @Override
   public void onStop() {
-    unregisterSensorListeners();
+    if (!compassListeners.isEmpty()) {
+      unregisterSensorListeners();
+    }
   }
 
   @Override
@@ -116,7 +125,7 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
       return;
     }
     if (lastAccuracySensorStatus == SensorManager.SENSOR_STATUS_UNRELIABLE) {
-      Timber.d("Compass sensor is unreliable, device calibration is needed.");
+      Logger.d(TAG, "Compass sensor is unreliable, device calibration is needed.");
       return;
     }
     if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
@@ -233,7 +242,8 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
    * @param smoothedValues array of float, that contains previous state
    * @return float filtered array of float
    */
-  private float[] lowPassFilter(float[] newValues, float[] smoothedValues) {
+  @NonNull
+  private float[] lowPassFilter(@NonNull float[] newValues, @Nullable float[] smoothedValues) {
     if (smoothedValues == null) {
       return newValues;
     }
