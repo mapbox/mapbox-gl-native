@@ -5,7 +5,7 @@ add_library(mbgl-filesource STATIC ${MBGL_FILESOURCE_FILES})
 target_include_directories(mbgl-filesource
     PRIVATE include
     PRIVATE src
-    PRIVATE platform/default
+    PRIVATE platform/default/include
 )
 
 target_link_libraries(mbgl-filesource

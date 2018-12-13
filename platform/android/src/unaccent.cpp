@@ -1,4 +1,4 @@
-#include <unaccent.hpp>
+#include <mbgl/text/unaccent.hpp>
 #include <string>
 #include "attach_env.hpp"
 #include "text/collator_jni.hpp"

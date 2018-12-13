@@ -8,7 +8,7 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/string.hpp>
 
-#include <sqlite3.hpp>
+#include <mbgl/storage/sqlite3.hpp>
 #include <thread>
 #include <random>
 

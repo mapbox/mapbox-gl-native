@@ -1,4 +1,4 @@
-#include "shared_thread_pool.hpp"
+#include <mbgl/util/shared_thread_pool.hpp>
 
 namespace mbgl {
 

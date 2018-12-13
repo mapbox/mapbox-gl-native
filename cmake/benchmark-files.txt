@@ -23,4 +23,3 @@ benchmark/parse/vector_tile.benchmark.cpp
 # util
 benchmark/util/dtoa.benchmark.cpp
 benchmark/util/tilecover.benchmark.cpp
-

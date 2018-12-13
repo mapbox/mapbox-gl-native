@@ -38,7 +38,7 @@ macro(mbgl_platform_core)
     target_sources_from_file(mbgl-core PRIVATE platform/android/core-files.txt)
 
     target_include_directories(mbgl-core
-        PUBLIC platform/default
+        PUBLIC platform/default/include
         PRIVATE platform/android
     )
 
@@ -90,7 +90,7 @@ target_link_libraries(mapbox-gl
 set(MBGL_TEST_TARGET_TYPE "library")
 macro(mbgl_platform_test)
     target_sources(mbgl-test
-        PRIVATE platform/default/mbgl/test/main.cpp
+        PRIVATE platform/default/src/mbgl/test/main.cpp
 
         # Main test entry point
         platform/android/src/test/main.jni.cpp

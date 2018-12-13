@@ -1,7 +1,7 @@
 #include <mbgl/style/expression/collator.hpp>
 #include <mbgl/util/platform.hpp>
 #include <libnu/strcoll.h>
-#include <unaccent.hpp>
+#include <mbgl/text/unaccent.hpp>
 
 /*
     The default implementation of Collator ignores locale.

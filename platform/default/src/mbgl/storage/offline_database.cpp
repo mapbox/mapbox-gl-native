@@ -1,15 +1,15 @@
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/storage/sqlite3.hpp>
 #include <mbgl/util/compression.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/logging.hpp>
 
-#include "offline_schema.hpp"
-#include "merge_sideloaded.hpp"
+#include <mbgl/storage/offline_schema.hpp>
+#include <mbgl/storage/merge_sideloaded.hpp>
 
-#include "sqlite3.hpp"
 
 namespace mbgl {
 

@@ -6,7 +6,7 @@ target_include_directories(mbgl-benchmark
     PRIVATE src
     PRIVATE benchmark/include
     PRIVATE benchmark/src
-    PRIVATE platform/default
+    PRIVATE platform/default/include
 )
 
 target_link_libraries(mbgl-benchmark

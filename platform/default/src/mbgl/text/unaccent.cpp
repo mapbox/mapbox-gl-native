@@ -1,6 +1,6 @@
 #include <mbgl/util/platform.hpp>
 #include <libnu/unaccent.h>
-#include <unaccent.hpp>
+#include <mbgl/text/unaccent.hpp>
 
 #include <cstring>
 #include <sstream>

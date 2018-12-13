@@ -72,10 +72,10 @@ void setTempPath(const std::string&);
 class Database {
 private:
     Database(std::unique_ptr<DatabaseImpl>);
-    Database(const Database &) = delete;
-    Database &operator=(const Database &) = delete;
 
 public:
+    Database(const Database &) = delete;
+    Database &operator=(const Database &) = delete;
     static mapbox::util::variant<Database, Exception> tryOpen(const std::string &filename, int flags = 0);
     static Database open(const std::string &filename, int flags = 0);
 
@@ -154,12 +154,11 @@ private:
 };
 
 class Transaction {
-private:
+public:
     Transaction(const Transaction&) = delete;
     Transaction(Transaction&&) = delete;
     Transaction& operator=(const Transaction&) = delete;
 
-public:
     enum Mode {
         Deferred,
         Immediate,
@@ -177,5 +176,5 @@ private:
     bool needRollback = true;
 };
 
-}
-}
+} // namespace sqlite
+} // namespace mapbox

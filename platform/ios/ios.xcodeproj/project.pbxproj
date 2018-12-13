@@ -298,6 +298,53 @@
 		55D120A61F791007004B6D81 /* libmbgl-loop-darwin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A71F791007004B6D81 /* libmbgl-loop-darwin.a */; };
 		55D120A81F79100C004B6D81 /* libmbgl-filesource.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A91F79100C004B6D81 /* libmbgl-filesource.a */; };
 		55E2AD131E5B125400E8C587 /* MGLOfflineStorageTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55E2AD121E5B125400E8C587 /* MGLOfflineStorageTests.mm */; };
+		55E5663F21C2A0920008B8B5 /* configuration_utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C0F1FE05F3600C1BD0D /* configuration_utils.h */; };
+		55E5664021C2A0920008B8B5 /* parse_configuration.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C131FE05F3600C1BD0D /* parse_configuration.h */; };
+		55E5664121C2A0920008B8B5 /* ssl_pin_verifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C161FE05F3600C1BD0D /* ssl_pin_verifier.h */; };
+		55E5664221C2A0920008B8B5 /* TSKPublicKeyAlgorithm.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C181FE05F3600C1BD0D /* TSKPublicKeyAlgorithm.h */; };
+		55E5664321C2A0920008B8B5 /* TSKSPKIHashCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C191FE05F3600C1BD0D /* TSKSPKIHashCache.h */; };
+		55E5664421C2A0920008B8B5 /* reporting_utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C1C1FE05F3600C1BD0D /* reporting_utils.h */; };
+		55E5664521C2A0930008B8B5 /* TSKBackgroundReporter.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C1E1FE05F3600C1BD0D /* TSKBackgroundReporter.h */; };
+		55E5664621C2A0930008B8B5 /* TSKPinFailureReport.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C201FE05F3600C1BD0D /* TSKPinFailureReport.h */; };
+		55E5664721C2A0930008B8B5 /* TSKReportsRateLimiter.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C221FE05F3600C1BD0D /* TSKReportsRateLimiter.h */; };
+		55E5664821C2A0930008B8B5 /* vendor_identifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C241FE05F3600C1BD0D /* vendor_identifier.h */; };
+		55E5664921C2A0930008B8B5 /* TrustKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C261FE05F3600C1BD0D /* TrustKit.h */; };
+		55E5664A21C2A0930008B8B5 /* TSKLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C281FE05F3600C1BD0D /* TSKLog.h */; };
+		55E5664B21C2A0930008B8B5 /* TSKPinningValidator.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C291FE05F3600C1BD0D /* TSKPinningValidator.h */; };
+		55E5664C21C2A0930008B8B5 /* TSKPinningValidator_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C2B1FE05F3600C1BD0D /* TSKPinningValidator_Private.h */; };
+		55E5664D21C2A0930008B8B5 /* TSKPinningValidatorCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C2C1FE05F3600C1BD0D /* TSKPinningValidatorCallback.h */; };
+		55E5664E21C2A0930008B8B5 /* TSKPinningValidatorResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C2D1FE05F3600C1BD0D /* TSKPinningValidatorResult.h */; };
+		55E5664F21C2A0930008B8B5 /* TSKTrustDecision.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C2F1FE05F3600C1BD0D /* TSKTrustDecision.h */; };
+		55E5665021C2A0930008B8B5 /* TSKTrustKitConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C301FE05F3600C1BD0D /* TSKTrustKitConfig.h */; };
+		55E5665121C2A1C20008B8B5 /* MMEReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BCC1FE05D7100C1BD0D /* MMEReachability.h */; };
+		55E5665221C2A2080008B8B5 /* MMENamespacedDependencies.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BC81FE05D7000C1BD0D /* MMENamespacedDependencies.h */; };
+		55E5665321C2A2080008B8B5 /* MapboxMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BAC1FE05D6C00C1BD0D /* MapboxMobileEvents.h */; };
+		55E5665421C2A2080008B8B5 /* CLLocation+MMEMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BC21FE05D6F00C1BD0D /* CLLocation+MMEMobileEvents.h */; };
+		55E5665521C2A2080008B8B5 /* MMEAPIClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BAB1FE05D6C00C1BD0D /* MMEAPIClient.h */; };
+		55E5665621C2A2080008B8B5 /* MMECategoryLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BB51FE05D6D00C1BD0D /* MMECategoryLoader.h */; };
+		55E5665721C2A2080008B8B5 /* MMECommonEventData.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BAE1FE05D6C00C1BD0D /* MMECommonEventData.h */; };
+		55E5665821C2A2080008B8B5 /* MMEConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BB01FE05D6C00C1BD0D /* MMEConstants.h */; };
+		55E5665921C2A2080008B8B5 /* MMEDependencyManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BB11FE05D6D00C1BD0D /* MMEDependencyManager.h */; };
+		55E5665A21C2A2080008B8B5 /* MMEEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BBA1FE05D6E00C1BD0D /* MMEEvent.h */; };
+		55E5665B21C2A2080008B8B5 /* MMEEventLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BA61FE05D6B00C1BD0D /* MMEEventLogger.h */; };
+		55E5665C21C2A2080008B8B5 /* MMEEventLogReportViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 406E99B51FFEFED600D9FFCC /* MMEEventLogReportViewController.h */; };
+		55E5665D21C2A2080008B8B5 /* MMEEventsConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BBB1FE05D6E00C1BD0D /* MMEEventsConfiguration.h */; };
+		55E5665E21C2A2080008B8B5 /* MMEHashProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = ACA65F4A214066AB00537748 /* MMEHashProvider.h */; };
+		55E5665F21C2A2080008B8B5 /* MMETrustKitProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = ACA65F442140667D00537748 /* MMETrustKitProvider.h */; };
+		55E5666021C2A2080008B8B5 /* MMEConfigurator.h in Headers */ = {isa = PBXBuildFile; fileRef = ACA65F4F214066E200537748 /* MMEConfigurator.h */; };
+		55E5666121C2A2080008B8B5 /* MMEEventsManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BA31FE05D6B00C1BD0D /* MMEEventsManager.h */; };
+		55E5666221C2A2080008B8B5 /* MMELocationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BB31FE05D6D00C1BD0D /* MMELocationManager.h */; };
+		55E5666321C2A2080008B8B5 /* MMEMetrics.h in Headers */ = {isa = PBXBuildFile; fileRef = ACD024552187EAAF00D8C8A7 /* MMEMetrics.h */; };
+		55E5666421C2A2080008B8B5 /* MMEMetricsManager.h in Headers */ = {isa = PBXBuildFile; fileRef = ACD024562187EAAF00D8C8A7 /* MMEMetricsManager.h */; };
+		55E5666521C2A2080008B8B5 /* MMENSDateWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BC51FE05D6F00C1BD0D /* MMENSDateWrapper.h */; };
+		55E5666621C2A2080008B8B5 /* MMENSURLSessionWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BAA1FE05D6C00C1BD0D /* MMENSURLSessionWrapper.h */; };
+		55E5666721C2A2080008B8B5 /* MMETimerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BC91FE05D7000C1BD0D /* MMETimerManager.h */; };
+		55E5666821C2A2080008B8B5 /* MMETypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BB61FE05D6D00C1BD0D /* MMETypes.h */; };
+		55E5666921C2A2080008B8B5 /* MMEUIApplicationWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BBE1FE05D6E00C1BD0D /* MMEUIApplicationWrapper.h */; };
+		55E5666A21C2A2080008B8B5 /* MMEUINavigation.h in Headers */ = {isa = PBXBuildFile; fileRef = 406E99B31FFEFED600D9FFCC /* MMEUINavigation.h */; };
+		55E5666B21C2A2080008B8B5 /* MMEUniqueIdentifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BBF1FE05D6E00C1BD0D /* MMEUniqueIdentifier.h */; };
+		55E5666C21C2A2080008B8B5 /* MMEDispatchManager.h in Headers */ = {isa = PBXBuildFile; fileRef = ACA65F552140696B00537748 /* MMEDispatchManager.h */; };
+		55E5666D21C2A2080008B8B5 /* NSData+MMEGZIP.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BCF1FE05D7100C1BD0D /* NSData+MMEGZIP.h */; };
 		632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */; };
 		6407D6701E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */; };
 		74CB5EB1219B252C00102936 /* MGLStyleLayerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 74CB5EAF219B252C00102936 /* MGLStyleLayerManager.h */; };
@@ -2359,7 +2406,6 @@
 				DA6408DB1DA4E7D300908C90 /* MGLVectorStyleLayer.h in Headers */,
 				DA704CC21F65A475004B3F28 /* MGLMapAccessibilityElement.h in Headers */,
 				DD0902AB1DB192A800C5BDCE /* MGLNetworkConfiguration.h in Headers */,
-				DA8848571CBAFB9800AB86E3 /* MGLMapboxEvents.h in Headers */,
 				35D3A1E61E9BE7EB002B38EE /* MGLScaleBar.h in Headers */,
 				0778DD431F67556700A73B34 /* MGLComputedShapeSource.h in Headers */,
 				1F6A82A221360F9D00BA5B41 /* MGLLoggingConfiguration.h in Headers */,
@@ -2441,6 +2487,54 @@
 				DAD1656E1CF41981001FF4B9 /* MGLFeature_Private.h in Headers */,
 				DA88483C1CBAFB8500AB86E3 /* MGLMapView.h in Headers */,
 				3EA9363147E77DD29FA06063 /* MGLRendererConfiguration.h in Headers */,
+				55E5663F21C2A0920008B8B5 /* configuration_utils.h in Headers */,
+				55E5664021C2A0920008B8B5 /* parse_configuration.h in Headers */,
+				55E5664121C2A0920008B8B5 /* ssl_pin_verifier.h in Headers */,
+				55E5664221C2A0920008B8B5 /* TSKPublicKeyAlgorithm.h in Headers */,
+				55E5664321C2A0920008B8B5 /* TSKSPKIHashCache.h in Headers */,
+				55E5664421C2A0920008B8B5 /* reporting_utils.h in Headers */,
+				55E5664521C2A0930008B8B5 /* TSKBackgroundReporter.h in Headers */,
+				55E5664621C2A0930008B8B5 /* TSKPinFailureReport.h in Headers */,
+				55E5664721C2A0930008B8B5 /* TSKReportsRateLimiter.h in Headers */,
+				55E5664821C2A0930008B8B5 /* vendor_identifier.h in Headers */,
+				55E5664921C2A0930008B8B5 /* TrustKit.h in Headers */,
+				55E5664A21C2A0930008B8B5 /* TSKLog.h in Headers */,
+				55E5664B21C2A0930008B8B5 /* TSKPinningValidator.h in Headers */,
+				55E5664C21C2A0930008B8B5 /* TSKPinningValidator_Private.h in Headers */,
+				55E5664D21C2A0930008B8B5 /* TSKPinningValidatorCallback.h in Headers */,
+				55E5664E21C2A0930008B8B5 /* TSKPinningValidatorResult.h in Headers */,
+				55E5664F21C2A0930008B8B5 /* TSKTrustDecision.h in Headers */,
+				55E5665021C2A0930008B8B5 /* TSKTrustKitConfig.h in Headers */,
+				55E5665121C2A1C20008B8B5 /* MMEReachability.h in Headers */,
+				55E5665221C2A2080008B8B5 /* MMENamespacedDependencies.h in Headers */,
+				55E5665321C2A2080008B8B5 /* MapboxMobileEvents.h in Headers */,
+				DA8848571CBAFB9800AB86E3 /* MGLMapboxEvents.h in Headers */,
+				55E5665421C2A2080008B8B5 /* CLLocation+MMEMobileEvents.h in Headers */,
+				55E5665521C2A2080008B8B5 /* MMEAPIClient.h in Headers */,
+				55E5665621C2A2080008B8B5 /* MMECategoryLoader.h in Headers */,
+				55E5665721C2A2080008B8B5 /* MMECommonEventData.h in Headers */,
+				55E5665821C2A2080008B8B5 /* MMEConstants.h in Headers */,
+				55E5665921C2A2080008B8B5 /* MMEDependencyManager.h in Headers */,
+				55E5665A21C2A2080008B8B5 /* MMEEvent.h in Headers */,
+				55E5665B21C2A2080008B8B5 /* MMEEventLogger.h in Headers */,
+				55E5665C21C2A2080008B8B5 /* MMEEventLogReportViewController.h in Headers */,
+				55E5665D21C2A2080008B8B5 /* MMEEventsConfiguration.h in Headers */,
+				55E5665E21C2A2080008B8B5 /* MMEHashProvider.h in Headers */,
+				55E5665F21C2A2080008B8B5 /* MMETrustKitProvider.h in Headers */,
+				55E5666021C2A2080008B8B5 /* MMEConfigurator.h in Headers */,
+				55E5666221C2A2080008B8B5 /* MMELocationManager.h in Headers */,
+				55E5666321C2A2080008B8B5 /* MMEMetrics.h in Headers */,
+				55E5666421C2A2080008B8B5 /* MMEMetricsManager.h in Headers */,
+				55E5666521C2A2080008B8B5 /* MMENSDateWrapper.h in Headers */,
+				55E5666621C2A2080008B8B5 /* MMENSURLSessionWrapper.h in Headers */,
+				55E5666721C2A2080008B8B5 /* MMETimerManager.h in Headers */,
+				55E5666821C2A2080008B8B5 /* MMETypes.h in Headers */,
+				55E5666921C2A2080008B8B5 /* MMEUIApplicationWrapper.h in Headers */,
+				55E5666A21C2A2080008B8B5 /* MMEUINavigation.h in Headers */,
+				55E5666B21C2A2080008B8B5 /* MMEUniqueIdentifier.h in Headers */,
+				55E5666C21C2A2080008B8B5 /* MMEDispatchManager.h in Headers */,
+				55E5666121C2A2080008B8B5 /* MMEEventsManager.h in Headers */,
+				55E5666D21C2A2080008B8B5 /* NSData+MMEGZIP.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
