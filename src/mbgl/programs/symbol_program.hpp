@@ -6,6 +6,7 @@
 #include <mbgl/util/interpolate.hpp>
 
 #include <mbgl/programs/attributes.hpp>
+#include <mbgl/programs/collision_box_program.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/programs/segment.hpp>
 #include <mbgl/shaders/symbol_icon.hpp>
@@ -447,5 +448,20 @@ using SymbolSDFTextProgram = SymbolSDFProgram<style::TextPaintProperties>;
 using SymbolLayoutVertex = SymbolLayoutAttributes::Vertex;
 using SymbolIconAttributes = SymbolIconProgram::Attributes;
 using SymbolTextAttributes = SymbolSDFTextProgram::Attributes;
+
+class SymbolLayerPrograms final : public LayerTypePrograms {
+public:
+    SymbolLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+        : symbolIcon(context, programParameters),
+          symbolIconSDF(context, programParameters),
+          symbolGlyph(context, programParameters),
+          collisionBox(context, programParameters),
+          collisionCircle(context, programParameters) {}
+    ProgramMap<SymbolIconProgram> symbolIcon;
+    ProgramMap<SymbolSDFIconProgram> symbolIconSDF;
+    ProgramMap<SymbolSDFTextProgram> symbolGlyph;
+    CollisionBoxProgram collisionBox;
+    CollisionCircleProgram collisionCircle;
+};
 
 } // namespace mbgl

@@ -181,7 +181,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             if (bucket.sdfIcons) {
                 if (values.hasHalo) {
-                    draw(parameters.programs.symbolIconSDF,
+                    draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
                          SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
                          bucket.icon,
                          bucket.iconSizeBinder,
@@ -191,7 +191,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 }
 
                 if (values.hasFill) {
-                    draw(parameters.programs.symbolIconSDF,
+                    draw(parameters.programs.getSymbolLayerPrograms().symbolIconSDF,
                          SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
                          bucket.icon,
                          bucket.iconSizeBinder,
@@ -200,7 +200,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          paintPropertyValues);
                 }
             } else {
-                draw(parameters.programs.symbolIcon,
+                draw(parameters.programs.getSymbolLayerPrograms().symbolIcon,
                      SymbolIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange),
                      bucket.icon,
                      bucket.iconSizeBinder,
@@ -234,7 +234,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             const Size texsize = geometryTile.glyphAtlasTexture->size;
 
             if (values.hasHalo) {
-                draw(parameters.programs.symbolGlyph,
+                draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
                      SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
                      bucket.text,
                      bucket.textSizeBinder,
@@ -244,7 +244,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             }
 
             if (values.hasFill) {
-                draw(parameters.programs.symbolGlyph,
+                draw(parameters.programs.getSymbolLayerPrograms().symbolGlyph,
                      SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
                      bucket.text,
                      bucket.textSizeBinder,
@@ -266,7 +266,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                     parameters.pixelsToGLUnits[1] / (pixelRatio * scale)
                     
                 }};
-            parameters.programs.collisionBox.draw(
+            parameters.programs.getSymbolLayerPrograms().collisionBox.draw(
                 parameters.context,
                 gl::Lines { 1.0f },
                 gl::DepthMode::disabled(),
@@ -301,7 +301,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                     
                 }};
 
-            parameters.programs.collisionCircle.draw(
+            parameters.programs.getSymbolLayerPrograms().collisionCircle.draw(
                 parameters.context,
                 gl::Triangles(),
                 gl::DepthMode::disabled(),

@@ -48,4 +48,11 @@ public:
 using CircleLayoutVertex = CircleProgram::LayoutVertex;
 using CircleAttributes = CircleProgram::Attributes;
 
+class CircleLayerPrograms final : public LayerTypePrograms  {
+public:
+    CircleLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+        : circle(context, programParameters) {}
+    ProgramMap<CircleProgram> circle;
+};
+
 } // namespace mbgl

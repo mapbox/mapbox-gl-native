@@ -101,7 +101,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
 
             const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
-            auto& programInstance = parameters.programs.heatmap.get(evaluated);
+            auto& programInstance = parameters.programs.getHeatmapLayerPrograms().heatmap.get(evaluated);
        
             const auto allUniformValues = programInstance.computeAllUniformValues(
                 HeatmapProgram::UniformValues {
@@ -148,7 +148,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         const Properties<>::PossiblyEvaluated properties;
         const HeatmapTextureProgram::PaintPropertyBinders paintAttributeData{ properties, 0 };
 
-        auto& programInstance = parameters.programs.heatmapTexture;
+        auto& programInstance = parameters.programs.getHeatmapLayerPrograms().heatmapTexture;
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
             HeatmapTextureProgram::UniformValues{

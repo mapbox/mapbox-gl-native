@@ -2,7 +2,10 @@
 
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/programs/background_program.hpp>
+#include <mbgl/programs/extrusion_texture_program.hpp>
 #include <mbgl/programs/programs.hpp>
+#include <mbgl/programs/raster_program.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <string>
