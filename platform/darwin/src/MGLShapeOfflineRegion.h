@@ -10,6 +10,20 @@ NS_ASSUME_NONNULL_BEGIN
  An offline region defined by a style URL, geographic shape, and
  range of zoom levels.
  
+ ### Example
+ ```swift
+ var coordinates = [
+     CLLocationCoordinate2D(latitude: 45.522585, longitude: -122.685699),
+     CLLocationCoordinate2D(latitude: 45.534611, longitude: -122.708873),
+     CLLocationCoordinate2D(latitude: 45.530883, longitude: -122.678833)
+ ]
+ 
+ let triangle = MGLPolygon(coordinates: &coordinates, count: UInt(coordinates.count))
+ let region = MGLShapeOfflineRegion(styleURL: MGLStyle.lightStyleURL, shape: triangle, fromZoomLevel: 11, toZoomLevel: 14)
+ let context = "Triangle Region".data(using: .utf8)
+ MGLOfflineStorage.shared.addPack(for: region, withContext: context!)
+ ```
+ 
  This class requires fewer resources than MGLTilePyramidOfflineRegion
  for irregularly shaped regions.
  */
