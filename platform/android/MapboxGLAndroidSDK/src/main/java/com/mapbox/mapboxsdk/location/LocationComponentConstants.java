@@ -6,7 +6,7 @@ package com.mapbox.mapboxsdk.location;
 final class LocationComponentConstants {
 
   // Controls the compass update rate in milliseconds
-  static final int COMPASS_UPDATE_RATE_MS = 500;
+  static final long COMPASS_UPDATE_RATE_MS = 500;
 
   // Sets the transition animation duration when switching camera modes.
   static final long TRANSITION_ANIMATION_DURATION_MS = 750;
