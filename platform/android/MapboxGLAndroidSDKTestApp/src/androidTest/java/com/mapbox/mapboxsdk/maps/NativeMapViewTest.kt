@@ -179,24 +179,6 @@ class NativeMapViewTest {
 
     @Test
     @UiThreadTest
-    fun testSetStyleUrl() {
-        val expected = Style.DARK
-        nativeMapView.styleUrl = expected
-        val actual = nativeMapView.styleUrl
-        assertEquals("Style URL should match", expected, actual)
-    }
-
-    @Test
-    @UiThreadTest
-    fun testSetStyleJson() {
-        val expected = "{}"
-        nativeMapView.styleJson = expected
-        val actual = nativeMapView.styleJson
-        assertEquals("Style JSON should match", expected, actual)
-    }
-
-    @Test
-    @UiThreadTest
     fun testSetContentPadding() {
         val expected = floatArrayOf(1.0f, 2.0f, 3.0f, 4.0f)
         nativeMapView.contentPadding = expected
