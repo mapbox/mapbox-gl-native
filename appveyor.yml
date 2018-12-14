@@ -47,8 +47,8 @@ for:
       - image: Visual Studio 2017
 
   environment:
-    LLVM_VERSION: 6.0.0
-    LLVM_HASH: 2501887b2f638d3f65b0336f354b96f8108b563522d81e841d5c88c34af283dd
+    LLVM_VERSION: 7.0.0
+    LLVM_HASH: 74b197a3959b0408adf0824be01db8dddfa2f9a967f4085af3fad900ed5fdbf6
     VCVARSALL: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat'
     QT_PREFIX: 'C:\Qt\latest\msvc2017_64\lib\cmake'
 
