@@ -1,0 +1,8 @@
+[ndk]
+cpu_abis = armv7
+compiler = clang
+app_platform = android-14
+
+[project]
+ignore = .git
+allow_symlinks = allow

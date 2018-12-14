@@ -1,0 +1,198 @@
+# BUILD FILE SYNTAX: SKYLARK
+import re
+
+mbgl_search_prefixes = [
+    r'^include/',
+    r'^src/',
+    r'^platform/default/include/',
+    r'^platform/darwin/src/',
+    r'^platform/darwin/include/',
+    r'^platform/ios/src/',
+    r'^platform/linux/src/',
+    r'^platform/android/src/',
+    r'^platform/android/',
+    r'^platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/Pinning/',
+    r'^platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/Reporting/',
+    r'^platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/',
+    r'^platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/Reachability/',
+    r'^platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/',
+    r'^platform/ios/vendor/SMCalloutView/',
+]
+
+def mbgl_header_path(filename):
+    for prefix in mbgl_search_prefixes:
+        if re.search(prefix, filename):
+            return re.sub(prefix, '', filename)
+    return filename
+
+mbgl_is_header = re.compile(r'\.h(pp)?$')
+mbgl_is_public = re.compile(r'^(include/|^[^/]+\.h(pp)?$)')
+
+def mbgl_load_file_list(filename, prefix = ''):
+    add_build_file_dep('//' + filename)
+    files = filter(len, [ re.sub(r'#.*|\n', '', file).strip() for file in open(filename) ])
+    headers = [ file for file in files if mbgl_is_header.search(file) ]
+
+    return dict(
+        public_headers = [ (mbgl_header_path(file), prefix + file)
+                           for file in headers if mbgl_is_public.search(file) ],
+        private_headers = [ (mbgl_header_path(file), prefix + file)
+                            for file in headers if not mbgl_is_public.search(file) ],
+        sources = [ prefix + file for file in files if not mbgl_is_header.search(file) ],
+    )
+
+def mbgl_merge_file_lists(*argv):
+    merged = dict(public_headers = [], private_headers = [], sources = [])
+    for arg in argv:
+        merged['public_headers'] += arg['public_headers']
+        merged['private_headers'] += arg['private_headers']
+        merged['sources'] += arg['sources']
+    return merged
+
+base_path = get_base_path() or '.';
+
+mbgl = dict(
+    core = mbgl_merge_file_lists(mbgl_load_file_list(base_path + '/cmake/core-files.txt'),
+                                 mbgl_load_file_list(base_path + '/cmake/filesource-files.txt')),
+    android = mbgl_merge_file_lists(mbgl_load_file_list(base_path + '/platform/android/core-files.txt'),
+                                    mbgl_load_file_list(base_path + '/platform/android/filesource-files.txt')),
+    ios = mbgl_merge_file_lists(mbgl_load_file_list(base_path + '/platform/ios/core-files.txt'),
+                                mbgl_load_file_list(base_path + '/platform/ios/sdk-files.txt')),
+    deps = [],
+)
+
+def mbgl_vendor_library(name):
+    files = mbgl_load_file_list(base_path + '/vendor/' + name + '-files.txt', prefix = 'vendor/' + name + '/')
+    cxx_library(
+        name = "vendor-" + name,
+        header_namespace = "",
+        srcs = files['sources'],
+        headers = dict(files['private_headers']),
+        exported_headers = dict(files['public_headers']),
+        link_style = 'static',
+        compiler_flags = [
+            "-Wno-tautological-unsigned-enum-zero-compare",
+        ],
+    )
+    mbgl['deps'].append(':vendor-' + name)
+
+mbgl_vendor_library("icu")
+mbgl_vendor_library("boost")
+mbgl_vendor_library("cheap-ruler-cpp")
+mbgl_vendor_library("earcut.hpp")
+mbgl_vendor_library("expected")
+mbgl_vendor_library("eternal")
+mbgl_vendor_library("geojson.hpp")
+mbgl_vendor_library("geojson-vt-cpp")
+mbgl_vendor_library("geometry.hpp")
+mbgl_vendor_library("jni.hpp")
+mbgl_vendor_library("kdbush.hpp")
+mbgl_vendor_library("sqlite")
+mbgl_vendor_library("pixelmatch-cpp")
+mbgl_vendor_library("polylabel")
+mbgl_vendor_library("protozero")
+mbgl_vendor_library("rapidjson")
+mbgl_vendor_library("shelf-pack-cpp")
+mbgl_vendor_library("supercluster.hpp")
+mbgl_vendor_library("unique_resource")
+mbgl_vendor_library("variant")
+mbgl_vendor_library("vector-tile")
+mbgl_vendor_library("wagyu")
+
+cxx_library(
+    name = "core",
+
+    srcs = mbgl['core']['sources'],
+    platform_srcs = [
+        ("android", mbgl['android']['sources'] + [ 'platform/android/src/main.cpp' ])
+    ],
+
+    header_namespace = "",
+    headers = dict(mbgl['core']['private_headers']),
+    exported_headers = dict(mbgl['core']['public_headers']),
+    platform_headers = [
+        ("android", dict(mbgl['android']['private_headers']))
+    ],
+    exported_platform_headers = [
+        ("android", dict(mbgl['android']['public_headers'])),
+    ],
+
+    compiler_flags = [
+        "-std=c++14",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-variable",
+        "-Wno-unused-parameter",
+        "-Wno-c++11-narrowing",
+        "-Wno-tautological-constant-compare",
+        "-fexceptions",
+        "-ftemplate-depth=1024",
+        "-frtti",
+    ],
+
+    preprocessor_flags = [
+        "-DMBGL_USE_GLES2=1",
+        "-DMBGL_VERSION_REV=\"standalone\"",
+        "-DRAPIDJSON_HAS_STDSTRING=1",
+    ],
+    exported_platform_linker_flags = [
+        ("android", [
+            "-lz",
+            "-lEGL",
+            "-lGLESv2",
+            "-landroid",
+            "-ljnigraphics",
+            "-llog",
+            "-fvisibility=hidden",
+            "-Wl,--icf=safe",
+            "-Wl,--version-script=" + base_path + "/platform/android/version-script"
+        ]),
+    ],
+
+    visibility = ["PUBLIC"],
+    deps = mbgl['deps'],
+    soname = "libmapbox-gl.$(ext)",
+)
+
+ndk_library(
+    name = "android-core",
+    deps = [ ":core" ],
+    flags = [
+        "NDK_APPLICATION_MK=$(env PWD)/" + get_base_path() + "/Application.mk",
+    ],
+)
+
+android_manifest(
+  name = 'android-manifest',
+  skeleton = 'platform/android/MapboxGLAndroidSDK/src/main/AndroidManifest.xml',
+)
+
+android_library(
+    name = "android",
+    deps = [ ":android-core" ],
+    manifest = ":android-manifest",
+)
+
+apple_library(
+    name = "ios-core",
+    deps = [ ":core" ],
+    headers = dict(mbgl['ios']['private_headers'] + [('Mapbox/Mapbox.h', 'platform/ios/src/Mapbox.h')]),
+    exported_headers = dict(mbgl['ios']['public_headers']),
+    srcs = mbgl['ios']['sources'],
+    lang_compiler_flags = {
+        "OBJCXX_CPP_OUTPUT": [
+            "-std=c++14",
+            "-fmodules",
+            "-fobjc-arc",
+        ],
+        "OBJC_CPP_OUTPUT": [
+            "-fmodules",
+            "-fobjc-arc",
+        ],
+        "CXX_CPP_OUTPUT": [
+            "-std=c++14",
+        ]
+    },
+)
