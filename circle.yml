@@ -9,6 +9,7 @@ workflows:
           filters:
             branches:
               ignore: master
+      - android-debug-arm-v7-buck
       - android-arm-v7-template:
           name: android-debug-arm-v7
       - android-arm-v7-template:
@@ -650,6 +651,26 @@ jobs:
             if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]] || [[ $CIRCLE_TAG == android-v* ]]; then
               make run-android-upload-archives
             fi
+# ------------------------------------------------------------------------------
+  android-debug-arm-v7-buck:
+    docker:
+      - image: mbgl/android-ndk-r17c-buck:07c5ef2e71
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
+      BUILDTYPE: Debug
+      ANDROID_NDK: /android/sdk/ndk-bundle
+    steps:
+      - checkout
+      - run:
+          name: Checkout submodules
+          command: git submodule update --init
+      - run:
+          name: Build Android library
+          command: |
+            cd misc/buck
+            buck build mapbox-gl-native:android-core
 
 # ------------------------------------------------------------------------------
   node-clang39-release:

@@ -31,6 +31,8 @@ test/fixtures/api/assets.zip
 test/fixtures/storage/assets.zip
 /.circle-week
 /vendor/.cache
+buck-out
+.buckd
 
 # Visual Studio Code
 .vscode
