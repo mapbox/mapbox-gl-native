@@ -77,6 +77,19 @@ MBGL_DEFINE_ENUM(SymbolAnchorType, {
     { SymbolAnchorType::BottomRight, "bottom-right" }
 });
     
+MBGL_DEFINE_ENUM(DynamicTextAnchorType, {
+    { DynamicTextAnchorType::Auto, "auto" },
+    { DynamicTextAnchorType::Center, "center" },
+    { DynamicTextAnchorType::Left, "left" },
+    { DynamicTextAnchorType::Right, "right" },
+    { DynamicTextAnchorType::Top, "top" },
+    { DynamicTextAnchorType::Bottom, "bottom" },
+    { DynamicTextAnchorType::TopLeft, "top-left" },
+    { DynamicTextAnchorType::TopRight, "top-right" },
+    { DynamicTextAnchorType::BottomLeft, "bottom-left" },
+    { DynamicTextAnchorType::BottomRight, "bottom-right" }
+});
+
 MBGL_DEFINE_ENUM(SymbolZOrderType, {
     { SymbolZOrderType::ViewportY, "viewport-y" },
     { SymbolZOrderType::Source, "source" }

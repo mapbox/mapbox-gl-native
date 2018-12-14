@@ -134,6 +134,14 @@ public:
     PropertyValue<TextJustifyType> getTextJustify() const;
     void setTextJustify(PropertyValue<TextJustifyType>);
 
+    static PropertyValue<float> getDefaultDynamicTextOffset();
+    PropertyValue<float> getDynamicTextOffset() const;
+    void setDynamicTextOffset(PropertyValue<float>);
+
+    static PropertyValue<std::vector<DynamicTextAnchorType>> getDefaultDynamicTextAnchor();
+    PropertyValue<std::vector<DynamicTextAnchorType>> getDynamicTextAnchor() const;
+    void setDynamicTextAnchor(PropertyValue<std::vector<DynamicTextAnchorType>>);
+
     static PropertyValue<SymbolAnchorType> getDefaultTextAnchor();
     PropertyValue<SymbolAnchorType> getTextAnchor() const;
     void setTextAnchor(PropertyValue<SymbolAnchorType>);

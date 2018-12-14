@@ -54,6 +54,11 @@ struct Converter<std::vector<std::string>> {
     optional<std::vector<std::string>> operator()(const Convertible& value, Error& error) const;
 };
 
+template <>
+struct Converter<std::vector<DynamicTextAnchorType>> {
+    optional<std::vector<DynamicTextAnchorType>> operator()(const Convertible& value, Error& error) const;
+};
+
 } // namespace conversion
 } // namespace style
 } // namespace mbgl

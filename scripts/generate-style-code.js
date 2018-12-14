@@ -49,7 +49,7 @@ global.evaluatedType = function (property) {
     if (property.length) {
       return `std::array<${evaluatedType({type: property.value})}, ${property.length}>`;
     } else {
-      return `std::vector<${evaluatedType({type: property.value})}>`;
+      return `std::vector<${evaluatedType({type: property.value, values: property.values, name: property.name})}>`;
     }
   default: throw new Error(`unknown type for ${property.name}`)
   }

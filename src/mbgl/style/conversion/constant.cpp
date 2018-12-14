@@ -64,6 +64,7 @@ template optional<TextJustifyType> Converter<TextJustifyType>::operator()(const 
 template optional<TextTransformType> Converter<TextTransformType>::operator()(const Convertible&, Error&) const;
 template optional<TranslateAnchorType> Converter<TranslateAnchorType>::operator()(const Convertible&, Error&) const;
 template optional<VisibilityType> Converter<VisibilityType>::operator()(const Convertible&, Error&) const;
+template optional<DynamicTextAnchorType> Converter<DynamicTextAnchorType>::operator()(const Convertible&, Error&) const;
 
 optional<Color> Converter<Color>::operator()(const Convertible& value, Error& error) const {
     optional<std::string> string = toString(value);
@@ -136,6 +137,27 @@ optional<std::vector<std::string>> Converter<std::vector<std::string>>::operator
 
     for (std::size_t i = 0; i < arrayLength(value); ++i) {
         optional<std::string> string = toString(arrayMember(value, i));
+        if (!string) {
+            error.message = "value must be an array of strings";
+            return nullopt;
+        }
+        result.push_back(*string);
+    }
+
+    return result;
+}
+
+optional<std::vector<DynamicTextAnchorType>> Converter<std::vector<DynamicTextAnchorType>>::operator()(const Convertible& value, Error& error) const {
+    if (!isArray(value)) {
+        error.message = "value must be an array";
+        return nullopt;
+    }
+
+    std::vector<DynamicTextAnchorType> result;
+    result.reserve(arrayLength(value));
+
+    for (std::size_t i = 0; i < arrayLength(value); ++i) {
+        optional<DynamicTextAnchorType> string = Converter<DynamicTextAnchorType>{}(arrayMember(value, i), error);
         if (!string) {
             error.message = "value must be an array of strings";
             return nullopt;

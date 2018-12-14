@@ -491,6 +491,38 @@ void SymbolLayer::setTextJustify(PropertyValue<TextJustifyType> value) {
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
+PropertyValue<float> SymbolLayer::getDefaultDynamicTextOffset() {
+    return DynamicTextOffset::defaultValue();
+}
+
+PropertyValue<float> SymbolLayer::getDynamicTextOffset() const {
+    return impl().layout.get<DynamicTextOffset>();
+}
+
+void SymbolLayer::setDynamicTextOffset(PropertyValue<float> value) {
+    if (value == getDynamicTextOffset())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->layout.get<DynamicTextOffset>() = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+PropertyValue<std::vector<DynamicTextAnchorType>> SymbolLayer::getDefaultDynamicTextAnchor() {
+    return DynamicTextAnchor::defaultValue();
+}
+
+PropertyValue<std::vector<DynamicTextAnchorType>> SymbolLayer::getDynamicTextAnchor() const {
+    return impl().layout.get<DynamicTextAnchor>();
+}
+
+void SymbolLayer::setDynamicTextAnchor(PropertyValue<std::vector<DynamicTextAnchorType>> value) {
+    if (value == getDynamicTextAnchor())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->layout.get<DynamicTextAnchor>() = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
 PropertyValue<SymbolAnchorType> SymbolLayer::getDefaultTextAnchor() {
     return TextAnchor::defaultValue();
 }
@@ -1438,6 +1470,8 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         TextLineHeight,
         TextLetterSpacing,
         TextJustify,
+        DynamicTextOffset,
+        DynamicTextAnchor,
         TextAnchor,
         TextMaxAngle,
         TextRotate,
@@ -1612,6 +1646,18 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
     case util::hashFNV1a("text-justify"):
         if (name == "text-justify") {
             property = Property::TextJustify;
+        }
+        break;
+    
+    case util::hashFNV1a("dynamic-text-offset"):
+        if (name == "dynamic-text-offset") {
+            property = Property::DynamicTextOffset;
+        }
+        break;
+    
+    case util::hashFNV1a("dynamic-text-anchor"):
+        if (name == "dynamic-text-anchor") {
+            property = Property::DynamicTextAnchor;
         }
         break;
     
@@ -1823,7 +1869,7 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         
     }
     
-    if (property == Property::IconSize || property == Property::IconRotate || property == Property::TextSize || property == Property::TextMaxWidth || property == Property::TextLetterSpacing || property == Property::TextRotate) {
+    if (property == Property::IconSize || property == Property::IconRotate || property == Property::TextSize || property == Property::TextMaxWidth || property == Property::TextLetterSpacing || property == Property::DynamicTextOffset || property == Property::TextRotate) {
         Error error;
         optional<PropertyValue<float>> typedValue = convert<PropertyValue<float>>(value, error, true, false);
         if (!typedValue) {
@@ -1852,6 +1898,11 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         
         if (property == Property::TextLetterSpacing) {
             setTextLetterSpacing(*typedValue);
+            return nullopt;
+        }
+        
+        if (property == Property::DynamicTextOffset) {
+            setDynamicTextOffset(*typedValue);
             return nullopt;
         }
         
@@ -1968,6 +2019,18 @@ optional<Error> SymbolLayer::setLayoutProperty(const std::string& name, const Co
         }
         
         setTextJustify(*typedValue);
+        return nullopt;
+        
+    }
+    
+    if (property == Property::DynamicTextAnchor) {
+        Error error;
+        optional<PropertyValue<std::vector<DynamicTextAnchorType>>> typedValue = convert<PropertyValue<std::vector<DynamicTextAnchorType>>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+        
+        setDynamicTextAnchor(*typedValue);
         return nullopt;
         
     }
