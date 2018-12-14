@@ -225,6 +225,15 @@
         XCTAssertEqualObjects(predicateAfter, forwardPredicateAfter);
     }
     {
+        NSArray *expected = @[@"match", @[@"to-number", @[@"id"]], @[@3002970001, @3004140052, @3002950027, @3002970033], @YES, @NO];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST($featureIdentifier, 'NSNumber') IN { 3002970001, 3004140052, 3002950027, 3002970033 }"];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
+        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH(CAST($featureIdentifier, 'NSNumber'), { 3002950027, 3002970001, 3002970033, 3004140052 }, YES, NO) == YES"];
+        auto forwardFilter = [NSPredicate predicateWithMGLJSONObject:expected].mgl_filter;
+        NSPredicate *forwardPredicateAfter = [NSPredicate mgl_predicateWithFilter:forwardFilter];
+        XCTAssertEqualObjects(predicateAfter, forwardPredicateAfter);
+    }
+    {
         NSArray *expected = @[@"!", @[@"match", @[@"get", @"x"], @[@6, @5, @4, @3], @YES, @NO]];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"NOT x IN { 6, 5, 4, 3}"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);

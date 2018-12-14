@@ -31,6 +31,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added `MGLLoggingConfiguration` and `MGLLoggingBlockHandler` that handle error and fault events produced by the SDK. ([#13235](https://github.com/mapbox/mapbox-gl-native/pull/13235))
 * Fixed random crashes during app termination. ([#13367](https://github.com/mapbox/mapbox-gl-native/pull/13367))
 * Fixed a crash when specifying MGLShapeSourceOptionLineDistanceMetrics when creating an MGLShapeSource. ([#13543](https://github.com/mapbox/mapbox-gl-native/pull/13543))
+* Fixed a crash when casting large numbers in `NSExpression`. ([#13580](https://github.com/mapbox/mapbox-gl-native/pull/13580))
 
 ## 4.6.0 - November 7, 2018
 
