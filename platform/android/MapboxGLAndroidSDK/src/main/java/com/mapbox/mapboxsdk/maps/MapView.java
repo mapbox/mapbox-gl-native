@@ -1002,10 +1002,12 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
     @Override
     public void onDidFinishRenderingFrame(boolean fully) {
-      renderCount++;
-      if (renderCount == 2) {
-        MapView.this.setForeground(null);
-        removeOnDidFinishRenderingFrameListener(this);
+      if (mapboxMap != null && mapboxMap.getStyle() != null && mapboxMap.getStyle().isFullyLoaded()) {
+        renderCount++;
+        if (renderCount == 3) {
+          MapView.this.setForeground(null);
+          removeOnDidFinishRenderingFrameListener(this);
+        }
       }
     }
 
