@@ -96,6 +96,11 @@ TEST(Mapbox, SpriteURL) {
         mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL,
             "mapbox://sprites/mapbox/streets-v10?fresh=true.png",
             "key"));
+    EXPECT_EQ(
+        "https://api.mapbox.com/styles/v1/mapbox/streets-v11/sprite?access_token=key&fresh=true.png",
+        mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL,
+            "mapbox://sprites/mapbox/streets-v11?fresh=true.png",
+            "key"));
     EXPECT_EQ("mapbox://////", mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL, "mapbox://////", "key"));
 }
 
