@@ -30,7 +30,7 @@ public:
 private:
     LayerManagerAndroid();
     /**
-     * @brief Enables a layer type for both JSON style an runtime API.
+     * @brief Enables a layer type for both JSON style and runtime API.
      */
     void addLayerType(std::unique_ptr<JavaLayerPeerFactory>); 
     /**
