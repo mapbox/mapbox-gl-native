@@ -564,6 +564,8 @@ public:
     _scaleBarPosition = MGLUIElementsPositionTopLeft;
     _scaleBarOffset = CGPointMake(8, 8);
 
+    [self installConstraints];
+
     // setup interaction
     //
     _pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
@@ -821,42 +823,42 @@ public:
 
 - (void)setScaleBarPosition:(MGLUIElementsPosition)scaleBarPosition {
     _scaleBarPosition = scaleBarPosition;
-    [self setNeedsUpdateConstraints];
+    [self installScaleBarConstraints];
 }
 
 - (void)setScaleBarOffset:(CGPoint)scaleBarOffset {
     _scaleBarOffset = scaleBarOffset;
-    [self setNeedsUpdateConstraints];
+    [self installScaleBarConstraints];
 }
 
 - (void)setCompassViewPosition:(MGLUIElementsPosition)compassViewPosition {
     _compassViewPosition = compassViewPosition;
-    [self setNeedsUpdateConstraints];
+    [self installCompressViewConstraints];
 }
 
 - (void)setCompassViewOffset:(CGPoint)compassViewOffset {
     _compassViewOffset = compassViewOffset;
-    [self setNeedsUpdateConstraints];
+    [self installCompressViewConstraints];
 }
 
 - (void)setLogoViewPosition:(MGLUIElementsPosition)logoViewPosition {
     _logoViewPosition = logoViewPosition;
-    [self setNeedsUpdateConstraints];
+    [self installLogoViewConstraints];
 }
 
 - (void)setLogoViewOffset:(CGPoint)logoViewOffset {
     _logoViewOffset = logoViewOffset;
-    [self setNeedsUpdateConstraints];
+    [self installLogoViewConstraints];
 }
 
 - (void)setAttributionButtonPosition:(MGLUIElementsPosition)attributionButtonPosition {
     _attributionButtonPosition = attributionButtonPosition;
-    [self setNeedsUpdateConstraints];
+    [self installAttributionButtonConstraints];
 }
 
 - (void)setAttributionButtonOffset:(CGPoint)attributionButtonOffset {
     _attributionButtonOffset = attributionButtonOffset;
-    [self setNeedsUpdateConstraints];
+    [self installAttributionButtonConstraints];
 }
 
 - (UIViewController *)viewControllerForLayoutGuides
@@ -877,7 +879,7 @@ public:
     return nil;
 }
 
-- (void)updateConstraintsWithView:(UIView *)view
+- (void)installConstraintsWithView:(UIView *)view
                       constraints:(NSMutableArray *)constraints
                          position:(MGLUIElementsPosition)position
                              size:(CGSize)size
@@ -1057,45 +1059,55 @@ public:
                                      multiplier:1.0
                                        constant:size.height]];
     }
-    
+
     [containerView removeConstraints:constraints];
     [constraints removeAllObjects];
     [containerView addConstraints:updatedConstrants];
     [constraints addObjectsFromArray:updatedConstrants];
 }
 
-- (void)updateConstraints
+- (void)installConstraints
 {
-    // compass view
-    //
-    [self updateConstraintsWithView:self.compassView
-                        constraints:self.compassViewConstraints
-                           position:self.compassViewPosition
-                               size:self.compassView.bounds.size
-                             offset:self.compassViewOffset];
-    
-    // scale bar view
-    [self updateConstraintsWithView:self.scaleBar
-                        constraints:self.scaleBarConstraints
-                           position:self.scaleBarPosition
-                               size:self.scaleBar.intrinsicContentSize
-                             offset:self.scaleBarOffset];
+    [self installCompressViewConstraints];
+    [self installScaleBarConstraints];
+    [self installLogoViewConstraints];
+    [self installAttributionButtonConstraints];
+}
 
+- (void)installCompressViewConstraints {
+    // compass view
+    [self installConstraintsWithView:self.compassView
+                         constraints:self.compassViewConstraints
+                            position:self.compassViewPosition
+                                size:self.compassView.bounds.size
+                              offset:self.compassViewOffset];
+}
+
+- (void)installScaleBarConstraints {
+    // scale bar view
+    [self installConstraintsWithView:self.scaleBar
+                         constraints:self.scaleBarConstraints
+                            position:self.scaleBarPosition
+                                size:self.scaleBar.intrinsicContentSize
+                              offset:self.scaleBarOffset];
+}
+
+- (void)installLogoViewConstraints {
     // logo view
-    [self updateConstraintsWithView:self.logoView
-                        constraints:self.logoViewConstraints
-                           position:self.logoViewPosition
-                               size:self.logoView.bounds.size
-                             offset:self.logoViewOffset];
-    
+    [self installConstraintsWithView:self.logoView
+                         constraints:self.logoViewConstraints
+                            position:self.logoViewPosition
+                                size:self.logoView.bounds.size
+                              offset:self.logoViewOffset];
+}
+
+- (void)installAttributionButtonConstraints {
     // attribution button
-    [self updateConstraintsWithView:self.attributionButton
-                        constraints:self.attributionButtonConstraints
-                           position:self.attributionButtonPosition
-                               size:self.attributionButton.bounds.size
-                             offset:self.attributionButtonOffset];
-    
-    [super updateConstraints];
+    [self installConstraintsWithView:self.attributionButton
+                         constraints:self.attributionButtonConstraints
+                            position:self.attributionButtonPosition
+                                size:self.attributionButton.bounds.size
+                              offset:self.attributionButtonOffset];
 }
 
 - (BOOL)isOpaque
@@ -1192,6 +1204,7 @@ public:
 {
     MGLLogDebug(@"Setting contentInset: %@", NSStringFromUIEdgeInsets(contentInset));
     [self setContentInset:contentInset animated:NO];
+    [self installConstraints];
 }
 
 - (void)setContentInset:(UIEdgeInsets)contentInset animated:(BOOL)animated
@@ -1386,6 +1399,7 @@ public:
 - (void)didMoveToSuperview
 {
     [self validateDisplayLink];
+    [self installConstraints];
     [super didMoveToSuperview];
 }
 
