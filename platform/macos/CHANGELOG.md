@@ -11,6 +11,8 @@
 * Added support for automatic localization of version 8 of the Mapbox Streets source. ([#13481](https://github.com/mapbox/mapbox-gl-native/pull/13481))
 * Fixed symbol flickering during instantaneous transitions. ([#13535](https://github.com/mapbox/mapbox-gl-native/pull/13535))
 * Added an `MGLStyle.enablePlacementTransitions` property to control how long it takes for collided labels to fade out. ([#13565](https://github.com/mapbox/mapbox-gl-native/pull/13565))
+* `MGLMapView`, `MGLShapeOfflineRegion`, and `MGLTilePyramidOfflineRegion` now default to version 11 of the Mapbox Streets style. Similarly, several class properties of `MGLStyle`, such as `MGLStyle.lightStyleURL`, have been updated to return URLs to new versions of their respective styles.
+
 
 ### Other changes
 
