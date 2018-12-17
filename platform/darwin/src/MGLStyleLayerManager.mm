@@ -38,22 +38,33 @@ MGLStyleLayer* LayerManagerDarwin::createPeer(style::Layer* layer) {
 }
 
 void LayerManagerDarwin::addLayerType(std::unique_ptr<LayerPeerFactory> factory) {
-    auto* coreFactory = factory->getCoreLayerFactory();
-    std::string type{coreFactory->getTypeInfo()->type};
+    NSCAssert(getFactory(factory->getCoreLayerFactory()->getTypeInfo()) == nullptr,
+              @"A layer factory with the given info is already added.");
+    registerCoreFactory(factory->getCoreLayerFactory());
+    peerFactories.emplace_back(std::move(factory));
+}
+
+void LayerManagerDarwin::addLayerTypeCoreOnly(std::unique_ptr<LayerFactory> factory) {
+    NSCAssert(getFactory(factory->getTypeInfo()) == nullptr,
+              @"A layer factory with the given info is already added.");
+    registerCoreFactory(factory.get());
+    coreFactories.emplace_back(std::move(factory));
+}
+
+void LayerManagerDarwin::registerCoreFactory(LayerFactory* factory) {
+    std::string type{factory->getTypeInfo()->type};
     if (!type.empty()) {
-        typeToFactory.emplace(std::make_pair(std::move(type), coreFactory));
+        NSCAssert(typeToFactory.find(type) == typeToFactory.end(), @"A layer type can be registered only once.");
+        typeToFactory.emplace(std::make_pair(std::move(type), factory));
     }
-    factories.emplace_back(std::move(factory));
 }
 
 LayerPeerFactory* LayerManagerDarwin::getPeerFactory(const mbgl::style::LayerTypeInfo* typeInfo) {
-    assert(typeInfo);
-    for (const auto& factory: factories) {
+    for (const auto& factory: peerFactories) {
         if (factory->getCoreLayerFactory()->getTypeInfo() == typeInfo) {
             return factory.get();
         }
     }
-    assert(false);
     return nullptr;
 }
 
@@ -63,8 +74,17 @@ LayerFactory* LayerManagerDarwin::getFactory(const std::string& type) noexcept {
 }
 
 LayerFactory* LayerManagerDarwin::getFactory(const mbgl::style::LayerTypeInfo* info) noexcept {
-    LayerPeerFactory* peerFactory = getPeerFactory(info);
-    return (peerFactory != nullptr) ? peerFactory->getCoreLayerFactory() : nullptr;
+    if (LayerPeerFactory* peerFactory = getPeerFactory(info)) {
+        return peerFactory->getCoreLayerFactory();
+    }
+
+    for (const auto& factory: coreFactories) {
+        if (factory->getTypeInfo() == info) {
+            return factory.get();
+        }
+    }
+
+    return nullptr;
 }
 
 // static
