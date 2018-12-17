@@ -6,7 +6,6 @@
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
 #include <mbgl/style/expression/formatted.hpp>
-
 #include <mbgl/util/color.hpp>
 
 #include <vector>
@@ -20,21 +19,6 @@ class SymbolLayer : public Layer {
 public:
     SymbolLayer(const std::string& layerID, const std::string& sourceID);
     ~SymbolLayer() final;
-
-    // Source
-    const std::string& getSourceID() const;
-    const std::string& getSourceLayer() const;
-    void setSourceLayer(const std::string& sourceLayer);
-
-    void setFilter(const Filter&);
-    const Filter& getFilter() const;
-
-    // Visibility
-    void setVisibility(VisibilityType) final;
-
-    // Zoom range
-    void setMinZoom(float) final;
-    void setMaxZoom(float) final;
 
     // Dynamic properties
     optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
@@ -284,12 +268,10 @@ public:
     Mutable<Impl> mutableImpl() const;
     SymbolLayer(Immutable<Impl>);
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
-};
 
-template <>
-inline bool Layer::is<SymbolLayer>() const {
-    return getType() == LayerType::Symbol;
-}
+protected:
+    Mutable<Layer::Impl> mutableBaseImpl() const final;
+};
 
 } // namespace style
 } // namespace mbgl

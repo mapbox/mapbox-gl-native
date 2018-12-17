@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
+
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -62,7 +63,6 @@ public class MapboxMapOptions implements Parcelable {
   private boolean scrollGesturesEnabled = true;
   private boolean tiltGesturesEnabled = true;
   private boolean zoomGesturesEnabled = true;
-  private boolean zoomControlsEnabled = false;
   private boolean doubleTapGesturesEnabled = true;
 
   private boolean prefetchesTiles = true;
@@ -76,9 +76,6 @@ public class MapboxMapOptions implements Parcelable {
 
   @ColorInt
   private int foregroundLoadColor;
-
-  private String styleUrl;
-  private String styleJson;
 
   private float pixelRatio;
 
@@ -119,12 +116,9 @@ public class MapboxMapOptions implements Parcelable {
     rotateGesturesEnabled = in.readByte() != 0;
     scrollGesturesEnabled = in.readByte() != 0;
     tiltGesturesEnabled = in.readByte() != 0;
-    zoomControlsEnabled = in.readByte() != 0;
     zoomGesturesEnabled = in.readByte() != 0;
     doubleTapGesturesEnabled = in.readByte() != 0;
 
-    styleUrl = in.readString();
-    styleJson = in.readString();
     apiBaseUrl = in.readString();
     textureMode = in.readByte() != 0;
     translucentTextureSurface = in.readByte() != 0;
@@ -150,8 +144,6 @@ public class MapboxMapOptions implements Parcelable {
     TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.mapbox_MapView, 0, 0);
     try {
       mapboxMapOptions.camera(new CameraPosition.Builder(typedArray).build());
-      mapboxMapOptions.styleUrl(typedArray.getString(R.styleable.mapbox_MapView_mapbox_styleUrl));
-      mapboxMapOptions.styleJson(typedArray.getString(R.styleable.mapbox_MapView_mapbox_styleJson));
       mapboxMapOptions.apiBaseUrl(typedArray.getString(R.styleable.mapbox_MapView_mapbox_apiBaseUrl));
 
       mapboxMapOptions.zoomGesturesEnabled(
@@ -162,8 +154,6 @@ public class MapboxMapOptions implements Parcelable {
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiRotateGestures, true));
       mapboxMapOptions.tiltGesturesEnabled(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiTiltGestures, true));
-      mapboxMapOptions.zoomControlsEnabled(
-        typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiZoomControls, false));
       mapboxMapOptions.doubleTapGesturesEnabled(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiDoubleTapGestures, true));
 
@@ -266,30 +256,6 @@ public class MapboxMapOptions implements Parcelable {
   @NonNull
   public MapboxMapOptions camera(CameraPosition cameraPosition) {
     this.cameraPosition = cameraPosition;
-    return this;
-  }
-
-  /**
-   * Specifies the styleUrl url associated with a map view.
-   *
-   * @param styleUrl Url to be used to load a styleUrl
-   * @return This
-   */
-  @NonNull
-  public MapboxMapOptions styleUrl(String styleUrl) {
-    this.styleUrl = styleUrl;
-    return this;
-  }
-
-  /**
-   * Specifies the styleJson associated with a map view.
-   *
-   * @param styleJson json to used as style
-   * @return This
-   */
-  @NonNull
-  public MapboxMapOptions styleJson(String styleJson) {
-    this.styleJson = styleJson;
     return this;
   }
 
@@ -512,18 +478,6 @@ public class MapboxMapOptions implements Parcelable {
   @NonNull
   public MapboxMapOptions tiltGesturesEnabled(boolean enabled) {
     tiltGesturesEnabled = enabled;
-    return this;
-  }
-
-  /**
-   * Specifies if the zoom controls are enabled for a map view.
-   *
-   * @param enabled True and gesture will be enabled
-   * @return This
-   */
-  @NonNull
-  public MapboxMapOptions zoomControlsEnabled(boolean enabled) {
-    zoomControlsEnabled = enabled;
     return this;
   }
 
@@ -792,24 +746,6 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
-   * Get the current configured styleUrl url for a map view.
-   *
-   * @return Style url to be used.
-   */
-  public String getStyleUrl() {
-    return styleUrl;
-  }
-
-  /**
-   * Get the current configured styleJson for a map view.
-   *
-   * @return Style json to be used.
-   */
-  public String getStyleJson() {
-    return styleJson;
-  }
-
-  /**
    * Get the current configured rotate gesture state for a map view.
    *
    * @return True indicates gesture is enabled
@@ -834,15 +770,6 @@ public class MapboxMapOptions implements Parcelable {
    */
   public boolean getTiltGesturesEnabled() {
     return tiltGesturesEnabled;
-  }
-
-  /**
-   * Get the current configured zoom controls state for a map view.
-   *
-   * @return True indicates gesture is enabled
-   */
-  public boolean getZoomControlsEnabled() {
-    return zoomControlsEnabled;
   }
 
   /**
@@ -993,12 +920,9 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeByte((byte) (rotateGesturesEnabled ? 1 : 0));
     dest.writeByte((byte) (scrollGesturesEnabled ? 1 : 0));
     dest.writeByte((byte) (tiltGesturesEnabled ? 1 : 0));
-    dest.writeByte((byte) (zoomControlsEnabled ? 1 : 0));
     dest.writeByte((byte) (zoomGesturesEnabled ? 1 : 0));
     dest.writeByte((byte) (doubleTapGesturesEnabled ? 1 : 0));
 
-    dest.writeString(styleUrl);
-    dest.writeString(styleJson);
     dest.writeString(apiBaseUrl);
     dest.writeByte((byte) (textureMode ? 1 : 0));
     dest.writeByte((byte) (translucentTextureSurface ? 1 : 0));
@@ -1071,9 +995,6 @@ public class MapboxMapOptions implements Parcelable {
     if (zoomGesturesEnabled != options.zoomGesturesEnabled) {
       return false;
     }
-    if (zoomControlsEnabled != options.zoomControlsEnabled) {
-      return false;
-    }
     if (doubleTapGesturesEnabled != options.doubleTapGesturesEnabled) {
       return false;
     }
@@ -1087,13 +1008,6 @@ public class MapboxMapOptions implements Parcelable {
       return false;
     }
     if (!Arrays.equals(attributionMargins, options.attributionMargins)) {
-      return false;
-    }
-    if (styleUrl != null ? !styleUrl.equals(options.styleUrl) : options.styleUrl != null) {
-      return false;
-    }
-
-    if (styleJson != null ? !styleJson.equals(options.styleJson) : options.styleJson != null) {
       return false;
     }
 
@@ -1146,13 +1060,10 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (scrollGesturesEnabled ? 1 : 0);
     result = 31 * result + (tiltGesturesEnabled ? 1 : 0);
     result = 31 * result + (zoomGesturesEnabled ? 1 : 0);
-    result = 31 * result + (zoomControlsEnabled ? 1 : 0);
     result = 31 * result + (doubleTapGesturesEnabled ? 1 : 0);
     result = 31 * result + (apiBaseUrl != null ? apiBaseUrl.hashCode() : 0);
     result = 31 * result + (textureMode ? 1 : 0);
     result = 31 * result + (translucentTextureSurface ? 1 : 0);
-    result = 31 * result + (styleUrl != null ? styleUrl.hashCode() : 0);
-    result = 31 * result + (styleJson != null ? styleJson.hashCode() : 0);
     result = 31 * result + (prefetchesTiles ? 1 : 0);
     result = 31 * result + (zMediaOverlay ? 1 : 0);
     result = 31 * result + (localIdeographFontFamily != null ? localIdeographFontFamily.hashCode() : 0);

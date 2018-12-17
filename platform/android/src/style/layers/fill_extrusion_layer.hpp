@@ -4,6 +4,7 @@
 
 #include "layer.hpp"
 #include "../transition_options.hpp"
+#include <mbgl/layermanager/fill_extrusion_layer_factory.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <jni/jni.hpp>
 
@@ -14,8 +15,6 @@ class FillExtrusionLayer : public Layer {
 public:
     using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/FillExtrusionLayer"; };
-
-    static void registerNative(jni::JNIEnv&);
 
     FillExtrusionLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
@@ -52,9 +51,24 @@ public:
     jni::Local<jni::Object<jni::ObjectTag>> getFillExtrusionBase(jni::JNIEnv&);
     void setFillExtrusionBaseTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Local<jni::Object<TransitionOptions>> getFillExtrusionBaseTransition(jni::JNIEnv&);
-    jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&);
+
+    jni::Local<jni::Object<jni::ObjectTag>> getFillExtrusionVerticalGradient(jni::JNIEnv&);
 
 }; // class FillExtrusionLayer
+
+class FillExtrusionJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::FillExtrusionLayerFactory {
+public:
+    ~FillExtrusionJavaLayerPeerFactory() override;
+
+    // JavaLayerPeerFactory overrides.
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+
+    void registerNative(jni::JNIEnv&) final;
+
+    LayerFactory* getLayerFactory() final { return this; }
+
+};  // class FillExtrusionJavaLayerPeerFactory
 
 } // namespace android
 } // namespace mbgl

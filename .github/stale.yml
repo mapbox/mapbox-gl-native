@@ -1,0 +1,28 @@
+# Configuration for probot-stale - https://github.com/probot/stale
+
+exemptProjects: false
+exemptMilestones: false
+
+staleLabel: archived
+
+limitPerRun: 1
+
+# SEMVER-MAJOR - @tobrun
+exemptLabels:
+  - SEMVER-MAJOR
+
+pulls:
+  daysUntilStale: 60
+  daysUntilClose: -1
+  markComment: false
+  closeComment: >
+    This pull request has been automatically detected as stale because it has not had
+    recent activity and will be archived. Thank you for your contributions.
+
+issues:
+  daysUntilStale: 180
+  daysUntilClose: -1
+  markComment: false
+  closeComment: >
+    This issue has been automatically detected as stale because it has not had
+    recent activity and will be archived. Thank you for your contributions.

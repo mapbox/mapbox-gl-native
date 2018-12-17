@@ -5,7 +5,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 namespace mbgl {
     namespace style {
-        class GeoJSONOptions;
+        struct GeoJSONOptions;
     }
 }
 

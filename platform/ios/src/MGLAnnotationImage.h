@@ -9,6 +9,11 @@ NS_ASSUME_NONNULL_BEGIN
  annotations visually on a map view. Annotation image objects wrap `UIImage`
  objects and may be recycled later and put into a reuse queue that is maintained
  by the map view.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/marker-image/">
+ Mark a place on the map with an image</a> example to learn how use an image
+ as a marker using `MGLAnnotationImage`. 
  */
 MGL_EXPORT
 @interface MGLAnnotationImage : NSObject <NSSecureCoding>

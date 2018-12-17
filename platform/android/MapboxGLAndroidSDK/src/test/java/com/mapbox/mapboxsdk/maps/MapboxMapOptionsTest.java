@@ -2,10 +2,11 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.Color;
 import android.view.Gravity;
+
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -142,20 +143,6 @@ public class MapboxMapOptionsTest {
     assertTrue(new MapboxMapOptions().getRotateGesturesEnabled());
     assertTrue(new MapboxMapOptions().rotateGesturesEnabled(true).getRotateGesturesEnabled());
     assertFalse(new MapboxMapOptions().rotateGesturesEnabled(false).getRotateGesturesEnabled());
-  }
-
-  @Test
-  public void testZoomControlsEnabled() {
-    assertFalse(new MapboxMapOptions().getZoomControlsEnabled());
-    assertTrue(new MapboxMapOptions().zoomControlsEnabled(true).getZoomControlsEnabled());
-    assertFalse(new MapboxMapOptions().zoomControlsEnabled(false).getZoomControlsEnabled());
-  }
-
-  @Test
-  public void testStyleUrl() {
-    assertEquals(Style.DARK, new MapboxMapOptions().styleUrl(Style.DARK).getStyleUrl());
-    assertNotEquals(Style.LIGHT, new MapboxMapOptions().styleUrl(Style.DARK).getStyleUrl());
-    assertNull(new MapboxMapOptions().getStyleUrl());
   }
 
   @Test

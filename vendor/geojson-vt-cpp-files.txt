@@ -1,0 +1,12 @@
+# This file is generated. Do not edit. Regenerate this with scripts/generate-cmake-files.js
+
+# mapbox
+include/mapbox/geojsonvt.hpp
+
+# mapbox/geojsonvt
+include/mapbox/geojsonvt/clip.hpp
+include/mapbox/geojsonvt/convert.hpp
+include/mapbox/geojsonvt/simplify.hpp
+include/mapbox/geojsonvt/tile.hpp
+include/mapbox/geojsonvt/types.hpp
+include/mapbox/geojsonvt/wrap.hpp

@@ -25,8 +25,8 @@
 
     MGLRasterStyleLayer *layer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     XCTAssertNotEqual(layer.rawLayer, nullptr);
-    XCTAssertTrue(layer.rawLayer->is<mbgl::style::RasterLayer>());
-    auto rawLayer = layer.rawLayer->as<mbgl::style::RasterLayer>();
+    XCTAssertEqualObjects(@(layer.rawLayer->getTypeInfo()->type), @"raster");
+    auto rawLayer = static_cast<mbgl::style::RasterLayer*>(layer.rawLayer);
 
     MGLTransition transitionTest = MGLTransitionMake(5, 4);
 

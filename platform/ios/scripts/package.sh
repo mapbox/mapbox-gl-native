@@ -10,9 +10,13 @@ DERIVED_DATA=build/ios
 PRODUCTS=${DERIVED_DATA}
 LOG_PATH=build/xcodebuild-$(date +"%Y-%m-%d_%H%M%S").log
 
-BUILDTYPE=${BUILDTYPE:-Debug}
 BUILD_FOR_DEVICE=${BUILD_DEVICE:-true}
 SYMBOLS=${SYMBOLS:-YES}
+
+BUILDTYPE=${BUILDTYPE:-Debug}
+if [[ ${SYMBOLS} == YES && ${BUILDTYPE} == Release ]]; then
+    BUILDTYPE='RelWithDebInfo'
+fi
 
 FORMAT=${FORMAT:-dynamic}
 BUILD_DYNAMIC=true
@@ -167,16 +171,6 @@ else
     cp -rv platform/ios/app/Settings.bundle ${OUTPUT}
 fi
 
-if [[ ${SYMBOLS} = NO ]]; then
-    step "Stripping symbols from binaries"
-    if [[ ${BUILD_STATIC} == true ]]; then
-        strip -Sx "${OUTPUT}/static/${NAME}.framework/${NAME}"
-    fi
-    if [[ ${BUILD_DYNAMIC} == true ]]; then
-        strip -Sx "${OUTPUT}/dynamic/${NAME}.framework/${NAME}"
-    fi
-fi
-
 function get_comparable_uuid {
     echo $(dwarfdump --uuid ${1} | sed -n 's/.*UUID:\([^\"]*\) .*/\1/p' | sort)
 }
@@ -204,7 +198,7 @@ fi
 
 function create_podspec {
     step "Creating local podspec (${1})"
-    [[ $SYMBOLS = YES ]] && POD_SUFFIX="-symbols" || POD_SUFFIX=""
+    [[ $SYMBOLS = NO ]] && POD_SUFFIX="-stripped" || POD_SUFFIX=""
     POD_SOURCE_PATH='    :path => ".",'
     POD_FRAMEWORKS="  m.vendored_frameworks = '"${NAME}".framework'"
     INPUT_PODSPEC=platform/ios/${NAME}-iOS-SDK${POD_SUFFIX}.podspec

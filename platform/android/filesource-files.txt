@@ -25,4 +25,4 @@ platform/android/src/offline/offline_region_status.cpp
 platform/android/src/offline/offline_region_status.hpp
 
 # Database
-platform/default/sqlite3.cpp
+platform/default/src/mbgl/storage/sqlite3.cpp

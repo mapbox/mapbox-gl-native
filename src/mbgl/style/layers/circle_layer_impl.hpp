@@ -15,6 +15,8 @@ public:
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
     CirclePaintProperties::Transitionable paint;
+
+    DECLARE_LAYER_TYPE_INFO;
 };
 
 } // namespace style

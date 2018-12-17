@@ -9,7 +9,7 @@ public:
         : properties(std::move(properties_)) {
     }
 
-    StubGeometryTileFeature(optional<FeatureIdentifier> id_, FeatureType type_, GeometryCollection geometry_, PropertyMap properties_)
+    StubGeometryTileFeature(FeatureIdentifier id_, FeatureType type_, GeometryCollection geometry_, PropertyMap properties_)
         : properties(std::move(properties_)),
           id(std::move(id_)),
           type(type_),
@@ -17,7 +17,7 @@ public:
     }
 
     PropertyMap properties;
-    optional<FeatureIdentifier> id;
+    FeatureIdentifier id;
     FeatureType type = FeatureType::Point;
     GeometryCollection geometry;
 
@@ -25,7 +25,7 @@ public:
         return type;
     }
 
-    optional<FeatureIdentifier> getID() const override {
+    FeatureIdentifier getID() const override {
         return id;
     }
 

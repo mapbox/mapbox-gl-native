@@ -1,33 +1,28 @@
 package com.mapbox.mapboxsdk.testapp.activity.location;
 
-import android.location.Location;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Toast;
-
 import com.mapbox.android.core.location.LocationEngine;
-import com.mapbox.android.core.location.LocationEngineListener;
-import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.location.LocationEngineProvider;
+import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.location.LocationComponent;
-import com.mapbox.mapboxsdk.location.modes.RenderMode;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.List;
 
-import timber.log.Timber;
-
-public class ManualLocationUpdatesActivity extends AppCompatActivity implements OnMapReadyCallback,
-  LocationEngineListener {
+public class ManualLocationUpdatesActivity extends AppCompatActivity implements OnMapReadyCallback {
 
   private MapView mapView;
   private LocationComponent locationComponent;
@@ -39,43 +34,38 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_location_manual_update);
 
+    locationEngine = LocationEngineProvider.getBestLocationEngine(this, false);
+
     FloatingActionButton fabManualUpdate = findViewById(R.id.fabManualLocationChange);
-    fabManualUpdate.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (locationComponent != null && locationComponent.getLocationEngine() == null) {
-          locationComponent.forceLocationUpdate(
-            Utils.getRandomLocation(LatLngBounds.from(60, 25, 40, -5)));
-        }
+    fabManualUpdate.setOnClickListener(v -> {
+      if (locationComponent != null && locationComponent.getLocationEngine() == null) {
+        locationComponent.forceLocationUpdate(
+          Utils.getRandomLocation(LatLngBounds.from(60, 25, 40, -5)));
       }
     });
     fabManualUpdate.setEnabled(false);
 
     FloatingActionButton fabToggle = findViewById(R.id.fabToggleManualLocation);
-    fabToggle.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (locationComponent != null) {
-          locationComponent.setLocationEngine(locationComponent.getLocationEngine() == null ? locationEngine :
-            null);
+    fabToggle.setOnClickListener(v -> {
+      if (locationComponent != null) {
+        locationComponent.setLocationEngine(locationComponent.getLocationEngine() == null ? locationEngine : null);
 
-          if (locationComponent.getLocationEngine() == null) {
-            fabToggle.setImageResource(R.drawable.ic_layers_clear);
-            fabManualUpdate.setEnabled(true);
-            fabManualUpdate.setAlpha(1f);
-            Toast.makeText(
-              ManualLocationUpdatesActivity.this.getApplicationContext(),
-              "LocationEngine disable, use manual updates",
-              Toast.LENGTH_SHORT).show();
-          } else {
-            fabToggle.setImageResource(R.drawable.ic_layers);
-            fabManualUpdate.setEnabled(false);
-            fabManualUpdate.setAlpha(0.5f);
-            Toast.makeText(
-              ManualLocationUpdatesActivity.this.getApplicationContext(),
-              "LocationEngine enabled",
-              Toast.LENGTH_SHORT).show();
-          }
+        if (locationComponent.getLocationEngine() == null) {
+          fabToggle.setImageResource(R.drawable.ic_layers_clear);
+          fabManualUpdate.setEnabled(true);
+          fabManualUpdate.setAlpha(1f);
+          Toast.makeText(
+            ManualLocationUpdatesActivity.this.getApplicationContext(),
+            "LocationEngine disabled, use manual updates",
+            Toast.LENGTH_SHORT).show();
+        } else {
+          fabToggle.setImageResource(R.drawable.ic_layers);
+          fabManualUpdate.setEnabled(false);
+          fabManualUpdate.setAlpha(0.5f);
+          Toast.makeText(
+            ManualLocationUpdatesActivity.this.getApplicationContext(),
+            "LocationEngine enabled",
+            Toast.LENGTH_SHORT).show();
         }
       }
     });
@@ -114,38 +104,28 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
     permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
-    locationEngine = new LocationEngineProvider(this).obtainBestLocationEngineAvailable();
-    locationEngine.addLocationEngineListener(this);
-    locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
-    locationEngine.activate();
-    locationComponent = mapboxMap.getLocationComponent();
-    locationComponent.activateLocationComponent(this, locationEngine);
-    locationComponent.setLocationComponentEnabled(true);
-    locationComponent.setRenderMode(RenderMode.COMPASS);
+    mapboxMap.setStyle(new Style.Builder().fromUrl(Style.MAPBOX_STREETS), style -> {
+      locationComponent = mapboxMap.getLocationComponent();
+      locationComponent.activateLocationComponent(
+        this,
+        style,
+        locationEngine,
+        new LocationEngineRequest.Builder(500)
+          .setFastestInterval(500)
+          .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+          .build());
+      locationComponent.setLocationComponentEnabled(true);
+      locationComponent.setRenderMode(RenderMode.COMPASS);
+    });
   }
 
   @Override
-  @SuppressWarnings( {"MissingPermission"})
-  public void onConnected() {
-    locationEngine.requestLocationUpdates();
-  }
-
-  @Override
-  public void onLocationChanged(Location location) {
-    Timber.d("Location change occurred: %s", location.toString());
-  }
-
-  @Override
-  @SuppressWarnings( {"MissingPermission"})
   protected void onStart() {
     super.onStart();
     mapView.onStart();
-    if (locationEngine != null) {
-      locationEngine.requestLocationUpdates();
-      locationEngine.addLocationEngineListener(this);
-    }
   }
 
   @Override
@@ -164,10 +144,6 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
   protected void onStop() {
     super.onStop();
     mapView.onStop();
-    if (locationEngine != null) {
-      locationEngine.removeLocationEngineListener(this);
-      locationEngine.removeLocationUpdates();
-    }
   }
 
   @Override
@@ -180,9 +156,6 @@ public class ManualLocationUpdatesActivity extends AppCompatActivity implements 
   protected void onDestroy() {
     super.onDestroy();
     mapView.onDestroy();
-    if (locationEngine != null) {
-      locationEngine.deactivate();
-    }
   }
 
   @Override

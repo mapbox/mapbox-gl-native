@@ -8,13 +8,14 @@ import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.FillExtrusionLayer;
 import com.mapbox.mapboxsdk.style.layers.Property;
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.light.Position;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.utils.ColorUtils;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
@@ -42,16 +43,18 @@ public class BuildingFillExtrusionActivity extends AppCompatActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_building_layer);
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      setupBuildings();
-      setupLight();
+      mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
+        setupBuildings(style);
+        setupLight();
+      });
     });
   }
 
-  private void setupBuildings() {
+  private void setupBuildings(Style style) {
     FillExtrusionLayer fillExtrusionLayer = new FillExtrusionLayer("3d-buildings", "composite");
     fillExtrusionLayer.setSourceLayer("building");
     fillExtrusionLayer.setFilter(eq(get("extrude"), literal("true")));
@@ -62,11 +65,11 @@ public class BuildingFillExtrusionActivity extends AppCompatActivity {
       fillExtrusionBase(Expression.get("min_height")),
       fillExtrusionOpacity(0.9f)
     );
-    mapboxMap.addLayer(fillExtrusionLayer);
+    style.addLayer(fillExtrusionLayer);
   }
 
   private void setupLight() {
-    light = mapboxMap.getLight();
+    light = mapboxMap.getStyle().getLight();
 
     findViewById(R.id.fabLightPosition).setOnClickListener(v -> {
       isInitPosition = !isInitPosition;
@@ -79,7 +82,7 @@ public class BuildingFillExtrusionActivity extends AppCompatActivity {
 
     findViewById(R.id.fabLightColor).setOnClickListener(v -> {
       isRedColor = !isRedColor;
-      light.setColor(PropertyFactory.colorToRgbaString(isRedColor ? Color.RED : Color.BLUE));
+      light.setColor(ColorUtils.colorToRgbaString(isRedColor ? Color.RED : Color.BLUE));
     });
   }
 

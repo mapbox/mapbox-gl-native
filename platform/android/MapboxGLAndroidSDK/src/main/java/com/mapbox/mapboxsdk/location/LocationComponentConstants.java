@@ -6,7 +6,7 @@ package com.mapbox.mapboxsdk.location;
 final class LocationComponentConstants {
 
   // Controls the compass update rate in milliseconds
-  static final int COMPASS_UPDATE_RATE_MS = 500;
+  static final long COMPASS_UPDATE_RATE_MS = 500;
 
   // Sets the transition animation duration when switching camera modes.
   static final long TRANSITION_ANIMATION_DURATION_MS = 750;
@@ -24,7 +24,13 @@ final class LocationComponentConstants {
   static final long DEFAULT_TRACKING_TILT_ANIM_DURATION = 1250;
 
   // Threshold value to perform immediate camera/layer position update.
-  static final double INSTANT_LOCATION_TRANSITION_THRESHOLD = 500_000;
+  static final double INSTANT_LOCATION_TRANSITION_THRESHOLD = 50_000;
+
+  // Default interval between location updates
+  static final long DEFAULT_INTERVAL_MILLIS = 1000;
+
+  // Default fastest acceptable interval between location updates
+  static final long DEFAULT_FASTEST_INTERVAL_MILLIS = 1000;
 
   // Sources
   static final String LOCATION_SOURCE = "mapbox-location-source";

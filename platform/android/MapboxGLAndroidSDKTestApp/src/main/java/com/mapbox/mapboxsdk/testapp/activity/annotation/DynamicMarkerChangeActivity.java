@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 
@@ -31,10 +32,12 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_dynamic_marker);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.setTag(false);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(mapboxMap -> {
+      mapboxMap.setStyle(Style.MAPBOX_STREETS);
+
       DynamicMarkerChangeActivity.this.mapboxMap = mapboxMap;
       // Create marker
       MarkerOptions markerOptions = new MarkerOptions()
@@ -46,7 +49,7 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
       marker = mapboxMap.addMarker(markerOptions);
     });
 
-    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+    FloatingActionButton fab = findViewById(R.id.fab);
     fab.setColorFilter(ContextCompat.getColor(this, R.color.primary));
     fab.setOnClickListener(view -> {
       if (mapboxMap != null) {

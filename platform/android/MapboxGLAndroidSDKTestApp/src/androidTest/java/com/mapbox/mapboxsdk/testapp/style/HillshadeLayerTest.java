@@ -3,265 +3,221 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
 import android.graphics.Color;
+import android.support.test.annotation.UiThreadTest;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.mapbox.mapboxsdk.maps.BaseLayerTest;
+import org.junit.Before;
 import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.HillshadeLayer;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.*;
-import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
 import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 
 /**
  * Basic smoke tests for HillshadeLayer
  */
 @RunWith(AndroidJUnit4.class)
-public class HillshadeLayerTest extends BaseActivityTest {
+public class HillshadeLayerTest extends BaseLayerTest {
 
   private HillshadeLayer layer;
 
-  @Override
-  protected Class getActivityClass() {
-    return EspressoTestActivity.class;
-  }
-
-  private void setupLayer() {
-    Timber.i("Retrieving layer");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-        Timber.i("Adding layer");
-        layer = new HillshadeLayer("my-layer", "composite");
-        layer.setSourceLayer("composite");
-        mapboxMap.addLayer(layer);
-        // Layer reference is now stale, get new reference
-        layer = mapboxMap.getLayerAs("my-layer");
-      }
-    });
+  @Before
+  @UiThreadTest
+  public void beforeTest(){
+    super.before();
+    layer = new HillshadeLayer("my-layer", "composite");
+    layer.setSourceLayer("composite");
+    setupLayer(layer);
   }
 
   @Test
+  @UiThreadTest
   public void testSourceId() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("SourceId");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
-      // Get source id
-      assertEquals(layer.getSourceId(), "composite");
-    });
+    assertNotNull(layer);
+    assertEquals(layer.getSourceId(), "composite");
   }
 
   @Test
+  @UiThreadTest
   public void testSetVisibility() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("Visibility");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Get initial
-      assertEquals(layer.getVisibility().getValue(), VISIBLE);
+    // Get initial
+    assertEquals(layer.getVisibility().getValue(), VISIBLE);
 
-      // Set
-      layer.setProperties(visibility(NONE));
-      assertEquals(layer.getVisibility().getValue(), NONE);
-    });
+    // Set
+    layer.setProperties(visibility(NONE));
+    assertEquals(layer.getVisibility().getValue(), NONE);
   }
 
   @Test
+  @UiThreadTest
   public void testHillshadeIlluminationDirectionAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("hillshade-illumination-direction");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getHillshadeIlluminationDirection().getValue());
 
-      // Set and Get
-      layer.setProperties(hillshadeIlluminationDirection(0.3f));
-      assertEquals((Float) layer.getHillshadeIlluminationDirection().getValue(), (Float) 0.3f);
-    });
+    // Set and Get
+    Float propertyValue = 0.3f;
+    layer.setProperties(hillshadeIlluminationDirection(propertyValue));
+    assertEquals(layer.getHillshadeIlluminationDirection().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testHillshadeIlluminationAnchorAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("hillshade-illumination-anchor");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getHillshadeIlluminationAnchor().getValue());
 
-      // Set and Get
-      layer.setProperties(hillshadeIlluminationAnchor(HILLSHADE_ILLUMINATION_ANCHOR_MAP));
-      assertEquals((String) layer.getHillshadeIlluminationAnchor().getValue(), (String) HILLSHADE_ILLUMINATION_ANCHOR_MAP);
-    });
+    // Set and Get
+    String propertyValue = HILLSHADE_ILLUMINATION_ANCHOR_MAP;
+    layer.setProperties(hillshadeIlluminationAnchor(propertyValue));
+    assertEquals(layer.getHillshadeIlluminationAnchor().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testHillshadeExaggerationTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("hillshade-exaggerationTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setHillshadeExaggerationTransition(options);
-      assertEquals(layer.getHillshadeExaggerationTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setHillshadeExaggerationTransition(options);
+    assertEquals(layer.getHillshadeExaggerationTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testHillshadeExaggerationAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("hillshade-exaggeration");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getHillshadeExaggeration().getValue());
 
-      // Set and Get
-      layer.setProperties(hillshadeExaggeration(0.3f));
-      assertEquals((Float) layer.getHillshadeExaggeration().getValue(), (Float) 0.3f);
-    });
+    // Set and Get
+    Float propertyValue = 0.3f;
+    layer.setProperties(hillshadeExaggeration(propertyValue));
+    assertEquals(layer.getHillshadeExaggeration().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testHillshadeShadowColorTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("hillshade-shadow-colorTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setHillshadeShadowColorTransition(options);
-      assertEquals(layer.getHillshadeShadowColorTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setHillshadeShadowColorTransition(options);
+    assertEquals(layer.getHillshadeShadowColorTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testHillshadeShadowColorAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("hillshade-shadow-color");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getHillshadeShadowColor().getValue());
 
-      // Set and Get
-      layer.setProperties(hillshadeShadowColor("rgba(0, 0, 0, 1)"));
-      assertEquals((String) layer.getHillshadeShadowColor().getValue(), (String) "rgba(0, 0, 0, 1)");
-    });
+    // Set and Get
+    String propertyValue = "rgba(0, 0, 0, 1)";
+    layer.setProperties(hillshadeShadowColor(propertyValue));
+    assertEquals(layer.getHillshadeShadowColor().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testHillshadeShadowColorAsIntConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("hillshade-shadow-color");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      layer.setProperties(hillshadeShadowColor(Color.RED));
-      assertEquals(layer.getHillshadeShadowColorAsInt(), Color.RED);
-    });
+    // Set and Get
+    layer.setProperties(hillshadeShadowColor(Color.RED));
+    assertEquals(layer.getHillshadeShadowColorAsInt(), Color.RED);
   }
 
   @Test
+  @UiThreadTest
   public void testHillshadeHighlightColorTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("hillshade-highlight-colorTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setHillshadeHighlightColorTransition(options);
-      assertEquals(layer.getHillshadeHighlightColorTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setHillshadeHighlightColorTransition(options);
+    assertEquals(layer.getHillshadeHighlightColorTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testHillshadeHighlightColorAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("hillshade-highlight-color");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getHillshadeHighlightColor().getValue());
 
-      // Set and Get
-      layer.setProperties(hillshadeHighlightColor("rgba(0, 0, 0, 1)"));
-      assertEquals((String) layer.getHillshadeHighlightColor().getValue(), (String) "rgba(0, 0, 0, 1)");
-    });
+    // Set and Get
+    String propertyValue = "rgba(0, 0, 0, 1)";
+    layer.setProperties(hillshadeHighlightColor(propertyValue));
+    assertEquals(layer.getHillshadeHighlightColor().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testHillshadeHighlightColorAsIntConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("hillshade-highlight-color");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      layer.setProperties(hillshadeHighlightColor(Color.RED));
-      assertEquals(layer.getHillshadeHighlightColorAsInt(), Color.RED);
-    });
+    // Set and Get
+    layer.setProperties(hillshadeHighlightColor(Color.RED));
+    assertEquals(layer.getHillshadeHighlightColorAsInt(), Color.RED);
   }
 
   @Test
+  @UiThreadTest
   public void testHillshadeAccentColorTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("hillshade-accent-colorTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setHillshadeAccentColorTransition(options);
-      assertEquals(layer.getHillshadeAccentColorTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setHillshadeAccentColorTransition(options);
+    assertEquals(layer.getHillshadeAccentColorTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testHillshadeAccentColorAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("hillshade-accent-color");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getHillshadeAccentColor().getValue());
 
-      // Set and Get
-      layer.setProperties(hillshadeAccentColor("rgba(0, 0, 0, 1)"));
-      assertEquals((String) layer.getHillshadeAccentColor().getValue(), (String) "rgba(0, 0, 0, 1)");
-    });
+    // Set and Get
+    String propertyValue = "rgba(0, 0, 0, 1)";
+    layer.setProperties(hillshadeAccentColor(propertyValue));
+    assertEquals(layer.getHillshadeAccentColor().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testHillshadeAccentColorAsIntConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("hillshade-accent-color");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      layer.setProperties(hillshadeAccentColor(Color.RED));
-      assertEquals(layer.getHillshadeAccentColorAsInt(), Color.RED);
-    });
+    // Set and Get
+    layer.setProperties(hillshadeAccentColor(Color.RED));
+    assertEquals(layer.getHillshadeAccentColorAsInt(), Color.RED);
   }
 }

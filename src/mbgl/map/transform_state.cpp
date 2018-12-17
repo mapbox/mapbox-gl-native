@@ -133,21 +133,20 @@ ViewportMode TransformState::getViewportMode() const {
 #pragma mark - Camera options
 
 CameraOptions TransformState::getCameraOptions(const EdgeInsets& padding) const {
-    CameraOptions camera;
-
+    LatLng center;
     if (padding.isFlush()) {
-        camera.center = getLatLng();
+        center = getLatLng();
     } else {
         ScreenCoordinate point = padding.getCenter(size.width, size.height);
         point.y = size.height - point.y;
-        camera.center = screenCoordinateToLatLng(point).wrapped();
+        center = screenCoordinateToLatLng(point).wrapped();
     }
-    camera.padding = padding;
-    camera.zoom = getZoom();
-    camera.angle = -angle * util::RAD2DEG;
-    camera.pitch = pitch * util::RAD2DEG;
-
-    return camera;
+    return CameraOptions()
+        .withCenter(center)
+        .withPadding(padding)
+        .withZoom(getZoom())
+        .withAngle(-angle * util::RAD2DEG)
+        .withPitch(pitch * util::RAD2DEG);
 }
 
 #pragma mark - Position
@@ -376,12 +375,9 @@ void TransformState::constrain(double& scale_, double& x_, double& y_) const {
         return;
     }
 
-    const double ratioX = (rotatedNorth() ? size.height : size.width) / util::tileSize;
+    // Constrain scale to avoid zooming out far enough to show off-world areas on the Y axis.
     const double ratioY = (rotatedNorth() ? size.width : size.height) / util::tileSize;
-
-    // Constrain minimum scale to avoid zooming out far enough to show off-world areas on the Y axis.
-    // If Y axis ratio is too small to be constrained, use X axis ratio instead.
-    scale_ = util::max(scale_, ratioY < 1.0 ? ratioX : ratioY);
+    scale_ = util::max(scale_, ratioY);
 
     // Constrain min/max pan to avoid showing off-world areas on the Y axis.
     double max_y = (scale_ * util::tileSize - (rotatedNorth() ? size.width : size.height)) / 2;

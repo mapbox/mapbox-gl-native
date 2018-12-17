@@ -6,11 +6,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.CustomLayer;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.model.customlayer.ExampleCustomLayer;
@@ -34,15 +34,17 @@ public class CustomLayerActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_custom_layer);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
       mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(39.91448, -243.60947), 10));
-
+      mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> initFab());
     });
+  }
 
-    fab = (FloatingActionButton) findViewById(R.id.fab);
+  private void initFab() {
+    fab = findViewById(R.id.fab);
     fab.setColorFilter(ContextCompat.getColor(this, R.color.primary));
     fab.setOnClickListener(view -> {
       if (mapboxMap != null) {
@@ -52,14 +54,15 @@ public class CustomLayerActivity extends AppCompatActivity {
   }
 
   private void swapCustomLayer() {
+    Style style = mapboxMap.getStyle();
     if (customLayer != null) {
-      mapboxMap.removeLayer(customLayer);
+      style.removeLayer(customLayer);
       customLayer = null;
       fab.setImageResource(R.drawable.ic_layers);
     } else {
       customLayer = new CustomLayer("custom",
         ExampleCustomLayer.createContext());
-      mapboxMap.addLayerBelow(customLayer, "building");
+      style.addLayerBelow(customLayer, "building");
       fab.setImageResource(R.drawable.ic_layers_clear);
     }
   }

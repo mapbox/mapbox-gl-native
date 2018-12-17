@@ -3,8 +3,6 @@
     <declare-styleable name="mapbox_MapView">
 
         <!--Configuration-->
-        <attr name="mapbox_styleUrl" format="string"/>
-        <attr name="mapbox_styleJson" format="string"/>
         <attr name="mapbox_apiBaseUrl" format="string"/>
         <attr name="mapbox_localIdeographFontFamily" format="string"/>
         <attr name="mapbox_cross_source_collisions" format="boolean"/>
@@ -26,9 +24,6 @@
         <attr name="mapbox_uiRotateGestures" format="boolean"/>
         <attr name="mapbox_uiTiltGestures" format="boolean"/>
         <attr name="mapbox_uiDoubleTapGestures" format="boolean"/>
-
-        <!--UI-Controls-->
-        <attr name="mapbox_uiZoomControls" format="boolean"/>
 
         <!--Compass-->
         <attr name="mapbox_uiCompass" format="boolean"/>
@@ -162,10 +157,6 @@
         <!-- Map layer configuration -->
         <attr name="mapbox_layer_below" format="string"/>
 
-        <!-- Map zoom levels -->
-        <attr name="mapbox_maxZoom" format="float"/>
-        <attr name="mapbox_minZoom" format="float"/>
-
         <!-- Icon scale based on map zoom levels -->
         <attr name="mapbox_maxZoomIconScale" format="float"/>
         <attr name="mapbox_minZoomIconScale" format="float"/>
@@ -177,6 +168,12 @@
 
         <!-- Animation duration multiplier -->
         <attr name="mapbox_trackingAnimationDurationMultiplier" format="float" />
+
+        <!-- Compass animation -->
+        <attr name="mapbox_compassAnimationEnabled" format="boolean" />
+
+        <!-- Accuracy animation-->
+        <attr name="mapbox_accuracyAnimationEnabled" format="boolean" />
 
     </declare-styleable>
 </resources>

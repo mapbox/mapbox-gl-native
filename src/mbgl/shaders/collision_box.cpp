@@ -7,8 +7,8 @@ namespace mbgl {
 namespace shaders {
 
 const char* collision_box::name = "collision_box";
-const char* collision_box::vertexSource = source() + 14428;
-const char* collision_box::fragmentSource = source() + 15252;
+const char* collision_box::vertexSource = source() + 9956;
+const char* collision_box::fragmentSource = source() + 10602;
 
 // Uncompressed source of collision_box.vertex.glsl:
 /*

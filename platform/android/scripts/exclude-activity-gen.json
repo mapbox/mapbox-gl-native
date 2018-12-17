@@ -38,5 +38,11 @@
   "RenderTestActivity",
   "SymbolLayerActivity",
   "LocationFragmentActivity",
-  "MergeOfflineRegionsActivity"
+  "MergeOfflineRegionsActivity",
+  "NestedViewPagerActivity",
+  "DebugModeActivity",
+  "TextureViewDebugModeActivity",
+  "RuntimeStyleActivity",
+  "GridSourceActivity",
+  "AnimatedImageSourceActivity"
 ]

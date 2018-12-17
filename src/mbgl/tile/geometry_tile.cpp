@@ -19,8 +19,6 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/actor/scheduler.hpp>
 
-#include <iostream>
-
 namespace mbgl {
 
 using namespace style;
@@ -99,8 +97,7 @@ void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) 
 
     for (const auto& layer : layers) {
         // Skip irrelevant layers.
-        if (layer->type == LayerType::Background ||
-            layer->type == LayerType::Custom ||
+        if (layer->getTypeInfo()->source == LayerTypeInfo::Source::NotRequired ||
             layer->source != sourceID ||
             id.overscaledZ < std::floor(layer->minZoom) ||
             id.overscaledZ >= std::ceil(layer->maxZoom) ||

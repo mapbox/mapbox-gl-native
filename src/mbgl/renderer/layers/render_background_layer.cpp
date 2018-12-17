@@ -14,7 +14,7 @@ namespace mbgl {
 using namespace style;
 
 RenderBackgroundLayer::RenderBackgroundLayer(Immutable<style::BackgroundLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Background, _impl),
+    : RenderLayer(std::move(_impl)),
       unevaluated(impl().paint.untransitioned()) {
 }
 
@@ -121,6 +121,14 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
             );
         }
     }
+}
+
+optional<Color> RenderBackgroundLayer::getSolidBackground() const {
+    if (!evaluated.get<BackgroundPattern>().from.empty()) {
+        return nullopt;
+    }
+
+    return { evaluated.get<BackgroundColor>() * evaluated.get<BackgroundOpacity>() };
 }
 
 } // namespace mbgl

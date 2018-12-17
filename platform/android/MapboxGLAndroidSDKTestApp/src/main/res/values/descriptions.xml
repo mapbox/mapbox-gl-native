@@ -25,7 +25,6 @@
     <string name="description_scroll_by">Scroll with pixels in x,y direction</string>
     <string name="description_snapshot">Example to make a snapshot of the map</string>
     <string name="description_doublemap">2 maps in a view hierarchy</string>
-    <string name="description_view_marker">Use an Android SDK View as marker</string>
     <string name="description_dynamic_info_window_adapter">Learn how to create a dynamic custom InfoWindow</string>
     <string name="description_viewpager">Use SupportMapFragments in a ViewPager</string>
     <string name="description_runtime_style">Adopt the map style on the fly</string>
@@ -47,7 +46,6 @@
     <string name="description_add_remove_markers">Change Symbol icon when zoom levels changes</string>
     <string name="description_style_file">Use a local file as the style</string>
     <string name="description_map_in_dialog">Display a map inside a dialog fragment</string>
-    <string name="description_marker_view_rectangle">Marker Views within a rectangle</string>
     <string name="description_circle_layer">Show bus stops and route in Singapore</string>
     <string name="description_url_transform">Transform urls on the fly</string>
     <string name="description_restricted_bounds">Limit viewport to Iceland</string>
@@ -65,6 +63,7 @@
     <string name="description_textureview_resize">Resize a map rendered on a TextureView</string>
     <string name="description_textureview_animate">Animate a map rendered on a TextureView</string>
     <string name="description_textureview_transparent">Enable a transparent surface on TextureView</string>
+    <string name="description_overlay">Blend an overlay on a map</string>
     <string name="description_grid_source">Example Custom Geometry Source</string>
     <string name="description_local_glyph">Suzhou using Droid Sans for Chinese glyphs</string>
     <string name="description_hillshade">Example raster-dem source and hillshade layer</string>
@@ -76,4 +75,6 @@
     <string name="description_location_modes">Showcases location render and tracking modes</string>
     <string name="description_location_fragment">Uses LocationComponent in a Fragment</string>
     <string name="description_location_manual">Force location updates and don\'t rely on the engine</string>
+    <string name="description_recyclerview">Show a MapView as a recyclerView item</string>
+    <string name="description_nested_viewpager">Show a MapView inside a viewpager inside a recyclerView</string>
 </resources>

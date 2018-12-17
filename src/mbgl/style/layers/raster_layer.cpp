@@ -14,8 +14,22 @@
 namespace mbgl {
 namespace style {
 
+
+// static
+const LayerTypeInfo* RasterLayer::Impl::staticTypeInfo() noexcept {
+    const static LayerTypeInfo typeInfo
+        {"raster",
+          LayerTypeInfo::Source::Required,
+          LayerTypeInfo::Pass3D::NotRequired,
+          LayerTypeInfo::Layout::NotRequired,
+          LayerTypeInfo::Clipping::NotRequired
+        };
+    return &typeInfo;
+}
+
+
 RasterLayer::RasterLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(makeMutable<Impl>(LayerType::Raster, layerID, sourceID)) {
+    : Layer(makeMutable<Impl>(layerID, sourceID)) {
 }
 
 RasterLayer::RasterLayer(Immutable<Impl> impl_)
@@ -40,40 +54,6 @@ std::unique_ptr<Layer> RasterLayer::cloneRef(const std::string& id_) const {
 }
 
 void RasterLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
-}
-
-// Source
-
-const std::string& RasterLayer::getSourceID() const {
-    return impl().source;
-}
-
-
-// Visibility
-
-void RasterLayer::setVisibility(VisibilityType value) {
-    if (value == getVisibility())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->visibility = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-// Zoom range
-
-void RasterLayer::setMinZoom(float minZoom) {
-    auto impl_ = mutableImpl();
-    impl_->minZoom = minZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-void RasterLayer::setMaxZoom(float maxZoom) {
-    auto impl_ = mutableImpl();
-    impl_->maxZoom = maxZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
 }
 
 // Layout properties
@@ -538,6 +518,10 @@ optional<Error> RasterLayer::setLayoutProperty(const std::string& name, const Co
         
 
     return Error { "layer doesn't support this property" };
+}
+
+Mutable<Layer::Impl> RasterLayer::mutableBaseImpl() const {
+    return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
 } // namespace style

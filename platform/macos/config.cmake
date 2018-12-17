@@ -1,44 +1,7 @@
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11)
-
-include(cmake/icu.cmake)
 include(cmake/loop-darwin.cmake)
 
 macro(mbgl_platform_core)
-    target_sources(mbgl-core
-        # Misc
-        PRIVATE platform/darwin/mbgl/storage/reachability.h
-        PRIVATE platform/darwin/mbgl/storage/reachability.m
-        PRIVATE platform/darwin/src/CFHandle.hpp
-        PRIVATE platform/darwin/src/collator.mm
-        PRIVATE platform/darwin/src/local_glyph_rasterizer.mm
-        PRIVATE platform/darwin/src/logging_nslog.mm
-        PRIVATE platform/darwin/src/nsthread.mm
-        PRIVATE platform/darwin/src/string_nsstring.mm
-        PRIVATE platform/default/bidi.cpp
-        PRIVATE platform/default/thread_local.cpp
-        PRIVATE platform/default/utf.cpp
-
-        # Image handling
-        PRIVATE platform/darwin/mbgl/util/image+MGLAdditions.hpp
-        PRIVATE platform/darwin/src/image.mm
-        PRIVATE platform/default/png_writer.cpp
-
-        # Headless view
-        PRIVATE platform/default/mbgl/gl/headless_frontend.cpp
-        PRIVATE platform/default/mbgl/gl/headless_frontend.hpp
-        PRIVATE platform/default/mbgl/gl/headless_backend.cpp
-        PRIVATE platform/default/mbgl/gl/headless_backend.hpp
-
-        # Snapshotting
-        PRIVATE platform/default/mbgl/map/map_snapshotter.cpp
-        PRIVATE platform/default/mbgl/map/map_snapshotter.hpp
-
-        # Thread pool
-        PRIVATE platform/default/mbgl/util/shared_thread_pool.cpp
-        PRIVATE platform/default/mbgl/util/shared_thread_pool.hpp
-        PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
-        PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
-    )
+    target_sources_from_file(mbgl-core PRIVATE platform/macos/core-files.txt)
 
     if(WITH_EGL)
         target_sources(mbgl-core
@@ -54,20 +17,16 @@ macro(mbgl_platform_core)
         )
     endif()
 
-    target_add_mason_package(mbgl-core PUBLIC geojson)
-    target_add_mason_package(mbgl-core PUBLIC polylabel)
-
     target_compile_options(mbgl-core
         PRIVATE -fobjc-arc
     )
 
     target_include_directories(mbgl-core
-        PUBLIC platform/darwin
-        PUBLIC platform/default
+        PUBLIC platform/darwin/include
+        PUBLIC platform/default/include
     )
 
     target_link_libraries(mbgl-core
-        PRIVATE icu
         PUBLIC "-lz"
         PUBLIC "-framework Foundation"
         PUBLIC "-framework CoreText"
@@ -120,7 +79,8 @@ endmacro()
 
 macro(mbgl_platform_test)
     target_sources(mbgl-test
-        PRIVATE platform/default/mbgl/test/main.cpp
+        PRIVATE platform/default/src/mbgl/layermanager/layer_manager.cpp
+        PRIVATE platform/default/src/mbgl/test/main.cpp
     )
 
     target_include_directories(mbgl-test
@@ -128,7 +88,7 @@ macro(mbgl_platform_test)
     )
 
     set_source_files_properties(
-        platform/default/mbgl/test/main.cpp
+        platform/default/src/mbgl/test/main.cpp
             PROPERTIES
         COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
     )
@@ -141,6 +101,7 @@ endmacro()
 
 macro(mbgl_platform_benchmark)
     target_sources(mbgl-benchmark
+        PRIVATE platform/default/src/mbgl/layermanager/layer_manager.cpp
         PRIVATE benchmark/src/main.cpp
     )
 
@@ -157,6 +118,9 @@ macro(mbgl_platform_benchmark)
 endmacro()
 
 macro(mbgl_platform_node)
+    target_sources(mbgl-core
+        PRIVATE platform/default/src/mbgl/layermanager/layer_manager.cpp
+    )
     target_link_libraries(mbgl-node INTERFACE
         -exported_symbols_list ${CMAKE_SOURCE_DIR}/platform/node/symbol-list
         -dead_strip

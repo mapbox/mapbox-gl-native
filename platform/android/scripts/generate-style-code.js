@@ -56,6 +56,7 @@ global.propertyType = function propertyType(property) {
       case 'number':
         return 'Float';
       case 'formatted':
+        return 'Formatted';
       case 'string':
         return 'String';
       case 'enum':
@@ -76,6 +77,7 @@ global.propertyJavaType = function propertyType(property) {
        case 'number':
          return 'float';
        case 'formatted':
+         return 'Formatted';
        case 'string':
          return 'String';
        case 'enum':
@@ -159,6 +161,7 @@ global.defaultExpressionJava = function(property) {
       case 'number':
         return 'number';
       case 'formatted':
+        return 'format';
       case 'string':
         return "string";
       case 'enum':
@@ -184,6 +187,7 @@ global.defaultValueJava = function(property) {
       case 'number':
         return '0.3f';
       case 'formatted':
+        return 'new Formatted(new FormattedSection("default"))'
       case 'string':
         return '"' + property['default'] + '"';
       case 'enum':
@@ -192,7 +196,6 @@ global.defaultValueJava = function(property) {
         return '"rgba(0, 0, 0, 1)"';
       case 'array':
              switch (property.value) {
-              case 'formatted':
               case 'string':
                 return '[' + property['default'] + "]";
               case 'number':

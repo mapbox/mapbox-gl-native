@@ -51,9 +51,8 @@ private:
     CrossfadeParameters crossfade;
 };
 
-template <>
-inline bool RenderLayer::is<RenderFillExtrusionLayer>() const {
-    return type == style::LayerType::FillExtrusion;
+inline const RenderFillExtrusionLayer* toRenderFillExtrusionLayer(const RenderLayer* layer) {
+    return static_cast<const RenderFillExtrusionLayer*>(layer);
 }
 
 } // namespace mbgl

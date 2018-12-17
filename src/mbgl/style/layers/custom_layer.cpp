@@ -2,8 +2,19 @@
 #include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/style/layer_observer.hpp>
 
+#include <mbgl/renderer/layers/render_custom_layer.hpp>
+
 namespace mbgl {
 namespace style {
+
+namespace {
+    const LayerTypeInfo typeInfoCustom
+    { "",
+      LayerTypeInfo::Source::NotRequired,
+      LayerTypeInfo::Pass3D::NotRequired,
+      LayerTypeInfo::Layout::NotRequired,
+      LayerTypeInfo::Clipping::NotRequired };
+}  // namespace
 
 CustomLayer::CustomLayer(const std::string& layerID,
                          std::unique_ptr<CustomLayerHost> host)
@@ -25,31 +36,6 @@ std::unique_ptr<Layer> CustomLayer::cloneRef(const std::string&) const {
     return nullptr;
 }
 
-// Visibility
-
-void CustomLayer::setVisibility(VisibilityType value) {
-    if (value == getVisibility())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->visibility = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-// Zoom range
-
-void CustomLayer::setMinZoom(float minZoom) {
-    auto impl_ = mutableImpl();
-    impl_->minZoom = minZoom;
-    baseImpl = std::move(impl_);
-}
-
-void CustomLayer::setMaxZoom(float maxZoom) {
-    auto impl_ = mutableImpl();
-    impl_->maxZoom = maxZoom;
-    baseImpl = std::move(impl_);
-}
-
 using namespace conversion;
 
 optional<Error> CustomLayer::setPaintProperty(const std::string&, const Convertible&) {
@@ -60,9 +46,13 @@ optional<Error> CustomLayer::setLayoutProperty(const std::string&, const Convert
     return Error { "layer doesn't support this property" };
 }
 
-template <>
-bool Layer::is<CustomLayer>() const {
-    return getType() == LayerType::Custom;
+Mutable<Layer::Impl> CustomLayer::mutableBaseImpl() const {
+    return staticMutableCast<Layer::Impl>(mutableImpl());
+}
+
+// static
+const LayerTypeInfo* CustomLayer::Impl::staticTypeInfo() noexcept {
+    return &typeInfoCustom;
 }
 
 } // namespace style

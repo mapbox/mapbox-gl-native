@@ -8,6 +8,8 @@ else()
     add_executable(mbgl-test ${MBGL_TEST_FILES})
 endif()
 
+# GCC 8+ trips over GTest's way of defining Test functions
+target_compile_options(mbgl-test PRIVATE -Wno-shadow)
 
 if(NOT WITH_NODEJS)
     target_compile_definitions(mbgl-test PRIVATE "-DTEST_HAS_SERVER=0")
@@ -19,23 +21,16 @@ target_include_directories(mbgl-test
     PRIVATE src
     PRIVATE test/include
     PRIVATE test/src
-    PRIVATE platform/default
+    PRIVATE platform/default/include
 )
 
-target_link_libraries(mbgl-test
-    PRIVATE mbgl-core
-    PRIVATE gtest
+target_link_libraries(mbgl-test PRIVATE
+    gtest
+    mbgl-core
+    shelf-pack-cpp
+    unique_resource
+    pixelmatch-cpp
 )
-
-target_add_mason_package(mbgl-test PRIVATE geometry)
-target_add_mason_package(mbgl-test PRIVATE variant)
-target_add_mason_package(mbgl-test PRIVATE unique_resource)
-target_add_mason_package(mbgl-test PRIVATE rapidjson)
-target_add_mason_package(mbgl-test PRIVATE pixelmatch)
-target_add_mason_package(mbgl-test PRIVATE boost)
-target_add_mason_package(mbgl-test PRIVATE geojson)
-target_add_mason_package(mbgl-test PRIVATE geojsonvt)
-target_add_mason_package(mbgl-test PRIVATE shelf-pack)
 
 mbgl_platform_test()
 

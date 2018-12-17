@@ -39,44 +39,49 @@ static std::string getTileBBox(int32_t x, int32_t y, int8_t z) {
             util::toString(max.x) + "," + util::toString(max.y));
 }
 
-Resource Resource::style(const std::string& url) {
+Resource Resource::style(const std::string& url, const Priority priority) {
     return Resource {
         Resource::Kind::Style,
-        url
+        url,
+        priority
     };
 }
 
-Resource Resource::source(const std::string& url) {
+Resource Resource::source(const std::string& url, const Priority priority) {
     return Resource {
         Resource::Kind::Source,
-        url
+        url,
+        priority
     };
 }
 
-Resource Resource::image(const std::string& url) {
+Resource Resource::image(const std::string& url, const Priority priority) {
     return Resource {
         Resource::Kind::Image,
-        url
+        url,
+        priority
     };
 }
 
-Resource Resource::spriteImage(const std::string& base, float pixelRatio) {
+Resource Resource::spriteImage(const std::string& base, float pixelRatio, const Priority priority) {
     util::URL url(base);
     return Resource{ Resource::Kind::SpriteImage,
                      base.substr(0, url.path.first + url.path.second) +
                          (pixelRatio > 1 ? "@2x" : "") + ".png" +
-                         base.substr(url.query.first, url.query.second) };
+                         base.substr(url.query.first, url.query.second),
+                     priority };
 }
 
-Resource Resource::spriteJSON(const std::string& base, float pixelRatio) {
+Resource Resource::spriteJSON(const std::string& base, float pixelRatio, const Priority priority) {
     util::URL url(base);
     return Resource{ Resource::Kind::SpriteJSON,
                      base.substr(0, url.path.first + url.path.second) +
                          (pixelRatio > 1 ? "@2x" : "") + ".json" +
-                         base.substr(url.query.first, url.query.second) };
+                         base.substr(url.query.first, url.query.second),
+                     priority };
 }
 
-Resource Resource::glyphs(const std::string& urlTemplate, const FontStack& fontStack, const std::pair<uint16_t, uint16_t>& glyphRange) {
+Resource Resource::glyphs(const std::string& urlTemplate, const FontStack& fontStack, const std::pair<uint16_t, uint16_t>& glyphRange, const Priority priority) {
     return Resource {
         Resource::Kind::Glyphs,
         util::replaceTokens(urlTemplate, [&](const std::string& token) -> optional<std::string> {
@@ -87,7 +92,8 @@ Resource Resource::glyphs(const std::string& urlTemplate, const FontStack& fontS
             } else {
                 return {};
             }
-        })
+        }),
+        priority
     };
 }
 
@@ -97,6 +103,7 @@ Resource Resource::tile(const std::string& urlTemplate,
                         int32_t y,
                         int8_t z,
                         Tileset::Scheme scheme,
+                        const Priority priority,
                         LoadingMethod loadingMethod) {
     bool supportsRatio = urlTemplate.find("{ratio}") != std::string::npos;
     if (scheme == Tileset::Scheme::TMS) {
@@ -116,16 +123,17 @@ Resource Resource::tile(const std::string& urlTemplate,
             } else if (token == "bbox-epsg-3857") {
                 return getTileBBox(x, y, z);
             } else if (token == "prefix") {
-                std::string prefix{ 2 };
-                prefix[0] = "0123456789abcdef"[x % 16];
-                prefix[1] = "0123456789abcdef"[y % 16];
-                return prefix;
+                return {{
+                    "0123456789abcdef"[x % 16],
+                    "0123456789abcdef"[y % 16],
+                }};
             } else if (token == "ratio") {
                 return std::string(pixelRatio > 1.0 ? "@2x" : "");
             } else {
                 return {};
             }
         }),
+        priority,
         Resource::TileData {
             urlTemplate,
             uint8_t(supportsRatio && pixelRatio > 1.0 ? 2 : 1),

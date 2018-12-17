@@ -6,6 +6,7 @@
 #import "MGLTilePyramidOfflineRegion_Private.h"
 #import "MGLShapeOfflineRegion.h"
 #import "MGLShapeOfflineRegion_Private.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #import "NSValue+MGLAdditions.h"
 
@@ -60,6 +61,7 @@ private:
 }
 
 - (instancetype)init {
+    MGLLogInfo(@"Calling this initializer is not allowed.");
     if (self = [super init]) {
         _state = MGLOfflinePackStateInvalid;
         NSLog(@"%s called; did you mean to call +[MGLOfflineStorage addPackForRegion:withContext:completionHandler:] instead?", __PRETTY_FUNCTION__);
@@ -79,15 +81,15 @@ private:
 }
 
 - (void)dealloc {
-    NSAssert(_state == MGLOfflinePackStateInvalid, @"MGLOfflinePack was not invalided prior to deallocation.");
+    MGLAssert(_state == MGLOfflinePackStateInvalid, @"MGLOfflinePack was not invalided prior to deallocation.");
 }
 
 - (id <MGLOfflineRegion>)region {
     MGLAssertOfflinePackIsValid();
 
     const mbgl::OfflineRegionDefinition &regionDefinition = _mbglOfflineRegion->getDefinition();
-    NSAssert([MGLTilePyramidOfflineRegion conformsToProtocol:@protocol(MGLOfflineRegion_Private)], @"MGLTilePyramidOfflineRegion should conform to MGLOfflineRegion_Private.");
-    NSAssert([MGLShapeOfflineRegion conformsToProtocol:@protocol(MGLOfflineRegion_Private)], @"MGLShapeOfflineRegion should conform to MGLOfflineRegion_Private.");
+    MGLAssert([MGLTilePyramidOfflineRegion conformsToProtocol:@protocol(MGLOfflineRegion_Private)], @"MGLTilePyramidOfflineRegion should conform to MGLOfflineRegion_Private.");
+    MGLAssert([MGLShapeOfflineRegion conformsToProtocol:@protocol(MGLOfflineRegion_Private)], @"MGLShapeOfflineRegion should conform to MGLOfflineRegion_Private.");
     
     
     
@@ -108,6 +110,7 @@ private:
 }
 
 - (void)resume {
+    MGLLogInfo(@"Resuming pack download.");
     MGLAssertOfflinePackIsValid();
 
     self.state = MGLOfflinePackStateActive;
@@ -117,6 +120,7 @@ private:
 }
 
 - (void)suspend {
+    MGLLogInfo(@"Suspending pack download.");
     MGLAssertOfflinePackIsValid();
 
     if (self.state == MGLOfflinePackStateActive) {
@@ -129,7 +133,8 @@ private:
 }
 
 - (void)invalidate {
-    NSAssert(_state != MGLOfflinePackStateInvalid, @"Cannot invalidate an already invalid offline pack.");
+    MGLLogInfo(@"Invalidating pack.");
+    MGLAssert(_state != MGLOfflinePackStateInvalid, @"Cannot invalidate an already invalid offline pack.");
 
     self.state = MGLOfflinePackStateInvalid;
     mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
@@ -138,15 +143,16 @@ private:
 }
 
 - (void)setState:(MGLOfflinePackState)state {
+    MGLLogDebug(@"Setting state: %ld", (long)state);
     if (!self.mbglOfflineRegion) {
         // A progress update has arrived after the call to
         // -[MGLOfflineStorage removePack:withCompletionHandler:] but before the
         // removal is complete and the completion handler is called.
-        NSAssert(_state == MGLOfflinePackStateInvalid, @"A valid MGLOfflinePack has no mbgl::OfflineRegion.");
+        MGLAssert(_state == MGLOfflinePackStateInvalid, @"A valid MGLOfflinePack has no mbgl::OfflineRegion.");
         return;
     }
 
-    NSAssert(_state != MGLOfflinePackStateInvalid, @"Cannot change the state of an invalid offline pack.");
+    MGLAssert(_state != MGLOfflinePackStateInvalid, @"Cannot change the state of an invalid offline pack.");
 
     if (!_isSuspending || state != MGLOfflinePackStateActive) {
         _isSuspending = NO;
@@ -155,6 +161,7 @@ private:
 }
 
 - (void)requestProgress {
+    MGLLogInfo(@"Requesting pack progress.");
     MGLAssertOfflinePackIsValid();
 
     mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
@@ -172,7 +179,7 @@ private:
 }
 
 - (void)offlineRegionStatusDidChange:(mbgl::OfflineRegionStatus)status {
-    NSAssert(_state != MGLOfflinePackStateInvalid, @"Cannot change update progress of an invalid offline pack.");
+    MGLAssert(_state != MGLOfflinePackStateInvalid, @"Cannot change update progress of an invalid offline pack.");
 
     switch (status.downloadState) {
         case mbgl::OfflineRegionDownloadState::Inactive:
@@ -207,6 +214,9 @@ private:
 }
 
 - (void)didReceiveError:(NSError *)error {
+    MGLLogError(@"Error: %@", error.localizedDescription);
+    MGLLogInfo(@"Notifying about pack error.");
+    
     NSDictionary *userInfo = @{ MGLOfflinePackUserInfoKeyError: error };
     NSNotificationCenter *noteCenter = [NSNotificationCenter defaultCenter];
     [noteCenter postNotificationName:MGLOfflinePackErrorNotification
@@ -215,6 +225,7 @@ private:
 }
 
 - (void)didReceiveMaximumAllowedMapboxTiles:(uint64_t)limit {
+    MGLLogInfo(@"Notifying reached maximum allowed Mapbox tiles: %lu", (unsigned long)limit);
     NSDictionary *userInfo = @{ MGLOfflinePackUserInfoKeyMaximumCount: @(limit) };
     NSNotificationCenter *noteCenter = [NSNotificationCenter defaultCenter];
     [noteCenter postNotificationName:MGLOfflinePackMaximumMapboxTilesReachedNotification

@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
-
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
@@ -25,8 +24,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Responsible for managing attribution interactions on the map.
@@ -38,7 +37,7 @@ import java.util.Locale;
  */
 public class AttributionDialogManager implements View.OnClickListener, DialogInterface.OnClickListener {
 
-  private static final String MAP_FEEDBACK_URL = "https://www.mapbox.com/map-feedback";
+  private static final String MAP_FEEDBACK_URL = "https://www.mapbox.com/feedback";
   private static final String MAP_FEEDBACK_LOCATION_FORMAT = MAP_FEEDBACK_URL + "/#/%f/%f/%d";
 
   @NonNull
@@ -180,17 +179,20 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
 
       List<String> attributions = new ArrayList<>();
       String attribution;
-      for (Source source : mapboxMap.getSources()) {
-        attribution = source.getAttribution();
-        if (!attribution.isEmpty()) {
-          attributions.add(source.getAttribution());
+
+      Style style = mapboxMap.getStyle();
+      if (style != null) {
+        for (Source source : mapboxMap.getStyle().getSources()) {
+          attribution = source.getAttribution();
+          if (!attribution.isEmpty()) {
+            attributions.add(source.getAttribution());
+          }
         }
       }
 
-      return new AttributionParser.Options()
+      return new AttributionParser.Options(context)
         .withCopyrightSign(true)
         .withImproveMap(true)
-        .withContext(context)
         .withTelemetryAttribution(true)
         .withAttributionData(attributions.toArray(new String[attributions.size()]))
         .build().getAttributions();

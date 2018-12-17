@@ -171,6 +171,14 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:context], @1);
     }
     {
+        NSExpression *expression = [NSExpression expressionForVariable:@"lineProgress"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"line-progress"]);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$lineProgress"].mgl_jsonExpressionObject, @[@"line-progress"]);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:@[@"line-progress"]], expression);
+        NSMutableDictionary *context = [@{@"lineProgress": @1} mutableCopy];
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:context], @1);
+    }
+    {
         NSExpression *expression = [NSExpression expressionForVariable:@"geometryType"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"geometry-type"]);
         XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$geometryType"].mgl_jsonExpressionObject, @[@"geometry-type"]);
@@ -367,8 +375,8 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
-        NSArray *arguments = @[MGLConstantExpression(@1), MGLConstantExpression(@1), MGLConstantExpression(@1)];
-        NSExpression *expression = [NSExpression expressionForFunction:@"add:to:" arguments:arguments];
+        NSArray *threeArguments = @[MGLConstantExpression(@1), MGLConstantExpression(@1), MGLConstantExpression(@1)];
+        NSExpression *expression = [NSExpression expressionForFunction:@"add:to:" arguments:threeArguments];
         NSArray *jsonExpression = @[@"+", @1, @1, @1];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         jsonExpression = @[@"+", @[@"+", @1, @1], @1];
@@ -988,8 +996,44 @@ using namespace std::string_literals;
         NSArray *jsonExpression = @[@"random", @1, @2, @3, @4, @5];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
-        expression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('random', 1, 2, 3, 4)"];
+    }
+    {
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('random', 1, 2, 3, 4)"];
         XCTAssertThrowsSpecificNamed([expression expressionValueWithObject:nil context:nil], NSException, NSInvalidArgumentException);
+    }
+    {
+        NSArray *arguments = @[
+            MGLConstantExpression(@"one"), MGLConstantExpression(@1),
+            [NSExpression expressionForVariable:@"one"],
+        ];
+        NSExpression *nullaryExpression = [NSExpression expressionForFunction:@"MGL_LET" arguments:arguments];
+        NSExpression *unaryExpression = [NSExpression expressionForFunction:@"MGL_LET:" arguments:arguments];
+        XCTAssertEqualObjects(nullaryExpression.mgl_jsonExpressionObject, unaryExpression.mgl_jsonExpressionObject);
+    }
+    {
+        NSArray *arguments = @[
+            [NSExpression expressionForVariable:@"x"],
+            MGLConstantExpression(@YES), MGLConstantExpression(@"yes"),
+            MGLConstantExpression(@NO), MGLConstantExpression(@"no"),
+        ];
+        NSExpression *nullaryExpression = [NSExpression expressionForFunction:@"MGL_MATCH" arguments:arguments];
+        NSExpression *unaryExpression = [NSExpression expressionForFunction:@"MGL_MATCH:" arguments:arguments];
+        XCTAssertEqualObjects(nullaryExpression.mgl_jsonExpressionObject, unaryExpression.mgl_jsonExpressionObject);
+    }
+    {
+        NSArray *arguments = @[
+            [NSPredicate predicateWithValue:YES],
+            MGLConstantExpression(@"yes"), MGLConstantExpression(@"no"),
+        ];
+        NSExpression *nullaryExpression = [NSExpression expressionForFunction:@"MGL_IF" arguments:arguments];
+        NSExpression *unaryExpression = [NSExpression expressionForFunction:@"MGL_IF:" arguments:arguments];
+        XCTAssertEqualObjects(nullaryExpression.mgl_jsonExpressionObject, unaryExpression.mgl_jsonExpressionObject);
+    }
+    {
+        NSArray *arguments = @[MGLConstantExpression(@"zoom")];
+        NSExpression *nullaryExpression = [NSExpression expressionForFunction:@"MGL_FUNCTION" arguments:arguments];
+        NSExpression *unaryExpression = [NSExpression expressionForFunction:@"MGL_FUNCTION:" arguments:arguments];
+        XCTAssertEqualObjects(nullaryExpression.mgl_jsonExpressionObject, unaryExpression.mgl_jsonExpressionObject);
     }
 }
 
@@ -1028,9 +1072,18 @@ using namespace std::string_literals;
     }
     {
         NSExpression *original = [NSExpression expressionForKeyPath:@"name_en"];
-        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K, %K, %K})",
-                                  @"name_zh-Hans", @"name_zh-CN", @"name_zh", @"name"];
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K, %K, %K})", @"name_zh-Hans", @"name_zh-CN", @"name_zh", @"name"];
         XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:[NSLocale localeWithLocaleIdentifier:@"zh-Hans"]], expected);
+    }
+    {
+        NSExpression *original = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K})", @"name_en", @"name"];
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_coalesce:({mgl_coalesce:({name_en, name}), mgl_coalesce:({name_en, name})})"];
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:nil], expected);
+    }
+    {
+        NSExpression *original = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K})", @"name_en", @"name"];
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_coalesce:({mgl_coalesce:({name_ja, name}), mgl_coalesce:({name_ja, name})})"];
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:[NSLocale localeWithLocaleIdentifier:@"ja-JP"]], expected);
     }
     {
         NSExpression *original = [NSExpression expressionForKeyPath:@"name_en"];

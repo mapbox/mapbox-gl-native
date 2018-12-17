@@ -7,8 +7,8 @@ namespace mbgl {
 namespace shaders {
 
 const char* clipping_mask::name = "clipping_mask";
-const char* clipping_mask::vertexSource = source() + 10633;
-const char* clipping_mask::fragmentSource = source() + 10745;
+const char* clipping_mask::vertexSource = source() + 7848;
+const char* clipping_mask::fragmentSource = source() + 7944;
 
 // Uncompressed source of clipping_mask.vertex.glsl:
 /*

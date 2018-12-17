@@ -66,7 +66,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
         return;
     }
 
-    NSTimeInterval timeout         = 5.0;
+    NSTimeInterval timeout         = 10.0;
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot"];
     CGSize size                    = self.mapView.bounds.size;
     CLLocationCoordinate2D coord   = CLLocationCoordinate2DMake(30.0, 30.0);
@@ -118,7 +118,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
         return;
     }
 
-    NSTimeInterval timeout         = 5.0;
+    NSTimeInterval timeout         = 10.0;
     XCTestExpectation *expectation = [self expectationWithDescription:@"snapshot"];
     CGSize size                    = self.mapView.bounds.size;
     CLLocationCoordinate2D coord   = CLLocationCoordinate2DMake(30.0, 30.0);
@@ -186,7 +186,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
 
     [snapshotter cancel];
 
-    [self waitForExpectations:@[expectation] timeout:0.5];
+    [self waitForExpectations:@[expectation] timeout:5.0];
 }
 
 - (void)testAllocatingSnapshotOnBackgroundQueue {
@@ -379,7 +379,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
         [expectation fulfill];
     }];
 
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:10.0];
 }
 
 - (void)testSnapshotPointConversionCoordinateOrdering {
@@ -426,7 +426,7 @@ MGLMapSnapshotter* snapshotterWithCoordinates(CLLocationCoordinate2D coordinates
         [expectation fulfill];
     }];
 
-    [self waitForExpectations:@[expectation] timeout:5.0];
+    [self waitForExpectations:@[expectation] timeout:10.0];
 }
 
 

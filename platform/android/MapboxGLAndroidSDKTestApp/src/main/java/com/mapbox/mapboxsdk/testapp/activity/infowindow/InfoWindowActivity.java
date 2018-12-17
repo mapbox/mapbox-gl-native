@@ -13,6 +13,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.text.DecimalFormat;
@@ -24,12 +25,31 @@ import java.text.DecimalFormat;
  * </p>
  */
 public class InfoWindowActivity extends AppCompatActivity
-  implements OnMapReadyCallback, MapboxMap.OnInfoWindowCloseListener, MapboxMap.OnMapLongClickListener,
-  MapboxMap.OnInfoWindowClickListener, MapboxMap.OnInfoWindowLongClickListener {
+  implements OnMapReadyCallback, MapboxMap.OnInfoWindowCloseListener, MapboxMap.OnInfoWindowClickListener,
+  MapboxMap.OnInfoWindowLongClickListener {
 
   private MapboxMap mapboxMap;
   private MapView mapView;
   private Marker customMarker;
+
+  private MapboxMap.OnMapLongClickListener mapLongClickListener = new MapboxMap.OnMapLongClickListener() {
+    @Override
+    public boolean onMapLongClick(@NonNull LatLng point) {
+      if (customMarker != null) {
+        // Remove previous added marker
+        mapboxMap.removeAnnotation(customMarker);
+        customMarker = null;
+      }
+
+      // Add marker on long click location with default marker image
+      customMarker = mapboxMap.addMarker(new MarkerOptions()
+        .title("Custom Marker")
+        .snippet(new DecimalFormat("#.#####").format(point.getLatitude()) + ", "
+          + new DecimalFormat("#.#####").format(point.getLongitude()))
+        .position(point));
+      return true;
+    }
+  };
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +64,10 @@ public class InfoWindowActivity extends AppCompatActivity
   @Override
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
-    addMarkers();
-    addInfoWindowListeners();
+    mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
+      addMarkers();
+      addInfoWindowListeners();
+    });
   }
 
   private void addMarkers() {
@@ -77,7 +99,7 @@ public class InfoWindowActivity extends AppCompatActivity
 
   private void addInfoWindowListeners() {
     mapboxMap.setOnInfoWindowCloseListener(this);
-    mapboxMap.setOnMapLongClickListener(this);
+    mapboxMap.addOnMapLongClickListener(mapLongClickListener);
     mapboxMap.setOnInfoWindowClickListener(this);
     mapboxMap.setOnInfoWindowLongClickListener(this);
   }
@@ -106,22 +128,6 @@ public class InfoWindowActivity extends AppCompatActivity
   @Override
   public void onInfoWindowLongClick(Marker marker) {
     Toast.makeText(getApplicationContext(), "OnLongClick: " + marker.getTitle(), Toast.LENGTH_LONG).show();
-  }
-
-  @Override
-  public void onMapLongClick(@NonNull LatLng point) {
-    if (customMarker != null) {
-      // Remove previous added marker
-      mapboxMap.removeAnnotation(customMarker);
-      customMarker = null;
-    }
-
-    // Add marker on long click location with default marker image
-    customMarker = mapboxMap.addMarker(new MarkerOptions()
-      .title("Custom Marker")
-      .snippet(new DecimalFormat("#.#####").format(point.getLatitude()) + ", "
-        + new DecimalFormat("#.#####").format(point.getLongitude()))
-      .position(point));
   }
 
   @Override
@@ -157,6 +163,9 @@ public class InfoWindowActivity extends AppCompatActivity
   @Override
   protected void onDestroy() {
     super.onDestroy();
+    if (mapboxMap != null) {
+      mapboxMap.removeOnMapLongClickListener(mapLongClickListener);
+    }
     mapView.onDestroy();
   }
 

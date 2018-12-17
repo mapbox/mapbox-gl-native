@@ -18,11 +18,12 @@ mbgl::Feature Feature::convert(jni::JNIEnv& env, const jni::Object<Feature>& jFe
 
     auto jId = jFeature.Call(env, id);
 
+    using mbid = mapbox::feature::identifier;
+
     return mbgl::Feature {
         Geometry::convert(env, jFeature.Call(env, geometry)),
         JsonObject::convert(env, jFeature.Call(env, properties)),
-        jId ? std::experimental::optional<mapbox::geometry::identifier>(jni::Make<std::string>(env, jId))
-            : std::experimental::nullopt
+        jId ? mbid { jni::Make<std::string>(env, jId) } : mbid { mapbox::feature::null_value }
     };
 }
 
@@ -33,7 +34,7 @@ class FeatureIdVisitor {
 public:
     template<class T>
     std::string operator()(const T& i) const {
-        return std::to_string(i);
+        return util::toString(i);
     }
 
     std::string operator()(const std::string& i) const {
@@ -41,7 +42,11 @@ public:
     }
 
     std::string operator()(const std::nullptr_t&) const {
-        return "";
+        return {};
+    }
+
+    std::string operator()(const mapbox::feature::null_value_t&) const {
+        return {};
     }
 };
 
@@ -52,7 +57,7 @@ jni::Local<jni::Object<Feature>> convertFeature(jni::JNIEnv& env, const mbgl::Fe
     return javaClass.Call(env, method,
         Geometry::New(env, value.geometry),
         JsonObject::New(env, value.properties),
-        jni::Make<jni::String>(env, value.id ? value.id.value().match(FeatureIdVisitor()) : ""));
+        jni::Make<jni::String>(env, value.id.is<mbgl::NullValue>() ? std::string {} : value.id.match(FeatureIdVisitor())));
 }
 
 jni::Local<jni::Array<jni::Object<Feature>>> Feature::convert(jni::JNIEnv& env, const std::vector<mbgl::Feature>& value) {

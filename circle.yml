@@ -22,7 +22,7 @@ workflows:
           filters:
             tags:
               only: /node-.*/
-      - node-gcc6-debug:
+      - node-gcc8-debug:
           filters:
             tags:
               only: /node-.*/
@@ -32,18 +32,12 @@ workflows:
               only: /node-.*/
       - linux-clang-38-libcxx-debug:
           name: linux-clang-3.8-libcxx-debug
-      - linux-clang4-sanitize-address
-      - linux-clang4-sanitize-undefined
-      - linux-clang4-sanitize-thread
+      - linux-clang-7-sanitize-address-undefined
+      - linux-clang-7-sanitize-thread
       - linux-gcc49-debug:
           name: linux-gcc4.9-debug
       - linux-gcc5-debug-coverage
-      - ios-debug-template:
-          name: ios-debug
-          xcode: "9.4.1"
-      - ios-debug-template:
-          name: ios-debug-xcode10
-          xcode: "10.0.0"
+      - ios-debug
       - ios-release-template:
           name: ios-release
       - ios-release-tag:
@@ -53,7 +47,6 @@ workflows:
             branches:
               ignore: /.*/
       - macos-debug
-      - qt4-linux-gcc5-release
       - qt5-linux-gcc5-release
       - qt5-macos-debug
   nightly:
@@ -220,7 +213,7 @@ commands:
           steps: [ save-node_modules-cache ]
       - when:
           condition: << parameters.ccache >>
-          steps: [ save-ccache ]
+          steps: [ save-ccache, show-ccache-stats ]
       - when:
           condition: << parameters.mason >>
           steps: [ save-mason_packages-cache ]
@@ -311,7 +304,6 @@ commands:
     steps:
     - run:
         name: Log in to Google Cloud Platform
-        shell: /bin/bash -euo pipefail
         command: |
           if [[ -n "${GCLOUD_SERVICE_ACCOUNT_JSON}" && -z "${SKIP_FIREBASE:-}" ]]; then
             echo "${GCLOUD_SERVICE_ACCOUNT_JSON}" > secret.json
@@ -374,18 +366,28 @@ commands:
         command: make test-node
 
   run-node-linux-tests:
+    parameters:
+      node_version:
+        type: string
+        default: v8
     steps:
     - run:
         name: Run node tests
         command: |
+          . "$NVM_DIR/nvm.sh" && nvm use << parameters.node_version >>
           xvfb-run --server-args="-screen 0 1024x768x24" \
             logbt -- apitrace trace --api=egl -v make test-node
 
   run-node-linux-tests-recycle-map:
+    parameters:
+      node_version:
+        type: string
+        default: v8
     steps:
     - run:
         name: Run node tests (recycling the map object)
         command: |
+          . "$NVM_DIR/nvm.sh" && nvm use << parameters.node_version >>
           xvfb-run --server-args="-screen 0 1024x768x24" \
             logbt -- apitrace trace --api=egl -v make test-node-recycle-map
 
@@ -397,6 +399,14 @@ commands:
           xvfb-run --server-args="-screen 0 1024x768x24" \
             make run-test
 
+  run-unit-tests-sanitized:
+    steps:
+    - run:
+        name: Run tests
+        command: |
+          xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
+          # Unfortunately, Google Test eats the status code, so we'll have to check the output.
+          [ -z "$(sed -n '/^SUMMARY: .*Sanitizer:/p' sanitizer)" ]
 
   publish-node-package:
     steps:
@@ -447,7 +457,7 @@ commands:
 jobs:
   nitpick:
     docker:
-      - image: mbgl/7d2403f42e:linux-clang-4
+      - image: mbgl/linux-clang-7:a5a3c52107
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -456,8 +466,8 @@ jobs:
     steps:
       - install-dependencies: { mason: false, ccache: false }
       - run:
-          name: Initialize submodule
-          command: git submodule update --init mapbox-gl-js
+          name: Initialize submodules
+          command: git submodule update --init
       - run:
           name: Verify submodule pin
           command: scripts/nitpick/submodule-pin.js
@@ -478,16 +488,11 @@ jobs:
           name: Android code generation
           command: scripts/nitpick/generated-code.js android
           when: always
-      - run:
-          name: Vendored packages
-          command: scripts/nitpick/vendoring.js
-          when: always
-
 
 # ------------------------------------------------------------------------------
   clang-tidy:
     docker:
-      - image: mbgl/7d2403f42e:linux-clang-3.9
+      - image: mbgl/linux-clang-7:a5a3c52107
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -514,12 +519,12 @@ jobs:
         type: string
         default: "c++_static"
     docker:
-      - image: mbgl/feb0443038:android-ndk-r17
+      - image: mbgl/android-ndk-r17c:dd161efed6
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
       BUILDTYPE: Debug
       IS_LOCAL_DEVELOPMENT: false
       MBGL_ANDROID_STL: << parameters.stl >>
@@ -576,12 +581,12 @@ jobs:
 # ------------------------------------------------------------------------------
   android-release:
     docker:
-      - image: mbgl/feb0443038:android-ndk-r17
+      - image: mbgl/android-ndk-r17c:dd161efed6
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
       BUILDTYPE: Release
       IS_LOCAL_DEVELOPMENT: false
     steps:
@@ -641,7 +646,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node-clang39-release:
     docker:
-      - image: mbgl/7d2403f42e:linux-clang-3.9
+      - image: mbgl/linux-clang-3.9:2077f965ed
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -658,14 +663,14 @@ jobs:
       - upload-render-tests
 
 # ------------------------------------------------------------------------------
-  node-gcc6-debug:
+  node-gcc8-debug:
     docker:
-      - image: mbgl/7d2403f42e:linux-gcc-6
+      - image: mbgl/linux-gcc-8:d2b1553d2f
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
       BUILDTYPE: Debug
       WITH_EGL: 1
     steps:
@@ -679,7 +684,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node-macos-release:
     macos:
-      xcode: "9.4.1"
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -698,7 +703,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-clang-38-libcxx-debug:
     docker:
-      - image: mbgl/7d2403f42e:linux-clang-3.8-libcxx
+      - image: mbgl/linux-clang-3.8-libcxx:d6800bdbb4
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -712,9 +717,9 @@ jobs:
       - save-dependencies
 
 # ------------------------------------------------------------------------------
-  linux-clang4-sanitize-address:
+  linux-clang-7-sanitize-address-undefined:
     docker:
-      - image: mbgl/7d2403f42e:linux-clang-4
+      - image: mbgl/linux-clang-7:a5a3c52107
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -722,51 +727,21 @@ jobs:
       BUILDTYPE: Sanitize
       WITH_EGL: 1
       GDB: '' # Do not run with GDB
-      CXXFLAGS: -fsanitize=address
-      LDFLAGS: -fsanitize=address
+      CXXFLAGS: -fsanitize=address -fsanitize=undefined
+      LDFLAGS: -fsanitize=address -fsanitize=undefined
       ASAN_OPTIONS: detect_leaks=0:color=always:print_summary=1
-    steps:
-      - install-dependencies
-      - setup-llvm-symbolizer
-      - build-test
-      - save-dependencies
-      - run:
-          name: Run tests
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
-            # Unfortunately, Google Test eats the status code, so we'll have to check the output.
-            [ -z "$(sed -n '/^SUMMARY: AddressSanitizer:/p' sanitizer)" ]
-
-# ------------------------------------------------------------------------------
-  linux-clang4-sanitize-undefined:
-    docker:
-      - image: mbgl/7d2403f42e:linux-clang-4
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Sanitize
-      WITH_EGL: 1
-      GDB: '' # Do not run with GDB
-      CXXFLAGS: -fsanitize=undefined
-      LDFLAGS: -fsanitize=undefined
       UBSAN_OPTIONS: print_stacktrace=1:color=always:print_summary=1
     steps:
       - install-dependencies
       - setup-llvm-symbolizer
       - build-test
       - save-dependencies
-      - run:
-          name: Run tests
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
-            # Unfortunately, Google Test eats the status code, so we'll have to check the output.
-            [ -z "$(sed -n '/^SUMMARY: UndefinedBehaviorSanitizer:/p' sanitizer)" ]
+      - run-unit-tests-sanitized
 
 # ------------------------------------------------------------------------------
-  linux-clang4-sanitize-thread:
+  linux-clang-7-sanitize-thread:
     docker:
-      - image: mbgl/7d2403f42e:linux-clang-4
+      - image: mbgl/linux-clang-7:a5a3c52107
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -782,22 +757,17 @@ jobs:
       - setup-llvm-symbolizer
       - build-test
       - save-dependencies
-      - run:
-          name: Run tests
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
-            # Unfortunately, Google Test eats the status code, so we'll have to check the output.
-            [ -z "$(sed -n '/^SUMMARY: ThreadSanitizer:/p' sanitizer)" ]
+      - run-unit-tests-sanitized
 
 # ------------------------------------------------------------------------------
   linux-gcc49-debug:
     docker:
-      - image: mbgl/7d2403f42e:linux-gcc-4.9
+      - image: mbgl/linux-gcc-4.9:e3818a77c1
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
       BUILDTYPE: Debug
       WITH_EGL: 1
       WITH_CXX11ABI: 0
@@ -813,12 +783,12 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-gcc5-debug-coverage:
     docker:
-      - image: mbgl/7d2403f42e:linux-gcc-5
+      - image: mbgl/linux-gcc-5:54f59e3ac5
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
       BUILDTYPE: Debug
       WITH_EGL: 1
       WITH_COVERAGE: 1
@@ -830,17 +800,16 @@ jobs:
       - save-dependencies
       - run-unit-tests
       - run:
-          name: Upload coverage results to coveralls
+          name: Upload coverage results to codecov.io
           command: |
-            platform/linux/scripts/coveralls.sh
+            curl -sSfL -o codecov https://codecov.io/bash
+            chmod +x codecov
+            ./codecov -c
 
 # ------------------------------------------------------------------------------
-  ios-debug-template:
-    parameters:
-      xcode:
-        type: string
+  ios-debug:
     macos:
-      xcode: << parameters.xcode >>
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -848,7 +817,6 @@ jobs:
       - install-macos-dependencies
       - install-dependencies
       - build-ios-test
-      - build-ios-integration-test
       - check-public-symbols
       - run:
           name: Check symbol namespacing for mapbox-events-ios
@@ -866,7 +834,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-nightly:
     macos:
-      xcode: "9.4.1"
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -885,7 +853,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-address-nightly:
     macos:
-      xcode: "9.4.1"
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -904,7 +872,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-static-analyzer-nightly:
     macos:
-      xcode: "9.4.1"
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -923,7 +891,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-release-template:
     macos:
-      xcode: "10.0.0"
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -953,7 +921,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-release-tag:
     macos:
-      xcode: "10.0.0"
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: Release
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -995,7 +963,7 @@ jobs:
 # ------------------------------------------------------------------------------
   macos-debug:
     macos:
-      xcode: "9.4.1"
+      xcode: "10.1.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -1018,38 +986,14 @@ jobs:
       - upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
-  qt4-linux-gcc5-release:
-    docker:
-      - image: mbgl/7d2403f42e:linux-gcc-5-qt-4
-    resource_class: large
-    working_directory: /src
-    environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
-      BUILDTYPE: Release
-      GTEST_OUTPUT: xml
-      LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
-    steps:
-      - install-dependencies
-      - build-qt-app
-      - build-qt-test
-      - save-dependencies
-      - run:
-          name: Run memory-load tests
-          command: |
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              make run-qt-test-Memory.*:*.Load
-            scripts/log_memory_benchmarks.sh test_detail.xml "Platform=Linux,Compiler=${_CC},Arch=$(uname -m)"
-
-# ------------------------------------------------------------------------------
   qt5-linux-gcc5-release:
     docker:
-      - image: mbgl/7d2403f42e:linux-gcc-5-qt-5.9
+      - image: mbgl/linux-gcc-5-qt-5.9:5132cfd29f
     resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 4
-      JOBS: 4
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
       BUILDTYPE: Release
       WITH_QT_I18N: 1
     steps:

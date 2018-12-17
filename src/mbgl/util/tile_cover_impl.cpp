@@ -205,6 +205,10 @@ struct BuildBoundsMap {
             buildTable(ring, et, true);
         }
     }
+    BoundsMap operator()(const EmptyGeometry&) const {
+        return {};
+    }
+
     BoundsMap operator()(const Point<double>&p) const {
         Bound bnd;
         auto point = p;

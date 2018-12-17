@@ -14,11 +14,14 @@ import com.mapbox.mapboxsdk.R;
 
 /**
  * Bubble View for Android with custom stroke width and color, arrow size, position and direction.
+ * @deprecated As of 7.0.0,
+ * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+ *   Mapbox Annotation Plugin</a> instead
  */
+@Deprecated
 public class BubbleLayout extends LinearLayout {
 
   public static final float DEFAULT_STROKE_WIDTH = -1;
-  @NonNull
   private ArrowDirection arrowDirection;
   private float arrowWidth;
   private float arrowHeight;
@@ -114,7 +117,7 @@ public class BubbleLayout extends LinearLayout {
    * @return this
    */
   @NonNull
-  public BubbleLayout setArrowDirection(@NonNull ArrowDirection arrowDirection) {
+  public BubbleLayout setArrowDirection(ArrowDirection arrowDirection) {
     resetPadding();
     this.arrowDirection = arrowDirection;
     initPadding();

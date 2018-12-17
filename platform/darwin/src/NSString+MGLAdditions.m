@@ -46,11 +46,17 @@
     if ([script isEqualToString:@"Latn"]) {
         transform = NSStringTransformToLatin;
     } else if ([script isEqualToString:@"Hans"]) {
-        // No transform available.
+        transform = @"Hant-Hans";
+    } else if ([script isEqualToString:@"Hant"]) {
+        transform = @"Hans-Hant";
     } else if ([script isEqualToString:@"Cyrl"]) {
         transform = @"Any-Latin; Latin-Cyrillic";
     } else if ([script isEqualToString:@"Arab"]) {
         transform = @"Any-Latin; Latin-Arabic";
+    } else if ([script isEqualToString:@"Jpan"]) {
+        transform = @"Any-Latin; Latin-Katakana";
+    } else if ([script isEqualToString:@"Kore"]) {
+        transform = @"Any-Latin; Latin-Hangul";
     }
     return transform ? [string stringByApplyingTransform:transform reverse:NO] : string;
 }

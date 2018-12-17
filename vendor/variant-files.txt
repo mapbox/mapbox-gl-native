@@ -1,0 +1,8 @@
+# This file is generated. Do not edit. Regenerate this with scripts/generate-cmake-files.js
+
+# mapbox
+include/mapbox/optional.hpp
+include/mapbox/recursive_wrapper.hpp
+include/mapbox/variant.hpp
+include/mapbox/variant_io.hpp
+include/mapbox/variant_visitor.hpp

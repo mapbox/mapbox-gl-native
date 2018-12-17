@@ -17,7 +17,7 @@ namespace mbgl {
 using namespace style;
 
 RenderHeatmapLayer::RenderHeatmapLayer(Immutable<style::HeatmapLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Heatmap, _impl),
+    : RenderLayer(std::move(_impl)),
     unevaluated(impl().paint.untransitioned()), colorRamp({256, 1}) {
 }
 
@@ -183,6 +183,10 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             getID()
         );
     }
+}
+
+void RenderHeatmapLayer::update() {
+    updateColorRamp();
 }
 
 void RenderHeatmapLayer::updateColorRamp() {

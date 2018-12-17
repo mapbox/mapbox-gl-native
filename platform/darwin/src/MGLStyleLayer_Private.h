@@ -3,6 +3,7 @@
 #import "MGLStyleLayer.h"
 #import "MGLStyleValue_Private.h"
 
+#include <mbgl/layermanager/layer_factory.hpp>
 #include <mbgl/style/layer.hpp>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -81,5 +82,22 @@ struct LayerWrapper {
 - (void)removeFromStyle:(MGLStyle *)style;
 
 @end
+
+namespace mbgl {
+
+class LayerPeerFactory {
+public:
+    virtual ~LayerPeerFactory() = default;
+    /**
+     Get the corresponding core layer factory.
+     */
+    virtual LayerFactory* getCoreLayerFactory() = 0;
+    /**
+     Creates an MGLStyleLayer instance with a raw pointer to the backing store.
+     */
+    virtual MGLStyleLayer* createPeer(style::Layer*) = 0;
+};
+
+}  // namespace mbgl
 
 NS_ASSUME_NONNULL_END

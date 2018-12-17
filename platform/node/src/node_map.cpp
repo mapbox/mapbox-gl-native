@@ -892,31 +892,6 @@ void NodeMap::SetPaintProperty(const Nan::FunctionCallbackInfo<v8::Value>& info)
     info.GetReturnValue().SetUndefined();
 }
 
-struct SetFilterVisitor {
-    mbgl::style::Filter& filter;
-
-    void operator()(mbgl::style::CustomLayer&) {
-        Nan::ThrowTypeError("layer doesn't support filters");
-    }
-
-    void operator()(mbgl::style::RasterLayer&) {
-        Nan::ThrowTypeError("layer doesn't support filters");
-    }
-
-    void operator()(mbgl::style::HillshadeLayer&) {
-        Nan::ThrowTypeError("layer doesn't support filters");
-    }
-
-    void operator()(mbgl::style::BackgroundLayer&) {
-        Nan::ThrowTypeError("layer doesn't support filters");
-    }
-
-    template <class VectorLayer>
-    void operator()(VectorLayer& layer) {
-        layer.setFilter(filter);
-    }
-};
-
 void NodeMap::SetFilter(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
@@ -949,7 +924,7 @@ void NodeMap::SetFilter(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         filter = std::move(*converted);
     }
 
-    layer->accept(SetFilterVisitor { filter });
+    layer->setFilter(filter);
 }
 
 void NodeMap::SetCenter(const Nan::FunctionCallbackInfo<v8::Value>& info) {

@@ -1,5 +1,6 @@
 #include <mbgl/test/util.hpp>
 
+#include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/renderer/group_by_layout.hpp>
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
@@ -15,7 +16,7 @@ static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vecto
     std::vector<std::unique_ptr<RenderLayer>> result;
     result.reserve(layers.size());
     for (auto& layer : layers) {
-        result.push_back(RenderLayer::create(layer->baseImpl));
+        result.push_back(LayerManager::get()->createRenderLayer(layer->baseImpl));
     }
     return result;
 }
@@ -40,18 +41,20 @@ TEST(GroupByLayout, UnrelatedType) {
 TEST(GroupByLayout, UnrelatedFilter) {
     using namespace mbgl::style::expression::dsl;
     std::vector<std::unique_ptr<Layer>> layers;
-    layers.push_back(std::make_unique<LineLayer>("a", "source"));
+    auto lineLayer = std::make_unique<LineLayer>("a", "source");
+    lineLayer->setFilter(Filter(get("property")));
+    layers.push_back(std::move(lineLayer));
     layers.push_back(std::make_unique<LineLayer>("b", "source"));
-    layers[0]->as<LineLayer>()->setFilter(Filter(get("property")));
     auto result = groupByLayout(toRenderLayers(layers));
     ASSERT_EQ(2u, result.size());
 }
 
 TEST(GroupByLayout, UnrelatedLayout) {
     std::vector<std::unique_ptr<Layer>> layers;
-    layers.push_back(std::make_unique<LineLayer>("a", "source"));
+    auto lineLayer = std::make_unique<LineLayer>("a", "source");
+    lineLayer->setLineCap(LineCapType::Square);
+    layers.push_back(std::move(lineLayer));
     layers.push_back(std::make_unique<LineLayer>("b", "source"));
-    layers[0]->as<LineLayer>()->setLineCap(LineCapType::Square);
     auto result = groupByLayout(toRenderLayers(layers));
     ASSERT_EQ(2u, result.size());
 }

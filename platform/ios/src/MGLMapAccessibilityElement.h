@@ -7,7 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLFeature;
 
 /// Unique identifier representing a single annotation in mbgl.
-typedef uint32_t MGLAnnotationTag;
+typedef uint64_t MGLAnnotationTag;
 
 /** An accessibility element representing something that appears on the map. */
 MGL_EXPORT

@@ -1,6 +1,7 @@
 #import "MGLSource_Private.h"
 #import "MGLStyle_Private.h"
 #import "MGLMapView_Private.h"
+#import "NSBundle+MGLAdditions.h"
 
 #include <mbgl/style/style.hpp>
 #include <mbgl/map/map.hpp>
@@ -57,11 +58,38 @@
     _mapView.style.rawStyle->addSource(std::move(_pendingSource));
 }
 
-- (void)removeFromMapView:(MGLMapView *)mapView {
+- (BOOL)removeFromMapView:(MGLMapView *)mapView error:(NSError * __nullable * __nullable)outError {
+    BOOL removed = NO;
+    
     if (self.rawSource == mapView.style.rawStyle->getSource(self.identifier.UTF8String)) {
-        _pendingSource = mapView.style.rawStyle->removeSource(self.identifier.UTF8String);
-        _mapView = nil;
+        
+        auto removedSource = mapView.style.rawStyle->removeSource(self.identifier.UTF8String);
+        
+        if (removedSource) {
+            removed = YES;
+            _pendingSource = std::move(removedSource);
+            _mapView = nil;
+        } else if (outError) {
+            NSString *localizedDescription = [NSString stringWithFormat:
+                                              NSLocalizedStringWithDefaultValue(@"REMOVE_SRC_FAIL_IN_USE_FMT", @"Foundation", nil, @"The source “%@” can’t be removed while it is in use.", @"User-friendly error description; first placeholder is the source’s identifier"),
+                                              self.identifier];
+
+            *outError = [NSError errorWithDomain:MGLErrorDomain
+                                            code:MGLErrorCodeSourceIsInUseCannotRemove
+                                        userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
+        }
+    } else if (outError) {
+        // TODO: Consider raising an exception here
+        NSString *localizedDescription = [NSString stringWithFormat:
+                                          NSLocalizedStringWithDefaultValue(@"REMOVE_SRC_FAIL_MISMATCH_FMT", @"Foundation", nil, @"The source can’t be removed because its identifier, “%@”, belongs to a different source in this style.", @"User-friendly error description"),
+                                          self.identifier];
+        
+        *outError = [NSError errorWithDomain:MGLErrorDomain
+                                        code:MGLErrorCodeSourceIdentifierMismatch
+                                    userInfo:@{ NSLocalizedDescriptionKey : localizedDescription }];
     }
+    
+    return removed;
 }
 
 - (NSString *)description {

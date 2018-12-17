@@ -17,18 +17,15 @@ class TransitionParameters;
 class PropertyEvaluationParameters;
 class PaintParameters;
 class RenderSource;
+class RenderLayerSymbolInterface;
 class RenderTile;
 class TransformState;
 
 class RenderLayer {
 protected:
-    RenderLayer(style::LayerType, Immutable<style::Layer::Impl>);
-
-    const style::LayerType type;
+    RenderLayer(Immutable<style::Layer::Impl>);
 
 public:
-    static std::unique_ptr<RenderLayer> create(Immutable<style::Layer::Impl>);
-
     virtual ~RenderLayer() = default;
 
     // Begin transitions for any properties that have changed since the last frame.
@@ -43,20 +40,8 @@ public:
     // Returns true if the layer has a pattern property and is actively crossfading.
     virtual bool hasCrossfade() const = 0;
 
-    // Check whether this layer is of the given subtype.
-    template <class T>
-    bool is() const;
-
-    // Dynamically cast this layer to the given subtype.
-    template <class T>
-    T* as() {
-        return is<T>() ? reinterpret_cast<T*>(this) : nullptr;
-    }
-
-    template <class T>
-    const T* as() const {
-        return is<T>() ? reinterpret_cast<const T*>(this) : nullptr;
-    }
+    // Returns instance of RenderLayerSymbolInterface if RenderLayer supports it.
+    virtual const RenderLayerSymbolInterface* getSymbolInterface() const;
 
     const std::string& getID() const;
 
@@ -86,23 +71,36 @@ public:
                                                ImageDependencies&) const {
         return nullptr;
     }
-    void setRenderTiles(std::vector<std::reference_wrapper<RenderTile>>);
+
+    using RenderTiles = std::vector<std::reference_wrapper<RenderTile>>;
+    void setRenderTiles(RenderTiles, const TransformState&);
+
     // Private implementation
     Immutable<style::Layer::Impl> baseImpl;
     void setImpl(Immutable<style::Layer::Impl>);
 
-    friend std::string layoutKey(const RenderLayer&);
+    virtual void markContextDestroyed();
+
+    // TODO: Figure out how to remove this or whether layers other than
+    // RenderHeatmapLayer and RenderLineLayer need paint property updates,
+    // similar to color ramp. Temporarily moved to the base.
+    virtual void update();
+
+    // TODO: Only for background layers.
+    virtual optional<Color> getSolidBackground() const;
 
 protected:
     // Checks whether the current hardware can render this layer. If it can't, we'll show a warning
     // in the console to inform the developer.
     void checkRenderability(const PaintParameters&, uint32_t activeBindingCount);
 
+    // Code specific to RenderTiles sorting / filtering
+    virtual RenderTiles filterRenderTiles(RenderTiles) const;
+    virtual void sortRenderTiles(const TransformState&);
+    using FilterFunctionPtr = bool (*)(RenderTile&);
+    RenderTiles filterRenderTiles(RenderTiles, FilterFunctionPtr) const;
+
 protected:
-    // renderTiles are exposed directly to CrossTileSymbolIndex and Placement so they
-    // can update opacities in the symbol buckets immediately before rendering
-    friend class CrossTileSymbolIndex;
-    friend class Placement;
     // Stores current set of tiles to be rendered for this layer.
     std::vector<std::reference_wrapper<RenderTile>> renderTiles;
 
@@ -111,7 +109,7 @@ protected:
     RenderPass passes = RenderPass::None;
 
 private:
-    // Some layers may not render correctly on some hardware when the vertex attribute limit of
+    // Some layers may not render correctly on some hardware when the vertex attribute limit of
     // that GPU is exceeded. More attributes are used when adding many data driven paint properties
     // to a layer.
     bool hasRenderFailures = false;

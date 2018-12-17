@@ -118,8 +118,7 @@ public:
         } else if ( _isString(value)) {
             return { *toString(holder) };
         } else if (_isNumber(value)) {
-            // Need to cast to a double here as the float is otherwise considered a bool...
-           return { static_cast<double>(*toNumber(holder)) };
+           return { *toDouble(holder) };
         } else {
             return {};
         }

@@ -58,19 +58,19 @@ public class CustomGeometrySource extends Source {
    */
   @UiThread
   public CustomGeometrySource(String id, GeometryTileProvider provider) {
-    this(id, provider, new CustomGeometrySourceOptions());
+    this(id, new CustomGeometrySourceOptions(), provider);
   }
 
   /**
-   * Create a CustomGeometrySource with non-default CustomGeometrySourceOptions.
-   * <p>Supported options are minZoom, maxZoom, buffer, and tolerance.</p>
+   * Create a CustomGeometrySource with non-default {@link CustomGeometrySourceOptions}.
    *
    * @param id       The source id.
-   * @param provider The tile provider that returns geometry data for this source.
    * @param options  CustomGeometrySourceOptions.
+   * @param provider The tile provider that returns geometry data for this source.
    */
   @UiThread
-  public CustomGeometrySource(String id, GeometryTileProvider provider, CustomGeometrySourceOptions options) {
+  public CustomGeometrySource(String id, CustomGeometrySourceOptions options,
+                              GeometryTileProvider provider) {
     super();
     this.provider = provider;
     initialize(id, options);
@@ -231,7 +231,7 @@ public class CustomGeometrySource extends Source {
       }
 
       executor = new ThreadPoolExecutor(THREAD_POOL_LIMIT, THREAD_POOL_LIMIT,
-        0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+        0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
         new ThreadFactory() {
           final AtomicInteger threadCount = new AtomicInteger();
           final int poolId = poolCount.getAndIncrement();

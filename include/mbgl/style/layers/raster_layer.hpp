@@ -6,7 +6,6 @@
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
 #include <mbgl/style/expression/formatted.hpp>
-
 #include <mbgl/util/color.hpp>
 
 namespace mbgl {
@@ -18,16 +17,6 @@ class RasterLayer : public Layer {
 public:
     RasterLayer(const std::string& layerID, const std::string& sourceID);
     ~RasterLayer() final;
-
-    // Source
-    const std::string& getSourceID() const;
-
-    // Visibility
-    void setVisibility(VisibilityType) final;
-
-    // Zoom range
-    void setMinZoom(float) final;
-    void setMaxZoom(float) final;
 
     // Dynamic properties
     optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
@@ -91,12 +80,10 @@ public:
     Mutable<Impl> mutableImpl() const;
     RasterLayer(Immutable<Impl>);
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
-};
 
-template <>
-inline bool Layer::is<RasterLayer>() const {
-    return getType() == LayerType::Raster;
-}
+protected:
+    Mutable<Layer::Impl> mutableBaseImpl() const final;
+};
 
 } // namespace style
 } // namespace mbgl

@@ -8,7 +8,6 @@
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:mapbox_styleUrl="@string/mapbox_style_dark"/>
+        android:layout_height="match_parent"/>
 
 </RelativeLayout>

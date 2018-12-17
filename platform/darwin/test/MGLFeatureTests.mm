@@ -39,7 +39,7 @@
     features.push_back(mbgl::Feature { polygon });
 
     NSArray<MGLShape <MGLFeature> *> *shapes = MGLFeaturesFromMBGLFeatures(features);
-    XCTAssertEqual(shapes.count, 3, @"All features should be converted into shapes");
+    XCTAssertEqual(shapes.count, 3UL, @"All features should be converted into shapes");
 
     MGLPointFeature *pointShape = (MGLPointFeature *)shapes[0];
     XCTAssertTrue([pointShape isKindOfClass:[MGLPointFeature class]]);
@@ -48,7 +48,7 @@
 
     MGLPolylineFeature *polylineShape = (MGLPolylineFeature *)shapes[1];
     XCTAssertTrue([polylineShape isKindOfClass:[MGLPolylineFeature class]]);
-    XCTAssertEqual(polylineShape.pointCount, 2);
+    XCTAssertEqual(polylineShape.pointCount, 2UL);
     CLLocationCoordinate2D polylineCoordinates[2];
     [polylineShape getCoordinates:polylineCoordinates range:NSMakeRange(0, polylineShape.pointCount)];
     XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:polylineCoordinates[0]],
@@ -58,7 +58,7 @@
 
     MGLPolygonFeature *polygonShape = (MGLPolygonFeature *)shapes[2];
     XCTAssertTrue([polygonShape isKindOfClass:[MGLPolygonFeature class]]);
-    XCTAssertEqual(polygonShape.pointCount, 4);
+    XCTAssertEqual(polygonShape.pointCount, 4UL);
     CLLocationCoordinate2D *polygonCoordinates = polygonShape.coordinates;
     XCTAssertNotEqual(polygonCoordinates, nil);
     XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:polygonCoordinates[0]],
@@ -70,9 +70,9 @@
     XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:polygonCoordinates[3]],
                           [NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(4, 1)]);
     NSArray<MGLPolygon *> *interiorPolygons = polygonShape.interiorPolygons;
-    XCTAssertEqual(interiorPolygons.count, 1);
+    XCTAssertEqual(interiorPolygons.count, 1UL);
     MGLPolygon *interiorPolygon = interiorPolygons.firstObject;
-    XCTAssertEqual(interiorPolygon.pointCount, 4);
+    XCTAssertEqual(interiorPolygon.pointCount, 4UL);
     CLLocationCoordinate2D interiorPolygonCoordinates[4];
     [interiorPolygon getCoordinates:interiorPolygonCoordinates range:NSMakeRange(0, interiorPolygon.pointCount)];
     XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:interiorPolygonCoordinates[0]],
@@ -91,7 +91,7 @@
     mbgl::Point<double> point = { -90.066667, 29.95 };
     mbgl::Feature pointFeature { point };
     pointFeature.id = { UINT64_MAX };
-    pointFeature.properties["null"] = mapbox::geometry::null_value;
+    pointFeature.properties["null"] = mapbox::feature::null_value;
     pointFeature.properties["bool"] = true;
     pointFeature.properties["unsigned int"] = UINT64_MAX;
     pointFeature.properties["int"] = INT64_MIN;
@@ -104,7 +104,7 @@
     features.push_back(pointFeature);
 
     NSArray<MGLShape <MGLFeature> *> *shapes = MGLFeaturesFromMBGLFeatures(features);
-    XCTAssertEqual(shapes.count, 1, @"All features should be converted into shapes");
+    XCTAssertEqual(shapes.count, 1UL, @"All features should be converted into shapes");
 
     MGLShape <MGLFeature> *shape = shapes.firstObject;
     XCTAssertTrue([shape conformsToProtocol:@protocol(MGLFeature)]);
@@ -176,7 +176,7 @@
     // it has no "id" key (or value)
     XCTAssertNil(geoJSONFeature[@"id"]);
     // it has a null representation of the properties object
-    XCTAssertEqualObjects(geoJSONFeature[@"properties"], [NSNull null]);
+    XCTAssertEqualObjects(geoJSONFeature[@"properties"], @{});
 
     // when there is a string identifier
     pointFeature.identifier = @"string-id";
@@ -317,13 +317,13 @@
                                        @"geometries": @[
                                            @{ @"geometry": @{@"type": @"Point",
                                                              @"coordinates": @[@(pointCoordinate.longitude), @(pointCoordinate.latitude)]},
-                                              @"properties": [NSNull null],
+                                              @"properties": @{},
                                               @"type": @"Feature",
                                              },
                                             @{ @"geometry": @{@"type": @"LineString",
                                                               @"coordinates": @[@[@(coord1.longitude), @(coord1.latitude)],
                                                                                 @[@(coord2.longitude), @(coord2.latitude)]]},
-                                               @"properties": [NSNull null],
+                                               @"properties": @{},
                                                @"type": @"Feature",
                                             }
                                         ]

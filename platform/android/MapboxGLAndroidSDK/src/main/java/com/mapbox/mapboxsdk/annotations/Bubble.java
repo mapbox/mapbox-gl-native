@@ -10,9 +10,9 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 
+@Deprecated
 class Bubble extends Drawable {
 
-  @NonNull
   private RectF rect;
   private float arrowWidth;
   private float arrowHeight;
@@ -142,7 +142,7 @@ class Bubble extends Drawable {
     }
   }
 
-  private void initLeftSquarePath(RectF rect, Path path, float strokeWidth) {
+  private void initLeftSquarePath(@NonNull RectF rect, @NonNull Path path, float strokeWidth) {
     path.moveTo(arrowWidth + rect.left + strokeWidth, rect.top + strokeWidth);
     path.lineTo(rect.width() - strokeWidth, rect.top + strokeWidth);
 
@@ -159,7 +159,7 @@ class Bubble extends Drawable {
     path.close();
   }
 
-  private void initLeftRoundedPath(RectF rect, Path path, float strokeWidth) {
+  private void initLeftRoundedPath(@NonNull RectF rect, @NonNull Path path, float strokeWidth) {
     path.moveTo(arrowWidth + rect.left + cornersRadius + strokeWidth, rect.top + strokeWidth);
     path.lineTo(rect.width() - cornersRadius - strokeWidth, rect.top + strokeWidth);
     path.arcTo(new RectF(rect.right - cornersRadius, rect.top + strokeWidth, rect.right - strokeWidth,
@@ -188,7 +188,7 @@ class Bubble extends Drawable {
     path.close();
   }
 
-  private void initTopSquarePath(RectF rect, Path path, float strokeWidth) {
+  private void initTopSquarePath(@NonNull RectF rect, @NonNull Path path, float strokeWidth) {
     path.moveTo(rect.left + arrowPosition + strokeWidth, rect.top + arrowHeight + strokeWidth);
 
     path.lineTo(rect.left + arrowPosition + (strokeWidth / 2), rect.top + arrowHeight + strokeWidth);
@@ -207,7 +207,7 @@ class Bubble extends Drawable {
     path.close();
   }
 
-  private void initTopRoundedPath(RectF rect, Path path, float strokeWidth) {
+  private void initTopRoundedPath(@NonNull RectF rect, @NonNull Path path, float strokeWidth) {
     path.moveTo(rect.left + Math.min(arrowPosition, cornersRadius) + strokeWidth, rect.top + arrowHeight
       + strokeWidth);
     path.lineTo(rect.left + arrowPosition + (strokeWidth / 2), rect.top + arrowHeight + strokeWidth);
@@ -235,7 +235,7 @@ class Bubble extends Drawable {
     path.close();
   }
 
-  private void initRightSquarePath(RectF rect, Path path, float strokeWidth) {
+  private void initRightSquarePath(@NonNull RectF rect, @NonNull Path path, float strokeWidth) {
     path.moveTo(rect.left + strokeWidth, rect.top + strokeWidth);
     path.lineTo(rect.width() - arrowWidth - strokeWidth, rect.top + strokeWidth);
 
@@ -251,7 +251,7 @@ class Bubble extends Drawable {
     path.close();
   }
 
-  private void initRightRoundedPath(RectF rect, Path path, float strokeWidth) {
+  private void initRightRoundedPath(@NonNull RectF rect, @NonNull Path path, float strokeWidth) {
     path.moveTo(rect.left + cornersRadius + strokeWidth, rect.top + strokeWidth);
     path.lineTo(rect.width() - cornersRadius - arrowWidth - strokeWidth, rect.top + strokeWidth);
     path.arcTo(new RectF(rect.right - cornersRadius - arrowWidth,
@@ -274,7 +274,7 @@ class Bubble extends Drawable {
     path.close();
   }
 
-  private void initBottomSquarePath(RectF rect, Path path, float strokeWidth) {
+  private void initBottomSquarePath(@NonNull RectF rect, @NonNull Path path, float strokeWidth) {
     path.moveTo(rect.left + strokeWidth, rect.top + strokeWidth);
     path.lineTo(rect.right - strokeWidth, rect.top + strokeWidth);
     path.lineTo(rect.right - strokeWidth, rect.bottom - arrowHeight - strokeWidth);
@@ -289,7 +289,7 @@ class Bubble extends Drawable {
     path.close();
   }
 
-  private void initBottomRoundedPath(RectF rect, Path path, float strokeWidth) {
+  private void initBottomRoundedPath(@NonNull RectF rect, @NonNull Path path, float strokeWidth) {
     path.moveTo(rect.left + cornersRadius + strokeWidth, rect.top + strokeWidth);
     path.lineTo(rect.width() - cornersRadius - strokeWidth, rect.top + strokeWidth);
     path.arcTo(new RectF(rect.right - cornersRadius,

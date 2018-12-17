@@ -10,7 +10,9 @@ This document discusses the specific subset of the predicate and expression
 syntax supported by this SDK. For a more general introduction to predicates and
 expressions, consult the
 _[Predicate Programming Guide](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/Predicates/AdditionalChapters/Introduction.html)_
-in Apple developer documentation.
+in Apple developer documentation. For additional detail on how this SDK has
+extended the `NSExpression` class, consult the [`NSExpression(MGLAdditions)`](./Categories/NSExpression(MGLAdditions).html)
+section of this documentation.
 
 ## Using predicates to filter vector data
 
@@ -290,6 +292,17 @@ The following variables are defined by this SDK for use with style layers:
       <code>NSExpression.zoomLevelVariableExpression</code> property.
    </td>
 </tr>
+<tr>
+   <td><code>$lineProgress</code></td>
+   <td>Number</td>
+   <td>
+      A number that indicates the relative distance along a line at a given
+      point along the line. This variable evaluates to 0 at the beginning of the
+      line and 1 at the end of the line. It can only be used with the
+      `MGLLineStyleLayer.lineGradient` property. It corresponds to the
+      <code>NSExpression.lineProgressVariableExpression</code> property.
+   </td>
+</tr>
 </tbody>
 </table>
 
@@ -544,9 +557,9 @@ expression that contains references to those variables.
    An input expression, then any number of argument pairs, followed by a default
    expression. Each argument pair consists of a constant value followed by an
    expression to produce as a result of matching that constant value.
-   If the input value is an aggregate expression, then any of the constant values within 
-   that aggregate expression result in the following argument. This is shorthand for 
-   specifying an argument pair for each of the constant values within that aggregate 
+   If the input value is an aggregate expression, then any of the constant values within
+   that aggregate expression result in the following argument. This is shorthand for
+   specifying an argument pair for each of the constant values within that aggregate
    expression. It is not possible to match the aggregate expression itself.
 </dd>
 </dl>
@@ -720,9 +733,9 @@ operator in the Mapbox Style Specification. See also the
 <dd>
    The first argument is one of the following strings denoting curve types:
    <code>linear</code>, <code>exponential</code>, or <code>cubic-bezier</code>.
-   
+
    The second argument is an expression providing parameters for the curve:
-   
+
    <ul>
       <li>If the curve type is <code>linear</code>, the argument is <code>NIL</code>.</li>
       <li>
@@ -737,7 +750,7 @@ operator in the Mapbox Style Specification. See also the
          cubic Bézier curve.
       </li>
    </ul>
-   
+
    The third argument is an <code>NSDictionary</code> object representing the
    interpolation’s stops, with numeric zoom levels as keys and expressions as
    values.
@@ -821,7 +834,7 @@ operator.
    The first argument is an expression that evaluates to a number, specifying
    the minimum value in case the target is less than any of the stops in the
    second argument.
-   
+
    The second argument is an <code>NSDictionary</code> object representing the
    interpolation’s stops, with numeric zoom levels as keys and expressions as
    values.

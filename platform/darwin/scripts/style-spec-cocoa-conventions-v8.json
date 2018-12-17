@@ -32,7 +32,8 @@
   },
   "paint_fill-extrusion": {
     "fill-extrusion-translate": "fill-extrusion-translation",
-    "fill-extrusion-translate-anchor": "fill-extrusion-translation-anchor"
+    "fill-extrusion-translate-anchor": "fill-extrusion-translation-anchor",
+    "fill-extrusion-vertical-gradient": "fill-extrusion-has-vertical-gradient"
   },
   "paint_raster": {
     "raster-brightness-min": "minimum-raster-brightness",

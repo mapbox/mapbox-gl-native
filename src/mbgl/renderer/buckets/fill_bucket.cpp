@@ -137,13 +137,9 @@ bool FillBucket::hasData() const {
 }
 
 float FillBucket::getQueryRadius(const RenderLayer& layer) const {
-    if (!layer.is<RenderFillLayer>()) {
-        return 0;
-    }
-
-    const std::array<float, 2>& translate = layer.as<RenderFillLayer>()->evaluated.get<FillTranslate>();
+    const RenderFillLayer* fillLayer = toRenderFillLayer(&layer);
+    const std::array<float, 2>& translate = fillLayer->evaluated.get<FillTranslate>();
     return util::length(translate[0], translate[1]);
-
 }
 
 } // namespace mbgl

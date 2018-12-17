@@ -181,7 +181,8 @@ inline uint32_t OverscaledTileID::overscaleFactor() const {
 }
 
 inline bool OverscaledTileID::isChildOf(const OverscaledTileID& rhs) const {
-    return overscaledZ > rhs.overscaledZ &&
+    return wrap == rhs.wrap &&
+           overscaledZ > rhs.overscaledZ &&
            (canonical == rhs.canonical || canonical.isChildOf(rhs.canonical));
 }
 

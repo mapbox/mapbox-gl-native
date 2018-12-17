@@ -7,19 +7,18 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
-
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
+import timber.log.Timber;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-
-import timber.log.Timber;
 
 /**
  * Test activity showcasing how to use a file:// resource for the style.json and how to use MapboxMap#setStyleJson.
@@ -34,18 +33,19 @@ public class StyleFileActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_style_file);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
+      mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
+        FloatingActionButton fab = findViewById(R.id.fab_file);
+        fab.setColorFilter(ContextCompat.getColor(StyleFileActivity.this, R.color.primary));
+        fab.setOnClickListener(view -> new CreateStyleFileTask(view.getContext(), mapboxMap).execute());
 
-      FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_file);
-      fab.setColorFilter(ContextCompat.getColor(StyleFileActivity.this, R.color.primary));
-      fab.setOnClickListener(view -> new CreateStyleFileTask(view.getContext(), mapboxMap).execute());
-
-      FloatingActionButton fabStyleJson = (FloatingActionButton) findViewById(R.id.fab_style_json);
-      fabStyleJson.setColorFilter(ContextCompat.getColor(StyleFileActivity.this, R.color.primary));
-      fabStyleJson.setOnClickListener(view -> new LoadStyleFileTask(view.getContext(), mapboxMap).execute());
+        FloatingActionButton fabStyleJson = findViewById(R.id.fab_style_json);
+        fabStyleJson.setColorFilter(ContextCompat.getColor(StyleFileActivity.this, R.color.primary));
+        fabStyleJson.setOnClickListener(view -> new LoadStyleFileTask(view.getContext(), mapboxMap).execute());
+      });
     });
   }
 
@@ -78,7 +78,7 @@ public class StyleFileActivity extends AppCompatActivity {
       Timber.d("Read json, %s", json);
       MapboxMap mapboxMap = this.mapboxMap.get();
       if (mapboxMap != null) {
-        mapboxMap.setStyleJson(json);
+        mapboxMap.setStyle(new Style.Builder().fromJson(json));
       }
     }
   }
@@ -116,7 +116,7 @@ public class StyleFileActivity extends AppCompatActivity {
       // Actual file:// usage
       MapboxMap mapboxMap = this.mapboxMap.get();
       if (mapboxMap != null) {
-        mapboxMap.setStyleUrl("file://" + cacheStyleFile.getAbsolutePath());
+        mapboxMap.setStyle(new Style.Builder().fromUrl("file://" + cacheStyleFile.getAbsolutePath()));
       }
     }
 

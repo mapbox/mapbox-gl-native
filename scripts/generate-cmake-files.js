@@ -10,19 +10,19 @@ require('./style-code');
 
 const fileListTxt = ejs.compile(fs.readFileSync('cmake/files.txt.ejs', 'utf8'), {strict: true});
 
-function generateFileList(name, regex, patterns) {
-    const files = child_process.execSync(`git ls-files ${patterns.map((p) => '"' + p + '"').join(' ')}`).toString().trim().split('\n');
+function generateFileList(filename, root, regex, patterns) {
+    const files = child_process.execSync(`git -C ${root} ls-files ${patterns.map((p) => '"' + p + '"').join(' ')}`).toString().trim().split('\n');
     var groups = {};
     for (const file of files) {
         const match = file.match(regex);
-        const group = match[1] || name;
+        const group = match[1] || path.basename(filename, '-files.txt')
         if (!groups[group]) {
             groups[group] = [];
         }
         groups[group].push(file);
     }
 
-    writeIfModified(`cmake/${name}-files.txt`, fileListTxt({ groups: groups }));
+    writeIfModified(filename, fileListTxt({ groups: groups }));
 }
 
 function generateXcodeSourceList(project, target, name) {
@@ -87,15 +87,39 @@ function generateXcodeSourceList(project, target, name) {
     writeIfModified(`${projectPath}/${name || target}-files.txt`, fileListTxt({ groups: groups }));
 }
 
-generateFileList('core', /^(?:src|include)\/(?:mbgl\/)?(.+)\/[^\/]+$/,
+generateFileList('cmake/core-files.txt', '.', /^(?:src|include)\/(?:mbgl\/)?(.+)\/[^\/]+$/,
     [ 'include/*.hpp', 'include/*.h', 'src/*.hpp', 'src/*.cpp', 'src/*.h', 'src/*.c' ]);
 
-generateFileList('benchmark', /^benchmark\/(?:(?:src|include)\/)?(?:mbgl\/)?(?:(.+)\/)?[^\/]+$/,
+generateFileList('cmake/benchmark-files.txt', '.', /^benchmark\/(?:(?:src|include)\/)?(?:mbgl\/)?(?:(.+)\/)?[^\/]+$/,
     [ 'benchmark/*.hpp', 'benchmark/*.cpp', 'benchmark/*.h', 'benchmark/*.c' ]);
 
-generateFileList('test', /^test\/(?:(?:src|include)\/)?(?:mbgl\/)?(?:(.+)\/)?[^\/]+$/,
+generateFileList('cmake/test-files.txt', '.', /^test\/(?:(?:src|include)\/)?(?:mbgl\/)?(?:(.+)\/)?[^\/]+$/,
     [ 'test/*.hpp', 'test/*.cpp', 'test/*.h', 'test/*.c' ]);
 
-generateXcodeSourceList('platform/macos/macos.xcodeproj', 'dynamic', 'core');
+generateXcodeSourceList('platform/macos/macos.xcodeproj', 'dynamic', 'sdk');
 
-generateXcodeSourceList('platform/ios/ios.xcodeproj', 'dynamic', 'core');
+generateXcodeSourceList('platform/ios/ios.xcodeproj', 'dynamic', 'sdk');
+
+const vendorRegex = /^(?:(?:src|include)\/)?(?:(.+)\/)?[^\/]+$/
+generateFileList('vendor/boost-files.txt', 'vendor/boost', vendorRegex, [ "include/**/*.hpp", "include/**/*.h" ]);
+generateFileList('vendor/cheap-ruler-cpp-files.txt', 'vendor/cheap-ruler-cpp', vendorRegex, [ "include/**/*.hpp" ]);
+generateFileList('vendor/earcut.hpp-files.txt', 'vendor/earcut.hpp', vendorRegex, [ "include/**/*.hpp" ]);
+generateFileList('vendor/eternal-files.txt', 'vendor/eternal', vendorRegex, [ "include/**/*.hpp" ]);
+generateFileList('vendor/expected-files.txt', 'vendor/expected', vendorRegex, [ "include/expected.hpp" ]);
+generateFileList('vendor/geojson-vt-cpp-files.txt', 'vendor/geojson-vt-cpp', vendorRegex, [ "include/**/*.hpp" ]);
+generateFileList('vendor/geojson.hpp-files.txt', 'vendor/geojson.hpp', vendorRegex, [ "include/**/*.hpp" ]);
+generateFileList('vendor/geometry.hpp-files.txt', 'vendor/geometry.hpp', vendorRegex, [ "include/**/*.hpp" ]);
+generateFileList('vendor/icu-files.txt', 'vendor/icu', vendorRegex, [ "include/**/*.h", "src/*.h", "src/*.cpp" ]);
+generateFileList('vendor/jni.hpp-files.txt', 'vendor/jni.hpp', vendorRegex, [ "include/**/*.hpp", ":!:include/jni/string_conversion.hpp" ]);
+generateFileList('vendor/kdbush.hpp-files.txt', 'vendor/kdbush.hpp', vendorRegex, [ "include/*.hpp" ]);
+generateFileList('vendor/pixelmatch-cpp-files.txt', 'vendor/pixelmatch-cpp', vendorRegex, [ "include/**/*.hpp" ]);
+generateFileList('vendor/polylabel-files.txt', 'vendor/polylabel', vendorRegex, [ "include/**/*.hpp" ]);
+generateFileList('vendor/protozero-files.txt', 'vendor/protozero', vendorRegex, [ "include/**/*.hpp" ]);
+generateFileList('vendor/rapidjson-files.txt', 'vendor/rapidjson', vendorRegex, [ "include/**/*.h" ]);
+generateFileList('vendor/shelf-pack-cpp-files.txt', 'vendor/shelf-pack-cpp', vendorRegex, [ "include/**/*.hpp" ]);
+generateFileList('vendor/sqlite-files.txt', 'vendor/sqlite', vendorRegex, [ "include/*.h", "src/*.c" ]);
+generateFileList('vendor/supercluster.hpp-files.txt', 'vendor/supercluster.hpp', vendorRegex, [ "include/*.hpp" ]);
+generateFileList('vendor/unique_resource-files.txt', 'vendor/unique_resource', vendorRegex, [ "unique_resource.hpp" ]);
+generateFileList('vendor/variant-files.txt', 'vendor/variant', vendorRegex, [ "include/**/*.hpp" ]);
+generateFileList('vendor/vector-tile-files.txt', 'vendor/vector-tile', vendorRegex, [ "include/**/*.hpp" ]);
+generateFileList('vendor/wagyu-files.txt', 'vendor/wagyu', vendorRegex, [ "include/**/*.hpp" ]);

@@ -11,6 +11,7 @@
 #import "NSArray+MGLAdditions.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #include <string>
 
@@ -65,10 +66,20 @@
     NSData *htmlData = [styledHTML dataUsingEncoding:NSUTF8StringEncoding];
 
 #if TARGET_OS_IPHONE
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithData:htmlData
-                                                                                          options:options
-                                                                               documentAttributes:nil
-                                                                                            error:NULL];
+    __block NSMutableAttributedString *attributedString;
+    dispatch_block_t initialization = ^{
+            // This initializer should be called from a global or main queue. https://developer.apple.com/documentation/foundation/nsattributedstring/1524613-initwithdata
+            attributedString = [[NSMutableAttributedString alloc] initWithData:htmlData
+                                                                       options:options
+                                                            documentAttributes:nil
+                                                                         error:NULL];
+    };
+    
+    if (![[NSThread currentThread] isMainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), initialization);
+    } else {
+        initialization();
+    }
 #else
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithHTML:htmlData
                                                                                           options:options
@@ -81,7 +92,7 @@
                                  options:0
                               usingBlock:
     ^(id _Nullable value, NSRange range, BOOL * _Nonnull stop) {
-        NSCAssert(!value || [value isKindOfClass:[NSURL class]], @"If present, URL attribute must be an NSURL.");
+        MGLCAssert(!value || [value isKindOfClass:[NSURL class]], @"If present, URL attribute must be an NSURL.");
 
         // Detect feedback links by the bogus style rule applied above.
         NSNumber *strokeWidth = [attributedString attribute:NSStrokeWidthAttributeName

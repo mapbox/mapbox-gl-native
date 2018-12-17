@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 
 #include <algorithm>
 #include <list>
@@ -56,6 +57,19 @@ public:
     }
 
     std::list<FakeFileRequest*> requests;
+
 };
+
+class FakeOnlineFileSource : public OnlineFileSource, public FakeFileSource {
+public:
+    std::unique_ptr<AsyncRequest> request(const Resource& resource, Callback callback) override {
+        return FakeFileSource::request(resource, callback);
+    }
+
+    bool respond(Resource::Kind kind, const Response& response) {
+        return FakeFileSource::respond(kind, response);
+    }
+};
+
 
 } // namespace mbgl

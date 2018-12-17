@@ -37,13 +37,13 @@ public class ImageTest extends BaseActivityTest {
       assertTrue(drawable instanceof BitmapDrawable);
 
       Bitmap bitmapSet = ((BitmapDrawable) drawable).getBitmap();
-      mapboxMap.addImage(IMAGE_ID, bitmapSet);
+      mapboxMap.getStyle().addImage(IMAGE_ID, bitmapSet);
 
-      Bitmap bitmapGet = mapboxMap.getImage(IMAGE_ID);
+      Bitmap bitmapGet = mapboxMap.getStyle().getImage(IMAGE_ID);
       assertTrue(bitmapGet.sameAs(bitmapSet));
 
-      mapboxMap.removeImage(IMAGE_ID);
-      assertNull(mapboxMap.getImage(IMAGE_ID));
+      mapboxMap.getStyle().removeImage(IMAGE_ID);
+      assertNull(mapboxMap.getStyle().getImage(IMAGE_ID));
     });
   }
 }

@@ -181,11 +181,8 @@ bool FillExtrusionBucket::hasData() const {
 }
 
 float FillExtrusionBucket::getQueryRadius(const RenderLayer& layer) const {
-    if (!layer.is<RenderFillExtrusionLayer>()) {
-        return 0;
-    }
-
-    const std::array<float, 2>& translate = layer.as<RenderFillExtrusionLayer>()->evaluated.get<FillExtrusionTranslate>();
+    const RenderFillExtrusionLayer* fillExtrusionLayer = toRenderFillExtrusionLayer(&layer);
+    const std::array<float, 2>& translate = fillExtrusionLayer->evaluated.get<FillExtrusionTranslate>();
     return util::length(translate[0], translate[1]);
 }
 

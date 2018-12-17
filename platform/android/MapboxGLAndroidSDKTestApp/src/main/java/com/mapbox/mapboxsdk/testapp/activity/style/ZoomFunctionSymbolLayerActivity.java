@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp.activity.style;
 
 import android.graphics.PointF;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -9,8 +10,10 @@ import com.google.gson.JsonObject;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -51,28 +54,48 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
   private boolean isSelected = false;
   private boolean isShowingSymbolLayer = true;
 
+  private MapboxMap.OnMapClickListener mapClickListener = new MapboxMap.OnMapClickListener() {
+    @Override
+    public boolean onMapClick(@NonNull LatLng point) {
+      PointF screenPoint = mapboxMap.getProjection().toScreenLocation(point);
+      List<Feature> featureList = mapboxMap.queryRenderedFeatures(screenPoint, LAYER_ID);
+      if (!featureList.isEmpty()) {
+        Feature feature = featureList.get(0);
+        boolean selectedNow = feature.getBooleanProperty(KEY_PROPERTY_SELECTED);
+        isSelected = !selectedNow;
+        updateSource(mapboxMap.getStyle());
+      } else {
+        Timber.e("No features found");
+      }
+      return true;
+    }
+  };
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_zoom_symbol_layer);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      updateSource();
-      addLayer();
-      addMapClickListener();
+
+      map.setStyle(Style.MAPBOX_STREETS, style -> {
+        updateSource(style);
+        addLayer(style);
+        map.addOnMapClickListener(mapClickListener);
+      });
     });
   }
 
-  private void updateSource() {
+  private void updateSource(Style style) {
     FeatureCollection featureCollection = createFeatureCollection();
     if (source != null) {
       source.setGeoJson(featureCollection);
     } else {
       source = new GeoJsonSource(SOURCE_ID, featureCollection);
-      mapboxMap.addSource(source);
+      style.addSource(source);
     }
   }
 
@@ -94,7 +117,7 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
     return FeatureCollection.fromFeatures(new Feature[] {feature});
   }
 
-  private void addLayer() {
+  private void addLayer(Style style) {
     layer = new SymbolLayer(LAYER_ID, SOURCE_ID);
     layer.setProperties(
       iconImage(
@@ -110,22 +133,7 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
       ),
       iconAllowOverlap(true)
     );
-    mapboxMap.addLayer(layer);
-  }
-
-  private void addMapClickListener() {
-    mapboxMap.setOnMapClickListener(point -> {
-      PointF screenPoint = mapboxMap.getProjection().toScreenLocation(point);
-      List<Feature> featureList = mapboxMap.queryRenderedFeatures(screenPoint, LAYER_ID);
-      if (!featureList.isEmpty()) {
-        Feature feature = featureList.get(0);
-        boolean selectedNow = feature.getBooleanProperty(KEY_PROPERTY_SELECTED);
-        isSelected = !selectedNow;
-        updateSource();
-      } else {
-        Timber.e("No features found");
-      }
-    });
+    style.addLayer(layer);
   }
 
   @Override
@@ -139,7 +147,7 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
     if (mapboxMap != null) {
       if (item.getItemId() == R.id.menu_action_change_location) {
         isInitialPosition = !isInitialPosition;
-        updateSource();
+        updateSource(mapboxMap.getStyle());
       } else if (item.getItemId() == R.id.menu_action_toggle_source) {
         toggleSymbolLayerVisibility();
       }

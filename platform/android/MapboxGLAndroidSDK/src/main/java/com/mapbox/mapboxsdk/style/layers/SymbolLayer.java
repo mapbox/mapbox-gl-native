@@ -11,8 +11,11 @@ import android.support.annotation.UiThread;
 import static com.mapbox.mapboxsdk.utils.ColorUtils.rgbaToColor;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+import com.mapbox.mapboxsdk.style.types.Formatted;
+import com.mapbox.mapboxsdk.style.types.FormattedSection;
 
 /**
  * An icon or a text label.
@@ -120,12 +123,12 @@ public class SymbolLayer extends Layer {
   @Nullable
   public Expression getFilter() {
     checkThread();
-    Expression expression = null;
-    JsonArray array = (JsonArray) nativeGetFilter();
-    if (array != null) {
-      expression = Expression.Converter.convert(array);
+    JsonElement jsonElement = nativeGetFilter();
+    if (jsonElement != null) {
+      return Expression.Converter.convert(jsonElement);
+    } else {
+      return null;
     }
-    return expression;
   }
 
   /**
@@ -385,13 +388,13 @@ public class SymbolLayer extends Layer {
   /**
    * Get the TextField property
    *
-   * @return property wrapper value around String
+   * @return property wrapper value around Formatted
    */
   @NonNull
   @SuppressWarnings("unchecked")
-  public PropertyValue<String> getTextField() {
+  public PropertyValue<Formatted> getTextField() {
     checkThread();
-    return (PropertyValue<String>) new PropertyValue("text-field", nativeGetTextField());
+    return (PropertyValue<Formatted>) new PropertyValue("text-field", nativeGetTextField());
   }
 
   /**

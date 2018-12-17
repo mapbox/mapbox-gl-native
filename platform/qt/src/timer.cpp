@@ -9,9 +9,7 @@ namespace mbgl {
 namespace util {
 
 Timer::Impl::Impl() {
-#if QT_VERSION >= 0x050000
     timer.setTimerType(Qt::PreciseTimer);
-#endif
     connect(&timer, SIGNAL(timeout()), this, SLOT(timerFired()));
 }
 

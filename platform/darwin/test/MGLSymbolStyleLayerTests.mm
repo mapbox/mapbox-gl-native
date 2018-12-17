@@ -43,8 +43,8 @@
 
     MGLSymbolStyleLayer *layer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     XCTAssertNotEqual(layer.rawLayer, nullptr);
-    XCTAssertTrue(layer.rawLayer->is<mbgl::style::SymbolLayer>());
-    auto rawLayer = layer.rawLayer->as<mbgl::style::SymbolLayer>();
+    XCTAssertEqualObjects(@(layer.rawLayer->getTypeInfo()->type), @"symbol");
+    auto rawLayer = static_cast<mbgl::style::SymbolLayer*>(layer.rawLayer);
 
     MGLTransition transitionTest = MGLTransitionMake(5, 4);
 

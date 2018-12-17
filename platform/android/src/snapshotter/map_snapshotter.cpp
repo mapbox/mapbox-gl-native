@@ -24,7 +24,8 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
                                const jni::Object<LatLngBounds>& region,
                                const jni::Object<CameraPosition>& position,
                                jni::jboolean _showLogo,
-                               const jni::String& _programCacheDir)
+                               const jni::String& _programCacheDir,
+                               const jni::String& _localIdeographFontFamily)
         : javaPeer(_env, _obj)
         , pixelRatio(_pixelRatio)
         , threadPool(sharedThreadPool()) {
@@ -65,7 +66,10 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
                                                          pixelRatio,
                                                          cameraOptions,
                                                          bounds,
-                                                         jni::Make<std::string>(_env, _programCacheDir));
+                                                         jni::Make<std::string>(_env, _programCacheDir),
+                                                         _localIdeographFontFamily ?
+                                                            jni::Make<std::string>(_env, _localIdeographFontFamily) :
+                                                            optional<std::string>{});
 
 }
 
@@ -85,14 +89,20 @@ void MapSnapshotter::start(JNIEnv& env) {
         if (err) {
             // error handler callback
             static auto onSnapshotFailed = javaClass.GetMethod<void (jni::String)>(*_env, "onSnapshotFailed");
-            javaPeer.get(*_env).Call(*_env, onSnapshotFailed, jni::Make<jni::String>(*_env, util::toString(err)));
+            auto weakReference = javaPeer.get(*_env);
+            if (weakReference) {
+                weakReference.Call(*_env, onSnapshotFailed, jni::Make<jni::String>(*_env, util::toString(err)));
+            }
         } else {
             // Create the wrapper
             auto mapSnapshot = android::MapSnapshot::New(*_env, std::move(image), pixelRatio, attributions, showLogo, pointForFn, latLngForFn);
 
             // invoke callback
             static auto onSnapshotReady = javaClass.GetMethod<void (jni::Object<MapSnapshot>)>(*_env, "onSnapshotReady");
-            javaPeer.get(*_env).Call(*_env, onSnapshotReady, mapSnapshot);
+            auto weakReference = javaPeer.get(*_env);
+            if (weakReference) {
+                weakReference.Call(*_env, onSnapshotReady, mapSnapshot);
+            }
         }
 
         deactivateFilesource(*_env);
@@ -156,7 +166,7 @@ void MapSnapshotter::registerNative(jni::JNIEnv& env) {
 
     // Register the peer
     jni::RegisterNativePeer<MapSnapshotter>(env, javaClass, "nativePtr",
-                                            jni::MakePeer<MapSnapshotter, const jni::Object<MapSnapshotter>&, const jni::Object<FileSource>&, jni::jfloat, jni::jint, jni::jint, const jni::String&, const jni::String&, const jni::Object<LatLngBounds>&, const jni::Object<CameraPosition>&, jni::jboolean, const jni::String&>,
+                                            jni::MakePeer<MapSnapshotter, const jni::Object<MapSnapshotter>&, const jni::Object<FileSource>&, jni::jfloat, jni::jint, jni::jint, const jni::String&, const jni::String&, const jni::Object<LatLngBounds>&, const jni::Object<CameraPosition>&, jni::jboolean, const jni::String&, const jni::String&>,
                                            "nativeInitialize",
                                            "finalize",
                                             METHOD(&MapSnapshotter::setStyleUrl, "setStyleUrl"),

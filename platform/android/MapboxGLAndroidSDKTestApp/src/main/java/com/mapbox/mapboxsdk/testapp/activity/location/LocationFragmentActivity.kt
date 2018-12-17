@@ -10,7 +10,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import com.mapbox.android.core.location.LocationEngineListener
+import com.mapbox.android.core.location.LocationEngine
+import com.mapbox.android.core.location.LocationEngineCallback
+import com.mapbox.android.core.location.LocationEngineProvider
+import com.mapbox.android.core.location.LocationEngineResult
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -18,8 +21,10 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.location.LocationComponent
+import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.testapp.R
 import kotlinx.android.synthetic.main.activity_location_layer_fragment.*
+import java.lang.Exception
 
 class LocationFragmentActivity : AppCompatActivity() {
   private lateinit var permissionsManager: PermissionsManager
@@ -78,7 +83,7 @@ class LocationFragmentActivity : AppCompatActivity() {
     permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
   }
 
-  class LocationFragment : Fragment(), LocationEngineListener {
+  class LocationFragment : Fragment(), LocationEngineCallback<LocationEngineResult> {
     companion object {
       const val TAG = "LFragment"
       fun newInstance(): LocationFragment {
@@ -88,7 +93,6 @@ class LocationFragmentActivity : AppCompatActivity() {
 
     private lateinit var mapView: MapView
     private lateinit var mapboxMap: MapboxMap
-    private var component: LocationComponent? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
       mapView = MapView(inflater.context)
@@ -100,22 +104,21 @@ class LocationFragmentActivity : AppCompatActivity() {
       mapView.onCreate(savedInstanceState)
       mapView.getMapAsync {
         mapboxMap = it
-        component = mapboxMap.locationComponent
-        component?.activateLocationComponent(activity)
-        component?.isLocationComponentEnabled = true
-        component?.locationEngine?.addLocationEngineListener(this)
+        it.setStyle(Style.MAPBOX_STREETS) { style ->
+            val component = mapboxMap.locationComponent
+            component.activateLocationComponent(activity, style)
+            component.isLocationComponentEnabled = true
+            component.locationEngine?.getLastLocation(this)
+        }
       }
     }
 
-    override fun onLocationChanged(location: Location?) {
-      if (location != null) {
-        mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location), 12.0))
-        component?.locationEngine?.removeLocationEngineListener(this)
-      }
+    override fun onSuccess(result: LocationEngineResult?) {
+        mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(result?.lastLocation), 12.0))
     }
 
-    override fun onConnected() {
-      // no impl
+    override fun onFailure(exception: Exception) {
+      //noop
     }
 
     override fun onStart() {
@@ -151,7 +154,6 @@ class LocationFragmentActivity : AppCompatActivity() {
     override fun onDestroyView() {
       super.onDestroyView()
       mapView.onDestroy()
-      component?.locationEngine?.removeLocationEngineListener(this)
     }
   }
 

@@ -3,574 +3,491 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
 import android.graphics.Color;
+import android.support.test.annotation.UiThreadTest;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.mapbox.mapboxsdk.maps.BaseLayerTest;
+import org.junit.Before;
 import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.*;
-import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
 import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 
 /**
  * Basic smoke tests for LineLayer
  */
 @RunWith(AndroidJUnit4.class)
-public class LineLayerTest extends BaseActivityTest {
+public class LineLayerTest extends BaseLayerTest {
 
   private LineLayer layer;
 
-  @Override
-  protected Class getActivityClass() {
-    return EspressoTestActivity.class;
-  }
-
-  private void setupLayer() {
-    Timber.i("Retrieving layer");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
-        Timber.i("Adding layer");
-        layer = new LineLayer("my-layer", "composite");
-        layer.setSourceLayer("composite");
-        mapboxMap.addLayer(layer);
-        // Layer reference is now stale, get new reference
-        layer = mapboxMap.getLayerAs("my-layer");
-      }
-    });
+  @Before
+  @UiThreadTest
+  public void beforeTest(){
+    super.before();
+    layer = new LineLayer("my-layer", "composite");
+    layer.setSourceLayer("composite");
+    setupLayer(layer);
   }
 
   @Test
+  @UiThreadTest
   public void testSourceId() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("SourceId");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
-      // Get source id
-      assertEquals(layer.getSourceId(), "composite");
-    });
+    assertNotNull(layer);
+    assertEquals(layer.getSourceId(), "composite");
   }
 
   @Test
+  @UiThreadTest
   public void testSetVisibility() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("Visibility");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Get initial
-      assertEquals(layer.getVisibility().getValue(), VISIBLE);
+    // Get initial
+    assertEquals(layer.getVisibility().getValue(), VISIBLE);
 
-      // Set
-      layer.setProperties(visibility(NONE));
-      assertEquals(layer.getVisibility().getValue(), NONE);
-    });
+    // Set
+    layer.setProperties(visibility(NONE));
+    assertEquals(layer.getVisibility().getValue(), NONE);
   }
 
   @Test
+  @UiThreadTest
   public void testSourceLayer() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("SourceLayer");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Get initial
-      assertEquals(layer.getSourceLayer(), "composite");
+    // Get initial
+    assertEquals(layer.getSourceLayer(), "composite");
 
-      // Set
-      final String sourceLayer = "test";
-      layer.setSourceLayer(sourceLayer);
-      assertEquals(layer.getSourceLayer(), sourceLayer);
-    });
+    // Set
+    final String sourceLayer = "test";
+    layer.setSourceLayer(sourceLayer);
+    assertEquals(layer.getSourceLayer(), sourceLayer);
   }
 
   @Test
+  @UiThreadTest
   public void testFilter() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("Filter");
-    invoke(mapboxMap, (uiController, mapboxMap1) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Get initial
-      assertEquals(layer.getFilter(), null);
+    // Get initial
+    assertEquals(layer.getFilter(), null);
 
-      // Set
-      Expression filter = eq(get("undefined"), literal(1.0));
-      layer.setFilter(filter);
-      assertEquals(layer.getFilter().toString(), filter.toString());
-    });
+    // Set
+    Expression filter = eq(get("undefined"), literal(1.0));
+    layer.setFilter(filter);
+    assertEquals(layer.getFilter().toString(), filter.toString());
+
+    // Set constant
+    filter = literal(true);
+    layer.setFilter(filter);
+    assertEquals(layer.getFilter().toString(), filter.toString());
   }
 
 
 
   @Test
+  @UiThreadTest
   public void testLineCapAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-cap");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineCap().getValue());
 
-      // Set and Get
-      layer.setProperties(lineCap(LINE_CAP_BUTT));
-      assertEquals((String) layer.getLineCap().getValue(), (String) LINE_CAP_BUTT);
-    });
+    // Set and Get
+    String propertyValue = LINE_CAP_BUTT;
+    layer.setProperties(lineCap(propertyValue));
+    assertEquals(layer.getLineCap().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testLineJoinAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-join");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineJoin().getValue());
 
-      // Set and Get
-      layer.setProperties(lineJoin(LINE_JOIN_BEVEL));
-      assertEquals((String) layer.getLineJoin().getValue(), (String) LINE_JOIN_BEVEL);
-    });
+    // Set and Get
+    String propertyValue = LINE_JOIN_BEVEL;
+    layer.setProperties(lineJoin(propertyValue));
+    assertEquals(layer.getLineJoin().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testLineJoinAsExpression() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-join-expression");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineJoin().getExpression());
 
-      // Set and Get
-      Expression expression = string(Expression.get("undefined"));
-      layer.setProperties(lineJoin(expression));
-      assertEquals(layer.getLineJoin().getExpression(), expression);
-    });
+    // Set and Get
+    Expression expression = string(Expression.get("undefined"));
+    layer.setProperties(lineJoin(expression));
+    assertEquals(layer.getLineJoin().getExpression(), expression);
   }
 
-
   @Test
+  @UiThreadTest
   public void testLineMiterLimitAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-miter-limit");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineMiterLimit().getValue());
 
-      // Set and Get
-      layer.setProperties(lineMiterLimit(0.3f));
-      assertEquals((Float) layer.getLineMiterLimit().getValue(), (Float) 0.3f);
-    });
+    // Set and Get
+    Float propertyValue = 0.3f;
+    layer.setProperties(lineMiterLimit(propertyValue));
+    assertEquals(layer.getLineMiterLimit().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testLineRoundLimitAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-round-limit");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineRoundLimit().getValue());
 
-      // Set and Get
-      layer.setProperties(lineRoundLimit(0.3f));
-      assertEquals((Float) layer.getLineRoundLimit().getValue(), (Float) 0.3f);
-    });
+    // Set and Get
+    Float propertyValue = 0.3f;
+    layer.setProperties(lineRoundLimit(propertyValue));
+    assertEquals(layer.getLineRoundLimit().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testLineOpacityTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-opacityTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setLineOpacityTransition(options);
-      assertEquals(layer.getLineOpacityTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setLineOpacityTransition(options);
+    assertEquals(layer.getLineOpacityTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testLineOpacityAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-opacity");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineOpacity().getValue());
 
-      // Set and Get
-      layer.setProperties(lineOpacity(0.3f));
-      assertEquals((Float) layer.getLineOpacity().getValue(), (Float) 0.3f);
-    });
+    // Set and Get
+    Float propertyValue = 0.3f;
+    layer.setProperties(lineOpacity(propertyValue));
+    assertEquals(layer.getLineOpacity().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testLineOpacityAsExpression() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-opacity-expression");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineOpacity().getExpression());
 
-      // Set and Get
-      Expression expression = number(Expression.get("undefined"));
-      layer.setProperties(lineOpacity(expression));
-      assertEquals(layer.getLineOpacity().getExpression(), expression);
-    });
+    // Set and Get
+    Expression expression = number(Expression.get("undefined"));
+    layer.setProperties(lineOpacity(expression));
+    assertEquals(layer.getLineOpacity().getExpression(), expression);
   }
 
-
   @Test
+  @UiThreadTest
   public void testLineColorTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-colorTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setLineColorTransition(options);
-      assertEquals(layer.getLineColorTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setLineColorTransition(options);
+    assertEquals(layer.getLineColorTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testLineColorAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-color");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineColor().getValue());
 
-      // Set and Get
-      layer.setProperties(lineColor("rgba(0, 0, 0, 1)"));
-      assertEquals((String) layer.getLineColor().getValue(), (String) "rgba(0, 0, 0, 1)");
-    });
+    // Set and Get
+    String propertyValue = "rgba(0, 0, 0, 1)";
+    layer.setProperties(lineColor(propertyValue));
+    assertEquals(layer.getLineColor().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testLineColorAsExpression() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-color-expression");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineColor().getExpression());
 
-      // Set and Get
-      Expression expression = toColor(Expression.get("undefined"));
-      layer.setProperties(lineColor(expression));
-      assertEquals(layer.getLineColor().getExpression(), expression);
-    });
+    // Set and Get
+    Expression expression = toColor(Expression.get("undefined"));
+    layer.setProperties(lineColor(expression));
+    assertEquals(layer.getLineColor().getExpression(), expression);
   }
 
-
   @Test
+  @UiThreadTest
   public void testLineColorAsIntConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-color");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      layer.setProperties(lineColor(Color.RED));
-      assertEquals(layer.getLineColorAsInt(), Color.RED);
-    });
+    // Set and Get
+    layer.setProperties(lineColor(Color.RED));
+    assertEquals(layer.getLineColorAsInt(), Color.RED);
   }
 
   @Test
+  @UiThreadTest
   public void testLineTranslateTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-translateTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setLineTranslateTransition(options);
-      assertEquals(layer.getLineTranslateTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setLineTranslateTransition(options);
+    assertEquals(layer.getLineTranslateTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testLineTranslateAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-translate");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineTranslate().getValue());
 
-      // Set and Get
-      layer.setProperties(lineTranslate(new Float[] {0f, 0f}));
-      assertEquals((Float[]) layer.getLineTranslate().getValue(), (Float[]) new Float[] {0f, 0f});
-    });
+    // Set and Get
+    Float[] propertyValue = new Float[] {0f, 0f};
+    layer.setProperties(lineTranslate(propertyValue));
+    assertEquals(layer.getLineTranslate().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testLineTranslateAnchorAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-translate-anchor");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineTranslateAnchor().getValue());
 
-      // Set and Get
-      layer.setProperties(lineTranslateAnchor(LINE_TRANSLATE_ANCHOR_MAP));
-      assertEquals((String) layer.getLineTranslateAnchor().getValue(), (String) LINE_TRANSLATE_ANCHOR_MAP);
-    });
+    // Set and Get
+    String propertyValue = LINE_TRANSLATE_ANCHOR_MAP;
+    layer.setProperties(lineTranslateAnchor(propertyValue));
+    assertEquals(layer.getLineTranslateAnchor().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testLineWidthTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-widthTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setLineWidthTransition(options);
-      assertEquals(layer.getLineWidthTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setLineWidthTransition(options);
+    assertEquals(layer.getLineWidthTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testLineWidthAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-width");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineWidth().getValue());
 
-      // Set and Get
-      layer.setProperties(lineWidth(0.3f));
-      assertEquals((Float) layer.getLineWidth().getValue(), (Float) 0.3f);
-    });
+    // Set and Get
+    Float propertyValue = 0.3f;
+    layer.setProperties(lineWidth(propertyValue));
+    assertEquals(layer.getLineWidth().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testLineWidthAsExpression() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-width-expression");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineWidth().getExpression());
 
-      // Set and Get
-      Expression expression = number(Expression.get("undefined"));
-      layer.setProperties(lineWidth(expression));
-      assertEquals(layer.getLineWidth().getExpression(), expression);
-    });
+    // Set and Get
+    Expression expression = number(Expression.get("undefined"));
+    layer.setProperties(lineWidth(expression));
+    assertEquals(layer.getLineWidth().getExpression(), expression);
   }
 
-
   @Test
+  @UiThreadTest
   public void testLineGapWidthTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-gap-widthTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setLineGapWidthTransition(options);
-      assertEquals(layer.getLineGapWidthTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setLineGapWidthTransition(options);
+    assertEquals(layer.getLineGapWidthTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testLineGapWidthAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-gap-width");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineGapWidth().getValue());
 
-      // Set and Get
-      layer.setProperties(lineGapWidth(0.3f));
-      assertEquals((Float) layer.getLineGapWidth().getValue(), (Float) 0.3f);
-    });
+    // Set and Get
+    Float propertyValue = 0.3f;
+    layer.setProperties(lineGapWidth(propertyValue));
+    assertEquals(layer.getLineGapWidth().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testLineGapWidthAsExpression() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-gap-width-expression");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineGapWidth().getExpression());
 
-      // Set and Get
-      Expression expression = number(Expression.get("undefined"));
-      layer.setProperties(lineGapWidth(expression));
-      assertEquals(layer.getLineGapWidth().getExpression(), expression);
-    });
+    // Set and Get
+    Expression expression = number(Expression.get("undefined"));
+    layer.setProperties(lineGapWidth(expression));
+    assertEquals(layer.getLineGapWidth().getExpression(), expression);
   }
 
-
   @Test
+  @UiThreadTest
   public void testLineOffsetTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-offsetTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setLineOffsetTransition(options);
-      assertEquals(layer.getLineOffsetTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setLineOffsetTransition(options);
+    assertEquals(layer.getLineOffsetTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testLineOffsetAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-offset");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineOffset().getValue());
 
-      // Set and Get
-      layer.setProperties(lineOffset(0.3f));
-      assertEquals((Float) layer.getLineOffset().getValue(), (Float) 0.3f);
-    });
+    // Set and Get
+    Float propertyValue = 0.3f;
+    layer.setProperties(lineOffset(propertyValue));
+    assertEquals(layer.getLineOffset().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testLineBlurTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-blurTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setLineBlurTransition(options);
-      assertEquals(layer.getLineBlurTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setLineBlurTransition(options);
+    assertEquals(layer.getLineBlurTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testLineBlurAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-blur");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineBlur().getValue());
 
-      // Set and Get
-      layer.setProperties(lineBlur(0.3f));
-      assertEquals((Float) layer.getLineBlur().getValue(), (Float) 0.3f);
-    });
+    // Set and Get
+    Float propertyValue = 0.3f;
+    layer.setProperties(lineBlur(propertyValue));
+    assertEquals(layer.getLineBlur().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testLineBlurAsExpression() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-blur-expression");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineBlur().getExpression());
 
-      // Set and Get
-      Expression expression = number(Expression.get("undefined"));
-      layer.setProperties(lineBlur(expression));
-      assertEquals(layer.getLineBlur().getExpression(), expression);
-    });
+    // Set and Get
+    Expression expression = number(Expression.get("undefined"));
+    layer.setProperties(lineBlur(expression));
+    assertEquals(layer.getLineBlur().getExpression(), expression);
   }
 
-
   @Test
+  @UiThreadTest
   public void testLineDasharrayTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-dasharrayTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setLineDasharrayTransition(options);
-      assertEquals(layer.getLineDasharrayTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setLineDasharrayTransition(options);
+    assertEquals(layer.getLineDasharrayTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testLineDasharrayAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-dasharray");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLineDasharray().getValue());
 
-      // Set and Get
-      layer.setProperties(lineDasharray(new Float[] {}));
-      assertEquals((Float[]) layer.getLineDasharray().getValue(), (Float[]) new Float[] {});
-    });
+    // Set and Get
+    Float[] propertyValue = new Float[] {};
+    layer.setProperties(lineDasharray(propertyValue));
+    assertEquals(layer.getLineDasharray().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testLinePatternTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-patternTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setLinePatternTransition(options);
-      assertEquals(layer.getLinePatternTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setLinePatternTransition(options);
+    assertEquals(layer.getLinePatternTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testLinePatternAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-pattern");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLinePattern().getValue());
 
-      // Set and Get
-      layer.setProperties(linePattern("pedestrian-polygon"));
-      assertEquals((String) layer.getLinePattern().getValue(), (String) "pedestrian-polygon");
-    });
+    // Set and Get
+    String propertyValue = "pedestrian-polygon";
+    layer.setProperties(linePattern(propertyValue));
+    assertEquals(layer.getLinePattern().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testLinePatternAsExpression() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("line-pattern-expression");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getLinePattern().getExpression());
 
-      // Set and Get
-      Expression expression = string(Expression.get("undefined"));
-      layer.setProperties(linePattern(expression));
-      assertEquals(layer.getLinePattern().getExpression(), expression);
-    });
+    // Set and Get
+    Expression expression = string(Expression.get("undefined"));
+    layer.setProperties(linePattern(expression));
+    assertEquals(layer.getLinePattern().getExpression(), expression);
   }
-
 }

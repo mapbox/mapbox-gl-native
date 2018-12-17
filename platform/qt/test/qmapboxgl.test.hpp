@@ -3,9 +3,6 @@
 #include <QApplication>
 #include <QMapboxGL>
 
-// We're using QGLFramebufferObject, which is only available in Qt 5 and up.
-#if QT_VERSION >= 0x050000
-
 #include <QGLWidget>
 #include <QGLFramebufferObject>
 
@@ -32,5 +29,3 @@ private slots:
     void onMapChanged(QMapboxGL::MapChange);
     void onNeedsRendering();
 };
-
-#endif

@@ -4,7 +4,7 @@ namespace mbgl {
 namespace style {
 
 bool LineLayer::Impl::hasLayoutDifference(const Layer::Impl& other) const {
-    assert(other.type == LayerType::Line);
+    assert(other.getTypeInfo() == getTypeInfo());
     const auto& impl = static_cast<const style::LineLayer::Impl&>(other);
     return filter     != impl.filter ||
            visibility != impl.visibility ||

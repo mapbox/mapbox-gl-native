@@ -8,6 +8,7 @@
 
 #include "layer.hpp"
 #include "../transition_options.hpp"
+#include <mbgl/layermanager/<%- type.replace('-', '_') %>_layer_factory.hpp>
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
 #include <jni/jni.hpp>
 
@@ -18,8 +19,6 @@ class <%- camelize(type) %>Layer : public Layer {
 public:
     using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/<%- camelize(type) %>Layer"; };
-
-    static void registerNative(jni::JNIEnv&);
 
 <% if (type === 'background') { -%>
     <%- camelize(type) %>Layer(jni::JNIEnv&, jni::String&);
@@ -42,9 +41,22 @@ public:
     jni::Local<jni::Object<TransitionOptions>> get<%- camelize(property.name) %>Transition(jni::JNIEnv&);
 <% } -%>
 <% } -%>
-    jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&);
 
 }; // class <%- camelize(type) %>Layer
+
+class <%- camelize(type) %>JavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::<%- camelize(type) %>LayerFactory {
+public:
+    ~<%- camelize(type) %>JavaLayerPeerFactory() override;
+
+    // JavaLayerPeerFactory overrides.
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+
+    void registerNative(jni::JNIEnv&) final;
+
+    LayerFactory* getLayerFactory() final { return this; }
+
+};  // class <%- camelize(type) %>JavaLayerPeerFactory
 
 } // namespace android
 } // namespace mbgl

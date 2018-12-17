@@ -8,7 +8,7 @@
 #pragma mark - Tests
 
 - (void)waitForMapViewToBeRendered {
-    [self waitForMapViewToBeRenderedWithTimeout:5];
+    [self waitForMapViewToBeRenderedWithTimeout:10];
 }
 
 // This test does not strictly need to be in this test file/target. Including here for convenience.

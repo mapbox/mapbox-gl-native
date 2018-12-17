@@ -228,6 +228,6 @@ public final class MapFragment extends Fragment implements OnMapReadyCallback {
      *
      * @param mapView The created mapview
      */
-    void onMapViewReady(@NonNull MapView mapView);
+    void onMapViewReady(MapView mapView);
   }
 }

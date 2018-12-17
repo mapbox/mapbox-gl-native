@@ -48,12 +48,6 @@ final class MapGestureDetector {
   private final AnnotationManager annotationManager;
   private final CameraChangeDispatcher cameraChangeDispatcher;
 
-  // deprecated map touch API
-  private MapboxMap.OnMapClickListener onMapClickListener;
-  private MapboxMap.OnMapLongClickListener onMapLongClickListener;
-  private MapboxMap.OnFlingListener onFlingListener;
-  private MapboxMap.OnScrollListener onScrollListener;
-
   // new map touch API
   private final CopyOnWriteArrayList<MapboxMap.OnMapClickListener> onMapClickListenerList
     = new CopyOnWriteArrayList<>();
@@ -62,9 +56,6 @@ final class MapGestureDetector {
     = new CopyOnWriteArrayList<>();
 
   private final CopyOnWriteArrayList<MapboxMap.OnFlingListener> onFlingListenerList
-    = new CopyOnWriteArrayList<>();
-
-  private final CopyOnWriteArrayList<MapboxMap.OnScrollListener> onScrollListenerList
     = new CopyOnWriteArrayList<>();
 
   private final CopyOnWriteArrayList<MapboxMap.OnMoveListener> onMoveListenerList
@@ -238,7 +229,6 @@ final class MapGestureDetector {
 
       case MotionEvent.ACTION_CANCEL:
         scheduledAnimators.clear();
-        transform.cancelTransitions();
         transform.setGestureInProgress(false);
         break;
     }
@@ -461,7 +451,6 @@ final class MapGestureDetector {
         // Scroll the map
         transform.moveBy(-distanceX, -distanceY, 0 /*no duration*/);
 
-        notifyOnScrollListeners();
         notifyOnMoveListeners(detector);
       }
       return true;
@@ -660,8 +649,8 @@ final class MapGestureDetector {
     }
 
     @Override
-    public void onRotateEnd(@NonNull RotateGestureDetector detector, float velocityX, float velocityY,
-                            float angularVelocity) {
+    public void onRotateEnd(@NonNull RotateGestureDetector detector, float velocityX,
+                            float velocityY, float angularVelocity) {
       if (uiSettings.isIncreaseScaleThresholdWhenRotating()) {
         // resetting default scale threshold values
         gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(defaultSpanSinceStartThreshold);
@@ -758,8 +747,8 @@ final class MapGestureDetector {
     }
 
     @Override
-    public boolean onShove(@NonNull ShoveGestureDetector detector, float deltaPixelsSinceLast,
-                           float deltaPixelsSinceStart) {
+    public boolean onShove(@NonNull ShoveGestureDetector detector,
+                           float deltaPixelsSinceLast, float deltaPixelsSinceStart) {
       // dispatching camera start event only when the movement actually occurred
       cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
 
@@ -928,50 +917,24 @@ final class MapGestureDetector {
   }
 
   void notifyOnMapClickListeners(@NonNull PointF tapPoint) {
-    // deprecated API
-    if (onMapClickListener != null) {
-      onMapClickListener.onMapClick(projection.fromScreenLocation(tapPoint));
-    }
-
-    // new API
     for (MapboxMap.OnMapClickListener listener : onMapClickListenerList) {
-      listener.onMapClick(projection.fromScreenLocation(tapPoint));
+      if (listener.onMapClick(projection.fromScreenLocation(tapPoint))) {
+        return;
+      }
     }
   }
 
   void notifyOnMapLongClickListeners(@NonNull PointF longClickPoint) {
-    // deprecated API
-    if (onMapLongClickListener != null) {
-      onMapLongClickListener.onMapLongClick(projection.fromScreenLocation(longClickPoint));
-    }
-
-    // new API
     for (MapboxMap.OnMapLongClickListener listener : onMapLongClickListenerList) {
-      listener.onMapLongClick(projection.fromScreenLocation(longClickPoint));
+      if (listener.onMapLongClick(projection.fromScreenLocation(longClickPoint))) {
+        return;
+      }
     }
   }
 
   void notifyOnFlingListeners() {
-    // deprecated API
-    if (onFlingListener != null) {
-      onFlingListener.onFling();
-    }
-
-    // new API
     for (MapboxMap.OnFlingListener listener : onFlingListenerList) {
       listener.onFling();
-    }
-  }
-
-  void notifyOnScrollListeners() {
-    //deprecated API
-    if (onScrollListener != null) {
-      onScrollListener.onScroll();
-    }
-
-    // new API
-    for (MapboxMap.OnScrollListener listener : onScrollListenerList) {
-      listener.onScroll();
     }
   }
 
@@ -1047,22 +1010,6 @@ final class MapGestureDetector {
     }
   }
 
-  void setOnMapClickListener(MapboxMap.OnMapClickListener onMapClickListener) {
-    this.onMapClickListener = onMapClickListener;
-  }
-
-  void setOnMapLongClickListener(MapboxMap.OnMapLongClickListener onMapLongClickListener) {
-    this.onMapLongClickListener = onMapLongClickListener;
-  }
-
-  void setOnFlingListener(MapboxMap.OnFlingListener onFlingListener) {
-    this.onFlingListener = onFlingListener;
-  }
-
-  void setOnScrollListener(MapboxMap.OnScrollListener onScrollListener) {
-    this.onScrollListener = onScrollListener;
-  }
-
   void addOnMapClickListener(MapboxMap.OnMapClickListener onMapClickListener) {
     onMapClickListenerList.add(onMapClickListener);
   }
@@ -1085,14 +1032,6 @@ final class MapGestureDetector {
 
   void removeOnFlingListener(MapboxMap.OnFlingListener onFlingListener) {
     onFlingListenerList.remove(onFlingListener);
-  }
-
-  void addOnScrollListener(MapboxMap.OnScrollListener onScrollListener) {
-    onScrollListenerList.add(onScrollListener);
-  }
-
-  void removeOnScrollListener(MapboxMap.OnScrollListener onScrollListener) {
-    onScrollListenerList.remove(onScrollListener);
   }
 
   void addOnMoveListener(MapboxMap.OnMoveListener listener) {

@@ -65,7 +65,7 @@
 
     MGLShapeCollection *collection = (MGLShapeCollection *)source.shape;
     XCTAssertNotNil(collection);
-    XCTAssertEqual(collection.shapes.count, 1);
+    XCTAssertEqual(collection.shapes.count, 1UL);
     XCTAssertTrue([collection.shapes.firstObject isMemberOfClass:[MGLPolylineFeature class]]);
 }
 
@@ -294,7 +294,7 @@
     MGLShapeCollectionFeature *shape = (MGLShapeCollectionFeature *)source.shape;
 
     XCTAssertTrue([shape isKindOfClass:[MGLShapeCollectionFeature class]]);
-    XCTAssertEqual(shape.shapes.count, 1, @"Shape collection should contain 1 shape");
+    XCTAssertEqual(shape.shapes.count, 1UL, @"Shape collection should contain 1 shape");
 
     // when a shape is included in the features array
     MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:coordinates count:sizeof(coordinates)/sizeof(coordinates[0]) interiorPolygons:nil];
@@ -319,7 +319,7 @@
     MGLShapeCollectionFeature *shape = (MGLShapeCollectionFeature *)source.shape;
 
     XCTAssertTrue([shape isKindOfClass:[MGLShapeCollection class]]);
-    XCTAssertEqual(shape.shapes.count, 1, @"Shape collection should contain 1 shape");
+    XCTAssertEqual(shape.shapes.count, 1UL, @"Shape collection should contain 1 shape");
 }
 
 @end

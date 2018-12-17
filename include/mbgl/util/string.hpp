@@ -1,24 +1,13 @@
 #pragma once
 
-#include <sstream>
 #include <string>
-#include <cassert>
 #include <cstdlib>
-#include <exception>
+#include <type_traits>
 
 // Polyfill needed by Qt when building for Android with GCC
 #if defined(__ANDROID__) && defined(__GLIBCXX__)
 
 namespace std {
-
-template <typename T>
-std::string to_string(T value)
-{
-    std::ostringstream oss;
-    oss << value;
-
-    return oss.str();
-}
 
 inline int stoi(const std::string &str)
 {
@@ -36,38 +25,52 @@ inline float stof(const std::string &str) {
 namespace mbgl {
 namespace util {
 
+std::string toString(int64_t);
+std::string toString(uint64_t);
+std::string toString(int32_t);
+std::string toString(uint32_t);
+std::string toString(double, bool decimal = false);
+
+inline std::string toString(int16_t t) {
+    return toString(static_cast<int32_t>(t));
+}
+
+inline std::string toString(uint16_t t) {
+    return toString(static_cast<uint32_t>(t));
+}
+
+inline std::string toString(int8_t t) {
+    return toString(static_cast<int32_t>(t));
+}
+
+inline std::string toString(uint8_t t) {
+    return toString(static_cast<uint32_t>(t));
+}
+
+template <typename = std::enable_if<!std::is_same<uint64_t, unsigned long>::value>>
+inline std::string toString(unsigned long t) {
+    return toString(static_cast<uint64_t>(t));
+}
+
+template <typename = std::enable_if<!std::is_same<uint64_t, unsigned long long>::value>>
+inline std::string toString(unsigned long long t) {
+    return toString(static_cast<uint64_t>(t));
+}
+
+inline std::string toString(float t, bool decimal = false) {
+    return toString(static_cast<double>(t), decimal);
+}
+
+inline std::string toString(long double t, bool decimal = false) {
+    return toString(static_cast<double>(t), decimal);
+}
+
+std::string toString(std::exception_ptr);
+
 template <class T>
-inline std::string toString(T t) {
-    return std::to_string(t);
-}
+std::string toString(T) = delete;
 
-inline std::string toString(int8_t num) {
-    return std::to_string(int(num));
-}
-
-inline std::string toString(uint8_t num) {
-    return std::to_string(unsigned(num));
-}
-
-std::string toString(float);
-std::string toString(double);
-std::string toString(long double);
-
-inline std::string toString(std::exception_ptr error) {
-    assert(error);
-
-    if (!error) {
-        return "(null)";
-    }
-
-    try {
-        std::rethrow_exception(error);
-    } catch (const std::exception& ex) {
-        return ex.what();
-    } catch (...) {
-        return "Unknown exception type";
-    }
-}
+std::string toHex(size_t);
 
 inline float stof(const std::string& str) {
     return std::stof(str);
@@ -75,3 +78,17 @@ inline float stof(const std::string& str) {
 
 } // namespace util
 } // namespace mbgl
+
+// Android's libstdc++ doesn't have std::to_string()
+#if defined(__ANDROID__) && defined(__GLIBCXX__)
+
+namespace std {
+
+template <typename T>
+inline std::string to_string(T value) {
+    return mbgl::util::toString(value);
+}
+
+} // namespace std
+
+#endif

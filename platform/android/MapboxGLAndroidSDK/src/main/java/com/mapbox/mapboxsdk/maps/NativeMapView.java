@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.LibraryLoader;
@@ -42,19 +43,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 // Class that wraps the native methods for convenience
 final class NativeMapView {
 
   private static final String TAG = "Mbgl-NativeMapView";
 
-  //Hold a reference to prevent it from being GC'd as long as it's used on the native side
-  @NonNull
+  // Hold a reference to prevent it from being GC'd as long as it's used on the native side
   private final FileSource fileSource;
 
   // Used to schedule work on the MapRenderer Thread
-  @NonNull
   private final MapRenderer mapRenderer;
 
   // Used to validate if methods are called from the correct thread
@@ -62,11 +60,11 @@ final class NativeMapView {
   private final Thread thread;
 
   // Used for view callbacks
-  @NonNull
+  @Nullable
   private ViewCallback viewCallback;
 
   // Used for map change callbacks
-  @NonNull
+  @Nullable
   private StateCallback stateCallback;
 
   // Device density
@@ -82,8 +80,6 @@ final class NativeMapView {
   // Listener invoked to return a bitmap of the map
   private MapboxMap.SnapshotReadyCallback snapshotReadyCallback;
 
-  private final CopyOnWriteArrayList<MapView.OnMapChangedListener> onMapChangedListeners = new CopyOnWriteArrayList<>();
-
   static {
     LibraryLoader.load();
   }
@@ -93,15 +89,15 @@ final class NativeMapView {
   //
 
   public NativeMapView(@NonNull final Context context, final boolean crossSourceCollisions,
-                       @NonNull final ViewCallback viewCallback, @NonNull final StateCallback stateCallback,
-                       @NonNull final MapRenderer mapRenderer) {
-    this(context, context.getResources().getDisplayMetrics().density,
-      crossSourceCollisions, viewCallback, stateCallback, mapRenderer);
+                       final ViewCallback viewCallback, final StateCallback stateCallback,
+                       final MapRenderer mapRenderer) {
+    this(context, context.getResources().getDisplayMetrics().density, crossSourceCollisions, viewCallback,
+      stateCallback, mapRenderer);
   }
 
-  public NativeMapView(@NonNull final Context context, final float pixelRatio, final boolean crossSourceCollisions,
-                       @NonNull final ViewCallback viewCallback, @NonNull final StateCallback stateCallback,
-                       @NonNull final MapRenderer mapRenderer) {
+  public NativeMapView(final Context context, final float pixelRatio, final boolean crossSourceCollisions,
+                       final ViewCallback viewCallback, final StateCallback stateCallback,
+                       final MapRenderer mapRenderer) {
     this.mapRenderer = mapRenderer;
     this.viewCallback = viewCallback;
     this.fileSource = FileSource.getInstance(context);
@@ -139,7 +135,6 @@ final class NativeMapView {
 
   public void destroy() {
     destroyed = true;
-    onMapChangedListeners.clear();
     viewCallback = null;
     nativeDestroy();
   }
@@ -193,9 +188,10 @@ final class NativeMapView {
     nativeSetStyleUrl(url);
   }
 
+  @NonNull
   public String getStyleUrl() {
     if (checkState("getStyleUrl")) {
-      return null;
+      return "";
     }
     return nativeGetStyleUrl();
   }
@@ -207,9 +203,10 @@ final class NativeMapView {
     nativeSetStyleJson(newStyleJson);
   }
 
+  @NonNull
   public String getStyleJson() {
     if (checkState("getStyleJson")) {
-      return null;
+      return "";
     }
     return nativeGetStyleJson();
   }
@@ -267,8 +264,7 @@ final class NativeMapView {
     if (checkState("")) {
       return new LatLng();
     }
-    // wrap longitude values coming from core
-    return nativeGetLatLng().wrap();
+    return nativeGetLatLng();
   }
 
   public CameraPosition getCameraForLatLngBounds(LatLngBounds bounds, int[] padding, double bearing, double tilt) {
@@ -313,6 +309,10 @@ final class NativeMapView {
       return 0;
     }
     return nativeGetPitch();
+  }
+
+  public void setPitch(double pitch) {
+    setPitch(pitch, 0);
   }
 
   public void setPitch(double pitch, long duration) {
@@ -386,15 +386,29 @@ final class NativeMapView {
     nativeRotateBy(sx / pixelRatio, sy / pixelRatio, ex, ey, duration);
   }
 
-  public void setContentPadding(int[] padding) {
+  public void setContentPadding(float[] padding) {
     if (checkState("setContentPadding")) {
       return;
     }
+    // TopLeftBottomRight
     nativeSetContentPadding(
       padding[1] / pixelRatio,
       padding[0] / pixelRatio,
       padding[3] / pixelRatio,
       padding[2] / pixelRatio);
+  }
+
+  public float[] getContentPadding() {
+    if (checkState("getContentPadding")) {
+      return new float[] {0, 0, 0, 0};
+    }
+    float[] topLeftBottomRight = nativeGetContentPadding();
+    return new float[]{
+      topLeftBottomRight[1] * pixelRatio,
+      topLeftBottomRight[0] * pixelRatio,
+      topLeftBottomRight[3] * pixelRatio,
+      topLeftBottomRight[2] * pixelRatio
+    };
   }
 
   public void setBearing(double degrees) {
@@ -623,7 +637,7 @@ final class NativeMapView {
       return new LatLng();
     }
     return nativeLatLngForProjectedMeters(projectedMeters.getNorthing(),
-      projectedMeters.getEasting()).wrap();
+      projectedMeters.getEasting());
   }
 
   @NonNull
@@ -640,7 +654,7 @@ final class NativeMapView {
     if (checkState("latLngForPixel")) {
       return new LatLng();
     }
-    return nativeLatLngForPixel(pixel.x / pixelRatio, pixel.y / pixelRatio).wrap();
+    return nativeLatLngForPixel(pixel.x / pixelRatio, pixel.y / pixelRatio);
   }
 
   public double getTopOffsetPixelsForAnnotationSymbol(String symbolName) {
@@ -713,9 +727,10 @@ final class NativeMapView {
     nativeSetTransitionDelay(delay);
   }
 
+  @NonNull
   public List<Layer> getLayers() {
     if (checkState("getLayers")) {
-      return null;
+      return new ArrayList<>();
     }
     return Arrays.asList(nativeGetLayers());
   }
@@ -755,34 +770,37 @@ final class NativeMapView {
     nativeAddLayerAt(layer.getNativePtr(), index);
   }
 
-  @Nullable
-  public Layer removeLayer(@NonNull String layerId) {
+  public boolean removeLayer(@NonNull String layerId) {
     if (checkState("removeLayer")) {
-      return null;
+      return false;
     }
-    return nativeRemoveLayerById(layerId);
+
+    Layer layer = getLayer(layerId);
+    if (layer != null) {
+      return removeLayer(layer);
+    }
+    return false;
   }
 
-  @Nullable
-  public Layer removeLayer(@NonNull Layer layer) {
+
+  public boolean removeLayer(@NonNull Layer layer) {
     if (checkState("removeLayer")) {
-      return null;
+      return false;
     }
-    nativeRemoveLayer(layer.getNativePtr());
-    return layer;
+    return nativeRemoveLayer(layer.getNativePtr());
   }
 
-  @Nullable
-  public Layer removeLayerAt(@IntRange(from = 0) int index) {
+  public boolean removeLayerAt(@IntRange(from = 0) int index) {
     if (checkState("removeLayerAt")) {
-      return null;
+      return false;
     }
     return nativeRemoveLayerAt(index);
   }
 
+  @NonNull
   public List<Source> getSources() {
     if (checkState("getSources")) {
-      return null;
+      return new ArrayList<>();
     }
     return Arrays.asList(nativeGetSources());
   }
@@ -801,25 +819,22 @@ final class NativeMapView {
     nativeAddSource(source, source.getNativePtr());
   }
 
-  @Nullable
-  public Source removeSource(@NonNull String sourceId) {
+  public boolean removeSource(@NonNull String sourceId) {
     if (checkState("removeSource")) {
-      return null;
+      return false;
     }
     Source source = getSource(sourceId);
     if (source != null) {
       return removeSource(source);
     }
-    return null;
+    return false;
   }
 
-  @Nullable
-  public Source removeSource(@NonNull Source source) {
+  public boolean removeSource(@NonNull Source source) {
     if (checkState("removeSource")) {
-      return null;
+      return false;
     }
-    nativeRemoveSource(source, source.getNativePtr());
-    return source;
+    return nativeRemoveSource(source, source.getNativePtr());
   }
 
   public void addImage(@NonNull String name, @NonNull Bitmap image, boolean sdf) {
@@ -924,99 +939,92 @@ final class NativeMapView {
   //
 
   @Keep
-  protected void onMapChanged(int rawChange) {
-    for (MapView.OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
-      try {
-        onMapChangedListener.onMapChanged(rawChange);
-      } catch (RuntimeException err) {
-        Logger.e(TAG, "Exception in MapView.OnMapChangedListener", err);
-        MapStrictMode.strictModeViolation(err);
-      }
+  private void onCameraWillChange(boolean animated) {
+    if (stateCallback != null) {
+      stateCallback.onCameraWillChange(animated);
     }
   }
 
   @Keep
-  private void onCameraWillChange(boolean animated) {
-    stateCallback.onCameraWillChange(animated);
-    // deprecated API
-    onMapChanged(animated ? MapView.REGION_WILL_CHANGE_ANIMATED : MapView.REGION_WILL_CHANGE);
-  }
-
-  @Keep
   private void onCameraIsChanging() {
-    stateCallback.onCameraIsChanging();
-    // deprecated API
-    onMapChanged(MapView.REGION_IS_CHANGING);
+    if (stateCallback != null) {
+      stateCallback.onCameraIsChanging();
+    }
   }
 
   @Keep
   private void onCameraDidChange(boolean animated) {
-    stateCallback.onCameraDidChange(animated);
-    // deprecated API
-    onMapChanged(animated ? MapView.REGION_DID_CHANGE_ANIMATED : MapView.REGION_DID_CHANGE);
+    if (stateCallback != null) {
+      stateCallback.onCameraDidChange(animated);
+    }
   }
 
   @Keep
   private void onWillStartLoadingMap() {
-    stateCallback.onWillStartLoadingMap();
-    // deprecated API
-    onMapChanged(MapView.WILL_START_LOADING_MAP);
+    if (stateCallback != null) {
+      stateCallback.onWillStartLoadingMap();
+    }
   }
 
   @Keep
   private void onDidFinishLoadingMap() {
-    stateCallback.onDidFinishLoadingMap();
-    // deprecated API
-    onMapChanged(MapView.DID_FINISH_LOADING_MAP);
+    if (stateCallback != null) {
+      stateCallback.onDidFinishLoadingMap();
+    }
   }
 
   @Keep
   private void onDidFailLoadingMap(String error) {
-    stateCallback.onDidFailLoadingMap(error);
-    // deprecated API
-    onMapChanged(MapView.DID_FAIL_LOADING_MAP);
+    if (stateCallback != null) {
+      stateCallback.onDidFailLoadingMap(error);
+    }
   }
 
   @Keep
   private void onWillStartRenderingFrame() {
-    stateCallback.onWillStartRenderingFrame();
-    // deprecated API
-    onMapChanged(MapView.WILL_START_RENDERING_FRAME);
+    if (stateCallback != null) {
+      stateCallback.onWillStartRenderingFrame();
+    }
   }
 
   @Keep
   private void onDidFinishRenderingFrame(boolean fully) {
-    stateCallback.onDidFinishRenderingFrame(fully);
-    // deprecated API
-    onMapChanged(fully ? MapView.DID_FINISH_RENDERING_FRAME_FULLY_RENDERED : MapView.DID_FINISH_RENDERING_FRAME);
+    if (stateCallback != null) {
+      stateCallback.onDidFinishRenderingFrame(fully);
+    }
   }
 
   @Keep
   private void onWillStartRenderingMap() {
-    stateCallback.onWillStartRenderingMap();
-    // deprecated API
-    onMapChanged(MapView.WILL_START_RENDERING_MAP);
+    if (stateCallback != null) {
+      stateCallback.onWillStartRenderingMap();
+    }
   }
 
   @Keep
   private void onDidFinishRenderingMap(boolean fully) {
-    stateCallback.onDidFinishRenderingMap(fully);
-    // deprecated API
-    onMapChanged(fully ? MapView.DID_FINISH_RENDERING_MAP_FULLY_RENDERED : MapView.DID_FINISH_RENDERING_MAP);
+    if (stateCallback != null) {
+      stateCallback.onDidFinishRenderingMap(fully);
+    }
+  }
+
+  @Keep
+  private void onDidBecomeIdle() {
+    stateCallback.onDidBecomeIdle();
   }
 
   @Keep
   private void onDidFinishLoadingStyle() {
-    stateCallback.onDidFinishLoadingStyle();
-    // deprecated API
-    onMapChanged(MapView.DID_FINISH_LOADING_STYLE);
+    if (stateCallback != null) {
+      stateCallback.onDidFinishLoadingStyle();
+    }
   }
 
   @Keep
   private void onSourceChanged(String sourceId) {
-    stateCallback.onSourceChanged(sourceId);
-    // deprecated API
-    onMapChanged(MapView.SOURCE_DID_CHANGE);
+    if (stateCallback != null) {
+      stateCallback.onSourceChanged(sourceId);
+    }
   }
 
   @Keep
@@ -1125,7 +1133,10 @@ final class NativeMapView {
   private native void nativeRotateBy(double sx, double sy, double ex, double ey, long duration);
 
   @Keep
-  private native void nativeSetContentPadding(double top, double left, double bottom, double right);
+  private native void nativeSetContentPadding(float top, float left, float bottom, float right);
+
+  @Keep
+  private native float[] nativeGetContentPadding();
 
   @Keep
   private native void nativeSetBearing(double degrees, long duration);
@@ -1260,16 +1271,11 @@ final class NativeMapView {
   @Keep
   private native void nativeAddLayerAt(long layerPtr, int index) throws CannotAddLayerException;
 
-  @NonNull
   @Keep
-  private native Layer nativeRemoveLayerById(String layerId);
+  private native boolean nativeRemoveLayer(long layerId);
 
   @Keep
-  private native void nativeRemoveLayer(long layerId);
-
-  @NonNull
-  @Keep
-  private native Layer nativeRemoveLayerAt(int index);
+  private native boolean nativeRemoveLayerAt(int index);
 
   @NonNull
   @Keep
@@ -1283,7 +1289,7 @@ final class NativeMapView {
   private native void nativeAddSource(Source source, long sourcePtr) throws CannotAddSourceException;
 
   @Keep
-  private native void nativeRemoveSource(Source source, long sourcePtr);
+  private native boolean nativeRemoveSource(Source source, long sourcePtr);
 
   @Keep
   private native void nativeAddImage(String name, Bitmap bitmap, float pixelRatio, boolean sdf);
@@ -1345,27 +1351,6 @@ final class NativeMapView {
   }
 
   //
-  // MapChangeEvents
-  //
-
-  /**
-   * @deprecated use {@link StateCallback} instead
-   */
-  @Deprecated
-  void addOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
-    onMapChangedListeners.add(listener);
-  }
-
-  /**
-   * @deprecated use {@link StateCallback} instead
-   */
-  void removeOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
-    if (onMapChangedListeners.contains(listener)) {
-      onMapChangedListeners.remove(listener);
-    }
-  }
-
-  //
   // Snapshot
   //
 
@@ -1399,6 +1384,10 @@ final class NativeMapView {
       }
 
     });
+  }
+
+  boolean isDestroyed() {
+    return destroyed;
   }
 
   //
@@ -1462,14 +1451,18 @@ final class NativeMapView {
     Bitmap getViewContent();
   }
 
-  public interface StateCallback {
+  interface StyleCallback {
+    void onWillStartLoadingMap();
+
+    void onDidFinishLoadingStyle();
+  }
+
+  interface StateCallback extends StyleCallback {
     void onCameraWillChange(boolean animated);
 
     void onCameraIsChanging();
 
     void onCameraDidChange(boolean animated);
-
-    void onWillStartLoadingMap();
 
     void onDidFinishLoadingMap();
 
@@ -1483,7 +1476,7 @@ final class NativeMapView {
 
     void onDidFinishRenderingMap(boolean fully);
 
-    void onDidFinishLoadingStyle();
+    void onDidBecomeIdle();
 
     void onSourceChanged(String sourceId);
   }

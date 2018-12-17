@@ -14,8 +14,22 @@
 namespace mbgl {
 namespace style {
 
+
+// static
+const LayerTypeInfo* HeatmapLayer::Impl::staticTypeInfo() noexcept {
+    const static LayerTypeInfo typeInfo
+        {"heatmap",
+          LayerTypeInfo::Source::Required,
+          LayerTypeInfo::Pass3D::Required,
+          LayerTypeInfo::Layout::NotRequired,
+          LayerTypeInfo::Clipping::NotRequired
+        };
+    return &typeInfo;
+}
+
+
 HeatmapLayer::HeatmapLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(makeMutable<Impl>(LayerType::Heatmap, layerID, sourceID)) {
+    : Layer(makeMutable<Impl>(layerID, sourceID)) {
 }
 
 HeatmapLayer::HeatmapLayer(Immutable<Impl> impl_)
@@ -40,62 +54,6 @@ std::unique_ptr<Layer> HeatmapLayer::cloneRef(const std::string& id_) const {
 }
 
 void HeatmapLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
-}
-
-// Source
-
-const std::string& HeatmapLayer::getSourceID() const {
-    return impl().source;
-}
-
-void HeatmapLayer::setSourceLayer(const std::string& sourceLayer) {
-    auto impl_ = mutableImpl();
-    impl_->sourceLayer = sourceLayer;
-    baseImpl = std::move(impl_);
-}
-
-const std::string& HeatmapLayer::getSourceLayer() const {
-    return impl().sourceLayer;
-}
-
-// Filter
-
-void HeatmapLayer::setFilter(const Filter& filter) {
-    auto impl_ = mutableImpl();
-    impl_->filter = filter;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-const Filter& HeatmapLayer::getFilter() const {
-    return impl().filter;
-}
-
-// Visibility
-
-void HeatmapLayer::setVisibility(VisibilityType value) {
-    if (value == getVisibility())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->visibility = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-// Zoom range
-
-void HeatmapLayer::setMinZoom(float minZoom) {
-    auto impl_ = mutableImpl();
-    impl_->minZoom = minZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-void HeatmapLayer::setMaxZoom(float maxZoom) {
-    auto impl_ = mutableImpl();
-    impl_->maxZoom = maxZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
 }
 
 // Layout properties
@@ -424,6 +382,10 @@ optional<Error> HeatmapLayer::setLayoutProperty(const std::string& name, const C
         
 
     return Error { "layer doesn't support this property" };
+}
+
+Mutable<Layer::Impl> HeatmapLayer::mutableBaseImpl() const {
+    return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
 } // namespace style

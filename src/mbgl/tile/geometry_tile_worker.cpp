@@ -1,6 +1,7 @@
 #include <mbgl/tile/geometry_tile_worker.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/layout/pattern_layout.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
@@ -312,7 +313,7 @@ static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vecto
     std::vector<std::unique_ptr<RenderLayer>> renderLayers;
     renderLayers.reserve(layers.size());
     for (auto& layer : layers) {
-        renderLayers.push_back(RenderLayer::create(layer));
+        renderLayers.push_back(LayerManager::get()->createRenderLayer(layer));
 
         renderLayers.back()->transition(TransitionParameters {
             Clock::time_point::max(),
@@ -375,7 +376,7 @@ void GeometryTileWorker::parse() {
         // are needed to render the layer. They use the intermediate Layout data structure to accomplish this,
         // and either immediately create a bucket if no images/glyphs are used, or the Layout is stored until
         // the images/glyphs are available to add the features to the buckets.
-        if (leader.as<RenderSymbolLayer>() ||leader.as<RenderLineLayer>() || leader.as<RenderFillLayer>() || leader.as<RenderFillExtrusionLayer>()) {
+        if (leader.baseImpl->getTypeInfo()->layout == LayerTypeInfo::Layout::Required) {
             auto layout = leader.createLayout(parameters, group, std::move(geometryLayer), glyphDependencies, imageDependencies);
             if (layout->hasDependencies()) {
                 layouts.push_back(std::move(layout));

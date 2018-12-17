@@ -53,6 +53,27 @@ mapbox::geometry::geometry<double> parseGeometry(const std::string& json) {
         });
 }
 
+std::ostream& operator<<(std::ostream& os, mbgl::Response::Error::Reason r) {
+    switch (r) {
+    case mbgl::Response::Error::Reason::Success:
+        return os << "Response::Error::Reason::Success";
+    case mbgl::Response::Error::Reason::NotFound:
+        return os << "Response::Error::Reason::NotFound";
+    case mbgl::Response::Error::Reason::Server:
+        return os << "Response::Error::Reason::Server";
+    case mbgl::Response::Error::Reason::Connection:
+        return os << "Response::Error::Reason::Connection";
+    case mbgl::Response::Error::Reason::RateLimit:
+        return os << "Response::Error::Reason::RateLimit";
+    case mbgl::Response::Error::Reason::Other:
+        return os << "Response::Error::Reason::Other";
+    }
+
+    // The above switch is exhaustive, but placate GCC nonetheless:
+    assert(false);
+    return os;
+}
+
 int main(int argc, char *argv[]) {
     args::ArgumentParser argumentParser("Mapbox GL offline tool");
     args::HelpFlag helpFlag(argumentParser, "help", "Display this help menu", {'h', "help"});
@@ -116,7 +137,7 @@ int main(int argc, char *argv[]) {
                 std::string json = readFile(geometryValue.Get());
                 auto geometry = parseGeometry(json);
                 return OfflineRegionDefinition{ OfflineGeometryRegionDefinition(style, geometry, minZoom, maxZoom, pixelRatio) };
-            } catch(std::runtime_error e) {
+            } catch(const std::runtime_error& e) {
                 std::cerr << "Could not parse geojson file " << geometryValue.Get() << ": " << e.what() << std::endl;
                 exit(1);
             }

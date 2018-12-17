@@ -14,8 +14,22 @@
 namespace mbgl {
 namespace style {
 
+
+// static
+const LayerTypeInfo* FillLayer::Impl::staticTypeInfo() noexcept {
+    const static LayerTypeInfo typeInfo
+        {"fill",
+          LayerTypeInfo::Source::Required,
+          LayerTypeInfo::Pass3D::NotRequired,
+          LayerTypeInfo::Layout::Required,
+          LayerTypeInfo::Clipping::Required
+        };
+    return &typeInfo;
+}
+
+
 FillLayer::FillLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(makeMutable<Impl>(LayerType::Fill, layerID, sourceID)) {
+    : Layer(makeMutable<Impl>(layerID, sourceID)) {
 }
 
 FillLayer::FillLayer(Immutable<Impl> impl_)
@@ -40,62 +54,6 @@ std::unique_ptr<Layer> FillLayer::cloneRef(const std::string& id_) const {
 }
 
 void FillLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
-}
-
-// Source
-
-const std::string& FillLayer::getSourceID() const {
-    return impl().source;
-}
-
-void FillLayer::setSourceLayer(const std::string& sourceLayer) {
-    auto impl_ = mutableImpl();
-    impl_->sourceLayer = sourceLayer;
-    baseImpl = std::move(impl_);
-}
-
-const std::string& FillLayer::getSourceLayer() const {
-    return impl().sourceLayer;
-}
-
-// Filter
-
-void FillLayer::setFilter(const Filter& filter) {
-    auto impl_ = mutableImpl();
-    impl_->filter = filter;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-const Filter& FillLayer::getFilter() const {
-    return impl().filter;
-}
-
-// Visibility
-
-void FillLayer::setVisibility(VisibilityType value) {
-    if (value == getVisibility())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->visibility = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-// Zoom range
-
-void FillLayer::setMinZoom(float minZoom) {
-    auto impl_ = mutableImpl();
-    impl_->minZoom = minZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-void FillLayer::setMaxZoom(float maxZoom) {
-    auto impl_ = mutableImpl();
-    impl_->maxZoom = maxZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
 }
 
 // Layout properties
@@ -539,6 +497,10 @@ optional<Error> FillLayer::setLayoutProperty(const std::string& name, const Conv
         
 
     return Error { "layer doesn't support this property" };
+}
+
+Mutable<Layer::Impl> FillLayer::mutableBaseImpl() const {
+    return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
 } // namespace style

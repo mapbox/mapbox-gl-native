@@ -144,6 +144,7 @@ test/util/peer.test.cpp
 test/util/position.test.cpp
 test/util/projection.test.cpp
 test/util/run_loop.test.cpp
+test/util/string.test.cpp
 test/util/text_conversions.test.cpp
 test/util/thread.test.cpp
 test/util/thread_local.test.cpp
@@ -152,4 +153,3 @@ test/util/tile_range.test.cpp
 test/util/timer.test.cpp
 test/util/token.test.cpp
 test/util/url.test.cpp
-

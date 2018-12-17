@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
  Core Location framework’s `CLLocationManager` class, but your implementation
  does not need to be based on `CLLocationManager`.
  
+ To receive location updates from an object that conforms to the `MGLLocationManager`
+ protocol, use the optional methods available in the `MGLLocationManagerDelegate` protocol.
  */
 @protocol MGLLocationManager <NSObject>
 

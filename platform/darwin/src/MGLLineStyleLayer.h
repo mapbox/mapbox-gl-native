@@ -89,6 +89,15 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslationAnchor) {
  new line style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
 
+ #### Related examples
+ See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/shape-collection/">Add
+ multiple shapes from a single shape source</a> example to learn how to add a
+ line to your map using this style layer. See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/runtime-add-line/">Add a
+ line style layer from GeoJSON</a> example to learn how to add and style line
+ data to an `MGLMapView` object at runtime.
+
  ### Example
 
  ```swift
@@ -368,8 +377,9 @@ MGL_EXPORT
 
 #if TARGET_OS_IPHONE
 /**
- Defines a gradient with which to color a line feature. Can only be used with
- GeoJSON sources that specify `"lineMetrics": true`.
+ The color gradient with which the line will be drawn. This property only has an
+ effect on lines defined by an `MGLShapeSource` whose
+ `MGLShapeSourceOptionLineDistanceMetrics` option is set to `YES`.
  
  This property is only applied to the style if `lineDasharray` is set to `nil`,
  and `linePattern` is set to `nil`, and the data source requirements are met.
@@ -389,8 +399,9 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) NSExpression *lineGradient;
 #else
 /**
- Defines a gradient with which to color a line feature. Can only be used with
- GeoJSON sources that specify `"lineMetrics": true`.
+ The color gradient with which the line will be drawn. This property only has an
+ effect on lines defined by an `MGLShapeSource` whose
+ `MGLShapeSourceOptionLineDistanceMetrics` option is set to `YES`.
  
  This property is only applied to the style if `lineDasharray` is set to `nil`,
  and `linePattern` is set to `nil`, and the data source requirements are met.

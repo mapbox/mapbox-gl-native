@@ -39,11 +39,17 @@ private:
 
     template <class S> friend class Immutable;
     template <class S, class... Args> friend Mutable<S> makeMutable(Args&&...);
+    template <class S, class U> friend Mutable<S> staticMutableCast(const Mutable<U>&);
 };
 
 template <class T, class... Args>
 Mutable<T> makeMutable(Args&&... args) {
     return Mutable<T>(std::make_shared<T>(std::forward<Args>(args)...));
+}
+
+template <class S, class U>
+Mutable<S> staticMutableCast(const Mutable<U>& u) {
+    return Mutable<S>(std::static_pointer_cast<S>(u.ptr));
 }
 
 /**

@@ -151,9 +151,9 @@ void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
         }
         response.error = std::make_unique<Error>(Error::Reason::RateLimit, "HTTP status code 429", http::parseRetryHeaders(retryAfter, xRateLimitReset));
     } else if (code >= 500 && code < 600) {
-        response.error = std::make_unique<Error>(Error::Reason::Server, std::string{ "HTTP status code " } + std::to_string(code));
+        response.error = std::make_unique<Error>(Error::Reason::Server, std::string{ "HTTP status code " } + util::toString(code));
     } else {
-        response.error = std::make_unique<Error>(Error::Reason::Other, std::string{ "HTTP status code " } + std::to_string(code));
+        response.error = std::make_unique<Error>(Error::Reason::Other, std::string{ "HTTP status code " } + util::toString(code));
     }
 
     async.send();
@@ -186,10 +186,6 @@ HTTPFileSource::~HTTPFileSource() = default;
 
 std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, Callback callback) {
     return std::make_unique<HTTPRequest>(*impl->env, resource, callback);
-}
-
-uint32_t HTTPFileSource::maximumConcurrentRequests() {
-    return 20;
 }
 
 } // namespace mbgl

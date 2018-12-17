@@ -222,6 +222,11 @@ MGL_EXPORT
     if it should display itself as unselected.
  @param animated `YES` if the change in selection state is animated; `NO` if the
     change is immediate.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-vie
+ ws/">Annotation views</a> example to learn how to modify an
+ `MGLAnnotationView`'s behavior when it is selected.
  */
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated;
 
@@ -250,6 +255,11 @@ MGL_EXPORT
  attempting to stop an operation that has already been initiated; doing so can
  lead to undefined behavior. Once begun, the drag operation should always
  continue to completion.
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/draggable-views
+ /">Draggable annotation views</a> to learn how to enable users to drag
+ `MGLAnnotationView` objects on your map.
  */
 @property (nonatomic, assign, getter=isDraggable) BOOL draggable;
 

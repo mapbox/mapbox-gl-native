@@ -14,8 +14,22 @@
 namespace mbgl {
 namespace style {
 
+
+// static
+const LayerTypeInfo* HillshadeLayer::Impl::staticTypeInfo() noexcept {
+    const static LayerTypeInfo typeInfo
+        {"hillshade",
+          LayerTypeInfo::Source::Required,
+          LayerTypeInfo::Pass3D::Required,
+          LayerTypeInfo::Layout::NotRequired,
+          LayerTypeInfo::Clipping::NotRequired
+        };
+    return &typeInfo;
+}
+
+
 HillshadeLayer::HillshadeLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(makeMutable<Impl>(LayerType::Hillshade, layerID, sourceID)) {
+    : Layer(makeMutable<Impl>(layerID, sourceID)) {
 }
 
 HillshadeLayer::HillshadeLayer(Immutable<Impl> impl_)
@@ -40,40 +54,6 @@ std::unique_ptr<Layer> HillshadeLayer::cloneRef(const std::string& id_) const {
 }
 
 void HillshadeLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
-}
-
-// Source
-
-const std::string& HillshadeLayer::getSourceID() const {
-    return impl().source;
-}
-
-
-// Visibility
-
-void HillshadeLayer::setVisibility(VisibilityType value) {
-    if (value == getVisibility())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->visibility = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-// Zoom range
-
-void HillshadeLayer::setMinZoom(float minZoom) {
-    auto impl_ = mutableImpl();
-    impl_->minZoom = minZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-void HillshadeLayer::setMaxZoom(float maxZoom) {
-    auto impl_ = mutableImpl();
-    impl_->maxZoom = maxZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
 }
 
 // Layout properties
@@ -449,6 +429,10 @@ optional<Error> HillshadeLayer::setLayoutProperty(const std::string& name, const
         
 
     return Error { "layer doesn't support this property" };
+}
+
+Mutable<Layer::Impl> HillshadeLayer::mutableBaseImpl() const {
+    return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
 } // namespace style

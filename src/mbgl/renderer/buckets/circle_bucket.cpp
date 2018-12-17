@@ -18,7 +18,7 @@ CircleBucket::CircleBucket(const BucketParameters& parameters, const std::vector
             std::piecewise_construct,
             std::forward_as_tuple(layer->getID()),
             std::forward_as_tuple(
-                layer->as<RenderCircleLayer>()->evaluated,
+                toRenderCircleLayer(layer)->evaluated,
                 parameters.tileID.overscaledZ));
     }
 }
@@ -104,12 +104,7 @@ static float get(const RenderCircleLayer& layer, const std::map<std::string, Cir
 }
 
 float CircleBucket::getQueryRadius(const RenderLayer& layer) const {
-    if (!layer.is<RenderCircleLayer>()) {
-        return 0;
-    }
-
-    auto circleLayer = layer.as<RenderCircleLayer>();
-
+    const RenderCircleLayer* circleLayer = toRenderCircleLayer(&layer);
     float radius = get<CircleRadius>(*circleLayer, paintPropertyBinders);
     float stroke = get<CircleStrokeWidth>(*circleLayer, paintPropertyBinders);
     auto translate = circleLayer->evaluated.get<CircleTranslate>();

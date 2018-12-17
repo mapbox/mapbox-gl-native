@@ -29,7 +29,7 @@ namespace style {
  */
 class Layer::Impl {
 public:
-    Impl(LayerType, std::string layerID, std::string sourceID);
+    Impl(std::string layerID, std::string sourceID);
     virtual ~Impl() = default;
 
     Impl& operator=(const Impl&) = delete;
@@ -41,7 +41,12 @@ public:
     // Utility function for automatic layer grouping.
     virtual void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const = 0;
 
-    const LayerType type;
+    // Returns pointer to the statically allocated layer type info structure.
+    virtual const LayerTypeInfo* getTypeInfo() const noexcept = 0;
+
+    // Populates the given \a fontStack with fonts being used by the layer.
+    virtual void populateFontStack(std::set<FontStack>& fontStack) const;
+
     std::string id;
     std::string source;
     std::string sourceLayer;
@@ -53,6 +58,11 @@ public:
 protected:
     Impl(const Impl&) = default;
 };
+
+// To be used in the inherited classes.
+#define DECLARE_LAYER_TYPE_INFO \
+const LayerTypeInfo* getTypeInfo() const noexcept final { return staticTypeInfo(); } \
+static const LayerTypeInfo* staticTypeInfo() noexcept
 
 } // namespace style
 } // namespace mbgl

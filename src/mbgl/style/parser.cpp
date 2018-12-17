@@ -18,7 +18,6 @@
 
 #include <algorithm>
 #include <set>
-#include <sstream>
 
 namespace mbgl {
 namespace style {
@@ -30,11 +29,7 @@ StyleParseResult Parser::parse(const std::string& json) {
     document.Parse<0>(json.c_str());
 
     if (document.HasParseError()) {
-        std::stringstream message;
-        message <<  document.GetErrorOffset() << " - "
-            << rapidjson::GetParseError_En(document.GetParseError());
-
-        return std::make_exception_ptr(std::runtime_error(message.str()));
+        return std::make_exception_ptr(std::runtime_error(formatJSONParseError(document)));
     }
 
     if (!document.IsObject()) {
@@ -272,14 +267,13 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
     }
 }
 
-std::vector<FontStack> Parser::fontStacks() const {
+std::set<FontStack> Parser::fontStacks() const {
     std::vector<Immutable<Layer::Impl>> impls;
     impls.reserve(layers.size());
     for (const auto& layer : layers) {
         impls.emplace_back(layer->baseImpl);
     }
-    std::set<FontStack> result = mbgl::fontStacks(impls);
-    return std::vector<FontStack>(result.begin(), result.end());
+    return mbgl::fontStacks(impls);
 }
 
 } // namespace style

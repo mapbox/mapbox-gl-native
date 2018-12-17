@@ -4,9 +4,6 @@
 
 #include <QMapbox>
 
-// We're using QGLFramebufferObject, which is only available in Qt 5 and up.
-#if QT_VERSION >= 0x050000
-
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
 
@@ -76,5 +73,3 @@ TEST_F(QMapboxGLTest, TEST_DISABLED_ON_CI(styleUrl)) {
     map.setStyleUrl(QString());
     runUntil(QMapboxGL::MapChangeDidFailLoadingMap);
 }
-
-#endif

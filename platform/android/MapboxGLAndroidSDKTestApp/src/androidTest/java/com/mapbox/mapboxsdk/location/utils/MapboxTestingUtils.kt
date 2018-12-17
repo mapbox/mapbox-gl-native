@@ -15,7 +15,7 @@ import com.mapbox.mapboxsdk.style.layers.Property
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 
 fun MapboxMap.querySourceFeatures(sourceId: String): List<Feature> {
-  return this.getSourceAs<GeoJsonSource>(sourceId)?.querySourceFeatures(null) ?: emptyList()
+  return this.style!!.getSourceAs<GeoJsonSource>(sourceId)?.querySourceFeatures(null) ?: emptyList()
 }
 
 fun MapboxMap.queryRenderedFeatures(location: Location, layerId: String): List<Feature> {
@@ -25,7 +25,7 @@ fun MapboxMap.queryRenderedFeatures(location: Location, layerId: String): List<F
 }
 
 fun MapboxMap.isLayerVisible(layerId: String): Boolean {
-  return this.getLayer(layerId)?.visibility?.value?.equals(Property.VISIBLE)!!
+  return this.style!!.getLayer(layerId)?.visibility?.value?.equals(Property.VISIBLE)!!
 }
 
 fun MapboxMap.waitForSource(uiController: UiController, sourceId: String) {
@@ -41,8 +41,17 @@ fun MapboxMap.waitForLayer(uiController: UiController, location: Location, layer
   var counter = 0
   val delay = MapboxTestingUtils.MAP_RENDER_DELAY
   while (
-    if (shouldDisappear) this.queryRenderedFeatures(location, layerId).isNotEmpty() else this.queryRenderedFeatures(location, layerId).isEmpty()
+    if (shouldDisappear) this.queryRenderedFeatures(location, layerId).isNotEmpty() else (this.style == null || this.queryRenderedFeatures(location, layerId).isEmpty())
       && delay * counter < MapboxTestingUtils.RENDER_TIMEOUT) {
+    uiController.loopMainThreadForAtLeast(delay)
+    counter++
+  }
+}
+
+fun MapboxMap.waitForStyle(uiController: UiController, mapboxMap: MapboxMap) {
+  var counter = 0
+  val delay = MapboxTestingUtils.MAP_RENDER_DELAY
+  while ((mapboxMap.style == null && !mapboxMap.style?.isFullyLoaded!!) && delay * counter < MapboxTestingUtils.RENDER_TIMEOUT) {
     uiController.loopMainThreadForAtLeast(delay)
     counter++
   }
@@ -62,7 +71,7 @@ class MapboxTestingUtils {
 
     const val MAP_RENDER_DELAY = 250L
     const val MAP_CONNECTION_DELAY = 1000L
-    const val RENDER_TIMEOUT = 2_500L
+    const val RENDER_TIMEOUT = 5_500L
 
     /**
      * Used to increase style load time for stress testing.
@@ -99,7 +108,7 @@ class MapboxTestingUtils {
 
 fun MapboxMap.addImageFromDrawable(string: String, drawable: Drawable) {
   val bitmapFromDrawable = getBitmapFromDrawable(drawable)
-  this.addImage(string, bitmapFromDrawable)
+  this.style!!.addImage(string, bitmapFromDrawable)
 }
 
 private fun getBitmapFromDrawable(drawable: Drawable): Bitmap {

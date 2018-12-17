@@ -25,9 +25,9 @@ TEST(StyleConversion, LayerTransition) {
             }
         }
     })JSON");
-
-    ASSERT_EQ(400ms, *layer->as<BackgroundLayer>()->impl().paint
+    ASSERT_STREQ("background", layer->getTypeInfo()->type);
+    ASSERT_EQ(400ms, *static_cast<BackgroundLayer*>(layer.get())->impl().paint
         .get<BackgroundColor>().options.duration);
-    ASSERT_EQ(500ms, *layer->as<BackgroundLayer>()->impl().paint
+    ASSERT_EQ(500ms, *static_cast<BackgroundLayer*>(layer.get())->impl().paint
         .get<BackgroundColor>().options.delay);
 }

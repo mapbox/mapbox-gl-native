@@ -14,8 +14,22 @@
 namespace mbgl {
 namespace style {
 
+
+// static
+const LayerTypeInfo* FillExtrusionLayer::Impl::staticTypeInfo() noexcept {
+    const static LayerTypeInfo typeInfo
+        {"fill-extrusion",
+          LayerTypeInfo::Source::Required,
+          LayerTypeInfo::Pass3D::Required,
+          LayerTypeInfo::Layout::Required,
+          LayerTypeInfo::Clipping::NotRequired
+        };
+    return &typeInfo;
+}
+
+
 FillExtrusionLayer::FillExtrusionLayer(const std::string& layerID, const std::string& sourceID)
-    : Layer(makeMutable<Impl>(LayerType::FillExtrusion, layerID, sourceID)) {
+    : Layer(makeMutable<Impl>(layerID, sourceID)) {
 }
 
 FillExtrusionLayer::FillExtrusionLayer(Immutable<Impl> impl_)
@@ -40,62 +54,6 @@ std::unique_ptr<Layer> FillExtrusionLayer::cloneRef(const std::string& id_) cons
 }
 
 void FillExtrusionLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
-}
-
-// Source
-
-const std::string& FillExtrusionLayer::getSourceID() const {
-    return impl().source;
-}
-
-void FillExtrusionLayer::setSourceLayer(const std::string& sourceLayer) {
-    auto impl_ = mutableImpl();
-    impl_->sourceLayer = sourceLayer;
-    baseImpl = std::move(impl_);
-}
-
-const std::string& FillExtrusionLayer::getSourceLayer() const {
-    return impl().sourceLayer;
-}
-
-// Filter
-
-void FillExtrusionLayer::setFilter(const Filter& filter) {
-    auto impl_ = mutableImpl();
-    impl_->filter = filter;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-const Filter& FillExtrusionLayer::getFilter() const {
-    return impl().filter;
-}
-
-// Visibility
-
-void FillExtrusionLayer::setVisibility(VisibilityType value) {
-    if (value == getVisibility())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->visibility = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-// Zoom range
-
-void FillExtrusionLayer::setMinZoom(float minZoom) {
-    auto impl_ = mutableImpl();
-    impl_->minZoom = minZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-void FillExtrusionLayer::setMaxZoom(float maxZoom) {
-    auto impl_ = mutableImpl();
-    impl_->maxZoom = maxZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
 }
 
 // Layout properties
@@ -292,6 +250,33 @@ TransitionOptions FillExtrusionLayer::getFillExtrusionBaseTransition() const {
     return impl().paint.template get<FillExtrusionBase>().options;
 }
 
+PropertyValue<bool> FillExtrusionLayer::getDefaultFillExtrusionVerticalGradient() {
+    return { true };
+}
+
+PropertyValue<bool> FillExtrusionLayer::getFillExtrusionVerticalGradient() const {
+    return impl().paint.template get<FillExtrusionVerticalGradient>().value;
+}
+
+void FillExtrusionLayer::setFillExtrusionVerticalGradient(PropertyValue<bool> value) {
+    if (value == getFillExtrusionVerticalGradient())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<FillExtrusionVerticalGradient>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void FillExtrusionLayer::setFillExtrusionVerticalGradientTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<FillExtrusionVerticalGradient>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions FillExtrusionLayer::getFillExtrusionVerticalGradientTransition() const {
+    return impl().paint.template get<FillExtrusionVerticalGradient>().options;
+}
+
 using namespace conversion;
 
 optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, const Convertible& value) {
@@ -304,6 +289,7 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
         FillExtrusionPattern,
         FillExtrusionHeight,
         FillExtrusionBase,
+        FillExtrusionVerticalGradient,
         FillExtrusionOpacityTransition,
         FillExtrusionColorTransition,
         FillExtrusionTranslateTransition,
@@ -311,6 +297,7 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
         FillExtrusionPatternTransition,
         FillExtrusionHeightTransition,
         FillExtrusionBaseTransition,
+        FillExtrusionVerticalGradientTransition,
     };
 
     Property property = Property::Unknown;
@@ -383,6 +370,16 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
     case util::hashFNV1a("fill-extrusion-base-transition"):
         if (name == "fill-extrusion-base-transition") {
             property = Property::FillExtrusionBaseTransition;
+        }
+        break;
+    case util::hashFNV1a("fill-extrusion-vertical-gradient"):
+        if (name == "fill-extrusion-vertical-gradient") {
+            property = Property::FillExtrusionVerticalGradient;
+        }
+        break;
+    case util::hashFNV1a("fill-extrusion-vertical-gradient-transition"):
+        if (name == "fill-extrusion-vertical-gradient-transition") {
+            property = Property::FillExtrusionVerticalGradientTransition;
         }
         break;
     
@@ -472,6 +469,18 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
         
     }
     
+    if (property == Property::FillExtrusionVerticalGradient) {
+        Error error;
+        optional<PropertyValue<bool>> typedValue = convert<PropertyValue<bool>>(value, error, false, false);
+        if (!typedValue) {
+            return error;
+        }
+        
+        setFillExtrusionVerticalGradient(*typedValue);
+        return nullopt;
+        
+    }
+    
 
     Error error;
     optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
@@ -514,6 +523,11 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
         return nullopt;
     }
     
+    if (property == Property::FillExtrusionVerticalGradientTransition) {
+        setFillExtrusionVerticalGradientTransition(*transition);
+        return nullopt;
+    }
+    
 
     return Error { "layer doesn't support this property" };
 }
@@ -539,6 +553,10 @@ optional<Error> FillExtrusionLayer::setLayoutProperty(const std::string& name, c
         
 
     return Error { "layer doesn't support this property" };
+}
+
+Mutable<Layer::Impl> FillExtrusionLayer::mutableBaseImpl() const {
+    return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
 } // namespace style

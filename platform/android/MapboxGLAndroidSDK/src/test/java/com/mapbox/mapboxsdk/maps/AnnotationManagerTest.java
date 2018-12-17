@@ -6,7 +6,6 @@ import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.junit.Test;
@@ -27,15 +26,14 @@ public class AnnotationManagerTest {
     NativeMapView aNativeMapView = mock(NativeMapView.class);
     MapView aMapView = mock(MapView.class);
     LongSparseArray<Annotation> annotationsArray = new LongSparseArray<>();
-    MarkerViewManager aMarkerViewManager = mock(MarkerViewManager.class);
     IconManager aIconManager = mock(IconManager.class);
     Annotations annotations = new AnnotationContainer(aNativeMapView, annotationsArray);
-    Markers markers = new MarkerContainer(aNativeMapView, aMapView, annotationsArray, aIconManager, aMarkerViewManager);
+    Markers markers = new MarkerContainer(aNativeMapView, annotationsArray, aIconManager);
     Polygons polygons = new PolygonContainer(aNativeMapView, annotationsArray);
     Polylines polylines = new PolylineContainer(aNativeMapView, annotationsArray);
     ShapeAnnotations shapeAnnotations = new ShapeAnnotationContainer(aNativeMapView, annotationsArray);
-    AnnotationManager annotationManager = new AnnotationManager(aNativeMapView, aMapView, annotationsArray,
-      aMarkerViewManager, aIconManager, annotations, markers, polygons, polylines, shapeAnnotations);
+    AnnotationManager annotationManager = new AnnotationManager(aMapView, annotationsArray,
+      aIconManager, annotations, markers, polygons, polylines, shapeAnnotations);
     Marker aMarker = mock(Marker.class);
     long aId = 5L;
     when(aNativeMapView.addMarker(aMarker)).thenReturn(aId);
@@ -54,15 +52,15 @@ public class AnnotationManagerTest {
     NativeMapView aNativeMapView = mock(NativeMapView.class);
     MapView aMapView = mock(MapView.class);
     LongSparseArray<Annotation> annotationsArray = new LongSparseArray<>();
-    MarkerViewManager aMarkerViewManager = mock(MarkerViewManager.class);
     IconManager aIconManager = mock(IconManager.class);
     Annotations annotations = new AnnotationContainer(aNativeMapView, annotationsArray);
-    Markers markers = new MarkerContainer(aNativeMapView, aMapView, annotationsArray, aIconManager, aMarkerViewManager);
+    Markers markers = new MarkerContainer(aNativeMapView, annotationsArray, aIconManager);
     Polygons polygons = new PolygonContainer(aNativeMapView, annotationsArray);
     Polylines polylines = new PolylineContainer(aNativeMapView, annotationsArray);
     ShapeAnnotations shapeAnnotations = new ShapeAnnotationContainer(aNativeMapView, annotationsArray);
-    AnnotationManager annotationManager = new AnnotationManager(aNativeMapView, aMapView, annotationsArray,
-      aMarkerViewManager, aIconManager, annotations, markers, polygons, polylines, shapeAnnotations);
+    AnnotationManager annotationManager = new AnnotationManager(aMapView, annotationsArray,
+      aIconManager, annotations, markers, polygons, polylines, shapeAnnotations);
+
     long firstId = 1L;
     long secondId = 2L;
     List<BaseMarkerOptions> markerList = new ArrayList<>();
@@ -75,7 +73,7 @@ public class AnnotationManagerTest {
     when(aNativeMapView.addMarker(any(Marker.class))).thenReturn(firstId, secondId);
 
     when(aNativeMapView.addMarkers(ArgumentMatchers.<Marker>anyList()))
-            .thenReturn(new long[]{firstId, secondId});
+      .thenReturn(new long[] {firstId, secondId});
 
     annotationManager.addMarkers(markerList, aMapboxMap);
 

@@ -4,13 +4,9 @@ apply plugin: 'kotlin-android'
 
 dependencies {
     lintChecks project(":MapboxGLAndroidSDKLint")
-    api(dependenciesList.mapboxAndroidTelemetry) {
-        exclude group: 'com.android.support', module: 'appcompat-v7'
-    }
+    api dependenciesList.mapboxAndroidTelemetry
     api dependenciesList.mapboxJavaGeoJSON
-    api(dependenciesList.mapboxAndroidGestures) {
-        exclude group: 'com.android.support', module: 'appcompat-v7'
-    }
+    api dependenciesList.mapboxAndroidGestures
     implementation dependenciesList.mapboxJavaTurf
     implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportAnnotations
@@ -18,6 +14,7 @@ dependencies {
     implementation dependenciesList.okhttp3
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
+    testImplementation dependenciesList.mockk
     testImplementation dependenciesList.robolectric
     testImplementation dependenciesList.kotlinLib
 }
@@ -27,7 +24,6 @@ android {
     buildToolsVersion androidVersions.buildToolsVersion
 
     defaultConfig {
-        vectorDrawables.useSupportLibrary = true
         minSdkVersion androidVersions.minSdkVersion
         targetSdkVersion androidVersions.targetSdkVersion
         buildConfigField "String", "GIT_REVISION_SHORT", String.format("\"%s\"", getGitRevision())
@@ -119,11 +115,6 @@ android {
     sourceSets {
         // limit amount of exposed library resources
         main.res.srcDirs += 'src/main/res-public'
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     lintOptions {

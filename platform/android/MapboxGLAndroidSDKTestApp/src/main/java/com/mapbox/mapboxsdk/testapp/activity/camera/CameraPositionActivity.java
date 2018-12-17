@@ -6,28 +6,28 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
-
 import timber.log.Timber;
 
 /**
  * Test activity showcasing how to listen to camera change events.
  */
-public class CameraPositionActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener,
+public class CameraPositionActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener,
   MapboxMap.OnMapLongClickListener {
 
   private MapView mapView;
@@ -40,7 +40,12 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_camera_position);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    Toolbar toolbar = findViewById(R.id.toolbar);
+    toolbar.setTitle(R.string.activity_camera_position);
+    toolbar.setNavigationIcon(R.drawable.ic_ab_back);
+    toolbar.setNavigationOnClickListener(v -> finish());
+
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
   }
@@ -48,20 +53,23 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
   @Override
   public void onMapReady(@NonNull final MapboxMap map) {
     mapboxMap = map;
+    map.setStyle(Style.SATELLITE_STREETS, style -> {
+      // add a listener to FAB
+      fab = findViewById(R.id.fab);
+      fab.setColorFilter(ContextCompat.getColor(CameraPositionActivity.this, R.color.primary));
+      fab.setOnClickListener(this);
+    });
+
     toggleLogCameraChanges();
 
-    // add a listener to FAB
-    fab = (FloatingActionButton) findViewById(R.id.fab);
-    fab.setColorFilter(ContextCompat.getColor(CameraPositionActivity.this, R.color.primary));
-    fab.setOnClickListener(this);
-
     // listen to long click events to toggle logging camera changes
-    mapboxMap.setOnMapLongClickListener(this);
+    mapboxMap.addOnMapLongClickListener(this);
   }
 
   @Override
-  public void onMapLongClick(@NonNull LatLng point) {
+  public boolean onMapLongClick(@NonNull LatLng point) {
     toggleLogCameraChanges();
+    return false;
   }
 
   @Override
@@ -119,6 +127,9 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
   @Override
   protected void onDestroy() {
     super.onDestroy();
+    if (mapboxMap != null) {
+      mapboxMap.removeOnMapLongClickListener(this);
+    }
     mapView.onDestroy();
   }
 

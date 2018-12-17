@@ -22,8 +22,8 @@
 - (void)testProperties {
     MGLBackgroundStyleLayer *layer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"layerID"];
     XCTAssertNotEqual(layer.rawLayer, nullptr);
-    XCTAssertTrue(layer.rawLayer->is<mbgl::style::BackgroundLayer>());
-    auto rawLayer = layer.rawLayer->as<mbgl::style::BackgroundLayer>();
+    XCTAssertEqualObjects(@(layer.rawLayer->getTypeInfo()->type), @"background");
+    auto rawLayer = static_cast<mbgl::style::BackgroundLayer*>(layer.rawLayer);
 
     MGLTransition transitionTest = MGLTransitionMake(5, 4);
 

@@ -14,45 +14,45 @@ TEST(Transform, InvalidZoom) {
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
     ASSERT_DOUBLE_EQ(0, transform.getZoom());
 
-    transform.setZoom(1);
+    transform.jumpTo(CameraOptions().withZoom(1.0));
+
     ASSERT_DOUBLE_EQ(1, transform.getZoom());
 
     const double invalid = NAN;
 
-    transform.setZoom(invalid);
+    transform.jumpTo(CameraOptions().withZoom(invalid));
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
     ASSERT_DOUBLE_EQ(1, transform.getZoom());
 
-    transform.setLatLngZoom({ 0, 0 }, invalid);
+    transform.jumpTo(CameraOptions().withCenter(LatLng()).withZoom(invalid));
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
     ASSERT_DOUBLE_EQ(1, transform.getZoom());
 
-    transform.setZoom(transform.getState().getMaxZoom() + 0.1);
+    transform.jumpTo(CameraOptions().withZoom(transform.getState().getMaxZoom() + 0.1));
     ASSERT_DOUBLE_EQ(transform.getZoom(), transform.getState().getMaxZoom());
 
-    CameraOptions cameraOptions;
-    cameraOptions.center = LatLng { util::LATITUDE_MAX, util::LONGITUDE_MAX };
-    cameraOptions.zoom = transform.getState().getMaxZoom();
-
     // Executing flyTo with an empty size causes frameZoom to be NaN.
-    transform.flyTo(cameraOptions);
+    transform.flyTo(CameraOptions()
+                        .withCenter(LatLng{ util::LATITUDE_MAX, util::LONGITUDE_MAX })
+                        .withZoom(transform.getState().getMaxZoom()));
     transform.updateTransitions(transform.getTransitionStart() + transform.getTransitionDuration());
     ASSERT_DOUBLE_EQ(transform.getZoom(), transform.getState().getMaxZoom());
 
     // Executing flyTo with maximum zoom level to the same zoom level causes
     // frameZoom to be bigger than maximum zoom.
     transform.resize(Size { 100, 100 });
-    transform.flyTo(cameraOptions);
+    transform.flyTo(CameraOptions()
+                        .withCenter(LatLng{ util::LATITUDE_MAX, util::LONGITUDE_MAX })
+                        .withZoom(transform.getState().getMaxZoom()));
     transform.updateTransitions(transform.getTransitionStart() + transform.getTransitionDuration());
 
     ASSERT_TRUE(transform.getState().valid());
     ASSERT_DOUBLE_EQ(transform.getState().getMaxZoom(), transform.getZoom());
 }
-
 
 TEST(Transform, InvalidBearing) {
     Transform transform;
@@ -61,28 +61,26 @@ TEST(Transform, InvalidBearing) {
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
     ASSERT_DOUBLE_EQ(0, transform.getZoom());
 
-    transform.setZoom(1);
-    transform.setAngle(2);
-
+    transform.jumpTo(CameraOptions().withZoom(1.0).withAngle(2.0));
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
     ASSERT_DOUBLE_EQ(1, transform.getZoom());
-    ASSERT_DOUBLE_EQ(2, transform.getAngle());
+    ASSERT_NEAR(-2.0 * util::DEG2RAD, transform.getAngle(), 1e-15);
 
     const double invalid = NAN;
-    transform.setAngle(invalid);
 
+    transform.jumpTo(CameraOptions().withAngle(invalid));
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
     ASSERT_DOUBLE_EQ(1, transform.getZoom());
-    ASSERT_DOUBLE_EQ(2, transform.getAngle());
+    ASSERT_NEAR(-2.0 * util::DEG2RAD, transform.getAngle(), 1e-15);
 }
 
 TEST(Transform, IntegerZoom) {
     Transform transform;
 
     auto checkIntegerZoom = [&transform](uint8_t zoomInt, double zoom) {
-        transform.setZoom(zoom);
+        transform.jumpTo(CameraOptions().withZoom(zoom));
         ASSERT_NEAR(transform.getZoom(), zoom, 0.0001);
         ASSERT_EQ(transform.getState().getIntegerZoom(), zoomInt);
         ASSERT_NEAR(transform.getState().getZoomFraction(), zoom - zoomInt, 0.0001);
@@ -104,9 +102,9 @@ TEST(Transform, PerspectiveProjection) {
 
     Transform transform;
     transform.resize({ 1000, 1000 });
-    transform.setZoom(10);
-    transform.setPitch(0.9);
-    transform.setLatLng(LatLng(38, -77));
+
+    // 0.9 rad ~ 51.5662 deg
+    transform.jumpTo(CameraOptions().withCenter(LatLng { 38.0, -77.0 }).withZoom(10.0).withPitch(51.5662));
 
     // expected values are from mapbox-gl-js
 
@@ -134,9 +132,9 @@ TEST(Transform, PerspectiveProjection) {
 TEST(Transform, UnwrappedLatLng) {
     Transform transform;
     transform.resize({ 1000, 1000 });
-    transform.setZoom(10);
-    transform.setPitch(0.9);
-    transform.setLatLng(LatLng(38, -77));
+
+    // 0.9 rad ~ 51.5662 deg
+    transform.jumpTo(CameraOptions().withCenter(LatLng { 38.0, -77.0 }).withZoom(10.0).withPitch(51.5662));
 
     const TransformState& state = transform.getState();
 
@@ -162,39 +160,29 @@ TEST(Transform, UnwrappedLatLng) {
 }
 
 TEST(Transform, ConstrainHeightOnly) {
-    LatLng loc;
-
     Transform transform;
     transform.resize({ 1000, 1000 });
-    transform.setZoom(util::MAX_ZOOM);
 
-    transform.setLatLng(LatLngBounds::world().southwest());
-    loc = transform.getLatLng();
-    ASSERT_NEAR(-util::LATITUDE_MAX, loc.latitude(), 0.001);
-    ASSERT_NEAR(util::LONGITUDE_MAX, std::abs(loc.longitude()), 0.001);
+    transform.jumpTo(CameraOptions().withCenter(LatLngBounds::world().southwest()).withZoom(util::MAX_ZOOM));
+    ASSERT_NEAR(-util::LATITUDE_MAX, transform.getLatLng().latitude(), 0.001);
+    ASSERT_NEAR(util::LONGITUDE_MAX, std::abs(transform.getLatLng().longitude()), 0.001);
 
-    transform.setLatLng(LatLngBounds::world().northeast());
-    loc = transform.getLatLng();
-    ASSERT_NEAR(util::LATITUDE_MAX, loc.latitude(), 0.001);
-    ASSERT_NEAR(util::LONGITUDE_MAX, std::abs(loc.longitude()), 0.001);
+    transform.jumpTo(CameraOptions().withCenter(LatLngBounds::world().northeast()));
+    ASSERT_NEAR(util::LATITUDE_MAX, transform.getLatLng().latitude(), 0.001);
+    ASSERT_NEAR(util::LONGITUDE_MAX, std::abs(transform.getLatLng().longitude()), 0.001);
 }
 
 TEST(Transform, ConstrainWidthAndHeight) {
-    LatLng loc;
-
     Transform transform(MapObserver::nullObserver(), ConstrainMode::WidthAndHeight);
     transform.resize({ 1000, 1000 });
-    transform.setZoom(util::MAX_ZOOM);
 
-    transform.setLatLng(LatLngBounds::world().southwest());
-    loc = transform.getLatLng();
-    ASSERT_NEAR(-util::LATITUDE_MAX, loc.latitude(), 0.001);
-    ASSERT_NEAR(-util::LONGITUDE_MAX, loc.longitude(), 0.001);
+    transform.jumpTo(CameraOptions().withCenter(LatLngBounds::world().southwest()).withZoom(util::MAX_ZOOM));
+    ASSERT_NEAR(-util::LATITUDE_MAX, transform.getLatLng().latitude(), 0.001);
+    ASSERT_NEAR(-util::LONGITUDE_MAX, transform.getLatLng().longitude(), 0.001);
 
-    transform.setLatLng(LatLngBounds::world().northeast());
-    loc = transform.getLatLng();
-    ASSERT_NEAR(util::LATITUDE_MAX, loc.latitude(), 0.001);
-    ASSERT_NEAR(util::LONGITUDE_MAX, std::abs(loc.longitude()), 0.001);
+    transform.jumpTo(CameraOptions().withCenter(LatLngBounds::world().northeast()));
+    ASSERT_NEAR(util::LATITUDE_MAX, transform.getLatLng().latitude(), 0.001);
+    ASSERT_NEAR(util::LONGITUDE_MAX, std::abs(transform.getLatLng().longitude()), 0.001);
 }
 
 TEST(Transform, Anchor) {
@@ -202,97 +190,90 @@ TEST(Transform, Anchor) {
     transform.resize({ 1000, 1000 });
 
     const LatLng latLng { 10, -100 };
-    transform.setLatLngZoom(latLng, 10);
+    const ScreenCoordinate anchorPoint = { 150, 150 };
 
+    transform.jumpTo(CameraOptions().withCenter(latLng).withZoom(10.0));
     ASSERT_DOUBLE_EQ(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
     ASSERT_DOUBLE_EQ(10, transform.getZoom());
     ASSERT_DOUBLE_EQ(0, transform.getAngle());
 
-    const optional<ScreenCoordinate> invalidAnchorPoint {};
-    const ScreenCoordinate anchorPoint = { 150, 150 };
-
     const LatLng anchorLatLng = transform.getState().screenCoordinateToLatLng(anchorPoint);
     ASSERT_NE(latLng.latitude(), anchorLatLng.latitude());
     ASSERT_NE(latLng.longitude(), anchorLatLng.longitude());
 
-    transform.setLatLngZoom(latLng, 2);
-    transform.setZoom(3);
+    transform.jumpTo(CameraOptions().withCenter(latLng).withZoom(3.0));
     ASSERT_DOUBLE_EQ(3, transform.getZoom());
     ASSERT_DOUBLE_EQ(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
 
-    transform.setZoom(3.5, invalidAnchorPoint);
+    transform.jumpTo(CameraOptions().withZoom(3.5));
     ASSERT_DOUBLE_EQ(3.5, transform.getZoom());
     ASSERT_DOUBLE_EQ(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
 
-    transform.setZoom(5.5, anchorPoint);
+    transform.jumpTo(CameraOptions().withZoom(5.5).withAnchor(anchorPoint));
     ASSERT_DOUBLE_EQ(5.5, transform.getZoom());
     ASSERT_NE(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_NE(latLng.longitude(), transform.getLatLng().longitude());
 
-    transform.setLatLngZoom(latLng, 10);
-    transform.setZoom(3);
+    transform.jumpTo(CameraOptions().withCenter(latLng).withZoom(3.0));
     ASSERT_DOUBLE_EQ(3, transform.getZoom());
     ASSERT_NEAR(latLng.latitude(), transform.getLatLng().latitude(), 0.000001);
     ASSERT_NEAR(latLng.longitude(), transform.getLatLng().longitude(), 0.000001);
 
-    transform.setZoom(5, invalidAnchorPoint);
+    transform.jumpTo(CameraOptions().withZoom(5.0));
     ASSERT_DOUBLE_EQ(5, transform.getZoom());
     ASSERT_NEAR(latLng.latitude(), transform.getLatLng().latitude(), 0.000001);
     ASSERT_NEAR(latLng.longitude(), transform.getLatLng().longitude(), 0.000001);
 
-    transform.setZoom(7, anchorPoint);
+    transform.jumpTo(CameraOptions().withZoom(7.0).withAnchor(anchorPoint));
     ASSERT_DOUBLE_EQ(7, transform.getZoom());
     ASSERT_NE(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_NE(latLng.longitude(), transform.getLatLng().longitude());
 
-    transform.setLatLngZoom(latLng, 10);
-    transform.setZoom(2);
+    transform.jumpTo(CameraOptions().withCenter(latLng).withZoom(2.0));
     ASSERT_DOUBLE_EQ(2, transform.getZoom());
     ASSERT_NEAR(latLng.latitude(), transform.getLatLng().latitude(), 0.000001);
     ASSERT_NEAR(latLng.longitude(), transform.getLatLng().longitude(), 0.000001);
 
-    transform.setZoom(4, invalidAnchorPoint);
+    transform.jumpTo(CameraOptions().withZoom(4.0));
     ASSERT_DOUBLE_EQ(4, transform.getZoom());
     ASSERT_NEAR(latLng.latitude(), transform.getLatLng().latitude(), 0.000001);
     ASSERT_NEAR(latLng.longitude(), transform.getLatLng().longitude(), 0.000001);
 
-    transform.setZoom(8, anchorPoint);
+    transform.jumpTo(CameraOptions().withZoom(8.0).withAnchor(anchorPoint));
     ASSERT_DOUBLE_EQ(8, transform.getZoom());
     ASSERT_NE(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_NE(latLng.longitude(), transform.getLatLng().longitude());
 
-    transform.setLatLngZoom(latLng, 10);
-    transform.setAngle(M_PI_4);
+    transform.jumpTo(CameraOptions().withCenter(latLng).withZoom(10.0).withAngle(-45.0));
     ASSERT_NEAR(M_PI_4, transform.getAngle(), 0.000001);
     ASSERT_DOUBLE_EQ(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
 
-    transform.setAngle(0, invalidAnchorPoint);
+    transform.jumpTo(CameraOptions().withAngle(0.0));
     ASSERT_DOUBLE_EQ(0, transform.getAngle());
     ASSERT_DOUBLE_EQ(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
 
-    transform.setAngle(45 * util::DEG2RAD, anchorPoint);
-    ASSERT_NEAR(45 / util::RAD2DEG, transform.getAngle(), 0.000001);
+    transform.jumpTo(CameraOptions().withAngle(45.0).withAnchor(anchorPoint));
+    ASSERT_NEAR(-45.0 * util::DEG2RAD, transform.getAngle(), 0.000001);
     ASSERT_NEAR(anchorLatLng.latitude(), transform.getLatLng().latitude(), 1);
     ASSERT_NEAR(anchorLatLng.longitude(), transform.getLatLng().longitude(), 1);
 
-    transform.setLatLngZoom(latLng, 10);
-    transform.setPitch(10 * util::DEG2RAD);
-    ASSERT_DOUBLE_EQ(10 / util::RAD2DEG, transform.getPitch());
+    transform.jumpTo(CameraOptions().withCenter(latLng).withZoom(10.0).withPitch(10.0));
+    ASSERT_DOUBLE_EQ(10.0 * util::DEG2RAD, transform.getPitch());
     ASSERT_DOUBLE_EQ(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
 
-    transform.setPitch(15 * util::DEG2RAD, invalidAnchorPoint);
-    ASSERT_DOUBLE_EQ(15 / util::RAD2DEG, transform.getPitch());
+    transform.jumpTo(CameraOptions().withPitch(15.0));
+    ASSERT_DOUBLE_EQ(15.0 * util::DEG2RAD, transform.getPitch());
     ASSERT_DOUBLE_EQ(latLng.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng.longitude(), transform.getLatLng().longitude());
 
-    transform.setPitch(20 * util::DEG2RAD, anchorPoint);
-    ASSERT_DOUBLE_EQ(20 / util::RAD2DEG, transform.getPitch());
+    transform.jumpTo(CameraOptions().withPitch(20.0).withAnchor(anchorPoint));
+    ASSERT_DOUBLE_EQ(20.0 * util::DEG2RAD, transform.getPitch());
     ASSERT_NEAR(anchorLatLng.latitude(), transform.getLatLng().latitude(), 1);
     ASSERT_NEAR(anchorLatLng.longitude(), transform.getLatLng().longitude(), 1);
 }
@@ -304,7 +285,7 @@ TEST(Transform, Padding) {
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
 
-    transform.setLatLngZoom({ 10, -100 }, 10);
+    transform.jumpTo(CameraOptions().withCenter(LatLng { 10, -100 }).withZoom(10.0));
 
     const LatLng trueCenter = transform.getLatLng();
     ASSERT_DOUBLE_EQ(10, trueCenter.latitude());
@@ -327,7 +308,8 @@ TEST(Transform, Padding) {
 TEST(Transform, MoveBy) {
     Transform transform;
     transform.resize({ 1000, 1000 });
-    transform.setLatLngZoom({ 0, 0 }, 10);
+
+    transform.jumpTo(CameraOptions().withCenter(LatLng()).withZoom(10.0));
 
     LatLng trueCenter = transform.getLatLng();
     ASSERT_DOUBLE_EQ(0, trueCenter.latitude());
@@ -354,7 +336,8 @@ TEST(Transform, MoveBy) {
 TEST(Transform, Antimeridian) {
     Transform transform;
     transform.resize({ 1000, 1000 });
-    transform.setLatLngZoom({ 0, 0 }, 1);
+
+    transform.jumpTo(CameraOptions().withCenter(LatLng()).withZoom(1.0));
 
     // San Francisco
     const LatLng coordinateSanFrancisco { 37.7833, -122.4167 };
@@ -362,7 +345,7 @@ TEST(Transform, Antimeridian) {
     ASSERT_NEAR(151.79409149185352, pixelSF.x, 1e-2);
     ASSERT_NEAR(383.76774094913071, pixelSF.y, 1e-2);
 
-    transform.setLatLng({ 0, -181 });
+    transform.jumpTo(CameraOptions().withCenter(LatLng { 0.0, -181.0 }));
 
     ScreenCoordinate pixelSFLongest = transform.latLngToScreenCoordinate(coordinateSanFrancisco);
     ASSERT_NEAR(-357.36306616412816, pixelSFLongest.x, 1e-2);
@@ -374,19 +357,19 @@ TEST(Transform, Antimeridian) {
     ASSERT_NEAR(666.63617954008976, pixelSFShortest.x, 1e-2);
     ASSERT_DOUBLE_EQ(pixelSF.y, pixelSFShortest.y);
 
-    transform.setLatLng({ 0, 179 });
+    transform.jumpTo(CameraOptions().withCenter(LatLng { 0.0, 179.0 }));
     pixelSFShortest = transform.latLngToScreenCoordinate(coordinateSanFrancisco);
     ASSERT_DOUBLE_EQ(pixelSFLongest.x, pixelSFShortest.x);
     ASSERT_DOUBLE_EQ(pixelSFLongest.y, pixelSFShortest.y);
 
     // Waikiri
     const LatLng coordinateWaikiri{ -16.9310, 179.9787 };
-    transform.setLatLngZoom(coordinateWaikiri, 10);
+    transform.jumpTo(CameraOptions().withCenter(coordinateWaikiri).withZoom(10.0));
     ScreenCoordinate pixelWaikiri = transform.latLngToScreenCoordinate(coordinateWaikiri);
     ASSERT_NEAR(500, pixelWaikiri.x, 1e-2);
     ASSERT_NEAR(500, pixelWaikiri.y, 1e-2);
 
-    transform.setLatLng({ coordinateWaikiri.latitude(), 180.0213 });
+    transform.jumpTo(CameraOptions().withCenter(LatLng { coordinateWaikiri.latitude(), 180.0213 }));
     ScreenCoordinate pixelWaikiriLongest = transform.latLngToScreenCoordinate(coordinateWaikiri);
     ASSERT_NEAR(524725.96438108233, pixelWaikiriLongest.x, 1e-2);
     ASSERT_DOUBLE_EQ(pixelWaikiri.y, pixelWaikiriLongest.y);
@@ -401,7 +384,7 @@ TEST(Transform, Antimeridian) {
     ASSERT_NEAR(coordinateWaikiri.latitude(), coordinateFromPixel.latitude(), 0.000001);
     ASSERT_NEAR(coordinateWaikiri.longitude(), coordinateFromPixel.longitude(), 0.000001);
 
-    transform.setLatLng({ coordinateWaikiri.latitude(), -179.9787 });
+    transform.jumpTo(CameraOptions().withCenter(LatLng { coordinateWaikiri.latitude(), 180.0213 }));
     pixelWaikiriShortest = transform.latLngToScreenCoordinate(coordinateWaikiri);
     ASSERT_DOUBLE_EQ(pixelWaikiriLongest.x, pixelWaikiriShortest.x);
     ASSERT_DOUBLE_EQ(pixelWaikiriLongest.y, pixelWaikiriShortest.y);
@@ -416,20 +399,14 @@ TEST(Transform, Camera) {
     transform.resize({ 1000, 1000 });
 
     const LatLng latLng1 { 45, 135 };
-    CameraOptions cameraOptions1;
-    cameraOptions1.zoom = 20;
-    cameraOptions1.center = latLng1;
+    CameraOptions cameraOptions1 = CameraOptions().withCenter(latLng1).withZoom(20.0);
     transform.jumpTo(cameraOptions1);
-
     ASSERT_DOUBLE_EQ(latLng1.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng1.longitude(), transform.getLatLng().longitude());
     ASSERT_DOUBLE_EQ(20, transform.getZoom());
 
     const LatLng latLng2 { -45, -135 };
-    CameraOptions cameraOptions2;
-    cameraOptions2.zoom = 10;
-    cameraOptions2.center = latLng2;
-
+    CameraOptions cameraOptions2 = CameraOptions().withCenter(latLng2).withZoom(10.0);
     transform.jumpTo(cameraOptions2);
     ASSERT_DOUBLE_EQ(latLng2.latitude(), transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(latLng2.longitude(), transform.getLatLng().longitude());
@@ -476,6 +453,19 @@ TEST(Transform, Camera) {
     transform.updateTransitions(transform.getTransitionStart() + Milliseconds(750));
     transform.updateTransitions(transform.getTransitionStart() + transform.getTransitionDuration());
     ASSERT_FALSE(transform.inTransition());
+
+    // Anchor and center points are mutually exclusive.
+    CameraOptions camera;
+    camera.center = LatLng { 0, 0 };
+    camera.anchor = ScreenCoordinate { 0, 0 }; // top-left
+    camera.zoom = transform.getState().getMaxZoom();
+    transform.easeTo(camera, AnimationOptions(Seconds(1)));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(250));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(500));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(750));
+    transform.updateTransitions(transform.getTransitionStart() + transform.getTransitionDuration());
+    ASSERT_DOUBLE_EQ(transform.getLatLng().latitude(), 0);
+    ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), 0);
 }
 
 TEST(Transform, DefaultTransform) {
@@ -557,7 +547,8 @@ TEST(Transform, LatLngBounds) {
 
     Transform transform;
     transform.resize({ 1000, 1000 });
-    transform.setLatLngZoom({ 0, 0 }, transform.getState().getMaxZoom());
+
+    transform.jumpTo(CameraOptions().withCenter(LatLng()).withZoom(transform.getState().getMaxZoom()));
 
     // Default bounds.
     ASSERT_EQ(transform.getState().getLatLngBounds(), optional<LatLngBounds> {});
@@ -571,7 +562,7 @@ TEST(Transform, LatLngBounds) {
         ASSERT_EQ(transform.getState().getLatLngBounds(), optional<LatLngBounds> {});
     }
 
-    transform.setLatLng(sanFrancisco);
+    transform.jumpTo(CameraOptions().withCenter(sanFrancisco));
     ASSERT_EQ(transform.getLatLng(), sanFrancisco);
 
     // Single location.
@@ -579,17 +570,17 @@ TEST(Transform, LatLngBounds) {
     ASSERT_EQ(transform.getLatLng(), sanFrancisco);
 
     transform.setLatLngBounds(LatLngBounds::hull({ -90.0, -180.0 }, { 0.0, 180.0 }));
-    transform.setLatLng(sanFrancisco);
+    transform.jumpTo(CameraOptions().withCenter(sanFrancisco));
     ASSERT_EQ(transform.getLatLng().latitude(), 0.0);
     ASSERT_EQ(transform.getLatLng().longitude(), sanFrancisco.longitude());
 
     transform.setLatLngBounds(LatLngBounds::hull({ -90.0, 0.0 }, { 90.0, 180.0 }));
-    transform.setLatLng(sanFrancisco);
+    transform.jumpTo(CameraOptions().withCenter(sanFrancisco));
     ASSERT_EQ(transform.getLatLng().latitude(), sanFrancisco.latitude());
     ASSERT_EQ(transform.getLatLng().longitude(), 0.0);
 
     transform.setLatLngBounds(LatLngBounds::hull({ -90.0, 0.0 }, { 0.0, 180.0 }));
-    transform.setLatLng(sanFrancisco);
+    transform.jumpTo(CameraOptions().withCenter(sanFrancisco));
     ASSERT_EQ(transform.getLatLng().latitude(), 0.0);
     ASSERT_EQ(transform.getLatLng().longitude(), 0.0);
 }
@@ -597,17 +588,18 @@ TEST(Transform, LatLngBounds) {
 TEST(Transform, PitchBounds) {
     Transform transform;
     transform.resize({ 1000, 1000 });
-    transform.setLatLngZoom({ 0, 0 }, transform.getState().getMaxZoom());
+
+    transform.jumpTo(CameraOptions().withCenter(LatLng()).withZoom(transform.getState().getMaxZoom()));
 
     ASSERT_DOUBLE_EQ(transform.getState().getPitch() * util::RAD2DEG, 0.0);
     ASSERT_DOUBLE_EQ(transform.getState().getMinPitch() * util::RAD2DEG, 0.0);
     ASSERT_DOUBLE_EQ(transform.getState().getMaxPitch() * util::RAD2DEG, 60.0);
 
     transform.setMinPitch(45.0 * util::DEG2RAD);
-    transform.setPitch(0.0 * util::DEG2RAD);
+    transform.jumpTo(CameraOptions().withPitch(0));
     ASSERT_NEAR(transform.getState().getPitch() * util::RAD2DEG, 45.0, 1e-5);
 
     transform.setMaxPitch(55.0 * util::DEG2RAD);
-    transform.setPitch(60.0 * util::DEG2RAD);
+    transform.jumpTo(CameraOptions().withPitch(60.0));
     ASSERT_NEAR(transform.getState().getPitch() * util::RAD2DEG, 55.0, 1e-5);
 }

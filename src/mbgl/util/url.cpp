@@ -1,8 +1,6 @@
 #include <mbgl/util/url.hpp>
 #include <mbgl/util/token.hpp>
 
-#include <iomanip>
-#include <sstream>
 #include <string>
 #include <cstdlib>
 #include <algorithm>
@@ -24,26 +22,30 @@ inline bool isSchemeCharacter(char c) {
     return isAlphaNumericCharacter(c) || c == '-' || c == '+' || c == '.';
 }
 
+inline char toLowerHex(char c) {
+    c &= 0x0F;
+    return '0' + c + (c > 9 ? 39 : 0);
+}
+
 } // namespace
 
 namespace mbgl {
 namespace util {
 
 std::string percentEncode(const std::string& input) {
-    std::ostringstream encoded;
-
-    encoded.fill('0');
-    encoded << std::hex;
+    std::string encoded;
 
     for (auto c : input) {
         if (isAlphaNumericCharacter(c) || c == '-' || c == '_' || c == '.' || c == '~') {
-            encoded << c;
+            encoded += c;
         } else {
-            encoded << '%' << std::setw(2) << int(c);
+            encoded += '%';
+            encoded += toLowerHex(c >> 4);
+            encoded += toLowerHex(c);
         }
     }
 
-    return encoded.str();
+    return encoded;
 }
 
 std::string percentDecode(const std::string& input) {

@@ -18,7 +18,7 @@ HeatmapBucket::HeatmapBucket(const BucketParameters& parameters, const std::vect
             std::piecewise_construct,
             std::forward_as_tuple(layer->getID()),
             std::forward_as_tuple(
-                layer->as<RenderHeatmapLayer>()->evaluated,
+                toRenderHeatmapLayer(layer)->evaluated,
                 parameters.tileID.overscaledZ));
     }
 }
@@ -50,10 +50,9 @@ void HeatmapBucket::addFeature(const GeometryTileFeature& feature,
             auto y = point.y;
 
             // Do not include points that are outside the tile boundaries.
-            // Include all points in Still mode. You need to include points from
-            // neighbouring tiles so that they are not clipped at tile boundaries.
-            if ((mode == MapMode::Continuous) &&
-                (x < 0 || x >= util::EXTENT || y < 0 || y >= util::EXTENT)) continue;
+            if (x < 0 || x >= util::EXTENT || y < 0 || y >= util::EXTENT) {
+                continue;
+            }
 
             if (segments.empty() || segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
                 // Move to a new segments because the old one can't hold the geometry.

@@ -6,6 +6,14 @@
 
 using namespace mbgl::util;
 
+TEST(URL, percentEncode) {
+    EXPECT_EQ("%22%c3%a9nc%c3%b8%c3%b0ing%22", percentEncode("\"éncøðing\""));
+}
+
+TEST(URL, percentDecode) {
+    EXPECT_EQ("\"éncøðing\"", percentDecode("%22%C3%A9nc%C3%B8%C3%B0ing%22"));
+}
+
 TEST(URL, Scheme) {
     EXPECT_EQ(URL::Segment({ 0, 4 }), URL("http://example.com/test?query=foo").scheme);
     EXPECT_EQ(URL::Segment({ 0, 4 }), URL("http://127.0.0.1:8080/test?query=foo").scheme);

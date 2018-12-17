@@ -2,8 +2,6 @@ package com.mapbox.mapboxsdk.testapp.maps
 
 import android.graphics.PointF
 import android.support.test.espresso.UiController
-import com.mapbox.mapboxsdk.camera.CameraPosition
-import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
@@ -67,10 +65,10 @@ class VisibleRegionTest : BaseActivityTest() {
       )
 
       mapboxMap.setPadding(
-        (mapView.width / 4f).toInt(),
-        (mapView.height / 4f).toInt(),
-        (mapView.width / 4f).toInt(),
-        (mapView.height / 4f).toInt())
+        mapView.width / 4,
+        mapView.height / 4,
+        mapView.width / 4,
+        mapView.height / 4)
 
       val visibleRegion = mapboxMap.projection.getVisibleRegion(false)
       val filtered = latLngs.filter { visibleRegion.latLngBounds.contains(it) }
@@ -96,7 +94,7 @@ class VisibleRegionTest : BaseActivityTest() {
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f)
       )
 
-      mapboxMap.setPadding((mapView.width / 4f).toInt(), 0, 0, 0)
+      mapboxMap.setPadding(mapView.width / 4, 0, 0, 0)
 
       val visibleRegion = mapboxMap.projection.getVisibleRegion(false)
       val filtered = latLngs.filter { visibleRegion.latLngBounds.contains(it) }
@@ -122,7 +120,7 @@ class VisibleRegionTest : BaseActivityTest() {
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f)
       )
 
-      mapboxMap.setPadding(0, (mapView.height / 4f).toInt(), 0, 0)
+      mapboxMap.setPadding(0, mapView.height / 4, 0, 0)
 
       val visibleRegion = mapboxMap.projection.getVisibleRegion(false)
       val filtered = latLngs.filter { visibleRegion.latLngBounds.contains(it) }
@@ -148,7 +146,7 @@ class VisibleRegionTest : BaseActivityTest() {
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f)
       )
 
-      mapboxMap.setPadding(0, 0, (mapView.width / 4f).toInt(), 0)
+      mapboxMap.setPadding(0, 0, mapView.width / 4, 0)
 
       val visibleRegion = mapboxMap.projection.getVisibleRegion(false)
       val filtered = latLngs.filter { visibleRegion.latLngBounds.contains(it) }
@@ -174,7 +172,7 @@ class VisibleRegionTest : BaseActivityTest() {
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f)
       )
 
-      mapboxMap.setPadding(0, 0, 0, (mapView.height / 4f).toInt())
+      mapboxMap.setPadding(0, 0, 0, mapView.height / 4)
 
       val visibleRegion = mapboxMap.projection.getVisibleRegion(false)
       val filtered = latLngs.filter { visibleRegion.latLngBounds.contains(it) }
@@ -191,9 +189,12 @@ class VisibleRegionTest : BaseActivityTest() {
       val latLngs = listOf(
         mapboxMap.getLatLngFromScreenCoords(0f, 0f),
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat()),
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat())
+          .also { it.longitude += 360 },
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height / 2f),
@@ -222,10 +223,10 @@ class VisibleRegionTest : BaseActivityTest() {
       )
 
       mapboxMap.setPadding(
-        (mapView.width / 4f).toInt(),
-        (mapView.height / 4f).toInt(),
-        (mapView.width / 4f).toInt(),
-        (mapView.height / 4f).toInt())
+        mapView.width / 4,
+        mapView.height / 4,
+        mapView.width / 4,
+        mapView.height / 4)
 
       val visibleRegion = mapboxMap.projection.getVisibleRegion(false)
       val filtered = latLngs.filter { visibleRegion.latLngBounds.contains(it) }
@@ -242,16 +243,19 @@ class VisibleRegionTest : BaseActivityTest() {
       val latLngs = listOf(
         mapboxMap.getLatLngFromScreenCoords(0f, 0f),
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat()),
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat())
+          .also { it.longitude += 360 },
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height / 2f),
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f)
       )
 
-      mapboxMap.setPadding((mapView.width / 4f).toInt(), 0, 0, 0)
+      mapboxMap.setPadding(mapView.width / 4, 0, 0, 0)
 
       val visibleRegion = mapboxMap.projection.getVisibleRegion(false)
       val filtered = latLngs.filter { visibleRegion.latLngBounds.contains(it) }
@@ -265,19 +269,23 @@ class VisibleRegionTest : BaseActivityTest() {
     validateTestSetup()
     invoke(mapboxMap) { _: UiController, mapboxMap: MapboxMap ->
       mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(0.0, 180.0), 8.0))
+
       val latLngs = listOf(
         mapboxMap.getLatLngFromScreenCoords(0f, 0f),
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat()),
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat())
+          .also { it.longitude += 360 },
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height / 2f),
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f)
       )
 
-      mapboxMap.setPadding(0, (mapView.height / 4f).toInt(), 0, 0)
+      mapboxMap.setPadding(0, mapView.height / 4, 0, 0)
 
       val visibleRegion = mapboxMap.projection.getVisibleRegion(false)
       val filtered = latLngs.filter { visibleRegion.latLngBounds.contains(it) }
@@ -294,16 +302,19 @@ class VisibleRegionTest : BaseActivityTest() {
       val latLngs = listOf(
         mapboxMap.getLatLngFromScreenCoords(0f, 0f),
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat()),
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f)
+           .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat())
+          .also { it.longitude += 360 },
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height / 2f),
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f)
       )
 
-      mapboxMap.setPadding(0, 0, (mapView.width / 4f).toInt(), 0)
+      mapboxMap.setPadding(0, 0, mapView.width / 4, 0)
 
       val visibleRegion = mapboxMap.projection.getVisibleRegion(false)
       val filtered = latLngs.filter { visibleRegion.latLngBounds.contains(it) }
@@ -320,16 +331,19 @@ class VisibleRegionTest : BaseActivityTest() {
       val latLngs = listOf(
         mapboxMap.getLatLngFromScreenCoords(0f, 0f),
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f),
-        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat()),
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), 0f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height / 2f)
+          .also { it.longitude += 360 },
+        mapboxMap.getLatLngFromScreenCoords(mapView.width.toFloat(), mapView.height.toFloat())
+          .also { it.longitude += 360 },
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height.toFloat()),
         mapboxMap.getLatLngFromScreenCoords(0f, mapView.height / 2f),
         mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f)
       )
 
-      mapboxMap.setPadding(0, 0, 0, (mapView.height / 4f).toInt())
+      mapboxMap.setPadding(0, 0, 0, mapView.height / 4)
 
       val visibleRegion = mapboxMap.projection.getVisibleRegion(false)
       val filtered = latLngs.filter { visibleRegion.latLngBounds.contains(it) }
@@ -370,7 +384,8 @@ class VisibleRegionTest : BaseActivityTest() {
             val latLngs = listOf(
                     mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f),
                     mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f - d / 2f, mapView.height / 2f),
-                    mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f + d / 2f, mapView.height / 2f),
+                    mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f + d / 2f, mapView.height / 2f)
+                      .also { it.longitude += 360 },
                     mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f - d / 2f),
                     mapboxMap.getLatLngFromScreenCoords(mapView.width / 2f, mapView.height / 2f + d / 2f)
             )

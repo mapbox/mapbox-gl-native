@@ -16,6 +16,8 @@ public:
 
     Properties<>::Unevaluated layout;
     FillPaintProperties::Transitionable paint;
+
+    DECLARE_LAYER_TYPE_INFO;
 };
 
 } // namespace style

@@ -1,5 +1,6 @@
 #import "MGLMapCamera.h"
 #import "MGLGeometry_Private.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #import <CoreLocation/CoreLocation.h>
 
@@ -91,6 +92,7 @@ BOOL MGLEqualFloatWithAccuracy(CGFloat left, CGFloat right, CGFloat accuracy)
                                    pitch:(CGFloat)pitch
                                  heading:(CLLocationDirection)heading
 {
+    MGLLogDebug(@"Initializing withCenterCoordinate: %@ altitude: %.0fm pitch: %f° heading: %f°", MGLStringFromCLLocationCoordinate2D(centerCoordinate), altitude, pitch, heading);
     if (self = [super init])
     {
         _centerCoordinate = centerCoordinate;
@@ -103,6 +105,7 @@ BOOL MGLEqualFloatWithAccuracy(CGFloat left, CGFloat right, CGFloat accuracy)
 
 - (nullable instancetype)initWithCoder:(NSCoder *)coder
 {
+    MGLLogInfo(@"Initialiazing with coder.");
     if (self = [super init])
     {
         _centerCoordinate = CLLocationCoordinate2DMake([coder decodeDoubleForKey:@"centerLatitude"],
@@ -141,6 +144,7 @@ BOOL MGLEqualFloatWithAccuracy(CGFloat left, CGFloat right, CGFloat accuracy)
 }
 
 - (void)setViewingDistance:(CLLocationDistance)distance {
+    MGLLogDebug(@"Setting viewingDistance: %f", distance);
     CLLocationDirection eyeAngle = 90 - self.pitch;
     self.altitude = distance * sin(MGLRadiansFromDegrees(eyeAngle));
 }

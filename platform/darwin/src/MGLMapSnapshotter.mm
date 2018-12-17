@@ -15,6 +15,11 @@
 #import "NSBundle+MGLAdditions.h"
 #import "MGLStyle.h"
 #import "MGLAttributionInfo_Private.h"
+#import "MGLLoggingConfiguration_Private.h"
+#import "MGLRendererConfiguration.h"
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#import "MGLMapboxEvents.h"
+#endif
 
 #if TARGET_OS_IPHONE
 #import "UIImage+MGLAdditions.h"
@@ -29,10 +34,12 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 @implementation MGLMapSnapshotOptions
 
-- (instancetype _Nonnull)initWithStyleURL:(nullable NSURL *)styleURL camera:(MGLMapCamera *)camera size:(CGSize) size
+- (instancetype _Nonnull)initWithStyleURL:(nullable NSURL *)styleURL camera:(MGLMapCamera *)camera size:(CGSize)size
 {
+    MGLLogDebug(@"Initializing withStyleURL: %@ camera: %@ size: %@", styleURL, camera, MGLStringFromSize(size));
     self = [super init];
-    if (self) {
+    if (self)
+    {
         if ( !styleURL)
         {
             styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
@@ -45,7 +52,6 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 #else
         _scale = [NSScreen mainScreen].backingScaleFactor;
 #endif
-        
     }
     return self;
 }
@@ -110,6 +116,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 @interface MGLMapSnapshotter()
 @property (nonatomic) BOOL cancelled;
+@property (nonatomic) BOOL terminated;
 @property (nonatomic) dispatch_queue_t resultQueue;
 @property (nonatomic, copy) MGLMapSnapshotCompletionHandler completion;
 + (void)completeWithErrorCode:(MGLErrorCode)errorCode description:(nonnull NSString*)description onQueue:(dispatch_queue_t)queue completion:(MGLMapSnapshotCompletionHandler)completion;
@@ -122,8 +129,10 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 }
 
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     if (_completion) {
-        NSAssert(_snapshotCallback, @"Snapshot in progress - there should be a valid callback");
+        MGLAssert(_snapshotCallback, @"Snapshot in progress - there should be a valid callback");
 
         [MGLMapSnapshotter completeWithErrorCode:MGLErrorCodeSnapshotFailed
                                      description:@"MGLMapSnapshotter deallocated prior to snapshot completion."
@@ -132,17 +141,47 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     }
 }
 
+
+- (instancetype)init {
+    NSAssert(NO, @"Please use -[MGLMapSnapshotter initWithOptions:]");
+    [super doesNotRecognizeSelector:_cmd];
+    return nil;
+}
+
 - (instancetype)initWithOptions:(MGLMapSnapshotOptions *)options
 {
+    MGLLogDebug(@"Initializing withOptions: %@", options);
     self = [super init];
     if (self) {
         [self setOptions:options];
+#if TARGET_OS_IPHONE
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:UIApplicationWillTerminateNotification object:nil];
+#else
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+#endif
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+        [MGLMapboxEvents pushTurnstileEvent];
+#endif
     }
     return self;
 }
 
+- (void)applicationWillTerminate:(NSNotification *)notification
+{
+    if (self.completion) {
+        [self cancel];
+    }
+
+    _mbglMapSnapshotter.reset();
+    _snapshotCallback.reset();
+    _mbglThreadPool.reset();
+    
+    self.terminated = YES;
+}
+
 - (void)startWithCompletionHandler:(MGLMapSnapshotCompletionHandler)completion
 {
+    MGLLogDebug(@"Starting withCompletionHandler: %@", completion);
     [self startWithQueue:dispatch_get_main_queue() completionHandler:completion];
 }
 
@@ -158,7 +197,12 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
         [NSException raise:NSInternalInconsistencyException
                     format:@"Already started this snapshotter."];
     }
-    
+
+    if (self.terminated) {
+        [NSException raise:NSInternalInconsistencyException
+                    format:@"Starting a snapshotter after application termination is not supported."];
+    }
+
     self.completion = completion;
     self.resultQueue = queue;
     self.cancelled = NO;
@@ -173,7 +217,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
         __typeof__(self) strongSelf = weakSelf;
         // If self had died, _snapshotCallback would have been destroyed and this block would not be executed
-        NSCAssert(strongSelf, @"Snapshot callback executed after being destroyed.");
+        MGLCAssert(strongSelf, @"Snapshot callback executed after being destroyed.");
 
         if (!strongSelf.completion)
             return;
@@ -500,6 +544,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (void)cancel
 {
+    MGLLogInfo(@"Cancelling snapshotter.");
     self.cancelled = YES;
     
     if (_snapshotCallback) {
@@ -529,6 +574,18 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 - (void)setOptions:(MGLMapSnapshotOptions *)options
 {
+    if (_terminated) {
+        [NSException raise:NSInternalInconsistencyException
+                    format:@"Calling MGLMapSnapshotter.options after application termination is not supported."];
+    }
+
+    MGLLogDebug(@"Setting options: %@", options);
+
+    if (_completion) {
+        [self cancel];
+    }
+    
+    _cancelled = NO;
     _options = options;
     mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
     _mbglThreadPool = mbgl::sharedThreadPool();
@@ -560,8 +617,11 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
         coordinateBounds = MGLLatLngBoundsFromCoordinateBounds(options.coordinateBounds);
     }
     
+    // App-global configuration
+    MGLRendererConfiguration* config = [MGLRendererConfiguration currentConfiguration];
+    
     // Create the snapshotter
-    _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(mbglFileSource, _mbglThreadPool, style, size, pixelRatio, cameraOptions, coordinateBounds);
+    _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(mbglFileSource, _mbglThreadPool, style, size, pixelRatio, cameraOptions, coordinateBounds, config.cacheDir, config.localFontFamilyName);
 }
 
 @end

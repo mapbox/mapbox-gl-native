@@ -6,7 +6,6 @@
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
 #include <mbgl/style/expression/formatted.hpp>
-
 #include <mbgl/util/color.hpp>
 
 namespace mbgl {
@@ -18,21 +17,6 @@ class FillExtrusionLayer : public Layer {
 public:
     FillExtrusionLayer(const std::string& layerID, const std::string& sourceID);
     ~FillExtrusionLayer() final;
-
-    // Source
-    const std::string& getSourceID() const;
-    const std::string& getSourceLayer() const;
-    void setSourceLayer(const std::string& sourceLayer);
-
-    void setFilter(const Filter&);
-    const Filter& getFilter() const;
-
-    // Visibility
-    void setVisibility(VisibilityType) final;
-
-    // Zoom range
-    void setMinZoom(float) final;
-    void setMaxZoom(float) final;
 
     // Dynamic properties
     optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
@@ -82,6 +66,12 @@ public:
     void setFillExtrusionBaseTransition(const TransitionOptions&);
     TransitionOptions getFillExtrusionBaseTransition() const;
 
+    static PropertyValue<bool> getDefaultFillExtrusionVerticalGradient();
+    PropertyValue<bool> getFillExtrusionVerticalGradient() const;
+    void setFillExtrusionVerticalGradient(PropertyValue<bool>);
+    void setFillExtrusionVerticalGradientTransition(const TransitionOptions&);
+    TransitionOptions getFillExtrusionVerticalGradientTransition() const;
+
     // Private implementation
 
     class Impl;
@@ -90,12 +80,10 @@ public:
     Mutable<Impl> mutableImpl() const;
     FillExtrusionLayer(Immutable<Impl>);
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
-};
 
-template <>
-inline bool Layer::is<FillExtrusionLayer>() const {
-    return getType() == LayerType::FillExtrusion;
-}
+protected:
+    Mutable<Layer::Impl> mutableBaseImpl() const final;
+};
 
 } // namespace style
 } // namespace mbgl

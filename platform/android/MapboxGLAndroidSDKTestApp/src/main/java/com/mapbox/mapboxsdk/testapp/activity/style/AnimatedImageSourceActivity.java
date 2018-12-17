@@ -16,6 +16,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngQuad;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.RasterLayer;
 import com.mapbox.mapboxsdk.style.sources.ImageSource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -24,7 +25,7 @@ import com.mapbox.mapboxsdk.testapp.R;
  * Test activity showing how to use a series of images to create an animation
  * with an ImageSource
  * <p>
- *   GL-native equivalent of https://www.mapbox.com/mapbox-gl-js/example/animate-images/
+ * GL-native equivalent of https://www.mapbox.com/mapbox-gl-js/example/animate-images/
  * </p>
  */
 public class AnimatedImageSourceActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -33,41 +34,36 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
   private static final String ID_IMAGE_LAYER = "animated_image_layer";
 
   private MapView mapView;
-  private MapboxMap mapboxMap;
-
-  private Handler handler;
+  private final Handler handler = new Handler();
   private Runnable runnable;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_animated_image_source);
-
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
   }
 
   @Override
   public void onMapReady(@NonNull final MapboxMap map) {
-    mapboxMap = map;
-
-    // add source
     LatLngQuad quad = new LatLngQuad(
-        new LatLng(46.437, -80.425),
-        new LatLng(46.437, -71.516),
-        new LatLng(37.936, -71.516),
-        new LatLng(37.936, -80.425));
-    mapboxMap.addSource(new ImageSource(ID_IMAGE_SOURCE, quad, R.drawable.southeast_radar_0));
+      new LatLng(46.437, -80.425),
+      new LatLng(46.437, -71.516),
+      new LatLng(37.936, -71.516),
+      new LatLng(37.936, -80.425));
 
-    // add layer
-    RasterLayer layer = new RasterLayer(ID_IMAGE_LAYER, ID_IMAGE_SOURCE);
-    mapboxMap.addLayer(layer);
-
-    // loop refresh geojson
-    handler = new Handler();
-    runnable = new RefreshImageRunnable(mapboxMap, handler);
-    handler.postDelayed(runnable, 100);
+    final ImageSource imageSource = new ImageSource(ID_IMAGE_SOURCE, quad, R.drawable.southeast_radar_0);
+    final RasterLayer layer = new RasterLayer(ID_IMAGE_LAYER, ID_IMAGE_SOURCE);
+    map.setStyle(new Style.Builder()
+        .fromUrl(Style.MAPBOX_STREETS)
+        .withSource(imageSource)
+        .withLayer(layer), style -> {
+        runnable = new RefreshImageRunnable(imageSource, handler);
+        handler.postDelayed(runnable, 100);
+      }
+    );
   }
 
   @Override
@@ -109,7 +105,7 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
 
   private static class RefreshImageRunnable implements Runnable {
 
-    private MapboxMap mapboxMap;
+    private ImageSource imageSource;
     private Handler handler;
     private Bitmap[] drawables;
     private int drawableIndex;
@@ -124,8 +120,8 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
       return null;
     }
 
-    RefreshImageRunnable(MapboxMap mapboxMap, Handler handler) {
-      this.mapboxMap = mapboxMap;
+    RefreshImageRunnable(ImageSource imageSource, Handler handler) {
+      this.imageSource = imageSource;
       this.handler = handler;
       drawables = new Bitmap[4];
       drawables[0] = getBitmap(R.drawable.southeast_radar_0);
@@ -137,7 +133,7 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
 
     @Override
     public void run() {
-      ((ImageSource) mapboxMap.getSource(ID_IMAGE_SOURCE)).setImage(drawables[drawableIndex++]);
+      imageSource.setImage(drawables[drawableIndex++]);
       if (drawableIndex > 3) {
         drawableIndex = 0;
       }

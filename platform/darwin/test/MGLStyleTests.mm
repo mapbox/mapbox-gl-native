@@ -141,9 +141,9 @@
 - (void)testSources {
     NSSet<MGLSource *> *initialSources = self.style.sources;
     if ([initialSources.anyObject.identifier isEqualToString:@"com.mapbox.annotations"]) {
-        XCTAssertEqual(self.style.sources.count, 1);
+        XCTAssertEqual(self.style.sources.count, 1UL);
     } else {
-        XCTAssertEqual(self.style.sources.count, 0);
+        XCTAssertEqual(self.style.sources.count, 0UL);
     }
     MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
     [self.style addSource:shapeSource];
@@ -237,7 +237,12 @@
     [self.style addLayer:fillLayer];
 
     // Attempt to remove the raster tile source
-    [self.style removeSource:rasterTileSource];
+    NSError *error;
+    BOOL result = [self.style removeSource:rasterTileSource error:&error];
+    
+    XCTAssertFalse(result);
+    XCTAssertEqualObjects(error.domain, MGLErrorDomain);
+    XCTAssertEqual(error.code, MGLErrorCodeSourceIsInUseCannotRemove);
     
     // Ensure it is still there
     XCTAssertTrue([[self.style sourceWithIdentifier:rasterTileSource.identifier] isMemberOfClass:[MGLRasterTileSource class]]);
@@ -246,9 +251,9 @@
 - (void)testLayers {
     NSArray<MGLStyleLayer *> *initialLayers = self.style.layers;
     if ([initialLayers.firstObject.identifier isEqualToString:@"com.mapbox.annotations.points"]) {
-        XCTAssertEqual(self.style.layers.count, 1);
+        XCTAssertEqual(self.style.layers.count, 1UL);
     } else {
-        XCTAssertEqual(self.style.layers.count, 0);
+        XCTAssertEqual(self.style.layers.count, 0UL);
     }
     MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shapeSource" shape:nil options:nil];
     [self.style addSource:shapeSource];
@@ -463,6 +468,26 @@
         NSArray *preferences = @[@"mul"];
         XCTAssertNil([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences]);
     }
+}
+
+#pragma mark Transition tests
+
+- (void)testTransition
+{
+    MGLTransition transitionTest = MGLTransitionMake(5, 4);
+    
+    self.style.transition = transitionTest;
+    
+    XCTAssert(self.style.transition.delay == transitionTest.delay);
+    XCTAssert(self.style.transition.duration == transitionTest.duration);
+}
+
+- (void)testEnablePlacementTransition
+{
+    XCTAssertTrue(self.style.enablePlacementTransitions, @"The default value for enabling placement transitions should be YES.");
+    
+    self.style.enablePlacementTransitions = NO;
+    XCTAssertFalse(self.style.enablePlacementTransitions, @"Enabling placement transitions should be NO.");
 }
 
 @end

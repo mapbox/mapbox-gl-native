@@ -18,7 +18,7 @@ namespace mbgl {
 using namespace style;
 
 RenderLineLayer::RenderLineLayer(Immutable<style::LineLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Line, _impl),
+    : RenderLayer(std::move(_impl)),
       unevaluated(impl().paint.untransitioned()),
       colorRamp({256, 1}) {
 }
@@ -28,7 +28,8 @@ const style::LineLayer::Impl& RenderLineLayer::impl() const {
 }
 
 std::unique_ptr<Bucket> RenderLineLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
-    assert(false); // Should be calling createLayout() instead.
+    // Should be calling createLayout() instead.
+    assert(baseImpl->getTypeInfo()->layout == LayerTypeInfo::Layout::NotRequired);
     return nullptr;
 }
 
@@ -293,5 +294,9 @@ float RenderLineLayer::getLineWidth(const GeometryTileFeature& feature, const fl
     }
 }
 
+
+void RenderLineLayer::update() {
+    updateColorRamp();
+}
 
 } // namespace mbgl

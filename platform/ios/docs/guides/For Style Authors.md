@@ -226,6 +226,7 @@ In style JSON | In Objective-C | In Swift
 
 In style JSON | In Objective-C | In Swift
 --------------|----------------|---------
+`fill-extrusion-vertical-gradient` | `MGLFillExtrusionStyleLayer.fillExtrusionHasVerticalGradient` | `MGLFillExtrusionStyleLayer.fillExtrusionHasVerticalGradient`
 `fill-extrusion-translate` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslation` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslation`
 `fill-extrusion-translate-anchor` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslationAnchor` | `MGLFillExtrusionStyleLayer.fillExtrusionTranslationAnchor`
 
@@ -386,8 +387,9 @@ In style specification | Method, function, or predicate type | Format string syn
 `sin`                  | `mgl_sin:` | `mgl_sin(0)`
 `sqrt`                 | `sqrt:` | `sqrt(2)`
 `tan`                  | `mgl_tan:` | `mgl_tan(0)`
-`zoom`                 | `NSExpression.zoomLevelVariableExpression` | `$zoom`
+`zoom`                 | `NSExpression.zoomLevelVariableExpression` | `$zoomLevel`
 `heatmap-density`      | `NSExpression.heatmapDensityVariableExpression` | `$heatmapDensity`
+`line-progress`        | `NSExpression.lineProgressVariableExpression` | `$lineProgress`
 
 For operators that have no corresponding `NSExpression` symbol, use the
 `MGL_FUNCTION()` format string syntax.

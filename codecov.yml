@@ -1,0 +1,9 @@
+ignore:
+  - "test/"
+  - "vendor/"
+
+coverage:
+  status:
+    project:
+      default:
+        threshold: 1%

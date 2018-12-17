@@ -7,8 +7,8 @@ namespace mbgl {
 namespace shaders {
 
 const char* fill_extrusion_pattern::name = "fill_extrusion_pattern";
-const char* fill_extrusion_pattern::vertexSource = source() + 30748;
-const char* fill_extrusion_pattern::fragmentSource = source() + 34026;
+const char* fill_extrusion_pattern::vertexSource = source() + 23204;
+const char* fill_extrusion_pattern::fragmentSource = source() + 26124;
 
 // Uncompressed source of fill_extrusion_pattern.vertex.glsl:
 /*
@@ -17,6 +17,7 @@ uniform vec2 u_pixel_coord_upper;
 uniform vec2 u_pixel_coord_lower;
 uniform float u_height_factor;
 uniform vec4 u_scale;
+uniform float u_vertical_gradient;
 
 uniform vec3 u_lightcolor;
 uniform lowp vec3 u_lightpos;
@@ -132,7 +133,11 @@ void main() {
     directional = mix((1.0 - u_lightintensity), max((0.5 + u_lightintensity), 1.0), directional);
 
     if (normal.y != 0.0) {
-        directional *= clamp((t + base) * pow(height / 150.0, 0.5), mix(0.7, 0.98, 1.0 - u_lightintensity), 1.0);
+        // This avoids another branching statement, but multiplies by a constant of 0.84 if no vertical gradient,
+        // and otherwise calculates the gradient based on base + height
+        directional *= (
+            (1.0 - u_vertical_gradient) +
+            (u_vertical_gradient * clamp((t + base) * pow(height / 150.0, 0.5), mix(0.7, 0.98, 1.0 - u_lightintensity), 1.0)));
     }
 
     v_lighting.rgb += clamp(directional * u_lightcolor, mix(vec3(0.0), vec3(0.3), 1.0 - u_lightcolor), vec3(1.0));

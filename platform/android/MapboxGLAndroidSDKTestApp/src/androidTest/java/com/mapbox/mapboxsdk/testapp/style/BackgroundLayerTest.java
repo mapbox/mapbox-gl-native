@@ -3,161 +3,139 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
 import android.graphics.Color;
+import android.support.test.annotation.UiThreadTest;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.mapbox.mapboxsdk.maps.BaseLayerTest;
+import org.junit.Before;
 import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.BackgroundLayer;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.*;
-import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
 import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 
 /**
  * Basic smoke tests for BackgroundLayer
  */
 @RunWith(AndroidJUnit4.class)
-public class BackgroundLayerTest extends BaseActivityTest {
+public class BackgroundLayerTest extends BaseLayerTest {
 
   private BackgroundLayer layer;
 
-  @Override
-  protected Class getActivityClass() {
-    return EspressoTestActivity.class;
-  }
-
-  private void setupLayer() {
-    Timber.i("Retrieving layer");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      layer = mapboxMap.getLayerAs("background");
-    });
+  @Before
+  @UiThreadTest
+  public void beforeTest(){
+    super.before();
+    layer = new BackgroundLayer("my-layer");
+    setupLayer(layer);
   }
 
   @Test
+  @UiThreadTest
   public void testSetVisibility() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("Visibility");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Get initial
-      assertEquals(layer.getVisibility().getValue(), VISIBLE);
+    // Get initial
+    assertEquals(layer.getVisibility().getValue(), VISIBLE);
 
-      // Set
-      layer.setProperties(visibility(NONE));
-      assertEquals(layer.getVisibility().getValue(), NONE);
-    });
+    // Set
+    layer.setProperties(visibility(NONE));
+    assertEquals(layer.getVisibility().getValue(), NONE);
   }
 
   @Test
+  @UiThreadTest
   public void testBackgroundColorTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("background-colorTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setBackgroundColorTransition(options);
-      assertEquals(layer.getBackgroundColorTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setBackgroundColorTransition(options);
+    assertEquals(layer.getBackgroundColorTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testBackgroundColorAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("background-color");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getBackgroundColor().getValue());
 
-      // Set and Get
-      layer.setProperties(backgroundColor("rgba(0, 0, 0, 1)"));
-      assertEquals((String) layer.getBackgroundColor().getValue(), (String) "rgba(0, 0, 0, 1)");
-    });
+    // Set and Get
+    String propertyValue = "rgba(0, 0, 0, 1)";
+    layer.setProperties(backgroundColor(propertyValue));
+    assertEquals(layer.getBackgroundColor().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testBackgroundColorAsIntConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("background-color");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      layer.setProperties(backgroundColor(Color.RED));
-      assertEquals(layer.getBackgroundColorAsInt(), Color.RED);
-    });
+    // Set and Get
+    layer.setProperties(backgroundColor(Color.RED));
+    assertEquals(layer.getBackgroundColorAsInt(), Color.RED);
   }
 
   @Test
+  @UiThreadTest
   public void testBackgroundPatternTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("background-patternTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setBackgroundPatternTransition(options);
-      assertEquals(layer.getBackgroundPatternTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setBackgroundPatternTransition(options);
+    assertEquals(layer.getBackgroundPatternTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testBackgroundPatternAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("background-pattern");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getBackgroundPattern().getValue());
 
-      // Set and Get
-      layer.setProperties(backgroundPattern("pedestrian-polygon"));
-      assertEquals((String) layer.getBackgroundPattern().getValue(), (String) "pedestrian-polygon");
-    });
+    // Set and Get
+    String propertyValue = "pedestrian-polygon";
+    layer.setProperties(backgroundPattern(propertyValue));
+    assertEquals(layer.getBackgroundPattern().getValue(), propertyValue);
   }
 
   @Test
+  @UiThreadTest
   public void testBackgroundOpacityTransition() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("background-opacityTransitionOptions");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
 
-      // Set and Get
-      TransitionOptions options = new TransitionOptions(300, 100);
-      layer.setBackgroundOpacityTransition(options);
-      assertEquals(layer.getBackgroundOpacityTransition(), options);
-    });
+    // Set and Get
+    TransitionOptions options = new TransitionOptions(300, 100);
+    layer.setBackgroundOpacityTransition(options);
+    assertEquals(layer.getBackgroundOpacityTransition(), options);
   }
 
   @Test
+  @UiThreadTest
   public void testBackgroundOpacityAsConstant() {
-    validateTestSetup();
-    setupLayer();
     Timber.i("background-opacity");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      assertNotNull(layer);
+    assertNotNull(layer);
+    assertNull(layer.getBackgroundOpacity().getValue());
 
-      // Set and Get
-      layer.setProperties(backgroundOpacity(0.3f));
-      assertEquals((Float) layer.getBackgroundOpacity().getValue(), (Float) 0.3f);
-    });
+    // Set and Get
+    Float propertyValue = 0.3f;
+    layer.setProperties(backgroundOpacity(propertyValue));
+    assertEquals(layer.getBackgroundOpacity().getValue(), propertyValue);
   }
 }

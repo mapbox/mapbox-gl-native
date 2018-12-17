@@ -49,7 +49,11 @@ typedef NS_ENUM(NSInteger, MGLErrorCode) {
     /** An attempt to load the style failed. */
     MGLErrorCodeLoadStyleFailed = 5,
     /** An error occurred while snapshotting the map. */
-    MGLErrorCodeSnapshotFailed = 6
+    MGLErrorCodeSnapshotFailed = 6,
+    /** Source is in use and cannot be removed */
+    MGLErrorCodeSourceIsInUseCannotRemove = 7,
+    /** Source is in use and cannot be removed */
+    MGLErrorCodeSourceIdentifierMismatch = 8
 };
 
 /** Options for enabling debugging features in an `MGLMapView` instance. */
@@ -90,8 +94,12 @@ typedef struct __attribute__((objc_boxable)) MGLTransition {
     /**
      The amount of time in seconds to wait before beginning the animation.
      */
-    NSTimeInterval delay;
+    NSTimeInterval delay; 
 } MGLTransition;
+
+NS_INLINE NSString *MGLStringFromMGLTransition(MGLTransition transition) {
+    return [NSString stringWithFormat:@"transition { duration: %f, delay: %f }", transition.duration, transition.delay];
+}
 
 /**
  Creates a new `MGLTransition` from the given duration and delay.

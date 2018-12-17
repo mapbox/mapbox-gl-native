@@ -8,41 +8,21 @@ import com.mapbox.android.telemetry.Event;
 import com.mapbox.android.telemetry.MapEventFactory;
 import com.mapbox.android.telemetry.MapState;
 import com.mapbox.android.telemetry.MapboxTelemetry;
-import com.mapbox.android.telemetry.SessionInterval;
 import com.mapbox.android.telemetry.TelemetryEnabler;
+import com.mapbox.android.telemetry.SessionInterval;
+
 import com.mapbox.mapboxsdk.BuildConfig;
-import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
-import com.mapbox.mapboxsdk.offline.OfflineGeometryRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 
-import java.lang.reflect.Field;
-
 public class TelemetryImpl implements TelemetryDefinition {
 
-  private static final String TAG = "Mbgl-TelemetryImpl";
-  private static TelemetryImpl instance;
   @Nullable
   private MapboxTelemetry telemetry;
 
-  /**
-   * Get a single instance of TelemetryImpl.
-   *
-   * @return instance of Telemetry
-   * @deprecated reference instance from Mapbox.java instead
-   */
-  @Deprecated
-  public static synchronized TelemetryImpl getInstance() {
-    if (instance == null) {
-      instance = new TelemetryImpl();
-    }
-    return instance;
-  }
-
-  private TelemetryImpl() {
+  public TelemetryImpl() {
     Context appContext = Mapbox.getApplicationContext();
     String accessToken = Mapbox.getAccessToken();
     telemetry = new MapboxTelemetry(appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT);
@@ -116,86 +96,13 @@ public class TelemetryImpl implements TelemetryDefinition {
   }
 
   @Override
-  public void onCreateOfflineRegion(OfflineRegionDefinition offlineDefinition) {
+  public void onCreateOfflineRegion(@NonNull OfflineRegionDefinition offlineDefinition) {
     MapEventFactory mapEventFactory = new MapEventFactory();
-
-    Event mapOfflineEvent;
-    if (offlineDefinition instanceof OfflineTilePyramidRegionDefinition) {
-      OfflineTilePyramidRegionDefinition tileDefinition =
-        (OfflineTilePyramidRegionDefinition)offlineDefinition;
-      mapOfflineEvent = mapEventFactory.buildMapOfflineEvent(
-        tileDefinition.getMinZoom(), tileDefinition.getMaxZoom(), "bounds",
-        new String[]{tileDefinition.getStyleURL()});
-    } else {
-      OfflineGeometryRegionDefinition geometryDefinition =
-        (OfflineGeometryRegionDefinition) offlineDefinition;
-      mapOfflineEvent = mapEventFactory.buildMapOfflineEvent(
-        geometryDefinition.getMinZoom(), geometryDefinition.getMaxZoom(), geometryDefinition.getGeometry().type(),
-        new String[]{geometryDefinition.getStyleURL()});
-    }
-  }
-
-  /**
-   * Set the debug logging state of telemetry.
-   *
-   * @param debugLoggingEnabled true to enable logging
-   * @deprecated use {@link #setDebugLoggingEnabled(boolean)} instead
-   */
-  @Deprecated
-  public static void updateDebugLoggingEnabled(boolean debugLoggingEnabled) {
-    TelemetryDefinition definition = Mapbox.getTelemetry();
-    if (definition != null) {
-      definition.setDebugLoggingEnabled(debugLoggingEnabled);
-    }
-  }
-
-  /**
-   * Update the telemetry rotation session id interval
-   *
-   * @param interval the selected session interval
-   * @return true if rotation session id was updated
-   * @deprecated use {@link #setSessionIdRotationInterval(int)} instead
-   */
-  @Deprecated
-  public static boolean updateSessionIdRotationInterval(@NonNull SessionInterval interval) {
-    try {
-      Field field = interval.getClass().getDeclaredField("interval");
-      field.setAccessible(true);
-      Integer intervalValue = (Integer) field.get(interval);
-      TelemetryDefinition definition = Mapbox.getTelemetry();
-      if (definition != null) {
-        return definition.setSessionIdRotationInterval(intervalValue);
-      }
-    } catch (Exception exception) {
-      Logger.e(TAG, "Exception occurred when updating session id rotation interval", exception);
-      MapStrictMode.strictModeViolation(exception);
-    }
-    return false;
-  }
-
-  /**
-   * Method to be called when an end-user has selected to participate in telemetry collection.
-   *
-   * @deprecated use {@link #setUserTelemetryRequestState(boolean)} with parameter true instead
-   */
-  @Deprecated
-  public static void enableOnUserRequest() {
-    TelemetryDefinition definition = Mapbox.getTelemetry();
-    if (definition != null) {
-      definition.setUserTelemetryRequestState(true);
-    }
-  }
-
-  /**
-   * Method to be called when an end-user has selected to opt-out of telemetry collection.
-   *
-   * @deprecated use {@link #setUserTelemetryRequestState(boolean)} with parameter false instead
-   */
-  @Deprecated
-  public static void disableOnUserRequest() {
-    TelemetryDefinition definition = Mapbox.getTelemetry();
-    if (definition != null) {
-      definition.setUserTelemetryRequestState(false);
-    }
+    telemetry.push(mapEventFactory.createOfflineDownloadStartEvent(
+      offlineDefinition instanceof OfflineTilePyramidRegionDefinition ? "tileregion" : "shaperegion",
+      offlineDefinition.getMinZoom(),
+      offlineDefinition.getMaxZoom(),
+      offlineDefinition.getStyleURL())
+    );
   }
 }

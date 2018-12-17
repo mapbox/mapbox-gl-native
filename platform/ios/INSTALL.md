@@ -104,12 +104,14 @@ You can alternatively install the SDK as a static framework:
 
 #### CocoaPods
 
+For instructions on installing stable release versions of the Mapbox Maps SDK for iOS with CocoaPods, see [our website](https://www.mapbox.com/install/ios/cocoapods/).
+
 ##### Testing pre-releases with CocoaPods
 
-To test pre-releases and/or betas, you can reference the pre-release like so in your Podfile:
+To test pre-releases of the dynamic framework, directly specify the version in your Podfile:
 
 ```rb
-pod 'Mapbox-iOS-SDK-symbols', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/<insert branch or tag>/platform/ios/Mapbox-iOS-SDK-symbols.podspec'
+pod 'Mapbox-iOS-SDK', '~> x.x.x-alpha.1'
 ```
 
 ##### Testing nightly releases with CocoaPods
@@ -134,13 +136,27 @@ pod 'Mapbox-iOS-SDK-nightly-dynamic', podspec: 'https://raw.githubusercontent.co
 
 If using the static framework, add `$(inherited)` to your target’s Other Linker Flags in the Build Settings tab.
 
+##### Using pre-stripped releases with CocoaPods
+
+If you choose to commit the contents of your `Pods` directory to source control and are encountering file size limitations, you may wish to use builds that have been pre-stripped of debug symbols.
+
+```rb
+pod 'Mapbox-iOS-SDK-stripped', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/ios-v{x.x.x}/platform/ios/Mapbox-iOS-SDK-stripped.podspec'
+```
+
+Note that these builds lack some debugging information, which could make development more difficult and result in less useful crash reports. Though initially smaller on disk, using these builds has no effect on the ultimate size of your application — see our [Understanding iOS Framework Size guide](https://www.mapbox.com/help/ios-framework-size/) for more information.
+
 #### Carthage
 
-For instructions on installing stable release versions of the Mapbox Maps SDK for iOS with Carthage, see [our website](https://www.mapbox.com/install/ios/carthage/). If you require a build without symbols pre-stripped, use [this feed URL](https://www.mapbox.com/ios-sdk/Mapbox-iOS-SDK-symbols.json) with Carthage.
+For instructions on installing stable release versions of the Mapbox Maps SDK for iOS with Carthage, see [our website](https://www.mapbox.com/install/ios/carthage/). If you require a build with debug symbols pre-stripped, use [this feed URL](https://www.mapbox.com/ios-sdk/Mapbox-iOS-SDK-stripped.json) with Carthage.
 
 ##### Testing pre-releases with Carthage
 
-Carthage currently does not support pre-release versions of binaries.
+To test pre-releases of the dynamic framework, directly specify the version in your Cartfile:
+
+```json
+binary "https://www.mapbox.com/ios-sdk/Mapbox-iOS-SDK.json" ~> x.x.x-alpha.1
+```
 
 ##### Using your own build with Carthage
 

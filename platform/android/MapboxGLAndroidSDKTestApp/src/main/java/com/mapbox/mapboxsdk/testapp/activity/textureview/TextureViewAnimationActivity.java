@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.Locale;
@@ -57,6 +58,8 @@ public class TextureViewAnimationActivity extends AppCompatActivity {
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.getMapAsync(mapboxMap -> {
       TextureViewAnimationActivity.this.mapboxMap = mapboxMap;
+
+      mapboxMap.setStyle(Style.MAPBOX_STREETS);
 
       setFpsView(mapboxMap);
 

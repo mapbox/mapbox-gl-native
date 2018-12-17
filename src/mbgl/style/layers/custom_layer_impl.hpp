@@ -20,6 +20,8 @@ public:
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
     std::shared_ptr<CustomLayerHost> host;
+
+    DECLARE_LAYER_TYPE_INFO;
 };
 
 } // namespace style

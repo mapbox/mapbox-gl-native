@@ -126,6 +126,7 @@
         </activity>
         <activity
             android:name=".activity.camera.CameraPositionActivity"
+            android:theme="@style/NoActionBar"
             android:description="@string/description_cameraposition"
             android:label="@string/activity_camera_position">
             <meta-data
@@ -366,17 +367,6 @@
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_maplayout" />
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity" />
-        </activity>
-        <activity
-            android:name=".activity.annotation.MarkerViewActivity"
-            android:description="@string/description_view_marker"
-            android:label="@string/activity_view_marker">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_annotation" />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity" />
@@ -669,17 +659,6 @@
                 android:value=".activity.FeatureOverviewActivity" />
         </activity>
         <activity
-            android:name=".activity.annotation.MarkerViewsInRectangleActivity"
-            android:description="@string/description_marker_view_rectangle"
-            android:label="@string/activity_marker_view_rectangle">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_annotation" />
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity" />
-        </activity>
-        <activity
             android:name=".activity.maplayout.LatLngBoundsForCameraActivity"
             android:description="@string/description_restricted_bounds"
             android:label="@string/activity_restricted_bounds">
@@ -759,6 +738,17 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity" />
+        </activity>
+        <activity
+                android:name=".activity.maplayout.OverlayMapActivity"
+                android:description="@string/description_overlay"
+                android:label="@string/activity_overlay">
+            <meta-data
+                    android:name="@string/category"
+                    android:value="@string/category_maplayout" />
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activity.FeatureOverviewActivity" />
         </activity>
         <activity
             android:name=".activity.maplayout.LocalGlyphActivity"
@@ -871,7 +861,28 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity" />
         </activity>
-
+        <activity
+                android:name=".activity.maplayout.RecyclerViewActivity"
+                android:description="@string/description_recyclerview"
+                android:label="@string/activity_recyclerview">
+            <meta-data
+                    android:name="@string/category"
+                    android:value="@string/category_maplayout" />
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activity.FeatureOverviewActivity" />
+        </activity>
+        <activity
+                android:name=".activity.fragment.NestedViewPagerActivity"
+                android:description="@string/description_recyclerview"
+                android:label="@string/activity_nested_viewpager">
+            <meta-data
+                    android:name="@string/category"
+                    android:value="@string/category_fragment" />
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activity.FeatureOverviewActivity" />
+        </activity>
         <!-- For Instrumentation tests -->
         <activity
             android:name=".activity.style.RuntimeStyleTestActivity"

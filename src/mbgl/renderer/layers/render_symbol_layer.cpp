@@ -23,7 +23,7 @@ namespace mbgl {
 using namespace style;
 
 RenderSymbolLayer::RenderSymbolLayer(Immutable<style::SymbolLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::Symbol, _impl),
+    : RenderLayer(std::move(_impl)),
       unevaluated(impl().paint.untransitioned()) {
 }
 
@@ -32,7 +32,8 @@ const style::SymbolLayer::Impl& RenderSymbolLayer::impl() const {
 }
 
 std::unique_ptr<Bucket> RenderSymbolLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
-    assert(false); // Should be calling createLayout() instead.
+    // Should be calling createLayout() instead.
+    assert(baseImpl->getTypeInfo()->layout == LayerTypeInfo::Layout::NotRequired);
     return nullptr;
 }
 
@@ -71,6 +72,22 @@ bool RenderSymbolLayer::hasTransition() const {
 
 bool RenderSymbolLayer::hasCrossfade() const {
     return false;
+}
+
+const std::string& RenderSymbolLayer::layerID() const {
+    return RenderLayer::getID();
+}
+
+const RenderLayerSymbolInterface* RenderSymbolLayer::getSymbolInterface() const {
+    return this;
+}
+
+const std::vector<std::reference_wrapper<RenderTile>>& RenderSymbolLayer::getRenderTiles() const {
+    return renderTiles;
+}
+
+SymbolBucket* RenderSymbolLayer::getSymbolBucket(const RenderTile& renderTile) const {
+    return renderTile.tile.getBucket<SymbolBucket>(*baseImpl);
 }
 
 void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
@@ -360,6 +377,25 @@ style::SymbolPropertyValues RenderSymbolLayer::textPropertyValues(const style::S
             evaluated.get<style::TextHaloWidth>().constantOr(1),
             evaluated.get<style::TextColor>().constantOr(Color::black()).a > 0
     };
+}
+
+RenderLayer::RenderTiles RenderSymbolLayer::filterRenderTiles(RenderTiles tiles) const {
+    auto filterFn = [](auto& tile){ return !tile.tile.isRenderable(); };
+    return RenderLayer::filterRenderTiles(std::move(tiles), filterFn);
+}
+
+void RenderSymbolLayer::sortRenderTiles(const TransformState& state) {
+    // Sort symbol tiles in opposite y position, so tiles with overlapping symbols are drawn
+    // on top of each other, with lower symbols being drawn on top of higher symbols.
+    std::sort(renderTiles.begin(), renderTiles.end(), [&state](const auto& a, const auto& b) {
+        Point<float> pa(a.get().id.canonical.x, a.get().id.canonical.y);
+        Point<float> pb(b.get().id.canonical.x, b.get().id.canonical.y);
+
+        auto par = util::rotate(pa, state.getAngle());
+        auto pbr = util::rotate(pb, state.getAngle());
+
+        return std::tie(b.get().id.canonical.z, par.y, par.x) < std::tie(a.get().id.canonical.z, pbr.y, pbr.x);
+    });
 }
 
 } // namespace mbgl

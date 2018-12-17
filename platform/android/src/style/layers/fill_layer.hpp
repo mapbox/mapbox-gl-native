@@ -4,6 +4,7 @@
 
 #include "layer.hpp"
 #include "../transition_options.hpp"
+#include <mbgl/layermanager/fill_layer_factory.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <jni/jni.hpp>
 
@@ -14,8 +15,6 @@ class FillLayer : public Layer {
 public:
     using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/FillLayer"; };
-
-    static void registerNative(jni::JNIEnv&);
 
     FillLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
@@ -50,9 +49,22 @@ public:
     jni::Local<jni::Object<jni::ObjectTag>> getFillPattern(jni::JNIEnv&);
     void setFillPatternTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Local<jni::Object<TransitionOptions>> getFillPatternTransition(jni::JNIEnv&);
-    jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&);
 
 }; // class FillLayer
+
+class FillJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::FillLayerFactory {
+public:
+    ~FillJavaLayerPeerFactory() override;
+
+    // JavaLayerPeerFactory overrides.
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+
+    void registerNative(jni::JNIEnv&) final;
+
+    LayerFactory* getLayerFactory() final { return this; }
+
+};  // class FillJavaLayerPeerFactory
 
 } // namespace android
 } // namespace mbgl

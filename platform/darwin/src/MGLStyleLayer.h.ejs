@@ -1,6 +1,7 @@
 <%
   const doc = locals.doc;
   const type = locals.type;
+  const examples = locals.examples;
   const layoutProperties = locals.layoutProperties;
   const paintProperties = locals.paintProperties;
   const enumProperties = locals.enumProperties;
@@ -68,6 +69,11 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
  otherwise, find it using the `MGLStyle.layers` property. You can also create a
  new <%- type %> style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
+<% if (examples) { -%>
+
+ #### Related examples
+<%- examples.wrap(80, 1) %>
+<% } -%>
 
  ### Example
 
@@ -118,6 +124,11 @@ which it is added.
 <% for (const property of layoutProperties) { -%>
 /**
 <%- propertyDoc(property.name, property, type, 'layout').wrap(80, 1) %>
+<% if (property.examples) { -%>
+
+ #### Related examples
+<%- propertyExample(property).wrap(80, 1) %>
+<% } -%>
  */
 @property (nonatomic<% if (!property.required) { %>, null_resettable<% } if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) NSExpression *<%- camelizeWithLeadingLowercase(property.name) %>;
 
@@ -133,6 +144,11 @@ which it is added.
 <% for (const property of paintProperties) { -%>
 /**
 <%- propertyDoc(property.name, property, type, 'paint').wrap(80, 1) %>
+<% if (property.examples) { -%>
+
+ #### Related examples
+<%- propertyExample(property).wrap(80, 1) %>
+<% } -%>
  */
 @property (nonatomic<% if (!property.required) { %>, null_resettable<% } if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) NSExpression *<%- camelizeWithLeadingLowercase(property.name) %>;
 

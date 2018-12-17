@@ -115,7 +115,7 @@ MBGL_CONSTEXPR WritingModeType operator~(WritingModeType value) {
     return WritingModeType(~mbgl::underlying_type(value));
 }
 
-using GlyphDependencies = std::map<FontStack,GlyphIDs>;
-using GlyphRangeDependencies = std::map<FontStack,GlyphRangeSet>;
+using GlyphDependencies = std::map<FontStack, GlyphIDs>;
+using GlyphRangeDependencies = std::map<FontStack, std::unordered_set<GlyphRange>>;
 
 } // end namespace mbgl

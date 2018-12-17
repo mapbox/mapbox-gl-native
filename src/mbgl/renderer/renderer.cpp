@@ -1,4 +1,6 @@
 #include <mbgl/renderer/renderer.hpp>
+
+#include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/renderer/renderer_impl.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
@@ -55,6 +57,9 @@ std::vector<Feature> Renderer::queryRenderedFeatures(const ScreenBox& box, const
 }
 
 AnnotationIDs Renderer::queryPointAnnotations(const ScreenBox& box) const {
+    if (!LayerManager::annotationsEnabled) {
+        return {};
+    }
     RenderedQueryOptions options;
     options.layerIDs = {{ AnnotationManager::PointLayerID }};
     auto features = queryRenderedFeatures(box, options);
@@ -62,6 +67,9 @@ AnnotationIDs Renderer::queryPointAnnotations(const ScreenBox& box) const {
 }
 
 AnnotationIDs Renderer::queryShapeAnnotations(const ScreenBox& box) const {
+    if (!LayerManager::annotationsEnabled) {
+        return {};
+    }
     auto features = impl->queryShapeAnnotations({
         box.min,
         {box.max.x, box.min.y},
@@ -73,12 +81,14 @@ AnnotationIDs Renderer::queryShapeAnnotations(const ScreenBox& box) const {
 }
     
 AnnotationIDs Renderer::getAnnotationIDs(const std::vector<Feature>& features) const {
+    if (!LayerManager::annotationsEnabled) {
+        return {};
+    }
     std::set<AnnotationID> set;
     for (auto &feature : features) {
-        assert(feature.id);
-        assert(feature.id->is<uint64_t>());
-        assert(feature.id->get<uint64_t>() <= std::numeric_limits<AnnotationID>::max());
-        set.insert(static_cast<AnnotationID>(feature.id->get<uint64_t>()));
+        assert(feature.id.is<uint64_t>());
+        assert(feature.id.get<uint64_t>() <= std::numeric_limits<AnnotationID>::max());
+        set.insert(static_cast<AnnotationID>(feature.id.get<uint64_t>()));
     }
     AnnotationIDs ids;
     ids.reserve(set.size());
@@ -88,6 +98,14 @@ AnnotationIDs Renderer::getAnnotationIDs(const std::vector<Feature>& features) c
 
 std::vector<Feature> Renderer::querySourceFeatures(const std::string& sourceID, const SourceQueryOptions& options) const {
     return impl->querySourceFeatures(sourceID, options);
+}
+
+FeatureExtensionValue Renderer::queryFeatureExtensions(const std::string& sourceID,
+                                                       const Feature& feature,
+                                                       const std::string& extension,
+                                                       const std::string& extensionField,
+                                                       const optional<std::map<std::string, Value>>& args) const {
+    return impl->queryFeatureExtensions(sourceID, feature, extension, extensionField, args);
 }
 
 void Renderer::dumpDebugLogs() {

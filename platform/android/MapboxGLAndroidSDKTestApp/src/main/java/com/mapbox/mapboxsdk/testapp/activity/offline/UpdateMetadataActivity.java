@@ -40,7 +40,7 @@ public class UpdateMetadataActivity extends AppCompatActivity implements Adapter
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_metadata_update);
 
-    ListView listView = (ListView) findViewById(R.id.listView);
+    ListView listView = findViewById(R.id.listView);
     listView.setAdapter(adapter = new OfflineRegionMetadataAdapter(this));
     listView.setEmptyView(findViewById(android.R.id.empty));
     listView.setOnItemClickListener(this);
@@ -73,11 +73,11 @@ public class UpdateMetadataActivity extends AppCompatActivity implements Adapter
 
   @Override
   public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-    ViewGroup container = (ViewGroup) findViewById(R.id.container);
+    ViewGroup container = findViewById(R.id.container);
     container.removeAllViews();
     container.addView(mapView = new MapView(view.getContext()));
-    mapView.setOfflineRegionDefinition(adapter.getItem(position).getDefinition());
     mapView.onCreate(null);
+    mapView.getMapAsync(map -> map.setOfflineRegionDefinition(adapter.getItem(position).getDefinition()));
     mapView.onStart();
     mapView.onResume();
     return true;

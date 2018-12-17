@@ -13,18 +13,22 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.attribution.AttributionLayout;
 import com.mapbox.mapboxsdk.attribution.AttributionMeasure;
 import com.mapbox.mapboxsdk.attribution.AttributionParser;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.log.Logger;
+import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
 
@@ -50,7 +54,7 @@ public class MapSnapshotter {
      *
      * @param snapshot the snapshot
      */
-    void onSnapshotReady(@NonNull MapSnapshot snapshot);
+    void onSnapshotReady(MapSnapshot snapshot);
 
   }
 
@@ -68,7 +72,7 @@ public class MapSnapshotter {
      *
      * @param error the error message
      */
-    void onError(@NonNull String error);
+    void onError(String error);
   }
 
   private static final int LOGO_MARGIN_DP = 4;
@@ -95,6 +99,8 @@ public class MapSnapshotter {
     private LatLngBounds region;
     private CameraPosition cameraPosition;
     private boolean showLogo = true;
+    private String localIdeographFontFamily;
+    private String apiBaseUrl;
 
     /**
      * @param width  the width of the image
@@ -172,6 +178,34 @@ public class MapSnapshotter {
     }
 
     /**
+     * Set the font family for generating glyphs locally for ideographs in the &#x27;CJK Unified Ideographs&#x27;
+     * and &#x27;Hangul Syllables&#x27; ranges.
+     * <p>
+     * The font family argument is passed to {@link android.graphics.Typeface#create(String, int)}.
+     * Default system fonts are defined in &#x27;/system/etc/fonts.xml&#x27;
+     *
+     * @param fontFamily font family for local ideograph generation.
+     * @return the mutated {@link Options}
+     */
+    @NonNull
+    public Options withLocalIdeographFontFamily(String fontFamily) {
+      this.localIdeographFontFamily = fontFamily;
+      return this;
+    }
+
+    /**
+     * Specifies the URL used for API endpoint.
+     *
+     * @param apiBaseUrl The base of our API endpoint
+     * @return the mutated {@link Options}
+     */
+    @NonNull
+    public Options withApiBaseUrl(String apiBaseUrl) {
+      this.apiBaseUrl = apiBaseUrl;
+      return this;
+    }
+
+    /**
      * @return the width of the image
      */
     public int getWidth() {
@@ -214,6 +248,21 @@ public class MapSnapshotter {
     public CameraPosition getCameraPosition() {
       return cameraPosition;
     }
+
+    /**
+     * @return the font family used for locally generating ideographs
+     */
+    public String getLocalIdeographFontFamily() {
+      return localIdeographFontFamily;
+    }
+
+    /**
+     * @return The base of our API endpoint
+     */
+    @Nullable
+    public String getApiBaseUrl() {
+      return apiBaseUrl;
+    }
   }
 
   /**
@@ -226,12 +275,21 @@ public class MapSnapshotter {
   public MapSnapshotter(@NonNull Context context, @NonNull Options options) {
     checkThread();
     this.context = context.getApplicationContext();
+    TelemetryDefinition telemetry = Mapbox.getTelemetry();
+    if (telemetry != null) {
+      telemetry.onAppUserTurnstileEvent();
+    }
     FileSource fileSource = FileSource.getInstance(context);
+    String apiBaseUrl = options.getApiBaseUrl();
+    if (!TextUtils.isEmpty(apiBaseUrl)) {
+      fileSource.setApiBaseUrl(apiBaseUrl);
+    }
+
     String programCacheDir = FileSource.getInternalCachePath(context);
 
     nativeInitialize(this, fileSource, options.pixelRatio, options.width,
       options.height, options.styleUrl, options.styleJson, options.region, options.cameraPosition,
-      options.showLogo, programCacheDir);
+      options.showLogo, programCacheDir, options.localIdeographFontFamily);
   }
 
   /**
@@ -333,8 +391,8 @@ public class MapSnapshotter {
   }
 
   @NonNull
-  private AttributionMeasure getAttributionMeasure(@NonNull MapSnapshot mapSnapshot, @NonNull Bitmap snapshot,
-                                                   int margin) {
+  private AttributionMeasure getAttributionMeasure(@NonNull MapSnapshot mapSnapshot,
+                                                   @NonNull Bitmap snapshot, int margin) {
     Logo logo = createScaledLogo(snapshot);
     TextView longText = createTextView(mapSnapshot, false, logo.getScale());
     TextView shortText = createTextView(mapSnapshot, true, logo.getScale());
@@ -349,14 +407,15 @@ public class MapSnapshotter {
       .build();
   }
 
-  private void drawLogo(MapSnapshot mapSnapshot, @NonNull Canvas canvas, int margin,
-                        @NonNull AttributionLayout layout) {
+  private void drawLogo(MapSnapshot mapSnapshot, @NonNull Canvas canvas,
+                        int margin, @NonNull AttributionLayout layout) {
     if (mapSnapshot.isShowLogo()) {
       drawLogo(mapSnapshot.getBitmap(), canvas, margin, layout);
     }
   }
 
-  private void drawLogo(@NonNull Bitmap snapshot, @NonNull Canvas canvas, int margin, AttributionLayout placement) {
+  private void drawLogo(@NonNull Bitmap snapshot, @NonNull Canvas canvas,
+                        int margin, AttributionLayout placement) {
     Bitmap selectedLogo = placement.getLogo();
     if (selectedLogo != null) {
       canvas.drawBitmap(selectedLogo, margin, snapshot.getHeight() - selectedLogo.getHeight() - margin, null);
@@ -364,7 +423,7 @@ public class MapSnapshotter {
   }
 
   private void drawAttribution(@NonNull MapSnapshot mapSnapshot, @NonNull Canvas canvas,
-                               @NonNull AttributionMeasure measure, @NonNull AttributionLayout layout) {
+                               @NonNull AttributionMeasure measure, AttributionLayout layout) {
     // draw attribution
     PointF anchorPoint = layout.getAnchorPoint();
     if (anchorPoint != null) {
@@ -414,7 +473,7 @@ public class MapSnapshotter {
    */
   @NonNull
   private String createAttributionString(MapSnapshot mapSnapshot, boolean shortText) {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(context)
       .withAttributionData(mapSnapshot.getAttributions())
       .withCopyrightSign(false)
       .withImproveMap(false)
@@ -512,7 +571,8 @@ public class MapSnapshotter {
                                          FileSource fileSource, float pixelRatio,
                                          int width, int height, String styleUrl, String styleJson,
                                          LatLngBounds region, CameraPosition position,
-                                         boolean showLogo, String programCacheDir);
+                                         boolean showLogo, String programCacheDir,
+                                         String localIdeographFontFamily);
 
   @Keep
   protected native void nativeStart();

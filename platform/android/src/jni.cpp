@@ -41,9 +41,11 @@
 #include "offline/offline_region_error.hpp"
 #include "offline/offline_region_status.hpp"
 #include "style/transition_options.hpp"
-#include "style/layers/layers.hpp"
+#include "style/layers/layer_manager.hpp"
 #include "style/sources/source.hpp"
 #include "style/light.hpp"
+#include "style/formatted.hpp"
+#include "style/formatted_section.hpp"
 #include "snapshotter/map_snapshotter.hpp"
 #include "snapshotter/map_snapshot.hpp"
 #include "text/collator_jni.hpp"
@@ -158,10 +160,12 @@ void registerNatives(JavaVM *vm) {
 
     // Style
     TransitionOptions::registerNative(env);
-    registerNativeLayers(env);
+    LayerManagerAndroid::get()->registerNative(env);
     Source::registerNative(env);
     Light::registerNative(env);
     Position::registerNative(env);
+    Formatted::registerNative(env);
+    FormattedSection::registerNative(env);
 
     // Map
     CameraPosition::registerNative(env);

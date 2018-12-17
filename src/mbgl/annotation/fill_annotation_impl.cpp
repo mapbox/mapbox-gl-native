@@ -21,7 +21,7 @@ void FillAnnotationImpl::updateStyle(Style::Impl& style) const {
         layer = style.addLayer(std::move(newLayer), AnnotationManager::PointLayerID);
     }
 
-    auto* fillLayer = layer->as<FillLayer>();
+    auto* fillLayer = static_cast<FillLayer*>(layer);
     fillLayer->setFillOpacity(annotation.opacity);
     fillLayer->setFillColor(annotation.color);
     fillLayer->setFillOutlineColor(annotation.outlineColor);

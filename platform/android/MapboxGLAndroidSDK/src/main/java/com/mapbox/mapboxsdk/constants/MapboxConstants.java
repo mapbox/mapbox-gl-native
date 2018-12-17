@@ -117,6 +117,11 @@ public class MapboxConstants {
    */
   public static final String FRAG_ARG_MAPBOXMAPOPTIONS = "MapboxMapOptions";
 
+  /**
+   * Layer Id of annotations layer
+   */
+  public static final String LAYER_ID_ANNOTATIONS = "com.mapbox.annotations.points";
+
   // Save instance state keys
   public static final String STATE_HAS_SAVED_STATE = "mapbox_savedState";
   public static final String STATE_CAMERA_POSITION = "mapbox_cameraPosition";
@@ -124,10 +129,8 @@ public class MapboxConstants {
   public static final String STATE_SCROLL_ENABLED = "mapbox_scrollEnabled";
   public static final String STATE_ROTATE_ENABLED = "mapbox_rotateEnabled";
   public static final String STATE_TILT_ENABLED = "mapbox_tiltEnabled";
-  public static final String STATE_ZOOM_CONTROLS_ENABLED = "mapbox_zoomControlsEnabled";
   public static final String STATE_DOUBLE_TAP_ENABLED = "mapbox_doubleTapEnabled";
   public static final String STATE_DEBUG_ACTIVE = "mapbox_debugActive";
-  public static final String STATE_STYLE_URL = "mapbox_styleUrl";
   public static final String STATE_COMPASS_ENABLED = "mapbox_compassEnabled";
   public static final String STATE_COMPASS_GRAVITY = "mapbox_compassGravity";
   public static final String STATE_COMPASS_MARGIN_LEFT = "mapbox_compassMarginLeft";

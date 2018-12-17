@@ -2,6 +2,7 @@
 
 #import "MGLMultiPoint_Private.h"
 #import "MGLGeometry_Private.h"
+#import "MGLLoggingConfiguration_Private.h"
 
 #import "MGLFeature.h"
 
@@ -21,6 +22,7 @@
 }
 
 - (instancetype)initWithCoordinates:(const CLLocationCoordinate2D *)coords count:(NSUInteger)count interiorPolygons:(NSArray<MGLPolygon *> *)interiorPolygons {
+    MGLLogDebug(@"Initializing with %lu coordinates and %lu interiorPolygons.", (unsigned long)count, (unsigned long)interiorPolygons);
     if (self = [super initWithCoordinates:coords count:count]) {
         if (interiorPolygons.count) {
             _interiorPolygons = interiorPolygons;
@@ -30,6 +32,7 @@
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder {
+    MGLLogInfo(@"Initializng with coder.");
     self = [super initWithCoder:decoder];
     if (self) {
         _interiorPolygons = [decoder decodeObjectOfClass:[NSArray class] forKey:@"interiorPolygons"];
@@ -114,7 +117,7 @@
 
     for (MGLPolygon *interiorPolygon in self.interiorPolygons) {
         NSMutableArray *interiorRing = [NSMutableArray array];
-        for (int index = 0; index < interiorPolygon.pointCount; index++) {
+        for (NSUInteger index = 0; index < interiorPolygon.pointCount; index++) {
             CLLocationCoordinate2D coordinate = interiorPolygon.coordinates[index];
             [interiorRing addObject:@[@(coordinate.longitude), @(coordinate.latitude)]];
         }
@@ -143,6 +146,7 @@
 }
 
 - (instancetype)initWithPolygons:(NSArray<MGLPolygon *> *)polygons {
+    MGLLogDebug(@"Initializing with %lu polygons.", (unsigned long)polygons.count);
     if (self = [super init]) {
         _polygons = polygons;
 
@@ -157,6 +161,7 @@
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder {
+    MGLLogInfo(@"Initializing with coder.");
     if (self = [super initWithCoder:decoder]) {
         _polygons = [decoder decodeObjectOfClass:[NSArray class] forKey:@"polygons"];
     }

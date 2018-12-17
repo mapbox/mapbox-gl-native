@@ -37,7 +37,7 @@ namespace android {
     /**
      * Invoked when the construction is initiated from the jvm through a subclass
      */
-    Layer::Layer(jni::JNIEnv&, std::unique_ptr<mbgl::style::Layer> coreLayer)
+    Layer::Layer(std::unique_ptr<mbgl::style::Layer> coreLayer)
         : ownedLayer(std::move(coreLayer))
         , layer(*ownedLayer) {
     }
@@ -109,20 +109,6 @@ namespace android {
         }
     }
 
-    struct SetFilterEvaluator {
-        style::Filter filter;
-
-        void operator()(style::BackgroundLayer&) { Log::Warning(mbgl::Event::JNI, "BackgroundLayer doesn't support filters"); }
-        void operator()(style::CustomLayer&) { Log::Warning(mbgl::Event::JNI, "CustomLayer doesn't support filters"); }
-        void operator()(style::RasterLayer&) { Log::Warning(mbgl::Event::JNI, "RasterLayer doesn't support filters"); }
-        void operator()(style::HillshadeLayer&) { Log::Warning(mbgl::Event::JNI, "HillshadeLayer doesn't support filters"); }
-
-        template <class LayerType>
-        void operator()(LayerType& layer) {
-            layer.setFilter(filter);
-        }
-    };
-
     void Layer::setFilter(jni::JNIEnv& env, const jni::Array<jni::Object<>>& jfilter) {
         using namespace mbgl::style;
         using namespace mbgl::style::conversion;
@@ -134,31 +120,14 @@ namespace android {
             return;
         }
 
-        layer.accept(SetFilterEvaluator {std::move(*converted)});
+        layer.setFilter(std::move(*converted));
     }
-
-    struct GetFilterEvaluator {
-        mbgl::style::Filter noop(std::string layerType) {
-            Log::Warning(mbgl::Event::JNI, "%s doesn't support filter", layerType.c_str());
-            return {};
-        }
-
-        mbgl::style::Filter operator()(style::BackgroundLayer&) { return noop("BackgroundLayer"); }
-        mbgl::style::Filter operator()(style::CustomLayer&) { return noop("CustomLayer"); }
-        mbgl::style::Filter operator()(style::RasterLayer&) { return noop("RasterLayer"); }
-        mbgl::style::Filter operator()(style::HillshadeLayer&) { return noop("HillshadeLayer"); }
-
-        template <class LayerType>
-            mbgl::style::Filter operator()(LayerType& layer) {
-            return layer.getFilter();
-        }
-    };
 
     jni::Local<jni::Object<gson::JsonElement>> Layer::getFilter(jni::JNIEnv& env) {
         using namespace mbgl::style;
         using namespace mbgl::style::conversion;
 
-        Filter filter = layer.accept(GetFilterEvaluator());
+        Filter filter = layer.getFilter();
         if (filter.expression) {
             mbgl::Value expressionValue = (*filter.expression)->serialize();
             return gson::JsonElement::New(env, expressionValue);
@@ -167,62 +136,16 @@ namespace android {
         }
     }
 
-    struct SetSourceLayerEvaluator {
-        std::string sourceLayer;
-
-        void operator()(style::BackgroundLayer&) { Log::Warning(mbgl::Event::JNI, "BackgroundLayer doesn't support source layer"); }
-        void operator()(style::CustomLayer&) { Log::Warning(mbgl::Event::JNI, "CustomLayer doesn't support source layer"); }
-        void operator()(style::RasterLayer&) { Log::Warning(mbgl::Event::JNI, "RasterLayer doesn't support source layer"); }
-        void operator()(style::HillshadeLayer&) { Log::Warning(mbgl::Event::JNI, "HillshadeLayer doesn't support source layer"); }
-
-        template <class LayerType>
-        void operator()(LayerType& layer) {
-            layer.setSourceLayer(sourceLayer);
-        }
-    };
-
     void Layer::setSourceLayer(jni::JNIEnv& env, const jni::String& sourceLayer) {
-        layer.accept(SetSourceLayerEvaluator {jni::Make<std::string>(env, sourceLayer)});
+        layer.setSourceLayer(jni::Make<std::string>(env, sourceLayer));
     }
-
-    struct GetSourceLayerEvaluator {
-        std::string noop(std::string layerType) {
-            Log::Warning(mbgl::Event::JNI, "%s doesn't support source layer", layerType.c_str());
-            return {};
-        }
-
-        std::string operator()(style::BackgroundLayer&) { return noop("BackgroundLayer"); }
-        std::string operator()(style::CustomLayer&) { return noop("CustomLayer"); }
-        std::string operator()(style::RasterLayer&) { return noop("RasterLayer"); }
-        std::string operator()(style::HillshadeLayer&) { return noop("HillshadeLayer"); }
-
-        template <class LayerType>
-        std::string operator()(LayerType& layer) {
-            return layer.getSourceLayer();
-        }
-    };
 
     jni::Local<jni::String> Layer::getSourceLayer(jni::JNIEnv& env) {
-        return jni::Make<jni::String>(env, layer.accept(GetSourceLayerEvaluator()));
+        return jni::Make<jni::String>(env, layer.getSourceLayer());
     }
 
-    struct GetSourceIdEvaluator {
-        std::string noop(std::string layerType) {
-            Log::Warning(mbgl::Event::JNI, "%s doesn't support get source id", layerType.c_str());
-            return {};
-        }
-
-        std::string operator()(style::BackgroundLayer&) { return noop("BackgroundLayer"); }
-        std::string operator()(style::CustomLayer&) { return noop("CustomLayer"); }
-
-        template <class LayerType>
-        std::string operator()(LayerType& layer) {
-            return layer.getSourceID();
-        }
-    };
-
     jni::Local<jni::String> Layer::getSourceId(jni::JNIEnv& env) {
-        return jni::Make<jni::String>(env, layer.accept(GetSourceIdEvaluator()));
+        return jni::Make<jni::String>(env, layer.getSourceID());
     }
 
     jni::jfloat Layer::getMinZoom(jni::JNIEnv&){

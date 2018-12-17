@@ -9,14 +9,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.Toast;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.utils.MapFragmentUtils;
@@ -41,7 +40,6 @@ public class DoubleMapActivity extends AppCompatActivity {
 
     if (savedInstanceState == null) {
       MapboxMapOptions options = new MapboxMapOptions();
-      options.styleUrl(Style.DARK);
       options.camera(new CameraPosition.Builder()
         .target(MACHU_PICCHU)
         .zoom(ZOOM_IN)
@@ -77,12 +75,12 @@ public class DoubleMapActivity extends AppCompatActivity {
       // MapView large
       mapView = new MapView(view.getContext(), MapFragmentUtils.resolveArgs(view.getContext(), getArguments()));
       mapView.onCreate(savedInstanceState);
+      mapView.getMapAsync(mapboxMap -> mapboxMap.setStyle(Style.MAPBOX_STREETS));
       ((ViewGroup) view.findViewById(R.id.container)).addView(mapView, 0);
 
       // MapView mini
       mapViewMini = view.findViewById(R.id.mini_map);
       mapViewMini.onCreate(savedInstanceState);
-      mapViewMini.setStyleUrl(Style.LIGHT);
       mapViewMini.getMapAsync(mapboxMap -> {
         mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
           new CameraPosition.Builder().target(MACHU_PICCHU)
@@ -90,6 +88,7 @@ public class DoubleMapActivity extends AppCompatActivity {
             .build()
           )
         );
+        mapboxMap.setStyle(new Style.Builder().fromUrl(Style.LIGHT));
 
         UiSettings uiSettings = mapboxMap.getUiSettings();
         uiSettings.setAllGesturesEnabled(false);
@@ -99,8 +98,10 @@ public class DoubleMapActivity extends AppCompatActivity {
 
         mapboxMap.addOnMapClickListener(point -> {
           // test if we can open 2 activities after each other
-          Toast.makeText(mapViewMini.getContext(), "Creating a new Activity instance",Toast.LENGTH_SHORT).show();
+          Toast.makeText(mapViewMini.getContext(), "Creating a new Activity instance", Toast.LENGTH_SHORT).show();
           startActivity(new Intent(mapViewMini.getContext(), DoubleMapActivity.class));
+
+          return false;
         });
       });
     }
@@ -148,7 +149,7 @@ public class DoubleMapActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
       super.onSaveInstanceState(outState);
       mapView.onSaveInstanceState(outState);
       mapViewMini.onSaveInstanceState(outState);

@@ -11,8 +11,10 @@ import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
+import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
 
@@ -49,11 +51,8 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
 
       // Add layer / source
       final GeoJsonSource source = new GeoJsonSource("highlighted-shapes-source");
-      mapboxMap.addSource(source);
-      mapboxMap.addLayer(
-        new FillLayer("highlighted-shapes-layer", "highlighted-shapes-source")
-          .withProperties(fillColor(Color.RED))
-      );
+      final Layer layer = new FillLayer("highlighted-shapes-layer", "highlighted-shapes-source")
+        .withProperties(fillColor(Color.RED));
 
       selectionBox.setOnClickListener(view -> {
         // Query
@@ -74,6 +73,12 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
         // Update source data
         source.setGeoJson(FeatureCollection.fromFeatures(features));
       });
+
+      mapboxMap.setStyle(new Style.Builder()
+        .fromUrl(Style.MAPBOX_STREETS)
+        .withSource(source)
+        .withLayer(layer)
+      );
     });
   }
 

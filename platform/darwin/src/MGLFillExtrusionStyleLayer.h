@@ -40,6 +40,11 @@ typedef NS_ENUM(NSUInteger, MGLFillExtrusionTranslationAnchor) {
  new fill-extrusion style layer and add it to the style using a method such as
  `-[MGLStyle addLayer:]`.
 
+ #### Related examples
+ See the <a
+ href="https://www.mapbox.com/ios-sdk/maps/examples/extrusions/">Display 3D
+ buildings</a> example to learn how to add and style 3D layers on a map.
+
  ### Example
 
  ```swift
@@ -157,6 +162,33 @@ MGL_EXPORT
  This property corresponds to the `fill-extrusion-color-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition fillExtrusionColorTransition;
+
+/**
+ Whether to apply a vertical gradient to the sides of a fill-extrusion layer. If
+ true, sides will be shaded slightly darker farther down.
+ 
+ The default value of this property is an expression that evaluates to `YES`.
+ Set this property to `nil` to reset it to the default value.
+ 
+ This attribute corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-fill-extrusion-vertical-gradient"><code>fill-extrusion-vertical-gradient</code></a>
+ layout property in the Mapbox Style Specification.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant Boolean values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *fillExtrusionHasVerticalGradient;
+
+@property (nonatomic, null_resettable) NSExpression *fillExtrusionVerticalGradient __attribute__((unavailable("Use fillExtrusionHasVerticalGradient instead.")));
 
 /**
  The height with which to extrude this layer.

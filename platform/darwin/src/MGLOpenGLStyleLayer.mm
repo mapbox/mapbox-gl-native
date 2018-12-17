@@ -1,4 +1,5 @@
 #import "MGLOpenGLStyleLayer.h"
+#import "MGLOpenGLStyleLayer_Private.h"
 
 #import "MGLMapView_Private.h"
 #import "MGLStyle_Private.h"
@@ -184,3 +185,12 @@ private:
 }
 
 @end
+
+namespace mbgl {
+
+MGLStyleLayer* OpenGLStyleLayerPeerFactory::createPeer(style::Layer* rawLayer) {
+    return [[MGLOpenGLStyleLayer alloc] initWithRawLayer:rawLayer];
+}
+
+}  // namespace mbgl
+

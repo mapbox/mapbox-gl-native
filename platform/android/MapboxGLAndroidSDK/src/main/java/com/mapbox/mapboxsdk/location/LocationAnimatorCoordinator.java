@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.location;
 
 import android.animation.Animator;
-import android.animation.AnimatorSet;
 import android.location.Location;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -13,13 +12,13 @@ import android.view.animation.LinearInterpolator;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Projection;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.ACCURACY_RADIUS_ANIMATION_DURATION;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.COMPASS_UPDATE_RATE_MS;
-import static com.mapbox.mapboxsdk.location.LocationComponentConstants.INSTANT_LOCATION_TRANSITION_THRESHOLD;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.MAX_ANIMATION_DURATION_MS;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.TRANSITION_ANIMATION_DURATION_MS;
 import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_CAMERA_COMPASS_BEARING;
@@ -31,6 +30,7 @@ import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_LAYER_GPS_BE
 import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_LAYER_LATLNG;
 import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_TILT;
 import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_ZOOM;
+import static com.mapbox.mapboxsdk.location.Utils.immediateAnimation;
 
 final class LocationAnimatorCoordinator {
 
@@ -39,11 +39,20 @@ final class LocationAnimatorCoordinator {
   final List<MapboxAnimator.OnLayerAnimationsValuesChangeListener> layerListeners = new ArrayList<>();
   final List<MapboxAnimator.OnCameraAnimationsValuesChangeListener> cameraListeners = new ArrayList<>();
 
+  private final Projection projection;
   private Location previousLocation;
   private float previousAccuracyRadius = -1;
   private float previousCompassBearing = -1;
   private long locationUpdateTimestamp = -1;
   private float durationMultiplier;
+  private final MapboxAnimatorSetProvider animatorSetProvider;
+  private boolean compassAnimationEnabled;
+  private boolean accuracyAnimationEnabled;
+
+  LocationAnimatorCoordinator(@NonNull Projection projection, @NonNull MapboxAnimatorSetProvider animatorSetProvider) {
+    this.projection = projection;
+    this.animatorSetProvider = animatorSetProvider;
+  }
 
   void addLayerListener(MapboxAnimator.OnLayerAnimationsValuesChangeListener listener) {
     layerListeners.add(listener);
@@ -81,8 +90,8 @@ final class LocationAnimatorCoordinator {
     updateLayerAnimators(previousLayerLatLng, targetLatLng, previousLayerBearing, targetLayerBearing);
     updateCameraAnimators(previousCameraLatLng, previousCameraBearing, targetLatLng, targetCameraBearing);
 
-    boolean snap = immediateAnimation(previousCameraLatLng, targetLatLng, currentCameraPosition.zoom)
-      || immediateAnimation(previousLayerLatLng, targetLatLng, currentCameraPosition.zoom);
+    boolean snap = immediateAnimation(projection, previousCameraLatLng, targetLatLng)
+      || immediateAnimation(projection, previousLayerLatLng, targetLatLng);
     playLocationAnimators(snap ? 0 : getAnimationDuration());
 
     previousLocation = newLocation;
@@ -97,7 +106,7 @@ final class LocationAnimatorCoordinator {
     float previousCameraBearing = (float) currentCameraPosition.bearing;
 
     updateCompassAnimators(targetCompassBearing, previousLayerBearing, previousCameraBearing);
-    playCompassAnimators(COMPASS_UPDATE_RATE_MS);
+    playCompassAnimators(compassAnimationEnabled ? COMPASS_UPDATE_RATE_MS : 0);
 
     previousCompassBearing = targetCompassBearing;
   }
@@ -109,7 +118,7 @@ final class LocationAnimatorCoordinator {
 
     float previousAccuracyRadius = getPreviousAccuracyRadius();
     updateAccuracyAnimators(targetAccuracyRadius, previousAccuracyRadius);
-    playAccuracyAnimator(noAnimation ? 0 : ACCURACY_RADIUS_ANIMATION_DURATION);
+    playAccuracyAnimator(noAnimation || !accuracyAnimationEnabled ? 0 : ACCURACY_RADIUS_ANIMATION_DURATION);
 
     this.previousAccuracyRadius = targetAccuracyRadius;
   }
@@ -249,27 +258,20 @@ final class LocationAnimatorCoordinator {
     locationAnimators.add(animatorArray.get(ANIMATOR_LAYER_GPS_BEARING));
     locationAnimators.add(animatorArray.get(ANIMATOR_CAMERA_LATLNG));
     locationAnimators.add(animatorArray.get(ANIMATOR_CAMERA_GPS_BEARING));
-    AnimatorSet locationAnimatorSet = new AnimatorSet();
-    locationAnimatorSet.playTogether(locationAnimators);
-    locationAnimatorSet.setInterpolator(new LinearInterpolator());
-    locationAnimatorSet.setDuration(duration);
-    locationAnimatorSet.start();
+    animatorSetProvider.startAnimation(locationAnimators, new LinearInterpolator(), duration);
   }
 
   private void playCompassAnimators(long duration) {
     List<Animator> compassAnimators = new ArrayList<>();
     compassAnimators.add(animatorArray.get(ANIMATOR_LAYER_COMPASS_BEARING));
     compassAnimators.add(animatorArray.get(ANIMATOR_CAMERA_COMPASS_BEARING));
-    AnimatorSet compassAnimatorSet = new AnimatorSet();
-    compassAnimatorSet.playTogether(compassAnimators);
-    compassAnimatorSet.setDuration(duration);
-    compassAnimatorSet.start();
+    animatorSetProvider.startAnimation(compassAnimators, new LinearInterpolator(), duration);
   }
 
   private void playAccuracyAnimator(long duration) {
-    MapboxAnimator animator = animatorArray.get(ANIMATOR_LAYER_ACCURACY);
-    animator.setDuration(duration);
-    animator.start();
+    List<Animator> accuracyAnimators = new ArrayList<>();
+    accuracyAnimators.add(animatorArray.get(ANIMATOR_LAYER_ACCURACY));
+    animatorSetProvider.startAnimation(accuracyAnimators, new LinearInterpolator(), duration);
   }
 
   private void playZoomAnimator(long duration) {
@@ -288,11 +290,7 @@ final class LocationAnimatorCoordinator {
     List<Animator> locationAnimators = new ArrayList<>();
     locationAnimators.add(animatorArray.get(ANIMATOR_CAMERA_LATLNG));
     locationAnimators.add(animatorArray.get(ANIMATOR_CAMERA_GPS_BEARING));
-    AnimatorSet locationAnimatorSet = new AnimatorSet();
-    locationAnimatorSet.playTogether(locationAnimators);
-    locationAnimatorSet.setInterpolator(new FastOutSlowInInterpolator());
-    locationAnimatorSet.setDuration(duration);
-    locationAnimatorSet.start();
+    animatorSetProvider.startAnimation(locationAnimators, new FastOutSlowInInterpolator(), duration);
   }
 
   void resetAllCameraAnimations(@NonNull CameraPosition currentCameraPosition, boolean isGpsNorth) {
@@ -317,7 +315,7 @@ final class LocationAnimatorCoordinator {
     createNewAnimator(ANIMATOR_CAMERA_LATLNG,
       new CameraLatLngAnimator(previousCameraTarget, currentTarget, cameraListeners));
 
-    return immediateAnimation(previousCameraTarget, currentTarget, currentCameraPosition.zoom);
+    return immediateAnimation(projection, previousCameraTarget, currentTarget);
   }
 
   private void resetCameraGpsBearingAnimation(@NonNull CameraPosition currentCameraPosition, boolean isGpsNorth) {
@@ -382,12 +380,11 @@ final class LocationAnimatorCoordinator {
     this.durationMultiplier = trackingAnimationDurationMultiplier;
   }
 
-  private boolean immediateAnimation(LatLng current, @NonNull LatLng target, double zoom) {
-    // TODO: calculate the value based on the projection
-    double distance = current.distanceTo(target);
-    if (zoom > 10) {
-      distance *= zoom;
-    }
-    return distance > INSTANT_LOCATION_TRANSITION_THRESHOLD;
+  void setCompassAnimationEnabled(boolean compassAnimationEnabled) {
+    this.compassAnimationEnabled = compassAnimationEnabled;
+  }
+
+  void setAccuracyAnimationEnabled(boolean accuracyAnimationEnabled) {
+    this.accuracyAnimationEnabled = accuracyAnimationEnabled;
   }
 }

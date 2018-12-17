@@ -41,6 +41,11 @@ MGL_EXPORT
  let source = MGLImageSource(identifier: "radar", coordinateQuad: coordinates, url: URL(string: "https://www.mapbox.com/mapbox-gl-js/assets/radar.gif")!)
  mapView.style?.addSource(source)
  ```
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/image-source/">
+ Add an image</a> example to learn how to add an image to your map using
+ `MGLImageSource`.
  */
 MGL_EXPORT
 @interface MGLImageSource : MGLSource

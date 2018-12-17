@@ -6,11 +6,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 import com.mapbox.mapboxsdk.testapp.R;
 
@@ -52,19 +51,25 @@ public class ViewPagerActivity extends AppCompatActivity {
 
       switch (position) {
         case 0:
-          options.styleUrl(Style.MAPBOX_STREETS);
           options.camera(new CameraPosition.Builder().target(new LatLng(34.920526, 102.634774)).zoom(3).build());
           fragment = SupportMapFragment.newInstance(options);
+          fragment.getMapAsync(mapboxMap -> {
+            mapboxMap.setStyle(Style.MAPBOX_STREETS);
+          });
           break;
         case 1:
-          options.styleUrl(Style.DARK);
           options.camera(new CameraPosition.Builder().target(new LatLng(62.326440, 92.764913)).zoom(3).build());
           fragment = SupportMapFragment.newInstance(options);
+          fragment.getMapAsync(mapboxMap -> {
+            mapboxMap.setStyle(Style.DARK);
+          });
           break;
         case 2:
-          options.styleUrl(Style.SATELLITE);
           options.camera(new CameraPosition.Builder().target(new LatLng(-25.007786, 133.623852)).zoom(3).build());
           fragment = SupportMapFragment.newInstance(options);
+          fragment.getMapAsync(mapboxMap -> {
+            mapboxMap.setStyle(Style.SATELLITE);
+          });
           break;
       }
       return fragment;

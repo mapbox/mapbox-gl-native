@@ -5,7 +5,8 @@ package com.mapbox.mapboxsdk.style.layers;
 import android.support.annotation.ColorInt;
 
 import com.mapbox.mapboxsdk.style.expressions.Expression;
-import com.mapbox.mapboxsdk.utils.ColorUtils;
+import com.mapbox.mapboxsdk.style.types.Formatted;
+import static com.mapbox.mapboxsdk.utils.ColorUtils.colorToRgbaString;
 
 /**
  * Constructs paint/layout properties for Layers
@@ -1245,6 +1246,26 @@ public class PropertyFactory {
   }
 
   /**
+   * Whether to apply a vertical gradient to the sides of a fill-extrusion layer. If true, sides will be shaded slightly darker farther down.
+   *
+   * @param value a Boolean value
+   * @return property wrapper around Boolean
+   */
+  public static PropertyValue<Boolean> fillExtrusionVerticalGradient(Boolean value) {
+    return new PaintPropertyValue<>("fill-extrusion-vertical-gradient", value);
+  }
+
+  /**
+   * Whether to apply a vertical gradient to the sides of a fill-extrusion layer. If true, sides will be shaded slightly darker farther down.
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> fillExtrusionVerticalGradient(Expression expression) {
+    return new PaintPropertyValue<>("fill-extrusion-vertical-gradient", expression);
+  }
+
+  /**
    * The opacity at which the image will be drawn.
    *
    * @param value a Float value
@@ -2117,8 +2138,18 @@ public class PropertyFactory {
   /**
    * Value to use for a text label. If a plain `string` is provided, it will be treated as a `formatted` with default/inherited formatting options.
    *
-   * @param value a String value
-   * @return property wrapper around String
+   * @param value a Formatted value
+   * @return property wrapper around Formatted
+   */
+  public static PropertyValue<Formatted> textField(Formatted value) {
+    return new LayoutPropertyValue<>("text-field", value);
+  }
+
+  /**
+   * Value to use for a text label. If a plain `string` is provided, it will be treated as a `formatted` with default/inherited formatting options.
+   *
+   * @param value a Formatted value
+   * @return property wrapper around Formatted
    */
   public static PropertyValue<Expression> textField(Expression value) {
     return new LayoutPropertyValue<>("text-field", value);
@@ -2444,33 +2475,4 @@ public class PropertyFactory {
     return new LayoutPropertyValue<>("text-optional", value);
   }
 
-  /**
-   * Converts Android color int to "rbga(r, g, b, a)" String equivalent.
-   * <p>
-   * Alpha value will be converted from 0-255 range to 0-1.
-   * </p>
-   *
-   * @param color Android color int
-   * @return String rgba color
-   * @deprecated use {@link com.mapbox.mapboxsdk.utils.ColorUtils#colorToRgbaString(int)} instead
-   */
-  @Deprecated
-  public static String colorToRgbaString(@ColorInt int color) {
-    return ColorUtils.colorToRgbaString(color);
-  }
-
-  /**
-   * Converts Android color int to rgba float array.
-   * <p>
-   * Alpha value will be converted from 0-255 range to 0-1.
-   * </p>
-   *
-   * @param color Android color int
-   * @return int rgba array
-   * @deprecated use {@link com.mapbox.mapboxsdk.utils.ColorUtils#colorToRgbaArray(int)} instead
-   */
-  @Deprecated
-  public static float[] colorToRgbaArray(@ColorInt int color) {
-    return ColorUtils.colorToRgbaArray(color);
-  }
 }

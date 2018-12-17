@@ -6,7 +6,7 @@
 #include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/util/logging.hpp>
 
-#include <sqlite3.hpp>
+#include <mbgl/storage/sqlite3.hpp>
 
 #include "asset_manager_file_source.hpp"
 

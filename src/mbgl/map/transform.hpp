@@ -46,11 +46,6 @@ public:
         @param offset The distance to pan the map by, measured in pixels from
             top to bottom and from left to right. */
     void moveBy(const ScreenCoordinate& offset, const AnimationOptions& = {});
-    void setLatLng(const LatLng&, const AnimationOptions& = {});
-    void setLatLng(const LatLng&, const EdgeInsets&, const AnimationOptions& = {});
-    void setLatLng(const LatLng&, optional<ScreenCoordinate>, const AnimationOptions& = {});
-    void setLatLngZoom(const LatLng&, double zoom, const AnimationOptions& = {});
-    void setLatLngZoom(const LatLng&, double zoom, const EdgeInsets&, const AnimationOptions& = {});
     LatLng getLatLng(const EdgeInsets& = {}) const;
     ScreenCoordinate getScreenCoordinate(const EdgeInsets& = {}) const;
 
@@ -64,53 +59,19 @@ public:
 
     // Zoom
 
-    /** Sets the zoom level, keeping the given point fixed within the view.
-        @param zoom The new zoom level. */
-    void setZoom(double zoom, const AnimationOptions& = {});
-    /** Sets the zoom level, keeping the given point fixed within the view.
-        @param zoom The new zoom level.
-        @param anchor A point relative to the top-left corner of the view.
-            If unspecified, the center point is fixed within the view. */
-    void setZoom(double zoom, optional<ScreenCoordinate> anchor, const AnimationOptions& = {});
-    /** Sets the zoom level, keeping the center point fixed within the inset view.
-        @param zoom The new zoom level.
-        @param padding The viewport padding that affects the fixed center point. */
-    void setZoom(double zoom, const EdgeInsets& padding, const AnimationOptions& = {});
     /** Returns the zoom level. */
     double getZoom() const;
 
     // Angle
 
     void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const AnimationOptions& = {});
-    /** Sets the angle of rotation.
-        @param angle The new angle of rotation, measured in radians
-            counterclockwise from true north. */
-    void setAngle(double angle, const AnimationOptions& = {});
-    /** Sets the angle of rotation, keeping the given point fixed within the view.
-        @param angle The new angle of rotation, measured in radians
-            counterclockwise from true north.
-        @param anchor A point relative to the top-left corner of the view. */
-    void setAngle(double angle, optional<ScreenCoordinate> anchor, const AnimationOptions& = {});
-    /** Sets the angle of rotation, keeping the center point fixed within the inset view.
-        @param angle The new angle of rotation, measured in radians
-            counterclockwise from true north.
-        @param padding The viewport padding that affects the fixed center point. */
-    void setAngle(double angle, const EdgeInsets& padding, const AnimationOptions& = {});
     /** Returns the angle of rotation.
         @return The angle of rotation, measured in radians counterclockwise from
             true north. */
     double getAngle() const;
 
     // Pitch
-    /** Sets the pitch angle.
-        @param angle The new pitch angle, measured in radians toward the
-            horizon. */
-    void setPitch(double pitch, const AnimationOptions& = {});
-    /** Sets the pitch angle, keeping the given point fixed within the view.
-        @param angle The new pitch angle, measured in radians toward the
-            horizon.
-        @param anchor A point relative to the top-left corner of the view. */
-    void setPitch(double pitch, optional<ScreenCoordinate> anchor, const AnimationOptions& = {});
+
     double getPitch() const;
 
     // North Orientation

@@ -13,16 +13,16 @@
   },
   "license": "BSD-2-Clause",
   "dependencies": {
-    "@mapbox/cmake-node-module": "^1.1.0",
+    "@mapbox/cmake-node-module": "^1.2.0",
     "node-pre-gyp": "^0.10.2",
     "npm-run-all": "^4.0.2"
   },
   "devDependencies": {
-    "@octokit/rest": "^15.9.2",
+    "@octokit/rest": "^15.15.1",
     "aws-sdk": "^2.285.1",
     "csscolorparser": "^1.0.2",
     "ejs": "^2.4.1",
-    "esm": "^3.0.55",
+    "esm": "^3.0.84",
     "express": "^4.11.1",
     "flow-remove-types": "^1.2.1",
     "json-stringify-pretty-compact": "^1.0.4",

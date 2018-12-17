@@ -31,9 +31,4 @@ private:
     const std::array<float, 2> getLight(const PaintParameters& parameters);
 };
 
-template <>
-inline bool RenderLayer::is<RenderHillshadeLayer>() const {
-    return type == style::LayerType::Hillshade;
-}
-
 } // namespace mbgl

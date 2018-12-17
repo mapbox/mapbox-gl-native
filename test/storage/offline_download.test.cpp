@@ -12,7 +12,7 @@
 #include <mbgl/util/compression.hpp>
 #include <mbgl/util/string.hpp>
 
-#include <sqlite3.hpp>
+#include <mbgl/storage/sqlite3.hpp>
 #include <gtest/gtest.h>
 #include <iostream>
 
@@ -61,7 +61,7 @@ public:
     }
 
     util::RunLoop loop;
-    StubFileSource fileSource;
+    StubOnlineFileSource fileSource;
     OfflineDatabase db;
     std::size_t size = 0;
 
@@ -277,8 +277,8 @@ TEST(OfflineDownload, Activate) {
 }
 
 TEST(OfflineDownload, DoesNotFloodTheFileSourceWithRequests) {
-    FakeFileSource fileSource;
     OfflineTest test;
+    FakeOnlineFileSource fileSource;
     auto region = test.createRegion();
     ASSERT_TRUE(region);
     OfflineDownload download(
@@ -297,7 +297,7 @@ TEST(OfflineDownload, DoesNotFloodTheFileSourceWithRequests) {
     fileSource.respond(Resource::Kind::Style, test.response("style.json"));
     test.loop.runOnce();
 
-    EXPECT_EQ(HTTPFileSource::maximumConcurrentRequests(), fileSource.requests.size());
+    EXPECT_EQ(fileSource.getMaximumConcurrentRequests(), fileSource.requests.size());
 }
 
 TEST(OfflineDownload, GetStatusNoResources) {
@@ -661,6 +661,66 @@ TEST(OfflineDownload, Deactivate) {
 
     test.loop.run();
 }
+
+
+TEST(OfflineDownload, AllOfflineRequestsHaveLowPriority) {
+    OfflineTest test;
+    auto region = test.createRegion();
+    ASSERT_TRUE(region);
+    OfflineDownload download(
+        region->getID(),
+        OfflineTilePyramidRegionDefinition("http://127.0.0.1:3000/style.json", LatLngBounds::world(), 0.0, 0.0, 1.0),
+        test.db, test.fileSource);
+
+    test.fileSource.styleResponse = [&] (const Resource& resource) {
+        EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        return test.response("style.json");
+    };
+
+    test.fileSource.spriteImageResponse = [&] (const Resource& resource) {
+        EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        return test.response("sprite.png");
+    };
+
+    test.fileSource.imageResponse = [&] (const Resource& resource) {
+        EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        return test.response("radar.gif");
+    };
+
+    test.fileSource.spriteJSONResponse = [&] (const Resource& resource) {
+        EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        return test.response("sprite.json");
+    };
+
+    test.fileSource.glyphsResponse = [&] (const Resource& resource) {
+        EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        return test.response("glyph.pbf");
+    };
+
+    test.fileSource.sourceResponse = [&] (const Resource& resource) {
+        EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        return test.response("streets.json");
+    };
+
+    test.fileSource.tileResponse = [&] (const Resource& resource) {
+        EXPECT_TRUE(resource.priority == Resource::Priority::Low);
+        return test.response("0-0-0.vector.pbf");
+    };
+
+    auto observer = std::make_unique<MockObserver>();
+
+    observer->statusChangedFn = [&] (OfflineRegionStatus status) {
+        if (status.complete()) {
+            test.loop.stop();
+        }
+    };
+
+    download.setObserver(std::move(observer));
+    download.setState(OfflineRegionDownloadState::Active);
+
+    test.loop.run();
+}
+
 
 #ifndef __QT__ // Qt doesn't expose the ability to register virtual file system handlers.
 TEST(OfflineDownload, DiskFull) {

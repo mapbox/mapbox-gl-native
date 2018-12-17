@@ -4,6 +4,7 @@
 
 #include "layer.hpp"
 #include "../transition_options.hpp"
+#include <mbgl/layermanager/heatmap_layer_factory.hpp>
 #include <mbgl/style/layers/heatmap_layer.hpp>
 #include <jni/jni.hpp>
 
@@ -14,8 +15,6 @@ class HeatmapLayer : public Layer {
 public:
     using SuperTag = Layer;
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/HeatmapLayer"; };
-
-    static void registerNative(jni::JNIEnv&);
 
     HeatmapLayer(jni::JNIEnv&, jni::String&, jni::String&);
 
@@ -42,9 +41,22 @@ public:
     jni::Local<jni::Object<jni::ObjectTag>> getHeatmapOpacity(jni::JNIEnv&);
     void setHeatmapOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Local<jni::Object<TransitionOptions>> getHeatmapOpacityTransition(jni::JNIEnv&);
-    jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&);
 
 }; // class HeatmapLayer
+
+class HeatmapJavaLayerPeerFactory final : public JavaLayerPeerFactory,  public mbgl::HeatmapLayerFactory {
+public:
+    ~HeatmapJavaLayerPeerFactory() override;
+
+    // JavaLayerPeerFactory overrides.
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) final;
+    jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) final;
+
+    void registerNative(jni::JNIEnv&) final;
+
+    LayerFactory* getLayerFactory() final { return this; }
+
+};  // class HeatmapJavaLayerPeerFactory
 
 } // namespace android
 } // namespace mbgl

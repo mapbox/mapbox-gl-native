@@ -425,3 +425,121 @@ TEST(OnlineFileSource, ChangeAPIBaseURL){
     fs.setAPIBaseURL(customURL);
     EXPECT_EQ(customURL, fs.getAPIBaseURL());
 }
+
+
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(LowHighPriorityRequests)) {
+    util::RunLoop loop;
+    OnlineFileSource fs;
+    std::size_t response_counter = 0;
+    const std::size_t NUM_REQUESTS = 3;
+
+    fs.setMaximumConcurrentRequests(1);
+
+    NetworkStatus::Set(NetworkStatus::Status::Offline);
+
+    // requesting a low priority resource
+    Resource low_prio{ Resource::Unknown, "http://127.0.0.1:3000/load/1" };
+    low_prio.setPriority(Resource::Priority::Low);
+    std::unique_ptr<AsyncRequest> req_0 = fs.request(low_prio, [&](Response) {
+        response_counter++;
+        req_0.reset();
+        EXPECT_EQ(response_counter, NUM_REQUESTS); // make sure this is responded last
+        loop.stop();
+    });
+
+    // requesting two "regular" resources
+    Resource regular1{ Resource::Unknown, "http://127.0.0.1:3000/load/2" };
+    std::unique_ptr<AsyncRequest> req_1 = fs.request(regular1, [&](Response) {
+        response_counter++;
+        req_1.reset();
+    });
+    Resource regular2{ Resource::Unknown, "http://127.0.0.1:3000/load/3" };
+    std::unique_ptr<AsyncRequest> req_2 = fs.request(regular2, [&](Response) {
+        response_counter++;
+        req_2.reset();
+    });
+
+    NetworkStatus::Set(NetworkStatus::Status::Online);
+
+    loop.run();
+}
+
+
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(LowHighPriorityRequestsMany)) {
+    util::RunLoop loop;
+    OnlineFileSource fs;
+    int response_counter = 0;
+    int correct_low = 0;
+    int correct_regular = 0;
+
+
+    fs.setMaximumConcurrentRequests(1);
+
+    NetworkStatus::Set(NetworkStatus::Status::Offline);
+
+    std::vector<std::unique_ptr<AsyncRequest>> collector;
+
+    for (int num_reqs = 0; num_reqs < 20; num_reqs++) {
+        if (num_reqs % 2 == 0) {
+            std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/load/" + std::to_string(num_reqs), Resource::Priority::Regular }, [&](Response) {
+                response_counter++;
+
+                if (response_counter <= 10) { // count the high priority requests that arrive late correctly
+                    correct_regular++;
+                }
+            });
+            collector.push_back(std::move(req));
+        }
+        else {
+            std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/load/" + std::to_string(num_reqs), Resource::Priority::Low }, [&](Response) {
+                response_counter++;
+
+                if (response_counter > 10) { // count the low priority requests that arrive late correctly
+                    correct_low++;
+                }
+
+                // stop and check correctness after last low priority request is responded
+                if (20 == response_counter) {
+                    loop.stop();
+                    for (auto& collected_req : collector) {
+                        collected_req.reset();
+                    }
+                    ASSERT_TRUE(correct_low >= 9);
+                    ASSERT_TRUE(correct_regular >= 9);
+                }
+            });
+            collector.push_back(std::move(req));
+        }
+    }
+
+    NetworkStatus::Set(NetworkStatus::Status::Online);
+
+    loop.run();
+}
+
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(MaximumConcurrentRequests)) {
+    util::RunLoop loop;
+    OnlineFileSource fs;
+
+    ASSERT_EQ(fs.getMaximumConcurrentRequests(), 20u);
+
+    fs.setMaximumConcurrentRequests(10);
+    ASSERT_EQ(fs.getMaximumConcurrentRequests(), 10u);
+}
+TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RequestSameUrlMultipleTimes)) {
+    util::RunLoop loop;
+    OnlineFileSource fs;
+
+    int count = 0;
+    std::vector<std::unique_ptr<AsyncRequest>> requests;
+
+    for (int i = 0; i < 100; ++i) {
+        requests.emplace_back(fs.request({ Resource::Unknown, "http://127.0.0.1:3000/load" }, [&](Response) {
+            if (++count == 100) {
+                loop.stop();
+            }
+        }));
+    }
+
+    loop.run();
+}

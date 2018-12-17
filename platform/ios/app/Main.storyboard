@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="PSe-Ot-7Ff">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="PSe-Ot-7Ff">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
-        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
-        <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -42,12 +39,25 @@
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                     </button>
+                                    <view hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BHE-Wn-x69" customClass="MBXFrameTimeGraphView">
+                                        <rect key="frame" x="0.0" y="467" width="375" height="200"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <accessibility key="accessibilityConfiguration">
+                                            <accessibilityTraits key="traits" notEnabled="YES"/>
+                                        </accessibility>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="200" id="TgT-yb-9e5"/>
+                                        </constraints>
+                                    </view>
                                 </subviews>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <gestureRecognizers/>
                                 <constraints>
                                     <constraint firstItem="58y-pX-YyB" firstAttribute="top" secondItem="kNe-zV-9ha" secondAttribute="topMargin" constant="30" id="89S-qk-mPR"/>
+                                    <constraint firstItem="BHE-Wn-x69" firstAttribute="leading" secondItem="kNe-zV-9ha" secondAttribute="leading" id="aHd-3F-9nV"/>
+                                    <constraint firstAttribute="bottom" secondItem="BHE-Wn-x69" secondAttribute="bottom" id="bfH-4q-2uU"/>
                                     <constraint firstItem="58y-pX-YyB" firstAttribute="leading" secondItem="kNe-zV-9ha" secondAttribute="leadingMargin" id="cXU-Qh-ilW"/>
+                                    <constraint firstAttribute="trailing" secondItem="BHE-Wn-x69" secondAttribute="trailing" id="lZL-gi-2XC"/>
                                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="58y-pX-YyB" secondAttribute="trailing" id="txU-Gp-2du"/>
                                 </constraints>
                                 <connections>
@@ -104,6 +114,7 @@
                         </rightBarButtonItems>
                     </navigationItem>
                     <connections>
+                        <outlet property="frameTimeGraphView" destination="BHE-Wn-x69" id="sFg-9b-DgH"/>
                         <outlet property="hudLabel" destination="58y-pX-YyB" id="aGG-7a-bZR"/>
                         <outlet property="mapView" destination="kNe-zV-9ha" id="VNR-WO-1q4"/>
                         <segue destination="zvf-Qd-4Ru" kind="show" identifier="ShowSnapshots" id="hzX-Jp-UJq"/>
@@ -117,7 +128,7 @@
                     </connections>
                 </pongPressGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="1365.5999999999999" y="349.13793103448279"/>
+            <point key="canvasLocation" x="1365.5999999999999" y="348.57571214392806"/>
         </scene>
         <!--Offline Packs-->
         <scene sceneID="xIg-PA-7r3">
@@ -279,7 +290,7 @@
                                         </connections>
                                     </switch>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Rotation" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vio-XU-tgS">
-                                        <rect key="frame" x="209.5" y="6" width="50.5" height="16"/>
+                                        <rect key="frame" x="209" y="6" width="50.5" height="16"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="50.5" id="OiV-2P-9xm"/>
                                         </constraints>
@@ -294,7 +305,7 @@
                                         </connections>
                                     </switch>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pitch" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0uK-zq-Ys2">
-                                        <rect key="frame" x="312" y="6" width="31" height="16"/>
+                                        <rect key="frame" x="312.5" y="6" width="31" height="16"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="31" id="gM8-I7-4d3"/>
                                         </constraints>

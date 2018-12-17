@@ -14,8 +14,22 @@
 namespace mbgl {
 namespace style {
 
+
+// static
+const LayerTypeInfo* BackgroundLayer::Impl::staticTypeInfo() noexcept {
+    const static LayerTypeInfo typeInfo
+        {"background",
+          LayerTypeInfo::Source::NotRequired,
+          LayerTypeInfo::Pass3D::NotRequired,
+          LayerTypeInfo::Layout::NotRequired,
+          LayerTypeInfo::Clipping::NotRequired
+        };
+    return &typeInfo;
+}
+
+
 BackgroundLayer::BackgroundLayer(const std::string& layerID)
-    : Layer(makeMutable<Impl>(LayerType::Background, layerID, std::string())) {
+    : Layer(makeMutable<Impl>(layerID, std::string())) {
 }
 
 BackgroundLayer::BackgroundLayer(Immutable<Impl> impl_)
@@ -40,34 +54,6 @@ std::unique_ptr<Layer> BackgroundLayer::cloneRef(const std::string& id_) const {
 }
 
 void BackgroundLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
-}
-
-
-// Visibility
-
-void BackgroundLayer::setVisibility(VisibilityType value) {
-    if (value == getVisibility())
-        return;
-    auto impl_ = mutableImpl();
-    impl_->visibility = value;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-// Zoom range
-
-void BackgroundLayer::setMinZoom(float minZoom) {
-    auto impl_ = mutableImpl();
-    impl_->minZoom = minZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
-}
-
-void BackgroundLayer::setMaxZoom(float maxZoom) {
-    auto impl_ = mutableImpl();
-    impl_->maxZoom = maxZoom;
-    baseImpl = std::move(impl_);
-    observer->onLayerChanged(*this);
 }
 
 // Layout properties
@@ -292,6 +278,10 @@ optional<Error> BackgroundLayer::setLayoutProperty(const std::string& name, cons
         
 
     return Error { "layer doesn't support this property" };
+}
+
+Mutable<Layer::Impl> BackgroundLayer::mutableBaseImpl() const {
+    return staticMutableCast<Layer::Impl>(mutableImpl());
 }
 
 } // namespace style

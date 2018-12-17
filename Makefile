@@ -175,8 +175,7 @@ $(MACOS_COMPDB_PATH)/Makefile:
 	mkdir -p $(MACOS_COMPDB_PATH)
 	(cd $(MACOS_COMPDB_PATH) && cmake ../../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
-		-DWITH_EGL=${WITH_EGL} \
-		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
+		-DWITH_EGL=${WITH_EGL})
 
 .PHONY:
 compdb: $(BUILD_DEPS) $(TEST_DEPS) $(MACOS_COMPDB_PATH)/Makefile
@@ -302,7 +301,6 @@ $(LINUX_BUILD): $(BUILD_DEPS)
 	mkdir -p $(LINUX_OUTPUT_PATH)
 	(cd $(LINUX_OUTPUT_PATH) && cmake -G Ninja ../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
-		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		-DWITH_CXX11ABI=${WITH_CXX11ABI} \
 		-DWITH_COVERAGE=${WITH_COVERAGE} \
 		-DWITH_OSMESA=${WITH_OSMESA} \
@@ -385,13 +383,7 @@ endif
 QT_QMAKE_FOUND := $(shell command -v qmake 2> /dev/null)
 ifdef QT_QMAKE_FOUND
   export QT_INSTALL_DOCS = $(shell qmake -query QT_INSTALL_DOCS)
-  ifeq ($(shell qmake -query QT_VERSION | head -c1), 4)
-    QT_ROOT_PATH = build/qt4-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
-    WITH_QT_4=1
-  else
-    QT_ROOT_PATH = build/qt-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
-    WITH_QT_4=0
-  endif
+  QT_ROOT_PATH = build/qt-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
 endif
 
 export QT_OUTPUT_PATH = $(QT_ROOT_PATH)/$(BUILDTYPE)
@@ -402,13 +394,11 @@ $(QT_BUILD): $(BUILD_DEPS)
 	mkdir -p $(QT_OUTPUT_PATH)
 	(cd $(QT_OUTPUT_PATH) && cmake -G Ninja ../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
-		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		-DMBGL_PLATFORM=qt \
 		-DMASON_PLATFORM=$(MASON_PLATFORM) \
 		-DMASON_PLATFORM_VERSION=$(MASON_PLATFORM_VERSION) \
 		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
 		-DWITH_QT_I18N=${WITH_QT_I18N} \
-		-DWITH_QT_4=${WITH_QT_4} \
 		-DWITH_CXX11ABI=${WITH_CXX11ABI} \
 		-DWITH_COVERAGE=${WITH_COVERAGE})
 
@@ -424,7 +414,6 @@ $(MACOS_QT_PROJ_PATH): $(BUILD_DEPS)
 		-DMASON_PLATFORM_VERSION=$(MASON_PLATFORM_VERSION) \
 		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
 		-DWITH_QT_I18N=${WITH_QT_I18N} \
-		-DWITH_QT_4=${WITH_QT_4} \
 		-DWITH_CXX11ABI=${WITH_CXX11ABI} \
 		-DWITH_COVERAGE=${WITH_COVERAGE})
 
@@ -446,14 +435,12 @@ $(QNX_QT_BUILD): $(BUILD_DEPS)
 	mkdir -p $(QNX_OUTPUT_PATH)
 	(cd $(QNX_OUTPUT_PATH) && cmake -G Ninja ../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
-		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		-DQCC_COMPILER_TARGET=${QCC_COMPILER_TARGET} \
 		-DQCC_NTOARCH=${QCC_NTOARCH} \
 		-DCMAKE_TOOLCHAIN_FILE=platform/qt/qnx.cmake \
 		-DMBGL_PLATFORM=qt \
 		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
 		-DWITH_QT_I18N=${WITH_QT_I18N} \
-		-DWITH_QT_4=${WITH_QT_4} \
 		-DWITH_CXX11ABI=${WITH_CXX11ABI} \
 		-DWITH_COVERAGE=${WITH_COVERAGE})
 
@@ -660,9 +647,9 @@ run-android-ui-test-%: run-android-ui-test-arm-v7-%
 # Run Java Unit tests on the JVM of the development machine executing this
 .PHONY: run-android-unit-test
 run-android-unit-test: platform/android/gradle/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest --info
 run-android-unit-test-%: platform/android/gradle/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest --tests "$*"
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest  --info --tests "$*"
 
 # Builds a release package of the Android SDK
 .PHONY: apackage

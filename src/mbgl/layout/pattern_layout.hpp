@@ -37,14 +37,14 @@ public:
                     hasPattern(false) {
 
         using PatternLayer = typename B::RenderLayerType;
-        const auto renderLayer = layers.at(0)->as<PatternLayer>();
+        const auto renderLayer = static_cast<const PatternLayer*>(layers.at(0));
         const typename PatternLayer::StyleLayerImpl& leader = renderLayer->impl();
         layout = leader.layout.evaluate(PropertyEvaluationParameters(zoom));
         sourceLayerID = leader.sourceLayer;
         groupID = renderLayer->getID();
 
         for (const auto& layer : layers) {
-            const typename B::PossiblyEvaluatedPaintProperties evaluatedProps = layer->as<PatternLayer>()->paintProperties();
+            const typename B::PossiblyEvaluatedPaintProperties evaluatedProps = static_cast<const PatternLayer*>(layer)->paintProperties();
             layerPaintProperties.emplace(layer->getID(), std::move(evaluatedProps));
             const auto patternProperty = evaluatedProps.template get<typename PatternLayer::PatternProperty>();
             const auto constantPattern = patternProperty.constantOr(Faded<std::basic_string<char> >{ "", ""});

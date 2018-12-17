@@ -1,7 +1,8 @@
 #include "constant.hpp"
 #include "collection.hpp"
+#include "../style/formatted.hpp"
 
-#include <sstream>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 namespace android {
@@ -24,13 +25,22 @@ Result<jni::Local<jni::Object<>>> Converter<jni::Local<jni::Object<>>, std::stri
 }
 
 Result<jni::Local<jni::Object<>>> Converter<jni::Local<jni::Object<>>, Color>::operator()(jni::JNIEnv& env, const Color& value) const {
-    std::stringstream sstream;
-    sstream << "rgba(" << value.r << ", " << value.g << ", " << value.b << ", "  << value.a << ")";
-    return jni::Make<jni::String>(env, sstream.str());
+    std::string result;
+    result.reserve(32);
+    result += "rgba(";
+    result += util::toString(value.r);
+    result += ", ";
+    result += util::toString(value.g);
+    result += ", ";
+    result += util::toString(value.b);
+    result += ", ";
+    result += util::toString(value.a);
+    result += ")";
+    return jni::Make<jni::String>(env, result);
 }
 
 Result<jni::Local<jni::Object<>>> Converter<jni::Local<jni::Object<>>, style::expression::Formatted>::operator()(jni::JNIEnv& env, const style::expression::Formatted& value) const {
-    return jni::Make<jni::String>(env, value.toString());
+    return Formatted::New(env, value);
 }
 
 Result<jni::Local<jni::Object<>>> Converter<jni::Local<jni::Object<>>, std::vector<std::string>>::operator()(jni::JNIEnv& env, const std::vector<std::string>& value) const {

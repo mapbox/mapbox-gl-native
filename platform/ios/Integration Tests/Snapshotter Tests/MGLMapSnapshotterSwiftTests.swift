@@ -22,7 +22,7 @@ class MGLMapSnapshotterSwiftTests: MGLMapViewIntegrationTest {
             return
         }
 
-        let timeout: TimeInterval = 5.0
+        let timeout: TimeInterval = 10.0
         let expectation = self.expectation(description: "snapshot")
 
         let options = MGLMapSnapshotterSwiftTests.snapshotterOptions(size: mapView.bounds.size)

@@ -14,7 +14,6 @@
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
 #include <mbgl/style/expression/formatted.hpp>
-
 #include <mbgl/util/color.hpp>
 
 <% if (type === 'line' || type === 'symbol') { -%>
@@ -34,25 +33,6 @@ public:
     <%- camelize(type) %>Layer(const std::string& layerID, const std::string& sourceID);
 <% } -%>
     ~<%- camelize(type) %>Layer() final;
-
-<% if (type !== 'background') { -%>
-    // Source
-    const std::string& getSourceID() const;
-<% if (type !== 'raster' && type !== 'hillshade') { -%>
-    const std::string& getSourceLayer() const;
-    void setSourceLayer(const std::string& sourceLayer);
-
-    void setFilter(const Filter&);
-    const Filter& getFilter() const;
-<% } -%>
-
-<% } -%>
-    // Visibility
-    void setVisibility(VisibilityType) final;
-
-    // Zoom range
-    void setMinZoom(float) final;
-    void setMaxZoom(float) final;
 
     // Dynamic properties
     optional<conversion::Error> setLayoutProperty(const std::string& name, const conversion::Convertible& value) final;
@@ -86,12 +66,10 @@ public:
     Mutable<Impl> mutableImpl() const;
     <%- camelize(type) %>Layer(Immutable<Impl>);
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
-};
 
-template <>
-inline bool Layer::is<<%- camelize(type) %>Layer>() const {
-    return getType() == LayerType::<%- camelize(type) %>;
-}
+protected:
+    Mutable<Layer::Impl> mutableBaseImpl() const final;
+};
 
 } // namespace style
 } // namespace mbgl

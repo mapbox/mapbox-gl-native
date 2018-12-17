@@ -69,10 +69,7 @@ public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition,
     this.pixelRatio = parcel.readFloat();
   }
 
-  /*
-   * Getters
-   */
-
+  @Override
   public String getStyleURL() {
     return styleURL;
   }
@@ -98,16 +95,25 @@ public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition,
     return LatLngBounds.from(bbox[3], bbox[2], bbox[1], bbox[0]);
   }
 
+  @Override
   public double getMinZoom() {
     return minZoom;
   }
 
+  @Override
   public double getMaxZoom() {
     return maxZoom;
   }
 
+  @Override
   public float getPixelRatio() {
     return pixelRatio;
+  }
+
+  @NonNull
+  @Override
+  public String getType() {
+    return "shaperegion";
   }
 
   /*

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
+#include <mbgl/layermanager/layer_factory.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/layer.hpp>
 #include "../../gson/json_array.hpp"
@@ -10,33 +10,17 @@
 #include <jni/jni.hpp>
 
 namespace mbgl {
+
 namespace android {
 
-class Layer : private mbgl::util::noncopyable {
+class Layer {
 public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/style/layers/Layer"; };
 
     static void registerNative(jni::JNIEnv&);
 
-    /*
-     * Called when a non-owning peer object is created on the c++ side
-     */
-    Layer(mbgl::Map&, mbgl::style::Layer&);
-
-    /*
-     * Called when a owning peer object is created on the c++ side
-     */
-    Layer(mbgl::Map&, std::unique_ptr<mbgl::style::Layer>);
-
-    /*
-     * Called when a Java object was created from the jvm side
-     */
-    Layer(jni::JNIEnv&, std::unique_ptr<mbgl::style::Layer>);
-
     virtual ~Layer();
-
-    virtual jni::Local<jni::Object<Layer>> createJavaPeer(jni::JNIEnv&) = 0;
 
     /**
      * Set core layer (ie return ownership after remove)
@@ -80,6 +64,21 @@ public:
     jni::Local<jni::Object<jni::ObjectTag>> getVisibility(jni::JNIEnv&);
 
 protected:
+    /*
+     * Called when a non-owning peer object is created on the c++ side
+     */
+    Layer(mbgl::Map&, mbgl::style::Layer&);
+
+    /*
+     * Called when a owning peer object is created on the c++ side
+     */
+    Layer(mbgl::Map&, std::unique_ptr<mbgl::style::Layer>);
+
+    /*
+     * Called when a Java object was created from the jvm side
+     */
+    Layer(std::unique_ptr<mbgl::style::Layer>);
+
     // Release the owned view and return it
     std::unique_ptr<mbgl::style::Layer> releaseCoreLayer();
 
@@ -91,8 +90,37 @@ protected:
 
     // Map is set when the layer is retrieved or after adding to the map
     mbgl::Map* map;
-
 };
+
+/**
+ * @brief A factory class for a layer Java peer objects of a certain type.
+ */
+class JavaLayerPeerFactory {
+public:
+    virtual ~JavaLayerPeerFactory() = default;
+    /**
+     * @brief Create a non-owning peer.
+     */
+    virtual jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv&, mbgl::Map&, mbgl::style::Layer&) = 0;
+
+    /**
+     * @brief Create an owning peer.
+     */
+    virtual jni::Local<jni::Object<Layer>> createJavaLayerPeer(jni::JNIEnv& env, mbgl::Map& map, std::unique_ptr<mbgl::style::Layer>) = 0;
+
+    /**
+     * @brief Register peer methods.
+     */
+    virtual void registerNative(jni::JNIEnv&) = 0;
+
+    /**
+     * @brief Get the corresponding layer factory.
+     * 
+     * @return style::LayerFactory* must not be \c nullptr.
+     */
+    virtual LayerFactory* getLayerFactory() = 0;
+};
+
 
 } // namespace android
 } // namespace mbgl

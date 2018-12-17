@@ -16,6 +16,8 @@ public:
 
     LineLayoutProperties::Unevaluated layout;
     LinePaintProperties::Transitionable paint;
+
+    DECLARE_LAYER_TYPE_INFO;
 };
 
 } // namespace style

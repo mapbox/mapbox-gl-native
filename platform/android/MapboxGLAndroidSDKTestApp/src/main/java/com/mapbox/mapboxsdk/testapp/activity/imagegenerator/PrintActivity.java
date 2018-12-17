@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.support.v4.print.PrintHelper;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -23,18 +23,23 @@ public class PrintActivity extends AppCompatActivity implements MapboxMap.Snapsh
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_print);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(mapboxMap -> PrintActivity.this.mapboxMap = mapboxMap);
+    mapView.getMapAsync(this::initMap);
 
     final View fab = findViewById(R.id.fab);
     if (fab != null) {
       fab.setOnClickListener(view -> {
-        if (mapboxMap != null) {
+        if (mapboxMap != null && mapboxMap.getStyle() != null) {
           mapboxMap.snapshot(PrintActivity.this);
         }
       });
     }
+  }
+
+  private void initMap(MapboxMap mapboxMap) {
+    this.mapboxMap = mapboxMap;
+    mapboxMap.setStyle(Style.MAPBOX_STREETS);
   }
 
   @Override

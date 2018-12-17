@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.http;
 
 import android.support.annotation.Keep;
+import android.support.annotation.Nullable;
 import com.mapbox.mapboxsdk.Mapbox;
 
 import java.util.concurrent.locks.ReentrantLock;
@@ -58,13 +59,16 @@ public class NativeHttpRequest implements HttpResponder {
   }
 
   private void executeLocalRequest(String resourceUrl) {
-    new LocalRequestTask(bytes -> {
-      if (bytes != null) {
-        lock.lock();
-        if (nativePtr != 0) {
-          nativeOnResponse(200, null, null, null, null, null, null, bytes);
+    new LocalRequestTask(new LocalRequestTask.OnLocalRequestResponse() {
+      @Override
+      public void onResponse(@Nullable byte[] bytes) {
+        if (bytes != null) {
+          lock.lock();
+          if (nativePtr != 0) {
+            NativeHttpRequest.this.nativeOnResponse(200, null, null, null, null, null, null, bytes);
+          }
+          lock.unlock();
         }
-        lock.unlock();
       }
     }).execute(resourceUrl);
   }

@@ -18,6 +18,8 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/util/color.hpp>
 
 using namespace mbgl;
@@ -69,12 +71,58 @@ TEST(Map, RendererState) {
     test.runLoop.runOnce();
     test.frontend.render(test.map);
 
+    // RendererState::getCameraOptions
     const CameraOptions& options = test.frontend.getCameraOptions();
     EXPECT_NEAR(options.center->latitude(), coordinate.latitude(), 1e-7);
     EXPECT_NEAR(options.center->longitude(), coordinate.longitude(), 1e-7);
     ASSERT_DOUBLE_EQ(*options.zoom, zoom);
     ASSERT_DOUBLE_EQ(*options.pitch, pitchInDegrees);
     EXPECT_NEAR(*options.angle, bearingInDegrees, 1e-7);
+
+    {
+        const LatLng& latLng = test.frontend.latLngForPixel(ScreenCoordinate { 0, 0 });
+        const ScreenCoordinate& point = test.frontend.pixelForLatLng(coordinate);
+        EXPECT_NEAR(coordinate.latitude(), latLng.latitude(), 1e-1);
+        EXPECT_NEAR(coordinate.longitude(), latLng.longitude(), 1e-1);
+        const Size size = test.map.getSize();
+        EXPECT_NEAR(point.x, size.width / 2.0, 1e-7);
+        EXPECT_NEAR(point.y, size.height / 2.0, 1e-7);
+    }
+
+    // RendererState::hasImage
+    test.map.getStyle().addImage(std::make_unique<style::Image>("default_marker", decodeImage(util::read_file("test/fixtures/sprites/default_marker.png")), 1.0));
+
+    // The frontend has not yet been notified about the newly-added image.
+    EXPECT_FALSE(test.frontend.hasImage("default_marker"));
+
+    test.runLoop.runOnce();
+    test.frontend.render(test.map);
+
+    EXPECT_TRUE(test.frontend.hasImage("default_marker"));
+
+    // RendererState::hasSource
+    auto source = std::make_unique<GeoJSONSource>("GeoJSONSource");
+    source->setGeoJSON( Geometry<double>{ Point<double>{ 0, 0 } } );
+    test.map.getStyle().addSource(std::move(source));
+
+    // The frontend has not yet been notified about the newly-added source.
+    EXPECT_FALSE(test.frontend.hasSource("GeoJSONSource"));
+
+    test.runLoop.runOnce();
+    test.frontend.render(test.map);
+
+    EXPECT_TRUE(test.frontend.hasSource("GeoJSONSource"));
+
+    // RendererState::hasLayer
+    test.map.getStyle().addLayer(std::make_unique<SymbolLayer>("SymbolLayer", "GeoJSONSource"));
+
+    // The frontend has not yet been notified about the newly-added source.
+    EXPECT_FALSE(test.frontend.hasLayer("SymbolLayer"));
+
+    test.runLoop.runOnce();
+    test.frontend.render(test.map);
+
+    EXPECT_TRUE(test.frontend.hasLayer("SymbolLayer"));
 }
 
 TEST(Map, LatLngBehavior) {
@@ -237,7 +285,7 @@ TEST(Map, SetStyleInvalidJSON) {
     auto observer = Log::removeObserver();
     auto flo = static_cast<FixtureLogObserver*>(observer.get());
     EXPECT_EQ(1u, flo->count({ EventSeverity::Error, Event::ParseStyle, -1,
-        "Failed to parse style: 0 - Invalid value." }));
+        "Failed to parse style: Invalid value. at offset 0" }));
     auto unchecked = flo->unchecked();
     EXPECT_TRUE(unchecked.empty()) << unchecked;
 }

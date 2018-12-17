@@ -17,8 +17,22 @@ public:
                   const mapbox::geojsonvt::Options& options)
         : impl(geoJSON, options) {}
 
-    mapbox::geometry::feature_collection<int16_t> getTile(const CanonicalTileID& tileID) final {
+    mapbox::feature::feature_collection<int16_t> getTile(const CanonicalTileID& tileID) final {
         return impl.getTile(tileID.z, tileID.x, tileID.y).features;
+    }
+
+    mapbox::feature::feature_collection<double> getChildren(const std::uint32_t) final {
+        return {};
+    }
+
+    mapbox::feature::feature_collection<double> getLeaves(const std::uint32_t,
+                                                           const std::uint32_t,
+                                                           const std::uint32_t) final {
+        return {};
+    }
+
+    std::uint8_t getClusterExpansionZoom(std::uint32_t) final {
+        return 0;
     }
 
 private:
@@ -27,12 +41,26 @@ private:
 
 class SuperclusterData : public GeoJSONData {
 public:
-    SuperclusterData(const mapbox::geometry::feature_collection<double>& features,
+    SuperclusterData(const mapbox::feature::feature_collection<double>& features,
                      const mapbox::supercluster::Options& options)
         : impl(features, options) {}
 
-    mapbox::geometry::feature_collection<int16_t> getTile(const CanonicalTileID& tileID) final {
+    mapbox::feature::feature_collection<int16_t> getTile(const CanonicalTileID& tileID) final {
         return impl.getTile(tileID.z, tileID.x, tileID.y);
+    }
+
+    mapbox::feature::feature_collection<double> getChildren(const std::uint32_t cluster_id) final {
+        return impl.getChildren(cluster_id);
+    }
+
+    mapbox::feature::feature_collection<double> getLeaves(const std::uint32_t cluster_id,
+                                                           const std::uint32_t limit,
+                                                           const std::uint32_t offset) final {
+        return impl.getLeaves(cluster_id, limit, offset);
+    }
+
+    std::uint8_t getClusterExpansionZoom(std::uint32_t cluster_id) final {
+        return impl.getClusterExpansionZoom(cluster_id);
     }
 
 private:
@@ -47,17 +75,17 @@ GeoJSONSource::Impl::Impl(std::string id_, GeoJSONOptions options_)
 GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON)
     : Source::Impl(other),
       options(other.options) {
-    double scale = util::EXTENT / util::tileSize;
+    constexpr double scale = util::EXTENT / util::tileSize;
 
     if (options.cluster
-        && geoJSON.is<mapbox::geometry::feature_collection<double>>()
-        && !geoJSON.get<mapbox::geometry::feature_collection<double>>().empty()) {
+        && geoJSON.is<mapbox::feature::feature_collection<double>>()
+        && !geoJSON.get<mapbox::feature::feature_collection<double>>().empty()) {
         mapbox::supercluster::Options clusterOptions;
         clusterOptions.maxZoom = options.clusterMaxZoom;
         clusterOptions.extent = util::EXTENT;
         clusterOptions.radius = ::round(scale * options.clusterRadius);
-        data = std::make_unique<SuperclusterData>(
-            geoJSON.get<mapbox::geometry::feature_collection<double>>(), clusterOptions);
+        data = std::make_shared<SuperclusterData>(
+            geoJSON.get<mapbox::feature::feature_collection<double>>(), clusterOptions);
     } else {
         mapbox::geojsonvt::Options vtOptions;
         vtOptions.maxZoom = options.maxzoom;
@@ -65,7 +93,7 @@ GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON)
         vtOptions.buffer = ::round(scale * options.buffer);
         vtOptions.tolerance = scale * options.tolerance;
         vtOptions.lineMetrics = options.lineMetrics;
-        data = std::make_unique<GeoJSONVTData>(geoJSON, vtOptions);
+        data = std::make_shared<GeoJSONVTData>(geoJSON, vtOptions);
     }
 }
 
@@ -75,8 +103,8 @@ Range<uint8_t> GeoJSONSource::Impl::getZoomRange() const {
     return { options.minzoom, options.maxzoom };
 }
 
-GeoJSONData* GeoJSONSource::Impl::getData() const {
-    return data.get();
+std::weak_ptr<GeoJSONData> GeoJSONSource::Impl::getData() const {
+    return data;
 }
 
 optional<std::string> GeoJSONSource::Impl::getAttribution() const {

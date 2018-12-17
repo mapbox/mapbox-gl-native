@@ -94,6 +94,32 @@ src/mbgl/gl/vertex_array.hpp
 src/mbgl/gl/vertex_array_extension.hpp
 src/mbgl/gl/vertex_buffer.hpp
 
+# layermanager
+include/mbgl/layermanager/background_layer_factory.hpp
+include/mbgl/layermanager/circle_layer_factory.hpp
+include/mbgl/layermanager/custom_layer_factory.hpp
+include/mbgl/layermanager/fill_extrusion_layer_factory.hpp
+include/mbgl/layermanager/fill_layer_factory.hpp
+include/mbgl/layermanager/heatmap_layer_factory.hpp
+include/mbgl/layermanager/hillshade_layer_factory.hpp
+include/mbgl/layermanager/layer_factory.hpp
+include/mbgl/layermanager/layer_manager.hpp
+include/mbgl/layermanager/line_layer_factory.hpp
+include/mbgl/layermanager/raster_layer_factory.hpp
+include/mbgl/layermanager/symbol_layer_factory.hpp
+src/mbgl/layermanager/background_layer_factory.cpp
+src/mbgl/layermanager/circle_layer_factory.cpp
+src/mbgl/layermanager/custom_layer_factory.cpp
+src/mbgl/layermanager/fill_extrusion_layer_factory.cpp
+src/mbgl/layermanager/fill_layer_factory.cpp
+src/mbgl/layermanager/heatmap_layer_factory.cpp
+src/mbgl/layermanager/hillshade_layer_factory.cpp
+src/mbgl/layermanager/layer_factory.cpp
+src/mbgl/layermanager/layer_manager.cpp
+src/mbgl/layermanager/line_layer_factory.cpp
+src/mbgl/layermanager/raster_layer_factory.cpp
+src/mbgl/layermanager/symbol_layer_factory.cpp
+
 # layout
 src/mbgl/layout/clip_lines.cpp
 src/mbgl/layout/clip_lines.hpp
@@ -262,6 +288,7 @@ src/mbgl/renderer/layers/render_heatmap_layer.cpp
 src/mbgl/renderer/layers/render_heatmap_layer.hpp
 src/mbgl/renderer/layers/render_hillshade_layer.cpp
 src/mbgl/renderer/layers/render_hillshade_layer.hpp
+src/mbgl/renderer/layers/render_layer_symbol_interface.hpp
 src/mbgl/renderer/layers/render_line_layer.cpp
 src/mbgl/renderer/layers/render_line_layer.hpp
 src/mbgl/renderer/layers/render_raster_layer.cpp
@@ -726,6 +753,7 @@ src/mbgl/util/geo.cpp
 src/mbgl/util/geojson_impl.cpp
 src/mbgl/util/grid_index.cpp
 src/mbgl/util/grid_index.hpp
+src/mbgl/util/hash.hpp
 src/mbgl/util/http_header.cpp
 src/mbgl/util/http_header.hpp
 src/mbgl/util/http_timeout.cpp
@@ -751,6 +779,7 @@ src/mbgl/util/math.hpp
 src/mbgl/util/offscreen_texture.cpp
 src/mbgl/util/offscreen_texture.hpp
 src/mbgl/util/premultiply.cpp
+src/mbgl/util/rapidjson.cpp
 src/mbgl/util/rapidjson.hpp
 src/mbgl/util/rect.hpp
 src/mbgl/util/std.hpp
@@ -773,4 +802,3 @@ src/mbgl/util/utf.hpp
 src/mbgl/util/version.cpp
 src/mbgl/util/version.hpp
 src/mbgl/util/work_request.cpp
-

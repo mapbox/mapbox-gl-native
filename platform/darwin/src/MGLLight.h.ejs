@@ -46,11 +46,11 @@ typedef struct __attribute__((objc_boxable)) MGLSphericalPosition {
 
 /**
  Creates a new `MGLSphericalPosition` from the given radial, azimuthal, polar.
- 
+
  @param radial The radial coordinate.
  @param azimuthal The azimuthal angle.
  @param polar The polar angle.
- 
+
  @return Returns a `MGLSphericalPosition` struct containing the position attributes.
  */
 NS_INLINE MGLSphericalPosition MGLSphericalPositionMake(CGFloat radial, CLLocationDirection azimuthal, CLLocationDirection polar) {
@@ -58,12 +58,12 @@ NS_INLINE MGLSphericalPosition MGLSphericalPositionMake(CGFloat radial, CLLocati
     position.radial = radial;
     position.azimuthal = azimuthal;
     position.polar = polar;
-    
+
     return position;
 }
 
 /**
- <%- doc %>
+ <%- doc.wrap(80, 1) %>
  */
 MGL_EXPORT
 @interface MGLLight : NSObject
@@ -76,6 +76,11 @@ MGL_EXPORT
  This property corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-<%- originalPropertyName(property) %>"><code><%- originalPropertyName(property) %></code></a>
  light property in the Mapbox Style Specification.
+<% if (property.examples) { -%>
+
+ #### Related examples
+<%- propertyExample(property).wrap(80, 1) %>
+<% } -%>
  */
 @property (nonatomic<% if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) NSExpression *<%- camelizeWithLeadingLowercase(property.name) %>;
 

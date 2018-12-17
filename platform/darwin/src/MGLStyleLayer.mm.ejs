@@ -13,9 +13,12 @@
 #import "MGLStyleLayer_Private.h"
 #import "MGLStyleValue_Private.h"
 #import "MGL<%- camelize(type) %>StyleLayer.h"
+#import "MGLLoggingConfiguration_Private.h"
+#import "MGL<%- camelize(type) %>StyleLayer_Private.h"
 
-#include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
+#include <mbgl/style/transition_options.hpp>
+
 <% if (enumProperties) { -%>
 
 namespace mbgl {
@@ -58,6 +61,7 @@ namespace mbgl {
 <% if (type == 'background') { -%>
 - (instancetype)initWithIdentifier:(NSString *)identifier
 {
+    MGLLogDebug(@"Initializing %@ with identifier: %@", NSStringFromClass([self class]), identifier);
     auto layer = std::make_unique<mbgl::style::<%- camelize(type) %>Layer>(identifier.UTF8String);
     return self = [super initWithPendingLayer:std::move(layer)];
 }
@@ -65,6 +69,7 @@ namespace mbgl {
 <% } else { -%>
 - (instancetype)initWithIdentifier:(NSString *)identifier source:(MGLSource *)source
 {
+    MGLLogDebug(@"Initializing %@ with identifier: %@ source: %@", NSStringFromClass([self class]), identifier, source);
     auto layer = std::make_unique<mbgl::style::<%- camelize(type) %>Layer>(identifier.UTF8String, source.identifier.UTF8String);
     return self = [super initWithPendingLayer:std::move(layer)];
 }
@@ -95,6 +100,7 @@ namespace mbgl {
 - (void)setSourceLayerIdentifier:(NSString *)sourceLayerIdentifier
 {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting sourceLayerIdentifier: %@", sourceLayerIdentifier);
 
     self.rawLayer->setSourceLayer(sourceLayerIdentifier.UTF8String ?: "");
 }
@@ -102,6 +108,7 @@ namespace mbgl {
 - (void)setPredicate:(NSPredicate *)predicate
 {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting predicate: %@", predicate);
 
     self.rawLayer->setFilter(predicate ? predicate.mgl_filter : mbgl::style::Filter());
 }
@@ -120,6 +127,7 @@ namespace mbgl {
 <% for (const property of layoutProperties) { -%>
 - (void)set<%- camelize(property.name) %>:(NSExpression *)<%- objCName(property) %> {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting <%- objCName(property) %>: %@", <%- objCName(property) %>);
 
 <% if (property.tokens) { -%>
     if (<%- objCName(property) %> && <%- objCName(property) %>.expressionType == NSConstantValueExpressionType) {
@@ -171,6 +179,7 @@ namespace mbgl {
 
 - (void)set<%- camelize(property.name) %>:(NSExpression *)<%- objCName(property) %> {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting <%- objCName(property) %>: %@", <%- objCName(property) %>);
 
 <% switch (property['property-type']) {
     case 'color-ramp': -%>
@@ -199,20 +208,17 @@ namespace mbgl {
 
 - (void)set<%- camelize(property.name) %>Transition:(MGLTransition )transition {
     MGLAssertStyleLayerIsValid();
+    MGLLogDebug(@"Setting <%- objCName(property) %>Transition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->set<%- camelize(originalPropertyName(property)) %>Transition(options);
+    self.rawLayer->set<%- camelize(originalPropertyName(property)) %>Transition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)<%- objCGetter(property) %>Transition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->get<%- camelize(originalPropertyName(property)) %>Transition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 <% } -%>
 <% if (property.original) { -%>
@@ -246,3 +252,11 @@ namespace mbgl {
 <% } -%>
 @end
 <% } -%>
+
+namespace mbgl {
+
+MGLStyleLayer* <%- camelize(type) %>StyleLayerPeerFactory::createPeer(style::Layer* rawLayer) {
+    return [[MGL<%- camelize(type) %>StyleLayer alloc] initWithRawLayer:rawLayer];
+}
+
+}  // namespace mbgl

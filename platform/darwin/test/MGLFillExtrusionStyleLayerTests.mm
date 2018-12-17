@@ -43,8 +43,8 @@
 
     MGLFillExtrusionStyleLayer *layer = [[MGLFillExtrusionStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
     XCTAssertNotEqual(layer.rawLayer, nullptr);
-    XCTAssertTrue(layer.rawLayer->is<mbgl::style::FillExtrusionLayer>());
-    auto rawLayer = layer.rawLayer->as<mbgl::style::FillExtrusionLayer>();
+    XCTAssertEqualObjects(@(layer.rawLayer->getTypeInfo()->type), @"fill-extrusion");
+    auto rawLayer = static_cast<mbgl::style::FillExtrusionLayer*>(layer.rawLayer);
 
     MGLTransition transitionTest = MGLTransitionMake(5, 4);
 
@@ -203,6 +203,50 @@
         MGLTransition fillExtrusionColorTransition = layer.fillExtrusionColorTransition;
         XCTAssertEqual(fillExtrusionColorTransition.delay, transitionTest.delay);
         XCTAssertEqual(fillExtrusionColorTransition.duration, transitionTest.duration);
+    }
+
+    // fill-extrusion-vertical-gradient
+    {
+        XCTAssertTrue(rawLayer->getFillExtrusionVerticalGradient().isUndefined(),
+                      @"fill-extrusion-vertical-gradient should be unset initially.");
+        NSExpression *defaultExpression = layer.fillExtrusionHasVerticalGradient;
+
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"false"];
+        layer.fillExtrusionHasVerticalGradient = constantExpression;
+        mbgl::style::PropertyValue<bool> propertyValue = { false };
+        XCTAssertEqual(rawLayer->getFillExtrusionVerticalGradient(), propertyValue,
+                       @"Setting fillExtrusionHasVerticalGradient to a constant value expression should update fill-extrusion-vertical-gradient.");
+        XCTAssertEqualObjects(layer.fillExtrusionHasVerticalGradient, constantExpression,
+                              @"fillExtrusionHasVerticalGradient should round-trip constant value expressions.");
+
+        constantExpression = [NSExpression expressionWithFormat:@"false"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.fillExtrusionHasVerticalGradient = functionExpression;
+
+        {
+            using namespace mbgl::style::expression::dsl;
+            propertyValue = mbgl::style::PropertyExpression<bool>(
+                step(zoom(), literal(false), 18.0, literal(false))
+            );
+        }
+
+        XCTAssertEqual(rawLayer->getFillExtrusionVerticalGradient(), propertyValue,
+                       @"Setting fillExtrusionHasVerticalGradient to a camera expression should update fill-extrusion-vertical-gradient.");
+        XCTAssertEqualObjects(layer.fillExtrusionHasVerticalGradient, functionExpression,
+                              @"fillExtrusionHasVerticalGradient should round-trip camera expressions.");
+
+
+        layer.fillExtrusionHasVerticalGradient = nil;
+        XCTAssertTrue(rawLayer->getFillExtrusionVerticalGradient().isUndefined(),
+                      @"Unsetting fillExtrusionHasVerticalGradient should return fill-extrusion-vertical-gradient to the default value.");
+        XCTAssertEqualObjects(layer.fillExtrusionHasVerticalGradient, defaultExpression,
+                              @"fillExtrusionHasVerticalGradient should return the default value after being unset.");
+
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.fillExtrusionHasVerticalGradient = functionExpression, NSException, NSInvalidArgumentException, @"MGLFillExtrusionLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.fillExtrusionHasVerticalGradient = functionExpression, NSException, NSInvalidArgumentException, @"MGLFillExtrusionLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
     // fill-extrusion-height
@@ -481,6 +525,7 @@
 - (void)testPropertyNames {
     [self testPropertyName:@"fill-extrusion-base" isBoolean:NO];
     [self testPropertyName:@"fill-extrusion-color" isBoolean:NO];
+    [self testPropertyName:@"fill-extrusion-has-vertical-gradient" isBoolean:YES];
     [self testPropertyName:@"fill-extrusion-height" isBoolean:NO];
     [self testPropertyName:@"fill-extrusion-opacity" isBoolean:NO];
     [self testPropertyName:@"fill-extrusion-pattern" isBoolean:NO];

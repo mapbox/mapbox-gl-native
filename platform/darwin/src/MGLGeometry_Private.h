@@ -33,6 +33,20 @@ NS_INLINE MGLRadianCoordinate2D MGLRadianCoordinate2DMake(MGLLocationRadians lat
 /// the given point.
 CGRect MGLExtendRect(CGRect rect, CGPoint point);
 
+#if TARGET_OS_IPHONE
+NS_INLINE NSString *MGLStringFromSize(CGSize size) {
+    return NSStringFromCGSize(size);
+}
+#else
+NS_INLINE NSString *MGLStringFromSize(NSSize size) {
+    return NSStringFromSize(size);
+}
+#endif
+
+NS_INLINE NSString *MGLStringFromCLLocationCoordinate2D(CLLocationCoordinate2D coordinate) {
+    return [NSString stringWithFormat:@"(lat: %f, lon: %f)", coordinate.latitude, coordinate.longitude];
+}
+
 mbgl::LatLng MGLLatLngFromLocationCoordinate2D(CLLocationCoordinate2D coordinate);
 
 NS_INLINE mbgl::Point<double> MGLPointFromLocationCoordinate2D(CLLocationCoordinate2D coordinate) {

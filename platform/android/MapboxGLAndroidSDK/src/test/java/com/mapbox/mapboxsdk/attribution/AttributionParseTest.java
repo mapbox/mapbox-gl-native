@@ -15,14 +15,13 @@ import static junit.framework.Assert.assertEquals;
 @Config(constants = BuildConfig.class)
 public class AttributionParseTest {
 
-  private static final String STREETS_ATTRIBUTION = "<a href=\"https://www.mapbox.com/about/maps/\" target=\"_blank\">&copy; Mapbox</a> <a href=\"http://www.openstreetmap.org/about/\" target=\"_blank\">&copy; OpenStreetMap</a> <a class=\"mapbox-improve-map\" href=\"https://www.mapbox.com/map-feedback/\" target=\"_blank\">Improve this map</a>\n";
-  private static final String SATELLITE_ATTRIBUTION = "<a href=\"https://www.mapbox.com/about/maps/\" target=\"_blank\">&copy; Mapbox</a> <a href=\"http://www.openstreetmap.org/about/\" target=\"_blank\">&copy; OpenStreetMap</a> <a class=\"mapbox-improve-map\" href=\"https://www.mapbox.com/map-feedback/\" target=\"_blank\">Improve this map</a> <a href=\"https://www.digitalglobe.com/\" target=\"_blank\">&copy; DigitalGlobe</a>\n";
+  private static final String STREETS_ATTRIBUTION = "<a href=\"https://www.mapbox.com/about/maps/\" target=\"_blank\">&copy; Mapbox</a> <a href=\"http://www.openstreetmap.org/about/\" target=\"_blank\">&copy; OpenStreetMap</a> <a class=\"mapbox-improve-map\" href=\"https://www.mapbox.com/feedback/\" target=\"_blank\">Improve this map</a>\n";
+  private static final String SATELLITE_ATTRIBUTION = "<a href=\"https://www.mapbox.com/about/maps/\" target=\"_blank\">&copy; Mapbox</a> <a href=\"http://www.openstreetmap.org/about/\" target=\"_blank\">&copy; OpenStreetMap</a> <a class=\"mapbox-improve-map\" href=\"https://www.mapbox.com/feedback/\" target=\"_blank\">Improve this map</a> <a href=\"https://www.digitalglobe.com/\" target=\"_blank\">&copy; DigitalGlobe</a>\n";
 
   @Test
   public void testParseAttributionStringSatellite() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(SATELLITE_ATTRIBUTION)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     Set<Attribution> attributionList = attributionParser.getAttributions();
@@ -40,7 +39,7 @@ public class AttributionParseTest {
           assertEquals("Title openstreetmap should match", "© OpenStreetMap", attribution.getTitle());
           break;
         case 2:
-          assertEquals("URL improve map should match", "https://www.mapbox.com/map-feedback/", attribution.getUrl());
+          assertEquals("URL improve map should match", "https://www.mapbox.com/feedback/", attribution.getUrl());
           assertEquals("Title improve map should match", "Improve This Map", attribution.getTitle());
           break;
         case 3:
@@ -54,9 +53,8 @@ public class AttributionParseTest {
 
   @Test
   public void testParseAttributionStringStreets() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     Set<Attribution> attributionList = attributionParser.getAttributions();
@@ -74,7 +72,7 @@ public class AttributionParseTest {
           assertEquals("Title openstreetmap should match", "© OpenStreetMap", attribution.getTitle());
           break;
         case 2:
-          assertEquals("URL improve map should match", "https://www.mapbox.com/map-feedback/", attribution.getUrl());
+          assertEquals("URL improve map should match", "https://www.mapbox.com/feedback/", attribution.getUrl());
           assertEquals("Title improve map should match", "Improve This Map", attribution.getTitle());
           break;
       }
@@ -84,10 +82,9 @@ public class AttributionParseTest {
 
   @Test
   public void testParseAttributionWithoutMapbox() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION)
       .withMapboxAttribution(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     Set<Attribution> attributionList = attributionParser.getAttributions();
@@ -101,7 +98,7 @@ public class AttributionParseTest {
           assertEquals("Title openstreetmap should match", "© OpenStreetMap", attribution.getTitle());
           break;
         case 1:
-          assertEquals("URL improve map should match", "https://www.mapbox.com/map-feedback/", attribution.getUrl());
+          assertEquals("URL improve map should match", "https://www.mapbox.com/feedback/", attribution.getUrl());
           assertEquals("Title improve map should match", "Improve This Map", attribution.getTitle());
           break;
       }
@@ -111,9 +108,8 @@ public class AttributionParseTest {
 
   @Test
   public void testParseAttributionArrayString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(new String[] {STREETS_ATTRIBUTION, "", SATELLITE_ATTRIBUTION})
-      .withContext(RuntimeEnvironment.application)
       .build();
     Set<Attribution> attributionList = attributionParser.getAttributions();
     assertEquals("Size of list should match", 4, attributionList.size());
@@ -130,7 +126,7 @@ public class AttributionParseTest {
           assertEquals("Title openstreetmap should match", "© OpenStreetMap", attribution.getTitle());
           break;
         case 2:
-          assertEquals("URL improve map should match", "https://www.mapbox.com/map-feedback/", attribution.getUrl());
+          assertEquals("URL improve map should match", "https://www.mapbox.com/feedback/", attribution.getUrl());
           assertEquals("Title improve map should match", "Improve This Map", attribution.getTitle());
           break;
         case 3:
@@ -144,10 +140,9 @@ public class AttributionParseTest {
 
   @Test
   public void testHideImproveThisMapAttributionArrayString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(SATELLITE_ATTRIBUTION)
       .withImproveMap(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
     Set<Attribution> attributionList = attributionParser.getAttributions();
     assertEquals("Size of list should match", 3, attributionList.size());
@@ -174,10 +169,9 @@ public class AttributionParseTest {
 
   @Test
   public void testParseHideCopyrightAttributionArrayString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION, "", SATELLITE_ATTRIBUTION)
       .withCopyrightSign(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
     Set<Attribution> attributionList = attributionParser.getAttributions();
     assertEquals("Size of list should match", 4, attributionList.size());
@@ -194,7 +188,7 @@ public class AttributionParseTest {
           assertEquals("Title openstreetmap should match", "OpenStreetMap", attribution.getTitle());
           break;
         case 2:
-          assertEquals("URL improve map should match", "https://www.mapbox.com/map-feedback/", attribution.getUrl());
+          assertEquals("URL improve map should match", "https://www.mapbox.com/feedback/", attribution.getUrl());
           assertEquals("Title improve map should match", "Improve This Map", attribution.getTitle());
           break;
         case 3:
@@ -208,11 +202,10 @@ public class AttributionParseTest {
 
   @Test
   public void testOutputWithoutCopyRightString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION)
       .withCopyrightSign(false)
       .withImproveMap(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     assertEquals(
@@ -225,10 +218,9 @@ public class AttributionParseTest {
 
   @Test
   public void testOutputWithCopyRightString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION)
       .withImproveMap(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     assertEquals(
@@ -240,12 +232,11 @@ public class AttributionParseTest {
 
   @Test
   public void testOutputWithoutCopyRightWithoutMapboxString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION)
       .withCopyrightSign(false)
       .withImproveMap(false)
       .withMapboxAttribution(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     assertEquals(
@@ -257,11 +248,10 @@ public class AttributionParseTest {
 
   @Test
   public void testOutputWithCopyRightWithoutMapboxString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION)
       .withImproveMap(false)
       .withMapboxAttribution(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     assertEquals(
@@ -273,12 +263,11 @@ public class AttributionParseTest {
 
   @Test
   public void testOutputSatelliteString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION, SATELLITE_ATTRIBUTION, "blabla", "")
       .withImproveMap(false)
       .withCopyrightSign(false)
       .withMapboxAttribution(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     assertEquals(
@@ -290,12 +279,11 @@ public class AttributionParseTest {
 
   @Test
   public void testShortOpenStreetMapString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION, SATELLITE_ATTRIBUTION, "blabla", "")
       .withImproveMap(false)
       .withCopyrightSign(false)
       .withMapboxAttribution(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     assertEquals(
@@ -307,11 +295,10 @@ public class AttributionParseTest {
 
   @Test
   public void testShortOpenStreetMapWithoutCopyrightString() throws Exception {
-    AttributionParser attributionParser = new AttributionParser.Options()
+    AttributionParser attributionParser = new AttributionParser.Options(RuntimeEnvironment.application)
       .withAttributionData(STREETS_ATTRIBUTION, SATELLITE_ATTRIBUTION, "blabla", "")
       .withImproveMap(false)
       .withCopyrightSign(false)
-      .withContext(RuntimeEnvironment.application)
       .build();
 
     assertEquals(

@@ -19,7 +19,7 @@ namespace mbgl {
 using namespace style;
 
 RenderFillExtrusionLayer::RenderFillExtrusionLayer(Immutable<style::FillExtrusionLayer::Impl> _impl)
-    : RenderLayer(style::LayerType::FillExtrusion, _impl),
+    : RenderLayer(std::move(_impl)),
       unevaluated(impl().paint.untransitioned()) {
 }
 
@@ -28,10 +28,10 @@ const style::FillExtrusionLayer::Impl& RenderFillExtrusionLayer::impl() const {
 }
 
 std::unique_ptr<Bucket> RenderFillExtrusionLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
-    assert(false); // Should be calling createLayout() instead.
+    // Should be calling createLayout() instead.
+    assert(baseImpl->getTypeInfo()->layout == LayerTypeInfo::Layout::NotRequired);
     return nullptr;
 }
-
 
 std::unique_ptr<Layout> RenderFillExtrusionLayer::createLayout(const BucketParameters& parameters,
                         const std::vector<const RenderLayer*>& group,
@@ -226,7 +226,8 @@ style::FillExtrusionPaintProperties::PossiblyEvaluated RenderFillExtrusionLayer:
         evaluated.get<style::FillExtrusionTranslateAnchor>(),
         evaluated.get<style::FillExtrusionPattern>(),
         evaluated.get<style::FillExtrusionHeight>(),
-        evaluated.get<style::FillExtrusionBase>()
+        evaluated.get<style::FillExtrusionBase>(),
+        evaluated.get<style::FillExtrusionVerticalGradient>()
     };
 }
 

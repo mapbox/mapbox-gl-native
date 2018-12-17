@@ -18,6 +18,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -34,7 +35,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconRotate;
 
 /**
- * Test activity showcasing animating MarkerViews.
+ * Test activity showcasing animating a SymbolLayer.
  */
 public class AnimatedSymbolLayerActivity extends AppCompatActivity {
 
@@ -56,6 +57,7 @@ public class AnimatedSymbolLayerActivity extends AppCompatActivity {
 
   private MapView mapView;
   private MapboxMap mapboxMap;
+  private Style style;
 
   private List<Car> randomCars = new ArrayList<>();
   private GeoJsonSource randomCarSource;
@@ -70,13 +72,16 @@ public class AnimatedSymbolLayerActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_animated_marker);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(mapboxMap -> {
-      AnimatedSymbolLayerActivity.this.mapboxMap = mapboxMap;
-      setupCars();
-      animateRandomRoutes();
-      animateTaxi();
+    mapView.getMapAsync(map -> {
+      this.mapboxMap = map;
+      map.setStyle(Style.MAPBOX_STREETS, style -> {
+        this.style = style;
+        setupCars();
+        animateRandomRoutes();
+        animateTaxi();
+      });
     });
   }
 
@@ -180,7 +185,7 @@ public class AnimatedSymbolLayerActivity extends AppCompatActivity {
   }
 
   private void updatePassengerSource() {
-    GeoJsonSource source = mapboxMap.getSourceAs(PASSENGER_SOURCE);
+    GeoJsonSource source = style.getSourceAs(PASSENGER_SOURCE);
     FeatureCollection featureCollection = FeatureCollection.fromFeatures(new Feature[] {
       Feature.fromGeometry(
         Point.fromLngLat(
@@ -256,8 +261,8 @@ public class AnimatedSymbolLayerActivity extends AppCompatActivity {
     }
 
     randomCarSource = new GeoJsonSource(RANDOM_CAR_SOURCE, featuresFromRoutes());
-    mapboxMap.addSource(randomCarSource);
-    mapboxMap.addImage(RANDOM_CAR_IMAGE_ID,
+    style.addSource(randomCarSource);
+    style.addImage(RANDOM_CAR_IMAGE_ID,
       ((BitmapDrawable) getResources().getDrawable(R.drawable.ic_car_top)).getBitmap());
 
     SymbolLayer symbolLayer = new SymbolLayer(RANDOM_CAR_LAYER, RANDOM_CAR_SOURCE);
@@ -268,7 +273,7 @@ public class AnimatedSymbolLayerActivity extends AppCompatActivity {
       iconIgnorePlacement(true)
     );
 
-    mapboxMap.addLayerBelow(symbolLayer, WATERWAY_LAYER_ID);
+    style.addLayerBelow(symbolLayer, WATERWAY_LAYER_ID);
   }
 
   private void addPassenger() {
@@ -282,11 +287,11 @@ public class AnimatedSymbolLayerActivity extends AppCompatActivity {
       )
     });
 
-    mapboxMap.addImage(PASSENGER,
+    style.addImage(PASSENGER,
       ((BitmapDrawable) getResources().getDrawable(R.drawable.icon_burned)).getBitmap());
 
     GeoJsonSource geoJsonSource = new GeoJsonSource(PASSENGER_SOURCE, featureCollection);
-    mapboxMap.addSource(geoJsonSource);
+    style.addSource(geoJsonSource);
 
     SymbolLayer symbolLayer = new SymbolLayer(PASSENGER_LAYER, PASSENGER_SOURCE);
     symbolLayer.withProperties(
@@ -294,7 +299,7 @@ public class AnimatedSymbolLayerActivity extends AppCompatActivity {
       iconIgnorePlacement(true),
       iconAllowOverlap(true)
     );
-    mapboxMap.addLayerBelow(symbolLayer, RANDOM_CAR_LAYER);
+    style.addLayerBelow(symbolLayer, RANDOM_CAR_LAYER);
   }
 
   private void addMainCar() {
@@ -308,10 +313,10 @@ public class AnimatedSymbolLayerActivity extends AppCompatActivity {
     FeatureCollection featureCollection = FeatureCollection.fromFeatures(new Feature[] {feature});
 
     taxi = new Car(feature, passenger, getDuration());
-    mapboxMap.addImage(TAXI,
+    style.addImage(TAXI,
       ((BitmapDrawable) getResources().getDrawable(R.drawable.ic_taxi_top)).getBitmap());
     taxiSource = new GeoJsonSource(TAXI_SOURCE, featureCollection);
-    mapboxMap.addSource(taxiSource);
+    style.addSource(taxiSource);
 
     SymbolLayer symbolLayer = new SymbolLayer(TAXI_LAYER, TAXI_SOURCE);
     symbolLayer.withProperties(
@@ -321,7 +326,7 @@ public class AnimatedSymbolLayerActivity extends AppCompatActivity {
       iconIgnorePlacement(true)
 
     );
-    mapboxMap.addLayer(symbolLayer);
+    style.addLayer(symbolLayer);
   }
 
   private LatLng getLatLngInBounds() {
