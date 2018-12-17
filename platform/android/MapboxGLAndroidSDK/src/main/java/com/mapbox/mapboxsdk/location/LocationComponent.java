@@ -5,6 +5,7 @@ import android.content.Context;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
@@ -161,6 +162,10 @@ public final class LocationComponent {
     = new CopyOnWriteArrayList<>();
   private final CopyOnWriteArrayList<OnCameraTrackingChangedListener> onCameraTrackingChangedListeners
     = new CopyOnWriteArrayList<>();
+
+  // Workaround for too frequent updates, see https://github.com/mapbox/mapbox-gl-native/issues/13587
+  private long fastestInterval;
+  private long lastUpdateTime;
 
   /**
    * Internal use.
@@ -693,19 +698,21 @@ public final class LocationComponent {
   @SuppressLint("MissingPermission")
   public void setLocationEngine(@Nullable LocationEngine locationEngine) {
     if (this.locationEngine != null) {
-      // If internal location engines being used, extra steps need to be taken to deconstruct the
-      // instance.
+      // If internal location engines being used, extra steps need to be taken to deconstruct the instance.
       this.locationEngine.removeLocationUpdates(currentLocationEngineListener);
       this.locationEngine = null;
     }
 
     if (locationEngine != null) {
+      fastestInterval = locationEngineRequest.getFastestInterval();
       this.locationEngine = locationEngine;
       if (isLayerReady && isEnabled) {
         setLastLocation();
         locationEngine.requestLocationUpdates(
           locationEngineRequest, currentLocationEngineListener, Looper.getMainLooper());
       }
+    } else {
+      fastestInterval = 0;
     }
   }
 
@@ -1112,6 +1119,13 @@ public final class LocationComponent {
     } else if (!isLayerReady) {
       lastLocation = location;
       return;
+    } else {
+      long currentTime = SystemClock.elapsedRealtime();
+      if (currentTime - lastUpdateTime < fastestInterval) {
+        return;
+      } else {
+        lastUpdateTime = currentTime;
+      }
     }
 
     showLocationLayerIfHidden();
