@@ -20,7 +20,7 @@ initialize_ios_target(mbgl-loop-darwin)
 macro(mbgl_platform_core)
     initialize_ios_target(mbgl-core)
 
-    target_sources_from_file(mbgl-core PRIVATE platform/ios/core-files.txt)
+    target_sources_from_file(mbgl-core PRIVATE platform/ios/core-files.json)
 
     target_include_directories(mbgl-core
         PUBLIC platform/darwin/include
@@ -43,8 +43,8 @@ endmacro()
 macro(mbgl_filesource)
     initialize_ios_target(mbgl-filesource)
 
-    # Modify platform/darwin/filesource-files.txt to change the source files for this target.
-    target_sources_from_file(mbgl-filesource PRIVATE platform/darwin/filesource-files.txt)
+    # Modify platform/darwin/filesource-files.json to change the source files for this target.
+    target_sources_from_file(mbgl-filesource PRIVATE platform/darwin/filesource-files.json)
 
     target_link_libraries(mbgl-filesource
         PUBLIC "-lsqlite3"

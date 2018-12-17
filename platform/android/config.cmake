@@ -34,12 +34,12 @@ set(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_SHARED_LINKER_FLAGS_RELWIT
 ## mbgl core ##
 
 macro(mbgl_platform_core)
-    # Modify platform/android/core-files.txt to change the source files for this target.
-    target_sources_from_file(mbgl-core PRIVATE platform/android/core-files.txt)
+    # Modify platform/android/core-files.json to change the source files for this target.
+    target_sources_from_file(mbgl-core PRIVATE platform/android/core-files.json)
 
     target_include_directories(mbgl-core
         PUBLIC platform/default/include
-        PRIVATE platform/android
+        PRIVATE platform/android/include
     )
 
     target_link_libraries(mbgl-core
@@ -57,8 +57,8 @@ endmacro()
 
 
 macro(mbgl_filesource)
-    # Modify platform/android/filesource-files.txt to change the source files for this target.
-    target_sources_from_file(mbgl-filesource PRIVATE platform/android/filesource-files.txt)
+    # Modify platform/android/filesource-files.json to change the source files for this target.
+    target_sources_from_file(mbgl-filesource PRIVATE platform/android/filesource-files.json)
 
     target_link_libraries(mbgl-filesource
         PUBLIC sqlite
@@ -97,7 +97,7 @@ macro(mbgl_platform_test)
     )
 
     target_include_directories(mbgl-test
-        PRIVATE platform/android
+        PRIVATE platform/android/include
     )
 
     target_link_libraries(mbgl-test

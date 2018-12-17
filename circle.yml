@@ -474,8 +474,8 @@ jobs:
           command: scripts/nitpick/submodule-pin.js
           when: always
       - run:
-          name: CMake file list generation
-          command: scripts/nitpick/generated-code.js cmake
+          name: Source file list generation
+          command: scripts/nitpick/generated-code.js sources
           when: always
       - run:
           name: Shader code generation

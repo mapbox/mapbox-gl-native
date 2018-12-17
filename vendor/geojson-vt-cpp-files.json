@@ -1,0 +1,14 @@
+{
+    "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
+    "sources": [],
+    "public_headers": {
+        "mapbox/geojsonvt.hpp": "vendor/geojson-vt-cpp/include/mapbox/geojsonvt.hpp",
+        "mapbox/geojsonvt/clip.hpp": "vendor/geojson-vt-cpp/include/mapbox/geojsonvt/clip.hpp",
+        "mapbox/geojsonvt/convert.hpp": "vendor/geojson-vt-cpp/include/mapbox/geojsonvt/convert.hpp",
+        "mapbox/geojsonvt/simplify.hpp": "vendor/geojson-vt-cpp/include/mapbox/geojsonvt/simplify.hpp",
+        "mapbox/geojsonvt/tile.hpp": "vendor/geojson-vt-cpp/include/mapbox/geojsonvt/tile.hpp",
+        "mapbox/geojsonvt/types.hpp": "vendor/geojson-vt-cpp/include/mapbox/geojsonvt/types.hpp",
+        "mapbox/geojsonvt/wrap.hpp": "vendor/geojson-vt-cpp/include/mapbox/geojsonvt/wrap.hpp"
+    },
+    "private_headers": {}
+}

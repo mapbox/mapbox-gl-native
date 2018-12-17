@@ -1,74 +1,35 @@
 # BUILD FILE SYNTAX: SKYLARK
-import re
 
-mbgl_search_prefixes = [
-    r'^include/',
-    r'^src/',
-    r'^platform/default/include/',
-    r'^platform/darwin/src/',
-    r'^platform/darwin/include/',
-    r'^platform/ios/src/',
-    r'^platform/linux/src/',
-    r'^platform/android/src/',
-    r'^platform/android/',
-    r'^platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/Pinning/',
-    r'^platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/Reporting/',
-    r'^platform/ios/vendor/mapbox-events-ios/vendor/TrustKit/',
-    r'^platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/Reachability/',
-    r'^platform/ios/vendor/mapbox-events-ios/MapboxMobileEvents/',
-    r'^platform/ios/vendor/SMCalloutView/',
-]
+import json
 
-def mbgl_header_path(filename):
-    for prefix in mbgl_search_prefixes:
-        if re.search(prefix, filename):
-            return re.sub(prefix, '', filename)
-    return filename
+mbgl_base_path = get_base_path() or '.'
 
-mbgl_is_header = re.compile(r'\.h(pp)?$')
-mbgl_is_public = re.compile(r'^(include/|^[^/]+\.h(pp)?$)')
-
-def mbgl_load_file_list(filename, prefix = ''):
-    add_build_file_dep('//' + filename)
-    files = filter(len, [ re.sub(r'#.*|\n', '', file).strip() for file in open(filename) ])
-    headers = [ file for file in files if mbgl_is_header.search(file) ]
-
-    return dict(
-        public_headers = [ (mbgl_header_path(file), prefix + file)
-                           for file in headers if mbgl_is_public.search(file) ],
-        private_headers = [ (mbgl_header_path(file), prefix + file)
-                            for file in headers if not mbgl_is_public.search(file) ],
-        sources = [ prefix + file for file in files if not mbgl_is_header.search(file) ],
-    )
-
-def mbgl_merge_file_lists(*argv):
-    merged = dict(public_headers = [], private_headers = [], sources = [])
+def mbgl_load_file_lists(*argv):
+    merged = dict(sources = [], public_headers = {}, private_headers = {})
     for arg in argv:
-        merged['public_headers'] += arg['public_headers']
-        merged['private_headers'] += arg['private_headers']
-        merged['sources'] += arg['sources']
+        filename = mbgl_base_path + '/' + arg + '-files.json'
+        add_build_file_dep('//' + filename)
+        files = json.load(open(filename))
+        merged['public_headers'].update(files['public_headers'])
+        merged['private_headers'].update(files['private_headers'])
+        merged['sources'] += files['sources']
     return merged
 
-base_path = get_base_path() or '.';
-
 mbgl = dict(
-    core = mbgl_merge_file_lists(mbgl_load_file_list(base_path + '/cmake/core-files.txt'),
-                                 mbgl_load_file_list(base_path + '/cmake/filesource-files.txt')),
-    android = mbgl_merge_file_lists(mbgl_load_file_list(base_path + '/platform/android/core-files.txt'),
-                                    mbgl_load_file_list(base_path + '/platform/android/filesource-files.txt')),
-    ios = mbgl_merge_file_lists(mbgl_load_file_list(base_path + '/platform/ios/core-files.txt'),
-                                mbgl_load_file_list(base_path + '/platform/ios/sdk-files.txt')),
+    core = mbgl_load_file_lists('src/core', 'platform/default/filesource'),
+    android = mbgl_load_file_lists('platform/android/core', 'platform/android/filesource'),
+    ios = mbgl_load_file_lists('platform/ios/core', 'platform/ios/sdk'),
     deps = [],
 )
 
 def mbgl_vendor_library(name):
-    files = mbgl_load_file_list(base_path + '/vendor/' + name + '-files.txt', prefix = 'vendor/' + name + '/')
+    files = mbgl_load_file_lists('vendor/' + name)
     cxx_library(
         name = "vendor-" + name,
         header_namespace = "",
         srcs = files['sources'],
-        headers = dict(files['private_headers']),
-        exported_headers = dict(files['public_headers']),
+        headers = files['private_headers'],
+        exported_headers = files['public_headers'],
         link_style = 'static',
         compiler_flags = [
             "-Wno-tautological-unsigned-enum-zero-compare",
@@ -104,17 +65,17 @@ cxx_library(
 
     srcs = mbgl['core']['sources'],
     platform_srcs = [
-        ("android", mbgl['android']['sources'] + [ 'platform/android/src/main.cpp' ])
+        ("android", mbgl['android']['sources']),
     ],
 
     header_namespace = "",
-    headers = dict(mbgl['core']['private_headers']),
-    exported_headers = dict(mbgl['core']['public_headers']),
+    headers = mbgl['core']['private_headers'],
+    exported_headers = mbgl['core']['public_headers'],
     platform_headers = [
-        ("android", dict(mbgl['android']['private_headers']))
+        ("android", mbgl['android']['private_headers'])
     ],
     exported_platform_headers = [
-        ("android", dict(mbgl['android']['public_headers'])),
+        ("android", mbgl['android']['public_headers']),
     ],
 
     compiler_flags = [
@@ -147,7 +108,7 @@ cxx_library(
             "-llog",
             "-fvisibility=hidden",
             "-Wl,--icf=safe",
-            "-Wl,--version-script=" + base_path + "/platform/android/version-script"
+            "-Wl,--version-script=" + mbgl_base_path + "/platform/android/version-script"
         ]),
     ],
 
@@ -160,7 +121,7 @@ ndk_library(
     name = "android-core",
     deps = [ ":core" ],
     flags = [
-        "NDK_APPLICATION_MK=$(env PWD)/" + get_base_path() + "/Application.mk",
+        "NDK_APPLICATION_MK=$(env PWD)/" + mbgl_base_path + "/Application.mk",
     ],
 )
 
@@ -178,8 +139,8 @@ android_library(
 apple_library(
     name = "ios-core",
     deps = [ ":core" ],
-    headers = dict(mbgl['ios']['private_headers'] + [('Mapbox/Mapbox.h', 'platform/ios/src/Mapbox.h')]),
-    exported_headers = dict(mbgl['ios']['public_headers']),
+    headers = mbgl['ios']['private_headers'],
+    exported_headers = mbgl['ios']['public_headers'],
     srcs = mbgl['ios']['sources'],
     lang_compiler_flags = {
         "OBJCXX_CPP_OUTPUT": [

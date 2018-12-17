@@ -1,0 +1,31 @@
+{
+    "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
+    "sources": [],
+    "public_headers": {
+        "mapbox/geometry/wagyu/active_bound_list.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/active_bound_list.hpp",
+        "mapbox/geometry/wagyu/bound.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/bound.hpp",
+        "mapbox/geometry/wagyu/bubble_sort.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/bubble_sort.hpp",
+        "mapbox/geometry/wagyu/build_edges.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/build_edges.hpp",
+        "mapbox/geometry/wagyu/build_local_minima_list.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/build_local_minima_list.hpp",
+        "mapbox/geometry/wagyu/build_result.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/build_result.hpp",
+        "mapbox/geometry/wagyu/config.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/config.hpp",
+        "mapbox/geometry/wagyu/edge.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/edge.hpp",
+        "mapbox/geometry/wagyu/intersect.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/intersect.hpp",
+        "mapbox/geometry/wagyu/intersect_util.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/intersect_util.hpp",
+        "mapbox/geometry/wagyu/local_minimum.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/local_minimum.hpp",
+        "mapbox/geometry/wagyu/local_minimum_util.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/local_minimum_util.hpp",
+        "mapbox/geometry/wagyu/point.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/point.hpp",
+        "mapbox/geometry/wagyu/process_horizontal.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/process_horizontal.hpp",
+        "mapbox/geometry/wagyu/process_maxima.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/process_maxima.hpp",
+        "mapbox/geometry/wagyu/quick_clip.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/quick_clip.hpp",
+        "mapbox/geometry/wagyu/ring.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/ring.hpp",
+        "mapbox/geometry/wagyu/ring_util.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/ring_util.hpp",
+        "mapbox/geometry/wagyu/scanbeam.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/scanbeam.hpp",
+        "mapbox/geometry/wagyu/snap_rounding.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/snap_rounding.hpp",
+        "mapbox/geometry/wagyu/topology_correction.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/topology_correction.hpp",
+        "mapbox/geometry/wagyu/util.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/util.hpp",
+        "mapbox/geometry/wagyu/vatti.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/vatti.hpp",
+        "mapbox/geometry/wagyu/wagyu.hpp": "vendor/wagyu/include/mapbox/geometry/wagyu/wagyu.hpp"
+    },
+    "private_headers": {}
+}

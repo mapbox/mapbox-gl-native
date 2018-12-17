@@ -39,6 +39,6 @@ buck-out
 mapbox-gl-native.code-workspace
 
 # Generated list files from code generation
-/scripts/generate-cmake-files.list
+/scripts/generate-file-lists.list
 /scripts/generate-shaders.list
 /scripts/generate-style-code.list
