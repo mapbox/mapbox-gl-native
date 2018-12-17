@@ -2229,6 +2229,11 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     [self updateHUD];
 }
 
+- (void)mapView:(MGLMapView *)mapView didDeselectAnnotation:(id<MGLAnnotation>)annotation
+{
+	[mapView removeAnnotation:annotation];
+}
+
 - (void)updateHUD {
     if (!self.reuseQueueStatsEnabled && !self.mapInfoHUDEnabled) return;
 
