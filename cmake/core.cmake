@@ -1,5 +1,5 @@
-# Modify cmake/core-files.txt to change the source files for this target.
-load_sources_list(MBGL_CORE_FILES cmake/core-files.txt)
+# scripts/generate-file-lists.js to change the source files for this target.
+load_sources_list(MBGL_CORE_FILES src/core-files.json)
 add_library(mbgl-core STATIC ${MBGL_CORE_FILES})
 
 target_include_directories(mbgl-core

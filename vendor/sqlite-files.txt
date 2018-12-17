@@ -1,5 +1,0 @@
-# This file is generated. Do not edit. Regenerate this with scripts/generate-cmake-files.js
-
-# sqlite
-include/sqlite3.h
-src/sqlite3.c

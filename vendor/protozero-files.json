@@ -1,0 +1,18 @@
+{
+    "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
+    "sources": [],
+    "public_headers": {
+        "protozero/byteswap.hpp": "vendor/protozero/include/protozero/byteswap.hpp",
+        "protozero/config.hpp": "vendor/protozero/include/protozero/config.hpp",
+        "protozero/exception.hpp": "vendor/protozero/include/protozero/exception.hpp",
+        "protozero/iterators.hpp": "vendor/protozero/include/protozero/iterators.hpp",
+        "protozero/pbf_builder.hpp": "vendor/protozero/include/protozero/pbf_builder.hpp",
+        "protozero/pbf_message.hpp": "vendor/protozero/include/protozero/pbf_message.hpp",
+        "protozero/pbf_reader.hpp": "vendor/protozero/include/protozero/pbf_reader.hpp",
+        "protozero/pbf_writer.hpp": "vendor/protozero/include/protozero/pbf_writer.hpp",
+        "protozero/types.hpp": "vendor/protozero/include/protozero/types.hpp",
+        "protozero/varint.hpp": "vendor/protozero/include/protozero/varint.hpp",
+        "protozero/version.hpp": "vendor/protozero/include/protozero/version.hpp"
+    },
+    "private_headers": {}
+}

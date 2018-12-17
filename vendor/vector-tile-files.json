@@ -1,0 +1,10 @@
+{
+    "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
+    "sources": [],
+    "public_headers": {
+        "mapbox/vector_tile.hpp": "vendor/vector-tile/include/mapbox/vector_tile.hpp",
+        "mapbox/vector_tile/vector_tile_config.hpp": "vendor/vector-tile/include/mapbox/vector_tile/vector_tile_config.hpp",
+        "mapbox/vector_tile/version.hpp": "vendor/vector-tile/include/mapbox/vector_tile/version.hpp"
+    },
+    "private_headers": {}
+}

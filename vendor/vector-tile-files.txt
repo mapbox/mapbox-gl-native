@@ -1,8 +1,0 @@
-# This file is generated. Do not edit. Regenerate this with scripts/generate-cmake-files.js
-
-# mapbox
-include/mapbox/vector_tile.hpp
-
-# mapbox/vector_tile
-include/mapbox/vector_tile/vector_tile_config.hpp
-include/mapbox/vector_tile/version.hpp
