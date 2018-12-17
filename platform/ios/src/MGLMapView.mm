@@ -4239,7 +4239,21 @@ public:
 
         annotationView.annotation = nil;
         [annotationView removeFromSuperview];
-        [self.annotationContainerView.annotationViews removeObject:annotationView];
+
+		if ([self.annotationContainerView.annotationViews containsObject:annotationView])
+		{
+	        [self.annotationContainerView.annotationViews removeObject:annotationView];
+
+			if ([annotation isKindOfClass:[NSObject class]] && ![annotation isKindOfClass:[MGLMultiPoint class]])
+			{
+				[(NSObject *)annotation removeObserver:self forKeyPath:@"coordinate" context:(void *)(NSUInteger)annotationTag];
+			}
+			else if ([annotation isKindOfClass:[MGLMultiPoint class]])
+			{
+				[(NSObject *)annotation removeObserver:self forKeyPath:@"coordinates" context:(void *)(NSUInteger)annotationTag];
+			}
+			self.mbglMap.removeAnnotation(annotationTag);
+		}
 
         if (annotationTag == _selectedAnnotationTag)
         {
@@ -4249,17 +4263,7 @@ public:
         _annotationContextsByAnnotationTag.erase(annotationTag);
         _annotationTagsByAnnotation.erase(annotation);
 
-        if ([annotation isKindOfClass:[NSObject class]] && ![annotation isKindOfClass:[MGLMultiPoint class]])
-        {
-            [(NSObject *)annotation removeObserver:self forKeyPath:@"coordinate" context:(void *)(NSUInteger)annotationTag];
-        }
-        else if ([annotation isKindOfClass:[MGLMultiPoint class]])
-        {
-            [(NSObject *)annotation removeObserver:self forKeyPath:@"coordinates" context:(void *)(NSUInteger)annotationTag];
-        }
-
         _isChangingAnnotationLayers = YES;
-        self.mbglMap.removeAnnotation(annotationTag);
     }
 
     [self didChangeValueForKey:@"annotations"];
