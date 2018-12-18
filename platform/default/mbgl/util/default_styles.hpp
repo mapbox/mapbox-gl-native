@@ -13,12 +13,12 @@ struct DefaultStyle {
     const unsigned currentVersion;
 };
 
-constexpr const DefaultStyle streets          = { "mapbox://styles/mapbox/streets-v10",           "Streets",           10 };
-constexpr const DefaultStyle outdoors         = { "mapbox://styles/mapbox/outdoors-v10",          "Outdoors",          10 };
-constexpr const DefaultStyle light            = { "mapbox://styles/mapbox/light-v9",              "Light",              9 };
-constexpr const DefaultStyle dark             = { "mapbox://styles/mapbox/dark-v9",               "Dark",               9 };
+constexpr const DefaultStyle streets          = { "mapbox://styles/mapbox/streets-v11",           "Streets",           11 };
+constexpr const DefaultStyle outdoors         = { "mapbox://styles/mapbox/outdoors-v11",          "Outdoors",          11 };
+constexpr const DefaultStyle light            = { "mapbox://styles/mapbox/light-v10",             "Light",             10 };
+constexpr const DefaultStyle dark             = { "mapbox://styles/mapbox/dark-v10",              "Dark",              10 };
 constexpr const DefaultStyle satellite        = { "mapbox://styles/mapbox/satellite-v9",          "Satellite",          9 };
-constexpr const DefaultStyle satelliteStreets = { "mapbox://styles/mapbox/satellite-streets-v10", "Satellite Streets", 10 };
+constexpr const DefaultStyle satelliteStreets = { "mapbox://styles/mapbox/satellite-streets-v11", "Satellite Streets", 11 };
 
 const DefaultStyle orderedStyles[] = {
     streets, outdoors, light, dark, satellite, satelliteStreets,
