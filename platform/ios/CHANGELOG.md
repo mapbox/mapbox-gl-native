@@ -2,6 +2,14 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## master
+
+### Other changes
+
+* Added an `MGLStyle.enablePlacementTransitions` property to control how long it takes for collided labels to fade out. ([#13565](https://github.com/mapbox/mapbox-gl-native/pull/13565))
+* Fixed a crash when casting large numbers in `NSExpression`. ([#13580](https://github.com/mapbox/mapbox-gl-native/pull/13580))
+
+
 ## 4.7.0
 
 ### Packaging
