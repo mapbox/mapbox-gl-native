@@ -229,6 +229,27 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                                     parameters.state);
 
                 parameters.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
+            } else if (layout.get<DynamicTextAnchor>().size()) {
+                auto partiallyEvaluatedSize = bucket.textSizeBinder->evaluateForZoom(parameters.state.getZoom());
+                bucket.text.dynamicVertices.clear();
+                for (auto& symbol : bucket.text.placedSymbols) {
+                    if (symbol.hidden || symbol.dynamicShift.x == -INFINITY) {
+                        // These symbols are from a justification that is not being used, or a label that wasn't placed
+                        // so we don't need to do the extra math to figure out what incremental shift to apply.
+                        hideGlyphs(symbol.glyphOffsets.size(), bucket.text.dynamicVertices);
+                    } else {
+                        auto renderTextSize = evaluateSizeForFeature(partiallyEvaluatedSize, symbol);
+                        auto renderTimeTextScale = renderTextSize * bucket.tilePixelRatio / 24;
+
+                        const float shiftX = (symbol.dynamicShift.x * renderTimeTextScale) / pow(2, parameters.state.getZoom() - tile.tile.id.overscaledZ);
+                        const float shiftY = (symbol.dynamicShift.y * renderTimeTextScale) / pow(2, parameters.state.getZoom() - tile.tile.id.overscaledZ);
+                        const Point<float> shiftedAnchor = Point<float>(symbol.anchorPoint.x + shiftX, symbol.anchorPoint.y + shiftY);
+                        for (size_t i = 0; i < symbol.glyphOffsets.size(); i++) {
+                            addDynamicAttributes(shiftedAnchor, 0, bucket.text.dynamicVertices);
+                        }
+                    }
+                }
+                parameters.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
             }
 
             const Size texsize = geometryTile.glyphAtlasTexture->size;

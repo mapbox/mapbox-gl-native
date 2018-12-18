@@ -180,35 +180,42 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
         auto& feature = *it;
         if (feature.geometry.empty()) continue;
 
-        std::pair<Shaping, Shaping> shapedTextOrientations;
+        std::tuple<Shaping, Shaping, Shaping, Shaping> shapedTextOrientations;
         optional<PositionedIcon> shapedIcon;
-
+        const SymbolAnchorType textAnchor = layout.evaluate<TextAnchor>(zoom, feature);
+        const TextJustifyType textJustify = layout.evaluate<TextJustify>(zoom, feature);
         // if feature has text, shape the text
         if (feature.formattedText) {
-            auto applyShaping = [&] (const TaggedString& formattedText, WritingModeType writingMode) {
-                const float oneEm = 24.0f;
+            auto applyShaping = [&] (const TaggedString& formattedText, WritingModeType writingMode, const SymbolAnchorType anchor, const TextJustifyType justify) {
                 const Shaping result = getShaping(
                     /* string */ formattedText,
                     /* maxWidth: ems */ layout.get<SymbolPlacement>() == SymbolPlacementType::Point ?
-                        layout.evaluate<TextMaxWidth>(zoom, feature) * oneEm : 0,
-                    /* lineHeight: ems */ layout.get<TextLineHeight>() * oneEm,
-                    /* anchor */ layout.evaluate<TextAnchor>(zoom, feature),
-                    /* justify */ layout.evaluate<TextJustify>(zoom, feature),
-                    /* spacing: ems */ util::i18n::allowsLetterSpacing(feature.formattedText->rawText()) ? layout.evaluate<TextLetterSpacing>(zoom, feature) * oneEm : 0.0f,
-                    /* translate */ Point<float>(layout.evaluate<TextOffset>(zoom, feature)[0] * oneEm, layout.evaluate<TextOffset>(zoom, feature)[1] * oneEm),
-                    /* verticalHeight */ oneEm,
+                        layout.evaluate<TextMaxWidth>(zoom, feature) * util::ONE_EM : 0,
+                    /* lineHeight: ems */ layout.get<TextLineHeight>() * util::ONE_EM,
+                    /* anchor */ anchor,
+                    /* justify */ justify,
+                    /* spacing: ems */ util::i18n::allowsLetterSpacing(feature.formattedText->rawText()) ? layout.evaluate<TextLetterSpacing>(zoom, feature) * util::ONE_EM : 0.0f,
+                    /* translate */ Point<float>(layout.evaluate<TextOffset>(zoom, feature)[0] * util::ONE_EM, layout.evaluate<TextOffset>(zoom, feature)[1] * util::ONE_EM),
+                    /* verticalHeight */ util::ONE_EM,
                     /* writingMode */ writingMode,
                     /* bidirectional algorithm object */ bidi,
                     /* glyphs */ glyphMap);
 
                 return result;
             };
+            
+            if (layout.evaluate<DynamicTextAnchor>(zoom, feature).size() > 0 && !textAlongLine) {
+                std::get<0>(shapedTextOrientations) = applyShaping(*feature.formattedText, WritingModeType::Horizontal, SymbolAnchorType::TopLeft, TextJustifyType::Right);
+                std::get<1>(shapedTextOrientations) = applyShaping(*feature.formattedText, WritingModeType::Horizontal, SymbolAnchorType::TopLeft, TextJustifyType::Center);
+                std::get<1>(shapedTextOrientations) = applyShaping(*feature.formattedText, WritingModeType::Horizontal, SymbolAnchorType::TopLeft, TextJustifyType::Left);
+            } else {
+                std::get<0>(shapedTextOrientations) = applyShaping(*feature.formattedText, WritingModeType::Horizontal, textAnchor, textJustify);
+            }
 
-            shapedTextOrientations.first = applyShaping(*feature.formattedText, WritingModeType::Horizontal);
 
             if (util::i18n::allowsVerticalWritingMode(feature.formattedText->rawText()) && textAlongLine) {
                 feature.formattedText->verticalizePunctuation();
-                shapedTextOrientations.second = applyShaping(*feature.formattedText, WritingModeType::Vertical);
+                std::get<3>(shapedTextOrientations) = applyShaping(*feature.formattedText, WritingModeType::Vertical, textAnchor, textJustify);
             }
         }
 
@@ -233,7 +240,7 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
         }
 
         // if either shapedText or icon position is present, add the feature
-        if (shapedTextOrientations.first || shapedIcon) {
+        if (std::get<0>(shapedTextOrientations) || shapedIcon) {
             addFeature(std::distance(features.begin(), it), feature, shapedTextOrientations, shapedIcon, glyphPositions);
         }
 
@@ -245,7 +252,7 @@ void SymbolLayout::prepareSymbols(const GlyphMap& glyphMap, const GlyphPositions
 
 void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
                               const SymbolFeature& feature,
-                              const std::pair<Shaping, Shaping>& shapedTextOrientations,
+                              const std::tuple<Shaping, Shaping, Shaping, Shaping>& shapedTextOrientations,
                               optional<PositionedIcon> shapedIcon,
                               const GlyphPositions& glyphPositions) {
     const float minScale = 0.5f;
@@ -304,8 +311,8 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
             Anchors anchors = getAnchors(line,
                                          symbolSpacing,
                                          textMaxAngle,
-                                         (shapedTextOrientations.second ?: shapedTextOrientations.first).left,
-                                         (shapedTextOrientations.second ?: shapedTextOrientations.first).right,
+                                         (std::get<3>(shapedTextOrientations) ?: std::get<0>(shapedTextOrientations)).left,
+                                         (std::get<3>(shapedTextOrientations) ?: std::get<0>(shapedTextOrientations)).right,
                                          (shapedIcon ? shapedIcon->left() : 0),
                                          (shapedIcon ? shapedIcon->right() : 0),
                                          glyphSize,
@@ -325,8 +332,8 @@ void SymbolLayout::addFeature(const std::size_t layoutFeatureIndex,
             if (line.size() > 1) {
                 optional<Anchor> anchor = getCenterAnchor(line,
                                                           textMaxAngle,
-                                                          (shapedTextOrientations.second ?: shapedTextOrientations.first).left,
-                                                          (shapedTextOrientations.second ?: shapedTextOrientations.first).right,
+                                                          (std::get<3>(shapedTextOrientations) ?: std::get<0>(shapedTextOrientations)).left,
+                                                          (std::get<3>(shapedTextOrientations) ?: std::get<0>(shapedTextOrientations)).right,
                                                           (shapedIcon ? shapedIcon->left() : 0),
                                                           (shapedIcon ? shapedIcon->right() : 0),
                                                           glyphSize,
@@ -410,7 +417,7 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
     const bool sortFeaturesByY = zOrderByViewport && (layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
         layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>());
 
-    auto bucket = std::make_shared<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances));
+    auto bucket = std::make_shared<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, sortFeaturesByY, tilePixelRatio, bucketLeaderID, std::move(symbolInstances));
 
     for (SymbolInstance &symbolInstance : bucket->symbolInstances) {
 
@@ -423,21 +430,25 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
 
         if (hasText) {
             const Range<float> sizeData = bucket->textSizeBinder->getVertexSizeData(feature);
-            bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
-                    symbolInstance.textOffset, symbolInstance.writingModes, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
-            symbolInstance.placedTextIndex = bucket->text.placedSymbols.size() - 1;
-            PlacedSymbol& horizontalSymbol = bucket->text.placedSymbols.back();
+            auto placeSymbol = [&] (SymbolQuads glyphQuads) {
+                bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,symbolInstance.textOffset, symbolInstance.writingModes, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
 
-            bool firstHorizontal = true;
-            for (const auto& symbol : symbolInstance.horizontalGlyphQuads) {
-                size_t index = addSymbol(
-                    bucket->text, sizeData, symbol,
-                    symbolInstance.anchor, horizontalSymbol);
-                if (firstHorizontal) {
-                    horizontalSymbol.vertexStartIndex = index;
-                    firstHorizontal = false;
+                PlacedSymbol& horizontalSymbol = bucket->text.placedSymbols.back();
+
+                bool firstHorizontal = true;
+                for (const auto& symbol : glyphQuads) {
+                    size_t index = addSymbol(
+                        bucket->text, sizeData, symbol,
+                        symbolInstance.anchor, horizontalSymbol);
+                    if (firstHorizontal) {
+                        horizontalSymbol.vertexStartIndex = index;
+                        firstHorizontal = false;
+                    }
                 }
-            }
+                return bucket->text.placedSymbols.size() - 1;
+            };
+
+            symbolInstance.placedRightTextIndex = placeSymbol(symbolInstance.rightJustifiedGlyphQuads);
 
             if (symbolInstance.writingModes & WritingModeType::Vertical) {
                 bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
@@ -458,6 +469,10 @@ void SymbolLayout::createBucket(const ImagePositions&, std::unique_ptr<FeatureIn
                     }
                 }
             }
+            // didn't have time to figure out why the order matters here,
+            // but if I place these before the vertical text the glyphs don't render - merp
+            symbolInstance.placedCenterTextIndex = placeSymbol(symbolInstance.centerJustifiedGlyphQuads);
+            symbolInstance.placedLeftTextIndex = placeSymbol(symbolInstance.leftJustifiedGlyphQuads);
         }
 
         if (hasIcon) {

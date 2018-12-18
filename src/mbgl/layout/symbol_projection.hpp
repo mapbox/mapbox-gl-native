@@ -13,7 +13,13 @@ namespace mbgl {
     namespace style {
         class SymbolPropertyValues;
     } // end namespace style
-    
+
+    void hideGlyphs(size_t numGlyphs, gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray);
+    void addDynamicAttributes(
+        const Point<float>& anchorPoint,
+        const float angle,
+        gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray
+    );
     struct TileDistance {
         TileDistance(float prevTileDistance_, float lastSegmentViewportDistance_)
             : prevTileDistance(prevTileDistance_), lastSegmentViewportDistance(lastSegmentViewportDistance_)

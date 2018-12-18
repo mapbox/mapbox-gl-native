@@ -7,10 +7,10 @@ using namespace style;
 
 SymbolInstance::SymbolInstance(Anchor& anchor_,
                                GeometryCoordinates line_,
-                               const std::pair<Shaping, Shaping>& shapedTextOrientations,
+                               const std::tuple<Shaping, Shaping, Shaping, Shaping>& shapedTextOrientations,
                                optional<PositionedIcon> shapedIcon,
                                const SymbolLayoutProperties::Evaluated& layout,
-                               const float layoutTextSize,
+                               const float layoutTextSize_,
                                const float textBoxScale,
                                const float textPadding,
                                const SymbolPlacementType textPlacement,
@@ -31,32 +31,39 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     hasIcon(shapedIcon),
 
     // Create the collision features that will be used to check whether this symbol instance can be placed
-    textCollisionFeature(line_, anchor, shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature, overscaling, rotate),
+    textCollisionFeature(line_, anchor, std::get<0>(shapedTextOrientations), textBoxScale, textPadding, textPlacement, indexedFeature, overscaling, rotate),
     iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, indexedFeature, rotate),
     layoutFeatureIndex(layoutFeatureIndex_),
     dataFeatureIndex(dataFeatureIndex_),
     textOffset(textOffset_),
     iconOffset(iconOffset_),
-    key(key_) {
+    key(key_),
+    layoutTextSize(layoutTextSize_) {
 
     // Create the quads used for rendering the icon and glyphs.
     if (shapedIcon) {
-        iconQuad = getIconQuad(*shapedIcon, layout, layoutTextSize, shapedTextOrientations.first);
+        iconQuad = getIconQuad(*shapedIcon, layout, layoutTextSize, std::get<0>(shapedTextOrientations));
     }
-    if (shapedTextOrientations.first) {
-        horizontalGlyphQuads = getGlyphQuads(shapedTextOrientations.first, layout, textPlacement, positions);
+    if (std::get<0>(shapedTextOrientations)) {
+        rightJustifiedGlyphQuads = getGlyphQuads(std::get<0>(shapedTextOrientations), layout, textPlacement, positions);
     }
-    if (shapedTextOrientations.second) {
-        verticalGlyphQuads = getGlyphQuads(shapedTextOrientations.second, layout, textPlacement, positions);
+    if (std::get<1>(shapedTextOrientations)) {
+        centerJustifiedGlyphQuads = getGlyphQuads(std::get<1>(shapedTextOrientations), layout, textPlacement, positions);
+    }
+    if (std::get<2>(shapedTextOrientations)) {
+        leftJustifiedGlyphQuads = getGlyphQuads(std::get<2>(shapedTextOrientations), layout, textPlacement, positions);
+    }
+    if (std::get<3>(shapedTextOrientations)) {
+        verticalGlyphQuads = getGlyphQuads(std::get<3>(shapedTextOrientations), layout, textPlacement, positions);
     }
     // 'hasText' depends on finding at least one glyph in the shaping that's also in the GlyphPositionMap
-    hasText = horizontalGlyphQuads.size() > 0 || verticalGlyphQuads.size() > 0;
+    hasText = rightJustifiedGlyphQuads.size() > 0 || centerJustifiedGlyphQuads.size() > 0 || leftJustifiedGlyphQuads.size() > 0 || verticalGlyphQuads.size() > 0;
 
-    if (shapedTextOrientations.first && shapedTextOrientations.second) {
+    if (std::get<0>(shapedTextOrientations) && std::get<3>(shapedTextOrientations)) {
         writingModes = WritingModeType::Horizontal | WritingModeType::Vertical;
-    } else if (shapedTextOrientations.first) {
+    } else if (std::get<0>(shapedTextOrientations)) {
         writingModes = WritingModeType::Horizontal;
-    } else if (shapedTextOrientations.second) {
+    } else if (std::get<3>(shapedTextOrientations)) {
         writingModes = WritingModeType::Vertical;
     } else {
         writingModes = WritingModeType::None;

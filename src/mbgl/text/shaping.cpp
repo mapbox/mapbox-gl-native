@@ -10,58 +10,8 @@
 
 namespace mbgl {
 
-struct AnchorAlignment {
-    AnchorAlignment(float horizontal_, float vertical_)
-        : horizontalAlign(horizontal_), verticalAlign(vertical_) {
-    }
-
-    float horizontalAlign;
-    float verticalAlign;
-};
-
-AnchorAlignment getAnchorAlignment(style::SymbolAnchorType anchor) {
-    float horizontalAlign = 0.5;
-    float verticalAlign = 0.5;
-
-    switch (anchor) {
-    case style::SymbolAnchorType::Top:
-    case style::SymbolAnchorType::Bottom:
-    case style::SymbolAnchorType::Center:
-        break;
-    case style::SymbolAnchorType::Right:
-    case style::SymbolAnchorType::TopRight:
-    case style::SymbolAnchorType::BottomRight:
-        horizontalAlign = 1;
-        break;
-    case style::SymbolAnchorType::Left:
-    case style::SymbolAnchorType::TopLeft:
-    case style::SymbolAnchorType::BottomLeft:
-        horizontalAlign = 0;
-        break;
-    }
-
-    switch (anchor) {
-    case style::SymbolAnchorType::Left:
-    case style::SymbolAnchorType::Right:
-    case style::SymbolAnchorType::Center:
-        break;
-    case style::SymbolAnchorType::Bottom:
-    case style::SymbolAnchorType::BottomLeft:
-    case style::SymbolAnchorType::BottomRight:
-        verticalAlign = 1;
-        break;
-    case style::SymbolAnchorType::Top:
-    case style::SymbolAnchorType::TopLeft:
-    case style::SymbolAnchorType::TopRight:
-        verticalAlign = 0;
-        break;
-    }
-
-    return AnchorAlignment(horizontalAlign, verticalAlign);
-}
-
 PositionedIcon PositionedIcon::shapeIcon(const ImagePosition& image, const std::array<float, 2>& iconOffset, style::SymbolAnchorType iconAnchor, const float iconRotation) {
-    AnchorAlignment anchorAlign = getAnchorAlignment(iconAnchor);
+    AnchorAlignment anchorAlign = AnchorAlignment::getAnchorAlignment(iconAnchor);
     float dx = iconOffset[0];
     float dy = iconOffset[1];
     float x1 = dx - image.displaySize()[0] * anchorAlign.horizontalAlign;
@@ -339,7 +289,7 @@ void shapeLines(Shaping& shaping,
         y += lineHeight * lineMaxScale;
     }
 
-    auto anchorAlign = getAnchorAlignment(textAnchor);
+    auto anchorAlign = AnchorAlignment::getAnchorAlignment(textAnchor);
 
     align(shaping, justify, anchorAlign.horizontalAlign, anchorAlign.verticalAlign, maxLineLength,
           lineHeight, lines.size());

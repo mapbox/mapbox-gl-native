@@ -97,10 +97,9 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
                           const GlyphPositions& positions) {
     const float textRotate = layout.get<TextRotate>() * util::DEG2RAD;
 
-    const float oneEm = 24.0;
     std::array<float, 2> textOffset = layout.get<TextOffset>();
-    textOffset[0] *= oneEm;
-    textOffset[1] *= oneEm;
+    textOffset[0] *= util::ONE_EM;
+    textOffset[1] *= util::ONE_EM;
 
     SymbolQuads quads;
 

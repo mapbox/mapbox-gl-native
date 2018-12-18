@@ -7,6 +7,56 @@
 
 namespace mbgl {
 
+struct AnchorAlignment {
+    AnchorAlignment(float horizontal_, float vertical_)
+        : horizontalAlign(horizontal_), verticalAlign(vertical_) {
+    }
+
+    static AnchorAlignment getAnchorAlignment(style::SymbolAnchorType anchor) {
+        float horizontalAlign = 0.5;
+        float verticalAlign = 0.5;
+
+        switch (anchor) {
+        case style::SymbolAnchorType::Top:
+        case style::SymbolAnchorType::Bottom:
+        case style::SymbolAnchorType::Center:
+            break;
+        case style::SymbolAnchorType::Right:
+        case style::SymbolAnchorType::TopRight:
+        case style::SymbolAnchorType::BottomRight:
+            horizontalAlign = 1;
+            break;
+        case style::SymbolAnchorType::Left:
+        case style::SymbolAnchorType::TopLeft:
+        case style::SymbolAnchorType::BottomLeft:
+            horizontalAlign = 0;
+            break;
+        }
+
+        switch (anchor) {
+        case style::SymbolAnchorType::Left:
+        case style::SymbolAnchorType::Right:
+        case style::SymbolAnchorType::Center:
+            break;
+        case style::SymbolAnchorType::Bottom:
+        case style::SymbolAnchorType::BottomLeft:
+        case style::SymbolAnchorType::BottomRight:
+            verticalAlign = 1;
+            break;
+        case style::SymbolAnchorType::Top:
+        case style::SymbolAnchorType::TopLeft:
+        case style::SymbolAnchorType::TopRight:
+            verticalAlign = 0;
+            break;
+        }
+
+        return AnchorAlignment(horizontalAlign, verticalAlign);
+    }
+
+    float horizontalAlign;
+    float verticalAlign;
+};
+
 class SymbolFeature;
 class BiDi;
 

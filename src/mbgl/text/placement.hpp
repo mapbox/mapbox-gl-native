@@ -4,8 +4,10 @@
 #include <unordered_map>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/text/collision_index.hpp>
+#include <mbgl/text/shaping.hpp>
 #include <mbgl/layout/symbol_projection.hpp>
 #include <mbgl/style/transition_options.hpp>
+#include <mbgl/util/geometry.hpp>
 #include <unordered_set>
 
 namespace mbgl {
@@ -29,6 +31,14 @@ public:
     bool isHidden() const;
     OpacityState icon;
     OpacityState text;
+};
+
+class DynamicTextOffsets {
+public:
+    DynamicTextOffsets(Point<float> right, Point<float> center, Point<float> left);
+    Point<float> right;
+    Point<float> center;
+    Point<float> left;
 };
 
 class JointPlacement {
@@ -121,6 +131,7 @@ private:
 
     std::unordered_map<uint32_t, JointPlacement> placements;
     std::unordered_map<uint32_t, JointOpacityState> opacities;
+    std::unordered_map<uint32_t, DynamicTextOffsets> dynamicOffsets;
 
     bool stale = false;
     

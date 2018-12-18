@@ -15,7 +15,9 @@ class SymbolInstance {
 public:
     SymbolInstance(Anchor& anchor,
                    GeometryCoordinates line,
-                   const std::pair<Shaping, Shaping>& shapedTextOrientations,
+                   // When dynamic-text-anchor is used, order is right, center, left, vertical.
+                   // Otherwise order is horizontal, empty, empty, vertical.
+                   const std::tuple<Shaping, Shaping, Shaping, Shaping>& shapedTextOrientations,
                    optional<PositionedIcon> shapedIcon,
                    const style::SymbolLayoutProperties::Evaluated&,
                    const float layoutTextSize,
@@ -38,7 +40,9 @@ public:
     GeometryCoordinates line;
     bool hasText;
     bool hasIcon;
-    SymbolQuads horizontalGlyphQuads;
+    SymbolQuads rightJustifiedGlyphQuads;
+    SymbolQuads leftJustifiedGlyphQuads;
+    SymbolQuads centerJustifiedGlyphQuads;
     SymbolQuads verticalGlyphQuads;
     optional<SymbolQuad> iconQuad;
     CollisionFeature textCollisionFeature;
@@ -49,8 +53,11 @@ public:
     std::array<float, 2> textOffset;
     std::array<float, 2> iconOffset;
     std::u16string key;
+    float layoutTextSize;
     bool isDuplicate;
-    optional<size_t> placedTextIndex;
+    optional<size_t> placedRightTextIndex;
+    optional<size_t> placedCenterTextIndex;
+    optional<size_t> placedLeftTextIndex;
     optional<size_t> placedVerticalTextIndex;
     optional<size_t> placedIconIndex;
     uint32_t crossTileID = 0;

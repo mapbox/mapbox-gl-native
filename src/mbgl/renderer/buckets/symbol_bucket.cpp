@@ -18,6 +18,7 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
                            bool sdfIcons_,
                            bool iconsNeedLinear_,
                            bool sortFeaturesByY_,
+                           const float tilePixelRatio_,
                            const std::string bucketName_,
                            const std::vector<SymbolInstance>&& symbolInstances_)
     : Bucket(LayerType::Symbol),
@@ -25,6 +26,7 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
       sdfIcons(sdfIcons_),
       iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
       sortFeaturesByY(sortFeaturesByY_),
+      tilePixelRatio(tilePixelRatio_),
       bucketLeaderID(std::move(bucketName_)),
       symbolInstances(std::move(symbolInstances_)),
       textSizeBinder(SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue())),
@@ -210,8 +212,8 @@ void SymbolBucket::sortFeatures(const float angle) {
         const SymbolInstance& symbolInstance = symbolInstances[i];
         featureSortOrder->push_back(symbolInstance.dataFeatureIndex);
 
-        if (symbolInstance.placedTextIndex) {
-            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedTextIndex]);
+        if (symbolInstance.placedRightTextIndex) {
+            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedRightTextIndex]);
         }
         if (symbolInstance.placedVerticalTextIndex) {
             addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedVerticalTextIndex]);

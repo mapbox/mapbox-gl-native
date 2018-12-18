@@ -39,6 +39,7 @@ constexpr double MAX_ZOOM = 25.5;
 constexpr float  MIN_ZOOM_F = MIN_ZOOM;
 constexpr float  MAX_ZOOM_F = MAX_ZOOM;
 constexpr uint8_t DEFAULT_MAX_ZOOM = 22;
+constexpr float ONE_EM = 24.0f;
 
 constexpr uint8_t DEFAULT_PREFETCH_ZOOM_DELTA = 4;
 

@@ -99,7 +99,6 @@ enum class SymbolAnchorType : uint8_t {
 };
 
 enum class DynamicTextAnchorType : uint8_t {
-    Auto,
     Center,
     Left,
     Right,
@@ -108,7 +107,8 @@ enum class DynamicTextAnchorType : uint8_t {
     TopLeft,
     TopRight,
     BottomLeft,
-    BottomRight
+    BottomRight,
+    Auto
 };
 
 enum class TextTransformType : uint8_t {
