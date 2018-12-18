@@ -5,34 +5,38 @@
 
 @implementation MGLStyleURLIntegrationTest
 
-- (void)testLoadingStreetsStyleURL {
-    self.mapView.styleURL = [MGLStyle streetsStyleURL];
+- (void)internalTestWithStyleSelector:(SEL)selector {
+    if (![self validAccessToken]) {
+        return;
+    }
+
+    self.mapView.styleURL = [MGLStyle performSelector:selector];
     [self waitForMapViewToFinishLoadingStyleWithTimeout:5];
+}
+
+
+- (void)testLoadingStreetsStyleURL {
+    [self internalTestWithStyleSelector:@selector(streetsStyleURL)];
 }
 
 - (void)testLoadingOutdoorsStyleURL {
-    self.mapView.styleURL = [MGLStyle outdoorsStyleURL];
-    [self waitForMapViewToFinishLoadingStyleWithTimeout:5];
+    [self internalTestWithStyleSelector:@selector(outdoorsStyleURL)];
 }
 
 - (void)testLoadingLightStyleURL {
-    self.mapView.styleURL = [MGLStyle lightStyleURL];
-    [self waitForMapViewToFinishLoadingStyleWithTimeout:5];
+    [self internalTestWithStyleSelector:@selector(lightStyleURL)];
 }
 
 - (void)testLoadingDarkStyleURL {
-    self.mapView.styleURL = [MGLStyle darkStyleURL];
-    [self waitForMapViewToFinishLoadingStyleWithTimeout:5];
+    [self internalTestWithStyleSelector:@selector(darkStyleURL)];
 }
 
 - (void)testLoadingSatelliteStyleURL {
-    self.mapView.styleURL = [MGLStyle satelliteStyleURL];
-    [self waitForMapViewToFinishLoadingStyleWithTimeout:5];
+    [self internalTestWithStyleSelector:@selector(satelliteStyleURL)];
 }
 
 - (void)testLoadingSatelliteStreetsStyleURL {
-    self.mapView.styleURL = [MGLStyle satelliteStreetsStyleURL];
-    [self waitForMapViewToFinishLoadingStyleWithTimeout:5];
+    [self internalTestWithStyleSelector:@selector(satelliteStreetsStyleURL)];
 }
 
 @end
