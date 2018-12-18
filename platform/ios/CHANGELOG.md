@@ -2,14 +2,6 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## master
-
-### Other changes
-
-* Added an `MGLStyle.enablePlacementTransitions` property to control how long it takes for collided labels to fade out. ([#13565](https://github.com/mapbox/mapbox-gl-native/pull/13565))
-* Fixed a crash when casting large numbers in `NSExpression`. ([#13580](https://github.com/mapbox/mapbox-gl-native/pull/13580))
-
-
 ## 4.7.0
 
 ### Packaging
@@ -38,7 +30,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Renamed `-[MGLOfflineStorage putResourceWithUrl:data:modified:expires:etag:mustRevalidate:]` to `-[MGLOfflineStorage preloadData:forURL:modificationDate:expirationDate:eTag:mustRevalidate:]`. ([#13318](https://github.com/mapbox/mapbox-gl-native/pull/13318))
 * Added `MGLLoggingConfiguration` and `MGLLoggingBlockHandler` that handle error and fault events produced by the SDK. ([#13235](https://github.com/mapbox/mapbox-gl-native/pull/13235))
 * Fixed random crashes during app termination. ([#13367](https://github.com/mapbox/mapbox-gl-native/pull/13367))
-* Fixed a crash when specifying MGLShapeSourceOptionLineDistanceMetrics when creating an MGLShapeSource. ([#13543](https://github.com/mapbox/mapbox-gl-native/pull/13543))
+* Fixed a crash when specifying `MGLShapeSourceOptionLineDistanceMetrics` when creating an `MGLShapeSource`. ([#13543](https://github.com/mapbox/mapbox-gl-native/pull/13543))
 
 ## 4.6.0 - November 7, 2018
 
