@@ -79,3 +79,6 @@
 [submodule "vendor/eternal"]
 	path = vendor/eternal
 	url = https://github.com/mapbox/eternal.git
+[submodule "platform/android/vendor/mapbox-gestures-android"]
+	path = platform/android/vendor/mapbox-gestures-android
+	url = https://github.com/mapbox/mapbox-gestures-android.git

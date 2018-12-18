@@ -719,7 +719,7 @@ android-check : android-checkstyle android-lint-sdk android-lint-test-app
 # Runs checkstyle on the Android code
 .PHONY: android-checkstyle
 android-checkstyle: platform/android/gradle/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none checkstyle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:checkstyle :MapboxGLAndroidSDKTestApp:checkstyle
 
 # Runs lint on the Android SDK code
 .PHONY: android-lint-sdk
@@ -757,6 +757,11 @@ endif
 .PHONY: android-configuration
 android-configuration: platform/android/gradle/configuration.gradle
 	cat platform/android/gradle/configuration.gradle
+
+# Updates Android's vendor submodules
+.PHONY: android-update-vendor
+android-update-vendor: platform/android/gradle/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none updateVendorSubmodules
 
 # Creates a dependency graph using Graphviz
 .PHONY: android-graph
