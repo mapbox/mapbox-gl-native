@@ -509,7 +509,7 @@ jobs:
       - run:
           name: Run Clang checks
           command: make check
-          no_output_timeout: 20m
+          no_output_timeout: 25m
       - save-dependencies: { ccache: false }
 
 # ------------------------------------------------------------------------------
