@@ -636,6 +636,14 @@ jobs:
       - run:
           name: Record size
           command: platform/android/scripts/metrics.sh
+      - run:
+          name: Trigger benchmark run
+          command: |
+            if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
+              if [[ $CIRCLE_BRANCH == master ]]; then
+                curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=build https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
+              fi
+            fi
       - deploy:
           name: Publish to Maven
           command: |
