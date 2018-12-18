@@ -10,7 +10,6 @@ ext {
     versions = [
             mapboxServices  : '4.3.0',
             mapboxTelemetry : '4.1.1',
-            mapboxGestures  : '0.3.0',
             supportLib      : '27.1.1',
             constraintLayout: '1.1.2',
             espresso        : '3.0.2',
@@ -32,7 +31,6 @@ ext {
             mapboxJavaServices     : "com.mapbox.mapboxsdk:mapbox-sdk-services:${versions.mapboxServices}",
             mapboxJavaGeoJSON      : "com.mapbox.mapboxsdk:mapbox-sdk-geojson:${versions.mapboxServices}",
             mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxTelemetry}",
-            mapboxAndroidGestures  : "com.mapbox.mapboxsdk:mapbox-android-gestures:${versions.mapboxGestures}",
 
             // for testApp
             mapboxJavaTurf         : "com.mapbox.mapboxsdk:mapbox-sdk-turf:${versions.mapboxServices}",

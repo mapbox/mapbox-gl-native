@@ -1,1 +1,2 @@
-include ':MapboxGLAndroidSDK', ':MapboxGLAndroidSDKTestApp', ':MapboxGLAndroidSDKLint'
+include ':MapboxGLAndroidSDK', ':MapboxGLAndroidSDKTestApp', ':MapboxGLAndroidSDKLint', ':MapboxAndroidGestures'
+project(':MapboxAndroidGestures').projectDir = new File('vendor/mapbox-gestures-android/library')

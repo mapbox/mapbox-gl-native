@@ -29,3 +29,4 @@ subprojects {
 // Load build system information. If this file does not exist, run
 // `make platform/android/gradle/configuration.gradle`
 apply from: "${rootDir}/gradle/configuration.gradle"
+apply from: "${rootDir}/gradle/gradle-update-vendor-modules.gradle"

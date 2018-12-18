@@ -6,7 +6,7 @@ dependencies {
     lintChecks project(":MapboxGLAndroidSDKLint")
     api dependenciesList.mapboxAndroidTelemetry
     api dependenciesList.mapboxJavaGeoJSON
-    api dependenciesList.mapboxAndroidGestures
+    api project(":MapboxAndroidGestures")
     implementation dependenciesList.mapboxJavaTurf
     implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportAnnotations
