@@ -792,48 +792,6 @@ public final class LocationComponent {
   }
 
   /**
-   * Return the last known {@link CompassEngine} accuracy status of the location component.
-   * <p>
-   * The last known accuracy of the compass sensor, one of SensorManager.SENSOR_STATUS_*
-   *
-   * @return the last know compass accuracy bearing
-   * @deprecated Use {@link #getCompassEngine()}
-   */
-  @Deprecated
-  public float getLastKnownCompassAccuracyStatus() {
-    return compassEngine != null ? compassEngine.getLastAccuracySensorStatus() : 0;
-  }
-
-  /**
-   * Add a compass listener to get heading updates every second. Once the first listener gets added,
-   * the sensor gets initiated and starts returning values.
-   *
-   * @param compassListener a {@link CompassListener} for listening into compass heading and
-   *                        accuracy changes
-   * @deprecated Use {@link #getCompassEngine()}
-   */
-  @Deprecated
-  public void addCompassListener(@NonNull CompassListener compassListener) {
-    if (compassEngine != null) {
-      compassEngine.addCompassListener(compassListener);
-    }
-  }
-
-  /**
-   * Remove a compass listener.
-   *
-   * @param compassListener the {@link CompassListener} which you'd like to remove from the listener
-   *                        list.
-   * @deprecated Use {@link #getCompassEngine()}
-   */
-  @Deprecated
-  public void removeCompassListener(@NonNull CompassListener compassListener) {
-    if (compassEngine != null) {
-      compassEngine.removeCompassListener(compassListener);
-    }
-  }
-
-  /**
    * Adds a listener that gets invoked when the user clicks the displayed location.
    * <p>
    * If there are registered location click listeners and the location is clicked,
