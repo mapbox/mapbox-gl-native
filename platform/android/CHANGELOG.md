@@ -3,7 +3,37 @@
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
 ## master
-- Add `fill-extrusion-vertical-gradient` fill paint property [#13463](https://github.com/mapbox/mapbox-gl-native/pull/13463)
+
+## 6.8.0 - December 19, 2018
+ - Update core styles based on the streets-v8 source. This results in breaking changes for any code that references internal layers and sources of the style [#13615](https://github.com/mapbox/mapbox-gl-native/pull/13615)
+ - Fixed compass update time not getting updated [#13569](https://github.com/mapbox/mapbox-gl-native/pull/13569)
+ - Register compass sensor listener only if necessary [#13573](https://github.com/mapbox/mapbox-gl-native/pull/13573)
+ - Immediate location animation based on map's projection [#13545](https://github.com/mapbox/mapbox-gl-native/pull/13545)
+ - Option to disable smooth animation of compass and accuracy values [#13574](https://github.com/mapbox/mapbox-gl-native/pull/13574)
+ - Add onDidBecomeIdle to Map events [#13513](https://github.com/mapbox/mapbox-gl-native/pull/13513)
+ - Expose setAccessToken on Mapbox.java [#13397](https://github.com/mapbox/mapbox-gl-native/pull/13397)
+ - Use locale sensitive DecimalFormat for color alpha conversion [#13393](https://github.com/mapbox/mapbox-gl-native/pull/13393)
+ - Enabled RecyclerView integration [#13132](https://github.com/mapbox/mapbox-gl-native/pull/13132)
+
+## 7.0.0-beta.1 - December 12, 2018
+ - Style builder and Style.java [#13484](https://github.com/mapbox/mapbox-gl-native/pull/13484)
+ - LatLng bounds cannot be wrapped [#13419](https://github.com/mapbox/mapbox-gl-native/pull/13419)
+ - Expose endpoint change option for snapshotter [#13508](https://github.com/mapbox/mapbox-gl-native/pull/13508)
+ - Formatted "text-field" property setter [#13358](https://github.com/mapbox/mapbox-gl-native/pull/13358)
+ - Expose setAccesToken on Mapbox.java [#13397](https://github.com/mapbox/mapbox-gl-native/pull/13397)
+ - Immediately notify core about forced connectivity state [#13485](https://github.com/mapbox/mapbox-gl-native/pull/13485)
+ - Handle transition duration of 0ms for symbols [#13535](https://github.com/mapbox/mapbox-gl-native/pull/13535)
+ - Returning boolean when removing sources and layers [#13428](https://github.com/mapbox/mapbox-gl-native/pull/13428)
+ - Telemetry v4.1.1 bump [#13499](https://github.com/mapbox/mapbox-gl-native/pull/13499)
+ - mapbox-java 4.2.0 bump [#13507](https://github.com/mapbox/mapbox-gl-native/pull/13507)
+
+## 7.0.0-alpha.3 - November 30, 2018
+ - Add `fill-extrusion-vertical-gradient` fill paint property [#13463](https://github.com/mapbox/mapbox-gl-native/pull/13463)
+ - Don't cancel core transitions on MotionEvent#ACTION_CANCEL [#13465](https://github.com/mapbox/mapbox-gl-native/pull/13465)
+ - Require context in AttributionParser.Options [#13444](https://github.com/mapbox/mapbox-gl-native/pull/13444)
+ - Deprecated annotations package [#13468](https://github.com/mapbox/mapbox-gl-native/pull/13468)
+ - Send turnstile event while create MapSnapshotter instance [#13475](https://github.com/mapbox/mapbox-gl-native/pull/13475)
+ - Remove default zoom level restrictions when activating the location component [#13425](https://github.com/mapbox/mapbox-gl-native/pull/13425)
 
 ## 6.7.2 - November 30, 2018
  - Telemetry v3.5.6 [#13486](https://github.com/mapbox/mapbox-gl-native/pull/13486)
