@@ -862,7 +862,11 @@ public final class MapboxMap {
    *
    * @param markerOptions A marker options object that defines how to render the marker
    * @return The {@code Marker} that was added to the map
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public Marker addMarker(@NonNull MarkerOptions markerOptions) {
     return annotationManager.addMarker(markerOptions, this);
@@ -877,7 +881,11 @@ public final class MapboxMap {
    *
    * @param markerOptions A marker options object that defines how to render the marker
    * @return The {@code Marker} that was added to the map
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public Marker addMarker(@NonNull BaseMarkerOptions markerOptions) {
     return annotationManager.addMarker(markerOptions, this);
@@ -892,7 +900,11 @@ public final class MapboxMap {
    *
    * @param markerOptionsList A list of marker options objects that defines how to render the markers
    * @return A list of the {@code Marker}s that were added to the map
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Marker> addMarkers(@NonNull List<? extends
     BaseMarkerOptions> markerOptionsList) {
@@ -905,7 +917,11 @@ public final class MapboxMap {
    * </p>
    *
    * @param updatedMarker An updated marker object
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void updateMarker(@NonNull Marker updatedMarker) {
     annotationManager.updateMarker(updatedMarker, this);
   }
@@ -915,7 +931,11 @@ public final class MapboxMap {
    *
    * @param polylineOptions A polyline options object that defines how to render the polyline
    * @return The {@code Polyine} that was added to the map
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public Polyline addPolyline(@NonNull PolylineOptions polylineOptions) {
     return annotationManager.addPolyline(polylineOptions, this);
@@ -926,7 +946,11 @@ public final class MapboxMap {
    *
    * @param polylineOptionsList A list of polyline options objects that defines how to render the polylines.
    * @return A list of the {@code Polyline}s that were added to the map.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Polyline> addPolylines(@NonNull List<PolylineOptions> polylineOptionsList) {
     return annotationManager.addPolylines(polylineOptionsList, this);
@@ -936,7 +960,11 @@ public final class MapboxMap {
    * Update a polyline on this map.
    *
    * @param polyline An updated polyline object.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void updatePolyline(@NonNull Polyline polyline) {
     annotationManager.updatePolyline(polyline);
   }
@@ -946,7 +974,11 @@ public final class MapboxMap {
    *
    * @param polygonOptions A polygon options object that defines how to render the polygon.
    * @return The {@code Polygon} that was added to the map.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public Polygon addPolygon(@NonNull PolygonOptions polygonOptions) {
     return annotationManager.addPolygon(polygonOptions, this);
@@ -957,7 +989,11 @@ public final class MapboxMap {
    *
    * @param polygonOptionsList A list of polygon options objects that defines how to render the polygons
    * @return A list of the {@code Polygon}s that were added to the map
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Polygon> addPolygons(@NonNull List<PolygonOptions> polygonOptionsList) {
     return annotationManager.addPolygons(polygonOptionsList, this);
@@ -967,7 +1003,11 @@ public final class MapboxMap {
    * Update a polygon on this map.
    *
    * @param polygon An updated polygon object
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void updatePolygon(@NonNull Polygon polygon) {
     annotationManager.updatePolygon(polygon);
   }
@@ -979,7 +1019,11 @@ public final class MapboxMap {
    * Calls removeAnnotation() internally.
    *
    * @param marker Marker to remove
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void removeMarker(@NonNull Marker marker) {
     annotationManager.removeAnnotation(marker);
   }
@@ -991,7 +1035,11 @@ public final class MapboxMap {
    * Calls removeAnnotation() internally.
    *
    * @param polyline Polyline to remove
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void removePolyline(@NonNull Polyline polyline) {
     annotationManager.removeAnnotation(polyline);
   }
@@ -1003,7 +1051,11 @@ public final class MapboxMap {
    * Calls removeAnnotation() internally.
    *
    * @param polygon Polygon to remove
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void removePolygon(@NonNull Polygon polygon) {
     annotationManager.removeAnnotation(polygon);
   }
@@ -1012,7 +1064,11 @@ public final class MapboxMap {
    * Removes an annotation from the map.
    *
    * @param annotation The annotation object to remove.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void removeAnnotation(@NonNull Annotation annotation) {
     annotationManager.removeAnnotation(annotation);
   }
@@ -1021,7 +1077,11 @@ public final class MapboxMap {
    * Removes an annotation from the map
    *
    * @param id The identifier associated to the annotation to be removed
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void removeAnnotation(long id) {
     annotationManager.removeAnnotation(id);
   }
@@ -1030,21 +1090,33 @@ public final class MapboxMap {
    * Removes multiple annotations from the map.
    *
    * @param annotationList A list of annotation objects to remove.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void removeAnnotations(@NonNull List<? extends Annotation> annotationList) {
     annotationManager.removeAnnotations(annotationList);
   }
 
   /**
    * Removes all annotations from the map.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void removeAnnotations() {
     annotationManager.removeAnnotations();
   }
 
   /**
    * Removes all markers, polylines, polygons, overlays, etc from the map.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void clear() {
     annotationManager.removeAnnotations();
   }
@@ -1054,7 +1126,11 @@ public final class MapboxMap {
    *
    * @param id the id used to look up an annotation
    * @return An annotation with a matched id, null is returned if no match was found
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @Nullable
   public Annotation getAnnotation(long id) {
     return annotationManager.getAnnotation(id);
@@ -1065,7 +1141,11 @@ public final class MapboxMap {
    *
    * @return A list of all the annotation objects. The returned object is a copy so modifying this
    * list will not update the map
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Annotation> getAnnotations() {
     return annotationManager.getAnnotations();
@@ -1076,7 +1156,11 @@ public final class MapboxMap {
    *
    * @return A list of all the markers objects. The returned object is a copy so modifying this
    * list will not update the map.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Marker> getMarkers() {
     return annotationManager.getMarkers();
@@ -1087,7 +1171,11 @@ public final class MapboxMap {
    *
    * @return A list of all the polygon objects. The returned object is a copy so modifying this
    * list will not update the map.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Polygon> getPolygons() {
     return annotationManager.getPolygons();
@@ -1098,7 +1186,11 @@ public final class MapboxMap {
    *
    * @return A list of all the polylines objects. The returned object is a copy so modifying this
    * list will not update the map.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Polyline> getPolylines() {
     return annotationManager.getPolylines();
@@ -1109,7 +1201,11 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the user clicks on a marker.
    *                 To unset the callback, use null.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void setOnMarkerClickListener(@Nullable OnMarkerClickListener listener) {
     annotationManager.setOnMarkerClickListener(listener);
   }
@@ -1119,7 +1215,11 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the user clicks on a polygon.
    *                 To unset the callback, use null.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void setOnPolygonClickListener(@Nullable OnPolygonClickListener listener) {
     annotationManager.setOnPolygonClickListener(listener);
   }
@@ -1129,7 +1229,11 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the user clicks on a polyline.
    *                 To unset the callback, use null.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void setOnPolylineClickListener(@Nullable OnPolylineClickListener listener) {
     annotationManager.setOnPolylineClickListener(listener);
   }
@@ -1143,7 +1247,11 @@ public final class MapboxMap {
    * Selecting an already selected marker will have no effect.
    *
    * @param marker The marker to select.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void selectMarker(@NonNull Marker marker) {
     if (marker == null) {
       Logger.w(TAG, "marker was null, so just returning");
@@ -1154,7 +1262,11 @@ public final class MapboxMap {
 
   /**
    * Deselects any currently selected marker. All markers will have it's info window closed.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void deselectMarkers() {
     annotationManager.deselectMarkers();
   }
@@ -1163,7 +1275,11 @@ public final class MapboxMap {
    * Deselects a currently selected marker. The selected marker will have it's info window closed.
    *
    * @param marker the marker to deselect
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void deselectMarker(@NonNull Marker marker) {
     annotationManager.deselectMarker(marker);
   }
@@ -1172,7 +1288,11 @@ public final class MapboxMap {
    * Gets the currently selected marker.
    *
    * @return The currently selected marker.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Marker> getSelectedMarkers() {
     return annotationManager.getSelectedMarkers();
@@ -1191,7 +1311,11 @@ public final class MapboxMap {
    *
    * @param infoWindowAdapter The callback to be invoked when an info window will be shown.
    *                          To unset the callback, use null.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void setInfoWindowAdapter(@Nullable InfoWindowAdapter infoWindowAdapter) {
     annotationManager.getInfoWindowManager().setInfoWindowAdapter(infoWindowAdapter);
   }
@@ -1200,7 +1324,11 @@ public final class MapboxMap {
    * Gets the callback to be invoked when an info window will be shown.
    *
    * @return The callback to be invoked when an info window will be shown.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @Nullable
   public InfoWindowAdapter getInfoWindowAdapter() {
     return annotationManager.getInfoWindowManager().getInfoWindowAdapter();
@@ -1210,7 +1338,11 @@ public final class MapboxMap {
    * Changes whether the map allows concurrent multiple infowindows to be shown.
    *
    * @param allow If true, map allows concurrent multiple infowindows to be shown.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void setAllowConcurrentMultipleOpenInfoWindows(boolean allow) {
     annotationManager.getInfoWindowManager().setAllowConcurrentMultipleOpenInfoWindows(allow);
   }
@@ -1219,7 +1351,11 @@ public final class MapboxMap {
    * Returns whether the map allows concurrent multiple infowindows to be shown.
    *
    * @return If true, map allows concurrent multiple infowindows to be shown.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public boolean isAllowConcurrentMultipleOpenInfoWindows() {
     return annotationManager.getInfoWindowManager().isAllowConcurrentMultipleOpenInfoWindows();
   }
@@ -1247,7 +1383,7 @@ public final class MapboxMap {
    * @param latLngBounds the bounds to set the map with
    * @return the camera position that fits the bounds
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds) {
     // we use current camera tilt value to provide expected transformations as #11993
     return getCameraForLatLngBounds(latLngBounds, new int[] {0, 0, 0, 0});
@@ -1261,7 +1397,7 @@ public final class MapboxMap {
    * @param padding      the padding to apply to the bounds
    * @return the camera position that fits the bounds and padding
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
                                                  @NonNull @Size(value = 4) int[] padding) {
     // we use current camera tilt/bearing value to provide expected transformations as #11993
@@ -1277,7 +1413,7 @@ public final class MapboxMap {
    * @param tilt         to transform the camera position with
    * @return the camera position that fits the bounds and given bearing and tilt
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
                                                  @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION,
                                                    to = MapboxConstants.MAXIMUM_DIRECTION) double bearing,
@@ -1296,7 +1432,7 @@ public final class MapboxMap {
    * @param tilt         to transform the camera position with
    * @return the camera position that fits the bounds, bearing and tilt
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
                                                  @NonNull @Size(value = 4) int[] padding,
                                                  @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION,
@@ -1312,7 +1448,7 @@ public final class MapboxMap {
    * @param geometry the geometry to wraps the map with
    * @return the camera position that fits the geometry inside
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForGeometry(@NonNull Geometry geometry) {
     // we use current camera tilt value to provide expected transformations as #11993
     return getCameraForGeometry(geometry, new int[] {0, 0, 0, 0});
@@ -1325,7 +1461,7 @@ public final class MapboxMap {
    * @param padding  the padding to apply to the bounds
    * @return the camera position that fits the geometry inside and padding
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForGeometry(@NonNull Geometry geometry,
                                              @NonNull @Size(value = 4) int[] padding) {
     // we use current camera tilt/bearing value to provide expected transformations as #11993
@@ -1340,7 +1476,7 @@ public final class MapboxMap {
    * @param tilt     the tilt at which to compute the geometry's bounds
    * @return the camera position that the geometry inside with bearing and tilt
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForGeometry(@NonNull Geometry geometry,
                                              @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION,
                                                to = MapboxConstants.MAXIMUM_DIRECTION) double bearing,
@@ -1358,7 +1494,7 @@ public final class MapboxMap {
    * @param tilt     the tilt at which to compute the geometry's bounds
    * @return the camera position that fits the geometry inside with padding, bearing and tilt
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForGeometry(@NonNull Geometry geometry,
                                              @NonNull @Size(value = 4) int[] padding,
                                              @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION,
@@ -1366,21 +1502,6 @@ public final class MapboxMap {
                                              @FloatRange(from = MapboxConstants.MINIMUM_TILT,
                                                to = MapboxConstants.MAXIMUM_TILT) double tilt) {
     return nativeMapView.getCameraForGeometry(geometry, padding, bearing, tilt);
-  }
-
-  /**
-   * Get a camera position that fits a provided shape with a given bearing and padding.
-   *
-   * @param geometry the geometry to wraps the map with
-   * @param bearing  the bearing at which to compute the geometry's bounds
-   * @param padding  the padding to apply to the bounds
-   * @return the camera position that fits the geometry inside with padding and bearing
-   * @deprecated use Mapbox{@link #getCameraForGeometry(Geometry, int[], double, double)} instead
-   */
-  @NonNull
-  @Deprecated
-  public CameraPosition getCameraForGeometry(@NonNull Geometry geometry, double bearing, @NonNull int[] padding) {
-    return getCameraForGeometry(geometry, padding, bearing, transform.getTilt());
   }
 
   //
@@ -2055,7 +2176,11 @@ public final class MapboxMap {
    * Interface definition for a callback to be invoked when the user clicks on a marker.
    *
    * @see MapboxMap#setOnMarkerClickListener(OnMarkerClickListener)
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public interface OnMarkerClickListener {
     /**
      * Called when the user clicks on a marker.
@@ -2070,7 +2195,11 @@ public final class MapboxMap {
    * Interface definition for a callback to be invoked when the user clicks on a polygon.
    *
    * @see MapboxMap#setOnPolygonClickListener(OnPolygonClickListener)
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public interface OnPolygonClickListener {
     /**
      * Called when the user clicks on a polygon.
@@ -2084,7 +2213,11 @@ public final class MapboxMap {
    * Interface definition for a callback to be invoked when the user clicks on a polyline.
    *
    * @see MapboxMap#setOnPolylineClickListener(OnPolylineClickListener)
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public interface OnPolylineClickListener {
     /**
      * Called when the user clicks on a polyline.
@@ -2143,7 +2276,11 @@ public final class MapboxMap {
    * Interface definition for a callback to be invoked when an info window will be shown.
    *
    * @see MapboxMap#setInfoWindowAdapter(InfoWindowAdapter)
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public interface InfoWindowAdapter {
     /**
      * Called when an info window will be shown as a result of a marker click.
