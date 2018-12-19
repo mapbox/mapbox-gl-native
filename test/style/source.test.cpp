@@ -11,8 +11,8 @@
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/image_source.hpp>
 #include <mbgl/style/sources/custom_geometry_source.hpp>
-#include <mbgl/style/layers/hillshade_layer.cpp>
-#include <mbgl/style/layers/raster_layer.cpp>
+#include <mbgl/style/layers/hillshade_layer.hpp>
+#include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 
 #include <mbgl/renderer/sources/render_raster_source.hpp>
