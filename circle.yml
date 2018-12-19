@@ -906,7 +906,7 @@ jobs:
           command: |
             curl -sSfL -o codecov https://codecov.io/bash 
             chmod +x codecov
-            ./codecov -c -F ios
+            ./codecov -F ios
       - check-public-symbols
       - run:
           name: Check symbol namespacing for mapbox-events-ios
