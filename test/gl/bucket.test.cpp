@@ -114,9 +114,9 @@ TEST(Buckets, SymbolBucket) {
     bool sortFeaturesByY = false;
     std::string bucketLeaderID = "test";
     std::vector<SymbolInstance> symbolInstances;
-
+    const float tilePixelRatio = 1.0f;
     gl::Context context;
-    SymbolBucket bucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, bucketLeaderID, std::move(symbolInstances) };
+    SymbolBucket bucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, tilePixelRatio, bucketLeaderID, std::move(symbolInstances) };
     ASSERT_FALSE(bucket.hasIconData());
     ASSERT_FALSE(bucket.hasTextData());
     ASSERT_FALSE(bucket.hasCollisionBoxData());
