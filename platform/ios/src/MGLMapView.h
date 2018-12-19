@@ -305,7 +305,7 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIView *scaleBar;
 
 /**
- A `MGLUIElementsPosition` indicating the position of the scale bar.
+ The postion of the scale bar. The default value is `MGLOrnamentPositionTopLeft`.
  */
 @property (nonatomic, assign) MGLOrnamentPosition scaleBarPosition;
 
@@ -321,7 +321,7 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIImageView *compassView;
 
 /**
- A `MGLUIElementsPosition` indicating the position of the compass.
+ The postion of the compass view. The default value is `MGLOrnamentPositionTopRight`.
  */
 @property (nonatomic, assign) MGLOrnamentPosition compassViewPosition;
 
@@ -342,7 +342,7 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIImageView *logoView;
 
 /**
- A `MGLUIElementsPosition` indicating the position of the logo.
+ The postion of the logo view. The default value is `MGLOrnamentPositionBottomLeft`.
  */
 @property (nonatomic, assign) MGLOrnamentPosition logoViewPosition;
 
@@ -378,12 +378,12 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIButton *attributionButton;
 
 /**
-  A `MGLUIElementsPosition` indicating the position of the attribution.
+ The postion of the attribution button. The default value is `MGLOrnamentPositionBottomRight`.
  */
 @property (nonatomic, assign) MGLOrnamentPosition attributionButtonPosition;
 
 /**
-  A `CGPoint` indicating the position offset of the attribution.
+ A `CGPoint` indicating the position offset of the attribution.
  */
 @property (nonatomic, assign) CGPoint attributionButtonOffset;
 
