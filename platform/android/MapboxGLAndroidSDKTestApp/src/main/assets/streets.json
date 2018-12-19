@@ -49,8 +49,8 @@
             "ios": "4.4.0"
         }
     },
-    "center": [-122.4241, 37.78],
-    "zoom": 9,
+    "center": [0.0, 0.0],
+    "zoom": 0,
     "bearing": 0,
     "pitch": 0,
     "sources": {
