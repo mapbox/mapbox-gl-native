@@ -13,6 +13,7 @@
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
 #include <mbgl/text/glyph.hpp>
+#include <mbgl/util/i18n.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/tile_cover.hpp>
@@ -205,7 +206,10 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
     }
 
     if (!parser.glyphURL.empty()) {
-        result->requiredResourceCount += parser.fontStacks().size() * GLYPH_RANGES_PER_FONT_STACK;
+        result->requiredResourceCount += parser.fontStacks().size() *
+            (definition.match([](auto& reg){ return reg.includeIdeographs; }) ?
+                GLYPH_RANGES_PER_FONT_STACK :
+                NON_IDEOGRAPH_GLYPH_RANGES_PER_FONT_STACK);
     }
 
     if (!parser.spriteURL.empty()) {
@@ -298,9 +302,14 @@ void OfflineDownload::activateDownload() {
         }
 
         if (!parser.glyphURL.empty()) {
+            const bool includeIdeographs = definition.match([](auto& reg){ return reg.includeIdeographs; });
             for (const auto& fontStack : parser.fontStacks()) {
                 for (char16_t i = 0; i < GLYPH_RANGES_PER_FONT_STACK; i++) {
-                    queueResource(Resource::glyphs(parser.glyphURL, fontStack, getGlyphRange(i * GLYPHS_PER_GLYPH_RANGE)));
+                    // Assumes that if a glyph range starts with fixed width/ideographic characters, the entire
+                    // range will be fixed width.
+                    if (includeIdeographs || !util::i18n::allowsFixedWidthGlyphGeneration(i * GLYPHS_PER_GLYPH_RANGE)) {
+                        queueResource(Resource::glyphs(parser.glyphURL, fontStack, getGlyphRange(i * GLYPHS_PER_GLYPH_RANGE)));
+                    }
                 }
             }
         }
