@@ -244,8 +244,10 @@ public class CameraForTest extends BaseActivityTest {
     validateTestSetup();
     onMapView().perform(getMapboxMapAction((uiController, mapboxMap) -> {
       List<List<Point>> polygonDefinition = getPolygonDefinition();
-      CameraPosition actualPosition = mapboxMap.getCameraForGeometry(Polygon.fromLngLats(polygonDefinition), 45,
-        new int[] {5, 5, 5, 5});
+      CameraPosition actualPosition = mapboxMap.getCameraForGeometry(
+        Polygon.fromLngLats(polygonDefinition),
+        new int[] {5, 5, 5, 5},
+        45, 0);
       CameraPosition expectedPosition = new CameraPosition.Builder()
         .target(new LatLng()).zoom(3.63).tilt(0).bearing(45).build();
       assertEquals("Latitude should match",

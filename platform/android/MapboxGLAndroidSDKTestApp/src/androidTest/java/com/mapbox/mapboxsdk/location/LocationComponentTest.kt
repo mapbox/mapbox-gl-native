@@ -1219,12 +1219,6 @@ class LocationComponentTest : BaseActivityTest() {
           override fun getLastAccuracySensorStatus(): Int {
             return 0
           }
-
-          override fun onStart() {
-          }
-
-          override fun onStop() {
-          }
         }
 
         component.compassEngine = engine

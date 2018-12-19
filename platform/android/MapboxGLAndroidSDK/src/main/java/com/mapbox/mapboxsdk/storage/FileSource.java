@@ -76,11 +76,9 @@ public class FileSource {
    *
    * @param context the context to derive the files directory path from
    * @return the files directory path
-   * @deprecated Use {@link #getResourcesCachePath(Context)} instead.
    */
-  @Nullable
-  @Deprecated
-  public static String getCachePath(@NonNull Context context) {
+  @NonNull
+  private static String getCachePath(@NonNull Context context) {
     // Default value
     boolean isExternalStorageConfiguration = MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL;
 

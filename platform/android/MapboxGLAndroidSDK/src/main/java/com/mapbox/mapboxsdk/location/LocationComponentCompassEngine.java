@@ -109,20 +109,6 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
   }
 
   @Override
-  public void onStart() {
-    if (!compassListeners.isEmpty()) {
-      registerSensorListeners();
-    }
-  }
-
-  @Override
-  public void onStop() {
-    if (!compassListeners.isEmpty()) {
-      unregisterSensorListeners();
-    }
-  }
-
-  @Override
   public void onSensorChanged(@NonNull SensorEvent event) {
     // check when the last time the compass was updated, return if too soon.
     long currentTime = SystemClock.elapsedRealtime();

@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.testapp.camera;
 
-import android.graphics.PointF;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingRegistry;
 import android.support.test.espresso.idling.CountingIdlingResource;
@@ -150,35 +149,6 @@ public class CameraEaseTest extends BaseActivityTest {
           @Override
           public void onFinish() {
             verifyCameraPosition(mapboxMap, centerBounds, mapboxMap.getCameraPosition().zoom, 0, 0);
-            animationIdlingResource.decrement();
-          }
-        });
-    });
-
-    Espresso.onIdle();
-  }
-
-  @Test
-  public void testEaseToMoveBy() {
-    validateTestSetup();
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      final PointF centerPoint = mapboxMap.getProjection().toScreenLocation(mapboxMap.getCameraPosition().target);
-      final LatLng moveTarget = new LatLng(2, 2);
-      final PointF moveTargetPoint = mapboxMap.getProjection().toScreenLocation(moveTarget);
-
-      animationIdlingResource.increment();
-      mapboxMap.easeCamera(CameraUpdateFactory.scrollBy(
-        moveTargetPoint.x - centerPoint.x, moveTargetPoint.y - centerPoint.y),
-        new MapboxMap.CancelableCallback() {
-          @Override
-          public void onCancel() {
-            verifyCameraPosition(mapboxMap, moveTarget, mapboxMap.getCameraPosition().zoom, 0, 0);
-            animationIdlingResource.decrement();
-          }
-
-          @Override
-          public void onFinish() {
-            verifyCameraPosition(mapboxMap, moveTarget, mapboxMap.getCameraPosition().zoom, 0, 0);
             animationIdlingResource.decrement();
           }
         });
