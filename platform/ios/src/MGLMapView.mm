@@ -521,7 +521,7 @@ public:
     _logoView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_logoView];
     _logoViewConstraints = [NSMutableArray array];
-    _logoViewPosition = MGLUIElementsPositionBottomLeft;
+    _logoViewPosition = MGLOrnamentPositionBottomLeft;
     _logoViewOffset = CGPointMake(8, 8);
 
     // setup attribution
@@ -537,7 +537,7 @@ public:
 
     UILongPressGestureRecognizer *attributionLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(showAttribution:)];
     [_attributionButton addGestureRecognizer:attributionLongPress];
-    _attributionButtonPosition = MGLUIElementsPositionBottomRight;
+    _attributionButtonPosition = MGLOrnamentPositionBottomRight;
     _attributionButtonOffset = CGPointMake(8, 8);
 
     // setup compass
@@ -552,7 +552,7 @@ public:
     _compassView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_compassView];
     _compassViewConstraints = [NSMutableArray array];
-    _compassViewPosition = MGLUIElementsPositionTopRight;
+    _compassViewPosition = MGLOrnamentPositionTopRight;
     _compassViewOffset = CGPointMake(8, 8);
     
     // setup scale control
@@ -561,7 +561,7 @@ public:
     _scaleBar.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_scaleBar];
     _scaleBarConstraints = [NSMutableArray array];
-    _scaleBarPosition = MGLUIElementsPositionTopLeft;
+    _scaleBarPosition = MGLOrnamentPositionTopLeft;
     _scaleBarOffset = CGPointMake(8, 8);
 
     [self installConstraints];
@@ -821,7 +821,7 @@ public:
     return YES;
 }
 
-- (void)setScaleBarPosition:(MGLUIElementsPosition)scaleBarPosition {
+- (void)setScaleBarPosition:(MGLOrnamentPosition)scaleBarPosition {
     _scaleBarPosition = scaleBarPosition;
     [self installScaleBarConstraints];
 }
@@ -831,7 +831,7 @@ public:
     [self installScaleBarConstraints];
 }
 
-- (void)setCompassViewPosition:(MGLUIElementsPosition)compassViewPosition {
+- (void)setCompassViewPosition:(MGLOrnamentPosition)compassViewPosition {
     _compassViewPosition = compassViewPosition;
     [self installCompressViewConstraints];
 }
@@ -841,7 +841,7 @@ public:
     [self installCompressViewConstraints];
 }
 
-- (void)setLogoViewPosition:(MGLUIElementsPosition)logoViewPosition {
+- (void)setLogoViewPosition:(MGLOrnamentPosition)logoViewPosition {
     _logoViewPosition = logoViewPosition;
     [self installLogoViewConstraints];
 }
@@ -851,7 +851,7 @@ public:
     [self installLogoViewConstraints];
 }
 
-- (void)setAttributionButtonPosition:(MGLUIElementsPosition)attributionButtonPosition {
+- (void)setAttributionButtonPosition:(MGLOrnamentPosition)attributionButtonPosition {
     _attributionButtonPosition = attributionButtonPosition;
     [self installAttributionButtonConstraints];
 }
@@ -881,7 +881,7 @@ public:
 
 - (void)installConstraintsWithView:(UIView *)view
                       constraints:(NSMutableArray *)constraints
-                         position:(MGLUIElementsPosition)position
+                         position:(MGLOrnamentPosition)position
                              size:(CGSize)size
                            offset:(CGPoint)offset {
     UIView *containerView = nil;
@@ -892,19 +892,19 @@ public:
         UILayoutGuide *safeAreaLayoutGuide = self.safeAreaLayoutGuide;
         
         switch (position) {
-            case MGLUIElementsPositionTopLeft:
+            case MGLOrnamentPositionTopLeft:
                 [updatedConstrants addObject:[view.topAnchor constraintEqualToAnchor:safeAreaLayoutGuide.topAnchor constant:offset.y]];
                 [updatedConstrants addObject:[view.leftAnchor constraintEqualToAnchor:safeAreaLayoutGuide.leftAnchor constant:offset.x]];
                 break;
-            case MGLUIElementsPositionTopRight:
+            case MGLOrnamentPositionTopRight:
                 [updatedConstrants addObject:[view.topAnchor constraintEqualToAnchor:safeAreaLayoutGuide.topAnchor constant:offset.y]];
                 [updatedConstrants addObject:[safeAreaLayoutGuide.rightAnchor constraintEqualToAnchor:view.rightAnchor constant:offset.x]];
                 break;
-            case MGLUIElementsPositionBottomLeft:
+            case MGLOrnamentPositionBottomLeft:
                 [updatedConstrants addObject:[safeAreaLayoutGuide.bottomAnchor constraintEqualToAnchor:view.bottomAnchor constant:offset.y]];
                 [updatedConstrants addObject:[view.leftAnchor constraintEqualToAnchor:safeAreaLayoutGuide.leftAnchor constant:offset.x]];
                 break;
-            case MGLUIElementsPositionBottomRight:
+            case MGLOrnamentPositionBottomRight:
                 [updatedConstrants addObject:[safeAreaLayoutGuide.bottomAnchor constraintEqualToAnchor:view.bottomAnchor constant:offset.y]];
                 [updatedConstrants addObject: [safeAreaLayoutGuide.rightAnchor constraintEqualToAnchor:view.rightAnchor constant:offset.x]];
                 break;
@@ -925,7 +925,7 @@ public:
         containerView = useLayoutGuides ? viewController.view : self;
         
         switch (position) {
-                case MGLUIElementsPositionTopLeft:
+                case MGLOrnamentPositionTopLeft:
                 if (useLayoutGuides) {
                     [updatedConstrants addObject:
                      [NSLayoutConstraint constraintWithItem:view
@@ -953,7 +953,7 @@ public:
                                              multiplier:1.0
                                                constant:offset.x + self.contentInset.left]];
                 break;
-                case MGLUIElementsPositionTopRight:
+                case MGLOrnamentPositionTopRight:
                 if (useLayoutGuides) {
                     [updatedConstrants addObject:
                      [NSLayoutConstraint constraintWithItem:view
@@ -982,7 +982,7 @@ public:
                                              multiplier:1.0
                                                constant:offset.x + self.contentInset.right]];
                 break;
-                case MGLUIElementsPositionBottomLeft:
+                case MGLOrnamentPositionBottomLeft:
                 if (useLayoutGuides) {
                     [updatedConstrants addObject:
                      [NSLayoutConstraint constraintWithItem:viewController.bottomLayoutGuide
@@ -1010,7 +1010,7 @@ public:
                                              multiplier:1.0
                                                constant:offset.x + self.contentInset.left]];
                 break;
-                case MGLUIElementsPositionBottomRight:
+                case MGLOrnamentPositionBottomRight:
                 if (useLayoutGuides) {
                     [updatedConstrants addObject:
                      [NSLayoutConstraint constraintWithItem:viewController.bottomLayoutGuide
