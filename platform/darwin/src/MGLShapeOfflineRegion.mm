@@ -26,6 +26,7 @@
 }
 
 @synthesize styleURL = _styleURL;
+@synthesize includesIdeographicGlyphs = _includesIdeographicGlyphs;
 
 -(NSDictionary *)offlineStartEventAttributes {
     return @{
@@ -71,6 +72,7 @@
         _shape = shape;
         _minimumZoomLevel = minimumZoomLevel;
         _maximumZoomLevel = maximumZoomLevel;
+        _includesIdeographicGlyphs = YES;
     }
     return self;
 }
@@ -78,7 +80,9 @@
 - (instancetype)initWithOfflineRegionDefinition:(const mbgl::OfflineGeometryRegionDefinition &)definition {
     NSURL *styleURL = [NSURL URLWithString:@(definition.styleURL.c_str())];
     MGLShape *shape = MGLShapeFromGeoJSON(definition.geometry);
-    return [self initWithStyleURL:styleURL shape:shape fromZoomLevel:definition.minZoom toZoomLevel:definition.maxZoom];
+    MGLShapeOfflineRegion* result = [self initWithStyleURL:styleURL shape:shape fromZoomLevel:definition.minZoom toZoomLevel:definition.maxZoom];
+    result.includesIdeographicGlyphs = definition.includeIdeographs;
+    return result;
 }
 
 - (const mbgl::OfflineRegionDefinition)offlineRegionDefinition {
@@ -90,7 +94,7 @@
     return mbgl::OfflineGeometryRegionDefinition(_styleURL.absoluteString.UTF8String,
                                                  _shape.geometryObject,
                                                  _minimumZoomLevel, _maximumZoomLevel,
-                                                 scaleFactor);
+                                                 scaleFactor, _includesIdeographicGlyphs);
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)coder {
@@ -100,7 +104,9 @@
     double minimumZoomLevel = [coder decodeDoubleForKey:@"minimumZoomLevel"];
     double maximumZoomLevel = [coder decodeDoubleForKey:@"maximumZoomLevel"];
 
-    return [self initWithStyleURL:styleURL shape:shape fromZoomLevel:minimumZoomLevel toZoomLevel:maximumZoomLevel];
+    MGLShapeOfflineRegion* result = [self initWithStyleURL:styleURL shape:shape fromZoomLevel:minimumZoomLevel toZoomLevel:maximumZoomLevel];
+    result.includesIdeographicGlyphs = [coder decodeBoolForKey:@"includesIdeographicGlyphs"];
+    return result;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
@@ -109,10 +115,13 @@
     [coder encodeObject:_shape forKey:@"shape"];
     [coder encodeDouble:_maximumZoomLevel forKey:@"maximumZoomLevel"];
     [coder encodeDouble:_minimumZoomLevel forKey:@"minimumZoomLevel"];
+    [coder encodeBool:_includesIdeographicGlyphs forKey:@"includesIdeographicGlyphs"];
 }
 
 - (id)copyWithZone:(nullable NSZone *)zone {
-    return [[[self class] allocWithZone:zone] initWithStyleURL:_styleURL shape:_shape fromZoomLevel:_minimumZoomLevel toZoomLevel:_maximumZoomLevel];
+    MGLShapeOfflineRegion* result = [[[self class] allocWithZone:zone] initWithStyleURL:_styleURL shape:_shape fromZoomLevel:_minimumZoomLevel toZoomLevel:_maximumZoomLevel];
+    result.includesIdeographicGlyphs = _includesIdeographicGlyphs;
+    return result;
 }
 
 - (BOOL)isEqual:(id)other {
@@ -127,13 +136,15 @@
     return (_minimumZoomLevel == otherRegion->_minimumZoomLevel
             && _maximumZoomLevel == otherRegion->_maximumZoomLevel
             && _shape.geometryObject == otherRegion->_shape.geometryObject
-            && [_styleURL isEqual:otherRegion->_styleURL]);
+            && [_styleURL isEqual:otherRegion->_styleURL]
+            && _includesIdeographicGlyphs == otherRegion->_includesIdeographicGlyphs);
 }
 
 - (NSUInteger)hash {
     return (_styleURL.hash
             + _shape.hash
-            + @(_minimumZoomLevel).hash + @(_maximumZoomLevel).hash);
+            + @(_minimumZoomLevel).hash + @(_maximumZoomLevel).hash
+            + @(_includesIdeographicGlyphs).hash);
 }
 
 @end

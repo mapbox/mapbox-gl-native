@@ -140,7 +140,7 @@
     MGLShape *shape = [MGLShape shapeWithData: [geojson dataUsingEncoding:NSUTF8StringEncoding] encoding: NSUTF8StringEncoding error:&error];
     XCTAssertNil(error);
     MGLShapeOfflineRegion *region = [[MGLShapeOfflineRegion alloc] initWithStyleURL:styleURL shape:shape fromZoomLevel:zoomLevel toZoomLevel:zoomLevel];
-    
+    region.includesIdeographicGlyphs = NO;
     
     NSString *nameKey = @"Name";
     NSString *name = @"Utrecht centrum";
