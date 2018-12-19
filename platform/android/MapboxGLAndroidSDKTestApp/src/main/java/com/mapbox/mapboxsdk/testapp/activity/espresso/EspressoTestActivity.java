@@ -1,19 +1,16 @@
 package com.mapbox.mapboxsdk.testapp.activity.espresso;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
  * Base activity for instrumentation testing.
  */
-public class EspressoTestActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class EspressoTestActivity extends AppCompatActivity {
 
   public MapView mapView;
   protected MapboxMap mapboxMap;
@@ -26,18 +23,6 @@ public class EspressoTestActivity extends AppCompatActivity implements OnMapRead
     // Initialize map as normal
     mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(this);
-  }
-
-  @Override
-  public void onMapReady(@NonNull final MapboxMap map) {
-    map.setStyle(new Style.Builder().fromUrl("asset://streets.json"),
-      style -> mapboxMap = map
-    );
-  }
-
-  public MapboxMap getMapboxMap() {
-    return mapboxMap;
   }
 
   @Override
