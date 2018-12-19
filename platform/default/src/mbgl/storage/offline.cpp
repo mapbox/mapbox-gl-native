@@ -16,12 +16,13 @@ namespace mbgl {
 // OfflineTilePyramidRegionDefinition
 
 OfflineTilePyramidRegionDefinition::OfflineTilePyramidRegionDefinition(
-    std::string styleURL_, LatLngBounds bounds_, double minZoom_, double maxZoom_, float pixelRatio_)
+    std::string styleURL_, LatLngBounds bounds_, double minZoom_, double maxZoom_, float pixelRatio_, bool includeIdeographs_)
     : styleURL(std::move(styleURL_)),
       bounds(std::move(bounds_)),
       minZoom(minZoom_),
       maxZoom(maxZoom_),
-      pixelRatio(pixelRatio_) {
+      pixelRatio(pixelRatio_),
+      includeIdeographs(includeIdeographs_) {
     if (minZoom < 0 || maxZoom < 0 || maxZoom < minZoom || pixelRatio < 0 ||
         !std::isfinite(minZoom) || std::isnan(maxZoom) || !std::isfinite(pixelRatio)) {
         throw std::invalid_argument("Invalid offline region definition");
@@ -31,12 +32,13 @@ OfflineTilePyramidRegionDefinition::OfflineTilePyramidRegionDefinition(
 
 // OfflineGeometryRegionDefinition
 
-OfflineGeometryRegionDefinition::OfflineGeometryRegionDefinition(std::string styleURL_, Geometry<double> geometry_, double minZoom_, double maxZoom_, float pixelRatio_)
+OfflineGeometryRegionDefinition::OfflineGeometryRegionDefinition(std::string styleURL_, Geometry<double> geometry_, double minZoom_, double maxZoom_, float pixelRatio_, bool includeIdeographs_)
     : styleURL(styleURL_)
     , geometry(std::move(geometry_))
     , minZoom(minZoom_)
     , maxZoom(maxZoom_)
-    , pixelRatio(pixelRatio_) {
+    , pixelRatio(pixelRatio_)
+    , includeIdeographs(includeIdeographs_){
     if (minZoom < 0 || maxZoom < 0 || maxZoom < minZoom || pixelRatio < 0 ||
         !std::isfinite(minZoom) || std::isnan(maxZoom) || !std::isfinite(pixelRatio)) {
         throw std::invalid_argument("Invalid offline region definition");
@@ -64,7 +66,8 @@ OfflineRegionDefinition decodeOfflineRegionDefinition(const std::string& region)
         || !(hasValidBounds() || hasValidGeometry())
         || !doc.HasMember("min_zoom") || !doc["min_zoom"].IsDouble()
         || (doc.HasMember("max_zoom") && !doc["max_zoom"].IsDouble())
-        || !doc.HasMember("pixel_ratio") || !doc["pixel_ratio"].IsDouble()) {
+        || !doc.HasMember("pixel_ratio") || !doc["pixel_ratio"].IsDouble()
+        || (doc.HasMember("include_ideographs") && !doc["include_ideographs"].IsBool())) {
         throw std::runtime_error("Malformed offline region definition");
     }
 
@@ -74,6 +77,7 @@ OfflineRegionDefinition decodeOfflineRegionDefinition(const std::string& region)
     double minZoom = doc["min_zoom"].GetDouble();
     double maxZoom = doc.HasMember("max_zoom") ? doc["max_zoom"].GetDouble() : INFINITY;
     float pixelRatio = doc["pixel_ratio"].GetDouble();
+    bool includeIdeographs = doc.HasMember("include_ideographs") ? doc["include_ideographs"].GetBool() : true;
     
     if (doc.HasMember("bounds")) {
         return OfflineTilePyramidRegionDefinition{
@@ -81,12 +85,12 @@ OfflineRegionDefinition decodeOfflineRegionDefinition(const std::string& region)
                 LatLngBounds::hull(
                          LatLng(doc["bounds"][0].GetDouble(), doc["bounds"][1].GetDouble()),
                          LatLng(doc["bounds"][2].GetDouble(), doc["bounds"][3].GetDouble())),
-                minZoom, maxZoom, pixelRatio };
+                minZoom, maxZoom, pixelRatio, includeIdeographs };
     } else {
         return OfflineGeometryRegionDefinition{
                 styleURL,
                 mapbox::geojson::convert<Geometry<double>>(doc["geometry"].GetObject()),
-                minZoom, maxZoom, pixelRatio };
+                minZoom, maxZoom, pixelRatio, includeIdeographs };
     };
 
 }
@@ -104,6 +108,7 @@ std::string encodeOfflineRegionDefinition(const OfflineRegionDefinition& region)
         }
 
         doc.AddMember("pixel_ratio", _region.pixelRatio, doc.GetAllocator());
+        doc.AddMember("include_ideographs", _region.includeIdeographs, doc.GetAllocator());
     });
 
     // Encode specific properties

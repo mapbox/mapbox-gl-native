@@ -29,7 +29,7 @@ class TileID;
  */
 class OfflineTilePyramidRegionDefinition {
 public:
-    OfflineTilePyramidRegionDefinition(std::string, LatLngBounds, double, double, float);
+    OfflineTilePyramidRegionDefinition(std::string, LatLngBounds, double, double, float, bool);
 
     /* Private */
     const std::string styleURL;
@@ -37,6 +37,7 @@ public:
     const double minZoom;
     const double maxZoom;
     const float pixelRatio;
+    const bool includeIdeographs;
 };
 
 /*
@@ -52,7 +53,7 @@ public:
  */
 class OfflineGeometryRegionDefinition {
 public:
-    OfflineGeometryRegionDefinition(std::string styleURL, Geometry<double>, double minZoom, double maxZoom, float pixelRatio);
+    OfflineGeometryRegionDefinition(std::string styleURL, Geometry<double>, double minZoom, double maxZoom, float pixelRatio, bool includeIdeographs);
 
     /* Private */
     const std::string styleURL;
@@ -60,6 +61,7 @@ public:
     const double minZoom;
     const double maxZoom;
     const float pixelRatio;
+    const bool includeIdeographs;
 };
 
 /*
