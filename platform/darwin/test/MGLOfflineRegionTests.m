@@ -25,8 +25,9 @@
 
     XCTAssertEqualObjects(original.styleURL, copy.styleURL, @"Style URL has changed.");
     XCTAssert(MGLCoordinateBoundsEqualToCoordinateBounds(original.bounds, copy.bounds), @"Bounds have changed.");
-    XCTAssertEqual(original.minimumZoomLevel, original.minimumZoomLevel, @"Minimum zoom level has changed.");
-    XCTAssertEqual(original.maximumZoomLevel, original.maximumZoomLevel, @"Maximum zoom level has changed.");
+    XCTAssertEqual(original.minimumZoomLevel, copy.minimumZoomLevel, @"Minimum zoom level has changed.");
+    XCTAssertEqual(original.maximumZoomLevel, copy.maximumZoomLevel, @"Maximum zoom level has changed.");
+    XCTAssertEqual(original.includesIdeographicGlyphs, copy.includesIdeographicGlyphs, @"Include ideographs has changed.");
 }
 
 - (void)testGeometryRegionEquality {
@@ -36,13 +37,15 @@
     XCTAssertNil(error);
     
     MGLShapeOfflineRegion *original = [[MGLShapeOfflineRegion alloc] initWithStyleURL:[MGLStyle lightStyleURLWithVersion:MGLStyleDefaultVersion] shape:shape fromZoomLevel:5 toZoomLevel:10];
+    original.includesIdeographicGlyphs = NO;
     MGLShapeOfflineRegion *copy = [original copy];
     XCTAssertEqualObjects(original, copy, @"Shape region should be equal to its copy.");
     
     XCTAssertEqualObjects(original.styleURL, copy.styleURL, @"Style URL has changed.");
     XCTAssertEqualObjects(original.shape, copy.shape, @"Geometry has changed.");
-    XCTAssertEqual(original.minimumZoomLevel, original.minimumZoomLevel, @"Minimum zoom level has changed.");
-    XCTAssertEqual(original.maximumZoomLevel, original.maximumZoomLevel, @"Maximum zoom level has changed.");
+    XCTAssertEqual(original.minimumZoomLevel, copy.minimumZoomLevel, @"Minimum zoom level has changed.");
+    XCTAssertEqual(original.maximumZoomLevel, copy.maximumZoomLevel, @"Maximum zoom level has changed.");
+    XCTAssertEqual(original.includesIdeographicGlyphs, copy.includesIdeographicGlyphs, @"Include ideographs has changed.");
 }
 
 @end

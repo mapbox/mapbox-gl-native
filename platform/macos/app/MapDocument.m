@@ -82,6 +82,7 @@ NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *sha
 @property (weak) IBOutlet NSNumberFormatter *minimumOfflinePackZoomLevelFormatter;
 @property (weak) IBOutlet NSTextField *maximumOfflinePackZoomLevelField;
 @property (weak) IBOutlet NSNumberFormatter *maximumOfflinePackZoomLevelFormatter;
+@property (weak) IBOutlet NSButton *includesIdeographicGlyphsBox;
 
 @end
 
@@ -931,6 +932,8 @@ NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *sha
     self.minimumOfflinePackZoomLevelFormatter.maximum = @(ceil(self.mapView.maximumZoomLevel));
     self.maximumOfflinePackZoomLevelFormatter.maximum = @(ceil(self.mapView.maximumZoomLevel));
     
+    NSString *fontFamilyName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLIdeographicFontFamilyName"];
+    self.includesIdeographicGlyphsBox.state = fontFamilyName ? NSOffState : NSOnState;
     [self.addOfflinePackWindow makeFirstResponder:self.offlinePackNameField];
     
     __weak __typeof__(self) weakSelf = self;
@@ -945,6 +948,7 @@ NSArray<id <MGLAnnotation>> *MBXFlattenedShapes(NSArray<id <MGLAnnotation>> *sha
                                                            bounds:strongSelf.mapView.visibleCoordinateBounds
                                                     fromZoomLevel:strongSelf.minimumOfflinePackZoomLevelField.integerValue
                                                       toZoomLevel:strongSelf.maximumOfflinePackZoomLevelField.integerValue];
+        region.includesIdeographicGlyphs = strongSelf.includesIdeographicGlyphsBox.state == NSOnState;
         NSString *name = strongSelf.offlinePackNameField.stringValue;
         if (!name.length) {
             name = strongSelf.offlinePackNameField.placeholderString;
