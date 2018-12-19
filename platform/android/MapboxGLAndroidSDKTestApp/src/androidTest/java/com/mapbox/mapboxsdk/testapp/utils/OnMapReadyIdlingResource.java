@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.WorkerThread;
 import android.support.test.espresso.IdlingResource;
+
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
@@ -35,7 +36,7 @@ public class OnMapReadyIdlingResource implements IdlingResource {
 
   private void initMap(MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
-    mapboxMap.setStyle(Style.MAPBOX_STREETS);
+    mapboxMap.setStyle(new Style.Builder().fromUrl("asset://streets.json"));
   }
 
   @Override
