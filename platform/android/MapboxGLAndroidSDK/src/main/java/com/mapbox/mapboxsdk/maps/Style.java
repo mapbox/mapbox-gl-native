@@ -756,25 +756,25 @@ public class Style {
    * constant means your map style will always use the latest version and may change as we
    * improve the style.
    */
-  public static final String MAPBOX_STREETS = "mapbox://styles/mapbox/streets-v10";
+  public static final String MAPBOX_STREETS = "mapbox://styles/mapbox/streets-v11";
 
   /**
    * Outdoors: A general-purpose style tailored to outdoor activities. Using this constant means
    * your map style will always use the latest version and may change as we improve the style.
    */
-  public static final String OUTDOORS = "mapbox://styles/mapbox/outdoors-v10";
+  public static final String OUTDOORS = "mapbox://styles/mapbox/outdoors-v11";
 
   /**
    * Light: Subtle light backdrop for data visualizations. Using this constant means your map
    * style will always use the latest version and may change as we improve the style.
    */
-  public static final String LIGHT = "mapbox://styles/mapbox/light-v9";
+  public static final String LIGHT = "mapbox://styles/mapbox/light-v10";
 
   /**
    * Dark: Subtle dark backdrop for data visualizations. Using this constant means your map style
    * will always use the latest version and may change as we improve the style.
    */
-  public static final String DARK = "mapbox://styles/mapbox/dark-v9";
+  public static final String DARK = "mapbox://styles/mapbox/dark-v10";
 
   /**
    * Satellite: A beautiful global satellite and aerial imagery layer. Using this constant means
@@ -787,7 +787,7 @@ public class Style {
    * constant means your map style will always use the latest version and may change as we
    * improve the style.
    */
-  public static final String SATELLITE_STREETS = "mapbox://styles/mapbox/satellite-streets-v10";
+  public static final String SATELLITE_STREETS = "mapbox://styles/mapbox/satellite-streets-v11";
 
   /**
    * Traffic Day: Color-coded roads based on live traffic congestion data. Traffic data is currently
