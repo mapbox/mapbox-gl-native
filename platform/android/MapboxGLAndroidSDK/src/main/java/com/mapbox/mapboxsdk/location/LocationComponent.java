@@ -211,6 +211,7 @@ public final class LocationComponent {
    * <strong>Note</strong>: This method will initialize and use an internal {@link LocationEngine} when enabled.
    *
    * @param context the context
+   * @param style the proxy object for current map style. More info at {@link Style}
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style) {
@@ -223,6 +224,7 @@ public final class LocationComponent {
    * Afterwards, you can manage component's visibility by {@link #setLocationComponentEnabled(boolean)}.
    *
    * @param context                  the context
+   * @param style the proxy object for current map style. More info at {@link Style}
    * @param useDefaultLocationEngine true if you want to initialize and use the built-in location engine or false if
    *                                 there should be no location engine initialized
    */
@@ -241,6 +243,7 @@ public final class LocationComponent {
    * Afterwards, you can manage component's visibility by {@link #setLocationComponentEnabled(boolean)}.
    *
    * @param context                  the context
+   * @param style the proxy object for current map style. More info at {@link Style}
    * @param useDefaultLocationEngine true if you want to initialize and use the built-in location engine or false if
    *                                 there should be no location engine initialized
    * @param locationEngineRequest    the location request
@@ -264,6 +267,7 @@ public final class LocationComponent {
    * <strong>Note</strong>: This method will initialize and use an internal {@link LocationEngine} when enabled.
    *
    * @param context  the context
+   * @param style the proxy object for current map style. More info at {@link Style}
    * @param styleRes the LocationComponent style res
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
@@ -279,6 +283,7 @@ public final class LocationComponent {
    * </p>
    *
    * @param context the context
+   * @param style the proxy object for current map style. More info at {@link Style}
    * @param options the options
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
@@ -294,6 +299,7 @@ public final class LocationComponent {
    * Afterwards, you can manage component's visibility by {@link #setLocationComponentEnabled(boolean)}.
    *
    * @param context        the context
+   * @param style the proxy object for current map style. More info at {@link Style}
    * @param locationEngine the engine, or null if you'd like to only force location updates
    * @param styleRes       the LocationComponent style res
    */
@@ -309,6 +315,7 @@ public final class LocationComponent {
    * Afterwards, you can manage component's visibility by {@link #setLocationComponentEnabled(boolean)}.
    *
    * @param context               the context
+   * @param style the proxy object for current map style. More info at {@link Style}
    * @param locationEngine        the engine, or null if you'd like to only force location updates
    * @param locationEngineRequest the location request
    * @param styleRes              the LocationComponent style res
@@ -325,6 +332,7 @@ public final class LocationComponent {
    * This method will show the location icon and enable the camera tracking the location.
    *
    * @param context        the context
+   * @param style the proxy object for current map style. More info at {@link Style}
    * @param locationEngine the engine
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
@@ -337,6 +345,7 @@ public final class LocationComponent {
    * This method will show the location icon and enable the camera tracking the location.
    *
    * @param context               the context
+   * @param style the proxy object for current map style. More info at {@link Style}
    * @param locationEngine        the engine
    * @param locationEngineRequest the location request
    */
@@ -352,6 +361,7 @@ public final class LocationComponent {
    * Afterwards, you can manage component's visibility by {@link #setLocationComponentEnabled(boolean)}.
    *
    * @param locationEngine the engine, or null if you'd like to only force location updates
+   * @param style the proxy object for current map style. More info at {@link Style}
    * @param options        the options
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
@@ -368,6 +378,7 @@ public final class LocationComponent {
    * Afterwards, you can manage component's visibility by {@link #setLocationComponentEnabled(boolean)}.
    *
    * @param context               the context
+   * @param style the proxy object for current map style. More info at {@link Style}
    * @param locationEngine        the engine, or null if you'd like to only force location updates
    * @param locationEngineRequest the location request
    * @param options               the options
