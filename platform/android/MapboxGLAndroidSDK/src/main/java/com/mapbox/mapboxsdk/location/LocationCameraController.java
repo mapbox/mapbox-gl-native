@@ -89,7 +89,11 @@ final class LocationCameraController implements MapboxAnimator.OnCameraAnimation
                      @Nullable OnLocationCameraTransitionListener internalTransitionListener) {
     final boolean wasTracking = isLocationTracking();
     this.cameraMode = cameraMode;
-    mapboxMap.cancelTransitions();
+
+    if (cameraMode != CameraMode.NONE) {
+      mapboxMap.cancelTransitions();
+    }
+
     adjustGesturesThresholds();
     notifyCameraTrackingChangeListener(wasTracking);
     transitionToCurrentLocation(wasTracking, lastLocation, internalTransitionListener);
