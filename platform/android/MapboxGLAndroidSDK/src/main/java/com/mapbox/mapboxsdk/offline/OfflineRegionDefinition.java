@@ -48,7 +48,20 @@ public interface OfflineRegionDefinition {
   float getPixelRatio();
 
   /**
-   * Gest the type of the OfflineRegionDefinition for telemetry ("tileregion", "shaperegion").
+   * Specifies whether to include ideographic glyphs in downloaded font data.
+   * Ideographic glyphs make up the majority of downloaded font data, but
+   * it is possible to configure the renderer to use locally installed fonts
+   * instead of relying on fonts downloaded as part of the offline pack.
+   *
+   * Defaults to `true`
+   *
+   * @return true if offline region will include ideographic glyphs
+   * @see MapboxMapOptions localIdeographFontFamily
+   */
+  boolean getIncludeIdeographs();
+
+  /**
+   * Gets the type of the OfflineRegionDefinition for telemetry ("tileregion", "shaperegion").
    *
    * @return The type of the OfflineRegionDefinition.
    */
