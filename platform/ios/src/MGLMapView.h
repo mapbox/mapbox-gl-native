@@ -48,11 +48,22 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
     MGLAnnotationVerticalAlignmentBottom,
 };
 
-typedef NS_ENUM(NSUInteger, MGLUIElementsPosition) {
-    MGLUIElementsPositionTopLeft = 0,
-    MGLUIElementsPositionTopRight,
-    MGLUIElementsPositionBottomLeft,
-    MGLUIElementsPositionBottomRight,
+/**
+ The position of scale bar, compass, logo and attribution in a map view. Used with
+ `MGLMapView.scaleBarPosition`,
+ `MGLMapView.compassViewPosition`,
+ `MGLMapView.logoViewPosition`,
+ `MGLMapView.attributionButtonPosition`.
+ */
+typedef NS_ENUM(NSUInteger, MGLOrnamentPosition) {
+    /** Place the ornament in the top left of the map view. */
+    MGLOrnamentPositionTopLeft = 0,
+    /** Place the ornament in the top right of the map view. */
+    MGLOrnamentPositionTopRight,
+    /** Place the ornament in the bottom left of the map view. */
+    MGLOrnamentPositionBottomLeft,
+    /** Place the ornament in the bottom right of the map view. */
+    MGLOrnamentPositionBottomRight,
 };
 
 /**
@@ -296,7 +307,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  A `MGLUIElementsPosition` indicating the position of the scale bar.
  */
-@property (nonatomic, assign) MGLUIElementsPosition scaleBarPosition;
+@property (nonatomic, assign) MGLOrnamentPosition scaleBarPosition;
 
 /**
  A `CGPoint` indicating the position offset of the scale bar
@@ -312,7 +323,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  A `MGLUIElementsPosition` indicating the position of the compass.
  */
-@property (nonatomic, assign) MGLUIElementsPosition compassViewPosition;
+@property (nonatomic, assign) MGLOrnamentPosition compassViewPosition;
 
 /**
  A `CGPoint` indicating the position offset of the compass.
@@ -333,7 +344,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  A `MGLUIElementsPosition` indicating the position of the logo.
  */
-@property (nonatomic, assign) MGLUIElementsPosition logoViewPosition;
+@property (nonatomic, assign) MGLOrnamentPosition logoViewPosition;
 
 /**
  A `CGPoint` indicating the position offset of the logo.
@@ -369,7 +380,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
   A `MGLUIElementsPosition` indicating the position of the attribution.
  */
-@property (nonatomic, assign) MGLUIElementsPosition attributionButtonPosition;
+@property (nonatomic, assign) MGLOrnamentPosition attributionButtonPosition;
 
 /**
   A `CGPoint` indicating the position offset of the attribution.
