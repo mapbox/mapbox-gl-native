@@ -19,12 +19,12 @@
     <!-- these are public -->
     <!-- Using one of these constants means your map style will always use the latest version and
      may change as we improve the style. -->
-    <string name="mapbox_style_mapbox_streets" translatable="false">mapbox://styles/mapbox/streets-v10</string>
-    <string name="mapbox_style_outdoors" translatable="false">mapbox://styles/mapbox/outdoors-v10</string>
-    <string name="mapbox_style_light" translatable="false">mapbox://styles/mapbox/light-v9</string>
-    <string name="mapbox_style_dark" translatable="false">mapbox://styles/mapbox/dark-v9</string>
+    <string name="mapbox_style_mapbox_streets" translatable="false">mapbox://styles/mapbox/streets-v11</string>
+    <string name="mapbox_style_outdoors" translatable="false">mapbox://styles/mapbox/outdoors-v11</string>
+    <string name="mapbox_style_light" translatable="false">mapbox://styles/mapbox/light-v10</string>
+    <string name="mapbox_style_dark" translatable="false">mapbox://styles/mapbox/dark-v10</string>
     <string name="mapbox_style_satellite" translatable="false">mapbox://styles/mapbox/satellite-v9</string>
-    <string name="mapbox_style_satellite_streets" translatable="false">mapbox://styles/mapbox/satellite-streets-v10</string>
+    <string name="mapbox_style_satellite_streets" translatable="false">mapbox://styles/mapbox/satellite-streets-v11</string>
     <string name="mapbox_style_traffic_day" translatable="false">mapbox://styles/mapbox/traffic-day-v2</string>
     <string name="mapbox_style_traffic_night" translatable="false">mapbox://styles/mapbox/traffic-night-v2</string>
 </resources>
