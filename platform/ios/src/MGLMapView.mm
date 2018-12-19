@@ -810,41 +810,49 @@ public:
 }
 
 - (void)setScaleBarPosition:(MGLOrnamentPosition)scaleBarPosition {
+    MGLLogDebug(@"Setting scaleBarPosition: %@", scaleBarPosition);
     _scaleBarPosition = scaleBarPosition;
     [self installScaleBarConstraints];
 }
 
 - (void)setScaleBarOffset:(CGPoint)scaleBarOffset {
+    MGLLogDebug(@"Setting scaleBarOffset: %@", scaleBarOffset);
     _scaleBarOffset = scaleBarOffset;
     [self installScaleBarConstraints];
 }
 
 - (void)setCompassViewPosition:(MGLOrnamentPosition)compassViewPosition {
+    MGLLogDebug(@"Setting compassViewPosition: %@", compassViewPosition);
     _compassViewPosition = compassViewPosition;
     [self installCompressViewConstraints];
 }
 
 - (void)setCompassViewOffset:(CGPoint)compassViewOffset {
+    MGLLogDebug(@"Setting compassViewOffset: %@", compassViewOffset);
     _compassViewOffset = compassViewOffset;
     [self installCompressViewConstraints];
 }
 
 - (void)setLogoViewPosition:(MGLOrnamentPosition)logoViewPosition {
+    MGLLogDebug(@"Setting logoViewPosition: %@", logoViewPosition);
     _logoViewPosition = logoViewPosition;
     [self installLogoViewConstraints];
 }
 
 - (void)setLogoViewOffset:(CGPoint)logoViewOffset {
+    MGLLogDebug(@"Setting logoViewOffset: %@", logoViewOffset);
     _logoViewOffset = logoViewOffset;
     [self installLogoViewConstraints];
 }
 
 - (void)setAttributionButtonPosition:(MGLOrnamentPosition)attributionButtonPosition {
+    MGLLogDebug(@"Setting attributionButtonPosition: %@", attributionButtonPosition);
     _attributionButtonPosition = attributionButtonPosition;
     [self installAttributionButtonConstraints];
 }
 
 - (void)setAttributionButtonOffset:(CGPoint)attributionButtonOffset {
+    MGLLogDebug(@"Setting attributionButtonOffset: %@", attributionButtonOffset);
     _attributionButtonOffset = attributionButtonOffset;
     [self installAttributionButtonConstraints];
 }
