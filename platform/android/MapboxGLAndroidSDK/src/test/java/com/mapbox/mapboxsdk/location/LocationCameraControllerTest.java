@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -121,6 +122,45 @@ public class LocationCameraControllerTest {
     camera.setCameraMode(cameraMode);
 
     verify(internalTrackingChangedListener).onCameraTrackingChanged(cameraMode);
+  }
+
+  @Test
+  public void setCameraMode_cancelTransitionsWhenSet() {
+    MapboxMap mapboxMap = mock(MapboxMap.class);
+    when(mapboxMap.getUiSettings()).thenReturn(mock(UiSettings.class));
+    when(mapboxMap.getProjection()).thenReturn(mock(Projection.class));
+    LocationCameraController camera = buildCamera(mapboxMap);
+    camera.initializeOptions(mock(LocationComponentOptions.class));
+
+    camera.setCameraMode(CameraMode.NONE_COMPASS);
+    verify(mapboxMap, times(1)).cancelTransitions();
+
+    camera.setCameraMode(CameraMode.NONE_GPS);
+    verify(mapboxMap, times(2)).cancelTransitions();
+
+    camera.setCameraMode(CameraMode.TRACKING);
+    verify(mapboxMap, times(3)).cancelTransitions();
+
+    camera.setCameraMode(CameraMode.TRACKING_COMPASS);
+    verify(mapboxMap, times(4)).cancelTransitions();
+
+    camera.setCameraMode(CameraMode.TRACKING_GPS);
+    verify(mapboxMap, times(5)).cancelTransitions();
+
+    camera.setCameraMode(CameraMode.TRACKING_GPS_NORTH);
+    verify(mapboxMap, times(6)).cancelTransitions();
+  }
+
+  @Test
+  public void setCameraMode_dontCancelTransitionsWhenNoneSet() {
+    MapboxMap mapboxMap = mock(MapboxMap.class);
+    when(mapboxMap.getUiSettings()).thenReturn(mock(UiSettings.class));
+    when(mapboxMap.getProjection()).thenReturn(mock(Projection.class));
+    LocationCameraController camera = buildCamera(mapboxMap);
+    camera.initializeOptions(mock(LocationComponentOptions.class));
+
+    camera.setCameraMode(CameraMode.NONE);
+    verify(mapboxMap, never()).cancelTransitions();
   }
 
   @Test
@@ -367,7 +407,7 @@ public class LocationCameraControllerTest {
   }
 
   @Test
-  public void onMove_cancellingTransitionWhileNone() {
+  public void onMove_notCancellingTransitionWhileNone() {
     MapboxMap mapboxMap = mock(MapboxMap.class);
     when(mapboxMap.getUiSettings()).thenReturn(mock(UiSettings.class));
     MoveGestureDetector moveGestureDetector = mock(MoveGestureDetector.class);
@@ -376,12 +416,12 @@ public class LocationCameraControllerTest {
 
     camera.setCameraMode(CameraMode.NONE);
     camera.onMoveListener.onMove(moveGestureDetector);
-    verify(mapboxMap, times(1)).cancelTransitions();
+    verify(mapboxMap, times(0)).cancelTransitions();
     verify(moveGestureDetector, times(0)).interrupt();
 
     // testing subsequent calls
     camera.onMoveListener.onMove(moveGestureDetector);
-    verify(mapboxMap, times(1)).cancelTransitions();
+    verify(mapboxMap, times(0)).cancelTransitions();
     verify(moveGestureDetector, times(0)).interrupt();
   }
 
@@ -395,12 +435,12 @@ public class LocationCameraControllerTest {
 
     camera.setCameraMode(CameraMode.TRACKING);
     camera.onMoveListener.onMove(moveGestureDetector);
-    verify(mapboxMap, times(2)).cancelTransitions();
+    verify(mapboxMap, times(1)).cancelTransitions();
     verify(moveGestureDetector, times(1)).interrupt();
 
     // testing subsequent calls
     camera.onMoveListener.onMove(moveGestureDetector);
-    verify(mapboxMap, times(2)).cancelTransitions();
+    verify(mapboxMap, times(1)).cancelTransitions();
     verify(moveGestureDetector, times(1)).interrupt();
   }
 
@@ -413,12 +453,12 @@ public class LocationCameraControllerTest {
 
     camera.setCameraMode(CameraMode.NONE_COMPASS);
     camera.onMoveListener.onMove(moveGestureDetector);
-    verify(mapboxMap, times(2)).cancelTransitions();
+    verify(mapboxMap, times(1)).cancelTransitions();
     verify(moveGestureDetector, times(1)).interrupt();
 
     // testing subsequent calls
     camera.onMoveListener.onMove(moveGestureDetector);
-    verify(mapboxMap, times(2)).cancelTransitions();
+    verify(mapboxMap, times(1)).cancelTransitions();
     verify(moveGestureDetector, times(1)).interrupt();
   }
 
