@@ -96,6 +96,8 @@ const MGLExceptionName MGLUserLocationAnnotationTypeException = @"MGLUserLocatio
 const MGLExceptionName MGLResourceNotFoundException = @"MGLResourceNotFoundException";
 const MGLExceptionName MGLUnderlyingMapUnavailableException = @"MGLUnderlyingMapUnavailableException";
 
+const CGPoint MGLDefaultOrnamentPositionOffset = CGPointMake(8, 8);
+
 /// Indicates the manner in which the map view is tracking the user location.
 typedef NS_ENUM(NSUInteger, MGLUserTrackingState) {
     /// The map view is not yet tracking the user location.
@@ -512,7 +514,7 @@ public:
     [self addSubview:_logoView];
     _logoViewConstraints = [NSMutableArray array];
     _logoViewPosition = MGLOrnamentPositionBottomLeft;
-    _logoViewOffset = CGPointMake(8, 8);
+    _logoViewOffset = MGLDefaultOrnamentPositionOffset;
 
     // setup attribution
     //
@@ -528,7 +530,7 @@ public:
     UILongPressGestureRecognizer *attributionLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(showAttribution:)];
     [_attributionButton addGestureRecognizer:attributionLongPress];
     _attributionButtonPosition = MGLOrnamentPositionBottomRight;
-    _attributionButtonOffset = CGPointMake(8, 8);
+    _attributionButtonOffset = MGLDefaultOrnamentPositionOffset;
 
     // setup compass
     //
@@ -543,7 +545,7 @@ public:
     [self addSubview:_compassView];
     _compassViewConstraints = [NSMutableArray array];
     _compassViewPosition = MGLOrnamentPositionTopRight;
-    _compassViewOffset = CGPointMake(8, 8);
+    _compassViewOffset = MGLDefaultOrnamentPositionOffset;
     
     // setup scale control
     //
@@ -552,7 +554,7 @@ public:
     [self addSubview:_scaleBar];
     _scaleBarConstraints = [NSMutableArray array];
     _scaleBarPosition = MGLOrnamentPositionTopLeft;
-    _scaleBarOffset = CGPointMake(8, 8);
+    _scaleBarOffset = MGLDefaultOrnamentPositionOffset;
 
     [self installConstraints];
 
