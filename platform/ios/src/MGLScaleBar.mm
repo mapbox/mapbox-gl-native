@@ -86,7 +86,7 @@ static const MGLRow MGLImperialTable[] ={
 @property (nonatomic, assign) CGFloat borderWidth;
 @property (nonatomic) NSCache* labelImageCache;
 @property (nonatomic) MGLScaleBarLabel* prototypeLabel;
-
+@property (nonatomic) CGFloat lastLabelWidth;
 
 @end
 
@@ -94,6 +94,7 @@ static const CGFloat MGLBarHeight = 4;
 static const CGFloat MGLFeetPerMeter = 3.28084;
 
 @interface MGLScaleBarLabel : UILabel
+
 @end
 
 @implementation MGLScaleBarLabel
@@ -184,7 +185,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 #pragma mark - Dimensions
 
 - (CGSize)intrinsicContentSize {
-    return CGSizeMake(self.actualWidth, 16);
+    return CGSizeMake(self.actualWidth + self.lastLabelWidth/2, 16);
 }
 
 - (CGFloat)actualWidth {
@@ -255,12 +256,9 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     [self updateVisibility];
     
     self.row = [self preferredRow];
-    
+
     CGSize size = self.intrinsicContentSize;
-    self.frame = CGRectMake(CGRectGetMinX(self.frame),
-                            CGRectGetMinY(self.frame),
-                            size.width,
-                            size.height);
+    self.bounds = CGRectMake(0, 0, size.width, size.height);
 }
 
 - (void)updateVisibility {
@@ -370,7 +368,9 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 
         CLLocationDistance barDistance = multiplier * i;
         UIImage *image = [self cachedLabelImageForDistance:barDistance];
-
+        if (i == self.row.numberOfBars) {
+            self.lastLabelWidth = image.size.width;
+        }
         labelView.layer.contents      = (id)image.CGImage;
         labelView.layer.contentsScale = image.scale;
     }
@@ -420,7 +420,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 }
 
 - (void)layoutLabels {
-    CGFloat barWidth = round(self.bounds.size.width / self.bars.count);
+    CGFloat barWidth = round(self.actualWidth / self.bars.count);
     BOOL RTL = [self usesRightToLeftLayout];
     NSUInteger i = RTL ? self.bars.count : 0;
     for (UIView *label in self.labelViews) {
