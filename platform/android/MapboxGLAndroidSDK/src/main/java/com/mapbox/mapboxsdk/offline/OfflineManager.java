@@ -39,7 +39,10 @@ public class OfflineManager {
   //
 
   static {
-    LibraryLoader.load();
+    LibraryLoader libraryLoader = Mapbox.getLibraryLoader();
+    if (libraryLoader != null) {
+      libraryLoader.load();
+    }
   }
 
   // Native peer pointer

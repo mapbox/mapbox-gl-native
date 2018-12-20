@@ -10,6 +10,7 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
+import com.mapbox.mapboxsdk.module.ModuleProviderImpl;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
@@ -27,7 +28,6 @@ import com.mapbox.mapboxsdk.utils.ThreadUtils;
 public final class Mapbox {
 
   private static final String TAG = "Mbgl-Mapbox";
-  private static ModuleProvider moduleProvider;
   private static Mapbox INSTANCE;
 
   private Context context;
@@ -35,6 +35,10 @@ public final class Mapbox {
   private String accessToken;
   @Nullable
   private TelemetryDefinition telemetry;
+  @Nullable
+  private LibraryLoader libraryLoader;
+  @Nullable
+  private static ModuleProvider moduleProvider;
 
   /**
    * Get an instance of Mapbox.
@@ -51,21 +55,37 @@ public final class Mapbox {
   public static synchronized Mapbox getInstance(@NonNull Context context, @Nullable String accessToken) {
     ThreadUtils.checkThread("Mapbox");
     if (INSTANCE == null) {
-      Context appContext = context.getApplicationContext();
-      FileSource.initializeFileDirsPaths(appContext);
-      INSTANCE = new Mapbox(appContext, accessToken);
-      if (isAccessTokenValid(accessToken)) {
-        initializeTelemetry();
-      }
-      ConnectivityReceiver.instance(appContext);
+      initialize(context, accessToken);
     }
     return INSTANCE;
+  }
+
+  /**
+   * Set a custom module provider
+   *
+   * @param moduleProvider module provider used to load modules@return
+   */
+  @UiThread
+  public static synchronized void setModuleProvider(@NonNull ModuleProvider moduleProvider) {
+    Mapbox.moduleProvider = moduleProvider;
   }
 
   Mapbox(@NonNull Context context, @Nullable String accessToken) {
     this.context = context;
     this.accessToken = accessToken;
   }
+
+  static void initialize(Context context, String accessToken) {
+    Context appContext = context.getApplicationContext();
+    INSTANCE = new Mapbox(appContext, accessToken);
+    initializeLibraryLoader();
+    if (isAccessTokenValid(accessToken)) {
+      initializeTelemetry();
+    }
+    FileSource.initializeFileDirsPaths(appContext);
+    ConnectivityReceiver.instance(appContext);
+  }
+
 
   /**
    * Get the current active access token for this application.
@@ -145,16 +165,39 @@ public final class Mapbox {
   }
 
   /**
-   * Get the module provider
+   * Initializes library loader.
+   */
+  private static void initializeLibraryLoader() {
+    try {
+      INSTANCE.libraryLoader = getModuleProvider().obtainLibraryLoader();
+    } catch (Exception exception) {
+      String message = "Error occurred while initializing library loader";
+      Logger.e(TAG, message, exception);
+      MapStrictMode.strictModeViolation(message, exception);
+    }
+  }
+
+  /**
+   * Get an instance of LibraryLoader if initialised.
+   *
+   * @return library loader used to load native libraries
+   */
+  @Nullable
+  public static LibraryLoader getLibraryLoader() {
+    return INSTANCE.libraryLoader;
+  }
+
+  /**
+   * Get the module provider, internal use only
    *
    * @return moduleProvider
    */
   @NonNull
   public static ModuleProvider getModuleProvider() {
-    if (moduleProvider == null) {
-      moduleProvider = new ModuleProviderImpl();
+    if (Mapbox.moduleProvider == null) {
+      Mapbox.moduleProvider = new ModuleProviderImpl();
     }
-    return moduleProvider;
+    return Mapbox.moduleProvider;
   }
 
   /**

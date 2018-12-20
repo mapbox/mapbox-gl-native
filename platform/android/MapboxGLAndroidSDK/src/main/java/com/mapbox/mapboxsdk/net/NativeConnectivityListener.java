@@ -3,14 +3,22 @@ package com.mapbox.mapboxsdk.net;
 import android.support.annotation.Keep;
 
 import com.mapbox.mapboxsdk.LibraryLoader;
+import com.mapbox.mapboxsdk.MapStrictMode;
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.log.Logger;
 
 /**
  * Updates the native library's connectivity state
  */
 class NativeConnectivityListener implements ConnectivityListener {
 
+  private static final String TAG = "NativeConnectivity";
+
   static {
-    LibraryLoader.load();
+    LibraryLoader libraryLoader = Mapbox.getLibraryLoader();
+    if (libraryLoader != null) {
+      libraryLoader.load();
+    }
   }
 
   @Keep
@@ -24,7 +32,12 @@ class NativeConnectivityListener implements ConnectivityListener {
   }
 
   NativeConnectivityListener() {
-    initialize();
+    try {
+      initialize();
+    } catch (UnsatisfiedLinkError error) {
+      Logger.e(TAG, error.getMessage());
+      MapStrictMode.strictModeViolation(error);
+    }
   }
 
   @Override

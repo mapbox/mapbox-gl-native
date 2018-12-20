@@ -25,7 +25,10 @@ public class OfflineRegion {
   //
 
   static {
-    LibraryLoader.load();
+    LibraryLoader libraryLoader = Mapbox.getLibraryLoader();
+    if (libraryLoader != null) {
+      libraryLoader.load();
+    }
   }
 
   // Members

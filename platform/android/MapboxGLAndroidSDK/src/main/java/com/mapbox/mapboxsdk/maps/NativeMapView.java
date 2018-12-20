@@ -17,6 +17,7 @@ import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.MapStrictMode;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.Polygon;
@@ -81,7 +82,10 @@ final class NativeMapView {
   private MapboxMap.SnapshotReadyCallback snapshotReadyCallback;
 
   static {
-    LibraryLoader.load();
+    LibraryLoader libraryLoader = Mapbox.getLibraryLoader();
+    if (libraryLoader != null) {
+      libraryLoader.load();
+    }
   }
 
   //
