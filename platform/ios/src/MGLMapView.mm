@@ -894,11 +894,9 @@ public:
                          position:(MGLOrnamentPosition)position
                              size:(CGSize)size
                            offset:(CGPoint)offset {
-    UIView *containerView = nil;
     NSMutableArray *updatedConstraints = [NSMutableArray array];
     
     if (@available(iOS 11.0, *)) {
-        containerView = self;
         UILayoutGuide *safeAreaLayoutGuide = self.safeAreaLayoutGuide;
         
         switch (position) {
@@ -932,7 +930,6 @@ public:
         //
         UIViewController *viewController = self.viewControllerForLayoutGuides;
         BOOL useLayoutGuides = viewController.view && viewController.automaticallyAdjustsScrollViewInsets;
-        containerView = useLayoutGuides ? viewController.view : self;
         
         switch (position) {
                 case MGLOrnamentPositionTopLeft:
