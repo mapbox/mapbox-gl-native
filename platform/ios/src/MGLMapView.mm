@@ -931,14 +931,16 @@ public:
                                                  multiplier:1.0
                                                    constant:offset.y]];
                 }
-                [updatedConstraints addObject:
-                 [NSLayoutConstraint constraintWithItem:view
-                                              attribute:NSLayoutAttributeTop
-                                              relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                 toItem:self
-                                              attribute:NSLayoutAttributeTop
-                                             multiplier:1.0
-                                               constant:offset.y + self.contentInset.top]];
+                else {
+                    [updatedConstraints addObject:
+                     [NSLayoutConstraint constraintWithItem:view
+                                                  attribute:NSLayoutAttributeTop
+                                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                     toItem:self
+                                                  attribute:NSLayoutAttributeTop
+                                                 multiplier:1.0
+                                                   constant:offset.y]];
+                }
                 [updatedConstraints addObject:
                  [NSLayoutConstraint constraintWithItem:view
                                               attribute:NSLayoutAttributeLeft
@@ -946,7 +948,7 @@ public:
                                                  toItem:self
                                               attribute:NSLayoutAttributeLeft
                                              multiplier:1.0
-                                               constant:offset.x + self.contentInset.left]];
+                                               constant:offset.x]];
                 break;
                 case MGLOrnamentPositionTopRight:
                 if (useLayoutGuides) {
@@ -959,15 +961,16 @@ public:
                                                  multiplier:1.0
                                                    constant:offset.y]];
                 }
-                [updatedConstraints addObject:
-                 [NSLayoutConstraint constraintWithItem:view
-                                              attribute:NSLayoutAttributeTop
-                                              relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                 toItem:self
-                                              attribute:NSLayoutAttributeTop
-                                             multiplier:1.0
-                                               constant:offset.y + self.contentInset.top]];
-                
+                else {
+                    [updatedConstraints addObject:
+                     [NSLayoutConstraint constraintWithItem:view
+                                                  attribute:NSLayoutAttributeTop
+                                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                     toItem:self
+                                                  attribute:NSLayoutAttributeTop
+                                                 multiplier:1.0
+                                                   constant:offset.y]];
+                }
                 [updatedConstraints addObject:
                  [NSLayoutConstraint constraintWithItem:self
                                               attribute:NSLayoutAttributeTrailing
@@ -975,7 +978,7 @@ public:
                                                  toItem:view
                                               attribute:NSLayoutAttributeTrailing
                                              multiplier:1.0
-                                               constant:offset.x + self.contentInset.right]];
+                                               constant:offset.x]];
                 break;
                 case MGLOrnamentPositionBottomLeft:
                 if (useLayoutGuides) {
@@ -986,16 +989,18 @@ public:
                                                      toItem:view
                                                   attribute:NSLayoutAttributeBaseline
                                                  multiplier:1.0
-                                                   constant:offset.y + self.contentInset.bottom]];
+                                                   constant:offset.y]];
                 }
-                [updatedConstraints addObject:
-                 [NSLayoutConstraint constraintWithItem:self
-                                              attribute:NSLayoutAttributeBottom
-                                              relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                 toItem:view
-                                              attribute:NSLayoutAttributeBaseline
-                                             multiplier:1
-                                               constant:offset.y + self.contentInset.bottom]];
+                else {
+                    [updatedConstraints addObject:
+                     [NSLayoutConstraint constraintWithItem:self
+                                                  attribute:NSLayoutAttributeBottom
+                                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                     toItem:view
+                                                  attribute:NSLayoutAttributeBaseline
+                                                 multiplier:1
+                                                   constant:offset.y]];
+                }
                 [updatedConstraints addObject:
                  [NSLayoutConstraint constraintWithItem:view
                                               attribute:NSLayoutAttributeLeading
@@ -1003,7 +1008,7 @@ public:
                                                  toItem:self
                                               attribute:NSLayoutAttributeLeading
                                              multiplier:1.0
-                                               constant:offset.x + self.contentInset.left]];
+                                               constant:offset.x]];
                 break;
                 case MGLOrnamentPositionBottomRight:
                 if (useLayoutGuides) {
@@ -1014,16 +1019,18 @@ public:
                                                      toItem:view
                                                   attribute:NSLayoutAttributeBaseline
                                                  multiplier:1
-                                                   constant:offset.y + self.contentInset.bottom]];
+                                                   constant:offset.y]];
                 }
-                [updatedConstraints addObject:
-                 [NSLayoutConstraint constraintWithItem:self
-                                              attribute:NSLayoutAttributeBottom
-                                              relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                 toItem:view
-                                              attribute:NSLayoutAttributeBaseline
-                                             multiplier:1
-                                               constant:offset.y + self.contentInset.bottom]];
+                else {
+                    [updatedConstraints addObject:
+                     [NSLayoutConstraint constraintWithItem:self
+                                                  attribute:NSLayoutAttributeBottom
+                                                  relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                     toItem:view
+                                                  attribute:NSLayoutAttributeBaseline
+                                                 multiplier:1
+                                                   constant:offset.y]];
+                }
                 [updatedConstraints addObject:
                  [NSLayoutConstraint constraintWithItem:self
                                               attribute:NSLayoutAttributeTrailing
@@ -1031,7 +1038,7 @@ public:
                                                  toItem:view
                                               attribute:NSLayoutAttributeTrailing
                                              multiplier:1
-                                               constant:offset.x + self.contentInset.right]];
+                                               constant:offset.x]];
                 break;
                 
             default:
