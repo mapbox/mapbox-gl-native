@@ -498,10 +498,12 @@ MBGL_ANDROID_ABIS += x86;x86
 MBGL_ANDROID_ABIS += x86-64;x86_64
 
 MBGL_ANDROID_LOCAL_WORK_DIR = /data/local/tmp/core-tests
+MBGL_ANDROID_LOCAL_BENCHMARK_DIR = /data/local/tmp/benchmark
 MBGL_ANDROID_LIBDIR = lib$(if $(filter arm-v8 x86-64,$1),64)
 MBGL_ANDROID_DALVIKVM = dalvikvm$(if $(filter arm-v8 x86-64,$1),64,32)
 MBGL_ANDROID_APK_SUFFIX = $(if $(filter Release,$(BUILDTYPE)),release,debug)
 MBGL_ANDROID_CORE_TEST_DIR = platform/android/MapboxGLAndroidSDK/.externalNativeBuild/cmake/$(buildtype)/$2/core-tests
+MBGL_ANDROID_BENCHMARK_DIR = platform/android/MapboxGLAndroidSDK/.externalNativeBuild/cmake/$(buildtype)/$2/benchmark
 MBGL_ANDROID_STL ?= c++_static
 MBGL_ANDROID_GRADLE = ./gradlew --parallel --max-workers=$(JOBS) -Pmapbox.buildtype=$(buildtype) -Pmapbox.stl=$(MBGL_ANDROID_STL)
 
@@ -526,6 +528,10 @@ define ANDROID_RULES
 .PHONY: android-test-lib-$1
 android-test-lib-$1: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 -Pmapbox.with_test=true :MapboxGLAndroidSDKTestApp:assemble$(BUILDTYPE)
+
+.PHONY: android-benchmark-$1
+android-benchmark-$1: platform/android/gradle/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 -Pmapbox.with_benchmark=true :MapboxGLAndroidSDKTestApp:assemble$(BUILDTYPE)
 
 # Build SDK for for specified abi
 .PHONY: android-lib-$1
@@ -570,6 +576,31 @@ run-android-core-test-$1-%: android-core-test-$1
 # Run the core test for specified abi
 .PHONY: run-android-core-test-$1
 run-android-core-test-$1: run-android-core-test-$1-*
+
+# Run benchmarks for specified abi
+.PHONY: run-android-benchmark-$1
+run-android-benchmark-$1: run-android-benchmark-$1-*
+
+run-android-benchmark-$1-%: android-benchmark-$1
+	mkdir -p $(MBGL_ANDROID_BENCHMARK_DIR)
+	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/$(buildtype)/MapboxGLAndroidSDKTestApp-$(MBGL_ANDROID_APK_SUFFIX).apk classes.dex -d $(MBGL_ANDROID_BENCHMARK_DIR)
+
+	# Delete old test folder and create new one
+	adb shell "rm -Rf $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR) && mkdir -p $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR)/benchmark && mkdir -p $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR)/test"
+
+	# Push compiled java sources, test data and executable to device
+	adb push $(MBGL_ANDROID_BENCHMARK_DIR)/classes.dex $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR) > /dev/null 2>&1
+	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/intermediate-jars/$(buildtype)/jni/$2/libmapbox-gl.so $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR) > /dev/null 2>&1
+	adb push benchmark/fixtures $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR)/benchmark > /dev/null 2>&1
+	adb push test/fixtures $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR)/test > /dev/null 2>&1
+	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/$(buildtype)/obj/$2/mbgl-benchmark $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR) > /dev/null 2>&1
+
+	# Run benchmark. Number of benchmark iterations can be set by run-android-benchmark-N parameter.
+	adb shell "export LD_LIBRARY_PATH=$(MBGL_ANDROID_LOCAL_BENCHMARK_DIR) && cd $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR) && chmod +x mbgl-benchmark && ./mbgl-benchmark --class_path=$(MBGL_ANDROID_LOCAL_BENCHMARK_DIR)/classes.dex --benchmark_repetitions=$$* --benchmark_format=json --benchmark_out=results.json"
+
+	# Pull results.json from the device
+	rm -rf $(MBGL_ANDROID_BENCHMARK_DIR)/results && mkdir -p $(MBGL_ANDROID_BENCHMARK_DIR)/results
+	adb pull $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR)/results.json $(MBGL_ANDROID_BENCHMARK_DIR)/results > /dev/null 2>&1
 
 # Run the test app on connected android device with specified abi
 .PHONY: run-android-$1

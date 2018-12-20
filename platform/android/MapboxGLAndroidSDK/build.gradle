@@ -96,6 +96,10 @@ android {
                         targets "mbgl-test"
                     }
 
+                    if (project.hasProperty("mapbox.with_benchmark")) {
+                        targets "mbgl-benchmark"
+                    }
+
                     if (abi != 'all') {
                         abiFilters abi.split(' ')
                     } else {
