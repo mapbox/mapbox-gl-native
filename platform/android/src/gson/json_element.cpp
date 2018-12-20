@@ -2,6 +2,7 @@
 #include "json_array.hpp"
 #include "json_object.hpp"
 #include "json_primitive.hpp"
+#include "../math/math.hpp"
 
 namespace mbgl {
 namespace android {
@@ -58,13 +59,21 @@ mbgl::Value JsonElement::convert(jni::JNIEnv &env, const jni::Object<JsonElement
     static auto getAsBoolean = primitiveClass.GetMethod<jni::jboolean ()>(env, "getAsBoolean");
     static auto getAsString = primitiveClass.GetMethod<jni::String ()>(env, "getAsString");
     static auto getAsDouble = primitiveClass.GetMethod<jni::jdouble ()>(env, "getAsDouble");
+    static auto getAsInteger = primitiveClass.GetMethod<jni::jint ()>(env, "getAsInt");
 
     if (jsonElement.Call(env, isJsonPrimitive)) {
         auto primitive = jni::Cast(env, primitiveClass, jsonElement);
         if (primitive.Call(env, isBoolean)) {
             return bool(primitive.Call(env, getAsBoolean));
         } else if (primitive.Call(env, isNumber)) {
-            return primitive.Call(env, getAsDouble); // TODO: how to differentiate types here?
+            auto value = primitive.Call(env, getAsDouble);
+            if (value == math::Math::rint(env, value)) {
+                // uint64_t
+                return static_cast<uint64_t>(primitive.Call(env, getAsInteger));
+            } else {
+                // double
+                return value;
+            }
         } else if (primitive.Call(env, isString)) {
             return jni::Make<std::string>(env, primitive.Call(env, getAsString));
         } else {

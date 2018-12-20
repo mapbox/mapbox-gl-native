@@ -802,14 +802,14 @@ class LocationComponentTest : EspressoTest() {
         assertThat(mapboxMap.style?.getSource(LOCATION_SOURCE), notNullValue())
         mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
         mapboxMap.waitForSource(uiController, LOCATION_SOURCE)
-        assertEquals(77.0, mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getNumberProperty(PROPERTY_GPS_BEARING) as Double, 0.1)
+        assertEquals(77f, mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getNumberProperty(PROPERTY_GPS_BEARING).toFloat(), 0.1f)
 
         location.bearing = 92f
         component.forceLocationUpdate(location)
         uiController.loopMainThreadForAtLeast(MAX_ANIMATION_DURATION_MS + MAP_RENDER_DELAY) // Waiting for the animation to finish
         mapboxMap.waitForSource(uiController, LOCATION_SOURCE)
         mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
-        assertEquals(92.0, mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getNumberProperty(PROPERTY_GPS_BEARING) as Double, 0.1)
+        assertEquals(92.0f, mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getNumberProperty(PROPERTY_GPS_BEARING).toFloat(), 0.1f)
       }
     }
 
