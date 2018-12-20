@@ -108,6 +108,53 @@ namespace android {
         return Feature::convert(env, features);
     }
 
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> GeoJSONSource::getClusterChildren(jni::JNIEnv& env, const jni::Object<geojson::Feature>& feature) {
+        using namespace mbgl::android::conversion;
+        using namespace mbgl::android::geojson;
+
+        if (rendererFrontend) {
+            mbgl::Feature _feature = Feature::convert(env, feature);
+            const auto featureExtension = rendererFrontend->queryFeatureExtensions(source.getID(), _feature, "supercluster", "children", {});
+            if (featureExtension.is<mbgl::FeatureCollection>()) {
+                return Feature::convert(env, featureExtension.get<mbgl::FeatureCollection>());
+            }
+        }
+        return jni::Array<jni::Object<Feature>>::New(env, 0);
+    }
+
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> GeoJSONSource::getClusterLeaves(jni::JNIEnv& env, const jni::Object<geojson::Feature>& feature, jni::jlong limit, jni::jlong offset) {
+        using namespace mbgl::android::conversion;
+        using namespace mbgl::android::geojson;
+
+        if (rendererFrontend) {
+            mbgl::Feature _feature = Feature::convert(env, feature);
+            const std::map<std::string, mbgl::Value> options = { {"limit", static_cast<uint64_t>(limit)},
+                                                                    {"offset", static_cast<uint64_t>(offset)} };
+            auto featureExtension = rendererFrontend->queryFeatureExtensions(source.getID(), _feature, "supercluster", "leaves", options);
+            if (featureExtension.is<mbgl::FeatureCollection>()) {
+                return Feature::convert(env, featureExtension.get<mbgl::FeatureCollection>());
+            }
+        }
+        return jni::Array<jni::Object<Feature>>::New(env, 0);;
+    }
+
+    jint GeoJSONSource::getClusterExpansionZoom(jni::JNIEnv& env, const jni::Object<geojson::Feature>& feature) {
+        using namespace mbgl::android::conversion;
+        using namespace mbgl::android::geojson;
+
+        if (rendererFrontend) {
+            mbgl::Feature _feature = Feature::convert(env, feature);
+            auto featureExtension = rendererFrontend->queryFeatureExtensions(source.getID(), _feature, "supercluster", "expansion-zoom", {});
+            if (featureExtension.is<mbgl::Value>()) {
+                auto value = featureExtension.get<mbgl::Value>();
+                if (value.is<uint64_t>()) {
+                    return value.get<uint64_t>();
+                }
+            }
+        }
+        return 0;
+    }
+
     jni::Local<jni::Object<Source>> GeoJSONSource::createJavaPeer(jni::JNIEnv& env) {
         static auto& javaClass = jni::Class<GeoJSONSource>::Singleton(env);
         static auto constructor = javaClass.GetConstructor<jni::jlong>(env);
@@ -176,7 +223,10 @@ namespace android {
             METHOD(&GeoJSONSource::setGeometry, "nativeSetGeometry"),
             METHOD(&GeoJSONSource::setURL, "nativeSetUrl"),
             METHOD(&GeoJSONSource::getURL, "nativeGetUrl"),
-            METHOD(&GeoJSONSource::querySourceFeatures, "querySourceFeatures")
+            METHOD(&GeoJSONSource::querySourceFeatures, "querySourceFeatures"),
+            METHOD(&GeoJSONSource::getClusterChildren, "nativeGetClusterChildren"),
+            METHOD(&GeoJSONSource::getClusterLeaves, "nativeGetClusterLeaves"),
+            METHOD(&GeoJSONSource::getClusterExpansionZoom, "nativeGetClusterExpansionZoom")
         );
     }
 
