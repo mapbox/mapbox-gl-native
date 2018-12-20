@@ -108,6 +108,26 @@ macro(mbgl_platform_test)
     )
 endmacro()
 
+## Benchmark ##
+macro(mbgl_platform_benchmark)
+    target_sources(mbgl-benchmark
+        PRIVATE platform/android/src/test/benchmark_runner.cpp
+        PRIVATE platform/android/src/test/runtime.cpp
+    )
+
+    set_target_properties(mbgl-benchmark
+        PROPERTIES
+        LINK_FLAGS
+        "-fPIE -pie \
+        -Wl,--export-dynamic \
+        -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/src/test/version-script")
+
+    target_link_libraries(mbgl-benchmark
+        PRIVATE mbgl-filesource
+    )
+endmacro()
+
+
 ## Custom layer example ##
 
 add_library(example-custom-layer SHARED

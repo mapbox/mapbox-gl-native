@@ -173,11 +173,11 @@ endmacro()
 
 macro(mbgl_platform_benchmark)
     target_sources(mbgl-benchmark
-        PRIVATE benchmark/src/main.cpp
+        PRIVATE platform/default/src/mbgl/benchmark/main.cpp
     )
 
     set_source_files_properties(
-        benchmark/src/main.cpp
+        platform/default/src/mbgl/benchmark/main.cpp
             PROPERTIES
         COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
     )
