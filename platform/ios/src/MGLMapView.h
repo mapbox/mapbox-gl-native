@@ -310,7 +310,7 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, assign) MGLOrnamentPosition scaleBarPosition;
 
 /**
- A `CGPoint` indicating the position offset of the scale bar
+ A `CGPoint` indicating the position offset of the scale bar.
  */
 @property (nonatomic, assign) CGPoint scaleBarOffset;
 
