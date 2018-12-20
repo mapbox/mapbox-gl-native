@@ -15,8 +15,6 @@ import com.mapbox.mapboxsdk.log.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
-
 /**
  * This manager class handles compass events such as starting the tracking of device bearing, or
  * when a new compass update occurs.
@@ -72,10 +70,12 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
     compassSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
     if (compassSensor == null) {
       if (isGyroscopeAvailable()) {
-        Timber.d("Rotation vector sensor not supported on device, falling back to orientation.");
+        Logger.d(TAG, "Rotation vector sensor not supported on device, "
+                + "falling back to orientation.");
         compassSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
       } else {
-        Timber.d("Rotation vector sensor not supported on device, falling back to accelerometer and magnetic field.");
+        Logger.d(TAG, "Rotation vector sensor not supported on device, "
+                        + "falling back to accelerometer and magnetic field.");
         gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
       }
