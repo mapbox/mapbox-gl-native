@@ -13,9 +13,10 @@ namespace mbgl {
 
 class BucketParameters;
 
-class CircleBucket : public Bucket {
+class CircleBucket final : public Bucket {
 public:
     CircleBucket(const BucketParameters&, const std::vector<const RenderLayer*>&);
+    ~CircleBucket() override;
 
     void addFeature(const GeometryTileFeature&,
                     const GeometryCollection&,
@@ -27,6 +28,7 @@ public:
     void upload(gl::Context&) override;
 
     float getQueryRadius(const RenderLayer&) const override;
+    bool supportsLayer(const style::Layer::Impl&) const override;
 
     gl::VertexVector<CircleLayoutVertex> vertices;
     gl::IndexVector<gl::Triangles> triangles;
@@ -39,10 +41,5 @@ public:
 
     const MapMode mode;
 };
-
-template <>
-inline bool Bucket::is<CircleBucket>() const {
-    return layerType == style::LayerType::Circle;
-}
 
 } // namespace mbgl

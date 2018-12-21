@@ -2,7 +2,6 @@
 #include <mbgl/layout/layout.hpp>
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/style/layer_impl.hpp>
-#include <mbgl/style/layer_type.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/mat4.hpp>
 

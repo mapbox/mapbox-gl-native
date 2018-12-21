@@ -37,7 +37,7 @@ public:
     size_t vertexStartIndex;
 };
 
-class SymbolBucket : public Bucket {
+class SymbolBucket final : public Bucket {
 public:
     SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated,
                  const std::map<std::string, std::pair<style::IconPaintProperties::PossiblyEvaluated, style::TextPaintProperties::PossiblyEvaluated>>&,
@@ -49,9 +49,11 @@ public:
                  bool sortFeaturesByY,
                  const std::string bucketLeaderID,
                  const std::vector<SymbolInstance>&&);
+    ~SymbolBucket() override;
 
     void upload(gl::Context&) override;
     bool hasData() const override;
+    bool supportsLayer(const style::Layer::Impl&) const override;
     bool hasTextData() const;
     bool hasIconData() const;
     bool hasCollisionBoxData() const;
@@ -137,10 +139,5 @@ public:
 
     std::shared_ptr<std::vector<size_t>> featureSortOrder;
 };
-
-template <>
-inline bool Bucket::is<SymbolBucket>() const {
-    return layerType == style::LayerType::Symbol;
-}
 
 } // namespace mbgl

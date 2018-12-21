@@ -37,9 +37,7 @@ struct GeometryTooLongException : std::exception {};
 FillExtrusionBucket::FillExtrusionBucket(const FillExtrusionBucket::PossiblyEvaluatedLayoutProperties,
                        std::map<std::string, FillExtrusionBucket::PossiblyEvaluatedPaintProperties> layerPaintProperties,
                        const float zoom,
-                       const uint32_t)
-    : Bucket(LayerType::FillExtrusion) {
-
+                       const uint32_t) {
     for (const auto& pair : layerPaintProperties) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,
@@ -49,6 +47,8 @@ FillExtrusionBucket::FillExtrusionBucket(const FillExtrusionBucket::PossiblyEval
                 zoom));
     }
 }
+
+FillExtrusionBucket::~FillExtrusionBucket() = default;
 
 void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
                                      const GeometryCollection& geometry,
@@ -178,6 +178,10 @@ void FillExtrusionBucket::upload(gl::Context& context) {
 
 bool FillExtrusionBucket::hasData() const {
     return !triangleSegments.empty();
+}
+
+bool FillExtrusionBucket::supportsLayer(const style::Layer::Impl& impl) const {
+    return style::FillExtrusionLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
 }
 
 float FillExtrusionBucket::getQueryRadius(const RenderLayer& layer) const {
