@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
     the constant itself. Such details may change significantly from version to
     version.
  */
-static MGL_EXPORT const NSInteger MGLStyleDefaultVersion = 11;
+static MGL_EXPORT const NSInteger MGLStyleDefaultVersion = 10;
 
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLInvalidStyleURLException;
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLRedundantLayerException;
