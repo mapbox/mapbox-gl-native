@@ -40,12 +40,7 @@ extension MGLSDKTestHelpers {
         for i in 0..<Int(methodCount) {
             let method = methodList![i]
             let selector = method_getName(method)
-            #if os(macOS)
-                methods.insert(selector.description)
-            #else
-                XCTAssertNotNil(selector)
-                methods.insert(selector!.description)
-            #endif
+            methods.insert(selector.description)
         }
         free(methodList)
         return methods
