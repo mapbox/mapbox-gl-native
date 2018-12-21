@@ -4,6 +4,27 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 7.0.0-beta.2 - December 21, 2018
+- Mapbox services sdk version bump to 4.3.0 [#13610](https://github.com/mapbox/mapbox-gl-native/pull/13610)
+- Added Style object parameter mention to LocationComponent methods [#13597](https://github.com/mapbox/mapbox-gl-native/pull/13597)
+- Clean up remaining deprecated methods for 7.0.0 [#13613](https://github.com/mapbox/mapbox-gl-native/pull/13613)
+- Dismiss the foreground color only when the style is loaded [#13582](https://github.com/mapbox/mapbox-gl-native/pull/13582)
+- Location update fastest interval workaround[#13592](https://github.com/mapbox/mapbox-gl-native/pull/13592)
+- CameraMode transition animation and result listeners[#13523](https://github.com/mapbox/mapbox-gl-native/pull/13523)
+- Validate if weakreference is still valid [#13555](https://github.com/mapbox/mapbox-gl-native/pull/13555)
+
+## 6.8.0 - December 19, 2018
+ - Update core styles based on the streets-v8 source. This results in breaking changes for any code that references internal layers and sources of the style [#13615](https://github.com/mapbox/mapbox-gl-native/pull/13615)
+ - Fixed compass update time not getting updated [#13569](https://github.com/mapbox/mapbox-gl-native/pull/13569)
+ - Register compass sensor listener only if necessary [#13573](https://github.com/mapbox/mapbox-gl-native/pull/13573)
+ - Immediate location animation based on map's projection [#13545](https://github.com/mapbox/mapbox-gl-native/pull/13545)
+ - Option to disable smooth animation of compass and accuracy values [#13574](https://github.com/mapbox/mapbox-gl-native/pull/13574)
+ - Add onDidBecomeIdle to Map events [#13513](https://github.com/mapbox/mapbox-gl-native/pull/13513)
+ - Expose setAccessToken on Mapbox.java [#13397](https://github.com/mapbox/mapbox-gl-native/pull/13397)
+ - Expose endpoint change option for snapshotter [#13508](https://github.com/mapbox/mapbox-gl-native/pull/13508)
+ - Use locale sensitive DecimalFormat for color alpha conversion [#13393](https://github.com/mapbox/mapbox-gl-native/pull/13393)
+ - Enabled RecyclerView integration [#13132](https://github.com/mapbox/mapbox-gl-native/pull/13132)
+
 ## 7.0.0-beta.1 - December 12, 2018
  - Style builder and Style.java [#13484](https://github.com/mapbox/mapbox-gl-native/pull/13484)
  - LatLng bounds cannot be wrapped [#13419](https://github.com/mapbox/mapbox-gl-native/pull/13419)
