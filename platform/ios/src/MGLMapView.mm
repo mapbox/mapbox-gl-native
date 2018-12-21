@@ -830,6 +830,7 @@ public:
 }
 
 - (void)setScaleBarOffset:(CGPoint)scaleBarOffset {
+    NSAssert(scaleBarOffset.x >= 0 && scaleBarOffset.y >= 0, @"The position offset of the scale bar should not be negative.");
     MGLLogDebug(@"Setting scaleBarOffset: %@", scaleBarOffset);
     _scaleBarOffset = scaleBarOffset;
     [self installScaleBarConstraints];
@@ -842,6 +843,7 @@ public:
 }
 
 - (void)setCompassViewOffset:(CGPoint)compassViewOffset {
+    NSAssert(compassViewOffset.x >= 0 && compassViewOffset.y >= 0, @"The position offset of the compass should not be negative.");
     MGLLogDebug(@"Setting compassViewOffset: %@", compassViewOffset);
     _compassViewOffset = compassViewOffset;
     [self installCompressViewConstraints];
@@ -854,6 +856,7 @@ public:
 }
 
 - (void)setLogoViewOffset:(CGPoint)logoViewOffset {
+    NSAssert(logoViewOffset.x >= 0 && logoViewOffset.y >= 0, @"The position offset of the logo should not be negative.");
     MGLLogDebug(@"Setting logoViewOffset: %@", logoViewOffset);
     _logoViewOffset = logoViewOffset;
     [self installLogoViewConstraints];
@@ -866,6 +869,7 @@ public:
 }
 
 - (void)setAttributionButtonOffset:(CGPoint)attributionButtonOffset {
+    NSAssert(attributionButtonOffset.x >= 0 && attributionButtonOffset.y >= 0, @"The position offset of the attribution should not be negative.");
     MGLLogDebug(@"Setting attributionButtonOffset: %@", attributionButtonOffset);
     _attributionButtonOffset = attributionButtonOffset;
     [self installAttributionButtonConstraints];
