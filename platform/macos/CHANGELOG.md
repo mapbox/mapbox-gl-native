@@ -2,27 +2,31 @@
 
 ## master
 
+* Added an `MGLStyle.enablePlacementTransitions` property to control how long it takes for colliding labels to fade out. ([#13565](https://github.com/mapbox/mapbox-gl-native/pull/13565))
+* Fixed a crash when casting large numbers in `NSExpression`. ([#13580](https://github.com/mapbox/mapbox-gl-native/pull/13580))
+
+## 0.13.0 - December 20, 2018
+
+### Packaging
+
+* This SDK’s dynamic framework now has a bundle identifier of `com.mapbox.Mapbox`. ([#12857](https://github.com/mapbox/mapbox-gl-native/pull/12857))
+* `MGLMapView`, `MGLShapeOfflineRegion`, and `MGLTilePyramidOfflineRegion` now default to version 11 of the Mapbox Streets style. Similarly, several class properties of `MGLStyle`, such as `MGLStyle.lightStyleURL`, have been updated to return URLs to new versions of their respective styles. ([#13585](https://github.com/mapbox/mapbox-gl-native/pull/13585))
+
 ### Styles and rendering
 
 * Fixed an issue where the `{prefix}` token in tile URL templates was evaluated incorrectly when requesting a source’s tiles. ([#13429](https://github.com/mapbox/mapbox-gl-native/pull/13429))
 * Added an `-[MGLStyle removeSource:error:]` method that returns a descriptive error if the style fails to remove the source, whereas `-[MGLStyle removeSource:]` fails silently. ([#13399](https://github.com/mapbox/mapbox-gl-native/pull/13399))
 * Added the `MGLFillExtrusionStyleLayer.fillExtrusionHasVerticalGradient` property. ([#13463](https://github.com/mapbox/mapbox-gl-native/pull/13463))
 * Added support for setting `MGLCollisionBehaviorPre4_0` in `NSUserDefaults`. ([#13426](https://github.com/mapbox/mapbox-gl-native/pull/13426))
-* Added support for automatic localization of version 8 of the Mapbox Streets source. ([#13481](https://github.com/mapbox/mapbox-gl-native/pull/13481))
-* Points of interest have clearer localized VoiceOver hints in styles that use version 8 of the Mapbox Streets source. ([#13525](https://github.com/mapbox/mapbox-gl-native/pull/13525))
+* `-[MGLStyle localizeLabelsIntoLocale:]` and `-[NSExpression(MGLAdditions) mgl_expressionLocalizedIntoLocale:]` can automatically localize styles that use version 8 of the Mapbox Streets source. ([#13481](https://github.com/mapbox/mapbox-gl-native/pull/13481))
 * Fixed symbol flickering during instantaneous transitions. ([#13535](https://github.com/mapbox/mapbox-gl-native/pull/13535))
-* Added an `MGLStyle.enablePlacementTransitions` property to control how long it takes for collided labels to fade out. ([#13565](https://github.com/mapbox/mapbox-gl-native/pull/13565))
-* `MGLMapView`, `MGLShapeOfflineRegion`, and `MGLTilePyramidOfflineRegion` now default to version 11 of the Mapbox Streets style. Similarly, several class properties of `MGLStyle`, such as `MGLStyle.lightStyleURL`, have been updated to return URLs to new versions of their respective styles.
-
+* Fixed a crash when specifying `MGLShapeSourceOptionLineDistanceMetrics` when creating an `MGLShapeSource`. ([#13543](https://github.com/mapbox/mapbox-gl-native/pull/13543))
 
 ### Other changes
 
-* This SDK’s dynamic framework now has a bundle identifier of `com.mapbox.Mapbox`. ([#12857](https://github.com/mapbox/mapbox-gl-native/pull/12857))
 * Renamed `-[MGLOfflineStorage putResourceWithUrl:data:modified:expires:etag:mustRevalidate:]` to `-[MGLOfflineStorage preloadData:forURL:modificationDate:expirationDate:eTag:mustRevalidate:]`. ([#13318](https://github.com/mapbox/mapbox-gl-native/pull/13318))
 * `MGLMapSnapshotter` now respects the `MGLIdeographicFontFamilyName` key in Info.plist, which reduces bandwidth consumption when snapshotting regions that contain Chinese or Japanese characters. ([#13427](https://github.com/mapbox/mapbox-gl-native/pull/13427))
 * Added `MGLLoggingConfiguration` and `MGLLoggingBlockHandler` that handle error and fault events produced by the SDK. ([#13235](https://github.com/mapbox/mapbox-gl-native/pull/13235))
-* Fixed a crash when specifying `MGLShapeSourceOptionLineDistanceMetrics` when creating an `MGLShapeSource`. ([#13543](https://github.com/mapbox/mapbox-gl-native/pull/13543))
-* Fixed a crash when casting large numbers in `NSExpression`. ([#13580](https://github.com/mapbox/mapbox-gl-native/pull/13580))s
 
 ## 0.12.0 - November 8, 2018
 
