@@ -15,15 +15,16 @@
 
 namespace mbgl {
 
-class HillshadeBucket : public Bucket {
+class HillshadeBucket final : public Bucket {
 public:
     HillshadeBucket(PremultipliedImage&&, Tileset::DEMEncoding encoding);
     HillshadeBucket(std::shared_ptr<PremultipliedImage>, Tileset::DEMEncoding encoding);
     HillshadeBucket(DEMData&&);
-
+    ~HillshadeBucket() override;
 
     void upload(gl::Context&) override;
     bool hasData() const override;
+    bool supportsLayer(const style::Layer::Impl&) const override;
 
     void clear();
     void setMask(TileMask&&);
@@ -55,10 +56,5 @@ private:
     DEMData demdata;
     bool prepared = false;
 };
-
-template <>
-inline bool Bucket::is<HillshadeBucket>() const {
-    return layerType == style::LayerType::Hillshade;
-}
 
 } // namespace mbgl

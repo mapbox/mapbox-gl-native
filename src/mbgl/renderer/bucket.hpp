@@ -1,10 +1,9 @@
 #pragma once
 
-#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/style/layer_type.hpp>
 #include <mbgl/style/image_impl.hpp>
 #include <mbgl/renderer/image_atlas.hpp>
+#include <mbgl/style/layer_impl.hpp>
 #include <atomic>
 
 namespace mbgl {
@@ -17,28 +16,12 @@ class RenderLayer;
 class PatternDependency;
 using PatternLayerMap = std::unordered_map<std::string, PatternDependency>;
 
-class Bucket : private util::noncopyable {
+class Bucket {
 public:
-    Bucket(style::LayerType layerType_)
-        : layerType(layerType_) {
-    }
+    Bucket(const Bucket&) = delete;
+    Bucket& operator=(const Bucket&) = delete;
 
     virtual ~Bucket() = default;
-
-    // Check whether this bucket is of the given subtype.
-    template <class T>
-    bool is() const;
-
-    // Dynamically cast this bucket to the given subtype.
-    template <class T>
-    T* as() {
-        return is<T>() ? reinterpret_cast<T*>(this) : nullptr;
-    }
-
-    template <class T>
-    const T* as() const {
-        return is<T>() ? reinterpret_cast<const T*>(this) : nullptr;
-    }
 
     // Feature geometries are also used to populate the feature index.
     // Obtaining these is a costly operation, so we do it only once, and
@@ -64,9 +47,14 @@ public:
     bool needsUpload() const {
         return hasData() && !uploaded;
     }
+    // Returns true if this bucket fits the given layer; returns false otherwise.
+    // Implementations of this class check at least that this bucket has
+    // the same layer type with the given layer, but extra checks are also
+    // possible.
+    virtual bool supportsLayer(const style::Layer::Impl&) const = 0;
 
 protected:
-    style::LayerType layerType;
+    Bucket() = default;
     std::atomic<bool> uploaded { false };
 };
 

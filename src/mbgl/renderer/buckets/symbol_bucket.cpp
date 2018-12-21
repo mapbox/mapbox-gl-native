@@ -20,8 +20,7 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
                            bool sortFeaturesByY_,
                            const std::string bucketName_,
                            const std::vector<SymbolInstance>&& symbolInstances_)
-    : Bucket(LayerType::Symbol),
-      layout(std::move(layout_)),
+    : layout(std::move(layout_)),
       sdfIcons(sdfIcons_),
       iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
       sortFeaturesByY(sortFeaturesByY_),
@@ -40,6 +39,8 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
                 std::forward_as_tuple(pair.second.second, zoom)));
     }
 }
+
+SymbolBucket::~SymbolBucket() = default;
 
 void SymbolBucket::upload(gl::Context& context) {
     if (hasTextData()) {
@@ -125,6 +126,10 @@ void SymbolBucket::upload(gl::Context& context) {
 
 bool SymbolBucket::hasData() const {
     return hasTextData() || hasIconData() || hasCollisionBoxData();
+}
+
+bool SymbolBucket::supportsLayer(const style::Layer::Impl& impl) const {
+    return style::SymbolLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
 }
 
 bool SymbolBucket::hasTextData() const {

@@ -11,8 +11,7 @@ namespace mbgl {
 using namespace style;
 
 HeatmapBucket::HeatmapBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers)
-    : Bucket(LayerType::Heatmap),
-      mode(parameters.mode) {
+    : mode(parameters.mode) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,
@@ -22,6 +21,8 @@ HeatmapBucket::HeatmapBucket(const BucketParameters& parameters, const std::vect
                 parameters.tileID.overscaledZ));
     }
 }
+
+HeatmapBucket::~HeatmapBucket() = default;
 
 void HeatmapBucket::upload(gl::Context& context) {
     vertexBuffer = context.createVertexBuffer(std::move(vertices));
@@ -36,6 +37,10 @@ void HeatmapBucket::upload(gl::Context& context) {
 
 bool HeatmapBucket::hasData() const {
     return !segments.empty();
+}
+
+bool HeatmapBucket::supportsLayer(const style::Layer::Impl& impl) const {
+    return style::HeatmapLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
 }
 
 void HeatmapBucket::addFeature(const GeometryTileFeature& feature,
