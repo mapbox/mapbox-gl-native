@@ -14,7 +14,6 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 - Validate if weakreference is still valid [#13555](https://github.com/mapbox/mapbox-gl-native/pull/13555)
 
 ## 6.8.1 - December 21, 2018
-
  - Telemetry bump to 3.5.7 [#13645](https://github.com/mapbox/mapbox-gl-native/pull/13645)
  - Revert core styles back to streets-v7 source [#13643](https://github.com/mapbox/mapbox-gl-native/pull/13643)
 
