@@ -5,8 +5,8 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ## 4.7.1 - December 21, 2018
 
 ### Styles and rendering
-* Reverts the ability for `MGLMapView`, `MGLShapeOfflineRegion`, and `MGLTilePyramidOfflineRegion` to use version 11 of the Mapbox Streets style.
-* Reverts the ability for convenience methods on `MGLStyle` such as `MGLStyle.lightStyleURL`, to use version 11 of the Mapbox Streets style.
+* `MGLMapView`, `MGLShapeOfflineRegion`, and `MGLTilePyramidOfflineRegion` now use version 10 of the Mapbox Streets style. ([#13646](https://github.com/mapbox/mapbox-gl-native/pull/13646))
+* Convenience methods on `MGLStyle` such as `MGLStyle.lightStyleURL` now use use version 10 of the Mapbox Streets style. ([#13646](https://github.com/mapbox/mapbox-gl-native/pull/13646))
 
 ## 4.7.0 - December 18, 2018
 
