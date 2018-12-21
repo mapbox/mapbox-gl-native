@@ -15,7 +15,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## 6.8.1 - December 21, 2018
  - Telemetry bump to 3.5.7 [#13645](https://github.com/mapbox/mapbox-gl-native/pull/13645)
- - Revert core styles back to streets-v7 source [#13643](https://github.com/mapbox/mapbox-gl-native/pull/13643)
+ - Revert core styles back to streets-v7 source [#13648](https://github.com/mapbox/mapbox-gl-native/pull/13648)
 
 ## 6.8.0 - December 19, 2018
  - Update core styles based on the streets-v8 source. This results in breaking changes for any code that references internal layers and sources of the style [#13615](https://github.com/mapbox/mapbox-gl-native/pull/13615)
