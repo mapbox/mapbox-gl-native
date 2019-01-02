@@ -939,7 +939,7 @@ public:
         return;
     }
     
-    if ([self.delegate respondsToSelector:@selector(mapViewDidBecomeIdle)]) {
+    if ([self.delegate respondsToSelector:@selector(mapViewDidBecomeIdle:)]) {
         [self.delegate mapViewDidBecomeIdle:self];
     }
 }
