@@ -446,6 +446,27 @@ void QMapboxGLSettings::setApiBaseUrl(const QString& url)
 }
 
 /*!
+    Returns the local font family. Returns an empty string if no local font family is set.
+*/
+QString QMapboxGLSettings::localFontFamily() const
+{
+    return m_localFontFamily;
+}
+
+/*!
+    Sets the local font family.
+
+   Rendering Chinese/Japanese/Korean (CJK) ideographs and precomposed Hangul Syllables requires
+   downloading large amounts of font data, which can significantly slow map load times. Use the
+   localIdeographFontFamily setting to speed up map load times by using locally available fonts
+   instead of font data fetched from the server.
+*/
+void QMapboxGLSettings::setLocalFontFamily(const QString &family)
+{
+    m_localFontFamily = family;
+}
+
+/*!
     Returns resource transformation callback used to transform requested URLs.
 */
 std::function<std::string(const std::string &&)> QMapboxGLSettings::resourceTransform() const
@@ -1723,6 +1744,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     , m_threadPool(mbgl::sharedThreadPool())
     , m_mode(settings.contextMode())
     , m_pixelRatio(pixelRatio_)
+    , m_localFontFamily(settings.localFontFamily())
 {
     // Setup the FileSource
     m_fileSourceObj->setAccessToken(settings.accessToken().toStdString());
@@ -1802,7 +1824,8 @@ void QMapboxGLPrivate::createRenderer()
         m_pixelRatio,
         *m_fileSourceObj,
         *m_threadPool,
-        m_mode
+        m_mode,
+        m_localFontFamily
     );
 
     connect(m_mapRenderer.get(), SIGNAL(needsRendering()), this, SLOT(requestRendering()));
