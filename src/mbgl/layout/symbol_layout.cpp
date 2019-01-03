@@ -90,10 +90,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
     }
 
     for (const auto& layer : layers) {
-        layerPaintProperties.emplace(layer->getID(), std::make_pair(
-            toRenderSymbolLayer(layer)->iconPaintProperties(),
-            toRenderSymbolLayer(layer)->textPaintProperties()
-        ));
+        layerPaintProperties.emplace(layer->getID(), toRenderSymbolLayer(layer)->evaluated);
     }
 
     // Determine glyph dependencies
