@@ -101,7 +101,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             continue;
         }
         SymbolBucket& bucket = *bucket_;
-
+        assert(bucket.paintProperties.find(getID()) != bucket.paintProperties.end());
+        const auto& evaluated_ = bucket.paintProperties.at(getID());
         const auto& layout = bucket.layout;
 
         auto draw = [&] (auto& program,
@@ -152,8 +153,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         GeometryTile& geometryTile = static_cast<GeometryTile&>(tile.tile);
 
         if (bucket.hasIconData()) {
-            auto values = iconPropertyValues(layout);
-            auto paintPropertyValues = iconPaintProperties();
+            auto values = iconPropertyValues(evaluated_, layout);
+            const auto& paintPropertyValues = iconPaintProperties(evaluated_);
 
             const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
                 layout.get<IconRotationAlignment>() == AlignmentType::Map;
@@ -213,8 +214,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         if (bucket.hasTextData()) {
             parameters.context.bindTexture(*geometryTile.glyphAtlasTexture, 0, gl::TextureFilter::Linear);
 
-            auto values = textPropertyValues(layout);
-            auto paintPropertyValues = textPaintProperties();
+            auto values = textPropertyValues(evaluated_, layout);
+            const auto& paintPropertyValues = textPaintProperties(evaluated_);
 
             const bool alongLine = layout.get<SymbolPlacement>() != SymbolPlacementType::Point &&
                 layout.get<TextRotationAlignment>() == AlignmentType::Map;
@@ -328,54 +329,59 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
     }
 }
 
-style::IconPaintProperties::PossiblyEvaluated RenderSymbolLayer::iconPaintProperties() const {
+// static
+style::IconPaintProperties::PossiblyEvaluated RenderSymbolLayer::iconPaintProperties(const style::SymbolPaintProperties::PossiblyEvaluated& evaluated_) {
     return style::IconPaintProperties::PossiblyEvaluated {
-            evaluated.get<style::IconOpacity>(),
-            evaluated.get<style::IconColor>(),
-            evaluated.get<style::IconHaloColor>(),
-            evaluated.get<style::IconHaloWidth>(),
-            evaluated.get<style::IconHaloBlur>(),
-            evaluated.get<style::IconTranslate>(),
-            evaluated.get<style::IconTranslateAnchor>()
+            evaluated_.get<style::IconOpacity>(),
+            evaluated_.get<style::IconColor>(),
+            evaluated_.get<style::IconHaloColor>(),
+            evaluated_.get<style::IconHaloWidth>(),
+            evaluated_.get<style::IconHaloBlur>(),
+            evaluated_.get<style::IconTranslate>(),
+            evaluated_.get<style::IconTranslateAnchor>()
     };
 }
 
-style::TextPaintProperties::PossiblyEvaluated RenderSymbolLayer::textPaintProperties() const {
+// static
+style::TextPaintProperties::PossiblyEvaluated RenderSymbolLayer::textPaintProperties(const style::SymbolPaintProperties::PossiblyEvaluated& evaluated_) {
     return style::TextPaintProperties::PossiblyEvaluated {
-            evaluated.get<style::TextOpacity>(),
-            evaluated.get<style::TextColor>(),
-            evaluated.get<style::TextHaloColor>(),
-            evaluated.get<style::TextHaloWidth>(),
-            evaluated.get<style::TextHaloBlur>(),
-            evaluated.get<style::TextTranslate>(),
-            evaluated.get<style::TextTranslateAnchor>()
+            evaluated_.get<style::TextOpacity>(),
+            evaluated_.get<style::TextColor>(),
+            evaluated_.get<style::TextHaloColor>(),
+            evaluated_.get<style::TextHaloWidth>(),
+            evaluated_.get<style::TextHaloBlur>(),
+            evaluated_.get<style::TextTranslate>(),
+            evaluated_.get<style::TextTranslateAnchor>()
     };
 }
 
-
-style::SymbolPropertyValues RenderSymbolLayer::iconPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated& layout_) const {
+// static
+style::SymbolPropertyValues RenderSymbolLayer::iconPropertyValues(const style::SymbolPaintProperties::PossiblyEvaluated& evaluated_,
+                                                                  const style::SymbolLayoutProperties::PossiblyEvaluated& layout_) {
     return style::SymbolPropertyValues {
             layout_.get<style::IconPitchAlignment>(),
             layout_.get<style::IconRotationAlignment>(),
             layout_.get<style::IconKeepUpright>(),
-            evaluated.get<style::IconTranslate>(),
-            evaluated.get<style::IconTranslateAnchor>(),
-            evaluated.get<style::IconHaloColor>().constantOr(Color::black()).a > 0 &&
-            evaluated.get<style::IconHaloWidth>().constantOr(1),
-            evaluated.get<style::IconColor>().constantOr(Color::black()).a > 0
+            evaluated_.get<style::IconTranslate>(),
+            evaluated_.get<style::IconTranslateAnchor>(),
+            evaluated_.get<style::IconHaloColor>().constantOr(Color::black()).a > 0 &&
+            evaluated_.get<style::IconHaloWidth>().constantOr(1),
+            evaluated_.get<style::IconColor>().constantOr(Color::black()).a > 0
     };
 }
 
-style::SymbolPropertyValues RenderSymbolLayer::textPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated& layout_) const {
+// static
+style::SymbolPropertyValues RenderSymbolLayer::textPropertyValues(const style::SymbolPaintProperties::PossiblyEvaluated& evaluated_,
+                                                                  const style::SymbolLayoutProperties::PossiblyEvaluated& layout_) {
     return style::SymbolPropertyValues {
             layout_.get<style::TextPitchAlignment>(),
             layout_.get<style::TextRotationAlignment>(),
             layout_.get<style::TextKeepUpright>(),
-            evaluated.get<style::TextTranslate>(),
-            evaluated.get<style::TextTranslateAnchor>(),
-            evaluated.get<style::TextHaloColor>().constantOr(Color::black()).a > 0 &&
-            evaluated.get<style::TextHaloWidth>().constantOr(1),
-            evaluated.get<style::TextColor>().constantOr(Color::black()).a > 0
+            evaluated_.get<style::TextTranslate>(),
+            evaluated_.get<style::TextTranslateAnchor>(),
+            evaluated_.get<style::TextHaloColor>().constantOr(Color::black()).a > 0 &&
+            evaluated_.get<style::TextHaloWidth>().constantOr(1),
+            evaluated_.get<style::TextColor>().constantOr(Color::black()).a > 0
     };
 }
 
@@ -396,6 +402,10 @@ void RenderSymbolLayer::sortRenderTiles(const TransformState& state) {
 
         return std::tie(b.get().id.canonical.z, par.y, par.x) < std::tie(a.get().id.canonical.z, pbr.y, pbr.x);
     });
+}
+
+void RenderSymbolLayer::updateBucketPaintProperties(Bucket* bucket) const {
+    static_cast<SymbolBucket*>(bucket)->paintProperties[getID()] = evaluated;
 }
 
 } // namespace mbgl

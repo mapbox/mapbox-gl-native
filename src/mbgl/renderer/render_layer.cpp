@@ -71,16 +71,23 @@ RenderLayer::RenderTiles RenderLayer::filterRenderTiles(RenderTiles tiles, Filte
             continue;
         }
 
-        if (tile.tile.getBucket(*baseImpl)) {
+        if (Bucket* bucket = tile.tile.getBucket(*baseImpl)) {
             tile.used = true;
             tile.needsClipping |= needsClipping_;
             filtered.emplace_back(tile);
+            if (tile.tile.isComplete()) {
+                updateBucketPaintProperties(bucket);
+            }
         }
     }
     return filtered;
 }
 
 void RenderLayer::markContextDestroyed() {
+    // no-op
+}
+
+void RenderLayer::updateBucketPaintProperties(Bucket*) const {
     // no-op
 }
 

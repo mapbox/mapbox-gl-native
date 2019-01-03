@@ -68,11 +68,8 @@ public:
     bool hasCrossfade() const override;
     void render(PaintParameters&, RenderSource*) override;
 
-    style::IconPaintProperties::PossiblyEvaluated iconPaintProperties() const;
-    style::TextPaintProperties::PossiblyEvaluated textPaintProperties() const;
-
-    style::SymbolPropertyValues iconPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated&) const;
-    style::SymbolPropertyValues textPropertyValues(const style::SymbolLayoutProperties::PossiblyEvaluated&) const;
+    static style::IconPaintProperties::PossiblyEvaluated iconPaintProperties(const style::SymbolPaintProperties::PossiblyEvaluated&);
+    static style::TextPaintProperties::PossiblyEvaluated textPaintProperties(const style::SymbolPaintProperties::PossiblyEvaluated&);
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
     std::unique_ptr<Layout> createLayout(const BucketParameters&,
@@ -97,8 +94,13 @@ public:
     const style::SymbolLayer::Impl& impl() const;
 
 protected:
+    static style::SymbolPropertyValues iconPropertyValues(const style::SymbolPaintProperties::PossiblyEvaluated&,
+                                                          const style::SymbolLayoutProperties::PossiblyEvaluated&);
+    static style::SymbolPropertyValues textPropertyValues(const style::SymbolPaintProperties::PossiblyEvaluated&,
+                                                          const style::SymbolLayoutProperties::PossiblyEvaluated&);
     RenderTiles filterRenderTiles(RenderTiles) const final;
     void sortRenderTiles(const TransformState&) final;
+    void updateBucketPaintProperties(Bucket*) const final;
 };
 
 inline const RenderSymbolLayer* toRenderSymbolLayer(const RenderLayer* layer) {
