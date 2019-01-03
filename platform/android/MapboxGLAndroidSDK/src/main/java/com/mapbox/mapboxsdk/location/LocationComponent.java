@@ -32,6 +32,8 @@ import com.mapbox.mapboxsdk.maps.MapboxMap.OnMapClickListener;
 import com.mapbox.mapboxsdk.maps.Style;
 
 import java.lang.ref.WeakReference;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -698,6 +700,10 @@ public final class LocationComponent {
     updateLocation(location, false);
   }
 
+  public void setMaxAnimationFps(int maxAnimationFps) {
+    locationAnimatorCoordinator.setMaxAnimationFps(maxAnimationFps);
+  }
+
   /**
    * Set the location engine to update the current user location.
    * <p>
@@ -989,7 +995,7 @@ public final class LocationComponent {
     LayerFeatureProvider featureProvider = new LayerFeatureProvider();
     LayerBitmapProvider bitmapProvider = new LayerBitmapProvider(context);
     locationLayerController = new LocationLayerController(mapboxMap, style, sourceProvider, featureProvider,
-      bitmapProvider, options);
+      bitmapProvider, options, renderModeChangedListener);
     locationCameraController = new LocationCameraController(
       context, mapboxMap, cameraTrackingChangedListener, options, onCameraMoveInvalidateListener);
 
@@ -997,8 +1003,6 @@ public final class LocationComponent {
       mapboxMap.getProjection(),
       MapboxAnimatorSetProvider.getInstance()
     );
-    locationAnimatorCoordinator.addLayerListener(locationLayerController);
-    locationAnimatorCoordinator.addCameraListener(locationCameraController);
     locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options
       .trackingAnimationDurationMultiplier());
 
@@ -1164,6 +1168,13 @@ public final class LocationComponent {
     locationAnimatorCoordinator.feedNewAccuracyRadius(Utils.calculateZoomLevelRadius(mapboxMap, location), noAnimation);
   }
 
+  private void updateAnimatorListenerHolders() {
+    Set<AnimatorListenerHolder> animationsValueChangeListeners = new HashSet<>();
+    animationsValueChangeListeners.addAll(locationLayerController.getAnimationListeners());
+    animationsValueChangeListeners.addAll(locationCameraController.getAnimationListeners());
+    locationAnimatorCoordinator.updateAnimatorListenerHolders(animationsValueChangeListeners);
+  }
+
   @NonNull
   private OnCameraMoveListener onCameraMoveListener = new OnCameraMoveListener() {
     @Override
@@ -1298,9 +1309,20 @@ public final class LocationComponent {
     public void onCameraTrackingChanged(int currentMode) {
       locationAnimatorCoordinator.cancelZoomAnimation();
       locationAnimatorCoordinator.cancelTiltAnimation();
+      updateAnimatorListenerHolders();
+      locationAnimatorCoordinator.resetAllCameraAnimations(mapboxMap.getCameraPosition(),
+        locationCameraController.getCameraMode() == CameraMode.TRACKING_GPS_NORTH);
       for (OnCameraTrackingChangedListener listener : onCameraTrackingChangedListeners) {
         listener.onCameraTrackingChanged(currentMode);
       }
+    }
+  };
+
+  @NonNull
+  private OnRenderModeChangedListener renderModeChangedListener = new OnRenderModeChangedListener() {
+    @Override
+    public void onRenderModeChanged(int currentMode) {
+      updateAnimatorListenerHolders();
     }
   };
 
