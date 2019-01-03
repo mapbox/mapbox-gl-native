@@ -29,6 +29,7 @@ set(MBGL_QT_CORE_FILES
     # Platform integration
     PRIVATE platform/qt/src/async_task.cpp
     PRIVATE platform/qt/src/async_task_impl.hpp
+    PRIVATE platform/qt/src/local_glyph_rasterizer.cpp
     PRIVATE platform/qt/src/qt_logging.cpp
     PRIVATE platform/qt/src/qt_image.cpp
     PRIVATE platform/qt/src/run_loop.cpp
@@ -38,7 +39,6 @@ set(MBGL_QT_CORE_FILES
     PRIVATE platform/qt/src/timer_impl.hpp
     PRIVATE platform/qt/src/utf.cpp
 
-    PRIVATE platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
     PRIVATE platform/default/src/mbgl/text/collator.cpp
     PRIVATE platform/default/src/mbgl/text/unaccent.cpp
     PRIVATE platform/default/include/mbgl/text/unaccent.hpp
