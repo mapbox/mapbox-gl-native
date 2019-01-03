@@ -6,17 +6,14 @@ import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
-import java.util.List;
-
-abstract class MapboxCameraAnimatorAdapter extends
-  MapboxFloatAnimator<MapboxAnimator.OnCameraAnimationsValuesChangeListener> {
+class MapboxCameraAnimatorAdapter extends MapboxFloatAnimator {
   @Nullable
   private final MapboxMap.CancelableCallback cancelableCallback;
 
   MapboxCameraAnimatorAdapter(Float previous, Float target,
-                              List<OnCameraAnimationsValuesChangeListener> updateListeners,
+                              AnimationsValueChangeListener updateListener,
                               @Nullable MapboxMap.CancelableCallback cancelableCallback) {
-    super(previous, target, updateListeners);
+    super(previous, target, updateListener, Integer.MAX_VALUE);
     this.cancelableCallback = cancelableCallback;
     addListener(new MapboxAnimatorListener());
   }
