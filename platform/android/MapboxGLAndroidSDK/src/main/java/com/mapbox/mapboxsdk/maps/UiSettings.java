@@ -538,7 +538,7 @@ public final class UiSettings {
    *
    * @return the active manager class used for showing attribution
    */
-  @NonNull
+  @Nullable
   public AttributionDialogManager getAttributionDialogManager() {
     return attributionDialogManager;
   }
