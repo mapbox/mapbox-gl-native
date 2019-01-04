@@ -45,6 +45,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
   @NonNull
   private final MapboxMap mapboxMap;
   private Set<Attribution> attributionSet;
+  private AlertDialog dialog;
 
   public AttributionDialogManager(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
     this.context = context;
@@ -72,7 +73,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
     builder.setTitle(R.string.mapbox_attributionsDialogTitle);
     builder.setAdapter(new ArrayAdapter<>(context, R.layout.mapbox_attribution_list_item, attributionTitles), this);
-    builder.show();
+    dialog = builder.show();
   }
 
   private String[] getAttributionTitles() {
@@ -90,6 +91,12 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
       showTelemetryDialog();
     } else {
       showMapFeedbackWebPage(which);
+    }
+  }
+
+  public void onStop() {
+    if (dialog != null && dialog.isShowing()) {
+      dialog.dismiss();
     }
   }
 
