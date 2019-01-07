@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class Style {
 
-  private final NativeMapView nativeMapView;
+  private final NativeMap nativeMap;
   private final HashMap<String, Source> sources = new HashMap<>();
   private final HashMap<String, Layer> layers = new HashMap<>();
   private final HashMap<String, Bitmap> images = new HashMap<>();
@@ -39,11 +39,11 @@ public class Style {
    * Private constructor to build a style object.
    *
    * @param builder       the builder used for creating this style
-   * @param nativeMapView the map object used to load this style
+   * @param nativeMap the map object used to load this style
    */
-  private Style(@NonNull Builder builder, @NonNull NativeMapView nativeMapView) {
+  private Style(@NonNull Builder builder, @NonNull NativeMap nativeMap) {
     this.builder = builder;
-    this.nativeMapView = nativeMapView;
+    this.nativeMap = nativeMap;
   }
 
   /**
@@ -54,7 +54,7 @@ public class Style {
   @NonNull
   public String getUrl() {
     validateState("getUrl");
-    return nativeMapView.getStyleUrl();
+    return nativeMap.getStyleUrl();
   }
 
   /**
@@ -65,7 +65,7 @@ public class Style {
   @NonNull
   public String getJson() {
     validateState("getJson");
-    return nativeMapView.getStyleJson();
+    return nativeMap.getStyleJson();
   }
 
   //
@@ -80,7 +80,7 @@ public class Style {
   @NonNull
   public List<Source> getSources() {
     validateState("getSources");
-    return nativeMapView.getSources();
+    return nativeMap.getSources();
   }
 
   /**
@@ -91,7 +91,7 @@ public class Style {
   public void addSource(@NonNull Source source) {
     validateState("addSource");
     sources.put(source.getId(), source);
-    nativeMapView.addSource(source);
+    nativeMap.addSource(source);
   }
 
   /**
@@ -105,7 +105,7 @@ public class Style {
     validateState("getSource");
     Source source = sources.get(id);
     if (source == null) {
-      source = nativeMapView.getSource(id);
+      source = nativeMap.getSource(id);
     }
     return source;
   }
@@ -124,7 +124,7 @@ public class Style {
     if (sources.containsKey(sourceId)) {
       return (T) sources.get(sourceId);
     }
-    return (T) nativeMapView.getSource(sourceId);
+    return (T) nativeMap.getSource(sourceId);
   }
 
   /**
@@ -136,7 +136,7 @@ public class Style {
   public boolean removeSource(@NonNull String sourceId) {
     validateState("removeSource");
     sources.remove(sourceId);
-    return nativeMapView.removeSource(sourceId);
+    return nativeMap.removeSource(sourceId);
   }
 
   /**
@@ -148,7 +148,7 @@ public class Style {
   public boolean removeSource(@NonNull Source source) {
     validateState("removeSource");
     sources.remove(source.getId());
-    return nativeMapView.removeSource(source);
+    return nativeMap.removeSource(source);
   }
 
   //
@@ -163,7 +163,7 @@ public class Style {
   public void addLayer(@NonNull Layer layer) {
     validateState("addLayer");
     layers.put(layer.getId(), layer);
-    nativeMapView.addLayer(layer);
+    nativeMap.addLayer(layer);
   }
 
   /**
@@ -175,7 +175,7 @@ public class Style {
   public void addLayerBelow(@NonNull Layer layer, @NonNull String below) {
     validateState("addLayerBelow");
     layers.put(layer.getId(), layer);
-    nativeMapView.addLayerBelow(layer, below);
+    nativeMap.addLayerBelow(layer, below);
   }
 
   /**
@@ -187,7 +187,7 @@ public class Style {
   public void addLayerAbove(@NonNull Layer layer, @NonNull String above) {
     validateState("addLayerAbove");
     layers.put(layer.getId(), layer);
-    nativeMapView.addLayerAbove(layer, above);
+    nativeMap.addLayerAbove(layer, above);
   }
 
   /**
@@ -200,7 +200,7 @@ public class Style {
   public void addLayerAt(@NonNull Layer layer, @IntRange(from = 0) int index) {
     validateState("addLayerAbove");
     layers.put(layer.getId(), layer);
-    nativeMapView.addLayerAt(layer, index);
+    nativeMap.addLayerAt(layer, index);
   }
 
   /**
@@ -214,7 +214,7 @@ public class Style {
     validateState("getLayer");
     Layer layer = layers.get(id);
     if (layer == null) {
-      layer = nativeMapView.getLayer(id);
+      layer = nativeMap.getLayer(id);
     }
     return layer;
   }
@@ -230,7 +230,7 @@ public class Style {
   public <T extends Layer> T getLayerAs(@NonNull String layerId) {
     validateState("getLayerAs");
     // noinspection unchecked
-    return (T) nativeMapView.getLayer(layerId);
+    return (T) nativeMap.getLayer(layerId);
   }
 
   /**
@@ -241,7 +241,7 @@ public class Style {
   @NonNull
   public List<Layer> getLayers() {
     validateState("getLayers");
-    return nativeMapView.getLayers();
+    return nativeMap.getLayers();
   }
 
   /**
@@ -253,7 +253,7 @@ public class Style {
   public boolean removeLayer(@NonNull String layerId) {
     validateState("removeLayer");
     layers.remove(layerId);
-    return nativeMapView.removeLayer(layerId);
+    return nativeMap.removeLayer(layerId);
   }
 
   /**
@@ -265,7 +265,7 @@ public class Style {
   public boolean removeLayer(@NonNull Layer layer) {
     validateState("removeLayer");
     layers.remove(layer.getId());
-    return nativeMapView.removeLayer(layer);
+    return nativeMap.removeLayer(layer);
   }
 
   /**
@@ -276,7 +276,7 @@ public class Style {
    */
   public boolean removeLayerAt(@IntRange(from = 0) int index) {
     validateState("removeLayerAt");
-    return nativeMapView.removeLayerAt(index);
+    return nativeMap.removeLayerAt(index);
   }
 
   //
@@ -302,7 +302,7 @@ public class Style {
    */
   public void addImage(@NonNull String name, @NonNull Bitmap image, boolean sdf) {
     validateState("addImage");
-    nativeMapView.addImage(name, image, sdf);
+    nativeMap.addImage(name, image, sdf);
   }
 
   /**
@@ -310,7 +310,7 @@ public class Style {
    */
   public void addImages(@NonNull HashMap<String, Bitmap> images) {
     validateState("addImages");
-    nativeMapView.addImages(images);
+    nativeMap.addImages(images);
   }
 
   /**
@@ -320,7 +320,7 @@ public class Style {
    */
   public void removeImage(@NonNull String name) {
     validateState("removeImage");
-    nativeMapView.removeImage(name);
+    nativeMap.removeImage(name);
   }
 
   /**
@@ -332,7 +332,7 @@ public class Style {
   @Nullable
   public Bitmap getImage(@NonNull String id) {
     validateState("getImage");
-    return nativeMapView.getImage(id);
+    return nativeMap.getImage(id);
   }
 
   //
@@ -349,8 +349,8 @@ public class Style {
    */
   public void setTransition(@NonNull TransitionOptions transitionOptions) {
     validateState("setTransition");
-    nativeMapView.setTransitionDuration(transitionOptions.getDuration());
-    nativeMapView.setTransitionDelay(transitionOptions.getDelay());
+    nativeMap.setTransitionDuration(transitionOptions.getDuration());
+    nativeMap.setTransitionDelay(transitionOptions.getDelay());
   }
 
   /**
@@ -364,7 +364,7 @@ public class Style {
   @NonNull
   public TransitionOptions getTransition() {
     validateState("getTransition");
-    return new TransitionOptions(nativeMapView.getTransitionDuration(), nativeMapView.getTransitionDelay());
+    return new TransitionOptions(nativeMap.getTransitionDuration(), nativeMap.getTransitionDelay());
   }
 
   //
@@ -379,7 +379,7 @@ public class Style {
   @Nullable
   public Light getLight() {
     validateState("getLight");
-    return nativeMapView.getLight();
+    return nativeMap.getLight();
   }
 
   //
@@ -395,19 +395,19 @@ public class Style {
     for (Source source : sources.values()) {
       if (source != null) {
         source.setDetached();
-        nativeMapView.removeSource(source);
+        nativeMap.removeSource(source);
       }
     }
 
     for (Layer layer : layers.values()) {
       if (layer != null) {
         layer.setDetached();
-        nativeMapView.removeLayer(layer);
+        nativeMap.removeLayer(layer);
       }
     }
 
     for (Map.Entry<String, Bitmap> bitmapEntry : images.entrySet()) {
-      nativeMapView.removeImage(bitmapEntry.getKey());
+      nativeMap.removeImage(bitmapEntry.getKey());
       bitmapEntry.getValue().recycle();
     }
 
@@ -671,8 +671,8 @@ public class Style {
     /**
      * Build the composed style.
      */
-    Style build(@NonNull NativeMapView nativeMapView) {
-      return new Style(this, nativeMapView);
+    Style build(@NonNull NativeMap nativeMap) {
+      return new Style(this, nativeMap);
     }
 
     class ImageWrapper {

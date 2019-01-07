@@ -16,11 +16,11 @@ import java.util.List;
  */
 class PolygonContainer implements Polygons {
 
-  private final NativeMapView nativeMapView;
+  private final NativeMap nativeMap;
   private final LongSparseArray<Annotation> annotations;
 
-  PolygonContainer(NativeMapView nativeMapView, LongSparseArray<Annotation> annotations) {
-    this.nativeMapView = nativeMapView;
+  PolygonContainer(NativeMap nativeMap, LongSparseArray<Annotation> annotations) {
+    this.nativeMap = nativeMap;
     this.annotations = annotations;
   }
 
@@ -28,7 +28,7 @@ class PolygonContainer implements Polygons {
   public Polygon addBy(@NonNull PolygonOptions polygonOptions, @NonNull MapboxMap mapboxMap) {
     Polygon polygon = polygonOptions.getPolygon();
     if (!polygon.getPoints().isEmpty()) {
-      long id = nativeMapView != null ? nativeMapView.addPolygon(polygon) : 0;
+      long id = nativeMap != null ? nativeMap.addPolygon(polygon) : 0;
       polygon.setId(id);
       polygon.setMapboxMap(mapboxMap);
       annotations.put(id, polygon);
@@ -43,7 +43,7 @@ class PolygonContainer implements Polygons {
 
     Polygon polygon;
     List<Polygon> polygons = new ArrayList<>(count);
-    if (nativeMapView != null && count > 0) {
+    if (nativeMap != null && count > 0) {
       for (PolygonOptions polygonOptions : polygonOptionsList) {
         polygon = polygonOptions.getPolygon();
         if (!polygon.getPoints().isEmpty()) {
@@ -51,7 +51,7 @@ class PolygonContainer implements Polygons {
         }
       }
 
-      long[] ids = nativeMapView.addPolygons(polygons);
+      long[] ids = nativeMap.addPolygons(polygons);
       for (int i = 0; i < ids.length; i++) {
         polygon = polygons.get(i);
         polygon.setMapboxMap(mapboxMap);
@@ -64,7 +64,7 @@ class PolygonContainer implements Polygons {
 
   @Override
   public void update(@NonNull Polygon polygon) {
-    nativeMapView.updatePolygon(polygon);
+    nativeMap.updatePolygon(polygon);
     annotations.setValueAt(annotations.indexOfKey(polygon.getId()), polygon);
   }
 
