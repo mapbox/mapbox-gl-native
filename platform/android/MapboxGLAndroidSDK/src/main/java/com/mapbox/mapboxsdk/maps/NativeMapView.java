@@ -4,15 +4,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.IntRange;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
-
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.LibraryLoader;
@@ -32,17 +29,15 @@ import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
 import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 // Class that wraps the native methods for convenience
 final class NativeMapView implements NativeMap {
@@ -243,27 +238,11 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void moveBy(double dx, double dy) {
-    if (checkState("moveBy")) {
-      return;
-    }
-    moveBy(dx, dy, 0);
-  }
-
-  @Override
   public void moveBy(double dx, double dy, long duration) {
     if (checkState("moveBy")) {
       return;
     }
     nativeMoveBy(dx / pixelRatio, dy / pixelRatio, duration);
-  }
-
-  @Override
-  public void setLatLng(@NonNull LatLng latLng) {
-    if (checkState("setLatLng")) {
-      return;
-    }
-    setLatLng(latLng, 0);
   }
 
   @Override
@@ -331,11 +310,6 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void setPitch(double pitch) {
-    setPitch(pitch, 0);
-  }
-
-  @Override
   public void setPitch(double pitch, long duration) {
     if (checkState("setPitch")) {
       return;
@@ -400,14 +374,6 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void rotateBy(double sx, double sy, double ex, double ey) {
-    if (checkState("rotateBy")) {
-      return;
-    }
-    rotateBy(sx, sy, ex, ey, 0);
-  }
-
-  @Override
   public void rotateBy(double sx, double sy, double ex, double ey,
                        long duration) {
     if (checkState("rotateBy")) {
@@ -435,7 +401,7 @@ final class NativeMapView implements NativeMap {
       return new float[] {0, 0, 0, 0};
     }
     float[] topLeftBottomRight = nativeGetContentPadding();
-    return new float[]{
+    return new float[] {
       topLeftBottomRight[1] * pixelRatio,
       topLeftBottomRight[0] * pixelRatio,
       topLeftBottomRight[3] * pixelRatio,
@@ -444,27 +410,11 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void setBearing(double degrees) {
-    if (checkState("setBearing")) {
-      return;
-    }
-    setBearing(degrees, 0);
-  }
-
-  @Override
   public void setBearing(double degrees, long duration) {
     if (checkState("setBearing")) {
       return;
     }
     nativeSetBearing(degrees, duration);
-  }
-
-  @Override
-  public void setBearing(double degrees, double cx, double cy) {
-    if (checkState("setBearing")) {
-      return;
-    }
-    setBearing(degrees, cx, cy, 0);
   }
 
   @Override
@@ -731,7 +681,7 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void jumpTo(double angle, @NonNull LatLng center, double pitch, double zoom) {
+  public void jumpTo(@NonNull LatLng center, double zoom, double pitch, double angle) {
     if (checkState("jumpTo")) {
       return;
     }
@@ -739,7 +689,7 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void easeTo(double angle, @NonNull LatLng center, long duration, double pitch, double zoom,
+  public void easeTo(@NonNull LatLng center, double zoom, double angle, double pitch, long duration,
                      boolean easingInterpolator) {
     if (checkState("easeTo")) {
       return;
@@ -749,7 +699,7 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void flyTo(double angle, @NonNull LatLng center, long duration, double pitch, double zoom) {
+  public void flyTo(@NonNull LatLng center, double zoom, double angle, double pitch, long duration) {
     if (checkState("flyTo")) {
       return;
     }
@@ -766,41 +716,32 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void setPrefetchesTiles(boolean enable) {
-    if (checkState("setPrefetchesTiles")) {
+  public void setPrefetchTiles(boolean enable) {
+    if (checkState("setPrefetchTiles")) {
       return;
     }
-    nativeSetPrefetchesTiles(enable);
+    nativeSetPrefetchTiles(enable);
   }
 
   @Override
-  public boolean getPrefetchesTiles() {
-    if (checkState("getPrefetchesTiles")) {
+  public boolean getPrefetchTiles() {
+    if (checkState("getPrefetchTiles")) {
       return false;
     }
-    return nativeGetPrefetchesTiles();
+    return nativeGetPrefetchTiles();
   }
 
   // Runtime style Api
 
   @Override
-  public long getTransitionDuration() {
-    return nativeGetTransitionDuration();
+  public void setTransitionOptions(@NonNull TransitionOptions transitionOptions) {
+    nativeSetTransitionOptions(transitionOptions);
   }
 
+  @NonNull
   @Override
-  public void setTransitionDuration(long duration) {
-    nativeSetTransitionDuration(duration);
-  }
-
-  @Override
-  public long getTransitionDelay() {
-    return nativeGetTransitionDelay();
-  }
-
-  @Override
-  public void setTransitionDelay(long delay) {
-    nativeSetTransitionDelay(delay);
+  public TransitionOptions getTransitionOptions() {
+    return nativeGetTransitionOptions();
   }
 
   @Override
@@ -928,31 +869,11 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void addImage(@NonNull String name, @NonNull Bitmap image, boolean sdf) {
-    if (checkState("addImage")) {
-      return;
-    }
-
-    // Determine pixel ratio, cast to float to avoid rounding, see mapbox-gl-native/issues/11809
-    float pixelRatio = (float) image.getDensity() / DisplayMetrics.DENSITY_DEFAULT;
-    nativeAddImage(name, image, pixelRatio, sdf);
-  }
-
-  @Override
-  public void addImages(@NonNull HashMap<String, Bitmap> bitmapHashMap) {
+  public void addImages(@NonNull Image[] images) {
     if (checkState("addImages")) {
       return;
     }
-    this.addImages(bitmapHashMap, false);
-  }
-
-  @Override
-  public void addImages(@NonNull HashMap<String, Bitmap> bitmapHashMap, boolean sdf) {
-    if (checkState("addImages")) {
-      return;
-    }
-    //noinspection unchecked
-    new BitmapImageConversionTask(this, sdf).execute(bitmapHashMap);
+    nativeAddImages(images);
   }
 
   @Override
@@ -1343,6 +1264,13 @@ final class NativeMapView implements NativeMap {
   private native CameraPosition nativeGetCameraPosition();
 
   @Keep
+  private native void nativeSetTransitionOptions(TransitionOptions transitionOptions);
+
+  @NonNull
+  @Keep
+  private native TransitionOptions nativeGetTransitionOptions();
+
+  @Keep
   private native long nativeGetTransitionDuration();
 
   @Keep
@@ -1431,20 +1359,20 @@ final class NativeMapView implements NativeMap {
   private native Light nativeGetLight();
 
   @Keep
-  private native void nativeSetPrefetchesTiles(boolean enable);
+  private native void nativeSetPrefetchTiles(boolean enable);
 
   @Keep
-  private native boolean nativeGetPrefetchesTiles();
+  private native boolean nativeGetPrefetchTiles();
 
   int getWidth() {
-    if (checkState("")) {
+    if (checkState("") || viewCallback == null) {
       return 0;
     }
     return viewCallback.getWidth();
   }
 
   int getHeight() {
-    if (checkState("")) {
+    if (checkState("") || viewCallback == null) {
       return 0;
     }
     return viewCallback.getHeight();
@@ -1487,60 +1415,9 @@ final class NativeMapView implements NativeMap {
     });
   }
 
-  boolean isDestroyed() {
+  @Override
+  public boolean isDestroyed() {
     return destroyed;
-  }
-
-  //
-  // Image conversion
-  //
-
-  private static class BitmapImageConversionTask extends AsyncTask<HashMap<String, Bitmap>, Void, List<Image>> {
-
-    private NativeMapView nativeMapView;
-    private boolean sdf;
-
-    BitmapImageConversionTask(NativeMapView nativeMapView, boolean sdf) {
-      this.nativeMapView = nativeMapView;
-      this.sdf = sdf;
-    }
-
-    @NonNull
-    @Override
-    protected List<Image> doInBackground(HashMap<String, Bitmap>... params) {
-      HashMap<String, Bitmap> bitmapHashMap = params[0];
-
-      List<Image> images = new ArrayList<>();
-      ByteBuffer buffer;
-      String name;
-      Bitmap bitmap;
-
-      for (Map.Entry<String, Bitmap> stringBitmapEntry : bitmapHashMap.entrySet()) {
-        name = stringBitmapEntry.getKey();
-        bitmap = stringBitmapEntry.getValue();
-
-        if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
-          bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
-        }
-
-        buffer = ByteBuffer.allocate(bitmap.getByteCount());
-        bitmap.copyPixelsToBuffer(buffer);
-
-        float pixelRatio = (float) bitmap.getDensity() / DisplayMetrics.DENSITY_DEFAULT;
-
-        images.add(new Image(buffer.array(), pixelRatio, name, bitmap.getWidth(), bitmap.getHeight(), sdf));
-      }
-
-      return images;
-    }
-
-    @Override
-    protected void onPostExecute(@NonNull List<Image> images) {
-      super.onPostExecute(images);
-      if (nativeMapView != null && !nativeMapView.checkState("nativeAddImages")) {
-        nativeMapView.nativeAddImages(images.toArray(new Image[images.size()]));
-      }
-    }
   }
 
   public interface ViewCallback {

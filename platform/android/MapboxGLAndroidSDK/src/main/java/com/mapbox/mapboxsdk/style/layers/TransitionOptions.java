@@ -11,7 +11,9 @@ import android.support.annotation.Nullable;
  */
 public class TransitionOptions {
 
+  @Keep
   private long duration;
+  @Keep
   private long delay;
 
   /**

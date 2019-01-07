@@ -13,6 +13,10 @@ public:
 
     static jni::Local<jni::Object<TransitionOptions>> fromTransitionOptions(jni::JNIEnv&, jlong duration, jlong offset);
 
+    static long getDuration(jni::JNIEnv&, const jni::Object<TransitionOptions>&);
+
+    static long getOffset(jni::JNIEnv&, const jni::Object<TransitionOptions>&);
+
     static void registerNative(jni::JNIEnv&);
 };
 

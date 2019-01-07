@@ -1,10 +1,12 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
+import android.util.DisplayMetrics;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
@@ -13,6 +15,8 @@ import com.mapbox.mapboxsdk.style.sources.Source;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.ref.WeakReference;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +30,7 @@ import java.util.Map;
  * has been loaded by underlying map.
  * </p>
  */
+@SuppressWarnings("unchecked")
 public class Style {
 
   private final NativeMap nativeMap;
@@ -38,7 +43,7 @@ public class Style {
   /**
    * Private constructor to build a style object.
    *
-   * @param builder       the builder used for creating this style
+   * @param builder   the builder used for creating this style
    * @param nativeMap the map object used to load this style
    */
   private Style(@NonNull Builder builder, @NonNull NativeMap nativeMap) {
@@ -296,21 +301,28 @@ public class Style {
   /**
    * Adds an image to be used in the map's style
    *
-   * @param name  the name of the image
-   * @param image the pre-multiplied Bitmap
-   * @param sdf   the flag indicating image is an SDF or template image
+   * @param name   the name of the image
+   * @param bitmap the pre-multiplied Bitmap
+   * @param sdf    the flag indicating image is an SDF or template image
    */
-  public void addImage(@NonNull String name, @NonNull Bitmap image, boolean sdf) {
+  public void addImage(@NonNull final String name, @NonNull final Bitmap bitmap, boolean sdf) {
     validateState("addImage");
-    nativeMap.addImage(name, image, sdf);
+    new BitmapImageConversionTask(nativeMap, sdf).execute(new Builder.ImageWrapper(name, bitmap, sdf));
   }
 
   /**
    * Adds an images to be used in the map's style.
    */
   public void addImages(@NonNull HashMap<String, Bitmap> images) {
+    addImages(images, false);
+  }
+
+  /**
+   * Adds an images to be used in the map's style.
+   */
+  public void addImages(@NonNull HashMap<String, Bitmap> images, boolean sdf) {
     validateState("addImages");
-    nativeMap.addImages(images);
+    new BitmapImageConversionTask(nativeMap, sdf).execute(Builder.ImageWrapper.convertToImageArray(images, sdf));
   }
 
   /**
@@ -349,8 +361,7 @@ public class Style {
    */
   public void setTransition(@NonNull TransitionOptions transitionOptions) {
     validateState("setTransition");
-    nativeMap.setTransitionDuration(transitionOptions.getDuration());
-    nativeMap.setTransitionDelay(transitionOptions.getDelay());
+    nativeMap.setTransitionOptions(transitionOptions);
   }
 
   /**
@@ -364,7 +375,7 @@ public class Style {
   @NonNull
   public TransitionOptions getTransition() {
     validateState("getTransition");
-    return new TransitionOptions(nativeMap.getTransitionDuration(), nativeMap.getTransitionDelay());
+    return nativeMap.getTransitionOptions();
   }
 
   //
@@ -675,7 +686,7 @@ public class Style {
       return new Style(this, nativeMap);
     }
 
-    class ImageWrapper {
+    static class ImageWrapper {
       Bitmap bitmap;
       String id;
       boolean sdf;
@@ -684,6 +695,16 @@ public class Style {
         this.id = id;
         this.bitmap = bitmap;
         this.sdf = sdf;
+      }
+
+      static ImageWrapper[] convertToImageArray(HashMap<String, Bitmap> bitmapHashMap, boolean sdf) {
+        ImageWrapper[] images = new ImageWrapper[bitmapHashMap.size()];
+        List<String> keyList = new ArrayList<>(bitmapHashMap.keySet());
+        for (int i = 0; i < bitmapHashMap.size(); i++) {
+          String id = keyList.get(i);
+          images[i] = new ImageWrapper(id, bitmapHashMap.get(id), sdf);
+        }
+        return images;
       }
     }
 
@@ -719,6 +740,53 @@ public class Style {
       LayerAtWrapper(Layer layer, int index) {
         super(layer);
         this.index = index;
+      }
+    }
+  }
+
+  private static class BitmapImageConversionTask extends AsyncTask<Builder.ImageWrapper, Void, List<Image>> {
+
+    private WeakReference<NativeMap> nativeMap;
+    private boolean sdf;
+
+    BitmapImageConversionTask(NativeMap nativeMap, boolean sdf) {
+      this.nativeMap = new WeakReference<>(nativeMap);
+      this.sdf = sdf;
+    }
+
+    @NonNull
+    @Override
+    protected List<Image> doInBackground(Builder.ImageWrapper... params) {
+      List<Image> images = new ArrayList<>();
+      ByteBuffer buffer;
+      String name;
+      Bitmap bitmap;
+
+      for (Builder.ImageWrapper param : params) {
+        name = param.id;
+        bitmap = param.bitmap;
+
+        if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
+          bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
+        }
+
+        buffer = ByteBuffer.allocate(bitmap.getByteCount());
+        bitmap.copyPixelsToBuffer(buffer);
+
+        float pixelRatio = (float) bitmap.getDensity() / DisplayMetrics.DENSITY_DEFAULT;
+
+        images.add(new Image(buffer.array(), pixelRatio, name, bitmap.getWidth(), bitmap.getHeight(), sdf));
+      }
+
+      return images;
+    }
+
+    @Override
+    protected void onPostExecute(@NonNull List<Image> images) {
+      super.onPostExecute(images);
+      NativeMap nativeMap = this.nativeMap.get();
+      if (nativeMap != null && !nativeMap.isDestroyed()) {
+        nativeMap.addImages(images.toArray(new Image[images.size()]));
       }
     }
   }

@@ -17,18 +17,92 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.Layer;
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.Source;
 
-import java.util.HashMap;
 import java.util.List;
 
 interface NativeMap {
-  void destroy();
+
+  //
+  // Lifecycle API
+  //
 
   void update();
 
   void resizeView(int width, int height);
+
+  void onLowMemory();
+
+  void destroy();
+
+  boolean isDestroyed();
+
+  //
+  // Camera API
+  //
+
+  void jumpTo(@NonNull LatLng center, double zoom, double pitch, double bearing);
+
+  void easeTo(@NonNull LatLng center, double zoom, double bearing, double pitch, long duration,
+              boolean easingInterpolator);
+
+  void flyTo(@NonNull LatLng center, double zoom, double bearing, double pitch, long duration);
+
+  void moveBy(double deltaX, double deltaY, long duration);
+
+  @NonNull
+  CameraPosition getCameraPosition();
+
+  CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds bounds, int[] padding, double bearing, double pitch);
+
+  CameraPosition getCameraForGeometry(@NonNull Geometry geometry, int[] padding, double bearing, double pitch);
+
+  void resetPosition();
+
+  void setLatLng(@NonNull LatLng latLng, long duration);
+
+  LatLng getLatLng();
+
+  void setLatLngBounds(@NonNull LatLngBounds latLngBounds);
+
+  void setVisibleCoordinateBounds(@NonNull LatLng[] coordinates, @NonNull RectF padding,
+                                  double direction, long duration);
+
+  void setPitch(double pitch, long duration);
+
+  double getPitch();
+
+  void setZoom(double zoom, @NonNull PointF focalPoint, long duration);
+
+  double getZoom();
+
+  void setMinZoom(double zoom);
+
+  double getMinZoom();
+
+  void setMaxZoom(double zoom);
+
+  double getMaxZoom();
+
+  void resetZoom();
+
+  void rotateBy(double sx, double sy, double ex, double ey, long duration);
+
+  void setBearing(double degrees, long duration);
+
+  void setBearing(double degrees, double fx, double fy, long duration);
+
+  double getBearing();
+
+  void resetNorth();
+
+  void cancelTransitions();
+
+  //
+  // Style API
+  //
 
   void setStyleUrl(String url);
 
@@ -40,68 +114,115 @@ interface NativeMap {
   @NonNull
   String getStyleJson();
 
-  void setLatLngBounds(LatLngBounds latLngBounds);
+  boolean isFullyLoaded();
 
-  void cancelTransitions();
+  void addLayer(@NonNull Layer layer);
 
-  void setGestureInProgress(boolean inProgress);
+  void addLayerBelow(@NonNull Layer layer, @NonNull String below);
 
-  void moveBy(double dx, double dy);
+  void addLayerAbove(@NonNull Layer layer, @NonNull String above);
 
-  void moveBy(double dx, double dy, long duration);
+  void addLayerAt(@NonNull Layer layer, @IntRange(from = 0) int index);
 
-  void setLatLng(@NonNull LatLng latLng);
+  @NonNull
+  List<Layer> getLayers();
 
-  void setLatLng(@NonNull LatLng latLng, long duration);
+  Layer getLayer(String layerId);
 
-  LatLng getLatLng();
+  boolean removeLayer(@NonNull String layerId);
 
-  CameraPosition getCameraForLatLngBounds(LatLngBounds bounds, int[] padding, double bearing, double tilt);
+  boolean removeLayer(@NonNull Layer layer);
 
-  CameraPosition getCameraForGeometry(Geometry geometry, int[] padding, double bearing, double tilt);
+  boolean removeLayerAt(@IntRange(from = 0) int index);
 
-  void resetPosition();
+  void addSource(@NonNull Source source);
 
-  double getPitch();
+  @NonNull
+  List<Source> getSources();
 
-  void setPitch(double pitch);
+  Source getSource(@NonNull String sourceId);
 
-  void setPitch(double pitch, long duration);
+  boolean removeSource(@NonNull String sourceId);
 
-  void setZoom(double zoom, @NonNull PointF focalPoint, long duration);
+  boolean removeSource(@NonNull Source source);
 
-  double getZoom();
+  void setTransitionOptions(@NonNull TransitionOptions transitionOptions);
 
-  void resetZoom();
+  @NonNull
+  TransitionOptions getTransitionOptions();
 
-  void setMinZoom(double zoom);
+  void addImages(Image[] images);
 
-  double getMinZoom();
+  Bitmap getImage(String name);
 
-  void setMaxZoom(double zoom);
+  void removeImage(String name);
 
-  double getMaxZoom();
+  Light getLight();
 
-  void rotateBy(double sx, double sy, double ex, double ey);
-
-  void rotateBy(double sx, double sy, double ex, double ey,
-                long duration);
+  //
+  // Content padding API
+  //
 
   void setContentPadding(float[] padding);
 
   float[] getContentPadding();
 
-  void setBearing(double degrees);
+  //
+  // Query API
+  //
 
-  void setBearing(double degrees, long duration);
+  @NonNull
+  List<Feature> queryRenderedFeatures(@NonNull PointF coordinates,
+                                      @Nullable String[] layerIds,
+                                      @Nullable Expression filter);
 
-  void setBearing(double degrees, double cx, double cy);
+  @NonNull
+  List<Feature> queryRenderedFeatures(@NonNull RectF coordinates,
+                                      @Nullable String[] layerIds,
+                                      @Nullable Expression filter);
 
-  void setBearing(double degrees, double fx, double fy, long duration);
+  //
+  // Projection API
+  //
 
-  double getBearing();
+  double getMetersPerPixelAtLatitude(double lat);
 
-  void resetNorth();
+  ProjectedMeters projectedMetersForLatLng(@NonNull LatLng latLng);
+
+  LatLng latLngForProjectedMeters(@NonNull ProjectedMeters projectedMeters);
+
+  @NonNull
+  PointF pixelForLatLng(@NonNull LatLng latLng);
+
+  LatLng latLngForPixel(@NonNull PointF pixel);
+
+  //
+  // Utils API
+  //
+
+  void setOnFpsChangedListener(@NonNull MapboxMap.OnFpsChangedListener listener);
+
+  void setDebug(boolean debug);
+
+  boolean getDebug();
+
+  void cycleDebugOptions();
+
+  void setReachability(boolean status);
+
+  void setApiBaseUrl(String baseUrl);
+
+  void setPrefetchTiles(boolean enable);
+
+  boolean getPrefetchTiles();
+
+  void setGestureInProgress(boolean inProgress);
+
+  float getPixelRatio();
+
+  //
+  // Deprecated Annotations API
+  //
 
   long addMarker(Marker marker);
 
@@ -128,120 +249,16 @@ interface NativeMap {
 
   void removeAnnotations(long[] ids);
 
-  @NonNull
-  long[] queryPointAnnotations(RectF rect);
-
-  @NonNull
-  long[] queryShapeAnnotations(RectF rectF);
+  double getTopOffsetPixelsForAnnotationSymbol(String symbolName);
 
   void addAnnotationIcon(String symbol, int width, int height, float scale, byte[] pixels);
 
   void removeAnnotationIcon(String symbol);
 
-  void setVisibleCoordinateBounds(LatLng[] coordinates, RectF padding, double direction, long duration);
-
-  void onLowMemory();
-
-  void setDebug(boolean debug);
-
-  void cycleDebugOptions();
-
-  boolean getDebug();
-
-  boolean isFullyLoaded();
-
-  void setReachability(boolean status);
-
-  double getMetersPerPixelAtLatitude(double lat);
-
-  ProjectedMeters projectedMetersForLatLng(@NonNull LatLng latLng);
-
-  LatLng latLngForProjectedMeters(@NonNull ProjectedMeters projectedMeters);
+  @NonNull
+  long[] queryPointAnnotations(RectF rectF);
 
   @NonNull
-  PointF pixelForLatLng(@NonNull LatLng latLng);
+  long[] queryShapeAnnotations(RectF rectF);
 
-  LatLng latLngForPixel(@NonNull PointF pixel);
-
-  double getTopOffsetPixelsForAnnotationSymbol(String symbolName);
-
-  void jumpTo(double angle, @NonNull LatLng center, double pitch, double zoom);
-
-  void easeTo(double angle, @NonNull LatLng center, long duration, double pitch, double zoom,
-              boolean easingInterpolator);
-
-  void flyTo(double angle, @NonNull LatLng center, long duration, double pitch, double zoom);
-
-  @NonNull
-  CameraPosition getCameraPosition();
-
-  void setPrefetchesTiles(boolean enable);
-
-  boolean getPrefetchesTiles();
-
-  long getTransitionDuration();
-
-  void setTransitionDuration(long duration);
-
-  long getTransitionDelay();
-
-  void setTransitionDelay(long delay);
-
-  @NonNull
-  List<Layer> getLayers();
-
-  Layer getLayer(String layerId);
-
-  void addLayer(@NonNull Layer layer);
-
-  void addLayerBelow(@NonNull Layer layer, @NonNull String below);
-
-  void addLayerAbove(@NonNull Layer layer, @NonNull String above);
-
-  void addLayerAt(@NonNull Layer layer, @IntRange(from = 0) int index);
-
-  boolean removeLayer(@NonNull String layerId);
-
-  boolean removeLayer(@NonNull Layer layer);
-
-  boolean removeLayerAt(@IntRange(from = 0) int index);
-
-  @NonNull
-  List<Source> getSources();
-
-  Source getSource(@NonNull String sourceId);
-
-  void addSource(@NonNull Source source);
-
-  boolean removeSource(@NonNull String sourceId);
-
-  boolean removeSource(@NonNull Source source);
-
-  void addImage(@NonNull String name, @NonNull Bitmap image, boolean sdf);
-
-  void addImages(@NonNull HashMap<String, Bitmap> bitmapHashMap);
-
-  void addImages(@NonNull HashMap<String, Bitmap> bitmapHashMap, boolean sdf);
-
-  void removeImage(String name);
-
-  Bitmap getImage(String name);
-
-  @NonNull
-  List<Feature> queryRenderedFeatures(@NonNull PointF coordinates,
-                                      @Nullable String[] layerIds,
-                                      @Nullable Expression filter);
-
-  @NonNull
-  List<Feature> queryRenderedFeatures(@NonNull RectF coordinates,
-                                      @Nullable String[] layerIds,
-                                      @Nullable Expression filter);
-
-  void setApiBaseUrl(String baseUrl);
-
-  Light getLight();
-
-  float getPixelRatio();
-
-  void setOnFpsChangedListener(@NonNull MapboxMap.OnFpsChangedListener listener);
 }

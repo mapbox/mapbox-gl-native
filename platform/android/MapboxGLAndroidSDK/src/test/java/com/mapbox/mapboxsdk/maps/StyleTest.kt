@@ -33,9 +33,8 @@ class StyleTest {
         every { nativeMapView.addLayerAbove(any(), any()) } answers {}
         every { nativeMapView.addLayerAt(any(), any()) } answers {}
         every { nativeMapView.addSource(any()) } answers {}
-        every { nativeMapView.addImage(any(), any(), any()) } answers {}
-        every { nativeMapView.transitionDuration = any() } answers {}
-        every { nativeMapView.transitionDelay = any() } answers {}
+        every { nativeMapView.addImages(any()) } answers {}
+        every { nativeMapView.transitionOptions = any() } answers {}
         every { nativeMapView.isDestroyed } returns false
         mapboxMap.injectLocationComponent(spyk())
     }
@@ -104,24 +103,7 @@ class StyleTest {
         val transitionOptions = TransitionOptions(100, 200)
         val builder = Style.Builder().withTransition(transitionOptions)
         mapboxMap.setStyle(builder)
-        verify(exactly = 1) { nativeMapView.transitionDuration = 100 }
-        verify(exactly = 1) { nativeMapView.transitionDelay = 200 }
-    }
-
-    @Test
-    fun testWithImage() {
-        val image = mockk<Bitmap>()
-        val builder = Style.Builder().withImage("id", image)
-        mapboxMap.setStyle(builder)
-        verify(exactly = 1) { nativeMapView.addImage("id", image, false) }
-    }
-
-    @Test
-    fun testWithImageSdf() {
-        val image = mockk<Bitmap>()
-        val builder = Style.Builder().withImage("id", image, true)
-        mapboxMap.setStyle(builder)
-        verify(exactly = 1) { nativeMapView.addImage("id", image, true) }
+        verify(exactly = 1) { nativeMapView.transitionOptions = transitionOptions }
     }
 
     @Test
@@ -186,28 +168,7 @@ class StyleTest {
         mapboxMap.setStyle(builder)
         verify(exactly = 1) { nativeMapView.styleUrl = Style.MAPBOX_STREETS }
         mapboxMap.notifyStyleLoaded()
-        verify(exactly = 1) { nativeMapView.transitionDuration = 100 }
-        verify(exactly = 1) { nativeMapView.transitionDelay = 200 }
-    }
-
-    @Test
-    fun testWithFromImage() {
-        val bitmap = mockk<Bitmap>()
-        val builder = Style.Builder().fromUrl(Style.MAPBOX_STREETS).withImage("id", bitmap)
-        mapboxMap.setStyle(builder)
-        verify(exactly = 1) { nativeMapView.styleUrl = Style.MAPBOX_STREETS }
-        mapboxMap.notifyStyleLoaded()
-        verify(exactly = 1) { nativeMapView.addImage("id", bitmap, false) }
-    }
-
-    @Test
-    fun testWithFromImageSdf() {
-        val bitmap = mockk<Bitmap>()
-        val builder = Style.Builder().fromUrl(Style.MAPBOX_STREETS).withImage("id", bitmap, true)
-        mapboxMap.setStyle(builder)
-        verify(exactly = 1) { nativeMapView.styleUrl = Style.MAPBOX_STREETS }
-        mapboxMap.notifyStyleLoaded()
-        verify(exactly = 1) { nativeMapView.addImage("id", bitmap, true) }
+        verify(exactly = 1) { nativeMapView.transitionOptions = transitionOptions }
     }
 
     @Test
