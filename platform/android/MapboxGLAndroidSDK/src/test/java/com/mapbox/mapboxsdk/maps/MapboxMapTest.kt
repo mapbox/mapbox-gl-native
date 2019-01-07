@@ -29,8 +29,7 @@ class MapboxMapTest {
         nativeMapView = mockk()
         mapboxMap = MapboxMap(nativeMapView, Transform(mapView, nativeMapView, cameraChangeDispatcher), null, null, null, cameraChangeDispatcher)
         every { nativeMapView.styleUrl = any() } answers {}
-        every { nativeMapView.transitionDuration = any() } answers {}
-        every { nativeMapView.transitionDelay = any() } answers {}
+        every { nativeMapView.transitionOptions = any() } answers {}
         every { nativeMapView.isDestroyed } returns false
         every { nativeMapView.cameraPosition } returns CameraPosition.DEFAULT
         every { nativeMapView.cancelTransitions() } answers {}
@@ -38,7 +37,7 @@ class MapboxMapTest {
         every { nativeMapView.minZoom = any() } answers {}
         every { nativeMapView.maxZoom = any() } answers {}
         every { nativeMapView.setOnFpsChangedListener(any()) } answers {}
-        every { nativeMapView.prefetchesTiles = any() } answers {}
+        every { nativeMapView.prefetchTiles = any() } answers {}
         every { nativeMapView.setLatLngBounds(any()) } answers {}
         mapboxMap.injectLocationComponent(spyk())
         mapboxMap.setStyle(Style.MAPBOX_STREETS)
@@ -49,8 +48,7 @@ class MapboxMapTest {
     fun testTransitionOptions() {
         val expected = TransitionOptions(100, 200)
         mapboxMap.style?.transition = expected
-        verify { nativeMapView.transitionDelay = 200 }
-        verify { nativeMapView.transitionDuration = 100 }
+        verify { nativeMapView.transitionOptions = expected }
     }
 
     @Test
@@ -60,7 +58,7 @@ class MapboxMapTest {
         val target = LatLng(1.0, 2.0)
         val expected = CameraPosition.Builder().target(target).build()
         mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(expected), callback)
-        verify { nativeMapView.jumpTo(-1.0, target, -1.0, -1.0) }
+        verify { nativeMapView.jumpTo(target, -1.0, -1.0, -1.0) }
         verify { callback.onFinish() }
     }
 
@@ -86,7 +84,7 @@ class MapboxMapTest {
     @Test
     fun testTilePrefetch() {
         mapboxMap.prefetchesTiles = true
-        verify { nativeMapView.prefetchesTiles = true }
+        verify { nativeMapView.prefetchTiles = true }
     }
 
     @Test

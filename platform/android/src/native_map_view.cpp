@@ -629,13 +629,11 @@ jni::Local<jni::Array<jlong>> NativeMapView::addPolygons(JNIEnv& env, const jni:
     return result;
 }
 
-//TODO: Move to Polyline class and make native peer
 void NativeMapView::updatePolyline(JNIEnv& env, jlong polylineId, const jni::Object<Polyline>& polyline) {
     mbgl::LineAnnotation annotation = Polyline::toAnnotation(env, polyline);
     map->updateAnnotation(polylineId, annotation);
 }
 
-//TODO: Move to Polygon class and make native peer
 void NativeMapView::updatePolygon(JNIEnv& env, jlong polygonId, const jni::Object<Polygon>& polygon) {
     mbgl::FillAnnotation annotation = Polygon::toAnnotation(env, polygon);
     map->updateAnnotation(polygonId, annotation);
@@ -680,25 +678,18 @@ jdouble NativeMapView::getTopOffsetPixelsForAnnotationSymbol(JNIEnv& env, const 
     return map->getTopOffsetPixelsForAnnotationImage(jni::Make<std::string>(env, symbolName));
 }
 
-jlong NativeMapView::getTransitionDuration(JNIEnv&) {
+jni::Local<jni::Object<TransitionOptions>> NativeMapView::getTransitionOptions(JNIEnv& env) {
     const auto transitionOptions = map->getStyle().getTransitionOptions();
-    return std::chrono::duration_cast<std::chrono::milliseconds>(transitionOptions.duration.value_or(mbgl::Duration::zero())).count();
+    const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(transitionOptions.duration.value_or(mbgl::Duration::zero())).count();
+    const auto delay = std::chrono::duration_cast<std::chrono::milliseconds>(transitionOptions.delay.value_or(mbgl::Duration::zero())).count();
+    return TransitionOptions::fromTransitionOptions(env, duration, delay);
 }
 
-void NativeMapView::setTransitionDuration(JNIEnv&, jlong duration) {
-    auto transitionOptions = map->getStyle().getTransitionOptions();
-    transitionOptions.duration.emplace(mbgl::Milliseconds(duration));
-    map->getStyle().setTransitionOptions(transitionOptions);
-}
-
-jlong NativeMapView::getTransitionDelay(JNIEnv&) {
-    const auto transitionOptions = map->getStyle().getTransitionOptions();
-    return std::chrono::duration_cast<std::chrono::milliseconds>(transitionOptions.delay.value_or(mbgl::Duration::zero())).count();
-}
-
-void NativeMapView::setTransitionDelay(JNIEnv&, jlong delay) {
-    auto transitionOptions = map->getStyle().getTransitionOptions();
-    transitionOptions.delay.emplace(mbgl::Milliseconds(delay));
+void NativeMapView::setTransitionOptions(JNIEnv& env, const jni::Object<TransitionOptions>& options) {
+    const mbgl::style::TransitionOptions transitionOptions(
+            Duration(mbgl::Milliseconds(TransitionOptions::getDuration(env, options))),
+            Duration(mbgl::Milliseconds(TransitionOptions::getOffset(env, options)))
+    );
     map->getStyle().setTransitionOptions(transitionOptions);
 }
 
@@ -1012,11 +1003,11 @@ jni::Local<jni::Object<Bitmap>> NativeMapView::getImage(JNIEnv& env, const jni::
     }
 }
 
-void NativeMapView::setPrefetchesTiles(JNIEnv&, jni::jboolean enable) {
+void NativeMapView::setPrefetchTiles(JNIEnv&, jni::jboolean enable) {
     map->setPrefetchZoomDelta(enable ? util::DEFAULT_PREFETCH_ZOOM_DELTA : uint8_t(0));
 }
 
-jni::jboolean NativeMapView::getPrefetchesTiles(JNIEnv&) {
+jni::jboolean NativeMapView::getPrefetchTiles(JNIEnv&) {
     return jni::jboolean(map->getPrefetchZoomDelta() > 0);
 }
 
@@ -1093,10 +1084,8 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::addAnnotationIcon, "nativeAddAnnotationIcon"),
             METHOD(&NativeMapView::removeAnnotationIcon, "nativeRemoveAnnotationIcon"),
             METHOD(&NativeMapView::getTopOffsetPixelsForAnnotationSymbol, "nativeGetTopOffsetPixelsForAnnotationSymbol"),
-            METHOD(&NativeMapView::getTransitionDuration, "nativeGetTransitionDuration"),
-            METHOD(&NativeMapView::setTransitionDuration, "nativeSetTransitionDuration"),
-            METHOD(&NativeMapView::getTransitionDelay, "nativeGetTransitionDelay"),
-            METHOD(&NativeMapView::setTransitionDelay, "nativeSetTransitionDelay"),
+            METHOD(&NativeMapView::getTransitionOptions, "nativeGetTransitionOptions"),
+            METHOD(&NativeMapView::setTransitionOptions, "nativeSetTransitionOptions"),
             METHOD(&NativeMapView::queryPointAnnotations, "nativeQueryPointAnnotations"),
             METHOD(&NativeMapView::queryShapeAnnotations, "nativeQueryShapeAnnotations"),
             METHOD(&NativeMapView::queryRenderedFeaturesForPoint, "nativeQueryRenderedFeaturesForPoint"),
@@ -1118,8 +1107,8 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::removeImage, "nativeRemoveImage"),
             METHOD(&NativeMapView::getImage, "nativeGetImage"),
             METHOD(&NativeMapView::setLatLngBounds, "nativeSetLatLngBounds"),
-            METHOD(&NativeMapView::setPrefetchesTiles, "nativeSetPrefetchesTiles"),
-            METHOD(&NativeMapView::getPrefetchesTiles, "nativeGetPrefetchesTiles")
+            METHOD(&NativeMapView::setPrefetchTiles, "nativeSetPrefetchTiles"),
+            METHOD(&NativeMapView::getPrefetchTiles, "nativeGetPrefetchTiles")
     );
 }
 

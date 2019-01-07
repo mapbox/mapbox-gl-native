@@ -33,6 +33,9 @@ public class ImageTest extends EspressoTest {
       Bitmap bitmapSet = ((BitmapDrawable) drawable).getBitmap();
       mapboxMap.getStyle().addImage(IMAGE_ID, bitmapSet);
 
+      // adding an image requires converting the image with an asynctask
+      uiController.loopMainThreadForAtLeast(200);
+
       Bitmap bitmapGet = mapboxMap.getStyle().getImage(IMAGE_ID);
       assertTrue(bitmapGet.sameAs(bitmapSet));
 

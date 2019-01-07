@@ -44,7 +44,7 @@ class NativeMapViewTest {
     @UiThreadTest
     fun testBearing() {
         val expected = BEARING_TEST
-        nativeMapView.bearing = expected
+        nativeMapView.setBearing(expected, 0)
         val actual = nativeMapView.bearing
         assertEquals("Bearing should match", expected, actual, DELTA)
     }
@@ -53,7 +53,7 @@ class NativeMapViewTest {
     @UiThreadTest
     fun testLatLng() {
         val expected = LATLNG_TEST
-        nativeMapView.latLng = expected
+        nativeMapView.setLatLng(expected, 0)
         val actual = nativeMapView.latLng
         assertEquals("Latitude should match", expected.latitude, actual.latitude, DELTA)
         assertEquals("Longitude should match", expected.longitude, actual.longitude, DELTA)
@@ -81,7 +81,7 @@ class NativeMapViewTest {
     @UiThreadTest
     fun testPitch() {
         val expected = PITCH_TEST
-        nativeMapView.pitch = expected
+        nativeMapView.setPitch(expected, 0)
         val actual = nativeMapView.pitch
         assertEquals("Pitch should match", expected, actual, DELTA)
     }
@@ -120,7 +120,7 @@ class NativeMapViewTest {
                 .tilt(PITCH_TEST)
                 .zoom(ZOOM_TEST)
                 .build()
-        nativeMapView.jumpTo(BEARING_TEST, LATLNG_TEST, PITCH_TEST, ZOOM_TEST)
+        nativeMapView.jumpTo(LATLNG_TEST, ZOOM_TEST, PITCH_TEST, BEARING_TEST)
         val actual = nativeMapView.cameraPosition
         assertEquals("Latitude should match", expected.target.latitude, actual.target.latitude, DELTA)
         assertEquals("Longitude should match", expected.target.longitude, actual.target.longitude, DELTA)
@@ -133,7 +133,7 @@ class NativeMapViewTest {
     @UiThreadTest
     fun testLatLngForPixel() {
         val expected = LATLNG_TEST
-        nativeMapView.latLng = LATLNG_TEST
+        nativeMapView.setLatLng(LATLNG_TEST,0)
         val actual = nativeMapView.latLngForPixel(
                 PointF((WIDTH / 2).toFloat(), (HEIGHT / 2).toFloat())
         )
@@ -145,7 +145,7 @@ class NativeMapViewTest {
     @UiThreadTest
     fun testPixelForLatLng() {
         val expected = PointF((WIDTH / 2).toFloat(), (HEIGHT / 2).toFloat())
-        nativeMapView.latLng = LATLNG_TEST
+        nativeMapView.setLatLng(LATLNG_TEST, 0)
         val actual = nativeMapView.pixelForLatLng(LATLNG_TEST)
         assertEquals("X should match", expected.x.toDouble(), actual.x.toDouble(), DELTA_BIG)
         assertEquals("Y should match", expected.y.toDouble(), actual.y.toDouble(), DELTA_BIG)
@@ -155,8 +155,8 @@ class NativeMapViewTest {
     @UiThreadTest
     fun testPrefetchTilesTrue() {
         val expected = true
-        nativeMapView.prefetchesTiles = true
-        val actual = nativeMapView.prefetchesTiles
+        nativeMapView.prefetchTiles = true
+        val actual = nativeMapView.prefetchTiles
         assertEquals("Flag should match", expected, actual)
     }
 
@@ -164,8 +164,8 @@ class NativeMapViewTest {
     @UiThreadTest
     fun testPrefetchTilesFalse() {
         val expected = false
-        nativeMapView.prefetchesTiles = false
-        val actual = nativeMapView.prefetchesTiles
+        nativeMapView.prefetchTiles = false
+        val actual = nativeMapView.prefetchTiles
         assertEquals("Flag should match", expected, actual)
     }
 
@@ -173,7 +173,7 @@ class NativeMapViewTest {
     @UiThreadTest
     fun testPrefetchTilesDefault() {
         val expected = true
-        val actual = nativeMapView.prefetchesTiles
+        val actual = nativeMapView.prefetchTiles
         assertEquals("Flag should match", expected, actual)
     }
 
@@ -233,7 +233,7 @@ class NativeMapViewTest {
                 .target(LatLng(12.0, 14.0))
                 .bearing(20.0)
                 .build()
-        nativeMapView.flyTo(expected.bearing, expected.target, 0, expected.tilt, expected.zoom)
+        nativeMapView.flyTo(expected.target, expected.zoom, expected.bearing, expected.tilt, 0)
         val actual = nativeMapView.cameraPosition
         assertEquals("Bearing should match", expected.bearing, actual.bearing, TestConstants.BEARING_DELTA)
         assertEquals("Latitude should match", expected.target.latitude, actual.target.latitude, TestConstants.LAT_LNG_DELTA)
@@ -251,7 +251,7 @@ class NativeMapViewTest {
                 .target(LatLng(12.0, 14.0))
                 .bearing(20.0)
                 .build()
-        nativeMapView.easeTo(expected.bearing, expected.target, 0, expected.tilt, expected.zoom, false)
+        nativeMapView.easeTo(expected.target, expected.zoom, expected.bearing, expected.tilt, 0, false)
         val actual = nativeMapView.cameraPosition
         assertEquals("Bearing should match", expected.bearing, actual.bearing, TestConstants.BEARING_DELTA)
         assertEquals("Latitude should match", expected.target.latitude, actual.target.latitude, TestConstants.LAT_LNG_DELTA)
@@ -269,7 +269,7 @@ class NativeMapViewTest {
                 .target(LatLng(0.0, 0.0))
                 .bearing(0.0)
                 .build()
-        nativeMapView.jumpTo(1.0, LatLng(1.0, 2.0), 23.0, 12.0)
+        nativeMapView.jumpTo(LatLng(1.0, 2.0), 12.0, 23.0, 1.0)
         nativeMapView.resetPosition()
         val actual = nativeMapView.cameraPosition
         assertEquals("Bearing should match", expected.bearing, actual.bearing, TestConstants.BEARING_DELTA)
@@ -310,7 +310,7 @@ class NativeMapViewTest {
                 .target(LatLng(4.21494310024160, -4.218749958739409))
                 .bearing(0.0)
                 .build()
-        nativeMapView.moveBy(12.0, 12.0)
+        nativeMapView.moveBy(12.0, 12.0, 0)
         val actual = nativeMapView.cameraPosition
         assertEquals("Bearing should match", expected.bearing, actual.bearing, TestConstants.BEARING_DELTA)
         assertEquals("Latitude should match", expected.target.latitude, actual.target.latitude, TestConstants.LAT_LNG_DELTA)

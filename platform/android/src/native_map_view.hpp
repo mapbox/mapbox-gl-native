@@ -187,13 +187,9 @@ public:
 
     jni::jdouble getTopOffsetPixelsForAnnotationSymbol(JNIEnv&, const jni::String&);
 
-    jni::jlong getTransitionDuration(JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getTransitionOptions(JNIEnv&);
 
-    void setTransitionDuration(JNIEnv&, jni::jlong);
-
-    jni::jlong getTransitionDelay(JNIEnv&);
-
-    void setTransitionDelay(JNIEnv&, jni::jlong);
+    void setTransitionOptions(JNIEnv&, const jni::Object<TransitionOptions>&);
 
     jni::Local<jni::Array<jlong>> queryPointAnnotations(JNIEnv&, const jni::Object<RectF>&);
 
@@ -239,9 +235,9 @@ public:
 
     jni::Local<jni::Object<Bitmap>> getImage(JNIEnv&, const jni::String&);
 
-    void setPrefetchesTiles(JNIEnv&, jni::jboolean);
+    void setPrefetchTiles(JNIEnv&, jni::jboolean);
 
-    jni::jboolean getPrefetchesTiles(JNIEnv&);
+    jni::jboolean getPrefetchTiles(JNIEnv&);
 
     mbgl::Map& getMap();
 

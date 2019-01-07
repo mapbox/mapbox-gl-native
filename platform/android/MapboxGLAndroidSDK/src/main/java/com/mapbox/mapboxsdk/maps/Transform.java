@@ -99,7 +99,7 @@ final class Transform implements MapView.OnCameraDidChangeListener {
     if (isValidCameraPosition(cameraPosition)) {
       cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
-      nativeMap.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
+      nativeMap.jumpTo(cameraPosition.target, cameraPosition.zoom, cameraPosition.tilt, cameraPosition.bearing);
       cameraChangeDispatcher.onCameraIdle();
       invalidateCameraPosition();
       handler.post(new Runnable() {
@@ -125,8 +125,8 @@ final class Transform implements MapView.OnCameraDidChangeListener {
         cameraCancelableCallback = callback;
       }
       mapView.addOnCameraDidChangeListener(this);
-      nativeMap.easeTo(cameraPosition.bearing, cameraPosition.target, durationMs, cameraPosition.tilt,
-        cameraPosition.zoom, easingInterpolator);
+      nativeMap.easeTo(cameraPosition.target, cameraPosition.zoom, cameraPosition.bearing, cameraPosition.tilt,
+        durationMs, easingInterpolator);
     }
   }
 
@@ -142,8 +142,8 @@ final class Transform implements MapView.OnCameraDidChangeListener {
         cameraCancelableCallback = callback;
       }
       mapView.addOnCameraDidChangeListener(this);
-      nativeMap.flyTo(cameraPosition.bearing, cameraPosition.target, durationMs, cameraPosition.tilt,
-        cameraPosition.zoom);
+      nativeMap.flyTo(cameraPosition.target, cameraPosition.zoom, cameraPosition.bearing,
+        cameraPosition.tilt, durationMs);
     }
   }
 
@@ -231,11 +231,11 @@ final class Transform implements MapView.OnCameraDidChangeListener {
   }
 
   void setBearing(double bearing) {
-    nativeMap.setBearing(bearing);
+    nativeMap.setBearing(bearing, 0);
   }
 
   void setBearing(double bearing, float focalX, float focalY) {
-    nativeMap.setBearing(bearing, focalX, focalY);
+    nativeMap.setBearing(bearing, focalX, focalY, 0);
   }
 
   void setBearing(double bearing, float focalX, float focalY, long duration) {
@@ -272,7 +272,7 @@ final class Transform implements MapView.OnCameraDidChangeListener {
   }
 
   void setCenterCoordinate(LatLng centerCoordinate) {
-    nativeMap.setLatLng(centerCoordinate);
+    nativeMap.setLatLng(centerCoordinate, 0);
   }
 
   void setGestureInProgress(boolean gestureInProgress) {
