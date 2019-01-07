@@ -23,7 +23,6 @@ public class MapSnapshotterReuseActivity extends AppCompatActivity implements Ma
   private MapSnapshotter mapSnapshotter;
   private View fab;
 
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -59,17 +58,15 @@ public class MapSnapshotterReuseActivity extends AppCompatActivity implements Ma
   @Override
   public void onSnapshotReady(MapSnapshot snapshot) {
     fab.setVisibility(View.VISIBLE);
-    ImageView imageView = (ImageView) findViewById(R.id.snapshot_image);
+    ImageView imageView = findViewById(R.id.snapshot_image);
     imageView.setImageBitmap(snapshot.getBitmap());
   }
 
   private LatLngBounds getRandomBounds() {
-    return LatLngBounds.from(
-      randomInRange(5, 10),
-      randomInRange(-5, 5),
-      randomInRange(-5, 5),
-      randomInRange(5, 10)
-    );
+    return new LatLngBounds.Builder()
+      .include(new LatLng(randomInRange(5, 10), randomInRange(-5, 5)))
+      .include(new LatLng(randomInRange(-5, 5), randomInRange(5, 10)))
+      .build();
   }
 
   private CameraPosition getRandomCameraPosition() {
