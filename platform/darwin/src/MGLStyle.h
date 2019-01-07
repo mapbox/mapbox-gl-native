@@ -275,7 +275,7 @@ MGL_EXPORT
  
  The default value of this property is `YES`.
  */
-@property (nonatomic, assign) BOOL enablePlacementTransitions;
+@property (nonatomic, assign) BOOL performsPlacementTransitions;
 
 /**
  Returns a source with the given identifier in the current style.
