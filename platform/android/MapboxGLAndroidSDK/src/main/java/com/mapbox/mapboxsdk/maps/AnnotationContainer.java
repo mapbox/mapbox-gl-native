@@ -14,11 +14,11 @@ import java.util.List;
  */
 class AnnotationContainer implements Annotations {
 
-  private final NativeMapView nativeMapView;
+  private final NativeMap nativeMap;
   private final LongSparseArray<Annotation> annotations;
 
-  AnnotationContainer(NativeMapView nativeMapView, LongSparseArray<Annotation> annotations) {
-    this.nativeMapView = nativeMapView;
+  AnnotationContainer(NativeMap nativeMap, LongSparseArray<Annotation> annotations) {
+    this.nativeMap = nativeMap;
     this.annotations = annotations;
   }
 
@@ -39,8 +39,8 @@ class AnnotationContainer implements Annotations {
 
   @Override
   public void removeBy(long id) {
-    if (nativeMapView != null) {
-      nativeMapView.removeAnnotation(id);
+    if (nativeMap != null) {
+      nativeMap.removeAnnotation(id);
     }
     annotations.remove(id);
   }
@@ -80,8 +80,8 @@ class AnnotationContainer implements Annotations {
   }
 
   private void removeNativeAnnotations(long[] ids) {
-    if (nativeMapView != null) {
-      nativeMapView.removeAnnotations(ids);
+    if (nativeMap != null) {
+      nativeMap.removeAnnotations(ids);
     }
   }
 }
