@@ -16,6 +16,9 @@
 #import "MGLStyle.h"
 #import "MGLAttributionInfo_Private.h"
 #import "MGLRendererConfiguration.h"
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#import "MGLMapboxEvents.h"
+#endif
 
 #if TARGET_OS_IPHONE
 #import "UIImage+MGLAdditions.h"
@@ -30,7 +33,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 @implementation MGLMapSnapshotOptions
 
-- (instancetype _Nonnull)initWithStyleURL:(nullable NSURL *)styleURL camera:(MGLMapCamera *)camera size:(CGSize) size
+- (instancetype _Nonnull)initWithStyleURL:(nullable NSURL *)styleURL camera:(MGLMapCamera *)camera size:(CGSize)size
 {
     self = [super init];
     if (self) {
@@ -138,6 +141,9 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     self = [super init];
     if (self) {
         [self setOptions:options];
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+        [MGLMapboxEvents pushTurnstileEvent];
+#endif
     }
     return self;
 }
