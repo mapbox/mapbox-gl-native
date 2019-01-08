@@ -1,11 +1,10 @@
 package com.mapbox.mapboxsdk.offline;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.Keep;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -24,7 +23,7 @@ import com.mapbox.turf.TurfMeasurement;
  * <p>
  * if includeIdeographs is false, offline region will not include CJK glyphs
  */
-public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition, Parcelable {
+public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition {
 
   @Keep
   private String styleURL;
@@ -104,6 +103,7 @@ public class OfflineGeometryRegionDefinition implements OfflineRegionDefinition,
   /**
    * Calculates the bounding box for the Geometry it contains
    * to retain backwards compatibility
+   *
    * @return the {@link LatLngBounds} or null
    */
   @Nullable

@@ -3,8 +3,8 @@ package com.mapbox.mapboxsdk.offline;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Keep;
-
 import android.support.annotation.NonNull;
+
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 
@@ -21,7 +21,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
  * <p>
  * if includeIdeographs is false, offline region will not include CJK glyphs
  */
-public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefinition, Parcelable {
+public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefinition {
 
   @Keep
   private String styleURL;
