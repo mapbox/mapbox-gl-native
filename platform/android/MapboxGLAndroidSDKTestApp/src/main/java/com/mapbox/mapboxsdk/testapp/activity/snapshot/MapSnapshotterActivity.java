@@ -68,7 +68,8 @@ public class MapSnapshotterActivity extends AppCompatActivity {
       .withPixelRatio(1)
 
       // Optionally the style
-      .withStyle((column + row) % 2 == 0 ? Style.MAPBOX_STREETS : Style.DARK);
+      .withStyle((column + row) % 2 == 0 ? Style.MAPBOX_STREETS : Style.DARK)
+        .withLocalIdeographFontFamily("sans-serif");
 
     // Optionally the visible region
     if (row % 2 == 0) {
