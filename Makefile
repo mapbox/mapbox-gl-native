@@ -555,8 +555,11 @@ run-android-core-test-$1-%: android-core-test-$1
 	adb push mapbox-gl-js/src/style-spec/reference/v8.json $(MBGL_ANDROID_LOCAL_WORK_DIR)/mapbox-gl-js/src/style-spec/reference > /dev/null 2>&1
 	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/$(buildtype)/obj/$2/mbgl-test $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
 
+# Create gtest filter for skipped tests.
+	$(eval SKIPPED_TESTS := -$(shell sed -n '/#\|^$$/!p' platform/android/tests/skipped.txt | sed ':a;$!N;s/\n/:/g;ta'))
+
 	# Kick off the tests
-	adb shell "export LD_LIBRARY_PATH=$(MBGL_ANDROID_LOCAL_WORK_DIR) && cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && chmod +x mbgl-test && ./mbgl-test --class_path=$(MBGL_ANDROID_LOCAL_WORK_DIR)/classes.dex --gtest_filter=$$*"
+	adb shell "export LD_LIBRARY_PATH=$(MBGL_ANDROID_LOCAL_WORK_DIR) && cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && chmod +x mbgl-test && ./mbgl-test --class_path=$(MBGL_ANDROID_LOCAL_WORK_DIR)/classes.dex --gtest_filter=$$*:$(SKIPPED_TESTS)"
 
 	# Gather the results and unpack them
 	adb shell "cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && tar -cvzf results.tgz test/fixtures/*  > /dev/null 2>&1"
