@@ -1415,14 +1415,16 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Selects an annotation and displays its callout view.
 
- The `animated` parameter determines whether the map is panned to bring the
- annotation on-screen, specifically:
-
+ The `animated` parameter determines whether the selection is animated including whether the map is
+ panned to bring the annotation into view, specifically:
+ 
  | `animated` parameter | Effect |
  |------------------|--------|
- | `NO`             | The annotation is selected, and the callout is presented. However the map is not panned to bring the annotation or callout onscreen. The presentation of the callout is animated. |
- | `YES`            | The annotation is selected, and the callout is presented. If the annotation is offscreen *and* is of type `MGLPointAnnotation`, the map is panned so that the annotation and its callout are brought just onscreen. The annotation is *not* centered within the viewport. |
+ | `NO`             | The annotation is selected, and the callout is presented. However the map is not panned to bring the annotation or callout into view. The presentation of the callout is NOT animated. |
+ | `YES`            | The annotation is selected, and the callout is presented. If the annotation is not visible (or is partially visible) *and* is of type `MGLPointAnnotation`, the map is panned so that the annotation and its callout are brought into view. The annotation is *not* centered within the viewport. |
 
+ Note that a selection initiated by a single tap gesture is always animated.
+ 
  @param annotation The annotation object to select.
  @param animated If `YES`, the annotation and callout view are animated on-screen.
 
@@ -1430,6 +1432,17 @@ MGL_EXPORT IB_DESIGNABLE
  change the camera.
  */
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
+
+/**
+ :nodoc:
+ Selects an annotation and displays its callout view. This method should be
+ considered "alpha" and as such is liable to change.
+ 
+ @param annotation The annotation object to select.
+ @param moveIntoView If the annotation is not visible (or is partially visible) *and* is of type `MGLPointAnnotation`, the map is panned so that the annotation and its callout are brought into view. The annotation is *not* centered within the viewport. |
+ @param animateSelection If `YES`, the annotation's selection state and callout view's presentation are animated.
+ */
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation moveIntoView:(BOOL)moveIntoView animateSelection:(BOOL)animateSelection;
 
 /**
  Deselects an annotation and hides its callout view.

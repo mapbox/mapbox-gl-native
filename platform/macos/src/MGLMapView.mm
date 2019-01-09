@@ -2279,7 +2279,7 @@ public:
     [self selectAnnotation:firstAnnotation];
 }
 
-- (BOOL)isBringingAnnotationOnscreenSupportedForAnnotation:(id<MGLAnnotation>)annotation animated:(BOOL)animated {
+- (BOOL)isMovingAnnotationIntoViewSupportedForAnnotation:(id<MGLAnnotation>)annotation animated:(BOOL)animated {
     // Consider delegating
     return animated && [annotation isKindOfClass:[MGLPointAnnotation class]];
 }
@@ -2293,12 +2293,12 @@ public:
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint
 {
     MGLLogDebug(@"Selecting annotation: %@ atPoint: %@", annotation, NSStringFromPoint(gesturePoint));
-    [self selectAnnotation:annotation atPoint:gesturePoint moveOnscreen:YES animateSelection:YES];
+    [self selectAnnotation:annotation atPoint:gesturePoint moveIntoView:YES animateSelection:YES];
 }
 
-- (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint moveOnscreen:(BOOL)moveOnscreen animateSelection:(BOOL)animateSelection
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint moveIntoView:(BOOL)moveIntoView animateSelection:(BOOL)animateSelection
 {
-    MGLLogDebug(@"Selecting annotation: %@ atPoint: %@ moveOnscreen: %@ animateSelection: %@", annotation, NSStringFromPoint(gesturePoint), MGLStringFromBOOL(moveOnscreen), MGLStringFromBOOL(animateSelection));
+    MGLLogDebug(@"Selecting annotation: %@ atPoint: %@ moveIntoView: %@ animateSelection: %@", annotation, NSStringFromPoint(gesturePoint), MGLStringFromBOOL(moveIntoView), MGLStringFromBOOL(animateSelection));
     id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
     if (annotation == selectedAnnotation) {
         return;
@@ -2313,8 +2313,8 @@ public:
         [self addAnnotation:annotation];
     }
 
-    if (moveOnscreen) {
-        moveOnscreen = [self isBringingAnnotationOnscreenSupportedForAnnotation:annotation animated:animateSelection];
+    if (moveIntoView) {
+        moveIntoView = [self isMovingAnnotationIntoViewSupportedForAnnotation:annotation animated:animateSelection];
     }
 
     // The annotation's anchor will bounce to the current click.
@@ -2326,7 +2326,7 @@ public:
         positioningRect.origin = [self convertCoordinate:origin toPointToView:self];
     }
 
-    if (!moveOnscreen && NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
+    if (!moveIntoView && NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
         if (!NSEqualPoints(gesturePoint, NSZeroPoint)) {
             positioningRect = CGRectMake(gesturePoint.x, gesturePoint.y, positioningRect.size.width, positioningRect.size.height);
         }
@@ -2359,9 +2359,9 @@ public:
         [callout showRelativeToRect:positioningRect ofView:self preferredEdge:edge];
     }
 
-    if (moveOnscreen)
+    if (moveIntoView)
     {
-        moveOnscreen = NO;
+        moveIntoView = NO;
 
         NSRect (^edgeInsetsInsetRect)(NSRect, NSEdgeInsets) = ^(NSRect rect, NSEdgeInsets insets) {
             return NSMakeRect(rect.origin.x + insets.left,
@@ -2381,26 +2381,26 @@ public:
         if (CGRectGetMinX(positioningRect) < CGRectGetMinX(bounds))
         {
             constrainedRect.origin.x = expandedPositioningRect.origin.x;
-            moveOnscreen = YES;
+            moveIntoView = YES;
         }
         else if (CGRectGetMaxX(positioningRect) > CGRectGetMaxX(bounds))
         {
             constrainedRect.origin.x = CGRectGetMaxX(expandedPositioningRect) - constrainedRect.size.width;
-            moveOnscreen = YES;
+            moveIntoView = YES;
         }
 
         if (CGRectGetMinY(positioningRect) < CGRectGetMinY(bounds))
         {
             constrainedRect.origin.y = expandedPositioningRect.origin.y;
-            moveOnscreen = YES;
+            moveIntoView = YES;
         }
         else if (CGRectGetMaxY(positioningRect) > CGRectGetMaxY(bounds))
         {
             constrainedRect.origin.y = CGRectGetMaxY(expandedPositioningRect) - constrainedRect.size.height;
-            moveOnscreen = YES;
+            moveIntoView = YES;
         }
 
-        if (moveOnscreen)
+        if (moveIntoView)
         {
             CGPoint center = CGPointMake(CGRectGetMidX(constrainedRect), CGRectGetMidY(constrainedRect));
             CLLocationCoordinate2D centerCoord = [self convertPoint:center toCoordinateFromView:self];
