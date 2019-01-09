@@ -2279,7 +2279,7 @@ public:
     [self selectAnnotation:firstAnnotation];
 }
 
-- (BOOL)ismovingAnnotationIntoViewSupportedForAnnotation:(id<MGLAnnotation>)annotation animated:(BOOL)animated {
+- (BOOL)isMovingAnnotationIntoViewSupportedForAnnotation:(id<MGLAnnotation>)annotation animated:(BOOL)animated {
     // Consider delegating
     return animated && [annotation isKindOfClass:[MGLPointAnnotation class]];
 }
@@ -2314,7 +2314,7 @@ public:
     }
 
     if (moveIntoView) {
-        moveIntoView = [self ismovingAnnotationIntoViewSupportedForAnnotation:annotation animated:animateSelection];
+        moveIntoView = [self isMovingAnnotationIntoViewSupportedForAnnotation:annotation animated:animateSelection];
     }
 
     // The annotation's anchor will bounce to the current click.
