@@ -7,6 +7,14 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added an `MGLStyle.performsPlacementTransitions` property to control how long it takes for colliding labels to fade out. ([#13565](https://github.com/mapbox/mapbox-gl-native/pull/13565))
 * Fixed a crash when casting large numbers in `NSExpression`. ([#13580](https://github.com/mapbox/mapbox-gl-native/pull/13580))
 * Fixed a bug where the `animated` parameter to `-[MGLMapView selectAnnotation:animated:]` was being ignored. ([#13689](https://github.com/mapbox/mapbox-gl-native/pull/13689))
+* Reinstates version 11 as the default Mapbox Streets style (as introduced in 4.7.0). ([#13690](https://github.com/mapbox/mapbox-gl-native/pull/13690))
+
+## 4.7.1 - December 21, 2018
+
+### Styles and rendering
+
+* Reverts the ability for `MGLMapView`, `MGLShapeOfflineRegion`, and `MGLTilePyramidOfflineRegion` to use version 11 of the Mapbox Streets style. ([#13650](https://github.com/mapbox/mapbox-gl-native/pull/13650))
+* Reverts the ability for convenience methods on `MGLStyle` such as `MGLStyle.lightStyleURL`, to use version 11 of the Mapbox Streets style. ([#13650](https://github.com/mapbox/mapbox-gl-native/pull/13650))
 
 ## 4.7.0 - December 18, 2018
 
