@@ -1435,7 +1435,8 @@ MGL_EXPORT IB_DESIGNABLE
 
 /**
  :nodoc:
- Selects an annotation and displays its callout view.
+ Selects an annotation and displays its callout view. This method should be
+ considered "alpha" and as such is liable to change.
  
  @param annotation The annotation object to select.
  @param moveIntoView If the annotation is not visible (or is partially visible) *and* is of type `MGLPointAnnotation`, the map is panned so that the annotation and its callout are brought into view. The annotation is *not* centered within the viewport. |
