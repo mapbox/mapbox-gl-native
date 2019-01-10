@@ -8,12 +8,11 @@ import android.os.Looper;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
+import android.support.annotation.RestrictTo;
 import com.mapbox.mapboxsdk.LibraryLoader;
-import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
@@ -135,24 +134,17 @@ public class OfflineManager {
     deleteAmbientDatabase(this.context);
   }
 
+  /**
+   * Clears the current instance of the offline manager.
+   */
+  @RestrictTo(RestrictTo.Scope.LIBRARY)
+  public static void clear() {
+    instance = null;
+  }
+
   private void deleteAmbientDatabase(final Context context) {
-    // Delete the file in a separate thread to avoid affecting the UI
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          String path = FileSource.getInternalCachePath(context) + File.separator + "mbgl-cache.db";
-          File file = new File(path);
-          if (file.exists()) {
-            file.delete();
-            Logger.d(TAG, String.format("Old ambient cache database deleted to save space: %s", path));
-          }
-        } catch (Exception exception) {
-          Logger.e(TAG, "Failed to delete old ambient cache database: ", exception);
-          MapStrictMode.strictModeViolation(exception);
-        }
-      }
-    }).start();
+    final String path = FileSource.getInternalCachePath(context) + File.separator + "mbgl-cache.db";
+    FileUtils.deleteFile(path);
   }
 
   /**

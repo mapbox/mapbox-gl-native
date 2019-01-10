@@ -27,6 +27,7 @@
     <string name="activity_offline">Offline Map</string>
     <string name="activity_update_metadata">Update metadata Map</string>
     <string name="activity_offline_region_delete">Delete region</string>
+    <string name="activity_change_resources_cache_path">Change resources cache path</string>
     <string name="activity_minmax_zoom">Min/Max Zoom</string>
     <string name="activity_viewpager">ViewPager</string>
     <string name="activity_runtime_style">Runtime Style</string>
