@@ -1222,7 +1222,7 @@ public:
             self.mbglMap.setConstrainMode(mbgl::ConstrainMode::HeightOnly);
         }
 
-        _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateFromDisplayLink)];
+        _displayLink = [self.window.screen displayLinkWithTarget:self selector:@selector(updateFromDisplayLink)];
         [self updateDisplayLinkPreferredFramesPerSecond];
         [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
         _needsDisplayRefresh = YES;
@@ -1301,6 +1301,16 @@ public:
 
 - (void)sleepGL:(__unused NSNotification *)notification
 {
+    // If this view targets an external display, such as AirPlay or CarPlay, we
+    // can safely continue to render OpenGL content without tripping
+    // gpus_ReturnNotPermittedKillClient in libGPUSupportMercury, because the
+    // external connection keeps the application from truly receding to the
+    // background.
+    if (self.window.screen != [UIScreen mainScreen])
+    {
+        return;
+    }
+    
     MGLLogInfo(@"Entering background.");
     MGLAssertIsMainThread();
     
