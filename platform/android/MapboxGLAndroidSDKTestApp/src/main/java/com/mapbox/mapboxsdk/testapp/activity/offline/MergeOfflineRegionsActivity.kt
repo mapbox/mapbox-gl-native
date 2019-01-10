@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.activity_merge_offline_regions.*
 class MergeOfflineRegionsActivity : AppCompatActivity() {
   companion object {
     private const val LOG_TAG = "Mbgl-MergeOfflineRegionsActivity"
-    private const val TEST_DB_FILE_NAME = "offline.db"
+    private const val TEST_DB_FILE_NAME = "offline_test.db"
     private const val TEST_STYLE = Style.SATELLITE
   }
 
