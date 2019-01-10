@@ -5,13 +5,13 @@
 	<key>BuildLocationStyle</key>
 	<string>CustomLocation</string>
 	<key>CustomBuildIntermediatesPath</key>
-	<string>../../build/ios</string>
+	<string>../../build/ios/Build/Intermediates</string>
 	<key>CustomBuildLocationType</key>
 	<string>RelativeToWorkspace</string>
 	<key>CustomBuildProductsPath</key>
-	<string>../../build/ios</string>
+	<string>../../build/ios/Build/Products</string>
 	<key>DerivedDataCustomLocation</key>
-	<string>../../build/ios</string>
+	<string>../../build/ios/DerivedData</string>
 	<key>DerivedDataLocationStyle</key>
 	<string>WorkspaceRelativePath</string>
 	<key>IssueFilterStyle</key>

@@ -196,13 +196,14 @@ endif
 ifeq ($(HOST_PLATFORM), macos)
 
 IOS_OUTPUT_PATH = build/ios
+IOS_DERIVED_DATA = $(IOS_OUTPUT_PATH)/Build
 IOS_PROJ_PATH = $(IOS_OUTPUT_PATH)/mbgl.xcodeproj
 IOS_WORK_PATH = platform/ios/ios.xcworkspace
 IOS_USER_DATA_PATH = $(IOS_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
 
 IOS_XCODEBUILD_SIM = xcodebuild \
 	  ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
-	  -derivedDataPath $(IOS_OUTPUT_PATH) \
+	  -derivedDataPath $(IOS_DERIVED_DATA) \
 	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
 	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
 	  -workspace $(IOS_WORK_PATH)
