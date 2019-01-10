@@ -21,7 +21,7 @@ import java.io.IOException
 class OfflineManagerTest : EspressoTest() {
 
   companion object {
-    private const val TEST_DB_FILE_NAME = "offline.db"
+    private const val TEST_DB_FILE_NAME = "offline_test.db"
   }
 
   private val context: Context by lazy { rule.activity }
