@@ -125,6 +125,7 @@
         "geojson/geometry_collection.hpp": "platform/android/src/geojson/geometry_collection.hpp",
         "geojson/line_string.hpp": "platform/android/src/geojson/line_string.hpp",
         "geojson/multi_line_string.hpp": "platform/android/src/geojson/multi_line_string.hpp",
+        "geojson/multi_point.hpp": "platform/android/src/geojson/multi_point.hpp",
         "geojson/multi_polygon.hpp": "platform/android/src/geojson/multi_polygon.hpp",
         "geojson/point.hpp": "platform/android/src/geojson/point.hpp",
         "geojson/polygon.hpp": "platform/android/src/geojson/polygon.hpp",
