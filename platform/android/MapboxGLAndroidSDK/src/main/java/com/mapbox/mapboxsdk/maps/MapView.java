@@ -430,6 +430,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   public void setMaximumFps(int maximumFps) {
     if (mapRenderer != null) {
       mapRenderer.setMaximumFps(maximumFps);
+    } else {
+      throw new IllegalStateException("Calling MapView#setMaximumFps before mapRenderer is created.");
     }
   }
 
