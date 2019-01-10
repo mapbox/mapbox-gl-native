@@ -792,7 +792,7 @@ public class Style {
   /**
    * Traffic Day: Color-coded roads based on live traffic congestion data. Traffic data is currently
    * available in
-   * <a href="https://www.mapbox.com/api-documentation/pages/traffic-countries.html">these select
+   * <a href="https://www.mapbox.com/help/how-directions-work/#traffic-data">these select
    * countries</a>. Using this constant means your map style will always use the latest version and
    * may change as we improve the style.
    */
@@ -801,7 +801,7 @@ public class Style {
   /**
    * Traffic Night: Color-coded roads based on live traffic congestion data, designed to maximize
    * legibility in low-light situations. Traffic data is currently available in
-   * <a href="https://www.mapbox.com/api-documentation/pages/traffic-countries.html">these select
+   * <a href="https://www.mapbox.com/help/how-directions-work/#traffic-data">these select
    * countries</a>. Using this constant means your map style will always use the latest version and
    * may change as we improve the style.
    */
