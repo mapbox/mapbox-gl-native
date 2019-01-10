@@ -3,10 +3,14 @@ package com.mapbox.mapboxsdk.utils;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
+import com.mapbox.mapboxsdk.log.Logger;
+
 import java.io.File;
 import java.lang.ref.WeakReference;
 
 public class FileUtils {
+
+  private static final String TAG = "Mbgl-FileUtils";
 
   /**
    * Task checking whether app's process can read a file.
@@ -120,5 +124,31 @@ public class FileUtils {
      * Invoked when app's process doesn't have a permission to write to a file or an error occurs.
      */
     void onError();
+  }
+
+  /**
+   * Deletes a file asynchronously in a separate thread.
+   *
+   * @param path the path of the file that should be deleted
+   */
+  public static void deleteFile(@NonNull final String path) {
+    // Delete the file in a separate thread to avoid affecting the UI
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          File file = new File(path);
+          if (file.exists()) {
+            if (file.delete()) {
+              Logger.d(TAG, "File deleted to save space: " + path);
+            } else {
+              Logger.e(TAG, "Failed to delete file: " + path);
+            }
+          }
+        } catch (Exception exception) {
+          Logger.e(TAG, "Failed to delete file: ", exception);
+        }
+      }
+    }).start();
   }
 }
