@@ -23,16 +23,56 @@ namespace mbgl {
 namespace android {
 
 LayerManagerAndroid::LayerManagerAndroid() {
+#if defined(MBGL_LAYER_FILL_DISABLE_RUNTIME)
+    addLayerTypeCoreOnly(std::make_unique<FillJavaLayerPeerFactory>());
+#elif !defined(MBGL_LAYER_FILL_DISABLE_ALL)
     addLayerType(std::make_unique<FillJavaLayerPeerFactory>());
+#endif
+#if defined(MBGL_LAYER_LINE_DISABLE_RUNTIME)
+    addLayerTypeCoreOnly(std::make_unique<LineJavaLayerPeerFactory>());
+#elif !defined(MBGL_LAYER_LINE_DISABLE_ALL)
     addLayerType(std::make_unique<LineJavaLayerPeerFactory>());
+#endif
+#if defined(MBGL_LAYER_CIRCLE_DISABLE_RUNTIME)
+    addLayerTypeCoreOnly(std::make_unique<CircleJavaLayerPeerFactory>());
+#elif !defined(MBGL_LAYER_CIRCLE_DISABLE_ALL)
     addLayerType(std::make_unique<CircleJavaLayerPeerFactory>());
+#endif
+#if defined(MBGL_LAYER_SYMBOL_DISABLE_RUNTIME)
+    addLayerTypeCoreOnly(std::make_unique<SymbolJavaLayerPeerFactory>());
+#elif !defined(MBGL_LAYER_SYMBOL_DISABLE_ALL)
     addLayerType(std::make_unique<SymbolJavaLayerPeerFactory>());
+#endif
+#if defined(MBGL_LAYER_RASTER_DISABLE_RUNTIME)
+    addLayerTypeCoreOnly(std::make_unique<RasterJavaLayerPeerFactory>());
+#elif !defined(MBGL_LAYER_RASTER_DISABLE_ALL)
     addLayerType(std::make_unique<RasterJavaLayerPeerFactory>());
+#endif
+#if defined(MBGL_LAYER_BACKGROUND_DISABLE_RUNTIME)
+    addLayerTypeCoreOnly(std::make_unique<BackgroundJavaLayerPeerFactory>());
+#elif !defined(MBGL_LAYER_BACKGROUND_DISABLE_ALL)
     addLayerType(std::make_unique<BackgroundJavaLayerPeerFactory>());
+#endif
+#if defined(MBGL_LAYER_HILLSHADE_DISABLE_RUNTIME)
+    addLayerTypeCoreOnly(std::make_unique<HillshadeJavaLayerPeerFactory>());
+#elif !defined(MBGL_LAYER_HILLSHADE_DISABLE_ALL)
     addLayerType(std::make_unique<HillshadeJavaLayerPeerFactory>());
+#endif
+#if defined(MBGL_LAYER_FILL_EXTRUSION_DISABLE_RUNTIME)
+    addLayerTypeCoreOnly(std::make_unique<FillExtrusionJavaLayerPeerFactory>());
+#elif !defined(MBGL_LAYER_FILL_EXTRUSION_DISABLE_ALL)
     addLayerType(std::make_unique<FillExtrusionJavaLayerPeerFactory>());
+#endif
+#if defined(MBGL_LAYER_HEATMAP_DISABLE_RUNTIME)
+    addLayerTypeCoreOnly(std::make_unique<HeatmapJavaLayerPeerFactory>());
+#elif !defined(MBGL_LAYER_HEATMAP_DISABLE_ALL)
     addLayerType(std::make_unique<HeatmapJavaLayerPeerFactory>());
+#endif
+#if defined(MBGL_LAYER_CUSTOM_DISABLE_RUNTIME)
+    addLayerTypeCoreOnly(std::make_unique<CustomJavaLayerPeerFactory>());
+#elif !defined(MBGL_LAYER_CUSTOM_DISABLE_ALL)
     addLayerType(std::make_unique<CustomJavaLayerPeerFactory>());
+#endif
 }
 
 LayerManagerAndroid::~LayerManagerAndroid() = default;
@@ -111,7 +151,7 @@ LayerFactory* LayerManagerAndroid::getFactory(const mbgl::style::LayerTypeInfo* 
     return nullptr;
 }
 
-// static 
+// static
 LayerManagerAndroid* LayerManagerAndroid::get() noexcept {
     static LayerManagerAndroid impl;
     return &impl;
@@ -123,6 +163,10 @@ LayerManager* LayerManager::get() noexcept {
     return android::LayerManagerAndroid::get();
 }
 
+#if defined(MBGL_LAYER_LINE_DISABLE_ALL) || defined(MBGL_LAYER_SYMBOL_DISABLE_ALL) || defined(MBGL_LAYER_FILL_DISABLE_ALL)
+const bool LayerManager::annotationsEnabled = false;
+#else
 const bool LayerManager::annotationsEnabled = true;
+#endif
 
 } // namespace mbgl
