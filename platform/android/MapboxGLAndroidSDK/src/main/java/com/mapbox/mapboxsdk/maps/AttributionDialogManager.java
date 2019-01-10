@@ -37,7 +37,7 @@ import java.util.Set;
  */
 public class AttributionDialogManager implements View.OnClickListener, DialogInterface.OnClickListener {
 
-  private static final String MAP_FEEDBACK_URL = "https://www.mapbox.com/feedback";
+  private static final String MAP_FEEDBACK_URL = "https://apps.mapbox.com/feedback";
   private static final String MAP_FEEDBACK_LOCATION_FORMAT = MAP_FEEDBACK_URL + "/#/%f/%f/%d";
 
   @NonNull

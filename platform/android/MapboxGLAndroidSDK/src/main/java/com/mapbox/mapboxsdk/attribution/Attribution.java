@@ -18,6 +18,7 @@ public class Attribution {
     // Using a List makes URL backwards compatible
     IMPROVE_MAP_URLS.add("https://www.mapbox.com/feedback/");
     IMPROVE_MAP_URLS.add("https://www.mapbox.com/map-feedback/");
+    IMPROVE_MAP_URLS.add("https://apps.mapbox.com/feedback/");
   }
 
   private String title;
