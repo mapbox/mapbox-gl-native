@@ -29,6 +29,8 @@ public:
 
 private:
     LayerManagerAndroid();
+
+    void initialize();
     /**
      * @brief Enables a layer type for both JSON style and runtime API.
      */
