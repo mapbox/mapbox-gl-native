@@ -4,6 +4,20 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 7.0.1 - January 11, 2019
+ - Experimental setMaximumFps configuration on MapView [#13498](https://github.com/mapbox/mapbox-gl-native/pull/13498)
+
+## 7.1.0-alpha.1 - January 9, 2019
+ - Add a Buck build and BUCK file for Android [#13584](https://github.com/mapbox/mapbox-gl-native/pull/13584)
+ - Instrumented unit tests, add map tests, refactor generated layer tests [#13443](https://github.com/mapbox/mapbox-gl-native/pull/13443)
+ - Add setMaximumFps configuration on MapView [#13498](https://github.com/mapbox/mapbox-gl-native/pull/13498)
+ - Fix deduping rings in quering [#11984](https://github.com/mapbox/mapbox-gl-native/pull/11984)
+ - Updated script detection for Unicode 11 [#13651](https://github.com/mapbox/mapbox-gl-native/pull/13651)
+ - Drop layer type and remaining usages [#13624](https://github.com/mapbox/mapbox-gl-native/pull/13624)
+ - Save debug cache state vs map state [#13638](https://github.com/mapbox/mapbox-gl-native/pull/13638)
+ - Add "localIdeographs" option to OfflineRegionDefinition [#13607](https://github.com/mapbox/mapbox-gl-native/pull/13607)
+ - Remove timber in favor of logger [#13625](https://github.com/mapbox/mapbox-gl-native/pull/13625)
+
 ## 7.0.0 - January 7, 2019
 - Update core styles based on the streets-v8 source. This results in breaking changes for any code that references internal layers and sources of the style [#13615](https://github.com/mapbox/mapbox-gl-native/pull/13615)
 - Cancel camera transitions only when set CameraMode is not None [#13662](https://github.com/mapbox/mapbox-gl-native/pull/13662)
