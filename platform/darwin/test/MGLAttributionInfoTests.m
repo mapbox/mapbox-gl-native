@@ -14,7 +14,7 @@
         @"<a href=\"https://www.mapbox.com/about/maps/\" target=\"_blank\">&copy; Mapbox</a> "
         @"<a href=\"http://www.openstreetmap.org/about/\" target=\"_blank\">©️ OpenStreetMap</a> "
         @"CC&nbsp;BY-SA "
-        @"<a class=\"mapbox-improve-map\" href=\"https://www.mapbox.com/map-feedback/\" target=\"_blank\">Improve this map</a>",
+        @"<a class=\"mapbox-improve-map\" href=\"https://apps.mapbox.com/feedback/\" target=\"_blank\">Improve this map</a>",
     };
 
     NSMutableArray<MGLAttributionInfo *> *infos = [NSMutableArray array];
@@ -44,7 +44,7 @@
     XCTAssertNil([infos[2] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14]);
 
     XCTAssertEqualObjects(infos[3].title.string, @"Improve this map");
-    XCTAssertEqualObjects(infos[3].URL, [NSURL URLWithString:@"https://www.mapbox.com/map-feedback/"]);
+    XCTAssertEqualObjects(infos[3].URL, [NSURL URLWithString:@"https://apps.mapbox.com/feedback/"]);
     XCTAssertTrue(infos[3].feedbackLink);
     NSURL *styleURL = [MGLStyle satelliteStreetsStyleURLWithVersion:99];
     XCTAssertEqualObjects([infos[3] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14],
