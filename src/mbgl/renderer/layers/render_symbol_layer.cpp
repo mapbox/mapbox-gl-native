@@ -102,7 +102,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         }
         SymbolBucket& bucket = *bucket_;
         assert(bucket.paintProperties.find(getID()) != bucket.paintProperties.end());
-        const auto& evaluated_ = bucket.paintProperties.at(getID());
+        const auto& bucketPaintProperties = bucket.paintProperties.at(getID());
+        const auto& evaluated_ = bucketPaintProperties.evaluated;
         const auto& layout = bucket.layout;
 
         auto draw = [&] (auto& program,
@@ -187,7 +188,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          bucket.icon,
                          bucket.iconSizeBinder,
                          values,
-                         bucket.paintPropertyBinders.at(getID()).first,
+                         bucketPaintProperties.iconBinders,
                          paintPropertyValues);
                 }
 
@@ -197,7 +198,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          bucket.icon,
                          bucket.iconSizeBinder,
                          values,
-                         bucket.paintPropertyBinders.at(getID()).first,
+                         bucketPaintProperties.iconBinders,
                          paintPropertyValues);
                 }
             } else {
@@ -206,7 +207,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                      bucket.icon,
                      bucket.iconSizeBinder,
                      values,
-                     bucket.paintPropertyBinders.at(getID()).first,
+                     bucketPaintProperties.iconBinders,
                      paintPropertyValues);
             }
         }
@@ -240,7 +241,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                      bucket.text,
                      bucket.textSizeBinder,
                      values,
-                     bucket.paintPropertyBinders.at(getID()).second,
+                     bucketPaintProperties.textBinders,
                      paintPropertyValues);
             }
 
@@ -250,7 +251,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                      bucket.text,
                      bucket.textSizeBinder,
                      values,
-                     bucket.paintPropertyBinders.at(getID()).second,
+                     bucketPaintProperties.textBinders,
                      paintPropertyValues);
             }
         }
@@ -405,7 +406,8 @@ void RenderSymbolLayer::sortRenderTiles(const TransformState& state) {
 }
 
 void RenderSymbolLayer::updateBucketPaintProperties(Bucket* bucket) const {
-    static_cast<SymbolBucket*>(bucket)->paintProperties[getID()] = evaluated;
+    assert(bucket->supportsLayer(*baseImpl));
+    static_cast<SymbolBucket*>(bucket)->paintProperties.at(getID()).evaluated = evaluated;
 }
 
 } // namespace mbgl
