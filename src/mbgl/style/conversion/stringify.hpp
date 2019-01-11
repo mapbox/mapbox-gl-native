@@ -160,7 +160,7 @@ void stringify(Writer& writer, const PropertyValue<T>& v) {
 template <class Property, class Writer, class T>
 void stringify(Writer& writer, const PropertyValue<T>& value) {
     if (!value.isUndefined()) {
-        writer.Key(Property::key);
+        writer.Key(Property::name());
         stringify(writer, value);
     }
 }
