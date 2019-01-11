@@ -40,7 +40,7 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
 
   private static final String LAYER_ID = "symbolLayer";
   private static final String SOURCE_ID = "poiSource";
-  private static final String BUS_MAKI_ICON_ID = "bus-11";
+  private static final String BUS_MAKI_ICON_ID = "bus";
   private static final String CAFE_MAKI_ICON_ID = "cafe-11";
   private static final String KEY_PROPERTY_SELECTED = "selected";
   private static final float ZOOM_STOP_MAX_VALUE = 12.0f;
