@@ -380,7 +380,9 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    */
   @UiThread
   public void onStop() {
-    attributionClickListener.onStop();
+    if (attributionClickListener != null) {
+      attributionClickListener.onStop();
+    }
 
     if (mapboxMap != null) {
       // map was destroyed before it was started
