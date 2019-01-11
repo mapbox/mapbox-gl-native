@@ -125,17 +125,18 @@ find platform/{darwin,ios}/resources platform/macos/sdk -path '*/MYLANG.lproj/*.
 
 To add an example code listing to the documentation for a class or class member:
 
-1. Add a test method named in the form `testMGLClass` or `testMGLClass$method`
-   to [MGLDocumentationExampleTests](test/MGLDocumentationExampleTests.swift).
-   Wrap the code you’d like to appear in the documentation within
-   `//#-example-code` and `//#-end-example-code` comments.
-1. If the header doesn’t already have an example code listing, add the path to
-   the header to platform/darwin/scripts/update-examples.list.
-1. Insert the code listings into the headers:
-
-```bash
-make darwin-update-examples
-```
+ 1. Add a test case named in the form testMGLClass or testMGLClass$method to [MGLDocumentationExamplesTests](test/MGLDocumentationExampleTests.swift).
+ 2. Wrap the code you'd like to appear in the documentation within the
+    following comment blocks:
+    ```
+    //#-example-code
+    ...
+    //#-end-example-code
+    ```
+ 3. Insert an empty Swift code block inside the header file where you'd like the
+    example code to be inserted.
+ 4. Run `make darwin-update-examples` to extract example code from the test
+    method below and insert it into the header.
 
 [SourceKitten](https://github.com/jpsim/SourceKitten/) is required and will be installed automatically using Homebrew.
 
