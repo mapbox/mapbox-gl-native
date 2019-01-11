@@ -40,7 +40,7 @@ public:
 class SymbolBucket final : public Bucket {
 public:
     SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated,
-                 std::map<std::string, style::SymbolPaintProperties::PossiblyEvaluated>,
+                 const std::map<std::string, style::SymbolPaintProperties::PossiblyEvaluated>&,
                  const style::PropertyValue<float>& textSize,
                  const style::PropertyValue<float>& iconSize,
                  float zoom,
@@ -78,11 +78,12 @@ public:
 
     std::vector<SymbolInstance> symbolInstances;
 
-    std::map<std::string, style::SymbolPaintProperties::PossiblyEvaluated> paintProperties;
-
-    std::map<std::string, std::pair<
-        SymbolIconProgram::PaintPropertyBinders,
-        SymbolSDFTextProgram::PaintPropertyBinders>> paintPropertyBinders;
+    struct PaintProperties {
+        style::SymbolPaintProperties::PossiblyEvaluated evaluated;
+        SymbolIconProgram::PaintPropertyBinders iconBinders;
+        SymbolSDFTextProgram::PaintPropertyBinders textBinders;
+    };
+    std::map<std::string, PaintProperties> paintProperties;
 
     std::unique_ptr<SymbolSizeBinder> textSizeBinder;
 
