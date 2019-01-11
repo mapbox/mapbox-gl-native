@@ -1,5 +1,7 @@
-include ':MapboxGLAndroidSDK', ':MapboxGLAndroidSDKTestApp', ':MapboxGLAndroidSDKLint', ':MapboxAndroidGestures', ':services-core', ':services-geojson', ':services-turf'
+include ':MapboxGLAndroidSDK', ':MapboxGLAndroidSDKTestApp', ':MapboxGLAndroidSDKLint', ':MapboxAndroidGestures', ':services-core', ':services-geojson', ':services-turf', ':libtelemetry', ':libcore'
 project(':MapboxAndroidGestures').projectDir = new File('vendor/mapbox-gestures-android/library')
 project(':services-core').projectDir = new File('vendor/mapbox-java/services-core')
 project(':services-geojson').projectDir = new File('vendor/mapbox-java/services-geojson')
 project(':services-turf').projectDir = new File('vendor/mapbox-java/services-turf')
+project(':libtelemetry').projectDir = new File('vendor/mapbox-events-android/libtelemetry')
+project(':libcore').projectDir = new File('vendor/mapbox-events-android/libcore')
