@@ -5,9 +5,9 @@ apply plugin: 'kotlin-android'
 dependencies {
     lintChecks project(":MapboxGLAndroidSDKLint")
     api dependenciesList.mapboxAndroidTelemetry
-    api dependenciesList.mapboxJavaGeoJSON
     api project(":MapboxAndroidGestures")
-    implementation dependenciesList.mapboxJavaTurf
+    api project(":services-geojson")
+    implementation project(":services-turf")
     implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportAnnotations
     implementation dependenciesList.supportFragmentV4

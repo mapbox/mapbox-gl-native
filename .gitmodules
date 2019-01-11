@@ -82,3 +82,6 @@
 [submodule "platform/android/vendor/mapbox-gestures-android"]
 	path = platform/android/vendor/mapbox-gestures-android
 	url = https://github.com/mapbox/mapbox-gestures-android.git
+[submodule "platform/android/vendor/mapbox-java"]
+	path = platform/android/vendor/mapbox-java
+	url = https://github.com/mapbox/mapbox-java.git

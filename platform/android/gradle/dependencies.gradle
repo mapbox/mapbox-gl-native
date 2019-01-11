@@ -8,7 +8,6 @@ ext {
     ]
 
     versions = [
-            mapboxServices  : '4.3.0',
             mapboxTelemetry : '4.1.1',
             supportLib      : '27.1.1',
             constraintLayout: '1.1.2',
@@ -28,12 +27,7 @@ ext {
     ]
 
     dependenciesList = [
-            mapboxJavaServices     : "com.mapbox.mapboxsdk:mapbox-sdk-services:${versions.mapboxServices}",
-            mapboxJavaGeoJSON      : "com.mapbox.mapboxsdk:mapbox-sdk-geojson:${versions.mapboxServices}",
             mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxTelemetry}",
-
-            // for testApp
-            mapboxJavaTurf         : "com.mapbox.mapboxsdk:mapbox-sdk-turf:${versions.mapboxServices}",
 
             junit                  : "junit:junit:${versions.junit}",
             mockito                : "org.mockito:mockito-core:${versions.mockito}",
