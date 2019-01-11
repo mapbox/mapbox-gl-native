@@ -18,8 +18,9 @@ public:
 
     // SuperclusterData
     virtual mapbox::feature::feature_collection<double> getChildren(const std::uint32_t) = 0;
-    virtual mapbox::feature::feature_collection<double> getLeaves(const std::uint32_t, const std::uint32_t,
-                                                                   const std::uint32_t) = 0;
+    virtual mapbox::feature::feature_collection<double> getLeaves(const std::uint32_t,
+                                                                   const std::uint32_t limit  = 10u,
+                                                                   const std::uint32_t offset = 0u) = 0;
     virtual std::uint8_t getClusterExpansionZoom(std::uint32_t) = 0;
 };
 
@@ -30,13 +31,13 @@ public:
     ~Impl() final;
 
     Range<uint8_t> getZoomRange() const;
-    GeoJSONData* getData() const;
+    std::weak_ptr<GeoJSONData> getData() const;
 
     optional<std::string> getAttribution() const final;
 
 private:
     GeoJSONOptions options;
-    std::unique_ptr<GeoJSONData> data;
+    std::shared_ptr<GeoJSONData> data;
 };
 
 } // namespace style
