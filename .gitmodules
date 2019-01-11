@@ -85,3 +85,6 @@
 [submodule "platform/android/vendor/mapbox-java"]
 	path = platform/android/vendor/mapbox-java
 	url = https://github.com/mapbox/mapbox-java.git
+[submodule "platform/android/vendor/mapbox-events-android"]
+	path = platform/android/vendor/mapbox-events-android
+	url = https://github.com/mapbox/mapbox-events-android.git

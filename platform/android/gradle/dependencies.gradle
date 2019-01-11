@@ -8,7 +8,6 @@ ext {
     ]
 
     versions = [
-            mapboxTelemetry : '4.1.1',
             supportLib      : '27.1.1',
             constraintLayout: '1.1.2',
             espresso        : '3.0.2',
@@ -27,8 +26,6 @@ ext {
     ]
 
     dependenciesList = [
-            mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxTelemetry}",
-
             junit                  : "junit:junit:${versions.junit}",
             mockito                : "org.mockito:mockito-core:${versions.mockito}",
             mockk                  : "io.mockk:mockk:${versions.mockk}",
