@@ -189,34 +189,86 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 
 #pragma mark - MGLCluster management
 
-- (NSArray<id <MGLFeature>> *)leavesOfCluster:(id<MGLCluster>)cluster offset:(NSUInteger)offset limit:(NSUInteger)limit {
-    if(!self.rawSource) {
+- (mbgl::optional<mbgl::FeatureExtensionValue>)featureExtensionValueOfCluster:(MGLShape<MGLCluster> *)cluster extension:(std::string)extension options:(const std::map<std::string, mbgl::Value>)options {
+    mbgl::optional<mbgl::FeatureExtensionValue> extensionValue;
+    
+    // Check parameters
+    if (!self.rawSource || !self.mapView || !cluster) {
+        return extensionValue;
+    }
+
+    auto geoJSON = [cluster geoJSONObject];
+    
+    if (!geoJSON.is<mbgl::Feature>()) {
+        MGLAssert(0, @"cluster geoJSON object is not a feature.");
+        return extensionValue;
+    }
+    
+    auto clusterFeature = geoJSON.get<mbgl::Feature>();
+    
+    extensionValue = self.mapView.renderer->queryFeatureExtensions(self.rawSource->getID(),
+                                                                   clusterFeature,
+                                                                   "supercluster",
+                                                                   extension,
+                                                                   options);
+    
+    return extensionValue;
+}
+
+
+- (NSArray<id <MGLFeature>> *)leavesOfCluster:(MGLShape<MGLCluster> *)cluster offset:(NSUInteger)offset limit:(NSUInteger)limit {
+    const std::map<std::string, mbgl::Value> options = {
+        { "limit", static_cast<uint64_t>(limit) },
+        { "offset", static_cast<uint64_t>(offset) }
+    };
+
+    auto featureExtension = [self featureExtensionValueOfCluster:cluster extension:"leaves" options:options];
+
+    if (!featureExtension) {
         return @[];
     }
     
-    MGLAssert(offset < UINT32_MAX, @"`offset` should be < `UINT32_MAX`");
-    MGLAssert(limit < UINT32_MAX, @"`limit` should be < `UINT32_MAX`");
+    if (!featureExtension->is<mbgl::FeatureCollection>()) {
+        return @[];
+    }
     
-    std::vector<mbgl::Feature> leaves = self.rawSource->getLeaves((uint32_t)cluster.clusterIdentifier, (uint32_t)limit, (uint32_t)offset);
+    std::vector<mbgl::Feature> leaves = featureExtension->get<mbgl::FeatureCollection>();
     return MGLFeaturesFromMBGLFeatures(leaves);
 }
 
-- (NSArray<id <MGLFeature>> *)childrenOfCluster:(id<MGLCluster>)cluster {
-    if(!self.rawSource) {
+- (NSArray<id <MGLFeature>> *)childrenOfCluster:(MGLShape<MGLCluster> *)cluster {
+    auto featureExtension = [self featureExtensionValueOfCluster:cluster extension:"children" options:{}];
+    
+    if (!featureExtension) {
         return @[];
     }
-
-    std::vector<mbgl::Feature> children = self.rawSource->getChildren((uint32_t)cluster.clusterIdentifier);
-    return MGLFeaturesFromMBGLFeatures(children);
+    
+    if (!featureExtension->is<mbgl::FeatureCollection>()) {
+        return @[];
+    }
+    
+    std::vector<mbgl::Feature> leaves = featureExtension->get<mbgl::FeatureCollection>();
+    return MGLFeaturesFromMBGLFeatures(leaves);
 }
 
-- (double)zoomLevelForExpandingCluster:(id<MGLCluster>)cluster {
-    if(!self.rawSource) {
+- (double)zoomLevelForExpandingCluster:(MGLShape<MGLCluster> *)cluster {
+    auto featureExtension = [self featureExtensionValueOfCluster:cluster extension:"expansion-zoom" options:{}];
+
+    if (!featureExtension) {
         return -1.0;
     }
-
-    uint8_t zoom = self.rawSource->getClusterExpansionZoom((uint32_t)cluster.clusterIdentifier);
-    return static_cast<double>(zoom);
+    
+    if (!featureExtension->is<mbgl::Value>()) {
+        return -1.0;
+    }
+    
+    auto value = featureExtension->get<mbgl::Value>();
+    if (value.is<uint64_t>()) {
+        auto zoom = value.get<uint64_t>();
+        return static_cast<double>(zoom);
+    }
+    
+    return -1.0;
 }
 
 - (void)debugRecursiveLogForFeature:(id <MGLFeature>)feature indent:(NSUInteger)indent {

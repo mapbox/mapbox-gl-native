@@ -93,7 +93,6 @@
     pointFeature.properties["cluster"] = true;
     pointFeature.properties["cluster_id"] = 1ULL;
     pointFeature.properties["point_count"] = 5ULL;
-    pointFeature.properties["point_count_abbreviated"] = std::string("5");;
     
     id<MGLFeature> feature = MGLFeatureFromMBGLFeature(pointFeature);
     
@@ -103,7 +102,6 @@
     XCTAssert(cluster);
     XCTAssert(cluster.clusterIdentifier == 1);
     XCTAssert(cluster.clusterPointCount == 5);
-    XCTAssertEqualObjects(cluster.clusterPointCountAbbreviation, @"5");
 }
 
 - (void)testPropertyConversion {

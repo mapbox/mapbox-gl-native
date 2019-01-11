@@ -36,7 +36,7 @@ FOUNDATION_EXTERN MGL_EXPORT const NSUInteger MGLClusterIdentifierInvalid;
  ```
  */
 MGL_EXPORT
-@protocol MGLCluster <NSObject>
+@protocol MGLCluster <MGLFeature>
 
 /** The identifier for the cluster. */
 @property (nonatomic, readonly) NSUInteger clusterIdentifier;
@@ -44,11 +44,11 @@ MGL_EXPORT
 /** The number of points within this cluster */
 @property (nonatomic, readonly) NSUInteger clusterPointCount;
 
-/**
- An `NSString` abbreviation for the number of points within this cluster. For
- example "1.2k".
- */
-@property (nonatomic, readonly) NSString *clusterPointCountAbbreviation;
+///**
+// An `NSString` abbreviation for the number of points within this cluster. For
+// example "1.2k".
+// */
+//@property (nonatomic, readonly) NSString *clusterPointCountAbbreviation;
 @end
 
 NS_ASSUME_NONNULL_END

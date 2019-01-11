@@ -7,7 +7,7 @@
 NSString * const MGLClusterBoolKey              = @"cluster";
 NSString * const MGLClusterIdentifierKey        = @"cluster_id";
 NSString * const MGLClusterCountKey             = @"point_count";
-NSString * const MGLClusterCountAbbreviationKey = @"point_count_abbreviated";
+//NSString * const MGLClusterCountAbbreviationKey = @"point_count_abbreviated";
 
 const NSUInteger MGLClusterIdentifierInvalid = NSUIntegerMax;
 
@@ -58,22 +58,22 @@ static NSUInteger MGLClusterPointCountIMP(id self, SEL _cmd) {
     return [count unsignedIntegerValue];
 }
 
-/**
- Static free function used as implementation for custom subclasses (that conform
- to both `MGLFeature` and `MGLCluster`).
- */
-static NSString *MGLClusterPointCountAbbreviationIMP(id self, SEL _cmd) {
-    id<MGLFeature> feature = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(self, MGLFeature);
-
-    NSString *abbreviation = MGL_OBJC_DYNAMIC_CAST([feature attributeForKey:MGLClusterCountAbbreviationKey], NSString);
-    MGLAssert(abbreviation, @"Clusters should have a point_count_abbreviated");
-    
-    if (!abbreviation) {
-        return @"0";
-    }
-    
-    return abbreviation;
-}
+///**
+// Static free function used as implementation for custom subclasses (that conform
+// to both `MGLFeature` and `MGLCluster`).
+// */
+//static NSString *MGLClusterPointCountAbbreviationIMP(id self, SEL _cmd) {
+//    id<MGLFeature> feature = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(self, MGLFeature);
+//
+//    NSString *abbreviation = MGL_OBJC_DYNAMIC_CAST([feature attributeForKey:MGLClusterCountAbbreviationKey], NSString);
+//    MGLAssert(abbreviation, @"Clusters should have a point_count_abbreviated");
+//
+//    if (!abbreviation) {
+//        return @"0";
+//    }
+//
+//    return abbreviation;
+//}
 
 static IMP MGLFeatureClusterIMPFromSelector(SEL selector) {
     if (selector == @selector(clusterIdentifier)) {
@@ -82,9 +82,9 @@ static IMP MGLFeatureClusterIMPFromSelector(SEL selector) {
     else if (selector == @selector(clusterPointCount)) {
         return (IMP)MGLClusterPointCountIMP;
     }
-    else if (selector == @selector(clusterPointCountAbbreviation)) {
-        return (IMP)MGLClusterPointCountAbbreviationIMP;
-    }
+//    else if (selector == @selector(clusterPointCountAbbreviation)) {
+//        return (IMP)MGLClusterPointCountAbbreviationIMP;
+//    }
     MGLCAssert(0, @"Unrecognized selector: %@", NSStringFromSelector(selector));
     return NULL;
 }
@@ -149,7 +149,7 @@ id<MGLFeature, MGLCluster> MGLConvertFeatureToClusterSubclass(id<MGLFeature> fea
     
     MGLCAssert([cluster respondsToSelector:@selector(clusterIdentifier)], @"Feature subclass %@ - missing selector `clusterIdentifier`", subclassName);
     MGLCAssert([cluster respondsToSelector:@selector(clusterPointCount)], @"Feature subclass %@ - missing selector `clusterPointCount`", subclassName);
-    MGLCAssert([cluster respondsToSelector:@selector(clusterPointCountAbbreviation)], @"Feature subclass %@ - missing selector `clusterPointCountAbbreviation`", subclassName);
+//    MGLCAssert([cluster respondsToSelector:@selector(clusterPointCountAbbreviation)], @"Feature subclass %@ - missing selector `clusterPointCountAbbreviation`", subclassName);
     
     return cluster;
 }

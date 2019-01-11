@@ -53,7 +53,6 @@
         @"cluster" : @(YES),
         @"cluster_id" : @(456),
         @"point_count" : @(2),
-        @"point_count_abbreviated" : @"2"
         };
 
     XCTAssert([pointFeature isMemberOfClass:[MGLPointFeature class]], @"");
@@ -73,7 +72,6 @@
     XCTAssert(cluster);
     XCTAssert(cluster.clusterIdentifier == 456);
     XCTAssert(cluster.clusterPointCount == 2);
-    XCTAssertEqualObjects(cluster.clusterPointCountAbbreviation, @"2");
     
     // Archiving shouldn't affect
     [NSKeyedArchiver archiveRootObject:unarchivedPointFeature toFile:filePath];

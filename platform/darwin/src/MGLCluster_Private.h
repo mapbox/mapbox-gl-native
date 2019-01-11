@@ -7,7 +7,7 @@
 FOUNDATION_EXPORT NSString * const MGLClusterBoolKey;
 FOUNDATION_EXPORT NSString * const MGLClusterIdentifierKey;
 FOUNDATION_EXPORT NSString * const MGLClusterCountKey;
-FOUNDATION_EXPORT NSString * const MGLClusterCountAbbreviationKey;
+//FOUNDATION_EXPORT NSString * const MGLClusterCountAbbreviationKey;
 
 FOUNDATION_EXPORT BOOL MGLFeatureHasClusterAttribute(id<MGLFeature> feature);
 

@@ -415,7 +415,6 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
                 "cluster" : true,
                 "cluster_id" : 123,
                 "point_count" : 4567,
-                "point_count_abbreviated" : "4.5k"
             ]
         ]
         
@@ -433,8 +432,6 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
             guard let cluster = pointFeature as? MGLCluster else {
                 throw ExampleError.featureIsNotACluster
             }
-            
-            print("Approximate number of points in cluster: \(cluster.clusterPointCountAbbreviation)")
             
             //#-end-example-code
             

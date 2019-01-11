@@ -25,7 +25,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
  @param indent Used during recursion. Specify 0.
  */
 
-- (void)debugRecursiveLogForFeature:(id <MGLFeature>)feature indent:(NSUInteger)indent;
+- (void)debugRecursiveLogForFeature:(MGLShape<MGLFeature> *)feature indent:(NSUInteger)indent;
 @end
 
 NS_ASSUME_NONNULL_END
