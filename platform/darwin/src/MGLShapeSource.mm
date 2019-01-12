@@ -211,10 +211,8 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
                                                                    "supercluster",
                                                                    extension,
                                                                    options);
-    
     return extensionValue;
 }
-
 
 - (NSArray<id <MGLFeature>> *)leavesOfCluster:(MGLPointFeatureCluster *)cluster offset:(NSUInteger)offset limit:(NSUInteger)limit {
     const std::map<std::string, mbgl::Value> options = {

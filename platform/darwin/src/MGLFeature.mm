@@ -7,7 +7,6 @@
 #import "MGLPolygon.h"
 #import "MGLValueEvaluator.h"
 
-#import "MGLCluster.h"
 #import "MGLShape_Private.h"
 #import "MGLPointCollection_Private.h"
 #import "MGLPolyline_Private.h"
@@ -22,8 +21,10 @@
 #import <mbgl/style/conversion/geojson.hpp>
 #import <mapbox/feature.hpp>
 
-static NSString * const MGLClusterIdentifierKey        = @"cluster_id";
-static NSString * const MGLClusterCountKey             = @"point_count";
+// Cluster constants
+static NSString * const MGLClusterIdentifierKey = @"cluster_id";
+static NSString * const MGLClusterCountKey = @"point_count";
+const NSUInteger MGLClusterIdentifierInvalid = NSUIntegerMax;
 
 @interface MGLEmptyFeature ()
 @end
@@ -98,17 +99,10 @@ MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 @end
 
-const NSUInteger MGLClusterIdentifierInvalid = NSUIntegerMax;
-
 @implementation MGLPointFeatureCluster
 
-// If it turns out we need to cluster other classes, then consider moving the
-// following MGLCluster methods into free functions, and generate the subclasses
-// at runtime
 - (NSUInteger)clusterIdentifier {
-    id<MGLFeature> feature = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(self, MGLFeature);
-    
-    NSNumber *clusterNumber = MGL_OBJC_DYNAMIC_CAST([feature attributeForKey:MGLClusterIdentifierKey], NSNumber);
+    NSNumber *clusterNumber = MGL_OBJC_DYNAMIC_CAST([self attributeForKey:MGLClusterIdentifierKey], NSNumber);
     MGLAssert(clusterNumber, @"Clusters should have a cluster_id");
     
     if (!clusterNumber) {
@@ -122,15 +116,11 @@ const NSUInteger MGLClusterIdentifierInvalid = NSUIntegerMax;
 }
 
 - (NSUInteger)clusterPointCount {
-    id<MGLFeature> feature = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(self, MGLFeature);
-    
-    NSNumber *count = MGL_OBJC_DYNAMIC_CAST([feature attributeForKey:MGLClusterCountKey], NSNumber);
+    NSNumber *count = MGL_OBJC_DYNAMIC_CAST([self attributeForKey:MGLClusterCountKey], NSNumber);
     MGLAssert(count, @"Clusters should have a point_count");
     
     return [count unsignedIntegerValue];
 }
-
-
 @end
 
 
@@ -361,12 +351,11 @@ MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 template <typename T>
 class GeometryEvaluator {
 private:
-    mbgl::PropertyMap _properties;
+    const mbgl::PropertyMap *shared_properties;
     
 public:
-    
-    GeometryEvaluator(mbgl::PropertyMap properties = {}):
-        _properties(properties)
+    GeometryEvaluator(const mbgl::PropertyMap *properties = nullptr):
+        shared_properties(properties)
     {}
     
     MGLShape <MGLFeature> * operator()(const mbgl::EmptyGeometry &) const {
@@ -377,15 +366,20 @@ public:
     MGLShape <MGLFeature> * operator()(const mbgl::Point<T> &geometry) const {
         Class pointFeatureClass = [MGLPointFeature class];
         
-        auto clusterIt = _properties.find("cluster");
-        if (clusterIt != _properties.end()) {
-            auto clusterValue = clusterIt->second;
-            if (clusterValue.template is<bool>()) {
-                if (clusterValue.template get<bool>()) {
-                    pointFeatureClass = [MGLPointFeatureCluster class];
+        // If we're dealing with a cluster, we should change the class type.
+        // This could be generic and build the subclass at runtime if it turns
+        // out we need to support more than point clusters.
+        if (shared_properties) {
+            auto clusterIt = shared_properties->find("cluster");
+            if (clusterIt != shared_properties->end()) {
+                auto clusterValue = clusterIt->second;
+                if (clusterValue.template is<bool>()) {
+                    if (clusterValue.template get<bool>()) {
+                        pointFeatureClass = [MGLPointFeatureCluster class];
+                    }
                 }
             }
-        }        
+        }
         
         MGLPointFeature *feature = [[pointFeatureClass alloc] init];
         feature.coordinate = toLocationCoordinate2D(geometry);
@@ -436,10 +430,7 @@ public:
         return [MGLShapeCollectionFeature shapeCollectionWithShapes:shapes];
     }
 
-private:
-        
-//    mbgl::PropertyMap _properties;
-        
+private:        
     static CLLocationCoordinate2D toLocationCoordinate2D(const mbgl::Point<T> &point) {
         return CLLocationCoordinate2DMake(point.y, point.x);
     }
@@ -508,7 +499,7 @@ id <MGLFeature> MGLFeatureFromMBGLFeature(const mbgl::Feature &feature) {
         ValueEvaluator evaluator;
         attributes[@(pair.first.c_str())] = mbgl::Value::visit(value, evaluator);
     }
-    GeometryEvaluator<double> evaluator(feature.properties);
+    GeometryEvaluator<double> evaluator(&feature.properties);
     MGLShape <MGLFeature> *shape = mapbox::geometry::geometry<double>::visit(feature.geometry, evaluator);
     if (!feature.id.is<mapbox::feature::null_value_t>()) {
         shape.identifier = mbgl::FeatureIdentifier::visit(feature.id, ValueEvaluator());

@@ -5,7 +5,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MGLFeature;
-//@protocol MGLCluster;
 @class MGLPointFeature;
 @class MGLPointFeatureCluster;
 @class MGLShape;
@@ -331,8 +330,7 @@ MGL_EXPORT
  This method supports pagination; you supply an offset (number of features to skip)
  and a maximum number of features to return.
  
- @param cluster An object that conforms to the `MGLCluster` protocol. Currently
-    the only types that can conform are private subclasses of `MGLPointFeature`.
+ @param cluster An object of type `MGLPointFeatureCluster` (that conforms to the `MGLCluster` protocol).
  @param offset Number of features to skip.
  @param limit Maximum number of features to return
  
@@ -343,15 +341,14 @@ MGL_EXPORT
 /**
  Returns an array of map features that are the immediate children of the specified
  cluster *on the next zoom level*. The may include features that also conform to
- the `MGLCluster` protocol.
+ the `MGLCluster` protocol (currently only objects of type `MGLPointFeatureCluster`).
  
- @param cluster An object that conforms to the `MGLCluster` protocol. Currently
-    the only types that can conform are private subclasses of `MGLPointFeature`.
+ @param cluster An object of type `MGLPointFeatureCluster` (that conforms to the `MGLCluster` protocol).
  
  @return An array of objects that conform to the `MGLFeature` protocol.
  
  @note The returned array may contain the `cluster` that was passed in, if the next
-    zoom level doesn't the zoom level for expanding that cluster. See
+    zoom level doesn't match the zoom level for expanding that cluster. See
     `-[MGLShapeSource zoomLevelForExpandingCluster:]`.
  */
 - (NSArray<id<MGLFeature>> *)childrenOfCluster:(MGLPointFeatureCluster *)cluster;
@@ -359,8 +356,7 @@ MGL_EXPORT
 /**
  Returns the zoom level at which the given cluster expands.
  
- @param cluster An object that conforms to the `MGLCluster` protocol. Currently
-    the only types that can conform are private subclasses of `MGLPointFeature`.
+ @param cluster An object of type `MGLPointFeatureCluster` (that conforms to the `MGLCluster` protocol).
  
  @return Zoom level. This should be >= 0; any negative return value should be
     considered an error.

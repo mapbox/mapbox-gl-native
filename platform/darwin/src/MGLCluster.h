@@ -11,10 +11,11 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXTERN MGL_EXPORT const NSUInteger MGLClusterIdentifierInvalid;
 
 /**
- A protocol that (private) feature subclasses (i.e. those already conforming to
- the `MGLFeature` protocol) conform to if they are represent clusters.
+ A protocol that feature subclasses (i.e. those already conforming to
+ the `MGLFeature` protocol) conform to if they represent clusters.
  
- Currently only subclasses of `MGLPointFeature` support `MGLCluster`.
+ Currently the only class that conforms to `MGLCluster` is
+ `MGLPointFeatureCluster` (a subclass of `MGLPointFeature`).
  
  To check if a feature is a cluster, check conformity to `MGLCluster`, for
  example:
@@ -31,6 +32,11 @@ FOUNDATION_EXTERN MGL_EXPORT const NSUInteger MGLClusterIdentifierInvalid;
      throw ExampleError.featureIsNotACluster
  }
  
+ // Currently the only supported class that conforms to `MGLCluster` is
+ // `MGLPointFeatureCluster`
+ guard cluster is MGLPointFeatureCluster else {
+     throw ExampleError.unexpectedFeatureType
+ }
  ```
  */
 MGL_EXPORT

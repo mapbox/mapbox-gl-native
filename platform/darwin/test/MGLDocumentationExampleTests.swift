@@ -433,6 +433,12 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
                 throw ExampleError.featureIsNotACluster
             }
             
+            // Currently the only supported class that conforms to `MGLCluster` is
+            // `MGLPointFeatureCluster`
+            guard cluster is MGLPointFeatureCluster else {
+                throw ExampleError.unexpectedFeatureType
+            }
+            
             //#-end-example-code
             
             XCTAssert(cluster.clusterIdentifier == 123)

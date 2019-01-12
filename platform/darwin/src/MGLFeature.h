@@ -187,13 +187,23 @@ MGL_EXPORT
  #### Related examples
  See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/runtime-multiple-annotations/">
  Dynamically style interactive points</a> example to learn how to initialize
- `MGLPointFeature` objects and add it them your map.
+ `MGLPointFeature` objects and add them to your map.
  */
 MGL_EXPORT
 @interface MGLPointFeature : MGLPointAnnotation <MGLFeature>
 @end
 
-
+/**
+ An `MGLPointFeatureCluster` object associates a point shape (with an optional
+ identifier and attributes) and represents a point cluster.
+ 
+ @see `MGLCluster`
+ 
+ #### Related examples
+ See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/clustering/">
+ Clustering point data</a> example to learn how to initialize
+ clusters and add them to your map.
+ */
 MGL_EXPORT
 @interface MGLPointFeatureCluster : MGLPointFeature <MGLCluster>
 @end

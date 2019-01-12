@@ -63,8 +63,7 @@
     
     XCTAssertEqualObjects(pointFeature, unarchivedPointFeature);
 
-    // Unarchive process should convert to a cluster
-//    NSString *subclassName = MGLClusterSubclassNameForFeature(pointFeature);
+    // Unarchive process should ensure we still have a cluster
     XCTAssert([unarchivedPointFeature isMemberOfClass:[MGLPointFeatureCluster class]]);
     
     id<MGLCluster> cluster = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(unarchivedPointFeature, MGLCluster);
@@ -72,13 +71,6 @@
     XCTAssert(cluster);
     XCTAssert(cluster.clusterIdentifier == 456);
     XCTAssert(cluster.clusterPointCount == 2);
-    
-//    // Archiving shouldn't affect
-//    [NSKeyedArchiver archiveRootObject:unarchivedPointFeature toFile:filePath];
-//    MGLPointFeature *unarchivedPointFeature2 = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
-//
-//    XCTAssert([unarchivedPointFeature2 isMemberOfClass:[MGLPointFeatureCluster class]]);
-//    XCTAssertEqualObjects(pointFeature, unarchivedPointFeature2);
 }
 
 
