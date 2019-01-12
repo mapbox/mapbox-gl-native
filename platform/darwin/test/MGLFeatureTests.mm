@@ -102,6 +102,8 @@
     XCTAssert(cluster);
     XCTAssert(cluster.clusterIdentifier == 1);
     XCTAssert(cluster.clusterPointCount == 5);
+    
+    XCTAssert([cluster isMemberOfClass:[MGLPointFeatureCluster class]]);
 }
 
 - (void)testPropertyConversion {

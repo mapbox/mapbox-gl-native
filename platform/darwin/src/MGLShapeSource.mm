@@ -7,7 +7,7 @@
 #import "MGLSource_Private.h"
 #import "MGLFeature_Private.h"
 #import "MGLShape_Private.h"
-#import "MGLCluster_Private.h"
+#import "MGLCluster.h"
 
 #import "NSPredicate+MGLPrivateAdditions.h"
 #import "NSURL+MGLAdditions.h"
@@ -216,7 +216,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
 }
 
 
-- (NSArray<id <MGLFeature>> *)leavesOfCluster:(MGLShape<MGLCluster> *)cluster offset:(NSUInteger)offset limit:(NSUInteger)limit {
+- (NSArray<id <MGLFeature>> *)leavesOfCluster:(MGLPointFeatureCluster *)cluster offset:(NSUInteger)offset limit:(NSUInteger)limit {
     const std::map<std::string, mbgl::Value> options = {
         { "limit", static_cast<uint64_t>(limit) },
         { "offset", static_cast<uint64_t>(offset) }
@@ -236,7 +236,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
     return MGLFeaturesFromMBGLFeatures(leaves);
 }
 
-- (NSArray<id <MGLFeature>> *)childrenOfCluster:(MGLShape<MGLCluster> *)cluster {
+- (NSArray<id <MGLFeature>> *)childrenOfCluster:(MGLPointFeatureCluster *)cluster {
     auto featureExtension = [self featureExtensionValueOfCluster:cluster extension:"children" options:{}];
     
     if (!featureExtension) {
@@ -251,7 +251,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
     return MGLFeaturesFromMBGLFeatures(leaves);
 }
 
-- (double)zoomLevelForExpandingCluster:(MGLShape<MGLCluster> *)cluster {
+- (double)zoomLevelForExpandingCluster:(MGLPointFeatureCluster *)cluster {
     auto featureExtension = [self featureExtensionValueOfCluster:cluster extension:"expansion-zoom" options:{}];
 
     if (!featureExtension) {
@@ -282,7 +282,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
     
     printf("%*s%s\n", (int)indent, "", log.UTF8String);
     
-    id<MGLCluster> cluster = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(feature, MGLCluster);
+    MGLPointFeatureCluster *cluster = MGL_OBJC_DYNAMIC_CAST(feature, MGLPointFeatureCluster);
     
     if (cluster) {
         for (id <MGLFeature> child in [self childrenOfCluster:cluster]) {

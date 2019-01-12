@@ -5,8 +5,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MGLFeature;
-@protocol MGLCluster;
+//@protocol MGLCluster;
 @class MGLPointFeature;
+@class MGLPointFeatureCluster;
 @class MGLShape;
 
 /**
@@ -337,7 +338,7 @@ MGL_EXPORT
  
  @return An array of objects that conform to the `MGLFeature` protocol.
  */
-- (NSArray<id <MGLFeature>> *)leavesOfCluster:(MGLShape<MGLCluster> *)cluster offset:(NSUInteger)offset limit:(NSUInteger)limit;
+- (NSArray<id <MGLFeature>> *)leavesOfCluster:(MGLPointFeatureCluster *)cluster offset:(NSUInteger)offset limit:(NSUInteger)limit;
 
 /**
  Returns an array of map features that are the immediate children of the specified
@@ -353,7 +354,7 @@ MGL_EXPORT
     zoom level doesn't the zoom level for expanding that cluster. See
     `-[MGLShapeSource zoomLevelForExpandingCluster:]`.
  */
-- (NSArray<id<MGLFeature>> *)childrenOfCluster:(MGLShape<MGLCluster> *)cluster;
+- (NSArray<id<MGLFeature>> *)childrenOfCluster:(MGLPointFeatureCluster *)cluster;
 
 /**
  Returns the zoom level at which the given cluster expands.
@@ -364,7 +365,7 @@ MGL_EXPORT
  @return Zoom level. This should be >= 0; any negative return value should be
     considered an error.
  */
-- (double)zoomLevelForExpandingCluster:(MGLShape<MGLCluster> *)cluster;
+- (double)zoomLevelForExpandingCluster:(MGLPointFeatureCluster *)cluster;
 
 @end
 

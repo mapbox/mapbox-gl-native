@@ -47,10 +47,6 @@ NS_ASSUME_NONNULL_END
             NSSet<Class> *identifierClasses = [NSSet setWithArray:@[[NSString class], [NSNumber class]]]; \
             identifier = [decoder decodeObjectOfClasses:identifierClasses forKey:@"identifier"]; \
             _attributes = [decoder decodeObjectOfClass:[NSDictionary class] forKey:@"attributes"]; \
-            /* If this feature is a cluster, then change the class */ \
-            if (MGLFeatureHasClusterAttribute(self)) { \
-                MGLConvertFeatureToClusterSubclass(self); \
-            } \
         } \
         return self; \
     }

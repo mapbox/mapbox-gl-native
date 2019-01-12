@@ -1,11 +1,13 @@
+#import "MGLFoundation_Private.h"
 #import "MGLFeature_Private.h"
+#import "MGLCluster.h"
 
 #import "MGLPointAnnotation.h"
 #import "MGLPolyline.h"
 #import "MGLPolygon.h"
 #import "MGLValueEvaluator.h"
 
-#import "MGLCluster_Private.h"
+#import "MGLCluster.h"
 #import "MGLShape_Private.h"
 #import "MGLPointCollection_Private.h"
 #import "MGLPolyline_Private.h"
@@ -19,6 +21,9 @@
 #import <mbgl/util/geometry.hpp>
 #import <mbgl/style/conversion/geojson.hpp>
 #import <mapbox/feature.hpp>
+
+static NSString * const MGLClusterIdentifierKey        = @"cluster_id";
+static NSString * const MGLClusterCountKey             = @"point_count";
 
 @interface MGLEmptyFeature ()
 @end
@@ -92,6 +97,42 @@ MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 }
 
 @end
+
+const NSUInteger MGLClusterIdentifierInvalid = NSUIntegerMax;
+
+@implementation MGLPointFeatureCluster
+
+// If it turns out we need to cluster other classes, then consider moving the
+// following MGLCluster methods into free functions, and generate the subclasses
+// at runtime
+- (NSUInteger)clusterIdentifier {
+    id<MGLFeature> feature = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(self, MGLFeature);
+    
+    NSNumber *clusterNumber = MGL_OBJC_DYNAMIC_CAST([feature attributeForKey:MGLClusterIdentifierKey], NSNumber);
+    MGLAssert(clusterNumber, @"Clusters should have a cluster_id");
+    
+    if (!clusterNumber) {
+        return MGLClusterIdentifierInvalid;
+    }
+    
+    NSUInteger clusterIdentifier = [clusterNumber unsignedIntegerValue];
+    MGLAssert(clusterIdentifier <= UINT32_MAX, @"Cluster identifiers are 32bit");
+    
+    return clusterIdentifier;
+}
+
+- (NSUInteger)clusterPointCount {
+    id<MGLFeature> feature = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(self, MGLFeature);
+    
+    NSNumber *count = MGL_OBJC_DYNAMIC_CAST([feature attributeForKey:MGLClusterCountKey], NSNumber);
+    MGLAssert(count, @"Clusters should have a point_count");
+    
+    return [count unsignedIntegerValue];
+}
+
+
+@end
+
 
 @interface MGLPolylineFeature ()
 @end
@@ -319,14 +360,34 @@ MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
  */
 template <typename T>
 class GeometryEvaluator {
+private:
+    mbgl::PropertyMap _properties;
+    
 public:
+    
+    GeometryEvaluator(mbgl::PropertyMap properties = {}):
+        _properties(properties)
+    {}
+    
     MGLShape <MGLFeature> * operator()(const mbgl::EmptyGeometry &) const {
         MGLEmptyFeature *feature = [[MGLEmptyFeature alloc] init];
         return feature;
     }
 
     MGLShape <MGLFeature> * operator()(const mbgl::Point<T> &geometry) const {
-        MGLPointFeature *feature = [[MGLPointFeature alloc] init];
+        Class pointFeatureClass = [MGLPointFeature class];
+        
+        auto clusterIt = _properties.find("cluster");
+        if (clusterIt != _properties.end()) {
+            auto clusterValue = clusterIt->second;
+            if (clusterValue.template is<bool>()) {
+                if (clusterValue.template get<bool>()) {
+                    pointFeatureClass = [MGLPointFeatureCluster class];
+                }
+            }
+        }        
+        
+        MGLPointFeature *feature = [[pointFeatureClass alloc] init];
         feature.coordinate = toLocationCoordinate2D(geometry);
         return feature;
     }
@@ -376,6 +437,9 @@ public:
     }
 
 private:
+        
+//    mbgl::PropertyMap _properties;
+        
     static CLLocationCoordinate2D toLocationCoordinate2D(const mbgl::Point<T> &point) {
         return CLLocationCoordinate2DMake(point.y, point.x);
     }
@@ -444,17 +508,13 @@ id <MGLFeature> MGLFeatureFromMBGLFeature(const mbgl::Feature &feature) {
         ValueEvaluator evaluator;
         attributes[@(pair.first.c_str())] = mbgl::Value::visit(value, evaluator);
     }
-    GeometryEvaluator<double> evaluator;
+    GeometryEvaluator<double> evaluator(feature.properties);
     MGLShape <MGLFeature> *shape = mapbox::geometry::geometry<double>::visit(feature.geometry, evaluator);
     if (!feature.id.is<mapbox::feature::null_value_t>()) {
         shape.identifier = mbgl::FeatureIdentifier::visit(feature.id, ValueEvaluator());
     }
     shape.attributes = attributes;
 
-    if (MGLFeatureHasClusterAttribute(shape)) {
-        MGLConvertFeatureToClusterSubclass(shape);
-    }
-    
     return shape;
 }
 

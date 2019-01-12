@@ -1,4 +1,3 @@
-#import <Foundation/Foundation.h>
 #import "MGLFoundation.h"
 
 @protocol MGLFeature;
@@ -32,7 +31,6 @@ FOUNDATION_EXTERN MGL_EXPORT const NSUInteger MGLClusterIdentifierInvalid;
      throw ExampleError.featureIsNotACluster
  }
  
- print("Approximate number of points in cluster: \(cluster.clusterPointCountAbbreviation)")
  ```
  */
 MGL_EXPORT
@@ -44,11 +42,6 @@ MGL_EXPORT
 /** The number of points within this cluster */
 @property (nonatomic, readonly) NSUInteger clusterPointCount;
 
-///**
-// An `NSString` abbreviation for the number of points within this cluster. For
-// example "1.2k".
-// */
-//@property (nonatomic, readonly) NSString *clusterPointCountAbbreviation;
 @end
 
 NS_ASSUME_NONNULL_END
