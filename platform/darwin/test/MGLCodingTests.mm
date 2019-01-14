@@ -53,7 +53,7 @@
         @"cluster" : @(YES),
         @"cluster_id" : @(456),
         @"point_count" : @(2),
-        };
+    };
 
     XCTAssert([pointFeature isKindOfClass:[MGLPointFeature class]], @"");
     

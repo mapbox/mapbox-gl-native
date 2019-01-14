@@ -430,7 +430,7 @@ public:
         return [MGLShapeCollectionFeature shapeCollectionWithShapes:shapes];
     }
 
-private:        
+private:
     static CLLocationCoordinate2D toLocationCoordinate2D(const mbgl::Point<T> &point) {
         return CLLocationCoordinate2DMake(point.y, point.x);
     }
