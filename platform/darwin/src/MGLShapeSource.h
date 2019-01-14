@@ -332,7 +332,7 @@ MGL_EXPORT
  
  @param cluster An object of type `MGLPointFeatureCluster` (that conforms to the `MGLCluster` protocol).
  @param offset Number of features to skip.
- @param limit Maximum number of features to return
+ @param limit The maximum number of features to return
  
  @return An array of objects that conform to the `MGLFeature` protocol.
  */
