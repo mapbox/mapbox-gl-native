@@ -69,12 +69,14 @@ custom_categories:
     children:
       - MGLFeature
       - MGLPointFeature
+      - MGLPointFeatureCluster
       - MGLPolygonFeature
       - MGLPolylineFeature
       - MGLMultiPolygonFeature
       - MGLMultiPolylineFeature
       - MGLPointCollectionFeature
       - MGLShapeCollectionFeature
+      - MGLEmptyFeature
   - name: Style Content
     children:
       - MGLSource

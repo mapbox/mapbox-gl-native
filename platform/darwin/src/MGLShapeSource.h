@@ -5,6 +5,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MGLFeature;
+@class MGLPointFeature;
+@class MGLPointFeatureCluster;
 @class MGLShape;
 
 /**
@@ -320,6 +322,46 @@ MGL_EXPORT
     represent features in the source that match the predicate.
  */
 - (NSArray<id <MGLFeature>> *)featuresMatchingPredicate:(nullable NSPredicate *)predicate;
+
+/**
+ Returns an array of map features that are the leaves of the specified cluster.
+ ("Leaves" are the original points that belong to the cluster.)
+ 
+ This method supports pagination; you supply an offset (number of features to skip)
+ and a maximum number of features to return.
+ 
+ @param cluster An object of type `MGLPointFeatureCluster` (that conforms to the `MGLCluster` protocol).
+ @param offset Number of features to skip.
+ @param limit The maximum number of features to return
+ 
+ @return An array of objects that conform to the `MGLFeature` protocol.
+ */
+- (NSArray<id <MGLFeature>> *)leavesOfCluster:(MGLPointFeatureCluster *)cluster offset:(NSUInteger)offset limit:(NSUInteger)limit;
+
+/**
+ Returns an array of map features that are the immediate children of the specified
+ cluster *on the next zoom level*. The may include features that also conform to
+ the `MGLCluster` protocol (currently only objects of type `MGLPointFeatureCluster`).
+ 
+ @param cluster An object of type `MGLPointFeatureCluster` (that conforms to the `MGLCluster` protocol).
+ 
+ @return An array of objects that conform to the `MGLFeature` protocol.
+ 
+ @note The returned array may contain the `cluster` that was passed in, if the next
+    zoom level doesn't match the zoom level for expanding that cluster. See
+    `-[MGLShapeSource zoomLevelForExpandingCluster:]`.
+ */
+- (NSArray<id<MGLFeature>> *)childrenOfCluster:(MGLPointFeatureCluster *)cluster;
+
+/**
+ Returns the zoom level at which the given cluster expands.
+ 
+ @param cluster An object of type `MGLPointFeatureCluster` (that conforms to the `MGLCluster` protocol).
+ 
+ @return Zoom level. This should be >= 0; any negative return value should be
+    considered an error.
+ */
+- (double)zoomLevelForExpandingCluster:(MGLPointFeatureCluster *)cluster;
 
 @end
 

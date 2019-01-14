@@ -1,6 +1,9 @@
 #import <Mapbox/Mapbox.h>
 #import <XCTest/XCTest.h>
 
+#import "MGLFoundation_Private.h"
+#import "MGLCluster.h"
+
 #if TARGET_OS_IPHONE
 #import "MGLUserLocation_Private.h"
 #endif
@@ -40,6 +43,36 @@
 
     XCTAssertEqualObjects(pointFeature, unarchivedPointFeature);
 }
+
+- (void)testPointFeatureCluster {
+    MGLPointFeature *pointFeature = [[MGLPointFeatureCluster alloc] init];
+    pointFeature.title = @"title";
+    pointFeature.subtitle = @"subtitle";
+    pointFeature.identifier = @(123);
+    pointFeature.attributes = @{
+        @"cluster" : @(YES),
+        @"cluster_id" : @(456),
+        @"point_count" : @(2),
+    };
+
+    XCTAssert([pointFeature isKindOfClass:[MGLPointFeature class]], @"");
+    
+    NSString *filePath = [self temporaryFilePathForClass:MGLPointFeature.class];
+    [NSKeyedArchiver archiveRootObject:pointFeature toFile:filePath];
+    MGLPointFeature *unarchivedPointFeature = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+    
+    XCTAssertEqualObjects(pointFeature, unarchivedPointFeature);
+
+    // Unarchive process should ensure we still have a cluster
+    XCTAssert([unarchivedPointFeature isMemberOfClass:[MGLPointFeatureCluster class]]);
+    
+    id<MGLCluster> cluster = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(unarchivedPointFeature, MGLCluster);
+    
+    XCTAssert(cluster);
+    XCTAssert(cluster.clusterIdentifier == 456);
+    XCTAssert(cluster.clusterPointCount == 2);
+}
+
 
 - (void)testPolyline {
     CLLocationCoordinate2D coordinates[] = {

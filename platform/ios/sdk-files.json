@@ -136,6 +136,7 @@
         "MGLFillStyleLayer.h": "platform/darwin/src/MGLFillStyleLayer.h",
         "MGLAnnotationImage.h": "platform/ios/src/MGLAnnotationImage.h",
         "MGLHillshadeStyleLayer.h": "platform/darwin/src/MGLHillshadeStyleLayer.h",
+        "MGLCluster.h": "platform/darwin/src/MGLCluster.h",
         "MGLClockDirectionFormatter.h": "platform/darwin/src/MGLClockDirectionFormatter.h",
         "MGLSymbolStyleLayer.h": "platform/darwin/src/MGLSymbolStyleLayer.h",
         "MGLAttributionInfo.h": "platform/darwin/src/MGLAttributionInfo.h",

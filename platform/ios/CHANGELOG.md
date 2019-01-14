@@ -8,6 +8,8 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed a crash when casting large numbers in `NSExpression`. ([#13580](https://github.com/mapbox/mapbox-gl-native/pull/13580))
 * Fixed a bug where the `animated` parameter to `-[MGLMapView selectAnnotation:animated:]` was being ignored. ([#13689](https://github.com/mapbox/mapbox-gl-native/pull/13689))
 * Reinstates version 11 as the default Mapbox Streets style (as introduced in 4.7.0). ([#13690](https://github.com/mapbox/mapbox-gl-native/pull/13690))
+* Added the `-[MGLShapeSource leavesOfCluster:offset:limit:]`, `-[MGLShapeSource childrenOfCluster:]`, `-[MGLShapeSource zoomLevelForExpandingCluster:]` methods for inspecting a cluster in an `MGLShapeSource`s created with the `MGLShapeSourceOptionClustered` option. Feature querying now returns clusters represented by `MGLPointFeatureCluster` objects (that conform to the `MGLCluster` protocol). ([#12952](https://github.com/mapbox/mapbox-gl-native/pull/12952)
+
 
 ## 4.7.1 - December 21, 2018
 

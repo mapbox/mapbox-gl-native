@@ -118,6 +118,7 @@
         "MGLTilePyramidOfflineRegion.h": "platform/darwin/src/MGLTilePyramidOfflineRegion.h",
         "NSValue+MGLAdditions.h": "platform/darwin/src/NSValue+MGLAdditions.h",
         "MGLMapViewDelegate.h": "platform/macos/src/MGLMapViewDelegate.h",
+        "MGLCluster.h": "platform/darwin/src/MGLCluster.h",
         "MGLFeature.h": "platform/darwin/src/MGLFeature.h",
         "MGLStyleLayer.h": "platform/darwin/src/MGLStyleLayer.h",
         "MGLGeometry.h": "platform/darwin/src/MGLGeometry.h",
