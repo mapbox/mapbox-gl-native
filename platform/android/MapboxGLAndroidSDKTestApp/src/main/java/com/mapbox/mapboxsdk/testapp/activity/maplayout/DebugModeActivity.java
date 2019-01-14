@@ -24,11 +24,11 @@ import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.utils.IdleZoomListener;
 
 import java.util.List;
 import java.util.Locale;
 
-import com.mapbox.mapboxsdk.testapp.utils.IdleZoomListener;
 import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
@@ -85,7 +85,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
   private void setupMapView(Bundle savedInstanceState) {
     MapboxMapOptions mapboxMapOptions = setupMapboxMapOptions();
     mapView = new MapView(this, mapboxMapOptions);
-    ((ViewGroup) findViewById(R.id.coordinator_layout)).addView(mapView);
+    ((ViewGroup) findViewById(R.id.coordinator_layout)).addView(mapView, 0);
     mapView.addOnDidFinishLoadingStyleListener(() -> {
       if (mapboxMap != null) {
         setupNavigationView(mapboxMap.getStyle().getLayers());
