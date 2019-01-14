@@ -4653,6 +4653,8 @@ public:
     CGRect constrainedRect = self.contentFrame;
     CGRect bounds = constrainedRect;
 
+    BOOL expandedPositioningRectToMoveCalloutIntoViewWithMargins = NO;
+    
     UIView <MGLCalloutView> *calloutView = nil;
 
     if ([annotation respondsToSelector:@selector(title)] &&
@@ -4720,22 +4722,22 @@ public:
 
         // If the callout view provides inset (outset) information, we can use it to expand our positioning
         // rect, which we then use to help move the annotation on-screen if want need to.
-        if (moveIntoView) {
-            UIEdgeInsets margins = UIEdgeInsetsZero;
-            
-            if ([calloutView respondsToSelector:@selector(marginInsetsHintForPresentationFromRect:)]) {
-                margins = [calloutView marginInsetsHintForPresentationFromRect:calloutPositioningRect];
-            }
-            
+        if (moveIntoView && [calloutView respondsToSelector:@selector(marginInsetsHintForPresentationFromRect:)]) {
+            UIEdgeInsets margins = [calloutView marginInsetsHintForPresentationFromRect:calloutPositioningRect];
             expandedPositioningRect = UIEdgeInsetsInsetRect(expandedPositioningRect, margins);
+            expandedPositioningRectToMoveCalloutIntoViewWithMargins = YES;
         }
     }
-    else
+    
+    if (!expandedPositioningRectToMoveCalloutIntoViewWithMargins)
     {
-        // No callout, so update our bounds to handle cases where annotations
-        // are partially off-screen, but don't have a callout (and so shouldn't
-        // be moved. We may want to consider an MGLMapViewDelegate equivalent of
-        // the callout's marginInsetsHintForPresentationFromRect:
+        // We don't have a callout (OR our callout didn't implement
+        // marginInsetsHintForPresentationFromRect: - in this case we need to
+        // ensure that partially off-screen annotations are NOT moved into view.
+        //
+        // We may want to create (and fallback to) an `MGLMapViewDelegate` version
+        // of the `-[MGLCalloutView marginInsetsHintForPresentationFromRect:]
+        // protocol method.
         bounds = CGRectInset(bounds, -calloutPositioningRect.size.width, -calloutPositioningRect.size.height);
     }        
 
