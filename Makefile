@@ -517,9 +517,14 @@ android-style-code:
 	node platform/android/scripts/generate-style-code.js
 style-code: android-style-code
 
+# Vendor submodules configuration for Android.
+.PHONY: platform/android/vendor
+platform/android/vendor:
+	git submodule update --init --recursive platform/android/vendor
+
 # Configuration file for running CMake from Gradle within Android Studio.
-platform/android/gradle/configuration.gradle:
-	@echo "ext {\n    node = '`command -v node || command -v nodejs`'\n    npm = '`command -v npm`'\n    ccache = '`command -v ccache`'\n}" > $@
+platform/android/gradle/configuration.gradle: platform/android/vendor
+	@printf "ext {\n    node = '`command -v node || command -v nodejs`'\n    npm = '`command -v npm`'\n    ccache = '`command -v ccache`'\n}" > $@
 
 define ANDROID_RULES
 # $1 = arm-v7 (short arch)
@@ -765,7 +770,7 @@ android-update-vendor: platform/android/gradle/configuration.gradle
 
 # Creates a dependency graph using Graphviz
 .PHONY: android-graph
-android-graph:
+android-graph: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:generateDependencyGraphMapboxLibraries
 
 #### Miscellaneous targets #####################################################

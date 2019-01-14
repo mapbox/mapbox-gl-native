@@ -532,9 +532,6 @@ jobs:
     steps:
       - install-dependencies: { gradle: true }
       - run:
-          name: Update vendor submodules
-          command: make android-update-vendor
-      - run:
           name: Check code style
           command: make android-check
       - run:
@@ -595,9 +592,6 @@ jobs:
       IS_LOCAL_DEVELOPMENT: false
     steps:
       - install-dependencies: { gradle: true }
-      - run:
-          name: Update vendor submodules
-          command: make android-update-vendor
       - run:
           name: Generate Maven credentials
           command: |
