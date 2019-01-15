@@ -69,12 +69,11 @@ public:
         : ptr(std::const_pointer_cast<const S>(std::move(s.ptr))) {}
 
     template <class S>
-    Immutable(Immutable<S>&& s)
+    Immutable(Immutable<S> s)
         : ptr(std::move(s.ptr)) {}
 
-    template <class S>
-    Immutable(const Immutable<S>& s)
-        : ptr(s.ptr) {}
+    Immutable(Immutable&&) = default;
+    Immutable(const Immutable&) = default;
 
     template <class S>
     Immutable& operator=(Mutable<S>&& s) {
@@ -82,17 +81,8 @@ public:
         return *this;
     }
 
-    template <class S>
-    Immutable& operator=(Immutable<S>&& s) {
-        ptr = std::move(s.ptr);
-        return *this;
-    }
-
-    template <class S>
-    Immutable& operator=(const Immutable<S>& s) {
-        ptr = s.ptr;
-        return *this;
-    }
+    Immutable& operator=(Immutable&&) = default;
+    Immutable& operator=(const Immutable&) = default;
 
     const T* get() const { return ptr.get(); }
     const T* operator->() const { return ptr.get(); }
