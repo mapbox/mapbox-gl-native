@@ -22,23 +22,23 @@ class MapboxMapTest {
 
     private lateinit var nativeMapView: NativeMapView
 
+    private lateinit var transform: Transform
+
     @Before
     fun setup() {
         val cameraChangeDispatcher = spyk<CameraChangeDispatcher>()
-        val mapView = mockk<MapView>()
         nativeMapView = mockk()
-        mapboxMap = MapboxMap(nativeMapView, Transform(mapView, nativeMapView, cameraChangeDispatcher), null, null, null, cameraChangeDispatcher)
+        transform = mockk()
+        mapboxMap = MapboxMap(nativeMapView, transform, null, null, null, cameraChangeDispatcher)
         every { nativeMapView.styleUrl = any() } answers {}
         every { nativeMapView.transitionOptions = any() } answers {}
         every { nativeMapView.isDestroyed } returns false
-        every { nativeMapView.cameraPosition } returns CameraPosition.DEFAULT
-        every { nativeMapView.cancelTransitions() } answers {}
-        every { nativeMapView.jumpTo(any(), any(), any(), any()) } answers {}
-        every { nativeMapView.minZoom = any() } answers {}
-        every { nativeMapView.maxZoom = any() } answers {}
         every { nativeMapView.setOnFpsChangedListener(any()) } answers {}
         every { nativeMapView.prefetchTiles = any() } answers {}
         every { nativeMapView.setLatLngBounds(any()) } answers {}
+        every { transform.minZoom = any() } answers {}
+        every { transform.maxZoom = any() } answers {}
+        every { transform.moveCamera(any(), any(), any()) } answers {}
         mapboxMap.injectLocationComponent(spyk())
         mapboxMap.setStyle(Style.MAPBOX_STREETS)
         mapboxMap.onFinishLoadingStyle()
@@ -51,27 +51,26 @@ class MapboxMapTest {
         verify { nativeMapView.transitionOptions = expected }
     }
 
-    @Test
-    fun testMoveCamera() {
-        val callback = mockk<MapboxMap.CancelableCallback>()
-        every { callback.onFinish() } answers {}
-        val target = LatLng(1.0, 2.0)
-        val expected = CameraPosition.Builder().target(target).build()
-        mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(expected), callback)
-        verify { nativeMapView.jumpTo(target, -1.0, -1.0, -1.0) }
-        verify { callback.onFinish() }
-    }
+  @Test
+  fun testMoveCamera() {
+    val callback = mockk<MapboxMap.CancelableCallback>()
+    val target = LatLng(1.0, 2.0)
+    val expected = CameraPosition.Builder().target(target).build()
+    val update = CameraUpdateFactory.newCameraPosition(expected)
+    mapboxMap.moveCamera(update, callback)
+    verify { transform.moveCamera(mapboxMap, update, callback) }
+  }
 
     @Test
     fun testMinZoom() {
         mapboxMap.setMinZoomPreference(10.0)
-        verify { nativeMapView.minZoom = 10.0 }
+        verify { transform.minZoom = 10.0 }
     }
 
     @Test
     fun testMaxZoom() {
         mapboxMap.setMaxZoomPreference(10.0)
-        verify { nativeMapView.maxZoom = 10.0 }
+        verify { transform.maxZoom = 10.0 }
     }
 
     @Test
