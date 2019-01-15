@@ -35,7 +35,7 @@
 #include "map_renderer.hpp"
 #include "map_renderer_runnable.hpp"
 #include "native_map_view.hpp"
-#ifndef MODULE_OFFLINE_DISABLE
+#ifndef MBGL_MODULE_OFFLINE_DISABLE
 #include "offline/offline_manager.hpp"
 #include "offline/offline_region.hpp"
 #include "offline/offline_region_definition.hpp"
@@ -48,7 +48,7 @@
 #include "style/light.hpp"
 #include "style/formatted.hpp"
 #include "style/formatted_section.hpp"
-#ifndef MODULE_SNAPSHOT_DISABLE
+#ifndef MBGL_MODULE_SNAPSHOT_DISABLE
 #include "snapshotter/map_snapshotter.hpp"
 #include "snapshotter/map_snapshot.hpp"
 #endif
@@ -181,7 +181,7 @@ void registerNatives(JavaVM *vm) {
     ConnectivityListener::registerNative(env);
 
     // Offline
-#ifndef MODULE_OFFLINE_DISABLE
+#ifndef MBGL_MODULE_OFFLINE_DISABLE
     OfflineManager::registerNative(env);
     OfflineRegion::registerNative(env);
     OfflineRegionDefinition::registerNative(env);
@@ -192,7 +192,7 @@ void registerNatives(JavaVM *vm) {
 #endif
 
     // Snapshotter
-#ifndef MODULE_SNAPSHOT_DISABLE
+#ifndef MBGL_MODULE_SNAPSHOT_DISABLE
     MapSnapshotter::registerNative(env);
     MapSnapshot::registerNative(env);
 #endif
