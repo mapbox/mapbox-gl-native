@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,13 +37,14 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
 /**
  * Test activity showcasing the different debug modes and allows to cycle between the default map styles.
  */
-public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCallback, MapboxMap.OnFpsChangedListener {
 
   private MapView mapView;
   private MapboxMap mapboxMap;
   private ActionBarDrawerToggle actionBarDrawerToggle;
   private int currentStyleIndex;
   private IdleZoomListener idleZoomListener;
+  private boolean isReportFps = true;
 
   private static final String[] STYLES = new String[] {
     Style.MAPBOX_STREETS,
@@ -54,6 +56,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
     Style.TRAFFIC_DAY,
     Style.TRAFFIC_NIGHT
   };
+  private TextView fpsView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +66,6 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
     setupMapView(savedInstanceState);
     setupDebugChangeView();
     setupStyleChangeView();
-    setupFpsChangeView();
   }
 
   private void setupToolbar() {
@@ -113,10 +115,13 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
   }
 
   private void setFpsView() {
-    final TextView fpsView = findViewById(R.id.fpsView);
-    mapboxMap.setOnFpsChangedListener(fps ->
-      fpsView.setText(String.format(Locale.US, "FPS: %4.2f", fps))
-    );
+    fpsView = findViewById(R.id.fpsView);
+    mapboxMap.setOnFpsChangedListener(this);
+  }
+
+  @Override
+  public void onFpsChanged(double fps) {
+    fpsView.setText(String.format(Locale.US, "FPS: %4.2f", fps));
   }
 
   private void setupNavigationView(List<Layer> layerList) {
@@ -173,18 +178,26 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
     });
   }
 
-  private void setupFpsChangeView() {
-    findViewById(R.id.fps_30).setOnClickListener(view -> {
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    int itemId = item.getItemId();
+    if (itemId == R.id.menu_action_toggle_report_fps) {
+      isReportFps = !isReportFps;
+      fpsView.setVisibility(isReportFps ? View.VISIBLE : View.GONE);
+      mapboxMap.setOnFpsChangedListener(isReportFps ? this : null);
+    } else if (itemId == R.id.menu_action_limit_to_30_fps) {
       mapView.setMaximumFps(30);
-    });
-    findViewById(R.id.fps_60).setOnClickListener(view -> {
+    } else if (itemId == R.id.menu_action_limit_to_60_fps) {
       mapView.setMaximumFps(60);
-    });
+    }
+
+    return actionBarDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
   }
 
   @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    return actionBarDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.menu_debug, menu);
+    return true;
   }
 
   @Override
