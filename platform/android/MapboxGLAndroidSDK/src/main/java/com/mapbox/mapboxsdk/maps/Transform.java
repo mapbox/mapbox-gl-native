@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -77,13 +78,15 @@ final class Transform implements MapView.OnCameraDidChangeListener {
     if (animated) {
       invalidateCameraPosition();
       if (cameraCancelableCallback != null) {
+        final MapboxMap.CancelableCallback callback = cameraCancelableCallback;
+
+        // nullification has to happen before Handler#post, see https://github.com/robolectric/robolectric/issues/1306
+        cameraCancelableCallback = null;
+
         handler.post(new Runnable() {
           @Override
           public void run() {
-            if (cameraCancelableCallback != null) {
-              cameraCancelableCallback.onFinish();
-              cameraCancelableCallback = null;
-            }
+            callback.onFinish();
           }
         });
       }
@@ -173,13 +176,16 @@ final class Transform implements MapView.OnCameraDidChangeListener {
     if (cameraCancelableCallback != null) {
       final MapboxMap.CancelableCallback callback = cameraCancelableCallback;
       cameraChangeDispatcher.onCameraIdle();
+
+      // nullification has to happen before Handler#post, see https://github.com/robolectric/robolectric/issues/1306
+      cameraCancelableCallback = null;
+
       handler.post(new Runnable() {
         @Override
         public void run() {
           callback.onCancel();
         }
       });
-      cameraCancelableCallback = null;
     }
 
     // cancel ongoing transitions
