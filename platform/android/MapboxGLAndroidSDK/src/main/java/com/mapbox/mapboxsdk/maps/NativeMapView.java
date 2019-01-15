@@ -1391,27 +1391,30 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void setOnFpsChangedListener(@NonNull final MapboxMap.OnFpsChangedListener listener) {
+  public void setOnFpsChangedListener(@Nullable final MapboxMap.OnFpsChangedListener listener) {
     final Handler handler = new Handler();
     mapRenderer.queueEvent(new Runnable() {
 
       @Override
       public void run() {
-        mapRenderer.setOnFpsChangedListener(new MapboxMap.OnFpsChangedListener() {
-          @Override
-          public void onFpsChanged(final double fps) {
-            handler.post(new Runnable() {
+        if (listener != null) {
+          mapRenderer.setOnFpsChangedListener(new MapboxMap.OnFpsChangedListener() {
+            @Override
+            public void onFpsChanged(final double fps) {
+              handler.post(new Runnable() {
 
-              @Override
-              public void run() {
-                listener.onFpsChanged(fps);
-              }
+                @Override
+                public void run() {
+                  listener.onFpsChanged(fps);
+                }
 
-            });
-          }
-        });
+              });
+            }
+          });
+        } else {
+          mapRenderer.setOnFpsChangedListener(null);
+        }
       }
-
     });
   }
 

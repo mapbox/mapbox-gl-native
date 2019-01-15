@@ -20,23 +20,24 @@
             android:id="@+id/textZoom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|start"
             android:layout_margin="8dp"
+            android:text="Zoom: 0.00"
+            android:paddingTop="4dp"
             android:textIsSelectable="true"
-            android:textSize="14sp"
-            app:layout_anchor="@id/bottom_sheet"
-            app:layout_anchorGravity="bottom|start"/>
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/fpsView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|end"
             android:layout_margin="8dp"
-            android:textIsSelectable="true"
-            android:textSize="14sp"
             app:layout_anchor="@id/textZoom"
-            app:layout_anchorGravity="top"/>
+            app:layout_anchorGravity="bottom"
+            android:text="FPS: 60.00"
+            android:paddingTop="16dp"
+            android:layout_marginTop="64dp"
+            android:textIsSelectable="true"
+            android:textSize="14sp"/>
 
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/bottom_sheet"
@@ -71,29 +72,6 @@
             app:layout_anchor="@id/bottom_sheet"
             app:layout_anchorGravity="bottom|end"/>
 
-        <Button
-            android:id="@+id/fps_60"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|start"
-            app:backgroundTint="@color/primary"
-            android:layout_margin="@dimen/fab_margin"
-            android:text="@string/fps60"
-            app:layout_anchor="@id/bottom_sheet"
-            app:layout_anchorGravity="top|end"/>
-
-        <Button
-            android:id="@+id/fps_30"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|end"
-            android:layout_marginBottom="82dp"
-            app:backgroundTint="@color/primary"
-            android:layout_marginEnd="@dimen/fab_margin"
-            android:layout_marginRight="@dimen/fab_margin"
-            android:text="@string/fps30"
-            app:layout_anchor="@id/fps_60"
-            app:layout_anchorGravity="top"/>
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
