@@ -411,6 +411,11 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     mapCallback.onDestroy();
     initialRenderCallback.onDestroy();
 
+    if (compassView != null) {
+      // avoid leaking context through animator #13742
+      compassView.resetAnimation();
+    }
+
     if (mapboxMap != null) {
       mapboxMap.onDestroy();
     }

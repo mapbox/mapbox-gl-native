@@ -68,7 +68,7 @@ public final class CompassView extends AppCompatImageView implements Runnable {
     this.isAnimating = isAnimating;
   }
 
-  private void resetAnimation() {
+  public void resetAnimation() {
     if (fadeAnimator != null) {
       fadeAnimator.cancel();
     }
