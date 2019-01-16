@@ -41,6 +41,7 @@ typedef struct PanTestData {
 } PanTestData;
 
 #define PAN_TEST_TERMINATOR {{FLT_MAX, FLT_MAX}, NO, NO, NO, NO, NO}
+static const CGFloat kAnnotationScale = 0.125f;
 
 - (void)internalTestOffscreenSelectionTitle:(NSString*)title withTestData:(PanTestData)test animateSelection:(BOOL)animateSelection {
     
@@ -60,7 +61,7 @@ typedef struct PanTestData {
     
     NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReuseIdentifer";
     CGSize size = self.mapView.bounds.size;
-    CGSize annotationSize = CGSizeMake(40.0, 40.0);
+    CGSize annotationSize = CGSizeMake(floor(size.width*kAnnotationScale), floor(size.height*kAnnotationScale));
     
     self.viewForAnnotation = ^MGLAnnotationView*(MGLMapView *view, id<MGLAnnotation> annotation) {
         
@@ -130,12 +131,12 @@ typedef struct PanTestData {
         return CGRectContainsRect(expandedRect1, rect2);
     };
     
-    CGFloat epsilon = 0.000001;
+    CGFloat epsilon = 0.00001;
     if (expectMapToHavePanned) {
         CLLocationDegrees latitudeDelta = fabs(mapCenterAfterSelection.latitude - mapCenterBeforeSelection.latitude);
         CLLocationDegrees longitudeDelta = fabs(mapCenterAfterSelection.longitude - mapCenterBeforeSelection.longitude);
         
-        XCTAssert( (latitudeDelta > epsilon) || (longitudeDelta > epsilon) ); // One of them should have moved
+        XCTAssert( (latitudeDelta > epsilon) || (longitudeDelta > epsilon), @"Deltas: lat=%f, long=%f", latitudeDelta, longitudeDelta); // One of them should have moved
 
         // If the map panned - the intention is that the annotation is on-screen,
         // and so should have an annotation view and that it is fully on screen
@@ -143,14 +144,19 @@ typedef struct PanTestData {
 
         XCTAssertNotNil(annotationViewAfterSelection);
         
-        XCTAssert(CGRectContainsRectWithAccuracy(self.mapView.bounds, annotationFrameAfterSelection, epsilon));
+        XCTAssert(CGRectContainsRectWithAccuracy(self.mapView.bounds, annotationFrameAfterSelection, 0.25), @"Mapview:%@ frame:%@", NSStringFromCGRect(self.mapView.bounds), NSStringFromCGRect(annotationFrameAfterSelection));
         
         // Check the callout
         if (showsCallout) {
             UIView *calloutView = self.mapView.calloutViewForSelectedAnnotation;
             XCTAssertNotNil(calloutView);
             
-            XCTAssert(expectCalloutToBeFullyOnscreen == CGRectContainsRectWithAccuracy(self.mapView.bounds, calloutView.frame, epsilon));
+            XCTAssert(expectCalloutToBeFullyOnscreen == CGRectContainsRectWithAccuracy(self.mapView.bounds, calloutView.frame, 0.25),
+                      @"Expect contains:%d, Mapview:%@ annotation:%@ callout:%@",
+                      expectCalloutToBeFullyOnscreen,
+                      NSStringFromCGRect(self.mapView.bounds),
+                      NSStringFromCGRect(annotationFrameAfterSelection),
+                      NSStringFromCGRect(calloutView.frame));
         }
     }
     else {
@@ -170,7 +176,11 @@ typedef struct PanTestData {
             
             if (annotationViewAfterSelection) {
                 XCTAssertNotNil(calloutView);
-                XCTAssert(expectCalloutToBeFullyOnscreen == CGRectContainsRectWithAccuracy(self.mapView.bounds, calloutView.frame, epsilon));
+                XCTAssert(expectCalloutToBeFullyOnscreen == CGRectContainsRectWithAccuracy(self.mapView.bounds, calloutView.frame, 0.25),
+                          @"Mapview:%@ annotation:%@ callout:%@",
+                          NSStringFromCGRect(self.mapView.bounds),
+                          NSStringFromCGRect(annotationViewAfterSelection.frame),
+                          NSStringFromCGRect(calloutView.frame));
             }
             else {
                 // If there's no annotation view, should we expect a callout?
@@ -197,7 +207,7 @@ typedef struct PanTestData {
         int row = 0;
         PanTestData *test = testData;
         while (test->relativeCoord.x != FLT_MAX) {
-            NSString *activityTitle = [NSString stringWithFormat:@"Row %d/%d", row, i];
+            NSString *activityTitle = [NSString stringWithFormat:@"Rowwer %d/%d", row, i];
             [XCTContext runActivityNamed:activityTitle
                                    block:^(id<XCTActivity>  _Nonnull activity) {
                                        [self internalTestOffscreenSelectionTitle:activityTitle
@@ -258,6 +268,15 @@ typedef struct PanTestData {
     // Tests moveIntoView:YES
     // without a callout
     
+    // From https://github.com/mapbox/mapbox-gl-native/pull/13727#issuecomment-454028698
+    //
+    // | Annotation position | Has callout? | Callout implements `marginInsets...`? | Map pans when selected with moveIntoView=YES? |
+    // |---------------------|--------------|---------------------------------------|-----------------------------------------------|
+    // | Offscreen           | No           | n/a                                   | Yes (no margins)                              |
+    // | Partially           | No           | n/a                                   | No                                            |
+    // | Onscreen            | No           | n/a                                   | No                                            |
+    //
+    
     PanTestData tests[] = {
         //  Coord           showsCallout    impl margins?   moveIntoView     expectMapToPan  calloutOnScreen
         //  Offscreen
@@ -281,11 +300,19 @@ typedef struct PanTestData {
     [self internalRunTests:tests];
 }
 
-
 - (void)testSelectionMoveIntoViewWithCallout  {
     // Tests moveIntoView:YES
     // WITH the default callout (implements marginshint)
     
+    // From https://github.com/mapbox/mapbox-gl-native/pull/13727#issuecomment-454028698
+    //
+    // | Annotation position | Has callout? | Callout implements `marginInsets...`? | Map pans when selected with moveIntoView=YES? |
+    // |---------------------|--------------|---------------------------------------|-----------------------------------------------|
+    // | Offscreen           | Yes          | Yes                                   | Yes to ensure callout is fully visible        |
+    // | Partially           | Yes          | Yes                                   | Yes to ensure callout is fully visible        |
+    // | Onscreen            | Yes          | Yes                                   | Yes, but *only* to ensure callout is fully visible |
+    //
+
     PanTestData tests[] = {
         //  Coord           showsCallout    impl margins?   moveIntoView    expectMapToPan  calloutOnScreen
         //  Offscreen
@@ -302,6 +329,7 @@ typedef struct PanTestData {
         
         //  Onscreen
         {   { 0.5f, 0.5f},  YES,            YES,            YES,            NO,             YES },
+        {   {kAnnotationScale, 0.5f}, YES,  YES,            YES,            YES,            YES }, // expects to move, because although onscreen, callout would not be.
 
         PAN_TEST_TERMINATOR
     };
@@ -313,6 +341,15 @@ typedef struct PanTestData {
     // Tests moveIntoView:YES
     // WITH a callout that DOES NOT implement marginshint
     
+    // From https://github.com/mapbox/mapbox-gl-native/pull/13727#issuecomment-454028698
+    //
+    // | Annotation position | Has callout? | Callout implements `marginInsets...`? | Map pans when selected with moveIntoView=YES? |
+    // |---------------------|--------------|---------------------------------------|-----------------------------------------------|
+    // | Offscreen           | Yes          | No                                    | Yes, but only to show annotation (not callout) with no margins |
+    // | Partially           | Yes          | No                                    | No                                            |
+    // | Onscreen            | Yes          | No                                    | No                                            |
+    //
+
     PanTestData tests[] = {
         //  Coord           showsCallout    impl margins?   moveIntoView    expectMapToPan  calloutOnScreen
         //  Offscreen
@@ -321,14 +358,14 @@ typedef struct PanTestData {
         {   { 0.5f,-1.0f},  YES,            NO,             YES,            YES,            NO },
         {   { 0.5f, 2.0f},  YES,            NO,             YES,            YES,            YES },   // Because annotation was off the bottom of screen, and callout is above annotation
         {   { 2.0f, 2.0f},  YES,            NO,             YES,            YES,            NO },
-        
+
         //  Partial
         {   { 0.0f, 0.5f},  YES,            NO,             YES,            NO,             NO },
         {   { 1.0f, 0.5f},  YES,            NO,             YES,            NO,             NO },
         {   { 0.5f, 0.0f},  YES,            NO,             YES,            NO,             NO },
         {   { 0.5f, 1.0f},  YES,            NO,             YES,            NO,             YES }, // Because annotation was off the bottom of screen, and callout is above annotation
         {   { 1.0f, 1.0f},  YES,            NO,             YES,            NO,             NO },
-        
+
         //  Onscreen
         {   { 0.5f, 0.5f},  YES,            NO,             YES,            NO,             YES },
 
@@ -394,8 +431,8 @@ typedef struct PanTestData {
 
     // Check that the annotation is in the center of the view
     CGPoint annotationPoint = [self.mapView convertCoordinate:point.coordinate toPointToView:self.mapView];
-    XCTAssertEqualWithAccuracy(annotationPoint.x, size.width/2.0, epsilon);
-    XCTAssertEqualWithAccuracy(annotationPoint.y, size.height/2.0, epsilon);
+    XCTAssertEqualWithAccuracy(annotationPoint.x, size.width/2.0, 0.25);
+    XCTAssertEqualWithAccuracy(annotationPoint.y, size.height/2.0, 0.25);
 
     // Now test taps around the annotation
     CGPoint tapPoint = CGPointMake(annotationPoint.x + offset.dx, annotationPoint.y + offset.dy);
