@@ -347,6 +347,7 @@
 		55E5666D21C2A2080008B8B5 /* NSData+MMEGZIP.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BCF1FE05D7100C1BD0D /* NSData+MMEGZIP.h */; };
 		632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */; };
 		6407D6701E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */; };
+		6FA9341721EF372100AA9CA8 /* MBXOrnamentsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FA9341521EF372100AA9CA8 /* MBXOrnamentsViewController.m */; };
 		74CB5EB1219B252C00102936 /* MGLStyleLayerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 74CB5EAF219B252C00102936 /* MGLStyleLayerManager.h */; };
 		74CB5EB2219B252C00102936 /* MGLStyleLayerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 74CB5EAF219B252C00102936 /* MGLStyleLayerManager.h */; };
 		74CB5EB3219B252C00102936 /* MGLStyleLayerManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 74CB5EB0219B252C00102936 /* MGLStyleLayerManager.mm */; };
@@ -1076,6 +1077,8 @@
 		632281DD1E6F855900D75A5D /* MBXEmbeddedMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXEmbeddedMapViewController.h; sourceTree = "<group>"; };
 		632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXEmbeddedMapViewController.m; sourceTree = "<group>"; };
 		6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MGLDocumentationExampleTests.swift; path = ../../darwin/test/MGLDocumentationExampleTests.swift; sourceTree = "<group>"; };
+		6FA9341521EF372100AA9CA8 /* MBXOrnamentsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXOrnamentsViewController.m; sourceTree = "<group>"; };
+		6FA9341621EF372100AA9CA8 /* MBXOrnamentsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXOrnamentsViewController.h; sourceTree = "<group>"; };
 		74CB5EAF219B252C00102936 /* MGLStyleLayerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLStyleLayerManager.h; sourceTree = "<group>"; };
 		74CB5EB0219B252C00102936 /* MGLStyleLayerManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLStyleLayerManager.mm; sourceTree = "<group>"; };
 		74CB5EB5219B280300102936 /* MGLHillshadeStyleLayer_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLHillshadeStyleLayer_Private.h; sourceTree = "<group>"; };
@@ -1950,6 +1953,8 @@
 				965DF51020F9430500438AAC /* MBXFrameTimeGraphView.m */,
 				632281DD1E6F855900D75A5D /* MBXEmbeddedMapViewController.h */,
 				632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */,
+				6FA9341621EF372100AA9CA8 /* MBXOrnamentsViewController.h */,
+				6FA9341521EF372100AA9CA8 /* MBXOrnamentsViewController.m */,
 				DA821D051CCC6D59007508D4 /* Main.storyboard */,
 				DA821D041CCC6D59007508D4 /* LaunchScreen.storyboard */,
 				DA1DC99E1CB6E088006E619F /* Assets.xcassets */,
@@ -3083,6 +3088,7 @@
 				354B839C1D2E9B48005D9406 /* MBXUserLocationAnnotationView.m in Sources */,
 				965DF51120F9430500438AAC /* MBXFrameTimeGraphView.m in Sources */,
 				DA1DC9991CB6E054006E619F /* MBXAppDelegate.m in Sources */,
+				6FA9341721EF372100AA9CA8 /* MBXOrnamentsViewController.m in Sources */,
 				DA1DC96B1CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m in Sources */,
 				DA1DC96A1CB6C6B7006E619F /* MBXCustomCalloutView.m in Sources */,
 				927FBCFC1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m in Sources */,
