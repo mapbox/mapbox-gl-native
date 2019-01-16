@@ -4,6 +4,27 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 7.1.0-alpha.2 - January 16, 2019
+ - Do not invoke #onCancel when animation is scheduled from #onFinish block [#13737](https://github.com/mapbox/mapbox-gl-native/pull/13737)
+ - Updated licenses after Android vendorization [#13738](https://github.com/mapbox/mapbox-gl-native/pull/13738)
+ - Use QueryFeatureExtension to query the map for supercluster v0.3.0 properties, add api for getLeaves, getChildren and getNextExpansionZoom [#13631](https://github.com/mapbox/mapbox-gl-native/pull/13631)
+ - Restore correct Snapshot attribution, make attribution parser backwards compatible [#13732](https://github.com/mapbox/mapbox-gl-native/pull/13732)
+ - Vendorize Android Mapbox dependencies [#13712](https://github.com/mapbox/mapbox-gl-native/pull/13712)
+ - Introduce NativeMap abstraction, remove static code block removal utility [#13681](https://github.com/mapbox/mapbox-gl-native/pull/13681)
+ - Notify requests about network reachability in priority order [#13721](https://github.com/mapbox/mapbox-gl-native/pull/13721)
+ - SymbolBucket, use single map for paint properties data [#13724](https://github.com/mapbox/mapbox-gl-native/pull/13724)
+ - Avoid NullPointerException when quickly closing activity for attribution click handling [#13723](https://github.com/mapbox/mapbox-gl-native/pull/13723)
+ - Return constexpr strings from functions to avoid ODR compile failures [#13720](https://github.com/mapbox/mapbox-gl-native/pull/13720)
+ - Split layer type specific code in mbgl::Programs [#13577](https://github.com/mapbox/mapbox-gl-native/pull/13577)
+ - Shader program must always match bucket in render symbol layer [#13667](https://github.com/mapbox/mapbox-gl-native/pull/13667)
+ - Implement Google benchmark runner for Android platform [#13628](https://github.com/mapbox/mapbox-gl-native/pull/13628)
+ - Avoid leaking attribution dialog when hosting context is stopped [#13673](https://github.com/mapbox/mapbox-gl-native/pull/13673)
+ - Android test runner for core unit tests [#13617](https://github.com/mapbox/mapbox-gl-native/pull/13617)
+ - Throw IllegalStateException when when setting an maximum fps while the mapRenderer isn't created yet [#13706](https://github.com/mapbox/mapbox-gl-native/pull/13706)
+ - Lift Parceable interface to OfflineRegionDefinition [#13688](https://github.com/mapbox/mapbox-gl-native/pull/13688)
+ - Espresso test rework [#13576](https://github.com/mapbox/mapbox-gl-native/pull/13576)
+
+
 ## 7.0.1 - January 11, 2019
  - Experimental setMaximumFps configuration on MapView [#13498](https://github.com/mapbox/mapbox-gl-native/pull/13498)
 
