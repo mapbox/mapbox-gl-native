@@ -96,11 +96,11 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
 
     if (data.lock() != data_) {
         data = data_;
-        tilePyramid.cache.clear();
+        tilePyramid.reduceMemoryUse();
 
         if (data_) {
             const uint8_t maxZ = impl().getZoomRange().max;
-            for (const auto& pair : tilePyramid.tiles) {
+            for (const auto& pair : tilePyramid.getTiles()) {
                 if (pair.first.canonical.z <= maxZ) {
                     static_cast<GeoJSONTile*>(pair.second.get())->updateData(data_->getTile(pair.first.canonical));
                 }
@@ -109,8 +109,7 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
     }
 
     if (!data_) {
-        tilePyramid.tiles.clear();
-        tilePyramid.renderTiles.clear();
+        tilePyramid.clearAll();
         return;
     }
 
