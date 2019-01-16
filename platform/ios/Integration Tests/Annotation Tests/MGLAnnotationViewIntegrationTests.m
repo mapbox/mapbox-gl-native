@@ -51,7 +51,8 @@ typedef struct PanTestData {
     BOOL expectMapToHavePanned          = test.expectMapToHavePanned;
     BOOL expectCalloutToBeFullyOnscreen = test.calloutOnScreen;
     
-    
+    // Reset the map to a consistent state - want the map to be zoomed in, so that
+    // it's free to be panned without hitting boundaries.
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(0, 0) zoomLevel:14 animated:NO];
     [self waitForMapViewToBeRenderedWithTimeout:1.0];
     
@@ -76,13 +77,12 @@ typedef struct PanTestData {
         return annotationView;
     };
     
-    MGLPointAnnotation *point = [[MGLPointAnnotation alloc] init];
-    point.title = title;
-    
-    // Coordinate for left edge
+    // Coordinate for annotation screen coordinate
     CGPoint annotationPoint = CGPointMake(relativeCoordinate.x * size.width, relativeCoordinate.y * size.height);
     CLLocationCoordinate2D coordinate = [self.mapView convertPoint:annotationPoint toCoordinateFromView:self.mapView];
     
+    MGLPointAnnotation *point = [[MGLPointAnnotation alloc] init];
+    point.title = title;
     point.coordinate = coordinate;
     
     self.mapViewAnnotationCanShowCalloutForAnnotation = ^BOOL(MGLMapView *mapView, id<MGLAnnotation> annotation) {
@@ -114,7 +114,7 @@ typedef struct PanTestData {
     
     [self.mapView selectAnnotation:point moveIntoView:moveIntoView animateSelection:animateSelection];
 
-    // animated selection takes MGLAnimationDuration (0.3 seconds), so wait a little
+    // Animated selection takes MGLAnimationDuration (0.3 seconds), so wait a little
     // longer. We don't need to wait as long if we're not animated (but we do
     // want the runloop to tick over)
     [self waitFor:animateSelection ? 0.4: 0.05];
@@ -125,7 +125,6 @@ typedef struct PanTestData {
 
     // If the annotation is still "offscreen" at this point, then the above annotation view
     // may be nil, which is expected.
-    
     BOOL (^CGRectContainsRectWithAccuracy)(CGRect, CGRect, CGFloat) = ^(CGRect rect1, CGRect rect2, CGFloat accuracy) {
         CGRect expandedRect1 = CGRectInset(rect1, -accuracy, -accuracy);
         return CGRectContainsRect(expandedRect1, rect2);
