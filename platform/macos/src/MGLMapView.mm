@@ -2281,7 +2281,7 @@ public:
 
 - (BOOL)isMovingAnnotationIntoViewSupportedForAnnotation:(id<MGLAnnotation>)annotation animated:(BOOL)animated {
     // Consider delegating
-    return animated && [annotation isKindOfClass:[MGLPointAnnotation class]];
+    return [annotation isKindOfClass:[MGLPointAnnotation class]];
 }
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation
@@ -2326,10 +2326,20 @@ public:
         positioningRect.origin = [self convertCoordinate:origin toPointToView:self];
     }
 
-    if (!moveIntoView && NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
-        if (!NSEqualPoints(gesturePoint, NSZeroPoint)) {
+    BOOL shouldShowCallout = ([annotation respondsToSelector:@selector(title)]
+                              && annotation.title
+                              && !self.calloutForSelectedAnnotation.shown
+                              && [self.delegate respondsToSelector:@selector(mapView:annotationCanShowCallout:)]
+                              && [self.delegate mapView:self annotationCanShowCallout:annotation]);
+    
+    if (NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
+        if (!moveIntoView && !NSEqualPoints(gesturePoint, NSZeroPoint)) {
             positioningRect = CGRectMake(gesturePoint.x, gesturePoint.y, positioningRect.size.width, positioningRect.size.height);
         }
+    }
+    // Onscreen or partially on-screen
+    else if (!shouldShowCallout) {
+        moveIntoView = NO;
     }
 
     self.selectedAnnotation = annotation;
@@ -2337,11 +2347,7 @@ public:
     // For the callout to be shown, the annotation must have a title, its
     // callout must not already be shown, and the annotation must be able to
     // show a callout according to the delegate.
-    if ([annotation respondsToSelector:@selector(title)]
-        && annotation.title
-        && !self.calloutForSelectedAnnotation.shown
-        && [self.delegate respondsToSelector:@selector(mapView:annotationCanShowCallout:)]
-        && [self.delegate mapView:self annotationCanShowCallout:annotation]) {
+    if (shouldShowCallout) {
         NSPopover *callout = [self calloutForAnnotation:annotation];
 
         // Hang the callout off the right edge of the annotation image’s
@@ -2371,7 +2377,12 @@ public:
         };
 
         // Add padding around the positioning rect (in essence an inset from the edge of the viewport
-        NSRect expandedPositioningRect = edgeInsetsInsetRect(positioningRect, MGLMapViewOffscreenAnnotationPadding);
+        NSRect expandedPositioningRect = positioningRect;
+        
+        if (shouldShowCallout) {
+            // If we have a callout, expand this rect to include a buffer
+            expandedPositioningRect = edgeInsetsInsetRect(positioningRect, MGLMapViewOffscreenAnnotationPadding);
+        }
 
         // Used for callout positioning, and moving offscreen annotations onscreen.
         CGRect constrainedRect = edgeInsetsInsetRect(self.bounds, self.contentInsets);
