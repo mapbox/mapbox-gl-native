@@ -151,6 +151,9 @@ static const CGFloat kAnnotationScale = 0.125f;
             UIView *calloutView = self.mapView.calloutViewForSelectedAnnotation;
             XCTAssertNotNil(calloutView);
             
+            // If kAnnotationScale == 0.25, then the following assert can fail.
+            // This is really a warning (see https://github.com/mapbox/mapbox-gl-native/issues/13744 )
+            // If you need this NOT to fail the tests, consider replacing with MGLTestWarning
             XCTAssert(expectCalloutToBeFullyOnscreen == CGRectContainsRectWithAccuracy(self.mapView.bounds, calloutView.frame, 0.25),
                       @"Expect contains:%d, Mapview:%@ annotation:%@ callout:%@",
                       expectCalloutToBeFullyOnscreen,
@@ -176,7 +179,11 @@ static const CGFloat kAnnotationScale = 0.125f;
             
             if (annotationViewAfterSelection) {
                 XCTAssertNotNil(calloutView);
-                XCTAssert(expectCalloutToBeFullyOnscreen == CGRectContainsRectWithAccuracy(self.mapView.bounds, calloutView.frame, 0.25),
+
+                // If kAnnotationScale == 0.25, then the following assert can fail.
+                // This is really a warning (see https://github.com/mapbox/mapbox-gl-native/issues/13744 )
+                // If you need this NOT to fail the tests, consider replacing with MGLTestWarning
+                XCTAssert((expectCalloutToBeFullyOnscreen == CGRectContainsRectWithAccuracy(self.mapView.bounds, calloutView.frame, 0.25)),
                           @"Mapview:%@ annotation:%@ callout:%@",
                           NSStringFromCGRect(self.mapView.bounds),
                           NSStringFromCGRect(annotationViewAfterSelection.frame),
@@ -207,7 +214,7 @@ static const CGFloat kAnnotationScale = 0.125f;
         int row = 0;
         PanTestData *test = testData;
         while (test->relativeCoord.x != FLT_MAX) {
-            NSString *activityTitle = [NSString stringWithFormat:@"Rowwer %d/%d", row, i];
+            NSString *activityTitle = [NSString stringWithFormat:@"Row %d/%d", row, i];
             [XCTContext runActivityNamed:activityTitle
                                    block:^(id<XCTActivity>  _Nonnull activity) {
                                        [self internalTestOffscreenSelectionTitle:activityTitle
@@ -329,7 +336,14 @@ static const CGFloat kAnnotationScale = 0.125f;
         
         //  Onscreen
         {   { 0.5f, 0.5f},  YES,            YES,            YES,            NO,             YES },
-        {   {kAnnotationScale, 0.5f}, YES,  YES,            YES,            YES,            YES }, // expects to move, because although onscreen, callout would not be.
+        
+        //  Just at the edge of the screen.
+        //  Expects to move, because although onscreen, callout would not be.
+        //  However, if the scale is 0.25, then expectToPan should be NO, because
+        //  of the width of the annotation
+        //
+        //  Coord                     showsCallout  impl margins?   moveIntoView    expectMapToPan                  calloutOnScreen
+        {   {kAnnotationScale, 0.5f}, YES,          YES,            YES,            (kAnnotationScale == 0.125f),   YES },
 
         PAN_TEST_TERMINATOR
     };

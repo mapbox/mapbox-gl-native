@@ -16,6 +16,13 @@
 #define MGLTestAssertNotNil(myself, expression, ...) \
     _XCTPrimitiveAssertNotNil(myself, expression, @#expression, __VA_ARGS__)
 
+#define MGLTestWarning(expression, format, ...) \
+({ \
+    if (!(expression))  { \
+        NSString *message = [NSString stringWithFormat:format, ##__VA_ARGS__]; \
+        printf("warning: Test Case '%s' at line %d: '%s' %s\n", __PRETTY_FUNCTION__, __LINE__, #expression, message.UTF8String); \
+    } \
+})
 
 @interface MGLMapViewIntegrationTest : XCTestCase <MGLMapViewDelegate>
 @property (nonatomic) MGLMapView *mapView;
