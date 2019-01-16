@@ -4539,7 +4539,7 @@ public:
 
 - (BOOL)isMovingAnnotationIntoViewSupportedForAnnotation:(id<MGLAnnotation>)annotation animated:(BOOL)animated {
     // Consider delegating
-    return animated && [annotation isKindOfClass:[MGLPointAnnotation class]];
+    return [annotation isKindOfClass:[MGLPointAnnotation class]];
 }
 
 - (id <MGLAnnotation>)selectedAnnotation

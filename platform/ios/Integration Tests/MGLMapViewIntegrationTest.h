@@ -27,6 +27,8 @@
 @property (nonatomic) void (^regionIsChanging)(MGLMapView *mapView);
 @property (nonatomic) void (^regionDidChange)(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated);
 @property (nonatomic) CGPoint (^mapViewUserLocationAnchorPoint)(MGLMapView *mapView);
+@property (nonatomic) BOOL (^mapViewAnnotationCanShowCalloutForAnnotation)(MGLMapView *mapView, id<MGLAnnotation> annotation);
+@property (nonatomic) id<MGLCalloutView> (^mapViewCalloutViewForAnnotation)(MGLMapView *mapView, id<MGLAnnotation> annotation);
 
 // Utility methods
 - (NSString*)validAccessToken;

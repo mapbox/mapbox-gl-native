@@ -108,6 +108,20 @@
     return CGPointZero;
 }
 
+- (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id<MGLAnnotation>)annotation {
+    if (self.mapViewAnnotationCanShowCalloutForAnnotation) {
+        return self.mapViewAnnotationCanShowCalloutForAnnotation(mapView, annotation);
+    }
+    return NO;
+}
+
+- (id<MGLCalloutView>)mapView:(MGLMapView *)mapView calloutViewForAnnotation:(id<MGLAnnotation>)annotation {
+    if (self.mapViewCalloutViewForAnnotation) {
+        return self.mapViewCalloutViewForAnnotation(mapView, annotation);
+    }
+    return nil;
+}
+
 #pragma mark - Utilities
 
 - (void)waitForMapViewToFinishLoadingStyleWithTimeout:(NSTimeInterval)timeout {
