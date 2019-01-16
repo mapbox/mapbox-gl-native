@@ -2,11 +2,19 @@ ignore:
   - "test/"
   - "vendor/"
   - "platform/ios/test"
+  - "platform/ios/vendor"
   - "platform/darwin/test"
+  - "platform/darwin/include"
+  - "platform/darwin/docs"
+  - "platform/ios/resources"
+  - "platform/ios/scripts"
 flags:
+  linux:
+    paths:
+      
   ios:
     paths:
-      - "platform/ios/"  - "platform/darwin/test"
+      - "platform/ios/"
 coverage:
   status:
     project:
