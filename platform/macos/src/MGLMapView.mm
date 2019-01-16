@@ -1845,7 +1845,7 @@ public:
 
 - (nullable NSArray<id <MGLAnnotation>> *)visibleAnnotations
 {
-    return [self visibleFeaturesInRect:self.bounds];
+    return [self visibleAnnotationsInRect:self.bounds];
 }
 
 - (nullable NSArray<id <MGLAnnotation>> *)visibleAnnotationsInRect:(CGRect)rect

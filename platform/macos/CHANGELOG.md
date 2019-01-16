@@ -5,6 +5,7 @@
 * Added an `MGLStyle.performsPlacementTransitions` property to control how long it takes for colliding labels to fade out. ([#13565](https://github.com/mapbox/mapbox-gl-native/pull/13565))
 * Fixed a crash when casting large numbers in `NSExpression`. ([#13580](https://github.com/mapbox/mapbox-gl-native/pull/13580))
 * Added the `-[MGLShapeSource leavesOfCluster:offset:limit:]`, `-[MGLShapeSource childrenOfCluster:]`, `-[MGLShapeSource zoomLevelForExpandingCluster:]` methods for inspecting a cluster in an `MGLShapeSource`s created with the `MGLShapeSourceOptionClustered` option. Feature querying now returns clusters represented by `MGLPointFeatureCluster` objects (that conform to the `MGLCluster` protocol). ([#12952](https://github.com/mapbox/mapbox-gl-native/pull/12952)
+* Fixed a bug with `MGLMapView.visibleAnnotations` that resulted in incorrect results and performance degradation. ([#13745](https://github.com/mapbox/mapbox-gl-native/pull/13745))
 
 
 ## 0.13.0 - December 20, 2018
