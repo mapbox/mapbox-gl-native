@@ -3,8 +3,6 @@ package com.mapbox.mapboxsdk.style.sources;
 import android.support.annotation.Keep;
 
 import android.support.annotation.NonNull;
-
-import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
 
 /**
@@ -16,10 +14,6 @@ public abstract class Source {
   private long nativePtr;
 
   protected boolean detached;
-
-  static {
-    LibraryLoader.load();
-  }
 
   /**
    * Internal use
