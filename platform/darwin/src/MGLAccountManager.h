@@ -39,7 +39,7 @@ MGL_EXPORT
 /*
  The API base URL that is used to access Mapbox resources. The default base URL is `https://api.mapbox.com`. If `nil`, the Mapbox default base API URL is in use.
  */
-@property (class, atomic) NSURL *apiBaseURL;
+@property (class, nonatomic) NSURL *apiBaseURL;
 
 + (BOOL)mapboxMetricsEnabledSettingShownInApp __attribute__((unavailable("Telemetry settings are now always shown in the ℹ️ menu.")));
 

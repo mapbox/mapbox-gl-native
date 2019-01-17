@@ -8,12 +8,14 @@
 @interface MGLAccountManager ()
 
 @property (atomic) NSString *accessToken;
+@property (nonatomic) NSURL *apiBaseURL;
 
 @end
 #else
 @interface MGLAccountManager ()
 
 @property (atomic) NSString *accessToken;
+@property (nonatomic) NSURL *apiBaseURL;
 
 @end
 #endif
