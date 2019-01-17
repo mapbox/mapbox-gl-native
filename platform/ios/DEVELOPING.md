@@ -125,7 +125,7 @@ find platform/{darwin,ios}/resources platform/macos/sdk -path '*/MYLANG.lproj/*.
 
 To add an example code listing to the documentation for a class or class member:
 
- 1. Add a test case named in the form testMGLClass or testMGLClass$method to [MGLDocumentationExamplesTests](test/MGLDocumentationExampleTests.swift).
+ 1. Add a test case named in the form `testMGLClass` or `testMGLClass$method` to [MGLDocumentationExamplesTests](test/MGLDocumentationExampleTests.swift).
  2. Wrap the code you'd like to appear in the documentation within the
     following comment blocks:
     ```
