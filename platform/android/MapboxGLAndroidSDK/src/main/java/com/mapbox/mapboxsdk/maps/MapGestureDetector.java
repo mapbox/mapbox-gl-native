@@ -118,7 +118,8 @@ final class MapGestureDetector {
       RotateGestureListener rotateGestureListener = new RotateGestureListener(
         context.getResources().getDimension(R.dimen.mapbox_minimum_scale_span_when_rotating),
         context.getResources().getDimension(R.dimen.mapbox_minimum_angular_velocity),
-        context.getResources().getDimension(R.dimen.mapbox_defaultScaleSpanSinceStartThreshold));
+        context.getResources().getDimension(
+          com.mapbox.android.gestures.R.dimen.mapbox_defaultScaleSpanSinceStartThreshold));
       ShoveGestureListener shoveGestureListener = new ShoveGestureListener();
       TapGestureListener tapGestureListener = new TapGestureListener();
 
