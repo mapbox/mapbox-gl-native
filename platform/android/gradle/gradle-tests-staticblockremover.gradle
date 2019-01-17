@@ -1,0 +1,64 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+        classpath 'com.darylteo.gradle:javassist-plugin:0.4.1'
+    }
+}
+
+import com.darylteo.gradle.javassist.tasks.TransformationTask
+import com.darylteo.gradle.javassist.transformers.ClassTransformer
+import javassist.CtClass
+import javassist.CtConstructor
+
+class StaticBlockRemover extends ClassTransformer {
+
+    private static final SOURCE = "com.mapbox.mapboxsdk.style.sources.Source";
+    private static final LAYER = "com.mapbox.mapboxsdk.style.layers.Layer";
+    private static
+    final NATIVE_CONNECTIVITY_LISTENER = "com.mapbox.mapboxsdk.net.NativeConnectivityListener";
+    private static final OFFLINE_MANAGER = "com.mapbox.mapboxsdk.offline.OfflineManager";
+    private static final OFFLINE_REGION = "com.mapbox.mapboxsdk.offline.OfflineRegion";
+    private static final List<String> excludes = new ArrayList<>();
+
+    static {
+        excludes.add(SOURCE)
+        excludes.add(LAYER)
+        excludes.add(NATIVE_CONNECTIVITY_LISTENER)
+        excludes.add(OFFLINE_MANAGER)
+        excludes.add(OFFLINE_REGION)
+    }
+
+    public void applyTransformations(CtClass clazz) throws Exception {
+        if (shouldFilter(clazz)) {
+            CtConstructor constructor = clazz.getClassInitializer()
+            if (constructor != null) {
+                clazz.removeConstructor(constructor)
+            }
+        }
+    }
+
+    public boolean shouldFilter(CtClass clazz) {
+        return hasAStaticBlock(clazz);
+    }
+
+    private boolean hasAStaticBlock(CtClass clazz) {
+        String name = clazz.getName();
+        return excludes.contains(name);
+    }
+}
+
+task removeStatic(type: TransformationTask) {
+    // TODO Find a better way to get output classes path
+    String fromToDirPath = buildDir.getAbsolutePath() + "/intermediates/classes/debug"
+    from fromToDirPath
+    transformation = new StaticBlockRemover()
+    into fromToDirPath
+}
+
+afterEvaluate {
+    compileDebugUnitTestSources.dependsOn(removeStatic)
+}
