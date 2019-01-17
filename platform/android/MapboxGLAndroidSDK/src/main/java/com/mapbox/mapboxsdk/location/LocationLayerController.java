@@ -73,6 +73,9 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
 
   private boolean isHidden = true;
 
+  @Nullable
+  private String layerBelow;
+
   LocationLayerController(MapboxMap mapboxMap, Style style, LayerSourceProvider layerSourceProvider,
                           LayerFeatureProvider featureProvider, LayerBitmapProvider bitmapProvider,
                           @NonNull LocationComponentOptions options) {
@@ -99,6 +102,14 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
   }
 
   void applyStyle(@NonNull LocationComponentOptions options) {
+    String newLayerBelowOption = options.layerBelow();
+    if ((layerBelow != null || newLayerBelowOption != null)) {
+      if (layerBelow == null || !layerBelow.equals(newLayerBelowOption)) {
+        removeLayers();
+        addLayers(newLayerBelowOption);
+      }
+    }
+
     this.options = options;
 
     float elevation = options.elevation();
@@ -211,6 +222,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
   }
 
   private void addLayers(@NonNull String idBelowLayer) {
+    layerBelow = idBelowLayer;
     addSymbolLayer(BEARING_LAYER, idBelowLayer);
     addSymbolLayer(FOREGROUND_LAYER, BEARING_LAYER);
     addSymbolLayer(BACKGROUND_LAYER, FOREGROUND_LAYER);
@@ -231,6 +243,13 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
   private void addLayerToMap(Layer layer, @NonNull String idBelowLayer) {
     style.addLayerBelow(layer, idBelowLayer);
     layerMap.add(layer.getId());
+  }
+
+  private void removeLayers() {
+    for (String layerId : layerMap) {
+      style.removeLayer(layerId);
+    }
+    layerMap.clear();
   }
 
   private void setBearingProperty(@NonNull String propertyId, float bearing) {
