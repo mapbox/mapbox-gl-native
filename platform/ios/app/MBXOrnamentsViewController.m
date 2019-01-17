@@ -12,10 +12,6 @@
 
 @implementation MBXOrnamentsViewController
 
-- (void)dealloc {
-    [self.timer invalidate];
-}
-
 - (void)setCurrentPositionIndex:(NSInteger)currentPositionIndex {
     NSArray *ornamentPositions = @[@[
                                        @(MGLOrnamentPositionTopLeft),
@@ -74,19 +70,24 @@
     self.mapView = mapView;
 }
 
-- (void)tick {
+- (void)viewDidDisappear:(BOOL)animated {
+    [self.timer invalidate];
+    self.timer = nil;
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:1
+                                                  target:self
+                                                selector:@selector(onTimerTick)
+                                                userInfo:nil
+                                                 repeats:YES];
+}
+
+- (void)onTimerTick {
     self.currentPositionIndex ++;
     if (self.currentPositionIndex >= 4) {
         self.currentPositionIndex = 0;
     }
-}
-
-- (void)mapViewDidFinishRenderingMap:(MGLMapView *)mapView fullyRendered:(BOOL)fullyRendered {
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:1
-                                                  target:self
-                                                selector:@selector(tick)
-                                                userInfo:nil
-                                                 repeats:YES];
 }
 
 @end
