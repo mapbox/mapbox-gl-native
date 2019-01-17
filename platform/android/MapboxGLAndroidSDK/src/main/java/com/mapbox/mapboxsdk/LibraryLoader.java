@@ -16,11 +16,16 @@ public abstract class LibraryLoader {
   private static final LibraryLoader DEFAULT = new LibraryLoader() {
     @Override
     public void load(String name) {
-      System.loadLibrary(name);
+      if (!loaded) {
+        System.loadLibrary(name);
+      }
+      loaded = true;
     }
   };
 
   private static volatile LibraryLoader loader = DEFAULT;
+
+  protected static boolean loaded;
 
   /**
    * Set the library loader that loads the shared library.
