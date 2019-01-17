@@ -839,14 +839,14 @@ public:
 - (void)setCompassViewPosition:(MGLOrnamentPosition)compassViewPosition {
     MGLLogDebug(@"Setting compassViewPosition: %d", compassViewPosition);
     _compassViewPosition = compassViewPosition;
-    [self installCompressViewConstraints];
+    [self installCompassViewConstraints];
 }
 
 - (void)setCompassViewOffset:(CGPoint)compassViewOffset {
     NSAssert(compassViewOffset.x >= 0 && compassViewOffset.y >= 0, @"The position offset of the compass should not be negative.");
     MGLLogDebug(@"Setting compassViewOffset: (x:%f, y:%f)", compassViewOffset.x, compassViewOffset.y);
     _compassViewOffset = compassViewOffset;
-    [self installCompressViewConstraints];
+    [self installCompassViewConstraints];
 }
 
 - (void)setLogoViewPosition:(MGLOrnamentPosition)logoViewPosition {
@@ -1086,13 +1086,13 @@ public:
 
 - (void)installConstraints
 {
-    [self installCompressViewConstraints];
+    [self installCompassViewConstraints];
     [self installScaleBarConstraints];
     [self installLogoViewConstraints];
     [self installAttributionButtonConstraints];
 }
 
-- (void)installCompressViewConstraints {
+- (void)installCompassViewConstraints {
     // compass view
     [self installConstraintsWithView:self.compassView
                          constraints:self.compassViewConstraints
