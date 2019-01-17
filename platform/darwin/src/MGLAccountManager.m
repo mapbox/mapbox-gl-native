@@ -28,6 +28,11 @@
     if (accessToken.length) {
         self.accessToken = accessToken;
     }
+    
+    NSString *apiBaseURL = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMapboxAPIBaseURL"];
+    if (apiBaseURL.length) {
+        [self setAPIBaseURL:[NSURL URLWithString:apiBaseURL]];
+    }
 }
 
 + (instancetype)sharedManager {
@@ -69,6 +74,14 @@
 
 + (NSString *)accessToken {
     return [MGLAccountManager sharedManager].accessToken;
+}
+
++ (void)setAPIBaseURL:(NSURL *)apiBaseURL {
+    [MGLAccountManager sharedManager].apiBaseURL = apiBaseURL;
+}
+
++ (NSURL *)apiBaseURL {
+    return [MGLAccountManager sharedManager].apiBaseURL;
 }
 
 @end

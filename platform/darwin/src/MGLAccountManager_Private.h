@@ -8,4 +8,7 @@
 /// The current global access token.
 @property (atomic) NSString *accessToken;
 
+/// The current API base URL.
+@property (atomic) NSURL *apiBaseURL;
+
 @end
