@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  #### Related examples
  See the <a
- href="https://www.mapbox.com/ios-sdk/maps/examples/heatmap-example/">Create a
+ href="https://docs.mapbox.com/ios/maps/examples/heatmap-example/">Create a
  heatmap layer</a> example to learn how to add this style layer to your map.
 
  ### Example
