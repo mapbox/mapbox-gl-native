@@ -45,7 +45,10 @@ void validate(const std::vector<MaskedRenderable> expected) {
     std::vector<MaskedRenderable> actual = expected;
     std::for_each(actual.begin(), actual.end(),
                   [](auto& renderable) { renderable.mask.clear(); });
-    algorithm::updateTileMasks<MaskedRenderable>({ actual.begin(), actual.end() });
+    std::vector<std::reference_wrapper<MaskedRenderable>> sorted(actual.begin(), actual.end());
+    std::sort(sorted.begin(), sorted.end(),
+                  [](const MaskedRenderable& a, const MaskedRenderable& b){ return a.id < b.id; });
+    algorithm::updateTileMasks<MaskedRenderable>(std::move(sorted));
     EXPECT_EQ(expected, actual);
 }
 

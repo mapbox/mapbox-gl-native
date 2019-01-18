@@ -25,8 +25,9 @@ private:
     std::multimap<UnwrappedTileID, Leaf> pool;
 
 public:
+    // The given vector must be sorted by id.
     template <typename Renderable>
-    void update(std::vector<std::reference_wrapper<Renderable>> renderables);
+    void update(std::vector<std::reference_wrapper<Renderable>> sortedRenderables);
 
     std::map<UnwrappedTileID, ClipID> getClipIDs() const;
 };
