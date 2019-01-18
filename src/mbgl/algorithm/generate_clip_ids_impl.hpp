@@ -10,12 +10,11 @@ namespace algorithm {
 template <typename Renderable>
 void ClipIDGenerator::update(std::vector<std::reference_wrapper<Renderable>> renderables) {
     std::size_t size = 0;
-
-    std::sort(renderables.begin(), renderables.end(),
-              [](const auto& a, const auto& b) { return a.get().id < b.get().id; });
+    assert(std::is_sorted(renderables.begin(), renderables.end(),
+        [](const Renderable& a, const Renderable& b) { return a.id < b.id; }));
 
     const auto end = renderables.end();
-    for (auto it = renderables.begin(); it != end; it++) {
+    for (auto it = renderables.begin(); it != end; ++it) {
         auto& renderable = it->get();
         if (!renderable.used || !renderable.needsClipping) {
             continue;
