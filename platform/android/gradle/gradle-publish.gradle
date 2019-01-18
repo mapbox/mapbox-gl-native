@@ -1,5 +1,6 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply from: "${rootDir}/gradle/dependencies.gradle"
 
 allprojects {
     group project.GROUP
@@ -97,6 +98,21 @@ afterEvaluate { project ->
                         }
                     }
                 }
+
+                def vendorMap = getVendorMap()
+                pom.whenConfigured { pom ->
+                    println("Current dependencies ${pom.dependencies}")
+                    pom.dependencies.each { dep ->
+                        println("Processing vendor ${dep}")
+                        if (dep.getGroupId() == rootProject.name) {
+                            Vendor vendor = vendorMap.get(dep.getArtifactId())
+                            dep.setGroupId(project.GROUP)
+                            dep.setArtifactId(vendor.artifactName)
+                            dep.setVersion(vendor.artifactVersion)
+                            println("Updated vendor ${dep}")
+                        }
+                    }
+                }
             }
         }
     }
@@ -140,4 +156,34 @@ afterEvaluate { project ->
             classpath += files(variant.javaCompile.classpath.files)
         }
     }
+}
+
+// this class holds values that will be included in the resulting pom file for vendorized libraries
+class Vendor {
+    private final artifactName
+    private final artifactVersion
+
+    Vendor(artifactName, artifactVersion) {
+        this.artifactName = artifactName
+        this.artifactVersion = artifactVersion
+    }
+
+    def getArtifactName() {
+        return artifactName
+    }
+
+    def getArtifactVersion() {
+        return artifactVersion
+    }
+}
+
+HashMap<String, Vendor> getVendorMap() {
+    def map = new HashMap<String, Vendor>()
+    map.put("mapbox-android-gestures", new Vendor(vendorArtifacts.mapboxGestures, vendorVersions.mapboxGestures))
+    map.put("services-core", new Vendor(vendorArtifacts.mapboxJavaCore, vendorVersions.mapboxJava))
+    map.put("services-turf", new Vendor(vendorArtifacts.mapboxJavaTurf, vendorVersions.mapboxJava))
+    map.put("services-geojson", new Vendor(vendorArtifacts.mapboxJavaGeojson, vendorVersions.mapboxJava))
+    map.put("libcore", new Vendor(vendorArtifacts.mapboxAndroidCore, vendorVersions.mapboxAndroidCore))
+    map.put("libtelemetry", new Vendor(vendorArtifacts.mapboxTelemetry, vendorVersions.mapboxTelemetry))
+    return map
 }

@@ -25,6 +25,22 @@ ext {
             gms             : '16.0.0'
     ]
 
+    vendorArtifacts = [
+            mapboxGestures   : 'mapbox-android-gestures',
+            mapboxJavaCore   : 'mapbox-sdk-core',
+            mapboxJavaTurf   : 'mapbox-sdk-turf',
+            mapboxJavaGeojson: 'mapbox-sdk-geojson',
+            mapboxTelemetry  : 'mapbox-android-telemetry',
+            mapboxAndroidCore: 'mapbox-android-core'
+    ]
+
+    vendorVersions = [
+            mapboxGestures   : '0.3.0',
+            mapboxJava       : '4.3.0',
+            mapboxTelemetry  : '4.2.0',
+            mapboxAndroidCore: '1.1.0'
+    ]
+
     dependenciesList = [
             junit                  : "junit:junit:${versions.junit}",
             mockito                : "org.mockito:mockito-core:${versions.mockito}",
