@@ -14,7 +14,7 @@ ext {
             testRunner      : '1.0.2',
             leakCanary      : '1.6.1',
             junit           : '4.12',
-            mockito         : '2.18.3',
+            mockito         : '2.23.4',
             mockk           : '1.8.13.kotlin13',
             robolectric     : '3.8',
             timber          : '4.7.1',
