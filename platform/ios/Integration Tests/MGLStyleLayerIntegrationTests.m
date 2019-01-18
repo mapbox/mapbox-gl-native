@@ -9,7 +9,7 @@
     // Adapted from https://www.mapbox.com/ios-sdk/examples/dds-circle-layer/
 
     // "mapbox://examples.2uf7qges" is a map ID referencing a tileset. For more
-    // more information, see mapbox.com/help/define-map-id/
+    // more information, see docs.mapbox.com/help/glossary/map-id/
     MGLSource *source = [[MGLVectorTileSource alloc] initWithIdentifier:@"trees" configurationURL:[NSURL URLWithString:@"mapbox://examples.2uf7qges"]];
     [self.mapView.style addSource:source];
 

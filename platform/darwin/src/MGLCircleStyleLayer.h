@@ -80,11 +80,11 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslationAnchor) {
 
  #### Related examples
  See the <a
- href="https://www.mapbox.com/ios-sdk/maps/examples/dds-circle-layer/">Data-driven
+ href="https://docs.mapbox.com/ios/maps/examples/dds-circle-layer/">Data-driven
  circles</a>, <a
- href="https://www.mapbox.com/ios-sdk/maps/examples/shape-collection/">Add
- multiple shapes from a single shape source</a>, and <a
- href="https://www.mapbox.com/ios-sdk/maps/examples/clustering/">Cluster point
+ href="https://docs.mapbox.com/ios/maps/examples/shape-collection/">Add multiple
+ shapes from a single shape source</a>, and <a
+ href="https://docs.mapbox.com/ios/maps/examples/clustering/">Cluster point
  data</a> examples to learn how to add circles to your map using this style
  layer.
 

@@ -294,7 +294,7 @@ MGL_EXPORT IB_DESIGNABLE
 
  @note The Mapbox terms of service, which governs the use of Mapbox-hosted
     vector tiles and styles,
-    <a href="https://www.mapbox.com/help/mapbox-logo/">requires</a> most Mapbox
+    <a href="https://docs.mapbox.com/help/how-mapbox-works/attribution/">requires</a> most Mapbox
     customers to display the Mapbox logo. If this applies to you, do not
     hide this view or change its contents.
  */
@@ -309,18 +309,18 @@ MGL_EXPORT IB_DESIGNABLE
 
  @note The Mapbox terms of service, which governs the use of Mapbox-hosted
     vector tiles and styles,
-    <a href="https://www.mapbox.com/help/attribution/">requires</a> these
+    <a href="https://www.mapbox.com/tos/#[FamaFama]">requires</a> these
     copyright notices to accompany any map that features Mapbox-designed styles,
     OpenStreetMap data, or other Mapbox data such as satellite or terrain
     data. If that applies to this map view, do not hide this view or remove
     any notices from it.
 
  @note You are additionally
-    <a href="https://www.mapbox.com/help/telemetry-opt-out-for-users/">required</a>
+    <a href="https://www.mapbox.com/tos/#[FamaFama]">required</a>
     to provide users with the option to disable anonymous usage and location
     sharing (telemetry). If this view is hidden, you must implement this
     setting elsewhere in your app or via `Settings.bundle`. See our
-    <a href="https://www.mapbox.com/ios-sdk/#telemetry_opt_out">website</a> for
+    <a href="https://docs.mapbox.com/help/how-mapbox-works/attribution/#mapbox-maps-sdk-for-ios">website</a> for
     implementation help.
  */
 @property (nonatomic, readonly) UIButton *attributionButton;
