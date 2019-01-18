@@ -14,7 +14,7 @@
         @"<a href=\"https://www.mapbox.com/about/maps/\" target=\"_blank\">&copy; Mapbox</a> "
         @"<a href=\"http://www.openstreetmap.org/about/\" target=\"_blank\">©️ OpenStreetMap</a> "
         @"CC&nbsp;BY-SA "
-        @"<a class=\"mapbox-improve-map\" href=\"https://www.mapbox.com/map-feedback/\" target=\"_blank\">Improve this map</a>",
+        @"<a class=\"mapbox-improve-map\" href=\"https://apps.mapbox.com/feedback/\" target=\"_blank\">Improve this map</a>",
     };
 
     NSMutableArray<MGLAttributionInfo *> *infos = [NSMutableArray array];
@@ -44,13 +44,13 @@
     XCTAssertNil([infos[2] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14]);
 
     XCTAssertEqualObjects(infos[3].title.string, @"Improve this map");
-    XCTAssertEqualObjects(infos[3].URL, [NSURL URLWithString:@"https://www.mapbox.com/map-feedback/"]);
+    XCTAssertEqualObjects(infos[3].URL, [NSURL URLWithString:@"https://apps.mapbox.com/feedback/"]);
     XCTAssertTrue(infos[3].feedbackLink);
     NSURL *styleURL = [MGLStyle satelliteStreetsStyleURLWithVersion:99];
     XCTAssertEqualObjects([infos[3] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14],
-                          [NSURL URLWithString:@"https://www.mapbox.com/feedback/?referrer=com.mapbox.Mapbox#/77.63680/12.98108/14.00/0.0/0"]);
+                          [NSURL URLWithString:@"https://apps.mapbox.com/feedback/?referrer=com.mapbox.Mapbox#/77.63680/12.98108/14.00/0.0/0"]);
     XCTAssertEqualObjects([infos[3] feedbackURLForStyleURL:styleURL atCenterCoordinate:mapbox zoomLevel:3.14159 direction:90.9 pitch:12.5],
-                          [NSURL URLWithString:@"https://www.mapbox.com/feedback/?referrer=com.mapbox.Mapbox&owner=mapbox&id=satellite-streets-v99&access_token&map_sdk_version=1.0.0#/77.63680/12.98108/3.14/90.9/13"]);
+                          [NSURL URLWithString:@"https://apps.mapbox.com/feedback/?referrer=com.mapbox.Mapbox&owner=mapbox&id=satellite-streets-v99&access_token&map_sdk_version=1.0.0#/77.63680/12.98108/3.14/90.9/13"]);
 }
 
 - (void)testStyle {
