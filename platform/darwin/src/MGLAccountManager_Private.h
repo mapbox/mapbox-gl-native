@@ -9,6 +9,6 @@
 @property (atomic) NSString *accessToken;
 
 /// The current API base URL.
-@property (atomic) NSURL *apiBaseURL;
+@property (atomic, readwrite) NSURL *apiBaseURL;
 
 @end
