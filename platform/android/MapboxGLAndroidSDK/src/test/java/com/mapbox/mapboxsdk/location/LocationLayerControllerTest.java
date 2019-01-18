@@ -570,11 +570,21 @@ public class LocationLayerControllerTest {
 
   private LayerSourceProvider buildLayerProvider() {
     LayerSourceProvider layerSourceProvider = mock(LayerSourceProvider.class);
-    when(layerSourceProvider.generateLayer(SHADOW_LAYER)).thenReturn(mock(Layer.class));
-    when(layerSourceProvider.generateLayer(BACKGROUND_LAYER)).thenReturn(mock(Layer.class));
-    when(layerSourceProvider.generateLayer(FOREGROUND_LAYER)).thenReturn(mock(Layer.class));
-    when(layerSourceProvider.generateLayer(BEARING_LAYER)).thenReturn(mock(Layer.class));
-    when(layerSourceProvider.generateAccuracyLayer()).thenReturn(mock(Layer.class));
+
+    Layer shadowLayer = mock(Layer.class);
+    when(layerSourceProvider.generateLayer(SHADOW_LAYER)).thenReturn(shadowLayer);
+
+    Layer backgroundLayer = mock(Layer.class);
+    when(layerSourceProvider.generateLayer(BACKGROUND_LAYER)).thenReturn(backgroundLayer);
+
+    Layer foregroundLayer = mock(Layer.class);
+    when(layerSourceProvider.generateLayer(FOREGROUND_LAYER)).thenReturn(foregroundLayer);
+
+    Layer bearingLayer = mock(Layer.class);
+    when(layerSourceProvider.generateLayer(BEARING_LAYER)).thenReturn(bearingLayer);
+
+    Layer accuracyLayer = mock(Layer.class);
+    when(layerSourceProvider.generateAccuracyLayer()).thenReturn(accuracyLayer);
     return layerSourceProvider;
   }
 }
