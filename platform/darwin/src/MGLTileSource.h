@@ -148,7 +148,7 @@ typedef NS_ENUM(NSUInteger, MGLTileCoordinateSystem) {
 typedef NS_ENUM(NSUInteger, MGLDEMEncoding) {
 
     /**
-     Raster tiles generated with the [Mapbox encoding formula](https://www.mapbox.com/help/access-elevation-data/#mapbox-terrain-rgb).
+     Raster tiles generated with the [Mapbox encoding formula](https://docs.mapbox.com/help/troubleshooting/access-elevation-data/#mapbox-terrain-rgb).
     */
     MGLDEMEncodingMapbox = 0,
 
