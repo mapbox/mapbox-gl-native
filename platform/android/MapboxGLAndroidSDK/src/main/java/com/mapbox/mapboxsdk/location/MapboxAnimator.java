@@ -26,7 +26,8 @@ abstract class MapboxAnimator<K> extends ValueAnimator implements ValueAnimator.
     ANIMATOR_CAMERA_COMPASS_BEARING,
     ANIMATOR_LAYER_ACCURACY,
     ANIMATOR_ZOOM,
-    ANIMATOR_TILT
+    ANIMATOR_TILT,
+    ANIMATOR_PULSING_CIRCLE
   })
   @interface Type {
   }
@@ -40,6 +41,7 @@ abstract class MapboxAnimator<K> extends ValueAnimator implements ValueAnimator.
   static final int ANIMATOR_LAYER_ACCURACY = 6;
   static final int ANIMATOR_ZOOM = 7;
   static final int ANIMATOR_TILT = 8;
+  static final int ANIMATOR_PULSING_CIRCLE = 9;
 
   private final AnimationsValueChangeListener<K> updateListener;
   private final K target;
@@ -57,6 +59,15 @@ abstract class MapboxAnimator<K> extends ValueAnimator implements ValueAnimator.
     this.target = target;
     addUpdateListener(this);
     addListener(new AnimatorListener());
+  }
+
+  public MapboxAnimator(AnimationsValueChangeListener<K> updateListener, K target, K animatedValue,
+                        double minUpdateInterval, long timeElapsed) {
+    this.updateListener = updateListener;
+    this.target = target;
+    this.animatedValue = animatedValue;
+    this.minUpdateInterval = minUpdateInterval;
+    this.timeElapsed = timeElapsed;
   }
 
   @Override

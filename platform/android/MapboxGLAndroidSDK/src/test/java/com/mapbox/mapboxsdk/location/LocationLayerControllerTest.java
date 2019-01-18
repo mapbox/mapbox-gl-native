@@ -33,6 +33,7 @@ import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_FOREGROUND_ICON_OFFSET;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_GPS_BEARING;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_SHADOW_ICON_OFFSET;
+import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PULSING_CIRCLE_LAYER;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.SHADOW_ICON;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.SHADOW_LAYER;
 import static com.mapbox.mapboxsdk.location.MapboxAnimator.ANIMATOR_LAYER_ACCURACY;
@@ -161,6 +162,23 @@ public class LocationLayerControllerTest {
   }
 
   @Test
+  public void onInitialization_pulsingCircleLayerIsAdded() {
+    OnRenderModeChangedListener internalRenderModeChangedListener = mock(OnRenderModeChangedListener.class);
+    LayerSourceProvider sourceProvider = buildLayerProvider();
+    Layer pulsingCircleLayer = mock(Layer.class);
+    when(sourceProvider.generatePulsingCircleLayer()).thenReturn(pulsingCircleLayer);
+    GeoJsonSource locationSource = mock(GeoJsonSource.class);
+    when(sourceProvider.generateSource(any(Feature.class))).thenReturn(locationSource);
+    LayerBitmapProvider bitmapProvider = mock(LayerBitmapProvider.class);
+    LocationComponentOptions options = mock(LocationComponentOptions.class);
+
+    new LocationLayerController(mapboxMap, mapboxMap.getStyle(), sourceProvider, buildFeatureProvider(options),
+        bitmapProvider, options, internalRenderModeChangedListener);
+
+    verify(style).addLayerBelow(pulsingCircleLayer, ACCURACY_LAYER);
+  }
+
+  @Test
   public void onInitialization_numberOfCachedLayerIdsIsConstant() {
     OnRenderModeChangedListener internalRenderModeChangedListener = mock(OnRenderModeChangedListener.class);
     LayerSourceProvider sourceProvider = buildLayerProvider();
@@ -175,7 +193,7 @@ public class LocationLayerControllerTest {
 
     controller.initializeComponents(mapboxMap.getStyle(), options);
 
-    assertEquals(5, controller.layerSet.size());
+    assertEquals(6, controller.layerSet.size());
   }
 
   @Test
@@ -379,7 +397,7 @@ public class LocationLayerControllerTest {
     layerController.applyStyle(options);
 
     verify(style, times(0)).removeLayer(any(String.class));
-    verify(style, times(5)).addLayerBelow(any(Layer.class), any(String.class));
+    verify(style, times(6)).addLayerBelow(any(Layer.class), any(String.class));
   }
 
   @Test
@@ -401,7 +419,7 @@ public class LocationLayerControllerTest {
 
     verify(style, times(0)).removeLayer(any(String.class));
     verify(style, times(1)).addLayer(any(Layer.class));
-    verify(style, times(4)).addLayerBelow(any(Layer.class), Mockito.<String>any());
+    verify(style, times(5)).addLayerBelow(any(Layer.class), Mockito.<String>any());
   }
 
   @Test
@@ -628,6 +646,10 @@ public class LocationLayerControllerTest {
     Layer accuracyLayer = mock(Layer.class);
     when(accuracyLayer.getId()).thenReturn(ACCURACY_LAYER);
     when(layerSourceProvider.generateAccuracyLayer()).thenReturn(accuracyLayer);
+
+    Layer pulsingCircleLayer = mock(Layer.class);
+    when(pulsingCircleLayer.getId()).thenReturn(PULSING_CIRCLE_LAYER);
+    when(layerSourceProvider.generatePulsingCircleLayer()).thenReturn(pulsingCircleLayer);
     return layerSourceProvider;
   }
 

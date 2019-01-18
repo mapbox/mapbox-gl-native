@@ -21,11 +21,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
 class LocationAnimatorCoordinatorTest {
 
   private lateinit var locationAnimatorCoordinator: LocationAnimatorCoordinator
+  private lateinit var locationComponentOptions: LocationComponentOptions
   private val cameraPosition: CameraPosition = CameraPosition.DEFAULT
 
   private val animatorProvider: MapboxAnimatorProvider = mockk()
@@ -35,7 +37,14 @@ class LocationAnimatorCoordinatorTest {
 
   @Before
   fun setUp() {
-    locationAnimatorCoordinator = LocationAnimatorCoordinator(projection, animatorSetProvider, animatorProvider)
+    locationComponentOptions = LocationComponentOptions.builder(
+      RuntimeEnvironment.systemContext)
+      .pulsingCircleEnabled(true)
+      .build()
+
+    locationAnimatorCoordinator = LocationAnimatorCoordinator(projection,
+      animatorSetProvider,
+      animatorProvider, locationComponentOptions)
     configureAnimatorProvider()
     every { projection.getMetersPerPixelAtLatitude(any()) } answers { 1.0 }
     every { animatorSetProvider.startAnimation(any(), any(), any()) } answers {}
@@ -48,7 +57,8 @@ class LocationAnimatorCoordinatorTest {
       ANIMATOR_CAMERA_COMPASS_BEARING,
       ANIMATOR_LAYER_ACCURACY,
       ANIMATOR_ZOOM,
-      ANIMATOR_TILT
+      ANIMATOR_TILT,
+      ANIMATOR_PULSING_CIRCLE
     ))
   }
 
@@ -344,6 +354,12 @@ class LocationAnimatorCoordinatorTest {
     )
 
     assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_TILT] != null)
+  }
+
+  @Test
+  fun startPulsingCircle_animatorCreated() {
+    locationAnimatorCoordinator.startLocationComponentCirclePulsing(locationComponentOptions)
+    assertTrue(locationAnimatorCoordinator.animatorArray[ANIMATOR_PULSING_CIRCLE] != null)
   }
 
   @Test

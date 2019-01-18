@@ -880,6 +880,28 @@
                 android:value=".activity.FeatureOverviewActivity" />
         </activity>
         <activity
+            android:name=".activity.location.BasicLocationPulsingCircleActivity"
+            android:description="@string/description_location_basic_pulsing_circle"
+            android:label="@string/activity_basic_location_pulsing_circle">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_location" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity" />
+        </activity>
+        <activity
+            android:name=".activity.location.CustomizedLocationPulsingCircleActivity"
+            android:description="@string/description_location_customized_pulsing_circle"
+            android:label="@string/activity_customized_location_pulsing_circle">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_location" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity" />
+        </activity>
+        <activity
             android:name=".activity.location.LocationFragmentActivity"
             android:description="@string/description_location_fragment"
             android:label="@string/activity_location_fragment">

@@ -159,4 +159,12 @@
     <public name="mapbox_layer_above" format="string" type="attr" />
     <public name="mapbox_layer_below" format="string" type="attr" />
 
+    <!-- Pulsing circle -->
+    <public name="mapbox_pulsingLocationCircleEnabled" format="boolean" type="attr" />
+    <public name="mapbox_pulsingLocationCircleFadeEnabled" format="boolean" type="attr" />
+    <public name="mapbox_pulsingLocationCircleColor" format="color" type="attr" />
+    <public name="mapbox_pulsingLocationCircleDuration" format="float" type="attr" />
+    <public name="mapbox_pulsingLocationCircleRadius" format="float" type="attr" />
+    <public name="mapbox_pulsingLocationCircleAlpha" format="float" type="attr" />
+    <public name="mapbox_pulsingLocationCircleInterpolator" format="string" type="attr" />
 </resources>
