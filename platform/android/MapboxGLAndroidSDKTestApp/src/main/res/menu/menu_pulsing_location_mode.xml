@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/action_map_style_change"
+        android:title="Toggle custom Map style"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/action_component_disable"
+        android:title="Disable Component"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/action_component_enabled"
+        android:title="Enable Component"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/action_cancel_pulsing"
+        android:title="Cancel pulsing"
+        app:showAsAction="never"/>
+
+</menu>

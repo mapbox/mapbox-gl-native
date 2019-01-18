@@ -33,7 +33,7 @@ class StyleChangeIdlingResource : IdlingResource {
 
   fun waitForStyle(mapboxMap: MapboxMap, styleUrl: String) {
     isIdle = false
-    mapboxMap.setStyle(Style.Builder().fromUrl(styleUrl)) {
+    mapboxMap.setStyle(Style.Builder().fromUri(styleUrl)) {
       setIdle()
     }
   }

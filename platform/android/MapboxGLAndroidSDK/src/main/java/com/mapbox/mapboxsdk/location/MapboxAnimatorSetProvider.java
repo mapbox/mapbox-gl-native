@@ -29,4 +29,15 @@ class MapboxAnimatorSetProvider {
     locationAnimatorSet.setDuration(duration);
     locationAnimatorSet.start();
   }
+
+  /**
+   * Starts a single animator rather than playing multliple animators all at once.
+   *
+   * @param singleAnimation the {@link Animator} to run.
+   */
+  void startSingleAnimation(@NonNull Animator singleAnimation) {
+    AnimatorSet locationAnimatorSet = new AnimatorSet();
+    locationAnimatorSet.play(singleAnimation);
+    locationAnimatorSet.start();
+  }
 }

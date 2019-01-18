@@ -27,6 +27,7 @@ import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_GPS_BEARING;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_LOCATION_STALE;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_SHADOW_ICON_OFFSET;
+import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PULSING_CIRCLE_LAYER;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.SHADOW_ICON;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.SHADOW_LAYER;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
@@ -105,6 +106,20 @@ class LayerSourceProvider {
         circleColor(get(PROPERTY_ACCURACY_COLOR)),
         circleOpacity(get(PROPERTY_ACCURACY_ALPHA)),
         circleStrokeColor(get(PROPERTY_ACCURACY_COLOR)),
+        circlePitchAlignment(Property.CIRCLE_PITCH_ALIGNMENT_MAP)
+      );
+  }
+
+  /**
+   * Adds a {@link CircleLayer} to the map to support the {@link LocationComponent} pulsing UI functionality.
+   *
+   * @return a {@link CircleLayer} with the correct data-driven styling. Tilting the map will keep the pulsing
+   * layer aligned with the map plane.
+   */
+  @NonNull
+  Layer generatePulsingCircleLayer() {
+    return new CircleLayer(PULSING_CIRCLE_LAYER, LOCATION_SOURCE)
+      .withProperties(
         circlePitchAlignment(Property.CIRCLE_PITCH_ALIGNMENT_MAP)
       );
   }

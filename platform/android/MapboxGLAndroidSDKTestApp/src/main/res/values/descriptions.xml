@@ -78,6 +78,8 @@
     <string name="description_draggable_marker">Click to add a marker, long-click to drag</string>
     <string name="description_location_map_change">Change map\'s style while location is displayed</string>
     <string name="description_location_modes">Showcases location render and tracking modes</string>
+    <string name="description_location_basic_pulsing_circle">Display the LocationComponent\'s default pulsing circle</string>
+    <string name="description_location_customized_pulsing_circle">Display and customize the LocationComponent\'s pulsing circle</string>
     <string name="description_location_fragment">Uses LocationComponent in a Fragment</string>
     <string name="description_location_manual">Force location updates and don\'t rely on the engine</string>
     <string name="description_location_activation_builder">Use LocationComponentActivationOptions to set options</string>
