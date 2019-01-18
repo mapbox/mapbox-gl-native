@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 import android.support.annotation.StyleRes;
 import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 import android.view.WindowManager;
 
 import com.mapbox.android.core.location.LocationEngine;
@@ -654,6 +655,7 @@ public final class LocationComponent {
    *
    * @param options to update the current style
    */
+  @SuppressLint("MissingPermission")
   public void applyStyle(@NonNull final LocationComponentOptions options) {
     checkActivationState();
     LocationComponent.this.options = options;
@@ -665,6 +667,9 @@ public final class LocationComponent {
       locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options.trackingAnimationDurationMultiplier());
       locationAnimatorCoordinator.setCompassAnimationEnabled(options.compassAnimationEnabled());
       locationAnimatorCoordinator.setAccuracyAnimationEnabled(options.accuracyAnimationEnabled());
+      if (options.pulseEnabled()) {
+        locationAnimatorCoordinator.startLocationCirclePulsing(options, mapboxMap);
+      }
       updateMapWithOptions(options);
     }
   }
@@ -1139,6 +1144,10 @@ public final class LocationComponent {
     locationAnimatorCoordinator.cancelAllAnimations();
     if (locationEngine != null) {
       locationEngine.removeLocationUpdates(currentLocationEngineListener);
+    }
+    if (options.pulseEnabled()) {
+      Log.d(TAG, "onLocationLayerStop: about to stop animation ");
+      locationAnimatorCoordinator.stopPulsingAnimation();
     }
     mapboxMap.removeOnCameraMoveListener(onCameraMoveListener);
     mapboxMap.removeOnCameraIdleListener(onCameraIdleListener);

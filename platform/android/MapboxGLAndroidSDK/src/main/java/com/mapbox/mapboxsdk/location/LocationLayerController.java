@@ -6,6 +6,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -19,6 +20,7 @@ import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +48,7 @@ import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_GPS_BEARING;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_LOCATION_STALE;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_SHADOW_ICON_OFFSET;
+import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_PULSING_CIRCLE_LAYER;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.SHADOW_ICON;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.SHADOW_LAYER;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
@@ -54,6 +57,9 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
 import static com.mapbox.mapboxsdk.style.layers.Property.NONE;
 import static com.mapbox.mapboxsdk.style.layers.Property.VISIBLE;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleOpacity;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleStrokeColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
 import static com.mapbox.mapboxsdk.utils.ColorUtils.colorToRgbaString;
@@ -72,6 +78,8 @@ final class LocationLayerController {
 
   @VisibleForTesting
   final Set<String> layerSet = new HashSet<>();
+  private final List<String> layerMap = new ArrayList<>();
+  private final String TAG = "LocationLayerController";
   private Feature locationFeature;
   private GeoJsonSource locationSource;
 
@@ -133,6 +141,8 @@ final class LocationLayerController {
     styleBearing(options);
     styleAccuracy(options.accuracyAlpha(), options.accuracyColor());
     styleScaling(options);
+    styleScaling(options);
+    stylePulsingCircle(options);
     determineIconsSource(options);
   }
 
@@ -244,6 +254,7 @@ final class LocationLayerController {
     addSymbolLayer(BACKGROUND_LAYER, FOREGROUND_LAYER);
     addSymbolLayer(SHADOW_LAYER, BACKGROUND_LAYER);
     addAccuracyLayer();
+    addPulsingCircleLayerToMap();
   }
 
   private void addSymbolLayer(@NonNull String layerId, @NonNull String beforeLayerId) {
@@ -259,6 +270,11 @@ final class LocationLayerController {
   private void addLayerToMap(Layer layer, @NonNull String idBelowLayer) {
     style.addLayerBelow(layer, idBelowLayer);
     layerSet.add(layer.getId());
+  }
+
+  private void addPulsingCircleLayerToMap() {
+    Layer pulsingCircleLayer = layerSourceProvider.generatePulsingCircleLayer();
+    addLayerToMap(pulsingCircleLayer, ACCURACY_LAYER);
   }
 
   private void removeLayers() {
@@ -367,6 +383,21 @@ final class LocationLayerController {
     }
   }
 
+  private void stylePulsingCircle(LocationComponentOptions options) {
+    if (mapboxMap.getStyle() != null) {
+      if (mapboxMap.getStyle().getLayer(PROPERTY_PULSING_CIRCLE_LAYER) != null) {
+        Log.d(TAG, "stylePulsingCircle: options.pulseEnabled() = " + options.pulseEnabled());
+        // TODO: Swap true for options.pulseEnabled() but figure out why options.pulseEnabled() sometimes returns false
+        setLayerVisibility(PROPERTY_PULSING_CIRCLE_LAYER, true);
+        mapboxMap.getStyle().getLayer(PROPERTY_PULSING_CIRCLE_LAYER).setProperties(
+          circleColor(options.pulseColor()),
+          circleStrokeColor(options.pulseColor()),
+          circleOpacity(options.pulseAlpha())
+        );
+      }
+    }
+  }
+
   private void determineIconsSource(LocationComponentOptions options) {
     String foregroundIconString = buildIconString(
       renderMode == RenderMode.GPS ? options.gpsName() : options.foregroundName(), FOREGROUND_ICON);
@@ -442,6 +473,7 @@ final class LocationLayerController {
     new MapboxAnimator.AnimationsValueChangeListener<Float>() {
       @Override
       public void onNewAnimationValue(Float value) {
+        // TODO: Hide the pulsing circle layer once the accuracy circle is visibile? (i.e. newAnimationValue > 0)
         updateAccuracyRadius(value);
       }
     };

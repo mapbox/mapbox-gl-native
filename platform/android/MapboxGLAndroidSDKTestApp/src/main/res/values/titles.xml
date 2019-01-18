@@ -75,6 +75,7 @@
     <string name="activity_draggable_maker">Draggable marker</string>
     <string name="activity_location_map_change">Simple Location Activity</string>
     <string name="activity_location_modes">Location Modes Activity</string>
+    <string name="activity_location_pulsing_circle">Location Pulsing Circle Activity</string>
     <string name="activity_location_fragment">Location Fragment</string>
     <string name="activity_location_manual">Manual Location updates</string>
     <string name="activity_location_activation_builder">Build Location Activation</string>

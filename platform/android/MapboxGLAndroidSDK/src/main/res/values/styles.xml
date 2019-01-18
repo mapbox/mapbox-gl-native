@@ -33,5 +33,11 @@
     <item name="mapbox_trackingInitialMoveThreshold">@dimen/mapbox_locationComponentTrackingInitialMoveThreshold</item>
     <item name="mapbox_trackingMultiFingerMoveThreshold">@dimen/mapbox_locationComponentTrackingMultiFingerMoveThreshold</item>
 
+    <!-- Location pulsing circle -->
+    <item name="mapbox_pulsingLocationCircleColor">@color/mapbox_location_layer_blue</item>
+    <item name="mapbox_pulsingLocationCircleDuration">2.5</item>
+    <item name="mapbox_pulsingLocationCircleFrequency">2</item>
+    <item name="mapbox_pulsingLocationCircleAlpha">0.4</item>
+    <item name="mapbox_pulsingLocationCircleInterpolator">linear</item>
   </style>
 </resources>

@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.location;
 
 import android.support.annotation.NonNull;
+
 import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.Layer;
@@ -27,6 +28,7 @@ import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_GPS_BEARING;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_LOCATION_STALE;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_SHADOW_ICON_OFFSET;
+import static com.mapbox.mapboxsdk.location.LocationComponentConstants.PROPERTY_PULSING_CIRCLE_LAYER;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.SHADOW_ICON;
 import static com.mapbox.mapboxsdk.location.LocationComponentConstants.SHADOW_LAYER;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
@@ -105,6 +107,14 @@ class LayerSourceProvider {
         circleColor(get(PROPERTY_ACCURACY_COLOR)),
         circleOpacity(get(PROPERTY_ACCURACY_ALPHA)),
         circleStrokeColor(get(PROPERTY_ACCURACY_COLOR)),
+        circlePitchAlignment(Property.CIRCLE_PITCH_ALIGNMENT_MAP)
+      );
+  }
+
+  @NonNull
+  Layer generatePulsingCircleLayer() {
+    return new CircleLayer(PROPERTY_PULSING_CIRCLE_LAYER, LOCATION_SOURCE)
+      .withProperties(
         circlePitchAlignment(Property.CIRCLE_PITCH_ALIGNMENT_MAP)
       );
   }

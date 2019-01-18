@@ -80,6 +80,11 @@ public final class LocationComponentConstants {
    */
   public static final String BEARING_LAYER = "mapbox-location-bearing-layer";
 
+  /**
+   * Layer ID of the location pulsing circle.
+   */
+  public static final String PROPERTY_PULSING_CIRCLE_LAYER = "mapbox-location-pulsing-circle-layer";
+
   // Icons
   static final String FOREGROUND_ICON = "mapbox-location-icon";
   static final String BACKGROUND_ICON = "mapbox-location-stroke-icon";

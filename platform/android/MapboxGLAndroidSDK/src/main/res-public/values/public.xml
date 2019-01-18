@@ -12,7 +12,7 @@
     <public name="mapbox_apiBaseUrl" type="attr" />
     <public name="mapbox_localIdeographFontFamily" type="attr" />
     <public name="mapbox_cross_source_collisions" type="attr" />
-    <public name="mapbox_pixelRatio"  type="float" />
+    <public name="mapbox_pixelRatio" type="float" />
 
     <!--Camera-->
     <public name="mapbox_cameraTargetLng" type="attr" />
@@ -105,42 +105,42 @@
     <!-- Exposed colors -->
     <public name="mapbox_blue" type="color" />
 
-    <public name="mapbox_LocationComponent" type="style"/>
+    <public name="mapbox_LocationComponent" type="style" />
 
-    <public name="mapbox_foregroundDrawable" format="reference" type="attr"/>
-    <public name="mapbox_foregroundTintColor" format="color" type="attr"/>
-    <public name="mapbox_backgroundDrawable" format="reference" type="attr"/>
-    <public name="mapbox_backgroundTintColor" format="color" type="attr"/>
-    <public name="mapbox_bearingDrawable" format="reference" type="attr"/>
-    <public name="mapbox_bearingTintColor" format="color" type="attr"/>
-    <public name="mapbox_navigationDrawable" format="reference" type="attr"/>
+    <public name="mapbox_foregroundDrawable" format="reference" type="attr" />
+    <public name="mapbox_foregroundTintColor" format="color" type="attr" />
+    <public name="mapbox_backgroundDrawable" format="reference" type="attr" />
+    <public name="mapbox_backgroundTintColor" format="color" type="attr" />
+    <public name="mapbox_bearingDrawable" format="reference" type="attr" />
+    <public name="mapbox_bearingTintColor" format="color" type="attr" />
+    <public name="mapbox_navigationDrawable" format="reference" type="attr" />
 
-    <public name="mapbox_foregroundDrawableStale" format="reference" type="attr"/>
-    <public name="mapbox_foregroundStaleTintColor" format="color" type="attr"/>
-    <public name="mapbox_backgroundDrawableStale" format="reference" type="attr"/>
-    <public name="mapbox_backgroundStaleTintColor" format="color" type="attr"/>
+    <public name="mapbox_foregroundDrawableStale" format="reference" type="attr" />
+    <public name="mapbox_foregroundStaleTintColor" format="color" type="attr" />
+    <public name="mapbox_backgroundDrawableStale" format="reference" type="attr" />
+    <public name="mapbox_backgroundStaleTintColor" format="color" type="attr" />
 
-    <public name="mapbox_accuracyAlpha" format="float" type="attr"/>
-    <public name="mapbox_accuracyColor" format="color" type="attr"/>
+    <public name="mapbox_accuracyAlpha" format="float" type="attr" />
+    <public name="mapbox_accuracyColor" format="color" type="attr" />
 
-    <public name="mapbox_elevation" format="dimension" type="attr"/>
+    <public name="mapbox_elevation" format="dimension" type="attr" />
 
-    <public name="mapbox_enableStaleState" format="boolean" type="attr"/>
-    <public name="mapbox_staleStateTimeout" format="integer" min="0" type="attr"/>
+    <public name="mapbox_enableStaleState" format="boolean" type="attr" />
+    <public name="mapbox_staleStateTimeout" format="integer" min="0" type="attr" />
 
     <!-- Location icon padding -->
-    <public name="mapbox_iconPaddingLeft" format="integer" type="attr"/>
-    <public name="mapbox_iconPaddingTop" format="integer" type="attr"/>
-    <public name="mapbox_iconPaddingRight" format="integer" type="attr"/>
-    <public name="mapbox_iconPaddingBottom" format="integer" type="attr"/>
+    <public name="mapbox_iconPaddingLeft" format="integer" type="attr" />
+    <public name="mapbox_iconPaddingTop" format="integer" type="attr" />
+    <public name="mapbox_iconPaddingRight" format="integer" type="attr" />
+    <public name="mapbox_iconPaddingBottom" format="integer" type="attr" />
 
     <!-- Icon scale based on map zoom levels -->
-    <public name="mapbox_maxZoomIconScale" format="float" type="attr"/>
-    <public name="mapbox_minZoomIconScale" format="float" type="attr"/>
+    <public name="mapbox_maxZoomIconScale" format="float" type="attr" />
+    <public name="mapbox_minZoomIconScale" format="float" type="attr" />
 
     <!-- Camera tracking settings -->
-    <public name="mapbox_trackingInitialMoveThreshold" format="float" type="attr"/>
-    <public name="mapbox_trackingMultiFingerMoveThreshold" format="float" type="attr"/>
+    <public name="mapbox_trackingInitialMoveThreshold" format="float" type="attr" />
+    <public name="mapbox_trackingMultiFingerMoveThreshold" format="float" type="attr" />
 
     <!-- Animation duration multiplier -->
     <public name="mapbox_trackingAnimationDurationMultiplier" format="float" type="attr" />
@@ -150,4 +150,13 @@
 
     <!-- Accuracy animation-->
     <public name="mapbox_accuracyAnimationEnabled" format="boolean" type="attr" />
+
+    <!-- Pulsing circle -->
+    <public name="mapbox_pulsingLocationCircleEnabled" format="boolean" type="attr" />
+    <public name="mapbox_pulsingLocationCircleFadeEnabled" format="boolean" type="attr" />
+    <public name="mapbox_pulsingLocationCircleColor" format="color" type="attr" />
+    <public name="mapbox_pulsingLocationCircleDuration" format="float" type="attr" />
+    <public name="mapbox_pulsingLocationCircleFrequency" format="float" type="attr" />
+    <public name="mapbox_pulsingLocationCircleAlpha" format="float" type="attr" />
+    <public name="mapbox_pulsingLocationCircleInterpolator" format="string" type="attr" />
 </resources>
