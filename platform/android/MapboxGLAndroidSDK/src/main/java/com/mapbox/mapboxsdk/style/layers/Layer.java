@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.gson.JsonElement;
+import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.types.Formatted;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
@@ -19,6 +20,10 @@ public abstract class Layer {
   @Keep
   private boolean invalidated;
   private boolean detached;
+
+  static {
+    LibraryLoader.load();
+  }
 
   @Keep
   protected Layer(long nativePtr) {
