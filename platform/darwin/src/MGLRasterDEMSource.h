@@ -34,7 +34,7 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionDEMEnc
  `-[MGLStyle addSource:]` and `-[MGLStyle sourceWithIdentifier:]`.
  
  Currently, raster DEM sources only support the format used by
- <a href="https://www.mapbox.com/help/access-elevation-data/#mapbox-terrain-rgb">Mapbox Terrain-RGB</a>.
+ <a href="https://docs.mapbox.com/help/troubleshooting/access-elevation-data/#mapbox-terrain-rgb">Mapbox Terrain-RGB</a>.
 
  ### Example
 

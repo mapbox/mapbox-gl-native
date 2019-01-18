@@ -358,9 +358,9 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
 
  #### Related examples
  See the <a
- href="https://www.mapbox.com/ios-sdk/maps/examples/runtime-multiple-annotations/">Dynamically
+ href="https://docs.mapbox.com/ios/maps/examples/runtime-multiple-annotations/">Dynamically
  style interactive points</a> and <a
- href="https://www.mapbox.com/ios-sdk/maps/examples/clustering-with-images/">Use
+ href="https://docs.mapbox.com/ios/maps/examples/clustering-with-images/">Use
  images to cluster point data</a> examples learn how to style data on your map
  using this layer.
 
@@ -520,7 +520,7 @@ MGL_EXPORT
 
  #### Related examples
  See the <a
- href="https://www.mapbox.com/ios-sdk/maps/examples/clustering-with-images/">Use
+ href="https://docs.mapbox.com/ios/maps/examples/clustering-with-images/">Use
  images to cluster point data</a> example to learn how to dynamically set your
  icons with an expression.
  */
@@ -1089,10 +1089,9 @@ MGL_EXPORT
  feature attributes
 
  #### Related examples
- See the <a
- href="https://www.mapbox.com/ios-sdk/maps/examples/clustering/">Cluster point
- data</a> and <a
- href="https://www.mapbox.com/ios-sdk/maps/examples/clustering-with-images/">Use
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/clustering/">Cluster
+ point data</a> and <a
+ href="https://docs.mapbox.com/ios/maps/examples/clustering-with-images/">Use
  images to cluster point data</a> to learn how to use an expression to set this
  attribute to the number of markers within a cluster.
  */
