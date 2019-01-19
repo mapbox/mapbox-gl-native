@@ -15,7 +15,7 @@
 @interface MGLAccountManager ()
 
 @property (atomic) NSString *accessToken;
-@property (nonatomic) NSURL *apiBaseURL;
+@property (atomic) NSURL *apiBaseURL;
 
 @end
 #endif
