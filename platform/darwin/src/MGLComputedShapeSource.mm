@@ -22,7 +22,7 @@ mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDi
     if (NSNumber *value = options[MGLShapeSourceOptionMinimumZoomLevel]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             [NSException raise:NSInvalidArgumentException
-                        format:@"MGLShapeSourceOptionMaximumZoomLevelForClustering must be an NSNumber."];
+                        format:@"MGLShapeSourceOptionMinimumZoomLevel must be an NSNumber."];
         }
         sourceOptions.zoomRange.min = value.integerValue;
     }
