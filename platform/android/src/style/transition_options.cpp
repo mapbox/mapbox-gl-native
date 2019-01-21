@@ -15,9 +15,9 @@ long TransitionOptions::getDuration(jni::JNIEnv& env, const jni::Object<Transiti
     return transitionOptions.Get(env, field);
 }
 
-long TransitionOptions::getOffset(jni::JNIEnv& env, const jni::Object<TransitionOptions>& transitionOptions) {
+long TransitionOptions::getDelay(jni::JNIEnv& env, const jni::Object<TransitionOptions>& transitionOptions) {
     static auto& javaClass = jni::Class<TransitionOptions>::Singleton(env);
-    static auto field = javaClass.GetField<jlong>(env, "offset");
+    static auto field = javaClass.GetField<jlong>(env, "delay");
     return transitionOptions.Get(env, field);
 }
 

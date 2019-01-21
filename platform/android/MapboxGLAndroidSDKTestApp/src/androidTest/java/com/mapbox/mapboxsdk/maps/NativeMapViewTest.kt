@@ -10,6 +10,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions
 import com.mapbox.mapboxsdk.testapp.utils.TestConstants
 import junit.framework.Assert.assertEquals
 import org.junit.Before
@@ -317,6 +318,14 @@ class NativeMapViewTest {
         assertEquals("Longitude should match", expected.target.longitude, actual.target.longitude, TestConstants.LAT_LNG_DELTA)
         assertEquals("Tilt should match", expected.tilt, actual.tilt, TestConstants.TILT_DELTA)
         assertEquals("Zoom should match", expected.zoom, actual.zoom, TestConstants.ZOOM_DELTA)
+    }
+
+    @Test
+    @UiThreadTest
+    fun testTransitionOptions() {
+        val transitionOptions = TransitionOptions(500, 500)
+        nativeMapView.transitionOptions = transitionOptions
+        assertEquals(transitionOptions, nativeMapView.transitionOptions)
     }
 
     class DummyRenderer(context: Context) : MapRenderer(context, null) {

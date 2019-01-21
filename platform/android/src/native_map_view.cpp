@@ -688,7 +688,7 @@ jni::Local<jni::Object<TransitionOptions>> NativeMapView::getTransitionOptions(J
 void NativeMapView::setTransitionOptions(JNIEnv& env, const jni::Object<TransitionOptions>& options) {
     const mbgl::style::TransitionOptions transitionOptions(
             Duration(mbgl::Milliseconds(TransitionOptions::getDuration(env, options))),
-            Duration(mbgl::Milliseconds(TransitionOptions::getOffset(env, options)))
+            Duration(mbgl::Milliseconds(TransitionOptions::getDelay(env, options)))
     );
     map->getStyle().setTransitionOptions(transitionOptions);
 }

@@ -15,7 +15,7 @@ public:
 
     static long getDuration(jni::JNIEnv&, const jni::Object<TransitionOptions>&);
 
-    static long getOffset(jni::JNIEnv&, const jni::Object<TransitionOptions>&);
+    static long getDelay(jni::JNIEnv&, const jni::Object<TransitionOptions>&);
 
     static void registerNative(jni::JNIEnv&);
 };
