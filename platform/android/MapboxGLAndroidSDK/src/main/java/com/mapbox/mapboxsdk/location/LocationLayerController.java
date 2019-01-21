@@ -107,6 +107,7 @@ final class LocationLayerController implements MapboxAnimator.OnLayerAnimationsV
       if (layerBelow == null || !layerBelow.equals(newLayerBelowOption)) {
         removeLayers();
         addLayers(newLayerBelowOption);
+        setRenderMode(renderMode);
       }
     }
 
