@@ -49,7 +49,6 @@ macro(mbgl_platform_core)
         PUBLIC -ljnigraphics
         PUBLIC -lEGL
         PUBLIC -lGLESv2
-        PUBLIC -lstdc++
         PUBLIC -latomic
         PUBLIC -lz
     )
@@ -65,7 +64,6 @@ macro(mbgl_filesource)
         PUBLIC jni.hpp
         PUBLIC -llog
         PUBLIC -landroid
-        PUBLIC -lstdc++
         PUBLIC -latomic
     )
 endmacro()
