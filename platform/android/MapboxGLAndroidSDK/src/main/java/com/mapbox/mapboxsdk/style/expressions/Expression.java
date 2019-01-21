@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.style.expressions;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -1826,6 +1827,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-+">Style specification</a>
    */
+  @SuppressLint("Range")
   public static Expression sum(@Size(min = 2) Number... numbers) {
     Expression[] numberExpression = new Expression[numbers.length];
     for (int i = 0; i < numbers.length; i++) {
@@ -1874,6 +1876,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-*">Style specification</a>
    */
+  @SuppressLint("Range")
   public static Expression product(@Size(min = 2) Number... numbers) {
     Expression[] numberExpression = new Expression[numbers.length];
     for (int i = 0; i < numbers.length; i++) {
@@ -2590,6 +2593,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-min">Style specification</a>
    */
+  @SuppressLint("Range")
   public static Expression min(@Size(min = 1) Number... numbers) {
     Expression[] numberExpression = new Expression[numbers.length];
     for (int i = 0; i < numbers.length; i++) {
@@ -2638,6 +2642,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-max">Style specification</a>
    */
+  @SuppressLint("Range")
   public static Expression max(@Size(min = 1) Number... numbers) {
     Expression[] numberExpression = new Expression[numbers.length];
     for (int i = 0; i < numbers.length; i++) {
