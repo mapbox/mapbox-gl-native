@@ -408,7 +408,13 @@ public class FileSource {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        callback.onReceive(getPossibleResourcesCachePaths(context));
+        final List<String> possiblePaths = getPossibleResourcesCachePaths(context);
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+          @Override
+          public void run() {
+            callback.onReceive(possiblePaths);
+          }
+        });
       }
     }).start();
   }
