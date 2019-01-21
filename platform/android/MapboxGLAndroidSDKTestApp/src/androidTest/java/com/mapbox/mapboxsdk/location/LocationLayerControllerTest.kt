@@ -388,6 +388,29 @@ class LocationLayerControllerTest : EspressoTest() {
     executeComponentTest(componentAction)
   }
 
+  @Test
+  fun applyStyle_layerBelow_restoreLayerVisibility() {
+    val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
+      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
+                                             uiController: UiController, context: Context) {
+        component.activateLocationComponent(context,  mapboxMap.style!!,false)
+        component.isLocationComponentEnabled = true
+        component.forceLocationUpdate(location)
+        mapboxMap.waitForLayer(uiController, location, FOREGROUND_LAYER)
+        uiController.loopMainThreadForAtLeast(150)
+
+        component.applyStyle(LocationComponentOptions.builder(context).layerBelow("road-label").build())
+
+        assertThat(mapboxMap.isLayerVisible(FOREGROUND_LAYER), `is`(true))
+        assertThat(mapboxMap.isLayerVisible(BACKGROUND_LAYER), `is`(true))
+        assertThat(mapboxMap.isLayerVisible(SHADOW_LAYER), `is`(true))
+        assertThat(mapboxMap.isLayerVisible(ACCURACY_LAYER), `is`(true))
+        assertThat(mapboxMap.isLayerVisible(BEARING_LAYER), `is`(false))
+      }
+    }
+    executeComponentTest(componentAction)
+  }
+
   @After
   override fun afterTest() {
     super.afterTest()
