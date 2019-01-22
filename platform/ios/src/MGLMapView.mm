@@ -1109,11 +1109,13 @@ public:
 
 - (void)setContentInset:(UIEdgeInsets)contentInset
 {
+    MGLLogDebug(@"Setting contentInset: %@", NSStringFromUIEdgeInsets(contentInset));
     [self setContentInset:contentInset animated:NO];
 }
 
 - (void)setContentInset:(UIEdgeInsets)contentInset animated:(BOOL)animated
 {
+    MGLLogDebug(@"Setting contentInset: %@ animated:", NSStringFromUIEdgeInsets(contentInset), MGLStringFromBOOL(animated));
     if (UIEdgeInsetsEqualToEdgeInsets(contentInset, self.contentInset))
     {
         return;
@@ -1275,6 +1277,7 @@ public:
 
 - (void)setPreferredFramesPerSecond:(MGLMapViewPreferredFramesPerSecond)preferredFramesPerSecond
 {
+    MGLLogDebug(@"Setting preferredFramesPerSecond: %ld", preferredFramesPerSecond);
     if (_preferredFramesPerSecond == preferredFramesPerSecond)
     {
         return;
@@ -5322,11 +5325,13 @@ public:
 
 - (void)setTargetCoordinate:(CLLocationCoordinate2D)targetCoordinate
 {
+    MGLLogDebug(@"Setting targetCoordinate: %@", MGLStringFromCLLocationCoordinate2D(targetCoordinate));
     [self setTargetCoordinate:targetCoordinate animated:YES];
 }
 
 - (void)setTargetCoordinate:(CLLocationCoordinate2D)targetCoordinate animated:(BOOL)animated
 {
+    MGLLogDebug(@"Setting targetCoordinate: %@ animated: %@", MGLStringFromCLLocationCoordinate2D(targetCoordinate), MGLStringFromBOOL(animated));
     if (targetCoordinate.latitude != self.targetCoordinate.latitude
         || targetCoordinate.longitude != self.targetCoordinate.longitude)
     {
