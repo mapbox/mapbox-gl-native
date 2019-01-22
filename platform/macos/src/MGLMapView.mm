@@ -1389,14 +1389,16 @@ public:
 }
 
 - (void)setContentInsets:(NSEdgeInsets)contentInsets {
+    MGLLogDebug(@"Setting contentInset: %@", MGLStringFromNSEdgeInsets(contentInsets));
     [self setContentInsets:contentInsets animated:NO];
 }
 
 - (void)setContentInsets:(NSEdgeInsets)contentInsets animated:(BOOL)animated {
+    
     if (NSEdgeInsetsEqual(contentInsets, self.contentInsets)) {
         return;
     }
-
+    MGLLogDebug(@"Setting contentInset: %@ animated:", MGLStringFromNSEdgeInsets(contentInsets), MGLStringFromBOOL(animated));
     // After adjusting the content insets, move the center coordinate from the
     // old frame of reference to the new one represented by the newly set
     // content insets.
