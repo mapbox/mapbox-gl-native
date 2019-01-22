@@ -58,6 +58,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
  */
 public class GeoJsonClusteringActivity extends AppCompatActivity {
 
+  private static final double CAMERA_ZOOM_DELTA = 0.01;
   private MapView mapView;
   private MapboxMap mapboxMap;
 
@@ -121,7 +122,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
     if (clickOptionCounter == 0) {
       double nextZoomLevel = clusterSource.getClusterExpansionZoom(cluster);
       double zoomDelta = nextZoomLevel - mapboxMap.getCameraPosition().zoom;
-      mapboxMap.animateCamera(CameraUpdateFactory.zoomBy(zoomDelta, clickPoint));
+      mapboxMap.animateCamera(CameraUpdateFactory.zoomBy(zoomDelta + CAMERA_ZOOM_DELTA, clickPoint));
       Toast.makeText(this, "Zooming to " + nextZoomLevel, Toast.LENGTH_SHORT).show();
     } else if (clickOptionCounter == 1) {
       FeatureCollection collection = clusterSource.getClusterChildren(cluster);
