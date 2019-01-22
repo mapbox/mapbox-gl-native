@@ -457,7 +457,9 @@ public class FileSource {
     final List<String> paths = new ArrayList<>();
     final File[] extDirs = context.getExternalFilesDirs(null);
     for (File dir : extDirs) {
-      paths.add(dir.getAbsolutePath());
+      if (dir != null) {
+        paths.add(dir.getAbsolutePath());
+      }
     }
     return paths;
   }
