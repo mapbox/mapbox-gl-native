@@ -81,11 +81,10 @@ android {
                     // Enable ccache if the user has installed it.
                     if (ccache?.trim()) {
                         arguments "-DANDROID_CCACHE=" + ccache
-                        // ccache splits up the compile command until multiple invocations and uses -E
-                        // with one of them, and clang doesn't like unused arguments in that case.
-                        cFlags "-Qunused-arguments"
-                        cppFlags "-Qunused-arguments"
                     }
+
+                    cFlags "-Qunused-arguments"
+                    cppFlags "-Qunused-arguments"
 
                     targets "mapbox-gl"
 
