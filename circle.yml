@@ -642,11 +642,19 @@ jobs:
           name: Record size
           command: platform/android/scripts/metrics.sh
       - run:
-          name: Trigger benchmark run
+          name: Trigger core benchmark run
           command: |
             if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
               if [[ $CIRCLE_BRANCH == master ]]; then
-                curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=build https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
+                curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=core-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
+              fi
+            fi
+      - run:
+          name: Trigger android benchmark run
+          command: |
+            if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
+              if [[ $CIRCLE_BRANCH == master ]]; then
+                curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=android-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
               fi
             fi
       - deploy:
