@@ -11,7 +11,7 @@
 - (void)setUp
 {
     [super setUp];
-    _mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 64, 64)];
+    _mapView = [[MGLMapView alloc] initWithFrame:CGRectMake(0, 0, 256, 256)];
     _mapView.delegate = self;
 }
 

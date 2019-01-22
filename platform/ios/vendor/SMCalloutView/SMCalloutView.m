@@ -269,6 +269,8 @@ NSTimeInterval const kMGLSMCalloutViewRepositionDelayForUIScrollView = 1.0/3.0;
 
 - (UIEdgeInsets)marginInsetsHintForPresentationFromRect:(CGRect)rect {
 
+    const CGFloat defaultMargin = 20.0f;
+    
     // form our subviews based on our content set so far
     [self rebuildSubviews];
 
@@ -281,16 +283,16 @@ NSTimeInterval const kMGLSMCalloutViewRepositionDelayForUIScrollView = 1.0/3.0;
     CGFloat horizontalMargin = fmaxf(0, ceilf((CALLOUT_MIN_WIDTH-rect.size.width)/2));
 
     UIEdgeInsets insets = {
-        .top = 0.0f,
-        .right = -horizontalMargin,
+        .top    = 0.0f,
+        .right  = -defaultMargin - horizontalMargin,
         .bottom = 0.0f,
-        .left = -horizontalMargin
+        .left   = -defaultMargin - horizontalMargin
     };
 
     if (self.permittedArrowDirection == MGLSMCalloutArrowDirectionUp)
-        insets.bottom -= size.height;
+        insets.bottom -= (defaultMargin + size.height);
     else
-        insets.top -= size.height;
+        insets.top -= (defaultMargin + size.height);
 
     return insets;
 }

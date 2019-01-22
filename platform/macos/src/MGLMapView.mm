@@ -2281,7 +2281,7 @@ public:
 
 - (BOOL)isMovingAnnotationIntoViewSupportedForAnnotation:(id<MGLAnnotation>)annotation animated:(BOOL)animated {
     // Consider delegating
-    return animated && [annotation isKindOfClass:[MGLPointAnnotation class]];
+    return [annotation isKindOfClass:[MGLPointAnnotation class]];
 }
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation
@@ -2326,10 +2326,20 @@ public:
         positioningRect.origin = [self convertCoordinate:origin toPointToView:self];
     }
 
-    if (!moveIntoView && NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
-        if (!NSEqualPoints(gesturePoint, NSZeroPoint)) {
+    BOOL shouldShowCallout = ([annotation respondsToSelector:@selector(title)]
+                              && annotation.title
+                              && !self.calloutForSelectedAnnotation.shown
+                              && [self.delegate respondsToSelector:@selector(mapView:annotationCanShowCallout:)]
+                              && [self.delegate mapView:self annotationCanShowCallout:annotation]);
+    
+    if (NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
+        if (!moveIntoView && !NSEqualPoints(gesturePoint, NSZeroPoint)) {
             positioningRect = CGRectMake(gesturePoint.x, gesturePoint.y, positioningRect.size.width, positioningRect.size.height);
         }
+    }
+    // Onscreen or partially on-screen
+    else if (!shouldShowCallout) {
+        moveIntoView = NO;
     }
 
     self.selectedAnnotation = annotation;
@@ -2337,11 +2347,7 @@ public:
     // For the callout to be shown, the annotation must have a title, its
     // callout must not already be shown, and the annotation must be able to
     // show a callout according to the delegate.
-    if ([annotation respondsToSelector:@selector(title)]
-        && annotation.title
-        && !self.calloutForSelectedAnnotation.shown
-        && [self.delegate respondsToSelector:@selector(mapView:annotationCanShowCallout:)]
-        && [self.delegate mapView:self annotationCanShowCallout:annotation]) {
+    if (shouldShowCallout) {
         NSPopover *callout = [self calloutForAnnotation:annotation];
 
         // Hang the callout off the right edge of the annotation image’s
@@ -2365,39 +2371,52 @@ public:
 
         NSRect (^edgeInsetsInsetRect)(NSRect, NSEdgeInsets) = ^(NSRect rect, NSEdgeInsets insets) {
             return NSMakeRect(rect.origin.x + insets.left,
-                              rect.origin.y + insets.top,
+                              rect.origin.y + insets.bottom,
                               rect.size.width - insets.left - insets.right,
                               rect.size.height - insets.top - insets.bottom);
         };
 
         // Add padding around the positioning rect (in essence an inset from the edge of the viewport
-        NSRect expandedPositioningRect = edgeInsetsInsetRect(positioningRect, MGLMapViewOffscreenAnnotationPadding);
+        NSRect expandedPositioningRect = positioningRect;
+        
+        if (shouldShowCallout) {
+            // If we have a callout, expand this rect to include a buffer
+            expandedPositioningRect = edgeInsetsInsetRect(positioningRect, MGLMapViewOffscreenAnnotationPadding);
+        }
 
         // Used for callout positioning, and moving offscreen annotations onscreen.
         CGRect constrainedRect = edgeInsetsInsetRect(self.bounds, self.contentInsets);
         CGRect bounds          = constrainedRect;
 
         // Any one of these cases should trigger a move onscreen
-        if (CGRectGetMinX(positioningRect) < CGRectGetMinX(bounds))
-        {
-            constrainedRect.origin.x = expandedPositioningRect.origin.x;
+        CGFloat minX = CGRectGetMinX(expandedPositioningRect);
+        
+        if (minX < CGRectGetMinX(bounds)) {
+            constrainedRect.origin.x = minX;
             moveIntoView = YES;
         }
-        else if (CGRectGetMaxX(positioningRect) > CGRectGetMaxX(bounds))
-        {
-            constrainedRect.origin.x = CGRectGetMaxX(expandedPositioningRect) - constrainedRect.size.width;
+        else {
+            CGFloat maxX = CGRectGetMaxX(expandedPositioningRect);
+            
+            if (maxX > CGRectGetMaxX(bounds)) {
+                constrainedRect.origin.x = maxX - CGRectGetWidth(constrainedRect);
+                moveIntoView = YES;
+            }
+        }
+        
+        CGFloat minY = CGRectGetMinY(expandedPositioningRect);
+        
+        if (minY < CGRectGetMinY(bounds)) {
+            constrainedRect.origin.y = minY;
             moveIntoView = YES;
         }
-
-        if (CGRectGetMinY(positioningRect) < CGRectGetMinY(bounds))
-        {
-            constrainedRect.origin.y = expandedPositioningRect.origin.y;
-            moveIntoView = YES;
-        }
-        else if (CGRectGetMaxY(positioningRect) > CGRectGetMaxY(bounds))
-        {
-            constrainedRect.origin.y = CGRectGetMaxY(expandedPositioningRect) - constrainedRect.size.height;
-            moveIntoView = YES;
+        else {
+            CGFloat maxY = CGRectGetMaxY(expandedPositioningRect);
+            
+            if (maxY > CGRectGetMaxY(bounds)) {
+                constrainedRect.origin.y = maxY - CGRectGetHeight(constrainedRect);
+                moveIntoView = YES;
+            }
         }
 
         if (moveIntoView)
