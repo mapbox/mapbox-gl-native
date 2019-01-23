@@ -11,6 +11,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added the `-[MGLShapeSource leavesOfCluster:offset:limit:]`, `-[MGLShapeSource childrenOfCluster:]`, `-[MGLShapeSource zoomLevelForExpandingCluster:]` methods for inspecting a cluster in an `MGLShapeSource`s created with the `MGLShapeSourceOptionClustered` option. Feature querying now returns clusters represented by `MGLPointFeatureCluster` objects (that conform to the `MGLCluster` protocol). ([#12952](https://github.com/mapbox/mapbox-gl-native/pull/12952)
 * `MGLMapView` no longer freezes on external displays connected through AirPlay or CarPlay when the main device’s screen goes to sleep or the user manually locks the screen. ([#13701](https://github.com/mapbox/mapbox-gl-native/pull/13701))
 * Fixed a bug where selecting partially on-screen annotations (without a callout) would move the map. ([#13727](https://github.com/mapbox/mapbox-gl-native/pull/13727))
+* Fixed an issue calculating the viewport when setting visible coordinates with a `direction`. ([#13761](https://github.com/mapbox/mapbox-gl-native/pull/13761))
 
 ## 4.7.1 - December 21, 2018
 

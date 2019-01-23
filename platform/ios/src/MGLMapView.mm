@@ -3329,12 +3329,10 @@ public:
     {
         latLngs.push_back({coordinates[i].latitude, coordinates[i].longitude});
     }
+    
+    CLLocationDirection cameraDirection = direction >= 0 ? direction : 0;
 
-    mbgl::CameraOptions cameraOptions = self.mbglMap.cameraForLatLngs(latLngs, padding);
-    if (direction >= 0)
-    {
-        cameraOptions.angle = direction;
-    }
+    mbgl::CameraOptions cameraOptions = self.mbglMap.cameraForLatLngs(latLngs, padding, cameraDirection);
 
     mbgl::AnimationOptions animationOptions;
     if (duration > 0)
