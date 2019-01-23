@@ -341,6 +341,8 @@
 		1F95931A1E6DE2B600D5B294 /* MGLNSDateAdditionsTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLNSDateAdditionsTests.mm; path = ../../darwin/test/MGLNSDateAdditionsTests.mm; sourceTree = "<group>"; };
 		1F9EF4051FBA1B0D0063FBB0 /* mapbox_helmet.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = mapbox_helmet.pdf; sourceTree = "<group>"; };
 		1FC481842098F323000D09B4 /* NSPredicate+MGLPrivateAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPredicate+MGLPrivateAdditions.h"; sourceTree = "<group>"; };
+		1FDB00CC21F8F1FD00D21389 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
+		1FDB00CD21F8F1FF00D21389 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3508EC621D749D39009B0EE4 /* NSExpression+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSExpression+MGLAdditions.h"; sourceTree = "<group>"; };
 		3508EC631D749D39009B0EE4 /* NSExpression+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSExpression+MGLAdditions.mm"; sourceTree = "<group>"; };
 		3526EABC1DF9B19800006B43 /* MGLCodingTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLCodingTests.mm; path = ../../darwin/test/MGLCodingTests.mm; sourceTree = "<group>"; };
@@ -1520,6 +1522,7 @@
 				da,
 				"pt-PT",
 				ko,
+				cs,
 			);
 			mainGroup = DA839E891CC2E3400062CAFB;
 			productRefGroup = DA839E931CC2E3400062CAFB /* Products */;
@@ -1768,6 +1771,7 @@
 				DAD88E03202ACF5900AAA536 /* da */,
 				DA934097208562590059919A /* pt-PT */,
 				DAFEB3702093ACBF00A86A83 /* ko */,
+				1FDB00CC21F8F1FD00D21389 /* cs */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1822,6 +1826,7 @@
 				DAD88E06202ACF9200AAA536 /* da */,
 				DA9340992085629E0059919A /* pt-PT */,
 				DA9340A0208565870059919A /* ar */,
+				1FDB00CD21F8F1FF00D21389 /* cs */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
