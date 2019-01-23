@@ -7,6 +7,7 @@
 * Added the `-[MGLShapeSource leavesOfCluster:offset:limit:]`, `-[MGLShapeSource childrenOfCluster:]`, `-[MGLShapeSource zoomLevelForExpandingCluster:]` methods for inspecting a cluster in an `MGLShapeSource`s created with the `MGLShapeSourceOptionClustered` option. Feature querying now returns clusters represented by `MGLPointFeatureCluster` objects (that conform to the `MGLCluster` protocol). ([#12952](https://github.com/mapbox/mapbox-gl-native/pull/12952)
 * Fixed a bug with `MGLMapView.visibleAnnotations` that resulted in incorrect results and performance degradation. ([#13745](https://github.com/mapbox/mapbox-gl-native/pull/13745))
 * Fixed a bug where selecting partially on-screen annotations (without a callout) would move the map. ([#13727](https://github.com/mapbox/mapbox-gl-native/pull/13727))
+* Added a Czech localization. ([#13782](https://github.com/mapbox/mapbox-gl-native/pull/13782))
 
 ## 0.13.0 - December 20, 2018
 
