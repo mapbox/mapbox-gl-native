@@ -420,6 +420,7 @@
         "mbgl/style/filter.hpp": "include/mbgl/style/filter.hpp",
         "mbgl/style/image.hpp": "include/mbgl/style/image.hpp",
         "mbgl/style/layer.hpp": "include/mbgl/style/layer.hpp",
+        "mbgl/style/layer_properties.hpp": "include/mbgl/style/layer_properties.hpp",
         "mbgl/style/layers/background_layer.hpp": "include/mbgl/style/layers/background_layer.hpp",
         "mbgl/style/layers/circle_layer.hpp": "include/mbgl/style/layers/circle_layer.hpp",
         "mbgl/style/layers/custom_layer.hpp": "include/mbgl/style/layers/custom_layer.hpp",

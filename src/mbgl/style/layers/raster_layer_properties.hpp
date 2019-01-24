@@ -3,6 +3,8 @@
 #pragma once
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layer_properties.hpp>
+#include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>
@@ -54,6 +56,19 @@ class RasterPaintProperties : public Properties<
     RasterResampling,
     RasterFadeDuration
 > {};
+
+class RasterLayerProperties final : public LayerProperties {
+public:
+    explicit RasterLayerProperties(Immutable<RasterLayer::Impl>);
+    RasterLayerProperties(
+        Immutable<RasterLayer::Impl>,
+        RasterPaintProperties::PossiblyEvaluated);
+    ~RasterLayerProperties() override;
+
+    const RasterLayer::Impl& layerImpl() const;
+    // Data members.
+    RasterPaintProperties::PossiblyEvaluated evaluated;
+};
 
 } // namespace style
 } // namespace mbgl

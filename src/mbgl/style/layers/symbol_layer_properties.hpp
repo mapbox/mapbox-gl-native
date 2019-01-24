@@ -3,6 +3,8 @@
 #pragma once
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layer_properties.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>
@@ -330,6 +332,19 @@ class SymbolPaintProperties : public Properties<
     TextTranslate,
     TextTranslateAnchor
 > {};
+
+class SymbolLayerProperties final : public LayerProperties {
+public:
+    explicit SymbolLayerProperties(Immutable<SymbolLayer::Impl>);
+    SymbolLayerProperties(
+        Immutable<SymbolLayer::Impl>,
+        SymbolPaintProperties::PossiblyEvaluated);
+    ~SymbolLayerProperties() override;
+
+    const SymbolLayer::Impl& layerImpl() const;
+    // Data members.
+    SymbolPaintProperties::PossiblyEvaluated evaluated;
+};
 
 } // namespace style
 } // namespace mbgl
