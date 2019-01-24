@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import android.util.DisplayMetrics;
 
-import com.mapbox.geojson.Polygon;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
