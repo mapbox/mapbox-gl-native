@@ -3,6 +3,8 @@
 #pragma once
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layer_properties.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>
@@ -49,6 +51,21 @@ class FillPaintProperties : public Properties<
     FillTranslateAnchor,
     FillPattern
 > {};
+
+class FillLayerProperties final : public LayerProperties {
+public:
+    explicit FillLayerProperties(Immutable<FillLayer::Impl>);
+    FillLayerProperties(
+        Immutable<FillLayer::Impl>,
+        CrossfadeParameters,
+        FillPaintProperties::PossiblyEvaluated);
+    ~FillLayerProperties() override;
+
+    const FillLayer::Impl& layerImpl() const;
+    // Data members.
+    CrossfadeParameters crossfade;
+    FillPaintProperties::PossiblyEvaluated evaluated;
+};
 
 } // namespace style
 } // namespace mbgl

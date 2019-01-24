@@ -3,6 +3,8 @@
 #pragma once
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/layer_properties.hpp>
+#include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/style/properties.hpp>
@@ -101,6 +103,21 @@ class LinePaintProperties : public Properties<
     LinePattern,
     LineGradient
 > {};
+
+class LineLayerProperties final : public LayerProperties {
+public:
+    explicit LineLayerProperties(Immutable<LineLayer::Impl>);
+    LineLayerProperties(
+        Immutable<LineLayer::Impl>,
+        CrossfadeParameters,
+        LinePaintProperties::PossiblyEvaluated);
+    ~LineLayerProperties() override;
+
+    const LineLayer::Impl& layerImpl() const;
+    // Data members.
+    CrossfadeParameters crossfade;
+    LinePaintProperties::PossiblyEvaluated evaluated;
+};
 
 } // namespace style
 } // namespace mbgl

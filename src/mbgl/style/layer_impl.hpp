@@ -12,8 +12,6 @@
 
 namespace mbgl {
 
-class RenderLayer;
-
 namespace style {
 
 /**
