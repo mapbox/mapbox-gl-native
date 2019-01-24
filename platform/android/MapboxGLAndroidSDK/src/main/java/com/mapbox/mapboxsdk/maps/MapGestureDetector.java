@@ -77,7 +77,6 @@ final class MapGestureDetector {
   private PointF focalPoint;
 
   private AndroidGesturesManager gesturesManager;
-  private boolean executeDoubleTap;
 
   private Animator scaleAnimator;
   private Animator rotateAnimator;
@@ -208,13 +207,14 @@ final class MapGestureDetector {
       return false;
     }
 
+    if (motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN) {
+      cancelAnimators();
+      transform.setGestureInProgress(true);
+    }
+
     boolean result = gesturesManager.onTouchEvent(motionEvent);
 
     switch (motionEvent.getActionMasked()) {
-      case MotionEvent.ACTION_DOWN:
-        cancelAnimators();
-        transform.setGestureInProgress(true);
-        break;
       case MotionEvent.ACTION_UP:
         transform.setGestureInProgress(false);
 
@@ -257,7 +257,7 @@ final class MapGestureDetector {
    * Posted on main thread with {@link #animationsTimeoutHandler}. Cancels all scheduled animators if needed.
    */
   @NonNull
-  private Runnable cancelAnimatorsRunnable = new Runnable() {
+  private final Runnable cancelAnimatorsRunnable = new Runnable() {
     @Override
     public void run() {
       cancelAnimators();
@@ -353,15 +353,9 @@ final class MapGestureDetector {
     public boolean onDoubleTapEvent(MotionEvent motionEvent) {
       int action = motionEvent.getActionMasked();
       if (action == MotionEvent.ACTION_DOWN) {
-        executeDoubleTap = true;
-      }
-      if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
-        if (!uiSettings.isZoomGesturesEnabled() || !uiSettings.isDoubleTapGesturesEnabled() || !executeDoubleTap) {
+        if (!uiSettings.isZoomGesturesEnabled() || !uiSettings.isDoubleTapGesturesEnabled()) {
           return false;
         }
-
-        transform.cancelTransitions();
-        cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
         PointF zoomFocalPoint;
         // Single finger double tap
@@ -374,11 +368,13 @@ final class MapGestureDetector {
         }
 
         zoomInAnimated(zoomFocalPoint, false);
+      }
 
+      if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
         sendTelemetryEvent(TelemetryConstants.DOUBLE_TAP, new PointF(motionEvent.getX(), motionEvent.getY()));
-
         return true;
       }
+
       return super.onDoubleTapEvent(motionEvent);
     }
 
@@ -482,14 +478,15 @@ final class MapGestureDetector {
         return false;
       }
 
-      cancelTransitionsIfRequired();
-
       quickZoom = detector.getPointersCount() == 1;
       if (quickZoom) {
-        // when quickzoom, dismiss double tap and disable move gesture
-        executeDoubleTap = false;
+        if (!uiSettings.isQuickZoomGesturesEnabled()) {
+          return false;
+        }
         gesturesManager.getMoveGestureDetector().setEnabled(false);
       }
+
+      cancelTransitionsIfRequired();
 
       if (uiSettings.isIncreaseRotateThresholdWhenScaling()) {
         // increase rotate angle threshold when scale is detected first

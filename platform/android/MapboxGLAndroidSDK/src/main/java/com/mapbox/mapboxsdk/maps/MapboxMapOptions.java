@@ -64,6 +64,7 @@ public class MapboxMapOptions implements Parcelable {
   private boolean tiltGesturesEnabled = true;
   private boolean zoomGesturesEnabled = true;
   private boolean doubleTapGesturesEnabled = true;
+  private boolean quickZoomGesturesEnabled = true;
 
   private boolean prefetchesTiles = true;
   private boolean zMediaOverlay = false;
@@ -118,6 +119,7 @@ public class MapboxMapOptions implements Parcelable {
     tiltGesturesEnabled = in.readByte() != 0;
     zoomGesturesEnabled = in.readByte() != 0;
     doubleTapGesturesEnabled = in.readByte() != 0;
+    quickZoomGesturesEnabled = in.readByte() != 0;
 
     apiBaseUrl = in.readString();
     textureMode = in.readByte() != 0;
@@ -506,6 +508,18 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Specifies whether the user may zoom the map by tapping twice, holding and moving the pointer up and down.
+   *
+   * @param enabled True and gesture will be enabled
+   * @return This
+   */
+  @NonNull
+  public MapboxMapOptions quickZoomGesturesEnabled(boolean enabled) {
+    quickZoomGesturesEnabled = enabled;
+    return this;
+  }
+
+  /**
    * Enable {@link android.view.TextureView} as rendered surface.
    * <p>
    * Since the 5.2.0 release we replaced our TextureView with an {@link android.opengl.GLSurfaceView}
@@ -791,6 +805,15 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Get whether the user may zoom the map by tapping twice, holding and moving the pointer up and down.
+   *
+   * @return True indicates gesture is enabled
+   */
+  public boolean getQuickZoomGesturesEnabled() {
+    return quickZoomGesturesEnabled;
+  }
+
+  /**
    * Get the current configured visibility state for attribution for a map view.
    *
    * @return Visibility state of the attribution
@@ -922,6 +945,7 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeByte((byte) (tiltGesturesEnabled ? 1 : 0));
     dest.writeByte((byte) (zoomGesturesEnabled ? 1 : 0));
     dest.writeByte((byte) (doubleTapGesturesEnabled ? 1 : 0));
+    dest.writeByte((byte) (quickZoomGesturesEnabled ? 1 : 0));
 
     dest.writeString(apiBaseUrl);
     dest.writeByte((byte) (textureMode ? 1 : 0));
@@ -998,6 +1022,9 @@ public class MapboxMapOptions implements Parcelable {
     if (doubleTapGesturesEnabled != options.doubleTapGesturesEnabled) {
       return false;
     }
+    if (quickZoomGesturesEnabled != options.quickZoomGesturesEnabled) {
+      return false;
+    }
     if (cameraPosition != null ? !cameraPosition.equals(options.cameraPosition) : options.cameraPosition != null) {
       return false;
     }
@@ -1061,6 +1088,7 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (tiltGesturesEnabled ? 1 : 0);
     result = 31 * result + (zoomGesturesEnabled ? 1 : 0);
     result = 31 * result + (doubleTapGesturesEnabled ? 1 : 0);
+    result = 31 * result + (quickZoomGesturesEnabled ? 1 : 0);
     result = 31 * result + (apiBaseUrl != null ? apiBaseUrl.hashCode() : 0);
     result = 31 * result + (textureMode ? 1 : 0);
     result = 31 * result + (translucentTextureSurface ? 1 : 0);
