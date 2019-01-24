@@ -337,7 +337,7 @@ public final class LocationComponent {
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
-                                        @NonNull LocationEngine locationEngine) {
+                                        @Nullable LocationEngine locationEngine) {
     activateLocationComponent(context, style, locationEngine, R.style.mapbox_LocationComponent);
   }
 
@@ -351,7 +351,7 @@ public final class LocationComponent {
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
-                                        @NonNull LocationEngine locationEngine,
+                                        @Nullable LocationEngine locationEngine,
                                         @NonNull LocationEngineRequest locationEngineRequest) {
     activateLocationComponent(context, style, locationEngine, locationEngineRequest, R.style.mapbox_LocationComponent);
   }
