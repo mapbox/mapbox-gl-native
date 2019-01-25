@@ -36,9 +36,9 @@ NS_ASSUME_NONNULL_BEGIN
  in GeoJSON.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/marker/">
- Mark a place on the map with an annotation</a>, <a href="https://www.mapbox.com/ios-sdk/maps/examples/marker-image/">
- Mark a place on the map with an image</a>, and <a href="https://www.mapbox.com/ios-sdk/maps/examples/default-callout/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/marker/">
+ Mark a place on the map with an annotation</a>, <a href="https://docs.mapbox.com/ios/maps/examples/marker-image/">
+ Mark a place on the map with an image</a>, and <a href="https://docs.mapbox.com/ios/maps/examples/default-callout/">
  Default callout usage</a> examples to learn how to add `MGLPointAnnotation`
  objects to your map.
  */
