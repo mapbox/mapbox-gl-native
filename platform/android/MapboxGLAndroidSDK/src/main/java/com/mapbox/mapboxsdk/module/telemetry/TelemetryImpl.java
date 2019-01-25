@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.module.telemetry;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.mapbox.android.telemetry.AppUserTurnstile;
@@ -16,6 +17,8 @@ import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
+
+import java.util.UUID;
 
 public class TelemetryImpl implements TelemetryDefinition {
 
@@ -104,5 +107,12 @@ public class TelemetryImpl implements TelemetryDefinition {
       offlineDefinition.getMaxZoom(),
       offlineDefinition.getStyleURL())
     );
+  }
+
+  @Override
+  public void onPerformanceEvent(Bundle data) {
+    if (data != null && !data.isEmpty()) {
+      telemetry.push(new PerformanceEvent(UUID.randomUUID().toString(), data));
+    }
   }
 }
