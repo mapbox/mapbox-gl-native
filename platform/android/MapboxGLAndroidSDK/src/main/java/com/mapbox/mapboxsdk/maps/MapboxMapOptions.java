@@ -158,6 +158,8 @@ public class MapboxMapOptions implements Parcelable {
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiTiltGestures, true));
       mapboxMapOptions.doubleTapGesturesEnabled(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiDoubleTapGestures, true));
+      mapboxMapOptions.quickZoomGesturesEnabled(
+        typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_uiQuickZoomGestures, true));
 
       mapboxMapOptions.maxZoomPreference(typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_cameraZoomMax,
         MapboxConstants.MAXIMUM_ZOOM));

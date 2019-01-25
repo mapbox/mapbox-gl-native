@@ -124,11 +124,6 @@ public class GestureDetectorActivity extends AppCompatActivity {
     mapView.onSaveInstanceState(outState);
   }
 
-  @Override
-  protected void onRestoreInstanceState(Bundle savedInstanceState) {
-    super.onRestoreInstanceState(savedInstanceState);
-  }
-
   private void initializeMap() {
     gesturesManager = mapboxMap.getGesturesManager();
 
@@ -139,7 +134,7 @@ public class GestureDetectorActivity extends AppCompatActivity {
 
     attachListeners();
 
-    focusOnAPoint(mapboxMap.getUiSettings().getFocalPoint() != null);
+    fixedFocalPointEnabled(mapboxMap.getUiSettings().getFocalPoint() != null);
   }
 
   public void attachListeners() {
@@ -239,7 +234,7 @@ public class GestureDetectorActivity extends AppCompatActivity {
     UiSettings uiSettings = mapboxMap.getUiSettings();
     switch (item.getItemId()) {
       case R.id.menu_gesture_focus_point:
-        focusOnAPoint(focalPointLatLng == null);
+        fixedFocalPointEnabled(focalPointLatLng == null);
         return true;
       case R.id.menu_gesture_animation:
         uiSettings.setScaleVelocityAnimationEnabled(!uiSettings.isScaleVelocityAnimationEnabled());
@@ -268,8 +263,8 @@ public class GestureDetectorActivity extends AppCompatActivity {
     return super.onOptionsItemSelected(item);
   }
 
-  private void focusOnAPoint(boolean focus) {
-    if (focus) {
+  private void fixedFocalPointEnabled(boolean enabled) {
+    if (enabled) {
       focalPointLatLng = new LatLng(51.50325, -0.12968);
       marker = mapboxMap.addMarker(new MarkerOptions().position(focalPointLatLng));
       mapboxMap.easeCamera(CameraUpdateFactory.newLatLngZoom(focalPointLatLng, 16));
