@@ -25,10 +25,6 @@ const style::HeatmapLayer::Impl& RenderHeatmapLayer::impl() const {
     return static_cast<const style::HeatmapLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Bucket> RenderHeatmapLayer::createBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) const {
-    return std::make_unique<HeatmapBucket>(parameters, layers);
-}
-
 void RenderHeatmapLayer::transition(const TransitionParameters& parameters) {
     unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
 }

@@ -23,10 +23,6 @@ const style::CircleLayer::Impl& RenderCircleLayer::impl() const {
     return static_cast<const style::CircleLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Bucket> RenderCircleLayer::createBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) const {
-    return std::make_unique<CircleBucket>(parameters, layers);
-}
-
 void RenderCircleLayer::transition(const TransitionParameters& parameters) {
     unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
 }

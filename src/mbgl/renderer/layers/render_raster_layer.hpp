@@ -18,8 +18,6 @@ public:
 
     void render(PaintParameters&, RenderSource*) override;
 
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
-
     // Paint properties
     style::RasterPaintProperties::Unevaluated unevaluated;
     style::RasterPaintProperties::PossiblyEvaluated evaluated;

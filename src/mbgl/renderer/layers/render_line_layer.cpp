@@ -1,5 +1,4 @@
 #include <mbgl/renderer/layers/render_line_layer.hpp>
-#include <mbgl/renderer/buckets/line_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/image_manager.hpp>
@@ -25,20 +24,6 @@ RenderLineLayer::RenderLineLayer(Immutable<style::LineLayer::Impl> _impl)
 
 const style::LineLayer::Impl& RenderLineLayer::impl() const {
     return static_cast<const style::LineLayer::Impl&>(*baseImpl);
-}
-
-std::unique_ptr<Bucket> RenderLineLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
-    // Should be calling createLayout() instead.
-    assert(baseImpl->getTypeInfo()->layout == LayerTypeInfo::Layout::NotRequired);
-    return nullptr;
-}
-
-std::unique_ptr<Layout> RenderLineLayer::createLayout(const BucketParameters& parameters,
-                                                      const std::vector<const RenderLayer*>& group,
-                                                      std::unique_ptr<GeometryTileLayer> layer,
-                                                      GlyphDependencies&,
-                                                      ImageDependencies& imageDependencies) const {
-    return std::make_unique<PatternLayout<LineBucket>>(parameters, group, std::move(layer), imageDependencies);
 }
 
 void RenderLineLayer::transition(const TransitionParameters& parameters) {

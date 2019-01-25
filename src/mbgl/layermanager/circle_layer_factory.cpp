@@ -1,5 +1,6 @@
 #include <mbgl/layermanager/circle_layer_factory.hpp>
 
+#include <mbgl/renderer/buckets/circle_bucket.hpp>
 #include <mbgl/renderer/layers/render_circle_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
@@ -21,6 +22,10 @@ std::unique_ptr<style::Layer> CircleLayerFactory::createLayer(const std::string&
         return nullptr;
     }
     return layer;
+}
+
+std::unique_ptr<Bucket> CircleLayerFactory::createBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) noexcept {
+    return std::make_unique<CircleBucket>(parameters, layers);
 }
 
 std::unique_ptr<RenderLayer> CircleLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {

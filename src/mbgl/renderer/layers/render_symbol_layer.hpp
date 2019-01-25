@@ -71,13 +71,6 @@ public:
     static style::IconPaintProperties::PossiblyEvaluated iconPaintProperties(const style::SymbolPaintProperties::PossiblyEvaluated&);
     static style::TextPaintProperties::PossiblyEvaluated textPaintProperties(const style::SymbolPaintProperties::PossiblyEvaluated&);
 
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
-    std::unique_ptr<Layout> createLayout(const BucketParameters&,
-                                               const std::vector<const RenderLayer*>&,
-                                               std::unique_ptr<GeometryTileLayer>,
-                                               GlyphDependencies&,
-                                               ImageDependencies&) const override;
-
     // RenderLayerSymbolInterface overrides
     const RenderLayerSymbolInterface* getSymbolInterface() const final;
     const std::string& layerID() const final;

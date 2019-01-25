@@ -2,6 +2,7 @@
 
 #include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 #include <memory>
 
 namespace mbgl {
@@ -13,7 +14,6 @@ class FeatureIndex;
 
 class Layout {
 public:
-    Layout() = default;
     virtual ~Layout() = default;
 
     virtual void createBucket(const ImagePositions&,
@@ -30,6 +30,13 @@ public:
     };
     
     virtual bool hasDependencies() const = 0;
+};
+
+class LayoutParameters {
+public:
+    const BucketParameters& bucketParameters;
+    GlyphDependencies& glyphDependencies;
+    ImageDependencies& imageDependencies;
 };
 
 } // namespace mbgl
