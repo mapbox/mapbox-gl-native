@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
  path.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/offline-pack/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/offline-pack/">
  Download an offline map</a> example to learn how to calculate the progress
  of an offline download.
  */
@@ -184,7 +184,7 @@ typedef NS_ENUM(NSUInteger, MGLResourceKind) {
  maintains a canonical collection of offline packs in its `packs` property.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/offline-pack/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/offline-pack/">
  Download an offline map</a> example to learn how to create and register an
  offline pack for a defined region.
  */

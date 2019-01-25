@@ -27,7 +27,7 @@ typedef NSString *MGLShapeSourceOption NS_STRING_ENUM;
  is ignored when creating an `MGLComputedShapeSource` object.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/clustering/">Cluster point data</a> and <a href="https://www.mapbox.com/ios-sdk/maps/examples/clustering-with-images/">Use images to cluster point data</a> examples to learn how to cluster point data with this `MGLShapeSourceOption`.
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/clustering/">Cluster point data</a> and <a href="https://docs.mapbox.com/ios/maps/examples/clustering-with-images/">Use images to cluster point data</a> examples to learn how to cluster point data with this `MGLShapeSourceOption`.
  */
 FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClustered;
 
@@ -149,7 +149,7 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionLine
  ```
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/clustering/">Cluster point data</a>, <a href="https://www.mapbox.com/ios-sdk/maps/examples/clustering-with-images/">Use images to cluster point data</a>, and <a href="https://www.mapbox.com/ios-sdk/maps/examples/live-data/">Add live data</a> examples to learn how to add data to your map using this `MGLSource` object.
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/clustering/">Cluster point data</a>, <a href="https://docs.mapbox.com/ios/maps/examples/clustering-with-images/">Use images to cluster point data</a>, and <a href="https://docs.mapbox.com/ios/maps/examples/live-data/">Add live data</a> examples to learn how to add data to your map using this `MGLSource` object.
  */
 MGL_EXPORT
 @interface MGLShapeSource : MGLSource
@@ -175,7 +175,7 @@ MGL_EXPORT
  @return An initialized shape source.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/live-data/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/live-data/">
  Add live data</a> example to learn how to add live data to your map by
  updating the an `MGLShapeSource` object's `URL` property.
  */
@@ -209,7 +209,7 @@ MGL_EXPORT
  @return An initialized shape source.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/runtime-animate-line/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/runtime-animate-line/">
  Animate a line</a> example to learn how to animate line data by continously
  updating an `MGLShapeSource`'s `shape` attribute.
  */
