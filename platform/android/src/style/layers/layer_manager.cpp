@@ -24,52 +24,52 @@ namespace android {
 
 LayerManagerAndroid::LayerManagerAndroid() {
 #if defined(MBGL_LAYER_FILL_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<FillJavaLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<FillLayerFactory>());
 #elif !defined(MBGL_LAYER_FILL_DISABLE_ALL)
     addLayerType(std::make_unique<FillJavaLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_LINE_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<LineJavaLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<LineLayerFactory>());
 #elif !defined(MBGL_LAYER_LINE_DISABLE_ALL)
     addLayerType(std::make_unique<LineJavaLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_CIRCLE_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<CircleJavaLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<CircleLayerFactory>());
 #elif !defined(MBGL_LAYER_CIRCLE_DISABLE_ALL)
     addLayerType(std::make_unique<CircleJavaLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_SYMBOL_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<SymbolJavaLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<SymbolLayerFactory>());
 #elif !defined(MBGL_LAYER_SYMBOL_DISABLE_ALL)
     addLayerType(std::make_unique<SymbolJavaLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_RASTER_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<RasterJavaLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<RasterLayerFactory>());
 #elif !defined(MBGL_LAYER_RASTER_DISABLE_ALL)
     addLayerType(std::make_unique<RasterJavaLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_BACKGROUND_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<BackgroundJavaLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<BackgroundLayerFactory>());
 #elif !defined(MBGL_LAYER_BACKGROUND_DISABLE_ALL)
     addLayerType(std::make_unique<BackgroundJavaLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_HILLSHADE_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<HillshadeJavaLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<HillshadeLayerFactory>());
 #elif !defined(MBGL_LAYER_HILLSHADE_DISABLE_ALL)
     addLayerType(std::make_unique<HillshadeJavaLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_FILL_EXTRUSION_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<FillExtrusionJavaLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<FillExtrusionLayerFactory>());
 #elif !defined(MBGL_LAYER_FILL_EXTRUSION_DISABLE_ALL)
     addLayerType(std::make_unique<FillExtrusionJavaLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_HEATMAP_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<HeatmapJavaLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<HeatmapLayerFactory>());
 #elif !defined(MBGL_LAYER_HEATMAP_DISABLE_ALL)
     addLayerType(std::make_unique<HeatmapJavaLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_CUSTOM_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<CustomJavaLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<CustomLayerFactory>());
 #elif !defined(MBGL_LAYER_CUSTOM_DISABLE_ALL)
     addLayerType(std::make_unique<CustomJavaLayerPeerFactory>());
 #endif

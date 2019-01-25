@@ -17,52 +17,52 @@ namespace mbgl {
 
 LayerManagerDarwin::LayerManagerDarwin() {
 #if defined(MBGL_LAYER_FILL_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<FillStyleLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<FillLayerFactory>());
 #elif !defined(MBGL_LAYER_FILL_DISABLE_ALL)
     addLayerType(std::make_unique<FillStyleLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_LINE_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<LineStyleLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<LineLayerFactory>());
 #elif !defined(MBGL_LAYER_LINE_DISABLE_ALL)
     addLayerType(std::make_unique<LineStyleLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_CIRCLE_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<CircleStyleLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<CircleLayerFactory>());
 #elif !defined(MBGL_LAYER_CIRCLE_DISABLE_ALL)
     addLayerType(std::make_unique<CircleStyleLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_SYMBOL_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<SymbolStyleLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<SymbolLayerFactory>());
 #elif !defined(MBGL_LAYER_SYMBOL_DISABLE_ALL)
     addLayerType(std::make_unique<SymbolStyleLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_RASTER_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<RasterStyleLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<RasterLayerFactory>());
 #elif !defined(MBGL_LAYER_RASTER_DISABLE_ALL)
     addLayerType(std::make_unique<RasterStyleLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_BACKGROUND_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<BackgroundStyleLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<BackgroundLayerFactory>());
 #elif !defined(MBGL_LAYER_BACKGROUND_DISABLE_ALL)
     addLayerType(std::make_unique<BackgroundStyleLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_HILLSHADE_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<HillshadeStyleLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<HillshadeLayerFactory>());
 #elif !defined(MBGL_LAYER_HILLSHADE_DISABLE_ALL)
     addLayerType(std::make_unique<HillshadeStyleLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_FILL_EXTRUSION_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<FillExtrusionStyleLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<FillExtrusionLayerFactory>());
 #elif !defined(MBGL_LAYER_FILL_EXTRUSION_DISABLE_ALL)
     addLayerType(std::make_unique<FillExtrusionStyleLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_HEATMAP_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<HeatmapStyleLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<HeatmapLayerFactory>());
 #elif !defined(MBGL_LAYER_HEATMAP_DISABLE_ALL)
     addLayerType(std::make_unique<HeatmapStyleLayerPeerFactory>());
 #endif
 #if defined(MBGL_LAYER_CUSTOM_DISABLE_RUNTIME)
-    addLayerTypeCoreOnly(std::make_unique<OpenGLStyleLayerPeerFactory>());
+    addLayerTypeCoreOnly(std::make_unique<CustomLayerFactory>());
 #elif !defined(MBGL_LAYER_CUSTOM_DISABLE_ALL)
     addLayerType(std::make_unique<OpenGLStyleLayerPeerFactory>());
 #endif
