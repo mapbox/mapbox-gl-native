@@ -53,7 +53,9 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
  `MGLMapView.userTrackingMode`.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/user-tracking-mode/">Switch between user tracking modes</a> example to learn how to toggle modes and how each mode behaves.
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/user-tracking-mode/">
+ Switch between user tracking modes</a> example to learn how to toggle modes and
+ how each mode behaves.
  */
 typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
     /** The map does not follow the user location. */
@@ -156,7 +158,7 @@ FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLResourceNotFoundException
  ensuring that your use adheres to the relevant terms of use.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/simple-map-view/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/simple-map-view/">
  Simple map view</a> example to learn how to initialize a basic `MGLMapView`.
  */
 MGL_EXPORT IB_DESIGNABLE
@@ -185,13 +187,14 @@ MGL_EXPORT IB_DESIGNABLE
  @return An initialized map view.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/custom-style/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/custom-style/">
  Apply a style designed in Mapbox Studio</a> example to learn how to
- initialize an `MGLMapView` with a custom style. See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/raster-styles/">
- Appy a style designed in Mapbox Studio Classic</a> example to learn how to
- intialize an `MGLMapView` with a Studio Classic style _or_ a custom style
- JSON. See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/source-custom-vector/">
- Use third-party vector tiles</a> example to learn how to initialize an
+ initialize an `MGLMapView` with a custom style. See the
+ <a href="https://docs.mapbox.com/ios/maps/examples/raster-styles/"> Apply a
+ style designed in Mapbox Studio Classic</a> example to learn how to intialize
+ an `MGLMapView` with a Studio Classic style _or_ a custom style JSON. See the
+ <a href="https://docs.mapbox.com/ios/maps/examples/source-custom-vector/"> Use
+ third-party vector tiles</a> example to learn how to initialize an
  `MGLMapView` with a third-party tile source.
  */
 - (instancetype)initWithFrame:(CGRect)frame styleURL:(nullable NSURL *)styleURL;
@@ -248,7 +251,7 @@ MGL_EXPORT IB_DESIGNABLE
  you want to introspect individual style attributes, use the `style` property.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/switch-styles/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/switch-styles/">
  Switch between map styles</a> example to learn how to change the style of
  a map at runtime.
  */
@@ -421,7 +424,7 @@ MGL_EXPORT IB_DESIGNABLE
  `-setUserTrackingMode:animated:` method instead.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/user-location-annotation/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/user-location-annotation/">
  Customize the user location annotation</a> to learn how to customize the
  default user location annotation shown by `MGLUserTrackingMode`.
  */
@@ -918,7 +921,7 @@ MGL_EXPORT IB_DESIGNABLE
     immediately.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/camera-animation/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/camera-animation/">
  Camera animation</a> example to learn how to trigger an animation that
  rotates around a central point.
  */
@@ -937,7 +940,7 @@ MGL_EXPORT IB_DESIGNABLE
     is `0`, this parameter is ignored.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/camera-animation/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/camera-animation/">
  Camera animation</a> example to learn how to create a timed animation that
  rotates around a central point for a specific duration.
  */
@@ -1185,7 +1188,7 @@ MGL_EXPORT IB_DESIGNABLE
  @return The geographic coordinate at the given point.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/point-conversion/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/point-conversion/">
  Point conversion</a> example to learn how to convert a `CGPoint` to a map
  coordinate.
  */
@@ -1204,7 +1207,7 @@ MGL_EXPORT IB_DESIGNABLE
     corresponding to the given geographic coordinate.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/point-conversion/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/point-conversion/">
  Point conversion</a> example to learn how to convert a map coordinate to a
  `CGPoint` object.
  */
@@ -1281,8 +1284,8 @@ MGL_EXPORT IB_DESIGNABLE
     annotation object.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-models/">
- Annotation models</a> and <a href="https://www.mapbox.com/ios-sdk/maps/examples/line-geojson/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/annotation-models/">
+ Annotation models</a> and <a href="https://docs.mapbox.com/ios/maps/examples/line-geojson/">
  Add a line annotation from GeoJSON</a> examples to learn how to add an
  annotation to an `MGLMapView` object.
  */
@@ -1352,7 +1355,7 @@ MGL_EXPORT IB_DESIGNABLE
     such object exists in the reuse queue.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-view-image/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/annotation-view-image/">
  Add annotation views and images</a> example learn how to most efficiently
  reuse an `MGLAnnotationImage`.
  */
@@ -1517,7 +1520,7 @@ MGL_EXPORT IB_DESIGNABLE
     represent features in the sources used by the current style.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/select-layer/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/select-layer/">
  Select a feature within a layer</a> example to learn how to query an
  `MGLMapView` object for visible `MGLFeature` objects.
  */

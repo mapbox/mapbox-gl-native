@@ -185,7 +185,7 @@ MGL_EXPORT
  identifier and attributes.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/runtime-multiple-annotations/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/runtime-multiple-annotations/">
  Dynamically style interactive points</a> example to learn how to initialize
  `MGLPointFeature` objects and add them to your map.
  */
@@ -200,7 +200,7 @@ MGL_EXPORT
  @see `MGLCluster`
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/clustering/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/clustering/">
  Clustering point data</a> example to learn how to initialize
  clusters and add them to your map.
  */
@@ -217,7 +217,7 @@ MGL_EXPORT
  feature in GeoJSON.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/line-geojson/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/line-geojson/">
  Add a line annotation from GeoJSON</a> example to learn how to initialize an
  `MGLPolylineFeature` and add it to an `MGLMapView` object.
  */
@@ -284,7 +284,7 @@ MGL_EXPORT
  in GeoJSON.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/shape-collection/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/shape-collection/">
  Add multiple shapes from a single shape source</a> example to learn how to
  add shape data to your map using an `MGLShapeCollectionFeature` object.
  */
