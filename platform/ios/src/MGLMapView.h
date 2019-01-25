@@ -159,7 +159,7 @@ FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLResourceNotFoundException
  See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/simple-map-view/">
  Simple map view</a> example to learn how to initialize a basic `MGLMapView`.
  */
-MGL_EXPORT IB_DESIGNABLE
+MGL_EXPORT
 @interface MGLMapView : UIView
 
 #pragma mark Creating Instances
