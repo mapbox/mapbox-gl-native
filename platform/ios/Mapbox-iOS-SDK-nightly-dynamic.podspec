@@ -7,12 +7,12 @@ Pod::Spec.new do |m|
 
   m.summary           = 'Open source vector map solution for iOS with full styling capabilities.'
   m.description       = 'Open source, OpenGL-based vector map solution for iOS with full styling capabilities and Cocoa Touch APIs.'
-  m.homepage          = 'https://www.mapbox.com/ios-sdk/'
+  m.homepage          = 'https://docs.mapbox.com/ios/maps/'
   m.license           = { :type => 'BSD', :file => 'LICENSE.md' }
   m.author            = { 'Mapbox' => 'mobile@mapbox.com' }
-  m.screenshot        = "https://www.mapbox.com/ios-sdk/api/#{version}/img/screenshot.png"
+  m.screenshot        = "https://docs.mapbox.com/ios/api/maps/#{version}/img/screenshot.png"
   m.social_media_url  = 'https://twitter.com/mapbox'
-  m.documentation_url = 'https://www.mapbox.com/ios-sdk/api/'
+  m.documentation_url = 'https://docs.mapbox.com/ios/api/maps/'
 
   m.source = {
     :http => "https://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/mapbox-ios-sdk-nightly-dynamic.zip",

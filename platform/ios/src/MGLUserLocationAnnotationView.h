@@ -27,7 +27,7 @@ MGL_EXPORT
  is inactive.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/user-location-annotation/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/user-location-annotation/">
  Customize the user location annotation</a> example to learn how to customize
  the default user location annotation object.
  */

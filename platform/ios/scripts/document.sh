@@ -55,7 +55,7 @@ jazzy \
     --module-version ${SHORT_VERSION} \
     --readme ${README} \
     --documentation="platform/{darwin,ios}/docs/guides/*.md" \
-    --root-url https://www.mapbox.com/ios-sdk/api/${RELEASE_VERSION}/ \
+    --root-url https://docs.mapbox.com/ios/api/maps/${RELEASE_VERSION}/ \
     --theme ${THEME} \
     --output ${OUTPUT}
 
