@@ -2,6 +2,7 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/layermanager/layer_manager.hpp>
+#include <mbgl/layout/layout.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/layout/pattern_layout.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
@@ -340,7 +341,6 @@ void GeometryTileWorker::parse() {
     layouts.clear();
 
     featureIndex = std::make_unique<FeatureIndex>(*data ? (*data)->clone() : nullptr);
-    BucketParameters parameters { id, mode, pixelRatio };
 
     GlyphDependencies glyphDependencies;
     ImageDependencies imageDependencies;
@@ -359,6 +359,7 @@ void GeometryTileWorker::parse() {
         }
 
         const RenderLayer& leader = *group.at(0);
+        BucketParameters parameters { id, mode, pixelRatio, leader.baseImpl->getTypeInfo() };
 
         auto geometryLayer = (*data)->getLayer(leader.baseImpl->sourceLayer);
         if (!geometryLayer) {
@@ -377,7 +378,7 @@ void GeometryTileWorker::parse() {
         // and either immediately create a bucket if no images/glyphs are used, or the Layout is stored until
         // the images/glyphs are available to add the features to the buckets.
         if (leader.baseImpl->getTypeInfo()->layout == LayerTypeInfo::Layout::Required) {
-            auto layout = leader.createLayout(parameters, group, std::move(geometryLayer), glyphDependencies, imageDependencies);
+            auto layout = LayerManager::get()->createLayout({parameters, glyphDependencies, imageDependencies}, std::move(geometryLayer), group);
             if (layout->hasDependencies()) {
                 layouts.push_back(std::move(layout));
             } else {
@@ -386,7 +387,7 @@ void GeometryTileWorker::parse() {
         } else {
             const Filter& filter = leader.baseImpl->filter;
             const std::string& sourceLayerID = leader.baseImpl->sourceLayer;
-            std::shared_ptr<Bucket> bucket = leader.createBucket(parameters, group);
+            std::shared_ptr<Bucket> bucket = LayerManager::get()->createBucket(parameters, group);
 
             for (std::size_t i = 0; !obsolete && i < geometryLayer->featureCount(); i++) {
                 std::unique_ptr<GeometryTileFeature> feature = geometryLayer->getFeature(i);

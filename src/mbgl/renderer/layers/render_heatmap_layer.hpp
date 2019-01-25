@@ -28,8 +28,6 @@ public:
             const float,
             const mat4&) const override;
 
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
-
     // Paint properties
     style::HeatmapPaintProperties::Unevaluated unevaluated;
     style::HeatmapPaintProperties::PossiblyEvaluated evaluated;

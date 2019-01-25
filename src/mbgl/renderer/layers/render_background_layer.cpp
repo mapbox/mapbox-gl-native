@@ -22,12 +22,6 @@ const style::BackgroundLayer::Impl& RenderBackgroundLayer::impl() const {
     return static_cast<const style::BackgroundLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Bucket> RenderBackgroundLayer::createBucket(const BucketParameters &,
-                                                            const std::vector<const RenderLayer *> &) const {
-    assert(false);
-    return nullptr;
-}
-
 void RenderBackgroundLayer::transition(const TransitionParameters &parameters) {
     unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
 }

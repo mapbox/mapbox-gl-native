@@ -47,7 +47,7 @@ TEST(Buckets, CircleBucket) {
     BackendScope scope { backend };
 
     gl::Context context;
-    CircleBucket bucket { { {0, 0, 0}, MapMode::Static, 1.0 }, {} };
+    CircleBucket bucket { { {0, 0, 0}, MapMode::Static, 1.0, nullptr }, {} };
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 

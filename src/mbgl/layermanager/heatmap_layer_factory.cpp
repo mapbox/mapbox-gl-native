@@ -1,5 +1,6 @@
 #include <mbgl/layermanager/heatmap_layer_factory.hpp>
 
+#include <mbgl/renderer/buckets/heatmap_bucket.hpp>
 #include <mbgl/renderer/layers/render_heatmap_layer.hpp>
 #include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layers/heatmap_layer_impl.hpp>
@@ -21,6 +22,10 @@ std::unique_ptr<style::Layer> HeatmapLayerFactory::createLayer(const std::string
         return nullptr;
     }
     return layer;
+}
+
+std::unique_ptr<Bucket> HeatmapLayerFactory::createBucket(const BucketParameters& parameters, const std::vector<const RenderLayer*>& layers) noexcept {
+    return std::make_unique<HeatmapBucket>(parameters, layers);
 }
 
 std::unique_ptr<RenderLayer> HeatmapLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {

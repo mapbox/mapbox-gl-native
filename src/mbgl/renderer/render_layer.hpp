@@ -62,15 +62,6 @@ public:
             const float,
             const mat4&) const { return false; };
 
-    virtual std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const = 0;
-    virtual std::unique_ptr<Layout> createLayout(const BucketParameters&,
-                                               const std::vector<const RenderLayer*>&,
-                                               std::unique_ptr<GeometryTileLayer>,
-                                               GlyphDependencies&,
-                                               ImageDependencies&) const {
-        return nullptr;
-    }
-
     using RenderTiles = std::vector<std::reference_wrapper<RenderTile>>;
     void setRenderTiles(RenderTiles, const TransformState&);
 

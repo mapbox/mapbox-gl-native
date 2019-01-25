@@ -22,11 +22,6 @@ const style::RasterLayer::Impl& RenderRasterLayer::impl() const {
     return static_cast<const style::RasterLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Bucket> RenderRasterLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
-    assert(false);
-    return nullptr;
-}
-
 void RenderRasterLayer::transition(const TransitionParameters& parameters) {
     unevaluated = impl().paint.transitioned(parameters, std::move(unevaluated));
 }

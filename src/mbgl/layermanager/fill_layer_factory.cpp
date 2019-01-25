@@ -1,5 +1,6 @@
 #include <mbgl/layermanager/fill_layer_factory.hpp>
 
+#include <mbgl/renderer/buckets/fill_bucket.hpp>
 #include <mbgl/renderer/layers/render_fill_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
@@ -21,6 +22,13 @@ std::unique_ptr<style::Layer> FillLayerFactory::createLayer(const std::string& i
         return nullptr;
     }
     return layer;
+}
+
+std::unique_ptr<Layout>
+FillLayerFactory::createLayout(const LayoutParameters& parameters,
+                               std::unique_ptr<GeometryTileLayer> layer,
+                               const std::vector<const RenderLayer*>& group) noexcept {
+    return std::make_unique<PatternLayout<FillBucket>>(parameters.bucketParameters, group, std::move(layer), parameters.imageDependencies);
 }
 
 std::unique_ptr<RenderLayer> FillLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {

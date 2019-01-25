@@ -46,11 +46,6 @@ void RenderCustomLayer::markContextDestroyed() {
     contextDestroyed = true;
 }
 
-std::unique_ptr<Bucket> RenderCustomLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
-    assert(false);
-    return nullptr;
-}
-
 void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) {
     if (host != impl().host) {
         //If the context changed, deinitialize the previous one before initializing the new one.

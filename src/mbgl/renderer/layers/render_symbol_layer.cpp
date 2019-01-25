@@ -12,7 +12,6 @@
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/layout/symbol_projection.hpp>
 #include <mbgl/util/math.hpp>
 
@@ -29,24 +28,6 @@ RenderSymbolLayer::RenderSymbolLayer(Immutable<style::SymbolLayer::Impl> _impl)
 
 const style::SymbolLayer::Impl& RenderSymbolLayer::impl() const {
     return static_cast<const style::SymbolLayer::Impl&>(*baseImpl);
-}
-
-std::unique_ptr<Bucket> RenderSymbolLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
-    // Should be calling createLayout() instead.
-    assert(baseImpl->getTypeInfo()->layout == LayerTypeInfo::Layout::NotRequired);
-    return nullptr;
-}
-
-std::unique_ptr<Layout> RenderSymbolLayer::createLayout(const BucketParameters& parameters,
-                                                              const std::vector<const RenderLayer*>& group,
-                                                              std::unique_ptr<GeometryTileLayer> layer,
-                                                              GlyphDependencies& glyphDependencies,
-                                                              ImageDependencies& imageDependencies) const {
-    return std::make_unique<SymbolLayout>(parameters,
-                                          group,
-                                          std::move(layer),
-                                          imageDependencies,
-                                          glyphDependencies);
 }
 
 void RenderSymbolLayer::transition(const TransitionParameters& parameters) {

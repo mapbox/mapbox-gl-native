@@ -24,11 +24,6 @@ const style::HillshadeLayer::Impl& RenderHillshadeLayer::impl() const {
     return static_cast<const style::HillshadeLayer::Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Bucket> RenderHillshadeLayer::createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const {
-    assert(false);
-    return nullptr;
-}
-
 const std::array<float, 2> RenderHillshadeLayer::getLatRange(const UnwrappedTileID& id) {
    const LatLng latlng0 = LatLng(id);
    const LatLng latlng1 = LatLng(UnwrappedTileID(id.canonical.z, id.canonical.x, id.canonical.y + 1));

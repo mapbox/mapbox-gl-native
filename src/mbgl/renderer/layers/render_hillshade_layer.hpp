@@ -19,8 +19,6 @@ public:
 
     void render(PaintParameters&, RenderSource* src) override;
 
-    std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
-
     // Paint properties
     style::HillshadePaintProperties::Unevaluated unevaluated;
     style::HillshadePaintProperties::PossiblyEvaluated evaluated;
