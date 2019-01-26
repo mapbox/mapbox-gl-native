@@ -7,8 +7,7 @@
 + (void)checkForUpdates {
 #if TARGET_IPHONE_SIMULATOR
     // Abort if running in a playground.
-    if ([[NSBundle mainBundle].bundleIdentifier hasPrefix:@"com.apple.dt.playground."] ||
-        NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
+    if ([[NSBundle mainBundle].bundleIdentifier hasPrefix:@"com.apple.dt.playground."]) {
         return;
     }
 

@@ -288,7 +288,6 @@ public:
     /// True if a willChange notification has been issued for shape annotation layers and a didChange notification is pending.
     BOOL _isChangingAnnotationLayers;
     BOOL _isWaitingForRedundantReachableNotification;
-    BOOL _isTargetingInterfaceBuilder;
 
     CLLocationDegrees _pendingLatitude;
     CLLocationDegrees _pendingLongitude;
@@ -390,14 +389,12 @@ public:
     }
 
     NSString *styleURLString = @(self.mbglMap.getStyle().getURL().c_str()).mgl_stringOrNilIfEmpty;
-    MGLAssert(styleURLString || _isTargetingInterfaceBuilder, @"Invalid style URL string %@", styleURLString);
+    MGLAssert(styleURLString, @"Invalid style URL string %@", styleURLString);
     return styleURLString ? [NSURL URLWithString:styleURLString] : nil;
 }
 
 - (void)setStyleURL:(nullable NSURL *)styleURL
 {
-    if (_isTargetingInterfaceBuilder) return;
-
     if ( ! styleURL)
     {
         styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
@@ -432,7 +429,6 @@ public:
 
 - (void)commonInit
 {
-    _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
     _opaque = NO;
 
     BOOL background = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
@@ -474,7 +470,7 @@ public:
     _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *[config fileSource], *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default, enableCrossSourceCollisions);
 
     // start paused if in IB
-    if (_isTargetingInterfaceBuilder || background) {
+    if (background) {
         self.dormant = YES;
     }
 
@@ -1051,7 +1047,7 @@ public:
 
     [self adjustContentInset];
 
-    if (!_isTargetingInterfaceBuilder && _mbglMap) {
+    if (_mbglMap) {
         self.mbglMap.setSize([self size]);
     }
 
@@ -5145,7 +5141,7 @@ public:
 - (void)setShowsUserLocation:(BOOL)showsUserLocation
 {
     MGLLogDebug(@"Setting showsUserLocation: %@", MGLStringFromBOOL(showsUserLocation));
-    if (showsUserLocation == _showsUserLocation || _isTargetingInterfaceBuilder) return;
+    if (showsUserLocation == _showsUserLocation) return;
 
     _showsUserLocation = showsUserLocation;
 
