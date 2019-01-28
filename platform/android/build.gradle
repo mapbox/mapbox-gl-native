@@ -1,5 +1,4 @@
 buildscript {
-    apply from: "${rootDir}/gradle/gradle-update-vendor-modules.gradle"
     apply from: "${rootDir}/gradle/dependencies.gradle"
 
     repositories {
