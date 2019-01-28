@@ -5,11 +5,13 @@ import android.location.Location;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.SparseArray;
 import android.view.animation.LinearInterpolator;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
 
@@ -34,6 +36,9 @@ import static com.mapbox.mapboxsdk.location.Utils.immediateAnimation;
 
 final class LocationAnimatorCoordinator {
 
+  private static final String TAG = "Mbgl-LocationAnimatorCoordinator";
+
+  @VisibleForTesting
   final SparseArray<MapboxAnimator> animatorArray = new SparseArray<>();
 
   private final Projection projection;
@@ -42,29 +47,28 @@ final class LocationAnimatorCoordinator {
   private float previousCompassBearing = -1;
   private long locationUpdateTimestamp = -1;
   private float durationMultiplier;
+  private final MapboxAnimatorProvider animatorProvider;
   private final MapboxAnimatorSetProvider animatorSetProvider;
   private boolean compassAnimationEnabled;
   private boolean accuracyAnimationEnabled;
-  private int maxAnimationFps = Integer.MAX_VALUE;
 
-  private MapboxAnimator.AnimationsValueChangeListener[] listeners;
+  @VisibleForTesting
+  int maxAnimationFps = Integer.MAX_VALUE;
 
-  LocationAnimatorCoordinator(@NonNull Projection projection, @NonNull MapboxAnimatorSetProvider animatorSetProvider) {
+  @VisibleForTesting
+  final SparseArray<MapboxAnimator.AnimationsValueChangeListener> listeners = new SparseArray<>();
+
+  LocationAnimatorCoordinator(@NonNull Projection projection, @NonNull MapboxAnimatorSetProvider animatorSetProvider,
+                              @NonNull MapboxAnimatorProvider animatorProvider) {
     this.projection = projection;
+    this.animatorProvider = animatorProvider;
     this.animatorSetProvider = animatorSetProvider;
   }
 
   void updateAnimatorListenerHolders(@NonNull Set<AnimatorListenerHolder> listenerHolders) {
-    int maxIndex = 0;
+    listeners.clear();
     for (AnimatorListenerHolder holder : listenerHolders) {
-      if (holder.getAnimatorType() > maxIndex) {
-        maxIndex = holder.getAnimatorType();
-      }
-    }
-
-    listeners = new MapboxAnimator.AnimationsValueChangeListener[maxIndex + 1];
-    for (AnimatorListenerHolder holder : listenerHolders) {
-      listeners[holder.getAnimatorType()] = holder.getListener();
+      listeners.append(holder.getAnimatorType(), holder.getListener());
     }
   }
 
@@ -229,26 +233,26 @@ final class LocationAnimatorCoordinator {
 
   private void createNewLatLngAnimator(@MapboxAnimator.Type int animatorType, LatLng previous, LatLng target) {
     cancelAnimator(animatorType);
-    MapboxAnimator.AnimationsValueChangeListener listener = listeners[animatorType];
+    MapboxAnimator.AnimationsValueChangeListener listener = listeners.get(animatorType);
     if (listener != null) {
-      animatorArray.put(animatorType, new MapboxLatLngAnimator(previous, target, listener, maxAnimationFps));
+      animatorArray.put(animatorType, animatorProvider.latLngAnimator(previous, target, listener, maxAnimationFps));
     }
   }
 
   private void createNewFloatAnimator(@MapboxAnimator.Type int animatorType, float previous, float target) {
     cancelAnimator(animatorType);
-    MapboxAnimator.AnimationsValueChangeListener listener = listeners[animatorType];
+    MapboxAnimator.AnimationsValueChangeListener listener = listeners.get(animatorType);
     if (listener != null) {
-      animatorArray.put(animatorType, new MapboxFloatAnimator(previous, target, listener, maxAnimationFps));
+      animatorArray.put(animatorType, animatorProvider.floatAnimator(previous, target, listener, maxAnimationFps));
     }
   }
 
   private void createNewCameraAdapterAnimator(@MapboxAnimator.Type int animatorType, float previous, float target,
                                               @Nullable MapboxMap.CancelableCallback cancelableCallback) {
     cancelAnimator(animatorType);
-    MapboxAnimator.AnimationsValueChangeListener listener = listeners[animatorType];
+    MapboxAnimator.AnimationsValueChangeListener listener = listeners.get(animatorType);
     if (listener != null) {
-      animatorArray.put(animatorType, new MapboxCameraAnimatorAdapter(previous, target, listener, cancelableCallback));
+      animatorArray.put(animatorType, animatorProvider.cameraAnimator(previous, target, listener, cancelableCallback));
     }
   }
 
@@ -379,6 +383,7 @@ final class LocationAnimatorCoordinator {
 
   void setMaxAnimationFps(int maxAnimationFps) {
     if (maxAnimationFps <= 0) {
+      Logger.e(TAG, "Max animation FPS cannot be less or equal to 0.");
       return;
     }
     this.maxAnimationFps = maxAnimationFps;

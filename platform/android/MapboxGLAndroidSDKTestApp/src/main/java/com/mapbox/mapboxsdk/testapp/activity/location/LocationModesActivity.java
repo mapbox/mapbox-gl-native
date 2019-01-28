@@ -174,6 +174,10 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
     } else if (id == R.id.action_gestures_management_enabled) {
       enableGesturesManagement();
       return true;
+    } else if (id == R.id.action_component_throttling_enabled) {
+      locationComponent.setMaxAnimationFps(5);
+    } else if (id == R.id.action_component_throttling_disabled) {
+      locationComponent.setMaxAnimationFps(Integer.MAX_VALUE);
     }
 
     return super.onOptionsItemSelected(item);

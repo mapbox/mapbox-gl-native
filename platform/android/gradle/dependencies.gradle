@@ -17,7 +17,7 @@ ext {
             leakCanary      : '1.6.1',
             junit           : '4.12',
             mockito         : '2.23.4',
-            mockk           : '1.8.13.kotlin13',
+            mockk           : '1.9',
             robolectric     : '3.8',
             timber          : '4.7.1',
             okhttp          : '3.11.0',
