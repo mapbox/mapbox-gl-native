@@ -517,13 +517,8 @@ android-style-code:
 	node platform/android/scripts/generate-style-code.js
 style-code: android-style-code
 
-# Vendor submodules configuration for Android.
-.PHONY: platform/android/vendor
-platform/android/vendor:
-	git submodule update --init --recursive platform/android/vendor
-
 # Configuration file for running CMake from Gradle within Android Studio.
-platform/android/gradle/configuration.gradle: platform/android/vendor
+platform/android/gradle/configuration.gradle:
 	@printf "ext {\n    node = '`command -v node || command -v nodejs`'\n    npm = '`command -v npm`'\n    ccache = '`command -v ccache`'\n}" > $@
 
 define ANDROID_RULES
@@ -762,11 +757,6 @@ endif
 .PHONY: android-configuration
 android-configuration: platform/android/gradle/configuration.gradle
 	cat platform/android/gradle/configuration.gradle
-
-# Updates Android's vendor submodules
-.PHONY: android-update-vendor
-android-update-vendor: platform/android/gradle/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none updateVendorSubmodules
 
 # Creates a dependency graph using Graphviz
 .PHONY: android-graph

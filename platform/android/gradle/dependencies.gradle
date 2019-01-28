@@ -7,6 +7,9 @@ ext {
     ]
 
     versions = [
+            mapboxServices  : '4.3.0',
+            mapboxTelemetry : '4.2.0',
+            mapboxGestures  : '0.3.0',
             supportLib      : '27.1.1',
             constraintLayout: '1.1.2',
             espresso        : '3.0.2',
@@ -25,23 +28,15 @@ ext {
             reLinker        : '1.3.1'
     ]
 
-    vendorArtifacts = [
-            mapboxGestures   : 'mapbox-android-gestures',
-            mapboxJavaCore   : 'mapbox-sdk-core',
-            mapboxJavaTurf   : 'mapbox-sdk-turf',
-            mapboxJavaGeojson: 'mapbox-sdk-geojson',
-            mapboxTelemetry  : 'mapbox-android-telemetry',
-            mapboxAndroidCore: 'mapbox-android-core'
-    ]
-
-    vendorVersions = [
-            mapboxGestures   : '0.3.0',
-            mapboxJava       : '4.3.0',
-            mapboxTelemetry  : '4.2.0',
-            mapboxAndroidCore: '1.1.0'
-    ]
-
     dependenciesList = [
+            mapboxJavaServices     : "com.mapbox.mapboxsdk:mapbox-sdk-services:${versions.mapboxServices}",
+            mapboxJavaGeoJSON      : "com.mapbox.mapboxsdk:mapbox-sdk-geojson:${versions.mapboxServices}",
+            mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxTelemetry}",
+            mapboxAndroidGestures  : "com.mapbox.mapboxsdk:mapbox-android-gestures:${versions.mapboxGestures}",
+
+            // for testApp
+            mapboxJavaTurf         : "com.mapbox.mapboxsdk:mapbox-sdk-turf:${versions.mapboxServices}",
+
             junit                  : "junit:junit:${versions.junit}",
             mockito                : "org.mockito:mockito-core:${versions.mockito}",
             mockk                  : "io.mockk:mockk:${versions.mockk}",
