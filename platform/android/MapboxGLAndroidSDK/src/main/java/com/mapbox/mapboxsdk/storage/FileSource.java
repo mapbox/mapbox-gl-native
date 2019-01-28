@@ -69,22 +69,6 @@ public class FileSource {
   }
 
   /**
-   * This callback receives an asynchronous response containing a list of possible
-   * paths for the resources cache database.
-   */
-  @Keep
-  public interface PossibleResourcesCachePathsCallback {
-
-    /**
-     * Receives the list of possible paths
-     *
-     * @param possiblePaths the paths list
-     */
-    void onReceive(@NonNull List<String> possiblePaths);
-
-  }
-
-  /**
    * This callback receives an asynchronous response containing the migration path
    * and the list of the successfully migrated offline regions.
    */
@@ -141,7 +125,7 @@ public class FileSource {
         SharedPreferences preferences = context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
         String defaultExternalStoragePath = context.getExternalFilesDir(null).getAbsolutePath();
         cachePath = preferences.getString(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH, defaultExternalStoragePath);
-        if (!isValidPath(context, cachePath)) {
+        if (!isPathWritable(cachePath)) {
           cachePath = null;
         }
       } catch (NullPointerException exception) {
@@ -286,8 +270,7 @@ public class FileSource {
   }
 
   /**
-   * Changes the path of the resources cache database. Possible paths can be retrieved with
-   * {@link #requestPossibleResourcesCachePaths(Context, PossibleResourcesCachePathsCallback)}.
+   * Changes the path of the resources cache database.
    * Note that the external storage setting needs to be activated in the manifest.
    *
    * @param context       the context for the migration process
@@ -297,6 +280,12 @@ public class FileSource {
   public static void migrateToResourcesCachePath(@NonNull Context context,
                                                  @NonNull final String migrationPath,
                                                  @NonNull final MigrateResourcesCachePathCallback callback) {
+    if (getInstance(context).isActivated()) {
+      final String activatedMessage = "Cannot migrate, file source is activated!";
+      Logger.w(TAG, activatedMessage);
+      callback.onError(activatedMessage);
+    }
+
     final WeakReference<Context> contextWeakReference = new WeakReference<>(context);
     new Thread(new Runnable() {
       @Override
@@ -311,8 +300,8 @@ public class FileSource {
               message = "Migration not needed";
             } else if (!isExternalStorageReadable()) {
               message = "External storage is not readable!";
-            } else if (!isValidPath(context, migrationPath)) {
-              message = "Migration path is not valid: " + migrationPath;
+            } else if (!isPathWritable(migrationPath)) {
+              message = "Migration path is not writable: " + migrationPath;
             } else {
               message = null;
               new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -384,84 +373,11 @@ public class FileSource {
     });
   }
 
-  private static boolean isValidPath(@NonNull Context context, String resourcesCachePath) {
-    if (resourcesCachePath == null || resourcesCachePath.isEmpty()) {
+  private static boolean isPathWritable(String path) {
+    if (path == null || path.isEmpty()) {
       return false;
     }
-    for (String externalStoragePath : getPossibleResourcesCachePaths(context)) {
-      if (resourcesCachePath.equals(externalStoragePath)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Get possible paths for the resource cache database migration.
-   * See {@link #migrateToResourcesCachePath(Context, String, MigrateResourcesCachePathCallback)}.
-   *
-   * @param context  the context to retrieve the paths from
-   * @param callback the callback for the response
-   */
-  public static void requestPossibleResourcesCachePaths(@NonNull final Context context,
-                                                        @NonNull final PossibleResourcesCachePathsCallback callback) {
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        final List<String> possiblePaths = getPossibleResourcesCachePaths(context);
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-          @Override
-          public void run() {
-            callback.onReceive(possiblePaths);
-          }
-        });
-      }
-    }).start();
-  }
-
-  private static List<String> getPossibleResourcesCachePaths(@NonNull final Context context) {
-    if (!isExternalStorageConfiguration(context)) {
-      Logger.w(TAG, "External storage setting is not enabled!");
-      return Collections.emptyList();
-    }
-    return obtainExternalFilesPaths(context);
-  }
-
-  private static List<String> obtainExternalFilesPaths(@NonNull Context context) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      return obtainExternalFilesPathsKitKat(context);
-    }
-    return obtainExternalFilesPathsLegacy(context);
-  }
-
-  private static List<String> obtainExternalFilesPathsLegacy(@NonNull Context context) {
-    final String postFix = File.separator + "Android" + File.separator + "data" + File.separator
-        + context.getPackageName() + File.separator + "files";
-    final List<String> paths = new ArrayList<>();
-    final String externalStorage = System.getenv("EXTERNAL_STORAGE");
-    final String secondaryStorage = System.getenv("SECONDARY_STORAGE");
-    if (externalStorage != null) {
-      paths.add(externalStorage + postFix);
-    }
-    if (secondaryStorage != null) {
-      final String[] secPaths = secondaryStorage.split(":");
-      for (String path : secPaths) {
-        paths.add(path + postFix);
-      }
-    }
-    return paths;
-  }
-
-  @TargetApi(Build.VERSION_CODES.KITKAT)
-  private static List<String> obtainExternalFilesPathsKitKat(@NonNull Context context) {
-    final List<String> paths = new ArrayList<>();
-    final File[] extDirs = context.getExternalFilesDirs(null);
-    for (File dir : extDirs) {
-      if (dir != null) {
-        paths.add(dir.getAbsolutePath());
-      }
-    }
-    return paths;
+    return new File(path).canWrite();
   }
 
   private static void reinitializeOfflineManager(@NonNull Context context) {
