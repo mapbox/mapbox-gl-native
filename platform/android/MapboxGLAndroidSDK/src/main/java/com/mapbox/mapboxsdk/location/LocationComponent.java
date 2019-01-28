@@ -164,6 +164,8 @@ public final class LocationComponent {
     = new CopyOnWriteArrayList<>();
   private final CopyOnWriteArrayList<OnCameraTrackingChangedListener> onCameraTrackingChangedListeners
     = new CopyOnWriteArrayList<>();
+  private final CopyOnWriteArrayList<OnRenderModeChangedListener> onRenderModeChangedListeners
+    = new CopyOnWriteArrayList<>();
 
   // Workaround for too frequent updates, see https://github.com/mapbox/mapbox-gl-native/issues/13587
   private long fastestInterval;
@@ -864,6 +866,24 @@ public final class LocationComponent {
   }
 
   /**
+   * Adds a listener that gets invoked when render mode changes.
+   *
+   * @param listener Listener that gets invoked when render mode changes.
+   */
+  public void addOnRenderModeChangedListener(@NonNull OnRenderModeChangedListener listener) {
+    onRenderModeChangedListeners.add(listener);
+  }
+
+  /**
+   * Removes a listener that gets invoked when render mode changes.
+   *
+   * @param listener Listener that gets invoked when render mode changes.
+   */
+  public void removeRenderModeChangedListener(@NonNull OnRenderModeChangedListener listener) {
+    onRenderModeChangedListeners.remove(listener);
+  }
+
+  /**
    * Adds the passed listener that gets invoked when user updates have stopped long enough for the last update
    * to be considered stale.
    * <p>
@@ -1323,6 +1343,9 @@ public final class LocationComponent {
     @Override
     public void onRenderModeChanged(int currentMode) {
       updateAnimatorListenerHolders();
+      for (OnRenderModeChangedListener listener : onRenderModeChangedListeners) {
+        listener.onRenderModeChanged(currentMode);
+      }
     }
   };
 
