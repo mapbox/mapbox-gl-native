@@ -4,11 +4,13 @@ apply plugin: 'kotlin-android'
 
 dependencies {
     lintChecks project(":MapboxGLAndroidSDKLint")
-    api project(":libcore")
-    api project(":libtelemetry")
-    api project(":MapboxAndroidGestures")
-    api project(":services-geojson")
-    implementation project(":services-turf")
+    api dependenciesList.mapboxAndroidTelemetry
+    api dependenciesList.mapboxJavaGeoJSON
+    api (dependenciesList.mapboxAndroidGestures) {
+        // workaround until https://github.com/mapbox/mapbox-gestures-android/issues/50 is released
+        exclude group: 'com.jakewharton.timber', module: 'timber'
+    }
+    implementation dependenciesList.mapboxJavaTurf
     implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportAnnotations
     implementation dependenciesList.supportFragmentV4
