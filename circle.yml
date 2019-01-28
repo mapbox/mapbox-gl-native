@@ -536,6 +536,9 @@ jobs:
     steps:
       - install-dependencies: { gradle: true }
       - run:
+          name: Android nitpick
+          command: make run-android-nitpick
+      - run:
           name: Check code style
           command: make android-check
       - run:
@@ -596,6 +599,9 @@ jobs:
       IS_LOCAL_DEVELOPMENT: false
     steps:
       - install-dependencies: { gradle: true }
+      - run:
+          name: Android nitpick
+          command: make run-android-nitpick
       - run:
           name: Trigger core benchmark run
           command: |
