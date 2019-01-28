@@ -13,9 +13,9 @@ if [ -z `which jazzy` ]; then
 
     CIRCLECI=${CIRCLECI:-false}
     if [[ "${CIRCLECI}" == true ]]; then
-        sudo gem install jazzy --no-document
+        sudo gem install jazzy -v 0.9.4 --no-document
     else
-        gem install jazzy --no-document
+        gem install jazzy -v 0.9.4 --no-document
     fi
 
     if [ -z `which jazzy` ]; then
