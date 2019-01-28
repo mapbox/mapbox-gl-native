@@ -331,15 +331,14 @@ commands:
     steps:
     - run:
         name: Install iOS packaging dependencies
-        command: brew install awscli wget
+        command: ./platform/ios/scripts/install-packaging-dependencies.sh
         background: true
 
   install-macos-dependencies:
     steps:
     - run:
         name: Install macOS dependencies
-        command: |
-          brew install cmake ccache
+        command: brew install cmake ccache
 
   install-node-macos-dependencies:
     steps:
@@ -945,8 +944,8 @@ jobs:
       SLACK_CHANNEL: C0ACM9Q2C
     steps:
       - install-macos-dependencies
-      - install-ios-packaging-dependencies
       - install-dependencies
+      - install-ios-packaging-dependencies
       - run:
           name: Build dynamic framework for device and simulator
           command: make iframework
@@ -981,8 +980,8 @@ jobs:
             export SLACK_MESSAGE="<$CIRCLE_BUILD_URL|Release build for \`$CIRCLE_TAG\` started.>"
             scripts/notify-slack.sh
       - install-macos-dependencies
-      - install-ios-packaging-dependencies
       - install-dependencies
+      - install-ios-packaging-dependencies
       - run:
           name: Build, package, and upload iOS release
           command: |
