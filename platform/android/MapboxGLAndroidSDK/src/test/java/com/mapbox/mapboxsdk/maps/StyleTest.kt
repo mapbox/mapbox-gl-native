@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.maps
 
 import android.graphics.Bitmap
+import android.graphics.drawable.ShapeDrawable
 import com.mapbox.mapboxsdk.constants.MapboxConstants
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions
@@ -14,7 +15,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import java.lang.IllegalStateException
 
 @RunWith(RobolectricTestRunner::class)
 class StyleTest {
@@ -277,4 +277,27 @@ class StyleTest {
         style!!.addLayer(mockk<SymbolLayer>())
     }
 
+    @Test
+    fun testAddImage() {
+        val bitmap = Bitmap.createBitmap(1, 1,  Bitmap.Config.ARGB_8888)
+        val builder = Style.Builder().fromUrl(Style.SATELLITE).withImage("id", bitmap)
+        mapboxMap.setStyle(builder)
+        verify(exactly = 1) { nativeMapView.styleUrl = Style.SATELLITE }
+        verify(exactly = 0) { nativeMapView.addImages(any()) }
+        mapboxMap.notifyStyleLoaded()
+        verify(exactly = 1) { nativeMapView.addImages(any()) }
+    }
+
+    @Test
+    fun testAddDrawable() {
+        val drawable = ShapeDrawable()
+        drawable.intrinsicHeight = 10
+        drawable.intrinsicWidth = 10
+        val builder = Style.Builder().fromUrl(Style.SATELLITE).withImage("id", drawable)
+        mapboxMap.setStyle(builder)
+        verify(exactly = 1) { nativeMapView.styleUrl = Style.SATELLITE }
+        verify(exactly = 0) { nativeMapView.addImages(any()) }
+        mapboxMap.notifyStyleLoaded()
+        verify(exactly = 1) { nativeMapView.addImages(any()) }
+    }
 }

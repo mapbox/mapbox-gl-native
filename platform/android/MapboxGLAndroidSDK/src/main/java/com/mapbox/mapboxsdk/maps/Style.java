@@ -1,17 +1,20 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import android.util.DisplayMetrics;
+
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.Source;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -299,6 +302,20 @@ public class Style {
   }
 
   /**
+   * Adds an drawable to be converted into a bitmap to be used in the map's style
+   *
+   * @param name     the name of the image
+   * @param drawable the drawable instance to convert
+   */
+  public void addImage(@NonNull String name, @NonNull Drawable drawable) {
+    Bitmap bitmap = BitmapUtils.getBitmapFromDrawable(drawable);
+    if (bitmap == null) {
+      throw new IllegalArgumentException("Provided drawable couldn't be converted to a Bitmap.");
+    }
+    addImage(name, bitmap, false);
+  }
+
+  /**
    * Adds an image to be used in the map's style
    *
    * @param name   the name of the image
@@ -312,6 +329,8 @@ public class Style {
 
   /**
    * Adds an images to be used in the map's style.
+   *
+   * @param images the map of images to add
    */
   public void addImages(@NonNull HashMap<String, Bitmap> images) {
     addImages(images, false);
@@ -319,6 +338,9 @@ public class Style {
 
   /**
    * Adds an images to be used in the map's style.
+   *
+   * @param images the map of images to add
+   * @param sdf    the flag indicating image is an SDF or template image
    */
   public void addImages(@NonNull HashMap<String, Bitmap> images, boolean sdf) {
     validateState("addImages");
@@ -631,6 +653,22 @@ public class Style {
     }
 
     /**
+     * Will add the drawable as image when the map style has loaded.
+     *
+     * @param id       the id for the image
+     * @param drawable the drawable to be converted and added
+     * @return this
+     */
+    @NonNull
+    public Builder withImage(@NonNull String id, @NonNull Drawable drawable) {
+      Bitmap bitmap = BitmapUtils.getBitmapFromDrawable(drawable);
+      if (bitmap == null) {
+        throw new IllegalArgumentException("Provided drawable couldn't be converted to a Bitmap.");
+      }
+      return this.withImage(id, bitmap, false);
+    }
+
+    /**
      * Will add the image when the map style has loaded.
      *
      * @param id    the id for the image
@@ -643,10 +681,28 @@ public class Style {
     }
 
     /**
+     * Will add the drawable as image when the map style has loaded.
+     *
+     * @param id       the id for the image
+     * @param drawable the drawable to be converted and added
+     * @param sdf      the flag indicating image is an SDF or template image
+     * @return this
+     */
+    @NonNull
+    public Builder withImage(@NonNull String id, @NonNull Drawable drawable, boolean sdf) {
+      Bitmap bitmap = BitmapUtils.getBitmapFromDrawable(drawable);
+      if (bitmap == null) {
+        throw new IllegalArgumentException("Provided drawable couldn't be converted to a Bitmap.");
+      }
+      return this.withImage(id, bitmap, sdf);
+    }
+
+    /**
      * Will add the image when the map style has loaded.
      *
      * @param id    the id for the image
      * @param image the image to be added
+     * @param sdf   the flag indicating image is an SDF or template image
      * @return this
      */
     @NonNull
