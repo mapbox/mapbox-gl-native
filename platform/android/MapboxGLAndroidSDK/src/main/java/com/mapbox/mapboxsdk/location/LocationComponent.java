@@ -1021,7 +1021,8 @@ public final class LocationComponent {
 
     locationAnimatorCoordinator = new LocationAnimatorCoordinator(
       mapboxMap.getProjection(),
-      MapboxAnimatorSetProvider.getInstance()
+      MapboxAnimatorSetProvider.getInstance(),
+      MapboxAnimatorProvider.getInstance()
     );
     locationAnimatorCoordinator.setTrackingAnimationDurationMultiplier(options
       .trackingAnimationDurationMultiplier());

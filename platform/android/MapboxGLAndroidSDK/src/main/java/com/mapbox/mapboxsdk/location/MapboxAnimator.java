@@ -45,7 +45,7 @@ abstract class MapboxAnimator<K> extends ValueAnimator implements ValueAnimator.
   private final K target;
   private K animatedValue;
 
-  private double minUpdateInterval;
+  private final double minUpdateInterval;
   private long timeElapsed;
 
   MapboxAnimator(@NonNull K previous, @NonNull K target, @NonNull AnimationsValueChangeListener<K> updateListener,
