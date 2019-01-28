@@ -57,7 +57,7 @@ dependencies {
     implementation dependenciesList.kotlinLib
 
     implementation project(':MapboxGLAndroidSDK')
-    implementation project(":services-turf")
+    implementation dependenciesList.mapboxJavaTurf
 
     implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportRecyclerView
