@@ -5,7 +5,7 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode;
 /**
  * Listener that gets invoked when layer render mode changes.
  */
-interface OnRenderModeChangedListener {
+public interface OnRenderModeChangedListener {
 
   /**
    * Invoked on every {@link RenderMode} change.
