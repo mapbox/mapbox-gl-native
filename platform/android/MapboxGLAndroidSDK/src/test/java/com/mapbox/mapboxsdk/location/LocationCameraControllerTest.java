@@ -346,7 +346,8 @@ public class LocationCameraControllerTest {
     camera.setCameraMode(TRACKING_COMPASS);
     float compassBearing = 5f;
 
-    getAnimationListener(ANIMATOR_CAMERA_COMPASS_BEARING, camera.getAnimationListeners()).onNewAnimationValue(compassBearing);
+    getAnimationListener(ANIMATOR_CAMERA_COMPASS_BEARING, camera.getAnimationListeners())
+      .onNewAnimationValue(compassBearing);
 
     verify(mapboxMap).moveCamera(any(CameraUpdate.class));
   }
@@ -359,7 +360,8 @@ public class LocationCameraControllerTest {
     camera.setCameraMode(NONE_COMPASS);
     float compassBearing = 5f;
 
-    getAnimationListener(ANIMATOR_CAMERA_COMPASS_BEARING, camera.getAnimationListeners()).onNewAnimationValue(compassBearing);
+    getAnimationListener(ANIMATOR_CAMERA_COMPASS_BEARING, camera.getAnimationListeners())
+      .onNewAnimationValue(compassBearing);
 
     verify(mapboxMap).moveCamera(any(CameraUpdate.class));
   }
