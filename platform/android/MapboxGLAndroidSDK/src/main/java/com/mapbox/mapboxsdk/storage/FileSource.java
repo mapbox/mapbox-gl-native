@@ -276,57 +276,58 @@ public class FileSource {
     if (getInstance(context).isActivated()) {
       final String activatedMessage = "Cannot set path, file source is activated!";
       Logger.w(TAG, activatedMessage);
-    }
+      callback.onError(activatedMessage);
+    } else {
+      final WeakReference<Context> contextWeakReference = new WeakReference<>(context);
+      new Thread(new Runnable() {
+        @Override
+        public void run() {
+          final Context context = contextWeakReference.get();
+          final String message;
+          if (context != null) {
+            if (resourcesCachePath != null) {
+              if (!isExternalStorageConfiguration(context)) {
+                message = "External storage setting is not enabled";
+              } else if (resourcesCachePath.equals(path)) {
+                message = "Changing the path not needed";
+              } else if (!isExternalStorageReadable()) {
+                message = "External storage is not readable";
+              } else if (!isPathWritable(path)) {
+                message = "Path is not writable: " + path;
+              } else {
+                message = null;
 
-    final WeakReference<Context> contextWeakReference = new WeakReference<>(context);
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        final Context context = contextWeakReference.get();
-        final String message;
-        if (context != null) {
-          if (resourcesCachePath != null) {
-            if (!isExternalStorageConfiguration(context)) {
-              message = "External storage setting is not enabled";
-            } else if (resourcesCachePath.equals(path)) {
-              message = "Changing the path not needed";
-            } else if (!isExternalStorageReadable()) {
-              message = "External storage is not readable";
-            } else if (!isPathWritable(path)) {
-              message = "Path is not writable: " + path;
+                final SharedPreferences.Editor editor =
+                    context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
+                editor.putString(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH, path).apply();
+
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                  @Override
+                  public void run() {
+                    setResourcesCachePath(context, path);
+                    callback.onSuccess(path);
+                  }
+                });
+              }
             } else {
-              message = null;
-
-              final SharedPreferences.Editor editor =
-                  context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
-              editor.putString(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH, path).apply();
-
-              new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                  setResourcesCachePath(context, path);
-                  callback.onSuccess(path);
-                }
-              });
+              message = "Resources cache path was not initialized.";
             }
           } else {
-            message = "Resources cache path was not initialized.";
+            message = "Context is null";
           }
-        } else {
-          message = "Context is null";
-        }
 
-        if (message != null) {
-          Logger.w(TAG, message);
-          new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-              callback.onError(message);
-            }
-          });
+          if (message != null) {
+            Logger.w(TAG, message);
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+              @Override
+              public void run() {
+                callback.onError(message);
+              }
+            });
+          }
         }
-      }
-    }).start();
+      }).start();
+    }
   }
 
   private static void setResourcesCachePath(@NonNull Context context, @NonNull String path) {
