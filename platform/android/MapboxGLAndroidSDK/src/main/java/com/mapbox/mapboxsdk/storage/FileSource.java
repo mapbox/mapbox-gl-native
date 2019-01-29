@@ -1,13 +1,11 @@
 package com.mapbox.mapboxsdk.storage;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -20,15 +18,10 @@ import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
-import com.mapbox.mapboxsdk.offline.OfflineRegion;
-import com.mapbox.mapboxsdk.utils.FileUtils;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -69,22 +62,21 @@ public class FileSource {
   }
 
   /**
-   * This callback receives an asynchronous response containing the migration path
-   * and the list of the successfully migrated offline regions.
+   * This callback receives an asynchronous response containing the new path of the
+   * resources cache database.
    */
   @Keep
-  public interface MigrateResourcesCachePathCallback {
+  public interface SetResourcesCachePathCallback {
 
     /**
-     * Receives the migration path and the migrated offline regions
+     * Receives the new database path
      *
-     * @param migrationPath  the path of the current resources cache database
-     * @param offlineRegions the list if the migrated offline regions
+     * @param path the path of the current resources cache database
      */
-    void onMigrate(String migrationPath, OfflineRegion[] offlineRegions);
+    void onSuccess(String path);
 
     /**
-     * Receives an error message if the migration was not successful
+     * Receives an error message if setting the path was not successful
      *
      * @param message the error message
      */
@@ -269,21 +261,13 @@ public class FileSource {
     }
   }
 
-  /**
-   * Changes the path of the resources cache database.
-   * Note that the external storage setting needs to be activated in the manifest.
-   *
-   * @param context       the context for the migration process
-   * @param migrationPath the migration path
-   * @param callback      the callback to obtain the result of the migration
-   */
-  public static void migrateToResourcesCachePath(@NonNull Context context,
-                                                 @NonNull final String migrationPath,
-                                                 @NonNull final MigrateResourcesCachePathCallback callback) {
+  public static void setResourcesCachePath(@NonNull Context context,
+                                           @NonNull final String path,
+                                           @NonNull final SetResourcesCachePathCallback callback) {
+
     if (getInstance(context).isActivated()) {
-      final String activatedMessage = "Cannot migrate, file source is activated!";
+      final String activatedMessage = "Cannot set path, file source is activated!";
       Logger.w(TAG, activatedMessage);
-      callback.onError(activatedMessage);
     }
 
     final WeakReference<Context> contextWeakReference = new WeakReference<>(context);
@@ -295,19 +279,25 @@ public class FileSource {
         if (context != null) {
           if (resourcesCachePath != null) {
             if (!isExternalStorageConfiguration(context)) {
-              message = "External storage setting is not enabled!";
-            } else if (resourcesCachePath.equals(migrationPath)) {
-              message = "Migration not needed";
+              message = "External storage setting is not enabled";
+            } else if (resourcesCachePath.equals(path)) {
+              message = "Changing the path not needed";
             } else if (!isExternalStorageReadable()) {
-              message = "External storage is not readable!";
-            } else if (!isPathWritable(migrationPath)) {
-              message = "Migration path is not writable: " + migrationPath;
+              message = "External storage is not readable";
+            } else if (!isPathWritable(path)) {
+              message = "Path is not writable: " + path;
             } else {
               message = null;
+
+              final SharedPreferences.Editor editor =
+                  context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
+              editor.putString(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH, path).apply();
+
               new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                  startMigration(context, migrationPath, callback);
+                  setResourcesCachePath(context, path);
+                  callback.onSuccess(path);
                 }
               });
             }
@@ -331,46 +321,11 @@ public class FileSource {
     }).start();
   }
 
-  private static void startMigration(@NonNull final Context context,
-                                     @NonNull final String migrationPath,
-                                     @NonNull final MigrateResourcesCachePathCallback callback) {
-
-    final String oldPath = resourcesCachePath;
-    final String oldDatabasePath = oldPath + File.separator + "mbgl-offline.db";
+  private static void setResourcesCachePath(@NonNull Context context, @NonNull String path) {
     resourcesCachePathLoaderLock.lock();
-    resourcesCachePath = migrationPath;
+    resourcesCachePath = path;
     reinitializeOfflineManager(context);
     resourcesCachePathLoaderLock.unlock();
-
-    // merge
-    final OfflineManager offlineManager = OfflineManager.getInstance(context);
-    offlineManager.mergeOfflineRegions(oldDatabasePath, new OfflineManager.MergeOfflineRegionsCallback() {
-      @Override
-      public void onMerge(OfflineRegion[] offlineRegions) {
-        FileUtils.deleteFile(oldDatabasePath);
-
-        new Thread(new Runnable() {
-          @Override
-          public void run() {
-            SharedPreferences.Editor editor =
-                context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
-            editor.putString(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH, migrationPath).apply();
-          }
-        }).start();
-
-        callback.onMigrate(migrationPath, offlineRegions);
-      }
-
-      @Override
-      public void onError(String error) {
-        resourcesCachePathLoaderLock.lock();
-        resourcesCachePath = oldPath;
-        reinitializeOfflineManager(context);
-        resourcesCachePathLoaderLock.unlock();
-
-        callback.onError(error);
-      }
-    });
   }
 
   private static boolean isPathWritable(String path) {

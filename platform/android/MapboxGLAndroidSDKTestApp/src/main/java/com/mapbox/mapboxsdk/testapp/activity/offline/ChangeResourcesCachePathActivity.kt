@@ -12,7 +12,6 @@ import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.TextView
 import android.widget.Toast
-import com.mapbox.mapboxsdk.offline.OfflineRegion
 import com.mapbox.mapboxsdk.storage.FileSource
 import com.mapbox.mapboxsdk.testapp.R
 import kotlinx.android.synthetic.main.activity_change_resources_cache_path.*
@@ -21,7 +20,7 @@ import java.util.ArrayList
 
 class ChangeResourcesCachePathActivity : AppCompatActivity(),
     AdapterView.OnItemClickListener,
-    FileSource.MigrateResourcesCachePathCallback {
+    FileSource.SetResourcesCachePathCallback {
 
   lateinit var adapter: PathAdapter
 
@@ -46,7 +45,7 @@ class ChangeResourcesCachePathActivity : AppCompatActivity(),
   override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
     listView.onItemClickListener = null
     val path: String = adapter.getItem(position) as String
-    FileSource.migrateToResourcesCachePath(this, path, this)
+    FileSource.setResourcesCachePath(this, path, this)
   }
 
   override fun onError(message: String?) {
@@ -54,9 +53,9 @@ class ChangeResourcesCachePathActivity : AppCompatActivity(),
     Toast.makeText(this, "Error: $message", Toast.LENGTH_LONG).show()
   }
 
-  override fun onMigrate(migrationPath: String?, offlineRegions: Array<out OfflineRegion>?) {
+  override fun onSuccess(path: String?) {
     listView.onItemClickListener = this
-    Toast.makeText(this, "Migrated ${offlineRegions?.size} regions to: $migrationPath", Toast.LENGTH_LONG).show()
+    Toast.makeText(this, "New path: $path", Toast.LENGTH_LONG).show()
   }
 
   private fun obtainExternalFilesPaths(context: Context): List<String> {
