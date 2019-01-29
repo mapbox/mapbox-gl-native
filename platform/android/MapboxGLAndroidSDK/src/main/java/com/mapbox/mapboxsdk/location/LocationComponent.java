@@ -25,6 +25,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.log.Logger;
+import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraIdleListener;
 import com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveListener;
@@ -702,6 +703,46 @@ public final class LocationComponent {
     updateLocation(location, false);
   }
 
+  /**
+   * Set max FPS at which location animators can output updates. The throttling will only impact the location puck
+   * and camera tracking smooth animations.
+   * <p>
+   * Setting this <b>will not impact</b> any other animations schedule with {@link MapboxMap}, gesture animations or
+   * {@link #zoomWhileTracking(double)}/{@link #tiltWhileTracking(double)}.
+   * <p>
+   * Use this setting to limit animation rate of the location puck on higher zoom levels to decrease the stress on
+   * the device's CPU which can directly improve battery life, without sacrificing UX.
+   * <p>
+   * Example usage:
+   * <pre>
+   * {@code
+   * mapboxMap.addOnCameraIdleListener(new MapboxMap.OnCameraIdleListener() {
+   *   @Override
+   *   public void onCameraIdle() {
+   *     double zoom = mapboxMap.getCameraPosition().zoom;
+   *     int maxAnimationFps;
+   *     if (zoom < 5) {
+   *       maxAnimationFps = 3;
+   *     } else if (zoom < 10) {
+   *       maxAnimationFps = 5;
+   *     } else if (zoom < 15) {
+   *       maxAnimationFps = 7;
+   *     } else if (zoom < 18) {
+   *       maxAnimationFps = 15;
+   *     } else {
+   *       maxAnimationFps = Integer.MAX_VALUE;
+   *     }
+   *     locationComponent.setMaxAnimationFps(maxAnimationFps);
+   *   }
+   * });
+   * }
+   * </pre>
+   * <p>
+   * If you're looking for a way to throttle the FPS of the whole map, including other animations and gestures, see
+   * {@link MapView#setMaximumFps(int)}.
+   *
+   * @param maxAnimationFps max location animation FPS
+   */
   public void setMaxAnimationFps(int maxAnimationFps) {
     locationAnimatorCoordinator.setMaxAnimationFps(maxAnimationFps);
   }

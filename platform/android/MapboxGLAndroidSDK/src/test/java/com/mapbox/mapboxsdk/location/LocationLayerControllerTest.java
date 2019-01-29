@@ -518,7 +518,8 @@ public class LocationLayerControllerTest {
     layer.setRenderMode(RenderMode.COMPASS);
     float compassBearing = 2f;
 
-    getAnimationListener(ANIMATOR_LAYER_COMPASS_BEARING, layer.getAnimationListeners()).onNewAnimationValue(compassBearing);
+    getAnimationListener(ANIMATOR_LAYER_COMPASS_BEARING, layer.getAnimationListeners())
+      .onNewAnimationValue(compassBearing);
 
     verify(locationFeature).addNumberProperty(PROPERTY_COMPASS_BEARING, compassBearing);
   }
@@ -561,7 +562,8 @@ public class LocationLayerControllerTest {
     layer.setRenderMode(RenderMode.NORMAL);
     float accuracyRadiusValue = 2f;
 
-    getAnimationListener(ANIMATOR_LAYER_ACCURACY, layer.getAnimationListeners()).onNewAnimationValue(accuracyRadiusValue);
+    getAnimationListener(ANIMATOR_LAYER_ACCURACY, layer.getAnimationListeners())
+      .onNewAnimationValue(accuracyRadiusValue);
 
     verify(locationFeature).addNumberProperty(PROPERTY_ACCURACY_RADIUS, accuracyRadiusValue);
   }
@@ -584,7 +586,8 @@ public class LocationLayerControllerTest {
     float accuracyRadiusValue = 2f;
 
     assertNull(getAnimationListener(ANIMATOR_LAYER_ACCURACY, layer.getAnimationListeners()));
-    verify(locationFeature, times(0)).addNumberProperty(PROPERTY_ACCURACY_RADIUS, accuracyRadiusValue);
+    verify(locationFeature, times(0))
+      .addNumberProperty(PROPERTY_ACCURACY_RADIUS, accuracyRadiusValue);
   }
 
   private LayerFeatureProvider buildFeatureProvider(@NonNull LocationComponentOptions options) {
