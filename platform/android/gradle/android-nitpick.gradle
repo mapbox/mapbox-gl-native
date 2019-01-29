@@ -9,26 +9,25 @@ def MAPBOX_TELEMETRY_TAG_PREFIX = 'telem-'
 def MAPBOX_GESTURES_DIR = 'mapbox-gestures-android'
 def MAPBOX_GESTURES_TAG_PREFIX = 'v'
 
-task verifyVendorSubmodulePins {
+task androidNitpick {
     doLast {
+        println "Running android nitpick script"
+
         println "Verify vendor submodule pins"
+        exec {
+            workingDir = "${rootDir}"
+            commandLine "git", "submodule", "update", "--init", "--recursive", "vendor"
+        }
         verifyVendorSubmodulePin(MAPBOX_JAVA_DIR, MAPBOX_JAVA_TAG_PREFIX, versions.mapboxServices)
         verifyVendorSubmodulePin(MAPBOX_TELEMETRY_DIR, MAPBOX_TELEMETRY_TAG_PREFIX, versions.mapboxTelemetry)
         verifyVendorSubmodulePin(MAPBOX_GESTURES_DIR, MAPBOX_GESTURES_TAG_PREFIX, versions.mapboxGestures)
     }
 }
 
-task androidNitpick {
-    doLast {
-        println "Running android nitpick script"
-        verifyVendorSubmodulePins
-    }
-}
-
 private def verifyVendorSubmodulePin(def dir, def prefix, def version) {
     def output = new ByteArrayOutputStream()
     exec {
-        workingDir "${rootDir}/vendor/${dir}"
+        workingDir = "${rootDir}/vendor/${dir}"
         commandLine "git", "rev-list", "-n", "1", "tags/${prefix + version}"
         standardOutput = output
     }
@@ -36,7 +35,7 @@ private def verifyVendorSubmodulePin(def dir, def prefix, def version) {
     output.reset()
 
     exec {
-        workingDir "${rootDir}/vendor/${dir}"
+        workingDir = "${rootDir}/vendor/${dir}"
         commandLine "git", "rev-parse", "HEAD"
         standardOutput = output
     }
