@@ -261,6 +261,14 @@ public class FileSource {
     }
   }
 
+  /**
+   * Changes the path of the resources cache database.
+   * Note that the external storage setting needs to be activated in the manifest.
+   *
+   * @param context  the context of the path
+   * @param path     the new database path
+   * @param callback the callback to obtain the result
+   */
   public static void setResourcesCachePath(@NonNull Context context,
                                            @NonNull final String path,
                                            @NonNull final SetResourcesCachePathCallback callback) {
