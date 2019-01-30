@@ -55,6 +55,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * `MGLMapSnapshotter` now respects the `MGLIdeographicFontFamilyName` key in Info.plist, which reduces bandwidth consumption when snapshotting regions that contain Chinese or Japanese characters. ([#13427](https://github.com/mapbox/mapbox-gl-native/pull/13427))
 * Fixed a sporadic crash when using `MGLMapSnapshotter`. ([#13300](https://github.com/mapbox/mapbox-gl-native/pull/13300))
 
+### User interaction
+
+* Added options to customize position of scale bar, compass, logo and attribution. ([#13556](https://github.com/mapbox/mapbox-gl-native/pull/13556))
+
 ### Other changes
 
 * Modified the behavior of the map view so that programmatic camera transitions can no longer be interrupted by user interaction when `MGLMapView.zoomEnabled`, `MGLMapView.rotateEnabled`, `MGLMapView.scrollEnabled`, and `MGLMapView.pitchEnabled` are set to false. ([#13362](https://github.com/mapbox/mapbox-gl-native/pull/13362))
