@@ -15,7 +15,7 @@
         <code>
         <a name="/{{usr}}"></a>
         <a name="//apple_ref/{{language_stub}}/{{dash_type}}/{{name}}" class="dashAnchor"></a>
-        <a class="token" href="#/{{usr}}"><span class="token-name">{{name}}</span><span class="token-icon" /></a>
+        <a class="token {{#usage_discouraged}}discouraged{{/usage_discouraged}}" href="#/{{usr}}"><span class="token-name">{{name}}</span><span class="token-icon" /></a>
         </code>
         {{#default_impl_abstract}}
           <span class="declaration-note">
@@ -30,6 +30,7 @@
       </div>
       <div class="height-container">
         <section class="section">
+          {{> deprecation}}
           {{#abstract}}
           <div class="abstract">
             {{{abstract}}}

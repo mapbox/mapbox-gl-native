@@ -523,6 +523,9 @@ h1 > .anchor-icon { margin-bottom: 2px; }
     background-repeat: no-repeat;
   }
 
+  .discouraged {
+    text-decoration: line-through;
+  }
   .declaration-note {
     font-size: 13px;
     color: #808080;
@@ -571,6 +574,7 @@ h1 > .anchor-icon { margin-bottom: 2px; }
   padding: 6px 12px;
   margin: 12px 0;
   border-left: $aside_border;
+  border-radius: 4px;
   overflow-y: hidden;
   .aside-title {
     font-size: 10px;
@@ -579,7 +583,6 @@ h1 > .anchor-icon { margin-bottom: 2px; }
     text-transform: uppercase;
     padding: 2px 8px;
     display: inline;
-    border-radius: 4px;
     margin: 0;
     -webkit-user-select: none;
   }
@@ -590,19 +593,17 @@ h1 > .anchor-icon { margin-bottom: 2px; }
 
 .language {
   background: $color_light;
-  border-radius: 4px;
   border-left: $declaration_language_border;
 }
 
 .aside.aside-see, .aside.aside-note, {
   background: $color_light;
-  border-radius: 4px;
   .aside-title {
     padding-left: 0px;
   }
 }
 
-.aside-warning {
+.aside-warning, .aside-deprecated, .aside-unavailable {
   border-left: $aside_warning_border;
   .aside-title {
     color: $aside_warning_color;
