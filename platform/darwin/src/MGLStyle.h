@@ -12,8 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  A version number identifying the default version of the Mapbox Streets style
- obtained through the `-streetsStyleURL` method. This version number may also be
- passed into the `-streetsStyleURLWithVersion:` method.
+ obtained through the `MGLStyle.streetsStyleURL` method. This version number may also be
+ passed into the `+[MGLStyle streetsStyleURLWithVersion:]` method.
 
  The value of this constant generally corresponds to the latest released version
  as of the date on which this SDK was published. You can use this constant to
@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning The value of this constant may change in a future release of the SDK.
     If you use any feature that depends on a specific aspect of a default style
-    – for instance, the minimum zoom level that includes roads – you may use the
+    — for instance, the minimum zoom level that includes roads — you may use the
     current value of this constant or the underlying style URL, but do not use
     the constant itself. Such details may change significantly from version to
     version.
@@ -41,11 +41,11 @@ FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLRedundantSourceIdentifier
  The proxy object for the current map style.
 
  MGLStyle provides a set of convenience methods for changing Mapbox
- default styles using `-[MGLMapView styleURL]`.
+ default styles using `MGLMapView.styleURL`.
  <a href="https://www.mapbox.com/maps/">Learn more about Mapbox default styles</a>.
 
  It is also possible to directly manipulate the current map style
- via `-[MGLMapView style]` by updating the style's data sources or layers.
+ via `MGLMapView.style` by updating the style's data sources or layers.
 
  @note Wait until the map style has finished loading before modifying a map's
     style via any of the `MGLStyle` instance methods below. You can use the
@@ -74,9 +74,9 @@ MGL_EXPORT
  is specified explicitly.
 
  @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the minimum zoom level that includes roads – use the
-    `-streetsStyleURLWithVersion:` method instead. Such details may change
+    any feature that depends on a specific aspect of a default style — for
+    instance, the minimum zoom level that includes roads — use the
+    `+streetsStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
 @property (class, nonatomic, readonly) NSURL *streetsStyleURL;
@@ -104,9 +104,9 @@ MGL_EXPORT
  Outdoors is a general-purpose style tailored to outdoor activities.
 
  @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the minimum zoom level that includes roads – use the
-    `-outdoorsStyleURLWithVersion:` method instead. Such details may change
+    any feature that depends on a specific aspect of a default style — for
+    instance, the minimum zoom level that includes roads — use the
+    `+outdoorsStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
 @property (class, nonatomic, readonly) NSURL *outdoorsStyleURL;
@@ -128,9 +128,9 @@ MGL_EXPORT
  Light is a subtle, light-colored backdrop for data visualizations.
 
  @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the minimum zoom level that includes roads – use the
-    `-lightStyleURLWithVersion:` method instead. Such details may change
+    any feature that depends on a specific aspect of a default style — for
+    instance, the minimum zoom level that includes roads — use the
+    `+lightStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
 @property (class, nonatomic, readonly) NSURL *lightStyleURL;
@@ -153,9 +153,9 @@ MGL_EXPORT
  Dark is a subtle, dark-colored backdrop for data visualizations.
 
  @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the minimum zoom level that includes roads – use the
-    `-darkStyleURLWithVersion:` method instead. Such details may change
+    any feature that depends on a specific aspect of a default style — for
+    instance, the minimum zoom level that includes roads — use the
+    `+darkStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
 @property (class, nonatomic, readonly) NSURL *darkStyleURL;
@@ -178,9 +178,9 @@ MGL_EXPORT
  Satellite is high-resolution satellite and aerial imagery.
 
  @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the raster tile sets included in the style – use the
-    `-satelliteStyleURLWithVersion:` method instead. Such details may change
+    any feature that depends on a specific aspect of a default style — for
+    instance, the raster tile sets included in the style — use the
+    `+satelliteStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
 
  #### Related example
@@ -214,9 +214,9 @@ MGL_EXPORT
  Streets.
 
  @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the minimum zoom level that includes roads – use the
-    `-satelliteStreetsStyleURLWithVersion:` method instead. Such details may
+    any feature that depends on a specific aspect of a default style — for
+    instance, the minimum zoom level that includes roads — use the
+    `+satelliteStreetsStyleURLWithVersion:` method instead. Such details may
     change significantly from version to version.
 
  #### Related example

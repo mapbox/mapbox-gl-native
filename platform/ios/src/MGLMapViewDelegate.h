@@ -346,7 +346,7 @@ NS_ASSUME_NONNULL_BEGIN
  the map view with respect to the content insets.
 
  This method will override any values set by `MGLMapView.userLocationVerticalAlignment`
- or `-[MGLMapView setUserLocationVerticalAlignment:]`.
+ or `-[MGLMapView setUserLocationVerticalAlignment:animated:]`.
 
  @param mapView The map view that is tracking the user's location.
  */
