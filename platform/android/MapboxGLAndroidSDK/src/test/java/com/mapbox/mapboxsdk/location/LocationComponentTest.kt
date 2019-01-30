@@ -100,20 +100,6 @@ class LocationComponentTest {
   @Test
   fun activateWithDefaultLocationEngineRequestAndOptionsTest() {
     locationComponent.activateLocationComponent(context, mockk(), true, locationEngineRequest, locationComponentOptions)
-
-    Assert.assertEquals(locationEngineRequest, locationComponent.locationEngineRequest)
-
-    doReturn(mock(TypedArray::class.java)).`when`(context)
-            .obtainStyledAttributes(R.style.mapbox_LocationComponent, R.styleable.mapbox_LocationComponent)
-
-    val resources = mock(Resources::class.java)
-
-    doReturn(resources).`when`(context).resources
-    doReturn(0f).`when`(resources)
-            .getDimension(R.dimen.mapbox_locationComponentTrackingMultiFingerMoveThreshold)
-    doReturn(0f).`when`(resources)
-            .getDimension(R.dimen.mapbox_locationComponentTrackingMultiFingerMoveThreshold)
-    locationComponent.activateLocationComponent(context, mockk(), true, locationEngineRequest, locationComponentOptions)
     Assert.assertEquals(locationEngineRequest, locationComponent.locationEngineRequest)
   }
 
