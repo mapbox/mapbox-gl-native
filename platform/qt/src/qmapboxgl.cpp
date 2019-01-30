@@ -1475,11 +1475,11 @@ void QMapboxGL::removeLayer(const QString& id)
 /*!
     List of all existing layer ids from the current style.
 */
-QList<QString> QMapboxGL::layerIds() const
+QVector<QString> QMapboxGL::layerIds() const
 {
     const auto &layers = d_ptr->mapObj->getStyle().getLayers();
 
-    QList<QString> layerIds;
+    QVector<QString> layerIds;
     layerIds.reserve(layers.size());
 
     for (const mbgl::style::Layer *layer : layers) {
