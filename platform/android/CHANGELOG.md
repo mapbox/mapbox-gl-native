@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 7.1.0 - January 30, 2019
+### Build
+ - Revert Android vendorization, add submodule pinning [#13815](https://github.com/mapbox/mapbox-gl-native/pull/13815)
+
 ## 7.1.0-beta.1 - January 23, 2019
 ### Bugs
  - Ignore unused C++ arguments for all build environments [#13774](https://github.com/mapbox/mapbox-gl-native/pull/13774)
