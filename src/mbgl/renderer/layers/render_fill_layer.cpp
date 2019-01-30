@@ -236,18 +236,6 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
     }
 }
 
-style::FillPaintProperties::PossiblyEvaluated RenderFillLayer::paintProperties() const {
-    return FillPaintProperties::PossiblyEvaluated {
-        evaluated.get<style::FillAntialias>(),
-        evaluated.get<style::FillOpacity>(),
-        evaluated.get<style::FillColor>(),
-        evaluated.get<style::FillOutlineColor>(),
-        evaluated.get<style::FillTranslate>(),
-        evaluated.get<style::FillTranslateAnchor>(),
-        evaluated.get<style::FillPattern>()
-    };
-}
-
 bool RenderFillLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
         const GeometryTileFeature& feature,

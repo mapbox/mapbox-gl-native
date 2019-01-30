@@ -218,18 +218,6 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             getID());
     }
 }
-style::FillExtrusionPaintProperties::PossiblyEvaluated RenderFillExtrusionLayer::paintProperties() const {
-    return FillExtrusionPaintProperties::PossiblyEvaluated {
-        evaluated.get<style::FillExtrusionOpacity>(),
-        evaluated.get<style::FillExtrusionColor>(),
-        evaluated.get<style::FillExtrusionTranslate>(),
-        evaluated.get<style::FillExtrusionTranslateAnchor>(),
-        evaluated.get<style::FillExtrusionPattern>(),
-        evaluated.get<style::FillExtrusionHeight>(),
-        evaluated.get<style::FillExtrusionBase>(),
-        evaluated.get<style::FillExtrusionVerticalGradient>()
-    };
-}
 
 bool RenderFillExtrusionLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
