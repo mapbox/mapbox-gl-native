@@ -13,7 +13,7 @@ public:
     std::string max;
 };
 
-using PatternLayerMap = std::unordered_map<std::string, PatternDependency>;
+using PatternLayerMap = std::map<std::string, PatternDependency>;
 
 class PatternFeature  {
 public:
@@ -44,8 +44,7 @@ public:
         groupID = renderLayer->getID();
 
         for (const auto& layer : layers) {
-            const typename B::PossiblyEvaluatedPaintProperties evaluatedProps = static_cast<const PatternLayer*>(layer)->paintProperties();
-            layerPaintProperties.emplace(layer->getID(), std::move(evaluatedProps));
+            const typename B::PossiblyEvaluatedPaintProperties evaluatedProps = static_cast<const PatternLayer*>(layer)->evaluated;
             const auto patternProperty = evaluatedProps.template get<typename PatternLayer::PatternProperty>();
             const auto constantPattern = patternProperty.constantOr(Faded<std::basic_string<char> >{ "", ""});
             // determine if layer group has any layers that use *-pattern property and add
@@ -57,6 +56,7 @@ public:
                 patternDependencies.emplace(constantPattern.to, ImageType::Pattern);
                 patternDependencies.emplace(constantPattern.from, ImageType::Pattern);
             }
+            layerPaintProperties.emplace(layer->getID(), std::move(evaluatedProps));
         }
 
         const size_t featureCount = sourceLayer->featureCount();
@@ -65,7 +65,7 @@ public:
             if (!leader.filter(style::expression::EvaluationContext { this->zoom, feature.get() }))
                 continue;
 
-            std::unordered_map<std::string, PatternDependency> patternDependencyMap;
+            PatternLayerMap patternDependencyMap;
             if (hasPattern) {
                 for (const auto& layer : layers) {
                     const auto it = layerPaintProperties.find(layer->getID());

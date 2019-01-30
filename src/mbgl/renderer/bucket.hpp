@@ -14,7 +14,7 @@ class Context;
 
 class RenderLayer;
 class PatternDependency;
-using PatternLayerMap = std::unordered_map<std::string, PatternDependency>;
+using PatternLayerMap = std::map<std::string, PatternDependency>;
 
 class Bucket {
 public:

@@ -22,7 +22,6 @@ public:
     bool hasTransition() const override;
     bool hasCrossfade() const override;
     void render(PaintParameters&, RenderSource*) override;
-    style::FillPaintProperties::PossiblyEvaluated paintProperties() const;
 
     bool queryIntersectsFeature(
             const GeometryCoordinates&,

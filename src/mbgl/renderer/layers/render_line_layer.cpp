@@ -264,24 +264,6 @@ void RenderLineLayer::updateColorRamp() {
     }
 }
 
-RenderLinePaintProperties::PossiblyEvaluated RenderLineLayer::paintProperties() const {
-    return RenderLinePaintProperties::PossiblyEvaluated {
-        evaluated.get<style::LineOpacity>(),
-        evaluated.get<style::LineColor>(),
-        evaluated.get<style::LineTranslate>(),
-        evaluated.get<style::LineTranslateAnchor>(),
-        evaluated.get<style::LineWidth>(),
-        evaluated.get<style::LineGapWidth>(),
-        evaluated.get<style::LineOffset>(),
-        evaluated.get<style::LineBlur>(),
-        evaluated.get<style::LineDasharray>(),
-        evaluated.get<style::LinePattern>(),
-        evaluated.get<style::LineGradient>(),
-        evaluated.get<LineFloorwidth>()
-
-    };
-}
-
 float RenderLineLayer::getLineWidth(const GeometryTileFeature& feature, const float zoom) const {
     float lineWidth = evaluated.get<style::LineWidth>()
             .evaluate(feature, zoom, style::LineWidth::defaultValue());
@@ -293,7 +275,6 @@ float RenderLineLayer::getLineWidth(const GeometryTileFeature& feature, const fl
         return lineWidth;
     }
 }
-
 
 void RenderLineLayer::update() {
     updateColorRamp();

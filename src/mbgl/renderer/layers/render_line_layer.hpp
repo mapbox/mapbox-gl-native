@@ -17,8 +17,6 @@ class RenderLinePaintProperties : public style::ConcatenateProperties<
     style::LinePaintProperties,
     style::Properties<LineFloorwidth>> {};
 
-class LineBucket;
-
 class RenderLineLayer: public RenderLayer {
 public:
     using StyleLayerImpl = style::LineLayer::Impl;
@@ -33,8 +31,6 @@ public:
     bool hasCrossfade() const override;
     void render(PaintParameters&, RenderSource*) override;
     void update() final;
-
-    RenderLinePaintProperties::PossiblyEvaluated paintProperties() const;
 
     bool queryIntersectsFeature(
             const GeometryCoordinates&,
