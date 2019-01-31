@@ -227,8 +227,8 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
         // Observe for changes to the API base URL (and find out the current one).
         [[MGLAccountManager sharedManager] addObserver:self
-                                                  forKeyPath:@"apiBaseURL"
-                                                     options:(NSKeyValueObservingOptionInitial |
+                                            forKeyPath:@"apiBaseURL"
+                                               options:(NSKeyValueObservingOptionInitial |
                                                               NSKeyValueObservingOptionNew)
                                                      context:NULL];
 

@@ -15,7 +15,7 @@
 @interface MGLAccountManager ()
 
 @property (atomic) NSString *accessToken;
-@property (atomic) NSURL *apiBaseURL;
+@property (nonatomic) NSURL *apiBaseURL;
 
 @end
 #endif
@@ -32,7 +32,9 @@
     }
     
     NSString *apiBaseURL = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMapboxAPIBaseURL"];
-    if (apiBaseURL.length) {
+    
+    // If apiBaseURL is not a valid URL, [NSURL URLWithString:] will be `nil`.
+    if (apiBaseURL.length && [NSURL URLWithString:apiBaseURL]) {
         [self setAPIBaseURL:[NSURL URLWithString:apiBaseURL]];
     }
 }
