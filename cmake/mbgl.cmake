@@ -66,8 +66,11 @@ if(WITH_NODEJS)
 
     # Run submodule update
     set(MBGL_SUBMODULES mapbox-gl-js)
-    if (MBGL_PLATFORM STREQUAL "ios")
+    if(MBGL_PLATFORM STREQUAL "ios")
         list(APPEND MBGL_SUBMODULES platform/ios/vendor/mapbox-events-ios)
+    endif()
+    if(MBGL_PLATFORM STREQUAL "ios" OR MBGL_PLATFORM STREQUAL "macos")
+        list(APPEND MBGL_SUBMODULES platform/darwin/docs/theme)
     endif()
 
     message(STATUS "Updating submodules...")
