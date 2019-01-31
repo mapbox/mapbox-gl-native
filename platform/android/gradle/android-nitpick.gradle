@@ -25,6 +25,11 @@ task androidNitpick {
 }
 
 private def verifyVendorSubmodulePin(def dir, def prefix, def version) {
+    exec {
+        workingDir = "${rootDir}/vendor/${dir}"
+        commandLine "git", "fetch", "-t"
+    }
+
     def output = new ByteArrayOutputStream()
     exec {
         workingDir = "${rootDir}/vendor/${dir}"
