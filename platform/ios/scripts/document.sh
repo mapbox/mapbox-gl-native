@@ -10,6 +10,9 @@ if [ -z `which jazzy` ]; then
     ./platform/ios/scripts/install-packaging-dependencies.sh
 fi
 
+DEFAULT_THEME="platform/darwin/docs/theme"
+THEME=${JAZZY_THEME:-$DEFAULT_THEME}
+CUSTOM_HEAD=${JAZZY_CUSTOM_HEAD:-''}
 OUTPUT=${OUTPUT:-documentation}
 
 BRANCH=$( git describe --tags --match=ios-v*.*.* --abbrev=0 )
@@ -31,8 +34,6 @@ cp -r platform/darwin/docs/img "${OUTPUT}"
 cp -r platform/ios/docs/img "${OUTPUT}"
 
 step "Generating jazzy docs for ${SHORT_VERSION}…"
-DEFAULT_THEME="platform/darwin/docs/theme"
-THEME=${JAZZY_THEME:-$DEFAULT_THEME}
 
 jazzy \
     --config platform/ios/jazzy.yml \
@@ -43,6 +44,7 @@ jazzy \
     --documentation="platform/{darwin,ios}/docs/guides/*.md" \
     --root-url https://docs.mapbox.com/ios/api/maps/${RELEASE_VERSION}/ \
     --theme ${THEME} \
+    --head "${CUSTOM_HEAD}" \
     --output ${OUTPUT}
 
 # https://github.com/realm/jazzy/issues/411
