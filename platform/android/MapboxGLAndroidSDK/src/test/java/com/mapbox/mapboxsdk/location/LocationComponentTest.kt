@@ -98,6 +98,20 @@ class LocationComponentTest {
   }
 
   @Test
+  fun activateWithDefaultLocationEngineRequestAndOptionsTestDefaultLocationEngine() {
+    locationComponent.activateLocationComponent(context, mockk(), true, locationEngineRequest, locationComponentOptions)
+    Assert.assertEquals(locationEngineRequest, locationComponent.locationEngineRequest)
+    Assert.assertNotNull(locationComponent.locationEngine)
+  }
+
+  @Test
+  fun activateWithDefaultLocationEngineRequestAndOptionsTestCustomLocationEngine() {
+    locationComponent.activateLocationComponent(context, mockk(), false, locationEngineRequest, locationComponentOptions)
+    Assert.assertEquals(locationEngineRequest, locationComponent.locationEngineRequest)
+    Assert.assertNull(locationComponent.locationEngine)
+  }
+
+  @Test
   fun locationUpdatesWhenEnabledDisableTest() {
     locationComponent.activateLocationComponent(context, mockk(), locationEngine, locationEngineRequest, locationComponentOptions)
     verify(locationEngine, times(0)).removeLocationUpdates(currentListener)
