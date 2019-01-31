@@ -88,3 +88,6 @@
 [submodule "platform/android/vendor/mapbox-events-android"]
 	path = platform/android/vendor/mapbox-events-android
 	url = https://github.com/mapbox/mapbox-events-android.git
+[submodule "platform/darwin/docs/theme"]
+	path = platform/darwin/docs/theme
+	url = https://github.com/mapbox/jazzy-theme.git
