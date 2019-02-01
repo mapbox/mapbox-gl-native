@@ -8,7 +8,7 @@ const MGLExceptionName MGLBundleNotFoundException = @"MGLBundleNotFoundException
 
 + (instancetype)mgl_frameworkBundle {
     NSBundle *bundle = [self bundleForClass:[MGLAccountManager class]];
-
+#ifndef MBGL_BUNDLE_ASSET_LOAD_DISABLE
     if (![bundle.infoDictionary[@"CFBundlePackageType"] isEqualToString:@"FMWK"]) {
         // For static frameworks, the bundle is the containing application
         // bundle but the resources are in Mapbox.bundle.
@@ -20,6 +20,7 @@ const MGLExceptionName MGLBundleNotFoundException = @"MGLBundleNotFoundException
                         format:@"The Mapbox framework bundle could not be found. If using the Mapbox Maps SDK for iOS as a static framework, make sure that Mapbox.bundle is copied into the root of the app bundle."];
         }
     }
+#endif
 
     return bundle;
 }
