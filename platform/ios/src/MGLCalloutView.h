@@ -47,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
  Presents a callout view by adding it to `view` and pointing at the given rect
  of `view`’s bounds. Constrains the callout to the bounds of the given view.
  */
-- (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToView:(UIView *)constrainedView animated:(BOOL)animated __attribute__((unavailable("Use -presentCalloutFromRect:inView:constrainedToRect:animated: instead.")));
+- (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToView:(UIView *)constrainedView animated:(BOOL)animated __attribute__((unavailable("Use `-presentCalloutFromRect:inView:constrainedToRect:animated:` instead.")));
 
 
 /**
