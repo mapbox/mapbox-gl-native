@@ -47,12 +47,8 @@ void RenderLineLayer::transition(const TransitionParameters& parameters) {
 
 void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     style::Properties<LineFloorwidth>::Unevaluated extra(unevaluated.get<style::LineWidth>());
-
-    auto dashArrayParams = parameters;
-    dashArrayParams.useIntegerZoom = true;
-
     evaluated = RenderLinePaintProperties::PossiblyEvaluated(
-    unevaluated.evaluate(parameters).concat(extra.evaluate(dashArrayParams)));
+        unevaluated.evaluate(parameters).concat(extra.evaluate(parameters)));
 
     crossfade = parameters.getCrossfadeParameters();
 

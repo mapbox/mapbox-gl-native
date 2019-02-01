@@ -10,7 +10,8 @@
 namespace mbgl {
 
 struct LineFloorwidth : style::DataDrivenPaintProperty<float, attributes::a_floorwidth, uniforms::u_floorwidth> {
-    static float defaultValue() { return 1; }
+    using EvaluatorType = DataDrivenPropertyEvaluator<float, true>;
+    static float defaultValue() { return 1.0; }
 };
 
 class RenderLinePaintProperties : public style::ConcatenateProperties<

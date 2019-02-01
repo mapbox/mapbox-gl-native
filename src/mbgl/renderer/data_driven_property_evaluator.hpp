@@ -7,7 +7,7 @@
 
 namespace mbgl {
 
-template <typename T>
+template <typename T, bool useIntegerZoom = false>
 class DataDrivenPropertyEvaluator {
 public:
     using ResultType = PossiblyEvaluatedPropertyValue<T>;
@@ -25,14 +25,18 @@ public:
     }
 
     ResultType operator()(const style::PropertyExpression<T>& expression) const {
-        if (!expression.isFeatureConstant()) {
-            auto returnExpression = expression;
-            returnExpression.useIntegerZoom = parameters.useIntegerZoom;
-            return ResultType(returnExpression);
-        } else if (!parameters.useIntegerZoom) {
-            return ResultType(expression.evaluate(parameters.z));
-        } else {
+        if (useIntegerZoom) {  // Compiler will optimize out the unused branch.
+            if (!expression.isFeatureConstant()) {
+                auto returnExpression = expression;
+                returnExpression.useIntegerZoom = true;
+                return ResultType(returnExpression);
+            } 
             return ResultType(expression.evaluate(floor(parameters.z)));
+        } else {
+            if (!expression.isFeatureConstant()) {
+                return ResultType(expression);
+            }
+            return ResultType(expression.evaluate(parameters.z));
         }
     }
 

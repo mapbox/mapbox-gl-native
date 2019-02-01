@@ -18,18 +18,15 @@ public:
         : z(z_),
           now(Clock::time_point::max()),
           zoomHistory(),
-          defaultFadeDuration(0),
-          useIntegerZoom(false) {}
+          defaultFadeDuration(0) {}
 
     PropertyEvaluationParameters(ZoomHistory zoomHistory_,
                           TimePoint now_,
-                          Duration defaultFadeDuration_,
-                          bool useIntegerZoom_ = false)
+                          Duration defaultFadeDuration_)
         : z(zoomHistory_.lastZoom),
           now(std::move(now_)),
           zoomHistory(std::move(zoomHistory_)),
-          defaultFadeDuration(std::move(defaultFadeDuration_)),
-          useIntegerZoom(useIntegerZoom_) {}
+          defaultFadeDuration(std::move(defaultFadeDuration_)) {}
 
     CrossfadeParameters getCrossfadeParameters() const {
         const float fraction = z - std::floor(z);
@@ -47,7 +44,6 @@ public:
     TimePoint now;
     ZoomHistory zoomHistory;
     Duration defaultFadeDuration;
-    bool useIntegerZoom;
 };
 
 } // namespace mbgl
