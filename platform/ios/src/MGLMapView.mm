@@ -5163,12 +5163,6 @@ public:
     MGLLogDebug(@"Setting userTrackingMode: %lu animated: %@", mode, MGLStringFromBOOL(animated));
     if (mode == _userTrackingMode) return;
 
-    if ((mode == MGLUserTrackingModeFollowWithHeading || mode == MGLUserTrackingModeFollowWithCourse) &&
-        ! CLLocationCoordinate2DIsValid(self.userLocation.coordinate))
-    {
-        mode = MGLUserTrackingModeNone;
-    }
-
     MGLUserTrackingMode oldMode = _userTrackingMode;
     [self willChangeValueForKey:@"userTrackingMode"];
     _userTrackingMode = mode;

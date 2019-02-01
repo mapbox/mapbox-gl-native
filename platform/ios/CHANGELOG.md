@@ -2,6 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## master
+
+* Fixed a bug where setting `MGLMapView.userTrackingMode` to `MGLUserTrackingModeFollowWithHeading` and `MGLUserTrackingModeFollowWithCourse` was being ignored. ([#13849](https://github.com/mapbox/mapbox-gl-native/pull/13849))
+
 ## 4.8.0
 
 ### Styles and rendering
