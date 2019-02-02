@@ -5,6 +5,9 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * `MGLMapSnapshotter` now follows "MGLIdeographicFontFamilyName" app setting to reduce font data usage while snapshotting CJK maps [#13427](https://github.com/mapbox/mapbox-gl-native/pull/13427)
 
+## v4.5.0-cn.2
+* Added options to customize position of scale bar, compass, logo and attribution. ([#13863](https://github.com/mapbox/mapbox-gl-native/pull/13863))
+
 ## v4.5.0-cn.1
 * Restored iOS 8 support for the Mapbox Maps SDK for iOS. ([#13036](https://github.com/mapbox/mapbox-gl-native/pull/13036))
 
