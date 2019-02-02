@@ -294,6 +294,7 @@
 		55E2AD131E5B125400E8C587 /* MGLOfflineStorageTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55E2AD121E5B125400E8C587 /* MGLOfflineStorageTests.mm */; };
 		632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */; };
 		6407D6701E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */; };
+		6FA9341721EF372100AA9CA8 /* MBXOrnamentsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FA9341521EF372100AA9CA8 /* MBXOrnamentsViewController.m */; };
 		8989B17C201A48EB0081CF59 /* MGLHeatmapStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8989B17A201A48EA0081CF59 /* MGLHeatmapStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8989B17D201A48EB0081CF59 /* MGLHeatmapStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8989B17A201A48EA0081CF59 /* MGLHeatmapStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8989B17E201A48EB0081CF59 /* MGLHeatmapStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8989B17B201A48EA0081CF59 /* MGLHeatmapStyleLayer.mm */; };
@@ -976,6 +977,8 @@
 		632281DD1E6F855900D75A5D /* MBXEmbeddedMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXEmbeddedMapViewController.h; sourceTree = "<group>"; };
 		632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXEmbeddedMapViewController.m; sourceTree = "<group>"; };
 		6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MGLDocumentationExampleTests.swift; path = ../../darwin/test/MGLDocumentationExampleTests.swift; sourceTree = "<group>"; };
+		6FA9341521EF372100AA9CA8 /* MBXOrnamentsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXOrnamentsViewController.m; sourceTree = "<group>"; };
+		6FA9341621EF372100AA9CA8 /* MBXOrnamentsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXOrnamentsViewController.h; sourceTree = "<group>"; };
 		8989B17A201A48EA0081CF59 /* MGLHeatmapStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLHeatmapStyleLayer.h; sourceTree = "<group>"; };
 		8989B17B201A48EA0081CF59 /* MGLHeatmapStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLHeatmapStyleLayer.mm; sourceTree = "<group>"; };
 		920A3E5C1E6F995200C16EFC /* MGLSourceQueryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLSourceQueryTests.m; path = ../../darwin/test/MGLSourceQueryTests.m; sourceTree = "<group>"; };
@@ -1806,6 +1809,8 @@
 				DA1DC99A1CB6E064006E619F /* MBXViewController.m */,
 				632281DD1E6F855900D75A5D /* MBXEmbeddedMapViewController.h */,
 				632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */,
+				6FA9341621EF372100AA9CA8 /* MBXOrnamentsViewController.h */,
+				6FA9341521EF372100AA9CA8 /* MBXOrnamentsViewController.m */,
 				DA821D051CCC6D59007508D4 /* Main.storyboard */,
 				DA821D041CCC6D59007508D4 /* LaunchScreen.storyboard */,
 				DA1DC99E1CB6E088006E619F /* Assets.xcassets */,
@@ -2852,6 +2857,7 @@
 				DA1DC9971CB6E046006E619F /* main.m in Sources */,
 				354B839C1D2E9B48005D9406 /* MBXUserLocationAnnotationView.m in Sources */,
 				DA1DC9991CB6E054006E619F /* MBXAppDelegate.m in Sources */,
+				6FA9341721EF372100AA9CA8 /* MBXOrnamentsViewController.m in Sources */,
 				DA1DC96B1CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m in Sources */,
 				DA1DC96A1CB6C6B7006E619F /* MBXCustomCalloutView.m in Sources */,
 				927FBCFC1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m in Sources */,
