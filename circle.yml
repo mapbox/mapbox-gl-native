@@ -606,7 +606,7 @@ jobs:
           command: |
             if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
               if [[ $CIRCLE_BRANCH == master ]]; then
-                curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=core-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
+                curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=android-core-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
               fi
             fi
       - run:
