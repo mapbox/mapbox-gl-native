@@ -61,7 +61,7 @@ public:
     // world, unwrap the start longitude to ensure the shortest path is taken.
     void unwrapForShortestPath(const LatLng& end) {
         const double delta = std::abs(end.lon - lon);
-        if (delta <= util::LONGITUDE_MAX || delta >= util::DEGREES_MAX) return;
+        if (delta <= util::LONGITUDE_MAX) return;
         if (lon > 0 && end.lon < 0) lon -= util::DEGREES_MAX;
         else if (lon < 0 && end.lon > 0) lon += util::DEGREES_MAX;
     }
@@ -128,12 +128,16 @@ public:
     }
 
     LatLng constrain(const LatLng& p) const {
-        if (contains(p)) {
+        if (contains(p, LatLng::WrapMode::Wrapped)) {
             return p;
         }
+        LatLng latLng = p;
+        if (crossesAntimeridian()) {
+            latLng.unwrapForShortestPath(ne);
+        }
         return LatLng {
-            util::clamp(p.latitude(), sw.latitude(), ne.latitude()),
-            util::clamp(p.longitude(), sw.longitude(), ne.longitude())
+                util::clamp(latLng.latitude(), sw.latitude(), ne.latitude()),
+                util::clamp(latLng.longitude(), sw.longitude(), ne.longitude())
         };
     }
 
