@@ -12,7 +12,7 @@ import com.mapbox.mapboxsdk.geometry.ProjectedMeters
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions
 import com.mapbox.mapboxsdk.testapp.utils.TestConstants
-import junit.framework.Assert.assertEquals
+import junit.framework.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -325,6 +325,16 @@ class NativeMapViewTest {
     fun testTransitionOptions() {
         val transitionOptions = TransitionOptions(500, 500)
         nativeMapView.transitionOptions = transitionOptions
+        assertTrue(transitionOptions.isEnablePlacementTransitions)
+        assertEquals(transitionOptions, nativeMapView.transitionOptions)
+    }
+
+    @Test
+    @UiThreadTest
+    fun testTransitionOptions_disablePlacementTransitions() {
+        val transitionOptions = TransitionOptions(500, 500, false)
+        nativeMapView.transitionOptions = transitionOptions
+        assertFalse(transitionOptions.isEnablePlacementTransitions)
         assertEquals(transitionOptions, nativeMapView.transitionOptions)
     }
 

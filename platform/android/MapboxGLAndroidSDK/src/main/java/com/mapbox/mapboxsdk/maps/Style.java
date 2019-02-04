@@ -375,9 +375,16 @@ public class Style {
 
   /**
    * <p>
-   * Set the transition duration for style changes.
+   * Set the transition options for style changes.
    * </p>
-   * The default value for delay and duration is zero, so any changes take effect without animation.
+   * If not set, any changes take effect without animation, besides symbols,
+   * which will fade in/out with a default duration after symbol collision detection.
+   * <p>
+   * To disable symbols fade in/out animation,
+   * pass transition options with {@link TransitionOptions#enablePlacementTransitions} equal to false.
+   * <p>
+   * Both {@link TransitionOptions#duration} and {@link TransitionOptions#delay}
+   * will also change the behavior of the symbols fade in/out animation if the placement transition is enabled.
    *
    * @param transitionOptions the transition options
    */
@@ -388,9 +395,17 @@ public class Style {
 
   /**
    * <p>
-   * Get the transition for style changes.
+   * Get the transition options for style changes.
    * </p>
-   * The default value for delay and transition is zero, so any changes take effect without animation.
+   * By default, any changes take effect without animation, besides symbols,
+   * which will fade in/out with a default duration after symbol collision detection.
+   * <p>
+   * To disable symbols fade in/out animation,
+   * pass transition options with {@link TransitionOptions#enablePlacementTransitions} equal to false
+   * into {@link #setTransition(TransitionOptions)}.
+   * <p>
+   * Both {@link TransitionOptions#duration} and {@link TransitionOptions#delay}
+   * will also change the behavior of the symbols fade in/out animation if the placement transition is enabled.
    *
    * @return TransitionOptions the transition options
    */
