@@ -682,13 +682,15 @@ jni::Local<jni::Object<TransitionOptions>> NativeMapView::getTransitionOptions(J
     const auto transitionOptions = map->getStyle().getTransitionOptions();
     const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(transitionOptions.duration.value_or(mbgl::Duration::zero())).count();
     const auto delay = std::chrono::duration_cast<std::chrono::milliseconds>(transitionOptions.delay.value_or(mbgl::Duration::zero())).count();
-    return TransitionOptions::fromTransitionOptions(env, duration, delay);
+    const auto enablePlacementTransitions = (jboolean) transitionOptions.enablePlacementTransitions;
+    return TransitionOptions::fromTransitionOptions(env, duration, delay, enablePlacementTransitions);
 }
 
 void NativeMapView::setTransitionOptions(JNIEnv& env, const jni::Object<TransitionOptions>& options) {
     const mbgl::style::TransitionOptions transitionOptions(
             Duration(mbgl::Milliseconds(TransitionOptions::getDuration(env, options))),
-            Duration(mbgl::Milliseconds(TransitionOptions::getDelay(env, options)))
+            Duration(mbgl::Milliseconds(TransitionOptions::getDelay(env, options))),
+            TransitionOptions::isEnablePlacementTransitions(env, options)
     );
     map->getStyle().setTransitionOptions(transitionOptions);
 }
