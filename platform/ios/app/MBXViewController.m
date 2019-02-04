@@ -7,7 +7,6 @@
 #import "MBXUserLocationAnnotationView.h"
 #import "LimeGreenStyleLayer.h"
 #import "MBXEmbeddedMapViewController.h"
-#import "MBXOrnamentsViewController.h"
 
 #import "MBXFrameTimeGraphView.h"
 
@@ -105,9 +104,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MBXSettingsMiscellaneousShowSnapshots,
     MBXSettingsMiscellaneousShouldLimitCameraChanges,
     MBXSettingsMiscellaneousShowCustomLocationManager,
-    MBXSettingsMiscellaneousOrnamentsPlacement,
     MBXSettingsMiscellaneousPrintLogFile,
-    MBXSettingsMiscellaneousDeleteLogFile
+    MBXSettingsMiscellaneousDeleteLogFile,
 };
 
 // Utility methods
@@ -501,7 +499,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                 @"Show Snapshots",
                 [NSString stringWithFormat:@"%@ Camera Changes", (_shouldLimitCameraChanges ? @"Unlimit" : @"Limit")],
                 @"View Route Simulation",
-                @"Ornaments Placement",
             ]];
 
             if (self.debugLoggingEnabled)
@@ -757,12 +754,6 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                     if (self.shouldLimitCameraChanges) {
                         [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(39.748947, -104.995882) zoomLevel:10 direction:0 animated:NO];
                     }
-                    break;
-                }
-                case MBXSettingsMiscellaneousOrnamentsPlacement:
-                {
-                    MBXOrnamentsViewController *ornamentsViewController = [[MBXOrnamentsViewController alloc] init];
-                    [self.navigationController pushViewController:ornamentsViewController animated:YES];
                     break;
                 }
                 default:
