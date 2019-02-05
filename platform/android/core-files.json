@@ -97,7 +97,6 @@
         "platform/linux/src/headless_backend_egl.cpp"
     ],
     "public_headers": {
-        "mbgl/gl/gl_impl.hpp": "platform/android/include/mbgl/gl/gl_impl.hpp",
         "jni/string_conversion.hpp": "platform/default/include/jni/string_conversion.hpp",
         "mbgl/gl/headless_backend.hpp": "platform/default/include/mbgl/gl/headless_backend.hpp",
         "mbgl/gl/headless_frontend.hpp": "platform/default/include/mbgl/gl/headless_frontend.hpp",
