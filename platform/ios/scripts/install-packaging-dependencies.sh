@@ -16,7 +16,7 @@ if [ -z `which jazzy` ]; then
 
     CIRCLECI=${CIRCLECI:-false}
     if [[ "${CIRCLECI}" == true ]]; then
-        sudo gem install sqlite3 -- --with-sqlite3-lib=/usr/lib
+        sudo gem install sqlite3 -v 1.3.13 -- --with-sqlite3-lib=/usr/lib
         sudo gem install jazzy -v $JAZZY_VERSION --no-document
     else
         gem install jazzy -v $JAZZY_VERSION --no-document
