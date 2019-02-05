@@ -9,6 +9,7 @@ google.charts.setOnLoadCallback(() => {
     const platforms = [
         { 'platform': 'iOS', 'arch': 'armv7' },
         { 'platform': 'iOS', 'arch': 'arm64' },
+        { 'platform': 'iOS', 'arch': 'Dynamic' },
         { 'platform': 'Android', 'arch': 'arm-v7' },
         { 'platform': 'Android', 'arch': 'arm-v8' },
         { 'platform': 'Android', 'arch': 'x86' },
@@ -34,6 +35,7 @@ google.charts.setOnLoadCallback(() => {
                 series: [
                     { color: '#dc464c', targetAxisIndex: 1, pointSize: 2 }, // iOS/armv7
                     { color: '#a01d22', targetAxisIndex: 1, pointSize: 2 }, // iOS/arm64
+                    { color: '#ffcc00', targetAxisIndex: 1, pointSize: 2 }, // iOS/dynamic
                     { color: '#7774c0', targetAxisIndex: 1, pointSize: 2 }, // Android/arm-v7
                     { color: '#5f5c99', targetAxisIndex: 1, pointSize: 2 }, // Android/arm-v8
                     { color: '#48ad6e', targetAxisIndex: 1, pointSize: 2 }, // Android/x86
