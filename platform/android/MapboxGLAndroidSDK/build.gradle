@@ -22,6 +22,10 @@ dependencies {
 android {
     compileSdkVersion androidVersions.compileSdkVersion
 
+    // Roboelectric 4.0 required config
+    // http://robolectric.org/migrating/#migrating-to-40
+    testOptions.unitTests.includeAndroidResources = true
+
     defaultConfig {
         minSdkVersion androidVersions.minSdkVersion
         targetSdkVersion androidVersions.targetSdkVersion
