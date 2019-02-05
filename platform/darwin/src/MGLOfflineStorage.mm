@@ -159,7 +159,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     NSString *bundleIdentifier = [NSBundle mgl_applicationBundleIdentifier];
     if (!bundleIdentifier) {
         // There’s no main bundle identifier when running in a unit test bundle.
-        bundleIdentifier = [NSBundle bundleForClass:self].bundleIdentifier;
+        bundleIdentifier = [[NSUUID UUID] UUIDString];
     }
     cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
     if (useSubdirectory) {
