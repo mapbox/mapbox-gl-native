@@ -166,7 +166,7 @@ RenderGeoJSONSource::queryFeatureExtensions(const Feature& feature,
         return {};
     }
 
-    const auto clusterID = getProperty<uint64_t>(feature.properties, "cluster_id");
+    const auto clusterID = getProperty<int64_t>(feature.properties, "cluster_id");
     if (!clusterID) {
         return {};
     }

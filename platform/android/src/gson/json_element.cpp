@@ -68,8 +68,8 @@ mbgl::Value JsonElement::convert(jni::JNIEnv &env, const jni::Object<JsonElement
         } else if (primitive.Call(env, isNumber)) {
             auto value = primitive.Call(env, getAsDouble);
             if (value == math::Math::rint(env, value)) {
-                // uint64_t
-                return static_cast<uint64_t>(primitive.Call(env, getAsInteger));
+                // int64_t
+                return static_cast<int64_t>(primitive.Call(env, getAsInteger));
             } else {
                 // double
                 return value;
