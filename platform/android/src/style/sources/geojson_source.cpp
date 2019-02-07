@@ -114,6 +114,7 @@ namespace android {
 
         if (rendererFrontend) {
             mbgl::Feature _feature = Feature::convert(env, feature);
+            _feature.properties["cluster_id"] = static_cast<uint64_t>(_feature.properties["cluster_id"].get<double>());
             const auto featureExtension = rendererFrontend->queryFeatureExtensions(source.getID(), _feature, "supercluster", "children", {});
             if (featureExtension.is<mbgl::FeatureCollection>()) {
                 return Feature::convert(env, featureExtension.get<mbgl::FeatureCollection>());
@@ -128,6 +129,7 @@ namespace android {
 
         if (rendererFrontend) {
             mbgl::Feature _feature = Feature::convert(env, feature);
+            _feature.properties["cluster_id"] = static_cast<uint64_t>(_feature.properties["cluster_id"].get<double>());
             const std::map<std::string, mbgl::Value> options = { {"limit", static_cast<uint64_t>(limit)},
                                                                     {"offset", static_cast<uint64_t>(offset)} };
             auto featureExtension = rendererFrontend->queryFeatureExtensions(source.getID(), _feature, "supercluster", "leaves", options);
@@ -144,6 +146,7 @@ namespace android {
 
         if (rendererFrontend) {
             mbgl::Feature _feature = Feature::convert(env, feature);
+            _feature.properties["cluster_id"] = static_cast<uint64_t>(_feature.properties["cluster_id"].get<double>());
             auto featureExtension = rendererFrontend->queryFeatureExtensions(source.getID(), _feature, "supercluster", "expansion-zoom", {});
             if (featureExtension.is<mbgl::Value>()) {
                 auto value = featureExtension.get<mbgl::Value>();
