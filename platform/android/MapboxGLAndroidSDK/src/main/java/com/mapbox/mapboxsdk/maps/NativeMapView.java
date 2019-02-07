@@ -70,7 +70,7 @@ final class NativeMapView implements NativeMap {
 
   // Holds the pointer to JNI NativeMapView
   @Keep
-  long nativePtr = 0;
+  private long nativePtr = 0;
 
   // Listener invoked to return a bitmap of the map
   private MapboxMap.SnapshotReadyCallback snapshotReadyCallback;
@@ -1376,6 +1376,10 @@ final class NativeMapView implements NativeMap {
       return 0;
     }
     return viewCallback.getHeight();
+  }
+
+  long getNativePtr() {
+    return nativePtr;
   }
 
   //

@@ -228,6 +228,13 @@ public final class MapboxMap {
     }
   }
 
+  /**
+   * Experimental feature. Do not use.
+   */
+  long getNativeMapPtr() {
+    return nativeMapView.getNativePtr();
+  }
+
   // Style
 
   /**

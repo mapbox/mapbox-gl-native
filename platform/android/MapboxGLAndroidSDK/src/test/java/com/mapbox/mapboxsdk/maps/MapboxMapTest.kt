@@ -35,6 +35,7 @@ class MapboxMapTest {
         every { nativeMapView.isDestroyed } returns false
         every { nativeMapView.setOnFpsChangedListener(any()) } answers {}
         every { nativeMapView.prefetchTiles = any() } answers {}
+        every { nativeMapView.nativePtr } returns 5
         every { nativeMapView.setLatLngBounds(any()) } answers {}
         every { transform.minZoom = any() } answers {}
         every { transform.maxZoom = any() } answers {}
@@ -101,5 +102,10 @@ class MapboxMapTest {
     @Test(expected = IllegalArgumentException::class)
     fun testEaseCameraChecksDurationPositive() {
         mapboxMap.easeCamera(CameraUpdateFactory.newLatLng(LatLng(30.0, 30.0)), 0, null)
+    }
+
+    @Test
+    fun testGetNativeMapPtr() {
+        assertEquals(5, mapboxMap.nativeMapPtr)
     }
 }
