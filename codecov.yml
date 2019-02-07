@@ -6,12 +6,13 @@ ignore:
   - "platform/darwin/test"
   # - "platform/darwin/include"
   - "platform/darwin/docs"
+  - "platform/ios/app"
   - "platform/ios/resources"
   - "platform/ios/scripts"
 flags:
   ios:
     paths:
-      - "platform/ios/"
+      - "build/ios/ios/Logs/Test/*.xcresult/*_Test/"
 coverage:
   status:
     project:
