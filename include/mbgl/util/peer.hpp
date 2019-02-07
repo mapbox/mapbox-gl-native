@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -8,102 +9,22 @@ namespace util {
 
 class peer {
 public:
-    peer() = default;
-    peer(const peer&) = delete;
-
-    peer(peer&& other)
-        : vtable(other.vtable)
-    {
-        if (vtable) {
-            vtable->move(other.storage, storage);
-        }
-        other.vtable = nullptr;
-    }
+    peer() noexcept : storage(nullptr, noop_deleter) {}
 
     template <class T>
-    peer(T&& value) {
-        using _Vt = std::decay_t<T>;
-        vtable = get_vtable<_Vt>();
-        new (&storage) _Vt(std::forward<T>(value));
-    }
+    peer(T&& value) noexcept : storage(new std::decay_t<T>(std::forward<T>(value)), cast_deleter<std::decay_t<T>>) {}
 
-    ~peer() {
-        reset();
-    }
-
-    peer& operator=(peer&& rhs) {
-        peer(std::move(rhs)).swap(*this);
-        return *this;
-    }
-
-    void reset()  {
-        if (vtable) {
-            vtable->destroy(storage);
-            vtable = nullptr;
-        }
-    }
-
-    void swap(peer& rhs)  {
-        if (this == &rhs) {
-            return;
-        } else {
-            peer tmp(std::move(rhs));
-            rhs.vtable = vtable;
-            if (rhs.vtable) {
-                rhs.vtable->move(storage, rhs.storage);
-            }
-            vtable = tmp.vtable;
-            if (vtable) {
-                vtable->move(tmp.storage, storage);
-            }
-        }
-    }
-
-    bool has_value() const {
-        return vtable != nullptr;
-    }
+    bool has_value() const noexcept { return static_cast<bool>(storage); }
 
     template <class T>
-    T& get() {
-        return reinterpret_cast<T&>(storage);
-    }
-
-    template <class T>
-    T&& take() {
-        reset();
-        return std::move(get<T>());
-    }
+    T& get() noexcept { return *reinterpret_cast<T*>(storage.get()); }
 
 private:
-    using storage_t = std::aligned_storage_t<2*sizeof(void*), alignof(void*)>;
+    template <typename T>
+    static void cast_deleter(void* ptr) noexcept { delete reinterpret_cast<T*>(ptr); }
+    static void noop_deleter(void*) noexcept {}
 
-    struct vtable {
-        virtual ~vtable() = default;
-        virtual void move(storage_t&, storage_t&) = 0;
-        virtual void destroy(storage_t&) = 0;
-    };
-
-    template <class T>
-    struct vtable_impl : public vtable {
-        static_assert(sizeof(T) <= sizeof(storage_t), "peer object is too big");
-
-        void move(storage_t& src, storage_t& dst) override {
-            new (&dst) T(std::move(reinterpret_cast<T&>(src)));
-            destroy(src);
-        }
-
-        void destroy(storage_t& s) override {
-            reinterpret_cast<T&>(s).~T();
-        }
-    };
-
-    template <class T>
-    static vtable* get_vtable() {
-        static vtable_impl<T> vtable;
-        return &vtable;
-    }
-
-    vtable* vtable = nullptr;
+    using storage_t = std::unique_ptr<void, void(*)(void*)>;
     storage_t storage;
 };
 
