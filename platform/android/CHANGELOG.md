@@ -4,6 +4,32 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 7.2.0-alpha.1 - February 7, 2019
+### Build
+- Update downstream circle-ci job name [#13872](https://github.com/mapbox/mapbox-gl-native/pull/13872)
+- Prioritize running benchmarks when building master [#13801](https://github.com/mapbox/mapbox-gl-native/pull/13801)
+- Revert modules vendorization and keep submodules only [#13806](https://github.com/mapbox/mapbox-gl-native/pull/13806)
+- Run vendor submodule check [#13816](https://github.com/mapbox/mapbox-gl-native/pull/13816)
+- Fetch tags during nitpick, bump gestures library to v0.4.0 [#13847](https://github.com/mapbox/mapbox-gl-native/pull/13847)
+- Update downstream circle-ci job name [#13872](https://github.com/mapbox/mapbox-gl-native/pull/13872)
+
+### Bugs
+- Test app fixes 7.1.0 QA [#13773](https://github.com/mapbox/mapbox-gl-native/pull/13773)
+- Remove deprecated javacompile, resolve AS 3.3.0 warning on deprecation [#13777](https://github.com/mapbox/mapbox-gl-native/pull/13777)
+- Update project readme with buck source file ignore configuration [#13788](https://github.com/mapbox/mapbox-gl-native/pull/13788)
+- Fix LocationEngine's annotation [#13792](https://github.com/mapbox/mapbox-gl-native/pull/13792)
+- Fix core-only layer creation [#13798](https://github.com/mapbox/mapbox-gl-native/pull/13798)
+- Remove faulty cast to uint64_t, explict casting for cluster API [#13888](https://github.com/mapbox/mapbox-gl-native/pull/13888)
+
+### Features
+- Expose symbol placement transition duration option [#13868](https://github.com/mapbox/mapbox-gl-native/pull/13868)
+- Separate quick zoom gesture option [#13791](https://github.com/mapbox/mapbox-gl-native/pull/13791)
+- Location animators memory and CPU optimizations [#13678](https://github.com/mapbox/mapbox-gl-native/pull/13678)
+- Added performance event [#13795](https://github.com/mapbox/mapbox-gl-native/pull/13795)
+- Adding new variation of LocationComponent#activateLocationComponent [#13829](https://github.com/mapbox/mapbox-gl-native/pull/13829)
+- Expose symbol placement transition duration option [#13868](https://github.com/mapbox/mapbox-gl-native/pull/13868)
+- Add experimental pointer [#13889](https://github.com/mapbox/mapbox-gl-native/pull/13889)
+
 ## 7.1.2 - February 7, 2019
 ### Bugs
  - Fix layer not rendering correctly when property value's negative [#13888](https://github.com/mapbox/mapbox-gl-native/pull/13888)
