@@ -59,9 +59,9 @@ public:
 
     // If the distance from start to end longitudes is between half and full
     // world, unwrap the start longitude to ensure the shortest path is taken.
-    void unwrapForShortestPath(const LatLng& end) {
+    void unwrapForShortestPath(const LatLng& end, bool limitMaxDegrees = true) {
         const double delta = std::abs(end.lon - lon);
-        if (delta <= util::LONGITUDE_MAX) return;
+        if (delta <= util::LONGITUDE_MAX || (limitMaxDegrees && delta >= util::DEGREES_MAX)) return;
         if (lon > 0 && end.lon < 0) lon -= util::DEGREES_MAX;
         else if (lon < 0 && end.lon > 0) lon += util::DEGREES_MAX;
     }
@@ -133,7 +133,7 @@ public:
         }
         LatLng latLng = p;
         if (crossesAntimeridian()) {
-            latLng.unwrapForShortestPath(ne);
+            latLng.unwrapForShortestPath(ne, false);
         }
         return LatLng {
                 util::clamp(latLng.latitude(), sw.latitude(), ne.latitude()),
