@@ -109,29 +109,25 @@ TEST(Peer, SmallType) {
     EXPECT_EQ(p, 0);
 }
 
-// peer is not able to receive large types, unless we increase storage_t
-// capacity.
-//TEST(Peer, LargeType) {
-//    TestType t1;
-//    peer u1 = peer(std::move(t1));
-//    EXPECT_TRUE(u1.has_value());
-//
-//    //TestType should be moved into owning peer
-//    EXPECT_EQ(u1.get<TestType>().i1, 1);
-//
-//    auto u2(std::move(u1));
-//    EXPECT_FALSE(u1.has_value());
-//
-//    //TestType should not be moved when owning peer is moved;
-//    EXPECT_EQ(u2.get<TestType>().i1, 1);
-//
-//    //TestType should be moved out of owning peer
-//    // Note: two moves are involved in returning the moved value
-//    //  First out of the peer, and then in the return statement
-//    auto t2 = std::move(u2.get<TestType>());
-//    EXPECT_FALSE(u2.has_value());
-//    EXPECT_EQ(t2.i1, 3);
-//}
+TEST(Peer, LargeType) {
+    TestType t1;
+    peer u1 = peer(std::move(t1));
+    EXPECT_TRUE(u1.has_value());
+
+    //TestType should be moved into owning peer
+    EXPECT_EQ(u1.get<TestType>().i1, 1);
+
+    auto u2(std::move(u1));
+    EXPECT_FALSE(u1.has_value());
+
+    //TestType should not be moved when owning peer is moved;
+    EXPECT_EQ(u2.get<TestType>().i1, 1);
+
+    // TestType should not be moved out of owning peer
+    auto& t2 = u2.get<TestType>();
+    EXPECT_TRUE(u2.has_value());
+    EXPECT_EQ(t2.i1, 1);
+}
 
 TEST(Peer, Pointer) {
     auto t1 = new TestType();
@@ -163,9 +159,8 @@ TEST(Peer, UniquePtr) {
     EXPECT_EQ(t1.get(), nullptr);
     EXPECT_TRUE(u1.has_value());
 
-    auto t2 = std::move(u1.take<TestType>());
+    u1 = peer();
     EXPECT_FALSE(u1.has_value());
-    (void)t2;
 
     peer u2;
     TestType * t3 = new TestType();
@@ -185,7 +180,7 @@ TEST(Peer, SharedPtr) {
 
     u1 = std::move(u2);
     EXPECT_EQ(weak.use_count(), 2);
-    u2.swap(u1);
+    std::swap(u2, u1);
     EXPECT_EQ(weak.use_count(), 2);
     u2 = 0;
     EXPECT_EQ(weak.use_count(), 1);
