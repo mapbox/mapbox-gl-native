@@ -634,6 +634,12 @@ ScreenCoordinate Map::pixelForLatLng(const LatLng& latLng) const {
     return impl->transform.latLngToScreenCoordinate(unwrappedLatLng);
 }
 
+ScreenCoordinate Map::pixelForLatLngRaw(const LatLng& latLng) const {
+    // This method, in comparison to the Map::pixelForLatLng, will not unwrap point's longitude
+    // and always return values relative to the center of the screen
+    return impl->transform.latLngToScreenCoordinate(latLng);
+}
+
 LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {
     return impl->transform.screenCoordinateToLatLng(pixel);
 }

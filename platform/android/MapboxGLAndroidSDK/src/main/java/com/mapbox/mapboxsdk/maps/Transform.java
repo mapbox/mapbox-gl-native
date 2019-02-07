@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.log.Logger;
 
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener;
@@ -248,13 +249,9 @@ final class Transform implements MapView.OnCameraDidChangeListener {
     nativeMap.setBearing(bearing, focalX, focalY, duration);
   }
 
-
-  //
-  // LatLng / CenterCoordinate
-  //
-
-  LatLng getLatLng() {
-    return nativeMap.getLatLng();
+  @Nullable
+  LatLngBounds getLatLngBounds() {
+    return nativeMap.getLatLngBounds();
   }
 
   //
@@ -273,8 +270,8 @@ final class Transform implements MapView.OnCameraDidChangeListener {
   // Center coordinate
   //
 
-  LatLng getCenterCoordinate() {
-    return nativeMap.getLatLng();
+  LatLng getCenterCoordinate(boolean padded) {
+    return nativeMap.getLatLng(padded);
   }
 
   void setCenterCoordinate(LatLng centerCoordinate) {

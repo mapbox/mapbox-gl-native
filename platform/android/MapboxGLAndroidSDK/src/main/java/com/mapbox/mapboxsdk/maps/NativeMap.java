@@ -6,6 +6,7 @@ import android.graphics.RectF;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.annotations.Marker;
@@ -63,9 +64,12 @@ interface NativeMap {
 
   void setLatLng(@NonNull LatLng latLng, long duration);
 
-  LatLng getLatLng();
+  LatLng getLatLng(boolean padded);
 
-  void setLatLngBounds(@NonNull LatLngBounds latLngBounds);
+  void setLatLngBounds(@Nullable LatLngBounds latLngBounds);
+
+  @NonNull
+  LatLngBounds getLatLngBounds();
 
   void setVisibleCoordinateBounds(@NonNull LatLng[] coordinates, @NonNull RectF padding,
                                   double direction, long duration);
@@ -193,6 +197,9 @@ interface NativeMap {
 
   @NonNull
   PointF pixelForLatLng(@NonNull LatLng latLng);
+
+  @NonNull
+  PointF pixelForLatLngRaw(@NonNull LatLng latLng);
 
   LatLng latLngForPixel(@NonNull PointF pixel);
 

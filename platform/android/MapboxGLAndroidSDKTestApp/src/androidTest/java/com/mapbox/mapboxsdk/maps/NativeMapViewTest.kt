@@ -55,7 +55,21 @@ class NativeMapViewTest {
     fun testLatLng() {
         val expected = LATLNG_TEST
         nativeMapView.setLatLng(expected, 0)
-        val actual = nativeMapView.latLng
+        val actual = nativeMapView.getLatLng(true)
+        assertEquals("Latitude should match", expected.latitude, actual.latitude, DELTA)
+        assertEquals("Longitude should match", expected.longitude, actual.longitude, DELTA)
+    }
+
+    @Test
+    @UiThreadTest
+    fun testLatLngPadded() {
+        val expected = LATLNG_TEST
+        nativeMapView.contentPadding = FloatArray(4).also {
+            it[0] = 200f
+            it[1] = 50f
+        }
+        nativeMapView.setLatLng(expected, 0)
+        val actual = nativeMapView.getLatLng(true)
         assertEquals("Latitude should match", expected.latitude, actual.latitude, DELTA)
         assertEquals("Longitude should match", expected.longitude, actual.longitude, DELTA)
     }
@@ -64,11 +78,10 @@ class NativeMapViewTest {
     @UiThreadTest
     fun testLatLngDefault() {
         val expected = LatLng()
-        val actual = nativeMapView.latLng
+        val actual = nativeMapView.getLatLng(true)
         assertEquals("Latitude should match", expected.latitude, actual.latitude, DELTA)
         assertEquals("Longitude should match", expected.longitude, actual.longitude, DELTA)
     }
-
 
     @Test
     @UiThreadTest

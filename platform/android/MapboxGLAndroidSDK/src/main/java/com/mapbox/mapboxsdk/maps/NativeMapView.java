@@ -10,6 +10,7 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.LibraryLoader;
@@ -214,11 +215,20 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public void setLatLngBounds(LatLngBounds latLngBounds) {
+  public void setLatLngBounds(@Nullable LatLngBounds latLngBounds) {
     if (checkState("setLatLngBounds")) {
       return;
     }
     nativeSetLatLngBounds(latLngBounds);
+  }
+
+  @NonNull
+  @Override
+  public LatLngBounds getLatLngBounds() {
+    if (checkState("getLatLngBounds")) {
+      return LatLngBounds.world();
+    }
+    return nativeGetLatLngBounds();
   }
 
   @Override
@@ -254,11 +264,11 @@ final class NativeMapView implements NativeMap {
   }
 
   @Override
-  public LatLng getLatLng() {
+  public LatLng getLatLng(boolean padded) {
     if (checkState("")) {
       return new LatLng();
     }
-    return nativeGetLatLng();
+    return nativeGetLatLng(padded);
   }
 
   @Override
@@ -660,6 +670,17 @@ final class NativeMapView implements NativeMap {
       return new PointF();
     }
     PointF pointF = nativePixelForLatLng(latLng.getLatitude(), latLng.getLongitude());
+    pointF.set(pointF.x * pixelRatio, pointF.y * pixelRatio);
+    return pointF;
+  }
+
+  @Override
+  @NonNull
+  public PointF pixelForLatLngRaw(@NonNull LatLng latLng) {
+    if (checkState("pixelForLatLngRaw")) {
+      return new PointF();
+    }
+    PointF pointF = nativePixelForLatLngRaw(latLng.getLatitude(), latLng.getLongitude());
     pointF.set(pointF.x * pixelRatio, pointF.y * pixelRatio);
     return pointF;
   }
@@ -1095,6 +1116,9 @@ final class NativeMapView implements NativeMap {
   private native void nativeSetLatLngBounds(LatLngBounds latLngBounds);
 
   @Keep
+  private native LatLngBounds nativeGetLatLngBounds();
+
+  @Keep
   private native void nativeCancelTransitions();
 
   @Keep
@@ -1108,7 +1132,7 @@ final class NativeMapView implements NativeMap {
 
   @NonNull
   @Keep
-  private native LatLng nativeGetLatLng();
+  private native LatLng nativeGetLatLng(boolean padded);
 
   @NonNull
   @Keep
@@ -1239,6 +1263,10 @@ final class NativeMapView implements NativeMap {
   @NonNull
   @Keep
   private native PointF nativePixelForLatLng(double lat, double lon);
+
+  @NonNull
+  @Keep
+  private native PointF nativePixelForLatLngRaw(double lat, double lon);
 
   @NonNull
   @Keep

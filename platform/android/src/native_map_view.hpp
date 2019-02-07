@@ -85,6 +85,8 @@ public:
 
     void setLatLngBounds(jni::JNIEnv&, const jni::Object<mbgl::android::LatLngBounds>&);
 
+    jni::Local<jni::Object<LatLngBounds>> getLatLngBounds(jni::JNIEnv&);
+
     void cancelTransitions(jni::JNIEnv&);
 
     void setGestureInProgress(jni::JNIEnv&, jni::jboolean);
@@ -97,7 +99,7 @@ public:
 
     void flyTo(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble, jni::jlong, jni::jdouble, jni::jdouble);
 
-    jni::Local<jni::Object<LatLng>> getLatLng(JNIEnv&);
+    jni::Local<jni::Object<LatLng>> getLatLng(JNIEnv&, jni::jboolean);
 
     void setLatLng(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jlong);
 
@@ -166,6 +168,8 @@ public:
     jni::Local<jni::Object<ProjectedMeters>> projectedMetersForLatLng(JNIEnv&, jni::jdouble, jni::jdouble);
 
     jni::Local<jni::Object<PointF>> pixelForLatLng(JNIEnv&, jdouble, jdouble);
+
+    jni::Local<jni::Object<PointF>> pixelForLatLngRaw(JNIEnv&, jdouble, jdouble);
 
     jni::Local<jni::Object<LatLng>> latLngForProjectedMeters(JNIEnv&, jdouble, jdouble);
 

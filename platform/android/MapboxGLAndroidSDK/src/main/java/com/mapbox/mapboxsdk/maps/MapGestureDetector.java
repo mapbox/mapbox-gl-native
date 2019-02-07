@@ -8,6 +8,8 @@ import android.graphics.PointF;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.util.Pair;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.animation.DecelerateInterpolator;
@@ -26,6 +28,7 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.TelemetryConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 
 import java.util.ArrayList;
@@ -34,6 +37,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.mapbox.mapboxsdk.constants.MapboxConstants.ANIMATION_DURATION_FLING_BASE;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_GESTURE;
 
@@ -41,6 +45,9 @@ import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.RE
  * Manages gestures events on a MapView.
  */
 final class MapGestureDetector {
+
+  @VisibleForTesting
+  static final int BOUND_REPEL_RATIO = 1000;
 
   private final Transform transform;
   private final Projection projection;
@@ -106,6 +113,18 @@ final class MapGestureDetector {
       // Initialize gesture listeners
       initializeGestureListeners(context, true);
     }
+  }
+
+  @VisibleForTesting
+  MapGestureDetector(Transform transform, Projection projection, UiSettings uiSettings,
+                     AnnotationManager annotationManager, CameraChangeDispatcher cameraChangeDispatcher,
+                     AndroidGesturesManager androidGesturesManager) {
+    this.annotationManager = annotationManager;
+    this.transform = transform;
+    this.projection = projection;
+    this.uiSettings = uiSettings;
+    this.cameraChangeDispatcher = cameraChangeDispatcher;
+    this.gesturesManager = androidGesturesManager;
   }
 
   private void initializeGestureListeners(@NonNull Context context, boolean attachDefaultListeners) {
@@ -412,11 +431,42 @@ final class MapGestureDetector {
       // tilt results in a bigger translation, limiting input for #5281
       double tilt = transform.getTilt();
       double tiltFactor = 1.5 + ((tilt != 0) ? (tilt / 10) : 0);
-      double offsetX = velocityX / tiltFactor / screenDensity;
-      double offsetY = velocityY / tiltFactor / screenDensity;
+      float offsetX = (float) (velocityX / tiltFactor / screenDensity);
+      float offsetY = (float) (velocityY / tiltFactor / screenDensity);
 
-      // calculate animation time based on displacement
-      long animationTime = (long) (velocityXY / 7 / tiltFactor + MapboxConstants.ANIMATION_DURATION_FLING_BASE);
+      double animationTimeDivider = 1;
+
+      LatLngBounds bounds = transform.getLatLngBounds();
+      if (bounds != null) {
+        // camera movement is limited by bounds, calculate the acceptable offset that doesn't cross the bounds
+        Pair<Float, Float> offset = findBoundsLimitedOffset(projection, transform, bounds, -offsetX, -offsetY);
+        if (offset != null) {
+          float targetOffsetX = -offset.first;
+          float targetOffsetY = -offset.second;
+
+          // check how much did we cut from the original offset and shorten animation time by the same ratio
+          float offsetDiffRatioX = 0f;
+          if (targetOffsetX != 0) {
+            offsetDiffRatioX = offsetX / targetOffsetX;
+          }
+          float offsetDiffRatioY = 0f;
+          if (targetOffsetY != 0) {
+            offsetDiffRatioY = offsetY / targetOffsetY;
+          }
+
+          // pick the highest ratio as a divider
+          animationTimeDivider = offsetDiffRatioX > offsetDiffRatioY ? offsetDiffRatioX : offsetDiffRatioY;
+          // default to 1 if necessary
+          animationTimeDivider = animationTimeDivider > 1 ? animationTimeDivider : 1;
+
+          offsetX = targetOffsetX;
+          offsetY = targetOffsetY;
+        }
+      }
+
+      // calculate animation time based on displacement and make it shorter if we've hit the bound
+      long animationTime =
+        (long) ((velocityXY / 7 / tiltFactor + ANIMATION_DURATION_FLING_BASE) / animationTimeDivider);
 
       // update transformation
       transform.moveBy(offsetX, offsetY, animationTime);
@@ -444,6 +494,16 @@ final class MapGestureDetector {
       if (distanceX != 0 || distanceY != 0) {
         // dispatching camera start event only when the movement actually occurred
         cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
+
+        LatLngBounds bounds = transform.getLatLngBounds();
+        if (bounds != null) {
+          // camera movement is limited by bounds, calculate the acceptable offset that doesn't cross the bounds
+          Pair<Float, Float> offset = findBoundsLimitedOffset(projection, transform, bounds, distanceX, distanceY);
+          if (offset != null) {
+            distanceX = offset.first;
+            distanceY = offset.second;
+          }
+        }
 
         // Scroll the map
         transform.moveBy(-distanceX, -distanceY, 0 /*no duration*/);
@@ -912,6 +972,63 @@ final class MapGestureDetector {
 
   private boolean isZoomValid(double mapZoom) {
     return mapZoom >= MapboxConstants.MINIMUM_ZOOM && mapZoom <= MapboxConstants.MAXIMUM_ZOOM;
+  }
+
+  /**
+   * Finds acceptable camera offset based on the bounds that are limiting the camera movement.
+   * <p>
+   * To find the offset, we're hit testing all bounding box edges against the segment that is created from the current
+   * screen center and a target calculated from the provided offset.
+   * Because we are converting LatLng to unwrapped screen coordinates, we are going to find only one collision, or none,
+   * and return an acceptable offset based on the distance from the original point to bounds intersection,
+   * or the original target.
+   */
+  @Nullable
+  @VisibleForTesting
+  static Pair<Float, Float> findBoundsLimitedOffset(@NonNull Projection projection,
+                                                    @NonNull Transform transform,
+                                                    @NonNull LatLngBounds bounds,
+                                                    float offsetX, float offsetY) {
+    // because core returns number with big precision, LatLngBounds#contains can fail when using raw values
+    LatLng coreScreenCenter = transform.getCenterCoordinate(false);
+    LatLng screenCenter = new LatLng(
+      MathUtils.round(coreScreenCenter.getLatitude(), 6),
+      MathUtils.round(coreScreenCenter.getLongitude(), 6));
+    if (!bounds.contains(screenCenter) || bounds.equals(LatLngBounds.world())) {
+      // return when screen center is not within bounds or the camera is not limited
+      return null;
+    }
+
+    PointF referencePixel = projection.toScreenLocationRaw(screenCenter);
+    PointF nwPixel = projection.toScreenLocationRaw(bounds.getNorthWest());
+    PointF nePixel = projection.toScreenLocationRaw(bounds.getNorthEast());
+    PointF sePixel = projection.toScreenLocationRaw(bounds.getSouthEast());
+    PointF swPixel = projection.toScreenLocationRaw(bounds.getSouthWest());
+
+    Pair[] edges = new Pair[] {
+      new Pair<>(nwPixel, nePixel), // north edge
+      new Pair<>(nePixel, sePixel), // east edge
+      new Pair<>(sePixel, swPixel), // south edge
+      new Pair<>(swPixel, nwPixel) // west edge
+    };
+
+    // to prevent the screen center from being permanently attracted to the bound we need to push the origin
+    // so that it isn't a part of the bound's edge segment, otherwise, we'd have a constant collision
+    PointF boundsCenter = projection.toScreenLocationRaw(bounds.getCenter());
+    PointF toCenterVector = new PointF(boundsCenter.x - referencePixel.x, boundsCenter.y - referencePixel.y);
+    referencePixel.offset(toCenterVector.x / BOUND_REPEL_RATIO, toCenterVector.y / BOUND_REPEL_RATIO);
+    PointF target = new PointF(referencePixel.x + offsetX, referencePixel.y + offsetY);
+
+    for (Pair edge : edges) {
+      PointF intersection =
+        MathUtils.findSegmentsIntersection(referencePixel, target, (PointF) edge.first, (PointF) edge.second);
+      if (intersection != null) {
+        // returning a limited offset vector
+        return new Pair<>(intersection.x - referencePixel.x, intersection.y - referencePixel.y);
+      }
+    }
+    // no collisions, returning the original offset vector
+    return new Pair<>(target.x - referencePixel.x, target.y - referencePixel.y);
   }
 
   void notifyOnMapClickListeners(@NonNull PointF tapPoint) {

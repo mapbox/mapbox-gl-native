@@ -56,7 +56,6 @@ public class LatLngBoundsForCameraActivity extends AppCompatActivity implements 
     this.mapboxMap = mapboxMap;
     mapboxMap.setStyle(Style.SATELLITE_STREETS);
     mapboxMap.setMinZoomPreference(2);
-    mapboxMap.getUiSettings().setFlingVelocityAnimationEnabled(false);
     showCrosshair();
     setupBounds(ICELAND_BOUNDS);
   }

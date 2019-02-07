@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.maps;
 import android.graphics.PointF;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
+
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.constants.GeometryConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -255,6 +256,18 @@ public class Projection {
   @NonNull
   public PointF toScreenLocation(@NonNull LatLng location) {
     return nativeMapView.pixelForLatLng(location);
+  }
+
+  /**
+   * Similarly to {@link #toScreenLocation(LatLng)} this method returns a screen location of a coordinate, however,
+   * the values are always relative to the screens center and do not unwrap when crossing the antimeridian.
+   *
+   * @param location A LatLng on the map to convert to a screen location.
+   * @return A Point representing the screen location in screen pixels, always relative to screen's center.
+   */
+  @NonNull
+  PointF toScreenLocationRaw(@NonNull LatLng location) {
+    return nativeMapView.pixelForLatLngRaw(location);
   }
 
   float getHeight() {

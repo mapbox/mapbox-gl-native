@@ -141,6 +141,7 @@ public:
 
     // Projection
     ScreenCoordinate pixelForLatLng(const LatLng&) const;
+    ScreenCoordinate pixelForLatLngRaw(const LatLng&) const;
     LatLng latLngForPixel(const ScreenCoordinate&) const;
 
     // Annotations

@@ -288,6 +288,15 @@ void NativeMapView::setLatLngBounds(jni::JNIEnv& env, const jni::Object<mbgl::an
     }
 }
 
+jni::Local<jni::Object<LatLngBounds>> NativeMapView::getLatLngBounds(jni::JNIEnv& env) {
+    optional<mbgl::LatLngBounds> bounds = map->getLatLngBounds();
+    if (bounds) {
+        return LatLngBounds::New(env, bounds.value());
+    } else {
+        return LatLngBounds::New(env, mbgl::LatLngBounds::world());
+    }
+}
+
 void NativeMapView::cancelTransitions(jni::JNIEnv&) {
     map->cancelTransitions();
 }
@@ -365,8 +374,8 @@ void NativeMapView::flyTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitud
     map->flyTo(cameraOptions, animationOptions);
 }
 
-jni::Local<jni::Object<LatLng>> NativeMapView::getLatLng(JNIEnv& env) {
-    return LatLng::New(env, map->getLatLng(insets));
+jni::Local<jni::Object<LatLng>> NativeMapView::getLatLng(JNIEnv& env, jni::jboolean padded) {
+    return LatLng::New(env, map->getLatLng(padded ? insets : EdgeInsets{}));
 }
 
 void NativeMapView::setLatLng(jni::JNIEnv&, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration) {
@@ -585,6 +594,11 @@ jni::Local<jni::Object<LatLng>> NativeMapView::latLngForProjectedMeters(JNIEnv& 
 
 jni::Local<jni::Object<PointF>> NativeMapView::pixelForLatLng(JNIEnv& env, jdouble latitude, jdouble longitude) {
     mbgl::ScreenCoordinate pixel = map->pixelForLatLng(mbgl::LatLng(latitude, longitude));
+    return PointF::New(env, static_cast<float>(pixel.x), static_cast<float>(pixel.y));
+}
+
+jni::Local<jni::Object<PointF>> NativeMapView::pixelForLatLngRaw(JNIEnv& env, jdouble latitude, jdouble longitude) {
+    mbgl::ScreenCoordinate pixel = map->pixelForLatLngRaw(mbgl::LatLng(latitude, longitude));
     return PointF::New(env, static_cast<float>(pixel.x), static_cast<float>(pixel.y));
 }
 
@@ -1076,6 +1090,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::getMetersPerPixelAtLatitude, "nativeGetMetersPerPixelAtLatitude"),
             METHOD(&NativeMapView::projectedMetersForLatLng, "nativeProjectedMetersForLatLng"),
             METHOD(&NativeMapView::pixelForLatLng, "nativePixelForLatLng"),
+            METHOD(&NativeMapView::pixelForLatLngRaw, "nativePixelForLatLngRaw"),
             METHOD(&NativeMapView::latLngForProjectedMeters, "nativeLatLngForProjectedMeters"),
             METHOD(&NativeMapView::latLngForPixel, "nativeLatLngForPixel"),
             METHOD(&NativeMapView::addPolylines, "nativeAddPolylines"),
@@ -1109,6 +1124,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::removeImage, "nativeRemoveImage"),
             METHOD(&NativeMapView::getImage, "nativeGetImage"),
             METHOD(&NativeMapView::setLatLngBounds, "nativeSetLatLngBounds"),
+            METHOD(&NativeMapView::getLatLngBounds, "nativeGetLatLngBounds"),
             METHOD(&NativeMapView::setPrefetchTiles, "nativeSetPrefetchTiles"),
             METHOD(&NativeMapView::getPrefetchTiles, "nativeGetPrefetchTiles")
     );
