@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 7.1.2 - February 7, 2019
+### Bugs
+ - Fix layer not rendering correctly when property value's negative [#13888](https://github.com/mapbox/mapbox-gl-native/pull/13888)
+
 ## 7.1.1 - February 1, 2019
 ### Bugs
  - Fix a crash caused by the missing `Timber` dependency [#13847](https://github.com/mapbox/mapbox-gl-native/pull/13847)
