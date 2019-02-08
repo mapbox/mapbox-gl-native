@@ -978,7 +978,7 @@ jobs:
           name: Build and run SDK unit tests with the static analyzer
           command: make ios-static-analyzer
       - run:
-          name: Upload coverage results to codecov.io
+          name: Generate code coverage reports
           command: |
             platform/ios/scripts/code-coverage.sh
       - save-dependencies

@@ -12,9 +12,12 @@ ignore:
 flags:
   ios:
     paths:
-      - "build/ios/ios/Logs/Test/*.xcresult/*_Test/"
+      - "build/ios/ios/Logs/Test/"
 coverage:
   status:
     project:
       default:
+        threshold: 1%
+      ios:
+        flags: ios
         threshold: 1%
