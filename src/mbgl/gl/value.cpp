@@ -1,5 +1,4 @@
 #include <mbgl/gl/value.hpp>
-#include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
 
@@ -7,14 +6,12 @@ namespace mbgl {
 namespace gl {
 namespace value {
 
+using namespace platform;
+
 const constexpr ClearDepth::Type ClearDepth::Default;
 
 void ClearDepth::Set(const Type& value) {
-#if MBGL_USE_GLES2
     MBGL_CHECK_ERROR(glClearDepthf(value));
-#else
-    MBGL_CHECK_ERROR(glClearDepth(value));
-#endif
 }
 
 ClearDepth::Type ClearDepth::Get() {
@@ -130,11 +127,7 @@ StencilOp::Type StencilOp::Get() {
 const constexpr DepthRange::Type DepthRange::Default;
 
 void DepthRange::Set(const Type& value) {
-#if MBGL_USE_GLES2
     MBGL_CHECK_ERROR(glDepthRangef(value.min, value.max));
-#else
-    MBGL_CHECK_ERROR(glDepthRange(value.min, value.max));
-#endif
 }
 
 DepthRange::Type DepthRange::Get() {

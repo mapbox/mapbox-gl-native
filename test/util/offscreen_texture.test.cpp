@@ -1,13 +1,15 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/gl/gl.hpp>
+#include <mbgl/platform/gl_functions.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/defines.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
 
 #include <mbgl/util/offscreen_texture.hpp>
 
 using namespace mbgl;
+using namespace mbgl::platform;
 
 TEST(OffscreenTexture, EmptyRed) {
     HeadlessBackend backend({ 512, 256 });

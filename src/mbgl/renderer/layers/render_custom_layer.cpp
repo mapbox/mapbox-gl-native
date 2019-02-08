@@ -3,9 +3,9 @@
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/bucket.hpp>
+#include <mbgl/platform/gl_functions.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/gl/gl.hpp>
 #include <mbgl/util/mat4.hpp>
 
 namespace mbgl {
@@ -15,7 +15,7 @@ using namespace style;
 RenderCustomLayer::RenderCustomLayer(Immutable<style::CustomLayer::Impl> _impl)
     : RenderLayer(std::move(_impl)), host(impl().host) {
     assert(BackendScope::exists());
-    host->initialize();
+    MBGL_CHECK_ERROR(host->initialize());
 }
 
 RenderCustomLayer::~RenderCustomLayer() {
@@ -23,7 +23,7 @@ RenderCustomLayer::~RenderCustomLayer() {
     if (contextDestroyed) {
         host->contextLost();
     } else {
-        host->deinitialize();
+        MBGL_CHECK_ERROR(host->deinitialize());
     }
 }
 

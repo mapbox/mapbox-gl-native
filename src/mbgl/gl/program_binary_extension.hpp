@@ -2,7 +2,7 @@
 
 #include <mbgl/gl/features.hpp>
 #include <mbgl/gl/extension.hpp>
-#include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/defines.hpp>
 
 #if MBGL_HAS_BINARY_PROGRAMS
 

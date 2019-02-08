@@ -1,5 +1,4 @@
 #include <mbgl/gl/context.hpp>
-#include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/debugging_extension.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
 #include <mbgl/gl/program_binary_extension.hpp>
@@ -11,6 +10,8 @@
 
 namespace mbgl {
 namespace gl {
+
+using namespace platform;
 
 static_assert(underlying_type(ShaderType::Vertex) == GL_VERTEX_SHADER, "OpenGL type mismatch");
 static_assert(underlying_type(ShaderType::Fragment) == GL_FRAGMENT_SHADER, "OpenGL type mismatch");

@@ -41,6 +41,9 @@ macro(mbgl_platform_core)
     endif()
 
     target_sources(mbgl-core
+        # GL
+        PRIVATE platform/linux/src/gl_functions.cpp
+
         # Misc
         PRIVATE platform/default/src/mbgl/util/logging_stderr.cpp
         PRIVATE platform/default/src/mbgl/util/string_stdlib.cpp
