@@ -2,6 +2,7 @@
     "//": "This file can be edited manually and is the canonical source.",
     "sources": [
         "platform/darwin/src/collator.mm",
+        "platform/darwin/src/gl_functions.cpp",
         "platform/darwin/src/image.mm",
         "platform/darwin/src/local_glyph_rasterizer.mm",
         "platform/darwin/src/logging_nslog.mm",

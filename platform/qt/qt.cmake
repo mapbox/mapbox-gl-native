@@ -38,6 +38,7 @@ set(MBGL_QT_CORE_FILES
     PRIVATE platform/qt/src/timer.cpp
     PRIVATE platform/qt/src/timer_impl.hpp
     PRIVATE platform/qt/src/utf.cpp
+    PRIVATE platform/qt/src/gl_functions.cpp
 
     PRIVATE platform/default/src/mbgl/text/collator.cpp
     PRIVATE platform/default/src/mbgl/text/unaccent.cpp

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/gl/extension.hpp>
-#include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/defines.hpp>
 
 namespace mbgl {
 namespace gl {
@@ -25,11 +25,11 @@ public:
                               { "GL_APPLE_vertex_array_object", "glGenVertexArraysAPPLE" } })) {
     }
 
-    const ExtensionFunction<void(GLuint array)> bindVertexArray;
+    const ExtensionFunction<void(platform::GLuint array)> bindVertexArray;
 
-    const ExtensionFunction<void(GLsizei n, const GLuint* arrays)> deleteVertexArrays;
+    const ExtensionFunction<void(platform::GLsizei n, const platform::GLuint* arrays)> deleteVertexArrays;
 
-    const ExtensionFunction<void(GLsizei n, GLuint* arrays)> genVertexArrays;
+    const ExtensionFunction<void(platform::GLsizei n, platform::GLuint* arrays)> genVertexArrays;
 };
 
 } // namespace extension
