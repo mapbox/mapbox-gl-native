@@ -17,6 +17,7 @@
         "test/geometry/line_atlas.test.cpp",
         "test/gl/bucket.test.cpp",
         "test/gl/context.test.cpp",
+        "test/gl/gl_functions.test.cpp",
         "test/gl/object.test.cpp",
         "test/map/map.test.cpp",
         "test/map/prefetch.test.cpp",
