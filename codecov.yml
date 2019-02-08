@@ -1,9 +1,9 @@
 ignore:
   - "test/"
   - "vendor/"
-  - "platform/ios/test"
+#  - "platform/ios/test"
   - "platform/ios/vendor"
-  - "platform/darwin/test"
+#  - "platform/darwin/test"
   # - "platform/darwin/include"
   - "platform/darwin/docs"
   - "platform/ios/app"
@@ -12,7 +12,8 @@ ignore:
 flags:
   ios:
     paths:
-      - "build/ios/ios/Logs/Test/"
+      - "platform/ios/test"
+      - "platform/darwin/test"
 coverage:
   status:
     project:
