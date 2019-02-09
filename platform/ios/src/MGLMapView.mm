@@ -220,7 +220,7 @@ public:
 @property (nonatomic) UIPanGestureRecognizer *twoFingerDrag;
 
 @property (nonatomic) UIInterfaceOrientation currentOrientation;
-@property (nonatomic, readonly) UIInterfaceOrientationMask applicationSupportedInterfaceOrientations;
+@property (nonatomic) UIInterfaceOrientationMask applicationSupportedInterfaceOrientations;
 
 @property (nonatomic) MGLCameraChangeReason cameraChangeReasonBitmask;
 
@@ -1292,6 +1292,11 @@ public:
     [self updateDisplayLinkPreferredFramesPerSecond];
 }
 
+- (void)willMoveToWindow:(UIWindow *)newWindow {
+    [super willMoveToWindow:newWindow];
+    [self refreshSupportedInterfaceOrientationsWithWindow:newWindow];
+}
+
 - (void)didMoveToWindow
 {
     [self validateDisplayLink];
@@ -1304,24 +1309,25 @@ public:
     [super didMoveToSuperview];
 }
 
-
-- (UIInterfaceOrientationMask)applicationSupportedInterfaceOrientations {
+- (void)refreshSupportedInterfaceOrientationsWithWindow:(UIWindow *)window {
+    
+    // "The system intersects the view controller's supported orientations with
+    // the app's supported orientations (as determined by the Info.plist file or
+    // the app delegate's application:supportedInterfaceOrientationsForWindow:
+    // method) and the device's supported orientations to determine whether to rotate.
+    
+    UIApplication *application = [UIApplication sharedApplication];
+    
+    if (window && [application.delegate respondsToSelector:@selector(application:supportedInterfaceOrientationsForWindow:)]) {
+        self.applicationSupportedInterfaceOrientations = [application.delegate application:application supportedInterfaceOrientationsForWindow:window];
+        return;
+    }
+    
+    // If no delegate method, check the application's plist.
     static UIInterfaceOrientationMask orientationMask = UIInterfaceOrientationMaskAll;
+
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        
-        // "The system intersects the view controller's supported orientations with
-        // the app's supported orientations (as determined by the Info.plist file or
-        // the app delegate's application:supportedInterfaceOrientationsForWindow:
-        // method) and the device's supported orientations to determine whether to rotate.
-        
-        UIApplication *application = [UIApplication sharedApplication];
-        
-        if (self.window && [application.delegate respondsToSelector:@selector(application:supportedInterfaceOrientationsForWindow:)]) {
-            orientationMask = [application.delegate application:application supportedInterfaceOrientationsForWindow:self.window];
-            return;
-        }
-        
         // No application delegate
         
         NSString *key;
@@ -1338,7 +1344,7 @@ public:
             default:
                 break;
         }
-
+        
         NSArray *orientations;
         
         if (key)
@@ -1366,14 +1372,14 @@ public:
             }
         }
     });
-    
-    return orientationMask;
+
+    self.applicationSupportedInterfaceOrientations = orientationMask;
 }
 
 - (void)deviceOrientationDidChange:(__unused NSNotification *)notification
 {
     UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
-
+    
     // The docs for `UIViewController.supportedInterfaceOrientations` states:
     //
     //  When the user changes the device orientation, the system calls this method
@@ -1384,22 +1390,20 @@ public:
     //
     // We want to match similar behaviour. However, it may be preferable to look
     // at the owning view controller (in cases where the map view may be covered
-    // by another view. TODO:
-    //
-    // ???
+    // by another view.
     
 //  UIViewController *viewController = [self viewControllerForLayoutGuides];
     UIViewController *viewController = [self.window.rootViewController mgl_topMostViewController];
-
+    
     if (![viewController shouldAutorotate]) {
         return;
     }
-
+    
     if ((self.currentOrientation == (UIInterfaceOrientation)deviceOrientation) &&
         (self.currentOrientation != UIInterfaceOrientationUnknown)) {
         return;
     }
-
+    
     // "The system intersects the view controller's supported orientations with
     // the app's supported orientations (as determined by the Info.plist file or
     // the app delegate's application:supportedInterfaceOrientationsForWindow:
