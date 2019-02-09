@@ -66,3 +66,4 @@ FOUNDATION_EXPORT MGL_EXPORT const unsigned char MapboxVersionString[];
 #import "NSExpression+MGLAdditions.h"
 #import "NSPredicate+MGLAdditions.h"
 #import "MGLLoggingConfiguration.h"
+#import "MGLNetworkConfiguration.h"

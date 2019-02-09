@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "MGLLoggingConfiguration_Private.h"
+#import "MGLNetworkConfiguration.h"
 
 #include <mutex>
 #include <chrono>
@@ -82,13 +83,10 @@ class HTTPFileSource::Impl {
 public:
     Impl() {
         @autoreleasepool {
-            NSURLSessionConfiguration* sessionConfig =
-                [NSURLSessionConfiguration defaultSessionConfiguration];
-            sessionConfig.timeoutIntervalForResource = 30;
-            sessionConfig.HTTPMaximumConnectionsPerHost = 8;
-            sessionConfig.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
-            sessionConfig.URLCache = nil;
 
+            NSURLSessionConfiguration *sessionConfig =
+            [MGLNetworkConfiguration sharedManager].sessionConfiguration;
+            
             session = [NSURLSession sessionWithConfiguration:sessionConfig];
 
             userAgent = getUserAgent();
