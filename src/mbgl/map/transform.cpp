@@ -83,7 +83,7 @@ void Transform::jumpTo(const CameraOptions& camera) {
  */
 void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& animation) {
     const LatLng unwrappedLatLng = camera.center.value_or(getLatLng());
-    const LatLng latLng = unwrappedLatLng.wrapped();
+    const LatLng latLng = state.bounds ? unwrappedLatLng : unwrappedLatLng.wrapped();
     double zoom = camera.zoom.value_or(getZoom());
     double angle = camera.angle ? -*camera.angle * util::DEG2RAD : getAngle();
     double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
