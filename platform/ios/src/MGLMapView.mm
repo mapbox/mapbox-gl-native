@@ -904,6 +904,9 @@ public:
             break;
     }
 
+    [updatedConstraints addObject:[view.widthAnchor constraintEqualToConstant:size.width]];
+    [updatedConstraints addObject:[view.heightAnchor constraintEqualToConstant:size.height]];
+
     [NSLayoutConstraint deactivateConstraints:constraints];
     [constraints removeAllObjects];
     [NSLayoutConstraint activateConstraints:updatedConstraints];
