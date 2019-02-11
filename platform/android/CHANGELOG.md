@@ -11,7 +11,6 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 - Revert modules vendorization and keep submodules only [#13806](https://github.com/mapbox/mapbox-gl-native/pull/13806)
 - Run vendor submodule check [#13816](https://github.com/mapbox/mapbox-gl-native/pull/13816)
 - Fetch tags during nitpick, bump gestures library to v0.4.0 [#13847](https://github.com/mapbox/mapbox-gl-native/pull/13847)
-- Update downstream circle-ci job name [#13872](https://github.com/mapbox/mapbox-gl-native/pull/13872)
 
 ### Bugs
 - Test app fixes 7.1.0 QA [#13773](https://github.com/mapbox/mapbox-gl-native/pull/13773)
@@ -22,7 +21,6 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 - Remove faulty cast to uint64_t, explict casting for cluster API [#13888](https://github.com/mapbox/mapbox-gl-native/pull/13888)
 
 ### Features
-- Expose symbol placement transition duration option [#13868](https://github.com/mapbox/mapbox-gl-native/pull/13868)
 - Separate quick zoom gesture option [#13791](https://github.com/mapbox/mapbox-gl-native/pull/13791)
 - Location animators memory and CPU optimizations [#13678](https://github.com/mapbox/mapbox-gl-native/pull/13678)
 - Added performance event [#13795](https://github.com/mapbox/mapbox-gl-native/pull/13795)
