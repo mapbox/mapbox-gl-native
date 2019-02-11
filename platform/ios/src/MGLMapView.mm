@@ -1329,30 +1329,7 @@ public:
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         // No application delegate
-        
-        NSString *key;
-        
-        switch ([[UIDevice currentDevice] userInterfaceIdiom]) {
-            case UIUserInterfaceIdiomPhone:
-                key = @"UISupportedInterfaceOrientations~iphone";
-                break;
-                
-            case UIUserInterfaceIdiomPad:
-                key = @"UISupportedInterfaceOrientations~ipad";
-                break;
-                
-            default:
-                break;
-        }
-        
-        NSArray *orientations;
-        
-        if (key)
-            orientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:key];
-        
-        if (!orientations) {
-            orientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
-        }
+        NSArray *orientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
         
         // Application's info plist provided supported orientations.
         if (orientations.count > 0) {
