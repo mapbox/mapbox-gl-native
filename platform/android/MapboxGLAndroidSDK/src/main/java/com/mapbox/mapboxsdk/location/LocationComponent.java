@@ -189,7 +189,7 @@ public final class LocationComponent {
 
   @VisibleForTesting
   LocationComponent(@NonNull MapboxMap mapboxMap,
-                    @NonNull LocationEngineCallback<LocationEngineResult> currentlistener,
+                    @NonNull LocationEngineCallback<LocationEngineResult> currentListener,
                     @NonNull LocationEngineCallback<LocationEngineResult> lastListener,
                     @NonNull LocationLayerController locationLayerController,
                     @NonNull LocationCameraController locationCameraController,
@@ -198,7 +198,7 @@ public final class LocationComponent {
                     @NonNull CompassEngine compassEngine,
                     @NonNull InternalLocationEngineProvider internalLocationEngineProvider) {
     this.mapboxMap = mapboxMap;
-    this.currentLocationEngineListener = currentlistener;
+    this.currentLocationEngineListener = currentListener;
     this.lastLocationEngineListener = lastListener;
     this.locationLayerController = locationLayerController;
     this.locationCameraController = locationCameraController;
@@ -251,6 +251,27 @@ public final class LocationComponent {
    * @param style                    the proxy object for current map style. More info at {@link Style}
    * @param useDefaultLocationEngine true if you want to initialize and use the built-in location engine or false if
    *                                 there should be no location engine initialized
+   * @param options                  the options for customizing the LocationComponent
+   */
+  @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
+                                        boolean useDefaultLocationEngine,
+                                        @NonNull LocationComponentOptions options) {
+    if (useDefaultLocationEngine) {
+      activateLocationComponent(context, style, options);
+    } else {
+      activateLocationComponent(context, style, null, options);
+    }
+  }
+
+  /**
+   * This method initializes the component and needs to be called before any other operations are performed.
+   * Afterwards, you can manage component's visibility by {@link #setLocationComponentEnabled(boolean)}.
+   *
+   * @param context                  the context
+   * @param style                    the proxy object for current map style. More info at {@link Style}
+   * @param useDefaultLocationEngine true if you want to initialize and use the built-in location engine or false if
+   *                                 there should be no location engine initialized
    * @param locationEngineRequest    the location request
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
@@ -274,7 +295,7 @@ public final class LocationComponent {
    * @param useDefaultLocationEngine true if you want to initialize and use the built-in location engine or false if
    *                                 there should be no location engine initialized
    * @param locationEngineRequest    the location request
-   * @param options                  the options
+   * @param options                  the options for customizing the LocationComponent
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
@@ -313,7 +334,7 @@ public final class LocationComponent {
    *
    * @param context the context
    * @param style   the proxy object for current map style. More info at {@link Style}
-   * @param options the options
+   * @param options the options for customizing the LocationComponent
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
@@ -391,7 +412,7 @@ public final class LocationComponent {
    *
    * @param locationEngine the engine, or null if you'd like to only force location updates
    * @param style          the proxy object for current map style. More info at {@link Style}
-   * @param options        the options
+   * @param options        the options for customizing the LocationComponent
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
@@ -410,7 +431,7 @@ public final class LocationComponent {
    * @param style                 the proxy object for current map style. More info at {@link Style}
    * @param locationEngine        the engine, or null if you'd like to only force location updates
    * @param locationEngineRequest the location request
-   * @param options               the options
+   * @param options               the options for customizing the LocationComponent
    */
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         @Nullable LocationEngine locationEngine,
