@@ -105,10 +105,26 @@ class LocationComponentTest {
   }
 
   @Test
+  fun activateWithDefaultLocationEngineAndOptionsTestDefaultLocationEngine() {
+    locationComponent.activateLocationComponent(context, mockk(), true, locationComponentOptions)
+    Assert.assertNotNull(locationComponent.locationComponentOptions)
+    Assert.assertEquals(locationComponentOptions.foregroundName(), locationComponent.locationComponentOptions.foregroundName())
+    Assert.assertEquals(locationComponentOptions.accuracyColor(), locationComponent.locationComponentOptions.accuracyColor())
+  }
+
+  @Test
   fun activateWithDefaultLocationEngineRequestAndOptionsTestCustomLocationEngine() {
     locationComponent.activateLocationComponent(context, mockk(), false, locationEngineRequest, locationComponentOptions)
     Assert.assertEquals(locationEngineRequest, locationComponent.locationEngineRequest)
     Assert.assertNull(locationComponent.locationEngine)
+  }
+
+  @Test
+  fun activateWithDefaultLocationEngineAndOptionsTestCustomLocationEngine() {
+    locationComponent.activateLocationComponent(context, mockk(), false, locationComponentOptions)
+    Assert.assertNotNull(locationComponent.locationComponentOptions)
+    Assert.assertEquals(locationComponentOptions.foregroundName(), locationComponent.locationComponentOptions.foregroundName())
+    Assert.assertEquals(locationComponentOptions.accuracyColor(), locationComponent.locationComponentOptions.accuracyColor())
   }
 
   @Test
