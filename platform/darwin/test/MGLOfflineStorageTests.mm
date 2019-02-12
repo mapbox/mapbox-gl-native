@@ -33,32 +33,41 @@
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:cacheURL.path], @"Cache subdirectory should not exist.");
 }
 
+- (MGLOfflineStorage *)syncedOfflineStorage {
+    MGLOfflineStorage *os = nil;
+    @synchronized (self) {
+        os = [MGLOfflineStorage sharedOfflineStorage];
+    }
+    
+    return os;
+}
+
 - (void)setUp {
     [super setUp];
 
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        XCTestExpectation *expectation = [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
+        XCTestExpectation *expectation = [self keyValueObservingExpectationForObject:[self syncedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
             const auto changeKind = static_cast<NSKeyValueChange>([change[NSKeyValueChangeKindKey] unsignedLongValue]);
             return changeKind == NSKeyValueChangeSetting;
         }];
-        if ([MGLOfflineStorage sharedOfflineStorage].packs) {
+        if ([self syncedOfflineStorage].packs) {
             [expectation fulfill];
             [self waitForExpectationsWithTimeout:0 handler:nil];
         } else {
             [self waitForExpectationsWithTimeout:10 handler:nil];
         }
 
-        XCTAssertNotNil([MGLOfflineStorage sharedOfflineStorage].packs, @"Shared offline storage object should have a non-nil collection of packs by this point.");
+        XCTAssertNotNil([self syncedOfflineStorage].packs, @"Shared offline storage object should have a non-nil collection of packs by this point.");
     });
 }
 
 - (void)testSharedObject {
-    XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage], [MGLOfflineStorage sharedOfflineStorage], @"There should only be one shared offline storage object.");
+    XCTAssertEqual([self syncedOfflineStorage], [self syncedOfflineStorage], @"There should only be one shared offline storage object.");
 }
 
 - (void)testAddPackForBounds {
-    NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
+    NSUInteger countOfPacks = [self syncedOfflineStorage].packs.count;
 
     NSURL *styleURL = [MGLStyle lightStyleURLWithVersion:8];
     /// Somewhere near Grape Grove, Ohio, United States.
@@ -77,13 +86,13 @@
     }];
 
     __block MGLOfflinePack *pack;
-    [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
+    [self keyValueObservingExpectationForObject:[self syncedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
         const auto changeKind = static_cast<NSKeyValueChange>([change[NSKeyValueChangeKindKey] unsignedLongValue]);
         NSIndexSet *indices = change[NSKeyValueChangeIndexesKey];
         return changeKind == NSKeyValueChangeInsertion && indices.count == 1;
     }];
     XCTestExpectation *additionCompletionHandlerExpectation = [self expectationWithDescription:@"add pack completion handler"];
-    [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack * _Nullable completionHandlerPack, NSError * _Nullable error) {
+    [[self syncedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack * _Nullable completionHandlerPack, NSError * _Nullable error) {
         XCTAssertNotNil(completionHandlerPack, @"Added pack should exist.");
         XCTAssertEqual(completionHandlerPack.state, MGLOfflinePackStateInactive, @"New pack should initially have inactive state.");
         pack = completionHandlerPack;
@@ -91,9 +100,9 @@
     }];
     [self waitForExpectationsWithTimeout:5 handler:nil];
 
-    XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Added pack should have been added to the canonical collection of packs owned by the shared offline storage object. This assertion can fail if this test is run before -testAAALoadPacks.");
+    XCTAssertEqual([self syncedOfflineStorage].packs.count, countOfPacks + 1, @"Added pack should have been added to the canonical collection of packs owned by the shared offline storage object. This assertion can fail if this test is run before -testAAALoadPacks.");
 
-    XCTAssertEqual(pack, [MGLOfflineStorage sharedOfflineStorage].packs.lastObject, @"Pack should be appended to end of packs array.");
+    XCTAssertEqual(pack, [self syncedOfflineStorage].packs.lastObject, @"Pack should be appended to end of packs array.");
 
     XCTAssertEqualObjects(pack.region, region, @"Added pack’s region has changed.");
 
@@ -131,7 +140,7 @@
 }
 
 - (void)testAddPackForGeometry {
-    NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
+    NSUInteger countOfPacks = [self syncedOfflineStorage].packs.count;
     
     NSURL *styleURL = [MGLStyle lightStyleURLWithVersion:8];
     double zoomLevel = 20;
@@ -148,13 +157,13 @@
     NSData *context = [NSKeyedArchiver archivedDataWithRootObject:@{nameKey: name}];
     
     __block MGLOfflinePack *pack;
-    [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
+    [self keyValueObservingExpectationForObject:[self syncedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
         const auto changeKind = static_cast<NSKeyValueChange>([change[NSKeyValueChangeKindKey] unsignedLongValue]);
         NSIndexSet *indices = change[NSKeyValueChangeIndexesKey];
         return changeKind == NSKeyValueChangeInsertion && indices.count == 1;
     }];
     XCTestExpectation *additionCompletionHandlerExpectation = [self expectationWithDescription:@"add pack completion handler"];
-    [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack * _Nullable completionHandlerPack, NSError * _Nullable error) {
+    [[self syncedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack * _Nullable completionHandlerPack, NSError * _Nullable error) {
         XCTAssertNotNil(completionHandlerPack, @"Added pack should exist.");
         XCTAssertEqual(completionHandlerPack.state, MGLOfflinePackStateInactive, @"New pack should initially have inactive state.");
         pack = completionHandlerPack;
@@ -162,9 +171,9 @@
     }];
     [self waitForExpectationsWithTimeout:5 handler:nil];
     
-    XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Added pack should have been added to the canonical collection of packs owned by the shared offline storage object. This assertion can fail if this test is run before -testAAALoadPacks.");
+    XCTAssertEqual([self syncedOfflineStorage].packs.count, countOfPacks + 1, @"Added pack should have been added to the canonical collection of packs owned by the shared offline storage object. This assertion can fail if this test is run before -testAAALoadPacks.");
     
-    XCTAssertEqual(pack, [MGLOfflineStorage sharedOfflineStorage].packs.lastObject, @"Pack should be appended to end of packs array.");
+    XCTAssertEqual(pack, [self syncedOfflineStorage].packs.lastObject, @"Pack should be appended to end of packs array.");
     
     XCTAssertEqualObjects(pack.region, region, @"Added pack’s region has changed.");
     
@@ -227,18 +236,18 @@
 }
 
 - (void)testRemovePack {
-    NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
+    NSUInteger countOfPacks = [self syncedOfflineStorage].packs.count;
 
-    MGLOfflinePack *pack = [MGLOfflineStorage sharedOfflineStorage].packs.lastObject;
+    MGLOfflinePack *pack = [self syncedOfflineStorage].packs.lastObject;
     XCTAssertNotNil(pack, @"Added pack should still exist.");
 
-    [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
+    [self keyValueObservingExpectationForObject:[self syncedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
         const auto changeKind = static_cast<NSKeyValueChange>([change[NSKeyValueChangeKindKey] unsignedLongValue]);
         NSIndexSet *indices = change[NSKeyValueChangeIndexesKey];
         return changeKind == NSKeyValueChangeRemoval && indices.count == 1;
     }];
     XCTestExpectation *completionHandlerExpectation = [self expectationWithDescription:@"remove pack completion handler"];
-    [[MGLOfflineStorage sharedOfflineStorage] removePack:pack withCompletionHandler:^(NSError * _Nullable error) {
+    [[self syncedOfflineStorage] removePack:pack withCompletionHandler:^(NSError * _Nullable error) {
         XCTAssertEqual(pack.state, MGLOfflinePackStateInvalid, @"Removed pack should be invalid in the completion handler.");
         [completionHandlerExpectation fulfill];
     }];
@@ -246,11 +255,11 @@
 
     XCTAssertEqual(pack.state, MGLOfflinePackStateInvalid, @"Removed pack should have been invalidated synchronously.");
 
-    XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks - 1, @"Removed pack should have been removed from the canonical collection of packs owned by the shared offline storage object. This assertion can fail if this test is run before -testAAALoadPacks or -testAddPack.");
+    XCTAssertEqual([self syncedOfflineStorage].packs.count, countOfPacks - 1, @"Removed pack should have been removed from the canonical collection of packs owned by the shared offline storage object. This assertion can fail if this test is run before -testAAALoadPacks or -testAddPack.");
 }
 
 - (void)testCountOfBytesCompleted {
-    XCTAssertGreaterThan([MGLOfflineStorage sharedOfflineStorage].countOfBytesCompleted, 0UL);
+    XCTAssertGreaterThan([self syncedOfflineStorage].countOfBytesCompleted, 0UL);
 }
 
 - (NSURL *)offlineStorage:(MGLOfflineStorage *)storage
@@ -264,7 +273,7 @@
 }
 
 - (void)testResourceTransform {
-    MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+    MGLOfflineStorage *os = [self syncedOfflineStorage];
     [os setDelegate:self];
 
     auto fs = os.mbglFileSource;
@@ -321,28 +330,28 @@
         // Merging databases creates an empty file if the file does not exist at the given path.
         XCTAssertEqual(fileSize, databaseFileSize, @"The database file size must be:%lld actual size:%lld", databaseFileSize, fileSize);
         
-        NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
+        NSUInteger countOfPacks = [self syncedOfflineStorage].packs.count;
         
-        [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
+        [self keyValueObservingExpectationForObject:[self syncedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
             const auto changeKind = static_cast<NSKeyValueChange>([change[NSKeyValueChangeKindKey] unsignedLongValue]);
             NSIndexSet *indices = change[NSKeyValueChangeIndexesKey];
             return changeKind == NSKeyValueChangeInsertion && indices.count == 1;
         }];
         
         XCTestExpectation *fileAdditionCompletionHandlerExpectation = [self expectationWithDescription:@"add database content completion handler"];
-        MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+        MGLOfflineStorage *os = [self syncedOfflineStorage];
         [os addContentsOfFile:filePath withCompletionHandler:^(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
             XCTAssertNotNil(fileURL, @"The fileURL should not be nil.");
             XCTAssertNotNil(packs, @"Adding the contents of the sideload_sat.db should update one pack.");
             XCTAssertNil(error, @"Adding contents to a file should not return an error.");
-            for (MGLOfflinePack *pack in [MGLOfflineStorage sharedOfflineStorage].packs) {
+            for (MGLOfflinePack *pack in [self syncedOfflineStorage].packs) {
                 NSLog(@"PACK:%@", pack);
             }
             [fileAdditionCompletionHandlerExpectation fulfill];
         }];
-        [self waitForExpectationsWithTimeout:10 handler:nil];
+        [self waitForExpectationsWithTimeout:20 handler:nil];
         // Depending on the database it may update or add a pack. For this case specifically the offline database adds one pack.
-        XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Adding contents of sideload_sat.db should add one pack.");
+        XCTAssertEqual([self syncedOfflineStorage].packs.count, countOfPacks + 1, @"Adding contents of sideload_sat.db should add one pack.");
 
     }
     // Invalid database type
@@ -362,7 +371,7 @@
         [fileManager copyItemAtURL:resourceURL toURL:[NSURL fileURLWithPath:filePath] error:&error];
         
         XCTestExpectation *invalidFileCompletionHandlerExpectation = [self expectationWithDescription:@"invalid content database completion handler"];
-        MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+        MGLOfflineStorage *os = [self syncedOfflineStorage];
         [os addContentsOfFile:filePath withCompletionHandler:^(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
             XCTAssertNotNil(error, @"Passing an invalid offline database file should return an error.");
             XCTAssertNil(packs, @"Passing an invalid offline database file should not add packs to the offline database.");
@@ -382,7 +391,7 @@
             [fileManager removeItemAtPath:filePath error:nil];
         }
         
-        MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+        MGLOfflineStorage *os = [self syncedOfflineStorage];
         XCTAssertThrowsSpecificNamed([os addContentsOfFile:filePath withCompletionHandler:nil], NSException, NSInvalidArgumentException, "MGLOfflineStorage should rise an exception if an invalid database file is passed.");
 
     }
@@ -390,7 +399,7 @@
     {
         NSURL *resourceURL = [NSURL URLWithString:@"https://www.mapbox.com"];
         
-        MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+        MGLOfflineStorage *os = [self syncedOfflineStorage];
         XCTAssertThrowsSpecificNamed([os addContentsOfURL:resourceURL withCompletionHandler:nil], NSException, NSInvalidArgumentException, "MGLOfflineStorage should rise an exception if an invalid URL file is passed.");
         
     }
@@ -400,7 +409,7 @@
 - (void)testPutResourceForURL {
     NSURL *styleURL = [NSURL URLWithString:@"https://api.mapbox.com/some/thing"];
     
-    MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+    MGLOfflineStorage *os = [self syncedOfflineStorage];
     std::string testData("test data");
     NSData *data = [NSData dataWithBytes:testData.c_str() length:testData.length()];
     [os preloadData:data forURL:styleURL modificationDate:nil expirationDate:nil eTag:nil mustRevalidate:NO];
@@ -426,7 +435,7 @@
 - (void)testPutResourceForURLWithTimestamps {
     NSURL *styleURL = [NSURL URLWithString:@"https://api.mapbox.com/some/thing"];
     
-    MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
+    MGLOfflineStorage *os = [self syncedOfflineStorage];
     std::string testData("test data");
     NSDate *now = [NSDate date];
     NSDate *future = [now dateByAddingTimeInterval:600];
