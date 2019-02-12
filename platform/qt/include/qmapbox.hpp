@@ -127,9 +127,9 @@ public:
     virtual void deinitialize() = 0;
 };
 
-double metersPerPixelAtLatitude(double latitude, double zoom);
-ProjectedMeters projectedMetersForCoordinate(const Coordinate &);
-Coordinate coordinateForProjectedMeters(const ProjectedMeters &);
+Q_MAPBOXGL_EXPORT double metersPerPixelAtLatitude(double latitude, double zoom);
+Q_MAPBOXGL_EXPORT ProjectedMeters projectedMetersForCoordinate(const Coordinate &);
+Q_MAPBOXGL_EXPORT Coordinate coordinateForProjectedMeters(const ProjectedMeters &);
 
 } // namespace QMapbox
 
