@@ -459,7 +459,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         let options = MGLMapSnapshotOptions(styleURL: MGLStyle.satelliteStreetsStyleURL, camera: camera, size: CGSize(width: 320, height: 480))
         options.zoomLevel = 10
 
-        let snapshotter = MGLMapSnapshotter(options: options)
+        let snapshotter = MGLMapSnapshotter(options: options, offlineStorage: MGLOfflineStorage.shared)
         snapshotter.start { (snapshot, error) in
             if let error = error {
                 fatalError(error.localizedDescription)

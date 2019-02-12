@@ -119,6 +119,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 @property (nonatomic) BOOL terminated;
 @property (nonatomic) dispatch_queue_t resultQueue;
 @property (nonatomic, copy) MGLMapSnapshotCompletionHandler completion;
+@property (nonatomic) MGLOfflineStorage *offlineStorage;
 + (void)completeWithErrorCode:(MGLErrorCode)errorCode description:(nonnull NSString*)description onQueue:(dispatch_queue_t)queue completion:(MGLMapSnapshotCompletionHandler)completion;
 @end
 
@@ -148,11 +149,12 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     return nil;
 }
 
-- (instancetype)initWithOptions:(MGLMapSnapshotOptions *)options
+- (instancetype)initWithOptions:(MGLMapSnapshotOptions *)options offlineStorage:(MGLOfflineStorage *)offlineStorage
 {
     MGLLogDebug(@"Initializing withOptions: %@", options);
     self = [super init];
     if (self) {
+        _offlineStorage = offlineStorage;
         [self setOptions:options];
 #if TARGET_OS_IPHONE
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:UIApplicationWillTerminateNotification object:nil];
@@ -587,7 +589,13 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     
     _cancelled = NO;
     _options = options;
-    mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
+    mbgl::DefaultFileSource *mbglFileSource = self.offlineStorage.mbglFileSource;
+    
+    if (!mbglFileSource) {
+        [self cancel];
+    }
+    
+    
     _mbglThreadPool = mbgl::sharedThreadPool();
     
     std::string styleURL = std::string([options.styleURL.absoluteString UTF8String]);

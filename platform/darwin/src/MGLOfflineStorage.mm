@@ -59,10 +59,6 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     static MGLOfflineStorage *sharedOfflineStorage;
     dispatch_once(&onceToken, ^{
         sharedOfflineStorage = [[self alloc] init];
-#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-        [[NSNotificationCenter defaultCenter] addObserver:sharedOfflineStorage selector:@selector(unpauseFileSource:) name:UIApplicationWillEnterForegroundNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:sharedOfflineStorage selector:@selector(pauseFileSource:) name:UIApplicationDidEnterBackgroundNotification object:nil];
-#endif
         [sharedOfflineStorage reloadPacks];
     });
 
@@ -204,11 +200,19 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 }
 
 - (instancetype)init {
+    NSURL *cacheURL = [[self class] cacheURLIncludingSubdirectory:YES];
+    NSString *cachePath = cacheURL.path ?: @"";
+
+    NSString *assetPath = [NSBundle mainBundle].resourceURL.path;
+    
+    return [self initWithCachePath:cachePath assetPath:assetPath];
+}
+
+
+- (instancetype)initWithCachePath:(NSString *)cachePath assetPath:(NSString *)assetPath {
     MGLInitializeRunLoop();
 
     if (self = [super init]) {
-        NSURL *cacheURL = [[self class] cacheURLIncludingSubdirectory:YES];
-        NSString *cachePath = cacheURL.path ?: @"";
 
         // Move the offline cache from v3.2.0-beta.1 to a location that can also
         // be used for ambient caching.
@@ -224,7 +228,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
             [[NSFileManager defaultManager] moveItemAtPath:subdirectorylessCacheURL.path toPath:cachePath error:NULL];
         }
 
-        _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String, [NSBundle mainBundle].resourceURL.path.UTF8String);
+        _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String, assetPath.UTF8String);
 
         // Observe for changes to the API base URL (and find out the current one).
         [[MGLNetworkConfiguration sharedManager] addObserver:self
@@ -239,6 +243,12 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
                                                options:(NSKeyValueObservingOptionInitial |
                                                         NSKeyValueObservingOptionNew)
                                                context:NULL];
+        
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(unpauseFileSource:) name:UIApplicationWillEnterForegroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pauseFileSource:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+#endif
+
     }
     return self;
 }
@@ -347,7 +357,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
             auto& regions = result.value();
             packs = [NSMutableArray arrayWithCapacity:regions.size()];
             for (auto &region : regions) {
-                MGLOfflinePack *pack = [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(region))];
+                MGLOfflinePack *pack = [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(region)) offlineStorage:self];
                 [packs addObject:pack];
             }
         }
@@ -404,7 +414,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
             } : nil];
         }
         if (completion) {
-            MGLOfflinePack *pack = mbglOfflineRegion ? [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(mbglOfflineRegion.value()))] : nil;
+            MGLOfflinePack *pack = mbglOfflineRegion ? [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(mbglOfflineRegion.value())) offlineStorage:self] : nil;
             dispatch_async(dispatch_get_main_queue(), [&, completion, error, pack](void) {
                 completion(pack, error);
             });
@@ -456,7 +466,11 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 }
 
 - (void)getPacksWithCompletionHandler:(void (^)(NSArray<MGLOfflinePack *> *packs, NSError * _Nullable error))completion {
+    
+    __typeof__(self) strongSelf = self;
+    
     self.mbglFileSource->listOfflineRegions([&, completion](mbgl::expected<mbgl::OfflineRegions, std::exception_ptr> result) {
+        
         NSError *error;
         NSMutableArray *packs;
         if (!result) {
@@ -467,7 +481,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
             auto& regions = result.value();
             packs = [NSMutableArray arrayWithCapacity:regions.size()];
             for (auto &region : regions) {
-                MGLOfflinePack *pack = [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(region))];
+                MGLOfflinePack *pack = [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(region)) offlineStorage:strongSelf];
                 [packs addObject:pack];
             }
         }

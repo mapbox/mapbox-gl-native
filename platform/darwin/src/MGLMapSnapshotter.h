@@ -5,6 +5,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MGLOfflineStorage;
+
 /**
  The options to use when creating images with the `MGLMapSnapshotter`.
  */
@@ -182,7 +184,7 @@ MGL_EXPORT
  @param options The options to use when generating a map snapshot.
  @return An initialized map snapshotter.
  */
-- (instancetype)initWithOptions:(MGLMapSnapshotOptions *)options NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithOptions:(MGLMapSnapshotOptions *)options offlineStorage:(MGLOfflineStorage*)offlineStorage NS_DESIGNATED_INITIALIZER;
 
 /**
  Starts the snapshot creation and executes the specified block with the result.

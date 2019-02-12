@@ -16,7 +16,7 @@ MGL_EXPORT
 @property (class, nonatomic, readonly) MGLRendererConfiguration *currentConfiguration;
 
 /** The file source to use. Defaults to `mbgl::DefaultFileSource` */
-@property (nonatomic, readonly) mbgl::DefaultFileSource *fileSource;
+//@property (nonatomic, readonly) mbgl::DefaultFileSource *fileSource;
 
 /** The GL context mode to use. Defaults to `mbgl::GLContextMode::Unique` */
 @property (nonatomic, readonly) mbgl::GLContextMode contextMode;

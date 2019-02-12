@@ -469,12 +469,15 @@ public:
     MGLRendererConfiguration *config = [MGLRendererConfiguration currentConfiguration];
     _mbglThreadPool = mbgl::sharedThreadPool();
 
-    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, *config.fileSource, *_mbglThreadPool, config.contextMode, config.cacheDir, config.localFontFamilyName);
+    
+    mbgl::DefaultFileSource *fileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
+    
+    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, *fileSource, *_mbglThreadPool, config.contextMode, config.cacheDir, config.localFontFamilyName);
     BOOL enableCrossSourceCollisions = !config.perSourceCollisions;
     _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView);
     
     NSAssert(!_mbglMap, @"_mbglMap should be NULL");
-    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *[config fileSource], *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default, enableCrossSourceCollisions);
+    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *fileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default, enableCrossSourceCollisions);
 
     // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {

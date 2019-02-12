@@ -53,6 +53,7 @@ private:
 
 @property (nonatomic, nullable, readwrite) mbgl::OfflineRegion *mbglOfflineRegion;
 @property (nonatomic, readwrite) MGLOfflinePackProgress progress;
+@property (atomic, weak) MGLOfflineStorage *offlineStorage;
 
 @end
 
@@ -69,13 +70,17 @@ private:
     return self;
 }
 
-- (instancetype)initWithMBGLRegion:(mbgl::OfflineRegion *)region {
+- (instancetype)initWithMBGLRegion:(mbgl::OfflineRegion *)region offlineStorage:(MGLOfflineStorage *)offlineStorage {
     if (self = [super init]) {
         _mbglOfflineRegion = region;
         _state = MGLOfflinePackStateUnknown;
-
-        mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
-        mbglFileSource->setOfflineRegionObserver(*_mbglOfflineRegion, std::make_unique<MBGLOfflineRegionObserver>(self));
+        _offlineStorage = offlineStorage;
+        
+        mbgl::DefaultFileSource *mbglFileSource = [offlineStorage mbglFileSource];
+        
+        if (mbglFileSource) {
+            mbglFileSource->setOfflineRegionObserver(*_mbglOfflineRegion, std::make_unique<MBGLOfflineRegionObserver>(self));
+        }
     }
     return self;
 }
@@ -113,10 +118,17 @@ private:
     MGLLogInfo(@"Resuming pack download.");
     MGLAssertOfflinePackIsValid();
 
-    self.state = MGLOfflinePackStateActive;
 
-    mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
-    mbglFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Active);
+    mbgl::DefaultFileSource *mbglFileSource = [self.offlineStorage mbglFileSource];
+    if (mbglFileSource) {
+        self.state = MGLOfflinePackStateActive;
+        mbglFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Active);
+    }
+    else {
+        // What state should be we in?
+        self.state = MGLOfflinePackStateInvalid;
+
+    }
 }
 
 - (void)suspend {
@@ -128,8 +140,10 @@ private:
         _isSuspending = YES;
     }
 
-    mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
-    mbglFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Inactive);
+    mbgl::DefaultFileSource *mbglFileSource = [self.offlineStorage mbglFileSource];
+    if (mbglFileSource) {
+        mbglFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Inactive);
+    }
 }
 
 - (void)invalidate {
@@ -137,8 +151,12 @@ private:
     MGLAssert(_state != MGLOfflinePackStateInvalid, @"Cannot invalidate an already invalid offline pack.");
 
     self.state = MGLOfflinePackStateInvalid;
-    mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
-    mbglFileSource->setOfflineRegionObserver(*self.mbglOfflineRegion, nullptr);
+    mbgl::DefaultFileSource *mbglFileSource = [self.offlineStorage mbglFileSource];
+    
+    if (mbglFileSource) {
+        mbglFileSource->setOfflineRegionObserver(*self.mbglOfflineRegion, nullptr);
+    }
+    
     self.mbglOfflineRegion = nil;
 }
 
@@ -164,8 +182,13 @@ private:
     MGLLogInfo(@"Requesting pack progress.");
     MGLAssertOfflinePackIsValid();
 
-    mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
+    mbgl::DefaultFileSource *mbglFileSource = [self.offlineStorage mbglFileSource];
 
+    if (!mbglFileSource) {
+        return;
+    }
+        
+    
     __weak MGLOfflinePack *weakSelf = self;
     mbglFileSource->getOfflineRegionStatus(*_mbglOfflineRegion, [&, weakSelf](mbgl::expected<mbgl::OfflineRegionStatus, std::exception_ptr> status) {
         if (status) {

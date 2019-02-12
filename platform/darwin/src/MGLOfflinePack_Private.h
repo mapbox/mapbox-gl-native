@@ -3,14 +3,14 @@
 #include <mbgl/storage/default_file_source.hpp>
 
 NS_ASSUME_NONNULL_BEGIN
-
+@class MGLOfflineStorage;
 @interface MGLOfflinePack (Private)
 
 @property (nonatomic, nullable) mbgl::OfflineRegion *mbglOfflineRegion;
 
 @property (nonatomic, readwrite) MGLOfflinePackState state;
 
-- (instancetype)initWithMBGLRegion:(mbgl::OfflineRegion *)region;
+- (instancetype)initWithMBGLRegion:(mbgl::OfflineRegion *)region offlineStorage:(MGLOfflineStorage *)offlineStorage;
 
 /**
  Invalidates the pack and ensures that no future progress update can ever

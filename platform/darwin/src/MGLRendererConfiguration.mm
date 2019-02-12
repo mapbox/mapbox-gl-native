@@ -12,6 +12,7 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
 
 @interface MGLRendererConfiguration ()
 @property (nonatomic, readwrite) BOOL perSourceCollisions;
+//@property (nonatomic) MGLOfflineStorage *offlineStorage;
 @end
 
 
@@ -25,10 +26,11 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
     return [self initWithPropertyDictionary:[[NSBundle mainBundle] infoDictionary]];
 }
 
-- (instancetype)initWithPropertyDictionary:(nonnull NSDictionary *)properties {
+- (instancetype)initWithPropertyDictionary:(nonnull NSDictionary *)properties{
     self = [super init];
     
     if (self) {
+        
         // Set the collision behaviour. A value set in `NSUserDefaults.standardUserDefaults`
         // should override anything in the application's info.plist
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -57,9 +59,9 @@ static NSString * const MGLCollisionBehaviorPre4_0Key = @"MGLCollisionBehaviorPr
     return self;
 }
 
-- (mbgl::DefaultFileSource *)fileSource {
-    return [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
-}
+//- (mbgl::DefaultFileSource *)fileSource {
+//    return self.offlineStorage.mbglFileSource;
+//}
 
 - (mbgl::GLContextMode)contextMode {
     return mbgl::GLContextMode::Unique;
