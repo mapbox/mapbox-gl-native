@@ -230,7 +230,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
                                             forKeyPath:@"apiBaseURL"
                                                options:(NSKeyValueObservingOptionInitial |
                                                               NSKeyValueObservingOptionNew)
-                                                     context:NULL];
+                                              context:NULL];
 
         // Observe for changes to the global access token (and find out the current one).
         [[MGLAccountManager sharedManager] addObserver:self
