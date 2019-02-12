@@ -141,53 +141,45 @@ void RunLoop::Impl::wake() {
 }
 
 void RunLoop::Impl::addRunnable(Runnable* runnable) {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    if (runnable->iter == runnables.end()) {
-        auto iter = runnables.insert(runnables.end(), runnable);
-        runnable->iter = std::move(iter);
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        runnables.push_back(runnable);
     }
 
     wake();
 }
 
 void RunLoop::Impl::removeRunnable(Runnable* runnable) {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
-    if (runnable->iter == runnables.end()) {
-        return;
-    }
-
-    if (nextRunnable == runnable->iter) {
-        ++nextRunnable;
-    }
-
-    runnables.erase(runnable->iter);
-    runnable->iter = runnables.end();
-}
-
-void RunLoop::Impl::initRunnable(Runnable* runnable) {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-    runnable->iter = runnables.end();
+    std::lock_guard<std::mutex> lock(mutex);
+    runnables.remove(runnable);
 }
 
 Milliseconds RunLoop::Impl::processRunnables() {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-
     auto now = Clock::now();
     auto nextDue = TimePoint::max();
+    std::list<Runnable*> tmp;
+    {
+        std::lock_guard<std::mutex> lock(mutex);
 
-    // O(N) but in the render thread where we get tons
-    // of messages, the size of the list is usually 1~2.
-    for (nextRunnable = runnables.begin(); nextRunnable != runnables.end();) {
-        Runnable* runnable = *(nextRunnable++);
+        // O(N) but in the render thread where we get tons
+        // of messages, the size of the list is usually 1~2.
+        auto it = runnables.begin();
+        while (it != runnables.end()) {
+            Runnable* runnable = *it;
 
-        auto const dueTime = runnable->dueTime();
-        if (dueTime <= now) {
-            runnable->runTask();
-        } else {
-            nextDue = std::min(nextDue, dueTime);
+            auto const dueTime = runnable->dueTime();
+            if (dueTime <= now) {
+                tmp.push_back(runnable);
+                runnables.erase(it++);
+            } else {
+                nextDue = std::min(nextDue, dueTime);
+                ++it;
+            }
         }
+    }
+
+    for (auto runnable : tmp) {
+        runnable->runTask();
     }
 
     if (runnables.empty() || nextDue == TimePoint::max()) {
