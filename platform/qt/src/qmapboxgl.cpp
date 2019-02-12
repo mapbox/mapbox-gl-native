@@ -1169,7 +1169,7 @@ void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &icon)
 */
 double QMapboxGL::metersPerPixelAtLatitude(double latitude_, double zoom_) const
 {
-    return mbgl::Projection::getMetersPerPixelAtLatitude(latitude_, zoom_);
+    return QMapbox::metersPerPixelAtLatitude(latitude_, zoom_);
 }
 
 /*!
@@ -1177,8 +1177,7 @@ double QMapboxGL::metersPerPixelAtLatitude(double latitude_, double zoom_) const
 */
 QMapbox::ProjectedMeters QMapboxGL::projectedMetersForCoordinate(const QMapbox::Coordinate &coordinate_) const
 {
-    auto projectedMeters = mbgl::Projection::projectedMetersForLatLng(mbgl::LatLng { coordinate_.first, coordinate_.second });
-    return QMapbox::ProjectedMeters(projectedMeters.northing(), projectedMeters.easting());
+    return QMapbox::projectedMetersForCoordinate(coordinate_);
 }
 
 /*!
@@ -1186,8 +1185,7 @@ QMapbox::ProjectedMeters QMapboxGL::projectedMetersForCoordinate(const QMapbox::
 */
 QMapbox::Coordinate QMapboxGL::coordinateForProjectedMeters(const QMapbox::ProjectedMeters &projectedMeters) const
 {
-    auto latLng = mbgl::Projection::latLngForProjectedMeters(mbgl::ProjectedMeters { projectedMeters.first, projectedMeters.second });
-    return QMapbox::Coordinate(latLng.latitude(), latLng.longitude());
+    return QMapbox::coordinateForProjectedMeters(projectedMeters);
 }
 
 /*!

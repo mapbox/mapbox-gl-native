@@ -127,6 +127,10 @@ public:
     virtual void deinitialize() = 0;
 };
 
+double metersPerPixelAtLatitude(double latitude, double zoom);
+ProjectedMeters projectedMetersForCoordinate(const Coordinate &);
+Coordinate coordinateForProjectedMeters(const ProjectedMeters &);
+
 } // namespace QMapbox
 
 Q_DECLARE_METATYPE(QMapbox::Coordinate);
