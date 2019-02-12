@@ -276,14 +276,6 @@ template <> void Query::bind(int offset, const char *value) {
     stmt.impl->check(sqlite3_bind_text(stmt.impl->stmt, offset, value, -1, SQLITE_STATIC));
 }
 
-// We currently cannot use sqlite3_bind_blob64 / sqlite3_bind_text64 because they
-// were introduced in SQLite 3.8.7, and we need to support earlier versions:
-//    Android 11: 3.7
-//    Android 21: 3.8
-//    Android 24: 3.9
-// Per https://developer.android.com/reference/android/database/sqlite/package-summary.
-// The first iOS version with 3.8.7+ was 9.0, with 3.8.8.
-
 void Query::bind(int offset, const char * value, std::size_t length, bool retain) {
     assert(stmt.impl);
     if (length > std::numeric_limits<int>::max()) {
