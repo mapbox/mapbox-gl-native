@@ -219,6 +219,9 @@ public:
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) UIPanGestureRecognizer *twoFingerDrag;
 
+@property (nonatomic) UIInterfaceOrientation currentOrientation;
+@property (nonatomic) UIInterfaceOrientationMask applicationSupportedInterfaceOrientations;
+
 @property (nonatomic) MGLCameraChangeReason cameraChangeReasonBitmask;
 
 /// Mapping from reusable identifiers to annotation images.
@@ -609,9 +612,11 @@ public:
     // so causes a loop when asking for location permission. See: https://github.com/mapbox/mapbox-gl-native/issues/11225
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveMemoryWarning) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
+
+    // Device orientation management
+    self.currentOrientation = UIInterfaceOrientationUnknown;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-
 
     // set initial position
     //
@@ -1287,6 +1292,11 @@ public:
     [self updateDisplayLinkPreferredFramesPerSecond];
 }
 
+- (void)willMoveToWindow:(UIWindow *)newWindow {
+    [super willMoveToWindow:newWindow];
+    [self refreshSupportedInterfaceOrientationsWithWindow:newWindow];
+}
+
 - (void)didMoveToWindow
 {
     [self validateDisplayLink];
@@ -1299,8 +1309,97 @@ public:
     [super didMoveToSuperview];
 }
 
+- (void)refreshSupportedInterfaceOrientationsWithWindow:(UIWindow *)window {
+    
+    // "The system intersects the view controller's supported orientations with
+    // the app's supported orientations (as determined by the Info.plist file or
+    // the app delegate's application:supportedInterfaceOrientationsForWindow:
+    // method) and the device's supported orientations to determine whether to rotate.
+    
+    UIApplication *application = [UIApplication sharedApplication];
+    
+    if (window && [application.delegate respondsToSelector:@selector(application:supportedInterfaceOrientationsForWindow:)]) {
+        self.applicationSupportedInterfaceOrientations = [application.delegate application:application supportedInterfaceOrientationsForWindow:window];
+        return;
+    }
+    
+    // If no delegate method, check the application's plist.
+    static UIInterfaceOrientationMask orientationMask = UIInterfaceOrientationMaskAll;
+
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        // No application delegate
+        NSArray *orientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
+        
+        // Application's info plist provided supported orientations.
+        if (orientations.count > 0) {
+            orientationMask = 0;
+            
+            NSDictionary *lookup =
+            @{
+              @"UIInterfaceOrientationPortrait" : @(UIInterfaceOrientationMaskPortrait),
+              @"UIInterfaceOrientationPortraitUpsideDown" : @(UIInterfaceOrientationMaskPortraitUpsideDown),
+              @"UIInterfaceOrientationLandscapeLeft" : @(UIInterfaceOrientationMaskLandscapeLeft),
+              @"UIInterfaceOrientationLandscapeRight" : @(UIInterfaceOrientationMaskLandscapeRight)
+              };
+            
+            for (NSString *orientation in orientations) {
+                UIInterfaceOrientationMask mask = ((NSNumber*)lookup[orientation]).unsignedIntegerValue;
+                orientationMask |= mask;
+            }
+        }
+    });
+
+    self.applicationSupportedInterfaceOrientations = orientationMask;
+}
+
 - (void)deviceOrientationDidChange:(__unused NSNotification *)notification
 {
+    UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+    
+    // The docs for `UIViewController.supportedInterfaceOrientations` states:
+    //
+    //  When the user changes the device orientation, the system calls this method
+    //  on the root view controller or the topmost presented view controller that
+    //  fills the window. If the view controller supports the new orientation, the
+    //  window and view controller are rotated to the new orientation. This method
+    //  is only called if the view controller's shouldAutorotate method returns YES.
+    //
+    // We want to match similar behaviour. However, it may be preferable to look
+    // at the owning view controller (in cases where the map view may be covered
+    // by another view.
+    
+    UIViewController *viewController = [self.window.rootViewController mgl_topMostViewController];
+    
+    if (![viewController shouldAutorotate]) {
+        return;
+    }
+    
+    if ((self.currentOrientation == (UIInterfaceOrientation)deviceOrientation) &&
+        (self.currentOrientation != UIInterfaceOrientationUnknown)) {
+        return;
+    }
+    
+    // "The system intersects the view controller's supported orientations with
+    // the app's supported orientations (as determined by the Info.plist file or
+    // the app delegate's application:supportedInterfaceOrientationsForWindow:
+    // method) and the device's supported orientations to determine whether to rotate.
+    
+    UIInterfaceOrientationMask supportedOrientations = viewController.supportedInterfaceOrientations;
+    supportedOrientations &= self.applicationSupportedInterfaceOrientations;
+    
+    // Interface orientations are defined by device orientations
+    UIInterfaceOrientationMask interfaceOrientation = 1 << deviceOrientation;
+    UIInterfaceOrientationMask validOrientation = interfaceOrientation & UIInterfaceOrientationMaskAll;
+    
+    if (!(validOrientation & supportedOrientations)) {
+        return;
+    }
+    
+    self.currentOrientation = (UIInterfaceOrientation)deviceOrientation;
+
+    // Q. Do we need to re-layout if we're just going from Portrait -> Portrait
+    // Upside Down (or from Left to Right)?
     [self setNeedsLayout];
 }
 
