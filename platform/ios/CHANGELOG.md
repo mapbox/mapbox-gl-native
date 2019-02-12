@@ -5,6 +5,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ## 4.9.0
 
 * Fixed a bug where setting `MGLMapView.userTrackingMode` to `MGLUserTrackingModeFollowWithHeading` or `MGLUserTrackingModeFollowWithCourse` would be ignored if the user’s location was not already available. ([#13849](https://github.com/mapbox/mapbox-gl-native/pull/13849))
+* Improved tilt gesture performance. ([#13902](https://github.com/mapbox/mapbox-gl-native/pull/13902))
 
 ## 4.8.0 - January 30, 2019
 

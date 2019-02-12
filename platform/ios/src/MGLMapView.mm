@@ -1968,9 +1968,11 @@ public:
     [self cancelTransitions];
 
     self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureTilt;
-
+    static CGFloat initialPitch;
+    
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
+        initialPitch = self.mbglMap.getPitch();
         [self trackGestureEvent:MMEEventGesturePitchStart forRecognizer:twoFingerDrag];
         [self notifyGestureDidBegin];
     }
@@ -1978,10 +1980,9 @@ public:
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan || twoFingerDrag.state == UIGestureRecognizerStateChanged)
     {
         CGFloat gestureDistance = CGPoint([twoFingerDrag translationInView:twoFingerDrag.view]).y;
-        CGFloat currentPitch = self.mbglMap.getPitch();
-        CGFloat slowdown = 20.0;
+        CGFloat slowdown = 2.0;
 
-        CGFloat pitchNew = currentPitch - (gestureDistance / slowdown);
+        CGFloat pitchNew = initialPitch - (gestureDistance / slowdown);
 
         CGPoint centerPoint = [self anchorPointForGesture:twoFingerDrag];
 
