@@ -4,6 +4,7 @@
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/traits.hpp>
+#include <mbgl/util/projection.hpp>
 
 #include <QOpenGLContext>
 
@@ -220,6 +221,32 @@ QVector<QPair<QString, QString> >& defaultStyles()
     }
 
     return styles;
+}
+
+/*!
+    Returns the amount of meters per pixel from a given \a latitude and \a zoom.
+*/
+double metersPerPixelAtLatitude(double latitude, double zoom)
+{
+    return mbgl::Projection::getMetersPerPixelAtLatitude(latitude, zoom);
+}
+
+/*!
+    Return the projected meters for a given \a coordinate object.
+*/
+ProjectedMeters projectedMetersForCoordinate(const Coordinate &coordinate)
+{
+    auto projectedMeters = mbgl::Projection::projectedMetersForLatLng(mbgl::LatLng { coordinate.first, coordinate.second });
+    return QMapbox::ProjectedMeters(projectedMeters.northing(), projectedMeters.easting());
+}
+
+/*!
+    Returns the coordinate for a given \a projectedMeters object.
+*/
+Coordinate coordinateForProjectedMeters(const ProjectedMeters &projectedMeters)
+{
+    auto latLng = mbgl::Projection::latLngForProjectedMeters(mbgl::ProjectedMeters { projectedMeters.first, projectedMeters.second });
+    return QMapbox::Coordinate(latLng.latitude(), latLng.longitude());
 }
 
 } // namespace QMapbox
