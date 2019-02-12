@@ -26,8 +26,6 @@ public:
 
         virtual void runTask() = 0;
         virtual TimePoint dueTime() const = 0;
-
-        std::list<Runnable*>::iterator iter;
     };
 
     Impl(RunLoop*, RunLoop::Type);
@@ -37,7 +35,6 @@ public:
 
     void addRunnable(Runnable*);
     void removeRunnable(Runnable*);
-    void initRunnable(Runnable*);
 
     Milliseconds processRunnables();
 
@@ -55,9 +52,8 @@ private:
 
     std::unique_ptr<Thread<Alarm>> alarm;
 
-    std::recursive_mutex mtx;
+    std::mutex mutex;
     std::list<Runnable*> runnables;
-    std::list<Runnable*>::iterator nextRunnable = runnables.end();
 };
 
 } // namespace util

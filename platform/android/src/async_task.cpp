@@ -13,7 +13,6 @@ class AsyncTask::Impl : public RunLoop::Impl::Runnable {
 public:
     Impl(std::function<void()>&& fn)
         : queued(true), task(std::move(fn)) {
-        loop->initRunnable(this);
     }
 
     ~Impl() {

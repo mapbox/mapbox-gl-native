@@ -10,21 +10,20 @@ namespace util {
 
 class Timer::Impl : public RunLoop::Impl::Runnable {
 public:
-    Impl() {
-        loop->initRunnable(this);
-    }
+    Impl() = default;
 
     ~Impl() {
         stop();
     }
 
-    void start(Duration timeout, Duration repeat_, std::function<void ()>&& task_) {
+    void start(Duration timeout, Duration repeat_, std::function<void()>&& task_) {
         stop();
 
         repeat = repeat_;
         task = std::move(task_);
         // Prevent overflows when timeout is set to Duration::max()
-        due = (timeout == Duration::max()) ? std::chrono::time_point<Clock>::max() : Clock::now() + timeout;
+        due = (timeout == Duration::max()) ? std::chrono::time_point<Clock>::max() : Clock::now() +
+                                                                                     timeout;
         loop->addRunnable(this);
     }
 
@@ -59,8 +58,7 @@ private:
     std::function<void()> task;
 };
 
-Timer::Timer()
-    : impl(std::make_unique<Impl>()) {
+Timer::Timer() : impl(std::make_unique<Impl>()) {
 }
 
 Timer::~Timer() = default;
