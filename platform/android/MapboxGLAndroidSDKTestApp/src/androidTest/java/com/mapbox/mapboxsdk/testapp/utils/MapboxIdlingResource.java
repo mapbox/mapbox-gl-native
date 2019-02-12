@@ -9,12 +9,13 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 public abstract class MapboxIdlingResource implements IdlingResource {
 
+  private MapView mapView;
   private MapboxMap mapboxMap;
   IdlingResource.ResourceCallback resourceCallback;
 
   @UiThread
   void inflateMap(Activity activity) {
-    MapView mapView = activity.findViewById(R.id.mapView);
+    mapView = activity.findViewById(R.id.mapView);
     if (mapView != null) {
       mapView.getMapAsync(this::initMap);
     }
@@ -37,5 +38,9 @@ public abstract class MapboxIdlingResource implements IdlingResource {
 
   public MapboxMap getMapboxMap() {
     return mapboxMap;
+  }
+
+  public MapView getMapView() {
+    return mapView;
   }
 }

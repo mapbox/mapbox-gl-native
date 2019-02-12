@@ -28,50 +28,8 @@ fun MapboxMap.isLayerVisible(layerId: String): Boolean {
   return this.style!!.getLayer(layerId)?.visibility?.value?.equals(Property.VISIBLE)!!
 }
 
-fun MapboxMap.waitForSource(uiController: UiController, sourceId: String) {
-  var counter = 0
-  val delay = MapboxTestingUtils.MAP_RENDER_DELAY
-  while (this.querySourceFeatures(sourceId).isEmpty() && delay * counter < MapboxTestingUtils.RENDER_TIMEOUT) {
-    uiController.loopMainThreadForAtLeast(delay)
-    counter++
-  }
-}
-
-fun MapboxMap.waitForLayer(uiController: UiController, location: Location, layerId: String, shouldDisappear: Boolean = false) {
-  var counter = 0
-  val delay = MapboxTestingUtils.MAP_RENDER_DELAY
-  while (
-    if (shouldDisappear) this.queryRenderedFeatures(location, layerId).isNotEmpty() else (this.style == null || this.queryRenderedFeatures(location, layerId).isEmpty())
-      && delay * counter < MapboxTestingUtils.RENDER_TIMEOUT) {
-    uiController.loopMainThreadForAtLeast(delay)
-    counter++
-  }
-}
-
-fun MapboxMap.waitForStyle(uiController: UiController, mapboxMap: MapboxMap) {
-  var counter = 0
-  val delay = MapboxTestingUtils.MAP_RENDER_DELAY
-  while ((mapboxMap.style == null && !mapboxMap.style?.isFullyLoaded!!) && delay * counter < MapboxTestingUtils.RENDER_TIMEOUT) {
-    uiController.loopMainThreadForAtLeast(delay)
-    counter++
-  }
-}
-
-inline fun waitForRenderResult(uiController: UiController, checkFunction: () -> Boolean, expectedResult: Boolean) {
-  var counter = 0
-  val delay = MapboxTestingUtils.MAP_RENDER_DELAY
-  while (checkFunction.invoke() != expectedResult && delay * counter < MapboxTestingUtils.RENDER_TIMEOUT) {
-    uiController.loopMainThreadForAtLeast(delay)
-    counter++
-  }
-}
-
 class MapboxTestingUtils {
   companion object {
-
-    const val MAP_RENDER_DELAY = 250L
-    const val MAP_CONNECTION_DELAY = 1000L
-    const val RENDER_TIMEOUT = 5_500L
 
     /**
      * Used to increase style load time for stress testing.
