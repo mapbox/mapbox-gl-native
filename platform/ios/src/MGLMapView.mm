@@ -1369,7 +1369,6 @@ public:
     // at the owning view controller (in cases where the map view may be covered
     // by another view.
     
-//  UIViewController *viewController = [self viewControllerForLayoutGuides];
     UIViewController *viewController = [self.window.rootViewController mgl_topMostViewController];
     
     if (![viewController shouldAutorotate]) {
