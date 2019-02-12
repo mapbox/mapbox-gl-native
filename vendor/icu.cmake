@@ -28,6 +28,7 @@ target_compile_definitions(icu PRIVATE
 
 target_compile_options(icu PRIVATE
     -Wno-error
+    -Wno-shorten-64-to-32
 )
 
 target_include_directories(icu SYSTEM PUBLIC
