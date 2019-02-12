@@ -14,7 +14,7 @@ import com.mapbox.mapboxsdk.style.sources.CustomGeometrySource;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.GeometryTileProvider;
 import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
-import com.mapbox.mapboxsdk.testapp.utils.Utils;
+import com.mapbox.mapboxsdk.testapp.utils.TestingAsyncUtils;
 
 import org.junit.Test;
 
@@ -148,7 +148,7 @@ public class GeoJsonConversionTest extends EspressoTest {
         );
       mapboxMap.getStyle().addLayer(layer);
 
-      Utils.waitForLayer(uiController, mapboxMap, latLng, "layer");
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
 
       assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng)).isEmpty());
     }));
