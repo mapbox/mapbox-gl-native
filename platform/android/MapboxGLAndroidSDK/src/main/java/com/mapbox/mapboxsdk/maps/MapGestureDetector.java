@@ -878,6 +878,9 @@ final class MapGestureDetector {
   private void dispatchCameraIdle() {
     // we need to dispatch camera idle callback only if there is no other gestures in progress
     if (noGesturesInProgress()) {
+      // invalidate the camera position, so that it's valid when fetched from the #onIdle event
+      // and doesn't rely on the last frame being rendered
+      transform.invalidateCameraPosition();
       cameraChangeDispatcher.onCameraIdle();
     }
   }
