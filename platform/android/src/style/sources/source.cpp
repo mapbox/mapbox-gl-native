@@ -24,12 +24,18 @@
 
 // Android Source peers
 #include "geojson_source.hpp"
+#ifndef MBGL_SOURCE_IMAGE_DISABLE_RUNTIME
 #include "image_source.hpp"
+#endif
 #include "raster_source.hpp"
 #include "unknown_source.hpp"
 #include "vector_source.hpp"
+#ifndef MBGL_SOURCE_CUSTOM_DISABLE_RUNTIME
 #include "custom_geometry_source.hpp"
+#endif
+#ifndef MBGL_SOURCE_RASTERDEM_DISABLE_RUNTIME
 #include "raster_dem_source.hpp"
+#endif
 
 namespace mbgl {
 namespace android {
@@ -37,15 +43,19 @@ namespace android {
     static std::unique_ptr<Source> createSourcePeer(jni::JNIEnv& env, mbgl::style::Source& coreSource, AndroidRendererFrontend& frontend) {
         if (coreSource.is<mbgl::style::VectorSource>()) {
             return std::make_unique<VectorSource>(env, *coreSource.as<mbgl::style::VectorSource>(), frontend);
-        } else if (coreSource.is<mbgl::style::RasterSource>()) {
-            return std::make_unique<RasterSource>(env, *coreSource.as<mbgl::style::RasterSource>(), frontend);
-        } else if (coreSource.is<mbgl::style::GeoJSONSource>()) {
-            return std::make_unique<GeoJSONSource>(env, *coreSource.as<mbgl::style::GeoJSONSource>(), frontend);
-        } else if (coreSource.is<mbgl::style::ImageSource>()) {
-            return std::make_unique<ImageSource>(env, *coreSource.as<mbgl::style::ImageSource>(), frontend);
-        } else {
-            return std::make_unique<UnknownSource>(env, coreSource, frontend);
         }
+        if (coreSource.is<mbgl::style::RasterSource>()) {
+            return std::make_unique<RasterSource>(env, *coreSource.as<mbgl::style::RasterSource>(), frontend);
+        }
+        if (coreSource.is<mbgl::style::GeoJSONSource>()) {
+            return std::make_unique<GeoJSONSource>(env, *coreSource.as<mbgl::style::GeoJSONSource>(), frontend);
+        }
+#ifndef MBGL_SOURCE_IMAGE_DISABLE_RUNTIME
+        if (coreSource.is<mbgl::style::ImageSource>()) {
+            return std::make_unique<ImageSource>(env, *coreSource.as<mbgl::style::ImageSource>(), frontend);
+        }
+#endif
+        return std::make_unique<UnknownSource>(env, coreSource, frontend);
     }
 
     const jni::Object<Source>& Source::peerForCoreSource(jni::JNIEnv& env, mbgl::style::Source& coreSource, AndroidRendererFrontend& frontend) {
@@ -156,12 +166,18 @@ namespace android {
 
         // Register subclasses
         GeoJSONSource::registerNative(env);
+#ifndef MBGL_SOURCE_IMAGE_DISABLE_RUNTIME
         ImageSource::registerNative(env);
+#endif
         RasterSource::registerNative(env);
         UnknownSource::registerNative(env);
         VectorSource::registerNative(env);
+#ifndef MBGL_SOURCE_CUSTOM_DISABLE_RUNTIME
         CustomGeometrySource::registerNative(env);
+#endif
+#ifndef MBGL_SOURCE_RASTERDEM_DISABLE_RUNTIME
         RasterDEMSource::registerNative(env);
+#endif
     }
 
 } // namespace android

@@ -2,9 +2,11 @@
 
 #include <mbgl/util/logging.hpp>
 
+#ifndef MBGL_MODULE_ANNOTATION_DISABLE
 #include "annotation/marker.hpp"
 #include "annotation/polygon.hpp"
 #include "annotation/polyline.hpp"
+#endif
 #include "bitmap.hpp"
 #include "bitmap_factory.hpp"
 #include "connectivity_listener.hpp"
@@ -15,12 +17,22 @@
 #include "geojson/feature_collection.hpp"
 #include "geojson/geometry.hpp"
 #include "geojson/geometry_collection.hpp"
+#ifndef MBGL_GEOJSON_LINESTRING_DISABLE
 #include "geojson/line_string.hpp"
+#endif
+#ifndef MBGL_GEOJSON_MULTILINESTRING_DISABLE
 #include "geojson/multi_line_string.hpp"
+#endif
+#ifndef MBGL_GEOJSON_MULTIPOINT_DISABLE
 #include "geojson/multi_point.hpp"
+#endif
+#ifndef MBGL_GEOJSON_MULTIPOLYGON_DISABLE
 #include "geojson/multi_polygon.hpp"
+#endif
 #include "geojson/point.hpp"
+#ifndef MBGL_GEOJSON_POLYGON_DISABLE
 #include "geojson/polygon.hpp"
+#endif
 #include "geometry/lat_lng.hpp"
 #include "geometry/lat_lng_bounds.hpp"
 #include "geometry/lat_lng_quad.hpp"
@@ -45,7 +57,9 @@
 #include "style/transition_options.hpp"
 #include "style/layers/layer_manager.hpp"
 #include "style/sources/source.hpp"
+#ifndef MBGL_STYLE_LIGHT_DISABLE
 #include "style/light.hpp"
+#endif
 #include "style/formatted.hpp"
 #include "style/formatted_section.hpp"
 #ifndef MBGL_MODULE_SNAPSHOT_DISABLE
@@ -126,12 +140,22 @@ void registerNatives(JavaVM *vm) {
     geojson::FeatureCollection::registerNative(env);
     geojson::Geometry::registerNative(env);
     geojson::GeometryCollection::registerNative(env);
+#ifndef MBGL_GEOJSON_LINESTRING_DISABLE
     geojson::LineString::registerNative(env);
+#endif
+#ifndef MBGL_GEOJSON_MULTILINESTRING_DISABLE
     geojson::MultiLineString::registerNative(env);
+#endif
+#ifndef MBGL_GEOJSON_MULTIPOINT_DISABLE
     geojson::MultiPoint::registerNative(env);
+#endif
+#ifndef MBGL_GEOJSON_MULTIPOLYGON_DISABLE
     geojson::MultiPolygon::registerNative(env);
+#endif
     geojson::Point::registerNative(env);
+#ifndef MBGL_GEOJSON_POLYGON_DISABLE
     geojson::Polygon::registerNative(env);
+#endif
 
     // Geometry
     LatLng::registerNative(env);
@@ -146,9 +170,11 @@ void registerNatives(JavaVM *vm) {
     gson::JsonPrimitive::registerNative(env);
 
     //Annotation
+#ifndef MBGL_MODULE_ANNOTATION_DISABLE
     Marker::registerNative(env);
     Polygon::registerNative(env);
     Polyline::registerNative(env);
+#endif
 
     // Map
     MapRenderer::registerNative(env);
@@ -166,8 +192,12 @@ void registerNatives(JavaVM *vm) {
     TransitionOptions::registerNative(env);
     LayerManagerAndroid::get()->registerNative(env);
     Source::registerNative(env);
+#ifndef MBGL_STYLE_LIGHT_DISABLE
     Light::registerNative(env);
+#endif
+#ifndef MBGL_STYLE_POSITION_DISABLE
     Position::registerNative(env);
+#endif
     Formatted::registerNative(env);
     FormattedSection::registerNative(env);
 
