@@ -4,7 +4,6 @@
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/storage/network_status.hpp>
 
@@ -258,7 +257,6 @@ private:
     int height = 64;
 
     // Ensure these are initialised last
-    std::shared_ptr<mbgl::ThreadPool> threadPool;
     std::unique_ptr<mbgl::Map> map;
     mbgl::EdgeInsets insets;
 };

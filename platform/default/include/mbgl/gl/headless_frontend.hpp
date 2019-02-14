@@ -10,7 +10,6 @@
 
 namespace mbgl {
 
-class Scheduler;
 class Renderer;
 class Map;
 class TransformState;
@@ -22,13 +21,11 @@ class RendererBackend;
 class HeadlessFrontend : public RendererFrontend {
 public:
     HeadlessFrontend(float pixelRatio_,
-                     Scheduler&,
                      const optional<std::string> programCacheDir = {},
                      gfx::ContextMode mode = gfx::ContextMode::Unique,
                      const optional<std::string> localFontFamily = {});
     HeadlessFrontend(Size,
                      float pixelRatio_,
-                     Scheduler&,
                      const optional<std::string> programCacheDir = {},
                      gfx::ContextMode mode = gfx::ContextMode::Unique,
                      const optional<std::string> localFontFamily = {});

@@ -9,18 +9,16 @@ namespace mbgl {
 
 Map::Impl::Impl(RendererFrontend& frontend_,
                 MapObserver& observer_,
-                Scheduler& scheduler_,
                 std::shared_ptr<FileSource> fileSource_,
                 const MapOptions& mapOptions)
         : observer(observer_),
           rendererFrontend(frontend_),
-          scheduler(scheduler_),
           transform(observer, mapOptions.constrainMode(), mapOptions.viewportMode()),
           mode(mapOptions.mapMode()),
           pixelRatio(mapOptions.pixelRatio()),
           crossSourceCollisions(mapOptions.crossSourceCollisions()),
           fileSource(std::move(fileSource_)),
-          style(std::make_unique<style::Style>(scheduler, *fileSource, pixelRatio)),
+          style(std::make_unique<style::Style>(*fileSource, pixelRatio)),
           annotationManager(*style) {
     transform.setNorthOrientation(mapOptions.northOrientation());
     style->impl->setObserver(this);

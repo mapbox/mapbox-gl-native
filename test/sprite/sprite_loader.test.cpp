@@ -8,7 +8,6 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <utility>
@@ -37,7 +36,6 @@ public:
     util::RunLoop loop;
     StubFileSource fileSource;
     StubSpriteLoaderObserver observer;
-    ThreadPool threadPool { 1 };
     SpriteLoader spriteLoader{ 1 };
 
     void run() {
@@ -45,7 +43,7 @@ public:
         Log::setObserver(std::make_unique<Log::NullObserver>());
 
         spriteLoader.setObserver(&observer);
-        spriteLoader.load("test/fixtures/resources/sprite", threadPool, fileSource);
+        spriteLoader.load("test/fixtures/resources/sprite", fileSource);
 
         loop.run();
     }

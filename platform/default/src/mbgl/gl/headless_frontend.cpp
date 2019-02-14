@@ -10,17 +10,15 @@
 namespace mbgl {
 
 HeadlessFrontend::HeadlessFrontend(float pixelRatio_,
-                                   Scheduler& scheduler,
                                    const optional<std::string> programCacheDir,
                                    const gfx::ContextMode contextMode,
                                    const optional<std::string> localFontFamily)
     : HeadlessFrontend(
-          { 256, 256 }, pixelRatio_, scheduler, programCacheDir, contextMode, localFontFamily) {
+          { 256, 256 }, pixelRatio_, programCacheDir, contextMode, localFontFamily) {
 }
 
 HeadlessFrontend::HeadlessFrontend(Size size_,
                                    float pixelRatio_,
-                                   Scheduler& scheduler,
                                    const optional<std::string> programCacheDir,
                                    const gfx::ContextMode contextMode,
                                    const optional<std::string> localFontFamily)
@@ -40,7 +38,7 @@ HeadlessFrontend::HeadlessFrontend(Size size_,
             renderer->render(*updateParameters_);
         }
     }),
-    renderer(std::make_unique<Renderer>(backend, pixelRatio, scheduler, programCacheDir, localFontFamily)) {
+    renderer(std::make_unique<Renderer>(backend, pixelRatio, programCacheDir, localFontFamily)) {
 }
 
 HeadlessFrontend::~HeadlessFrontend() = default;

@@ -22,7 +22,6 @@
 
 namespace mbgl {
 
-class Scheduler;
 class RendererFrontend;
 
 namespace style {
@@ -34,7 +33,6 @@ class Map : private util::noncopyable {
 public:
     explicit Map(RendererFrontend&,
                  MapObserver&,
-                 Scheduler&,
                  const MapOptions&,
                  const ResourceOptions&);
     ~Map();

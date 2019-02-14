@@ -26,7 +26,6 @@ class UpdateParameters;
 class RenderStaticData;
 class RenderedQueryOptions;
 class SourceQueryOptions;
-class Scheduler;
 class GlyphManager;
 class ImageManager;
 class LineAtlas;
@@ -42,7 +41,6 @@ class Renderer::Impl : public GlyphManagerObserver,
 public:
     Impl(gfx::RendererBackend&,
          float pixelRatio_,
-         Scheduler&,
          const optional<std::string> programCacheDir,
          const optional<std::string> localFontFamily_);
     ~Impl() final;
@@ -99,7 +97,6 @@ private:
     friend class Renderer;
 
     gfx::RendererBackend& backend;
-    Scheduler& scheduler;
 
     RendererObserver* observer;
 

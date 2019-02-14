@@ -8,7 +8,6 @@
 #include <mbgl/util/color.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/style/style.hpp>
 
 /*
@@ -34,15 +33,14 @@ namespace {
 class LocalGlyphRasterizerTest {
 public:
     LocalGlyphRasterizerTest(const optional<std::string> fontFamily)
-        : frontend(1, threadPool, optional<std::string>(), gfx::ContextMode::Unique, fontFamily)
+        : frontend(1, optional<std::string>(), gfx::ContextMode::Unique, fontFamily)
     {
     }
 
     util::RunLoop loop;
     std::shared_ptr<StubFileSource> fileSource = std::make_shared<StubFileSource>();
-    ThreadPool threadPool { 4 };
     HeadlessFrontend frontend;
-    MapAdapter map { frontend, MapObserver::nullObserver(), fileSource, threadPool,
+    MapAdapter map { frontend, MapObserver::nullObserver(), fileSource,
                   MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize())};
 
     void checkRendering(const char * name) {

@@ -2,7 +2,6 @@
 
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/actor/scheduler.hpp>
@@ -27,8 +26,7 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
                                const jni::String& _programCacheDir,
                                const jni::String& _localIdeographFontFamily)
         : javaPeer(_env, _obj)
-        , pixelRatio(_pixelRatio)
-        , threadPool(sharedThreadPool()) {
+        , pixelRatio(_pixelRatio) {
 
     // Get a reference to the JavaVM for callbacks
     if (_env.GetJavaVM(&vm) < 0) {
@@ -58,8 +56,7 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
 
     showLogo = _showLogo;
     // Create the core snapshotter
-    snapshotter = std::make_unique<mbgl::MapSnapshotter>(threadPool,
-                                                         style,
+    snapshotter = std::make_unique<mbgl::MapSnapshotter>(style,
                                                          size,
                                                          pixelRatio,
                                                          cameraOptions,

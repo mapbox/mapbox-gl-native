@@ -2,7 +2,6 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
-#include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/storage/resource_options.hpp>
 #include <mbgl/style/style.hpp>
@@ -20,9 +19,8 @@ using namespace mbgl::style;
 TEST(CustomGeometrySource, Grid) {
     util::RunLoop loop;
 
-    auto threadPool = sharedThreadPool();
-    HeadlessFrontend frontend { 1, *threadPool };
-    Map map(frontend, MapObserver::nullObserver(), *threadPool,
+    HeadlessFrontend frontend { 1 };
+    Map map(frontend, MapObserver::nullObserver(),
             MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()),
             ResourceOptions().withCachePath(":memory:").withAssetPath("test/fixtures/api/assets"));
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));

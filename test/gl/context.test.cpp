@@ -4,7 +4,6 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gl/defines.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
@@ -88,11 +87,9 @@ struct Buffer {
 TEST(GLContextMode, Shared) {
     util::RunLoop loop;
 
-    ThreadPool threadPool(4);
+    HeadlessFrontend frontend { 1, {}, gfx::ContextMode::Shared };
 
-    HeadlessFrontend frontend { 1, threadPool, {}, gfx::ContextMode::Shared };
-
-    Map map(frontend, MapObserver::nullObserver(), threadPool,
+    Map map(frontend, MapObserver::nullObserver(),
             MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()),
             ResourceOptions().withCachePath(":memory:").withAssetPath("test/fixtures/api/assets"));
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));

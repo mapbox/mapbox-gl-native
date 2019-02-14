@@ -6,7 +6,6 @@
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/gfx/backend_scope.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -21,11 +20,10 @@ TEST(API, RenderWithoutCallback) {
 
     util::RunLoop loop;
 
-    ThreadPool threadPool(4);
-    HeadlessFrontend frontend { 1, threadPool };
+    HeadlessFrontend frontend { 1 };
 
     auto map = std::make_unique<MapAdapter>(frontend, MapObserver::nullObserver(),
-                                            std::make_shared<StubFileSource>(), threadPool,
+                                            std::make_shared<StubFileSource>(),
                                             MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()));
     map->renderStill(nullptr);
 

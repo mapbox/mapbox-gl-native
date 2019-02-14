@@ -5,7 +5,6 @@
 
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
-#include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/util.hpp>
 
 #include <QtGlobal>
@@ -25,7 +24,7 @@ class QMapboxGLMapRenderer : public QObject
     Q_OBJECT
 
 public:
-    QMapboxGLMapRenderer(qreal pixelRatio, mbgl::ThreadPool &, QMapboxGLSettings::GLContextMode, const QString &localFontFamily);
+    QMapboxGLMapRenderer(qreal pixelRatio, QMapboxGLSettings::GLContextMode, const QString &localFontFamily);
     virtual ~QMapboxGLMapRenderer();
 
     void render();

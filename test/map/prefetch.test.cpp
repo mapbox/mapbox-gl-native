@@ -6,7 +6,6 @@
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -22,7 +21,6 @@ using namespace std::chrono_literals;
 
 TEST(Map, PrefetchTiles) {
     util::RunLoop runLoop;
-    ThreadPool threadPool(4);
     std::shared_ptr<StubFileSource> fileSource = std::make_shared<StubFileSource>();
 
     util::Timer emergencyShutoff;
@@ -36,8 +34,8 @@ TEST(Map, PrefetchTiles) {
         runLoop.stop();
     };
 
-    HeadlessFrontend frontend { { 512, 512 }, 1, threadPool };
-    MapAdapter map(frontend, observer, fileSource, threadPool,
+    HeadlessFrontend frontend { { 512, 512 }, 1 };
+    MapAdapter map(frontend, observer, fileSource,
                 MapOptions().withMapMode(MapMode::Continuous).withSize(frontend.getSize()));
 
     std::vector<int> tiles;

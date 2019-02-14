@@ -1,3 +1,4 @@
+#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/test.hpp>
 #include <mbgl/test/util.hpp>
 

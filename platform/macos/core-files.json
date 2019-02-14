@@ -13,9 +13,7 @@
         "platform/default/src/mbgl/gl/headless_frontend.cpp",
         "platform/default/src/mbgl/map/map_snapshotter.cpp",
         "platform/default/src/mbgl/text/bidi.cpp",
-        "platform/default/src/mbgl/util/default_thread_pool.cpp",
         "platform/default/src/mbgl/util/png_writer.cpp",
-        "platform/default/src/mbgl/util/shared_thread_pool.cpp",
         "platform/default/src/mbgl/util/thread_local.cpp",
         "platform/default/src/mbgl/util/utf.cpp"
     ],
@@ -24,9 +22,7 @@
         "mbgl/util/image+MGLAdditions.hpp": "platform/darwin/include/mbgl/util/image+MGLAdditions.hpp",
         "mbgl/gl/headless_backend.hpp": "platform/default/include/mbgl/gl/headless_backend.hpp",
         "mbgl/gl/headless_frontend.hpp": "platform/default/include/mbgl/gl/headless_frontend.hpp",
-        "mbgl/map/map_snapshotter.hpp": "platform/default/include/mbgl/map/map_snapshotter.hpp",
-        "mbgl/util/default_thread_pool.hpp": "platform/default/include/mbgl/util/default_thread_pool.hpp",
-        "mbgl/util/shared_thread_pool.hpp": "platform/default/include/mbgl/util/shared_thread_pool.hpp"
+        "mbgl/map/map_snapshotter.hpp": "platform/default/include/mbgl/map/map_snapshotter.hpp"
     },
     "private_headers": {
         "CFHandle.hpp": "platform/darwin/src/CFHandle.hpp"

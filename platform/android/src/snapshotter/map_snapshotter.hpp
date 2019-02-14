@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/map/map_snapshotter.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/util.hpp>
 
 #include "../file_source.hpp"
@@ -63,7 +62,6 @@ private:
     float pixelRatio;
     bool showLogo;
 
-    std::shared_ptr<mbgl::ThreadPool> threadPool;
     std::unique_ptr<Actor<mbgl::MapSnapshotter::Callback>> snapshotCallback;
     std::unique_ptr<mbgl::MapSnapshotter> snapshotter;
 

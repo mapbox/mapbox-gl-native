@@ -14,8 +14,7 @@ namespace mbgl {
 
 class MapSnapshotter::Impl {
 public:
-    Impl(std::shared_ptr<Scheduler>,
-         const std::pair<bool, std::string> style,
+    Impl(const std::pair<bool, std::string> style,
          const Size&,
          const float pixelRatio,
          const optional<CameraOptions> cameraOptions,
@@ -42,13 +41,11 @@ public:
     void snapshot(ActorRef<MapSnapshotter::Callback>);
 
 private:
-    std::shared_ptr<Scheduler> scheduler;
     HeadlessFrontend frontend;
     Map map;
 };
 
-MapSnapshotter::Impl::Impl(std::shared_ptr<Scheduler> scheduler_,
-                           const std::pair<bool, std::string> style,
+MapSnapshotter::Impl::Impl(const std::pair<bool, std::string> style,
                            const Size& size,
                            const float pixelRatio,
                            const optional<CameraOptions> cameraOptions,
@@ -56,12 +53,10 @@ MapSnapshotter::Impl::Impl(std::shared_ptr<Scheduler> scheduler_,
                            const optional<std::string> programCacheDir,
                            const optional<std::string> localFontFamily,
                            const ResourceOptions& resourceOptions)
-    : scheduler(std::move(scheduler_)),
-      frontend(
-          size, pixelRatio, *scheduler, programCacheDir, gfx::ContextMode::Unique, localFontFamily),
+     : frontend(
+          size, pixelRatio, programCacheDir, gfx::ContextMode::Unique, localFontFamily),
       map(frontend,
           MapObserver::nullObserver(),
-          *scheduler,
           MapOptions().withMapMode(MapMode::Static).withSize(size).withPixelRatio(pixelRatio),
           resourceOptions) {
     if (style.first) {
@@ -168,8 +163,7 @@ LatLngBounds MapSnapshotter::Impl::getRegion() const {
     return map.latLngBoundsForCamera(getCameraOptions());
 }
 
-MapSnapshotter::MapSnapshotter(std::shared_ptr<Scheduler> scheduler,
-                               const std::pair<bool, std::string> style,
+MapSnapshotter::MapSnapshotter(const std::pair<bool, std::string> style,
                                const Size& size,
                                const float pixelRatio,
                                const optional<CameraOptions> cameraOptions,
@@ -178,7 +172,7 @@ MapSnapshotter::MapSnapshotter(std::shared_ptr<Scheduler> scheduler,
                                const optional<std::string> localFontFamily,
                                const ResourceOptions& resourceOptions)
    : impl(std::make_unique<util::Thread<MapSnapshotter::Impl>>(
-       "Map Snapshotter", std::move(scheduler), style, size, pixelRatio, cameraOptions,
+       "Map Snapshotter", style, size, pixelRatio, cameraOptions,
        region, programCacheDir, localFontFamily, resourceOptions.clone())) {}
 
 MapSnapshotter::~MapSnapshotter() = default;

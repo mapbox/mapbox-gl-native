@@ -3,7 +3,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
@@ -30,9 +29,8 @@ public:
     }
 
     util::RunLoop loop;
-    ThreadPool threadPool{ 4 };
-    HeadlessFrontend frontend { { 1000, 1000 }, 1, threadPool };
-    Map map { frontend, MapObserver::nullObserver(), threadPool,
+    HeadlessFrontend frontend { { 1000, 1000 }, 1 };
+    Map map { frontend, MapObserver::nullObserver(),
               MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize()),
               ResourceOptions().withCachePath("benchmark/fixtures/api/cache.db").withAssetPath(".").withAccessToken("foobar") };
     ScreenBox box{{ 0, 0 }, { 1000, 1000 }};
