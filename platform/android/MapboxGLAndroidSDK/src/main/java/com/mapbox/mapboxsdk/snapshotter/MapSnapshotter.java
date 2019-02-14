@@ -99,7 +99,7 @@ public class MapSnapshotter {
     private LatLngBounds region;
     private CameraPosition cameraPosition;
     private boolean showLogo = true;
-    private String localIdeographFontFamily;
+    private String localIdeographFontFamily = "sans-serif";
     private String apiBaseUrl;
 
     /**
