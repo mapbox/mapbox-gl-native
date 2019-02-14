@@ -3,7 +3,6 @@
 #import "MGLFoundation_Private.h"
 #import "MGLAccountManager_Private.h"
 #import "MGLGeometry_Private.h"
-#import "MGLNetworkConfiguration.h"
 #import "MGLOfflinePack_Private.h"
 #import "MGLOfflineRegion_Private.h"
 #import "MGLTilePyramidOfflineRegion.h"
@@ -159,7 +158,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
     NSString *bundleIdentifier = [NSBundle mgl_applicationBundleIdentifier];
     if (!bundleIdentifier) {
         // There’s no main bundle identifier when running in a unit test bundle.
-        bundleIdentifier = [NSBundle bundleForClass:self].bundleIdentifier;
+        bundleIdentifier = [[NSUUID UUID] UUIDString];
     }
     cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
     if (useSubdirectory) {
@@ -227,11 +226,11 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String, [NSBundle mainBundle].resourceURL.path.UTF8String);
 
         // Observe for changes to the API base URL (and find out the current one).
-        [[MGLNetworkConfiguration sharedManager] addObserver:self
-                                                  forKeyPath:@"apiBaseURL"
-                                                     options:(NSKeyValueObservingOptionInitial |
+        [[MGLAccountManager sharedManager] addObserver:self
+                                            forKeyPath:@"apiBaseURL"
+                                               options:(NSKeyValueObservingOptionInitial |
                                                               NSKeyValueObservingOptionNew)
-                                                     context:NULL];
+                                               context:NULL];
 
         // Observe for changes to the global access token (and find out the current one).
         [[MGLAccountManager sharedManager] addObserver:self
@@ -245,7 +244,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[MGLNetworkConfiguration sharedManager] removeObserver:self forKeyPath:@"apiBaseURL"];
+    [[MGLAccountManager sharedManager] removeObserver:self forKeyPath:@"apiBaseURL"];
     [[MGLAccountManager sharedManager] removeObserver:self forKeyPath:@"accessToken"];
 
     for (MGLOfflinePack *pack in self.packs) {
@@ -263,7 +262,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         if (![accessToken isKindOfClass:[NSNull class]]) {
             self.mbglFileSource->setAccessToken(accessToken.UTF8String);
         }
-    } else if ([keyPath isEqualToString:@"apiBaseURL"] && object == [MGLNetworkConfiguration sharedManager]) {
+    } else if ([keyPath isEqualToString:@"apiBaseURL"] && object == [MGLAccountManager sharedManager]) {
         NSURL *apiBaseURL = change[NSKeyValueChangeNewKey];
         if ([apiBaseURL isKindOfClass:[NSNull class]]) {
             self.mbglFileSource->setAPIBaseURL(mbgl::util::API_BASE_URL);

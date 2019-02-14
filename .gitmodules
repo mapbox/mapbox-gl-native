@@ -79,3 +79,15 @@
 [submodule "vendor/eternal"]
 	path = vendor/eternal
 	url = https://github.com/mapbox/eternal.git
+[submodule "platform/android/vendor/mapbox-gestures-android"]
+	path = platform/android/vendor/mapbox-gestures-android
+	url = https://github.com/mapbox/mapbox-gestures-android.git
+[submodule "platform/android/vendor/mapbox-java"]
+	path = platform/android/vendor/mapbox-java
+	url = https://github.com/mapbox/mapbox-java.git
+[submodule "platform/android/vendor/mapbox-events-android"]
+	path = platform/android/vendor/mapbox-events-android
+	url = https://github.com/mapbox/mapbox-events-android.git
+[submodule "platform/darwin/docs/theme"]
+	path = platform/darwin/docs/theme
+	url = https://github.com/mapbox/jazzy-theme.git

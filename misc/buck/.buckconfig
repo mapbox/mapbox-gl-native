@@ -1,0 +1,15 @@
+[ndk]
+cpu_abis = armv7
+compiler = clang
+app_platform = android-14
+
+[project]
+ignore = .git
+allow_symlinks = allow
+
+[cxx]
+default_platform = iphonesimulator-x86_64
+
+[apple]
+iphonesimulator_target_sdk_version = 9.0
+iphoneos_target_sdk_version = 9.0

@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Toast;
+
 import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
@@ -43,7 +44,7 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
 
   private LocationComponent locationComponent;
   private MapboxMap mapboxMap;
-  private boolean customStyle;
+  private boolean defaultStyle = false;
 
   private static final String SAVED_STATE_CAMERA = "saved_state_camera";
   private static final String SAVED_STATE_RENDER = "saved_state_render";
@@ -124,18 +125,6 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
     this.mapboxMap = mapboxMap;
 
     mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
-      int[] padding;
-      if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-        padding = new int[] {0, 750, 0, 0};
-      } else {
-        padding = new int[] {0, 250, 0, 0};
-      }
-
-      LocationComponentOptions options = LocationComponentOptions.builder(this)
-        .padding(padding)
-        .layerBelow("waterway-label")
-        .build();
-
       locationComponent = mapboxMap.getLocationComponent();
       locationComponent.activateLocationComponent(this, style, true,
         new LocationEngineRequest.Builder(750)
@@ -143,7 +132,7 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
           .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
           .build()
       );
-      locationComponent.applyStyle(options);
+      toggleStyle();
       locationComponent.setLocationComponentEnabled(true);
       locationComponent.addOnLocationClickListener(this);
       locationComponent.addOnCameraTrackingChangedListener(this);
@@ -185,6 +174,10 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
     } else if (id == R.id.action_gestures_management_enabled) {
       enableGesturesManagement();
       return true;
+    } else if (id == R.id.action_component_throttling_enabled) {
+      locationComponent.setMaxAnimationFps(5);
+    } else if (id == R.id.action_component_throttling_disabled) {
+      locationComponent.setMaxAnimationFps(Integer.MAX_VALUE);
     }
 
     return super.onOptionsItemSelected(item);
@@ -195,10 +188,25 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
       return;
     }
 
-    customStyle = !customStyle;
-    locationComponent.applyStyle(
-      this,
-      customStyle ? R.style.CustomLocationComponent : R.style.mapbox_LocationComponent);
+    defaultStyle = !defaultStyle;
+    LocationComponentOptions options = LocationComponentOptions.createFromAttributes(
+      this, defaultStyle ? R.style.mapbox_LocationComponent : R.style.CustomLocationComponent);
+
+    if (defaultStyle) {
+      int[] padding;
+      if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+        padding = new int[] {0, 750, 0, 0};
+      } else {
+        padding = new int[] {0, 250, 0, 0};
+      }
+
+      options = options.toBuilder()
+        .padding(padding)
+        .layerBelow("road-label")
+        .build();
+    }
+
+    locationComponent.applyStyle(options);
   }
 
   private void toggleMapStyle() {

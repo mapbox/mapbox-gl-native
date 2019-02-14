@@ -73,6 +73,9 @@ If you are using Arch Linux, install [ncurses5-compat-libs](https://aur.archlinu
 Mapbox uses specific IDE settings related to code and check style.
 See [checkstyle guide](https://github.com/mapbox/mapbox-gl-native/wiki/Setting-up-Mapbox-checkstyle) for configuration details.
 
+#### Resolving duplicate file entries
+With buck build support, Android Studio can complain about duplicate source files. To remove this warning, open `MapboxGLAndroidSDK.iml` find the list of `excludeFolder` entries and add `<excludeFolder url="file://$MODULE_DIR$/../../../misc/" />` line.
+
 ##### Setting Mapbox Access Token
 
 _The test application (used for development purposes) uses Mapbox vector tiles, which require a Mapbox account and API access token. Obtain a free access token on the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/)._

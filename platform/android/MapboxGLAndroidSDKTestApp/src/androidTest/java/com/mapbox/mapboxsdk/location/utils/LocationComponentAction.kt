@@ -7,6 +7,7 @@ import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
 import android.view.View
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.location.LocationComponent
+import com.mapbox.mapboxsdk.maps.Style
 import org.hamcrest.Matcher
 
 class LocationComponentAction(private val mapboxMap: MapboxMap,
@@ -24,11 +25,12 @@ class LocationComponentAction(private val mapboxMap: MapboxMap,
     onPerformLocationComponentAction.onLocationComponentAction(
       mapboxMap.locationComponent,
       mapboxMap,
+      mapboxMap.style!!,
       uiController,
       view.context)
   }
 
   interface OnPerformLocationComponentAction {
-    fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap, uiController: UiController, context: Context)
+    fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap, style: Style, uiController: UiController, context: Context)
   }
 }

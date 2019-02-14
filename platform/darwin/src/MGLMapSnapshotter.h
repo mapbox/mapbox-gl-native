@@ -165,7 +165,7 @@ typedef void (^MGLMapSnapshotCompletionHandler)(MGLMapSnapshot* _Nullable snapsh
  ```
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/map-snapshotter/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/map-snapshotter/">
  Create a static map snapshot</a> example to learn how to use the
  `MGLMapSnapshotter` to generate a static image based on an `MGLMapView`
  object's style, camera, and view bounds.

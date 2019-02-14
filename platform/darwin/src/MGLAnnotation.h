@@ -18,8 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
  The other methods of this protocol are optional.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-models/">
- Annotation models</a> and <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-views/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/annotation-models/">
+ Annotation models</a> and <a href="https://docs.mapbox.com/ios/maps/examples/annotation-views/">
  Annotation views</a> examples to learn how to add objects that follow the
  `MGLAnnotation` protocol.
  */

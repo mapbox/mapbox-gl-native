@@ -14,8 +14,7 @@ import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.exceptions.InvalidMarkerPositionException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
@@ -39,18 +38,7 @@ import static org.junit.Assert.assertTrue;
  * @deprecated remove this file when removing deprecated annotations
  */
 @Deprecated
-public class MapboxMapTest extends BaseActivityTest {
-
-  @Override
-  protected Class getActivityClass() {
-    return EspressoTestActivity.class;
-  }
-
-  @Test
-  public void testSanity() {
-    validateTestSetup();
-    assertNotNull("mapboxMap should not be null", mapboxMap);
-  }
+public class MapboxMapTest extends EspressoTest {
 
   //
   // InfoWindow

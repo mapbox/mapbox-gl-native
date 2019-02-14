@@ -2,14 +2,6 @@
 
 @implementation MGLNetworkConfiguration
 
-+ (void)load {
-    // Read the initial configuration from Info.plist.
-    NSString *apiBaseURL = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMapboxAPIBaseURL"];
-    if (apiBaseURL.length) {
-        [self setAPIBaseURL:[NSURL URLWithString:apiBaseURL]];
-    }
-}
-
 + (instancetype)sharedManager {
     static dispatch_once_t onceToken;
     static MGLNetworkConfiguration *_sharedManager;
@@ -26,14 +18,6 @@
         setupBlock();
     }
     return _sharedManager;
-}
-
-+ (void)setAPIBaseURL:(NSURL *)apiBaseURL {
-    [MGLNetworkConfiguration sharedManager].apiBaseURL = apiBaseURL;
-}
-
-+ (NSURL *)apiBaseURL {
-    return [MGLNetworkConfiguration sharedManager].apiBaseURL;
 }
 
 @end

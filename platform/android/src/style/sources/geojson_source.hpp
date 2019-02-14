@@ -5,6 +5,7 @@
 #include "../../geojson/geometry.hpp"
 #include "../../geojson/feature.hpp"
 #include "../../geojson/feature_collection.hpp"
+#include "../../android_renderer_frontend.hpp"
 #include <jni/jni.hpp>
 
 namespace mbgl {
@@ -48,6 +49,10 @@ private:
 
     jni::Local<jni::Array<jni::Object<geojson::Feature>>> querySourceFeatures(jni::JNIEnv&,
                                                                   const jni::Array<jni::Object<>>&);
+
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> getClusterChildren(jni::JNIEnv&, const jni::Object<geojson::Feature>&);
+    jni::Local<jni::Array<jni::Object<geojson::Feature>>> getClusterLeaves(jni::JNIEnv&, const jni::Object<geojson::Feature>&, jni::jlong, jni::jlong);
+    jint getClusterExpansionZoom(jni::JNIEnv&, const jni::Object<geojson::Feature>&);
 
     jni::Local<jni::String> getURL(jni::JNIEnv&);
 

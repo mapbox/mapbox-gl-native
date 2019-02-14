@@ -1,7 +1,7 @@
 include(cmake/loop-darwin.cmake)
 
 macro(mbgl_platform_core)
-    target_sources_from_file(mbgl-core PRIVATE platform/macos/core-files.txt)
+    target_sources_from_file(mbgl-core PRIVATE platform/macos/core-files.json)
 
     if(WITH_EGL)
         target_sources(mbgl-core
@@ -39,8 +39,8 @@ endmacro()
 
 
 macro(mbgl_filesource)
-    # Modify platform/darwin/filesource-files.txt to change the source files for this target.
-    target_sources_from_file(mbgl-filesource PRIVATE platform/darwin/filesource-files.txt)
+    # Modify platform/darwin/filesource-files.json to change the source files for this target.
+    target_sources_from_file(mbgl-filesource PRIVATE platform/darwin/filesource-files.json)
 
     target_compile_options(mbgl-filesource
         PRIVATE -fobjc-arc
@@ -102,11 +102,11 @@ endmacro()
 macro(mbgl_platform_benchmark)
     target_sources(mbgl-benchmark
         PRIVATE platform/default/src/mbgl/layermanager/layer_manager.cpp
-        PRIVATE benchmark/src/main.cpp
+        PRIVATE platform/default/src/mbgl/benchmark/main.cpp
     )
 
     set_source_files_properties(
-        benchmark/src/main.cpp
+        platform/default/src/mbgl/benchmark/main.cpp
             PROPERTIES
         COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
     )

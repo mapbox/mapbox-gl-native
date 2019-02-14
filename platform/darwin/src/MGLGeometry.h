@@ -150,7 +150,7 @@ NS_INLINE BOOL MGLCoordinateBoundsIntersectsCoordinateBounds(MGLCoordinateBounds
  Returns `YES` if the coordinate is within the coordinate bounds.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/constraining-gestures/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/constraining-gestures/">
  Restrict map panning to an area</a> example to learn how to use
  `MGLCoordinateInCoordinateBounds` to determine if a point is within, or
  intersects, a given bounding box.

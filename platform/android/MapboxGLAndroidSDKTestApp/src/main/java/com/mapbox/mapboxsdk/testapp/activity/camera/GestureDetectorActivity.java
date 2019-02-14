@@ -30,8 +30,8 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.FontCache;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
@@ -66,18 +66,15 @@ public class GestureDetectorActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_gesture_detector);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(@NonNull MapboxMap mapboxMap) {
-        GestureDetectorActivity.this.mapboxMap = mapboxMap;
-        mapboxMap.setStyle(Style.MAPBOX_STREETS);
-        initializeMap();
-      }
+    mapView.getMapAsync(mapboxMap -> {
+      GestureDetectorActivity.this.mapboxMap = mapboxMap;
+      mapboxMap.setStyle(Style.MAPBOX_STREETS);
+      initializeMap();
     });
 
-    recyclerView = (RecyclerView) findViewById(R.id.alerts_recycler);
+    recyclerView = findViewById(R.id.alerts_recycler);
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
     gestureAlertsAdapter = new GestureAlertsAdapter();
@@ -136,47 +133,50 @@ public class GestureDetectorActivity extends AppCompatActivity {
     recyclerView.setLayoutParams(layoutParams);
 
     attachListeners();
+
+    fixedFocalPointEnabled(mapboxMap.getUiSettings().getFocalPoint() != null);
   }
 
   public void attachListeners() {
     mapboxMap.addOnMoveListener(new MapboxMap.OnMoveListener() {
       @Override
-      public void onMoveBegin(MoveGestureDetector detector) {
+      public void onMoveBegin(@NonNull MoveGestureDetector detector) {
         gestureAlertsAdapter.addAlert(new GestureAlert(GestureAlert.TYPE_START, "MOVE START"));
       }
 
       @Override
-      public void onMove(MoveGestureDetector detector) {
+      public void onMove(@NonNull MoveGestureDetector detector) {
         gestureAlertsAdapter.addAlert(new GestureAlert(GestureAlert.TYPE_PROGRESS, "MOVE PROGRESS"));
       }
 
       @Override
-      public void onMoveEnd(MoveGestureDetector detector) {
+      public void onMoveEnd(@NonNull MoveGestureDetector detector) {
         gestureAlertsAdapter.addAlert(new GestureAlert(GestureAlert.TYPE_END, "MOVE END"));
+        recalculateFocalPoint();
       }
     });
 
     mapboxMap.addOnRotateListener(new MapboxMap.OnRotateListener() {
       @Override
-      public void onRotateBegin(RotateGestureDetector detector) {
+      public void onRotateBegin(@NonNull RotateGestureDetector detector) {
         gestureAlertsAdapter.addAlert(new GestureAlert(GestureAlert.TYPE_START, "ROTATE START"));
       }
 
       @Override
-      public void onRotate(RotateGestureDetector detector) {
+      public void onRotate(@NonNull RotateGestureDetector detector) {
         gestureAlertsAdapter.addAlert(new GestureAlert(GestureAlert.TYPE_PROGRESS, "ROTATE PROGRESS"));
         recalculateFocalPoint();
       }
 
       @Override
-      public void onRotateEnd(RotateGestureDetector detector) {
+      public void onRotateEnd(@NonNull RotateGestureDetector detector) {
         gestureAlertsAdapter.addAlert(new GestureAlert(GestureAlert.TYPE_END, "ROTATE END"));
       }
     });
 
     mapboxMap.addOnScaleListener(new MapboxMap.OnScaleListener() {
       @Override
-      public void onScaleBegin(StandardScaleGestureDetector detector) {
+      public void onScaleBegin(@NonNull StandardScaleGestureDetector detector) {
         gestureAlertsAdapter.addAlert(new GestureAlert(GestureAlert.TYPE_START, "SCALE START"));
         if (focalPointLatLng != null) {
           gestureAlertsAdapter.addAlert(new GestureAlert(GestureAlert.TYPE_OTHER, "INCREASING MOVE THRESHOLD"));
@@ -190,12 +190,12 @@ public class GestureDetectorActivity extends AppCompatActivity {
       }
 
       @Override
-      public void onScale(StandardScaleGestureDetector detector) {
+      public void onScale(@NonNull StandardScaleGestureDetector detector) {
         gestureAlertsAdapter.addAlert(new GestureAlert(GestureAlert.TYPE_PROGRESS, "SCALE PROGRESS"));
       }
 
       @Override
-      public void onScaleEnd(StandardScaleGestureDetector detector) {
+      public void onScaleEnd(@NonNull StandardScaleGestureDetector detector) {
         gestureAlertsAdapter.addAlert(new GestureAlert(GestureAlert.TYPE_END, "SCALE END"));
 
         if (focalPointLatLng != null) {
@@ -207,17 +207,17 @@ public class GestureDetectorActivity extends AppCompatActivity {
 
     mapboxMap.addOnShoveListener(new MapboxMap.OnShoveListener() {
       @Override
-      public void onShoveBegin(ShoveGestureDetector detector) {
+      public void onShoveBegin(@NonNull ShoveGestureDetector detector) {
         gestureAlertsAdapter.addAlert(new GestureAlert(GestureAlert.TYPE_START, "SHOVE START"));
       }
 
       @Override
-      public void onShove(ShoveGestureDetector detector) {
+      public void onShove(@NonNull ShoveGestureDetector detector) {
         gestureAlertsAdapter.addAlert(new GestureAlert(GestureAlert.TYPE_PROGRESS, "SHOVE PROGRESS"));
       }
 
       @Override
-      public void onShoveEnd(ShoveGestureDetector detector) {
+      public void onShoveEnd(@NonNull ShoveGestureDetector detector) {
         gestureAlertsAdapter.addAlert(new GestureAlert(GestureAlert.TYPE_END, "SHOVE END"));
       }
     });
@@ -231,31 +231,50 @@ public class GestureDetectorActivity extends AppCompatActivity {
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    resetModes();
+    UiSettings uiSettings = mapboxMap.getUiSettings();
     switch (item.getItemId()) {
-      case R.id.menu_gesture_none:
-        return true;
       case R.id.menu_gesture_focus_point:
-        focalPointLatLng = new LatLng(51.50325, -0.12968);
-        marker = mapboxMap.addMarker(new MarkerOptions().position(focalPointLatLng));
-        mapboxMap.easeCamera(CameraUpdateFactory.newLatLngZoom(focalPointLatLng, 16));
-        mapboxMap.getUiSettings().setFocalPoint(mapboxMap.getProjection().toScreenLocation(focalPointLatLng));
+        fixedFocalPointEnabled(focalPointLatLng == null);
         return true;
       case R.id.menu_gesture_animation:
-        mapboxMap.getUiSettings().setAllVelocityAnimationsEnabled(false);
+        uiSettings.setScaleVelocityAnimationEnabled(!uiSettings.isScaleVelocityAnimationEnabled());
+        uiSettings.setRotateVelocityAnimationEnabled(!uiSettings.isRotateGesturesEnabled());
+        uiSettings.setFlingVelocityAnimationEnabled(!uiSettings.isFlingVelocityAnimationEnabled());
+        return true;
+      case R.id.menu_gesture_rotate:
+        uiSettings.setRotateGesturesEnabled(!uiSettings.isRotateGesturesEnabled());
+        return true;
+      case R.id.menu_gesture_tilt:
+        uiSettings.setTiltGesturesEnabled(!uiSettings.isTiltGesturesEnabled());
+        return true;
+      case R.id.menu_gesture_zoom:
+        uiSettings.setZoomGesturesEnabled(!uiSettings.isZoomGesturesEnabled());
+        return true;
+      case R.id.menu_gesture_scroll:
+        uiSettings.setScrollGesturesEnabled(!uiSettings.isScrollGesturesEnabled());
+        return true;
+      case R.id.menu_gesture_double_tap:
+        uiSettings.setDoubleTapGesturesEnabled(!uiSettings.isDoubleTapGesturesEnabled());
+        return true;
+      case R.id.menu_gesture_quick_zoom:
+        uiSettings.setQuickZoomGesturesEnabled(!uiSettings.isQuickZoomGesturesEnabled());
+        return true;
     }
     return super.onOptionsItemSelected(item);
   }
 
-  private void resetModes() {
-    focalPointLatLng = null;
-    mapboxMap.getUiSettings().setFocalPoint(null);
-    gesturesManager.getMoveGestureDetector().setMoveThreshold(0f);
-    mapboxMap.getUiSettings().setAllVelocityAnimationsEnabled(true);
-
-    if (marker != null) {
-      mapboxMap.removeMarker(marker);
-      marker = null;
+  private void fixedFocalPointEnabled(boolean enabled) {
+    if (enabled) {
+      focalPointLatLng = new LatLng(51.50325, -0.12968);
+      marker = mapboxMap.addMarker(new MarkerOptions().position(focalPointLatLng));
+      mapboxMap.easeCamera(CameraUpdateFactory.newLatLngZoom(focalPointLatLng, 16));
+    } else {
+      if (marker != null) {
+        mapboxMap.removeMarker(marker);
+        marker = null;
+      }
+      focalPointLatLng = null;
+      mapboxMap.getUiSettings().setFocalPoint(null);
     }
   }
 
@@ -283,20 +302,21 @@ public class GestureDetectorActivity extends AppCompatActivity {
       ViewHolder(View view) {
         super(view);
         Typeface typeface = FontCache.get("Roboto-Regular.ttf", view.getContext());
-        alertMessageTv = (TextView) view.findViewById(R.id.alert_message);
+        alertMessageTv = view.findViewById(R.id.alert_message);
         alertMessageTv.setTypeface(typeface);
       }
     }
 
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
       View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_gesture_alert, parent, false);
       return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
       GestureAlert alert = alerts.get(position);
       holder.alertMessageTv.setText(alert.getMessage());
       holder.alertMessageTv.setTextColor(

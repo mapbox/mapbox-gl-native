@@ -482,12 +482,12 @@
     XCTAssert(self.style.transition.duration == transitionTest.duration);
 }
 
-- (void)testEnablePlacementTransition
+- (void)testPerformsPlacementTransitions
 {
-    XCTAssertTrue(self.style.enablePlacementTransitions, @"The default value for enabling placement transitions should be YES.");
+    XCTAssertTrue(self.style.performsPlacementTransitions, @"The default value for enabling placement transitions should be YES.");
     
-    self.style.enablePlacementTransitions = NO;
-    XCTAssertFalse(self.style.enablePlacementTransitions, @"Enabling placement transitions should be NO.");
+    self.style.performsPlacementTransitions = NO;
+    XCTAssertFalse(self.style.performsPlacementTransitions, @"Enabling placement transitions should be NO.");
 }
 
 @end

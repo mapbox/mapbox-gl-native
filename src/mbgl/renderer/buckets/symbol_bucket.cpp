@@ -9,9 +9,7 @@ namespace mbgl {
 using namespace style;
 
 SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layout_,
-                           const std::map<std::string, std::pair<
-                               style::IconPaintProperties::PossiblyEvaluated,
-                               style::TextPaintProperties::PossiblyEvaluated>>& layerPaintProperties,
+                           const std::map<std::string, style::SymbolPaintProperties::PossiblyEvaluated>& paintProperties_,
                            const style::PropertyValue<float>& textSize,
                            const style::PropertyValue<float>& iconSize,
                            float zoom,
@@ -20,8 +18,7 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
                            bool sortFeaturesByY_,
                            const std::string bucketName_,
                            const std::vector<SymbolInstance>&& symbolInstances_)
-    : Bucket(LayerType::Symbol),
-      layout(std::move(layout_)),
+    : layout(std::move(layout_)),
       sdfIcons(sdfIcons_),
       iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
       sortFeaturesByY(sortFeaturesByY_),
@@ -30,16 +27,19 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
       textSizeBinder(SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue())),
       iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())) {
 
-    for (const auto& pair : layerPaintProperties) {
-        paintPropertyBinders.emplace(
+    for (const auto& pair : paintProperties_) {
+        paintProperties.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(pair.first),
-            std::forward_as_tuple(
-                std::piecewise_construct,
-                std::forward_as_tuple(pair.second.first, zoom),
-                std::forward_as_tuple(pair.second.second, zoom)));
+            std::forward_as_tuple(PaintProperties {
+                pair.second,
+                { RenderSymbolLayer::iconPaintProperties(pair.second), zoom },
+                { RenderSymbolLayer::textPaintProperties(pair.second), zoom }
+            }));
     }
 }
+
+SymbolBucket::~SymbolBucket() = default;
 
 void SymbolBucket::upload(gl::Context& context) {
     if (hasTextData()) {
@@ -110,9 +110,9 @@ void SymbolBucket::upload(gl::Context& context) {
     }
 
     if (!staticUploaded) {
-        for (auto& pair : paintPropertyBinders) {
-            pair.second.first.upload(context);
-            pair.second.second.upload(context);
+        for (auto& pair : paintProperties) {
+            pair.second.iconBinders.upload(context);
+            pair.second.textBinders.upload(context);
         }
     }
 
@@ -125,6 +125,10 @@ void SymbolBucket::upload(gl::Context& context) {
 
 bool SymbolBucket::hasData() const {
     return hasTextData() || hasIconData() || hasCollisionBoxData();
+}
+
+bool SymbolBucket::supportsLayer(const style::Layer::Impl& impl) const {
+    return style::SymbolLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
 }
 
 bool SymbolBucket::hasTextData() const {

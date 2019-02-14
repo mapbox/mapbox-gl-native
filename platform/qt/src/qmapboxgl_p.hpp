@@ -65,5 +65,7 @@ private:
     QMapboxGLSettings::GLContextMode m_mode;
     qreal m_pixelRatio;
 
+    QString m_localFontFamily;
+
     std::atomic_flag m_renderQueued = ATOMIC_FLAG_INIT;
 };

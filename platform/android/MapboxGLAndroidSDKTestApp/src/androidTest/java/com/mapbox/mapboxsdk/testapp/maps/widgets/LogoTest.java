@@ -6,8 +6,7 @@ import android.view.View;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 
 import org.hamcrest.Matcher;
 import org.junit.Test;
@@ -18,12 +17,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.not;
 
-public class LogoTest extends BaseActivityTest {
-
-  @Override
-  protected Class getActivityClass() {
-    return EspressoTestActivity.class;
-  }
+public class LogoTest extends EspressoTest {
 
   @Test
   public void testDefault() {

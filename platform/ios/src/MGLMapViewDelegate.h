@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 
-#import "MGLTypes.h"
+#import "Mapbox.h"
 #import "MGLCameraChangeReason.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
  `oldCamera` or change to `newCamera`.
 
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/constraining-gestures/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/constraining-gestures/">
  Restrict map panning to an area</a> example to learn how to use this method
  and `MGLMapCamera` objects to restrict a users ability to pan your map.
  */
@@ -116,7 +116,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param mapView The map view whose viewpoint is changing.
 
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/clustering/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/clustering/">
  Cluster point data</a> example to learn how to trigger an action whenever
  the map region changes.
  */
@@ -268,8 +268,8 @@ NS_ASSUME_NONNULL_BEGIN
  @param style The style that was loaded.
 
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/runtime-multiple-annotations/">
- Dynamically style interactive points</a> and <a href="https://www.mapbox.com/ios-sdk/maps/examples/shape-collection/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/runtime-multiple-annotations/">
+ Dynamically style interactive points</a> and <a href="https://docs.mapbox.com/ios/maps/examples/shape-collection/">
  Add multiple shapes from a single shape source</a> examples to learn how to
  ensure a map's style has loaded before modifying it at runtime.
  */
@@ -346,7 +346,7 @@ NS_ASSUME_NONNULL_BEGIN
  the map view with respect to the content insets.
 
  This method will override any values set by `MGLMapView.userLocationVerticalAlignment`
- or `-[MGLMapView setUserLocationVerticalAlignment:]`.
+ or `-[MGLMapView setUserLocationVerticalAlignment:animated:]`.
 
  @param mapView The map view that is tracking the user's location.
  */
@@ -374,9 +374,9 @@ NS_ASSUME_NONNULL_BEGIN
     `nil` if you want to display the default marker image or an annotation view.
 
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-models/">
- Annotation models</a>, <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-view-image/">
- Add annotation views and images</a>, and <a href="https://www.mapbox.com/ios-sdk/maps/examples/marker-image/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/annotation-models/">
+ Annotation models</a>, <a href="https://docs.mapbox.com/ios/maps/examples/annotation-view-image/">
+ Add annotation views and images</a>, and <a href="https://docs.mapbox.com/ios/maps/examples/marker-image/">
  Mark a place on the map with an image</a> examples to learn to specify which
  image should be used for `MGLAnnotation` objects that have been added to
  your map.
@@ -414,7 +414,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return A color to use for the shape outline.
 
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-models/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/annotation-models/">
  Annotation models</a> example to learn how to modify the outline color of an
  `MGLShape` object that has been added to your map as an annotation.
  */
@@ -434,7 +434,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return The polygon’s interior fill color.
 
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/polygon/">Add
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/polygon/">Add
  a polygon annotation</a> example to learn how to modify the color of a an
  `MGLPolygon` at runtime.
  */
@@ -451,7 +451,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return A line width for the polyline, measured in points.
 
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/line-geojson/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/line-geojson/">
  Add a line annotation from GeoJSON</a> example to learn how to modify the
  line width of an `MGLPolylineFeature` on your map.
  */
@@ -483,7 +483,7 @@ NS_ASSUME_NONNULL_BEGIN
     want to display an annotation image instead.
 
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-view-image/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/annotation-view-image/">
  Add annotation views and images</a> example to learn how to specify what
  `MGLViewAnnotation` to use for a given `MGLPointAnnotation` object on your
  map.
@@ -530,7 +530,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param annotation The annotation that was selected.
 
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/runtime-multiple-annotations/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/runtime-multiple-annotations/">
  Dynamically style interactive points</a> example to learn how to remove an
  annotation view if it has already been selected.
  */
@@ -609,9 +609,9 @@ NS_ASSUME_NONNULL_BEGIN
     callout.
 
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-view-image/">
- Add annotation views and images</a>, <a href="https://www.mapbox.com/ios-sdk/maps/examples/custom-callout/">
- Display custom views as callouts</a>, and <a href="https://www.mapbox.com/ios-sdk/maps/examples/default-callout/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/annotation-view-image/">
+ Add annotation views and images</a>, <a href="https://docs.mapbox.com/ios/maps/examples/custom-callout/">
+ Display custom views as callouts</a>, and <a href="https://docs.mapbox.com/ios/maps/examples/default-callout/">
  Default callout usage</a> examples to learn how to show callouts for
  `MGLAnnotation` objects.
  */
@@ -633,7 +633,7 @@ NS_ASSUME_NONNULL_BEGIN
     default callout view.
 
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/custom-callout/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/custom-callout/">
  Display custom views as callouts</a> example to learn how to customize an
  `MGLAnnotation` object's `MGLCalloutView`.
  */
@@ -664,7 +664,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return The accessory view to display.
 
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/default-callout/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/default-callout/">
  Default callout usage</a> example to learn how to modify the view that is
  displayed on the left side of the standard callout bubble.
  */
@@ -695,7 +695,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return The accessory view to display.
 
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/default-callout/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/default-callout/">
  Default callout usage</a> example to learn how to modify the view that is
  displayed on the right side of the standard callout bubble.
  */
@@ -725,7 +725,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param control The control that was tapped.
 
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/default-callout/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/default-callout/">
  Default callout usage</a> example to learn how to trigger an action when the
  standard callout bubble's accessory control is tapped.
  */
@@ -748,7 +748,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param annotation The annotation whose callout was tapped.
 
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/custom-callout/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/custom-callout/">
  Display custom views as callouts</a> example to learn how to trigger an
  action when an `MGLAnnotation`s `MGLCalloutView` is tapped.
  */

@@ -8,14 +8,14 @@ namespace mbgl {
 using namespace style;
 
 RasterBucket::RasterBucket(PremultipliedImage&& image_)
-    : Bucket(LayerType::Raster),
-      image(std::make_shared<PremultipliedImage>(std::move(image_))) {
+    : image(std::make_shared<PremultipliedImage>(std::move(image_))) {
 }
 
 RasterBucket::RasterBucket(std::shared_ptr<PremultipliedImage> image_)
-    : Bucket(LayerType::Raster),
-      image(image_) {
+    : image(std::move(image_)) {
 }
+
+RasterBucket::~RasterBucket() = default;
 
 void RasterBucket::upload(gl::Context& context) {
     if (!hasData()) {
@@ -108,5 +108,10 @@ void RasterBucket::setMask(TileMask&& mask_) {
 bool RasterBucket::hasData() const {
     return !!image;
 }
+
+bool RasterBucket::supportsLayer(const style::Layer::Impl& impl) const {
+    return style::RasterLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
+}
+
 
 } // namespace mbgl

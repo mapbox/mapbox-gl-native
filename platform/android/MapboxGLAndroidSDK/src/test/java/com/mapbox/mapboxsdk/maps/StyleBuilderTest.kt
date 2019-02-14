@@ -1,11 +1,14 @@
 package com.mapbox.mapboxsdk.maps
 
 import android.graphics.Bitmap
+import android.graphics.drawable.ShapeDrawable
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import com.mapbox.mapboxsdk.utils.BitmapUtils
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -91,6 +94,21 @@ class StyleBuilderTest {
         val builder = Style.Builder()
         builder.withImage("id", bitmap, true)
         assertEquals(bitmap, builder.images[0].bitmap)
+        assertEquals("id", builder.images[0].id)
+        assertEquals(true, builder.images[0].sdf)
+    }
+
+    @Test
+    fun testWithImageDrawable() {
+        val drawable = ShapeDrawable()
+        drawable.intrinsicWidth = 1
+        drawable.intrinsicHeight = 1
+        val builder = Style.Builder()
+        builder.withImage("id", drawable, true)
+        assertTrue(BitmapUtils.equals(
+                BitmapUtils.getBitmapFromDrawable(drawable)!!,
+                builder.images[0].bitmap)
+        )
         assertEquals("id", builder.images[0].id)
         assertEquals(true, builder.images[0].sdf)
     }

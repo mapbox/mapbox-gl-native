@@ -22,6 +22,8 @@ public abstract class LibraryLoader {
 
   private static volatile LibraryLoader loader = DEFAULT;
 
+  private static boolean loaded;
+
   /**
    * Set the library loader that loads the shared library.
    *
@@ -39,7 +41,10 @@ public abstract class LibraryLoader {
    */
   public static void load() {
     try {
-      loader.load("mapbox-gl");
+      if (!loaded) {
+        loader.load("mapbox-gl");
+      }
+      loaded = true;
     } catch (UnsatisfiedLinkError error) {
       String message = "Failed to load native shared library.";
       Logger.e(TAG, message, error);

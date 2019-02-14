@@ -224,7 +224,7 @@ MGL_EXPORT
     change is immediate.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-vie
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/annotation-vie
  ws/">Annotation views</a> example to learn how to modify an
  `MGLAnnotationView`'s behavior when it is selected.
  */
@@ -257,7 +257,7 @@ MGL_EXPORT
  continue to completion.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/draggable-views
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/draggable-views
  /">Draggable annotation views</a> to learn how to enable users to drag
  `MGLAnnotationView` objects on your map.
  */

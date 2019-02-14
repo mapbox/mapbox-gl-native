@@ -6,7 +6,8 @@ const ejs = require('ejs');
 const _ = require('lodash');
 const semver = require('semver');
 
-const changelog = fs.readFileSync('platform/ios/CHANGELOG.md', 'utf8');
+const changelogPath = 'platform/ios/CHANGELOG.md';
+const changelog = fs.readFileSync(changelogPath, 'utf8');
 
 let outputMode = {};
 switch(process.argv[2]) {
@@ -60,6 +61,11 @@ while (match = regex.exec(changelog)) {
 const versionsInReleaseNotes = _.map(releaseNotes, 'version');
 const bestReleaseNotesForCurrentVersion = semver.minSatisfying(versionsInReleaseNotes, ">=" + currentVersion);
 const currentReleaseNotes = _.find(releaseNotes, { version: bestReleaseNotesForCurrentVersion });
+
+if (!currentReleaseNotes) {
+    console.error('Could not find a release section satisfying %s in %s — did you forget to rename the "master" section to %s?', currentVersion, changelogPath, currentVersion.split("-")[0]);
+    process.exit(1);
+}
 
 /*
   Fill and print the release notes template.

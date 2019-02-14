@@ -939,7 +939,7 @@ public:
         return;
     }
     
-    if ([self.delegate respondsToSelector:@selector(mapViewDidBecomeIdle)]) {
+    if ([self.delegate respondsToSelector:@selector(mapViewDidBecomeIdle:)]) {
         [self.delegate mapViewDidBecomeIdle:self];
     }
 }
@@ -1389,14 +1389,16 @@ public:
 }
 
 - (void)setContentInsets:(NSEdgeInsets)contentInsets {
+    MGLLogDebug(@"Setting contentInset: %@", MGLStringFromNSEdgeInsets(contentInsets));
     [self setContentInsets:contentInsets animated:NO];
 }
 
 - (void)setContentInsets:(NSEdgeInsets)contentInsets animated:(BOOL)animated {
+    
     if (NSEdgeInsetsEqual(contentInsets, self.contentInsets)) {
         return;
     }
-
+    MGLLogDebug(@"Setting contentInset: %@ animated:", MGLStringFromNSEdgeInsets(contentInsets), MGLStringFromBOOL(animated));
     // After adjusting the content insets, move the center coordinate from the
     // old frame of reference to the new one represented by the newly set
     // content insets.
@@ -1845,7 +1847,7 @@ public:
 
 - (nullable NSArray<id <MGLAnnotation>> *)visibleAnnotations
 {
-    return [self visibleFeaturesInRect:self.bounds];
+    return [self visibleAnnotationsInRect:self.bounds];
 }
 
 - (nullable NSArray<id <MGLAnnotation>> *)visibleAnnotationsInRect:(CGRect)rect
@@ -2279,9 +2281,9 @@ public:
     [self selectAnnotation:firstAnnotation];
 }
 
-- (BOOL)isBringingAnnotationOnscreenSupportedForAnnotation:(id<MGLAnnotation>)annotation animated:(BOOL)animated {
+- (BOOL)isMovingAnnotationIntoViewSupportedForAnnotation:(id<MGLAnnotation>)annotation animated:(BOOL)animated {
     // Consider delegating
-    return animated && [annotation isKindOfClass:[MGLPointAnnotation class]];
+    return [annotation isKindOfClass:[MGLPointAnnotation class]];
 }
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation
@@ -2293,12 +2295,12 @@ public:
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint
 {
     MGLLogDebug(@"Selecting annotation: %@ atPoint: %@", annotation, NSStringFromPoint(gesturePoint));
-    [self selectAnnotation:annotation atPoint:gesturePoint moveOnscreen:YES animateSelection:YES];
+    [self selectAnnotation:annotation atPoint:gesturePoint moveIntoView:YES animateSelection:YES];
 }
 
-- (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint moveOnscreen:(BOOL)moveOnscreen animateSelection:(BOOL)animateSelection
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint moveIntoView:(BOOL)moveIntoView animateSelection:(BOOL)animateSelection
 {
-    MGLLogDebug(@"Selecting annotation: %@ atPoint: %@ moveOnscreen: %@ animateSelection: %@", annotation, NSStringFromPoint(gesturePoint), MGLStringFromBOOL(moveOnscreen), MGLStringFromBOOL(animateSelection));
+    MGLLogDebug(@"Selecting annotation: %@ atPoint: %@ moveIntoView: %@ animateSelection: %@", annotation, NSStringFromPoint(gesturePoint), MGLStringFromBOOL(moveIntoView), MGLStringFromBOOL(animateSelection));
     id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
     if (annotation == selectedAnnotation) {
         return;
@@ -2313,8 +2315,8 @@ public:
         [self addAnnotation:annotation];
     }
 
-    if (moveOnscreen) {
-        moveOnscreen = [self isBringingAnnotationOnscreenSupportedForAnnotation:annotation animated:animateSelection];
+    if (moveIntoView) {
+        moveIntoView = [self isMovingAnnotationIntoViewSupportedForAnnotation:annotation animated:animateSelection];
     }
 
     // The annotation's anchor will bounce to the current click.
@@ -2326,10 +2328,20 @@ public:
         positioningRect.origin = [self convertCoordinate:origin toPointToView:self];
     }
 
-    if (!moveOnscreen && NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
-        if (!NSEqualPoints(gesturePoint, NSZeroPoint)) {
+    BOOL shouldShowCallout = ([annotation respondsToSelector:@selector(title)]
+                              && annotation.title
+                              && !self.calloutForSelectedAnnotation.shown
+                              && [self.delegate respondsToSelector:@selector(mapView:annotationCanShowCallout:)]
+                              && [self.delegate mapView:self annotationCanShowCallout:annotation]);
+    
+    if (NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
+        if (!moveIntoView && !NSEqualPoints(gesturePoint, NSZeroPoint)) {
             positioningRect = CGRectMake(gesturePoint.x, gesturePoint.y, positioningRect.size.width, positioningRect.size.height);
         }
+    }
+    // Onscreen or partially on-screen
+    else if (!shouldShowCallout) {
+        moveIntoView = NO;
     }
 
     self.selectedAnnotation = annotation;
@@ -2337,11 +2349,7 @@ public:
     // For the callout to be shown, the annotation must have a title, its
     // callout must not already be shown, and the annotation must be able to
     // show a callout according to the delegate.
-    if ([annotation respondsToSelector:@selector(title)]
-        && annotation.title
-        && !self.calloutForSelectedAnnotation.shown
-        && [self.delegate respondsToSelector:@selector(mapView:annotationCanShowCallout:)]
-        && [self.delegate mapView:self annotationCanShowCallout:annotation]) {
+    if (shouldShowCallout) {
         NSPopover *callout = [self calloutForAnnotation:annotation];
 
         // Hang the callout off the right edge of the annotation image’s
@@ -2359,48 +2367,61 @@ public:
         [callout showRelativeToRect:positioningRect ofView:self preferredEdge:edge];
     }
 
-    if (moveOnscreen)
+    if (moveIntoView)
     {
-        moveOnscreen = NO;
+        moveIntoView = NO;
 
         NSRect (^edgeInsetsInsetRect)(NSRect, NSEdgeInsets) = ^(NSRect rect, NSEdgeInsets insets) {
             return NSMakeRect(rect.origin.x + insets.left,
-                              rect.origin.y + insets.top,
+                              rect.origin.y + insets.bottom,
                               rect.size.width - insets.left - insets.right,
                               rect.size.height - insets.top - insets.bottom);
         };
 
         // Add padding around the positioning rect (in essence an inset from the edge of the viewport
-        NSRect expandedPositioningRect = edgeInsetsInsetRect(positioningRect, MGLMapViewOffscreenAnnotationPadding);
+        NSRect expandedPositioningRect = positioningRect;
+        
+        if (shouldShowCallout) {
+            // If we have a callout, expand this rect to include a buffer
+            expandedPositioningRect = edgeInsetsInsetRect(positioningRect, MGLMapViewOffscreenAnnotationPadding);
+        }
 
         // Used for callout positioning, and moving offscreen annotations onscreen.
         CGRect constrainedRect = edgeInsetsInsetRect(self.bounds, self.contentInsets);
         CGRect bounds          = constrainedRect;
 
         // Any one of these cases should trigger a move onscreen
-        if (CGRectGetMinX(positioningRect) < CGRectGetMinX(bounds))
-        {
-            constrainedRect.origin.x = expandedPositioningRect.origin.x;
-            moveOnscreen = YES;
+        CGFloat minX = CGRectGetMinX(expandedPositioningRect);
+        
+        if (minX < CGRectGetMinX(bounds)) {
+            constrainedRect.origin.x = minX;
+            moveIntoView = YES;
         }
-        else if (CGRectGetMaxX(positioningRect) > CGRectGetMaxX(bounds))
-        {
-            constrainedRect.origin.x = CGRectGetMaxX(expandedPositioningRect) - constrainedRect.size.width;
-            moveOnscreen = YES;
+        else {
+            CGFloat maxX = CGRectGetMaxX(expandedPositioningRect);
+            
+            if (maxX > CGRectGetMaxX(bounds)) {
+                constrainedRect.origin.x = maxX - CGRectGetWidth(constrainedRect);
+                moveIntoView = YES;
+            }
+        }
+        
+        CGFloat minY = CGRectGetMinY(expandedPositioningRect);
+        
+        if (minY < CGRectGetMinY(bounds)) {
+            constrainedRect.origin.y = minY;
+            moveIntoView = YES;
+        }
+        else {
+            CGFloat maxY = CGRectGetMaxY(expandedPositioningRect);
+            
+            if (maxY > CGRectGetMaxY(bounds)) {
+                constrainedRect.origin.y = maxY - CGRectGetHeight(constrainedRect);
+                moveIntoView = YES;
+            }
         }
 
-        if (CGRectGetMinY(positioningRect) < CGRectGetMinY(bounds))
-        {
-            constrainedRect.origin.y = expandedPositioningRect.origin.y;
-            moveOnscreen = YES;
-        }
-        else if (CGRectGetMaxY(positioningRect) > CGRectGetMaxY(bounds))
-        {
-            constrainedRect.origin.y = CGRectGetMaxY(expandedPositioningRect) - constrainedRect.size.height;
-            moveOnscreen = YES;
-        }
-
-        if (moveOnscreen)
+        if (moveIntoView)
         {
             CGPoint center = CGPointMake(CGRectGetMidX(constrainedRect), CGRectGetMidY(constrainedRect));
             CLLocationCoordinate2D centerCoord = [self convertPoint:center toCoordinateFromView:self];

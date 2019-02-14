@@ -69,6 +69,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   private NativeMapView nativeMapView;
   @Nullable
   private MapboxMap mapboxMap;
+  private AttributionClickListener attributionClickListener;
   private MapboxMapOptions mapboxMapOptions;
   private MapRenderer mapRenderer;
   private boolean destroyed;
@@ -180,7 +181,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     mapboxMap.injectLocationComponent(new LocationComponent(mapboxMap));
 
     // inject widgets with MapboxMap
-    attrView.setOnClickListener(new AttributionClickListener(context, mapboxMap));
+    attrView.setOnClickListener(attributionClickListener = new AttributionClickListener(context, mapboxMap));
 
     // Ensure this view is interactable
     setClickable(true);
@@ -379,6 +380,10 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    */
   @UiThread
   public void onStop() {
+    if (attributionClickListener != null) {
+      attributionClickListener.onStop();
+    }
+
     if (mapboxMap != null) {
       // map was destroyed before it was started
       mapGestureDetector.cancelAnimators();
@@ -406,6 +411,11 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     mapCallback.onDestroy();
     initialRenderCallback.onDestroy();
 
+    if (compassView != null) {
+      // avoid leaking context through animator #13742
+      compassView.resetAnimation();
+    }
+
     if (mapboxMap != null) {
       mapboxMap.onDestroy();
     }
@@ -430,6 +440,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   public void setMaximumFps(int maximumFps) {
     if (mapRenderer != null) {
       mapRenderer.setMaximumFps(maximumFps);
+    } else {
+      throw new IllegalStateException("Calling MapView#setMaximumFps before mapRenderer is created.");
     }
   }
 
@@ -729,7 +741,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   /**
 
-  /**
+   /**
    * Set a callback that's invoked when the style has finished loading.
    *
    * @param listener The callback that's invoked when the style has finished loading
@@ -1217,11 +1229,19 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
     @Override
     public void onClick(View v) {
+      getDialogManager().onClick(v);
+    }
+
+    public void onStop() {
+      getDialogManager().onStop();
+    }
+
+    private AttributionDialogManager getDialogManager() {
       AttributionDialogManager customDialogManager = uiSettings.getAttributionDialogManager();
       if (customDialogManager != null) {
-        uiSettings.getAttributionDialogManager().onClick(v);
+        return uiSettings.getAttributionDialogManager();
       } else {
-        defaultDialogManager.onClick(v);
+        return defaultDialogManager;
       }
     }
   }

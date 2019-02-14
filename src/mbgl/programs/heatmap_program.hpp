@@ -2,6 +2,7 @@
 
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
+#include <mbgl/programs/heatmap_texture_program.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/shaders/heatmap.hpp>
 #include <mbgl/util/geometry.hpp>
@@ -45,5 +46,14 @@ public:
 
 using HeatmapLayoutVertex = HeatmapProgram::LayoutVertex;
 using HeatmapAttributes = HeatmapProgram::Attributes;
+
+class HeatmapLayerPrograms final : public LayerTypePrograms  {
+public:
+    HeatmapLayerPrograms(gl::Context& context, const ProgramParameters& programParameters) 
+        : heatmap(context, programParameters),
+          heatmapTexture(context, programParameters) {}
+    ProgramMap<HeatmapProgram> heatmap;
+    HeatmapTextureProgram heatmapTexture;
+};
 
 } // namespace mbgl

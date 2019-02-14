@@ -15,6 +15,7 @@
 #include <mbgl/gl/depth_mode.hpp>
 #include <mbgl/gl/stencil_mode.hpp>
 #include <mbgl/gl/color_mode.hpp>
+#include <mbgl/platform/gl_functions.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 

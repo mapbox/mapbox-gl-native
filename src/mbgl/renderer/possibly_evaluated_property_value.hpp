@@ -18,9 +18,8 @@ private:
 
 public:
     PossiblyEvaluatedPropertyValue() = default;
-    PossiblyEvaluatedPropertyValue(Value v, bool useIntegerZoom_ = false)
-        : value(std::move(v)),
-          useIntegerZoom(useIntegerZoom_) {}
+    PossiblyEvaluatedPropertyValue(Value v)
+        : value(std::move(v)) {}
 
     bool isConstant() const {
         return value.template is<T>();
@@ -46,16 +45,10 @@ public:
         return this->match(
             [&] (const T& constant_) { return constant_; },
             [&] (const style::PropertyExpression<T>& expression) {
-                if (useIntegerZoom) {
-                    return expression.evaluate(floor(zoom), feature, defaultValue);
-                } else {
-                    return expression.evaluate(zoom, feature, defaultValue);
-                }
+                return expression.evaluate(zoom, feature, defaultValue);
             }
         );
     }
-
-    bool useIntegerZoom;
 };
 
 template <class T>
@@ -69,9 +62,8 @@ private:
 
 public:
     PossiblyEvaluatedPropertyValue() = default;
-    PossiblyEvaluatedPropertyValue(Value v, bool useIntegerZoom_ = false)
-        : value(std::move(v)),
-          useIntegerZoom(useIntegerZoom_) {}
+    PossiblyEvaluatedPropertyValue(Value v)
+        : value(std::move(v)) {}
 
     bool isConstant() const {
         return value.template is<Faded<T>>();
@@ -108,8 +100,6 @@ public:
             }
         );
     }
-
-    bool useIntegerZoom;
 };
 
 

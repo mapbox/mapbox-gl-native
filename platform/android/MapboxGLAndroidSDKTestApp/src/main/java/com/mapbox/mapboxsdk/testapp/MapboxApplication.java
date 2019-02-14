@@ -4,6 +4,8 @@ import android.app.Application;
 import android.os.StrictMode;
 import android.text.TextUtils;
 
+import com.getkeepsafe.relinker.ReLinker;
+import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.log.Logger;
@@ -23,6 +25,7 @@ import static timber.log.Timber.DebugTree;
  */
 public class MapboxApplication extends Application {
 
+  private static final String TAG = "MapboxApplication";
   private static final String DEFAULT_MAPBOX_ACCESS_TOKEN = "YOUR_MAPBOX_ACCESS_TOKEN_GOES_HERE";
   private static final String ACCESS_TOKEN_NOT_SET_MESSAGE = "In order to run the Test App you need to set a valid "
     + "access token. During development, you can set the MAPBOX_ACCESS_TOKEN environment variable for the SDK to "
@@ -35,6 +38,7 @@ public class MapboxApplication extends Application {
     if (!initializeLeakCanary()) {
       return;
     }
+    initializeLibraryLoader();
     initializeLogger();
     initializeStrictMode();
     initializeMapbox();
@@ -48,6 +52,15 @@ public class MapboxApplication extends Application {
     }
     LeakCanary.install(this);
     return true;
+  }
+
+  private void initializeLibraryLoader() {
+    LibraryLoader.setLibraryLoader(new LibraryLoader() {
+      @Override
+      public void load(String name) {
+        ReLinker.log(message -> Logger.v(TAG, message)).loadLibrary(MapboxApplication.this, name);
+      }
+    });
   }
 
   private void initializeLogger() {

@@ -1,10 +1,15 @@
 package com.mapbox.mapboxsdk.testapp.activity.style;
 
 import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.Toast;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -16,11 +21,13 @@ import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 import timber.log.Timber;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.division;
@@ -51,8 +58,12 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
  */
 public class GeoJsonClusteringActivity extends AppCompatActivity {
 
+  private static final double CAMERA_ZOOM_DELTA = 0.01;
   private MapView mapView;
   private MapboxMap mapboxMap;
+
+  private GeoJsonSource clusterSource;
+  private int clickOptionCounter;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -68,19 +79,119 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
       mapboxMap = map;
       mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.7749, 122.4194), 0));
 
-      mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
-        @Override
-        public void onStyleLoaded(Style style) {
-          style.addImage(
-            "icon-id",
-            BitmapUtils.getBitmapFromDrawable(getResources().getDrawable(R.drawable.ic_hearing_black_24dp)),
-            true
-          );
-          // Add a clustered source with some layers
-          addClusteredGeoJsonSource(style);
+      final int[][] clusterLayers = new int[][] {
+        new int[] {150, ResourcesCompat.getColor(getResources(), R.color.redAccent, getTheme())},
+        new int[] {20, ResourcesCompat.getColor(getResources(), R.color.greenAccent, getTheme())},
+        new int[] {0, ResourcesCompat.getColor(getResources(), R.color.blueAccent, getTheme())}
+      };
+
+      try {
+        mapboxMap.setStyle(new Style.Builder()
+          .fromUrl(Style.LIGHT)
+          .withSource(clusterSource = createClusterSource())
+          .withLayer(createSymbolLayer())
+          .withLayer(createClusterLevelLayer(0, clusterLayers))
+          .withLayer(createClusterLevelLayer(1, clusterLayers))
+          .withLayer(createClusterLevelLayer(2, clusterLayers))
+          .withLayer(createClusterTextLayer())
+          .withImage("icon-id", Objects.requireNonNull(
+            BitmapUtils.getBitmapFromDrawable(getResources().getDrawable(R.drawable.ic_hearing_black_24dp))), true
+          )
+        );
+      } catch (IOException exception) {
+        Timber.e(exception);
+      }
+
+      mapboxMap.addOnMapClickListener(latLng -> {
+        PointF point = mapboxMap.getProjection().toScreenLocation(latLng);
+        List<Feature> features = mapboxMap.queryRenderedFeatures(point, "cluster-0", "cluster-1", "cluster-2");
+        if (!features.isEmpty()) {
+          onClusterClick(features.get(0), new Point((int) point.x, (int) point.y));
         }
+        return true;
       });
     });
+
+    findViewById(R.id.fab).setOnClickListener(v -> {
+      updateClickOptionCounter();
+      notifyClickOptionUpdate();
+    });
+  }
+
+  private void onClusterClick(Feature cluster, Point clickPoint) {
+    if (clickOptionCounter == 0) {
+      double nextZoomLevel = clusterSource.getClusterExpansionZoom(cluster);
+      double zoomDelta = nextZoomLevel - mapboxMap.getCameraPosition().zoom;
+      mapboxMap.animateCamera(CameraUpdateFactory.zoomBy(zoomDelta + CAMERA_ZOOM_DELTA, clickPoint));
+      Toast.makeText(this, "Zooming to " + nextZoomLevel, Toast.LENGTH_SHORT).show();
+    } else if (clickOptionCounter == 1) {
+      FeatureCollection collection = clusterSource.getClusterChildren(cluster);
+      Toast.makeText(this, "Children: " + collection.toJson(), Toast.LENGTH_SHORT).show();
+    } else {
+      FeatureCollection collection = clusterSource.getClusterLeaves(cluster, 2, 1);
+      Toast.makeText(this, "Leaves: " + collection.toJson(), Toast.LENGTH_SHORT).show();
+    }
+  }
+
+  private GeoJsonSource createClusterSource() throws IOException {
+    String earthQuakes = GeoParseUtil.loadStringFromAssets(this, "earthquakes.geojson");
+    FeatureCollection featureCollection = FeatureCollection.fromJson(earthQuakes);
+    return new GeoJsonSource("earthquakes", featureCollection, new GeoJsonOptions()
+      .withCluster(true)
+      .withClusterMaxZoom(14)
+      .withClusterRadius(50)
+    );
+  }
+
+  private SymbolLayer createSymbolLayer() {
+    return new SymbolLayer("unclustered-points", "earthquakes")
+      .withProperties(
+        iconImage("icon-id"),
+        iconSize(
+          division(
+            get("mag"), literal(4.0f)
+          )
+        ),
+        iconColor(
+          interpolate(exponential(1), get("mag"),
+            stop(2.0, rgb(0, 255, 0)),
+            stop(4.5, rgb(0, 0, 255)),
+            stop(7.0, rgb(255, 0, 0))
+          )
+        )
+      )
+      .withFilter(has("mag"));
+  }
+
+  private CircleLayer createClusterLevelLayer(int level, int[][] layerColors) {
+    CircleLayer circles = new CircleLayer("cluster-" + level, "earthquakes");
+    circles.setProperties(
+      circleColor(layerColors[level][1]),
+      circleRadius(18f)
+    );
+
+    Expression pointCount = toNumber(get("point_count"));
+    circles.setFilter(
+      level == 0
+        ? all(has("point_count"),
+        gte(pointCount, literal(layerColors[level][0]))
+      ) : all(has("point_count"),
+        gt(pointCount, literal(layerColors[level][0])),
+        lt(pointCount, literal(layerColors[level - 1][0]))
+      )
+    );
+    return circles;
+  }
+
+  private SymbolLayer createClusterTextLayer() {
+    return new SymbolLayer("count", "earthquakes")
+      .withProperties(
+        textField(Expression.toString(get("point_count"))),
+        textSize(12f),
+        textColor(Color.WHITE),
+        textIgnorePlacement(true),
+        textAllowOverlap(true)
+      );
   }
 
   @Override
@@ -136,82 +247,30 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
     }
   }
 
-  private void addClusteredGeoJsonSource(Style style) {
-    // Add a clustered source
-    try {
-      style.addSource(
-        new GeoJsonSource("earthquakes",
-          new URL("https://www.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson"),
-          new GeoJsonOptions()
-            .withCluster(true)
-            .withClusterMaxZoom(14)
-            .withClusterRadius(50)
-        )
-      );
-    } catch (MalformedURLException malformedUrlException) {
-      Timber.e(malformedUrlException, "That's not an url... ");
+  private void updateClickOptionCounter() {
+    if (clickOptionCounter == 2) {
+      clickOptionCounter = 0;
+    } else {
+      clickOptionCounter++;
     }
+  }
 
-    // Add unclustered layer
-    int[][] layers = new int[][] {
-      new int[] {150, ResourcesCompat.getColor(getResources(), R.color.redAccent, getTheme())},
-      new int[] {20, ResourcesCompat.getColor(getResources(), R.color.greenAccent, getTheme())},
-      new int[] {0, ResourcesCompat.getColor(getResources(), R.color.blueAccent, getTheme())}
-    };
-
-    SymbolLayer unclustered = new SymbolLayer("unclustered-points", "earthquakes");
-    unclustered.setProperties(
-      iconImage("icon-id"),
-      iconSize(
-        division(
-          get("mag"), literal(4.0f)
-        )
-      ),
-      iconColor(
-        interpolate(exponential(1), get("mag"),
-          stop(2.0, rgb(0, 255, 0)),
-          stop(4.5, rgb(0, 0, 255)),
-          stop(7.0, rgb(255, 0, 0))
-        )
-      )
-    );
-    unclustered.setFilter(has("mag"));
-    style.addLayer(unclustered);
-
-    for (int i = 0; i < layers.length; i++) {
-      // Add some nice circles
-      CircleLayer circles = new CircleLayer("cluster-" + i, "earthquakes");
-      circles.setProperties(
-        circleColor(layers[i][1]),
-        circleRadius(18f)
-      );
-
-      Expression pointCount = toNumber(get("point_count"));
-      circles.setFilter(
-        i == 0
-          ? all(has("point_count"),
-          gte(pointCount, literal(layers[i][0]))
-        ) : all(has("point_count"),
-          gt(pointCount, literal(layers[i][0])),
-          lt(pointCount, literal(layers[i - 1][0]))
-        )
-      );
-      style.addLayer(circles);
+  private void notifyClickOptionUpdate() {
+    if (clickOptionCounter == 0) {
+      Toast.makeText(
+        GeoJsonClusteringActivity.this,
+        "Clicking a cluster will zoom to the level where it dissolves",
+        Toast.LENGTH_SHORT).show();
+    } else if (clickOptionCounter == 1) {
+      Toast.makeText(
+        GeoJsonClusteringActivity.this,
+        "Clicking a cluster will show the details of the cluster children",
+        Toast.LENGTH_SHORT).show();
+    } else {
+      Toast.makeText(
+        GeoJsonClusteringActivity.this,
+        "Clicking a cluster will show the details of the cluster leaves with an offset and limit",
+        Toast.LENGTH_SHORT).show();
     }
-
-    // Add the count labels
-    SymbolLayer count = new SymbolLayer("count", "earthquakes");
-    count.setProperties(
-      textField(Expression.toString(get("point_count"))),
-      textSize(12f),
-      textColor(Color.WHITE),
-      textIgnorePlacement(true),
-      textAllowOverlap(true)
-    );
-    style.addLayer(count);
-
-
-    // Zoom out to start
-    mapboxMap.animateCamera(CameraUpdateFactory.zoomTo(1));
   }
 }

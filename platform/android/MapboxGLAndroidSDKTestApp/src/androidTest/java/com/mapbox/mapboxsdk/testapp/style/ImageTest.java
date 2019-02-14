@@ -7,9 +7,8 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
 
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -20,14 +19,9 @@ import static org.junit.Assert.assertTrue;
  * CRUD tests around Image
  */
 @RunWith(AndroidJUnit4.class)
-public class ImageTest extends BaseActivityTest {
+public class ImageTest extends EspressoTest {
 
   private static final String IMAGE_ID = "test.image";
-
-  @Override
-  protected Class getActivityClass() {
-    return RuntimeStyleTestActivity.class;
-  }
 
   @Test
   public void testAddGetImage() {
@@ -38,6 +32,9 @@ public class ImageTest extends BaseActivityTest {
 
       Bitmap bitmapSet = ((BitmapDrawable) drawable).getBitmap();
       mapboxMap.getStyle().addImage(IMAGE_ID, bitmapSet);
+
+      // adding an image requires converting the image with an asynctask
+      uiController.loopMainThreadForAtLeast(200);
 
       Bitmap bitmapGet = mapboxMap.getStyle().getImage(IMAGE_ID);
       assertTrue(bitmapGet.sameAs(bitmapSet));

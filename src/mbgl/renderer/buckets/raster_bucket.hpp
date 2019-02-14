@@ -12,13 +12,15 @@
 
 namespace mbgl {
 
-class RasterBucket : public Bucket {
+class RasterBucket final : public Bucket {
 public:
     RasterBucket(PremultipliedImage&&);
     RasterBucket(std::shared_ptr<PremultipliedImage>);
+    ~RasterBucket() override;
 
     void upload(gl::Context&) override;
     bool hasData() const override;
+    bool supportsLayer(const style::Layer::Impl&) const override;
 
     void clear();
     void setImage(std::shared_ptr<PremultipliedImage>);
@@ -37,10 +39,5 @@ public:
     optional<gl::VertexBuffer<RasterLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
 };
-
-template <>
-inline bool Bucket::is<RasterBucket>() const {
-    return layerType == style::LayerType::Raster;
-}
 
 } // namespace mbgl

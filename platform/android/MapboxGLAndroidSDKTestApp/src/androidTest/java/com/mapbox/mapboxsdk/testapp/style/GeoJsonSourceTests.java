@@ -14,8 +14,7 @@ import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
 
 import org.hamcrest.Matcher;
@@ -33,12 +32,7 @@ import static org.junit.Assert.assertTrue;
  * Tests for {@link GeoJsonSource}
  */
 @RunWith(AndroidJUnit4.class)
-public class GeoJsonSourceTests extends BaseActivityTest {
-
-  @Override
-  protected Class getActivityClass() {
-    return RuntimeStyleTestActivity.class;
-  }
+public class GeoJsonSourceTests extends EspressoTest {
 
   @Test
   public void testFeatureCollection() {

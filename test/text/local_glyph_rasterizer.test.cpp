@@ -52,7 +52,8 @@ public:
 
 } // end namespace
 
-#ifdef __APPLE__
+// Enabling Qt requires adding a CJK-compatible font in the CI image.
+#if defined(__APPLE__)
 
 TEST(LocalGlyphRasterizer, PingFang) {
     LocalGlyphRasterizerTest test(std::string("PingFang"));
@@ -64,10 +65,14 @@ TEST(LocalGlyphRasterizer, PingFang) {
         return response;
     };
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
+#if defined(__APPLE__)
     test.checkRendering("ping_fang");
+#elif defined(__QT__)
+    test.checkRendering("ping_fang_qt");
+#endif // defined(__APPLE__)
 }
 
-#endif
+#endif // defined(__APPLE__)
 
 TEST(LocalGlyphRasterizer, NoLocal) {
     // Expectation: without any local fonts set, and without any CJK glyphs provided,

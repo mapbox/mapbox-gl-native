@@ -9,7 +9,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
+import com.mapbox.mapboxsdk.testapp.activity.BaseTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.DeviceIndependentTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.TestConstants;
 
@@ -18,7 +18,7 @@ import org.junit.Test;
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
 import static org.junit.Assert.assertEquals;
 
-public class CameraEaseTest extends BaseActivityTest {
+public class CameraEaseTest extends BaseTest {
 
   private final CountingIdlingResource animationIdlingResource =
     new CountingIdlingResource("animation_idling_resource");

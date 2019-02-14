@@ -94,6 +94,9 @@ private:
 
     void onSurfaceChanged(JNIEnv&, jint width, jint height);
 
+    // Called on Main thread
+    void onSurfaceDestroyed(JNIEnv&);
+
 private:
     jni::WeakReference<jni::Object<MapRenderer>, jni::EnvAttachingDeleter> javaPeer;
 

@@ -15,7 +15,7 @@ namespace mbgl {
 class BucketParameters;
 class RenderLineLayer;
 
-class LineBucket : public Bucket {
+class LineBucket final : public Bucket {
 public:
 
     // These aliases are used by the PatternLayout template
@@ -27,6 +27,7 @@ public:
                std::map<std::string, PossiblyEvaluatedPaintProperties> layerPaintProperties,
                const float zoom,
                const uint32_t overscaling);
+    ~LineBucket() override;
 
     void addFeature(const GeometryTileFeature&,
                     const GeometryCollection&,
@@ -38,6 +39,7 @@ public:
     void upload(gl::Context&) override;
 
     float getQueryRadius(const RenderLayer&) const override;
+    bool supportsLayer(const style::Layer::Impl&) const override;
 
     PossiblyEvaluatedLayoutProperties layout;
 
@@ -78,10 +80,5 @@ private:
 
     float getLineWidth(const RenderLineLayer& layer) const;
 };
-
-template <>
-inline bool Bucket::is<LineBucket>() const {
-    return layerType == style::LayerType::Line;
-}
 
 } // namespace mbgl

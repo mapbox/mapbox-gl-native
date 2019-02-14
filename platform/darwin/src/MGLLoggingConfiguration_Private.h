@@ -4,6 +4,12 @@ NS_INLINE NSString *MGLStringFromBOOL(BOOL value) {
     return value ? @"YES" : @"NO";
 }
 
+#if TARGET_OS_OSX
+NS_INLINE NSString *MGLStringFromNSEdgeInsets(NSEdgeInsets insets) {
+    return [NSString stringWithFormat:@"{ top: %f, left: %f, bottom: %f, right: %f", insets.top, insets.left, insets.bottom, insets.right];
+}
+#endif
+
 #ifdef MGL_LOGGING_DISABLED
 
 #define MGLLogInfo(...)

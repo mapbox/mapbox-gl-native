@@ -2,6 +2,7 @@
 #import <XCTest/XCTest.h>
 
 #import <mbgl/util/geometry.hpp>
+#import "MGLFoundation_Private.h"
 #import "../../darwin/src/MGLFeature_Private.h"
 
 @interface MGLFeatureTests : XCTestCase
@@ -83,6 +84,26 @@
                           [NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(3, 3)]);
     XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:interiorPolygonCoordinates[3]],
                           [NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(3, 2)]);
+}
+
+- (void)testClusterGeometryConversion {    
+    mbgl::Point<double> point = { -90.066667, 29.95 };
+    mbgl::Feature pointFeature { point };
+    pointFeature.id = { UINT64_MAX };
+    pointFeature.properties["cluster"] = true;
+    pointFeature.properties["cluster_id"] = 1ULL;
+    pointFeature.properties["point_count"] = 5ULL;
+    
+    id<MGLFeature> feature = MGLFeatureFromMBGLFeature(pointFeature);
+    
+    XCTAssert([feature conformsToProtocol:@protocol(MGLFeature)]);
+    
+    id<MGLCluster> cluster = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(feature, MGLCluster);
+    XCTAssert(cluster);
+    XCTAssert(cluster.clusterIdentifier == 1);
+    XCTAssert(cluster.clusterPointCount == 5);
+    
+    XCTAssert([cluster isMemberOfClass:[MGLPointFeatureCluster class]]);
 }
 
 - (void)testPropertyConversion {

@@ -6,7 +6,6 @@ public class TestConstants {
   public static final double TILT_DELTA = 0.3;
   public static final double ZOOM_DELTA = 0.3;
 
-  public static final String TEXT_MARKER_TEXT = "Text";
   public static final String TEXT_MARKER_TITLE = "Marker";
   public static final String TEXT_MARKER_SNIPPET = "Snippet";
 }

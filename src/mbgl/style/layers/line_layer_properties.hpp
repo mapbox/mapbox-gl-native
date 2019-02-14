@@ -13,22 +13,22 @@ namespace mbgl {
 namespace style {
 
 struct LineCap : LayoutProperty<LineCapType> {
-    static constexpr const char * key = "line-cap";
+    static constexpr const char *name() { return "line-cap"; }
     static LineCapType defaultValue() { return LineCapType::Butt; }
 };
 
 struct LineJoin : DataDrivenLayoutProperty<LineJoinType> {
-    static constexpr const char * key = "line-join";
+    static constexpr const char *name() { return "line-join"; }
     static LineJoinType defaultValue() { return LineJoinType::Miter; }
 };
 
 struct LineMiterLimit : LayoutProperty<float> {
-    static constexpr const char * key = "line-miter-limit";
+    static constexpr const char *name() { return "line-miter-limit"; }
     static float defaultValue() { return 2; }
 };
 
 struct LineRoundLimit : LayoutProperty<float> {
-    static constexpr const char * key = "line-round-limit";
+    static constexpr const char *name() { return "line-round-limit"; }
     static float defaultValue() { return 1; }
 };
 

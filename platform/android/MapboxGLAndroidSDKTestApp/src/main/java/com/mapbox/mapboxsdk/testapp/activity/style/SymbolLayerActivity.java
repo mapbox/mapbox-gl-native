@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mapbox.geojson.Feature;
@@ -30,6 +29,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.formatFontScale;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.FormatOption.formatTextFont;
@@ -37,7 +37,10 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.concat;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.format;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.formatEntry;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.id;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.match;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.switchCase;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.toBool;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
@@ -45,6 +48,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAnchor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOpacity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAnchor;
@@ -65,11 +69,13 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
   private static final String MARKER_SOURCE = "marker-source";
   private static final String MARKER_LAYER = "marker-layer";
   private static final String MARKER_ICON = "my-layers-image";
+  public static final String ID_FEATURE_PROPERTY = "id";
   public static final String SELECTED_FEATURE_PROPERTY = "selected";
   public static final String TITLE_FEATURE_PROPERTY = "title";
 
   private GeoJsonSource geoJsonSource;
   private FeatureCollection markerCollection;
+  private SymbolLayer symbolLayer;
   private MapboxMap mapboxMap;
   private MapView mapView;
   private boolean initialFont;
@@ -104,13 +110,13 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
 
     // source
     markerCollection = FeatureCollection.fromFeatures(new Feature[] {
-      Feature.fromGeometry(Point.fromLngLat(4.91638, 52.35673), featureProperties("Marker 1")),
-      Feature.fromGeometry(Point.fromLngLat(4.91638, 52.34673), featureProperties("Marker 2"))
+      Feature.fromGeometry(Point.fromLngLat(4.91638, 52.35673), featureProperties("1", "Marker 1")),
+      Feature.fromGeometry(Point.fromLngLat(4.91638, 52.34673), featureProperties("2", "Marker 2"))
     });
     geoJsonSource = new GeoJsonSource(MARKER_SOURCE, markerCollection);
 
     // layer
-    SymbolLayer layer = new SymbolLayer(MARKER_LAYER, MARKER_SOURCE)
+    symbolLayer = new SymbolLayer(MARKER_LAYER, MARKER_SOURCE)
       .withProperties(
         iconImage(MARKER_ICON),
         iconIgnorePlacement(true),
@@ -138,9 +144,9 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
 
     mapboxMap.setStyle(new Style.Builder()
         .fromUrl("asset://streets.json")
-        .withImage(MARKER_ICON, icLayersBitmap)
+        .withImage(MARKER_ICON, Objects.requireNonNull(icLayersBitmap), true)
         .withSource(geoJsonSource)
-        .withLayer(layer),
+        .withLayer(symbolLayer),
       style -> styleLoaded = true
     );
 
@@ -157,11 +163,21 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
       for (Feature feature : markerCollection.features()) {
         if (feature.getStringProperty(TITLE_FEATURE_PROPERTY)
           .equals(features.get(0).getStringProperty(TITLE_FEATURE_PROPERTY))) {
+
+          // use DDS
           boolean selected = feature.getBooleanProperty(SELECTED_FEATURE_PROPERTY);
           feature.addBooleanProperty(SELECTED_FEATURE_PROPERTY, !selected);
+
+          // validate symbol flicker regression for #13407
+          symbolLayer.setProperties(iconOpacity(match(
+            get(ID_FEATURE_PROPERTY), literal(1.0f),
+            stop(feature.getStringProperty("id"), 0.3f)
+          )));
         }
       }
       geoJsonSource.setGeoJson(markerCollection);
+
+
     }
 
     return false;
@@ -187,8 +203,9 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
     initialFont = !initialFont;
   }
 
-  private JsonObject featureProperties(String title) {
+  private JsonObject featureProperties(String id, String title) {
     JsonObject object = new JsonObject();
+    object.add(ID_FEATURE_PROPERTY, new JsonPrimitive(id));
     object.add(TITLE_FEATURE_PROPERTY, new JsonPrimitive(title));
     object.add(SELECTED_FEATURE_PROPERTY, new JsonPrimitive(false));
     return object;

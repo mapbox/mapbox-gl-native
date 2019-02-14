@@ -170,8 +170,18 @@ public:
 private:
 
     void networkIsReachableAgain() {
+        // Notify regular priority requests.
         for (auto& request : allRequests) {
-            request->networkIsReachableAgain();
+            if (request->resource.priority == Resource::Priority::Regular) {
+                request->networkIsReachableAgain();
+            }
+        }
+
+        // Notify low priority requests.
+        for (auto& request : allRequests) {
+            if (request->resource.priority == Resource::Priority::Low) {
+                request->networkIsReachableAgain();
+            }
         }
     }
 

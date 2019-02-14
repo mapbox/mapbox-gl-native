@@ -28,7 +28,8 @@ class QMapboxGLMapRenderer : public QObject
 
 public:
     QMapboxGLMapRenderer(qreal pixelRatio, mbgl::DefaultFileSource &,
-            mbgl::ThreadPool &, QMapboxGLSettings::GLContextMode);
+            mbgl::ThreadPool &, QMapboxGLSettings::GLContextMode,
+            const QString &localFontFamily);
     virtual ~QMapboxGLMapRenderer();
 
     void render();

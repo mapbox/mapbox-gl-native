@@ -26,12 +26,12 @@ class IconManager {
 
   private final Map<Icon, Integer> iconMap = new HashMap<>();
 
-  private NativeMapView nativeMapView;
+  private NativeMap nativeMap;
   private int highestIconWidth;
   private int highestIconHeight;
 
-  IconManager(NativeMapView nativeMapView) {
-    this.nativeMapView = nativeMapView;
+  IconManager(NativeMap nativeMap) {
+    this.nativeMap = nativeMap;
   }
 
   Icon loadIconForMarker(@NonNull Marker marker) {
@@ -47,7 +47,7 @@ class IconManager {
   }
 
   int getTopOffsetPixelsForIcon(@NonNull Icon icon) {
-    return (int) (nativeMapView.getTopOffsetPixelsForAnnotationSymbol(icon.getId()) * nativeMapView.getPixelRatio());
+    return (int) (nativeMap.getTopOffsetPixelsForAnnotationSymbol(icon.getId()) * nativeMap.getPixelRatio());
   }
 
   int getHighestIconWidth() {
@@ -101,7 +101,7 @@ class IconManager {
 
   private void loadIcon(Icon icon) {
     Bitmap bitmap = icon.getBitmap();
-    nativeMapView.addAnnotationIcon(icon.getId(),
+    nativeMap.addAnnotationIcon(icon.getId(),
       bitmap.getWidth(),
       bitmap.getHeight(),
       icon.getScale(),
@@ -144,7 +144,7 @@ class IconManager {
   }
 
   private void remove(Icon icon) {
-    nativeMapView.removeAnnotationIcon(icon.getId());
+    nativeMap.removeAnnotationIcon(icon.getId());
     iconMap.remove(icon);
   }
 

@@ -58,7 +58,7 @@ public:
     virtual void startRender(PaintParameters&) = 0;
     virtual void finishRender(PaintParameters&) = 0;
 
-    // Returns an unsorted list of RenderTiles.
+    // Returns a list of RenderTiles, sorted by tile id.
     virtual std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() = 0;
 
     virtual std::unordered_map<std::string, std::vector<Feature>>

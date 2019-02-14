@@ -1,0 +1,8 @@
+{
+    "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
+    "sources": [],
+    "public_headers": {
+        "mapbox/shelf-pack.hpp": "vendor/shelf-pack-cpp/include/mapbox/shelf-pack.hpp"
+    },
+    "private_headers": {}
+}

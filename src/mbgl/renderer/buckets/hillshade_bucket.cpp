@@ -9,14 +9,14 @@ namespace mbgl {
 using namespace style;
 
 HillshadeBucket::HillshadeBucket(PremultipliedImage&& image_, Tileset::DEMEncoding encoding)
-    : Bucket(LayerType::Hillshade),
-      demdata(image_, encoding) {
+    : demdata(image_, encoding) {
 }
 
 HillshadeBucket::HillshadeBucket(DEMData&& demdata_)
-    : Bucket(LayerType::Hillshade),
-      demdata(std::move(demdata_)) {
+    : demdata(std::move(demdata_)) {
 }
+
+HillshadeBucket::~HillshadeBucket() = default;
 
 const DEMData& HillshadeBucket::getDEMData() const {
     return demdata;
@@ -113,5 +113,10 @@ void HillshadeBucket::setMask(TileMask&& mask_) {
 bool HillshadeBucket::hasData() const {
     return demdata.getImage()->valid();
 }
+
+bool HillshadeBucket::supportsLayer(const style::Layer::Impl& impl) const {
+    return style::HillshadeLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
+}
+
 
 } // namespace mbgl

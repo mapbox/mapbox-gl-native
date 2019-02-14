@@ -15,9 +15,9 @@ namespace mbgl {
 class BucketParameters;
 class RenderFillLayer;
 
-class FillBucket : public Bucket {
+class FillBucket final : public Bucket {
 public:
-
+    ~FillBucket() override;
     // These aliases are used by the PatternLayout template
     using RenderLayerType = RenderFillLayer;
     using PossiblyEvaluatedPaintProperties = style::FillPaintProperties::PossiblyEvaluated;
@@ -38,6 +38,7 @@ public:
     void upload(gl::Context&) override;
 
     float getQueryRadius(const RenderLayer&) const override;
+    bool supportsLayer(const style::Layer::Impl&) const override;
 
     gl::VertexVector<FillLayoutVertex> vertices;
     gl::IndexVector<gl::Lines> lines;
@@ -51,10 +52,5 @@ public:
 
     std::map<std::string, FillProgram::PaintPropertyBinders> paintPropertyBinders;
 };
-
-template <>
-inline bool Bucket::is<FillBucket>() const {
-    return layerType == style::LayerType::Fill;
-}
 
 } // namespace mbgl

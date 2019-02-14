@@ -11,27 +11,22 @@ import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion
 import com.mapbox.mapboxsdk.storage.FileSource
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest
 import com.mapbox.mapboxsdk.testapp.utils.FileUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-class OfflineManagerTest : BaseActivityTest() {
+class OfflineManagerTest : EspressoTest() {
 
   companion object {
-    private const val TEST_DB_FILE_NAME = "offline.db"
+    private const val TEST_DB_FILE_NAME = "offline_test.db"
   }
 
   private val context: Context by lazy { rule.activity }
 
   private lateinit var offlineIdlingResource: CountingIdlingResource
-
-  override fun getActivityClass(): Class<*> {
-    return EspressoTestActivity::class.java
-  }
 
   override fun beforeTest() {
     super.beforeTest()

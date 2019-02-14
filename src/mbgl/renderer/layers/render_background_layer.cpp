@@ -96,7 +96,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
 
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
             draw(
-                parameters.programs.backgroundPattern,
+                parameters.programs.getBackgroundLayerPrograms().backgroundPattern,
                 BackgroundPatternUniforms::values(
                     parameters.matrixForTile(tileID),
                     evaluated.get<BackgroundOpacity>(),
@@ -112,7 +112,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
     } else {
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
             draw(
-                parameters.programs.background,
+                parameters.programs.getBackgroundLayerPrograms().background,
                 BackgroundProgram::UniformValues {
                     uniforms::u_matrix::Value( parameters.matrixForTile(tileID) ),
                     uniforms::u_color::Value( evaluated.get<BackgroundColor>() ),

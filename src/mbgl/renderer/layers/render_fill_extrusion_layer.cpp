@@ -126,7 +126,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 FillExtrusionBucket& bucket = *bucket_;
 
                 draw(
-                    parameters.programs.fillExtrusion.get(evaluated),
+                    parameters.programs.getFillExtrusionLayerPrograms().fillExtrusion.get(evaluated),
                     bucket,
                     FillExtrusionUniforms::values(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
@@ -153,7 +153,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 FillExtrusionBucket& bucket = *bucket_;
 
                 draw(
-                    parameters.programs.fillExtrusionPattern.get(evaluated),
+                    parameters.programs.getFillExtrusionLayerPrograms().fillExtrusionPattern.get(evaluated),
                     bucket,
                     FillExtrusionPatternUniforms::values(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
@@ -184,7 +184,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         const Properties<>::PossiblyEvaluated properties;
         const ExtrusionTextureProgram::PaintPropertyBinders paintAttributeData{ properties, 0 };
         
-        auto& programInstance = parameters.programs.extrusionTexture;
+        auto& programInstance = parameters.programs.getFillExtrusionLayerPrograms().extrusionTexture;
 
         const auto allUniformValues = programInstance.computeAllUniformValues(
             ExtrusionTextureProgram::UniformValues{
@@ -217,18 +217,6 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             allAttributeBindings,
             getID());
     }
-}
-style::FillExtrusionPaintProperties::PossiblyEvaluated RenderFillExtrusionLayer::paintProperties() const {
-    return FillExtrusionPaintProperties::PossiblyEvaluated {
-        evaluated.get<style::FillExtrusionOpacity>(),
-        evaluated.get<style::FillExtrusionColor>(),
-        evaluated.get<style::FillExtrusionTranslate>(),
-        evaluated.get<style::FillExtrusionTranslateAnchor>(),
-        evaluated.get<style::FillExtrusionPattern>(),
-        evaluated.get<style::FillExtrusionHeight>(),
-        evaluated.get<style::FillExtrusionBase>(),
-        evaluated.get<style::FillExtrusionVerticalGradient>()
-    };
 }
 
 bool RenderFillExtrusionLayer::queryIntersectsFeature(

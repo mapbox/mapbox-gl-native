@@ -1,0 +1,8 @@
+{
+    "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
+    "sources": [],
+    "public_headers": {
+        "mapbox/cheap_ruler.hpp": "vendor/cheap-ruler-cpp/include/mapbox/cheap_ruler.hpp"
+    },
+    "private_headers": {}
+}

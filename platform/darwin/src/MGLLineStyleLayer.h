@@ -91,12 +91,12 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslationAnchor) {
 
  #### Related examples
  See the <a
- href="https://www.mapbox.com/ios-sdk/maps/examples/shape-collection/">Add
- multiple shapes from a single shape source</a> example to learn how to add a
- line to your map using this style layer. See the <a
- href="https://www.mapbox.com/ios-sdk/maps/examples/runtime-add-line/">Add a
- line style layer from GeoJSON</a> example to learn how to add and style line
- data to an `MGLMapView` object at runtime.
+ href="https://docs.mapbox.com/ios/maps/examples/shape-collection/">Add multiple
+ shapes from a single shape source</a> example to learn how to add a line to
+ your map using this style layer. See the <a
+ href="https://docs.mapbox.com/ios/maps/examples/runtime-add-line/">Add a line
+ style layer from GeoJSON</a> example to learn how to add and style line data to
+ an `MGLMapView` object at runtime.
 
  ### Example
 

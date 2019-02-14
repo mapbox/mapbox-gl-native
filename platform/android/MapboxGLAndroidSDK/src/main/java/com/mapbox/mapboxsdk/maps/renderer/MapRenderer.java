@@ -75,6 +75,11 @@ public abstract class MapRenderer implements MapRendererScheduler {
   }
 
   @CallSuper
+  protected void onSurfaceDestroyed() {
+    nativeOnSurfaceDestroyed();
+  }
+
+  @CallSuper
   protected void onDrawFrame(GL10 gl) {
     long startTime = System.nanoTime();
     try {
@@ -122,6 +127,8 @@ public abstract class MapRenderer implements MapRendererScheduler {
   private native void nativeOnSurfaceCreated();
 
   private native void nativeOnSurfaceChanged(int width, int height);
+
+  private native void nativeOnSurfaceDestroyed();
 
   private native void nativeRender();
 

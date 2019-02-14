@@ -1,0 +1,34 @@
+{
+    "//": "This file can be edited manually and is the canonical source.",
+    "sources": [
+        "platform/darwin/src/collator.mm",
+        "platform/darwin/src/gl_functions.cpp",
+        "platform/darwin/src/image.mm",
+        "platform/darwin/src/local_glyph_rasterizer.mm",
+        "platform/darwin/src/logging_nslog.mm",
+        "platform/darwin/src/nsthread.mm",
+        "platform/darwin/src/reachability.m",
+        "platform/darwin/src/string_nsstring.mm",
+        "platform/default/src/mbgl/gl/headless_backend.cpp",
+        "platform/default/src/mbgl/gl/headless_frontend.cpp",
+        "platform/default/src/mbgl/map/map_snapshotter.cpp",
+        "platform/default/src/mbgl/text/bidi.cpp",
+        "platform/default/src/mbgl/util/default_thread_pool.cpp",
+        "platform/default/src/mbgl/util/png_writer.cpp",
+        "platform/default/src/mbgl/util/shared_thread_pool.cpp",
+        "platform/default/src/mbgl/util/thread_local.cpp",
+        "platform/default/src/mbgl/util/utf.cpp"
+    ],
+    "public_headers": {
+        "mbgl/storage/reachability.h": "platform/darwin/include/mbgl/storage/reachability.h",
+        "mbgl/util/image+MGLAdditions.hpp": "platform/darwin/include/mbgl/util/image+MGLAdditions.hpp",
+        "mbgl/gl/headless_backend.hpp": "platform/default/include/mbgl/gl/headless_backend.hpp",
+        "mbgl/gl/headless_frontend.hpp": "platform/default/include/mbgl/gl/headless_frontend.hpp",
+        "mbgl/map/map_snapshotter.hpp": "platform/default/include/mbgl/map/map_snapshotter.hpp",
+        "mbgl/util/default_thread_pool.hpp": "platform/default/include/mbgl/util/default_thread_pool.hpp",
+        "mbgl/util/shared_thread_pool.hpp": "platform/default/include/mbgl/util/shared_thread_pool.hpp"
+    },
+    "private_headers": {
+        "CFHandle.hpp": "platform/darwin/src/CFHandle.hpp"
+    }
+}

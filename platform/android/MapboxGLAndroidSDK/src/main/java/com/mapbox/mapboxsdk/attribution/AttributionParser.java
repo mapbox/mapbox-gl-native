@@ -157,7 +157,7 @@ public class AttributionParser {
    * @return if the url is valid for improve this map
    */
   private boolean isValidForImproveThisMap(@NonNull String url) {
-    return withImproveMap || !url.equals(Attribution.IMPROVE_MAP_URL);
+    return withImproveMap || !(Attribution.IMPROVE_MAP_URLS.contains(url));
   }
 
   /**

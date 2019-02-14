@@ -24,6 +24,7 @@
         <attr name="mapbox_uiRotateGestures" format="boolean"/>
         <attr name="mapbox_uiTiltGestures" format="boolean"/>
         <attr name="mapbox_uiDoubleTapGestures" format="boolean"/>
+        <attr name="mapbox_uiQuickZoomGestures" format="boolean"/>
 
         <!--Compass-->
         <attr name="mapbox_uiCompass" format="boolean"/>

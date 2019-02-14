@@ -41,6 +41,9 @@ macro(mbgl_platform_core)
     endif()
 
     target_sources(mbgl-core
+        # GL
+        PRIVATE platform/linux/src/gl_functions.cpp
+
         # Misc
         PRIVATE platform/default/src/mbgl/util/logging_stderr.cpp
         PRIVATE platform/default/src/mbgl/util/string_stdlib.cpp
@@ -173,11 +176,11 @@ endmacro()
 
 macro(mbgl_platform_benchmark)
     target_sources(mbgl-benchmark
-        PRIVATE benchmark/src/main.cpp
+        PRIVATE platform/default/src/mbgl/benchmark/main.cpp
     )
 
     set_source_files_properties(
-        benchmark/src/main.cpp
+        platform/default/src/mbgl/benchmark/main.cpp
             PROPERTIES
         COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
     )

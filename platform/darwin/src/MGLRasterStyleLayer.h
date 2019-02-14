@@ -36,8 +36,8 @@ typedef NS_ENUM(NSUInteger, MGLRasterResamplingMode) {
  `MGLImageSource` object. For example, you could use a raster style layer to
  render <a href="https://www.mapbox.com/satellite/">Mapbox Satellite</a>
  imagery, a <a
- href="https://www.mapbox.com/help/define-tileset/#raster-tilesets">raster tile
- set</a> uploaded to Mapbox Studio, or a raster map authored in <a
+ href="https://docs.mapbox.com/help/glossary/tileset/#raster-tilesets">raster
+ tile set</a> uploaded to Mapbox Studio, or a raster map authored in <a
  href="https://tilemill-project.github.io/tilemill/">TileMill</a>, the classic
  Mapbox Editor, or Mapbox Studio Classic.
  
@@ -53,10 +53,9 @@ typedef NS_ENUM(NSUInteger, MGLRasterResamplingMode) {
  `-[MGLStyle addLayer:]`.
 
  #### Related examples
- See the <a
- href="https://www.mapbox.com/ios-sdk/maps/examples/image-source/">Add an
- image</a> and <a
- href="https://www.mapbox.com/ios-sdk/maps/examples/source-custom-raster/">Add
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/image-source/">Add
+ an image</a> and <a
+ href="https://docs.mapbox.com/ios/maps/examples/source-custom-raster/">Add
  raster imagery</a> examples to learn how to add imagery with this style layer.
 
  ### Example

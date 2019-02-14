@@ -65,4 +65,11 @@ public:
 using RasterLayoutVertex = RasterProgram::LayoutVertex;
 using RasterAttributes = RasterProgram::Attributes;
 
+class RasterLayerPrograms final : public LayerTypePrograms {
+public:
+    RasterLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+        : raster(context, programParameters) {}
+    RasterProgram raster;
+};
+
 } // namespace mbgl

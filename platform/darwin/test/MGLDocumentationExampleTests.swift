@@ -47,6 +47,84 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         styleLoadingExpectation.fulfill()
     }
     
+    func testMGLLight() {
+        //#-example-code
+        let light = MGLLight()
+        let position = MGLSphericalPosition(radial: 5, azimuthal: 180, polar: 80)
+        light.position = NSExpression(forConstantValue: NSValue(mglSphericalPosition: position))
+        light.anchor = NSExpression(forConstantValue: "map")
+        mapView.style?.light = light
+        //#-end-example-code
+        
+        XCTAssertNotNil(mapView.style?.light)
+    }
+    
+    func testMGLTilePyramidOfflineRegion() {
+        class MGLStyle {
+            static var lightStyleURL: URL {
+                return MGLDocumentationExampleTests.styleURL
+            }
+        }
+
+        //#-example-code
+        let northeast = CLLocationCoordinate2D(latitude: 40.989329, longitude: -102.062592)
+        let southwest = CLLocationCoordinate2D(latitude: 36.986207, longitude: -109.049896)
+        let bbox = MGLCoordinateBounds(sw: southwest, ne: northeast)
+
+        let region = MGLTilePyramidOfflineRegion(styleURL: MGLStyle.lightStyleURL, bounds: bbox, fromZoomLevel: 11, toZoomLevel: 14)
+        let context = "Tile Pyramid Region".data(using: .utf8)
+        MGLOfflineStorage.shared.addPack(for: region, withContext: context!)
+        //#-end-example-code
+
+        XCTAssertNotNil(region)
+    }
+    
+    func testMGLShapeOfflineRegion() {
+        class MGLStyle {
+            static var lightStyleURL: URL {
+                return MGLDocumentationExampleTests.styleURL
+            }
+        }
+        
+        //#-example-code
+        var coordinates = [
+            CLLocationCoordinate2D(latitude: 45.522585, longitude: -122.685699),
+            CLLocationCoordinate2D(latitude: 45.534611, longitude: -122.708873),
+            CLLocationCoordinate2D(latitude: 45.530883, longitude: -122.678833)
+        ]
+        
+        let triangle = MGLPolygon(coordinates: &coordinates, count: UInt(coordinates.count))
+        let region = MGLShapeOfflineRegion(styleURL: MGLStyle.lightStyleURL, shape: triangle, fromZoomLevel: 11, toZoomLevel: 14)
+        let context = "Triangle Region".data(using: .utf8)
+        MGLOfflineStorage.shared.addPack(for: region, withContext: context!)
+        //#-end-example-code
+        
+        XCTAssertNotNil(region)
+    }
+    
+    func testMGLOfflinePack() {
+        let northeast = CLLocationCoordinate2D(latitude: 40.989329, longitude: -102.062592)
+        let southwest = CLLocationCoordinate2D(latitude: 36.986207, longitude: -109.049896)
+        let bbox = MGLCoordinateBounds(sw: southwest, ne: northeast)
+        let region = MGLTilePyramidOfflineRegion(styleURL: MGLStyle.lightStyleURL, bounds: bbox, fromZoomLevel: 11, toZoomLevel: 14)
+        let context = "Tile Pyramid Region".data(using: .utf8)
+        
+        //#-example-code
+        MGLOfflineStorage.shared.addPack(for: region, withContext: context!) { (pack, error) in
+            guard error == nil else {
+                // If download fails, log the error to the console
+                print("Error: \(error?.localizedDescription ?? "unknown error")")
+                return
+            }
+            
+            // Start an MGLOfflinePack download
+            pack!.resume()
+        }
+        //#-end-example-code
+        
+        XCTAssertNotNil(region)
+    }
+    
     func testMGLShape$shapeWithData_encoding_error_() {
         let mainBundle = Bundle(for: MGLDocumentationExampleTests.self)
         
@@ -374,7 +452,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
                 return MGLDocumentationExampleTests.styleURL
             }
         }
-        
+
         //#-example-code
         let camera = MGLMapCamera(lookingAtCenter: CLLocationCoordinate2D(latitude: 37.7184, longitude: -122.4365), altitude: 100, pitch: 20, heading: 0)
 
@@ -392,6 +470,61 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         //#-end-example-code
         
         wait(for: [expectation], timeout: 5)
+    }
+    
+    func testMGLCluster() {
+
+        enum ExampleError: Error {
+            case unexpectedFeatureType
+            case featureIsNotACluster
+        }
+        
+        let geoJSON: [String: Any] = [
+            "type" : "Feature",
+            "geometry" : [
+                "coordinates" : [
+                    -77.00896639534831,
+                    38.87031006108791,
+                    0.0
+                ],
+                "type" : "Point"
+            ],
+            "properties" : [
+                "cluster" : true,
+                "cluster_id" : 123,
+                "point_count" : 4567,
+            ]
+        ]
+        
+        let clusterShapeData = try! JSONSerialization.data(withJSONObject: geoJSON, options: [])
+        
+        do {
+            //#-example-code
+            let shape = try! MGLShape(data: clusterShapeData, encoding: String.Encoding.utf8.rawValue)
+            
+            guard let pointFeature = shape as? MGLPointFeature else {
+                throw ExampleError.unexpectedFeatureType
+            }
+            
+            // Check for cluster conformance
+            guard let cluster = pointFeature as? MGLCluster else {
+                throw ExampleError.featureIsNotACluster
+            }
+            
+            // Currently the only supported class that conforms to `MGLCluster` is
+            // `MGLPointFeatureCluster`
+            guard cluster is MGLPointFeatureCluster else {
+                throw ExampleError.unexpectedFeatureType
+            }
+            
+            //#-end-example-code
+            
+            XCTAssert(cluster.clusterIdentifier == 123)
+            XCTAssert(cluster.clusterPointCount == 4567)
+        }
+        catch let error {
+            XCTFail("Example failed with thrown error: \(error)")
+        }            
     }
     
     // For testMGLMapView().

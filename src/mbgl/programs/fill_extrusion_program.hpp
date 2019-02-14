@@ -2,6 +2,7 @@
 
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
+#include <mbgl/programs/extrusion_texture_program.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/shaders/fill_extrusion.hpp>
 #include <mbgl/shaders/fill_extrusion_pattern.hpp>
@@ -111,5 +112,17 @@ public:
 
 using FillExtrusionLayoutVertex = FillExtrusionProgram::LayoutVertex;
 using FillExtrusionAttributes = FillExtrusionProgram::Attributes;
+
+
+class FillExtrusionLayerPrograms final : public LayerTypePrograms {
+public:
+    FillExtrusionLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+        : fillExtrusion(context, programParameters),
+          fillExtrusionPattern(context, programParameters),
+          extrusionTexture(context, programParameters) {}
+    ProgramMap<FillExtrusionProgram> fillExtrusion;
+    ProgramMap<FillExtrusionPatternProgram> fillExtrusionPattern;
+    ExtrusionTextureProgram extrusionTexture;
+};
 
 } // namespace mbgl

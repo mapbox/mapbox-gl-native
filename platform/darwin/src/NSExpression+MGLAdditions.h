@@ -114,9 +114,9 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionI
  @param stops The stops must be an `NSDictionary` constant `NSExpression`.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/dds-circle-layer/">
- Data-driven circles</a>, <a href="https://www.mapbox.com/ios-sdk/maps/examples/clustering/">
- Cluster point data</a>, and <a href="https://www.mapbox.com/ios-sdk/maps/examples/clustering-with-images/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/dds-circle-layer/">
+ Data-driven circles</a>, <a href="https://docs.mapbox.com/ios/maps/examples/clustering/">
+ Cluster point data</a>, and <a href="https://docs.mapbox.com/ios/maps/examples/clustering-with-images/">
  Use images to cluster point data</a> examples to learn how to use this
  expression to style a map layer based on an attribute value.
  */
@@ -134,7 +134,7 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionI
  @param stops The stops expression.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/heatmap-example/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/heatmap-example/">
  Create a heatmap layer</a> example to learn how to style an `MGLHeatmapStyleLayer`
  based on zoom level and point density with this expression.
  */
@@ -204,7 +204,7 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionI
  
  This method assumes the receiver refers to the feature attributes that are
  available in vector tiles supplied by the
- <a href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview">Mapbox Streets source</a>.
+ <a href="https://www.mapbox.com/vector-tiles/mapbox-streets-v8/#overview">Mapbox Streets source</a>.
  On iOS, the user can set the system’s preferred language in Settings, General
  Settings, Language & Region. On macOS, the user can set the system’s preferred
  language in the Language & Region pane of System Preferences.

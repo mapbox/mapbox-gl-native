@@ -21,7 +21,10 @@ dependencies {
 
 android {
     compileSdkVersion androidVersions.compileSdkVersion
-    buildToolsVersion androidVersions.buildToolsVersion
+
+    // Roboelectric 4.0 required config
+    // http://robolectric.org/migrating/#migrating-to-40
+    testOptions.unitTests.includeAndroidResources = true
 
     defaultConfig {
         minSdkVersion androidVersions.minSdkVersion
@@ -55,6 +58,7 @@ android {
         externalNativeBuild {
             cmake {
                 path "../../../CMakeLists.txt"
+                version "3.10.2"
             }
         }
     }
@@ -80,11 +84,10 @@ android {
                     // Enable ccache if the user has installed it.
                     if (ccache?.trim()) {
                         arguments "-DANDROID_CCACHE=" + ccache
-                        // ccache splits up the compile command until multiple invocations and uses -E
-                        // with one of them, and clang doesn't like unused arguments in that case.
-                        cFlags "-Qunused-arguments"
-                        cppFlags "-Qunused-arguments"
                     }
+
+                    cFlags "-Qunused-arguments"
+                    cppFlags "-Qunused-arguments"
 
                     targets "mapbox-gl"
 
@@ -94,6 +97,10 @@ android {
 
                     if (project.hasProperty("mapbox.with_test")) {
                         targets "mbgl-test"
+                    }
+
+                    if (project.hasProperty("mapbox.with_benchmark")) {
+                        targets "mbgl-benchmark"
                     }
 
                     if (abi != 'all') {
@@ -159,5 +166,6 @@ configurations {
 apply from: "${rootDir}/gradle/gradle-javadoc.gradle"
 apply from: "${rootDir}/gradle/gradle-publish.gradle"
 apply from: "${rootDir}/gradle/gradle-checkstyle.gradle"
-apply from: "${rootDir}/gradle/gradle-tests-staticblockremover.gradle"
 apply from: "${rootDir}/gradle/gradle-dependencies-graph.gradle"
+apply from: "${rootDir}/gradle/gradle-update-vendor-modules.gradle"
+apply from: "${rootDir}/gradle/android-nitpick.gradle"

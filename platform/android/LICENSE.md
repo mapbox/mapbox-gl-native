@@ -1,5 +1,11 @@
 <!-- This file was generated. Use `make android-license` to update. -->  
 ## Additional Mapbox GL licenses  
+Mapbox GL uses portions of the Android AppCompat Library v7.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
 Mapbox GL uses portions of the Android Arch-Common.  
 URL: [https://developer.android.com/topic/libraries/architecture/index.html](https://developer.android.com/topic/libraries/architecture/index.html)  
 License: [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -7,6 +13,18 @@ License: [The Apache Software License, Version 2.0](http://www.apache.org/licens
 ===========================================================================
 
 Mapbox GL uses portions of the Android Arch-Runtime.  
+URL: [https://developer.android.com/topic/libraries/architecture/index.html](https://developer.android.com/topic/libraries/architecture/index.html)  
+License: [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Android Lifecycle Extensions.  
+URL: [https://developer.android.com/topic/libraries/architecture/index.html](https://developer.android.com/topic/libraries/architecture/index.html)  
+License: [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Android Lifecycle LiveData.  
 URL: [https://developer.android.com/topic/libraries/architecture/index.html](https://developer.android.com/topic/libraries/architecture/index.html)  
 License: [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -33,6 +51,12 @@ License: [The Apache Software License, Version 2.0](http://www.apache.org/licens
 Mapbox GL uses portions of the Android Lifecycle-Common.  
 URL: [https://developer.android.com/topic/libraries/architecture/index.html](https://developer.android.com/topic/libraries/architecture/index.html)  
 License: [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Android Support AnimatedVectorDrawable.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 ===========================================================================
 
@@ -66,6 +90,17 @@ License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.
 
 ===========================================================================
 
+Mapbox GL uses portions of the Android Support VectorDrawable.  
+URL: [http://developer.android.com/tools/extras/support-library.html](http://developer.android.com/tools/extras/support-library.html)  
+License: [The Apache Software License](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Converter: Gson.  
+License: [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
 Mapbox GL uses portions of the Gson.  
 License: [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -95,7 +130,24 @@ License: [The Apache Software License, Version 2.0](http://www.apache.org/licens
 
 ===========================================================================
 
+Mapbox GL uses portions of the Mapbox Services SDK.  
+URL: [https://github.com/mapbox/mapbox-java](https://github.com/mapbox/mapbox-java)  
+License: [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the Mapbox Services SDK.  
+URL: [https://github.com/mapbox/mapbox-java](https://github.com/mapbox/mapbox-java)  
+License: [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
 Mapbox GL uses portions of the OkHttp.  
+License: [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+===========================================================================
+
+Mapbox GL uses portions of the OkHttp Logging Interceptor.  
 License: [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 ===========================================================================
@@ -105,9 +157,8 @@ License: [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 ===========================================================================
 
-Mapbox GL uses portions of the Timber.  
-URL: [https://github.com/JakeWharton/timber](https://github.com/JakeWharton/timber)  
-License: [The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
+Mapbox GL uses portions of the Retrofit.  
+License: [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 ===========================================================================
 

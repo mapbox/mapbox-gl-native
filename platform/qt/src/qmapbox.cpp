@@ -4,6 +4,7 @@
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/traits.hpp>
+#include <mbgl/util/projection.hpp>
 
 #include <QOpenGLContext>
 
@@ -49,21 +50,21 @@ namespace QMapbox {
 /*!
     \typedef QMapbox::Coordinates
 
-    Alias for QList<QMapbox::Coordinate>.
+    Alias for QVector<QMapbox::Coordinate>.
     A list of QMapbox::Coordinate objects.
 */
 
 /*!
     \typedef QMapbox::CoordinatesCollection
 
-    Alias for QList<QMapbox::Coordinates>.
+    Alias for QVector<QMapbox::Coordinates>.
     A list of QMapbox::Coordinates objects.
 */
 
 /*!
     \typedef QMapbox::CoordinatesCollections
 
-    Alias for QList<QMapbox::CoordinatesCollection>.
+    Alias for QVector<QMapbox::CoordinatesCollection>.
     A list of QMapbox::CoordinatesCollection objects.
 */
 
@@ -150,7 +151,7 @@ namespace QMapbox {
 /*!
     \typedef QMapbox::AnnotationIDs
 
-    Alias for QList<quint32> representing a container of annotation identifiers.
+    Alias for QVector<quint32> representing a container of annotation identifiers.
 */
 
 /*!
@@ -203,14 +204,14 @@ void setNetworkMode(NetworkMode mode)
 }
 
 /*!
-    \fn QList<QPair<QString, QString> >& QMapbox::defaultStyles()
+    \fn QVector<QPair<QString, QString> >& QMapbox::defaultStyles()
 
     Returns a list containing a pair of string objects, representing the style
     URL and name, respectively.
 */
-QList<QPair<QString, QString> >& defaultStyles()
+QVector<QPair<QString, QString> >& defaultStyles()
 {
-    static QList<QPair<QString, QString>> styles;
+    static QVector<QPair<QString, QString>> styles;
 
     if (styles.isEmpty()) {
         for (auto style : mbgl::util::default_styles::orderedStyles) {
@@ -220,6 +221,32 @@ QList<QPair<QString, QString> >& defaultStyles()
     }
 
     return styles;
+}
+
+/*!
+    Returns the amount of meters per pixel from a given \a latitude and \a zoom.
+*/
+double metersPerPixelAtLatitude(double latitude, double zoom)
+{
+    return mbgl::Projection::getMetersPerPixelAtLatitude(latitude, zoom);
+}
+
+/*!
+    Return the projected meters for a given \a coordinate object.
+*/
+ProjectedMeters projectedMetersForCoordinate(const Coordinate &coordinate)
+{
+    auto projectedMeters = mbgl::Projection::projectedMetersForLatLng(mbgl::LatLng { coordinate.first, coordinate.second });
+    return QMapbox::ProjectedMeters(projectedMeters.northing(), projectedMeters.easting());
+}
+
+/*!
+    Returns the coordinate for a given \a projectedMeters object.
+*/
+Coordinate coordinateForProjectedMeters(const ProjectedMeters &projectedMeters)
+{
+    auto latLng = mbgl::Projection::latLngForProjectedMeters(mbgl::ProjectedMeters { projectedMeters.first, projectedMeters.second });
+    return QMapbox::Coordinate(latLng.latitude(), latLng.longitude());
 }
 
 } // namespace QMapbox

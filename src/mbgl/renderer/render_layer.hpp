@@ -2,7 +2,6 @@
 #include <mbgl/layout/layout.hpp>
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/style/layer_impl.hpp>
-#include <mbgl/style/layer_type.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/mat4.hpp>
 
@@ -97,6 +96,10 @@ protected:
     // Code specific to RenderTiles sorting / filtering
     virtual RenderTiles filterRenderTiles(RenderTiles) const;
     virtual void sortRenderTiles(const TransformState&);
+    // For some layers, we want Buckets to cache their corresponding paint properties, so that outdated buckets (and
+    // the cached paint properties) can be still in use while the tile is loading new buckets (which will
+    // correpond to the current paint properties of the layer).
+    virtual void updateBucketPaintProperties(Bucket*) const;
     using FilterFunctionPtr = bool (*)(RenderTile&);
     RenderTiles filterRenderTiles(RenderTiles, FilterFunctionPtr) const;
 

@@ -60,10 +60,19 @@ NS_INLINE MGLSphericalPosition MGLSphericalPositionMake(CGFloat radial, CLLocati
   An `MGLLight` object represents the light source for extruded geometries in
  `MGLStyle`.
  
+ ### Example
+ ```swift
+ let light = MGLLight()
+ let position = MGLSphericalPosition(radial: 5, azimuthal: 180, polar: 80)
+ light.position = NSExpression(forConstantValue: NSValue(mglSphericalPosition: position))
+ light.anchor = NSExpression(forConstantValue: "map")
+ mapView.style?.light = light
+ ```
+ 
  #### Related examples
  See the <a
- href="https://www.mapbox.com/ios-sdk/maps/examples/light-example/">Adjust light
- of 3D buildings</a> to learn how to create and modify the light source for 3D
+ href="https://docs.mapbox.com/ios/maps/examples/light-example/">Adjust light of
+ 3D buildings</a> to learn how to create and modify the light source for 3D
  geometries.
  */
 MGL_EXPORT
@@ -128,8 +137,8 @@ MGL_EXPORT
 
  #### Related examples
  See the <a
- href="https://www.mapbox.com/ios-sdk/maps/examples/light-example/">Adjust light
- of 3D buildings</a> example to learn how to create and modify the position of
+ href="https://docs.mapbox.com/ios/maps/examples/light-example/">Adjust light of
+ 3D buildings</a> example to learn how to create and modify the position of
  value of an `MGLLight` object for 3D geometries.
  */
 @property (nonatomic) NSExpression *position;
