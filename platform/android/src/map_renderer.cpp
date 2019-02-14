@@ -33,9 +33,12 @@ MapRenderer::~MapRenderer() = default;
 
 void MapRenderer::reset() {
     destroyed = true;
-    // Make sure to destroy the renderer on the GL Thread
-    auto self = ActorRef<MapRenderer>(*this, mailbox);
-    self.ask(&MapRenderer::resetRenderer).wait();
+
+    if (renderer) {
+        // Make sure to destroy the renderer on the GL Thread
+        auto self = ActorRef<MapRenderer>(*this, mailbox);
+        self.ask(&MapRenderer::resetRenderer).wait();
+    }
 
     // Lock to make sure there is no concurrent initialisation on the gl thread
     std::lock_guard<std::mutex> lock(initialisationMutex);
@@ -113,7 +116,6 @@ void MapRenderer::requestSnapshot(SnapshotCallback callback) {
 // Called on OpenGL thread //
 
 void MapRenderer::resetRenderer() {
-    assert (renderer);
     renderer.reset();
 }
 
@@ -188,6 +190,12 @@ void MapRenderer::onSurfaceChanged(JNIEnv&, jint width, jint height) {
     requestRender();
 }
 
+void MapRenderer::onSurfaceDestroyed(JNIEnv&) {
+    // Make sure to destroy the renderer on the GL Thread
+    auto self = ActorRef<MapRenderer>(*this, mailbox);
+    self.ask(&MapRenderer::resetRenderer).wait();
+}
+
 // Static methods //
 
 void MapRenderer::registerNative(jni::JNIEnv& env) {
@@ -204,7 +212,9 @@ void MapRenderer::registerNative(jni::JNIEnv& env) {
                                          METHOD(&MapRenderer::onSurfaceCreated,
                                                 "nativeOnSurfaceCreated"),
                                          METHOD(&MapRenderer::onSurfaceChanged,
-                                                "nativeOnSurfaceChanged"));
+                                                "nativeOnSurfaceChanged"),
+                                         METHOD(&MapRenderer::onSurfaceDestroyed,
+                                                "nativeOnSurfaceDestroyed"));
 }
 
 MapRenderer& MapRenderer::getNativePeer(JNIEnv& env, const jni::Object<MapRenderer>& jObject) {

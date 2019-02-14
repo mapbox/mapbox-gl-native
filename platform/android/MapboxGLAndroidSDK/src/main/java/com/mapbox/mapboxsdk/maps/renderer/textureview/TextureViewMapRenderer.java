@@ -57,6 +57,14 @@ public class TextureViewMapRenderer extends MapRenderer {
    * Overridden to provide package access
    */
   @Override
+  protected void onSurfaceDestroyed() {
+    super.onSurfaceDestroyed();
+  }
+
+  /**
+   * Overridden to provide package access
+   */
+  @Override
   protected void onDrawFrame(GL10 gl) {
     super.onDrawFrame(gl);
   }
