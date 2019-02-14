@@ -68,7 +68,7 @@ public class MapboxMapOptions implements Parcelable {
 
   private boolean prefetchesTiles = true;
   private boolean zMediaOverlay = false;
-  private String localIdeographFontFamily;
+  private String localIdeographFontFamily = "sans-serif";
 
   private String apiBaseUrl;
 
