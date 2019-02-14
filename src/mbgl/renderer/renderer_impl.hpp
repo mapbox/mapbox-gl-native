@@ -28,7 +28,6 @@ class RenderStaticData;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 class FileSource;
-class Scheduler;
 class GlyphManager;
 class ImageManager;
 class LineAtlas;
@@ -37,7 +36,7 @@ class CrossTileSymbolIndex;
 class Renderer::Impl : public GlyphManagerObserver,
                        public RenderSourceObserver{
 public:
-    Impl(RendererBackend&, float pixelRatio_, FileSource&, Scheduler&, GLContextMode,
+    Impl(RendererBackend&, float pixelRatio_, FileSource&, GLContextMode,
          const optional<std::string> programCacheDir, const optional<std::string> localFontFamily);
     ~Impl() final;
 
@@ -90,7 +89,6 @@ private:
     friend class Renderer;
 
     RendererBackend& backend;
-    Scheduler& scheduler;
     FileSource& fileSource;
 
     RendererObserver* observer;

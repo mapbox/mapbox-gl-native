@@ -10,7 +10,6 @@
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/geojson.hpp>
@@ -25,12 +24,11 @@ TEST(API, RecycleMapUpdateImages) {
     util::RunLoop loop;
 
     StubFileSource fileSource;
-    ThreadPool threadPool(4);
     float pixelRatio { 1 };
 
-    HeadlessFrontend frontend { pixelRatio, fileSource, threadPool };
+    HeadlessFrontend frontend { pixelRatio, fileSource };
     auto map = std::make_unique<Map>(frontend, MapObserver::nullObserver(), frontend.getSize(),
-                                     pixelRatio, fileSource, threadPool,
+                                     pixelRatio, fileSource,
                                      MapOptions().withMapMode(MapMode::Static));
 
     EXPECT_TRUE(map);

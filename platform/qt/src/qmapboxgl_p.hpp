@@ -9,7 +9,6 @@
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/resource_transform.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/geo.hpp>
 
 #include <QObject>
@@ -58,7 +57,6 @@ private:
 
     std::unique_ptr<QMapboxGLMapObserver> m_mapObserver;
     std::shared_ptr<mbgl::DefaultFileSource> m_fileSourceObj;
-    std::shared_ptr<mbgl::ThreadPool> m_threadPool;
     std::unique_ptr<QMapboxGLMapRenderer> m_mapRenderer;
     std::unique_ptr<mbgl::Actor<mbgl::ResourceTransform>> m_resourceTransform;
 

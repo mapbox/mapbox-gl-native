@@ -20,7 +20,6 @@
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/projection.hpp>
@@ -65,8 +64,7 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
                              jni::jboolean _crossSourceCollisions)
     : javaPeer(_env, _obj)
     , mapRenderer(MapRenderer::getNativePeer(_env, jMapRenderer))
-    , pixelRatio(_pixelRatio)
-    , threadPool(sharedThreadPool()) {
+    , pixelRatio(_pixelRatio) {
 
     // Get a reference to the JavaVM for callbacks
     if (_env.GetJavaVM(&vm) < 0) {
@@ -91,7 +89,7 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
     map = std::make_unique<mbgl::Map>(*rendererFrontend, *this,
                                       mbgl::Size{ static_cast<uint32_t>(width),
                                                   static_cast<uint32_t>(height) }, pixelRatio,
-                                      fileSource, *threadPool, options);
+                                      fileSource, options);
 }
 
 /**

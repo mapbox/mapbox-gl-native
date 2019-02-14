@@ -4,7 +4,6 @@
 
 #include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/util/shared_thread_pool.hpp>
 
 class QMapboxGLRendererBackend : public mbgl::RendererBackend
 {

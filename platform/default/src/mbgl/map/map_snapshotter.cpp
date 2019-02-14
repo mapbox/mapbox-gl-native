@@ -15,7 +15,6 @@ namespace mbgl {
 class MapSnapshotter::Impl {
 public:
     Impl(FileSource*,
-         std::shared_ptr<Scheduler>,
          const std::pair<bool, std::string> style,
          const Size&,
          const float pixelRatio,
@@ -42,13 +41,11 @@ public:
     void snapshot(ActorRef<MapSnapshotter::Callback>);
 
 private:
-    std::shared_ptr<Scheduler> scheduler;
     HeadlessFrontend frontend;
     Map map;
 };
 
 MapSnapshotter::Impl::Impl(FileSource* fileSource,
-           std::shared_ptr<Scheduler> scheduler_,
            const std::pair<bool, std::string> style,
            const Size& size,
            const float pixelRatio,
@@ -56,9 +53,8 @@ MapSnapshotter::Impl::Impl(FileSource* fileSource,
            const optional<LatLngBounds> region,
            const optional<std::string> programCacheDir,
            const optional<std::string> localFontFamily)
-    : scheduler(std::move(scheduler_))
-    , frontend(size, pixelRatio, *fileSource, *scheduler, programCacheDir, GLContextMode::Unique, localFontFamily)
-    , map(frontend, MapObserver::nullObserver(), size, pixelRatio, *fileSource, *scheduler, MapOptions().withMapMode(MapMode::Static)) {
+    , frontend(size, pixelRatio, programCacheDir, GLContextMode::Unique, localFontFamily)
+    , map(frontend, MapObserver::nullObserver(), size, pixelRatio, *fileSource, MapOptions().withMapMode(MapMode::Static)) {
 
     if (style.first) {
         map.getStyle().loadJSON(style.second);
@@ -165,7 +161,6 @@ LatLngBounds MapSnapshotter::Impl::getRegion() const {
 }
 
 MapSnapshotter::MapSnapshotter(FileSource* fileSource,
-                               std::shared_ptr<Scheduler> scheduler,
                                const std::pair<bool, std::string> style,
                                const Size& size,
                                const float pixelRatio,
@@ -173,7 +168,7 @@ MapSnapshotter::MapSnapshotter(FileSource* fileSource,
                                const optional<LatLngBounds> region,
                                const optional<std::string> programCacheDir,
                                const optional<std::string> localFontFamily)
-   : impl(std::make_unique<util::Thread<MapSnapshotter::Impl>>("Map Snapshotter", fileSource, std::move(scheduler), style, size, pixelRatio, cameraOptions, region, programCacheDir, localFontFamily)) {
+   : impl(std::make_unique<util::Thread<MapSnapshotter::Impl>>("Map Snapshotter", fileSource, style, size, pixelRatio, cameraOptions, region, programCacheDir, localFontFamily)) {
 }
 
 MapSnapshotter::~MapSnapshotter() = default;

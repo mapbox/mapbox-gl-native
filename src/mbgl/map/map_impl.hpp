@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_observer.hpp>
@@ -30,7 +29,6 @@ public:
          RendererFrontend&,
          MapObserver&,
          FileSource&,
-         Scheduler&,
 
          Size size,
          float pixelRatio,
@@ -61,7 +59,6 @@ public:
     MapObserver& observer;
     RendererFrontend& rendererFrontend;
     FileSource& fileSource;
-    Scheduler& scheduler;
 
     Transform transform;
 

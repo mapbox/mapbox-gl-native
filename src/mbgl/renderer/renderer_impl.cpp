@@ -38,12 +38,10 @@ static RendererObserver& nullObserver() {
 Renderer::Impl::Impl(RendererBackend& backend_,
                      float pixelRatio_,
                      FileSource& fileSource_,
-                     Scheduler& scheduler_,
                      GLContextMode contextMode_,
                      const optional<std::string> programCacheDir_,
                      const optional<std::string> localFontFamily_)
     : backend(backend_)
-    , scheduler(scheduler_)
     , fileSource(fileSource_)
     , observer(&nullObserver())
     , contextMode(contextMode_)
@@ -111,7 +109,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         updateParameters.pixelRatio,
         updateParameters.debugOptions,
         updateParameters.transformState,
-        scheduler,
         fileSource,
         updateParameters.mode,
         updateParameters.annotationManager,

@@ -5,7 +5,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/style/style.hpp>
@@ -36,7 +35,6 @@ public:
 
     util::RunLoop runLoop;
     StubFileSource fileSource;
-    ThreadPool threadPool { 4 };
 
 private:
     Response response(const std::string& path) {
@@ -71,9 +69,9 @@ TEST(Memory, Vector) {
     MemoryTest test;
     float ratio { 2 };
 
-    HeadlessFrontend frontend { { 256, 256 }, ratio, test.fileSource, test.threadPool };
+    HeadlessFrontend frontend { { 256, 256 }, ratio, test.fileSource };
     Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), ratio, test.fileSource,
-            test.threadPool, MapOptions().withMapMode(MapMode::Static));
+            MapOptions().withMapMode(MapMode::Static));
     map.jumpTo(CameraOptions().withZoom(16));
     map.getStyle().loadURL("mapbox://streets");
 
@@ -84,9 +82,9 @@ TEST(Memory, Raster) {
     MemoryTest test;
     float ratio { 2 };
 
-    HeadlessFrontend frontend { { 256, 256 }, ratio, test.fileSource, test.threadPool };
+    HeadlessFrontend frontend { { 256, 256 }, ratio, test.fileSource };
     Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), ratio, test.fileSource,
-            test.threadPool, MapOptions().withMapMode(MapMode::Static));
+            MapOptions().withMapMode(MapMode::Static));
     map.getStyle().loadURL("mapbox://satellite");
 
     frontend.render(map);
@@ -122,9 +120,9 @@ TEST(Memory, Footprint) {
     class FrontendAndMap {
     public:
         FrontendAndMap(MemoryTest& test_, const char* style)
-            : frontend(Size{ 256, 256 }, 2, test_.fileSource, test_.threadPool)
-            , map(frontend, MapObserver::nullObserver(), frontend.getSize(), 2, test_.fileSource
-            , test_.threadPool, MapOptions().withMapMode(MapMode::Static)) {
+            : frontend(Size{ 256, 256 }, 2, test_.fileSource)
+            , map(frontend, MapObserver::nullObserver(), frontend.getSize(), 2, test_.fileSource,
+                  MapOptions().withMapMode(MapMode::Static)) {
             map.jumpTo(CameraOptions().withZoom(16));
             map.getStyle().loadURL(style);
             frontend.render(map);

@@ -4,7 +4,6 @@
 #include <mbgl/tile/vector_tile_data.hpp>
 #include <mbgl/tile/tile_loader_impl.hpp>
 
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/style/style.hpp>
@@ -26,8 +25,7 @@ public:
     FakeFileSource fileSource;
     TransformState transformState;
     util::RunLoop loop;
-    ThreadPool threadPool { 1 };
-    style::Style style { loop, fileSource, 1 };
+    style::Style style { fileSource, 1 };
     AnnotationManager annotationManager { style };
     ImageManager imageManager;
     GlyphManager glyphManager { fileSource };
@@ -37,7 +35,6 @@ public:
         1.0,
         MapDebugOptions(),
         transformState,
-        threadPool,
         fileSource,
         MapMode::Continuous,
         annotationManager,

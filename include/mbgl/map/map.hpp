@@ -21,7 +21,6 @@
 namespace mbgl {
 
 class FileSource;
-class Scheduler;
 class RendererFrontend;
 
 namespace style {
@@ -36,7 +35,6 @@ public:
                  Size size,
                  float pixelRatio,
                  FileSource&,
-                 Scheduler&,
                  const MapOptions&);
     ~Map();
 

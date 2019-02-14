@@ -1,6 +1,5 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_options.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/util.hpp>
 #include <mbgl/util/image.hpp>
@@ -34,11 +33,10 @@ public:
 
     util::RunLoop loop;
     StubFileSource fileSource;
-    ThreadPool threadPool { 4 };
     float pixelRatio { 1 };
-    HeadlessFrontend frontend { pixelRatio, fileSource, threadPool };
+    HeadlessFrontend frontend { pixelRatio, fileSource };
     Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
-              threadPool, MapOptions().withMapMode(MapMode::Static)};
+              MapOptions().withMapMode(MapMode::Static)};
 };
 
 std::vector<Feature> getTopClusterFeature(QueryTest& test) {

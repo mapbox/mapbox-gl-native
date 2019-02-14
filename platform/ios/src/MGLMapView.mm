@@ -10,7 +10,6 @@
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/storage/reachability.h>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/style/style.hpp>
@@ -30,7 +29,6 @@
 #include <mbgl/util/default_styles.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/projection.hpp>
 
@@ -272,8 +270,6 @@ public:
     MBGLView *_mbglView;
     std::unique_ptr<MGLRenderFrontend> _rendererFrontend;
     
-    std::shared_ptr<mbgl::ThreadPool> _mbglThreadPool;
-
     BOOL _opaque;
 
     MGLAnnotationTagContextMap _annotationContextsByAnnotationTag;
@@ -468,9 +464,8 @@ public:
 
     // setup mbgl map
     MGLRendererConfiguration *config = [MGLRendererConfiguration currentConfiguration];
-    _mbglThreadPool = mbgl::sharedThreadPool();
 
-    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, *config.fileSource, *_mbglThreadPool, config.contextMode, config.cacheDir, config.localFontFamilyName);
+    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, *config.fileSource, config.contextMode, config.cacheDir, config.localFontFamilyName);
     BOOL enableCrossSourceCollisions = !config.perSourceCollisions;
     _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView);
 
@@ -481,7 +476,7 @@ public:
               .withCrossSourceCollisions(enableCrossSourceCollisions);
 
     NSAssert(!_mbglMap, @"_mbglMap should be NULL");
-    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *[config fileSource], *_mbglThreadPool, mapOptions);
+    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *[config fileSource], mapOptions);
 
     // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {
@@ -739,7 +734,6 @@ public:
     _mbglView = nullptr;
 
     _rendererFrontend.reset();
-    _mbglThreadPool.reset();
 }
 
 - (void)dealloc

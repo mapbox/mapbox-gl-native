@@ -25,8 +25,8 @@ static auto *getScheduler() {
 };
 
 QMapboxGLMapRenderer::QMapboxGLMapRenderer(qreal pixelRatio,
-        mbgl::DefaultFileSource &fs, mbgl::ThreadPool &tp, QMapboxGLSettings::GLContextMode mode, const QString &localFontFamily)
-    : m_renderer(std::make_unique<mbgl::Renderer>(m_backend, pixelRatio, fs, tp, static_cast<mbgl::GLContextMode>(mode), mbgl::optional<std::string> {},
+        mbgl::DefaultFileSource &fs, QMapboxGLSettings::GLContextMode mode, const QString &localFontFamily)
+    : m_renderer(std::make_unique<mbgl::Renderer>(m_backend, pixelRatio, fs, static_cast<mbgl::GLContextMode>(mode), mbgl::optional<std::string> {},
                  localFontFamily.isEmpty() ? mbgl::nullopt : mbgl::optional<std::string> { localFontFamily.toStdString() }))
     , m_forceScheduler(needsToForceScheduler())
 {

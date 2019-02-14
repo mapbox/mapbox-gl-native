@@ -7,7 +7,6 @@
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/storage/online_file_source.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -23,12 +22,11 @@ TEST(API, RenderWithoutCallback) {
     util::RunLoop loop;
 
     StubFileSource fileSource;
-    ThreadPool threadPool(4);
     float pixelRatio { 1 };
-    HeadlessFrontend frontend { pixelRatio, fileSource, threadPool };
+    HeadlessFrontend frontend { pixelRatio, fileSource };
 
     auto map = std::make_unique<Map>(frontend, MapObserver::nullObserver(), frontend.getSize(),
-                                     pixelRatio, fileSource, threadPool,
+                                     pixelRatio, fileSource,
                                      MapOptions().withMapMode(MapMode::Static));
     map->renderStill(nullptr);
 

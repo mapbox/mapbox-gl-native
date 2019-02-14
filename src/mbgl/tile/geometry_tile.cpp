@@ -1,4 +1,5 @@
 #include <mbgl/tile/geometry_tile.hpp>
+
 #include <mbgl/tile/geometry_tile_worker.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/tile_observer.hpp>
@@ -45,7 +46,7 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
     : Tile(Kind::Geometry, id_),
       sourceID(std::move(sourceID_)),
       mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
-      worker(parameters.workerScheduler,
+      worker(Scheduler::GetBackground(),
              ActorRef<GeometryTile>(*this, mailbox),
              id_,
              sourceID,

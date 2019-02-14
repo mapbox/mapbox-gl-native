@@ -6,9 +6,7 @@
 #import <mbgl/map/map_snapshotter.hpp>
 #import <mbgl/map/camera.hpp>
 #import <mbgl/storage/default_file_source.hpp>
-#import <mbgl/util/default_thread_pool.hpp>
 #import <mbgl/util/string.hpp>
-#import <mbgl/util/shared_thread_pool.hpp>
 
 #import "MGLOfflineStorage_Private.h"
 #import "MGLGeometry_Private.h"
@@ -123,7 +121,6 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 @end
 
 @implementation MGLMapSnapshotter {
-    std::shared_ptr<mbgl::ThreadPool> _mbglThreadPool;
     std::unique_ptr<mbgl::MapSnapshotter> _mbglMapSnapshotter;
     std::unique_ptr<mbgl::Actor<mbgl::MapSnapshotter::Callback>> _snapshotCallback;
 }
@@ -174,7 +171,6 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
     _mbglMapSnapshotter.reset();
     _snapshotCallback.reset();
-    _mbglThreadPool.reset();
     
     self.terminated = YES;
 }
@@ -588,7 +584,6 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     _cancelled = NO;
     _options = options;
     mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
-    _mbglThreadPool = mbgl::sharedThreadPool();
     
     std::string styleURL = std::string([options.styleURL.absoluteString UTF8String]);
     std::pair<bool, std::string> style = std::make_pair(false, styleURL);
@@ -621,7 +616,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     MGLRendererConfiguration* config = [MGLRendererConfiguration currentConfiguration];
     
     // Create the snapshotter
-    _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(mbglFileSource, _mbglThreadPool, style, size, pixelRatio, cameraOptions, coordinateBounds, config.cacheDir, config.localFontFamilyName);
+    _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(mbglFileSource, style, size, pixelRatio, cameraOptions, coordinateBounds, config.cacheDir, config.localFontFamilyName);
 }
 
 @end

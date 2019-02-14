@@ -1,7 +1,5 @@
 #pragma once
 
-#include "node_thread_pool.hpp"
-
 #include <mbgl/map/map.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/image.hpp>
@@ -83,7 +81,6 @@ public:
     const float pixelRatio;
     mbgl::MapMode mode;
     bool crossSourceCollisions;
-    NodeThreadPool threadpool;
     NodeMapObserver mapObserver;
     std::unique_ptr<mbgl::HeadlessFrontend> frontend;
     std::unique_ptr<mbgl::Map> map;

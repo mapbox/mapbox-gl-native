@@ -1,12 +1,33 @@
-#include <mbgl/util/default_thread_pool.hpp>
+#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/actor/mailbox.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
 
+#include <condition_variable>
+#include <mutex>
+#include <queue>
+#include <thread>
+
 namespace mbgl {
+
+class ThreadPool final : public Scheduler {
+public:
+    explicit ThreadPool(std::size_t count);
+    ~ThreadPool() override;
+
+    void schedule(std::weak_ptr<Mailbox>) override;
+
+private:
+    std::vector<std::thread> threads;
+    std::queue<std::weak_ptr<Mailbox>> queue;
+    std::mutex mutex;
+    std::condition_variable cv;
+    bool terminate { false };
+};
 
 ThreadPool::ThreadPool(std::size_t count) {
     threads.reserve(count);
+
     for (std::size_t i = 0; i < count; ++i) {
         threads.emplace_back([this, i]() {
             platform::setCurrentThreadName(std::string{ "Worker " } + util::toString(i + 1));
@@ -52,6 +73,11 @@ void ThreadPool::schedule(std::weak_ptr<Mailbox> mailbox) {
     }
 
     cv.notify_one();
+}
+
+Scheduler& Scheduler::GetBackground() {
+    static std::unique_ptr<ThreadPool> pool(new ThreadPool(4));
+    return *pool;
 }
 
 } // namespace mbgl

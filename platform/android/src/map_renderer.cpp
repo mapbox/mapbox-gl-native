@@ -1,7 +1,6 @@
 #include "map_renderer.hpp"
 
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 #include <string>
@@ -25,7 +24,6 @@ MapRenderer::MapRenderer(jni::JNIEnv& _env,
         , fileSource(FileSource::getDefaultFileSource(_env, _fileSource))
         , programCacheDir(jni::Make<std::string>(_env, programCacheDir_))
         , localIdeographFontFamily(localIdeographFontFamily_ ? jni::Make<std::string>(_env, localIdeographFontFamily_) : optional<std::string>{})
-        , threadPool(sharedThreadPool())
         , mailbox(std::make_shared<Mailbox>(*this)) {
 }
 
@@ -174,7 +172,7 @@ void MapRenderer::onSurfaceCreated(JNIEnv&) {
 
     // Create the new backend and renderer
     backend = std::make_unique<AndroidRendererBackend>();
-    renderer = std::make_unique<Renderer>(*backend, pixelRatio, fileSource, *threadPool,
+    renderer = std::make_unique<Renderer>(*backend, pixelRatio, fileSource,
                                           GLContextMode::Unique, programCacheDir, localIdeographFontFamily);
     rendererRef = std::make_unique<ActorRef<Renderer>>(*renderer, mailbox);
 

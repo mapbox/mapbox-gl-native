@@ -12,7 +12,6 @@
 
 namespace mbgl {
 
-class Scheduler;
 class FileSource;
 class SpriteLoaderObserver;
 
@@ -21,7 +20,7 @@ public:
     SpriteLoader(float pixelRatio);
     ~SpriteLoader();
 
-    void load(const std::string& url, Scheduler&, FileSource&);
+    void load(const std::string& url, FileSource&);
 
     void setObserver(SpriteLoaderObserver*);
 

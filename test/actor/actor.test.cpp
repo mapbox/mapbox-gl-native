@@ -1,5 +1,4 @@
 #include <mbgl/actor/actor.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 #include <mbgl/test/util.hpp>
@@ -20,9 +19,8 @@ TEST(Actor, Construction) {
         };
     };
 
-    ThreadPool pool { 1 };
     bool constructed = false;
-    Actor<Test> test(pool, std::ref(constructed));
+    Actor<Test> test(Scheduler::GetBackground(), std::ref(constructed));
 
     EXPECT_TRUE(constructed);
 }
@@ -37,10 +35,9 @@ TEST(Actor, Destruction) {
         bool& destructed;
     };
 
-    ThreadPool pool { 1 };
     bool destructed = false;
     {
-        Actor<Test> test(pool, std::ref(destructed));
+        Actor<Test> test(Scheduler::GetBackground(), std::ref(destructed));
     }
 
     EXPECT_TRUE(destructed);
@@ -72,15 +69,13 @@ TEST(Actor, DestructionBlocksOnReceive) {
         }
     };
 
-    ThreadPool pool { 1 };
-
     std::promise<void> enteredPromise;
     std::future<void> enteredFuture = enteredPromise.get_future();
 
     std::promise<void> exitingPromise;
     std::future<void> exitingFuture = exitingPromise.get_future();
 
-    Actor<Test> test(pool, std::move(enteredPromise), std::move(exitingFuture));
+    Actor<Test> test(Scheduler::GetBackground(), std::move(enteredPromise), std::move(exitingFuture));
 
     test.self().invoke(&Test::wait);
     enteredFuture.wait();
@@ -157,11 +152,8 @@ TEST(Actor, DestructionAllowedInReceiveOnSameThread) {
         }
     };
 
-    ThreadPool pool { 1 };
-
     std::promise<void> callbackFiredPromise;
-
-    auto test = std::make_unique<Actor<Test>>(pool);
+    auto test = std::make_unique<Actor<Test>>(Scheduler::GetBackground());
 
     // Callback (triggered while mutex is locked in Mailbox::receive())
     test->self().invoke(&Test::callMeBack, [&]() {
@@ -189,12 +181,10 @@ TEST(Actor, SelfDestructionDoesntCrashWaitingReceivingThreads) {
     };
 
 
-    ThreadPool pool { 2 };
-
     std::promise<void> actorClosedPromise;
 
-    auto closingActor = std::make_unique<Actor<Test>>(pool);
-    auto waitingActor = std::make_unique<Actor<Test>>(pool);
+    auto closingActor = std::make_unique<Actor<Test>>(Scheduler::GetBackground());
+    auto waitingActor = std::make_unique<Actor<Test>>(Scheduler::GetBackground());
 
     std::atomic<bool> waitingMessageProcessed {false};
 
@@ -251,11 +241,9 @@ TEST(Actor, OrderedMailbox) {
         }
     };
 
-    ThreadPool pool { 1 };
-
     std::promise<void> endedPromise;
     std::future<void> endedFuture = endedPromise.get_future();
-    Actor<Test> test(pool, std::move(endedPromise));
+    Actor<Test> test(Scheduler::GetBackground(), std::move(endedPromise));
 
     for (auto i = 1; i <= 10; ++i) {
         test.self().invoke(&Test::receive, i);
@@ -287,11 +275,9 @@ TEST(Actor, NonConcurrentMailbox) {
         }
     };
 
-    ThreadPool pool { 10 };
-
     std::promise<void> endedPromise;
     std::future<void> endedFuture = endedPromise.get_future();
-    Actor<Test> test(pool, std::move(endedPromise));
+    Actor<Test> test(Scheduler::GetBackground(), std::move(endedPromise));
 
     for (auto i = 1; i <= 10; ++i) {
         test.self().invoke(&Test::receive, i);
@@ -313,8 +299,7 @@ TEST(Actor, Ask) {
         }
     };
 
-    ThreadPool pool { 2 };
-    Actor<Test> test(pool);
+    Actor<Test> test(Scheduler::GetBackground());
 
     auto result = test.self().ask(&Test::doubleIt, 1);
 
@@ -339,9 +324,8 @@ TEST(Actor, AskVoid) {
         }
     };
 
-    ThreadPool pool { 1 };
     bool executed = false;
-    Actor<Test> actor(pool, executed);
+    Actor<Test> actor(Scheduler::GetBackground(), executed);
 
     actor.self().ask(&Test::doIt).get();
     EXPECT_TRUE(executed);
@@ -353,8 +337,7 @@ TEST(Actor, NoSelfActorRef) {
     // Trivially constructable
     struct Trivial {};
     
-    ThreadPool pool { 2 };
-    Actor<Trivial> trivial(pool);
+    Actor<Trivial> trivial(Scheduler::GetBackground());
     
     
     // With arguments
@@ -372,7 +355,7 @@ TEST(Actor, NoSelfActorRef) {
     
     std::promise<void> promise;
     auto future = promise.get_future();
-    Actor<WithArguments> withArguments(pool, std::move(promise));
+    Actor<WithArguments> withArguments(Scheduler::GetBackground(), std::move(promise));
     
     withArguments.self().invoke(&WithArguments::receive);
     future.wait();

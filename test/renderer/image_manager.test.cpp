@@ -9,7 +9,6 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/string.hpp>
 
 #include <utility>

@@ -1,14 +1,14 @@
 #include <mbgl/util/async_task.hpp>
-#include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
-#include <mbgl/actor/actor_ref.hpp>
 
+#include <mbgl/actor/actor_ref.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/test/util.hpp>
 
 #include <atomic>
 #include <future>
 #include <vector>
 
+using namespace mbgl;
 using namespace mbgl::util;
 
 namespace {
@@ -104,11 +104,10 @@ TEST(AsyncTask, RequestCoalescingMultithreaded) {
     unsigned count = 0, numThreads = 25;
     AsyncTask async([&count] { ++count; });
 
-    mbgl::ThreadPool threads(numThreads);
-    auto mailbox = std::make_shared<mbgl::Mailbox>(threads);
+    auto mailbox = std::make_shared<Mailbox>(Scheduler::GetBackground());
 
     TestWorker worker(&async);
-    mbgl::ActorRef<TestWorker> workerRef(worker, mailbox);
+    ActorRef<TestWorker> workerRef(worker, mailbox);
 
     for (unsigned i = 0; i < numThreads; ++i) {
         workerRef.invoke(&TestWorker::run);
@@ -133,11 +132,10 @@ TEST(AsyncTask, ThreadSafety) {
 
     AsyncTask async([&count] { ++count; });
 
-    mbgl::ThreadPool threads(numThreads);
-    auto mailbox = std::make_shared<mbgl::Mailbox>(threads);
+    auto mailbox = std::make_shared<Mailbox>(Scheduler::GetBackground());
 
     TestWorker worker(&async);
-    mbgl::ActorRef<TestWorker> workerRef(worker, mailbox);
+    ActorRef<TestWorker> workerRef(worker, mailbox);
 
     for (unsigned i = 0; i < numThreads; ++i) {
         // The callback runs on the worker, thus the atomic type.
