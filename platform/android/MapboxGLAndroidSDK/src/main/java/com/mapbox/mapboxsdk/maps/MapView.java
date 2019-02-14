@@ -61,6 +61,8 @@ import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
  */
 public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
+  private MapPresenter mapPresenter;
+
   private final MapChangeReceiver mapChangeReceiver = new MapChangeReceiver();
   private final MapCallback mapCallback = new MapCallback();
   private final InitialRenderCallback initialRenderCallback = new InitialRenderCallback();
@@ -120,20 +122,9 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       return;
     }
 
-    // hide surface until map is fully loaded #10990
-    setForeground(new ColorDrawable(options.getForegroundLoadColor()));
-
     mapboxMapOptions = options;
 
-    // inflate view
-    View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
-    compassView = view.findViewById(R.id.compassView);
-    attrView = view.findViewById(R.id.attributionView);
-    logoView = view.findViewById(R.id.logoView);
-
-    // add accessibility support
-    setContentDescription(context.getString(R.string.mapbox_mapActionDescription));
-    setWillNotDraw(false);
+    mapPresenter = new MapPresenterImpl(this, context, options);
     initialiseDrawingSurface(options);
   }
 
@@ -276,30 +267,9 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   private void initialiseDrawingSurface(MapboxMapOptions options) {
     String localFontFamily = options.getLocalIdeographFontFamily();
     if (options.getTextureMode()) {
-      TextureView textureView = new TextureView(getContext());
-      boolean translucentSurface = options.getTranslucentTextureSurface();
-      mapRenderer = new TextureViewMapRenderer(getContext(),
-        textureView, localFontFamily, translucentSurface) {
-        @Override
-        protected void onSurfaceCreated(GL10 gl, EGLConfig config) {
-          MapView.this.onSurfaceCreated();
-          super.onSurfaceCreated(gl, config);
-        }
-      };
 
-      addView(textureView, 0);
     } else {
-      GLSurfaceView glSurfaceView = new GLSurfaceView(getContext());
-      glSurfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
-      mapRenderer = new GLSurfaceViewMapRenderer(getContext(), glSurfaceView, localFontFamily) {
-        @Override
-        public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-          MapView.this.onSurfaceCreated();
-          super.onSurfaceCreated(gl, config);
-        }
-      };
 
-      addView(glSurfaceView, 0);
     }
 
     boolean crossSourceCollisions = mapboxMapOptions.getCrossSourceCollisions();
@@ -432,10 +402,10 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   /**
-   *  The maximum frame rate at which the map view is rendered,
-   *  but it can't excess the ability of device hardware.
+   * The maximum frame rate at which the map view is rendered,
+   * but it can't excess the ability of device hardware.
    *
-   * @param maximumFps  Can be set to arbitrary integer values.
+   * @param maximumFps Can be set to arbitrary integer values.
    */
   public void setMaximumFps(int maximumFps) {
     if (mapRenderer != null) {
@@ -740,8 +710,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   /**
-
-   /**
+   * /**
    * Set a callback that's invoked when the style has finished loading.
    *
    * @param listener The callback that's invoked when the style has finished loading
@@ -775,6 +744,59 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    */
   public void removeOnSourceChangedListener(OnSourceChangedListener listener) {
     mapChangeReceiver.removeOnSourceChangedListener(listener);
+  }
+
+
+  ///
+  /// View Implementation
+  ///
+
+  void setForegroundColor(int foregroundLoadColor) {
+    // hide surface until map is fully loaded #10990
+    setForeground(new ColorDrawable(foregroundLoadColor));
+  }
+
+  void inflateInternalViews() {
+    View view = LayoutInflater.from(getContext()).inflate(R.layout.mapbox_mapview_internal, this);
+    compassView = view.findViewById(R.id.compassView);
+    attrView = view.findViewById(R.id.attributionView);
+    logoView = view.findViewById(R.id.logoView);
+  }
+
+  void setViewOptions() {
+    // add accessibility support
+    setContentDescription(getContext().getString(R.string.mapbox_mapActionDescription));
+    setWillNotDraw(false);
+  }
+
+  MapRenderer initializeTextureView(@Nullable String localFontFamily, boolean translucent) {
+    TextureView textureView = new TextureView(getContext());
+    mapRenderer = new TextureViewMapRenderer(getContext(),
+      textureView, localFontFamily, translucent) {
+      @Override
+      protected void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        MapView.this.onSurfaceCreated();
+        super.onSurfaceCreated(gl, config);
+      }
+    };
+
+    addView(textureView, 0);
+    return mapRenderer;
+  }
+
+  MapRenderer initializeSurfaceView(@Nullable String localFontFamily) {
+    GLSurfaceView glSurfaceView = new GLSurfaceView(getContext());
+    glSurfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
+    mapRenderer = new GLSurfaceViewMapRenderer(getContext(), glSurfaceView, localFontFamily) {
+      @Override
+      public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        MapView.this.onSurfaceCreated();
+        super.onSurfaceCreated(gl, config);
+      }
+    };
+
+    addView(glSurfaceView, 0);
+    return mapRenderer;
   }
 
   /**
