@@ -20,9 +20,9 @@ namespace mbgl {
 static SpriteLoaderObserver nullObserver;
 
 struct SpriteLoader::Loader {
-    Loader(Scheduler& scheduler, SpriteLoader& imageManager)
+    Loader(SpriteLoader& imageManager)
         : mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
-          worker(scheduler, ActorRef<SpriteLoader>(imageManager, mailbox)) {
+          worker(Scheduler::GetBackground(), ActorRef<SpriteLoader>(imageManager, mailbox)) {
     }
 
     std::shared_ptr<const std::string> image;
@@ -40,14 +40,14 @@ SpriteLoader::SpriteLoader(float pixelRatio_)
 
 SpriteLoader::~SpriteLoader() = default;
 
-void SpriteLoader::load(const std::string& url, Scheduler& scheduler, FileSource& fileSource) {
+void SpriteLoader::load(const std::string& url, FileSource& fileSource) {
     if (url.empty()) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
         observer->onSpriteLoaded({});
         return;
     }
 
-    loader = std::make_unique<Loader>(scheduler, *this);
+    loader = std::make_unique<Loader>(*this);
 
     loader->jsonRequest = fileSource.request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
         if (res.error) {

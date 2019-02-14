@@ -26,8 +26,7 @@ class Style;
 
 class MapSnapshotter {
 public:
-    MapSnapshotter(std::shared_ptr<Scheduler> scheduler,
-                   const std::pair<bool, std::string> style,
+    MapSnapshotter(const std::pair<bool, std::string> style,
                    const Size&,
                    const float pixelRatio,
                    const optional<CameraOptions> cameraOptions,

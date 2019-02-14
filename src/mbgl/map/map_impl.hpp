@@ -1,7 +1,5 @@
 #pragma once
 
-#include <mbgl/actor/actor.hpp>
-#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/map_observer.hpp>
@@ -30,7 +28,7 @@ struct StillImageRequest {
 
 class Map::Impl : public style::Observer, public RendererObserver {
 public:
-    Impl(RendererFrontend&, MapObserver&, Scheduler&, std::shared_ptr<FileSource>, const MapOptions&);
+    Impl(RendererFrontend&, MapObserver&, std::shared_ptr<FileSource>, const MapOptions&);
     ~Impl() final;
 
     // StyleObserver
@@ -54,7 +52,6 @@ public:
 
     MapObserver& observer;
     RendererFrontend& rendererFrontend;
-    Scheduler& scheduler;
 
     Transform transform;
 

@@ -17,7 +17,6 @@
 #include "../conversion/url_or_tileset.hpp"
 
 #include <string>
-#include <mbgl/util/shared_thread_pool.hpp>
 
 // GeoJSONSource uses a "coalescing" model for high frequency asynchronous data update calls,
 // which in practice means, that any update that started processing is going to finish
@@ -48,16 +47,14 @@ namespace android {
         : Source(env, std::make_unique<mbgl::style::GeoJSONSource>(
                 jni::Make<std::string>(env, sourceId),
                 convertGeoJSONOptions(env, options)))
-        , threadPool(sharedThreadPool())
-        , converter(std::make_unique<Actor<FeatureConverter>>(*threadPool)) {
+        , converter(std::make_unique<Actor<FeatureConverter>>(Scheduler::GetBackground())) {
     }
 
     GeoJSONSource::GeoJSONSource(jni::JNIEnv& env,
                                  mbgl::style::Source& coreSource,
                                  AndroidRendererFrontend& frontend)
         : Source(env, coreSource, createJavaPeer(env), frontend)
-        , threadPool(sharedThreadPool())
-        , converter(std::make_unique<Actor<FeatureConverter>>(*threadPool)) {
+        , converter(std::make_unique<Actor<FeatureConverter>>(Scheduler::GetBackground())) {
     }
 
     GeoJSONSource::~GeoJSONSource() = default;

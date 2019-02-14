@@ -2,6 +2,7 @@
 #include "util/async_queue.hpp"
 
 #include <mbgl/actor/mailbox.hpp>
+#include <mbgl/platform/background_scheduler.hpp>
 
 namespace node_mbgl {
 
@@ -35,3 +36,14 @@ void NodeThreadPool::Worker::WorkComplete() {
 }
 
 } // namespace node_mbgl
+
+namespace mbgl {
+namespace platform {
+
+Scheduler& GetBackgroundScheduler() {
+    static node_mbgl::NodeThreadPool pool;
+    return pool;
+}
+
+} // namespace platform
+} // namespace mbgl

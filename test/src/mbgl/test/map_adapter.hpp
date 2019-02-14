@@ -13,9 +13,8 @@ public:
     explicit MapAdapter(RendererFrontend& frontend,
                         MapObserver& observer,
                         std::shared_ptr<FileSource> fileSource,
-                        Scheduler& scheduler,
                         const MapOptions& options)
-        : Map(std::make_unique<Map::Impl>(frontend, observer, scheduler, std::move(fileSource), options)) {}
+        : Map(std::make_unique<Map::Impl>(frontend, observer, std::move(fileSource), options)) {}
 };
 
 } // namespace mbgl

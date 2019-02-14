@@ -31,7 +31,6 @@
 #include <mbgl/util/image.hpp>
 
 #include <mbgl/util/tileset.hpp>
-#include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/range.hpp>
@@ -55,8 +54,7 @@ public:
     StubRenderSourceObserver renderSourceObserver;
     Transform transform;
     TransformState transformState;
-    ThreadPool threadPool { 1 };
-    Style style { loop, fileSource, 1 };
+    Style style { fileSource, 1 };
     AnnotationManager annotationManager { style };
     ImageManager imageManager;
     GlyphManager glyphManager { fileSource };
@@ -65,7 +63,6 @@ public:
         1.0,
         MapDebugOptions(),
         transformState,
-        threadPool,
         fileSource,
         MapMode::Continuous,
         annotationManager,
@@ -763,7 +760,6 @@ TEST(Source, ImageSourceImageUpdate) {
 
 TEST(Source, CustomGeometrySourceSetTileData) {
     SourceTest test;
-    std::shared_ptr<ThreadPool> threadPool = sharedThreadPool();
     CustomGeometrySource source("source", CustomGeometrySource::Options());
     source.loadDescription(test.fileSource);
 

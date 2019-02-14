@@ -8,8 +8,8 @@
 namespace mbgl {
 namespace style {
 
-Style::Style(Scheduler& scheduler, FileSource& fileSource, float pixelRatio)
-    : impl(std::make_unique<Impl>(scheduler, fileSource, pixelRatio)) {
+Style::Style(FileSource& fileSource, float pixelRatio)
+    : impl(std::make_unique<Impl>(fileSource, pixelRatio)) {
 }
 
 Style::~Style() = default;

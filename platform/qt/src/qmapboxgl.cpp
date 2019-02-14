@@ -43,7 +43,6 @@
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/traits.hpp>
 #include <mbgl/actor/scheduler.hpp>
 
@@ -1724,7 +1723,6 @@ mbgl::ResourceOptions resourceOptionsFromQMapboxGLSettings(const QMapboxGLSettin
 
 QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings, const QSize &size, qreal pixelRatio_)
     : QObject(q)
-    , m_threadPool(mbgl::sharedThreadPool())
     , m_mode(settings.contextMode())
     , m_pixelRatio(pixelRatio_)
     , m_localFontFamily(settings.localFontFamily())
@@ -1741,7 +1739,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     auto resourceOptions = resourceOptionsFromQMapboxGLSettings(settings);
 
     // Setup the Map object.
-    mapObj = std::make_unique<mbgl::Map>(*this, *m_mapObserver, *m_threadPool,
+    mapObj = std::make_unique<mbgl::Map>(*this, *m_mapObserver,
                                          mapOptionsFromQMapboxGLSettings(settings, size, m_pixelRatio),
                                          resourceOptions);
 
@@ -1799,7 +1797,6 @@ void QMapboxGLPrivate::createRenderer()
 
     m_mapRenderer = std::make_unique<QMapboxGLMapRenderer>(
         m_pixelRatio,
-        *m_threadPool,
         m_mode,
         m_localFontFamily
     );

@@ -27,9 +27,8 @@ namespace style {
 
 static Observer nullObserver;
 
-Style::Impl::Impl(Scheduler& scheduler_, FileSource& fileSource_, float pixelRatio)
-    : scheduler(scheduler_),
-      fileSource(fileSource_),
+Style::Impl::Impl(FileSource& fileSource_, float pixelRatio)
+    : fileSource(fileSource_),
       spriteLoader(std::make_unique<SpriteLoader>(pixelRatio)),
       light(std::make_unique<Light>()),
       observer(&nullObserver) {
@@ -111,7 +110,7 @@ void Style::Impl::parse(const std::string& json_) {
     setLight(std::make_unique<Light>(parser.light));
 
     spriteLoaded = false;
-    spriteLoader->load(parser.spriteURL, scheduler, fileSource);
+    spriteLoader->load(parser.spriteURL, fileSource);
     glyphURL = parser.glyphURL;
 
     loaded = true;

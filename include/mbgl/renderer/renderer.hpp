@@ -14,7 +14,6 @@ namespace mbgl {
 
 class RendererObserver;
 class RenderedQueryOptions;
-class Scheduler;
 class SourceQueryOptions;
 class UpdateParameters;
 
@@ -24,7 +23,7 @@ class RendererBackend;
 
 class Renderer {
 public:
-    Renderer(gfx::RendererBackend&, float pixelRatio_, Scheduler&,
+    Renderer(gfx::RendererBackend&, float pixelRatio_,
              const optional<std::string> programCacheDir = {},
              const optional<std::string> localFontFamily = {});
     ~Renderer();

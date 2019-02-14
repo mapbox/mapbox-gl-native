@@ -4,7 +4,6 @@
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/tile/tile_id.hpp>
-#include <mbgl/util/shared_thread_pool.hpp>
 #include <tuple>
 #include <map>
 
@@ -14,8 +13,7 @@ namespace style {
 CustomGeometrySource::CustomGeometrySource(std::string id,
                                        const CustomGeometrySource::Options options)
     : Source(makeMutable<CustomGeometrySource::Impl>(std::move(id), options)),
-    threadPool(sharedThreadPool()),
-    loader(std::make_unique<Actor<CustomTileLoader>>(*threadPool, options.fetchTileFunction, options.cancelTileFunction)) {
+    loader(std::make_unique<Actor<CustomTileLoader>>(Scheduler::GetBackground(), options.fetchTileFunction, options.cancelTileFunction)) {
 }
 
 CustomGeometrySource::~CustomGeometrySource() = default;

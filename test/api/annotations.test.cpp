@@ -2,7 +2,6 @@
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/map_adapter.hpp>
 
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
@@ -28,10 +27,9 @@ std::unique_ptr<style::Image> namedMarker(const std::string& name) {
 class AnnotationTest {
 public:
     util::RunLoop loop;
-    ThreadPool threadPool { 4 };
-    HeadlessFrontend frontend { 1, threadPool };
+    HeadlessFrontend frontend { 1 };
 
-    MapAdapter map { frontend, MapObserver::nullObserver(), std::make_shared<StubFileSource>(), threadPool,
+    MapAdapter map { frontend, MapObserver::nullObserver(), std::make_shared<StubFileSource>(),
                   MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize())};
 
     void checkRendering(const char * name) {

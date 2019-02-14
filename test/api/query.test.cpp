@@ -1,7 +1,6 @@
 #include <mbgl/test/map_adapter.hpp>
 
 #include <mbgl/map/map_options.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/util.hpp>
 #include <mbgl/util/image.hpp>
@@ -35,9 +34,8 @@ public:
 
     util::RunLoop loop;
     std::shared_ptr<StubFileSource> fileSource = std::make_shared<StubFileSource>();
-    ThreadPool threadPool { 4 };
-    HeadlessFrontend frontend { 1, threadPool };
-    MapAdapter map { frontend, MapObserver::nullObserver(), fileSource, threadPool,
+    HeadlessFrontend frontend { 1 };
+    MapAdapter map { frontend, MapObserver::nullObserver(), fileSource,
                   MapOptions().withMapMode(MapMode::Static).withSize(frontend.getSize())};
 };
 
