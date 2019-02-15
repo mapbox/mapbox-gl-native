@@ -1,6 +1,6 @@
 # Distributing Mapbox GL Native for Android
 
-Depending on your use case, you may want to support all or just a subset of [Android ABIs](http://developer.android.com/ndk/guides/abis.html). This document covers building an `.aar` file from the Mapbox Android SDK and building `.so` files for specific ABIs. In normal circumstances an application developer will use [APK splits](https://developer.android.com/studio/build/configure-apk-splits.html) to optimize this at application level.
+Depending on your use case, you may want to support all or just a subset of [Android ABIs](http://developer.android.com/ndk/guides/abis.html). This document covers building an `.aar` file from the Mapbox Maps SDK for Android and building `.so` files for specific ABIs. In normal circumstances an application developer will use [APK splits](https://developer.android.com/studio/build/configure-apk-splits.html) to optimize this at application level.
 
 ##### Build types
 

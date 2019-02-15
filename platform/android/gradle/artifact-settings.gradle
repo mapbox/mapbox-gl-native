@@ -1,0 +1,22 @@
+ext {
+    mapboxArtifactDeveloperName = 'Mapbox'
+    mapboxArtifactGroupId = 'com.mapbox.mapboxsdk'
+    mapboxArtifactUrl = 'https://github.com/mapbox/mapbox-gl-native'
+    mapboxArtifactVcsUrl = 'https://github.com/mapbox/mapbox-gl-native.git'
+    mapboxArtifactTrackerUrl = 'https://github.com/mapbox/mapbox-gl-native/issues'
+    mapboxArtifactScmUrl = 'scm:git@github.com:mapbox/mapbox-gl-native.git'
+    mapboxArtifactGitUrl = 'https://github.com/mapbox/mapbox-gl-native'
+    mapboxLicenseName = 'BSD'
+    mapboxLicenseUrl = 'https://opensource.org/licenses/BSD-2-Clause'
+    mapboxArtifactInceptionYear = '2014'
+    versionName = project.hasProperty('versionName') ? project.property('versionName') : System.getenv('VERSION_NAME')
+
+    mapboxBintrayUserOrg = 'mapbox'
+    mapboxBintrayRepoName = 'mapbox'
+
+    // mapboxBintrayArtifactId is the same as mapboxArtifactGroup because of a weird bug
+    // https://github.com/bintray/gradle-bintray-plugin/issues/88
+    mapboxArtifactId = 'mapbox-android-sdk'
+    mapboxArtifactTitle = 'Mapbox Maps SDK for Android'
+    mapboxArtifactDescription = 'Mapbox Maps SDK for Android'
+}
