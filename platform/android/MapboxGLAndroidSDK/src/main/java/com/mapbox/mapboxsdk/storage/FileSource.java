@@ -13,10 +13,10 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
 
@@ -24,8 +24,6 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import com.mapbox.mapboxsdk.log.Logger;
 
 /**
  * Holds a central reference to the core's DefaultFileSource for as long as
@@ -110,33 +108,37 @@ public class FileSource {
    */
   @NonNull
   private static String getCachePath(@NonNull Context context) {
-    String cachePath = null;
-    if (isExternalStorageConfiguration(context) && isExternalStorageReadable()) {
-      try {
-        // Try getting the external storage path
-        SharedPreferences preferences = context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
-        String defaultExternalStoragePath = context.getExternalFilesDir(null).getAbsolutePath();
-        cachePath = preferences.getString(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH, defaultExternalStoragePath);
-        if (!isPathWritable(cachePath)) {
-          cachePath = null;
-        }
-      } catch (NullPointerException exception) {
-        Logger.e(TAG, "Failed to obtain the external storage path: ", exception);
-        MapStrictMode.strictModeViolation(exception);
-      }
-    }
+    SharedPreferences preferences = context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+    String cachePath = preferences.getString(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH, null);
 
-    if (cachePath == null) {
-      // Default to internal storage
-      cachePath = context.getFilesDir().getAbsolutePath();
+    if (!isPathWritable(cachePath)) {
+      // Use default path
+      cachePath = getDefaultCachePath(context);
 
-      // Reset cache path
+      // Reset stored cache path
       SharedPreferences.Editor editor =
           context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
       editor.remove(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH).apply();
     }
 
     return cachePath;
+  }
+
+  /**
+   * Get the default resources cache path depending on the external storage configuration
+   *
+   * @param context the context to derive the files directory path from
+   * @return the default directory path
+   */
+  @NonNull
+  private static String getDefaultCachePath(@NonNull Context context) {
+    if (isExternalStorageConfiguration(context) && isExternalStorageReadable()) {
+      File externalFilesDir = context.getExternalFilesDir(null);
+      if (externalFilesDir != null) {
+        return externalFilesDir.getAbsolutePath();
+      }
+    }
+    return context.getFilesDir().getAbsolutePath();
   }
 
   private static boolean isExternalStorageConfiguration(@NonNull Context context) {
@@ -278,28 +280,27 @@ public class FileSource {
       Logger.w(TAG, activatedMessage);
       callback.onError(activatedMessage);
     } else {
-      final WeakReference<Context> contextWeakReference = new WeakReference<>(context);
-      new Thread(new Runnable() {
-        @Override
-        public void run() {
-          final Context context = contextWeakReference.get();
-          final String message;
-          if (context != null) {
-            if (resourcesCachePath != null) {
-              if (!isExternalStorageConfiguration(context)) {
-                message = "External storage setting is not enabled";
-              } else if (resourcesCachePath.equals(path)) {
-                message = "Changing the path not needed";
-              } else if (!isExternalStorageReadable()) {
-                message = "External storage is not readable";
-              } else if (!isPathWritable(path)) {
+      if (path.equals(resourcesCachePath)) {
+        // no need to change the path
+        callback.onSuccess(path);
+      } else {
+        final WeakReference<Context> contextWeakReference = new WeakReference<>(context);
+        new Thread(new Runnable() {
+          @Override
+          public void run() {
+            final Context context = contextWeakReference.get();
+            final String message;
+            if (context != null) {
+              if (!isPathWritable(path)) {
                 message = "Path is not writable: " + path;
               } else {
                 message = null;
 
                 final SharedPreferences.Editor editor =
                     context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
-                editor.putString(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH, path).apply();
+                if (!editor.putString(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH, path).commit()) {
+                  Logger.w(TAG, "Cannot store cache path in shared preferences.");
+                }
 
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                   @Override
@@ -310,23 +311,21 @@ public class FileSource {
                 });
               }
             } else {
-              message = "Resources cache path was not initialized.";
+              message = "Context is null";
             }
-          } else {
-            message = "Context is null";
-          }
 
-          if (message != null) {
-            Logger.w(TAG, message);
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-              @Override
-              public void run() {
-                callback.onError(message);
-              }
-            });
+            if (message != null) {
+              Logger.w(TAG, message);
+              new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                  callback.onError(message);
+                }
+              });
+            }
           }
-        }
-      }).start();
+        }).start();
+      }
     }
   }
 

@@ -16,7 +16,6 @@ import com.mapbox.mapboxsdk.storage.FileSource
 import com.mapbox.mapboxsdk.testapp.R
 import kotlinx.android.synthetic.main.activity_change_resources_cache_path.*
 import java.io.File
-import java.util.ArrayList
 
 class ChangeResourcesCachePathActivity : AppCompatActivity(),
     AdapterView.OnItemClickListener,
@@ -29,7 +28,7 @@ class ChangeResourcesCachePathActivity : AppCompatActivity(),
     setContentView(R.layout.activity_change_resources_cache_path)
 
     Thread(Runnable {
-      adapter = PathAdapter(this, obtainExternalFilesPaths(this))
+      adapter = PathAdapter(this, obtainFilesPaths(this))
       listView.adapter = adapter
       listView.emptyView = empty
       listView.onItemClickListener = this
@@ -58,15 +57,21 @@ class ChangeResourcesCachePathActivity : AppCompatActivity(),
     Toast.makeText(this, "New path: $path", Toast.LENGTH_LONG).show()
   }
 
-  private fun obtainExternalFilesPaths(context: Context): List<String> {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      obtainExternalFilesPathsKitKat(context)
-    } else obtainExternalFilesPathsLegacy(context)
+  private fun obtainFilesPaths(context: Context): List<String> {
+    val paths = ArrayList<String>()
+    paths.add(context.filesDir.absolutePath)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      paths.addAll(obtainExternalFilesPathsKitKat(context))
+    } else {
+      paths.addAll(obtainExternalFilesPathsLegacy(context))
+    }
+    paths.add("${File.separator}invalid${File.separator}cache${File.separator}path")
+    return paths
   }
 
   private fun obtainExternalFilesPathsLegacy(context: Context): List<String> {
-    val postFix = (File.separator + "Android" + File.separator + "data" + File.separator
-        + context.packageName + File.separator + "files")
+    val postFix =
+        "${File.separator}Android${File.separator}data${File.separator}${context.packageName}${File.separator}files"
     val paths = ArrayList<String>()
     val externalStorage = System.getenv("EXTERNAL_STORAGE")
     val secondaryStorage = System.getenv("SECONDARY_STORAGE")
