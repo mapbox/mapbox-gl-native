@@ -941,13 +941,13 @@ mbgl::optional<mbgl::Annotation> asMapboxGLAnnotation(const QMapbox::Annotation 
         return { mbgl::SymbolAnnotation(mbgl::Point<double> { pair.second, pair.first }, symbolAnnotation.icon.toStdString()) };
     } else if (annotation.canConvert<QMapbox::LineAnnotation>()) {
         QMapbox::LineAnnotation lineAnnotation = annotation.value<QMapbox::LineAnnotation>();
-        auto color = mbgl::Color::parse(lineAnnotation.color.name().toStdString());
+        auto color = mbgl::Color::parse(mbgl::style::conversion::convertColor(lineAnnotation.color));
         return { mbgl::LineAnnotation(asMapboxGLGeometry(lineAnnotation.geometry), lineAnnotation.opacity, lineAnnotation.width, { *color }) };
     } else if (annotation.canConvert<QMapbox::FillAnnotation>()) {
         QMapbox::FillAnnotation fillAnnotation = annotation.value<QMapbox::FillAnnotation>();
-        auto color = mbgl::Color::parse(fillAnnotation.color.name().toStdString());
+        auto color = mbgl::Color::parse(mbgl::style::conversion::convertColor(fillAnnotation.color));
         if (fillAnnotation.outlineColor.canConvert<QColor>()) {
-            auto outlineColor = mbgl::Color::parse(fillAnnotation.outlineColor.value<QColor>().name().toStdString());
+            auto outlineColor = mbgl::Color::parse(mbgl::style::conversion::convertColor(fillAnnotation.outlineColor.value<QColor>()));
             return { mbgl::FillAnnotation(asMapboxGLGeometry(fillAnnotation.geometry), fillAnnotation.opacity, { *color }, { *outlineColor }) };
         } else {
             return { mbgl::FillAnnotation(asMapboxGLGeometry(fillAnnotation.geometry), fillAnnotation.opacity, { *color }, {}) };
