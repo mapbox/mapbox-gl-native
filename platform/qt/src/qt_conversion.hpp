@@ -13,6 +13,8 @@ namespace mbgl {
 namespace style {
 namespace conversion {
 
+std::string convertColor(const QColor &color);
+
 template <>
 class ConversionTraits<QVariant> {
 public:
@@ -96,7 +98,7 @@ public:
         if (value.type() == QVariant::String) {
             return value.toString().toStdString();
         } else if (value.type() == QVariant::Color) {
-            return value.value<QColor>().name().toStdString();
+            return convertColor(value.value<QColor>());
         } else {
             return {};
         }
@@ -108,7 +110,7 @@ public:
         } else if (value.type() == QVariant::String) {
             return { value.toString().toStdString() };
         } else if (value.type() == QVariant::Color) {
-            return { value.value<QColor>().name().toStdString() };
+            return { convertColor(value.value<QColor>()) };
         } else if (value.type() == QVariant::Int) {
             return { int64_t(value.toInt()) };
         } else if (value.canConvert(QVariant::Double)) {
@@ -149,6 +151,11 @@ private:
 template <class T, class...Args>
 optional<T> convert(const QVariant& value, Error& error, Args&&...args) {
     return convert<T>(Convertible(value), error, std::forward<Args>(args)...);
+}
+
+inline std::string convertColor(const QColor &color) {
+    return QString::asprintf("rgba(%d,%d,%d,%lf)",
+        color.red(), color.green(), color.blue(), color.alphaF()).toStdString();
 }
 
 } // namespace conversion
