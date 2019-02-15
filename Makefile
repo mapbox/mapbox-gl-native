@@ -710,6 +710,11 @@ run-android-upload-archives: platform/android/gradle/configuration.gradle
 run-android-upload-archives-local: platform/android/gradle/configuration.gradle
 	cd platform/android && export IS_LOCAL_DEVELOPMENT=true && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDK:uploadArchives
 
+# Uploads the compiled Android SDK to Bintray
+.PHONY: run-android-upload-to-bintray
+run-android-upload-to-bintray: platform/android/gradle/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDK:bintrayUpload
+
 # Dump system graphics information for the test app
 .PHONY: android-gfxinfo
 android-gfxinfo:

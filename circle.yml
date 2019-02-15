@@ -669,10 +669,10 @@ jobs:
           name: Record size
           command: platform/android/scripts/metrics.sh
       - deploy:
-          name: Publish to Maven
+          name: Publish to Bintray
           command: |
             if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]] || [[ $CIRCLE_TAG == android-v* ]]; then
-              make run-android-upload-archives
+              make run-android-upload-to-bintray
             fi
 # ------------------------------------------------------------------------------
   android-debug-arm-v7-buck:
