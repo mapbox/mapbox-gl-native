@@ -5,7 +5,7 @@
 #include <cstdio>
 #include <ctime>
 
-#if defined(_WINDOWS)
+#if defined(_WIN32)
 #define _gmtime(t, i) gmtime_s(i, t)
 #else
 #define _gmtime(t, i) gmtime_r(t, i)

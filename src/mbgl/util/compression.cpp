@@ -1,6 +1,6 @@
 #include <mbgl/util/compression.hpp>
 
-#if defined(__QT__) && defined(_WINDOWS) && !defined(__GNUC__)
+#if defined(__QT__) && defined(_WIN32) && !defined(__GNUC__)
 #include <QtZlib/zlib.h>
 #else
 #include <zlib.h>
