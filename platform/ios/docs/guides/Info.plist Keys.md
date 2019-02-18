@@ -31,3 +31,7 @@ The name of the font family to use for client-side text rendering of CJK ideogra
 Beginning in version 4.0, the SDK also performs collision detection between style layers based on different sources by default. For the default behavior, omit the `MGLCollisionBehaviorPre4_0` key or set it to NO (`false`).
 
 This property may also be set using `[[NSUserDefaults standardUserDefaults] setObject:@(YES) forKey:@"MGLCollisionBehaviorPre4_0"]`; it will override any value specified in the `Info.plist`.
+
+## MGLNSURLSessionDelegateClassName
+
+If you set this key to the runtime class name of a class that conforms to the `NSURLSessionDelegate` protocol, that class will be used as a delegate for the `NSURLSession`. As an example, this can be used to implement support for tile sources using HTTP Basic Authentication. If the class is implemented in Swift, it needs to bridge to Objective-C. A Swift application would either need to give the class an Objective-C name or set the key to a mangled name.

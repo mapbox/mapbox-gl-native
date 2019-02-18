@@ -25,3 +25,7 @@ The name of the font family to use for client-side text rendering of CJK ideogra
 If this key is set to YES (`true`), collision detection is performed only between symbol style layers based on the same source, as in versions 0.1–0.7 of the Mapbox Maps SDK for iOS. In other words, symbols in an `MGLSymbolStyleLayer` based on one source (for example, an `MGLShapeSource`) may overlap with symbols in another layer that is based on a different source (such as the Mapbox Streets source). This is the case regardless of the `MGLSymbolStyleLayer.iconAllowsOverlap`, `MGLSymbolStyleLayer.iconIgnoresPlacement`, `MGLSymbolStyleLayer.textAllowsOverlap`, and `MGLSymbolStyleLayer.textIgnoresPlacement` properties.
 
 Beginning in version 0.7, the SDK also performs collision detection between style layers based on different sources by default. For the default behavior, omit the `MGLCollisionBehaviorPre4_0` key or set it to NO (`false`). This property is so named because version 0.7 of the Mapbox Maps SDK for macOS corresponds to version 4.0 of the Mapbox Maps SDK for iOS.
+
+## MGLNSURLSessionDelegateClassName
+
+If you set this key to the runtime class name of a class that conforms to the `NSURLSessionDelegate` protocol, that class will be used as a delegate for the `NSURLSession`. As an example, this can be used to implement support for tile sources using HTTP Basic Authentication. If the class is implemented in Swift, it needs to bridge to Objective-C. A Swift application would either need to give the class an Objective-C name or set the key to a mangled name.
