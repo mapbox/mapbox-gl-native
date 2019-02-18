@@ -26,7 +26,7 @@ using GLubyte = unsigned char;
 using GLuint = unsigned int;
 using GLvoid = void;
 
-#if defined(_WINDOWS)
+#if defined(_WIN32)
 using GLintptr = long long;
 using GLsizeiptr = long long;
 #else
