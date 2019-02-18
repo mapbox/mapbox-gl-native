@@ -17,12 +17,9 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentConstants.*
 import com.mapbox.mapboxsdk.location.modes.RenderMode
-import com.mapbox.mapboxsdk.location.utils.LocationComponentAction
+import com.mapbox.mapboxsdk.location.utils.*
 import com.mapbox.mapboxsdk.location.utils.MapboxTestingUtils.Companion.MAPBOX_HEAVY_STYLE
 import com.mapbox.mapboxsdk.location.utils.MapboxTestingUtils.Companion.pushSourceUpdates
-import com.mapbox.mapboxsdk.location.utils.StyleChangeIdlingResource
-import com.mapbox.mapboxsdk.location.utils.isLayerVisible
-import com.mapbox.mapboxsdk.location.utils.querySourceFeatures
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
@@ -242,6 +239,33 @@ class LocationLayerControllerTest : EspressoTest() {
         TestingAsyncUtils.waitForLayer(uiController, idlingResource.mapView)
 
         assertThat(mapboxMap.querySourceFeatures(LOCATION_SOURCE)[0].getBooleanProperty(PROPERTY_LOCATION_STALE), `is`(true))
+      }
+    }
+    executeComponentTest(componentAction)
+  }
+
+  @Test
+  fun whenStyleChanged_isDisabled_hasLayerBelow_staysHidden() {
+    val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
+      override fun onLocationComponentAction(component: LocationComponent, mapboxMap: MapboxMap,
+                                             style: Style, uiController: UiController, context: Context) {
+        component.activateLocationComponent(context, style, false)
+        component.isLocationComponentEnabled = true
+        component.forceLocationUpdate(location)
+        TestingAsyncUtils.waitForLayer(uiController, idlingResource.mapView)
+        component.isLocationComponentEnabled = false
+        TestingAsyncUtils.waitForLayer(uiController, idlingResource.mapView)
+        assertThat(mapboxMap.queryRenderedFeatures(location, FOREGROUND_LAYER).isEmpty(), `is`(true))
+
+        val options =
+          LocationComponentOptions.createFromAttributes(context, com.mapbox.mapboxsdk.testapp.R.style.CustomLocationComponent)
+            .toBuilder()
+            .layerBelow("road-label")
+            .build()
+
+        component.applyStyle(options)
+        TestingAsyncUtils.waitForLayer(uiController, idlingResource.mapView)
+        assertThat(mapboxMap.queryRenderedFeatures(location, FOREGROUND_LAYER).isEmpty(), `is`(true))
       }
     }
     executeComponentTest(componentAction)
