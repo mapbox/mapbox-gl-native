@@ -30,7 +30,7 @@ MGL_EXPORT
  will not affect the behavior of that session.
  
  */
-@property (strong, null_resettable) NSURLSessionConfiguration *sessionConfiguration;
+@property (atomic, strong, null_resettable) NSURLSessionConfiguration *sessionConfiguration;
 
 @end
 
