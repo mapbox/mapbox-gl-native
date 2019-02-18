@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 import android.support.annotation.StyleRes;
 import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 import android.view.WindowManager;
 
 import com.mapbox.android.core.location.LocationEngine;
@@ -217,8 +218,11 @@ public final class LocationComponent {
    *
    * @param context the context
    * @param style   the proxy object for current map style. More info at {@link Style}
+   * @deprecated As of 7.2.0,
+   * use {@link LocationComponentActivationOptions.Builder} instead
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style) {
     activateLocationComponent(context, style,
       LocationComponentOptions.createFromAttributes(context, R.style.mapbox_LocationComponent));
@@ -232,8 +236,11 @@ public final class LocationComponent {
    * @param style                    the proxy object for current map style. More info at {@link Style}
    * @param useDefaultLocationEngine true if you want to initialize and use the built-in location engine or false if
    *                                 there should be no location engine initialized
+   * @deprecated As of 7.2.0,
+   * use {@link LocationComponentActivationOptions.Builder} instead
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         boolean useDefaultLocationEngine) {
     if (useDefaultLocationEngine) {
@@ -252,8 +259,11 @@ public final class LocationComponent {
    * @param useDefaultLocationEngine true if you want to initialize and use the built-in location engine or false if
    *                                 there should be no location engine initialized
    * @param locationEngineRequest    the location request
+   * @deprecated As of 7.2.0,
+   * use {@link LocationComponentActivationOptions.Builder} instead
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         boolean useDefaultLocationEngine,
                                         @NonNull LocationEngineRequest locationEngineRequest) {
@@ -275,8 +285,11 @@ public final class LocationComponent {
    *                                 there should be no location engine initialized
    * @param locationEngineRequest    the location request
    * @param options                  the options
+   * @deprecated As of 7.2.0,
+   * use {@link LocationComponentActivationOptions.Builder} instead
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         boolean useDefaultLocationEngine,
                                         @NonNull LocationEngineRequest locationEngineRequest,
@@ -298,8 +311,11 @@ public final class LocationComponent {
    * @param context  the context
    * @param style    the proxy object for current map style. More info at {@link Style}
    * @param styleRes the LocationComponent style res
+   * @deprecated As of 7.2.0,
+   * use {@link LocationComponentActivationOptions.Builder} instead
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style, @StyleRes int styleRes) {
     activateLocationComponent(context, style, LocationComponentOptions.createFromAttributes(context, styleRes));
   }
@@ -314,8 +330,11 @@ public final class LocationComponent {
    * @param context the context
    * @param style   the proxy object for current map style. More info at {@link Style}
    * @param options the options
+   * @deprecated As of 7.2.0,
+   * use {@link LocationComponentActivationOptions.Builder} instead
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         @NonNull LocationComponentOptions options) {
     initialize(context, style, options);
@@ -331,8 +350,11 @@ public final class LocationComponent {
    * @param style          the proxy object for current map style. More info at {@link Style}
    * @param locationEngine the engine, or null if you'd like to only force location updates
    * @param styleRes       the LocationComponent style res
+   * @deprecated As of 7.2.0,
+   * use {@link LocationComponentActivationOptions.Builder} instead
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         @Nullable LocationEngine locationEngine, @StyleRes int styleRes) {
     activateLocationComponent(context, style, locationEngine,
@@ -348,8 +370,11 @@ public final class LocationComponent {
    * @param locationEngine        the engine, or null if you'd like to only force location updates
    * @param locationEngineRequest the location request
    * @param styleRes              the LocationComponent style res
+   * @deprecated As of 7.2.0,
+   * use {@link LocationComponentActivationOptions.Builder} instead
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         @Nullable LocationEngine locationEngine,
                                         @NonNull LocationEngineRequest locationEngineRequest, @StyleRes int styleRes) {
@@ -363,8 +388,11 @@ public final class LocationComponent {
    * @param context        the context
    * @param style          the proxy object for current map style. More info at {@link Style}
    * @param locationEngine the engine
+   * @deprecated As of 7.2.0,
+   * use {@link LocationComponentActivationOptions.Builder} instead
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         @Nullable LocationEngine locationEngine) {
     activateLocationComponent(context, style, locationEngine, R.style.mapbox_LocationComponent);
@@ -377,8 +405,11 @@ public final class LocationComponent {
    * @param style                 the proxy object for current map style. More info at {@link Style}
    * @param locationEngine        the engine
    * @param locationEngineRequest the location request
+   * @deprecated As of 7.2.0,
+   * use {@link LocationComponentActivationOptions.Builder} instead
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         @Nullable LocationEngine locationEngine,
                                         @NonNull LocationEngineRequest locationEngineRequest) {
@@ -392,8 +423,11 @@ public final class LocationComponent {
    * @param locationEngine the engine, or null if you'd like to only force location updates
    * @param style          the proxy object for current map style. More info at {@link Style}
    * @param options        the options
+   * @deprecated As of 7.2.0,
+   * use {@link LocationComponentActivationOptions.Builder} instead
    */
   @RequiresPermission(anyOf = {ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION})
+  @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         @Nullable LocationEngine locationEngine,
                                         @NonNull LocationComponentOptions options) {
@@ -411,7 +445,10 @@ public final class LocationComponent {
    * @param locationEngine        the engine, or null if you'd like to only force location updates
    * @param locationEngineRequest the location request
    * @param options               the options
+   * @deprecated As of 7.2.0,
+   * use {@link LocationComponentActivationOptions.Builder} instead
    */
+  @Deprecated
   public void activateLocationComponent(@NonNull Context context, @NonNull Style style,
                                         @Nullable LocationEngine locationEngine,
                                         @NonNull LocationEngineRequest locationEngineRequest,
@@ -421,6 +458,55 @@ public final class LocationComponent {
     setLocationEngine(locationEngine);
     applyStyle(options);
   }
+
+  public void activateLocationComponent(@NonNull LocationComponentActivationOptions
+                                          locationComponentActivationOptions) {
+
+    Log.d(TAG, "locationComponentActivationOptions context packageName = " + locationComponentActivationOptions.context().getPackageName());
+    Log.d(TAG, "locationComponentActivationOptions style URL = " + locationComponentActivationOptions.style().getUrl());
+    Log.d(TAG, "locationComponentActivationOptions styleRes = " + locationComponentActivationOptions.styleRes());
+
+    if (locationComponentActivationOptions.context() != null
+      && locationComponentActivationOptions.style() != null
+      && locationComponentActivationOptions.locationComponentOptions() != null) {
+      initialize(locationComponentActivationOptions.context(), locationComponentActivationOptions.style(),
+        locationComponentActivationOptions.locationComponentOptions());
+    }
+
+    if (locationComponentActivationOptions.locationEngineRequest() != null) {
+      setLocationEngineRequest(locationComponentActivationOptions.locationEngineRequest());
+    }
+
+    if (locationComponentActivationOptions.locationEngine() != null) {
+      setLocationEngine(locationEngine);
+    } else if (locationComponentActivationOptions.useDefaultLocationEngine()) {
+      initializeLocationEngine(locationComponentActivationOptions.context());
+    } else {
+      setLocationEngine(null);
+    }
+
+    // TODO: How to do some sort of null check on an int for locationComponentActivationOptions.styleRes() ?
+    if (locationComponentActivationOptions.styleRes() <0 &&
+      locationComponentActivationOptions.locationComponentOptions() == null
+      && locationComponentActivationOptions.context() != null) {
+
+      applyStyle(LocationComponentOptions.createFromAttributes(locationComponentActivationOptions.context(),
+        R.style.mapbox_LocationComponent));
+
+    } else if (locationComponentActivationOptions.styleRes() <0
+      && locationComponentActivationOptions.locationComponentOptions() == null
+      && locationComponentActivationOptions.context() != null) {
+
+      applyStyle(LocationComponentOptions.createFromAttributes(locationComponentActivationOptions.context(),
+        locationComponentActivationOptions.styleRes()));
+    } else if (locationComponentActivationOptions.styleRes() < 0
+      && locationComponentActivationOptions.locationComponentOptions() != null
+      && locationComponentActivationOptions.context() != null) {
+
+      applyStyle(locationComponentActivationOptions.locationComponentOptions());
+    }
+  }
+
 
   /**
    * Manage component's visibility after activation.
