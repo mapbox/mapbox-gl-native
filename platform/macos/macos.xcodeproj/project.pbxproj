@@ -283,7 +283,7 @@
 		DAF25716201901C200367EF5 /* MGLHillshadeStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF25714201901C200367EF5 /* MGLHillshadeStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DAF25721201902C100367EF5 /* MGLHillshadeStyleLayerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAF2571D201902A500367EF5 /* MGLHillshadeStyleLayerTests.mm */; };
 		DD0902B21DB1AC6400C5BDCE /* MGLNetworkConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0902AF1DB1AC6400C5BDCE /* MGLNetworkConfiguration.m */; };
-		DD0902B31DB1AC6400C5BDCE /* MGLNetworkConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = DD0902B01DB1AC6400C5BDCE /* MGLNetworkConfiguration.h */; };
+		DD0902B31DB1AC6400C5BDCE /* MGLNetworkConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = DD0902B01DB1AC6400C5BDCE /* MGLNetworkConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DD58A4C91D822C6700E1F038 /* MGLExpressionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DD58A4C71D822C6200E1F038 /* MGLExpressionTests.mm */; };
 /* End PBXBuildFile section */
 

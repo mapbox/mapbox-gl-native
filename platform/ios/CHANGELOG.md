@@ -7,6 +7,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed a bug where setting `MGLMapView.userTrackingMode` to `MGLUserTrackingModeFollowWithHeading` or `MGLUserTrackingModeFollowWithCourse` would be ignored if the user’s location was not already available. ([#13849](https://github.com/mapbox/mapbox-gl-native/pull/13849))
 * Improved tilt gesture performance. ([#13902](https://github.com/mapbox/mapbox-gl-native/pull/13902))
 * Fixed a bug where `layoutSubviews` was always called on device rotation, regardless of the application's or top-most view controller's supported orientations. ([#13900](https://github.com/mapbox/mapbox-gl-native/pull/13900))
+* Added `MGLNetworkConfiguration` class to customize the SDK's `NSURLSessionConfiguration` object. ([#11447](https://github.com/mapbox/mapbox-gl-native/pull/13886))
 
 ## 4.8.0 - January 30, 2019
 
