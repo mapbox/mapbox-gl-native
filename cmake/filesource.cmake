@@ -1,11 +1,11 @@
-# Modify cmake/filesource-files.txt to change the source files for this target.
-load_sources_list(MBGL_FILESOURCE_FILES cmake/filesource-files.txt)
+# Modify platform/default/filesource-files.json to change the source files for this target.
+load_sources_list(MBGL_FILESOURCE_FILES platform/default/filesource-files.json)
 add_library(mbgl-filesource STATIC ${MBGL_FILESOURCE_FILES})
 
 target_include_directories(mbgl-filesource
     PRIVATE include
     PRIVATE src
-    PRIVATE platform/default
+    PRIVATE platform/default/include
 )
 
 target_link_libraries(mbgl-filesource

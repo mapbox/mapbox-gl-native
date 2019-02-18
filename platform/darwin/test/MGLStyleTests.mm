@@ -470,4 +470,24 @@
     }
 }
 
+#pragma mark Transition tests
+
+- (void)testTransition
+{
+    MGLTransition transitionTest = MGLTransitionMake(5, 4);
+    
+    self.style.transition = transitionTest;
+    
+    XCTAssert(self.style.transition.delay == transitionTest.delay);
+    XCTAssert(self.style.transition.duration == transitionTest.duration);
+}
+
+- (void)testPerformsPlacementTransitions
+{
+    XCTAssertTrue(self.style.performsPlacementTransitions, @"The default value for enabling placement transitions should be YES.");
+    
+    self.style.performsPlacementTransitions = NO;
+    XCTAssertFalse(self.style.performsPlacementTransitions, @"Enabling placement transitions should be NO.");
+}
+
 @end

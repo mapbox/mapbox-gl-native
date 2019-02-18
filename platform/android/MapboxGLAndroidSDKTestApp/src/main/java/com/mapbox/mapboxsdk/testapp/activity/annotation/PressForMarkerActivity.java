@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.text.DecimalFormat;
@@ -52,6 +53,8 @@ public class PressForMarkerActivity extends AppCompatActivity {
         addMarker(point);
         return false;
       });
+
+      mapboxMap.setStyle(Style.MAPBOX_STREETS);
 
       if (savedInstanceState != null) {
         markerList = savedInstanceState.getParcelableArrayList(STATE_MARKER_LIST);

@@ -9,9 +9,8 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
-#include <mbgl/util/fnv_hash.hpp>
 
-#include <mbgl/renderer/layers/render_hillshade_layer.hpp>
+#include <mapbox/eternal.hpp>
 
 namespace mbgl {
 namespace style {
@@ -228,8 +227,7 @@ TransitionOptions HillshadeLayer::getHillshadeAccentColorTransition() const {
 using namespace conversion;
 
 optional<Error> HillshadeLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        Unknown,
+    enum class Property : uint8_t {
         HillshadeIlluminationDirection,
         HillshadeIlluminationAnchor,
         HillshadeExaggeration,
@@ -244,74 +242,27 @@ optional<Error> HillshadeLayer::setPaintProperty(const std::string& name, const 
         HillshadeAccentColorTransition,
     };
 
-    Property property = Property::Unknown;
-    switch (util::hashFNV1a(name.c_str())) {
-    case util::hashFNV1a("hillshade-illumination-direction"):
-        if (name == "hillshade-illumination-direction") {
-            property = Property::HillshadeIlluminationDirection;
-        }
-        break;
-    case util::hashFNV1a("hillshade-illumination-direction-transition"):
-        if (name == "hillshade-illumination-direction-transition") {
-            property = Property::HillshadeIlluminationDirectionTransition;
-        }
-        break;
-    case util::hashFNV1a("hillshade-illumination-anchor"):
-        if (name == "hillshade-illumination-anchor") {
-            property = Property::HillshadeIlluminationAnchor;
-        }
-        break;
-    case util::hashFNV1a("hillshade-illumination-anchor-transition"):
-        if (name == "hillshade-illumination-anchor-transition") {
-            property = Property::HillshadeIlluminationAnchorTransition;
-        }
-        break;
-    case util::hashFNV1a("hillshade-exaggeration"):
-        if (name == "hillshade-exaggeration") {
-            property = Property::HillshadeExaggeration;
-        }
-        break;
-    case util::hashFNV1a("hillshade-exaggeration-transition"):
-        if (name == "hillshade-exaggeration-transition") {
-            property = Property::HillshadeExaggerationTransition;
-        }
-        break;
-    case util::hashFNV1a("hillshade-shadow-color"):
-        if (name == "hillshade-shadow-color") {
-            property = Property::HillshadeShadowColor;
-        }
-        break;
-    case util::hashFNV1a("hillshade-shadow-color-transition"):
-        if (name == "hillshade-shadow-color-transition") {
-            property = Property::HillshadeShadowColorTransition;
-        }
-        break;
-    case util::hashFNV1a("hillshade-highlight-color"):
-        if (name == "hillshade-highlight-color") {
-            property = Property::HillshadeHighlightColor;
-        }
-        break;
-    case util::hashFNV1a("hillshade-highlight-color-transition"):
-        if (name == "hillshade-highlight-color-transition") {
-            property = Property::HillshadeHighlightColorTransition;
-        }
-        break;
-    case util::hashFNV1a("hillshade-accent-color"):
-        if (name == "hillshade-accent-color") {
-            property = Property::HillshadeAccentColor;
-        }
-        break;
-    case util::hashFNV1a("hillshade-accent-color-transition"):
-        if (name == "hillshade-accent-color-transition") {
-            property = Property::HillshadeAccentColorTransition;
-        }
-        break;
-    
-    }
+    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
+        { "hillshade-illumination-direction", static_cast<uint8_t>(Property::HillshadeIlluminationDirection) },
+        { "hillshade-illumination-anchor", static_cast<uint8_t>(Property::HillshadeIlluminationAnchor) },
+        { "hillshade-exaggeration", static_cast<uint8_t>(Property::HillshadeExaggeration) },
+        { "hillshade-shadow-color", static_cast<uint8_t>(Property::HillshadeShadowColor) },
+        { "hillshade-highlight-color", static_cast<uint8_t>(Property::HillshadeHighlightColor) },
+        { "hillshade-accent-color", static_cast<uint8_t>(Property::HillshadeAccentColor) },
+        { "hillshade-illumination-direction-transition", static_cast<uint8_t>(Property::HillshadeIlluminationDirectionTransition) },
+        { "hillshade-illumination-anchor-transition", static_cast<uint8_t>(Property::HillshadeIlluminationAnchorTransition) },
+        { "hillshade-exaggeration-transition", static_cast<uint8_t>(Property::HillshadeExaggerationTransition) },
+        { "hillshade-shadow-color-transition", static_cast<uint8_t>(Property::HillshadeShadowColorTransition) },
+        { "hillshade-highlight-color-transition", static_cast<uint8_t>(Property::HillshadeHighlightColorTransition) },
+        { "hillshade-accent-color-transition", static_cast<uint8_t>(Property::HillshadeAccentColorTransition) }
+    });
 
-    if (property == Property::Unknown) {
+    const auto it = properties.find(name.c_str());
+    if (it == properties.end()) {
         return Error { "layer doesn't support this property" };
     }
+
+    Property property = static_cast<Property>(it->second);
 
         
     if (property == Property::HillshadeIlluminationDirection || property == Property::HillshadeExaggeration) {
@@ -415,21 +366,6 @@ optional<Error> HillshadeLayer::setLayoutProperty(const std::string& name, const
         return Layer::setVisibility(value);
     }
 
-    enum class Property {
-        Unknown,
-    };
-
-    Property property = Property::Unknown;
-    switch (util::hashFNV1a(name.c_str())) {
-    
-    }
-
-    if (property == Property::Unknown) {
-        return Error { "layer doesn't support this property" };
-    }
-
-        
-
     return Error { "layer doesn't support this property" };
 }
 
@@ -438,24 +374,4 @@ Mutable<Layer::Impl> HillshadeLayer::mutableBaseImpl() const {
 }
 
 } // namespace style
-
-const style::LayerTypeInfo* HillshadeLayerFactory::getTypeInfo() const noexcept {
-    return style::HillshadeLayer::Impl::staticTypeInfo();
-}
-
-std::unique_ptr<style::Layer> HillshadeLayerFactory::createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept {
-    optional<std::string> source = getSource(value);
-    if (!source) {
-        return nullptr;
-    }
-
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::HillshadeLayer(id, *source));
-    return layer;
-}
-
-std::unique_ptr<RenderLayer> HillshadeLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
-    assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderHillshadeLayer>(staticImmutableCast<style::HillshadeLayer::Impl>(std::move(impl)));
-}
-
 } // namespace mbgl

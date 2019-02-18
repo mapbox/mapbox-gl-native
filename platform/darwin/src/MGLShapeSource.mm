@@ -1,10 +1,13 @@
+#import "MGLFoundation_Private.h"
 #import "MGLShapeSource_Private.h"
 
+#import "MGLLoggingConfiguration_Private.h"
 #import "MGLStyle_Private.h"
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
 #import "MGLFeature_Private.h"
 #import "MGLShape_Private.h"
+#import "MGLCluster.h"
 
 #import "NSPredicate+MGLPrivateAdditions.h"
 #import "NSURL+MGLAdditions.h"
@@ -182,6 +185,108 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShap
         features = self.mapView.renderer->querySourceFeatures(self.rawSource->getID(), { {}, optionalFilter });
     }
     return MGLFeaturesFromMBGLFeatures(features);
+}
+
+#pragma mark - MGLCluster management
+
+- (mbgl::optional<mbgl::FeatureExtensionValue>)featureExtensionValueOfCluster:(MGLShape<MGLCluster> *)cluster extension:(std::string)extension options:(const std::map<std::string, mbgl::Value>)options {
+    mbgl::optional<mbgl::FeatureExtensionValue> extensionValue;
+    
+    // Check parameters
+    if (!self.rawSource || !self.mapView || !cluster) {
+        return extensionValue;
+    }
+
+    auto geoJSON = [cluster geoJSONObject];
+    
+    if (!geoJSON.is<mbgl::Feature>()) {
+        MGLAssert(0, @"cluster geoJSON object is not a feature.");
+        return extensionValue;
+    }
+    
+    auto clusterFeature = geoJSON.get<mbgl::Feature>();
+    
+    extensionValue = self.mapView.renderer->queryFeatureExtensions(self.rawSource->getID(),
+                                                                   clusterFeature,
+                                                                   "supercluster",
+                                                                   extension,
+                                                                   options);
+    return extensionValue;
+}
+
+- (NSArray<id <MGLFeature>> *)leavesOfCluster:(MGLPointFeatureCluster *)cluster offset:(NSUInteger)offset limit:(NSUInteger)limit {
+    const std::map<std::string, mbgl::Value> options = {
+        { "limit", static_cast<uint64_t>(limit) },
+        { "offset", static_cast<uint64_t>(offset) }
+    };
+
+    auto featureExtension = [self featureExtensionValueOfCluster:cluster extension:"leaves" options:options];
+
+    if (!featureExtension) {
+        return @[];
+    }
+    
+    if (!featureExtension->is<mbgl::FeatureCollection>()) {
+        return @[];
+    }
+    
+    std::vector<mbgl::Feature> leaves = featureExtension->get<mbgl::FeatureCollection>();
+    return MGLFeaturesFromMBGLFeatures(leaves);
+}
+
+- (NSArray<id <MGLFeature>> *)childrenOfCluster:(MGLPointFeatureCluster *)cluster {
+    auto featureExtension = [self featureExtensionValueOfCluster:cluster extension:"children" options:{}];
+    
+    if (!featureExtension) {
+        return @[];
+    }
+    
+    if (!featureExtension->is<mbgl::FeatureCollection>()) {
+        return @[];
+    }
+    
+    std::vector<mbgl::Feature> leaves = featureExtension->get<mbgl::FeatureCollection>();
+    return MGLFeaturesFromMBGLFeatures(leaves);
+}
+
+- (double)zoomLevelForExpandingCluster:(MGLPointFeatureCluster *)cluster {
+    auto featureExtension = [self featureExtensionValueOfCluster:cluster extension:"expansion-zoom" options:{}];
+
+    if (!featureExtension) {
+        return -1.0;
+    }
+    
+    if (!featureExtension->is<mbgl::Value>()) {
+        return -1.0;
+    }
+    
+    auto value = featureExtension->get<mbgl::Value>();
+    if (value.is<uint64_t>()) {
+        auto zoom = value.get<uint64_t>();
+        return static_cast<double>(zoom);
+    }
+    
+    return -1.0;
+}
+
+- (void)debugRecursiveLogForFeature:(id <MGLFeature>)feature indent:(NSUInteger)indent {
+    NSString *description = feature.description;
+    
+    // Want our recursive log on a single line
+    NSString *log = [description stringByReplacingOccurrencesOfString:@"\\s+"
+                                                           withString:@" "
+                                                              options:NSRegularExpressionSearch
+                                                                range:NSMakeRange(0, description.length)];
+    
+    printf("%*s%s\n", (int)indent, "", log.UTF8String);
+    
+    MGLPointFeatureCluster *cluster = MGL_OBJC_DYNAMIC_CAST(feature, MGLPointFeatureCluster);
+    
+    if (cluster) {
+        for (id <MGLFeature> child in [self childrenOfCluster:cluster]) {
+            [self debugRecursiveLogForFeature:child indent:indent + 4];
+        }
+    }
 }
 
 @end

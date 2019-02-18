@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
  use the optional methods available in the `MGLCalloutViewDelegate` protocol.
  
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/custom-callout/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/custom-callout/">
  Display custom views as callouts</a> example to learn how to customize an
  `MGLCalloutView`.
  */
@@ -47,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
  Presents a callout view by adding it to `view` and pointing at the given rect
  of `view`’s bounds. Constrains the callout to the bounds of the given view.
  */
-- (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToView:(UIView *)constrainedView animated:(BOOL)animated __attribute__((unavailable("Use -presentCalloutFromRect:inView:constrainedToRect:animated: instead.")));
+- (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToView:(UIView *)constrainedView animated:(BOOL)animated __attribute__((unavailable("Use `-presentCalloutFromRect:inView:constrainedToRect:animated:` instead.")));
 
 
 /**

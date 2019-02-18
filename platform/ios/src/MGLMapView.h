@@ -51,9 +51,11 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
 /**
  The mode used to track the user location on the map. Used with
  `MGLMapView.userTrackingMode`.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/user-tracking-mode/">Switch between user tracking modes</a> example to learn how to toggle modes and how each mode behaves.
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/user-tracking-mode/">
+ Switch between user tracking modes</a> example to learn how to toggle modes and
+ how each mode behaves.
  */
 typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
     /** The map does not follow the user location. */
@@ -66,7 +68,7 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
         The default user location annotation displays a fan-shaped indicator with
         the current heading. The heading indicator represents the direction the
         device is facing, which is sized according to the reported accuracy.
-     
+
         This tracking mode is disabled if the user pans the map view, but
         remains enabled if the user zooms in. If the user rotates the map
         view, this tracking mode will fall back to `MGLUserTrackingModeFollow`.
@@ -77,7 +79,7 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
         Course represents the direction in which the device is traveling.
         The default user location annotation shows a puck-shaped indicator
         that rotates as the course changes.
-     
+
         This tracking mode is disabled if the user pans the map view, but
         remains enabled if the user zooms in. If the user rotates the map view,
         this tracking mode will fall back to `MGLUserTrackingModeFollow`.
@@ -132,8 +134,8 @@ FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLResourceNotFoundException
  Access tokens associate requests to Mapbox’s vector tile and style APIs with
  your Mapbox account. They also deter other developers from using your styles
  without your permission.
- 
- Because `MGLMapView` loads asynchronously, several delegate methods are available 
+
+ Because `MGLMapView` loads asynchronously, several delegate methods are available
  for receiving map-related updates. These methods can be used to ensure that certain operations
  have completed before taking any additional actions. Information on these methods is located
  in the `MGLMapViewDelegate` protocol documentation.
@@ -154,9 +156,9 @@ FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLResourceNotFoundException
 
  @note You are responsible for getting permission to use the map data and for
  ensuring that your use adheres to the relevant terms of use.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/simple-map-view/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/simple-map-view/">
  Simple map view</a> example to learn how to initialize a basic `MGLMapView`.
  */
 MGL_EXPORT IB_DESIGNABLE
@@ -183,15 +185,16 @@ MGL_EXPORT IB_DESIGNABLE
     (`mapbox://styles/{user}/{style}`), or a path to a local file relative
     to the application’s resource path. Specify `nil` for the default style.
  @return An initialized map view.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/custom-style/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/custom-style/">
  Apply a style designed in Mapbox Studio</a> example to learn how to
- initialize an `MGLMapView` with a custom style. See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/raster-styles/">
- Appy a style designed in Mapbox Studio Classic</a> example to learn how to
- intialize an `MGLMapView` with a Studio Classic style _or_ a custom style
- JSON. See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/source-custom-vector/">
- Use third-party vector tiles</a> example to learn how to initialize an
+ initialize an `MGLMapView` with a custom style. See the
+ <a href="https://docs.mapbox.com/ios/maps/examples/raster-styles/"> Apply a
+ style designed in Mapbox Studio Classic</a> example to learn how to intialize
+ an `MGLMapView` with a Studio Classic style _or_ a custom style JSON. See the
+ <a href="https://docs.mapbox.com/ios/maps/examples/source-custom-vector/"> Use
+ third-party vector tiles</a> example to learn how to initialize an
  `MGLMapView` with a third-party tile source.
  */
 - (instancetype)initWithFrame:(CGRect)frame styleURL:(nullable NSURL *)styleURL;
@@ -246,9 +249,9 @@ MGL_EXPORT IB_DESIGNABLE
 
  If you want to modify the current style without replacing it outright, or if
  you want to introspect individual style attributes, use the `style` property.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/switch-styles/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/switch-styles/">
  Switch between map styles</a> example to learn how to change the style of
  a map at runtime.
  */
@@ -294,7 +297,7 @@ MGL_EXPORT IB_DESIGNABLE
 
  @note The Mapbox terms of service, which governs the use of Mapbox-hosted
     vector tiles and styles,
-    <a href="https://www.mapbox.com/help/mapbox-logo/">requires</a> most Mapbox
+    <a href="https://docs.mapbox.com/help/how-mapbox-works/attribution/">requires</a> most Mapbox
     customers to display the Mapbox logo. If this applies to you, do not
     hide this view or change its contents.
  */
@@ -309,18 +312,18 @@ MGL_EXPORT IB_DESIGNABLE
 
  @note The Mapbox terms of service, which governs the use of Mapbox-hosted
     vector tiles and styles,
-    <a href="https://www.mapbox.com/help/attribution/">requires</a> these
+    <a href="https://www.mapbox.com/tos/#[FamaFama]">requires</a> these
     copyright notices to accompany any map that features Mapbox-designed styles,
     OpenStreetMap data, or other Mapbox data such as satellite or terrain
     data. If that applies to this map view, do not hide this view or remove
     any notices from it.
 
  @note You are additionally
-    <a href="https://www.mapbox.com/help/telemetry-opt-out-for-users/">required</a>
+    <a href="https://www.mapbox.com/tos/#[FamaFama]">required</a>
     to provide users with the option to disable anonymous usage and location
     sharing (telemetry). If this view is hidden, you must implement this
     setting elsewhere in your app or via `Settings.bundle`. See our
-    <a href="https://www.mapbox.com/ios-sdk/#telemetry_opt_out">website</a> for
+    <a href="https://docs.mapbox.com/help/how-mapbox-works/attribution/#mapbox-maps-sdk-for-ios">website</a> for
     implementation help.
  */
 @property (nonatomic, readonly) UIButton *attributionButton;
@@ -362,13 +365,13 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  The object that this map view uses to start and stop the delivery of location-related
  updates.
- 
+
  To receive the current user location, implement the `-[MGLMapViewDelegate mapView:didUpdateUserLocation:]`
  and `-[MGLMapViewDelegate mapView:didFailToLocateUserWithError:]` methods.
- 
+
  If setting this property to `nil` or if no custom manager is provided this property
  is set to the default location manager.
- 
+
  `MGLMapView` uses a default location manager. If you want to substitute your own
  location manager, you should do so by setting this property before setting
  `showsUserLocation` to `YES`. To restore the default location manager,
@@ -392,7 +395,7 @@ MGL_EXPORT IB_DESIGNABLE
  `NSLocationAlwaysUsageDescription` in its `Info.plist` to satisfy the
  requirements of the underlying Core Location framework when enabling this
  property.
- 
+
  If you implement a custom location manager, set the `locationManager` before
  calling `showsUserLocation`.
  */
@@ -419,9 +422,9 @@ MGL_EXPORT IB_DESIGNABLE
  Changing the value of this property updates the map view with an animated
  transition. If you don’t want to animate the change, use the
  `-setUserTrackingMode:animated:` method instead.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/user-location-annotation/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/user-location-annotation/">
  Customize the user location annotation</a> to learn how to customize the
  default user location annotation shown by `MGLUserTrackingMode`.
  */
@@ -447,7 +450,7 @@ MGL_EXPORT IB_DESIGNABLE
  transition. If you don’t want to animate the change, use the
  `-setUserLocationVerticalAlignment:animated:` method instead.
  */
-@property (nonatomic, assign) MGLAnnotationVerticalAlignment userLocationVerticalAlignment __attribute__((deprecated("Use -[MGLMapViewDelegate mapViewUserLocationAnchorPoint:] instead.")));
+@property (nonatomic, assign) MGLAnnotationVerticalAlignment userLocationVerticalAlignment __attribute__((deprecated("Use `-[MGLMapViewDelegate mapViewUserLocationAnchorPoint:]` instead.")));
 
 /**
  Sets the vertical alignment of the user location annotation within the
@@ -458,7 +461,7 @@ MGL_EXPORT IB_DESIGNABLE
     position within the map view. If `NO`, the user location annotation
     instantaneously moves to its new position.
  */
-- (void)setUserLocationVerticalAlignment:(MGLAnnotationVerticalAlignment)alignment animated:(BOOL)animated __attribute__((deprecated("Use -[MGLMapViewDelegate mapViewUserLocationAnchorPoint:] instead.")));
+- (void)setUserLocationVerticalAlignment:(MGLAnnotationVerticalAlignment)alignment animated:(BOOL)animated __attribute__((deprecated("Use `-[MGLMapViewDelegate mapViewUserLocationAnchorPoint:]` instead.")));
 
 /**
  Updates the position of the user location annotation view by retreiving the user's last
@@ -636,12 +639,12 @@ MGL_EXPORT IB_DESIGNABLE
 
  Changing the center coordinate centers the map on the new coordinate without
  changing the current zoom level.
- 
+
  @param coordinate The new center coordinate for the map.
  @param animated Specify `YES` if you want the map view to scroll to the new
     location or `NO` if you want the map to display the new location
     immediately.
- 
+
  @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`.
  */
@@ -656,7 +659,7 @@ MGL_EXPORT IB_DESIGNABLE
  @param animated Specify `YES` if you want the map view to animate scrolling and
     zooming to the new location or `NO` if you want the map to display the new
     location immediately.
- 
+
  @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`.
  */
@@ -673,7 +676,7 @@ MGL_EXPORT IB_DESIGNABLE
  @param animated Specify `YES` if you want the map view to animate scrolling,
     zooming, and rotating to the new location or `NO` if you want the map to
     display the new location immediately.
- 
+
  @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`.
  */
@@ -691,7 +694,7 @@ MGL_EXPORT IB_DESIGNABLE
     zooming, and rotating to the new location or `NO` if you want the map to
     display the new location immediately.
  @param completion The block executed after the animation finishes.
- 
+
  @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`.
  */
@@ -793,7 +796,7 @@ MGL_EXPORT IB_DESIGNABLE
  Changing the value of this property updates the receiver immediately. If you
  want to animate the change, call `-setVisibleCoordinateBounds:animated:`
  instead.
- 
+
  If a longitude is less than −180 degrees or greater than 180 degrees, the
  visible bounds straddles the antimeridian or international date line. For
  example, if both Tokyo and San Francisco are visible, the visible bounds might
@@ -804,7 +807,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit the given coordinate bounds,
  optionally animating the change.
- 
+
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
  example, to show both Tokyo and San Francisco simultaneously, you could set the
@@ -819,7 +822,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit the given coordinate bounds and
  optionally some additional padding on each side.
- 
+
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
  example, to show both Tokyo and San Francisco simultaneously, you could set the
@@ -836,7 +839,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit all of the given coordinates and
  optionally some additional padding on each side.
- 
+
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
  example, to show both Tokyo and San Francisco simultaneously, you could set the
@@ -855,7 +858,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit all of the given coordinates and
  optionally some additional padding on each side.
- 
+
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
  example, to show both Tokyo and San Francisco simultaneously, you could set the
@@ -916,9 +919,9 @@ MGL_EXPORT IB_DESIGNABLE
  @param animated Specify `YES` if you want the map view to animate the change to
     the new viewpoint or `NO` if you want the map to display the new viewpoint
     immediately.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/camera-animation/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/camera-animation/">
  Camera animation</a> example to learn how to trigger an animation that
  rotates around a central point.
  */
@@ -935,9 +938,9 @@ MGL_EXPORT IB_DESIGNABLE
  @param function A timing function used for the animation. Set this parameter to
     `nil` for a transition that matches most system animations. If the duration
     is `0`, this parameter is ignored.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/camera-animation/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/camera-animation/">
  Camera animation</a> example to learn how to create a timed animation that
  rotates around a central point for a specific duration.
  */
@@ -961,7 +964,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Moves the viewpoint to a different location with respect to the map with an
  optional transition duration and timing function.
- 
+
  @param camera The new viewpoint.
  @param duration The amount of time, measured in seconds, that the transition
  animation should take. Specify `0` to jump to the new viewpoint
@@ -1050,7 +1053,7 @@ MGL_EXPORT IB_DESIGNABLE
     with zoom level as high (close to the ground) as possible while still
     including the entire coordinate bounds. The camera object uses the current
     direction and pitch.
- 
+
  @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
  depending on the order of notification delivery.
@@ -1060,7 +1063,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns the camera that best fits the given coordinate bounds, with the specified camera,
  optionally with some additional padding on each side.
- 
+
  @param camera The camera that the return camera should adhere to. All values
     on this camera will be manipulated except for pitch and direction.
  @param bounds The coordinate bounds to fit to the receiver’s viewport.
@@ -1080,7 +1083,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns the camera that best fits the given shape, with the specified camera,
  optionally with some additional padding on each side.
- 
+
  @param camera The camera that the return camera should adhere to. All values
     on this camera will be manipulated except for pitch and direction.
  @param shape The shape to fit to the receiver’s viewport.
@@ -1089,7 +1092,7 @@ MGL_EXPORT IB_DESIGNABLE
  @return A camera object centered on the shape's center with zoom level as high
     (close to the ground) as possible while still including the entire shape. The
     initial camera's pitch and direction will be honored.
- 
+
  @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
  depending on the order of notification delivery.
@@ -1104,10 +1107,10 @@ MGL_EXPORT IB_DESIGNABLE
  @param direction The direction of the viewport, measured in degrees clockwise from true north.
  @param insets The minimum padding (in screen points) that would be visible
     around the returned camera object if it were set as the receiver’s camera.
- @return A camera object centered on the shape's center with zoom level as high 
+ @return A camera object centered on the shape's center with zoom level as high
     (close to the ground) as possible while still including the entire shape. The
     camera object uses the current pitch.
- 
+
  @note The behavior of this method is undefined if called in response to
  `UIApplicationWillTerminateNotification`; you may receive a `nil` return value
  depending on the order of notification delivery.
@@ -1183,9 +1186,9 @@ MGL_EXPORT IB_DESIGNABLE
  @param point The point to convert.
  @param view The view in whose coordinate system the point is expressed.
  @return The geographic coordinate at the given point.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/point-conversion/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/point-conversion/">
  Point conversion</a> example to learn how to convert a `CGPoint` to a map
  coordinate.
  */
@@ -1202,9 +1205,9 @@ MGL_EXPORT IB_DESIGNABLE
     belong to the same window as the map view.
  @return The point (in the appropriate view or window coordinate system)
     corresponding to the given geographic coordinate.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/point-conversion/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/point-conversion/">
  Point conversion</a> example to learn how to convert a map coordinate to a
  `CGPoint` object.
  */
@@ -1213,7 +1216,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Converts a rectangle in the given view’s coordinate system to a geographic
  bounding box.
- 
+
  If the returned coordinate bounds contains a longitude is less than −180 degrees
  or greater than 180 degrees, the bounding box straddles the antimeridian or
  international date line.
@@ -1227,7 +1230,7 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Converts a geographic bounding box to a rectangle in the given view’s
  coordinate system.
- 
+
  To bring both sides of the antimeridian or international date line into view,
  specify some longitudes less than −180 degrees or greater than 180 degrees. For
  example, to show both Tokyo and San Francisco simultaneously, you could set the
@@ -1279,10 +1282,10 @@ MGL_EXPORT IB_DESIGNABLE
  @param annotation The annotation object to add to the receiver. This object
     must conform to the `MGLAnnotation` protocol. The map view retains the
     annotation object.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-models/">
- Annotation models</a> and <a href="https://www.mapbox.com/ios-sdk/maps/examples/line-geojson/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/annotation-models/">
+ Annotation models</a> and <a href="https://docs.mapbox.com/ios/maps/examples/line-geojson/">
  Add a line annotation from GeoJSON</a> examples to learn how to add an
  annotation to an `MGLMapView` object.
  */
@@ -1350,9 +1353,9 @@ MGL_EXPORT IB_DESIGNABLE
     annotation image object using the `-mapView:imageForAnnotation:` method.
  @return An annotation image object with the given identifier, or `nil` if no
     such object exists in the reuse queue.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/annotation-view-image/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/annotation-view-image/">
  Add annotation views and images</a> example learn how to most efficiently
  reuse an `MGLAnnotationImage`.
  */
@@ -1415,13 +1418,15 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Selects an annotation and displays its callout view.
 
- The `animated` parameter determines whether the map is panned to bring the
- annotation on-screen, specifically:
+ The `animated` parameter determines whether the selection is animated including whether the map is
+ panned to bring the annotation into view, specifically:
 
  | `animated` parameter | Effect |
  |------------------|--------|
- | `NO`             | The annotation is selected, and the callout is presented. However the map is not panned to bring the annotation or callout onscreen. The presentation of the callout is animated. |
- | `YES`            | The annotation is selected, and the callout is presented. If the annotation is offscreen *and* is of type `MGLPointAnnotation`, the map is panned so that the annotation and its callout are brought just onscreen. The annotation is *not* centered within the viewport. |
+ | `NO`             | The annotation is selected, and the callout is presented. However the map is not panned to bring the annotation or callout into view. The presentation of the callout is NOT animated. |
+ | `YES`            | The annotation is selected, and the callout is presented. If the annotation is not visible (or is partially visible) *and* is of type `MGLPointAnnotation`, the map is panned so that the annotation and its callout are brought into view. The annotation is *not* centered within the viewport. |
+
+ Note that a selection initiated by a single tap gesture is always animated.
 
  @param annotation The annotation object to select.
  @param animated If `YES`, the annotation and callout view are animated on-screen.
@@ -1430,6 +1435,17 @@ MGL_EXPORT IB_DESIGNABLE
  change the camera.
  */
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
+
+/**
+ :nodoc:
+ Selects an annotation and displays its callout view. This method should be
+ considered "alpha" and as such is liable to change.
+
+ @param annotation The annotation object to select.
+ @param moveIntoView If the annotation is not visible (or is partially visible) *and* is of type `MGLPointAnnotation`, the map is panned so that the annotation and its callout are brought into view. The annotation is *not* centered within the viewport. |
+ @param animateSelection If `YES`, the annotation's selection state and callout view's presentation are animated.
+ */
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation moveIntoView:(BOOL)moveIntoView animateSelection:(BOOL)animateSelection;
 
 /**
  Deselects an annotation and hides its callout view.
@@ -1502,9 +1518,9 @@ MGL_EXPORT IB_DESIGNABLE
  @param point A point expressed in the map view’s coordinate system.
  @return An array of objects conforming to the `MGLFeature` protocol that
     represent features in the sources used by the current style.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/select-layer/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/select-layer/">
  Select a feature within a layer</a> example to learn how to query an
  `MGLMapView` object for visible `MGLFeature` objects.
  */
@@ -1513,18 +1529,18 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns an array of rendered map features that intersect with a given point,
  restricted to the given style layers.
- 
+
  This method returns all the intersecting features from the specified layers. To
  filter the returned features, use the
  `-visibleFeaturesAtPoint:inStyleLayersWithIdentifiers:predicate:` method. For
  more information about searching for map features, see that method’s
  documentation.
- 
+
  @param point A point expressed in the map view’s coordinate system.
- @param styleLayerIdentifiers A set of strings that correspond to the names 
-    of layers defined in the current style. Only the features contained in 
+ @param styleLayerIdentifiers A set of strings that correspond to the names
+    of layers defined in the current style. Only the features contained in
     these layers are included in the returned array.
- @return An array of objects conforming to the `MGLFeature` protocol that 
+ @return An array of objects conforming to the `MGLFeature` protocol that
     represent features in the sources used by the current style.
  */
 - (NSArray<id <MGLFeature>> *)visibleFeaturesAtPoint:(CGPoint)point inStyleLayersWithIdentifiers:(nullable NSSet<NSString *> *)styleLayerIdentifiers NS_SWIFT_NAME(visibleFeatures(at:styleLayerIdentifiers:));
@@ -1614,11 +1630,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Returns an array of rendered map features that intersect with the given
  rectangle, restricted to the given style layers.
- 
+
  This method returns all the intersecting features from the specified layers. To
  filter the returned features, use the
  `-visibleFeaturesAtPoint:inStyleLayersWithIdentifiers:predicate:` method. For
- more information about searching for map features, see that method’s 
+ more information about searching for map features, see that method’s
  documentation.
 
  @param rect A rectangle expressed in the map view’s coordinate system.
@@ -1634,7 +1650,7 @@ MGL_EXPORT IB_DESIGNABLE
  Returns an array of rendered map features that intersect with the given
  rectangle, restricted to the given style layers and filtered by the given
  predicate.
- 
+
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant map
  content sources. The returned array includes features loaded by
@@ -1683,7 +1699,7 @@ MGL_EXPORT IB_DESIGNABLE
  inspectable in Interface Builder, or a manually constructed `NSURL`. This
  approach also avoids layer identifer name changes that will occur in the
  default style’s layers over time.
- 
+
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set
     the style URL to an explicitly versioned style using a convenience method
@@ -1691,7 +1707,7 @@ MGL_EXPORT IB_DESIGNABLE
     inspectable in Interface Builder, or a manually constructed `NSURL`. This
     approach also avoids layer identifer name changes that will occur in the
     default style’s layers over time.
- 
+
  @param rect A rectangle expressed in the map view’s coordinate system.
  @param styleLayerIdentifiers A set of strings that correspond to the names of
     layers defined in the current style. Only the features contained in these

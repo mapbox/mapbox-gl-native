@@ -1,15 +1,12 @@
 package com.mapbox.mapboxsdk.testapp.activity.maplayout;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -24,20 +21,18 @@ public class LocalGlyphActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_local_glyph);
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(@NonNull MapboxMap mapboxMap) {
-        // Set initial position to Suzhou
-        mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
-          new CameraPosition.Builder()
-            .target(new LatLng(31.3003, 120.7457))
-            .zoom(11)
-            .bearing(0)
-            .tilt(0)
-            .build()));
-      }
+    mapView.getMapAsync(mapboxMap -> {
+      mapboxMap.setStyle(Style.MAPBOX_STREETS);
+      // Set initial position to Suzhou
+      mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
+        new CameraPosition.Builder()
+          .target(new LatLng(31.3003, 120.7457))
+          .zoom(11)
+          .bearing(0)
+          .tilt(0)
+          .build()));
     });
   }
 

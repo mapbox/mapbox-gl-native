@@ -10,6 +10,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLFillStyleLayer_Private.h"
 
+#include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 
 
@@ -129,19 +130,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting fillColorTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setFillColorTransition(options);
+    self.rawLayer->setFillColorTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)fillColorTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillColorTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setFillOpacity:(NSExpression *)fillOpacity {
@@ -166,19 +163,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting fillOpacityTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setFillOpacityTransition(options);
+    self.rawLayer->setFillOpacityTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)fillOpacityTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillOpacityTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setFillOutlineColor:(NSExpression *)fillOutlineColor {
@@ -203,19 +196,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting fillOutlineColorTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setFillOutlineColorTransition(options);
+    self.rawLayer->setFillOutlineColorTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)fillOutlineColorTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillOutlineColorTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setFillPattern:(NSExpression *)fillPattern {
@@ -240,19 +229,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting fillPatternTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setFillPatternTransition(options);
+    self.rawLayer->setFillPatternTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)fillPatternTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillPatternTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setFillTranslation:(NSExpression *)fillTranslation {
@@ -277,19 +262,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting fillTranslationTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setFillTranslateTransition(options);
+    self.rawLayer->setFillTranslateTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)fillTranslationTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillTranslateTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setFillTranslate:(NSExpression *)fillTranslate {

@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
+import com.mapbox.mapboxsdk.testapp.activity.BaseTest;
 import com.mapbox.mapboxsdk.testapp.activity.camera.CameraAnimationTypeActivity;
 import org.junit.Test;
 
@@ -11,7 +11,7 @@ import static com.mapbox.mapboxsdk.testapp.action.OrientationChangeAction.orient
 import static com.mapbox.mapboxsdk.testapp.action.OrientationChangeAction.orientationPortrait;
 import static com.mapbox.mapboxsdk.testapp.action.OrientationChangeAction.orientationPortraitReverse;
 
-public class OrientationTest extends BaseActivityTest {
+public class OrientationTest extends BaseTest {
 
   @Test
   public void testChangeDeviceOrientation() {

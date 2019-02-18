@@ -10,6 +10,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLLineStyleLayer_Private.h"
 
+#include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 
 
@@ -190,19 +191,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting lineBlurTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setLineBlurTransition(options);
+    self.rawLayer->setLineBlurTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)lineBlurTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getLineBlurTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setLineColor:(NSExpression *)lineColor {
@@ -227,19 +224,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting lineColorTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setLineColorTransition(options);
+    self.rawLayer->setLineColorTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)lineColorTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getLineColorTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setLineDashPattern:(NSExpression *)lineDashPattern {
@@ -264,19 +257,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting lineDashPatternTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setLineDasharrayTransition(options);
+    self.rawLayer->setLineDasharrayTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)lineDashPatternTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getLineDasharrayTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setLineDasharray:(NSExpression *)lineDasharray {
@@ -308,19 +297,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting lineGapWidthTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setLineGapWidthTransition(options);
+    self.rawLayer->setLineGapWidthTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)lineGapWidthTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getLineGapWidthTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setLineGradient:(NSExpression *)lineGradient {
@@ -363,19 +348,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting lineOffsetTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setLineOffsetTransition(options);
+    self.rawLayer->setLineOffsetTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)lineOffsetTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getLineOffsetTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setLineOpacity:(NSExpression *)lineOpacity {
@@ -400,19 +381,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting lineOpacityTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setLineOpacityTransition(options);
+    self.rawLayer->setLineOpacityTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)lineOpacityTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getLineOpacityTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setLinePattern:(NSExpression *)linePattern {
@@ -437,19 +414,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting linePatternTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setLinePatternTransition(options);
+    self.rawLayer->setLinePatternTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)linePatternTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getLinePatternTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setLineTranslation:(NSExpression *)lineTranslation {
@@ -474,19 +447,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting lineTranslationTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setLineTranslateTransition(options);
+    self.rawLayer->setLineTranslateTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)lineTranslationTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getLineTranslateTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setLineTranslate:(NSExpression *)lineTranslate {
@@ -543,19 +512,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting lineWidthTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setLineWidthTransition(options);
+    self.rawLayer->setLineWidthTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)lineWidthTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getLineWidthTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 @end

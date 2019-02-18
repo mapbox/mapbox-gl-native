@@ -1,7 +1,7 @@
 add_vendor_target(gtest STATIC)
 
-# Modify cmake/test-files.txt to change the source files for this target.
-load_sources_list(MBGL_TEST_FILES cmake/test-files.txt)
+# scripts/generate-file-lists.js to change the source files for this target.
+load_sources_list(MBGL_TEST_FILES test/test-files.json)
 if (MBGL_TEST_TARGET_TYPE STREQUAL "library")
     add_library(mbgl-test SHARED ${MBGL_TEST_FILES})
 else()
@@ -21,7 +21,7 @@ target_include_directories(mbgl-test
     PRIVATE src
     PRIVATE test/include
     PRIVATE test/src
-    PRIVATE platform/default
+    PRIVATE platform/default/include
 )
 
 target_link_libraries(mbgl-test PRIVATE

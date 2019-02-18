@@ -2,7 +2,7 @@
 #include <mbgl/text/language_tag.hpp>
 #include <mbgl/util/platform.hpp>
 
-#include <unaccent.hpp>
+#include <mbgl/text/unaccent.hpp>
 
 #include <jni/jni.hpp>
 

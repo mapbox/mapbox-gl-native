@@ -24,6 +24,15 @@ struct Renderable {
     }
 };
 
+namespace {
+auto makeSorted(std::vector<Renderable>& renderables) {
+    std::vector<std::reference_wrapper<Renderable>> sorted(renderables.begin(), renderables.end());
+    std::sort(sorted.begin(), sorted.end(),
+                  [](const Renderable& a, const Renderable& b){ return a.id < b.id; });
+    return sorted;
+}
+}  // namespace
+
 ::std::ostream& operator<<(::std::ostream& os, const Renderable& rhs) {
     return os << "Renderable{ " << rhs.id <<  ", " << rhs.clip << " }";
 }
@@ -71,7 +80,7 @@ TEST(GenerateClipIDs, ParentAndFourChildrenNegative) {
     };
 
     algorithm::ClipIDGenerator generator;
-    generator.update<Renderable>({ renderables.begin(), renderables.end() });
+    generator.update<Renderable>(makeSorted(renderables));
 
     EXPECT_EQ(decltype(renderables)({
                   Renderable{ UnwrappedTileID{ 1, -2, 0 }, ClipID{ "00000111", "00000010" } },
@@ -102,7 +111,7 @@ TEST(GenerateClipIDs, NegativeParentAndMissingLevel) {
     };
 
     algorithm::ClipIDGenerator generator;
-    generator.update<Renderable>({ renderables.begin(), renderables.end() });
+    generator.update<Renderable>(makeSorted(renderables));
 
     EXPECT_EQ(decltype(renderables)({
                   Renderable{ UnwrappedTileID{ 1, -1, 0 }, ClipID{ "00000111", "00000001" } },
@@ -186,7 +195,7 @@ TEST(GenerateClipIDs, MultipleLevels) {
     };
 
     algorithm::ClipIDGenerator generator;
-    generator.update<Renderable>({ renderables.begin(), renderables.end() });
+    generator.update<Renderable>(makeSorted(renderables));
     ASSERT_EQ(decltype(renderables)({
                   Renderable{ UnwrappedTileID{ 2, 0, 0 }, ClipID{ "00001111", "00000001" } },
                   Renderable{ UnwrappedTileID{ 3, 0, 0 }, ClipID{ "00001111", "00000011" } },
@@ -237,7 +246,7 @@ TEST(GenerateClipIDs, Bug206) {
     };
 
     algorithm::ClipIDGenerator generator;
-    generator.update<Renderable>({ renderables.begin(), renderables.end() });
+    generator.update<Renderable>(makeSorted(renderables));
     EXPECT_EQ(
         decltype(renderables)({
             Renderable{ UnwrappedTileID{ 10, 162, 395 }, ClipID{ "00001111", "00000001" } },
@@ -350,8 +359,8 @@ TEST(GenerateClipIDs, SomeUnclippedTiles) {
     };
 
     algorithm::ClipIDGenerator generator;
-    generator.update<Renderable>({ renderables1.begin(), renderables1.end() });
-    generator.update<Renderable>({ renderables2.begin(), renderables2.end() });
+    generator.update<Renderable>(makeSorted(renderables1));
+    generator.update<Renderable>(makeSorted(renderables2));
     EXPECT_EQ(decltype(renderables1)({
                 Renderable { UnwrappedTileID { 7, 36, 49 }, ClipID {"00000011","00000010"} },
                 Renderable { UnwrappedTileID { 7, 36, 48 }, ClipID {"00000011","00000001"} },

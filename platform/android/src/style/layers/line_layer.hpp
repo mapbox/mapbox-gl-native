@@ -4,6 +4,7 @@
 
 #include "layer.hpp"
 #include "../transition_options.hpp"
+#include <mbgl/layermanager/line_layer_factory.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <jni/jni.hpp>
 

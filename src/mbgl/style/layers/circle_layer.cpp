@@ -9,9 +9,8 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
-#include <mbgl/util/fnv_hash.hpp>
 
-#include <mbgl/renderer/layers/render_circle_layer.hpp>
+#include <mapbox/eternal.hpp>
 
 namespace mbgl {
 namespace style {
@@ -363,8 +362,7 @@ TransitionOptions CircleLayer::getCircleStrokeOpacityTransition() const {
 using namespace conversion;
 
 optional<Error> CircleLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        Unknown,
+    enum class Property : uint8_t {
         CircleRadius,
         CircleColor,
         CircleBlur,
@@ -389,124 +387,37 @@ optional<Error> CircleLayer::setPaintProperty(const std::string& name, const Con
         CircleStrokeOpacityTransition,
     };
 
-    Property property = Property::Unknown;
-    switch (util::hashFNV1a(name.c_str())) {
-    case util::hashFNV1a("circle-radius"):
-        if (name == "circle-radius") {
-            property = Property::CircleRadius;
-        }
-        break;
-    case util::hashFNV1a("circle-radius-transition"):
-        if (name == "circle-radius-transition") {
-            property = Property::CircleRadiusTransition;
-        }
-        break;
-    case util::hashFNV1a("circle-color"):
-        if (name == "circle-color") {
-            property = Property::CircleColor;
-        }
-        break;
-    case util::hashFNV1a("circle-color-transition"):
-        if (name == "circle-color-transition") {
-            property = Property::CircleColorTransition;
-        }
-        break;
-    case util::hashFNV1a("circle-blur"):
-        if (name == "circle-blur") {
-            property = Property::CircleBlur;
-        }
-        break;
-    case util::hashFNV1a("circle-blur-transition"):
-        if (name == "circle-blur-transition") {
-            property = Property::CircleBlurTransition;
-        }
-        break;
-    case util::hashFNV1a("circle-opacity"):
-        if (name == "circle-opacity") {
-            property = Property::CircleOpacity;
-        }
-        break;
-    case util::hashFNV1a("circle-opacity-transition"):
-        if (name == "circle-opacity-transition") {
-            property = Property::CircleOpacityTransition;
-        }
-        break;
-    case util::hashFNV1a("circle-translate"):
-        if (name == "circle-translate") {
-            property = Property::CircleTranslate;
-        }
-        break;
-    case util::hashFNV1a("circle-translate-transition"):
-        if (name == "circle-translate-transition") {
-            property = Property::CircleTranslateTransition;
-        }
-        break;
-    case util::hashFNV1a("circle-translate-anchor"):
-        if (name == "circle-translate-anchor") {
-            property = Property::CircleTranslateAnchor;
-        }
-        break;
-    case util::hashFNV1a("circle-translate-anchor-transition"):
-        if (name == "circle-translate-anchor-transition") {
-            property = Property::CircleTranslateAnchorTransition;
-        }
-        break;
-    case util::hashFNV1a("circle-pitch-scale"):
-        if (name == "circle-pitch-scale") {
-            property = Property::CirclePitchScale;
-        }
-        break;
-    case util::hashFNV1a("circle-pitch-scale-transition"):
-        if (name == "circle-pitch-scale-transition") {
-            property = Property::CirclePitchScaleTransition;
-        }
-        break;
-    case util::hashFNV1a("circle-pitch-alignment"):
-        if (name == "circle-pitch-alignment") {
-            property = Property::CirclePitchAlignment;
-        }
-        break;
-    case util::hashFNV1a("circle-pitch-alignment-transition"):
-        if (name == "circle-pitch-alignment-transition") {
-            property = Property::CirclePitchAlignmentTransition;
-        }
-        break;
-    case util::hashFNV1a("circle-stroke-width"):
-        if (name == "circle-stroke-width") {
-            property = Property::CircleStrokeWidth;
-        }
-        break;
-    case util::hashFNV1a("circle-stroke-width-transition"):
-        if (name == "circle-stroke-width-transition") {
-            property = Property::CircleStrokeWidthTransition;
-        }
-        break;
-    case util::hashFNV1a("circle-stroke-color"):
-        if (name == "circle-stroke-color") {
-            property = Property::CircleStrokeColor;
-        }
-        break;
-    case util::hashFNV1a("circle-stroke-color-transition"):
-        if (name == "circle-stroke-color-transition") {
-            property = Property::CircleStrokeColorTransition;
-        }
-        break;
-    case util::hashFNV1a("circle-stroke-opacity"):
-        if (name == "circle-stroke-opacity") {
-            property = Property::CircleStrokeOpacity;
-        }
-        break;
-    case util::hashFNV1a("circle-stroke-opacity-transition"):
-        if (name == "circle-stroke-opacity-transition") {
-            property = Property::CircleStrokeOpacityTransition;
-        }
-        break;
-    
-    }
+    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
+        { "circle-radius", static_cast<uint8_t>(Property::CircleRadius) },
+        { "circle-color", static_cast<uint8_t>(Property::CircleColor) },
+        { "circle-blur", static_cast<uint8_t>(Property::CircleBlur) },
+        { "circle-opacity", static_cast<uint8_t>(Property::CircleOpacity) },
+        { "circle-translate", static_cast<uint8_t>(Property::CircleTranslate) },
+        { "circle-translate-anchor", static_cast<uint8_t>(Property::CircleTranslateAnchor) },
+        { "circle-pitch-scale", static_cast<uint8_t>(Property::CirclePitchScale) },
+        { "circle-pitch-alignment", static_cast<uint8_t>(Property::CirclePitchAlignment) },
+        { "circle-stroke-width", static_cast<uint8_t>(Property::CircleStrokeWidth) },
+        { "circle-stroke-color", static_cast<uint8_t>(Property::CircleStrokeColor) },
+        { "circle-stroke-opacity", static_cast<uint8_t>(Property::CircleStrokeOpacity) },
+        { "circle-radius-transition", static_cast<uint8_t>(Property::CircleRadiusTransition) },
+        { "circle-color-transition", static_cast<uint8_t>(Property::CircleColorTransition) },
+        { "circle-blur-transition", static_cast<uint8_t>(Property::CircleBlurTransition) },
+        { "circle-opacity-transition", static_cast<uint8_t>(Property::CircleOpacityTransition) },
+        { "circle-translate-transition", static_cast<uint8_t>(Property::CircleTranslateTransition) },
+        { "circle-translate-anchor-transition", static_cast<uint8_t>(Property::CircleTranslateAnchorTransition) },
+        { "circle-pitch-scale-transition", static_cast<uint8_t>(Property::CirclePitchScaleTransition) },
+        { "circle-pitch-alignment-transition", static_cast<uint8_t>(Property::CirclePitchAlignmentTransition) },
+        { "circle-stroke-width-transition", static_cast<uint8_t>(Property::CircleStrokeWidthTransition) },
+        { "circle-stroke-color-transition", static_cast<uint8_t>(Property::CircleStrokeColorTransition) },
+        { "circle-stroke-opacity-transition", static_cast<uint8_t>(Property::CircleStrokeOpacityTransition) }
+    });
 
-    if (property == Property::Unknown) {
+    const auto it = properties.find(name.c_str());
+    if (it == properties.end()) {
         return Error { "layer doesn't support this property" };
     }
+
+    Property property = static_cast<Property>(it->second);
 
         
     if (property == Property::CircleRadius || property == Property::CircleBlur || property == Property::CircleOpacity || property == Property::CircleStrokeWidth || property == Property::CircleStrokeOpacity) {
@@ -681,21 +592,6 @@ optional<Error> CircleLayer::setLayoutProperty(const std::string& name, const Co
         return Layer::setVisibility(value);
     }
 
-    enum class Property {
-        Unknown,
-    };
-
-    Property property = Property::Unknown;
-    switch (util::hashFNV1a(name.c_str())) {
-    
-    }
-
-    if (property == Property::Unknown) {
-        return Error { "layer doesn't support this property" };
-    }
-
-        
-
     return Error { "layer doesn't support this property" };
 }
 
@@ -704,27 +600,4 @@ Mutable<Layer::Impl> CircleLayer::mutableBaseImpl() const {
 }
 
 } // namespace style
-
-const style::LayerTypeInfo* CircleLayerFactory::getTypeInfo() const noexcept {
-    return style::CircleLayer::Impl::staticTypeInfo();
-}
-
-std::unique_ptr<style::Layer> CircleLayerFactory::createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept {
-    optional<std::string> source = getSource(value);
-    if (!source) {
-        return nullptr;
-    }
-
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::CircleLayer(id, *source));
-    if (!initSourceLayerAndFilter(layer.get(), value)) {
-        return nullptr;
-    }
-    return layer;
-}
-
-std::unique_ptr<RenderLayer> CircleLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
-    assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderCircleLayer>(staticImmutableCast<style::CircleLayer::Impl>(std::move(impl)));
-}
-
 } // namespace mbgl

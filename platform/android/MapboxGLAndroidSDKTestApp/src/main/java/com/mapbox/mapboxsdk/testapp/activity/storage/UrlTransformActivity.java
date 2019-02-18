@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.storage.Resource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -18,7 +18,6 @@ import timber.log.Timber;
 public class UrlTransformActivity extends AppCompatActivity {
 
   private MapView mapView;
-  private MapboxMap mapboxMap;
 
   /**
    * Be sure to use an isolated class so the activity is not leaked when
@@ -48,7 +47,7 @@ public class UrlTransformActivity extends AppCompatActivity {
 
     mapView.getMapAsync(map -> {
       Timber.i("Map loaded");
-      mapboxMap = map;
+      map.setStyle(Style.MAPBOX_STREETS);
     });
   }
 

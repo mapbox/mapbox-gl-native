@@ -3,11 +3,11 @@ add_executable(mbgl-offline
 )
 
 target_sources(mbgl-offline
-    PRIVATE platform/default/mbgl/util/default_styles.hpp
+    PRIVATE platform/default/include/mbgl/util/default_styles.hpp
 )
 
 target_include_directories(mbgl-offline
-    PRIVATE platform/default
+    PRIVATE platform/default/include
 )
 
 target_link_libraries(mbgl-offline

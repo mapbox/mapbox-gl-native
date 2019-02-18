@@ -16,9 +16,10 @@ public class OfflineUtils {
     try {
       String json = new String(metadata, JSON_CHARSET);
       JsonObject jsonObject = new Gson().fromJson(json, JsonObject.class);
-      return jsonObject.get(JSON_FIELD_REGION_NAME).getAsString();
+      String name = jsonObject.get(JSON_FIELD_REGION_NAME).getAsString();
+      return name != null ? name : "";
     } catch (Exception exception) {
-      return null;
+      return "";
     }
   }
 

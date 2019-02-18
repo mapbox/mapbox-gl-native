@@ -524,22 +524,27 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
 
 - (void)setTransition:(MGLTransition)transition
 {
-    auto transitionOptions = self.rawStyle->getTransitionOptions();
-    transitionOptions.duration = MGLDurationFromTimeInterval(transition.duration);
-    transitionOptions.delay = MGLDurationFromTimeInterval(transition.delay);
-    
-    self.rawStyle->setTransitionOptions(transitionOptions);
+    self.rawStyle->setTransitionOptions(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)transition
 {
-    MGLTransition transition;
     const mbgl::style::TransitionOptions transitionOptions = self.rawStyle->getTransitionOptions();
-
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
     
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
+}
+
+- (void)setPerformsPlacementTransitions:(BOOL)performsPlacementTransitions
+{
+    mbgl::style::TransitionOptions transitionOptions = self.rawStyle->getTransitionOptions();
+    transitionOptions.enablePlacementTransitions = static_cast<bool>(performsPlacementTransitions);
+    self.rawStyle->setTransitionOptions(transitionOptions);
+}
+
+- (BOOL)performsPlacementTransitions
+{
+    mbgl::style::TransitionOptions transitionOptions = self.rawStyle->getTransitionOptions();
+    return transitionOptions.enablePlacementTransitions;
 }
 
 #pragma mark Style light

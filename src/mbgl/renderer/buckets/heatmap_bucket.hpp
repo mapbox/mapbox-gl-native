@@ -13,9 +13,10 @@ namespace mbgl {
 
 class BucketParameters;
 
-class HeatmapBucket : public Bucket {
+class HeatmapBucket final : public Bucket {
 public:
     HeatmapBucket(const BucketParameters&, const std::vector<const RenderLayer*>&);
+    ~HeatmapBucket() override;
 
     void addFeature(const GeometryTileFeature&,
                             const GeometryCollection&,
@@ -26,6 +27,7 @@ public:
     void upload(gl::Context&) override;
 
     float getQueryRadius(const RenderLayer&) const override;
+    bool supportsLayer(const style::Layer::Impl&) const override;
 
     gl::VertexVector<HeatmapLayoutVertex> vertices;
     gl::IndexVector<gl::Triangles> triangles;
@@ -38,10 +40,5 @@ public:
 
     const MapMode mode;
 };
-
-template <>
-inline bool Bucket::is<HeatmapBucket>() const {
-    return layerType == style::LayerType::Heatmap;
-}
 
 } // namespace mbgl

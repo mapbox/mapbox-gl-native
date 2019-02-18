@@ -12,24 +12,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  A version number identifying the default version of the Mapbox Streets style
- obtained through the `-streetsStyleURL` method. This version number may also be
- passed into the `-streetsStyleURLWithVersion:` method.
+ obtained through the `MGLStyle.streetsStyleURL` method. This version number may also be
+ passed into the `+[MGLStyle streetsStyleURLWithVersion:]` method.
 
  The value of this constant generally corresponds to the latest released version
  as of the date on which this SDK was published. You can use this constant to
  ascertain the style used by `MGLMapView` and `MGLTilePyramidOfflineRegion` when
  no style URL is specified. Consult the
- <a href="https://www.mapbox.com/api-documentation/#styles">Mapbox Styles API documentation</a>
+ <a href="https://www.mapbox.com/api-documentation/maps/#styles">Mapbox Styles API documentation</a>
  for the most up-to-date style versioning information.
 
  @warning The value of this constant may change in a future release of the SDK.
     If you use any feature that depends on a specific aspect of a default style
-    – for instance, the minimum zoom level that includes roads – you may use the
+    — for instance, the minimum zoom level that includes roads — you may use the
     current value of this constant or the underlying style URL, but do not use
     the constant itself. Such details may change significantly from version to
     version.
  */
-static MGL_EXPORT const NSInteger MGLStyleDefaultVersion = 10;
+static MGL_EXPORT const NSInteger MGLStyleDefaultVersion = 11;
 
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLInvalidStyleURLException;
 FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLRedundantLayerException;
@@ -41,20 +41,20 @@ FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLRedundantSourceIdentifier
  The proxy object for the current map style.
 
  MGLStyle provides a set of convenience methods for changing Mapbox
- default styles using `-[MGLMapView styleURL]`.
+ default styles using `MGLMapView.styleURL`.
  <a href="https://www.mapbox.com/maps/">Learn more about Mapbox default styles</a>.
 
  It is also possible to directly manipulate the current map style
- via `-[MGLMapView style]` by updating the style's data sources or layers.
+ via `MGLMapView.style` by updating the style's data sources or layers.
 
  @note Wait until the map style has finished loading before modifying a map's
     style via any of the `MGLStyle` instance methods below. You can use the
     `-[MGLMapViewDelegate mapView:didFinishLoadingStyle:]` or
     `-[MGLMapViewDelegate mapViewDidFinishLoadingMap:]` methods as indicators
     that it's safe to modify the map's style.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/default-styles/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/default-styles/">
  Default styles</a> example to learn how to initialize an `MGLMapView` object
  with a Mapbox default style using `MGLStyle`'s class methods.
  */
@@ -74,9 +74,9 @@ MGL_EXPORT
  is specified explicitly.
 
  @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the minimum zoom level that includes roads – use the
-    `-streetsStyleURLWithVersion:` method instead. Such details may change
+    any feature that depends on a specific aspect of a default style — for
+    instance, the minimum zoom level that includes roads — use the
+    `+streetsStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
 @property (class, nonatomic, readonly) NSURL *streetsStyleURL;
@@ -104,9 +104,9 @@ MGL_EXPORT
  Outdoors is a general-purpose style tailored to outdoor activities.
 
  @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the minimum zoom level that includes roads – use the
-    `-outdoorsStyleURLWithVersion:` method instead. Such details may change
+    any feature that depends on a specific aspect of a default style — for
+    instance, the minimum zoom level that includes roads — use the
+    `+outdoorsStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
 @property (class, nonatomic, readonly) NSURL *outdoorsStyleURL;
@@ -128,9 +128,9 @@ MGL_EXPORT
  Light is a subtle, light-colored backdrop for data visualizations.
 
  @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the minimum zoom level that includes roads – use the
-    `-lightStyleURLWithVersion:` method instead. Such details may change
+    any feature that depends on a specific aspect of a default style — for
+    instance, the minimum zoom level that includes roads — use the
+    `+lightStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
 @property (class, nonatomic, readonly) NSURL *lightStyleURL;
@@ -153,9 +153,9 @@ MGL_EXPORT
  Dark is a subtle, dark-colored backdrop for data visualizations.
 
  @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the minimum zoom level that includes roads – use the
-    `-darkStyleURLWithVersion:` method instead. Such details may change
+    any feature that depends on a specific aspect of a default style — for
+    instance, the minimum zoom level that includes roads — use the
+    `+darkStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
 @property (class, nonatomic, readonly) NSURL *darkStyleURL;
@@ -178,13 +178,13 @@ MGL_EXPORT
  Satellite is high-resolution satellite and aerial imagery.
 
  @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the raster tile sets included in the style – use the
-    `-satelliteStyleURLWithVersion:` method instead. Such details may change
+    any feature that depends on a specific aspect of a default style — for
+    instance, the raster tile sets included in the style — use the
+    `+satelliteStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
- 
+
  #### Related example
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/satellite-style/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/satellite-style/">
  Satellite styles</a> example to learn how to initialize a map with the Mapbox
  Satellite style.
  */
@@ -214,13 +214,13 @@ MGL_EXPORT
  Streets.
 
  @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the minimum zoom level that includes roads – use the
-    `-satelliteStreetsStyleURLWithVersion:` method instead. Such details may
+    any feature that depends on a specific aspect of a default style — for
+    instance, the minimum zoom level that includes roads — use the
+    `+satelliteStreetsStyleURLWithVersion:` method instead. Such details may
     change significantly from version to version.
- 
+
  #### Related example
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/satellite-style/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/satellite-style/">
  Satellite styles</a> example to learn how to initialize a map with the Mapbox
  Satellite Streets style.
  */
@@ -269,6 +269,13 @@ MGL_EXPORT
  paint properties.
  */
 @property (nonatomic) MGLTransition transition;
+
+/**
+ A boolean value indicating whether label placement transitions are enabled.
+
+ The default value of this property is `YES`.
+ */
+@property (nonatomic, assign) BOOL performsPlacementTransitions;
 
 /**
  Returns a source with the given identifier in the current style.
@@ -320,7 +327,7 @@ MGL_EXPORT
 
 /**
  Removes a source from the current style.
- 
+
  @note Source identifiers are not guaranteed to exist across styles or different
  versions of the same style. Applications that use this API must first set the
  style URL to an explicitly versioned style using a convenience method like
@@ -328,11 +335,11 @@ MGL_EXPORT
  inspectable in Interface Builder, or a manually constructed `NSURL`. This
  approach also avoids source identifer name changes that will occur in the default
  style’s sources over time.
- 
+
  @param source The source to remove from the current style.
  @param outError Upon return, if an error has occurred, a pointer to an `NSError`
  object describing the error. Pass in `NULL` to ignore any error.
- 
+
  @return `YES` if `source` was removed successfully. If `NO`, `outError` contains
  an `NSError` object describing the problem.
  */
@@ -417,9 +424,9 @@ MGL_EXPORT
 
  @param layer The layer to insert.
  @param sibling An existing layer in the style.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/shape-collection/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/shape-collection/">
  Add multiple shapes from a single shape source</a> example to learn how to
  add a layer to your map below an existing layer.
  */
@@ -442,9 +449,9 @@ MGL_EXPORT
 
  @param layer The layer to insert.
  @param sibling An existing layer in the style.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/image-source/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/image-source/">
  Add an image</a> example to learn how to add a layer to your map above an
  existing layer.
  */
@@ -505,10 +512,10 @@ MGL_EXPORT
 
  @param image The image for the name.
  @param name The name of the image to set to the style.
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/clustering-with-images/">
- Use images to cluster point data</a> and <a href="https://www.mapbox.com/ios-sdk/maps/examples/clustering/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/clustering-with-images/">
+ Use images to cluster point data</a> and <a href="https://docs.mapbox.com/ios/maps/examples/clustering/">
  Cluster point data</a> examples to learn how to add images to your map using
  an `MGLStyle` object.
  */
@@ -541,14 +548,14 @@ MGL_EXPORT
 
 /**
  Attempts to localize labels in the style into the given locale.
- 
+
  This method automatically modifies the text property of any symbol style layer
  in the style whose source is the
- <a href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview">Mapbox Streets source</a>.
+ <a href="https://www.mapbox.com/vector-tiles/mapbox-streets-v8/#overview">Mapbox Streets source</a>.
  On iOS, the user can set the system’s preferred language in Settings, General
  Settings, Language & Region. On macOS, the user can set the system’s preferred
  language in the Language & Region pane of System Preferences.
- 
+
  @param locale The locale into which labels should be localized. To use the
     system’s preferred language, if supported, specify `nil`. To use the local
     language, specify a locale with the identifier `mul`.

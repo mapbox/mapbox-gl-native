@@ -2,6 +2,7 @@
 
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
+#include <mbgl/programs/hillshade_prepare_program.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/shaders/hillshade.hpp>
 #include <mbgl/util/geometry.hpp>
@@ -51,5 +52,14 @@ public:
 
 using HillshadeLayoutVertex = HillshadeProgram::LayoutVertex;
 using HillshadeAttributes = HillshadeProgram::Attributes;
+
+class HillshadeLayerPrograms final : public LayerTypePrograms  {
+public:
+    HillshadeLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+        : hillshade(context, programParameters),
+          hillshadePrepare(context, programParameters) {}
+    HillshadeProgram hillshade;
+    HillshadePrepareProgram hillshadePrepare;
+};
 
 } // namespace mbgl

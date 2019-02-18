@@ -2,15 +2,24 @@ package com.mapbox.mapboxsdk.attribution;
 
 import android.support.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Attribution {
 
   private static final String OPENSTREETMAP = "OpenStreetMap";
   private static final String OPENSTREETMAP_ABBR = "OSM";
   static final String TELEMETRY = "Telemetry Settings";
-
-  static final String IMPROVE_MAP_URL = "https://www.mapbox.com/feedback/";
   static final String MAPBOX_URL = "https://www.mapbox.com/about/maps/";
   static final String TELEMETRY_URL = "https://www.mapbox.com/telemetry/";
+  static final List<String> IMPROVE_MAP_URLS = new ArrayList<>();
+
+  static {
+    // Using a List makes URL backwards compatible
+    IMPROVE_MAP_URLS.add("https://www.mapbox.com/feedback/");
+    IMPROVE_MAP_URLS.add("https://www.mapbox.com/map-feedback/");
+    IMPROVE_MAP_URLS.add("https://apps.mapbox.com/feedback/");
+  }
 
   private String title;
   private String url;

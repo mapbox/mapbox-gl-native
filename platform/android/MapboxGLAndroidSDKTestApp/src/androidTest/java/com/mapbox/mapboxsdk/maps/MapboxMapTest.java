@@ -11,20 +11,12 @@ import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidMarkerPositionException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
-import com.mapbox.mapboxsdk.testapp.utils.TestConstants;
-import com.mapbox.mapboxsdk.testapp.utils.ViewUtils;
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 import org.hamcrest.Matcher;
-import org.junit.Ignore;
 import org.junit.Test;
-import timber.log.Timber;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +24,6 @@ import java.util.List;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static com.mapbox.mapboxsdk.testapp.utils.TestConstants.LAT_LNG_DELTA;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -44,120 +35,10 @@ import static org.junit.Assert.assertTrue;
  * Methods executed on MapboxMap are called from a ViewAction to ensure correct synchronisation
  * with the application UI-thread.
  * </p>
+ * @deprecated remove this file when removing deprecated annotations
  */
-public class MapboxMapTest extends BaseActivityTest {
-
-  @Override
-  protected Class getActivityClass() {
-    return EspressoTestActivity.class;
-  }
-
-  @Test
-  public void testSanity() {
-    validateTestSetup();
-    assertNotNull("mapboxMap should not be null", mapboxMap);
-  }
-
-  //
-  // Style wide transition options
-  //
-
-  @Test
-  public void testTransitionDuration() {
-    validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      long transitionDuration = 600;
-      mapboxMap.setTransitionDuration(transitionDuration);
-      assertEquals(
-        "TransitionDuration should match", transitionDuration, mapboxMap.getTransitionDuration(), 0
-      );
-    }));
-  }
-
-  @Test
-  public void testTransitionDelay() {
-    validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      long transitionDelay = 50;
-      mapboxMap.setTransitionDelay(transitionDelay);
-      assertEquals(
-        "TransitionDelay should match", transitionDelay, mapboxMap.getTransitionDelay(), 0
-      );
-    }));
-  }
-
-  //
-  // Camera tests
-  //
-  @Test
-  public void testCameraPositionOnFinish() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-
-      final LatLng latLng = new LatLng(30.0, 30.0);
-      mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(latLng), new MapboxMap.CancelableCallback() {
-        @Override
-        public void onCancel() {
-        }
-
-        @Override
-        public void onFinish() {
-          LatLng cameraPositionLatLng = mapboxMap.getCameraPosition().target;
-          Timber.d(cameraPositionLatLng.toString());
-          assertEquals(cameraPositionLatLng.getLatitude(), latLng.getLatitude(), LAT_LNG_DELTA);
-          assertEquals(cameraPositionLatLng.getLongitude(), latLng.getLongitude(), LAT_LNG_DELTA);
-        }
-      });
-    }));
-  }
-
-  @Test
-  public void testCameraForLatLngBounds() {
-    ViewUtils.checkViewIsDisplayed(R.id.mapView);
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      // set
-      mapboxMap.setLatLngBoundsForCameraTarget(
-        new LatLngBounds.Builder().include(new LatLng()).include(new LatLng(1, 1)).build());
-      // reset
-      mapboxMap.setLatLngBoundsForCameraTarget(null);
-    }));
-  }
-
-
-  //
-  // MinZoomLevel
-  //
-
-  @Test
-  public void testMinZoom() {
-    validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      mapboxMap.setMinZoomPreference(10);
-      assertEquals("MinZoom should match", 10, mapboxMap.getMinZoomLevel(), 10);
-    }));
-  }
-
-  @Test
-  public void testMaxZoom() {
-    validateTestSetup();
-    final double zoom = 10;
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      mapboxMap.setMaxZoomPreference(zoom);
-      assertEquals("MaxZoom should match", zoom, mapboxMap.getMaxZoomLevel(), 10);
-    }));
-  }
-
-  @Test
-  @Ignore
-  public void testInitialZoomLevels() {
-    validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      assertEquals("MaxZoom should match", MapboxConstants.MAXIMUM_ZOOM, mapboxMap.getMaxZoomLevel(),
-        TestConstants.ZOOM_DELTA);
-      assertEquals("MinZoom should match", MapboxConstants.MINIMUM_ZOOM, mapboxMap.getMinZoomLevel(),
-        TestConstants.ZOOM_DELTA);
-    }));
-  }
+@Deprecated
+public class MapboxMapTest extends EspressoTest {
 
   //
   // InfoWindow
@@ -188,59 +69,6 @@ public class MapboxMapTest extends BaseActivityTest {
       MapboxMap.InfoWindowAdapter infoWindowAdapter = marker -> null;
       mapboxMap.setInfoWindowAdapter(infoWindowAdapter);
       assertEquals("InfoWindowAdpter should be the same", infoWindowAdapter, mapboxMap.getInfoWindowAdapter());
-    }));
-  }
-
-  //
-  // setters/getters interfaces
-  //
-
-  @Test
-  public void testFpsListener() {
-    validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      MapboxMap.OnFpsChangedListener fpsChangedListener = fps -> {
-
-      };
-      mapboxMap.setOnFpsChangedListener(fpsChangedListener);
-      assertEquals("FpsListener should match", fpsChangedListener, mapboxMap.getOnFpsChangedListener());
-    }));
-  }
-
-  @Test
-  public void testInfoWindowClickListener() {
-    validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      MapboxMap.OnInfoWindowClickListener clickListener = marker -> false;
-      mapboxMap.setOnInfoWindowClickListener(clickListener);
-      assertEquals(
-        "InfoWidowClickListener should match", clickListener, mapboxMap.getOnInfoWindowClickListener()
-      );
-    }));
-  }
-
-  @Test
-  public void testInfoWindowCloseListener() {
-    validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      MapboxMap.OnInfoWindowCloseListener listener = marker -> {
-
-      };
-      mapboxMap.setOnInfoWindowCloseListener(listener);
-      assertEquals("InfoWindowCloseListener should match", listener, mapboxMap.getOnInfoWindowCloseListener());
-    }));
-  }
-
-  @Test
-  public void testInfoWindowLongClickListener() {
-    validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      MapboxMap.OnInfoWindowLongClickListener listener = marker -> {
-
-      };
-      mapboxMap.setOnInfoWindowLongClickListener(listener);
-      assertEquals("InfoWindowLongClickListener should match", listener,
-        mapboxMap.getOnInfoWindowLongClickListener());
     }));
   }
 
@@ -618,21 +446,6 @@ public class MapboxMapTest extends BaseActivityTest {
       assertTrue("Selected markers should be empty", mapboxMap.getSelectedMarkers().isEmpty());
     }));
   }
-
-  // Tile pre-fetching
-
-  @Test
-  public void testTilePrefetch() {
-    validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      mapboxMap.setPrefetchesTiles(true);
-      assertTrue(mapboxMap.getPrefetchesTiles());
-      mapboxMap.setPrefetchesTiles(false);
-      assertFalse(mapboxMap.getPrefetchesTiles());
-    }));
-  }
-
-  //
 
   public class MapboxMapAction implements ViewAction {
 

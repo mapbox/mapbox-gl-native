@@ -26,6 +26,8 @@ class MapChangeReceiver implements NativeMapView.StateCallback {
     = new CopyOnWriteArrayList<>();
   private final List<MapView.OnDidFinishRenderingMapListener> onDidFinishRenderingMapListenerList
     = new CopyOnWriteArrayList<>();
+  private final List<MapView.OnDidBecomeIdleListener> onDidBecomeIdleListenerList
+      = new CopyOnWriteArrayList<>();
   private final List<MapView.OnDidFinishLoadingStyleListener> onDidFinishLoadingStyleListenerList
     = new CopyOnWriteArrayList<>();
   private final List<MapView.OnSourceChangedListener> onSourceChangedListenerList = new CopyOnWriteArrayList<>();
@@ -171,6 +173,20 @@ class MapChangeReceiver implements NativeMapView.StateCallback {
   }
 
   @Override
+  public void onDidBecomeIdle() {
+    try {
+      if (!onDidBecomeIdleListenerList.isEmpty()) {
+        for (MapView.OnDidBecomeIdleListener listener : onDidBecomeIdleListenerList) {
+          listener.onDidBecomeIdle();
+        }
+      }
+    } catch (Throwable err) {
+      Logger.e(TAG, "Exception in onDidBecomeIdle", err);
+      throw err;
+    }
+  }
+
+  @Override
   public void onDidFinishLoadingStyle() {
     try {
       if (!onDidFinishLoadingStyleListenerList.isEmpty()) {
@@ -278,6 +294,14 @@ class MapChangeReceiver implements NativeMapView.StateCallback {
     onDidFinishRenderingMapListenerList.remove(listener);
   }
 
+  void addOnDidBecomeIdleListener(MapView.OnDidBecomeIdleListener listener) {
+    onDidBecomeIdleListenerList.add(listener);
+  }
+
+  void removeOnDidBecomeIdleListener(MapView.OnDidBecomeIdleListener listener) {
+    onDidBecomeIdleListenerList.remove(listener);
+  }
+
   void addOnDidFinishLoadingStyleListener(MapView.OnDidFinishLoadingStyleListener listener) {
     onDidFinishLoadingStyleListenerList.add(listener);
   }
@@ -305,6 +329,7 @@ class MapChangeReceiver implements NativeMapView.StateCallback {
     onDidFinishRenderingFrameList.clear();
     onWillStartRenderingMapListenerList.clear();
     onDidFinishRenderingMapListenerList.clear();
+    onDidBecomeIdleListenerList.clear();
     onDidFinishLoadingStyleListenerList.clear();
     onSourceChangedListenerList.clear();
   }

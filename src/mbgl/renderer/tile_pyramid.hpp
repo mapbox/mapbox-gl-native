@@ -66,12 +66,16 @@ public:
     void setObserver(TileObserver*);
     void dumpDebugLogs() const;
 
-    bool enabled = false;
+    const std::map<OverscaledTileID, std::unique_ptr<Tile>>& getTiles() const { return tiles; }
+    void clearAll();
+
+private:
+    void addRenderTile(const UnwrappedTileID& tileID, Tile& tile);
 
     std::map<OverscaledTileID, std::unique_ptr<Tile>> tiles;
     TileCache cache;
 
-    std::vector<RenderTile> renderTiles;
+    std::list<RenderTile> renderTiles;
 
     TileObserver* observer = nullptr;
 

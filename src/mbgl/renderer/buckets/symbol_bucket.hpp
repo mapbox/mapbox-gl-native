@@ -37,10 +37,10 @@ public:
     size_t vertexStartIndex;
 };
 
-class SymbolBucket : public Bucket {
+class SymbolBucket final : public Bucket {
 public:
     SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated,
-                 const std::map<std::string, std::pair<style::IconPaintProperties::PossiblyEvaluated, style::TextPaintProperties::PossiblyEvaluated>>&,
+                 const std::map<std::string, style::SymbolPaintProperties::PossiblyEvaluated>&,
                  const style::PropertyValue<float>& textSize,
                  const style::PropertyValue<float>& iconSize,
                  float zoom,
@@ -49,9 +49,11 @@ public:
                  bool sortFeaturesByY,
                  const std::string bucketLeaderID,
                  const std::vector<SymbolInstance>&&);
+    ~SymbolBucket() override;
 
     void upload(gl::Context&) override;
     bool hasData() const override;
+    bool supportsLayer(const style::Layer::Impl&) const override;
     bool hasTextData() const;
     bool hasIconData() const;
     bool hasCollisionBoxData() const;
@@ -76,9 +78,12 @@ public:
 
     std::vector<SymbolInstance> symbolInstances;
 
-    std::map<std::string, std::pair<
-        SymbolIconProgram::PaintPropertyBinders,
-        SymbolSDFTextProgram::PaintPropertyBinders>> paintPropertyBinders;
+    struct PaintProperties {
+        style::SymbolPaintProperties::PossiblyEvaluated evaluated;
+        SymbolIconProgram::PaintPropertyBinders iconBinders;
+        SymbolSDFTextProgram::PaintPropertyBinders textBinders;
+    };
+    std::map<std::string, PaintProperties> paintProperties;
 
     std::unique_ptr<SymbolSizeBinder> textSizeBinder;
 
@@ -137,10 +142,5 @@ public:
 
     std::shared_ptr<std::vector<size_t>> featureSortOrder;
 };
-
-template <>
-inline bool Bucket::is<SymbolBucket>() const {
-    return layerType == style::LayerType::Symbol;
-}
 
 } // namespace mbgl

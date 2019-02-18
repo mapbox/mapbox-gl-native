@@ -4,7 +4,7 @@
 
 #include "MGLStyleLayer_Private.h"
 
-#include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/layermanager/fill_extrusion_layer_factory.hpp>
 
 namespace mbgl {
 

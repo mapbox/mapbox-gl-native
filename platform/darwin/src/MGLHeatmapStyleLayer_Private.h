@@ -4,7 +4,7 @@
 
 #include "MGLStyleLayer_Private.h"
 
-#include <mbgl/style/layers/heatmap_layer.hpp>
+#include <mbgl/layermanager/heatmap_layer_factory.hpp>
 
 namespace mbgl {
 

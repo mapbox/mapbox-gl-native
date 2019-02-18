@@ -9,11 +9,13 @@ workflows:
           filters:
             branches:
               ignore: master
+      - android-debug-arm-v7-buck
       - android-arm-v7-template:
           name: android-debug-arm-v7
       - android-arm-v7-template:
           name: android-gnustl-arm-v7
           stl: gnustl_shared
+          image: android-ndk-r17c:1d5db0eb34
       - android-release:
           filters:
             tags:
@@ -329,15 +331,14 @@ commands:
     steps:
     - run:
         name: Install iOS packaging dependencies
-        command: brew install awscli wget
+        command: ./platform/ios/scripts/install-packaging-dependencies.sh
         background: true
 
   install-macos-dependencies:
     steps:
     - run:
         name: Install macOS dependencies
-        command: |
-          brew install cmake ccache
+        command: brew install cmake ccache
 
   install-node-macos-dependencies:
     steps:
@@ -466,15 +467,15 @@ jobs:
     steps:
       - install-dependencies: { mason: false, ccache: false }
       - run:
-          name: Initialize submodule
-          command: git submodule update --init mapbox-gl-js
+          name: Initialize submodules
+          command: git submodule update --init
       - run:
           name: Verify submodule pin
           command: scripts/nitpick/submodule-pin.js
           when: always
       - run:
-          name: CMake file list generation
-          command: scripts/nitpick/generated-code.js cmake
+          name: Source file list generation
+          command: scripts/nitpick/generated-code.js sources
           when: always
       - run:
           name: Shader code generation
@@ -518,8 +519,11 @@ jobs:
       stl:
         type: string
         default: "c++_static"
+      image:
+        type: string
+        default: android-ndk-r19:8e91a7ebab
     docker:
-      - image: mbgl/android-ndk-r17c:dd161efed6
+      - image: mbgl/<< parameters.image >>
     resource_class: large
     working_directory: /src
     environment:
@@ -530,6 +534,9 @@ jobs:
       MBGL_ANDROID_STL: << parameters.stl >>
     steps:
       - install-dependencies: { gradle: true }
+      - run:
+          name: Android nitpick
+          command: make run-android-nitpick
       - run:
           name: Check code style
           command: make android-check
@@ -581,7 +588,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-release:
     docker:
-      - image: mbgl/android-ndk-r17c:dd161efed6
+      - image: mbgl/android-ndk-r19:8e91a7ebab
     resource_class: large
     working_directory: /src
     environment:
@@ -591,6 +598,25 @@ jobs:
       IS_LOCAL_DEVELOPMENT: false
     steps:
       - install-dependencies: { gradle: true }
+      - run:
+          name: Android nitpick
+          command: make run-android-nitpick
+      - run:
+          name: Trigger core benchmark run
+          command: |
+            if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
+              if [[ $CIRCLE_BRANCH == master ]]; then
+                curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=android-core-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
+              fi
+            fi
+      - run:
+          name: Trigger android benchmark run
+          command: |
+            if [ -n "${MOBILE_METRICS_TOKEN}" ]; then
+              if [[ $CIRCLE_BRANCH == master ]]; then
+                curl -u $MOBILE_METRICS_TOKEN -d build_parameters[CIRCLE_JOB]=android-benchmark https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master
+              fi
+            fi
       - run:
           name: Generate Maven credentials
           command: |
@@ -642,6 +668,26 @@ jobs:
             if [[ $CIRCLE_BRANCH == master ]] || [[ $CIRCLE_BRANCH == release-* ]] || [[ $CIRCLE_TAG == android-v* ]]; then
               make run-android-upload-archives
             fi
+# ------------------------------------------------------------------------------
+  android-debug-arm-v7-buck:
+    docker:
+      - image: mbgl/android-ndk-r17c-buck:07c5ef2e71
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 2
+      JOBS: 2
+      BUILDTYPE: Debug
+      ANDROID_NDK: /android/sdk/ndk-bundle
+    steps:
+      - checkout
+      - run:
+          name: Checkout submodules
+          command: git submodule update --init
+      - run:
+          name: Build Android library
+          command: |
+            cd misc/buck
+            buck build mapbox-gl-native:android-core
 
 # ------------------------------------------------------------------------------
   node-clang39-release:
@@ -898,8 +944,8 @@ jobs:
       SLACK_CHANNEL: C0ACM9Q2C
     steps:
       - install-macos-dependencies
-      - install-ios-packaging-dependencies
       - install-dependencies
+      - install-ios-packaging-dependencies
       - run:
           name: Build dynamic framework for device and simulator
           command: make iframework
@@ -934,8 +980,8 @@ jobs:
             export SLACK_MESSAGE="<$CIRCLE_BUILD_URL|Release build for \`$CIRCLE_TAG\` started.>"
             scripts/notify-slack.sh
       - install-macos-dependencies
-      - install-ios-packaging-dependencies
       - install-dependencies
+      - install-ios-packaging-dependencies
       - run:
           name: Build, package, and upload iOS release
           command: |

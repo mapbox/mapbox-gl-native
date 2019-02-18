@@ -14,9 +14,8 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
-#include <mbgl/util/fnv_hash.hpp>
 
-#include <mbgl/renderer/layers/render_<%- type.replace('-', '_') %>_layer.hpp>
+#include <mapbox/eternal.hpp>
 
 namespace mbgl {
 namespace style {
@@ -172,8 +171,7 @@ TransitionOptions <%- camelize(type) %>Layer::get<%- camelize(property.name) %>T
 using namespace conversion;
 
 optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        Unknown,
+    enum class Property : uint8_t {
 <% for (const property of paintProperties) { -%>
         <%- camelize(property.name) %>,
 <% } -%>
@@ -182,25 +180,17 @@ optional<Error> <%- camelize(type) %>Layer::setPaintProperty(const std::string& 
 <% } -%>
     };
 
-    Property property = Property::Unknown;
-    switch (util::hashFNV1a(name.c_str())) {
-    <% for (const property of paintProperties) { -%>
-case util::hashFNV1a("<%- property.name %>"):
-        if (name == "<%- property.name %>") {
-            property = Property::<%- camelize(property.name) %>;
-        }
-        break;
-    case util::hashFNV1a("<%- property.name %>-transition"):
-        if (name == "<%- property.name %>-transition") {
-            property = Property::<%- camelize(property.name) %>Transition;
-        }
-        break;
-    <% } %>
-    }
+    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
+        <%- paintProperties.map(p => `{ "${p.name}", static_cast<uint8_t>(Property::${camelize(p.name)}) }`).join(',\n        ') %>,
+        <%- paintProperties.map(p => `{ "${p.name}-transition", static_cast<uint8_t>(Property::${camelize(p.name)}Transition) }`).join(',\n        ') %>
+    });
 
-    if (property == Property::Unknown) {
+    const auto it = properties.find(name.c_str());
+    if (it == properties.end()) {
         return Error { "layer doesn't support this property" };
     }
+
+    Property property = static_cast<Property>(it->second);
 
     <%
         const paintConversions = {};
@@ -252,28 +242,22 @@ optional<Error> <%- camelize(type) %>Layer::setLayoutProperty(const std::string&
     if (name == "visibility") {
         return Layer::setVisibility(value);
     }
-
+<% if (layoutProperties.length) { -%>
     enum class Property {
-        Unknown,
 <% for (const property of layoutProperties) { -%>
         <%- camelize(property.name) %>,
 <% } -%>
     };
+    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
+        <%- layoutProperties.map(p => `{ "${p.name}", static_cast<uint8_t>(Property::${camelize(p.name)}) }`).join(',\n        ') %>
+    });
 
-    Property property = Property::Unknown;
-    switch (util::hashFNV1a(name.c_str())) {
-    <% for (const property of layoutProperties) { %>
-    case util::hashFNV1a("<%- property.name %>"):
-        if (name == "<%- property.name %>") {
-            property = Property::<%- camelize(property.name) %>;
-        }
-        break;
-    <% } %>
-    }
-
-    if (property == Property::Unknown) {
+    const auto it = properties.find(name.c_str());
+    if (it == properties.end()) {
         return Error { "layer doesn't support this property" };
     }
+
+    Property property = static_cast<Property>(it->second);
 
     <%
         const layoutConversions = {};
@@ -305,7 +289,7 @@ optional<Error> <%- camelize(type) %>Layer::setLayoutProperty(const std::string&
         <% } %>
     }
     <% } %>
-
+<% } /* if (layoutProperties.length) */ %>
     return Error { "layer doesn't support this property" };
 }
 
@@ -314,34 +298,4 @@ Mutable<Layer::Impl> <%- camelize(type) %>Layer::mutableBaseImpl() const {
 }
 
 } // namespace style
-
-const style::LayerTypeInfo* <%- camelize(type) %>LayerFactory::getTypeInfo() const noexcept {
-    return style::<%- camelize(type) %>Layer::Impl::staticTypeInfo();
-}
-
-std::unique_ptr<style::Layer> <%- camelize(type) %>LayerFactory::createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept {
-<% if (type === 'background') { -%>
-    (void)value;
-    return std::unique_ptr<style::Layer>(new style::<%- camelize(type) %>Layer(id));
-<% } else { -%>
-    optional<std::string> source = getSource(value);
-    if (!source) {
-        return nullptr;
-    }
-
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::<%- camelize(type) %>Layer(id, *source));
-<% if (type !== 'raster' && type !== 'hillshade') { -%>
-    if (!initSourceLayerAndFilter(layer.get(), value)) {
-        return nullptr;
-    }
-<% } -%>
-    return layer;
-<% } -%>
-}
-
-std::unique_ptr<RenderLayer> <%- camelize(type) %>LayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
-    assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<Render<%- camelize(type) %>Layer>(staticImmutableCast<style::<%- camelize(type) %>Layer::Impl>(std::move(impl)));
-}
-
 } // namespace mbgl

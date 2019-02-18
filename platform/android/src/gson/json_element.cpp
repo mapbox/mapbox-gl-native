@@ -64,7 +64,7 @@ mbgl::Value JsonElement::convert(jni::JNIEnv &env, const jni::Object<JsonElement
         if (primitive.Call(env, isBoolean)) {
             return bool(primitive.Call(env, getAsBoolean));
         } else if (primitive.Call(env, isNumber)) {
-            return primitive.Call(env, getAsDouble); // TODO: how to differentiate types here?
+            return primitive.Call(env, getAsDouble);
         } else if (primitive.Call(env, isString)) {
             return jni::Make<std::string>(env, primitive.Call(env, getAsString));
         } else {

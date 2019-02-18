@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
-
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
@@ -25,8 +24,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Responsible for managing attribution interactions on the map.
@@ -38,7 +37,7 @@ import java.util.Locale;
  */
 public class AttributionDialogManager implements View.OnClickListener, DialogInterface.OnClickListener {
 
-  private static final String MAP_FEEDBACK_URL = "https://www.mapbox.com/feedback";
+  private static final String MAP_FEEDBACK_URL = "https://apps.mapbox.com/feedback";
   private static final String MAP_FEEDBACK_LOCATION_FORMAT = MAP_FEEDBACK_URL + "/#/%f/%f/%d";
 
   @NonNull
@@ -46,6 +45,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
   @NonNull
   private final MapboxMap mapboxMap;
   private Set<Attribution> attributionSet;
+  private AlertDialog dialog;
 
   public AttributionDialogManager(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
     this.context = context;
@@ -73,7 +73,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
     builder.setTitle(R.string.mapbox_attributionsDialogTitle);
     builder.setAdapter(new ArrayAdapter<>(context, R.layout.mapbox_attribution_list_item, attributionTitles), this);
-    builder.show();
+    dialog = builder.show();
   }
 
   private String[] getAttributionTitles() {
@@ -91,6 +91,12 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
       showTelemetryDialog();
     } else {
       showMapFeedbackWebPage(which);
+    }
+  }
+
+  public void onStop() {
+    if (dialog != null && dialog.isShowing()) {
+      dialog.dismiss();
     }
   }
 
@@ -180,10 +186,14 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
 
       List<String> attributions = new ArrayList<>();
       String attribution;
-      for (Source source : mapboxMap.getSources()) {
-        attribution = source.getAttribution();
-        if (!attribution.isEmpty()) {
-          attributions.add(source.getAttribution());
+
+      Style style = mapboxMap.getStyle();
+      if (style != null) {
+        for (Source source : mapboxMap.getStyle().getSources()) {
+          attribution = source.getAttribution();
+          if (!attribution.isEmpty()) {
+            attributions.add(source.getAttribution());
+          }
         }
       }
 

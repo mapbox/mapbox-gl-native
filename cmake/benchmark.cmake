@@ -1,12 +1,12 @@
-# Modify cmake/benchmark-files.txt to change the source files for this target.
-load_sources_list(MBGL_BENCHMARK_FILES cmake/benchmark-files.txt)
+# Run scripts/generate-file-lists.js to change the source files for this target.
+load_sources_list(MBGL_BENCHMARK_FILES benchmark/benchmark-files.json)
 add_executable(mbgl-benchmark ${MBGL_BENCHMARK_FILES})
 
 target_include_directories(mbgl-benchmark
     PRIVATE src
     PRIVATE benchmark/include
     PRIVATE benchmark/src
-    PRIVATE platform/default
+    PRIVATE platform/default/include
 )
 
 target_link_libraries(mbgl-benchmark

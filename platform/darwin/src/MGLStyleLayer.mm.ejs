@@ -16,6 +16,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGL<%- camelize(type) %>StyleLayer_Private.h"
 
+#include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 
 <% if (enumProperties) { -%>
@@ -209,19 +210,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting <%- objCName(property) %>Transition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->set<%- camelize(originalPropertyName(property)) %>Transition(options);
+    self.rawLayer->set<%- camelize(originalPropertyName(property)) %>Transition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)<%- objCGetter(property) %>Transition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->get<%- camelize(originalPropertyName(property)) %>Transition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 <% } -%>
 <% if (property.original) { -%>

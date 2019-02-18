@@ -5,8 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.FloatRange;
-import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Size;
@@ -34,17 +34,14 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.log.Logger;
+import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
-import com.mapbox.mapboxsdk.style.layers.Layer;
-import com.mapbox.mapboxsdk.style.light.Light;
-import com.mapbox.mapboxsdk.style.sources.Source;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -62,31 +59,32 @@ public final class MapboxMap {
   private static final String TAG = "Mbgl-MapboxMap";
 
   private final NativeMapView nativeMapView;
-
   private final UiSettings uiSettings;
   private final Projection projection;
   private final Transform transform;
-  private final AnnotationManager annotationManager;
   private final CameraChangeDispatcher cameraChangeDispatcher;
-  private final MapChangeReceiver mapChangeReceiver;
-
   private final OnGesturesManagerInteractionListener onGesturesManagerInteractionListener;
+  private final List<Style.OnStyleLoaded> styleLoadedCallbacks = new ArrayList<>();
 
   private LocationComponent locationComponent;
+  private AnnotationManager annotationManager;
+
   @Nullable
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
+  @Nullable
+  private Style style;
+
+  private boolean debugActive;
+
   MapboxMap(NativeMapView map, Transform transform, UiSettings ui, Projection projection,
-            OnGesturesManagerInteractionListener listener, AnnotationManager annotations,
-            CameraChangeDispatcher cameraChangeDispatcher, MapChangeReceiver mapChangeReceiver) {
+            OnGesturesManagerInteractionListener listener, CameraChangeDispatcher cameraChangeDispatcher) {
     this.nativeMapView = map;
     this.uiSettings = ui;
     this.projection = projection;
-    this.annotationManager = annotations.bind(this);
     this.transform = transform;
     this.onGesturesManagerInteractionListener = listener;
     this.cameraChangeDispatcher = cameraChangeDispatcher;
-    this.mapChangeReceiver = mapChangeReceiver;
   }
 
   void initialise(@NonNull Context context, @NonNull MapboxMapOptions options) {
@@ -96,9 +94,35 @@ public final class MapboxMap {
     // Map configuration
     setDebugActive(options.getDebugActive());
     setApiBaseUrl(options);
-    setStyleUrl(options);
-    setStyleJson(options);
     setPrefetchesTiles(options);
+  }
+
+  /**
+   * Get the Style of the map asynchronously.
+   */
+  public void getStyle(@NonNull Style.OnStyleLoaded onStyleLoaded) {
+    if (style != null && style.isFullyLoaded()) {
+      onStyleLoaded.onStyleLoaded(style);
+    } else {
+      styleLoadedCallbacks.add(onStyleLoaded);
+    }
+  }
+
+  /**
+   * Get the Style of the map.
+   * <p>
+   * Returns null when style is being loaded.
+   * </p>
+   *
+   * @return the style of the map
+   */
+  @Nullable
+  public Style getStyle() {
+    if (style == null || !style.isFullyLoaded()) {
+      return null;
+    } else {
+      return style;
+    }
   }
 
   /**
@@ -106,10 +130,6 @@ public final class MapboxMap {
    */
   void onStart() {
     nativeMapView.update();
-    if (TextUtils.isEmpty(nativeMapView.getStyleUrl()) && TextUtils.isEmpty(nativeMapView.getStyleJson())) {
-      // if user hasn't loaded a Style yet
-      nativeMapView.setStyleUrl(Style.MAPBOX_STREETS);
-    }
     locationComponent.onStart();
   }
 
@@ -127,8 +147,7 @@ public final class MapboxMap {
    */
   void onSaveInstanceState(@NonNull Bundle outState) {
     outState.putParcelable(MapboxConstants.STATE_CAMERA_POSITION, transform.getCameraPosition());
-    outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, nativeMapView.getDebug());
-    outState.putString(MapboxConstants.STATE_STYLE_URL, nativeMapView.getStyleUrl());
+    outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, isDebugActive());
     uiSettings.onSaveInstanceState(outState);
   }
 
@@ -149,11 +168,6 @@ public final class MapboxMap {
     }
 
     nativeMapView.setDebug(savedInstanceState.getBoolean(MapboxConstants.STATE_DEBUG_ACTIVE));
-
-    final String styleUrl = savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL);
-    if (!TextUtils.isEmpty(styleUrl)) {
-      nativeMapView.setStyleUrl(savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL));
-    }
   }
 
   /**
@@ -173,17 +187,28 @@ public final class MapboxMap {
   }
 
   /**
-   * Called when the map will start loading style.
+   * Called when the OnMapReadyCallback has finished executing.
+   * <p>
+   * Invalidation of the camera position is required to update the added components in
+   * OnMapReadyCallback with the correct transformation.
+   * </p>
    */
-  void onStartLoadingMap() {
-    locationComponent.onStartLoadingMap();
+  void onPostMapReady() {
+    transform.invalidateCameraPosition();
   }
 
   /**
-   * Called the map finished loading style.
+   * Called when the map finished loading a style.
    */
   void onFinishLoadingStyle() {
-    locationComponent.onFinishLoadingStyle();
+    notifyStyleLoaded();
+  }
+
+  /**
+   * Called when the map failed loading a style.
+   */
+  void onFailLoadingStyle() {
+    styleLoadedCallbacks.clear();
   }
 
   /**
@@ -203,49 +228,14 @@ public final class MapboxMap {
     }
   }
 
+  /**
+   * Experimental feature. Do not use.
+   */
+  long getNativeMapPtr() {
+    return nativeMapView.getNativePtr();
+  }
+
   // Style
-
-  /**
-   * <p>
-   * Get the animation duration for style changes.
-   * </p>
-   * The default value is zero, so any changes take effect without animation.
-   *
-   * @return Duration in milliseconds
-   */
-  public long getTransitionDuration() {
-    return nativeMapView.getTransitionDuration();
-  }
-
-  /**
-   * Set the animation duration for style changes.
-   *
-   * @param durationMs Duration in milliseconds
-   */
-  public void setTransitionDuration(long durationMs) {
-    nativeMapView.setTransitionDuration(durationMs);
-  }
-
-  /**
-   * <p>
-   * Get the animation delay for style changes.
-   * </p>
-   * The default value is zero, so any changes begin to animate immediately.
-   *
-   * @return Delay in milliseconds
-   */
-  public long getTransitionDelay() {
-    return nativeMapView.getTransitionDelay();
-  }
-
-  /**
-   * Set the animation delay for style changes.
-   *
-   * @param delayMs Delay in milliseconds
-   */
-  public void setTransitionDelay(long delayMs) {
-    nativeMapView.setTransitionDelay(delayMs);
-  }
 
   /**
    * Sets tile pre-fetching from MapboxOptions.
@@ -263,7 +253,7 @@ public final class MapboxMap {
    * @param enable true to enable
    */
   public void setPrefetchesTiles(boolean enable) {
-    nativeMapView.setPrefetchesTiles(enable);
+    nativeMapView.setPrefetchTiles(enable);
   }
 
   /**
@@ -273,223 +263,7 @@ public final class MapboxMap {
    * @see MapboxMap#setPrefetchesTiles(boolean)
    */
   public boolean getPrefetchesTiles() {
-    return nativeMapView.getPrefetchesTiles();
-  }
-
-  /**
-   * Retrieve all the layers in the style
-   *
-   * @return all the layers in the current style
-   */
-  @NonNull
-  public List<Layer> getLayers() {
-    return nativeMapView.getLayers();
-  }
-
-  /**
-   * Get the layer by id
-   *
-   * @param layerId the layer's id
-   * @return the layer, if present in the style
-   */
-  @Nullable
-  public Layer getLayer(@NonNull String layerId) {
-    return nativeMapView.getLayer(layerId);
-  }
-
-  /**
-   * Tries to cast the Layer to T, throws ClassCastException if it's another type.
-   *
-   * @param layerId the layer id used to look up a layer
-   * @param <T>     the generic attribute of a Layer
-   * @return the casted Layer, null if another type
-   */
-  @Nullable
-  public <T extends Layer> T getLayerAs(@NonNull String layerId) {
-    // noinspection unchecked
-    return (T) nativeMapView.getLayer(layerId);
-  }
-
-  /**
-   * Adds the layer to the map. The layer must be newly created and not added to the map before
-   *
-   * @param layer the layer to add
-   */
-  public void addLayer(@NonNull Layer layer) {
-    nativeMapView.addLayer(layer);
-  }
-
-  /**
-   * Adds the layer to the map. The layer must be newly created and not added to the map before
-   *
-   * @param layer the layer to add
-   * @param below the layer id to add this layer before
-   */
-  public void addLayerBelow(@NonNull Layer layer, @NonNull String below) {
-    nativeMapView.addLayerBelow(layer, below);
-  }
-
-  /**
-   * Adds the layer to the map. The layer must be newly created and not added to the map before
-   *
-   * @param layer the layer to add
-   * @param above the layer id to add this layer above
-   */
-  public void addLayerAbove(@NonNull Layer layer, @NonNull String above) {
-    nativeMapView.addLayerAbove(layer, above);
-  }
-
-  /**
-   * Adds the layer to the map at the specified index. The layer must be newly
-   * created and not added to the map before
-   *
-   * @param layer the layer to add
-   * @param index the index to insert the layer at
-   */
-  public void addLayerAt(@NonNull Layer layer, @IntRange(from = 0) int index) {
-    nativeMapView.addLayerAt(layer, index);
-  }
-
-  /**
-   * Removes the layer. The reference is re-usable after this and can be re-added
-   *
-   * @param layerId the layer to remove
-   * @return true if the layer was successfully removed, false - otherwise
-   */
-  public boolean removeLayer(@NonNull String layerId) {
-    return nativeMapView.removeLayer(layerId);
-  }
-
-  /**
-   * Removes the layer. The reference is re-usable after this and can be re-added
-   *
-   * @param layer the layer to remove
-   * @return true if the layer was successfully removed, false - otherwise
-   */
-  public boolean removeLayer(@NonNull Layer layer) {
-    return nativeMapView.removeLayer(layer);
-  }
-
-  /**
-   * Removes the layer. Any other references to the layer become invalid and should not be used anymore
-   *
-   * @param index the layer index
-   * @return true if the layer was successfully removed, false - otherwise
-   */
-  public boolean removeLayerAt(@IntRange(from = 0) int index) {
-    return nativeMapView.removeLayerAt(index);
-  }
-
-  /**
-   * Retrieve all the sources in the style
-   *
-   * @return all the sources in the current style
-   */
-  @NonNull
-  public List<Source> getSources() {
-    return nativeMapView.getSources();
-  }
-
-  /**
-   * Retrieve a source by id
-   *
-   * @param sourceId the source's id
-   * @return the source if present in the current style
-   */
-  @Nullable
-  public Source getSource(@NonNull String sourceId) {
-    return nativeMapView.getSource(sourceId);
-  }
-
-  /**
-   * Tries to cast the Source to T, returns null if it's another type.
-   *
-   * @param sourceId the id used to look up a layer
-   * @param <T>      the generic type of a Source
-   * @return the casted Source, null if another type
-   */
-  @Nullable
-  public <T extends Source> T getSourceAs(@NonNull String sourceId) {
-    try {
-      // noinspection unchecked
-      return (T) nativeMapView.getSource(sourceId);
-    } catch (ClassCastException exception) {
-      String message = String.format("Source: %s is a different type: ", sourceId);
-      Logger.e(TAG, message, exception);
-      MapStrictMode.strictModeViolation(message, exception);
-      return null;
-    }
-  }
-
-  /**
-   * Adds the source to the map. The source must be newly created and not added to the map before
-   *
-   * @param source the source to add
-   */
-  public void addSource(@NonNull Source source) {
-    nativeMapView.addSource(source);
-  }
-
-  /**
-   * Removes the source, preserving the reference for re-use
-   *
-   * @param sourceId the source to remove
-   * @return true if the source was successfully removed, false - otherwise
-   */
-  public boolean removeSource(@NonNull String sourceId) {
-    return nativeMapView.removeSource(sourceId);
-  }
-
-  /**
-   * Removes the source, preserving the reference for re-use
-   *
-   * @param source the source to remove
-   * @return true if the source was successfully removed, false - otherwise
-   */
-  public boolean removeSource(@NonNull Source source) {
-    return nativeMapView.removeSource(source);
-  }
-
-  /**
-   * Adds an image to be used in the map's style
-   *
-   * @param name  the name of the image
-   * @param image the pre-multiplied Bitmap
-   */
-  public void addImage(@NonNull String name, @NonNull Bitmap image) {
-    addImage(name, image, false);
-  }
-
-  /**
-   * Adds an image to be used in the map's style
-   *
-   * @param name  the name of the image
-   * @param image the pre-multiplied Bitmap
-   * @param sdf   the flag indicating image is an SDF or template image
-   */
-  public void addImage(@NonNull String name, @NonNull Bitmap image, boolean sdf) {
-    nativeMapView.addImage(name, image, sdf);
-  }
-
-  /**
-   * Adds an images to be used in the map's style
-   */
-  public void addImages(@NonNull HashMap<String, Bitmap> images) {
-    nativeMapView.addImages(images);
-  }
-
-  /**
-   * Removes an image from the map's style
-   *
-   * @param name the name of the image to remove
-   */
-  public void removeImage(@NonNull String name) {
-    nativeMapView.removeImage(name);
-  }
-
-  @Nullable
-  public Bitmap getImage(@NonNull String name) {
-    return nativeMapView.getImage(name);
+    return nativeMapView.getPrefetchTiles();
   }
 
   //
@@ -576,20 +350,6 @@ public final class MapboxMap {
   @NonNull
   public Projection getProjection() {
     return projection;
-  }
-
-  //
-  // Light
-  //
-
-  /**
-   * Get the global light source used to change lighting conditions on extruded fill layers.
-   *
-   * @return the global light source
-   */
-  @NonNull
-  public Light getLight() {
-    return nativeMapView.getLight();
   }
 
   //
@@ -844,7 +604,7 @@ public final class MapboxMap {
    * @param y Amount of pixels to scroll to in y direction
    */
   public void scrollBy(float x, float y) {
-    nativeMapView.moveBy(x, y);
+    nativeMapView.moveBy(x, y, 0);
   }
 
   /**
@@ -901,6 +661,41 @@ public final class MapboxMap {
   }
 
   //
+  // Offline
+  //
+
+  /**
+   * Loads a new style from the specified offline region definition and moves the map camera to that region.
+   *
+   * @param definition the offline region definition
+   * @see OfflineRegionDefinition
+   */
+  public void setOfflineRegionDefinition(@NonNull OfflineRegionDefinition definition) {
+    setOfflineRegionDefinition(definition, null);
+  }
+
+  /**
+   * Loads a new style from the specified offline region definition and moves the map camera to that region.
+   *
+   * @param definition the offline region definition
+   * @param callback   the callback to be invoked when the style has loaded
+   * @see OfflineRegionDefinition
+   */
+  public void setOfflineRegionDefinition(@NonNull OfflineRegionDefinition definition,
+                                         @Nullable Style.OnStyleLoaded callback) {
+    double minZoom = definition.getMinZoom();
+    double maxZoom = definition.getMaxZoom();
+    CameraPosition cameraPosition = new CameraPosition.Builder()
+      .target(definition.getBounds().getCenter())
+      .zoom(minZoom)
+      .build();
+    moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    setMinZoomPreference(minZoom);
+    setMaxZoomPreference(maxZoom);
+    setStyle(new Style.Builder().fromUrl(definition.getStyleURL()), callback);
+  }
+
+  //
   // Debug
   //
 
@@ -910,7 +705,7 @@ public final class MapboxMap {
    * @return If true, map debug information is currently shown.
    */
   public boolean isDebugActive() {
-    return nativeMapView.getDebug();
+    return debugActive;
   }
 
   /**
@@ -922,6 +717,7 @@ public final class MapboxMap {
    * @param debugActive If true, map debug information is shown.
    */
   public void setDebugActive(boolean debugActive) {
+    this.debugActive = debugActive;
     nativeMapView.setDebug(debugActive);
   }
 
@@ -936,6 +732,7 @@ public final class MapboxMap {
    */
   public void cycleDebugOptions() {
     nativeMapView.cycleDebugOptions();
+    this.debugActive = nativeMapView.getDebug();
   }
 
   //
@@ -954,170 +751,113 @@ public final class MapboxMap {
   //
 
   /**
-   * <p>
-   * Loads a new map style asynchronous from the specified URL.
-   * </p>
-   * {@code url} can take the following forms:
-   * <ul>
-   * <li>{@code Style.*}: load one of the bundled styles in {@link Style}.</li>
-   * <li>{@code mapbox://styles/<user>/<style>}:
-   * loads the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
-   * {@code user} is your username. {@code style} is the ID of your custom
-   * style created in <a href="https://www.mapbox.com/studio">Mapbox Studio</a>.</li>
-   * <li>{@code http://...} or {@code https://...}:
-   * loads the style over the Internet from any web server.</li>
-   * <li>{@code asset://...}:
-   * loads the style from the APK {@code assets/} directory.
-   * This is used to load a style bundled with your app.</li>
-   * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
-   * </ul>
+   * Loads a new map style from the specified bundled style.
    * <p>
    * This method is asynchronous and will return before the style finishes loading.
    * If you wish to wait for the map to finish loading, listen to the {@link MapView.OnDidFinishLoadingStyleListener}
-   * callback or use the {@link #setStyleUrl(String, OnStyleLoadedListener)} method instead.
+   * callback or use the {@link #setStyle(String, Style.OnStyleLoaded)} method instead.
    * </p>
    * If the style fails to load or an invalid style URL is set, the map view will become blank.
    * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
    * will be triggered.
    *
-   * @param url The URL of the map style
+   * @param style The bundled style
    * @see Style
    */
-  public void setStyleUrl(@NonNull String url) {
-    setStyleUrl(url, null);
+  public void setStyle(@Style.StyleUrl String style) {
+    this.setStyle(style, null);
   }
 
   /**
-   * <p>
-   * Loads a new map style asynchronous from the specified URL.
-   * </p>
-   * {@code url} can take the following forms:
-   * <ul>
-   * <li>{@code Style.*}: load one of the bundled styles in {@link Style}.</li>
-   * <li>{@code mapbox://styles/<user>/<style>}:
-   * loads the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
-   * {@code user} is your username. {@code style} is the ID of your custom
-   * style created in <a href="https://www.mapbox.com/studio">Mapbox Studio</a>.</li>
-   * <li>{@code http://...} or {@code https://...}:
-   * loads the style over the Internet from any web server.</li>
-   * <li>{@code asset://...}:
-   * loads the style from the APK {@code assets/} directory.
-   * This is used to load a style bundled with your app.</li>
-   * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
-   * </ul>
+   * Loads a new map style from the specified bundled style.
    * <p>
    * If the style fails to load or an invalid style URL is set, the map view will become blank.
    * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
    * will be triggered.
-   * <p>
+   * </p>
    *
-   * @param url      The URL of the map style
-   * @param callback The callback that is invoked when the style has loaded.
+   * @param style    The bundled style
+   * @param callback The callback to be invoked when the style has loaded
    * @see Style
    */
-  public void setStyleUrl(@NonNull final String url, @Nullable final OnStyleLoadedListener callback) {
+  public void setStyle(@Style.StyleUrl String style, final Style.OnStyleLoaded callback) {
+    this.setStyle(new Style.Builder().fromUrl(style), callback);
+  }
+
+  /**
+   * Loads a new map style from the specified builder.
+   * <p>
+   * If the builder fails to load, the map view will become blank. An error message will be logged in the Android logcat
+   * and {@link MapView.OnDidFailLoadingMapListener} callback will be triggered. If you wish to wait for the map to
+   * finish loading, listen to the {@link MapView.OnDidFinishLoadingStyleListener} callback or use the
+   * {@link #setStyle(String, Style.OnStyleLoaded)} instead.
+   * </p>
+   *
+   * @param builder The style builder
+   * @see Style
+   */
+  public void setStyle(Style.Builder builder) {
+    this.setStyle(builder, null);
+  }
+
+  /**
+   * Loads a new map style from the specified builder.
+   * <p>
+   * If the builder fails to load, the map view will become blank. An error message will be logged in the Android logcat
+   * and {@link MapView.OnDidFailLoadingMapListener} callback will be triggered.
+   * </p>
+   *
+   * @param builder  The style builder
+   * @param callback The callback to be invoked when the style has loaded
+   * @see Style
+   */
+  public void setStyle(Style.Builder builder, final Style.OnStyleLoaded callback) {
+    locationComponent.onStartLoadingMap();
+    if (style != null) {
+      style.onWillStartLoadingMap();
+    }
+
     if (callback != null) {
-      mapChangeReceiver.addOnDidFinishLoadingStyleListener(new MapView.OnDidFinishLoadingStyleListener() {
-        @Override
-        public void onDidFinishLoadingStyle() {
-          callback.onStyleLoaded(url);
-          mapChangeReceiver.removeOnDidFinishLoadingStyleListener(this);
-        }
-      });
+      styleLoadedCallbacks.add(callback);
     }
-    nativeMapView.setStyleUrl(url);
-  }
 
-  /**
-   * <p>
-   * Loads a new map style from the specified bundled style.
-   * </p>
-   * <p>
-   * This method is asynchronous and will return before the style finishes loading.
-   * If you wish to wait for the map to finish loading, listen to the {@link MapView.OnDidFinishLoadingStyleListener}
-   * callback or use the {@link #setStyle(String, OnStyleLoadedListener)} method instead.
-   * </p>
-   * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
-   * will be triggered.
-   *
-   * @param style The bundled style.
-   * @see Style
-   */
-  public void setStyle(@NonNull @Style.StyleUrl String style) {
-    setStyleUrl(style);
-  }
-
-  /**
-   * <p>
-   * Loads a new map style from the specified bundled style.
-   * </p>
-   * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
-   * will be triggered.
-   *
-   * @param style    The bundled style.
-   * @param callback The callback to be invoked when the style has finished loading
-   * @see Style
-   */
-  public void setStyle(@NonNull @Style.StyleUrl String style, @Nullable OnStyleLoadedListener callback) {
-    setStyleUrl(style, callback);
-  }
-
-  /**
-   * Loads a new map style from MapboxMapOptions if available.
-   *
-   * @param options the object containing the style url
-   */
-  private void setStyleUrl(@NonNull MapboxMapOptions options) {
-    String style = options.getStyleUrl();
-    if (!TextUtils.isEmpty(style)) {
-      setStyleUrl(style, null);
+    style = builder.build(nativeMapView);
+    if (!TextUtils.isEmpty(builder.getUrl())) {
+      nativeMapView.setStyleUrl(builder.getUrl());
+    } else if (!TextUtils.isEmpty(builder.getJson())) {
+      nativeMapView.setStyleJson(builder.getJson());
+    } else {
+      // user didn't provide a `from` component,
+      // flag the style as loaded,
+      // add components defined added using the `with` prefix.
+      notifyStyleLoadedDelayed();
     }
   }
 
-  /**
-   * Returns the map style url currently displayed in the map view.
-   *
-   * @return The URL of the map style
-   */
-  @Nullable
-  public String getStyleUrl() {
-    return nativeMapView.getStyleUrl();
-  }
-
-  /**
-   * Loads a new map style from a json string.
-   * <p>
-   * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView.OnDidFailLoadingMapListener} callback
-   * will be triggered.
-   * </p>
-   */
-  public void setStyleJson(@NonNull String styleJson) {
-    nativeMapView.setStyleJson(styleJson);
-  }
-
-  /**
-   * Loads a new map style json from MapboxMapOptions if available.
-   *
-   * @param options the object containing the style json
-   */
-  private void setStyleJson(@NonNull MapboxMapOptions options) {
-    String styleJson = options.getStyleJson();
-    if (!TextUtils.isEmpty(styleJson)) {
-      setStyleJson(styleJson);
+  void notifyStyleLoaded() {
+    if (nativeMapView.isDestroyed()) {
+      return;
     }
+
+    if (style != null) {
+      style.onDidFinishLoadingStyle();
+      locationComponent.onFinishLoadingStyle();
+      for (Style.OnStyleLoaded styleLoadedCallback : styleLoadedCallbacks) {
+        styleLoadedCallback.onStyleLoaded(style);
+      }
+    } else {
+      MapStrictMode.strictModeViolation("No style to provide.");
+    }
+    styleLoadedCallbacks.clear();
   }
 
-  /**
-   * Returns the map style json currently displayed in the map view.
-   *
-   * @return The json of the map style
-   */
-  @NonNull
-  public String getStyleJson() {
-    return nativeMapView.getStyleJson();
+  private void notifyStyleLoadedDelayed() {
+    new Handler().post(new Runnable() {
+      @Override
+      public void run() {
+        notifyStyleLoaded();
+      }
+    });
   }
 
   //
@@ -1133,7 +873,11 @@ public final class MapboxMap {
    *
    * @param markerOptions A marker options object that defines how to render the marker
    * @return The {@code Marker} that was added to the map
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public Marker addMarker(@NonNull MarkerOptions markerOptions) {
     return annotationManager.addMarker(markerOptions, this);
@@ -1148,7 +892,11 @@ public final class MapboxMap {
    *
    * @param markerOptions A marker options object that defines how to render the marker
    * @return The {@code Marker} that was added to the map
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public Marker addMarker(@NonNull BaseMarkerOptions markerOptions) {
     return annotationManager.addMarker(markerOptions, this);
@@ -1163,7 +911,11 @@ public final class MapboxMap {
    *
    * @param markerOptionsList A list of marker options objects that defines how to render the markers
    * @return A list of the {@code Marker}s that were added to the map
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Marker> addMarkers(@NonNull List<? extends
     BaseMarkerOptions> markerOptionsList) {
@@ -1176,7 +928,11 @@ public final class MapboxMap {
    * </p>
    *
    * @param updatedMarker An updated marker object
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void updateMarker(@NonNull Marker updatedMarker) {
     annotationManager.updateMarker(updatedMarker, this);
   }
@@ -1186,7 +942,11 @@ public final class MapboxMap {
    *
    * @param polylineOptions A polyline options object that defines how to render the polyline
    * @return The {@code Polyine} that was added to the map
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public Polyline addPolyline(@NonNull PolylineOptions polylineOptions) {
     return annotationManager.addPolyline(polylineOptions, this);
@@ -1197,7 +957,11 @@ public final class MapboxMap {
    *
    * @param polylineOptionsList A list of polyline options objects that defines how to render the polylines.
    * @return A list of the {@code Polyline}s that were added to the map.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Polyline> addPolylines(@NonNull List<PolylineOptions> polylineOptionsList) {
     return annotationManager.addPolylines(polylineOptionsList, this);
@@ -1207,7 +971,11 @@ public final class MapboxMap {
    * Update a polyline on this map.
    *
    * @param polyline An updated polyline object.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void updatePolyline(@NonNull Polyline polyline) {
     annotationManager.updatePolyline(polyline);
   }
@@ -1217,7 +985,11 @@ public final class MapboxMap {
    *
    * @param polygonOptions A polygon options object that defines how to render the polygon.
    * @return The {@code Polygon} that was added to the map.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public Polygon addPolygon(@NonNull PolygonOptions polygonOptions) {
     return annotationManager.addPolygon(polygonOptions, this);
@@ -1228,7 +1000,11 @@ public final class MapboxMap {
    *
    * @param polygonOptionsList A list of polygon options objects that defines how to render the polygons
    * @return A list of the {@code Polygon}s that were added to the map
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Polygon> addPolygons(@NonNull List<PolygonOptions> polygonOptionsList) {
     return annotationManager.addPolygons(polygonOptionsList, this);
@@ -1238,7 +1014,11 @@ public final class MapboxMap {
    * Update a polygon on this map.
    *
    * @param polygon An updated polygon object
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void updatePolygon(@NonNull Polygon polygon) {
     annotationManager.updatePolygon(polygon);
   }
@@ -1250,7 +1030,11 @@ public final class MapboxMap {
    * Calls removeAnnotation() internally.
    *
    * @param marker Marker to remove
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void removeMarker(@NonNull Marker marker) {
     annotationManager.removeAnnotation(marker);
   }
@@ -1262,7 +1046,11 @@ public final class MapboxMap {
    * Calls removeAnnotation() internally.
    *
    * @param polyline Polyline to remove
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void removePolyline(@NonNull Polyline polyline) {
     annotationManager.removeAnnotation(polyline);
   }
@@ -1274,7 +1062,11 @@ public final class MapboxMap {
    * Calls removeAnnotation() internally.
    *
    * @param polygon Polygon to remove
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void removePolygon(@NonNull Polygon polygon) {
     annotationManager.removeAnnotation(polygon);
   }
@@ -1283,7 +1075,11 @@ public final class MapboxMap {
    * Removes an annotation from the map.
    *
    * @param annotation The annotation object to remove.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void removeAnnotation(@NonNull Annotation annotation) {
     annotationManager.removeAnnotation(annotation);
   }
@@ -1292,7 +1088,11 @@ public final class MapboxMap {
    * Removes an annotation from the map
    *
    * @param id The identifier associated to the annotation to be removed
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void removeAnnotation(long id) {
     annotationManager.removeAnnotation(id);
   }
@@ -1301,21 +1101,33 @@ public final class MapboxMap {
    * Removes multiple annotations from the map.
    *
    * @param annotationList A list of annotation objects to remove.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void removeAnnotations(@NonNull List<? extends Annotation> annotationList) {
     annotationManager.removeAnnotations(annotationList);
   }
 
   /**
    * Removes all annotations from the map.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void removeAnnotations() {
     annotationManager.removeAnnotations();
   }
 
   /**
    * Removes all markers, polylines, polygons, overlays, etc from the map.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void clear() {
     annotationManager.removeAnnotations();
   }
@@ -1325,7 +1137,11 @@ public final class MapboxMap {
    *
    * @param id the id used to look up an annotation
    * @return An annotation with a matched id, null is returned if no match was found
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @Nullable
   public Annotation getAnnotation(long id) {
     return annotationManager.getAnnotation(id);
@@ -1336,7 +1152,11 @@ public final class MapboxMap {
    *
    * @return A list of all the annotation objects. The returned object is a copy so modifying this
    * list will not update the map
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Annotation> getAnnotations() {
     return annotationManager.getAnnotations();
@@ -1347,7 +1167,11 @@ public final class MapboxMap {
    *
    * @return A list of all the markers objects. The returned object is a copy so modifying this
    * list will not update the map.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Marker> getMarkers() {
     return annotationManager.getMarkers();
@@ -1358,7 +1182,11 @@ public final class MapboxMap {
    *
    * @return A list of all the polygon objects. The returned object is a copy so modifying this
    * list will not update the map.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Polygon> getPolygons() {
     return annotationManager.getPolygons();
@@ -1369,7 +1197,11 @@ public final class MapboxMap {
    *
    * @return A list of all the polylines objects. The returned object is a copy so modifying this
    * list will not update the map.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Polyline> getPolylines() {
     return annotationManager.getPolylines();
@@ -1380,7 +1212,11 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the user clicks on a marker.
    *                 To unset the callback, use null.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void setOnMarkerClickListener(@Nullable OnMarkerClickListener listener) {
     annotationManager.setOnMarkerClickListener(listener);
   }
@@ -1390,7 +1226,11 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the user clicks on a polygon.
    *                 To unset the callback, use null.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void setOnPolygonClickListener(@Nullable OnPolygonClickListener listener) {
     annotationManager.setOnPolygonClickListener(listener);
   }
@@ -1400,7 +1240,11 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the user clicks on a polyline.
    *                 To unset the callback, use null.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void setOnPolylineClickListener(@Nullable OnPolylineClickListener listener) {
     annotationManager.setOnPolylineClickListener(listener);
   }
@@ -1414,7 +1258,11 @@ public final class MapboxMap {
    * Selecting an already selected marker will have no effect.
    *
    * @param marker The marker to select.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void selectMarker(@NonNull Marker marker) {
     if (marker == null) {
       Logger.w(TAG, "marker was null, so just returning");
@@ -1425,7 +1273,11 @@ public final class MapboxMap {
 
   /**
    * Deselects any currently selected marker. All markers will have it's info window closed.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void deselectMarkers() {
     annotationManager.deselectMarkers();
   }
@@ -1434,7 +1286,11 @@ public final class MapboxMap {
    * Deselects a currently selected marker. The selected marker will have it's info window closed.
    *
    * @param marker the marker to deselect
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void deselectMarker(@NonNull Marker marker) {
     annotationManager.deselectMarker(marker);
   }
@@ -1443,7 +1299,11 @@ public final class MapboxMap {
    * Gets the currently selected marker.
    *
    * @return The currently selected marker.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @NonNull
   public List<Marker> getSelectedMarkers() {
     return annotationManager.getSelectedMarkers();
@@ -1462,7 +1322,11 @@ public final class MapboxMap {
    *
    * @param infoWindowAdapter The callback to be invoked when an info window will be shown.
    *                          To unset the callback, use null.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void setInfoWindowAdapter(@Nullable InfoWindowAdapter infoWindowAdapter) {
     annotationManager.getInfoWindowManager().setInfoWindowAdapter(infoWindowAdapter);
   }
@@ -1471,7 +1335,11 @@ public final class MapboxMap {
    * Gets the callback to be invoked when an info window will be shown.
    *
    * @return The callback to be invoked when an info window will be shown.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   @Nullable
   public InfoWindowAdapter getInfoWindowAdapter() {
     return annotationManager.getInfoWindowManager().getInfoWindowAdapter();
@@ -1481,7 +1349,11 @@ public final class MapboxMap {
    * Changes whether the map allows concurrent multiple infowindows to be shown.
    *
    * @param allow If true, map allows concurrent multiple infowindows to be shown.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public void setAllowConcurrentMultipleOpenInfoWindows(boolean allow) {
     annotationManager.getInfoWindowManager().setAllowConcurrentMultipleOpenInfoWindows(allow);
   }
@@ -1490,7 +1362,11 @@ public final class MapboxMap {
    * Returns whether the map allows concurrent multiple infowindows to be shown.
    *
    * @return If true, map allows concurrent multiple infowindows to be shown.
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public boolean isAllowConcurrentMultipleOpenInfoWindows() {
     return annotationManager.getInfoWindowManager().isAllowConcurrentMultipleOpenInfoWindows();
   }
@@ -1518,7 +1394,7 @@ public final class MapboxMap {
    * @param latLngBounds the bounds to set the map with
    * @return the camera position that fits the bounds
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds) {
     // we use current camera tilt value to provide expected transformations as #11993
     return getCameraForLatLngBounds(latLngBounds, new int[] {0, 0, 0, 0});
@@ -1532,7 +1408,7 @@ public final class MapboxMap {
    * @param padding      the padding to apply to the bounds
    * @return the camera position that fits the bounds and padding
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
                                                  @NonNull @Size(value = 4) int[] padding) {
     // we use current camera tilt/bearing value to provide expected transformations as #11993
@@ -1548,7 +1424,7 @@ public final class MapboxMap {
    * @param tilt         to transform the camera position with
    * @return the camera position that fits the bounds and given bearing and tilt
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
                                                  @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION,
                                                    to = MapboxConstants.MAXIMUM_DIRECTION) double bearing,
@@ -1567,7 +1443,7 @@ public final class MapboxMap {
    * @param tilt         to transform the camera position with
    * @return the camera position that fits the bounds, bearing and tilt
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds,
                                                  @NonNull @Size(value = 4) int[] padding,
                                                  @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION,
@@ -1583,7 +1459,7 @@ public final class MapboxMap {
    * @param geometry the geometry to wraps the map with
    * @return the camera position that fits the geometry inside
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForGeometry(@NonNull Geometry geometry) {
     // we use current camera tilt value to provide expected transformations as #11993
     return getCameraForGeometry(geometry, new int[] {0, 0, 0, 0});
@@ -1596,7 +1472,7 @@ public final class MapboxMap {
    * @param padding  the padding to apply to the bounds
    * @return the camera position that fits the geometry inside and padding
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForGeometry(@NonNull Geometry geometry,
                                              @NonNull @Size(value = 4) int[] padding) {
     // we use current camera tilt/bearing value to provide expected transformations as #11993
@@ -1611,7 +1487,7 @@ public final class MapboxMap {
    * @param tilt     the tilt at which to compute the geometry's bounds
    * @return the camera position that the geometry inside with bearing and tilt
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForGeometry(@NonNull Geometry geometry,
                                              @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION,
                                                to = MapboxConstants.MAXIMUM_DIRECTION) double bearing,
@@ -1629,7 +1505,7 @@ public final class MapboxMap {
    * @param tilt     the tilt at which to compute the geometry's bounds
    * @return the camera position that fits the geometry inside with padding, bearing and tilt
    */
-  @NonNull
+  @Nullable
   public CameraPosition getCameraForGeometry(@NonNull Geometry geometry,
                                              @NonNull @Size(value = 4) int[] padding,
                                              @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION,
@@ -1637,21 +1513,6 @@ public final class MapboxMap {
                                              @FloatRange(from = MapboxConstants.MINIMUM_TILT,
                                                to = MapboxConstants.MAXIMUM_TILT) double tilt) {
     return nativeMapView.getCameraForGeometry(geometry, padding, bearing, tilt);
-  }
-
-  /**
-   * Get a camera position that fits a provided shape with a given bearing and padding.
-   *
-   * @param geometry the geometry to wraps the map with
-   * @param bearing  the bearing at which to compute the geometry's bounds
-   * @param padding  the padding to apply to the bounds
-   * @return the camera position that fits the geometry inside with padding and bearing
-   * @deprecated use Mapbox{@link #getCameraForGeometry(Geometry, int[], double, double)} instead
-   */
-  @NonNull
-  @Deprecated
-  public CameraPosition getCameraForGeometry(@NonNull Geometry geometry, double bearing, @NonNull int[] padding) {
-    return getCameraForGeometry(geometry, padding, bearing, transform.getTilt());
   }
 
   //
@@ -2082,10 +1943,14 @@ public final class MapboxMap {
     this.locationComponent = locationComponent;
   }
 
+  void injectAnnotationManager(AnnotationManager annotationManager) {
+    this.annotationManager = annotationManager.bind(this);
+  }
+
   /**
    * Returns the {@link LocationComponent} that can be used to display user's location on the map.
    * <p>
-   * Use {@link LocationComponent#activateLocationComponent(Context)} or any overload to activate the component,
+   * Use {@link LocationComponent#activateLocationComponent(Context, Style)} or any overload to activate the component,
    * then, enable it with {@link LocationComponent#setLocationComponentEnabled(boolean)}.
    * <p>
    * You can customize the location icon and more with {@link com.mapbox.mapboxsdk.location.LocationComponentOptions}.
@@ -2322,7 +2187,11 @@ public final class MapboxMap {
    * Interface definition for a callback to be invoked when the user clicks on a marker.
    *
    * @see MapboxMap#setOnMarkerClickListener(OnMarkerClickListener)
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public interface OnMarkerClickListener {
     /**
      * Called when the user clicks on a marker.
@@ -2337,7 +2206,11 @@ public final class MapboxMap {
    * Interface definition for a callback to be invoked when the user clicks on a polygon.
    *
    * @see MapboxMap#setOnPolygonClickListener(OnPolygonClickListener)
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public interface OnPolygonClickListener {
     /**
      * Called when the user clicks on a polygon.
@@ -2351,7 +2224,11 @@ public final class MapboxMap {
    * Interface definition for a callback to be invoked when the user clicks on a polyline.
    *
    * @see MapboxMap#setOnPolylineClickListener(OnPolylineClickListener)
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public interface OnPolylineClickListener {
     /**
      * Called when the user clicks on a polyline.
@@ -2410,7 +2287,11 @@ public final class MapboxMap {
    * Interface definition for a callback to be invoked when an info window will be shown.
    *
    * @see MapboxMap#setInfoWindowAdapter(InfoWindowAdapter)
+   * @deprecated As of 7.0.0,
+   * use <a href="https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-annotation">
+   *   Mapbox Annotation Plugin</a> instead
    */
+  @Deprecated
   public interface InfoWindowAdapter {
     /**
      * Called when an info window will be shown as a result of a marker click.
@@ -2448,18 +2329,6 @@ public final class MapboxMap {
      * @param snapshot the snapshot bitmap
      */
     void onSnapshotReady(@NonNull Bitmap snapshot);
-  }
-
-  /**
-   * Interface definition for a callback to be invoked when the style has finished loading.
-   */
-  public interface OnStyleLoadedListener {
-    /**
-     * Invoked when the style has finished loading
-     *
-     * @param style the style that has been loaded
-     */
-    void onStyleLoaded(@NonNull String style);
   }
 
   //

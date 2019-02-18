@@ -13,9 +13,9 @@ namespace mbgl {
 class BucketParameters;
 class RenderFillExtrusionLayer;
 
-class FillExtrusionBucket : public Bucket {
+class FillExtrusionBucket final : public Bucket {
 public:
-
+    ~FillExtrusionBucket() override;
     // These aliases are used by the PatternLayout template
     using RenderLayerType = RenderFillExtrusionLayer;
     using PossiblyEvaluatedPaintProperties = style::FillExtrusionPaintProperties::PossiblyEvaluated;
@@ -33,6 +33,8 @@ public:
 
     bool hasData() const override;
 
+    bool supportsLayer(const style::Layer::Impl&) const override;
+
     void upload(gl::Context&) override;
 
     float getQueryRadius(const RenderLayer&) const override;
@@ -46,10 +48,5 @@ public:
     
     std::unordered_map<std::string, FillExtrusionProgram::PaintPropertyBinders> paintPropertyBinders;
 };
-
-template <>
-inline bool Bucket::is<FillExtrusionBucket>() const {
-    return layerType == style::LayerType::FillExtrusion;
-}
 
 } // namespace mbgl

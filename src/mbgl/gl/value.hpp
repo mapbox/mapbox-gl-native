@@ -6,6 +6,7 @@
 #include <mbgl/gl/color_mode.hpp>
 #include <mbgl/gl/cull_face_mode.hpp>
 #include <mbgl/gl/attribute.hpp>
+#include <mbgl/platform/gl_functions.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/size.hpp>
 #include <mbgl/util/range.hpp>

@@ -17,16 +17,17 @@ import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentOptions;
 import com.mapbox.mapboxsdk.location.OnCameraTrackingChangedListener;
+import com.mapbox.mapboxsdk.location.OnLocationCameraTransitionListener;
 import com.mapbox.mapboxsdk.location.OnLocationClickListener;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
 
   private LocationComponent locationComponent;
   private MapboxMap mapboxMap;
-  private boolean customStyle;
+  private boolean defaultStyle = false;
 
   private static final String SAVED_STATE_CAMERA = "saved_state_camera";
   private static final String SAVED_STATE_RENDER = "saved_state_render";
@@ -123,32 +124,22 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
   public void onMapReady(@NonNull MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
 
-    int[] padding;
-    if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-      padding = new int[] {0, 750, 0, 0};
-    } else {
-      padding = new int[] {0, 250, 0, 0};
-    }
-
-    LocationComponentOptions options = LocationComponentOptions.builder(this)
-      .padding(padding)
-      .layerBelow("waterway-label")
-      .build();
-
-    locationComponent = mapboxMap.getLocationComponent();
-    locationComponent.activateLocationComponent(this, true,
-      new LocationEngineRequest.Builder(750)
-        .setFastestInterval(750)
-        .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-        .build()
-    );
-    locationComponent.applyStyle(options);
-    locationComponent.setLocationComponentEnabled(true);
-    locationComponent.addOnLocationClickListener(this);
-    locationComponent.addOnCameraTrackingChangedListener(this);
-    locationComponent.setCameraMode(cameraMode);
-    setRendererMode(renderMode);
-    locationComponent.forceLocationUpdate(lastLocation);
+    mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
+      locationComponent = mapboxMap.getLocationComponent();
+      locationComponent.activateLocationComponent(this, style, true,
+        new LocationEngineRequest.Builder(750)
+          .setFastestInterval(750)
+          .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+          .build()
+      );
+      toggleStyle();
+      locationComponent.setLocationComponentEnabled(true);
+      locationComponent.addOnLocationClickListener(this);
+      locationComponent.addOnCameraTrackingChangedListener(this);
+      locationComponent.setCameraMode(cameraMode);
+      setRendererMode(renderMode);
+      locationComponent.forceLocationUpdate(lastLocation);
+    });
   }
 
   @Override
@@ -183,24 +174,55 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
     } else if (id == R.id.action_gestures_management_enabled) {
       enableGesturesManagement();
       return true;
+    } else if (id == R.id.action_component_throttling_enabled) {
+      locationComponent.setMaxAnimationFps(5);
+    } else if (id == R.id.action_component_throttling_disabled) {
+      locationComponent.setMaxAnimationFps(Integer.MAX_VALUE);
     }
 
     return super.onOptionsItemSelected(item);
   }
 
   private void toggleStyle() {
-    customStyle = !customStyle;
-    locationComponent.applyStyle(
-      this,
-      customStyle ? R.style.CustomLocationComponent : R.style.mapbox_LocationComponent);
+    if (locationComponent == null) {
+      return;
+    }
+
+    defaultStyle = !defaultStyle;
+    LocationComponentOptions options = LocationComponentOptions.createFromAttributes(
+      this, defaultStyle ? R.style.mapbox_LocationComponent : R.style.CustomLocationComponent);
+
+    if (defaultStyle) {
+      int[] padding;
+      if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+        padding = new int[] {0, 750, 0, 0};
+      } else {
+        padding = new int[] {0, 250, 0, 0};
+      }
+
+      options = options.toBuilder()
+        .padding(padding)
+        .layerBelow("road-label")
+        .build();
+    }
+
+    locationComponent.applyStyle(options);
   }
 
   private void toggleMapStyle() {
-    String styleUrl = mapboxMap.getStyleUrl().contentEquals(Style.DARK) ? Style.LIGHT : Style.DARK;
-    mapboxMap.setStyle(styleUrl);
+    if (locationComponent == null) {
+      return;
+    }
+
+    String styleUrl = Style.DARK.equals(mapboxMap.getStyle().getUrl()) ? Style.LIGHT : Style.DARK;
+    mapboxMap.setStyle(new Style.Builder().fromUrl(styleUrl));
   }
 
   private void disableGesturesManagement() {
+    if (locationComponent == null) {
+      return;
+    }
+
     LocationComponentOptions options = locationComponent
       .getLocationComponentOptions()
       .toBuilder()
@@ -210,6 +232,10 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
   }
 
   private void enableGesturesManagement() {
+    if (locationComponent == null) {
+      return;
+    }
+
     LocationComponentOptions options = locationComponent
       .getLocationComponentOptions()
       .toBuilder()
@@ -324,35 +350,47 @@ public class LocationModesActivity extends AppCompatActivity implements OnMapRea
       String selectedTrackingType = trackingTypes.get(position);
       locationTrackingBtn.setText(selectedTrackingType);
       if (selectedTrackingType.contentEquals("None")) {
-        locationComponent.setCameraMode(CameraMode.NONE);
+        setCameraTrackingMode(CameraMode.NONE);
       } else if (selectedTrackingType.contentEquals("Tracking")) {
-        locationComponent.setCameraMode(CameraMode.TRACKING);
+        setCameraTrackingMode(CameraMode.TRACKING);
       } else if (selectedTrackingType.contentEquals("Tracking Compass")) {
-        locationComponent.setCameraMode(CameraMode.TRACKING_COMPASS);
+        setCameraTrackingMode(CameraMode.TRACKING_COMPASS);
       } else if (selectedTrackingType.contentEquals("Tracking GPS")) {
-        locationComponent.setCameraMode(CameraMode.TRACKING_GPS);
+        setCameraTrackingMode(CameraMode.TRACKING_GPS);
       } else if (selectedTrackingType.contentEquals("Tracking GPS North")) {
-        locationComponent.setCameraMode(CameraMode.TRACKING_GPS_NORTH);
+        setCameraTrackingMode(CameraMode.TRACKING_GPS_NORTH);
       }
       listPopup.dismiss();
-
-      if (locationComponent.getCameraMode() != CameraMode.NONE) {
-        locationComponent.zoomWhileTracking(15, 750, new MapboxMap.CancelableCallback() {
-          @Override
-          public void onCancel() {
-            // No impl
-          }
-
-          @Override
-          public void onFinish() {
-            locationComponent.tiltWhileTracking(45);
-          }
-        });
-      } else {
-        mapboxMap.easeCamera(CameraUpdateFactory.tiltTo(0));
-      }
     });
     listPopup.show();
+  }
+
+  private void setCameraTrackingMode(@CameraMode.Mode int mode) {
+    locationComponent.setCameraMode(mode, new OnLocationCameraTransitionListener() {
+      @Override
+      public void onLocationCameraTransitionFinished(@CameraMode.Mode int cameraMode) {
+        if (mode != CameraMode.NONE) {
+          locationComponent.zoomWhileTracking(15, 750, new MapboxMap.CancelableCallback() {
+            @Override
+            public void onCancel() {
+              // No impl
+            }
+
+            @Override
+            public void onFinish() {
+              locationComponent.tiltWhileTracking(45);
+            }
+          });
+        } else {
+          mapboxMap.easeCamera(CameraUpdateFactory.tiltTo(0));
+        }
+      }
+
+      @Override
+      public void onLocationCameraTransitionCanceled(@CameraMode.Mode int cameraMode) {
+        // No impl
+      }
+    });
   }
 
   @Override

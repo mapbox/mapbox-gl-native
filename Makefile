@@ -498,10 +498,12 @@ MBGL_ANDROID_ABIS += x86;x86
 MBGL_ANDROID_ABIS += x86-64;x86_64
 
 MBGL_ANDROID_LOCAL_WORK_DIR = /data/local/tmp/core-tests
+MBGL_ANDROID_LOCAL_BENCHMARK_DIR = /data/local/tmp/benchmark
 MBGL_ANDROID_LIBDIR = lib$(if $(filter arm-v8 x86-64,$1),64)
 MBGL_ANDROID_DALVIKVM = dalvikvm$(if $(filter arm-v8 x86-64,$1),64,32)
-MBGL_ANDROID_APK_SUFFIX = $(if $(filter Release,$(BUILDTYPE)),release-unsigned,debug)
+MBGL_ANDROID_APK_SUFFIX = $(if $(filter Release,$(BUILDTYPE)),release,debug)
 MBGL_ANDROID_CORE_TEST_DIR = platform/android/MapboxGLAndroidSDK/.externalNativeBuild/cmake/$(buildtype)/$2/core-tests
+MBGL_ANDROID_BENCHMARK_DIR = platform/android/MapboxGLAndroidSDK/.externalNativeBuild/cmake/$(buildtype)/$2/benchmark
 MBGL_ANDROID_STL ?= c++_static
 MBGL_ANDROID_GRADLE = ./gradlew --parallel --max-workers=$(JOBS) -Pmapbox.buildtype=$(buildtype) -Pmapbox.stl=$(MBGL_ANDROID_STL)
 
@@ -517,7 +519,7 @@ style-code: android-style-code
 
 # Configuration file for running CMake from Gradle within Android Studio.
 platform/android/gradle/configuration.gradle:
-	@echo "ext {\n    node = '`command -v node || command -v nodejs`'\n    npm = '`command -v npm`'\n    ccache = '`command -v ccache`'\n}" > $@
+	@printf "ext {\n    node = '`command -v node || command -v nodejs`'\n    npm = '`command -v npm`'\n    ccache = '`command -v ccache`'\n}" > $@
 
 define ANDROID_RULES
 # $1 = arm-v7 (short arch)
@@ -526,6 +528,10 @@ define ANDROID_RULES
 .PHONY: android-test-lib-$1
 android-test-lib-$1: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 -Pmapbox.with_test=true :MapboxGLAndroidSDKTestApp:assemble$(BUILDTYPE)
+
+.PHONY: android-benchmark-$1
+android-benchmark-$1: platform/android/gradle/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 -Pmapbox.with_benchmark=true :MapboxGLAndroidSDKTestApp:assemble$(BUILDTYPE)
 
 # Build SDK for for specified abi
 .PHONY: android-lib-$1
@@ -542,27 +548,24 @@ android-$1: platform/android/gradle/configuration.gradle
 android-core-test-$1: android-test-lib-$1
 	# Compile main sources and extract the classes (using the test app to get all transitive dependencies in one place)
 	mkdir -p $(MBGL_ANDROID_CORE_TEST_DIR)
-	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-$(MBGL_ANDROID_APK_SUFFIX).apk classes.dex -d $(MBGL_ANDROID_CORE_TEST_DIR)
-
-	# Compile Test runner
-	find platform/android/src/test -name "*.java" > $(MBGL_ANDROID_CORE_TEST_DIR)/java-sources.txt
-	javac -sourcepath platform/android/src/test -d $(MBGL_ANDROID_CORE_TEST_DIR) -source 1.7 -target 1.7 @$(MBGL_ANDROID_CORE_TEST_DIR)/java-sources.txt
-
-	# Combine and dex
-	cd $(MBGL_ANDROID_CORE_TEST_DIR) && $(ANDROID_HOME)/build-tools/25.0.0/dx --dex --output=test.jar *.class classes.dex
+	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/$(buildtype)/MapboxGLAndroidSDKTestApp-$(MBGL_ANDROID_APK_SUFFIX).apk classes.dex -d $(MBGL_ANDROID_CORE_TEST_DIR)
 
 run-android-core-test-$1-%: android-core-test-$1
 	# Ensure clean state on the device
-	adb shell "rm -Rf $(MBGL_ANDROID_LOCAL_WORK_DIR) && mkdir -p $(MBGL_ANDROID_LOCAL_WORK_DIR)/test"
+	adb shell "rm -Rf $(MBGL_ANDROID_LOCAL_WORK_DIR) && mkdir -p $(MBGL_ANDROID_LOCAL_WORK_DIR)/test && mkdir -p $(MBGL_ANDROID_LOCAL_WORK_DIR)/mapbox-gl-js/src/style-spec/reference"
 
 	# Push all needed files to the device
-	adb push $(MBGL_ANDROID_CORE_TEST_DIR)/test.jar $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
+	adb push $(MBGL_ANDROID_CORE_TEST_DIR)/classes.dex $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
+	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/intermediate-jars/$(buildtype)/jni/$2/libmapbox-gl.so $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
 	adb push test/fixtures $(MBGL_ANDROID_LOCAL_WORK_DIR)/test > /dev/null 2>&1
-	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/bundles/default/jni/$2/libmapbox-gl.so $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
-	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/bundles/default/jni/$2/libmbgl-test.so $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
+	adb push mapbox-gl-js/src/style-spec/reference/v8.json $(MBGL_ANDROID_LOCAL_WORK_DIR)/mapbox-gl-js/src/style-spec/reference > /dev/null 2>&1
+	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/$(buildtype)/obj/$2/mbgl-test $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
+
+# Create gtest filter for skipped tests.
+	$(eval SKIPPED_TESTS := -$(shell sed -n '/#\|^$$/!p' platform/android/tests/skipped.txt | sed ':a;$!N;s/\n/:/g;ta'))
 
 	# Kick off the tests
-	adb shell "export LD_LIBRARY_PATH=/system/$(MBGL_ANDROID_LIBDIR):$(MBGL_ANDROID_LOCAL_WORK_DIR) && cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && $(MBGL_ANDROID_DALVIKVM) -cp $(MBGL_ANDROID_LOCAL_WORK_DIR)/test.jar Main --gtest_filter=$$*"
+	adb shell "export LD_LIBRARY_PATH=$(MBGL_ANDROID_LOCAL_WORK_DIR) && cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && chmod +x mbgl-test && ./mbgl-test --class_path=$(MBGL_ANDROID_LOCAL_WORK_DIR)/classes.dex --gtest_filter=$$*:$(SKIPPED_TESTS)"
 
 	# Gather the results and unpack them
 	adb shell "cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && tar -cvzf results.tgz test/fixtures/*  > /dev/null 2>&1"
@@ -573,6 +576,31 @@ run-android-core-test-$1-%: android-core-test-$1
 # Run the core test for specified abi
 .PHONY: run-android-core-test-$1
 run-android-core-test-$1: run-android-core-test-$1-*
+
+# Run benchmarks for specified abi
+.PHONY: run-android-benchmark-$1
+run-android-benchmark-$1: run-android-benchmark-$1-*
+
+run-android-benchmark-$1-%: android-benchmark-$1
+	mkdir -p $(MBGL_ANDROID_BENCHMARK_DIR)
+	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/$(buildtype)/MapboxGLAndroidSDKTestApp-$(MBGL_ANDROID_APK_SUFFIX).apk classes.dex -d $(MBGL_ANDROID_BENCHMARK_DIR)
+
+	# Delete old test folder and create new one
+	adb shell "rm -Rf $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR) && mkdir -p $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR)/benchmark && mkdir -p $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR)/test"
+
+	# Push compiled java sources, test data and executable to device
+	adb push $(MBGL_ANDROID_BENCHMARK_DIR)/classes.dex $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR) > /dev/null 2>&1
+	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/intermediate-jars/$(buildtype)/jni/$2/libmapbox-gl.so $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR) > /dev/null 2>&1
+	adb push benchmark/fixtures $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR)/benchmark > /dev/null 2>&1
+	adb push test/fixtures $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR)/test > /dev/null 2>&1
+	adb push platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/$(buildtype)/obj/$2/mbgl-benchmark $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR) > /dev/null 2>&1
+
+	# Run benchmark. Number of benchmark iterations can be set by run-android-benchmark-N parameter.
+	adb shell "export LD_LIBRARY_PATH=$(MBGL_ANDROID_LOCAL_BENCHMARK_DIR) && cd $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR) && chmod +x mbgl-benchmark && ./mbgl-benchmark --class_path=$(MBGL_ANDROID_LOCAL_BENCHMARK_DIR)/classes.dex --benchmark_repetitions=$$* --benchmark_format=json --benchmark_out=results.json"
+
+	# Pull results.json from the device
+	rm -rf $(MBGL_ANDROID_BENCHMARK_DIR)/results && mkdir -p $(MBGL_ANDROID_BENCHMARK_DIR)/results
+	adb pull $(MBGL_ANDROID_LOCAL_BENCHMARK_DIR)/results.json $(MBGL_ANDROID_BENCHMARK_DIR)/results > /dev/null 2>&1
 
 # Run the test app on connected android device with specified abi
 .PHONY: run-android-$1
@@ -617,6 +645,8 @@ run-android-render-test-$1: $(BUILD_DEPS) platform/android/gradle/configuration.
 	adb pull "`adb shell 'printenv EXTERNAL_STORAGE' | tr -d '\r'`/mapbox/render" platform/android/build/render-test
 	# copy expected result and run pixelmatch
 	python platform/android/scripts/run-render-test.py
+	# remove test definitions from assets
+	rm -rf platform/android/MapboxGLAndroidSDKTestApp/src/main/assets/integration
 
 endef
 
@@ -689,7 +719,7 @@ android-check : android-checkstyle android-lint-sdk android-lint-test-app
 # Runs checkstyle on the Android code
 .PHONY: android-checkstyle
 android-checkstyle: platform/android/gradle/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none checkstyle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:checkstyle :MapboxGLAndroidSDKTestApp:checkstyle
 
 # Runs lint on the Android SDK code
 .PHONY: android-lint-sdk
@@ -728,9 +758,19 @@ endif
 android-configuration: platform/android/gradle/configuration.gradle
 	cat platform/android/gradle/configuration.gradle
 
+# Updates Android's vendor submodules
+.PHONY: android-update-vendor
+android-update-vendor: platform/android/gradle/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none updateVendorSubmodules
+
+# Run android nitpick script
+.PHONY: run-android-nitpick
+run-android-nitpick: android-update-vendor
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none androidNitpick
+
 # Creates a dependency graph using Graphviz
 .PHONY: android-graph
-android-graph:
+android-graph: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:generateDependencyGraphMapboxLibraries
 
 #### Miscellaneous targets #####################################################
@@ -753,7 +793,8 @@ clean:
 	        ./platform/android/MapboxGLAndroidSDK/.externalNativeBuild \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/build \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/activity/gen \
-	        ./platform/android/MapboxGLAndroidSDK/src/main/assets
+	        ./platform/android/MapboxGLAndroidSDK/src/main/assets \
+		./platform/android/MapboxGLAndroidSDKTestApp/src/main/assets/integration
 
 .PHONY: distclean
 distclean: clean

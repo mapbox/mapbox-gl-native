@@ -1,5 +1,5 @@
-#include "mock.hpp"
 #include <mbgl/test/util.hpp>
+#include <mbgl/test/mock.hpp>
 #include <mbgl/util/variant.hpp>
 
 #include <mapbox/variant_io.hpp>

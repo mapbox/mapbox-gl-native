@@ -58,6 +58,8 @@ public final class UiSettings {
 
   private boolean doubleTapGesturesEnabled = true;
 
+  private boolean quickZoomGesturesEnabled = true;
+
   private boolean scaleVelocityAnimationEnabled = true;
   private boolean rotateVelocityAnimationEnabled = true;
   private boolean flingVelocityAnimationEnabled = true;
@@ -113,6 +115,7 @@ public final class UiSettings {
     setRotateGesturesEnabled(options.getRotateGesturesEnabled());
     setTiltGesturesEnabled(options.getTiltGesturesEnabled());
     setDoubleTapGesturesEnabled(options.getDoubleTapGesturesEnabled());
+    setQuickZoomGesturesEnabled(options.getQuickZoomGesturesEnabled());
   }
 
   private void saveGestures(Bundle outState) {
@@ -126,6 +129,7 @@ public final class UiSettings {
     outState.putBoolean(MapboxConstants.STATE_FLING_ANIMATION_ENABLED, isFlingVelocityAnimationEnabled());
     outState.putBoolean(MapboxConstants.STATE_INCREASE_ROTATE_THRESHOLD, isIncreaseRotateThresholdWhenScaling());
     outState.putBoolean(MapboxConstants.STATE_INCREASE_SCALE_THRESHOLD, isIncreaseScaleThresholdWhenRotating());
+    outState.putBoolean(MapboxConstants.STATE_QUICK_ZOOM_ENABLED, isQuickZoomGesturesEnabled());
   }
 
   private void restoreGestures(Bundle savedInstanceState) {
@@ -141,6 +145,7 @@ public final class UiSettings {
       savedInstanceState.getBoolean(MapboxConstants.STATE_INCREASE_ROTATE_THRESHOLD));
     setIncreaseScaleThresholdWhenRotating(
       savedInstanceState.getBoolean(MapboxConstants.STATE_INCREASE_SCALE_THRESHOLD));
+    setQuickZoomGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_QUICK_ZOOM_ENABLED));
   }
 
   private void initialiseCompass(MapboxMapOptions options, @NonNull Resources resources) {
@@ -538,7 +543,7 @@ public final class UiSettings {
    *
    * @return the active manager class used for showing attribution
    */
-  @NonNull
+  @Nullable
   public AttributionDialogManager getAttributionDialogManager() {
     return attributionDialogManager;
   }
@@ -730,6 +735,29 @@ public final class UiSettings {
     return doubleTapGesturesEnabled;
   }
 
+  /**
+   * Returns whether the user may zoom the map by tapping twice, holding and moving the pointer up and down.
+   *
+   * @return If true, zooming by tapping twice and holding is enabled.
+   */
+  public boolean isQuickZoomGesturesEnabled() {
+    return quickZoomGesturesEnabled;
+  }
+
+  /**
+   * Changes whether the user may zoom the map by tapping twice, holding and moving the pointer up and down.
+   * <p>
+   * This setting controls only user interactions with the map. If you set the value to false,
+   * you may still change the map location programmatically.
+   * </p>
+   * The default value is true.
+   *
+   * @param quickZoomGesturesEnabled If true, zooming by tapping twice and holding is enabled.
+   */
+  public void setQuickZoomGesturesEnabled(boolean quickZoomGesturesEnabled) {
+    this.quickZoomGesturesEnabled = quickZoomGesturesEnabled;
+  }
+
   private void restoreDeselectMarkersOnTap(Bundle savedInstanceState) {
     setDeselectMarkersOnTap(savedInstanceState.getBoolean(MapboxConstants.STATE_DESELECT_MARKER_ON_TAP));
   }
@@ -899,6 +927,8 @@ public final class UiSettings {
    * @see #setScrollGesturesEnabled(boolean)
    * @see #setRotateGesturesEnabled(boolean)
    * @see #setTiltGesturesEnabled(boolean)
+   * @see #setDoubleTapGesturesEnabled(boolean)
+   * @see #setQuickZoomGesturesEnabled(boolean)
    */
   public void setAllGesturesEnabled(boolean enabled) {
     setScrollGesturesEnabled(enabled);
@@ -906,6 +936,7 @@ public final class UiSettings {
     setTiltGesturesEnabled(enabled);
     setZoomGesturesEnabled(enabled);
     setDoubleTapGesturesEnabled(enabled);
+    setQuickZoomGesturesEnabled(enabled);
   }
 
   private void saveFocalPoint(Bundle outState) {

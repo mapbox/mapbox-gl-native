@@ -10,6 +10,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLFillExtrusionStyleLayer_Private.h"
 
+#include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 
 
@@ -104,19 +105,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting fillExtrusionBaseTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setFillExtrusionBaseTransition(options);
+    self.rawLayer->setFillExtrusionBaseTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)fillExtrusionBaseTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillExtrusionBaseTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setFillExtrusionColor:(NSExpression *)fillExtrusionColor {
@@ -141,19 +138,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting fillExtrusionColorTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setFillExtrusionColorTransition(options);
+    self.rawLayer->setFillExtrusionColorTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)fillExtrusionColorTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillExtrusionColorTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setFillExtrusionHasVerticalGradient:(NSExpression *)fillExtrusionHasVerticalGradient {
@@ -203,19 +196,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting fillExtrusionHeightTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setFillExtrusionHeightTransition(options);
+    self.rawLayer->setFillExtrusionHeightTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)fillExtrusionHeightTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillExtrusionHeightTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setFillExtrusionOpacity:(NSExpression *)fillExtrusionOpacity {
@@ -240,19 +229,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting fillExtrusionOpacityTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setFillExtrusionOpacityTransition(options);
+    self.rawLayer->setFillExtrusionOpacityTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)fillExtrusionOpacityTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillExtrusionOpacityTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setFillExtrusionPattern:(NSExpression *)fillExtrusionPattern {
@@ -277,19 +262,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting fillExtrusionPatternTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setFillExtrusionPatternTransition(options);
+    self.rawLayer->setFillExtrusionPatternTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)fillExtrusionPatternTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillExtrusionPatternTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setFillExtrusionTranslation:(NSExpression *)fillExtrusionTranslation {
@@ -314,19 +295,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting fillExtrusionTranslationTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setFillExtrusionTranslateTransition(options);
+    self.rawLayer->setFillExtrusionTranslateTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)fillExtrusionTranslationTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getFillExtrusionTranslateTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setFillExtrusionTranslate:(NSExpression *)fillExtrusionTranslate {

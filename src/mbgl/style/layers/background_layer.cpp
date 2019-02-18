@@ -9,9 +9,8 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
-#include <mbgl/util/fnv_hash.hpp>
 
-#include <mbgl/renderer/layers/render_background_layer.hpp>
+#include <mapbox/eternal.hpp>
 
 namespace mbgl {
 namespace style {
@@ -147,8 +146,7 @@ TransitionOptions BackgroundLayer::getBackgroundOpacityTransition() const {
 using namespace conversion;
 
 optional<Error> BackgroundLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        Unknown,
+    enum class Property : uint8_t {
         BackgroundColor,
         BackgroundPattern,
         BackgroundOpacity,
@@ -157,44 +155,21 @@ optional<Error> BackgroundLayer::setPaintProperty(const std::string& name, const
         BackgroundOpacityTransition,
     };
 
-    Property property = Property::Unknown;
-    switch (util::hashFNV1a(name.c_str())) {
-    case util::hashFNV1a("background-color"):
-        if (name == "background-color") {
-            property = Property::BackgroundColor;
-        }
-        break;
-    case util::hashFNV1a("background-color-transition"):
-        if (name == "background-color-transition") {
-            property = Property::BackgroundColorTransition;
-        }
-        break;
-    case util::hashFNV1a("background-pattern"):
-        if (name == "background-pattern") {
-            property = Property::BackgroundPattern;
-        }
-        break;
-    case util::hashFNV1a("background-pattern-transition"):
-        if (name == "background-pattern-transition") {
-            property = Property::BackgroundPatternTransition;
-        }
-        break;
-    case util::hashFNV1a("background-opacity"):
-        if (name == "background-opacity") {
-            property = Property::BackgroundOpacity;
-        }
-        break;
-    case util::hashFNV1a("background-opacity-transition"):
-        if (name == "background-opacity-transition") {
-            property = Property::BackgroundOpacityTransition;
-        }
-        break;
-    
-    }
+    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
+        { "background-color", static_cast<uint8_t>(Property::BackgroundColor) },
+        { "background-pattern", static_cast<uint8_t>(Property::BackgroundPattern) },
+        { "background-opacity", static_cast<uint8_t>(Property::BackgroundOpacity) },
+        { "background-color-transition", static_cast<uint8_t>(Property::BackgroundColorTransition) },
+        { "background-pattern-transition", static_cast<uint8_t>(Property::BackgroundPatternTransition) },
+        { "background-opacity-transition", static_cast<uint8_t>(Property::BackgroundOpacityTransition) }
+    });
 
-    if (property == Property::Unknown) {
+    const auto it = properties.find(name.c_str());
+    if (it == properties.end()) {
         return Error { "layer doesn't support this property" };
     }
+
+    Property property = static_cast<Property>(it->second);
 
         
     if (property == Property::BackgroundColor) {
@@ -264,21 +239,6 @@ optional<Error> BackgroundLayer::setLayoutProperty(const std::string& name, cons
         return Layer::setVisibility(value);
     }
 
-    enum class Property {
-        Unknown,
-    };
-
-    Property property = Property::Unknown;
-    switch (util::hashFNV1a(name.c_str())) {
-    
-    }
-
-    if (property == Property::Unknown) {
-        return Error { "layer doesn't support this property" };
-    }
-
-        
-
     return Error { "layer doesn't support this property" };
 }
 
@@ -287,19 +247,4 @@ Mutable<Layer::Impl> BackgroundLayer::mutableBaseImpl() const {
 }
 
 } // namespace style
-
-const style::LayerTypeInfo* BackgroundLayerFactory::getTypeInfo() const noexcept {
-    return style::BackgroundLayer::Impl::staticTypeInfo();
-}
-
-std::unique_ptr<style::Layer> BackgroundLayerFactory::createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept {
-    (void)value;
-    return std::unique_ptr<style::Layer>(new style::BackgroundLayer(id));
-}
-
-std::unique_ptr<RenderLayer> BackgroundLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
-    assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderBackgroundLayer>(staticImmutableCast<style::BackgroundLayer::Impl>(std::move(impl)));
-}
-
 } // namespace mbgl

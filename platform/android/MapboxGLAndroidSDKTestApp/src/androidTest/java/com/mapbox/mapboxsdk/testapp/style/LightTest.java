@@ -12,7 +12,7 @@ import com.mapbox.mapboxsdk.style.layers.FillExtrusionLayer;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.style.light.Position;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
+import com.mapbox.mapboxsdk.testapp.activity.BaseTest;
 import com.mapbox.mapboxsdk.testapp.activity.style.FillExtrusionStyleTestActivity;
 
 import timber.log.Timber;
@@ -36,7 +36,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
 @RunWith(AndroidJUnit4.class)
-public class LightTest extends BaseActivityTest {
+public class LightTest extends BaseTest {
 
   private Light light;
 
@@ -149,7 +149,7 @@ public class LightTest extends BaseActivityTest {
 
       @Override
       public void perform(UiController uiController, View view) {
-        light = mapboxMap.getLight();
+        light = mapboxMap.getStyle().getLight();
         FillExtrusionLayer fillExtrusionLayer = new FillExtrusionLayer("3d-buildings", "composite");
         fillExtrusionLayer.setSourceLayer("building");
         fillExtrusionLayer.setFilter(eq(Expression.get("extrude"), "true"));
@@ -160,7 +160,7 @@ public class LightTest extends BaseActivityTest {
           fillExtrusionBase(Expression.get("min_height")),
           fillExtrusionOpacity(0.6f)
         );
-        mapboxMap.addLayer(fillExtrusionLayer);
+        mapboxMap.getStyle().addLayer(fillExtrusionLayer);
       }
     });
   }

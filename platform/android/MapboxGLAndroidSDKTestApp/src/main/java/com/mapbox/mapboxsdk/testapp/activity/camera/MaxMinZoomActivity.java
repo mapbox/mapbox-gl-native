@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
-import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -25,7 +25,7 @@ public class MaxMinZoomActivity extends AppCompatActivity implements OnMapReadyC
     @Override
     public boolean onMapClick(@NonNull LatLng point) {
       if (mapboxMap != null) {
-        mapboxMap.setStyle(Style.OUTDOORS, style -> Timber.d("Style Loaded %s", style));
+        mapboxMap.setStyle(new Style.Builder().fromUrl(Style.OUTDOORS));
       }
       return true;
     }
@@ -39,11 +39,14 @@ public class MaxMinZoomActivity extends AppCompatActivity implements OnMapReadyC
     mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
+
+    mapView.addOnDidFinishLoadingStyleListener(() -> Timber.d("Style Loaded"));
   }
 
   @Override
   public void onMapReady(@NonNull final MapboxMap map) {
     mapboxMap = map;
+    mapboxMap.setStyle(Style.MAPBOX_STREETS);
     mapboxMap.setMinZoomPreference(3);
     mapboxMap.setMaxZoomPreference(5);
     mapboxMap.addOnMapClickListener(clickListener);

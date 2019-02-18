@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.constants.Style
+import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.log.Logger
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion
@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.activity_merge_offline_regions.*
 class MergeOfflineRegionsActivity : AppCompatActivity() {
   companion object {
     private const val LOG_TAG = "Mbgl-MergeOfflineRegionsActivity"
-    private const val TEST_DB_FILE_NAME = "offline.db"
+    private const val TEST_DB_FILE_NAME = "offline_test.db"
     private const val TEST_STYLE = Style.SATELLITE
   }
 
@@ -27,14 +27,13 @@ class MergeOfflineRegionsActivity : AppCompatActivity() {
     // forcing offline state
     Mapbox.setConnected(false)
 
-    mapView.setStyleUrl(TEST_STYLE)
-
     mapView.onCreate(savedInstanceState)
     load_region_btn.setOnClickListener {
       copyAsset()
     }
     mapView.getMapAsync {
       it.isDebugActive = true
+      it.setStyle(Style.Builder().fromUrl(TEST_STYLE))
     }
   }
 
@@ -59,7 +58,9 @@ class MergeOfflineRegionsActivity : AppCompatActivity() {
       FileSource.getResourcesCachePath(this) + "/" + TEST_DB_FILE_NAME,
       object : OfflineManager.MergeOfflineRegionsCallback {
         override fun onMerge(offlineRegions: Array<OfflineRegion>) {
-          mapView.setStyleUrl(TEST_STYLE)
+          mapView.getMapAsync{
+              it.setStyle(Style.Builder().fromUrl(TEST_STYLE))
+          }
           Toast.makeText(
             this@MergeOfflineRegionsActivity,
             String.format("Merged %d regions.", offlineRegions.size),

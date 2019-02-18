@@ -1,8 +1,10 @@
 package com.mapbox.mapboxsdk.offline;
 
+import android.os.Parcelable;
 import android.support.annotation.Keep;
 
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 
 /**
  * This is the interface that all Offline Region definitions have to implement.
@@ -10,7 +12,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
  * For the present, a tile pyramid is the only type of offline region.
  */
 @Keep
-public interface OfflineRegionDefinition {
+public interface OfflineRegionDefinition extends Parcelable {
 
   /**
    * Gets the bounds of the OfflineRegion.
@@ -48,7 +50,20 @@ public interface OfflineRegionDefinition {
   float getPixelRatio();
 
   /**
-   * Gest the type of the OfflineRegionDefinition for telemetry ("tileregion", "shaperegion").
+   * Specifies whether to include ideographic glyphs in downloaded font data.
+   * Ideographic glyphs make up the majority of downloaded font data, but
+   * it is possible to configure the renderer to use locally installed fonts
+   * instead of relying on fonts downloaded as part of the offline pack.
+   *
+   * Defaults to `true`
+   *
+   * @return true if offline region will include ideographic glyphs
+   * @see MapboxMapOptions#localIdeographFontFamily(String)
+   */
+  boolean getIncludeIdeographs();
+
+  /**
+   * Gets the type of the OfflineRegionDefinition for telemetry ("tileregion", "shaperegion").
    *
    * @return The type of the OfflineRegionDefinition.
    */

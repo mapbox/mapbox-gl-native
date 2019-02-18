@@ -14,8 +14,7 @@ LineBucket::LineBucket(const style::LineLayoutProperties::PossiblyEvaluated layo
                        std::map<std::string, RenderLinePaintProperties::PossiblyEvaluated> layerPaintProperties,
                        const float zoom_,
                        const uint32_t overscaling_)
-    : Bucket(LayerType::Line),
-      layout(layout_),
+    : layout(layout_),
       zoom(zoom_),
       overscaling(overscaling_) {
 
@@ -29,6 +28,7 @@ LineBucket::LineBucket(const style::LineLayoutProperties::PossiblyEvaluated layo
     }
 }
 
+LineBucket::~LineBucket() = default;
 
 void LineBucket::addFeature(const GeometryTileFeature& feature,
                             const GeometryCollection& geometryCollection,
@@ -521,6 +521,10 @@ void LineBucket::upload(gl::Context& context) {
 
 bool LineBucket::hasData() const {
     return !segments.empty();
+}
+
+bool LineBucket::supportsLayer(const style::Layer::Impl& impl) const {
+    return style::LineLayer::Impl::staticTypeInfo() == impl.getTypeInfo();
 }
 
 template <class Property>

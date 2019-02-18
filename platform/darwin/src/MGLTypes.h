@@ -94,7 +94,7 @@ typedef struct __attribute__((objc_boxable)) MGLTransition {
     /**
      The amount of time in seconds to wait before beginning the animation.
      */
-    NSTimeInterval delay;
+    NSTimeInterval delay; 
 } MGLTransition;
 
 NS_INLINE NSString *MGLStringFromMGLTransition(MGLTransition transition) {

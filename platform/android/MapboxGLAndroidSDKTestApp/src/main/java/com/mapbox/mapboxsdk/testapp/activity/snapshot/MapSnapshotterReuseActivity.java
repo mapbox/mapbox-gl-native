@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.snapshotter.MapSnapshot;
@@ -22,7 +22,6 @@ public class MapSnapshotterReuseActivity extends AppCompatActivity implements Ma
 
   private MapSnapshotter mapSnapshotter;
   private View fab;
-
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -59,17 +58,15 @@ public class MapSnapshotterReuseActivity extends AppCompatActivity implements Ma
   @Override
   public void onSnapshotReady(MapSnapshot snapshot) {
     fab.setVisibility(View.VISIBLE);
-    ImageView imageView = (ImageView) findViewById(R.id.snapshot_image);
+    ImageView imageView = findViewById(R.id.snapshot_image);
     imageView.setImageBitmap(snapshot.getBitmap());
   }
 
   private LatLngBounds getRandomBounds() {
-    return LatLngBounds.from(
-      randomInRange(5, 10),
-      randomInRange(-5, 5),
-      randomInRange(-5, 5),
-      randomInRange(5, 10)
-    );
+    return new LatLngBounds.Builder()
+      .include(new LatLng(randomInRange(5, 10), randomInRange(-5, 5)))
+      .include(new LatLng(randomInRange(-5, 5), randomInRange(5, 10)))
+      .build();
   }
 
   private CameraPosition getRandomCameraPosition() {

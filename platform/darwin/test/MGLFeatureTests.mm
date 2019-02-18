@@ -2,6 +2,7 @@
 #import <XCTest/XCTest.h>
 
 #import <mbgl/util/geometry.hpp>
+#import "MGLFoundation_Private.h"
 #import "../../darwin/src/MGLFeature_Private.h"
 
 @interface MGLFeatureTests : XCTestCase
@@ -83,6 +84,26 @@
                           [NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(3, 3)]);
     XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:interiorPolygonCoordinates[3]],
                           [NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(3, 2)]);
+}
+
+- (void)testClusterGeometryConversion {    
+    mbgl::Point<double> point = { -90.066667, 29.95 };
+    mbgl::Feature pointFeature { point };
+    pointFeature.id = { UINT64_MAX };
+    pointFeature.properties["cluster"] = true;
+    pointFeature.properties["cluster_id"] = 1ULL;
+    pointFeature.properties["point_count"] = 5ULL;
+    
+    id<MGLFeature> feature = MGLFeatureFromMBGLFeature(pointFeature);
+    
+    XCTAssert([feature conformsToProtocol:@protocol(MGLFeature)]);
+    
+    id<MGLCluster> cluster = MGL_OBJC_DYNAMIC_CAST_AS_PROTOCOL(feature, MGLCluster);
+    XCTAssert(cluster);
+    XCTAssert(cluster.clusterIdentifier == 1);
+    XCTAssert(cluster.clusterPointCount == 5);
+    
+    XCTAssert([cluster isMemberOfClass:[MGLPointFeatureCluster class]]);
 }
 
 - (void)testPropertyConversion {
@@ -176,7 +197,7 @@
     // it has no "id" key (or value)
     XCTAssertNil(geoJSONFeature[@"id"]);
     // it has a null representation of the properties object
-    XCTAssertEqualObjects(geoJSONFeature[@"properties"], [NSNull null]);
+    XCTAssertEqualObjects(geoJSONFeature[@"properties"], @{});
 
     // when there is a string identifier
     pointFeature.identifier = @"string-id";
@@ -317,13 +338,13 @@
                                        @"geometries": @[
                                            @{ @"geometry": @{@"type": @"Point",
                                                              @"coordinates": @[@(pointCoordinate.longitude), @(pointCoordinate.latitude)]},
-                                              @"properties": [NSNull null],
+                                              @"properties": @{},
                                               @"type": @"Feature",
                                              },
                                             @{ @"geometry": @{@"type": @"LineString",
                                                               @"coordinates": @[@[@(coord1.longitude), @(coord1.latitude)],
                                                                                 @[@(coord2.longitude), @(coord2.latitude)]]},
-                                               @"properties": [NSNull null],
+                                               @"properties": @{},
                                                @"type": @"Feature",
                                             }
                                         ]

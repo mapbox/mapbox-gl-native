@@ -80,4 +80,13 @@ public:
 using BackgroundLayoutVertex = BackgroundProgram::LayoutVertex;
 using BackgroundAttributes = BackgroundProgram::Attributes;
 
+class BackgroundLayerPrograms final : public LayerTypePrograms  {
+public:
+    BackgroundLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+        : background(context, programParameters),
+          backgroundPattern(context, programParameters) {}
+    BackgroundProgram background;
+    BackgroundPatternProgram backgroundPattern;
+};
+
 } // namespace mbgl

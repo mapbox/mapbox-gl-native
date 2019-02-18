@@ -103,4 +103,17 @@ public:
 using FillLayoutVertex = FillProgram::LayoutVertex;
 using FillAttributes = FillProgram::Attributes;
 
+class FillLayerPrograms final : public LayerTypePrograms {
+public:
+    FillLayerPrograms(gl::Context& context, const ProgramParameters& programParameters)
+        : fill(context, programParameters),
+          fillPattern(context, programParameters),
+          fillOutline(context, programParameters),
+          fillOutlinePattern(context, programParameters) {}
+    ProgramMap<FillProgram> fill;
+    ProgramMap<FillPatternProgram> fillPattern;
+    ProgramMap<FillOutlineProgram> fillOutline;
+    ProgramMap<FillOutlinePatternProgram> fillOutlinePattern;
+};
+
 } // namespace mbgl

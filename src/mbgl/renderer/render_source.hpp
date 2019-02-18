@@ -4,6 +4,7 @@
 #include <mbgl/tile/tile_observer.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/geojson.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/layer_impl.hpp>
@@ -57,7 +58,7 @@ public:
     virtual void startRender(PaintParameters&) = 0;
     virtual void finishRender(PaintParameters&) = 0;
 
-    // Returns an unsorted list of RenderTiles.
+    // Returns a list of RenderTiles, sorted by tile id.
     virtual std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() = 0;
 
     virtual std::unordered_map<std::string, std::vector<Feature>>
@@ -69,6 +70,14 @@ public:
 
     virtual std::vector<Feature>
     querySourceFeatures(const SourceQueryOptions&) const = 0;
+
+    virtual FeatureExtensionValue
+    queryFeatureExtensions(const Feature&,
+                           const std::string&,
+                           const std::string&,
+                           const optional<std::map<std::string, Value>>&) const {
+        return {};
+    }
 
     virtual void reduceMemoryUse() = 0;
 

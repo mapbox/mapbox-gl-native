@@ -69,6 +69,9 @@ public:
     QString apiBaseUrl() const;
     void setApiBaseUrl(const QString &);
 
+    QString localFontFamily() const;
+    void setLocalFontFamily(const QString &);
+
     std::function<std::string(const std::string &&)> resourceTransform() const;
     void setResourceTransform(const std::function<std::string(const std::string &&)> &);
 
@@ -83,6 +86,7 @@ private:
     QString m_assetPath;
     QString m_accessToken;
     QString m_apiBaseUrl;
+    QString m_localFontFamily;
     std::function<std::string(const std::string &&)> m_resourceTransform;
 };
 
@@ -236,7 +240,7 @@ public:
     bool layerExists(const QString &id);
     void removeLayer(const QString &id);
 
-    QList<QString> layerIds() const;
+    QVector<QString> layerIds() const;
 
     void setFilter(const QString &layer, const QVariant &filter);
     QVariant getFilter(const QString &layer) const;

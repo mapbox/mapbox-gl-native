@@ -6,9 +6,9 @@ macro(mbgl_platform_core)
     )
 
     target_include_directories(mbgl-core
-        PUBLIC platform/default
         PRIVATE platform/qt
         PRIVATE platform/qt/include
+        PUBLIC platform/default/include
     )
 
     target_link_libraries(mbgl-core PRIVATE
@@ -18,8 +18,8 @@ macro(mbgl_platform_core)
 
     if(NOT WITH_QT_DECODERS)
         target_sources(mbgl-core
-            PRIVATE platform/default/jpeg_reader.cpp
-            PRIVATE platform/default/png_reader.cpp
+            PRIVATE platform/default/src/mbgl/util/jpeg_reader.cpp
+            PRIVATE platform/default/src/mbgl/util/png_reader.cpp
         )
 
         target_add_mason_package(mbgl-core PRIVATE libjpeg-turbo)
@@ -29,7 +29,7 @@ macro(mbgl_platform_core)
     endif()
 
     if(NOT WITH_QT_I18N)
-        target_sources(mbgl-core PRIVATE platform/default/bidi.cpp)
+        target_sources(mbgl-core PRIVATE platform/default/src/mbgl/text/bidi.cpp)
         target_link_libraries(mbgl-core PRIVATE icu)
     else()
         target_sources(mbgl-core PRIVATE platform/qt/src/bidi.cpp)

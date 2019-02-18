@@ -67,6 +67,7 @@ public:
     void onDidFinishRenderingFrame(MapObserver::RenderMode) override;
     void onWillStartRenderingMap() override;
     void onDidFinishRenderingMap(MapObserver::RenderMode) override;
+    void onDidBecomeIdle() override;
     void onDidFinishLoadingStyle() override;
     void onSourceChanged(mbgl::style::Source&) override;
 
@@ -138,7 +139,9 @@ public:
 
     void setVisibleCoordinateBounds(JNIEnv&, const jni::Array<jni::Object<LatLng>>&, const jni::Object<RectF>&, jni::jdouble, jni::jlong);
 
-    void setContentPadding(JNIEnv&, double, double, double, double);
+    void setContentPadding(JNIEnv&, float, float, float, float);
+
+    jni::Local<jni::Array<jni::jfloat>> getContentPadding(JNIEnv&);
 
     void scheduleSnapshot(jni::JNIEnv&);
 
@@ -184,13 +187,9 @@ public:
 
     jni::jdouble getTopOffsetPixelsForAnnotationSymbol(JNIEnv&, const jni::String&);
 
-    jni::jlong getTransitionDuration(JNIEnv&);
+    jni::Local<jni::Object<TransitionOptions>> getTransitionOptions(JNIEnv&);
 
-    void setTransitionDuration(JNIEnv&, jni::jlong);
-
-    jni::jlong getTransitionDelay(JNIEnv&);
-
-    void setTransitionDelay(JNIEnv&, jni::jlong);
+    void setTransitionOptions(JNIEnv&, const jni::Object<TransitionOptions>&);
 
     jni::Local<jni::Array<jlong>> queryPointAnnotations(JNIEnv&, const jni::Object<RectF>&);
 
@@ -236,9 +235,9 @@ public:
 
     jni::Local<jni::Object<Bitmap>> getImage(JNIEnv&, const jni::String&);
 
-    void setPrefetchesTiles(JNIEnv&, jni::jboolean);
+    void setPrefetchTiles(JNIEnv&, jni::jboolean);
 
-    jni::jboolean getPrefetchesTiles(JNIEnv&);
+    jni::jboolean getPrefetchTiles(JNIEnv&);
 
     mbgl::Map& getMap();
 

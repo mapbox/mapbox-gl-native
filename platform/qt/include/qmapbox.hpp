@@ -2,10 +2,10 @@
 #define QMAPBOX_H
 
 #include <QColor>
-#include <QList>
 #include <QPair>
-#include <QVariant>
 #include <QString>
+#include <QVariant>
+#include <QVector>
 
 // This header follows the Qt coding style: https://wiki.qt.io/Qt_Coding_Style
 
@@ -25,10 +25,10 @@ typedef QPair<double, double> Coordinate;
 typedef QPair<Coordinate, double> CoordinateZoom;
 typedef QPair<double, double> ProjectedMeters;
 
-typedef QList<Coordinate> Coordinates;
-typedef QList<Coordinates> CoordinatesCollection;
+typedef QVector<Coordinate> Coordinates;
+typedef QVector<Coordinates> CoordinatesCollection;
 
-typedef QList<CoordinatesCollection> CoordinatesCollections;
+typedef QVector<CoordinatesCollection> CoordinatesCollections;
 
 struct Q_MAPBOXGL_EXPORT Feature {
     enum Type {
@@ -95,14 +95,14 @@ struct Q_MAPBOXGL_EXPORT FillAnnotation {
 
 typedef QVariant Annotation;
 typedef quint32 AnnotationID;
-typedef QList<AnnotationID> AnnotationIDs;
+typedef QVector<AnnotationID> AnnotationIDs;
 
 enum NetworkMode {
     Online, // Default
     Offline,
 };
 
-Q_MAPBOXGL_EXPORT QList<QPair<QString, QString> >& defaultStyles();
+Q_MAPBOXGL_EXPORT QVector<QPair<QString, QString> >& defaultStyles();
 
 Q_MAPBOXGL_EXPORT NetworkMode networkMode();
 Q_MAPBOXGL_EXPORT void setNetworkMode(NetworkMode);
@@ -126,6 +126,10 @@ public:
     virtual void render(const CustomLayerRenderParameters&) = 0;
     virtual void deinitialize() = 0;
 };
+
+Q_MAPBOXGL_EXPORT double metersPerPixelAtLatitude(double latitude, double zoom);
+Q_MAPBOXGL_EXPORT ProjectedMeters projectedMetersForCoordinate(const Coordinate &);
+Q_MAPBOXGL_EXPORT Coordinate coordinateForProjectedMeters(const ProjectedMeters &);
 
 } // namespace QMapbox
 

@@ -8,9 +8,12 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.view.View;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * Utility class for creating bitmaps
@@ -119,6 +122,25 @@ public class BitmapUtils {
     }
     Bitmap compass = BitmapFactory.decodeByteArray(array, 0, array.length);
     return new BitmapDrawable(context.getResources(), compass);
+  }
+
+
+  /**
+   * Validates if the bytes of a bitmap matches another
+   *
+   * @param bitmap the bitmap to be compared against
+   * @param other  the bitmap to compare with
+   * @return true if equal
+   */
+  @VisibleForTesting
+  public static boolean equals(Bitmap bitmap, Bitmap other) {
+    ByteBuffer buffer = ByteBuffer.allocate(bitmap.getHeight() * bitmap.getRowBytes());
+    bitmap.copyPixelsToBuffer(buffer);
+
+    ByteBuffer bufferOther = ByteBuffer.allocate(other.getHeight() * other.getRowBytes());
+    other.copyPixelsToBuffer(bufferOther);
+
+    return Arrays.equals(buffer.array(), bufferOther.array());
   }
 
 }

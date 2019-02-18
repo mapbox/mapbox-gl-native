@@ -1,9 +1,11 @@
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/context.hpp>
-#include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/defines.hpp>
 
 namespace mbgl {
 namespace gl {
+
+using namespace platform;
 
 void bindAttributeLocation(Context& context, ProgramID id, AttributeLocation location, const char* name) {
     // We're using sequentially numberered attribute locations starting with 0. Therefore we can use

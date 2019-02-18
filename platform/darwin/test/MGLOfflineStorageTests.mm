@@ -140,7 +140,7 @@
     MGLShape *shape = [MGLShape shapeWithData: [geojson dataUsingEncoding:NSUTF8StringEncoding] encoding: NSUTF8StringEncoding error:&error];
     XCTAssertNil(error);
     MGLShapeOfflineRegion *region = [[MGLShapeOfflineRegion alloc] initWithStyleURL:styleURL shape:shape fromZoomLevel:zoomLevel toZoomLevel:zoomLevel];
-    
+    region.includesIdeographicGlyphs = NO;
     
     NSString *nameKey = @"Name";
     NSString *name = @"Utrecht centrum";
@@ -333,7 +333,7 @@
         MGLOfflineStorage *os = [MGLOfflineStorage sharedOfflineStorage];
         [os addContentsOfFile:filePath withCompletionHandler:^(NSURL *fileURL, NSArray<MGLOfflinePack *> * _Nullable packs, NSError * _Nullable error) {
             XCTAssertNotNil(fileURL, @"The fileURL should not be nil.");
-            XCTAssertNotNil(packs, @"Adding the contents of the barcelona.db should update one pack.");
+            XCTAssertNotNil(packs, @"Adding the contents of the sideload_sat.db should update one pack.");
             XCTAssertNil(error, @"Adding contents to a file should not return an error.");
             for (MGLOfflinePack *pack in [MGLOfflineStorage sharedOfflineStorage].packs) {
                 NSLog(@"PACK:%@", pack);
@@ -342,7 +342,7 @@
         }];
         [self waitForExpectationsWithTimeout:10 handler:nil];
         // Depending on the database it may update or add a pack. For this case specifically the offline database adds one pack.
-        XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Adding contents of barcelona.db should add one pack.");
+        XCTAssertEqual([MGLOfflineStorage sharedOfflineStorage].packs.count, countOfPacks + 1, @"Adding contents of sideload_sat.db should add one pack.");
 
     }
     // Invalid database type

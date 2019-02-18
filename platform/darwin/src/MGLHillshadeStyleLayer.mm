@@ -10,6 +10,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLHillshadeStyleLayer_Private.h"
 
+#include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 
 
@@ -73,19 +74,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting hillshadeAccentColorTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setHillshadeAccentColorTransition(options);
+    self.rawLayer->setHillshadeAccentColorTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)hillshadeAccentColorTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getHillshadeAccentColorTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setHillshadeExaggeration:(NSExpression *)hillshadeExaggeration {
@@ -110,19 +107,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting hillshadeExaggerationTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setHillshadeExaggerationTransition(options);
+    self.rawLayer->setHillshadeExaggerationTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)hillshadeExaggerationTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getHillshadeExaggerationTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setHillshadeHighlightColor:(NSExpression *)hillshadeHighlightColor {
@@ -147,19 +140,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting hillshadeHighlightColorTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setHillshadeHighlightColorTransition(options);
+    self.rawLayer->setHillshadeHighlightColorTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)hillshadeHighlightColorTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getHillshadeHighlightColorTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setHillshadeIlluminationAnchor:(NSExpression *)hillshadeIlluminationAnchor {
@@ -220,19 +209,15 @@ namespace mbgl {
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting hillshadeShadowColorTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setHillshadeShadowColorTransition(options);
+    self.rawLayer->setHillshadeShadowColorTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)hillshadeShadowColorTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getHillshadeShadowColorTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 @end

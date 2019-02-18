@@ -9,9 +9,8 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
-#include <mbgl/util/fnv_hash.hpp>
 
-#include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
+#include <mapbox/eternal.hpp>
 
 namespace mbgl {
 namespace style {
@@ -282,8 +281,7 @@ TransitionOptions FillExtrusionLayer::getFillExtrusionVerticalGradientTransition
 using namespace conversion;
 
 optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        Unknown,
+    enum class Property : uint8_t {
         FillExtrusionOpacity,
         FillExtrusionColor,
         FillExtrusionTranslate,
@@ -302,94 +300,31 @@ optional<Error> FillExtrusionLayer::setPaintProperty(const std::string& name, co
         FillExtrusionVerticalGradientTransition,
     };
 
-    Property property = Property::Unknown;
-    switch (util::hashFNV1a(name.c_str())) {
-    case util::hashFNV1a("fill-extrusion-opacity"):
-        if (name == "fill-extrusion-opacity") {
-            property = Property::FillExtrusionOpacity;
-        }
-        break;
-    case util::hashFNV1a("fill-extrusion-opacity-transition"):
-        if (name == "fill-extrusion-opacity-transition") {
-            property = Property::FillExtrusionOpacityTransition;
-        }
-        break;
-    case util::hashFNV1a("fill-extrusion-color"):
-        if (name == "fill-extrusion-color") {
-            property = Property::FillExtrusionColor;
-        }
-        break;
-    case util::hashFNV1a("fill-extrusion-color-transition"):
-        if (name == "fill-extrusion-color-transition") {
-            property = Property::FillExtrusionColorTransition;
-        }
-        break;
-    case util::hashFNV1a("fill-extrusion-translate"):
-        if (name == "fill-extrusion-translate") {
-            property = Property::FillExtrusionTranslate;
-        }
-        break;
-    case util::hashFNV1a("fill-extrusion-translate-transition"):
-        if (name == "fill-extrusion-translate-transition") {
-            property = Property::FillExtrusionTranslateTransition;
-        }
-        break;
-    case util::hashFNV1a("fill-extrusion-translate-anchor"):
-        if (name == "fill-extrusion-translate-anchor") {
-            property = Property::FillExtrusionTranslateAnchor;
-        }
-        break;
-    case util::hashFNV1a("fill-extrusion-translate-anchor-transition"):
-        if (name == "fill-extrusion-translate-anchor-transition") {
-            property = Property::FillExtrusionTranslateAnchorTransition;
-        }
-        break;
-    case util::hashFNV1a("fill-extrusion-pattern"):
-        if (name == "fill-extrusion-pattern") {
-            property = Property::FillExtrusionPattern;
-        }
-        break;
-    case util::hashFNV1a("fill-extrusion-pattern-transition"):
-        if (name == "fill-extrusion-pattern-transition") {
-            property = Property::FillExtrusionPatternTransition;
-        }
-        break;
-    case util::hashFNV1a("fill-extrusion-height"):
-        if (name == "fill-extrusion-height") {
-            property = Property::FillExtrusionHeight;
-        }
-        break;
-    case util::hashFNV1a("fill-extrusion-height-transition"):
-        if (name == "fill-extrusion-height-transition") {
-            property = Property::FillExtrusionHeightTransition;
-        }
-        break;
-    case util::hashFNV1a("fill-extrusion-base"):
-        if (name == "fill-extrusion-base") {
-            property = Property::FillExtrusionBase;
-        }
-        break;
-    case util::hashFNV1a("fill-extrusion-base-transition"):
-        if (name == "fill-extrusion-base-transition") {
-            property = Property::FillExtrusionBaseTransition;
-        }
-        break;
-    case util::hashFNV1a("fill-extrusion-vertical-gradient"):
-        if (name == "fill-extrusion-vertical-gradient") {
-            property = Property::FillExtrusionVerticalGradient;
-        }
-        break;
-    case util::hashFNV1a("fill-extrusion-vertical-gradient-transition"):
-        if (name == "fill-extrusion-vertical-gradient-transition") {
-            property = Property::FillExtrusionVerticalGradientTransition;
-        }
-        break;
-    
-    }
+    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
+        { "fill-extrusion-opacity", static_cast<uint8_t>(Property::FillExtrusionOpacity) },
+        { "fill-extrusion-color", static_cast<uint8_t>(Property::FillExtrusionColor) },
+        { "fill-extrusion-translate", static_cast<uint8_t>(Property::FillExtrusionTranslate) },
+        { "fill-extrusion-translate-anchor", static_cast<uint8_t>(Property::FillExtrusionTranslateAnchor) },
+        { "fill-extrusion-pattern", static_cast<uint8_t>(Property::FillExtrusionPattern) },
+        { "fill-extrusion-height", static_cast<uint8_t>(Property::FillExtrusionHeight) },
+        { "fill-extrusion-base", static_cast<uint8_t>(Property::FillExtrusionBase) },
+        { "fill-extrusion-vertical-gradient", static_cast<uint8_t>(Property::FillExtrusionVerticalGradient) },
+        { "fill-extrusion-opacity-transition", static_cast<uint8_t>(Property::FillExtrusionOpacityTransition) },
+        { "fill-extrusion-color-transition", static_cast<uint8_t>(Property::FillExtrusionColorTransition) },
+        { "fill-extrusion-translate-transition", static_cast<uint8_t>(Property::FillExtrusionTranslateTransition) },
+        { "fill-extrusion-translate-anchor-transition", static_cast<uint8_t>(Property::FillExtrusionTranslateAnchorTransition) },
+        { "fill-extrusion-pattern-transition", static_cast<uint8_t>(Property::FillExtrusionPatternTransition) },
+        { "fill-extrusion-height-transition", static_cast<uint8_t>(Property::FillExtrusionHeightTransition) },
+        { "fill-extrusion-base-transition", static_cast<uint8_t>(Property::FillExtrusionBaseTransition) },
+        { "fill-extrusion-vertical-gradient-transition", static_cast<uint8_t>(Property::FillExtrusionVerticalGradientTransition) }
+    });
 
-    if (property == Property::Unknown) {
+    const auto it = properties.find(name.c_str());
+    if (it == properties.end()) {
         return Error { "layer doesn't support this property" };
     }
+
+    Property property = static_cast<Property>(it->second);
 
         
     if (property == Property::FillExtrusionOpacity) {
@@ -539,21 +474,6 @@ optional<Error> FillExtrusionLayer::setLayoutProperty(const std::string& name, c
         return Layer::setVisibility(value);
     }
 
-    enum class Property {
-        Unknown,
-    };
-
-    Property property = Property::Unknown;
-    switch (util::hashFNV1a(name.c_str())) {
-    
-    }
-
-    if (property == Property::Unknown) {
-        return Error { "layer doesn't support this property" };
-    }
-
-        
-
     return Error { "layer doesn't support this property" };
 }
 
@@ -562,27 +482,4 @@ Mutable<Layer::Impl> FillExtrusionLayer::mutableBaseImpl() const {
 }
 
 } // namespace style
-
-const style::LayerTypeInfo* FillExtrusionLayerFactory::getTypeInfo() const noexcept {
-    return style::FillExtrusionLayer::Impl::staticTypeInfo();
-}
-
-std::unique_ptr<style::Layer> FillExtrusionLayerFactory::createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept {
-    optional<std::string> source = getSource(value);
-    if (!source) {
-        return nullptr;
-    }
-
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::FillExtrusionLayer(id, *source));
-    if (!initSourceLayerAndFilter(layer.get(), value)) {
-        return nullptr;
-    }
-    return layer;
-}
-
-std::unique_ptr<RenderLayer> FillExtrusionLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
-    assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderFillExtrusionLayer>(staticImmutableCast<style::FillExtrusionLayer::Impl>(std::move(impl)));
-}
-
 } // namespace mbgl

@@ -16,11 +16,11 @@ import java.util.List;
  */
 class PolylineContainer implements Polylines {
 
-  private final NativeMapView nativeMapView;
+  private final NativeMap nativeMap;
   private final LongSparseArray<Annotation> annotations;
 
-  PolylineContainer(NativeMapView nativeMapView, LongSparseArray<Annotation> annotations) {
-    this.nativeMapView = nativeMapView;
+  PolylineContainer(NativeMap nativeMap, LongSparseArray<Annotation> annotations) {
+    this.nativeMap = nativeMap;
     this.annotations = annotations;
   }
 
@@ -28,7 +28,7 @@ class PolylineContainer implements Polylines {
   public Polyline addBy(@NonNull PolylineOptions polylineOptions, @NonNull MapboxMap mapboxMap) {
     Polyline polyline = polylineOptions.getPolyline();
     if (!polyline.getPoints().isEmpty()) {
-      long id = nativeMapView != null ? nativeMapView.addPolyline(polyline) : 0;
+      long id = nativeMap != null ? nativeMap.addPolyline(polyline) : 0;
       polyline.setMapboxMap(mapboxMap);
       polyline.setId(id);
       annotations.put(id, polyline);
@@ -42,7 +42,7 @@ class PolylineContainer implements Polylines {
     int count = polylineOptionsList.size();
     Polyline polyline;
     List<Polyline> polylines = new ArrayList<>(count);
-    if (nativeMapView != null && count > 0) {
+    if (nativeMap != null && count > 0) {
       for (PolylineOptions options : polylineOptionsList) {
         polyline = options.getPolyline();
         if (!polyline.getPoints().isEmpty()) {
@@ -50,7 +50,7 @@ class PolylineContainer implements Polylines {
         }
       }
 
-      long[] ids = nativeMapView.addPolylines(polylines);
+      long[] ids = nativeMap.addPolylines(polylines);
       for (int i = 0; i < ids.length; i++) {
         Polyline polylineCreated = polylines.get(i);
         polylineCreated.setMapboxMap(mapboxMap);
@@ -63,7 +63,7 @@ class PolylineContainer implements Polylines {
 
   @Override
   public void update(@NonNull Polyline polyline) {
-    nativeMapView.updatePolyline(polyline);
+    nativeMap.updatePolyline(polyline);
     annotations.setValueAt(annotations.indexOfKey(polyline.getId()), polyline);
   }
 

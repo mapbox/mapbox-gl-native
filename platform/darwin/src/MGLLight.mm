@@ -5,7 +5,6 @@
 #import "MGLLight.h"
 
 #import "MGLTypes.h"
-#import "NSDate+MGLAdditions.h"
 #import "MGLStyleValue_Private.h"
 #import "NSValue+MGLAdditions.h"
 #import "MGLLoggingConfiguration_Private.h"
@@ -20,19 +19,6 @@ namespace mbgl {
         { MGLLightAnchorViewport, "viewport" },
     });
 
-}
-
-NS_INLINE MGLTransition MGLTransitionFromOptions(const mbgl::style::TransitionOptions& options) {
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(options.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(options.delay.value_or(mbgl::Duration::zero()));
-
-    return transition;
-}
-
-NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition transition) {
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    return options;
 }
 
 @interface MGLLight()

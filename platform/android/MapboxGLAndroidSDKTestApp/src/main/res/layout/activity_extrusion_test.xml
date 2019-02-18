@@ -12,7 +12,6 @@
         app:mapbox_cameraTargetLat="40.7135"
         app:mapbox_cameraTargetLng="-74.0066"
         app:mapbox_cameraTilt="45"
-        app:mapbox_cameraZoom="15"
-        app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"/>
+        app:mapbox_cameraZoom="15"/>
 
 </RelativeLayout>

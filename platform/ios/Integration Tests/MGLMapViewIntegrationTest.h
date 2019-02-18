@@ -16,6 +16,13 @@
 #define MGLTestAssertNotNil(myself, expression, ...) \
     _XCTPrimitiveAssertNotNil(myself, expression, @#expression, __VA_ARGS__)
 
+#define MGLTestWarning(expression, format, ...) \
+({ \
+    if (!(expression))  { \
+        NSString *message = [NSString stringWithFormat:format, ##__VA_ARGS__]; \
+        printf("warning: Test Case '%s' at line %d: '%s' %s\n", __PRETTY_FUNCTION__, __LINE__, #expression, message.UTF8String); \
+    } \
+})
 
 @interface MGLMapViewIntegrationTest : XCTestCase <MGLMapViewDelegate>
 @property (nonatomic) MGLMapView *mapView;
@@ -27,6 +34,8 @@
 @property (nonatomic) void (^regionIsChanging)(MGLMapView *mapView);
 @property (nonatomic) void (^regionDidChange)(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated);
 @property (nonatomic) CGPoint (^mapViewUserLocationAnchorPoint)(MGLMapView *mapView);
+@property (nonatomic) BOOL (^mapViewAnnotationCanShowCalloutForAnnotation)(MGLMapView *mapView, id<MGLAnnotation> annotation);
+@property (nonatomic) id<MGLCalloutView> (^mapViewCalloutViewForAnnotation)(MGLMapView *mapView, id<MGLAnnotation> annotation);
 
 // Utility methods
 - (NSString*)validAccessToken;

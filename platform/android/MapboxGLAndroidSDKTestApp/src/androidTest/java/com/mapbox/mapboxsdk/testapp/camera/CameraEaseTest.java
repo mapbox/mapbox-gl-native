@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.testapp.camera;
 
-import android.graphics.PointF;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingRegistry;
 import android.support.test.espresso.idling.CountingIdlingResource;
@@ -10,7 +9,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
+import com.mapbox.mapboxsdk.testapp.activity.BaseTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.DeviceIndependentTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.TestConstants;
 
@@ -19,7 +18,7 @@ import org.junit.Test;
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
 import static org.junit.Assert.assertEquals;
 
-public class CameraEaseTest extends BaseActivityTest {
+public class CameraEaseTest extends BaseTest {
 
   private final CountingIdlingResource animationIdlingResource =
     new CountingIdlingResource("animation_idling_resource");
@@ -150,35 +149,6 @@ public class CameraEaseTest extends BaseActivityTest {
           @Override
           public void onFinish() {
             verifyCameraPosition(mapboxMap, centerBounds, mapboxMap.getCameraPosition().zoom, 0, 0);
-            animationIdlingResource.decrement();
-          }
-        });
-    });
-
-    Espresso.onIdle();
-  }
-
-  @Test
-  public void testEaseToMoveBy() {
-    validateTestSetup();
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      final PointF centerPoint = mapboxMap.getProjection().toScreenLocation(mapboxMap.getCameraPosition().target);
-      final LatLng moveTarget = new LatLng(2, 2);
-      final PointF moveTargetPoint = mapboxMap.getProjection().toScreenLocation(moveTarget);
-
-      animationIdlingResource.increment();
-      mapboxMap.easeCamera(CameraUpdateFactory.scrollBy(
-        moveTargetPoint.x - centerPoint.x, moveTargetPoint.y - centerPoint.y),
-        new MapboxMap.CancelableCallback() {
-          @Override
-          public void onCancel() {
-            verifyCameraPosition(mapboxMap, moveTarget, mapboxMap.getCameraPosition().zoom, 0, 0);
-            animationIdlingResource.decrement();
-          }
-
-          @Override
-          public void onFinish() {
-            verifyCameraPosition(mapboxMap, moveTarget, mapboxMap.getCameraPosition().zoom, 0, 0);
             animationIdlingResource.decrement();
           }
         });

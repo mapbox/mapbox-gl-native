@@ -1,4 +1,6 @@
+#import "MGLFoundation_Private.h"
 #import "MGLFeature_Private.h"
+#import "MGLCluster.h"
 
 #import "MGLPointAnnotation.h"
 #import "MGLPolyline.h"
@@ -19,17 +21,23 @@
 #import <mbgl/style/conversion/geojson.hpp>
 #import <mapbox/feature.hpp>
 
+// Cluster constants
+static NSString * const MGLClusterIdentifierKey = @"cluster_id";
+static NSString * const MGLClusterCountKey = @"point_count";
+const NSUInteger MGLClusterIdentifierInvalid = NSUIntegerMax;
+
 @interface MGLEmptyFeature ()
 @end
 
 @implementation MGLEmptyFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     MGLLogDebug(@"Retrieving attributeForKey: %@", key);
@@ -60,11 +68,12 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 @implementation MGLPointFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     MGLLogDebug(@"Retrieving attributeForKey: %@", key);
@@ -90,17 +99,43 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 
 @end
 
+@implementation MGLPointFeatureCluster
+
+- (NSUInteger)clusterIdentifier {
+    NSNumber *clusterNumber = MGL_OBJC_DYNAMIC_CAST([self attributeForKey:MGLClusterIdentifierKey], NSNumber);
+    MGLAssert(clusterNumber, @"Clusters should have a cluster_id");
+    
+    if (!clusterNumber) {
+        return MGLClusterIdentifierInvalid;
+    }
+    
+    NSUInteger clusterIdentifier = [clusterNumber unsignedIntegerValue];
+    MGLAssert(clusterIdentifier <= UINT32_MAX, @"Cluster identifiers are 32bit");
+    
+    return clusterIdentifier;
+}
+
+- (NSUInteger)clusterPointCount {
+    NSNumber *count = MGL_OBJC_DYNAMIC_CAST([self attributeForKey:MGLClusterCountKey], NSNumber);
+    MGLAssert(count, @"Clusters should have a point_count");
+    
+    return [count unsignedIntegerValue];
+}
+@end
+
+
 @interface MGLPolylineFeature ()
 @end
 
 @implementation MGLPolylineFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     MGLLogDebug(@"Retrieving attributeForKey: %@", key);
@@ -133,11 +168,12 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 @implementation MGLPolygonFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     MGLLogDebug(@"Retrieving attributeForKey: %@", key);
@@ -170,11 +206,12 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 @implementation MGLPointCollectionFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     MGLLogDebug(@"Retrieving attributeForKey: %@", key);
@@ -197,11 +234,12 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 @implementation MGLMultiPolylineFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     MGLLogDebug(@"Retrieving attributeForKey: %@", key);
@@ -234,11 +272,12 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 @implementation MGLMultiPolygonFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     MGLLogDebug(@"Retrieving attributeForKey: %@", key);
@@ -271,7 +310,7 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 @implementation MGLShapeCollectionFeature
 
 @synthesize identifier;
-@synthesize attributes;
+@synthesize attributes = _attributes;
 
 @dynamic shapes;
 
@@ -282,6 +321,7 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 MGL_DEFINE_FEATURE_INIT_WITH_CODER();
 MGL_DEFINE_FEATURE_ENCODE();
 MGL_DEFINE_FEATURE_IS_EQUAL();
+MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER();
 
 - (id)attributeForKey:(NSString *)key {
     return self.attributes[key];
@@ -310,14 +350,38 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
  */
 template <typename T>
 class GeometryEvaluator {
+private:
+    const mbgl::PropertyMap *shared_properties;
+    
 public:
+    GeometryEvaluator(const mbgl::PropertyMap *properties = nullptr):
+        shared_properties(properties)
+    {}
+    
     MGLShape <MGLFeature> * operator()(const mbgl::EmptyGeometry &) const {
         MGLEmptyFeature *feature = [[MGLEmptyFeature alloc] init];
         return feature;
     }
 
     MGLShape <MGLFeature> * operator()(const mbgl::Point<T> &geometry) const {
-        MGLPointFeature *feature = [[MGLPointFeature alloc] init];
+        Class pointFeatureClass = [MGLPointFeature class];
+        
+        // If we're dealing with a cluster, we should change the class type.
+        // This could be generic and build the subclass at runtime if it turns
+        // out we need to support more than point clusters.
+        if (shared_properties) {
+            auto clusterIt = shared_properties->find("cluster");
+            if (clusterIt != shared_properties->end()) {
+                auto clusterValue = clusterIt->second;
+                if (clusterValue.template is<bool>()) {
+                    if (clusterValue.template get<bool>()) {
+                        pointFeatureClass = [MGLPointFeatureCluster class];
+                    }
+                }
+            }
+        }
+        
+        MGLPointFeature *feature = [[pointFeatureClass alloc] init];
         feature.coordinate = toLocationCoordinate2D(geometry);
         return feature;
     }
@@ -435,7 +499,7 @@ id <MGLFeature> MGLFeatureFromMBGLFeature(const mbgl::Feature &feature) {
         ValueEvaluator evaluator;
         attributes[@(pair.first.c_str())] = mbgl::Value::visit(value, evaluator);
     }
-    GeometryEvaluator<double> evaluator;
+    GeometryEvaluator<double> evaluator(&feature.properties);
     MGLShape <MGLFeature> *shape = mapbox::geometry::geometry<double>::visit(feature.geometry, evaluator);
     if (!feature.id.is<mapbox::feature::null_value_t>()) {
         shape.identifier = mbgl::FeatureIdentifier::visit(feature.id, ValueEvaluator());
@@ -463,7 +527,7 @@ mbgl::Feature mbglFeature(mbgl::Feature feature, id identifier, NSDictionary *at
 
 NSDictionary<NSString *, id> *NSDictionaryFeatureForGeometry(NSDictionary *geometry, NSDictionary *attributes, id identifier) {
     NSMutableDictionary *feature = [@{@"type": @"Feature",
-                                      @"properties": (attributes) ?: [NSNull null],
+                                      @"properties": attributes,
                                       @"geometry": geometry} mutableCopy];
     feature[@"id"] = identifier;
     return [feature copy];

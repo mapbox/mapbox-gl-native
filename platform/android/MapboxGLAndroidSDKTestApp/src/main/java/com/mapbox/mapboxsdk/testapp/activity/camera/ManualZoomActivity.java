@@ -8,7 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.UiSettings;
@@ -31,11 +31,10 @@ public class ManualZoomActivity extends AppCompatActivity {
     setContentView(R.layout.activity_manual_zoom);
 
     mapView = (MapView) findViewById(R.id.mapView);
-    mapView.setStyleUrl(Style.SATELLITE);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(mapboxMap -> {
       ManualZoomActivity.this.mapboxMap = mapboxMap;
-
+      mapboxMap.setStyle(new Style.Builder().fromUrl(Style.SATELLITE));
       UiSettings uiSettings = ManualZoomActivity.this.mapboxMap.getUiSettings();
       uiSettings.setAllGesturesEnabled(false);
     });

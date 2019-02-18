@@ -9,9 +9,8 @@
 #include <mbgl/style/conversion/transition_options.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion_impl.hpp>
-#include <mbgl/util/fnv_hash.hpp>
 
-#include <mbgl/renderer/layers/render_line_layer.hpp>
+#include <mapbox/eternal.hpp>
 
 namespace mbgl {
 namespace style {
@@ -428,8 +427,7 @@ TransitionOptions LineLayer::getLineGradientTransition() const {
 using namespace conversion;
 
 optional<Error> LineLayer::setPaintProperty(const std::string& name, const Convertible& value) {
-    enum class Property {
-        Unknown,
+    enum class Property : uint8_t {
         LineOpacity,
         LineColor,
         LineTranslate,
@@ -454,124 +452,37 @@ optional<Error> LineLayer::setPaintProperty(const std::string& name, const Conve
         LineGradientTransition,
     };
 
-    Property property = Property::Unknown;
-    switch (util::hashFNV1a(name.c_str())) {
-    case util::hashFNV1a("line-opacity"):
-        if (name == "line-opacity") {
-            property = Property::LineOpacity;
-        }
-        break;
-    case util::hashFNV1a("line-opacity-transition"):
-        if (name == "line-opacity-transition") {
-            property = Property::LineOpacityTransition;
-        }
-        break;
-    case util::hashFNV1a("line-color"):
-        if (name == "line-color") {
-            property = Property::LineColor;
-        }
-        break;
-    case util::hashFNV1a("line-color-transition"):
-        if (name == "line-color-transition") {
-            property = Property::LineColorTransition;
-        }
-        break;
-    case util::hashFNV1a("line-translate"):
-        if (name == "line-translate") {
-            property = Property::LineTranslate;
-        }
-        break;
-    case util::hashFNV1a("line-translate-transition"):
-        if (name == "line-translate-transition") {
-            property = Property::LineTranslateTransition;
-        }
-        break;
-    case util::hashFNV1a("line-translate-anchor"):
-        if (name == "line-translate-anchor") {
-            property = Property::LineTranslateAnchor;
-        }
-        break;
-    case util::hashFNV1a("line-translate-anchor-transition"):
-        if (name == "line-translate-anchor-transition") {
-            property = Property::LineTranslateAnchorTransition;
-        }
-        break;
-    case util::hashFNV1a("line-width"):
-        if (name == "line-width") {
-            property = Property::LineWidth;
-        }
-        break;
-    case util::hashFNV1a("line-width-transition"):
-        if (name == "line-width-transition") {
-            property = Property::LineWidthTransition;
-        }
-        break;
-    case util::hashFNV1a("line-gap-width"):
-        if (name == "line-gap-width") {
-            property = Property::LineGapWidth;
-        }
-        break;
-    case util::hashFNV1a("line-gap-width-transition"):
-        if (name == "line-gap-width-transition") {
-            property = Property::LineGapWidthTransition;
-        }
-        break;
-    case util::hashFNV1a("line-offset"):
-        if (name == "line-offset") {
-            property = Property::LineOffset;
-        }
-        break;
-    case util::hashFNV1a("line-offset-transition"):
-        if (name == "line-offset-transition") {
-            property = Property::LineOffsetTransition;
-        }
-        break;
-    case util::hashFNV1a("line-blur"):
-        if (name == "line-blur") {
-            property = Property::LineBlur;
-        }
-        break;
-    case util::hashFNV1a("line-blur-transition"):
-        if (name == "line-blur-transition") {
-            property = Property::LineBlurTransition;
-        }
-        break;
-    case util::hashFNV1a("line-dasharray"):
-        if (name == "line-dasharray") {
-            property = Property::LineDasharray;
-        }
-        break;
-    case util::hashFNV1a("line-dasharray-transition"):
-        if (name == "line-dasharray-transition") {
-            property = Property::LineDasharrayTransition;
-        }
-        break;
-    case util::hashFNV1a("line-pattern"):
-        if (name == "line-pattern") {
-            property = Property::LinePattern;
-        }
-        break;
-    case util::hashFNV1a("line-pattern-transition"):
-        if (name == "line-pattern-transition") {
-            property = Property::LinePatternTransition;
-        }
-        break;
-    case util::hashFNV1a("line-gradient"):
-        if (name == "line-gradient") {
-            property = Property::LineGradient;
-        }
-        break;
-    case util::hashFNV1a("line-gradient-transition"):
-        if (name == "line-gradient-transition") {
-            property = Property::LineGradientTransition;
-        }
-        break;
-    
-    }
+    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
+        { "line-opacity", static_cast<uint8_t>(Property::LineOpacity) },
+        { "line-color", static_cast<uint8_t>(Property::LineColor) },
+        { "line-translate", static_cast<uint8_t>(Property::LineTranslate) },
+        { "line-translate-anchor", static_cast<uint8_t>(Property::LineTranslateAnchor) },
+        { "line-width", static_cast<uint8_t>(Property::LineWidth) },
+        { "line-gap-width", static_cast<uint8_t>(Property::LineGapWidth) },
+        { "line-offset", static_cast<uint8_t>(Property::LineOffset) },
+        { "line-blur", static_cast<uint8_t>(Property::LineBlur) },
+        { "line-dasharray", static_cast<uint8_t>(Property::LineDasharray) },
+        { "line-pattern", static_cast<uint8_t>(Property::LinePattern) },
+        { "line-gradient", static_cast<uint8_t>(Property::LineGradient) },
+        { "line-opacity-transition", static_cast<uint8_t>(Property::LineOpacityTransition) },
+        { "line-color-transition", static_cast<uint8_t>(Property::LineColorTransition) },
+        { "line-translate-transition", static_cast<uint8_t>(Property::LineTranslateTransition) },
+        { "line-translate-anchor-transition", static_cast<uint8_t>(Property::LineTranslateAnchorTransition) },
+        { "line-width-transition", static_cast<uint8_t>(Property::LineWidthTransition) },
+        { "line-gap-width-transition", static_cast<uint8_t>(Property::LineGapWidthTransition) },
+        { "line-offset-transition", static_cast<uint8_t>(Property::LineOffsetTransition) },
+        { "line-blur-transition", static_cast<uint8_t>(Property::LineBlurTransition) },
+        { "line-dasharray-transition", static_cast<uint8_t>(Property::LineDasharrayTransition) },
+        { "line-pattern-transition", static_cast<uint8_t>(Property::LinePatternTransition) },
+        { "line-gradient-transition", static_cast<uint8_t>(Property::LineGradientTransition) }
+    });
 
-    if (property == Property::Unknown) {
+    const auto it = properties.find(name.c_str());
+    if (it == properties.end()) {
         return Error { "layer doesn't support this property" };
     }
+
+    Property property = static_cast<Property>(it->second);
 
         
     if (property == Property::LineOpacity || property == Property::LineWidth || property == Property::LineGapWidth || property == Property::LineOffset || property == Property::LineBlur) {
@@ -750,47 +661,25 @@ optional<Error> LineLayer::setLayoutProperty(const std::string& name, const Conv
     if (name == "visibility") {
         return Layer::setVisibility(value);
     }
-
     enum class Property {
-        Unknown,
         LineCap,
         LineJoin,
         LineMiterLimit,
         LineRoundLimit,
     };
+    MAPBOX_ETERNAL_CONSTEXPR const auto properties = mapbox::eternal::hash_map<mapbox::eternal::string, uint8_t>({
+        { "line-cap", static_cast<uint8_t>(Property::LineCap) },
+        { "line-join", static_cast<uint8_t>(Property::LineJoin) },
+        { "line-miter-limit", static_cast<uint8_t>(Property::LineMiterLimit) },
+        { "line-round-limit", static_cast<uint8_t>(Property::LineRoundLimit) }
+    });
 
-    Property property = Property::Unknown;
-    switch (util::hashFNV1a(name.c_str())) {
-    
-    case util::hashFNV1a("line-cap"):
-        if (name == "line-cap") {
-            property = Property::LineCap;
-        }
-        break;
-    
-    case util::hashFNV1a("line-join"):
-        if (name == "line-join") {
-            property = Property::LineJoin;
-        }
-        break;
-    
-    case util::hashFNV1a("line-miter-limit"):
-        if (name == "line-miter-limit") {
-            property = Property::LineMiterLimit;
-        }
-        break;
-    
-    case util::hashFNV1a("line-round-limit"):
-        if (name == "line-round-limit") {
-            property = Property::LineRoundLimit;
-        }
-        break;
-    
-    }
-
-    if (property == Property::Unknown) {
+    const auto it = properties.find(name.c_str());
+    if (it == properties.end()) {
         return Error { "layer doesn't support this property" };
     }
+
+    Property property = static_cast<Property>(it->second);
 
         
     if (property == Property::LineCap) {
@@ -845,27 +734,4 @@ Mutable<Layer::Impl> LineLayer::mutableBaseImpl() const {
 }
 
 } // namespace style
-
-const style::LayerTypeInfo* LineLayerFactory::getTypeInfo() const noexcept {
-    return style::LineLayer::Impl::staticTypeInfo();
-}
-
-std::unique_ptr<style::Layer> LineLayerFactory::createLayer(const std::string& id, const style::conversion::Convertible& value) noexcept {
-    optional<std::string> source = getSource(value);
-    if (!source) {
-        return nullptr;
-    }
-
-    std::unique_ptr<style::Layer> layer = std::unique_ptr<style::Layer>(new style::LineLayer(id, *source));
-    if (!initSourceLayerAndFilter(layer.get(), value)) {
-        return nullptr;
-    }
-    return layer;
-}
-
-std::unique_ptr<RenderLayer> LineLayerFactory::createRenderLayer(Immutable<style::Layer::Impl> impl) noexcept {
-    assert(impl->getTypeInfo() == getTypeInfo());
-    return std::make_unique<RenderLineLayer>(staticImmutableCast<style::LineLayer::Impl>(std::move(impl)));
-}
-
 } // namespace mbgl

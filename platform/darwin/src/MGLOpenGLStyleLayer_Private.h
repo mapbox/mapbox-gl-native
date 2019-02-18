@@ -2,7 +2,7 @@
 
 #include "MGLStyleLayer_Private.h"
 
-#include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/layermanager/custom_layer_factory.hpp>
 
 namespace mbgl {
     

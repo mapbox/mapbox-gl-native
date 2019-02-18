@@ -3,7 +3,6 @@
 #include <mbgl/util/peer.hpp>
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/style/layer_type.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/conversion.hpp>
 

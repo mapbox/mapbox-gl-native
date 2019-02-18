@@ -10,6 +10,7 @@
 #import "MGLLoggingConfiguration_Private.h"
 #import "MGLHeatmapStyleLayer_Private.h"
 
+#include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 
 
@@ -113,19 +114,15 @@
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting heatmapIntensityTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setHeatmapIntensityTransition(options);
+    self.rawLayer->setHeatmapIntensityTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)heatmapIntensityTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getHeatmapIntensityTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setHeatmapOpacity:(NSExpression *)heatmapOpacity {
@@ -150,19 +147,15 @@
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting heatmapOpacityTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setHeatmapOpacityTransition(options);
+    self.rawLayer->setHeatmapOpacityTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)heatmapOpacityTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getHeatmapOpacityTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setHeatmapRadius:(NSExpression *)heatmapRadius {
@@ -187,19 +180,15 @@
     MGLAssertStyleLayerIsValid();
     MGLLogDebug(@"Setting heatmapRadiusTransition: %@", MGLStringFromMGLTransition(transition));
 
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setHeatmapRadiusTransition(options);
+    self.rawLayer->setHeatmapRadiusTransition(MGLOptionsFromTransition(transition));
 }
 
 - (MGLTransition)heatmapRadiusTransition {
     MGLAssertStyleLayerIsValid();
 
     mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getHeatmapRadiusTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
-    return transition;
+    return MGLTransitionFromOptions(transitionOptions);
 }
 
 - (void)setHeatmapWeight:(NSExpression *)heatmapWeight {

@@ -21,6 +21,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.location.LocationComponent
+import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.testapp.R
 import kotlinx.android.synthetic.main.activity_location_layer_fragment.*
 import java.lang.Exception
@@ -92,7 +93,6 @@ class LocationFragmentActivity : AppCompatActivity() {
 
     private lateinit var mapView: MapView
     private lateinit var mapboxMap: MapboxMap
-    private var component: LocationComponent? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
       mapView = MapView(inflater.context)
@@ -104,10 +104,12 @@ class LocationFragmentActivity : AppCompatActivity() {
       mapView.onCreate(savedInstanceState)
       mapView.getMapAsync {
         mapboxMap = it
-        component = mapboxMap.locationComponent
-        component?.activateLocationComponent(activity)
-        component?.isLocationComponentEnabled = true
-        component?.locationEngine?.getLastLocation(this)
+        it.setStyle(Style.MAPBOX_STREETS) { style ->
+            val component = mapboxMap.locationComponent
+            component.activateLocationComponent(activity, style)
+            component.isLocationComponentEnabled = true
+            component.locationEngine?.getLastLocation(this)
+        }
       }
     }
 

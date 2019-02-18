@@ -10,10 +10,10 @@ import android.support.annotation.Nullable;
 import android.view.Surface;
 import android.view.WindowManager;
 
+import com.mapbox.mapboxsdk.log.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import timber.log.Timber;
 
 /**
  * This manager class handles compass events such as starting the tracking of device bearing, or
@@ -21,15 +21,18 @@ import timber.log.Timber;
  */
 class LocationComponentCompassEngine implements CompassEngine, SensorEventListener {
 
+  private static final String TAG = "Mbgl-LocationComponentCompassEngine";
+
   // The rate sensor events will be delivered at. As the Android documentation states, this is only
   // a hint to the system and the events might actually be received faster or slower then this
   // specified rate. Since the minimum Android API levels about 9, we are able to set this value
   // ourselves rather than using one of the provided constants which deliver updates too quickly for
   // our use case. The default is set to 100ms
-  private static final int SENSOR_DELAY_MICROS = 100 * 1000;
+  static final int SENSOR_DELAY_MICROS = 100 * 1000;
   // Filtering coefficient 0 < ALPHA < 1
   private static final float ALPHA = 0.45f;
 
+  @NonNull
   private final WindowManager windowManager;
   @NonNull
   private final SensorManager sensorManager;
@@ -61,16 +64,18 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
    * Construct a new instance of the this class. A internal compass listeners needed to separate it
    * from the cleared list of public listeners.
    */
-  LocationComponentCompassEngine(WindowManager windowManager, SensorManager sensorManager) {
+  LocationComponentCompassEngine(@NonNull WindowManager windowManager, @NonNull SensorManager sensorManager) {
     this.windowManager = windowManager;
     this.sensorManager = sensorManager;
     compassSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
     if (compassSensor == null) {
       if (isGyroscopeAvailable()) {
-        Timber.d("Rotation vector sensor not supported on device, falling back to orientation.");
+        Logger.d(TAG, "Rotation vector sensor not supported on device, "
+                + "falling back to orientation.");
         compassSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
       } else {
-        Timber.d("Rotation vector sensor not supported on device, falling back to accelerometer and magnetic field.");
+        Logger.d(TAG, "Rotation vector sensor not supported on device, "
+                        + "falling back to accelerometer and magnetic field.");
         gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
       }
@@ -80,7 +85,7 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
   @Override
   public void addCompassListener(@NonNull CompassListener compassListener) {
     if (compassListeners.isEmpty()) {
-      onStart();
+      registerSensorListeners();
     }
     compassListeners.add(compassListener);
   }
@@ -89,7 +94,7 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
   public void removeCompassListener(@NonNull CompassListener compassListener) {
     compassListeners.remove(compassListener);
     if (compassListeners.isEmpty()) {
-      onStop();
+      unregisterSensorListeners();
     }
   }
 
@@ -104,16 +109,6 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
   }
 
   @Override
-  public void onStart() {
-    registerSensorListeners();
-  }
-
-  @Override
-  public void onStop() {
-    unregisterSensorListeners();
-  }
-
-  @Override
   public void onSensorChanged(@NonNull SensorEvent event) {
     // check when the last time the compass was updated, return if too soon.
     long currentTime = SystemClock.elapsedRealtime();
@@ -121,15 +116,12 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
       return;
     }
     if (lastAccuracySensorStatus == SensorManager.SENSOR_STATUS_UNRELIABLE) {
-      Timber.d("Compass sensor is unreliable, device calibration is needed.");
+      Logger.d(TAG, "Compass sensor is unreliable, device calibration is needed.");
       return;
     }
     if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
       rotationVectorValue = getRotationVectorFromSensorEvent(event);
       updateOrientation();
-
-      // Update the compassUpdateNextTimestamp
-      compassUpdateNextTimestamp = currentTime + LocationComponentConstants.COMPASS_UPDATE_RATE_MS;
     } else if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
       notifyCompassChangeListeners((event.values[0] + 360) % 360);
     } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -139,6 +131,9 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
       magneticValues = lowPassFilter(getRotationVectorFromSensorEvent(event), magneticValues);
       updateOrientation();
     }
+
+    // Update the compassUpdateNextTimestamp
+    compassUpdateNextTimestamp = currentTime + LocationComponentConstants.COMPASS_UPDATE_RATE_MS;
   }
 
   @Override
@@ -238,7 +233,7 @@ class LocationComponentCompassEngine implements CompassEngine, SensorEventListen
    * @param smoothedValues array of float, that contains previous state
    * @return float filtered array of float
    */
-  @Nullable
+  @NonNull
   private float[] lowPassFilter(@NonNull float[] newValues, @Nullable float[] smoothedValues) {
     if (smoothedValues == null) {
       return newValues;

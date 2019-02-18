@@ -7,7 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  `MGLShape` is an abstract class that represents a shape or annotation. Shapes
- constitute the content of a map – not only the overlays atop the map, but also
+ constitute the content of a map — not only the overlays atop the map, but also
  the content that forms the base map.
 
  Create instances of `MGLPointAnnotation`, `MGLPointCollection`, `MGLPolyline`,

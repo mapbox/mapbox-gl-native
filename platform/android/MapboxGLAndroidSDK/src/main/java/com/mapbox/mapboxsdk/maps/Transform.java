@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -24,7 +25,7 @@ final class Transform implements MapView.OnCameraDidChangeListener {
 
   private static final String TAG = "Mbgl-Transform";
 
-  private final NativeMapView nativeMapView;
+  private final NativeMap nativeMap;
   private final MapView mapView;
   private final Handler handler = new Handler();
 
@@ -44,9 +45,9 @@ final class Transform implements MapView.OnCameraDidChangeListener {
     }
   };
 
-  Transform(MapView mapView, NativeMapView nativeMapView, CameraChangeDispatcher cameraChangeDispatcher) {
+  Transform(MapView mapView, NativeMap nativeMap, CameraChangeDispatcher cameraChangeDispatcher) {
     this.mapView = mapView;
-    this.nativeMapView = nativeMapView;
+    this.nativeMap = nativeMap;
     this.cameraChangeDispatcher = cameraChangeDispatcher;
   }
 
@@ -77,13 +78,15 @@ final class Transform implements MapView.OnCameraDidChangeListener {
     if (animated) {
       invalidateCameraPosition();
       if (cameraCancelableCallback != null) {
+        final MapboxMap.CancelableCallback callback = cameraCancelableCallback;
+
+        // nullification has to happen before Handler#post, see https://github.com/robolectric/robolectric/issues/1306
+        cameraCancelableCallback = null;
+
         handler.post(new Runnable() {
           @Override
           public void run() {
-            if (cameraCancelableCallback != null) {
-              cameraCancelableCallback.onFinish();
-              cameraCancelableCallback = null;
-            }
+            callback.onFinish();
           }
         });
       }
@@ -99,7 +102,7 @@ final class Transform implements MapView.OnCameraDidChangeListener {
     if (isValidCameraPosition(cameraPosition)) {
       cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
-      nativeMapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
+      nativeMap.jumpTo(cameraPosition.target, cameraPosition.zoom, cameraPosition.tilt, cameraPosition.bearing);
       cameraChangeDispatcher.onCameraIdle();
       invalidateCameraPosition();
       handler.post(new Runnable() {
@@ -125,8 +128,8 @@ final class Transform implements MapView.OnCameraDidChangeListener {
         cameraCancelableCallback = callback;
       }
       mapView.addOnCameraDidChangeListener(this);
-      nativeMapView.easeTo(cameraPosition.bearing, cameraPosition.target, durationMs, cameraPosition.tilt,
-        cameraPosition.zoom, easingInterpolator);
+      nativeMap.easeTo(cameraPosition.target, cameraPosition.zoom, cameraPosition.bearing, cameraPosition.tilt,
+        durationMs, easingInterpolator);
     }
   }
 
@@ -142,8 +145,8 @@ final class Transform implements MapView.OnCameraDidChangeListener {
         cameraCancelableCallback = callback;
       }
       mapView.addOnCameraDidChangeListener(this);
-      nativeMapView.flyTo(cameraPosition.bearing, cameraPosition.target, durationMs, cameraPosition.tilt,
-        cameraPosition.zoom);
+      nativeMap.flyTo(cameraPosition.target, cameraPosition.zoom, cameraPosition.bearing,
+        cameraPosition.tilt, durationMs);
     }
   }
 
@@ -154,8 +157,8 @@ final class Transform implements MapView.OnCameraDidChangeListener {
   @UiThread
   @Nullable
   CameraPosition invalidateCameraPosition() {
-    if (nativeMapView != null) {
-      CameraPosition cameraPosition = nativeMapView.getCameraPosition();
+    if (nativeMap != null) {
+      CameraPosition cameraPosition = nativeMap.getCameraPosition();
       if (this.cameraPosition != null && !this.cameraPosition.equals(cameraPosition)) {
         cameraChangeDispatcher.onCameraMove();
       }
@@ -173,17 +176,20 @@ final class Transform implements MapView.OnCameraDidChangeListener {
     if (cameraCancelableCallback != null) {
       final MapboxMap.CancelableCallback callback = cameraCancelableCallback;
       cameraChangeDispatcher.onCameraIdle();
+
+      // nullification has to happen before Handler#post, see https://github.com/robolectric/robolectric/issues/1306
+      cameraCancelableCallback = null;
+
       handler.post(new Runnable() {
         @Override
         public void run() {
           callback.onCancel();
         }
       });
-      cameraCancelableCallback = null;
     }
 
     // cancel ongoing transitions
-    nativeMapView.cancelTransitions();
+    nativeMap.cancelTransitions();
 
     cameraChangeDispatcher.onCameraIdle();
   }
@@ -191,7 +197,7 @@ final class Transform implements MapView.OnCameraDidChangeListener {
   @UiThread
   void resetNorth() {
     cancelTransitions();
-    nativeMapView.resetNorth();
+    nativeMap.resetNorth();
   }
 
   //
@@ -201,20 +207,20 @@ final class Transform implements MapView.OnCameraDidChangeListener {
   // Zoom in or out
 
   double getRawZoom() {
-    return nativeMapView.getZoom();
+    return nativeMap.getZoom();
   }
 
   void zoomBy(double zoomAddition, @NonNull PointF focalPoint) {
-    setZoom(nativeMapView.getZoom() + zoomAddition, focalPoint);
+    setZoom(nativeMap.getZoom() + zoomAddition, focalPoint);
   }
 
   void setZoom(double zoom, @NonNull PointF focalPoint) {
-    nativeMapView.setZoom(zoom, focalPoint, 0);
+    nativeMap.setZoom(zoom, focalPoint, 0);
   }
 
   // Direction
   double getBearing() {
-    double direction = -nativeMapView.getBearing();
+    double direction = -nativeMap.getBearing();
 
     while (direction > 360) {
       direction -= 360;
@@ -227,19 +233,19 @@ final class Transform implements MapView.OnCameraDidChangeListener {
   }
 
   double getRawBearing() {
-    return nativeMapView.getBearing();
+    return nativeMap.getBearing();
   }
 
   void setBearing(double bearing) {
-    nativeMapView.setBearing(bearing);
+    nativeMap.setBearing(bearing, 0);
   }
 
   void setBearing(double bearing, float focalX, float focalY) {
-    nativeMapView.setBearing(bearing, focalX, focalY);
+    nativeMap.setBearing(bearing, focalX, focalY, 0);
   }
 
   void setBearing(double bearing, float focalX, float focalY, long duration) {
-    nativeMapView.setBearing(bearing, focalX, focalY, duration);
+    nativeMap.setBearing(bearing, focalX, focalY, duration);
   }
 
 
@@ -248,7 +254,7 @@ final class Transform implements MapView.OnCameraDidChangeListener {
   //
 
   LatLng getLatLng() {
-    return nativeMapView.getLatLng();
+    return nativeMap.getLatLng();
   }
 
   //
@@ -256,11 +262,11 @@ final class Transform implements MapView.OnCameraDidChangeListener {
   //
 
   double getTilt() {
-    return nativeMapView.getPitch();
+    return nativeMap.getPitch();
   }
 
   void setTilt(Double pitch) {
-    nativeMapView.setPitch(pitch, 0);
+    nativeMap.setPitch(pitch, 0);
   }
 
   //
@@ -268,15 +274,15 @@ final class Transform implements MapView.OnCameraDidChangeListener {
   //
 
   LatLng getCenterCoordinate() {
-    return nativeMapView.getLatLng();
+    return nativeMap.getLatLng();
   }
 
   void setCenterCoordinate(LatLng centerCoordinate) {
-    nativeMapView.setLatLng(centerCoordinate);
+    nativeMap.setLatLng(centerCoordinate, 0);
   }
 
   void setGestureInProgress(boolean gestureInProgress) {
-    nativeMapView.setGestureInProgress(gestureInProgress);
+    nativeMap.setGestureInProgress(gestureInProgress);
     if (!gestureInProgress) {
       invalidateCameraPosition();
     }
@@ -286,7 +292,7 @@ final class Transform implements MapView.OnCameraDidChangeListener {
     if (duration > 0) {
       mapView.addOnCameraDidChangeListener(moveByChangeListener);
     }
-    nativeMapView.moveBy(offsetX, offsetY, duration);
+    nativeMap.moveBy(offsetX, offsetY, duration);
   }
 
   //
@@ -298,11 +304,11 @@ final class Transform implements MapView.OnCameraDidChangeListener {
       Logger.e(TAG, String.format("Not setting minZoomPreference, value is in unsupported range: %s", minZoom));
       return;
     }
-    nativeMapView.setMinZoom(minZoom);
+    nativeMap.setMinZoom(minZoom);
   }
 
   double getMinZoom() {
-    return nativeMapView.getMinZoom();
+    return nativeMap.getMinZoom();
   }
 
   void setMaxZoom(double maxZoom) {
@@ -310,10 +316,10 @@ final class Transform implements MapView.OnCameraDidChangeListener {
       Logger.e(TAG, String.format("Not setting maxZoomPreference, value is in unsupported range: %s", maxZoom));
       return;
     }
-    nativeMapView.setMaxZoom(maxZoom);
+    nativeMap.setMaxZoom(maxZoom);
   }
 
   double getMaxZoom() {
-    return nativeMapView.getMaxZoom();
+    return nativeMap.getMaxZoom();
   }
 }

@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.HeatmapLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -53,25 +54,29 @@ public class HeatmapLayerActivity extends AppCompatActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_heatmaplayer);
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      addEarthquakeSource();
-      addHeatmapLayer();
-      addCircleLayer();
+
+      try {
+        mapboxMap.setStyle(new Style.Builder()
+          .fromUrl(Style.DARK)
+          .withSource(createEarthquakeSource())
+          .withLayerAbove(createHeatmapLayer(), "waterway-label")
+          .withLayerBelow(createCircleLayer(), HEATMAP_LAYER_ID)
+        );
+      } catch (MalformedURLException exception) {
+        Timber.e(exception);
+      }
     });
   }
 
-  private void addEarthquakeSource() {
-    try {
-      mapboxMap.addSource(new GeoJsonSource(EARTHQUAKE_SOURCE_ID, new URL(EARTHQUAKE_SOURCE_URL)));
-    } catch (MalformedURLException malformedUrlException) {
-      Timber.e(malformedUrlException, "That's not an url... ");
-    }
+  private GeoJsonSource createEarthquakeSource() throws MalformedURLException {
+    return new GeoJsonSource(EARTHQUAKE_SOURCE_ID, new URL(EARTHQUAKE_SOURCE_URL));
   }
 
-  private void addHeatmapLayer() {
+  private HeatmapLayer createHeatmapLayer() {
     HeatmapLayer layer = new HeatmapLayer(HEATMAP_LAYER_ID, EARTHQUAKE_SOURCE_ID);
     layer.setMaxZoom(9);
     layer.setSourceLayer(HEATMAP_LAYER_SOURCE);
@@ -129,11 +134,10 @@ public class HeatmapLayerActivity extends AppCompatActivity {
         )
       )
     );
-
-    mapboxMap.addLayerAbove(layer, "waterway-label");
+    return layer;
   }
 
-  private void addCircleLayer() {
+  private CircleLayer createCircleLayer() {
     CircleLayer circleLayer = new CircleLayer(CIRCLE_LAYER_ID, EARTHQUAKE_SOURCE_ID);
     circleLayer.setProperties(
 
@@ -179,7 +183,7 @@ public class HeatmapLayerActivity extends AppCompatActivity {
       circleStrokeWidth(1.0f)
     );
 
-    mapboxMap.addLayerBelow(circleLayer, HEATMAP_LAYER_ID);
+    return circleLayer;
   }
 
   @Override

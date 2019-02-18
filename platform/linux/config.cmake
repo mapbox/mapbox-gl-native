@@ -1,9 +1,9 @@
 include(cmake/sqlite.cmake)
 
 add_library(mbgl-loop-uv STATIC
-    platform/default/async_task.cpp
-    platform/default/run_loop.cpp
-    platform/default/timer.cpp
+    platform/default/src/mbgl/util/async_task.cpp
+    platform/default/src/mbgl/util/run_loop.cpp
+    platform/default/src/mbgl/util/timer.cpp
 )
 
 target_include_directories(mbgl-loop-uv
@@ -20,7 +20,7 @@ target_add_mason_package(mbgl-loop-uv PUBLIC libuv)
 macro(mbgl_platform_core)
     if(WITH_OSMESA)
         target_sources(mbgl-core
-            PRIVATE platform/default/headless_backend_osmesa.cpp
+            PRIVATE platform/default/src/mbgl/gl/headless_backend_osmesa.cpp
         )
         target_link_libraries(mbgl-core
             PUBLIC -lOSMesa
@@ -41,43 +41,46 @@ macro(mbgl_platform_core)
     endif()
 
     target_sources(mbgl-core
+        # GL
+        PRIVATE platform/linux/src/gl_functions.cpp
+
         # Misc
-        PRIVATE platform/default/logging_stderr.cpp
-        PRIVATE platform/default/string_stdlib.cpp
-        PRIVATE platform/default/thread.cpp
-        PRIVATE platform/default/bidi.cpp
-        PRIVATE platform/default/collator.cpp
-        PRIVATE platform/default/layer_manager.cpp
-        PRIVATE platform/default/local_glyph_rasterizer.cpp
-        PRIVATE platform/default/thread_local.cpp
-        PRIVATE platform/default/unaccent.cpp
-        PRIVATE platform/default/unaccent.hpp
-        PRIVATE platform/default/utf.cpp
+        PRIVATE platform/default/src/mbgl/util/logging_stderr.cpp
+        PRIVATE platform/default/src/mbgl/util/string_stdlib.cpp
+        PRIVATE platform/default/src/mbgl/util/thread.cpp
+        PRIVATE platform/default/src/mbgl/text/bidi.cpp
+        PRIVATE platform/default/src/mbgl/text/collator.cpp
+        PRIVATE platform/default/src/mbgl/layermanager/layer_manager.cpp
+        PRIVATE platform/default/src/mbgl/text/local_glyph_rasterizer.cpp
+        PRIVATE platform/default/src/mbgl/util/thread_local.cpp
+        PRIVATE platform/default/src/mbgl/text/unaccent.cpp
+        PRIVATE platform/default/include/mbgl/text/unaccent.hpp
+        PRIVATE platform/default/src/mbgl/util/utf.cpp
 
         # Image handling
-        PRIVATE platform/default/image.cpp
-        PRIVATE platform/default/jpeg_reader.cpp
-        PRIVATE platform/default/png_writer.cpp
-        PRIVATE platform/default/png_reader.cpp
+        PRIVATE platform/default/src/mbgl/util/image.cpp
+        PRIVATE platform/default/src/mbgl/util/jpeg_reader.cpp
+        PRIVATE platform/default/src/mbgl/util/png_writer.cpp
+        PRIVATE platform/default/src/mbgl/util/png_reader.cpp
 
         # Headless view
-        PRIVATE platform/default/mbgl/gl/headless_frontend.cpp
-        PRIVATE platform/default/mbgl/gl/headless_frontend.hpp
-        PRIVATE platform/default/mbgl/gl/headless_backend.cpp
-        PRIVATE platform/default/mbgl/gl/headless_backend.hpp
+        PRIVATE platform/default/src/mbgl/gl/headless_frontend.cpp
+        PRIVATE platform/default/include/mbgl/gl/headless_frontend.hpp
+        PRIVATE platform/default/src/mbgl/gl/headless_backend.cpp
+        PRIVATE platform/default/include/mbgl/gl/headless_backend.hpp
 
         # Snapshotting
-        PRIVATE platform/default/mbgl/map/map_snapshotter.cpp
-        PRIVATE platform/default/mbgl/map/map_snapshotter.hpp
+        PRIVATE platform/default/src/mbgl/map/map_snapshotter.cpp
+        PRIVATE platform/default/include/mbgl/map/map_snapshotter.hpp
 
         # Thread pool
-        PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
-        PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
-        PRIVATE platform/default/mbgl/util/shared_thread_pool.cpp
+        PRIVATE platform/default/src/mbgl/util/default_thread_pool.cpp
+        PRIVATE platform/default/src/mbgl/util/default_thread_pool.cpp
+        PRIVATE platform/default/src/mbgl/util/shared_thread_pool.cpp
     )
 
     target_include_directories(mbgl-core
-        PRIVATE platform/default
+        PRIVATE platform/default/include
         PRIVATE platform/linux
     )
 
@@ -103,10 +106,10 @@ endmacro()
 macro(mbgl_filesource)
     target_sources(mbgl-filesource
         # File source
-        PRIVATE platform/default/http_file_source.cpp
+        PRIVATE platform/default/src/mbgl/storage/http_file_source.cpp
 
         # Database
-        PRIVATE platform/default/sqlite3.cpp
+        PRIVATE platform/default/src/mbgl/storage/sqlite3.cpp
     )
 
     # We're not referencing any cURL symbols since we're dynamically loading it. However, we want to
@@ -151,7 +154,7 @@ endmacro()
 
 macro(mbgl_platform_test)
     target_sources(mbgl-test
-        PRIVATE platform/default/mbgl/test/main.cpp
+        PRIVATE platform/default/src/mbgl/test/main.cpp
     )
 
     target_include_directories(mbgl-test
@@ -159,7 +162,7 @@ macro(mbgl_platform_test)
     )
 
     set_source_files_properties(
-        platform/default/mbgl/test/main.cpp
+        platform/default/src/mbgl/test/main.cpp
             PROPERTIES
         COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
     )
@@ -173,11 +176,11 @@ endmacro()
 
 macro(mbgl_platform_benchmark)
     target_sources(mbgl-benchmark
-        PRIVATE benchmark/src/main.cpp
+        PRIVATE platform/default/src/mbgl/benchmark/main.cpp
     )
 
     set_source_files_properties(
-        benchmark/src/main.cpp
+        platform/default/src/mbgl/benchmark/main.cpp
             PROPERTIES
         COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
     )

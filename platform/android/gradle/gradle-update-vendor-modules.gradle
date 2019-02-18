@@ -1,0 +1,5 @@
+task updateVendorSubmodules {
+    doLast {
+        "git submodule update --init --recursive vendor".execute()
+    }
+}

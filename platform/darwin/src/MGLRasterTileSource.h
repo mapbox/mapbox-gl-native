@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
  integers.
 
  The default value for this option is 512. Version 4 of the
- <a href="https://www.mapbox.com/api-documentation/#maps">Mapbox Maps API</a>
+ <a href="https://www.mapbox.com/api-documentation/maps/#maps">Mapbox Maps API</a>
  requires a value of 256, as do many third-party tile servers, so consult your
  provider’s documentation for the correct value.
 
@@ -52,9 +52,9 @@ FOUNDATION_EXTERN MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionTileSi
  ])
  mapView.style?.addSource(source)
  ```
- 
+
  #### Related examples
- See the <a href="https://www.mapbox.com/ios-sdk/maps/examples/source-custom-raster/">
+ See the <a href="https://docs.mapbox.com/ios/maps/examples/source-custom-raster/">
  Add raster imagery</a> example to learn how to add a `MGLRasterStyleLayer`
  to your map using an `MGLRasterTileSource`.
  */

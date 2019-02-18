@@ -9,8 +9,7 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.IconManagerResolver;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +24,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Tests integration between Icons and Markers
  */
-public class IconTest extends BaseActivityTest {
+public class IconTest extends EspressoTest {
 
   private Map<Icon, Integer> iconMap;
 
@@ -144,10 +143,5 @@ public class IconTest extends BaseActivityTest {
       mapboxMap.clear();
       assertEquals("Amount of icons should match 0", 0, iconMap.size());
     }));
-  }
-
-  @Override
-  protected Class getActivityClass() {
-    return EspressoTestActivity.class;
   }
 }

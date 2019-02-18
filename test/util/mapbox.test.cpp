@@ -92,9 +92,9 @@ TEST(Mapbox, SpriteURL) {
         "https://api.mapbox.com/styles/v1/mapbox/streets-v8/draft/sprite@2x.png?access_token=key",
         mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL, "mapbox://sprites/mapbox/streets-v8/draft@2x.png", "key"));
     EXPECT_EQ(
-        "https://api.mapbox.com/styles/v1/mapbox/streets-v10/sprite?access_token=key&fresh=true.png",
+        "https://api.mapbox.com/styles/v1/mapbox/streets-v11/sprite?access_token=key&fresh=true.png",
         mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL,
-            "mapbox://sprites/mapbox/streets-v10?fresh=true.png",
+            "mapbox://sprites/mapbox/streets-v11?fresh=true.png",
             "key"));
     EXPECT_EQ("mapbox://////", mbgl::util::mapbox::normalizeSpriteURL(util::API_BASE_URL, "mapbox://////", "key"));
 }

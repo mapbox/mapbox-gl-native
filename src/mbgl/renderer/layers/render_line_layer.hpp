@@ -10,14 +10,13 @@
 namespace mbgl {
 
 struct LineFloorwidth : style::DataDrivenPaintProperty<float, attributes::a_floorwidth, uniforms::u_floorwidth> {
-    static float defaultValue() { return 1; }
+    using EvaluatorType = DataDrivenPropertyEvaluator<float, true>;
+    static float defaultValue() { return 1.0; }
 };
 
 class RenderLinePaintProperties : public style::ConcatenateProperties<
     style::LinePaintProperties,
     style::Properties<LineFloorwidth>> {};
-
-class LineBucket;
 
 class RenderLineLayer: public RenderLayer {
 public:
@@ -33,8 +32,6 @@ public:
     bool hasCrossfade() const override;
     void render(PaintParameters&, RenderSource*) override;
     void update() final;
-
-    RenderLinePaintProperties::PossiblyEvaluated paintProperties() const;
 
     bool queryIntersectsFeature(
             const GeometryCoordinates&,

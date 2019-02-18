@@ -88,20 +88,6 @@ public final class CameraUpdateFactory {
   }
 
   /**
-   * Returns a CameraUpdate that scrolls the camera over the map,
-   * shifting the center of view by the specified number of pixels in the x and y directions.
-   *
-   * @param xPixel Amount of pixels to scroll to in x direction
-   * @param yPixel Amount of pixels to scroll to in y direction
-   * @return CameraUpdate Final Camera Position
-   * @deprecated use {@link MapboxMap#scrollBy(float, float)} for more precise displacements when using a padded map.
-   */
-  @Deprecated
-  public static CameraUpdate scrollBy(float xPixel, float yPixel) {
-    return new CameraMoveUpdate(xPixel, yPixel);
-  }
-
-  /**
    * Returns a CameraUpdate that shifts the zoom level of the current camera viewpoint.
    *
    * @param amount Amount of zoom level to change with

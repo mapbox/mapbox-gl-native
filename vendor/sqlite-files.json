@@ -1,0 +1,10 @@
+{
+    "//": "This file is generated. Do not edit. Regenerate it with scripts/generate-file-lists.js",
+    "sources": [
+        "vendor/sqlite/src/sqlite3.c"
+    ],
+    "public_headers": {
+        "sqlite3.h": "vendor/sqlite/include/sqlite3.h"
+    },
+    "private_headers": {}
+}

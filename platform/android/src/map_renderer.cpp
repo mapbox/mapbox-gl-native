@@ -33,9 +33,12 @@ MapRenderer::~MapRenderer() = default;
 
 void MapRenderer::reset() {
     destroyed = true;
-    // Make sure to destroy the renderer on the GL Thread
-    auto self = ActorRef<MapRenderer>(*this, mailbox);
-    self.ask(&MapRenderer::resetRenderer).wait();
+
+    if (renderer) {
+        // Make sure to destroy the renderer on the GL Thread
+        auto self = ActorRef<MapRenderer>(*this, mailbox);
+        self.ask(&MapRenderer::resetRenderer).wait();
+    }
 
     // Lock to make sure there is no concurrent initialisation on the gl thread
     std::lock_guard<std::mutex> lock(initialisationMutex);
@@ -58,7 +61,10 @@ void MapRenderer::schedule(std::weak_ptr<Mailbox> scheduled) {
     static auto& javaClass = jni::Class<MapRenderer>::Singleton(*_env);
     static auto queueEvent = javaClass.GetMethod<void(
             jni::Object<MapRendererRunnable>)>(*_env, "queueEvent");
-    javaPeer.get(*_env).Call(*_env, queueEvent, peer);
+    auto weakReference = javaPeer.get(*_env);
+    if (weakReference) {
+        weakReference.Call(*_env, queueEvent, peer);
+    }
 
     // Release the c++ peer as it will be destroyed on GC of the Java Peer
     runnable.release();
@@ -68,7 +74,10 @@ void MapRenderer::requestRender() {
     android::UniqueEnv _env = android::AttachEnv();
     static auto& javaClass = jni::Class<MapRenderer>::Singleton(*_env);
     static auto onInvalidate = javaClass.GetMethod<void()>(*_env, "requestRender");
-    javaPeer.get(*_env).Call(*_env, onInvalidate);
+    auto weakReference = javaPeer.get(*_env);
+    if (weakReference) {
+        weakReference.Call(*_env, onInvalidate);
+    }
 }
 
 void MapRenderer::update(std::shared_ptr<UpdateParameters> params) {
@@ -107,7 +116,6 @@ void MapRenderer::requestSnapshot(SnapshotCallback callback) {
 // Called on OpenGL thread //
 
 void MapRenderer::resetRenderer() {
-    assert (renderer);
     renderer.reset();
 }
 
@@ -182,6 +190,12 @@ void MapRenderer::onSurfaceChanged(JNIEnv&, jint width, jint height) {
     requestRender();
 }
 
+void MapRenderer::onSurfaceDestroyed(JNIEnv&) {
+    // Make sure to destroy the renderer on the GL Thread
+    auto self = ActorRef<MapRenderer>(*this, mailbox);
+    self.ask(&MapRenderer::resetRenderer).wait();
+}
+
 // Static methods //
 
 void MapRenderer::registerNative(jni::JNIEnv& env) {
@@ -198,7 +212,9 @@ void MapRenderer::registerNative(jni::JNIEnv& env) {
                                          METHOD(&MapRenderer::onSurfaceCreated,
                                                 "nativeOnSurfaceCreated"),
                                          METHOD(&MapRenderer::onSurfaceChanged,
-                                                "nativeOnSurfaceChanged"));
+                                                "nativeOnSurfaceChanged"),
+                                         METHOD(&MapRenderer::onSurfaceDestroyed,
+                                                "nativeOnSurfaceDestroyed"));
 }
 
 MapRenderer& MapRenderer::getNativePeer(JNIEnv& env, const jni::Object<MapRenderer>& jObject) {

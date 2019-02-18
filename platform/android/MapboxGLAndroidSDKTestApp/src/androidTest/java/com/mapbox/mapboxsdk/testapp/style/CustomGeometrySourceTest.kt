@@ -8,7 +8,7 @@ import com.mapbox.mapboxsdk.style.sources.CustomGeometrySource.THREAD_PREFIX
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke
 import com.mapbox.mapboxsdk.testapp.action.OrientationChangeAction.orientationLandscape
 import com.mapbox.mapboxsdk.testapp.action.OrientationChangeAction.orientationPortrait
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest
+import com.mapbox.mapboxsdk.testapp.activity.BaseTest
 import com.mapbox.mapboxsdk.testapp.activity.style.GridSourceActivity
 import com.mapbox.mapboxsdk.testapp.activity.style.GridSourceActivity.ID_GRID_LAYER
 import com.mapbox.mapboxsdk.testapp.activity.style.GridSourceActivity.ID_GRID_SOURCE
@@ -16,11 +16,12 @@ import org.junit.Assert
 import org.junit.Ignore
 import org.junit.Test
 
-class CustomGeometrySourceTest : BaseActivityTest() {
+class CustomGeometrySourceTest : BaseTest() {
 
   override fun getActivityClass(): Class<*> = GridSourceActivity::class.java
 
   @Test
+  @Ignore
   fun sourceNotLeakingThreadsTest() {
     validateTestSetup()
     waitAction(4000)
@@ -39,9 +40,9 @@ class CustomGeometrySourceTest : BaseActivityTest() {
   fun threadsShutdownWhenSourceRemovedTest() {
     validateTestSetup()
     invoke(mapboxMap) { uiController, mapboxMap ->
-      mapboxMap.removeLayer(ID_GRID_LAYER)
+      mapboxMap.style!!.removeLayer(ID_GRID_LAYER)
       uiController.loopMainThreadForAtLeast(3000)
-      mapboxMap.removeSource(ID_GRID_SOURCE)
+      mapboxMap.style!!.removeSource(ID_GRID_SOURCE)
       uiController.loopMainThreadForAtLeast(1000)
       Assert.assertTrue("There should be no threads running when the source is removed.",
         Thread.getAllStackTraces().keys.filter {
@@ -55,12 +56,12 @@ class CustomGeometrySourceTest : BaseActivityTest() {
   fun threadsRestartedWhenSourceReAddedTest() {
     validateTestSetup()
     invoke(mapboxMap) { uiController, mapboxMap ->
-      mapboxMap.removeLayer((rule.activity as GridSourceActivity).layer)
+      mapboxMap.style!!.removeLayer((rule.activity as GridSourceActivity).layer)
       uiController.loopMainThreadForAtLeast(3000)
-      mapboxMap.removeSource(ID_GRID_SOURCE)
+      mapboxMap.style!!.removeSource(ID_GRID_SOURCE)
       uiController.loopMainThreadForAtLeast(1000)
-      mapboxMap.addSource((rule.activity as GridSourceActivity).source)
-      mapboxMap.addLayer((rule.activity as GridSourceActivity).layer)
+      mapboxMap.style!!.addSource((rule.activity as GridSourceActivity).source)
+      mapboxMap.style!!.addLayer((rule.activity as GridSourceActivity).layer)
       uiController.loopMainThreadForAtLeast(1000)
       Assert.assertTrue("Threads should be restarted when the source is re-added to the map.",
         Thread.getAllStackTraces().keys.filter {

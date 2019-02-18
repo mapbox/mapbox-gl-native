@@ -5,9 +5,9 @@ include(node_modules/@mapbox/cmake-node-module/module.cmake)
 add_library(mbgl-loop-node INTERFACE)
 
 target_sources(mbgl-loop-node INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/default/async_task.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/default/run_loop.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/default/timer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/default/src/mbgl/util/async_task.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/default/src/mbgl/util/run_loop.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/default/src/mbgl/util/timer.cpp
 )
 
 target_include_directories(mbgl-loop-node INTERFACE
@@ -49,7 +49,7 @@ target_sources(mbgl-node INTERFACE
 )
 
 target_include_directories(mbgl-node INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/platform/default
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform/default/include
 )
 
 target_link_libraries(mbgl-node INTERFACE

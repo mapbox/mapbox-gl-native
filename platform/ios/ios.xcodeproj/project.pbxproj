@@ -170,7 +170,7 @@
 		35D13AC61D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35D13AC21D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm */; };
 		35D3A1E61E9BE7EB002B38EE /* MGLScaleBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 355ADFFB1E9281DA00F3939D /* MGLScaleBar.h */; };
 		35D3A1E71E9BE7EC002B38EE /* MGLScaleBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 355ADFFB1E9281DA00F3939D /* MGLScaleBar.h */; };
-		35D9DDE21DA25EEC00DAAD69 /* MGLCodingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D9DDE11DA25EEC00DAAD69 /* MGLCodingTests.m */; };
+		35D9DDE21DA25EEC00DAAD69 /* MGLCodingTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35D9DDE11DA25EEC00DAAD69 /* MGLCodingTests.mm */; };
 		35E0CFE61D3E501500188327 /* MGLStyle_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 35E0CFE51D3E501500188327 /* MGLStyle_Private.h */; };
 		35E0CFE71D3E501500188327 /* MGLStyle_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 35E0CFE51D3E501500188327 /* MGLStyle_Private.h */; };
 		35E1A4D81D74336F007AA97F /* MGLValueEvaluator.h in Headers */ = {isa = PBXBuildFile; fileRef = 35E1A4D71D74336F007AA97F /* MGLValueEvaluator.h */; };
@@ -298,6 +298,53 @@
 		55D120A61F791007004B6D81 /* libmbgl-loop-darwin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A71F791007004B6D81 /* libmbgl-loop-darwin.a */; };
 		55D120A81F79100C004B6D81 /* libmbgl-filesource.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A91F79100C004B6D81 /* libmbgl-filesource.a */; };
 		55E2AD131E5B125400E8C587 /* MGLOfflineStorageTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55E2AD121E5B125400E8C587 /* MGLOfflineStorageTests.mm */; };
+		55E5663F21C2A0920008B8B5 /* configuration_utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C0F1FE05F3600C1BD0D /* configuration_utils.h */; };
+		55E5664021C2A0920008B8B5 /* parse_configuration.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C131FE05F3600C1BD0D /* parse_configuration.h */; };
+		55E5664121C2A0920008B8B5 /* ssl_pin_verifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C161FE05F3600C1BD0D /* ssl_pin_verifier.h */; };
+		55E5664221C2A0920008B8B5 /* TSKPublicKeyAlgorithm.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C181FE05F3600C1BD0D /* TSKPublicKeyAlgorithm.h */; };
+		55E5664321C2A0920008B8B5 /* TSKSPKIHashCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C191FE05F3600C1BD0D /* TSKSPKIHashCache.h */; };
+		55E5664421C2A0920008B8B5 /* reporting_utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C1C1FE05F3600C1BD0D /* reporting_utils.h */; };
+		55E5664521C2A0930008B8B5 /* TSKBackgroundReporter.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C1E1FE05F3600C1BD0D /* TSKBackgroundReporter.h */; };
+		55E5664621C2A0930008B8B5 /* TSKPinFailureReport.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C201FE05F3600C1BD0D /* TSKPinFailureReport.h */; };
+		55E5664721C2A0930008B8B5 /* TSKReportsRateLimiter.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C221FE05F3600C1BD0D /* TSKReportsRateLimiter.h */; };
+		55E5664821C2A0930008B8B5 /* vendor_identifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C241FE05F3600C1BD0D /* vendor_identifier.h */; };
+		55E5664921C2A0930008B8B5 /* TrustKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C261FE05F3600C1BD0D /* TrustKit.h */; };
+		55E5664A21C2A0930008B8B5 /* TSKLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C281FE05F3600C1BD0D /* TSKLog.h */; };
+		55E5664B21C2A0930008B8B5 /* TSKPinningValidator.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C291FE05F3600C1BD0D /* TSKPinningValidator.h */; };
+		55E5664C21C2A0930008B8B5 /* TSKPinningValidator_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C2B1FE05F3600C1BD0D /* TSKPinningValidator_Private.h */; };
+		55E5664D21C2A0930008B8B5 /* TSKPinningValidatorCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C2C1FE05F3600C1BD0D /* TSKPinningValidatorCallback.h */; };
+		55E5664E21C2A0930008B8B5 /* TSKPinningValidatorResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C2D1FE05F3600C1BD0D /* TSKPinningValidatorResult.h */; };
+		55E5664F21C2A0930008B8B5 /* TSKTrustDecision.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C2F1FE05F3600C1BD0D /* TSKTrustDecision.h */; };
+		55E5665021C2A0930008B8B5 /* TSKTrustKitConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834C301FE05F3600C1BD0D /* TSKTrustKitConfig.h */; };
+		55E5665121C2A1C20008B8B5 /* MMEReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BCC1FE05D7100C1BD0D /* MMEReachability.h */; };
+		55E5665221C2A2080008B8B5 /* MMENamespacedDependencies.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BC81FE05D7000C1BD0D /* MMENamespacedDependencies.h */; };
+		55E5665321C2A2080008B8B5 /* MapboxMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BAC1FE05D6C00C1BD0D /* MapboxMobileEvents.h */; };
+		55E5665421C2A2080008B8B5 /* CLLocation+MMEMobileEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BC21FE05D6F00C1BD0D /* CLLocation+MMEMobileEvents.h */; };
+		55E5665521C2A2080008B8B5 /* MMEAPIClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BAB1FE05D6C00C1BD0D /* MMEAPIClient.h */; };
+		55E5665621C2A2080008B8B5 /* MMECategoryLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BB51FE05D6D00C1BD0D /* MMECategoryLoader.h */; };
+		55E5665721C2A2080008B8B5 /* MMECommonEventData.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BAE1FE05D6C00C1BD0D /* MMECommonEventData.h */; };
+		55E5665821C2A2080008B8B5 /* MMEConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BB01FE05D6C00C1BD0D /* MMEConstants.h */; };
+		55E5665921C2A2080008B8B5 /* MMEDependencyManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BB11FE05D6D00C1BD0D /* MMEDependencyManager.h */; };
+		55E5665A21C2A2080008B8B5 /* MMEEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BBA1FE05D6E00C1BD0D /* MMEEvent.h */; };
+		55E5665B21C2A2080008B8B5 /* MMEEventLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BA61FE05D6B00C1BD0D /* MMEEventLogger.h */; };
+		55E5665C21C2A2080008B8B5 /* MMEEventLogReportViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 406E99B51FFEFED600D9FFCC /* MMEEventLogReportViewController.h */; };
+		55E5665D21C2A2080008B8B5 /* MMEEventsConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BBB1FE05D6E00C1BD0D /* MMEEventsConfiguration.h */; };
+		55E5665E21C2A2080008B8B5 /* MMEHashProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = ACA65F4A214066AB00537748 /* MMEHashProvider.h */; };
+		55E5665F21C2A2080008B8B5 /* MMETrustKitProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = ACA65F442140667D00537748 /* MMETrustKitProvider.h */; };
+		55E5666021C2A2080008B8B5 /* MMEConfigurator.h in Headers */ = {isa = PBXBuildFile; fileRef = ACA65F4F214066E200537748 /* MMEConfigurator.h */; };
+		55E5666121C2A2080008B8B5 /* MMEEventsManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BA31FE05D6B00C1BD0D /* MMEEventsManager.h */; };
+		55E5666221C2A2080008B8B5 /* MMELocationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BB31FE05D6D00C1BD0D /* MMELocationManager.h */; };
+		55E5666321C2A2080008B8B5 /* MMEMetrics.h in Headers */ = {isa = PBXBuildFile; fileRef = ACD024552187EAAF00D8C8A7 /* MMEMetrics.h */; };
+		55E5666421C2A2080008B8B5 /* MMEMetricsManager.h in Headers */ = {isa = PBXBuildFile; fileRef = ACD024562187EAAF00D8C8A7 /* MMEMetricsManager.h */; };
+		55E5666521C2A2080008B8B5 /* MMENSDateWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BC51FE05D6F00C1BD0D /* MMENSDateWrapper.h */; };
+		55E5666621C2A2080008B8B5 /* MMENSURLSessionWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BAA1FE05D6C00C1BD0D /* MMENSURLSessionWrapper.h */; };
+		55E5666721C2A2080008B8B5 /* MMETimerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BC91FE05D7000C1BD0D /* MMETimerManager.h */; };
+		55E5666821C2A2080008B8B5 /* MMETypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BB61FE05D6D00C1BD0D /* MMETypes.h */; };
+		55E5666921C2A2080008B8B5 /* MMEUIApplicationWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BBE1FE05D6E00C1BD0D /* MMEUIApplicationWrapper.h */; };
+		55E5666A21C2A2080008B8B5 /* MMEUINavigation.h in Headers */ = {isa = PBXBuildFile; fileRef = 406E99B31FFEFED600D9FFCC /* MMEUINavigation.h */; };
+		55E5666B21C2A2080008B8B5 /* MMEUniqueIdentifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BBF1FE05D6E00C1BD0D /* MMEUniqueIdentifier.h */; };
+		55E5666C21C2A2080008B8B5 /* MMEDispatchManager.h in Headers */ = {isa = PBXBuildFile; fileRef = ACA65F552140696B00537748 /* MMEDispatchManager.h */; };
+		55E5666D21C2A2080008B8B5 /* NSData+MMEGZIP.h in Headers */ = {isa = PBXBuildFile; fileRef = 40834BCF1FE05D7100C1BD0D /* NSData+MMEGZIP.h */; };
 		632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */; };
 		6407D6701E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */; };
 		74CB5EB1219B252C00102936 /* MGLStyleLayerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 74CB5EAF219B252C00102936 /* MGLStyleLayerManager.h */; };
@@ -430,7 +477,10 @@
 		CA4EB8C720863487006AB465 /* MGLStyleLayerIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */; };
 		CA55CD41202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA55CD42202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CA65C4F821E9BB080068B0D4 /* MGLCluster.h in Headers */ = {isa = PBXBuildFile; fileRef = CA65C4F721E9BB080068B0D4 /* MGLCluster.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CA65C4F921E9BB080068B0D4 /* MGLCluster.h in Headers */ = {isa = PBXBuildFile; fileRef = CA65C4F721E9BB080068B0D4 /* MGLCluster.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA6914B520E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA6914B420E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m */; };
+		CA88DC3021C85D900059ED5A /* MGLStyleURLIntegrationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA88DC2F21C85D900059ED5A /* MGLStyleURLIntegrationTest.m */; };
 		CA8FBC0921A47BB100D1203C /* MGLRendererConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA8FBC0821A47BB100D1203C /* MGLRendererConfigurationTests.mm */; };
 		CAA69DA4206DCD0E007279CD /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; };
 		CAA69DA5206DCD0E007279CD /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -820,6 +870,11 @@
 		1FCAE2A020B872A400C577DD /* MGLLocationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLLocationManager.h; sourceTree = "<group>"; };
 		1FCAE2A120B872A400C577DD /* MGLLocationManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLLocationManager.m; sourceTree = "<group>"; };
 		1FCAE2A620B88B3800C577DD /* MGLLocationManager_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLLocationManager_Private.h; sourceTree = "<group>"; };
+		1FDB00C721F8F14E00D21389 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
+		1FDB00C821F8F14F00D21389 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Foundation.strings; sourceTree = "<group>"; };
+		1FDB00C921F8F15000D21389 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = cs; path = cs.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
+		1FDB00CA21F8F15100D21389 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
+		1FDB00CB21F8F15300D21389 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = cs; path = cs.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		20DABE861DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Foundation.strings"; sourceTree = "<group>"; };
 		20DABE881DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+MGLAdditions.h"; path = "src/UIImage+MGLAdditions.h"; sourceTree = SOURCE_ROOT; };
@@ -887,7 +942,7 @@
 		35D13AB61D3D15E300AFB4E0 /* MGLStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLStyleLayer.mm; sourceTree = "<group>"; };
 		35D13AC11D3D19DD00AFB4E0 /* MGLFillStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFillStyleLayer.h; sourceTree = "<group>"; };
 		35D13AC21D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFillStyleLayer.mm; sourceTree = "<group>"; };
-		35D9DDE11DA25EEC00DAAD69 /* MGLCodingTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLCodingTests.m; path = ../../darwin/test/MGLCodingTests.m; sourceTree = "<group>"; };
+		35D9DDE11DA25EEC00DAAD69 /* MGLCodingTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLCodingTests.mm; path = ../../darwin/test/MGLCodingTests.mm; sourceTree = "<group>"; };
 		35DE35531EB7CBA8004917C5 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = sv; path = sv.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		35E0CFE51D3E501500188327 /* MGLStyle_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLStyle_Private.h; sourceTree = "<group>"; };
 		35E1A4D71D74336F007AA97F /* MGLValueEvaluator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLValueEvaluator.h; sourceTree = "<group>"; };
@@ -1001,7 +1056,7 @@
 		40FDA7691CCAAA6800442548 /* MBXAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXAnnotationView.h; sourceTree = "<group>"; };
 		40FDA76A1CCAAA6800442548 /* MBXAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXAnnotationView.m; sourceTree = "<group>"; };
 		554180411D2E97DE00012372 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
-		556660C91E1BF3A900E2C41B /* MGLFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLFoundation.h; sourceTree = "<group>"; };
+		556660C91E1BF3A900E2C41B /* MGLFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLFoundation.h; sourceTree = "<group>"; wrapsLines = 0; };
 		556660D71E1D085500E2C41B /* MGLVersionNumber.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLVersionNumber.m; path = ../../darwin/test/MGLVersionNumber.m; sourceTree = "<group>"; };
 		558DE79E1E5615E400C7916D /* MGLFoundation_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFoundation_Private.h; sourceTree = "<group>"; };
 		558DE79F1E5615E400C7916D /* MGLFoundation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFoundation.mm; sourceTree = "<group>"; };
@@ -1095,7 +1150,9 @@
 		CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLStyleLayerIntegrationTests.m; sourceTree = "<group>"; };
 		CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCameraChangeReason.h; sourceTree = "<group>"; };
 		CA5E5042209BDC5F001A8A81 /* MGLTestUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MGLTestUtility.h; path = ../../darwin/test/MGLTestUtility.h; sourceTree = "<group>"; };
+		CA65C4F721E9BB080068B0D4 /* MGLCluster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCluster.h; sourceTree = "<group>"; };
 		CA6914B420E67F50002DB0EE /* MGLAnnotationViewIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLAnnotationViewIntegrationTests.m; path = "Annotation Tests/MGLAnnotationViewIntegrationTests.m"; sourceTree = "<group>"; };
+		CA88DC2F21C85D900059ED5A /* MGLStyleURLIntegrationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLStyleURLIntegrationTest.m; sourceTree = "<group>"; };
 		CA8FBC0821A47BB100D1203C /* MGLRendererConfigurationTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLRendererConfigurationTests.mm; path = ../../darwin/test/MGLRendererConfigurationTests.mm; sourceTree = "<group>"; };
 		CAE7AD5320F46EF5003B6782 /* integration-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "integration-Bridging-Header.h"; sourceTree = "<group>"; };
 		CAE7AD5420F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MGLMapSnapshotterSwiftTests.swift; sourceTree = "<group>"; };
@@ -1437,6 +1494,7 @@
 				CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */,
 				CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */,
 				CA4EB8C620863487006AB465 /* MGLStyleLayerIntegrationTests.m */,
+				CA88DC2F21C85D900059ED5A /* MGLStyleURLIntegrationTest.m */,
 				077061DB215DA11F000FEF62 /* MGLTestLocationManager.h */,
 				077061D9215DA00E000FEF62 /* MGLTestLocationManager.m */,
 			);
@@ -1932,7 +1990,7 @@
 				353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.m */,
 				DAEDC4331D603417000224FF /* MGLAttributionInfoTests.m */,
 				DA35A2C31CCA9F8300E826B2 /* MGLClockDirectionFormatterTests.m */,
-				35D9DDE11DA25EEC00DAAD69 /* MGLCodingTests.m */,
+				35D9DDE11DA25EEC00DAAD69 /* MGLCodingTests.mm */,
 				DA35A2C41CCA9F8300E826B2 /* MGLCompassDirectionFormatterTests.m */,
 				DA35A2A91CCA058D00E826B2 /* MGLCoordinateFormatterTests.m */,
 				3598544C1E1D38AA00B29F84 /* MGLDistanceFormatterTests.m */,
@@ -2157,30 +2215,31 @@
 		DAD165811CF4CFC4001FF4B9 /* Geometry */ = {
 			isa = PBXGroup;
 			children = (
+				CA65C4F721E9BB080068B0D4 /* MGLCluster.h */,
 				DA8847E01CBAFA5100AB86E3 /* MGLAnnotation.h */,
-				DAD165691CF41981001FF4B9 /* MGLFeature.h */,
 				DAD1656A1CF41981001FF4B9 /* MGLFeature_Private.h */,
+				DAD165691CF41981001FF4B9 /* MGLFeature.h */,
 				DAD1656B1CF41981001FF4B9 /* MGLFeature.mm */,
-				DA8847E11CBAFA5100AB86E3 /* MGLGeometry.h */,
 				DA8848011CBAFA6200AB86E3 /* MGLGeometry_Private.h */,
+				DA8847E11CBAFA5100AB86E3 /* MGLGeometry.h */,
 				DA8848021CBAFA6200AB86E3 /* MGLGeometry.mm */,
-				DA8847E31CBAFA5100AB86E3 /* MGLMultiPoint.h */,
 				DA8848041CBAFA6200AB86E3 /* MGLMultiPoint_Private.h */,
+				DA8847E31CBAFA5100AB86E3 /* MGLMultiPoint.h */,
 				DA8848051CBAFA6200AB86E3 /* MGLMultiPoint.mm */,
 				DA8847E71CBAFA5100AB86E3 /* MGLOverlay.h */,
 				DA8847E81CBAFA5100AB86E3 /* MGLPointAnnotation.h */,
 				DA88480B1CBAFA6200AB86E3 /* MGLPointAnnotation.mm */,
-				4049C29B1DB6CD6C00B3F799 /* MGLPointCollection.h */,
 				4049C2AB1DB6E05500B3F799 /* MGLPointCollection_Private.h */,
+				4049C29B1DB6CD6C00B3F799 /* MGLPointCollection.h */,
 				4049C29C1DB6CD6C00B3F799 /* MGLPointCollection.mm */,
-				DA8847E91CBAFA5100AB86E3 /* MGLPolygon.h */,
 				9654C1271FFC1CC000DB6A19 /* MGLPolygon_Private.h */,
+				DA8847E91CBAFA5100AB86E3 /* MGLPolygon.h */,
 				DA88480C1CBAFA6200AB86E3 /* MGLPolygon.mm */,
-				DA8847EA1CBAFA5100AB86E3 /* MGLPolyline.h */,
 				9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */,
+				DA8847EA1CBAFA5100AB86E3 /* MGLPolyline.h */,
 				DA88480D1CBAFA6200AB86E3 /* MGLPolyline.mm */,
-				DA8847EB1CBAFA5100AB86E3 /* MGLShape.h */,
 				40CF6DBA1DAC3C1800A4D18B /* MGLShape_Private.h */,
+				DA8847EB1CBAFA5100AB86E3 /* MGLShape.h */,
 				DA88480E1CBAFA6200AB86E3 /* MGLShape.mm */,
 				DAD165761CF4CDFF001FF4B9 /* MGLShapeCollection.h */,
 				DAD165771CF4CDFF001FF4B9 /* MGLShapeCollection.mm */,
@@ -2301,6 +2360,7 @@
 				DA88483A1CBAFB8500AB86E3 /* MGLAnnotationImage.h in Headers */,
 				74CB5EBD219B280400102936 /* MGLFillStyleLayer_Private.h in Headers */,
 				DAF2571B201901E200367EF5 /* MGLHillshadeStyleLayer.h in Headers */,
+				CA65C4F821E9BB080068B0D4 /* MGLCluster.h in Headers */,
 				DA35A2BB1CCA9A6900E826B2 /* MGLClockDirectionFormatter.h in Headers */,
 				353933FE1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h in Headers */,
 				DA8848201CBAFA6200AB86E3 /* MGLOfflinePack_Private.h in Headers */,
@@ -2359,7 +2419,6 @@
 				DA6408DB1DA4E7D300908C90 /* MGLVectorStyleLayer.h in Headers */,
 				DA704CC21F65A475004B3F28 /* MGLMapAccessibilityElement.h in Headers */,
 				DD0902AB1DB192A800C5BDCE /* MGLNetworkConfiguration.h in Headers */,
-				DA8848571CBAFB9800AB86E3 /* MGLMapboxEvents.h in Headers */,
 				35D3A1E61E9BE7EB002B38EE /* MGLScaleBar.h in Headers */,
 				0778DD431F67556700A73B34 /* MGLComputedShapeSource.h in Headers */,
 				1F6A82A221360F9D00BA5B41 /* MGLLoggingConfiguration.h in Headers */,
@@ -2441,6 +2500,54 @@
 				DAD1656E1CF41981001FF4B9 /* MGLFeature_Private.h in Headers */,
 				DA88483C1CBAFB8500AB86E3 /* MGLMapView.h in Headers */,
 				3EA9363147E77DD29FA06063 /* MGLRendererConfiguration.h in Headers */,
+				55E5663F21C2A0920008B8B5 /* configuration_utils.h in Headers */,
+				55E5664021C2A0920008B8B5 /* parse_configuration.h in Headers */,
+				55E5664121C2A0920008B8B5 /* ssl_pin_verifier.h in Headers */,
+				55E5664221C2A0920008B8B5 /* TSKPublicKeyAlgorithm.h in Headers */,
+				55E5664321C2A0920008B8B5 /* TSKSPKIHashCache.h in Headers */,
+				55E5664421C2A0920008B8B5 /* reporting_utils.h in Headers */,
+				55E5664521C2A0930008B8B5 /* TSKBackgroundReporter.h in Headers */,
+				55E5664621C2A0930008B8B5 /* TSKPinFailureReport.h in Headers */,
+				55E5664721C2A0930008B8B5 /* TSKReportsRateLimiter.h in Headers */,
+				55E5664821C2A0930008B8B5 /* vendor_identifier.h in Headers */,
+				55E5664921C2A0930008B8B5 /* TrustKit.h in Headers */,
+				55E5664A21C2A0930008B8B5 /* TSKLog.h in Headers */,
+				55E5664B21C2A0930008B8B5 /* TSKPinningValidator.h in Headers */,
+				55E5664C21C2A0930008B8B5 /* TSKPinningValidator_Private.h in Headers */,
+				55E5664D21C2A0930008B8B5 /* TSKPinningValidatorCallback.h in Headers */,
+				55E5664E21C2A0930008B8B5 /* TSKPinningValidatorResult.h in Headers */,
+				55E5664F21C2A0930008B8B5 /* TSKTrustDecision.h in Headers */,
+				55E5665021C2A0930008B8B5 /* TSKTrustKitConfig.h in Headers */,
+				55E5665121C2A1C20008B8B5 /* MMEReachability.h in Headers */,
+				55E5665221C2A2080008B8B5 /* MMENamespacedDependencies.h in Headers */,
+				55E5665321C2A2080008B8B5 /* MapboxMobileEvents.h in Headers */,
+				DA8848571CBAFB9800AB86E3 /* MGLMapboxEvents.h in Headers */,
+				55E5665421C2A2080008B8B5 /* CLLocation+MMEMobileEvents.h in Headers */,
+				55E5665521C2A2080008B8B5 /* MMEAPIClient.h in Headers */,
+				55E5665621C2A2080008B8B5 /* MMECategoryLoader.h in Headers */,
+				55E5665721C2A2080008B8B5 /* MMECommonEventData.h in Headers */,
+				55E5665821C2A2080008B8B5 /* MMEConstants.h in Headers */,
+				55E5665921C2A2080008B8B5 /* MMEDependencyManager.h in Headers */,
+				55E5665A21C2A2080008B8B5 /* MMEEvent.h in Headers */,
+				55E5665B21C2A2080008B8B5 /* MMEEventLogger.h in Headers */,
+				55E5665C21C2A2080008B8B5 /* MMEEventLogReportViewController.h in Headers */,
+				55E5665D21C2A2080008B8B5 /* MMEEventsConfiguration.h in Headers */,
+				55E5665E21C2A2080008B8B5 /* MMEHashProvider.h in Headers */,
+				55E5665F21C2A2080008B8B5 /* MMETrustKitProvider.h in Headers */,
+				55E5666021C2A2080008B8B5 /* MMEConfigurator.h in Headers */,
+				55E5666221C2A2080008B8B5 /* MMELocationManager.h in Headers */,
+				55E5666321C2A2080008B8B5 /* MMEMetrics.h in Headers */,
+				55E5666421C2A2080008B8B5 /* MMEMetricsManager.h in Headers */,
+				55E5666521C2A2080008B8B5 /* MMENSDateWrapper.h in Headers */,
+				55E5666621C2A2080008B8B5 /* MMENSURLSessionWrapper.h in Headers */,
+				55E5666721C2A2080008B8B5 /* MMETimerManager.h in Headers */,
+				55E5666821C2A2080008B8B5 /* MMETypes.h in Headers */,
+				55E5666921C2A2080008B8B5 /* MMEUIApplicationWrapper.h in Headers */,
+				55E5666A21C2A2080008B8B5 /* MMEUINavigation.h in Headers */,
+				55E5666B21C2A2080008B8B5 /* MMEUniqueIdentifier.h in Headers */,
+				55E5666C21C2A2080008B8B5 /* MMEDispatchManager.h in Headers */,
+				55E5666121C2A2080008B8B5 /* MMEEventsManager.h in Headers */,
+				55E5666D21C2A2080008B8B5 /* NSData+MMEGZIP.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2474,6 +2581,7 @@
 				071BBB041EE76147001FB02A /* MGLImageSource.h in Headers */,
 				74CB5EC0219B280400102936 /* MGLHeatmapStyleLayer_Private.h in Headers */,
 				74CB5ECB219B285000102936 /* MGLLineStyleLayer_Private.h in Headers */,
+				CA65C4F921E9BB080068B0D4 /* MGLCluster.h in Headers */,
 				DABFB8611CBE99E500D62B32 /* MGLMultiPoint.h in Headers */,
 				74CB5ECD219B285000102936 /* MGLOpenGLStyleLayer_Private.h in Headers */,
 				74CB5ECF219B285000102936 /* MGLRasterStyleLayer_Private.h in Headers */,
@@ -2770,7 +2878,7 @@
 					};
 					DA2E88501CC036F400F24E7B = {
 						CreatedOnToolsVersion = 7.3;
-						LastSwiftMigration = 0820;
+						LastSwiftMigration = 1010;
 					};
 					DA8847D11CBAF91600AB86E3 = {
 						CreatedOnToolsVersion = 7.3;
@@ -2817,6 +2925,7 @@
 				da,
 				"pt-PT",
 				ko,
+				cs,
 			);
 			mainGroup = DA1DC9411CB6C1C2006E619F;
 			productRefGroup = DA1DC94B1CB6C1C2006E619F /* Products */;
@@ -2933,6 +3042,7 @@
 				CA4EB8C720863487006AB465 /* MGLStyleLayerIntegrationTests.m in Sources */,
 				CA34C9C3207FD272005C1A06 /* MGLCameraTransitionTests.mm in Sources */,
 				16376B0A1FFD9DAF0000563E /* MBGLIntegrationTests.m in Sources */,
+				CA88DC3021C85D900059ED5A /* MGLStyleURLIntegrationTest.m in Sources */,
 				CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */,
 				CAE7AD5520F46EF5003B6782 /* MGLMapSnapshotterSwiftTests.swift in Sources */,
 				CA0C27922076C804001CE5B7 /* MGLShapeSourceTests.m in Sources */,
@@ -2982,7 +3092,7 @@
 				170C437D2029D97900863DF0 /* MGLHeatmapStyleLayerTests.mm in Sources */,
 				170C437C2029D96F00863DF0 /* MGLHeatmapColorTests.mm in Sources */,
 				357579801D501E09000B822E /* MGLFillStyleLayerTests.mm in Sources */,
-				35D9DDE21DA25EEC00DAAD69 /* MGLCodingTests.m in Sources */,
+				35D9DDE21DA25EEC00DAAD69 /* MGLCodingTests.mm in Sources */,
 				DA1F8F3D1EBD287B00367E42 /* MGLDocumentationGuideTests.swift in Sources */,
 				076171C32139C70900668A35 /* MGLMapViewTests.m in Sources */,
 				3598544D1E1D38AA00B29F84 /* MGLDistanceFormatterTests.m in Sources */,
@@ -3377,6 +3487,7 @@
 				DAD88E07202ACFE800AAA536 /* da */,
 				DA93409B208562EB0059919A /* pt-PT */,
 				DAFEB3742093AE3700A86A83 /* ko */,
+				1FDB00C721F8F14E00D21389 /* cs */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -3404,6 +3515,7 @@
 				DAD88E0A202AD03C00AAA536 /* da */,
 				DA93409D208563220059919A /* pt-PT */,
 				DAFEB3772093AE7900A86A83 /* ko */,
+				1FDB00CA21F8F15100D21389 /* cs */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -3428,6 +3540,7 @@
 				DACBC60C20118AD000C4D7E2 /* he */,
 				DAD88E08202AD01300AAA536 /* da */,
 				DAFEB3752093AE4800A86A83 /* ko */,
+				1FDB00C821F8F14F00D21389 /* cs */,
 			);
 			name = Foundation.strings;
 			sourceTree = "<group>";
@@ -3453,6 +3566,7 @@
 				DAD88E09202AD01F00AAA536 /* da */,
 				DA93409C2085630C0059919A /* pt-PT */,
 				DAFEB3762093AE6800A86A83 /* ko */,
+				1FDB00C921F8F15000D21389 /* cs */,
 			);
 			name = Foundation.stringsdict;
 			sourceTree = "<group>";
@@ -3485,6 +3599,7 @@
 				DA93409E208563360059919A /* pt-PT */,
 				DAFEB3782093AE9200A86A83 /* ko */,
 				DAAE9B1C213A636B00F7D722 /* ar */,
+				1FDB00CB21F8F15300D21389 /* cs */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";
@@ -3802,7 +3917,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "../darwin/test/test-Bridging-Header.h";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = RelWithDebInfo;
 		};
@@ -4044,7 +4159,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "../darwin/test/test-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -4074,7 +4189,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "../darwin/test/test-Bridging-Header.h";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};

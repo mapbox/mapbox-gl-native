@@ -11,7 +11,7 @@ import android.widget.Toast;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -76,12 +76,11 @@ public class OfflineActivity extends AppCompatActivity
 
     // Set up map
     mapView = (MapView) findViewById(R.id.mapView);
-    mapView.setStyleUrl(STYLE_URL);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(mapboxMap -> {
       Timber.d("Map is ready");
       OfflineActivity.this.mapboxMap = mapboxMap;
-
+      mapboxMap.setStyle(new Style.Builder().fromUrl(STYLE_URL));
       // Set initial position to UNHQ in NYC
       mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
         new CameraPosition.Builder()

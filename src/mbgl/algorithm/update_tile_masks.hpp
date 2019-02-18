@@ -95,10 +95,12 @@ void computeTileMasks(
 // Only other Renderables that are *children* of the Renderable we are generating the mask for will
 // be considered. For example, adding a Renderable with TileID 4/8/13 won't affect the TileMask for
 // 2/1/3, since it is not a descendant of it.
+//
+// The given |renderables| must be sorted by id.
 template <typename Renderable>
 void updateTileMasks(std::vector<std::reference_wrapper<Renderable>> renderables) {
-    std::sort(renderables.begin(), renderables.end(),
-              [](const Renderable& a, const Renderable& b) { return a.id < b.id; });
+    assert(std::is_sorted(renderables.begin(), renderables.end(),
+        [](const Renderable& a, const Renderable& b) { return a.id < b.id; }));
 
     TileMask mask;
     const auto end = renderables.end();

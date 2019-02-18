@@ -10,12 +10,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 
 public final class WaitAction implements ViewAction {
 
-  private static final long DEFAULT_LOOP_TIME = 375;
   private final long loopTime;
-
-  public WaitAction() {
-    this(DEFAULT_LOOP_TIME);
-  }
 
   public WaitAction(long loopTime) {
     this.loopTime = loopTime;

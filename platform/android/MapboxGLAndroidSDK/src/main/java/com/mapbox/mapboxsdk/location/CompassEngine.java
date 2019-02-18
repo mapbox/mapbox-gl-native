@@ -52,14 +52,4 @@ public interface CompassEngine {
    * @return last accuracy status
    */
   int getLastAccuracySensorStatus();
-
-  /**
-   * Lifecycle method that can be used for adding or releasing resources.
-   */
-  void onStart();
-
-  /**
-   * Lifecycle method that can be used for adding or releasing resources.
-   */
-  void onStop();
 }

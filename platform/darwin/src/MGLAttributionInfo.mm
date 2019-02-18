@@ -161,7 +161,7 @@
         return nil;
     }
     
-    NSURLComponents *components = [NSURLComponents componentsWithString:@"https://www.mapbox.com/feedback/"];
+    NSURLComponents *components = [NSURLComponents componentsWithString:@"https://apps.mapbox.com/feedback/"];
     components.fragment = [NSString stringWithFormat:@"/%.5f/%.5f/%.2f/%.1f/%i",
                            centerCoordinate.longitude, centerCoordinate.latitude, zoomLevel,
                            direction, (int)round(pitch)];

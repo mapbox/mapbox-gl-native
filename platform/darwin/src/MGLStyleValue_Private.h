@@ -5,12 +5,14 @@
 #import "NSValue+MGLStyleAttributeAdditions.h"
 #import "NSValue+MGLAdditions.h"
 #import "NSExpression+MGLPrivateAdditions.h"
+#import "NSDate+MGLAdditions.h"
 #import "MGLTypes.h"
 
 #import "MGLConversion.h"
 #include <mbgl/style/conversion/color_ramp_property_value.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/position.hpp>
+#import <mbgl/style/transition_options.hpp>
 #import <mbgl/style/types.hpp>
 
 #import <mbgl/util/enum.hpp>
@@ -28,6 +30,19 @@ namespace mbgl {
             class Expression;
         }
     }
+}
+
+NS_INLINE MGLTransition MGLTransitionFromOptions(const mbgl::style::TransitionOptions& options) {
+    MGLTransition transition;
+    transition.duration = MGLTimeIntervalFromDuration(options.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(options.delay.value_or(mbgl::Duration::zero()));
+    
+    return transition;
+}
+
+NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition transition) {
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
+    return options;
 }
 
 id MGLJSONObjectFromMBGLExpression(const mbgl::style::expression::Expression &mbglExpression);

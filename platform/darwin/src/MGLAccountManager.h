@@ -15,7 +15,7 @@ MGL_EXPORT
 
 /**
  The
- <a href="https://www.mapbox.com/help/define-access-token/">Mapbox access token</a>
+ <a href="https://docs.mapbox.com/help/glossary/access-token/">Mapbox access token</a>
  used by all instances of `MGLMapView` in the current application.
 
  Mapbox-hosted vector tiles and styles require an API access token, which you

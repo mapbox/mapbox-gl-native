@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/style/layer_type.hpp>
 #include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <memory>

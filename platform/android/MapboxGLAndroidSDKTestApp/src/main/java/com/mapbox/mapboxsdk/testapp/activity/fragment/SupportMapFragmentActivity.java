@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapFragment;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -45,7 +45,6 @@ public class SupportMapFragmentActivity extends AppCompatActivity implements Map
 
   private MapboxMapOptions createFragmentOptions() {
     MapboxMapOptions options = new MapboxMapOptions();
-    options.styleUrl(Style.MAPBOX_STREETS);
 
     options.scrollGesturesEnabled(false);
     options.zoomGesturesEnabled(false);
@@ -73,6 +72,7 @@ public class SupportMapFragmentActivity extends AppCompatActivity implements Map
   @Override
   public void onMapReady(@NonNull MapboxMap map) {
     mapboxMap = map;
+    mapboxMap.setStyle(Style.SATELLITE);
   }
 
   @Override

@@ -8,7 +8,7 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
@@ -74,29 +74,33 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      addBusStopSource();
-      addBusStopCircleLayer();
-      initFloatingActionButtons();
-      isLoadingStyle = false;
+      mapboxMap.setStyle(Style.SATELLITE_STREETS);
+      mapView.addOnDidFinishLoadingStyleListener(() -> {
+        Style style = mapboxMap.getStyle();
+        addBusStopSource(style);
+        addBusStopCircleLayer(style);
+        initFloatingActionButtons();
+        isLoadingStyle = false;
+      });
     });
   }
 
-  private void addBusStopSource() {
+  private void addBusStopSource(Style style) {
     try {
       source = new GeoJsonSource(SOURCE_ID, new URL(URL_BUS_ROUTES));
     } catch (MalformedURLException exception) {
       Timber.e(exception, "That's not an url... ");
     }
-    mapboxMap.addSource(source);
+    style.addSource(source);
   }
 
-  private void addBusStopCircleLayer() {
+  private void addBusStopCircleLayer(Style style) {
     layer = new CircleLayer(LAYER_ID, SOURCE_ID);
     layer.setProperties(
       circleColor(Color.parseColor("#FF9800")),
       circleRadius(2.0f)
     );
-    mapboxMap.addLayerBelow(layer, "waterway-label");
+    style.addLayerBelow(layer, "waterway-label");
   }
 
   private void initFloatingActionButtons() {
@@ -128,13 +132,13 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
   }
 
   private void removeOldSource() {
-    mapboxMap.removeSource(SOURCE_ID);
-    mapboxMap.removeLayer(LAYER_ID);
+    mapboxMap.getStyle().removeSource(SOURCE_ID);
+    mapboxMap.getStyle().removeLayer(LAYER_ID);
   }
 
   private void addClusteredSource() {
     try {
-      mapboxMap.addSource(
+      mapboxMap.getStyle().addSource(
         new GeoJsonSource(SOURCE_ID_CLUSTER,
           new URL(URL_BUS_ROUTES),
           new GeoJsonOptions()
@@ -159,7 +163,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
       iconImage("bus-15")
     );
 
-    mapboxMap.addLayer(unclustered);
+    mapboxMap.getStyle().addLayer(unclustered);
 
     for (int i = 0; i < layers.length; i++) {
       // Add some nice circles
@@ -179,7 +183,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
           lt(pointCount, literal(layers[i - 1][0]))
         )
       );
-      mapboxMap.addLayer(circles);
+      mapboxMap.getStyle().addLayer(circles);
     }
 
     // Add the count labels
@@ -191,7 +195,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
       textIgnorePlacement(true),
       textAllowOverlap(true)
     );
-    mapboxMap.addLayer(count);
+    mapboxMap.getStyle().addLayer(count);
   }
 
   private void removeFabs() {
@@ -206,20 +210,17 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
   }
 
   private void removeBusStop() {
-    mapboxMap.removeLayer(layer);
-    mapboxMap.removeSource(source);
+    mapboxMap.getStyle().removeLayer(layer);
+    mapboxMap.getStyle().removeSource(source);
   }
 
   private void loadNewStyle() {
-    mapboxMap.setStyleUrl(getNextStyle(), style -> {
-      addBusStop();
-      isLoadingStyle = false;
-    });
+    mapboxMap.setStyle(new Style.Builder().fromUrl(getNextStyle()));
   }
 
   private void addBusStop() {
-    mapboxMap.addLayer(layer);
-    mapboxMap.addSource(source);
+    mapboxMap.getStyle().addLayer(layer);
+    mapboxMap.getStyle().addSource(source);
   }
 
   private String getNextStyle() {

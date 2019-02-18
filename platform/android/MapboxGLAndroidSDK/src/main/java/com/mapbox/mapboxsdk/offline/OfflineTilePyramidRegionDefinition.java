@@ -3,8 +3,8 @@ package com.mapbox.mapboxsdk.offline;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Keep;
-
 import android.support.annotation.NonNull;
+
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 
@@ -18,8 +18,10 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
  * tiles from minZoom up to the maximum zoom level provided by that source.
  * <p>
  * pixelRatio must be &#x2265; 0 and should typically be 1.0 or 2.0.
+ * <p>
+ * if includeIdeographs is false, offline region will not include CJK glyphs
  */
-public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefinition, Parcelable {
+public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefinition {
 
   @Keep
   private String styleURL;
@@ -31,6 +33,8 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
   private double maxZoom;
   @Keep
   private float pixelRatio;
+  @Keep
+  private boolean includeIdeographs;
 
   /**
    * Constructor to create an OfflineTilePyramidDefinition from parameters.
@@ -43,13 +47,31 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
    */
   @Keep
   public OfflineTilePyramidRegionDefinition(
-    String styleURL, LatLngBounds bounds, double minZoom, double maxZoom, float pixelRatio) {
+      String styleURL, LatLngBounds bounds, double minZoom, double maxZoom, float pixelRatio) {
+    this(styleURL, bounds, minZoom, maxZoom, pixelRatio, true);
+  }
+
+  /**
+   * Constructor to create an OfflineTilePyramidDefinition from parameters.
+   *
+   * @param styleURL   the style
+   * @param bounds     the bounds
+   * @param minZoom    min zoom
+   * @param maxZoom    max zoom
+   * @param pixelRatio pixel ratio of the device
+   * @param includeIdeographs include glyphs for CJK languages
+   */
+  @Keep
+  public OfflineTilePyramidRegionDefinition(
+    String styleURL, LatLngBounds bounds, double minZoom, double maxZoom, float pixelRatio,
+    boolean includeIdeographs) {
     // Note: Also used in JNI
     this.styleURL = styleURL;
     this.bounds = bounds;
     this.minZoom = minZoom;
     this.maxZoom = maxZoom;
     this.pixelRatio = pixelRatio;
+    this.includeIdeographs = includeIdeographs;
   }
 
   /**
@@ -92,6 +114,11 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
   @Override
   public float getPixelRatio() {
     return pixelRatio;
+  }
+
+  @Override
+  public boolean getIncludeIdeographs() {
+    return includeIdeographs;
   }
 
   @NonNull

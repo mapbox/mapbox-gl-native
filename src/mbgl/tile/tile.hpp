@@ -56,8 +56,7 @@ public:
 
     template <class T>
     T* getBucket(const style::Layer::Impl& layer) const {
-        Bucket* bucket = getBucket(layer);
-        return bucket ? bucket->as<T>() : nullptr;
+        return static_cast<T*>(getBucket(layer));
     }
 
     virtual void setShowCollisionBoxes(const bool) {}

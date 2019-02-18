@@ -6,7 +6,7 @@ Put interactive, scalable world maps into your native Cocoa application with the
 * Customize every aspect of the map’s appearance in code or visually using [Mapbox Studio](https://www.mapbox.com/mapbox-studio/).
 * High-performance OpenGL rendering and multitouch gestures keep your users happy.
 * A well-designed, fully documented API helps you stay productive.
-* Develop across [multiple platforms](https://www.mapbox.com/maps/), including [iOS](https://www.mapbox.com/ios-sdk/), using the same styles and similar APIs.
+* Develop across [multiple platforms](https://www.mapbox.com/maps/), including [iOS](https://docs.mapbox.com/ios/maps/), using the same styles and similar APIs.
 
 ![](https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/platform/macos/docs/img/screenshot.jpg)
 
@@ -93,6 +93,6 @@ script AppDelegate
 end script
 ```
 
-Full API documentation is included in this package, within the `documentation` folder, and [online](https://mapbox.github.io/mapbox-gl-native/macos/). The [Mapbox Maps SDK for iOS](https://www.mapbox.com/ios-sdk/) has [API documentation](https://www.mapbox.com/ios-sdk/api/) and [online examples](https://www.mapbox.com/ios-sdk/examples/) that apply to the Mapbox Maps SDK for macOS with few differences, mostly around unimplemented features like user location tracking.
+Full API documentation is included in this package, within the `documentation` folder, and [online](https://mapbox.github.io/mapbox-gl-native/macos/). The [Mapbox Maps SDK for iOS](https://docs.mapbox.com/ios/maps/) has [API documentation](https://docs.mapbox.com/ios/api/maps/) and [online examples](https://docs.mapbox.com/ios/maps/examples/) that apply to the Mapbox Maps SDK for macOS with few differences, mostly around unimplemented features like user location tracking.
 
 Mapbox does not officially support the macOS SDK to the same extent as the iOS SDK; however, [bug reports and pull requests](https://github.com/mapbox/mapbox-gl-native/issues/) are certainly welcome.

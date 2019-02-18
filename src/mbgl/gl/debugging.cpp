@@ -5,6 +5,8 @@
 namespace mbgl {
 namespace gl {
 
+using namespace platform;
+
 #ifndef NDEBUG
 
 DebugGroup::DebugGroup(const Context& context_, const std::string& name) : context(context_) {

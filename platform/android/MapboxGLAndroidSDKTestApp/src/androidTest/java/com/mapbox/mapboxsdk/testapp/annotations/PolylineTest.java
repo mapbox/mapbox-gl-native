@@ -5,8 +5,7 @@ import android.graphics.Color;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
-import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
+import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -14,12 +13,7 @@ import org.junit.Test;
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
 import static org.junit.Assert.assertEquals;
 
-public class PolylineTest extends BaseActivityTest {
-
-  @Override
-  protected Class getActivityClass() {
-    return EspressoTestActivity.class;
-  }
+public class PolylineTest extends EspressoTest {
 
   @Test
   @Ignore

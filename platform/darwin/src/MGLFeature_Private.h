@@ -18,6 +18,7 @@ NSArray<MGLShape <MGLFeature> *> *MGLFeaturesFromMBGLFeatures(const std::vector<
 /**
  Returns an `MGLFeature` object converted from the given mbgl::Feature
  */
+MGL_EXPORT
 id <MGLFeature> MGLFeatureFromMBGLFeature(const mbgl::Feature &feature);
 
 /**
@@ -31,7 +32,7 @@ MGLShape* MGLShapeFromGeoJSON(const mapbox::geojson::geojson &geojson);
  returns the feature object with converted `mbgl::FeatureIdentifier` and
  `mbgl::PropertyMap` properties.
  */
-mbgl::Feature mbglFeature(mbgl::Feature feature, id identifier, NSDictionary *attributes);
+mbgl::Feature mbglFeature(mbgl::Feature feature, id identifier, NSDictionary * attributes);
 
 /**
  Returns an `NSDictionary` representation of an `MGLFeature`.
@@ -45,7 +46,7 @@ NS_ASSUME_NONNULL_END
         if (self = [super initWithCoder:decoder]) { \
             NSSet<Class> *identifierClasses = [NSSet setWithArray:@[[NSString class], [NSNumber class]]]; \
             identifier = [decoder decodeObjectOfClasses:identifierClasses forKey:@"identifier"]; \
-            attributes = [decoder decodeObjectOfClass:[NSDictionary class] forKey:@"attributes"]; \
+            _attributes = [decoder decodeObjectOfClass:[NSDictionary class] forKey:@"attributes"]; \
         } \
         return self; \
     }
@@ -54,7 +55,7 @@ NS_ASSUME_NONNULL_END
     - (void)encodeWithCoder:(NSCoder *)coder { \
         [super encodeWithCoder:coder]; \
         [coder encodeObject:identifier forKey:@"identifier"]; \
-        [coder encodeObject:attributes forKey:@"attributes"]; \
+        [coder encodeObject:_attributes forKey:@"attributes"]; \
     }
 
 #define MGL_DEFINE_FEATURE_IS_EQUAL() \
@@ -66,4 +67,12 @@ NS_ASSUME_NONNULL_END
     } \
     - (NSUInteger)hash { \
         return [super hash] + [[self geoJSONDictionary] hash]; \
+    }
+
+#define MGL_DEFINE_FEATURE_ATTRIBUTES_GETTER() \
+    - (NSDictionary *) attributes { \
+        if (!_attributes) { \
+            return @{}; \
+        } \
+        return _attributes; \
     }

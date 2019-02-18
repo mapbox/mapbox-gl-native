@@ -13,6 +13,7 @@ import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.ArrayList;
@@ -61,11 +62,11 @@ public class PolylineActivity extends AppCompatActivity {
       polylineOptions.addAll(getAllPolylines());
     }
 
-    mapView = (MapView) findViewById(R.id.mapView);
+    mapView = findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(mapboxMap -> {
       PolylineActivity.this.mapboxMap = mapboxMap;
-
+      mapboxMap.setStyle(Style.SATELLITE_STREETS);
       mapboxMap.setOnPolylineClickListener(polyline -> Toast.makeText(
         PolylineActivity.this,
         "You clicked on polyline with id = " + polyline.getId(),

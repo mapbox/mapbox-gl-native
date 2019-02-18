@@ -39,6 +39,7 @@ public:
     virtual void onDidFinishRenderingMap(RenderMode) {}
     virtual void onDidFinishLoadingStyle() {}
     virtual void onSourceChanged(style::Source&) {}
+    virtual void onDidBecomeIdle() {}
 };
 
 } // namespace mbgl
