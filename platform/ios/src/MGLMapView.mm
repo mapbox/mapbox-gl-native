@@ -210,14 +210,14 @@ public:
 
 @property (nonatomic, readwrite) MGLStyle *style;
 
-@property (nonatomic) UITapGestureRecognizer *singleTapGestureRecognizer;
-@property (nonatomic) UITapGestureRecognizer *doubleTap;
-@property (nonatomic) UITapGestureRecognizer *twoFingerTap;
-@property (nonatomic) UIPanGestureRecognizer *pan;
-@property (nonatomic) UIPinchGestureRecognizer *pinch;
-@property (nonatomic) UIRotationGestureRecognizer *rotate;
-@property (nonatomic) UILongPressGestureRecognizer *quickZoom;
-@property (nonatomic) UIPanGestureRecognizer *twoFingerDrag;
+@property (nonatomic, readwrite) UITapGestureRecognizer *singleTapGestureRecognizer;
+@property (nonatomic, readwrite) UITapGestureRecognizer *doubleTap;
+@property (nonatomic, readwrite) UITapGestureRecognizer *twoFingerTap;
+@property (nonatomic, readwrite) UIPanGestureRecognizer *pan;
+@property (nonatomic, readwrite) UIPinchGestureRecognizer *pinch;
+@property (nonatomic, readwrite) UIRotationGestureRecognizer *rotate;
+@property (nonatomic, readwrite) UILongPressGestureRecognizer *quickZoom;
+@property (nonatomic, readwrite) UIPanGestureRecognizer *twoFingerDrag;
 
 @property (nonatomic) UIInterfaceOrientation currentOrientation;
 @property (nonatomic) UIInterfaceOrientationMask applicationSupportedInterfaceOrientations;

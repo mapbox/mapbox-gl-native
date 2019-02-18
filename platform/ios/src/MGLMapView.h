@@ -360,6 +360,24 @@ MGL_EXPORT IB_DESIGNABLE
 
 - (void)removeStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 
+#pragma mark Access internal gesture gesture recognizers
+
+@property (nonatomic, readonly) UITapGestureRecognizer *singleTapGestureRecognizer;
+
+@property (nonatomic, readonly) UITapGestureRecognizer *doubleTap;
+
+@property (nonatomic, readonly) UITapGestureRecognizer *twoFingerTap;
+
+@property (nonatomic, readonly) UIPanGestureRecognizer *pan;
+
+@property (nonatomic, readonly) UIPinchGestureRecognizer *pinch;
+
+@property (nonatomic, readonly) UIRotationGestureRecognizer *rotate;
+
+@property (nonatomic, readonly) UILongPressGestureRecognizer *quickZoom;
+
+@property (nonatomic, readonly) UIPanGestureRecognizer *twoFingerDrag;
+
 #pragma mark Displaying the User’s Location
 
 /**
