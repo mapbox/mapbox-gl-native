@@ -111,6 +111,11 @@ final class LocationLayerController {
       if (layerBelow == null || !layerBelow.equals(newLayerBelowOption)) {
         removeLayers();
         addLayers(newLayerBelowOption);
+        if (isHidden) {
+          for (String layerId : layerMap) {
+            setLayerVisibility(layerId, false);
+          }
+        }
         setRenderMode(renderMode);
       }
     }
