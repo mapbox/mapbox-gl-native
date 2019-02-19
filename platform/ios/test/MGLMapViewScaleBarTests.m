@@ -19,6 +19,7 @@
 
 - (void)tearDown {
     self.mapView = nil;
+    [MGLAccountManager setAccessToken:nil];
 
     [super tearDown];
 }
