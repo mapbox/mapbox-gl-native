@@ -12,6 +12,7 @@ ext {
             mapboxGestures  : '0.4.0',
             supportLib      : '27.1.1',
             constraintLayout: '1.1.2',
+            uiAutomator     : '2.1.3',
             espresso        : '3.0.2',
             testRunner      : '1.0.2',
             leakCanary      : '1.6.2',
@@ -45,6 +46,7 @@ ext {
             testEspressoCore       : "com.android.support.test.espresso:espresso-core:${versions.espresso}",
             testEspressoIntents    : "com.android.support.test.espresso:espresso-intents:${versions.espresso}",
             testEspressoContrib    : "com.android.support.test.espresso:espresso-contrib:${versions.espresso}",
+            testUiAutomator        : "com.android.support.test.uiautomator:uiautomator-v18:${versions.uiAutomator}",
 
             supportAnnotations     : "com.android.support:support-annotations:${versions.supportLib}",
             supportAppcompatV7     : "com.android.support:appcompat-v7:${versions.supportLib}",

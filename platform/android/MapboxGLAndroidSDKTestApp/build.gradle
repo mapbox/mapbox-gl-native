@@ -76,6 +76,7 @@ dependencies {
     androidTestImplementation dependenciesList.testEspressoCore
     androidTestImplementation dependenciesList.testEspressoIntents
     androidTestImplementation dependenciesList.testEspressoContrib
+    androidTestImplementation dependenciesList.testUiAutomator
 }
 
 apply from: "${rootDir}/gradle/gradle-make.gradle"
