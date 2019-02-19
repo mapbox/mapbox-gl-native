@@ -20,6 +20,7 @@ import android.view.ViewConfiguration;
  */
 final class MapKeyListener {
 
+  private final Projection projection;
   private final Transform transform;
   private final UiSettings uiSettings;
   private final MapGestureDetector mapGestureDetector;
@@ -27,7 +28,8 @@ final class MapKeyListener {
   @Nullable
   private TrackballLongPressTimeOut currentTrackballLongPressTimeOut;
 
-  MapKeyListener(Transform transform, UiSettings uiSettings, MapGestureDetector mapGestureDetector) {
+  MapKeyListener(Projection projection, Transform transform, UiSettings uiSettings, MapGestureDetector mapGestureDetector) {
+    this.projection = projection;
     this.transform = transform;
     this.uiSettings = uiSettings;
     this.mapGestureDetector = mapGestureDetector;
@@ -127,7 +129,7 @@ final class MapKeyListener {
         }
 
         // Zoom out
-        PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+        PointF focalPoint = new PointF(projection.getWidth() / 2, projection.getHeight() / 2);
         mapGestureDetector.zoomOutAnimated(focalPoint, true);
         return true;
 
@@ -163,7 +165,7 @@ final class MapKeyListener {
         }
 
         // Zoom in
-        PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+        PointF focalPoint = new PointF(projection.getWidth() / 2, projection.getHeight() / 2);
         mapGestureDetector.zoomInAnimated(focalPoint, true);
         return true;
     }
@@ -218,7 +220,7 @@ final class MapKeyListener {
         // Only handle if we have not already long pressed
         if (currentTrackballLongPressTimeOut != null) {
           // Zoom in
-          PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+          PointF focalPoint = new PointF(projection.getWidth() / 2, projection.getHeight() / 2);
           mapGestureDetector.zoomInAnimated(focalPoint, true);
         }
         return true;
@@ -260,7 +262,7 @@ final class MapKeyListener {
       // Check if the trackball is still pressed
       if (!cancelled) {
         // Zoom out
-        PointF pointF = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+        PointF pointF = new PointF(projection.getWidth() / 2, projection.getHeight() / 2);
         mapGestureDetector.zoomOutAnimated(pointF, true);
 
         // Ensure the up action is not run

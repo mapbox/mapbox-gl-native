@@ -10,6 +10,7 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.LibraryLoader;
@@ -80,22 +81,15 @@ final class NativeMapView implements NativeMap {
   }
 
   //
-  // Constructors
+  // Constructor
   //
 
-  public NativeMapView(@NonNull final Context context, final boolean crossSourceCollisions,
-                       final ViewCallback viewCallback, final StateCallback stateCallback,
-                       final MapRenderer mapRenderer) {
-    this(context, context.getResources().getDisplayMetrics().density, crossSourceCollisions, viewCallback,
-      stateCallback, mapRenderer);
-  }
-
-  public NativeMapView(final Context context, final float pixelRatio, final boolean crossSourceCollisions,
-                       final ViewCallback viewCallback, final StateCallback stateCallback,
+  public NativeMapView(final FileSource fileSource, final float pixelRatio, final boolean crossSourceCollisions,
+                       @Nullable final ViewCallback viewCallback, @Nullable final StateCallback stateCallback,
                        final MapRenderer mapRenderer) {
     this.mapRenderer = mapRenderer;
     this.viewCallback = viewCallback;
-    this.fileSource = FileSource.getInstance(context);
+    this.fileSource = fileSource;
     this.pixelRatio = pixelRatio;
     this.thread = Thread.currentThread();
     this.stateCallback = stateCallback;

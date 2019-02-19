@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.TextureView;
 
+import com.mapbox.mapboxsdk.maps.MapPresenter;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -27,11 +28,11 @@ public class TextureViewMapRenderer extends MapRenderer {
    * @param localIdeographFontFamily the local font family
    * @param translucentSurface    the translucency flag
    */
-  public TextureViewMapRenderer(@NonNull Context context,
+  public TextureViewMapRenderer(@NonNull MapPresenter mapPresenter, @NonNull Context context,
                                 @NonNull TextureView textureView,
                                 String localIdeographFontFamily,
                                 boolean translucentSurface) {
-    super(context, localIdeographFontFamily);
+    super(mapPresenter, context, localIdeographFontFamily);
     this.translucentSurface = translucentSurface;
     renderThread = new TextureViewRenderThread(textureView, this);
     renderThread.start();

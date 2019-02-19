@@ -974,7 +974,9 @@ public final class UiSettings {
    * Returns the measured height of the MapView
    *
    * @return height in pixels
+   * @deprecated use {@link MapView#getHeight()} instead
    */
+  @Deprecated
   public float getHeight() {
     return projection.getHeight();
   }
@@ -983,7 +985,9 @@ public final class UiSettings {
    * Returns the measured width of the MapView
    *
    * @return widht in pixels
+   * @deprecated use {@link MapView#getWidth()} instead
    */
+  @Deprecated
   public float getWidth() {
     return projection.getWidth();
   }

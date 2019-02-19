@@ -559,7 +559,7 @@ final class MapGestureDetector {
         scaleFocalPoint = focalPoint;
       } else if (quickZoom) {
         // around center
-        scaleFocalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+        scaleFocalPoint = new PointF(projection.getWidth() / 2, projection.getHeight() / 2);
       } else {
         // around gesture
         scaleFocalPoint = detector.getFocalPoint();

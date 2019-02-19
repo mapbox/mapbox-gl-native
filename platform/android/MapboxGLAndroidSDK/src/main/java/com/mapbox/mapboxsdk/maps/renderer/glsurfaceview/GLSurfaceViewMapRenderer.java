@@ -4,6 +4,8 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 
 import android.support.annotation.NonNull;
+
+import com.mapbox.mapboxsdk.maps.MapPresenter;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.maps.renderer.egl.EGLConfigChooser;
 
@@ -23,10 +25,10 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
   @NonNull
   private final GLSurfaceView glSurfaceView;
 
-  public GLSurfaceViewMapRenderer(Context context,
+  public GLSurfaceViewMapRenderer(@NonNull MapPresenter mapPresenter, Context context,
                                   GLSurfaceView glSurfaceView,
                                   String localIdeographFontFamily) {
-    super(context, localIdeographFontFamily);
+    super(mapPresenter, context, localIdeographFontFamily);
     this.glSurfaceView = glSurfaceView;
     glSurfaceView.setEGLContextClientVersion(2);
     glSurfaceView.setEGLConfigChooser(new EGLConfigChooser());
