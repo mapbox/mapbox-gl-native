@@ -91,10 +91,12 @@ namespace {
 
 QThreadStorage<std::shared_ptr<mbgl::util::RunLoop>> loop;
 
-std::shared_ptr<mbgl::DefaultFileSource> sharedDefaultFileSource(
-        const std::string& cachePath, const std::string& assetRoot, uint64_t maximumCacheSize) {
+std::shared_ptr<mbgl::DefaultFileSource> sharedDefaultFileSource(const QMapboxGLSettings &settings) {
     static std::mutex mutex;
     static std::unordered_map<std::string, std::weak_ptr<mbgl::DefaultFileSource>> fileSources;
+
+    const std::string cachePath = settings.cacheDatabasePath().toStdString();
+    const std::string accessToken = settings.accessToken().toStdString();
 
     std::lock_guard<std::mutex> lock(mutex);
 
@@ -107,17 +109,23 @@ std::shared_ptr<mbgl::DefaultFileSource> sharedDefaultFileSource(
         }
     }
 
+    const auto key = cachePath + "|" + accessToken;
+
     // Return an existing FileSource if available.
-    auto sharedFileSource = fileSources.find(cachePath);
+    auto sharedFileSource = fileSources.find(key);
     if (sharedFileSource != fileSources.end()) {
         return sharedFileSource->second.lock();
     }
 
     // New path, create a new FileSource.
     auto newFileSource = std::make_shared<mbgl::DefaultFileSource>(
-        cachePath, assetRoot, maximumCacheSize);
+        cachePath, settings.assetPath().toStdString(), settings.cacheDatabaseMaximumSize());
 
-    fileSources[cachePath] = newFileSource;
+    // Setup the FileSource
+    newFileSource->setAccessToken(accessToken);
+    newFileSource->setAPIBaseURL(settings.apiBaseUrl().toStdString());
+
+    fileSources[key] = newFileSource;
 
     return newFileSource;
 }
@@ -1735,19 +1743,12 @@ void QMapboxGL::connectionEstablished()
 
 QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings, const QSize &size, qreal pixelRatio_)
     : QObject(q)
-    , m_fileSourceObj(sharedDefaultFileSource(
-        settings.cacheDatabasePath().toStdString(),
-        settings.assetPath().toStdString(),
-        settings.cacheDatabaseMaximumSize()))
+    , m_fileSourceObj(sharedDefaultFileSource(settings))
     , m_threadPool(mbgl::sharedThreadPool())
     , m_mode(settings.contextMode())
     , m_pixelRatio(pixelRatio_)
     , m_localFontFamily(settings.localFontFamily())
 {
-    // Setup the FileSource
-    m_fileSourceObj->setAccessToken(settings.accessToken().toStdString());
-    m_fileSourceObj->setAPIBaseURL(settings.apiBaseUrl().toStdString());
-
     if (settings.resourceTransform()) {
         m_resourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(*mbgl::Scheduler::GetCurrent(),
             [callback = settings.resourceTransform()] (mbgl::Resource::Kind, const std::string &&url_) -> std::string {
