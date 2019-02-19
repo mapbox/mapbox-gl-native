@@ -459,16 +459,15 @@ public final class LocationComponent {
     applyStyle(options);
   }
 
+  /**
+   * This method initializes the component and needs to be called before any other operations are performed.
+   * Afterwards, you can manage component's visibility by {@link #setLocationComponentEnabled(boolean)}.
+   *
+   * @param locationComponentActivationOptions a fully built {@link LocationComponentActivationOptions} object
+   */
   public void activateLocationComponent(@NonNull LocationComponentActivationOptions
                                           locationComponentActivationOptions) {
-
-    Log.d(TAG, "locationComponentActivationOptions context packageName = " + locationComponentActivationOptions.context().getPackageName());
-    Log.d(TAG, "locationComponentActivationOptions style URL = " + locationComponentActivationOptions.style().getUrl());
-    Log.d(TAG, "locationComponentActivationOptions styleRes = " + locationComponentActivationOptions.styleRes());
-
-    if (locationComponentActivationOptions.context() != null
-      && locationComponentActivationOptions.style() != null
-      && locationComponentActivationOptions.locationComponentOptions() != null) {
+    if (locationComponentActivationOptions.locationComponentOptions() != null) {
       initialize(locationComponentActivationOptions.context(), locationComponentActivationOptions.style(),
         locationComponentActivationOptions.locationComponentOptions());
     }
@@ -485,24 +484,14 @@ public final class LocationComponent {
       setLocationEngine(null);
     }
 
-    // TODO: How to do some sort of null check on an int for locationComponentActivationOptions.styleRes() ?
-    if (locationComponentActivationOptions.styleRes() <0 &&
-      locationComponentActivationOptions.locationComponentOptions() == null
-      && locationComponentActivationOptions.context() != null) {
-
-      applyStyle(LocationComponentOptions.createFromAttributes(locationComponentActivationOptions.context(),
-        R.style.mapbox_LocationComponent));
-
-    } else if (locationComponentActivationOptions.styleRes() <0
-      && locationComponentActivationOptions.locationComponentOptions() == null
-      && locationComponentActivationOptions.context() != null) {
-
+    if (locationComponentActivationOptions.styleRes() == 0 &&
+      locationComponentActivationOptions.locationComponentOptions() == null) {
+        applyStyle(LocationComponentOptions.createFromAttributes(
+          locationComponentActivationOptions.context(), R.style.mapbox_LocationComponent));
+    } else if (locationComponentActivationOptions.styleRes() != 0) {
       applyStyle(LocationComponentOptions.createFromAttributes(locationComponentActivationOptions.context(),
         locationComponentActivationOptions.styleRes()));
-    } else if (locationComponentActivationOptions.styleRes() < 0
-      && locationComponentActivationOptions.locationComponentOptions() != null
-      && locationComponentActivationOptions.context() != null) {
-
+    } else if (locationComponentActivationOptions.locationComponentOptions() != null) {
       applyStyle(locationComponentActivationOptions.locationComponentOptions());
     }
   }

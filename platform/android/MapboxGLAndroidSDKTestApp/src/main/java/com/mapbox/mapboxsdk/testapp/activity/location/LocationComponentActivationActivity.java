@@ -13,6 +13,7 @@ import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
 import com.mapbox.mapboxsdk.location.LocationComponentOptions;
+import com.mapbox.mapboxsdk.location.modes.CameraMode;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -81,18 +82,18 @@ public class LocationComponentActivationActivity extends AppCompatActivity imple
       .elevation(5)
       .accuracyAlpha(.6f)
       .accuracyColor(Color.GREEN)
-      .foregroundDrawable(R.drawable.mapbox_marker_icon_default)
+      .foregroundDrawable(R.drawable.mapbox_logo_helmet)
       .build();
 
     LocationComponentActivationOptions locationComponentActivationOptions = LocationComponentActivationOptions
       .builder(this, style)
-      .locationComponentOptions(locationComponentOptions)
       .useDefaultLocationEngine(true)
       .build();
 
     locationComponent.activateLocationComponent(locationComponentActivationOptions);
     locationComponent.setLocationComponentEnabled(true);
-    locationComponent.setRenderMode(RenderMode.COMPASS);
+    locationComponent.setRenderMode(RenderMode.NORMAL);
+    locationComponent.setCameraMode(CameraMode.TRACKING);
   }
 
   @Override
