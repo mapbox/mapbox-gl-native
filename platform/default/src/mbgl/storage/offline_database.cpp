@@ -78,6 +78,15 @@ void OfflineDatabase::initialize() {
     }
 }
 
+void OfflineDatabase::changePath(const std::string& path_) {
+    Log::Info(Event::Database, "Changing the database path.");
+
+    statements.clear();
+    db.reset();
+    path = path_;
+    initialize();
+}
+
 void OfflineDatabase::handleError(const mapbox::sqlite::Exception& ex, const char* action) {
     if (ex.code == mapbox::sqlite::ResultCode::NotADB ||
         ex.code == mapbox::sqlite::ResultCode::Corrupt ||
