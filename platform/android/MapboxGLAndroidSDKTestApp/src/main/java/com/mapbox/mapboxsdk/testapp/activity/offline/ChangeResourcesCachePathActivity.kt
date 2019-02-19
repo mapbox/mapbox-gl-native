@@ -12,27 +12,36 @@ import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.TextView
 import android.widget.Toast
+import com.mapbox.mapboxsdk.log.Logger
+import com.mapbox.mapboxsdk.offline.OfflineManager
+import com.mapbox.mapboxsdk.offline.OfflineRegion
 import com.mapbox.mapboxsdk.storage.FileSource
 import com.mapbox.mapboxsdk.testapp.R
 import kotlinx.android.synthetic.main.activity_change_resources_cache_path.*
 import java.io.File
 
 class ChangeResourcesCachePathActivity : AppCompatActivity(),
-    AdapterView.OnItemClickListener,
-    FileSource.SetResourcesCachePathCallback {
+  AdapterView.OnItemClickListener,
+  FileSource.ResourcesCachePathChangeCallback {
 
-  lateinit var adapter: PathAdapter
+  companion object {
+    private const val TAG = "Mbgl-ChangeResourcesCachePathActivity"
+  }
+
+  private lateinit var adapter: PathAdapter
+
+  private lateinit var offlineManager: OfflineManager
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_change_resources_cache_path)
 
-    Thread(Runnable {
-      adapter = PathAdapter(this, obtainFilesPaths(this))
-      listView.adapter = adapter
-      listView.emptyView = empty
-      listView.onItemClickListener = this
-    }).start()
+    adapter = PathAdapter(this, obtainExternalFilesPaths())
+    listView.adapter = adapter
+    listView.emptyView = empty
+    listView.onItemClickListener = this
+
+    offlineManager = OfflineManager.getInstance(this)
   }
 
   override fun onStart() {
@@ -55,23 +64,33 @@ class ChangeResourcesCachePathActivity : AppCompatActivity(),
   override fun onSuccess(path: String?) {
     listView.onItemClickListener = this
     Toast.makeText(this, "New path: $path", Toast.LENGTH_LONG).show()
+
+    offlineManager.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+      override fun onList(offlineRegions: Array<out OfflineRegion>?) {
+        Logger.i(TAG, "Number of saved offline regions in the new path: ${offlineRegions?.size.toString()}")
+      }
+
+      override fun onError(error: String?) {
+        Logger.e(TAG, error)
+      }
+    })
   }
 
-  private fun obtainFilesPaths(context: Context): List<String> {
+  private fun Context.obtainExternalFilesPaths(): List<String> {
     val paths = ArrayList<String>()
-    paths.add(context.filesDir.absolutePath)
+    paths.add(this.filesDir.absolutePath)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      paths.addAll(obtainExternalFilesPathsKitKat(context))
+      paths.addAll(obtainExternalFilesPathsKitKat())
     } else {
-      paths.addAll(obtainExternalFilesPathsLegacy(context))
+      paths.addAll(obtainExternalFilesPathsLegacy())
     }
     paths.add("${File.separator}invalid${File.separator}cache${File.separator}path")
     return paths
   }
 
-  private fun obtainExternalFilesPathsLegacy(context: Context): List<String> {
+  private fun Context.obtainExternalFilesPathsLegacy(): List<String> {
     val postFix =
-        "${File.separator}Android${File.separator}data${File.separator}${context.packageName}${File.separator}files"
+      "${File.separator}Android${File.separator}data${File.separator}${this.packageName}${File.separator}files"
     val paths = ArrayList<String>()
     val externalStorage = System.getenv("EXTERNAL_STORAGE")
     val secondaryStorage = System.getenv("SECONDARY_STORAGE")
@@ -88,9 +107,9 @@ class ChangeResourcesCachePathActivity : AppCompatActivity(),
   }
 
   @TargetApi(Build.VERSION_CODES.KITKAT)
-  private fun obtainExternalFilesPathsKitKat(context: Context): List<String> {
+  private fun Context.obtainExternalFilesPathsKitKat(): List<String> {
     val paths = ArrayList<String>()
-    val extDirs = context.getExternalFilesDirs(null)
+    val extDirs = this.getExternalFilesDirs(null)
     for (dir in extDirs) {
       if (dir != null) {
         paths.add(dir.absolutePath)
@@ -105,11 +124,9 @@ class ChangeResourcesCachePathActivity : AppCompatActivity(),
       return paths[position]
     }
 
-
     override fun getItemId(position: Int): Long {
       return position.toLong()
     }
-
 
     override fun getCount(): Int {
       return paths.size

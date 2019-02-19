@@ -8,7 +8,6 @@ import android.os.Looper;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 
-import android.support.annotation.RestrictTo;
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
@@ -132,14 +131,6 @@ public class OfflineManager {
 
     // Delete any existing previous ambient cache database
     deleteAmbientDatabase(this.context);
-  }
-
-  /**
-   * Clears the current instance of the offline manager.
-   */
-  @RestrictTo(RestrictTo.Scope.LIBRARY)
-  public static void clear() {
-    instance = null;
   }
 
   private void deleteAmbientDatabase(final Context context) {
@@ -461,17 +452,17 @@ public class OfflineManager {
    * resource were requested in the process of map rendering.
    * Use this method to pre-warm the cache with resources you know
    * will be requested.
-   *
+   * <p>
    * This call is asynchronous: the data may not be immediately available
    * for in-progress requests, although subsequent requests should have
    * access to the cached data.
    *
-   * @param url The URL of the resource to insert
-   * @param data Response data to store for this resource. Data is expected to be uncompressed;
-   *             internally, the cache will compress data as necessary.
-   * @param modified Optional "modified" response header, in seconds since 1970, or 0 if not set
-   * @param expires Optional "expires" response header, in seconds since 1970, or 0 if not set
-   * @param etag Optional "entity tag" response header
+   * @param url            The URL of the resource to insert
+   * @param data           Response data to store for this resource. Data is expected to be uncompressed;
+   *                       internally, the cache will compress data as necessary.
+   * @param modified       Optional "modified" response header, in seconds since 1970, or 0 if not set
+   * @param expires        Optional "expires" response header, in seconds since 1970, or 0 if not set
+   * @param etag           Optional "entity tag" response header
    * @param mustRevalidate Indicates whether response can be used after it's stale
    */
   @Keep

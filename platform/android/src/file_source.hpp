@@ -39,6 +39,8 @@ public:
 
     void setResourceTransform(jni::JNIEnv&, const jni::Object<FileSource::ResourceTransformCallback>&);
 
+    void setResourceCachePath(jni::JNIEnv&, const jni::String&);
+
     void resume(jni::JNIEnv&);
 
     void pause(jni::JNIEnv&);
@@ -52,6 +54,7 @@ public:
     static void registerNative(jni::JNIEnv&);
 
 private:
+    const std::string DATABASE_FILE = "/mbgl-offline.db";
     optional<int> activationCounter;
     std::unique_ptr<Actor<ResourceTransform>> resourceTransform;
     std::unique_ptr<mbgl::DefaultFileSource> fileSource;
