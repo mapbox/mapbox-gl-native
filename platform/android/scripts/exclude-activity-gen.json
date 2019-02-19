@@ -46,5 +46,7 @@
   "GridSourceActivity",
   "AnimatedImageSourceActivity",
   "EspressoTestActivity",
+  "ChangeResourcesCachePathActivity",
+  "EspressoTestActivity",
   "FragmentBackStackActivity"
 ]
