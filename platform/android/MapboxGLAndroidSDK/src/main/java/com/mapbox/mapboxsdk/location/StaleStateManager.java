@@ -1,7 +1,10 @@
 package com.mapbox.mapboxsdk.location;
 
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Class controls the location stale state when the {@link android.location.Location} hasn't
@@ -14,24 +17,18 @@ class StaleStateManager {
   private boolean isEnabled;
   private final OnLocationStaleListener innerOnLocationStaleListeners;
   @NonNull
-  private final Handler handler;
+  private final StaleMessageHandler handler;
   private boolean isStale = true;
   private long delayTime;
 
+  private final int staleStateMessage = 1;
+
   StaleStateManager(OnLocationStaleListener innerListener, LocationComponentOptions options) {
     innerOnLocationStaleListeners = innerListener;
-    handler = new Handler();
+    handler = new StaleMessageHandler(this);
     isEnabled = options.enableStaleState();
     delayTime = options.staleStateTimeout();
   }
-
-  @NonNull
-  private Runnable staleStateRunnable = new Runnable() {
-    @Override
-    public void run() {
-      setState(true);
-    }
-  };
 
   void setEnabled(boolean enabled) {
     if (enabled) {
@@ -54,7 +51,9 @@ class StaleStateManager {
 
   void setDelayTime(long delayTime) {
     this.delayTime = delayTime;
-    postTheCallback();
+    if (handler.hasMessages(staleStateMessage)) {
+      postTheCallback();
+    }
   }
 
   void onStart() {
@@ -69,7 +68,7 @@ class StaleStateManager {
 
   private void postTheCallback() {
     handler.removeCallbacksAndMessages(null);
-    handler.postDelayed(staleStateRunnable, delayTime);
+    handler.sendEmptyMessageDelayed(staleStateMessage, delayTime);
   }
 
   private void setState(boolean stale) {
@@ -77,6 +76,23 @@ class StaleStateManager {
       isStale = stale;
       if (isEnabled) {
         innerOnLocationStaleListeners.onStaleStateChange(stale);
+      }
+    }
+  }
+
+  private static class StaleMessageHandler extends Handler {
+
+    private final WeakReference<StaleStateManager> managerWeakReference;
+
+    private StaleMessageHandler(StaleStateManager staleStateManager) {
+      this.managerWeakReference = new WeakReference<>(staleStateManager);
+    }
+
+    @Override
+    public void handleMessage(Message msg) {
+      StaleStateManager manager = managerWeakReference.get();
+      if (manager != null) {
+        manager.setState(true);
       }
     }
   }
