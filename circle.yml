@@ -906,7 +906,11 @@ jobs:
           command: |
             curl -sSfL -o codecov https://codecov.io/bash 
             chmod +x codecov
-            ./codecov -F ios -c
+            ./codecov -F ios -J 'CI'
+      - run:
+          name: Generate code coverage reports
+          command: |
+            platform/ios/scripts/code-coverage.sh
       - check-public-symbols
       - run:
           name: Check symbol namespacing for mapbox-events-ios
@@ -977,10 +981,10 @@ jobs:
       - run:
           name: Build and run SDK unit tests with the static analyzer
           command: make ios-static-analyzer
-      - run:
-          name: Generate code coverage reports
-          command: |
-            platform/ios/scripts/code-coverage.sh
+      # - run:
+      #     name: Generate code coverage reports
+      #     command: |
+      #       platform/ios/scripts/code-coverage.sh
       - save-dependencies
       - collect-xcode-build-logs
       - upload-xcode-build-logs
