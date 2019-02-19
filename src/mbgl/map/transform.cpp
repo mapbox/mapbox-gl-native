@@ -124,7 +124,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     const double startScale = state.scale;
     const double startAngle = state.angle;
     const double startPitch = state.pitch;
-    state.panning = latLng != startLatLng;
+    state.panning = unwrappedLatLng != startLatLng;
     state.scaling = scale != startScale;
     state.rotating = angle != startAngle;
 
