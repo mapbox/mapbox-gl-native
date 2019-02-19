@@ -34,6 +34,9 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         static let shared = MGLOfflineStorageMock()
         func addPack(for: MGLOfflineRegion, withContext: Data, completionHandler: MGLOfflinePackAdditionCompletionHandler? = nil) {
             XCTAssert(MGLOfflineStorage.shared.responds(to: #selector(MGLOfflineStorage.shared.addPack(for:withContext:completionHandler:))))
+            if let completionHandler = completionHandler {
+                completionHandler(nil, NSError(domain: "MGLDocumentationExampleError", code: 0, userInfo: [NSLocalizedDescriptionKey: "\(#function) is mocked and not functional."]))
+            }
         }
     }
 
@@ -122,21 +125,19 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         let bbox = MGLCoordinateBounds(sw: southwest, ne: northeast)
         let region = MGLTilePyramidOfflineRegion(styleURL: MGLDocumentationExampleTests.styleURL, bounds: bbox, fromZoomLevel: 11, toZoomLevel: 14)
         let context = "Tile Pyramid Region".data(using: .utf8)!
-        
+
         //#-example-code
         MGLOfflineStorage.shared.addPack(for: region, withContext: context) { (pack, error) in
-            guard error == nil else {
-                // If download fails, log the error to the console
-                print("Error: \(error?.localizedDescription ?? "unknown error")")
+            guard let pack = pack else {
+                // If adding the pack fails, log an error to console.
+                print("Error:", error?.localizedDescription ?? "unknown error adding pack at \(#file)(\(#line)) in \(#function)")
                 return
             }
-            
+
             // Start an MGLOfflinePack download
-            pack!.resume()
+            pack.resume()
         }
         //#-end-example-code
-        
-        XCTAssertNotNil(region)
     }
     
     func testMGLShape$shapeWithData_encoding_error_() {
