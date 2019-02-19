@@ -19,11 +19,12 @@ FileSource::FileSource(jni::JNIEnv& _env,
                        const jni::String& accessToken,
                        const jni::String& _cachePath,
                        const jni::Object<AssetManager>& assetManager) {
-    mapbox::sqlite::setTempPath(jni::Make<std::string>(_env, _cachePath));
+    std::string path = jni::Make<std::string>(_env, _cachePath);
+    mapbox::sqlite::setTempPath(path);
 
     // Create a core default file source
     fileSource = std::make_unique<mbgl::DefaultFileSource>(
-        jni::Make<std::string>(_env, _cachePath) + "/mbgl-offline.db",
+        path + DATABASE_FILE,
         std::make_unique<AssetManagerFileSource>(_env, assetManager));
 
     // Set access token
@@ -67,6 +68,12 @@ void FileSource::setResourceTransform(jni::JNIEnv& env, const jni::Object<FileSo
         resourceTransform.reset();
         fileSource->setResourceTransform({});
     }
+}
+
+void FileSource::setResourceCachePath(jni::JNIEnv& env, const jni::String& path) {
+    std::string newPath = jni::Make<std::string>(env, path);
+    mapbox::sqlite::setTempPath(newPath);
+    fileSource->setResourceCachePath(newPath + DATABASE_FILE);
 }
 
 void FileSource::resume(jni::JNIEnv&) {
@@ -129,6 +136,7 @@ void FileSource::registerNative(jni::JNIEnv& env) {
         METHOD(&FileSource::setAccessToken, "setAccessToken"),
         METHOD(&FileSource::setAPIBaseUrl, "setApiBaseUrl"),
         METHOD(&FileSource::setResourceTransform, "setResourceTransform"),
+        METHOD(&FileSource::setResourceCachePath, "setResourceCachePath"),
         METHOD(&FileSource::resume, "activate"),
         METHOD(&FileSource::pause, "deactivate"),
         METHOD(&FileSource::isResumed, "isActivated")

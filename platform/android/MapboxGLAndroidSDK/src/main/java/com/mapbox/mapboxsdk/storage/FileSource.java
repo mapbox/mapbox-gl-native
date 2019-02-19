@@ -13,11 +13,11 @@ import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+
 import com.mapbox.mapboxsdk.MapStrictMode;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.log.Logger;
-import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.utils.ThreadUtils;
 
 import java.io.File;
@@ -117,7 +117,7 @@ public class FileSource {
 
       // Reset stored cache path
       SharedPreferences.Editor editor =
-          context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
+        context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
       editor.remove(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH).apply();
     }
 
@@ -148,11 +148,11 @@ public class FileSource {
     try {
       // Try getting a custom value from the app Manifest
       ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(),
-          PackageManager.GET_META_DATA);
+        PackageManager.GET_META_DATA);
       if (appInfo.metaData != null) {
         isExternalStorageConfiguration = appInfo.metaData.getBoolean(
-            MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
-            MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL
+          MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
+          MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL
         );
       }
     } catch (PackageManager.NameNotFoundException exception) {
@@ -182,8 +182,8 @@ public class FileSource {
     }
 
     Logger.w(TAG, "External storage was requested but it isn't readable. For API level < 18"
-        + " make sure you've requested READ_EXTERNAL_STORAGE or WRITE_EXTERNAL_STORAGE"
-        + " permissions in your app Manifest (defaulting to internal storage).");
+      + " make sure you've requested READ_EXTERNAL_STORAGE or WRITE_EXTERNAL_STORAGE"
+      + " permissions in your app Manifest (defaulting to internal storage).");
 
     return false;
   }
@@ -212,9 +212,9 @@ public class FileSource {
     @NonNull
     @Override
     protected String[] doInBackground(Context... contexts) {
-      return new String[]{
-          getCachePath(contexts[0]),
-          contexts[0].getCacheDir().getAbsolutePath()
+      return new String[] {
+        getCachePath(contexts[0]),
+        contexts[0].getCacheDir().getAbsolutePath()
       };
     }
 
@@ -297,7 +297,7 @@ public class FileSource {
                 message = null;
 
                 final SharedPreferences.Editor editor =
-                    context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
+                  context.getSharedPreferences(MAPBOX_SHARED_PREFERENCES, Context.MODE_PRIVATE).edit();
                 if (!editor.putString(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH, path).commit()) {
                   Logger.w(TAG, "Cannot store cache path in shared preferences.");
                 }
@@ -305,8 +305,15 @@ public class FileSource {
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                   @Override
                   public void run() {
-                    setResourcesCachePath(context, path);
-                    callback.onSuccess(path);
+                    if (getInstance(context).isActivated()) {
+                      final String activatedMessage = "Cannot set path, file source is activated!";
+                      Logger.w(TAG, activatedMessage);
+                      callback.onError(activatedMessage);
+                      editor.remove(MAPBOX_SHARED_PREFERENCE_RESOURCES_CACHE_PATH).apply();
+                    } else {
+                      setResourcesCachePath(context, path);
+                      callback.onSuccess(path);
+                    }
                   }
                 });
               }
@@ -332,8 +339,8 @@ public class FileSource {
   private static void setResourcesCachePath(@NonNull Context context, @NonNull String path) {
     resourcesCachePathLoaderLock.lock();
     resourcesCachePath = path;
-    reinitializeOfflineManager(context);
     resourcesCachePathLoaderLock.unlock();
+    getInstance(context).setResourceCachePath(path);
   }
 
   private static boolean isPathWritable(String path) {
@@ -341,12 +348,6 @@ public class FileSource {
       return false;
     }
     return new File(path).canWrite();
-  }
-
-  private static void reinitializeOfflineManager(@NonNull Context context) {
-    final FileSource fileSource = FileSource.getInstance(context);
-    fileSource.initialize(Mapbox.getAccessToken(), resourcesCachePath, context.getResources().getAssets());
-    OfflineManager.clear();
   }
 
   private static void lockPathLoaders() {
@@ -395,6 +396,9 @@ public class FileSource {
    */
   @Keep
   public native void setResourceTransform(final ResourceTransformCallback callback);
+
+  @Keep
+  private native void setResourceCachePath(String path);
 
   @Keep
   private native void initialize(String accessToken, String cachePath, AssetManager assetManager);
