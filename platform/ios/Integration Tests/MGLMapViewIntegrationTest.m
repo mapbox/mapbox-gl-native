@@ -57,6 +57,7 @@
     self.renderFinishedExpectation = nil;
     self.mapView = nil;
     self.style = nil;
+    [MGLAccountManager setAccessToken:nil];
 
     [super tearDown];
 }

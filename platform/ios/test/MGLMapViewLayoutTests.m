@@ -58,6 +58,7 @@
 - (void)tearDown {
     self.styleLoadingExpectation = nil;
     self.mapView = nil;
+    [MGLAccountManager setAccessToken:nil];
 
     [super tearDown];
 }

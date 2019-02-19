@@ -36,6 +36,7 @@ static MGLMapView *mapView;
 
 + (void)tearDown {
     mapView = nil;
+    [MGLAccountManager setAccessToken:nil];
     [super tearDown];
 }
 
