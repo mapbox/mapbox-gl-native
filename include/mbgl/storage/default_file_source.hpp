@@ -47,6 +47,8 @@ public:
 
     void setResourceTransform(optional<ActorRef<ResourceTransform>>&&);
 
+    void setResourceCachePath(const std::string&);
+
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
 
     /*
