@@ -1146,7 +1146,7 @@ public final class LocationComponent {
       locationEngine.removeLocationUpdates(currentLocationEngineListener);
     }
     if (options.pulseEnabled()) {
-      Log.d(TAG, "onLocationLayerStop: about to stop animation ");
+      Logger.d(TAG, "onLocationLayerStop: about to stop animation ");
       locationAnimatorCoordinator.stopPulsingAnimation();
     }
     mapboxMap.removeOnCameraMoveListener(onCameraMoveListener);

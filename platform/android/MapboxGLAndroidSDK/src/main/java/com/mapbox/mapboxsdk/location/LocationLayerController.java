@@ -14,6 +14,7 @@ import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
+import com.mapbox.mapboxsdk.log.Logger;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.Layer;
@@ -386,7 +387,7 @@ final class LocationLayerController {
   private void stylePulsingCircle(LocationComponentOptions options) {
     if (mapboxMap.getStyle() != null) {
       if (mapboxMap.getStyle().getLayer(PROPERTY_PULSING_CIRCLE_LAYER) != null) {
-        Log.d(TAG, "stylePulsingCircle: options.pulseEnabled() = " + options.pulseEnabled());
+        Logger.d(TAG, "stylePulsingCircle: options.pulseEnabled() = " + options.pulseEnabled());
         // TODO: Swap true for options.pulseEnabled() but figure out why options.pulseEnabled() sometimes returns false
         setLayerVisibility(PROPERTY_PULSING_CIRCLE_LAYER, true);
         mapboxMap.getStyle().getLayer(PROPERTY_PULSING_CIRCLE_LAYER).setProperties(
