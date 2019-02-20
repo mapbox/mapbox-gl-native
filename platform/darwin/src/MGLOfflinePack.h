@@ -106,15 +106,15 @@ typedef struct __attribute__((objc_boxable)) MGLOfflinePackProgress {
  
  ### Example
  ```swift
- MGLOfflineStorage.shared.addPack(for: region, withContext: context!) { (pack, error) in
-     guard error == nil else {
-         // If download fails, log the error to the console
-         print("Error: \(error?.localizedDescription ?? "unknown error")")
+ MGLOfflineStorage.shared.addPack(for: region, withContext: context) { (pack, error) in
+     guard let pack = pack else {
+         // If adding the pack fails, log an error to console.
+         print("Error:", error?.localizedDescription ?? "unknown error adding pack at \(#file)(\(#line)) in \(#function)")
          return
      }
-     
+ 
      // Start an MGLOfflinePack download
-     pack!.resume()
+     pack.resume()
  }
  ```
  */
