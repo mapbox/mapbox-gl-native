@@ -29,6 +29,17 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     var styleLoadingExpectation: XCTestExpectation!
     static let styleURL = Bundle(for: MGLDocumentationExampleTests.self).url(forResource: "one-liner", withExtension: "json")!
 
+    // Mock MGLOfflineStorage singleton so that it doesn't start long-running tasks that could interfere with other tests.
+    fileprivate class MGLOfflineStorageMock {
+        static let shared = MGLOfflineStorageMock()
+        func addPack(for: MGLOfflineRegion, withContext: Data, completionHandler: MGLOfflinePackAdditionCompletionHandler? = nil) {
+            XCTAssert(MGLOfflineStorage.shared.responds(to: #selector(MGLOfflineStorage.shared.addPack(for:withContext:completionHandler:))))
+            if let completionHandler = completionHandler {
+                completionHandler(nil, NSError(domain: "MGLDocumentationExampleError", code: 0, userInfo: [NSLocalizedDescriptionKey: "\(#function) is mocked and not functional."]))
+            }
+        }
+    }
+
     override func setUp() {
         super.setUp()
         mapView = MGLMapView(frame: CGRect(x: 0, y: 0, width: 256, height: 256), styleURL: MGLDocumentationExampleTests.styleURL)
@@ -66,6 +77,8 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
             }
         }
 
+        typealias MGLOfflineStorage = MGLOfflineStorageMock
+
         //#-example-code
         let northeast = CLLocationCoordinate2D(latitude: 40.989329, longitude: -102.062592)
         let southwest = CLLocationCoordinate2D(latitude: 36.986207, longitude: -109.049896)
@@ -85,6 +98,8 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
                 return MGLDocumentationExampleTests.styleURL
             }
         }
+
+        typealias MGLOfflineStorage = MGLOfflineStorageMock
         
         //#-example-code
         var coordinates = [
@@ -103,26 +118,26 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
     
     func testMGLOfflinePack() {
+        typealias MGLOfflineStorage = MGLOfflineStorageMock
+
         let northeast = CLLocationCoordinate2D(latitude: 40.989329, longitude: -102.062592)
         let southwest = CLLocationCoordinate2D(latitude: 36.986207, longitude: -109.049896)
         let bbox = MGLCoordinateBounds(sw: southwest, ne: northeast)
-        let region = MGLTilePyramidOfflineRegion(styleURL: MGLStyle.lightStyleURL, bounds: bbox, fromZoomLevel: 11, toZoomLevel: 14)
-        let context = "Tile Pyramid Region".data(using: .utf8)
-        
+        let region = MGLTilePyramidOfflineRegion(styleURL: MGLDocumentationExampleTests.styleURL, bounds: bbox, fromZoomLevel: 11, toZoomLevel: 14)
+        let context = "Tile Pyramid Region".data(using: .utf8)!
+
         //#-example-code
-        MGLOfflineStorage.shared.addPack(for: region, withContext: context!) { (pack, error) in
-            guard error == nil else {
-                // If download fails, log the error to the console
-                print("Error: \(error?.localizedDescription ?? "unknown error")")
+        MGLOfflineStorage.shared.addPack(for: region, withContext: context) { (pack, error) in
+            guard let pack = pack else {
+                // If adding the pack fails, log an error to console.
+                print("Error:", error?.localizedDescription ?? "unknown error adding pack at \(#file)(\(#line)) in \(#function)")
                 return
             }
-            
+
             // Start an MGLOfflinePack download
-            pack!.resume()
+            pack.resume()
         }
         //#-end-example-code
-        
-        XCTAssertNotNil(region)
     }
     
     func testMGLShape$shapeWithData_encoding_error_() {
