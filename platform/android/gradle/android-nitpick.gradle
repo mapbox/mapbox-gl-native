@@ -17,6 +17,7 @@ task androidNitpick {
         exec {
             workingDir = "${rootDir}"
             commandLine "git", "submodule", "update", "--init", "--recursive", "vendor"
+            ignoreExitValue = true
         }
         verifyVendorSubmodulePin(MAPBOX_JAVA_DIR, MAPBOX_JAVA_TAG_PREFIX, versions.mapboxServices)
         verifyVendorSubmodulePin(MAPBOX_TELEMETRY_DIR, MAPBOX_TELEMETRY_TAG_PREFIX, versions.mapboxTelemetry)
