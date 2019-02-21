@@ -75,6 +75,7 @@
 #import "MGLMapAccessibilityElement.h"
 #import "MGLLocationManager_Private.h"
 #import "MGLLoggingConfiguration_Private.h"
+#import "MGLNetworkConfiguration_Private.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -200,7 +201,8 @@ public:
                           MGLSMCalloutViewDelegate,
                           MGLCalloutViewDelegate,
                           MGLMultiPointDelegate,
-                          MGLAnnotationImageDelegate>
+                          MGLAnnotationImageDelegate,
+                          MGLNetworkEventDelegate>
 
 @property (nonatomic, readwrite) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
@@ -520,6 +522,9 @@ public:
     
     // setup default location manager
     self.locationManager = nil;
+    
+    // setup the download events
+    [MGLNetworkConfiguration sharedManager].delegate = self;
 
     // Set up annotation management and selection state.
     _annotationImagesByIdentifier = [NSMutableDictionary dictionary];
@@ -7060,6 +7065,13 @@ void MBGLMapViewRenderable::bind() {
 {
     MGLLogDebug(@"Setting showsHeading: %@", MGLStringFromBOOL(showsHeading));
     self.showsUserHeadingIndicator = showsHeading;
+}
+
+#pragma mark - MGLNetworkEventDelegate
+
+- (void)networkConfiguration:(MGLNetworkConfiguration *)networkConfiguration didReceiveNetworkEvent:(NSDictionary *)event
+{
+    [MGLMapboxEvents pushEvent:kMGLDownloadPerformanceEvent withAttributes:event];
 }
 
 @end

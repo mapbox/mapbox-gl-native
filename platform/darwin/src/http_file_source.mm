@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "MGLLoggingConfiguration_Private.h"
-#import "MGLNetworkConfiguration.h"
+#import "MGLNetworkConfiguration_Private.h"
 
 #include <mutex>
 #include <chrono>
@@ -215,14 +215,19 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
         }
 
         [req addValue:impl->userAgent forHTTPHeaderField:@"User-Agent"];
-
+        
+        if (resource.kind == mbgl::Resource::Kind::Tile) {
+            [[MGLNetworkConfiguration sharedManager] startDownloadEvent:url.relativePath type:@"tile"];
+        }
+        
         request->task = [impl->session
             dataTaskWithRequest:req
               completionHandler:^(NSData* data, NSURLResponse* res, NSError* error) {
                 if (error && [error code] == NSURLErrorCancelled) {
+                    [[MGLNetworkConfiguration sharedManager] cancelDownloadEvent:res.URL.relativePath];
                     return;
                 }
-
+                [[MGLNetworkConfiguration sharedManager] stopDownloadEvent:res.URL.relativePath];
                 Response response;
                 using Error = Response::Error;
 
