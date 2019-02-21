@@ -193,6 +193,7 @@
         "MGLMapViewDelegate.h": "platform/ios/src/MGLMapViewDelegate.h",
         "MGLDistanceFormatter.h": "platform/darwin/src/MGLDistanceFormatter.h",
         "MGLOpenGLStyleLayer.h": "platform/darwin/src/MGLOpenGLStyleLayer.h",
+        "MGLMapboxEventsDelegate.h": "platform/darwin/src/MGLMapboxEventsDelegate.h",
         "MGLTileSource.h": "platform/darwin/src/MGLTileSource.h",
         "MGLTilePyramidOfflineRegion.h": "platform/darwin/src/MGLTilePyramidOfflineRegion.h",
         "MGLVectorTileSource.h": "platform/darwin/src/MGLVectorTileSource.h",

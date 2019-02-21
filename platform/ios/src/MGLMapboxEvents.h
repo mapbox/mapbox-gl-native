@@ -3,7 +3,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MGLMapboxEvents : NSObject
+@interface MGLMapboxEvents : NSObject 
 
 + (nullable instancetype)sharedInstance;
 

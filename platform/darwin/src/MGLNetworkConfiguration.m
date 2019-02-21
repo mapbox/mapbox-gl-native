@@ -1,4 +1,5 @@
 #import "MGLNetworkConfiguration_Private.h"
+#import "MGLMapboxEventsDelegate.h"
 
 
 NSString * const kMGLDownloadPerformanceEvent = @"mobile.performance_trace";
@@ -9,7 +10,6 @@ static NSString * const MGLResourceType = @"resource_type";
 
 @property (strong) NSURLSessionConfiguration *sessionConfig;
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSDictionary*> *events;
-@property (nonatomic, weak, nullable) id<MGLNetworkEventDelegate> delegate;
 
 @end
 
@@ -63,34 +63,49 @@ static NSString * const MGLResourceType = @"resource_type";
 }
 
 - (void)stopDownloadEvent:(NSString *)urlString {
+    [self sendEventForURL:urlString withAction:nil];
+}
+
+- (void)cancelDownloadEvent:(NSString *)urlString {
+    [self sendEventForURL:urlString withAction:@"cancel"];
+}
+
+- (void)sendEventForURL:(NSString *)urlString withAction:(NSString *)action
+{
     if (urlString && [self.events objectForKey:urlString]) {
-        if ([self.delegate respondsToSelector:@selector(networkConfiguration:didReceiveNetworkEvent:)])
+        if ([self.eventsDelegate shouldReceiveEvents])
         {
-            NSDictionary *parameters = [self.events objectForKey:urlString];
-            NSDate *startDate = [parameters objectForKey:MGLStartTime];
-            NSDate *endDate = [NSDate date];
-            NSTimeInterval elapsedTime = [endDate timeIntervalSinceDate:startDate];
-            NSDateFormatter* iso8601Formatter = [[NSDateFormatter alloc] init];
-            iso8601Formatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
-            
-            NSDictionary *eventAttributes = @{
-                                              @"event" : kMGLDownloadPerformanceEvent,
-                                              @"created" : [iso8601Formatter stringFromDate:[NSDate date]],
-                                              @"sessionId" : [NSUUID UUID].UUIDString,
-                                              @"counters" : @[ @{ @"name" : @"elapsed_time" }, @{ @"value" : @(elapsedTime) } ],
-                                              @"attributes" : @[ @{ @"name" : @"resource" }, @{ @"value" : urlString },  ]
-                                              };
-            
-            [self.delegate networkConfiguration:self didReceiveNetworkEvent:eventAttributes];
+            NSDictionary *eventAttributes = [self eventAttributesForURL:urlString withAction:action];
+            [self.eventsDelegate didReceiveEvent:kMGLDownloadPerformanceEvent withAttributes:eventAttributes];
         }
         [self.events removeObjectForKey:urlString];
     }
 }
 
-- (void)cancelDownloadEvent:(NSString *)urlString {
-    if (urlString && [self.events objectForKey:urlString]) {
-        [self.events removeObjectForKey:urlString];
+- (NSDictionary *)eventAttributesForURL:(NSString *)urlString withAction:(NSString *)action
+{
+    NSDictionary *parameters = [self.events objectForKey:urlString];
+    NSDate *startDate = [parameters objectForKey:MGLStartTime];
+    NSDate *endDate = [NSDate date];
+    NSTimeInterval elapsedTime = [endDate timeIntervalSinceDate:startDate];
+    NSDateFormatter* iso8601Formatter = [[NSDateFormatter alloc] init];
+    iso8601Formatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
+    NSString *createdDate = [iso8601Formatter stringFromDate:[NSDate date]];
+    
+    NSMutableArray *attributes = [NSMutableArray array];
+    [attributes addObject:@{ @"name" : @"resource" , @"value" : urlString }];
+    [attributes addObject:@{ @"name" : MGLResourceType , @"value" : [parameters objectForKey:MGLResourceType] }];
+    if (action) {
+        [attributes addObject:@{ @"name" : @"action" , @"value" : action }];
     }
+    
+    return @{
+             @"event" : kMGLDownloadPerformanceEvent,
+             @"created" : createdDate,
+             @"sessionId" : [NSUUID UUID].UUIDString,
+             @"counters" : @[ @{ @"name" : @"elapsed_time" , @"value" : @(elapsedTime) } ],
+             @"attributes" : attributes
+             };
 }
 
 @end

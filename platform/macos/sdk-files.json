@@ -113,6 +113,7 @@
         "MGLOverlay.h": "platform/darwin/src/MGLOverlay.h",
         "MGLPolyline.h": "platform/darwin/src/MGLPolyline.h",
         "MGLLineStyleLayer.h": "platform/darwin/src/MGLLineStyleLayer.h",
+        "MGLMapboxEventsDelegate.h": "platform/darwin/src/MGLMapboxEventsDelegate.h",
         "MGLDistanceFormatter.h": "platform/darwin/src/MGLDistanceFormatter.h",
         "MGLHeatmapStyleLayer.h": "platform/darwin/src/MGLHeatmapStyleLayer.h",
         "MGLOfflineRegion.h": "platform/darwin/src/MGLOfflineRegion.h",

@@ -37,6 +37,8 @@
 		1F26B6C320E1A351007BCC21 /* simple_route.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F26B6C220E1A351007BCC21 /* simple_route.json */; };
 		1F2B94C0221636D900210640 /* MGLNetworkConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F2B94BF221636D800210640 /* MGLNetworkConfiguration_Private.h */; };
 		1F2B94C1221636D900210640 /* MGLNetworkConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F2B94BF221636D800210640 /* MGLNetworkConfiguration_Private.h */; };
+		1F2B95072220A73B00210640 /* MGLMapboxEventsDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F2B95052220A73B00210640 /* MGLMapboxEventsDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1F2B95082220A73B00210640 /* MGLMapboxEventsDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F2B95052220A73B00210640 /* MGLMapboxEventsDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1F6A82A221360F9D00BA5B41 /* MGLLoggingConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F6A82A021360F9C00BA5B41 /* MGLLoggingConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1F6A82A321360F9D00BA5B41 /* MGLLoggingConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F6A82A021360F9C00BA5B41 /* MGLLoggingConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1F6A82A421360F9D00BA5B41 /* MGLLoggingConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F6A82A121360F9C00BA5B41 /* MGLLoggingConfiguration.m */; };
@@ -866,6 +868,7 @@
 		1F26B6C020E189C9007BCC21 /* MBXCustomLocationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXCustomLocationViewController.m; sourceTree = "<group>"; };
 		1F26B6C220E1A351007BCC21 /* simple_route.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = simple_route.json; sourceTree = "<group>"; };
 		1F2B94BF221636D800210640 /* MGLNetworkConfiguration_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLNetworkConfiguration_Private.h; sourceTree = "<group>"; };
+		1F2B95052220A73B00210640 /* MGLMapboxEventsDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLMapboxEventsDelegate.h; sourceTree = "<group>"; };
 		1F6A82A021360F9C00BA5B41 /* MGLLoggingConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLLoggingConfiguration.h; sourceTree = "<group>"; };
 		1F6A82A121360F9C00BA5B41 /* MGLLoggingConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLLoggingConfiguration.m; sourceTree = "<group>"; };
 		1F6A82A62138871900BA5B41 /* MGLLoggingConfiguration_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLLoggingConfiguration_Private.h; sourceTree = "<group>"; };
@@ -2071,6 +2074,7 @@
 				558DE79F1E5615E400C7916D /* MGLFoundation.mm */,
 				DA8847E21CBAFA5100AB86E3 /* MGLMapCamera.h */,
 				DA8848031CBAFA6200AB86E3 /* MGLMapCamera.mm */,
+				1F2B95052220A73B00210640 /* MGLMapboxEventsDelegate.h */,
 				927FBCFD1F4DB05500F8BF1F /* MGLMapSnapshotter.h */,
 				927FBCFE1F4DB05500F8BF1F /* MGLMapSnapshotter.mm */,
 				DD0902A41DB18F1B00C5BDCE /* MGLNetworkConfiguration.h */,
@@ -2504,6 +2508,7 @@
 				DA88485C1CBAFB9800AB86E3 /* MGLFaux3DUserLocationAnnotationView.h in Headers */,
 				35305D4A1D22AA6A0007D005 /* NSData+MGLAdditions.h in Headers */,
 				359F57461D2FDDA6005217F1 /* MGLUserLocationAnnotationView_Private.h in Headers */,
+				1F2B95072220A73B00210640 /* MGLMapboxEventsDelegate.h in Headers */,
 				404C26E21D89B877000AA13D /* MGLTileSource.h in Headers */,
 				DA8847FD1CBAFA5100AB86E3 /* MGLTilePyramidOfflineRegion.h in Headers */,
 				DA88482F1CBAFA6200AB86E3 /* NSProcessInfo+MGLAdditions.h in Headers */,
@@ -2693,6 +2698,7 @@
 				353933F61D3FB785003F57D7 /* MGLBackgroundStyleLayer.h in Headers */,
 				DABFB85D1CBE99E500D62B32 /* MGLAccountManager.h in Headers */,
 				74CB5EB2219B252C00102936 /* MGLStyleLayerManager.h in Headers */,
+				1F2B95082220A73B00210640 /* MGLMapboxEventsDelegate.h in Headers */,
 				9221BAB020699F8A0054BDF4 /* MGLTilePyramidOfflineRegion_Private.h in Headers */,
 				96E516F5200059B100A02306 /* MGLNetworkConfiguration.h in Headers */,
 				96E516F42000597D00A02306 /* NSData+MGLAdditions.h in Headers */,
