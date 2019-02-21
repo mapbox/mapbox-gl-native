@@ -3,18 +3,14 @@ package com.mapbox.mapboxsdk.maps;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
-
 class MapPresenterImpl implements MapPresenter {
 
   private final MapChangeReceiver mapChangeReceiver;
 
-  private final MapView mapView;
+  private final IMapView mapView;
   private final MapboxMapOptions mapboxMapOptions;
-  private final MapRenderer renderer;
-  private final NativeMapView nativeMapView;
 
-  MapPresenterImpl(@NonNull MapView mapView, @NonNull Context context, @NonNull MapboxMapOptions mapboxMapOptions,
+  MapPresenterImpl(@NonNull IMapView mapView, @NonNull Context context, @NonNull MapboxMapOptions mapboxMapOptions,
                    @NonNull MapChangeReceiver mapChangeReceiver) {
     this.mapView = mapView;
     this.mapboxMapOptions = mapboxMapOptions;
@@ -26,15 +22,17 @@ class MapPresenterImpl implements MapPresenter {
 
     String localFontFamily = mapboxMapOptions.getLocalIdeographFontFamily();
     if (mapboxMapOptions.getTextureMode()) {
-      renderer = mapView.createTextureView(this, localFontFamily,
-        mapboxMapOptions.getTranslucentTextureSurface());
+      mapView.createTextureView(localFontFamily, mapboxMapOptions.getTranslucentTextureSurface());
     } else {
-      renderer = mapView.createSurfaceView(this, localFontFamily,
-        mapboxMapOptions.getRenderSurfaceOnTop());
+      mapView.createSurfaceView(localFontFamily, mapboxMapOptions.getRenderSurfaceOnTop());
     }
 
-    nativeMapView = mapView.createNativeMapView(getPixelRatio(), mapboxMapOptions.getCrossSourceCollisions(),
-      mapChangeReceiver, renderer);
+    mapView.createNativeMapView(getPixelRatio(), mapboxMapOptions.getCrossSourceCollisions(), mapChangeReceiver);
+  }
+
+  @Override
+  public void onSurfaceCreated() {
+
   }
 
   private float getPixelRatio() {
@@ -45,11 +43,6 @@ class MapPresenterImpl implements MapPresenter {
       pixelRatio = mapView.getDensity();
     }
     return pixelRatio;
-  }
-
-  @Override
-  public void onSurfaceCreated() {
-
   }
 
   @Override

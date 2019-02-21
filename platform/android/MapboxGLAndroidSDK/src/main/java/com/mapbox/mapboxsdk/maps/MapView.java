@@ -39,6 +39,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
 
@@ -58,6 +61,7 @@ import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
  */
 public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
+  private final IMapView impl = new IMapViewImpl();
   private MapPresenter mapPresenter;
   private final MapCallback mapCallback = new MapCallback();
   private final InitialRenderCallback initialRenderCallback = new InitialRenderCallback();
@@ -68,6 +72,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   private MapboxMap mapboxMap;
   private AttributionClickListener attributionClickListener;
   private MapboxMapOptions mapboxMapOptions;
+  private MapRenderer mapRenderer;
   private boolean destroyed;
   private boolean hasSurface;
 
@@ -118,7 +123,74 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
     mapboxMapOptions = options;
 
-    mapPresenter = new MapPresenterImpl(this, context, options, new MapChangeReceiver());
+    mapPresenter = new MapPresenterImpl(impl, context, options, new MapChangeReceiver());
+  }
+
+  private class IMapViewImpl implements IMapView {
+
+    ///
+    /// Private View Implementation
+    ///
+
+    public void setForegroundColor(int foregroundLoadColor) {
+      // hide surface until map is fully loaded #10990
+      MapView.this.setForeground(new ColorDrawable(foregroundLoadColor));
+    }
+
+    public void inflateInternalViews() {
+      View view = LayoutInflater.from(getContext()).inflate(R.layout.mapbox_mapview_internal, MapView.this);
+      compassView = view.findViewById(R.id.compassView);
+      attrView = view.findViewById(R.id.attributionView);
+      logoView = view.findViewById(R.id.logoView);
+    }
+
+    public void setViewOptions() {
+      // add accessibility support
+      setContentDescription(getContext().getString(R.string.mapbox_mapActionDescription));
+      setWillNotDraw(false);
+    }
+
+    public void createTextureView(@Nullable String localFontFamily, boolean translucent) {
+      TextureView textureView = new TextureView(getContext());
+      mapRenderer =
+        new TextureViewMapRenderer(getContext(), textureView, localFontFamily, translucent) {
+          @Override
+          protected void onSurfaceCreated(GL10 gl, EGLConfig config) {
+            mapPresenter.onSurfaceCreated();
+            super.onSurfaceCreated(gl, config);
+          }
+        };
+      addView(textureView, 0);
+    }
+
+    public void createSurfaceView(@Nullable String localFontFamily, boolean renderSurfaceOnTop) {
+      GLSurfaceView glSurfaceView = new GLSurfaceView(getContext());
+      glSurfaceView.setZOrderMediaOverlay(renderSurfaceOnTop);
+      mapRenderer = new GLSurfaceViewMapRenderer(getContext(), glSurfaceView, localFontFamily) {
+        @Override
+        public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+          mapPresenter.onSurfaceCreated();
+          super.onSurfaceCreated(gl, config);
+        }
+      };
+      addView(glSurfaceView, 0);
+    }
+
+    public float getDensity() {
+      return getResources().getDisplayMetrics().density;
+    }
+
+    public void createNativeMapView(float pixelRatio, boolean crossSourceCollisions,
+                                    MapChangeReceiver mapChangeReceiver) {
+      nativeMapView = new NativeMapView(
+        FileSource.getInstance(getContext()),
+        pixelRatio,
+        crossSourceCollisions,
+        MapView.this,
+        mapChangeReceiver,
+        mapRenderer
+      );
+    }
   }
 
   private void initialiseMap() {
@@ -134,9 +206,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     // callback for camera change events
     final CameraChangeDispatcher cameraDispatcher = new CameraChangeDispatcher();
 
-    // setup components for MapboxMap creation
-    Projection proj = new Projection(nativeMapView);
-    UiSettings uiSettings = new UiSettings(proj, focalInvalidator, compassView, attrView, logoView, getPixelRatio());
+
+    // TODO PRESENTERS legacy annotations
     LongSparseArray<Annotation> annotationsArray = new LongSparseArray<>();
     IconManager iconManager = new IconManager(nativeMapView);
     Annotations annotations = new AnnotationContainer(nativeMapView, annotationsArray);
@@ -146,6 +217,12 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     ShapeAnnotations shapeAnnotations = new ShapeAnnotationContainer(nativeMapView, annotationsArray);
     AnnotationManager annotationManager = new AnnotationManager(this, annotationsArray, iconManager,
       annotations, markers, polygons, polylines, shapeAnnotations);
+
+
+    // setup components for MapboxMap creation
+    Projection proj = new Projection(nativeMapView);
+    UiSettings uiSettings = new UiSettings(proj, focalInvalidator, compassView, attrView, logoView, 1/*TODO
+    PRESENTERS getPixelRatio()*/);
     Transform transform = new Transform(this, nativeMapView, cameraDispatcher);
 
     // MapboxMap
@@ -356,7 +433,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   @UiThread
   public void onDestroy() {
     destroyed = true;
-    mapChangeReceiver.clear();
+    //TODO PRESENTERS mapChangeReceiver.clear();
     mapCallback.onDestroy();
     initialRenderCallback.onDestroy();
 
@@ -714,63 +791,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    */
   public void removeOnSourceChangedListener(OnSourceChangedListener listener) {
     mapPresenter.removeOnSourceChangedListener(listener);
-  }
-
-
-  ///
-  /// View Implementation
-  ///
-
-  void setForegroundColor(int foregroundLoadColor) {
-    // hide surface until map is fully loaded #10990
-    setForeground(new ColorDrawable(foregroundLoadColor));
-  }
-
-  void inflateInternalViews() {
-    View view = LayoutInflater.from(getContext()).inflate(R.layout.mapbox_mapview_internal, this);
-    compassView = view.findViewById(R.id.compassView);
-    attrView = view.findViewById(R.id.attributionView);
-    logoView = view.findViewById(R.id.logoView);
-  }
-
-  void setViewOptions() {
-    // add accessibility support
-    setContentDescription(getContext().getString(R.string.mapbox_mapActionDescription));
-    setWillNotDraw(false);
-  }
-
-  MapRenderer createTextureView(@NonNull MapPresenter mapPresenter, @Nullable String localFontFamily,
-                                boolean translucent) {
-    TextureView textureView = new TextureView(getContext());
-    MapRenderer mapRenderer =
-      new TextureViewMapRenderer(mapPresenter, getContext(), textureView, localFontFamily, translucent);
-    addView(textureView, 0);
-    return mapRenderer;
-  }
-
-  MapRenderer createSurfaceView(@NonNull MapPresenter mapPresenter, @Nullable String localFontFamily,
-                                boolean renderSurfaceOnTop) {
-    GLSurfaceView glSurfaceView = new GLSurfaceView(getContext());
-    glSurfaceView.setZOrderMediaOverlay(renderSurfaceOnTop);
-    MapRenderer mapRenderer = new GLSurfaceViewMapRenderer(mapPresenter, getContext(), glSurfaceView, localFontFamily);
-    addView(glSurfaceView, 0);
-    return mapRenderer;
-  }
-
-  float getDensity() {
-    return getResources().getDisplayMetrics().density;
-  }
-
-  NativeMapView createNativeMapView(float pixelRatio, boolean crossSourceCollisions,
-                                           MapChangeReceiver mapChangeReceiver, MapRenderer renderer) {
-    return new NativeMapView(
-      FileSource.getInstance(getContext()),
-      pixelRatio,
-      crossSourceCollisions,
-      this,
-      mapChangeReceiver,
-      renderer
-    );
   }
 
   /**

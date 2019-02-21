@@ -28,11 +28,11 @@ public class TextureViewMapRenderer extends MapRenderer {
    * @param localIdeographFontFamily the local font family
    * @param translucentSurface    the translucency flag
    */
-  public TextureViewMapRenderer(@NonNull MapPresenter mapPresenter, @NonNull Context context,
+  public TextureViewMapRenderer(@NonNull Context context,
                                 @NonNull TextureView textureView,
                                 String localIdeographFontFamily,
                                 boolean translucentSurface) {
-    super(mapPresenter, context, localIdeographFontFamily);
+    super(context, localIdeographFontFamily);
     this.translucentSurface = translucentSurface;
     renderThread = new TextureViewRenderThread(textureView, this);
     renderThread.start();

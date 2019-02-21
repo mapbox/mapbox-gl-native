@@ -28,13 +28,10 @@ public abstract class MapRenderer implements MapRendererScheduler {
   // Holds the pointer to the native peer after initialisation
   private long nativePtr = 0;
 
-  private final MapPresenter mapPresenter;
-
   private double expectedRenderTime = 0;
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
-  public MapRenderer(@NonNull MapPresenter mapPresenter, @NonNull Context context, String localIdeographFontFamily) {
-    this.mapPresenter = mapPresenter;
+  public MapRenderer(@NonNull Context context, String localIdeographFontFamily) {
     FileSource fileSource = FileSource.getInstance(context);
     float pixelRatio = context.getResources().getDisplayMetrics().density;
     String programCacheDir = FileSource.getInternalCachePath(context);
@@ -69,7 +66,6 @@ public abstract class MapRenderer implements MapRendererScheduler {
 
   @CallSuper
   protected void onSurfaceCreated(GL10 gl, EGLConfig config) {
-    mapPresenter.onSurfaceCreated();
     nativeOnSurfaceCreated();
   }
 
