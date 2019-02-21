@@ -7,9 +7,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
+import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -80,7 +82,13 @@ public class LocationMapChangeActivity extends AppCompatActivity implements OnMa
   @SuppressLint("MissingPermission")
   private void activateLocationComponent(@NonNull Style style) {
     LocationComponent locationComponent = mapboxMap.getLocationComponent();
-    locationComponent.activateLocationComponent(this, style);
+
+    locationComponent.activateLocationComponent(
+      LocationComponentActivationOptions
+        .builder(this, style)
+        .useDefaultLocationEngine(true)
+        .build());
+
     locationComponent.setLocationComponentEnabled(true);
     locationComponent.setRenderMode(RenderMode.COMPASS);
 

@@ -87,6 +87,7 @@ public class LocationComponentActivationActivity extends AppCompatActivity imple
 
     LocationComponentActivationOptions locationComponentActivationOptions = LocationComponentActivationOptions
       .builder(this, style)
+      .locationComponentOptions(locationComponentOptions)
       .useDefaultLocationEngine(true)
       .build();
 
