@@ -4,13 +4,24 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+## 7.2.0-beta.1 - February 21, 2019
+
+### Bugs
+- Keep location component's layers hidden when new style with the "layer-below" option is applied[#13936](https://github.com/mapbox/mapbox-gl-native/pull/13936)
+
+### Features
+- Set localIdeographFontFamily default to sans-serif[#13925](https://github.com/mapbox/mapbox-gl-native/pull/13925)
+
+
 ## 7.2.0-alpha.2 - February 14, 2019
-### Bug
+
+### Bugs
 - Invalidate the camera position when gesture finishes[#13920](https://github.com/mapbox/mapbox-gl-native/pull/13920)
 - Hook into surface holder to cleanup renderer on the right thread before the surface is destroyed [#13926](https://github.com/mapbox/mapbox-gl-native/pull/13926)
 - Fix deadlock in http request on hitting tile limit[#13858](https://github.com/mapbox/mapbox-gl-native/pull/13858)
 
 ## 7.2.0-alpha.1 - February 7, 2019
+
 ### Build
 - Update downstream circle-ci job name [#13872](https://github.com/mapbox/mapbox-gl-native/pull/13872)
 - Prioritize running benchmarks when building master [#13801](https://github.com/mapbox/mapbox-gl-native/pull/13801)
@@ -35,18 +46,22 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 - Add experimental pointer [#13889](https://github.com/mapbox/mapbox-gl-native/pull/13889)
 
 ## 7.1.2 - February 7, 2019
+
 ### Bugs
  - Fix layer not rendering correctly when property value's negative [#13888](https://github.com/mapbox/mapbox-gl-native/pull/13888)
 
 ## 7.1.1 - February 1, 2019
+
 ### Bugs
  - Fix a crash caused by the missing `Timber` dependency [#13847](https://github.com/mapbox/mapbox-gl-native/pull/13847)
 
 ## 7.1.0 - January 30, 2019
+
 ### Build
  - Revert Android vendorization, add submodule pinning [#13815](https://github.com/mapbox/mapbox-gl-native/pull/13815)
 
 ## 7.1.0-beta.1 - January 23, 2019
+
 ### Bugs
  - Ignore unused C++ arguments for all build environments [#13774](https://github.com/mapbox/mapbox-gl-native/pull/13774)
  - Import gesture detector dimens using the correct package structure [#13750](https://github.com/mapbox/mapbox-gl-native/pull/13750)
@@ -58,6 +73,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
  - Update to NDK 19, migrate STL experimental/optional [#13049](https://github.com/mapbox/mapbox-gl-native/pull/13049)
 
 ## 7.1.0-alpha.3 - January 21, 2019
+
 ### Features
  - Add library loading to peer objects [#13758](https://github.com/mapbox/mapbox-gl-native/pull/13758)
  - Remove tile sorting from the clip and mask algorithms [#13756](https://github.com/mapbox/mapbox-gl-native/pull/13756)
