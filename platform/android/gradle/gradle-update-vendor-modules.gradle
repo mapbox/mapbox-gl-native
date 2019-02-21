@@ -1,5 +1,8 @@
 task updateVendorSubmodules {
     doLast {
-        "git submodule update --init --recursive vendor".execute()
+        exec {
+            workingDir = "${rootDir}"
+            commandLine "git", "submodule", "update", "--init", "vendor"
+        }
     }
 }

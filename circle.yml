@@ -535,6 +535,9 @@ jobs:
     steps:
       - install-dependencies: { gradle: true }
       - run:
+          name: Initialize vendor submodules
+          command: git submodule update --init platform/android/vendor
+      - run:
           name: Android nitpick
           command: make run-android-nitpick
       - run:
@@ -598,6 +601,9 @@ jobs:
       IS_LOCAL_DEVELOPMENT: false
     steps:
       - install-dependencies: { gradle: true }
+      - run:
+          name: Initialize vendor submodules
+          command: git submodule update --init platform/android/vendor
       - run:
           name: Android nitpick
           command: make run-android-nitpick
