@@ -81,7 +81,7 @@ public class LocationComponentActivationOptions {
 
   /**
    * The location request which the {@link LocationComponent} should use
-   * @return
+   * @return the LocationEngineRequest object
    */
   @Nullable
   public LocationEngineRequest locationEngineRequest() {
@@ -164,9 +164,9 @@ public class LocationComponentActivationOptions {
     public LocationComponentActivationOptions build() {
       if (styleRes != 0 && locationComponentOptions != null) {
         throw new IllegalArgumentException(
-          "You've provided both a style resource and a LocationComponentOptions object to the " +
-            "LocationComponentActivationOptions builder. You can't use both and " +
-            "you must choose one of the two to style the LocationComponent.");
+          "You've provided both a style resource and a LocationComponentOptions object to the "
+            + "LocationComponentActivationOptions builder. You can't use both and "
+            + "you must choose one of the two to style the LocationComponent.");
       }
       if (context == null) {
         throw new NullPointerException(
@@ -174,13 +174,13 @@ public class LocationComponentActivationOptions {
       }
       if (style == null) {
         throw new NullPointerException(
-          "Style in LocationComponentActivationOptions is null. Make sure the Style object isn't null." +
-            " Wait for the map to fully load before passing the Style object to LocationComponentActivationOptions.");
+          "Style in LocationComponentActivationOptions is null. Make sure the Style object isn't null."
+            + " Wait for the map to fully load before passing the Style object to LocationComponentActivationOptions.");
       }
       if (!style.isFullyLoaded()) {
         throw new IllegalArgumentException(
-          "Style in LocationComponentActivationOptions isn't fully loaded. Wait for the map to fully load before " +
-            "passing the Style object to LocationComponentActivationOptions.");
+          "Style in LocationComponentActivationOptions isn't fully loaded. Wait for the map to fully load before "
+            + "passing the Style object to LocationComponentActivationOptions.");
       }
       return new LocationComponentActivationOptions(context, style, locationEngine, locationEngineRequest,
         locationComponentOptions, styleRes, useDefaultLocationEngine);

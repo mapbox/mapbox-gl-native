@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.location;
 
 import android.annotation.SuppressLint;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;

@@ -68,12 +68,11 @@ public class LocationComponentActivationOptionsTest {
 
   @Test
   public void includingBothStyleResAndComponentOptions_causesExceptionToBeThrown() throws Exception {
-    when(style.isFullyLoaded()).thenReturn(true);
 
     thrown.expect(IllegalArgumentException.class);
-    thrown.expectMessage("You've provided both a style resource and a LocationComponentOptions object to the " +
-      "LocationComponentActivationOptions builder. You can't use both and " +
-      "you must choose one of the two to style the LocationComponent.");
+    thrown.expectMessage("You've provided both a style resource and a LocationComponentOptions"
+      + " object to the LocationComponentActivationOptions builder. You can't use both and "
+      + "you must choose one of the two to style the LocationComponent.");
 
     LocationComponentOptions locationComponentOptions = LocationComponentOptions.builder(context)
       .accuracyAlpha(0.5f)
@@ -87,21 +86,31 @@ public class LocationComponentActivationOptionsTest {
   }
 
   @Test
-  public void nullStyle_causesExceptionToBeThrown() throws Exception {
-    when(style.isFullyLoaded()).thenReturn(false);
-
+  public void nullContext_causesExceptionToBeThrown() throws Exception {
     thrown.expect(NullPointerException.class);
-    thrown.expectMessage("Style in LocationComponentActivationOptions is null. Wait for the map to fully load before " +
-      "passing the Style object to LocationComponentActivationOptions.");
+    thrown.expectMessage("Context in LocationComponentActivationOptions is null.");
 
     LocationComponentOptions locationComponentOptions = LocationComponentOptions.builder(context)
       .accuracyAlpha(0.5f)
       .build();
     assertNotNull(locationComponentOptions);
 
-    LocationComponentActivationOptions.builder(context, style)
-      .locationComponentOptions(locationComponentOptions)
-      .styleRes(R.style.mapbox_LocationComponent)
+    LocationComponentActivationOptions.builder(null, style)
+      .build();
+  }
+
+  @Test
+  public void nullStyle_causesExceptionToBeThrown() throws Exception {
+    thrown.expect(NullPointerException.class);
+    thrown.expectMessage("Style in LocationComponentActivationOptions is null. Make sure the Style object isn't null."
+      + " Wait for the map to fully load before passing the Style object to LocationComponentActivationOptions.");
+
+    LocationComponentOptions locationComponentOptions = LocationComponentOptions.builder(context)
+      .accuracyAlpha(0.5f)
+      .build();
+    assertNotNull(locationComponentOptions);
+
+    LocationComponentActivationOptions.builder(context, null)
       .build();
   }
 }

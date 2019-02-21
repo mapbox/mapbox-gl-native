@@ -481,8 +481,8 @@ public final class LocationComponent {
     // Initialize the LocationComponent with Context, the map's `Style`, and either custom LocationComponentOptions
     // or backup options created from default/custom attributes
     initialize(locationComponentActivationOptions.context(), locationComponentActivationOptions.style(),
-      locationComponentActivationOptions.locationComponentOptions() != null ?
-        locationComponentActivationOptions.locationComponentOptions() :
+      locationComponentActivationOptions.locationComponentOptions() != null
+        ? locationComponentActivationOptions.locationComponentOptions() :
         locationComponentOptionsToUseIfCustomOptionsAreNull);
 
     // Apply the LocationComponent styling
@@ -490,8 +490,8 @@ public final class LocationComponent {
       applyStyle(locationComponentActivationOptions.locationComponentOptions());
     } else if (locationComponentActivationOptions.styleRes() != 0) {
       applyStyle(locationComponentOptionsToUseIfCustomOptionsAreNull);
-    } else if (locationComponentActivationOptions.styleRes() == 0 &&
-      locationComponentActivationOptions.locationComponentOptions() == null) {
+    } else if (locationComponentActivationOptions.styleRes() == 0
+      && locationComponentActivationOptions.locationComponentOptions() == null) {
       applyStyle(locationComponentOptionsToUseIfCustomOptionsAreNull);
     }
 
