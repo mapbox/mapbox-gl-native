@@ -174,7 +174,12 @@ public class LocationComponentActivationOptions {
       }
       if (style == null) {
         throw new NullPointerException(
-          "Style in LocationComponentActivationOptions is null. Wait for the map to fully load before " +
+          "Style in LocationComponentActivationOptions is null. Make sure the Style object isn't null." +
+            " Wait for the map to fully load before passing the Style object to LocationComponentActivationOptions.");
+      }
+      if (!style.isFullyLoaded()) {
+        throw new IllegalArgumentException(
+          "Style in LocationComponentActivationOptions isn't fully loaded. Wait for the map to fully load before " +
             "passing the Style object to LocationComponentActivationOptions.");
       }
       return new LocationComponentActivationOptions(context, style, locationEngine, locationEngineRequest,

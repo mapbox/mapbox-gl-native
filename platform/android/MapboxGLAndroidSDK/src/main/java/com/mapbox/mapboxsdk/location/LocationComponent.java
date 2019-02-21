@@ -467,35 +467,51 @@ public final class LocationComponent {
    */
   public void activateLocationComponent(@NonNull LocationComponentActivationOptions
                                           locationComponentActivationOptions) {
-    if (locationComponentActivationOptions.locationComponentOptions() != null) {
-      initialize(locationComponentActivationOptions.context(), locationComponentActivationOptions.style(),
-        locationComponentActivationOptions.locationComponentOptions());
+    // Create LocationComponentOptions from attributes ahead of time for usage if
+    // locationComponentActivationOptions.locationComponentOptions() is null
+    LocationComponentOptions locationComponentOptionsToUseIfCustomOptionsAreNull =
+      LocationComponentOptions.createFromAttributes(
+        locationComponentActivationOptions.context(), R.style.mapbox_LocationComponent);
+
+    if (locationComponentActivationOptions.styleRes() != 0) {
+      locationComponentOptionsToUseIfCustomOptionsAreNull = LocationComponentOptions.createFromAttributes(
+        locationComponentActivationOptions.context(), locationComponentActivationOptions.styleRes());
     }
 
+    // Initialize the LocationComponent with Context, the map's `Style`, and either custom LocationComponentOptions
+    // or backup options created from default/custom attributes
+    initialize(locationComponentActivationOptions.context(), locationComponentActivationOptions.style(),
+      locationComponentActivationOptions.locationComponentOptions() != null ?
+        locationComponentActivationOptions.locationComponentOptions() :
+        locationComponentOptionsToUseIfCustomOptionsAreNull);
+
+    // Apply the LocationComponent styling
+    if (locationComponentActivationOptions.locationComponentOptions() != null) {
+      applyStyle(locationComponentActivationOptions.locationComponentOptions());
+    } else if (locationComponentActivationOptions.styleRes() != 0) {
+      applyStyle(locationComponentOptionsToUseIfCustomOptionsAreNull);
+    } else if (locationComponentActivationOptions.styleRes() == 0 &&
+      locationComponentActivationOptions.locationComponentOptions() == null) {
+      applyStyle(locationComponentOptionsToUseIfCustomOptionsAreNull);
+    }
+
+    // Set the LocationEngine request if one was given to LocationComponentActivationOptions
     if (locationComponentActivationOptions.locationEngineRequest() != null) {
       setLocationEngineRequest(locationComponentActivationOptions.locationEngineRequest());
     }
 
+    // Set the LocationEngine if one was given to LocationComponentActivationOptions
     if (locationComponentActivationOptions.locationEngine() != null) {
+      Log.d(TAG, "activateLocationComponent: locationComponentActivationOptions.locationEngine() != null");
       setLocationEngine(locationEngine);
     } else if (locationComponentActivationOptions.useDefaultLocationEngine()) {
+      Log.d(TAG, "activateLocationComponent: locationComponentActivationOptions.useDefaultLocationEngine()");
       initializeLocationEngine(locationComponentActivationOptions.context());
     } else {
+      Log.d(TAG, "activateLocationComponent: setLocationEngine(null);");
       setLocationEngine(null);
     }
-
-    if (locationComponentActivationOptions.styleRes() == 0 &&
-      locationComponentActivationOptions.locationComponentOptions() == null) {
-        applyStyle(LocationComponentOptions.createFromAttributes(
-          locationComponentActivationOptions.context(), R.style.mapbox_LocationComponent));
-    } else if (locationComponentActivationOptions.styleRes() != 0) {
-      applyStyle(LocationComponentOptions.createFromAttributes(locationComponentActivationOptions.context(),
-        locationComponentActivationOptions.styleRes()));
-    } else if (locationComponentActivationOptions.locationComponentOptions() != null) {
-      applyStyle(locationComponentActivationOptions.locationComponentOptions());
-    }
   }
-
 
   /**
    * Manage component's visibility after activation.
