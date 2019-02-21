@@ -9,7 +9,14 @@ function finish { >&2 echo -en "\033[0m"; }
 trap finish EXIT
 
 step "Installing packaging dependencies…"
-brew install awscli wget
+
+if [ -z `which aws` ]; then
+    brew install awscli
+fi
+
+if [ -z `which wget` ]; then
+    brew install wget
+fi
 
 if [ -z `which jazzy` ]; then
     step "Installing jazzy…"
