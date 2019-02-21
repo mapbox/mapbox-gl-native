@@ -12,7 +12,6 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 ### Features
 - Set localIdeographFontFamily default to sans-serif[#13925](https://github.com/mapbox/mapbox-gl-native/pull/13925)
 
-
 ## 7.2.0-alpha.2 - February 14, 2019
 
 ### Bugs
