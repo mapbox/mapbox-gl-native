@@ -221,6 +221,7 @@
         "MGLStyle_Private.h": "platform/darwin/src/MGLStyle_Private.h",
         "MGLHeatmapStyleLayer_Private.h": "platform/darwin/src/MGLHeatmapStyleLayer_Private.h",
         "NSPredicate+MGLPrivateAdditions.h": "platform/darwin/src/NSPredicate+MGLPrivateAdditions.h",
+        "MGLNetworkConfiguration_Private.h": "platform/darwin/src/MGLNetworkConfiguration_Private.h",
         "NSDate+MGLAdditions.h": "platform/darwin/src/NSDate+MGLAdditions.h",
         "MGLCompactCalloutView.h": "platform/ios/src/MGLCompactCalloutView.h",
         "MGLStyleLayerManager.h": "platform/darwin/src/MGLStyleLayerManager.h",

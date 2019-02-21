@@ -169,6 +169,7 @@
         "NSException+MGLAdditions.h": "platform/darwin/src/NSException+MGLAdditions.h",
         "MGLTileSource_Private.h": "platform/darwin/src/MGLTileSource_Private.h",
         "NSExpression+MGLPrivateAdditions.h": "platform/darwin/src/NSExpression+MGLPrivateAdditions.h",
+        "MGLNetworkConfiguration_Private.h": "platform/darwin/src/MGLNetworkConfiguration_Private.h",
         "NSCompoundPredicate+MGLAdditions.h": "platform/darwin/src/NSCompoundPredicate+MGLAdditions.h",
         "MGLSymbolStyleLayer_Private.h": "platform/darwin/src/MGLSymbolStyleLayer_Private.h",
         "NSProcessInfo+MGLAdditions.h": "platform/darwin/src/NSProcessInfo+MGLAdditions.h",

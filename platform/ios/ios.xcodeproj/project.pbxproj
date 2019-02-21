@@ -35,6 +35,8 @@
 		1F06668D1EC64F8E001C16D7 /* MGLLight.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F0666891EC64F8E001C16D7 /* MGLLight.mm */; };
 		1F26B6C120E189C9007BCC21 /* MBXCustomLocationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F26B6C020E189C9007BCC21 /* MBXCustomLocationViewController.m */; };
 		1F26B6C320E1A351007BCC21 /* simple_route.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F26B6C220E1A351007BCC21 /* simple_route.json */; };
+		1F2B94C0221636D900210640 /* MGLNetworkConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F2B94BF221636D800210640 /* MGLNetworkConfiguration_Private.h */; };
+		1F2B94C1221636D900210640 /* MGLNetworkConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F2B94BF221636D800210640 /* MGLNetworkConfiguration_Private.h */; };
 		1F6A82A221360F9D00BA5B41 /* MGLLoggingConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F6A82A021360F9C00BA5B41 /* MGLLoggingConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1F6A82A321360F9D00BA5B41 /* MGLLoggingConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F6A82A021360F9C00BA5B41 /* MGLLoggingConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1F6A82A421360F9D00BA5B41 /* MGLLoggingConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F6A82A121360F9C00BA5B41 /* MGLLoggingConfiguration.m */; };
@@ -863,6 +865,7 @@
 		1F26B6BF20E189C9007BCC21 /* MBXCustomLocationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXCustomLocationViewController.h; sourceTree = "<group>"; };
 		1F26B6C020E189C9007BCC21 /* MBXCustomLocationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXCustomLocationViewController.m; sourceTree = "<group>"; };
 		1F26B6C220E1A351007BCC21 /* simple_route.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = simple_route.json; sourceTree = "<group>"; };
+		1F2B94BF221636D800210640 /* MGLNetworkConfiguration_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLNetworkConfiguration_Private.h; sourceTree = "<group>"; };
 		1F6A82A021360F9C00BA5B41 /* MGLLoggingConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLLoggingConfiguration.h; sourceTree = "<group>"; };
 		1F6A82A121360F9C00BA5B41 /* MGLLoggingConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLLoggingConfiguration.m; sourceTree = "<group>"; };
 		1F6A82A62138871900BA5B41 /* MGLLoggingConfiguration_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLLoggingConfiguration_Private.h; sourceTree = "<group>"; };
@@ -2071,6 +2074,7 @@
 				927FBCFD1F4DB05500F8BF1F /* MGLMapSnapshotter.h */,
 				927FBCFE1F4DB05500F8BF1F /* MGLMapSnapshotter.mm */,
 				DD0902A41DB18F1B00C5BDCE /* MGLNetworkConfiguration.h */,
+				1F2B94BF221636D800210640 /* MGLNetworkConfiguration_Private.h */,
 				DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.m */,
 				3EA9337830C7738BF7F5493C /* MGLRendererConfiguration.h */,
 				3EA931BC4F087E166D538F21 /* MGLRendererConfiguration.mm */,
@@ -2396,6 +2400,7 @@
 				3510FFF01D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */,
 				74CB5EBF219B280400102936 /* MGLHeatmapStyleLayer_Private.h in Headers */,
 				1FC4817D2098CBC0000D09B4 /* NSPredicate+MGLPrivateAdditions.h in Headers */,
+				1F2B94C0221636D900210640 /* MGLNetworkConfiguration_Private.h in Headers */,
 				353AFA141D65AB17005A69F4 /* NSDate+MGLAdditions.h in Headers */,
 				DA8848531CBAFB9800AB86E3 /* MGLCompactCalloutView.h in Headers */,
 				74CB5EB1219B252C00102936 /* MGLStyleLayerManager.h in Headers */,
@@ -2634,6 +2639,7 @@
 				AC518E00201BB55A00EBC820 /* MGLTelemetryConfig.h in Headers */,
 				3510FFFA1D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.h in Headers */,
 				DA72620C1DEEE3480043BB89 /* MGLOpenGLStyleLayer.h in Headers */,
+				1F2B94C1221636D900210640 /* MGLNetworkConfiguration_Private.h in Headers */,
 				35CE61831D4165D9004F2359 /* UIColor+MGLAdditions.h in Headers */,
 				96E516F32000597100A02306 /* NSDictionary+MGLAdditions.h in Headers */,
 				1FCAE2A920B88B3800C577DD /* MGLLocationManager_Private.h in Headers */,

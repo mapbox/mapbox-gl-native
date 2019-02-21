@@ -18,6 +18,7 @@
 		170A82BF201BDD1B00943087 /* MGLHeatmapStyleLayerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 170A82BE201BDD1B00943087 /* MGLHeatmapStyleLayerTests.mm */; };
 		170A82C4201FB6EC00943087 /* MGLHeatmapColorTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 170A82C2201FAFF800943087 /* MGLHeatmapColorTests.mm */; };
 		1753ED401E53CE6100A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED3F1E53CE5200A9FD90 /* MGLConversion.h */; };
+		1F2B94C3221E22E600210640 /* MGLNetworkConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F2B94C2221E22E500210640 /* MGLNetworkConfiguration_Private.h */; };
 		1F7454A31ECFB00300021D39 /* MGLLight_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F7454A01ECFB00300021D39 /* MGLLight_Private.h */; };
 		1F7454A41ECFB00300021D39 /* MGLLight.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F7454A11ECFB00300021D39 /* MGLLight.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1F7454A51ECFB00300021D39 /* MGLLight.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F7454A21ECFB00300021D39 /* MGLLight.mm */; };
@@ -330,6 +331,7 @@
 		170A82BE201BDD1B00943087 /* MGLHeatmapStyleLayerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLHeatmapStyleLayerTests.mm; sourceTree = "<group>"; };
 		170A82C2201FAFF800943087 /* MGLHeatmapColorTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLHeatmapColorTests.mm; sourceTree = "<group>"; };
 		1753ED3F1E53CE5200A9FD90 /* MGLConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLConversion.h; sourceTree = "<group>"; };
+		1F2B94C2221E22E500210640 /* MGLNetworkConfiguration_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLNetworkConfiguration_Private.h; sourceTree = "<group>"; };
 		1F7454A01ECFB00300021D39 /* MGLLight_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight_Private.h; sourceTree = "<group>"; };
 		1F7454A11ECFB00300021D39 /* MGLLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight.h; sourceTree = "<group>"; };
 		1F7454A21ECFB00300021D39 /* MGLLight.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLight.mm; sourceTree = "<group>"; };
@@ -1208,6 +1210,7 @@
 				92092EEE1F5EB10E00AF5130 /* MGLMapSnapshotter.h */,
 				92092EEF1F5EB10E00AF5130 /* MGLMapSnapshotter.mm */,
 				DD0902B01DB1AC6400C5BDCE /* MGLNetworkConfiguration.h */,
+				1F2B94C2221E22E500210640 /* MGLNetworkConfiguration_Private.h */,
 				DD0902AF1DB1AC6400C5BDCE /* MGLNetworkConfiguration.m */,
 				3EA9369A4C46957566058822 /* MGLRendererConfiguration.h */,
 				3EA93B1B0864609938506E12 /* MGLRendererConfiguration.mm */,
@@ -1326,6 +1329,7 @@
 				DAE6C3C21CC31F4500DB3429 /* Mapbox.h in Headers */,
 				DAE6C3641CC31E0400DB3429 /* MGLPolygon.h in Headers */,
 				DA35A2BF1CCA9B1A00E826B2 /* MGLClockDirectionFormatter.h in Headers */,
+				1F2B94C3221E22E600210640 /* MGLNetworkConfiguration_Private.h in Headers */,
 				35602BFA1D3EA99F0050646F /* MGLFillStyleLayer.h in Headers */,
 				DA35A2A41CC9EB1A00E826B2 /* MGLCoordinateFormatter.h in Headers */,
 				35C5D8491D6DD66D00E95907 /* NSCompoundPredicate+MGLAdditions.h in Headers */,
