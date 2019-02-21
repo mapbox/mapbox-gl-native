@@ -4,8 +4,17 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## master
 
+
+## 7.2.0-beta.1 - February 21, 2019
+###Bugs
+- Keep location component's layers hidden when new style with the "layer-below" option is applied[#13936](https://github.com/mapbox/mapbox-gl-native/pull/13936)
+
+### Features
+- Set localIdeographFontFamily default to sans-serif[#13925](https://github.com/mapbox/mapbox-gl-native/pull/13925)
+
+
 ## 7.2.0-alpha.2 - February 14, 2019
-### Bug
+### Bugs
 - Invalidate the camera position when gesture finishes[#13920](https://github.com/mapbox/mapbox-gl-native/pull/13920)
 - Hook into surface holder to cleanup renderer on the right thread before the surface is destroyed [#13926](https://github.com/mapbox/mapbox-gl-native/pull/13926)
 - Fix deadlock in http request on hitting tile limit[#13858](https://github.com/mapbox/mapbox-gl-native/pull/13858)
