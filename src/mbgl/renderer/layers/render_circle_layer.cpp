@@ -14,6 +14,19 @@ namespace mbgl {
 
 using namespace style;
 
+namespace {
+template <typename Iterator>
+bool isCoveredByParent(const UnwrappedTileID& child, Iterator begin, Iterator end) {
+    for (auto it = begin; it != end; ++it) {
+        const auto& tileId = it->get().id;
+        if (child != tileId && child.isChildOf(tileId)) {
+            return true;
+        }
+    }
+    return false;
+}
+} // namespace
+
 RenderCircleLayer::RenderCircleLayer(Immutable<style::CircleLayer::Impl> _impl)
     : RenderLayer(std::move(_impl)),
       unevaluated(impl().paint.untransitioned()) {
@@ -185,6 +198,35 @@ bool RenderCircleLayer::queryIntersectsFeature(
     }
 
     return false;
+}
+
+RenderLayer::RenderTiles RenderCircleLayer::filterRenderTiles(RenderTiles tiles_) const {
+    RenderTiles tiles = RenderLayer::filterRenderTiles(tiles_);
+
+    // Tiles are sorted by tile id / zoom level, if first and last tiles are from different
+    // zoom levels, check whether tile vector contains parents covering children area.
+    // This might happen when map is panned (or zoomed) and missing tile is not yet loaded,
+    // thus, cached parent tile is used to cover missing area, therefore, loaded child tiles
+    // will be drawn together with the parent.
+
+    if (tiles.size() > 1 &&
+            tiles.front().get().id.canonical.z != tiles.back().get().id.canonical.z) {
+
+        RenderTiles filtered;
+        filtered.reserve(tiles.size());
+
+        auto lowerBound = tiles.end();
+        for (auto it = tiles.rbegin(); it != tiles.rend(); ++it) {
+            if (!isCoveredByParent(it->get().id, tiles.begin(), --lowerBound)) {
+                filtered.emplace_back(it->get());
+            }
+        }
+
+        std::reverse(filtered.begin(), filtered.end());
+        return filtered;
+    }
+
+    return tiles;
 }
 
 } // namespace mbgl

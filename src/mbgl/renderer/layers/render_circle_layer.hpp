@@ -16,6 +16,7 @@ public:
     bool hasTransition() const override;
     bool hasCrossfade() const override;
     void render(PaintParameters&, RenderSource*) override;
+    RenderTiles filterRenderTiles(RenderTiles) const override;
 
     bool queryIntersectsFeature(
             const GeometryCoordinates&,
