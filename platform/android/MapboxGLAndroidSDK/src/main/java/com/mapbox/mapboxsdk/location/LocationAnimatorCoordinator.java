@@ -6,6 +6,7 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.BounceInterpolator;
@@ -154,13 +155,29 @@ final class LocationAnimatorCoordinator {
   }
 
   void startLocationCirclePulsing(LocationComponentOptions options, MapboxMap mapboxMap) {
-    pulsingLocationCircleAnimator = new PulsingLocationCircleAnimator();
-    pulsingLocationCircleAnimator.animatePulsingCircleRadius(
-        retrievePulseInterpolator(options.pulseInterpolator()), mapboxMap, options);
+    pulsingLocationCircleAnimator = new PulsingLocationCircleAnimator(retrievePulseInterpolator(
+      options.pulseInterpolator()), mapboxMap, options);
+    pulsingLocationCircleAnimator.startPulsingAnimation();
   }
 
   void stopPulsingAnimation() {
     pulsingLocationCircleAnimator.stopPulsingAnimation();
+  }
+
+  void pausePulsingAnimation() {
+    pulsingLocationCircleAnimator.pausePulsingAnimation();
+  }
+
+  void resumePulsingAnimation() {
+    pulsingLocationCircleAnimator.resumePulsingAnimation();
+  }
+
+  void pulsingAnimationIsRunning() {
+    pulsingLocationCircleAnimator.pulsingAnimationIsRunning();
+  }
+
+  boolean pulsingAnimationIsStarted() {
+    return pulsingLocationCircleAnimator.pulsingAnimationIsStarted();
   }
 
   private LatLng getPreviousLayerLatLng() {

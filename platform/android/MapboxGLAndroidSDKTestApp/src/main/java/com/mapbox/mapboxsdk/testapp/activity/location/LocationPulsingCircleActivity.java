@@ -20,6 +20,7 @@ import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
 import com.mapbox.mapboxsdk.location.LocationComponentOptions;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
 import com.mapbox.mapboxsdk.location.modes.PulseMode;
@@ -48,10 +49,10 @@ public class LocationPulsingCircleActivity extends AppCompatActivity implements 
   private static final String SAVED_STATE_LOCATION = "saved_state_location";
 
   // Make sure that the frequency value is equal to or larger than the duration value.
-  private static final float DEFAULT_LOCATION_CIRCLE_PULSE_FREQUENCY = 1700;
-  private static final float DEFAULT_LOCATION_CIRCLE_PULSE_DURATION = 1700;
+  private static final float DEFAULT_LOCATION_CIRCLE_PULSE_FREQUENCY = 5000;
+  private static final float DEFAULT_LOCATION_CIRCLE_PULSE_DURATION = 1900;
 
-  private static final float DEFAULT_LOCATION_CIRCLE_PULSE_ALPHA = .4f;
+  private static final float DEFAULT_LOCATION_CIRCLE_PULSE_ALPHA = .6f;
   private static final String DEFAULT_LOCATION_CIRCLE_INTERPOLATOR_PULSE_MODE = PulseMode.DECELERATE;
   private static final boolean DEFAULT_LOCATION_CIRCLE_PULSE_FADE_MODE = false;
 
@@ -130,17 +131,22 @@ public class LocationPulsingCircleActivity extends AppCompatActivity implements 
     mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
 
       locationComponent = mapboxMap.getLocationComponent();
-      locationComponent.activateLocationComponent(this, style, true,
-          new LocationEngineRequest.Builder(750)
-              .setFastestInterval(750)
-              .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-              .build(),
-          buildLocationComponentOptions(
-              "waterway-label",
-              DEFAULT_LOCATION_CIRCLE_PULSE_COLOR,
-              DEFAULT_LOCATION_CIRCLE_PULSE_ALPHA,
-              DEFAULT_LOCATION_CIRCLE_PULSE_DURATION,
-              DEFAULT_LOCATION_CIRCLE_PULSE_FREQUENCY));
+
+      locationComponent.activateLocationComponent(
+          LocationComponentActivationOptions
+              .builder(this, style)
+              .locationComponentOptions(buildLocationComponentOptions(
+                  "waterway-label",
+                  DEFAULT_LOCATION_CIRCLE_PULSE_COLOR,
+                  DEFAULT_LOCATION_CIRCLE_PULSE_ALPHA,
+                  DEFAULT_LOCATION_CIRCLE_PULSE_DURATION,
+                  DEFAULT_LOCATION_CIRCLE_PULSE_FREQUENCY))
+              .useDefaultLocationEngine(true)
+              .locationEngineRequest(new LocationEngineRequest.Builder(750)
+                  .setFastestInterval(750)
+                  .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+                  .build())
+              .build());
 
       locationComponent.setLocationComponentEnabled(true);
       locationComponent.setCameraMode(CameraMode.TRACKING);
@@ -170,14 +176,19 @@ public class LocationPulsingCircleActivity extends AppCompatActivity implements 
   private void setNewLocationComponentOptions(@Nullable float newPulsingFrequency,
                                               @Nullable int newPulsingColor) {
     if (mapboxMap.getStyle() != null) {
-      locationComponent.activateLocationComponent(this, mapboxMap.getStyle(),
-          true,
-          new LocationEngineRequest.Builder(750)
-              .setFastestInterval(750)
-              .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
-              .build(), buildLocationComponentOptions("waterway-label",
-              newPulsingColor, DEFAULT_LOCATION_CIRCLE_PULSE_ALPHA,
-              DEFAULT_LOCATION_CIRCLE_PULSE_DURATION, newPulsingFrequency));
+
+      locationComponent.activateLocationComponent(
+          LocationComponentActivationOptions
+              .builder(this, mapboxMap.getStyle())
+              .locationComponentOptions(buildLocationComponentOptions("waterway-label",
+                  newPulsingColor, DEFAULT_LOCATION_CIRCLE_PULSE_ALPHA,
+                  DEFAULT_LOCATION_CIRCLE_PULSE_DURATION, newPulsingFrequency))
+              .useDefaultLocationEngine(true)
+              .locationEngineRequest(new LocationEngineRequest.Builder(750)
+                  .setFastestInterval(750)
+                  .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+                  .build())
+              .build());
     }
   }
 

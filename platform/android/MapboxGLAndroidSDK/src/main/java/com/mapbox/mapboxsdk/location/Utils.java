@@ -56,14 +56,6 @@ public final class Utils {
     return (float) (location.getAccuracy() * (1 / metersPerPixel));
   }
 
-  static float calculatePulsingCircleRadius(@NonNull MapboxMap mapboxMap, @Nullable Location location) {
-    if (location == null) {
-      return 0;
-    }
-    double metersPerPixel = mapboxMap.getProjection().getMetersPerPixelAtLatitude(location.getLatitude());
-    return (float) (location.getAccuracy() * (1 / metersPerPixel));
-  }
-
   static boolean immediateAnimation(@NonNull Projection projection, @NonNull LatLng current, @NonNull LatLng target) {
     double metersPerPixel = projection.getMetersPerPixelAtLatitude((current.getLatitude() + target.getLatitude()) / 2);
     double distance = current.distanceTo(target);
