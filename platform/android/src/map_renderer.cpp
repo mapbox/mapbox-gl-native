@@ -184,7 +184,12 @@ void MapRenderer::onSurfaceCreated(JNIEnv&) {
     }
 }
 
-void MapRenderer::onSurfaceChanged(JNIEnv&, jint width, jint height) {
+void MapRenderer::onSurfaceChanged(JNIEnv& env, jint width, jint height) {
+    if (!renderer) {
+        // In case the surface has been destroyed (due to app back-grounding)
+        onSurfaceCreated(env);
+    }
+
     backend->resizeFramebuffer(width, height);
     framebufferSizeChanged = true;
     requestRender();

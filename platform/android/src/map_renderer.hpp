@@ -94,7 +94,9 @@ private:
 
     void onSurfaceChanged(JNIEnv&, jint width, jint height);
 
-    // Called on Main thread
+private:
+    // Called on either Main or GL thread //
+
     void onSurfaceDestroyed(JNIEnv&);
 
 private:
