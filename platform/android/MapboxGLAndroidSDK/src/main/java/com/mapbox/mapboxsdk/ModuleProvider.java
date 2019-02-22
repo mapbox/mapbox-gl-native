@@ -26,4 +26,13 @@ public interface ModuleProvider {
   @Nullable
   TelemetryDefinition obtainTelemetry();
 
+
+  /**
+   * Get the concrete implementation of LibraryLoaderProvider
+   *
+   * @return a new instance of LibraryLoaderProvider
+   */
+  @NonNull
+  LibraryLoaderProvider createLibraryLoaderProvider();
+
 }
