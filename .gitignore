@@ -45,3 +45,6 @@ mapbox-gl-native.code-workspace
 /scripts/generate-file-lists.list
 /scripts/generate-shaders.list
 /scripts/generate-style-code.list
+
+# iosapp access token
+/platform/ios/mapbox_access_token

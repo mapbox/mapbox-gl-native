@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="PSe-Ot-7Ff">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="PSe-Ot-7Ff">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -117,8 +117,6 @@
                         <outlet property="frameTimeGraphView" destination="BHE-Wn-x69" id="sFg-9b-DgH"/>
                         <outlet property="hudLabel" destination="58y-pX-YyB" id="aGG-7a-bZR"/>
                         <outlet property="mapView" destination="kNe-zV-9ha" id="VNR-WO-1q4"/>
-                        <segue destination="zvf-Qd-4Ru" kind="show" identifier="ShowSnapshots" id="hzX-Jp-UJq"/>
-                        <segue destination="dgL-Bu-te0" kind="show" identifier="ShowCustomLocationManger" id="kDM-0K-hSf"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AAd-8J-9UU" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -371,93 +369,6 @@
                 </rotationGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="594.39999999999998" y="1083.5082458770617"/>
-        </scene>
-        <!--Snapshots View Controller-->
-        <scene sceneID="Ooh-2U-4Bz">
-            <objects>
-                <viewController id="zvf-Qd-4Ru" customClass="MBXSnapshotsViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="Jxm-v6-zI0">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="miZ-Fw-EWq" userLabel="Image View TL">
-                                <rect key="frame" x="0.0" y="64" width="125" height="301.5"/>
-                            </imageView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="XuN-T4-Z83" userLabel="Image View TM">
-                                <rect key="frame" x="125" y="64" width="125" height="301.5"/>
-                            </imageView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ykR-Ku-i9l" userLabel="Image View TR">
-                                <rect key="frame" x="250" y="64" width="125" height="301.5"/>
-                            </imageView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="TL0-V8-T2F" userLabel="Image View BL">
-                                <rect key="frame" x="0.0" y="365.5" width="125" height="301.5"/>
-                            </imageView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="eMy-JU-rq4" userLabel="Image View BM">
-                                <rect key="frame" x="125" y="365.5" width="125" height="301.5"/>
-                            </imageView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zT0-3J-0xw" userLabel="Image View BR">
-                                <rect key="frame" x="250" y="365.5" width="125" height="301.5"/>
-                            </imageView>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstItem="eMy-JU-rq4" firstAttribute="leading" secondItem="TL0-V8-T2F" secondAttribute="trailing" id="0xP-ii-cyV"/>
-                            <constraint firstItem="eMy-JU-rq4" firstAttribute="top" secondItem="XuN-T4-Z83" secondAttribute="bottom" id="1HV-Tp-mUB"/>
-                            <constraint firstItem="TL0-V8-T2F" firstAttribute="leading" secondItem="0Ve-S1-bkK" secondAttribute="leading" id="3fH-bn-5ND"/>
-                            <constraint firstItem="miZ-Fw-EWq" firstAttribute="leading" secondItem="0Ve-S1-bkK" secondAttribute="leading" id="4yV-CW-c5n"/>
-                            <constraint firstItem="0Ve-S1-bkK" firstAttribute="bottom" secondItem="eMy-JU-rq4" secondAttribute="bottom" id="57P-Qo-M11"/>
-                            <constraint firstItem="ykR-Ku-i9l" firstAttribute="top" secondItem="0Ve-S1-bkK" secondAttribute="top" id="ARo-Nk-uVV"/>
-                            <constraint firstItem="0Ve-S1-bkK" firstAttribute="trailing" secondItem="ykR-Ku-i9l" secondAttribute="trailing" id="BRi-93-PGb"/>
-                            <constraint firstItem="eMy-JU-rq4" firstAttribute="height" secondItem="miZ-Fw-EWq" secondAttribute="height" id="FqJ-zb-pkb"/>
-                            <constraint firstItem="TL0-V8-T2F" firstAttribute="height" secondItem="miZ-Fw-EWq" secondAttribute="height" id="GrM-9L-dba"/>
-                            <constraint firstItem="XuN-T4-Z83" firstAttribute="height" secondItem="miZ-Fw-EWq" secondAttribute="height" id="HSd-2T-Kz7"/>
-                            <constraint firstItem="0Ve-S1-bkK" firstAttribute="trailing" secondItem="zT0-3J-0xw" secondAttribute="trailing" id="HaC-la-079"/>
-                            <constraint firstItem="0Ve-S1-bkK" firstAttribute="bottom" secondItem="TL0-V8-T2F" secondAttribute="bottom" id="JgE-s8-RAh"/>
-                            <constraint firstItem="zT0-3J-0xw" firstAttribute="top" secondItem="ykR-Ku-i9l" secondAttribute="bottom" id="KQm-ue-i3z"/>
-                            <constraint firstItem="zT0-3J-0xw" firstAttribute="width" secondItem="miZ-Fw-EWq" secondAttribute="width" id="LUI-BF-66V"/>
-                            <constraint firstItem="0Ve-S1-bkK" firstAttribute="bottom" secondItem="zT0-3J-0xw" secondAttribute="bottom" id="MAe-3N-78O"/>
-                            <constraint firstItem="TL0-V8-T2F" firstAttribute="width" secondItem="miZ-Fw-EWq" secondAttribute="width" id="OvH-2m-yli"/>
-                            <constraint firstItem="XuN-T4-Z83" firstAttribute="top" secondItem="0Ve-S1-bkK" secondAttribute="top" id="bzY-6Y-K80"/>
-                            <constraint firstItem="XuN-T4-Z83" firstAttribute="leading" secondItem="miZ-Fw-EWq" secondAttribute="trailing" id="jhf-gz-4UF"/>
-                            <constraint firstItem="eMy-JU-rq4" firstAttribute="width" secondItem="miZ-Fw-EWq" secondAttribute="width" id="l3m-tf-b1h"/>
-                            <constraint firstItem="ykR-Ku-i9l" firstAttribute="leading" secondItem="XuN-T4-Z83" secondAttribute="trailing" id="oEV-Yi-iLs"/>
-                            <constraint firstItem="TL0-V8-T2F" firstAttribute="top" secondItem="miZ-Fw-EWq" secondAttribute="bottom" id="oLW-zh-Fnk"/>
-                            <constraint firstItem="miZ-Fw-EWq" firstAttribute="top" secondItem="0Ve-S1-bkK" secondAttribute="top" id="qpD-mN-wfP"/>
-                            <constraint firstItem="ykR-Ku-i9l" firstAttribute="height" secondItem="miZ-Fw-EWq" secondAttribute="height" id="sP4-HJ-Vgk"/>
-                            <constraint firstItem="XuN-T4-Z83" firstAttribute="width" secondItem="miZ-Fw-EWq" secondAttribute="width" id="sTw-zD-Jid"/>
-                            <constraint firstItem="zT0-3J-0xw" firstAttribute="height" secondItem="miZ-Fw-EWq" secondAttribute="height" id="t0u-eQ-Ail"/>
-                            <constraint firstItem="ykR-Ku-i9l" firstAttribute="width" secondItem="miZ-Fw-EWq" secondAttribute="width" id="uQU-pB-kvq"/>
-                            <constraint firstItem="zT0-3J-0xw" firstAttribute="leading" secondItem="eMy-JU-rq4" secondAttribute="trailing" id="w8M-MN-cmx"/>
-                        </constraints>
-                        <viewLayoutGuide key="safeArea" id="0Ve-S1-bkK"/>
-                    </view>
-                    <connections>
-                        <outlet property="snapshotImageViewBL" destination="TL0-V8-T2F" id="e6C-dB-kHm"/>
-                        <outlet property="snapshotImageViewBM" destination="eMy-JU-rq4" id="zeR-3U-EbH"/>
-                        <outlet property="snapshotImageViewBR" destination="zT0-3J-0xw" id="6YR-lR-ela"/>
-                        <outlet property="snapshotImageViewTL" destination="miZ-Fw-EWq" id="2Jj-kh-3Zw"/>
-                        <outlet property="snapshotImageViewTM" destination="XuN-T4-Z83" id="MXY-7F-jB2"/>
-                        <outlet property="snapshotImageViewTR" destination="ykR-Ku-i9l" id="aEL-Sg-RIW"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="5xV-Ua-pqK" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1365.5999999999999" y="1083.5082458770617"/>
-        </scene>
-        <!--Custom Location View Controller-->
-        <scene sceneID="TUi-Dc-6uA">
-            <objects>
-                <viewController id="dgL-Bu-te0" customClass="MBXCustomLocationViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="ero-1d-Jm5">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <viewLayoutGuide key="safeArea" id="t2S-ES-YuE"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="RtO-ic-8Nc" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2073" y="1082"/>
         </scene>
     </scenes>
     <resources>

@@ -1,3 +1,6 @@
+// 20190429130948
+// https://raw.githubusercontent.com/mapbox/mapbox-gl-native/bc7ae969c40ea0d7de39ccf0451da94f61534d55/platform/darwin/test/amsterdam.geojson
+
 {
   "type": "FeatureCollection",
   "features": [

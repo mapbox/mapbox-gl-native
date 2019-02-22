@@ -12,6 +12,8 @@
 		071BBB031EE76146001FB02A /* MGLImageSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071BBB041EE76147001FB02A /* MGLImageSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071BBB071EE77631001FB02A /* MGLImageSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 071BBB051EE7761A001FB02A /* MGLImageSourceTests.m */; };
+		074A7F0822779861001A62D1 /* amsterdam.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 074A7F0722779860001A62D1 /* amsterdam.geojson */; };
+		074A7F0922779861001A62D1 /* amsterdam.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 074A7F0722779860001A62D1 /* amsterdam.geojson */; };
 		076171C32139C70900668A35 /* MGLMapViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 076171C22139C70900668A35 /* MGLMapViewTests.m */; };
 		076171C72141A91700668A35 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 076171C62141A91700668A35 /* Settings.bundle */; };
 		077061DA215DA00E000FEF62 /* MGLTestLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 077061D9215DA00E000FEF62 /* MGLTestLocationManager.m */; };
@@ -33,10 +35,6 @@
 		1753ED431E53CE6F00A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED411E53CE6F00A9FD90 /* MGLConversion.h */; };
 		1F06668A1EC64F8E001C16D7 /* MGLLight.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F0666881EC64F8E001C16D7 /* MGLLight.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1F06668D1EC64F8E001C16D7 /* MGLLight.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F0666891EC64F8E001C16D7 /* MGLLight.mm */; };
-		1F26B6C120E189C9007BCC21 /* MBXCustomLocationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F26B6C020E189C9007BCC21 /* MBXCustomLocationViewController.m */; };
-		1F26B6C320E1A351007BCC21 /* simple_route.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F26B6C220E1A351007BCC21 /* simple_route.json */; };
-		1F2B94C0221636D900210640 /* MGLNetworkConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F2B94BF221636D800210640 /* MGLNetworkConfiguration_Private.h */; };
-		1F2B94C1221636D900210640 /* MGLNetworkConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F2B94BF221636D800210640 /* MGLNetworkConfiguration_Private.h */; };
 		1F6A82A221360F9D00BA5B41 /* MGLLoggingConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F6A82A021360F9C00BA5B41 /* MGLLoggingConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1F6A82A321360F9D00BA5B41 /* MGLLoggingConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F6A82A021360F9C00BA5B41 /* MGLLoggingConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1F6A82A421360F9D00BA5B41 /* MGLLoggingConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F6A82A121360F9C00BA5B41 /* MGLLoggingConfiguration.m */; };
@@ -124,14 +122,11 @@
 		353AFA151D65AB17005A69F4 /* NSDate+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 353AFA121D65AB17005A69F4 /* NSDate+MGLAdditions.h */; };
 		353AFA161D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 353AFA131D65AB17005A69F4 /* NSDate+MGLAdditions.mm */; };
 		353AFA171D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 353AFA131D65AB17005A69F4 /* NSDate+MGLAdditions.mm */; };
-		353BAEF61D646370009A8DA9 /* amsterdam.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 353BAEF51D646370009A8DA9 /* amsterdam.geojson */; };
-		353BAEF71D646370009A8DA9 /* amsterdam.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 353BAEF51D646370009A8DA9 /* amsterdam.geojson */; };
 		353D23961D0B0DFE002BE09D /* MGLAnnotationViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.m */; };
 		354B83961D2E873E005D9406 /* MGLUserLocationAnnotationView.h in Headers */ = {isa = PBXBuildFile; fileRef = 354B83941D2E873E005D9406 /* MGLUserLocationAnnotationView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		354B83971D2E873E005D9406 /* MGLUserLocationAnnotationView.h in Headers */ = {isa = PBXBuildFile; fileRef = 354B83941D2E873E005D9406 /* MGLUserLocationAnnotationView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		354B83981D2E873E005D9406 /* MGLUserLocationAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 354B83951D2E873E005D9406 /* MGLUserLocationAnnotationView.m */; };
 		354B83991D2E873E005D9406 /* MGLUserLocationAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 354B83951D2E873E005D9406 /* MGLUserLocationAnnotationView.m */; };
-		354B839C1D2E9B48005D9406 /* MBXUserLocationAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 354B839B1D2E9B48005D9406 /* MBXUserLocationAnnotationView.m */; };
 		3557F7B01E1D27D300CCA5E6 /* MGLDistanceFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3557F7AE1E1D27D300CCA5E6 /* MGLDistanceFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3557F7B21E1D27D300CCA5E6 /* MGLDistanceFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3557F7AF1E1D27D300CCA5E6 /* MGLDistanceFormatter.m */; };
 		35599DED1D46F14E0048254D /* MGLStyleValue.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35599DEA1D46F14E0048254D /* MGLStyleValue.mm */; };
@@ -343,7 +338,6 @@
 		920A3E5D1E6F995200C16EFC /* MGLSourceQueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 920A3E5C1E6F995200C16EFC /* MGLSourceQueryTests.m */; };
 		9221BAAD2069843A0054BDF4 /* MGLTilePyramidOfflineRegion_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9221BAAC2069843A0054BDF4 /* MGLTilePyramidOfflineRegion_Private.h */; };
 		9221BAB020699F8A0054BDF4 /* MGLTilePyramidOfflineRegion_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9221BAAC2069843A0054BDF4 /* MGLTilePyramidOfflineRegion_Private.h */; };
-		927FBCFC1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 927FBCFB1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m */; };
 		927FBCFF1F4DB05500F8BF1F /* MGLMapSnapshotter.h in Headers */ = {isa = PBXBuildFile; fileRef = 927FBCFD1F4DB05500F8BF1F /* MGLMapSnapshotter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		927FBD001F4DB05500F8BF1F /* MGLMapSnapshotter.h in Headers */ = {isa = PBXBuildFile; fileRef = 927FBCFD1F4DB05500F8BF1F /* MGLMapSnapshotter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		927FBD011F4DB05500F8BF1F /* MGLMapSnapshotter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 927FBCFE1F4DB05500F8BF1F /* MGLMapSnapshotter.mm */; };
@@ -475,11 +469,8 @@
 		DA0CD5901CF56F6A00A5F5A5 /* MGLFeatureTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */; };
 		DA17BE301CC4BAC300402C41 /* MGLMapView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA17BE2F1CC4BAC300402C41 /* MGLMapView_Private.h */; };
 		DA17BE311CC4BDAA00402C41 /* MGLMapView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA17BE2F1CC4BAC300402C41 /* MGLMapView_Private.h */; };
-		DA1DC96A1CB6C6B7006E619F /* MBXCustomCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA1DC9671CB6C6B7006E619F /* MBXCustomCalloutView.m */; };
 		DA1DC96B1CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA1DC9691CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m */; };
 		DA1DC9701CB6C6CE006E619F /* points.geojson in Resources */ = {isa = PBXBuildFile; fileRef = DA1DC96C1CB6C6CE006E619F /* points.geojson */; };
-		DA1DC9711CB6C6CE006E619F /* polyline.geojson in Resources */ = {isa = PBXBuildFile; fileRef = DA1DC96D1CB6C6CE006E619F /* polyline.geojson */; };
-		DA1DC9731CB6C6CE006E619F /* threestates.geojson in Resources */ = {isa = PBXBuildFile; fileRef = DA1DC96F1CB6C6CE006E619F /* threestates.geojson */; };
 		DA1DC9971CB6E046006E619F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DA1DC9961CB6E046006E619F /* main.m */; };
 		DA1DC9991CB6E054006E619F /* MBXAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DA1DC9981CB6E054006E619F /* MBXAppDelegate.m */; };
 		DA1DC99B1CB6E064006E619F /* MBXViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA1DC99A1CB6E064006E619F /* MBXViewController.m */; };
@@ -702,9 +693,6 @@
 		DD0902A91DB1929D00C5BDCE /* MGLNetworkConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.m */; };
 		DD0902AA1DB1929D00C5BDCE /* MGLNetworkConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.m */; };
 		DD0902AB1DB192A800C5BDCE /* MGLNetworkConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = DD0902A41DB18F1B00C5BDCE /* MGLNetworkConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DD4823751D94AE6C00EB71B7 /* fill_filter_style.json in Resources */ = {isa = PBXBuildFile; fileRef = DD4823721D94AE6C00EB71B7 /* fill_filter_style.json */; };
-		DD4823761D94AE6C00EB71B7 /* line_filter_style.json in Resources */ = {isa = PBXBuildFile; fileRef = DD4823731D94AE6C00EB71B7 /* line_filter_style.json */; };
-		DD4823771D94AE6C00EB71B7 /* numeric_filter_style.json in Resources */ = {isa = PBXBuildFile; fileRef = DD4823741D94AE6C00EB71B7 /* numeric_filter_style.json */; };
 		DD58A4C61D822BD000E1F038 /* MGLExpressionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DD58A4C51D822BD000E1F038 /* MGLExpressionTests.mm */; };
 		DD9BE4F71EB263C50079A3AF /* UIViewController+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DD9BE4F51EB263C50079A3AF /* UIViewController+MGLAdditions.h */; };
 		DD9BE4F81EB263C50079A3AF /* UIViewController+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DD9BE4F61EB263C50079A3AF /* UIViewController+MGLAdditions.m */; };
@@ -811,6 +799,7 @@
 		071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLImageSource.h; sourceTree = "<group>"; };
 		071BBAFD1EE75CD4001FB02A /* MGLImageSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLImageSource.mm; sourceTree = "<group>"; };
 		071BBB051EE7761A001FB02A /* MGLImageSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLImageSourceTests.m; path = ../../darwin/test/MGLImageSourceTests.m; sourceTree = "<group>"; };
+		074A7F0722779860001A62D1 /* amsterdam.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = amsterdam.geojson; path = ../../darwin/test/amsterdam.geojson; sourceTree = "<group>"; };
 		076171C22139C70900668A35 /* MGLMapViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLMapViewTests.m; path = ../../darwin/test/MGLMapViewTests.m; sourceTree = "<group>"; };
 		076171C62141A91700668A35 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Settings.bundle; path = app/Settings.bundle; sourceTree = SOURCE_ROOT; };
 		077061D9215DA00E000FEF62 /* MGLTestLocationManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTestLocationManager.m; sourceTree = "<group>"; };
@@ -835,10 +824,6 @@
 		1753ED411E53CE6F00A9FD90 /* MGLConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLConversion.h; sourceTree = "<group>"; };
 		1F0666881EC64F8E001C16D7 /* MGLLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight.h; sourceTree = "<group>"; };
 		1F0666891EC64F8E001C16D7 /* MGLLight.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLight.mm; sourceTree = "<group>"; };
-		1F26B6BF20E189C9007BCC21 /* MBXCustomLocationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXCustomLocationViewController.h; sourceTree = "<group>"; };
-		1F26B6C020E189C9007BCC21 /* MBXCustomLocationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXCustomLocationViewController.m; sourceTree = "<group>"; };
-		1F26B6C220E1A351007BCC21 /* simple_route.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = simple_route.json; sourceTree = "<group>"; };
-		1F2B94BF221636D800210640 /* MGLNetworkConfiguration_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLNetworkConfiguration_Private.h; sourceTree = "<group>"; };
 		1F6A82A021360F9C00BA5B41 /* MGLLoggingConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLLoggingConfiguration.h; sourceTree = "<group>"; };
 		1F6A82A121360F9C00BA5B41 /* MGLLoggingConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLLoggingConfiguration.m; sourceTree = "<group>"; };
 		1F6A82A62138871900BA5B41 /* MGLLoggingConfiguration_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLLoggingConfiguration_Private.h; sourceTree = "<group>"; };
@@ -890,12 +875,9 @@
 		353933FD1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLSymbolStyleLayer.h; sourceTree = "<group>"; };
 		353AFA121D65AB17005A69F4 /* NSDate+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+MGLAdditions.h"; sourceTree = "<group>"; };
 		353AFA131D65AB17005A69F4 /* NSDate+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSDate+MGLAdditions.mm"; sourceTree = "<group>"; };
-		353BAEF51D646370009A8DA9 /* amsterdam.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = amsterdam.geojson; path = ../../darwin/test/amsterdam.geojson; sourceTree = "<group>"; };
 		353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLAnnotationViewTests.m; sourceTree = "<group>"; };
 		354B83941D2E873E005D9406 /* MGLUserLocationAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationAnnotationView.h; sourceTree = "<group>"; };
 		354B83951D2E873E005D9406 /* MGLUserLocationAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLUserLocationAnnotationView.m; sourceTree = "<group>"; };
-		354B839A1D2E9B48005D9406 /* MBXUserLocationAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXUserLocationAnnotationView.h; sourceTree = "<group>"; };
-		354B839B1D2E9B48005D9406 /* MBXUserLocationAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXUserLocationAnnotationView.m; sourceTree = "<group>"; };
 		3557F7AE1E1D27D300CCA5E6 /* MGLDistanceFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLDistanceFormatter.h; sourceTree = "<group>"; };
 		3557F7AF1E1D27D300CCA5E6 /* MGLDistanceFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLDistanceFormatter.m; sourceTree = "<group>"; };
 		35599DEA1D46F14E0048254D /* MGLStyleValue.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLStyleValue.mm; sourceTree = "<group>"; };
@@ -1041,8 +1023,6 @@
 		8989B17B201A48EA0081CF59 /* MGLHeatmapStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLHeatmapStyleLayer.mm; sourceTree = "<group>"; };
 		920A3E5C1E6F995200C16EFC /* MGLSourceQueryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLSourceQueryTests.m; path = ../../darwin/test/MGLSourceQueryTests.m; sourceTree = "<group>"; };
 		9221BAAC2069843A0054BDF4 /* MGLTilePyramidOfflineRegion_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLTilePyramidOfflineRegion_Private.h; sourceTree = "<group>"; };
-		927FBCFA1F4DAA8300F8BF1F /* MBXSnapshotsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXSnapshotsViewController.h; sourceTree = "<group>"; };
-		927FBCFB1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXSnapshotsViewController.m; sourceTree = "<group>"; };
 		927FBCFD1F4DB05500F8BF1F /* MGLMapSnapshotter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapSnapshotter.h; sourceTree = "<group>"; };
 		927FBCFE1F4DB05500F8BF1F /* MGLMapSnapshotter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLMapSnapshotter.mm; sourceTree = "<group>"; wrapsLines = 0; };
 		92F2C3EC1F0E3C3A00268EC0 /* MGLRendererFrontend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLRendererFrontend.h; sourceTree = "<group>"; };
@@ -1127,13 +1107,9 @@
 		DA1DC9501CB6C1C2006E619F /* MBXAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXAppDelegate.h; sourceTree = "<group>"; };
 		DA1DC9531CB6C1C2006E619F /* MBXViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXViewController.h; sourceTree = "<group>"; };
 		DA1DC95E1CB6C1C2006E619F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DA1DC9661CB6C6B7006E619F /* MBXCustomCalloutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXCustomCalloutView.h; sourceTree = "<group>"; };
-		DA1DC9671CB6C6B7006E619F /* MBXCustomCalloutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXCustomCalloutView.m; sourceTree = "<group>"; };
 		DA1DC9681CB6C6B7006E619F /* MBXOfflinePacksTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXOfflinePacksTableViewController.h; sourceTree = "<group>"; };
 		DA1DC9691CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXOfflinePacksTableViewController.m; sourceTree = "<group>"; };
 		DA1DC96C1CB6C6CE006E619F /* points.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = points.geojson; sourceTree = "<group>"; };
-		DA1DC96D1CB6C6CE006E619F /* polyline.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = polyline.geojson; sourceTree = "<group>"; };
-		DA1DC96F1CB6C6CE006E619F /* threestates.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = threestates.geojson; sourceTree = "<group>"; };
 		DA1DC9961CB6E046006E619F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		DA1DC9981CB6E054006E619F /* MBXAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXAppDelegate.m; sourceTree = "<group>"; };
 		DA1DC99A1CB6E064006E619F /* MBXViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXViewController.m; sourceTree = "<group>"; };
@@ -1365,9 +1341,6 @@
 		DAFEB3782093AE9200A86A83 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ko; path = ko.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfiguration.m; sourceTree = "<group>"; };
 		DD0902A41DB18F1B00C5BDCE /* MGLNetworkConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLNetworkConfiguration.h; sourceTree = "<group>"; };
-		DD4823721D94AE6C00EB71B7 /* fill_filter_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = fill_filter_style.json; sourceTree = "<group>"; };
-		DD4823731D94AE6C00EB71B7 /* line_filter_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = line_filter_style.json; sourceTree = "<group>"; };
-		DD4823741D94AE6C00EB71B7 /* numeric_filter_style.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = numeric_filter_style.json; sourceTree = "<group>"; };
 		DD58A4C51D822BD000E1F038 /* MGLExpressionTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLExpressionTests.mm; path = ../../darwin/test/MGLExpressionTests.mm; sourceTree = "<group>"; };
 		DD9BE4F51EB263C50079A3AF /* UIViewController+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+MGLAdditions.h"; sourceTree = "<group>"; };
 		DD9BE4F61EB263C50079A3AF /* UIViewController+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+MGLAdditions.m"; sourceTree = "<group>"; };
@@ -1447,6 +1420,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		074A7F062277792F001A62D1 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				A4F3FB1C2254865900A30170 /* missing_icon.json */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		16376B081FFD9DAF0000563E /* Integration Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -1767,15 +1748,8 @@
 		9604FC341F313A5E003EEA02 /* Fixtures */ = {
 			isa = PBXGroup;
 			children = (
-				353BAEF51D646370009A8DA9 /* amsterdam.geojson */,
+				074A7F0722779860001A62D1 /* amsterdam.geojson */,
 				DA1DC96C1CB6C6CE006E619F /* points.geojson */,
-				A4F3FB1C2254865900A30170 /* missing_icon.json */,
-				DA1DC96D1CB6C6CE006E619F /* polyline.geojson */,
-				1F26B6C220E1A351007BCC21 /* simple_route.json */,
-				DA1DC96F1CB6C6CE006E619F /* threestates.geojson */,
-				DD4823721D94AE6C00EB71B7 /* fill_filter_style.json */,
-				DD4823731D94AE6C00EB71B7 /* line_filter_style.json */,
-				DD4823741D94AE6C00EB71B7 /* numeric_filter_style.json */,
 			);
 			name = Fixtures;
 			sourceTree = "<group>";
@@ -1818,6 +1792,7 @@
 				DA1DC9921CB6DF24006E619F /* Frameworks */,
 				DAC07C951CBB2CAD000CB309 /* Configuration */,
 				DA1DC94B1CB6C1C2006E619F /* Products */,
+				074A7F062277792F001A62D1 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1845,16 +1820,8 @@
 				DA1DC9981CB6E054006E619F /* MBXAppDelegate.m */,
 				40FDA7691CCAAA6800442548 /* MBXAnnotationView.h */,
 				40FDA76A1CCAAA6800442548 /* MBXAnnotationView.m */,
-				DA1DC9661CB6C6B7006E619F /* MBXCustomCalloutView.h */,
-				DA1DC9671CB6C6B7006E619F /* MBXCustomCalloutView.m */,
-				354B839A1D2E9B48005D9406 /* MBXUserLocationAnnotationView.h */,
-				354B839B1D2E9B48005D9406 /* MBXUserLocationAnnotationView.m */,
 				DA1DC9681CB6C6B7006E619F /* MBXOfflinePacksTableViewController.h */,
 				DA1DC9691CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m */,
-				927FBCFA1F4DAA8300F8BF1F /* MBXSnapshotsViewController.h */,
-				927FBCFB1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m */,
-				1F26B6BF20E189C9007BCC21 /* MBXCustomLocationViewController.h */,
-				1F26B6C020E189C9007BCC21 /* MBXCustomLocationViewController.m */,
 				DA1DC9531CB6C1C2006E619F /* MBXViewController.h */,
 				DA1DC99A1CB6E064006E619F /* MBXViewController.m */,
 				965DF50F20F9430500438AAC /* MBXFrameTimeGraphView.h */,
@@ -1992,7 +1959,6 @@
 				927FBCFD1F4DB05500F8BF1F /* MGLMapSnapshotter.h */,
 				927FBCFE1F4DB05500F8BF1F /* MGLMapSnapshotter.mm */,
 				DD0902A41DB18F1B00C5BDCE /* MGLNetworkConfiguration.h */,
-				1F2B94BF221636D800210640 /* MGLNetworkConfiguration_Private.h */,
 				DD0902A21DB18DE700C5BDCE /* MGLNetworkConfiguration.m */,
 				3EA9337830C7738BF7F5493C /* MGLRendererConfiguration.h */,
 				3EA931BC4F087E166D538F21 /* MGLRendererConfiguration.mm */,
@@ -2316,7 +2282,6 @@
 				74CB5EBF219B280400102936 /* MGLHeatmapStyleLayer_Private.h in Headers */,
 				1FC4817D2098CBC0000D09B4 /* NSPredicate+MGLPrivateAdditions.h in Headers */,
 				1FCCEC3A222607A500302E3B /* MGLSDKMetricsManager_Private.h in Headers */,
-				1F2B94C0221636D900210640 /* MGLNetworkConfiguration_Private.h in Headers */,
 				353AFA141D65AB17005A69F4 /* NSDate+MGLAdditions.h in Headers */,
 				DA8848531CBAFB9800AB86E3 /* MGLCompactCalloutView.h in Headers */,
 				74CB5EB1219B252C00102936 /* MGLStyleLayerManager.h in Headers */,
@@ -2544,7 +2509,6 @@
 				3510FFFA1D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.h in Headers */,
 				1FF48588223710BE00F19727 /* MGLAttributedExpression.h in Headers */,
 				DA72620C1DEEE3480043BB89 /* MGLOpenGLStyleLayer.h in Headers */,
-				1F2B94C1221636D900210640 /* MGLNetworkConfiguration_Private.h in Headers */,
 				35CE61831D4165D9004F2359 /* UIColor+MGLAdditions.h in Headers */,
 				96E516F32000597100A02306 /* NSDictionary+MGLAdditions.h in Headers */,
 				1FCAE2A920B88B3800C577DD /* MGLLocationManager_Private.h in Headers */,
@@ -2674,6 +2638,7 @@
 				DA1DC9471CB6C1C2006E619F /* Frameworks */,
 				DA1DC9481CB6C1C2006E619F /* Resources */,
 				DA4A269A1CB6F5D3000B7809 /* Embed Frameworks */,
+				072FAE4E2230A76900CC750D /* Insert Mapbox Access Token */,
 			);
 			buildRules = (
 			);
@@ -2890,19 +2855,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DD4823771D94AE6C00EB71B7 /* numeric_filter_style.json in Resources */,
 				A4F3FB1D2254865900A30170 /* missing_icon.json in Resources */,
 				DA1DC9701CB6C6CE006E619F /* points.geojson in Resources */,
-				353BAEF61D646370009A8DA9 /* amsterdam.geojson in Resources */,
-				DA1DC9711CB6C6CE006E619F /* polyline.geojson in Resources */,
-				DD4823761D94AE6C00EB71B7 /* line_filter_style.json in Resources */,
+				074A7F0822779861001A62D1 /* amsterdam.geojson in Resources */,
 				076171C72141A91700668A35 /* Settings.bundle in Resources */,
 				DA821D071CCC6D59007508D4 /* Main.storyboard in Resources */,
-				DA1DC9731CB6C6CE006E619F /* threestates.geojson in Resources */,
 				DA821D061CCC6D59007508D4 /* LaunchScreen.storyboard in Resources */,
 				96E027231E57C76E004B8E66 /* Localizable.strings in Resources */,
-				1F26B6C320E1A351007BCC21 /* simple_route.json in Resources */,
-				DD4823751D94AE6C00EB71B7 /* fill_filter_style.json in Resources */,
 				DA1DC99F1CB6E088006E619F /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2913,7 +2872,7 @@
 			files = (
 				DA2784FC1DF02FF4001D5B8D /* Media.xcassets in Resources */,
 				1F8A59F72165326D004DFE75 /* sideload_sat.db in Resources */,
-				353BAEF71D646370009A8DA9 /* amsterdam.geojson in Resources */,
+				074A7F0922779861001A62D1 /* amsterdam.geojson in Resources */,
 				DA35D0881E1A6309007DED41 /* one-liner.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2958,6 +2917,28 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		072FAE4E2230A76900CC750D /* Insert Mapbox Access Token */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Insert Mapbox Access Token";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ \"$CI\" ]]; then\n  echo \"CI environment, access token not required\"\n  exit 0\nelse\n  token_file=$SRCROOT/mapbox_access_token\n  token=\"$(cat $token_file 2> /dev/null)\" || token=\"$(cat ~/.mapbox 2> /dev/null)\"\n\n  if [ \"$token\" ]; then\n    plutil -replace MGLMapboxAccessToken -string $token \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n  else\n    echo 'error: Missing Mapbox access token'\n    echo \"error: Get an access token from <https://www.mapbox.com/studio/account/tokens/>, then create a new file at $token_file that contains the access token.\"\n  exit 1\nfi\n\nfi\n\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		16376B031FFD9DAF0000563E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -2992,16 +2973,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA1DC9971CB6E046006E619F /* main.m in Sources */,
-				354B839C1D2E9B48005D9406 /* MBXUserLocationAnnotationView.m in Sources */,
 				965DF51120F9430500438AAC /* MBXFrameTimeGraphView.m in Sources */,
 				DA1DC9991CB6E054006E619F /* MBXAppDelegate.m in Sources */,
 				6FA9341721EF372100AA9CA8 /* MBXOrnamentsViewController.m in Sources */,
 				DA1DC96B1CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m in Sources */,
-				DA1DC96A1CB6C6B7006E619F /* MBXCustomCalloutView.m in Sources */,
-				927FBCFC1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m in Sources */,
 				DA1DC99B1CB6E064006E619F /* MBXViewController.m in Sources */,
 				40FDA76B1CCAAA6800442548 /* MBXAnnotationView.m in Sources */,
-				1F26B6C120E189C9007BCC21 /* MBXCustomLocationViewController.m in Sources */,
 				3E6465D62065767A00685536 /* LimeGreenStyleLayer.m in Sources */,
 				632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */,
 			);
