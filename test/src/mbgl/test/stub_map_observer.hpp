@@ -20,7 +20,7 @@ public:
         }
     }
 
-    void onDidFailLoadingMap(std::exception_ptr) final {
+    void onDidFailLoadingMap(MapLoadError, const std::string&) final {
         if (didFailLoadingMapCallback) {
             didFailLoadingMapCallback();
         }

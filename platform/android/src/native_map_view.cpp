@@ -164,13 +164,12 @@ void NativeMapView::onDidFinishLoadingMap() {
     }
 }
 
-void NativeMapView::onDidFailLoadingMap(std::exception_ptr exceptionPtr) {
+void NativeMapView::onDidFailLoadingMap(MapLoadError, const std::string& error) {
     assert(vm != nullptr);
 
     android::UniqueEnv _env = android::AttachEnv();
     static auto& javaClass = jni::Class<NativeMapView>::Singleton(*_env);
     static auto onDidFailLoadingMap = javaClass.GetMethod<void (jni::String)>(*_env, "onDidFailLoadingMap");
-    std::string error = mbgl::util::toString(exceptionPtr);
     auto weakReference = javaPeer.get(*_env);
     if (weakReference) {
         weakReference.Call(*_env, onDidFailLoadingMap, jni::Make<jni::String>(*_env, error));

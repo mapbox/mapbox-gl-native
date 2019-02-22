@@ -62,7 +62,7 @@ public:
     void onCameraDidChange(MapObserver::CameraChangeMode) override;
     void onWillStartLoadingMap() override;
     void onDidFinishLoadingMap() override;
-    void onDidFailLoadingMap(std::exception_ptr) override;
+    void onDidFailLoadingMap(MapLoadError, const std::string&) override;
     void onWillStartRenderingFrame() override;
     void onDidFinishRenderingFrame(MapObserver::RenderMode) override;
     void onWillStartRenderingMap() override;

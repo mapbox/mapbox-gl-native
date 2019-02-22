@@ -22,7 +22,7 @@ class HeadlessFrontend;
 namespace node_mbgl {
 
 class NodeMapObserver : public mbgl::MapObserver {
-    void onDidFailLoadingMap(std::exception_ptr) override;
+    void onDidFailLoadingMap(mbgl::MapLoadError, const std::string&) override;
 };
 
 class NodeMap;
