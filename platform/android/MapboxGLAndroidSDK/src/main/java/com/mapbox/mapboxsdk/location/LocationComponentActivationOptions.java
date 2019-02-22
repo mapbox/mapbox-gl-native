@@ -11,8 +11,6 @@ import com.mapbox.mapboxsdk.maps.Style;
 /**
  * A class which holds the various options for activating the Maps SDK's {@link LocationComponent} to eventually
  * show the device location on the map.
- *
- * since 7.2.0
  */
 public class LocationComponentActivationOptions {
 
@@ -24,7 +22,7 @@ public class LocationComponentActivationOptions {
   private final int styleRes;
   private final boolean useDefaultLocationEngine;
 
-  LocationComponentActivationOptions(@NonNull Context context, @NonNull Style style,
+  private LocationComponentActivationOptions(@NonNull Context context, @NonNull Style style,
                                      @Nullable LocationEngine locationEngine,
                                      @Nullable LocationEngineRequest locationEngineRequest,
                                      @Nullable LocationComponentOptions locationComponentOptions,
@@ -102,7 +100,6 @@ public class LocationComponentActivationOptions {
    *
    * @return the style resource.
    */
-  @Nullable
   public int styleRes() {
     return styleRes;
   }
@@ -112,15 +109,12 @@ public class LocationComponentActivationOptions {
    * location engine initialized
    * @return whether the default LocationEngine is used
    */
-  @Nullable
   public boolean useDefaultLocationEngine() {
     return useDefaultLocationEngine;
   }
 
   /**
    * Builder class for constructing a new instance of {@link LocationComponentActivationOptions}.
-   *
-   * since 7.2.0
    */
   public static class Builder {
     private Context context;
@@ -129,13 +123,39 @@ public class LocationComponentActivationOptions {
     private LocationEngineRequest locationEngineRequest;
     private LocationComponentOptions locationComponentOptions;
     private int styleRes;
-    private boolean useDefaultLocationEngine;
 
-    public Builder(Context context, Style style) {
+    /**
+     *  Set to true as the default in case a true/false value isn't declared via the builder's
+     *  {@link LocationComponentActivationOptions#useDefaultLocationEngine()} method.
+     *
+     *  Please be aware that this activation boolean is ignored when a non-null
+     *  {@link LocationEngine} is set via the builder's `locationEngine()` method.
+     */
+    private boolean useDefaultLocationEngine = true;
+
+    /**
+     * Constructor for the {@link LocationComponentActivationOptions} builder class.
+     * While other activation options are optional, the activation process always requires
+     * context and a fully-loaded map {@link Style} object, which is why the two are in this
+     * constructor.
+     */
+    public Builder(@NonNull Context context, @NonNull Style style) {
       this.context = context;
       this.style = style;
     }
 
+    /**
+     * Deliver your own {@link LocationEngine} to the LocationComponent.
+     *
+     * The true/false
+     * {@link LocationComponentActivationOptions#builder(Context, Style)#useDefaultLocationEngine}
+     * activation option is ignored when a non-null {@link LocationEngine} is set via
+     * this `locationEngine()` method.
+     *
+     * @param locationEngine a {@link LocationEngine} object
+     *
+     * @return The {@link Builder} class with a set LocationEngine.
+     */
     public Builder locationEngine(LocationEngine locationEngine) {
       this.locationEngine = locationEngine;
       return this;

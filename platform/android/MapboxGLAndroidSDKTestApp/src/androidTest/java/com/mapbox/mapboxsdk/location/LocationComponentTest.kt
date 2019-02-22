@@ -80,7 +80,7 @@ class LocationComponentTest : EspressoTest() {
         component.isLocationComponentEnabled = true
 
         val locationEngine = component.locationEngine
-        assertThat(locationEngine, nullValue())
+        assertThat(locationEngine, notNullValue())
 
         TestingAsyncUtils.waitForLayer(uiController, idlingResource.mapView)
       }
@@ -115,7 +115,7 @@ class LocationComponentTest : EspressoTest() {
         val locationEngine = component.locationEngine
         val componentOptions = component.locationComponentOptions
 
-        assertThat(locationEngine, nullValue())
+        assertThat(locationEngine, notNullValue())
         assertThat(componentOptions, notNullValue())
 
         TestingAsyncUtils.waitForLayer(uiController, idlingResource.mapView)
@@ -136,6 +136,7 @@ class LocationComponentTest : EspressoTest() {
 
           locationComponentActivationOptions = LocationComponentActivationOptions
                   .builder(context, style)
+                  .locationEngine(null)
                   .locationComponentOptions(
                           LocationComponentOptions.builder(context)
                                   .staleStateTimeout(200)
