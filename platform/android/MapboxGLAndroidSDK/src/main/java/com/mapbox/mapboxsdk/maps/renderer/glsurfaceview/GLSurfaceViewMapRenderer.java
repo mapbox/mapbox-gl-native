@@ -25,6 +25,8 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
   @NonNull
   private final GLSurfaceView glSurfaceView;
 
+  private boolean requestDestroy;
+
   public GLSurfaceViewMapRenderer(Context context,
                                   GLSurfaceView glSurfaceView,
                                   String localIdeographFontFamily) {
@@ -40,7 +42,7 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
 
       @Override
       public void surfaceDestroyed(SurfaceHolder holder) {
-        GLSurfaceViewMapRenderer.this.onSurfaceDestroyed();
+        requestDestroy = true;
       }
 
     });
@@ -52,8 +54,26 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
   }
 
   @Override
+  public void onPause() {
+    super.onPause();
+  }
+
+  @Override
+  public void onDestroy() {
+    if (requestDestroy) {
+      onSurfaceDestroyed();
+    }
+    super.onDestroy();
+  }
+
+  @Override
   public void onStart() {
     glSurfaceView.onResume();
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
   }
 
   @Override
