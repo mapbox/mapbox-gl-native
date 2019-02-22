@@ -3,8 +3,6 @@
 #include "node_feature.hpp"
 #include "node_conversion.hpp"
 
-#include <mbgl/map/projection_mode.hpp>
-#include <mbgl/util/exception.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/style/conversion/source.hpp>
@@ -26,6 +24,7 @@
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/light.hpp>
 #include <mbgl/map/map_observer.hpp>
+#include <mbgl/util/exception.hpp>
 #include <mbgl/util/premultiply.hpp>
 
 #include <unistd.h>
@@ -54,8 +53,14 @@ static const char* releasedMessage() {
     return "Map resources have already been released";
 }
 
-void NodeMapObserver::onDidFailLoadingMap(std::exception_ptr error) {
-    std::rethrow_exception(error);
+void NodeMapObserver::onDidFailLoadingMap(mbgl::MapLoadError error, const std::string& description) {
+    switch (error) {
+        case mbgl::MapLoadError::StyleParseError:
+            Nan::ThrowError(NodeMap::ParseError(description.c_str()));
+            break;
+        default:
+            Nan::ThrowError(description.c_str());
+    }
 }
 
 void NodeMap::Init(v8::Local<v8::Object> target) {

@@ -3,10 +3,16 @@
 #include <mbgl/style/source.hpp>
 
 #include <cstdint>
-#include <exception>
 #include <string>
 
 namespace mbgl {
+
+enum class MapLoadError {
+    StyleParseError,
+    StyleLoadError,
+    NotFoundError,
+    UnknownError,
+};
 
 class MapObserver {
 public:
@@ -32,7 +38,7 @@ public:
     virtual void onCameraDidChange(CameraChangeMode) {}
     virtual void onWillStartLoadingMap() {}
     virtual void onDidFinishLoadingMap() {}
-    virtual void onDidFailLoadingMap(std::exception_ptr) {}
+    virtual void onDidFailLoadingMap(MapLoadError, const std::string&) {}
     virtual void onWillStartRenderingFrame() {}
     virtual void onDidFinishRenderingFrame(RenderMode) {}
     virtual void onWillStartRenderingMap() {}
