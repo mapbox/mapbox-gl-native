@@ -94,3 +94,7 @@
 [submodule "vendor/args"]
 	path = vendor/args
 	url = https://github.com/Taywee/args
+[submodule "platform/ios/ios-sdk-examples"]
+	path = platform/ios/ios-sdk-examples
+	url = https://github.com/mapbox/ios-sdk-examples.git
+
