@@ -80,7 +80,7 @@ class LocationComponentTest : EspressoTest() {
         component.isLocationComponentEnabled = true
 
         val locationEngine = component.locationEngine
-        assertThat(locationEngine, notNullValue())
+        assertThat(locationEngine, nullValue())
 
         TestingAsyncUtils.waitForLayer(uiController, idlingResource.mapView)
       }
@@ -115,7 +115,7 @@ class LocationComponentTest : EspressoTest() {
         val locationEngine = component.locationEngine
         val componentOptions = component.locationComponentOptions
 
-        assertThat(locationEngine, notNullValue())
+        assertThat(locationEngine, nullValue())
         assertThat(componentOptions, notNullValue())
 
         TestingAsyncUtils.waitForLayer(uiController, idlingResource.mapView)
@@ -164,7 +164,7 @@ class LocationComponentTest : EspressoTest() {
     executeComponentTest(componentAction)
   }
 
-  @Test(expected = IllegalStateException::class)
+  @Test(expected = IllegalArgumentException::class)
   fun settingMapStyleImmediatelyBeforeLoadingComponent_throwsInvalidStyle() {
     validateTestSetup()
     val componentAction = object : LocationComponentAction.OnPerformLocationComponentAction {
