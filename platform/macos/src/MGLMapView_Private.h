@@ -22,6 +22,9 @@ namespace mbgl {
 /// Center longitude set independently of the center latitude in an inspectable.
 @property (nonatomic) CLLocationDegrees pendingLongitude;
 
+/// The map view’s OpenGL rendering context.
+- (CGLContextObj)context;
+
 /// Asynchronously render a frame of the map.
 - (void)setNeedsGLDisplay;
 

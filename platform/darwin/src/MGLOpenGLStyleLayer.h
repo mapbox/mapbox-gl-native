@@ -27,6 +27,12 @@ MGL_EXPORT
 
 @property (nonatomic, weak, readonly) MGLStyle *style;
 
+#if TARGET_OS_IPHONE
+@property (nonatomic, readonly) EAGLContext *context;
+#else
+@property (nonatomic, readonly) CGLContextObj context;
+#endif
+
 - (instancetype)initWithIdentifier:(NSString *)identifier;
 
 - (void)didMoveToMapView:(MGLMapView *)mapView;
