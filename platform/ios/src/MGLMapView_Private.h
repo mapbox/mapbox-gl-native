@@ -13,6 +13,9 @@ FOUNDATION_EXTERN MGL_EXPORT MGLExceptionName const MGLUnderlyingMapUnavailableE
 
 @interface MGLMapView (Private)
 
+/// The map view’s OpenGL rendering context.
+@property (nonatomic, readonly) EAGLContext *context;
+
 /// Currently shown popover representing the selected annotation.
 @property (nonatomic) UIView<MGLCalloutView> *calloutViewForSelectedAnnotation;
 

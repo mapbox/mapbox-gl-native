@@ -195,7 +195,7 @@ public:
                           MGLMultiPointDelegate,
                           MGLAnnotationImageDelegate>
 
-@property (nonatomic) EAGLContext *context;
+@property (nonatomic, readwrite) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
 @property (nonatomic) UIImageView *glSnapshotView;
 

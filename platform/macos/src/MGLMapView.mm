@@ -707,6 +707,11 @@ public:
     return !_isTargetingInterfaceBuilder;
 }
 
+- (CGLContextObj)context {
+    MGLOpenGLLayer *layer = _isTargetingInterfaceBuilder ? nil : (MGLOpenGLLayer *)self.layer;
+    return layer.openGLContext.CGLContextObj;
+}
+
 - (void)setFrame:(NSRect)frame {
     super.frame = frame;
     if (!_isTargetingInterfaceBuilder) {
