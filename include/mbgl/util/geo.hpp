@@ -127,15 +127,7 @@ public:
                       (sw.longitude() + ne.longitude()) / 2);
     }
 
-    LatLng constrain(const LatLng& p) const {
-        if (contains(p)) {
-            return p;
-        }
-        return LatLng {
-            util::clamp(p.latitude(), sw.latitude(), ne.latitude()),
-            util::clamp(p.longitude(), sw.longitude(), ne.longitude())
-        };
-    }
+    LatLng constrain(const LatLng& p) const;
 
     void extend(const LatLng& point) {
         sw = LatLng(std::min(point.latitude(), sw.latitude()),
@@ -170,6 +162,9 @@ private:
 
     LatLngBounds(LatLng sw_, LatLng ne_)
         : sw(std::move(sw_)), ne(std::move(ne_)) {}
+
+    bool containsLatitude(double latitude) const;
+    bool containsLongitude(double longitude, LatLng::WrapMode wrap) const;
 
     friend bool operator==(const LatLngBounds& a, const LatLngBounds& b) {
         return a.sw == b.sw && a.ne == b.ne;

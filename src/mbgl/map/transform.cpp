@@ -82,8 +82,10 @@ void Transform::jumpTo(const CameraOptions& camera) {
  * not included in `options`.
  */
 void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& animation) {
-    const LatLng unwrappedLatLng = camera.center.value_or(getLatLng());
-    const LatLng latLng = unwrappedLatLng.wrapped();
+    const EdgeInsets& padding = camera.padding;
+    LatLng startLatLng = getLatLng(padding, LatLng::Unwrapped);
+    const LatLng& unwrappedLatLng = camera.center.value_or(startLatLng);
+    const LatLng& latLng = state.bounds ? unwrappedLatLng : unwrappedLatLng.wrapped();
     double zoom = camera.zoom.value_or(getZoom());
     double angle = camera.angle ? -*camera.angle * util::DEG2RAD : getAngle();
     double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
@@ -92,17 +94,18 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         return;
     }
 
-    // Determine endpoints.
-    EdgeInsets padding = camera.padding;
-    LatLng startLatLng = getLatLng(padding);
-    // If gesture in progress, we transfer the world rounds from the end
-    // longitude into start, so we can guarantee the "scroll effect" of rounding
-    // the world while assuring the end longitude remains wrapped.
-    if (isGestureInProgress()) {
-        startLatLng = LatLng(startLatLng.latitude(), startLatLng.longitude() - (unwrappedLatLng.longitude() - latLng.longitude()));
+    if (!state.bounds) {
+        if (isGestureInProgress()) {
+            // If gesture in progress, we transfer the wrap rounds from the end longitude into
+            // start, so the "scroll effect" of rounding the world is the same while assuring the
+            // end longitude remains wrapped.
+            const double wrap = unwrappedLatLng.longitude() - latLng.longitude();
+            startLatLng = LatLng(startLatLng.latitude(), startLatLng.longitude() - wrap);
+        } else {
+            // Find the shortest path otherwise.
+            startLatLng.unwrapForShortestPath(latLng);
+        }
     }
-    // Find the shortest path otherwise.
-    else startLatLng.unwrapForShortestPath(latLng);
 
     const Point<double> startPoint = Projection::project(startLatLng, state.scale);
     const Point<double> endPoint = Projection::project(latLng, state.scale);
@@ -156,7 +159,8 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     Where applicable, local variable documentation begins with the associated
     variable or function in van Wijk (2003). */
 void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &animation) {
-    const LatLng latLng = camera.center.value_or(getLatLng()).wrapped();
+    const EdgeInsets& padding = camera.padding;
+    const LatLng& latLng = camera.center.value_or(getLatLng(padding, LatLng::Unwrapped)).wrapped();
     double zoom = camera.zoom.value_or(getZoom());
     double angle = camera.angle ? -*camera.angle * util::DEG2RAD : getAngle();
     double pitch = camera.pitch ? *camera.pitch * util::DEG2RAD : getPitch();
@@ -166,8 +170,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     }
 
     // Determine endpoints.
-    EdgeInsets padding = camera.padding;
-    LatLng startLatLng = getLatLng(padding).wrapped();
+    LatLng startLatLng = getLatLng(padding, LatLng::Unwrapped).wrapped();
     startLatLng.unwrapForShortestPath(latLng);
 
     const Point<double> startPoint = Projection::project(startLatLng, state.scale);
@@ -316,9 +319,9 @@ void Transform::moveBy(const ScreenCoordinate& offset, const AnimationOptions& a
     easeTo(CameraOptions().withCenter(state.screenCoordinateToLatLng(centerPoint)), animation);
 }
 
-LatLng Transform::getLatLng(const EdgeInsets& padding) const {
+LatLng Transform::getLatLng(const EdgeInsets& padding, LatLng::WrapMode wrap) const {
     if (padding.isFlush()) {
-        return state.getLatLng();
+        return state.getLatLng(wrap);
     } else {
         return screenCoordinateToLatLng(padding.getCenter(state.size.width, state.size.height));
     }

@@ -436,7 +436,7 @@ TEST(Transform, Camera) {
     flyOptions.transitionFrameFn = [&](double t) {
         ASSERT_TRUE(t >= 0 && t <= 1);
         ASSERT_LE(latLng2.latitude(), transform.getLatLng().latitude());
-        ASSERT_GE(latLng2.longitude(), transform.getLatLng().longitude());
+        ASSERT_GE(latLng2.longitude(), transform.getLatLng({}, LatLng::Unwrapped).longitude());
     };
     flyOptions.transitionFinishFn = [&]() {
         // XXX Fix precision loss in flyTo:
@@ -586,20 +586,165 @@ TEST(Transform, LatLngBounds) {
     transform.setLatLngBounds(LatLngBounds::singleton(sanFrancisco));
     ASSERT_EQ(transform.getLatLng(), sanFrancisco);
 
+    //    -1   |   0   |  +1
+    // ┌───┬───┰───┬───┰───┬───┐
+    // │   │   ┃•  │   ┃   │   │
+    // ├───┼───╂───┼───╂───┼───┤
+    // │   │   ┃▓▓▓│▓▓▓┃   │   │
+    // └───┴───┸───┴───┸───┴───┘
     transform.setLatLngBounds(LatLngBounds::hull({ -90.0, -180.0 }, { 0.0, 180.0 }));
     transform.jumpTo(CameraOptions().withCenter(sanFrancisco));
     ASSERT_EQ(transform.getLatLng().latitude(), 0.0);
     ASSERT_EQ(transform.getLatLng().longitude(), sanFrancisco.longitude());
 
+    // Try crossing the antimeridian from the left.
+    transform.jumpTo(CameraOptions().withCenter(LatLng { 0.0, -200.0 }));
+    ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), -180.0);
+
+    // Try crossing the antimeridian from the right.
+    transform.jumpTo(CameraOptions().withCenter(LatLng { 0.0, 200.0 }));
+    ASSERT_DOUBLE_EQ(transform.getLatLng({}, LatLng::Unwrapped).longitude(), 180.0);
+    ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), -180.0);
+
+    //    -1   |   0   |  +1
+    // ┌───┬───┰───┬───┰───┬───┐
+    // │   │   ┃•  │▓▓▓┃   │   │
+    // ├───┼───╂───┼───╂───┼───┤
+    // │   │   ┃   │▓▓▓┃   │   │
+    // └───┴───┸───┴───┸───┴───┘
     transform.setLatLngBounds(LatLngBounds::hull({ -90.0, 0.0 }, { 90.0, 180.0 }));
     transform.jumpTo(CameraOptions().withCenter(sanFrancisco));
     ASSERT_EQ(transform.getLatLng().latitude(), sanFrancisco.latitude());
     ASSERT_EQ(transform.getLatLng().longitude(), 0.0);
 
+    //    -1   |   0   |  +1
+    // ┌───┬───┰───┬───┰───┬───┐
+    // │   │   ┃•  │   ┃   │   │
+    // ├───┼───╂───┼───╂───┼───┤
+    // │   │   ┃   │▓▓▓┃   │   │
+    // └───┴───┸───┴───┸───┴───┘
     transform.setLatLngBounds(LatLngBounds::hull({ -90.0, 0.0 }, { 0.0, 180.0 }));
     transform.jumpTo(CameraOptions().withCenter(sanFrancisco));
     ASSERT_EQ(transform.getLatLng().latitude(), 0.0);
     ASSERT_EQ(transform.getLatLng().longitude(), 0.0);
+
+    //    -1   |   0   |  +1
+    // ┌───┬───┰───┬───┰───┬───┐
+    // │   │   ┃   │  ▓┃▓  │   │
+    // ├───┼───╂───┼───╂───┼───┤
+    // │   │   ┃   │   ┃   │   │
+    // └───┴───┸───┴───┸───┴───┘
+    LatLng inside { 45.0, 150.0 };
+    transform.setLatLngBounds(LatLngBounds::hull({ 0.0, 120.0 }, { 90.0, 240.0 }));
+    transform.jumpTo(CameraOptions().withCenter(inside));
+    ASSERT_EQ(transform.getLatLng().latitude(), inside.latitude());
+    ASSERT_EQ(transform.getLatLng().longitude(), inside.longitude());
+
+    transform.jumpTo(CameraOptions().withCenter(LatLng { 0.0, 140.0 }));
+    ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), 140.0);
+
+    transform.jumpTo(CameraOptions().withCenter(LatLng { 0.0, 160.0 }));
+    ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), 160.0);
+
+    // Constrain latitude only.
+    transform.jumpTo(CameraOptions().withCenter(LatLng { -45.0, inside.longitude() }));
+    ASSERT_EQ(transform.getLatLng().latitude(), 0.0);
+    ASSERT_EQ(transform.getLatLng().longitude(), inside.longitude());
+
+    // Crossing the antimeridian, within bounds.
+    transform.jumpTo(CameraOptions().withCenter(LatLng { inside.latitude(), 181.0 }));
+    ASSERT_EQ(transform.getLatLng().longitude(), -179.0);
+
+    // Crossing the antimeridian, outside bounds.
+    transform.jumpTo(CameraOptions().withCenter(inside));
+    transform.jumpTo(CameraOptions().withCenter(LatLng { inside.latitude(), 250.0 }));
+    ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), -120.0);
+
+    // Constrain to the left edge.
+    transform.jumpTo(CameraOptions().withCenter(LatLng { inside.latitude(), 119.0 }));
+    ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), 120.0);
+
+    // Simulate swipe to the left.
+    mbgl::AnimationOptions easeOptions(mbgl::Seconds(1));
+    easeOptions.transitionFrameFn = [&](double /* t */) {
+        ASSERT_NEAR(transform.getLatLng().longitude(), 120.0, 1e-4);
+    };
+    easeOptions.transitionFinishFn = [&]() {
+        ASSERT_NEAR(transform.getLatLng().longitude(), 120.0, 1e-4);
+    };
+    transform.moveBy(ScreenCoordinate { -500, -500 }, easeOptions);
+
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(0));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(250));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(500));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(750));
+    transform.updateTransitions(transform.getTransitionStart() + transform.getTransitionDuration());
+
+    // Constrain to the right edge.
+    transform.jumpTo(CameraOptions().withCenter(LatLng { inside.latitude(), 241.0 }));
+    ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), -120.0);
+
+    // Simulate swipe to the right.
+    easeOptions.transitionFrameFn = [&](double /* t */) {
+        ASSERT_NEAR(transform.getLatLng().longitude(), -120.0, 1e-4);
+    };
+    easeOptions.transitionFinishFn = [&]() {
+        ASSERT_NEAR(transform.getLatLng().longitude(), -120.0, 1e-4);
+    };
+    transform.moveBy(ScreenCoordinate { 500, 500 }, easeOptions);
+
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(0));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(250));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(500));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(750));
+    transform.updateTransitions(transform.getTransitionStart() + transform.getTransitionDuration());
+
+    //    -1   |   0   |  +1
+    // ┌───┬───┰───┬───┰───┬───┐
+    // │   │   ┃   │   ┃   │   │
+    // ├───┼───╂───┼───╂───┼───┤
+    // │   │  ▓┃▓  │   ┃   │   │
+    // └───┴───┸───┴───┸───┴───┘
+    inside = LatLng{ -45.0, -150.0 };
+    transform.setLatLngBounds(LatLngBounds::hull({ -90.0, -240.0 }, { 0.0, -120.0 }));
+    transform.jumpTo(CameraOptions().withCenter(inside));
+    ASSERT_DOUBLE_EQ(transform.getLatLng().latitude(), inside.latitude());
+    ASSERT_EQ(transform.getLatLng().longitude(), inside.longitude());
+
+    transform.jumpTo(CameraOptions().withCenter(LatLng { 0.0, -140.0 }));
+    ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), -140.0);
+
+    transform.jumpTo(CameraOptions().withCenter(LatLng { 0.0, -160.0 }));
+    ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), -160.0);
+
+    // Constrain latitude only.
+    transform.jumpTo(CameraOptions().withCenter(LatLng { 45.0, inside.longitude() }));
+    ASSERT_EQ(transform.getLatLng().latitude(), 0.0);
+    ASSERT_EQ(transform.getLatLng().longitude(), inside.longitude());
+
+    // Crossing the antimeridian, within bounds.
+    transform.jumpTo(CameraOptions().withCenter(LatLng { inside.latitude(), -181.0 }));
+    ASSERT_DOUBLE_EQ(transform.getLatLng().latitude(), inside.latitude());
+    ASSERT_EQ(transform.getLatLng().longitude(), 179.0);
+
+    // Crossing the antimeridian, outside bounds.
+    transform.jumpTo(CameraOptions().withCenter(inside));
+    transform.jumpTo(CameraOptions().withCenter(LatLng { inside.latitude(), -250.0 }));
+    ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), 120.0);
+
+    // Constrain to the left edge.
+    transform.jumpTo(CameraOptions().withCenter(LatLng { inside.latitude(), -119.0 }));
+    ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), -120.0);
+
+    transform.moveBy(ScreenCoordinate { -500, 0 });
+    ASSERT_NEAR(transform.getLatLng().longitude(), -120.0, 1e-4);
+
+    // Constrain to the right edge.
+    transform.jumpTo(CameraOptions().withCenter(LatLng { inside.latitude(), -241.0 }));
+    ASSERT_DOUBLE_EQ(transform.getLatLng().longitude(), 120.0);
+
+    transform.moveBy(ScreenCoordinate { 500, 0 });
+    ASSERT_NEAR(transform.getLatLng().longitude(), 120.0, 1e-4);
 }
 
 TEST(Transform, PitchBounds) {
