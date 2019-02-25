@@ -5,10 +5,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.spyk
-import io.mockk.verify
+import io.mockk.*
 import junit.framework.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -27,19 +24,11 @@ class MapboxMapTest {
     @Before
     fun setup() {
         val cameraChangeDispatcher = spyk<CameraChangeDispatcher>()
-        nativeMapView = mockk()
-        transform = mockk()
-        mapboxMap = MapboxMap(nativeMapView, transform, null, null, null, cameraChangeDispatcher)
-        every { nativeMapView.styleUrl = any() } answers {}
-        every { nativeMapView.transitionOptions = any() } answers {}
+        nativeMapView = mockk(relaxed = true)
+        transform = mockk(relaxed = true)
+        mapboxMap = MapboxMap(nativeMapView, transform, mockk(relaxed = true), null, null, cameraChangeDispatcher)
         every { nativeMapView.isDestroyed } returns false
-        every { nativeMapView.setOnFpsChangedListener(any()) } answers {}
-        every { nativeMapView.prefetchTiles = any() } answers {}
         every { nativeMapView.nativePtr } returns 5
-        every { nativeMapView.setLatLngBounds(any()) } answers {}
-        every { transform.minZoom = any() } answers {}
-        every { transform.maxZoom = any() } answers {}
-        every { transform.moveCamera(any(), any(), any()) } answers {}
         mapboxMap.injectLocationComponent(spyk())
         mapboxMap.setStyle(Style.MAPBOX_STREETS)
         mapboxMap.onFinishLoadingStyle()
@@ -108,4 +97,11 @@ class MapboxMapTest {
     fun testGetNativeMapPtr() {
         assertEquals(5, mapboxMap.nativeMapPtr)
     }
+
+  @Test
+  fun testNativeMapIsNotCalledOnStateSave() {
+    clearMocks(nativeMapView)
+    mapboxMap.onSaveInstanceState(mockk(relaxed = true))
+    verify { nativeMapView wasNot Called }
+  }
 }
