@@ -62,8 +62,8 @@ public:
         override the number of components available in the buffer for each vertex.  Thus,
         a buffer with only one float for each vertex can be bound to a `vec2` attribute
     */
-    template <class Vertex, class DrawMode>
-    static AttributeBinding binding(const VertexBuffer<Vertex, DrawMode>& buffer,
+    template <class Vertex>
+    static AttributeBinding binding(const VertexBuffer<Vertex>& buffer,
                                     std::size_t attributeIndex,
                                     std::size_t attributeSize = N) {
         static_assert(std::is_standard_layout<Vertex>::value, "vertex type must use standard layout");
@@ -262,8 +262,7 @@ public:
         return result;
     }
 
-    template <class DrawMode>
-    static Bindings bindings(const VertexBuffer<Vertex, DrawMode>& buffer) {
+    static Bindings bindings(const VertexBuffer<Vertex>& buffer) {
         return Bindings { As::Type::binding(buffer, TypeIndex<As, As...>::value)... };
     }
 

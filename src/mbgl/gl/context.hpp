@@ -63,16 +63,16 @@ public:
 #endif
     optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
-    template <class Vertex, class DrawMode>
-    VertexBuffer<Vertex, DrawMode> createVertexBuffer(VertexVector<Vertex, DrawMode>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
-        return VertexBuffer<Vertex, DrawMode> {
+    template <class Vertex>
+    VertexBuffer<Vertex> createVertexBuffer(VertexVector<Vertex>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
+        return VertexBuffer<Vertex> {
             v.vertexSize(),
             createVertexBuffer(v.data(), v.byteSize(), usage)
         };
     }
 
-    template <class Vertex, class DrawMode>
-    void updateVertexBuffer(VertexBuffer<Vertex, DrawMode>& buffer, VertexVector<Vertex, DrawMode>&& v) {
+    template <class Vertex>
+    void updateVertexBuffer(VertexBuffer<Vertex>& buffer, VertexVector<Vertex>&& v) {
         assert(v.vertexSize() == buffer.vertexCount);
         updateVertexBuffer(buffer.buffer, v.data(), v.byteSize());
     }
