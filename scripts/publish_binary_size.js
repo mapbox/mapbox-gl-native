@@ -42,8 +42,7 @@ const platforms = [
 
 const sizeCheckInfo = [];
 const rows = [];
-const date = new Date();
-const formattedCurrentDate = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}`
+const date = new Date().toISOString().substring(0, 19);
 
 function query(after) {
     return github.request({
@@ -128,7 +127,7 @@ function query(after) {
                   'platform' : platform,
                   'arch': arch,
                   'size' : runSizeMeasurements[i],
-                  'created_at': formattedCurrentDate
+                  'created_at': date
               }));
           }
         }
@@ -155,7 +154,7 @@ github.apps.createInstallationToken({installation_id: SIZE_CHECK_APP_INSTALLATIO
         var secondPromise = new AWS.S3({region: 'us-east-1'}).putObject({
             Body: zlib.gzipSync(sizeCheckInfo.join('\n')),
             Bucket: 'mapbox-loading-dock',
-            Key: `raw/mobile.binarysize/${formattedCurrentDate}/mapbox-maps-ios-android-${process.env['CIRCLE_SHA1']}.json.gz`,
+            Key: `raw/mobile.binarysize/${date.substring(0,10)}/mapbox-maps-ios-android-${process.env['CIRCLE_SHA1']}.json.gz`,
             CacheControl: 'max-age=300',
             ContentEncoding: 'gzip',
             ContentType: 'application/json'
