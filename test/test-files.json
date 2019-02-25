@@ -30,6 +30,7 @@
         "test/renderer/backend_scope.test.cpp",
         "test/renderer/group_by_layout.test.cpp",
         "test/renderer/image_manager.test.cpp",
+        "test/renderer/layers/render_circle_layer.test.cpp",
         "test/sprite/sprite_loader.test.cpp",
         "test/sprite/sprite_parser.test.cpp",
         "test/src/mbgl/test/fixture_log_observer.cpp",
