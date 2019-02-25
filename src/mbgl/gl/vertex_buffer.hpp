@@ -10,15 +10,14 @@
 namespace mbgl {
 namespace gl {
 
-template <class V, class DrawMode = Indexed>
+template <class V>
 class VertexVector {
 public:
     using Vertex = V;
-    static constexpr std::size_t groupSize = DrawMode::bufferGroupSize;
 
     template <class... Args>
     void emplace_back(Args&&... args) {
-        static_assert(sizeof...(args) == groupSize, "wrong buffer element count");
+        static_assert(sizeof...(args) == 1, "wrong buffer element count");
         util::ignore({(v.emplace_back(std::forward<Args>(args)), 0)...});
     }
 
@@ -34,7 +33,7 @@ private:
     std::vector<Vertex> v;
 };
 
-template <class V, class DrawMode = Indexed>
+template <class V>
 class VertexBuffer {
 public:
     using Vertex = V;
