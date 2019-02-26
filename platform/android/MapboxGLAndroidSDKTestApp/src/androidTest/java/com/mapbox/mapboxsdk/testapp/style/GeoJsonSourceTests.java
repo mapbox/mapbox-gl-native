@@ -16,6 +16,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
 import com.mapbox.mapboxsdk.testapp.activity.EspressoTest;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
+import com.mapbox.mapboxsdk.testapp.utils.TestingAsyncUtils;
 
 import org.hamcrest.Matcher;
 import org.junit.Test;
@@ -26,7 +27,7 @@ import java.io.IOException;
 import timber.log.Timber;
 
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for {@link GeoJsonSource}
@@ -93,11 +94,10 @@ public class GeoJsonSourceTests extends EspressoTest {
       }
 
       source.setGeoJson(Point.fromLngLat(20, 55));
-      uiController.loopMainThreadForAtLeast(1000);
-      assertTrue(
-        mapboxMap.queryRenderedFeatures(
-          mapboxMap.getProjection().toScreenLocation(
-            new LatLng(55, 20)), "layer").size() == 1);
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
+      assertEquals(1, mapboxMap.queryRenderedFeatures(
+        mapboxMap.getProjection().toScreenLocation(
+          new LatLng(55, 20)), "layer").size());
     });
   }
 

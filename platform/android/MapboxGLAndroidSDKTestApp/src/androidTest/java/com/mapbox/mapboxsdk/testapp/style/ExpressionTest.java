@@ -250,7 +250,7 @@ public class ExpressionTest extends EspressoTest {
           )
         ));
       mapboxMap.getStyle().addLayer(layer);
-      uiController.loopMainThreadForAtLeast(1000);
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
       assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
         .isEmpty());
 
@@ -260,7 +260,7 @@ public class ExpressionTest extends EspressoTest {
           literal(ColorUtils.colorToRgbaString(Color.RED))
         )
       ));
-      uiController.loopMainThreadForAtLeast(1000);
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
       assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
         .isEmpty());
 
@@ -270,7 +270,7 @@ public class ExpressionTest extends EspressoTest {
           literal(ColorUtils.colorToRgbaString(Color.RED))
         )
       ));
-      uiController.loopMainThreadForAtLeast(1000);
+      TestingAsyncUtils.INSTANCE.waitForLayer(uiController, idlingResource.getMapView());
       assertFalse(mapboxMap.queryRenderedFeatures(mapboxMap.getProjection().toScreenLocation(latLng), "layer")
         .isEmpty());
     });
