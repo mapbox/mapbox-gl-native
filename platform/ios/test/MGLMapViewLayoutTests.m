@@ -14,7 +14,7 @@
 
 @implementation MGLOrnamentTestData
 
-+ (instancetype)createWithPostion:(MGLOrnamentPosition)position offset:(CGPoint)offset expectedOrigin:(CGPoint)expectedOrigin {
++ (instancetype)createWithPosition:(MGLOrnamentPosition)position offset:(CGPoint)offset expectedOrigin:(CGPoint)expectedOrigin {
     MGLOrnamentTestData *data = [[MGLOrnamentTestData alloc] init];
     data.position = position;
     data.offset = offset;
@@ -153,16 +153,16 @@
     }
 
     return @[
-             [MGLOrnamentTestData createWithPostion:MGLOrnamentPositionTopLeft
+             [MGLOrnamentTestData createWithPosition:MGLOrnamentPositionTopLeft
                                              offset:CGPointMake(margin, margin)
                                      expectedOrigin:CGPointMake(margin, margin)],
-             [MGLOrnamentTestData createWithPostion:MGLOrnamentPositionTopRight
+             [MGLOrnamentTestData createWithPosition:MGLOrnamentPositionTopRight
                                              offset:CGPointMake(margin, margin)
                                      expectedOrigin:CGPointMake(CGRectGetMaxX(self.mapView.bounds) - margin - CGRectGetWidth(view.frame), 4)],
-             [MGLOrnamentTestData createWithPostion:MGLOrnamentPositionBottomLeft
+             [MGLOrnamentTestData createWithPosition:MGLOrnamentPositionBottomLeft
                                              offset:CGPointMake(margin, margin)
                                      expectedOrigin:CGPointMake(margin,  CGRectGetMaxY(self.mapView.bounds) - margin - bottomSafeAreaInset - CGRectGetHeight(view.frame))],
-             [MGLOrnamentTestData createWithPostion:MGLOrnamentPositionBottomRight
+             [MGLOrnamentTestData createWithPosition:MGLOrnamentPositionBottomRight
                                              offset:CGPointMake(margin, margin)
                                      expectedOrigin:CGPointMake(CGRectGetMaxX(self.mapView.bounds) - margin - CGRectGetWidth(view.frame),
                                                                 CGRectGetMaxY(self.mapView.bounds) - margin - bottomSafeAreaInset - CGRectGetHeight(view.frame))]
@@ -190,13 +190,8 @@
 }
 
 - (void)testScalebarPlacement {
-    CGFloat bottomSafeAreaInset = 0.0;
     double accuracy = 0.01;
     CGFloat margin = 4.0;
-
-    if (@available(iOS 11.0, *)) {
-        bottomSafeAreaInset = self.mapView.safeAreaInsets.bottom;
-    }
 
     UIView *scaleBar = self.mapView.scaleBar;
     NSArray *testDataList = [self makeTestDataListWithView:scaleBar margin:margin];
@@ -215,13 +210,8 @@
 }
 
 - (void)testAttributionButtonPlacement {
-    CGFloat bottomSafeAreaInset = 0.0;
     double accuracy = 0.01;
     CGFloat margin = 4.0;
-
-    if (@available(iOS 11.0, *)) {
-        bottomSafeAreaInset = self.mapView.safeAreaInsets.bottom;
-    }
 
     UIView *attributionButton = self.mapView.attributionButton;
     NSArray *testDataList = [self makeTestDataListWithView:attributionButton margin:margin];
@@ -240,13 +230,8 @@
 }
 
 - (void)testLogoPlacement {
-    CGFloat bottomSafeAreaInset = 0.0;
     double accuracy = 0.01;
     CGFloat margin = 4.0;
-
-    if (@available(iOS 11.0, *)) {
-        bottomSafeAreaInset = self.mapView.safeAreaInsets.bottom;
-    }
 
     UIView *logoView = self.mapView.logoView;
     NSArray *testDataList = [self makeTestDataListWithView:logoView margin:margin];

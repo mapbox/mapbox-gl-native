@@ -185,7 +185,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 #pragma mark - Dimensions
 
 - (CGSize)intrinsicContentSize {
-    return CGSizeMake(self.actualWidth + self.lastLabelWidth/2, 16);
+    return CGSizeMake(ceil(self.actualWidth + self.lastLabelWidth/2), 16);
 }
 
 - (CGFloat)actualWidth {

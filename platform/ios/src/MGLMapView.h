@@ -305,7 +305,7 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIView *scaleBar;
 
 /**
- The postion of the scale bar. The default value is `MGLOrnamentPositionTopLeft`.
+ The position of the scale bar. The default value is `MGLOrnamentPositionTopLeft`.
  */
 @property (nonatomic, assign) MGLOrnamentPosition scaleBarPosition;
 
@@ -321,7 +321,7 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIImageView *compassView;
 
 /**
- The postion of the compass view. The default value is `MGLOrnamentPositionTopRight`.
+ The position of the compass view. The default value is `MGLOrnamentPositionTopRight`.
  */
 @property (nonatomic, assign) MGLOrnamentPosition compassViewPosition;
 
@@ -342,7 +342,7 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIImageView *logoView;
 
 /**
- The postion of the logo view. The default value is `MGLOrnamentPositionBottomLeft`.
+ The position of the logo view. The default value is `MGLOrnamentPositionBottomLeft`.
  */
 @property (nonatomic, assign) MGLOrnamentPosition logoViewPosition;
 
@@ -378,7 +378,7 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIButton *attributionButton;
 
 /**
- The postion of the attribution button. The default value is `MGLOrnamentPositionBottomRight`.
+ The position of the attribution button. The default value is `MGLOrnamentPositionBottomRight`.
  */
 @property (nonatomic, assign) MGLOrnamentPosition attributionButtonPosition;
 

@@ -13,42 +13,43 @@
 @implementation MBXOrnamentsViewController
 
 - (void)setCurrentPositionIndex:(NSInteger)currentPositionIndex {
-    NSArray *ornamentPositions = @[@[
-                                       @(MGLOrnamentPositionTopLeft),
-                                       @(MGLOrnamentPositionTopRight),
-                                       @(MGLOrnamentPositionBottomRight),
-                                       @(MGLOrnamentPositionBottomLeft)
-                                       ],
-                                   @[
-                                       @(MGLOrnamentPositionTopRight),
-                                       @(MGLOrnamentPositionBottomRight),
-                                       @(MGLOrnamentPositionBottomLeft),
-                                       @(MGLOrnamentPositionTopLeft)
-                                       ],
-                                   @[
-                                       @(MGLOrnamentPositionBottomRight),
-                                       @(MGLOrnamentPositionBottomLeft),
-                                       @(MGLOrnamentPositionTopLeft),
-                                       @(MGLOrnamentPositionTopRight)
-                                       ],
-                                   @[
-                                       @(MGLOrnamentPositionBottomLeft),
-                                       @(MGLOrnamentPositionTopLeft),
-                                       @(MGLOrnamentPositionTopRight),
-                                       @(MGLOrnamentPositionBottomRight)
-                                       ],
-                                   @[
-                                       @(MGLOrnamentPositionTopLeft),
-                                       @(MGLOrnamentPositionTopRight),
-                                       @(MGLOrnamentPositionBottomRight),
-                                       @(MGLOrnamentPositionBottomLeft)
-                                       ],
-                                   ];
-    NSArray *currentPosition = ornamentPositions[currentPositionIndex];
-    self.mapView.scaleBarPosition = [currentPosition[0] integerValue];
-    self.mapView.compassViewPosition = [currentPosition[1] integerValue];
-    self.mapView.logoViewPosition = [currentPosition[2] integerValue];
-    self.mapView.attributionButtonPosition = [currentPosition[3] integerValue];
+    MGLOrnamentPosition ornamentPositions[5][4] = {
+        {
+            MGLOrnamentPositionTopLeft,
+            MGLOrnamentPositionTopRight,
+            MGLOrnamentPositionBottomRight,
+            MGLOrnamentPositionBottomLeft
+        },
+        {
+            MGLOrnamentPositionTopRight,
+            MGLOrnamentPositionBottomRight,
+            MGLOrnamentPositionBottomLeft,
+            MGLOrnamentPositionTopLeft
+        },
+        {
+            MGLOrnamentPositionBottomRight,
+            MGLOrnamentPositionBottomLeft,
+            MGLOrnamentPositionTopLeft,
+            MGLOrnamentPositionTopRight
+        },
+        {
+            MGLOrnamentPositionBottomLeft,
+            MGLOrnamentPositionTopLeft,
+            MGLOrnamentPositionTopRight,
+            MGLOrnamentPositionBottomRight
+        },
+        {
+            MGLOrnamentPositionTopLeft,
+            MGLOrnamentPositionTopRight,
+            MGLOrnamentPositionBottomRight,
+            MGLOrnamentPositionBottomLeft
+        }
+    };
+    MGLOrnamentPosition *currentPosition = ornamentPositions[currentPositionIndex];
+    self.mapView.scaleBarPosition = currentPosition[0];
+    self.mapView.compassViewPosition = currentPosition[1];
+    self.mapView.logoViewPosition = currentPosition[2];
+    self.mapView.attributionButtonPosition = currentPosition[3];
     
     _currentPositionIndex = currentPositionIndex;
 }
@@ -57,7 +58,7 @@
     [super viewDidLoad];
     self.title = @"Ornaments";
 
-    MGLMapView *mapView = [[MGLMapView alloc] initWithFrame:self.view.frame];
+    MGLMapView *mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds];
     mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [mapView setCenterCoordinate:CLLocationCoordinate2DMake(39.915143, 116.404053)
                        zoomLevel:16

@@ -70,7 +70,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### User interaction
 
-* Added options to customize position of scale bar, compass, logo and attribution. ([#13556](https://github.com/mapbox/mapbox-gl-native/pull/13556))
+* Added options to customize position of scale bar, compass, logo and attribution. ([#13911](https://github.com/mapbox/mapbox-gl-native/pull/13911))
 
 ### Other changes
 
