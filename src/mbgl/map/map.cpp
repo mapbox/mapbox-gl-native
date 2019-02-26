@@ -1,7 +1,7 @@
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/map_impl.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/map/transform_state.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/layermanager/layer_manager.hpp>
 #include <mbgl/style/style_impl.hpp>
@@ -20,76 +20,12 @@
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/math/log2.hpp>
+
 #include <utility>
 
 namespace mbgl {
 
 using namespace style;
-
-struct StillImageRequest {
-    StillImageRequest(Map::StillImageCallback&& callback_)
-        : callback(std::move(callback_)) {
-    }
-
-    Map::StillImageCallback callback;
-};
-
-class Map::Impl : public style::Observer,
-                  public RendererObserver {
-public:
-    Impl(Map&,
-         RendererFrontend&,
-         MapObserver&,
-         float pixelRatio,
-         FileSource&,
-         Scheduler&,
-         MapMode,
-         ConstrainMode,
-         ViewportMode,
-         bool);
-
-    ~Impl();
-
-    // StyleObserver
-    void onSourceChanged(style::Source&) override;
-    void onUpdate() override;
-    void onStyleLoading() override;
-    void onStyleLoaded() override;
-    void onStyleError(std::exception_ptr) override;
-
-    // RendererObserver
-    void onInvalidate() override;
-    void onResourceError(std::exception_ptr) override;
-    void onWillStartRenderingFrame() override;
-    void onDidFinishRenderingFrame(RenderMode, bool) override;
-    void onWillStartRenderingMap() override;
-    void onDidFinishRenderingMap() override;
-
-    Map& map;
-    MapObserver& observer;
-    RendererFrontend& rendererFrontend;
-    FileSource& fileSource;
-    Scheduler& scheduler;
-
-    Transform transform;
-
-    const MapMode mode;
-    const float pixelRatio;
-    const bool crossSourceCollisions;
-
-    MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
-
-    std::unique_ptr<Style> style;
-    AnnotationManager annotationManager;
-
-    bool cameraMutated = false;
-
-    uint8_t prefetchZoomDelta = util::DEFAULT_PREFETCH_ZOOM_DELTA;
-
-    bool loading = false;
-    bool rendererFullyLoaded;
-    std::unique_ptr<StillImageRequest> stillImageRequest;
-};
 
 Map::Map(RendererFrontend& rendererFrontend,
          MapObserver& mapObserver,
@@ -104,49 +40,14 @@ Map::Map(RendererFrontend& rendererFrontend,
     : impl(std::make_unique<Impl>(*this,
                                   rendererFrontend,
                                   mapObserver,
-                                  pixelRatio,
                                   fileSource,
                                   scheduler,
+                                  size,
+                                  pixelRatio,
                                   mapMode,
                                   constrainMode,
                                   viewportMode,
-                                  crossSourceCollisions)) {
-    impl->transform.resize(size);
-}
-
-Map::Impl::Impl(Map& map_,
-                RendererFrontend& frontend,
-                MapObserver& mapObserver,
-                float pixelRatio_,
-                FileSource& fileSource_,
-                Scheduler& scheduler_,
-                MapMode mode_,
-                ConstrainMode constrainMode_,
-                ViewportMode viewportMode_,
-                bool crossSourceCollisions_)
-    : map(map_),
-      observer(mapObserver),
-      rendererFrontend(frontend),
-      fileSource(fileSource_),
-      scheduler(scheduler_),
-      transform(observer,
-                constrainMode_,
-                viewportMode_),
-      mode(mode_),
-      pixelRatio(pixelRatio_),
-      crossSourceCollisions(crossSourceCollisions_),
-      style(std::make_unique<Style>(scheduler, fileSource, pixelRatio)),
-      annotationManager(*style) {
-
-    style->impl->setObserver(this);
-    rendererFrontend.setObserver(*this);
-}
-
-Map::Impl::~Impl() {
-    // Explicitly reset the RendererFrontend first to ensure it releases
-    // All shared resources (AnnotationManager)
-    rendererFrontend.reset();
-};
+                                  crossSourceCollisions)) {}
 
 Map::~Map() = default;
 
@@ -186,47 +87,6 @@ void Map::renderStill(const CameraOptions& camera, MapDebugOptions debugOptions,
 void Map::triggerRepaint() {
     impl->onUpdate();
 }
-
-#pragma mark - Map::Impl RendererObserver
-
-void Map::Impl::onWillStartRenderingMap() {
-    if (mode == MapMode::Continuous) {
-        observer.onWillStartRenderingMap();
-    }
-}
-
-void Map::Impl::onWillStartRenderingFrame() {
-    if (mode == MapMode::Continuous) {
-        observer.onWillStartRenderingFrame();
-    }
-}
-
-void Map::Impl::onDidFinishRenderingFrame(RenderMode renderMode, bool needsRepaint) {
-    rendererFullyLoaded = renderMode == RenderMode::Full;
-
-    if (mode == MapMode::Continuous) {
-        observer.onDidFinishRenderingFrame(MapObserver::RenderMode(renderMode));
-
-        if (needsRepaint || transform.inTransition()) {
-            onUpdate();
-        } else if (rendererFullyLoaded) {
-            observer.onDidBecomeIdle();
-        }
-    } else if (stillImageRequest && rendererFullyLoaded) {
-        auto request = std::move(stillImageRequest);
-        request->callback(nullptr);
-    }
-}
-
-void Map::Impl::onDidFinishRenderingMap() {
-    if (mode == MapMode::Continuous && loading) {
-        observer.onDidFinishRenderingMap(MapObserver::RenderMode::Full);
-        if (loading) {
-            loading = false;
-            observer.onDidFinishLoadingMap();
-        }
-    }
-};
 
 #pragma mark - Style
 
@@ -728,74 +588,6 @@ uint8_t Map::getPrefetchZoomDelta() const {
 
 bool Map::isFullyLoaded() const {
     return impl->style->impl->isLoaded() && impl->rendererFullyLoaded;
-}
-
-void Map::Impl::onSourceChanged(style::Source& source) {
-    observer.onSourceChanged(source);
-}
-
-void Map::Impl::onInvalidate() {
-    onUpdate();
-}
-
-void Map::Impl::onUpdate() {
-    // Don't load/render anything in still mode until explicitly requested.
-    if (mode != MapMode::Continuous && !stillImageRequest) {
-        return;
-    }
-
-    TimePoint timePoint = mode == MapMode::Continuous ? Clock::now() : Clock::time_point::max();
-
-    transform.updateTransitions(timePoint);
-
-    UpdateParameters params = {
-        style->impl->isLoaded(),
-        mode,
-        pixelRatio,
-        debugOptions,
-        timePoint,
-        transform.getState(),
-        style->impl->getGlyphURL(),
-        style->impl->spriteLoaded,
-        style->impl->getTransitionOptions(),
-        style->impl->getLight()->impl,
-        style->impl->getImageImpls(),
-        style->impl->getSourceImpls(),
-        style->impl->getLayerImpls(),
-        annotationManager,
-        prefetchZoomDelta,
-        bool(stillImageRequest),
-        crossSourceCollisions
-    };
-
-    rendererFrontend.update(std::make_shared<UpdateParameters>(std::move(params)));
-}
-
-void Map::Impl::onStyleLoading() {
-    loading = true;
-    rendererFullyLoaded = false;
-    observer.onWillStartLoadingMap();
-}
-
-void Map::Impl::onStyleLoaded() {
-    if (!cameraMutated) {
-        map.jumpTo(style->getDefaultCamera());
-    }
-    if (LayerManager::annotationsEnabled) {
-        annotationManager.onStyleLoaded();
-    }
-    observer.onDidFinishLoadingStyle();
-}
-
-void Map::Impl::onStyleError(std::exception_ptr error) {
-    observer.onDidFailLoadingMap(error);
-}
-
-void Map::Impl::onResourceError(std::exception_ptr error) {
-    if (mode != MapMode::Continuous && stillImageRequest) {
-        auto request = std::move(stillImageRequest);
-        request->callback(error);
-    }
 }
 
 void Map::dumpDebugLogs() const {
