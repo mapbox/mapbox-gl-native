@@ -32,7 +32,7 @@ ActiveUniforms activeUniforms(ProgramID);
 
 #endif
 
-template <class Tag, class T>
+template <class T>
 class Uniform {
 public:
     using Value = T;
@@ -53,23 +53,23 @@ public:
     };
 };
 
-template <class Tag, class T>
-using UniformScalar = Uniform<Tag, T>;
+template <class T>
+using UniformScalar = Uniform<T>;
 
-template <class Tag, class T, size_t N>
-using UniformVector = Uniform<Tag, std::array<T, N>>;
+template <class T, size_t N>
+using UniformVector = Uniform<std::array<T, N>>;
 
-template <class Tag, class T, size_t N>
-using UniformMatrix = Uniform<Tag, std::array<T, N*N>>;
+template <class T, size_t N>
+using UniformMatrix = Uniform<std::array<T, N*N>>;
 
 #define MBGL_DEFINE_UNIFORM_SCALAR(type_, name_) \
-    struct name_ : ::mbgl::gl::UniformScalar<name_, type_> { static auto name() { return #name_; } }
+    struct name_ : ::mbgl::gl::UniformScalar<type_> { static auto name() { return #name_; } }
 
 #define MBGL_DEFINE_UNIFORM_VECTOR(type_, n_, name_) \
-    struct name_ : ::mbgl::gl::UniformVector<name_, type_, n_> { static auto name() { return #name_; } }
+    struct name_ : ::mbgl::gl::UniformVector<type_, n_> { static auto name() { return #name_; } }
 
 #define MBGL_DEFINE_UNIFORM_MATRIX(type_, n_, name_) \
-    struct name_ : ::mbgl::gl::UniformMatrix<name_, type_, n_> { static auto name() { return #name_; } }
+    struct name_ : ::mbgl::gl::UniformMatrix<type_, n_> { static auto name() { return #name_; } }
 
 UniformLocation uniformLocation(ProgramID, const char * name);
 
