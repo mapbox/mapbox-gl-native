@@ -12,6 +12,7 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/geo.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/map/camera.hpp>
@@ -122,6 +123,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- Prezz `X` to cycle through the viewport modes\n");
     printf("- Press `A` to cycle through Mapbox offices in the world + dateline monument\n");
     printf("- Press `B` to cycle through the color, stencil, and depth buffer\n");
+    printf("- Press `D` to cycle through camera bounds: inside, crossing IDL at left, crossing IDL at right, and disabled\n");
     printf("\n");
     printf("- Press `1` through `6` to add increasing numbers of point annotations for testing\n");
     printf("- Press `7` through `0` to add increasing numbers of shape annotations for testing\n");
@@ -279,6 +281,44 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
         case GLFW_KEY_E:
             view->toggle3DExtrusions(!view->show3DExtrusions);
             break;
+        case GLFW_KEY_D: {
+            static const std::vector<mbgl::LatLngBounds> bounds = {
+                mbgl::LatLngBounds::hull(mbgl::LatLng { -45.0, -170.0 }, mbgl::LatLng { 45.0, 170.0 }),  // inside
+                mbgl::LatLngBounds::hull(mbgl::LatLng { -45.0, -200.0 }, mbgl::LatLng { 45.0, -160.0 }), // left IDL
+                mbgl::LatLngBounds::hull(mbgl::LatLng { -45.0, 160.0 }, mbgl::LatLng { 45.0, 200.0 }),   // right IDL
+                mbgl::LatLngBounds::world()
+            };
+            static size_t nextBound = 0u;
+            static mbgl::AnnotationID boundAnnotationID = std::numeric_limits<mbgl::AnnotationID>::max();
+
+            mbgl::LatLngBounds bound = bounds[nextBound++];
+            nextBound = nextBound % bounds.size();
+
+            if (bound == mbgl::LatLngBounds::world()) {
+                view->map->setLatLngBounds({});
+                view->map->removeAnnotation(boundAnnotationID);
+                boundAnnotationID = std::numeric_limits<mbgl::AnnotationID>::max();
+                break;
+            } else {
+                view->map->setLatLngBounds(bound);
+            }
+
+            mbgl::Polygon<double> rect;
+            rect.push_back({
+                mbgl::Point<double>{ bound.west(), bound.north() },
+                mbgl::Point<double>{ bound.east(), bound.north() },
+                mbgl::Point<double>{ bound.east(), bound.south() },
+                mbgl::Point<double>{ bound.west(), bound.south() },
+            });
+
+            auto boundAnnotation = mbgl::FillAnnotation { rect, 0.5f, { view->makeRandomColor() }, { view->makeRandomColor() } };
+
+            if (boundAnnotationID == std::numeric_limits<mbgl::AnnotationID>::max()) {
+                boundAnnotationID = view->map->addAnnotation(boundAnnotation);
+            } else {
+                view->map->updateAnnotation(boundAnnotationID, boundAnnotation);
+            }
+        } break;
         }
     }
 
