@@ -419,7 +419,7 @@ struct ZoomInterpolatedAttribute {
 };
 
 template <class Attr>
-struct InterpolationUniform : gl::UniformScalar<InterpolationUniform<Attr>, float> {
+struct InterpolationUniform : gl::UniformScalar<float> {
     static auto name() {
         static const std::string name = Attr::name() + std::string("_t");
         return name.c_str();
