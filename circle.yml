@@ -544,14 +544,14 @@ jobs:
           name: Check code style
           command: make android-check
       - run:
+          name: Run Android unit tests
+          command: make run-android-unit-test
+      - run:
           name: Build libmapbox-gl.so for arm-v7
           command: make android-lib-arm-v7
       - run:
           name: Compile Core tests for arm-v7
           command: make android-test-lib-arm-v7
-      - run:
-          name: Test phone module
-          command: make run-android-unit-test
       - run:
           name: Generate Espresso sanity tests
           command: make test-code-android
