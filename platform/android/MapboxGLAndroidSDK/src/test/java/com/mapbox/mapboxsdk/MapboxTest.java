@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk;
 
 import android.content.Context;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -68,12 +69,27 @@ public class MapboxTest {
     assertFalse(Mapbox.isAccessTokenValid("blabla"));
   }
 
+  @After
+  public void after() {
+    clearMapboxSingleton();
+  }
+
   private void injectMapboxSingleton(String accessToken) {
     Mapbox mapbox = new Mapbox(context, accessToken);
     try {
       Field field = Mapbox.class.getDeclaredField("INSTANCE");
       field.setAccessible(true);
       field.set(mapbox, mapbox);
+    } catch (Exception exception) {
+      throw new AssertionError();
+    }
+  }
+
+  private void clearMapboxSingleton() {
+    try {
+      Field field = Mapbox.class.getDeclaredField("INSTANCE");
+      field.setAccessible(true);
+      field.set(field, null);
     } catch (Exception exception) {
       throw new AssertionError();
     }
