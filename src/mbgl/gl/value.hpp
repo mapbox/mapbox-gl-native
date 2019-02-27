@@ -126,18 +126,18 @@ struct Blend {
 };
 
 struct BlendEquation {
-    using Type = gfx::ColorMode::BlendEquation;
-    static const constexpr Type Default = gfx::ColorMode::BlendEquation::Add;
+    using Type = gfx::ColorBlendEquationType;
+    static const constexpr Type Default = gfx::ColorBlendEquationType::Add;
     static void Set(const Type&);
     static Type Get();
 };
 
 struct BlendFunc {
     struct Type {
-        gfx::ColorMode::BlendFactor sfactor;
-        gfx::ColorMode::BlendFactor dfactor;
+        gfx::ColorBlendFactorType sfactor;
+        gfx::ColorBlendFactorType dfactor;
     };
-    static const constexpr Type Default = { gfx::ColorMode::BlendFactor::One, gfx::ColorMode::BlendFactor::Zero };
+    static const constexpr Type Default = { gfx::ColorBlendFactorType::One, gfx::ColorBlendFactorType::Zero };
     static void Set(const Type&);
     static Type Get();
 };

@@ -1,4 +1,5 @@
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/enum.hpp>
 #include <mbgl/gl/debugging_extension.hpp>
 #include <mbgl/gl/vertex_array_extension.hpp>
 #include <mbgl/gl/program_binary_extension.hpp>
@@ -735,7 +736,7 @@ void Context::setColorMode(const gfx::ColorMode& color) {
         blend = true;
         blendColor = color.blendColor;
         apply_visitor([&] (const auto& blendFunction) {
-            blendEquation = gfx::ColorMode::BlendEquation(blendFunction.equation);
+            blendEquation = gfx::ColorBlendEquationType(blendFunction.equation);
             blendFunc = { blendFunction.srcFactor, blendFunction.dstFactor };
         }, color.blendFunction);
     }
@@ -743,24 +744,11 @@ void Context::setColorMode(const gfx::ColorMode& color) {
     colorMask = color.mask;
 }
 
-GLenum toGLenum(const gfx::PrimitiveType primitiveType) {
-    switch (primitiveType) {
-        case gfx::PrimitiveType::Points: return GL_POINTS;
-        case gfx::PrimitiveType::Lines: return GL_LINES;
-        case gfx::PrimitiveType::LineLoop: return GL_LINE_LOOP;
-        case gfx::PrimitiveType::LineStrip: return GL_LINE_STRIP;
-        case gfx::PrimitiveType::Triangles: return GL_TRIANGLES;
-        case gfx::PrimitiveType::TriangleStrip: return GL_TRIANGLE_STRIP;
-        case gfx::PrimitiveType::TriangleFan: return GL_TRIANGLE_FAN;
-    }
-    return GL_INVALID_ENUM;
-}
-
 void Context::draw(gfx::PrimitiveType primitiveType,
                    std::size_t indexOffset,
                    std::size_t indexLength) {
     MBGL_CHECK_ERROR(glDrawElements(
-        toGLenum(primitiveType),
+        Enum<gfx::PrimitiveType>::to(primitiveType),
         static_cast<GLsizei>(indexLength),
         GL_UNSIGNED_SHORT,
         reinterpret_cast<GLvoid*>(sizeof(uint16_t) * indexOffset)));
