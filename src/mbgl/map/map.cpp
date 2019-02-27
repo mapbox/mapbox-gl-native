@@ -187,6 +187,11 @@ void Map::resetPosition(const EdgeInsets& padding) {
 
 #pragma mark - Zoom
 
+void Map::scaleBy(double scale, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
+    double zoom = getZoom() + impl->transform.getState().scaleZoom(scale);
+    easeTo(CameraOptions().withZoom(zoom).withAnchor(anchor), animation);
+}
+
 void Map::setZoom(double zoom, const AnimationOptions& animation) {
     easeTo(CameraOptions().withZoom(zoom), animation);
 }

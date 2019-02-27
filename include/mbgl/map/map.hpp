@@ -81,6 +81,7 @@ public:
     void resetPosition(const EdgeInsets& = {});
 
     // Zoom
+    void scaleBy(double scale, optional<ScreenCoordinate> anchor, const AnimationOptions& animation);
     void setZoom(double zoom, const AnimationOptions& = {});
     void setZoom(double zoom, optional<ScreenCoordinate>, const AnimationOptions& = {});
     void setZoom(double zoom, const EdgeInsets&, const AnimationOptions& = {});
