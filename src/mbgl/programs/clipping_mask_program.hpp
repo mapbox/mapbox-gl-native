@@ -12,7 +12,7 @@ class ClippingMaskProgram : public Program<
     shaders::clipping_mask,
     gl::Triangle,
     PositionOnlyLayoutAttributes,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix>,
     style::Properties<>>
 {

@@ -17,7 +17,7 @@ namespace mbgl {
 template <class Shaders,
           class Primitive,
           class LayoutAttrs,
-          class Uniforms,
+          class UniformTypeList,
           class PaintProps>
 class Program {
 public:
@@ -29,9 +29,9 @@ public:
     using PaintAttributes = typename PaintPropertyBinders::Attributes;
     using Attributes = gl::ConcatenateAttributes<LayoutAttributes, PaintAttributes>;
 
-    using UniformValues = typename Uniforms::Values;
-    using PaintUniforms = typename PaintPropertyBinders::Uniforms;
-    using AllUniforms = gl::ConcatenateUniforms<Uniforms, PaintUniforms>;
+    using UniformValues = gfx::UniformValues<UniformTypeList>;
+    using PaintUniformTypeList = typename PaintPropertyBinders::UniformTypeList;
+    using AllUniforms = typename TypeListConcat<UniformTypeList, PaintUniformTypeList>::template ExpandInto<gl::Uniforms>;
 
     using ProgramType = gl::Program<Primitive, Attributes, AllUniforms>;
 

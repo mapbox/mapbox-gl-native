@@ -34,18 +34,13 @@ struct FillExtrusionLayoutAttributes : gl::Attributes<
     attributes::a_normal_ed>
 {};
 
-struct FillExtrusionUniforms : gl::Uniforms<
+using FillExtrusionUniforms = TypeList<
     uniforms::u_matrix,
     uniforms::u_lightcolor,
     uniforms::u_lightpos,
-    uniforms::u_lightintensity>
-{
-    static Values values(mat4,
-                         const TransformState&,
-                         const EvaluatedLight&);
-};
+    uniforms::u_lightintensity>;
 
-struct FillExtrusionPatternUniforms : gl::Uniforms<
+using FillExtrusionPatternUniforms = TypeList<
     uniforms::u_matrix,
     uniforms::u_scale,
     uniforms::u_texsize,
@@ -56,17 +51,7 @@ struct FillExtrusionPatternUniforms : gl::Uniforms<
     uniforms::u_height_factor,
     uniforms::u_lightcolor,
     uniforms::u_lightpos,
-    uniforms::u_lightintensity>
-{
-    static Values values(mat4,
-                         Size atlasSize,
-                         const CrossfadeParameters&,
-                         const UnwrappedTileID&,
-                         const TransformState&,
-                         const float heightFactor,
-                         const float pixelRatio,
-                         const EvaluatedLight&);
-};
+    uniforms::u_lightintensity>;
 
 class FillExtrusionProgram : public Program<
     shaders::fill_extrusion,
@@ -97,6 +82,11 @@ public:
             }}
         };
     }
+
+    static UniformValues uniformValues(mat4,
+                                       const TransformState&,
+                                       const EvaluatedLight&);
+
 };
 
 class FillExtrusionPatternProgram : public Program<
@@ -108,6 +98,15 @@ class FillExtrusionPatternProgram : public Program<
 {
 public:
     using Program::Program;
+
+    static UniformValues uniformValues(mat4,
+                                       Size atlasSize,
+                                       const CrossfadeParameters&,
+                                       const UnwrappedTileID&,
+                                       const TransformState&,
+                                       const float heightFactor,
+                                       const float pixelRatio,
+                                       const EvaluatedLight&);
 };
 
 using FillExtrusionLayoutVertex = FillExtrusionProgram::LayoutVertex;

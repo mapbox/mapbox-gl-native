@@ -10,14 +10,14 @@
 namespace mbgl {
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_color_ramp);
+MBGL_DEFINE_UNIFORM_SCALAR(uint32_t, u_color_ramp);
 } // namespace uniforms
 
 class HeatmapTextureProgram : public Program<
     shaders::heatmap_texture,
     gl::Triangle,
     gl::Attributes<attributes::a_pos>,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix,
         uniforms::u_world,
         uniforms::u_image,

@@ -166,7 +166,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                 paintPropertyBinders.setPatternParameters(patternPosA, patternPosB, crossfade);
 
                 const auto allUniformValues = programInstance.computeAllUniformValues(
-                    FillPatternUniforms::values(
+                    FillPatternProgram::uniformValues(
                         tile.translatedMatrix(evaluated.get<FillTranslate>(),
                                               evaluated.get<FillTranslateAnchor>(),
                                               parameters.state),

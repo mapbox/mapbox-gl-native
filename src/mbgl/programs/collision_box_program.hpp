@@ -29,7 +29,7 @@ class CollisionBoxProgram : public Program<
     shaders::collision_box,
     gl::Line,
     gl::ConcatenateAttributes<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix,
         uniforms::u_extrude_scale,
         uniforms::u_camera_to_center_distance>,
@@ -109,7 +109,7 @@ class CollisionCircleProgram : public Program<
     shaders::collision_circle,
     gl::Triangle,
     gl::ConcatenateAttributes<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix,
         uniforms::u_extrude_scale,
         uniforms::u_overscale_factor,

@@ -24,7 +24,7 @@ class HillshadeProgram : public Program<
     gl::Attributes<
         attributes::a_pos,
         attributes::a_texture_pos>,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix,
         uniforms::u_image,
         uniforms::u_highlight,

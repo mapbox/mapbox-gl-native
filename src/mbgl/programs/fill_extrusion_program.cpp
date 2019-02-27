@@ -31,11 +31,11 @@ float lightIntensity(const EvaluatedLight& light) {
     return light.get<LightIntensity>();
 }
 
-FillExtrusionUniforms::Values
-FillExtrusionUniforms::values(mat4 matrix,
-                              const TransformState& state,
-                              const EvaluatedLight& light) {
-    return FillExtrusionUniforms::Values{
+FillExtrusionProgram::UniformValues
+FillExtrusionProgram::uniformValues(mat4 matrix,
+                                    const TransformState& state,
+                                    const EvaluatedLight& light) {
+    return {
         uniforms::u_matrix::Value( matrix ),
         uniforms::u_lightcolor::Value( lightColor(light) ),
         uniforms::u_lightpos::Value( lightPosition(light, state) ),
@@ -43,21 +43,21 @@ FillExtrusionUniforms::values(mat4 matrix,
     };
 }
 
-FillExtrusionPatternUniforms::Values
-FillExtrusionPatternUniforms::values(mat4 matrix,
-                                     Size atlasSize,
-                                     const CrossfadeParameters& crossfade,
-                                     const UnwrappedTileID& tileID,
-                                     const TransformState& state,
-                                     const float heightFactor,
-                                     const float pixelRatio,
-                                     const EvaluatedLight& light) {
+FillExtrusionPatternProgram::UniformValues
+FillExtrusionPatternProgram::uniformValues(mat4 matrix,
+                                           Size atlasSize,
+                                           const CrossfadeParameters& crossfade,
+                                           const UnwrappedTileID& tileID,
+                                           const TransformState& state,
+                                           const float heightFactor,
+                                           const float pixelRatio,
+                                           const EvaluatedLight& light) {
     const auto tileRatio = 1 / tileID.pixelsToTileUnits(1, state.getIntegerZoom());
     int32_t tileSizeAtNearestZoom = util::tileSize * state.zoomScale(state.getIntegerZoom() - tileID.canonical.z);
     int32_t pixelX = tileSizeAtNearestZoom * (tileID.canonical.x + tileID.wrap * state.zoomScale(tileID.canonical.z));
     int32_t pixelY = tileSizeAtNearestZoom * tileID.canonical.y;
 
-    return FillExtrusionPatternUniforms::Values{
+    return {
         uniforms::u_matrix::Value( matrix ),
         uniforms::u_scale::Value( {{pixelRatio, tileRatio, crossfade.fromScale, crossfade.toScale}} ),
         uniforms::u_texsize::Value( atlasSize ),

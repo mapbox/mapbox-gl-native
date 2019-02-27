@@ -32,44 +32,22 @@ ActiveUniforms activeUniforms(ProgramID);
 
 #endif
 
-template <class T>
-class Uniform {
+template <class Value>
+class UniformState {
 public:
-    using Value = T;
+    UniformState(UniformLocation location_) : location(std::move(location_)) {
+    }
 
-    class State {
-    public:
-        State(UniformLocation location_) : location(std::move(location_)) {}
-
-        void operator=(const Value& value) {
-            if (location >= 0 && (!current || *current != value)) {
-                current = value;
-                bindUniform(location, value);
-            }
+    void operator=(const Value& value) {
+        if (location >= 0 && (!current || *current != value)) {
+            current = value;
+            bindUniform(location, value);
         }
+    }
 
-        UniformLocation location;
-        optional<T> current = {};
-    };
+    UniformLocation location;
+    optional<Value> current = {};
 };
-
-template <class T>
-using UniformScalar = Uniform<T>;
-
-template <class T, size_t N>
-using UniformVector = Uniform<std::array<T, N>>;
-
-template <class T, size_t N>
-using UniformMatrix = Uniform<std::array<T, N*N>>;
-
-#define MBGL_DEFINE_UNIFORM_SCALAR(type_, name_) \
-    struct name_ : ::mbgl::gl::UniformScalar<type_> { static auto name() { return #name_; } }
-
-#define MBGL_DEFINE_UNIFORM_VECTOR(type_, n_, name_) \
-    struct name_ : ::mbgl::gl::UniformVector<type_, n_> { static auto name() { return #name_; } }
-
-#define MBGL_DEFINE_UNIFORM_MATRIX(type_, n_, name_) \
-    struct name_ : ::mbgl::gl::UniformMatrix<type_, n_> { static auto name() { return #name_; } }
 
 UniformLocation uniformLocation(ProgramID, const char * name);
 
@@ -77,7 +55,7 @@ template <class... Us>
 class Uniforms {
 public:
     using Types = TypeList<Us...>;
-    using State = IndexedTuple<TypeList<Us...>, TypeList<typename Us::State...>>;
+    using State = IndexedTuple<TypeList<Us...>, TypeList<UniformState<typename Us::Value>...>>;
     using Values = IndexedTuple<TypeList<Us...>, TypeList<typename Us::Value...>>;
     using NamedLocations = std::vector<std::pair<const std::string, UniformLocation>>;
 

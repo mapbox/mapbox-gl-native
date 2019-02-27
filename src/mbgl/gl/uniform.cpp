@@ -63,7 +63,7 @@ void bindUniform<bool>(UniformLocation location, const bool& t) {
 }
 
 template <>
-void bindUniform<uint8_t>(UniformLocation location, const uint8_t& t) {
+void bindUniform<uint32_t>(UniformLocation location, const uint32_t& t) {
     bindUniform(location, int32_t(t));
 }
 
@@ -153,7 +153,7 @@ bool verifyUniform<bool>(const ActiveUniform& uniform) {
 }
 
 template <>
-bool verifyUniform<uint8_t>(const ActiveUniform& uniform) {
+bool verifyUniform<uint32_t>(const ActiveUniform& uniform) {
     assert(uniform.size == 1 &&
            (uniform.type == UniformDataType::Int ||
             uniform.type == UniformDataType::Float ||

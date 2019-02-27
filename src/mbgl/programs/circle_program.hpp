@@ -18,7 +18,7 @@ class CircleProgram : public Program<
     gl::Triangle,
     gl::Attributes<
         attributes::a_pos>,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix,
         uniforms::u_scale_with_map,
         uniforms::u_extrude_scale,

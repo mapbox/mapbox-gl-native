@@ -10,8 +10,8 @@
 namespace mbgl {
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_image0);
-MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_image1);
+MBGL_DEFINE_UNIFORM_SCALAR(uint32_t, u_image0);
+MBGL_DEFINE_UNIFORM_SCALAR(uint32_t, u_image1);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_fade_t);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_buffer_scale);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_brightness_low);
@@ -29,7 +29,7 @@ class RasterProgram : public Program<
     gl::Attributes<
         attributes::a_pos,
         attributes::a_texture_pos>,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix,
         uniforms::u_image0,
         uniforms::u_image1,

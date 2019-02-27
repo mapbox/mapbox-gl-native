@@ -21,13 +21,12 @@ template <class> class Faded;
 
 using BackgroundLayoutAttributes = PositionOnlyLayoutAttributes;
 
-struct BackgroundUniforms : gl::Uniforms<
+using BackgroundUniforms = TypeList<
     uniforms::u_matrix,
     uniforms::u_color,
-    uniforms::u_opacity>
-{};
+    uniforms::u_opacity>;
 
-struct BackgroundPatternUniforms : gl::Uniforms<
+using BackgroundPatternUniforms = TypeList<
     uniforms::u_matrix,
     uniforms::u_opacity,
     uniforms::u_texsize,
@@ -43,17 +42,7 @@ struct BackgroundPatternUniforms : gl::Uniforms<
     uniforms::u_image,
     uniforms::u_pixel_coord_upper,
     uniforms::u_pixel_coord_lower,
-    uniforms::u_tile_units_to_pixels>
-{
-    static Values values(mat4 matrix,
-                         float opacity,
-                         Size atlasSize,
-                         const ImagePosition&,
-                         const ImagePosition&,
-                         const CrossfadeParameters&,
-                         const UnwrappedTileID&,
-                         const TransformState&);
-};
+    uniforms::u_tile_units_to_pixels>;
 
 class BackgroundProgram : public Program<
     shaders::background,
@@ -75,6 +64,15 @@ class BackgroundPatternProgram : public Program<
 {
 public:
     using Program::Program;
+
+    static UniformValues uniformValues(mat4 matrix,
+                                       float opacity,
+                                       Size atlasSize,
+                                       const ImagePosition&,
+                                       const ImagePosition&,
+                                       const CrossfadeParameters&,
+                                       const UnwrappedTileID&,
+                                       const TransformState&);
 };
 
 using BackgroundLayoutVertex = BackgroundProgram::LayoutVertex;
