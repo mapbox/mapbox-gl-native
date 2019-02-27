@@ -10,8 +10,8 @@ using namespace style;
 
 static_assert(sizeof(FillLayoutVertex) == 4, "expected FillLayoutVertex size");
 
-FillPatternUniforms::Values
-FillPatternUniforms::values(mat4 matrix,
+FillPatternProgram::UniformValues
+FillPatternProgram::uniformValues(mat4 matrix,
                             Size framebufferSize,
                             Size atlasSize,
                             const CrossfadeParameters& crossfade,
@@ -24,7 +24,7 @@ FillPatternUniforms::values(mat4 matrix,
     int32_t pixelX = tileSizeAtNearestZoom * (tileID.canonical.x + tileID.wrap * state.zoomScale(tileID.canonical.z));
     int32_t pixelY = tileSizeAtNearestZoom * tileID.canonical.y;
 
-    return FillPatternUniforms::Values {
+    return {
         uniforms::u_matrix::Value( matrix ),
         uniforms::u_world::Value( framebufferSize ),
         uniforms::u_texsize::Value( atlasSize ),

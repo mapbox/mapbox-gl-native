@@ -13,7 +13,7 @@ class ExtrusionTextureProgram : public Program<
     shaders::extrusion_texture,
     gl::Triangle,
     gl::Attributes<attributes::a_pos>,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix,
         uniforms::u_world,
         uniforms::u_image,

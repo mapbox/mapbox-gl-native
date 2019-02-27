@@ -91,7 +91,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
             draw(
                 parameters.programs.getBackgroundLayerPrograms().backgroundPattern,
-                BackgroundPatternUniforms::values(
+                BackgroundPatternProgram::uniformValues(
                     parameters.matrixForTile(tileID),
                     evaluated.get<BackgroundOpacity>(),
                     parameters.imageManager.getPixelSize(),

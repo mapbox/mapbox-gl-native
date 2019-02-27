@@ -33,7 +33,7 @@ class TransformState;
 namespace uniforms {
 MBGL_DEFINE_UNIFORM_MATRIX(double, 4, u_gl_coord_matrix);
 MBGL_DEFINE_UNIFORM_MATRIX(double, 4, u_label_plane_matrix);
-MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_texture);
+MBGL_DEFINE_UNIFORM_SCALAR(uint32_t, u_texture);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_is_halo);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_gamma_scale);
 
@@ -109,12 +109,12 @@ class SymbolSizeBinder {
 public:
     virtual ~SymbolSizeBinder() = default;
 
-    using Uniforms = gl::Uniforms<
+    using UniformTypeList = TypeList<
         uniforms::u_is_size_zoom_constant,
         uniforms::u_is_size_feature_constant,
         uniforms::u_size_t,
         uniforms::u_size>;
-    using UniformValues = Uniforms::Values;
+    using UniformValues = gfx::UniformValues<UniformTypeList>;
 
     static std::unique_ptr<SymbolSizeBinder> create(const float tileZoom,
                                                     const style::PropertyValue<float>& sizeProperty,
@@ -246,7 +246,7 @@ public:
 template <class Shaders,
           class Primitive,
           class LayoutAttrs,
-          class Uniforms,
+          class UniformTypeList,
           class PaintProps>
 class SymbolProgram {
 public:
@@ -260,10 +260,10 @@ public:
     using PaintAttributes = typename PaintPropertyBinders::Attributes;
     using Attributes = gl::ConcatenateAttributes<LayoutAndSizeAttributes, PaintAttributes>;
 
-    using UniformValues = typename Uniforms::Values;
-    using SizeUniforms = typename SymbolSizeBinder::Uniforms;
-    using PaintUniforms = typename PaintPropertyBinders::Uniforms;
-    using AllUniforms = gl::ConcatenateUniforms<Uniforms, SizeUniforms, PaintUniforms>;
+    using UniformValues = gfx::UniformValues<UniformTypeList>;
+    using SizeUniformTypeList = typename SymbolSizeBinder::UniformTypeList;
+    using PaintUniformTypeList = typename PaintPropertyBinders::UniformTypeList;
+    using AllUniforms = typename TypeListConcat<UniformTypeList, SizeUniformTypeList, PaintUniformTypeList>::template ExpandInto<gl::Uniforms>;
 
     using ProgramType = gl::Program<Primitive, Attributes, AllUniforms>;
 
@@ -346,7 +346,7 @@ class SymbolIconProgram : public SymbolProgram<
     shaders::symbol_icon,
     gl::Triangle,
     SymbolLayoutAttributes,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix,
         uniforms::u_label_plane_matrix,
         uniforms::u_gl_coord_matrix,
@@ -385,7 +385,7 @@ class SymbolSDFProgram : public SymbolProgram<
     shaders::symbol_sdf,
     gl::Triangle,
     SymbolLayoutAttributes,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix,
         uniforms::u_label_plane_matrix,
         uniforms::u_gl_coord_matrix,
@@ -407,7 +407,7 @@ public:
     using BaseProgram = SymbolProgram<shaders::symbol_sdf,
         gl::Triangle,
         SymbolLayoutAttributes,
-        gl::Uniforms<
+        TypeList<
             uniforms::u_matrix,
             uniforms::u_label_plane_matrix,
             uniforms::u_gl_coord_matrix,

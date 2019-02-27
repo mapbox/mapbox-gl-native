@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/gfx/uniform.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
@@ -419,7 +420,8 @@ struct ZoomInterpolatedAttribute {
 };
 
 template <class Attr>
-struct InterpolationUniform : gl::UniformScalar<float> {
+struct InterpolationUniformType {
+    using Value = float;
     static auto name() {
         static const std::string name = Attr::name() + std::string("_t");
         return name.c_str();
@@ -439,7 +441,7 @@ private:
     struct Detail<T, UniformValueType, PossiblyEvaluatedType, TypeList<As...>> {
         using Binder = PaintPropertyBinder<T, UniformValueType, PossiblyEvaluatedType, typename As::Type...>;
         using ZoomInterpolatedAttributeList = TypeList<ZoomInterpolatedAttribute<As>...>;
-        using InterpolationUniformList = TypeList<InterpolationUniform<As>...>;
+        using InterpolationUniformTypeList = TypeList<InterpolationUniformType<As>...>;
     };
 
     template <class P>
@@ -483,7 +485,7 @@ public:
     template <class P>
     using ZoomInterpolatedAttributeList = typename Property<P>::ZoomInterpolatedAttributeList;
     template <class P>
-    using InterpolationUniformList = typename Property<P>::InterpolationUniformList;
+    using InterpolationUniformTypeList = typename Property<P>::InterpolationUniformTypeList;
 
     using Attributes = typename TypeListConcat<ZoomInterpolatedAttributeList<Ps>...>::template ExpandInto<gl::Attributes>;
     using AttributeBindings = typename Attributes::Bindings;
@@ -495,8 +497,9 @@ public:
         ) };
     }
 
-    using Uniforms = typename TypeListConcat<InterpolationUniformList<Ps>..., typename Ps::Uniforms...>::template ExpandInto<gl::Uniforms>;
-    using UniformValues = typename Uniforms::Values;
+    using UniformTypeList = TypeListConcat<InterpolationUniformTypeList<Ps>..., typename Ps::Uniforms...>;
+    using UniformValues = gfx::UniformValues<UniformTypeList>;
+    using Uniforms = typename UniformTypeList::template ExpandInto<gl::Uniforms>;
 
     template <class EvaluatedProperties>
     UniformValues uniformValues(float currentZoom, EvaluatedProperties& currentProperties) const {

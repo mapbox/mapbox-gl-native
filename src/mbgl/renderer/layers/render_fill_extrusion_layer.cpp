@@ -114,7 +114,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 draw(
                     parameters.programs.getFillExtrusionLayerPrograms().fillExtrusion.get(evaluated),
                     bucket,
-                    FillExtrusionUniforms::values(
+                    FillExtrusionProgram::uniformValues(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
                                                   evaluated.get<FillExtrusionTranslateAnchor>(),
                                                   parameters.state),
@@ -141,7 +141,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 draw(
                     parameters.programs.getFillExtrusionLayerPrograms().fillExtrusionPattern.get(evaluated),
                     bucket,
-                    FillExtrusionPatternUniforms::values(
+                    FillExtrusionPatternProgram::uniformValues(
                         tile.translatedClipMatrix(evaluated.get<FillExtrusionTranslate>(),
                                                   evaluated.get<FillExtrusionTranslateAnchor>(),
                                                   parameters.state),

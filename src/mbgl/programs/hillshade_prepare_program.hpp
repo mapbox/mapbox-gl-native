@@ -19,7 +19,7 @@ class HillshadePrepareProgram : public Program<
     gl::Attributes<
         attributes::a_pos,
         attributes::a_texture_pos>,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix,
         uniforms::u_dimension,
         uniforms::u_zoom,

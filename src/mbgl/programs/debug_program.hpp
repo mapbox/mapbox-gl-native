@@ -13,7 +13,7 @@ class DebugProgram : public Program<
     gl::Line,
     gl::Attributes<
         attributes::a_pos>,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix,
         uniforms::u_color>,
     style::Properties<>>

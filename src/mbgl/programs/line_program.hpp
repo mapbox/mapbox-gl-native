@@ -38,7 +38,7 @@ class LineProgram : public Program<
     shaders::line,
     gl::Triangle,
     LineLayoutAttributes,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix,
         uniforms::u_ratio,
         uniforms::u_gl_units_to_pixels>,
@@ -102,7 +102,7 @@ class LinePatternProgram : public Program<
     shaders::line_pattern,
     gl::Triangle,
     LineLayoutAttributes,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix,
         uniforms::u_ratio,
         uniforms::u_gl_units_to_pixels,
@@ -128,7 +128,7 @@ class LineSDFProgram : public Program<
     shaders::line_sdf,
     gl::Triangle,
     LineLayoutAttributes,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix,
         uniforms::u_ratio,
         uniforms::u_gl_units_to_pixels,
@@ -159,7 +159,7 @@ class LineGradientProgram : public Program<
     shaders::line_gradient,
     gl::Triangle,
     LineLayoutAttributes,
-    gl::Uniforms<
+    TypeList<
         uniforms::u_matrix,
         uniforms::u_ratio,
         uniforms::u_gl_units_to_pixels,

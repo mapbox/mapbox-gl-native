@@ -23,12 +23,11 @@ template <class> class Faded;
 
 using FillLayoutAttributes = PositionOnlyLayoutAttributes;
 
-struct FillUniforms : gl::Uniforms<
+using FillUniforms = TypeList<
     uniforms::u_matrix,
-    uniforms::u_world>
-{};
+    uniforms::u_world>;
 
-struct FillPatternUniforms : gl::Uniforms<
+using FillPatternUniforms = TypeList<
     uniforms::u_matrix,
     uniforms::u_world,
     uniforms::u_texsize,
@@ -36,16 +35,7 @@ struct FillPatternUniforms : gl::Uniforms<
     uniforms::u_fade,
     uniforms::u_image,
     uniforms::u_pixel_coord_upper,
-    uniforms::u_pixel_coord_lower>
-{
-    static Values values(mat4 matrix,
-                         Size framebufferSize,
-                         Size atlasSize,
-                         const CrossfadeParameters& crossfade,
-                         const UnwrappedTileID&,
-                         const TransformState&,
-                         const float pixelRatio);
-};
+    uniforms::u_pixel_coord_lower>;
 
 class FillProgram : public Program<
     shaders::fill,
@@ -76,6 +66,14 @@ class FillPatternProgram : public Program<
 {
 public:
     using Program::Program;
+
+    static UniformValues uniformValues(mat4 matrix,
+                                       Size framebufferSize,
+                                       Size atlasSize,
+                                       const CrossfadeParameters& crossfade,
+                                       const UnwrappedTileID&,
+                                       const TransformState&,
+                                       const float pixelRatio);
 };
 
 class FillOutlineProgram : public Program<

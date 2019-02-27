@@ -10,8 +10,8 @@ using namespace style;
 
 static_assert(sizeof(BackgroundLayoutVertex) == 4, "expected BackgroundLayoutVertex size");
 
-BackgroundPatternUniforms::Values
-BackgroundPatternUniforms::values(mat4 matrix,
+BackgroundPatternProgram::UniformValues
+BackgroundPatternProgram::uniformValues(mat4 matrix,
                                   float opacity,
                                   Size atlasSize,
                                   const ImagePosition& a,
@@ -24,7 +24,7 @@ BackgroundPatternUniforms::values(mat4 matrix,
     int32_t pixelX = tileSizeAtNearestZoom * (tileID.canonical.x + tileID.wrap * state.zoomScale(tileID.canonical.z));
     int32_t pixelY = tileSizeAtNearestZoom * tileID.canonical.y;
 
-    return BackgroundPatternUniforms::Values {
+    return {
         uniforms::u_matrix::Value( matrix ),
         uniforms::u_opacity::Value( opacity ),
         uniforms::u_texsize::Value( atlasSize ),
